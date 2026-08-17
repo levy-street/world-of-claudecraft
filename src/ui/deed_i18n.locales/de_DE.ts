@@ -33,19 +33,19 @@ export const table: DeedLocaleTable = {
     desc: 'Bereinige einen Riss vom Rang S, der schwersten Stufe, die ein Rissportal erzeugen kann.',
   },
   pvp_honor_sergeant: {
-    name: 'Sergeant',
+    name: 'Linienbrecher',
     desc: 'Verdiene im Laufe deines Lebens 10.000 Ehre. Sie auszugeben kostet dich nie den Rang.',
-    title: 'Sergeant',
+    title: 'Linienbrecher',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Ritter-Leutnant',
+    name: 'Feldverheerer',
     desc: 'Verdiene im Laufe deines Lebens 40.000 Ehre, eine Saison echten Krieges hinter dir.',
-    title: 'Ritter-Leutnant',
+    title: 'Feldverheerer',
   },
   pvp_honor_field_marshal: {
-    name: 'Feldmarschall',
+    name: 'Kriegsgekrönt',
     desc: 'Verdiene im Laufe deines Lebens 150.000 Ehre. Selten auf jedem Reich, und das sollte es auch sein.',
-    title: 'Feldmarschall',
+    title: 'Kriegsgekrönt',
   },
   chr_drakemaw_broodlord: {
     name: 'Gelegebrecher',
@@ -984,5 +984,49 @@ export const table: DeedLocaleTable = {
   prog_armorcrafting_rare: {
     name: 'Zur Perfektion gepanzert',
     desc: 'Fertige dein erstes seltenes Ausrüstungsstück in der Rüstungsherstellung.',
+  },
+  col_reliquary_rank_2: {
+    name: 'Beutewahrer',
+    desc: 'Erreiche Kustos-Rang 2 im Reliquiar (10 einzigartige katalogisierte Reliquien).',
+    title: 'Beutewahrer',
+  },
+  col_reliquary_rank_3: {
+    name: 'Der Katalogisierer',
+    desc: 'Erreiche Kustos-Rang 3 im Reliquiar (25 einzigartige katalogisierte Reliquien).',
+    title: 'der Katalogisierer',
+  },
+  col_reliquary_rank_4: {
+    name: 'Erzkustos',
+    desc: 'Erreiche Kustos-Rang 4 im Reliquiar (50 einzigartige katalogisierte Reliquien).',
+    title: 'Erzkustos',
+  },
+  col_reliquary_rank_5: {
+    name: 'Ewige Beute',
+    desc: 'Erreiche Kustos-Rang 5 im Reliquiar (100 einzigartige katalogisierte Reliquien).',
+  },
+  col_reliquary_complete: {
+    name: 'Das Große Reliquiar',
+    desc: 'Katalogisiere jede Reliquie des Reliquiars, die ein Charakter behalten kann. Ein späteres Wachstum des Katalogs nimmt sie dir nie wieder.',
+    title: 'Kustos des Gewölbes',
+  },
+  col_reliquary_conquerors: {
+    name: 'Regal der Eroberer',
+    desc: 'Katalogisiere jede Reliquie im Regal Eroberer des Reliquiars. Ein späteres Wachstum des Katalogs nimmt sie dir nie wieder.',
+    title: 'Gewölbebrecher',
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    name: 'Nythraxis illuminiert',
+    desc: 'Illuminiere die Seite Heroisch: Nythraxis-Schlachtzug des Reliquiars.',
+    title: 'Licht von Nythraxis',
+  },
+  col_reliquary_illum_thunzharr: {
+    name: 'Thunzharr illuminiert',
+    desc: 'Illuminiere die Seite Thunzharr, der Erwachende Gipfel des Reliquiars.',
+    title: 'Licht von Thunzharr',
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    name: 'Heiligtum illuminiert',
+    desc: 'Illuminiere die Seite Heroisch: Gravewyrm-Heiligtum des Reliquiars.',
+    title: 'Licht des Heiligtums',
   },
 };

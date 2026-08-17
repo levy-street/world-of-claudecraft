@@ -1,9 +1,11 @@
-import { existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { NodeIO } from '@gltf-transform/core';
+import { type Node, NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
 import { describe, expect, it } from 'vitest';
+import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 import {
   type ClipMap,
   manifestUrls,
@@ -13,7 +15,7 @@ import {
   visibleAttachmentsForGraphics,
   visualKeyFor,
 } from '../src/render/characters/manifest';
-import { NPCS } from '../src/sim/data';
+import { MOBS, NPCS } from '../src/sim/data';
 
 function expectedClipNames(clips: ClipMap): string[] {
   return [
@@ -63,6 +65,70 @@ async function glbAnimationNames(path: string): Promise<Set<string>> {
   );
 }
 
+async function glbRenderableContract(path: string): Promise<{
+  sceneMeshes: number;
+  scenePrimitives: number;
+  skinnedVertices: number;
+  defaultSceneNodes: number;
+  animations: Map<string, { channels: number; keyframes: number; duration: number }>;
+}> {
+  await MeshoptDecoder.ready;
+  const io = new NodeIO()
+    .registerExtensions(ALL_EXTENSIONS)
+    .registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
+  const root = (await io.read(path)).getRoot();
+  let sceneMeshes = 0;
+  let scenePrimitives = 0;
+  let skinnedVertices = 0;
+  const visited = new Set<Node>();
+  const visit = (node: Node): void => {
+    if (visited.has(node)) return;
+    visited.add(node);
+    const mesh = node.getMesh();
+    if (mesh) {
+      sceneMeshes++;
+      scenePrimitives += mesh.listPrimitives().length;
+      if (node.getSkin()) {
+        skinnedVertices += mesh
+          .listPrimitives()
+          .reduce(
+            (total, primitive) => total + (primitive.getAttribute('POSITION')?.getCount() ?? 0),
+            0,
+          );
+      }
+    }
+    for (const child of node.listChildren()) visit(child);
+  };
+  for (const node of root.getDefaultScene()?.listChildren() ?? []) visit(node);
+  return {
+    sceneMeshes,
+    scenePrimitives,
+    skinnedVertices,
+    defaultSceneNodes: visited.size,
+    animations: new Map(
+      root.listAnimations().map((animation) => {
+        let channels = 0;
+        let keyframes = 0;
+        let duration = 0;
+        for (const channel of animation.listChannels()) {
+          const target = channel.getTargetNode();
+          const sampler = channel.getSampler();
+          const input = sampler?.getInput();
+          if (!target || !visited.has(target) || !input) continue;
+          let channelDuration = 0;
+          keyframes += input.getCount();
+          for (const time of input.getArray() ?? []) {
+            channelDuration = Math.max(channelDuration, Number(time));
+          }
+          duration = Math.max(duration, channelDuration);
+          if (input.getCount() > 1 && channelDuration > 0) channels++;
+        }
+        return [animation.getName(), { channels, keyframes, duration }];
+      }),
+    ),
+  };
+}
+
 describe('character visual manifest', () => {
   it('keeps Bursar Fernando in his likeness atlas (the Eastbrook banker easter egg)', () => {
     // The maintainer-approved easter egg: black shoulder-length hair and light
@@ -70,7 +136,10 @@ describe('character visual manifest', () => {
     // always resolve skin 0; the mech precedent for a real index-0 texture).
     // The def must stay TINT-FREE: an entity tint would wash the repaint back
     // toward the gold villager look. Do not "clean up" any of the three.
-    const key = visualKeyFor({ kind: 'npc', templateId: 'bursar_fernando' } as never);
+    const key = visualKeyFor({
+      kind: 'npc',
+      templateId: 'bursar_fernando',
+    } as never);
     expect(key).toBe('npc_fernando');
     expect(VISUALS.npc_fernando.tint).toBeUndefined();
     const atlas = SKINS.npc_fernando?.[0];
@@ -121,6 +190,34 @@ describe('character visual manifest', () => {
     expect(VISUALS.mob_boar.deathTimeScale).toBeUndefined();
   });
 
+  it('uses the dedicated generated Lich form without player equipment', async () => {
+    const visual = VISUALS.form_metamorph;
+    expect(visual.url).toBe('models/chars/forms/metamorphosis.glb');
+    expect(visual.url).not.toContain('players/rogue');
+    expect(visual.url).not.toContain('creatures/demon');
+    expect(visual.attach).toBeUndefined();
+    expect(visual.show).toBeUndefined();
+    expect(visual.tint).toBeUndefined();
+    expect(visual.height).toBe(2.55);
+    expect(visual.yaw).toBe(-Math.PI / 2);
+    expect(visual.attackTimeScale).toBe(6);
+    expect(visual.deathTimeScale).toBe(3);
+    expect(visual.clips.idle).toBe('Idle');
+    expect(visual.clips.walk).toBe('Walk');
+    expect(visual.clips.run).toBe('Run');
+    expect(visual.clips.attack).toEqual(['Attack']);
+    expect(visual.clips.hit).toEqual(['Hit']);
+    expect(visual.clips.death).toBe('Death');
+    expect(visual.clips.cast).toBe('Cast');
+    expect(visual.clips.jump).toBeUndefined();
+    expect(VISUALS.form_lich).toBeUndefined();
+
+    const animationNames = await glbAnimationNames(`public/${visual.url}`);
+    expect(
+      [...new Set(expectedClipNames(visual.clips))].filter((name) => !animationNames.has(name)),
+    ).toEqual([]);
+  });
+
   it('renders the Nythraxis phase-2 court as Aldren / Malric / Voss, not generic skeletons', () => {
     // The heroic "Spirit of X" adds are the same characters risen again, so they
     // must reuse each named crypt boss's visual. Without the MOB_KEYS entries they
@@ -133,14 +230,20 @@ describe('character visual manifest', () => {
     ];
     for (const [addId, namedId] of court) {
       const addKey = visualKeyFor({ kind: 'mob', templateId: addId } as never);
-      const namedKey = visualKeyFor({ kind: 'mob', templateId: namedId } as never);
+      const namedKey = visualKeyFor({
+        kind: 'mob',
+        templateId: namedId,
+      } as never);
       expect(addKey, addId).toBe(namedKey);
       expect(addKey, addId).not.toBe('skel_minion');
     }
   });
 
   it('gives the summoned Water Elemental its own untinted animated water body', async () => {
-    const key = visualKeyFor({ kind: 'mob', templateId: 'water_elemental' } as never);
+    const key = visualKeyFor({
+      kind: 'mob',
+      templateId: 'water_elemental',
+    } as never);
     expect(key).toBe('mob_water_elemental');
 
     const visual = VISUALS[key];
@@ -154,6 +257,139 @@ describe('character visual manifest', () => {
     expect(
       [...new Set(expectedClipNames(visual.clips))].filter((name) => !animationNames.has(name)),
     ).toEqual([]);
+  });
+
+  it('renders Tithefiend as a tinted shadow creature instead of a generic bandit', () => {
+    const key = visualKeyFor({ kind: 'mob', templateId: 'guardian_tithefiend' } as never);
+    expect(key).toBe('mob_demonalt');
+    expect(VISUALS[key].tint).toBe('entity');
+  });
+
+  it('renders the three Stampede guardians as distinct beasts', () => {
+    const expected = [
+      ['guardian_stampede_0', 'greyjaw', 'models/creatures/greyjaw.glb'],
+      ['guardian_stampede_1', 'mob_boar', 'models/creatures/wild_boar.glb'],
+      ['guardian_stampede_2', 'mob_raptor', 'models/creatures/velociraptor.glb'],
+    ] as const;
+    for (const [templateId, visualKey, model] of expected) {
+      const key = visualKeyFor({ kind: 'mob', templateId } as never);
+      expect(key, templateId).toBe(visualKey);
+      expect(VISUALS[key].url, templateId).toBe(model);
+    }
+    expect(new Set(expected.map(([, key]) => key)).size).toBe(expected.length);
+  });
+
+  it('gives the Necromancer Gravewing its dedicated generated creature visual', async () => {
+    const key = visualKeyFor({
+      kind: 'mob',
+      templateId: 'necromancy_gravewing',
+    } as never);
+    expect(key).toBe('mob_gravewing');
+
+    const visual = VISUALS[key];
+    expect(visual.url).toBe('models/creatures/gravewing.glb');
+    expect(visual.height).toBe(2.4);
+    expect(visual.yaw).toBe(-Math.PI / 2);
+    expect(visual.attackTimeScale).toBe(6);
+    expect(visual.tint).toBeUndefined();
+    expect(visual.clips.cast).toBeUndefined();
+
+    const animationNames = await glbAnimationNames(`public/${visual.url}`);
+    expect(animationNames.size).toBeGreaterThan(0);
+    expect(
+      [...new Set(expectedClipNames(visual.clips))].filter((name) => !animationNames.has(name)),
+    ).toEqual([]);
+  });
+
+  it('routes the Destruction summons to their dedicated untinted fel rigs', async () => {
+    const summons = [
+      {
+        templateId: 'emberkin',
+        key: 'mob_emberkin',
+        url: 'models/creatures/emberkin.glb',
+        height: 2.1,
+        scale: 0.55,
+      },
+      {
+        templateId: 'gloomshade',
+        key: 'mob_gloomshade',
+        url: 'models/creatures/gloomshade_abyssal_guardian.glb',
+        height: 2.6,
+        scale: 1.15,
+      },
+      {
+        templateId: 'pyre_colossus',
+        key: 'mob_pyre_colossus',
+        url: 'models/creatures/pyre_colossus.glb',
+        height: 2.5,
+        scale: 1.7,
+      },
+    ] as const;
+
+    for (const summon of summons) {
+      const key = visualKeyFor({
+        kind: 'mob',
+        templateId: summon.templateId,
+      } as never);
+      expect(key).toBe(summon.key);
+
+      const visual = VISUALS[key];
+      expect(visual.url).toBe(summon.url);
+      expect(visual.height).toBe(summon.height);
+      expect(MOBS[summon.templateId].scale).toBe(summon.scale);
+      expect(visual.height * (MOBS[summon.templateId].scale ?? 1)).toBeCloseTo(
+        summon.height * summon.scale,
+      );
+      expect(visual.yaw).toBe(-Math.PI / 2);
+      expect(visual.attackTimeScale).toBe(6);
+      expect(visual.deathTimeScale).toBe(3);
+      expect(visual.tint).toBeUndefined();
+      expect(visual.clips).toMatchObject({
+        idle: 'Idle',
+        walk: 'Walk',
+        run: 'Run',
+        death: 'Death',
+        cast: 'Cast',
+        jump: 'Jump',
+        attack: ['Attack'],
+        hit: ['Hit'],
+      });
+      if (summon.templateId === 'emberkin') {
+        expect(visual.clips.attackByAbility).toEqual({ emberkin_felbolt: 'Cast' });
+      }
+      if (summon.templateId === 'gloomshade') {
+        expect(visual.clips.attackByAbility).toEqual({
+          gloomshade_abyssal_chain: 'Cast',
+        });
+      }
+
+      const publicPath = `public/${visual.url}`;
+      const animationNames = await glbAnimationNames(publicPath);
+      const requiredClips = [...new Set(expectedClipNames(visual.clips))];
+      expect(requiredClips.filter((name) => !animationNames.has(name))).toEqual([]);
+      const renderable = await glbRenderableContract(publicPath);
+      expect(renderable.sceneMeshes).toBeGreaterThan(0);
+      expect(renderable.scenePrimitives).toBeGreaterThan(0);
+      expect(renderable.skinnedVertices).toBeGreaterThan(0);
+      expect(renderable.defaultSceneNodes).toBeGreaterThan(0);
+      for (const clip of requiredClips) {
+        const animation = renderable.animations.get(clip);
+        expect(animation?.channels, `${summon.templateId} ${clip} channels`).toBeGreaterThan(0);
+        expect(animation?.keyframes, `${summon.templateId} ${clip} keyframes`).toBeGreaterThan(1);
+        expect(animation?.duration, `${summon.templateId} ${clip} duration`).toBeGreaterThan(0);
+      }
+      if (summon.templateId === 'gloomshade') {
+        const binary = readFileSync(publicPath);
+        expect(binary.byteLength).toBeLessThanOrEqual(1536 * 1024);
+      }
+      const digest = createHash('sha256')
+        .update(readFileSync(publicPath))
+        .digest('hex')
+        .slice(0, 12);
+      expect(MEDIA_ASSETS[visual.url]).toBe(
+        `/media/${visual.url.replace(/\.glb$/, `.${digest}.glb`)}`,
+      );
+    }
   });
 
   it('points the Combat Mech manifest at animation clips baked into the GLB', async () => {
@@ -216,9 +452,18 @@ describe('character visual manifest', () => {
     const byUrl = new Map<string, Set<string>>();
     for (const key of ['form_cat', 'mob_wolf', 'greyjaw'] as const) {
       const visual = VISUALS[key];
-      const animationNames =
-        byUrl.get(visual.url) ?? (await glbAnimationNames(`public/${visual.url}`));
-      byUrl.set(visual.url, animationNames);
+      const baseNames = byUrl.get(visual.url) ?? (await glbAnimationNames(`public/${visual.url}`));
+      byUrl.set(visual.url, baseNames);
+
+      // A bespoke clip (e.g. greyjaw's Greyjaw_Attack) can live in a separate
+      // mesh-free animUrls donor GLB instead of the base rig, same pattern as
+      // player_mage/mob_elemental; the runtime merges both into one clip pool
+      // (assets.ts), so the existence check must too.
+      const animationNames = new Set(baseNames);
+      for (const animUrl of visual.animUrls ?? []) {
+        const donorNames = await glbAnimationNames(`public/${animUrl}`);
+        for (const name of donorNames) animationNames.add(name);
+      }
 
       expect(animationNames.size).toBeGreaterThan(0);
       expect(
@@ -302,9 +547,35 @@ describe('character visual manifest', () => {
       const doc = await io.read(`public/${visual.url}`);
       const animations = doc.getRoot().listAnimations();
       const names = new Set(animations.map((animation) => animation.getName()));
+      // A bespoke attack/cast clip (e.g. mob_wildheart_stalker's Wildheart_Stalker_Attack,
+      // scripts/build_wildheart_stalker_anims.mjs; mob_wildheart_hexcaller's
+      // Wildheart_Hexcaller_Attack, scripts/build_wildheart_hexcaller_anims.mjs; or
+      // mob_wildheart_high_priest's Wildheart_High_Priest_Attack,
+      // scripts/build_wildheart_high_priest_anims.mjs) ships mesh-free in its own
+      // animUrls companion GLB, not the base rig GLB this test re-cuts; merge every
+      // animUrls donor's clip names in too, same as the general animUrls-aware gate in
+      // tests/character_clipmaps.test.ts.
+      for (const url of visual.animUrls ?? []) {
+        const donorNames = await glbAnimationNames(`public/${url}`);
+        for (const name of donorNames) names.add(name);
+      }
       expect(names.size).toBeGreaterThan(0);
+      // animUrls donors (e.g. mob_wildheart_ravager's Wildheart_Ravager_Attack,
+      // Hit_Stagger, issue #2889 round 2) ship extra clips in a separate
+      // mesh-free GLB alongside the base rig; merge their names in before
+      // checking every clip the ClipMap references actually resolves
+      // somewhere. durationOf and the Death end-vs-start check below stay on
+      // the base-only `names`/`animations`, since none of those checks touch
+      // a donor-only clip.
+      const namesWithDonors = new Set(names);
+      for (const donorUrl of visual.animUrls ?? []) {
+        const donorDoc = await io.read(`public/${donorUrl}`);
+        for (const donorAnimation of donorDoc.getRoot().listAnimations()) {
+          namesWithDonors.add(donorAnimation.getName());
+        }
+      }
       expect(
-        [...new Set(expectedClipNames(visual.clips))].filter((name) => !names.has(name)),
+        [...new Set(expectedClipNames(visual.clips))].filter((name) => !namesWithDonors.has(name)),
         key,
       ).toEqual([]);
 

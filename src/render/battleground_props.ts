@@ -7,13 +7,13 @@
 //
 // Graphics fairness: a carried flag's position is actionable info, so the flag
 // is plainly visible on EVERY tier (unlit pennant + pole), and the carried-state
-// dressing (the lean and the team-color carrier ring) is built and driven
+// dressing (the lean) is built and driven
 // unconditionally. High tiers only boost the pennant color for bloom pop
 // (cosmetic); the rune's point light is likewise cosmetic richness on top of
 // the always-on additive glow.
 //
 // Each built group carries `userData.bg` (BgObjectRefs): the per-frame handles
-// battleground_fx.ts animates (the flag lean pivot + carrier ring, the rune gem
+// battleground_fx.ts animates (the flag lean pivot, the rune gem
 // spinner). The refs point at child objects the renderer never touches; the
 // group's own position/rotation stay renderer-owned.
 import * as THREE from 'three';
@@ -41,9 +41,6 @@ const FLAG_GOLD = 0xd8b34a;
 const PENNANT_W = 1.15;
 const PENNANT_H = 0.75;
 const PENNANT_BLOOM_BOOST = 1.6; // high-tier color multiplier (bloom pop only)
-const CARRY_RING_INNER = 0.62;
-const CARRY_RING_OUTER = 0.95;
-const CARRY_RING_Y = 0.06;
 const RUNE_DISC_R = 1.05;
 const RUNE_DISC_Y = 0.08;
 const RUNE_GEM_SIZE = 0.42;
@@ -62,7 +59,6 @@ export type BgObjectRefs =
       team: number; // 0 = Crimson, 1 = Azure (bgInfo.match.flags index)
       color: number;
       lean: THREE.Group; // pole + pennant pivot: yawed to the carrier, tilted while carried
-      ring: THREE.Mesh; // team-color carrier ring, visible only while carried
     }
   | {
       kind: 'rune';
@@ -79,7 +75,6 @@ let flagFinialGeo: THREE.ConeGeometry | null = null;
 let flagFootGeo: THREE.CylinderGeometry | null = null;
 let flagBandGeo: THREE.CylinderGeometry | null = null;
 let flagCollarGeo: THREE.SphereGeometry | null = null;
-let carryRingGeo: THREE.RingGeometry | null = null;
 let runeDiscGeo: THREE.CircleGeometry | null = null;
 let runeGemGeo: THREE.BoxGeometry | null = null;
 
@@ -281,7 +276,9 @@ export function buildBattlegroundObject(
   // bg_flag (and any future bg_ object defaults to the flag body): pole +
   // team-color pennant, bright at every tier. The pole and pennant live on a
   // lean pivot the fx pass tips over the carrier's shoulder while carried; the
-  // ring under it flags the carrier at a glance from any angle.
+  // The carrier needs no ground ring of its own: the pole is already tipped
+  // over their shoulder, which reads from any angle, and a fourth ring at a
+  // fighter's feet only competes with the identity and target rings.
   flagPoleGeo ??= markSharedGeometry(
     new THREE.CylinderGeometry(FLAG_POLE_R * 0.85, FLAG_POLE_R * 1.15, FLAG_POLE_H, 10),
   );
@@ -306,9 +303,6 @@ export function buildBattlegroundObject(
   }
   // A spear point, not a bead: the silhouette that makes it read as a standard.
   flagFinialGeo ??= markSharedGeometry(new THREE.ConeGeometry(FLAG_FINIAL_R, FLAG_FINIAL_H, 10));
-  carryRingGeo ??= markSharedGeometry(
-    new THREE.RingGeometry(CARRY_RING_INNER, CARRY_RING_OUTER, 24),
-  );
   const lean = new THREE.Group();
   lean.rotation.order = 'YXZ'; // yaw to the carrier first, then tilt back
   const pole = new THREE.Mesh(flagPoleGeo, surfaceMat({ color: 0x4a3728, roughness: 0.85 }));
@@ -335,16 +329,11 @@ export function buildBattlegroundObject(
   finial.position.y = FLAG_POLE_H + FLAG_FINIAL_H / 2 + 0.08;
   lean.add(finial);
   group.add(lean);
-  const ring = new THREE.Mesh(carryRingGeo, glowMaterial(color));
-  ring.rotation.x = -Math.PI / 2;
-  ring.position.y = CARRY_RING_Y;
-  ring.visible = false; // battleground_fx shows it only while carried
-  group.add(ring);
   // Explicit team mapping, never a fallback: an unknown color gets NO fx refs
   // (static upright flag) rather than silently riding the wrong flag's state.
   const team = color === BG_TEAM_COLORS[0] ? 0 : color === BG_TEAM_COLORS[1] ? 1 : null;
   if (team !== null) {
-    group.userData.bg = { kind: 'flag', team, color, lean, ring } satisfies BgObjectRefs;
+    group.userData.bg = { kind: 'flag', team, color, lean } satisfies BgObjectRefs;
   }
   return { group, height: FLAG_POLE_H + FLAG_FINIAL_H + 0.2 };
 }

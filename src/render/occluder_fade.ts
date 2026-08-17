@@ -16,8 +16,28 @@ export interface OccluderFadeMat {
   depthWrite: boolean;
 }
 
+/**
+ * userData marker every ghost material carries. It is what makes the boot
+ * prewarm of the TRANSPARENT variants (occluder_ghost_prewarm.ts) complete by
+ * construction: a registry that has to be fed separately gets forgotten by the
+ * next hideable call site, while a material that skipped this constructor
+ * cannot fade at all.
+ */
+const GHOST_MARKER = 'wocOccluderGhost';
+
+/** True for a material some hideable registry handed to `occluderFadeMat`. */
+export function isOccluderGhostMaterial(mat: THREE.Material): boolean {
+  return (mat.userData as { [GHOST_MARKER]?: boolean })[GHOST_MARKER] === true;
+}
+
+/** Drop the marker from a clone of a ghost material (clone() copies userData). */
+export function clearOccluderGhostMarker(mat: THREE.Material): void {
+  delete (mat.userData as { [GHOST_MARKER]?: boolean })[GHOST_MARKER];
+}
+
 /** Capture a material's authored state before its first fade. */
 export function occluderFadeMat(mat: THREE.Material): OccluderFadeMat {
+  (mat.userData as { [GHOST_MARKER]?: boolean })[GHOST_MARKER] = true;
   return { mat, transparent: mat.transparent, opacity: mat.opacity, depthWrite: mat.depthWrite };
 }
 

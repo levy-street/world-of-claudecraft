@@ -13,18 +13,19 @@ import {
   itemIconRecipe,
   itemImageUrl,
   UI_ITEM_IMAGE_IDS,
+  WEAPON_IMAGE_IDS,
 } from '../src/ui/icons';
 import { ITEM_WEAPON_VARIANTS } from '../src/ui/weapon_variants';
 
 // Gate for the committed WebP item icons (mirror of tests/skill_icons.test.ts). Art under
-// public/ui/items/<id>.webp is the source of truth (WebP only), served by itemImageUrl for
-// kind 'item' (bags, tooltips, loot, vendor, the /wiki guide). The guard is a bijection plus
-// a scope check (wired ids are real, non-equipment items):
+// public/ui/items/<id>.webp is the source of truth (WebP only), served by itemImageUrl or
+// weaponIconUrl for kind 'item' (bags, tooltips, loot, vendor, the /wiki guide). The guard is
+// a bijection plus a scope check:
 //   A) every id in ITEM_IMAGE_IDS resolves to a committed, VALID .webp;
 //   B) only .webp art (+ mapping.json) is committed under public/ui/items;
-//   C) every committed .webp is a WIRED id (an item id, or a UI pseudo-item id);
-//   D) every wired ITEM id is a real ITEMS entry that is not a weapon (weapons ship rendered
-//      model thumbnails via WEAPON_ICON_DIR; everything else, armor included, lives here),
+//   C) every committed .webp is a WIRED item, weapon, or UI pseudo-item id;
+//   D) every wired ITEM id is a real ITEMS entry that is not a weapon, every weapon-art id is
+//      a directly authored weapon,
 //      and every UI pseudo-item id is deliberately NOT an item (the two sets stay disjoint);
 //   E) the whole bag family (the 5 equippable bags + the implicit backpack) is image-backed,
 //      so the bag bar never mixes painted art with a procedural fallback.
@@ -199,6 +200,29 @@ const webpFiles = (): string[] =>
 
 type Mapping = {
   iconSize: number;
+  styleContract: {
+    id: string;
+    document: string;
+    summary: string;
+    master: {
+      minimumWidth: number;
+      minimumHeight: number;
+      square: boolean;
+      singleFrame: boolean;
+      colorSpace: string;
+      opaque: boolean;
+    };
+    shipping: {
+      width: number;
+      height: number;
+      format: string;
+      maximumBytes: number;
+      opaque: boolean;
+    };
+    reviewSizes: number[];
+    circularCropReviewSize: number;
+    anchors: { itemId: string; sha256: string }[];
+  };
   entries: {
     itemId: string;
     name: string;
@@ -230,13 +254,14 @@ function missingPaintedWaveItemIds(): string[] {
 describe('item webp icons', () => {
   it('has image-backed item ids wired (guards the fixture)', () => {
     expect(ITEM_IMAGE_IDS.size).toBeGreaterThan(0);
+    expect(WEAPON_IMAGE_IDS.size).toBe(123);
   });
 
-  it('A) every image-backed item id resolves to a committed, decodable .webp', async () => {
+  it('A) every image-backed item and weapon resolves to a committed, decodable .webp', async () => {
     const broken: string[] = [];
-    for (const id of [...ITEM_IMAGE_IDS, ...UI_ITEM_IMAGE_IDS]) {
+    for (const id of [...ITEM_IMAGE_IDS, ...WEAPON_IMAGE_IDS, ...UI_ITEM_IMAGE_IDS]) {
       if (ITEM_ART_PENDING.has(id)) continue; // covered by A2/A3 below
-      const url = itemImageUrl(id);
+      const url = WEAPON_IMAGE_IDS.has(id) ? iconDataUrl('item', id) : itemImageUrl(id);
       expect(url, `${id} must resolve to a webp url`).toMatch(/^\/ui\/items\/.+\.webp$/);
       const file = path.join(publicDir, (url as string).replace(/^\//, ''));
       if (!existsSync(file)) broken.push(`${id} -> ${url} (missing file)`);
@@ -297,22 +322,25 @@ describe('item webp icons', () => {
     const orphans: string[] = [];
     for (const file of webpFiles()) {
       const id = path.basename(file, '.webp');
-      if (!ITEM_IMAGE_IDS.has(id) && !UI_ITEM_IMAGE_IDS.has(id))
-        orphans.push(`${path.relative(repoRoot, file)} (not in ITEM_IMAGE_IDS/UI_ITEM_IMAGE_IDS)`);
+      if (!ITEM_IMAGE_IDS.has(id) && !WEAPON_IMAGE_IDS.has(id) && !UI_ITEM_IMAGE_IDS.has(id)) {
+        orphans.push(
+          `${path.relative(repoRoot, file)} (not in an item, weapon, or UI image registry)`,
+        );
+      }
     }
     expect(orphans, 'remove dead-weight art or wire the id into ITEM_IMAGE_IDS').toEqual([]);
   });
 
-  it('D) every wired id is a real, non-weapon item', () => {
+  it('D) every general item-art id is a real, non-weapon item', () => {
     const bad: string[] = [];
     for (const id of ITEM_IMAGE_IDS) {
       const def = (ITEMS as Record<string, { kind?: string }>)[id];
       if (!def) bad.push(`${id} (no such item)`);
-      else if (def.kind === 'weapon') bad.push(`${id} (weapon: has its own rendered-JPG pipeline)`);
+      else if (def.kind === 'weapon') bad.push(`${id} (weapon: belongs in WEAPON_IMAGE_IDS)`);
     }
     expect(
       bad,
-      'ITEM_IMAGE_IDS covers real items only; weapons use WEAPON_ICON_DIR thumbnails instead',
+      'ITEM_IMAGE_IDS covers non-weapon items; painted weapons belong in WEAPON_IMAGE_IDS',
     ).toEqual([]);
   });
 
@@ -330,6 +358,15 @@ describe('item webp icons', () => {
       'UI_ITEM_IMAGE_IDS is only for icon ids with no ITEMS record (the implicit backpack); ' +
         'a real item belongs in ITEM_IMAGE_IDS, where guard D checks it',
     ).toEqual([]);
+  });
+
+  it('D3) every authored weapon has one per-item painted path', () => {
+    expect([...WEAPON_IMAGE_IDS].sort()).toEqual(Object.keys(ITEM_WEAPON_VARIANTS).sort());
+    for (const id of WEAPON_IMAGE_IDS) {
+      expect(ITEMS[id]?.kind, id).toBe('weapon');
+      expect(ITEMS[id]?.heroicOf, `${id} should be an authored base weapon`).toBeUndefined();
+      expect(iconDataUrl('item', id), id).toBe(`/ui/items/${id}.webp`);
+    }
   });
 
   it('E) every bag, and the implicit backpack, renders painted art (not a procedural icon)', () => {
@@ -390,9 +427,9 @@ describe('item webp icons', () => {
       expect(batch.styleReference).toBeTruthy();
       expect(batch.commonPrompt).toBeTruthy();
     }
-    // The legacy bag family is project-owned art, so each curated entry overrides the
-    // file-level CraftPix license. Silkspun Satchel is separately generated and therefore
-    // belongs only to generatedBatches, never to the ordinary CraftPix-governed entries.
+    // The legacy bag family is project-owned art, so each ordinary entry carries its own
+    // project license. Silkspun Satchel is separately generated and therefore belongs only to
+    // generatedBatches, never to the project-owned ordinary entries.
     for (const id of [...BAG_IDS.filter((bagId) => bagId !== 'silkspun_satchel'), 'backpack']) {
       const entry = m.entries.find((e) => e.itemId === id);
       expect(entry?.license, `${id} must carry its own license override`).toContain(
@@ -406,6 +443,111 @@ describe('item webp icons', () => {
     expect(silkspunOwners, 'silkspun_satchel generated-art owner').toHaveLength(1);
     expect(silkspunOwners[0].source).toBe('OpenAI built-in image generation');
     expect(silkspunOwners[0].license).toContain('project asset');
+  });
+
+  it('F1) pins the canonical item-art style contract and its approved visual anchors', () => {
+    const contract = mapping().styleContract;
+    expect(contract.id).toBe('woc-item-icon-v1');
+    expect(contract.document).toBe('docs/design/item-icon-art-style.md');
+    expect(contract.summary).toBe(
+      'Classic dark-fantasy MMORPG painted inventory art; tactile material rendering; opaque dark painted ground; top-left key light; centered complete subject; no accidental writing, crop, frame, transparency, or watermark.',
+    );
+    expect(contract.master).toEqual({
+      minimumWidth: 512,
+      minimumHeight: 512,
+      square: true,
+      singleFrame: true,
+      colorSpace: 'srgb',
+      opaque: true,
+    });
+    expect(contract.shipping).toEqual({
+      width: 128,
+      height: 128,
+      format: 'webp',
+      maximumBytes: 15_360,
+      opaque: true,
+    });
+    expect(contract.reviewSizes).toEqual([128, 40, 28, 22]);
+    expect(contract.circularCropReviewSize).toBe(64);
+    expect(contract.anchors).toEqual([
+      {
+        itemId: 'eastbrook_buckler',
+        sha256: '2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156',
+      },
+      {
+        itemId: 'kingsbane_last_oath',
+        sha256: '0435d8e1ec593676ba939150177fb4fa1e439e763fef8e8fe375ba359265ca30',
+      },
+      {
+        itemId: 'cinderweave_raiment',
+        sha256: '345a2760fc15f5b24937878709d24229ca1a13f96eda16c5ad6871213a3f48e4',
+      },
+      {
+        itemId: 'linen_pouch',
+        sha256: 'b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937',
+      },
+      {
+        itemId: 'anglers_feast_platter',
+        sha256: '0ea8b9e92b170e277ab08a7c00daa73d641cb8803b2b8290de251a9a68f5a644',
+      },
+      {
+        itemId: 'firebottle',
+        sha256: 'c3965ddb8daa75ba1b8eb5adb75845ac3220e2eb2af0f5db3ad8d28cebd7b122',
+      },
+      {
+        itemId: 'arcanite_mining_pick',
+        sha256: '1f68e6bfbc521b2eb7c67cf7931bad05d1c68d68b132b7cf328d6c0d135f43b6',
+      },
+    ]);
+    for (const anchor of contract.anchors) {
+      const file = path.join(itemsDir, `${anchor.itemId}.webp`);
+      expect(existsSync(file), `${anchor.itemId} style anchor must exist`).toBe(true);
+      expect(createHash('sha256').update(readFileSync(file)).digest('hex')).toBe(anchor.sha256);
+    }
+
+    const guide = readFileSync(path.join(repoRoot, contract.document), 'utf8');
+    expect(guide).toContain('# Item Icon Art Style');
+    expect(guide).toContain('Contract id: `woc-item-icon-v1`');
+    expect(guide).toContain('## Reusable generation brief');
+    expect(guide).toContain('## Acceptance review');
+    expect(guide).toContain('## Provenance and replacement policy');
+    const normalizedGuide = guide.replace(/\s+/g, ' ');
+    for (const requiredRule of [
+      'The subject normally fills 68 to 76 percent of the square.',
+      'Use a warm key light from the top-left and a cool, deep shadow toward the bottom-right.',
+      'It is a painted vignette with subtle atmosphere and contact shadow, not a flat black product-photo void.',
+      'Do not add letters, numbers, words, labels, pseudo-writing, UI chrome, a frame, a checkerboard,',
+      'Do not duplicate an existing painting for a differently named authored item.',
+      '| One-handed weapon | Full weapon on a strong diagonal, distinct guard or head, grip visible |',
+      '| Helmet | One centered headpiece with no head, face, shoulders, or mannequin |',
+      '| Food | One plated serving or compact ingredient group, warm appetizing light, no table scene |',
+      '| Mount collectible | Recognizable three-quarter mount bust or vehicle portrait with tack and personality; do not show only loose reins |',
+      'Review every icon at the 512 master, 128px, 40px, 28px, and 22px.',
+      'Also inspect 28px grayscale and a 64px circular crop.',
+      'Repainting never rewrites historical evidence.',
+      'Quiet drift inside `woc-item-icon-v1` is not allowed.',
+    ]) {
+      expect(normalizedGuide, `style contract must retain: ${requiredRule}`).toContain(
+        requiredRule,
+      );
+    }
+
+    for (const instructionPath of [
+      'DESIGN.md',
+      'public/CLAUDE.md',
+      'src/sim/content/CLAUDE.md',
+      'src/ui/CLAUDE.md',
+    ]) {
+      const instructions = readFileSync(path.join(repoRoot, instructionPath), 'utf8');
+      expect(
+        instructions,
+        `${instructionPath} must route future item art through the contract`,
+      ).toContain('docs/design/item-icon-art-style.md');
+      expect(
+        instructions,
+        `${instructionPath} must name the versioned item-art contract`,
+      ).toContain('woc-item-icon-v1');
+    }
   });
 
   it('F2) ships the complete project-owned professions material art set', () => {
@@ -458,7 +600,7 @@ describe('item webp icons', () => {
       expect(entry?.sourceFile, `${id} mapping and manifest batch/version must agree`).toBe(
         `${declared?.batch}/masters/${id}.png (accepted ${declared?.acceptedVersion})`,
       );
-      expect(entry?.license, `${id} must override the mapping's CraftPix default`).toContain(
+      expect(entry?.license, `${id} must carry its explicit project license`).toContain(
         'World of ClaudeCraft original art',
       );
     }
@@ -506,7 +648,7 @@ describe('item webp icons', () => {
       expect(itemImageUrl(id), `${id} runtime URL`).toBe(`/ui/items/${id}.webp`);
       expect(
         m.entries.some((entry) => entry.itemId === id),
-        `${id} must not inherit CraftPix`,
+        `${id} must not be an ordinary mapping entry`,
       ).toBe(false);
       const owners = (m.generatedBatches ?? []).filter((batch) => batch.itemIds.includes(id));
       expect(owners, `${id} must have one generated provenance owner`).toHaveLength(1);
@@ -563,7 +705,7 @@ describe('item webp icons', () => {
     ).toEqual([]);
   });
 
-  it('J) mapped weapons keep their rendered model thumbnails', () => {
+  it('J) mapped weapons serve per-item paintings independently of their held model', () => {
     const weaponIds = new Set(
       Object.values(ITEMS)
         .filter((item) => item.kind === 'weapon')
@@ -572,8 +714,8 @@ describe('item webp icons', () => {
     const strayMappings = Object.keys(ITEM_WEAPON_VARIANTS).filter((id) => !weaponIds.has(id));
     expect(strayMappings, 'thumbnail mappings must only target real weapons').toEqual([]);
     for (const id of Object.keys(ITEM_WEAPON_VARIANTS)) {
-      expect(iconDataUrl('item', id), `${id} must keep its rendered weapon thumbnail`).toBe(
-        `/ui/weapons/${ITEM_WEAPON_VARIANTS[id]}.jpg`,
+      expect(iconDataUrl('item', id), `${id} must serve bespoke painted inventory art`).toBe(
+        `/ui/items/${id}.webp`,
       );
     }
   });
@@ -595,11 +737,11 @@ describe('unknown item ids resolve to the shared fallback recipe (stale-client p
       expect(isUnknownIconRecipe(itemIconRecipe(hostile)), hostile).toBe(true);
     }
     // The weapon-art arm shares the gate: without it, a prototype key
-    // stringifies a prototype member into a garbage /ui/weapons/ URL before
+    // stringifies a prototype member into a garbage /ui/items/ URL before
     // the recipe layer is ever consulted (canvas-bound at runtime, so pinned
     // at the source).
     const iconsSource = readFileSync(new URL('../src/ui/icons.ts', import.meta.url), 'utf8');
-    expect(iconsSource).toContain('Object.hasOwn(ITEM_ICON_IMAGES, id)');
+    expect(iconsSource).toContain('Object.hasOwn(ITEM_WEAPON_VARIANTS, id)');
     // A real def without committed art takes its DERIVED recipe, not the
     // fallback, so this pin cannot pass by everything falling through.
     const derived = Object.values(ITEMS).find(

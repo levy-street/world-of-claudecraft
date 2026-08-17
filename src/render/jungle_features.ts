@@ -113,10 +113,6 @@ for (const key of Object.keys(REACH_PROP_URLS) as ReachPropKey[]) {
   );
 }
 
-export const jungleFeaturesPreloadInternalsForTest = {
-  propUrls: [...PALM_URLS, GREAT_TREE_URL, ...Object.values(REACH_PROP_URLS)],
-};
-
 export interface Placement {
   x: number;
   y: number;

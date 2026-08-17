@@ -189,6 +189,31 @@ export async function getBugReportScreenshot(id: number): Promise<string | null>
   return res.rows[0]?.screenshot ?? null;
 }
 
+// Batched retention prune for bug_reports (the retention-sweep primitive,
+// mirrors pruneUnstuckReportsBatch in unstuck_db.ts). Every row can carry a
+// screenshot up to BUG_SCREENSHOT_MAX (~900 KB), so this table grows without
+// bound the fastest of the report tables; listBugReports pages the admin view
+// (limit/offset) regardless of age or status, so pruning oldest-first never
+// invalidates a still-reachable page. retentionDays <= 0 keeps rows forever
+// (the safe default); the interval floors to one whole day.
+export async function pruneBugReportsBatch(
+  retentionDays: number,
+  batchSize: number,
+): Promise<number> {
+  if (!Number.isFinite(retentionDays) || retentionDays <= 0) return 0;
+  const days = Math.max(1, Math.floor(retentionDays));
+  const res = await pool.query(
+    `DELETE FROM bug_reports
+      WHERE id IN (
+        SELECT id FROM bug_reports
+         WHERE created_at < now() - ($1::int * INTERVAL '1 day')
+         ORDER BY created_at ASC, id ASC
+         LIMIT $2)`,
+    [days, Math.max(1, Math.floor(batchSize))],
+  );
+  return res.rowCount ?? 0;
+}
+
 export type BugReportResolution = 'resolved' | 'dismissed';
 
 // Close one OPEN bug report, mirroring moderation_db.ts's ignoreReport UPDATE shape

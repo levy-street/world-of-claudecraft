@@ -74,17 +74,22 @@ export interface RenderBudgetGovernorOptions {
 }
 
 const CAPS_BY_TIER: Record<GfxTier, RenderBudgetCaps> = {
+  // Low must stay monotonically lighter than medium on every axis: it used to carry
+  // LOOSER caps and HIGHER quality floors than medium, so a player who dropped from
+  // medium to low got a heavier frame. Targets/urgents are medium x 0.9 rounded to
+  // clean values, and the four floors mirror low's band minima in GFX_BUCKET_BANDS
+  // (which now equal medium's), so low can always shed at least as far as medium.
   low: {
-    targetCalls: 560,
-    urgentCalls: 760,
-    targetTriangles: 2_200_000,
-    urgentTriangles: 3_000_000,
-    targetGrassTufts: 5_600,
-    urgentGrassTufts: 7_600,
-    minGrassLevel: 0.62,
-    minFoliageLevel: 0.68,
-    minVfxLevel: 0.84,
-    minLightingLevel: 0.78,
+    targetCalls: 380,
+    urgentCalls: 560,
+    targetTriangles: 1_600_000,
+    urgentTriangles: 2_350_000,
+    targetGrassTufts: 3_400,
+    urgentGrassTufts: 4_900,
+    minGrassLevel: 0.5,
+    minFoliageLevel: 0.5,
+    minVfxLevel: 0.58,
+    minLightingLevel: 0.45,
   },
   medium: {
     targetCalls: 420,
@@ -162,6 +167,45 @@ function copyCaps(caps: RenderBudgetCaps): RenderBudgetCaps {
   return { ...caps };
 }
 
+const URGENT_FOLIAGE_STEP = 0.14;
+const URGENT_GRASS_STEP = 0.14;
+const URGENT_LIGHTING_STEP = 0.12;
+const URGENT_VFX_STEP = 0.08;
+
+/** Non-resolution states visited by repeated urgent degradation.
+ * applyPointLightBudget already pins a counted light at its visible ancestry root, so
+ * hidden descendants cannot drift the live program's drawn-light count. Renderer
+ * prewarm still walks this urgent ladder as defense in depth for legitimate budget
+ * transitions behind the loading cover. It omits the normal-pressure ladder's smaller
+ * steps; grass, foliage and VFX levels do not select shader programs themselves. */
+export function renderBudgetShaderPrewarmLevels(
+  state: Pick<RenderBudgetState, 'levels' | 'caps'>,
+): RenderBudgetLevels[] {
+  let current = copyLevels(state.levels);
+  const sequence: RenderBudgetLevels[] = [];
+  for (let i = 0; i < 16; i++) {
+    const next: RenderBudgetLevels = {
+      grass: Math.max(state.caps.minGrassLevel, round2(current.grass - URGENT_GRASS_STEP)),
+      foliage: Math.max(state.caps.minFoliageLevel, round2(current.foliage - URGENT_FOLIAGE_STEP)),
+      vfx: Math.max(state.caps.minVfxLevel, round2(current.vfx - URGENT_VFX_STEP)),
+      lighting: Math.max(
+        state.caps.minLightingLevel,
+        round2(current.lighting - URGENT_LIGHTING_STEP),
+      ),
+      resolution: current.resolution,
+    };
+    if (
+      next.grass === current.grass &&
+      next.foliage === current.foliage &&
+      next.vfx === current.vfx &&
+      next.lighting === current.lighting
+    )
+      break;
+    sequence.push(next);
+    current = next;
+  }
+  return sequence;
+}
 const SUBMIT_STALL_MS = 120;
 const SUBMIT_STALL_URGENT_MS = 250;
 const SUBMIT_STALL_HOLD_SECONDS: Record<GfxTier, number> = {
@@ -427,12 +471,26 @@ export class RenderBudgetGovernor {
       return this.state(out);
     }
 
+    // Measured headroom, the gate on ALL recovery: every clause is a real cost
+    // reading, never inferred from wall cadence.
     const canRecover =
       (this.externalFrameCap || this.frameMsEma <= this.budget.recoverFrameMs) &&
       totalMs <= this.budget.recoverFrameMs &&
       submitMs <= Math.max(8, this.budget.recoverFrameMs * 0.7) &&
       rawSubmitMs <= SUBMIT_STALL_RECOVERY_CEILING_MS &&
-      this.stallPressure < 0.5 &&
+      this.stallPressure < 0.5;
+    // Scene-density headroom, the gate on the climb ABOVE baseline only. Raising a
+    // bucket past its baseline widens the drawn ring and grows these very counters,
+    // so gating the return TO baseline on them lets the ladder close its own gate
+    // and strand the buckets it has not restored yet (resolution recovers last).
+    // Deliberate: dense frames no longer reset stableSeconds, so one frame under
+    // the line at a fire slot permits one enrich step. The rate bound is the
+    // stableSeconds reset on each fired step plus the recoverStableSeconds
+    // recharge (the 1.5x cooldown is shorter on every tier and never binds);
+    // the at-slot re-check only picks WHICH frame may fire, so repeated dips
+    // can walk quality to the band maxima at one step per recharge window.
+    // Only degrade() ever lowers quality.
+    const canEnrich =
       sample.calls <= this.caps.targetCalls * 0.9 &&
       sample.triangles <= this.caps.targetTriangles * 0.9 &&
       sample.grassVisibleTufts <= this.caps.targetGrassTufts * 0.9;
@@ -440,7 +498,7 @@ export class RenderBudgetGovernor {
     if (canRecover) {
       this.stableSeconds += sample.dt;
       if (this.stableSeconds >= this.budget.recoverStableSeconds && this.cooldownSeconds <= 0) {
-        const changed = this.recover(maxRenderScale);
+        const changed = this.recover(maxRenderScale, canEnrich);
         if (changed) {
           this.mode = 'recovering';
           this.reason = 'recover';
@@ -478,7 +536,7 @@ export class RenderBudgetGovernor {
     let changed = false;
 
     const drawDominant = pressure.draw >= pressure.frame && pressure.draw >= pressure.submit;
-    const foliageStep = urgent ? 0.14 : 0.08;
+    const foliageStep = urgent ? URGENT_FOLIAGE_STEP : 0.08;
     if (
       (urgent || drawDominant || pressure.draw >= 1.08) &&
       this.reduceLevel('foliage', this.caps.minFoliageLevel, foliageStep)
@@ -486,7 +544,7 @@ export class RenderBudgetGovernor {
       changed = true;
     }
 
-    const grassStep = urgent ? 0.14 : 0.08;
+    const grassStep = urgent ? URGENT_GRASS_STEP : 0.08;
     if (
       (urgent ||
         pressure.grass >= 1 ||
@@ -496,7 +554,7 @@ export class RenderBudgetGovernor {
       changed = true;
     }
 
-    const lightingStep = urgent ? 0.12 : 0.07;
+    const lightingStep = urgent ? URGENT_LIGHTING_STEP : 0.07;
     const environmentFloored =
       this.levels.foliage <= this.caps.minFoliageLevel + 0.001 &&
       this.levels.grass <= this.caps.minGrassLevel + 0.001;
@@ -507,7 +565,7 @@ export class RenderBudgetGovernor {
       changed = true;
     }
 
-    const vfxStep = urgent ? 0.08 : 0.05;
+    const vfxStep = urgent ? URGENT_VFX_STEP : 0.05;
     const lightingDone = this.levels.lighting <= this.caps.minLightingLevel + 0.001;
     const severeFramePressure = pressure.frame >= 1.25 || pressure.submit >= 1.25;
     if (
@@ -532,16 +590,20 @@ export class RenderBudgetGovernor {
     return changed;
   }
 
-  private recover(maxRenderScale: number): boolean {
+  /** Phase A restores what pressure took, quality buckets before render scale, and runs on
+   * measured headroom alone. Phase B climbs past the baselines and additionally needs scene
+   * density under the draw caps. Returning false claims nothing: no cooldown, no mode change. */
+  private recover(maxRenderScale: number, allowAboveBaseline: boolean): boolean {
     if (this.raiseLevel('grass', this.bands.grass.baseline, 0.08)) return true;
     if (this.raiseLevel('lighting', this.bands.lighting.baseline, 0.08)) return true;
     if (this.raiseLevel('vfx', this.bands.vfx.baseline, 0.08)) return true;
     if (this.raiseLevel('foliage', this.bands.foliage.baseline, 0.08)) return true;
+    if (this.raiseLevel('resolution', maxRenderScale, this.budget.recoverStep)) return true;
+    if (!allowAboveBaseline) return false;
     if (this.raiseLevel('foliage', this.bands.foliage.max, 0.08)) return true;
     if (this.raiseLevel('vfx', this.bands.vfx.max, 0.08)) return true;
     if (this.raiseLevel('grass', this.bands.grass.max, 0.06)) return true;
     if (this.raiseLevel('lighting', this.bands.lighting.max, 0.05)) return true;
-    if (this.raiseLevel('resolution', maxRenderScale, this.budget.recoverStep)) return true;
     return false;
   }
 }

@@ -3,6 +3,7 @@ import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import { ABILITIES } from '../../sim/data';
 import { ABILITY_VFX_FULL_SPECS } from '../ability_vfx_full_specs';
 import { loadGltf } from '../assets/loader';
+import { clamp01 } from '../num_clamp';
 
 // Spirit apparitions (the gallery's spawnSpirit/updateSpirits): ghost-tinted
 // creature GLBs playing a short choreographed path, a druid's spectral bear
@@ -169,10 +170,6 @@ interface SpiritSlot {
   prevX: number;
   prevY: number;
   prevZ: number;
-}
-
-function clamp01(v: number): number {
-  return Math.min(1, Math.max(0, v));
 }
 
 function easeInOutSine(t: number): number {

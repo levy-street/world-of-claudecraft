@@ -26,6 +26,7 @@ import { createMob } from '../src/sim/entity';
 import { idleRng } from '../src/sim/mob/idle_rng';
 import { respawnMob } from '../src/sim/mob/lifecycle';
 import { resetEvadingMob } from '../src/sim/mob/locomotion';
+import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import type { CampDef, Entity, WorldContent } from '../src/sim/types';
 
@@ -229,6 +230,32 @@ describe('off-stream rng: an off-stream mob idles without touching the shared st
       expect(on.draws).toBe(1);
     });
   }
+});
+
+describe('rng observer exceptions propagate (the fail-closed contract)', () => {
+  it('next() lets an observer throw reach the caller instead of swallowing it', () => {
+    // ScriptedRng (tests/reliquary_content.test.ts) fail-closes the chest
+    // derivations by throwing from its observer, so the whole delve equality
+    // regime rests on next() not wrapping this call. The throw is TERMINAL
+    // for the instance: `s` has already advanced past the unconsumed draw,
+    // so a caller that caught and continued would silently shift its stream
+    // (the rng.ts header states the same contract).
+    const rng = new Rng(1);
+    rng.setObserver(() => {
+      throw new Error('fail closed');
+    });
+    expect(() => rng.next()).toThrow('fail closed');
+    // Every funneled method inherits the propagation. range/int/pick are the
+    // arms ScriptedRng actually depends on (it overrides chance() away from
+    // next(), so its observer fires through these three or a bare next()).
+    expect(() => rng.chance(0.5)).toThrow('fail closed');
+    expect(() => rng.range(0, 1)).toThrow('fail closed');
+    expect(() => rng.int(0, 1)).toThrow('fail closed');
+    expect(() => rng.pick([1, 2])).toThrow('fail closed');
+    // Clearing the observer restores plain draws: the seam stays tests-only.
+    rng.setObserver(null);
+    expect(() => rng.next()).not.toThrow();
+  });
 });
 
 describe('off-stream rng: the flag rides the template through every spawn path', () => {

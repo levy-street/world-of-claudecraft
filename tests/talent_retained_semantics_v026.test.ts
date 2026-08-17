@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { dealDamage } from '../src/sim/combat/damage';
 import { runEffects } from '../src/sim/combat/effect_dispatch';
-import { onCastCompleted, onDamageTaken, tickProcState } from '../src/sim/combat/talent_procs';
+import { tickProcState } from '../src/sim/combat/talent_procs';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import {
   accumulateTalentEffect,
@@ -13,7 +13,8 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import type { PlayerMeta, ResolvedAbility } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
-import type { AbilityEffect, Entity, PlayerClass, SimEvent } from '../src/sim/types';
+import type { AbilityEffect, Entity, PlayerClass } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 type TestSim = Sim & {
   nextId: number;
@@ -38,26 +39,6 @@ function spawnTarget(sim: TestSim, player: Entity, distance = 12): Entity {
   sim.addEntity(target);
   player.facing = Math.atan2(target.pos.x - player.pos.x, target.pos.z - player.pos.z);
   sim.targetEntity(target.id, player.id);
-  return target;
-}
-
-function spawnTargetAt(
-  sim: TestSim,
-  player: Entity,
-  id: number,
-  xOffset: number,
-  zOffset: number,
-): Entity {
-  const target = createMob(id, MOBS.forest_wolf, 1, {
-    x: player.pos.x + xOffset,
-    y: player.pos.y,
-    z: player.pos.z + zOffset,
-  });
-  target.maxHp = 50_000;
-  target.hp = target.maxHp;
-  target.hostile = true;
-  target.aiState = 'idle';
-  sim.addEntity(target);
   return target;
 }
 
@@ -91,74 +72,27 @@ function effect<T extends AbilityEffect['type']>(
 }
 
 describe('retained v0.26 all-class Talents V2 semantics', () => {
-  it('resolves the final Twin Verdicts, Rattling Ambush, Storm Recall, Sky Echo, Bruin Rebound, and content values', () => {
+  it('resolves the retained Concussive Economy and Warlock content values', () => {
     const rowOption = (cls: PlayerClass, id: string) => {
       const option = ROW_TREES[cls].flatMap((row) => row.options).find((o) => o.id === id);
       if (!option) throw new Error(`missing row option ${cls}:${id}`);
       return option;
     };
 
-    // Balance pass: Swift Verdicts is a cooldown cut (10 -> 8 sec), not
-    // banked charges.
-    expect(rowOption('paladin', 'pal_r14_swift_verdicts').name).toBe('Swift Verdicts');
-    const verdict = resolved('paladin', 'judgement', { 14: 'pal_r14_swift_verdicts' });
-    expect(verdict).toMatchObject({ cost: 30 });
-    expect(verdict.cooldown).toBeCloseTo(8);
-    expect(verdict.bonusCharges ?? 0).toBe(0);
-
-    // Balance pass: hun_r14_sniper_training is Steady Draw now (the Rattling
-    // Ambush reset+free relay was the worst loop in the game).
-    const steadyDraw = rowOption('hunter', 'hun_r14_sniper_training');
-    expect(steadyDraw.name).toBe('Steady Draw');
-    expect(steadyDraw.effect.proc).toBeUndefined();
-    const aimed = resolved('hunter', 'aimed_shot', { 14: 'hun_r14_sniper_training' });
-    expect(aimed.castTime).toBeCloseTo(2.4);
-    expect(effect(aimed, 'directDamage')).toEqual(
-      effect(resolved('hunter', 'aimed_shot'), 'directDamage'),
-    );
-
-    const recall = rowOption('shaman', 'sha_r20_elemental_fury');
-    expect(recall.name).toBe('Storm Recall');
-    expect(recall.effect.proc).toEqual({
-      id: 'sha_storm_recall',
-      name: 'Storm Recall',
-      school: 'nature',
-      trigger: { on: 'spellCrit', abilities: ['lightning_bolt'] },
-      responses: [
-        { kind: 'cooldownRefund', ability: 'earth_shock', seconds: 'reset' },
-        { kind: 'empowerNext', aura: 'next_cast_free', abilities: ['earth_shock'], duration: 8 },
-      ],
-    });
-    const bolt = resolved('shaman', 'lightning_bolt', { 20: 'sha_r20_elemental_fury' });
-    const jolt = resolved('shaman', 'earth_shock', { 20: 'sha_r20_elemental_fury' });
-    expect(effect(bolt, 'directDamage')).toEqual(
-      effect(resolved('shaman', 'lightning_bolt'), 'directDamage'),
-    );
-    expect(effect(jolt, 'directDamage')).toEqual(
-      effect(resolved('shaman', 'earth_shock'), 'directDamage'),
-    );
-
-    const skyEcho = rowOption('shaman', 'sha_r11_elemental_attunement');
-    expect(skyEcho.name).toBe('Sky Echo');
-    expect(skyEcho.effect.proc?.name).toBe('Sky Echo');
-
-    const bruin = rowOption('druid', 'dru_r8_brutal_bash');
-    expect(bruin.name).toBe('Bruin Rebound');
-    expect(bruin.effect.proc?.name).toBe('Bruin Rebound');
-    expect(bruin.effect.proc?.responses).toEqual([
+    const concussive = rowOption('druid', 'dru_r11_improved_mark');
+    expect(concussive.name).toBe('Concussive Economy');
+    expect(concussive.effect.proc?.name).toBe('Concussive Economy');
+    expect(concussive.effect.proc?.responses).toEqual([
       { kind: 'resource', amount: 15, resourceType: 'rage' },
       { kind: 'cooldownRefund', ability: 'bash', seconds: 20 },
     ]);
 
-    expect(
-      effect(resolved('priest', 'mind_sear', { 20: 'pri_r20_mind_sear' }), 'aoeDamage'),
-    ).toMatchObject({ min: 24, max: 28 });
-    const carnage = ROW_TREES.warlock
+    const reflection = ROW_TREES.warlock
       .flatMap((row) => row.options)
       .find((option) => option.id === 'wlk_r20_grimoire_of_haste');
-    expect(carnage?.effect.proc?.responses).toContainEqual(
-      expect.objectContaining({ kind: 'absorb', amount: 90 }),
-    );
+    expect(reflection?.name).toBe('Forbidden Reflection');
+    expect(reflection?.effect.global?.warlockForbiddenReflection).toBe(60);
+    expect(reflection?.effect.tuning?.reflectionWindow).toBe(10);
   });
 
   it('scales both the flat bonus and coefficient of a weapon strike', () => {
@@ -185,30 +119,18 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     const twinstrike = resolved('warrior', 'raging_gale', {}, 'fury');
     expect(twinstrike).toMatchObject({ charges: 2, bonusCharges: 1 });
 
-    const doubleCharge = resolved('warrior', 'charge', { 5: 'war_row_double_charge' }, 'arms');
-    expect(doubleCharge).toMatchObject({ charges: 2, bonusCharges: 1 });
-
+    // The warrior arm was Double Charge, which this branch replaced with Intervene,
+    // so `charge` no longer takes talent bonusCharges. The talent-added half of the
+    // claim is still covered by Double Blink below; only the warrior INSTANCE is
+    // gone, not the mechanism.
     const doubleBlink = resolved('mage', 'blink', { 5: 'mag_r5_double_blink' });
     expect(doubleBlink).toMatchObject({ charges: 2, bonusCharges: 1 });
   });
 
-  it('Fieldhardy (was Calloused Hide) is a flat max-health passive', () => {
-    // Balance pass: the on-hit instant Long Draw is gone; the option is the
-    // classic Survivalist shape and no bigHitTaken response remains on it.
-    const sim = harness(new Sim({ seed: 2608, playerClass: 'hunter', autoEquip: false }));
-    sim.setPlayerLevel(20);
-    const before = sim.player.maxHp;
-    expect(sim.selectTalentRow(17, 'hun_r17_thick_hide')).toBe(true);
-    expect(sim.player.maxHp).toBeGreaterThan(before);
-    const player = sim.player;
-    player.resource = player.maxResource;
-    spawnTarget(sim, player);
-    onDamageTaken(sim.ctx, player, Math.ceil(player.maxHp * 0.15));
-    expect(player.auras.some((aura) => aura.id === 'hun_calloused_hide')).toBe(false);
-  });
-
   it('consumes a scoped cheap-cast aura at the authoritative cost boundary', () => {
-    const sim = harness(new Sim({ seed: 2609, playerClass: 'druid', autoEquip: false }));
+    const sim = harness(
+      new Sim({ seed: 2609, playerClass: 'druid', autoEquip: false, world: EMPTY_TEST_WORLD }),
+    );
     sim.setPlayerLevel(20);
     const player = sim.player;
     player.resource = player.maxResource;
@@ -234,107 +156,20 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     expect(player.auras.some((aura) => aura.id === 'test_cheap_claw')).toBe(false);
   });
 
-  it('snapshots Viperfletch from the preceding resolved Fell Shot hit', () => {
-    const sim = harness(new Sim({ seed: 2610, playerClass: 'hunter', autoEquip: false }));
-    sim.setPlayerLevel(20);
-    expect(sim.selectTalentRow(14, 'hun_r14_serpents_venom')).toBe(true);
-    const player = sim.player;
-    const target = spawnTarget(sim, player);
-    const res = sim.resolvedAbility('arcane_shot');
-    if (!res) throw new Error('missing Fell Shot');
-    sim.events = [];
+  it("reduces each Warlock specialization's primary generator cost by 25%", () => {
+    const rows = { 14: 'wlk_r14_amplify_curse' };
 
-    runEffects(sim.ctx, player, metaOf(sim), target, res);
-
-    const direct = sim.events.find(
-      (event) => event.type === 'damage' && event.ability === res.def.name,
-    );
-    if (!direct || direct.type !== 'damage') throw new Error('missing direct Fell Shot damage');
-    const dot = target.auras.find(
-      (aura) => aura.kind === 'dot' && aura.id === 'arcane_shot' && aura.sourceId === player.id,
-    );
-    expect(dot?.value).toBe(Math.max(1, Math.round(Math.round(direct.amount * 0.5) / 3)));
-    expect(dot?.school).toBe('nature');
+    expect(resolved('warlock', 'needle_of_fate', rows, 'affliction').cost).toBe(23);
+    // 55 base, -25% from the talent, then demonology's innate -8% generator
+    // baseline (spec_baselines.ts) stacks multiplicatively: floor lands at 37.
+    expect(resolved('warlock', 'soul_harvest', rows, 'demonology').cost).toBe(37);
+    expect(resolved('warlock', 'shadow_bolt', rows, 'destruction').cost).toBe(42);
   });
 
-  it("applies conditional bolt damage only for the caster's DoT", () => {
-    const damage = (withOwnDot: boolean): number => {
-      const sim = harness(new Sim({ seed: 2611, playerClass: 'warlock', autoEquip: false }));
-      sim.setPlayerLevel(20);
-      expect(sim.selectTalentRow(14, 'wlk_r14_amplify_curse')).toBe(true);
-      const player = sim.player;
-      const target = spawnTarget(sim, player);
-      if (withOwnDot) {
-        target.auras.push({
-          id: 'corruption',
-          name: 'Blackrot',
-          kind: 'dot',
-          remaining: 18,
-          duration: 18,
-          value: 1,
-          sourceId: player.id,
-          school: 'shadow',
-        });
-      }
-      const res = sim.resolvedAbility('shadow_bolt');
-      if (!res) throw new Error('missing Gloom Bolt');
-      sim.events = [];
-      runEffects(sim.ctx, player, metaOf(sim), target, res);
-      const event = sim.events.find(
-        (candidate) => candidate.type === 'damage' && candidate.ability === res.def.name,
-      );
-      if (!event || event.type !== 'damage') throw new Error('missing Gloom Bolt damage');
-      return event.amount;
-    };
-
-    expect(damage(true)).toBeGreaterThan(damage(false));
-  });
-
-  it('Steady Rain prevents damage pushback without changing baseline channels', () => {
-    const castRemainingAfterHit = (selected: boolean): number => {
-      const sim = harness(new Sim({ seed: 2612, playerClass: 'hunter', autoEquip: false }));
-      sim.setPlayerLevel(20);
-      if (selected) expect(sim.selectTalentRow(20, 'hun_r20_improved_volley')).toBe(true);
-      const player = sim.player;
-      const attacker = spawnTarget(sim, player, 4);
-      player.castingAbility = 'volley';
-      player.castRemaining = 2;
-      player.castTotal = 3;
-      dealDamage(sim.ctx, attacker, player, 10, false, 'physical', 'Test Hit', 'hit');
-      return player.castRemaining;
-    };
-
-    expect(castRemainingAfterHit(false)).toBeGreaterThan(2);
-    expect(castRemainingAfterHit(true)).toBe(2);
-  });
-
-  it('fires and consumes Mercy Deferred when real damage crosses its health threshold', () => {
-    const sim = harness(new Sim({ seed: 2613, playerClass: 'priest', autoEquip: false }));
-    sim.setPlayerLevel(20);
-    expect(sim.selectTalentRow(14, 'pri_r14_greater_heal')).toBe(true);
-    const player = sim.player;
-    const attacker = spawnTarget(sim, player, 4);
-
-    onCastCompleted(sim.ctx, player, 'heal', player);
-    expect(player.auras).toContainEqual(
-      expect.objectContaining({ kind: 'heal_echo', value: 60, value2: 0.35 }),
+  it('makes winning Lingering Dread absorb 10% max-health damage before fear breaks', () => {
+    const sim = harness(
+      new Sim({ seed: 2614, playerClass: 'warrior', autoEquip: false, world: EMPTY_TEST_WORLD }),
     );
-    player.hp = Math.round(player.maxHp * 0.4);
-    const damage = Math.round(player.maxHp * 0.1);
-    const expectedHp = Math.min(player.maxHp, player.hp - damage + 60);
-    sim.events = [];
-
-    dealDamage(sim.ctx, attacker, player, damage, false, 'physical', 'Test Hit', 'hit');
-
-    expect(player.hp).toBe(expectedHp);
-    expect(player.auras.some((aura) => aura.kind === 'heal_echo')).toBe(false);
-    expect(sim.events).toContainEqual(
-      expect.objectContaining({ type: 'spellfx', fx: 'echoBurst', targetId: player.id }),
-    );
-  });
-
-  it('makes winning Lingering Dread absorb 20% max-health damage before fear breaks', () => {
-    const sim = harness(new Sim({ seed: 2614, playerClass: 'warrior', autoEquip: false }));
     sim.setPlayerLevel(20);
     expect(sim.selectTalentRow(11, 'war_row_lingering_dread')).toBe(true);
     const player = sim.player;
@@ -344,17 +179,17 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
 
     runEffects(sim.ctx, player, metaOf(sim), target, shout);
     const fear = target.auras.find((aura) => aura.id === 'fear_incap');
-    expect(fear?.breakThreshold).toBe(Math.round(target.maxHp * 0.2));
+    expect(fear?.breakThreshold).toBe(Math.round(target.maxHp * 0.1));
 
     dealDamage(sim.ctx, player, target, 100, false, 'physical', 'Test Hit', 'hit');
     expect(target.auras.find((aura) => aura.id === 'fear_incap')?.breakThreshold).toBe(
-      Math.round(target.maxHp * 0.2) - 100,
+      Math.round(target.maxHp * 0.1) - 100,
     );
     dealDamage(
       sim.ctx,
       player,
       target,
-      Math.round(target.maxHp * 0.2) - 100,
+      Math.round(target.maxHp * 0.1) - 100,
       false,
       'physical',
       'Test Hit',
@@ -363,14 +198,13 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
     expect(target.auras.some((aura) => aura.id === 'fear_incap')).toBe(false);
   });
 
-  it.each([
-    ['paladin', 17, 'pal_r17_ardent_defender', 180],
-    ['rogue', 17, 'rog_r17_cheat_death', 120],
-  ] as const)(
+  it.each([['rogue', 8, 'rog_r8_borrowed_breath', 120]] as const)(
     '%s cheat death saves once, honors its %d-row ICD, and rearms deterministically',
     (cls, level, optionId, icd) => {
       const selectedSim = () => {
-        const sim = harness(new Sim({ seed: 2615, playerClass: cls, autoEquip: false }));
+        const sim = harness(
+          new Sim({ seed: 2615, playerClass: cls, autoEquip: false, world: EMPTY_TEST_WORLD }),
+        );
         sim.setPlayerLevel(20);
         expect(sim.selectTalentRow(level, optionId)).toBe(true);
         return sim;
@@ -401,7 +235,9 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
   );
 
   it('does not grant cheat death without the selected row', () => {
-    const sim = harness(new Sim({ seed: 2616, playerClass: 'rogue', autoEquip: false }));
+    const sim = harness(
+      new Sim({ seed: 2616, playerClass: 'rogue', autoEquip: false, world: EMPTY_TEST_WORLD }),
+    );
     sim.setPlayerLevel(20);
     const player = sim.player;
     player.hp = 100;
@@ -410,32 +246,5 @@ describe('retained v0.26 all-class Talents V2 semantics', () => {
 
     expect(player.hp).toBe(0);
     expect(player.dead).toBe(true);
-  });
-
-  it('Dawnward Ricochet damages and silences its primary before deterministic falloff bounces', () => {
-    const sim = harness(new Sim({ seed: 2617, playerClass: 'paladin', autoEquip: false }));
-    sim.setPlayerLevel(20);
-    expect(sim.selectTalentRow(20, 'pal_r20_aura_mastery')).toBe(true);
-    const player = sim.player;
-    const primary = spawnTargetAt(sim, player, 9200, 3, 0);
-    // Insert the higher id first; equal-distance ties must still choose the lower id.
-    const tiedHigh = spawnTargetAt(sim, player, 9102, 3, 4);
-    const tiedLow = spawnTargetAt(sim, player, 9101, 7, 0);
-    const untouched = spawnTargetAt(sim, player, 9103, 13, 0);
-    const ricochet = sim.resolvedAbility('aura_surge');
-    if (!ricochet) throw new Error('missing Dawnward Ricochet');
-    sim.events = [];
-
-    runEffects(sim.ctx, player, metaOf(sim), primary, ricochet);
-
-    const damage = sim.events.filter(
-      (event): event is Extract<SimEvent, { type: 'damage' }> =>
-        event.type === 'damage' && event.ability === ricochet.def.name,
-    );
-    expect(damage.map((event) => event.targetId)).toEqual([primary.id, tiedLow.id, tiedHigh.id]);
-    expect(damage[1]?.amount).toBe(Math.max(1, Math.round((damage[0]?.amount ?? 0) * 0.75)));
-    expect(damage[2]?.amount).toBe(Math.max(1, Math.round((damage[0]?.amount ?? 0) * 0.75 ** 2)));
-    expect(primary.auras.some((aura) => aura.kind === 'silence')).toBe(true);
-    expect(untouched.hp).toBe(untouched.maxHp);
   });
 });

@@ -10,6 +10,8 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { PALADIN_BASTION_SWEEP_CLIP } from '../src/render/characters/paladin_bastion_sweep_clip';
+import { PALADIN_TEMPLARS_VERDICT_CLIP } from '../src/render/characters/paladin_templars_verdict_clip';
 import { ABILITIES } from '../src/sim/data';
 
 const ROOT = join(__dirname, '..');
@@ -58,7 +60,12 @@ describe('paladin ability-specific clips (issue #2889 follow-up batch)', () => {
     const block = manifestBlock('player_paladin: swims({', 'player_hunter: swims({');
     expect(block).toContain('paladin_ability_anims.glb');
     expect(block).toContain('attackByAbility');
-    for (const clip of PALADIN_CLIPS) expect(block).toContain(`'${clip}'`);
+    // Cast_Verdict still ships in the donor but is unmapped on the composed
+    // tree: its client (judgement) was retired by the Dawnreaver overhaul and
+    // final_edict, its successor, carries the overhaul's own synthesized
+    // Templars Verdict clip instead.
+    const mappedDonorClips = PALADIN_CLIPS.filter((clip) => clip !== 'Cast_Verdict');
+    for (const clip of mappedDonorClips) expect(block).toContain(`'${clip}'`);
   });
 
   it('every mapped ability id is a real paladin ability, and every referenced clip is shipped', () => {
@@ -68,8 +75,19 @@ describe('paladin ability-specific clips (issue #2889 follow-up batch)', () => {
     const abilityEnd = paladinBlock.indexOf('\n      },', abilityStart);
     expect(abilityEnd).toBeGreaterThan(abilityStart);
     const block = paladinBlock.slice(abilityStart, abilityEnd);
-    const rows = [...block.matchAll(/^\s*([a-z_]+): '([A-Za-z_]+)',$/gm)];
+    const rows = [...block.matchAll(/^\s*([a-z_]+): '([A-Za-z0-9_]+)',$/gm)];
     expect(rows.length).toBeGreaterThan(8); // catches a wholesale accidental deletion
+    // A mapped clip is legal from any of the three real sources on the
+    // composed tree: the #2889 donor GLB, the base paladin rig's own clips,
+    // or the two overhaul clips synthesized at runtime
+    // (paladin_templars_verdict_clip.ts / paladin_bastion_sweep_clip.ts).
+    const rigClips = clipNamesOf('public/models/chars/players/paladin.glb');
+    const legalClips = [
+      ...PALADIN_CLIPS,
+      ...rigClips,
+      PALADIN_TEMPLARS_VERDICT_CLIP,
+      PALADIN_BASTION_SWEEP_CLIP,
+    ];
     for (const [, abilityId, clip] of rows) {
       expect(
         ABILITIES[abilityId],
@@ -79,15 +97,17 @@ describe('paladin ability-specific clips (issue #2889 follow-up batch)', () => {
         'paladin',
       );
       expect(
-        PALADIN_CLIPS,
-        `attackByAbility value '${clip}' for '${abilityId}' is not a shipped clip`,
+        legalClips,
+        `attackByAbility value '${clip}' for '${abilityId}' is not a shipped or synthesized clip`,
       ).toContain(clip);
     }
-    // Judgement (the seal-unleashing finisher) and Consecration (the ground
-    // AoE) each name their own clip; the two defensive cooldowns share
-    // Cast_Ward and the four buff/aura abilities share Cast_Blessing.
+    // Final Edict (judgement's overhaul successor) carries the synthesized
+    // Templars Verdict clip; Consecration (the ground AoE) names its own
+    // donor clip; the two defensive cooldowns share Cast_Ward and the
+    // buff/aura abilities share Cast_Blessing.
     const map = Object.fromEntries(rows.map(([, id, clip]) => [id, clip]));
-    expect(map.judgement).toBe('Cast_Verdict');
+    expect(map.final_edict).toBe(PALADIN_TEMPLARS_VERDICT_CLIP);
+    expect(map.bastion_sweep).toBe(PALADIN_BASTION_SWEEP_CLIP);
     expect(map.consecration).toBe('Cast_Consecrate');
     expect(map.hammer_of_justice).toBe('Cast_HammerBash');
     expect(map.divine_protection).toBe('Cast_Ward');

@@ -49,6 +49,19 @@
   },
   "overrides": [
     {
+      "includes": [
+        "docs/achievements/placeholder-art-completion-2026-08-09/accepted-art.json",
+        "docs/achievements/placeholder-art-completion-2026-08-09/mob-portrait-source-manifest.json",
+        "docs/achievements/placeholder-art-completion-2026-08-09/weapons-a-generation-record.json",
+        "docs/achievements/placeholder-art-completion-2026-08-09/weapons-b-generation-record.json",
+        "docs/achievements/item-art-consistency-2026-08-09/*.json",
+        "docs/perf/hitch/gate.json"
+      ],
+      "formatter": {
+        "enabled": false
+      }
+    },
+    {
       "includes": ["index.html", "play.html", "guide.html"],
       "formatter": {
         "enabled": false

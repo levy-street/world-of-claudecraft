@@ -3,8 +3,36 @@
 // flooded jungle caldera with two routes around a central beast island. Both
 // paths climb into one ritual terrace beneath a colossal jaguar shrine.
 import type { DungeonDef, DungeonSpawn, ItemDef, MobTemplate } from '../types';
+import { HEROIC_FINALE_COPPER } from './dungeon_difficulty';
 
 export const WILDHEART_ITEMS: Record<string, ItemDef> = {
+  // Rogue dagger (drops from the Fanglord Beastmaster, the Wildheart Basin
+  // mid-boss). Shadow-bolt on-hit; the heroic twin lives in HEROIC_ITEMS.
+  duskwhisper: {
+    id: 'duskwhisper',
+    name: 'Duskwhisper',
+    kind: 'weapon',
+    slot: 'mainhand',
+    quality: 'epic',
+    weapon: { min: 20, max: 31, speed: 1.7, dagger: true },
+    // ilvl-26 mainhand budget (18): the stamina point over budget came off the
+    // DPS-neutral stat, keeping the agility identity.
+    stats: { agi: 12, sta: 6 },
+    sellValue: 9000,
+    requiredClass: ['rogue', 'hunter'],
+    requiredLevel: 20,
+    weaponProcs: [
+      {
+        id: 'duskwhisper_bolt',
+        name: 'Duskbolt',
+        trigger: 'weaponHit',
+        chance: 0.08,
+        effects: [
+          { kind: 'chainArc', school: 'shadow', damage: 20, jumps: 0, falloff: 0.6, radius: 8 },
+        ],
+      },
+    ],
+  },
   wildheart_tuskblade: {
     id: 'wildheart_tuskblade',
     name: 'Wildheart Tuskblade',
@@ -264,6 +292,7 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
       // Guaranteed troll trophy junk: the Grubjaw rare convention (zone2.ts).
       { itemId: 'chipped_tusk', chance: 1 },
       { itemId: 'fanglords_beastspear', chance: 0.12 },
+      { itemId: 'duskwhisper', chance: 0.12 },
     ],
     scale: 2.35,
     color: 0x485b3d,
@@ -295,7 +324,12 @@ export const WILDHEART_MOBS: Record<string, MobTemplate> = {
       enrage: 'THE WILD HEART BEATS THROUGH ME!',
     },
     loot: [
-      { copper: 55000, chance: 1 },
+      // 15000c base (rolls 9000c to 21000c, roughly 1g to 2g): the same
+      // gold-farm nerf Korzul took (the old 55000c paid 3.3g to 7.7g per
+      // pop). bossChainPull slows a Zulgar farm but does not stop it. The
+      // daily-lockout heroic clear pays the 10g finale base instead;
+      // tests/heroic_finale_gold.test.ts pins the ladder.
+      { copper: 15000, heroicCopper: HEROIC_FINALE_COPPER, chance: 1 },
       { itemId: 'bone_fragments', chance: 0.8 },
       // Guaranteed uncommon (chances sum to 1.0, exactly one drops): the Korzul
       // korzul_guaranteed_uncommon pattern, one piece per armor class.

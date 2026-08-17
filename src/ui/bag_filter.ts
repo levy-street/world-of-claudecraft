@@ -1,3 +1,4 @@
+import { compareBagStacks } from '../sim/inventory_sort';
 import { isMaterialItem } from '../sim/material_taxonomy';
 import type { InvSlot, ItemDef } from '../sim/types';
 
@@ -122,9 +123,14 @@ export function qualityRank(item: ItemDef): number {
 // interleaving with known items. Shared with bank_filter.ts like qualityRank.
 export const UNKNOWN_QUALITY_RANK = QUALITY_RANK.poor + 1;
 
-// Filter, then sort. Returns a new array; never mutates the input. Sorts are
-// stable (Array.prototype.sort is spec-stable), so ties preserve insertion order
-// and the 'recent' sort is simply the unsorted filtered list.
+// Filter, then sort. Returns a new array; never mutates the input. 'recent'
+// is simply the unsorted filtered list. The quality and name views break
+// their ties with the sim's canonical clean-up ladder (compareBagStacks,
+// src/sim/inventory_sort.ts): before it, ties kept insertion order, which
+// scattered same-item stacks across a quality band and split a fine material
+// grade from its base grade (the "sorted by quality but my elder logs are
+// everywhere" report). The ladder is what the sort button stamps into the
+// real cells, so the derived views and the physical clean-up agree.
 export function applyBagFilter(
   slots: readonly InvSlot[],
   lookup: ItemLookup,
@@ -150,10 +156,10 @@ export function applyBagFilter(
       const item = lookup(slot.itemId);
       return item ? qualityRank(item) : UNKNOWN_QUALITY_RANK;
     };
-    filtered.sort((a, b) => rank(a) - rank(b));
+    filtered.sort((a, b) => rank(a) - rank(b) || compareBagStacks(a, b, lookup));
   } else if (state.sort === 'name') {
     const name = (slot: InvSlot) => lookup(slot.itemId)?.name ?? slot.itemId;
-    filtered.sort((a, b) => name(a).localeCompare(name(b)));
+    filtered.sort((a, b) => name(a).localeCompare(name(b)) || compareBagStacks(a, b, lookup));
   }
   return filtered;
 }

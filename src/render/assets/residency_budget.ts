@@ -6,9 +6,16 @@
 // texture bytes (compressed mip chains counted as stored, bitmaps as w*h*4,
 // deduped by source), and the parsed-GLTF retention maps. English console
 // output by design. The one caller is the Renderer constructor's build
-// summary, gated to dev browsers and the native iOS profile. Known
+// summary, gated to dev browsers and the iOS WebKit profile (every iOS host, not
+// just the packaged app). Known
 // under-count: only the six common material map slots are walked; alphaMap,
-// envMap, scene.background and the standalone texture cache are not.
+// envMap, scene.background and the standalone texture cache are not. World-only
+// KTX2 textures released by ktx2_mip_release.ts truthfully report ~0 mip bytes
+// after upload; the renderer passes the retained restore sources in as their
+// own pre-counted 'ktx2 restore sources' entry (ktx2RetainedSourceBytes fed
+// through ResidencySource.bytes) so the mip release cannot read as a free win
+// in this table. residencyBudget itself stays a pure function of its sources
+// argument.
 import type * as THREE from 'three';
 
 export interface ResidencyBucket {
@@ -127,6 +134,10 @@ export interface ResidencySource {
   objects?: THREE.Object3D[];
   geometries?: THREE.BufferGeometry[];
   textures?: THREE.Texture[];
+  /** Pre-counted bytes attributed directly to `label`, for retention that is
+   *  not a walkable Three object (e.g. the KTX2 restore-source registry, raw
+   *  ArrayBuffers the caller sums via ktx2RetainedSourceBytes()). */
+  bytes?: number;
 }
 
 /** One-shot walk over every registered source; dedupes shared buffers/images so
@@ -146,6 +157,7 @@ export function residencyBudget(sources: ResidencySource[]): ResidencyBucket[] {
       const bytes = textureBytes(tex, seenImages);
       if (bytes > 0) acc.add(`${src.label}: textures`, bytes);
     }
+    if (src.bytes !== undefined && src.bytes > 0) acc.add(src.label, src.bytes);
   }
   return acc.buckets();
 }

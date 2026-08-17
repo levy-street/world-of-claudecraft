@@ -6,6 +6,9 @@ exports `routes` ONLY; everything else imports the concrete module (`./config`
 for the flag, `./mirror` for the observer), because the barrel drags `routes.ts`
 into the importer's graph and breaks tests that partial-mock the db module.
 
+This file is the canonical description of the shared storefront-mirror
+pattern; `server/epic/CLAUDE.md` documents only Epic's deltas from it.
+
 ## Why this exists where it does
 Steam is a MIRROR, never an authority. The sim decides deed unlocks,
 `server/deeds_records.ts` records them into `character_deeds`, and this
@@ -26,8 +29,9 @@ never awaits any of it.
 - `web_api.ts` - the fetch shell: the ONE place server code talks to the Steam
   Web API (partner host, 5 s timeout, 'upstream' on any fault).
 - `mirror.ts` - the push worker: per-process FIFO with in-flight dedupe,
-  at-least-once delivery with capped retries, then DROP (reconcile-on-link
-  heals any gap); a short-TTL link cache the routes overwrite synchronously.
+  at-least-once delivery with capped retries, then DROP (reconcile-on-link and
+  `reconcileOnLogin`, called by `game.ts` on join, heal any gap); a short-TTL
+  link cache the routes overwrite synchronously.
 - `achievement_map.ts` - deed id to `ACH_*` name, hard cap 100. A shipped ACH
   name is PERMANENT: entries may be added, never renamed or reused.
 - `steam_db.ts` - the `steam_links` SQL boundary (DDL in `db.ts` SCHEMA):

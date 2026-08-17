@@ -30,6 +30,18 @@ target maps changed-path substrings to a bring-up recipe (driving `window.__game
 clip region. Only write a bespoke `scripts/<thing>_shot.mjs` when the flow genuinely cannot
 be a target entry (for example an online-only or multi-client scene).
 
+**Standing capture rule (maintainer preference): every capture rig seeds the LOWEST
+graphics preset before the app boots.** Seed it the way the existing rigs seed presets,
+via `page.evaluateOnNewDocument` writing `localStorage` `woc_settings` with
+`{ graphicsPreset: 1 }` before `page.goto`. `scripts/climb_stall_shot.mjs` shows the
+seeding MECHANISM, but copy only the shape: that rig deliberately seeds a high profile
+(preset 5, the Advanced expert profile whose sub-dials it also seeds; the ladder in
+`src/ui/options_view.ts` tops out at the Insane preset above Ultra) because its purpose
+is a graphics shot. The default preset is not the lowest either (`src/game/settings.ts`
+pins the range), so an unseeded rig is NOT lowest. The one
+exception: shots whose PURPOSE is a graphics comparison (preset ladders, VFX quality,
+shadow tiers) keep the preset the comparison needs.
+
 ## 2. Before/after protocol
 
 1. Capture AFTER on your branch.

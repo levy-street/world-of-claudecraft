@@ -9,7 +9,7 @@ import { type TranslationKey, t } from '../../ui/i18n';
 import { hrefFor } from '../routes';
 import { paras, related } from './ui';
 
-export const PROF_FAQ_COUNT = 8;
+export const PROF_FAQ_COUNT = 10;
 
 export function faqDetailHtml(): string {
   const items: string[] = [];

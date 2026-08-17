@@ -25,6 +25,7 @@ import {
   lstatSync,
   mkdirSync,
   readdirSync,
+  readFileSync,
   renameSync,
   statSync,
   unlinkSync,
@@ -32,19 +33,34 @@ import {
 } from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
+import {
+  assertExactlyOneItemIconOwner,
+  inspectItemIconMaster,
+  itemIconOwnershipIndex,
+} from './lib/item_icon_intake.mjs';
 
 const root = process.cwd();
 const itemsDir = path.join(root, 'public/ui/items');
+const testDirectives = (process.env.WOC_TEST_CONVERTER_FAIL_AT ?? '')
+  .split(',')
+  .map((value) => value.trim())
+  .filter(Boolean);
 
 // The served icon square. Mirrors "iconSize" in public/ui/items/mapping.json and the
 // existing committed art; the HUD upscales it in CSS for the larger slots.
 const ICON_SIZE = 128;
 const FALLBACK_QUALITY = 75;
-const SIZE_CAP = 15 * 1024;
+const DEFAULT_SIZE_CAP = 15 * 1024;
+const testSizeCap = Number(
+  testDirectives
+    .find((directive) => directive.startsWith('size-cap:'))
+    ?.slice('size-cap:'.length) ?? DEFAULT_SIZE_CAP,
+);
+const SIZE_CAP = Number.isInteger(testSizeCap) && testSizeCap > 0 ? testSizeCap : DEFAULT_SIZE_CAP;
 
 // Foreign (non-webp) raster inputs we know how to convert. mapping.json and any .webp
-// are left alone. Multi-frame inputs (animated .gif, multi-page .tif/.tiff) convert
-// first-frame-only; the item icon set is static, so that is the intended behavior.
+// are left alone. Intake accepts only reviewed, square, opaque, single-frame sRGB masters
+// at 512px or larger; invalid source art is refused before any file is changed.
 const SOURCE_EXTS = new Set(['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.tif', '.tiff', '.avif']);
 
 const qFlag = process.argv.indexOf('--quality');
@@ -55,19 +71,14 @@ if (!Number.isFinite(quality) || quality < 1 || quality > 100) {
 }
 
 // smartSubsample defeats the 4:2:0 colored-halo artifact on the saturated edges of these
-// icons (they are upscaled on 3x mobile, so subsampling shows). alphaQuality 100 keeps the
-// transparent matte crisp. Metadata is stripped by default (sharp does not copy it),
-// shrinking the file further.
+// icons (they are upscaled on 3x mobile, so subsampling shows). alphaQuality remains explicit
+// for deterministic encoding even though intake requires an opaque master. Metadata is stripped
+// by default (sharp does not copy it), shrinking the file further.
 const webpOptions = { alphaQuality: 100, smartSubsample: true, effort: 6 };
 
 const rel = (p) => path.relative(itemsDir, p).split(path.sep).join('/');
 
-const injectedFailures = new Set(
-  (process.env.WOC_TEST_CONVERTER_FAIL_AT ?? '')
-    .split(',')
-    .map((value) => value.trim())
-    .filter(Boolean),
-);
+const injectedFailures = new Set(testDirectives);
 const phaseCounts = new Map();
 
 function runFsPhase(phase, operation) {
@@ -241,13 +252,11 @@ function commitBatch(prepared) {
 }
 
 async function encode(src, encodeQuality) {
-  // .rotate() auto-orients from EXIF. The centered cover resize always emits the exact served
-  // square, including for a mistakenly small input; source-resolution review remains a
-  // separate art-intake concern. .toColorspace('srgb') is not ICC-managed, so inputs are
-  // expected to already be sRGB.
+  // Intake has already proved the source is a reviewed square. .rotate() applies EXIF and the
+  // fill resize therefore cannot silently crop composition from a non-square source.
   return sharp(src)
     .rotate()
-    .resize(ICON_SIZE, ICON_SIZE, { fit: 'cover', position: 'centre' })
+    .resize(ICON_SIZE, ICON_SIZE, { fit: 'fill' })
     .toColorspace('srgb')
     .webp({ ...webpOptions, quality: encodeQuality })
     .toBuffer();
@@ -263,7 +272,7 @@ async function encodeWithinBudget(src) {
   }
   if (buffer.length > SIZE_CAP) {
     throw new Error(
-      `${rel(src)} remains ${buffer.length} B at q${encodeQuality}; exceeds the 15 KiB cap`,
+      `${rel(src)} remains ${buffer.length} B at q${encodeQuality}; exceeds the ${SIZE_CAP} B cap`,
     );
   }
   return { buffer, encodeQuality };
@@ -297,6 +306,15 @@ async function main() {
     return;
   }
 
+  const mappingPath = path.join(itemsDir, 'mapping.json');
+  let mapping;
+  try {
+    mapping = JSON.parse(readFileSync(mappingPath, 'utf8'));
+  } catch (error) {
+    throw new Error(`cannot read current item provenance from mapping.json: ${messageOf(error)}`);
+  }
+  const owners = itemIconOwnershipIndex(mapping);
+
   // Refuse the whole batch on a destination collision before touching disk: two foreign
   // sources sharing a basename (foo.png + foo.jpg) both map to foo.webp, so the second
   // encode would overwrite the first and both originals would be unlinked (silent data
@@ -315,6 +333,11 @@ async function main() {
       console.error(`  ${rel(dst)} <- ${list.map(rel).join(', ')}`);
     }
     process.exit(1);
+  }
+
+  for (const src of sources) {
+    await inspectItemIconMaster(src);
+    assertExactlyOneItemIconOwner(path.basename(src, path.extname(src)), owners);
   }
 
   // Encode and validate the whole batch before touching any destination or original. A cap

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   clampText,
   classifyRendererExit,
+  escapeNotificationMarkup,
   MAX_ERROR_TEXT,
   normalizeConsoleMessage,
   redactSecrets,
@@ -29,6 +30,76 @@ describe('clampText', () => {
     const csi = String.fromCharCode(0x9b);
     const nel = String.fromCharCode(0x85);
     expect(clampText(`a${csi}b${nel}c`, 100)).toBe('a b c');
+  });
+
+  it('flattens the U+2028/U+2029 line separators (the Unicode newline forgery vector)', () => {
+    // LS and PS pass a C0-only filter yet render as real line breaks on
+    // surfaces honoring Unicode line breaking, letting a crafted string push
+    // a template tail off screen and present a forged second line.
+    const ls = String.fromCodePoint(0x2028);
+    const ps = String.fromCodePoint(0x2029);
+    expect(clampText(`one${ls}two${ps}three`, 100)).toBe('one two three');
+  });
+
+  it('strips the invisible margin classes: ALM, word joiner, tag characters and friends', () => {
+    // U+061C is the Arabic analog of the stripped RLM; U+2060 WORD JOINER is
+    // the modern U+FEFF; U+E0001/U+E007F tag characters are fully invisible
+    // and can smuggle hidden content; soft hyphen U+00AD, the Mongolian
+    // vowel separator U+180E, and interlinear annotation U+FFF9-U+FFFB all
+    // hide or restructure what the surface displays.
+    const cp = String.fromCodePoint;
+    expect(clampText(`a${cp(0x061c)}b${cp(0x2060)}c`, 100)).toBe('a b c');
+    expect(clampText(`a${cp(0xad)}b${cp(0x180e)}c${cp(0xfff9)}d${cp(0xfffb)}e`, 100)).toBe(
+      'a b c d e',
+    );
+    expect(clampText(`tag${cp(0xe0001)}${cp(0xe007f)}ged`, 100)).toBe('tag ged');
+  });
+
+  it('never splits a surrogate pair at the cap boundary', () => {
+    // A cap landing mid-astral-character would leave a lone high surrogate
+    // that native UTF-8 conversion renders as U+FFFD; the clamp drops it. A
+    // boundary landing between whole characters keeps the full cap.
+    const emoji = String.fromCodePoint(0x1f600);
+    expect(clampText(`${'x'.repeat(9)}${emoji}y`, 10)).toBe(`${'x'.repeat(9)}...`);
+    expect(clampText(`${'x'.repeat(8)}${emoji}y`, 10)).toBe(`${'x'.repeat(8)}${emoji}...`);
+  });
+
+  it('drops a trailing lone high surrogate on the unclamped path too', () => {
+    // The preload pre-cap can split an astral pair, and the flattener can
+    // collapse a run so the cut string lands UNDER this cap with the lone
+    // surrogate tail intact (security-review probe); both exits strip it.
+    const loneHigh = String.fromCharCode(0xd83d);
+    expect(clampText(`short${loneHigh}`, 100)).toBe('short');
+    // A complete pair at the end of a short string survives untouched.
+    const emoji = String.fromCodePoint(0x1f600);
+    expect(clampText(`short${emoji}`, 100)).toBe(`short${emoji}`);
+  });
+
+  it('strips invisible direction and width formatters bound for OS surfaces', () => {
+    // U+202E (right-to-left override) can visually reorder a notification or
+    // dialog line into reading as something else; U+200B and U+FEFF hide seams
+    // between words. Format characters flatten to one space like the controls.
+    expect(clampText('a\u202eb\u2066c', 100)).toBe('a b c');
+    expect(clampText('pay\u200bload\ufeff!', 100)).toBe('pay load !');
+  });
+});
+
+describe('escapeNotificationMarkup', () => {
+  it('entity-escapes the three markup-significant characters, ampersand first', () => {
+    // Ampersand first, or the escapes of < and > would themselves be
+    // double-escaped on the way through.
+    expect(escapeNotificationMarkup('<b>bold</b> & <a href="x">y</a>')).toBe(
+      '&lt;b&gt;bold&lt;/b&gt; &amp; &lt;a href="x"&gt;y&lt;/a&gt;',
+    );
+    expect(escapeNotificationMarkup('no markup here')).toBe('no markup here');
+  });
+
+  it('neutralizes pre-encoded and numeric entity smuggling', () => {
+    // A daemon that decodes entities must see only literal text: an attacker
+    // shipping already-encoded markup has its ampersands re-escaped, so
+    // neither form survives to be re-interpreted.
+    expect(escapeNotificationMarkup('&lt;b&gt;')).toBe('&amp;lt;b&amp;gt;');
+    expect(escapeNotificationMarkup('&#60;b&#62;')).toBe('&amp;#60;b&amp;#62;');
   });
 });
 

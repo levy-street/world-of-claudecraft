@@ -23,11 +23,16 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import type { PoolClient, QueryResult } from 'pg';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import {
+  bustAllLifetimeXpRankCache,
+  resetLifetimeXpRankCacheForTests,
+} from '../../server/character_rank_cache';
 import { PgDailyRewardDb } from '../../server/daily_rewards_db';
 import {
   deedsBoardRanked,
   ELIGIBLE_ACCOUNT_SQL,
   lifetimeXpRankForCharacter,
+  lifetimeXpRankForCharacterUncached,
   lifetimeXpStanding,
   pool,
   topArenaRatings,
@@ -145,10 +150,12 @@ describe('every ranked board query embeds the fragment', () => {
     // account still inflates rank and total though it appears on no board.
     // lifetimeXpStanding is the BEARER-authenticated self-view, so its `own`
     // subquery stays UNGATED (an owner sees their own rank even when delisted):
-    // exactly two occurrences. lifetimeXpRankForCharacter feeds UNAUTHENTICATED
-    // public surfaces, so its `own` subquery is ALSO gated (a banned account shows
-    // no public rank at all): three occurrences, plus the eligibility flag it
-    // returns null on.
+    // exactly two occurrences. lifetimeXpRankForCharacterUncached feeds
+    // UNAUTHENTICATED public surfaces, so its `own` subquery is ALSO gated (a
+    // banned account shows no public rank at all): three occurrences, plus the
+    // eligibility flag it returns null on. Driven against the uncached read
+    // directly (never the cached lifetimeXpRankForCharacter wrapper db.ts
+    // callers use) so this pin exercises the SQL every time, not a cache hit.
     const occurrences = (haystack: string, needle: string): number =>
       haystack.split(needle).length - 1;
     const standingSql = await capturedSql(() => lifetimeXpStanding(1, 42));
@@ -156,7 +163,7 @@ describe('every ranked board query embeds the fragment', () => {
     expect(occurrences(standingSql[0], ELIGIBLE_LITERAL)).toBe(2);
     expect(occurrences(standingSql[0], 'a.id = characters.account_id')).toBe(2);
     expect(standingSql[0]).not.toContain('AS eligible');
-    const publicSql = await capturedSql(() => lifetimeXpRankForCharacter(42));
+    const publicSql = await capturedSql(() => lifetimeXpRankForCharacterUncached(42));
     expect(publicSql).toHaveLength(1);
     expect(occurrences(publicSql[0], ELIGIBLE_LITERAL)).toBe(3);
     expect(occurrences(publicSql[0], 'a.id = characters.account_id')).toBe(3);
@@ -166,6 +173,8 @@ describe('every ranked board query embeds the fragment', () => {
   it('the public rank read resolves null for a delisted subject and the rank for an eligible one', async () => {
     // The SQL pins above prove the eligible flag is SELECTed; this drives the
     // JS gate on it, so deleting the `if (!eligible) return null` arm reds here.
+    // Uncached, same reason as the pin above: two sequential calls for the same
+    // characterId must each hit pool.query, never a cached first result.
     const rankRow = (eligible: boolean): QueryResult => ({
       ...emptyResult(),
       rowCount: 1,
@@ -173,9 +182,59 @@ describe('every ranked board query embeds the fragment', () => {
     });
     const spy = vi.spyOn(pool, 'query');
     spy.mockImplementation(() => Promise.resolve(rankRow(false)) as never);
-    await expect(lifetimeXpRankForCharacter(42)).resolves.toBeNull();
+    await expect(lifetimeXpRankForCharacterUncached(42)).resolves.toBeNull();
     spy.mockImplementation(() => Promise.resolve(rankRow(true)) as never);
-    await expect(lifetimeXpRankForCharacter(42)).resolves.toEqual({ rank: 6, total: 10 });
+    await expect(lifetimeXpRankForCharacterUncached(42)).resolves.toEqual({
+      rank: 6,
+      total: 10,
+    });
+  });
+
+  it('lifetimeXpRankForCharacter (the 4 call sites) is cached in front of the uncached read', async () => {
+    // The keyed cache's generic mechanism is pinned in
+    // tests/server/character_rank_cache.test.ts; this proves the production
+    // wiring: db.ts's exported lifetimeXpRankForCharacter (what
+    // characters.ts/leaderboard.ts/main.ts/profile_page.ts all import) really
+    // goes through it, so a repeat read for the same character costs no query,
+    // while a different character and the raw uncached export still do.
+    resetLifetimeXpRankCacheForTests();
+    const rankRow: QueryResult = {
+      ...emptyResult(),
+      rowCount: 1,
+      rows: [{ ahead: 0, total: 1, eligible: true }],
+    };
+    const spy = vi.spyOn(pool, 'query').mockImplementation(() => Promise.resolve(rankRow) as never);
+    try {
+      await lifetimeXpRankForCharacter(55);
+      await lifetimeXpRankForCharacter(55);
+      expect(spy).toHaveBeenCalledTimes(1);
+      await lifetimeXpRankForCharacter(56);
+      expect(spy).toHaveBeenCalledTimes(2);
+      // The uncached export bypasses the cache entirely, even for a key the
+      // cache already holds.
+      await lifetimeXpRankForCharacterUncached(55);
+      expect(spy).toHaveBeenCalledTimes(3);
+    } finally {
+      resetLifetimeXpRankCacheForTests();
+    }
+  });
+
+  it('bustAllLifetimeXpRankCache forces the next read of every character to re-query', async () => {
+    resetLifetimeXpRankCacheForTests();
+    const rankRow: QueryResult = {
+      ...emptyResult(),
+      rowCount: 1,
+      rows: [{ ahead: 0, total: 1, eligible: true }],
+    };
+    const spy = vi.spyOn(pool, 'query').mockImplementation(() => Promise.resolve(rankRow) as never);
+    try {
+      await lifetimeXpRankForCharacter(77);
+      bustAllLifetimeXpRankCache();
+      await lifetimeXpRankForCharacter(77);
+      expect(spy).toHaveBeenCalledTimes(2);
+    } finally {
+      resetLifetimeXpRankCacheForTests();
+    }
   });
 
   it('daily rewards: every ranked read agrees on one population', async () => {
@@ -315,6 +374,11 @@ describe('main.ts wiring', () => {
     expect(body).toContain("arenaLeaderboardCache['2v2'] = null");
     expect(body).toContain('deedsBoardCache = null');
     expect(body).toContain('bustDailyRewardBoardCache()');
+    // Not a board, but the same immediacy: the per-character lifetime-XP rank
+    // cache (server/character_rank_cache.ts). A ban/unban changes every OTHER
+    // eligible character's ahead/total counts, so the whole cache is dropped
+    // rather than one key.
+    expect(body).toContain('bustAllLifetimeXpRankCache()');
     // Not a board, but on the same hook and for the same reason: the
     // daily-reward ban and IP-ban writes fire this hook and feed the
     // daily_reward_excluded_accounts view that the Discord winner-announcement

@@ -145,7 +145,7 @@ export function weaponSkinCastClip(
  *
  *  `tests/weapon_skins.test.ts` scans the ability table and fails if a new
  *  cast-time shot lands without a row here, so the list cannot silently rot. */
-const DRAWN_SHOT_CAST_IDS: ReadonlySet<string> = new Set(['aimed_shot']);
+const DRAWN_SHOT_CAST_IDS: ReadonlySet<string> = new Set(['aimed_shot', 'measured_shot']);
 
 /** True when this cast is a drawn shot (see DRAWN_SHOT_CAST_IDS). */
 export function isDrawnShotCast(abilityId: string | null | undefined): boolean {

@@ -169,6 +169,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       { itemId: 'cragmaw_prowlboots', chance: 0.3 },
       { itemId: 'cragward_pauldrons', chance: 0.25 },
       { itemId: 'cragthorn_greatstaff', chance: 0.2 },
+      { itemId: 'boneglass_shiv', chance: 0.2 },
       // Independent roll like every other piece on this table, so the quiver
       // costs the existing drops nothing.
       { itemId: 'cragmaw_huntquiver', chance: 0.25 },
@@ -1063,11 +1064,13 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     },
     enrage: { belowHpPct: 0.2, dmgMult: 1.5, hasteMult: 1.25 },
     // Personal loot table: rolled INDEPENDENTLY for every contributor (see
-    // rollWorldBossLoot). A guaranteed storm trophy, plus AT MOST ONE epic Tier-2 set
-    // piece. The glove group rolls first at ~32%; the belt group also rolls at ~32% but
-    // the one-gear cap keeps it only when the glove roll missed, so its EFFECTIVE drop
-    // rate is ~22% (0.68 x 0.32) and a single kill never hands out both a glove and a belt.
-    // Keep the glove entries first if this ordering skew is ever retuned.
+    // rollWorldBossLoot). A guaranteed storm trophy, plus AT MOST ONE epic Tier-2
+    // piece per contributor. The gear group (four gloves + the vestments chest)
+    // rolls first at 40% (5 x 0.08); the belt group also rolls at 32% (4 x 0.08)
+    // but the one-gear cap keeps it only when the first roll missed, so its
+    // EFFECTIVE drop rate is ~19% (0.60 x 0.32) and one contributor never
+    // receives two pieces from one kill. Keep the gear-group entries first if
+    // this ordering skew is ever retuned.
     loot: [
       { itemId: 'inert_storm_shard', chance: 1 },
       { itemId: 'crownforged_gauntlets', chance: 0.08, rollGroup: 'thunzharr_t2' },
@@ -2316,6 +2319,37 @@ export const ZONE3_OBJECTS: GroundObjectDef[] = [
 // ---------------------------------------------------------------------------
 
 export const ZONE3_ITEMS: Record<string, ItemDef> = {
+  // Rogue dagger (Basin rare): fills the Lv17-19 pre-cap gap. A minor bleed
+  // proc so a leveling rogue gets a taste of an interesting dagger before cap.
+  boneglass_shiv: {
+    id: 'boneglass_shiv',
+    name: 'Boneglass Shiv',
+    kind: 'weapon',
+    slot: 'mainhand',
+    quality: 'rare',
+    weapon: { min: 17, max: 27, speed: 1.7, dagger: true },
+    stats: { agi: 7, sta: 3 },
+    sellValue: 3000,
+    requiredClass: ['rogue', 'hunter'],
+    weaponProcs: [
+      {
+        id: 'boneglass_cut',
+        name: 'Boneglass Cut',
+        trigger: 'weaponHit',
+        chance: 0.06,
+        effects: [
+          {
+            kind: 'dot',
+            name: 'Boneglass Cut',
+            school: 'physical',
+            perTick: 4,
+            interval: 2,
+            duration: 6,
+          },
+        ],
+      },
+    ],
+  },
   // --- quest items ---
   highwatch_summons: {
     id: 'highwatch_summons',
@@ -2534,9 +2568,10 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     quality: 'rare',
     // The quiver ladder's early-Thornpeak rung, off the same beast that already
     // anchors the zone's agi-leather line (Huntcord above, Prowlboots): Old
-    // Cragmaw (level 14) -> item level 17, offhand budget 7. Fills the long
+    // Cragmaw (level 14) -> item level 17, worn-offhand budget 4. Fills the long
     // stretch between Mogger's uncommon (item level 7) and Korzul's rare (23).
-    stats: { agi: 4, sta: 3 },
+    occupiesHand: false,
+    stats: { agi: 3, sta: 1 },
     sellValue: 240,
     requiredClass: HUNTER_ONLY,
   },
@@ -3478,11 +3513,12 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     kind: 'held_offhand',
     slot: 'offhand',
     quality: 'rare',
-    // Korzul the Gravewyrm (level 20) -> item level 23, stats on the exact
-    // offhand budget, primaryStatBudget(23, rare, offhand) = 10. The mid rung of
-    // the quiver ladder, between Mogger's uncommon and the raid epic; agi/sta is
-    // the hunter identity the nighttalon leather set already carries.
-    stats: { agi: 6, sta: 4 },
+    // Korzul the Gravewyrm (level 20) -> item level 23, stats on the exact worn
+    // budget, primaryStatBudget(23, rare, offhand, WORN_OFFHAND_STAT_MULT) = 6.
+    // The mid rung of the quiver ladder, between Mogger's uncommon and the raid
+    // epic; agi/sta is the hunter identity the nighttalon leather set carries.
+    occupiesHand: false,
+    stats: { agi: 4, sta: 2 },
     sellValue: 360,
     requiredClass: HUNTER_ONLY,
   },
@@ -3492,11 +3528,14 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     kind: 'held_offhand',
     slot: 'offhand',
     quality: 'epic',
-    // The hunter counterpart to wraithfire_orb, off the same raid boss and on
-    // the same line: primaryStatBudget(29, epic, offhand) = 15. Setless, despite
-    // sharing the Direfang display name with the nighttalon set pieces, so it
-    // cannot shift that set's bonus thresholds.
-    stats: { agi: 9, sta: 6 },
+    // The hunter counterpart to wraithfire_orb, off the same raid boss, but on
+    // the WORN line rather than the orb's held one: the orb costs you the
+    // two-hander and this does not, so it prices at
+    // primaryStatBudget(29, epic, offhand, WORN_OFFHAND_STAT_MULT) = 9 against
+    // the orb's 15. Setless, despite sharing the Direfang display name with the
+    // nighttalon set pieces, so it cannot shift that set's bonus thresholds.
+    occupiesHand: false,
+    stats: { agi: 5, sta: 4 },
     // Physical ranged DPS identity: Hit, matching the nighttalon leather set
     // (attacks miss, so Hit is the throughput rating); never crit-first like the
     // caster orb, whose heals are not resisted.

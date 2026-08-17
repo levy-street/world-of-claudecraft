@@ -124,17 +124,74 @@ export function pickActiveReleaseBranch(names) {
 /**
  * The refs the nightly run gates. A manual dispatch ref replaces the whole
  * list (that is the acceptance path: point the workflow at a scratch branch);
- * otherwise the default branch plus the active release branch, deduplicated.
+ * otherwise the default branch plus the active release branch, deduplicated
+ * by name AND by resolved commit SHA: a release cut, or a release-to-main
+ * merge, commonly leaves both branches pointing at the identical commit, and
+ * gating both would run a full duplicate lane-job matrix for no extra
+ * coverage.
  *
- * @param {{ inputRef?: string | null, releaseBranch?: string | null, defaultBranch?: string }} opts
+ * `shaByRef` maps a candidate ref name to its resolved commit SHA. A name
+ * missing from the map, or mapped to a falsy value, means the SHA could not
+ * be resolved for that ref: it is always kept, never dropped, because
+ * dedup exists to NARROW the gated set and an unproven SHA must not be the
+ * reason a ref goes ungated (fail OPEN, the same direction as every other
+ * failure mode in this file).
+ *
+ * @param {{ inputRef?: string | null, releaseBranch?: string | null, defaultBranch?: string,
+ *   shaByRef?: Readonly<Record<string, string | null | undefined>> }} opts
  * @returns {string[]}
  */
-export function buildTargets({ inputRef, releaseBranch, defaultBranch = 'main' }) {
+export function buildTargets({ inputRef, releaseBranch, defaultBranch = 'main', shaByRef = {} }) {
   const dispatch = typeof inputRef === 'string' ? inputRef.trim() : '';
   if (dispatch !== '') return [dispatch];
   const targets = [defaultBranch];
   if (releaseBranch && releaseBranch !== defaultBranch) targets.push(releaseBranch);
-  return targets;
+  return dedupeTargetsBySha(targets, shaByRef);
+}
+
+/**
+ * Drop a later target whose resolved SHA matches an earlier target already
+ * kept. A target whose SHA is unknown (missing or falsy in `shaByRef`) is
+ * always kept: fail OPEN toward widening the gated set, never toward
+ * silently dropping a ref the resolver could not vouch for.
+ *
+ * @param {readonly string[]} names
+ * @param {Readonly<Record<string, string | null | undefined>>} shaByRef
+ * @returns {string[]}
+ */
+export function dedupeTargetsBySha(names, shaByRef) {
+  /** @type {string[]} */
+  const kept = [];
+  const seenShas = new Set();
+  for (const name of names) {
+    const sha = shaByRef[name];
+    if (!sha) {
+      kept.push(name);
+      continue;
+    }
+    if (seenShas.has(sha)) continue;
+    seenShas.add(sha);
+    kept.push(name);
+  }
+  return kept;
+}
+
+/**
+ * Extract the commit SHA from a git-refs API single-ref response
+ * (`GET /repos/{repo}/git/ref/heads/{branch}`). Anything that is not the
+ * expected `{ object: { sha: string } }` shape resolves to null, which
+ * `dedupeTargetsBySha` treats as "unknown": fail OPEN, never drop a target
+ * on an unproven duplicate.
+ *
+ * @param {unknown} body
+ * @returns {string | null}
+ */
+export function shaFromGitRefResponse(body) {
+  const sha =
+    body && typeof body === 'object'
+      ? /** @type {{ object?: { sha?: unknown } }} */ (body).object?.sha
+      : undefined;
+  return typeof sha === 'string' && sha.length > 0 ? sha : null;
 }
 
 /**

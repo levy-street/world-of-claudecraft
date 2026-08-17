@@ -342,6 +342,21 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('CREATE TABLE IF NOT EXISTS rate_limits');
   });
 
+  it('applies the UA analytics schemas (progress events, attribution, ad spend)', async () => {
+    // PROGRESS_EVENTS_SCHEMA (server/progress_events_db.ts),
+    // ACCOUNT_ATTRIBUTION_SCHEMA (server/attribution_db.ts), and
+    // AD_SPEND_SCHEMA (server/ad_spend_db.ts) back the UA instrumentation.
+    // Pin them by name so none can regress to defined-but-unwired (the
+    // DISCORD_SCHEMA lesson): deleting an ensureSchema line must fail here.
+    await ensureSchema();
+    const applied = h.calls.join('\n');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS level_up_events');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS ftue_events');
+    expect(applied).toContain('CREATE UNIQUE INDEX IF NOT EXISTS ftue_events_first_touch');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS account_attribution');
+    expect(applied).toContain('CREATE TABLE IF NOT EXISTS ad_spend');
+  });
+
   it('applies the compact player-metrics schema without a boot backfill', async () => {
     // Both phases, in the order server/main.ts runs them: the schema
     // transaction, then the CONCURRENTLY builds, which are now a SEPARATE call
@@ -602,6 +617,8 @@ describe('ensureSchema wires every schema module at boot', () => {
       'guilds_realm_lower_name_prefix',
       'guilds_realm_created_id',
       'bank_ledger_container_recent',
+      'player_reports_retention_created',
+      'chat_violations_retention_created',
     ]);
     const guildPrefix = CONCURRENT_INDEX_MIGRATIONS.find(
       (m) => m.name === 'guilds_realm_lower_name_prefix',
@@ -635,6 +652,38 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(bankLedgerContainer?.checkSql).toContain("to_regclass('bank_ledger_container_recent')");
     expect(bankLedgerContainer?.dropSql).toBe(
       'DROP INDEX CONCURRENTLY IF EXISTS bank_ledger_container_recent',
+    );
+    // player_reports retention prune (prunePlayerReportsBatch): account-agnostic
+    // age scan, so the index leads with created_at rather than either existing
+    // account column, and is partial on the resolved-report predicate the
+    // prune actually filters (an open report is never pruned).
+    const playerReportsRetention = CONCURRENT_INDEX_MIGRATIONS.find(
+      (m) => m.name === 'player_reports_retention_created',
+    );
+    expect(playerReportsRetention?.createSql).toContain(
+      'ON player_reports(created_at ASC, id ASC)',
+    );
+    expect(playerReportsRetention?.createSql).toContain("WHERE status <> 'open'");
+    expect(playerReportsRetention?.checkSql).toContain(
+      "to_regclass('player_reports_retention_created')",
+    );
+    expect(playerReportsRetention?.dropSql).toBe(
+      'DROP INDEX CONCURRENTLY IF EXISTS player_reports_retention_created',
+    );
+    // chat_violations retention prune (pruneChatViolationsBatch): same
+    // account-agnostic age scan shape, not partial (no status column excludes
+    // rows here).
+    const chatViolationsRetention = CONCURRENT_INDEX_MIGRATIONS.find(
+      (m) => m.name === 'chat_violations_retention_created',
+    );
+    expect(chatViolationsRetention?.createSql).toContain(
+      'ON chat_violations(created_at ASC, id ASC)',
+    );
+    expect(chatViolationsRetention?.checkSql).toContain(
+      "to_regclass('chat_violations_retention_created')",
+    );
+    expect(chatViolationsRetention?.dropSql).toBe(
+      'DROP INDEX CONCURRENTLY IF EXISTS chat_violations_retention_created',
     );
   });
 

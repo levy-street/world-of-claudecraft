@@ -693,13 +693,25 @@ async function realmsHandler(ctx: Ctx): Promise<void> {
  * called in-handler (not via the rateLimit middleware) precisely to keep its 429
  * body shape unchanged, which the parity-first rate-limit invariant requires.
  */
+/** Percent-decode a route param, falling back to the RAW segment on a
+ *  malformed escape, the same arm the /c/ page uses for the identical lookup:
+ *  a bad escape is 404-shaped input (the name will not resolve), never a
+ *  throwable server error that turns the route into a 500. */
+export function decodedRouteName(raw: string): string {
+  try {
+    return decodeURIComponent(raw);
+  } catch {
+    return raw;
+  }
+}
+
 async function publicSheetHandler(ctx: Ctx): Promise<void> {
   if (!publicReadRateLimited(ctx.req).allowed) {
     json(ctx.res, 429, { error: 'rate limited' });
     return;
   }
   const rt = useRuntime();
-  const result = await readPublicSheet(dbReads, decodeURIComponent(ctx.params.name), {
+  const result = await readPublicSheet(dbReads, decodedRouteName(ctx.params.name), {
     realm: REALM,
     origin: rt.publicOrigin(ctx.req),
     toSheetRank: rt.toSheetRank,

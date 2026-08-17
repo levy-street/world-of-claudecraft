@@ -23,6 +23,7 @@ import { configureCommunityTestAccounts } from '../server/community_test_account
 import {
   backfillAccountEmailIfEmpty,
   bankBonusFactsForAccount,
+  consumeAppearanceReroll,
   createAccount,
   createCharacterCapped,
   deleteCharacter,
@@ -176,6 +177,83 @@ describe('deleteCharacter', () => {
     await expect(deleteCharacter(7, 42)).rejects.toThrow('delete failed');
 
     expect(dbMock.bustGuildList).not.toHaveBeenCalled();
+  });
+});
+
+describe('consumeAppearanceReroll', () => {
+  // The WHERE arm of this one UPDATE is the eligibility AUTHORITY: the JS
+  // mirror the roster button reads (appearanceRerollAvailable) is pinned by
+  // tests/server/characters.test.ts, but if THIS statement drifts, the button
+  // renders for a character the UPDATE refuses or hides for one it would
+  // accept. So the statement itself is pinned here, the renameCharacter
+  // pattern: every eligibility predicate inside the SQL, asserted as SQL.
+  const LOOK = { gender: 'female' as const };
+  const CUTOFF = new Date('2026-08-17T00:00:00Z');
+
+  it('decides everything inside the one UPDATE: ownership, realm, window-or-never-designed, unspent token', async () => {
+    dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 1 } as any);
+    await consumeAppearanceReroll(7, 42, LOOK, true, CUTOFF);
+
+    const [sql, params] = dbMock.query.mock.calls.at(-1)!;
+    expect(sql).toMatch(/UPDATE characters/i);
+    // the atomic one-shot: the token burns in the same statement as the look
+    expect(sql).toMatch(/appearance_reroll_used\s*=\s*TRUE/i);
+    expect(sql).toMatch(/appearance_reroll_used\s*=\s*FALSE/i);
+    // the free window OR the never-designed safety net, disjoined in SQL so
+    // two racing submits cannot both land whichever arm admits them
+    expect(sql).toMatch(/created_at\s*<\s*\$6\s+OR\s+appearance\s+IS\s+NULL/i);
+    // BOLA scoping, the getCharacter trio
+    expect(sql).toMatch(/account_id\s*=\s*\$2/);
+    expect(sql).toMatch(/realm\s*=\s*\$4/);
+    expect(params).toEqual([42, 7, JSON.stringify(LOOK), REALM, true, CUTOFF]);
+  });
+
+  it('edits the ONE helm key in the state blob, guarded on an actual change', async () => {
+    dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 1 } as any);
+    await consumeAppearanceReroll(7, 42, LOOK, true, CUTOFF);
+    const [sql] = dbMock.query.mock.calls.at(-1)!;
+    // jsonb_set / minus-key, never a whole-blob rewrite from an HTTP route...
+    expect(sql).toMatch(/jsonb_set\(state,\s*'\{helmHidden\}'/);
+    expect(sql).toMatch(/state\s*-\s*'helmHidden'/);
+    // ...and each arm fires only when the value actually moves, because both
+    // operators mint a whole new datum: an unguarded write detoasts and
+    // re-TOASTs the entire blob even when nothing changed.
+    expect(sql).toMatch(/IS DISTINCT FROM 'true'::jsonb/);
+    expect(sql).toMatch(/state \? 'helmHidden'/);
+    // a NULL helm choice (client offered no toggle) leaves the blob alone
+    expect(sql).toMatch(/\$5::boolean IS NULL THEN state/);
+  });
+
+  it('maps rowCount to the applied/refused boolean the route answers with', async () => {
+    dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 1 } as any);
+    expect(await consumeAppearanceReroll(7, 42, LOOK, null, CUTOFF)).toBe(true);
+    dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 0 } as any);
+    expect(await consumeAppearanceReroll(7, 42, LOOK, null, CUTOFF)).toBe(false);
+  });
+});
+
+describe('createCharacterCapped appearance column', () => {
+  it('persists the authored look as the sixth INSERT column, null for a legacy client', async () => {
+    const client = clientStub();
+    dbMock.connect.mockResolvedValue(client as any);
+    client.query.mockImplementation(async (sql: string) => {
+      if (/FROM accounts/i.test(sql)) return { rows: [{ id: 7 }], rowCount: 1 };
+      if (/count\(\*\)/i.test(sql)) return { rows: [{ n: 0 }], rowCount: 1 };
+      if (/INSERT INTO characters/i.test(sql)) {
+        return { rows: [{ id: 100, account_id: 7 }], rowCount: 1 };
+      }
+      return { rows: [], rowCount: 0 };
+    });
+
+    await createCharacterCapped(7, 'Designed', 'mage', 10, null, { gender: 'female' });
+    let insert = client.query.mock.calls.find((c: any[]) => /INSERT INTO characters/i.test(c[0]))!;
+    expect(insert[0]).toMatch(/appearance\)/);
+    expect(insert[1][5]).toBe(JSON.stringify({ gender: 'female' }));
+
+    client.query.mockClear();
+    await createCharacterCapped(7, 'Legacy', 'mage', 10, null, null);
+    insert = client.query.mock.calls.find((c: any[]) => /INSERT INTO characters/i.test(c[0]))!;
+    expect(insert[1][5]).toBeNull();
   });
 });
 

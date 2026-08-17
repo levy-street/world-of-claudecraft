@@ -406,6 +406,11 @@ The two-half icon system stays; this program raises its finish, it does not repl
   `tests/deed_icons.test.ts`). The compositor's painted-classic rules live in
   `docs/design/icon-system.md`: light from top-left, baked bevel frame, seeded speck noise,
   quality border in CSS outside the bevel.
+  Inventory paintings additionally follow the canonical, versioned
+  `docs/design/item-icon-art-style.md` contract (`woc-item-icon-v1`). It owns item-family
+  composition, approved
+  references, the reusable generation brief, master and shipping rules, small-size review, and
+  provenance for every bag, bank, vendor, equipment, loot, mail, and tooltip item image.
 - **Vector chrome glyphs** (menus, panel controls, status markers): the inline-SVG registry
   in `src/ui/ui_icons.ts` (`svgIcon`, monochrome, `fill: currentColor`). These inherit the
   themed accent from CSS `color` and are the only sanctioned thin-line icons; they serve

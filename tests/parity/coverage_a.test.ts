@@ -164,10 +164,7 @@ describe('coverage: each scenario fires its subsystem', () => {
   it('paladin_consecration: ground AoE pulses fire from BOTH callers (immediate + deferred)', () => {
     const rec = run('paladin_consecration');
     const hits = (rec.allEvents as Ev[]).filter(
-      (e) =>
-        e.type === 'damage' &&
-        typeof e.ability === 'string' &&
-        e.ability.toLowerCase().includes('holy ground'),
+      (e) => e.type === 'damage' && e.ability === 'Holy Ground',
     );
     // 1 immediate on-cast pulse (~4097) + >=1 deferred interval pulse (~3052).
     expect(hits.length).toBeGreaterThanOrEqual(2);

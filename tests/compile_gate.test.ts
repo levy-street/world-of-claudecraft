@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { createBackgroundGpuQueue } from '../src/render/background_gpu_queue';
 import {
   awaitCompileGate,
   CompileGateQueue,
@@ -138,11 +139,18 @@ describe('CompileGateQueue', () => {
     expect(secondCompile).toHaveBeenCalledTimes(1);
   });
 
-  it('uses a shared GPU arbiter and forwards live priority', async () => {
+  it('uses a shared GPU arbiter, forwards live priority, and declares its tail releasable', async () => {
     const priorities: Array<number | undefined> = [];
+    const tailOptions: Array<{ releaseTail?: boolean } | undefined> = [];
     const sharedQueue = {
-      run: async <T>(work: () => T | Promise<T>, priority?: number): Promise<T> => {
+      run: async <T>(
+        work: () => T | Promise<T>,
+        priority?: number,
+        _label?: string,
+        options?: { releaseTail?: boolean },
+      ): Promise<T> => {
         priorities.push(priority);
+        tailOptions.push(options);
         return work();
       },
     };
@@ -153,6 +161,33 @@ describe('CompileGateQueue', () => {
       timedOut: false,
     });
     expect(priorities).toEqual([40]);
+    // The gate's tail is the off-thread driver link: the shared queue may keep
+    // draining other lanes while it settles (the released-tail policy).
+    expect(tailOptions).toEqual([{ releaseTail: true }]);
+  });
+
+  it('overlaps gates up to the real shared queue cap and holds the next one', async () => {
+    // Composition over the REAL queue, not a fake: two gates start their
+    // compile prologues while neither link has settled, the third waits on
+    // the released-tail cap. This is the deliberate relaxation of the strict
+    // serialization the local fallback still provides.
+    const queue = new CompileGateQueue(createBackgroundGpuQueue());
+    const noopScheduler = { setTimeout: () => 0, clearTimeout: () => {} };
+    const started: string[] = [];
+    const gate = (name: string) =>
+      queue.run(
+        () => {
+          started.push(name);
+          return new Promise<void>(() => {});
+        },
+        1500,
+        { label: name, scheduler: noopScheduler },
+      );
+    void gate('one');
+    void gate('two');
+    void gate('three');
+    for (let index = 0; index < 12; index++) await Promise.resolve();
+    expect(started).toEqual(['one', 'two']);
   });
 });
 

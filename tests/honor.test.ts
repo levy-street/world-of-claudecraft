@@ -1,12 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
   ARENA_DAILY_TAPER_START,
+  ARENA_LOSS_HONOR_SHARE,
   awardBattlegroundAssistHonor,
   awardBattlegroundHonor,
   awardBattlegroundKillHonor,
   awardFiestaCompletionHonor,
   awardFiestaKillHonor,
-  awardRankedArenaWinHonor,
+  awardRankedArenaResultHonor,
   BATTLEGROUND_ASSIST_HONOR,
   BATTLEGROUND_FIRST_WIN_BONUS_HONOR,
   BATTLEGROUND_KILL_HONOR,
@@ -19,6 +20,7 @@ import {
   FIESTA_WIN_BONUS_HONOR,
   grantHonor,
   HONOR_REPEAT_DR,
+  RANKED_ARENA_LOSS_HONOR,
   RANKED_ARENA_WIN_HONOR,
   repeatHonorMultiplier,
 } from '../src/sim/pvp';
@@ -26,16 +28,19 @@ import type { ArenaMatch } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import * as arena from '../src/sim/social/arena';
 import * as fiesta from '../src/sim/social/fiesta';
+import { RL_TEST_WORLD } from './sim_shared';
 
 function world(): Sim {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: RL_TEST_WORLD });
 }
 
 function liveArena(): { sim: Sim; a: number; b: number; match: ArenaMatch } {
   const sim = world();
-  sim.utcDay = '2026-07-11';
+  sim.resetDay = '2026-07-11';
   const a = sim.addPlayer('warrior', 'Aleph', { characterId: 101 });
   const b = sim.addPlayer('mage', 'Bet', { characterId: 202 });
+  sim.setPlayerLevel(arena.ARENA_MIN_LEVEL, a);
+  sim.setPlayerLevel(arena.ARENA_MIN_LEVEL, b);
   sim.arenaQueueJoin(a);
   sim.arenaQueueJoin(b);
   for (let i = 0; i < 20 * 8; i++) {
@@ -48,9 +53,10 @@ function liveArena(): { sim: Sim; a: number; b: number; match: ArenaMatch } {
 
 function liveArena2v2(): { sim: Sim; match: ArenaMatch } {
   const sim = world();
-  sim.utcDay = '2026-07-11';
+  sim.resetDay = '2026-07-11';
   const classes = ['warrior', 'mage', 'rogue', 'priest'] as const;
   const pids = classes.map((cls, i) => sim.addPlayer(cls, `Ranked${i}`, { characterId: 500 + i }));
+  for (const pid of pids) sim.setPlayerLevel(arena.ARENA_MIN_LEVEL, pid);
   for (const pid of pids) sim.arenaQueueJoin(pid, '2v2');
   for (let i = 0; i < 20 * 8; i++) {
     sim.tick();
@@ -62,7 +68,7 @@ function liveArena2v2(): { sim: Sim; match: ArenaMatch } {
 
 function liveFiesta(): { sim: Sim; match: ArenaMatch; pids: number[] } {
   const sim = world();
-  sim.utcDay = '2026-07-11';
+  sim.resetDay = '2026-07-11';
   const classes = ['warrior', 'mage', 'rogue', 'priest'] as const;
   const pids = classes.map((cls, i) => sim.addPlayer(cls, `Fiesta${i}`, { characterId: 300 + i }));
   for (const pid of pids) sim.arenaQueueJoin(pid, 'fiesta');
@@ -138,19 +144,101 @@ describe('honor currency', () => {
 });
 
 describe('ranked Arena honor', () => {
-  it('awards only the winner and records the result exactly once', () => {
+  it('pays the winner the faucet and the loser a third of it, exactly once', () => {
     const { sim, a, b, match } = liveArena();
     arena.endArenaMatch(sim.ctx, match, 'A', 'defeat');
 
-    expect(sim.meta(a)!.honor).toBe(RANKED_ARENA_WIN_HONOR['1v1']);
-    expect(sim.meta(b)!.honor).toBe(0);
+    // Pinned to the literals (not the constants) so a wrong 1v1 faucet or a
+    // wrong loss share reddens here.
+    expect(sim.meta(a)!.honor).toBe(25);
+    expect(sim.meta(b)!.honor).toBe(8);
+    expect(RANKED_ARENA_WIN_HONOR['1v1']).toBe(25);
+    expect(RANKED_ARENA_LOSS_HONOR['1v1']).toBe(8);
     expect(sim.meta(a)!.arenaWins).toBe(1);
     expect(sim.meta(b)!.arenaLosses).toBe(1);
 
     arena.endArenaMatch(sim.ctx, match, 'B', 'forfeit');
-    expect(sim.meta(a)!.honor).toBe(RANKED_ARENA_WIN_HONOR['1v1']);
+    expect(sim.meta(a)!.honor).toBe(25);
+    expect(sim.meta(b)!.honor).toBe(8);
     expect(sim.meta(a)!.arenaWins).toBe(1);
     expect(sim.meta(b)!.arenaWins).toBe(0);
+  });
+
+  it('pays both brackets a loss award of one third of their own win award', () => {
+    for (const format of ['1v1', '2v2'] as const) {
+      expect(RANKED_ARENA_LOSS_HONOR[format]).toBe(
+        Math.round(RANKED_ARENA_WIN_HONOR[format] * ARENA_LOSS_HONOR_SHARE),
+      );
+      // A loss is worth clearly less than a win: the gap is the whole reason to
+      // play to win rather than to farm completions.
+      expect(RANKED_ARENA_LOSS_HONOR[format]).toBeLessThan(RANKED_ARENA_WIN_HONOR[format]);
+      expect(RANKED_ARENA_LOSS_HONOR[format]).toBeGreaterThan(0);
+    }
+    expect(ARENA_LOSS_HONOR_SHARE).toBeCloseTo(1 / 3, 10);
+  });
+
+  it('pays a drawn bout the loss award to BOTH sides', () => {
+    const { sim, a, b, match } = liveArena();
+    arena.endArenaMatch(sim.ctx, match, null, 'timeout');
+
+    expect(sim.meta(a)!.honor).toBe(8);
+    expect(sim.meta(b)!.honor).toBe(8);
+    expect(sim.meta(a)!.arenaWins).toBe(0);
+    expect(sim.meta(b)!.arenaWins).toBe(0);
+    // The draw pays through the loss reason, not the win one: a drawn bout has
+    // no winner to name.
+    const reasons = sim.events
+      .filter((event) => event.type === 'honor')
+      .map((event) => (event as { reason: string }).reason);
+    expect(reasons).toEqual(['arena_complete', 'arena_complete']);
+  });
+
+  it('pays the 2v2 loss award to every member of the losing team', () => {
+    const { sim, match } = liveArena2v2();
+    arena.endArenaMatch(sim.ctx, match, 'A', 'defeat');
+
+    for (const pid of match.teamB) {
+      expect(sim.meta(pid)!.honor).toBe(17);
+      expect(RANKED_ARENA_LOSS_HONOR['2v2']).toBe(17);
+      expect(sim.meta(pid)!.arena2v2Losses).toBe(1);
+    }
+  });
+
+  it('pays no honor for a forfeit win but still moves rating, win count, and Deeds', () => {
+    // Mirrors Fiesta's own reason !== 'forfeit' guard on completion honor: a
+    // forfeit (an opponent disconnect) must not be a free Honor farm, but the
+    // rating swing and win/loss ledger stay forfeit-inclusive (deliberately,
+    // per src/sim/deeds.ts's own comment) so a disconnect cannot grief the
+    // survivor's ladder standing. The LOSING side is the load-bearing half now
+    // that a played-out loss pays: conceding on sight must never be a way to
+    // buy the loss award.
+    const { sim, a, b, match } = liveArena();
+    const ratingBefore = sim.meta(a)!.arenaRating;
+
+    arena.endArenaMatch(sim.ctx, match, 'A', 'forfeit');
+
+    expect(sim.meta(a)!.honor).toBe(0);
+    expect(sim.meta(b)!.honor).toBe(0);
+    expect(sim.meta(a)!.arenaWins).toBe(1);
+    expect(sim.meta(b)!.arenaLosses).toBe(1);
+    expect(sim.meta(a)!.arenaRating).toBeGreaterThan(ratingBefore);
+  });
+
+  it('pays no honor for a 2v2 forfeit win but still moves rating and win count', () => {
+    const { sim, match } = liveArena2v2();
+    const ratingBefore = sim.meta(match.teamA[0])!.arena2v2Rating;
+
+    arena.endArenaMatch(sim.ctx, match, 'A', 'forfeit');
+
+    for (const pid of match.teamA) {
+      expect(sim.meta(pid)!.honor).toBe(0);
+      expect(sim.meta(pid)!.arena2v2Wins).toBe(1);
+    }
+    for (const pid of match.teamB) {
+      expect(sim.meta(pid)!.honor).toBe(0);
+      expect(sim.meta(pid)!.arena2v2Losses).toBe(1);
+    }
+    expect(sim.meta(match.teamA[0])!.arena2v2Rating).toBeGreaterThan(ratingBefore);
   });
 
   it('awards the 2v2 faucet to both winners through a real ranked result', () => {
@@ -163,45 +251,153 @@ describe('ranked Arena honor', () => {
       expect(RANKED_ARENA_WIN_HONOR['2v2']).toBe(50);
       expect(sim.meta(pid)!.arena2v2Wins).toBe(1);
     }
+    // What the losing team is paid is pinned by its own case above.
     for (const pid of match.teamB) {
-      expect(sim.meta(pid)!.honor).toBe(0);
       expect(sim.meta(pid)!.arena2v2Losses).toBe(1);
     }
   });
 
   it('applies repeat-opponent DR, the daily taper, and UTC rollover deterministically', () => {
     const sim = world();
-    sim.utcDay = '2026-07-11';
+    sim.resetDay = '2026-07-11';
     const pid = sim.addPlayer('warrior', 'Climber');
     const meta = sim.meta(pid)!;
 
     const repeat = Array.from({ length: 4 }, () =>
-      awardRankedArenaWinHonor(sim.ctx, meta, '1v1', '["character:9"]'),
+      awardRankedArenaResultHonor(sim.ctx, meta, '1v1', '["character:9"]', 'win'),
     );
     expect(repeat).toEqual([25, 0, 0, 0]);
 
     const fresh = world();
-    fresh.utcDay = '2026-07-11';
+    fresh.resetDay = '2026-07-11';
     const freshPid = fresh.addPlayer('warrior', 'Taper');
     const freshMeta = fresh.meta(freshPid)!;
     for (let i = 0; i < ARENA_DAILY_TAPER_START; i++) {
-      expect(awardRankedArenaWinHonor(fresh.ctx, freshMeta, '1v1', `["character:${i}"]`)).toBe(25);
+      expect(
+        awardRankedArenaResultHonor(fresh.ctx, freshMeta, '1v1', `["character:${i}"]`, 'win'),
+      ).toBe(25);
     }
-    expect(awardRankedArenaWinHonor(fresh.ctx, freshMeta, '1v1', '["character:next"]')).toBe(12);
+    expect(
+      awardRankedArenaResultHonor(fresh.ctx, freshMeta, '1v1', '["character:next"]', 'win'),
+    ).toBe(12);
 
-    fresh.utcDay = '2026-07-12';
-    expect(awardRankedArenaWinHonor(fresh.ctx, freshMeta, '1v1', '["character:next"]')).toBe(25);
+    fresh.resetDay = '2026-07-12';
+    expect(
+      awardRankedArenaResultHonor(fresh.ctx, freshMeta, '1v1', '["character:next"]', 'win'),
+    ).toBe(25);
+  });
+
+  it('decays a repeated loss to the same team and rolls the counter over each day', () => {
+    const sim = world();
+    sim.resetDay = '2026-07-11';
+    const meta = sim.meta(sim.addPlayer('warrior', 'Loser'))!;
+    const key = '["character:9"]';
+
+    const repeat = Array.from({ length: 4 }, () =>
+      awardRankedArenaResultHonor(sim.ctx, meta, '1v1', key, 'loss'),
+    );
+    // The same ARENA_REPEAT_DR curve the win award is on: the day's first meeting
+    // pays, every rematch pays nothing, so a traded pair cannot farm the loss arm.
+    expect(repeat).toEqual([8, 0, 0, 0]);
+
+    sim.resetDay = '2026-07-12';
+    expect(awardRankedArenaResultHonor(sim.ctx, meta, '1v1', key, 'loss')).toBe(8);
+  });
+
+  it('keeps the loss counter off the win counter, in both directions', () => {
+    const sim = world();
+    sim.resetDay = '2026-07-11';
+    const meta = sim.meta(sim.addPlayer('warrior', 'Rematch'))!;
+    const key = '["character:9"]';
+
+    // Losing to a team first must not spend the award for beating it later.
+    expect(awardRankedArenaResultHonor(sim.ctx, meta, '1v1', key, 'loss')).toBe(8);
+    expect(awardRankedArenaResultHonor(sim.ctx, meta, '1v1', key, 'win')).toBe(25);
+    // And each counter is spent exactly once, so the pairing's whole day is
+    // win + loss and no more: the win-trading ceiling.
+    expect(awardRankedArenaResultHonor(sim.ctx, meta, '1v1', key, 'loss')).toBe(0);
+    expect(awardRankedArenaResultHonor(sim.ctx, meta, '1v1', key, 'win')).toBe(0);
+    expect(meta.honor).toBe(33);
+  });
+
+  it('tapers loss awards on the daily win count without letting losses advance it', () => {
+    const sim = world();
+    sim.resetDay = '2026-07-11';
+    const meta = sim.meta(sim.addPlayer('warrior', 'Grinder'))!;
+
+    // A day of nothing but losses never tapers itself: the taper caps arena
+    // INCOME, and a player must not be able to pad it by conceding bouts.
+    for (let i = 0; i < ARENA_DAILY_TAPER_START + 2; i++) {
+      expect(awardRankedArenaResultHonor(sim.ctx, meta, '1v1', `["character:${i}"]`, 'loss')).toBe(
+        8,
+      );
+    }
+    expect(meta.honorArenaDaily?.totalWins).toBe(0);
+    expect(awardRankedArenaResultHonor(sim.ctx, meta, '1v1', '["character:win"]', 'win')).toBe(25);
+
+    // Wins do taper the loss award, on the same curve they taper themselves.
+    const winner = world();
+    winner.resetDay = '2026-07-11';
+    const winnerMeta = winner.meta(winner.addPlayer('warrior', 'Champion'))!;
+    for (let i = 0; i < ARENA_DAILY_TAPER_START; i++) {
+      awardRankedArenaResultHonor(winner.ctx, winnerMeta, '1v1', `["character:${i}"]`, 'win');
+    }
+    expect(
+      awardRankedArenaResultHonor(winner.ctx, winnerMeta, '1v1', '["character:next"]', 'loss'),
+    ).toBe(4);
   });
 
   it('does not reset a persisted daily window when the host has no UTC day', () => {
     const sim = world();
-    sim.utcDay = '2026-07-11';
+    sim.resetDay = '2026-07-11';
     const pid = sim.addPlayer('warrior', 'Replay');
     const meta = sim.meta(pid)!;
     const key = '["name:opponent"]';
-    expect(awardRankedArenaWinHonor(sim.ctx, meta, '1v1', key)).toBe(25);
-    sim.utcDay = '';
-    expect(awardRankedArenaWinHonor(sim.ctx, meta, '1v1', key)).toBe(0);
+    expect(awardRankedArenaResultHonor(sim.ctx, meta, '1v1', key, 'win')).toBe(25);
+    sim.resetDay = '';
+    expect(awardRankedArenaResultHonor(sim.ctx, meta, '1v1', key, 'win')).toBe(0);
+  });
+
+  it('round-trips the loss counter and leaves an unused one out of the save', () => {
+    const sim = world();
+    sim.resetDay = '2026-07-11';
+    const pid = sim.addPlayer('warrior', 'Persist');
+    const meta = sim.meta(pid)!;
+
+    // Absent, not empty, until a loss pays: a save written before this existed
+    // must round-trip byte-identical.
+    awardRankedArenaResultHonor(sim.ctx, meta, '1v1', '["character:9"]', 'win');
+    expect(sim.serializeCharacter(pid)!.honorArenaDaily?.lossesByOpponent).toBeUndefined();
+
+    awardRankedArenaResultHonor(sim.ctx, meta, '1v1', '["character:9"]', 'loss');
+    const saved = sim.serializeCharacter(pid)!;
+    expect(saved.honorArenaDaily?.lossesByOpponent).toEqual({ '1v1:["character:9"]': 1 });
+
+    const loaded = world();
+    loaded.resetDay = '2026-07-11';
+    const loadedPid = loaded.addPlayer('warrior', 'Persist', { state: saved });
+    const loadedMeta = loaded.meta(loadedPid)!;
+    // The spent counter survives the reload, so relogging cannot re-arm it.
+    expect(
+      awardRankedArenaResultHonor(loaded.ctx, loadedMeta, '1v1', '["character:9"]', 'loss'),
+    ).toBe(0);
+  });
+
+  it('sanitizes a malformed persisted loss counter', () => {
+    const seed = world();
+    const seedPid = seed.addPlayer('warrior', 'Corrupt');
+    const state = seed.serializeCharacter(seedPid)! as unknown as Record<string, unknown>;
+    state.honorArenaDaily = {
+      date: '2026-07-11',
+      winsByOpponent: {},
+      lossesByOpponent: { valid: 3.7, negative: -2, nan: Number.NaN },
+      fiestaCompletionsByOpponent: {},
+      totalWins: 0,
+    };
+
+    const loaded = world();
+    const meta = loaded.meta(loaded.addPlayer('warrior', 'Corrupt', { state: state as never }))!;
+    expect(meta.honorArenaDaily?.lossesByOpponent).toEqual({ valid: 3 });
   });
 });
 
@@ -227,7 +423,7 @@ describe('Fiesta honor', () => {
 
   it('applies per-victim kill DR and repeat-opposition completion DR', () => {
     const sim = world();
-    sim.utcDay = '2026-07-11';
+    sim.resetDay = '2026-07-11';
     const pid = sim.addPlayer('rogue', 'Fighter');
     const meta = sim.meta(pid)!;
     const pairs = new Map<string, number>();
@@ -255,7 +451,7 @@ describe('Fiesta honor', () => {
     );
     expect(sameTeam.sim.meta(allyKiller)!.honor).toBe(0);
 
-    const practice = new Sim({ seed: 7, playerClass: 'warrior' });
+    const practice = new Sim({ seed: 7, playerClass: 'warrior', world: RL_TEST_WORLD });
     expect(practice.startFiestaPractice()).toBe(true);
     let match: ArenaMatch | null = null;
     for (let i = 0; i < 20 * 8; i++) {
@@ -284,7 +480,7 @@ describe('Fiesta honor', () => {
 describe('Thornhollow Fields honor income', () => {
   function bgPlayer(): { sim: Sim; meta: NonNullable<ReturnType<Sim['meta']>> } {
     const sim = world();
-    sim.utcDay = '2026-08-06';
+    sim.resetDay = '2026-08-06';
     const pid = sim.addPlayer('warrior', 'Fielder', { characterId: 700 });
     return { sim, meta: sim.meta(pid)! };
   }
@@ -364,7 +560,7 @@ describe('Thornhollow Fields honor income', () => {
 
   it('leaves Fiesta awards on the shared zero-floor curve', () => {
     const sim = world();
-    sim.utcDay = '2026-08-06';
+    sim.resetDay = '2026-08-06';
     const pid = sim.addPlayer('rogue', 'Partygoer', { characterId: 701 });
     const meta = sim.meta(pid)!;
     const pairs = new Map<string, number>();
@@ -410,7 +606,13 @@ describe('WARFARE damage', () => {
     target.stats.pvpDefense = 0.2;
     target.maxHp = target.hp = 1_000;
     friendly.maxHp = friendly.hp = 1_000;
-    sim.duels.set(sourcePid, { a: sourcePid, b: targetPid, state: 'active', timer: 0 });
+    sim.duels.set(sourcePid, {
+      a: sourcePid,
+      b: targetPid,
+      state: 'active',
+      timer: 0,
+      controlled: new Map(),
+    });
     sim.duels.set(targetPid, sim.duels.get(sourcePid)!);
 
     (sim as any).dealDamage(source, target, 100, false, 'arcane', null, 'hit');
@@ -438,7 +640,13 @@ describe('WARFARE damage', () => {
     source.stats.pvpOffense = 9;
     target.stats.pvpDefense = 9;
     target.maxHp = target.hp = 1_000;
-    sim.duels.set(sourcePid, { a: sourcePid, b: targetPid, state: 'active', timer: 0 });
+    sim.duels.set(sourcePid, {
+      a: sourcePid,
+      b: targetPid,
+      state: 'active',
+      timer: 0,
+      controlled: new Map(),
+    });
     sim.duels.set(targetPid, sim.duels.get(sourcePid)!);
 
     (sim as any).dealDamage(source, target, 100, false, 'arcane', null, 'hit');

@@ -1,13 +1,12 @@
-// Item id -> weapon variant key. The SINGLE source of truth shared by the 2D bag
-// icon (src/ui/icons.ts, rendered as /ui/weapons/<key>.jpg) and the 3D held model
-// (src/render/characters/manifest.ts, attached as models/weapons/<key>.glb), so a
-// weapon's in-hand model always matches its inventory icon.
+// Item id -> held-weapon variant key. This registry selects the 3D model attached by
+// src/render/characters/manifest.ts as models/weapons/<key>.glb. Inventory identity is
+// deliberately independent: every authored weapon now ships bespoke painted art at
+// public/ui/items/<item-id>.webp, while Heroic copies inherit their base painting.
 //
 // Pure data, no imports, no DOM: safe to import from both the ui icon layer and
-// the render character layer (and from node unit tests). Add a weapon here once
-// and both surfaces pick it up. Keys are the rendered art set in public/ui/weapons/
-// and public/models/weapons/. Weapons are spread across the available models for
-// variety; art is limited so daggers/maces still share a model across a few items.
+// the render character layer (and from node unit tests). Add a base weapon here and add its
+// painted item WebP in the same change. Values name both the GLBs and their legacy JPG previews
+// under public/ui/weapons/, which remain useful to Armory and asset-pipeline tooling.
 export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   // ---- swords (sword_a..g + the adv set; legendary/epic kept distinct) --------
   worn_sword: 'sword_a',
@@ -68,6 +67,13 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   mistcallers_fang: 'adv_dagger', // EPIC: Heroic Vael dagger
   wildheart_fangknife: 'adv_dagger',
   voidsong_dirk: 'adv_dagger', // LEGENDARY: the S-rift caster dirk
+  // New rogue epics/rare, each a distinct unused dagger model (not adv_dagger)
+  rimefang: 'ice_fang', // EPIC: Rift frost dagger
+  marrowpoint: 'redskull_dagger', // EPIC: Cindraleth (Drakelands) bone dagger
+  duskwhisper: 'purple_dagger', // EPIC: Wildheart Beastmaster shadow dagger
+  // heroic_duskwhisper inherits the base variant via heroicOf (auto-generated);
+  // it must NOT have its own entry here (held_weapon_models pins that).
+  boneglass_shiv: 'whittler_s_knife', // RARE: Basin Lv17-19 filler
 
   // ---- staves (staff_a..d + adv_staff + adv_druid_staff) ----------------------
   gnarled_staff: 'staff_a',

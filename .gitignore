@@ -141,3 +141,9 @@ docs/music/renders/
 /scripts/gravewyrm_trio.mjs
 /TESTING-TALENTS-2-0.md
 parse-spool/
+
+# test artifacts: per-pid probe symlinks from tests/sfx_studio_server_security.test.ts
+public/models/sfx-studio-security-*.glb
+
+# Build artifacts (review 3050: class-directions PDFs land here)
+output/

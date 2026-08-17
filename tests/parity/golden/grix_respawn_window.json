@@ -1,0 +1,740 @@
+{
+  "scenario": "grix_respawn_window",
+  "seed": 1016,
+  "sampleEvery": 1,
+  "ticks": 0,
+  "coverage": [
+    "respawnWindow: death -> resolveRespawnSeconds rolls rng.range(36, 72) x 25s base",
+    "second kill after an in-place respawnMob rolls an independent window value"
+  ],
+  "draws": 17,
+  "drawDigest": "1f988a97",
+  "frames": [
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 964,
+      "state": "5bc471b0",
+      "events": "741638a5",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "init",
+      "players": [],
+      "entities": []
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 966,
+      "state": "0e048d08",
+      "events": "08b654a2",
+      "rng": {
+        "draws": 8,
+        "digest": "0abbf3ef"
+      },
+      "label": "first-kill",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 2362,
+            "kills": 1,
+            "xpGained": 192
+          },
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 2362,
+              "kills": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "slain:grix_the_tunnelking"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "cmb_giantslayer",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 964,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 192,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {},
+            "marks": [
+              "slain:grix_the_tunnelking"
+            ],
+            "recent": [
+              "slain:grix_the_tunnelking"
+            ]
+          },
+          "renown": 10,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "xp": 192
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 964
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 1000000,
+          "id": 964,
+          "inCombat": true,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 1000000,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "dead",
+          "bossDamagers": [
+            964
+          ],
+          "comboUntil": -1,
+          "corpseTimer": 60,
+          "critChance": 0.05,
+          "dead": true,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "id": 965,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 4,
+            "y": 1.5
+          },
+          "level": 7,
+          "loot": {
+            "copper": 140,
+            "items": [
+              {
+                "count": 1,
+                "itemId": "tallow_candle"
+              },
+              {
+                "count": 1,
+                "itemId": "lesser_healing_potion"
+              },
+              {
+                "count": 1,
+                "itemId": "tunnelkings_spade"
+              },
+              {
+                "count": 1,
+                "itemId": "hollowbone_hauberk"
+              }
+            ]
+          },
+          "lootFfaTimer": 60,
+          "lootRecipientIds": [
+            964
+          ],
+          "lootable": true,
+          "maxHp": 1362,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 4,
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "respawnTimer": 1799.057371,
+          "spawnPos": {
+            "x": 4,
+            "y": 1.5
+          },
+          "stats": {
+            "armor": 144
+          },
+          "tappedById": 964,
+          "templateId": "grix_the_tunnelking",
+          "weapon": {
+            "max": 58,
+            "min": 37,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 966,
+      "state": "ce9d9873",
+      "events": "f597efc4",
+      "rng": {
+        "draws": 17,
+        "digest": "1f988a97"
+      },
+      "label": "second-kill",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 4724,
+            "kills": 2,
+            "xpGained": 384
+          },
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 4724,
+              "kills": 2
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "slain:grix_the_tunnelking"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "cmb_giantslayer",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 964,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 384,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {},
+            "marks": [
+              "slain:grix_the_tunnelking"
+            ],
+            "recent": [
+              "slain:grix_the_tunnelking"
+            ]
+          },
+          "renown": 10,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "xp": 384
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 964
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 1000000,
+          "id": 964,
+          "inCombat": true,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 1000000,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "dead",
+          "bossDamagers": [
+            964
+          ],
+          "comboUntil": -1,
+          "corpseTimer": 60,
+          "critChance": 0.05,
+          "dead": true,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "id": 965,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 4,
+            "y": 1.5
+          },
+          "level": 7,
+          "loot": {
+            "copper": 130,
+            "items": [
+              {
+                "count": 1,
+                "itemId": "tallow_candle"
+              },
+              {
+                "count": 1,
+                "itemId": "lesser_healing_potion"
+              },
+              {
+                "count": 1,
+                "itemId": "tunnelkings_spade"
+              },
+              {
+                "count": 1,
+                "itemId": "moggers_copper_cudgel"
+              },
+              {
+                "count": 1,
+                "itemId": "briarroot_staff"
+              }
+            ]
+          },
+          "lootFfaTimer": 60,
+          "lootRecipientIds": [
+            964
+          ],
+          "lootable": true,
+          "maxHp": 1362,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 4,
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "respawnTimer": 1463.975608,
+          "spawnPos": {
+            "x": 4,
+            "y": 1.5
+          },
+          "stats": {
+            "armor": 144
+          },
+          "tappedById": 964,
+          "templateId": "grix_the_tunnelking",
+          "wanderTimer": 7.012083,
+          "weapon": {
+            "max": 58,
+            "min": 37,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 966,
+      "state": "ce9d9873",
+      "events": "741638a5",
+      "rng": {
+        "draws": 17,
+        "digest": "1f988a97"
+      },
+      "label": "final",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 4724,
+            "kills": 2,
+            "xpGained": 384
+          },
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 4724,
+              "kills": 2
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "slain:grix_the_tunnelking"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "cmb_giantslayer",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 964,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 384,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {},
+            "marks": [
+              "slain:grix_the_tunnelking"
+            ],
+            "recent": [
+              "slain:grix_the_tunnelking"
+            ]
+          },
+          "renown": 10,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "xp": 384
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 964
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 1000000,
+          "id": 964,
+          "inCombat": true,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 1000000,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "dead",
+          "bossDamagers": [
+            964
+          ],
+          "comboUntil": -1,
+          "corpseTimer": 60,
+          "critChance": 0.05,
+          "dead": true,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "id": 965,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 4,
+            "y": 1.5
+          },
+          "level": 7,
+          "loot": {
+            "copper": 130,
+            "items": [
+              {
+                "count": 1,
+                "itemId": "tallow_candle"
+              },
+              {
+                "count": 1,
+                "itemId": "lesser_healing_potion"
+              },
+              {
+                "count": 1,
+                "itemId": "tunnelkings_spade"
+              },
+              {
+                "count": 1,
+                "itemId": "moggers_copper_cudgel"
+              },
+              {
+                "count": 1,
+                "itemId": "briarroot_staff"
+              }
+            ]
+          },
+          "lootFfaTimer": 60,
+          "lootRecipientIds": [
+            964
+          ],
+          "lootable": true,
+          "maxHp": 1362,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 4,
+            "y": 1.5
+          },
+          "potionCooldownUntil": -1,
+          "respawnTimer": 1463.975608,
+          "spawnPos": {
+            "x": 4,
+            "y": 1.5
+          },
+          "stats": {
+            "armor": 144
+          },
+          "tappedById": 964,
+          "templateId": "grix_the_tunnelking",
+          "wanderTimer": 7.012083,
+          "weapon": {
+            "max": 58,
+            "min": 37,
+            "speed": 2
+          }
+        }
+      ]
+    }
+  ]
+}

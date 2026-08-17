@@ -88,6 +88,17 @@ export function instanceBindingLines(
   return '';
 }
 
+/** The player item lock line (issue 3042, src/sim/item_lock.ts): unlike the
+ *  Maker's Bond lines above, not scoped to commission-eligible equipment
+ *  kinds, since a player can lock any bag copy. The toggle itself only ever
+ *  targets a bag slot (src/sim/item_lock.ts setItemLocked), so this renders
+ *  on bag/bank tooltips; a worn item's projection (wornTooltipInstance above)
+ *  never carries `locked`, so this is naturally a no-op on the paperdoll. */
+export function instanceLockLine(instance?: ItemInstancePayload): string {
+  if (!instance?.locked) return '';
+  return `<div class="tt-sub" style="color:var(--gold)">${esc(t('hudChrome.bags.itemLockedLine'))}</div>`;
+}
+
 /** The masterwork seal (gold, the soulbound line's style). A legacy signed copy
  *  renders nothing here. There is deliberately NO standalone enchanted marker:
  *  a bare "Enchanted" badge told a player their copy was enchanted but not what

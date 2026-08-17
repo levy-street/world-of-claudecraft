@@ -5,9 +5,13 @@ import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
 import { READY_CHECK_SECONDS } from '../src/sim/social/ready_check';
 import type { SimEvent } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
+// Ready-check logic only touches parties, the sim clock, and chat/log emits: no
+// camp/npc/ground-object content is ever reached, so the ambient built-in world is
+// unnecessary here (subsystem-world pattern, docs/local-gate-perf Phase 9).
 function makeParty() {
-  const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+  const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true, world: EMPTY_TEST_WORLD });
   const lead = sim.addPlayer('warrior', 'Lead');
   const mate = sim.addPlayer('mage', 'Mate');
   sim.partyInvite(mate, lead);
@@ -17,7 +21,7 @@ function makeParty() {
 
 // Leader plus three members, so a single finalize can produce every tally bucket.
 function makeParty4() {
-  const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+  const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true, world: EMPTY_TEST_WORLD });
   const lead = sim.addPlayer('warrior', 'Lead');
   const a = sim.addPlayer('mage', 'Aay');
   const b = sim.addPlayer('priest', 'Bee');
@@ -58,7 +62,12 @@ describe('ready check', () => {
     const { sim, mate } = makeParty();
     sim.chat('/ready', mate); // member, not leader
     expect((sim as any).readyChecks.size).toBe(0);
-    const solo = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const solo = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const alone = solo.addPlayer('warrior', 'Solo');
     solo.chat('/ready', alone);
     expect((solo as any).readyChecks.size).toBe(0);

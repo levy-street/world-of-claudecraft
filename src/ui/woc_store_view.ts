@@ -62,8 +62,14 @@ export interface ArmoryContext {
   skinCatalog: SkinCatalog;
 }
 
+/** The Armory thumbnail directory, exported so consumers reasoning about the
+ *  FAMILY (the reliquary's opaque-art carve-out) share this one path instead
+ *  of re-spelling it. These cards paint their own bright background with no
+ *  alpha matte, unlike the dark-card item icon style. */
+export const ARMORY_SKIN_ART_DIR = '/ui/store/armory';
+
 export function armorySkinArt(skinId: string): string {
-  return `/ui/store/armory/${skinId}.webp`;
+  return `${ARMORY_SKIN_ART_DIR}/${skinId}.webp`;
 }
 
 /** Season 1 Armory sections, highest rarity first (the hero collection leads).

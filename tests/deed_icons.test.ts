@@ -140,15 +140,8 @@ const MISSING_PAINTED_DEED_IDS = [
   'pvp_card_duel_first_win',
 ] as const;
 
-// The two Drakelands brood deeds this branch appends (src/sim/content/deeds.ts tail).
-// Their 512px sources are not commissioned yet, so they ride the sanctioned fallback in the
-// Icons authoring rule in docs/design/deeds.md ("an artless deed falls back to its procedural
-// category crest, so art can trail the deed") and are flagged for the commissioned set in
-// docs/achievements/icon-brief.md. The debt is enumerated ONCE, as DEED_ART_PENDING beside
-// ITEM_ART_PENDING in src/ui/icons.ts, and every art test reads that one name so no two of them
-// can end up stating a different pending set. It is EXHAUSTIVE in both directions: a third
-// artless deed reds the suite, and so does a stale entry the moment `npm run assets:deeds`
-// ingests a crest.
+// The exhaustive art-debt ledger. It stays empty while every live deed has painted art, and a
+// future artless deed must enter this set explicitly rather than hiding behind a category crest.
 const DEED_ART_PENDING_IDS = [...DEED_ART_PENDING];
 
 describe('Book of Deeds webp icons', () => {
@@ -366,31 +359,30 @@ describe('Book of Deeds webp icons', () => {
     }
   });
 
-  it('an artless deed card resolves to a procedural crest (no committed image)', () => {
-    // Any live deed awaiting art must land on its category base crest, which carries no
-    // image URL and falls through to the procedural canvas path. The pending set is pinned
-    // exhaustively (DEED_ART_PENDING, src/ui/icons.ts) and the two counts below are literal, so a
-    // third artless deed, a dropped webp, or a silent catalog append all red here. The Rift
-    // coverage pair (dgn_rift, dgn_rift_s_rank) ships artless per docs/design/deeds.md step 6
-    // ("art can trail the deed"), and the twelve zone chronicle deeds added for
-    // frostveil/amberfall/nightbloom/wraithwood/palmreach/evergarden ship art-trailing per the
-    // same rule; both join the pending set alongside the Thornhollow Fields battleground quartet,
-    // the Drakelands brood pair, and the seven per-craft rare-tier profession deeds (issue #2055).
+  it('resolves every painted deed to its WebP; artless deeds sit in the pinned pending set', () => {
     const artless = DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id));
     expect(artless, 'only the pinned art-pending deeds may lack painted art').toEqual([
       ...DEED_ART_PENDING_IDS,
     ]);
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(262);
-    expect(DEED_IMAGE_IDS.size, 'the committed art set is unchanged by this PR').toBe(232);
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(273);
+    expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(271);
     for (const id of artless) {
-      const crestId = deedCrestId(id, DEEDS[id].category);
-      expect(crestId, `${id} must fall back to a category base crest`).toMatch(/^deed_cat_/);
+      const catCrestId = deedCrestId(id, DEEDS[id].category);
+      expect(catCrestId, `${id} must fall back to a category base crest`).toMatch(/^deed_cat_/);
       expect(
-        hasCrestRecipe(crestId),
-        `${id} -> ${crestId} must be a real procedural recipe, not the generic fallback`,
+        hasCrestRecipe(catCrestId),
+        `${id} -> ${catCrestId} must be a real procedural recipe, not the generic fallback`,
       ).toBe(true);
-      expect(deedImageUrl(crestId), `${id} -> ${crestId} must have no committed image`).toBeNull();
+      expect(
+        deedImageUrl(catCrestId),
+        `${id} -> ${catCrestId} must have no committed image`,
+      ).toBeNull();
       expect(deedImageUrl(`deed_${id}`), `${id} itself must have no committed image`).toBeNull();
+    }
+    for (const id of DEED_ORDER.filter((liveId) => DEED_IMAGE_IDS.has(liveId))) {
+      const crestId = deedCrestId(id, DEEDS[id].category);
+      expect(crestId, `${id} must keep its bespoke crest identity`).toBe(`deed_${id}`);
+      expect(deedImageUrl(crestId), id).toBe(`/ui/deeds/${id}.webp`);
     }
     expect(DEED_IMAGE_IDS.has('synthetic_artless')).toBe(false);
     expect(deedImageUrl('deed_synthetic_artless')).toBeNull();
@@ -398,8 +390,7 @@ describe('Book of Deeds webp icons', () => {
     expect(deedImageUrl('deed_cat_progression')).toBeNull();
     expect(deedImageUrl('deed_cat_dungeon')).toBeNull();
     expect(deedImageUrl('deed_cat_chronicle')).toBeNull();
-    // A non-deed_ crest id (a class or family unit-portrait crest) misses the prefix guard and
-    // returns null, so those crests keep their procedural canvas path untouched.
+    // A non-deed_ crest id misses this helper's prefix guard; crestIconUrl owns those paintings.
     expect(deedImageUrl('status_npc')).toBeNull();
     expect(deedImageUrl('family_wolf')).toBeNull();
   });

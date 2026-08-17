@@ -82,8 +82,8 @@ export const CLASS_DETAILS: Record<PlayerClass, ClassDetails> = {
 // tests/charselect_class_details.test.ts so this never drifts from the sim.
 export const SIGNATURE_ABILITIES: Record<PlayerClass, string[]> = {
   warrior: ['charge', 'heroic_strike', 'execute'],
-  paladin: ['holy_light', 'judgement', 'seal_of_righteousness'],
-  hunter: ['serpent_sting', 'aimed_shot', 'arcane_shot'],
+  paladin: ['holy_light', 'hammer_of_grace', 'divine_ascension'],
+  hunter: ['pack_command', 'measured_shot', 'raptor_strike'],
   rogue: ['sinister_strike', 'eviscerate', 'evasion'],
   priest: ['smite', 'power_word_shield', 'shadow_word_pain'],
   shaman: ['lightning_bolt', 'rockbiter_weapon', 'ghost_wolf'],
@@ -130,34 +130,34 @@ export const SPEC_CARD_INFO: Record<PlayerClass, Record<string, SpecCardInfo>> =
     holy: {
       primaryStat: 'int',
       complexity: 'low',
-      examples: ['holy_shock', 'holy_light', 'flash_of_light', 'lay_on_hands'],
+      examples: ['holy_light', 'dawns_embrace', 'radiant_chorus', 'lay_on_hands'],
     },
     protection: {
       primaryStat: 'str',
       complexity: 'medium',
-      examples: ['holy_shield', 'consecration', 'righteous_fury', 'sacred_bulwark'],
+      examples: ['bastion_sweep', 'oath_chain', 'holy_shield', 'consecration'],
     },
     retribution: {
       primaryStat: 'str',
       complexity: 'low',
-      examples: ['crusader_strike', 'judgement', 'seal_of_righteousness', 'exorcism'],
+      examples: ['final_edict', 'sun_gods_verdict', 'hammer_of_wrath', 'avenging_wrath'],
     },
   },
   hunter: {
     beast_mastery: {
       primaryStat: 'agi',
       complexity: 'low',
-      examples: ['bestial_wrath', 'tame_beast', 'serpent_sting', 'mongoose_bite'],
+      examples: ['pack_command', 'unleash_beast', 'bestial_wrath', 'tame_beast'],
     },
     marksmanship: {
       primaryStat: 'agi',
       complexity: 'medium',
-      examples: ['trueshot_aura', 'aimed_shot', 'rapid_fire', 'volley'],
+      examples: ['measured_shot', 'aimed_shot', 'rapid_fire', 'cold_focus'],
     },
     survival: {
       primaryStat: 'agi',
       complexity: 'high',
-      examples: ['wyvern_sting', 'wing_clip', 'concussive_shot', 'counter_shot'],
+      examples: ['bloodhook', 'raptor_strike', 'mongoose_bite', 'shrapnel_charge'],
     },
   },
   rogue: {
@@ -203,7 +203,7 @@ export const SPEC_CARD_INFO: Record<PlayerClass, Record<string, SpecCardInfo>> =
     enhancement: {
       primaryStat: 'str',
       complexity: 'medium',
-      examples: ['stormstrike', 'rockbiter_weapon', 'flametongue_weapon', 'lightning_shield'],
+      examples: ['stormstrike', 'rockbiter_weapon', 'galeheart_weapon', 'lightning_shield'],
     },
     restoration: {
       primaryStat: 'int',
@@ -236,8 +236,8 @@ export const SPEC_CARD_INFO: Record<PlayerClass, Record<string, SpecCardInfo>> =
     },
     demonology: {
       primaryStat: 'int',
-      complexity: 'medium',
-      examples: ['metamorphosis', 'summon_felguard', 'summon_voidwalker', 'demon_skin'],
+      complexity: 'high',
+      examples: ['soul_harvest', 'raise_bone_mage', 'army_of_the_dead', 'metamorphosis'],
     },
     destruction: {
       primaryStat: 'int',

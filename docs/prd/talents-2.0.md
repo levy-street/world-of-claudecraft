@@ -283,9 +283,9 @@ The designated scalable axis per spec (base value = shipped magnitude):
 | paladin/holy | heal crit damage (critDmgPct on heals) | +50% (2x) |
 | paladin/protection | threat (threatPct) | 50% |
 | paladin/retribution | Holy + physical ability damage (paired meleeDmgPct + spellDmgPct, scale together) | 20% |
-| hunter/beast_mastery | pet damage (petDmgPct) | 35% |
-| hunter/marksmanship | physical ability damage (meleeDmgPct) | 20% |
-| hunter/survival | physical ability damage (meleeDmgPct) | 15% |
+| hunter/beast_mastery | pet damage (petDmgPct) | 25% |
+| hunter/marksmanship | physical ability damage (meleeDmgPct) | 12% |
+| hunter/survival | Agility (agiPct) | 15% |
 | mage/arcane | spell damage (spellDmgPct) | 15% |
 | mage/fire | spell crit damage (critDmgPct) | +50% (2x) |
 | mage/frost | Frost spell damage (frost-kit ability dmgPct) | 25% |
@@ -323,7 +323,7 @@ reachable only through `mods.grants`. Result across all 27 specs:
   to copy.
 - Fake, WORTHLESS (baseline with learnLevel <= 10, already known when spec
   unlocks at 10): eviscerate (1), lightning_bolt (1), healing_wave (1),
-  demon_skin (1), judgement (4), power_word_shield (6), arcane_missiles (8),
+  demon_skin (1), power_word_shield (6), arcane_missiles (8),
   tame_beast (10), wing_clip (10), drain_life (10), bear_form (10).
 - Fake, EARLY-ACCESS ONLY (baseline learnLevel 12-20, the grant is a head
   start that evaporates by cap): flash_of_light (12), regrowth (14),
@@ -341,7 +341,7 @@ demotions: no existing character loses an ability they have today.
 |---|---|---|
 | paladin/holy | flash_of_light | Holy Shock (instant heal or damage) |
 | paladin/protection | righteous_fury | Holy Shield (block/absorb active) |
-| paladin/retribution | judgement | Repentance (single-target incapacitate) |
+| paladin/retribution | removed legacy action | Repentance (single-target incapacitate) |
 | hunter/beast_mastery | tame_beast | Bestial Wrath (pet enrage active) |
 | hunter/marksmanship | aimed_shot | Trueshot Aura (party ranged AP aura) |
 | hunter/survival | wing_clip | Wyvern Sting (sleep sting) |
@@ -424,9 +424,6 @@ destroys signature identity. The three offenders and their replacements
   REPLACE: "Crippling Blows" [mod]: Bladed Gyre (whirlwind) also applies
   the hamstring slow to everything it hits (addEffects, P5 machinery).
   Keeps the r14 damage-row theme without touching the signature.
-- pal_r14_crusader_strike (granted crusader_strike, the ret signature).
-  REPLACE: "Swift Verdicts" [mod]: Verdict (judgement) cooldown -40% and
-  cost -20%. Plain-but-strong, per the one-plain-option-per-row rule.
 - wlk_r20_metamorphosis (granted metamorphosis, the demonology signature).
   REPLACE: "Grimoire of Haste" [mod]: your demon gains +20% attack speed
   and +10% damage (pet buff vocabulary from the Dread Aspect rework).
@@ -596,27 +593,9 @@ baseline), so bringing the interrupt is a build decision. Kits below were
 extracted from classes.ts with learn levels; nothing references an ability
 that does not exist unless marked [grant NEW].
 
-**Paladin** (kit: seals, holy_light, devotion_aura, judgement,
-blessing_of_might, divine_protection, hammer_of_justice, lay_on_hands,
-flash_of_light, exorcism, consecration, righteous_fury, retribution_aura)
-- L5: Crusader's Zeal [mod] (Judgement cd -40%) / Blessed Momentum [P2]
-  (Holy Light castable while moving) / Vengeful Exorcism [mod]
-  (Exorcism dmg +25%, cost -25%)
-- L8: Rebuke [grant NEW, P1] (interrupt, 4s lockout, 12s cd) /
-  Fist of Justice [mod] (Hammer of Justice cd -40%) /
-  Consecrated Ground [mod] (Consecration dmg +30%, cost -30%)
-- L11: Divine Wisdom [mod] (heals cost -15%) / Guardian's Favor [mod]
-  (Divine Protection and Lay on Hands cd -33%) / Greater Blessing [mod]
-  (Blessing of Might effect +50%)
-- L14: Crusader Strike [grant NEW] (instant strike, 6s cd) /
-  Holy Wrath [grant NEW] (AoE holy nuke, 20s cd) /
-  Righteous Cause [mod] (Seal and Judgement dmg +15%)
-- L17: Divine Shield [grant NEW] (full immunity 8s, cannot attack, 5min cd) /
-  Sacred Ward [mod] (Devotion Aura +50%, Lay on Hands +30%) /
-  Ardent Defender [stats] (armor +10%, max HP +8%, the plain pick)
-- L20: Avenging Wrath [grant NEW] (+20% dmg and healing 20s, 3min cd; gold
-  tint via the form-tint render feature) / Hammer of Wrath [grant NEW]
-  (ranged holy execute below 20% HP) / Aura Mastery [mod] (auras +60%)
+**Paladin:** this early illustrative draft has been superseded. The implemented level
+5/8/11/14/17/20 rows and their exact runtime rules live in
+[`docs/design/paladin-devotion-core.md`](../design/paladin-devotion-core.md).
 
 **Hunter** (kit: raptor_strike, aspect_of_the_hawk/monkey/cheetah,
 serpent_sting, arcane_shot, concussive_shot, mongoose_bite, wing_clip,

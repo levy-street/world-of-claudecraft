@@ -4,13 +4,19 @@
 // shared-Sim references (resolve / stopFollow / entities / grid / the hostility +
 // arena helpers / partyOf / error / primaryId) now route through `this.ctx`. Statement
 // order, branches, grid-traversal order, and in-place mutation are preserved exactly;
-// the slice draws no rng, so the parity draw-order log must stay byte-identical.
+// the slice draws no rng, so the parity draw-order log must stay byte-identical. Later
+// edits have since touched some bodies (see `git log` on this file), so read them as
+// behavior-preserving rather than literally verbatim. The most recent: tabTarget's index
+// arithmetic moved into the pure `stepTabTarget` leaf so the backward bind
+// (tabTargetPrev) can share it. The forward result is unchanged: the parity golden covers
+// the cluster arm, and the fallback arm is pinned by the unit cases in
+// tests/tab_target.test.ts.
 //
 // Two disjoint concerns share this module (and this class) but no state: the stateless
 // target selectors (tab / nearest / friendly cycle, which only read/write entity
 // fields through the seam) and the party-scoped raid-marker STORE (`partyMarkers`),
 // which moved off Sim with its methods — mirroring the PartyMachine pattern (A1).
-// `markersFor`/`setMarker`/`clearMarker`/`markerFor` plus the nine selectors stay
+// `markersFor`/`setMarker`/`clearMarker`/`markerFor` plus every selector stay
 // reachable on Sim through thin same-named delegates (IWorld + the many foreign
 // main/hud/renderer/server/obs call sites); `clearEntityMarker` (death/despawn hooks)
 // and `dropPartyMarkers` (the A1 disband path) reach the moved code through the seam.
@@ -24,7 +30,7 @@ import { deadTargetSelectable } from './dead_target';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { isVcupCrossTeam } from './social/vale_cup';
-import { orderTabTargets, TAB_QUERY_RADIUS } from './tab_target';
+import { orderTabTargets, stepTabTarget, TAB_QUERY_RADIUS, type TabStep } from './tab_target';
 import type { Entity } from './types';
 
 export class Targeting {
@@ -85,6 +91,17 @@ export class Targeting {
   }
 
   tabTarget(pid?: number): void {
+    this.cycleEnemyTarget(1, pid);
+  }
+
+  // Shift+Tab: the mirror of tabTarget, stepping the same ordered candidate list
+  // backwards so a player who cycled one enemy too far can step straight back
+  // onto it instead of wrapping all the way around.
+  tabTargetPrev(pid?: number): void {
+    this.cycleEnemyTarget(-1, pid);
+  }
+
+  private cycleEnemyTarget(step: TabStep, pid?: number): void {
     const r = this.ctx.resolve(pid);
     if (!r) return;
     const p = r.e;
@@ -92,7 +109,7 @@ export class Targeting {
     if (candidates.length === 0) return;
     // Cycle the enemies the player can see / is fighting first; off-screen ones
     // stay reachable but never steal the selection (see tab_target.ts).
-    const { ids, primaryCount } = orderTabTargets(
+    const order = orderTabTargets(
       candidates.map((c) => ({
         id: c.e.id,
         dx: c.e.pos.x - p.pos.x,
@@ -102,21 +119,7 @@ export class Targeting {
       })),
       p.facing,
     );
-    const curIdx = ids.indexOf(p.targetId ?? -1);
-    let nextId: number;
-    if (curIdx === -1) {
-      // No (or no longer valid) target: grab the priority enemy, cluster first.
-      nextId = ids[0];
-    } else if (curIdx < primaryCount) {
-      // Cycling the near fight cluster: wrap back to its first (priority) mob
-      // instead of stepping out to a distant idle enemy still in range.
-      nextId = ids[(curIdx + 1) % primaryCount];
-    } else {
-      // Sitting on a distant fallback target: walk the rest of the fallback,
-      // then wrap back into the near cluster.
-      const next = curIdx + 1;
-      nextId = next < ids.length ? ids[next] : ids[0];
-    }
+    const nextId = stepTabTarget(order, order.ids.indexOf(p.targetId ?? -1), step);
     if (this.stopsAutoAttackOnSwitch(r.meta, p, nextId)) p.autoAttack = false;
     p.targetId = nextId;
   }

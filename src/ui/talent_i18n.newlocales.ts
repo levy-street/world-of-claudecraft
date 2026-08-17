@@ -423,7 +423,7 @@ export const TALENT_NEW_TITLE_OVERRIDES: Record<
   cs_CZ: {
     'Adrenaline Junkie': 'Adrenalinový šílenec',
     'Aspect Mastery': 'Mistrovství aspektů',
-    'Aura Mastery': 'Mistrovství aur',
+    'Sacred Concord': 'Posvátný soulad',
     'Battlemage Armor': 'Zbroj bitevního mága',
     'Blessed Momentum': 'Požehnaný spád',
     'Blessed Recovery': 'Požehnané zotavení',
@@ -506,7 +506,7 @@ export const TALENT_NEW_TITLE_OVERRIDES: Record<
   nl_NL: {
     'Adrenaline Junkie': 'Adrenalineverslaafde',
     'Aspect Mastery': 'Aspectmeesterschap',
-    'Aura Mastery': 'Aurameesterschap',
+    'Sacred Concord': 'Heilige eendracht',
     'Battlemage Armor': 'Strijdmagiërpantser',
     'Blessed Momentum': 'Gezegende vaart',
     'Blessed Recovery': 'Gezegend herstel',
@@ -589,7 +589,7 @@ export const TALENT_NEW_TITLE_OVERRIDES: Record<
   pl_PL: {
     'Adrenaline Junkie': 'Nałóg adrenaliny',
     'Aspect Mastery': 'Mistrzostwo aspektów',
-    'Aura Mastery': 'Mistrzostwo aur',
+    'Sacred Concord': 'Święta zgoda',
     'Battlemage Armor': 'Pancerz maga bitewnego',
     'Blessed Momentum': 'Błogosławiony pęd',
     'Blessed Recovery': 'Błogosławiona odnowa',
@@ -672,7 +672,7 @@ export const TALENT_NEW_TITLE_OVERRIDES: Record<
   id_ID: {
     'Adrenaline Junkie': 'Pecandu Adrenalin',
     'Aspect Mastery': 'Penguasaan Aspek',
-    'Aura Mastery': 'Penguasaan Aura',
+    'Sacred Concord': 'Harmoni suci',
     'Battlemage Armor': 'Zirah Penyihir Tempur',
     'Blessed Momentum': 'Momentum Terberkati',
     'Blessed Recovery': 'Pemulihan Terberkati',
@@ -755,7 +755,7 @@ export const TALENT_NEW_TITLE_OVERRIDES: Record<
   tr_TR: {
     'Adrenaline Junkie': 'Adrenalin Tutkunu',
     'Aspect Mastery': 'Suret Ustalığı',
-    'Aura Mastery': 'Aura Ustalığı',
+    'Sacred Concord': 'Kutsal ahenk',
     'Battlemage Armor': 'Savaş Büyücüsü Zırhı',
     'Blessed Momentum': 'Kutsanmış İvme',
     'Blessed Recovery': 'Kutsanmış Toparlanma',
@@ -838,7 +838,7 @@ export const TALENT_NEW_TITLE_OVERRIDES: Record<
   sv_SE: {
     'Adrenaline Junkie': 'Adrenalinberoende',
     'Aspect Mastery': 'Aspektmästerskap',
-    'Aura Mastery': 'Auramästerskap',
+    'Sacred Concord': 'Helig samklang',
     'Battlemage Armor': 'Stridsmagikerrustning',
     'Blessed Momentum': 'Välsignat momentum',
     'Blessed Recovery': 'Välsignad återhämtning',
@@ -921,7 +921,7 @@ export const TALENT_NEW_TITLE_OVERRIDES: Record<
   vi_VN: {
     'Adrenaline Junkie': 'Kẻ Nghiện Adrenalin',
     'Aspect Mastery': 'Tinh Thông Dạng Thức',
-    'Aura Mastery': 'Tinh Thông Hào Quang',
+    'Sacred Concord': 'Thánh hòa',
     'Battlemage Armor': 'Giáp Pháp Sư Chiến',
     'Blessed Momentum': 'Đà Phước Lành',
     'Blessed Recovery': 'Hồi Phục Phước Lành',
@@ -1004,7 +1004,7 @@ export const TALENT_NEW_TITLE_OVERRIDES: Record<
   da_DK: {
     'Adrenaline Junkie': 'Adrenalinjæger',
     'Aspect Mastery': 'Aspektmesterskab',
-    'Aura Mastery': 'Auramesterskab',
+    'Sacred Concord': 'Hellig samklang',
     'Battlemage Armor': 'Kampmagikerrustning',
     'Blessed Momentum': 'Velsignet fremdrift',
     'Blessed Recovery': 'Velsignet genopretning',

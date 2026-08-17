@@ -33,19 +33,19 @@ export const table: DeedLocaleTable = {
     desc: 'Rensa en reva av grad S, den svåraste graden en revportal kan skapa.',
   },
   pvp_honor_sergeant: {
-    name: 'Sergeant',
+    name: 'Linjebrytare',
     desc: 'Tjäna in 10 000 heder under din livstid. Att spendera den kostar dig aldrig rangen.',
-    title: 'Sergeant',
+    title: 'Linjebrytare',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Riddarlöjtnant',
+    name: 'Fälthärjare',
     desc: 'Tjäna in 40 000 heder under din livstid, en säsong av verkligt krig bakom dig.',
-    title: 'Riddarlöjtnant',
+    title: 'Fälthärjare',
   },
   pvp_honor_field_marshal: {
-    name: 'Fältmarskalk',
+    name: 'Krigskrönt',
     desc: 'Tjäna in 150 000 heder under din livstid. Sällsynt i alla riken, och så borde det vara.',
-    title: 'Fältmarskalk',
+    title: 'Krigskrönt',
   },
   chr_drakemaw_broodlord: {
     name: 'Kullbrytaren',
@@ -920,5 +920,49 @@ export const table: DeedLocaleTable = {
   prog_armorcrafting_rare: {
     name: 'Pansrad till perfektion',
     desc: 'Skapa ditt första sällsynta föremål i Rustningssmide.',
+  },
+  col_reliquary_rank_2: {
+    name: 'Bytesväktare',
+    desc: 'Nå intendentgrad 2 i Relikvariet (10 unika katalogiserade reliker).',
+    title: 'Bytesväktare',
+  },
+  col_reliquary_rank_3: {
+    name: 'Katalogisatorn',
+    desc: 'Nå intendentgrad 3 i Relikvariet (25 unika katalogiserade reliker).',
+    title: 'Katalogisatorn',
+  },
+  col_reliquary_rank_4: {
+    name: 'Ärkeintendent',
+    desc: 'Nå intendentgrad 4 i Relikvariet (50 unika katalogiserade reliker).',
+    title: 'Ärkeintendent',
+  },
+  col_reliquary_rank_5: {
+    name: 'Eviga byten',
+    desc: 'Nå intendentgrad 5 i Relikvariet (100 unika katalogiserade reliker).',
+  },
+  col_reliquary_complete: {
+    name: 'Det Stora Relikvariet',
+    desc: 'Katalogisera varje relik i Relikvariet som en rollperson kan behålla. Att katalogen växer senare tar det aldrig ifrån dig.',
+    title: 'Valvets intendent',
+  },
+  col_reliquary_conquerors: {
+    name: 'Erövrarnas hylla',
+    desc: 'Katalogisera varje relik på Relikvariets hylla Erövrare. Att katalogen växer senare tar det aldrig ifrån dig.',
+    title: 'Valvbrytare',
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    name: 'Nythraxis illuminerad',
+    desc: 'Illuminera sidan Heroisk: Nythraxis-raid i Relikvariet.',
+    title: 'Nythraxis ljus',
+  },
+  col_reliquary_illum_thunzharr: {
+    name: 'Thunzharr illuminerad',
+    desc: 'Illuminera sidan Thunzharr, den vaknande toppen i Relikvariet.',
+    title: 'Thunzharrs ljus',
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    name: 'Helgedomen illuminerad',
+    desc: 'Illuminera sidan Heroisk: Gravlindormens helgedom i Relikvariet.',
+    title: 'Helgedomens ljus',
   },
 };

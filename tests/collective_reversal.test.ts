@@ -83,7 +83,7 @@ describe('Collective Reversal content', () => {
 });
 
 describe('Collective Reversal behavior', () => {
-  it('finishes after seven seconds and offers every dead raid member a resurrection', () => {
+  it('finishes after seven seconds and offers every dead raid member within reach', () => {
     const { sim, mage } = chronomancer();
     const fallenWarrior = addToGroup(sim, mage, 'warrior', 'Fallen Warrior');
     const fallenPriest = addToGroup(sim, mage, 'priest', 'Fallen Priest');
@@ -93,11 +93,15 @@ describe('Collective Reversal behavior', () => {
     expect(sim.partyOf(mage.id)?.raid).toBe(true);
 
     killAt(fallenWarrior, mage.pos.x + 3, mage.pos.z + 2);
-    killAt(fallenPriest, mage.pos.x + 120, mage.pos.z + 80);
+    // The priest's BODY stays in reach while the released ghost walks far away:
+    // reach measures the corpse, so the offer still arrives.
+    killAt(fallenPriest, mage.pos.x + 5, mage.pos.z + 4);
     const priestCorpse = { ...(fallenPriest.corpsePos ?? fallenPriest.pos) };
     fallenPriest.ghost = true;
     fallenPriest.pos = { x: mage.pos.x + 200, y: mage.pos.y, z: mage.pos.z + 200 };
     fallenPriest.prevPos = { ...fallenPriest.pos };
+    // A raid member dead across the map is beyond resurrection reach (the
+    // unbounded sweep was the raid/heroic lockout bypass): no offer for them.
     killAt(fallenMage, mage.pos.x - 90, mage.pos.z - 70);
     const livingHp = livingMage.hp;
 
@@ -116,10 +120,12 @@ describe('Collective Reversal behavior', () => {
     expect(fallenMage.dead).toBe(true);
 
     const completionEvents = sim.tick();
-    mage.pos.x += 50;
-    mage.pos.z += 50;
+    // The caster drifts a few yards but stays within reach of the bodies: the
+    // live caster remains the arrival anchor for every accept.
+    mage.pos.x += 10;
+    mage.pos.z += 10;
     const currentCasterPosition = { x: mage.pos.x, z: mage.pos.z };
-    for (const offered of [fallenWarrior, fallenPriest, fallenMage]) {
+    for (const offered of [fallenWarrior, fallenPriest]) {
       expect(offered.dead).toBe(true);
       expect(completionEvents).toContainEqual(
         expect.objectContaining({
@@ -136,6 +142,10 @@ describe('Collective Reversal behavior', () => {
       expect(offered.pos.z).toBe(currentCasterPosition.z);
       expect(offered.hp).toBe(Math.round(offered.maxHp * 0.3));
     }
+    expect(completionEvents).not.toContainEqual(
+      expect.objectContaining({ type: 'resurrectionOffer', pid: fallenMage.id }),
+    );
+    expect(fallenMage.dead).toBe(true);
     expect(livingMage.hp).toBe(livingHp);
     expect(stranger.dead).toBe(true);
     expect(completionEvents).toContainEqual(

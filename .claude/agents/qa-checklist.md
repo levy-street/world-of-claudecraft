@@ -92,64 +92,47 @@ Skip if no `src/sim/` files are in scope.
   Run it for any sim change OR any `src/ui` / `src/render` change, not only sim.
 - A same-seed-same-result determinism test exists or is updated for new sim logic.
 
-### 2. Three-host / IWorld parity
+### 2. Three-host / IWorld parity (dispatch `cross-platform-sync`)
 
-Skip if the change is purely internal to one host.
+Skip if the change is purely internal to one host. For any wire / parity / matcher change the
+deep checklist is the `cross-platform-sync` agent; dispatch it and hold only the headline rules
+here:
 - New/changed `IWorld` members land in the matching facet file (`src/world_api/<facet>.ts`,
-  never the barrel) and are implemented in BOTH `Sim` (`src/sim/sim.ts`) and `ClientWorld`
-  (`src/net/online.ts`), with no stub in `ClientWorld`; the no-stub / kind-flip guard is
-  `npx vitest run tests/world_api_parity.test.ts` (the `IWORLD_MEMBERS` pin, updated in the
-  same change).
-- New snapshot fields are both encoded (`server/game.ts` `wireEntity`/`selfWireJson`) and
-  decoded (`src/net/online.ts` `applyWire`/`applySnapshot`), delta-guarded.
-- New `SimEvent`s are handled on the client; personal events route by `pid`.
-- New client commands have a server dispatch handler.
-- If the RL surface changed, `headless/env_server.ts` and `python/` stay consistent.
-- A new pure view core is parity-tested against BOTH a Sim-shaped and a ClientWorld-mirror
-  `IWorld` stub (online-only shapes the offline perf harness would not catch: absorb is
-  offline-only, the leaderboard is async/paged, target cast remaining and combo pips differ).
+  never the barrel), are implemented in BOTH `Sim` and `ClientWorld` with no stub, and update
+  the `IWORLD_MEMBERS` pin in the same change (`npx vitest run tests/world_api_parity.test.ts`).
+- New snapshot fields are both encoded (`server/game.ts`) and decoded (`src/net/online.ts`);
+  new `SimEvent`s are handled on the client; new client commands have a server dispatch
+  handler; the RL surface (`headless/env_server.ts` + `python/`) stays consistent.
 - Merely CONSUMING an already-landed `IWorld` member does not change it; do not treat that as a
   parity change.
 
-### 3. Server authority & security
+### 3. Server authority & security (dispatch `privacy-security-review`)
 
-Skip if no `server/` files are in scope.
+Skip if no `server/` files are in scope. For any auth / SQL / secret / wallet / admin surface
+the deep checklist is the `privacy-security-review` agent; dispatch it and hold only the
+headline rules here:
 - The client never decides combat/loot/quest/economy outcomes; handlers validate intent and let
   the `Sim` compute results (no client-supplied damage/loot/level/gold).
-- A new REST endpoint is a `RouteDef` module (`server/<domain>.ts` `export const routes`)
-  registered in `server/http/registry.ts` (scaffold: `npm run new:endpoint`), NEVER an inline
-  handler appended to the legacy `server/main.ts` ladder (retained only for the
-  `API_DISPATCH=legacy` rollback). Auth / ownership / rate limiting are declared middleware
-  and `meta.requireOwned`, not in-handler code; new error codes are APPENDED to
-  `server/http/error_codes.ts` (append-only, snapshot-guarded by
-  `tests/server/http/error_codes.test.ts`). Read `server/http/CLAUDE.md` when `server/http/`
-  or a routes table is in scope.
-- Dev/cheat command paths are gated behind `ALLOW_DEV_COMMANDS`; nothing enables it by default
-  or in production.
-- All SQL is parameterized (`$1, $2, ...` via `pg`); no string-built queries.
-- New WS commands and REST endpoints validate every argument (type, range, length, ownership);
-  rate limiting applies to abusable actions.
-- Admin endpoints require the admin gate (the `require_admin` middleware on a RouteDef, or
-  `adminAccountId` / `isAdminAccount` on the legacy arm); moderation actions are admin-gated.
-- No secrets hardcoded, none bundled into the client, none logged. For anything touching auth,
-  tokens, wallet, or the deploy secret, dispatch `privacy-security-review`.
+- A new REST endpoint is a `RouteDef` module registered in `server/http/registry.ts` (scaffold:
+  `npm run new:endpoint`), NEVER an inline handler on the legacy `server/main.ts` ladder; auth /
+  ownership / rate limiting are declared middleware, and new error codes are APPENDED to
+  `server/http/error_codes.ts` (snapshot-guarded by `tests/server/http/error_codes.test.ts`).
+  Read `server/http/CLAUDE.md` when `server/http/` or a routes table is in scope.
+- Dev/cheat paths stay behind `ALLOW_DEV_COMMANDS` (never on by default or in production); all
+  SQL is parameterized; no secrets hardcoded, bundled into the client, or logged.
 
-### 4. Persistence
+### 4. Persistence (dispatch `migration-safety`)
 
-Skip if persistence is unchanged.
-- Schema DDL changes are additive and idempotent (`IF NOT EXISTS`), safe to re-run on every boot
-  under the advisory lock. The schema is inline DDL applied in order by `ensureSchema()` in
-  `server/db.ts` (its `SCHEMA` plus the domain `*_SCHEMA` modules it imports; no migrations
-  directory), and the order is load-bearing.
-- Any JSONB blob (`characters.state`, the `world_state.data` rows: market via
-  `saveMarketState` / `loadMarketState` / `MarketSave` and mail via `saveMailState` /
-  `loadMailState` / `MailSave`, and `accounts.cosmetics`) defaults new fields on load;
-  characters/rows saved before this change still load without throwing or losing data.
-- New fields are written on every save path (autosave + on-leave + on-shutdown), not just held
-  in memory.
-- A new NOT NULL column on an existing table has a DEFAULT; new query predicates have indexes.
-- A save/load round-trip test exists for new state. For any schema or JSONB change, dispatch
-  `migration-safety`.
+Skip if persistence is unchanged. For any DDL or persisted-JSONB change the deep checklist is
+the `migration-safety` agent; dispatch it and hold only the headline rules here:
+- Schema DDL is additive and idempotent (`IF NOT EXISTS`), safe to re-run at every boot under
+  the `ensureSchema()` advisory lock (inline DDL in order, no migrations directory; the order
+  is load-bearing). Concurrent index builds go through the `CONCURRENT_INDEX_MIGRATIONS`
+  registry (`server/concurrent_indexes.ts`), built after listen, never ad hoc.
+- Any persisted JSONB blob (`characters.state`, the `world_state.data` rows,
+  `accounts.cosmetics`) defaults new fields on load (rows saved before the change still load),
+  and new fields are written on EVERY save path (autosave + on-leave + on-shutdown).
+- A save/load round-trip test exists for new state.
 
 ### 5. i18n
 
@@ -202,18 +185,22 @@ is the `frontend-seam-reviewer` agent; dispatch it and hold only the headline ru
   Gates: `tests/ui_tier_knobs.test.ts`, `tests/ui_effects_profile.test.ts`;
   `docs/design/graphics-settings-fairness.md` is the contract.
 
-### 7. Content fidelity
+### 7. Content fidelity & obligations (dispatch `content-obligations-reviewer`)
 
-Skip if no `src/sim/content/` files are in scope.
-- Gameplay math follows real classic-era formulas (rage, hit tables, armor DR, XP curves); no
-  invented balance numbers. No test knows the formulas, so verify against the design docs and
-  mark `[VERIFY]` where you cannot confirm from code alone.
-- Content referential integrity holds (quests reference real mobs/items; drop tables and rewards
-  resolve); covered by `tests/progression.test.ts` / `tests/talents.test.ts`.
+Skip if no `src/sim/content/` files are in scope. For any added or changed content record the
+deep checklist is the `content-obligations-reviewer` agent; dispatch it and hold only the
+headline rules here:
 - New content is data-as-code in `src/sim/content/`, merged through `src/sim/data.ts`, never an
-  inline table in `sim.ts`.
-- Player-facing content also feeds the `/wiki` guide: `npm run wiki:content` was run and any new
-  `guide.*` prose keys were added (freshness-gated by `tests/guide.test.ts`).
+  inline table in `sim.ts`; referential integrity holds (quests reference real mobs/items; drop
+  tables and rewards resolve; `tests/progression.test.ts` / `tests/talents.test.ts`).
+- Gameplay math follows real classic-era formulas (rage, hit tables, armor DR, XP curves); no
+  invented balance numbers. No test knows the formulas, so verify against `docs/design/` and
+  mark `[VERIFY]` where you cannot confirm from code alone.
+- The SAME-change obligations hold: Book of Deeds records for new conquerable content
+  (`tests/deeds_content.test.ts`), Reliquary pages for conquerable unique loot
+  (`tests/reliquary_content.test.ts`), wiki regen plus any new `guide.*` prose keys
+  (`npm run wiki:content`, freshness-gated by `tests/guide.test.ts`), and committed WebP item
+  art plus M16 non-Latin name fills for every new item id (`tests/item_icons.test.ts`).
 
 ### 8. Performance
 
@@ -241,18 +228,18 @@ Skip if no `src/sim/content/` files are in scope.
 ### 10. Build & copy gate
 
 - `npx tsc --noEmit` is clean.
-- The relevant Vitest files pass; for a full check the CI-equivalent gate is green, in the order
-  `npm run gate` (`scripts/gate.mjs`) runs it serially (CI splits the same step list across a
-  sharded test matrix plus a parallel checks job, pinned by `tests/ci_workflow.test.ts`):
-  `npm run i18n:gen` then the i18n freshness check
-  (`git diff --exit-code` over the generated i18n artifacts), `npm run security:gate`,
-  `npm run ci:changed` (biome, changed files), `npm run sfx:check`,
-  `npm test`, `npm run test:browser`, `npm run check:types`, `npm run build:env`,
-  `npm run build:server`, `npm run build:bot`, `npm run build`.
+- The relevant Vitest files pass; the pre-merge bar is `node scripts/gate_select.mjs`: the full
+  gate step list with one substitution (the full vitest run becomes an always-run set plus
+  `vitest related`), falling back to the full suite for any change it cannot classify.
+  `npm run gate` (`scripts/gate.mjs`) is the deeper full check; `npm run gate:fast` is the
+  day-loop subset and NEVER a merge bar. Do not work from a memorized step list: the
+  authoritative steps are `scripts/lib/gate_steps.mjs` and the model is `docs/qa-gate.md`
+  (CI splits the same steps across a sharded test matrix plus a parallel checks job, pinned by
+  `tests/ci_workflow.test.ts`).
 - Biome gates CHANGED FILES ONLY (`npm run ci:changed`); it fails on errors and format diffs,
   not lint warnings. A stray whole-tree `biome --write` that drags an unrelated monolith into
   the diff is a `[FAIL]` (the global Biome chore is deferred; never reformat the legacy tree).
-- Recommend `npm run gate` (`scripts/gate.mjs`) over an ad-hoc shell chain for the full check
+- Recommend `node scripts/gate_select.mjs` or `npm run gate` over an ad-hoc shell chain
   (release-tier automatically on a `release/**` branch); the rationale (piped exit codes,
   load flakes, worker caps) is in root `CLAUDE.md`.
 - FFmpeg comes from the bundled `ffmpeg-static`/`ffprobe-static` packages: the SFX suites and
@@ -273,12 +260,14 @@ Skip if no `src/sim/content/` files are in scope.
 | `server/`, `src/admin/`, `src/net/`, a deploy/secret file, new SQL/auth/secret/wallet code, or a new `Math.random`/`Date.now`/`performance.now` in `src/sim/` or a pure core | privacy-security-review |
 | `server/*_db.ts` DDL or any persisted JSONB shape (`characters.state`, a `world_state` row incl. market/mail, `accounts.cosmetics`) | migration-safety |
 | SQL or a database call site, schema/indexes, query cadence or cardinality, pool/lock/timeout behavior, scheduled database work, a database driver or Postgres engine/config change, or stored-data growth | database-performance-reviewer |
+| server-side per-tick, per-request, or per-broadcast work: a shared read or cache, a growing table or in-memory collection, a snapshot/event payload, new world-loop work | server-hot-path-reviewer |
 | `src/world_api.ts` (IWorld), `src/sim/`, `src/net/online.ts`, `server/game.ts` wire/dispatch, or the sim/server i18n matchers | cross-platform-sync |
 | `src/sim/` (determinism, rng draw-order, tick-phase, SimContext seam, move-not-rewrite on a relocation) | architecture-reviewer |
 | `src/ui/`, `src/styles/`, or `src/render/` presentation change (HUD windows/painters, CSS, mobile, graphics tiering) | frontend-seam-reviewer |
 | a release tag / `release/**` branch | release-malware-audit (plus `I18N_RELEASE_TIER=1`) |
 | new or rewritten tests, or acceptance criteria that claim coverage | test-coverage-auditor |
-| `src/sim/content/` balance-number change | no automated guard exists: flag for maintainer review against `docs/design/` |
+| `src/sim/content/` record added or changed (items, mobs, quests, zones, dungeons, abilities, recipes, deeds, reliquary) | content-obligations-reviewer (balance numbers additionally get maintainer eyes against `docs/design/`) |
+| `scripts/gate*.mjs`, `scripts/lib/gate_*.mjs` / `ci_*.mjs`, `scripts/lib/test_visibility.mjs`, `scripts/ci_shard_test.mjs`, `.github/workflows/`, or their pin tests (`tests/ci_workflow.test.ts`, `tests/ci_shard_plan.test.ts`, `tests/gate_select_plan.test.ts`, `tests/ci_test_select.test.ts`, `tests/nightly_plan.test.ts`) | gate-integrity-reviewer |
 | any completed deliverable set | this gate is the default |
 
 Consuming an already-landed `IWorld` member does not change it; do not dispatch

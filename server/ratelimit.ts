@@ -634,7 +634,7 @@ export function resetPublicReadRateLimits(): void {
 export const CHARACTER_MUTATION_MAX_PER_MINUTE = 20;
 
 /** The character mutations that each carry a dedicated per-account limiter bucket. */
-export type CharacterMutationAction = 'create' | 'rename' | 'delete' | 'takeover';
+export type CharacterMutationAction = 'create' | 'rename' | 'delete' | 'takeover' | 'reroll';
 
 const characterMutationIpAttempts = new Map<string, number[]>();
 const characterMutationAccountAttempts = new Map<string, number[]>();

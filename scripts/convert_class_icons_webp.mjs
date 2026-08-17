@@ -2,7 +2,7 @@
 //
 // Drop new art into public/ui/classes/ in ANY common raster format
 // (.png/.jpg/.jpeg/.gif/.bmp/.tif/.tiff/.avif), named for the class id it belongs to
-// (warrior.png, druid.png, ...), then run:  npm run assets:classes
+// (warrior.png, druid.png, ...), then run:  node scripts/convert_class_icons_webp.mjs
 // Each non-webp image is downscaled to ICON_SIZE, encoded to a sibling <id>.webp with the
 // tuned options below, and the ORIGINAL is deleted, so the committed tree is always WebP
 // only (the guard in tests/class_icons.test.ts fails if a non-webp image is ever committed).

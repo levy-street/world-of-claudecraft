@@ -725,7 +725,13 @@ must be re-derived if either number is ever tuned on its own.
   the hub rule with the ladder top routed through content (R23, the delve
   Marks prototype), R22 wield requirements reachable on the ladder below,
   the gatherer chronicle and first-cast deeds, and wiki presence. Shipping
-  an incomplete zone reds the gate instead of relying on memory.
+  an incomplete zone reds the gate instead of relying on memory. The first
+  zone that ships a tier-4 node or water also flips the tier-4/5 tools from
+  comfort items into ACCESS items, so the Drowned Litany's Marks tool rows
+  (`src/sim/content/delves/shop.ts`, priced for a world whose ladder tops
+  out at tier 3) and the wield table are re-derived in that SAME change;
+  the shop file's RE-CHECK TRIGGER comment is the other half of this
+  tripwire.
 - CAP SCALING when zone 4 arrives (design note, phase 13; implementation
   rides the first new zone): the land cap and the fishing cap are today
   authored constants (`GATHERING_PROFESSIONS` maxSkill 100 / 200) that

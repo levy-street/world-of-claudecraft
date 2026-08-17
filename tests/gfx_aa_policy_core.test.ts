@@ -30,7 +30,7 @@ describe('graphics anti-aliasing policy', () => {
     });
   });
 
-  it('preserves the constrained-memory and native iOS pixel-ratio ceilings', () => {
+  it('preserves the constrained-memory and iOS WebKit pixel-ratio ceilings', () => {
     expect(gfxAaPolicy('ultra', { constrainedMemory: true })).toEqual({
       pixelRatioCap: 1.48,
       msaaSamples: 0,
@@ -39,7 +39,7 @@ describe('graphics anti-aliasing policy', () => {
     expect(
       gfxAaPolicy('insane', {
         constrainedMemory: true,
-        nativeIosMemoryProfile: true,
+        iosMemoryProfile: true,
       }),
     ).toEqual({
       pixelRatioCap: 1.25,

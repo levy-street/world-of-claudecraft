@@ -361,6 +361,12 @@ function onSealedCrest(x: number, z: number): boolean {
 // steep, wall-banded, and encloses its own standable foot away from the
 // zone flood (measured: steepness 4.59, spot (-231.5,452.0) unreached).
 const ON_MAZE_WALL_POCKET = { x: -232, z: 452 };
+// Shared once, the same reason reachedByZone above is: the stand-spot and
+// reachability counter-example arms below both flood this exact origin
+// against this exact box (ZONES[0].hub, boxed around the hub and the maze
+// pocket), so computing it twice bought nothing but wall time.
+const MAZE_WALL_FLOOD_BOX = boxAround([ZONES[0].hub, ON_MAZE_WALL_POCKET]);
+const MAZE_WALL_FLOOD = floodFrom(ZONES[0].hub, MAZE_WALL_FLOOD_BOX);
 const ON_SOWFIELD_STAND = { x: -41, z: -137 }; // groundHeight adds the stand lift here
 const INSIDE_A_TOWN_COLLIDER = { x: -29, z: 0 };
 // Genuinely enclosed, not merely overlapping: the nearest ground a player
@@ -494,6 +500,20 @@ describe('gather node placement: every node sits on ground a player can work', (
     return worst;
   };
 
+  // Computed once and shared, the same reason reachedByZone above is: the
+  // arm right below and the tightest-pair check inside the next test both run
+  // this exact sweep over every shipped node, and re-running it a second time
+  // over the same 54 nodes bought nothing but wall time, since the function is
+  // a pure read of the (seed, node position) pair both arms already validate.
+  const seaClearanceByNode = new Map(
+    GATHER_NODES.map((node) => [node.id, seaClearanceInReach(node.pos.x, node.pos.z)] as const),
+  );
+  function cachedSeaClearance(nodeId: string): number {
+    const cached = seaClearanceByNode.get(nodeId);
+    if (cached === undefined) throw new Error(`no cached sea clearance for ${nodeId}`);
+    return cached;
+  }
+
   it('no water in reach: a gatherer never has to stand in the sea to work a node', () => {
     // Freeboard at the node's own point is not the whole question, and the
     // shipped content proved it: five nodes cleared the sea plane where they
@@ -508,7 +528,7 @@ describe('gather node placement: every node sits on ground a player can work', (
     // bound is the waterline itself: ground under it is water, and a node
     // whose working area contains water is not placed on land.
     for (const node of GATHER_NODES) {
-      const clearance = seaClearanceInReach(node.pos.x, node.pos.z);
+      const clearance = cachedSeaClearance(node.id);
       expect(
         clearance,
         `${node.id} at (${node.pos.x},${node.pos.z}) has open water ${(-clearance).toFixed(2)}yd deep inside its ${REACH}yd harvest reach`,
@@ -553,7 +573,7 @@ describe('gather node placement: every node sits on ground a player can work', (
     let tightest = Number.POSITIVE_INFINITY;
     let who = '';
     for (const node of GATHER_NODES) {
-      const clearance = seaClearanceInReach(node.pos.x, node.pos.z);
+      const clearance = cachedSeaClearance(node.id);
       if (clearance < tightest) {
         tightest = clearance;
         who = node.id;
@@ -780,12 +800,12 @@ describe('gather node placement: every node sits on ground a player can work', (
     // wall a spot IS standable, and the leg is the only thing that rejects it.
     // Floods its own box containing the point, because the Eastbrook box stops
     // near x = -12 and using it would pass for being out of bounds instead.
+    // Shared with the reachability arm below (MAZE_WALL_FLOOD): same origin,
+    // same box, computed once above.
     const spot = nearestStandSpot(ON_MAZE_WALL_POCKET.x, ON_MAZE_WALL_POCKET.z);
     expect(spot, 'the maze fixture must be standable, or it proves nothing').not.toBeNull();
     if (!spot) return;
-    const box = boxAround([ZONES[0].hub, ON_MAZE_WALL_POCKET]);
-    const reached = floodFrom(ZONES[0].hub, box);
-    expect(reached.has(cellKey(spot.x, spot.z))).toBe(false);
+    expect(MAZE_WALL_FLOOD.has(cellKey(spot.x, spot.z))).toBe(false);
   });
 
   it('hub reachability: every node is walkable-or-swimmable from its zone hub', () => {
@@ -800,20 +820,19 @@ describe('gather node placement: every node sits on ground a player can work', (
   });
 
   it('the reachability arm rejects a point walled off in the maze pocket', () => {
-    const hub = ZONES[0].hub;
     // Flood a box that deliberately CONTAINS the maze point, so failing to
-    // reach it is the wall's doing and not the bounding box's.
-    const box = boxAround([hub, ON_MAZE_WALL_POCKET]);
-    expect(ON_MAZE_WALL_POCKET.x).toBeLessThanOrEqual(box.xMax);
-    expect(ON_MAZE_WALL_POCKET.z).toBeLessThanOrEqual(box.zMax);
-    expect(ON_MAZE_WALL_POCKET.z).toBeGreaterThanOrEqual(box.zMin);
-    const reached = floodFrom(hub, box);
+    // reach it is the wall's doing and not the bounding box's. Shared with the
+    // stand-spot arm above (MAZE_WALL_FLOOD): same origin, same box, computed
+    // once above.
+    expect(ON_MAZE_WALL_POCKET.x).toBeLessThanOrEqual(MAZE_WALL_FLOOD_BOX.xMax);
+    expect(ON_MAZE_WALL_POCKET.z).toBeLessThanOrEqual(MAZE_WALL_FLOOD_BOX.zMax);
+    expect(ON_MAZE_WALL_POCKET.z).toBeGreaterThanOrEqual(MAZE_WALL_FLOOD_BOX.zMin);
     // NOT the hub cell: floodFrom seeds that unconditionally, so asserting it
     // would hold for a flood that spread nowhere at all. A cell 100 yards out
     // (west, INSIDE this box; the box's east edge sits at the hub margin)
     // proves the flood actually travelled before the wall stopped it.
-    expect(reached.has(cellKey(-100, 0))).toBe(true);
-    expect(reached.has(cellKey(ON_MAZE_WALL_POCKET.x, ON_MAZE_WALL_POCKET.z))).toBe(false);
+    expect(MAZE_WALL_FLOOD.has(cellKey(-100, 0))).toBe(true);
+    expect(MAZE_WALL_FLOOD.has(cellKey(ON_MAZE_WALL_POCKET.x, ON_MAZE_WALL_POCKET.z))).toBe(false);
   });
 
   it('zone containment: a node resolves to the zone whose material it grants', () => {

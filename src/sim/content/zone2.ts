@@ -694,6 +694,7 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
       'q_drowned',
       'q_drowned_censers',
       'q_no_rest',
+      'q_rite_of_redemption',
       'q_summoners',
       'q_bastion_door',
       'q_mistcaller',
@@ -1061,6 +1062,29 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     },
     requiresQuest: 'q_drowned_censers',
   },
+  // --- Paladin-only Dawnbound Tome chain, final step (learn Recall the Fallen). Aldric
+  // has followed the Light into the marsh; the rite is hallowed on the drowned ground
+  // and the ability is granted on turn-in (recall_the_fallen's requiresQuest gate). ---
+  q_rite_of_redemption: {
+    id: 'q_rite_of_redemption',
+    name: 'The Rite of Recall',
+    giverNpcId: 'brother_aldric_fen',
+    turnInNpcId: 'brother_aldric_fen',
+    text: 'So you followed me into the mire, $N. Good. I have the Dawnbound Tome here, and this drowned ground is where its words belong: nowhere is the veil between life and death thinner than a place where the dead will not stay buried. But the drowned would drag your voice down mid-verse. Clear a space fit for the rite: put 8 of the Drowned Dead to rest, and we will consecrate it together.',
+    completionText:
+      'Kneel, $N, and read the words aloud. There. Do you feel it? The Light no longer only mends the living in your hands, it can summon back those who have crossed over. Use it wisely. A soul called back to a hopeless fight is a cruelty, not a mercy. Rise, Redeemer.',
+    objectives: [
+      { type: 'kill', targetMobId: 'drowned_dead', count: 8, label: 'Drowned Dead laid to rest' },
+    ],
+    xpReward: 1800,
+    copperReward: 600,
+    itemRewards: {},
+    requiredClass: ['paladin'],
+    requiresQuest: 'q_divine_tome',
+    // Same minimum as the opening step (6): once you finish the Vale step you can
+    // do the rite the moment you reach Aldric in the marsh, no extra levels waited.
+    minLevel: 6,
+  },
   q_trolls: {
     id: 'q_trolls',
     name: 'Mounds of the Mirefen',
@@ -1286,6 +1310,7 @@ export const ZONE2_QUEST_ORDER = [
   'q_drowned',
   'q_drowned_censers',
   'q_no_rest',
+  'q_rite_of_redemption',
   'q_trolls',
   'q_troll_fetishes',
   'q_grubjaw',

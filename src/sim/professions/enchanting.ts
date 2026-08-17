@@ -60,6 +60,7 @@ import { ENCHANTS, type EnchantDef } from '../content/enchants';
 import { ENCHANT_FAMILY_CAST_DURATION_SEC } from '../content/professions';
 import { ITEMS } from '../data';
 import { recalcPlayerStats } from '../entity';
+import { consumeSelectedInventorySlot, itemCopyPin } from '../item_copy_ref';
 import { requiredLevelFor } from '../item_level_req';
 import { forceDismount } from '../mounts';
 import type { Rng } from '../rng';
@@ -311,23 +312,6 @@ export interface DisenchantResult {
     | 'busy';
 }
 
-function consumeSelectedInventorySlot(
-  inventory: InvSlot[],
-  itemId: string,
-  slotIndex: number | undefined,
-): ConsumedDisenchantUnit | undefined | null {
-  if (slotIndex === undefined) return undefined;
-  if (!Number.isInteger(slotIndex) || slotIndex < 0 || slotIndex >= inventory.length) return null;
-  const slot = inventory[slotIndex];
-  if (slot.itemId !== itemId || slot.count < 1) return null;
-  const instance =
-    slot.instance && slot.count > 1 ? cloneItemInstancePayload(slot.instance) : slot.instance;
-  const craftedRecipeId = slot.craftedRecipeId;
-  slot.count -= 1;
-  if (slot.count <= 0) inventory.splice(slotIndex, 1);
-  return { instance, craftedRecipeId };
-}
-
 function consumePreferredDisenchantVictim(
   inventory: InvSlot[],
   itemId: string,
@@ -528,32 +512,6 @@ export function evaluateDisenchantAdmission(
 /** Canonical JSON with recursively sorted object keys, so two structurally
  *  identical instance payloads fingerprint identically regardless of key
  *  insertion order (a save round-trip can reorder keys). Pure, draw-free. */
-function sortedJson(value: unknown): string {
-  if (Array.isArray(value)) return `[${value.map(sortedJson).join(',')}]`;
-  if (value !== null && typeof value === 'object') {
-    const record = value as Record<string, unknown>;
-    // An explicit undefined fingerprints like an ABSENT key (JSON.stringify
-    // drops both), so clearing a field by assignment can never flip the pin.
-    const keys = Object.keys(record)
-      .filter((k) => record[k] !== undefined)
-      .sort();
-    return `{${keys.map((k) => `${JSON.stringify(k)}:${sortedJson(record[k])}`).join(',')}}`;
-  }
-  return JSON.stringify(value) ?? 'null';
-}
-
-/** Per-copy identity fingerprint of a pin-selected disenchant victim slot:
- *  itemId + instance payload + slot craft marker, everything that
- *  distinguishes one copy of an item id from another. '' for no slot. */
-export function disenchantVictimPin(slot: InvSlot | undefined): string {
-  if (!slot) return '';
-  return sortedJson({
-    c: slot.craftedRecipeId ?? null,
-    i: slot.itemId,
-    p: slot.instance ?? null,
-  });
-}
-
 function beginEnchantFamilyCast(
   ctx: SimContext,
   p: Entity,
@@ -650,7 +608,7 @@ export function disenchantItem(
     // Pin the SELECTED copy's identity, not just its index: the complete-side
     // re-check below is what stops a mid-cast bag splice from redirecting the
     // destroy onto a different copy of the same item id.
-    targetPin: slotIndex === undefined ? '' : disenchantVictimPin(meta.inventory[slotIndex]),
+    targetPin: slotIndex === undefined ? '' : itemCopyPin(meta.inventory[slotIndex]),
   });
   return { ok: true, itemId, casting: true };
 }
@@ -665,15 +623,12 @@ export function completeDisenchantCast(ctx: SimContext, p: Entity, meta: PlayerM
   if (session.itemId === '') return;
   const slotIndex = session.bagSlot < 0 ? undefined : session.bagSlot;
   // Pin re-check for a slot-selected disenchant: a mid-cast bag splice (move,
-  // destroy, sell, bank) can shift a DIFFERENT copy of the same item id under
-  // the pinned index, and resolveDisenchant's id-only slot check would then
+  // destroy, sell, bank, sort) can shift a DIFFERENT copy of the same item id
+  // under the pinned index, and resolveDisenchant's id-only slot check would then
   // destroy a copy the player never selected (the enchanted or masterwork
   // one). Deny not_held instead; the player re-picks. Unpinned disenchants
   // re-resolve their preferred victim fresh and need no pin.
-  if (
-    slotIndex !== undefined &&
-    disenchantVictimPin(meta.inventory[slotIndex]) !== session.targetPin
-  ) {
+  if (slotIndex !== undefined && itemCopyPin(meta.inventory[slotIndex]) !== session.targetPin) {
     const result: DisenchantResult = { ok: false, itemId: session.itemId, reason: 'not_held' };
     meta.lastDisenchantResult = result;
     ctx.emit({
@@ -1019,10 +974,14 @@ function resolveReplaceEnchantBagged(
   // the replacement: the payload transform above carries every `instance` field
   // through, but the marker lives on the SLOT, so without this the replace arm
   // would launder a self-crafted piece exactly as the plain apply arm did.
+  // movement: this re-mints the player's OWN copy in place, the same reason
+  // silent + callerLogs are set, so it is not a new acquisition for the
+  // Reliquary tally either (re-enchanting a relic must not raise its count).
   ctx.addItemInstance(itemId, replacedEnchantPayloadFor(consumed.instance, enchant), pid, 1, {
     silent: true,
     callerLogs: true,
     craftedRecipeId: consumed.craftedRecipeId,
+    movement: true,
   });
   // Quality-tiered gain: the applied enchant's reagent-derived tier, exactly
   // like the plain arms (also stamps the shared throttle).
@@ -1161,10 +1120,13 @@ export function resolveApplyEnchant(
   // reopening the anti-farm gate (professions/crafting.ts
   // isCraftedDisenchantTrackedOutput) through a craft -> enchant -> disenchant
   // loop the player runs entirely on their own gear.
+  // movement: the plain apply arm re-mints the player's own copy too (see the
+  // replace arm above), so it is a relocation, not an acquisition.
   ctx.addItemInstance(itemId, merged, pid, 1, {
     silent: true,
     callerLogs: true,
     craftedRecipeId: consumed?.craftedRecipeId,
+    movement: true,
   });
   // Quality-tiered gain: the applied enchant's reagent-derived tier.
   if (meta) grantEnchantingSkill(ctx, meta, enchantGainTier(enchant));

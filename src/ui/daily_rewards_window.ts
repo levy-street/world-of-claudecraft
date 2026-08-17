@@ -1,4 +1,3 @@
-import { WEAPON_SKIN_LIST } from '../sim/content/weapon_skins';
 import type { PlayerClass, WeaponSkinType } from '../sim/types';
 import type { DailyRewardHistory, DailyRewardStatus, IWorld } from '../world_api';
 import { ArmoryInspect } from './armory_inspect';
@@ -158,12 +157,6 @@ export class DailyRewardsWindow {
       return;
     }
     void this.renderCurrent('open');
-  }
-
-  /** Prebuild the store's persistent Armory context while loading hides it. */
-  async prewarmArmoryPreview(): Promise<void> {
-    if (!this.storeEnabled()) return;
-    await this.ensureArmoryInspect().prewarm(WEAPON_SKIN_LIST.map((skin) => skin.id));
   }
 
   /** Dispose the profile-bound Armory context; the next open rebuilds it lazily. */

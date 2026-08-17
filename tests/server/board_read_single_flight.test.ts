@@ -10,7 +10,10 @@
 // counts share ONE single-key cache (both getters read one readProjectStats
 // flight, so a cold burst costs exactly one getAccountsCount and one
 // getCharactersCount read) and are moderation-INVARIANT, so the cache is NOT
-// bust-wired and a cold-cache db error degrades both counts to 0.
+// bust-wired and a cold-cache db error degrades both counts to 0. The reliquary
+// population aggregate rides the deed-rarity entry, TTL, and flight rather than
+// carrying a second cadence for its characters walk, so (F2) pins that one
+// refresh warms BOTH slices and that the reliquary slice degrades the same way.
 //
 // These drive the REAL module-private getters through boardReadTestSeam (exported
 // by server/main.ts) with only the underlying db reads mocked, so every
@@ -48,6 +51,7 @@ const dbMocks = vi.hoisted(() => ({
   getAccountsCount: vi.fn(),
   getCharactersCount: vi.fn(),
   deedRarityCounts: vi.fn(),
+  reliquaryRarityCounts: vi.fn(),
   deedsBoardRanked: vi.fn(),
   charactersForDeedsBoard: vi.fn(),
 }));
@@ -71,6 +75,10 @@ vi.mock('../../server/deeds_db', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../../server/deeds_db')>()),
   deedRarityCounts: dbMocks.deedRarityCounts,
 }));
+vi.mock('../../server/reliquary_rarity_db', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../server/reliquary_rarity_db')>()),
+  reliquaryRarityCounts: dbMocks.reliquaryRarityCounts,
+}));
 
 import type {
   ArenaLeaderRow,
@@ -82,8 +90,34 @@ import type { RankedDeedsAccount } from '../../server/deeds_board';
 import type { DeedRarityAggregate } from '../../server/deeds_db';
 import { ARENA_LEADERBOARD_LIMIT } from '../../server/leaderboard';
 import { boardReadTestSeam } from '../../server/main';
+import { resetPublicReadRateLimits } from '../../server/ratelimit';
+import { routes as reliquaryRoutes } from '../../server/reliquary';
+import type { ReliquaryRarityAggregate } from '../../server/reliquary_rarity_db';
+import { type FakeRes, fakeCtx } from './helpers';
 
 const seam = boardReadTestSeam;
+
+// getReliquaryRarity is module-private and NOT on boardReadTestSeam, so the only
+// path to the REAL getter is its registered handler: main.ts injects
+// getReliquaryRarity into server/reliquary at import (configureReliquaryRuntime),
+// and this file already imports main.ts. Driving the route therefore exercises
+// the genuine shared cache and flight. Calling configureReliquaryRuntime with a
+// fake here would do the opposite: it would replace the function under test.
+const reliquaryRoute = reliquaryRoutes.find((r) => r.path === '/api/reliquary/rarity');
+if (!reliquaryRoute) throw new Error('no route registered for /api/reliquary/rarity');
+const reliquaryRarityHandler = reliquaryRoute.handler;
+
+async function readReliquaryRarity(): Promise<ReliquaryRarityAggregate> {
+  // The handler spends the per-IP public-read budget before it reads; clear it
+  // so a case's own call count, never the budget, decides what the getter does.
+  resetPublicReadRateLimits();
+  const ctx = fakeCtx({ method: 'GET', url: '/api/reliquary/rarity' });
+  await reliquaryRarityHandler(ctx);
+  const fake = ctx.res as unknown as FakeRes;
+  // Degrade-not-throw: every arm below, including the failing ones, stays 200.
+  expect(fake.statusCode).toBe(200);
+  return JSON.parse(fake.body as string) as ReliquaryRarityAggregate;
+}
 
 // A real hidden deed id and a real non-hidden control, both sourced from
 // src/sim/content/deeds.ts (hid_saul_footnote has `hidden: true`; prog_first_steps
@@ -134,12 +168,32 @@ function guildRows(tag: string): GuildLeaderRow[] {
 }
 
 function arenaRows(tag: string): ArenaLeaderRow[] {
-  return [{ name: `${tag}-champ`, class: 'mage', level: 60, rating: 1800, wins: 20, losses: 5 }];
+  return [
+    { name: `${tag}-champ`, class: 'mage', level: 60, rating: 1800, wins: 20, losses: 5, draws: 0 },
+  ];
 }
 
 function rarityAggregate(): DeedRarityAggregate {
   return { totalEligible: 100, earned: { [LISTABLE_DEED_ID]: 40 } };
 }
+
+// Real catalogued ids (src/sim/content/reliquary.ts), one item relic, one mark
+// relic, one page. The cache passes the aggregate through untouched, so the
+// values here only have to be recognizable across a JSON round trip.
+function reliquaryAggregate(): ReliquaryRarityAggregate {
+  return {
+    totalEligible: 100,
+    found: { cryptbone_helm: 12, 'slain:old_greyjaw': 4 },
+    illuminated: { conquerors_hollow_crypt: 2 },
+  };
+}
+
+/** What getReliquaryRarity serves with nothing cached and the refresh down. */
+const EMPTY_RELIQUARY_AGGREGATE: ReliquaryRarityAggregate = {
+  totalEligible: 0,
+  found: {},
+  illuminated: {},
+};
 
 // A one-account Renown board roll-up whose display character id carries the
 // pre/post discriminator: the entry fill reads the character NAME live
@@ -181,8 +235,10 @@ beforeEach(() => {
   dbMocks.getAccountsCount.mockReset();
   dbMocks.getCharactersCount.mockReset();
   dbMocks.deedRarityCounts.mockReset();
+  dbMocks.reliquaryRarityCounts.mockReset();
   dbMocks.deedsBoardRanked.mockReset();
   dbMocks.charactersForDeedsBoard.mockReset();
+  resetPublicReadRateLimits();
   // Null the leaderboard/guild/rarity caches between cases (the flights clear
   // their own in-flight slots on settle, and every case below settles all its
   // deferreds, so no slot leaks across cases).
@@ -856,6 +912,104 @@ describe('hidden deeds are stripped at refresh time, before the cache install', 
     expect(dbMocks.deedRarityCounts).toHaveBeenCalledTimes(1);
     expect(peeked).toBe(refreshed);
     expect(peeked.earned).not.toHaveProperty(HIDDEN_DEED_ID);
+  });
+});
+
+// (F2) SHARED CACHE ENTRY: the reliquary aggregate rides the deeds rarity entry,
+// TTL, and single flight on purpose, so ONE refresh warms both slices and the
+// characters walk keeps a single cadence no matter which UI asks. The reliquary
+// slice carries the same degrade contract as the deeds one: stale-serve when a
+// refresh fails over a warm cache, the empty aggregate when it fails cold.
+describe('the reliquary rarity slice shares the deeds rarity cache entry', () => {
+  it('a deeds-driven refresh warms the reliquary slice too: the next reliquary read does no work', async () => {
+    dbMocks.deedRarityCounts.mockResolvedValue(rarityAggregate());
+    dbMocks.reliquaryRarityCounts.mockResolvedValue(reliquaryAggregate());
+    const deeds = await seam.getDeedsRarity();
+    expect(deeds.earned[LISTABLE_DEED_ID]).toBe(40);
+    // One refresh, both scans, once each, and the reliquary arm receives the
+    // deeds denominator (same predicate) so it never re-counts the eligible
+    // population inside the same refresh.
+    expect(dbMocks.deedRarityCounts).toHaveBeenCalledTimes(1);
+    expect(dbMocks.reliquaryRarityCounts).toHaveBeenCalledTimes(1);
+    expect(dbMocks.reliquaryRarityCounts).toHaveBeenCalledWith(rarityAggregate().totalEligible);
+    // The decisive oracle against a second cadence: within the TTL the
+    // reliquary read is a pure cache hit, so NEITHER scan runs again.
+    expect(await readReliquaryRarity()).toEqual(reliquaryAggregate());
+    expect(dbMocks.deedRarityCounts).toHaveBeenCalledTimes(1);
+    expect(dbMocks.reliquaryRarityCounts).toHaveBeenCalledTimes(1);
+  });
+
+  it('and the reverse: a reliquary-driven refresh warms the deeds slice', async () => {
+    dbMocks.deedRarityCounts.mockResolvedValue(rarityAggregate());
+    dbMocks.reliquaryRarityCounts.mockResolvedValue(reliquaryAggregate());
+    expect(await readReliquaryRarity()).toEqual(reliquaryAggregate());
+    expect(dbMocks.deedRarityCounts).toHaveBeenCalledTimes(1);
+    expect(dbMocks.reliquaryRarityCounts).toHaveBeenCalledTimes(1);
+    const deeds = await seam.getDeedsRarity();
+    expect(deeds.earned[LISTABLE_DEED_ID]).toBe(40);
+    expect(dbMocks.deedRarityCounts).toHaveBeenCalledTimes(1);
+    expect(dbMocks.reliquaryRarityCounts).toHaveBeenCalledTimes(1);
+  });
+
+  it('a failed refresh over a warm cache serves the previous reliquary slice, not the empty aggregate', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-07-11T12:00:00.000Z'));
+    dbMocks.deedRarityCounts.mockResolvedValue(rarityAggregate());
+    dbMocks.reliquaryRarityCounts.mockResolvedValueOnce(reliquaryAggregate());
+    expect(await readReliquaryRarity()).toEqual(reliquaryAggregate());
+    // Past DEEDS_RARITY_TTL_MS (5 min): the next read refreshes, and the
+    // reliquary arm of that refresh fails.
+    vi.setSystemTime(new Date('2026-07-11T12:06:00.000Z'));
+    dbMocks.reliquaryRarityCounts.mockRejectedValueOnce(new Error('db down'));
+    const served = await readReliquaryRarity();
+    expect(dbMocks.reliquaryRarityCounts).toHaveBeenCalledTimes(2);
+    expect(served).toEqual(reliquaryAggregate());
+    expect(served).not.toEqual(EMPTY_RELIQUARY_AGGREGATE);
+  });
+
+  it('a failed refresh with nothing ever cached degrades to the empty aggregate, not a throw', async () => {
+    dbMocks.deedRarityCounts.mockResolvedValue(rarityAggregate());
+    dbMocks.reliquaryRarityCounts.mockRejectedValueOnce(new Error('db down'));
+    expect(await readReliquaryRarity()).toEqual(EMPTY_RELIQUARY_AGGREGATE);
+    expect(dbMocks.reliquaryRarityCounts).toHaveBeenCalledTimes(1);
+  });
+
+  it('a slice that kept failing past the staleness bound drops to empty instead of serving forever', async () => {
+    // The carry-forward keeps the previous reliquary slice across a failed
+    // arm, but only inside RELIQUARY_RARITY_MAX_STALE_MS (three TTLs): past
+    // it, month-old counts indistinguishable from fresh ones would be worse
+    // than an honest empty degrade.
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-07-11T12:00:00.000Z'));
+    dbMocks.deedRarityCounts.mockResolvedValue(rarityAggregate());
+    dbMocks.reliquaryRarityCounts.mockResolvedValueOnce(reliquaryAggregate());
+    expect(await readReliquaryRarity()).toEqual(reliquaryAggregate());
+    // First failed cycle at +6 min: inside the bound, stale-serves.
+    vi.setSystemTime(new Date('2026-07-11T12:06:00.000Z'));
+    dbMocks.reliquaryRarityCounts.mockRejectedValue(new Error('db down'));
+    expect(await readReliquaryRarity()).toEqual(reliquaryAggregate());
+    // Past three TTLs of reliquary age: the carry-forward stops.
+    vi.setSystemTime(new Date('2026-07-11T12:21:00.000Z'));
+    expect(await readReliquaryRarity()).toEqual(EMPTY_RELIQUARY_AGGREGATE);
+  });
+
+  it('a reliquary-arm failure still installs a FRESH deeds slice: no deeds blackout, no retry storm', async () => {
+    // The deeds slice installs BEFORE the heavier reliquary arm runs, so the
+    // pre-existing deeds feature can never be blanked by the new scan failing,
+    // and the fresh cache stamp negative-caches the failed arm for one TTL
+    // window instead of re-running the healthy deeds scan per anonymous retry.
+    dbMocks.deedRarityCounts.mockResolvedValue(rarityAggregate());
+    dbMocks.reliquaryRarityCounts.mockRejectedValueOnce(new Error('db down'));
+    expect(await readReliquaryRarity()).toEqual(EMPTY_RELIQUARY_AGGREGATE);
+    const deeds = await seam.getDeedsRarity();
+    expect(deeds.earned[LISTABLE_DEED_ID]).toBe(40);
+    expect(dbMocks.deedRarityCounts).toHaveBeenCalledTimes(1);
+    expect(dbMocks.reliquaryRarityCounts).toHaveBeenCalledTimes(1);
+    // Within the TTL neither getter re-runs either scan.
+    await readReliquaryRarity();
+    await seam.getDeedsRarity();
+    expect(dbMocks.deedRarityCounts).toHaveBeenCalledTimes(1);
+    expect(dbMocks.reliquaryRarityCounts).toHaveBeenCalledTimes(1);
   });
 });
 

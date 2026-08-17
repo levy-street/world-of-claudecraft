@@ -1,0 +1,181 @@
+{
+ "batchId": "integration-dagger-icons-2026-08-10",
+ "source": "OpenAI built-in image generation (gpt-image-2)",
+ "owner": "World of ClaudeCraft",
+ "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+ "styleContract": {
+  "id": "woc-item-icon-v1",
+  "document": "docs/design/item-icon-art-style.md"
+ },
+ "context": "The four rating-ladder daggers the class-overhaul integration adds (rimefang, marrowpoint, duskwhisper, boneglass_shiv) painted to satisfy the completed-art contract at the v0.36.0 merge.",
+ "items": [
+  {
+   "id": "rimefang",
+   "master": {
+    "path": "tmp/imagegen/missing-painted-icons/masters/items/rimefang.png",
+    "bytes": 1251814,
+    "sha256": "655fa2864009acf9b16d23e186a9573c3084a427e00d9d84e9e3587c0547b907",
+    "width": 1024,
+    "height": 1024,
+    "format": "png",
+    "colourspace": "srgb"
+   },
+   "source": {
+    "path": "tmp/imagegen/missing-painted-icons/accepted/items/rimefang.png",
+    "bytes": 461660,
+    "sha256": "a409ee4cdb26ae57d0aee9a29f8811033818b865aa172611c714f401d7951d23",
+    "width": 512,
+    "height": 512,
+    "format": "png",
+    "colourspace": "srgb",
+    "alpha": "opaque"
+   },
+   "prompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory painting of one centered tangible item on an opaque dark atmospheric vignette. Tactile materials, top-left warm key light, cool deep shadow, safe margins, small-size and circular-crop readability. No UI border, rarity frame, accidental writing, watermark, transparency, mannequin, held presentation, or crop.\nSubject: A slender epic combat dagger of glacial blue rime-etched steel: a curved fang-shaped blade with frost crystals creeping up from a dark leather-wrapped hilt, faint cold vapor curling off the edge.",
+   "references": [
+    {
+     "path": "public/ui/items/duskfang_dirk.webp",
+     "role": "style reference",
+     "provenance": "World of ClaudeCraft project-generated art",
+     "license": "Project asset, rights reserved"
+    },
+    {
+     "path": "public/ui/items/drownedmoon_kris.webp",
+     "role": "composition reference",
+     "provenance": "World of ClaudeCraft project-generated art",
+     "license": "Project asset, rights reserved"
+    }
+   ],
+   "processing": [
+    "Generated with two shipped dagger paintings as style and composition references.",
+    "Normalized deterministically to a reviewed 512x512 opaque sRGB source.",
+    "Encoded to exact 128x128 WebP through scripts/convert_item_icons_webp.mjs at quality 82 with the hard 15 KiB gate."
+   ]
+  },
+  {
+   "id": "marrowpoint",
+   "master": {
+    "path": "tmp/imagegen/missing-painted-icons/masters/items/marrowpoint.png",
+    "bytes": 1421497,
+    "sha256": "0b3e13d465c10b898971e89de89393ddaf9b4b977fdfc4fb47f6b8500be5da91",
+    "width": 1024,
+    "height": 1024,
+    "format": "png",
+    "colourspace": "srgb"
+   },
+   "source": {
+    "path": "tmp/imagegen/missing-painted-icons/accepted/items/marrowpoint.png",
+    "bytes": 440555,
+    "sha256": "72963594efc6e23ab449bd32ef67da4a774c9e5d02ea9744c575f7d31ad6408e",
+    "width": 512,
+    "height": 512,
+    "format": "png",
+    "colourspace": "srgb",
+    "alpha": "opaque"
+   },
+   "prompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory painting of one centered tangible item on an opaque dark atmospheric vignette. Tactile materials, top-left warm key light, cool deep shadow, safe margins, small-size and circular-crop readability. No UI border, rarity frame, accidental writing, watermark, transparency, mannequin, held presentation, or crop.\nSubject: An epic stiletto dagger ground from dragon marrow-bone: a pale ivory blade tapering to a needle point, a guard of small bronze dragon scales, warm amber light catching the polished bone.",
+   "references": [
+    {
+     "path": "public/ui/items/duskfang_dirk.webp",
+     "role": "style reference",
+     "provenance": "World of ClaudeCraft project-generated art",
+     "license": "Project asset, rights reserved"
+    },
+    {
+     "path": "public/ui/items/drownedmoon_kris.webp",
+     "role": "composition reference",
+     "provenance": "World of ClaudeCraft project-generated art",
+     "license": "Project asset, rights reserved"
+    }
+   ],
+   "processing": [
+    "Generated with two shipped dagger paintings as style and composition references.",
+    "Normalized deterministically to a reviewed 512x512 opaque sRGB source.",
+    "Encoded to exact 128x128 WebP through scripts/convert_item_icons_webp.mjs at quality 82 with the hard 15 KiB gate."
+   ]
+  },
+  {
+   "id": "duskwhisper",
+   "master": {
+    "path": "tmp/imagegen/missing-painted-icons/masters/items/duskwhisper.png",
+    "bytes": 1337138,
+    "sha256": "19b56ea7322e10c8c8059e387e62dfd7d3482178dc4fe0693be34c013e050ae2",
+    "width": 1024,
+    "height": 1024,
+    "format": "png",
+    "colourspace": "srgb"
+   },
+   "source": {
+    "path": "tmp/imagegen/missing-painted-icons/accepted/items/duskwhisper.png",
+    "bytes": 463209,
+    "sha256": "16a7a09a2bd0e75c40b4930e7323edcf7099423ea56e8a47f384355267343789",
+    "width": 512,
+    "height": 512,
+    "format": "png",
+    "colourspace": "srgb",
+    "alpha": "opaque"
+   },
+   "prompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory painting of one centered tangible item on an opaque dark atmospheric vignette. Tactile materials, top-left warm key light, cool deep shadow, safe margins, small-size and circular-crop readability. No UI border, rarity frame, accidental writing, watermark, transparency, mannequin, held presentation, or crop.\nSubject: An epic assassin dagger with a whisper-thin curved blade of shadow-blued steel that drinks the light, a deep violet dusk sheen along the edge, a hilt wrapped in dark forest-root cord.",
+   "references": [
+    {
+     "path": "public/ui/items/duskfang_dirk.webp",
+     "role": "style reference",
+     "provenance": "World of ClaudeCraft project-generated art",
+     "license": "Project asset, rights reserved"
+    },
+    {
+     "path": "public/ui/items/drownedmoon_kris.webp",
+     "role": "composition reference",
+     "provenance": "World of ClaudeCraft project-generated art",
+     "license": "Project asset, rights reserved"
+    }
+   ],
+   "processing": [
+    "Generated with two shipped dagger paintings as style and composition references.",
+    "Normalized deterministically to a reviewed 512x512 opaque sRGB source.",
+    "Encoded to exact 128x128 WebP through scripts/convert_item_icons_webp.mjs at quality 82 with the hard 15 KiB gate."
+   ]
+  },
+  {
+   "id": "boneglass_shiv",
+   "master": {
+    "path": "tmp/imagegen/missing-painted-icons/masters/items/boneglass_shiv.png",
+    "bytes": 1180838,
+    "sha256": "9b83f2fce8bb505a546f0088e677e374eca76ceed99f74132631cfa38041e76b",
+    "width": 1024,
+    "height": 1024,
+    "format": "png",
+    "colourspace": "srgb"
+   },
+   "source": {
+    "path": "tmp/imagegen/missing-painted-icons/accepted/items/boneglass_shiv.png",
+    "bytes": 412207,
+    "sha256": "af66e8e47c6d2efe8737e696cc465ff78c096ccf7d4da01735ccc80a1548d236",
+    "width": 512,
+    "height": 512,
+    "format": "png",
+    "colourspace": "srgb",
+    "alpha": "opaque"
+   },
+   "prompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory painting of one centered tangible item on an opaque dark atmospheric vignette. Tactile materials, top-left warm key light, cool deep shadow, safe margins, small-size and circular-crop readability. No UI border, rarity frame, accidental writing, watermark, transparency, mannequin, held presentation, or crop.\nSubject: A rare crude shiv knapped from translucent smoky bone-glass: a jagged glassy blade with chipped edges, a grip wrapped in worn sinew cord, faint sickly green light refracting inside the glass.",
+   "references": [
+    {
+     "path": "public/ui/items/duskfang_dirk.webp",
+     "role": "style reference",
+     "provenance": "World of ClaudeCraft project-generated art",
+     "license": "Project asset, rights reserved"
+    },
+    {
+     "path": "public/ui/items/drownedmoon_kris.webp",
+     "role": "composition reference",
+     "provenance": "World of ClaudeCraft project-generated art",
+     "license": "Project asset, rights reserved"
+    }
+   ],
+   "processing": [
+    "Generated with two shipped dagger paintings as style and composition references.",
+    "Normalized deterministically to a reviewed 512x512 opaque sRGB source.",
+    "Encoded to exact 128x128 WebP through scripts/convert_item_icons_webp.mjs at quality 82 with the hard 15 KiB gate."
+   ]
+  }
+ ]
+}

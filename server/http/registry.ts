@@ -22,6 +22,7 @@
 // loader.
 
 import { routes as accountRoutes } from '../account';
+import { routes as adSpendRoutes } from '../ad_spend';
 import { routes as adminRoutes } from '../admin';
 import { routes as appleAuthRoutes } from '../apple_auth';
 import { routes as authRoutes } from '../auth_routes';
@@ -39,6 +40,7 @@ import { routes as leaderboardRoutes } from '../leaderboard';
 import { routes as mapsRoutes } from '../maps_routes';
 import { routes as oauthRoutes } from '../oauth';
 import { routes as otaUpdatesRoutes } from '../ota_updates';
+import { routes as reliquaryRoutes } from '../reliquary';
 import { routes as reportsRoutes } from '../reports';
 import { routes as seekerEntitlementRoutes } from '../seeker_entitlement';
 import { routes as steamRoutes } from '../steam';
@@ -140,6 +142,8 @@ export const apiRoutes: readonly RouteDef[] = [
   ...battlegroundRoutes,
   ...epicRoutes,
   ...otaUpdatesRoutes,
+  ...reliquaryRoutes,
+  ...adSpendRoutes,
   // new:endpoint spreads appear above this line (npm run new:endpoint)
 ];
 

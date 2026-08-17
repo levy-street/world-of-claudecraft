@@ -1290,9 +1290,9 @@ describe('rod synergy is literal-pinned on one shared draw (QA pins)', () => {
   it('first-cast delay ticks at seed 4242: tier-1 pole 136, tier-2 rod 113, tier-3 rod 91', () => {
     // Re-recorded after the Galecrest quest-camp content pass (its four new
     // camps shift the shared rng stream at Sim construction and move the delay
-    // draw), previously after the zones 1-3 quest-dedupe pass; the pinned
-    // property is unchanged: one seed, one hidden draw, monotonically shorter
-    // with each rod tier.
+    // draw; prior: 136/113/91 after zones 1-3 quest-dedupe). Property
+    // unchanged: one seed, one hidden draw, monotonically shorter with each
+    // rod tier.
     for (const [rod, ticks] of [
       [null, 136],
       ['ironreel_fishing_rod', 113],

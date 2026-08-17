@@ -34,8 +34,16 @@ function fakeFetch(responses: (number | Error)[]): { calls: FetchCall[]; fetch: 
   return { calls, fetch: impl };
 }
 
-async function settle(until: () => boolean): Promise<void> {
-  for (let i = 0; i < 200 && !until(); i++) {
+/** Polls `until` on every `setImmediate` tick, bounded by REAL wall-clock time
+ * rather than a fixed iteration count: the awaited work (gzip on the libuv
+ * threadpool, then a fetch) is genuine CPU/IO, so a busy host can stretch a
+ * fixed tick count past its real duration without the condition ever going
+ * false. `Date.now()` stays real here even under the sibling test's
+ * `vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })`, which
+ * deliberately excludes `Date`. */
+async function settle(until: () => boolean, timeoutMs = 8000): Promise<void> {
+  const deadline = Date.now() + timeoutMs;
+  while (!until() && Date.now() < deadline) {
     await new Promise((resolve) => setImmediate(resolve));
   }
 }

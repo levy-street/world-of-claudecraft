@@ -375,7 +375,7 @@ del daño Arcano realmente infligido por ese mago se convierte en curación para
 Valores provisionales para el primer playtest:
 
 - Duración: 15 segundos.
-- Conversión de daño Arcano de objetivo único: 35%.
+- Conversión de daño Arcano de objetivo único: 40%.
 - Un objetivo marcado de base.
 - Eco temporal realiza una pequeña cura inicial al aplicarse.
 - Cada impacto Arcano válido produce su propia curación.
@@ -659,16 +659,16 @@ generico), y descripcion centrada en reparar, prevenir y revertir.
 Remiendo temporal (`temporal_mend`, signatura de la spec, concedida al comprometer):
 cura directa aliado/uno mismo, alcance 30 (el estandar de todas las curas), casteo 2.0 s,
 sin cooldown, escuela arcana, critico y amenaza por la canalizacion normal (`applyHeal`).
-Rangos: n1 (5) 62-74 por 45 mana; n2 (12) 105-125 por 70; n3 (18) 150-178 por 95.
-Justificacion: a nivel 20 queda entre la Ola de sanacion del chaman (2.5 s, 90 mana,
-138-164) y el Toque de sanacion del druida (3.0 s, 110, 175-208), con el casteo de 2.0 s
-pedido; su HPS (~82/s antes de poder de hechizo) es deliberadamente algo menor que el de la
-Plegaria solemne del sacerdote (~100/s), el healer de referencia.
+Rangos: n1 (5) 62-74 por 45 mana; n2 (12) 105-125 por 70; n3 (18) 150-178 por 95;
+n4 (20) 218-258 por 110. En la comparativa determinista de nivel 20, con especializacion,
+maestria y equipo automatico reales, entrega ~175 HPS: queda junto a Heal de sacerdote
+(~175) y Holy Light de paladin (~184), por encima de Healing Wave de chaman (~125) y
+Healing Touch de druida (~137). Su menor eficiencia de mana compensa el casteo rapido de 2 s.
 
 Barrera temporal (`temporal_barrier`): escudo individual aliado/uno mismo, instantaneo y
 DENTRO del GCD, cooldown 12 s, duracion 10 s, alcance 30, escuela arcana, canalizacion normal
 de absorciones (aura kind `absorb`). Rangos: n1 (5) 55 por 50 mana; n2 (12) 100 por 75;
-n3 (18) 160 por 105. Justificacion: el Salmo de proteccion del sacerdote absorbe 145 con 6 s
+n3 (18) 160 por 105; n4 (20) 232 por 120. Justificacion: el Salmo de proteccion del sacerdote absorbe 145 con 6 s
 de cooldown y ventana de 30 s; la Barrera absorbe un bloque mayor con la mitad de cadencia y
 una ventana corta de 10 s, encajando el rol preventivo pedido. Regla de relanzamiento (el
 patron existente de absorciones): el MISMO lanzador REEMPLAZA su escudo por uno fresco a valor
@@ -684,8 +684,8 @@ nunca reduce vida, asi que queda fuera del registro del futuro Ancla por constru
   ("Increases all healing you do by 15%."), escalada por nivel/20 como toda maestria. Es el
   mismo campo generico que usa la maestria del sacerdote sagrado; en la practica solo toca el
   kit de curacion de Cronomancia porque es la unica fuente de curas de la spec. NOTA: el motor
-  aplica `healPct` tambien al valor de las absorciones propias (la Barrera se beneficia, 160
-  base -> 184 a nivel 20 con maestria completa), registrado en tests. Esta maestria es un
+  aplica `healPct` tambien al valor de las absorciones propias (la Barrera se beneficia, 232
+  base -> 267 a nivel 20 con maestria completa), registrado en tests. Esta maestria es un
   marcador de posicion hasta que Eco temporal exista (seccion 13.8).
 - No se creo `src/sim/combat/chronomancy.ts`: la Fase 1 se resuelve entera con `AbilityDef` y
   los efectos existentes (`heal`, `absorb`) sin logica especifica. El modulo nacera con Eco
@@ -746,16 +746,16 @@ sin cooldown, alcance 30, escuela arcana, `targetType: 'friendly'` (aliado o uno
 construye con DOS efectos: un `heal` normal (la cura inicial, alimenta `$d` y puede critear como
 cualquier cura directa) y un efecto nuevo minimo `temporalEcho` (solo lleva `duration`, alimenta
 `$t` y coloca la marca). Rangos: n1 (5) cura 24-30 por 40 mana; n2 (12) 40-50 por 60; n3 (18)
-58-70 por 85. Marca: 15 s. Justificacion: la cura inicial es deliberadamente pequena (~40% de
+58-70 por 85; n4 (20) 84-102 por 90. Marca: 15 s. Justificacion: la cura inicial es deliberadamente pequena (~40% de
 Remiendo temporal) porque el grueso de la sanacion viene de la conversion; el maná moderado y el
 GCD, mas la regla de una sola marca propia, limitan el spameo.
 
-Conversion de dano Arcano efectivo (constantes, no almacenadas en la marca): objetivo unico 35%,
+Conversion de dano Arcano efectivo (constantes, no almacenadas en la marca): objetivo unico 40%,
 area 15%. Se aplica al dano REALMENTE INFLIGIDO (`preHp - target.hp` en `dealDamage`, es decir tras
 mitigacion, tras absorciones y tras recortar el overkill), de modo que el dano absorbido, evitado,
 inmunizado o que excede la vida del enemigo NO fabrica curacion. Redondeo por impacto (Misiles
 Arcanos cura por cada misil). El daño de wand (arma a distancia del mago, escuela arcana) tambien
-convierte al 35% por ser dano Arcano real del mago; es marginal y coherente.
+convierte al 40% por ser dano Arcano real del mago; es marginal y coherente.
 
 ### 15.3 Arquitectura
 
@@ -786,7 +786,7 @@ convierte al 35% por ser dano Arcano real del mago; es marginal y coherente.
 La maestria de Fase 1 (Chronoweave, `global.healPct`) se aplica dentro de `applyHeal` (curas
 directas y absorciones propias), pero NO se aplica a la curacion de conversion de Eco temporal:
 la conversion usa `Math.round(danoEfectivo * tasa)` limpio. Es una decision consciente para
-mantener el numero de conversion legible y testeable (100 de Arcano single -> 35 exacto) y porque
+mantener el numero de conversion legible y testeable (100 de Arcano single -> 40 exacto) y porque
 la maestria de Fase 1 se definio como refuerzo de la curacion DIRECTA. Cuando se cierre la maestria
 definitiva de Cronomancia (seccion 13.8, potenciar Eco), se decidira si la conversion escala.
 

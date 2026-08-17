@@ -1,6 +1,9 @@
 export interface IWorldTargeting {
   targetEntity(id: number | null): void;
   tabTarget(): void;
+  // The backward half of the Tab cycle (Shift+Tab by default): steps the same
+  // ordered enemy list as tabTarget in reverse.
+  tabTargetPrev(): void;
   targetNearestFriendly(): void;
   friendlyTabTarget(): void;
   // Mirrors the client's "Stop Auto-Attack on Target Switch" setting (issue

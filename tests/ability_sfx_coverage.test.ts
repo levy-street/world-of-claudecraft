@@ -72,6 +72,33 @@ describe('release: the launch whoosh belongs to the recorded proj_ pack', () => 
       'shadow',
     ]);
   });
+
+  it('is recorded for the five caster-buff shouts, ahead of the projectile-school check', () => {
+    // Iron Bellow/battle_shout, Direhowl/demoralizing_shout, Emboldening
+    // Roar/emboldening_roar, Defiant Bellow/defiant_bellow, Valor
+    // Roar/rallying_cry: one shout recording covers the whole cast, launch
+    // included, so their procedural release whoosh must stay silent too.
+    for (const abilityId of [
+      'battle_shout',
+      'demoralizing_shout',
+      'emboldening_roar',
+      'defiant_bellow',
+      'rallying_cry',
+    ]) {
+      expect(
+        isAbilityMomentRecorded('release', { school: 'physical', archetype: 'shout', abilityId }),
+      ).toBe(true);
+    }
+    // An ordinary shout ability with no dedicated recording keeps the
+    // procedural release (school 'physical' is never in RECORDED_PROJECTILE_SCHOOLS).
+    expect(
+      isAbilityMomentRecorded('release', {
+        school: 'physical',
+        archetype: 'shout',
+        abilityId: 'charge',
+      }),
+    ).toBe(false);
+  });
 });
 
 describe('impact: the landing belongs to the recorded impact_ pack', () => {
@@ -120,12 +147,27 @@ describe('impact: the landing belongs to the recorded impact_ pack', () => {
     ).toBe(false);
   });
 
-  it('is recorded for the plain cc override (hammer_of_justice, entangling_roots, blind, cheap_shot, sap)', () => {
+  it('is recorded for the five caster-buff shouts regardless of archetype passed', () => {
+    for (const abilityId of [
+      'battle_shout',
+      'demoralizing_shout',
+      'emboldening_roar',
+      'defiant_bellow',
+      'rallying_cry',
+    ]) {
+      expect(
+        isAbilityMomentRecorded('impact', { school: 'physical', archetype: 'shout', abilityId }),
+      ).toBe(true);
+    }
+  });
+
+  it('is recorded for the plain cc override (hammer_of_justice, entangling_roots, blind, cheap_shot, kidney_shot, sap)', () => {
     for (const abilityId of [
       'hammer_of_justice',
       'entangling_roots',
       'blind',
       'cheap_shot',
+      'kidney_shot',
       'sap',
     ]) {
       expect(
@@ -157,7 +199,7 @@ describe('crit: combat_crit is a recording', () => {
 });
 
 describe('the moments no recording covers keep their procedural voice', () => {
-  it('leaves windup, pulse, spirit and motif uncovered', () => {
+  it('leaves windup, pulse, spirit and motif uncovered (no per-ability override)', () => {
     const uncovered: AbilityAudioMoment[] = ['windup', 'pulse', 'spirit', 'motif'];
     for (const moment of uncovered) {
       expect(isAbilityMomentRecorded(moment, { school: 'fire', archetype: 'bolt' })).toBe(false);
@@ -165,5 +207,11 @@ describe('the moments no recording covers keep their procedural voice', () => {
         false,
       );
     }
+  });
+
+  it('is recorded for pulse ONLY for Meteor (PULSE_IMPACT_ABILITIES), every other zone stays uncovered', () => {
+    expect(isAbilityMomentRecorded('pulse', { abilityId: 'meteor' })).toBe(true);
+    expect(isAbilityMomentRecorded('pulse', { abilityId: 'consecration' })).toBe(false);
+    expect(isAbilityMomentRecorded('pulse', {})).toBe(false);
   });
 });

@@ -192,6 +192,13 @@ export interface FightCloseRecord {
   truncated: boolean;
   /** Recorder-side totals, keyed by characterId as a string. */
   rollup: { perParticipant: Record<string, ParticipantTotals> };
+  /**
+   * Non-participant combatants seen in this fight (mobs, unresolved pets):
+   * entity id to display name, resolved at capture time by the recorder's
+   * state join, so event actors can be labeled instead of shown as raw ids.
+   * Optional and additive: absent from pre-roster senders.
+   */
+  actors?: { id: number; name: string }[];
 }
 
 /**

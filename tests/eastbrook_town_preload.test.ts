@@ -19,6 +19,10 @@ function deferred<T>(): { promise: Promise<T>; resolve: (value: T) => void } {
 vi.mock('../src/render/assets/loader', () => ({
   loadGltf: mocks.loadGltf,
   loadTexture: mocks.loadTexture,
+  // The surface-detail families (worn_stone.ts, pulled in transitively) load
+  // their compressed siblings; share the mock so their calls land in the same
+  // stream the prefix filters below already ignore.
+  loadKtx2Texture: mocks.loadTexture,
   releaseGltf: mocks.releaseGltf,
 }));
 

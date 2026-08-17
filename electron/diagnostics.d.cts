@@ -8,6 +8,7 @@ export const MAX_MIRRORED_CONSOLE_LINES: number;
 
 export function flattenControlChars(text: string): string;
 export function clampText(value: unknown, maxLength: number): string;
+export function escapeNotificationMarkup(text: string): string;
 export function redactSecrets(text: string): string;
 
 export interface RendererErrorLogEntry {

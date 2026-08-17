@@ -26,6 +26,8 @@ import type { ActionBarState } from './action_bar_view';
 // Attribute / property / class names the painter drives. Named, not inlined, so the
 // painter references no bare DOM string literal.
 const ARIA_LABEL_ATTR = 'aria-label';
+const ARIA_DESCRIPTION_ATTR = 'aria-description';
+const ARIA_DISABLED_ATTR = 'aria-disabled';
 const BACKGROUND_IMAGE_PROP = 'background-image';
 const HEIGHT_PROP = 'height';
 // Drives the radial cooldown sweep: a CSS custom property the `.cd-overlay`
@@ -38,6 +40,10 @@ const CLASS_OUT_OF_RANGE = 'oor';
 const CLASS_QUEUED = 'queued';
 const CLASS_PROC = 'proc';
 const CLASS_EMPOWERED = 'empowered';
+const CLASS_ASCENSION_SPENDER = 'ascension-spender';
+const ASCENSION_COST_ATTR = 'data-ascension-cost';
+const CLASS_FATE_CONSUME_READY = 'fate-consume-ready';
+const CLASS_FATE_SENTENCE_READY = 'fate-sentence-ready';
 const CLASS_MANY_SPELLS = 'many-spells';
 // The count badge gains this class on a charge-pool ability so "2" reads as
 // stored charges, not an item stack (distinct plate + color in hud.css).
@@ -106,8 +112,14 @@ export class ActionBarPainter {
       this.writers.toggleClass(el.btn, CLASS_QUEUED, s.queued);
       this.writers.toggleClass(el.btn, CLASS_PROC, s.procGlow);
       this.writers.toggleClass(el.btn, CLASS_EMPOWERED, s.empowered);
+      this.writers.toggleClass(el.btn, CLASS_ASCENSION_SPENDER, s.ascensionSpender);
+      this.writers.toggleClass(el.btn, CLASS_FATE_CONSUME_READY, s.fateConsumeReady);
+      this.writers.toggleClass(el.btn, CLASS_FATE_SENTENCE_READY, s.fateSentenceReady);
 
+      this.writers.setAttr(el.btn, ASCENSION_COST_ATTR, s.ascensionCostLabel);
       this.writers.setAttr(el.btn, ARIA_LABEL_ATTR, s.ariaLabel);
+      this.writers.setAttr(el.btn, ARIA_DESCRIPTION_ATTR, s.ariaDescription);
+      this.writers.setAttr(el.btn, ARIA_DISABLED_ATTR, s.usable ? 'false' : 'true');
       this.writers.setText(el.keybindEl, s.keybindLabel);
     }
   }

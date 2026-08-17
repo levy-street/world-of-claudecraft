@@ -13,8 +13,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 964,
-      "state": "84e509fa",
+      "nextId": 965,
+      "state": "36d5a127",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -51,7 +51,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 959,
+          "entityId": 960,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -72,6 +72,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -90,7 +94,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 54,
-          "id": 959,
+          "id": 960,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -134,9 +138,9 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 965,
-      "state": "3d6615ff",
-      "events": "10c1c556",
+      "nextId": 966,
+      "state": "8420df50",
+      "events": "c3025021",
       "rng": {
         "draws": 3,
         "digest": "80e78b7c"
@@ -145,9 +149,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 965,
-      "state": "de393d75",
-      "events": "cc147418",
+      "nextId": 966,
+      "state": "b301b6e6",
+      "events": "6ee017d8",
       "rng": {
         "draws": 3,
         "digest": "80e78b7c"
@@ -156,8 +160,8 @@
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 965,
-      "state": "7ba03766",
+      "nextId": 966,
+      "state": "7f8db0ab",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -167,8 +171,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 965,
-      "state": "53358e9d",
+      "nextId": 966,
+      "state": "04524724",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -178,9 +182,9 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 965,
-      "state": "86b682b8",
-      "events": "ad3d74ad",
+      "nextId": 966,
+      "state": "cfdf1287",
+      "events": "f4ee6d68",
       "rng": {
         "draws": 72,
         "digest": "1e25b053"
@@ -189,8 +193,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 965,
-      "state": "4931dce4",
+      "nextId": 966,
+      "state": "b3b85e0b",
       "events": "741638a5",
       "rng": {
         "draws": 153,
@@ -200,8 +204,8 @@
     {
       "tick": 70,
       "time": 3.5,
-      "nextId": 965,
-      "state": "512a2965",
+      "nextId": 966,
+      "state": "1638eb26",
       "events": "741638a5",
       "rng": {
         "draws": 241,
@@ -211,9 +215,9 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 965,
-      "state": "174f5dd4",
-      "events": "17f6bb90",
+      "nextId": 966,
+      "state": "f51d9534",
+      "events": "abcc035d",
       "rng": {
         "draws": 329,
         "digest": "fe735496"
@@ -222,9 +226,9 @@
     {
       "tick": 90,
       "time": 4.5,
-      "nextId": 965,
-      "state": "46c7f0c5",
-      "events": "14e00dba",
+      "nextId": 966,
+      "state": "08183a59",
+      "events": "9eb6c081",
       "rng": {
         "draws": 414,
         "digest": "00a5eee7"
@@ -233,8 +237,8 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 965,
-      "state": "58858e86",
+      "nextId": 966,
+      "state": "085459be",
       "events": "741638a5",
       "rng": {
         "draws": 509,
@@ -244,8 +248,8 @@
     {
       "tick": 110,
       "time": 5.5,
-      "nextId": 965,
-      "state": "d4f95629",
+      "nextId": 966,
+      "state": "4d7bc2d9",
       "events": "741638a5",
       "rng": {
         "draws": 609,
@@ -255,8 +259,8 @@
     {
       "tick": 120,
       "time": 6,
-      "nextId": 965,
-      "state": "3bf69390",
+      "nextId": 966,
+      "state": "f64cd6b0",
       "events": "741638a5",
       "rng": {
         "draws": 687,
@@ -266,8 +270,8 @@
     {
       "tick": 120,
       "time": 6,
-      "nextId": 965,
-      "state": "3bf69390",
+      "nextId": 966,
+      "state": "f64cd6b0",
       "events": "741638a5",
       "rng": {
         "draws": 687,
@@ -348,7 +352,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 959,
+          "entityId": 960,
           "equipment": {
             "chest": "apprentice_robe",
             "gloves": "shadowpulse_handwraps",
@@ -377,6 +381,26 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {
+              "lunar_choir_leggings": 1,
+              "lunar_tide_greatstaff": 1,
+              "sash_of_the_sunken_court": 1,
+              "shadowpulse_handwraps": 1
+            },
+            "firstFind": {
+              "lunar_choir_leggings": {},
+              "lunar_tide_greatstaff": {},
+              "sash_of_the_sunken_court": {},
+              "shadowpulse_handwraps": {}
+            },
+            "recent": [
+              "shadowpulse_handwraps",
+              "sash_of_the_sunken_court",
+              "lunar_choir_leggings",
+              "lunar_tide_greatstaff"
+            ]
+          },
           "renown": 55,
           "talents": {
             "rows": {}
@@ -399,7 +423,7 @@
           "hitBonus": 0.17,
           "hitRating": 170,
           "hp": 49842,
-          "id": 959,
+          "id": 960,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -416,7 +440,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 2041,
+          "resource": 2063,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -432,7 +456,7 @@
             "sta": 39,
             "str": 10
           },
-          "targetId": 964,
+          "targetId": 965,
           "templateId": "mage",
           "weapon": {
             "max": 60,
@@ -441,7 +465,7 @@
           }
         },
         {
-          "aggroTargetId": 959,
+          "aggroTargetId": 960,
           "aiState": "attack",
           "auras": [
             {
@@ -451,7 +475,7 @@
               "name": "Cinderbolt",
               "remaining": 6.05,
               "school": "fire",
-              "sourceId": 959,
+              "sourceId": 960,
               "tickInterval": 2,
               "tickTimer": 0.05,
               "value": 3
@@ -467,7 +491,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 49807,
-          "id": 964,
+          "id": 965,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -494,11 +518,11 @@
             "armor": 220
           },
           "swingTimer": 0.1,
-          "tappedById": 959,
+          "tappedById": 960,
           "templateId": "forest_wolf",
           "threat": [
             [
-              959,
+              960,
               194
             ]
           ],
@@ -513,8 +537,8 @@
     {
       "tick": 120,
       "time": 6,
-      "nextId": 965,
-      "state": "3bf69390",
+      "nextId": 966,
+      "state": "f64cd6b0",
       "events": "741638a5",
       "rng": {
         "draws": 687,
@@ -595,7 +619,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 959,
+          "entityId": 960,
           "equipment": {
             "chest": "apprentice_robe",
             "gloves": "shadowpulse_handwraps",
@@ -624,6 +648,26 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {
+              "lunar_choir_leggings": 1,
+              "lunar_tide_greatstaff": 1,
+              "sash_of_the_sunken_court": 1,
+              "shadowpulse_handwraps": 1
+            },
+            "firstFind": {
+              "lunar_choir_leggings": {},
+              "lunar_tide_greatstaff": {},
+              "sash_of_the_sunken_court": {},
+              "shadowpulse_handwraps": {}
+            },
+            "recent": [
+              "shadowpulse_handwraps",
+              "sash_of_the_sunken_court",
+              "lunar_choir_leggings",
+              "lunar_tide_greatstaff"
+            ]
+          },
           "renown": 55,
           "talents": {
             "rows": {}
@@ -646,7 +690,7 @@
           "hitBonus": 0.17,
           "hitRating": 170,
           "hp": 49842,
-          "id": 959,
+          "id": 960,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -663,7 +707,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 2041,
+          "resource": 2063,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -679,7 +723,7 @@
             "sta": 39,
             "str": 10
           },
-          "targetId": 964,
+          "targetId": 965,
           "templateId": "mage",
           "weapon": {
             "max": 60,
@@ -688,7 +732,7 @@
           }
         },
         {
-          "aggroTargetId": 959,
+          "aggroTargetId": 960,
           "aiState": "attack",
           "auras": [
             {
@@ -698,7 +742,7 @@
               "name": "Cinderbolt",
               "remaining": 6.05,
               "school": "fire",
-              "sourceId": 959,
+              "sourceId": 960,
               "tickInterval": 2,
               "tickTimer": 0.05,
               "value": 3
@@ -714,7 +758,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 49807,
-          "id": 964,
+          "id": 965,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -741,11 +785,11 @@
             "armor": 220
           },
           "swingTimer": 0.1,
-          "tappedById": 959,
+          "tappedById": 960,
           "templateId": "forest_wolf",
           "threat": [
             [
-              959,
+              960,
               194
             ]
           ],

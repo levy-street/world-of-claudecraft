@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "batch": "warlock-pet-action-art-2026-08-10",
+  "generator": "OpenAI built-in image generation",
+  "owner": "World of ClaudeCraft",
+  "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+  "mapping": {
+    "path": "public/ui/skills/warlock/mapping.json",
+    "bytes": 32579,
+    "sha256": "b0cbac8be01ab327b7439d2d0202b4db143422f5955dcdc67cef42fa5e674c66",
+    "recordFields": [
+      "abilityId",
+      "generatedResultPath",
+      "generationPrompt",
+      "references",
+      "source",
+      "owner",
+      "license"
+    ]
+  },
+  "processing": {
+    "script": "scripts/convert_skill_icons_webp.mjs",
+    "resize": {
+      "width": 128,
+      "height": 128,
+      "fit": "cover",
+      "position": "centre"
+    },
+    "colorspace": "sRGB",
+    "format": "webp",
+    "quality": 82,
+    "alphaQuality": 100,
+    "smartSubsample": true,
+    "effort": 6
+  },
+  "visualReview": {
+    "accepted": true,
+    "attemptsPerAsset": 1,
+    "retries": 0,
+    "reviewedSizes": [128, 40, 28],
+    "grayscaleSizes": [28],
+    "criteria": [
+      "semantic pet identity",
+      "action silhouette",
+      "small-size readability",
+      "safe framing",
+      "house-style match",
+      "no text or pseudo-writing"
+    ]
+  },
+  "assets": [
+    {
+      "id": "emberkin_felbolt",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019fe6e9-7ed7-7bc3-a44e-c7475af3a73f/exec-7977f613-1012-474c-86f3-1326b00f66aa.png",
+      "retainedRaw": {
+        "path": "tmp/imagegen/release-art-audit-v036/pet-actions/raw/emberkin_felbolt.png",
+        "bytes": 1515984,
+        "sha256": "8abed5aca00573f0ce6182ded10612a2535474a340599aeb30157c452b4da139",
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "opaque": true
+      },
+      "shipping": {
+        "path": "public/ui/skills/warlock/emberkin_felbolt.webp",
+        "bytes": 3470,
+        "sha256": "2f707b6e660c8dde374718ee84a7b3c0a06310cc23c7e25e10454f269ab7d7a2",
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorspace": "sRGB",
+        "opaque": true,
+        "deterministicReencodeMatch": true
+      }
+    },
+    {
+      "id": "gloomshade_abyssal_chain",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019fe6e9-7ed7-7bc3-a44e-c7475af3a73f/exec-12573b07-c935-4fe7-b65a-64ee9de4daea.png",
+      "retainedRaw": {
+        "path": "tmp/imagegen/release-art-audit-v036/pet-actions/raw/gloomshade_abyssal_chain.png",
+        "bytes": 2093479,
+        "sha256": "ea8effbd80e2d86a852f34b8d4c0d088fc05216bf56a2ff9067911c0f229a3a4",
+        "width": 1254,
+        "height": 1254,
+        "format": "png",
+        "opaque": true
+      },
+      "shipping": {
+        "path": "public/ui/skills/warlock/gloomshade_abyssal_chain.webp",
+        "bytes": 4766,
+        "sha256": "efcf3194a202289526c6745e28c9a00ed7d52ef873303109ec9039595497cf0f",
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorspace": "sRGB",
+        "opaque": true,
+        "deterministicReencodeMatch": true
+      }
+    }
+  ]
+}

@@ -2,7 +2,19 @@ import type { RespecPaymentTier } from '../sim/professions/focus';
 
 export type WorldInteractionOutcome = boolean | Promise<boolean>;
 
+/** A stable authored civic interaction point exposed to presentation without
+ * relying on the live entity interest radius. */
+export type CivicServiceKind = 'mailbox' | 'noticeboard';
+
+export interface CivicServicePlacement {
+  readonly kind: CivicServiceKind;
+  readonly x: number;
+  readonly z: number;
+}
+
 export interface IWorldInteraction {
+  /** The civic services that this world actually spawned. */
+  readonly civicServicePlacements: readonly CivicServicePlacement[];
   interact(): void;
   lootCorpse(id: number): WorldInteractionOutcome;
   autoLoot(id: number): void;

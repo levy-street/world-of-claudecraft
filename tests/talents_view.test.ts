@@ -15,7 +15,7 @@ function optionId(cls: PlayerClass, rowIndex: number, optionIndex = 0): string {
 }
 
 describe('Talents V2 row view', () => {
-  it('projects all six rows and three exclusive options for every playable class', () => {
+  it('projects all six rows and three exclusive options for classes with finished rows', () => {
     expect(ALL_CLASSES).toHaveLength(9);
     for (const cls of ALL_CLASSES) {
       const view = buildTalentsView(emptyAllocation(), cls, 20);

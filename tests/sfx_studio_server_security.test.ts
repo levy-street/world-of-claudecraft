@@ -23,6 +23,7 @@ import { startSfxStudio } from '../scripts/sfx_studio/server.mjs';
 import { SFX_CLIPS } from '../src/game/sfx_manifest.generated';
 
 const {
+  hashFile,
   listVersions,
   publishedStateHashForKey,
   publishedUrl,
@@ -111,8 +112,43 @@ describe.sequential('SFX Studio server security', () => {
     mkdirSync(exportRoot, { recursive: true });
   };
 
+  // This suite's only catalog request ("requires the secret token for GET
+  // project requests...") is the sole trigger for collectSfxCatalog's real
+  // ffprobe/ffmpeg pass over every published SFX clip. That per-clip analysis
+  // is disk-cached by content hash (scripts/sfx_studio/catalog.mjs), so a warm
+  // cache is real, already-shipped production behavior, not a test-only
+  // shortcut. Pre-seeding it here still exercises the real token gate and the
+  // real catalog-building code path (including its own directory scan and
+  // per-file hashing); only the ffprobe/ffmpeg analysis is skipped, which is
+  // safe because this suite never asserts on catalog body content, only on
+  // status codes. A single directory listing plus a content hash per file is
+  // enough to cover every hash collectSfxCatalog can look up, without
+  // depending on the SFX prompt catalog or its per-key published-file
+  // resolution (both already exercised for real by the request itself).
+  const seedCatalogAnalysisCache = () => {
+    const sfxDir = join(repoRoot, 'public/audio/sfx');
+    const files: Record<string, unknown> = {};
+    for (const name of readdirSync(sfxDir)) {
+      if (!name.endsWith('.mp3')) continue;
+      files[hashFile(join(sfxDir, name))] = {
+        info: {
+          codec: 'mp3',
+          sampleRate: 44100,
+          channels: 1,
+          channelLayout: 'mono',
+          duration: 0,
+          bitrate: 0,
+          bytes: 0,
+        },
+        levels: { integratedLufs: -16, truePeakDb: -1, loudnessRange: 0, thresholdLufs: -26 },
+      };
+    }
+    writeFileSync(join(STUDIO_ROOT, 'analysis.json'), JSON.stringify({ version: 1, files }));
+  };
+
   beforeAll(async () => {
     mkdirSync(STUDIO_ROOT, { recursive: true });
+    seedCatalogAnalysisCache();
     hadPlaybackDraft = existsSync(playbackDraft);
     if (hadPlaybackDraft) renameSync(playbackDraft, playbackDraftBackup);
     const running = await startSfxStudio({ port: 0 });

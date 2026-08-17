@@ -351,7 +351,7 @@ function warfareBonuses(signature: SetProc, capstoneText: string): SetBonusTier[
     {
       pieces: 2,
       effect: { pvpDefenseRating: WARFARE_SET_2PC_DEFENSE_RATING },
-      text: 'Increases WARFARE Defense Rating by 40.',
+      text: 'Increases Warfare Defense Rating by 40.',
     },
     {
       pieces: 4,
@@ -359,7 +359,7 @@ function warfareBonuses(signature: SetProc, capstoneText: string): SetBonusTier[
         pvpOffenseRating: WARFARE_SET_4PC_OFFENSE_RATING,
         ccDurationReduction: WARFARE_SET_4PC_CC_REDUCTION,
       },
-      text: 'Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.',
+      text: 'Increases Warfare Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.',
     },
     {
       pieces: 7,
@@ -421,7 +421,7 @@ export const ITEM_SETS: Record<string, ItemSet> = {
     name: 'Furyforged Battlegear',
     bonuses: warfareBonuses(
       WARFARE_UNBROKEN_OATH,
-      'Increases WARFARE Offense and Defense Rating by 80. Killing a hostile player grants Unbroken Oath, absorbing 200 damage for 10 sec.',
+      'Increases Warfare Offense and Defense Rating by 80. Killing a hostile player grants Unbroken Oath, absorbing 200 damage for 10 sec.',
     ),
   },
   [SET_WARFARE_STORMBOUND]: {
@@ -429,7 +429,7 @@ export const ITEM_SETS: Record<string, ItemSet> = {
     name: 'Stormbound Vestments',
     bonuses: warfareBonuses(
       WARFARE_EMBERWARD,
-      'Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec.',
+      'Increases Warfare Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec.',
     ),
   },
   [SET_WARFARE_ASHSTALKER]: {
@@ -437,7 +437,7 @@ export const ITEM_SETS: Record<string, ItemSet> = {
     name: 'Ashstalker Kit',
     bonuses: warfareBonuses(
       WARFARE_ASHEN_STEP,
-      'Increases WARFARE Offense and Defense Rating by 80. Killing a hostile player grants Ashen Step, increasing movement speed by 40% for 6 sec.',
+      'Increases Warfare Offense and Defense Rating by 80. Killing a hostile player grants Ashen Step, increasing movement speed by 40% for 6 sec.',
     ),
   },
   [SET_WARFARE_CINDERWEAVE]: {
@@ -445,7 +445,7 @@ export const ITEM_SETS: Record<string, ItemSet> = {
     name: 'Cinderweave Regalia',
     bonuses: warfareBonuses(
       WARFARE_EMBERWARD,
-      'Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec.',
+      'Increases Warfare Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec.',
     ),
   },
   [SET_WARFARE_THORNHIDE]: {
@@ -453,7 +453,7 @@ export const ITEM_SETS: Record<string, ItemSet> = {
     name: 'Thornhide Garb',
     bonuses: warfareBonuses(
       WARFARE_THORNGUARD,
-      'Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Thornguard, increasing dodge by 15% for 6 sec.',
+      'Increases Warfare Offense and Defense Rating by 80. Your spells have a 15% chance to grant Thornguard, increasing dodge by 15% for 6 sec.',
     ),
   },
 };

@@ -130,39 +130,4 @@ describe('Hunter Patch Up', () => {
     expect(pet.ownerId).toBe(sim.playerId);
     expect(pet.auras.some((aura) => aura.id === 'revive_pet')).toBe(false);
   });
-
-  it('improves the living-pet heal to exactly 360 without changing its cadence', () => {
-    const sim = makeHunter({ 11: 'hun_r11_mend_pet' });
-    const pet = addPet(sim, sim.playerId);
-
-    expect(sim.resolvedAbility('revive_pet')?.effects).toContainEqual({
-      type: 'hot',
-      total: 360,
-      duration: 12,
-      interval: 3,
-    });
-
-    castPatchUp(sim);
-
-    expect(pet.auras).toContainEqual(
-      expect.objectContaining({
-        id: 'revive_pet',
-        kind: 'hot',
-        value: 90,
-        tickInterval: 3,
-        sourceId: sim.playerId,
-      }),
-    );
-  });
-
-  it('keeps Master Tamer independent from Patch Up healing', () => {
-    const sim = makeHunter({ 17: 'hun_r17_master_tamer' });
-
-    expect(sim.resolvedAbility('revive_pet')?.effects).toContainEqual({
-      type: 'hot',
-      total: 240,
-      duration: 12,
-      interval: 3,
-    });
-  });
 });

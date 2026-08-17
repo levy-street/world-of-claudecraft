@@ -32,20 +32,64 @@ export const table: DeedLocaleTable = {
     name: '裂隙至尊',
     desc: '清除一個S級裂隙，裂隙傳送門所能生成的最高分級。',
   },
+  col_reliquary_rank_2: {
+    name: '戰利品保管者',
+    desc: '在聖物庫達到策展人等級 2（收錄 10 種不同聖物）。',
+    title: '戰利品保管者',
+  },
+  col_reliquary_rank_3: {
+    name: '編目師',
+    desc: '在聖物庫達到策展人等級 3（收錄 25 種不同聖物）。',
+    title: '編目師',
+  },
+  col_reliquary_rank_4: {
+    name: '首席策展人',
+    desc: '在聖物庫達到策展人等級 4（收錄 50 種不同聖物）。',
+    title: '首席策展人',
+  },
+  col_reliquary_rank_5: {
+    name: '永恆的戰利品',
+    desc: '在聖物庫達到策展人等級 5（收錄 100 種不同聖物）。',
+  },
   pvp_honor_sergeant: {
-    name: '中士',
+    name: '破陣者',
     desc: '生涯累計獲得10,000點榮譽。花費榮譽不會讓你失去此階級。',
-    title: '中士',
+    title: '破陣者',
   },
   pvp_honor_knight_lieutenant: {
-    name: '騎士中尉',
+    name: '掠野者',
     desc: '生涯累計獲得40,000點榮譽，象徵你已歷經一季真正的戰爭。',
-    title: '騎士中尉',
+    title: '掠野者',
   },
   pvp_honor_field_marshal: {
-    name: '元帥',
+    name: '戰冠者',
     desc: '生涯累計獲得150,000點榮譽。在任何王國都極為罕見，而它本該如此。',
-    title: '元帥',
+    title: '戰冠者',
+  },
+  col_reliquary_complete: {
+    name: '聖物庫大全',
+    desc: '將角色能夠保有的聖物庫中每一件聖物收錄在冊。此後目錄再增添，也不會收回這份紀錄。',
+    title: '寶庫策展人',
+  },
+  col_reliquary_conquerors: {
+    name: '征服者書架',
+    desc: '將聖物庫征服者書架上的每一件聖物收錄在冊。此後目錄再增添，也不會收回這份紀錄。',
+    title: '破庫者',
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    name: '點亮尼思拉克西斯',
+    desc: '點亮聖物庫的「英雄：尼思拉克西斯團隊副本」頁面。',
+    title: '尼思拉克西斯之光',
+  },
+  col_reliquary_illum_thunzharr: {
+    name: '點亮桑扎爾',
+    desc: '點亮聖物庫的「桑扎爾，覺醒之峰」頁面。',
+    title: '桑扎爾之光',
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    name: '點亮聖所',
+    desc: '點亮聖物庫的「英雄：墓龍聖所」頁面。',
+    title: '聖所之光',
   },
   chr_drakemaw_broodlord: {
     name: '碎巢者',

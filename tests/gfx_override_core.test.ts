@@ -143,15 +143,33 @@ describe('gfx override application', () => {
       ]),
     );
 
-    // Regenerated for the combined v21 profile controls and maxPooledObjects field. The staged
-    // vista and water tiers plus the bounded ground-object pool move every derived profile byte.
+    // Regenerated for the GfxSettings.nativeIosMemoryProfile -> iosMemoryProfile rename (the
+    // field now covers every iOS WebKit host, not just the packaged native app; see gfx.ts).
+    // Only the serialized KEY NAME moves for these desktop-default cases (none of them pass an
+    // iOS platform hint, so the field's VALUE stays false throughout), but JSON.stringify bakes
+    // the key name into the byte pin same as any other field.
+    // Regenerated again for the C1 memory-ratchet fix: the desktop
+    // maxPooledCharacterVisuals arm moved from POSITIVE_INFINITY (which
+    // JSON.stringify serializes as null) to the bounded 128 (see gfx.ts and
+    // tests/character_visual_pool.test.ts), so every desktop-default profile's
+    // serialized bytes moved by exactly that one value.
+    // The low row alone was regenerated once more when the desktop-client
+    // branch merged: its phase 5 low retune (bands/caps/grassRadius 72,
+    // characters floor 0.86, pinned per-axis by
+    // tests/gfx_low_monotonicity.test.ts) stacks on top of the C1 value, so
+    // low hashes differently from the release row while the other five match
+    // it byte for byte.
+    // Regenerated across the board for the denseDressing field (the dressing
+    // compensation cohort: lowPlus plus the leanFoliage medium session; see
+    // gfx.ts and tests/gfx.test.ts). Its VALUE is false for every
+    // desktop-default case here, only the serialized key name moves the bytes.
     expect(hashes).toEqual({
-      low: '4987a6b9a467580e2cb92a69c480991393c2c225ea15c34163d32c2ea1b79421',
-      medium: '631057f9ab877b911d9dc8871ce4618cdbe7e41834e138cdf8fca2ec65605c1a',
-      high: '8bae7a847914010b9c2628b83b71db75071473e4a0454fccc7f5995d99fb5c8c',
-      ultra: '6e4125654ebe9e92439a87a0025e8c2980261381f7519ed4e4151441f709663f',
-      insane: '9b8c9748c3c859e5f205ae1158ac78ed946cc334c0a430220805f35a99a49011',
-      advanced: 'c593310aac361378b53d43809c53c7c1f5f9947b811eea19e5ff0aab456e75e4',
+      low: '006edec83b3b6a50ac1a94b74ea3db24850e1cfbb1da3f053b7a7d09c68a7ca5',
+      medium: '98315c6396e6040891566ca9847999b6338dc048cc4591545abf77a27e6cc1dc',
+      high: '02205267b8778d10f7a44cbbca2b686602f62dde95069d0b27c23534ae219ab8',
+      ultra: '8bb27a672caf9e0df5c85a6b7ed628e5fa14a0c1f96d15b2ceb5df72c8cb71e0',
+      insane: 'a7c8bf8dd913f204eda8262b53289b27e9ff2a5af534817209cc5400e8999010',
+      advanced: '738594d16e2d1233b2f3d27a9e35e798dee354c6a07d684bac28c5923437ffa2',
     });
   });
 

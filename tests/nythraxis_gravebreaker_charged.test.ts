@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { DUNGEONS, instanceOrigin } from '../src/sim/data';
+import { BUILTIN_WORLD, DUNGEONS, instanceOrigin } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import type { Entity } from '../src/sim/types';
+import type { Entity, WorldContent } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
 // Gravebreaker is a CHARGED AUTO-ATTACK, not a scripted cast: the 12s cadence
@@ -13,6 +13,18 @@ import { groundHeight } from '../src/sim/world';
 // 1.5s on the pull, stacking with the opening swing) one-shot the best-geared
 // tank on heroic before any heal could land.
 
+// Every assertion runs inside the Nythraxis instance band: the boss, adds,
+// and raid members are all spawned by enterRaid/enterDungeon from the global
+// registries, never from the overworld camp/npc/groundObject placements
+// (same reasoning as the NYTHRAXIS_TEST_WORLD fixture in
+// nythraxis_raid_unit.test.ts, kept local here per the perf-batch no-shared-file rule).
+const NYTHRAXIS_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
 type TickEvent = ReturnType<Sim['tick']>[number];
 type TimedEvent = { at: number; event: TickEvent };
 type DamageEvent = Extract<TickEvent, { type: 'damage' }>;
@@ -22,7 +34,7 @@ function isDamage(event: TickEvent): event is DamageEvent {
 }
 
 function makeWorld(seed = 42) {
-  return new Sim({ seed, playerClass: 'warrior', noPlayer: true });
+  return new Sim({ seed, playerClass: 'warrior', noPlayer: true, world: NYTHRAXIS_TEST_WORLD });
 }
 
 function teleport(sim: Sim, pid: number, x: number, z: number) {

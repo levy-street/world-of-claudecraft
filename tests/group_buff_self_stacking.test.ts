@@ -1,46 +1,54 @@
-// Group buffs are ONE per target regardless of caster (v0.27.1): a second
-// hunter's Wildfang Rally REPLACES the first, never stacks a duplicate +45 AP
-// and +5% haste. The general rule: every aoeAlly group buff must either carry
+// Group buffs are ONE per target regardless of caster: a second Hunter's Pack
+// Rally replaces the first. The general rule: every aoeAlly group buff must either carry
 // Bloodlust-style exhaustion (exhaust: true, the 'sated' debuff blocks a second
 // application) or appear in aura_stacking's source-independent dedupe set; the
 // guard test at the bottom makes forgetting BOTH a loud CI failure for any
 // future group buff.
 import { describe, expect, it } from 'vitest';
-import { SOURCE_INDEPENDENT_GROUP_BUFF_AURA_IDS } from '../src/sim/combat/aura_stacking';
+import {
+  auraReplacementConflicts,
+  SOURCE_INDEPENDENT_GROUP_BUFF_AURA_IDS,
+} from '../src/sim/combat/aura_stacking';
+import { runHunterPackRally } from '../src/sim/combat/hunter_shared';
 import { ABILITIES } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 
 type AnySim = Sim & Record<string, any>;
 
-describe('Wildfang Rally never stacks with itself', () => {
+describe('Pack Rally never stacks with itself', () => {
   it('a second hunter casting replaces the first copy instead of stacking', () => {
     const sim = new Sim({ seed: 2026, playerClass: 'hunter', noPlayer: true }) as AnySim;
     const a = sim.addPlayer('hunter', 'HunterA');
     const b = sim.addPlayer('hunter', 'HunterB');
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
     for (const pid of [a, b]) {
       sim.setPlayerLevel(20, pid);
       expect(sim.setSpec('beast_mastery', pid)).toBe(true);
-      expect(sim.selectTalentRow(20, 'hun_r20_aspect_of_the_wild', pid)).toBe(true);
+      expect(sim.selectTalentRow(17, 'hun_r17_pack_rally', pid)).toBe(true);
       const p = sim.entities.get(pid) as Entity;
       p.resource = p.maxResource;
+      p.inCombat = true;
     }
     const entA = sim.entities.get(a) as Entity;
     const entB = sim.entities.get(b) as Entity;
     entB.pos = { ...entA.pos };
 
-    sim.castAbility('aspect_of_the_wild', a);
-    entB.gcdRemaining = 0;
-    sim.castAbility('aspect_of_the_wild', b);
+    runHunterPackRally(sim.ctx, entA, 10, 30);
+    runHunterPackRally(sim.ctx, entB, 10, 30);
 
     for (const ent of [entA, entB]) {
-      const haste = ent.auras.filter((x) => x.id === 'aspect_of_the_wild');
-      const ap = ent.auras.filter((x) => x.id === 'aspect_of_the_wild_ap');
-      expect(haste, 'one haste copy').toHaveLength(1);
-      expect(ap, 'one AP copy').toHaveLength(1);
+      const speed = ent.auras.filter((x) => x.id === 'hunter_pack_rally_speed');
+      const attackHaste = ent.auras.filter((x) => x.id === 'hunter_pack_rally_haste');
+      const spellHaste = ent.auras.filter((x) => x.id === 'hunter_pack_rally_spellhaste');
+      expect(speed, 'one speed copy').toHaveLength(1);
+      expect(attackHaste, 'one attack haste copy').toHaveLength(1);
+      expect(spellHaste, 'one spell haste copy').toHaveLength(1);
       // The later cast owns the surviving copy.
-      expect(haste[0].sourceId).toBe(b);
-      expect(ap[0].sourceId).toBe(b);
+      expect(speed[0].sourceId).toBe(b);
+      expect(attackHaste[0].sourceId).toBe(b);
+      expect(spellHaste[0].sourceId).toBe(b);
     }
   });
 });
@@ -105,57 +113,29 @@ describe('Mass Barrier never stacks its shield with itself', () => {
   });
 });
 
-describe("Nature's Fury never stacks its spell-crit pulse with itself", () => {
-  it('two druids in the same party pulsing on a shared ally leave exactly one copy', () => {
-    const sim = new Sim({ seed: 2026, playerClass: 'druid', noPlayer: true }) as AnySim;
-    const a = sim.addPlayer('druid', 'DruidA');
-    const b = sim.addPlayer('druid', 'DruidB');
-    for (const pid of [a, b]) {
-      sim.setPlayerLevel(20, pid);
-      expect(
-        sim.applyTalents({ spec: null, rows: { 20: 'dru_r20_improved_hurricane' } }, pid),
-      ).toBe(true);
-    }
-    const entA = sim.entities.get(a) as Entity;
-    const entB = sim.entities.get(b) as Entity;
-    entB.pos = { ...entA.pos };
-    entB.prevPos = { ...entA.pos };
-    sim.partyInvite(b, a);
-    sim.partyAccept(b);
-
-    // Moonwing Form is the Balance signature (gated behind the balance spec);
-    // the talent under test only needs the form AURA, so apply it directly
-    // like tests/natures_fury.test.ts does, without spending a spec pick.
-    const applyAura = sim as unknown as { applyAura(t: Entity, a: Record<string, unknown>): void };
-    for (const [ent, sourceId] of [
-      [entA, a],
-      [entB, b],
-    ] as const) {
-      applyAura.applyAura(ent, {
-        id: 'moonkin_form',
-        name: 'Moonwing Form',
-        kind: 'form_moonkin',
-        remaining: 3600,
-        duration: 3600,
-        value: 0,
-        sourceId,
-        school: 'arcane',
-      });
-    }
-
-    // Nature's Fury pulses once a second, staggered by pid: run past a full
-    // cycle so both druids have pulsed onto each other at least once.
-    for (let i = 0; i < 40; i++) sim.tick();
-
-    for (const ent of [entA, entB]) {
-      const fury = ent.auras.filter((x) => x.id === 'natures_fury');
-      expect(fury, "one Nature's Fury copy").toHaveLength(1);
-      expect(fury[0].kind).toBe('buff_spellcrit');
-    }
-  });
-});
+// Nature's Fury dedupe (the second half of #2868): RETIRED on this line. The
+// druid overhaul repurposed dru_r20_improved_hurricane into Nature's Echo (an
+// engine mechanic) and no talent grants moonwingPartyCritPct here, so the
+// moonwing pulse is unreachable and its dedupe cannot be exercised. The Mass
+// Barrier half above remains the live pin; the aura_stacking natures_fury
+// entry stays as inert protection if a future talent revives the pulse.
 
 describe('every group buff is exhaustion-gated or source-independent', () => {
+  it('replaces a Soulwell ward from another Warlock instead of stacking it', () => {
+    const ward = {
+      id: 'soulwell',
+      name: 'Soulwell',
+      kind: 'absorb',
+      remaining: 30,
+      duration: 30,
+      value: 100,
+      sourceId: 1,
+      school: 'shadow',
+    } as const;
+
+    expect(auraReplacementConflicts([ward], { ...ward, sourceId: 2 })).toEqual([0]);
+  });
+
   it('no aoeAlly buff can silently self-stack across casters', () => {
     const offenders: string[] = [];
     for (const ability of Object.values(ABILITIES)) {
@@ -188,5 +168,37 @@ describe('every group buff is exhaustion-gated or source-independent', () => {
       }
     }
     expect(offenders, 'group buffs missing both self-stack guards').toEqual([]);
+  });
+
+  // The aoeAlly sweep above never saw the OTHER shape a group buff can take:
+  // `buffTarget` with `party: true`, which is how every shout, blessing and
+  // Paladin aura reaches the party. Five Paladin auras stacked across casters
+  // for exactly that reason (two Paladins on Dawn Devotion granted +80 AP), so
+  // this arm holds the whole family, not just the ids that were fixed.
+  it('no party buffTarget aura can silently self-stack across casters', () => {
+    const offenders: string[] = [];
+    const seen: string[] = [];
+    for (const ability of Object.values(ABILITIES)) {
+      const effects = [
+        ...(ability.effects ?? []),
+        ...(ability.ranks ?? []).flatMap((r) => r.effects ?? []),
+      ];
+      for (const eff of effects) {
+        if (eff.type !== 'buffTarget' || !eff.party) continue;
+        seen.push(ability.id);
+        // A party buffTarget lands under the ability id (see aura_stacking.ts).
+        if (!SOURCE_INDEPENDENT_GROUP_BUFF_AURA_IDS.has(ability.id)) {
+          offenders.push(`${ability.id} (buffTarget party)`);
+        }
+        break;
+      }
+    }
+    // Guard the guard: if the party-buff shape is ever renamed, this scan would
+    // pass by finding nothing at all. It must keep seeing the real family.
+    expect(seen).toContain('battle_shout');
+    expect(seen).toContain('dawn_devotion');
+    expect(seen).toContain('retribution_aura');
+    expect(seen.length).toBeGreaterThanOrEqual(9);
+    expect(offenders, 'party buffTarget auras missing the source-independent guard').toEqual([]);
   });
 });

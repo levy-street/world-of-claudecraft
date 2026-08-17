@@ -380,6 +380,11 @@ export interface SharedIpRow {
 
 export type SharedIpsData = Paginated<SharedIpRow>;
 
+export interface GeneralChatRateLimit {
+  messages: number;
+  windowMinutes: number;
+}
+
 export interface AccountDetail {
   id: number;
   username: string;
@@ -396,8 +401,12 @@ export interface AccountDetail {
   chatMutedUntil: string | null;
   chatMuteReason: string;
   chatStrikes: number;
+  generalChatRateLimit: GeneralChatRateLimit | null;
   dailyRewardsBan?: { reason: string; createdAt: string; expiresAt: string | null } | null;
   dailyRewardsIpBans?: { ip: string; reason: string; createdAt: string }[];
+  // The operator-applied Cheater mark: remaining played-second budget, audited
+  // reason, and when it was applied. Null when the account is not marked.
+  cheaterMark?: { secondsRemaining: number; reason: string; setAt: string | null } | null;
   lastLoginIp: string | null;
   playtimeSeconds: number;
   characters: {

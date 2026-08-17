@@ -1,14 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
+import { CURATOR_RANK_DEFS } from '../src/sim/reliquary';
 import type { EquipSlot } from '../src/sim/types';
 import {
   buildPaperdollView,
   PAPERDOLL_LEFT_SLOTS,
   PAPERDOLL_RIGHT_SLOTS,
 } from '../src/ui/char_view';
+import { borderAccent } from '../src/ui/deed_border_view';
 import {
   buildInspectRemoteView,
   buildInspectView,
+  CURATOR_SIGIL_MIN_RANK,
   classColorCss,
   type InspectInput,
 } from '../src/ui/inspect_view';
@@ -22,6 +25,10 @@ const base: InspectInput = {
   skin: 2,
   skinCatalog: 'class',
   deedTitleText: '',
+  border: null,
+  curatorRank: 0,
+  relicsOwned: null,
+  relicsTotal: null,
   equippedItems: {
     helmet: 'monarch_crown_helm',
     chest: 'gravewoven_raiment',
@@ -136,6 +143,229 @@ describe('buildInspectView: badge gating', () => {
   });
 });
 
+describe('buildInspectView: the Curator standing line', () => {
+  // 'col_reliquary_rank_5' is the rank-5 deed bridge, whose reward IS the
+  // reliquary_gilt border; the ids below are the live catalog's, so a content
+  // rename reds here instead of silently dropping the accent.
+  const ranked = { ...base, curatorRank: 3, relicsOwned: 42, relicsTotal: 300 };
+
+  it('is null for a fresh character: no rank, no pair, no line', () => {
+    expect(buildInspectView(base, ITEMS).curator).toBeNull();
+  });
+
+  it('carries rank and the whole pair once the player is ranked', () => {
+    expect(buildInspectView(ranked, ITEMS).curator).toEqual({
+      rank: 3,
+      owned: 42,
+      total: 300,
+    });
+  });
+
+  it('shows at rank 1, the first ranked rung (the line is not sigil-gated)', () => {
+    expect(buildInspectView({ ...ranked, curatorRank: 1 }, ITEMS).curator).toEqual({
+      rank: 1,
+      owned: 42,
+      total: 300,
+    });
+  });
+
+  it('fails CLOSED when a rank arrives without its pair, per missing half', () => {
+    // A pair readout with half a pair would print a label and nothing to read.
+    // Both dimensions get their own negative case: a shared "either missing"
+    // fixture would pass with the guard reading only one of them.
+    expect(buildInspectView({ ...ranked, relicsOwned: null }, ITEMS).curator).toBeNull();
+    expect(buildInspectView({ ...ranked, relicsTotal: null }, ITEMS).curator).toBeNull();
+  });
+
+  it('never invents a line from a pair with no rank behind it', () => {
+    expect(
+      buildInspectView({ ...base, curatorRank: 0, relicsOwned: 4, relicsTotal: 300 }, ITEMS)
+        .curator,
+    ).toBeNull();
+  });
+});
+
+describe('buildInspectView: self-inspect reads LIVE standing', () => {
+  // The defect: the three wire fields answer "what did the server last
+  // broadcast", which is right for other players and wrong for yourself twice
+  // over. Offline nothing ever stamps them, so self-inspect showed no standing
+  // at all; online they ride the 60s flair cycle, so it showed one up to a
+  // minute behind the Reliquary window open beside it. Hud supplies
+  // selfStanding only when the inspected pid is the local player.
+
+  it('OFFLINE shape: selfStanding alone produces the line, with no wire fields at all', () => {
+    // The offline world stamps nothing, so every wire field is at its absent
+    // value. Before the fix this input produced curator: null.
+    const offline: InspectInput = {
+      ...base,
+      curatorRank: 0,
+      relicsOwned: null,
+      relicsTotal: null,
+      selfStanding: { curatorRank: 3, owned: 42, total: 300 },
+    };
+    expect(buildInspectView(offline, ITEMS).curator).toEqual({ rank: 3, owned: 42, total: 300 });
+  });
+
+  it('OVERRIDES a stale broadcast rather than merging with it', () => {
+    // Every wire field disagrees with the live read, and each one has to lose:
+    // a build that preferred the wire for any single field would print a
+    // mismatched line. The expected object pins all three at once.
+    const stale: InspectInput = {
+      ...base,
+      curatorRank: 1,
+      relicsOwned: 10,
+      relicsTotal: 300,
+      selfStanding: { curatorRank: 4, owned: 88, total: 301 },
+    };
+    expect(buildInspectView(stale, ITEMS).curator).toEqual({ rank: 4, owned: 88, total: 301 });
+  });
+
+  it('leaves the entity-derived behavior alone for everyone else', () => {
+    // Both the omitted and the explicitly-null forms are other players; neither
+    // may disturb the wire reading. Omission is the shape every existing caller
+    // and every test above uses, so it is the one that must not regress.
+    const other = { ...base, curatorRank: 2, relicsOwned: 20, relicsTotal: 300 };
+    const expected = { rank: 2, owned: 20, total: 300 };
+    expect(buildInspectView(other, ITEMS).curator).toEqual(expected);
+    expect(buildInspectView({ ...other, selfStanding: null }, ITEMS).curator).toEqual(expected);
+  });
+
+  it('drives the SIGIL too, so a live rank 5 wears the honor on self-inspect', () => {
+    // The line and the badge read one resolved standing; a fix that changed only
+    // the line would leave an Eternal Curator without their own sigil offline.
+    const offlineTop: InspectInput = {
+      ...base,
+      curatorRank: 0,
+      relicsOwned: null,
+      relicsTotal: null,
+      selfStanding: { curatorRank: 5, owned: 300, total: 300 },
+    };
+    const model = buildInspectView(offlineTop, ITEMS);
+    expect(model.badges.curator).toEqual({ rank: 5 });
+    expect(model.curator).toEqual({ rank: 5, owned: 300, total: 300 });
+  });
+
+  it('takes the sigil AWAY when the live read says the wire was wrong', () => {
+    // The override has to work downward as well, or it is just an "or" over the
+    // two sources: a wire rank 5 with a live rank 2 must show rank 2 and no
+    // sigil, not the honor the stale broadcast claimed.
+    const model = buildInspectView(
+      {
+        ...base,
+        curatorRank: 5,
+        relicsOwned: 300,
+        relicsTotal: 300,
+        selfStanding: { curatorRank: 2, owned: 30, total: 300 },
+      },
+      ITEMS,
+    );
+    expect(model.badges.curator).toBeNull();
+    expect(model.curator).toEqual({ rank: 2, owned: 30, total: 300 });
+  });
+
+  it('fails closed on an unranked live read, even against a ranked broadcast', () => {
+    const model = buildInspectView(
+      {
+        ...base,
+        curatorRank: 3,
+        relicsOwned: 42,
+        relicsTotal: 300,
+        selfStanding: { curatorRank: 0, owned: 0, total: 300 },
+      },
+      ITEMS,
+    );
+    expect(model.curator).toBeNull();
+    expect(model.badges.curator).toBeNull();
+  });
+});
+
+describe('buildInspectView: the Curator sigil badge (rank 5 only)', () => {
+  const ranked = (rank: number): InspectInput => ({
+    ...base,
+    curatorRank: rank,
+    relicsOwned: 100,
+    relicsTotal: 300,
+  });
+
+  it('is locked to the top rung: nothing at rank 4, the sigil at rank 5', () => {
+    // The boundary in both directions, which an "absent at 0, present at 5" pair
+    // would not pin: rank 4 is the rung that would inherit the honor if the gate
+    // slipped by one.
+    expect(buildInspectView(ranked(4), ITEMS).badges.curator).toBeNull();
+    expect(buildInspectView(ranked(5), ITEMS).badges.curator).toEqual({ rank: 5 });
+  });
+
+  it('is absent for every unranked and low-rank standing', () => {
+    for (const rank of [0, 1, 2, 3]) {
+      expect(buildInspectView(ranked(rank), ITEMS).badges.curator, `rank ${rank}`).toBeNull();
+    }
+  });
+
+  it('rides RANK alone, so a standing whose counts went missing keeps the honor', () => {
+    expect(
+      buildInspectView({ ...ranked(5), relicsOwned: null, relicsTotal: null }, ITEMS).badges
+        .curator,
+    ).toEqual({ rank: 5 });
+  });
+
+  it('the locked rank IS the ladder top rung today (a re-tier must be deliberate)', () => {
+    // CURATOR_SIGIL_MIN_RANK is a literal on purpose (a sixth rung must not
+    // silently move the honor), so this is the pin that reds when the ladder
+    // grows and asks a human to decide, rather than deriving the gate from the
+    // very table it is meant to guard.
+    expect(CURATOR_SIGIL_MIN_RANK).toBe(5);
+    expect(CURATOR_RANK_DEFS.at(-1)?.rank).toBe(CURATOR_SIGIL_MIN_RANK);
+    expect(CURATOR_RANK_DEFS).toHaveLength(5);
+  });
+
+  it('keeps the three older badge slots untouched at every Curator rank', () => {
+    // The sigil is a FOURTH slot, not a replacement: a rank-5 player with no
+    // other flair still shows exactly one badge.
+    const m = buildInspectView(ranked(5), ITEMS).badges;
+    expect(m.holder).toBeNull();
+    expect(m.discord).toBeNull();
+    expect(m.dev).toBeNull();
+    expect(Object.keys(m).sort()).toEqual(['curator', 'dev', 'discord', 'holder']);
+  });
+});
+
+describe('buildInspectView: the header border accent', () => {
+  it('is null for a borderless player', () => {
+    expect(buildInspectView(base, ITEMS).header.border).toBeNull();
+  });
+
+  it('resolves a worn border deed id to its slug AND that slug palette', () => {
+    // Deed id in, slug + colors out: the painter must receive resolved colors so
+    // it holds no palette of its own. The expected colors come from the ONE
+    // table, so this cannot drift from what the nameplate and portrait ring draw.
+    const accent = borderAccent('reliquary_gilt');
+    expect(accent).not.toBeNull();
+    expect(
+      buildInspectView({ ...base, border: 'col_reliquary_rank_5' }, ITEMS).header.border,
+    ).toEqual({
+      slug: 'reliquary_gilt',
+      frame: accent?.frame,
+      edge: accent?.edge,
+      glow: accent?.glow,
+    });
+  });
+
+  it('fails closed for every id that resolves to no accent', () => {
+    // A persisted id whose content record is gone, a TITLE-reward deed, and a
+    // prototype key: each renders exactly like a borderless player rather than
+    // an uncolored frame.
+    for (const id of ['deed_that_no_longer_exists', 'prog_veteran', '__proto__', '']) {
+      expect(buildInspectView({ ...base, border: id }, ITEMS).header.border, id).toBeNull();
+    }
+  });
+
+  it('leaves the rest of the header alone (the accent is additive)', () => {
+    const m = buildInspectView({ ...base, border: 'col_reliquary_rank_5' }, ITEMS).header;
+    expect(m.name).toBe('Elowen');
+    expect(m.classColor).toBe('#33c1f1');
+  });
+});
+
 describe('buildInspectView: gear reuses the char_view paperdoll (no forked slot list)', () => {
   it('maps worn gear (and empty slots) exactly like buildPaperdollView', () => {
     const m = buildInspectView(base, ITEMS);
@@ -171,6 +401,11 @@ describe('buildInspectRemoteView: the thin out-of-range card carries no gear', (
     });
     expect('gear' in m).toBe(false);
     expect('badges' in m).toBe(false);
+    // The out-of-range card stays FLAIRLESS: the Curator standing rides the
+    // per-entity wire and is proximity-gated like the three older badges, so
+    // looking a name up from chat must not leak it.
+    expect('curator' in m).toBe(false);
+    expect('border' in m).toBe(false);
   });
 
   it('allows a null guild', () => {

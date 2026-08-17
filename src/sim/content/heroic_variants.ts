@@ -19,13 +19,21 @@ import {
   primaryStatBudget,
   QUALITY_ILVL_BONUS,
   scaleWeaponDamage,
+  slotStatMultForItem,
   TWOHAND_DPS_MULT,
   TWOHAND_STAT_MULT,
   weaponDpsBudget,
 } from '../item_budget';
 import type { ItemDef, MobTemplate } from '../types';
 import { DUNGEON_DEFS } from './dungeons';
-import { NYTHRAXIS_RAID_BOSS_ID, NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL } from './heroic_loot';
+import {
+  ARMOR_RATING as FIVE_MAN_ARMOR_RATING,
+  FIVE_MAN_WEAPON_RATING,
+  HEROIC_BOSS_LOOT,
+  HEROIC_LOOT_SOURCE_LEVEL,
+  NYTHRAXIS_RAID_BOSS_ID,
+  NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL,
+} from './heroic_loot';
 import { TEMPLE_DUNGEON_DEFS } from './temple';
 import { WILDHEART_DUNGEON_DEFS } from './wildheart';
 
@@ -54,16 +62,21 @@ const RAID_SECONDARY_LEGENDARY = 30; // 3.0%
 // spell-facing Hit seed marks caster DPS and keeps Hit, paired with haste. A
 // spell-facing throughput seed (or no seed, like the Heartwood healer staff) stays
 // throughput-only and pairs crit + haste, so healer-facing gear never gains Hit.
-function applyRaidVariantRatings(variant: ItemDef, base: ItemDef): void {
-  const isLegendary = (base.quality ?? 'common') === 'legendary';
+// Spell-facing: carries caster stats (int/spirit/Spell Power) and no attack-power
+// stats (strength/agility). It only carries Hit when the authored base explicitly
+// seeds Hit, which distinguishes caster-DPS pieces from throughput/healer pieces.
+function isSpellFacing(base: ItemDef): boolean {
   const s = base.stats;
-  // Spell-facing: carries caster stats (int/spirit/Spell Power) and no attack-power
-  // stats (strength/agility). It only carries Hit when the authored base explicitly
-  // seeds Hit, which distinguishes caster-DPS pieces from throughput/healer pieces.
-  const spellFacing =
+  return (
     ((s?.int ?? 0) > 0 || (s?.spi ?? 0) > 0 || (base.spellPower ?? 0) > 0) &&
     (s?.str ?? 0) === 0 &&
-    (s?.agi ?? 0) === 0;
+    (s?.agi ?? 0) === 0
+  );
+}
+
+function applyRaidVariantRatings(variant: ItemDef, base: ItemDef): void {
+  const isLegendary = (base.quality ?? 'common') === 'legendary';
+  const spellFacing = isSpellFacing(base);
   const baseRatingKey = RAID_RATING_KEYS.find((k) => (base[k] ?? 0) > 0);
   const primaryKey: RatingKey = baseRatingKey ?? (spellFacing ? 'hasteRating' : 'hitRating');
   // Spell-facing pieces use the other throughput rating as their secondary: an
@@ -85,6 +98,20 @@ function applyRaidVariantRatings(variant: ItemDef, base: ItemDef): void {
   variant[secondaryKey] = isLegendary ? RAID_SECONDARY_LEGENDARY : RAID_SECONDARY;
 }
 
+// Apply the five-man BOSS tier's single rating to a variant, in place. A variant
+// that a five-man HEROIC_BOSS_LOOT table references directly registers at
+// HEROIC_LOOT_SOURCE_LEVEL (25) in the item-level source index (item_level.ts
+// keys the same bossId split), landing epics at item level 31: the one-rating
+// tier of the combat-rating ladder. The base's own rating key wins when it has
+// one; otherwise physical pieces take crit and spell-facing pieces take haste,
+// matching the authored HEROIC_ITEMS archetype fills (healer-facing pieces never
+// gain Hit). Weapons carry the weapon allowance, armor the armor one.
+function applyFiveManBossVariantRating(variant: ItemDef, base: ItemDef): void {
+  const baseRatingKey = RAID_RATING_KEYS.find((k) => (base[k] ?? 0) > 0);
+  const key: RatingKey = baseRatingKey ?? (isSpellFacing(base) ? 'hasteRating' : 'critRating');
+  variant[key] = base.weapon ? FIVE_MAN_WEAPON_RATING : FIVE_MAN_ARMOR_RATING;
+}
+
 function makeHeroicVariant(base: ItemDef, sourceLevel = HEROIC_VARIANT_SOURCE_LEVEL): ItemDef {
   const quality = base.quality ?? 'common';
   const targetLevel = sourceLevel + (QUALITY_ILVL_BONUS[quality] ?? 0);
@@ -93,7 +120,8 @@ function makeHeroicVariant(base: ItemDef, sourceLevel = HEROIC_VARIANT_SOURCE_LE
   // Rounded like expectedStatBudget so variant budgets stay integral under the
   // fractional TWOHAND_STAT_MULT.
   const targetBudget = Math.round(
-    primaryStatBudget(targetLevel, base.quality, base.slot) * handMultiplier,
+    primaryStatBudget(targetLevel, base.quality, base.slot, slotStatMultForItem(base)) *
+      handMultiplier,
   );
   const baseBudget = base.stats
     ? PRIMARY_STATS.reduce((sum, stat) => sum + (base.stats?.[stat] ?? 0), 0)
@@ -128,6 +156,14 @@ function makeHeroicVariant(base: ItemDef, sourceLevel = HEROIC_VARIANT_SOURCE_LE
   // Heroic RAID variants (source level 27 -> item level 33/37) get the dual rating;
   // five-man heroic variants inherit their base's ratings unchanged via the spread.
   if (sourceLevel === NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL) applyRaidVariantRatings(variant, base);
+  // A variant that a five-man HEROIC BOSS table references directly (source 25 ->
+  // item level 31, e.g. heroic_duskwhisper on the Fanglord Beastmaster) is a
+  // boss piece of the ilvl-31 tier, and every piece of that tier carries exactly
+  // one combat rating (tests/combat_rating.test.ts's ladder). Match the authored
+  // set convention: FIVE_MAN_WEAPON_RATING-sized crit for physical weapons,
+  // haste for spell-facing pieces, keeping the base's own rating key when it has
+  // one.
+  if (sourceLevel === HEROIC_LOOT_SOURCE_LEVEL) applyFiveManBossVariantRating(variant, base);
   // The spread widens ItemDef's discriminated union; the transform preserves the
   // base item's kind/slot shape, so this is a valid ItemDef of the same variant.
   return variant as ItemDef;
@@ -190,11 +226,25 @@ export function buildHeroicVariants(
   const raidBases = new Set(
     (mobs[NYTHRAXIS_RAID_BOSS_ID]?.loot ?? []).flatMap((e) => (e.itemId ? [e.itemId] : [])),
   );
+  // A variant a five-man HEROIC BOSS table references directly (heroic_duskwhisper
+  // on the Fanglord Beastmaster) registers at HEROIC_LOOT_SOURCE_LEVEL in the
+  // item-level source index (item_level.ts applies the same non-raid bossId rule),
+  // so the generator must budget it at that tier too or its stats and ratings
+  // undershoot its indexed item level.
+  const fiveManBossVariantIds = new Set<string>();
+  for (const [bossId, entries] of Object.entries(HEROIC_BOSS_LOOT)) {
+    if (bossId === NYTHRAXIS_RAID_BOSS_ID) continue;
+    for (const entry of entries) {
+      if (entry.itemId) fiveManBossVariantIds.add(entry.itemId);
+    }
+  }
   const out: Record<string, ItemDef> = {};
   for (const id of eligible) {
     const sourceLevel = raidBases.has(id)
       ? NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL
-      : HEROIC_VARIANT_SOURCE_LEVEL;
+      : fiveManBossVariantIds.has(heroicVariantId(id))
+        ? HEROIC_LOOT_SOURCE_LEVEL
+        : HEROIC_VARIANT_SOURCE_LEVEL;
     out[heroicVariantId(id)] = makeHeroicVariant(items[id], sourceLevel);
   }
   return out;

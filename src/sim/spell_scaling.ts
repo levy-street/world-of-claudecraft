@@ -82,8 +82,10 @@ export function directHitBonus(
   castTimeSec: number,
   aoe = false,
   mult = 1,
+  coefficientOverride?: number,
 ): number {
-  const coeff = directSpellCoeff(castTimeSec) * (aoe ? SPELL_AOE_COEFF_MULT : 1);
+  const coeff =
+    (coefficientOverride ?? directSpellCoeff(castTimeSec)) * (aoe ? SPELL_AOE_COEFF_MULT : 1);
   return Math.round(power * coeff * powerScale(def) * mult);
 }
 

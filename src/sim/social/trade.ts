@@ -253,7 +253,9 @@ function grantOffer(ctx: SimContext, grants: PendingGrant[], toPid: number): voi
       plainByRecipe.set(unit.craftedRecipeId, (plainByRecipe.get(unit.craftedRecipeId) ?? 0) + 1);
     }
     for (const [craftedRecipeId, count] of plainByRecipe) {
-      ctx.addItem(g.itemId, count, toPid, { craftedRecipeId });
+      // movement: the other player already held these, so the trade moves them
+      // rather than sourcing them from the world (no Reliquary obtain count).
+      ctx.addItem(g.itemId, count, toPid, { craftedRecipeId, movement: true });
     }
     for (const unit of g.units) {
       if (!unit.instance) continue;
@@ -267,8 +269,10 @@ function grantOffer(ctx: SimContext, grants: PendingGrant[], toPid: number): voi
       if (unit.instance.bindOnTrade === true && unit.instance.boundTo === undefined) {
         unit.instance.boundTo = toPid;
       }
+      // movement: the instanced arm of the same handover (see the plain arm).
       ctx.addItemInstance(g.itemId, unit.instance, toPid, 1, {
         craftedRecipeId: unit.craftedRecipeId,
+        movement: true,
       });
     }
   }

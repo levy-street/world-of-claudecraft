@@ -178,8 +178,10 @@ async function readPrewarm(page) {
       texturesAfter: p.texturesAfter,
       manifestCompleted: p.manifestCompleted,
       manifestPlanned: p.manifestPlanned,
+      manifestPartial: p.manifestPartial,
       manifestTimedOut: p.manifestTimedOut,
       manifestFailed: p.manifestFailed,
+      partialEntryIds: p.partialEntryIds,
       timedOutEntryIds: p.timedOutEntryIds,
       failedEntryIds: p.failedEntryIds,
       entries: (p.manifestEntries ?? []).map((e) => ({
@@ -189,6 +191,8 @@ async function readPrewarm(page) {
         elapsedMs: e.elapsedMs,
         programDelta: e.programDelta,
         textureDelta: e.textureDelta,
+        workDone: e.workDone,
+        workPlanned: e.workPlanned,
         detail: e.detail,
       })),
     };

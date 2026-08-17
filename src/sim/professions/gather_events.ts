@@ -5,6 +5,7 @@
 // gatherEvent.* lines.
 
 import { DUNGEON_X_THRESHOLD, zoneAt } from '../data';
+import { noteReliquaryMark } from '../reliquary';
 import type { Rng } from '../rng';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -93,7 +94,11 @@ export function announceGatherRareEvent(
   }));
   // Deed-mark hook: each flavor mark feeds its rare-find
   // deed (col_pristine_vein / col_ancient_heartwood / col_moonlit_bloom).
-  ctx.markVisited(finder, 'gather_event:' + flavor);
+  // Reliquary field-note trophies reuse the same stable gather_event:* ids
+  // (catalog allowlist only; noteReliquaryMark no-ops unknown ids).
+  const visitMark = `gather_event:${flavor}`;
+  ctx.markVisited(finder, visitMark);
+  noteReliquaryMark(ctx, finder, visitMark);
 }
 
 /** The zone-wide masterwork celebration copy. One pid-scoped

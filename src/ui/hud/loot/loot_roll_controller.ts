@@ -41,6 +41,12 @@ export interface LootRollControllerDeps {
   itemIcon(item: ItemDef): string;
   itemTooltip(item: ItemDef): string;
   attachTooltip(element: HTMLElement, html: () => string): void;
+  // Dismisses the shared #tooltip box immediately. render() tears down and
+  // rebuilds the whole loot-roll subtree on every repaint, so an element the
+  // cursor is currently hovering can be removed without ever firing its own
+  // mouseleave; without this the shared tooltip is left anchored to a detached
+  // node until the next mousemove happens to land somewhere else (#3027).
+  hideTooltip(): void;
   writers: Pick<PainterHostWriters, 'setStyleProp'>;
 }
 
@@ -420,6 +426,11 @@ export class LootRollController {
   private render(): void {
     const root = this.root();
     const checkedByRoll = this.checkedMasterPids();
+    // Every repaint tears down and rebuilds the whole subtree below, so any
+    // element currently under the cursor (and possibly owning the shared
+    // #tooltip box) is about to be detached without a mouseleave ever firing.
+    // Dismiss the tooltip up front so it never outlives the row it described.
+    this.deps.hideTooltip();
     if (
       this.activeRolls.size === 0 &&
       this.activeMasterRolls.size === 0 &&

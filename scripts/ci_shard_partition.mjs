@@ -87,7 +87,16 @@ export function partitionByLpt(items, count) {
 }
 
 /** Active pack strategy for the CI sequencer (approach 2). */
-export const partitionForCi = partitionByStripe;
+// Active CI strategy: LPT over MEASURED weights (re-wired 2026-08-14).
+// History: D11 tried LPT over static import-cost weights and stripe; both
+// missed the balance bar and stayed unwired. Re-measured with real per-file
+// durations after the harness splits, on the lane-excluded shard pool and
+// scored in real ms: stripe is WORSE than sha1-contiguous (11.3m vs 10.5m
+// worst shard) and stays rejected; LPT over measured weights lands 9.79m
+// worst with 0.06m spread, PROVIDED unknown files take the measured-scale
+// fallback (raw heuristic units regressed to 11.21m, the review round's
+// central catch).
+export const partitionForCi = partitionByLpt;
 
 /**
  * Known long-Duration files from Phase 3 CI evidence (run 30712431702 and
@@ -95,32 +104,30 @@ export const partitionForCi = partitionByStripe;
  * static import proxy under-weights them. Keys are repo-relative paths.
  * Values are extra weight units (same scale as weightForTestFile).
  */
-export const DURATION_WEIGHT_OVERLAY = Object.freeze({
-  'tests/mail_expiry.test.ts': 80_000,
-  'tests/professions_trend_guild_letter.test.ts': 79_000,
-  'tests/eastbrook_gameplay_integration.test.ts': 69_000,
-  'tests/tank_crit_immunity_warrior_pair.test.ts': 55_000,
-  'tests/tank_crit_immunity_paladin_pair.test.ts': 50_000,
-  'tests/professions_trend_delivery_kind.test.ts': 47_000,
-  'tests/corpse_harvest_sim.test.ts': 46_000,
-  'tests/escort_quest.test.ts': 43_000,
-  'tests/tank_crit_immunity_druid_pair.test.ts': 37_000,
-  'tests/mail_instance.test.ts': 35_000,
-  'tests/terrain_streaming.test.ts': 34_000,
-  'tests/escort_ambush_convoy.test.ts': 28_000,
-  'tests/professions_deeds_playthrough.test.ts': 25_000,
-  'tests/grave_inferno.test.ts': 24_000,
-  'tests/frost_mage_procs.test.ts': 24_000,
-  'tests/stable_yard.test.ts': 22_000,
-  'tests/world_population_invariant.test.ts': 21_000,
-  'tests/terrain_escape_walkout.test.ts': 21_000,
-  'tests/emerald_deck_escape.test.ts': 23_000,
-  'tests/sfx_export_core.test.ts': 18_000,
-  'tests/mount_race.test.ts': 18_000,
-  'tests/guild_letter_online.test.ts': 16_000,
-  'tests/dungeon_finder.test.ts': 17_000,
-  'tests/sfx_studio_server_security.test.ts': 16_000,
-});
+// The measured weight table: real per-file durations (ms) harvested from a
+// green full-mode CI run by scripts/ci_shard_weights_harvest.mjs. Regenerate
+// with `node scripts/ci_shard_weights_harvest.mjs <run-id>`; refresh when
+// the suite's shape changes. Staleness only unbalances (completeness is
+// structural); a file absent here falls back to the static heuristic below.
+import MEASURED_WEIGHTS_JSON from './ci_shard_weights.generated.json' with { type: 'json' };
+
+export const MEASURED_WEIGHTS = Object.freeze(
+  Object.fromEntries(Object.entries(MEASURED_WEIGHTS_JSON).filter(([k]) => k !== '__provenance')),
+);
+
+// The fallback for a file ABSENT from the table, on the MEASURED scale: the
+// review round proved the import-cost heuristic sits on a different scale
+// (median 36 ms measured vs 50k to 173k heuristic units), so 1.3% unknown
+// files claimed 18.7% of planned load and made the committed packing WORSE
+// than the sha1-contiguous baseline (11.21m vs 10.49m worst shard, scored
+// on real durations); a neutral measured-scale fallback restores the
+// intended result (9.79m worst, 0.06m spread). The measured MEDIAN is the
+// neutral estimate: most unknown files are new ordinary suites, and the
+// error from a genuinely heavy unknown is bounded until the next harvest.
+export const MEASURED_FALLBACK_MS = (() => {
+  const values = Object.values(MEASURED_WEIGHTS).sort((a, b) => a - b);
+  return values.length > 0 ? values[Math.floor(values.length / 2)] : 0;
+})();
 
 /**
  * Deterministic import-cost weight for a test file.
@@ -134,6 +141,15 @@ export const DURATION_WEIGHT_OVERLAY = Object.freeze({
  */
 export function weightForTestFile(relPath, body, size) {
   const path = relPath.replace(/\\/g, '/');
+  // A real measured duration beats every heuristic (the D11 LPT attempt
+  // missed its bar precisely because static import-cost weights mispredict
+  // runtime). A file absent from a NON-EMPTY table gets the measured-scale
+  // fallback above; the import-cost heuristic below survives only for a
+  // tree with no measured table at all (an emptied regeneration), where
+  // relative ordering is better than nothing.
+  const measured = MEASURED_WEIGHTS[path];
+  if (typeof measured === 'number' && measured > 0) return measured < 1 ? 1 : measured;
+  if (MEASURED_FALLBACK_MS > 0) return MEASURED_FALLBACK_MS;
   const text = typeof body === 'string' ? body : '';
   const bytes = Number.isFinite(size) && size > 0 ? size : text.length;
   let w = 1000 + bytes;
@@ -155,9 +171,6 @@ export function weightForTestFile(relPath, body, size) {
   if (/from\s+['"][^'"]*src\/game\//.test(text)) w += 12_000;
   if (path.startsWith('tests/parity/')) w += 20_000;
   if (path.startsWith('tests/helpers/')) w += 5_000;
-
-  const overlay = DURATION_WEIGHT_OVERLAY[path];
-  if (overlay) w += overlay;
 
   return w < 1 ? 1 : w;
 }

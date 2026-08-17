@@ -10,6 +10,11 @@ import type { Aura } from '../types';
 // or listed here; a new group buff with neither guard fails that test loudly.
 export const SOURCE_INDEPENDENT_GROUP_BUFF_AURA_IDS: ReadonlySet<string> = new Set([
   'arcane_intellect',
+  // Pack Rally uses three fixed aura ids. A later Hunter refreshes the group
+  // effect instead of multiplying it across sources.
+  'hunter_pack_rally_speed',
+  'hunter_pack_rally_haste',
+  'hunter_pack_rally_spellhaste',
   // Wildfang Rally (v0.27.1): two hunters must not double the +45 AP / +5%
   // haste; both halves dedupe across sources like every other group buff.
   'aspect_of_the_wild',
@@ -17,6 +22,17 @@ export const SOURCE_INDEPENDENT_GROUP_BUFF_AURA_IDS: ReadonlySet<string> = new S
   'battle_shout',
   'blessing_of_might',
   'devotion_aura',
+  // The overhauled Paladin aura kit. Every one is a persistent party buff, so a
+  // second Paladin running the SAME aura refreshes it instead of granting the
+  // effect twice: no double 5% damage reduction, no double thorns, no two copies
+  // of one Devotion. Distinct auras still coexist (Bastion plus Requital, or one
+  // Paladin's Dawn next to another's Grace), which is what the tooltips mean by
+  // Devotions from different Paladins working together.
+  'devotion_ward',
+  'retribution_aura',
+  'radiant_devotion',
+  'dawn_devotion',
+  'grace_devotion',
   // Emboldening Roar (Fury aoeAllySureCrit): two Fury warriors must not stack
   // two separate 3-charge guaranteed-crit auras on a shared ally.
   'emboldening_roar_crit',
@@ -32,8 +48,10 @@ export const SOURCE_INDEPENDENT_GROUP_BUFF_AURA_IDS: ReadonlySet<string> = new S
   'rallying_cry_hp',
   'rune_of_power',
   'sanguine_aura',
+  'soulwell',
   'trueshot_aura_ap', // Sureflight Aura (hunter aoeAllyAttackPower)
   'temporal_hourglass',
+  'aura_mastery',
 ]);
 
 export function auraReplacementConflicts(auras: readonly Aura[], aura: Aura): number[] {

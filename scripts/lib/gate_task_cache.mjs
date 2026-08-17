@@ -15,7 +15,7 @@
 //   cannot hide drift from committed artifacts.
 // - Standalone `npm test` / `npm run build` still regenerate via pretest/build
 //   (Phase 2 generate-once only applies inside gate.mjs).
-
+//
 /** Tasks the full gate runs through turbo for local disk cache. */
 export const GATE_CACHEABLE_TASKS = Object.freeze([
   'i18n:gen',
@@ -99,6 +99,8 @@ export const GATE_CACHE_TASK_INVENTORY = Object.freeze({
       'src/**',
       'scripts/build_server.mjs',
       'scripts/migrate_old_cragmaw_pelt.ts',
+      'scripts/migrate_rift_forge_rollback.ts',
+      'scripts/rift_forge_rollback_migration.ts',
       'private/**',
       'package.json',
     ],
@@ -136,7 +138,7 @@ export const GATE_CACHE_TASK_INVENTORY = Object.freeze({
 export const GATE_TURBO_UI_ARGS = Object.freeze(['--ui=stream']);
 
 /**
- * Args for `npx turbo run <tasks...>`.
+ * Args for `turbo run <tasks...>`.
  * @param {ReadonlyArray<string>} tasks package.json script names
  * @returns {string[]}
  */
@@ -149,14 +151,14 @@ export function turboRunArgs(tasks) {
       throw new Error(`turboRunArgs: invalid task ${JSON.stringify(t)}`);
     }
   }
-  return ['turbo', 'run', ...tasks, ...GATE_TURBO_UI_ARGS];
+  return ['run', ...tasks, ...GATE_TURBO_UI_ARGS];
 }
 
 /**
- * True when a gate step is invoked through turbo (cacheable pure artifacts).
+ * True when a gate step invokes turbo through npx for cacheable pure artifacts.
  * @param {string} cmd
  * @param {ReadonlyArray<string>} args
  */
 export function isTurboGateStep(cmd, args) {
-  return cmd === 'npx' && Array.isArray(args) && args[0] === 'turbo' && args[1] === 'run';
+  return /(?:^|[\\/])turbo(?:\.cmd)?$/.test(cmd) && Array.isArray(args) && args[0] === 'run';
 }

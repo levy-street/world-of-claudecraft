@@ -69,6 +69,35 @@ export function riftEscapeWindowActive(ctx: SimContext, mob: Entity): boolean {
   return (mob.escapeWindowUntil ?? 0) > ctx.time;
 }
 
+/** Instance-wide control suppression: true when the swinger's OWN escape
+ * window is live, or when any stamped mob in the swinger's rift instance (in
+ * practice the boss, the only stamped spawn) has one open. A dais guard's
+ * root, stun, or shove during the boss's death-zone fuse eats the escape
+ * window exactly like the boss's own procs would (the fuse assumes an
+ * unimpaired runner and samples impairment only at spawn), so the whole
+ * instance shares the suppression while a telegraph is in flight. Callers
+ * keep their rng chance draw BEFORE this check (roll drawn, effect skipped),
+ * so it moves no draw order; membership is by inst.mobIds, so a mob outside
+ * every instance can never be suppressed by someone else's rift. Draws no
+ * rng. */
+export function riftControlSuppressed(ctx: SimContext, swinger: Entity): boolean {
+  if (riftEscapeWindowActive(ctx, swinger)) return true;
+  for (const inst of ctx.riftInstances) {
+    if (inst.partyKey === null || !inst.mobIds.includes(swinger.id)) continue;
+    for (const id of inst.mobIds) {
+      if (id === swinger.id) continue;
+      const sibling = ctx.entities.get(id);
+      if (sibling && riftEscapeWindowActive(ctx, sibling)) return true;
+    }
+    if (inst.bossId !== null && !inst.mobIds.includes(inst.bossId)) {
+      const boss = ctx.entities.get(inst.bossId);
+      if (boss && riftEscapeWindowActive(ctx, boss)) return true;
+    }
+    return false;
+  }
+  return false;
+}
+
 /** Open the escape window for a telegraph starting NOW whose last blast lands
  * by `durationSec` from now. Never shrinks an already-open longer window
  * (overlapping telegraphs keep the furthest deadline). No-op without the rift

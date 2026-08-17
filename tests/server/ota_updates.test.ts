@@ -2,14 +2,19 @@ process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_ota_updat
 
 import type * as http from 'node:http';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { planOtaPublish } from '../../scripts/ota/publish_bundle.mjs';
+import { buildManifestEntries, planOtaPublish } from '../../scripts/ota/publish_bundle.mjs';
 import {
   compareSemver,
   configureOtaUpdatesRuntime,
+  normalizeOtaFileManifest,
   normalizeOtaManifest,
+  OTA_DELTA_OFFERS_PER_WINDOW,
+  OTA_FILE_MANIFEST_MAX_BYTES,
+  OTA_FILE_MANIFEST_MAX_ENTRIES,
   OTA_MANIFEST_MAX_BYTES,
   OTA_MANIFEST_TTL_MS,
   type OtaManifest,
+  type OtaManifestFileEntry,
   parseSemver,
   planOtaUpdate,
   resetOtaUpdatesRuntimeForTests,
@@ -33,6 +38,38 @@ const MANIFEST: OtaManifest = {
   url: 'https://updates.example.com/ota/bundles/wocc-web-0.33.0.zip',
   checksum: 'ab12cd34',
 };
+
+const FILE_MANIFEST_URL = 'https://updates.example.com/ota/manifests/wocc-web-0.33.0.manifest.json';
+
+const HASH_A = 'a'.repeat(64);
+const HASH_B = '0123456789abcdef'.repeat(4);
+
+const FILE_ENTRIES: OtaManifestFileEntry[] = [
+  {
+    file_name: 'assets/index-abc.js',
+    file_hash: HASH_A,
+    download_url: `https://updates.example.com/ota/files/${HASH_A}`,
+  },
+  {
+    file_name: 'index.html',
+    file_hash: HASH_B,
+    download_url: `https://updates.example.com/ota/files/${HASH_B}`,
+  },
+];
+
+function entryWith(overrides: Partial<OtaManifestFileEntry>): OtaManifestFileEntry {
+  return { ...FILE_ENTRIES[0], ...overrides };
+}
+
+/** A latest.json + file-manifest pair served by URL, the delta-publish shape. */
+function deltaRuntime(overrides: { entries?: unknown; latest?: Record<string, unknown> } = {}) {
+  const latest = overrides.latest ?? { ...MANIFEST, fileManifestUrl: FILE_MANIFEST_URL };
+  const entries = 'entries' in overrides ? overrides.entries : FILE_ENTRIES;
+  return vi.fn(async (url: string) => {
+    if (url === FILE_MANIFEST_URL) return entries;
+    return latest;
+  });
+}
 
 /** A well-formed plugin check-in body; spread overrides per case. */
 function checkinBody(overrides: Record<string, unknown> = {}): Record<string, unknown> {
@@ -72,6 +109,7 @@ afterEach(() => {
   resetPublicReadRateLimits();
   if (originalManifestUrl === undefined) delete process.env.OTA_MANIFEST_URL;
   else process.env.OTA_MANIFEST_URL = originalManifestUrl;
+  delete process.env.OTA_DELTA_DISABLED;
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
@@ -135,6 +173,25 @@ describe('normalizeOtaManifest', () => {
     ).toBeNull();
   });
 
+  it('accepts a same-origin fileManifestUrl and fails the whole manifest on a bad one', () => {
+    expect(
+      normalizeOtaManifest(
+        { ...MANIFEST, fileManifestUrl: FILE_MANIFEST_URL },
+        'https://updates.example.com',
+      ),
+    ).toEqual({ ...MANIFEST, fileManifestUrl: FILE_MANIFEST_URL });
+    for (const fileManifestUrl of [
+      'http://updates.example.com/ota/m.json',
+      'https://evil.example.net/ota/m.json',
+      42,
+      '',
+    ]) {
+      expect(
+        normalizeOtaManifest({ ...MANIFEST, fileManifestUrl }, 'https://updates.example.com'),
+      ).toBeNull();
+    }
+  });
+
   it('accepts what the publish script actually uploads, end to end', () => {
     // The publisher planner and this endpoint pin their halves separately;
     // this round-trip keeps them honest together: a full plan (checksum,
@@ -163,6 +220,116 @@ describe('normalizeOtaManifest', () => {
       publicBaseUrl: 'https://updates.example.com',
     });
     expect(normalizeOtaManifest(checksumless.manifest, 'https://updates.example.com')).toBeNull();
+  });
+
+  it('accepts a delta publish end to end: latest.json field AND the built entries', () => {
+    const plan = planOtaPublish({
+      version: '0.33.0',
+      bucket: 'wocc-ota',
+      prefix: 'ota',
+      publicBaseUrl: 'https://updates.example.com',
+      checksum: 'ab12cd34',
+      withFileManifest: true,
+    });
+    expect(normalizeOtaManifest(plan.manifest, 'https://updates.example.com')).toEqual({
+      version: '0.33.0',
+      url: 'https://updates.example.com/ota/bundles/wocc-web-0.33.0.zip',
+      checksum: 'ab12cd34',
+      fileManifestUrl: 'https://updates.example.com/ota/manifests/wocc-web-0.33.0.manifest.json',
+    });
+    const entries = buildManifestEntries({
+      files: [
+        { path: 'index.html', sha256: HASH_B },
+        { path: 'assets/index-abc.js', sha256: HASH_A },
+      ],
+      publicBaseUrl: 'https://updates.example.com',
+      prefix: 'ota',
+    });
+    expect(normalizeOtaFileManifest(entries, 'https://updates.example.com')).toEqual(FILE_ENTRIES);
+  });
+});
+
+describe('normalizeOtaFileManifest', () => {
+  const ORIGIN = 'https://updates.example.com';
+
+  it('accepts a well-formed entry list, canonicalizing hashes to lowercase', () => {
+    expect(normalizeOtaFileManifest(FILE_ENTRIES, ORIGIN)).toEqual(FILE_ENTRIES);
+    const upper = [entryWith({ file_hash: HASH_A.toUpperCase() })];
+    // Accepted case-insensitively, emitted lowercase so the wire is stable.
+    expect(normalizeOtaFileManifest(upper, ORIGIN)).toEqual([entryWith({ file_hash: HASH_A })]);
+  });
+
+  it('enforces content-addressing: the url tail must be the entry hash itself', () => {
+    // A same-origin url pointing at a DIFFERENT blob's hash is refused, so a
+    // write into the entry document alone can never remap a file to another
+    // object already in the bucket.
+    expect(
+      normalizeOtaFileManifest(
+        [entryWith({ download_url: `https://updates.example.com/ota/files/${HASH_B}` })],
+        ORIGIN,
+      ),
+    ).toBeNull();
+    expect(
+      normalizeOtaFileManifest(
+        [entryWith({ download_url: 'https://updates.example.com/ota/files/latest' })],
+        ORIGIN,
+      ),
+    ).toBeNull();
+  });
+
+  it('rejects duplicate file names (an ambiguous instruction to the device)', () => {
+    expect(normalizeOtaFileManifest([FILE_ENTRIES[0], { ...FILE_ENTRIES[0] }], ORIGIN)).toBeNull();
+  });
+
+  it('rejects a non-array, an empty list, and an oversized list outright', () => {
+    expect(normalizeOtaFileManifest({ files: FILE_ENTRIES }, ORIGIN)).toBeNull();
+    expect(normalizeOtaFileManifest('[]', ORIGIN)).toBeNull();
+    expect(normalizeOtaFileManifest([], ORIGIN)).toBeNull();
+    const oversized = new Array(OTA_FILE_MANIFEST_MAX_ENTRIES + 1).fill(FILE_ENTRIES[0]);
+    expect(normalizeOtaFileManifest(oversized, ORIGIN)).toBeNull();
+  });
+
+  it('one bad entry drops the WHOLE manifest, never a filtered subset', () => {
+    expect(
+      normalizeOtaFileManifest([FILE_ENTRIES[0], entryWith({ file_hash: 'beef' })], ORIGIN),
+    ).toBeNull();
+  });
+
+  it('rejects unsafe file names: traversal, absolute, backslash, NUL, percent, controls', () => {
+    for (const file_name of [
+      '../escape.js',
+      'a/../b.js',
+      '/etc/passwd',
+      'a\\b.js',
+      'a\0b.js',
+      // Percent is refused outright: a consumer that URL-decodes before
+      // joining would turn this into the traversal the segment walk refused.
+      '%2e%2e%2fescape.js',
+      'a%2fb.js',
+      'a\nb.js',
+      'a\u0001b.js',
+      '',
+      'a//b.js',
+      './a.js',
+      `${'x'.repeat(1025)}.js`,
+    ]) {
+      expect(normalizeOtaFileManifest([entryWith({ file_name })], ORIGIN)).toBeNull();
+    }
+  });
+
+  it('rejects malformed hashes and off-origin, non-https, or oversized download urls', () => {
+    for (const file_hash of ['', 'beef', `${HASH_A}00`, 'g'.repeat(64)]) {
+      expect(normalizeOtaFileManifest([entryWith({ file_hash })], ORIGIN)).toBeNull();
+    }
+    for (const download_url of [
+      `http://updates.example.com/ota/files/${HASH_A}`,
+      `https://evil.example.net/ota/files/${HASH_A}`,
+      'not a url',
+      '',
+      `https://updates.example.com/${'p/'.repeat(230)}/files/${HASH_A}`,
+    ]) {
+      expect(normalizeOtaFileManifest([entryWith({ download_url })], ORIGIN)).toBeNull();
+    }
   });
 });
 
@@ -310,6 +477,144 @@ describe('POST /api/ota/updates handler', () => {
     expect(await postCheck(checkinBody())).toEqual({ status: 200, body: NO_UPDATE });
     configureOtaUpdatesRuntime({ fetchManifest: async () => ({ version: 'nope' }) });
     expect(await postCheck(checkinBody())).toEqual({ status: 200, body: NO_UPDATE });
+  });
+
+  it('embeds the validated delta manifest in the offer when latest.json advertises one', async () => {
+    process.env.OTA_MANIFEST_URL = 'https://updates.example.com/ota/latest.json';
+    const fetchManifest = deltaRuntime();
+    configureOtaUpdatesRuntime({ fetchManifest });
+    expect(await postCheck(checkinBody())).toEqual({
+      status: 200,
+      body: {
+        version: '0.33.0',
+        url: MANIFEST.url,
+        checksum: 'ab12cd34',
+        manifest: FILE_ENTRIES,
+      },
+    });
+    // The file manifest is fetched under its own, larger byte bound.
+    expect(fetchManifest).toHaveBeenLastCalledWith(FILE_MANIFEST_URL, OTA_FILE_MANIFEST_MAX_BYTES);
+    expect(OTA_FILE_MANIFEST_MAX_BYTES).toBeGreaterThan(OTA_MANIFEST_MAX_BYTES);
+  });
+
+  it('never embeds the delta manifest in a no-update answer', async () => {
+    process.env.OTA_MANIFEST_URL = 'https://updates.example.com/ota/latest.json';
+    const fetchManifest = deltaRuntime();
+    configureOtaUpdatesRuntime({ fetchManifest });
+    expect(await postCheck(checkinBody({ version_name: '0.33.0' }))).toEqual({
+      status: 200,
+      body: NO_UPDATE,
+    });
+    // No offer means the file manifest is never even fetched.
+    expect(fetchManifest).toHaveBeenCalledTimes(1);
+    expect(fetchManifest).not.toHaveBeenCalledWith(FILE_MANIFEST_URL, OTA_FILE_MANIFEST_MAX_BYTES);
+  });
+
+  it('degrades to the zip offer when the file manifest is invalid or unreachable', async () => {
+    process.env.OTA_MANIFEST_URL = 'https://updates.example.com/ota/latest.json';
+    const zipOnlyOffer = {
+      status: 200,
+      body: { version: '0.33.0', url: MANIFEST.url, checksum: 'ab12cd34' },
+    };
+    // One traversal entry poisons the whole list.
+    configureOtaUpdatesRuntime({
+      fetchManifest: deltaRuntime({
+        entries: [FILE_ENTRIES[0], entryWith({ file_name: '../escape.js' })],
+      }),
+    });
+    expect(await postCheck(checkinBody())).toEqual(zipOnlyOffer);
+    // The file-manifest fetch failing outright must not take the offer down.
+    configureOtaUpdatesRuntime({
+      fetchManifest: vi.fn(async (url: string) => {
+        if (url === FILE_MANIFEST_URL) throw new Error('boom');
+        return { ...MANIFEST, fileManifestUrl: FILE_MANIFEST_URL };
+      }),
+    });
+    expect(await postCheck(checkinBody())).toEqual(zipOnlyOffer);
+  });
+
+  it('serializes the delta offer once: many checks, one file-manifest fetch, identical bytes', async () => {
+    process.env.OTA_MANIFEST_URL = 'https://updates.example.com/ota/latest.json';
+    const fetchManifest = deltaRuntime();
+    configureOtaUpdatesRuntime({ fetchManifest });
+    const bodies: unknown[] = [];
+    for (let i = 0; i < 5; i++) bodies.push((await postCheck(checkinBody())).body);
+    for (const body of bodies) expect(body).toEqual(bodies[0]);
+    // One latest.json fetch plus one file-manifest fetch across all five.
+    expect(fetchManifest).toHaveBeenCalledTimes(2);
+  });
+
+  it('withholds the manifest from plugins that cannot consume it (below 6.1, or unreported)', async () => {
+    process.env.OTA_MANIFEST_URL = 'https://updates.example.com/ota/latest.json';
+    const fetchManifest = deltaRuntime();
+    configureOtaUpdatesRuntime({ fetchManifest });
+    const zipOnly = { version: '0.33.0', url: MANIFEST.url, checksum: 'ab12cd34' };
+    expect(await postCheck(checkinBody({ plugin_version: '5.9.0' }))).toEqual({
+      status: 200,
+      body: zipOnly,
+    });
+    expect(await postCheck(checkinBody({ plugin_version: undefined }))).toEqual({
+      status: 200,
+      body: zipOnly,
+    });
+    expect((await postCheck(checkinBody({ plugin_version: '6.1.0' }))).body).toHaveProperty(
+      'manifest',
+    );
+    // The heavy document is only ever fetched for a capable plugin.
+    expect(fetchManifest.mock.calls.filter((c) => c[0] === FILE_MANIFEST_URL)).toHaveLength(1);
+  });
+
+  it('OTA_DELTA_DISABLED=1 is the kill switch: zip offers continue, manifests stop', async () => {
+    process.env.OTA_MANIFEST_URL = 'https://updates.example.com/ota/latest.json';
+    process.env.OTA_DELTA_DISABLED = '1';
+    const fetchManifest = deltaRuntime();
+    configureOtaUpdatesRuntime({ fetchManifest });
+    expect(await postCheck(checkinBody())).toEqual({
+      status: 200,
+      body: { version: '0.33.0', url: MANIFEST.url, checksum: 'ab12cd34' },
+    });
+    // The kill switch also stops the heavy fetch itself, not just the embed.
+    expect(fetchManifest.mock.calls.filter((c) => c[0] === FILE_MANIFEST_URL)).toHaveLength(0);
+  });
+
+  it('caps manifest-bearing offers per IP, degrading to the zip offer past the budget', async () => {
+    process.env.OTA_MANIFEST_URL = 'https://updates.example.com/ota/latest.json';
+    configureOtaUpdatesRuntime({ fetchManifest: deltaRuntime() });
+    const results: boolean[] = [];
+    for (let i = 0; i < OTA_DELTA_OFFERS_PER_WINDOW + 2; i++) {
+      const { status, body } = await postCheck(checkinBody());
+      expect(status).toBe(200); // never a 429: the zip offer still updates the device
+      results.push(Object.hasOwn(body as Record<string, unknown>, 'manifest'));
+    }
+    expect(results.filter(Boolean)).toHaveLength(OTA_DELTA_OFFERS_PER_WINDOW);
+    expect(results.slice(OTA_DELTA_OFFERS_PER_WINDOW)).toEqual([false, false]);
+  });
+
+  it('serves a prebuilt gzip body to gzip-capable callers, raw JSON otherwise', async () => {
+    process.env.OTA_MANIFEST_URL = 'https://updates.example.com/ota/latest.json';
+    configureOtaUpdatesRuntime({ fetchManifest: deltaRuntime() });
+    const plainCtx = fakeCtx({ method: 'POST', url: '/api/ota/updates', body: checkinBody() });
+    await routes[0].handler(plainCtx);
+    const plainRes = plainCtx.res as unknown as FakeResShape & {
+      headers: Record<string, unknown>;
+    };
+    expect(plainRes.headers['content-encoding']).toBeUndefined();
+    expect(plainRes.headers.vary).toBe('Accept-Encoding');
+    const rawLength = Number(plainRes.headers['content-length']);
+    expect(JSON.parse(plainRes.body)).toHaveProperty('manifest');
+
+    const gzipCtx = fakeCtx({
+      method: 'POST',
+      url: '/api/ota/updates',
+      body: checkinBody(),
+      headers: { 'accept-encoding': 'gzip, deflate, br' },
+    });
+    await routes[0].handler(gzipCtx);
+    const gzipRes = gzipCtx.res as unknown as FakeResShape & { headers: Record<string, unknown> };
+    expect(gzipRes.headers['content-encoding']).toBe('gzip');
+    expect(gzipRes.headers.vary).toBe('Accept-Encoding');
+    // The precompressed variant is genuinely smaller than the raw body.
+    expect(Number(gzipRes.headers['content-length'])).toBeLessThan(rawLength);
   });
 
   it('rejects an unknown platform with ota_updates.invalid_input', async () => {

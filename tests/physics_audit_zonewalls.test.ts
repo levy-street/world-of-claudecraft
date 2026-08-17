@@ -3,6 +3,7 @@ import { findLedgeGrab } from '../src/sim/physics/ledge';
 import { Sim } from '../src/sim/sim';
 import type { MoveInput } from '../src/sim/types';
 import { groundHeight, terrainHeight } from '../src/sim/world';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // Border ridges vs the ledge grab: the 2.2 grab reach may hop banks, but it
 // may never LADDER a player up terrain they could not walk up.
@@ -66,7 +67,12 @@ describe('the border ridge vs the ledge grab', () => {
   });
 
   it('jump-spam and the ledge grab gain no illegitimate height on the ridge', () => {
-    const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true });
+    const sim = new Sim({
+      seed: SEED,
+      playerClass: 'warrior',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     sim.setPlayerLevel(60);
     const p = sim.player;
     const meta = sim.players.get(p.id);

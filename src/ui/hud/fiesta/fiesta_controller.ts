@@ -5,6 +5,11 @@ import type {
   FiestaScoreboardPlayer,
   IWorld,
 } from '../../../world_api';
+import { classCrestId } from '../../crest_icon_art';
+import {
+  crestImageFallbackAttributes,
+  hydrateCrestImageFallbacks,
+} from '../../crest_image_fallback';
 import { esc } from '../../esc';
 import { formatNumber, type TranslationKey, t, tOptional } from '../../i18n';
 
@@ -137,12 +142,14 @@ export class FiestaController {
     const enemyTeam = fiesta.team === 'A' ? fiesta.teamB : fiesta.teamA;
     const faces = (players: FiestaScoreboardPlayer[]): string =>
       players
-        .map(
-          (player) =>
+        .map((player) => {
+          const crestId = classCrestId(player.cls);
+          return (
             `<div class="fp${player.me ? ' me' : ''}${player.down ? ' down' : ''}" title="${esc(player.name)}">` +
-            `<img class="fp-face" src="${this.deps.crestIconUrl(player.cls)}" alt="" draggable="false">` +
-            `<span class="fp-kills">${num(player.kills)}</span></div>`,
-        )
+            `<img class="fp-face" src="${this.deps.crestIconUrl(player.cls)}" ${crestImageFallbackAttributes(crestId, 96)} alt="" draggable="false">` +
+            `<span class="fp-kills">${num(player.kills)}</span></div>`
+          );
+        })
         .join('');
     const teamSignature = (players: FiestaScoreboardPlayer[]): string =>
       players.map((player) => `${player.kills}${player.down ? 'd' : ''}`).join(',');
@@ -166,6 +173,7 @@ export class FiestaController {
         <span class="fs-num theirs">${num(fiesta.theirScore)}</span>
       </div>
       <div class="fs-team theirs" aria-hidden="true">${faces(enemyTeam)}</div>`;
+    hydrateCrestImageFallbacks(element);
     element.setAttribute(
       'aria-label',
       t('fiesta.score.aria', {

@@ -35,7 +35,9 @@ export interface WeaponGripOverride {
 export const WEAPON_GRIP_OVERRIDES: Record<string, WeaponGripOverride> = {
   // Populated by hand or by the inspector Save button. An absent key is identity.
   notched_woodaxe: { pos: [0.1249, 0.0794, 0.0321], rot: [180, -8.7527, 180], scale: 0.85 },
-  whittler_s_knife: { pos: [0, 0.0184, 0], rot: [0, 0, -19.9726], scale: 0.6 },
+  // Boneglass Shiv: origin is at the blade CENTER, so raise the model along the
+  // grip axis (+Y) to bring the handle into the hand. oy = 0.40*scale - lift(0.04).
+  whittler_s_knife: { pos: [0, 0.26, 0], rot: [0, 0, -19.9726], scale: 0.6 },
   peeled_birch_wand: { pos: [0.01, 0.02, 0.02] },
   knotted_oak_stave: { pos: [-0.1, 0.57, 0.02], rot: [-180, 0, 0], scale: 0.85 },
   redskull_sword: { scale: 1.3 },
@@ -79,6 +81,13 @@ export const WEAPON_GRIP_OVERRIDES: Record<string, WeaponGripOverride> = {
     scale: 1.65,
   },
   ice_fang: { scale: 1.25 },
+  // The three non-KayKit rogue daggers below all have their mesh ORIGIN at the
+  // blade center (native height ~1.28, 0.64 node scale), so the family grip
+  // seats the hand mid-blade. Raise each along the grip axis (+Y) so the handle
+  // lands in the hand: oy = 0.40*scale - lift(0.04). Duskwhisper + its heroic
+  // twin share purple_dagger, so this one entry fixes both.
+  purple_dagger: { scale: 0.55, pos: [0, 0.23, 0] },
+  redskull_dagger: { pos: [0, 0.44, 0] }, // Marrowpoint (scale 1)
   glaciersplit: { pos: [0.0713, 0.0779, -0.0096], rot: [180, -7.6717, -165.7991], scale: 1.35 },
   rimecrusher: { rot: [-50.9571, -60.9258, -57.8216], scale: 1.8 },
   frostbite: { pos: [-0.0279, 0.0048, 0.0849], scale: 1.55 },

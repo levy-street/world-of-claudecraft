@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { type NameplateCanvasState, NameplateCanvasSurface } from '../src/render/nameplate_canvas';
@@ -239,6 +240,7 @@ describe('batched canvas nameplate state', () => {
       id: 2,
       guild: 'Canvas Raiders',
       title: 'prog_veteran',
+      border: 'prog_prestige_10',
       overheadEmoteId: 'wave',
       holderTier: 1,
       devTier: 4,
@@ -254,7 +256,13 @@ describe('batched canvas nameplate state', () => {
     const state = stateOf(painter, target.id);
 
     expect(state.guild).toBe('Canvas Raiders');
+    // The drawn `<...>` wrapper is prebuilt here in resolveContent (guild's
+    // only writer), so a guild change through the resolve gate rebuilds it
+    // and the per-frame draw path never allocates it.
+    expect(state.guildLabel).toBe('<Canvas Raiders>');
     expect(state.title).toBe('Veteran');
+    // The wire carries the DEED ID; the plate carries the resolved SLUG.
+    expect(state.border).toBe('prestige_laurels');
     expect(state.opacity).toBe(0.55);
     expect(state.badges).toHaveLength(3);
     expect(state.badges[2]).toMatchObject({
@@ -271,6 +279,88 @@ describe('batched canvas nameplate state', () => {
     expect(state.castFill).toBe(0.5);
     expect(state.castSource).toBe('fireball');
     expect(state.castLabel).not.toBe('fireball');
+
+    target.guild = 'New Banner';
+    painter.update(true);
+    expect(state.guild).toBe('New Banner');
+    expect(state.guildLabel).toBe('<New Banner>');
+
+    target.guild = '';
+    painter.update(true);
+    expect(state.guild).toBe('');
+    expect(state.guildLabel).toBe('');
+  });
+
+  it('keeps guild and guildLabel paired across the gated non-fullPass cadence', () => {
+    // 18 yd out: beyond NAMEPLATE_URGENT_RANGE (14), untargeted, and not
+    // casting, so a non-fullPass update takes the gated path and skips
+    // resolveContent (the default harness targets sit 3 yd away, inside the
+    // urgent range, and resolve every pass). The view group stays at the
+    // origin, so the plate itself remains on screen.
+    const target = entity({
+      id: 2,
+      guild: 'Far Banner',
+      pos: { x: 0, y: 0, z: -15 } as Entity['pos'],
+    });
+    const { painter } = harness([target]);
+    painter.update(true);
+    const state = stateOf(painter, target.id);
+    expect(state.guild).toBe('Far Banner');
+    expect(state.guildLabel).toBe('<Far Banner>');
+
+    // A guild change seen only by a throttled pass: the resolve gate has not
+    // run, so both fields legitimately hold the pre-change values. The
+    // invariant under test is the PAIRING, not freshness: a stray per-frame
+    // writer would split them (guild cleared, label still drawn stale).
+    target.guild = 'New Banner';
+    painter.update(false);
+    expect(state.guild).toBe('Far Banner');
+    expect(state.guildLabel).toBe(`<${state.guild}>`);
+
+    // The next full pass refreshes both together.
+    painter.update(true);
+    expect(state.guild).toBe('New Banner');
+    expect(state.guildLabel).toBe('<New Banner>');
+
+    // Guild removal through the same cadence: stale pair on the throttled
+    // pass, then both clear together on the full pass.
+    target.guild = '';
+    painter.update(false);
+    expect(state.guild).toBe('New Banner');
+    expect(state.guildLabel).toBe(`<${state.guild}>`);
+    painter.update(true);
+    expect(state.guild).toBe('');
+    expect(state.guildLabel).toBe('');
+  });
+
+  it('resolves the border slug per entity and clears it for every borderless case', () => {
+    // The slug is resolved on the SAME tier-cadenced resolveContent pass as the
+    // title, so a border change repaints exactly like a title change. Every arm
+    // here is a way a stale slug could survive onto the wrong plate.
+    const bordered = entity({ id: 2, border: 'col_reliquary_rank_5' });
+    const mob = entity({ id: 3, kind: 'mob', templateId: 'wolf', hostile: true });
+    const object = entity({ id: 4, kind: 'object', templateId: 'delve_locked_chest' });
+    const { painter } = harness([bordered, mob, object]);
+
+    painter.update(true);
+    expect(stateOf(painter, 2).border).toBe('reliquary_gilt');
+    // A mob and a world object never carry one, so the accent is player identity.
+    expect(stateOf(painter, 3).border).toBe('');
+    expect(stateOf(painter, 4).border).toBe('');
+
+    // Cleared selection: the reset must blank the slug the plate already holds.
+    bordered.border = null;
+    painter.update(true);
+    expect(stateOf(painter, 2).border).toBe('');
+
+    // A TITLE-reward deed is not a border, and an id the catalog no longer has
+    // (a save that outlived its content record) resolves to no accent either.
+    bordered.border = 'prog_veteran';
+    painter.update(true);
+    expect(stateOf(painter, 2).border).toBe('');
+    bordered.border = 'deed_that_no_longer_exists';
+    painter.update(true);
+    expect(stateOf(painter, 2).border).toBe('');
   });
 
   it('maps object, quest NPC, boss, and lootable corpse presentation', () => {
@@ -316,5 +406,49 @@ describe('batched canvas nameplate state', () => {
     painter.remove(target.id);
 
     expect((painter as unknown as PainterStateAccess).states.has(target.id)).toBe(false);
+  });
+});
+
+describe('guild single-writer invariant', () => {
+  // The guildLabel memo is load-bearing on "resolveContent is state.guild's
+  // only writer": a second writer appearing anywhere would silently stop the
+  // guild line drawing rather than drawing something stale (the harder
+  // failure to notice). Pin the writer set so a new assignment site fails
+  // here instead.
+  // The sibling source-pin idiom (tests/painter_host.test.ts). The rel arg
+  // must stay a VARIABLE: this file runs under happy-dom, whose web transform
+  // statically rewrites a literal `new URL('...', import.meta.url)` to a
+  // document-origin http URL that readFileSync then rejects.
+  const read = (rel: string): string => readFileSync(new URL(rel, import.meta.url), 'utf8');
+
+  it('state.guild is written only by resolveContent, and drawBase never writes it', () => {
+    const painter = read('../src/render/nameplate_painter.ts');
+    const canvas = read('../src/render/nameplate_canvas.ts');
+    // Anchor on the DEFINITION: a bare indexOf('resolveContent(') lands on the
+    // call site in update(), which sits above updateDynamicState and would
+    // admit that whole per-frame method into the window.
+    const definitionStart = painter.indexOf('private resolveContent(');
+    expect(definitionStart).toBeGreaterThan(-1);
+    const bodyStart = definitionStart + 'private resolveContent('.length;
+    // The window closes at the next class-member declaration after the
+    // definition (2-space indent, optional modifiers, then the member name and
+    // its open paren; today that is `private questMarker(`). Matching the
+    // declaration SHAPE rather than that name survives a rename or reorder,
+    // and method-body lines sit at 4+ spaces so they cannot match.
+    const memberDecl = /^ {2}(?:(?:private|public|protected|static) )*[A-Za-z_$][\w$]*\(/m;
+    const nextMember = painter.slice(bodyStart).match(memberDecl);
+    expect(nextMember).not.toBeNull();
+    const memberEnd = bodyStart + (nextMember?.index ?? painter.length);
+    // Both writes are the byte-identical `state.guild = `, so indexOf(match)
+    // cannot position the second one; matchAll carries each occurrence's own
+    // index instead, and every write must land inside [definitionStart,
+    // memberEnd).
+    const painterWrites = [...painter.matchAll(/state\.guild\s*=[^=]/g)];
+    expect(painterWrites).toHaveLength(2);
+    for (const write of painterWrites) {
+      expect(write.index).toBeGreaterThanOrEqual(definitionStart);
+      expect(write.index).toBeLessThan(memberEnd);
+    }
+    expect(canvas.match(/\.guild\s*=[^=]/g) ?? []).toHaveLength(0);
   });
 });

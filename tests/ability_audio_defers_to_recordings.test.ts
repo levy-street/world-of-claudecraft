@@ -12,8 +12,10 @@
 // gain node before dispatching to any recipe, so "no new gain node" is a
 // decisive read of "returned before scheduling", independent of how far the
 // synthesis primitives get against a stub context.
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { sfx } from '../src/game/sfx';
+import { AbilityVfx } from '../src/render/ability_vfx';
+import type { AbilityVfxFx } from '../src/render/ability_vfx/fx';
 
 let gainNodes = 0;
 let nowT = 0;
@@ -140,6 +142,20 @@ describe('moments a recording already sounds are skipped, not doubled', () => {
   it('stays silent on a crit (combat_crit is recorded)', () => {
     expect(nodesFor(() => sfx.abilityAudio('crit', 'shadow', 1, 0, 0, 0, {}))).toBe(0);
   });
+
+  it('stays silent on the Meteor zone pulse (the meteor recording plays instead)', () => {
+    // The painter's zoneRehit threads ev.ability through to abilityAudio so
+    // PULSE_IMPACT_ABILITIES (ability_sfx_coverage.ts) can silence this one
+    // ground-zone pulse specifically: fx.ts's fx:'tick' handler (hud.ts) plays
+    // the dedicated 'meteor' recording instead. Without abilityId threaded
+    // through, this would fall back to the generic uncovered 'pulse' case
+    // below and double the recording with a synthetic thud.
+    expect(
+      nodesFor(() =>
+        sfx.abilityAudio('pulse', 'fire', 1, 0, 0, 0, { archetype: 'nova', abilityId: 'meteor' }),
+      ),
+    ).toBe(0);
+  });
 });
 
 describe('moments no recording covers keep their procedural voice', () => {
@@ -186,5 +202,79 @@ describe('moments no recording covers keep their procedural voice', () => {
     expect(
       nodesFor(() => sfx.abilityAudio('pulse', 'fire', 1, 0, 0, 0, { archetype: 'nova' })),
     ).toBeGreaterThan(0);
+  });
+});
+
+// Pins the OTHER half of the anti-doubling path: the painter itself, not just
+// sfx.abilityAudio in isolation. zoneRehit (painter.ts) must actually thread
+// ev.ability through to deps.abilityAudio's opts.abilityId, or the coverage
+// rule above is unreachable in the real event flow and this would silently
+// fall back to the generic uncovered 'pulse' case, doubling the meteor
+// recording with a synthetic thud (the bug this whole file is pinning).
+describe('the painter threads ability id into its zone-pulse audio call', () => {
+  function harness() {
+    const abilityAudio = vi.fn();
+    const fx = {
+      setDelegates: vi.fn(),
+      setQuality: vi.fn(),
+      groundYAt: vi.fn(() => 0),
+      ringAt: vi.fn(),
+      burstAt: vi.fn(),
+    } as unknown as AbilityVfxFx;
+    const noop = vi.fn();
+    const abilityVfx = new AbilityVfx(
+      {
+        fx,
+        anchor: () => ({ x: 0, y: 0, z: 0 }),
+        spawnAoeRing: noop,
+        triggerAttack: noop,
+        vfx: {
+          projectile: noop,
+          lightningProjectile: noop,
+          burst: noop,
+          nova: noop,
+          tick: noop,
+          shoutwave: noop,
+          buffSwirl: noop,
+          beam: noop,
+        },
+        abilityAudio,
+      },
+      () => 0,
+    );
+    return { abilityVfx, abilityAudio };
+  }
+
+  it('carries abilityId: "meteor" on Meteor\'s ground-zone pulse', () => {
+    const { abilityVfx, abilityAudio } = harness();
+    const claimed = abilityVfx.handleSpellfxAt({
+      x: 0,
+      z: 0,
+      school: 'fire',
+      fx: 'tick',
+      ability: 'meteor',
+    });
+    expect(claimed).toBe(true);
+    expect(abilityAudio).toHaveBeenCalledTimes(1);
+    const opts = abilityAudio.mock.calls[0][6];
+    expect(opts).toMatchObject({ abilityId: 'meteor' });
+  });
+
+  // Comparison case: a different ability's zone pulse (Consecration) threads
+  // its own id the same way, proving this is the general zoneRehit contract
+  // and not a meteor-specific special case.
+  it('carries abilityId: "consecration" on Consecration\'s ground-zone pulse', () => {
+    const { abilityVfx, abilityAudio } = harness();
+    const claimed = abilityVfx.handleSpellfxAt({
+      x: 0,
+      z: 0,
+      school: 'holy',
+      fx: 'tick',
+      ability: 'consecration',
+    });
+    expect(claimed).toBe(true);
+    expect(abilityAudio).toHaveBeenCalledTimes(1);
+    const opts = abilityAudio.mock.calls[0][6];
+    expect(opts).toMatchObject({ abilityId: 'consecration' });
   });
 });

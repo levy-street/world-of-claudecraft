@@ -14,6 +14,9 @@ export interface RendererWorldPhaseMs {
   props: number;
   foliage: number;
   fish: number;
+  ambientScenery: number;
+  zoneVisibility: number;
+  zoneFeatures: number;
   vfx: number;
   camera: number;
   ambience: number;
@@ -49,6 +52,9 @@ export function beginRendererFrameTelemetry(
   worldPhaseMs.props = 0;
   worldPhaseMs.foliage = 0;
   worldPhaseMs.fish = 0;
+  worldPhaseMs.ambientScenery = 0;
+  worldPhaseMs.zoneVisibility = 0;
+  worldPhaseMs.zoneFeatures = 0;
   worldPhaseMs.vfx = 0;
   worldPhaseMs.camera = 0;
   worldPhaseMs.ambience = 0;

@@ -10,6 +10,7 @@ import type { IWorld } from '../src/world_api';
 vi.mock('../src/render/assets/loader', () => ({
   loadGltf: vi.fn(() => new Promise(() => undefined)),
   loadTexture: vi.fn(() => new Promise(() => undefined)),
+  loadKtx2Texture: vi.fn(() => new Promise(() => undefined)),
 }));
 
 vi.mock('../src/render/assets/preload', () => ({

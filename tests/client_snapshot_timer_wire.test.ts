@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { ClientWorld } from '../src/net/online';
 import {
+  STABLE_TIMER_WIRE_VERSION,
   snapshotTimerWireMode,
   stableCooldownRemaining,
   stableDeadlineRemaining,
@@ -45,11 +46,13 @@ const aura = (id: string, timer: Record<string, number>): Record<string, unknown
 });
 
 describe('stable snapshot timer protocol', () => {
-  it('negotiates exact v2 only and decodes named cooldown schedules', () => {
+  it('negotiates exact v3 only and decodes named cooldown schedules', () => {
+    expect(STABLE_TIMER_WIRE_VERSION).toBe(3);
     expect(snapshotTimerWireMode(undefined)).toBe('legacy');
-    expect(snapshotTimerWireMode(2)).toBe('stable');
-    expect(snapshotTimerWireMode('2')).toBe('unsupported');
-    expect(snapshotTimerWireMode(3)).toBe('unsupported');
+    expect(snapshotTimerWireMode(STABLE_TIMER_WIRE_VERSION)).toBe('stable');
+    expect(snapshotTimerWireMode('3')).toBe('unsupported');
+    expect(snapshotTimerWireMode(2)).toBe('unsupported');
+    expect(snapshotTimerWireMode(4)).toBe('unsupported');
 
     const accelerated = [3, 3, 1];
     expect(stableCooldownRemaining(accelerated, 0)).toBe(5);
@@ -68,7 +71,7 @@ describe('stable snapshot timer protocol', () => {
   it('ignores negative stable clocks without poisoning retained schedules', () => {
     const client = bareClient(1);
     apply(client, {
-      tw: 2,
+      tw: STABLE_TIMER_WIRE_VERSION,
       time: 10,
       self: playerWire(1, {
         auras: [aura('retained', { exp: 20 })],
@@ -76,11 +79,41 @@ describe('stable snapshot timer protocol', () => {
       }),
     });
 
-    apply(client, { tw: 2, time: -Number.MAX_VALUE, self: playerWire(1) });
-    apply(client, { tw: 2, time: 11, self: playerWire(1) });
+    apply(client, {
+      tw: STABLE_TIMER_WIRE_VERSION,
+      time: -Number.MAX_VALUE,
+      self: playerWire(1),
+    });
+    apply(client, { tw: STABLE_TIMER_WIRE_VERSION, time: 11, self: playerWire(1) });
 
     expect(client.player.auras[0]).toMatchObject({ id: 'retained', remaining: 9 });
     expect(client.player.cooldowns.get('cast')).toBe(9);
+  });
+
+  it('decodes permanent auras without countdown churn in stable and legacy snapshots', () => {
+    for (const stable of [false, true]) {
+      const client = bareClient(stable ? 11 : 12);
+      const pid = client.playerId;
+      apply(client, {
+        ...(stable ? { tw: STABLE_TIMER_WIRE_VERSION } : {}),
+        time: 10,
+        self: playerWire(pid, {
+          auras: [{ ...aura('permanent', {}), dur: 0, perm: 1 }],
+        }),
+      });
+
+      expect(client.player.auras[0]).toMatchObject({
+        id: 'permanent',
+        permanent: true,
+        remaining: Number.POSITIVE_INFINITY,
+        duration: Number.POSITIVE_INFINITY,
+      });
+
+      if (stable) {
+        apply(client, { tw: STABLE_TIMER_WIRE_VERSION, time: 100, self: playerWire(pid) });
+        expect(client.player.auras[0].remaining).toBe(Number.POSITIVE_INFINITY);
+      }
+    }
   });
 
   it('ages the nodeRespawnSeconds countdown off the stable ncd deadlines', () => {
@@ -89,19 +122,23 @@ describe('stable snapshot timer protocol', () => {
     // ages between snapshots without the wire resending it, and the read
     // drains to null exactly when the readiness flips.
     const client = bareClient(1);
-    apply(client, { tw: 2, time: 10, self: playerWire(1, { ncd: { ore: 12 } }) });
+    apply(client, {
+      tw: STABLE_TIMER_WIRE_VERSION,
+      time: 10,
+      self: playerWire(1, { ncd: { ore: 12 } }),
+    });
     expect(client.nodeRespawnSeconds('ore')).toBe(2);
-    apply(client, { tw: 2, time: 11, self: playerWire(1) });
+    apply(client, { tw: STABLE_TIMER_WIRE_VERSION, time: 11, self: playerWire(1) });
     expect(client.nodeRespawnSeconds('ore')).toBe(1);
-    apply(client, { tw: 2, time: 13.1, self: playerWire(1) });
+    apply(client, { tw: STABLE_TIMER_WIRE_VERSION, time: 13.1, self: playerWire(1) });
     expect(client.nodeRespawnSeconds('ore')).toBeNull();
     expect(client.nodeHarvestableByMe('ore')).toBe(true);
   });
 
-  it('ages omitted v2 timers and preserves auras on moving lite records', () => {
+  it('ages omitted stable timers and preserves auras on moving lite records', () => {
     const client = bareClient(1);
     apply(client, {
-      tw: 2,
+      tw: STABLE_TIMER_WIRE_VERSION,
       time: 10,
       ents: [playerWire(2, { auras: [aura('remote', { exp: 20 })] })],
       self: playerWire(1, {
@@ -117,7 +154,7 @@ describe('stable snapshot timer protocol', () => {
     expect(client.nodeHarvestableByMe('ore')).toBe(false);
 
     apply(client, {
-      tw: 2,
+      tw: STABLE_TIMER_WIRE_VERSION,
       time: 11,
       ents: [{ id: 2, x: 1, y: 0, z: 0, f: 0, hp: 100, mhp: 100 }],
       self: playerWire(1),
@@ -127,13 +164,18 @@ describe('stable snapshot timer protocol', () => {
     expect(client.player.cooldowns.get('cast')).toBe(4);
     expect(client.player.cooldowns.get('accelerated')).toBe(2);
 
-    apply(client, { tw: 2, time: 13.1, keep: [2], self: playerWire(1) });
+    apply(client, {
+      tw: STABLE_TIMER_WIRE_VERSION,
+      time: 13.1,
+      keep: [2],
+      self: playerWire(1),
+    });
     expect(client.nodeHarvestableByMe('ore')).toBe(true);
     expect(client.player.cooldowns.has('accelerated')).toBe(false);
     expect(client.player.cooldowns.get('cast')).toBeCloseTo(1.9, 8);
 
     apply(client, {
-      tw: 2,
+      tw: STABLE_TIMER_WIRE_VERSION,
       time: 13.1,
       ents: [{ id: 2, x: 2, y: 0, z: 0, f: 0, hp: 100, mhp: 100, auras: [] }],
       self: playerWire(1, { cds: {} }),
@@ -142,24 +184,56 @@ describe('stable snapshot timer protocol', () => {
     expect(client.player.cooldowns.size).toBe(0);
   });
 
+  it('does not age persistent engine auras when stable snapshots omit them', () => {
+    const client = bareClient(1, { playerClass: 'shaman' });
+    apply(client, {
+      tw: STABLE_TIMER_WIRE_VERSION,
+      time: 10,
+      self: playerWire(1, {
+        tid: 'shaman',
+        auras: [
+          {
+            ...aura('shaman_flow_state_progress', { rem: 86_400 }),
+            dur: 86_400,
+          },
+        ],
+      }),
+    });
+
+    apply(client, {
+      tw: STABLE_TIMER_WIRE_VERSION,
+      time: 11,
+      self: playerWire(1, { tid: 'shaman' }),
+    });
+
+    expect(client.player.auras[0]).toMatchObject({
+      id: 'shaman_flow_state_progress',
+      remaining: 86_400,
+    });
+  });
+
   it('freezes retained auras while ordinary cooldown deadlines continue', () => {
     const client = bareClient(1);
     apply(client, {
-      tw: 2,
+      tw: STABLE_TIMER_WIRE_VERSION,
       time: 0,
       self: playerWire(1, { auras: [aura('retained', { exp: 5 })], cds: { cast: 5 } }),
     });
     apply(client, {
-      tw: 2,
+      tw: STABLE_TIMER_WIRE_VERSION,
       time: 1,
       self: playerWire(1, { dead: 1, hp: 0, auras: [aura('retained', { rem: 4 })] }),
     });
-    apply(client, { tw: 2, time: 2, self: playerWire(1, { dead: 1, hp: 0 }) });
+    apply(client, {
+      tw: STABLE_TIMER_WIRE_VERSION,
+      time: 2,
+      self: playerWire(1, { dead: 1, hp: 0 }),
+    });
     expect(client.player.auras[0].remaining).toBe(4);
     expect(client.player.cooldowns.get('cast')).toBe(3);
   });
 
-  it('keeps v1 and v2 absence semantics isolated across rolling transitions', () => {
+  it('keeps legacy and stable absence semantics isolated across rolling transitions', () => {
     const client = bareClient(1);
     apply(client, {
       time: 1,
@@ -168,23 +242,23 @@ describe('stable snapshot timer protocol', () => {
     expect(client.player.auras[0].remaining).toBe(5);
 
     apply(client, {
-      tw: 2,
+      tw: STABLE_TIMER_WIRE_VERSION,
       time: 10,
       self: playerWire(1, { auras: [aura('stable', { exp: 15 })], cds: { cast: 15 } }),
     });
-    apply(client, { tw: 2, time: 11, self: playerWire(1) });
+    apply(client, { tw: STABLE_TIMER_WIRE_VERSION, time: 11, self: playerWire(1) });
     expect(client.player.auras[0]).toMatchObject({ id: 'stable', remaining: 4 });
     expect(client.player.cooldowns.get('cast')).toBe(4);
 
     apply(client, {
-      tw: 3,
+      tw: 4,
       time: 12,
       self: playerWire(1, { auras: [aura('future', { exp: 99 })], cds: { cast: 99 } }),
     });
     expect(client.player.auras[0].id).toBe('stable');
     expect(client.player.cooldowns.get('cast')).toBe(4);
 
-    apply(client, { tw: 2, time: 12, self: playerWire(1) });
+    apply(client, { tw: STABLE_TIMER_WIRE_VERSION, time: 12, self: playerWire(1) });
     expect(client.player.auras[0]).toMatchObject({ id: 'stable', remaining: 3 });
     expect(client.player.cooldowns.get('cast')).toBe(3);
 

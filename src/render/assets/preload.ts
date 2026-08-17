@@ -21,14 +21,33 @@
 //
 // This does NOT weaken the tier-independent superset invariant that props.ts and
 // characters/manifest.ts document (the v0.16.0 farmCrate P0): assetsReady() still
-// awaits every registered task before the Renderer is constructed, so placement
-// still cannot outrun a load. Only the start time moved. The ordering that makes
-// that true (begin, then await) is pinned by tests/defer_launcher_preloads.test.ts.
+// awaits every CRITICAL registered task before the Renderer is constructed, so
+// placement still cannot outrun a load. Only the start time moved. The ordering
+// that makes that true (begin, then await) is pinned by
+// tests/defer_launcher_preloads.test.ts.
+//
+// Within the deferred lane, registerDeferredPreload also takes an optional
+// priority ('critical', the default, vs 'background'). A 'critical' thunk is
+// exactly the lane above: started by beginDeferredPreloads() and awaited by
+// assetsReady(). A 'background' thunk is held back further, until
+// beginBackgroundPreloads() runs (main.ts calls it once the first frame is
+// actually on screen), and assetsReady() never waits on it at all. Use
+// 'background' ONLY for content a build path can tolerate arriving late (a
+// lazily streamed-in proximity build that already re-awaits its own loader on
+// approach, per src/render/CLAUDE.md's asset-loading section); anything a
+// synchronous scene-build step reads from the cache right after assetsReady()
+// resolves must stay 'critical', or that read throws "asset not preloaded".
 import { assetLoadStarted, recordPreloadWait } from './stats';
+
+export type DeferredPreloadPriority = 'critical' | 'background';
 
 const tasks: Promise<unknown>[] = [];
 const deferredStarters: (() => Promise<unknown>)[] = [];
 let deferredBegun = false;
+
+const backgroundStarters: (() => Promise<unknown>)[] = [];
+const backgroundTasks: Promise<unknown>[] = [];
+let backgroundBegun = false;
 
 export function registerPreload(task: Promise<unknown>): void {
   // Store a VALUE-ERASED view of the task. A settled promise pins its resolution
@@ -52,16 +71,44 @@ export function registerPreload(task: Promise<unknown>): void {
   tasks.push(erased);
 }
 
+/** Same value-erasure/rejection-observation contract as registerPreload, but
+ *  files into backgroundTasks instead: assetsReady() only ever reads `tasks`,
+ *  so a background task can never make the boot gate wait on it. */
+function registerBackgroundTask(task: Promise<unknown>): void {
+  const erased = task.then(() => undefined);
+  task.catch(() => undefined);
+  erased.catch(() => undefined);
+  backgroundTasks.push(erased);
+}
+
 /**
  * Register a world-content fetch that must NOT run on the launcher. The thunk is
- * held until beginDeferredPreloads(); it must CREATE the promise when called, not
- * close over one that is already in flight, or nothing is actually deferred.
+ * held until its lane opens; it must CREATE the promise when called, not close
+ * over one that is already in flight, or nothing is actually deferred.
  *
- * Registering after the lane has already been opened (a module imported lazily
- * mid-session) starts immediately, so a late import can never strand its assets
- * behind a gate that has already been lifted.
+ * `priority` picks the lane (default 'critical'):
+ *   'critical'    started by beginDeferredPreloads(), awaited by assetsReady().
+ *   'background'  started by beginBackgroundPreloads() (called once the first
+ *                 frame is on screen); assetsReady() never waits on it. Only
+ *                 safe for a build path that tolerates its assets arriving
+ *                 late (see the module header).
+ *
+ * Registering after a lane has already been opened (a module imported lazily
+ * mid-session) starts immediately in that same lane, so a late import can
+ * never strand its assets behind a gate that has already been lifted.
  */
-export function registerDeferredPreload(start: () => Promise<unknown>): void {
+export function registerDeferredPreload(
+  start: () => Promise<unknown>,
+  priority: DeferredPreloadPriority = 'critical',
+): void {
+  if (priority === 'background') {
+    if (backgroundBegun) {
+      registerBackgroundTask(start());
+      return;
+    }
+    backgroundStarters.push(start);
+    return;
+  }
   if (deferredBegun) {
     registerPreload(start());
     return;
@@ -91,6 +138,27 @@ export function beginDeferredPreloads(): number {
   return started;
 }
 
+/**
+ * Open the background lane: the first frame is actually on screen. Idempotent,
+ * mirrors beginDeferredPreloads() exactly except its tasks land in
+ * backgroundTasks, so assetsReady() (already resolved by the time this runs)
+ * never observes them.
+ */
+export function beginBackgroundPreloads(): number {
+  if (backgroundBegun) return 0;
+  backgroundBegun = true;
+  const started = backgroundStarters.length;
+  for (const start of backgroundStarters) {
+    try {
+      registerBackgroundTask(start());
+    } catch (err) {
+      registerBackgroundTask(Promise.reject(err));
+    }
+  }
+  backgroundStarters.length = 0;
+  return started;
+}
+
 /** Test-only view of the registry, so a guard can prove no task retains its
  *  resolution value (see tests/ios_entry_memory.test.ts) and that the deferred
  *  lane really holds its fetches back. */
@@ -98,10 +166,16 @@ export const preloadInternalsForTest = {
   tasks: (): readonly Promise<unknown>[] => tasks,
   pendingDeferred: (): number => deferredStarters.length,
   begun: (): boolean => deferredBegun,
+  backgroundTasks: (): readonly Promise<unknown>[] => backgroundTasks,
+  pendingBackground: (): number => backgroundStarters.length,
+  backgroundBegun: (): boolean => backgroundBegun,
   reset: (): void => {
     tasks.length = 0;
     deferredStarters.length = 0;
     deferredBegun = false;
+    backgroundTasks.length = 0;
+    backgroundStarters.length = 0;
+    backgroundBegun = false;
   },
 };
 

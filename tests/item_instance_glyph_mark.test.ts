@@ -4,8 +4,11 @@
 // before any painter suite.
 
 import { describe, expect, it } from 'vitest';
+import { bagCornerMark } from '../src/ui/bag_corner_mark_view';
 import { bagInstanceGlyphKind } from '../src/ui/bag_instance_glyph_view';
 import {
+  cornerMarkHtml,
+  fineSealMarkHtml,
   INSTANCE_GLYPH_ARIA_KEYS,
   instanceGlyphMarkHtml,
   UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS,
@@ -64,6 +67,38 @@ describe('item_instance_glyph_mark', () => {
     expect(bagInstanceGlyphKind({ rolled: { masterwork: true, stats: { sta: 1 } } })).toBe(
       'masterwork',
     );
+  });
+
+  it('cornerMarkHtml dispatches every resolved corner kind exhaustively', () => {
+    // The one dispatch every painter uses; a painter re-deriving the corner
+    // from the raw glyph kind is the drift this function exists to close.
+    expect(cornerMarkHtml(null)).toBe('');
+    expect(cornerMarkHtml('fine')).toBe(fineSealMarkHtml());
+    expect(cornerMarkHtml('fine')).toContain('class="bi-fine-seal"');
+    expect(cornerMarkHtml('fine')).toContain('aria-hidden="true"');
+    expect(cornerMarkHtml('masterwork')).toBe(instanceGlyphMarkHtml('masterwork'));
+    for (const kind of ['enchanted', 'signed', 'bound', 'generic'] as const) {
+      expect(cornerMarkHtml(kind)).toBe(instanceGlyphMarkHtml(kind));
+    }
+    // questReady only affects the quest arm; every other kind ignores it.
+    expect(cornerMarkHtml('fine', { questReady: true })).toBe(cornerMarkHtml('fine'));
+  });
+
+  it('cornerMarkHtml mints the quest seal, brightening only when ready', () => {
+    // Reachable from bags only (the banks pass a null quest arm into
+    // bagCornerMark), but the dispatch stays total so a future surface that
+    // CAN hold quest stacks needs no new markup path. Driven through the real
+    // priority core so the pin covers the composition, not just the string.
+    const quiet = cornerMarkHtml(bagCornerMark(null, 'quest', false));
+    expect(quiet).toContain('class="bi-quest-seal"');
+    expect(quiet).toContain('aria-hidden="true"');
+    expect(quiet).not.toContain('bi-quest-seal-ready');
+    const ready = cornerMarkHtml(bagCornerMark(null, 'questReady', false), { questReady: true });
+    expect(ready).toContain('bi-quest-seal bi-quest-seal-ready');
+    // Quest purpose outranks the fine grade through the core, and the
+    // dispatch honors the core's answer rather than the fine flag.
+    expect(cornerMarkHtml(bagCornerMark(null, 'quest', true))).toContain('bi-quest-seal');
+    expect(cornerMarkHtml(bagCornerMark(null, 'quest', true))).not.toContain('bi-fine-seal');
   });
 
   it('keeps one distinct aria key per kind (and unknown siblings)', () => {

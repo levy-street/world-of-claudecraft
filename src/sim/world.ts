@@ -1,5 +1,7 @@
 import { bgFieldHeightLocal } from './battleground_field';
 import { beaconSpiralLift } from './beacon_spiral';
+import { BORDER_EDGES } from './border_edges';
+import { bulwarkLift, bulwarkPadTarget, bulwarkPadWeight } from './bulwark_layout';
 import {
   castleLift,
   castlePadTarget,
@@ -33,9 +35,10 @@ import {
   ZONES,
   zoneAt,
 } from './data';
+import { dawnholdLift, dawnholdPadTarget, dawnholdPadWeight } from './dawnhold_layout';
 import { dockLocalPoint, dockSectionAtLocal, dockSurfaceLine, dockSurfaceYAt } from './dock_layout';
 import { dungeonFloorLift } from './dungeon_floor';
-import { lastKeepLiftAt } from './dungeon_layout';
+import { dawnholdKeepLiftAt, lastKeepLiftAt } from './dungeon_layout';
 import {
   EMBER_FLAT_POOLS,
   EMBER_LAVA_LINKS,
@@ -244,80 +247,14 @@ const BIOME_SHAPE: Record<
   cave: { hill: 9, base: 1, hubHeight: 1, crag: 6 },
 };
 
-// Ridge walls along every shared zone edge, each opened by a road pass. A
-// zone with sealedSouthBorder instead gets a taller, narrower wall with NO
-// pass, its crest shifted into the sealed zone's own band so the southern
-// neighbor's border content keeps (nearly) its original ground. Sealed
-// zones are entered only through a portal (see portals content).
-//
-// The world is a GRID of zone rectangles (see data.ts zoneAt): horizontal
-// edges separate north-south neighbors (the classic band borders) and
-// vertical edges separate east-west columns with the same math rotated a
-// quarter turn. An edge that spans its whole world row keeps the classic
-// unbounded ridge (byte-identical to the strip era); a partial edge
-// feathers to nothing past its span ends.
-export interface BorderEdge {
-  kind: 'h' | 'v';
-  at: number; // the edge line: z for 'h', x for 'v'
-  lo: number; // span start along the edge (x for 'h', z for 'v')
-  hi: number; // span end
-  fullRow: boolean; // spans the whole world row: no end feather
-  passAt: number; // pass coordinate along the span
-  sealed: boolean;
-}
+// Ridge walls along every shared zone edge, each opened by a road pass. The
+// edge geometry itself (BorderEdge, computeBorderEdges, the derived
+// BORDER_EDGES table, SEALED_BORDERS, and the crossesSealedBorder movement
+// wall) lives in the border_edges.ts leaf; re-exported here so existing
+// consumers (colliders.ts, the border/grid tests) need no changes.
+export type { BorderEdge } from './border_edges';
+export { computeBorderEdges, crossesSealedBorder, SEALED_BORDERS } from './border_edges';
 
-/** All shared edges between adjacent zone rects (pure; exported for tests). */
-export function computeBorderEdges(zones: readonly ZoneDef[]): BorderEdge[] {
-  const zx0 = (zn: ZoneDef) => zn.xMin ?? STRIP_MIN_X;
-  const zx1 = (zn: ZoneDef) => zn.xMax ?? STRIP_MAX_X;
-  const edges: BorderEdge[] = [];
-  for (const a of zones) {
-    for (const b of zones) {
-      // horizontal edge: b sits directly north of a, rects overlapping in x
-      if (a.zMax === b.zMin) {
-        const lo = Math.max(zx0(a), zx0(b));
-        const hi = Math.min(zx1(a), zx1(b));
-        if (hi - lo > 1) {
-          const sealed = b.sealedSouthBorder === true;
-          // full row = nothing that touches or crosses the border line lies
-          // beyond this span (a column zone whose band SPANS the line counts
-          // too: its interior must not inherit the row wall)
-          const fullRow = zones.every(
-            (zn) => zn.zMax < a.zMax || zn.zMin > a.zMax || (zx0(zn) >= lo && zx1(zn) <= hi),
-          );
-          edges.push({
-            kind: 'h',
-            at: a.zMax + (sealed ? 15 : 0),
-            lo,
-            hi,
-            fullRow,
-            passAt: b.southPassX ?? 0,
-            sealed,
-          });
-        }
-      }
-      // vertical edge: b sits directly east of a, rects overlapping in z
-      if (zx1(a) === zx0(b)) {
-        const lo = Math.max(a.zMin, b.zMin);
-        const hi = Math.min(a.zMax, b.zMax);
-        if (hi - lo > 1) {
-          edges.push({
-            kind: 'v',
-            at: zx1(a),
-            lo,
-            hi,
-            fullRow: false, // a column border never spans the world's full z
-            passAt: b.westPassZ ?? a.eastPassZ ?? (lo + hi) / 2,
-            sealed: false,
-          });
-        }
-      }
-    }
-  }
-  return edges;
-}
-
-const BORDER_EDGES: readonly BorderEdge[] = computeBorderEdges(ZONES);
 // Low, broad border ranges: steep enough to read as a border, gentle
 // enough that ANY land contact between two maps is walkable over (the
 // pass roads stay the easy way; the hills are never a hard wall). Only
@@ -334,23 +271,6 @@ const RIDGE_SIGMA = 26; // gaussian width of the wall
 const SEALED_RIDGE_HEIGHT = 60;
 const SEALED_RIDGE_SIGMA = 12;
 
-// Crest z of every sealed border: an uncrossable line for swept movement
-// within the edge's x span (plus its feather). Portal teleports assign
-// positions directly and are unaffected; the column realms whose bands
-// span the same z live outside the span and walk freely.
-export const SEALED_BORDERS: readonly { at: number; lo: number; hi: number }[] =
-  BORDER_EDGES.filter((e) => e.kind === 'h' && e.sealed).map((e) => ({
-    at: e.at,
-    lo: e.lo - 24,
-    hi: e.hi + 24,
-  }));
-
-export function crossesSealedBorder(x: number, z0: number, z1: number): boolean {
-  for (const b of SEALED_BORDERS) {
-    if (x >= b.lo && x <= b.hi && (z0 - b.at) * (z1 - b.at) < 0) return true;
-  }
-  return false;
-}
 const PASS_HALF_WIDTH = 10; // flat opening around the road
 const PASS_SHOULDER = 34; // ...rising to full wall by this far from the pass
 
@@ -1347,6 +1267,10 @@ const bedGroup = (ax: number, az: number, r: number, sats: [number, number][]): 
   ...sats.map(([x, z]) => ({ x, z, r: 3.25, ax, az })),
 ];
 export const GARDEN_BED_PADS: readonly GardenBedPad[] = [
+  // (Dawnhold's own planting is the flower court's procedural fields, which
+  // stand on the castle pad's dead-flat ground and need no pad of their own.
+  // Every entry below is a MODELED bed, mirrored one-to-one against
+  // PARTERRE_PLOTS and the content decorProps by tests/garden_parterre.)
   ...bedGroup(322, 878, 10, [
     [322, 892.8],
     [322, 863.2],
@@ -1397,6 +1321,47 @@ function applyGardenCoast(x: number, z: number, h: number): number {
     smoothstep(GARDEN_ZMIN - 8, GARDEN_ZMIN + 8, z) *
     (1 - smoothstep(GARDEN_ZMAX - 8, GARDEN_ZMAX + 8, z));
   if (zSeam <= 0) return h;
+  // The east world edge at the Moonmere's cap. The mere's east-cap lobe
+  // (GARDEN_LAND_LOBES {522,726}) carried dry lawn all the way to the world
+  // bound (x = WORLD_MAX_X): the near terrain mesh ended on dry ground, so a dry
+  // tongue of lawn jutted ~17yd past the edge and cliffed to the seabed, and
+  // simply capping the exterior left a wide shallow shelf just under the surface
+  // (player reports near 538,726). Ease the shore to a gentle beach and sink it,
+  // plus the whole exterior band the far mesh samples (out to WORLD_MAX_X + 90),
+  // to the open seabed along a noise-wandered line, so the map ends in deep water
+  // like every other coast. This runs BEFORE the x>566 interior cutoff because
+  // the far apron (render/far_terrain_core.ts) reads terrainHeight past the
+  // bound; it is bounded to the world-edge vicinity so it never reaches the
+  // instance space at x ~99400. Kept in the mere-cap z-band and clear of the Old
+  // Mill headland (x ~504); pinned by tests/world_edge_coast.test.ts.
+  const edgeIn = WORLD_MAX_X - x; // >0 inland of the bound, <0 past it
+  if (edgeIn > -100 && edgeIn < 60) {
+    const gardenEdgeZ = smoothstep(696, 712, z) * (1 - smoothstep(752, 772, z));
+    if (gardenEdgeZ > 0) {
+      // wander the shoreline so it never reads as a ruled band
+      const e = edgeIn + (fbm2(z * 0.05, 517, 9361, 2) - 0.5) * 6;
+      // a gentle bank easing the shore down to the beach; it RELEASES by
+      // edgeIn ~19 so the seaward windmill of the Old Mill (x ~516, footprint to
+      // x ~520) and the mill lawn keep flat, dry footing instead of hanging over
+      // the drop (player report: the mill floated once the shore came in).
+      const capW = (1 - smoothstep(11, 19, e)) * gardenEdgeZ;
+      if (capW > 0) {
+        const cap = WATER_LEVEL + 0.6 + 0.34 * Math.max(0, e - 7);
+        if (h > cap) h = h + (cap - h) * capW;
+      }
+      // ...then drop the shallows and the whole exterior to the open seabed, so
+      // the far apron reads deep water instead of a murky near-surface shelf
+      const seaT = (1 - smoothstep(2, 7, e)) * gardenEdgeZ;
+      if (seaT > 0) {
+        const floor = WATER_LEVEL - 6;
+        if (h > floor) h = h + (floor - h) * seaT;
+      }
+      // Past the world bound is the far mesh's sample region: return the deep
+      // sink directly so the interior coast recipe below (which lifts sea back
+      // up to its near-shore shelf) never re-raises it into a shallow slab.
+      if (edgeIn < 0) return h;
+    }
+  }
   // the east column: cross-fade toward the strip at the border
   if (x > 566) return h; // nothing east of the world (instance space far beyond)
   const seam = smoothstep(STRIP_MAX_X - 8, STRIP_MAX_X + 8, x);
@@ -1461,6 +1426,12 @@ export const MAZE_Z0 = MAZE_Z1 - MAZE_ROWS * MAZE_CELL;
 // corners/junctions read as crossing pieces. Collision is the union of the
 // same boxes, so the blocked ground IS the modeled hedge's footprint.
 export const MAZE_WALL_DEPTH = 4.2; // yd across a hedge piece (tracks the modeled hedge scale)
+// The piece's drawn size, kept HERE rather than beside the renderer because
+// colliders.ts needs the height for the camera top and src/sim may not import
+// src/render. render/garden_maze_core.ts re-exports all three.
+export const MAZE_WALL_OVERLAP = 0.75; // yd each piece reaches into its neighbor
+export const MAZE_WALL_SCALE = (MAZE_CELL + 2 * MAZE_WALL_OVERLAP) / 0.98; // 10.5 x 6.1 x 4.1
+export const MAZE_WALL_HEIGHT = 0.57 * MAZE_WALL_SCALE; // 6.1yd, the hedges' visual top
 
 /** Inside the maze footprint (small margin), where dressing must not spawn. */
 export function inGardenMaze(x: number, z: number): boolean {
@@ -1661,7 +1632,25 @@ function applyValeCoast(x: number, z: number, h: number): number {
   const t = smoothstep(0.02, 0.3, land);
   const shelf = smoothstep(-0.4, 0.06, land);
   const floor = WATER_LEVEL - 3.4 + (WATER_LEVEL - 1 - (WATER_LEVEL - 3.4)) * shelf;
-  return h + (floor + (h - floor) * t - h) * w;
+  let out = h + (floor + (h - floor) * t - h) * w;
+  // At the vale's northwest coast a low beach shelf (a few yards above water)
+  // aprons the foot of the steep grey cliff and reads as a proud triangle spit
+  // where it meets the bay (player report). Submerge that shelf so the bay water
+  // runs right up to the cliff foot with no spit. The height gate lowers ONLY
+  // the low shelf and never the cliff it fronts (protected from 12.5yd up); the
+  // z window covers the shelf and fades out before the cliff shoulder (z ~146),
+  // and the x window spans the shelf around x = -172. Deepened to open-sea level
+  // so it reads as bay water, not a submerged sandbar.
+  const spitW =
+    smoothstep(116, 122, z) *
+    (1 - smoothstep(141, 146, z)) *
+    (1 - smoothstep(22, 40, Math.abs(x + 172))) *
+    (1 - smoothstep(9.5, 12.5, out));
+  if (spitW > 0) {
+    const sea = Math.min(out, WATER_LEVEL - 2);
+    out = out + (sea - out) * spitW;
+  }
+  return out;
 }
 
 // The Ferrywalk: a natural sandbar causeway from the vale's west point across
@@ -2514,7 +2503,10 @@ function applyEmberLavaNetwork(x: number, z: number, h: number): number {
   }
   for (const link of EMBER_LAVA_LINKS) {
     const s = emberNearestOnLink(link, x, z);
-    const half = link.w * 0.62; // the channel model overhangs its melt line
+    // the river model now spans exactly link.w across the flow (the
+    // render scales it by its cross extent), so the bed only needs a
+    // shoulder either side rather than the old generous overhang
+    const half = link.w * 0.55;
     if (s.dist < half + 6.5) {
       const w = 1 - smoothstep(half, half + 3.5, s.dist);
       // low banks shouldering the channel, parted at every pool mouth
@@ -2593,6 +2585,14 @@ function applyCastlePad(x: number, z: number, h: number): number {
   return h + (castlePadTarget(x, z) - h) * w;
 }
 
+// The Ashen Bulwark's graded grounds on the Drakelands west headland (the
+// castle pad idiom at barracks scale; the plan lives in bulwark_layout.ts).
+function applyBulwarkPad(x: number, z: number, h: number): number {
+  const w = bulwarkPadWeight(x, z);
+  if (w <= 0) return h;
+  return h + (bulwarkPadTarget() - h) * w;
+}
+
 // The pad's northeast apron meets the Last Spring pool, and the pad yields to
 // the pool over castlePadWeight's own ring: the bailey's level floor ends on an
 // arc about 16yd out from the pool center and the ground then falls to the pool
@@ -2638,6 +2638,14 @@ function applyLastSpringBank(x: number, z: number, h: number): number {
   const w = castleSkirtWeight(x, z) * (1 - smoothstep(b.rim - b.ease, b.rim, d));
   if (w <= 0) return h;
   return h + (target - h) * w;
+}
+
+// Dawnhold Castle's graded grounds in the Evergarden (the same idiom at a
+// smaller scale; the plan lives in dawnhold_layout.ts).
+function applyDawnholdPad(x: number, z: number, h: number): number {
+  const w = dawnholdPadWeight(x, z);
+  if (w <= 0) return h;
+  return h + (dawnholdPadTarget() - h) * w;
 }
 
 // ---------------------------------------------------------------------------
@@ -4037,6 +4045,13 @@ export function groundHeight(x: number, z: number, seed: number): number {
       const origin = instanceOrigin(dungeon.index, instanceSlotForZ(z));
       return DUNGEON_FLOOR_Y + lastKeepLiftAt(x - origin.x, z - origin.z);
     }
+    if (dungeon?.interior === 'dawnhold') {
+      // Dawnhold Castle's interior rides the same authored-lift idiom as the
+      // Last Keep: the solar story and its stair ramps come from the shared
+      // room plan (src/sim/dungeon_layout.ts).
+      const origin = instanceOrigin(dungeon.index, instanceSlotForZ(z));
+      return DUNGEON_FLOOR_Y + dawnholdKeepLiftAt(x - origin.x, z - origin.z);
+    }
     // Every other interior is the flat room floor plus the raised boss dais
     // where its room plan stacks one (dungeon_floor.ts).
     return DUNGEON_FLOOR_Y + dungeonFloorLift(x, z);
@@ -4055,7 +4070,12 @@ export function groundHeight(x: number, z: number, seed: number): number {
   // (castleLift): the wall mass is a sheer riser the climb gate refuses,
   // and its flat top is the wall-walk.
   const terrain =
-    terrainHeight(x, z, seed) + sowfieldStandLift(x, z) + beaconSpiralLift(x, z) + castleLift(x, z);
+    terrainHeight(x, z, seed) +
+    sowfieldStandLift(x, z) +
+    beaconSpiralLift(x, z) +
+    castleLift(x, z) +
+    dawnholdLift(x, z) +
+    bulwarkLift(x, z);
   return Math.max(terrain, dockSurfaceHeight(x, z, seed), harborWalkHeight(x, z));
 }
 
@@ -4092,6 +4112,10 @@ function applyTerrainPads(x: number, z: number, seed: number, h0: number): numbe
   // after the shore grading that forms them (see REACH_POOL_RIM_EASE for the freeze
   // it closes and REACH_POOL_DECK_TIE_IN for the one-way edge it closes).
   h = applyReachPoolWalkwayBed(x, z, h);
+  // Dawnhold Castle's garden pad, same late application.
+  h = applyDawnholdPad(x, z, h);
+  // the Drakelands' headland barracks, graded the same way
+  h = applyBulwarkPad(x, z, h);
   // Level pads under the Evergarden's modeled flower beds, applied over the
   // FINISHED height (the garden seam reshapes the lawn per position, so an
   // early flatten would drift apart again): each bed ensemble sits flush on
@@ -4104,7 +4128,12 @@ function applyTerrainPads(x: number, z: number, seed: number, h0: number): numbe
       const padGate = pad.r + 4;
       if (dx * dx + dz * dz >= padGate * padGate) continue;
       const d = Math.sqrt(dx * dx + dz * dz);
-      const ch = terrainHeightUnpadded(pad.ax, pad.az, seed);
+      // the anchor height honors Dawnhold's castle pad (the courtyard
+      // parterres must sit on the graded bailey, not dig back down to the
+      // raw lawn beneath it); beds outside the pad are unaffected (w 0)
+      let ch = terrainHeightUnpadded(pad.ax, pad.az, seed);
+      const dw = dawnholdPadWeight(pad.ax, pad.az);
+      if (dw > 0) ch = ch + (dawnholdPadTarget() - ch) * dw;
       const blend = smoothstep(pad.r + 1, pad.r + 4, d);
       h = h * blend + ch * (1 - blend);
     }
@@ -5174,6 +5203,9 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
     if (gz > 2160 && gz < 2360 && emberLinkDistanceNorm(gx, gz) < 1.1) return null;
     // the Last Keep's graded grounds carry no wild scatter
     if (castlePadWeight(gx, gz) > 0) return null;
+    // ...nor the Ashen Bulwark's headland pad (a boulder in the drill yard
+    // is also a stray collider standing in the muster lane)
+    if (bulwarkPadWeight(gx, gz) > 0) return null;
     for (const pool of EMBER_FLAT_POOLS) {
       if (Math.hypot(gx - pool.x, gz - pool.z) < pool.r * 1.6 + 4) return null;
     }
@@ -5208,8 +5240,10 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
     kind = r < 0.1 ? 'tree' : r < 0.5 ? 'tree2' : 'rock';
   } else if (biome === 'garden') {
     // open parkland: sparse specimen trees on the lawns, and the maze
-    // keeps its corridors clear (the hedges are terrain, not dressing)
+    // keeps its corridors clear (the hedges are terrain, not dressing);
+    // Dawnhold's graded grounds take no wild scatter either
     if (inGardenMaze(gx, gz)) return null;
+    if (dawnholdPadWeight(gx, gz) > 0) return null;
     if (r > 0.3) return null;
     kind = r < 0.16 ? 'tree' : r < 0.2 ? 'tree2' : 'rock';
   } else if (biome === 'gale') {

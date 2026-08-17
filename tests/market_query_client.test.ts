@@ -13,7 +13,9 @@ describe('ClientWorld market query wire', () => {
       armorClass: 'cloth',
       primaryStat: 'int',
       rarity: 'rare',
+      sort: 'name',
       page: 2,
+      collapseLowest: true,
     });
 
     expect(sent).toEqual([
@@ -25,7 +27,41 @@ describe('ClientWorld market query wire', () => {
         armorClass: 'cloth',
         primaryStat: 'int',
         rarity: 'rare',
+        sort: 'name',
         page: 2,
+        collapseLowest: true,
+      },
+    ]);
+  });
+
+  it('sends the price-ascending sort axis (issue #3102)', () => {
+    const sent: unknown[] = [];
+    const client = { cmd: (payload: unknown) => sent.push(payload) } as unknown as ClientWorld;
+
+    ClientWorld.prototype.marketSearch.call(client, {
+      search: '',
+      itemType: 'all',
+      subtype: 'all',
+      armorClass: 'all',
+      primaryStat: 'all',
+      rarity: 'all',
+      sort: 'price',
+      page: 0,
+      collapseLowest: false,
+    });
+
+    expect(sent).toEqual([
+      {
+        cmd: 'market_search',
+        q: '',
+        itemType: 'all',
+        subtype: 'all',
+        armorClass: 'all',
+        primaryStat: 'all',
+        rarity: 'all',
+        sort: 'price',
+        page: 0,
+        collapseLowest: false,
       },
     ]);
   });

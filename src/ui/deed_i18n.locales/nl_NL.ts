@@ -33,19 +33,19 @@ export const table: DeedLocaleTable = {
     desc: 'Ontruim een S-rangs Rift, de zwaarste rang die een Riftportaal kan voortbrengen.',
   },
   pvp_honor_sergeant: {
-    name: 'Sergeant',
+    name: 'Liniebreker',
     desc: 'Verdien 10.000 eer in je levensloop. Ze uitgeven kost je nooit de rang.',
-    title: 'Sergeant',
+    title: 'Liniebreker',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Ridder-Luitenant',
+    name: 'Veldplunderaar',
     desc: 'Verdien 40.000 eer in je levensloop, een heus seizoen oorlog achter de rug.',
-    title: 'Ridder-Luitenant',
+    title: 'Veldplunderaar',
   },
   pvp_honor_field_marshal: {
-    name: 'Veldmaarschalk',
+    name: 'Oorlogsgekroond',
     desc: 'Verdien 150.000 eer in je levensloop. Zeldzaam op elk rijk, en dat hoort ook zo.',
-    title: 'Veldmaarschalk',
+    title: 'Oorlogsgekroond',
   },
   chr_drakemaw_broodlord: {
     name: 'Broedselbreker',
@@ -992,5 +992,49 @@ export const table: DeedLocaleTable = {
   prog_armorcrafting_rare: {
     name: 'Geplaat tot perfectie',
     desc: 'Vervaardig je eerste zeldzame stuk in Harnasmaken.',
+  },
+  col_reliquary_rank_2: {
+    name: 'Buitbewaarder',
+    desc: 'Bereik Curator-rang 2 in Het Reliquarium (10 unieke gecatalogiseerde relieken).',
+    title: 'Buitbewaarder',
+  },
+  col_reliquary_rank_3: {
+    name: 'De Catalogiseerder',
+    desc: 'Bereik Curator-rang 3 in Het Reliquarium (25 unieke gecatalogiseerde relieken).',
+    title: 'de Catalogiseerder',
+  },
+  col_reliquary_rank_4: {
+    name: 'Aartscurator',
+    desc: 'Bereik Curator-rang 4 in Het Reliquarium (50 unieke gecatalogiseerde relieken).',
+    title: 'Aartscurator',
+  },
+  col_reliquary_rank_5: {
+    name: 'Eeuwige Buit',
+    desc: 'Bereik Curator-rang 5 in Het Reliquarium (100 unieke gecatalogiseerde relieken).',
+  },
+  col_reliquary_complete: {
+    name: 'Het Grote Reliquarium',
+    desc: 'Catalogiseer elk reliek in Het Reliquarium dat een personage kan behouden. Latere groei van de catalogus neemt het je nooit meer af.',
+    title: 'Curator van de Schatkamer',
+  },
+  col_reliquary_conquerors: {
+    name: 'Plank der Veroveraars',
+    desc: 'Catalogiseer elk reliek op de plank Veroveraars van Het Reliquarium. Latere groei van de catalogus neemt het je nooit meer af.',
+    title: 'Schatkamerbreker',
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    name: 'Nythraxis verlucht',
+    desc: 'Verlucht de bladzijde Heroïsch: Nythraxis-raid van Het Reliquarium.',
+    title: 'Licht van Nythraxis',
+  },
+  col_reliquary_illum_thunzharr: {
+    name: 'Thunzharr verlucht',
+    desc: 'Verlucht de bladzijde Thunzharr, de Ontwakende Piek van Het Reliquarium.',
+    title: 'Licht van Thunzharr',
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    name: 'Heiligdom verlucht',
+    desc: 'Verlucht de bladzijde Heroïsch: Grafwurm-Heiligdom van Het Reliquarium.',
+    title: 'Licht van het Heiligdom',
   },
 };

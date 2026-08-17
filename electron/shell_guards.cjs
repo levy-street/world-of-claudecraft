@@ -243,7 +243,8 @@ function isTrustedSender(frame, allowedOrigins) {
 }
 
 // Decide whether a renderer key event (Electron's before-input-event `input` object)
-// is the DevTools toggle chord. The packaged build runs with setMenu(null) and no
+// is the DevTools toggle chord. The packaged build nulls the application menu on
+// win32/linux (main.cjs, before app ready) and never auto-opens
 // DevTools, so there is otherwise no way to open the inspector to check CSP violations,
 // GPU state, or runtime errors in a shipped app; main.cjs binds this to before-input-event
 // to restore a safe, read-only debug affordance. Only a keyDown counts. The accepted

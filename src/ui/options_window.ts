@@ -21,6 +21,9 @@
 
 import { syncAppViewport } from '../game/app_viewport';
 import { audio } from '../game/audio';
+import { desktopDisplayModeSupported } from '../game/desktop_display_mode_sync';
+import { desktopGpuPrefSupported } from '../game/desktop_gpu_pref_sync';
+import { desktopDiscordPresenceSupported } from '../game/discord_presence';
 import {
   GAMEPAD_NONE,
   GAMEPAD_ZOOM_IN,
@@ -51,6 +54,7 @@ import {
   normalizeClickMoveButton,
   SETTING_RANGES,
 } from '../game/settings';
+import { desktopBridge } from '../runtime';
 import type { IWorld } from '../world_api';
 import { appVersionInfo } from './app_version';
 import { type AuraOverlayHooks, AuraOverlaySettingsPanel } from './aura_overlay_settings';
@@ -87,6 +91,7 @@ import {
   type InterfaceTab,
   interfaceControlsForTab,
   type OptionsControl,
+  type OptionsEnv,
   type OptionsPanelId,
   type OptionsSettingsSource,
   optionsControlKeys,
@@ -211,6 +216,7 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   emoteWheel: 'hudChrome.keybinds.emoteWheel',
   targetFriendly: 'hudChrome.keybinds.targetFriendly',
   targetFriendlyNext: 'hudChrome.keybinds.targetFriendlyNext',
+  targetPrev: 'hudChrome.keybinds.targetPrev',
   discord: 'hudChrome.keybinds.discord',
   valecup: 'hudChrome.keybinds.valecup',
   bgFlag: 'hudChrome.keybinds.bgFlag',
@@ -232,6 +238,7 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   mount: 'hudChrome.keybinds.mount',
   deeds: 'hudChrome.deeds.title',
   professions: 'hudChrome.professions.title',
+  reliquary: 'hudChrome.reliquary.title',
 };
 
 /**
@@ -252,6 +259,9 @@ export interface OptionsWindowDeps {
   auraOverlays?: () => AuraOverlayHooks;
   /** The bug-report seam (online only; its presence gates the Report a Bug row). */
   bugReport(): BugReportHooks | null;
+  /** The Wiki row: Hud's confirm-first external hop (src/ui/wiki_link.ts). The
+   *  menu stays open so a Cancel lands the player back where they were. */
+  openWiki(): void;
   /** The keybind store (read labels, rebind, reset). */
   keybinds(): Keybinds;
   /** Display name for an action-bar slot's bound ability or item, or null when empty. */
@@ -579,6 +589,8 @@ export class OptionsWindow {
           this.view = a.view;
           this.keybindNote = '';
           this.render();
+        } else if (a.kind === 'wiki') {
+          this.deps.openWiki();
         } else if (a.kind === 'logout') {
           this.deps.options()?.logout();
         } else if (a.kind === 'unstuck') {
@@ -1143,6 +1155,11 @@ export class OptionsWindow {
             {
               touch: useTouchInterface(),
               nativeShell: isNativeAppShell(),
+              // Swaps the Display card's browser Fullscreen toggle for the
+              // shell's window-mode picker. The BRIDGE CAPABILITY again, never
+              // nativeShell: the mobile shells and pre-display-mode desktop
+              // builds must keep the browser toggle they can actually serve.
+              desktopDisplayMode: desktopDisplayModeSupported(desktopBridge()),
             },
           )
         : [];
@@ -1373,7 +1390,16 @@ export class OptionsWindow {
     // footer's Reset to Defaults must restore every Interface setting the panel
     // governs, not just whichever tab happens to be open when the player clicks
     // it, so switching tabs never changes what the shared button resets.
-    const controls = hooks ? buildInterfaceControls(this.settingsSource(hooks)) : [];
+    // The desktop GPU preference row is gated on the shell BRIDGE CAPABILITY,
+    // never on nativeShell: that flag is true in the mobile shells too, and a
+    // desktop shell installed before the preference shipped cannot serve it.
+    const env: OptionsEnv = {
+      touch: useTouchInterface(),
+      nativeShell: isNativeAppShell(),
+      desktopGpuPref: desktopGpuPrefSupported(desktopBridge()),
+      desktopDiscordPresence: desktopDiscordPresenceSupported(desktopBridge()),
+    };
+    const controls = hooks ? buildInterfaceControls(this.settingsSource(hooks), env) : [];
 
     const stripHost = document.createElement('div');
     stripHost.innerHTML = tabStripHtml(

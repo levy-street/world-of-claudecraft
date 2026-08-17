@@ -6,6 +6,12 @@
    rides the inline var(--range-fill, 0%) fallback, set per element by the HUD; it
    stays here and is never promoted to a :root token. */
 @layer base {
+  img.crest-image-fallback {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
   * {
     box-sizing: border-box;
     margin: 0;

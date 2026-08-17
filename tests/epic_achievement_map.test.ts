@@ -4,13 +4,24 @@
 // a bulk regeneration that would scramble, drop, or rename an entry.
 import { describe, expect, it } from 'vitest';
 import { ACHIEVEMENT_MAP, MAX_EPIC_ACHIEVEMENTS } from '../server/epic/achievement_map';
-import { DEEDS } from '../src/sim/content/deeds';
+import { ACHIEVEMENT_MAP as STEAM_ACHIEVEMENT_MAP } from '../server/steam/achievement_map';
+import { DEED_ORDER, DEEDS } from '../src/sim/content/deeds';
 
 const ACH_NAME_RE = /^ACH_[A-Z0-9_]+$/;
 
 describe('Epic achievement map', () => {
-  it('has exactly the 75 registered entries (same launch set as Steam)', () => {
-    expect(Object.keys(ACHIEVEMENT_MAP).length).toBe(75);
+  it('has exactly the 84 registered entries (same launch set as Steam)', () => {
+    expect(Object.keys(ACHIEVEMENT_MAP).length).toBe(84);
+  });
+
+  it('covers the whole Reliquary ladder: every col_reliquary_* deed in DEED_ORDER is mapped', () => {
+    // Derived from the real catalog, not a hardcoded list: a tenth ladder
+    // deed added to DEEDS without a mirror entry fails here by name.
+    const ladder = DEED_ORDER.filter((id) => /^col_reliquary_/.test(id));
+    expect(ladder.length).toBeGreaterThanOrEqual(9);
+    for (const deedId of ladder) {
+      expect(ACHIEVEMENT_MAP[deedId], deedId).toBeDefined();
+    }
   });
 
   it('stays within the portal soft cap', () => {
@@ -43,7 +54,20 @@ describe('Epic achievement map', () => {
     expect(ACHIEVEMENT_MAP.prog_guildsworn).toBe('ACH_GUILDSWORN');
   });
 
-  it('pins the full 75-entry registered map as a literal (permanent Epic achievement ids)', () => {
+  it('carries the exact same table as the Steam twin (the shared launch set)', () => {
+    // The LAUNCH SET is one id vocabulary across both storefronts (the Epic
+    // header's claim), and each side carries its own independent 84-line
+    // literal. The full-literal pins in each file already red any one-map
+    // edit; what this cross-pin adds is the twin-awareness step in the
+    // routine flow where a map and its own literal are updated together.
+    // The storefronts are documented as independent (D21), so a deliberate
+    // storefront-specific achievement is legal future content: when one
+    // ships, scoping or retiring THIS pin is the reviewed act that records
+    // the divergence.
+    expect(ACHIEVEMENT_MAP).toEqual(STEAM_ACHIEVEMENT_MAP);
+  });
+
+  it('pins the full 84-entry registered map as a literal (permanent Epic achievement ids)', () => {
     expect(ACHIEVEMENT_MAP).toEqual({
       prog_first_steps: 'ACH_FIRST_STEPS',
       prog_double_digits: 'ACH_DOUBLE_DIGITS',
@@ -95,6 +119,15 @@ describe('Epic achievement map', () => {
       col_seven_regalia: 'ACH_SEVEN_REGALIA',
       col_all_slots: 'ACH_ALL_SLOTS',
       col_glimmerfin: 'ACH_GLIMMERFIN',
+      col_reliquary_rank_2: 'ACH_RELIQUARY_RANK_2',
+      col_reliquary_rank_3: 'ACH_RELIQUARY_RANK_3',
+      col_reliquary_rank_4: 'ACH_RELIQUARY_RANK_4',
+      col_reliquary_rank_5: 'ACH_RELIQUARY_RANK_5',
+      col_reliquary_complete: 'ACH_RELIQUARY_COMPLETE',
+      col_reliquary_conquerors: 'ACH_RELIQUARY_CONQUERORS',
+      col_reliquary_illum_nythraxis_heroic: 'ACH_RELIQUARY_ILLUM_NYTHRAXIS_HEROIC',
+      col_reliquary_illum_thunzharr: 'ACH_RELIQUARY_ILLUM_THUNZHARR',
+      col_reliquary_illum_gravewyrm_heroic: 'ACH_RELIQUARY_ILLUM_GRAVEWYRM_HEROIC',
       pvp_arena_1v1_1750: 'ACH_ARENA_1V1_1750',
       pvp_arena_1v1_1900: 'ACH_ARENA_1V1_1900',
       pvp_arena_2v2_1900: 'ACH_ARENA_2V2_1900',

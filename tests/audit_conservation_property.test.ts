@@ -36,7 +36,7 @@
 // steer sweeps away from the OLD shared-book save window are gone: every sweep
 // now runs both officers acting and both officers saving.
 
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // ---------------------------------------------------------------------------
 // The fake durable database. Reads and writes an in-memory store instead of
@@ -240,13 +240,14 @@ import { auditBank, type BankLedgerAuditRow } from '../scripts/bank_audit.mjs';
 import { bankLedgerIdle } from '../server/bank_ledger';
 import { type ClientSession, GameServer } from '../server/game';
 import { GuildBankEscrowRefused, mergeGuildBankRow } from '../server/guild_bank_state';
+import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import {
   GUILD_BANK_RUNG_PRICES,
   type GuildBankState,
   guildBankRungsBought,
   sanitizeGuildBankState,
 } from '../src/sim/guild_bank';
-import type { InvSlot } from '../src/sim/types';
+import type { InvSlot, WorldContent } from '../src/sim/types';
 
 // Wire the fake durable table to the REAL escrow merge (see store.merge).
 store.merge.fn = (durable, deltas) => mergeGuildBankRow(durable, deltas);
@@ -532,6 +533,33 @@ function diffTotals(expected: Totals, actual: Totals): string {
 // reachable inside the op alphabet.
 // ---------------------------------------------------------------------------
 const BANKERS = ['bursar_fernando', 'bursar_petra_vell', 'bursar_aldous_crane'];
+
+// This suite never ticks the sim: every step is a synchronous guild-bank
+// dispatch, a save, or a fence, so it only ever reaches bank/character/purse
+// state through the three banker NPCs above. GameServer's Sim has no `world`
+// option of its own (server/game.ts constructs `new Sim({...})`
+// unconditionally, with no world field), so trimming its spawn roster goes
+// through the same setActiveWorldContent seam every zones/colliders test uses
+// in place of a Sim-constructor `world:` field. Zones/roads/props/services
+// stay the full built-in world (terrain and collision geometry this file
+// never touches); only the camp mobs, the ambient NPC roster, and ground loot
+// are trimmed, since makeWorld() below builds a fresh GameServer for EVERY
+// generated step sequence (thousands across the property sweeps below) and
+// none of them ever reach for a camp, a non-banker NPC, or a ground object.
+// Set once for the whole file (every test here wants the same trim), so there
+// is never a point mid-run where this Sim's captured worldContent and the
+// collider builder's getActiveWorldContent() read could disagree.
+const AUDIT_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: Object.fromEntries(
+    Object.entries(BUILTIN_WORLD.npcs).filter(([id]) => BANKERS.includes(id)),
+  ),
+  groundObjects: [],
+};
+setActiveWorldContent(AUDIT_TEST_WORLD);
+afterAll(() => setActiveWorldContent(null));
+
 const GUILD_ID = 4242;
 // The acting operator behind an injected purge. An admin account, never one of
 // the two officers: the ledger row books the OPERATOR'S account beside the

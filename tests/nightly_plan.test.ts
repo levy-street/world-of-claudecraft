@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   buildTargets,
+  dedupeTargetsBySha,
   labelEnsureFailed,
   NIGHTLY_DRILL_ISSUE_LABEL,
   NIGHTLY_DRILL_ISSUE_TITLE,
@@ -13,6 +14,7 @@ import {
   refNamesFromMatchingRefs,
   renderIssueBody,
   renderRecoveryComment,
+  shaFromGitRefResponse,
   summarizeRunJobs,
   trackingIssueIdentity,
 } from '../scripts/lib/nightly_plan.mjs';
@@ -130,6 +132,117 @@ describe('buildTargets', () => {
 
   it('never lists the default branch twice', () => {
     expect(buildTargets({ inputRef: null, releaseBranch: 'main' })).toEqual(['main']);
+  });
+
+  it('drops the release branch when it resolves to the same SHA as the default branch', () => {
+    // The scenario this exists for: a release cut or a release-to-main merge
+    // leaves both branches pointing at the identical commit.
+    expect(
+      buildTargets({
+        inputRef: null,
+        releaseBranch: 'release/v0.35.0',
+        defaultBranch: 'main',
+        shaByRef: { main: 'sha-1', 'release/v0.35.0': 'sha-1' },
+      }),
+    ).toEqual(['main']);
+  });
+
+  it('keeps both branches when their SHAs differ', () => {
+    expect(
+      buildTargets({
+        inputRef: null,
+        releaseBranch: 'release/v0.35.0',
+        defaultBranch: 'main',
+        shaByRef: { main: 'sha-1', 'release/v0.35.0': 'sha-2' },
+      }),
+    ).toEqual(['main', 'release/v0.35.0']);
+  });
+
+  it('fails open: an unresolved SHA never drops a target', () => {
+    // Missing from the map entirely.
+    expect(
+      buildTargets({
+        inputRef: null,
+        releaseBranch: 'release/v0.35.0',
+        defaultBranch: 'main',
+        shaByRef: { main: 'sha-1' },
+      }),
+    ).toEqual(['main', 'release/v0.35.0']);
+    // Explicitly null (a failed lookup), even though the other side matches.
+    expect(
+      buildTargets({
+        inputRef: null,
+        releaseBranch: 'release/v0.35.0',
+        defaultBranch: 'main',
+        shaByRef: { main: 'sha-1', 'release/v0.35.0': null },
+      }),
+    ).toEqual(['main', 'release/v0.35.0']);
+    // No shaByRef at all defaults to keeping everything, same as before this
+    // dedup existed.
+    expect(
+      buildTargets({ inputRef: null, releaseBranch: 'release/v0.35.0', defaultBranch: 'main' }),
+    ).toEqual(['main', 'release/v0.35.0']);
+  });
+
+  it('ignores shaByRef entirely on a dispatch override', () => {
+    expect(
+      buildTargets({
+        inputRef: 'scratch/broken-test',
+        releaseBranch: 'release/v0.35.0',
+        defaultBranch: 'main',
+        shaByRef: { main: 'sha-1', 'scratch/broken-test': 'sha-1' },
+      }),
+    ).toEqual(['scratch/broken-test']);
+  });
+});
+
+describe('dedupeTargetsBySha', () => {
+  it('drops a later name whose SHA repeats an earlier kept name', () => {
+    expect(
+      dedupeTargetsBySha(['main', 'release/v0.35.0', 'release/v0.34.0'], {
+        main: 'sha-1',
+        'release/v0.35.0': 'sha-1',
+        'release/v0.34.0': 'sha-2',
+      }),
+    ).toEqual(['main', 'release/v0.34.0']);
+  });
+
+  it('never drops a name with an unknown SHA, missing or falsy', () => {
+    expect(dedupeTargetsBySha(['main', 'release/v0.35.0'], { main: 'sha-1' })).toEqual([
+      'main',
+      'release/v0.35.0',
+    ]);
+    expect(
+      dedupeTargetsBySha(['main', 'release/v0.35.0'], { main: 'sha-1', 'release/v0.35.0': null }),
+    ).toEqual(['main', 'release/v0.35.0']);
+    expect(
+      dedupeTargetsBySha(['main', 'release/v0.35.0'], { main: 'sha-1', 'release/v0.35.0': '' }),
+    ).toEqual(['main', 'release/v0.35.0']);
+  });
+
+  it('passes an empty list through unchanged', () => {
+    expect(dedupeTargetsBySha([], {})).toEqual([]);
+  });
+});
+
+describe('shaFromGitRefResponse', () => {
+  it('extracts the commit SHA from a well-formed git-refs single-ref response', () => {
+    expect(
+      shaFromGitRefResponse({
+        ref: 'refs/heads/main',
+        object: { sha: 'abc123', type: 'commit' },
+      }),
+    ).toBe('abc123');
+  });
+
+  it('resolves to null for anything that is not the expected shape', () => {
+    expect(shaFromGitRefResponse(null)).toBeNull();
+    expect(shaFromGitRefResponse(undefined)).toBeNull();
+    expect(shaFromGitRefResponse('abc123')).toBeNull();
+    expect(shaFromGitRefResponse({})).toBeNull();
+    expect(shaFromGitRefResponse({ object: {} })).toBeNull();
+    expect(shaFromGitRefResponse({ object: { sha: 42 } })).toBeNull();
+    expect(shaFromGitRefResponse({ object: { sha: '' } })).toBeNull();
   });
 });
 

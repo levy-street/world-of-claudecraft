@@ -46,6 +46,7 @@ import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { isInJailCage, JAIL_GATE, JAIL_VISITOR_POS, jailGateTeleport } from '../src/sim/jail';
 import { registerChoice, startChoiceForPlayer } from '../src/sim/scenes/choices';
 import { playSceneForPlayer, registerScene } from '../src/sim/scenes/scenes';
+import { ARENA_MIN_LEVEL } from '../src/sim/social/arena';
 
 // Moderation acts on player sessions and the fixed jail cage; ambient camps,
 // world npcs and quest objects never take part, and every test here boots one
@@ -506,6 +507,7 @@ describe('in-game moderation actions', () => {
     );
     const inmateWs = fakeWs();
     const inmate = joined(server.join(inmateWs, 51, 151, 'Inmate', 'rogue', null));
+    server.sim.setPlayerLevel(ARENA_MIN_LEVEL, inmate.pid);
 
     // Queued when the jail lands: the queue is drained on the spot.
     server.handleMessage(inmate, JSON.stringify({ t: 'cmd', cmd: 'arena_queue', format: '1v1' }));

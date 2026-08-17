@@ -59,16 +59,29 @@ describe('draw_stats_core', () => {
   it('wires Renderer lifecycle consumers through the tested logical-frame session', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
 
-    expect(source.match(/createLogicalFrameDrawStats\(this\.webgl\.info\)/g)).toHaveLength(1);
+    // Exactly two mint sites: the composer-tier construction and the
+    // context-restore rebind below.
+    expect(source.match(/createLogicalFrameDrawStats\(this\.webgl\.info\)/g)).toHaveLength(2);
     expect(source).toMatch(
       /if \(GFX\.composer \|\| GFX\.gradePass\) \{[\s\S]{0,800}createLogicalFrameDrawStats\(this\.webgl\.info\)/,
+    );
+    // Context-restore rebind, whole statement with its drawStats polarity:
+    // three's restore path replaces webgl.info (premise pinned below), so a
+    // session kept from before the loss would accumulate into a dead object,
+    // zeroing the governor draw signal and the opaque-sort input for the rest
+    // of the session.
+    expect(source).toMatch(
+      /onWebGLContextRestored = \(\): void => \{[\s\S]{0,900}?if \(this\.drawStats\) this\.drawStats = createLogicalFrameDrawStats\(this\.webgl\.info\);/,
     );
     expect(source.match(/this\.drawStats\.beginFrame\(\)/g)).toHaveLength(1);
     expect(source.match(/this\.drawStats\.currentFrame\(\)/g)).toHaveLength(2);
     expect(source.match(/this\.drawStats\.governorSignal\(GFX\.tier\)/g)).toHaveLength(1);
     expect(source.match(/this\.drawStats\.discardOutOfBand\(\)/g)).toHaveLength(1);
+    // beginFrame re-arms every sync, including skipped presents (a hidden frame
+    // records an honest zero-draw submit); the adaptive-resolution step behind
+    // it is present-gated (a renderless frame carries no rendering signal).
     expect(source).toMatch(
-      /if \(this\.drawStats\) this\.drawStats\.beginFrame\(\);\n\s*this\.updateAdaptiveResolution\(dt\);/,
+      /if \(this\.drawStats\) this\.drawStats\.beginFrame\(\);\n(?:\s*\/\/[^\n]*\n)*\s*if \(present\) this\.updateAdaptiveResolution\(dt\);/,
     );
     expect(source).toContain(
       'const drawStatsFrame = this.drawStats ? this.drawStats.currentFrame() : null;',
@@ -81,6 +94,29 @@ describe('draw_stats_core', () => {
     expect(source).toContain('sample.calls = drawSignal.calls');
     expect(source).toContain('sample.triangles =\n      drawSignal.triangles');
     expect(source).toContain('else this.webgl.info.reset();');
+  });
+
+  it('pins the three restore premise the rebind depends on (info replaced on restore)', () => {
+    // The rebind above is load-bearing ONLY because three's context-restore
+    // path re-runs initGLContext, which mints a new WebGLInfo and reassigns
+    // renderer.info. If a future three stops replacing info on restore, this
+    // arm reds and the rebind (harmless either way) can be re-evaluated
+    // instead of silently guarding nothing.
+    const three = readFileSync(
+      new URL('../node_modules/three/src/renderers/WebGLRenderer.js', import.meta.url),
+      'utf8',
+    );
+    const sliceFn = (name: string): string => {
+      const start = three.indexOf(`function ${name}`);
+      expect(start, name).toBeGreaterThan(-1);
+      const next = three.indexOf('\n\t\tfunction ', start + 1);
+      return three.slice(start, next === -1 ? start + 4000 : next);
+    };
+    const restore = sliceFn('onContextRestore');
+    expect(restore).toContain('initGLContext()');
+    const init = sliceFn('initGLContext');
+    expect(init).toContain('info = new WebGLInfo');
+    expect(init).toContain('_this.info = info');
   });
 
   it('fills one caller-owned frame counter on the composer hot path', () => {

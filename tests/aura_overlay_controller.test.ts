@@ -306,31 +306,38 @@ describe('AuraOverlayController setup preview', () => {
   });
 
   it('refreshes selected talent proc frames when the row choice changes', () => {
+    // Druid carries the drawable talent procs in the reworked trees: row 8's
+    // improved_roots emits dru_ironhide_reflex and row 11's furor emits
+    // dru_gripping_ambush (no class has two drawable procs on one row now, so
+    // the swap crosses both rows: deselecting hides one frame while the other
+    // row's new selection adds one).
     let currentTalents: TalentAllocation = {
-      spec: 'elemental',
-      rows: { 5: 'sha_r5_concussion' },
+      spec: 'feral',
+      rows: { 8: 'dru_r8_improved_roots', 11: 'dru_r11_improved_mark' },
     };
     const controller = new AuraOverlayController({
       doc: document,
       writers,
-      playerClass: 'shaman',
-      playerName: 'Thrall',
-      known: () => known('lightning_bolt'),
+      playerClass: 'druid',
+      playerName: 'Runetotem',
+      known: () => known('wrath'),
       talents: () => currentTalents,
       iconUrl: (id) => `/icons/${id}.png`,
     });
 
-    expect(document.querySelector('[data-proc="sha_fault_line"]')).not.toBeNull();
+    expect(document.querySelector('[data-proc="dru_ironhide_reflex"]')).not.toBeNull();
     currentTalents = {
-      spec: 'elemental',
-      rows: { 5: 'sha_r5_improved_lightning_shield' },
+      spec: 'feral',
+      rows: { 8: 'dru_r8_brutal_bash', 11: 'dru_r11_furor' },
     };
     controller.paint([]);
 
     expect(
-      document.querySelector('[data-proc="sha_fault_line"]')?.classList.contains('loadout-hidden'),
+      document
+        .querySelector('[data-proc="dru_ironhide_reflex"]')
+        ?.classList.contains('loadout-hidden'),
     ).toBe(true);
-    expect(document.querySelector('[data-proc="sha_ward_surge"]')).not.toBeNull();
+    expect(document.querySelector('[data-proc="dru_gripping_ambush"]')).not.toBeNull();
   });
 
   it('applies persisted appearance and position to rebuilt frames', () => {

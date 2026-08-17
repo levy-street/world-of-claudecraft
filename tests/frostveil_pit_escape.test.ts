@@ -10,7 +10,9 @@
 // stranding spot, back down again, and checks nobody re-sharpened the ramp.
 
 import { describe, expect, it } from 'vitest';
+import { BUILTIN_WORLD } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
+import type { WorldContent } from '../src/sim/types';
 import {
   GLACIER_TARN_RAMP,
   groundHeight,
@@ -24,6 +26,28 @@ import { expectDefined } from './helpers/defined';
 
 // The production seed: the report is seed-pinned world geometry.
 const SEED = 20061;
+
+// Terrain and collider geometry read the module-global active world content
+// (data.ts), never Sim's cfg.world (see the sim.ts constructor invariant
+// comment on `worldContent`), so trimming cfg.world here cannot move the
+// tarn, the ramp, or the pinned pond-bed literals below: only which
+// entities Sim spawns changes. Every walker in this suite only ever
+// wanders inside the Frostveil zone (the Rime Elementals beached in the
+// bowl, the snowdrift wolves up the road), so the other ten zones' camps,
+// every zone's NPCs, and every ground object are pure Sim-construction
+// overhead here. Camp mob ids match FROSTVEIL_CAMPS exactly (frostveil.ts),
+// excluding the separately-appended FROSTVEIL_QUEST_CAMPS (terrace_howler),
+// which sit far outside anywhere a 12 second walk from the tarn can reach.
+const FROSTVEIL_ESCAPE_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: BUILTIN_WORLD.camps.filter((camp) =>
+    ['snowdrift_wolf', 'ice_wisp', 'rime_elemental', 'fen_sprite', 'frostmane_yeti'].includes(
+      camp.mobId,
+    ),
+  ),
+  npcs: {},
+  groundObjects: [],
+};
 
 // where the stranded player stood: the pond's dry west beach, inside the bowl
 const STRANDED = { x: 42, z: 1642 };
@@ -40,7 +64,12 @@ function onRim(x: number, z: number): boolean {
 }
 
 function makeWalker(spot: { x: number; z: number }) {
-  const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true });
+  const sim = new Sim({
+    seed: SEED,
+    playerClass: 'warrior',
+    autoEquip: true,
+    world: FROSTVEIL_ESCAPE_TEST_WORLD,
+  });
   sim.setPlayerLevel(20);
   const p = sim.player;
   const meta = expectDefined(

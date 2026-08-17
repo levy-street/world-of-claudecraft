@@ -1,9 +1,15 @@
 import { describe, expect, it } from 'vitest';
+import {
+  FLOW_STATE_READY_ID,
+  onShamanManaSpent,
+  shamanManaCost,
+} from '../src/sim/combat/shaman_talents';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { expectDefined } from './helpers/defined';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // The priest/shaman/paladin row redesign (docs/design/choice-row-quality-pass.md):
 // each proc-engine primitive proven end to end through the live content that
@@ -16,7 +22,7 @@ function rig(
   rows: Record<number, string>,
   seed = 11,
 ) {
-  const sim = new Sim({ seed, playerClass: cls, autoEquip: true });
+  const sim = new Sim({ seed, playerClass: cls, autoEquip: true, world: EMPTY_TEST_WORLD });
   sim.setPlayerLevel(level);
   expect(sim.applyTalents({ spec: null, rows })).toBe(true);
   const p = sim.player;
@@ -46,49 +52,40 @@ function castAndSettle(sim: Sim, ability: string, seconds = 4): void {
 }
 
 describe('priest redesign', () => {
-  it('Searing Light: every 3rd Smite makes the next heal free', () => {
+  it('Veil Unbound makes Veilstep a control break and speed burst', () => {
     const { sim, p } = rig('priest', 20, { 5: 'pri_r5_searing_light' });
-    addTargetMob(sim);
-    for (let i = 0; i < 3; i++) castAndSettle(sim, 'smite');
-    expect(p.auras.some((a) => a.kind === 'next_cast_free')).toBe(true);
-    sim.targetEntity(sim.playerId);
-    const before = p.resource;
-    sim.castAbility('flash_heal');
-    for (let i = 0; i < 20 * 2; i++) sim.tick(); // cast-time heals bill at completion
-    expect(p.resource).toBeGreaterThanOrEqual(before - 1); // the heal billed nothing
-    expect(p.auras.some((a) => a.kind === 'next_cast_free')).toBe(false); // consumed
+    p.auras.push({
+      id: 'test_slow',
+      name: 'Test Slow',
+      kind: 'slow',
+      value: 0.5,
+      remaining: 10,
+      duration: 10,
+      sourceId: 999,
+      school: 'shadow',
+    });
+    castAndSettle(sim, 'veilstep', 0);
+    expect(p.auras.some((a) => a.kind === 'slow')).toBe(false);
+    expect(p.auras).toContainEqual(
+      expect.objectContaining({ id: 'priest_veil_unbound', kind: 'buff_speed', value: 1.5 }),
+    );
   });
 
-  it('Improved Whispered Prayer: every third cast wards its target', () => {
-    // The #1756 choice pass turned this row into Warding Refrain: every 3rd
-    // Whispered Prayer wards, replacing the full-duration-Renew trigger.
+  it('Sheltering Step gives Psalm of Warding a target speed burst', () => {
     const { sim, p } = rig('priest', 20, { 5: 'pri_r5_improved_renew' });
-    p.hp = Math.round(p.maxHp * 0.5);
     sim.targetEntity(sim.playerId);
-    for (let i = 0; i < 3; i++) castAndSettle(sim, 'lesser_heal', 3);
-    expect(p.auras.some((a) => a.kind === 'absorb' && a.id === 'pri_lingering_ward')).toBe(true);
+    castAndSettle(sim, 'power_word_shield', 0);
+    expect(p.auras).toContainEqual(
+      expect.objectContaining({ id: 'priest_sheltering_step', kind: 'buff_speed', value: 1.4 }),
+    );
   });
 
-  it('Twisted Faith: Mindfracture hits harder on a DoT-afflicted target', () => {
-    const run = (withDot: boolean) => {
-      const { sim } = rig('priest', 20, { 5: 'pri_r5_twisted_faith' });
-      const mob = addTargetMob(sim);
-      if (withDot) castAndSettle(sim, 'shadow_word_pain', 2);
-      const before = mob.hp;
-      let dmg = 0;
-      sim.player.resource = sim.player.maxResource;
-      sim.castAbility('mind_blast');
-      for (let i = 0; i < 20 * 3; i++) {
-        for (const ev of sim.tick()) {
-          if (ev.type === 'damage' && ev.ability === 'Mindfracture') dmg += ev.amount;
-        }
-      }
-      expect(mob.hp).toBeLessThan(before);
-      return dmg;
-    };
-    // Same seed and cast pattern either way; the DoT-afflicted hit must be
-    // visibly larger (25% before crit variance; the seed draws no crit here).
-    expect(run(true)).toBeGreaterThan(run(false) * 1.2);
+  it('Processional Grace enables casting while moving after Veilstep', () => {
+    const { sim, p } = rig('priest', 20, { 5: 'pri_r5_twisted_faith' });
+    castAndSettle(sim, 'veilstep', 0);
+    expect(p.auras).toContainEqual(
+      expect.objectContaining({ kind: 'processional_grace', remaining: 4 }),
+    );
   });
 
   it('Improved Shield: a fully consumed Psalm of Warding heals its owner', () => {
@@ -116,34 +113,16 @@ describe('priest redesign', () => {
     expect(p.hp).toBeGreaterThanOrEqual(before + 45 - 1); // burst heal landed
   });
 
-  it('Greater Heal echo: dropping below 35% inside the window triggers the stored heal', () => {
-    const { sim, p } = rig('priest', 20, { 14: 'pri_r14_greater_heal' });
-    p.hp = Math.round(p.maxHp * 0.6);
-    sim.targetEntity(sim.playerId);
-    castAndSettle(sim, 'heal', 4);
-    expect(p.auras.some((a) => a.kind === 'heal_echo')).toBe(true);
-    const crash = Math.round(p.maxHp * 0.7);
-    const beforeCrash = p.hp;
-    (
-      sim as unknown as {
-        dealDamage(
-          s: Entity | null,
-          t: Entity,
-          n: number,
-          c: boolean,
-          sc: string,
-          a: string | null,
-          k: string,
-        ): void;
-      }
-    ).dealDamage(null, p, crash, false, 'physical', null, 'hit');
-    // The echo consumed and healed 60 on top of the post-crash floor.
-    expect(p.auras.some((a) => a.kind === 'heal_echo')).toBe(false);
-    expect(p.hp).toBeGreaterThanOrEqual(beforeCrash - crash + 59);
+  it('Last Prayer restores 30% maximum health', () => {
+    const { sim, p } = rig('priest', 20, { 8: 'pri_r17_desperate_prayer' });
+    p.hp = Math.round(p.maxHp * 0.4);
+    const before = p.hp;
+    castAndSettle(sim, 'desperate_prayer', 0);
+    expect(p.hp).toBe(before + Math.round(p.maxHp * 0.3));
   });
 
-  it('Inner Fire: a hit above 15% max health kindles a ward, once per 20 sec', () => {
-    const { sim, p } = rig('priest', 20, { 17: 'pri_r17_inner_fire' });
+  it('Wounded Halo: a hit above 15% max health kindles a ward, once per 20 sec', () => {
+    const { sim, p } = rig('priest', 20, { 8: 'pri_r17_inner_fire' });
     const hit = Math.round(p.maxHp * 0.2);
     const deal = (
       sim as unknown as {
@@ -170,148 +149,85 @@ describe('priest redesign', () => {
 });
 
 describe('shaman redesign', () => {
-  it('Fault Line: every 3rd Arc Bolt makes the next shock free', () => {
+  it('Wolfstep makes Shadewolf instant and clears movement control on entry', () => {
     const { sim, p } = rig('shaman', 20, { 5: 'sha_r5_concussion' });
-    addTargetMob(sim, 100000, 8);
-    for (let i = 0; i < 3; i++) castAndSettle(sim, 'lightning_bolt');
-    expect(p.auras.some((a) => a.kind === 'next_cast_free')).toBe(true);
-    const before = p.maxResource;
-    p.resource = before;
-    sim.castAbility('earth_shock');
-    for (let i = 0; i < 20; i++) sim.tick();
-    expect(p.resource).toBe(before);
+    expect(sim.resolvedAbility('ghost_wolf')?.castTime).toBe(0);
+    p.auras.push({
+      id: 'test_root',
+      name: 'Test Root',
+      kind: 'root',
+      value: 0,
+      remaining: 10,
+      duration: 10,
+      sourceId: 999,
+      school: 'frost',
+    });
+    sim.castAbility('ghost_wolf');
+    expect(p.auras.some((aura) => aura.id === 'ghost_wolf')).toBe(true);
+    expect(p.auras.some((aura) => aura.kind === 'root')).toBe(false);
   });
 
-  it('Improved Cinder Jolt: Earthen Jolt detonates the Cinder Jolt DoT', () => {
-    // Seed hunted so the Earthen Jolt that detonates actually LANDS: an avoided
-    // shock draws no detonation and the DoT survives, which is the only way this
-    // assertion can fail without the mechanic being broken. Re-hunted from 12
-    // after the v0.34.0 merge composed this branch's quest-dedupe content with
-    // the release's Dragonkin brood, shifting every shared-stream draw. Not a
-    // behavior regression: 71 of seeds 1 to 80 detonate. Spares: 2, 3.
-    const { sim } = rig(
-      'shaman',
-      20,
-      {
-        8: 'sha_r8_shock_efficiency',
-        14: 'sha_r14_improved_flame_shock',
-      },
-      1,
-    );
-    const mob = addTargetMob(sim, 100000, 8);
-    castAndSettle(sim, 'flame_shock', 7); // the shocks share a cooldown; wait it out
-    expect(mob.auras.some((a) => a.kind === 'dot' && a.id === 'flame_shock')).toBe(true);
-    castAndSettle(sim, 'earth_shock', 1);
-    expect(mob.auras.some((a) => a.kind === 'dot' && a.id === 'flame_shock')).toBe(false);
+  it('the control row resolves a four-second interrupt or two-second root', () => {
+    const { sim } = rig('shaman', 20, {
+      11: 'sha_r11_ancestral_guidance',
+    });
+    expect(sim.resolvedAbility('earth_shock')?.effects).toContainEqual({
+      type: 'interrupt',
+      lockout: 4,
+    });
+    expect(
+      rig('shaman', 20, { 11: 'sha_r11_elemental_attunement' }).sim.resolvedAbility('frost_shock')
+        ?.effects,
+    ).toContainEqual({ type: 'root', duration: 2 });
   });
 
-  it('Weapon Fury: imbued swings shave the shock cooldowns', () => {
-    const { sim, p } = rig('shaman', 20, { 14: 'sha_r14_weapon_fury' });
-    const mob = addTargetMob(sim);
-    castAndSettle(sim, 'rockbiter_weapon', 2);
-    castAndSettle(sim, 'earth_shock', 1);
-    const cds = p.cooldowns;
-    const before = cds.get('earth_shock');
-    expect(before).toBeGreaterThan(0);
-    sim.startAutoAttack();
-    let swings = 0;
-    for (let i = 0; i < 20 * 10 && swings === 0; i++) {
-      for (const ev of sim.tick()) {
-        if (ev.type === 'damage' && ev.sourceId === p.id && ev.school === 'physical') swings++;
-      }
+  it('Flow State arms after 120 Mana and discounts the next mana action by 40', () => {
+    const { sim, p } = rig('shaman', 20, { 14: 'sha_r14_chain_lightning' });
+    onShamanManaSpent(sim.ctx, p, 70);
+    expect(p.auras.some((aura) => aura.id === FLOW_STATE_READY_ID)).toBe(false);
+    onShamanManaSpent(sim.ctx, p, 50);
+    expect(p.auras.some((aura) => aura.id === FLOW_STATE_READY_ID)).toBe(true);
+    expect(shamanManaCost(sim.ctx, p, 65)).toBe(25);
+  });
+
+  it('the level-20 row contains no additional action grants', () => {
+    for (const optionId of ['sha_r20_bloodlust', 'sha_r20_elemental_fury', 'sha_r20_tidal_waves']) {
+      const { sim } = rig('shaman', 20, { 20: optionId });
+      expect(sim.meta(sim.playerId)?.talentMods.grants).toEqual([]);
     }
-    expect(swings).toBeGreaterThan(0);
-    const after = cds.get('earth_shock') ?? 0;
-    // Natural decay over N ticks plus the 0.5 sec shave per landed swing.
-    expect(mob.dead).toBe(false);
-    expect(expectDefined(before) - after).toBeGreaterThan(0.5);
-  });
-
-  it('Undertow Promise: every 3rd Mending Waters leaves an emergency heal echo', () => {
-    // The #1756 choice pass rebuilt this row off chain_heal (never obtainable)
-    // onto baseline Mending Waters: every 3rd cast stores an 80-heal echo that
-    // fires when the target drops below 35% inside its 10 sec window.
-    const { sim, p } = rig('shaman', 20, { 20: 'sha_r20_tidal_waves' });
-    p.hp = 1;
-    sim.targetEntity(sim.playerId);
-    for (let i = 0; i < 3; i++) castAndSettle(sim, 'healing_wave', 5);
-    expect(p.auras.some((a) => a.id === 'sha_undertow_promise' && a.kind === 'heal_echo')).toBe(
-      true,
-    );
-    p.hp = Math.ceil(p.maxHp * 0.4);
-    const before = p.hp;
-    sim.ctx.dealDamage(null, p, Math.ceil(p.maxHp * 0.1), false, 'physical', null, 'hit');
-    expect(p.hp).toBeGreaterThan(before - Math.ceil(p.maxHp * 0.1));
-    expect(p.auras.some((a) => a.id === 'sha_undertow_promise')).toBe(false);
   });
 });
 
 describe('paladin redesign', () => {
-  it('Vengeful Exorcism: Verdict resets the Rite of Expulsion cooldown', () => {
-    const { sim, p } = rig('paladin', 20, { 5: 'pal_r5_vengeful_exorcism' });
-    addTargetMob(sim, 100000, 8);
-    castAndSettle(sim, 'exorcism', 2);
-    expect(p.cooldowns.get('exorcism')).toBeGreaterThan(0);
-    castAndSettle(sim, 'seal_of_righteousness', 2);
-    castAndSettle(sim, 'judgement', 2);
-    expect(p.cooldowns.has('exorcism')).toBe(false);
+  it('Extended Dawn: Divine Ascension gains 2 additional charges', () => {
+    const { sim, p } = rig('paladin', 20, { 17: 'pal_r17_extended_dawn' });
+    if (!p.paladinDevotion) throw new Error('no devotion');
+    p.paladinDevotion.value = 20;
+    sim.castAbility('divine_ascension');
+    expect(p.paladinDevotion.ascensionCharges).toBe(7); // 5 base + 2
   });
 
-  it('Righteous Cause: swings under an active Oathbrand shave the Verdict cooldown', () => {
-    // Seed hunted so the first counted physical swing LANDS under the re-branded
-    // seal: an avoided swing draws no shave and the cooldown delta assertion
-    // needs a landed hit. Re-hunted from 2 after the v0.35.0 base sync composed this
-    // branch's quest-dedupe content with the release's Dragonkin brood, shifting
-    // every shared-stream draw (seed 2 now shaves nothing: 6.000 to 5.950, one
-    // tick of ordinary decay). Not a behavior regression: nearby seeds still
-    // shave the full amount, landing at 5.450. Spares: 4, 5.
-    const { sim, p } = rig('paladin', 20, { 14: 'pal_r14_righteous_cause' }, 3);
-    addTargetMob(sim);
-    castAndSettle(sim, 'seal_of_righteousness', 2);
-    castAndSettle(sim, 'judgement', 2);
-    castAndSettle(sim, 'seal_of_righteousness', 2); // judgement consumed the seal; re-brand
-    const before = p.cooldowns.get('judgement');
-    expect(before).toBeGreaterThan(0);
-    sim.startAutoAttack();
-    let swings = 0;
-    for (let i = 0; i < 20 * 10 && swings === 0; i++) {
-      for (const ev of sim.tick()) {
-        if (ev.type === 'damage' && ev.sourceId === p.id && ev.school === 'physical') swings++;
-      }
-    }
-    expect(swings).toBeGreaterThan(0);
-    expect(p.cooldowns.get('judgement') ?? 0).toBeLessThan(expectDefined(before) - 0.5);
+  it('Divine Steed: activating Divine Ascension grants a movement-speed burst', () => {
+    const { sim, p } = rig('paladin', 20, { 5: 'pal_r5_divine_steed' });
+    if (!p.paladinDevotion) throw new Error('no devotion');
+    p.paladinDevotion.value = 20;
+    sim.castAbility('divine_ascension');
+    expect(p.auras.some((a) => a.kind === 'buff_speed' && a.id === 'divine_steed_burst')).toBe(
+      true,
+    );
   });
 
-  it('Deathless Ardor: a killing blow leaves 1 health, once per 180 sec', () => {
-    const { sim, p } = rig('paladin', 20, { 17: 'pal_r17_ardent_defender' });
-    const deal = (
-      sim as unknown as {
-        dealDamage(
-          s: Entity | null,
-          t: Entity,
-          n: number,
-          c: boolean,
-          sc: string,
-          a: string | null,
-          k: string,
-        ): void;
-      }
-    ).dealDamage.bind(sim);
-    deal(null, p, p.hp + 500, false, 'physical', null, 'hit');
-    expect(p.dead).toBe(false);
-    expect(p.hp).toBe(1);
-    deal(null, p, 50, false, 'physical', null, 'hit'); // inside the ICD: dies
-    expect(p.dead).toBe(true);
+  it('Sanctified Fervor: Avenging Wrath grants critical strike and both haste channels', () => {
+    const { sim, p } = rig('paladin', 20, { 17: 'pal_r17_sanctified_fervor' });
+    sim.castAbility('avenging_wrath');
+    expect(p.auras.some((a) => a.kind === 'buff_crit' && a.value === 0.15)).toBe(true);
+    expect(p.auras.some((a) => a.kind === 'buff_haste' && a.value === 1.15)).toBe(true);
+    expect(p.auras.some((a) => a.kind === 'buff_spellhaste' && a.value === 0.15)).toBe(true);
   });
-
-  // The #1756 choice pass redesigned aura_surge from the Radiant Swell armor
-  // buff into Dawnward Ricochet (chain damage + silence); the new behavior is
-  // pinned end to end in talent_retained_semantics_v026.test.ts.
 
   it('replay determinism: the proc-heavy priest run is bit-identical', () => {
     const run = () => {
-      const { sim, p } = rig('priest', 20, { 5: 'pri_r5_searing_light', 17: 'pri_r17_inner_fire' });
+      const { sim, p } = rig('priest', 20, { 5: 'pri_r5_searing_light', 8: 'pri_r17_inner_fire' });
       addTargetMob(sim);
       for (let i = 0; i < 3; i++) castAndSettle(sim, 'smite');
       return { hp: p.hp, mana: p.resource, auras: p.auras.map((a) => [a.id, a.kind]) };
@@ -322,30 +238,52 @@ describe('paladin redesign', () => {
 
 describe('druid Lifesap redesign', () => {
   it('restores 30 resource per classic tick for 10 sec, in combat', () => {
-    const sim = new Sim({ seed: 11, playerClass: 'druid', autoEquip: true });
-    sim.setPlayerLevel(20);
-    expect(sim.applyTalents({ spec: null, rows: { 11: 'dru_r11_innervate' } })).toBe(true);
-    const p = sim.player;
-    p.resource = 0;
-    p.inCombat = true;
-    p.fiveSecondRule = 0; // no baseline mana regen mixes into the assertion
-    sim.castAbility('innervate');
-    sim.tick();
-    expect(p.auras.some((a) => a.kind === 'resource_sap')).toBe(true);
-    for (let i = 0; i < 20 * 11; i++) {
+    // A mana user now also passively regenerates Spirit mana in combat (the mp5
+    // change), so isolate Lifesap's contribution: run the same in-combat window with
+    // and without the sap and difference them. The v0.29 druid tree moved the
+    // Lifesap unlock to the row 17 pick.
+    const run = (withSap: boolean): { resource: number; cd: number } => {
+      const sim = new Sim({
+        seed: 11,
+        playerClass: 'druid',
+        autoEquip: true,
+        world: EMPTY_TEST_WORLD,
+      });
+      sim.setPlayerLevel(20);
+      expect(
+        sim.applyTalents({ spec: null, rows: { 17: 'dru_r17_survival_of_the_fittest' } }),
+      ).toBe(true);
+      const p = sim.player;
+      p.resource = 0;
+      p.inCombat = true;
       p.fiveSecondRule = 0;
+      if (withSap) sim.castAbility('innervate');
       sim.tick();
-    }
-    // five classic 2-sec ticks inside the 10 sec window
-    expect(p.resource).toBe(100);
-    expect(p.auras.some((a) => a.kind === 'resource_sap')).toBe(false); // expired
-    expect(p.cooldowns.get('innervate')).toBeGreaterThan(60);
+      if (withSap) expect(p.auras.some((a) => a.kind === 'resource_sap')).toBe(true);
+      for (let i = 0; i < 20 * 11; i++) {
+        p.fiveSecondRule = 0;
+        sim.tick();
+      }
+      if (withSap) expect(p.auras.some((a) => a.kind === 'resource_sap')).toBe(false); // expired
+      return { resource: p.resource, cd: p.cooldowns.get('innervate') ?? 0 };
+    };
+    const withSap = run(true);
+    // five classic 2-sec ticks inside the 10 sec window: 5 x 20 = 100 from the sap
+    expect(withSap.resource - run(false).resource).toBe(100);
+    expect(withSap.cd).toBeGreaterThan(60);
   });
 
   it('carries across a form shift and fills Rage in Bruin Form', () => {
-    const sim = new Sim({ seed: 11, playerClass: 'druid', autoEquip: true });
+    const sim = new Sim({
+      seed: 11,
+      playerClass: 'druid',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     sim.setPlayerLevel(20);
-    expect(sim.applyTalents({ spec: null, rows: { 11: 'dru_r11_innervate' } })).toBe(true);
+    expect(sim.applyTalents({ spec: null, rows: { 17: 'dru_r17_survival_of_the_fittest' } })).toBe(
+      true,
+    );
     const p = sim.player;
     sim.castAbility('innervate');
     sim.tick();

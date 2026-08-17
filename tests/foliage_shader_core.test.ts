@@ -136,7 +136,10 @@ describe('foliage shader core', () => {
     expect(
       createHash('sha256').update(canopy.fragmentShader).digest('hex'),
       'exact standard-material canopy fragment output',
-    ).toBe('1670272f361815b3df9bddf0ce4fb727a6cacd1ba24e0f88826ef2945f920427');
+      // Re-minted for three 0.185.1 (upstream standard-fragment chunk content
+      // moved across the r166-r185 window; every anchor above still matches
+      // and the phase 6 shader smoke compiled this shader clean at ultra).
+    ).toBe('ed6ec1277c0d9ee73867aea67772ff7269bac31ded37330a48bcd8f9b8e0b17c');
     expect(sharedMap).not.toContain('#include <emissivemap_fragment>');
     expect(sharedMap).toContain('totalEmissiveRadiance *= sampledDiffuseColor.rgb;');
   });

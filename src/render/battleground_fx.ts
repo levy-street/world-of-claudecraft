@@ -30,19 +30,48 @@ import {
   runeGemPose,
 } from './battleground_fx_core';
 import type { BgObjectRefs } from './battleground_props';
+import { type DashedRingSpec, dashedRingGeometry, paddedOutlineDuty } from './dashed_ring_core';
 import type { Vfx } from './vfx';
 
-// Identity rings: a flat ring at every match player's feet. Custom nameplates
-// make plate color unreliable, so ally-vs-enemy must read from the WORLD; the
-// ring is actionable information and draws on every tier. Colors are
-// RELATIVE, not team-keyed (owner direction): red always means enemy and
-// green always means ally, whatever your team's banner color, because the
-// red-is-hostile convention outranks team identity at a glance. A dark
-// underlay ring sits beneath the color so the mark holds on pale ground.
+// Identity rings: a flat DASHED ring at every match player's feet. Custom
+// nameplates make plate color unreliable, so ally-vs-enemy must read from the
+// WORLD; the ring is actionable information and draws on every tier, ungated by
+// quality (only cosmetic richness may be tier-shed). Colors are RELATIVE, not
+// team-keyed (owner direction): red always means enemy and green always means
+// ally, whatever your team's banner color, because the red-is-hostile
+// convention outranks team identity at a glance. A dark underlay ring sits
+// beneath the color so the mark holds on pale ground.
+//
+// Why DASHED, and thinner than it started: the solid ring at a unit's feet is
+// already taken. renderer.ts draws the target reticle as a solid, pulsing,
+// bloom-boosted annulus, and that is the sole visual language for "this is my
+// target". A second solid red ring under every hostile in the match read as the
+// same signal, so the whole enemy team looked targeted at once. Splitting the
+// identity mark into dashes separates the two by SHAPE, which survives distance,
+// color-vision differences, and bloom in a way a hue or opacity difference does
+// not; the target reticle is left exactly as it was. The geometry math is the
+// pure, Node-tested dashed_ring_core; this module only pools the result.
 export const BG_RING_ALLY = 0x3fd06a;
 export const BG_RING_ENEMY = 0xe8392b;
-const TEAM_RING_INNER = 0.55;
+// Thinner than the old 0.55-to-0.74 annulus, thinned INWARD so the mark keeps
+// its original footprint (players read the ring's outer edge as the unit's
+// ground circle) while the stroke stops competing with the reticle's weight.
+// 0.09 rather than the first pass's 0.12: still legible at fighting distance on
+// every tier, but light enough that the identity mark reads as a hint under the
+// feet instead of a second reticle.
+const TEAM_RING_INNER = 0.65;
 const TEAM_RING_OUTER = 0.74;
+// 12 dashes at a 0.55 duty: each dash is roughly 0.2 yd of arc against a 0.16 yd
+// gap, so it stays comfortably longer than the 0.09 yd stroke is thick (a dash
+// shorter than it is wide reads as a dotted smear) while the gaps are wide
+// enough not to close up into a solid ring at fighting distance.
+export const BG_RING_DASH_SPEC: DashedRingSpec = {
+  inner: TEAM_RING_INNER,
+  outer: TEAM_RING_OUTER,
+  dashes: 12,
+  duty: 0.55,
+  segments: 4,
+};
 const TEAM_RING_OPACITY = 0.95;
 const RING_UNDERLAY_PAD = 0.035; // a thin dark outline, not a fat rim (playtest note)
 const RING_UNDERLAY_OPACITY = 0.4;
@@ -54,6 +83,18 @@ const PICKUP_WHITE = 0xffffff;
 // Burst anchor scratch: fireworkBurst reads at.x/y/z synchronously and keeps
 // no reference, so one module-level vector serves every transition frame.
 const tmpV = new THREE.Vector3();
+
+// The one Three-side step the pure core leaves: wrap its arrays in a geometry.
+// Position + index only; a MeshBasicMaterial with no map needs no normals or
+// uvs, and the ring lies in the XY plane exactly like the RingGeometry it
+// replaced, so the caller's rotation.x = -PI/2 is unchanged.
+function dashedGeometry(spec: DashedRingSpec): THREE.BufferGeometry {
+  const { positions, indices } = dashedRingGeometry(spec);
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geo.setIndex(new THREE.BufferAttribute(indices, 1));
+  return geo;
+}
 
 interface ViewLike {
   group: THREE.Group;
@@ -85,8 +126,8 @@ export class BattlegroundFx {
   /** Scratch for the ring pass's "still on the roster" set. Reused and cleared
    *  per frame: a fresh Set every frame is garbage on the render hot path. */
   private ringSeen = new Set<number>();
-  private ringGeo: THREE.RingGeometry | null = null;
-  private ringUnderlayGeo: THREE.RingGeometry | null = null;
+  private ringGeo: THREE.BufferGeometry | null = null;
+  private ringUnderlayGeo: THREE.BufferGeometry | null = null;
   private ringMats: {
     ally: THREE.MeshBasicMaterial;
     enemy: THREE.MeshBasicMaterial;
@@ -131,7 +172,6 @@ export class BattlegroundFx {
       if (!flag) continue;
       seen[bg.team] = true;
       const carried = flag.state === 'carried';
-      bg.ring.visible = carried;
       const prev = this.tracks[bg.team];
       let yaw = 0;
       if (carried) {
@@ -278,18 +318,29 @@ export class BattlegroundFx {
     this.teamRings.clear();
   }
 
-  private ringGeometry(): THREE.RingGeometry {
-    if (!this.ringGeo) this.ringGeo = new THREE.RingGeometry(TEAM_RING_INNER, TEAM_RING_OUTER, 36);
+  private ringGeometry(): THREE.BufferGeometry {
+    if (!this.ringGeo) this.ringGeo = dashedGeometry(BG_RING_DASH_SPEC);
     return this.ringGeo;
   }
 
-  private ringUnderlayGeometry(): THREE.RingGeometry {
+  // The underlay is dashed TOO, on the same cadence: a solid dark ring behind
+  // the dashes would put the very silhouette back that the dashes remove, and
+  // the mark would read as a targeted unit again from any distance where the
+  // color layer thins out. It is padded on all four sides (both radii and both
+  // dash ends), so every dash gets a full dark rim instead of meeting bare
+  // ground where it is thinnest.
+  private ringUnderlayGeometry(): THREE.BufferGeometry {
     if (!this.ringUnderlayGeo) {
-      this.ringUnderlayGeo = new THREE.RingGeometry(
-        TEAM_RING_INNER - RING_UNDERLAY_PAD,
-        TEAM_RING_OUTER + RING_UNDERLAY_PAD,
-        36,
-      );
+      const duty = paddedOutlineDuty(BG_RING_DASH_SPEC, RING_UNDERLAY_PAD);
+      const cell = (Math.PI * 2) / BG_RING_DASH_SPEC.dashes;
+      this.ringUnderlayGeo = dashedGeometry({
+        ...BG_RING_DASH_SPEC,
+        inner: TEAM_RING_INNER - RING_UNDERLAY_PAD,
+        outer: TEAM_RING_OUTER + RING_UNDERLAY_PAD,
+        duty,
+        // Re-center the widened dash on the color dash it backs.
+        phase: -((duty - BG_RING_DASH_SPEC.duty) * cell) / 2,
+      });
     }
     return this.ringUnderlayGeo;
   }

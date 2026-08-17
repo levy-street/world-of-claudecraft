@@ -500,8 +500,8 @@ export function yumiCatDamaged(
   ability: string | null,
   kind: DamageEventKind,
   attackAnimationStarted = false,
-): void {
-  if (match.state !== 'active' || cat.dead) return;
+): number {
+  if (match.state !== 'active' || cat.dead) return 0;
   const y = yumiState(match);
   let dmg = Math.round(amount * yumiTakenMult(match.timer));
   dmg = Math.min(dmg, cat.hp);
@@ -522,6 +522,7 @@ export function yumiCatDamaged(
   });
   if (source && source.id !== cat.id) ctx.enterCombat(source, cat);
   if (cat.hp <= 0) killYumiCat(ctx, match, cat, source);
+  return dmg;
 }
 
 // Bench a downed fighter for the flat timer (reuses fiesta's clean-bench

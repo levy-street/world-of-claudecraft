@@ -33,19 +33,19 @@ export const table: DeedLocaleTable = {
     desc: 'Bir Yarık portalının oluşturabileceği en zor kademe olan S dereceli bir Yarığı temizle.',
   },
   pvp_honor_sergeant: {
-    name: 'Çavuş',
+    name: 'Saf Kıran',
     desc: 'Ömrün boyunca 10.000 onur kazan. Onu harcamak rütbeni asla kaybettirmez.',
-    title: 'Çavuş',
+    title: 'Saf Kıran',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Şövalye-Teğmen',
+    name: 'Meydan Yağmacısı',
     desc: 'Ömrün boyunca 40.000 onur kazan, arkanda gerçek bir savaş mevsimi bırak.',
-    title: 'Şövalye-Teğmen',
+    title: 'Meydan Yağmacısı',
   },
   pvp_honor_field_marshal: {
-    name: 'Saha Mareşali',
+    name: 'Savaş Taçlısı',
     desc: 'Ömrün boyunca 150.000 onur kazan. Herhangi bir diyarda nadirdir, ve öyle de olmalı.',
-    title: 'Saha Mareşali',
+    title: 'Savaş Taçlısı',
   },
   chr_drakemaw_broodlord: {
     name: 'Kuluçka Kırıcı',
@@ -943,5 +943,49 @@ export const table: DeedLocaleTable = {
   prog_armorcrafting_rare: {
     name: 'Kusursuza Kaplandı',
     desc: 'Zırh Yapımında ilk ender eşyanı işle.',
+  },
+  col_reliquary_rank_2: {
+    name: 'Ganimet Bekçisi',
+    desc: "Yadigârlık'ta Küratör derecesi 2'ye ulaş (10 benzersiz kataloglanmış yadigâr).",
+    title: 'Ganimet Bekçisi',
+  },
+  col_reliquary_rank_3: {
+    name: 'Kataloglayan',
+    desc: "Yadigârlık'ta Küratör derecesi 3'e ulaş (25 benzersiz kataloglanmış yadigâr).",
+    title: 'Kataloglayan',
+  },
+  col_reliquary_rank_4: {
+    name: 'Baş Küratör',
+    desc: "Yadigârlık'ta Küratör derecesi 4'e ulaş (50 benzersiz kataloglanmış yadigâr).",
+    title: 'Baş Küratör',
+  },
+  col_reliquary_rank_5: {
+    name: 'Ebedi Ganimet',
+    desc: "Yadigârlık'ta Küratör derecesi 5'e ulaş (100 benzersiz kataloglanmış yadigâr).",
+  },
+  col_reliquary_complete: {
+    name: 'Ulu Yadigârlık',
+    desc: "Yadigârlık'ta bir karakterin saklayabileceği her yadigârı kataloğa geçir. Kataloğun sonradan büyümesi bunu senden asla geri almaz.",
+    title: 'Hazine Küratörü',
+  },
+  col_reliquary_conquerors: {
+    name: 'Fatihler Rafı',
+    desc: "Yadigârlık'ın Fatihler rafındaki her yadigârı kataloğa geçir. Kataloğun sonradan büyümesi bunu senden asla geri almaz.",
+    title: 'Hazine Kıran',
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    name: 'Nythraxis Tezhiplendi',
+    desc: "Yadigârlık'ın Kahramanca: Nythraxis Baskını sayfasını tezhiple.",
+    title: 'Nythraxis Işığı',
+  },
+  col_reliquary_illum_thunzharr: {
+    name: 'Thunzharr Tezhiplendi',
+    desc: "Yadigârlık'ın Thunzharr, Uyanan Zirve sayfasını tezhiple.",
+    title: 'Thunzharr Işığı',
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    name: 'Mabet Tezhiplendi',
+    desc: "Yadigârlık'ın Kahramanca: Mezarejderi Mabedi sayfasını tezhiple.",
+    title: 'Mabedin Işığı',
   },
 };

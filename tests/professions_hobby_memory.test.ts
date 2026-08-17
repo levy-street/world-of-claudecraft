@@ -25,6 +25,7 @@ import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import type { QuestDef, QuestProgress } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // The Smith pair and its two hobby candidates (the crafts opposite its majors).
 const PAIR = 'weaponcrafting+armorcrafting';
@@ -38,7 +39,7 @@ const AWAY_PAIR = 'alchemy+cooking';
 const NON_CANDIDATE = 'cooking';
 
 function makeSim(seed = 7311): Sim {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: true });
+  return new Sim({ seed, playerClass: 'warrior', autoEquip: true, world: EMPTY_TEST_WORLD });
 }
 
 function ctxOf(sim: Sim): SimContext {

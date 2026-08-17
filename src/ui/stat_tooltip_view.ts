@@ -58,6 +58,7 @@ export function statEffectText(e: StatEffect, deps: StatTooltipI18n): string {
     case 'maxMana':
     case 'healthRegen':
     case 'manaRegen':
+    case 'manaRegenCombat':
       return deps.t(key, { value: int0(deps, e.value) });
     case 'critPct':
     case 'dodgePct':

@@ -217,7 +217,7 @@ function castForClass(bot) {
     case 'paladin':
       if (!(bot.self?.auras ?? []).some((a) => a.kind === 'imbue'))
         return shouldCast(bot, 'seal_of_righteousness', 0, 2_000);
-      return shouldCast(bot, 'judgement', 30, 1_000);
+      return shouldCast(bot, 'hammer_of_grace', 0, 1_000);
     case 'hunter':
       return shouldCast(bot, 'arcane_shot', 25, 1_200);
     case 'rogue':

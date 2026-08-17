@@ -534,14 +534,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     // pulseGroundAoE hit >=2 distinct in-radius targets (rng.range once per target).
     const aoeMobIds = rec.notes.aoeMobIds as number[];
     const consTargets = new Set(
-      ev
-        .filter(
-          (e) =>
-            e.type === 'damage' &&
-            typeof e.ability === 'string' &&
-            e.ability.toLowerCase().includes('holy ground'),
-        )
-        .map((e) => e.targetId),
+      ev.filter((e) => e.type === 'damage' && e.ability === 'Holy Ground').map((e) => e.targetId),
     );
     expect(aoeMobIds.filter((id) => consTargets.has(id)).length).toBeGreaterThanOrEqual(2);
   });

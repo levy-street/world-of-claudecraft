@@ -32,8 +32,17 @@
 
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import {
+  copyFileSync,
+  existsSync,
+  linkSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const SEMVER_RE = /^\d+\.\d+\.\d+$/;
@@ -41,6 +50,61 @@ const SEMVER_RE = /^\d+\.\d+\.\d+$/;
 /** The versioned, immutable artifact name for one published web bundle. */
 export function bundleFileName(version) {
   return `wocc-web-${version}.zip`;
+}
+
+/** The versioned, immutable per-file manifest document for one bundle. */
+export function manifestFileName(version) {
+  return `wocc-web-${version}.manifest.json`;
+}
+
+const FILE_HASH_RE = /^[0-9a-f]{64}$/;
+
+/**
+ * Build the per-file delta manifest the Capgo plugin consumes off the update
+ * check: one { file_name, file_hash, download_url } entry per dist file, with
+ * blobs content-addressed under <prefix>/files/<sha256> so an unchanged file
+ * is never re-uploaded or re-downloaded across versions (the device also
+ * reuses files already inside the store binary by the same hash). Pure and
+ * strict: throws on anything the server-side entry validation
+ * (server/ota_updates.ts normalizeOtaFileManifest) would reject, so a bad
+ * publish fails here instead of shipping a manifest the endpoint drops.
+ */
+export function buildManifestEntries({ files, publicBaseUrl, prefix }) {
+  const base = String(publicBaseUrl ?? '').replace(/\/+$/, '');
+  if (!base.startsWith('https://')) {
+    throw new Error('ota publish: OTA_PUBLIC_BASE_URL must be an https:// origin');
+  }
+  const cleanPrefix = String(prefix ?? 'ota').replace(/^\/+|\/+$/g, '');
+  const keyPrefix = cleanPrefix ? `${cleanPrefix}/` : '';
+  if (!Array.isArray(files) || files.length === 0) {
+    throw new Error('ota publish: file manifest needs at least one file');
+  }
+  const entries = files.map(({ path, sha256 }) => {
+    const name = String(path ?? '');
+    const segments = name.split('/');
+    const badSegment = segments.some((s) => s === '' || s === '.' || s === '..');
+    // Mirrors the server's entry validation (normalizeOtaFileManifest),
+    // including its control-char and '%' rejection: a dist file the endpoint
+    // would refuse must fail the publish loudly, not ship a manifest the
+    // server silently drops to zip-only.
+    const badChar = [...name].some((ch) => {
+      const c = ch.charCodeAt(0);
+      return c < 0x20 || c === 0x7f || ch === '%' || ch === '\\';
+    });
+    if (!name || badChar || badSegment) {
+      throw new Error(`ota publish: unsafe manifest path ${JSON.stringify(name)}`);
+    }
+    const hash = String(sha256 ?? '').toLowerCase();
+    if (!FILE_HASH_RE.test(hash)) {
+      throw new Error(`ota publish: ${name} needs a sha256 hex file hash, got ${sha256}`);
+    }
+    return {
+      file_name: name,
+      file_hash: hash,
+      download_url: `${base}/${keyPrefix}files/${hash}`,
+    };
+  });
+  return entries.sort((a, b) => (a.file_name < b.file_name ? -1 : 1));
 }
 
 /**
@@ -106,6 +170,7 @@ export function planOtaPublish({
   checksum,
   minNative,
   builtAt,
+  withFileManifest,
 }) {
   if (!SEMVER_RE.test(String(version ?? ''))) {
     throw new Error(`ota publish: version must be MAJOR.MINOR.PATCH, got ${version}`);
@@ -122,16 +187,27 @@ export function planOtaPublish({
   const keyPrefix = cleanPrefix ? `${cleanPrefix}/` : '';
   const bundleKey = `${keyPrefix}bundles/${bundleFileName(version)}`;
   const manifestKey = `${keyPrefix}latest.json`;
+  // The per-version delta artifacts (see buildManifestEntries): the immutable
+  // file-manifest document and the content-addressed blob prefix its entries
+  // point into. latest.json only advertises the document when this publish
+  // (or the rollback target) actually has one, so pre-delta versions keep
+  // serving zip-only offers.
+  const fileManifestKey = `${keyPrefix}manifests/${manifestFileName(version)}`;
+  const filesKeyPrefix = `${keyPrefix}files/`;
   const manifest = { version, url: `${base}/${bundleKey}` };
   if (checksum) manifest.checksum = checksum;
+  if (withFileManifest) manifest.fileManifestUrl = `${base}/${fileManifestKey}`;
   if (minNative) manifest.minNativeVersion = minNative;
   if (builtAt) manifest.builtAt = builtAt;
   return {
     bucket,
     bundleKey,
     manifestKey,
+    fileManifestKey,
+    filesKeyPrefix,
     bundleUrl: manifest.url,
     manifestUrl: `${base}/${manifestKey}`,
+    fileManifestUrl: `${base}/${fileManifestKey}`,
     manifest,
   };
 }
@@ -163,6 +239,64 @@ function s3ObjectExists(bucket, key, endpointArgs) {
 
 function sha256Of(path) {
   return createHash('sha256').update(readFileSync(path)).digest('hex');
+}
+
+/** Every file under dist/, as sorted posix-relative paths (the WebView paths). */
+function collectDistFiles(dir, prefix = '') {
+  const files = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const rel = prefix ? `${prefix}/${entry.name}` : entry.name;
+    if (entry.isDirectory()) files.push(...collectDistFiles(join(dir, entry.name), rel));
+    else if (entry.isFile()) files.push(rel);
+  }
+  return files.sort();
+}
+
+/**
+ * Stage the content-addressed blobs for one publish: dist-ota/files/<sha256>
+ * per unique hash (hardlinked when the volume allows, copied otherwise), so
+ * one `aws s3 sync` uploads exactly the blobs the bucket does not have yet.
+ */
+function stageManifestBlobs(distDir, files, stagingDir) {
+  rmSync(stagingDir, { recursive: true, force: true });
+  mkdirSync(stagingDir, { recursive: true });
+  const staged = new Set();
+  for (const { path, sha256 } of files) {
+    if (staged.has(sha256)) continue;
+    staged.add(sha256);
+    const source = join(distDir, path);
+    const target = join(stagingDir, sha256);
+    try {
+      linkSync(source, target);
+    } catch {
+      copyFileSync(source, target);
+    }
+  }
+  return staged.size;
+}
+
+function syncDir(localDir, bucket, keyPrefix, cacheControl, endpointArgs, dryRun) {
+  const dest = `s3://${bucket}/${keyPrefix.replace(/\/+$/, '')}`;
+  // --size-only: the keys are content hashes, so an existing key IS the same
+  // bytes and mtime drift must never force a re-upload of the whole set.
+  const cmdArgs = [
+    's3',
+    'sync',
+    localDir,
+    dest,
+    '--size-only',
+    '--content-type',
+    'application/octet-stream',
+    '--cache-control',
+    cacheControl,
+    ...endpointArgs,
+  ];
+  if (dryRun) {
+    const shown = cmdArgs.map((a) => (a.includes(' ') ? `'${a}'` : a)).join(' ');
+    console.log(`[dry-run] aws ${shown}`);
+    return;
+  }
+  run('aws', cmdArgs);
 }
 
 function uploadFile(localPath, bucket, key, contentType, cacheControl, endpointArgs, dryRun) {
@@ -200,11 +334,17 @@ function main() {
 
   mkdirSync(outDir, { recursive: true });
   const zipPath = resolve(outDir, bundleFileName(version));
+  const distDir = resolve(root, 'dist');
+  const blobStagingDir = resolve(outDir, 'files');
 
   let checksum;
+  let manifestEntries = null;
   if (args.rollback) {
     // Rollback: the zip must already be published; download it to re-derive
-    // the checksum the re-pointed manifest advertises.
+    // the checksum the re-pointed manifest advertises. The per-file manifest
+    // document is immutable per version too, so re-pointing needs only an
+    // existence probe: present means the delta channel rolls back with the
+    // zip; absent (a pre-delta version) means the offer degrades to zip-only.
     const probe = planOtaPublish({ version, bucket, prefix, publicBaseUrl, minNative });
     if (!s3ObjectExists(bucket, probe.bundleKey, endpointArgs)) {
       throw new Error(`ota publish: rollback target ${probe.bundleKey} does not exist`);
@@ -218,14 +358,30 @@ function main() {
       // embed: the NATIVE build (VITE_NATIVE_APP=1), never the plain web one.
       run('npm', ['run', 'build:native'], { cwd: root });
     }
-    if (!existsSync(resolve(root, 'dist', 'index.html'))) {
+    if (!existsSync(resolve(distDir, 'index.html'))) {
       throw new Error('ota publish: dist/index.html missing; run npm run build:native first');
     }
     rmSync(zipPath, { force: true });
-    run('zip', ['-qr', zipPath, '.'], { cwd: resolve(root, 'dist') });
+    run('zip', ['-qr', zipPath, '.'], { cwd: distDir });
     checksum = sha256Of(zipPath);
+    // The delta channel: hash every dist file for the per-file manifest and
+    // stage the content-addressed blobs the entries point at.
+    const files = collectDistFiles(distDir).map((path) => ({
+      path,
+      sha256: sha256Of(join(distDir, path)),
+    }));
+    manifestEntries = buildManifestEntries({ files, publicBaseUrl, prefix });
+    const stagedCount = stageManifestBlobs(distDir, files, blobStagingDir);
+    console.log(`ota publish: ${files.length} files, ${stagedCount} unique blobs staged`);
   }
 
+  const rollbackHasFileManifest =
+    args.rollback !== null &&
+    s3ObjectExists(
+      bucket,
+      planOtaPublish({ version, bucket, prefix, publicBaseUrl, minNative }).fileManifestKey,
+      endpointArgs,
+    );
   const plan = planOtaPublish({
     version,
     bucket,
@@ -234,6 +390,7 @@ function main() {
     checksum,
     minNative,
     builtAt: new Date().toISOString(),
+    withFileManifest: manifestEntries !== null || rollbackHasFileManifest,
   });
 
   if (!args.rollback) {
@@ -242,6 +399,32 @@ function main() {
         `ota publish: ${plan.bundleKey} already exists; bump the version or pass --force`,
       );
     }
+    if (s3ObjectExists(bucket, plan.fileManifestKey, endpointArgs) && !args.force) {
+      throw new Error(
+        `ota publish: ${plan.fileManifestKey} already exists; bump the version or pass --force`,
+      );
+    }
+    // Blobs first, then the documents that reference them: a check that races
+    // a publish must never be offered a manifest whose blobs are not up yet.
+    syncDir(
+      blobStagingDir,
+      bucket,
+      plan.filesKeyPrefix,
+      'public, max-age=31536000, immutable',
+      endpointArgs,
+      args.dryRun,
+    );
+    const fileManifestPath = resolve(outDir, manifestFileName(version));
+    writeFileSync(fileManifestPath, `${JSON.stringify(manifestEntries)}\n`);
+    uploadFile(
+      fileManifestPath,
+      bucket,
+      plan.fileManifestKey,
+      'application/json',
+      'public, max-age=31536000, immutable',
+      endpointArgs,
+      args.dryRun,
+    );
     uploadFile(
       zipPath,
       bucket,
@@ -268,6 +451,8 @@ function main() {
   console.log(`\nota publish: ${args.rollback ? 'rolled back to' : 'published'} ${version}`);
   console.log(`  bundle:   ${plan.bundleUrl}`);
   console.log(`  manifest: ${plan.manifestUrl}`);
+  if (plan.manifest.fileManifestUrl) console.log(`  delta:    ${plan.manifest.fileManifestUrl}`);
+  else console.log('  delta:    none (zip-only offer)');
   console.log(`  checksum: ${checksum}`);
   console.log('\nVerify the live manifest:');
   console.log(`  curl -s ${plan.manifestUrl}`);

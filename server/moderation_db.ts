@@ -3,6 +3,14 @@ import {
   STREAMER_PLATFORMS,
   type StreamerLinks,
 } from '../src/sim/account_flair';
+// The ONE clamp for a mark's played-second budget, shared with the sim so the
+// route, the database, and the countdown cannot disagree about what is in range.
+import { normalizeCheaterMarkSeconds } from '../src/sim/moderation';
+// The mark's refusal vocabulary. A machine token, never an English sentence:
+// `server/` is language-agnostic, so the admin route has to be able to turn a
+// refused write into a stable error code without parsing prose. The module is a
+// pure leaf (schemas + codes, no db), so importing it here adds no cycle.
+import { CheaterMarkRefused } from './cheater_mark_api';
 import { pool } from './db';
 
 export const REPORT_REASONS = [
@@ -13,7 +21,6 @@ export const REPORT_REASONS = [
   'other',
 ] as const;
 export type ReportReason = (typeof REPORT_REASONS)[number];
-export type ModerationAction = 'ignore' | 'kick' | 'kill' | 'suspend' | 'ban' | 'unban';
 
 // The closed set of values ever written to account_moderation_actions.action. The
 // column is free-text in SQL, so this const is the single source of truth: every
@@ -42,6 +49,10 @@ export const MODERATION_ACTIONS = [
   'daily_rewards_ip_unban',
   'reactivate',
   'chat_strikes_reset',
+  // Account-scoped General-only quota policy change. The quota DB module owns
+  // the surrounding transaction because its before/after JSON and NOTIFY must
+  // commit atomically with the policy row.
+  'general_chat_rate_limit',
   // Account flair. Not punitive (they grant a cosmetic mark, they do not sanction),
   // so unlike every action above they take an OPTIONAL reason. Audited all the same:
   // the AI mark and a streamer's links are visible to every player, so who set them
@@ -53,6 +64,13 @@ export const MODERATION_ACTIONS = [
   // folded into the stored reason text.
   'restore_item',
   'restore_slot',
+  // The Cheater mark (src/sim/moderation/). Punitive and visible to every player
+  // in range, so the reason is REQUIRED on both arms: who branded an account, for
+  // how long, and why has to be recoverable long after the tag has worn off.
+  // Only the operator arms are audited; the sim burning the budget down is a
+  // tick, not a decision, and would otherwise write an audit row per save.
+  'cheater_mark',
+  'cheater_mark_lift',
 ] as const;
 export type ModerationActionKind = (typeof MODERATION_ACTIONS)[number];
 
@@ -405,7 +423,37 @@ export async function ignoreReport(
      WHERE id = $1 AND status = 'open'`,
     [reportId, adminAccountId, cleanText(note, ACTION_REASON_MAX)],
   );
-  return (res.rowCount ?? 0) > 0;
+  const changed = (res.rowCount ?? 0) > 0;
+  if (changed) fireOnModerationQueueChanged();
+  return changed;
+}
+
+// Batched retention prune for player_reports (the retention-sweep primitive,
+// mirrors pruneUnstuckReportsBatch in unstuck_db.ts). An open report is NEVER
+// touched no matter how old: moderationQueue and moderationReportsForAccount
+// above both read WHERE status = 'open' exclusively, so a report the queue
+// still surfaces would silently vanish from the admin view if the age cutoff
+// alone governed the delete. Only a resolved report ('ignored' or 'actioned')
+// ages out. retentionDays <= 0 keeps rows forever (the safe default for a
+// destructive delete); the interval floors to one whole day so a sub-day
+// setting can never reach today's rows.
+export async function prunePlayerReportsBatch(
+  retentionDays: number,
+  batchSize: number,
+): Promise<number> {
+  if (!Number.isFinite(retentionDays) || retentionDays <= 0) return 0;
+  const days = Math.max(1, Math.floor(retentionDays));
+  const res = await pool.query(
+    `DELETE FROM player_reports
+      WHERE id IN (
+        SELECT id FROM player_reports
+         WHERE status != 'open'
+           AND created_at < now() - ($1::int * INTERVAL '1 day')
+         ORDER BY created_at ASC, id ASC
+         LIMIT $2)`,
+    [days, Math.max(1, Math.floor(batchSize))],
+  );
+  return res.rowCount ?? 0;
 }
 
 // Fired after every SUCCESSFUL moderateAccount commit, of ANY action kind,
@@ -434,6 +482,35 @@ function fireOnAccountModerated(): void {
     onAccountModerated?.();
   } catch (err) {
     console.error('post-moderation hook failed:', err);
+  }
+}
+
+// Fired after any successful write that changes what moderationQueue would
+// return: moderateAccount and muteAccountChat (both resolve any open reports
+// on the target account, and moderateAccount also sets banned_at/
+// suspended_until) and ignoreReport (resolves the one report it targets).
+// Kept separate from onAccountModerated above: that hook's board caches are
+// unrelated to the moderation queue, and ignoreReport/muteAccountChat have no
+// reason to bust boards. Injected at boot by main.ts (bustModerationQueueCache,
+// server/moderation_queue_cache.ts). Hooking the writes themselves, not one
+// route, covers both admin dispatch arms AND the in-game GM sanctions
+// (server/game.ts ModerationService), which call moderateAccount/
+// muteAccountChat directly.
+let onModerationQueueChanged: (() => void) | null = null;
+
+/** Inject (or clear) the post-write moderation-queue-cache-bust hook (boot-only). */
+export function setOnModerationQueueChanged(hook: (() => void) | null): void {
+  onModerationQueueChanged = hook;
+}
+
+// Mirrors fireOnAccountModerated: fires only after a successful commit, outside
+// any transaction path, and swallows its own errors so a bust failure never
+// surfaces as a failed moderation action.
+function fireOnModerationQueueChanged(): void {
+  try {
+    onModerationQueueChanged?.();
+  } catch (err) {
+    console.error('post-moderation-queue-change hook failed:', err);
   }
 }
 
@@ -522,6 +599,7 @@ export async function moderateAccount(input: {
     client.release();
   }
   fireOnAccountModerated();
+  fireOnModerationQueueChanged();
 }
 
 export async function muteAccountChat(input: {
@@ -569,6 +647,135 @@ export async function muteAccountChat(input: {
   } finally {
     client.release();
   }
+  fireOnModerationQueueChanged();
+}
+
+/**
+ * Apply or re-length the Cheater mark: `seconds` of PLAYED time the account owes
+ * before the tag lifts. Re-applying replaces the budget rather than adding to
+ * it, so an operator correcting a fat-fingered duration sets the value they
+ * meant instead of having to lift and re-apply.
+ *
+ * Validated here rather than at the route so the ceiling holds for every caller.
+ *
+ * Returns the budget the row now holds, read back by the UPDATE itself. Callers
+ * must use THAT rather than a follow-up SELECT: the unaudited save-path burn
+ * below is guarded only by `cheater_mark_seconds > 0`, so it can land between
+ * this COMMIT and any second read and hand the caller the OLD remaining while
+ * this write reported success.
+ */
+export async function setAccountCheaterMark(input: {
+  accountId: number;
+  adminAccountId: number;
+  reason: unknown;
+  seconds: unknown;
+}): Promise<number> {
+  const reason = cleanText(input.reason, ACTION_REASON_MAX);
+  if (!reason) throw new CheaterMarkRefused('reason_required');
+  const seconds = normalizeCheaterMarkSeconds(input.seconds);
+  if (seconds <= 0) throw new CheaterMarkRefused('invalid_duration');
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const updated = await client.query<{ cheater_mark_seconds: number }>(
+      `UPDATE accounts
+       SET cheater_mark_seconds = $2, cheater_mark_reason = $3, cheater_mark_set_at = now()
+       WHERE id = $1
+       RETURNING cheater_mark_seconds`,
+      [input.accountId, seconds, reason],
+    );
+    const stored = updated.rows[0]?.cheater_mark_seconds;
+    // Mirrors the lift arm's rowCount check, and for the same reason: an audit
+    // row saying an account was branded, written when the UPDATE matched
+    // nothing, is a false entry in a permanent record. Refusing BEFORE
+    // recordModerationAction is what keeps it out, since the throw rolls the
+    // transaction back.
+    //
+    // A mistyped or purged account id really does reach here from the admin
+    // route: requireAdminTarget only decodes the :id into a positive integer,
+    // and the operator-target guard's isAdminAccount read answers false for an
+    // id with no row. So this is a coded refusal an operator can act on, not an
+    // opaque 500.
+    if ((updated.rowCount ?? 0) === 0 || stored === undefined) {
+      throw new CheaterMarkRefused('no_account');
+    }
+    await recordModerationAction(client, 'cheater_mark', {
+      accountId: input.accountId,
+      adminAccountId: input.adminAccountId,
+      reason,
+    });
+    await client.query('COMMIT');
+    return normalizeCheaterMarkSeconds(stored);
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+/** Clear a live Cheater mark early. Refuses when the account is not marked, so a
+ *  double-click cannot write an audit row claiming a sanction was lifted twice. */
+export async function liftAccountCheaterMark(input: {
+  accountId: number;
+  adminAccountId: number;
+  reason: unknown;
+}): Promise<void> {
+  const reason = cleanText(input.reason, ACTION_REASON_MAX);
+  if (!reason) throw new CheaterMarkRefused('reason_required');
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const updated = await client.query(
+      `UPDATE accounts
+       SET cheater_mark_seconds = 0, cheater_mark_reason = NULL, cheater_mark_set_at = NULL
+       WHERE id = $1 AND cheater_mark_seconds > 0`,
+      [input.accountId],
+    );
+    if ((updated.rowCount ?? 0) === 0) throw new CheaterMarkRefused('not_marked');
+    await recordModerationAction(client, 'cheater_mark_lift', {
+      accountId: input.accountId,
+      adminAccountId: input.adminAccountId,
+      reason,
+    });
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+/** The remaining played-second budget, 0 when unmarked. Read at world join. */
+export async function accountCheaterMarkSeconds(accountId: number): Promise<number> {
+  const res = await pool.query<{ cheater_mark_seconds: number }>(
+    'SELECT cheater_mark_seconds FROM accounts WHERE id = $1',
+    [accountId],
+  );
+  return normalizeCheaterMarkSeconds(res.rows[0]?.cheater_mark_seconds);
+}
+
+/**
+ * Write the sim's remaining budget back to the account (the session save path).
+ *
+ * NOT audited and NOT an operator action: this is the countdown ticking, so an
+ * audit row per save would bury the two decisions that matter under thousands of
+ * mechanical ones. The `> 0` guard keeps an unmarked account's row untouched, so
+ * the common case costs zero writes.
+ */
+export async function burnAccountCheaterMark(
+  accountId: number,
+  secondsRemaining: number,
+): Promise<void> {
+  await pool.query(
+    `UPDATE accounts
+     SET cheater_mark_seconds = $2,
+         cheater_mark_reason = CASE WHEN $2 = 0 THEN NULL ELSE cheater_mark_reason END,
+         cheater_mark_set_at = CASE WHEN $2 = 0 THEN NULL ELSE cheater_mark_set_at END
+     WHERE id = $1 AND cheater_mark_seconds > 0`,
+    [accountId, normalizeCheaterMarkSeconds(secondsRemaining)],
+  );
 }
 
 export async function liftAccountChatMute(input: {

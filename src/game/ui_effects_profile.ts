@@ -58,12 +58,23 @@ export const EFFECTS_QUALITY_LOW_CUTOFF = 0.5;
 
 /** The loading curtain's normal opacity duration, also mirrored in shell.css. */
 export const LOADING_CURTAIN_FADE_MS = 350;
+export const WORLD_ENTRY_GPU_SETTLE_COVER_MS = 1800;
 
 /** Reduced motion removes the curtain synchronously instead of waiting on a visual fade. */
 export function loadingCurtainFadeMs(reduceMotion: boolean): number {
   return reduceMotion ? 0 : LOADING_CURTAIN_FADE_MS;
 }
 
+export function worldEntryGpuSettleCoverMs(input: {
+  adaptiveBudget: boolean;
+  constrainedMemory: boolean;
+  online: boolean;
+}): number {
+  // An online character is already live on the authoritative server. Do not
+  // hold movement behind a cosmetic GPU-settle cover after the first frame.
+  if (input.online) return 0;
+  return input.adaptiveBudget && !input.constrainedMemory ? WORLD_ENTRY_GPU_SETTLE_COVER_MS : 0;
+}
 /**
  * Resolve the UI effects profile from the static preset label, the effectsQuality
  * slider, and the effective reduced-motion flag. Pure: same input always yields the

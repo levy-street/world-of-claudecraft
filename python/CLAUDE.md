@@ -21,9 +21,9 @@ defined by `headless/env_server.ts`; these are two halves of one wire format, so
   queried spaces over any prose or docstring):
   - `observation_space = Box(-2.0, 2.0, shape=(obs_size,), float32)`
   - `action_space = Discrete(num_actions)`; `action_names` = the `ACTIONS` list.
-- `reset(seed=...)`/`step(action)` return the Gymnasium 5-tuple
-  (`obs, reward, terminated, truncated, info`); `obs` is `np.float32`.
-  `close()` sends `{"cmd":"close"}` then waits/kills the proc.
+- Gymnasium API shapes: `reset(seed=...)` returns the 2-tuple (`obs, info`);
+  `step(action)` returns the 5-tuple (`obs, reward, terminated, truncated, info`);
+  `obs` is `np.float32`. `close()` sends `{"cmd":"close"}` then waits/kills the proc.
 
 ## New behavior lands TS-side
 A new action, obs field, or command is a `src/sim/obs.ts` / `headless/` change

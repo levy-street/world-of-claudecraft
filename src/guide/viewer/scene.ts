@@ -24,7 +24,9 @@ export class ModelViewer {
   private readonly scene = new THREE.Scene();
   private readonly camera: THREE.PerspectiveCamera;
   private readonly turntable = new THREE.Group();
-  private readonly clock = new THREE.Clock();
+  // THREE.Timer, not the r183-deprecated Clock: update() once per frame, then
+  // getDelta(); the 0.1 cap already bounds any backgrounded-tab span.
+  private readonly timer = new THREE.Timer();
   private readonly reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   private readonly teardown: Array<() => void> = [];
 
@@ -293,7 +295,8 @@ export class ModelViewer {
       return;
     }
     this.raf = requestAnimationFrame(this.animate);
-    const dt = Math.min(this.clock.getDelta(), 0.1);
+    this.timer.update();
+    const dt = Math.min(this.timer.getDelta(), 0.1);
     if (!this.reduceMotion.matches && !this.dragging) this.rotateBy(AUTO_SPIN * dt);
     this.built?.mixer?.update(dt);
     if (this.onscreen) this.renderer.render(this.scene, this.camera);

@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { MapMarkerInteractionController } from '../src/ui/hud/map';
+import type { MapGatherNodeMarker } from '../src/ui/map_window_view';
 import { installWindowDrag, isWindowDragPreviewMutation } from '../src/ui/window_drag';
 import { draggedWindowPosition } from '../src/ui/window_drag_core';
 import { stackedWindowsVisible } from '../src/ui/window_stack_state_core';
@@ -72,7 +74,11 @@ describe('draggedWindowPosition', () => {
 
 // Fake DOM harness covering the event-driven drag contract without adding jsdom.
 describe('installWindowDrag', () => {
-  const setup = (options?: { elId?: string; isDragHandle?: () => boolean }) => {
+  const setup = (options?: {
+    elId?: string;
+    isDragHandle?: () => boolean;
+    onCommit?(el: HTMLElement, left: number, top: number, rect: DOMRect): void;
+  }) => {
     const windowClasses = new Set(['window', 'panel']);
     const bodyClasses = new Set<string>();
     let rectReads = 0;
@@ -154,8 +160,10 @@ describe('installWindowDrag', () => {
         target.style.top = '80px';
         target.style.transform = 'none';
       },
-      commitWindow: (_target, left, top, finalRect) =>
-        commits.push({ left, top, width: finalRect.width, height: finalRect.height }),
+      commitWindow: (target, left, top, finalRect) => {
+        commits.push({ left, top, width: finalRect.width, height: finalRect.height });
+        options?.onCommit?.(target, left, top, finalRect);
+      },
       requestFrame: (callback) => {
         frameRequests++;
         const id = nextFrame++;
@@ -243,6 +251,76 @@ describe('installWindowDrag', () => {
       expect(harness.el.style.transform).toBe('none');
       expect(harness.el.classList.contains('window-dragging')).toBe(false);
       expect(harness.bodyClasses.has('window-drag-active')).toBe(false);
+    } finally {
+      harness.restore();
+    }
+  });
+
+  it('refreshes cached map marker geometry only after the final window placement', () => {
+    let canvasLeft = 100;
+    let canvasRectReads = 0;
+    const canvas = {
+      width: 560,
+      height: 560,
+      getBoundingClientRect: () => {
+        canvasRectReads++;
+        return {
+          left: canvasLeft,
+          top: 50,
+          width: 280,
+          height: 280,
+        } as DOMRect;
+      },
+    } as HTMLCanvasElement;
+    const marker: MapGatherNodeMarker = {
+      mx: 140,
+      my: 200,
+      nodeId: 'node',
+      type: 'ore',
+      ready: true,
+      locked: false,
+    };
+    const interaction = new MapMarkerInteractionController({
+      names: {
+        zone: (id) => id,
+        dungeon: (id) => id,
+        delve: (id) => id,
+        station: (type) => type,
+        poi: (zoneId, index) => `${zoneId}/${index}`,
+        rift: (name) => name,
+      },
+      npc: () => '',
+      navigation: () => '',
+      station: () => '',
+      service: () => '',
+      gather: () => '<div>gather</div>',
+      questArea: () => '',
+      paint: () => {},
+      clearMemo: () => {},
+    });
+    interaction.gatherNodes = [marker];
+    interaction.refreshGeometry(canvas);
+    expect(interaction.showAt(canvas, 170, 150)).toBe(true);
+    expect(canvasRectReads).toBe(1);
+
+    const harness = setup({
+      elId: 'map-window',
+      onCommit: (_el, left) => {
+        canvasLeft = left;
+        interaction.refreshCurrentGeometry();
+      },
+    });
+    try {
+      harness.fire('pointerdown', {});
+      harness.fire('pointermove', { clientX: 230, clientY: 190 });
+      harness.flushFrame();
+      expect(canvasRectReads).toBe(1);
+
+      harness.fire('pointerup', { clientX: 230, clientY: 190, buttons: 0 });
+      expect(canvasRectReads).toBe(2);
+      expect(interaction.showAt(canvas, 170, 150)).toBe(false);
+      expect(interaction.showAt(canvas, 280, 150)).toBe(true);
+      expect(canvasRectReads).toBe(2);
     } finally {
       harness.restore();
     }

@@ -18,6 +18,7 @@ import { ITEMS } from '../sim/data';
 import type { EquipSlot, ItemInstancePayload, PlayerClass, SkinCatalog } from '../sim/types';
 import { attachAvatarFallback } from './avatar_fallback';
 import type { PaperdollSlot } from './char_view';
+import { CURATOR_SIGIL_GLOW, curatorSigilBadgeClass, curatorSigilDataUrl } from './curator_sigil';
 import { deedTitleText } from './deed_i18n';
 import {
   devCardBadgeClass,
@@ -41,6 +42,9 @@ import { iconDataUrl, QUALITY_COLOR } from './icons';
 import {
   buildInspectRemoteView,
   buildInspectView,
+  type InspectBorderModel,
+  type InspectCuratorBadgeModel,
+  type InspectCuratorModel,
   type InspectDevModel,
   type InspectDiscordModel,
   type InspectHolderModel,
@@ -48,6 +52,7 @@ import {
 import type { PainterHostPresentation } from './painter_host';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import { qualityGlowShadow } from './quality_glow';
+import { curatorRankNameKey } from './reliquary_view';
 import { svgIcon } from './ui_icons';
 
 /** The inspected entity fields the painter reads (a structural subset of the
@@ -61,6 +66,8 @@ export interface InspectEntity {
   skinCatalog?: SkinCatalog;
   /** Active Book of Deeds title (a deed id), if any. */
   title?: string | null;
+  /** Active Book of Deeds border (a deed id, never a slug), if any. */
+  border?: string | null;
   equippedItems: Partial<Record<EquipSlot, string>>;
   equippedInstances: Partial<Record<EquipSlot, ItemInstancePayload>>;
   /** The server-resolved active Armory weapon skin (wire wsk), render-only. */
@@ -75,6 +82,11 @@ export interface InspectEntity {
   devTier?: number;
   devMergedPrs?: number;
   githubLogin?: string;
+  /** Server-computed Curator standing (wire crk/cro/crt): rank plus the
+   *  character-scoped completion pair behind it. */
+  curatorRank?: number;
+  relicsOwned?: number;
+  relicsTotal?: number;
 }
 
 /** The out-of-range remote-profile inputs (the public character sheet subset). */
@@ -136,8 +148,17 @@ export class InspectWindow {
   }
 
   /** Rich in-range inspect: compact header, identity badges, live class-colored
-   *  turntable, and the worn 6/6 paperdoll. */
-  openInspect(e: InspectEntity, now: number): void {
+   *  turntable, and the worn 6/6 paperdoll.
+   *
+   *  `selfStanding` is the viewer's own LIVE Curator standing, and Hud passes it
+   *  only when the inspected entity is the viewer (see Hud.openInspect). It is a
+   *  parameter rather than a field on InspectEntity deliberately: InspectEntity
+   *  mirrors the wire, and this standing never crosses the wire at all. */
+  openInspect(
+    e: InspectEntity,
+    now: number,
+    selfStanding?: { curatorRank: number; owned: number; total: number } | null,
+  ): void {
     const cls = e.templateId as PlayerClass;
     const el = this.deps.root();
     this.captureOpener();
@@ -150,6 +171,11 @@ export class InspectWindow {
         skin: e.skin ?? 0,
         skinCatalog: e.skinCatalog ?? 'class',
         deedTitleText: e.title ? deedTitleText(e.title) : '',
+        border: e.border ?? null,
+        curatorRank: e.curatorRank ?? 0,
+        relicsOwned: typeof e.relicsOwned === 'number' ? e.relicsOwned : null,
+        relicsTotal: typeof e.relicsTotal === 'number' ? e.relicsTotal : null,
+        selfStanding: selfStanding ?? null,
         equippedItems: e.equippedItems,
         holderTier: e.holderTier ?? 0,
         holderBalance: e.holderBalance ?? null,
@@ -174,7 +200,7 @@ export class InspectWindow {
     el.innerHTML =
       this.panelTitleHtml() +
       `<div class="inspect-card">` +
-      `<div class="inspect-name">${esc(header.name)}</div>` +
+      `<div class="inspect-name"${this.borderAttrs(header.border)}>${esc(header.name)}</div>` +
       titleHtml +
       `<div class="inspect-meta">${esc(
         t('itemUi.equipment.levelClass', {
@@ -182,9 +208,11 @@ export class InspectWindow {
           className: classDisplayName(cls),
         }),
       )}</div>` +
+      this.curatorLineHtml(model.curator) +
       this.holderHtml(model.badges.holder) +
       this.discordHtml(model.badges.discord) +
       this.devHtml(model.badges.dev) +
+      this.curatorHtml(model.badges.curator) +
       `</div>` +
       // The class-colored model stage, delivered as a CSS custom property so the
       // stylesheet paints the border / glow / haze in the inspected player's hue.
@@ -280,6 +308,79 @@ export class InspectWindow {
       this.deps.attachTooltip(row, () => this.deps.itemTooltip(item, instance));
     }
     return row;
+  }
+
+  // The Book of Deeds border accent on the header name row: the cold-window twin
+  // of the unit-frame portrait ring, and the resting form of the same cartouche
+  // the overhead nameplate draws around a name. The SLUG rides in data-border
+  // (the stylesheet gates on a non-empty value) and the palette in the SAME three
+  // custom properties the ring uses, so one treatment and zero per-slug colors
+  // live in CSS. The pure core already gated the slug on the palette, so a
+  // borderless / stale / title-reward / drifted id arrives null and paints
+  // nothing at all, exactly like paintPortraitBorder writing ''.
+  private borderAttrs(border: InspectBorderModel | null): string {
+    if (!border) return '';
+    // The three palette values are escaped like the slug on the line above.
+    // Honest scope: esc() blocks an attribute BREAKOUT (quotes, angle
+    // brackets), which is the exploitable hole; it does NOT neutralize CSS
+    // declaration syntax inside the attribute. Today that distinction is moot
+    // (values come from the frozen deed_border_view palette and the core nulls
+    // unknown slugs); if a palette source ever becomes dynamic, validate the
+    // values against a hex pattern instead of leaning on this escape.
+    return (
+      ` data-border="${esc(border.slug)}"` +
+      ` style="--border-accent-frame:${esc(border.frame)};--border-accent-edge:${esc(border.edge)};--border-accent-glow:${esc(border.glow)}"`
+    );
+  }
+
+  // The Reliquary standing line: the labeled completion pair plus the named
+  // Curator rank. It reuses the character sheet's own three chrome keys
+  // (charCompletionLabel, charCompletion, and the rank-name key), so the LABEL,
+  // the pair wording, and the rung name are one source of text across both
+  // surfaces. The composition differs by design: the sheet lays these out as
+  // rows in the Reliquary block, the card packs them into one dot-separated
+  // meta line.
+  private curatorLineHtml(curator: InspectCuratorModel | null): string {
+    if (!curator) return '';
+    const pair = t('hudChrome.reliquary.charCompletion', {
+      owned: formatNumber(curator.owned, { maximumFractionDigits: 0 }),
+      total: formatNumber(curator.total, { maximumFractionDigits: 0 }),
+    });
+    const rankName = t(curatorRankNameKey(curator.rank), {
+      rank: formatNumber(curator.rank, { maximumFractionDigits: 0 }),
+    });
+    return (
+      `<div class="inspect-meta inspect-reliquary">` +
+      `${esc(t('hudChrome.reliquary.charCompletionLabel'))}: ${esc(pair)} · ${esc(rankName)}` +
+      `</div>`
+    );
+  }
+
+  // The Curator sigil badge: the Reliquary's rank-5 honor mark, rendered through
+  // the same .inspect-holder row family as the three flair badges above it so the
+  // four read as one column. Cosmetic identity only.
+  private curatorHtml(curator: InspectCuratorBadgeModel | null): string {
+    if (!curator) return '';
+    const rankName = t(curatorRankNameKey(curator.rank), {
+      rank: formatNumber(curator.rank, { maximumFractionDigits: 0 }),
+    });
+    return (
+      `<div class="inspect-holder">` +
+      // alt="" like the three sibling tier badges: the row already prints the
+      // rung name and a sub-line, so a localized alt on the art made a screen
+      // reader announce the same row three times. sigilCaption keeps the job of
+      // naming what the picture IS, but as the VISIBLE sub-line, which labels
+      // the mark for every reader at once (the key was named sigilAria until
+      // Phase 20 QA; the suffix misdeclared the render sink to translators once
+      // the string stopped being alt text). The sub used to repeat the window
+      // title ("The Reliquary"), which named the surface rather than the honor
+      // and was the least useful of the three announcements.
+      `<img class="${curatorSigilBadgeClass()}" style="--curator-glow:${CURATOR_SIGIL_GLOW}" src="${curatorSigilDataUrl()}" alt="" draggable="false">` +
+      `<div class="inspect-holder-text">` +
+      `<div class="inspect-holder-name">${esc(rankName)}</div>` +
+      `<div class="inspect-holder-sub">${esc(t('hudChrome.reliquary.sigilCaption'))}</div>` +
+      `</div></div>`
+    );
   }
 
   private holderHtml(holder: InspectHolderModel | null): string {

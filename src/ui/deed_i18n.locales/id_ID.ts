@@ -33,19 +33,19 @@ export const table: DeedLocaleTable = {
     desc: 'Bersihkan Rift peringkat S, tingkat tersulit yang bisa dimunculkan portal Rift.',
   },
   pvp_honor_sergeant: {
-    name: 'Sersan',
+    name: 'Pemecah Barisan',
     desc: 'Raih 10.000 kehormatan seumur hidupmu. Membelanjakannya tidak akan pernah menghilangkan pangkat ini.',
-    title: 'Sersan',
+    title: 'Pemecah Barisan',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Letnan Ksatria',
+    name: 'Perusak Medan',
     desc: 'Raih 40.000 kehormatan seumur hidupmu, satu musim perang sungguhan di belakangmu.',
-    title: 'Letnan Ksatria',
+    title: 'Perusak Medan',
   },
   pvp_honor_field_marshal: {
-    name: 'Marsekal Lapangan',
+    name: 'Bermahkota Perang',
     desc: 'Raih 150.000 kehormatan seumur hidupmu. Langka di realm mana pun, dan memang seharusnya begitu.',
-    title: 'Marsekal Lapangan',
+    title: 'Bermahkota Perang',
   },
   chr_drakemaw_broodlord: {
     name: 'Pemusnah Tetasan',
@@ -986,5 +986,49 @@ export const table: DeedLocaleTable = {
   prog_armorcrafting_rare: {
     name: 'Dilapisi hingga Sempurna',
     desc: 'Buat barang bertingkat langka pertamamu dalam Penempaan Zirah.',
+  },
+  col_reliquary_rank_2: {
+    name: 'Penjaga Rampasan',
+    desc: 'Capai peringkat Kurator 2 di Relikuari (10 relik unik terkatalog).',
+    title: 'Penjaga Rampasan',
+  },
+  col_reliquary_rank_3: {
+    name: 'Sang Pembuat Katalog',
+    desc: 'Capai peringkat Kurator 3 di Relikuari (25 relik unik terkatalog).',
+    title: 'sang Pembuat Katalog',
+  },
+  col_reliquary_rank_4: {
+    name: 'Kurator Utama',
+    desc: 'Capai peringkat Kurator 4 di Relikuari (50 relik unik terkatalog).',
+    title: 'Kurator Utama',
+  },
+  col_reliquary_rank_5: {
+    name: 'Rampasan Abadi',
+    desc: 'Capai peringkat Kurator 5 di Relikuari (100 relik unik terkatalog).',
+  },
+  col_reliquary_complete: {
+    name: 'Relikuari Agung',
+    desc: 'Katalogkan setiap relik di Relikuari yang bisa disimpan sebuah karakter. Pertumbuhan katalog di kemudian hari tidak pernah menariknya kembali.',
+    title: 'Kurator Ruang Simpan',
+  },
+  col_reliquary_conquerors: {
+    name: 'Rak Penakluk',
+    desc: 'Katalogkan setiap relik di rak Penakluk pada Relikuari. Pertumbuhan katalog di kemudian hari tidak pernah menariknya kembali.',
+    title: 'Pembobol Ruang Simpan',
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    name: 'Nythraxis Diterangi',
+    desc: 'Terangi halaman Heroik: Raid Nythraxis pada Relikuari.',
+    title: 'Cahaya Nythraxis',
+  },
+  col_reliquary_illum_thunzharr: {
+    name: 'Thunzharr Diterangi',
+    desc: 'Terangi halaman Thunzharr, Puncak yang Terjaga pada Relikuari.',
+    title: 'Cahaya Thunzharr',
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    name: 'Sanktum Diterangi',
+    desc: 'Terangi halaman Heroik: Sanktum Gravewyrm pada Relikuari.',
+    title: 'Cahaya Sanktum',
   },
 };

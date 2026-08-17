@@ -13,6 +13,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { VALE_CUP_BALL_TEMPLATE_ID } from '../src/sim/content/vale_cup';
 import { DUNGEON_X_THRESHOLD, MOBS } from '../src/sim/data';
 import type { Sim } from '../src/sim/sim';
+import { ARENA_MIN_LEVEL } from '../src/sim/social/arena';
 import {
   endCupMatch,
   VALE_CUP_BRAM_ID,
@@ -365,6 +366,7 @@ describe('Vale Cup <-> Arena: mutual queue exclusion', () => {
   it('rejects a Vale Cup queue join while merely waiting in the Arena queue', () => {
     const sim = makeWorld();
     const a = addAt(sim, 'warrior', 'Ada', 0, -40);
+    sim.setPlayerLevel(ARENA_MIN_LEVEL, a);
     sim.arenaQueueJoin(a); // alone: waits, not yet matched
     expect(sim.arenaQueue1v1).toContain(a);
     sim.drainEvents();
@@ -377,6 +379,7 @@ describe('Vale Cup <-> Arena: mutual queue exclusion', () => {
     const sim = makeWorld();
     const leader = addAt(sim, 'warrior', 'Leader', 0, -40);
     const member = addAt(sim, 'paladin', 'Member', 3, -40);
+    sim.setPlayerLevel(ARENA_MIN_LEVEL, leader);
     sim.vcupQueueJoin(1, 'vale', 'allrounder', false, member); // solo: waits
     sim.partyInvite(member, leader);
     sim.partyAccept(member);
@@ -397,6 +400,7 @@ describe('Vale Cup <-> Arena: mutual queue exclusion', () => {
     const a = addAt(sim, 'warrior', 'Ada', 0, -40);
     const c = addAt(sim, 'mage', 'Cee', 10, -40);
     const d = addAt(sim, 'rogue', 'Dee', 14, -40);
+    sim.setPlayerLevel(ARENA_MIN_LEVEL, a);
     sim.arenaQueueJoin(a);
     expect(sim.arenaQueue1v1).toContain(a);
     const match = startBout(sim, c, d); // an unrelated live rated Vale Cup match
@@ -413,6 +417,7 @@ describe('Vale Cup <-> Arena: mutual queue exclusion', () => {
   it('rejects starting a Vale Cup practice while waiting in the Arena queue', () => {
     const sim = makeWorld();
     const a = addAt(sim, 'warrior', 'Ada', 0, -40);
+    sim.setPlayerLevel(ARENA_MIN_LEVEL, a);
     sim.arenaQueueJoin(a);
     expect(sim.arenaQueue1v1).toContain(a);
     sim.drainEvents();

@@ -99,6 +99,24 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   `already_enchanted`, because the flag check precedes the id compare.
 - `commission.ts`: the Maker's Bond (commission opt-in mints `bindOnTrade`,
   `resolveUnbind` + the quality-tier fee ladder).
+- `commission_order.ts`: the commission order board (#1298) layered on the
+  Maker's Bond: a requester opens an order naming a recipe and a scope (the
+  open board, or one named crafter), a crafter accepts and crafts with the
+  commission opt-in exactly as before, then delivers the still-unbound copy
+  face to face (the same bind-on-first-trade stamp `trade.ts`'s `grantOffer`
+  applies; mail and the World Market refuse instanced payloads, so direct
+  delivery is the one channel). An order carries NO escrow: opening one holds
+  no gold or materials (order-time escrow for required materials is a flagged
+  later extension, out of scope). In-memory `Sim` state only, never persisted;
+  `updateCommissionOrders` is its retention sweep (open orders expire, terminal
+  orders prune). Draws no rng.
+- `harvest_yields.ts`: pure leaf, the corpse-harvest yield ledger (#2457)
+  behind the text-free `harvestResult` event. It records what LANDED, never
+  what was rolled: a signed grant a full bag downgraded to a plain top-up is
+  recorded plain, and a refused specimen contributes no entry (the
+  `gatherDowngrade` toast owns that feedback). ONE entry per DISTINCT granted
+  item id with folded quantities, so the client's line count matches the item
+  count; callers record beside each grant call, not from the roll loop.
 - Craft Cast System Phase 5 retired `action_throttle.ts`: profession actions
   are cast-paced. `PlayerMeta.craftThrottle` was never persisted (session-only
   from birth) and is kept only as an inert shape for the retirement suite
@@ -172,12 +190,11 @@ hosts, plus the pinned callback-name list in `tests/sim_context.test.ts`.
    `gatheringProficiency`, `craftSkills`, `knownRecipes`, `archetype`).
 3. Data tables in `src/sim/content/`, never in the module.
 4. Reads/actions: extend `IWorldProfessions` (`src/world_api/professions.ts`)
-   FIRST, then implement in BOTH `Sim` and `ClientWorld` (root "IWorld is the
-   only seam" rule).
+   FIRST, then follow the root IWorld facet procedure (both worlds plus the
+   parity pin).
 5. A test in `tests/professions_<thing>.test.ts` (exemplars:
    `tests/professions_crafting.test.ts`, `tests/gather_node_harvest.test.ts`).
-   Bug fix rule: a failing test that reproduces the bug first, then the
-   smallest change that turns it green.
+   Bug fixes follow the root test-first rule.
 
 ## Balance invariants (settled; do not re-litigate)
 - All ten craft skills are independent, purely ADDITIVE counters (`wheel.ts`):

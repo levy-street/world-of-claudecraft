@@ -54,7 +54,7 @@ describe('Ring of Frost visual', () => {
     }
   });
 
-  it('grows in, remains for its full lifetime, and disposes every owned resource', () => {
+  it('grows in, remains for its full lifetime, and disposes every per-ring resource except pooled materials', () => {
     const scene = new THREE.Scene();
     const visuals = new RingOfFrostVisuals(scene, () => 2);
     visuals.spawn({ x: 3, z: 7, radius: 6, innerRadius: 4.5, duration: 10 });
@@ -98,12 +98,114 @@ describe('Ring of Frost visual', () => {
     visuals.update(0.7);
 
     expect(scene.getObjectByName('ring-of-frost-fx')).toBeUndefined();
-    expect(disposedMaterials.size).toBeGreaterThanOrEqual(5);
+    // Per-ring geometries and the InstancedMesh instance buffer still dispose
+    // on expiry exactly as before; materials do NOT (they return to a pool
+    // for the next ring instead, see the reuse test below).
+    expect(disposedMaterials.size).toBe(0);
     expect(disposedGeometries.size).toBeGreaterThanOrEqual(4);
     expect(instancesDisposed).toBe(true);
     expect(sharedGeometryDisposed).toBe(false);
     visuals.dispose();
+    // A full teardown drains every pool, so the ring's materials are
+    // eventually disposed too, just not on the ring's own expiry.
+    expect(disposedMaterials.size).toBeGreaterThanOrEqual(5);
     expect(sharedGeometryDisposed).toBe(true);
+  });
+
+  it('reuses a released ring materials for the next spawn and resets its faded opacity', () => {
+    const scene = new THREE.Scene();
+    const visuals = new RingOfFrostVisuals(scene, () => 0);
+    visuals.spawn({ x: 0, z: 0, radius: 6, innerRadius: 4.5, duration: 1 });
+    const root1 = scene.getObjectByName('ring-of-frost-fx') as THREE.Group;
+    const outer1 = root1.getObjectByName('ring-of-frost-outer-edge') as THREE.LineLoop;
+    const band1 = root1.getObjectByName('ring-of-frost-band') as THREE.Mesh;
+    const outerMat1 = outer1.material as THREE.LineBasicMaterial;
+    const bandMat1 = band1.material as THREE.MeshBasicMaterial;
+
+    // Run the ring almost to the end of its life so the band's fade-out
+    // has driven its opacity close to zero before it is released.
+    visuals.update(0.9);
+    expect(bandMat1.opacity).toBeLessThan(0.05);
+    visuals.update(0.15); // crosses duration: releases into the pool
+    expect(scene.getObjectByName('ring-of-frost-fx')).toBeUndefined();
+
+    visuals.spawn({ x: 10, z: 10, radius: 6, innerRadius: 4.5, duration: 1 });
+    const root2 = scene.getObjectByName('ring-of-frost-fx') as THREE.Group;
+    const outer2 = root2.getObjectByName('ring-of-frost-outer-edge') as THREE.LineLoop;
+    const band2 = root2.getObjectByName('ring-of-frost-band') as THREE.Mesh;
+
+    // The pooled material object comes back, not a freshly allocated one...
+    expect(outer2.material).toBe(outerMat1);
+    expect(band2.material).toBe(bandMat1);
+
+    // ...and its opacity is reset to a fresh spawn's starting value, not
+    // left at the stale, nearly-invisible value it faded to before release.
+    // The ground truth for "a fresh spawn's starting value" is a brand-new
+    // RingOfFrostVisuals that never touches a pool at all.
+    const freshScene = new THREE.Scene();
+    const freshVisuals = new RingOfFrostVisuals(freshScene, () => 0);
+    freshVisuals.spawn({ x: 10, z: 10, radius: 6, innerRadius: 4.5, duration: 1 });
+    const freshRoot = freshScene.getObjectByName('ring-of-frost-fx') as THREE.Group;
+    const freshOuter = freshRoot.getObjectByName('ring-of-frost-outer-edge') as THREE.LineLoop;
+    const freshBand = freshRoot.getObjectByName('ring-of-frost-band') as THREE.Mesh;
+
+    expect((outer2.material as THREE.LineBasicMaterial).opacity).toBeCloseTo(
+      (freshOuter.material as THREE.LineBasicMaterial).opacity,
+      10,
+    );
+    expect((band2.material as THREE.MeshBasicMaterial).opacity).toBeCloseTo(
+      (freshBand.material as THREE.MeshBasicMaterial).opacity,
+      10,
+    );
+
+    visuals.dispose();
+    freshVisuals.dispose();
+  });
+
+  it('bounds each material pool at a fixed cap and reuses only the pooled survivors', () => {
+    const scene = new THREE.Scene();
+    const visuals = new RingOfFrostVisuals(scene, () => 0);
+    const CAP = 32;
+    const OVERFLOW = 5;
+    const duration = 1;
+    for (let i = 0; i < CAP + OVERFLOW; i++) {
+      visuals.spawn({ x: i, z: 0, radius: 6, innerRadius: 4.5, duration });
+    }
+
+    const collectBandMats = (): THREE.MeshBasicMaterial[] => {
+      const mats: THREE.MeshBasicMaterial[] = [];
+      scene.traverse((object) => {
+        if (object.name === 'ring-of-frost-band') {
+          mats.push((object as THREE.Mesh).material as THREE.MeshBasicMaterial);
+        }
+      });
+      return mats;
+    };
+
+    const firstBatch = collectBandMats();
+    expect(firstBatch.length).toBe(CAP + OVERFLOW);
+    const disposed = new Set<THREE.MeshBasicMaterial>();
+    for (const mat of firstBatch) mat.addEventListener('dispose', () => disposed.add(mat));
+
+    // Every ring shares the same duration and started at the same instant,
+    // so one update past that duration expires all of them in a single pass.
+    visuals.update(duration + 0.01);
+    expect(scene.children.length).toBe(0);
+    // Only the excess over the cap is really disposed; the rest is pooled.
+    expect(disposed.size).toBe(OVERFLOW);
+    const pooled = new Set(firstBatch.filter((mat) => !disposed.has(mat)));
+    expect(pooled.size).toBe(CAP);
+
+    for (let i = 0; i < CAP; i++) {
+      visuals.spawn({ x: i, z: 50, radius: 6, innerRadius: 4.5, duration: 10 });
+    }
+    const secondBatch = collectBandMats();
+    expect(secondBatch.length).toBe(CAP);
+    // Every one of the CAP new rings drew its band material from the
+    // surviving pool: no fresh allocation past the cap.
+    for (const mat of secondBatch) expect(pooled.has(mat)).toBe(true);
+
+    visuals.dispose();
   });
 
   it('reconciles authoritative ids and remaining lifetime without replaying a fresh ring', () => {

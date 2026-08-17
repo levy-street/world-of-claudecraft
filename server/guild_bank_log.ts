@@ -165,10 +165,11 @@ export function projectGuildBankLogRows(
 }
 
 // ---------------------------------------------------------------------------
-// The process cache. The database reader is INJECTED (the
-// configure<Domain>Runtime idiom) so tests can drive the cache mechanics with a
-// counting fake and no Postgres, and so the cache builds lazily: no clock and
-// no bound is bound before a test can replace it.
+// The process cache. The database reader is INJECTED, swappable only via the
+// `reader` override on resetGuildBankLogCacheForTests below, so tests can
+// drive the cache mechanics with a counting fake and no Postgres, and so the
+// cache builds lazily: no clock and no bound is bound before a test can
+// replace it.
 // ---------------------------------------------------------------------------
 
 export type GuildBankLogReader = (guildId: number) => Promise<readonly GuildBankLogEntry[]>;
@@ -309,12 +310,6 @@ export function guildBankLogCacheStats(): KeyedCachedReadStats & { dirtyGuilds: 
     entries: 0,
   };
   return { ...stats, dirtyGuilds: dirtyUntil.size };
-}
-
-/** Test seam: swap the database reader and rebuild the cache. */
-export function configureGuildBankLogReader(read: GuildBankLogReader): void {
-  reader = read;
-  active = null;
 }
 
 /** Test seam: reset to the production reader (or keep an injected one) and

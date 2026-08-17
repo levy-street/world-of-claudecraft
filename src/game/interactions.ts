@@ -125,13 +125,6 @@ export function hoverCursorKind(
   return 'default';
 }
 
-export function isActivePvpOpponent(world: PickInteractionWorld, e: Entity): boolean {
-  return (
-    e.kind === 'player' &&
-    isAttackableEntity(e, world.playerId ?? world.player.id, activePvpOpponentIds(world))
-  );
-}
-
 /** Resolve the client-side range for a lootable object before dispatch or approach. */
 export function objectInteractionRange(entity: Pick<Entity, 'templateId'>): number {
   return entity.templateId === EASTBROOK_NOTICEBOARD_TEMPLATE_ID

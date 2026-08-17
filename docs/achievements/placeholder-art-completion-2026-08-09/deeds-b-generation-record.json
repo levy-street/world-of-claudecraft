@@ -1,0 +1,2342 @@
+{
+  "schemaVersion": 1,
+  "batch": "placeholder-art-completion-deeds-b",
+  "created": "2026-08-09",
+  "worktree": "/Users/fernando/Documents/wocc-placeholder-art-v036",
+  "generationMode": "OpenAI built-in imagegen only",
+  "transparency": "flat #FF00FF chroma-key generation, installed helper soft matte and despill",
+  "sourceContract": "512x512 RGBA PNG, transparent corners, alpha>=8 padding >=28, center tolerance <=8, coverage 0.34..0.61",
+  "shippingContract": "128x128 transparent WebP, <=15 KiB, alpha>=8 padding >=7, center tolerance <=2, coverage 0.35..0.60",
+  "previewPaths": [
+    "tmp/imagegen/placeholder-art-completion/deeds-b/previews/all-128.webp",
+    "tmp/imagegen/placeholder-art-completion/deeds-b/previews/all-40.webp",
+    "tmp/imagegen/placeholder-art-completion/deeds-b/previews/all-24-gray.webp"
+  ],
+  "assets": [
+    {
+      "id": "chr_frostveil_gatherer",
+      "canonicalName": "Terraced Harvest",
+      "generationMode": "OpenAI built-in imagegen",
+      "useCase": "stylized-concept",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: transparent Book of Deeds achievement crest for a classic dark-fantasy MMORPG, designed to remain readable at 40px and 24px\nPrimary request: Create a fresh hand-painted deed medallion for \"Terraced Harvest\", harvesting ore, wood, and herbs in the Frostveil Reach.\nInput images: Image 1 and Image 2 are existing accepted Chronicle gathering deed crests. Use them only as authoritative references for frame geometry, material language, painterly finish, centered scale, and subject readability. Do not copy their interior arrangement or exact objects.\nScene/backdrop: Inside the medallion only, a deep frost-blue enamel ground with a restrained aurora glow. Outside the complete medallion, a perfectly flat uniform solid #FF00FF chroma-key field.\nSubject: A compact triangular still-life of one faceted glacier-iron ore chunk, one short pale frost-birch log with visible rings, and one sprig of tiny ice-blue winter herbs. All three resources must be unmistakable and similarly important.\nStyle/medium: Premium hand-painted classic fantasy MMORPG achievement icon, rich brushwork, crisp silhouette, deep jewel colors, subtle top-left illumination, never a flat glyph and never a 3D product render.\nComposition/framing: One complete circular medallion centered exactly on a square canvas. Blackened bronze and steel body, antique-gold double rim, exactly four small matching cardinal kite points at top, right, bottom, and left. No diagonal points. The full frame must fit with generous even exterior padding and no cropping. Center the three-resource subject inside the dark enamel inset and keep it bold enough for tiny UI sizes.\nLighting/mood: Cold dawn, icy blue and pale violet highlights, dignified and adventurous, high contrast against the inset.\nConstraints: The exterior chroma field must be exactly one flat #FF00FF color with no variation. No magenta anywhere inside the medallion. No exterior cast shadow, contact shadow, glow, reflection, gradient, texture, floor plane, or lighting variation. Crisp separated outer edge suitable for clean background removal. Keep the full medallion and all four cardinal points visible.\nAvoid: text, letters, numerals, runes that resemble letters, banners, ribbons, extra points, ornate outer flourishes, watermark, logo, clipped frame, off-center subject, tiny objects, muddy silhouette, photorealism.",
+      "references": [
+        {
+          "image": 1,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/chr_willowfen_gatherer.webp"
+        },
+        {
+          "image": 2,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/chr_peaks_gatherer.webp"
+        }
+      ],
+      "generatedOrigin": "/Users/fernando/.codex/generated_images/019fe708-52b8-7373-9773-7f5987ceaf94/exec-bebebe8f-11ba-4d0e-a1c9-36330bce7231.png",
+      "retries": [],
+      "files": {
+        "result": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/results/chr_frostveil_gatherer.png",
+          "bytes": 2153058,
+          "sha256": "8524a214ea157e7684324f6cb93145243d6be4a1714ea9f74f129382696a6782",
+          "dimensions": "1254x1254 srgb",
+          "channels": 3,
+          "hasAlpha": false
+        },
+        "master": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/masters/chr_frostveil_gatherer-alpha.png",
+          "bytes": 1791323,
+          "sha256": "14c76ef8eaecc07b584cbc1a76c60bdbd167224dae1bcbfedc32c3aaabdcce6c",
+          "dimensions": "1254x1254 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 102,
+              "minY": 89,
+              "maxX": 1147,
+              "maxY": 1131
+            },
+            "padding": {
+              "left": 102,
+              "top": 89,
+              "right": 106,
+              "bottom": 122
+            },
+            "center": {
+              "x": 624.5,
+              "y": 610
+            },
+            "coverage": 0.4530535778332303,
+            "opaquePixels": 708303,
+            "transparentPixels": 860082
+          }
+        },
+        "source": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/sources/chr_frostveil_gatherer.png",
+          "bytes": 371719,
+          "sha256": "77a04c5ccc3a3b80a557ca6284fce39301b61bf6862a23fddbb604a6e8fb77ca",
+          "dimensions": "512x512 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 43,
+              "minY": 43,
+              "maxX": 469,
+              "maxY": 468
+            },
+            "padding": {
+              "left": 43,
+              "top": 43,
+              "right": 42,
+              "bottom": 43
+            },
+            "center": {
+              "x": 256,
+              "y": 255.5
+            },
+            "coverage": 0.4542503356933594,
+            "opaquePixels": 116166,
+            "transparentPixels": 141728
+          }
+        },
+        "shipping": {
+          "path": "public/ui/deeds/chr_frostveil_gatherer.webp",
+          "bytes": 5758,
+          "sha256": "1da143d88643ff9ca5245259212168b5fc45a28183e0b8fef5a430ea12b10d4c",
+          "dimensions": "128x128 WebP RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 10,
+              "minY": 10,
+              "maxX": 117,
+              "maxY": 117
+            },
+            "padding": {
+              "left": 10,
+              "top": 10,
+              "right": 10,
+              "bottom": 10
+            },
+            "center": {
+              "x": 63.5,
+              "y": 63.5
+            },
+            "coverage": 0.46270751953125,
+            "opaquePixels": 6893,
+            "transparentPixels": 8442
+          }
+        }
+      },
+      "processing": {
+        "chromaHelper": "/Users/fernando/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+        "chromaArgs": [
+          "--auto-key border",
+          "--soft-matte",
+          "--transparent-threshold 12",
+          "--opaque-threshold 220",
+          "--despill",
+          "--force"
+        ],
+        "resize": "Lanczos3 full-canvas resize to 512x512 RGBA",
+        "fitScale": 1,
+        "recenterShift": {
+          "dx": 1,
+          "dy": 7
+        },
+        "webp": {
+          "size": "128x128",
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        }
+      },
+      "review": {
+        "verdict": "accepted",
+        "inspected": [
+          "1254px generated result",
+          "128px shipping color",
+          "40px shipping color",
+          "24px shipping grayscale"
+        ],
+        "checks": [
+          "complete centered medallion",
+          "exactly four cardinal kite points",
+          "no text or letter-like subject",
+          "zone-pair identity",
+          "distinct cross-zone palette",
+          "clean transparent edge",
+          "readable tiny silhouette"
+        ]
+      }
+    },
+    {
+      "id": "chr_frostveil_first_cast",
+      "canonicalName": "First Ice on the Tarn",
+      "generationMode": "OpenAI built-in imagegen",
+      "useCase": "stylized-concept",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: transparent Book of Deeds achievement crest for a classic dark-fantasy MMORPG, designed to remain readable at 40px and 24px\nPrimary request: Create a fresh hand-painted deed medallion for \"First Ice on the Tarn\", catching a fish in the Frostveil Reach.\nInput images: Image 1 and Image 2 are existing accepted Chronicle fishing deed crests. Use them only as authoritative references for frame geometry, material language, painterly finish, centered scale, and subject readability. Do not copy their fish species, interior composition, or palette.\nScene/backdrop: Inside the medallion only, the dark sapphire water of a glacier tarn beneath a thin shelf of cracked blue-white ice. Outside the complete medallion, a perfectly flat uniform solid #FF00FF chroma-key field.\nSubject: One bold silver-blue arctic char bursting upward through a clean circular break in the ice, with a single restrained arc of icy water. The fish must be the unmistakable central silhouette.\nStyle/medium: Premium hand-painted classic fantasy MMORPG achievement icon, rich brushwork, crisp silhouette, deep jewel colors, subtle top-left illumination, never a flat glyph and never a 3D product render.\nComposition/framing: One complete circular medallion centered exactly on a square canvas. Blackened bronze and steel body, antique-gold double rim, exactly four small matching cardinal kite points at top, right, bottom, and left. No diagonal points. The full frame must fit with generous even exterior padding and no cropping. Center the fish inside the dark enamel inset and keep it bold enough for tiny UI sizes.\nLighting/mood: Cold dawn, glacier blue and silver highlights with a faint aurora-violet accent, still and wintry yet triumphant, high contrast against the inset.\nConstraints: The exterior chroma field must be exactly one flat #FF00FF color with no variation. No magenta anywhere inside the medallion. No exterior cast shadow, contact shadow, glow, reflection, gradient, texture, floor plane, or lighting variation. Crisp separated outer edge suitable for clean background removal. Keep the full medallion and all four cardinal points visible.\nAvoid: text, letters, numerals, runes that resemble letters, banners, ribbons, hooks, fishing rods, extra fish, extra points, ornate outer flourishes, watermark, logo, clipped frame, off-center subject, muddy silhouette, photorealism.",
+      "references": [
+        {
+          "image": 1,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/chr_willowfen_first_cast.webp"
+        },
+        {
+          "image": 2,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/chr_farshore_first_cast.webp"
+        }
+      ],
+      "generatedOrigin": "/Users/fernando/.codex/generated_images/019fe708-52b8-7373-9773-7f5987ceaf94/exec-b66f99eb-c27c-4ba1-a3dc-838b4e14fe7b.png",
+      "retries": [],
+      "files": {
+        "result": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/results/chr_frostveil_first_cast.png",
+          "bytes": 2300161,
+          "sha256": "de4d0f939920eaa13d5ca95751c99f7df31a5523dcc0f01aee7cd58e4ebc58b1",
+          "dimensions": "1254x1254 srgb",
+          "channels": 3,
+          "hasAlpha": false
+        },
+        "master": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/masters/chr_frostveil_first_cast-alpha.png",
+          "bytes": 1988437,
+          "sha256": "d6248250e96a5c72218de023a4ee1c8612f5909697375280e4784cb5ede81cdc",
+          "dimensions": "1254x1254 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 77,
+              "minY": 30,
+              "maxX": 1174,
+              "maxY": 1173
+            },
+            "padding": {
+              "left": 77,
+              "top": 30,
+              "right": 79,
+              "bottom": 80
+            },
+            "center": {
+              "x": 625.5,
+              "y": 601.5
+            },
+            "coverage": 0.5039211047773123,
+            "opaquePixels": 783995,
+            "transparentPixels": 780092
+          }
+        },
+        "source": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/sources/chr_frostveil_first_cast.png",
+          "bytes": 408473,
+          "sha256": "0b4d571ec3452c95d826a82fb1608c62031efaa24542eec0675fbe8f29611744",
+          "dimensions": "512x512 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 39,
+              "minY": 30,
+              "maxX": 472,
+              "maxY": 481
+            },
+            "padding": {
+              "left": 39,
+              "top": 30,
+              "right": 39,
+              "bottom": 30
+            },
+            "center": {
+              "x": 255.5,
+              "y": 255.5
+            },
+            "coverage": 0.4714088439941406,
+            "opaquePixels": 115437,
+            "transparentPixels": 137214
+          }
+        },
+        "shipping": {
+          "path": "public/ui/deeds/chr_frostveil_first_cast.webp",
+          "bytes": 6152,
+          "sha256": "b4887114c0bbaef8eb217cb3964787f3fb5e63162a5387fe417c716702e27aee",
+          "dimensions": "128x128 WebP RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 9,
+              "minY": 7,
+              "maxX": 117,
+              "maxY": 120
+            },
+            "padding": {
+              "left": 9,
+              "top": 7,
+              "right": 10,
+              "bottom": 7
+            },
+            "center": {
+              "x": 63,
+              "y": 63.5
+            },
+            "coverage": 0.47998046875,
+            "opaquePixels": 7002,
+            "transparentPixels": 8148
+          }
+        }
+      },
+      "processing": {
+        "chromaHelper": "/Users/fernando/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+        "chromaArgs": [
+          "--auto-key border",
+          "--soft-matte",
+          "--transparent-threshold 12",
+          "--opaque-threshold 220",
+          "--despill",
+          "--force"
+        ],
+        "resize": "Lanczos3 full-canvas resize to 512x512 RGBA",
+        "fitScale": 0.9658119658119658,
+        "recenterShift": {
+          "dx": 0,
+          "dy": 10
+        },
+        "webp": {
+          "size": "128x128",
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        }
+      },
+      "review": {
+        "verdict": "accepted",
+        "inspected": [
+          "1254px generated result",
+          "128px shipping color",
+          "40px shipping color",
+          "24px shipping grayscale"
+        ],
+        "checks": [
+          "complete centered medallion",
+          "exactly four cardinal kite points",
+          "no text or letter-like subject",
+          "zone-pair identity",
+          "distinct cross-zone palette",
+          "clean transparent edge",
+          "readable tiny silhouette"
+        ]
+      }
+    },
+    {
+      "id": "chr_amberfall_gatherer",
+      "canonicalName": "The Amberfall Harvest",
+      "generationMode": "OpenAI built-in imagegen",
+      "useCase": "stylized-concept",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: transparent Book of Deeds achievement crest for a classic dark-fantasy MMORPG, designed to remain readable at 40px and 24px\nPrimary request: Create a fresh hand-painted deed medallion for \"The Amberfall Harvest\", harvesting ore, wood, and herbs in the Amberfall.\nInput images: Image 1 and Image 2 are existing accepted Chronicle gathering deed crests. Use them only as authoritative references for frame geometry, material language, painterly finish, centered scale, and subject readability. Do not copy their interior arrangement or exact objects.\nScene/backdrop: Inside the medallion only, a deep russet-brown enamel ground with a restrained honey-gold sky glow. Outside the complete medallion, a perfectly flat uniform solid #FF00FF chroma-key field.\nSubject: A compact triangular still-life of one dark iron ore chunk streaked with luminous amber, one short warm chestnut orchard log with visible rings, and one sprig of copper-orange medicinal leaves with a tiny golden blossom. All three resources must be unmistakable and similarly important.\nStyle/medium: Premium hand-painted classic fantasy MMORPG achievement icon, rich brushwork, crisp silhouette, deep jewel colors, subtle top-left illumination, never a flat glyph and never a 3D product render.\nComposition/framing: One complete circular medallion centered exactly on a square canvas. Blackened bronze and steel body, antique-gold double rim, exactly four small matching cardinal kite points at top, right, bottom, and left. No diagonal points. The full frame must fit with generous even exterior padding and no cropping. Center the three-resource subject inside the dark enamel inset and keep it bold enough for tiny UI sizes.\nLighting/mood: Late autumn, honey gold, burnt orange, copper, and deep wine-red accents, bountiful and storied, high contrast against the inset.\nConstraints: The exterior chroma field must be exactly one flat #FF00FF color with no variation. No magenta anywhere inside the medallion. No exterior cast shadow, contact shadow, glow, reflection, gradient, texture, floor plane, or lighting variation. Crisp separated outer edge suitable for clean background removal. Keep the full medallion and all four cardinal points visible.\nAvoid: text, letters, numerals, runes that resemble letters, banners, ribbons, extra points, ornate outer flourishes, watermark, logo, clipped frame, off-center subject, tiny objects, muddy silhouette, photorealism.",
+      "references": [
+        {
+          "image": 1,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/chr_galecrest_gatherer.webp"
+        },
+        {
+          "image": 2,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/chr_farshore_gatherer.webp"
+        }
+      ],
+      "generatedOrigin": "/Users/fernando/.codex/generated_images/019fe708-52b8-7373-9773-7f5987ceaf94/exec-d0b1136f-0b1c-4c11-b0b1-59402555ea59.png",
+      "retries": [],
+      "files": {
+        "result": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/results/chr_amberfall_gatherer.png",
+          "bytes": 2021055,
+          "sha256": "4d59814bfa0a0afddfa07c9083418422cf2a04ff35d63bb16e9b521c760e942c",
+          "dimensions": "1254x1254 srgb",
+          "channels": 3,
+          "hasAlpha": false
+        },
+        "master": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/masters/chr_amberfall_gatherer-alpha.png",
+          "bytes": 1682799,
+          "sha256": "c288f3dfdf94cacba706913e0318b6f732a7e9ddf650bf8e230a8ecd4ed6a29e",
+          "dimensions": "1254x1254 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 110,
+              "minY": 74,
+              "maxX": 1143,
+              "maxY": 1155
+            },
+            "padding": {
+              "left": 110,
+              "top": 74,
+              "right": 110,
+              "bottom": 98
+            },
+            "center": {
+              "x": 626.5,
+              "y": 614.5
+            },
+            "coverage": 0.4648340621017529,
+            "opaquePixels": 727333,
+            "transparentPixels": 841557
+          }
+        },
+        "source": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/sources/chr_amberfall_gatherer.png",
+          "bytes": 358473,
+          "sha256": "1af9286c00312baed8752217af1372b62a8c0a30e21dd9f177b2ed707bb4f201",
+          "dimensions": "512x512 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 45,
+              "minY": 35,
+              "maxX": 466,
+              "maxY": 476
+            },
+            "padding": {
+              "left": 45,
+              "top": 35,
+              "right": 45,
+              "bottom": 35
+            },
+            "center": {
+              "x": 255.5,
+              "y": 255.5
+            },
+            "coverage": 0.466552734375,
+            "opaquePixels": 119351,
+            "transparentPixels": 138480
+          }
+        },
+        "shipping": {
+          "path": "public/ui/deeds/chr_amberfall_gatherer.webp",
+          "bytes": 5324,
+          "sha256": "643fcf881d301ecdcb295395578a76096b71966fa8461aeb2080123e3c0467e7",
+          "dimensions": "128x128 WebP RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 11,
+              "minY": 8,
+              "maxX": 116,
+              "maxY": 119
+            },
+            "padding": {
+              "left": 11,
+              "top": 8,
+              "right": 11,
+              "bottom": 8
+            },
+            "center": {
+              "x": 63.5,
+              "y": 63.5
+            },
+            "coverage": 0.47515869140625,
+            "opaquePixels": 7089,
+            "transparentPixels": 8243
+          }
+        }
+      },
+      "processing": {
+        "chromaHelper": "/Users/fernando/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+        "chromaArgs": [
+          "--auto-key border",
+          "--soft-matte",
+          "--transparent-threshold 12",
+          "--opaque-threshold 220",
+          "--despill",
+          "--force"
+        ],
+        "resize": "Lanczos3 full-canvas resize to 512x512 RGBA",
+        "fitScale": 1,
+        "recenterShift": {
+          "dx": 0,
+          "dy": 5
+        },
+        "webp": {
+          "size": "128x128",
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        }
+      },
+      "review": {
+        "verdict": "accepted",
+        "inspected": [
+          "1254px generated result",
+          "128px shipping color",
+          "40px shipping color",
+          "24px shipping grayscale"
+        ],
+        "checks": [
+          "complete centered medallion",
+          "exactly four cardinal kite points",
+          "no text or letter-like subject",
+          "zone-pair identity",
+          "distinct cross-zone palette",
+          "clean transparent edge",
+          "readable tiny silhouette"
+        ]
+      }
+    },
+    {
+      "id": "chr_amberfall_first_cast",
+      "canonicalName": "A Catch from the Great Mere",
+      "generationMode": "OpenAI built-in imagegen",
+      "useCase": "stylized-concept",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: transparent Book of Deeds achievement crest for a classic dark-fantasy MMORPG, designed to remain readable at 40px and 24px\nPrimary request: Create a fresh hand-painted deed medallion for \"A Catch from the Great Mere\", catching a fish in the Amberfall.\nInput images: Image 1 and Image 2 are existing accepted Chronicle fishing deed crests. Use them only as authoritative references for frame geometry, material language, painterly finish, centered scale, and subject readability. Do not copy their fish species, interior composition, or palette.\nScene/backdrop: Inside the medallion only, the dark still water of a broad mere reflecting a honey-gold autumn sky and one soft lanternlike gleam. Outside the complete medallion, a perfectly flat uniform solid #FF00FF chroma-key field.\nSubject: One bold copper-and-gold freshwater perch curving upward from a clean amber ripple, with dark russet fins and a few bright droplets. The fish must be the unmistakable central silhouette.\nStyle/medium: Premium hand-painted classic fantasy MMORPG achievement icon, rich brushwork, crisp silhouette, deep jewel colors, subtle top-left illumination, never a flat glyph and never a 3D product render.\nComposition/framing: One complete circular medallion centered exactly on a square canvas. Blackened bronze and steel body, antique-gold double rim, exactly four small matching cardinal kite points at top, right, bottom, and left. No diagonal points. The full frame must fit with generous even exterior padding and no cropping. Center the fish inside the dark enamel inset and keep it bold enough for tiny UI sizes.\nLighting/mood: Amber sunset, copper, honey gold, and dark merlot shadows, serene and prosperous, high contrast against the inset.\nConstraints: The exterior chroma field must be exactly one flat #FF00FF color with no variation. No magenta anywhere inside the medallion. No exterior cast shadow, contact shadow, glow, reflection, gradient, texture, floor plane, or lighting variation. Crisp separated outer edge suitable for clean background removal. Keep the full medallion and all four cardinal points visible.\nAvoid: text, letters, numerals, runes that resemble letters, banners, ribbons, hooks, fishing rods, extra fish, extra points, ornate outer flourishes, watermark, logo, clipped frame, off-center subject, muddy silhouette, photorealism.",
+      "references": [
+        {
+          "image": 1,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/chr_galecrest_first_cast.webp"
+        },
+        {
+          "image": 2,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/chr_farshore_first_cast.webp"
+        }
+      ],
+      "generatedOrigin": "/Users/fernando/.codex/generated_images/019fe708-52b8-7373-9773-7f5987ceaf94/exec-f580be6c-bc17-4e1b-a153-2727b0ad3f27.png",
+      "retries": [],
+      "files": {
+        "result": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/results/chr_amberfall_first_cast.png",
+          "bytes": 1850983,
+          "sha256": "e86841befa363d97041b508880585e7e6a4ebd8a4f9604c313be9f5dd4fac29a",
+          "dimensions": "1254x1254 srgb",
+          "channels": 3,
+          "hasAlpha": false
+        },
+        "master": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/masters/chr_amberfall_first_cast-alpha.png",
+          "bytes": 1480580,
+          "sha256": "11942b3be6552fccb268fc4c5076638b127a1a346d9b13aa7c6cd1d6b3b34664",
+          "dimensions": "1254x1254 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 107,
+              "minY": 64,
+              "maxX": 1147,
+              "maxY": 1109
+            },
+            "padding": {
+              "left": 107,
+              "top": 64,
+              "right": 106,
+              "bottom": 144
+            },
+            "center": {
+              "x": 627,
+              "y": 586.5
+            },
+            "coverage": 0.4462981616721229,
+            "opaquePixels": 697804,
+            "transparentPixels": 870705
+          }
+        },
+        "source": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/sources/chr_amberfall_first_cast.png",
+          "bytes": 338206,
+          "sha256": "ecf45e3b6dbb93dbcb40b534b41bf2b408bacda0f323bc4d088e84343b9ddb7e",
+          "dimensions": "512x512 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 43,
+              "minY": 43,
+              "maxX": 468,
+              "maxY": 469
+            },
+            "padding": {
+              "left": 43,
+              "top": 43,
+              "right": 43,
+              "bottom": 42
+            },
+            "center": {
+              "x": 255.5,
+              "y": 256
+            },
+            "coverage": 0.44795989990234375,
+            "opaquePixels": 114479,
+            "transparentPixels": 143310
+          }
+        },
+        "shipping": {
+          "path": "public/ui/deeds/chr_amberfall_first_cast.webp",
+          "bytes": 5438,
+          "sha256": "1fef3b4211a7a72d1412bd50b36cab5a0bfcc960688f33a53e4b109f47a93b8b",
+          "dimensions": "128x128 WebP RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 11,
+              "minY": 10,
+              "maxX": 117,
+              "maxY": 117
+            },
+            "padding": {
+              "left": 11,
+              "top": 10,
+              "right": 10,
+              "bottom": 10
+            },
+            "center": {
+              "x": 64,
+              "y": 63.5
+            },
+            "coverage": 0.45660400390625,
+            "opaquePixels": 6802,
+            "transparentPixels": 8550
+          }
+        }
+      },
+      "processing": {
+        "chromaHelper": "/Users/fernando/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+        "chromaArgs": [
+          "--auto-key border",
+          "--soft-matte",
+          "--transparent-threshold 12",
+          "--opaque-threshold 220",
+          "--despill",
+          "--force"
+        ],
+        "resize": "Lanczos3 full-canvas resize to 512x512 RGBA",
+        "fitScale": 1,
+        "recenterShift": {
+          "dx": 0,
+          "dy": 17
+        },
+        "webp": {
+          "size": "128x128",
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        }
+      },
+      "review": {
+        "verdict": "accepted",
+        "inspected": [
+          "1254px generated result",
+          "128px shipping color",
+          "40px shipping color",
+          "24px shipping grayscale"
+        ],
+        "checks": [
+          "complete centered medallion",
+          "exactly four cardinal kite points",
+          "no text or letter-like subject",
+          "zone-pair identity",
+          "distinct cross-zone palette",
+          "clean transparent edge",
+          "readable tiny silhouette"
+        ]
+      }
+    },
+    {
+      "id": "chr_nightbloom_gatherer",
+      "canonicalName": "The Dreaming Harvest",
+      "generationMode": "OpenAI built-in imagegen",
+      "useCase": "stylized-concept",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: transparent Book of Deeds achievement crest for a classic dark-fantasy MMORPG, designed to remain readable at 40px and 24px\nPrimary request: Create a fresh hand-painted deed medallion for \"The Dreaming Harvest\", harvesting ore, wood, and herbs in the Nightbloom.\nInput images: Image 1 and Image 2 are existing accepted Chronicle gathering deed crests. Use them only as authoritative references for frame geometry, material language, painterly finish, centered scale, and subject readability. Do not copy their interior arrangement or exact objects.\nScene/backdrop: Inside the medallion only, a deep midnight-indigo enamel ground with a restrained moonwell halo and tiny distant starlight. Outside the complete medallion, a perfectly flat uniform solid #FF00FF chroma-key field.\nSubject: A compact triangular still-life of one faceted violet moonstone ore chunk, one short dark blue-black dreamwood log with pale rings, and one luminous five-petaled nightbloom flower on an indigo sprig. All three resources must be unmistakable and similarly important.\nStyle/medium: Premium hand-painted classic fantasy MMORPG achievement icon, rich brushwork, crisp silhouette, deep jewel colors, subtle top-left illumination, never a flat glyph and never a 3D product render.\nComposition/framing: One complete circular medallion centered exactly on a square canvas. Blackened bronze and steel body, antique-gold double rim, exactly four small matching cardinal kite points at top, right, bottom, and left. No diagonal points. The full frame must fit with generous even exterior padding and no cropping. Center the three-resource subject inside the dark enamel inset and keep it bold enough for tiny UI sizes.\nLighting/mood: Dreamlike moonlight, midnight blue, violet, pale silver, and a restrained cyan edge glow, mysterious but welcoming, high contrast against the inset.\nConstraints: The exterior chroma field must be exactly one flat #FF00FF color with no variation. No magenta anywhere inside the medallion. No exterior cast shadow, contact shadow, glow, reflection, gradient, texture, floor plane, or lighting variation. Crisp separated outer edge suitable for clean background removal. Keep the full medallion and all four cardinal points visible.\nAvoid: text, letters, numerals, runes that resemble letters, banners, ribbons, extra points, ornate outer flourishes, watermark, logo, clipped frame, off-center subject, tiny objects, muddy silhouette, photorealism.",
+      "references": [
+        {
+          "image": 1,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/chr_willowfen_gatherer.webp"
+        },
+        {
+          "image": 2,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/chr_peaks_gatherer.webp"
+        }
+      ],
+      "generatedOrigin": "/Users/fernando/.codex/generated_images/019fe708-52b8-7373-9773-7f5987ceaf94/exec-63135b70-8503-4284-890a-966064b54c35.png",
+      "retries": [],
+      "files": {
+        "result": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/results/chr_nightbloom_gatherer.png",
+          "bytes": 2104054,
+          "sha256": "ff30fd0e55b0828cf3d0a05842b8b16c5db62db5022f0ff0fe3808257d341902",
+          "dimensions": "1254x1254 srgb",
+          "channels": 3,
+          "hasAlpha": false
+        },
+        "master": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/masters/chr_nightbloom_gatherer-alpha.png",
+          "bytes": 1826799,
+          "sha256": "6c627597a6f987f58bf1bee4f84b6f40a4c399db52d1bb0f5420bf90607484ce",
+          "dimensions": "1254x1254 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 79,
+              "minY": 62,
+              "maxX": 1175,
+              "maxY": 1175
+            },
+            "padding": {
+              "left": 79,
+              "top": 62,
+              "right": 78,
+              "bottom": 78
+            },
+            "center": {
+              "x": 627,
+              "y": 618.5
+            },
+            "coverage": 0.48619346321436474,
+            "opaquePixels": 687501,
+            "transparentPixels": 807969
+          }
+        },
+        "source": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/sources/chr_nightbloom_gatherer.png",
+          "bytes": 391747,
+          "sha256": "46915f1c707f4aca20518b9158d059d24d5053c5dfcac36bae0315941b14c7bc",
+          "dimensions": "512x512 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 33,
+              "minY": 30,
+              "maxX": 478,
+              "maxY": 482
+            },
+            "padding": {
+              "left": 33,
+              "top": 30,
+              "right": 33,
+              "bottom": 29
+            },
+            "center": {
+              "x": 255.5,
+              "y": 256
+            },
+            "coverage": 0.4832611083984375,
+            "opaquePixels": 100703,
+            "transparentPixels": 134031
+          }
+        },
+        "shipping": {
+          "path": "public/ui/deeds/chr_nightbloom_gatherer.webp",
+          "bytes": 7820,
+          "sha256": "ad8aa4f2f25c2752cc9f293e8171d8adee88b5b236502d122b01b190d7db95ba",
+          "dimensions": "128x128 WebP RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 8,
+              "minY": 7,
+              "maxX": 119,
+              "maxY": 120
+            },
+            "padding": {
+              "left": 8,
+              "top": 7,
+              "right": 8,
+              "bottom": 7
+            },
+            "center": {
+              "x": 63.5,
+              "y": 63.5
+            },
+            "coverage": 0.49169921875,
+            "opaquePixels": 6026,
+            "transparentPixels": 7958
+          }
+        }
+      },
+      "processing": {
+        "chromaHelper": "/Users/fernando/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+        "chromaArgs": [
+          "--auto-key border",
+          "--soft-matte",
+          "--transparent-threshold 12",
+          "--opaque-threshold 220",
+          "--despill",
+          "--force"
+        ],
+        "resize": "Lanczos3 full-canvas resize to 512x512 RGBA",
+        "fitScale": 0.9934065934065934,
+        "recenterShift": {
+          "dx": 0,
+          "dy": 4
+        },
+        "webp": {
+          "size": "128x128",
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        }
+      },
+      "review": {
+        "verdict": "accepted",
+        "inspected": [
+          "1254px generated result",
+          "128px shipping color",
+          "40px shipping color",
+          "24px shipping grayscale"
+        ],
+        "checks": [
+          "complete centered medallion",
+          "exactly four cardinal kite points",
+          "no text or letter-like subject",
+          "zone-pair identity",
+          "distinct cross-zone palette",
+          "clean transparent edge",
+          "readable tiny silhouette"
+        ]
+      }
+    },
+    {
+      "id": "chr_nightbloom_first_cast",
+      "canonicalName": "A Ripple on the Moonwell",
+      "generationMode": "OpenAI built-in imagegen",
+      "useCase": "stylized-concept",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: transparent Book of Deeds achievement crest for a classic dark-fantasy MMORPG, designed to remain readable at 40px and 24px\nPrimary request: Create a fresh hand-painted deed medallion for \"A Ripple on the Moonwell\", catching a fish in the Nightbloom.\nInput images: Image 1 and Image 2 are existing accepted Chronicle fishing deed crests. Use them only as authoritative references for frame geometry, material language, painterly finish, centered scale, and subject readability. Do not copy their fish species, interior composition, or palette.\nScene/backdrop: Inside the medallion only, a mirror-dark indigo moonwell with one pale silver moon reflection and restrained violet ripples. Outside the complete medallion, a perfectly flat uniform solid #FF00FF chroma-key field.\nSubject: One bold silver-violet moonfish curving above a single luminous circular ripple, with translucent-looking blue fins painted as solid opaque forms and a few star-bright droplets. The fish must be the unmistakable central silhouette.\nStyle/medium: Premium hand-painted classic fantasy MMORPG achievement icon, rich brushwork, crisp silhouette, deep jewel colors, subtle top-left illumination, never a flat glyph and never a 3D product render.\nComposition/framing: One complete circular medallion centered exactly on a square canvas. Blackened bronze and steel body, antique-gold double rim, exactly four small matching cardinal kite points at top, right, bottom, and left. No diagonal points. The full frame must fit with generous even exterior padding and no cropping. Center the fish inside the dark enamel inset and keep it bold enough for tiny UI sizes.\nLighting/mood: Dreamlike moonlight, midnight indigo, violet, silver, and restrained cyan, tranquil and mysterious, high contrast against the inset.\nConstraints: The exterior chroma field must be exactly one flat #FF00FF color with no variation. No magenta anywhere inside the medallion. No exterior cast shadow, contact shadow, glow, reflection, gradient, texture, floor plane, or lighting variation. Crisp separated outer edge suitable for clean background removal. Keep the full medallion and all four cardinal points visible.\nAvoid: text, letters, numerals, runes that resemble letters, banners, ribbons, hooks, fishing rods, extra fish, extra points, ornate outer flourishes, watermark, logo, clipped frame, off-center subject, muddy silhouette, photorealism.",
+      "references": [
+        {
+          "image": 1,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/chr_willowfen_first_cast.webp"
+        },
+        {
+          "image": 2,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/chr_marsh_first_cast.webp"
+        }
+      ],
+      "generatedOrigin": "/Users/fernando/.codex/generated_images/019fe708-52b8-7373-9773-7f5987ceaf94/exec-734423af-a626-4c63-9e65-3716daaeea54.png",
+      "retries": [],
+      "files": {
+        "result": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/results/chr_nightbloom_first_cast.png",
+          "bytes": 2117806,
+          "sha256": "581a4d8f85a362d870875f83f5ab83c4d889d79166d6e6b0371cebf690088893",
+          "dimensions": "1254x1254 srgb",
+          "channels": 3,
+          "hasAlpha": false
+        },
+        "master": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/masters/chr_nightbloom_first_cast-alpha.png",
+          "bytes": 1788361,
+          "sha256": "dd6c81d72f11af2100336f2606de3c84233b84d24fe4566328ab6715379e0587",
+          "dimensions": "1254x1254 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 89,
+              "minY": 65,
+              "maxX": 1166,
+              "maxY": 1161
+            },
+            "padding": {
+              "left": 89,
+              "top": 65,
+              "right": 87,
+              "bottom": 92
+            },
+            "center": {
+              "x": 627.5,
+              "y": 613
+            },
+            "coverage": 0.4660149721847027,
+            "opaquePixels": 684739,
+            "transparentPixels": 839700
+          }
+        },
+        "source": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/sources/chr_nightbloom_first_cast.png",
+          "bytes": 372280,
+          "sha256": "1d668fff3d69e122c362cb2237aa04d1d20a613fcefc29dd13391e995aa35ecd",
+          "dimensions": "512x512 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 36,
+              "minY": 32,
+              "maxX": 476,
+              "maxY": 479
+            },
+            "padding": {
+              "left": 36,
+              "top": 32,
+              "right": 35,
+              "bottom": 32
+            },
+            "center": {
+              "x": 256,
+              "y": 255.5
+            },
+            "coverage": 0.4678230285644531,
+            "opaquePixels": 103121,
+            "transparentPixels": 138078
+          }
+        },
+        "shipping": {
+          "path": "public/ui/deeds/chr_nightbloom_first_cast.webp",
+          "bytes": 7130,
+          "sha256": "aff7fd0bec8a3245aeb9263883c183a753d7d726ab54222070a950c7ee59ef7c",
+          "dimensions": "128x128 WebP RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 9,
+              "minY": 8,
+              "maxX": 118,
+              "maxY": 119
+            },
+            "padding": {
+              "left": 9,
+              "top": 8,
+              "right": 9,
+              "bottom": 8
+            },
+            "center": {
+              "x": 63.5,
+              "y": 63.5
+            },
+            "coverage": 0.47613525390625,
+            "opaquePixels": 5396,
+            "transparentPixels": 8201
+          }
+        }
+      },
+      "processing": {
+        "chromaHelper": "/Users/fernando/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+        "chromaArgs": [
+          "--auto-key border",
+          "--soft-matte",
+          "--transparent-threshold 12",
+          "--opaque-threshold 220",
+          "--despill",
+          "--force"
+        ],
+        "resize": "Lanczos3 full-canvas resize to 512x512 RGBA",
+        "fitScale": 1,
+        "recenterShift": {
+          "dx": 0,
+          "dy": 5
+        },
+        "webp": {
+          "size": "128x128",
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        }
+      },
+      "review": {
+        "verdict": "accepted",
+        "inspected": [
+          "1254px generated result",
+          "128px shipping color",
+          "40px shipping color",
+          "24px shipping grayscale"
+        ],
+        "checks": [
+          "complete centered medallion",
+          "exactly four cardinal kite points",
+          "no text or letter-like subject",
+          "zone-pair identity",
+          "distinct cross-zone palette",
+          "clean transparent edge",
+          "readable tiny silhouette"
+        ]
+      }
+    },
+    {
+      "id": "chr_wraithwood_gatherer",
+      "canonicalName": "Harvest Under the Canopy",
+      "generationMode": "OpenAI built-in imagegen",
+      "useCase": "stylized-concept",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: transparent Book of Deeds achievement crest for a classic dark-fantasy MMORPG, designed to remain readable at 40px and 24px\nPrimary request: Create a fresh hand-painted deed medallion for \"Harvest Under the Canopy\", harvesting ore, wood, and herbs in the haunted Wraithwood.\nInput images: Image 1 and Image 2 are existing accepted Chronicle gathering deed crests. Use them only as authoritative references for frame geometry, material language, painterly finish, centered scale, and subject readability. Do not copy their interior arrangement or exact objects.\nScene/backdrop: Inside the medallion only, a deep charcoal-green enamel ground beneath a closed haunted canopy, with a restrained distant lantern glow and fine cold drizzle. Outside the complete medallion, a perfectly flat uniform solid #FF00FF chroma-key field.\nSubject: A compact triangular still-life of one pale grave-iron ore chunk, one short gnarled blackwood log with ghost-gray rings, and one sprig of drooping ivory ghostleaf with muted teal veins. All three resources must be unmistakable and similarly important.\nStyle/medium: Premium hand-painted classic fantasy MMORPG achievement icon, rich brushwork, crisp silhouette, deep jewel colors, subtle top-left illumination, never a flat glyph and never a 3D product render.\nComposition/framing: One complete circular medallion centered exactly on a square canvas. Blackened bronze and steel body, antique-gold double rim, exactly four small matching cardinal kite points at top, right, bottom, and left. No diagonal points. The full frame must fit with generous even exterior padding and no cropping. Center the three-resource subject inside the dark enamel inset and keep it bold enough for tiny UI sizes.\nLighting/mood: Haunted forest twilight, charcoal, desaturated teal, bone ivory, moss green, and one dim lantern-gold accent, eerie and dignified, high contrast against the inset.\nConstraints: The exterior chroma field must be exactly one flat #FF00FF color with no variation. No magenta anywhere inside the medallion. No exterior cast shadow, contact shadow, glow, reflection, gradient, texture, floor plane, or lighting variation. Crisp separated outer edge suitable for clean background removal. Keep the full medallion and all four cardinal points visible.\nAvoid: text, letters, numerals, runes that resemble letters, faces, ghosts, skulls, banners, ribbons, extra points, ornate outer flourishes, watermark, logo, clipped frame, off-center subject, tiny objects, muddy silhouette, photorealism.",
+      "references": [
+        {
+          "image": 1,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/chr_willowfen_gatherer.webp"
+        },
+        {
+          "image": 2,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/chr_galecrest_gatherer.webp"
+        }
+      ],
+      "generatedOrigin": "/Users/fernando/.codex/generated_images/019fe708-52b8-7373-9773-7f5987ceaf94/exec-b1180ca1-b388-4a52-92df-2bbf7e06cc78.png",
+      "retries": [],
+      "files": {
+        "result": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/results/chr_wraithwood_gatherer.png",
+          "bytes": 2071672,
+          "sha256": "045fd8ba04adc1c2dbdded5a369c0f22034f85e8dd1ab9072201fdd32bb940b7",
+          "dimensions": "1254x1254 srgb",
+          "channels": 3,
+          "hasAlpha": false
+        },
+        "master": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/masters/chr_wraithwood_gatherer-alpha.png",
+          "bytes": 1718057,
+          "sha256": "ae245e84fd7abc766cdf1d1ba1d701ab543dc9881aa0a03483743da66b51fae1",
+          "dimensions": "1254x1254 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 103,
+              "minY": 54,
+              "maxX": 1150,
+              "maxY": 1144
+            },
+            "padding": {
+              "left": 103,
+              "top": 54,
+              "right": 103,
+              "bottom": 109
+            },
+            "center": {
+              "x": 626.5,
+              "y": 599
+            },
+            "coverage": 0.47790483530851197,
+            "opaquePixels": 747751,
+            "transparentPixels": 821003
+          }
+        },
+        "source": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/sources/chr_wraithwood_gatherer.png",
+          "bytes": 358381,
+          "sha256": "4525ffdc950cd6a5a5fd1b85f43acc447670ae4e001a4aee54fe9475a8ff09ba",
+          "dimensions": "512x512 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 42,
+              "minY": 33,
+              "maxX": 469,
+              "maxY": 478
+            },
+            "padding": {
+              "left": 42,
+              "top": 33,
+              "right": 42,
+              "bottom": 33
+            },
+            "center": {
+              "x": 255.5,
+              "y": 255.5
+            },
+            "coverage": 0.47959136962890625,
+            "opaquePixels": 122749,
+            "transparentPixels": 135013
+          }
+        },
+        "shipping": {
+          "path": "public/ui/deeds/chr_wraithwood_gatherer.webp",
+          "bytes": 5524,
+          "sha256": "8a29f6099b6d015e23640aa48bacbef09ccfd14058c4187e7d49cc04e6bae462",
+          "dimensions": "128x128 WebP RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 10,
+              "minY": 8,
+              "maxX": 117,
+              "maxY": 119
+            },
+            "padding": {
+              "left": 10,
+              "top": 8,
+              "right": 10,
+              "bottom": 8
+            },
+            "center": {
+              "x": 63.5,
+              "y": 63.5
+            },
+            "coverage": 0.48822021484375,
+            "opaquePixels": 7302,
+            "transparentPixels": 8007
+          }
+        }
+      },
+      "processing": {
+        "chromaHelper": "/Users/fernando/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+        "chromaArgs": [
+          "--auto-key border",
+          "--soft-matte",
+          "--transparent-threshold 12",
+          "--opaque-threshold 220",
+          "--despill",
+          "--force"
+        ],
+        "resize": "Lanczos3 full-canvas resize to 512x512 RGBA",
+        "fitScale": 1,
+        "recenterShift": {
+          "dx": 0,
+          "dy": 11
+        },
+        "webp": {
+          "size": "128x128",
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        }
+      },
+      "review": {
+        "verdict": "accepted",
+        "inspected": [
+          "1254px generated result",
+          "128px shipping color",
+          "40px shipping color",
+          "24px shipping grayscale"
+        ],
+        "checks": [
+          "complete centered medallion",
+          "exactly four cardinal kite points",
+          "no text or letter-like subject",
+          "zone-pair identity",
+          "distinct cross-zone palette",
+          "clean transparent edge",
+          "readable tiny silhouette"
+        ]
+      }
+    },
+    {
+      "id": "chr_wraithwood_first_cast",
+      "canonicalName": "A Cast in the Looking-Glass",
+      "generationMode": "OpenAI built-in imagegen",
+      "useCase": "stylized-concept",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: transparent Book of Deeds achievement crest for a classic dark-fantasy MMORPG, designed to remain readable at 40px and 24px\nPrimary request: Create a fresh hand-painted deed medallion for \"A Cast in the Looking-Glass\", catching a fish in the haunted Wraithwood.\nInput images: Image 1 and Image 2 are existing accepted Chronicle fishing deed crests. Use them only as authoritative references for frame geometry, material language, painterly finish, centered scale, and subject readability. Do not copy their fish species, interior composition, or palette.\nScene/backdrop: Inside the medallion only, a black-green forest tarn as smooth as a dark mirror, reflecting crooked bare branches and a single distant lantern. Outside the complete medallion, a perfectly flat uniform solid #FF00FF chroma-key field.\nSubject: One bold pale ghost-pike gliding in an S-like natural fish curve just beneath a single broken silver ripple, with charcoal fins and a restrained teal edge light. The fish must be the unmistakable central silhouette and must not form a letter or rune.\nStyle/medium: Premium hand-painted classic fantasy MMORPG achievement icon, rich brushwork, crisp silhouette, deep jewel colors, subtle top-left illumination, never a flat glyph and never a 3D product render.\nComposition/framing: One complete circular medallion centered exactly on a square canvas. Blackened bronze and steel body, antique-gold double rim, exactly four small matching cardinal kite points at top, right, bottom, and left. No diagonal points. The full frame must fit with generous even exterior padding and no cropping. Center the fish inside the dark enamel inset and keep it bold enough for tiny UI sizes.\nLighting/mood: Haunted dusk, charcoal black, desaturated teal, pale silver, and one dim lantern-gold accent, uncanny and hushed, high contrast against the inset.\nConstraints: The exterior chroma field must be exactly one flat #FF00FF color with no variation. No magenta anywhere inside the medallion. No exterior cast shadow, contact shadow, glow, reflection, gradient, texture, floor plane, or lighting variation. Crisp separated outer edge suitable for clean background removal. Keep the full medallion and all four cardinal points visible.\nAvoid: text, letters, numerals, runes that resemble letters, faces, ghosts, skulls, banners, ribbons, hooks, fishing rods, extra fish, extra points, ornate outer flourishes, watermark, logo, clipped frame, off-center subject, muddy silhouette, photorealism.",
+      "references": [
+        {
+          "image": 1,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/chr_willowfen_first_cast.webp"
+        },
+        {
+          "image": 2,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/chr_galecrest_first_cast.webp"
+        }
+      ],
+      "generatedOrigin": "/Users/fernando/.codex/generated_images/019fe708-52b8-7373-9773-7f5987ceaf94/exec-1d18fedb-a90e-46bf-a4f5-4547693d9cce.png",
+      "retries": [],
+      "files": {
+        "result": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/results/chr_wraithwood_first_cast.png",
+          "bytes": 1920889,
+          "sha256": "e43887c2d934befbc924129e8345af26c71ee1ef54a5ce41153cce06f3bf8867",
+          "dimensions": "1254x1254 srgb",
+          "channels": 3,
+          "hasAlpha": false
+        },
+        "master": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/masters/chr_wraithwood_first_cast-alpha.png",
+          "bytes": 1550257,
+          "sha256": "f400afcaaf685017d111240fafa58291dd068f95c0bf5a22328ab74e15db5223",
+          "dimensions": "1254x1254 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 82,
+              "minY": 56,
+              "maxX": 1173,
+              "maxY": 1197
+            },
+            "padding": {
+              "left": 82,
+              "top": 56,
+              "right": 80,
+              "bottom": 56
+            },
+            "center": {
+              "x": 627.5,
+              "y": 626.5
+            },
+            "coverage": 0.4894919988095511,
+            "opaquePixels": 765606,
+            "transparentPixels": 802782
+          }
+        },
+        "source": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/sources/chr_wraithwood_first_cast.png",
+          "bytes": 327830,
+          "sha256": "69dd45a3ea578335ab223c298ad18f532d3b9267bfb85ba55d3ef690e62c4f4b",
+          "dimensions": "512x512 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 40,
+              "minY": 30,
+              "maxX": 472,
+              "maxY": 482
+            },
+            "padding": {
+              "left": 40,
+              "top": 30,
+              "right": 39,
+              "bottom": 29
+            },
+            "center": {
+              "x": 256,
+              "y": 256
+            },
+            "coverage": 0.4633140563964844,
+            "opaquePixels": 115985,
+            "transparentPixels": 139306
+          }
+        },
+        "shipping": {
+          "path": "public/ui/deeds/chr_wraithwood_first_cast.webp",
+          "bytes": 5220,
+          "sha256": "986d476495cc5ffb17e7a001d012e9fed16e0c36f9cce9dea076ffeaa5d6a209",
+          "dimensions": "128x128 WebP RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 10,
+              "minY": 7,
+              "maxX": 118,
+              "maxY": 120
+            },
+            "padding": {
+              "left": 10,
+              "top": 7,
+              "right": 9,
+              "bottom": 7
+            },
+            "center": {
+              "x": 64,
+              "y": 63.5
+            },
+            "coverage": 0.47186279296875,
+            "opaquePixels": 7031,
+            "transparentPixels": 8288
+          }
+        }
+      },
+      "processing": {
+        "chromaHelper": "/Users/fernando/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+        "chromaArgs": [
+          "--auto-key border",
+          "--soft-matte",
+          "--transparent-threshold 12",
+          "--opaque-threshold 220",
+          "--despill",
+          "--force"
+        ],
+        "resize": "Lanczos3 full-canvas resize to 512x512 RGBA",
+        "fitScale": 0.9699570815450643,
+        "recenterShift": {
+          "dx": 1,
+          "dy": 1
+        },
+        "webp": {
+          "size": "128x128",
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        }
+      },
+      "review": {
+        "verdict": "accepted",
+        "inspected": [
+          "1254px generated result",
+          "128px shipping color",
+          "40px shipping color",
+          "24px shipping grayscale"
+        ],
+        "checks": [
+          "complete centered medallion",
+          "exactly four cardinal kite points",
+          "no text or letter-like subject",
+          "zone-pair identity",
+          "distinct cross-zone palette",
+          "clean transparent edge",
+          "readable tiny silhouette"
+        ]
+      }
+    },
+    {
+      "id": "chr_palmreach_gatherer",
+      "canonicalName": "Harvest on the Palmstrand",
+      "generationMode": "OpenAI built-in imagegen",
+      "useCase": "stylized-concept",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: transparent Book of Deeds achievement crest for a classic dark-fantasy MMORPG, designed to remain readable at 40px and 24px\nPrimary request: Create a fresh hand-painted deed medallion for \"Harvest on the Palmstrand\", harvesting ore, wood, and herbs in the tropical Palmreach.\nInput images: Image 1 and Image 2 are existing accepted Chronicle gathering deed crests. Use them only as authoritative references for frame geometry, material language, painterly finish, centered scale, and subject readability. Do not copy their interior arrangement or exact objects.\nScene/backdrop: Inside the medallion only, a deep lagoon-teal enamel ground with restrained sunlit jungle haze. Outside the complete medallion, a perfectly flat uniform solid #FF00FF chroma-key field.\nSubject: A compact triangular still-life of one faceted sea-jade ore chunk, one short sun-warmed palmwood log with fibrous rings, and one vivid coral-red tropical orchid sprig with broad emerald leaves. All three resources must be unmistakable and similarly important.\nStyle/medium: Premium hand-painted classic fantasy MMORPG achievement icon, rich brushwork, crisp silhouette, deep jewel colors, subtle top-left illumination, never a flat glyph and never a 3D product render.\nComposition/framing: One complete circular medallion centered exactly on a square canvas. Blackened bronze and steel body, antique-gold double rim, exactly four small matching cardinal kite points at top, right, bottom, and left. No diagonal points. The full frame must fit with generous even exterior padding and no cropping. Center the three-resource subject inside the dark enamel inset and keep it bold enough for tiny UI sizes.\nLighting/mood: Tropical morning, sapphire, lagoon teal, sea-jade, emerald, and a coral-red focal accent, adventurous and sunlit, high contrast against the inset.\nConstraints: The exterior chroma field must be exactly one flat #FF00FF color with no variation. No magenta anywhere inside the medallion. No exterior cast shadow, contact shadow, glow, reflection, gradient, texture, floor plane, or lighting variation. Crisp separated outer edge suitable for clean background removal. Keep the full medallion and all four cardinal points visible.\nAvoid: text, letters, numerals, runes that resemble letters, banners, ribbons, extra points, ornate outer flourishes, watermark, logo, clipped frame, off-center subject, tiny objects, muddy silhouette, photorealism.",
+      "references": [
+        {
+          "image": 1,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/chr_farshore_gatherer.webp"
+        },
+        {
+          "image": 2,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/chr_marsh_gatherer.webp"
+        }
+      ],
+      "generatedOrigin": "/Users/fernando/.codex/generated_images/019fe708-52b8-7373-9773-7f5987ceaf94/exec-7555c5da-e043-4dd4-80f7-36755560de38.png",
+      "retries": [],
+      "files": {
+        "result": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/results/chr_palmreach_gatherer.png",
+          "bytes": 2109232,
+          "sha256": "34bb29240ff08641789b0ab08499e9cee2c653203182f039f2171a1433743f5a",
+          "dimensions": "1254x1254 srgb",
+          "channels": 3,
+          "hasAlpha": false
+        },
+        "master": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/masters/chr_palmreach_gatherer-alpha.png",
+          "bytes": 1774319,
+          "sha256": "4276d0c69933269cc2a2e7acfabf0f7e4c85fc935621ca71700bd44cfce58276",
+          "dimensions": "1254x1254 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 98,
+              "minY": 56,
+              "maxX": 1155,
+              "maxY": 1171
+            },
+            "padding": {
+              "left": 98,
+              "top": 56,
+              "right": 98,
+              "bottom": 82
+            },
+            "center": {
+              "x": 626.5,
+              "y": 613.5
+            },
+            "coverage": 0.47203526069051127,
+            "opaquePixels": 738112,
+            "transparentPixels": 830233
+          }
+        },
+        "source": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/sources/chr_palmreach_gatherer.png",
+          "bytes": 379494,
+          "sha256": "c0bf784fecf50cbe0341718822b583fd1992959816b6bbd2938c3c2fa0334463",
+          "dimensions": "512x512 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 41,
+              "minY": 30,
+              "maxX": 470,
+              "maxY": 481
+            },
+            "padding": {
+              "left": 41,
+              "top": 30,
+              "right": 41,
+              "bottom": 30
+            },
+            "center": {
+              "x": 255.5,
+              "y": 255.5
+            },
+            "coverage": 0.4663124084472656,
+            "opaquePixels": 116702,
+            "transparentPixels": 138425
+          }
+        },
+        "shipping": {
+          "path": "public/ui/deeds/chr_palmreach_gatherer.webp",
+          "bytes": 6174,
+          "sha256": "db730e16fef9ffbe9dca75c2f2d56f72032355c629845ecd7b57ad237f0b1e09",
+          "dimensions": "128x128 WebP RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 10,
+              "minY": 7,
+              "maxX": 117,
+              "maxY": 120
+            },
+            "padding": {
+              "left": 10,
+              "top": 7,
+              "right": 10,
+              "bottom": 7
+            },
+            "center": {
+              "x": 63.5,
+              "y": 63.5
+            },
+            "coverage": 0.474609375,
+            "opaquePixels": 7070,
+            "transparentPixels": 8244
+          }
+        }
+      },
+      "processing": {
+        "chromaHelper": "/Users/fernando/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+        "chromaArgs": [
+          "--auto-key border",
+          "--soft-matte",
+          "--transparent-threshold 12",
+          "--opaque-threshold 220",
+          "--despill",
+          "--force"
+        ],
+        "resize": "Lanczos3 full-canvas resize to 512x512 RGBA",
+        "fitScale": 0.9912280701754386,
+        "recenterShift": {
+          "dx": 0,
+          "dy": 5
+        },
+        "webp": {
+          "size": "128x128",
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        }
+      },
+      "review": {
+        "verdict": "accepted",
+        "inspected": [
+          "1254px generated result",
+          "128px shipping color",
+          "40px shipping color",
+          "24px shipping grayscale"
+        ],
+        "checks": [
+          "complete centered medallion",
+          "exactly four cardinal kite points",
+          "no text or letter-like subject",
+          "zone-pair identity",
+          "distinct cross-zone palette",
+          "clean transparent edge",
+          "readable tiny silhouette"
+        ]
+      }
+    },
+    {
+      "id": "chr_palmreach_first_cast",
+      "canonicalName": "Casting the Sapphire Lagoon",
+      "generationMode": "OpenAI built-in imagegen",
+      "useCase": "stylized-concept",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: transparent Book of Deeds achievement crest for a classic dark-fantasy MMORPG, designed to remain readable at 40px and 24px\nPrimary request: Create a fresh hand-painted deed medallion for \"Casting the Sapphire Lagoon\", catching a fish in the tropical Palmreach.\nInput images: Image 1 and Image 2 are existing accepted Chronicle fishing deed crests. Use them only as authoritative references for frame geometry, material language, painterly finish, centered scale, and subject readability. Do not copy their fish species, interior composition, or palette.\nScene/backdrop: Inside the medallion only, clear sapphire lagoon water over a restrained hint of pale coral and sunlit sand. Outside the complete medallion, a perfectly flat uniform solid #FF00FF chroma-key field.\nSubject: One bold turquoise-and-gold lagoon fish leaping through a clean arc of bright blue water, with coral-orange fins and a few sunlit droplets. The fish must be the unmistakable central silhouette.\nStyle/medium: Premium hand-painted classic fantasy MMORPG achievement icon, rich brushwork, crisp silhouette, deep jewel colors, subtle top-left illumination, never a flat glyph and never a 3D product render.\nComposition/framing: One complete circular medallion centered exactly on a square canvas. Blackened bronze and steel body, antique-gold double rim, exactly four small matching cardinal kite points at top, right, bottom, and left. No diagonal points. The full frame must fit with generous even exterior padding and no cropping. Center the fish inside the dark enamel inset and keep it bold enough for tiny UI sizes.\nLighting/mood: Tropical noon, sapphire, lagoon teal, turquoise, sun gold, and a restrained coral accent, bright and adventurous, high contrast against the inset.\nConstraints: The exterior chroma field must be exactly one flat #FF00FF color with no variation. No magenta anywhere inside the medallion. No exterior cast shadow, contact shadow, glow, reflection, gradient, texture, floor plane, or lighting variation. Crisp separated outer edge suitable for clean background removal. Keep the full medallion and all four cardinal points visible.\nAvoid: text, letters, numerals, runes that resemble letters, banners, ribbons, hooks, fishing rods, extra fish, extra points, ornate outer flourishes, watermark, logo, clipped frame, off-center subject, muddy silhouette, photorealism.",
+      "references": [
+        {
+          "image": 1,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/chr_farshore_first_cast.webp"
+        },
+        {
+          "image": 2,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/chr_galecrest_first_cast.webp"
+        }
+      ],
+      "generatedOrigin": "/Users/fernando/.codex/generated_images/019fe708-52b8-7373-9773-7f5987ceaf94/exec-dbe4e6b0-376a-4941-9595-625b6d2c0b3e.png",
+      "retries": [],
+      "files": {
+        "result": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/results/chr_palmreach_first_cast.png",
+          "bytes": 2002071,
+          "sha256": "cf8c43802728851750232d07c6fe4e3cd0471fb3cf4c0a4402060fc8060efb94",
+          "dimensions": "1254x1254 srgb",
+          "channels": 3,
+          "hasAlpha": false
+        },
+        "master": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/masters/chr_palmreach_first_cast-alpha.png",
+          "bytes": 1656722,
+          "sha256": "66c392780bcf30d18a437de70975be6cf4a26c89bab926ee2d5e39c110e6b352",
+          "dimensions": "1254x1254 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 108,
+              "minY": 67,
+              "maxX": 1144,
+              "maxY": 1117
+            },
+            "padding": {
+              "left": 108,
+              "top": 67,
+              "right": 109,
+              "bottom": 136
+            },
+            "center": {
+              "x": 626,
+              "y": 592
+            },
+            "coverage": 0.450367436642934,
+            "opaquePixels": 704123,
+            "transparentPixels": 864306
+          }
+        },
+        "source": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/sources/chr_palmreach_first_cast.png",
+          "bytes": 379335,
+          "sha256": "5702ae64e9a85fdb72c156e01aa683f0d95c208ea24b6062df9ae88267672491",
+          "dimensions": "512x512 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 45,
+              "minY": 41,
+              "maxX": 467,
+              "maxY": 470
+            },
+            "padding": {
+              "left": 45,
+              "top": 41,
+              "right": 44,
+              "bottom": 41
+            },
+            "center": {
+              "x": 256,
+              "y": 255.5
+            },
+            "coverage": 0.45183563232421875,
+            "opaquePixels": 115395,
+            "transparentPixels": 142343
+          }
+        },
+        "shipping": {
+          "path": "public/ui/deeds/chr_palmreach_first_cast.webp",
+          "bytes": 6022,
+          "sha256": "2588cab4857013e274ff44764432ec9908db5a802d86fc24d7f37bce3c5be79b",
+          "dimensions": "128x128 WebP RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 11,
+              "minY": 10,
+              "maxX": 116,
+              "maxY": 117
+            },
+            "padding": {
+              "left": 11,
+              "top": 10,
+              "right": 11,
+              "bottom": 10
+            },
+            "center": {
+              "x": 63.5,
+              "y": 63.5
+            },
+            "coverage": 0.46026611328125,
+            "opaquePixels": 6844,
+            "transparentPixels": 8475
+          }
+        }
+      },
+      "processing": {
+        "chromaHelper": "/Users/fernando/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+        "chromaArgs": [
+          "--auto-key border",
+          "--soft-matte",
+          "--transparent-threshold 12",
+          "--opaque-threshold 220",
+          "--despill",
+          "--force"
+        ],
+        "resize": "Lanczos3 full-canvas resize to 512x512 RGBA",
+        "fitScale": 1,
+        "recenterShift": {
+          "dx": 1,
+          "dy": 14
+        },
+        "webp": {
+          "size": "128x128",
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        }
+      },
+      "review": {
+        "verdict": "accepted",
+        "inspected": [
+          "1254px generated result",
+          "128px shipping color",
+          "40px shipping color",
+          "24px shipping grayscale"
+        ],
+        "checks": [
+          "complete centered medallion",
+          "exactly four cardinal kite points",
+          "no text or letter-like subject",
+          "zone-pair identity",
+          "distinct cross-zone palette",
+          "clean transparent edge",
+          "readable tiny silhouette"
+        ]
+      }
+    },
+    {
+      "id": "chr_evergarden_gatherer",
+      "canonicalName": "The Parterre's Bounty",
+      "generationMode": "OpenAI built-in imagegen",
+      "useCase": "stylized-concept",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: transparent Book of Deeds achievement crest for a classic dark-fantasy MMORPG, designed to remain readable at 40px and 24px\nPrimary request: Create a fresh hand-painted deed medallion for \"The Parterre's Bounty\", harvesting ore, wood, and herbs in the cultivated Evergarden.\nInput images: Image 1 and Image 2 are existing accepted Chronicle gathering deed crests. Use them only as authoritative references for frame geometry, material language, painterly finish, centered scale, and subject readability. Do not copy their interior arrangement or exact objects.\nScene/backdrop: Inside the medallion only, a deep hedge-green enamel ground with restrained dawn light over a formal garden. Outside the complete medallion, a perfectly flat uniform solid #FF00FF chroma-key field.\nSubject: A compact triangular still-life of one polished pale garden-stone ore chunk with mossy facets, one short neatly cut topiary-wood log with honey-colored rings, and one lush ivory-and-rose garden bloom with clipped emerald leaves. All three resources must be unmistakable and similarly important.\nStyle/medium: Premium hand-painted classic fantasy MMORPG achievement icon, rich brushwork, crisp silhouette, deep jewel colors, subtle top-left illumination, never a flat glyph and never a 3D product render.\nComposition/framing: One complete circular medallion centered exactly on a square canvas. Blackened bronze and steel body, antique-gold double rim, exactly four small matching cardinal kite points at top, right, bottom, and left. No diagonal points. The full frame must fit with generous even exterior padding and no cropping. Center the three-resource subject inside the dark enamel inset and keep it bold enough for tiny UI sizes.\nLighting/mood: Manicured spring dawn, hedge green, cream, blush rose, honey gold, and dew-bright highlights, elegant and abundant, high contrast against the inset.\nConstraints: The exterior chroma field must be exactly one flat #FF00FF color with no variation. No magenta anywhere inside the medallion. No exterior cast shadow, contact shadow, glow, reflection, gradient, texture, floor plane, or lighting variation. Crisp separated outer edge suitable for clean background removal. Keep the full medallion and all four cardinal points visible.\nAvoid: text, letters, numerals, runes that resemble letters, banners, ribbons, extra points, ornate outer flourishes, watermark, logo, clipped frame, off-center subject, tiny objects, muddy silhouette, photorealism.",
+      "references": [
+        {
+          "image": 1,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/chr_willowfen_gatherer.webp"
+        },
+        {
+          "image": 2,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/chr_farshore_gatherer.webp"
+        }
+      ],
+      "generatedOrigin": "/Users/fernando/.codex/generated_images/019fe708-52b8-7373-9773-7f5987ceaf94/exec-28fd8bc9-2652-47ba-a416-3aede5d296d5.png",
+      "retries": [],
+      "files": {
+        "result": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/results/chr_evergarden_gatherer.png",
+          "bytes": 1944926,
+          "sha256": "56cbedbb6f0a664e199dc0ff5bc02401120443188c2ef566494c49c496baf4d6",
+          "dimensions": "1254x1254 srgb",
+          "channels": 3,
+          "hasAlpha": false
+        },
+        "master": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/masters/chr_evergarden_gatherer-alpha.png",
+          "bytes": 1609104,
+          "sha256": "c24f4eb41b02a9f340dc6f5a06d518c37bd686f2d2d2a93049f6c252ae592a6d",
+          "dimensions": "1254x1254 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 110,
+              "minY": 57,
+              "maxX": 1139,
+              "maxY": 1119
+            },
+            "padding": {
+              "left": 110,
+              "top": 57,
+              "right": 114,
+              "bottom": 134
+            },
+            "center": {
+              "x": 624.5,
+              "y": 588
+            },
+            "coverage": 0.46218989186755494,
+            "opaquePixels": 723819,
+            "transparentPixels": 845715
+          }
+        },
+        "source": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/sources/chr_evergarden_gatherer.png",
+          "bytes": 379547,
+          "sha256": "adc990cee818a99fffdd8d3f94ca9910706f62c1f4b0951212f77800eef88f6c",
+          "dimensions": "512x512 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 46,
+              "minY": 39,
+              "maxX": 466,
+              "maxY": 472
+            },
+            "padding": {
+              "left": 46,
+              "top": 39,
+              "right": 45,
+              "bottom": 39
+            },
+            "center": {
+              "x": 256,
+              "y": 255.5
+            },
+            "coverage": 0.4632911682128906,
+            "opaquePixels": 118529,
+            "transparentPixels": 139329
+          }
+        },
+        "shipping": {
+          "path": "public/ui/deeds/chr_evergarden_gatherer.webp",
+          "bytes": 6148,
+          "sha256": "c9387b0c4e393ae82f667e8594c9da8c35accc776add3c21d5a29593c427d7f7",
+          "dimensions": "128x128 WebP RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 11,
+              "minY": 9,
+              "maxX": 116,
+              "maxY": 118
+            },
+            "padding": {
+              "left": 11,
+              "top": 9,
+              "right": 11,
+              "bottom": 9
+            },
+            "center": {
+              "x": 63.5,
+              "y": 63.5
+            },
+            "coverage": 0.47198486328125,
+            "opaquePixels": 7041,
+            "transparentPixels": 8302
+          }
+        }
+      },
+      "processing": {
+        "chromaHelper": "/Users/fernando/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+        "chromaArgs": [
+          "--auto-key border",
+          "--soft-matte",
+          "--transparent-threshold 12",
+          "--opaque-threshold 220",
+          "--despill",
+          "--force"
+        ],
+        "resize": "Lanczos3 full-canvas resize to 512x512 RGBA",
+        "fitScale": 1,
+        "recenterShift": {
+          "dx": 1,
+          "dy": 16
+        },
+        "webp": {
+          "size": "128x128",
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        }
+      },
+      "review": {
+        "verdict": "accepted",
+        "inspected": [
+          "1254px generated result",
+          "128px shipping color",
+          "40px shipping color",
+          "24px shipping grayscale"
+        ],
+        "checks": [
+          "complete centered medallion",
+          "exactly four cardinal kite points",
+          "no text or letter-like subject",
+          "zone-pair identity",
+          "distinct cross-zone palette",
+          "clean transparent edge",
+          "readable tiny silhouette"
+        ]
+      }
+    },
+    {
+      "id": "chr_evergarden_first_cast",
+      "canonicalName": "A Cast on the Petal Pond",
+      "generationMode": "OpenAI built-in imagegen",
+      "useCase": "stylized-concept",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: transparent Book of Deeds achievement crest for a classic dark-fantasy MMORPG, designed to remain readable at 40px and 24px\nPrimary request: Create a fresh hand-painted deed medallion for \"A Cast on the Petal Pond\", catching a fish in the cultivated Evergarden.\nInput images: Image 1 and Image 2 are existing accepted Chronicle fishing deed crests. Use them only as authoritative references for frame geometry, material language, painterly finish, centered scale, and subject readability. Do not copy their fish species, interior composition, or palette.\nScene/backdrop: Inside the medallion only, a deep jade garden pond scattered with a few pale rose petals and one restrained lily pad. Outside the complete medallion, a perfectly flat uniform solid #FF00FF chroma-key field.\nSubject: One bold ivory-and-coral ornamental koi curving upward through a clean emerald ripple, with warm gold fins and a few dew-bright droplets. The fish must be the unmistakable central silhouette.\nStyle/medium: Premium hand-painted classic fantasy MMORPG achievement icon, rich brushwork, crisp silhouette, deep jewel colors, subtle top-left illumination, never a flat glyph and never a 3D product render.\nComposition/framing: One complete circular medallion centered exactly on a square canvas. Blackened bronze and steel body, antique-gold double rim, exactly four small matching cardinal kite points at top, right, bottom, and left. No diagonal points. The full frame must fit with generous even exterior padding and no cropping. Center the fish inside the dark enamel inset and keep it bold enough for tiny UI sizes.\nLighting/mood: Manicured spring morning, deep jade, ivory, coral, blush rose, and warm gold, graceful and celebratory, high contrast against the inset.\nConstraints: The exterior chroma field must be exactly one flat #FF00FF color with no variation. No magenta anywhere inside the medallion. No exterior cast shadow, contact shadow, glow, reflection, gradient, texture, floor plane, or lighting variation. Crisp separated outer edge suitable for clean background removal. Keep the full medallion and all four cardinal points visible.\nAvoid: text, letters, numerals, runes that resemble letters, banners, ribbons, hooks, fishing rods, extra fish, extra points, ornate outer flourishes, watermark, logo, clipped frame, off-center subject, muddy silhouette, photorealism.",
+      "references": [
+        {
+          "image": 1,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/chr_willowfen_first_cast.webp"
+        },
+        {
+          "image": 2,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/chr_farshore_first_cast.webp"
+        }
+      ],
+      "generatedOrigin": "/Users/fernando/.codex/generated_images/019fe708-52b8-7373-9773-7f5987ceaf94/exec-b3cabfe5-d04f-43f6-b665-420d771c6ea7.png",
+      "retries": [],
+      "files": {
+        "result": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/results/chr_evergarden_first_cast.png",
+          "bytes": 2094703,
+          "sha256": "49084254beef43c93a18e90a25e74d82e247d4c5711b61efc03757416b018369",
+          "dimensions": "1254x1254 srgb",
+          "channels": 3,
+          "hasAlpha": false
+        },
+        "master": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/masters/chr_evergarden_first_cast-alpha.png",
+          "bytes": 1794069,
+          "sha256": "c170c191bcd18151c2cc9d802163043413074c7c779cfa49592ab9f6bc584341",
+          "dimensions": "1254x1254 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 69,
+              "minY": 29,
+              "maxX": 1183,
+              "maxY": 1153
+            },
+            "padding": {
+              "left": 69,
+              "top": 29,
+              "right": 70,
+              "bottom": 100
+            },
+            "center": {
+              "x": 626,
+              "y": 591
+            },
+            "coverage": 0.5079770253530012,
+            "opaquePixels": 794534,
+            "transparentPixels": 773714
+          }
+        },
+        "source": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/sources/chr_evergarden_first_cast.png",
+          "bytes": 396385,
+          "sha256": "9026a806ea129b16fb24b859cba411f7b3dc972a67fce1572c063930ba9b2535",
+          "dimensions": "512x512 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 32,
+              "minY": 30,
+              "maxX": 479,
+              "maxY": 481
+            },
+            "padding": {
+              "left": 32,
+              "top": 30,
+              "right": 32,
+              "bottom": 30
+            },
+            "center": {
+              "x": 255.5,
+              "y": 255.5
+            },
+            "coverage": 0.4925346374511719,
+            "opaquePixels": 123396,
+            "transparentPixels": 131660
+          }
+        },
+        "shipping": {
+          "path": "public/ui/deeds/chr_evergarden_first_cast.webp",
+          "bytes": 5886,
+          "sha256": "05abf50162fd7888823436bafec65185cddbffe5b39520feb931ec71b549da9c",
+          "dimensions": "128x128 WebP RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 8,
+              "minY": 7,
+              "maxX": 119,
+              "maxY": 120
+            },
+            "padding": {
+              "left": 8,
+              "top": 7,
+              "right": 8,
+              "bottom": 7
+            },
+            "center": {
+              "x": 63.5,
+              "y": 63.5
+            },
+            "coverage": 0.5010986328125,
+            "opaquePixels": 7478,
+            "transparentPixels": 7805
+          }
+        }
+      },
+      "processing": {
+        "chromaHelper": "/Users/fernando/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+        "chromaArgs": [
+          "--auto-key border",
+          "--soft-matte",
+          "--transparent-threshold 12",
+          "--opaque-threshold 220",
+          "--despill",
+          "--force"
+        ],
+        "resize": "Lanczos3 full-canvas resize to 512x512 RGBA",
+        "fitScale": 0.9826086956521739,
+        "recenterShift": {
+          "dx": 1,
+          "dy": 15
+        },
+        "webp": {
+          "size": "128x128",
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        }
+      },
+      "review": {
+        "verdict": "accepted",
+        "inspected": [
+          "1254px generated result",
+          "128px shipping color",
+          "40px shipping color",
+          "24px shipping grayscale"
+        ],
+        "checks": [
+          "complete centered medallion",
+          "exactly four cardinal kite points",
+          "no text or letter-like subject",
+          "zone-pair identity",
+          "distinct cross-zone palette",
+          "clean transparent edge",
+          "readable tiny silhouette"
+        ]
+      }
+    },
+    {
+      "id": "pvp_honor_sergeant",
+      "canonicalName": "Linebreaker",
+      "generationMode": "OpenAI built-in imagegen",
+      "useCase": "stylized-concept",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: transparent Book of Deeds PvP honor achievement crest for a classic dark-fantasy MMORPG, designed to remain readable at 40px and 24px\nPrimary request: Create a fresh hand-painted deed medallion for the first lifetime-honor rank \"Linebreaker\", earned by a battle-tested soldier.\nInput images: Image 1, Image 2, and Image 3 are existing accepted PvP deed crests. Use them only as authoritative references for frame geometry, material language, painterly finish, centered scale, and martial readability. Do not copy their exact subjects or interior compositions.\nScene/backdrop: Inside the medallion only, a dark iron enamel field with restrained smoky battlefield red at the horizon. Outside the complete medallion, a perfectly flat uniform solid #FF00FF chroma-key field.\nSubject: A single battered dark-iron linebreaker insignia: a compact forward-facing infantry helm over a dented round shield boss, crossed by one snapped enemy spear shaft. The silhouette must feel hard-earned and low-rank, with worn steel, leather, and only tiny antique-gold rivet accents. No crown.\nStyle/medium: Premium hand-painted classic fantasy MMORPG achievement icon, rich brushwork, crisp silhouette, deep jewel shadows, subtle top-left illumination, never a flat glyph and never a 3D product render.\nComposition/framing: One complete circular medallion centered exactly on a square canvas. Blackened bronze and steel body, antique-gold double rim, exactly four small matching cardinal kite points at top, right, bottom, and left. No diagonal points. The full frame must fit with generous even exterior padding and no cropping. Center one bold martial insignia inside the dark enamel inset and keep it readable at tiny UI sizes.\nLighting/mood: Soot, worn iron, dark leather, muted crimson, and sparse old gold, gritty, steadfast, and earned.\nConstraints: The exterior chroma field must be exactly one flat #FF00FF color with no variation. No magenta anywhere inside the medallion. No exterior cast shadow, contact shadow, glow, reflection, gradient, texture, floor plane, or lighting variation. Crisp separated outer edge suitable for clean background removal. Keep the full medallion and all four cardinal points visible.\nAvoid: text, letters, numerals, tally marks, runes that resemble letters, skulls, crowns, banners, ribbons, wings, extra points, ornate outer flourishes, watermark, logo, clipped frame, off-center subject, muddy silhouette, photorealism.",
+      "references": [
+        {
+          "image": 1,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/pvp_duel_first_win.webp"
+        },
+        {
+          "image": 2,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/pvp_bg_wins_25.webp"
+        },
+        {
+          "image": 3,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/pvp_arena_first_win.webp"
+        }
+      ],
+      "generatedOrigin": "/Users/fernando/.codex/generated_images/019fe708-52b8-7373-9773-7f5987ceaf94/exec-d1dd7e5c-480a-4f6c-9a78-2dc30d542663.png",
+      "retries": [],
+      "files": {
+        "result": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/results/pvp_honor_sergeant.png",
+          "bytes": 1971801,
+          "sha256": "9e7811f8b62e65aeb9665b9d522745d93c5607a02d8513f62876a58411b873b7",
+          "dimensions": "1254x1254 srgb",
+          "channels": 3,
+          "hasAlpha": false
+        },
+        "master": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/masters/pvp_honor_sergeant-alpha.png",
+          "bytes": 1589824,
+          "sha256": "4dc1bdc09faa65e4b3df0f8ed9b9aa5ae7ec56efd32ca39fda45788c28c3c46b",
+          "dimensions": "1254x1254 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 98,
+              "minY": 46,
+              "maxX": 1156,
+              "maxY": 1169
+            },
+            "padding": {
+              "left": 98,
+              "top": 46,
+              "right": 97,
+              "bottom": 84
+            },
+            "center": {
+              "x": 627,
+              "y": 607.5
+            },
+            "coverage": 0.4606178887845974,
+            "opaquePixels": 719997,
+            "transparentPixels": 848187
+          }
+        },
+        "source": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/sources/pvp_honor_sergeant.png",
+          "bytes": 320383,
+          "sha256": "052b546cec59b6dad7e95731bf0e31749c17761aacb50c3538b90458b0157725",
+          "dimensions": "512x512 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 43,
+              "minY": 30,
+              "maxX": 468,
+              "maxY": 481
+            },
+            "padding": {
+              "left": 43,
+              "top": 30,
+              "right": 43,
+              "bottom": 30
+            },
+            "center": {
+              "x": 255.5,
+              "y": 255.5
+            },
+            "coverage": 0.4482841491699219,
+            "opaquePixels": 112012,
+            "transparentPixels": 143293
+          }
+        },
+        "shipping": {
+          "path": "public/ui/deeds/pvp_honor_sergeant.webp",
+          "bytes": 5236,
+          "sha256": "9adc17030f8f446a20ea28ebabafbdf6f9f9b3f2a203a6b9222f85b7163bef7f",
+          "dimensions": "128x128 WebP RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 11,
+              "minY": 7,
+              "maxX": 117,
+              "maxY": 120
+            },
+            "padding": {
+              "left": 11,
+              "top": 7,
+              "right": 10,
+              "bottom": 7
+            },
+            "center": {
+              "x": 64,
+              "y": 63.5
+            },
+            "coverage": 0.45654296875,
+            "opaquePixels": 6775,
+            "transparentPixels": 8540
+          }
+        }
+      },
+      "processing": {
+        "chromaHelper": "/Users/fernando/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+        "chromaArgs": [
+          "--auto-key border",
+          "--soft-matte",
+          "--transparent-threshold 12",
+          "--opaque-threshold 220",
+          "--despill",
+          "--force"
+        ],
+        "resize": "Lanczos3 full-canvas resize to 512x512 RGBA",
+        "fitScale": 0.9847494553376906,
+        "recenterShift": {
+          "dx": 0,
+          "dy": 8
+        },
+        "webp": {
+          "size": "128x128",
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        }
+      },
+      "review": {
+        "verdict": "accepted",
+        "inspected": [
+          "1254px generated result",
+          "128px shipping color",
+          "40px shipping color",
+          "24px shipping grayscale"
+        ],
+        "checks": [
+          "complete centered medallion",
+          "exactly four cardinal kite points",
+          "no text or letter-like subject",
+          "zone-pair identity",
+          "distinct cross-zone palette",
+          "clean transparent edge",
+          "readable tiny silhouette"
+        ]
+      }
+    },
+    {
+      "id": "pvp_honor_knight_lieutenant",
+      "canonicalName": "Fieldreaver",
+      "generationMode": "OpenAI built-in imagegen",
+      "useCase": "stylized-concept",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: transparent Book of Deeds PvP honor achievement crest for a classic dark-fantasy MMORPG, designed to remain readable at 40px and 24px\nPrimary request: Create a fresh hand-painted deed medallion for the middle lifetime-honor rank \"Fieldreaver\", earned after a season of real war.\nInput images: Image 1, Image 2, and Image 3 are existing accepted high-tier PvP deed crests. Use them only as authoritative references for frame geometry, material language, painterly finish, centered scale, and martial readability. Do not copy their exact subjects or interior compositions.\nScene/backdrop: Inside the medallion only, a deep steel-blue enamel field with restrained storm clouds and a distant muted crimson battle glow. Outside the complete medallion, a perfectly flat uniform solid #FF00FF chroma-key field.\nSubject: A refined fieldreaver insignia: one polished steel cavalry greathelm with a narrow antique-gold brow guard, set before two compact crossed polearm heads. Add a restrained crimson horsehair plume, but no crown and no wings. The emblem must clearly outrank battered iron without feeling royal.\nStyle/medium: Premium hand-painted classic fantasy MMORPG achievement icon, rich brushwork, crisp silhouette, deep jewel shadows, subtle top-left illumination, never a flat glyph and never a 3D product render.\nComposition/framing: One complete circular medallion centered exactly on a square canvas. Blackened bronze and steel body, antique-gold double rim, exactly four small matching cardinal kite points at top, right, bottom, and left. No diagonal points. The full frame must fit with generous even exterior padding and no cropping. Center one bold martial insignia inside the dark enamel inset and keep it readable at tiny UI sizes.\nLighting/mood: Refined steel, storm blue, crimson, and measured antique gold, commanding, disciplined, and battle-proven.\nConstraints: The exterior chroma field must be exactly one flat #FF00FF color with no variation. No magenta anywhere inside the medallion. No exterior cast shadow, contact shadow, glow, reflection, gradient, texture, floor plane, or lighting variation. Crisp separated outer edge suitable for clean background removal. Keep the full medallion and all four cardinal points visible.\nAvoid: text, letters, numerals, tally marks, runes that resemble letters, skulls, crowns, banners, ribbons, wings, extra points, ornate outer flourishes, watermark, logo, clipped frame, off-center subject, muddy silhouette, photorealism.",
+      "references": [
+        {
+          "image": 1,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/pvp_arena_1v1_1900.webp"
+        },
+        {
+          "image": 2,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/pvp_bg_wins_25.webp"
+        },
+        {
+          "image": 3,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/pvp_vcup_wins_25.webp"
+        }
+      ],
+      "generatedOrigin": "/Users/fernando/.codex/generated_images/019fe708-52b8-7373-9773-7f5987ceaf94/exec-a0124435-473b-4292-a857-e8cd6f050e8f.png",
+      "retries": [],
+      "files": {
+        "result": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/results/pvp_honor_knight_lieutenant.png",
+          "bytes": 2156638,
+          "sha256": "5b057ab976cefdb6d198411544b709568905a940c4903f8490c5fa019d83385d",
+          "dimensions": "1254x1254 srgb",
+          "channels": 3,
+          "hasAlpha": false
+        },
+        "master": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/masters/pvp_honor_knight_lieutenant-alpha.png",
+          "bytes": 1811906,
+          "sha256": "58e46349f949fc50d5c41cf98a50ff278e977f6c76bf11113cec383ed4df0205",
+          "dimensions": "1254x1254 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 75,
+              "minY": 45,
+              "maxX": 1174,
+              "maxY": 1173
+            },
+            "padding": {
+              "left": 75,
+              "top": 45,
+              "right": 79,
+              "bottom": 80
+            },
+            "center": {
+              "x": 624.5,
+              "y": 609
+            },
+            "coverage": 0.48816355445667964,
+            "opaquePixels": 763679,
+            "transparentPixels": 804871
+          }
+        },
+        "source": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/sources/pvp_honor_knight_lieutenant.png",
+          "bytes": 358193,
+          "sha256": "8561b100e92b899a04e07f3665d3753362b261dc68d813b27e4e24256f9aa19f",
+          "dimensions": "512x512 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 36,
+              "minY": 30,
+              "maxX": 475,
+              "maxY": 481
+            },
+            "padding": {
+              "left": 36,
+              "top": 30,
+              "right": 36,
+              "bottom": 30
+            },
+            "center": {
+              "x": 255.5,
+              "y": 255.5
+            },
+            "coverage": 0.4698143005371094,
+            "opaquePixels": 117306,
+            "transparentPixels": 137556
+          }
+        },
+        "shipping": {
+          "path": "public/ui/deeds/pvp_honor_knight_lieutenant.webp",
+          "bytes": 5542,
+          "sha256": "0f75726fd2801e22f9d25524a2c115fa28738b174cc06c7e274715e288ef3955",
+          "dimensions": "128x128 WebP RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 9,
+              "minY": 7,
+              "maxX": 118,
+              "maxY": 120
+            },
+            "padding": {
+              "left": 9,
+              "top": 7,
+              "right": 9,
+              "bottom": 7
+            },
+            "center": {
+              "x": 63.5,
+              "y": 63.5
+            },
+            "coverage": 0.47796630859375,
+            "opaquePixels": 7122,
+            "transparentPixels": 8177
+          }
+        }
+      },
+      "processing": {
+        "chromaHelper": "/Users/fernando/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+        "chromaArgs": [
+          "--auto-key border",
+          "--soft-matte",
+          "--transparent-threshold 12",
+          "--opaque-threshold 220",
+          "--despill",
+          "--force"
+        ],
+        "resize": "Lanczos3 full-canvas resize to 512x512 RGBA",
+        "fitScale": 0.9783549783549783,
+        "recenterShift": {
+          "dx": 1,
+          "dy": 8
+        },
+        "webp": {
+          "size": "128x128",
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        }
+      },
+      "review": {
+        "verdict": "accepted",
+        "inspected": [
+          "1254px generated result",
+          "128px shipping color",
+          "40px shipping color",
+          "24px shipping grayscale"
+        ],
+        "checks": [
+          "complete centered medallion",
+          "exactly four cardinal kite points",
+          "no text or letter-like subject",
+          "zone-pair identity",
+          "distinct cross-zone palette",
+          "clean transparent edge",
+          "readable tiny silhouette"
+        ]
+      }
+    },
+    {
+      "id": "pvp_honor_field_marshal",
+      "canonicalName": "Warcrowned",
+      "generationMode": "OpenAI built-in imagegen",
+      "useCase": "stylized-concept",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: transparent Book of Deeds PvP honor achievement crest for a classic dark-fantasy MMORPG, designed to remain readable at 40px and 24px\nPrimary request: Create a fresh hand-painted deed medallion for the highest lifetime-honor rank \"Warcrowned\", a singular realm-rare marshal achievement.\nInput images: Image 1, Image 2, and Image 3 are existing accepted elite PvP deed crests. Use them only as authoritative references for frame geometry, material language, painterly finish, centered scale, and martial readability. Do not copy their exact subjects or interior compositions.\nScene/backdrop: Inside the medallion only, a near-black crimson enamel field with restrained rays of old gold and deep ember-red smoke. Outside the complete medallion, a perfectly flat uniform solid #FF00FF chroma-key field.\nSubject: One singular warcrowned marshal insignia: a forward-facing blackened-steel greathelm with polished gold cheek guards, surmounted by a low brutal five-spike war crown fused into the helm and backed by a rich crimson plume. Keep the crown unmistakable but compact and martial, with no letters and no separate weapons.\nStyle/medium: Premium hand-painted classic fantasy MMORPG achievement icon, rich brushwork, crisp silhouette, deep jewel shadows, dramatic top-left illumination, never a flat glyph and never a 3D product render.\nComposition/framing: One complete circular medallion centered exactly on a square canvas. Blackened bronze and steel body, antique-gold double rim, exactly four small matching cardinal kite points at top, right, bottom, and left. No diagonal points. The full frame must fit with generous even exterior padding and no cropping. Center one bold elite insignia inside the dark enamel inset and keep it readable at tiny UI sizes.\nLighting/mood: Blackened steel, deep crimson, molten old gold, and restrained ember highlights, rare, sovereign, fearsome, and triumphant.\nConstraints: The exterior chroma field must be exactly one flat #FF00FF color with no variation. No magenta anywhere inside the medallion. No exterior cast shadow, contact shadow, glow, reflection, gradient, texture, floor plane, or lighting variation. Crisp separated outer edge suitable for clean background removal. Keep the full medallion and all four cardinal points visible.\nAvoid: text, letters, numerals, tally marks, runes that resemble letters, skulls, banners, ribbons, wings, extra points, ornate outer flourishes, watermark, logo, clipped frame, off-center subject, muddy silhouette, photorealism.",
+      "references": [
+        {
+          "image": 1,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/pvp_arena_1v1_1900.webp"
+        },
+        {
+          "image": 2,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/pvp_arena_2v2_1900.webp"
+        },
+        {
+          "image": 3,
+          "role": "accepted deed style and geometry reference only",
+          "path": "/Users/fernando/Documents/wocc-placeholder-art-v036/public/ui/deeds/pvp_bg_wins_25.webp"
+        }
+      ],
+      "generatedOrigin": "/Users/fernando/.codex/generated_images/019fe708-52b8-7373-9773-7f5987ceaf94/exec-bf1b5581-408f-46ed-b2c0-4c44455cd505.png",
+      "retries": [],
+      "files": {
+        "result": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/results/pvp_honor_field_marshal.png",
+          "bytes": 1922258,
+          "sha256": "a0b2c069f098d32b09a3b81779d9028e7ea834c12698d20787e2c7a35ef8643d",
+          "dimensions": "1254x1254 srgb",
+          "channels": 3,
+          "hasAlpha": false
+        },
+        "master": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/masters/pvp_honor_field_marshal-alpha.png",
+          "bytes": 1591404,
+          "sha256": "b4d7bccabac5dad1c4afe7a4c3595a46d500e08b92a60e08efa226d3ce723ea2",
+          "dimensions": "1254x1254 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 83,
+              "minY": 54,
+              "maxX": 1177,
+              "maxY": 1200
+            },
+            "padding": {
+              "left": 83,
+              "top": 54,
+              "right": 76,
+              "bottom": 53
+            },
+            "center": {
+              "x": 630,
+              "y": 627
+            },
+            "coverage": 0.4689446721050851,
+            "opaquePixels": 732857,
+            "transparentPixels": 835093
+          }
+        },
+        "source": {
+          "path": "tmp/imagegen/placeholder-art-completion/deeds-b/sources/pvp_honor_field_marshal.png",
+          "bytes": 321115,
+          "sha256": "45e2433984bf249fe1251019c9767a01f16a080833a7d7859cc36947d0c32aaa",
+          "dimensions": "512x512 RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 40,
+              "minY": 30,
+              "maxX": 471,
+              "maxY": 481
+            },
+            "padding": {
+              "left": 40,
+              "top": 30,
+              "right": 40,
+              "bottom": 30
+            },
+            "center": {
+              "x": 255.5,
+              "y": 255.5
+            },
+            "coverage": 0.4388465881347656,
+            "opaquePixels": 109054,
+            "transparentPixels": 145722
+          }
+        },
+        "shipping": {
+          "path": "public/ui/deeds/pvp_honor_field_marshal.webp",
+          "bytes": 5488,
+          "sha256": "884dcb839aab8b0e30a0ad301cdabecda7d79d79ce3294a3c5e1fd14ec5db62f",
+          "dimensions": "128x128 WebP RGBA",
+          "geometry": {
+            "bounds": {
+              "minX": 10,
+              "minY": 7,
+              "maxX": 117,
+              "maxY": 120
+            },
+            "padding": {
+              "left": 10,
+              "top": 7,
+              "right": 10,
+              "bottom": 7
+            },
+            "center": {
+              "x": 63.5,
+              "y": 63.5
+            },
+            "coverage": 0.44720458984375,
+            "opaquePixels": 6594,
+            "transparentPixels": 8687
+          }
+        }
+      },
+      "processing": {
+        "chromaHelper": "/Users/fernando/.codex/skills/.system/imagegen/scripts/remove_chroma_key.py",
+        "chromaArgs": [
+          "--auto-key border",
+          "--soft-matte",
+          "--transparent-threshold 12",
+          "--opaque-threshold 220",
+          "--despill",
+          "--force"
+        ],
+        "resize": "Lanczos3 full-canvas resize to 512x512 RGBA",
+        "fitScale": 0.9658119658119658,
+        "recenterShift": {
+          "dx": -1,
+          "dy": 0
+        },
+        "webp": {
+          "size": "128x128",
+          "quality": 82,
+          "alphaQuality": 100,
+          "smartSubsample": true,
+          "effort": 6
+        }
+      },
+      "review": {
+        "verdict": "accepted",
+        "inspected": [
+          "1254px generated result",
+          "128px shipping color",
+          "40px shipping color",
+          "24px shipping grayscale"
+        ],
+        "checks": [
+          "complete centered medallion",
+          "exactly four cardinal kite points",
+          "no text or letter-like subject",
+          "zone-pair identity",
+          "distinct cross-zone palette",
+          "clean transparent edge",
+          "readable tiny silhouette"
+        ]
+      }
+    }
+  ]
+}

@@ -10,6 +10,15 @@ const IMMUTABLE_PREFIXES = ['/assets/', '/media/'];
 const VERSIONED_SFX = /^\/audio\/sfx\/[a-z0-9]+(?:_[a-z0-9]+)*\.mp3\?v=([a-f0-9]{12})$/;
 const BLOB_SFX = /^\/audio\/sfx\/blobs\/([a-f0-9]{64})\.mp3$/;
 const RUNTIME_SFX_PACK = '/audio/sfx/runtime-pack.json';
+// NPC voice lines (scripts/gen_npc_lines.mjs) and the remastered zone/combat
+// soundtrack (public/audio/music/, catalog in src/game/music_tracks.ts) both
+// bake a `?v=<hash12>` content hash into their public URL at generation time,
+// same convention as VERSIONED_SFX above. Unlike SFX, neither catalog has a
+// hot-reloadable runtime overlay, so a structural match is enough: the hash
+// and the file are always redeployed together as one unit, there is nothing
+// to verify against a live re-hash the way the SFX Studio pack requires.
+const VERSIONED_VOICE = /^\/audio\/voice\/[a-z0-9_]+\/[a-z0-9_]+\.mp3\?v=[a-f0-9]{12}$/;
+const VERSIONED_MUSIC = /^\/audio\/music\/[a-z0-9_]+\.mp3\?v=[a-f0-9]{12}$/;
 
 export function isPublicSfxPath(urlPath: string): boolean {
   return (
@@ -36,7 +45,9 @@ export function cacheControlFor(urlPath: string, actualSfxHash?: string): string
   if (urlPath.split('?')[0] === RUNTIME_SFX_PACK) return 'no-store';
   const requested = requestedSfxVersion(urlPath);
   return IMMUTABLE_PREFIXES.some((prefix) => urlPath.startsWith(prefix)) ||
-    (requested !== null && actualSfxHash?.startsWith(requested))
+    (requested !== null && actualSfxHash?.startsWith(requested)) ||
+    VERSIONED_VOICE.test(urlPath) ||
+    VERSIONED_MUSIC.test(urlPath)
     ? 'public, max-age=31536000, immutable'
     : 'no-cache';
 }

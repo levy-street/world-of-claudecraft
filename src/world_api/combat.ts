@@ -20,11 +20,21 @@ export interface ActiveTemporalHourglass {
   remaining: number;
 }
 
+export interface ActiveConsecration {
+  id: string;
+  x: number;
+  z: number;
+  radius: number;
+  duration: number;
+  remaining: number;
+}
+
 export interface IWorldCombat {
   known: ResolvedAbility[];
   /** Server-authored persistent traps currently visible to this world view. */
   activeFrostRings: ActiveFrostRing[];
   activeTemporalHourglasses: ActiveTemporalHourglass[];
+  activeConsecrations: ActiveConsecration[];
   /** Remaining server-authoritative lifetime of a reactive ability window. */
   reactiveAbilityWindowRemaining(abilityId: string): number;
   castAbility(abilityId: string): void;

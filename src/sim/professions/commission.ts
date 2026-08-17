@@ -206,7 +206,13 @@ export function unbindItem(ctx: SimContext, itemId: string, pid?: number): Unbin
     // byte-equal copies happened to share a slot. Unbind owning the cue means
     // owning it as SILENCE (the trainResult single-surface rule), not as a cue
     // of its own.
-    ctx.addItemInstance(itemId, freed, meta.entityId, 1, { silent: true, callerLogs: true });
+    // movement: an internal stack split of copies the player already held (the
+    // same fact silent + callerLogs encode), so it never counts as an obtain.
+    ctx.addItemInstance(itemId, freed, meta.entityId, 1, {
+      silent: true,
+      callerLogs: true,
+      movement: true,
+    });
   }
   return result;
 }

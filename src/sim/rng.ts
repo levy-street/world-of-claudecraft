@@ -3,9 +3,17 @@
 // value `next()` produces, in draw order. Every other method (`range`, `int`,
 // `chance`, `pick`) funnels through `next()`, so it sees those too. Pure
 // bookkeeping: it MUST NOT draw rng or branch simulation behavior.
+// One deliberate exception, and it is a contract on the CALL SITE: a test may
+// throw from its observer as a fail-closed guard (tests/reliquary_content.test.ts
+// ScriptedRng throws on any unscripted draw), so `next()` must never swallow
+// observer exceptions. Such a throw is TERMINAL for this instance: `s` has
+// already advanced past a draw nobody consumed, so the only sound response is
+// to abort the run and discard the Rng (and any Sim over it). Catching and
+// continuing would branch behavior on the one input class the determinism
+// invariant exists to exclude. Propagation is pinned in tests/off_stream_rng.test.ts.
 export type RngObserver = (value: number) => void;
 
-// Deterministic seeded RNG (mulberry32) — all sim randomness must flow through this.
+// Deterministic seeded RNG (mulberry32): all sim randomness must flow through this.
 export class Rng {
   private s: number;
   // Default null: zero overhead and byte-identical output, so sim determinism is
@@ -43,7 +51,7 @@ export class Rng {
   }
 }
 
-// Stateless hash noise for terrain — deterministic from coordinates + seed.
+// Stateless hash noise for terrain: deterministic from coordinates + seed.
 export function hash2(x: number, y: number, seed: number): number {
   let h = seed >>> 0;
   h = Math.imul(h ^ (x * 374761393), 668265263);

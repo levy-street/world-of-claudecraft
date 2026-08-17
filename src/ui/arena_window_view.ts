@@ -19,6 +19,7 @@
 
 import { CLASSES } from '../sim/data';
 import type { ArenaMapId } from '../sim/dungeon_layout';
+import { ARENA_MIN_LEVEL } from '../sim/social/arena';
 import type { PlayerClass } from '../sim/types';
 import type { ArenaFormat, ArenaInfo, ArenaStanding, PartyInfo } from '../world_api';
 
@@ -35,6 +36,9 @@ export interface ArenaAllTimeEntry {
   rating: number;
   wins: number;
   losses: number;
+  /** Absent on a board served by a realm that predates the W-L-D
+   *  change, so the consumer defaults it rather than rendering NaN. */
+  draws?: number;
 }
 
 /** A live-ladder row: rank + the raw class id (painter localizes when known). */
@@ -48,6 +52,8 @@ export interface ArenaLadderRow {
   rating: number;
   wins: number;
   losses: number;
+  /** Matches that ended level, the third figure of the W-L-D record. */
+  draws: number;
 }
 
 /** An all-time ladder row: a ladder row plus the player level the title shows. */
@@ -74,7 +80,13 @@ export type ArenaPartySection =
 export type ArenaAction =
   | { kind: 'in-match'; oppName: string }
   | { kind: 'queued'; queueSize: number }
-  | { kind: 'idle'; queueDisabled: boolean };
+  | {
+      kind: 'idle';
+      queueDisabled: boolean;
+      /** Ranked (1v1/2v2) only: the player is below ARENA_MIN_LEVEL, so the
+       *  painter shows the level requirement instead of the generic queue note. */
+      belowMinLevel: boolean;
+    };
 
 /** The full arena view-model: the offline notice, or the live panel. */
 export type ArenaView =
@@ -106,6 +118,9 @@ export interface ArenaViewInput {
   party: PartyInfo | null;
   /** The all-time ladder cache, by bracket (painter-owned, server-fetched). */
   allTime: Partial<Record<ArenaFormat, ArenaAllTimeEntry[]>>;
+  /** The local character's level, checked against ARENA_MIN_LEVEL for the
+   *  ranked (1v1/2v2) brackets; Fiesta and Protect Yumi need no floor. */
+  playerLevel: number;
 }
 
 /**
@@ -125,7 +140,13 @@ export function buildArenaView(input: ArenaViewInput): ArenaView {
   // (pvp_tabs_view.ts) owns tab pinning and locking, fed by the same snapshot.
   const bracket = a.match?.format ?? queuedFmt ?? selectedBracket;
   const canSwitchBracket = !a.queued && !inMatch;
-  const standing = a.standings[bracket];
+  // Defaulted HERE rather than at each reader: `standings` is mirrored straight
+  // off the server snapshot, so a client talking to a server that predates the
+  // draws field would otherwise render NaN in the rating-summary line. Every
+  // other draws consumer in this file already defaults; this is the one that
+  // reaches painters through `view.standing`, so one site covers them all.
+  const rawStanding = a.standings[bracket];
+  const standing = { ...rawStanding, draws: rawStanding.draws ?? 0 };
   const ladderRows = a.ladders[bracket];
   const partySize = party?.members.length ?? 1;
   const isLeader = !party || party.leader === myPid;
@@ -141,6 +162,10 @@ export function buildArenaView(input: ArenaViewInput): ArenaView {
     rating: r.rating,
     wins: r.wins,
     losses: r.losses,
+    // `?? 0` for the rolling-deploy reason the map guard below records: a
+    // snapshot from a server predating this field carries no draws, and an
+    // undefined would render as NaN in the W-L-D record.
+    draws: r.draws ?? 0,
   }));
 
   let partySection: ArenaPartySection = { kind: 'none' };
@@ -167,12 +192,22 @@ export function buildArenaView(input: ArenaViewInput): ArenaView {
   } else if (a.queued) {
     action = { kind: 'queued', queueSize: a.queueSize };
   } else {
-    let queueDisabled = false;
+    // 2v2 is a premade queue: the server rejects the whole team if any queued
+    // member is below the floor, so a level-eligible leader with a below-level
+    // teammate must see the same disabled affordance, not just their own level.
+    const partyBelowMinLevel =
+      bracket === '2v2' && isTeamBracket && party && partySize >= 2 && partySize <= teamCap
+        ? party.members.some((m) => m.level < ARENA_MIN_LEVEL)
+        : false;
+    const belowMinLevel =
+      ((bracket === '1v1' || bracket === '2v2') && input.playerLevel < ARENA_MIN_LEVEL) ||
+      partyBelowMinLevel;
+    let queueDisabled = belowMinLevel;
     if (isTeamBracket && party && partySize >= 2 && partySize <= teamCap && !isLeader)
       queueDisabled = true;
     else if (isTeamBracket && party && partySize > teamCap) queueDisabled = true;
     else if (bracket === '1v1' && party && partySize > 1) queueDisabled = true;
-    action = { kind: 'idle', queueDisabled };
+    action = { kind: 'idle', queueDisabled, belowMinLevel };
   }
 
   // The bout's map, shown from queue pop (countdown) through the aftermath;
@@ -195,6 +230,7 @@ export function buildArenaView(input: ArenaViewInput): ArenaView {
         rating: r.rating,
         wins: r.wins,
         losses: r.losses,
+        draws: r.draws ?? 0,
         level: r.level,
       }))
     : null;
@@ -212,6 +248,7 @@ export function buildArenaView(input: ArenaViewInput): ArenaView {
     bracket,
     party,
     canSwitchBracket,
+    input.playerLevel,
   ]);
 
   return {

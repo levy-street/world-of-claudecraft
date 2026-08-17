@@ -440,6 +440,156 @@
         }
       ],
       "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for druid\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Typhoon (typhoon)\nCanonical mechanic: Typhoon knocks enemies within 8 yd back 6 yd and dazes them to 50% movement for 4 sec; no damage; 20 sec cooldown.\nSubject: A broad wind wave throwing silhouettes outward and leaving spiral daze marks.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "moonseed",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/druid/moonseed.png",
+      "output": "moonseed.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A glowing silver seed haloed by a crescent moon, sprouting faint arcane tendrils.",
+      "references": [
+        {
+          "path": "public/ui/skills/druid/wrath.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/druid/healing_touch.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for druid\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Moonseed (moonseed)\nCanonical mechanic: Moonwing Form only. Strikes for Arcane damage, adds 1 Moontide, and extends Lunar Tempest.\nSubject: A glowing silver seed haloed by a crescent moon, sprouting faint arcane tendrils.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "moonlash",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/druid/moonlash.png",
+      "output": "moonlash.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A crashing tidal wave of cold moonlight breaking over a dark field.",
+      "references": [
+        {
+          "path": "public/ui/skills/druid/wrath.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/druid/healing_touch.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for druid\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Moonsurge (moonlash)\nCanonical mechanic: Spends 3 Moontide for a heavy strike of Arcane damage: the damage choice.\nSubject: A crashing tidal wave of cold moonlight breaking over a dark field.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "sunlance",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/druid/sunlance.png",
+      "output": "sunlance.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A golden lance of dawn sunlight striking down through parting clouds.",
+      "references": [
+        {
+          "path": "public/ui/skills/druid/wrath.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/druid/healing_touch.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for druid\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Sunwake (sunlance)\nCanonical mechanic: Spends 3 Moontide for a Nature strike plus a burn over 9 sec, restoring 35 mana: the mana choice.\nSubject: A golden lance of dawn sunlight striking down through parting clouds.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "redharvest",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/druid/redharvest.png",
+      "output": "redharvest.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A clawed paw reaping a sheaf of taut crimson strands like a wheat harvest.",
+      "references": [
+        {
+          "path": "public/ui/skills/druid/wrath.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/druid/healing_touch.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for druid\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Redharvest (redharvest)\nCanonical mechanic: Spends 3 Old Blood: strike, instantly deal all remaining bleed damage, remove both bleeds.\nSubject: A clawed paw reaping a sheaf of taut crimson strands like a wheat harvest.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "marrowbreak",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/druid/marrowbreak.png",
+      "output": "marrowbreak.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A great bear paw slamming down and cracking a massive bleached bone.",
+      "references": [
+        {
+          "path": "public/ui/skills/druid/wrath.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/druid/healing_touch.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for druid\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Marrowbreak (marrowbreak)\nCanonical mechanic: Spends 3 Old Blood for a heavy, high-threat strike; below half health it shields you instead.\nSubject: A great bear paw slamming down and cracking a massive bleached bone.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "overbloom",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/druid/overbloom.png",
+      "output": "overbloom.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A verdant flower bursting open in an overwhelming bloom of healing light.",
+      "references": [
+        {
+          "path": "public/ui/skills/druid/wrath.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/druid/healing_touch.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for druid\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Overbloom (overbloom)\nCanonical mechanic: Spends 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for 60% of what those effects had left.\nSubject: A verdant flower bursting open in an overwhelming bloom of healing light.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
     }
   ],
   "deferredStayProcedural": {},

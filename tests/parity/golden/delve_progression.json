@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 964,
-      "state": "e836976c",
+      "nextId": 965,
+      "state": "649d4b7d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -54,7 +54,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 959,
+          "entityId": 960,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -72,6 +72,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -90,7 +94,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 959
+              "sourceId": 960
             }
           ],
           "blockChance": 0.05,
@@ -103,7 +107,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 959,
+          "id": 960,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -147,9 +151,9 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 985,
-      "state": "31528b59",
-      "events": "638383f9",
+      "nextId": 986,
+      "state": "6d70e936",
+      "events": "29175199",
       "rng": {
         "draws": 1,
         "digest": "38457ea8"
@@ -158,8 +162,8 @@
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 985,
-      "state": "075b8498",
+      "nextId": 986,
+      "state": "6b3b55f9",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -207,7 +211,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 959,
+          "entityId": 960,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -226,6 +230,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 10,
           "talents": {
             "rows": {}
@@ -245,7 +253,7 @@
               "name": "Battle Stance",
               "remaining": 3599.65,
               "school": "physical",
-              "sourceId": 959
+              "sourceId": 960
             }
           ],
           "blockChance": 0.05,
@@ -257,7 +265,7 @@
           "dodgeChance": 0.063,
           "fiveSecondRule": 99.35,
           "hp": 50000,
-          "id": 959,
+          "id": 960,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -300,9 +308,9 @@
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 985,
-      "state": "03e06c62",
-      "events": "d1fea3d9",
+      "nextId": 986,
+      "state": "c68c582b",
+      "events": "e7756371",
       "rng": {
         "draws": 3,
         "digest": "392af441"
@@ -356,7 +364,7 @@
             "date": "2099-06-25"
           },
           "delveMarks": 89,
-          "entityId": 959,
+          "entityId": 960,
           "equipment": {
             "chest": "recruit_tunic",
             "legs": "reliquary_legs",
@@ -376,6 +384,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 10,
           "talents": {
             "rows": {}
@@ -395,7 +407,7 @@
               "name": "Battle Stance",
               "remaining": 3599.65,
               "school": "physical",
-              "sourceId": 959
+              "sourceId": 960
             }
           ],
           "blockChance": 0.05,
@@ -407,7 +419,7 @@
           "dodgeChance": 0.063,
           "fiveSecondRule": 99.35,
           "hp": 348,
-          "id": 959,
+          "id": 960,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -450,8 +462,8 @@
     {
       "tick": 9,
       "time": 0.45,
-      "nextId": 985,
-      "state": "3a6ea32d",
+      "nextId": 986,
+      "state": "b1b8ec9e",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -506,7 +518,7 @@
             "date": "2099-06-25"
           },
           "delveMarks": 89,
-          "entityId": 959,
+          "entityId": 960,
           "equipment": {
             "chest": "recruit_tunic",
             "legs": "reliquary_legs",
@@ -526,6 +538,10 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
           "renown": 10,
           "talents": {
             "rows": {}
@@ -545,7 +561,7 @@
               "name": "Battle Stance",
               "remaining": 3599.55,
               "school": "physical",
-              "sourceId": 959
+              "sourceId": 960
             }
           ],
           "blockChance": 0.05,
@@ -557,7 +573,7 @@
           "dodgeChance": 0.063,
           "fiveSecondRule": 99.45,
           "hp": 348,
-          "id": 959,
+          "id": 960,
           "kind": "player",
           "level": 7,
           "lootFfaTimer": "Infinity",

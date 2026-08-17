@@ -13,12 +13,18 @@ import { expectedStatBudget, itemLevel, primaryStatSum } from '../src/sim/item_l
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { buildHeroicVendorView } from '../src/ui/hud/vendor/heroic_vendor_view';
+import { VENDOR_TEST_WORLD } from './sim_shared';
 
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
 
 function makeSim(seed = 5): AnySim {
-  return new Sim({ seed, playerClass: 'warrior', noPlayer: true }) as AnySim;
+  return new Sim({
+    seed,
+    playerClass: 'warrior',
+    noPlayer: true,
+    world: VENDOR_TEST_WORLD,
+  }) as AnySim;
 }
 
 function teleport(sim: AnySim, e: AnyEntity, x: number, z: number): void {
@@ -192,6 +198,7 @@ describe('heroic mark reward persistence', () => {
       seed: 22,
       playerClass: 'warrior',
       noPlayer: true,
+      world: VENDOR_TEST_WORLD,
       lockoutNowMs: () => now,
       raidResetMs: () => nextReset,
     }) as AnySim;

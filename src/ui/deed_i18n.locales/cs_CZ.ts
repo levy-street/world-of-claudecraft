@@ -33,19 +33,19 @@ export const table: DeedLocaleTable = {
     desc: 'Vyčisti Trhlinu stupně S, nejtěžší úroveň, na jakou se může objevit trhlinový portál.',
   },
   pvp_honor_sergeant: {
-    name: 'Seržant',
+    name: 'Prolamovač šiků',
     desc: 'Získej za celý svůj život 10 000 cti. Její utrácení tě o hodnost nikdy nepřipraví.',
-    title: 'Seržant',
+    title: 'Prolamovač šiků',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Rytíř-poručík',
+    name: 'Plenitel polí',
     desc: 'Získej za celý svůj život 40 000 cti, celou sezónu skutečné války za sebou.',
-    title: 'Rytíř-poručík',
+    title: 'Plenitel polí',
   },
   pvp_honor_field_marshal: {
-    name: 'Polní maršál',
+    name: 'Korunovaný válkou',
     desc: 'Získej za celý svůj život 150 000 cti. Na kterémkoli realmu vzácnost, a taková i má být.',
-    title: 'Polní maršál',
+    title: 'Korunovaný válkou',
   },
   chr_drakemaw_broodlord: {
     name: 'Lamač líhně',
@@ -955,5 +955,49 @@ export const table: DeedLocaleTable = {
   prog_armorcrafting_rare: {
     name: 'Zbroj k dokonalosti',
     desc: 'Vytvoř svůj první vzácný předmět ve zbrojnictví.',
+  },
+  col_reliquary_rank_2: {
+    name: 'Strážce kořisti',
+    desc: 'Dosáhni hodnosti Kurátora 2 v Relikviáři (10 jedinečných zkatalogizovaných relikvií).',
+    title: 'Strážce kořisti',
+  },
+  col_reliquary_rank_3: {
+    name: 'Katalogizátor',
+    desc: 'Dosáhni hodnosti Kurátora 3 v Relikviáři (25 jedinečných zkatalogizovaných relikvií).',
+    title: 'Katalogizátor',
+  },
+  col_reliquary_rank_4: {
+    name: 'Arcikurátor',
+    desc: 'Dosáhni hodnosti Kurátora 4 v Relikviáři (50 jedinečných zkatalogizovaných relikvií).',
+    title: 'Arcikurátor',
+  },
+  col_reliquary_rank_5: {
+    name: 'Věčná kořist',
+    desc: 'Dosáhni hodnosti Kurátora 5 v Relikviáři (100 jedinečných zkatalogizovaných relikvií).',
+  },
+  col_reliquary_complete: {
+    name: 'Velký relikviář',
+    desc: 'Zkatalogizuj v Relikviáři každou relikvii, kterou si postava může ponechat. Pozdější růst katalogu ti to nikdy nevezme.',
+    title: 'Kurátor klenotnice',
+  },
+  col_reliquary_conquerors: {
+    name: 'Police Dobyvatelů',
+    desc: 'Zkatalogizuj každou relikvii z police Dobyvatelé v Relikviáři. Pozdější růst katalogu ti to nikdy nevezme.',
+    title: 'Lamač klenotnice',
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    name: 'Nythraxis iluminován',
+    desc: 'Iluminuj v Relikviáři stránku Hrdinský: Raid Nythraxis.',
+    title: 'Světlo Nythraxe',
+  },
+  col_reliquary_illum_thunzharr: {
+    name: 'Thunzharr iluminován',
+    desc: 'Iluminuj v Relikviáři stránku Thunzharr, Probouzející se vrchol.',
+    title: 'Světlo Thunzharru',
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    name: 'Svatyně iluminována',
+    desc: 'Iluminuj v Relikviáři stránku Hrdinská: Svatyně Hrobodraka.',
+    title: 'Světlo svatyně',
   },
 };

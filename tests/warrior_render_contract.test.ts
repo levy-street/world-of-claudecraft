@@ -52,12 +52,22 @@ describe('winning Warrior attack animation routing', () => {
     });
   });
 
+  it('routes Final Edict to its dedicated one-handed Templar verdict clip at authored speed', () => {
+    expect(VISUALS.player_paladin.clips.attackByAbility).toMatchObject({
+      final_edict: 'Paladin_Templars_Verdict_1H',
+    });
+    expect(VISUALS.player_paladin.clips.attackTimeScaleByAbility).toMatchObject({
+      final_edict: 1,
+    });
+  });
+
   it('normalizes damage-event display names and preserves the whirlwind spin cue', () => {
     expect(attackAbilityId(ABILITIES.mortal_strike.name)).toBe('mortal_strike');
     expect(attackAbilityId(ABILITIES.whirlwind.name)).toBe('whirlwind');
     expect(attackAbilityId('mortal_strike')).toBe('mortal_strike');
     expect(attackAbilityId('missing ability')).toBeUndefined();
     expect(isSpinAttackAbility('whirlwind')).toBe(true);
+    expect(isSpinAttackAbility('dawnfall')).toBe(true);
     expect(isSpinAttackAbility('mortal_strike')).toBe(false);
   });
 });

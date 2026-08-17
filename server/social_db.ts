@@ -10,8 +10,18 @@ import {
   GUILD_NAME_COLLISION_SQL,
   guildNameLockKey,
 } from './guild_name_db';
+import { GuildRosterCache } from './guild_roster_cache';
 import { REALM } from './realm';
 import type { CharInfo, CharRef, GuildEventRow, GuildRank, SocialDb } from './social';
+
+// The exact element type SocialDb.guildMembers() promises, named once so the
+// cache and the raw reader below can share it without repeating the shape.
+type GuildMemberRow = CharInfo & {
+  rank: GuildRank;
+  lastLogin: string | null;
+  activeTitle: string | null;
+  joinedAt: number | null;
+};
 
 // kept as an alias for the schema's column default; the live realm is REALM
 export const DEFAULT_REALM = REALM;
@@ -177,6 +187,12 @@ CREATE TABLE IF NOT EXISTS guild_banks (
 const CHAR_COLS = 'id, name, class AS cls, level, realm';
 
 export class PgSocialDb implements SocialDb {
+  // See server/guild_roster_cache.ts for what this caches, why it is safe for
+  // the "fresh database read" carrier lookup, and why it lives per instance.
+  private readonly guildRoster = new GuildRosterCache<GuildMemberRow[]>((guildId) =>
+    this.loadGuildMembers(guildId),
+  );
+
   constructor(private readonly pool: Pool) {}
 
   async findCharacterByName(name: string): Promise<CharInfo | null> {
@@ -338,6 +354,7 @@ export class PgSocialDb implements SocialDb {
         return { error: 'already_in_guild' };
       }
       await client.query('COMMIT');
+      this.guildRoster.bust(guildId);
       bustAdminGuildListReads();
       return { guildId };
     } catch (err) {
@@ -350,6 +367,7 @@ export class PgSocialDb implements SocialDb {
 
   async deleteGuild(id: number): Promise<void> {
     await this.pool.query('DELETE FROM guilds WHERE id = $1', [id]);
+    this.guildRoster.bust(id);
     bustAdminGuildListReads();
   }
 
@@ -410,6 +428,7 @@ export class PgSocialDb implements SocialDb {
         return 'already_member';
       }
       await client.query('COMMIT');
+      this.guildRoster.bust(guildId);
       bustAdminGuildListReads();
       return 'ok';
     } catch (err) {
@@ -421,7 +440,15 @@ export class PgSocialDb implements SocialDb {
   }
 
   async removeGuildMember(charId: number): Promise<void> {
-    await this.pool.query('DELETE FROM guild_members WHERE character_id = $1', [charId]);
+    // RETURNING costs nothing extra (the row is already read to be deleted)
+    // and is the only way this method learns which guild's roster cache to
+    // bust: its signature carries no guildId, only the character.
+    const res = await this.pool.query(
+      'DELETE FROM guild_members WHERE character_id = $1 RETURNING guild_id',
+      [charId],
+    );
+    const guildId = res.rows[0]?.guild_id;
+    if (guildId !== undefined) this.guildRoster.bust(Number(guildId));
     bustAdminGuildListReads();
   }
 
@@ -439,7 +466,9 @@ export class PgSocialDb implements SocialDb {
       [charId, rank, guildId],
     );
     bustAdminGuildListReads();
-    return (res.rowCount ?? 0) > 0;
+    const moved = (res.rowCount ?? 0) > 0;
+    if (moved) this.guildRoster.bust(guildId);
+    return moved;
   }
 
   async transferGuildLeader(
@@ -481,6 +510,7 @@ export class PgSocialDb implements SocialDb {
         fromCharId,
       ]);
       await client.query('COMMIT');
+      this.guildRoster.bust(guildId);
       return 'ok';
     } catch (err) {
       await client.query('ROLLBACK').catch(() => {});
@@ -507,14 +537,28 @@ export class PgSocialDb implements SocialDb {
     return { motd: row?.motd ?? '', motdSetBy: row?.motdSetBy ?? '' };
   }
 
-  async guildMembers(guildId: number): Promise<
-    (CharInfo & {
-      rank: GuildRank;
-      lastLogin: string | null;
-      activeTitle: string | null;
-      joinedAt: number | null;
-    })[]
-  > {
+  // Cached: see server/guild_roster_cache.ts. The raw JOIN lives in
+  // loadGuildMembers below; every call here goes through the per-guild TTL +
+  // single-flight cache instead. Use guildMembersFresh below for the one
+  // caller that documents needing an uncached read.
+  async guildMembers(guildId: number): Promise<GuildMemberRow[]> {
+    return this.guildRoster.read(guildId);
+  }
+
+  // Uncached escape hatch: bypasses guildRoster entirely, straight to
+  // loadGuildMembers. NOT part of the SocialDb interface (SocialService has no
+  // need for it; every one of its guildMembers reads is a display/broadcast
+  // audience, not an authorization decision). The one caller today is
+  // GameServer.guildBankSaveCarrier (server/game.ts), which documents exactly
+  // why: a stale membership read there can put a player who was just kicked on
+  // a rollback-and-kick path for an operator's admin purge, so that read must
+  // see the outcome of a same-process write that has not yet reached the next
+  // bust, not just one that is older than the roster cache's TTL.
+  async guildMembersFresh(guildId: number): Promise<GuildMemberRow[]> {
+    return this.loadGuildMembers(guildId);
+  }
+
+  private async loadGuildMembers(guildId: number): Promise<GuildMemberRow[]> {
     const res = await this.pool.query(
       `SELECT c.id, c.name, c.class AS cls, c.level, c.realm, c.last_login AS "lastLogin", gm.rank,
               gm.joined_at AS "joinedAt", c.state->>'activeTitle' AS active_title

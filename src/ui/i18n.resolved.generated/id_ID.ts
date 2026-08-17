@@ -127,6 +127,10 @@ export const id_ID: EnTranslations = {
         "label": "Kenakan kit level 20 baru",
         "description": "Kenakan preset level 20 pra-Sanktum untuk sebuah spesialisasi, tas dahulu. Hanya perlengkapan."
       },
+      "biskit": {
+        "label": "Kenakan kit BIS level 20",
+        "description": "Kenakan set epik terbaik untuk sebuah spesialisasi di semua slot. Hanya perlengkapan."
+      },
       "gold": {
         "label": "Tambah emas",
         "description": "Tambahkan emas ke dompet saat ini."
@@ -240,7 +244,8 @@ export const id_ID: EnTranslations = {
     },
     "hud": {
       "lowMana": "Mana Rendah",
-      "lowEnergy": "Energi Rendah"
+      "lowEnergy": "Energi Rendah",
+      "lowFocus": "Fokus rendah"
     },
     "talents": {
       "title": "Talenta",
@@ -316,6 +321,25 @@ export const id_ID: EnTranslations = {
     }
   },
   "hudChrome": {
+    "warlock": {
+      "doomLabel": "Kecaman",
+      "fateThreadsLabel": "Benang Takdir",
+      "doomMeterUnlock": "Pindahkan bilah sumber daya Penderitaan",
+      "doomMeterLock": "Kunci bilah sumber daya Penderitaan",
+      "doomEmptyStatus": "{value} dari {max} Kecaman.",
+      "doomStatus": "{value} dari {max} Kecaman; {remaining}.",
+      "fateThreadsStatus": "{value} dari {max} Benang Takdir.",
+      "fateThreadsConsumeReady": "Tiga Benang Takdir: Melahap dapat menganyamnya menjadi Kecaman tambahan.",
+      "fateThreadsSentenceReady": "Tiga Benang Takdir: Sentence dapat mengonsumsinya untuk 18% kerusakan tambahan."
+    },
+    "procOverlay": {
+      "soulFragmentsMeter": "Serpihan Jiwa",
+      "ruinMeter": "Wrack",
+      "ruinStatus": "{value} dari {max} Wrack"
+    },
+    "comboMeter": {
+      "label": "PK"
+    },
     "spectate": {
       "banner": "Menonton {name}"
     },
@@ -335,6 +359,12 @@ export const id_ID: EnTranslations = {
       "healerConfirmBody": "Sang Penjaga Pucat akan menghidupkan Anda kembali di sini, tetapi Upeti Sang Penjaga mengurangi semua atribut Anda sebesar 75%, hingga 10 menit pada level yang lebih tinggi. Membawa roh Anda kembali ke mayat Anda akan menghidupkan Anda kembali tanpa penalti.",
       "healerConfirmAccept": "Bangkitkan Aku",
       "healerConfirmCancel": "Membatalkan"
+    },
+    "wiki": {
+      "confirmTitle": "Buka Wiki?",
+      "confirmBody": "Ini akan membuka wiki World of ClaudeCraft di perambanmu. Permainan tetap berjalan.",
+      "confirmOpen": "Buka Wiki",
+      "confirmCancel": "Batal"
     },
     "unstuck": {
       "menuButton": "Lepaskan Diri",
@@ -372,7 +402,7 @@ export const id_ID: EnTranslations = {
       "timer": "{seconds}s"
     },
     "fct": {
-      "absorbed": "{amount} diserap",
+      "absorbed": "Terserap ({amount})",
       "cheap": "Lebih murah!"
     },
     "emotes": {
@@ -776,6 +806,11 @@ export const id_ID: EnTranslations = {
       "resetAction": "Atur Ulang",
       "note": "Seret bilah tab obrolan untuk memindahkan jendela, atau pegangan sudut untuk mengubah ukurannya. Atur Ulang mengembalikannya ke posisi dan ukuran bawaan."
     },
+    "chatQuota": {
+      "limitReached": "Batas obrolan Umum tercapai. Coba lagi dalam {seconds}.",
+      "pending": "Pesan Umum sebelumnya masih dikirim. Coba lagi sebentar.",
+      "unavailable": "Obrolan Umum untuk sementara tidak tersedia. Coba lagi sebentar lagi."
+    },
     "swing": {
       "ready": "Ayun",
       "seconds": "{seconds}d"
@@ -786,6 +821,14 @@ export const id_ID: EnTranslations = {
     },
     "rest": {
       "resting": "Beristirahat"
+    },
+    "paladin": {
+      "devotion": "Pengabdian",
+      "devotionValue": "Pengabdian {value} dari {max}",
+      "devotionAscensionCharges": "Pengabdian {value} dari {max}. Kenaikan: {charges} muatan.",
+      "devotionAscensionLast": "Pengabdian {value} dari {max}. Kenaikan: muatan terakhir.",
+      "ascensionLastAnnouncement": "Kenaikan: muatan terakhir",
+      "ascensionSpenderAria": "Slot aksi {slot}: {ability}. Menghabiskan satu muatan Kenaikan."
     },
     "abilityScaling": {
       "bonus": "(+{value})"
@@ -818,6 +861,7 @@ export const id_ID: EnTranslations = {
       "deeds": "Jasa",
       "mounts": "Tunggangan",
       "professions": "Profesi",
+      "reliquary": "Relikuari",
       "nameplates": "Nama",
       "haptics": "Haptik",
       "hapticsOff": "Haptik Nonaktif",
@@ -858,6 +902,14 @@ export const id_ID: EnTranslations = {
       "bodyWithVersion": "Versi {version} World of ClaudeCraft tersedia. Perbarui sekarang untuk perbaikan dan peningkatan terbaru.",
       "notNow": "Jangan sekarang",
       "update": "Perbarui"
+    },
+    "otaUpdate": {
+      "title": "Pembaruan Game",
+      "downloading": "Mengunduh pembaruan: {percent}",
+      "applying": "Pembaruan telah diunduh. Game dimulai ulang untuk menerapkannya.",
+      "incompatible": "Pembaruan diperlukan untuk bermain. Pembaruan akan diterapkan segera setelah unduhan selesai.",
+      "continueAnyway": "Lanjutkan tanpa memperbarui",
+      "progressLabel": "Progres unduhan pembaruan"
     },
     "cameraPrompt": {
       "title": "Pilih Kameramu",
@@ -905,6 +957,22 @@ export const id_ID: EnTranslations = {
       "closesIn": "Tutup dalam {time}",
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
+    },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "The Undercroft",
+        "state": "The State Floor",
+        "residence": "The Residence",
+        "tower": "The Watch Tower"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
     },
     "compass": {
       "N": "U",
@@ -960,6 +1028,7 @@ export const id_ID: EnTranslations = {
       "emoteWheel": "Roda Emote",
       "targetFriendly": "Bidik Sekutu Terdekat",
       "targetFriendlyNext": "Putar Bidikan Sekutu",
+      "targetPrev": "Putar Bidikan Mundur",
       "discord": "Discord",
       "valecup": "Piala Lembah",
       "bgFlag": "Aksi Bendera Medan Pertempuran",
@@ -1054,7 +1123,7 @@ export const id_ID: EnTranslations = {
       "blurb": "Dua benteng reruntuhan saling berhadapan di seberang ceruk berdinding dalam bayangan Thornpeak: Merah di selatan, Biru di utara, dan Halaman Reruntuhan yang lebih tua terletak di antara keduanya, yang tak pernah dikuasai salah satu pun. Lima lawan lima, satu bendera untuk tiap tim, dan tim pertama yang membawa pulang tiga bendera musuh menguasai medan.",
       "modeTag": "5v5 Rebut Bendera",
       "offlineNote": "Medan Thornhollow sedang menyinkronkan. Antrean akan terbuka setelah realm merespons.",
-      "ratingSummary": "Rating. {wins} menang / {losses} kalah",
+      "ratingSummary": "Rating. {wins} menang / {losses} kalah / {draws} seri",
       "careerCaptures": "Rebutan karier: {count}",
       "enterQueue": "Masuk Antrean",
       "enterQueueParty": "Masuk Antrean (party beranggota {count})",
@@ -1319,6 +1388,11 @@ export const id_ID: EnTranslations = {
       "keybindHelpLockCursorOnRotate": "Menjaga kursor mouse tetap di dalam jendela saat Anda menyeret untuk memutar kamera, sehingga tidak mencapai tepi layar atau berpindah ke monitor lain. Matikan jika Anda lebih suka kursor bebas.",
       "showWalletOnCharacterScreen": "Tampilkan Dompet di Layar Karakter",
       "showWalletOnPlayerCard": "Tampilkan Dompet di Kartu Pemain",
+      "showPlaytime": "Tampilkan Waktu Bermain di Lembar Karakter",
+      "forceHighPerfGpu": "Gunakan GPU Gaming Diskret",
+      "forceHighPerfGpuNote": "Aktif secara bawaan: aplikasi desktop meminta GPU gaming diskret dari komputer ini. Nonaktifkan ini jika permainan tidak mau dimulai, terbuka dengan layar hitam, atau layar laptop menjadi kosong. Berlaku mulai lain kali kamu membuka permainan.",
+      "discordPresence": "Status Aktivitas Discord",
+      "discordPresenceNote": "Menampilkan zona tempatmu berada dan sudah berapa lama kamu bermain dalam sesi ini sebagai aktivitas Discord-mu, dan siapa pun yang bisa melihat profil Discord-mu bisa melihat keduanya. Hanya nama zona, waktu sesimu, dan permainan yang dibagikan, tidak pernah karaktermu, akunmu, atau dengan siapa kamu bermain. Membutuhkan aplikasi Discord yang berjalan di komputer ini.",
       "showDevBadges": "Tampilkan Lencana Pengembang",
       "showOwnNameplate": "Tampilkan Papan Namaku",
       "showPlayerNameplates": "Tampilkan Papan Nama Pemain",
@@ -1453,6 +1527,173 @@ export const id_ID: EnTranslations = {
       "badges": {
         "backgrounded": "Di Latar Belakang",
         "offline": "Luring"
+      },
+      "diagnostics": {
+        "panelAria": "Diagnostik performa World of ClaudeCraft",
+        "title": "Dokter Performa ClaudeCraft",
+        "subtitle": "Pemindaian khusus permainan dengan bukti dan perbaikan tingkat kode.",
+        "aria": {
+          "liveMeasurements": "Pengukuran performa langsung",
+          "scanProgress": "Kemajuan pemindaian diagnostik",
+          "findings": "Temuan diagnostik yang diperingkat"
+        },
+        "controls": {
+          "minimize": "Perkecil",
+          "expand": "Perluas",
+          "start": "Mulai pemindaian 15 detik",
+          "refreshCensus": "Segarkan sensus adegan",
+          "copyReport": "Salin laporan yang jelas",
+          "downloadReport": "Unduh laporan",
+          "scanning": "Memindai...",
+          "scanAnother": "Pindai area lain",
+          "reportLogged": "Laporan dicatat ke konsol",
+          "copied": "Disalin",
+          "copyBlocked": "Salin diblokir: laporan dicatat",
+          "retestLowGraphics": "Uji ulang pada grafis Rendah"
+        },
+        "instruction": "Untuk sinyal terbaik, masuk ke Main Luring, bergerak melewati area yang lambat, putar kamera, dan picu efek yang tersendat selagi pemindaian berjalan.",
+        "status": {
+          "pausedHiddenRestart": "Pemindaian dijeda selagi tab ini tersembunyi. Ia akan dimulai ulang saat kamu kembali.",
+          "restoredRestart": "Tab dipulihkan. Memulai ulang tangkapan gameplay aktif 15 detik yang bersih.",
+          "worldLoaded": "Dunia dimuat. Menunggu bingkai pertama yang dapat dimainkan.",
+          "pausedHiddenContinue": "Pemindaian dijeda selagi tab ini tersembunyi. Kembali ke permainan untuk melanjutkan.",
+          "collectingRemaining": {
+            "one": "Mengumpulkan data gameplay aktif: {seconds} detik tersisa",
+            "other": "Mengumpulkan data gameplay aktif: {seconds} detik tersisa"
+          },
+          "waitingFrames": "Menunggu bingkai gameplay yang representatif: {current}/{minimum}",
+          "collectingNow": "Mengumpulkan data gameplay aktif: bergerak melewati area bermasalah sekarang.",
+          "ready": "Siap memindai. Tekan Mulai dan reproduksi perlambatan itu.",
+          "waitingWorld": "Menunggu dunia permainan. Pilih Main Luring atau masuk dengan karakter daring."
+        },
+        "metrics": {
+          "waitingRenderer": "renderer: menunggu",
+          "waitingCensus": "sensus adegan: menunggu",
+          "waitingHitch": "atribusi tersendat: aktif saat masuk dunia",
+          "recent": "terbaru  {fps} FPS | p95 {p95} ms | >50 ms {longFrames}",
+          "render": "render  kirim {submit} ms | dunia {world} ms | entitas {entities} ms",
+          "scene": "adegan   {calls} panggilan | {triangles} tris | {views} tampilan",
+          "hitches": "tersendat {hitches} | shader {shaders} | unggahan {uploads} | tampilan {views}",
+          "gpu": "GPU     {renderer}",
+          "waitingValue": "menunggu"
+        },
+        "scoreHeadline": "{score}/100: {headline}",
+        "healthyNoFindings": "Tidak ada ambang yang dapat ditindaklanjuti terpicu. Jika tersendat singkat masih mengganggumu, jalankan ulang pemindaian di sepanjang jalur pergerakan yang persis memicunya.",
+        "findingMeta": "{severity} | keyakinan {confidence}",
+        "sections": {
+          "evidence": "Bukti",
+          "tryNow": "Coba sekarang",
+          "codeFix": "Perbaikan kode",
+          "source": "Sumber terkait"
+        },
+        "severity": {
+          "critical": "KRITIS",
+          "warning": "PERINGATAN",
+          "info": "INFO"
+        },
+        "confidence": {
+          "high": "tinggi",
+          "medium": "sedang",
+          "low": "rendah"
+        },
+        "diagnosis": {
+          "noProblemTitle": "Tidak ada masalah performa berarti yang terdeteksi",
+          "summary": {
+            "findings": {
+              "one": "{findings} temuan yang dapat ditindaklanjuti dari 10 detik terakhir pada {fps} FPS dan p95 bingkai {p95}.",
+              "other": "{findings} temuan yang dapat ditindaklanjuti dari 10 detik terakhir pada {fps} FPS dan p95 bingkai {p95}."
+            },
+            "healthy": "10 detik terakhir bertahan pada {fps} FPS dengan p95 bingkai {p95}. Tidak ada ambang permainan, peramban, GPU, memori, aset, atau jaringan yang terpicu."
+          },
+          "titles": {
+            "hardwareAcceleration": "Rendering perangkat lunak sedang aktif",
+            "integratedGpu": "Permainan sedang menggunakan GPU terintegrasi",
+            "highDpi": "Rendering resolusi tinggi mahal di sini",
+            "forcedHighGraphics": "Grafis tinggi yang dipaksakan menurunkan performa",
+            "lowMemory": "Memori perangkat yang tersedia rendah",
+            "browserStalls": "Kemacetan peramban atau ekstensi terdeteksi",
+            "heapPressure": "Tekanan memori peramban terdeteksi",
+            "contextLoss": "Konteks grafis telah direset",
+            "gpuSubmit": "Pengiriman GPU adalah hambatan utama bingkai",
+            "sceneDraw": "Biaya gambar adegan melebihi anggaran grafis aktif",
+            "shadowPass": "Pass bayangan menggunakan porsi besar panggilan gambar",
+            "rendererWorld": "Pembaruan renderer dunia terikat CPU",
+            "rendererEntities": "Pembaruan tampilan entitas terikat CPU",
+            "rendererNameplates": "Penggambaran papan nama mahal",
+            "simCpu": "Pekerjaan simulasi menghabiskan bingkai",
+            "hudCpu": "Pembaruan HUD menghabiskan bingkai",
+            "eventCpu": "Pemrosesan event menghabiskan bingkai",
+            "shaderCompile": "Shader sedang dikompilasi selama permainan",
+            "textureUpload": "Unggahan tekstur menyebabkan tersendat dalam permainan",
+            "viewCreate": "Pembuatan tampilan entitas menyebabkan tersendat",
+            "otherHitch": "Bingkai panjang yang tak teratribusi masih tersisa",
+            "assetStartup": "Startup permainan tertunda oleh pekerjaan aset",
+            "longTasks": "Tugas peramban yang panjang memblokir bingkai",
+            "networkLatency": "Pengiriman jaringan menunda respons yang terlihat",
+            "snapshotApply": "Pemrosesan snapshot memblokir klien",
+            "generic": "Aturan performa {rule} perlu perhatian"
+          },
+          "causes": {
+            "environment": "Sebuah pengaturan peramban, GPU, memori, atau perangkat yang terdeteksi dapat membatasi performa sebelum permainan merender sebuah bingkai.",
+            "graphics": "Beban kerja grafis yang terukur berada di atas anggaran bingkai atau adegan aktif untuk tangkapan ini.",
+            "cpu": "Sebuah fase CPU yang terukur menghabiskan cukup banyak waktu thread utama sehingga melewati anggaran bingkai.",
+            "loading": "Persiapan sumber daya atau pekerjaan penggunaan pertama terjadi pada jalur permainan atau startup yang terlihat.",
+            "network": "Pengiriman jaringan atau pemrosesan snapshot klien menunda kondisi permainan terbaru yang dapat dimainkan."
+          },
+          "evidence": {
+            "environment": "Aturan lingkungan {rule} cocok dengan perangkat dan peramban ini.",
+            "gpuSubmit": "p95 pengiriman WebGL adalah {submit}, atau {share} dari p95 renderer.",
+            "frame": "Jendela terbaru mengukur {fps} FPS dengan p95 bingkai sebesar {p95}.",
+            "sceneCalls": "Adegan menggunakan {calls} panggilan gambar dari target {target}.",
+            "sceneTriangles": "Adegan mengirimkan {triangles} segitiga dari target {target}.",
+            "sceneCategory": "Kategori adegan {category} menyumbang {calls} panggilan dan {triangles} segitiga terukur.",
+            "censusNeeded": "Segarkan sensus adegan untuk mengidentifikasi kategori render utama.",
+            "shadow": "Pass bayangan mengirimkan {calls} panggilan, {share} dari baseline, dan {triangles} segitiga.",
+            "cpuPhase": "Fase terukur {phase} memiliki p95 sebesar {p95}.",
+            "hitch": "{count} dari {total} tersendat yang tercatat cocok dengan penyebab {cause}.",
+            "assets": "Gerbang pramuat menunggu {wait} untuk {tasks} tugas terdaftar.",
+            "failedAssets": "Grup aset yang gagal: {groups}.",
+            "longTasks": "{count} tugas panjang terukur, dengan p95 {p95} dan maksimum {max}.",
+            "network": "Interval snapshot adalah {interval}, usia terbaru adalah {age}, dan p95 gema input adalah {echo}.",
+            "snapshot": "p95 penguraian dan penerapan snapshot adalah {work}; p95 jeda jaringan adalah {gap}.",
+            "generic": "Aturan diagnostik {rule} cocok dengan tangkapan ini."
+          },
+          "tryNow": {
+            "environment": "Perbaiki pengaturan lingkungan yang terdeteksi, mulai ulang, dan ulangi pemindaian yang sama.",
+            "graphics": "Uji ulang jalur kamera yang sama pada grafis Rendah untuk memastikan tekanan grafis.",
+            "cpu": "Ulangi pemindaian saat diam dan saat bergerak untuk mengisolasi fase CPU.",
+            "loading": "Ulangi rute atau aksi penggunaan pertama yang sama untuk memastikan kapan tersendat terjadi.",
+            "network": "Bandingkan Main Luring dengan jalur pergerakan dan kamera yang sama."
+          },
+          "codeFix": {
+            "environment": "Jaga agar jalur cadangan yang terdeteksi tetap berada dalam anggaran grafis dan memori bersama.",
+            "graphics": "Gunakan anggaran render, instancing, berbagi material, LOD, dan lewati-kerja-tersembunyi yang sudah ada.",
+            "cpu": "Profilkan fase yang disebutkan, hilangkan pekerjaan dan alokasi yang berulang, dan pertahankan perilaku permainan.",
+            "loading": "Muat awal, kumpulkan dalam pul, atau sebarkan pekerjaan penggunaan pertama yang teridentifikasi ke seluruh anggaran startup dan streaming yang sudah ada.",
+            "network": "Kurangi biaya pengiriman atau pemrosesan snapshot tanpa melemahkan model server otoritatif."
+          }
+        },
+        "report": {
+          "title": "Diagnosis performa World of ClaudeCraft",
+          "statusLine": "Status: {status} ({score}/100)",
+          "capturedLine": "Tertangkap: {captured}",
+          "topFindingLine": "Temuan teratas: {finding}",
+          "summaryLine": "Ringkasan: {summary}",
+          "gpuLine": "GPU: {gpu}",
+          "graphicsLine": "Grafis: {tier}, skala render {scale}",
+          "recentLine": "Terbaru: {fps} FPS, p95 {p95}, {longFrames} bingkai di atas 50 ms, {frames} bingkai terukur",
+          "resultHeading": "Hasil",
+          "noThreshold": "Tidak ada ambang yang dapat ditindaklanjuti terpicu dalam tangkapan ini.",
+          "findingHeading": "{index}. {title}",
+          "findingMeta": "Tingkat keparahan: {severity}. Keyakinan: {confidence}.",
+          "rawSnapshotHeading": "Snapshot mentah",
+          "notAvailable": "tidak tersedia",
+          "status": {
+            "critical": "kritis",
+            "needsAttention": "perlu perhatian",
+            "healthy": "sehat"
+          }
+        }
       }
     },
     "auraOverlay": {
@@ -1524,6 +1765,7 @@ export const id_ID: EnTranslations = {
       "notEnoughHonor": "Tidak cukup Kehormatan.",
       "reasons": {
         "arenaWin": "Kemenangan arena",
+        "arenaComplete": "Pertarungan arena dijalani",
         "fiestaKill": "Eliminasi Fiesta",
         "fiestaComplete": "Fiesta selesai",
         "fiestaWin": "Kemenangan Fiesta",
@@ -1551,7 +1793,13 @@ export const id_ID: EnTranslations = {
     },
     "charSheet": {
       "offense": "Serangan",
-      "defense": "Pertahanan"
+      "defense": "Pertahanan",
+      "playtimeLabel": "Waktu Bermain",
+      "playtimeParts": "{major}, {minor}",
+      "playtimeUnderMinute": "Kurang dari satu menit",
+      "playtimeHidden": "Tersembunyi",
+      "showPlaytimeAria": "Tampilkan waktu bermain",
+      "hidePlaytimeAria": "Sembunyikan waktu bermain"
     },
     "statInfo": {
       "fromYour": "Dari {value} {stat} Anda:",
@@ -1569,7 +1817,7 @@ export const id_ID: EnTranslations = {
         "agi": "Mempertajam refleks dan bidikan Anda, meningkatkan beberapa statistik tempur Anda.",
         "sta": "Memperkokoh tubuh Anda, menaikkan nyawa maksimum dan seberapa cepat Anda memulihkan nyawa saat beristirahat.",
         "int": "Memperluas cadangan mana penyihir dan meningkatkan peluang mereka melancarkan serangan kritis mantra.",
-        "spi": "Mempercepat pemulihan mana penyihir saat beristirahat, di luar pertempuran.",
+        "spi": "Mempercepat kembalinya mana seorang pemantra. Sebagian besar mengalir saat beristirahat, di luar pertempuran, dan sebagian terus kembali bahkan dalam pertempuran.",
         "armor": "Meredam pukulan fisik yang datang. Pengurangannya lebih besar terhadap penyerang berlevel lebih rendah dan dibatasi hingga 75%.",
         "attackPower": "Memberi tenaga pada serangan senjata Anda. Setiap 14 daya serang menambah 1 kerusakan per detik.",
         "spellPower": "Meningkatkan kerusakan mantra dan kekuatan penyembuhanmu. Setiap poin Kecerdasan memberi sedikit Kekuatan Mantra, di atas apa pun dari perlengkapan atau buff.",
@@ -1593,6 +1841,7 @@ export const id_ID: EnTranslations = {
         "spellCritPct": "+{value}% Serangan Kritis Mantra",
         "healthRegen": "Sekitar {value} nyawa setiap 5 dtk saat beristirahat",
         "manaRegen": "Sekitar {value} mana setiap 5 dtk saat beristirahat",
+        "manaRegenCombat": "Sekitar {value} mana setiap 5 dtk saat bertarung",
         "damageReduction": "Pengurangan kerusakan terhadap penyerang level {level}: {value}%",
         "dpsFromAp": "Menambah {value} kerusakan per detik pada serangan Anda"
       },
@@ -1612,12 +1861,18 @@ export const id_ID: EnTranslations = {
       }
     },
     "talents": {
-      "defaultBuildName": "Rakitan {n}"
+      "defaultBuildName": "Rakitan {n}",
+      "newBuildWithGear": "Bangun Baru (simpan perlengkapan juga)",
+      "gearRestored": "Memulihkan {n} potongan perlengkapan dari bangun ini.",
+      "gearNotHeld": "Kamu tidak lagi memiliki {n} potongan tersimpan dari bangun ini.",
+      "gearCopyGone": "{n} potongan tersimpan bukan salinan yang ditetapkan bangun ini.",
+      "gearTakenByOtherSlot": "{n} potongan tersimpan membutuhkan salinan lain yang tidak kamu miliki."
     },
     "tips": {
       "joinChannels": "Tips: ketik /join world atau /join lfg untuk mengobrol dengan pemain di seluruh dunia."
     },
     "itemHeroicTag": "[HEROIK]",
+    "itemHeroicLabel": "Heroik",
     "itemSoulbound": "Terikat Jiwa",
     "itemUniqueEquipped": "Unik-Dipakai",
     "itemSet": {
@@ -1673,6 +1928,24 @@ export const id_ID: EnTranslations = {
         "many": "{count} detik tersisa",
         "other": "{count} detik tersisa"
       },
+      "playtimeDays": {
+        "one": "{count} hari",
+        "few": "{count} hari",
+        "many": "{count} hari",
+        "other": "{count} hari"
+      },
+      "playtimeHours": {
+        "one": "{count} jam",
+        "few": "{count} jam",
+        "many": "{count} jam",
+        "other": "{count} jam"
+      },
+      "playtimeMinutes": {
+        "one": "{count} menit",
+        "few": "{count} menit",
+        "many": "{count} menit",
+        "other": "{count} menit"
+      },
       "playersOnline": {
         "one": "Who: {count} pemain daring di {realm}.",
         "few": "Who: {count} pemain daring di {realm}.",
@@ -1684,6 +1957,48 @@ export const id_ID: EnTranslations = {
         "few": "Siapa: {count} pemain yang cocok dengan \"{query}\" di {realm}.",
         "many": "Siapa: {count} pemain yang cocok dengan \"{query}\" di {realm}.",
         "other": "Siapa: {count} pemain yang cocok dengan \"{query}\" di {realm}."
+      },
+      "reliquaryRetroSummary": {
+        "one": "Relikuarimu menyusul: {count} relik terkatalog.",
+        "few": "Relikuarimu menyusul: {count} relik terkatalog.",
+        "many": "Relikuarimu menyusul: {count} relik terkatalog.",
+        "other": "Relikuarimu menyusul: {count} relik terkatalog."
+      },
+      "reliquarySearchResults": {
+        "one": "{count} hasil.",
+        "few": "{count} hasil.",
+        "many": "{count} hasil.",
+        "other": "{count} hasil."
+      },
+      "reliquaryToGo": {
+        "one": "kurang {count} lagi",
+        "few": "kurang {count} lagi",
+        "many": "kurang {count} lagi",
+        "other": "kurang {count} lagi"
+      },
+      "reliquaryObtainedTimes": {
+        "one": "Diperoleh {count} kali",
+        "few": "Diperoleh {count} kali",
+        "many": "Diperoleh {count} kali",
+        "other": "Diperoleh {count} kali"
+      },
+      "reliquaryCellOwnedObtainedAria": {
+        "one": "{name}, terkatalog, diperoleh {count} kali",
+        "few": "{name}, terkatalog, diperoleh {count} kali",
+        "many": "{name}, terkatalog, diperoleh {count} kali",
+        "other": "{name}, terkatalog, diperoleh {count} kali"
+      },
+      "reliquaryCellOwnedClearsObtainedAria": {
+        "one": "{name}, terkatalog, pertama ditemukan pada penyelesaian ke-{clears}, diperoleh {count} kali",
+        "few": "{name}, terkatalog, pertama ditemukan pada penyelesaian ke-{clears}, diperoleh {count} kali",
+        "many": "{name}, terkatalog, pertama ditemukan pada penyelesaian ke-{clears}, diperoleh {count} kali",
+        "other": "{name}, terkatalog, pertama ditemukan pada penyelesaian ke-{clears}, diperoleh {count} kali"
+      },
+      "deedsRetroSummary": {
+        "one": "Kronikmu menyusul: {count} jasa tercatat.",
+        "few": "Kronikmu telah menyusul: {count} jasa tercatat.",
+        "many": "Kronikmu telah menyusul: {count} jasa tercatat.",
+        "other": "Kronikmu telah menyusul: {count} jasa tercatat."
       }
     },
     "bugReport": {
@@ -1912,6 +2227,10 @@ export const id_ID: EnTranslations = {
       "itemAriaBound": "{item}, jumlah {count}, salinan terikat",
       "itemAriaMasterwork": "{item}, jumlah {count}, karya master",
       "itemAriaQuest": "{item}, jumlah {count}, barang misi",
+      "itemAriaLocked": "{item}, jumlah {count}, terkunci",
+      "itemLockedLine": "Terkunci",
+      "lockItem": "Kunci Barang",
+      "unlockItem": "Buka Kunci Barang",
       "filterGroupAria": "Saring tas menurut kategori",
       "filterAll": "Semua",
       "filterWeapon": "Senjata",
@@ -1926,6 +2245,9 @@ export const id_ID: EnTranslations = {
       "sortRecent": "Terbaru",
       "sortQuality": "Kualitas",
       "sortName": "Nama",
+      "sortButton": "Urutkan",
+      "sortButtonAria": "Urutkan tasmu",
+      "sortButtonHint": "Gabungkan tumpukan dan kelompokkan barang berdasarkan jenis",
       "searchPlaceholder": "Cari barang",
       "searchAria": "Cari barang tas berdasarkan nama",
       "noMatch": "Tidak ada barang yang cocok dengan saringanmu.",
@@ -1951,18 +2273,36 @@ export const id_ID: EnTranslations = {
     "auraEffect": {
       "dot": "Memberikan {value} kerusakan {school} setiap {interval} dtk",
       "hot": "Memulihkan {value} kesehatan setiap {interval} dtk",
+      "mendingCurrent": "Menyimpan {value} penyembuhan, dilepaskan seiring waktu atau dihabiskan oleh Tambalan Bertingkat",
+      "mendingCurrentPercent": "Menyimpan penyembuhan setara {pct}% nyawa maksimum untuk Tambalan Bertingkat",
       "absorb": "Menyerap {value} kerusakan",
       "healAbsorb": "Menyerap {value} penyembuhan masuk",
       "thorns": "Inflige {value} de daño de {school} a los atacantes",
+      "stasis": "Kebal dan tidak dapat bertindak",
       "slow": "Reduce la velocidad de movimiento un {pct}%",
       "speed": "Aumenta la velocidad de movimiento un {pct}%",
       "attackSpeedSlow": "Reduce la velocidad de ataque un {pct}%",
       "attackSpeedFast": "Aumenta la velocidad de ataque un {pct}%",
       "haste": "Aumenta la velocidad de ataque y lanzamiento un {pct}%",
+      "imbueRange": "Senjata terinfus: {min} hingga {max} kerusakan tambahan saat Vonis",
+      "petDamage": "Meningkatkan kerusakan peliharaan sebesar {pct}%",
+      "petHaste": "Meningkatkan kecepatan tindakan peliharaan sebesar {pct}%",
+      "spellDamage": "Meningkatkan kerusakan sihir sebesar {pct}%",
+      "spellHaste": "Meningkatkan kecepatan rapal sihir sebesar {pct}%",
+      "sated": "Tidak dapat memperoleh manfaat dari efek percepatan kelompok lainnya",
+      "cauterizeFatigue": "Kauterisasi tidak dapat mencegah hantaman mematikan lainnya",
+      "castShield": "Rapalan tidak dapat diinterupsi atau ditunda oleh kerusakan",
       "dmgDone": "Meningkatkan kerusakan yang diberikan sebesar {pct}%",
       "dmgDoneReduce": "Mengurangi kerusakan yang diberikan sebesar {pct}%",
       "heatingUp": "Serangan kritis pembangun Api berturutan berikutmu memberikan Hot Streak; pembangun yang tidak kritis menghapus Heating Up",
       "elementalConvergencePrimed": "Mantra berikutmu dari sekolah elemen lain memberikan Konvergensi Elemen",
+      "hunterFerocity": "{stacks} Keganasan Kawanan: hewan peliharaanmu memberi {pct}% lebih banyak kerusakan",
+      "cooldownCap": "{used} dari {cap} dtk pengurangan jeda terpakai dalam jendela ini",
+      "funeralHarvestLock": "Funeral Harvest belum bisa menciptakan Serpihan Jiwa lagi",
+      "leadenHexLock": "Kutuk Timah belum bisa mengakar target ini lagi",
+      "forbiddenReflectionReady": "Jeda Penyihir Iblis berikutnya yang memenuhi syarat dapat dirapal kembali",
+      "forbiddenReflectionLock": "Pantulan Terlarang belum bisa disiapkan lagi",
+      "internalCooldown": "Efek ini tidak dapat terpicu lagi hingga penghitung waktu berakhir",
       "carriedFlag": "Kamu membawa bendera musuh. Batalkan buff ini untuk menjatuhkannya.",
       "battleStance": "Kuda-kuda Tempur: penghasilan amarah 10% lebih banyak",
       "berserkerStance": "Kuda-kuda Berserker: kritis 3% lebih sering dan menghantam 3% lebih keras",
@@ -1977,6 +2317,13 @@ export const id_ID: EnTranslations = {
       "revengeFree": "Balas Dendam berikutnya tidak membutuhkan Amarah",
       "victoryRush": "Terjangan Kemenangan siap digunakan",
       "maxHpPct": "Meningkatkan nyawa maksimum sebesar {pct}%",
+      "enrage": "Kerusakan yang diberikan meningkat {damagePct}%, kecepatan serang {hastePct}%, dan kecepatan gerak {movePct}%",
+      "suddenDeath": "Ajal Dini berikutnya tidak memakan Amarah dan mengabaikan syarat nyawanya",
+      "aoeEcho": "{charges} gema tersisa: kemampuan bertarget tunggal memberikan {pct}% kerusakan kepada hingga {targets} musuh terdekat",
+      "sureCrit": "{charges} rapalan kemampuan yang merusak dijamin menjadi pukulan kritis",
+      "temporalEcho": "Kerusakan Arkana dari perapal menyembuhkanmu sebesar {singlePct}% dari kerusakan bertarget tunggal atau {areaPct}% dari kerusakan area",
+      "arcaneCharge": "{stacks} Muatan Arkana: Kekuatan Arkan memberikan {damagePct}% kerusakan lebih besar, dirapal {castPct}% lebih cepat, dan menghabiskan {costMult}x mana",
+      "physicalReduction": "Mengurangi kerusakan Fisik yang diterima sebesar {pct}%",
       "temporalHourglass": "Kebal dan tidak dapat bertindak; memulihkan kesehatan dan mempercepat pemulihan jeda. Klik kanan untuk membatalkan.",
       "tongues": "Aumenta el tiempo de lanzamiento un {pct}%",
       "combustionCrit": "Mantra Api-mu selalu menghasilkan serangan kritis",
@@ -1986,6 +2333,22 @@ export const id_ID: EnTranslations = {
       "freeCast": "Rapalan berikutmu tidak membutuhkan biaya",
       "instantCast": "Mantra berikutmu yang memiliki waktu rapalan menjadi seketika",
       "cheapCast": "Mantra berikutmu menghabiskan {pct}% lebih sedikit mana",
+      "radiantResonance": "Cahaya Pemulih berikutnya menjadi seketika, atau Pelukan Fajar berikutnya menghabiskan {pct}% lebih sedikit mana dan dirapal dalam {castTime} dtk",
+      "solarReprisal": "Cakram Surya berikutnya tidak menghabiskan mana, mengabaikan jeda, dan memberi {pct}% lebih banyak kerusakan; Palu Karunia mengabaikan jedanya dan menyembuhkanmu sebesar 100% kerusakan yang diberikan; atau Cahaya Pemulih menjadi seketika",
+      "dawnsWrath": "PM: berapa pun nyawa · +1 penggunaan · Jeda 0 · +{pct}% kerusakan",
+      "venomRitual": "Ritual Bisa: tahap {stacks} dari {max}. Serangan penumpuk menambah tahap; pada {max}, Tidur Abadi berubah menjadi Robekan Bisa",
+      "gloam": "Remang: tahap {stacks} dari {max}. Pada {max}, pembuka Tabir Senjamu terbuka di area terbuka, dan yang berikutnya dilempar GRATIS serta meledakkan simpanan menjadi tabir bayangan",
+      "redline": "Garis Merah: takik {stacks} dari {max}. Pukulan Badan menambah takik; Pukulan Penghabisan menghantam {pct}% lebih keras per takik dan menutup jendela. Habis lebih dulu berarti hilang",
+      "veilstrikeWindow": "Tabir Bayangan: pembuka Tabir Senjamu dapat dipakai di area terbuka dari sudut mana pun, dan kerusakan yang kamu beri meningkat {pct}%",
+      "veiledEdge": "Serangan Pengintai berikutnya menghantam dua kali lipat",
+      "duskEconomy": "Kemampuan menghabiskan {pct}% lebih sedikit energi",
+      "moontide": "Pasang Rembulan: tahap {stacks} dari {max}. Rapalan Panah Liar, Langit Runtuh, dan Benih Rembulan mengisinya dalam Wujud Burung Bulan; pada {max}, Benih Rembulan menjadi Gelombang Rembulan dan Langit Runtuh menjadi Jejak Surya, dan keduanya memakainya",
+      "oldBlood": "Darah Tua: tahap {stacks} dari {max}. Serangan Serigala dan Bruin yang kena berbagi simpanan ini; pada {max}, Gigitan Berdarah atau Remuk Tulang bertransformasi",
+      "verdance": "Kehijauan: tahap {stacks} dari {max}. Rapalan Mekar Liar dan Mekar Kedua yang selesai mengisinya; pada {max}, Pemulihan Cepat menjadi Mekar Raya",
+      "freeExecute": "Kemampuan eksekusi berikutnya yang memenuhi syarat tidak memakan biaya apa pun",
+      "resourceSap": "Memulihkan {value} dari sumber dayamu saat ini setiap {interval} dtk",
+      "nextAttackCrit": "Seranganmu berikutnya dijamin akan menjadi pukulan kritis",
+      "healEcho": "Turun di bawah {threshold}% nyawa memulihkan {value} nyawa",
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
         "sp": "Meningkatkan daya mantra sebesar {value}",
@@ -2024,6 +2387,8 @@ export const id_ID: EnTranslations = {
       "mortalWound": "Reduce la sanación recibida un {pct}%",
       "vulnerability": "Aumenta el daño recibido un {pct}%",
       "physVuln": "Aumenta el daño físico recibido un {pct}%",
+      "bleedVuln": "Meningkatkan kerusakan pendarahan yang diterima sebesar {pct}%",
+      "sourceVuln": "Menerima {pct}% kerusakan lebih besar dari perapal yang memberikan efek ini",
       "spellVuln": "Aumenta el daño mágico recibido un {pct}%",
       "critVuln": "Aumenta la probabilidad de recibir golpes críticos un {pct}%",
       "costTax": "Aumenta los costes de habilidades un {pct}%",
@@ -2037,14 +2402,46 @@ export const id_ID: EnTranslations = {
       "disarm": "Desarmado: no puede usar ataques con arma",
       "lockout": "Escuela de hechizos bloqueada",
       "imbue": "Arma imbuida con efectos adicionales",
-      "imbueRange": "Senjata terinfus: {min} hingga {max} kerusakan tambahan saat Vonis",
+      "galeheartWeapon": "Menyelesaikan Irama Roh Perang {steps} pukulan menggemakan serangan itu {count} kali sebesar {pct}% kerusakannya sebagai kerusakan Alam",
+      "elementalTrance": "Kerusakan yang diterima berkurang {pct}%. {mana}% dari semua kerusakan yang kamu berikan diubah menjadi mana",
       "stealth": "Oculto; velocidad de movimiento reducida un {pct}%",
       "formBear": "Wujud Bruin: nyawa dan zirah meningkat",
       "formCat": "Forma felina: daño cuerpo a cuerpo y energía",
       "formTravel": "Wujud Fleet: kecepatan gerak meningkat sebesar {pct}%",
       "formFireball": "Ember Form: kecepatan gerak meningkat {pct}%; serangan dan mantra dinonaktifkan",
+      "formMoonkin": "Wujud Burung Bulan: kerusakan sihir meningkat {pct}% dan zirah meningkat {armorPct}%",
+      "formShadow": "Wujud Bayangan: kerusakan Bayangan meningkat {pct}%",
+      "resourceCount": "{value} dari {max}",
+      "formLich": "Soul Lance juga menghantam hingga {targets} musuh terdekat sebesar {pct}% kerusakan",
+      "afflictionEye": "Maledict Gaze menyerang setiap {interval} dtk; efek pada Eye ini menghasilkan {pct}% Kecaman",
+      "afflictionEyeSecondary": "Efek pada Eye ini menghasilkan {doomPct}% Kecaman; Sentence bergema di sini sebesar {echoPct}% kerusakan",
+      "afflictionAccomplice": "Kerusakan yang memenuhi syarat memberikan {value} Kecaman, paling banyak sekali setiap {interval} dtk",
+      "afflictionViolence": "{charges} balasan tersisa; serangan musuh memberikan {doom} Kecaman dan membalas {damage} kerusakan Bayangan",
+      "afflictionVicarious": "Mengalihkan atau mengurangi {pct}% kerusakan masuk dan dapat menghasilkan hingga {max} Kecaman",
+      "afflictionPossession": "Memperkuat Needle of Fate, Melahap, Maledict Gaze, dan Sentence",
+      "afflictionJudgment": "Eye utama menghasilkan {eyePct}% lebih banyak Kecaman; Sentence memberikan {sentencePct}% kerusakan lebih besar dan yang pertama mengembalikan {refund} Kecaman",
+      "afflictionLitany": "Perolehan Kecaman memberikan {damage} kerusakan Bayangan kepada hingga {targets} musuh dalam radius {radius} m, sekali per detik",
+      "afflictionFateThreads": "{stacks} Benang Takdir: Sentence memberikan {sentencePct}% kerusakan lebih besar, atau Melahap memperoleh {doom} Kecaman tambahan per tik",
+      "afflictionConsumeThreads": "Melahap sedang mengonsumsi {stacks} Benang Takdir untuk {doom} Kecaman tambahan per tik",
+      "necromancyHarvestMark": "Kematian dapat menciptakan 1 Serpihan Jiwa",
+      "necromancyOssuaryMark": "Menyimpan {storedPct}% dari kerusakanmu dan mayat hidupmu, ditambah {lancePct}% dari kerusakan Soul Lance; rapal ulang untuk meledakkannya. Kematian meledak dalam radius {radius} m dan menciptakan 1 Serpihan Jiwa",
+      "necromancyDeathEcho": "Gema Kematian warisan; tidak ada kemampuan saat ini yang mengonsumsinya",
+      "warlockAnchor": "Rapal ulang dalam radius {range} m untuk kembali ke sini dan mengonsumsi jangkar",
+      "formMetamorph": "Wujud iblis: ukuran tubuh meningkat {pct}%; bonus lainnya menyertai buff terpisah",
+      "energyRegen": "Meningkatkan regenerasi Energi sebesar {pct}%",
       "defensiveStance": "Kuda-kuda Waspada: kerusakan yang diterima berkurang, ancaman bertambah",
       "righteousFury": "Sumpah Membara: ancaman dari kerusakan Suci sangat meningkat",
+      "overpowerCharge": "{stacks} muatan: Serangan Pelukaimu berikutnya memberikan {pct}% kerusakan lebih besar",
+      "sweepingStrikes": "Serangan bertarget tunggal juga menghantam {targets} musuh terdekat sebesar {pct}% kerusakan",
+      "fingersOfFrost": "{charges} muatan: Tombak Es memperlakukan targetnya seolah membeku dan memberikan {pct}% kerusakan beku",
+      "brainFreeze": "Cambuk Musim Dinginmu berikutnya seketika dan mengabaikan jedanya",
+      "wintersChill": "{charges} muatan: mantra yang kompatibel memperlakukan target ini seolah membeku",
+      "icicles": "{value} dari {max} Es Runcing; pada {max}, Pancang Glasial dapat dirapal",
+      "desolation": "{charges} muatan: Baut Reruntuhanmu berikutnya dirapal {castPct}% lebih cepat atau Hujan Apimu berikutnya mendarat seketika",
+      "ruinousBrand": "{charges} salinan tersisa: mantra langsung menyalin {otherPct}% kerusakan ke sini, atau {selfPct}% saat ini menjadi targetnya",
+      "duskfireClaim": "Kematian memberikan {value} Wrack",
+      "pyreGuardian": "Menghasilkan {ruin} Wrack setiap {ruinInterval} dtk dan memberikan {damage} kerusakan Api dalam radius {radius} m setiap {damageInterval} dtk",
+      "perfectMoment": "Panah Aether tidak mengonsumsi Muatan Arkana",
       "scale": "Tamaño aumentado un {pct}%",
       "jump": "Altura de salto aumentada un {pct}%",
       "school": {
@@ -2093,7 +2490,8 @@ export const id_ID: EnTranslations = {
     "nameplate": {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
-      "afkTag": "AFK"
+      "afkTag": "AFK",
+      "cheaterTag": "< Pemain Curang >"
     },
     "mobTooltip": {
       "levelFamily": "{family} Level {level}",
@@ -2816,6 +3214,11 @@ export const id_ID: EnTranslations = {
       "toolEffectRechargeFull": "{effect} sudah terisi penuh.",
       "toolEffectRechargeToolCapped": "Bawa alat {profession} yang lebih baik untuk mengisi {effect} lebih jauh.",
       "toolEffectRechargeMaterials": "Mengisi ulang {effect} membutuhkan {material} x{count}.",
+      "craftingProgress": "Kamu sedang membuat: {remaining} dtk dari {total} dtk tersisa.",
+      "disenchantingProgress": "Kamu sedang menghancurkan pemantraan: {remaining} dtk dari {total} dtk tersisa.",
+      "enchantingProgress": "Kamu sedang memantrai: {remaining} dtk dari {total} dtk tersisa.",
+      "salvagingProgress": "Kamu sedang menyalvasi: {remaining} dtk dari {total} dtk tersisa.",
+      "rechargingToolEffectProgress": "Kamu sedang mengisi ulang efek alat: {remaining} dtk dari {total} dtk tersisa.",
       "tierPipAria": "Tingkat {tier}",
       "nextUnlockTier": "{points} menunjuk ke tingkat berikutnya: peluang karya besar meningkat",
       "nextUnlockSpecialized": "{points} menunjuk ke Khusus: biaya material turun",
@@ -2866,6 +3269,7 @@ export const id_ID: EnTranslations = {
       "craftedToast": "Dibuat: {name}",
       "craftedToastQty": "Dibuat: {name} x{qty}",
       "insufficientMaterials": "Anda tidak memiliki bahan untuk itu.",
+      "reagentLocked": "Reagen untuk itu terkunci.",
       "unknownRecipe": "Resep itu tidak ada.",
       "comboRequirementUnmet": "Kamu tidak memiliki kedua keahlian yang diperlukan pada tingkat yang disyaratkan untuk resep itu.",
       "comboRequires": "Penyelarasan: {craftA} + {craftB}, tingkat {tier}.",
@@ -2972,6 +3376,7 @@ export const id_ID: EnTranslations = {
       "notHeld": "Kamu tidak memiliki barang itu.",
       "notDisenchantable": "Kamu tidak bisa menghancurkan pemantraan itu.",
       "notSalvageable": "Kamu tidak bisa menyalvasi itu.",
+      "salvageLocked": "Barang itu terkunci.",
       "disenchantBusy": "Kamu sedang sibuk.",
       "salvageBusy": "Kamu sedang sibuk.",
       "enchantBusy": "Kamu sedang sibuk.",
@@ -3111,6 +3516,16 @@ export const id_ID: EnTranslations = {
       "denyOutOfRange": "Kamu harus berada di dekat peminta untuk menyerahkan komisi.",
       "denyNoSpace": "Peminta tidak memiliki ruang di tasnya."
     },
+    "bgOffer": {
+      "title": "Medan Thornhollow sudah siap",
+      "backfillTitle": "Medan Thornhollow membutuhkan seorang petarung",
+      "backfillBody": "Pertempuran ini sudah berlangsung. Kamu akan bergabung ke pihak yang kekurangan orang, dan pertandingan ini tidak akan mengubah peringkatmu.",
+      "accepted": "{accepted} dari {size} siap",
+      "remaining": "{seconds} dtk untuk menjawab",
+      "accept": "Terima",
+      "decline": "Tolak",
+      "acceptedWait": "Menunggu yang lain..."
+    },
     "finder": {
       "title": "Pencari Dungeon",
       "close": "Tutup",
@@ -3213,6 +3628,135 @@ export const id_ID: EnTranslations = {
         "dread_curse": "Kutukan Kengerian (khusus heroik, debuff bertumpuk untuk pergantian tank)"
       }
     },
+    "reliquary": {
+      "title": "Relikuari",
+      "close": "Tutup Relikuari",
+      "countLabel": "{owned}/{total} relik",
+      "completionAria": "Relik terisi: {owned} dari {total}",
+      "curatorRank": "Peringkat Kurator {rank}",
+      "curatorUnranked": "Kurator Tanpa Peringkat",
+      "curatorRankName1": "Kurator Magang",
+      "curatorRankName2": "Penjaga Rampasan",
+      "curatorRankName3": "Kurator Ahli",
+      "curatorRankName4": "Kurator Agung",
+      "curatorRankName5": "Kurator Abadi",
+      "rankUpBanner": "Peringkat Kurator {rank}: {name}",
+      "rankUpToast": "Peringkat Kurator {rank} tercapai: {name}",
+      "borderWearableNote": "Bingkai {name} bisa dikenakan lewat Kitab Jasa.",
+      "sigilCaption": "Lambang Kurator",
+      "recentLabel": "Temuan terbaru:",
+      "nearlyLabel": "Hampir tuntas:",
+      "nearlyJumpAria": "Buka {name}, {owned} dari {total} terisi",
+      "progressText": "{owned}/{total}",
+      "shelvesAria": "Rak Relikuari",
+      "navOverview": "Ikhtisar",
+      "navConquerors": "Penakluk",
+      "navProfessions": "Profesi",
+      "navHorizons": "Cakrawala",
+      "navCountAria": "{shelf}: {owned} dari {total} relik terisi",
+      "shelfEmpty": "Belum ada halaman di rak ini.",
+      "pageComplete": "Diterangi",
+      "clearsLabel": "{count} penyelesaian",
+      "srankClearsLabel": "{count} penyelesaian peringkat S",
+      "retiredLabel": "Ditarik",
+      "personalLabel": "Pribadi",
+      "backToShelf": "Kembali ke rak",
+      "gridAria": "Relik pada {name}",
+      "pageProgressAria": "Kemajuan halaman: {owned} dari {total} relik terisi",
+      "cellOwnedAria": "{name}, terkatalog",
+      "cellMissingAria": "{name}, belum ditemukan",
+      "ownedTooltipStatus": "Terkatalog di Relikuari",
+      "missingTooltipStatus": "Belum ditemukan",
+      "firstFindClears": "Pertama ditemukan pada penyelesaian ke-{count}",
+      "unlockToast": "Relik terkatalog: {name}",
+      "illuminateBanner": "Halaman diterangi: {name}",
+      "illuminateToast": "Setiap relik pada {name} sudah terisi.",
+      "illuminationBroadcastLine": "{name} telah menerangi sebuah halaman Relikuari: {page}",
+      "markFind": {
+        "masterwork_first": "Karya Besar Pertama",
+        "masterwork_weaponcrafting": "Karya Besar Penempaan Senjata",
+        "masterwork_armorcrafting": "Karya Besar Penempaan Zirah",
+        "masterwork_tailoring": "Karya Besar Menjahit",
+        "masterwork_leatherworking": "Karya Besar Pengolahan Kulit",
+        "masterwork_engineering": "Karya Besar Rekayasa",
+        "gather_event_pristine_vein": "Urat Bijih Murni",
+        "gather_event_ancient_heartwood": "Teras Kayu Purba",
+        "gather_event_moonlit_bloom": "Kuntum Cahaya Bulan",
+        "gather_event_perfect_specimen": "Spesimen Sempurna",
+        "slain_old_greyjaw": "Dikalahkan: Greyjaw Tua",
+        "slain_mogger": "Dikalahkan: Mogger",
+        "slain_grix_the_tunnelking": "Dikalahkan: Grix sang Raja Terowongan",
+        "slain_captain_verlan": "Dikalahkan: Kapten Verlan",
+        "slain_wraithbinder_maldrec": "Dikalahkan: Pengikat Arwah Maldrec",
+        "slain_mirejaw_the_ravenous": "Dikalahkan: Mirejaw sang Rakus",
+        "slain_sloomtooth_the_drowned": "Dikalahkan: Sloomtooth sang Tenggelam",
+        "slain_sister_nhalia": "Dikalahkan: Suster Nhalia",
+        "slain_grubjaw": "Dikalahkan: Grubjaw si Rakus",
+        "slain_ironvein_foreman": "Dikalahkan: Mandor Ironvein",
+        "slain_brutok_skullsmasher": "Dikalahkan: Brutok Penghancur Tengkorak",
+        "slain_voskar_emberwing": "Dikalahkan: Voskar sang Sayap Bara",
+        "slain_marrowlord_varkas": "Dikalahkan: Tuan Sumsum Varkas",
+        "slain_old_cragmaw": "Dikalahkan: Cragmaw Tua",
+        "slain_shardlord_kazzix": "Dikalahkan: Tuan Serpihan Kazzix",
+        "slain_gleamstag": "Dikalahkan: Sang Gleamstag",
+        "slain_old_marrowshell": "Dikalahkan: Marrowshell Tua",
+        "slain_aurelhorn": "Dikalahkan: Aurelhorn, Sang Pertama dari Kawanan",
+        "slain_drakemaw_broodlord": "Dikalahkan: Penguasa Sarang Drakemaw"
+      },
+      "accountScopeBadge": "Akun",
+      "accountScopeNote": "Koleksi akun: terbuka di setiap karakter pada akun ini.",
+      "unknownRelic": "Relik tak tercatat",
+      "sourceBossDungeon": "Jatuh dari {boss} di {dungeon}",
+      "sourceBoss": "Jatuh dari {boss}",
+      "sourceZone": "Ditemukan di {zone}",
+      "sourceProfession": "Diraih melalui {profession}",
+      "sourceDeed": "Diberikan oleh jasa {deed}",
+      "sourceVendor": "Dijual oleh {vendor}",
+      "sourceBossZone": "Jatuh dari {boss} di {zone}",
+      "sourceDelve": "Ditemukan di delve {delve}",
+      "sourceRift": "Jatuh dari penyelesaian Rift peringkat {rank}",
+      "sourceQuest": "Hadiah dari misi {quest}",
+      "sourceStore": "Dibeli di Toko WOC",
+      "sourceActivityCorpseHarvest": "Didapat saat memanen bangkai makhluk",
+      "sourceActivityMasterworkCraft": "Diraih dengan membuat sebuah karya besar",
+      "sourceActivityRiftFirstClear": "Diberikan kepada setiap anggota kelompok yang meraih penyelesaian pertama sebuah Rift berperingkat",
+      "cellMissingSourceAria": "{name}, belum ditemukan, {source}",
+      "cellOwnedClearsAria": "{name}, terkatalog, pertama ditemukan pada penyelesaian ke-{count}",
+      "searchPlaceholder": "Cari relik",
+      "searchAria": "Cari di Relikuari berdasarkan nama",
+      "searchEmpty": "Tidak ada relik yang cocok dengan pencarian itu.",
+      "filterEmpty": "Tidak ada relik yang cocok dengan saringan ini.",
+      "filterGroupAria": "Saring relik berdasarkan apakah kamu sudah menemukannya",
+      "gridKeyboardHint": "Gunakan tombol panah untuk berpindah antar relik, serta Home dan End untuk melompat ke ujung.",
+      "filterAll": "Semua",
+      "filterOwned": "Terkatalog",
+      "filterMissing": "Belum ada",
+      "recentJumpAria": "Buka halaman untuk {name}",
+      "recentEmpty": "Belum ada temuan. Relik yang kamu katalogkan mulai sekarang akan muncul di sini.",
+      "nearlyEmpty": "Halaman yang hampir tuntas berkumpul di sini.",
+      "stripNoMatch": "Tidak ada di sini yang cocok dengan pencarianmu.",
+      "shelfRecent": "Temuan terakhir: {name}",
+      "shelfNoFinds": "Belum ada yang terkatalog di rak ini.",
+      "shelfOpenAria": "Buka rak {name}, {owned} dari {total} terisi",
+      "sharedUniquesNote": "Total keseluruhanmu menghitung setiap relik satu kali saja; hitungan rak dan halaman mendaftar setiap petak, jadi relik yang tampil di lebih dari satu halaman dihitung oleh masing-masing halaman itu.",
+      "charCompletionLabel": "Relikuari",
+      "charCompletion": "{owned}/{total}",
+      "charRankLabel": "Kurator",
+      "charOpen": "Relikuari",
+      "trackerLabel": "Relikuari",
+      "collapseHint": "Ciutkan pelacak Relikuari",
+      "expandHint": "Bentangkan pelacak Relikuari",
+      "openWindowHint": "Buka Relikuari",
+      "pin": "Sematkan",
+      "unpin": "Lepas",
+      "pinFull": "Pelacak sudah penuh (maksimal {cap} halaman)",
+      "pinAria": "Sematkan {name} ke pelacak antarmuka",
+      "unpinAria": "Lepas {name}",
+      "rarityLine": "Ditemukan oleh {percent} kolektor",
+      "pageRarityLine": "Diterangi oleh {percent} kolektor",
+      "cellAriaWithRarity": "{base}, {rarity}",
+      "cellAriaWithAccountScope": "{base}, {scope}"
+    },
     "deeds": {
       "title": "Kitab Jasa",
       "close": "Tutup Kitab Jasa",
@@ -3249,18 +3793,23 @@ export const id_ID: EnTranslations = {
       "featRibbon": "Mahajasa",
       "hiddenBadge": "Tersembunyi",
       "titleChip": "Hadiah gelar",
+      "borderChip": "Hadiah bingkai",
       "watch": "Pantau",
       "unwatch": "Lepas Pantau",
       "watchFull": "Daftar pantauan penuh (maks {cap})",
       "watchAria": "Pantau {name} di pelacak HUD",
       "unwatchAria": "Berhenti memantau {name}",
+      "cosmeticsSection": "Gelar dan bingkai",
       "titlesSection": "Gelar",
       "titlesAria": "Pilih gelar yang ditampilkan",
       "titlesNone": "Tanpa Gelar",
       "titlesEmpty": "Raih jasa yang menganugerahkan gelar untuk membuka rak ini.",
+      "bordersSection": "Bingkai",
+      "bordersNone": "Tanpa bingkai",
+      "bordersEmpty": "Raih sebuah jasa yang memberi bingkai untuk membuka rak ini.",
       "unlockedBanner": "Jasa terukir: {name}",
       "unlockedTitleHint": "Gelar baru diraih: {title}. Pilih di Kitab Jasa.",
-      "retroSummary": "Kronikmu telah menyusul: {count} jasa tercatat.",
+      "unlockedBorderHint": "Bingkai baru diraih: {name}. Kenakan lewat Kitab Jasa.",
       "broadcastLine": "{name} telah mengukir jasa: {deed}",
       "rarityLine": "Diraih oleh {percent} petualang",
       "trackerLabel": "Jasa",
@@ -3270,6 +3819,7 @@ export const id_ID: EnTranslations = {
       "charTitleLabel": "Gelar",
       "charTitleNone": "Belum ada gelar dipilih",
       "charOpenBook": "Kitab Jasa",
+      "charBorderWorn": "{name} (dikenakan)",
       "lbTab": "Kemasyhuran",
       "lbTitleCol": "Gelar",
       "lbScopeNote": "Akun diberi peringkat berdasarkan Kemasyhuran seumur hidup. Setiap jasa dihitung sekali di semua karakter pada satu akun.",
@@ -3286,6 +3836,9 @@ export const id_ID: EnTranslations = {
       "toZone": "Peta zona",
       "toggleAria": "Beralih antara peta dunia dan peta zona",
       "levels": "Level {min} hingga {max}"
+    },
+    "arenaGate": {
+      "minLevelNote": "Membutuhkan Level {level}"
     }
   },
   "lb": {
@@ -3382,7 +3935,9 @@ export const id_ID: EnTranslations = {
       "delete_confirm": "Ketik nama karakter untuk mengonfirmasi penghapusan.",
       "already_in_world": "Karakter sudah berada di dalam dunia.",
       "taken_over": "Karakter Anda telah diambil alih oleh sesi lain.",
-      "rename_required": "Karakter ini harus diganti namanya sebelum memasuki dunia."
+      "rename_required": "Karakter ini harus diganti namanya sebelum memasuki dunia.",
+      "invalid_appearance": "Tampilan itu tidak dapat disimpan. Sesuaikan desainnya, lalu coba lagi.",
+      "reroll_unavailable": "Karakter ini tidak memiliki desain ulang gratis yang tersedia."
     },
     "moderation": {
       "suspended_until": "Akun ini ditangguhkan hingga {date}.",
@@ -3448,6 +4003,12 @@ export const id_ID: EnTranslations = {
       "genesis_token_claimed": "Seeker Genesis Token itu sudah diklaim.",
       "entitlement_required": "Diperlukan hak akses Seeker yang terverifikasi.",
       "current_ownership_required": "Diperlukan kepemilikan Seeker Genesis Token saat ini."
+    },
+    "cheater_mark": {
+      "admin_target": "Akun operator tidak dapat diberi tanda.",
+      "reason_required": "Alasan wajib diisi.",
+      "invalid_duration": "Masukkan durasi tanda setidaknya satu detik.",
+      "not_marked": "Akun tersebut tidak diberi tanda."
     }
   },
   "guide": {
@@ -3474,8 +4035,13 @@ export const id_ID: EnTranslations = {
       "quests": "Misi",
       "dungeons": "Dungeon & Raid",
       "delves": "Delve",
+      "rifts": "Rift",
+      "mounts": "Tunggangan & Menunggang",
       "reference": "Rujukan",
       "controls": "Kontrol",
+      "commands": "Perintah Garis Miring",
+      "interface": "Antarmuka & HUD",
+      "editor": "Editor Dunia",
       "settings": "Pengaturan & Kinerja",
       "combat": "Pertarungan",
       "talents": "Talent",
@@ -3483,6 +4049,7 @@ export const id_ID: EnTranslations = {
       "valeCup": "Piala Lembah",
       "thornhollow": "Medan Thornhollow",
       "deeds": "Kitab Jasa",
+      "reliquary": "Relikuari",
       "glossary": "Glosarium",
       "wishIKnew": "Hal yang Andai Kuketahui",
       "faq": "FAQ",
@@ -3498,6 +4065,10 @@ export const id_ID: EnTranslations = {
     "groups": {
       "start": "Mulai Bermain",
       "compendium": "Kompendium",
+      "world": "Dunia",
+      "character": "Karaktermu",
+      "endgame": "Konten Kelompok",
+      "compete": "Pemain Lawan Pemain",
       "reference": "Rujukan"
     },
     "breadcrumb": {
@@ -3537,7 +4108,9 @@ export const id_ID: EnTranslations = {
       "typeDelve": "Delve",
       "typeTerm": "Istilah",
       "typeAbility": "Kemampuan",
-      "typeDeed": "Jasa"
+      "typeDeed": "Jasa",
+      "typeReliquaryPage": "Halaman Relikuari",
+      "typeRelic": "Relik"
     },
     "home": {
       "eyebrow": "MMO browser bergaya klasik",
@@ -3547,8 +4120,8 @@ export const id_ID: EnTranslations = {
       "ctaLearn": "Cara Bermain",
       "what": {
         "heading": "MMO klasik, dibuat agar mudah dimainkan",
-        "pillarPlayTitle": "Main di browser-mu",
-        "pillarPlayBody": "Tanpa unduhan, tanpa peluncur. Buat karakter dan kamu sudah ada di dunia dalam hitungan detik, di desktop maupun ponsel.",
+        "pillarPlayTitle": "Buka situsnya dan mainkan",
+        "pillarPlayBody": "Tanpa unduhan, tanpa peluncur. Buat karakter dan dalam hitungan detik kamu sudah berada di dunia, di desktop maupun di ponsel. Ada juga aplikasi nativenya, kalau kamu mau.",
         "pillarClassesTitle": "Sembilan kelas, tiga peran",
         "pillarClassesBody": "Jadi tank, sembuhkan, atau lancarkan damage. Setiap kelas dimainkan sesuai arketipenya, dengan talent untuk menjadikannya milikmu.",
         "pillarOpenTitle": "Gratis dan sumber terbuka",
@@ -3562,6 +4135,7 @@ export const id_ID: EnTranslations = {
       "world": {
         "heading": "Jelajahi dunia",
         "sub": "Satu daratan menyambung, tiga zona, dari lembah yang tenang hingga puncak beku.",
+        "subCount": "Satu daratan yang menyambung terdiri dari {zones} zona, dari lembah yang tenang dan rawa tenggelam hingga padang abu, puncak beku, dan taman labirin semak.",
         "levels": "Level {min} hingga {max}",
         "cta": "Lihat dunianya",
         "valeName": "Lembah Eastbrook",
@@ -3579,7 +4153,20 @@ export const id_ID: EnTranslations = {
         "amberName": "Air Terjun Amber",
         "amberBlurb": "Di balik tebing barat, musim gugur yang tak pernah berakhir, dan lentera-lentera di atas danau keemasan.",
         "fenName": "Paya Willow",
-        "fenBlurb": "Melewati mahkota musim gugur, sebuah rawa cerah berisi pohon willow dan air yang tenang, serta sebuah kota di balik parit."
+        "fenBlurb": "Melewati mahkota musim gugur, sebuah rawa cerah berisi pohon willow dan air yang tenang, serta sebuah kota di balik parit.",
+        "farshoreName": "Pesisir Jauh",
+        "farshoreBlurb": "Sebuah pulau di seberang gosong pasir, tempat langit terkoyak di atas Riftfields dan Gullhaven membunyikan loncengnya setiap kali sebuah celah terbuka.",
+        "nightName": "Kuntum Malam",
+        "nightBlurb": "Sebuah negeri tengah malam berbintang tempat bunga-bunga menerangi jalan setapak dan Moonrest menjaga kesiagaannya.",
+        "hauntName": "Hutan Arwah",
+        "hauntBlurb": "Sebuah hutan berhantu di bawah kanopi raksasa, tempat lentera-lentera Gallowmere menjadi satu-satunya cahaya jujur di jalan.",
+        "jungleName": "Teluk Palem",
+        "jungleBlurb": "Pohon palem, pasir putih, dan burung-burung yang riuh, dengan kota pantai Drifthaven menjaga api tetap menyala di sepanjang pesisir.",
+        "gardenName": "Taman Abadi",
+        "gardenBlurb": "Sebuah realm labirin semak yang masih dirapikan entah oleh siapa, yang belum pernah terlihat oleh siapa pun, dimasuki melewati Hedgewick dan halaman air mancurnya.",
+        "galeName": "Puncak Angin",
+        "galeBlurb": "Tebing laut dan padang berangin yang melolong tiada henti, tempat Wickharbor menutup pintu-pintunya rapat-rapat.",
+        "levelsCap": "Level {level}"
       },
       "group": {
         "heading": "Bersatu untuk bagian yang sulit",
@@ -3601,7 +4188,8 @@ export const id_ID: EnTranslations = {
         "q3": "Bisakah saya bermain luring?",
         "a3": "Ya. Ada mode pemain tunggal instan di browser-mu, ditambah dunia daring bersama.",
         "q4": "Berapa lama untuk mencapai level maksimal?",
-        "a4": "Batasnya adalah level {cap}, dicapai melintasi tiga zona penuh misi, dungeon, dan penjelajahan."
+        "a4": "Batasnya adalah level {cap}, dicapai melintasi tiga zona penuh misi, dungeon, dan penjelajahan.",
+        "a4Count": "Batasnya adalah level {cap}, dicapai melintasi zona-zona misi, dungeon, dan penjelajahan. Ada {zones} zona semuanya, dan yang terjauh di antaranya dibangun untuk karakter yang sudah mencapai batas level."
       },
       "community": {
         "heading": "Bergabunglah dengan dunia",
@@ -3634,16 +4222,26 @@ export const id_ID: EnTranslations = {
       "questsTitle": "Misi",
       "questsBody": "Terima misi dari orang yang punya penanda di atas kepalanya, selesaikan tujuannya, lalu serahkan untuk mendapatkan pengalaman, koin, dan perlengkapan. Pelacak di layar menjaga tujuanmu tetap terlihat.",
       "deathTitle": "Kematian bukanlah akhir",
-      "deathBody": "Jika kamu tumbang, tubuhmu tetap di tempat ia jatuh dan kamu bangkit sebagai hantu di kuburan terdekat. Larikan rohmu kembali ke tubuhmu untuk bangkit di tempat, tanpa hukuman, atau terima Sang Penjaga Pucat di kuburan untuk kebangkitan seketika dengan harga kelemahan yang sekejap. Pahlawan yang baru dibuat sama sekali dibebaskan dari kelemahan itu, dan tak ada yang kamu miliki atau kamu raih yang pernah hilang.",
+      "deathBody": "Jika kamu tumbang, tubuhmu tetap di tempat ia jatuh dan kamu bangkit sebagai arwah di pemakaman terdekat. Larikan rohmu kembali ke tubuhmu untuk hidup lagi di tempat, tanpa hukuman apa pun, atau terimalah Penjaga Pucat di pemakaman untuk kebangkitan seketika dengan harga kelemahan sesaat. Pahlawan yang baru dibuat terbebas sepenuhnya dari kelemahan itu, dan tidak ada satu pun yang kamu miliki atau kamu peroleh yang pernah hilang. Permainan juga memberitahumu apa penyebabnya: sebaris pesan di obrolanmu menyebut siapa yang melayangkan pukulan mematikan, dan itu biasanya cara tercepat untuk tahu apa yang salah.",
       "groupingTitle": "Bermain bersama",
       "groupingBody": "Undang yang lain ke party untuk berbagi kredit misi dan menaklukkan dungeon. Sebagian besar dunia bisa ditempuh sendiri, jadi bergabung adalah pilihan, bukan keharusan.",
       "onlineTitle": "Daring atau luring",
       "onlineBody": "Mainkan dunia daring bersama dengan semua orang, atau mulai dunia luring instan di browser-mu untuk mempelajari seluk-beluknya.",
-      "reassure": "Talent terbuka di level 10 dan bisa diatur ulang kapan saja selama kamu di luar pertempuran, jadi pilihan awalmu tidak pernah permanen. Bereksperimenlah dengan bebas.",
-      "controlsLink": "Lihat rujukan kontrol selengkapnya"
+      "reassure": "Talenta dimulai di level 5, dan seluruhnya ada enam baris, masing-masing satu di level 5, 8, 11, 14, 17, dan 20. Setiap baris adalah satu pilihan dari tiga, dan kamu bisa mengatur ulang kapan saja selagi di luar pertempuran dan tidak sedang dalam pertandingan arena, jadi pilihan awalmu tidak pernah permanen. Bereksperimenlah dengan bebas.",
+      "controlsLink": "Lihat rujukan kontrol selengkapnya",
+      "step0Title": "Masuk",
+      "step0Body": "Bermain luring tidak meminta apa pun: pilih Luring di layar awal dan tekan Main. Untuk bermain bersama semua orang, buat akun gratis (nama pengguna, kata sandi, dan alamat email untuk pemulihan) atau masuk ke akun yang sudah kamu punya, lalu pilih sebuah dunia dari Daftar Dunia.",
+      "worldsTitle": "Memilih sebuah dunia",
+      "worldsBody": "Permainan daring berlangsung di dunia-dunia, dan masing-masing adalah salinan penuh dari permainan dengan pemainnya sendiri, World Market-nya sendiri, dan peringkatnya sendiri. Daftar Dunia menunjukkan seberapa ramai tiap dunia, dari Rendah hingga Penuh, jadi pilih yang sepi untuk keleluasaan atau yang ramai untuk keramaian. Karaktermu hidup di dunia tempat kamu membuatnya, dan kamu bisa menyimpan karakter di lebih dari satu dunia.",
+      "charactersTitle": "Karaktermu",
+      "charactersBody": "Satu akun bisa menyimpan hingga sepuluh karakter di tiap dunia, jadi ada ruang untuk mencoba beberapa kelas tanpa harus mengorbankan apa pun. Menghapus satu karakter adalah tindakan yang disengaja: karakter itu harus berada di luar dunia, dan permainan memintamu mengetikkan namanya sebelum ia benar-benar pergi. Karakter yang terhapus hilang untuk selamanya, dan daftar World Market serta surat Pos Gagak miliknya ikut lenyap bersamanya.\n\nSetelah kamu memilih sebuah kelas, kamu bisa menentukan seperti apa rupa pahlawanmu. Sebuah panel bertab memuat Tubuh, Wajah, Rambut, dan Gaya: pilih Pria atau Wanita, atur wajahnya dengan sederet slider dan pilihan mata, lalu pilih gaya dan warna rambut serta warna kulit, baik dari prasetel bernama maupun dari roda warna di baliknya. Tombol Acak Tampilan menggulirkan seluruh rupa jika kamu ingin dikejutkan, dan Atur Ulang mengembalikan karaktermu ke wajah standar untuk tubuh yang kamu pilih. Tak satu pun dari semua itu memengaruhi cara karaktermu bermain.",
+      "namesTitle": "Menamai pahlawanmu",
+      "namesBody": "Sebuah nama panjangnya 2 hingga 16 huruf, dimulai dengan huruf, dan boleh memuat spasi, tanda hubung, dan apostrof. Tidak ada dua karakter di dunia yang sama yang bisa berbagi satu nama, dan huruf kapital tidak membuat sebuah nama bebas dipakai: jika Ashwind sudah dipakai, ashwind juga sudah dipakai. Ejaanmu sendiri disimpan persis seperti yang kamu ketikkan. Pilih nama yang akan membuatmu senang, karena ia akan melekat pada karakter itu.",
+      "connectionTitle": "Jika koneksimu terputus",
+      "connectionBody": "Sinyal yang hilang, laptop yang ditutup, atau memuat ulang halaman tidak akan mengeluarkanmu dari permainan. Karaktermu tetap berada di dunia selama sekitar lima menit sementara permainan tersambung kembali dengan sendirinya, dan kamu akan kembali ke tempat yang sama dalam sesi yang sama. Itu juga berarti terputus mendadak bukan cara untuk kabur dari sebuah pertarungan: karaktermu masih berdiri di sana. Keluar dari menu permainan langsung membuatmu pergi seketika alih-alih menunggu, begitu pula saat masuk dengan karakter lain pada akun yang sama."
     },
     "controls": {
-      "intro": "Tombol bawaan untuk desktop. Setiap pengaturan tombol dapat diubah di opsi permainan, kecuali Esc, yang selalu membuka menu permainan, dan sebuah pengaturan tombol bisa berupa kombinasi pengubah seperti Shift+Z.",
+      "intro": "Tombol bawaan untuk desktop. Setiap pengikatan di sini bisa diubah dari panel Pengaturan Tombol di menu permainan, kecuali Esc, yang selalu membuka menu itu. Setiap aksi menampung hingga dua tombol, satu utama dan satu alternatif, dan sebuah pengikatan bisa berupa kombinasi pengubah seperti Shift+Z. Bisa juga berupa tombol tetikus: tombol tengah adalah M3 dan tombol ibu jari adalah M4 dan M5, tombol berikutnya dihitung naik dari sana. Klik kiri dan kanan tetap disediakan untuk kamera, gerak dengan klik, dan mengeklik benda di dunia.",
       "keyHeader": "Tombol",
       "actionHeader": "Aksi",
       "groupMovement": "Pergerakan",
@@ -3652,9 +4250,10 @@ export const id_ID: EnTranslations = {
       "groupCamera": "Kamera",
       "talents": "Bakat",
       "professions": "Profesi",
-      "arena": "Arena",
+      "arena": "Jendela PvP (arena dan Medan Thornhollow)",
       "leaderboard": "Papan Peringkat",
       "deeds": "Kitab Jasa",
+      "reliquary": "Relikuari",
       "sheathe": "Sarungkan/Cabut Senjata",
       "crafting": "Kriya",
       "valeCup": "Piala Lembah",
@@ -3663,6 +4262,7 @@ export const id_ID: EnTranslations = {
       "dungeonFinder": "Pencari Dungeon",
       "discord": "Discord",
       "abilities": "Gunakan kemampuan action bar (deretan angka; bilah kedua ada di numpad)",
+      "targetPrev": "Putar target mundur",
       "targetFriendly": "Targetkan kawan terdekat",
       "cycleFriendly": "Putar target kawan",
       "targetAuras": "Targetkan penguat dan pelemah",
@@ -3672,32 +4272,42 @@ export const id_ID: EnTranslations = {
       "arrowKeys": "Tombol Panah",
       "groupPet": "Perintah peliharaan",
       "petBar": "Bilah peliharaan: Serang, Berhenti, Hasut, Bertahan, Agresif (saat peliharaan Pemburu atau Penyihir Iblis dikeluarkan)",
-      "attackMoveNote": "Satu lagi, nonaktif secara bawaan: aktifkan Attack Move di opsi untuk menyediakan satu tombol (A, selama opsi menyala) yang membuatmu berjalan menuju kursor dan melancarkan serangan pada musuh di bawahnya, atau musuh pertama yang dijumpai di sepanjang jalan.",
+      "attackMoveNote": "Gerak serang tetap mati sampai kamu menyalakannya: buka panel Pengaturan Tombol, aktifkan, dan baris A di atas mulai bekerja. Dengan kursor di atas dunia permainan, ia membawamu menuju kursor dan melepaskan serangan ke musuh di bawahnya, atau ke musuh pertama yang kamu temui di jalan. Selagi opsi ini menyala, A menjalankan gerak serang itu alih-alih berbelok ke kiri, jadi berbeloklah dengan panah kiri, yang secara bawaan juga dibawa oleh Belok Kiri, atau berikan Belok Kiri tombolmu sendiri.",
       "mobileHeading": "Di perangkat seluler",
       "mobileBody": "Kontrol sentuh muncul secara otomatis di ponsel dan tablet: tuas gerak di sebelah kiri, seret di tempat lain mana pun untuk melihat sekeliling, cubit dengan dua jari untuk memperbesar kamera, dan tombol di layar untuk kemampuan serta menu kamu. Sebuah panah kecil di pojok kiri atas menampilkan atau menyembunyikan tombol menu, dan tombol More di sana menyimpan sisa jendelamu.",
       "controllerHeading": "Di kontroler",
-      "controllerBody": "Gamepad juga berfungsi, dan dukungan kontroler aktif secara bawaan. Tuas kiri untuk bergerak, tuas kanan untuk mengarahkan kamera, dan tombol muka serta bahu menangani kemampuanmu, melompat, dan berinteraksi. Buka sebuah jendela seperti tasmu untuk memunculkan penunjuk di layar, dan menu permainan dinavigasi langsung dengan D-pad dan tombol muka. Kamu bisa memetakan ulang tombol dan menyetel deadzone tuas, kecepatan kamera, getaran, serta arah pandang terbalik dari pengaturan kontroler di opsi."
+      "controllerBody": "Gamepad juga berfungsi, dan dukungan kontroler aktif secara bawaan. Tuas kiri untuk bergerak, tuas kanan untuk mengarahkan kamera, dan tombol muka serta bahu menangani kemampuanmu, melompat, dan berinteraksi. Buka sebuah jendela seperti tasmu untuk memunculkan penunjuk di layar, dan menu permainan dinavigasi langsung dengan D-pad dan tombol muka. Kamu bisa memetakan ulang tombol dan menyetel deadzone tuas, kecepatan kamera, getaran, serta arah pandang terbalik dari pengaturan kontroler di opsi.",
+      "moveAlt": "Bergerak dan berbelok (keempat aksi yang sama, pada tombol keduanya)",
+      "jumpSwim": "Lompat, dan berenang naik selagi kamu berada di dalam air",
+      "swimDown": "Berenang turun selagi kamu berada di dalam air (tahan)",
+      "swimNote": "Berenang menggunakan dua tombol: tahan Space untuk naik dan LCtrl untuk turun. Mengarahkan kamera ke bawah sambil berenang maju juga membuatmu menyelam, sehingga kamu bisa mengatur kedalamanmu lewat sudut pandang. LCtrl adalah satu-satunya tombol bawaan yang merupakan tombol pengubah tersendiri, dan sebuah penekanan tombol pengubah tunggal diabaikan saat kamu sedang mengikat tombol, jadi pilihlah tombol yang bukan pengubah jika kamu mengikat ulang Berenang Turun.",
+      "bgFlag": "Ambil bendera musuh di Medan Thornhollow",
+      "attackMove": "Serang Bergerak (hanya setelah kamu mengaktifkan opsinya)",
+      "meters": "Meter kerusakan (kerusakan, penyembuhan, dan ancaman)",
+      "petMark": "Peliharaan: Tandai, pilih peliharaanmu sendiri (sama seperti mengklik bingkainya)",
+      "onBarBinding": "Kamu juga bisa mengikat tombol langsung dari bilahnya: pilih Ubah tombol bilah aksi di panel Pengaturan Tombol, lalu klik sebuah slot di bilah yang aktif dan tekan tombol yang kamu inginkan. Klik Selesai saat kamu sudah selesai. Fitur ini hanya untuk desktop, karena membutuhkan papan ketik fisik.",
+      "clickMoveNote": "Klik untuk Bergerak nonaktif sampai kamu menyalakannya: buka panel Pengaturan Tombol di menu permainan, nyalakan Klik untuk Bergerak, lalu gunakan baris Tombol Klik untuk Bergerak di bawahnya untuk memilih tombol mouse mana yang akan menjalankanmu (Klik Kiri secara bawaan, atau Klik Kanan). Setelah aktif, mengklik sebuah titik di tanah akan membuatmu berjalan ke sana, dengan penanda di tanah menunjukkan tujuanmu. Mengklik seekor makhluk atau pemain lain akan membuatmu berjalan mendekatinya dan berhenti dalam jangkauan, sementara klik itu tetap menjalankan tugas biasanya untuk menargetkan atau berinteraksi; jika kamu sudah cukup dekat untuk menjangkau apa yang kamu klik, kamu langsung berinteraksi dan tetap di tempatmu. Salah satu tombol pergerakan mana pun akan langsung mengambil alih kendali dan mengakhiri perjalanan itu, begitu pula menahan tombol mouse untuk melihat sekeliling. Melompat tidak demikian, sehingga kamu tetap melanjutkan perjalanan melewati lompatan itu, dan membuka menu permainan hanya menjeda perjalanan, yang akan berlanjut saat kamu menutup menunya."
     },
     "settingsPage": {
       "heading": "Pengaturan & Kinerja",
       "intro": "Jadikan game terlihat terbaik atau berjalan paling cepat. Tiga pemuatan siap pakai, ditambah fungsi sebenarnya dari setiap opsi grafis.",
-      "wherePath": "Segala sesuatu di halaman ini ada di dalam game: tekan Esc untuk membuka opsi. Menu terbuka pada Ikhtisar berisi hal-hal penting yang disematkan, dengan kategori-kategori di rel di sampingnya: pengaturan di bawah ini ada di bawah Grafik, Antarmuka, dan Aksesibilitas dalam grup Tampilan, dan Hamparan Kinerja di bawah Sistem. Lebih cepat lagi, ketik sebuah nama di kotak pencarian di puncak dan langsung melompat ke sana.",
+      "wherePath": "Semua yang ada di halaman ini hidup di dalam permainan: tekan Esc untuk membuka menu permainan. Menu itu mendaftar panel sebagai tombol: Pengaturan Tombol, Kontroler, Grafik, Antarmuka, Aura, Audio, dan Hamparan Kinerja, dengan Wiki, Lepas Sangkut, Keluar, dan Kembali ke Permainan di bawahnya, dan Laporkan Bug ikut ke daftar selagi kamu bermain daring. Grafik dan Antarmuka memuat hampir semua yang dijelaskan di sini.",
       "fairnessTitle": "Adil berdasarkan desain",
-      "fairnessBody": "Tidak ada pilihan di sini yang menukar keindahan dengan kekuasaan. Pengaturan Lower hanya menghilangkan polesan kosmetik, tidak pernah informasi yang Anda lawan: debuff, cast bar, kesehatan party, dan jumlah kerusakan Anda identik dari Low hingga Ultra. Bermain di mesin sederhana tidak pernah menjadi kendala.",
+      "fairnessBody": "Tidak ada opsi di sini yang menukar keindahan dengan kekuatan. Pengaturan yang lebih rendah hanya melepas kilau kosmetik, tidak pernah informasi yang kamu pakai bertarung: pelemahanmu, bilah mantra, nyawa kelompok, dan angka kerusakan sama persis dari Low sampai Insane. Bermain di mesin sederhana tidak pernah menjadi kekurangan.",
       "loadoutsHeading": "Tiga pemuatan siap pakai",
       "loadoutsIntro": "Mulailah dari loadout yang terdengar seperti mesin Anda, lalu sesuaikan opsi satu per satu hingga dirasa tepat.",
       "recommended": "Direkomendasikan",
       "whyLabel": "Mengapa ini berhasil:",
-      "tagReload": "setelah memuat ulang",
+      "tagReload": "tekan Terapkan",
       "fpsTitle": "FPS terbaik",
       "fpsTagline": "Untuk laptop lama, grafis terintegrasi, dan permainan baterai.",
       "fpsWhy": "Kualitas Grafis adalah saklar utama, dan Kualitas Render adalah penggeser terkuat: pada 70%, dunia menggambar sekitar setengah piksel sementara antarmuka tetap sangat tajam.",
       "balancedTitle": "Seimbang",
       "balancedTagline": "Titik terbaik untuk sebagian besar mesin, dan saran default kami.",
-      "balancedWhy": "Medium menghadirkan bayangan nyata dan materi lengkap; High menambahkan oklusi dan mekar sekitar. Di bawah Ultra, jaring pengaman internal menyerap penurunan tiba-tiba dalam pertarungan yang sibuk, sehingga Balanced tetap mulus tanpa harus menjaga anak.",
+      "balancedWhy": "Medium menghadirkan bayangan sungguhan dan material penuh, dan High menambahkan oklusi ambien serta bloom di atasnya. Jaring pengaman bawaan tetap terpasang di setiap tingkat, sehingga Balanced melewati pertempuran ramai tanpa perlu kamu awasi.",
       "visualsTitle": "Visual Terbaik",
       "visualsTagline": "Mode tangkapan layar untuk mesin desktop yang tangguh.",
-      "visualsWhy": "Ultra ditampilkan pada resolusi tertinggi yang ditawarkan layar Anda dengan pencahayaan paling kaya. Ini juga menonaktifkan jaring pengaman, dan hanya untuk desktop: ponsel dan aplikasi berada pada posisi teratas di High.",
+      "visualsWhy": "Ultra menyajikan pada resolusi tertinggi yang ditawarkan layarmu, dengan pencahayaan paling kaya. Di atasnya ada Insane, etalase dengan semuanya menyala: yang satu ini harus kamu pilih sendiri, karena permainan tidak pernah memilihnya untukmu sekuat apa pun mesinmu.",
       "value50to70": "50 hingga 70%",
       "value90to100": "90 hingga 100%",
       "value100": "100%",
@@ -3705,16 +4315,16 @@ export const id_ID: EnTranslations = {
       "valueOnOptional": "Aktif (opsional)",
       "howHeading": "Bagaimana pilihan berperilaku",
       "factDetectTitle": "Permainan ini menyetel dirinya sendiri terlebih dahulu",
-      "factDetectBody": "Pada peluncuran pertama Anda, game membaca perangkat Anda dan memilih tingkatan yang masuk akal, dari Low di ponsel sederhana hingga Ultra di desktop yang kuat. Pilihan apa pun yang Anda buat sendiri selalu menang.",
+      "factDetectBody": "Pada peluncuran pertama permainan membaca perangkatmu dan menyimpan tingkat yang masuk akal untukmu. Setiap ponsel dan tablet mulai di Low agar kamu langsung masuk ke dunia, begitu pula kartu grafis lama atau berbasis perangkat lunak. Desktop yang kuat mulai di Ultra, atau di High bila mesinnya tampak tipis pada memori. Apa pun yang tidak bisa ditempatkan permainan tetap di Medium. Pilihan apa pun yang kamu buat sendiri selalu menang, dan pilihan itu bertahan.",
       "factReloadTitle": "Dua macam pilihan",
-      "factReloadBody": "Kualitas Grafis dan Pemilih tingkat lanjut berlaku setelah memuat ulang, dan panel menawarkan tombol Muat Ulang Sekarang bila diperlukan. Setiap opsi lainnya berlaku saat Anda mengubahnya.",
+      "factReloadBody": "Panel Grafik menyunting sebuah konsep. Ubah Kualitas Grafik atau salah satu tombol detail, lalu tekan Terapkan dan permainan membangun ulang dunia di tempatmu berdiri, tanpa muat ulang. Baris di sebelah tombol memberitahumu kapan hal itu selesai. Setiap opsi lain, di panel itu maupun di mana pun, berlaku pada saat kamu mengubahnya, dan hanya pembangunan ulang yang gagal total yang justru menawarkan tombol muat ulang.",
       "factGovernorTitle": "Jaring pengaman bawaan",
-      "factGovernorBody": "Di setiap tingkatan di bawah Ultra, game secara diam-diam menipiskan rumput, efek, dan pencahayaan sesaat ketika pertarungan besar terjadi, lalu memulihkannya. Memilih Ultra menunjukkan bahwa Anda lebih suka menyimpan setiap detail.",
-      "factSearchTitle": "Pencarian menemukannya lebih dulu",
-      "factSearchBody": "Tak yakin di mana letak sebuah opsi? Ketik di kotak pencarian di puncak menu. Ia memahami frasa umum juga, jadi fps menemukan penunjuk FPS, dan memilih sebuah hasil melompatkanmu ke pengaturan itu dan membiarkannya tersorot.",
-      "advancedHeading": "Prasetel Lanjutan: campur sendiri",
-      "advancedBody": "Lanjutan dimulai dari tingkat High dan membuka empat pemetik tambahan, sehingga Anda dapat menggunakan bingkai di tempat yang benar-benar Anda sadari: Detail Medan, Kepadatan Dedaunan, Efek & Pencahayaan, dan Kualitas Bayangan. Seperti Kualitas Grafis, ini berlaku setelah memuat ulang.",
-      "advancedMixes": "Dua campuran favorit: pertahankan Kualitas Bayangan pada High dan atur Efek & Pencahayaan ke Low untuk tampilan tajam dan bebas cahaya yang menyala, atau lakukan sebaliknya untuk menjaga mekarnya dan melembutkan bayangan.",
+      "factGovernorBody": "Setiap tingkat menjaga jaring pengaman tetap terpasang: ketika pertempuran besar melonjak, permainan diam-diam menipiskan rumput, efek, dan pencahayaan sesaat, lalu memulihkannya. Ultra dan Insane hanya menunggu jauh lebih lama sebelum melakukannya, sehingga prasetel kelas atas tidak pernah terganggu oleh satu bingkai lambat.",
+      "factSearchTitle": "Di mana sebuah pengaturan tinggal",
+      "factSearchBody": "Tidak ada kotak pencarian, jadi ada baiknya mengenal bentuk menunya. Grafik ditata sebagai kartu: Kualitas, Detail Dunia, Pencahayaan dan Efek, Kamera, Tampilan, dan Sistem, ditambah Kontrol Sentuh pada layar sentuh. Antarmuka terbagi menjadi empat tab: Umum, Jendela, Obrolan, dan Tempur. Kalau sebuah pengaturan mengubah cara dunia digambar, ia ada di Grafik, dan kalau mengubah apa yang ditampilkan antarmuka kepadamu, ia ada di Antarmuka.",
+      "advancedHeading": "Tombol detail dan campuran Advanced",
+      "advancedBody": "Kamu tidak perlu memilih Advanced untuk melihat tombol detail. Panel Grafik selalu menampilkannya, dalam dua kartu: Detail Dunia memuat Detail Medan, Kerapatan Dedaunan, Detail Permukaan, Jarak Pandang, Kualitas Air, dan Detail Karakter, sedangkan Pencahayaan dan Efek memuat Efek dan Pencahayaan, Kualitas Bayangan, Oklusi Ambien, Bloom, Antialias, Cahaya Dinamis, dan Efek Partikel. Di bawah prasetel tetap, setiap tombol menunjukkan kira-kira di mana prasetel itu berada.",
+      "advancedMixes": "Dua campuran favorit: pertahankan Kualitas Bayangan tinggi dan setel Efek dan Pencahayaan ke Low untuk tampilan tajam tanpa pendar yang berjalan ringan, atau lakukan sebaliknya untuk mempertahankan bloom dan melembutkan bayangan. Satu hal yang perlu diketahui sebelum mencampur: Oklusi Ambien, Bloom, dan Antialias bergantung pada rantai yang sama dengan Efek dan Pencahayaan, jadi dengan tombol itu di Low mereka tidak punya apa pun untuk dijalankan.",
       "tableHeading": "Setiap opsi grafik, dijelaskan",
       "colSetting": "Pengaturan",
       "colDoes": "Apa fungsinya",
@@ -3731,37 +4341,286 @@ export const id_ID: EnTranslations = {
       "rowBrowserEffects": "Betapa mewahnya antarmuka itu sendiri: kaca buram, cahaya, menu animasi. Otomatis cocok dengan browser Anda; dunia 3D tidak tersentuh.",
       "rowTerrainDetail": "Tekstur tanah yang kaya dan tercampur versus tampilan medan yang lebih sederhana dan lebih cepat.",
       "rowFoliageDensity": "Seberapa jauh dan lebatnya rumput yang tumbuh di sekitar karakter Anda.",
-      "rowEffectsQuality": "Mekar, oklusi sekitar, dan berapa banyak obor dan mantra yang menghasilkan cahaya nyata. Penghematan terbesar di antara para pemilih Tingkat Lanjut.",
+      "rowEffectsQuality": "Bloom, oklusi ambien, dan berapa banyak obor serta mantra yang memancarkan cahaya sungguhan. Penghematan tunggal terbesar di antara tombol detail, dan sakelar yang menjadi sandaran tombol pencahayaan lainnya.",
       "rowShadowQuality": "Kerenyahan bayangan. Low mempertahankan bayangan tetapi memperhalus tepinya.",
       "rowFrostedPanels": "Kaca buram kabur di balik jendela. Cantik, dan efek yang persis seperti yang dirasakan oleh browser yang lebih lemah; biarkan saja untuk tampilan klasik yang tajam.",
       "rowReduceMotion": "Menghapus animasi antarmuka sehingga jendela muncul seketika. Opsi aksesibilitas terlebih dahulu, dengan bonus kinerja kecil.",
       "rowPerfOverlay": "Pembacaan FPS di layar, waktu frame, dan banyak lagi. Aktifkan saat Anda menyetel halaman ini, lalu sembunyikan lagi.",
-      "tableFoot": "Mencari penggeser jarak imbang atau penutup FPS? Tidak ada yang perlu diburu: jarak pandang adalah bagian dari setiap tingkat kualitas, dan kecepatan bingkai mengikuti tampilan Anda.",
+      "tableFoot": "Mencari batas FPS? Tidak ada yang perlu dicari: laju bingkai mengikuti layarmu. Jarak gambar adalah tombol tersendiri, Jarak Pandang, di kartu Detail Dunia, dan setiap prasetel menyetelnya untukmu sampai kamu sendiri menggesernya.",
       "mobileTitle": "Di ponsel dan tablet",
-      "mobileBody": "Seluler mengelola lebih banyak hal untuk Anda: game memilih tingkatan, menjaga resolusi sedikit lebih rendah untuk melindungi baterai dan panas, dan mempertahankan tingkatan tertinggi hanya untuk desktop. Pemuatan di atas masih berlaku; ponsel cukup top out di High.",
-      "touchBody": "Pada layar sentuh, opsi juga menumbuhkan gugus kenyamanan tersendiri: ukuran dan sensitivitas joystick, ukuran dan opasitas tombol di layar, tata letak cermin untuk kidal, tuas kamera opsional, dan pandangan sentuh terbalik, agar layar menyesuaikan tanganmu, bukan sebaliknya.",
+      "mobileBody": "Di ponsel atau tablet permainan memulaimu di Low. Setiap perangkat sentuh mendarat di sana pada peluncuran pertama, dengan sengaja, agar kamu bisa masuk ke dunia dan bermain; naikkan sendiri dari panel Grafik kapan saja. Di peramban Android seluruh tangganya terbuka untukmu dan pilihanmu bertahan. Di iPhone dan iPad kamu tetap bisa memilih prasetel tertinggi dan prasetel itu langsung berlaku begitu kamu menekan Terapkan, tetapi permainan mengembalikanmu ke High pada peluncuran berikutnya, karena iOS bisa menghentikan tab selagi adegan sebesar itu dibangun. Aplikasi yang diunduh lebih ketat lagi: daftar prasetelnya berhenti di High dan tombol sistem satu per satu disembunyikan, karena aplikasi mengelolanya sendiri.",
+      "touchBody": "Di layar sentuh panel Grafik mendapat kartu Kontrol Sentuh tersendiri: ukuran dan zona mati joystick, ukuran tombol di layar, keburaman kontrol, tuas kamera opsional, tata letak cermin untuk kidal, dan pandangan sentuh terbalik, sehingga layar menyesuaikan tanganmu, bukan sebaliknya.",
       "audioTitle": "Suara dan bahasa",
-      "audioBody": "Jendela opsi bukan cuma soal piksel. Kategori Audio memuat kontrol volume terpisah untuk efek, musik, dan suara, dan kategori Antarmuka membawa pemilih bahasa yang melokalkan ulang seluruh antarmuka seketika, tanpa perlu memuat ulang, plus pemilih tema untuk hiasan jendela. Bahasa juga disematkan paling depan di Ikhtisar, jadi ia selalu selangkah dari membuka menu.",
-      "autolootBody": "Lebih suka tak mengeklik tiap mayat? Sebuah opsi antarmuka, nonaktif secara bawaan, menyerok jarahan dari bunuhanmu sendiri saat kamu berjalan melewatinya."
+      "audioBody": "Jendela opsi bukan cuma piksel. Audio menampung tiga penggeser volume, untuk efek suara, musik, dan suara tokoh, ditambah sakelar musik nyala mati dan empat sakelar untuk suara yang paling cepat membosankan: suara NPC, langkah kaki, suara antarmuka, dan umpan balik klik. Tab Umum pada panel Antarmuka membawa pemilih bahasa yang melokalkan ulang seluruh antarmuka seketika, tanpa muat ulang, dan pemilih tema untuk dandanan jendela.",
+      "autolootBody": "Lebih suka tidak mengeklik setiap mayat? Jarahan Otomatis Sambil Lewat, di tab Tempur pada panel Antarmuka dan mati secara bawaan, menciduk jarahan dari buruanmu sendiri saat kamu berjalan melewatinya.",
+      "panelsMoreBody": "Dua panel yang tidak didaftar di halaman ini tetap layak dilihat. Aura adalah tempat Anda membentuk peringatan besar di layar yang muncul saat salah satu proc kelas Anda terpicu: mana saja yang ditampilkan, ukurannya, warnanya, keburamannya, dan di mana posisinya di layar. Hamparan Kinerja adalah pembacaan yang Anda aktifkan selagi menyetel halaman ini, lalu sembunyikan lagi.",
+      "valueUltraOrInsane": "Ultra, atau Insane jika Anda menginginkan semuanya",
+      "advancedLadder": "Geser salah satu dari pemetik itu dan preset kualitas beralih ke Lanjutan, disemai persis dari tingkat yang sedang Anda lihat, sehingga campuran khusus Anda dimulai dari apa yang sudah Anda lihat, bukan dari nol. Tekan Terapkan begitu Anda menyukainya. Lanjutan berada di ujung daftar preset karena alasan itu: inilah profil ahli tempat campuran Anda sendiri hidup.",
+      "rowSurfaceDetail": "Lapisan detail aus pada batu dan jalan berpaving, dari nonaktif hingga hasil akhir paralaks penuh. Ini kenop jalanan kota: makin banyak Anda pertahankan, makin berat sebuah jalan berpaving untuk digambar.",
+      "rowViewDistance": "Seberapa jauh dunia digambar sebelum memudar. Setiap preset mengaturnya untuk Anda sampai Anda menggesernya sendiri.",
+      "rowWaterQuality": "Bagaimana danau, sungai, dan laut lepas diberi bayangan, dari datar dan murah hingga sepenuhnya reflektif.",
+      "rowCharacterDetail": "Seberapa jauh karakter lain mempertahankan rig animasi penuhnya sebelum turun ke versi yang lebih sederhana. Lebih tinggi lebih nyaman di mata pada hub yang ramai, dan lebih berat.",
+      "rowAmbientOcclusion": "Bayangan kontak lembut di tempat permukaan bertemu. Nonaktif, resolusi setengah, atau penuh.",
+      "rowBloom": "Cahaya lembut di sekitar sumber terang, api, dan efek mantra.",
+      "rowAntiAliasing": "Menghaluskan tepi bergerigi pada geometri yang jauh. Murah, dan layak tetap diaktifkan pada kebanyakan mesin.",
+      "rowDynamicLights": "Seberapa banyak obor, api unggun, dan mantra yang memancarkan cahaya nyata ke pemandangan di sekitarnya.",
+      "rowParticleEffects": "Seberapa padat efek partikel mantra, cuaca, dan lingkungan diperbolehkan untuk tampil.",
+      "rowCameraSpeed": "Seberapa cepat kamera berputar saat Anda melihat sekeliling dengan mouse.",
+      "rowTouchLookSpeed": "Hal yang sama untuk pandangan-geser, dan ini hanya muncul saat Anda menggunakan layar sentuh.",
+      "rowFullscreen": "Mengisi seluruh layar dengan permainan.",
+      "rowWaterRipples": "Jejak air dan riak yang menyebar di belakang Anda saat berenang. Nonaktif secara bawaan, dan satu-satunya efek air yang benar-benar memakan frame; percikan dan gelembung tidak terpengaruh bagaimanapun juga.",
+      "rowOverflowXp": "Pada level maks, apakah bilah Anda terus terisi dengan XP Berlebih atau menampilkan teks statis klasik level-maks sebagai gantinya.",
+      "rowInterfaceMode": "Apakah Anda mendapat antarmuka desktop atau kontrol sentuh di layar. Otomatis membaca perangkat Anda, dan Anda bisa memaksa salah satunya: tablet dengan papan ketik bisa memakai tata letak desktop, dan laptop layar sentuh bisa memakai kontrol sentuh.",
+      "interfaceHeading": "Panel Antarmuka",
+      "interfaceIntro": "Antarmuka adalah panel terbesar dalam permainan ini, dan terbagi menjadi empat tab. Tidak ada apa pun di sini yang mengubah apa yang bisa dilakukan dunia terhadap Anda: yang berubah adalah apa yang ditampilkan kepada Anda dan seberapa besar tampilannya. Inilah baris-baris yang paling layak Anda ketahui.",
+      "interfaceFoot": "Itu belum semuanya. Setiap tab membawa lebih banyak penggeser dan sakelar daripada yang layak didaftar di sini, jadi bukalah sekali dan baca daftarnya dari atas ke bawah. Lima menit yang terpakai dengan baik.",
+      "ifGeneralIntro": "Skala, kontras, dan apa yang ditampilkan antarmuka tentang Anda. Pemilih bahasa dan tema juga berada di puncak tab ini.",
+      "ifFramesIntro": "Bingkai Anda sendiri, bingkai sasaran Anda, dan seluruh tata letak party. Gugus party juga membawa penggeser skala, lebar, tinggi, jarak, dan kolom agar kisi raid pas dengan layar Anda, dan tombol Reset di bagian bawah tab mengembalikan setiap bingkai ke posisi awalnya.",
+      "ifChatIntro": "Bagaimana jendela obrolan tampil. Tombol reset untuk jendela obrolan itu sendiri juga ada di sini.",
+      "ifCombatIntro": "Bagaimana bilah Anda berperilaku dan apa yang ditampilkan pertarungan di layar.",
+      "ifUiScale": "Menskalakan seluruh antarmuka sekaligus. Perubahannya baru diterapkan saat Anda melepas penggeser, sehingga jendela di bawah kursor Anda tidak bergeser selagi Anda menyeretnya.",
+      "ifHudOpacity": "Seberapa pekat panel HUD di atas dunia di baliknya.",
+      "ifTooltipScale": "Ukuran teks tooltip, berguna pada layar kecil maupun yang sangat besar.",
+      "ifHighContrastText": "Teks antarmuka yang lebih tebal dan berkontras tinggi. Ini terutama opsi aksesibilitas, dan berguna di layar yang terang.",
+      "ifHighContrastBackground": "Latar belakang yang lebih polos dan berkontras tinggi di balik layar mulai dan layar karakter.",
+      "ifInvertLookY": "Membalik arah atas dan bawah pandangan mouse.",
+      "ifShowItemLevel": "Menambahkan baris level item pada setiap tooltip barang. Nonaktif secara bawaan, sehingga tooltip klasik yang hanya menampilkan statistik tetap terjaga.",
+      "ifShowPlaytime": "Menampilkan total waktu bermain seumur hidup Anda pada lembar karakter. Aktif secara bawaan, dan lembar itu punya tombol mata yang membaliknya per perangkat, yang berguna jika Anda melakukan streaming atau mengambil tangkapan layar. Totalnya tetap terus terhitung bagaimanapun juga.",
+      "ifShowOwnNameplate": "Menampilkan papan nama di atas kepala Anda persis seperti yang dilihat pemain lain, lengkap dengan segala hiasannya. Matikan untuk tampilan klasik.",
+      "ifShowPlayerNameplates": "Menampilkan papan nama pemain lain. Menonaktifkannya merapikan hub yang ramai, dan sasaran Anda saat ini tetap terbaca bagaimanapun juga.",
+      "ifWallet": "Apakah dompet Anda ditampilkan pada layar karakter. Ada sakelar serupa untuk kartu pemain.",
+      "ifDailyChest": "Apakah peti hadiah harian ditampilkan pada HUD Anda.",
+      "ifPlayerFrameScale": "Ukuran bingkai unit Anda sendiri.",
+      "ifTargetFrameScale": "Ukuran bingkai sasaran Anda.",
+      "ifPartyStyle": "Tata letak party: Otomatis mengikuti ukuran kelompok Anda, Klasik adalah susunan tradisional, dan Raid memadatkan semua orang ke dalam kisi ringkas.",
+      "ifPartyHealthText": "Apa yang dicetak pada bilah party: tidak ada, persentase, nyawa saat ini, atau nyawa saat ini dan maksimum.",
+      "ifPartySort": "Urutan anggota party dicantumkan: urutan grup, peran, atau nama.",
+      "ifPartyShowAuras": "Apakah buff dan debuff ditampilkan pada bingkai party. Sakelar serupa mencakup bilah sumber daya, penyerapan, peliharaan, dan apakah Anda muncul pada daftar party Anda sendiri.",
+      "ifAurasOnPlayerFrame": "Menampilkan buff dan debuff Anda pada bingkai unit Anda sendiri selain di bilah aura.",
+      "ifTargetOfTarget": "Menampilkan siapa yang sedang disasar oleh sasaran Anda, cara klasik untuk mengetahui apakah tank masih memegangnya.",
+      "ifPetFrame": "Menampilkan bingkai untuk peliharaan Anda.",
+      "ifChatFontScale": "Ukuran teks obrolan.",
+      "ifChatOpacity": "Seberapa pekat latar belakang obrolan.",
+      "ifCompactChat": "Merapatkan baris obrolan agar lebih banyak yang muat.",
+      "ifChatTimestamps": "Menambahkan waktu pada setiap baris obrolan, dalam format 12 jam atau 24 jam.",
+      "ifStartAttack": "Apakah memakai sebuah kemampuan juga memulai serangan otomatis Anda. Aktif secara bawaan, dan inilah perilaku klasik yang diharapkan sebagian besar pemain.",
+      "ifStopAutoAttack": "Apakah berganti sasaran menghentikan ayunan Anda. Nonaktif secara bawaan, sehingga serangan Anda berlanjut ke sasaran yang baru.",
+      "ifShowAttackButton": "Menampilkan tombol Serang secara eksplisit pada bilah aksi Anda.",
+      "ifWalkByAutoloot": "Menyerok jarahan dari bunuhan Anda sendiri saat Anda berjalan melewatinya. Nonaktif secara bawaan.",
+      "ifGroundReticle": "Menampilkan lingkaran tanah saat Anda membidik mantra yang ditempatkan.",
+      "ifMouseoverCast": "Membiarkan penyembuhan atau mantra ramah mendarat pada bingkai party yang sedang Anda arahkan kursor, tanpa mengubah sasaran Anda.",
+      "ifStickyTarget": "Mempertahankan sasaran Anda saat ini ketika Anda mengeklik tanah kosong, alih-alih menghapusnya.",
+      "ifFctScale": "Ukuran angka kerusakan dan penyembuhan yang melayang dari sasaran Anda.",
+      "ifExtraBars": "Menampilkan baris bilah aksi kedua, dan baris ketiga begitu baris kedua diaktifkan. Slotnya tetap bisa dijangkau lewat pengikatan tombolnya masing-masing meski barisnya sedang disembunyikan.",
+      "ifHideUnused": "Menyembunyikan slot aksi yang kosong sehingga hanya tombol yang benar-benar Anda pakai yang ditampilkan.",
+      "ifLockBars": "Mengunci bilah Anda sehingga Anda tidak bisa menyeret sebuah kemampuan keluar dari slotnya secara tidak sengaja.",
+      "keybindsHeading": "Panel Pengaturan Tombol",
+      "keybindsBody": "Daftar tombol hanyalah separuh dari panel itu. Di atasnya ada sakelar-sakelar yang menentukan bagaimana mouse Anda mengendalikan permainan: kamera mouse, apakah kursor terkunci saat Anda memutar pandangan, klik untuk bergerak dan tombol mouse mana yang memicunya, serang sambil bergerak, tata letak sentuh untuk tangan kiri, dan penyaring kata kasar untuk obrolan.",
+      "keybindsMouseBody": "Ada dua hal di sana yang mudah terlewat. Tombol mouse bisa diikat seperti tombol papan ketik, sehingga klik roda dan tombol jempol bisa membawa kemampuan, sementara klik kiri dan kanan tetap dicadangkan untuk kamera dan untuk mengeklik dunia. Dan Anda bisa mengikat langsung dari bilah aksi: aktifkan mode pengikatan pada-bilah di sini, lalu klik sebuah slot dan tekan tombol yang Anda inginkan."
     },
     "combat": {
       "intro": "Pertarungan mengikuti aturan MMO klasik yang familier. Kamu tak perlu mempelajari semuanya untuk bermain baik, ini sekadar gambaran cara kerja pertarungan.",
       "hitTitle": "Tak setiap pukulan mengena",
-      "hitBody": "Serangan bisa meleset atau dielak, begitu pula serangan musuh, sementara mantra bisa ditahan sepenuhnya. Bertarung di dekat levelmu sendiri adalah yang membuat pukulanmu mengena; semakin lebar selisih level, semakin banyak kamu menebas angin.",
+      "hitBody": "Serangan bisa meleset, dan bisa dielakkan, begitu pula serangan musuh. Dua jawaban lain hanya milik pemain: seorang prajurit bisa menepis pukulan dengan tangkisan, dan prajurit atau paladin yang memegang perisai bisa meredamnya menjadi hadangan, keduanya hanya terhadap apa yang datang dari depan. Makhluk-makhluk dunia tidak melakukan keduanya, jadi ayunan ke arah monster akan mengenai, meleset, atau dielakkan. Mantra tunduk pada aturannya sendiri dan tidak pernah meleset: mantra justru ditahan. Bertarung dekat dengan levelmu sendiri itulah yang membuat pukulanmu mendarat; makin lebar jarak level, makin sering kamu mengayun ke udara kosong.",
       "mitigationTitle": "Zirah dan nyawa menjagamu tetap berdiri",
       "mitigationBody": "Zirah meredam pukulan fisik, jadi zirah yang lebih baik adalah sumber daya tahan utamamu dalam pertarungan jarak dekat. Sihir adalah soal lain: kamu bertahan dari mantra dengan cadangan nyawa yang lebih dalam dan peluang menahannya sepenuhnya, bukan dengan zirah. Kelas zirah yang lebih berat menahan lebih banyak, tapi tak ada yang membuatmu kebal.",
       "resourcesTitle": "Tiap kelas punya iramanya sendiri",
       "resourcesBody": "Prajurit membangun Amarah di tengah pertarungan, penyamun menghabiskan Energi yang terus pulih, dan perapal mengelola kolam Mana. Memahami sumber dayamu adalah separuh dari memainkan kelasmu dengan baik.",
       "growTitle": "Kamu makin kuat tiap level",
-      "growBody": "Tiap level membuatmu lebih tangguh dan membuka kemampuan baru, sampai batas level {cap}. Mengerjakan misi adalah cara tercepat naik; berburu, menjalankan dungeon, dan menuntaskan delve menyempurnakannya.",
+      "growBody": "Setiap level membuatmu lebih tangguh dan membuka kemampuan baru, sampai ke batas level {cap}. Misi adalah jalan tercepat ke atas; berburu, dungeon, delve, dan profesi yang kamu geluti di sepanjang jalan melengkapi sisanya.",
       "effectsTitle": "Penguat, pelemah, dan kontrol kerumunan",
       "effectsBody": "Banyak kemampuan memberi efek yang bertahan. Yang menguntungkan (penguat) menaikkan statistikmu, melindungimu, atau menyembuhkanmu sedikit demi sedikit; yang merugikan (pelemah) menguras nyawamu dengan kerusakan seiring waktu atau melemahkanmu. Perhatikan ikon kecil di sudut atas layar, di samping minimap, untuk melihat apa yang menempel padamu dan berapa lama bertahan.",
-      "ccBody": "Kontrol kerumunan adalah jenis pelemahan khusus yang membatasi apa yang bisa dilakukan sasaran: pingsan, akar dan pelambatan, pembungkaman yang menghentikan perapalan mantra, pelucutan senjata, ketakutan, dan ubah wujud yang membuat lawan tak berbahaya sejenak. Melawan pemain lain, kontrol menipis bila diulang: jenis yang sama yang dipasang kembali terlalu cepat melemah lalu gagal sama sekali, dan pingsan yang dibuka dari siluman dihitung terpisah dari pingsan yang menyusul, sehingga tak seorang pun bisa dirantai tak berdaya selamanya. Makhluk-makhluk dunia tak menyimpan dendam semacam itu: kontrol tak pernah melemah karena diulang terhadap mereka, meski banyak dari musuh terperkasa, elite bernama dan bos terkuat di antara mereka, sama sekali tak bisa dikendalikan.",
+      "ccBody": "Kendali massa adalah jenis pelemahan khusus yang membatasi apa yang bisa dilakukan sebuah sasaran: pemingsanan, pengakaran dan perlambatan, pembungkaman yang menghentikan perapalan, pelucutan senjata, ketakutan, dan penjelmaan yang membuat lawan tak berbahaya sesaat. Terhadap pemain lain sebagian besar kendali menipis karena pengulangan: ketakutan, penjelmaan, pengakaran, dan penguncian aliran yang diterapkan kembali terlalu cepat menjadi lebih pendek lalu gagal sama sekali, sehingga tidak ada yang bisa ditahan tak berdaya selamanya. Pemingsanan adalah pengecualian yang disengaja, karena ia sudah singkat dan bersandar pada waktu jeda sungguhan, jadi pengulangan tidak pernah memendekkannya, meski perlengkapan yang memangkas durasi kendali tetap memangkasnya. Makhluk-makhluk dunia tidak menyimpan dendam semacam itu: terhadap mereka kendali tidak pernah melemah karena pengulangan, meski banyak musuh terkuat, elite bernama dan bos terkuat di antaranya, sama sekali tidak bisa dikendalikan.",
       "metersBody": "Penasaran bagaimana jalannya sebuah pertarungan? Tekan Shift+H untuk membuka meter party, yang menghitung kerusakan, penyembuhan, dan ancaman bagi kelompokmu, perjumpaan demi perjumpaan.",
       "queueTitle": "Gerakan berikutmu sudah termuat",
       "queueBody": "Kamu tak perlu menekan tombol tepat pada framenya. Tekan kemampuan berikutmu di saat-saat akhir perapalan yang sedang berjalan dan ia akan diantrekan, meluncur begitu perapalan selesai, sehingga permainan yang terlatih mengalir tanpa jeda. Tekanan yang terlalu dini cukup ditolak, jadi tak ada yang terbuang. Sebagian serangan jarak dekat bekerja dengan cara sama, ikut meluncur pada ayunan senjatamu berikutnya.",
       "deathTitle": "Saat kamu tumbang",
-      "deathBody": "Jika nyawamu mencapai nol, kamu tumbang di tempatmu berdiri, dan tubuhmu tetap di sana. Lepaskan rohmu dan kamu bangkit sebagai hantu di kuburan terdekat: lebih gesit langkahnya daripada yang hidup, di luar jangkauan musuh-musuhmu, tetapi tak mampu bertarung, menjarah, atau berbicara dengan siapa pun kecuali Sang Penjaga Pucat yang melayang di atas bebatuan. Dari sana kamu memilih. Larikan hantumu kembali ke tubuhmu dan kamu bangkit di tempat dengan sebagian nyawa dan mana pulih serta tanpa hukuman sama sekali. Atau terimalah tawaran Sang Penjaga Pucat untuk kebangkitan seketika di tempatmu berdiri, dengan harga Upeti Sang Penjaga: pelemahan sementara atas segenap dirimu yang bertahan lebih lama makin berpengalaman dirimu, dan sama sekali membebaskan karakter yang baru dibuat. Tumbang di dalam dungeon dan rohmu menunggu di kuburan luar; bawa hantumu kembali melewati pintu dan kamu bangkit di gerbang masuk. Delve adalah pengecualiannya: tumbang di sana dan kamu cukup ditegakkan kembali di gerbang masuk delve, meski kejatuhan kedua mengakhiri sesi itu. Jalan mana pun, kamu tak kehilangan pengalaman, perlengkapan, atau koin. Di antara pertarungan, duduklah untuk makan dan minum agar kamu memulai yang berikutnya dengan kekuatan penuh."
+      "deathBody": "Jika nyawamu mencapai nol, kamu tumbang di tempatmu berdiri, dan tubuhmu tetap di sana. Lepaskan rohmu dan kamu bangkit sebagai hantu di kuburan terdekat: lebih gesit langkahnya daripada yang hidup, di luar jangkauan musuh-musuhmu, tetapi tak mampu bertarung, menjarah, atau berbicara dengan siapa pun kecuali Sang Penjaga Pucat yang melayang di atas bebatuan. Dari sana kamu memilih. Larikan hantumu kembali ke tubuhmu dan kamu bangkit di tempat dengan sebagian nyawa dan mana pulih serta tanpa hukuman sama sekali. Atau terimalah tawaran Sang Penjaga Pucat untuk kebangkitan seketika di tempatmu berdiri, dengan harga Upeti Sang Penjaga: pelemahan sementara atas segenap dirimu yang bertahan lebih lama makin berpengalaman dirimu, dan sama sekali membebaskan karakter yang baru dibuat. Tumbang di dalam dungeon dan rohmu menunggu di kuburan luar; bawa hantumu kembali melewati pintu dan kamu bangkit di gerbang masuk. Delve adalah pengecualiannya: tumbang di sana dan kamu cukup ditegakkan kembali di gerbang masuk delve, meski kejatuhan kedua mengakhiri sesi itu. Jalan mana pun, kamu tak kehilangan pengalaman, perlengkapan, atau koin. Di antara pertarungan, duduklah untuk makan dan minum agar kamu memulai yang berikutnya dengan kekuatan penuh.",
+      "threatTitle": "Siapa yang dipukul musuh",
+      "threatBody": "Setiap musuh menyimpan catatan pribadi tentang siapa yang paling mengganggunya. Kerusakan menambahnya, begitu pula penyembuhan: sebuah penyembuhan menaruh ancaman pada musuh-musuh yang sudah bertarung dengan orang yang kamu sembuhkan, dibagi rata di antara mereka, sehingga penyembuhan paling aman adalah pada seseorang yang sudah dipegang tank. Tank menyalakan kuda-kuda waspada atau wujud pelindung yang melipatgandakan semua ancaman yang mereka hasilkan, sementara Wujud Serigala milik druid justru melepaskan ancaman, dan sebuah hasutan langsung mengangkat perapalnya ke puncak catatan dan mengunci musuh itu padanya selama beberapa detik. Musuh tidak berpindah sasaran seketika begitu seseorang melampaui tank: dibutuhkan selisih yang jelas untuk merebutnya, dan selisih yang lebih besar dari jarak jauh dibanding jarak dekat, sehingga sedikit kesabaran di awal sebuah tarikan menjaga pertarungan tetap pada tempatnya.",
+      "hazardsTitle": "Air bisa membunuhmu",
+      "breathBody": "Air dalam bisa direnangi, dan kamu bisa menyelam ke bawahnya. Selama kepalamu berada di bawah air, sebuah bilah Napas biru muncul dekat bagian atas layar dan terus berkurang; muncul ke permukaan dan bilah itu terisi kembali jauh lebih cepat daripada saat terkuras. Biarkan bilah itu habis selagi kamu masih di bawah air dan kamu mulai tenggelam, kehilangan sebagian nyawamu tiap detik sampai kamu mencapai udara, jadi awasi bilah itu saat menyelam jauh. Kematian mengosongkannya kembali, jadi lari balik selalu dimulai dengan napas penuh.",
+      "fatigueBody": "Laut tak memiliki tembok. Penyeberangan yang memang dimaksudkan dunia untuk kamu renangi, yakni selat dan rawa danau di antara satu bentang daratan dan berikutnya, serta danau-danau pedalaman, aman diseberangi selama apa pun waktu yang dibutuhkan. Namun berenanglah melewati garis pantai ke laut lepas yang sesungguhnya dan itu mulai menguras kekuatanmu: sebuah peringatan muncul, kamu mendapat jendela waktu yang nyata untuk berbalik, dan setelah itu laut memberikan kerusakan yang terus meningkat dan tak bisa dicegah apa pun sampai kamu kembali menuju daratan. Tenggelam atau kehabisan tenaga sejauh itu dari pantai dan kamu melepaskan roh seperti kematian lainnya, jadi anggaplah cakrawala sebagai pemandangan, bukan tujuan.",
+      "allyRezTitle": "Saat sekutu bisa membangkitkanmu",
+      "allyRezBody": "Kamu tak selalu harus lari balik. Seorang sekutu dengan mantra kebangkitan bisa membangkitkanmu sebagai gantinya, dan itu datang kepadamu sebagai permintaan yang bisa kamu terima atau tolak; biarkan tak terjawab dan permintaan itu kedaluwarsa, jadi jawablah selagi masih ada. Terima, dan kamu bangkit di sisi teman yang merapalkannya dengan sebagian nyawa dan mana pulih. Sebagian penyembuh bisa menawarkan kebangkitan bagi seluruh party yang tumbang sekaligus, meski kalian masing-masing tetap menjawab permintaan kalian sendiri. Medan Thornhollow adalah pengecualiannya: tak ada mantra kebangkitan yang menjangkaumu di sana, dan kamu menunggu gelombang berikutnya timmu.",
+      "unstuckTitle": "Saat kamu benar-benar terjebak",
+      "unstuckBody": "Jika dunia menjebakmu di suatu tempat yang tak bisa kamu keluar darinya, ketik /unstuck. Kamu harus berada di luar pertempuran dan berdiri diam, tidak sedang terkena pingsan atau akar, dan tidak sedang dalam duel atau pertandingan arena: hitung mundur singkat pun berjalan, dan bergerak atau menerima kerusakan akan membatalkannya. Setelah selesai, kamu diturunkan di kuburan terdekat. Ia tak pernah membunuhmu dan tak meninggalkan mayat, dan jika kamu sudah tumbang sebelumnya, ia justru membangkitkanmu di sana. Harganya adalah Penyakit Pelepasan, pelemahan sementara atas seluruh dirimu yang sudah pudar pada saat kamu bisa menggunakan perintah itu lagi, dan seperti Upeti Sang Penjaga, ia sepenuhnya membebaskan karakter yang baru dibuat.",
+      "climbTitle": "Menarik dirimu naik ke tepian",
+      "climbBody": "Tepian bukanlah tembok. Melompat ke arah sesuatu yang terlalu tinggi untuk dipijak membuat karaktermu menangkap bibirnya di dekat puncak lompatan dan menariknya naik ke atasnya, tanpa tombol tersendiri untuk ditekan. Apa pun yang cukup rendah untuk dilewati sendiri akan terlewati tanpa basa-basi; tarikan penuh itu disediakan untuk bibir yang berada di atas kepalamu. Gerakan ini singkat, dan ia mengambil alih kendali selama berlangsung, sehingga kamu tak bisa mengarahkannya di tengah jalan. Sebuah pingsan yang mengenaimu di tengah tarikan membuatmu melepas pegangan dan jatuh, diukur dari tempat lompatan itu meninggalkan tanah, dan sebuah pingsan atau akar mencegah panjatan itu dimulai sama sekali, hal yang patut diingat saat kamu berusaha keluar dari posisi buruk dalam sebuah pertarungan."
+    },
+    "interfacePage": {
+      "intro": "Sebuah peta layar: apa yang dilakukan setiap bingkai, bilah, dan tombol pada antarmukamu, serta jendela apa yang dibuka oleh setiap tombol.",
+      "scopeTitle": "Tombol, dan cara mengubahnya",
+      "scopeBody": "Setiap tombol yang disebutkan di halaman ini adalah tombol bawaan, dan setiap satunya bisa diikat ulang. Tabel tombol lengkap berada di halaman Kontrol, dan opsi yang mengubah tampilan serta perilaku antarmuka berada di halaman Pengaturan. Esc menutup jendela mana pun yang sedang teratas, dan membuka menu permainan saat tak ada apa pun yang terbuka.",
+      "glanceTitle": "Layar sekilas",
+      "glanceBody": "Antarmuka ini hidup di sekeliling tepi layar dan membiarkan bagian tengah kosong untuk dunia. Bingkaimu sendiri, bilah aksimu, dan bilah pengalamanmu berada di sepanjang bagian bawah. Targetmu dan party-mu berada di kiri atas. Peta mini dan nama zona berada di kanan atas, dengan pelacak-pelacakmu berjajar ke bawah di sisi kanan di bawahnya. Kotak obrolan berada di sudut kiri bawah, dan sebuah rel berisi tombol-tombol kecil persegi berada di kanan bawah.\n\nSemua yang lain adalah sebuah jendela yang kamu buka dan tutup. Sebagian besar jendela punya tombolnya sendiri, sebagian besar juga punya sebuah tombol di rel kanan bawah itu, dan setiap satunya ditutup dengan tombolnya sendiri lagi atau dengan Esc.",
+      "framesTitle": "Bingkai unit",
+      "framesBody": "Sebuah bingkai unit adalah sebuah potret dengan bilah di sampingnya: sebuah bilah nyawa selalu ada, sebuah bilah sumber daya saat unitnya memilikinya, serta sebuah nama dan chip level. Sebuah perisai kerusakan dilukis sebagai segmen yang lebih terang yang diletakkan di atas bilah nyawa, sehingga kamu bisa menyaksikan perisai itu terkuras habis sebelum nyawanya mulai bergerak. Ini muncul di bingkaimu sendiri, di targetmu, dan di baris party-mu; dua bingkai kecil, peliharaanmu dan target dari targetmu, tidak membawa lapisan perisai.",
+      "frameSelfTitle": "Bingkaimu sendiri",
+      "frameSelfBody": "Tengah bawah, di samping bilah aksimu. Potret, level, nyawa, dan sumber dayamu, dengan sebuah tanda selagi kamu bertarung, tanda istirahat selagi kamu beristirahat, dan sebaris poin combo untuk kelas yang membangunnya. Mengklik bingkai ini menargetkan dirimu sendiri.",
+      "frameTargetTitle": "Targetmu",
+      "frameTargetBody": "Kiri atas, muncul begitu kamu memilih sesuatu dan hilang lagi begitu kamu melepasnya. Potret dan bilah yang sama, ditambah label Elite pada musuh yang lebih tangguh, sebuah bilah rapalan yang menunjukkan apa yang sedang dirapal targetmu, dan sebuah strip berisi efek yang ada padanya.",
+      "frameTotTitle": "Target dari targetmu",
+      "frameTotBody": "Sebuah bingkai kecil di samping bingkai targetmu yang menunjukkan siapa yang sedang menjadi target dari targetmu. Ini adalah cara tercepat untuk mengetahui apakah seekor monster sedang melawan tank-mu atau justru mendatangimu. Bingkai ini tetap tersembunyi sampai kamu mengaktifkannya di opsi.",
+      "framePartyTitle": "Party-mu",
+      "framePartyBody": "Anggota party bertumpuk di bawah bingkai targetmu di sebelah kiri, satu baris untuk masing-masing. Sebuah baris meredup saat anggota itu berjalan keluar jangkauan, menampilkan efek yang layak direspons, dan bisa menampilkan peliharaan mereka di sampingnya. Seberapa banyak teks nyawa yang dibawa sebuah baris terserah padamu: tidak ada, persentase, angka, atau keduanya.",
+      "framePetTitle": "Peliharaanmu",
+      "framePetBody": "Pemburu, Penyihir Iblis, dan siapa pun lainnya yang mengeluarkan peliharaan mendapatkan sebuah bingkai kecil untuknya di samping bingkai milik mereka sendiri, lengkap dengan nama, level, dan nyawanya. Mengklik bingkai itu memilih peliharaanmu, dan Ctrl+6 melakukan hal yang sama dari papan ketik.",
+      "framesMoveBody": "Bingkaimu, bingkai targetmu, dan bingkai party-mu semuanya bisa dipindahkan. Masing-masing membawa sebuah tombol pindah kecil di sudutnya: buka kuncinya, seret bingkai itu ke tempat yang kamu inginkan, lalu kunci lagi supaya klik yang tak disengaja tidak bisa menggesernya. Jika bingkai-bingkai itu berakhir di tempat yang kamu sesali, Atur Ulang Posisi Bingkai di opsi mengembalikan semuanya ke tempat asalnya.",
+      "barsTitle": "Bilah, penghitung waktu, dan teks pertarungan",
+      "barsBody": "Bilah rapalanmu muncul di tengah layar, tepat di atas bilah aksimu, setiap kali kamu merapal atau menyalurkan mantra, dan menampilkan nama mantra serta waktu yang tersisa. Targetmu mendapatkan bilah rapalannya sendiri pada bingkainya, sehingga kamu bisa melihat apa yang akan datang dan meresponsnya.\n\nSebuah bilah ayunan tipis berada di bawah bilah rapalanmu dan terisi di antara ayunan senjatamu, sehingga penyerang jarak dekat atau jarak jauh bisa melihat kapan pukulan otomatis berikutnya akan mendarat.\n\nBilah pengalamanmu membentang selebar penuh di bawah bilah aksimu, terbagi menjadi segmen-segmen, dengan sebuah bagian yang lebih terang menunjukkan pengalaman istirahat yang telah kamu tabung.\n\nBerenang di bawah air dan sebuah bilah napas biru muncul di bagian atas layar. Bilah itu berkurang selama kepalamu terendam, berkedip merah begitu habis dan kamu mulai tenggelam, lalu terisi cepat begitu kamu muncul ke permukaan. Space membuatmu berenang ke atas, dan tombol Berenang Turun, Ctrl secara bawaan, membawamu lebih dalam.\n\nKerusakan dan penyembuhan melayang ke atas dari apa pun yang menerimanya sebagai angka-angka kecil, sehingga kamu bisa membaca sebuah pertarungan tanpa membaca teks. Tab Catatan Tempur di kotak obrolanmu menyimpan catatan tertulis yang lengkap.",
+      "aurasTitle": "Buff dan debuff",
+      "aurasBody": "Buff milikmu ditampilkan sebagai sebaris ikon kecil di sudut kanan atas di samping peta mini, masing-masing menghitung mundur waktu yang tersisa, dengan debuffmu di baris di bawahnya. Mengklik kanan salah satu buffmu sendiri akan melepasnya, selama itu buff yang boleh kamu lepas; debuff tak pernah bisa, dan strip milik targetmu hanya untuk dibaca.\n\nBuff pada Bingkai Pemain, sebuah opsi yang sejak awal nonaktif, memindahkan baris buffmu ke bingkai unitmu sendiri dan menyisakan seluruh sudut itu untuk debuffmu. Ini adalah pengaturan desktop: tata letak ponsel dan tablet menempatkan auramu secara otomatis.\n\nBuff dan debuff targetmu duduk bersama dalam sebuah strip di bawah bingkainya. Saat kamu menginginkan lebih banyak ruang untuk keduanya, Shift+J membuka jendela terpisah Buff dan Debuff Target yang bisa kamu pindahkan, saring hanya menjadi buff saja atau debuff saja, dan biarkan terbuka.",
+      "actionBarsTitle": "Bilah aksimu",
+      "actionBarsBody": "Tiga baris berisi sebelas slot kemampuan berada di atas bilah pengalamanmu, dengan tombol serang khusus di kepala baris pertama. Hanya baris pertama yang tersedia sejak awal: baris kedua dan ketiga diaktifkan di opsi saat kamu membutuhkan ruang lebih, dan baris ketiga membutuhkan baris kedua. Baris angka di bagian atas papan ketikmu memicu bilah pertama, sementara bilah tambahan secara bawaan menggunakan numpad.\n\nKemampuan berasal dari buku mantramu (P): seret satu keluar dari buku ke sebuah slot, atau gunakan sakelar pada barisnya untuk menempatkannya di slot kosong pertama. Barang bekerja dengan cara yang sama, sehingga setumpuk ramuan atau sebuah perban bisa menempati sebuah slot dan digunakan dengan sebuah tombol.\n\nSetelah sebuah bilah tersusun sesuai keinginanmu, kamu bisa menguncinya. Mengunci menolak seretan, penjatuhan, dan penghapusan, sementara kemampuannya sendiri tetap bisa dipakai seperti biasa, sehingga sebuah klik yang salah saat bertarung tak bisa mengacaukan susunan tombolmu.\n\nDua bilah yang lebih kecil bergabung dengan baris itu saat berlaku: bilah peliharaan, dengan Serang, Berhenti, Hasut, Bertahan, dan Agresif pada Ctrl plus 1 hingga 5, serta bilah kuda-kuda untuk kelas yang berganti kuda-kuda atau wujud.",
+      "minimapTitle": "Peta mini",
+      "minimapBody": "Kanan atas: sebuah peta mini bulat dengan nama zona di atasnya dan koordinatmu di bawahnya, dikelilingi oleh sebuah dial yang melukiskan waktu dalam sehari.\n\nCakram ini membawa lebih dari sekadar medan. Panahmu sendiri berada di tengah, menunjuk ke arah hadapmu, dengan party-mu di sekelilingmu sebagai titik-titik berwarna sesuai kelas dan sebuah panah tepi untuk siapa pun yang telah melenceng keluar darinya. Pemberi misi memakai tanda yang sama di sana seperti yang mereka pakai di dunia, dan kamu juga akan bisa mengenali titik pengumpulan dan stasiun kerajinan, portal perjalanan, mayat dan wadah yang bisa dijarah, musuh mana pun yang telah tertarik padamu, teman dan rekan guild yang berada di dekatmu, serta tubuhmu sendiri selagi kamu berlari kembali sebagai hantu.\n\nIndikator-indikator kecil muncul di atasnya saat ada sesuatu yang perlu disampaikan: sebuah amplop selagi surat yang belum dibaca menunggumu, sebuah koin selagi hasil penjualan atau barang kembalian menunggu di Sang Pedagang, dan sebuah tombol yang mendaftar lockout raid-mu.",
+      "mapTitle": "Peta dunia dan pelacak-pelacakmu",
+      "mapBody": "M membuka peta dunia: benua yang tergambar lengkap, dengan panahmu sendiri di atasnya, zona-zona beserta namanya, titik-titik menarik di sekitarmu, portal perjalanan, dan titik pengumpulan yang telah kamu temukan. Party-mu juga ditampilkan di sana. Di dalam sebuah delve, peta beralih menjadi skema ruangan-ruangan yang telah kamu jelajahi sejauh ini.\n\nDi sisi kanan, di bawah peta mini, setumpuk pelacak menjaga urusanmu saat ini tetap terlihat tanpa perlu membuka apa pun: misi yang kamu lacak beserta tujuannya, kemajuan jasamu, delve yang sedang kamu jalani, dan rift mana pun yang sedang kamu ikuti. Pelacak misi bisa diciutkan saat kamu ingin layarmu kembali lega.",
+      "chatTitle": "Kotak obrolan",
+      "chatBody": "Kiri bawah. Tekan Enter untuk mulai mengetik dan Enter lagi untuk mengirim.\n\nDua tab selalu ada di sana: Obrolan, catatan gabungan dari semua yang dikatakan di sekitarmu, dan Catatan Tempur, catatan tertulis dari pertarunganmu. Tombol plus menambah lebih banyak lagi, satu per saluran: Ucap, Teriak, Party, Umum, Dunia, LFG, Guild, dan Perwira, ditambah sebuah tab Bisik yang mengumpulkan setiap bisikan yang kamu kirim dan terima di satu tempat. Mengetik di sebuah tab saluran mengirim ke saluran itu tanpa kamu perlu mengetik ulang perintahnya.\n\nSeluruh kotak ini bisa diseret ke tempat lain dan diubah ukurannya, dan ia mengingat di mana kamu meninggalkannya.",
+      "keyWindowsTitle": "Jendela yang kamu buka dengan sebuah tombol",
+      "keyWindowsBody": "Masing-masing berikut ini punya tombol bawaan dan sebuah tombol di rel sudut kanan bawah. Tekan tombolnya lagi, atau Esc, untuk menutupnya.",
+      "winCharTitle": "Lembar karakter (C)",
+      "winCharBody": "Perlengkapan yang kamu kenakan di satu sisi, atributmu dan statistik yang mereka isi di sisi lain, dengan sebuah tooltip pada setiap nilai yang menjelaskan apa fungsinya bagi kelasmu. Ini juga memuat Waktu Bermain seumur hidupmu, dengan sebuah ikon mata kecil di sampingnya yang menyembunyikan angkanya saat kamu lebih suka tidak menampilkannya, serta tombol yang menyusun Kartu Pemainmu.",
+      "winBagsTitle": "Tas (B)",
+      "winBagsBody": "Semua yang kamu bawa, dalam satu paket dengan empat slot tas. Chip kategori di bagian atas mempersempitnya menjadi Senjata, Zirah, Konsumsi, Bahan, Perkakas, Misi, atau Tunggangan, dan sebuah kotak pencarian menyaring berdasarkan nama. Sebuah dropdown urutan menyusun ulang apa yang sedang kamu lihat berdasarkan Terbaru, Kualitas, atau Nama, dan pilihan itu diingat antar-sesi. Sebuah tombol Urutkan yang terpisah merapikan sel-sel sungguhan pada paket itu dalam satu tekanan, menghapus chip dan pencarian sehingga kamu melihat seluruh tas yang telah dirapikan.",
+      "winSpellbookTitle": "Buku Mantra (P)",
+      "winSpellbookBody": "Setiap kemampuan yang dimiliki kelasmu, yang sudah dipelajari maupun yang masih akan datang, berurutan. Di sinilah kamu menyeret kemampuan ke bilah aksimu.",
+      "winTalentsTitle": "Talenta (N)",
+      "winTalentsBody": "Tempat kamu memilih spesialisasimu, dan enam baris talentamu dengan tiga opsi yang ditawarkan tiap barisnya serta apa yang dilakukan setiap opsi. Baris yang belum kamu capai ditampilkan di samping baris yang bisa kamu pilih sekarang.",
+      "winProfessionsTitle": "Profesi (Shift+P)",
+      "winProfessionsBody": "Apa yang telah kamu pelajari, seberapa terampil kamu pada masing-masing, dan seberapa jauh lagi masing-masing bisa berkembang.",
+      "winCraftingTitle": "Kerajinan (T)",
+      "winCraftingBody": "Resepmu, apa yang dibutuhkan masing-masing, dan apa yang bisa kamu buat sekarang juga dengan apa yang sedang kamu bawa.",
+      "winQuestLogTitle": "Catatan Misi (L)",
+      "winQuestLogBody": "Setiap misi yang telah kamu ambil, ceritanya, tujuannya, dan kemajuanmu, lengkap dengan cara untuk menampilkan salah satunya di peta dan memilih misi mana yang diikuti pelacakmu.",
+      "winDeedsTitle": "Kitab Jasa (Shift+Z)",
+      "winDeedsBody": "Catatan tentang apa yang telah kamu lakukan, gelar dan Kemasyhuran yang telah dibayarkannya kepadamu, dan apa yang masih terbuka.",
+      "winSocialTitle": "Teman dan Guild (O)",
+      "winSocialBody": "Tab untuk temanmu, guildmu beserta daftar anggotanya, raid-mu, dan pemain yang telah kamu abaikan atau blokir.",
+      "winFinderTitle": "Pencari Dungeon (Shift+I)",
+      "winFinderBody": "Katalog konten kelompok yang bisa kamu antre. Centang aktivitas yang kamu inginkan, ikuti antrean sendirian atau pasang sebuah daftar untuk kelompokmu sendiri, dan terima begitu sebuah kelompok terbentuk.",
+      "winMetersTitle": "Meter kerusakan (Shift+H)",
+      "winMetersBody": "Kerusakan, penyembuhan, dan ancaman untukmu dan semua orang bersamamu, disimpan dalam segmen-segmen sehingga kamu bisa melihat kembali pertarungan sebelum yang terakhir. Panel penyembuhan dan ancaman bisa ditarik keluar untuk berdiri sendiri.",
+      "winMoreTitle": "Dan beberapa lagi",
+      "winMoreBody": "Peta dunia (M), jendela PvP (G), Piala Lembah (Y), papan peringkat (K), kalender acara (I), dan roda emote (X) semuanya bekerja dengan cara yang sama. Papan peringkat layak diluangkan waktu pada kunjungan pertamamu: ia menyimpan sebuah tab untuk pemain, satu untuk guild, satu yang memberi peringkat seluruh akun berdasarkan Kemasyhuran dari Kitab Jasa, dan satu untuk peringkat harian.\n\nKlik kanan pemain lain, pada papan namanya atau pada namanya di obrolan, dan Info Pemain membuka sebuah kartu tentang mereka: perlengkapan yang mereka kenakan, lengkap dengan tooltip, dan detail publik dari karakter mereka. Ini hanyalah sebuah lihat sekilas, tidak lebih, dan mengharuskan mereka cukup dekat untuk terlihat.",
+      "worldWindowsTitle": "Jendela yang dibukakan dunia untukmu",
+      "worldWindowsBody": "Beberapa jendela tidak pernah kamu buka dengan menekan tombol: ia terbuka saat kamu bicara dengan orang yang tepat atau mengeklik hal yang tepat.\n\nSeorang pedagang membuka jendela pedagang, dengan dagangannya untuk dibeli dan sebuah tab Beli Kembali yang menyimpan apa yang terakhir kamu jual, untuk berjaga-jaga kalau kamu menjualnya karena keliru. Sebaris tombol jumlah menyertai daftar dagangan, sehingga setumpuk reagen bisa dibeli lima atau sepuluh sekaligus dalam satu klik alih-alih sepuluh kali klik, dan ada jumlah kustom saat tak satu pun dari keduanya pas. Seorang pelatih kelas membuka daftar apa yang bisa kamu pelajari sekarang dan apa yang masih menunggu di depanmu.\n\nSeorang bendahara membuka lemari besimu, brankas berisi slot tambahan yang bisa kamu beli lebih banyak. Jika guildmu telah membuka bank, sebuah tab kedua di sana menampilkannya: setiap anggota bisa melihat isinya bahkan tanpa izin untuk mengambil apa pun, sehingga tidak seorang pun perlu bertanya apa yang disimpan guild, pangkat menentukan siapa yang boleh menyetor, menarik, dan memindahkan uang guild, dan sebuah log mencatat setiap pergerakannya.\n\nKotak surat Pos Gagak membuka suratmu, dengan yang sudah tiba di satu tab dan formulir pengiriman di tab lain, lengkap dengan lampirannya. Pasar Dunia di tempat Sang Pedagang punya jendelanya sendiri: telusuri dan beli di satu tab, daftarkan daganganmu sendiri di tab lain, dan kumpulkan apa yang sudah terjual di tab ketiga. Berdagang langsung dengan pemain lain membuka jendela perdagangan dengan satu sisi untuk masing-masing.",
+      "lootTitle": "Jarahan dan lemparan dadu",
+      "lootBody": "Berinteraksi dengan sesosok mayat yang telah kamu peroleh dan jendela jarahan terbuka, mendaftar apa saja yang dijatuhkan. Klik sebuah baris untuk mengambilnya.\n\nDalam sebuah kelompok, sebuah jarahan bagus di bawah aturan jarahan kelompok justru menampilkan sebuah permintaan lemparan dadu di layarmu: Butuh jika kamu menginginkannya untuk dirimu sendiri, Tamak jika kamu akan mengambilnya untuk dijual, atau Lewati untuk menyerahkannya pada orang lain. Sebuah panel kecil kemudian menunjukkan siapa saja yang sudah melempar dan apa pilihan mereka selagi waktunya berjalan mundur.\n\nAturan jarahan itu sendiri berada di jendelanya sendiri yang kecil. Pemimpin kelompok bisa mengubahnya di sana, dan semua orang lain melihat jendela yang sama secara hanya-baca, sehingga aturannya tak pernah menjadi rahasia.\n\nBeberapa mayat juga bisa dipanen untuk bagian-bagiannya. Jika bisa, sebuah bagian Panen muncul di kaki jendela jarahan dengan sebuah kotak centang untuk tiap komponen yang kamu inginkan.",
+      "playerCardTitle": "Kartu Pemainmu",
+      "playerCardBody": "Sebuah tombol pada lembar karaktermu menyusun sebuah Kartu Pemain: sebuah gambar dengan close-up karaktermu, perlengkapan yang sedang kamu kenakan, dan statistikmu, siap untuk disimpan atau dibagikan. Ini adalah sebuah cuplikan untuk memamerkan set baru, dan tak mengubah apa pun dalam permainan.",
+      "wikiTitle": "Tombol Wiki",
+      "wikiBody": "Wiki ini hanya sejauh satu klik di dalam permainan. Sebuah tombol untuknya berada bersama yang lain di rel sudut kanan bawah, ada sebuah baris untuknya di menu permainan Esc, dan di ponsel ia berada di baki Lainnya. Karena membukanya akan mengalihkanmu ke peramban, tombol ini selalu meminta konfirmasi lebih dulu, sehingga sentuhan tak sengaja di tengah pertarungan tak akan pernah bisa menarikmu keluar darinya. Permainan tetap berjalan di baliknya.",
+      "mobileTitle": "Di ponsel atau tablet",
+      "mobileBody": "Kontrol sentuh muncul dengan sendirinya, dan tata letaknya menyesuaikan ukuran layarmu: susunan ringkas di ponsel kecil, susunan standar di ponsel yang lebih besar, dan susunan yang lebih lapang di tablet.\n\nKemampuanmu berada dalam sebuah cincin, bukan baris angka: tombol serang dengan lima tombol aksi di sampingnya, dan sebuah sakelar halaman yang menukar cincin itu melalui sisa slotmu, hingga tujuh halaman begitu ketiga bilah aksimu diaktifkan semua. Di sekelilingnya berada tombol-tombol yang paling sering dijangkau pemain sentuh: menukar target, menggunakan apa yang ada di depanmu, dan melompat, ditambah sebuah baris tarik keluar berisi bahan konsumsimu yang mengisi dirinya sendiri dari apa yang kamu bawa.\n\nDi sepanjang tepi bawah ada Obrolan, Sosial, Misi, Pengaturan, dan Lainnya. Lainnya membuka sebuah baki yang menyimpan sisa jendelamu, termasuk karaktermu, Pencari Dungeon, PvP, Piala Lembah, emote, dan wiki. Jendela di sini memenuhi seluruh layar alih-alih melayang di atasnya.\n\nMemindahkan bingkai unitmu adalah hal khas desktop: di layar sentuh, tata letak menempatkannya untukmu.",
+      "railTitle": "Rel tombol",
+      "railBody": "Di sudut kanan bawah layar, jauh dari peta mini, terdapat sebuah rel berisi tombol-tombol kecil persegi, satu untuk tiap jendela, tersusun dalam dua kolom pendek berdampingan. Sebagian besar dicetak dengan tombol bawaannya.\n\nKolom pertama mencakup karaktermu, buku mantra, talenta, catatan misi, Kitab Jasa, profesi, peta dunia, tas, dan kerajinan. Kolom kedua dibuka dengan Toko WOC dan berlanjut melalui PvP, Pencari Dungeon, Piala Lembah, Duel Kartu, papan peringkat, emote, musik, teman dan guild, wiki ini, dan menu permainan. Beberapa lagi bergabung dengan mereka hanya saat berlaku."
+    },
+    "commandsPage": {
+      "intro": "Setiap perintah yang bisa kamu ketik ke dalam obrolan, dikelompokkan menurut kegunaannya, lengkap dengan bentuk pendeknya.",
+      "slashBody": "Apa pun yang kamu ketik di kotak obrolan yang dimulai dengan garis miring adalah sebuah perintah, bukan sesuatu yang kamu ucapkan dengan lantang. Tekan Enter dan perintah itu akan bertindak (kamu mengikuti seseorang, mengundangnya, atau mengocok angka) atau mencetak satu baris pribadi yang hanya bisa kamu lihat sendiri.",
+      "aliasBody": "Sebagian besar perintah memiliki bentuk pendek, dan setiap bentuk yang tercantum dalam satu baris melakukan persis hal yang sama: /w, /t, dan /tell adalah satu perintah yang sama. Kata dalam kurung sudut wajib diisi, kata dalam kurung siku bersifat opsional, dan huruf besar-kecil pada perintah itu sendiri tidak pernah menjadi masalah.",
+      "helpTipTitle": "Permainan ini juga tahu daftarnya",
+      "helpTipBody": "Ketik /help dalam permainan, atau /commands, atau cukup /?, dan seluruh daftar perintah akan tercetak ke dalam obrolanmu. Salah ketik sebuah perintah dan permainan akan memberi tahumu bahwa perintah itu tidak dikenali, sekaligus mengarahkanmu kembali ke /help.",
+      "cmdHeader": "Perintah",
+      "doesHeader": "Fungsi",
+      "groupTalking": "Berbicara",
+      "say": "Bicara kepada para pemain yang berdiri di dekatmu. Baris teks polos tanpa garis miring akan pergi ke tab obrolan mana pun yang sedang kamu pilih, dan Berkata adalah tab tempat kamu memulai.",
+      "yell": "Berteriak, sehingga pemain yang jauh lebih jauh dari jangkauan bicara bisa mendengarmu.",
+      "whisper": "Kirim pesan pribadi kepada satu pemain yang sedang daring. Namanya cocok dengan huruf besar-kecil apa pun yang kamu ketik, selama hanya ada satu pemain yang mungkin dimaksud.",
+      "reply": "Balas siapa pun yang terakhir membisikimu, tanpa perlu mengetik ulang namanya.",
+      "me": "Teks aksi bebas dalam sudut pandang orang ketiga, sehingga “/me merenungi air mancur” terbaca sebagai namamu diikuti oleh aksi tersebut. Semua orang di dekatmu bisa melihatnya.",
+      "partyChat": "Bicara dengan semua orang di party atau raid-mu.",
+      "groupChannels": "Saluran",
+      "channelsIntro": "Umum menjangkau seluruh realm, dan kamu otomatis berada di dalamnya sejak momen kamu masuk. Dunia dan LFG bersifat opsional: bergabunglah dulu, baru kamu bisa membaca dan berbicara di dalamnya.",
+      "general": "Saluran Umum yang berlaku se-realm.",
+      "gAlias": "Sebuah bentuk pendek dengan dua makna, jadi patut diketahui: secara luring perintah ini mengirim ke Umum, tetapi secara daring ia menjadi saluran guild-mu. Ketik /general atau /1 saat kamu benar-benar bermaksud mengirim ke Umum.",
+      "guild": "Bicara dengan guild-mu. Hanya permainan daring, dan kamu harus tergabung dalam sebuah guild.",
+      "officer": "Saluran petinggi guild-mu, terbuka bagi para petinggi dan pemimpin guild. Hanya permainan daring.",
+      "join": "Bergabung atau keluar dari sebuah saluran opsional. Dua saluran yang bisa kamu ikuti adalah world dan lfg, dan mengetik /join saja akan menampilkan daftarnya. Membuka tab obrolan untuk salah satunya akan otomatis membuatmu bergabung.",
+      "world": "Bicara di saluran Dunia, setelah kamu bergabung dengannya.",
+      "lfg": "Bicara di saluran LFG, tempat orang-orang mencari kelompok. Bergabunglah dulu.",
+      "groupParty": "Party dan kelompok",
+      "invite": "Undang seorang pemain yang sedang daring ke party-mu berdasarkan namanya, sejauh apa pun jaraknya darimu.",
+      "partyRoster": "Tanpa pesan setelahnya, perintah ini menampilkan daftar anggota party-mu sebagai gantinya: setiap anggota lengkap dengan level, kelas, dan nyawanya, serta pemimpinnya ditandai.",
+      "ready": "Pemimpin party atau raid memulai pemeriksaan kesiapan, dan semua orang lainnya mendapat permintaan untuk menjawab ya atau tidak.",
+      "assist": "Targetkan apa pun yang sedang ditargetkan pemain yang disebutkan. Tanpa nama, perintah ini membantu pemain yang sedang kamu targetkan. Perintah ini menjangkau party dan raid-mu di mana pun di dunia, serta siapa pun yang cukup dekat untuk kamu lihat.",
+      "follow": "Ikuti pemain lain secara otomatis. Tanpa nama, perintah ini mengikuti targetmu saat ini. Bergerak, merapal, bertarung, memilih target baru, atau pemain lain itu menjauh semuanya akan menghentikannya, dan kamu tidak bisa memulainya saat sedang bertarung.",
+      "unfollow": "Berhenti mengikuti.",
+      "roll": "Kocok sebuah angka acak, dari 1 sampai 100 kecuali kamu menentukan batas atau rentang sendiri. Party-mu melihat hasilnya, atau semua orang di dekatmu jika kamu tidak sedang dalam party. Kocokan itu dibuat oleh server, sehingga tak seorang pun bisa memalsukannya.",
+      "groupPeople": "Pemain lain",
+      "who": "Tampilkan daftar pemain yang sedang daring. Tambahkan teks untuk mempersempitnya ke nama atau zona yang mengandung teks itu.",
+      "inspect": "Periksa level, kelas, dan nyawa seorang pemain yang sedang daring.",
+      "ignore": "Sembunyikan obrolan publik seorang pemain dan gelembung obrolan di atas kepalanya darimu. Bisikan, lemparan dadu, undangan, dan suratnya tetap sampai kepadamu. Bentuk daftar menampilkan siapa saja yang sedang kamu abaikan.",
+      "block": "Versi yang lebih kuat: perintah ini juga menghentikan bisikan, undangan, dan surat mereka, serta menyembunyikan kalian berdua satu sama lain di /who. Bentuk daftar menampilkan siapa saja yang telah kamu blokir.",
+      "peopleNote": "Daftar /who serta daftar abaikan dan blokirmu disimpan oleh server, sehingga semua itu hanya berfungsi dalam permainan daring.",
+      "groupSelf": "Karaktermu",
+      "selfIntro": "Perintah-perintah ini mencetak satu baris pribadi ke dalam obrolanmu yang tak dilihat siapa pun selain kamu. Tak ada yang disiarkan, sehingga aman digunakan di tengah pertarungan.",
+      "played": "Berapa lama karakter ini telah berada di dunia selama sesi ini.",
+      "playtime": "Berapa lama karakter ini telah dimainkan secara total, di seluruh sesi.",
+      "xp": "Levelmu dan seberapa jauh progresmu di dalamnya.",
+      "gold": "Berapa banyak uang yang kamu bawa.",
+      "stats": "Ringkasan karakter satu baris: level, kelas, nyawa, sumber dayamu, daya serang, peluang kritis, dan zirah.",
+      "gear": "Semua yang sedang kamu kenakan, slot demi slot, sehingga slot kosong terlihat jelas.",
+      "bags": "Apa yang sedang kamu bawa, kualitas terbaik lebih dulu, dengan uangmu di bagian akhir.",
+      "abilities": "Kemampuan yang telah kamu pelajari.",
+      "talents": "Spesialisasimu, dan berapa banyak dari enam baris bakat yang sudah kamu pilih sejauh ini.",
+      "quests": "Catatan misi aktifmu, lengkap dengan progres tiap sasaran.",
+      "completed": "Misi yang sudah kamu serahkan, dalam urutan kamu menyelesaikannya.",
+      "session": "Apa yang telah kamu lakukan sejak kamu masuk: pembunuhan, kematian, kerusakan, dan pengalaman.",
+      "arena": "Kedudukanmu di Coliseum Abu pada kedua bracket: peringkat, menang, kalah, dan rasio kemenangan untuk 1v1 dan 2v2.",
+      "listings": "Daftar milikmu sendiri di Pasar Dunia, lengkap dengan harga yang diminta, waktu tersisa masing-masing, dan berapa banyak ruang yang masih kamu miliki untuk menambah lagi.",
+      "buyback": "Apa yang baru-baru ini kamu jual ke pedagang dan masih bisa kamu beli kembali.",
+      "groupState": "Keadaanmu saat ini",
+      "buffs": "Penguat dan pelemah yang ada padamu, beserta waktu tersisa masing-masing.",
+      "cooldowns": "Kemampuan mana saja yang sedang dalam jeda, yang paling cepat siap ditampilkan lebih dulu.",
+      "pet": "Nama, level, famili, dan nyawa peliharaanmu.",
+      "petTaunt": "Jeda Provokasi peliharaanmu, dan apakah ia disetel untuk merapalkannya sendiri.",
+      "speed": "Seberapa cepat kamu bergerak dibandingkan lari normal, dan apakah sesuatu sedang membuatmu terikat akar.",
+      "form": "Wujud pergantian bentuk atau kuda-kuda tempur yang sedang kamu tempati.",
+      "manaRegen": "Untuk pengguna mana: apakah pemulihan mana di luar pertempuranmu sudah mulai berjalan lagi.",
+      "savedMana": "Untuk pengguna mana yang sedang berubah wujud: mana yang disimpan sementara selama kamu berwujud lain, yang akan kembali saat kamu keluar dari wujud itu.",
+      "combo": "Berapa banyak poin combo yang sedang kamu simpan.",
+      "consumable": "Makanan dan minuman yang sedang bekerja padamu saat ini, dan berapa lama waktu tersisa masing-masing.",
+      "potion": "Jeda ramuan tempur bersama, yang terpisah dari jeda kemampuanmu.",
+      "falling": "Apakah kamu sedang melayang di udara, seberapa tinggi kamu berada di atas tanah, dan apakah pendaratannya akan menyakitkan.",
+      "groupCombat": "Dalam pertarungan",
+      "target": "Targetmu saat ini: nama, level, jenisnya, dan nyawa.",
+      "targetBuffs": "Aura-aura pada targetmu, masing-masing ditandai sebagai penguat atau pelemah.",
+      "range": "Seberapa jauh targetmu, dan apakah itu masih dalam jangkauan jarak dekat.",
+      "attack": "Apakah serangan otomatis sedang berjalan, pada siapa, dan berapa lama ayunanmu.",
+      "casting": "Apa yang sedang kamu rapalkan atau salurkan, dan berapa lama waktu tersisa.",
+      "combat": "Apakah kamu sedang dalam pertempuran, dan kapan kamu akan keluar darinya.",
+      "threat": "Siapa yang sedang menjadi fokus musuh yang bertarung denganmu.",
+      "consider": "Seberapa berbahaya level targetmu dibandingkan levelmu sendiri.",
+      "queued": "Kemampuan yang diantrekan untuk meluncur pada ayunan jarak dekatmu berikutnya.",
+      "overpower": "Untuk prajurit: apakah jendela Tangan Merah yang terbuka akibat elakan musuh masih tersedia.",
+      "groupWorld": "Dunia dan perjalanan",
+      "where": "Zona tempatmu berada, rentang levelnya, dan koordinatmu.",
+      "zones": "Setiap zona dalam urutan perjalanan lengkap dengan rentang levelnya, dan zona tempatmu berada ditandai.",
+      "nearby": "Makhluk hidup yang paling dekat denganmu, yang terdekat lebih dulu.",
+      "pois": "Titik-titik penting di zona tempatmu berada saat ini, yang terdekat lebih dulu, lengkap dengan jaraknya masing-masing.",
+      "graveyard": "Tempat rohmu akan kembali jika kamu tumbang di sini.",
+      "dungeons": "Setiap dungeon beserta zona tempat pintunya berada dan ukuran party yang dirancang untuknya, ditambah tingkat kesulitan yang sedang kamu pakai saat ini.",
+      "dungeonMode": "Alihkan dungeonmu antara tingkat kesulitan normal dan heroik.",
+      "dungeonReset": "Tinggalkan instansi-instansi kosong milikmu sendiri, yang kamu lakukan setelah mengganti kesulitan.",
+      "groupRecovery": "Pemulihan dan kehadiran",
+      "unstuck": "Jalan keluar saat dunia menjebakmu. Berdirilah diam selama hitung mundur singkat dan kamu akan dipindahkan ke kuburan terdekat, serta dibangkitkan di sana jika kamu sudah tumbang. Perintah ini membuatmu lemah karena Penyakit Pelepasan untuk sementara waktu setelahnya, jadi ini adalah pilihan terakhir, bukan jalan pintas.",
+      "afk": "Tandai dirimu sebagai Pergi Sebentar (AFK), dengan pesan opsional yang akan diterima secara otomatis oleh siapa pun yang membisikimu. Ulangi tanpa pesan untuk menghapusnya; obrolan lain apa pun juga akan menghapusnya.",
+      "dnd": "Jangan Ganggu: seperti status pergi, hanya saja bisikan yang dikirim kepadamu ditahan, bukan disampaikan.",
+      "sit": "Duduk di tempatmu berada, lalu berdiri kembali. Kamu akan otomatis berdiri begitu kamu bergerak, merapal, atau terkena pukulan.",
+      "help": "Cetak daftar perintah ke dalam obrolanmu.",
+      "emotesHeading": "Emote",
+      "emotesBody": "Emote sosial juga merupakan perintah: /wave, /bow, /cheer, /dance, /laugh, dan lainnya, masing-masing ditampilkan kepada semua orang dalam jangkauan bicara. Tambahkan sebuah nama untuk mengarahkannya kepada seseorang, seperti pada “/wave Aleph”, dan /me mencakup apa pun yang tidak ada dalam daftar.",
+      "emotesMore": "Selengkapnya tentang emote dan bermain bersama",
+      "bangHeading": "Perintah komunitas",
+      "bangBody": "Beberapa perintah dimulai dengan tanda seru, bukan garis miring. Perintah-perintah ini mengumumkan sesuatu ke seluruh realm dan sekaligus mengirimkannya ke Discord komunitas, sehingga orang yang sedang tidak masuk pun ikut melihatnya. Perintah-perintah ini adalah bagian dari permainan daring.",
+      "bangList": "Kumpulannya adalah !lfg untuk mencari kelompok, !wts dan !wtb untuk menjual dan membeli, !recruit untuk perekrutan guild, !event untuk raid atau pertemuan, dan !help saat kamu buntu. Ketik perintahnya, lalu pesanmu.",
+      "unknownHeading": "Jika sebuah perintah tidak berfungsi",
+      "unknownBody": "Sebuah perintah yang tidak dikenali permainan akan kembali sebagai pemberitahuan perintah-tidak-dikenal, dan tak ada yang diucapkan dengan lantang, sehingga salah ketik tak pernah nyasar ke saluran tempat kamu sedang bicara. Perintah yang dikirim terlalu cepat secara beruntun akan dibatasi lajunya: perlambat sejenak dan perintah itu akan berjalan lagi. Sebagian perintah membutuhkan sesuatu untuk ditindaklanjuti, sehingga /follow tanpa target yang dipilih, atau /reply saat tak ada yang membisikimu, akan memberitahumu demikian.",
+      "stickyBody": "Tab obrolan mana yang sedang kamu pilih menentukan ke mana baris teks polos tanpa garis miring akan pergi. Pilih tab Dunia dan baris tak bertanda berikutnya akan pergi ke Dunia, jadi liriklah tabnya sebelum kamu mengetik. Sebuah perintah garis miring selalu menang atas tab yang aktif, sehingga /w Bob hi akan membisiki Bob apa pun tab yang sedang terbuka, dan pada tab bisikan, baris teks polos akan membalas siapa pun yang terakhir membisikimu."
     },
     "glossary": {
       "intro": "Rujukan singkat untuk istilah-istilah yang dipakai di sepanjang panduan ini dan di obrolan.",
@@ -3794,7 +4653,7 @@ export const id_ID: EnTranslations = {
       "healerTerm": "Penyembuh",
       "healerDef": "Anggota party yang menjaga semua orang tetap hidup dengan mantra penyembuhan.",
       "specTerm": "Spec",
-      "specDef": "Sebuah spesialisasi: arah yang kamu condongkan untuk kelasmu, seperti penyembuhan atau damage, seiring kamu membelanjakan talent.",
+      "specDef": "Sebuah spesialisasi: jalur yang kamu pilih untuk kelasmu di level 5, seperti penyembuhan atau kerusakan. Ia menetapkan peranmu, memberi kemampuan khas dan penguasaan yang bertahan, dan tetap bersamamu bahkan ketika kamu mengatur ulang talenta.",
       "pullTerm": "Pull",
       "pullDef": "Memancing musuh atau kelompok ke dalam pertarungan, biasanya secara sengaja dan satu rombongan demi satu.",
       "instanceTerm": "Instance",
@@ -3822,7 +4681,7 @@ export const id_ID: EnTranslations = {
       "targetMarkerTerm": "Penanda sasaran",
       "targetMarkerDef": "Simbol yang bisa disematkan anggota party atau raid mana pun di atas sasaran agar semua orang memusatkan, atau menghindari, sasaran yang sama. Delapan simbol, satu sasaran per simbol.",
       "loadoutTerm": "Loadout",
-      "loadoutDef": "Susunan talenta yang tersimpan. Simpan beberapa dan berganti antar-bangun tanpa membelanjakan ulang poinmu satu per satu.",
+      "loadoutDef": "Sebuah susunan talenta tersimpan, hingga sepuluh buah. Masing-masing mengingat pilihan barisnya dan bilah aksinya, serta bisa pula mengingat perlengkapan yang kamu kenakan, sehingga berganti build cukup satu klik alih-alih menyusun ulang tiap baris.",
       "readyCheckTerm": "Cek kesiapan",
       "readyCheckDef": "Pemimpin kelompok mengetik /ready untuk menjajak party atau raid: setiap orang mengonfirmasi Siap atau Belum Siap, dan kelompok melihat hitungannya.",
       "soulboundTerm": "Soulbound",
@@ -3830,7 +4689,55 @@ export const id_ID: EnTranslations = {
       "spiritHealerTerm": "Sang Penjaga Pucat",
       "spiritHealerDef": "Penyembuh roh realm ini, melayang di atas tiap kuburan: ia bisa membangkitkan hantumu di tempat dengan harga kelemahan sesaat.",
       "worldBossTerm": "Bos dunia",
-      "worldBossDef": "Bos sekuat raid yang bangkit di dunia terbuka dengan irama tetap, dilawan oleh siapa pun yang berkumpul untuk menjawab alih-alih party tetap."
+      "worldBossDef": "Bos sekuat raid yang bangkit di dunia terbuka dengan irama tetap, dilawan oleh siapa pun yang berkumpul untuk menjawab alih-alih party tetap.",
+      "fiveSecondTerm": "Aturan lima detik",
+      "fiveSecondDef": "Manamu terisi dengan kecepatan penuh hanya setelah lima detik berlalu sejak terakhir kali kamu menghabiskannya. Sampai saat itu ia tetap mengalir dengan laju yang dikurangi, bukan berhenti sama sekali. Itulah sebabnya para pemantra mengatur ritme mereka alih-alih merapal tanpa henti.",
+      "talentRowTerm": "Baris talenta",
+      "talentRowDef": "Talenta datang sebagai enam baris, satu pada tiap level 5, 8, 11, 14, 17, dan 20. Setiap baris menawarkan tiga pilihan dan kamu mengambil salah satunya, jadi tidak ada poin yang perlu ditabung atau dibelanjakan.",
+      "riftTerm": "Rift",
+      "riftDef": "Sebuah celah yang terbuka dengan sendirinya di luar sana di zona-zona, menurun melalui lantai-lantai sebuah instance yang dibangun baru dari seed milik rift itu sendiri. Rift diberi peringkat C, B, A, atau S. Pintu masuknya tertutup bagi party baru setelah beberapa saat, dan hanya party pertama di realm yang mencapai dasar yang menyegelnya.",
+      "riftRankTerm": "Peringkat (rift)",
+      "riftRankDef": "Huruf pada sebuah rift, C, B, A, atau S, dan satu-satunya hal yang menentukan seberapa sulit ia. Sebuah rift tak pernah menyesuaikan diri dengan ukuran kelompokmu, sehingga peringkat itulah seluruh tangga kesulitannya: C paling ringan dan S paling ganas, dan setiap peringkat ditujukan untuk sebuah kelompok.",
+      "finderTerm": "Pencari Dungeon",
+      "finderDef": "Jendela yang mengatalogkan ruang bawah tanah dan raid, mengantrekanmu untuk Pencocokan Cepat, dan mencantumkan grup-grup Premade yang sedang mencari orang. Shift+I membukanya secara bawaan.",
+      "premadeTerm": "Premade",
+      "premadeDef": "Sebuah kelompok yang disusun sendiri oleh seorang pemain dan didaftarkan di papan Pencari Dungeon, bukan yang dirakitkan untukmu oleh antrean pencocokan cepat.",
+      "chronicleTerm": "Kronik",
+      "chronicleDef": "Koleksi jasa milik sebuah zona sendiri, dihimpun ke dalam bab-bab oleh seorang Juru Kronik setempat. Kamu bebas menggarap bab-babnya dalam urutan mana pun yang cocok untukmu.",
+      "marksTerm": "Tanda Delve dan Tanda Heroik",
+      "marksDef": "Dua hadiah yang dibayar konten akhir permainan yang bisa diulang, di luar jarahan. Delve membayar Tanda Delve, yang membeli perlengkapan dari penjaga delve dan meningkatkan pendampingmu; dungeon heroik membayar Tanda Heroik, yang membeli perlengkapan dari Kepala Perbekalan Heroik.",
+      "honorTerm": "Kehormatan",
+      "honorDef": "Apa yang dibayar oleh pertarungan melawan pemain lain: kemenangan arena, kemenangan Medan Thornhollow, dan bunuhan terhormat semuanya menambahnya. Kamu membelanjakannya pada Set Perang.",
+      "warfareTerm": "Perang",
+      "warfareDef": "Sisi perlengkapan dari pemain lawan pemain. Seorang Kepala Perbekalan menjual set zirah Perang dengan Kehormatan, dan rating Perang yang dibawanya hanya diperhitungkan dalam pertarungan melawan pemain lain.",
+      "fatigueTerm": "Kelelahan",
+      "fatigueDef": "Berenanglah cukup jauh ke laut lepas dan air mulai menguras tenagamu: sebuah peringatan datang lebih dulu, lalu kerusakan yang meningkat hingga kamu berbalik menuju daratan.",
+      "unstuckTerm": "Penyakit Pelepasan",
+      "unstuckDef": "Harga yang harus dibayar karena menggunakan Lepaskan Diri dari menu permainan. Diam saja selama hitung mundur dan itu akan menurunkanmu di kuburan terdekat, dan kamu membawa kelemahan sementara untuk beberapa saat setelahnya.",
+      "itemLevelTerm": "Level item",
+      "itemLevelDef": "Satu angka yang merangkum seberapa kuat sebuah perlengkapan, berguna saat kamu ingin membandingkan dua potongan dengan cepat. Aktifkan Tampilkan Level Item di opsi untuk melihatnya pada tooltip. Hanya perlengkapan yang sumbernya diketahui yang membawa satu angka, sehingga barang dasar pedagang dan perlengkapan awal tidak menampilkan apa pun, dan angka yang tidak ada adalah hal normal, bukan sebuah cacat.",
+      "requiredLevelTerm": "Level yang Dibutuhkan",
+      "requiredLevelDef": "Level yang harus kamu capai sebelum bisa mengenakan atau menggunakan sepotong perlengkapan. Tooltip menampilkannya dengan warna merah selama levelmu masih di bawahnya.",
+      "offHandTerm": "Tangan Sekunder",
+      "offHandDef": "Slot tangan kedua. Ia menampung sebuah perisai atau sebuah item yang dipegang seperti sebuah lentera atau sebuah tabung panah, dan sebuah senjata kedua hanya jika kelas dan spesialisasimu bisa memakai dua senjata sekaligus.",
+      "setBonusTerm": "Bonus set",
+      "setBonusDef": "Hadiah tambahan karena mengenakan beberapa potong dari keluarga zirah yang sama sekaligus. Tooltip menghitung berapa banyak potongan set yang sedang kamu kenakan, dan makin banyak potongan membuka makin banyak bonus.",
+      "commissionTerm": "Karya pesanan dan Ikatan Pembuat",
+      "commissionDef": "Sebuah karya yang dibuat untuk orang lain. Sang perajin menandai potongan itu sebagai karya pesanan, dan ia terikat pada siapa pun yang menerimanya dalam sebuah perdagangan; seorang master stasiun akan melepas ikatannya lagi nanti dengan sebuah biaya.",
+      "masterworkTerm": "Karya master",
+      "masterworkDef": "Versi terbaik dari sebuah karya, yang sesekali dihasilkan seorang perajin terampil sebagai ganti salinan biasa. Sebuah karya master selalu membawa nama pembuatnya.",
+      "toolCharmTerm": "Jimat alat",
+      "toolCharmDef": "Sebuah jimat hasil kerajinan yang kamu pasang pada alat penambangan, penebangan, atau herbalisme dari jendela Profesi untuk meningkatkan hasil yang dibawanya kembali. Memasangnya menghabiskan jimat itu, dan efeknya bertahan selama sejumlah muatan tertentu. Saat muatan itu habis, kamu mengisi ulang slotnya dengan material, bukan meracik jimat baru.",
+      "mountTerm": "Tunggangan",
+      "mountDef": "Sebuah makhluk yang kamu tunggangi untuk menyeberangi daratan lebih cepat. Hampir semua hal lain yang kamu lakukan menurunkanmu darinya: berenang, memasuki pertarungan, memanen, dan membuat kerajinan semuanya membuatmu kembali berpijak di kakimu sendiri.",
+      "ridingTerm": "Menunggang",
+      "ridingDef": "Keterampilan yang memungkinkanmu menunggang sama sekali. Kamu membelinya sekali dari seorang Kepala Kandang di level 20, dan setelah itu ia melekat pada karaktermu untuk selamanya.",
+      "reinsTerm": "Tali Kekang",
+      "reinsDef": "Barang yang merupakan tunggangan. Simpan sepasang di tasmu atau di bank dan tunggangan itu menjadi milikmu; gunakan untuk menunggang. Tali kekang bisa diperdagangkan, dikirim lewat pos, dan dijual kepada pemain lain.",
+      "claudiumTerm": "Claudium",
+      "claudiumDef": "Mata uang Toko WOC, dibelanjakan untuk kosmetik dan tidak untuk hal lain. Ia tidak pernah membeli kekuatan atau perkembangan.",
+      "worldTerm": "Dunia",
+      "worldDef": "Satu salinan bersama dari permainan daring, dengan pemainnya sendiri, pasarnya sendiri, dan peringkatnya sendiri. Panduan ini juga menyebutnya realm, dan karaktermu hidup di dunia tempat kamu membuatnya."
     },
     "faqPage": {
       "intro": "Pertanyaan yang paling sering ditanyakan pemain baru.",
@@ -3839,13 +4746,14 @@ export const id_ID: EnTranslations = {
       "q2": "Apakah saya butuh dompet kripto atau token apa pun?",
       "a2": "Tidak. Permainan sepenuhnya bisa dimainkan tanpa itu. Token komunitas yang opsional hanya menambah hiasan kosmetik dan sebagian dari kumpulan hadiah harian, dan ia tak pernah memengaruhi kekuatan atau kemajuan.",
       "q3": "Bisakah saya bermain di ponsel?",
-      "a3": "Ya. Permainan berjalan di peramban ponsel dengan kontrol sentuh, dan ada juga peluncur untuk desktop.",
+      "a3": "Ya. Permainan berjalan di peramban seluler modern mana pun dengan kontrol sentuh, dan ada aplikasinya juga: versi iOS dan Android, serta aplikasi desktop untuk Windows, macOS, dan Linux yang memperbarui dirinya sendiri.",
       "q4": "Bisakah saya bermain luring atau sendirian?",
       "a4": "Ya. Ada mode luring satu pemain yang instan, dan dunia daring sepenuhnya bisa dijalani sendiri kecuali dungeon, raid, dan bos dunia.",
       "q5": "Ada berapa banyak kelas?",
       "a5": "Sembilan, mencakup peran klasik tank, penyembuh, dan penyerang, masing-masing dengan sistem sumber daya (amukan, mana, atau energi) dan kemampuan khasnya sendiri.",
       "q6": "Berapa batas levelnya?",
       "a6": "Level {cap}, dicapai melintasi tiga zona terhubung berisi misi, ruang bawah tanah, dan penjelajahan.",
+      "a6Count": "Level {cap}, dicapai melintasi zona-zona berisi misi, ruang bawah tanah, dan penjelajahan. Ada {zones} zona semuanya, dari lembah permulaan hingga wilayah yang dibangun untuk karakter yang sudah berada di batas atas.",
       "q7": "Apakah karakter saya akan tersimpan?",
       "a7": "Karakter daring disimpan di server secara otomatis. Karakter luring tersimpan di perambanmu untuk sesi cepat dan pengujian.",
       "q8": "Bisakah saya menjalankan salinan saya sendiri?",
@@ -3853,9 +4761,27 @@ export const id_ID: EnTranslations = {
       "q9": "Apakah ada PvP?",
       "a9": "Ya. Bertarung tanding dengan siapa pun untuk kesenangan, atau melangkahlah ke Ashen Coliseum untuk melawan pemain lain. PvP bersifat sukarela, jadi kamu tak pernah dipaksa masuk ke dalamnya.",
       "q10": "Apa yang bisa dilakukan di level maksimal?",
-      "a10": "Batasnya adalah level {cap}. Dari sana kamu menjalankan dungeon lima pemain dan raid sepuluh pemain, menantangnya lagi dalam mode heroik demi jarahan yang ditingkatkan, menghadapi bos dunia saat ia bangkit, menguji dirimu di arena, terjun ke delve bersama seorang pendamping di sisimu, dan mengejar jasa di Kitab Jasa untuk menanjaki peringkat realm.",
+      "a10": "Batasnya adalah level {cap}. Dari sana kamu menjelajahi dungeon lima pemain dan raid sepuluh pemain, menghadapinya lagi dalam mode heroik demi jarahan yang ditingkatkan, menuruni celah lantai demi lantai, menghadapi bos dunia ketika ia bangkit, menguji diri di arena atau di medan pertempuran Medan Thornhollow, memainkan satu musim Piala Lembah, menyelam ke delve bersama pendamping di sisimu, membawa sebuah profesi sampai ke kerajinan adikarya, mengoleksi tunggangan, dan mengejar jasa di Kitab Jasa untuk menanjak di papan peringkat.",
       "q11": "Bagaimana cara menemukan sebuah kelompok?",
-      "a11": "Undang siapa pun yang kamu temui ke sebuah kelompok, bertanyalah di obrolan, atau bekerja samalah di sebuah ruang bawah tanah. Sebagian besar dunia bisa dijalani sendiri, jadi membentuk kelompok adalah pilihan, bukan keharusan."
+      "a11": "Undang siapa pun yang kamu temui ke sebuah kelompok, bertanyalah di obrolan, atau bekerja samalah di sebuah ruang bawah tanah. Sebagian besar dunia bisa dijalani sendiri, jadi membentuk kelompok adalah pilihan, bukan keharusan.",
+      "q12": "Apakah ada toko berbayar?",
+      "a12": "Ada sebuah toko kosmetik opsional. Ia menjual tampilan: Skin senjata Gudang Senjata Musim 1, dibeli dengan Claudium, mata uang toko itu. Tak satu pun di dalamnya menambah statistik, kekuatan, atau perkembangan, dan sebuah Skin tidak pernah mengubah cara senjatamu menghantam, sehingga setiap perlengkapan yang penting tetap datang dari bermain.",
+      "q13": "Di mana saya bisa mendapatkan aplikasinya?",
+      "a13": "Versi peramban tidak membutuhkan apa pun sama sekali: buka situsnya dan mainkan. Jika kamu lebih suka memakai aplikasi, unduhan desktop untuk Windows, macOS, dan Linux ada di halaman Unduh situs permainan. Aplikasi native iOS dan Android sedang dikerjakan, dan sampai keduanya hadir, sebuah ponsel atau tablet memainkan versi peramban dengan kontrol sentuh penuh. Setiap versi masuk ke akun yang sama dan dunia yang sama, sehingga karaktermu mengikutimu.",
+      "q14": "Apa yang saya butuhkan untuk menjalankannya?",
+      "a14": "Sebuah peramban terbaru di laptop, desktop, ponsel, atau tablet. Pada peluncuran pertamamu, permainan membaca perangkatmu dan memilih tingkatan grafis yang sesuai, dari Rendah hingga Ultra, dan pilihan apa pun yang kamu buat sendiri selalu menang. Mouse dan papan ketik, kontrol sentuh, dan sebuah kontroler semuanya berfungsi. Halaman pengaturan dan kontrol memuat detailnya.",
+      "q15": "Apakah saya butuh akun?",
+      "a15": "Hanya untuk bermain daring. Dunia luring tidak meminta apa pun: pilih Luring di layar mulai dan tekan Main. Sebuah akun daring gratis, membutuhkan sebuah nama pengguna, sebuah kata sandi, dan sebuah alamat email untuk pemulihan akun, dan menyimpan karaktermu di server. Setelah kamu memilikinya, kamu bisa menyalakan autentikasi dua-faktor dari opsi.",
+      "q16": "Apa itu dunia?",
+      "a16": "Permainan daring berlangsung di dunia-dunia, dan masing-masing adalah salinan penuh dari permainan dengan pemainnya sendiri, Pasar Dunia miliknya sendiri, dan papan peringkatnya sendiri. Saat kamu masuk, Daftar Dunia menunjukkan seberapa ramai setiap dunia, dari Rendah hingga Penuh, sehingga kamu bisa memilih yang sepi untuk ruang gerak atau yang ramai untuk keramaian. Karaktermu tinggal di dunia tempat kamu membuatnya, dan kamu bisa memiliki karakter di lebih dari satu dunia.",
+      "q17": "Berapa banyak karakter yang bisa saya miliki, dan bisakah saya menghapus satu?",
+      "a17": "Hingga sepuluh karakter per dunia pada satu akun, dan kamu bisa memiliki karakter di lebih dari satu dunia. Untuk menghapus satu, hapus dari daftar karakter: karakter itu tidak boleh sedang berada di dalam dunia, dan kamu harus mengetik namanya untuk mengonfirmasi, itulah sebabnya sebuah salah ketik jari tidak bisa membuatmu kehilangan seorang pahlawan. Menghapus bersifat permanen. Barang-barang milik karakter itu ikut terhapus bersamanya, entri Pasar Dunia miliknya ditarik dari pasar, dan kotak surat Pos Gagak miliknya dikosongkan.",
+      "q18": "Bisakah saya mengganti nama karakter saya?",
+      "a18": "Tidak dengan sendirinya, jadi pilihlah satu yang kamu suka. Nama terdiri dari 2 hingga 16 huruf, dimulai dengan sebuah huruf, dan mengizinkan spasi, tanda hubung, serta apostrof, dan setiap nama unik di dunianya masing-masing tanpa memandang bagaimana ia dikapitalisasi. Nama yang melanggar kode etik ditolak. Satu-satunya saat kamu diminta mengganti nama adalah ketika seorang moderator mengharuskannya. Menutup akunmu bisa melepaskan namanya untuk pemain lain, dan sekadar tidak bermain untuk sementara waktu tidak pernah melakukannya: akun yang tidak aktif tetap menyimpan namanya.",
+      "q19": "Apa yang terjadi jika saya terputus?",
+      "a19": "Karaktermu tetap berada di dalam dunia selama sekitar lima menit dan permainan berusaha menyambung kembali dengan sendirinya, sehingga sinyal yang terputus, sebuah laptop yang ditutup, atau sebuah muat ulang biasanya membawamu kembali persis ke tempatmu semula, dalam sesi yang sama. Karena karaktermu memang benar-benar masih berdiri di sana, memutuskan koneksi bukanlah cara untuk lolos dari sebuah pertarungan. Memilih Keluar dari menu permainan langsung meninggalkan dunia alih-alih menunggu habis jendela waktu itu.",
+      "q20": "Saya menemukan bug. Bagaimana cara melaporkannya?",
+      "a20": "Dari dalam permainan daring, buka menu dengan Esc dan pilih Laporkan Bug. Jelaskan apa yang terjadi dan kirimkan: duniamu, karaktermu, dan tempatmu berdiri ikut terkirim secara otomatis, bersama detail versi dan perangkatmu, dan kamu bisa mencentang Sertakan Tangkapan Layar untuk melampirkan gambar dari apa yang sedang kamu lihat. Jika kamu mengirim beberapa laporan berturut-turut, kamu mungkin diminta menunggu sebentar sebelum mengirim yang berikutnya."
     },
     "classList": {
       "heading": "Sembilan kelas",
@@ -3869,7 +4795,8 @@ export const id_ID: EnTranslations = {
     "resourceName": {
       "rage": "Amukan",
       "mana": "Mana",
-      "energy": "Energi"
+      "energy": "Energi",
+      "focus": "Fokus"
     },
     "classPage": {
       "back": "Semua kelas",
@@ -3882,7 +4809,25 @@ export const id_ID: EnTranslations = {
       "fullKitHeading": "Perlengkapan lengkap",
       "fullKitNote": "Perangkat yang dipelajari kelas ini seiring naik level, sesuai urutan kemunculannya. Talenta memberi beberapa kemampuan tambahan dan menentukan mana yang mengusung rakitanmu.",
       "petsHeading": "Iblis",
-      "petsNote": "Penyihir Iblis memanggil iblis untuk bertarung di sisinya, masing-masing cocok untuk tugas berbeda."
+      "petsNote": "Penyihir Iblis memanggil iblis untuk bertarung di sisinya, masing-masing cocok untuk tugas berbeda.",
+      "mageLore": "Penyihir menundukkan Api dan Beku untuk membinasakan musuh, memanggil Elemental Air, membekukan ancaman di tempat, atau melipat waktu itu sendiri untuk melindungi dan memulihkan sekutu mereka.",
+      "mageEleHeading": "Elemental Air",
+      "mageEleNote": "Seorang Penyihir Beku mempelajari cara memanggil Elemental Air, pendamping jarak jauh yang melontarkan Peluru Air ke targetmu dengan sendirinya. Ia menjawab bilah peliharaan seperti binatang Pemburu atau iblis Penyihir Iblis, meski ia tidak dirancang untuk menahan target untukmu.",
+      "mageEleJet": "Pancaran Air menempati bilah peliharaan sebagai tombolnya sendiri: klik untuk mengunci seberkas sinar pembeku pada satu musuh, atau klik kanan (tekan dan tahan di perangkat seluler) agar elemental itu menembakkannya sendiri kapan pun sudah siap.",
+      "formsHeading": "Perubahan Wujud",
+      "formsNote": "Seorang druid bertarung dengan berganti wujud. Sebagian besar kemampuan druid terikat pada satu wujud tertentu, jadi wujud yang sedang kamu tempati menentukan apa yang bisa kamu rapalkan, dan berganti wujud menghabiskan sedikit mana. Kamu bisa berubah wujud masuk atau keluar dari pertempuran, sesering yang kamu mau.",
+      "formsMoonwing": "Druid Keseimbangan mendapat satu wujud lagi, Wujud Burung Bulan, wujud perapal yang menjadi cara bertarung druid Keseimbangan. Inilah satu-satunya wujud hewan yang tetap mempertahankan mantramu, dan tongkat sihirmu hanya berfungsi dalam wujud ini atau dalam wujud perapal normalmu.",
+      "formLine": {
+        "form_bear": "Wujud tank: kulit tebal, Amarah alih-alih mana, dan ancaman ekstra agar musuh terus menyerangmu.",
+        "form_cat": "Wujud kerusakan jarak dekat: Energi dan poin combo, seperti penyamun, dan ancaman yang jauh lebih sedikit.",
+        "form_travel": "Wujud jelajah: jauh lebih cepat melintasi daratan, tetapi tak ada kemampuan lain sampai kamu keluar dari wujud ini."
+      },
+      "mageEleSummon": "Sebuah mantra Beku yang memanggil elemental itu ke sisimu dan mengarahkannya pada targetmu.",
+      "formName": {
+        "form_bear": "Wujud Bruin",
+        "form_cat": "Wujud Serigala",
+        "form_travel": "Wujud Fleet"
+      }
     },
     "classHook": {
       "warrior": "Petarung garis depan tak kenal lelah yang mengubah tiap pukulan yang diterima menjadi bahan bakar untuk pukulan berikutnya.",
@@ -3920,19 +4865,32 @@ export const id_ID: EnTranslations = {
       "none": "Tak ada kelas yang cocok dengan semua saringan. Bersihkan satu untuk melihat lebih banyak."
     },
     "abilityHook": {
+      "evil_eye": "Menandai musuh yang tindakan dan penderitaannya akan mengisi Kecaman-mu.",
       "heroic_strike": "Mengantrekan ayunan lebih berat yang menghabiskan amarah pada pukulanmu berikutnya.",
       "revenge": "Menyapu musuh di depanmu dan dapat menjadi gratis setelah menghindar atau menangkis.",
       "hamstring": "Melumpuhkan gerakan musuh agar tidak dapat melarikan diri.",
       "battle_shout": "Pekik penggugah semangat yang menaikkan daya serang seluruh kelompok.",
       "charge": "Menerjang musuh yang jauh untuk membuka pertarungan dengan pingsan singkat.",
       "thunder_clap": "Menghantam segala sesuatu di sekitarmu dan melambatkan serangan mereka.",
-      "seal_of_righteousness": "Mengisi ayunanmu dengan kerusakan Suci, lalu habiskan dengan Vonis.",
+      "seal_of_righteousness": "Meresapi ayunan jarak dekatmu dengan kerusakan Suci tambahan.",
       "holy_light": "Penyembuhan mantap berukuran besar untuk memenuhi nyawa sekutu atau dirimu sendiri.",
       "devotion_aura": "Penguat-diri tahan lama yang menaikkan zirah sehingga pukulan terasa lebih ringan.",
       "judgement": "Menghabiskan Segel aktifmu untuk menghantam musuh dari jarak dekat.",
+      "hammer_of_wrath": "Mengeksekusi musuh yang terluka dari jauh, atau musuh mana pun selama sayapmu aktif.",
+      "avenging_wrath": "Memberi 10 Pengabdian, lalu melipatduakan Pengabdian yang dihasilkan kemampuan selama lima belas detik.",
+      "bastion_sweep": "Menyapukan perisaimu menembus kelompok untuk merebut ancaman dan menumpuk Pengabdian.",
+      "oath_chain": "Menyeret musuh jauh ke dalam kawananmu dan memperlambat pelariannya.",
+      "veilbound_march": "Menembus satu kelompok untuk menandainya, menumpulkan kerusakannya terhadapmu, dan mengunci ancaman.",
+      "holy_shield": "Membelanjakan Pengabdian untuk jendela tangkis aktif, penyerapan, dan denyut ancaman.",
+      "consecration": "Menguasai tanah di sekitarmu dengan kerusakan Suci dan ancaman yang berkelanjutan.",
+      "hammer_of_justice": "Menghentikan satu musuh dengan pingsan singkat yang dapat diandalkan.",
+      "lay_on_hands": "Memulihkan nyawa dalam jumlah besar ketika sekutu nyaris tumbang.",
       "blessing_of_might": "Menaikkan daya serang sasaran kawan, bagus dirapalkan sebelum menarik musuh.",
       "divine_protection": "Perisai pelindung sekejap untuk menyerap kerusakan saat keadaan memburuk.",
       "raptor_strike": "Ayunan jarak dekat yang keras untuk saat sesuatu memperpendek jarak denganmu.",
+      "pack_command": "Memerintahkan pendampingmu menyerang dan menumpuk Keganasan Kawanan. Setiap tumpukan membuat hewan peliharaanmu memberi 10% lebih banyak kerusakan, hingga 30%, sebelum Lepaskan Sang Buas membelanjakan tumpukannya.",
+      "stampede": "Memanggil tiga binatang buas untuk menyerang selama 12 detik. Gunakan pada Keganasan Kawanan penuh agar mereka mempertahankan bonus kerusakan maksimum sepanjang pemanggilan.",
+      "measured_shot": "Tembakan jarak jauh yang disengaja dan memulihkan fokus untuk seranganmu yang lebih berat.",
       "aspect_of_the_hawk": "Kuda-kuda yang kamu jaga untuk mempertajam daya serang jarak jauhmu.",
       "serpent_sting": "Menanamkan bisa yang menguras kerusakan alam seiring waktu.",
       "arcane_shot": "Tembakan seketika dari kejauhan untuk tambahan kerusakan cepat.",
@@ -3951,11 +4909,21 @@ export const id_ID: EnTranslations = {
       "power_word_shield": "Menyelubungi sekutu dengan perisai yang menyerap pukulan sebelum mengena.",
       "renew": "Penyembuhan yang menggerogoti seiring waktu, bagus dirapalkan lalu terus bergerak.",
       "lightning_bolt": "Rapalan kerusakan Alam jarak jauh, andalanmu dari kejauhan.",
+      "chain_lightning": "Mengenai satu sasaran dan melompat ke dua musuh di dekatnya, menumpuk satu Guruh untuk seluruh rapalan.",
+      "thunder_reservoir": "Menyimpan petir sampai Sentakan Bumi atau Gempa Bumi dapat melepaskan imbalan berkekuatan penuh.",
       "rockbiter_weapon": "Mengisi senjatamu sehingga tiap ayunan menghantam lebih keras dalam jarak dekat.",
       "healing_wave": "Penyembuhan utamamu, pemulih langsung untuk dirimu atau sekutu.",
       "earth_shock": "Kejutan seketika untuk kerusakan Alam cepat saat kamu membutuhkannya sekarang.",
       "lightning_shield": "Mengisi tubuhmu sehingga penyerang menerima kerusakan Alam saat mereka memukulmu.",
       "flame_shock": "Bakaran seketika yang menghantam di awal dan terus menghanguskan seiring waktu.",
+      "galeheart_weapon": "Mengilhami kedua senjata dengan angin badai dan menghadiahi ritme serangan yang stabil.",
+      "warspirit_cadence": "Mengubah irama senjata yang mantap menjadi Gema Hati Badai dan peluang mantra seketika.",
+      "stormsurge": "Kadang mengembalikan Serangan Leluhur lebih awal setelah kamu membelanjakan peluang Pertanda Badai.",
+      "lifespring_weapon": "Mengilhami senjatamu dengan air pemulih dan memperkuat aliran penyembuhan berkelanjutan.",
+      "tidecall": "Memanggil pasang untuk memperkuat rangkaian mantra penyembuhan berikutnya.",
+      "ancestor_return": "Menghidupkan kembali setiap anggota kelompok atau serbuan yang gugur setelah rapalan panjang di luar pertempuran.",
+      "stoneward": "Mendirikan perisai batu bermuatan yang mengubah damage diterima menjadi pemulihan.",
+      "primal_exaltation": "Melepaskan kekuatan elemen spesialisasimu untuk sesaat.",
       "fireball": "Serangan api utamamu, menghantam sekaligus meninggalkan sasaran terbakar.",
       "fireball_form": "Jadilah bara hidup untuk melintasi medan terbuka dengan kecepatan tinggi.",
       "frost_armor": "Penguat-diri tahan lama yang mengeraskan zirahmu sebelum pertarungan.",
@@ -3972,7 +4940,7 @@ export const id_ID: EnTranslations = {
       "conjure_water": "Menciptakan minuman yang memulihkan mana, sehingga kamu bisa mengisi ulang di sela tarikan.",
       "conjure_food": "Menciptakan makanan yang memulihkan nyawa saat kamu duduk untuk menyantapnya.",
       "shadow_bolt": "Anak panah bayangan yang kamu rapalkan ke sasaran, serangan andalanmu.",
-      "summon_imp": "Memanggil Emberkin yang melontarkan panah api ke musuh dari kejauhan.",
+      "summon_imp": "Memanggil Emberkin yang merapal Baut Fel ke musuh dari kejauhan.",
       "demon_skin": "Penguat-diri tahan lama yang mengeraskan kulitmu dan menambah zirah.",
       "immolate": "Membakar sasaran untuk hantaman pembuka dan kobaran yang terus membara.",
       "corruption": "Membusukkan sasaran dengan bayangan yang menggerogoti sementara kamu melakukan hal lain.",
@@ -3981,17 +4949,14 @@ export const id_ID: EnTranslations = {
       "healing_touch": "Penyembuhan besar sasaran tunggal dengan rapalan panjang, untuk memenuhi nyawa seseorang.",
       "mark_of_the_wild": "Berkah tahan lama yang kamu pasang pada dirimu atau sekutu sebelum pertarungan.",
       "moonfire": "Menghantam seketika dan meninggalkan sasaran terbakar, bagus sambil bergerak.",
+      "moonseed": "Menambah tahap Pasang Rembulan dan memperpanjang Badai Rembulan selama kamu dalam Wujud Burung Bulan.",
       "rejuvenation": "Dirapalkan seketika dan menyembuhkan sekutu seiring waktu, sehingga kamu bisa terus bertindak.",
       "thorns": "Melindungi sekutu sehingga penyerang jarak dekat melukai diri sendiri saat memukul."
     },
     "petHook": {
-      "emberkin": "Iblis pelontar api jarak jauh yang menggerus musuh dari jarak aman.",
-      "gloomshade": "Iblis kokoh yang memprovokasi dan menahan serangan agar kamu bisa memantra dengan tenang.",
-      "duskborn": "Iblis jarak dekat yang gesit, memukul keras tetapi mudah tumbang di bawah tekanan.",
-      "spellhound": "Penyerang bayangan yang memburu pemantra musuh.",
-      "warfiend": "Petarung jarak dekat yang tangguh, serba bisa begitu kamu mampu memanggilnya.",
-      "pyre_colossus": "Raksasa kekar dengan serangan jarak dekat yang menghancurkan, dipanggil demi kekuatan murni.",
-      "wraithborn": "Perapal elite yang menghujankan bayangan berat dari kejauhan."
+      "emberkin": "Iblis jarak jauh yang Baut Fel khasnya menggerogoti musuh dari jarak aman.",
+      "gloomshade": "Iblis tank yang tangguh, yang mengejek dan memakai Rantai Jurang untuk menyeret musuh biasa yang kabur kembali ke jangkauan; bos menahan tarikannya.",
+      "pyre_colossus": "Raksasa kekar dengan serangan jarak dekat yang menghancurkan, dipanggil demi kekuatan murni."
     },
     "bestiary": {
       "heading": "Bestiari",
@@ -4059,17 +5024,41 @@ export const id_ID: EnTranslations = {
         "desc": "Penyerbu dari luar rift, sepenuhnya api dan kebencian. Di mana pun satu berdiri, sebuah celah tak pernah jauh."
       }
     },
+    "mountsPage": {
+      "heading": "Tunggangan dan menunggang",
+      "intro": "Tunggangan adalah cara yang lebih cepat untuk melintasi dunia, dan itulah keseluruhannya. Kamu belajar menunggang di kandang, membeli tali kekang pertamamu, dan setiap jalan sesudahnya menjadi lebih pendek.",
+      "whatHeading": "Apa itu tunggangan",
+      "whatBody": "Tunggangan adalah seekor binatang yang kamu tunggangi, dan yang diberikannya adalah kecepatan. Tanpa zirah, tanpa kerusakan, tanpa statistik: ia membawamu melintasi tanah lebih cepat, dan melompat sedikit lebih tinggi saat kamu melompat, dan itulah keseluruhan kesepakatannya. Setiap tunggangan dalam permainan ini adalah tunggangan darat, sehingga tidak ada yang terbang, dan tidak satu pun dari mereka berenang.",
+      "learnHeading": "Belajar menunggang",
+      "learnBody": "Menunggang adalah kecakapan yang kamu beli sekali saja, dan ia terbuka pada level {level}. Marla Hitchen, sang Kepala Kandang, menjaga Kandang Galecrest di perbukitan, dan ia menjual Pelatihan Menunggang seharga 80 emas. Pembelian tunggal itulah yang membuatmu bisa duduk di atas tunggangan sama sekali, dan ia tetap menjadi milikmu selamanya.\n\nBegitu kamu memilikinya, Marla punya misi untukmu: Pelajaran Menunggang Kuda. Ambil misi itu, ikuti petunjuk arah menuju kotak bercahaya di belakang gerbang start, dan tekan Mulai Balapan. Ia meminjamkanmu seekor Valorsteed latihan untuk pelajaran ini, sehingga pelajaran itu sendiri tidak membebanimu apa pun. Tunggangi lintasannya, selesaikan, dan kembalilah kepadanya untuk koin dan pengalamanmu. Kuda pinjaman itu kembali ke kandang sesudahnya, sehingga pelajaran itu mengajarkanmu cara duduk di pelana, bukan memberimu seekor kuda.",
+      "whereHeading": "Di mana menemukannya",
+      "whereBody": "Kandang Galecrest ditandai pada peta Puncak Angin, di perbukitan antara Tebing Curam dan Ladang Bangkai Kapal. Marla berdiri di samping kandang, menghadap arena balap.",
+      "firstHeading": "Tunggangan pertamamu",
+      "firstBody": "Valorsteed adalah satu-satunya tunggangan yang dijual di mana pun di dunia ini. Begitu kamu mempelajari Menunggang, Marla akan menjual Tali Kekang Valorsteed kepadamu seharga 10 emas, dan tali kekang itu menjadi milikmu untuk disimpan. Setiap tunggangan lain didapat di luar sana di dunia, sehingga kuda ini adalah tempat hampir setiap penunggang memulai.",
+      "rideHeading": "Naik dan turun dari tunggangan",
+      "rideBody": "Tidak ada jendela tunggangan dan tidak ada favorit yang perlu diatur, karena tali kekanglah tunggangannya. Gunakan satu tali kekang dari tasmu atau dari slot bilah aksi dan kamu menunggangi tunggangan itu. Memanggilnya makan waktu sesaat, panggilan singkat alih-alih instan, sehingga ia tidak akan menyelamatkanmu dari tarikan buruk. Turun dari tunggangan bersifat instan dan tidak pernah terhalang.\n\nGunakan tali kekang yang sedang kamu tunggangi dan kamu menyimpan tunggangan itu kembali. Gunakan tali kekang lain saat sedang menunggang dan kamu langsung berpindah ke tunggangan itu, tanpa ada yang perlu dipanggil di antaranya. Tombol Naiki / Turun, tombol backtick secara bawaan, hanya pernah menurunkanmu: itu jalan turun, bukan jalan naik. Satu pengecualiannya adalah pelajaran menunggang, tempat tombol yang sama memanggil kuda yang dipinjamkan Marla, karena kuda pinjaman tidak punya tali kekang untuk diklik. Di ponsel atau tablet, tombol Naiki di menu Lainnya bekerja dua arah, meski ia memanggil tali kekang pertama yang ada di tasmu alih-alih yang kamu pilih, jadi ketuk tali kekangnya sendiri saat kamu menginginkan tunggangan tertentu.",
+      "breaksHeading": "Yang membuatmu turun dari tunggangan",
+      "breaksBody": "Air selalu menang. Tunggangi apa pun yang cukup dalam untuk berenang dan kamu langsung turun, karena tidak ada tunggangan darat yang berenang, dan mati menjatuhkanmu di tempat kamu terjatuh. Kamu tidak bisa memanggil satu pun saat sedang bertarung, saat sedang mati atau kembali sebagai roh, atau kapan pun selama pertandingan Medan Thornhollow, yang seluruhnya bertarung dengan berjalan kaki sejak masa bersiap hingga pertahanan terakhir: jika kamu sedang menunggang saat menunggu, didudukkan ke dalam pertandingan akan menurunkanmu bersamanya. Melangkah ke pertarungan atau ke air di tengah pemanggilan juga membatalkannya.\n\nSebagian besar hal yang kamu lakukan juga menurunkanmu. Mengayunkan senjata, memulai sebuah rapalan, memanen simpul, memancing, membuat, memantra, menyalvasi, dan mengisi ulang alat profesi, semuanya menurunkanmu dari tunggangan begitu kamu memulainya, jadi bersiaplah turun di setiap urat. Memanggil tunggangan juga melepaskan wujud pergeseran bentuk apa pun yang sedang kamu pegang: kamu tidak akan pernah dalam wujud sekaligus menunggang.",
+      "speedHeading": "Kecepatan dan tingkatan",
+      "speedBody": "Kecepatan adalah satu-satunya hal yang membedakan satu tunggangan dari yang lain. Valorsteed yang kamu beli dari Marla menetapkan kecepatan dasarnya, dan tunggangan yang kamu kumpulkan di dunia luar melaju di atasnya: makin langka tali kekangnya, makin cepat larinya, dalam beberapa langkah yang jelas alih-alih peningkatan yang mulus. Tidak ada tingkatan kedua Menunggang untuk dilatih dan tidak ada peningkatan untuk dibeli sesudahnya. Kamu membayar Menunggang satu kali, dan sejak saat itu tali kekang yang kamu pakai menentukan seberapa cepat kamu bepergian.",
+      "collectHeading": "Dari mana tunggangan yang lebih langka berasal",
+      "collectBody": "Di luar konter Marla, tali kekang ditemukan, bukan dibeli. Ia jatuh dari bos terakhir dungeon lima pemain dan raid pada mode heroik, serta dari penuntasan rift, tempat makin sulit rift yang kamu tuntaskan, makin langka tali kekang yang bisa ditinggalkannya. Semuanya sengaja dibuat langka dan tidak ada sesi yang menjaminnya, jadi cara yang bijak untuk memburu tunggangan adalah membawa buruan itu serta pada sesi yang toh sudah kamu jalani. Halaman ini tidak akan memberitahumu tunggangan mana tergantung di bos yang mana: bagian itu adalah milikmu untuk cari tahu sendiri.",
+      "raceHeading": "Balapan kandang",
+      "raceBody": "Lintasan lompat rintangan di padok Marla terbuka untuk siapa saja, kapan saja, tidak hanya selama pelajaran berlangsung. Duduki sebuah tunggangan, berdirilah di kotak bercahaya di belakang gerbang, dan tekan Mulai Balapan. Sebuah hitungan mundur menahanmu tetap diam, lalu jam mulai berjalan: lewati ketujuh lompatan dan tunggangi kembali keluar melewati gerbang sebelum waktunya habis.\n\nSebuah lompatan hanya dihitung jika kamu benar-benar berada di udara melewati mistar, sehingga sekadar menerobos begitu saja tidak menghitung apa pun. Kamu boleh melewatinya dalam urutan apa pun dan dari sisi mana pun, dan satu yang terlewat bukan akhir dari segalanya: putar balik dan coba lagi. Mati, turun dari tunggangan, atau meninggalkan padok mengakhiri percobaan itu, begitu pula membiarkan waktunya habis, yang menurunkanmu dari pelana di tempat kamu berdiri; membatalkannya sendiri hanya menghentikan hitungan waktu. Tidak ada yang menghalangimu memulai lagi. Tidak ada biaya, tidak ada waktu tunggu, dan tidak ada hadiah selain waktu itu sendiri, dan berapa pun jumlah penunggang bisa menjalani lintasan itu sekaligus tanpa saling menghalangi.",
+      "goodsHeading": "Tali kekang adalah barang biasa",
+      "goodsBody": "Tunggangan adalah sebuah item, yang menjadikannya sesuatu yang bisa digerakkan ekonomi. Kamu memiliki sebuah tunggangan selama tali kekangnya berada di tasmu atau di bankmu, meski tali kekang yang disimpan di bank tetap menjadikan tunggangan itu milikmu tanpa membiarkanmu menungganginya: untuk memanggil binatang itu kamu harus membawa tali kekangnya. Tali kekang milik pemain tidak pernah soulbound, sehingga ia bisa diperdagangkan, dikirim lewat surat, dan didaftarkan di Pasar Dunia seperti temuan lainnya, kecuali item itu sendiri menyatakan sebaliknya. Ada dua hal yang layak diketahui sebelum kamu melepaskannya: tidak ada penjaja yang akan pernah membeli kembali sepasang tali kekang, sehingga sebuah tunggangan adalah pembelian yang kamu simpan atau teruskan, bukan sesuatu yang bisa diuangkan, dan jika tali kekang itu meninggalkan tasmu dan bankmu sekaligus saat kamu sedang menungganginya, diperdagangkan, dikirim lewat surat, atau dijual di pasar, tunggangan itu ikut pergi bersamanya dan kamu diturunkan di tempat kamu berdiri."
+    },
     "worldPage": {
       "heading": "Dunia",
-      "intro": "World of ClaudeCraft adalah satu daratan menyambung yang kamu lintasi dengan berjalan kaki, tiga zona terbentang dari selatan ke utara. Tidak ada perjalanan kilat, jadi pengembaraan itu sendiri bagian dari petualangan.",
+      "intro": "World of ClaudeCraft adalah satu daratan bersambung yang kamu seberangi dengan berjalan kaki. Jalan tua membentang dari selatan ke utara melewati lembah awal, rawa, dan puncak, dan terus mendaki melampauinya ke cekungan di baliknya serta negeri salju di puncak peta. Sederet alam yang lebih tinggi terbuka dari jalan itu ke barat dan sederet lagi ke timur, dan sebuah pulau terletak di lepas pantai timur Lembah. Tidak ada perjalanan cepat, tidak ada jalur terbang, dan tidak ada kereta: setiap perjalanan ditempuh dengan berjalan atau berkuda, jadi tibanya adalah bagian dari petualangan.\n\nDaratan itu juga menghitung waktu. Siklus siang dan malam berjalan di atas jam sungguhan yang dibagi semua orang di duniamu, sehingga langit beranjak dari fajar ke tengah hari lalu ke senja dan gelap untuk kalian semua sekaligus, bulan datang dan pergi melalui fase-fasenya, dan cahaya di tanah berubah bersamanya. Piringan di sekeliling peta kecilmu adalah tempat kamu membaca jam.",
       "hub": "Markas utama",
-      "mapHeading": "Jalan ke utara",
-      "mapSub": "Tiga zona, dari selatan ke utara, masing-masing setingkat lebih tinggi dalam level. Ikuti jejak misi dan daratan akan membawamu dari lembah ke puncak.",
+      "mapHeading": "Jalan dan alam-alam di baliknya",
+      "mapSub": "Jejak misi membentang dari selatan ke utara di tengah peta: lembah, rawa, puncak, dan terus melampauinya ke cekungan serta salju. Alam-alam lain terbuka di sepanjang jalan itu, bukan sesudahnya, lewat gerbang di timur dan barat jalan rawa, sementara pulau Farshore dicapai dari pantai timur Lembah. Yang menahanmu dari alam-alam jauh adalah pita levelnya, bukan perjalanannya: lima di antaranya berbagi pita tertinggi, jadi begitu kamu siap kamu bisa mengambilnya dalam urutan apa pun. Farshore adalah pengecualian, negeri berlevel rendah yang bisa kamu kunjungi sejak awal.",
       "places": "Tempat-tempat menonjol",
       "residents": "Siapa yang akan kamu temui",
       "valeBlurb": "Lembah awal yang hijau, tempat para pahlawan baru mengasah diri melawan serigala dan bandit di sekitar kota Eastbrook.",
       "marshBlurb": "Negeri yang tenggelam penuh kabut dan reruntuhan. Mudfin berkerumun di perairan dangkal dan sesuatu yang lebih tua bergerak di bawah air, diawasi dari kota-jembatan Fenbridge.",
-      "peaksBlurb": "Punggung bukit yang terkikis angin dan bekas tambang tua yang menanjak ke bahaya tertinggi dan terdingin di alam ini, dijaga oleh pos Highwatch.",
+      "peaksBlurb": "Punggung bukit yang dikikis angin dan galian tambang tua yang menanjak ke bahaya terberat di jalan awal, dipertahankan oleh pos Highwatch.",
       "duskBlurb": "Sebuah lembah senja abadi di bawah pohon agung Eldergleam, tempat reruntuhan kristal bersinar dan udara berdengung dengan sihir kuno.",
       "emberBlurb": "Padang tandus yang diterangi badai, berisi abu dan bloodglass, tempat drake-drake berputar di atas kaldera dan api troll membara di antara gumuk pasir, diawasi dari kota gerbang Wyrmwatch.",
       "frostBlurb": "Keheningan salju dan pohon pinus gelap di bawah aurora, tempat hawa dingin itu sendiri terasa terjaga dan Icemantle menjaga apinya tetap menyala.",
@@ -4122,13 +5111,25 @@ export const id_ID: EnTranslations = {
       "gladeTitle": "Sebuah sudut yang tenang: Brightwood Glade",
       "gladeBody": "Tidak setiap kisah di Lembah ini tentang yang mati. Di utara, sebuah hutan kecil yang dibasuh sinar matahari bernama Brightwood Glade menjaga iramanya sendiri yang lebih lembut, serba jalan setapak yang tenang dan cahaya berbintik di bawah dahan. Ia adalah penyeimbang lembut bagi jejak yang sedang kamu ikuti, dan layak dikunjungi saat jalan memberimu ruang untuk mengembara.",
       "worldBossTitle": "Saat puncak terjaga: sang bos dunia",
-      "worldBossBody": "Tinggi di Thornpeak, badai di atas Stormcrag kadang menghimpun sebuah wujud. Thunzharr, sang Puncak yang Terjaga bangkit di sana dengan irama tetap, sesosok elemental sekuat raid yang dilawan di dunia terbuka oleh siapa pun yang menjawab panggilan, dan ia tumbuh makin perkasa makin banyak penantang yang berdiri melawannya. Setiap orang yang bergabung dalam pertarungan memperoleh undian rampasannya sendiri, dihormati dengan ketentuan kunci raid, dan kejatuhannya bertahan cukup lama bagi yang gugur untuk berlari kembali dan menuntut haknya. Kumpulkan lebih banyak pedang daripada yang kamu kira kamu butuhkan."
+      "worldBossBody": "Tinggi di Thornpeak, badai di atas Stormcrag kadang menghimpun sebuah wujud. Thunzharr, sang Puncak yang Terjaga bangkit di sana dengan irama tetap, sesosok elemental sekuat raid yang dilawan di dunia terbuka oleh siapa pun yang menjawab panggilan, dan ia tumbuh makin perkasa makin banyak penantang yang berdiri melawannya. Setiap orang yang bergabung dalam pertarungan memperoleh undian rampasannya sendiri, dihormati dengan ketentuan kunci raid, dan kejatuhannya bertahan cukup lama bagi yang gugur untuk berlari kembali dan menuntut haknya. Kumpulkan lebih banyak pedang daripada yang kamu kira kamu butuhkan.",
+      "farshoreBlurb": "Sebuah pulau berisi jeritan camar dan angin asin di lepas pesisir timur Lembah, tempat rift terkoyak terbuka tanpa peringatan dan kota nelayan Gullhaven menjaga pesisirnya.",
+      "farshoreGreeting": "Kau datang lewat Ferrywalk? Berarti kau yang pertama dalam seminggu, dan Sang Penjaga akan ingin memeriksamu.",
+      "farshoreGreeter": "Penjaga Lonceng Tam, Dermaga",
+      "farshorePlaceNotes": "Gullhaven adalah satu-satunya kota sekaligus benteng pertahanan pulau ini. Dermaga adalah tempat Ferrywalk mencapai daratan, dengan sebuah lonceng waspada berdiri di atas tanjungnya; Padang Rumput Jaga menguasai dataran tinggi di tenggara kota, tempat seorang pengawas rift mendengarkan celah berikutnya; Tebing Terbelah retak terbuka di ujung selatan pulau; dan Ladang Rift adalah barisan gandum yang porak-poranda di timur Gullhaven, masih dipenuhi makhluk yang datang lewat celah di sana.",
+      "travelTitle": "Berkeliling",
+      "travelBody": "Setiap jalan di realm ini ditempuh dengan berjalan kaki atau berkuda. Tidak ada jalur terbang, tidak ada taksi, dan tidak ada jaringan teleportasi: peta ini adalah satu daratan menyambung, dan setiap sambungannya adalah sesuatu yang bisa kamu injak. Punggung bukit memisahkan satu realm dari yang berikutnya, dan di tempat dua realm berbagi sebuah punggung bukit, jalan itu mendaki lewat sebuah celah gunung. Namun tidak setiap perbatasan bekerja seperti itu. Di utara, sebuah jalan layang panjang membawa jalan itu keluar melintasi air dari Ceruk Terselubung menuju negeri bersalju di seberangnya, dan di selatan sana sebuah gosong pasir alami yang tipis bernama Ferrywalk membentang ke timur dari pesisir Lembah menuju Dermaga di pulau Pesisir Jauh, yang sama sekali tak memiliki perbatasan darat. Dan hanya ada satu pintu sejati di seluruh dunia luar: sebuah selubung senja tinggi di Thornpeak yang terbuka menuju Ceruk Terselubung. Punggung bukit selatan sang Ceruk tertutup rapat tanpa celah yang menembusnya, sehingga selubung itulah caramu pertama kali masuk, dan ia menutup di belakangmu dalam perjalanan kembali.\n\nKe mana pun kamu tumbang, perjalanan kembali selalu singkat. Setiap zona menyimpan setidaknya satu kuburan dengan Sang Penjaga Pucat melayang di atas bebatuannya, dan roh yang dilepaskan bangkit di kuburan terdekat.\n\nPeta ini tidak berakhir pada dinding tak kasatmata. Daratan berakhir menjadi pantai dan tanjung, lalu menjadi laut lepas. Penyeberangan yang memang dimaksudkan dunia ini untuk kamu renangi, selat dan rawa di antara satu realm dengan yang berikutnya, tenang dan aman untuk diseberangi. Namun berenanglah menuju laut lepas dan jarak itu sendiri akan mendorongmu kembali: kamu diperingatkan, dan diperingatkan lagi, dan jika kamu terus berenang, laut akan menguras tenagamu hingga membunuhmu. Menyelam memiliki batasnya sendiri, karena napasmu habis di bawah permukaan, jadi naiklah untuk bernapas dan berbaliklah saat air itu menyuruhmu.",
+      "mountsTitle": "Tunggangan",
+      "mountsBody": "Menunggang adalah satu hal yang membuat dunia terasa lebih kecil, dan itu adalah sebuah pelajaran sebelum menjadi seekor kuda. Pada level 20, Kepala Kandang Marla akan menerimamu: kamu membeli keahlian menunggang darinya, dan pelajaran menunggangnya sendiri gratis, sebuah lintasan lompat yang kamu tempuh mengelilingi padoknya di atas seekor kuda pinjaman. Lulusi lintasan itu, serahkan hasilnya, dan Valorsteed pertamamu menjadi milikmu, dan sejak saat itu kamu melintasi realm dengan jelas lebih cepat di atas kuda. Kecepatan adalah satu-satunya hal yang diberikan sebuah tunggangan: yang lebih langka, yang datang dari konten tersulit, malah lebih cepat lagi, tetapi tak satu pun dari mereka mengubah kekuatanmu dalam pertarungan. Naiki dan turunlah dengan tombol yang terikat dalam kontrolmu. Kamu tidak bisa menaikinya selama berada dalam pertempuran, dan mengayunkan senjata, merapal mantra, mengarungi air, atau tumbang dalam pertarungan semuanya akan membuatmu kembali berdiri di atas kakimu sendiri.",
+      "mountsMore": "Selengkapnya tentang tunggangan",
+      "riftTitle": "Portal rift",
+      "riftBody": "Sesuatu terus merobek celah di realm ini. Portal rift terbuka dengan sendirinya di dunia luar, tidak pernah di ketiga zona pada jalan awal, tetapi di setiap realm lain di luarnya dan di Pesisir Jauh, dan seluruh realm mendengar kabarnya begitu satu terkoyak terbuka. Setiap portal membawa sebuah peringkat, dan peringkat yang lebih tinggi berarti penjelajahan yang lebih sulit dan lebih kaya. Sebuah portal adalah peristiwa bersama: kelompok mana pun bisa melangkah masuk dan mendapatkan sesi tersendiri di dalamnya, tetapi hanya satu kelompok yang akan pernah menuntaskannya lebih dulu, sehingga sebuah rift yang baru terbuka layak untuk segera dikejar. Kamu harus berlevel 20 untuk memasukinya, dan jika tak seorang pun menjawab tepat waktu, rift itu runtuh dengan sendirinya.",
+      "riftMore": "Selengkapnya tentang rift"
     },
     "questsPage": {
       "heading": "Misi",
       "intro": "Misi adalah jantung dunia ini dan cara tercepat untuk naik level. Inilah cara kerjanya.",
       "acceptTitle": "Menemukan dan menerima",
-      "acceptBody": "Orang dengan penanda di atas kepalanya punya tugas untukmu. Bicaralah dengan mereka untuk menerima misi. Di Eastbrook, Marshal Redbrook menunggu dengan Wolves at the Door, salah satu misi pertama yang bisa kamu ambil.",
+      "acceptBody": "Orang dengan penanda di atas kepalanya punya pekerjaan untukmu, dan penandanya memberitahu jenis apa. Tanda seru emas berarti misi yang bisa kamu ambil sekarang juga, dan tanda tanya emas berarti misi yang sudah kamu selesaikan dan bisa kamu setorkan. Pada papan nama kamu juga akan melihat tanda tanya kelabu, yang berarti kamu sedang menjalani misi itu tetapi belum selesai. Pekerjaan berulang memakai penanda yang sama dalam warna biru: tanda seru biru terang adalah pekerjaan yang pernah kamu lakukan dan bisa diambil lagi, dan penanda yang sama dalam warna redup adalah pekerjaan yang masih dalam masa tunggunya. Setiap penanda kecuali yang kelabu tampil di papan nama, di peta kecil, dan di peta dunia, jadi kamu bisa melihat pekerjaan dari seberang kota. Di Eastbrook, Marsekal Redbrook menunggu dengan Serigala di Ambang Pintu, salah satu misi pertama yang bisa kamu ambil.",
       "objectivesTitle": "Tujuan",
       "objectivesBody": "Bunuh musuh tertentu, kumpulkan barang, atau berinteraksi dengan sesuatu di dunia. Pelacak di layar menghitung kemajuanmu seiring kamu melangkah. Jika kamu berubah pikiran, kamu bisa membuang sebuah misi dari log misimu dan mengambilnya lagi dari pemberinya nanti.",
       "turninTitle": "Menyerahkan misi",
@@ -4141,11 +5142,11 @@ export const id_ID: EnTranslations = {
       "typesTitle": "Jenis-jenis misi yang akan kamu temui",
       "typesBody": "Sebagian besar misi mengikuti salah satu dari beberapa bentuk yang sudah dikenal. Pelacak di layar menjelaskan persis apa yang diminta masing-masing, jadi kamu tak pernah dibiarkan menebak-nebak.",
       "typeSlayTitle": "Membunuh",
-      "typeSlayBody": "Tipiskan kawanan binatang buas atau patahkan cengkeraman sekte dengan mengalahkan sejumlah tertentu musuh bertanda. Salah satu misi pertamamu, membersihkan serigala dari jalan Eastbrook, adalah salah satunya.",
+      "typeSlayBody": "Kurangi kawanan hewan buas atau patahkan cengkeraman sebuah pemujaan dengan mengalahkan sejumlah tertentu musuh yang ditandai. Salah satu misi pertamamu, membersihkan serigala dari jalan Eastbrook, adalah salah satunya. Sesekali sebuah misi membangunkan sasarannya sendiri: sesuatu yang pada lintasanmu terakhir terbaca sebagai latar mendapat papan nama dan menjadi sesuatu yang bisa kamu pukul begitu kamu membawa misi yang menyangkutnya, jadi kembalilah dan lihat lagi.",
       "typeGatherTitle": "Mengumpulkan",
-      "typeGatherBody": "Kumpulkan barang dari dunia atau dari apa yang dijatuhkan musuh: ramuan herbal, bijih, reagen suram milik sekte. Beberapa keping hanya jatuh dari musuh tertentu, jadi perburuan dan hasilnya berjalan beriringan.",
+      "typeGatherBody": "Kumpulkan benda dari dunia atau dari apa yang dijatuhkan musuh: herba, bijih, reagen suram sebuah pemujaan. Beberapa kepingan hanya jatuh dari musuh tertentu, jadi perburuan dan panennya berjalan bersama. Benda di tanah yang menjadi bagian sebuah misi hanya menyerahkan diri selagi kamu benar-benar menjalaninya, dan benda itu akan mengatakannya kalau kamu tidak menjalaninya, atau kalau kamu sudah punya cukup. Sebagian misi juga menyerahkan alat ketika kamu menerimanya: awasi tasmu dan gunakan alat itu sebagaimana dijelaskan teks misi. Kalau sebuah misi memerlukan alat yang diberikan langkah sebelumnya, menerimanya akan mengembalikan alat itu ketika kamu tidak lagi memilikinya, sehingga alat yang hilang tidak bisa membuat rantainya buntu.",
       "typeInteractTitle": "Berinteraksi",
-      "typeInteractBody": "Gunakan, sucikan, atau baca sesuatu yang tertambat di dunia: makam yang ternoda, peringatan yang terukir di batu pantai, pintu kripta yang tersegel. Hampiri penanda itu dan bertindaklah atasnya.",
+      "typeInteractBody": "Gunakan, sucikan, atau baca sesuatu yang terpancang di dunia: kuburan yang dinodai, peringatan yang terukir di batu pantai, pintu kripta yang tersegel. Hampiri penandanya dan bertindaklah padanya. Ketika sebuah misi meminta beberapa, yang dimaksud adalah beberapa yang berbeda: setiap objek hanya memberimu kredit sekali, jadi carilah yang berikutnya alih-alih memakai yang sama dua kali. Objeknya tidak habis ketika kamu bertindak padanya, jadi semua orang di kelompokmu bisa mengambil kreditnya sendiri darinya.",
       "typeMusterTitle": "Himpun pertahanan",
       "typeMusterBody": "Beberapa misi memintamu menghimpun sebuah kota sebelum dorongan ke utara: pangkas ancaman di gerbang dan kumpulkan apa yang dibutuhkan para pembela. Ini adalah tujuan bunuh dan kumpulkan demi orang-orang yang kisahnya kamu jalani, dan membuatmu terus bergerak bersama mereka.",
       "typeGroupTitle": "Babak penutup kelompok",
@@ -4164,7 +5165,13 @@ export const id_ID: EnTranslations = {
       "sideCryptTitle": "Raja yang terlupakan",
       "sideCryptBody": "Tinggi di atas puncak terbentang misteri yang lebih hening: makam-makam tua bertanda mahkota yang tak terekam catatan mana pun. Baca para mati, kumpulkan apa yang mereka jaga, dan buka segel makam yang seharusnya tetap tertutup. Ini jejak ala detektif yang membuka jalan menuju raid akhir sepuluh pemain milik realm.",
       "sideTempleTitle": "Kuil yang tenggelam",
-      "sideTempleBody": "Sebuah gerbang cahaya pucat di atas telaga tinggi di pegunungan terbuka menuju kuil yang tenggelam tempat sebuah kultus yang karam masih bernyanyi. Rangkaian pendeknya berdiri terpisah dari kisah utama, sebuah misteri mandiri bagi siapa pun yang mendaki ke tepiannya, membaca peringatan yang terukir di bebatuan, dan turun untuk melihat untuk apa semua itu."
+      "sideTempleBody": "Sebuah gerbang cahaya pucat di atas telaga tinggi di pegunungan terbuka menuju kuil yang tenggelam tempat sebuah kultus yang karam masih bernyanyi. Rangkaian pendeknya berdiri terpisah dari kisah utama, sebuah misteri mandiri bagi siapa pun yang mendaki ke tepiannya, membaca peringatan yang terukir di bebatuan, dan turun untuk melihat untuk apa semua itu.",
+      "availableTitle": "Mengapa seorang NPC tidak punya apa-apa untukmu",
+      "availableBody": "Misi datang berantai. Sebagian besar hanya ditawarkan setelah kamu menyerahkan misi sebelumnya, dan banyak juga meminta level minimum, sehingga seorang NPC yang tidak punya apa-apa untukmu hari ini mungkin punya banyak setelah beberapa levelmu berikutnya atau begitu kamu menutup misi yang sedang kamu bawa. Beberapa punya syarat tersendiri, seperti Pelajaran Menunggang Kuda, yang hanya terbuka setelah kamu membeli kecakapan Menunggang. Misi kelompok menyatakannya di depan dengan mencantumkan berapa banyak pemain yang mereka sarankan kamu bawa. Sebagian tugas bisa diulang: kamu bisa mengambilnya lagi setelah masa tunggu, dan penanda di atas pemberinya memberitahumu kapan sebuah misi kembali tersedia.",
+      "typeEscortTitle": "Mengawal",
+      "typeEscortBody": "Seseorang perlu diantar ke tempat yang berbahaya. Ambil misinya, temui orang yang menunggu di awal jalan, dan ajak bicara untuk berangkat. Mereka berjalan di jalurnya sendiri sementara kamu mengimbangi langkahnya, dan bahaya yang bersarang di sepanjang jalan itu mengincar mereka, tidak selalu mengincarmu. Tetaplah dekat: musuh menyergap perjalanan itu dalam gelombang, dan perjalanan baru berlanjut setelah satu gelombang tumbang. Kamu tidak bisa menyerang orang yang sedang kamu antar, tetapi kamu bisa menyembuhkannya, dan jika ia tumbang, perjalanan itu langsung diatur ulang agar kamu bisa mencoba lagi. Capai ujung jalan bersamanya dalam keadaan hidup dan kamu di sisinya, maka misi pun tercatat selesai.",
+      "cardMasterTitle": "Tidak setiap NPC punya misi: Ahli Kartu",
+      "cardMasterBody": "Satu NPC di Eastbrook menawarkan permainan kartu, bukan misi. Ajak bicara Ahli Kartu, pilih baris Duel Kartu dari menunya, dan kamu bergabung ke antrean yang memasangkanmu dengan pemain berikutnya yang menunggu. Kelas apa pun bisa duduk, dan level atau perlengkapanmu sama sekali tidak berpengaruh. Kalian masing-masing bermain dari dek pribadi berisi dua puluh kartu bernilai satu hingga sepuluh, memegang empat kartu sekaligus dan menarik satu kartu baru setiap ronde: kartu yang lebih tinggi memenangkan ronde, dan dua kartu yang nilainya sama adalah seri yang tidak memberi angka bagi siapa pun. Yang pertama meraih dua ronde memenangkan pertandingan, jadi sebuah duel adalah yang terbaik dari tiga. Setiap ronde berjalan dengan batas waktu, jadi biarkan kartumu tak dimainkan selama sembilan puluh detik dan pertandingan jatuh ke pihak lain, kecuali belum ada ronde yang tercatat sama sekali, yang membuatnya langsung dibatalkan tanpa pemenang. Hal yang sama berlaku jika kamu sendiri yang pergi meninggalkan duel. Kamu harus berdiri di dekat Ahli Kartu untuk bergabung ke antrean, tetapi begitu kamu dipasangkan, papannya terbuka sendiri dan kamu bisa bermain dari mana saja. Ini butuh dua orang, jadi dunia luring tidak pernah menawarkannya."
     },
     "lore": {
       "figuresTitle": "Wajah-wajah yang akan kamu kenali",
@@ -4177,8 +5184,8 @@ export const id_ID: EnTranslations = {
     "dungeonsPage": {
       "heading": "Ruang Bawah Tanah dan Raid",
       "intro": "Saat dunia terbuka tidak lagi cukup, kumpulkan sebuah kelompok dan masuki sebuah instans: salinan pribadi dari sebuah ruang bawah tanah yang dibuat khusus untuk kelompokmu.",
-      "party": "Ruang bawah tanah dirancang untuk kelompok beranggota lima orang. Raid akhir permainan untuk sepuluh orang.",
-      "soloLead": "Setiap ruang bawah tanah dibuka dengan misi pengantar yang bisa dikerjakan sendiri, sehingga kamu selalu tahu mengapa kamu masuk ke sana.",
+      "party": "Dungeon dibangun untuk kelompok berisi lima. Raid akhir permainan untuk sepuluh. Kalau kamu tidak punya empat teman di dekatmu, Pencari Dungeon akan menyusun kelompok untuk penjelajahan yang diantrikannya. Pita level pada setiap kartu di bawah adalah level yang menjadi sasaran penulisan penjelajahan itu, bukan gembok di pintu: tidak ada yang menghalangimu masuk lebih awal atau kembali belakangan, meski Pencari Dungeon hanya akan mendudukkanmu di penjelajahan yang cocok dengan levelmu.",
+      "soloLead": "Bertanyalah di kota-kota terdekat sebelum berangkat: pemberi misi mereka membagikan rantai yang berakhir di aula-aula ini, dan membawa satu ke dalam berarti penjelajahannya membayar dua kali lipat.",
       "levelExact": "Level {n}",
       "levelBand": "Level {min} sampai {max}",
       "partySize": "{n} pemain",
@@ -4197,16 +5204,46 @@ export const id_ID: EnTranslations = {
       "raidBody": "Di balik pintu kerajaan yang tersegel menanti cobaan untuk sepuluh pemain: pertarungan berfase banyak dan sebuah kekuatan abadi yang harus dipadamkan bersama oleh seluruh raid. Raih jalanmu untuk masuk, lalu bawa sembilan kawan.",
       "heroicTitle": "Mode heroik",
       "heroicBody": "Setiap dungeon lima pemain, dan raid itu sendiri, punya versi heroik yang menanti di balik batas level. Aula yang sama, dibentuk ulang untuk kelompok endgame yang berperlengkapan: semuanya memukul lebih keras, tak ada yang bisa kamu tinggalkan dengan berlari, dan para bos sama sekali mengabaikan pingsan dan jerat. Lampaui dulu versi normalnya; heroik menganggap kamu sudah begitu.",
-      "heroicHowBody": "Pilih tingkat kesulitan sebelum kelompokmu mengklaim instance: ketik /dungeon heroic, atau ubah sakelar Kesulitan Dungeon di menu party. Pilihan itu dibagi seluruh party dan terkunci di pintu, jadi satu sesi tetap seperti yang diklaim di awal.",
+      "heroicHowBody": "Pilih tingkat kesulitan sebelum kelompokmu mengklaim instance: ketik /dungeon heroic, atau pilih Atur Kesulitan Dungeon di menu potretmu sendiri. Seorang diri kamu mengaturnya sendiri; dalam kelompok hanya pemimpin yang bisa, dan pilihan itu berlaku untuk semua orang dan terkunci di pintu, sehingga sebuah penjelajahan tetap menjadi apa yang diklaim.",
       "heroicRewardsTitle": "Tanda Heroik dan rampasan yang ditingkatkan",
-      "heroicRewardsBody": "Bos heroik menjatuhkan jarahan yang sudah kamu kenal, ditingkatkan dan diberi label Heroik pada tooltip, dan bos terakhir tiap sesi menambahkan epik yang tak ditemukan di tempat lain. Bunuhan terakhir itu juga meninggalkan Tanda Heroik bagi setiap peserta: mata uang yang dibelanjakan pada Quartermaster Vex di Highwatch, yang stok cincin dan kalungnya adalah satu-satunya perhiasan di realm ini.",
-      "heroicLockoutBody": "Dungeon normal bisa dijalankan sepanjang hari. Heroik menuntut kesabaran: membunuh bos terakhir mengunci setiap orang dalam sesi itu pada satu penuntasan heroik dungeon tersebut per hari, dan raid menyimpan kunci harian terpisah untuk tiap tingkat kesulitan. Sesi lima pemain yang sudah dituntaskan tetap terbuka bagi party-nya sendiri untuk lari balik dan menjarah, jadi tak seorang pun terkunci dari apa yang mereka raih di sana. Raid lebih ketat: begitu bunuhannya mengunci kamu, pintu tetap tertutup sampai reset harian, jadi kumpulkan rampasanmu sebelum kamu meninggalkan arena.",
+      "heroicRewardsBody": "Bos heroik menjatuhkan jarahan yang kamu kenal, ditingkatkan dan ditandai Heroik pada keterangannya, dan bos terakhir setiap penjelajahan menambahkan epik yang tidak ditemukan di tempat lain. Kematian terakhir itu juga meninggalkan Tanda Heroik bagi setiap peserta: mata uang yang dibelanjakan pada Kepala Perbekalan Vex di Highwatch, yang meja layannya adalah rak berisi cincin dan liontin yang tak bisa dibeli oleh apa pun selain bukti dari kedalaman heroik.",
+      "heroicLockoutBody": "Dungeon biasa bisa dijelajahi sepanjang hari. Heroik menuntut kesabaran: kematian bos terakhir membatasi semua orang dalam penjelajahan itu pada satu penuntasan heroik dungeon tersebut per hari, dan raid menyimpan kunci harian untuk setiap tingkat kesulitan. Di alam daring semua kunci harian terlepas bersamaan pada jam penyetelan ulang malam milik alam itu, sehingga penuntasan yang diambil tepat sebelum jam itu dan yang diambil tepat sesudahnya jatuh pada dua hari berbeda; mainlah luring di peramban dan sebuah kunci akan berakhir begitu saja sehari setelah kematian bos versimu sendiri. Penjelajahan lima pemain yang sudah tuntas tetap terbuka bagi kelompoknya sendiri untuk lari mayat dan jarahan, sehingga tak seorang pun terkunci dari apa yang ia peroleh di sana. Raid lebih ketat: begitu kematiannya mengunci kamu, pintunya tetap tertutup sampai penyetelan ulang, dan satu-satunya jalan kembali masuk adalah lari mayat oleh seseorang yang tumbang persis dalam penjelajahan yang menguncinya, jadi seorang peraid hidup yang keluar berarti sudah keluar untuk hari itu. Kumpulkan rampasanmu sebelum meninggalkan arena. Setiap kunci ini milik karakter yang memperolehnya, jadi penuntasan pada karakter utamamu membiarkan karakter lainmu bebas.",
       "resetTitle": "Mereset instansimu",
-      "resetBody": "Jika kesulitan diganti saat kelompok masih memegang perjalanan yang diklaim, klaim lama bertahan sebentar sebelum hilang sendiri. Pemimpin kelompok dapat segera melepaskannya dengan memilih Reset Semua Instansi di menu potretnya sendiri atau mengetik /dungeon reset. Kesulitan harus benar-benar sudah diubah, tidak boleh ada siapa pun, hidup atau gugur, di dalam, dan ada jeda singkat antarreset. Jika tiba di pintu dengan kesulitan yang salah, permainan akan memberi tahu sebelum perjalanan dimulai. Raid tidak pernah direset dengan cara ini; aturan pengunciannya sendiri tetap berlaku.",
+      "resetBody": "Gantilah kesulitan selagi kelompokmu masih memegang penjelajahan yang diklaim dan klaim lama akan bertahan sejenak sebelum terlepas sendiri. Pemimpin kelompok bisa melepaskannya sekaligus: pilih Setel Ulang Semua Instance di menu potretnya sendiri, atau ketik /dungeon reset. Penyetelan ulang hanya berfungsi setelah kesulitan benar-benar diubah, hanya selagi tidak ada seorang pun, hidup maupun tumbang, tersisa di dalam, hanya setelah setiap mayat di dalam sana dijarah bersih, dan sebuah jeda singkat memisahkan satu penyetelan ulang dari berikutnya. Datanglah ke pintu dengan kesulitan yang keliru dan permainan akan mengatakannya sebelum penjelajahan dimulai. Raid tidak pernah disetel ulang dengan cara ini; aturan kuncinya sendiri yang berlaku.",
       "templeLoreTitle": "Kuil Tenggelam, sedikit lebih dalam",
       "templeLoreBody": "Kuil itu memiliki legendanya sendiri, lebih tua dari pemujaan yang kamu kejar di tempat lain. Di tepi Glimmermere, sebuah danau yang meneguk cahaya bulan dan mengembalikan mereka yang tenggelam, seorang pengawas sebatang kara menjaga sebuah gerbang cahaya pucat. Di bawah permukaan, sebuah tangga dari batu dingin menurun menuju ke sana. Orang-orang yang tenggelam di sana tidak mati karena kecelakaan: mereka adalah Paduan Suara Pucat, yang tenggelam dalam pemujaan dan tak pernah berhenti bernyanyi. Para penjaga tua menggores satu peringatan ke bebatuan sebelum air menelan mereka, sebuah doa kepada sesuatu yang mereka sebut Bulan Tenggelam, dengan tangan yang lebih mantap menambahkan dua kata di bawahnya: ia hanya tertidur.",
       "cryptLeadTitle": "Pintu yang seharusnya dijaga tetap tertutup oleh orang mati",
-      "cryptLeadBody": "Tinggi di puncak, jauh dari pertempuran utama, tersembunyi sebuah misteri yang lebih dingin. Kuburan tua menyandang mahkota yang tak tercatat dalam catatan mana pun, dan orang-orang mati yang menjaganya dahulu mengabdi pada seorang raja yang terlupakan. Bacalah batu-batu nisan mereka, kumpulkan batu kunci yang mereka simpan, dan kamu dapat membuka segel sebuah makam yang tiga jiwa setia rela mati demi menjaganya tetap tertutup, cobaan opsional yang membuka realm bagi raid sepuluh pemainnya bagi mereka yang mengikuti petunjuk sampai akhir."
+      "cryptLeadBody": "Tinggi di puncak, jauh dari pertempuran utama, tersembunyi sebuah misteri yang lebih dingin. Kuburan tua menyandang mahkota yang tak tercatat dalam catatan mana pun, dan orang-orang mati yang menjaganya dahulu mengabdi pada seorang raja yang terlupakan. Bacalah batu-batu nisan mereka, kumpulkan batu kunci yang mereka simpan, dan kamu dapat membuka segel sebuah makam yang tiga jiwa setia rela mati demi menjaganya tetap tertutup, cobaan opsional yang membuka realm bagi raid sepuluh pemainnya bagi mereka yang mengikuti petunjuk sampai akhir.",
+      "formatsNote": "Ruang bawah tanah dan raid adalah satu dari tiga format ber-instance. Delve adalah penurunan singkat untuk satu atau dua orang, dan rift adalah robekan yang terkoyak terbuka di dunia dan menjatuhkan sebuah kelompok ke dalam sebuah dungeon yang dibangun baru setiap kalinya.",
+      "finderTitle": "Menemukan kelompok",
+      "finderBody": "Kamu tidak perlu berteriak di obrolan untuk mengisi sebuah party. Buka Pencari Dungeon untuk melihat perjalanan yang diantrekannya, pilih yang ingin kamu jalani, tentukan peran yang akan kamu mainkan, lalu masuk antrean. Pencari Dungeon menyusun sebuah grup penuh dengan campuran yang tepat antara Pelindung, Penyembuh, dan Penyerang, lalu menawarkannya pada semua orang sekaligus, dan kamu langsung berkelompok begitu party menerimanya. Daftarnya tidak hanya berisi perjalanan lima pemain: raid sepuluh pemain juga mengantre di sini, pada kedua tingkat kesulitan, meski Pencari Dungeon tidak pernah memeriksa apakah kamu sudah meraih jalanmu masuk, sehingga pintunya sendiri masih bisa menolakmu. Tidak semua perjalanan di realm ada dalam daftarnya, jadi lihat dulu sebelum kamu mengandalkannya untuk sebuah dungeon tertentu. Satu hal yang tidak dilakukannya adalah memindahkanmu: Pencari Dungeon membentuk grup dan menunjukkan arah ke pintu masuk, dan semua orang tetap berjalan sendiri menuju pintu itu dengan kaki mereka sendiri.",
+      "finderRolesBody": "Pilihan peranmu berasal dari kelasmu sebelum kamu berspesialisasi, dan dari spesialisasi aktifmu begitu kamu memilikinya, sehingga seorang penyembuh mengantre sebagai penyembuh. Melewati level tempat talent terbuka, Pencari Dungeon menghendaki kamu sudah memilih sebuah spesialisasi sebelum ia mau memberimu peran sama sekali. Setiap perjalanan dalam daftar juga membawa rentang levelnya sendiri, lebih ketat daripada pintunya sendiri, dan setiap anggota party yang mengantre harus berada di dalamnya: Pencari Dungeon tidak akan mendudukkan karakter yang harus ditanggung oleh kelompoknya.",
+      "finderOfferBody": "Sebuah grup yang terbentuk ditawarkan untuk jangka waktu singkat, jadi jawablah segera. Biarkan tawaran itu kedaluwarsa atau tolak, dan Pencari Dungeon akan menahanmu di luar antrean sejenak sebelum kamu bisa bergabung lagi, yang mencegah sebuah grup yang setengah dijawab menghambat semua orang lainnya.",
+      "finderBoardBody": "Lebih suka memilih sendiri teman seperjalananmu? Seorang pemimpin party bisa memasang grupnya di papan Grup Premade sebagai gantinya, diberi label sesuai tujuan perjalanan itu: kali pertama, misi pencarian, bersih tuntas, pemula diterima, atau berlari cepat. Pemain lain melamar dan sang pemimpin memutuskan siapa yang ikut. Tidak ada teks iklan bebas, hanya label-label itu, dan satu entri dalam daftar hanya ada di papan ini, ditawarkan lewat sebuah pos alih-alih antrean otomatis."
+    },
+    "riftsPage": {
+      "heading": "Rift",
+      "intro": "Sebuah rift adalah robekan pada dunia itu sendiri, bukan pintu yang kamu datangi. Melangkahlah melalui satu dan kamu mendapatkan jalan turun yang belum pernah dilalui siapa pun: lantai-lantainya, monster-monsternya, dan sosok yang menunggu di dasarnya semua dibangun baru khusus untuk rift itu saja, sehingga peringkat yang sama tidak pernah berjalan dengan cara yang sama dua kali.",
+      "whatHeading": "Apa itu rift",
+      "whatBody": "Dungeon adalah tempat. Ia selalu berada di sana, dan kamu mempelajarinya sampai hafal setiap sudutnya. Delve adalah jalan turun pribadi yang singkat, yang kamu mulai dari sebuah papan, dirancang untuk satu atau dua orang. Rift bukan keduanya: ia terbuka dengan sendirinya, di luar sana di dunia, tanpa peringatan, dan segala sesuatu di dalamnya dihasilkan tepat pada saat itu terjadi. Tak seorang pun punya rute untuk diberikan kepadamu, karena belum ada yang pernah menjelajahi rift ini. Ia bersifat instans seperti dua yang lain, sehingga apa yang kamu temukan di dalamnya hanya menjadi milikmu dan kelompokmu, tetapi ia satu-satunya konten instans dalam permainan ini yang mendatangimu sendiri alih-alih menunggu untuk ditemukan.",
+      "openHeading": "Di mana rift terbuka, dan seberapa sering",
+      "openBody": "Rift terkoyak terbuka di zona-zona yang lebih luas di realm ini, bukan di lembah awal, dan seluruh realm mendengar kabarnya: sebaris teks di obrolanmu menyebut peringkat dan zonanya begitu satu rift muncul. Setiap zona yang memenuhi syarat mendapat giliran rift kira-kira sekali setiap jam, dan zona yang sudah punya satu rift berdiri akan menunggu gilirannya alih-alih membuka yang kedua. Rift yang tidak ditutup siapa pun akan runtuh dengan sendirinya setelah beberapa jam, dan realm juga mendengar kabar itu. Zona yang rift-nya sudah tersegel akan tetap sunyi sampai gilirannya tiba lagi, jadi sebuah pengumuman layak dikejar selagi masih segar.",
+      "ranksHeading": "Keempat peringkat",
+      "ranksBody": "Setiap rift diberi peringkat C, B, A, atau S, dan peringkat itu ikut tercantum dalam pengumumannya, sehingga kamu tahu apa yang akan kamu hadapi sebelum meninggalkan kota. C adalah yang paling ringan, B dan A menanjak dari sana, dan S adalah yang paling berat yang bisa dicapai sebuah rift. Peringkat adalah kenop yang menentukan seberapa kejam lantai-lantainya, dan peringkat yang lebih berat membayar sepadan, jadi ambillah peringkat yang benar-benar sanggup ditahan kelompokmu.",
+      "rankFmt": "Peringkat {rank}",
+      "groupHeading": "Siapa yang masuk",
+      "groupBody": "Bawalah kelompok. Sebuah rift tidak melunak hanya karena lebih sedikit dari kalian yang melangkah masuk: tidak ada apa pun di dalamnya yang menghitung berapa banyak orang yang berdiri di sana, jadi peringkat pada portalnya adalah peringkat yang kamu hadapi, entah itu berlima atau sendirian. Pintunya akan membiarkanmu masuk sendirian, dan orang-orang memang mencobanya, tetapi sebuah rift adalah konten kelompok pada setiap peringkat, dan ia jujur soal itu sejak ruangan pertama. Party-mu mendapat salinan rift-nya sendiri, jadi tidak ada kelompok lain yang bisa menyerobot masuk ke dalam larimu. Jika kamu tumbang, kamu bisa berjalan kembali masuk sebagai hantu dan membangkitkan dirimu begitu pertarungan di dalam sudah berhenti.",
+      "levelNote": "Rift adalah konten endgame. Kamu harus berada di level maks, level {n}, untuk bisa melangkah melaluinya, pada peringkat apa pun.",
+      "floorsHeading": "Turun melewati lantai-lantainya",
+      "floorsBody": "Sebuah rift memiliki beberapa lantai, masing-masing dibangun baru, dan jalan turunnya tidak terbuka sampai lantai itu selesai denganmu: bersihkan apa yang hidup di sana, pecahkan apa pun yang mengunci jalanmu, dan jalan turunnya pun terkoyak terbuka. Lantai terakhir berakhir pada seorang bos. Setiap lantai punya wataknya sendiri, jadi satu lari saja bisa membawamu keluar dari salju dan masuk ke bara api, dan obrolanmu menyebut nama tiap lantai begitu kamu tiba di sana. Pelacak di layarmu adalah tempat kamu mengetahui berapa banyak lantai yang dimiliki rift ini. Beberapa rift membuka ke sebuah rangkaian buatan tangan alih-alih jalan turun yang dihasilkan otomatis, yang berjalan pada panjang tetapnya sendiri.",
+      "boundHeading": "Begitu kamu menumpahkan darah pertama",
+      "boundBody": "Bunuhan pertama yang diraih kelompokmu di dalam sebuah rift mengunci larianmu, begitu pula peti tersembunyi pertama yang kamu bongkar di luar jalur utama. Sejak saat itu kamu terikat pada salinan rift itu: keluar karena alasan apa pun dan kembali akan menempatkanmu di lari yang sama yang kamu tinggalkan, tidak pernah di lari kelompok lain dan tidak pernah di lari yang baru, selama pintu masuknya di dunia luar masih berdiri. Sebelum bunuhan pertama itu, dan sebelum peti pertama itu, belum ada yang terkunci, sehingga kelompok yang masih berkumpul bisa menyusun ulang dan masuk bersama tanpa meninggalkan salinan-salinan setengah jalan di belakang mereka.",
+      "raceHeading": "Balapan menuju penuntasan pertama",
+      "raceBody": "Setiap kelompok di realm ini bisa menyerang rift yang sama pada saat bersamaan, masing-masing di salinannya sendiri, dan hanya kelompok pertama yang menjatuhkan sosok di dasarnya yang menyegel rift itu. Ketika sebuah kelompok menang, realm mendengar nama dan catatan waktu mereka, dan jalan masuknya tertutup di belakang mereka. Kalah dalam balapan tidak mengakhiri larimu: salinanmu tetap terbuka, sosok di dasarnya tetap akan tumbang di tanganmu, dan kamu tetap berjalan keluar dengan kekuatanmu sendiri. Yang kamu bayar adalah semua yang seharusnya dibayar oleh sebuah penyegelan. Bos itu tidak meninggalkan apa pun bagi kelompok yang datang kedua, jadi yang kamu bawa pulang hanyalah apa yang dijatuhkan mob-mob di sepanjang jalan turun, dan tidak lebih dari itu. Kitab Jasa tetap menghitung penuntasanmu, karena kamu memang menjatuhkan sosok itu. Ini satu-satunya balapan dalam permainan yang bisa kamu kalah tanpa pernah melihat wajah orang-orang yang mengalahkanmu.",
+      "rewardsHeading": "Apa yang kamu bawa pulang",
+      "rewardsBody": "Menyegel sebuah rift, bukan sekadar bertahan hidup di dalamnya, adalah yang membayar. Jatuhkan rift itu lebih dulu dan ia membayar setara konten instans yang setingkat dengan peringkatnya, sehingga peringkat yang lebih berat sepadan dengan lari yang lebih berat pula. Menyegelnya juga menyerahkan sebuah Cincin Terikat Rift ke tangan setiap orang yang hadir di sana, disesuaikan dengan peran kelasmu dan pribadi untukmu, serta meninggalkan Sari Rift di dalam tasmu, ditambah permata rift di peringkat yang lebih berat. Selain jalan pulang, sosok di dasarnya juga meninggalkan sebuah peti tersegel yang bisa dibongkar kelompokmu untuk rampasan tambahan, memakai cara membobol kunci Jalur Tumbler yang sama seperti yang kamu kenal dari peti-peti delve, sehingga kerja yang bersih dan sabar membayar lebih baik daripada yang tergesa-gesa. Tak satu pun dari itu sampai ke kelompok yang datang kedua: balapan yang kalah hanya menyisakan apa yang dijatuhkan mob-mob di sepanjang jalan turun. Kitab Jasa adalah pengecualiannya, dan tetap menghitung penuntasanmu apa pun hasilnya, dengan satu jasa untuk menutup rift pertamamu dan satu lagi untuk menjatuhkan rift peringkat S.",
+      "trackerHeading": "Pelacak di layarmu",
+      "trackerBody": "Selama kamu berada di dalam, sebuah strip kecil di layarmu menjaga arahmu tetap jelas: lantai keberapa yang sedang kamu jalani dari berapa total lantainya, dan sebuah hitung mundur langsung. Bacalah hitung mundur itu baik-baik, sebab itu bukan larimu yang habis waktu. Itu adalah pintu masuk kembali di dunia luar yang sedang menutup. Begitu kamu sudah masuk, kelompokmu menjalani rift itu dengan temponya sendiri, selama apa pun itu, tetapi begitu jam itu mencapai nol, jalan masuknya lenyap bagi semua orang, jadi pikirkan dua kali sebelum melangkah keluar menjelang akhirnya."
     },
     "delvesPage": {
       "heading": "Delve",
@@ -4220,7 +5257,7 @@ export const id_ID: EnTranslations = {
       "tiersLabel": "Pilihan kesulitan",
       "affixesLabel": "Pengubah yang mungkin",
       "whatHeading": "Apa itu delve",
-      "whatBody": "Delve adalah dungeon ber-instance kecil yang dibuat khusus untukmu dan paling banyak satu sekutu, salinan pribadi tempat kamu tak bisa diganggu. Kamu memulainya dari papan yang dijaga seorang penjaga delve di dunia luar, masuk, bertarung menurun melalui segelintir ruangan, dan menutup pada satu penjaga akhir. Penjelajahan berlangsung cepat dan memang dimaksudkan untuk diulang, jadi delve adalah perkembangan yang andal kapan pun dunia terbuka mulai sepi.",
+      "whatBody": "Delve adalah dungeon kecil ber-instance yang dibuat khusus untukmu dan paling banyak satu sekutu, salinan pribadi tempat kamu tidak bisa diganggu. Kamu memulainya dari papan yang dijaga seorang penjaga delve di dunia luar, kamu turun, bertarung menembus segelintir ruangan, dan menutupnya pada satu penjaga tunggal. Apa yang menanti di balik penjaga itu berbeda dari satu delve ke delve lain: yang satu menyegel rampasannya di balik kunci, yang lain meminta sebuah ritus darimu. Penjelajahannya singkat dan dimaksudkan untuk diulang, jadi delve adalah kemajuan yang andal kapan pun dunia terbuka mengering.",
       "howHeading": "Cara sebuah penjelajahan berjalan",
       "howBody": "Bicaralah dengan sang penjaga untuk membuka papan, pilih tingkat kesulitan, lalu turun. Tiap penjelajahan merangkai beberapa ruang pendek dan berakhir pada penjaga akhirnya; bersihkan untuk mengklaim ganjaranmu dan kembali ke permukaan. Ajak seorang teman jika kamu punya, atau andalkan pendampingmu jika tidak.",
       "companionHeading": "Pendampingmu",
@@ -4232,23 +5269,28 @@ export const id_ID: EnTranslations = {
       "affixesHeading": "Pengubah penjelajahan",
       "affixesBody": "Penjelajahan yang lebih sulit akan memunculkan satu pengubah yang mengubah jalannya penurunan, dari mayat yang gelisah, udara busuk, hingga atap yang mulai runtuh. Semuanya menaikkan bahaya dan ganjaran sekaligus. Setiap delve menarik dari pengubah yang cocok dengan temanya; di seluruh realm, kumpulannya tampak seperti ini:",
       "marksHeading": "Tanda Delve",
-      "marksBody": "Menuntaskan delve menghasilkan Tanda Delve, mata uang yang terpisah dari koinmu. Belanjakan di sang penjaga untuk menguatkan pendampingmu dan mengambil perlengkapan yang tak akan kamu temukan di tempat lain.",
+      "marksBody": "Membersihkan delve menghasilkan Tanda Delve, mata uang yang disimpan terpisah dari uangmu. Belanjakan pada penjaganya untuk memperkuat pendampingmu dan mendapatkan perlengkapan yang tidak akan kamu temukan di tempat lain.\n\nTanda paling banyak memberi imbalan pada penjelajahan pertama harimu. Tiga penuntasan pertama setiap hari membayar penuh, dan setelah itu delve tetap membayar, hanya saja kurang bisa diandalkan, dengan tingkat yang lebih sulit bertahan lebih baik daripada yang lebih mudah. Hitungannya berganti setiap hari, jadi tidak perlu memeras sebuah delve sampai kering: kembalilah besok dan tarif bagusnya sudah menunggu.",
       "whereHeading": "Di mana menemukannya",
-      "whereBody": "Delve pertama, Reliquary yang Runtuh, terbuka di Bukit Reliquary, di lembah awal Lembah Eastbrook. Bruder Halven menjaga papannya di sana, dan ia akan mengirimmu turun begitu kamu siap. Tugasnya tak berakhir di situ: melewati Gundukan Troll di tepi utara Rawa Mirefen, penjaga yang sama membuka Litani Tenggelam bagi para penjelajah yang telah menemukan pijakan mereka."
+      "whereBody": "Delve pertama, Reliquary yang Runtuh, terbuka di Bukit Reliquary, di lembah awal Lembah Eastbrook. Bruder Halven menjaga papannya di sana, dan ia akan mengirimmu turun begitu kamu siap. Tugasnya tak berakhir di situ: melewati Gundukan Troll di tepi utara Rawa Mirefen, penjaga yang sama membuka Litani Tenggelam bagi para penjelajah yang telah menemukan pijakan mereka.",
+      "lockpickAnteBody": "Kamu menentukan taruhannya sebelum menyentuh kuncinya. Ambil tiga cungkil dan kamu punya ruang untuk salah langkah, tetapi peti hanya membayar hadiah paling sederhana; ambil dua untuk tawaran di tengah; ambil satu dan sebuah pemecahan yang bersih membayar yang paling kaya dari semuanya. Makin sedikit cungkil yang kamu pegang, makin sedikit waktu yang kamu punya untuk berpikir di antara gerakan, dan jika yang terakhir patah, kunci macet untuk selamanya: peti itu hilang sampai kamu membersihkan delve itu lagi.",
+      "riteHeading": "Saat delve berakhir dengan ritus",
+      "riteBody": "Tidak semua delve berakhir pada sebuah kunci. Litani Tenggelam justru ditutup dengan sebuah ritus: begitu penjaganya tumbang, altar-altar di sekeliling relikuari menyala dalam sebuah urutan dan memintamu menjawabnya kembali. Kamu memilih seberapa sulit membuatnya sebelum ritus itu dimulai, tawar-menawar yang sama seperti yang diminta cungkil kunci. Pengaturan yang lembut mengulang urutannya untukmu lebih dari sekali dan memberimu lebih dari satu percobaan, tetapi ia membatasi apa yang akan dibayar relikuari; yang paling keras menunjukkan urutannya hanya sekali, memberimu satu percobaan saja, dan menjadi satu-satunya jalan menuju hadiah paling kaya."
     },
     "talentsPage": {
       "heading": "Bakat dan spesialisasi",
       "intro": "Bakat adalah cara kamu menjadikan sebuah kelas milikmu sendiri. Bakat bersifat opsional, pemaaf, dan mudah diubah, jadi kamu bisa bereksperimen tanpa rasa takut.",
       "whatHeading": "Apa yang dilakukan bakat",
-      "whatBody": "Seiring kamu naik level, kamu mendapatkan poin bakat untuk dibelanjakan pada peningkatan kecil dan permanen bagi kemampuan dan statistikmu. Poin-poin itu membentuk bagaimana sebuah kelas terasa, mencondongkannya ke arah lebih banyak kerusakan, pertahanan lebih kokoh, atau penyembuhan lebih kuat.",
+      "whatBody": "Talentamu adalah tangga pilihan yang pendek, bukan tumpukan poin. Setiap baris yang terbuka menawarkan tiga opsi, dan kamu mengambil tepat satu. Talenta membentuk bagaimana rasanya memainkan sebuah kelas, mencondongkannya ke kerusakan yang lebih besar, pertahanan yang lebih kokoh, atau penyembuhan yang lebih kuat.",
       "howHeading": "Cara kerjanya",
-      "howBody": "Bakat terbuka pada level 10, dan kamu terus mengumpulkan poin saat menanjak menuju batas tertinggi. Kamu membelanjakannya di panel bakat kelasmu, tempat baris yang lebih dalam terbuka seiring kamu berinvestasi dan naik level, dan kamu bisa menyimpan lebih dari satu susunan untuk berganti antar-bangun.",
+      "howBody": "Talenta terbuka di level 5, level yang sama saat kamu memilih spesialisasimu. Lima baris lagi menyusul seiring kamu naik, masing-masing satu di level 8, 11, 14, 17, dan 20, sehingga yang terakhir mendarat di level tertinggi. Kamu membuat pilihanmu di panel talenta kelasmu, pada tab Pilihan di samping tab Spesialisasi.",
       "shareNote": "Sebuah susunan yang rampung bisa disalin menjadi kode pendek yang dapat dibagikan dan diberikan kepada teman, yang menempelkannya langsung ke panel bakatnya sendiri untuk memuatnya.",
-      "choiceNote": "Beberapa poin di tiap pohon adalah persimpangan, bukan pembelian: simpul itu menawarkan dua atau tiga opsi dan kamu memilih salah satunya. Reset berikutmu membuka kembali pilihan itu, seperti segala hal lain di pohon.",
+      "choiceNote": "Setiap baris adalah persimpangan: baris itu menawarkan tiga opsi dan kamu mengikat diri pada salah satunya. Penyetelan ulangmu berikutnya membuka kembali setiap satu dari pilihan itu.",
       "resetTitle": "Tidak ada yang permanen",
-      "resetNote": "Kamu bisa mengatur ulang bakatmu kapan saja saat berada di luar pertempuran dan tidak dalam pertandingan arena, jadi pilihan awal tak pernah menjadi jebakan. Cobalah berbagai hal, lihat apa yang kamu suka, dan ubah pikiranmu dengan bebas.",
+      "resetNote": "Kamu bisa mengatur ulang talentamu kapan saja selagi di luar pertempuran dan tidak sedang dalam pertandingan arena, jadi pilihan awal tidak pernah menjadi jebakan. Penyetelan ulang menghapus pilihan barismu dan tidak memungut biaya, dan spesialisasimu tetap sebagaimana adanya, jadi menyetel ulang tidak pernah mencabut peranmu di tengah penjelajahan. Medan pertempuran adalah pengecualian, dan di sana kamu bisa mengubah build di antara pertarungan. Cobalah berbagai hal, lihat apa yang kamu suka, dan ubah pikiranmu dengan bebas.",
       "specsHeading": "Spesialisasi per kelas",
-      "specsBody": "Setiap kelas memiliki beberapa spesialisasi, masing-masing dengan peran dan fokus khasnya sendiri. Memilih satu di panel bakat menganugerahkan sebuah kemampuan khas dan penguasaan abadi tersendiri. Inilah gambaran semuanya. Buka sebuah kelas untuk melihat perangkat lengkapnya."
+      "specsBody": "Setiap kelas punya segelintir spesialisasi, masing-masing dengan perannya sendiri dan fokus khas. Kamu memilih satu di panel talenta pada level 5. Spesialisasi memberi kemampuan khas dan penguasaan yang bertahan, sebagian besar menambahkan bonus pasif yang cocok dengan perannya, dan itu juga peran yang kamu daftarkan di Pencari Dungeon. Inilah bentuk mereka semua. Buka sebuah kelas untuk perlengkapan lengkapnya.",
+      "loadoutNote": "Kamu tidak harus berpatokan pada satu bangun saja. Simpan sebuah susunan bernama di panel, dan ia akan mengingat baik pilihannya maupun bilah aksimu, sehingga berpindah ke susunan lain hanya perlu satu klik, dengan aturan yang sama seperti reset: di luar pertempuran, dan tidak sedang dalam pertandingan arena.",
+      "loadoutGearNote": "Sebuah susunan bisa membawa perlengkapanmu juga. Simpan dengan entri yang menawarkan menyimpan perlengkapanmu sekalian dan susunan itu turut mencatat apa yang kamu kenakan, dan itulah yang membuat set PvP dan set dungeon berjarak satu klik alih-alih enam belas. Ia mengingat potongan yang persis, bukan sekadar namanya, jadi cincin bersihir tidak pernah diam-diam ditukar dengan kembaran polosnya yang tergeletak di sebelahnya di dalam tasmu. Apa pun yang tidak ditemukannya saat kamu beralih kembali dibiarkan begitu saja dan dilaporkan, jadi set yang kehilangan satu potongan ke bank atau ke pasar tetap mengenakan semua sisanya."
     },
     "arenaPage": {
       "heading": "Arena dan PvP",
@@ -4256,15 +5298,24 @@ export const id_ID: EnTranslations = {
       "duelsHeading": "Duel",
       "duelsBody": "Tantang pemain mana pun yang kamu temui untuk duel persahabatan. Tak ada yang dipertaruhkan selain harga diri, jadi inilah cara termudah mempelajari sebuah pertandingan atau menyelesaikan perselisihan ramah.",
       "coliseumHeading": "Coliseum Abu",
-      "coliseumBody": "Coliseum adalah arena realm, tempat kamu menghadapi pemain lain dalam pertandingan berperingkat, satu lawan satu atau dua lawan dua. Setiap bracket menyimpan peringkatnya sendiri, jadi sebuah kemenangan mengangkatmu di tangga itu untuk dilihat seluruh realm. Buka jendela Arena untuk mendaftar ke sebuah bracket, sendiri atau bersama pasanganmu.",
+      "coliseumBody": "Koloseum adalah arena alam ini, tempat kamu menghadapi pemain lain dalam pertandingan berperingkat, satu lawan satu atau dua lawan dua. Setiap kategori menyimpan peringkatnya sendiri, jadi sebuah kemenangan mengangkatmu di tangga itu untuk dilihat seluruh alam. Permainan berperingkat terbuka di level 15, dan itu berlaku untuk rekanmu juga: kalau salah satu dari kalian di bawahnya, antreannya tetap tertutup sampai kalian berdua memenuhi syarat. Seluruh pemain lawan pemain berada di balik satu tombol bertanda PvP: bukalah dan pilih sebuah tab, Medan Thornhollow, satu lawan satu, atau dua lawan dua, lalu daftarkan diri sendirian atau bersama rekanmu. Selagi kamu mengantre atau berada dalam pertandingan, tab lainnya tetap terkunci, jadi kamu tidak pernah bisa berada di dua antrean sekaligus.",
       "ladderHeading": "Menaiki tangga peringkat",
-      "ladderBody": "Permainan berperingkat melacak kedudukanmu dari waktu ke waktu. Lihat papan peringkat untuk mengetahui posisimu dan siapa yang memuncaki realm."
+      "ladderBody": "Permainan berperingkat melacak kedudukanmu dari waktu ke waktu. Lihat papan peringkat untuk mengetahui posisimu dan siapa yang memuncaki realm.",
+      "rewardsHeading": "Yang dibayar oleh permainan berperingkat",
+      "rewardsBody": "Kemenangan berperingkat membayar Kehormatan, mata uang pemain lawan pemain, dan kekalahan tidak merugikanmu apa pun selain peringkat. Kehormatan dimaksudkan untuk mengganjar pertandingan yang sungguhan: mengalahkan lawan atau tim yang sama lagi pada hari yang sama tidak membayar apa-apa lagi, hari kemenangan yang panjang membayar sedikit lebih kecil per kemenangan seiring berjalannya, dan sebuah pertandingan yang berakhir karena lawanmu menyerah tetap menggerakkan peringkatmu, tetapi sama sekali tidak membayar Kehormatan. Hari itu adalah milik Kehormatan sendiri, dan ia bergulir dengan jamnya sendiri, bukan mengikuti reset instansi realm.",
+      "honorHeading": "Kehormatan",
+      "honorBody": "Kehormatan adalah mata uang untuk bertarung melawan pemain lain. Kamu memperolehnya di Coliseum maupun di Medan Thornhollow; ia disimpan terpisah dari uangmu dan tak pernah tercampur dengannya, dan lembar karaktermu menunjukkan berapa banyak yang kamu miliki. Hanya ada satu hal untuk membelanjakannya: Perlengkapan Perang.",
+      "quartermastersBody": "Dua kepala perbekalan menjaga rak dagangan yang sama, jadi berdaganglah dengan yang lebih dekat denganmu. AMARAH, Kepala Suku Kehormatan, berdiri di Lembah Eastbrook, dan Marsekal Perang Draven Kole, Master Gudang Perang, melayani di Highwatch. Persediaan mereka adalah tingkat Perang: lima keluarga zirah, ditambah kalung, cincin, dan senjata yang dibagikan di antara semuanya.",
+      "honorFinalNote": "Pembelian dengan Kehormatan tidak dapat dikembalikan. Pembelian dengan uang bisa dibatalkan lewat daftar Beli Kembali milik pedagang, tetapi pembelian dengan Kehormatan tak pernah masuk ke sana, dan Perlengkapan Perang menjadi soulbound begitu kamu membelinya, sehingga tak pernah bisa ditukar, dikirim lewat pos, atau dijual kembali dengan cara apa pun. Karena itulah toko memintamu mengonfirmasi: baca perlengkapannya sebelum kamu menekan tombol itu.",
+      "warfareHeading": "Perlengkapan Perang",
+      "warfareBody": "Setiap perlengkapan Perang membawa Rating Serangan Perang dan Rating Pertahanan Perang, dan kedua rating itu sama sekali tak berguna melawan monster. Keduanya berlaku hanya saat kamu bertarung melawan pemain lain, dalam duel, di arena, atau di Medan Thornhollow, tempat Serangan menambah kerusakan yang kamu berikan dan Pertahanan mengurangi kerusakan yang kamu terima, masing-masing hingga batas tertingginya sendiri. Setiap keluarga zirah juga merupakan sebuah set, dan bonus setnya pun sama-sama berupa rating Perang atau efek yang hanya bekerja melawan pemain, sehingga satu set perlengkapan kehormatan penuh sama sekali tak berguna melawan bos dungeon.",
+      "warfareTradeBody": "Itulah kompromi yang disengaja. Perlengkapan Perang dibuat untuk bertarung melawan pemain, bukan sebagai jalan pintas melewati tingkatan dungeon: satu perlengkapan Perang tak pernah membawa rating pertarungan yang dimiliki perlengkapan Epik dungeon di slot yang sama, dan semua yang ia bawa dihabiskan untuk melawan pemain lain. Jika kamu ingin bertahan sendiri di arena, belilah. Jika kamu ingin menuntaskan heroik lebih cepat, dapatkan perlengkapanmu di dungeon."
     },
     "thornhollowPage": {
       "heading": "Medan Thornhollow",
       "intro": "Sebuah medan pertempuran rebut-bendera 5v5 berperingkat yang dipertarungkan di ceruk berdinding pada hutan tua di bawah Thornpeak, tempat dua benteng reruntuhan saling berhadapan di sepanjang jurang dan sebuah halaman yang lebih tua terletak di antara keduanya, yang tak pernah dikuasai salah satu pun. Dua tim beranggota lima, dua benteng, satu tujuan: curi bendera musuh dan bawa pulang sebelum mereka membawa pulang milikmu.",
       "queueHeading": "Masuk Antrean",
-      "queueBody": "Buka panel Medan Thornhollow dan masuk antrean sendirian, atau bawa party beranggota hingga lima orang dan masuk antrean bersama: party selalu ditempatkan pada satu tim yang sama, dan sisa kursi diisi oleh para juara solo. Ketika sepuluh orang telah siap, pertandingan menempatkan kedua tim di benteng masing-masing untuk masa bersiap singkat sebelum bendera-bendera diaktifkan.",
+      "queueBody": "Medan Thornhollow terbuka di level 20, dan setiap anggota kelompok harus mencapainya sebelum kelompoknya bisa mendaftar. Buka tombol PvP dan pilih tab Medan Thornhollow, tab yang memang terbuka pertama, lalu masuk antrean sendirian, atau bawalah kelompok berisi hingga lima orang dan daftarlah bersama: kelompok selalu ditempatkan dalam satu tim, dan kursi sisanya diisi juara-juara yang mendaftar sendirian. Ketika sepuluh orang siap, pertandingan menempatkan kedua tim di benteng masing-masing untuk barisan singkat sebelum benderanya aktif. Kalau kelompok berisi empat atau lima orang jika tidak akan menghadapi semata pendaftar sendirian, penjodohan menahan pertandingan sejenak untuk melihat apakah kelompok kedua muncul, jadi kelompok sebesar itu kadang menunggu beberapa saat lebih lama sebelum gerbangnya terbuka. Penantian itu singkat dan pada akhirnya selalu mengalah, jadi tidak ada yang terjebak di antrean karenanya.",
       "fieldHeading": "Medan",
       "fieldBody": "Sebuah medan terbuka berdinding yang terbagi menjadi tiga ruang: setiap tim memiliki medannya sendiri di depan bentengnya, dan Halaman Reruntuhan berdinding terletak di antara keduanya. Dua tembok tirai membentang di sepanjang lebar penuh, dan setiap pergerakan antar-ruang melewati persimpangan yang diperebutkan: gerbang utama yang lebar, atau rumah gerbang, sebuah ruangan kecil yang membentang di atas tembok dengan pintu-pintu yang bergeser sehingga memaksa pergerakan zig-zag melewati sudut penyergapan. Setiap benteng tertutup rapat kecuali mulutnya, sehingga setiap lari bendera dimulai dan berakhir melalui bukaan yang sama, dan sebuah barikade rendah memecah serbuan lurus ke dalamnya. Halaman itu menyimpan reruntuhan inti berongga dan dua Rune Kecepatan di sisi sayap; dua lainnya menunggu di jalur pendekatan bendera. Sebuah Rune Pertempuran atau Rune Tameng (memberi kerusakan lebih besar, atau menerima kerusakan lebih kecil, selama beberapa detik) menunggu di mulut halaman tiap gerbang utama: kedua alasnya membuka pertandingan pada sisi yang sama dan berpindah setiap kali direbut.",
       "flagsHeading": "Bendera",
@@ -4274,8 +5325,13 @@ export const id_ID: EnTranslations = {
       "respawnBody": "Kematian mempertahankan ritus klasiknya: mayatmu tergeletak di tempat ia jatuh hingga KAMU melepaskan diri, dan rohmu bangkit di kuburan berpagar di sebelah bentengmu, terlindungi di sana hingga gelombang kebangkitan berikutnya milik timmu. Gelombang itu membangkitkan setiap roh yang menunggu secara bersamaan, dan kedua gelombang tim sengaja dibuat berselisih waktu, sehingga pertarungan tidak pernah tereset sepenuhnya sekaligus. Tidak ada lari balik dan tidak ada tawar-menawar dengan penyembuh roh: lepaskan diri, tunggu gelombangnya, bertarung.",
       "carrierHeading": "Membawa bendera",
       "carrierBody": "Pembawa yang menahan bendera musuh terlalu lama akan semakin rentan, menerima kerusakan yang terus meningkat hingga bendera itu direbut, dijatuhkan, atau dikembalikan. Bersembunyi sambil membawa bendera adalah rencana yang kalah; membawanya pulang adalah rencana yang menang.",
+      "leavingHeading": "Pergi lebih awal, dan mengisi kursi kosong",
+      "leavingBody": "Meninggalkan pertandingan yang sedang berjalan berarti membelot darinya, dan tangga berperingkat tidak bisa mengganjar orang yang mencabut steker pada papan skor yang kalah: pembelot menanggung kekalahan dan peringkat yang menyertainya saat itu juga, menjatuhkan bendera kalau sedang membawanya, dan timnya bertarung dengan satu pemain kurang. Bagian terakhir itulah gunanya kursi kosong. Selagi sebuah pertandingan kekurangan satu petarung, antrean bisa menawarkan kursinya kepada seseorang yang sedang menunggu, dan itu selalu tawaran yang kamu terima atau tolak, bukan teleportasi yang menimpamu; menolak tidak merugikanmu dan meneruskannya ke orang berikutnya dalam barisan. Hanya pendaftar sendirian yang ditanya, jadi kelompok yang mendaftar bersama tidak pernah dipisah untuk menambal lubang.",
+      "backfillNote": "Mengambil kursi pengganti memang sengaja dibuat bebas risiko: kamu masuk ke papan skor yang tidak kamu ikut bentuk, jadi pertandingan itu tidak menyentuh peringkatmu ke arah mana pun, menang atau kalah, dan meninggalkannya pun tidak berutang apa-apa. Tawarannya juga berhenti datang begitu sebuah pertandingan cukup dekat ke akhir sehingga kedatangan tidak bisa lagi mengubahnya, jadi kamu tidak pernah didudukkan di penghujung milik orang lain.",
       "ladderHeading": "Papan Peringkat",
-      "ladderBody": "Setiap pertandingan menggerakkan rating medan pertempuran per-karakter yang persisten, menang atau kalah, dan papan sepanjang masa memeringkat para juara realm. Kemenangan dan kekalahan yang diperjuangkan dengan gigih juga membayar Kehormatan lewat sistem Perang."
+      "ladderBody": "Setiap pertandingan menggerakkan peringkat medan pertempuran yang menetap dan melekat pada karakter, menang atau kalah, dan papan sepanjang masa mengurutkan para juara alam ini.",
+      "rewardsHeading": "Apa yang dibayar sebuah pertandingan",
+      "rewardsBody": "Setiap pertandingan yang selesai membayar Kehormatan: lebih banyak untuk kemenangan, sekadar penghibur untuk kekalahan atau hasil seri, ditambah sejumlah kecil untuk setiap pukulan pamungkas yang kamu daratkan dan setiap yang kamu bantu, sehingga bertarung jauh dari bendera tetap sepadan untuk dilakukan. Kemenangan pertamamu tiap hari membayar bonus tambahan di atasnya, dan panel akan memberitahumu selama bonus itu masih menunggumu. Hari itu adalah milik Kehormatan sendiri, dan ia berputar ulang menurut jamnya sendiri, bukan mengikuti reset instans realm. Bertemu tim yang sama berulang kali membayar lebih sedikit untuk pertandingan itu sendiri setelah yang pertama, dengan cepat menetap di sebuah batas bawah alih-alih menyusut sampai nol, dan pertandingan yang menyerah sama sekali tidak membayar apa pun. Belanjakan hasil yang kamu peroleh di salah satu dari kedua Kepala Perbekalan Perang."
     },
     "valeCupPage": {
       "heading": "Piala Lembah",
@@ -4312,11 +5368,11 @@ export const id_ID: EnTranslations = {
       "howHeading": "Cara kerja jasa",
       "howBody": "Jasa diraih dan disimpan satu karakter pada satu waktu, sehingga setiap pahlawan yang kamu mainkan menyusun Kitabnya sendiri; hanya Papan Peringkat realm yang mengumpulkan Kemasyhuranmu dari semua karakter yang kamu mainkan, dan menghitung tiap jasa cuma sekali. Setiap jasa menuliskan dengan gamblang apa yang dimintanya darimu, langsung di Kitab Jasa dalam permainan, jadi kamu selalu tahu apa yang harus dikejar, dan kamu bisa memantau jasa yang sedang kamu incar agar tetap terlihat selagi bermain. Segelintir jasa tetap dirahasiakan dan baru menampakkan diri setelah kamu meraihnya. Kitab itu pun menjaga dirinya tetap jujur: apa pun yang bisa dibuktikan oleh catatan masa lalumu akan dikreditkannya seketika, sehingga seorang veteran tak pernah membukanya ke halaman kosong; hanya jasa penghitung yang memulai hitungannya dari awal.",
       "renownHeading": "Kemasyhuran",
-      "renownBody": "Kemasyhuran adalah skor di balik Kitab. Setiap jasa yang kamu raih bernilai jumlah tertentu, dan totalmu hanya naik, sehingga minggu yang tenang tidak pernah merugikanmu. Segelintir jasa bergantung pada keberuntungan bukan keahlian, dan Mahajasa adalah kehormatan tersendiri, jadi keduanya tidak bernilai Kemasyhuran sama sekali. Jasa tanpa Kemasyhuran tetap dihitung menuju penyelesaian di Kitabmu; mereka hanya tidak pernah mencetak skor.",
+      "renownBody": "Kemasyhuran adalah skor di balik Kitab. Setiap jasa yang kamu raih bernilai jumlah tertentu, dan totalmu hanya naik, jadi minggu yang sepi tidak pernah membuatmu kehilangan pijakan. Segelintir bergantung pada keberuntungan alih-alih keterampilan, jasa koleksi lainnya adalah imbalannya sendiri, dan Prestasi adalah kehormatan tersendiri, jadi tak satu pun dari itu bernilai Kemasyhuran. Jasa tanpa Kemasyhuran tetap dihitung untuk penuntasan Kitabmu; jasa itu hanya tidak pernah menghasilkan angka. Prestasi adalah satu-satunya pengecualian, dijaga sepenuhnya di luar hitungan.",
       "rewardsHeading": "Gelar dan bingkai",
-      "rewardsBody": "Semua hadiahnya sekadar untuk dipamerkan, dan memang itulah intinya. Sebagian jasa menganugerahkan gelar yang bisa kamu sandang atau bingkai untuk menghiasi namamu, dan tidak pernah ada yang membuat pahlawanmu lebih kuat. Pilih gelar yang kamu inginkan dari Kitab Jasa, dan gelar itu akan menyertaimu di papan namamu, dalam obrolan, dan di papan peringkat untuk dilihat semua orang.",
+      "rewardsBody": "Semua hadiahnya hanya untuk dipamerkan, dan memang itulah maksudnya. Sebagian jasa memberi gelar yang bisa kamu kenakan atau bingkai untuk membingkai namamu, dan tidak pernah sesuatu yang membuat pahlawanmu lebih kuat. Pilih gelar dan bingkai yang kamu mau dari Kitab Jasa: gelar itu ikut serta pada papan namamu, di obrolan, dan di papan peringkat agar dilihat semua orang, sedangkan bingkai menorehkan warnanya sendiri di sekeliling papan nama dan potretmu.",
       "chroniclesHeading": "Kronik",
-      "chroniclesBody": "Setiap zona menyimpan Kroniknya sendiri, sekumpulan jasa yang dihimpun oleh seorang Juru Kronik setempat yang mengemban sendiri tugas mencatat setiap pengelana yang lewat. Saul dari Lembah Eastbrook adalah yang pertama di antara mereka. Sebuah Kronik terbagi menjadi bab-bab, dan kamu bebas menggarapnya dalam urutan mana pun yang cocok untukmu.",
+      "chroniclesBody": "Setiap zona menyimpan Kronikanya sendiri, sekumpulan jasa yang dihimpun oleh penulis kronik setempat yang mengambil tugas mencatat setiap pengembara yang lewat. Saul dari Lembah Eastbrook adalah yang pertama, Osric Fenn menjaga Kronika Rawa di Fenbridge jauh di Mirefen, dan Zenzie mencatat Kronika Puncak di atas sana di Highwatch. Sebuah Kronika terbagi menjadi bab-bab, dan kamu bebas menyusurinya dalam urutan yang kamu suka.",
       "featsHeading": "Mahajasa",
       "featsBody": "Mahajasa adalah rak tersendiri: catatan warisan dan pencapaian pertama di dunia, jasa-jasa yang terikat pada era yang telah berlalu atau momen yang hanya akan terjadi sekali. Mahajasa tak membawa Kemasyhuran dan berada di luar hitungan penyelesaian, disimpan selamanya sebagai kenangan atas apa yang pernah dilakukan.",
       "catalogHeading": "Daftar lengkap segala jasa",
@@ -4339,6 +5395,30 @@ export const id_ID: EnTranslations = {
         "social": "Sosial",
         "exploration": "Eksplorasi",
         "feat": "Mahajasa"
+      },
+      "bookHeading": "Di dalam Kitab",
+      "bookBody": "Kitab menyortir setiap jasa ke dalam kategori yang bisa kamu pilih bergantian, dengan sebuah kotak pencarian dan filter untuk semuanya: untuk yang sudah kamu raih, untuk yang belum, dan untuk yang hampir kamu selesaikan. Sebuah baris Terbaru di dekat puncak menyimpan jasa yang baru saja kamu raih, dan mengeklik salah satunya langsung melompat ke kartunya, sama seperti mengeklik sebuah nama jasa yang diposkan seseorang di obrolan. Di sebelahnya, Hampir tercapai menunjukkanmu segelintir jasa yang paling dekat dengan penyelesaian. Di sebuah realm, setiap jasa juga membawa kelangkaannya, bagian petualang yang telah meraihnya, sehingga kamu bisa melihat sekilas mana yang umum dan mana yang benar-benar sebuah pendakian; dunia luring tak memiliki populasi untuk dihitung, sehingga ia tak menampilkan apa pun. Di ujung rel duduk rak Gelar, tempat kamu memilih gelar yang kamu kenakan.",
+      "platformHeading": "Pencapaian Steam dan Epic",
+      "platformBody": "Jika kamu menautkan akun Steam atau Epic Games dari aplikasi desktop, jasa yang kamu raih tercermin ke luar sebagai pencapaian pada akun itu. Dunia permainan tetap menjadi otoritasnya: kamu meraih jasa itu di sini, ia dicatat pada karaktermu, dan pencapaiannya menyusul kemudian. Tidak setiap jasa memiliki pencapaian yang sepadan, dan jika satu tidak tiba seketika, ia akan menyusul pada saat berikutnya kamu masuk. Menautkan hanyalah sebuah tautan, tidak pernah menjadi cara untuk masuk."
+    },
+    "reliquaryPage": {
+      "intro": "Relikuari adalah museum rampasan unik yang telah kamu katalogkan: benda buruan dari ruang bawah tanah, trofi profesi, tunggangan, tampilan senjata, dan gelar. Ia berpasangan dengan Kitab Jasa seperti aula trofi berpasangan dengan buku pencapaian.",
+      "howHeading": "Cara kerja koleksinya",
+      "howBody": "Buka Relikuari di dalam game (bawaan Shift+X). Setiap rak memuat halaman berisi relik unik. Kamu mengisi sebuah siluet saat pertama kali memperoleh benda itu pada karakter tersebut, dan menerangi sebuah halaman saat setiap relik di dalamnya sudah terisi. Beberapa halaman berlabel Ditarik atau Pribadi: halaman itu berada di luar penuntasan, jadi tidak pernah mengunci sebuah rak maupun seluruh katalog. Temuan langsung memunculkan pemberitahuan dan menyegarkan jendela yang terbuka; kemajuan bersifat per karakter, kecuali tampilan senjata, yang merupakan kosmetik akun.",
+      "ranksHeading": "Peringkat Kurator",
+      "ranksBody": "Peringkat Kurator naik seiring setiap relik unik yang terkatalog dan hanya memberi gelar serta bingkai kosmetik. Peringkat itu tidak pernah memberi kekuatan tempur, peluang jarahan, atau kompensasi kesialan. Tampilan senjata milik akun tidak menambah peringkat Kurator agar prestise tetap melekat pada karakter, dan relik pada halaman Ditarik atau Pribadi juga tidak menambahnya.",
+      "retiredTag": "Ditarik",
+      "personalTag": "Pribadi",
+      "retiredNote": "Relik ini tidak bisa lagi diraih. Halaman ini menghormati para veteran yang menyimpannya dan tidak dihitung untuk penuntasan maupun peringkat Kurator.",
+      "personalNote": "Setiap karakter hanya bisa memiliki miliknya sendiri. Halaman ini tidak dihitung untuk penuntasan maupun peringkat Kurator.",
+      "catalogHeading": "Katalog halaman",
+      "catalogBody": "Semua halaman Relikuari yang tertulis beserta nama relik yang dimuatnya. Daftar ini hanya berisi nama yang aman dari bocoran: buka Relikuari di dalam game untuk melihat kemajuanmu sendiri, jumlah penyelesaian, dan siluetnya.",
+      "spoilerNote": "Riwayat temuan pertama yang bersifat pribadi, jumlah penyelesaian, dan status belum dimiliki dibanding sudah dimiliki tetap berada di klien game. Wiki tidak pernah menerbitkan koleksi seorang pemain.",
+      "shelfHeading": "{label} ({count})",
+      "shelf": {
+        "conquerors": "Penakluk",
+        "professions": "Profesi",
+        "horizons": "Cakrawala"
       }
     },
     "wishPage": {
@@ -4349,7 +5429,7 @@ export const id_ID: EnTranslations = {
       "i2Title": "Kematian hampir tak merugikanmu",
       "i2Body": "Saat kamu tumbang, kamu bangkit sebagai hantu di kuburan terdekat. Larikan kembali ke tubuhmu untuk bangkit tanpa biaya, atau terima kebangkitan seketika dari Sang Penjaga Pucat dan tanggung kelemahan singkat demi kemudahannya. Tak ada pengalaman, perlengkapan, atau koin yang pernah hilang, jadi aman untuk mengambil risiko dan belajar.",
       "i3Title": "Bakat bukanlah jebakan",
-      "i3Body": "Bakat terbuka pada level 10 dan diatur ulang kapan pun kamu mau, selama di luar pertempuran, jadi pilihan awalmu tidak pernah permanen.",
+      "i3Body": "Talenta pertamamu datang di level 5, dan masing-masing dari enam baris itu adalah satu pilihan dari tiga, jadi sebuah build adalah segelintir keputusan yang kamu tangkap dalam sekali pandang. Kamu bisa mengatur ulang kapan pun kamu di luar pertempuran dan tidak sedang dalam pertandingan arena, jadi tidak ada yang kamu pilih di awal yang mengurungmu.",
       "i4Title": "Ikuti jejak misi",
       "i4Body": "Misi adalah cara tercepat untuk naik level dan misi menuntunmu menjelajahi dunia. Saat kamu ragu harus ke mana, cari penanda berikutnya.",
       "i5Title": "Jaga perlengkapanmu tetap terkini",
@@ -4370,6 +5450,39 @@ export const id_ID: EnTranslations = {
       "canvasLabel": "Model 3D {name} yang dapat diputar",
       "posterAlt": "{name}"
     },
+    "editorPage": {
+      "intro": "Sebuah editor peta milikmu sendiri, langsung di peramban. Bentuk daratannya, tanam properti dan kemah, lalu masuk ke hasilnya dan berjalan-jalan di sana.",
+      "whereTitle": "Di mana menemukannya",
+      "whereBody": "Editor ini adalah sebuah halaman tersendiri di /editor, terpisah dari permainan. Ia terbuka dengan sebuah Peta Tanpa Judul yang baru, dibangun dari dunia yang sudah kamu kenal, sehingga kamu selalu memulai dengan tanah sungguhan di bawah kakimu. Sebuah tur berpemandu singkat berjalan pada kunjungan pertamamu, dan Bantuan di bilah atas bisa menjalankannya lagi.",
+      "buildTitle": "Apa yang bisa kamu bangun",
+      "buildBody": "Alat-alat berada di bilah alat sebelah kiri, masing-masing dengan pintasan satu huruf yang ditampilkan pada tombolnya. Pilih satu dan bekerja langsung di peta yang ada di depanmu. Ctrl+Z mengurungkan dan Ctrl+Y mengulangi, sehingga tak ada yang kamu coba bersifat permanen.",
+      "toolLandTitle": "Membentuk daratan",
+      "toolLandBody": "Naikkan, turunkan, haluskan, dan ratakan tanah di bawah sebuah kuas yang ukurannya kamu atur sambil jalan, dengan sebuah putaran kekuatan pada langkah menaikkan, menurunkan, dan menghaluskan.",
+      "toolSurfaceTitle": "Mengecat dan membanjiri",
+      "toolSurfaceBody": "Cat penutup tanah bioma di atas bawaan zona, dan atur satu ketinggian air yang menjadi acuan naik-turun setiap danau yang dideklarasikan peta.",
+      "toolPlaceTitle": "Menempatkan properti",
+      "toolPlaceBody": "Jatuhkan potongan dari katalog aset bawaan ke atas tanah. Alat Pilih, tombol pertama di bilah alat, mengambil kembali sebuah potongan yang sudah ditempatkan sehingga kamu bisa memindahkan, memutar, mengubah skala, atau menduplikasinya, dan alat Hapus mengangkat satu dari peta saat kamu berubah pikiran. Sebuah penempatan bisa diberi tabrakan sehingga seorang pemain berjalan mengitarinya alih-alih menembusnya. Untuk sapuan besar, sebuah panel Prosedural berada di bawah alat yang sama: sebarkan seluruh kategori aset ke seluruh area sekaligus, atau naikkan serangkaian bukit, keduanya dikerjakan dari seed peta, sehingga pengaturan yang sama selalu memberimu hasil yang sama.",
+      "toolCampTitle": "Kemah dan titik kemunculan",
+      "toolCampBody": "Susun kemah-kemah mob yang hidup saat Uji Main, dan atur Titik Kemunculan tempat Uji Main menjatuhkan pemain.",
+      "toolBlockerTitle": "Dinding tak kasatmata",
+      "toolBlockerBody": "Seret Dinding Penghalang yang menghentikan pergerakan tanpa menampilkan apa pun, untuk sebuah tepi yang ingin kamu tutup diam-diam.",
+      "toolRegionTitle": "Menyalin seluruh area",
+      "toolRegionBody": "Pilih medan dan aset yang sudah ditempatkan dengan kotak seleksi memakai alat Wilayah, lalu tempel seleksi itu di tempat lain pada peta.",
+      "viewsTitle": "Dua tampilan dari peta yang sama",
+      "viewsBody": "Area pandang 3D menggambar petamu dengan mesin perender permainan yang sesungguhnya, sehingga apa yang kamu lihat adalah apa yang kamu dapat: seret untuk mengorbit, gulir untuk memperbesar. Peta atas 2D adalah tampilan denah, lebih cocok untuk memindahkan penanda zona seperti Hub, Kuburan, dan Titik menarik, serta untuk membingkai area luas sebelum kamu memahatnya. Sakelarnya berada di bilah atas.",
+      "playtestTitle": "Mainkan petamu",
+      "playtestBody": "Uji Main menyerahkan peta itu ke permainan dan menjatuhkanmu ke dalamnya sebagai seorang prajurit. Semua yang kamu buat ada tepat di bawah kakimu: kemah-kemah memunculkan mob, dinding penghalang menahan, dan penempatan yang memiliki tabrakan mendorongmu berjalan mengitarinya. Setelah kamu merasa cukup melihat, kembalilah ke editor dan lanjutkan bekerja.",
+      "sandboxTitle": "Sebuah kotak pasir, bukan dunia yang sesungguhnya",
+      "sandboxBody": "Peta kustom tidak pernah mengubah permainan yang sedang dimainkan semua orang lain. Sebuah Uji Main berjalan luring di peramban milikmu sendiri dan tidak pernah berbicara dengan server, sehingga tak ada yang terjadi di dalamnya menjangkau karaktermu atau dunia bersama.",
+      "saveTitle": "Menyimpan karyamu",
+      "saveBody": "Ctrl+S menyimpan, dan selama ada suntingan belum tersimpan, sebuah titik muncul di samping nama peta dan tombol Simpan meminta perhatianmu. Tanpa akun pun editor tetap berfungsi: peta disimpan di peramban milikmu sendiri, Simpan Otomatis bisa dinyalakan, dan Ekspor menuliskan sebuah peta sebagai berkas JSON polos yang bisa langsung dibaca kembali oleh Impor.\n\nSetelah masuk dengan akun permainanmu, sebuah penyimpanan juga dikirim ke server, sehingga peta-petamu mengikutimu ke mesin lain. Jendela Buka Peta punya satu tab, Peramban Ini, untuk draf di peramban ini, dan satu lagi, Peta Server Saya, untuk peta yang tersimpan di akunmu. Jika editor menampilkan lencana luring, masuklah ke permainan di tab lain, lalu muat ulang editor.",
+      "shareTitle": "Menerbitkan dan membuat fork",
+      "shareBody": "Peta yang tersimpan di akunmu dimulai sebagai privat. Dari jendela Buka Peta kamu bisa menerbitkan salah satunya, yang mencantumkannya agar bisa ditelusuri siapa pun, dan membatalkan penerbitannya kembali kapan saja. Tab Peta Publik di jendela yang sama menelusuri semua yang telah diterbitkan pemain lain: Buka memuat satu peta agar kamu bisa melihat-lihat bagaimana ia dibuat, dan Fork menjatuhkan sebuah salinan privat ke dalam daftarmu sendiri untuk diubah sesukamu. Sebuah salinan adalah peta baru: menyuntingnya tidak pernah menyentuh yang asli.\n\nAda batas berapa banyak peta yang boleh disimpan satu akun, jadi rapikan eksperimen yang sudah kamu selesaikan.",
+      "uploadTitle": "Membawa model milikmu sendiri",
+      "uploadBody": "Setelah masuk, tombol Unggah Aset mengambil sebuah model GLB milikmu sendiri dan menambahkannya ke peramban aset di samping katalog bawaan, siap ditempatkan seperti properti lainnya. Unggahan disimpan pada akunmu, dihitung terhadap batas ukuran dan penyimpanan, dan bisa dihapus dari peramban aset ketika kamu tidak lagi menginginkannya.",
+      "helpTitle": "Mempelajari alat-alatnya",
+      "helpBody": "Bantuan di bilah atas membuka sebuah rujukan yang mencakup setiap alat, pintasan papan ketik, dan gerakan tetikus, dan ia bisa memulai ulang tur berpemandu kapan saja. Selebihnya tinggal mengutak-atik: urungkan selalu hanya sejauh satu ketukan tombol, dan Ekspor memberimu salinan sebuah peta yang selalu bisa kamu kembali padanya."
+    },
     "models": {
       "title": "Penampil Model 3D",
       "lead": "Amati para pahlawan, monster, dan iblis di dunia ini dari dekat. Pilih sebuah model, lalu seret untuk memutarnya.",
@@ -4388,7 +5501,7 @@ export const id_ID: EnTranslations = {
     "gear": {
       "intro": "Perlengkapan adalah peralatan yang dikenakan karaktermu dan barang yang kamu bawa. Perlengkapan yang lebih baik adalah cara paling mantap untuk menjadi lebih kuat, dan kamu mengumpulkan sebagian besarnya hanya dengan bermain.",
       "slotsTitle": "Apa yang bisa kamu kenakan",
-      "slotsBody": "Kamu memiliki satu slot senjata, tujuh slot zirah, dan tiga slot perhiasan: satu leher dan dua jari. Setiap kelas hanya bisa menggunakan senjata tertentu dan mengenakan zirah sesuai bobotnya sendiri, kain, kulit, atau rantai, jadi peningkatan yang cocok untukmu adalah yang dibuat untuk kelasmu. Perhiasan sama sekali tak berbobot: kelas mana pun mengenakan apa pun yang diperolehnya. Di dalam batas itu, isi setiap slot dengan potongan terbaik yang kamu temukan.",
+      "slotsBody": "Kamu punya satu slot senjata tangan utama, satu slot tangan kiri, tujuh slot baju zirah, dan tiga slot perhiasan: satu leher dan dua jari. Setiap kelas hanya bisa memakai senjata tertentu dan mengenakan zirah sampai bobotnya sendiri, kain, kulit, atau rantai, jadi peningkatan yang cocok untukmu adalah yang dibuat untuk kelasmu. Perhiasan sama sekali tidak berbobot: kelas mana pun mengenakan apa yang ia peroleh. Di dalam itu, isilah setiap slot dengan potongan terbaik yang kamu temukan.",
       "slotMainhand": "Senjata",
       "slotHelmet": "Kepala",
       "slotNeck": "Leher",
@@ -4400,7 +5513,7 @@ export const id_ID: EnTranslations = {
       "slotFeet": "Kaki",
       "slotFinger": "Jari",
       "bagsTitle": "Tas dan ruang bawaan",
-      "bagsBody": "Semua yang kamu pungut menumpang dalam satu ransel bersama, dan kamu memperbesarnya dengan memasang tas. Jendela tasmu punya empat soket tas: klik sebuah tas di ranselmu untuk menyelipkannya ke soket kosong, dan tiap tas yang kamu kenakan menambah ruangnya sendiri. Tas sederhana adalah barang penjaja yang murah, yang lebih lapang jatuh dari binatang buas, dan yang terbaik berasal dari bos dungeon, jadi ruang bawaanmu tumbuh sejalan dengan perlengkapanmu.",
+      "bagsBody": "Semua yang kamu pungut ikut dalam satu ransel bersama, dan kamu memperbesarnya dengan memasang tas. Jendela tasmu punya empat slot tas: klik sebuah tas di ranselmu untuk menyelipkannya ke slot kosong, dan setiap tas yang kamu kenakan menambahkan ruangnya sendiri. Tas sederhana adalah barang pedagang yang murah, yang lebih lapang jatuh dari hewan buas, dan yang terbaik berasal dari bos dungeon, sehingga ruang bawaanmu tumbuh seiring perlengkapanmu. Apa pun yang bisa ditumpuk menyebutkan pada keterangannya berapa banyak yang muat dalam satu slot, dan begitulah kamu tahu lebih dulu bahwa borongan ramuan yang besar akan memakan dua slot.",
       "qualityTitle": "Kualitas, sekilas pandang",
       "qualityBody": "Setiap barang memiliki kualitas, dan namanya diberi warna yang sesuai sehingga kamu bisa membaca nilainya sekilas. Dari yang paling umum hingga yang paling berharga:",
       "qualityPoor": "Buruk",
@@ -4414,18 +5527,18 @@ export const id_ID: EnTranslations = {
       "upgradeBody": "Mengganti potongan lama dengan peningkatan baru lebih berguna bagimu daripada bermain sempurna dengan perlengkapan yang sudah kamu lampaui. Saat sesuatu yang lebih baik jatuh atau sebuah misi menawarkannya, ambillah. Jangan simpan barang bagusmu untuk nanti.",
       "itemLevelBody": "Untuk membandingkan dua perlengkapan dengan cepat, aktifkan Tampilkan Level Item di opsi. Perlengkapan yang sumbernya diketahui, dari musuh, misi, dan profesi kerajinan, kemudian menampilkan level item: satu angka yang memperkirakan kekuatan berdasarkan asalnya dan memudahkan melihat peningkatan terbaik, bahkan antar-slot. Item tanpa sumber seperti itu, misalnya barang dasar pedagang dan perlengkapan awal, tidak menampilkan level; angka yang tidak ada adalah hal normal.",
       "sourcesTitle": "Dari mana perlengkapan berasal",
-      "sourcesBody": "Sebagian besar peningkatan awalmu adalah hadiah misi, jadi lebih menguntungkan menuntaskan misi daripada menggerus musuh. Musuh menjatuhkan perlengkapan saat kamu mengalahkannya, penjaja di kota menjual barang dasar yang andal, perajin mengubah bahan yang dikumpulkan menjadi potongan yang bisa dikenakan, dan pasar pemain memungkinkanmu membeli dari petualang lain. Di puncak bukit, dua mata uang tanda membeli perlengkapan yang tak ditemukan di tempat lain: Tanda Delve pada penjaga delve, dan Tanda Heroik pada Kepala Perbekalan Heroik.",
+      "sourcesBody": "Sebagian besar peningkatan awalmu adalah imbalan misi, jadi lebih menguntungkan menyelesaikan misi daripada menggarap grind. Musuh menjatuhkan perlengkapan ketika kamu mengalahkannya, pedagang di kota menjual dasar yang kokoh, perajin mengubah bahan yang dikumpulkan menjadi potongan yang bisa dikenakan, dan pasar pemain memungkinkanmu membeli dari petualang lain. Di puncak bukit, tiga mata uang hasil jerih payah membeli perlengkapan yang tidak ditemukan di tempat lain: Tanda Delve pada penjaga delve, Tanda Heroik pada kepala perbekalan heroik, dan Kehormatan pada para kepala perbekalan kehormatan.",
       "soulboundTitle": "Soulbound: milikmu dan hanya milikmu",
       "soulboundBody": "Beberapa hadiah istimewa bersifat soulbound, terikat pada karaktermu sejak saat kamu meraihnya. Barang soulbound tak bisa ditukar, dikirim lewat pos, dijual ke penjaja, atau didaftarkan di pasar; ia milikmu dan hanya milikmu. Saat ini perlindungan itu menjaga token hadiah seperti Tanda Heroik, sementara perlengkapan yang kamu menangkan bebas kamu tukar, jual, atau bagikan.",
       "uniqueTitle": "Unik-Dipakai: satu legendaris dari tiap jenis",
       "uniqueBody": "Item legendaris bersifat unik-dipakai: karaktermu hanya bisa mengenakan satu salinan dari legendaris tertentu dalam satu waktu, dan versi heroiknya dihitung sebagai item yang sama. Salinan kedua bisa tersimpan di tasmu, di bank, atau di pasar, tetapi mencoba mengenakan keduanya sekaligus akan ditolak, dan tooltip menampilkan label emas Unik-Dipakai supaya kamu bisa melihat aturan ini sebelum merencanakan build di sekitar dua item itu.",
       "setsTitle": "Set dan bonus set",
-      "setsBody": "Sebagian zirah hadir dalam keluarga yang serasi, beberapa potongan yang dirancang untuk tampak dan bertarung sebagai satu kesatuan. Kenakan cukup banyak dari satu keluarga sekaligus dan set itu pun bangkit, memberi bonus di atas stat tiap potongannya, dan makin banyak potongan yang kamu kenakan makin kuat jadinya. Beberapa keluarga semacam itu muncul sebagai jarahan berharga selagi kamu naik level; yang terhebat di antaranya berasal dari konten kelompok paling tangguh di dekat batas level, jadi memburu satu set lengkap adalah tujuan babak akhir yang klasik.",
+      "setsBody": "Sebagian zirah datang dalam keluarga yang serasi, beberapa potongan yang dipotong agar tampak dan bertarung sebagai satu. Kenakan cukup banyak potongan dari satu keluarga sekaligus dan setnya terbangun, memberikan bonus di atas nilai masing-masing potongan, dan makin banyak potongan yang kamu kenakan makin kuat jadinya. Beberapa keluarga semacam itu muncul sebagai jarahan yang didambakan selagi kamu naik level, dan yang terbesar datang dari konten kelompok terberat di dekat level tertinggi, jadi memburu satu set penuh adalah tujuan akhir permainan yang klasik. Pertarungan melawan pemain lain punya keluarga serasinya sendiri, dibeli sepotong demi sepotong dengan Kehormatan; keluarga itu terbangun pada jumlah potongan yang berbeda dari keluarga jarahan, dan bonusnya hanya menjawab ketika musuhnya adalah pemain lain.",
       "consumablesTitle": "Barang Pakai Habis",
       "consumablesIntro": "Beberapa barang dipakai sekali untuk manfaat cepat. Mereka adalah asuransi murah, jadi simpanlah beberapa di tangan.",
-      "consumablesPotions": "Ramuan memulihkan nyawa atau mana saat kamu menggunakannya, bahkan di tengah pertarungan, yang menjadikannya penyelamat jitu saat sebuah serangan berjalan kacau. Mereka berbagi waktu jeda yang singkat, jadi rencanakan satu momen tepat untuk menggunakannya.",
+      "consumablesPotions": "Ramuan memulihkan nyawa atau mana pada saat kamu memakainya, bahkan di tengah pertempuran, yang membuatnya menjadi penyelamat ketika sebuah tarikan berantakan. Semua ramuan berbagi satu waktu jeda sepanjang beberapa menit, jadi kamu mendapat satu momen bagus per pertarungan alih-alih rentetan. Ramuan juga memulihkan lebih sedikit daripada duduk untuk makan atau minum, dan itulah harga karena tidak duduk. Ramuan hadir dalam tingkatan yang dipotong untuk tiap penggal dunia, jadi bawalah tingkatan yang dibuat untuk levelmu: ramuan lama bertingkat rendah hanyalah serpih pada karakter yang sudah tumbuh.",
       "consumablesFood": "Makanan dan minuman memulihkanmu saat kamu duduk dan beristirahat di sela pertarungan. Makan memulihkan nyawa, minum memulihkan mana, dan beristirahat dengan cara ini gratis. Duduklah selama beberapa detik setelah pertarungan berat alih-alih berlari ke pertarungan berikutnya dengan nyawa separuh pulih.",
-      "consumablesElixirs": "Eliksir memberikan buff sementara selama kamu berpetualang, sedikit keunggulan yang membantu saat kamu ingin mendorong sedikit lebih jauh.",
+      "consumablesElixirs": "Eliksir memberi penguatan sementara selagi kamu bertualang, sedikit keunggulan yang membantu ketika kamu ingin mendorong sedikit lebih jauh. Eliksir tidak berbagi waktu jeda ramuan, jadi kamu bisa meminum satu dan tetap menyimpan ramuan penyembuh sebagai cadangan. Dua eliksir untuk atribut yang sama tidak menumpuk, dan yang terakhir kamu minum itulah yang bertahan.",
       "fishingTitle": "Memancing",
       "fishingBody": "Memancing adalah selingan yang menenangkan. Bawalah joran, gunakan di tepi perairan terbuka, dan tarik apa pun yang menyambar. Sebagian besar kamu menangkap ikan yang merupakan makanan yang bisa kamu santap, sesekali barang rongsokan untuk dijual demi beberapa koin, dan sesekali tangkapan langka yang berharga. Apa yang kamu temukan bergantung pada perairan tempat kamu memancing.",
       "fishingFood": "Ikan yang kamu tarik adalah makanan: santap satu sambil kamu duduk beristirahat dan ia memulihkan nyawa, dengan ikan yang lebih mengenyangkan berasal dari perairan yang lebih dingin dan lebih dalam di utara. Mengail di danau adalah cara tenang untuk menjaga tasmu tetap penuh persediaan di sela pertarungan.",
@@ -4433,9 +5546,18 @@ export const id_ID: EnTranslations = {
       "cosmeticsTitle": "Penampilan dan kosmetik",
       "cosmeticsBody": "Beberapa hadiah hanya mengubah penampilan karaktermu, tak pernah seberapa kuat dirimu. Skin kosmetik ini membuatmu menonjol tanpa memengaruhi permainan, jadi kenakanlah yang mana pun kamu suka.",
       "cosmeticsRanks": "Kosmetik hadir dalam tingkat kelangkaannya sendiri, dan yang lebih langka adalah sesuatu yang seru untuk dikejar. Meraih tingkat yang lebih tinggi juga membuka penampilan di bawahnya.",
-      "cosmeticsSkins": "Ada dua lini kosmetik untuk dikoleksi. Sebagian besar kelas memiliki beberapa penampilan alternatif, sentuhan baru atas wujud kelas yang hanya milikmu untuk dikenakan. Di samping itu ada chroma: skema warna dwiwarna bernama yang mengecat ulang sebuah penampilan sepenuhnya, dari logam bersahaja hingga warna kekaisaran yang cerah.",
+      "cosmeticsSkins": "Penampilan karakter kamu hadir dalam dua jalur. Sebagian besar kelas punya beberapa penampilan alternatif, tafsir segar atas tampilan kelas yang menjadi milikmu untuk dikenakan. Di sampingnya berdiri chroma: skema dua warna bernama yang mengecat ulang sebuah tampilan sepenuhnya, dari logam yang bersahaja sampai warna kekaisaran yang menyala.",
       "cosmeticsCache": "Beberapa di antaranya berasal dari peti kosmetik misterius, sebuah hadiah tersegel yang mengundi satu dari tiga tingkat kualitas saat kamu membukanya dan menganugerahkan penampilan yang sesuai. Ini murni untuk penampilan: tak ada di dalamnya yang membuatmu lebih kuat, hanya lebih elok dipandang.",
-      "cosmeticsApply": "Atur penampilan aktifmu dari baris penampilan di layar karaktermu, dan berganti dengan bebas di antara semua yang telah kamu buka."
+      "cosmeticsApply": "Atur penampilan aktifmu dari baris penampilan di layar karaktermu, dan berganti dengan bebas di antara semua yang telah kamu buka.",
+      "slotOffhand": "Tangan Sekunder",
+      "offhandBody": "Apa yang ditempati Tangan Sekunder bergantung pada kelasmu. Sebuah perisai ada di sana, begitu pula sebuah fokus yang dipegang seperti sebuah orb atau sebuah tome, atau sebuah tabung panah untuk seorang pemburu. Kelas yang bisa memakai dua senjata sekaligus menempatkan senjata kedua di sana, dengan sebuah harga yang perlu kamu ketahui: bertarung dengan sebuah senjata di setiap tangan membuat ayunan biasamu meleset jauh lebih sering, meski ia tidak mengganggu kemampuanmu. Sebuah senjata dua tangan biasanya membutuhkan kedua tangan, sehingga mengenakannya membuat Tangan Sekunder melepas apa pun yang sedang dipegangnya, kecuali spesialisasimu termasuk yang langka, yang bisa membawa dua senjata semacam itu sekaligus.",
+      "bagsSort": "Ketika ranselmu berantakan, tombol Urutkan di jendela tas merapikannya dalam satu tekan. Tumpukan sebagian dari barang yang sama digabungkan menjadi satu, dan semuanya ditata ulang dalam urutan yang mudah dibaca: senjata dan zirah lebih dulu, lalu tas, konsumsi, perkakas, dan tunggangan, lalu bahan kerajinan dengan setiap tingkat halusnya duduk di samping versi biasanya, lalu barang misi, dengan barang remeh bermutu Buruk di posisi terakhir sehingga kamu bisa melihat sekilas apa yang harus dijual. Tak ada yang pernah dibuat atau hilang, hanya ditata ulang, jadi selalu aman untuk ditekan.",
+      "requiredLevelBody": "Beberapa potongan juga membawa sebuah level yang dibutuhkan, ditampilkan pada tooltip sebagai Membutuhkan Level. Kamu bisa menjarah, membeli, atau diberi potongan semacam itu pada level berapa pun, tetapi kamu tidak bisa mengenakannya sampai kamu mencapainya. Persyaratan itu mengikuti dari mana potongan itu berasal, bukan sekadar warnanya, sehingga sebuah item langka yang kamu menangkan pada levelmu sendiri biasanya langsung bisa dikenakan, sementara sebuah warisan dari jauh di atasmu menunggu di dalam tasmu sampai kamu menyusul.",
+      "sourcesHonor": "Kehormatan adalah apa yang dibayar oleh pertarungan melawan pemain lain, dan kedua kepala perbekalan Kehormatan, AMARAH di Eastbrook dan Marsekal Perang Draven Kole di Highwatch, menyimpan toko Perang yang hanya bisa dibeli dengan Kehormatan: seluruh keluarga zirah, perhiasan, dan senjata yang tak dibawa penjaja koin mana pun. Halaman Arena & PvP membahas cara Kehormatan itu sendiri diperoleh.",
+      "sourcesRifts": "Rift menambahkan satu sumber lagi begitu kamu mencapai batas level, dan sebuah rift adalah sebuah balapan: kelompok yang membersihkannya lebih dulu memenangkan hadiahnya. Pembersihan pertama itu membayar perlengkapan di atas segala yang ditinggalkan perjalanan itu, termasuk sebuah Cincin Terikat Rift yang disesuaikan dengan peran kelasmu, sebuah cincin yang tak akan kamu temukan di tempat lain mana pun di dunia. Sebuah kelompok yang menyelesaikannya kedua tetap menuntaskan perjalanannya sendiri dan tetap mendapat kredit atas pembersihan itu; yang mereka lepaskan adalah hadiah pembersihan pertama. Halaman Rift membahas balapan itu sendiri.",
+      "bindOnTradeBody": "Ada juga versi yang lebih lunak dari gagasan yang sama: beberapa barang terikat saat diperdagangkan, artinya ia bisa berpindah tangan tepat satu kali dan setelah itu menjadi milik siapa pun yang menerimanya. Sebuah karya pesanan yang dibuat oleh perajin terikat begitu sang perajin menyerahkannya. Sebuah salinan di bawah aturan ini tidak pernah menumpang di Pasar Dunia atau Pos Gagak, yang keduanya anonim; ia hanya berpindah tangan langsung atau tidak sama sekali, dan begitu ia berpindah, ia pun terikat. Tooltip menyebutkan aturan mana yang diikuti sebuah potongan, jadi periksa dulu sebelum kamu berencana menjualnya kembali.",
+      "cosmeticsWeapons": "Skin senjata adalah lini ketiga, dan ia mengubah apa yang kamu bawa, bukan siapa yang membawanya. Sebuah Skin mengecat ulang sebuah jenis senjata, sehingga tampilannya mengikuti pedang, tongkat, atau busur mana pun yang kamu kenakan, dan ia tidak pernah menyentuh statistik, jangkauan, atau kecepatan senjata itu. Skin terbuka untuk seluruh akunmu, bukan satu karakter saja, dan ia hadir dalam koleksi dengan tingkat kelangkaan seperti yang lainnya. Skin ditawarkan dalam koleksi musiman Gudang Senjata alih-alih ditemukan di dunia, dan Gudang Senjata juga tempat kamu mengaturnya, satu per jenis senjata, alih-alih dari baris penampilan. Semua orang yang berdiri di dekatmu melihat Skin yang kamu kenakan.",
+      "soulboundBodyBound": "Beberapa hadiah istimewa bersifat soulbound, terikat pada karaktermu sejak saat kamu meraihnya. Barang soulbound tak bisa ditukar, dikirim lewat pos, dijual ke penjaja, atau didaftarkan di pasar; ia milikmu dan hanya milikmu. Perlindungan itu menjaga token hadiah seperti Tanda Heroik, dan mencakup setiap potongan perlengkapan Perang yang dibeli dengan Kehormatan, sehingga sebuah perlengkapan pemain lawan pemain hanya dikenakan oleh karakter yang meraihnya. Sebagian besar perlengkapan yang kamu menangkan dari dunia tetap bebas kamu tukar, jual, atau bagikan."
     },
     "professions": {
       "intro": "Di luar pertempuran dan misi, dunia mengganjarmu karena menggarap tanah dan tempaan: mengumpulkan bahan mentah, mengolahnya menjadi perlengkapan dan barang lewat sepuluh kerajinan, dan menetap dalam identitas sebagai salah satu dari sepuluh arketipe yang diwakili kerajinan-kerajinan itu.",
@@ -4474,7 +5596,11 @@ export const id_ID: EnTranslations = {
       "colStation": "Stasiun",
       "colHub": "Hub",
       "colMaster": "Master",
-      "masterCellFmt": "{name}, {title}"
+      "masterCellFmt": "{name}, {title}",
+      "harvestBodyFamilies": "Pengumpulan tidak berhenti di simpul. Banyak binatang yang dibunuh bisa dipanen sekali masing-masing, siapa cepat dia dapat, untuk kulit, taring, cakar, gading, sutra, bisa, kain, dan daging, langsung dari bangkai bersama jarahan biasanya; satu kali tekan membuka keduanya. Bila seekor binatang membawa lebih dari satu komponen yang bisa diolah, pilihannya ada di tanganmu: ambil semua yang bisa diberikannya, atau fokus pada lebih sedikit komponen dan dapatkan kualitas yang jauh lebih baik dari apa yang kamu ambil.\n\nLemparan panen langka atau lebih baik pada keluarga berisi spesimen juga memberikan spesimen sempurna bertanda tangan (Kulit Murni, Sutra Murni, Kelenjar Racun Murni, Cakar Murni, atau Potongan Perdana) di atas hasil biasa, dan mencatat Spesimen Sempurna di Kitab Jasamu. Karakter mana pun bisa memanen, tanpa pelatihan, dan alat pengumpul mana pun yang kamu miliki dihitung untuk bagian premium, dari perdagangan mana pun alat itu berasal.",
+      "focusBodyTiers": "Setiap kota pusat menyimpan panel Fokus Kota bagi para pemanen yang berkunjung: berdirilah di kota, buka dari samping minimap, dan sebarkan anggaran 10 poin fokus ke jenis komponen yang kamu pedulikan. Setiap 5 poin pada sebuah komponen menaikkan tingkat panennya satu langkah (maksimal dua langkah), dan setiap poin menambah 10 persen pada hasilnya; komponen yang tidak difokuskan tidak pernah dibuat lebih buruk.\n\nAlokasimu mengikuti karaktermu ke mana pun kamu pergi, dan bisa diarahkan ulang pada kunjungan berikutnya ke kota, dengan kecepatan yang kamu pilih sendiri. Mengambil waktu itu gratis: penataan ulang berjalan 1 menit per poin yang kamu pindahkan. Membayar sedikit mempercepatnya, 15 detik per poin ditambah 5 tembaga dan 1 Debu Dentingan per poin, dan membayar penuh membuatnya instan seharga 25 tembaga dan 5 Debu Dentingan per poin. Hanya poin yang benar-benar kamu pindahkan yang dihitung, sehingga memindahkan satu poin saja murah, dan panel yang kamu buka lalu tutup tanpa perubahan tidak dikenai biaya sama sekali pada tingkat kecepatan mana pun.",
+      "toolEffectsHeading": "Efek Alat",
+      "toolEffectsBody": "Alat pengumpul punya sebuah slot di dalamnya, dan karya seorang pemantra, sebuah jimat, adalah yang masuk ke sana. Simpanan Sang Pengumpul menambah satu unit pada hasil sebuah panen; Mata Sang Perajin menaikkan tingkat dari apa yang ditariknya ke atas. Gizzel Tinker, Ahli Perkakas di Eastbrook, mengajarkan keduanya kepada pemantra yang telah mencapai keahlian 25 dalam kerajinan itu, dan keduanya dibuat di bengkel perkakasnya.\n\nJimat yang baru dipasang membawa 20 muatan pada alat umum dan 10 lagi untuk setiap anak tangga kelangkaan di atas umum, sehingga jimat yang sama yang dipasang pada beliung epik dimulai dengan 50. Satu muatan dihabiskan hanya ketika jimat itu benar-benar mengubah hasilnya, tidak pernah pada panen yang tidak diperbaikinya, dan sebuah slot bisa diatur untuk bertanya setiap kali dipakai, sehingga jimat itu menunggu sampai kamu memilih Pakai Satu Muatan. Memasang jimat baru menata ulang slot itu mengikuti alat yang sedang kamu bawa saat itu, sehingga ia terisi sesuai kapasitas alat itu, bukan kembali ke rekor tertinggi sebelumnya, dan pemasangan ulang yang sama sekali tidak mengubah apa pun akan ditolak alih-alih memakan jimatnya.\n\nKehabisan muatan tidak menghancurkan jimatnya: pemilik alat mengisi ulang slot itu, 10 muatan untuk setiap material arkana yang dibelanjakan, dan material mana yang diminta mengikuti yang lebih baik antara alat yang sedang kamu bawa dan alat terbaik yang pernah mengisi slot itu, Debu Dentingan untuk alat umum atau tidak umum, Esensi Dentingan untuk yang langka, dan Serpihan Dentingan untuk yang epik. Meninggalkan alat yang bagus di bank tidak membeli pengisian ulang yang lebih murah, hanya yang lebih kecil dengan harga yang sama; cara jujur untuk turun ke anak tangga yang lebih murah adalah memasang jimat baru sambil membawa alat yang lebih rendah, yang menata ulang slot itu di sana. Jika langit-langit slot itu berada di atas kemampuan alatmu saat ini, pengisian ulang berhenti di titik alat itu berhenti dan memintamu membawa yang lebih baik. Pengisian ulang menelan separuh material saat kamu adalah pemantra yang menandatangani jimat itu, dan lebih sedikit lagi jika kamu berspesialisasi dalam Pemantraan; siapa pun yang lain membayar tarif penuh. Pengisian ulang adalah rapalan singkat, seperti sisanya dalam keluarga kerajinan ini."
     },
     "profPages": {
       "back": "Kembali ke Profesi",
@@ -4631,7 +5757,10 @@ export const id_ID: EnTranslations = {
         },
         "salvageHeading": "Salvasi",
         "salvageNote": "Salvasi adalah sepupu sederhana dari penghancuran mantra: senjata dan zirah yang sama, tidak memerlukan keahlian dan tidak menambah keahlian, mengembalikan serpihan kerajinan biasa berdasarkan kualitas alih-alih bahan arkana apa pun. Siapapun bisa melakukannya, pemantrai atau bukan. Saat memegang item yang layak dipecah, pilihannya sederhana: dari langka ke atas, penghancuran mantra jelas lebih menguntungkan, sementara pada biasa kedua hasil dijual dengan harga yang kira-kira sama ke pedagang, jadi pecah ke arah bahan yang benar-benar kamu butuhkan.",
-        "bonusFmt": "+{value} {stat}"
+        "bonusFmt": "+{value} {stat}",
+        "enchantsNoteOffhand": "Mantra hadir dalam tiga tingkat. Tingkat dasar berjalan dengan Debu Dentingan (dengan sedikit Esensi di ujung atasnya) dan mencakup slot senjata, off-hand, dan setiap slot zirah, dengan pilihan sumbu stat yang cukup banyak sehingga setiap build menemukan sesuatu untuk tiap slot: perisai dan off-hand kaster yang dipegang mendapat mantra Stamina tersendiri, sehingga tidak ada slot terpakai yang mati mantra. Tingkat Unggul berharga satu Serpihan Dentingan ditambah Esensi: bonus yang lebih kuat pada slot-slot paling berdampak. Serpihan juga memberi makan dua saluran pembuangan lain, dua resep jimat seharga lima buah masing-masing dan anak tangga teratas pengisian ulang efek alat, jadi tabunglah beberapa sebelum kamu membelanjakannya.\n\nDi antara keduanya duduk lima mantra Bersura, satu konsumen untuk tiap sekunder yang diketik, sehingga tidak ada yang kamu giling berakhir buntu: Tepian Bersura (senjata, Kekuatan, memakan Baja Resonant), Segel Bersura (senjata, Intelijen, Kayu Resonant), Tenun Rune (dada, Roh, Benang Resonant), Kulit Bersura (celana, Kelincahan, Kulit Resonant), dan Kait Bersura (helm, Stamina, Kait Resonant). Masing-masing juga menelan dua Esensi Dentingan; bila sebuah slot dan stat memiliki mantra dasar sekaligus mantra Unggul, bonus Bersura mendarat di antara keduanya, sementara Tenun Rune adalah mantra Roh dada terkuat secara mutlak dan Kulit Bersura adalah satu-satunya mantra Kelincahan untuk celana. Bonus persisnya semua ada di tabel di bawah.",
+        "charmsHeading": "Jimat untuk alat pengumpul",
+        "charmsBody": "Pemantraan juga tempat asal jimat seorang pengumpul. Gizzel Tinker mengajarkan keduanya di bengkel perkakas Eastbrook begitu Pemantraanmu mencapai 25: Simpanan Sang Pengumpul, yang menambah satu unit pada sebuah panen, dan Mata Sang Perajin, yang menaikkan tingkat dari apa yang keluar. Masing-masing dibuat sekali, lalu dipasang pada beliung, kapak, atau sabit, tempat ia menghabiskan satu muatan hanya pada panen yang benar-benar diperbaikinya.\n\nPengisian ulang adalah tempat perdagangan ini terus menghasilkan. Muatan dipulihkan oleh siapa pun yang memiliki alat itu, bukan oleh pemantra yang lewat, dan pengisian ulang menelan separuh material saat pemiliknya adalah pemantra yang menandatangani jimat itu, lebih sedikit lagi dengan spesialisasi Pemantraan. Jadi sebuah jimat yang dijual di konter adalah penjualan satu kali, sementara jimat yang menumpang di alatmu sendiri adalah yang murah untuk terus dijalankan. Tangga muatan dan material lengkapnya ada di halaman profesi pengumpulan mana pun, di bawah Efek Alat."
       },
       "gatherIntro": {
         "mining": "Penambangan menarik bijih langsung dari batuan dunia: tembaga di Lembah Eastbrook, besi di Rawa Mirefen, dan osmium di ketinggian Dataran Tinggi Thornpeak, dengan urat pemula tersebar di setiap zona yang lebih muda di luarnya, memberi makan kerajinan tempa. Terbuka untuk semua orang sejak level 1: beliung penambangan seharga 20 tembaga dari konter Eastbrook, Fenbridge, atau Highwatch membuka setiap urat pemula, dan anak tangga beliung yang lebih tinggi terbangun saat penghitungmu sendiri meraihnya. Dilacak pada penghitungnya sendiri hingga batas 100.",
@@ -4675,7 +5804,7 @@ export const id_ID: EnTranslations = {
         "startBody": "Joran Pancing Sederhana berharga 20 tembaga dari Nelayan Brandt di Eastbrook (cari sang Pelaut Tua di tepi timur kota, di dekat jalan menuju Danau Cermin); Perajin Gizzel, Penyedia Bekal Hale di Fenbridge, dan Kepala Perbekalan Bree di Highwatch juga menyetok joran. Gunakan joran sambil menghadap air yang cukup dalam untuk menampung ikan, hingga sekitar 24 yard di depanmu, dan pelampungmu pun melayang keluar.\n\nKamu tidak bisa melempar saat bertarung, saat berenang, atau saat mati: melempar dari tepian adalah sikap yang dimaksudkan. Namun air menjadi lebih keras seiring daratannya: rawa menuntut setidaknya Joran gulungan besi tingkat 2 dan puncak-puncak menuntut Joran arus perak tingkat 3, dan kail yang dilempar tanpa joran yang diminta air itu tidak akan pernah lepas dari tanganmu. Dua joran duduk di atas keduanya, Stormreel dan Tidewrought: para insinyur membuatnya di bengkel alat dari apa yang ditarik kail, dan konter delve Litani Tenggelam menjualnya dengan Tanda Delve di balik gerbang penuntasannya, meski tidak pernah dengan koin. Tidak ada air yang meminta keduanya, jadi mereka membeli tunggu yang lebih pendek dan jendela penarikan yang lebih lebar alih-alih akses, yang pada anak tangga teratas berarti gigitan dalam tepat tiga detik.",
         "biteHeading": "Gigitan dan penarikan",
         "biteBody": "Setelah lemparan, gigitan datang pada saat tersembunyi antara {min} dan {max} detik; jedanya ditentukan ketika kail mendarat, jadi tidak ada dua lemparan yang terasa persis sama. Saat pelampung menggigit kamu punya jendela {reel} detik untuk menekan joran lagi dan menarik: tarik di dalam jendela itu dan tangkapan mendarat, ragu melewatinya dan ikan itu kabur tanpa meninggalkan apa pun. Satu sesi utuh dibatasi {cap} detik, sehingga bahkan lemparan yang sepi pun selesai dengan cepat.\n\nJoran yang lebih baik mempertajam kedua ujung minigame ini: setiap tingkat joran di atas yang pertama memangkas {rod} detik dari tunggu terlama yang mungkin, tidak pernah di bawah lantai tiga detik yang sudah disenggol joran teratas, dan menambah {reelRod} detik pada jendela penarikan, sehingga Joran gulungan besi menurunkan tunggu terburuk menjadi 6,5 detik dengan jendela 3,25 detik, dan Joran arus perak menjadi 5 dengan jendela lewat 4, kelangkaannya melebarkan penarikan sedikit di luar apa yang dibayar tingkatnya saja. Gigitan tercepat tidak pernah berubah apa pun yang kamu pegang, dan sebuah joran cukup berada di tasmu untuk dihitung.",
-        "earlyReelNote": "Satu peringatan untuk jempol yang tak sabaran: tekan joran lagi sebelum ada yang menyambar dan kamu akan menarik tali pancing kosong, mengakhiri lemparan (sesaat setelah melempar ada masa toleransi yang memaafkan penekanan ganda tak sengaja). Kesabaran adalah inti permainannya: tunggu sambarannya, baru menyentak.",
+        "earlyReelNote": "Satu peringatan untuk jempol yang tak sabar: tekan joranmu lagi sebelum ada yang menyambar dan kamu menggulung tali kosong, mengakhiri lemparan. Satu detik pertama setelah tali mendarat dimaafkan, jadi tekanan ganda yang tak sengaja tidak merugikanmu; lewat dari itu, menekan terlalu dini berarti lemparan yang terbuang. Kesabaran adalah seluruh permainannya: tunggu sambarannya, lalu sentak.",
         "scheduleHeading": "Perolehan keahlian",
         "scheduleNote": "Perolehan memancing mengikuti jadwal tetap tanpa lemparan dadu: satu poin penuh per tangkapan di bawah kecakapan 50, setengah poin di bawah 100, sepersepuluh di bawah 150, dan tetesan lambat 0,02 dari 150 ke 200. Rentang terakhir itu memang sengaja menjadi perjalanan ribuan tangkapan: 200 adalah sebuah pernyataan, bukan persinggahan menuju sesuatu yang lain.\n\nRongsokan berhenti mengajar sepenuhnya di {cutoff}: sejak titik itu, rumput air dan sepatu bot hanyalah rumput air dan sepatu bot. Airnya sendiri juga membatasi pelajaran: perairan tingkat 1 milik Lembah (dan setiap pesisir muda di luar tanah inti) tidak mengajarkan apa pun setelah 100, perairan rawa berhenti di 150, dan hanya perairan Thornpeak yang mendidik seorang pemancing sepanjang jalan ke 200. Selain itu setiap tangkapan yang mendarat memberi perolehan sesuai laju jadwalnya, jadi ketika penghitung mandek, jadwal itu sedang menyuruhmu mencari air yang lebih dalam.",
         "colProficiency": "Keahlian",
@@ -4735,7 +5864,10 @@ export const id_ID: EnTranslations = {
         "castPaceRecharge": "Pengisian ulang efek alat: rapal {seconds}d",
         "castPaceBatch": "Pembuatan massal: hingga {count} sekaligus, masing-masing tetap satu rapal",
         "doctrineHeading": "Pemain berdagang dengan pemain",
-        "doctrineBody": "Ekonomi kerajinan dibangun di atas satu gagasan: pemain memasok pemain. Pengumpul memberi makan pembuat, pembuat memberi makan pencari misi dan raider, dan pemecah memberi makan pemantrai, dengan pedagang dan master stasiun berdiri di tepi untuk menyerap sampah dan koin alih-alih bersaing dengan kamu. Jika ingin menghasilkan uang dari profesi, pelangganmu adalah manusia: pelajari apa yang dihabiskan pemain lain, tetapkan harga berdasarkan Pasar Dunia, dan perlakukan sistem NPC sebagai lantai di bawah hargamu, bukan pasar itu sendiri.\n\nPerlengkapan buatan disetel untuk berada di bawah batas raid: bahkan karya besar hanya satu tingkat kualitas di atas resepnya, tidak pernah melewati legendaris, dan anggaran statnya tetap di bawah pita jarahan raid. Bengkel mempersiapkanmu untuk konten tersulit; ia tidak menggantikannya. Hal itu menjaga pembuat, raider, dan pasar dalam segitiga yang stabil: item raid tetap menjadi tujuan yang diimpikan, dan item buatan tetap menjadi perlengkapan terbaik yang benar-benar bisa dibeli dengan uang."
+        "doctrineBody": "Ekonomi kerajinan dibangun di atas satu gagasan: pemain memasok pemain. Pengumpul memberi makan pembuat, pembuat memberi makan pencari misi dan raider, dan pemecah memberi makan pemantrai, dengan pedagang dan master stasiun berdiri di tepi untuk menyerap sampah dan koin alih-alih bersaing dengan kamu. Jika ingin menghasilkan uang dari profesi, pelangganmu adalah manusia: pelajari apa yang dihabiskan pemain lain, tetapkan harga berdasarkan Pasar Dunia, dan perlakukan sistem NPC sebagai lantai di bawah hargamu, bukan pasar itu sendiri.\n\nPerlengkapan buatan disetel untuk berada di bawah batas raid: bahkan karya besar hanya satu tingkat kualitas di atas resepnya, tidak pernah melewati legendaris, dan anggaran statnya tetap di bawah pita jarahan raid. Bengkel mempersiapkanmu untuk konten tersulit; ia tidak menggantikannya. Hal itu menjaga pembuat, raider, dan pasar dalam segitiga yang stabil: item raid tetap menjadi tujuan yang diimpikan, dan item buatan tetap menjadi perlengkapan terbaik yang benar-benar bisa dibeli dengan uang.",
+        "orderBoardHeading": "Papan pesanan komisi",
+        "orderBoardBody": "Kamu tidak perlu mencari perajin lewat obrolan. Buka jendela kerajinanmu dan papan pesanan komisi hanya sejauh satu klik di headernya. Siapa pun bisa memasang pesanan di sana: sebutkan resep yang ingin kamu buatkan, lalu biarkan terbuka untuk diambil perajin mana pun, atau tujukan pada satu perajin bernama, yang kemudian menjadi satu-satunya orang yang bisa mengambilnya. Seorang perajin yang menelusuri papan menerima sebuah pesanan, dan menerima berarti dia terikat padanya, sehingga sebuah pekerjaan hanya pernah dikerjakan oleh satu orang pada satu waktu.\n\nTidak ada yang ditahan saat kamu memasang pesanan: sebuah pesanan tidak memesan koin maupun material, sehingga harga dan siapa yang menyediakan reagen tetap menjadi urusan kalian berdua, disepakati sebagaimana komisi mana pun disepakati. Kamu bisa membatalkan pesananmu sendiri selama masih terbuka, dan pesanan yang tidak diambil siapa pun kedaluwarsa dengan sendirinya setelah satu hari. Begitu seorang perajin menerimanya, penyerahanlah yang menutup pesanan itu.\n\nPenyerahan terjadi secara langsung. Perajin itu membuat karyanya sebagai komisi, mendatangimu, dan menyerahkannya, jadi sisakan satu slot tas untuk menerimanya. Apa yang tiba mengikuti aturan komisi biasa di bawah, terikat kepadamu melalui Ikatan Pembuat.",
+        "commissionsBoardNote": "Ada dua jalan menuju sebuah komisi: sebuah pesanan yang kamu pasang di papan di atas, yang membawa pekerjaan itu kepada seorang perajin, dan seorang perajin yang begitu saja memilih membuatkan sepotong karya untukmu. Keduanya berakhir pada ikatan yang sama."
       },
       "faq": {
         "title": "FAQ Profesi",
@@ -4755,8 +5887,14 @@ export const id_ID: EnTranslations = {
         "q7": "Mengapa pengumpulan saya tiba-tiba melambat?",
         "a7": "Rapal panen dimulai pada 2,5 detik dan dipangkas dengan dua cara: 0,4 detik untuk setiap tingkat alat yang kamu bawa dan bisa kamu gunakan di atas tingkat simpul itu sendiri, dan 0,15 detik begitu penghitung perdaganganmu melewati band 100-nya, dengan lantai 1,5 detik. Berpindah dari simpul tingkat 1 ke simpul tingkat 3 dan kelebihanmu lenyap, sehingga beliung yang sama mengayun lebih lambat lagi. Memegang tepat tingkat yang disyaratkan tidak membeli kecepatan; itu hanya membuka simpulnya.\n\nPerolehan keahlian memudar dengan cara yang sama seperti pembuatan: sebuah simpul berubah abu-abu saat kecakapanmu naik melewati tingkatnya (simpul tingkat 1 tidak mengajarkan apa pun mulai dari kecakapan 75), jadi jawaban untuk perolehan yang lambat adalah simpul bertingkat lebih tinggi. Simpul itu membutuhkan alat setidaknya setingkat dengannya di tasmu (tidak ada simpul yang pernah dikerjakan dengan tangan kosong, tingkat 1 sekalipun), dan alat darat di atas tingkat 1 juga menuntut tanda penggunaannya lebih dulu, 40/70/85/100 dalam perdagangannya sendiri untuk tingkat 2 sampai 5. Memancing mengikuti penirusannya sendiri: perolehan penuh di bawah kecakapan 50, setengah di bawah 100, tetesan 0,1 di bawah 150 dan 0,02 di bawah 200, tangkapan rongsokan tidak mengajarkan apa pun sama sekali mulai dari 100, dan airnya sendiri membatasi pelajaran (perairan tingkat 1 berhenti mengajar pada 100, rawa pada 150), sehingga penghitung yang mandek juga bisa berarti kamu sudah melampaui airnya.",
         "q8": "Bisakah saya membuat di luar kota?",
-        "a8": "Sebagian. Sembilan resep lapangan biasa (senjata, zirah, makanan, dan ramuan pokok untuk pemula) bisa dibuat di mana saja, kapan saja, begitu pula tiga resep kombinasi milik pasangan yang telah disumpah. Selebihnya di atas itu terikat pada satu jenis stasiun: tempa, dapur, apoteker, penyamakan, alat tenun, atau bengkel alat, dan kamu harus berada dalam 20 yard dari stasiun agar pembuatan bisa berjalan.\n\nPada keahlian 75 dalam sebuah kerajinan kamu terspesialisasi, dan bersama diskon material 20 persen kamu mendapatkan stasiun bergerak: letakkan di lapangan dan ia berdiri selama 10 menit, melayani resep kerajinan itu seolah-olah kamu berada di stasiun sungguhan. Stasiun bergerak hanya untuk membuat: mempelajari resep dan melepas ikatan karya pesanan selalu membutuhkan stasiun asli di kota."
-      }
+        "a8": "Sebagian. Sembilan resep lapangan biasa (senjata, zirah, makanan, dan ramuan pokok untuk pemula) bisa dibuat di mana saja, kapan saja, begitu pula tiga resep kombinasi milik pasangan yang telah disumpah. Selebihnya di atas itu terikat pada satu jenis stasiun: tempa, dapur, apoteker, penyamakan, alat tenun, atau bengkel alat, dan kamu harus berada dalam 20 yard dari stasiun agar pembuatan bisa berjalan.\n\nPada keahlian 75 dalam sebuah kerajinan kamu terspesialisasi, dan bersama diskon material 20 persen kamu mendapatkan stasiun bergerak: letakkan di lapangan dan ia berdiri selama 10 menit, melayani resep kerajinan itu seolah-olah kamu berada di stasiun sungguhan. Stasiun bergerak hanya untuk membuat: mempelajari resep dan melepas ikatan karya pesanan selalu membutuhkan stasiun asli di kota.",
+        "q9": "Bagaimana cara mendapatkan sesuatu yang dibuatkan untuk saya?",
+        "a9": "Pasang di papan pesanan komisi. Buka jendela kerajinan, buka papannya dari headernya, dan sebutkan resep yang ingin kamu buatkan: biarkan pesanan itu terbuka untuk diterima siapa pun, atau tujukan pada satu perajin yang sudah kamu kenal. Menerima mengikat perajin itu pada pekerjaan tersebut, dan sebuah pesanan hanya pernah dipegang oleh satu orang pada satu waktu.\n\nTidak ada koin dan tidak ada material yang ditahan saat kamu memasang pesanan, jadi sepakati harga dan siapa yang membawa reagen di antara kalian berdua, sebagaimana komisi selalu diatur. Kamu bisa membatalkan pesananmu sendiri selama masih terbuka, dan pesanan yang tidak diterima siapa pun kedaluwarsa setelah satu hari. Penyerahan dilakukan secara langsung: berdirilah di dekat perajinmu dengan slot tas kosong saat karyanya sudah selesai. Ia tiba terikat kepadamu melalui Ikatan Pembuat, yang bisa dilepas oleh master stasiun mana pun dengan biaya seperti biasa.",
+        "q10": "Apa itu jimat, dan apa yang terjadi ketika ia kehabisan muatan?",
+        "a10": "Jimat adalah efek alat yang dipasang di slot: karya seorang pemantra yang bersemayam di alat pengumpul dan memperbaiki apa yang dihasilkannya. Simpanan Sang Pengumpul menambah satu unit pada sebuah panen, Mata Sang Perajin menaikkan tingkatnya, dan Gizzel Tinker mengajarkan keduanya di bengkel perkakas Eastbrook pada Pemantraan 25. Satu muatan dihabiskan hanya ketika jimat itu benar-benar mengubah hasilnya, sehingga panen yang tidak bisa diperbaikinya tidak membebanimu sama sekali, dan sebuah slot bisa diatur untuk bertanya setiap kali dipakai jika kamu lebih suka memutuskan muatan demi muatan.\n\nJimat baru membawa 20 muatan pada alat umum dan 10 lagi untuk tiap anak tangga kelangkaan di atasnya, sehingga alat epik dimulai dengan 50. Kehabisan muatan tidak menghancurkan jimatnya: pemilik alat mengisi ulang slot itu, 10 muatan per material arkana, dengan material yang diminta mengikuti yang lebih baik antara alat yang sedang mereka bawa dan alat terbaik yang pernah mengisi slot itu (Debu Dentingan untuk alat umum atau tidak umum, Esensi Dentingan untuk yang langka, Serpihan Dentingan untuk yang epik). Menyimpan alat yang bagus di bank sebelum mengisi ulang tidak pernah membuatnya lebih murah, hanya lebih kecil dengan harga yang sama, dan memasang jimat baru sambil membawa alat yang lebih rendah adalah cara jujur untuk turun ke anak tangga yang lebih murah. Pemantra yang menandatangani jimat itu membayar separuh untuk mengisi ulang miliknya sendiri, dan lebih sedikit lagi dengan spesialisasi Pemantraan."
+      },
+      "findingNodesNote": "Kamu tidak perlu mencarinya dengan mata sendiri. Setiap simpul di zona itu digambar di peta zona di mana pun peta itu menampilkan tanah tersebut, dan di minimap saat kamu melewatinya, sehingga sebuah putaran panen bisa direncanakan dari layar peta sebelum kamu berangkat. Simpul yang belum bisa dikerjakan alatmu ditandai, bukan disembunyikan: ia tetap ada di tempatnya dengan tanda pudar bercoret, sehingga kamu bisa melihat tanah yang sedang kamu tuju lewat latihan. Di desktop, mengarahkan kursor ke sebuah urat, rumpun, atau petak di dunia menyebutkan namanya, memberitahumu alat yang dibutuhkannya, dan, begitu kamu pernah mengerjakannya, menghitung mundur kemunculannya kembali hingga ke detik. Di layar sentuh tidak ada yang bisa diarahkan kursor, sehingga tanda di minimap menyampaikan cerita yang sama.",
+      "specimenBodyFamilies": "Sisakan sedikit ruang tas saat kamu berburu bahan: rejeki bertanda tangan butuh ruangnya sendiri atau tumpukan bertanda tangan yang cocok untuk mendarat, dan jika tidak ada yang muat hasilnya tetap datang tetapi tanda tangannya hilang. Pemanenan bangkai juga punya lengan jackpot tersendiri: sekitar {pct}% dari tiap komponen yang dipanen muncul langka atau lebih baik. Keluarga yang punya spesimen sempurna untuk diberikan (kulit, sutra, bisa, cakar, daging) menjaga hasil biasanya tetap polos dan mencetak spesimen bertanda tangan di sampingnya; tiga keluarga lainnya, taring, kain, dan gading, menandatangani hasil panennya sendiri."
     },
     "economy": {
       "intro": "Koin melumasi seluruh dunia: ia membeli perlengkapanmu, persediaan, dan perlengkapan perjalanan, serta berpindah tangan antarpemain. Kamu mengumpulkan semua ini hanya dengan bermain, jadi anggaplah halaman ini sebagai peta dari mana uangmu datang dan ke mana ia pergi.",
@@ -4764,7 +5902,7 @@ export const id_ID: EnTranslations = {
       "coinBody": "Uang hadir dalam tiga jenis koin. Seratus tembaga setara dengan satu perak, dan seratus perak setara dengan satu emas, sehingga pundimu terisi mulai dari koin terkecil. Kamu memperolehnya dari hadiah misi, dari menjarah musuh yang tumbang, dan dari menjual barang yang tak lagi kamu butuhkan.",
       "vendorsTitle": "Penjaja dan apa yang mereka simpan",
       "vendorsBody": "Kota dan pos terdepan bertaburan pedagang, masing-masing dengan dagangannya sendiri. Penyedia perbekalan menjual makanan dan minuman, pandai senjata dan pembuat zirah menjajakan perlengkapan, dan seorang juru bekal menyimpan perlengkapan perjalanan yang praktis. Hampirilah salah satunya untuk melihat apa yang mereka jual.",
-      "marksTitle": "Tanda: mata uang di luar koin",
+      "marksTitle": "Tanda dan Kehormatan: mata uang di luar uang",
       "marksBody": "Koin bukan satu-satunya yang kamu simpan. Delve membayar Tanda Delve, yang hanya kamu belanjakan di penjaga delve untuk peningkatan pendamping dan perlengkapan yang tak akan kamu temukan di tempat lain. Penjelajahan dungeon heroik meninggalkan Tanda Heroik pada bos akhir, yang kamu belanjakan bersama Kepala Perbekalan Heroik di Highwatch untuk perhiasan yang tak dijual di sudut realm mana pun lainnya. Keduanya tak pernah bercampur dengan koinmu.",
       "bankTitle": "Bank",
       "bankBody": "Setiap kota pusat memiliki cabang Brankas Bersepuh Emas, rumah perbankan realm ini. Bicaralah dengan bendahara di sana untuk membuka lemari besimu, ruang simpanan pribadi di luar tasmu yang dimiliki karaktermu seumur hidup. Apa pun yang kamu titipkan pada mereka menunggu dengan aman, di cabang mana pun yang kamu kunjungi berikutnya.",
@@ -4784,14 +5922,16 @@ export const id_ID: EnTranslations = {
       "marketTitle": "Pasar Dunia",
       "marketBody": "Sang Pedagang menjalankan Pasar Dunia, sebuah bursa yang digerakkan pemain tempat kamu bisa membeli dan menjual dengan orang yang mungkin tak pernah kamu temui. Bicaralah dengan Sang Pedagang di Eastbrook, atau dengan Auctioneer Voss di Highwatch, untuk membukanya: kedua penjaga melayani satu pasar bersama yang sama. Sang Pedagang juga selalu menyediakan stok barang miliknya sendiri yang terdaftar di sana, jadi selalu ada sesuatu untuk dibeli bahkan ketika tak ada pemain lain yang memasang.",
       "marketBrowse": "Menelusuri: gulir daftar barang atau cari berdasarkan nama untuk menemukan apa yang dijual. Setiap entri menampilkan barangnya, sang penjual, dan harga yang diminta untuk seluruh tumpukan.",
-      "marketPost": "Memasang: pilih sebuah tumpukan dari tasmu, tentukan harga, dan daftarkan. Barang disimpan oleh Sang Pedagang sampai seseorang membelinya. Entri yang tak terjual kembali kepadamu setelah beberapa waktu, dan kamu bisa menariknya lebih awal jika berubah pikiran.",
-      "marketCollect": "Mengambil: saat barangmu terjual, hasilnya menantimu di Sang Pedagang. Kembalilah untuk mengambil koin, beserta apa pun yang kembali karena tak terjual. Sang Pedagang mengambil potongan kecil dari setiap penjualan yang tuntas.",
-      "marketPricing": "Penentuan harga terserah padamu. Memasang sedikit di bawah harga yang diminta orang lain cenderung lebih cepat laku, sementara harga selangit mungkin teronggok tak tersentuh. Telusuri dulu untuk melihat seperti apa harga pasaran sebelum kamu memasang."
+      "marketPost": "Memasang: pilih setumpuk dari tasmu, tetapkan hargamu, dan pasang. Barangnya disimpan Pedagang sampai ada yang membelinya. Pasangan yang tak terjual kembali kepadamu setelah beberapa waktu, dan kamu bisa menariknya lebih awal kalau berubah pikiran. Memasang itu sendiri gratis, jadi harga yang optimistis tidak merugikanmu selain waktu.",
+      "marketCollect": "Mengambil: ketika barangmu terjual, hasilmu menunggu di Pedagang. Kembalilah untuk mengambil koinnya, bersama apa pun yang kembali tanpa terjual. Pedagang mengambil bagian kecil dari setiap penjualan yang tuntas. Tab Ambil merinci apa yang menunggu, satu baris untuk tiap penjualan yang tuntas berikut barangnya, pembelinya, dan berapa yang kamu dapat, jadi kamu bisa melihat persis apa yang terjual sebelum mengambil koinnya.",
+      "marketPricing": "Penentuan harga terserah padamu. Memasang sedikit di bawah harga yang diminta orang lain cenderung lebih cepat laku, sementara harga selangit mungkin teronggok tak tersentuh. Telusuri dulu untuk melihat seperti apa harga pasaran sebelum kamu memasang.",
+      "honorBody": "Bertarung melawan pemain lain membayar mata uang ketiga, Kehormatan. Memenangkan sebuah pertandingan arena berperingkat membayarnya, dan sebuah pertandingan yang tuntas dimainkan di Medan Thornhollow membayarnya baik kamu menang maupun kalah, sehingga kekalahan yang diperjuangkan dengan gigih di Medan itu tidak pernah menjadi pertandingan yang sia-sia. Kehormatan terkumpul di lembar karaktermu tanpa pernah bercampur dengan koinmu. Kamu membelanjakannya bersama kedua kepala perbekalan Kehormatan, AMARAH di Eastbrook dan Marsekal Perang Draven Kole di Highwatch, yang berbagi satu stok yang sama: keluarga zirah, perhiasan, dan senjata Perang yang hanya bisa dibeli dengan Kehormatan. Pembelian itu final, dan perlengkapannya terikat padamu begitu kamu membelinya, jadi bacalah sebuah potongan sebelum kamu mengonfirmasinya. Halaman Arena & PvP membahas cara Kehormatan diperoleh.",
+      "guildBankNote": "Guildmu menyimpan bank guildnya sendiri di samping lemari besi pribadimu, dibuka pada bendahara yang sama dan dijangkau lewat sebuah tab di jendela yang sama: sebuah kas bersama untuk koin dan sebuah simpanan bersama untuk barang. Setiap anggota bisa melihatnya, dan perwira guild adalah yang boleh memindahkan barang masuk dan keluar. Halaman Sosial & Kelompok memuat detailnya."
     },
     "social": {
       "intro": "Sebagian besar dunia ini bisa dimainkan sendirian, tetapi permainan ini dirancang untuk dimainkan bersama orang lain. Inilah cara berbicara, bekerja sama, dan menemukan kelompokmu.",
       "chatHeading": "Saluran obrolan",
-      "chatBody": "Obrolan terbagi menjadi beberapa saluran, masing-masing ditampilkan pada tabnya sendiri. Ketik pesan untuk mengirimnya di saluran yang aktif, atau gunakan perintah garis miring untuk mengarahkan satu baris ke tempat lain. Inilah saluran-saluran tempat kamu bisa berbicara:",
+      "chatBody": "Jendela obrolan dimulai dengan dua tampilan yang selalu ada, satu catatan gabungan dari semua yang dikatakan dan satu catatan pertempuran. Di luar itu kamu menambahkan tab yang kamu mau dengan tombol plus, satu per kanal, dan di desktop kamu bisa menyeretnya ke urutan apa pun yang kamu suka (Alt dengan panah kiri atau kanan memindahkan tab yang sedang aktif lewat papan ketik); klik kanan sebuah tab untuk menutupnya lagi, dan susunanmu diingat antar sesi. Mengetik di tab kanal mengirim pada kanal itu, dan perintah garis miring mengirim satu baris ke tempat lain tanpa berganti tab. Ada juga tab bisikan yang mengumpulkan setiap bisikan yang kamu kirim dan terima di satu tempat, dan di sana mengetik berarti membalas siapa pun yang terakhir menulis kepadamu. Inilah kanal-kanal tempat kamu bisa berbicara:",
       "chanSay": "Ucap.",
       "chanSayBody": "Suara bawaanmu. Ia menjangkau pemain yang dekat denganmu dan inilah yang dipakai saat mengerjakan misi berdampingan.",
       "chanYell": "Teriak.",
@@ -4800,6 +5940,8 @@ export const id_ID: EnTranslations = {
       "chanWhisperBody": "Pesan pribadi kepada satu pemain berdasarkan nama, di mana pun mereka berada. Gunakan untuk percakapan tenang.",
       "chanParty": "Party.",
       "chanPartyBody": "Bicaralah dengan semua orang di kelompokmu, sejauh apa pun kalian terpencar.",
+      "chanBattleground": "Medan Thornhollow.",
+      "chanBattlegroundBody": "Bicaralah dengan setiap petarung di Medan Thornhollow-mu, dari kedua pihak. Hanya berlaku selama pertandingan sedang berlangsung.",
       "chanGeneral": "Umum.",
       "chanGeneralBody": "Saluran seluruh realm yang selalu aktif dan menjangkau semua orang yang sedang online, cocok untuk bertanya atau mengobrol umum. Tidak seperti World dan Looking for Group, kamu tak pernah perlu memilih untuk ikut serta.",
       "chanWorld": "Dunia.",
@@ -4822,25 +5964,43 @@ export const id_ID: EnTranslations = {
       "lootRollBody": "Saat sebuah barang masuk undian, setiap anggota yang memenuhi syarat memilih Need jika menginginkannya, Greed jika hanya akan mengambilnya sebagai cadangan, atau Pass untuk mengundurkan diri. Lemparan tertinggi menang.",
       "lootMasterTitle": "Penjarah utama.",
       "lootMasterBody": "Sebagai gantinya, pemimpin bisa memegang kendali atas jarahan yang lebih baik, membagikan tiap potongan kepada anggota yang seharusnya menerimanya. Ini menjaga perlengkapan berharga agar tidak jatuh ke undian acak, seperti cara kelompok yang terorganisir menjalankan dungeon.",
-      "friendsHeading": "Teman dan abaikan",
+      "friendsHeading": "Teman, abaikan, dan blokir",
       "friendsBody": "Tambahkan pemain ke daftar temanmu untuk melihat kapan mereka daring dan di mana mereka berada, sehingga kamu bisa berkelompok begitu mereka masuk permainan.",
-      "ignoreBody": "Jika seseorang mengganggumu, tambahkan mereka ke daftar abaikanmu dan kamu akan berhenti melihat obrolan mereka.",
+      "ignoreBody": "Kalau seseorang mengoceh lebih banyak dari yang kamu mau, tambahkan dia ke daftar abaikanmu dan obrolan publiknya berhenti sampai kepadamu. Mengabaikan hanyalah pengaturan obrolan, dan itu tidak pernah menghapus siapa pun dari daftar temanmu.",
       "guildHeading": "Guild",
-      "guildBody": "Guild adalah kelompok pemain yang langgeng tempat kamu bernaung antar sesi. Buat satu atau terima undangan untuk bergabung, dan kamu hanya bisa berada di satu guild dalam satu waktu. Anggota memegang pangkat: seorang pemimpin, para petinggi, dan para anggota.",
-      "guildChatBody": "Bernaung dalam guild memberimu saluran obrolan guild pribadi dan menampilkan rekan guild-mu pada daftar bersama, jadi selalu ada wajah-wajah familier yang daring.",
+      "guildBody": "Guild adalah kelompok pemain yang bertahan lama, tempat kamu bernaung antar sesi. Mendirikannya menelan biaya sekali bayar sebesar 1 emas bagi pendirinya, atau kamu bisa cukup menerima undangan untuk bergabung, dan kamu hanya bisa berada di satu guild pada satu waktu. Anggota menyandang pangkat: seorang pemimpin, para perwira, dan para anggota.",
+      "guildChatBody": "Bergabung dengan guild memberimu kanal obrolan guild pribadi dan daftar bersama rekan-rekan guildmu. Anggota yang lebih baru menyandang lencana Rekrut dan yang sudah lama menyandang lencana Veteran menggantikan label anggota biasa, sementara perwira dan pemimpin guild selalu menampilkan pangkatnya, dan kamu bisa menyembunyikan nama yang sedang luring ketika kamu hanya ingin melihat siapa yang sedang ada. Perwira dan pemimpin guild juga bisa menyematkan pesan papan pengumuman singkat di puncak tab Guild, dan pesan itu dibacakan di catatan obrolanmu saat kamu masuk berikutnya, dan begitulah kebanyakan guild mengumumkan rencana pekan ini.",
       "communityHeading": "Memanggil seluruh komunitas",
       "communityBody": "Mulai satu baris obrolan dengan tanda seru untuk membuat panggilan komunitas: !lfg untuk mencari kelompok, !wts dan !wtb untuk berdagang, !recruit untuk guild-mu, !event untuk mengumumkan raid atau pertemuan, dan !help untuk meminta bantuan. Sebuah menu panggilan muncul begitu kamu mengetik tandanya. Tiap panggilan disiarkan di dunia dan digemakan ke Discord komunitas, jadi ia menjangkau pemain yang bahkan tak sedang masuk. Panggilan komunitas adalah bagian dari permainan daring.",
       "slashHeading": "Perintah garis miring yang praktis",
       "slashBody": "Beberapa perintah sehari-hari layak dihafal: /w Nama mengirim bisikan dan /r menjawab yang terakhir kamu terima, /invite mengajak seseorang ke party-mu, /follow membuntuti seorang teman, /roll melempar dadu agar dilihat kelompok, /who menampilkan siapa yang sedang daring, dan /afk menandaimu sedang pergi. Ketik /help dalam permainan untuk daftar lengkapnya.",
       "emotesBody": "Karaktermu juga bisa berbicara tanpa kata: ketik emote seperti /wave, /dance, /cheer, atau /bow, targetkan seorang teman dulu untuk mengarahkannya kepada mereka, atau tahan X untuk membuka roda emote demi ekspresi cepat di atas kepala.",
       "calendarHeading": "Kalender acara",
-      "calendarBody": "Tekan I untuk membuka kalender acara. Ia menandai hari-hari realm yang layak direncanakan, dari panggilan raid mingguan hingga malam fiesta, dan di sanalah guild menyimpan jadwalnya: pemimpin guild dan petinggi bisa menjadwalkan acara di sana, dan setiap anggota melihatnya di halaman yang sama.",
+      "calendarBody": "Tekan I untuk membuka kalender acara. Kalender itu menandai hari-hari alam yang layak direncanakan, Panggilan Raid mingguan, Hari Pasar, Bentrok Arena, dan Lomba Memancing, ditambah Hari Delve bulanan dan Persekutuan Gerbang Bulan, dan di sanalah guild menyimpan jadwalnya: pemimpin guild dan para perwira bisa memesan acara padanya, dan setiap anggota melihatnya di halaman yang sama. Hari-hari alam adalah ajakan untuk berkumpul, bukan bonus; tidak ada yang berubah pada karaktermu karena sebuah hari ditandai.",
       "readyHeading": "Cek kesiapan",
       "readyBody": "Sebelum sebuah pull besar, pemimpin kelompok bisa mengetik /ready untuk menjajak seisi ruangan: semua yang lain mendapat perintah Siap atau Belum Siap, dan begitu semua telah menjawab, atau 30 detik habis, seluruh kelompok melihat satu ringkasan hitungannya. Tak ada yang ditunjuk; yang penting hitungannya, bukan si pelaku.",
       "markersHeading": "Penanda sasaran",
       "markersBody": "Dalam party, targetkan makhluk musuh dan klik-kanan potretnya di bingkai sasaran (tekan-lama pada sentuh) untuk memahkotainya dengan salah satu dari delapan simbol raid. Anggota mana pun bisa menandai, tiap simbol menempel pada satu sasaran dalam satu waktu, dan memasang ulang sebuah simbol pada sasarannya sendiri menghapusnya. Urutan bunuh, penugasan kontrol kerumunan, atau sekadar 'yang ini dulu', semuanya bergerak lebih cepat sebagai simbol ketimbang kalimat.",
       "etiquetteHeading": "Etika berkelompok",
-      "etiquetteBody": "Berkelompok adalah pilihan, bukan kewajiban. Sapa saat kamu bergabung, gulirkan Need hanya pada perlengkapan yang benar-benar akan kamu pakai, dan beri tahu kelompok sebelum kamu pergi. Sedikit kesopanan sangat berarti, dan kebanyakan pemain senang dengan teman seperjalanan. Moderator menjaga ketertiban, dan pemain yang tak mau membiarkan orang lain menikmati permainan bisa dipindahkan ke sel penjara sampai seorang moderator melepaskannya."
+      "etiquetteBody": "Berkelompok adalah pilihan, bukan kewajiban. Sapalah ketika kamu bergabung, lempar Butuh hanya pada perlengkapan yang benar-benar akan kamu pakai, dan beri tahu kelompok sebelum kamu pamit. Sedikit kesopanan membawa dampak besar, dan sebagian besar pemain senang ada teman.",
+      "realmsHeading": "Dunia",
+      "realmsBody": "Permainan daring berjalan di atas dunia-dunia, dan setiap dunia adalah tempat terpisah dengan pemainnya sendiri. Kamu memilih satu dari Daftar Dunia sebelum bermain, dan setiap barisnya menunjukkan seberapa ramai dunia itu sekarang, dari Rendah lewat Sedang dan Tinggi hingga Penuh, atau Offline untuk dunia yang sedang tidak aktif. Rendah berarti banyak ruang, Tinggi berarti banyak teman seperjalanan, dan dunia yang sudah mencapai batasnya menunjukkan Penuh dan menolak masuk yang baru sampai seseorang keluar, jadi pilihlah tempat teman-temanmu berada atau tempat yang masih ada ruangnya.",
+      "realmsScopeBody": "Apa yang kamu lakukan tetap berada di dunia yang kamu pilih: karaktermu, daftar temanmu, guildmu, dan Pasar semuanya berada di sana, dan papan guild serta papan pemain yang kamu buka dalam permainan hanya memeringkat dunia itu sendiri, sementara papan di situs web mengumpulkan semua dunia menjadi satu. Setiap dunia juga menyimpan reset raid harian miliknya sendiri, sesuai waktu lokalnya masing-masing.",
+      "finderHeading": "Mencari kelompok",
+      "finderBody": "Kamu tidak perlu berteriak di saluran Mencari Kelompok untuk mengisi sebuah lari. Buka Pencari Dungeon, pilih lari yang kamu inginkan dan peran yang bersedia kamu isi, lalu bergabung ke antrean sendirian atau bersama party yang sudah kamu miliki. Pencari menunggu sampai semua peran terisi penuh, lalu menawarkan kelompoknya kepada semua orang sekaligus: sebuah jendela sembul meminta kalian masing-masing untuk menerima, dan party terbentuk begitu orang terakhir mengatakan ya. Menolak sebuah tawaran, atau membiarkannya kedaluwarsa, menempatkanmu pada jeda singkat sebelum antrean menawarkanmu yang lain, sehingga barisnya terus bergerak.",
+      "finderBoardBody": "Pencari juga menyimpan sebuah papan kelompok yang sudah dibentuk. Seorang pemimpin memasang daftar dengan tag yang menjelaskan tujuan larinya, dari kunjungan pertama sampai penuntasan penuh langsung, dan kamu melamar ke sana agar pemimpinnya menyetujui. Antrean otomatis mengisi dungeon dan raid endgame, masing-masing pada tingkat Normal dan Heroik, sementara papan juga bisa memuat lari penyelarasan solo, yang tidak pernah diisi oleh antrean untukmu; delve dan kegiatan dunia terbuka adalah urusanmu sendiri untuk mengaturnya. Bagaimanapun caranya, pencari hanya membentuk kelompoknya: berjalan ke pintu, mengatur tingkat kesulitan, dan menyepakati aturan jarahan tetap menjadi urusanmu.",
+      "finderMore": "Lihat apa yang ada di dalam tiap dungeon",
+      "blockBody": "Blokir adalah alat yang lebih keras, untuk pemain yang tak mau membiarkanmu tenang. Sebuah blokir memutus undangan, bisikan, dan surat mereka selain obrolan mereka, membuat kalian berdua tak terlihat satu sama lain di /who, dan menghapus mereka dari daftar temanmu jika mereka ada di sana. Blokir dari menu klik-kanan pada nama mereka atau dengan /block, /unblock mencabutnya kembali, dan /blocklist menampilkan siapa saja yang ada di dalamnya.",
+      "guildBoardBody": "Guild juga diberi peringkat. Jendela Papan Peringkat menyimpan papan Guild di samping papan pemain, memeringkat guild berdasarkan apa yang telah diraih bersama para anggotanya, sehingga sebuah guild yang sibuk bisa melihat di mana kedudukannya.",
+      "guildBankHeading": "Bank guild",
+      "guildBankBody": "Sebuah guild juga menyimpan brankasnya sendiri. Datanglah ke seorang bankir di salah satu kota pusat, buka bankmu, dan beralih ke tab Guild: di sana kamu akan menemukan kas berisi uang dan gudang barang bersama milik guild. Setiap anggota bisa membukanya dan melihat isinya, dan panel itu menyebutkan dengan jelas siapa yang bisa berbuat lebih. Hanya pemimpin guild dan para petinggi yang bisa bertindak, memasukkan uang dan barang serta mengeluarkannya kembali, dan setiap setoran dan penarikan dicatat dalam sebuah log yang bisa dibaca guild, sehingga tidak ada yang berpindah tanpa jejak.",
+      "guildBankRulesBody": "Gudang barangnya dimulai dalam keadaan tertutup. Seorang petinggi membukanya dengan uangnya sendiri, dan guild bisa membayar dari kas untuk memperluasnya nanti. Barang misi, apa pun yang soulbound, dan perlengkapan yang tidak diterima Pasar tetap berada di luar sana, sama seperti pada surat dan Pasar, sehingga bank ini untuk barang yang masih bisa berpindah tangan.",
+      "discordLinkBody": "Panel Discord dalam permainan juga bekerja sebaliknya. Tautkan akun Discord-mu ke sana dan peran komunitas yang kamu pegang di sana ikut masuk ke dalam dunia: sebuah nama berwarna di atas kepalamu, dan sebuah tanda pada baris obrolan untuk peran staf, sehingga kamu selalu bisa membedakan moderator sungguhan dari seseorang yang meminjam nama. Menautkan juga melacak sebuah status yang naik seiring keikutsertaanmu. Tak satu pun dari itu memberikan kekuatan apa pun dalam permainan.",
+      "moderationHeading": "Melaporkan pemain",
+      "moderationBody": "Jika seorang pemain keterlaluan, klik kanan namanya dan pilih Laporkan Pemain. Pilih sebuah alasan, dari pelecehan sampai spam sampai kecurangan, tambahkan sebaris keterangan tentang apa yang terjadi, dan kirimkan: laporan itu akan dibaca oleh para moderator. Sebuah laporan adalah catatan untuk mereka, bukan hukuman itu sendiri. Mengirimkannya tidak membungkam, mengeluarkan, atau memenjarakan siapa pun, dan tidak ada balasan yang memberitahumu apa yang diputuskan. Memblokir mereka menghentikan gangguan itu selagi kamu menunggu.",
+      "jailBody": "Moderator menjaga ketertiban, dan pemain yang tak mau membiarkan orang lain menikmati permainan bisa dipindahkan ke sel penjara. Sebuah hukuman selalu memiliki durasi tetap, meski seorang moderator bisa mengakhirinya lebih awal, dan waktunya terus berjalan baik kamu tetap masuk maupun tidak.",
+      "chatMore": "Selengkapnya tentang jendela obrolan dan sisa antarmuka",
+      "jailHeading": "Moderator dan penjara"
     },
     "stats": {
       "intro": "Karaktermu digambarkan oleh segelintir atribut. Kamu tak pernah harus menghafalnya untuk bermain dengan baik, tetapi mengetahui kira-kira apa fungsi masing-masing membantumu membaca lembar karaktermu dan memilih peningkatan yang tepat.",
@@ -4855,7 +6015,7 @@ export const id_ID: EnTranslations = {
       "intTitle": "Intellect",
       "intBody": "Intellect menumbuhkan cadangan mana seorang pemantra, meningkatkan spell power mereka sehingga mantranya memukul lebih keras, dan memperbaiki peluang mantranya kritis. Ia penting bagi kelas yang memantra dari mana; bagi kelas Amukan atau Energi ia hanya berperan kecil.",
       "spiTitle": "Spirit",
-      "spiBody": "Spirit mengatur seberapa cepat mana seorang pemantra pulih setiap kali mereka menjeda perapalannya, yang berlangsung hampir sepanjang waktu di antara pertarungan. Seperti Intellect, ia melayani kelas mana dan berarti kecil bagi yang lain.",
+      "spiBody": "Spirit mengatur seberapa cepat mana seorang pemantra kembali. Ia baru membayar penuh setelah beberapa detik berlalu tanpa pengeluaran apa pun, dan sebagian darinya terus mengalir bahkan di tengah perapalan, jadi Spirit tidak pernah menjadi beban mati dalam pertempuran, meski pemantra yang menyerang tanpa henti tetap akan kehabisan. Berhenti sejenak untuk menarik napas adalah keputusan mana yang sungguhan, di dalam pertempuran sama seperti di antaranya. Seperti Intellect, Spirit melayani kelas bermana dan hanya berarti sedikit bagi yang lain.",
       "armorTitle": "Zirah",
       "armorBody": "Zirah mengurangi kerusakan fisik yang kamu terima. Ia sebagian besar berasal dari apa yang kamu kenakan, dan kelas berzirah berat membawanya jauh lebih banyak. Lebih banyak zirah terhadap musuh yang setara levelmu berarti setiap serangannya mendarat lebih lunak.",
       "apTitle": "Attack power",
@@ -4873,22 +6033,32 @@ export const id_ID: EnTranslations = {
       "sheetHeading": "Membaca lembar karaktermu",
       "sheetBody": "Buka jendela karakter dalam permainan untuk melihat semua ini dalam satu tempat: lima atributmu di satu sisi dan stat yang mereka isi di sisi lain. Arahkan kursor ke nilai mana pun dan tooltip menguraikan apa fungsinya bagi kelasmu, sehingga kamu bisa melihat sekilas angka mana yang benar-benar digerakkan oleh sebuah peningkatan.",
       "growHeading": "Bagaimana statmu tumbuh",
-      "growBody": "Dua hal menaikkan statmu. Setiap level menambahkan sejumlah tetap dari tiap atribut yang sesuai dengan kelasmu, dan perlengkapan yang kamu kenakan menambah lebih banyak di atasnya. Menjaga perlengkapanmu tetap terkini adalah cara paling mantap untuk tumbuh lebih kuat, hingga ke batas akhir level."
+      "growBody": "Dua hal menaikkan statmu. Setiap level menambahkan sejumlah tetap dari tiap atribut yang sesuai dengan kelasmu, dan perlengkapan yang kamu kenakan menambah lebih banyak di atasnya. Menjaga perlengkapanmu tetap terkini adalah cara paling mantap untuk tumbuh lebih kuat, hingga ke batas akhir level.",
+      "hitTitle": "Rating Pukulan",
+      "hitBody": "Rating Pukulan berasal dari perlengkapanmu dan bonus setelannya. Ia membuat seranganmu lebih jarang meleset dan mantramu lebih jarang ditangkal, dan ia benar-benar berguna melawan musuh di atas levelmu sendiri, tempat pukulan meleset menumpuk paling cepat. Lembar statistikmu menampilkannya sebagai Rating Pukulan.",
+      "parryTitle": "Tangkis",
+      "parryBody": "Tangkis adalah pertahanan khas Prajurit: peluang untuk sepenuhnya menepis sebuah pukulan jarak dekat dan tidak menerima kerusakan sama sekali, dan ia tumbuh bersama Strength. Hanya serangan yang datang dari depan yang bisa ditangkis, satu alasan lagi untuk terus menghadap apa pun yang sedang menyerangmu. Kelas lain melihat barisnya di lembar statistik berada di angka nol.",
+      "warfareTitle": "Perang",
+      "warfareBody": "Perang adalah satu-satunya statistik yang hanya berlaku melawan pemain lain: ia menaikkan kerusakan yang kamu berikan kepada mereka dan menurunkan kerusakan yang kamu terima dari mereka, dan lembar statistikmu menampilkan kedua bagian itu dalam satu baris. Terhadap makhluk, ia sama sekali tidak berpengaruh. Ia berasal dari perlengkapan Perang yang kamu beli dengan Kehormatan, sehingga ia adalah hadiah untuk bermain PvP, bukan sesuatu yang perlu kamu kejar saat naik level."
     },
     "progression": {
       "intro": "Setiap pertempuran, misi, dan langkah ke utara membuat pahlawanmu lebih kuat. Inilah cara kerja menaikkan level dan apa yang membuatmu terus berkembang setelah mencapai puncak.",
       "xpTitle": "Cara kamu memperoleh pengalaman",
-      "xpBody": "Kamu memperoleh pengalaman dengan menyelesaikan misi, dengan mengalahkan musuh, dan dengan menuntaskan delve. Misi memberi jauh paling banyak, jadi mengikuti jejak misi adalah cara tercepat untuk naik. Bunuhan dan sesi delve di sepanjang jalan mengisi sisanya.",
+      "xpBody": "Kamu memperoleh pengalaman dengan menyelesaikan misi, mengalahkan musuh, membersihkan delve, dan menggeluti sebuah profesi: memanen dan membuat kerajinan membayar pengalaman karakter di atas keterampilan kriya yang mereka ajarkan, selama pekerjaannya masih mengajarimu sesuatu. Misi memberi paling banyak sejauh ini, jadi mengikuti jejak misi adalah jalan tercepat untuk menanjak, sementara kematian musuh, delve, dan pengumpulan yang kamu lakukan di sepanjang jalan melengkapi sisanya.",
       "capBody": "Setiap level membuatmu lebih tangguh dan menghadirkan kemampuan baru, hingga ke batas akhir level {cap}.",
       "journeyTitle": "Perjalanan ke utara",
       "journeyBody": "Dunia ini adalah satu hamparan tanah yang menyatu, tiga zona membentang dari selatan ke utara, masing-masing satu tingkat lebih tinggi levelnya. Kamu mulai di lembah hijau, melaju menembus rawa, dan berakhir di puncak tinggi yang dingin. Ikuti jejak misi dan tanah itu akan membawamu dari satu ke berikutnya.",
+      "journeyBodyCount": "Dunia ini adalah satu hamparan tanah yang menyatu, terdiri dari {zones} zona. Tiga di antaranya adalah jalur tempat kamu naik level, membentang dari selatan ke utara: kamu mulai di lembah hijau, melaju menembus rawa, dan berakhir di puncak tinggi yang dingin. Ikuti jejak misi dan tanah itu akan membawamu dari satu ke berikutnya. Sebuah pulau ada di lepas pantai lembah untuk level-level awal, dan sisa alam ini terbuka dari jalan yang sama, dibangun untuk karakter yang sudah menuntaskan pendakian itu.",
       "bandLabel": "Level {min} sampai {max}",
       "restedTitle": "Pengalaman istirahat",
-      "restedBody": "Masuklah ke sebuah penginapan dan tetap di luar pertempuran, dan karaktermu mengumpulkan pengalaman istirahat selama kamu menunggu. Tiap kota punya satu. Lain kali kamu keluar dan bertarung, cadangan itu memberi dorongan ekstra pada bunuhanmu hingga habis. Jeda di penginapan tak pernah menjadi waktu yang sia-sia; ia mempercepat rentang naik levelmu berikutnya.",
+      "restedBody": "Masuklah ke penginapan dan tetaplah di luar pertempuran, dan karaktermu menumpuk pengalaman istirahat selagi kamu menunggu. Setiap kota punya satu. Lain kali kamu keluar dan bertarung, simpanan itu memberi dorongan tambahan pada kematian musuhmu sampai habis. Jeda di penginapan tidak pernah waktu yang terbuang; ia mempercepat penggal kenaikan levelmu berikutnya. Simpanannya punya batas, jadi menginap semalam menumpuk kurang lebih sama banyak dengan tinggal sangat lama, dan begitu kamu mencapai level tertinggi tidak ada lagi bilah level untuk diisi, jadi pengalaman istirahat berhenti menumpuk.",
       "capTitle": "Mencapai level {cap}",
       "capJourneyBody": "Level {cap} adalah batas akhir, akhir dari menaikkan level tetapi bukan akhir dari berkembang. Dari sana kamu menjelajahi dungeon dan raid dalam mode normal dan heroik, menghadapi bos dunia saat ia bangkit, mengejar perlengkapan yang lebih baik, dan menguji diri di arena.",
+      "capEndgameBody": "Rift adalah satu-satunya hal yang menanti hingga batas akhir itu sendiri. Ia merekah di berbagai penjuru alam ini menurut jadwalnya sendiri, berperingkat dari C sampai S, dan setiap kelompok di dunia ini berlomba menjadi yang menutup masing-masingnya. Papan Delve juga terus berjalan, dan tingkat Heroiknya layak dilirik lagi begitu perlengkapanmu sudah mengejar.",
       "prestigeBody": "Pengalaman tetap dihitung bahkan setelah batas akhir. Ia mengisi level virtual kosmetik, sehingga bilah pengalamanmu terus naik, dan peringkat prestise jangka panjang yang bisa kamu klaim dari lembar karaktermu begitu kamu tiba di sana. Melewati tonggak besar pengalaman seumur hidup juga meraih jasa di Kitab Jasa-mu, dengan gelar kosmetik dan bingkai nameplate yang tampil di lembar karaktermu. Semuanya sepenuhnya opsional dan tak pernah memberi kekuatan, hanya tanda dari jalan yang telah kamu tempuh.",
-      "noRush": "Tidak perlu terburu-buru. Dunia ini ada untuk dinikmati sesuai temponya sendiri, jadi mengembaralah, ambil misi yang menarik perhatianmu, dan biarkan pahlawanmu tumbuh di sepanjang jalan."
+      "noRush": "Tidak perlu terburu-buru. Dunia ini ada untuk dinikmati sesuai temponya sendiri, jadi mengembaralah, ambil misi yang menarik perhatianmu, dan biarkan pahlawanmu tumbuh di sepanjang jalan.",
+      "ridingTitle": "Belajar menunggang",
+      "ridingBody": "Menunggang adalah salah satu hal yang menanti di ujung pendakian itu. Pada level {level} seorang kepala kandang akan mengajarkanmu kecakapan itu dengan bayaran emas yang tidak sedikit, dan sebuah pelajaran di lintasan latihan mengganjarmu dengan tali kekang pertamamu. Tunggangan sama sekali tidak memberikan kekuatan; ia hanya membuat dunia terasa lebih kecil, yang setelah berjalan jauh ke utara adalah imbalannya tersendiri."
     },
     "placeholder": {
       "note": "Bagian panduan ini sedang dalam pengerjaan."
@@ -5482,6 +6652,7 @@ export const id_ID: EnTranslations = {
     "email": "Email",
     "emailPlaceholder": "kamu@contoh.com",
     "emailError": "Silakan masukkan alamat email yang valid.",
+    "marketingOptIn": "Kirimkan berita dan pembaruan game ke email saya (opsional)",
     "showPassword": "Tampilkan kata sandi",
     "hidePassword": "Sembunyikan kata sandi",
     "logIn": "Masuk",
@@ -5582,6 +6753,19 @@ export const id_ID: EnTranslations = {
     "style": "Gaya",
     "resetLook": "Atur Ulang Tampilan",
     "resetShort": "Atur Ulang",
+    "shareTab": "Bagikan",
+    "designCode": "Kode tampilan",
+    "designCodeHint": "Salin kode ini untuk menyimpan atau membagikan tampilan ini. Tempel kode di sini lalu impor untuk memuatnya.",
+    "copyCode": "Salin kode",
+    "importCode": "Impor",
+    "designCodeCopied": "Kode tampilan disalin.",
+    "designCodeCopyManual": "Penyalinan otomatis diblokir di sini. Kode sudah dipilih; salin dengan papan ketik.",
+    "designCodeImported": "Tampilan diimpor.",
+    "designCodeImportedPartial": "Tampilan diimpor. Nilai yang tidak dikenali versi ini dilewati.",
+    "designCodeErrEmpty": "Tempel kode tampilan terlebih dahulu.",
+    "designCodeErrHeader": "Itu tampaknya bukan kode tampilan.",
+    "designCodeErrVersion": "Kode tampilan itu berasal dari versi gim yang lebih baru.",
+    "designCodeErrMalformed": "Kode tampilan itu rusak. Salin seluruh kode lalu coba lagi.",
     "browFlat": "Datar",
     "browArched": "Melengkung",
     "browThin": "Tipis",
@@ -5658,7 +6842,7 @@ export const id_ID: EnTranslations = {
     "browSoft": "Lembut",
     "browThick": "Tebal",
     "browAngled": "Miring",
-    "earrings": "Anting",
+    "earrings": "Tindik",
     "jewelMaterial": "Bahan Perhiasan",
     "jewelDefault": "Bawaan Tempa",
     "jewelGold": "Emas",
@@ -6645,7 +7829,8 @@ export const id_ID: EnTranslations = {
       "guilds": "Kiat: bergabung dengan guild memberimu saluran obrolan pribadi dan daftar bersama anggota guildmu.",
       "professions": "Kiat: profesi pengumpulan dan kerajinan dapat dilatih bersamaan dengan kelas tempurmu.",
       "loadouts": "Kiat: simpan lebih dari satu set talenta agar dapat bertukar build tanpa menggunakan poin dua kali.",
-      "pvp": "Kiat: tantang pemain lain untuk berduel persahabatan, atau masuk antrean arena Koloseum Abu, untuk menguji build-mu."
+      "pvp": "Kiat: tantang pemain lain untuk berduel persahabatan, atau masuk antrean arena Koloseum Abu, untuk menguji build-mu.",
+      "reliquary": "Tips: Relikuari melacak rampasan unik yang kamu kumpulkan, rak demi rak."
     }
   },
   "errors": {
@@ -6697,7 +7882,15 @@ export const id_ID: EnTranslations = {
       "readyBody": "Akan terpasang saat kamu keluar, atau mulai ulang sekarang.",
       "restart": "Mulai Ulang Sekarang",
       "later": "Nanti",
-      "dismiss": "Tutup"
+      "dismiss": "Tutup",
+      "whatsNew": "Lihat apa yang berubah di browsermu"
+    },
+    "notify": {
+      "updateReadyTitle": "Pembaruan {version} siap",
+      "updateReadyTitleNoVersion": "Pembaruan siap",
+      "updateReadyBody": "Mulai ulang World of ClaudeCraft untuk menerapkan pembaruan.",
+      "partyInviteTitle": "Undangan Kelompok",
+      "partyInviteBody": "{name} telah mengundangmu ke kelompoknya."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -6709,7 +7902,11 @@ export const id_ID: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "Permainan berjalan tanpa akselerasi GPU dan akan lambat. Perbarui driver grafismu, lalu nyalakan ulang permainan. Di Windows, juga atur permainan ke Performa tinggi di Pengaturan > Sistem > Tampilan > Grafis.",
+    "bodyDiscreteInactive": "Permainan tidak menggunakan GPU gaming diskret dan sebagai gantinya berjalan pada GPU terintegrasi (hemat daya), sehingga performa akan menurun. Perbarui driver grafismu, lalu nyalakan ulang permainan. Di Windows, juga atur permainan ke Performa tinggi di Pengaturan > Sistem > Tampilan > Grafis.",
     "bodyWeb": "Permainan berjalan tanpa akselerasi GPU dan akan lambat. Aktifkan akselerasi perangkat keras di pengaturan browsermu, perbarui driver grafismu, lalu nyalakan ulang browsermu.",
+    "hybridBodyWindows": "Sesi ini dirender menggunakan GPU terintegrasi (hemat daya). Jika komputer ini juga memiliki GPU gaming diskret, atur browsermu ke Performa tinggi di Pengaturan > Sistem > Tampilan > Grafis, lalu mulai ulang browsernya. Aplikasi desktop memilih GPU diskret secara otomatis.",
+    "hybridBodyLinux": "Sesi ini dirender menggunakan GPU terintegrasi (hemat daya). Jika komputer ini juga memiliki GPU gaming diskret, browser atau driver grafismu mungkin punya pengaturan pemilihan GPU sendiri, atau distromu mungkin menyediakan alat pengalihan GPU (seperti PRIME atau optimus-manager). Aplikasi desktop memilih GPU diskret secara otomatis.",
+    "hybridBodyOther": "Sesi ini dirender menggunakan GPU terintegrasi (hemat daya). Jika komputer ini juga memiliki GPU gaming diskret, periksa pengaturan grafis browser dan sistem operasimu untuk mengaktifkannya. Aplikasi desktop memilih GPU diskret secara otomatis.",
     "dismiss": "Tutup"
   },
   "perfNudge": {
@@ -6765,7 +7962,12 @@ export const id_ID: EnTranslations = {
     "sortLevel": "Level",
     "sortName": "Nama",
     "sortRecent": "Baru Dimainkan",
-    "sortPlaytime": "Waktu Bermain"
+    "sortPlaytime": "Waktu Bermain",
+    "redesign": "Desain Ulang",
+    "redesignHint": "Karakter ini dibuat sebelum pembuat karakter baru. Anda punya satu desain ulang gratis; terpakai saat Anda menyimpan.",
+    "redesignTitle": "Desain Ulang {name}",
+    "redesignSave": "Simpan Tampilan Baru",
+    "redesignCancel": "Pertahankan Tampilan Saat Ini"
   },
   "deleteCharacter": {
     "title": "Hapus Karakter",
@@ -6793,7 +7995,8 @@ export const id_ID: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "energy": "Energi",
-      "rage": "Amukan"
+      "rage": "Amukan",
+      "focus": "Fokus"
     },
     "roles": {
       "warrior": "Tank / DPS Jarak Dekat",
@@ -6896,6 +8099,7 @@ export const id_ID: EnTranslations = {
           "say": "Berkata",
           "yell": "Berteriak",
           "party": "Party",
+          "battleground": "Medan Thornhollow",
           "general": "Umum",
           "world": "Dunia",
           "lfg": "LFG",
@@ -6922,7 +8126,111 @@ export const id_ID: EnTranslations = {
       "zoomIn": "Perbesar",
       "zoomOut": "Perkecil",
       "mapCanvasLabel": "Peta",
-      "mapSummary": "Peta {zone}."
+      "mapSummary": "Peta {zone}.",
+      "mapMarkerDescription": "{area}. {markers}",
+      "mapMarkerEmpty": "Tidak ada penanda penting yang terlihat.",
+      "mapMarkerLocated": "{marker}: {direction}, {distance}.",
+      "mapMarkerLocatedCount": "{marker}: {count}; {direction}, {distance}.",
+      "mapMarkerMore": "{count} penanda lainnya.",
+      "mapMarkerDirections": {
+        "center": "di tengah",
+        "north": "di utara",
+        "northeast": "di timur laut",
+        "east": "di timur",
+        "southeast": "di tenggara",
+        "south": "di selatan",
+        "southwest": "di barat daya",
+        "west": "di barat",
+        "northwest": "di barat laut"
+      },
+      "mapMarkerDistances": {
+        "near": "dekat",
+        "medium": "jarak sedang",
+        "far": "jauh"
+      },
+      "mapMarkerLabels": {
+        "you": "Kamu",
+        "availableQuest": "Misi tersedia",
+        "readyQuest": "Misi siap diserahkan",
+        "repeatQuest": "Misi berulang",
+        "cooldownQuest": "Misi dalam masa tunggu",
+        "questObjective": "Area tujuan misi",
+        "readyOre": "Urat bijih siap ditambang",
+        "readyWood": "Tegakan pohon siap ditebang",
+        "readyHerb": "Petak herba siap dipanen",
+        "readyLockedOre": "Urat bijih siap ditambang, alat belum dapat digunakan",
+        "readyLockedWood": "Tegakan pohon siap ditebang, alat belum dapat digunakan",
+        "readyLockedHerb": "Petak herba siap dipanen, alat belum dapat digunakan",
+        "cooldownOre": "Urat bijih habis",
+        "cooldownWood": "Tegakan pohon telah ditebang",
+        "cooldownHerb": "Petak herba telah dipanen",
+        "cooldownLockedOre": "Urat bijih habis, alat belum dapat digunakan",
+        "cooldownLockedWood": "Tegakan pohon telah ditebang, alat belum dapat digunakan",
+        "cooldownLockedHerb": "Petak herba telah dipanen, alat belum dapat digunakan",
+        "station": "Stasiun kerajinan: {name}",
+        "service": "Layanan: {name}",
+        "partyMember": "Anggota party: {name}",
+        "deadPartyMember": "Anggota party yang tewas: {name}",
+        "partyMemberGeneric": "Anggota party",
+        "deadPartyMemberGeneric": "Anggota party yang tewas",
+        "friend": "Teman: {name}",
+        "guildMember": "Anggota guild: {name}",
+        "pointOfInterest": "Titik menarik: {name}",
+        "dungeonEntrance": "Pintu masuk dungeon: {name}",
+        "dungeonExit": "Pintu keluar dungeon",
+        "delveEntrance": "Pintu masuk delve: {name}",
+        "worldPassage": "Jalur menuju {zone}",
+        "riftEntrance": "Pintu masuk Rift: {name}",
+        "hostileEnemy": "Musuh yang siap menyerang",
+        "aggressiveEnemy": "Musuh yang menyerangmu",
+        "lootableEnemy": "Musuh yang dapat dijarah",
+        "corpse": "Mayatmu",
+        "deathZone": "Zona bahaya",
+        "teammate": "Rekan satu tim",
+        "deadTeammate": "Rekan satu tim yang tewas",
+        "flagCarrier": "Rekan satu tim yang membawa bendera",
+        "ownFlagStand": "Markas benderamu",
+        "enemyFlagStand": "Markas bendera musuh",
+        "riftDescent": "Jalur turun Rift",
+        "riftReturnBeacon": "Suar kembali",
+        "riftReturnExit": "Jalur keluar untuk kembali",
+        "ranked": "{marker}, peringkat {rank}",
+        "riftTreasureAvailable": "Harta tersedia",
+        "riftTreasureLocked": "Harta terkunci",
+        "riftTreasureOpened": "Harta telah dibuka",
+        "riftTreasureJammed": "Kunci peti harta macet",
+        "riftCacheAvailable": "Peti Rift tersedia",
+        "riftCacheLocked": "Peti terkunci",
+        "riftCacheOpened": "Peti telah dibuka",
+        "riftCacheJammed": "Kunci peti macet",
+        "pylonUnlit": "Pilar rune padam",
+        "pylonLit": "Pilar rune menyala",
+        "sequenceRuneUnlit": "Rune urutan padam",
+        "sequenceRuneLit": "Rune urutan menyala",
+        "iceGoal": "Sasaran es",
+        "boulderPad": "Sasaran batu besar",
+        "boulderMovable": "Batu besar yang dapat dipindahkan",
+        "boulderPlaced": "Batu besar yang telah ditempatkan",
+        "gateSealed": "Gerbang tersegel",
+        "gateOpen": "Gerbang terbuka",
+        "switchReady": "Sakelar siap",
+        "switchOn": "Sakelar diaktifkan",
+        "orbDormant": "Orb tertidur",
+        "orbActive": "Orb aktif",
+        "rollerHazard": "Bahaya batu besar menggelinding",
+        "delvePassageSealed": "Lorong tersegel",
+        "delvePassageOpen": "Lorong terbuka",
+        "delveSurfaceExit": "Pintu keluar ke permukaan",
+        "delveCacheLocked": "Peti delve terkunci",
+        "delveCacheReady": "Peti delve siap",
+        "delveCacheActive": "Peti delve aktif",
+        "delveCacheOpened": "Peti delve telah dibuka",
+        "delveReliquaryLocked": "Relikuari terkunci",
+        "delveReliquaryReady": "Relikuari siap",
+        "delveReliquaryActive": "Ritus relikuari aktif",
+        "delveReliquaryOpened": "Relikuari telah dibuka",
+        "bountiful": "Hadiah berlimpah: {marker}"
+      }
     },
     "options": {
       "gameMenu": "Menu Permainan",
@@ -6962,6 +8270,9 @@ export const id_ID: EnTranslations = {
       "graphicsReloadNote": "Kualitas Grafik dan Detail Medan berlaku setelah pemuatan ulang.",
       "reloadNow": "Muat Ulang Sekarang",
       "fullscreen": "Layar Penuh",
+      "displayMode": "Mode Layar",
+      "displayModeBorderless": "Layar Penuh Tanpa Bingkai",
+      "displayModeWindowed": "Jendela",
       "touchLookSpeed": "Kecepatan Pandang Sentuh",
       "joystickSize": "Ukuran Joystick",
       "buttonSize": "Ukuran Tombol",
@@ -7057,6 +8368,7 @@ export const id_ID: EnTranslations = {
     "chat": {
       "rightClickName": "Klik kanan {name}",
       "templates": {
+        "battleground": "[Medan Thornhollow] {name}: {message}",
         "party": "[Party] {name}: {message}",
         "yell": "{name} berteriak: {message}",
         "whisper": "{name} berbisik: {message}",
@@ -7171,6 +8483,7 @@ export const id_ID: EnTranslations = {
       "deathRecapAbility": "Kamu telah tewas. Tewas oleh {ability}.",
       "deathRecapFalling": "Kamu telah tewas. Kamu jatuh hingga tewas.",
       "deathRecapDrowned": "Kamu telah tewas. Kamu tenggelam.",
+      "deathRecapCauterized": "Kamu telah tewas. Bakaran Kauterisasi mengalahkanmu.",
       "respawn": "Kamu merasa segar dan pulih kembali.",
       "ignoringChat": "Mengabaikan obrolan dari {name}.",
       "noLongerIgnoring": "Tidak lagi mengabaikan {name}.",
@@ -7199,6 +8512,7 @@ export const id_ID: EnTranslations = {
       "notEnoughRage": "Amarah tidak cukup!",
       "notEnoughEnergy": "Energi tidak cukup!",
       "notEnoughMana": "Mana tidak cukup!",
+      "notEnoughDevotion": "Pengabdian tidak cukup!",
       "notEnoughResource": "{resource} tidak cukup!",
       "notEnoughHealth": "Nyawa tidak cukup.",
       "targetMustDodge": "Sasaranmu harus mengelak terlebih dahulu.",
@@ -7214,6 +8528,7 @@ export const id_ID: EnTranslations = {
       "outOfRange": "Di luar jangkauan.",
       "noTarget": "Kamu tidak memiliki sasaran.",
       "tooClose": "Terlalu dekat!",
+      "mustTargetAlly": "Sasaranmu harus seorang sekutu.",
       "facing": "Kamu harus menghadap sasaranmu.",
       "targetHealthBelow": "Kemampuan itu membutuhkan nyawa sasaran di bawah {percent}%.",
       "dagger": "Kamu harus menggunakan belati.",
@@ -7326,6 +8641,10 @@ export const id_ID: EnTranslations = {
     "pet": {
       "attack": "Serang",
       "waterJet": "Pancaran Air",
+      "felbolt": "Baut Fel",
+      "abyssalChain": "Rantai Jurang",
+      "autocastOn": "Mode otomatis aktif. Klik kanan, tekan-dan-tahan, atau tekan Shift+Enter untuk menonaktifkannya.",
+      "autocastOff": "Mode otomatis nonaktif. Klik kanan, tekan-dan-tahan, atau tekan Shift+Enter untuk mengaktifkannya.",
       "taunt": "Provokasi",
       "healDemon": "Sembuhkan Iblis",
       "healPet": "Sembuhkan Peliharaan",
@@ -7336,6 +8655,10 @@ export const id_ID: EnTranslations = {
       "petAttackDesc": "Perintahkan peliharaan Anda untuk menyerang target bermusuhan Anda saat ini.",
       "waterJetTitle": "Pancaran Air",
       "waterJetDesc": "Perintahkan Elemental Air-mu untuk menyalurkan aliran yang memperlambat selama 3 detik. Jeda 8 detik. Klik kanan untuk mengaktifkan secara otomatis setiap kali jeda selesai.",
+      "felboltTitle": "Baut Fel",
+      "felboltDesc": "Perintahkan Emberkin untuk melontarkan proyektil fel tambahan ke targetmu. Jeda 8 detik. Klik kanan, tekan-dan-tahan, atau tekan Shift+Enter untuk mengalihkan mode otomatis.",
+      "abyssalChainTitle": "Rantai Jurang",
+      "abyssalChainDesc": "Perintahkan Gloomshade untuk menyeret musuh biasa dari jarak lebih dari 8 hingga 20 m kembali ke dirinya. Bos tidak bisa ditarik. Jeda 15 detik. Klik kanan, tekan-dan-tahan, atau tekan Shift+Enter untuk mengalihkan mode otomatis.",
       "petTauntTitle": "Provokasi Peliharaan",
       "petTauntDesc": "Perintahkan peliharaan Anda untuk menyerbu dan Menggeram saat dalam jangkauan. Waktu jeda 10 detik.",
       "healDemonDesc": "Habiskan mana untuk menyalurkan penyembuhan ke iblis Anda selama 5 detik.",
@@ -7456,7 +8779,7 @@ export const id_ID: EnTranslations = {
       "queueNote": "Kamu akan dipasangkan dengan penantang daring berperingkat terdekat, lalu diteleportasi ke pasir arena. Menang untuk naik; yang pertama menyerah (1 nyawa) kalah. Kamu kembali persis ke tempat kamu mengantre.",
       "ladderAllTime": "Tangga Peringkat - Sepanjang Masa",
       "ladderOnline": "Tangga Peringkat - Daring",
-      "ratingSummary": "Peringkat - {wins} menang / {losses} kalah",
+      "ratingSummary": "Peringkat - {wins} menang / {losses} kalah / {draws} seri",
       "statusCountdown": "Bersiaplah...",
       "statusReturning": "Kembali ke dunia... {seconds}",
       "statusFight": "Bertarung sampai menyerah!",
@@ -7491,6 +8814,7 @@ export const id_ID: EnTranslations = {
     "tooltip": {
       "rank": "Peringkat {rank}",
       "cost": "{cost} {resource}",
+      "ruinCost": "{cost} Wrack",
       "range": "Jangkauan {range} yard",
       "rangeWithMin": "Jangkauan {min}-{max} yard",
       "instant": "Seketika",
@@ -7502,6 +8826,7 @@ export const id_ID: EnTranslations = {
       "requiresLevel": "Membutuhkan level {level}",
       "requiresForm": "Membutuhkan Wujud {form}",
       "requiresStealth": "Membutuhkan siluman",
+      "requiresStealthSkulduggery": "Membutuhkan siluman (tidak diperlukan pada 3 Gloam atau selama Tabir Bayangan)",
       "requiresCombo": "Menghabiskan poin kombo",
       "requiresTargetHealthBelow": "Membutuhkan nyawa target di bawah {percent}%",
       "requiresDodge": "Hanya bisa dipakai setelah target mengelak",
@@ -7517,7 +8842,9 @@ export const id_ID: EnTranslations = {
     "resources": {
       "mana": "Mana",
       "rage": "Amukan",
-      "energy": "Energi"
+      "energy": "Energi",
+      "focus": "fokus",
+      "devotion": "Pengabdian"
     },
     "forms": {
       "bear": "Beruang",
@@ -7718,6 +9045,7 @@ export const id_ID: EnTranslations = {
       "clickDestroy": "Klik untuk menghancurkan",
       "useFishing": "Pakai: Memancing di perairan terdekat.",
       "useHealingPotion": "Pakai: Memulihkan {amount} nyawa seketika. Bisa dipakai dalam pertempuran. Jeda 1 mnt.",
+      "useHealingPotionPct": "Pakai: Memulihkan {percent}% dari nyawa maksimum seketika. Bisa dipakai dalam pertempuran. Jeda 2 mnt.",
       "useManaPotion": "Pakai: Memulihkan {amount} mana seketika. Bisa dipakai dalam pertempuran. Jeda 1 mnt.",
       "clickUseInstant": "Klik untuk memakai seketika dalam pertempuran",
       "clickUse": "Klik untuk memakai",
@@ -7821,6 +9149,10 @@ export const id_ID: EnTranslations = {
       "filterPrimaryStatAll": "Stat utama apa pun",
       "filterRarity": "Kelangkaan",
       "filterRarityAll": "Semua kelangkaan",
+      "filterSort": "Urutkan",
+      "sortName": "Nama (A-Z)",
+      "sortPriceAsc": "Harga: rendah ke tinggi",
+      "collapseLowest": "Hanya harga terendah",
       "weaponSword": "Pedang",
       "weaponDagger": "Belati",
       "weaponStaff": "Tongkat Sihir",
@@ -7851,6 +9183,8 @@ export const id_ID: EnTranslations = {
       "quantity": "Jumlah",
       "quantityOf": "dari {count}",
       "priceEach": "Harga satuan",
+      "lowestPriceLabel": "Harga penawaran terendah saat ini",
+      "lowestPriceNone": "Belum ada penawaran aktif untuk item ini.",
       "listButton": "Pajang di Pasar Dunia",
       "minPriceError": "Tetapkan harga minimal 1 tembaga.",
       "collectEmpty": "Tidak ada yang menunggu. Hasil penjualan dan daftar kedaluwarsa terkumpul di sini.",
@@ -7949,19 +9283,71 @@ export const id_ID: EnTranslations = {
       },
       "rain_of_fire": {
         "name": "Hujan Api",
-        "description": "Menurunkan hujan api di area sasaran selama 4 detik, membakar musuh sebesar {damage} kerusakan Api setiap detik."
+        "description": "Menghabiskan 3 Pemusnahan untuk menurunkan hujan api ke area sasaran, memberi {damage} kerusakan Api setiap detik selama 4 dtk, diperpanjang menjadi 6 dtk pada peringkat 2. Kehancuran menurunkan gelombang pertamanya seketika."
       },
       "volley": {
         "name": "Hujan Panah",
-        "description": "Menghujani area sasaran dengan panah selama 3 detik, memberi {damage} kerusakan setiap 0.5 detik kepada musuh di dalamnya."
+        "description": "Menghujani area 8 m dengan anak panah selama 3 dtk. Musuh di dalam area menerima {damage} kerusakan Fisik setiap 0.5 dtk. Kerusakan meningkat dengan daya serang jarak jauh."
+      },
+      "pack_command": {
+        "name": "Perintah Kawanan",
+        "description": "Memerintahkan hewan peliharaanmu yang hidup untuk menyerang sebesar 36 sampai 48 kerusakan Fisik. Kerusakan meningkat dengan kekuatan serang hewan peliharaan. Serangan yang mengenai memulihkan 20 fokus dan memberi 1 Keganasan Kawanan selama 30 dtk, hingga 3. Setiap tumpukan menambah semua kerusakan hewan peliharaanmu sebesar 10%. Serangan ini memakai tumpukan yang kamu miliki sebelum benturan."
+      },
+      "stampede": {
+        "name": "Serbuan Liar",
+        "description": "Memanggil 3 binatang buas selama 12 dtk. Masing-masing menyerang tiap 2 dtk sebesar {damage} kerusakan Fisik. Kerusakan yang ditampilkan mencakup 8% kekuatan serang jarak jauhmu sebelum bonus kerusakan hewan peliharaan. Binatang buas mengunci Keganasan Kawanan saat dipanggil, memperoleh 10% kerusakan per tumpukan. Saat Serbuan Liar dalam jeda, Perintah Kawanan yang berhasil berpeluang 20% mengatur ulangnya, dijamin setelah 5 peluang gagal. Ia tidak dapat diatur ulang selama binatang buas aktif. (Penguasa Kawanan)"
+      },
+      "unleash_beast": {
+        "name": "Lepaskan Sang Buas",
+        "description": "Menghabiskan 3 Keganasan Kawanan setelah hewan peliharaanmu menyerang sebesar 83 sampai 105 kerusakan Fisik dan mengguncang setiap musuh dalam 6 meter sebesar 26 sampai 34. Serangan dan guncangan memakai bonus kerusakan hewan peliharaan penuh 30% dari Keganasan Kawanan dan meningkat dengan kekuatan serang hewan peliharaan. Selama 8 dtk sesudahnya, hewan peliharaan memberi 25% lebih banyak kerusakan, menyerang 35% lebih cepat, dan membuat Tembakan Bengis membelah hingga 2 musuh di dekatnya."
+      },
+      "measured_shot": {
+        "name": "Tembakan Terukur",
+        "description": "Menembak sasaran sebesar {damage} kerusakan Fisik. Tembakan yang mengenai memulihkan 20 fokus. Kerusakan meningkat dengan kekuatan serang jarak jauh."
+      },
+      "cold_focus": {
+        "name": "Fokus Dingin",
+        "description": "Selama 12 dtk, Tembakan Terukur memulihkan 50% lebih banyak fokus, dan Tarikan Panjang menghabiskan 25% lebih sedikit serta dirapal 30% lebih cepat. (Ciri khas Pandangan Dingin)"
+      },
+      "bloodhook": {
+        "name": "Kait Darah",
+        "description": "Menerjang ke arah musuh dan menerapkan Luka Kait Darah, memberi 34 kerusakan Fisik dasar ditambah 26% kekuatan serang jarak jauhmu selama 12 dtk dalam 4 denyut. (Ciri khas Kecakapan Lapangan)"
+      },
+      "shrapnel_charge": {
+        "name": "Muatan Serpihan",
+        "description": "Mengenai sasaran sebesar 24 sampai 30 kerusakan Fisik dan hingga 4 musuh lain dalam 6 meter sebesar 13 sampai 17. Sasaran lain juga berdarah sebesar 12 kerusakan selama 6 dtk. Bila sasaran utama membawa Luka Kait Darahmu, 1 denyut luka diberikan seketika. Kerusakan langsung meningkat dengan kekuatan serang jarak jauh."
+      },
+      "bloodtrail_assault": {
+        "name": "Serbuan Jejak Darah",
+        "description": "Selama 12 dtk, Kait Darah menyebarkan luka berkekuatan 60% ke maksimal 2 musuh di dekatnya, Robek Luka memerintahkan serangan hewan peliharaan sebesar 18 kerusakan, dan Muatan Serpihan bertambah 2 meter, memberi 25% lebih banyak kerusakan dasar ke sasaran utamanya, serta memicu 50% lebih banyak kerusakan luka."
+      },
+      "trailbreak": {
+        "name": "Putus Jejak",
+        "description": "Melompat 12 meter ke belakang. Bila kamu punya Momentum Berburu, ia disegarkan dan menyiapkan Masuk Kembali selama 12 dtk."
+      },
+      "wildheart": {
+        "name": "Hati Liar",
+        "description": "Seketika memulihkan 30% nyawa maksimummu."
+      },
+      "shellskin": {
+        "name": "Kulit Cangkang",
+        "description": "Mengurangi kerusakan yang diterima 60% selama 8 dtk, tetapi mencegah serangan selama aktif."
+      },
+      "frostjaw_trap": {
+        "name": "Jerat Rahang Beku",
+        "description": "Menempatkan jerat pada musuh terpilih atau di kakimu. Ia aktif setelah 0,75 dtk dan bertahan 30 dtk. Musuh pertama yang memicunya terakar 3 dtk, dan musuh dalam 4 meter diperlambat 50% selama 4 dtk."
+      },
+      "pack_rally": {
+        "name": "Pengumpulan Kawanan",
+        "description": "Mengambil Wujud Kuda Perang dan mengumpulkan sekutu di dekatnya dengan 30% kecepatan gerak serta 10% kecepatan serang dan rapal selama 10 dtk."
       },
       "hurricane": {
         "name": "Badai",
         "description": "Mendatangkan badai di area sasaran selama 6 detik, menghantam musuh sebesar {damage} kerusakan Alam setiap detik."
       },
       "earthquake": {
-        "name": "Gempa Bumi",
-        "description": "Mengguncang area sasaran selama 6 detik, menghantam musuh sebesar {damage} kerusakan Alam setiap 1.5 detik."
+        "name": "Bangkitan Sesar",
+        "description": "Mengguncang area 8 m selama 6 dtk, memberi {damage} kerusakan Alam setiap 1.5 dtk. Kerusakan meningkat dengan Kekuatan Mantra. Elemental: pada 5 Guntur, memberi 100% kerusakan lebih besar dan menghabiskan seluruh Guntur."
       },
       "heroic_strike": {
         "name": "Serangan Perampas",
@@ -8169,15 +9555,20 @@ export const id_ID: EnTranslations = {
       },
       "sinister_strike": {
         "name": "Tebasan Keji",
-        "description": "Serangan seketika sebesar kerusakan senjata ditambah {damage}. Memberi 1 poin kombo."
+        "description": "Serangan seketika sebesar kerusakan senjata ditambah {damage}. Memberi 1 poin combo.",
+        "specNote_assassination": "Menambah 1 Ritus Bisa (maks 6).",
+        "specNote_combat": "Selagi Redline aktif, tombol ini berubah menjadi Haymaker: 130% kerusakan senjata plus 10, memberi 2 poin combo, dan menambah 1 Redline (maks 4)."
       },
       "eviscerate": {
         "name": "Tidur Abadi",
-        "description": "Gerakan penutup yang menyebabkan {damage}."
+        "description": "Jurus penutup yang menyebabkan {damage}.",
+        "specNote_assassination": "Pada 6 Ritus Bisa, tombol ini berubah menjadi Venomrend: serangan yang seketika menimbulkan seluruh kerusakan yang masih akan diberikan pendarahanmu, menanamkan luka bisa yang segar, dan memulihkan 20 energi.",
+        "specNote_combat": "Mendaratkan ini dengan 4 poin combo atau lebih memulai Redline selama 8 detik: Wicked Slash berubah menjadi Haymaker dan tombol ini berubah menjadi Lights Out (45 plus 35 per poin combo, menghantam 25% lebih keras untuk setiap tingkat Redline yang terkumpul, memulihkan 25 energi). Gunakan sebelum Redline berakhir."
       },
       "backstab": {
         "name": "Tusukan Pengecut",
-        "description": "Tikam target dari belakang untuk 150% kerusakan senjata plus {damage}. Harus di belakang target. Membutuhkan belati. Memberi 1 poin kombo."
+        "description": "Tancapkan belatimu ke punggung target sebesar 150% kerusakan senjata ditambah {damage}. Harus berada di belakang target. Membutuhkan belati. Memberi 1 poin combo.",
+        "specNote_assassination": "Setiap serangan menambah 1 Ritus Bisa (maks 6) dan mengembalikan 15 energi. Pada 6 Ritus Bisa, Dirt Nap berubah menjadi Venomrend (menimbulkan seluruh sisa kerusakan pendarahanmu sekaligus)."
       },
       "gouge": {
         "name": "Colok Mata",
@@ -8189,7 +9580,7 @@ export const id_ID: EnTranslations = {
       },
       "slice_and_dice": {
         "name": "Tempo Bengis",
-        "description": "Gerakan penutup yang meningkatkan kecepatan serangan jarak dekat sebesar 30%. Bertahan lebih lama per poin kombo."
+        "description": "Jurus penutup yang meningkatkan kecepatan serang jarak dekat sebesar 30% selama 12 detik plus 4 detik per poin combo (5 poin combo: 32 detik)."
       },
       "sprint": {
         "name": "Tumit Gesit",
@@ -8197,15 +9588,17 @@ export const id_ID: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Pukulan Curang",
-        "description": "Gerakan penutup yang membuat target terpana. Bertahan 1 detik lebih lama per poin kombo."
+        "description": "Jurus penutup yang membuat target terpana selama 1 detik plus 1 detik per poin combo (5 poin combo: 6 detik)."
       },
       "ambush": {
         "name": "Serangan Penyergap",
-        "description": "Sergap target untuk 250% kerusakan senjata plus {damage}. Harus dalam siluman dan di belakang target. Membutuhkan belati. Memberi 1 poin kombo."
+        "description": "Menyerang dari bayangan sebesar 250% kerusakan senjata ditambah {damage}. Harus dalam siluman dan berada di belakang target. Membutuhkan belati. Memberi 1 poin combo.",
+        "specNote_subtlety": "Dipakai dari Selubung Senja, ini menambah 1 Gloam (maks 3). Pada 3 Gloam kamu bisa memakainya TANPA siluman dan dari sudut mana pun: penggunaan itu tidak memakan biaya, menghabiskan seluruh 3 Gloam, memulai Tabir Bayangan selama 6 detik, dan menghantam dua kali lipat."
       },
       "stealth": {
         "name": "Selubung Senja",
-        "description": "Menyembunyikanmu dalam bayangan: musuh nyaris tak menyadarimu, tetapi kau bergerak 50% lebih lambat. Menyerang atau menerima kerusakan mematahkan Duskveil. Rapal lagi untuk keluar."
+        "description": "Menyembunyikanmu dalam bayangan: musuh nyaris tidak menyadarimu, tetapi kamu bergerak 50% lebih lambat. Menyerang atau menerima kerusakan membatalkan Selubung Senja. Rapal lagi untuk keluar.",
+        "specNote_subtlety": "Setiap pembuka yang kamu pakai dari Selubung Senja menambah 1 Gloam (maks 3)."
       },
       "adrenaline_rush": {
         "name": "Darah Terpacu",
@@ -8213,11 +9606,14 @@ export const id_ID: EnTranslations = {
       },
       "garrote": {
         "name": "Kawat Leher",
-        "description": "Menjerat musuh, menimbulkan {damage} kerusakan sekarang dan membuatnya berdarah sebesar {overTime} selama 18 detik. Harus dalam siluman. Memberi 1 poin kombo."
+        "description": "Lilitkan kawat di leher musuh, menyebabkan {damage} kerusakan sekarang dan pendarahan sebesar {overTime} selama 18 detik. Harus dalam siluman. Memberi 1 poin combo.",
+        "specNote_subtlety": "Dipakai dari Selubung Senja, ini menambah 1 Gloam (maks 3). Pada 3 Gloam kamu bisa memakainya TANPA siluman: penggunaan itu tidak memakan biaya, menghabiskan seluruh 3 Gloam, dan memulai Tabir Bayangan selama 6 detik."
       },
       "cheap_shot": {
         "name": "Pukulan Ulu Hati",
-        "description": "Menyerang target sebesar {damage} kerusakan, menyetrumnya selama 4 detik. Harus dalam siluman. Memberi 2 poin kombo."
+        "description": "Serang target sebesar {damage} kerusakan, membuatnya terpana selama 4 detik. Harus dalam siluman. Memberi 2 poin combo.",
+        "descriptionNoStealth": "Serang target sebesar {damage} kerusakan, membuatnya terpana selama 4 detik. Memberi 2 poin combo.",
+        "specNote_subtlety": "Dipakai dari Selubung Senja, ini menambah 1 Gloam (maks 3). Pada 3 Gloam kamu bisa memakainya TANPA siluman: penggunaan itu tidak memakan biaya, menghabiskan seluruh 3 Gloam, dan memulai Tabir Bayangan selama 6 detik."
       },
       "sap": {
         "name": "Bius",
@@ -8229,11 +9625,11 @@ export const id_ID: EnTranslations = {
       },
       "expose_armor": {
         "name": "Tembus Zirah",
-        "description": "Gerakan penutup yang menyingkap target, mengurangi zirahnya sebesar {damage} selama 30 detik."
+        "description": "Jurus penutup yang membuka pertahanan target selama 30 detik: setiap poin combo yang dipakai mengurangi zirahnya sebesar 2% (5 poin combo: {damage}%)."
       },
       "rupture": {
         "name": "Kehabisan Darah",
-        "description": "Gerakan penutup yang melukai target, membuatnya berdarah sebesar {damage} selama 16 detik."
+        "description": "Jurus penutup yang melukai target: ia berdarah setiap 2 detik, selama 6 detik plus 2 detik per poin combo (5 poin combo: 16 detik dan {damage} total kerusakan)."
       },
       "vanish": {
         "name": "Langkah Asap",
@@ -8253,19 +9649,131 @@ export const id_ID: EnTranslations = {
       },
       "seal_of_righteousness": {
         "name": "Cap Sumpah",
-        "description": "Memenuhi dirimu dengan kekuatan Suci selama 30 detik, membuat setiap ayunan jarak dekatmu memberikan {damage} kerusakan Suci tambahan. Lepaskan dengan Vonis."
-      },
-      "holy_light": {
-        "name": "Cahaya Pemulih",
-        "description": "Menyembuhkan target sekutu sebesar {damage}."
-      },
-      "devotion_aura": {
-        "name": "Aura Teguh",
-        "description": "Meningkatkan zirahmu sebesar {buff} selama 30 menit."
+        "description": "Memenuhimu dengan kekuatan Suci selama 30 dtk, sehingga setiap ayunan jarak dekatmu memberi {damage} kerusakan Suci tambahan."
       },
       "judgement": {
         "name": "Vonis",
         "description": "Melepaskan Segel aktifmu kepada musuh, melahapnya untuk memberi kerusakan Suci yang tersimpan."
+      },
+      "holy_light": {
+        "name": "Cahaya Pemulih",
+        "description": "Menyembuhkan sasaran sekutu dengan cepat sebesar {damage}. Memulihkan nyawa menghasilkan 1 Pengabdian, bahkan tanpa spesialisasi. Resonansi Berseri atau Pembalasan Surya membuatnya seketika."
+      },
+      "divine_ascension": {
+        "name": "Kenaikan Ilahi",
+        "description": "Menghabiskan 20 Pengabdian untuk memperoleh 5 muatan Kenaikan hingga 45 dtk. Kemampuan bertanda menghabiskan satu muatan dan memperoleh efek tambahan."
+      },
+      "aura_mastery": {
+        "name": "Kerukunan Suci",
+        "description": "Selama 8 dtk, memperkuat setiap Pengabdian dan Aura Pembalasan aktif di kelompokmu. Pengabdian Benteng mengurangi kerusakan 15%; Pembalasan memberi 15 kerusakan Suci. Penggunaan berulang menyegarkan, bukan menumpuk."
+      },
+      "devotion_ward": {
+        "name": "Pengabdian Benteng",
+        "description": "Mengurangi kerusakan yang diterima kamu dan anggota kelompok sebesar 5% sampai mati atau tergantikan. Hanya aura ini dan Aura Pembalasan yang saling menggantikan; Pengabdian Berseri, Fajar, dan Karunia berdampingan."
+      },
+      "hammer_of_grace": {
+        "name": "Palu Karunia",
+        "description": "Seketika melemparkan palu suci ke musuh dalam 20 m sebesar {damage}, memulihkan 70 mana, menyembuhkanmu sebesar 50% kerusakan yang diberikan, dan menghasilkan 1 Pengabdian saat memberi kerusakan. Pembalasan Surya membuat Palu Karunia mengabaikan jedanya dan menyembuhkanmu sebesar 100% kerusakan yang diberikan."
+      },
+      "hushbrand": {
+        "name": "Tanda Bisu",
+        "description": "Memutus perapalan dan mencegah mantra dari aliran itu selama 4 dtk."
+      },
+      "guardian_covenant": {
+        "name": "Perjanjian Penjaga",
+        "description": "Melindungi satu sasaran sekutu dan dirimu, mengurangi kerusakan yang diterima 20% selama 8 dtk. Memilih dirimu secara bawaan bila tidak ada sasaran sekutu."
+      },
+      "solar_step": {
+        "name": "Langkah Surya",
+        "description": "Menambah kecepatan gerakmu 150% selama 2 dtk."
+      },
+      "solar_invocation": {
+        "name": "Seruan Surya",
+        "description": "Seketika menyembuhkan sekutu sebesar {damage} atau memberi kerusakan Suci sedang kepada musuh. Kedua penggunaan menghasilkan 1 Pengabdian. Selama Kenaikan, rapalan penyembuhan juga menyembuhkan pemain sekutu dalam 10 m dari sasaran sebesar separuhnya."
+      },
+      "radiant_devotion": {
+        "name": "Pengabdian Berseri",
+        "description": "Menambah kekuatan mantra kamu dan anggota kelompok sebesar 20 selama 30 mnt. Menggantikan Pengabdian Fajar atau Karuniamu sendiri, tetapi berdampingan dengan Pengabdian paladin lain."
+      },
+      "dawn_devotion": {
+        "name": "Pengabdian Fajar",
+        "description": "Menambah kekuatan serang kamu dan anggota kelompok sebesar 40 selama 30 mnt. Menggantikan Pengabdian Berseri atau Karuniamu sendiri, tetapi berdampingan dengan Pengabdian paladin lain dan dengan seruan pendekar."
+      },
+      "grace_devotion": {
+        "name": "Pengabdian Karunia",
+        "description": "Kamu dan anggota kelompok memulihkan 15 mana tiap 5 dtk dan membayar 3% lebih sedikit mana selama 30 mnt. Menggantikan Pengabdian Berseri atau Fajarmu sendiri, tetapi berdampingan dengan Pengabdian paladin lain."
+      },
+      "recall_the_fallen": {
+        "name": "Panggil yang Gugur",
+        "description": "Menghidupkan kembali anggota kelompok yang mati dengan 35% nyawa dan mana. Penyembuh Surya level 16 atau lebih tinggi justru memanggil kembali seluruh anggota kelompok yang gugur."
+      },
+      "beacon_of_light": {
+        "name": "Mercusuar Cahaya",
+        "description": "Menandai satu anggota kelompok sebagai Mercusuar Cahayamu. 50% penyembuhan langsungmu yang efektif pada anggota kelompok lain dalam 60 m juga menyembuhkan Mercusuar. Penyembuhan area dan berkala tidak dialihkan. Bertahan sampai salah satu dari kalian mati."
+      },
+      "final_edict": {
+        "name": "Titah Terakhir",
+        "description": "Melancarkan serangan senjata yang menghancurkan dan menghasilkan 1 Pengabdian saat memberi kerusakan. Pukulan yang berhasil memangkas sisa jeda Runtuhnya Fajar sebesar 2 dtk. Serangan otomatis yang berhasil dan pukulan Titah Terakhir berpeluang 15% memberi Murka Fajar selama 8 dtk. Kenaikan juga melepaskan ledakan Suci di sekitarmu."
+      },
+      "dawnfall": {
+        "name": "Runtuhnya Fajar",
+        "description": "Memberi {damage} kerusakan Suci kepada musuh di dekatnya dan menghasilkan 1 Pengabdian. Mengenai setidaknya satu musuh memangkas sisa jeda Titah Terakhir sebesar 2 dtk. Kenaikan menambah kerusakan dan radiusnya."
+      },
+      "sun_gods_verdict": {
+        "name": "Putusan Dewa Matahari",
+        "description": "Mengadili musuh di bawah Putusan Dewa Matahari selama 30 dtk. Titah Terakhir dan Runtuhnya Fajar menuliskan satu muatan pada pukulan yang berhasil. Kemampuan yang menempatkan muatan ketiga menentukan hukumannya: Titah Terakhir melepaskan kerusakan dahsyat pada terdakwa; Runtuhnya Fajar meledakkan putusan, melukai dan membuat musuh di dekatnya terhuyung 1,5 dtk."
+      },
+      "valkyrs_calling": {
+        "name": "Panggilan Valkyrie",
+        "description": "Naik ke udara, menjadi kebal kerusakan saat kamu terbang ke arah musuh. Setelah 2 dtk, kamu menukik ke area sasaran sebesar {damage} kerusakan Suci dan menghasilkan 1 Pengabdian. Kenaikan menambah kerusakan benturan 50% dan menghabiskan 1 muatan."
+      },
+      "faithforged_guard": {
+        "name": "Utang Cahaya",
+        "description": "Selama 8 dtk, pukulan musuh berikutnya terhadapmu dijawab: hingga {buff} kerusakan ditolak dan dikembalikan kepada penyerang sebagai kerusakan Suci, dan kamu memperoleh 1 Pengabdian. Hanya satu pukulan yang dijawab. Kenaikan menaikkan jumlah yang dapat dijawab sebesar 50%."
+      },
+      "mercy_lance": {
+        "name": "Tombak Belas Kasih",
+        "description": "Memberi {damage} kerusakan Suci kepada musuh dan menghasilkan 1 Pengabdian saat memberi kerusakan. Selama Kenaikan, ia menghabiskan 1 muatan untuk menjamin serangan kritis."
+      },
+      "sacred_form": {
+        "name": "Wujud Suci",
+        "description": "Memasuki keadaan suci hingga mati, menambah penyembuhan 10% dan peluang kritis mantra 5%, serta mengurangi ancaman yang dihasilkan 50%. Hanya untuk Penyembuh Surya."
+      },
+      "dawns_embrace": {
+        "name": "Pelukan Fajar",
+        "description": "Melepaskan penyembuhan kuat dan menghasilkan 1 Pengabdian. Resonansi Berseri memangkas biaya mananya 50% dan waktu rapal menjadi 1,5 dtk. Kenaikan menjadikannya seketika dan menambah penyembuhannya 35%."
+      },
+      "radiant_chorus": {
+        "name": "Paduan Suara Berseri",
+        "description": "Menyembuhkan sekutu di dekatnya sebesar {damage} dan menghasilkan 1 Pengabdian. Menyembuhkan secara efektif setidaknya 2 sekutu memberi Resonansi Berseri: Cahaya Pemulih berikutnya menjadi seketika, atau Pelukan Fajar berikutnya menghabiskan 50% lebih sedikit mana dan dirapal dalam 1,5 dtk. Kenaikan menambah penyembuhan dan radius Paduan Suara Berseri."
+      },
+      "life_covenant": {
+        "name": "Perjanjian Kehidupan",
+        "description": "Mengurangi kerusakan yang diterima sekutu sebesar 40% selama 6 dtk. Selama Kenaikan juga memberi perisai 120 poin tanpa menghabiskan muatan."
+      },
+      "aegis_first_dawn": {
+        "name": "Perisai Fajar Pertama",
+        "description": "Salurkan selama 5 dtk, menciptakan kubah suci berdiameter 10 meter. Sekutu di dalamnya disembuhkan tiap detik dan menerima 50% lebih sedikit kerusakan. Menyelesaikan penyaluran melepaskan penyembuhan akhir dan memberi 30% kecepatan gerak selama 4 dtk."
+      },
+      "vowkeeper_strike": {
+        "name": "Serangan Penjaga Ikrar",
+        "description": "Menyerang dengan ancaman tinggi dan menghasilkan 1 Pengabdian. Serangan yang berhasil berpeluang 20% memberi Pembalasan Surya selama 8 dtk; setiap tangkisan yang berhasil berpeluang 25%. Pembalasan Surya memperkuat Cakram Surya, Palu Karunia, atau Cahaya Pemulih berikutnya. Kenaikan juga memberi perisai penyerap kecil."
+      },
+      "bastion_rite": {
+        "name": "Ritus Benteng",
+        "description": "Mengurangi kerusakan fisik yang diterima 20% dan menambah peluang tangkis 20% selama 6 dtk. Kenaikan memperpanjang durasi menjadi 10 dtk."
+      },
+      "sunward_disc": {
+        "name": "Cakram Surya",
+        "description": "Membutuhkan perisai. Melemparkan cakram berseri yang menghantam lalu memantul di antara musuh di dekatnya. Setiap benturan yang melukai menghasilkan 1 Pengabdian. Pembalasan Surya membuat Cakram Surya tidak menghabiskan mana, mengabaikan jedanya, dan memberi 20% lebih banyak kerusakan. Kenaikan memperkuat 5 pantulan."
+      },
+      "sacred_challenge": {
+        "name": "Pacuan Suci",
+        "description": "Memaksa musuh menyerangmu. Selama Kenaikan juga mengurangi seluruh kerusakan yang diterima sebesar 15% selama 4 dtk tanpa menghabiskan muatan."
+      },
+      "devotion_aura": {
+        "name": "Aura Teguh",
+        "description": "Meningkatkan zirahmu sebesar {buff} selama 30 menit."
       },
       "blessing_of_might": {
         "name": "Sumpah Besi",
@@ -8273,7 +9781,7 @@ export const id_ID: EnTranslations = {
       },
       "divine_protection": {
         "name": "Tameng Iman",
-        "description": "Perisai suci menyerap {damage} kerusakan selama 10 detik."
+        "description": "Perisai suci menyerap {damage}% dari kesehatan maksimummu selama {duration} detik."
       },
       "hammer_of_justice": {
         "name": "Palu Pembelah",
@@ -8281,7 +9789,7 @@ export const id_ID: EnTranslations = {
       },
       "lay_on_hands": {
         "name": "Ritus Terakhir",
-        "description": "Lonjakan penyembuhan masif: memulihkan {damage} kesehatan. Jeda 10 menit."
+        "description": "Lonjakan penyembuhan masif memulihkan {damage}% dari kesehatan maksimummu. Jeda 10 menit."
       },
       "holy_taunt": {
         "name": "Hasutan Suci",
@@ -8289,7 +9797,7 @@ export const id_ID: EnTranslations = {
       },
       "flash_of_light": {
         "name": "Pemulihan Cahaya",
-        "description": "Semburan Cahaya yang cepat dan efisien yang menyembuhkan target sekutu sebesar {damage}."
+        "description": "Kilatan Cahaya yang cepat dan hemat, yang menyembuhkan sasaran sekutu sebesar {damage}. Memulihkan nyawa menghasilkan 1 Pengabdian, bahkan tanpa spesialisasi."
       },
       "exorcism": {
         "name": "Ritus Pengusiran",
@@ -8297,15 +9805,31 @@ export const id_ID: EnTranslations = {
       },
       "consecration": {
         "name": "Tanah Suci",
-        "description": "Mentahbiskan tanah di bawahmu, membakar musuh terdekat untuk {damage} kerusakan Suci setiap 2 detik selama 10 detik."
+        "description": "Mentahbiskan tanah selama 9 detik dan menimbulkan {damage} kerusakan Suci tiap detik. Penjaga Iman menerima 10% lebih sedikit kerusakan di dalamnya."
+      },
+      "bastion_sweep": {
+        "name": "Sapuan Benteng",
+        "description": "Sapukan perisai yang kamu kenakan menembus musuh dalam busur depan 180 derajat sebesar {damage} kerusakan Suci dengan ancaman tinggi dan menghasilkan 1 Pengabdian. Kenaikan menambah kerusakan 30% dan radius menjadi 8 m."
+      },
+      "oath_chain": {
+        "name": "Rantai Sumpah",
+        "description": "Seketika mengikat musuh jauh dengan rantai suci. Musuh bergerak ke arahmu dengan 18 m per detik sampai mencapai 3 m, lalu diperlambat 50% selama 4 dtk. Selama Kenaikan ia mengikat musuh kedua di dekatnya."
+      },
+      "veilbound_march": {
+        "name": "Barisan Tabir",
+        "description": "Menjadi halus selama 4 dtk, memperoleh 40% kecepatan gerak dan 30% baju zirah serta kebal terhadap akar, perlambatan, dan pemindahan. Musuh yang kamu lewati mendapat Tanda Tabir selama 6 dtk: mereka menerima kerusakan Suci tiap detik, memberimu 20% lebih sedikit kerusakan, dan menghasilkan ancaman tambahan. Tanda pertama memberi 1 Pengabdian. Saat barisan berakhir, musuh bertanda di dekatnya menerima ledakan akhir. Kenaikan menambah ledakan 50% dan sedikit menarik mereka ke arahmu."
+      },
+      "veilbound_mark": {
+        "name": "Tanda Tabir",
+        "description": "Menerima kerusakan Suci tiap detik, memberi 20% lebih sedikit kerusakan kepada paladin yang menempatkan tanda, dan menghasilkan ancaman tambahan terhadap paladin itu."
       },
       "righteous_fury": {
         "name": "Sumpah Membara",
-        "description": "Meningkatkan ancaman yang dihasilkan oleh kerusakan Suci-mu sebesar 60% selama 30 menit. Landasan utama paladin penahan serangan."
+        "description": "Secara pasif meningkatkan ancaman yang dihasilkan kerusakan Sucimu sebesar 30%. Hanya Penjaga iman."
       },
       "retribution_aura": {
         "name": "Aura Ganjaran",
-        "description": "Menyelimuti dirimu dengan energi suci selama 30 menit, memberikan 5 kerusakan Suci kepada musuh mana pun yang menyerangmu dari jarak dekat."
+        "description": "Menyelimuti dirimu dan kelompokmu dengan energi suci hingga mati atau digantikan. Musuh yang menyerang sekutu terpengaruh dari jarak dekat menerima {buff} kerusakan Suci, dan sekutu terpengaruh memberikan {buff} kerusakan Suci tambahan dengan serangan otomatis."
       },
       "tame_beast": {
         "name": "Ikatan Liar",
@@ -8317,119 +9841,131 @@ export const id_ID: EnTranslations = {
       },
       "raptor_strike": {
         "name": "Serangan Cabik Perut",
-        "description": "Serangan jarak dekat kuat yang meningkatkan kerusakan sebesar {damage}. Aktif pada ayunan berikutnya."
+        "description": "Memukul sebesar 10% kerusakan senjata ditambah {damage}. Sebuah pukulan telak memulihkan 15 Fokus dan memberi 1 Momentum Berburu. Kerusakan meningkat dengan daya serang melalui kerusakan senjata."
       },
       "aspect_of_the_hawk": {
         "name": "Wujud Elang Penyambar",
-        "description": "Mengambil wujud elang penyambar, meningkatkan daya serang sebesar {buff} selama 30 menit."
+        "description": "Mengambil wujud elang penyambar, meningkatkan daya serangmu sebesar {buff} selama 30 menit."
       },
       "serpent_sting": {
         "name": "Duri Bisa",
-        "description": "Menyengat target, memberikan {damage} kerusakan Alam selama 15 detik."
+        "description": "Memberi total {damage} kerusakan Alam selama 15 dtk, sekali tiap 3 dtk. Kerusakan meningkat dengan daya serang jarak jauh."
       },
       "arcane_shot": {
         "name": "Tembakan Bengis",
-        "description": "Tembakan seketika yang menimbulkan {damage} kerusakan Arkana."
+        "description": "Menembak sasaran sebesar {damage} kerusakan Arkana. Kerusakan meningkat dengan daya serang jarak jauh."
       },
       "concussive_shot": {
         "name": "Tembakan Pengguncang",
-        "description": "Membuat target linglung sebesar {damage} kerusakan, memperlambat gerakan sebesar 50% selama 4 detik."
+        "description": "Menembak sasaran sebesar {damage} kerusakan Fisik dan memperlambatnya 50% selama 4 dtk. Kerusakan meningkat dengan daya serang jarak jauh."
       },
       "mongoose_bite": {
-        "name": "Taring Balasan",
-        "description": "Serangan balasan setelah target mengelak sebesar kerusakan senjata ditambah {damage}. Tidak dapat dielakkan."
+        "name": "Robekan Luka",
+        "description": "Memukul sebesar 45% kerusakan senjata ditambah {damage}. Jika sasaran menyandang Luka Kait Darahmu, langsung memberi 1 denyut luka dan menyegarkan lukanya menjadi 12 dtk. Kerusakan meningkat dengan daya serang melalui kerusakan senjata."
+      },
+      "hunting_momentum": {
+        "name": "Momentum Berburu",
+        "description": "Pasif: Serangan Pembelah memberi 1 Momentum Berburu selama 8 dtk, hingga 3. Pada 3 tumpukan, Robek Luka memberi 45% lebih banyak kerusakan serangan dan menghabiskan tumpukan. (Kecakapan Lapangan)"
+      },
+      "fieldcraft_reentry": {
+        "name": "Masuk Kembali Bersenjata",
+        "description": "Pasif: Putus Jejak menyegarkan Momentum Berburu dan menyiapkan Serangan Pembelah atau Kait Darah berikutnya selama 12 dtk. Serangan Pembelah memberi 15% lebih banyak kerusakan per tumpukan. Kait Darah memberi 18 sampai 24 kerusakan Fisik tambahan, meningkat 15% per tumpukan dan oleh kekuatan serang jarak jauhmu. Pada 3 tumpukan, salah satu serangan menghabiskan Momentum Berburu. (Kecakapan Lapangan)"
       },
       "wing_clip": {
         "name": "Tebasan Pembelenggu",
-        "description": "Menimbulkan luka sebesar {damage} kerusakan, memperlambat musuh sebesar 40% selama 10 detik."
+        "description": "Menyayat sasaran sebesar {damage} kerusakan Fisik dan memperlambatnya 40% selama 10 dtk. Kerusakan meningkat dengan daya serang."
       },
       "aspect_of_the_monkey": {
         "name": "Wujud Musang",
-        "description": "Mengambil wujud musang, meningkatkan peluang menghindarmu sebesar 8% selama 30 menit."
+        "description": "Mengambil wujud musang, meningkatkan peluang mengelakmu sebesar 8% selama 30 menit."
       },
       "aspect_of_the_cheetah": {
         "name": "Wujud Kuda Pacu",
-        "description": "Mengambil wujud kuda pacu, meningkatkan kecepatan gerak sebesar 30% selama 30 menit."
+        "description": "Mengambil wujud kuda pacu, meningkatkan kecepatan gerakmu sebesar 30% selama 30 menit."
       },
       "aimed_shot": {
         "name": "Tarikan Panjang",
-        "description": "Tembakan yang ditarik dengan cermat yang menimbulkan {damage} kerusakan."
+        "description": "Menembak sasaran sebesar {damage} kerusakan Fisik. Kerusakan meningkat dengan daya serang jarak jauh."
       },
       "rapid_fire": {
         "name": "Tarikan Menggebu",
-        "description": "Meningkatkan kecepatan serangmu sebesar 40% selama 15 detik."
+        "description": "Salurkan enam tembakan cepat selama 2,4 detik sambil bergerak. Setiap tembakan menimbulkan {damage} kerusakan fisik."
       },
       "smite": {
-        "name": "Hardikan",
-        "description": "Menghardik musuh sebesar {damage} kerusakan Suci."
+        "name": "Himne Pemurnian",
+        "description": "Memberi {damage} kerusakan Suci. Kerusakan meningkat dengan Kekuatan Mantra. Disiplin: menyembuhkan setiap sekutu yang tertaut sebesar 30% dari kerusakannya. Kalau tidak ada sekutu yang tertaut, menyembuhkan anggota kelompok bernyawa terendah sebesar 15%."
       },
       "lesser_heal": {
         "name": "Doa Berbisik",
-        "description": "Menyembuhkan target sekutu sebesar {damage}."
+        "description": "Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Mantra."
       },
       "power_word_fortitude": {
         "name": "Litani Ketabahan",
-        "description": "Meningkatkan Stamina target sebesar {buff} selama 30 menit."
+        "description": "Meningkatkan Stamina setiap anggota kelompok sebesar {buff}% selama 30 menit."
       },
       "shadow_word_pain": {
         "name": "Ratapan Pembusukan",
-        "description": "Sepatah kata kegelapan menyebabkan {damage} kerusakan Bayangan selama 18 detik."
+        "description": "Memberi total {damage} kerusakan Bayangan selama 18 dtk, sekali tiap 3 dtk. Kerusakan meningkat dengan Kekuatan Mantra. Bayangan: memberi 10% kerusakan lebih besar, dan setiap denyut pada Patungmu memberi 1 Persembahan Kelam."
       },
       "power_word_shield": {
         "name": "Mazmur Penangkal",
-        "description": "Melindungi target, menyerap {damage} kerusakan selama 30 detik."
+        "description": "Melindungi sasaran sekutu, menyerap {damage} kerusakan selama 30 dtk. Disiplin juga menautkan sasaran itu pada kerusakan Sucimu selama 30 dtk."
       },
       "renew": {
         "name": "Rahmat Berlanjut",
-        "description": "Menyembuhkan target sebesar {damage} selama 15 detik."
+        "description": "Menyembuhkan sasaran sebesar {damage} selama 15 dtk, sekali tiap 3 dtk. Penyembuhan meningkat dengan Kekuatan Mantra."
       },
       "mind_blast": {
         "name": "Retak Pikiran",
-        "description": "Meledakkan pikiran target sebesar {damage} kerusakan Bayangan."
+        "description": "Memberi {damage} kerusakan Bayangan. Kerusakan meningkat dengan Kekuatan Mantra. Bayangan mengikat sebuah sasaran dengan Ratapan Pembusukanmu sebagai Patungnya, memberi 1 Persembahan Kelam, dan menggemakan 30% kerusakannya ke maksimal 3 musuh lain yang menyandang Ratapanmu."
       },
       "heal": {
         "name": "Doa Khidmat",
-        "description": "Doa yang lambat namun ampuh yang menyembuhkan target sekutu sebesar {damage}."
+        "description": "Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Mantra."
       },
       "mind_flay": {
         "name": "Litani Nestapa",
-        "description": "Menyerang pikiran target dengan energi Bayangan, menimbulkan {damage} kerusakan setiap detik selama 3 detik."
+        "description": "Menyalurkan selama 3 dtk, memberi {damage} kerusakan Bayangan setiap detik. Kerusakan meningkat dengan Kekuatan Mantra."
       },
       "flash_heal": {
         "name": "Doa Mendesak",
-        "description": "Doa cepat yang menyembuhkan target sekutu sebesar {damage}."
+        "description": "Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Mantra."
       },
       "lightning_bolt": {
         "name": "Sambaran Busur",
-        "description": "Melontarkan sambaran petir sebesar {damage} kerusakan Alam."
+        "description": "Memberi {damage} kerusakan Alam. Kerusakan meningkat dengan Kekuatan Mantra. Elemental: pukulan telak memberi 1 Guntur."
+      },
+      "thunder_reservoir": {
+        "name": "Wadah Guruh",
+        "description": "Pasif: Sambaran Busur dan Petir Bercabang memberi Guruh, hingga 5. Pada 5 Guruh, Sentakan Bumi memberi 125% lebih banyak kerusakan atau Gempa Bumi 100% lebih banyak, lalu menghabiskan seluruh Guruh. (Panggilan Guruh)"
       },
       "rockbiter_weapon": {
         "name": "Senjata Stonebound",
-        "description": "Mengisi senjatamu dengan amukan batu: setiap ayunan memberikan {damage} kerusakan tambahan selama 5 menit."
+        "description": "Meresapi senjatamu selama 30 menit. Setiap ayunan memberi {damage} kerusakan tambahan. Penguatan juga memperoleh 40% zirah dan 20% Stamina, menerima 15% kerusakan lebih sedikit, dan kebal terhadap serangan kritis dari makhluk, dan menghasilkan 2,75 kali lipat ancaman. Sentakan Bumi memaksa sasarannya menyerangmu selama 3 dtk, dan Tameng Guntur memberi 10% pengurangan kerusakan selama 3 dtk."
       },
       "healing_wave": {
         "name": "Air Pemulih",
-        "description": "Menyembuhkan target sekutu sebesar {damage}."
+        "description": "Menyembuhkan sasaran sekutu sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Mantra. Pemulihan: menyimpan 50% dari penyembuhan penuh sebelum kelebihan sebagai Arus Pemulih selama 12 dtk, sampai 30% nyawa maksimum sasaran."
       },
       "earth_shock": {
         "name": "Sentakan Bumi",
-        "description": "Seketika mengejutkan target dengan kekuatan pengguncang sebesar {damage} kerusakan Alam."
+        "description": "Memberi {damage} kerusakan Alam. Kerusakan meningkat dengan Kekuatan Mantra. Elemental: pada 5 Guntur, memberi 125% kerusakan lebih besar dan menghabiskan seluruh Guntur. Terikat Batu: memaksa sasaran menyerangmu selama 3 dtk."
       },
       "lightning_shield": {
         "name": "Tameng Guntur",
-        "description": "Menyelubungimu dengan petir yang menggelegar: penyerang jarak dekat menerima {buff} kerusakan Alam, hingga 3 muatan dan paling sering sekali setiap 5 detik."
+        "description": "Menyelimutimu dengan petir selama 10 menit. Tiga serangan jarak dekat berikutnya terhadapmu memberi {buff} kerusakan Alam kepada penyerangnya, paling banyak sekali tiap 5 dtk."
       },
       "flame_shock": {
         "name": "Sentakan Bara",
-        "description": "Membakar target dengan api sebesar {damage} kerusakan ditambah {overTime} selama 12 detik."
+        "description": "Memberi {damage} kerusakan Api, lalu {overTime} kerusakan Api selama 12 dtk. Pukulan awalnya meningkat dengan Kekuatan Mantra."
       },
       "flametongue_weapon": {
         "name": "Senjata Pyrebrand",
-        "description": "Mengisi senjatamu dengan api elemental: setiap ayunan memberi {damage} kerusakan Api tambahan selama 5 menit."
+        "description": "Meresapi senjatamu selama 30 menit. Setiap ayunan memberi {damage} kerusakan Api tambahan."
       },
       "frost_shock": {
         "name": "Sentakan Beku",
-        "description": "Seketika mengejutkan target dengan embun beku sebesar {damage} kerusakan Beku dan memperlambat gerakannya sebesar 50% selama 8 detik."
+        "description": "Memberi {damage} kerusakan Es dan memperlambat sasaran 50% selama 8 dtk. Kerusakan meningkat dengan Kekuatan Mantra."
       },
       "frostbrand_weapon": {
         "name": "Senjata Rimebound",
@@ -8437,11 +9973,11 @@ export const id_ID: EnTranslations = {
       },
       "ghost_wolf": {
         "name": "Serigala Bayang",
-        "description": "Mengubahmu menjadi Shadewolf, meningkatkan kecepatan gerak sebesar 40% selama 10 menit."
+        "description": "Menjadi Shadewolf dan bergerak 40% lebih cepat. Rapal lagi untuk kembali ke wujud biasamu."
       },
       "stormstrike": {
         "name": "Serangan Leluhur",
-        "description": "Mengalirkan badai melalui senjatamu, seketika menyerang sebesar kerusakan senjata ditambah {damage}."
+        "description": "Memukul sebesar kerusakan senjata ditambah {damage} dan memajukan Irama Roh Perang sebanyak 2 langkah. Kerusakan meningkat dengan daya serang melalui kerusakan senjata."
       },
       "shadow_bolt": {
         "name": "Panah Suram",
@@ -8459,9 +9995,29 @@ export const id_ID: EnTranslations = {
         "name": "Busuk Hitam",
         "description": "Mencemari target, menimbulkan {damage} kerusakan Bayangan selama 18 detik."
       },
+      "evil_eye": {
+        "name": "Evil Eye",
+        "description": "Menandai satu musuh sebagai fokus kutukanmu. Memindahkan Eye mempertahankan Kecaman tetapi tidak memperbarui masa berlakunya yang 20 detik."
+      },
+      "maledict_gaze": {
+        "name": "Maledict Gaze",
+        "description": "Maledict Eye-mu menyerang Evil Eye utama yang kamu pilih setiap 2,5 detik untuk kerusakan Bayangan. Possess the Evil Eye menggandakan kecepatan serangnya."
+      },
+      "needle_of_fate": {
+        "name": "Needle of Fate",
+        "description": "Menusuk musuh sebesar {damage} kerusakan Bayangan dan menghasilkan 5 Kecaman jika musuh itu menyandang Evil Eye-mu. Setiap pukulan pada Evil Eye utamamu menambah 1 Benang Takdir selama 12 detik, hingga 3. Jika tidak ada Evil Eye, Needle terlebih dahulu menandai targetnya."
+      },
+      "sentence": {
+        "name": "Sentence",
+        "description": "Mengonsumsi semua Kecaman dan Benang Takdir untuk menjatuhkan vonis kepada musuh. Setiap Benang meningkatkan kerusakan sebesar 6%. Efek tambahan meningkat pada 20, 50, 80, dan 100 Kecaman. Skala kerusakannya mendatar setelah level 16."
+      },
       "life_tap": {
         "name": "Tawar Getir",
         "description": "Mengubah {damage} kesehatan menjadi {damage} mana."
+      },
+      "cursed_accomplice": {
+        "name": "Cursed Accomplice",
+        "description": "Menautkan Maledict Eye-mu saat tidak ada sekutu yang dipilih, membuat Gaze miliknya menghasilkan 2 Kecaman. Menautkan satu anggota grup yang dipilih membuat hanya kerusakan mereka terhadap Evil Eye-mu yang menghasilkan 3 sebagai gantinya. Tautan baru menggantikan yang sebelumnya dan dapat terpicu sekali setiap 2 detik."
       },
       "curse_of_agony": {
         "name": "Tenung Derita",
@@ -8469,7 +10025,47 @@ export const id_ID: EnTranslations = {
       },
       "drain_life": {
         "name": "Melahap",
-        "description": "Menyedot nyawa target, memindahkan {damage} kesehatan kepadamu setiap detik selama 5 detik."
+        "description": "Melahap daya hidup sasaran, memberi {damage} kerusakan Bayangan setiap detik dan memindahkan 70% darinya kepadamu sebagai nyawa. Derita justru memindahkan seluruhnya. Ketika disalurkan pada Evil Eye utamamu, ia menghabiskan seluruh Benang Takdir di awal, dan setiap Benang menghasilkan 1 Kecaman tambahan per denyut."
+      },
+      "litany_of_guilt": {
+        "name": "Litany of Guilt",
+        "description": "Mengutuk Evil Eye utamamu selama 6 detik. Perolehan Kecaman melepaskan gelombang yang merusak hingga 2 musuh lain dalam radius 8 m, paling banyak sekali per detik. Peringkat 2 memperpanjangnya menjadi 8 detik dan 4 musuh."
+      },
+      "cinderhide": {
+        "name": "Cinderhide",
+        "description": "Mengeraskan kulitmu menjadi terak yang mendingin selama 10 detik, mengurangi semua kerusakan yang diterima sebesar 25%."
+      },
+      "umbral_anchor": {
+        "name": "Umbral Anchor",
+        "description": "Rapalan pertama: menjangkarkan bayanganmu di kakimu selama 5 menit. Rapal ulang dalam radius 40 m untuk kembali ke sana, mengonsumsi jangkar dan memulai jeda 45 detik."
+      },
+      "soulwell": {
+        "name": "Soulwell",
+        "description": "Memanggil Soulwell selama 3 menit. Selagi di luar pertempuran, anggota grup dapat mengisi ulang Batu Jiwa mereka hingga 3. Sebuah Batu Jiwa memulihkan 25% dari nyawa maksimum dan berbagi jeda ramuan."
+      },
+      "hex_of_violence": {
+        "name": "Hex of Violence",
+        "description": "Mengutuk musuh selama 8 detik. 3 tindakan merusak berikutnya masing-masing menghasilkan 7 Kecaman dan mencambuknya sebesar 16 kerusakan Bayangan."
+      },
+      "cruel_pact": {
+        "name": "Cruel Pact",
+        "description": "Mengorbankan 12% dari nyawa maksimummu untuk memulihkan 1,5% dari mana maksimummu dan menghasilkan 20 Kecaman. Tidak dapat digunakan pada atau di bawah 20% nyawa."
+      },
+      "vicarious_suffering": {
+        "name": "Vicarious Suffering",
+        "description": "Menautkan penderitaanmu selama 8 detik dan menghasilkan hingga 15 Kecaman dari pukulan bermusuhan. Pada dirimu sendiri, mengurangi kerusakan yang diterima sebesar 20%. Pada sekutu, mengalihkan hingga 20% kepadamu tanpa membuat nyawamu turun di bawah 15%."
+      },
+      "possess_evil_eye": {
+        "name": "Possess the Evil Eye",
+        "description": "Maledictor merasuki Evil Eye utamamu selama 15 detik dan menghasilkan 35 Kecaman. Needle of Fate dirapal dalam 1 detik dan menghasilkan 2 Kecaman tambahan, Melahap dapat disalurkan sambil bergerak, dan Sentence memberikan 25% kerusakan lebih besar dan melepaskan gema tertunda sebesar 60% kerusakan, menurun menjadi 30% sepanjang level 17-20."
+      },
+      "hour_of_judgment": {
+        "name": "Hour of Judgment",
+        "description": "Memanggil penghakiman atas Evil Eye utamamu selama 15 detik, memberikan 40 Kecaman dan 3 Benang Takdir, mengaktifkan Possession, menggandakan Kecaman yang dihasilkan melalui Eye utama, dan meningkatkan kerusakan Sentence sebesar 20%. Sentence pertama mengembalikan 50 Kecaman."
+      },
+      "coven": {
+        "name": "Coven",
+        "description": "Menciptakan Evil Eye sekunder pada hingga 4 musuh terdekat selama 15 detik. Mereka mengisi kumpulan Kecaman bersama sebesar 50%, dan Sentence bergema kepada mereka sebesar 35% kerusakan."
       },
       "fear": {
         "name": "Cekaman",
@@ -8481,11 +10077,16 @@ export const id_ID: EnTranslations = {
       },
       "shadowburn": {
         "name": "Api Senja",
-        "description": "Seketika menghantam target dengan bayangan membara sebesar {damage} kerusakan Bayangan."
+        "description": "Menghabiskan 1 Pemusnahan untuk mengeksekusi musuh di bawah 20% nyawa sebesar {damage} kerusakan Bayangan. Mengembalikan Pemusnahannya kalau sasaran yang diklaim mati dalam 5 dtk."
+      },
+      "ruinous_brand": {
+        "name": "Ruinous Brand",
+        "description": "Menandai musuh selama 15 detik. 3 mantra langsung berikutnya bergema sebesar 25% kerusakan terhadap musuh yang ditandai, atau menyalin 50% kerusakan kepadanya saat dirapalkan terhadap target lain."
       },
       "wrath": {
         "name": "Panah Liar",
-        "description": "Melontarkan panah energi alam sebesar {damage} kerusakan Alam."
+        "description": "Melontarkan baut energi alam sebesar {damage} kerusakan Alam.",
+        "specNote_balance": "Dalam Wujud Burung Bulan, setiap rapalan yang selesai menambah 1 Moontide (maks 3). Pada 3 Moontide, Moonseed berubah menjadi Moonsurge dan Skyfall berubah menjadi Sunwake."
       },
       "healing_touch": {
         "name": "Penyembuhan Liar",
@@ -8497,11 +10098,17 @@ export const id_ID: EnTranslations = {
       },
       "moonfire": {
         "name": "Badai Rembulan",
-        "description": "Membakar musuh dengan api bulan sebesar {damage} kerusakan Arkana ditambah kerusakan seiring waktu."
+        "description": "Membakar musuh dengan api rembulan sebesar {damage} kerusakan Arkana ditambah kerusakan seiring waktu.",
+        "specNote_balance": "Jaga agar tetap membara: Moonseed memperpanjangnya selama 6 detik."
+      },
+      "moonseed": {
+        "name": "Benih Rembulan",
+        "description": "Hanya dalam Wujud Burung Bulan. Menyerang sebesar {damage} kerusakan Gaib, menambah satu tahap Pasang Rembulan, dan memperpanjang Badai Rembulan-mu 6 dtk, hingga 6 dtk per penerapan. Saat Pasang Rembulan penuh, Benih Rembulan menjadi Gelombang Rembulan."
       },
       "rejuvenation": {
         "name": "Mekar Liar",
-        "description": "Menyembuhkan target sebesar {damage} selama 12 detik."
+        "description": "Menyembuhkan target sebesar {damage} selama 12 detik.",
+        "specNote_restoration": "Menanam kuntum BARU menambah 1 Verdance (maks 5). Pada 5 Verdance, Swiftmend berubah menjadi Overbloom."
       },
       "thorns": {
         "name": "Perisai Onak",
@@ -8513,35 +10120,44 @@ export const id_ID: EnTranslations = {
       },
       "bear_form": {
         "name": "Wujud Bruin",
-        "description": "Berubah wujud menjadi beruang: zirah +130%, daya serang sangat meningkat, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Rapal lagi untuk kembali ke wujud perapal."
+        "description": "Berubah wujud menjadi beruang: zirah +110%, kesehatan maksimum +30%, daya serang sangat meningkat, seranganmu membangun amarah dan menghasilkan 30% lebih banyak ancaman. Rapal lagi untuk kembali ke wujud perapal."
       },
       "maul": {
         "name": "Remuk Tulang",
-        "description": "Serangan mencabik yang meningkatkan kerusakan jarak dekat sebesar {damage} dan menimbulkan ancaman tinggi. Aktif pada ayunan berikutnya. Hanya dalam Wujud Bruin."
+        "description": "Serangan mencabik yang meningkatkan kerusakan jarak dekat sebesar {damage} dan menimbulkan ancaman besar. Aktif pada ayunanmu berikutnya. Hanya dalam Wujud Bruin.",
+        "specNote_feral": "Setiap pukulan yang mengenai menambah 1 Darah Tua; pada 3 Darah Tua tombol ini berubah menjadi Marrowbreak: serangan sebesar 78 hingga 96 kerusakan dengan ancaman besar; di bawah setengah nyawa, ia justru melindungimu sebesar 18% dari nyawa maksimummu dan mengembalikan 15 amarah."
       },
       "growl": {
         "name": "Gertakan",
         "description": "Menggeram pada target: ancamanmu naik menyamai musuh yang paling dibencinya dan ia terdorong untuk menyerangmu selama 3 detik. Hanya dalam Wujud Bruin."
       },
+      "challenging_roar": {
+        "name": "Auman Garang",
+        "description": "Sebuah auman garang: semua musuh dalam 10 yard terhasut, ancaman mereka terhadapmu naik menyamai musuh yang paling mereka benci, dan mereka terpaksa menyerangmu selama 3 detik. Hanya dalam Wujud Bruin."
+      },
       "cat_form": {
         "name": "Wujud Serigala",
-        "description": "Berubah wujud menjadi serigala: daya serang naik seiring levelmu, seranganmu memakai energi dan poin kombo, dan kau menghasilkan 29% lebih sedikit ancaman. Rapal lagi untuk kembali ke wujud perapal."
+        "description": "Mengubahmu menjadi serigala: agility naik seiring levelmu, daya serang +8 ditambah 2 per level, seranganmu memakai energi dan poin kombo, dan kamu menghasilkan 29% ancaman lebih sedikit. Rapal lagi untuk kembali ke wujud pemantra."
       },
       "claw": {
-        "name": "Cakar",
-        "description": "Mencakar musuh untuk kerusakan senjata plus {damage}. Memberi 1 poin kombo. Hanya dalam Wujud Serigala."
+        "name": "Cakar Perobek",
+        "description": "Cakar musuh sebesar kerusakan senjata ditambah {damage}. Memberi 1 poin combo. Hanya dalam Wujud Serigala.",
+        "specNote_feral": "Setiap pukulan yang mengenai menambah 1 Darah Tua (maks 3)."
       },
       "ferocious_bite": {
         "name": "Gigitan Berdarah",
-        "description": "Gerakan penutup yang menyebabkan {damage}. Hanya dalam Wujud Serigala."
+        "description": "Jurus penutup yang menyebabkan {damage}. Hanya dalam Wujud Serigala.",
+        "specNote_feral": "Setiap pukulan yang mengenai menambah 1 Darah Tua; pada 3 Darah Tua tombol ini berubah menjadi Redharvest: gigitan sebesar 70 plus 43 per poin combo yang juga seketika menimbulkan seluruh kerusakan yang masih akan diberikan Flense dan Bloodrift-mu, dan memulihkan 30 energi."
       },
       "swipe": {
         "name": "Cakar Menyapu",
-        "description": "Menyabet musuh di sekitar sebesar {damage} kerusakan. Menyebabkan ancaman ekstra. Hanya dalam Wujud Bruin."
+        "description": "Sapukan cakarmu melalui musuh terdekat sebesar {damage} kerusakan. Menimbulkan ancaman ekstra. Hanya dalam Wujud Bruin.",
+        "specNote_feral": "Setiap pukulan yang mengenai menambah 1 Darah Tua (maks 3)."
       },
       "regrowth": {
         "name": "Mekar Kedua",
-        "description": "Menyembuhkan target sekutu sebesar {damage} dan jumlah tambahan selama 21 detik."
+        "description": "Menyembuhkan target kawan sebesar {damage} dan jumlah tambahan selama 21 detik.",
+        "specNote_restoration": "Menanam kuntum BARU menambah 1 Verdance (maks 5)."
       },
       "barkskin": {
         "name": "Kulit Ek",
@@ -8557,7 +10173,8 @@ export const id_ID: EnTranslations = {
       },
       "starfire": {
         "name": "Langit Runtuh",
-        "description": "Memanggil turun panah api bintang, menyebabkan {damage} kerusakan Arkana."
+        "description": "Memanggil turun baut api bintang, menyebabkan {damage} kerusakan Arkana.",
+        "specNote_balance": "Dalam Wujud Burung Bulan, setiap rapalan yang selesai menambah 1 Moontide (maks 3). Pada 3 Moontide, tombol ini berubah menjadi Sunwake: serangan seketika sebesar 80 hingga 100 kerusakan Alam plus bakaran 45 selama 9 detik, memulihkan 35 mana dan menghabiskan seluruh 3."
       },
       "travel_form": {
         "name": "Wujud Fleet",
@@ -8573,7 +10190,7 @@ export const id_ID: EnTranslations = {
       },
       "faerie_fire": {
         "name": "Cahaya Sihir",
-        "description": "Mengurangi zirah target sebesar {damage}% selama 40 detik. Tidak menumpuk dengan Robek Zirah."
+        "description": "Mengurangi zirah target sebesar {damage}% selama 40 detik."
       },
       "hibernate": {
         "name": "Lelap",
@@ -8596,8 +10213,9 @@ export const id_ID: EnTranslations = {
         "description": "Meningkatkan daya serang sebesar {buff} selama {duration} detik. Hanya Wujud Serigala."
       },
       "rip": {
-        "name": "Robekan",
-        "description": "Gerakan penutup yang menyebabkan {damage} kerusakan Pendarahan selama 12 detik. Menghabiskan poin kombo. Hanya Wujud Serigala."
+        "name": "Celah Darah",
+        "description": "Jurus penutup yang membuat target berdarah setiap 2 detik selama 24 detik: 36 kerusakan plus 24 per poin combo yang dipakai (5 poin combo: {damage} total). Hanya dalam Wujud Serigala.",
+        "specNote_feral": "Pukulan yang mengenai menambah 1 Darah Tua (maks 3)."
       },
       "mortal_strike": {
         "name": "Serangan Pelukai",
@@ -8624,32 +10242,120 @@ export const id_ID: EnTranslations = {
         "description": "Menyerang target dengan kerusakan senjata ditambah {damage} kerusakan Suci. (talenta Paladin)"
       },
       "chain_heal": {
-        "name": "Penyembuhan Berantai",
-        "description": "Menyembuhkan target sekutu dalam jumlah besar, lalu melompat ke hingga 2 sekutu terdekat lainnya dengan penyembuhan 50% lebih sedikit pada setiap lompatan. (Kemampuan khas Pemulihan)"
+        "name": "Sembuh Beruntun",
+        "description": "Menyembuhkan sasaran kawan sebesar {damage}, lalu melompat ke hingga 2 sekutu dalam radius 12 meter. Setiap lompatan menyembuhkan sebesar 50% dari sasaran sebelumnya. Setiap sekutu yang terjangkau menghabiskan sisa Arus Pemulihmu dan langsung menyembuhkan sebesar 125% dari jumlah yang dihabiskan. Penyembuhan awal meningkat dengan kekuatan mantra. (ciri khas Pemulihan)"
+      },
+      "galeheart_weapon": {
+        "name": "Senjata Hati Badai",
+        "description": "Menyihir kedua senjata selama 30 mnt, mengaktifkan Irama Roh Perang."
+      },
+      "warspirit_cadence": {
+        "name": "Irama Roh Perang",
+        "description": "Pasif: setiap serangan senjata ke-3 yang mengenai memicu 2 Gema Hati Badai sebesar 50% kerusakan Alam dan memberi Pertanda Badai selama 12 dtk. Pertanda Badai membuat Sambaran Busur, Sentakan, atau Air Pemulih berikutnya seketika dan memangkas biaya mananya 50%. Serangan Leluhur dihitung sebagai 2 serangan. (Roh Perang)"
+      },
+      "stormsurge": {
+        "name": "Gelombang Badai",
+        "description": "Pasif: selama Serangan Leluhur dalam jeda, menghabiskan Pertanda Badai berpeluang 25% mengatur ulangnya. Bila 3 peluang pertama gagal, yang ke-4 selalu mengatur ulangnya. (Roh Perang)"
+      },
+      "lifespring_weapon": {
+        "name": "Senjata Mata Air Kehidupan",
+        "description": "Menyihir senjatamu selama 30 mnt. Air Pemulih dan Panggilan Pasang menambah 20% lebih banyak penyembuhan ke Arus Pemulih."
+      },
+      "unleash_weapon": {
+        "name": "Lepaskan Senjata",
+        "description": "Melepaskan sihir aktif senjatamu. Tanda Bara memberi 54 sampai 64 kerusakan Api, memperoleh 30% kekuatan mantra, dan memberi 2 Guruh. Hati Badai menyerang dengan senjatamu, memajukan Irama Roh Perang, dan memberi 20% kecepatan serang selama 6 dtk. Ikatan Batu menyerang sebesar 75% kerusakan senjata, memaksa sasaran menyerangmu, dan mengurangi kerusakan yang diterima 20% selama 4 dtk. Mata Air Kehidupan menghabiskan Arus Pemulihmu, menyembuhkan sebesar 125% sisa penyembuhannya, dan mengurangi benturan berikutnya dalam 8 dtk sebesar 50% nyawa yang dipulihkan."
+      },
+      "elemental_trance": {
+        "name": "Elemental Trance",
+        "description": "Memasuki trans elemental selama 15 detik, mengurangi kerusakan yang diterima sebesar 30% dan mengubah 20% dari semua kerusakan yang kamu berikan menjadi mana. (mesin Warspirit)"
+      },
+      "primal_exaltation": {
+        "name": "Pemuliaan Purba",
+        "description": "Selama 12 dtk, Sambaran Busur dan Petir Bercabang milik Panggilan Guruh dirapal 50% lebih cepat, dan Sambaran Busur memberi 2 Guruh; Roh Perang memicu iramanya tiap 2 benturan senjata; Tambal Roh menambah 50% lebih banyak penyembuhan ke Arus Pemulih. (Bakat syaman)"
+      },
+      "stoneward": {
+        "name": "Penjaga Batu",
+        "description": "Melindungi satu sekutu selama 60 dtk dengan 6 muatan. Kerusakan menghabiskan satu muatan untuk menyembuhkan 5% nyawa maksimum, sekali tiap 3 dtk. (Bakat syaman)"
+      },
+      "tidecall": {
+        "name": "Panggilan Pasang",
+        "description": "Menyembuhkan sasaran kawan sebesar {damage}. Penyembuhan meningkat dengan kekuatan mantra. Menambahkan penyembuhan penuh sebelum kelebihan ke Arus Pemulih, hingga 30% dari nyawa maksimum sasaran."
+      },
+      "soul_harvest": {
+        "name": "Essence Reap",
+        "description": "Mencabik jiwa musuh sebesar {damage} kerusakan Bayangan dan menciptakan 1 Serpihan Jiwa, hingga 5."
+      },
+      "soul_lance": {
+        "name": "Soul Lance",
+        "description": "Melontarkan tombak spektral sebesar {damage} kerusakan Bayangan. Terhadap Ossuary Mark-mu, 50% kerusakannya ditambahkan ke tanda tersebut."
+      },
+      "raise_graveguard": {
+        "name": "Raise Graveguard",
+        "description": "Membangkitkan pendamping bertahan permanen. Graveguard secara otomatis memancing perhatian, mencegat 20% dari kerusakanmu melalui Dominasi Kubur, dan Reaping Command membuatnya memancing perhatian dan menerima 30% kerusakan lebih sedikit selama 4 detik."
+      },
+      "raise_skeletal_warrior": {
+        "name": "Raise Skeletal Warrior",
+        "description": "Menghabiskan 1 Serpihan Jiwa untuk menambahkan Skeletal Warrior persisten ke Dominasi 2-slot milikmu. Hanya satu yang boleh mengabdi kepadamu. Ia membelah musuh terdekat sebesar 45% kerusakan setiap 6 detik, dan Reaping Command menahan targetnya dengan perlambatan 40% selama 4 detik."
+      },
+      "raise_bone_mage": {
+        "name": "Raise Bone Mage",
+        "description": "Menghabiskan 2 Serpihan Jiwa untuk menambahkan Bone Mage jarak jauh yang persisten ke Dominasi 2-slot milikmu. Hanya satu yang boleh mengabdi kepadamu. Serangannya membuat target terbuka terhadap 5% kerusakan sihir lebih besar selama 6 detik, dan Reaping Command menaikkan kelemahan itu menjadi 8%."
+      },
+      "bone_armor": {
+        "name": "Bone Armor",
+        "description": "Menyelimutimu dengan tulang, menyerap kerusakan setara 20% dari nyawa maksimummu."
+      },
+      "corpse_explosion": {
+        "name": "Corpse Explosion",
+        "description": "Mengorbankan Bone Mage terlebih dahulu, lalu Skeletal Warrior, dan Gravewing hanya sebagai upaya terakhir. Di antara duplikat, ia memilih yang durasi tersisanya paling sedikit, lalu yang terlemah, untuk memberikan {damage} kerusakan Bayangan di lokasi yang dipilih."
+      },
+      "funeral_harvest": {
+        "name": "Funeral Harvest",
+        "description": "Saat musuh yang baru saja kamu atau mayat hidupmu lukai mati, kamu memperoleh 1 Serpihan Jiwa. Ini dapat terjadi sekali setiap 3 detik."
+      },
+      "ossuary_mark": {
+        "name": "Ossuary Mark",
+        "description": "Menandai musuh selama 12 detik, menyimpan 20% dari kerusakan yang diberikan olehmu dan mayat hidupmu. Rapal ulang untuk meledakkannya. Jika musuh yang ditandai mati, ia meledak dalam radius 6 m dan menciptakan 1 Serpihan Jiwa."
+      },
+      "unholy_command": {
+        "name": "Unholy Command",
+        "description": "Menghabiskan 3 Serpihan Jiwa untuk memerintahkan semua mayat hidupmu memberikan 25% kerusakan lebih besar dan bertindak 20% lebih cepat selama 12 detik."
+      },
+      "reaping_command": {
+        "name": "Reaping Command",
+        "description": "Menghabiskan 2 Serpihan Jiwa untuk memerintahkan setiap abdi mayat hidup menyerang secara serentak. Graveguard memancing perhatian dan bersiaga, Warrior menahan, Bone Mage membuka pertahanan sihir, dan Gravewing merobek semua musuh yang terkena."
+      },
+      "sacrifice_undead": {
+        "name": "Sacrifice Undead",
+        "description": "Menghancurkan satu abdi Dominasi untuk memulihkan 25% dari nyawa maksimummu."
+      },
+      "raise_gravewing": {
+        "name": "Raise Gravewing",
+        "description": "Menghabiskan 2 Serpihan Jiwa untuk menambahkan Gravewing persisten ke Dominasi 2-slot milikmu. Hanya satu yang boleh mengabdi kepadamu. Ia membelah musuh terdekat sebesar 65% kerusakan setiap 5 detik, dan Reaping Command membuat setiap musuh yang terkena menerima 8% kerusakan lebih besar selama 5 detik."
+      },
+      "army_of_the_dead": {
+        "name": "Army of the Dead",
+        "description": "Membuka portal makam untuk membangkitkan Skeletal Warrior, Bone Mage, dan Gravewing sementara selama 20 detik, mengisi barisan yang dikosongkan oleh abdi Dominasi tetapmu."
       },
       "metamorphosis": {
-        "name": "Metamorfosis",
-        "description": "Mengambil kekuatan iblis, meningkatkan zirah dan daya serang selama 20 dtk. (talenta Warlock)"
+        "name": "Wujud Lich",
+        "description": "Menjadi seorang lich selama 20 dtk, menciptakan 3 Serpihan Jiwa serta meningkatkan kerusakan mantra dan kecepatan perapalanmu sebesar 20%. Makhluk mayat hidupmu memberi 50% kerusakan lebih besar dan bertindak 20% lebih cepat, dan Soul Lance menembus sasarannya untuk memukul hingga 2 musuh terdekat sebesar 50% dari kerusakannya. (Ciri khas Nekromansi)"
       },
       "holy_shock": {
         "name": "Kejutan Suci",
         "description": "Mengejutkan target kawan dengan energi Suci dan memulihkannya sebesar {damage}. (ciri khas Suci)"
       },
-      "aura_surge": {
-        "name": "Pantulan Fajar",
-        "description": "Melempar perisai tempa fajar yang menghasilkan {damage} kerusakan Suci, membungkam target utama selama 2 detik, lalu memantul ke hingga 2 musuh lain dalam jarak 10 yard dengan 75% kerusakan tiap pantulan. (talenta Paladin)"
-      },
       "holy_shield": {
         "name": "Perisai Suci",
-        "description": "Melindungimu dengan kekuatan Suci selama 10 dtk, meningkatkan zirah sebesar 90, dan menghantam penyerang jarak dekat dengan 12 kerusakan Suci. (ciri khas Perlindungan)"
+        "description": "Meningkatkan blok sebesar 30% dan memberi perisai sebesar {damage}% kesehatan maksimummu selama {duration} detik. Ascension memperkuat pertahanan."
       },
       "bestial_wrath": {
         "name": "Murka Buas",
-        "description": "Membawamu ke amarah buas, meningkatkan kekuatan serangan sebesar 55 selama 15 dtk. (ciri khas Penguasa Binatang)"
+        "description": "Memberi 3 Keganasan Kawanan. Lepaskan Sang Buas berikutnya dalam 20 dtk memberi 50% kerusakan pukul dan tepuk lebih besar, dan amukannya bertahan 12 dtk alih-alih 8. (Ciri khas Penguasaan Hewan Buas)"
       },
       "trueshot_aura": {
         "name": "Aura Tembakan Jitu",
-        "description": "Mengilhami sekutu di dekatmu, meningkatkan kekuatan serangan sebesar 35 selama 5 mnt. (ciri khas Penembakan)"
+        "description": "Meningkatkan daya serang sekutu dalam 30 m sebesar 10% selama 30 menit. (Ciri khas Ketepatan Bidik)"
       },
       "wyvern_sting": {
         "name": "Sengatan Wivern",
@@ -8669,31 +10375,31 @@ export const id_ID: EnTranslations = {
       },
       "cold_blood": {
         "name": "Darah Dingin",
-        "description": "Memusatkan niat membunuhmu sehingga serangan berikutnya menjadi serangan kritis. (ciri khas Pembunuhan)"
+        "description": "Memusatkan niat membunuhmu sehingga seranganmu berikutnya menjadi pukulan kritis. (mesin Knifework)"
       },
       "blade_flurry": {
         "name": "Tebasan Bertubi",
-        "description": "Melepaskan hujan bilah, meningkatkan kecepatan serangan sebesar 20% selama 12 dtk. (ciri khas Pertarungan)"
+        "description": "Melepaskan rentetan bilah, meningkatkan kecepatan serang sebesar 20% selama 12 detik. (mesin Thuggery)"
       },
       "hemorrhage": {
         "name": "Pendarahan",
-        "description": "Menyerang musuh dengan kerusakan senjata ditambah {damage} dan menyebabkan kerusakan berdarah selama 12 dtk. Memberi 1 poin kombo. (ciri khas Kelicikan)"
+        "description": "Menghantam musuh sebesar kerusakan senjata ditambah {damage}, menyebabkan kerusakan pendarahan selama 12 detik, dan meningkatkan kerusakan pendarahan yang diterima sebesar 40%. Memberi 1 poin combo. Setiap penggunaan ke-2 menambah 1 Gloam (maks 3). (mesin Skulduggery)"
       },
       "power_infusion": {
         "name": "Infusi Kekuatan",
-        "description": "Mengisi target kawan dengan kekuatan, meningkatkan kekuatan mantra sebesar 28 selama 15 dtk. (ciri khas Disiplin)"
+        "description": "Mengurapi sasaran sekutu, meningkatkan kerusakan, penyembuhan, dan kecepatan perapalan sebesar 20% selama 15 dtk."
       },
       "holy_nova": {
-        "name": "Nova Suci",
-        "description": "Menimbulkan ledakan cahaya Suci, memulihkan sekutu di dekatmu sebesar {damage} dan melukai musuh di dekatmu. (ciri khas Suci)"
+        "name": "Kidung Surya",
+        "description": "Menyembuhkan sekutu dalam 10 m sebesar {damage} dan memberi 24 sampai 30 kerusakan Suci kepada musuh di area yang sama. Kedua jumlah meningkat dengan Kekuatan Mantra. (Dasar Suci)"
       },
       "shadowform": {
-        "name": "Wujud Bayangan",
-        "description": "Mengambil wujud bayangan, memperkuat sihir bayangan sampai kamu berubah kembali. Gunakan lagi untuk kembali ke wujud normal. (ciri khas Bayangan)"
+        "name": "Selubung Senja",
+        "description": "Memasuki Selubung Senja dan meningkatkan kerusakan Bayanganmu sebesar 25%. Rapal lagi untuk meninggalkan Selubung Senja. (Ciri khas Bayangan)"
       },
       "elemental_mastery": {
         "name": "Penguasaan Elemen",
-        "description": "Memanggil penguasaan elemen, membuat mantra berikutnya seketika. (ciri khas Elemen)"
+        "description": "Selama 12 dtk, Sambaran Busur memberi 2 Guntur. Sambaran Busur atau Petir Bercabang berikutnya menjadi seketika, dan pembayaran Guntur penuh berikutnya memberi 25% kerusakan lebih besar. (Ciri khas Elemental)"
       },
       "siphon_life": {
         "name": "Sifon Nyawa",
@@ -8701,7 +10407,7 @@ export const id_ID: EnTranslations = {
       },
       "conflagrate": {
         "name": "Kobaran Api",
-        "description": "Menghabiskan Pembakaran milikmu pada musuh untuk menyulutnya dengan {damage} kerusakan Api. (ciri khas Penghancuran)"
+        "description": "Memajukan satu denyut mendatang dari Pakta Membaramu, lalu membakar sasaran sebesar {damage} kerusakan Api. Menghasilkan 1 Pemusnahan dan 1 Kehancuran. Menampung 2 muatan. (Ciri khas Penghancuran)"
       },
       "moonkin_form": {
         "name": "Wujud Burung Bulan",
@@ -8713,15 +10419,35 @@ export const id_ID: EnTranslations = {
       },
       "swiftmend": {
         "name": "Pemulihan Cepat",
-        "description": "Menghabiskan efek pemulihan berkala pada target kawan untuk memulihkannya sebesar {damage}. (ciri khas Pemulihan)"
+        "description": "Mengonsumsi efek penyembuhan seiring waktu pada target kawan untuk menyembuhkannya sebesar {damage}. Penanaman Wildbloom dan Second Bloom menambah Verdance; pada 5 Verdance tombol ini berubah menjadi Overbloom, yang seketika menyembuhkan setiap sekutu yang menyandang efek penyembuhan seiring waktumu sebesar 60% dari sisa efek tersebut. (mesin Groveheart)"
+      },
+      "moonlash": {
+        "name": "Gelombang Rembulan",
+        "description": "Menghabiskan 3 Pasang Rembulan milikmu untuk serangan berat sebesar {damage} kerusakan Gaib: pilihan kerusakan. Jejak Surya menghabiskan 3 Pasang Rembulan yang sama, jadi pilih salah satu."
+      },
+      "sunlance": {
+        "name": "Jejak Surya",
+        "description": "Menghabiskan 3 Pasang Rembulan milikmu untuk serangan sebesar {damage} kerusakan Alam ditambah bakaran {overTime} selama 9 dtk, dan memulihkan 35 mana: pilihan mana. Gelombang Rembulan menghabiskan 3 Pasang Rembulan yang sama, jadi pilih salah satu."
+      },
+      "redharvest": {
+        "name": "Panen Merah",
+        "description": "Menghabiskan 3 Darah Tua milikmu: menyerang sebesar {damage}, langsung memberikan semua kerusakan yang masih akan diberikan Kupasan dan Robekan milikmu, menghapus kedua pendarahan, dan memulihkan 30 energi. Berfungsi tanpa poin combo."
+      },
+      "marrowbreak": {
+        "name": "Pematah Sumsum",
+        "description": "Menghabiskan 3 Darah Tua milikmu untuk serangan berat berancaman tinggi sebesar {damage} kerusakan. Di bawah setengah nyawa, sebagai gantinya melindungimu dengan perisai sebesar 18% nyawa maksimum selama 8 dtk dan mengembalikan 15 amarah."
+      },
+      "overbloom": {
+        "name": "Mekar Raya",
+        "description": "Menghabiskan 5 Kehijauan. Memanen setiap penyembuhan berkala milikmu pada semua sekutu sebesar 60% dari penyembuhan tersisa, menghapus efek itu, dan menanam Mekar Liar segar pada sasaran."
       },
       "summon_imp": {
         "name": "Panggil Emberkin",
-        "description": "Memanggil Emberkin di bawah perintah Penyihir Iblis. Emberkin melontarkan Ashbolt ke arah musuhmu dari kejauhan. Memanggil iblis baru akan membubarkan iblismu saat ini. Kau hanya boleh memiliki satu iblis pada satu waktu."
+        "description": "Memanggil Emberkin di bawah perintah sang penyihir. Emberkin merapal Baut Fel ke musuhmu dari kejauhan. Memanggil iblis baru melepaskan iblismu yang sekarang. Kamu hanya boleh punya satu iblis pada satu waktu."
       },
       "summon_voidwalker": {
         "name": "Panggil Gloomshade",
-        "description": "Memanggil Gloomshade di bawah perintah Penyihir Iblis. Gloomshade adalah iblis kokoh yang memprovokasi musuhmu dan menyerap hantaman. Memanggil iblis baru akan membubarkan iblismu saat ini. Kau hanya boleh memiliki satu iblis pada satu waktu."
+        "description": "Memanggil Gloomshade di bawah perintah sang penyihir. Iblis tangguh ini mengejek musuh dan memakai Rantai Jurang untuk menyeret musuh biasa yang jauh kembali ke jangkauan. Bos tidak bisa ditarik. Memanggil iblis baru melepaskan iblismu yang sekarang. Kamu hanya boleh punya satu iblis pada satu waktu."
       },
       "summon_succubus": {
         "name": "Panggil Duskborn",
@@ -8737,7 +10463,7 @@ export const id_ID: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Panggil Raksasa Pyre",
-        "description": "Mengikat Raksasa Pyre pada kehendakmu, monster kekar dengan serangan jarak dekat yang meremukkan serta nyawa dan zirah terdalam di antara semua iblis. Waktu jeda yang panjang membatasi kekuatan mentahnya. Memanggil iblis baru akan membubarkan iblismu saat ini. Kau hanya boleh memiliki satu iblis pada satu waktu."
+        "description": "Menjatuhkan Raksasa Pyre di area sasaran dan memberikan 58-72 kerusakan Api saat mendarat. Ia bertarung selama 30 dtk tanpa menggantikan iblismu, membakar musuh di sekitar setiap 2 dtk, dan menghasilkan 1 Wrack setiap detik."
       },
       "summon_doomguard": {
         "name": "Panggil Wraithborn",
@@ -8831,6 +10557,10 @@ export const id_ID: EnTranslations = {
         "name": "Mati oleh Pedang",
         "description": "Kemampuan bertahan: selama 8 detik kamu menerima 30% lebih sedikit kerusakan dan mengelak jauh lebih banyak serangan."
       },
+      "intervene": {
+        "name": "Intervensi",
+        "description": "Bergegas ke sisi pemain kawan, menyerap {damage} kerusakan untuknya selama 6 detik."
+      },
       "recklessness": {
         "name": "Kenekatan",
         "description": "Mengamuk: penghasilan amarahmu meningkat sebesar 50% dan peluang serangan kritismu sebesar 20% selama 12 detik."
@@ -8845,7 +10575,7 @@ export const id_ID: EnTranslations = {
       },
       "intimidating_shout": {
         "name": "Teriakan Menggentarkan",
-        "description": "Teriakan menggentarkan yang membuat hingga 5 musuh dalam 8 yard lari ketakutan selama 8 detik. Kerusakan dapat mematahkan efeknya."
+        "description": "Teriakan menakutkan yang membuat hingga 5 musuh dalam 8 m lari ketakutan selama 4 dtk. Kerusakan bisa mematahkan efeknya."
       },
       "revenge": {
         "name": "Balas Dendam",
@@ -8868,8 +10598,8 @@ export const id_ID: EnTranslations = {
         "description": "Berubah menjadi kolosus selama 20 detik, melepaskan semua efek kontrol pada dirimu dan meningkatkan kerusakan yang kamu hasilkan sebesar 20%."
       },
       "avenging_wrath": {
-        "name": "Sayap Pembalas",
-        "description": "Memanggil kekuatan pembalasan, meningkatkan daya serangmu sebesar 60 dan kekuatan sihir sebesar 30 selama 20 detik. (talenta Paladin)"
+        "name": "Murka Pembalas",
+        "description": "Membentangkan sayap wadag dari kekuatan suci keemasan, memperoleh 10 Pengabdian dan menggandakan Pengabdian yang dihasilkan kemampuanmu selama 15 dtk. Juga meningkatkan kerusakan dan penyembuhan yang kamu berikan sebesar 20%. Penuai fajar: memungkinkan Palu Murka terhadap sasaran mana pun."
       },
       "berserk": {
         "name": "Kabut Merah",
@@ -8885,19 +10615,23 @@ export const id_ID: EnTranslations = {
       },
       "bloodlust": {
         "name": "Genderang Perang",
-        "description": "Membuat sekutu dalam jarak 30 m mengamuk, meningkatkan kecepatan serangan mereka sebesar 30% selama 15 detik. (talenta Shaman)"
+        "description": "Meningkatkan kecepatan serang, rapal, dan salur sekutu kelompok atau raid dalam 30 m sebesar 30% selama 15 dtk. Sekutu yang terkena tidak bisa memperoleh manfaat Genderang Perang atau Percepatan Waktu lagi selama 10 menit. (Talenta shaman)"
       },
       "chain_lightning": {
         "name": "Petir Bercabang",
-        "description": "Melontarkan petir ke area target, menghasilkan {damage} kerusakan kepada musuh di dekatnya. (talenta Shaman)"
+        "description": "Memukul hingga 3 musuh dalam 10 m sebesar {damage} kerusakan Alam masing-masing. Elemental: pukulan telak memberi 1 Guntur. Kerusakan meningkat dengan Kekuatan Mantra."
+      },
+      "abyssal_rift": {
+        "name": "Abyssal Rift",
+        "description": "Membuka celah di lokasi yang dipilih, menarik musuh dalam radius 8 m ke pusatnya, memberikan {damage} kerusakan Bayangan, dan membuat mereka terpana selama 2 detik. Bos menerima kerusakan tetapi menahan tarikan dan efek terpana."
       },
       "chaos_bolt": {
         "name": "Baut Reruntuhan",
-        "description": "Melontarkan panah api kacau yang menghasilkan {damage} kerusakan Api. (talenta Warlock)"
+        "description": "Menghabiskan 3 Pemusnahan untuk melontarkan sambaran berat api kacau yang memberi {damage} kerusakan Api. Kehancuran memperpendek perapalannya sebesar 30%."
       },
-      "cleansing_verdict": {
-        "name": "Vonis Pemurnian",
-        "description": "Menghapus efek sihir berbahaya dari target sekutu dan menyembuhkannya sebesar {damage} dengan sihir Suci."
+      "dark_pact": {
+        "name": "Sanguine Covenant",
+        "description": "Mengorbankan 10% dari nyawamu saat ini untuk menyerap kerusakan setara 30% dari nyawa maksimummu selama 8 detik."
       },
       "cloak_of_shadows": {
         "name": "Jubah Bayang",
@@ -8925,23 +10659,23 @@ export const id_ID: EnTranslations = {
       },
       "desperate_prayer": {
         "name": "Doa Terakhir",
-        "description": "Langsung memulihkan {damage} nyawamu. (talenta Priest)"
+        "description": "Langsung menyembuhkanmu sebesar 30% dari nyawa maksimum."
       },
       "deterrence": {
         "name": "Penjaga Duri",
         "description": "Meningkatkan peluang menghindarmu sebesar 50 poin persentase selama 10 detik. (talenta Hunter)"
       },
-      "divine_shield": {
-        "name": "Pelindung Cahaya",
-        "description": "Melindungimu dengan kekuatan suci dan menyerap 900 kerusakan selama 8 detik. (talenta Paladin)"
-      },
       "earthbind": {
         "name": "Bumi Mencengkeram",
-        "description": "Mengikat musuh di dekatnya ke tanah dan mengakarkan mereka selama 2 detik. (talenta Shaman)"
+        "description": "Mengakarkan musuh dalam 4 m dari titik sasaran selama 2 dtk, lalu memperlambat mereka 40% selama 6 dtk. (Talenta shaman)"
       },
       "evocation": {
         "name": "Sumur Eter",
         "description": "Restaura mana rápidamente. (talenta mage)"
+      },
+      "flurry_of_knives": {
+        "name": "Rentetan Pisau",
+        "description": "Menyabet semua musuh dalam radius 6 m dengan pisau lempar, menimbulkan {damage} kerusakan fisik dan memberi 2 poin combo. (talenta Rogue)"
       },
       "frenzied_regeneration": {
         "name": "Pemulihan Liar",
@@ -8953,19 +10687,15 @@ export const id_ID: EnTranslations = {
       },
       "ghostly_strike": {
         "name": "Serangan Arwah",
-        "description": "Menghantam musuh dengan kerusakan senjata ditambah {damage}, meningkatkan penghindaran sejenak, dan memberikan 1 poin kombo. (talenta Rogue)"
+        "description": "Menghantam musuh sebesar kerusakan senjata ditambah {damage} dan meningkatkan peluang mengelakmu sebesar 15% selama 7 detik. Memberi 1 poin combo. (talenta Rogue)"
       },
       "hammer_of_wrath": {
-        "name": "Palu Berdentang",
-        "description": "Melempar palu suci kepada musuh yang terluka dan menghasilkan {damage} kerusakan Suci. Hanya dapat digunakan di bawah 20% nyawa. (talenta Paladin)"
+        "name": "Palu Murka",
+        "description": "Melontarkan palu suci sebesar {damage} kerusakan dan menghasilkan 1 Pengabdian. Bisa dipakai di bawah 20% nyawa, atau selama Kenaikan Ilahi maupun Murka Pembalas. Murka Fajar memberi satu rapalan tambahan terhadap sasaran mana pun yang mengabaikan waktu jedanya yang sedang berjalan dan memberi 20% kerusakan lebih besar. Kenaikan meningkatkan kerusakannya sebesar 30%."
       },
       "healing_stream": {
         "name": "Mata Air",
         "description": "Memulihkan 120 nyawa target sekutu selama 12 detik. (talenta Shaman)"
-      },
-      "holy_wrath": {
-        "name": "Murka Santo",
-        "description": "Melepaskan kekuatan suci dan menghasilkan {damage} kerusakan kepada musuh di dekatnya. (talenta Paladin)"
       },
       "howl_of_terror": {
         "name": "Lolongan Ngeri",
@@ -8977,7 +10707,7 @@ export const id_ID: EnTranslations = {
       },
       "inner_focus": {
         "name": "Pikiran Hening",
-        "description": "Membuat mantra berikutnya tidak memerlukan biaya. Berlangsung 60 detik. (talenta Priest)"
+        "description": "Membuat mantra pendeta berikutnya gratis dan tak bisa diinterupsi. Bertahan 60 dtk."
       },
       "innervate": {
         "name": "Getah Hidup",
@@ -9023,6 +10753,10 @@ export const id_ID: EnTranslations = {
         "name": "Pembalikan Kolektif",
         "description": "Memundurkan alur waktu setiap anggota grup atau raid yang gugur, menghidupkan mereka kembali di dekat jasad dengan 30% kesehatan dan mana. Tidak dapat digunakan saat bertarung. (Kronomansi)"
       },
+      "ancestor_return": {
+        "name": "Kembalinya Leluhur",
+        "description": "Memanggil kembali setiap anggota kelompok atau serbuanmu yang gugur ke kehidupan di sisi jasadnya dengan 30% nyawa dan mana. Tidak dapat dirapal dalam pertempuran. (Tambal Roh)"
+      },
       "temporal_rewind": {
         "name": "Putar Balik Waktu",
         "description": "Mengirim gelombang arkan melalui grupmu atau raid, memundurkan waktu untuk memulihkan 30% kerusakan yang diterima setiap sekutu dalam 40 yard selama 5 detik terakhir (hingga 35% dari kesehatan maksimum mereka). Tidak dapat menjadi efek kritis. (Kronomansi)"
@@ -9045,7 +10779,7 @@ export const id_ID: EnTranslations = {
       },
       "mind_sear": {
         "name": "Bakar Pikir",
-        "description": "Menyalurkan energi Bayangan ke area target dan menghasilkan {damage} kerusakan setiap detik kepada musuh di dekatnya. (talenta Priest)"
+        "description": "Menyalurkan selama 3 dtk, memberi {damage} kerusakan Bayangan setiap detik kepada musuh dalam 8 m dari area sasaran. Kerusakan meningkat dengan Kekuatan Mantra. (Talenta pendeta)"
       },
       "multi_shot": {
         "name": "Tembakan Pecah",
@@ -9053,7 +10787,7 @@ export const id_ID: EnTranslations = {
       },
       "prayer_of_healing": {
         "name": "Penyembuhan Koor",
-        "description": "Memulihkan {damage} nyawa sekutu di dekatnya. (talenta Priest)"
+        "description": "Menyembuhkan sekutu dalam 30 m sebesar {damage}. Penyembuhan meningkat dengan Kekuatan Mantra. (Suci)"
       },
       "preparation": {
         "name": "Rencana Cadangan",
@@ -9065,11 +10799,11 @@ export const id_ID: EnTranslations = {
       },
       "psychic_scream": {
         "name": "Jerit Psikis",
-        "description": "Membuat musuh di dekatnya ketakutan hingga 4 detik. Kerusakan dapat membatalkan efek ini. (talenta Priest)"
+        "description": "Menakuti musuh dalam 8 m sampai 4 dtk. Kerusakan bisa mematahkan efeknya."
       },
       "counter_shot": {
         "name": "Tembakan Penangkal",
-        "description": "Sebuah tembakan yang mengganggu perapalan mantra target dan mengunci sekolah itu selama 4 detik."
+        "description": "Menginterupsi sasaran dan mencegahnya merapal mantra dari aliran itu selama 4 dtk."
       },
       "rebuke": {
         "name": "Teguran",
@@ -9087,6 +10821,10 @@ export const id_ID: EnTranslations = {
         "name": "Tabir Asap",
         "description": "Kamu menghilang ke dalam kepulan asap, meningkatkan peluang menghindar sebesar 30% selama 8 dtk."
       },
+      "sacrilegious_march": {
+        "name": "Sacrilegious March",
+        "description": "Meningkatkan kecepatan gerak sebesar 35%, tetapi mengorbankan 2% dari nyawa maksimummu setiap detik. Rapal lagi untuk membatalkan. Efek ini nonaktif secara otomatis pada 20% nyawa."
+      },
       "spellsteal": {
         "name": "Pencurian Mantra",
         "description": "Mencuri efek sihir menguntungkan dari musuh dan memindahkannya kepadamu."
@@ -9100,12 +10838,37 @@ export const id_ID: EnTranslations = {
         "description": "Serudukan kepala yang menerjang, mengganggu perapalan mantra target dan mengunci aliran sihir itu selama 4 detik."
       },
       "spell_lock": {
-        "name": "Kunci Mantra",
-        "description": "Membungkam target saat sedang merapal dan mencegah perapalan dari aliran sihir itu selama 5 detik."
+        "name": "Sumpal Jurang",
+        "description": "Menginterupsi perapalan musuh dan mencegahnya merapal mantra dari aliran itu selama 4 dtk."
+      },
+      "thieves_chorus": {
+        "name": "Paduan Suara Pencuri",
+        "description": "Sinyal siulan memacu kelompokmu: kecepatan serangan, rapalan, dan kanal meningkat 10% selama 10 detik. Sekutu yang baru saja terkena lonjakan percepatan kelompok terlalu lelah untuk mendapat manfaat. (talenta Rogue)"
       },
       "tranquility": {
         "name": "Lagu Rimba",
         "description": "Menyalurkan energi pemulihan selama 4 detik, memulihkan 42 sampai 52 nyawa sekutu dalam jarak 30 m setiap detik. (talenta Druid)"
+      },
+      "venom_dart": {
+        "name": "Damak Bisa",
+        "description": "Melontarkan damak beracun sebesar {damage} kerusakan alam. Memberi 1 poin combo. Knifework: memperpanjang luka Koyak Bisa Anda 6 detik, hingga 20 detik.",
+        "specNote_assassination": "Menambah 1 Ritus Bisa dan memperpanjang luka bisamu selama 6 detik (luka itu tidak akan pernah melebihi 20 detik)."
+      },
+      "body_blow": {
+        "name": "Pukulan Tubuh",
+        "description": "Pukulan berat sebesar 130% kerusakan senjata plus 10 yang memberikan 2 poin combo dan memperdalam Redline satu tingkat. (mesin Thuggery)"
+      },
+      "knockout_blow": {
+        "name": "Pukulan Nokaut",
+        "description": "Akhiri Redline dengan nokaut: menghantam sebesar 45 plus 35 per poin combo, 25% lebih keras per tingkat Redline, dan memulihkan 25 energi. (mesin Thuggery)"
+      },
+      "veilstrike": {
+        "name": "Hantaman Tabir",
+        "description": "Melahap simpanan Remang untuk menyelubungi dirimu dalam bayangan selama 6 detik: pembuka senyapmu bekerja di tempat terbuka dan kerusakanmu meningkat 25%. (mesin Skulduggery)"
+      },
+      "venomrend": {
+        "name": "Koyak Bisa",
+        "description": "Melahap Ritual Bisa: menghantam sebesar 22 tambah 26 per poin combo, meledakkan sisa kerusakan pendarahanmu, dan memulihkan 25 energi. (mesin Knifework)"
       },
       "typhoon": {
         "name": "Topan",
@@ -9114,6 +10877,30 @@ export const id_ID: EnTranslations = {
       "voidfeast": {
         "name": "Santapan Kehampaan",
         "description": "Melahap efek sihir (efek menguntungkan dari musuh atau efek berbahaya dari sekutu) dan memulihkan 6% nyawa maksimummu."
+      },
+      "veilstep": {
+        "name": "Langkah Tabir",
+        "description": "Melangkah menembus tabir ke arah yang kamu hadapi."
+      },
+      "scouring_mercy": {
+        "name": "Belas Kasih Pembersih",
+        "description": "Memberi 72 sampai 84 kerusakan Suci kepada musuh atau menyembuhkan sasaran sekutu sebesar 130 sampai 155. Kedua nilai meningkat dengan kekuatan mantra. Kerusakan juga menyembuhkan setiap sekutu yang terikat Doktrin sebesar 30%, atau anggota kelompok bernyawa terendah sebesar 15% bila tidak ada yang terikat. (Ciri khas Doktrin)"
+      },
+      "seraphic_vigil": {
+        "name": "Jaga Serafik",
+        "description": "Melindungi satu sekutu selama 30 dtk. Pukulan pertama yang membuatnya turun di bawah 35% nyawa menghabiskan Jaga dan menyembuhkannya sebesar 180. (Ciri khas Berkat)"
+      },
+      "summon_tithefiend": {
+        "name": "Panggil Iblis Persepuluhan",
+        "description": "Menghabiskan seluruh Persepuluhan Suram untuk memanggil Iblis Persepuluhan selama 6, 8, 10, 12, atau 15 dtk pada 1 sampai 5 tumpukan. Ia menyerang tiap 2 dtk sebesar 20 sampai 24 kerusakan Bayangan, ditambah 8 per tumpukan tambahan. Pada lima tumpukan ia membesar dan kerusakannya naik 25%. Kerusakannya meningkat dengan kekuatan mantramu. Ia lebih memilih Patungmu. Setiap benturan memulihkan 1% mana maksimum dan menggemakan 15% kerusakan ke maksimal 3 musuh lain yang membawa Ratapan Pembusukanmu. (Ciri khas Vesper)"
+      },
+      "martyrs_aegis": {
+        "name": "Perisai Martir",
+        "description": "Mengurangi kerusakan yang diterima sekutu sebesar 40% selama 8 dtk."
+      },
+      "choir_of_deliverance": {
+        "name": "Paduan Suara Pembebasan",
+        "description": "Merapal selama 6 dtk, menyembuhkan anggota grup dalam radius 30 meter sebesar {damage} setiap 2 dtk. Penyembuhan meningkat dengan kekuatan mantra."
       },
       "bear_charge": {
         "name": "Terjangan Bruin",
@@ -9129,7 +10916,8 @@ export const id_ID: EnTranslations = {
       },
       "rake": {
         "name": "Kupasan",
-        "description": "Pembuka siluman yang menggaruk musuh sebesar kerusakan senjata ditambah {damage} dan menimbulkan kerusakan berdarah selama 9 detik. Memberi 1 poin kombo. Hanya dalam Wujud Serigala."
+        "description": "Kupas musuh sebesar kerusakan senjata ditambah {damage} dan sebabkan kerusakan pendarahan selama 18 detik. Memberi 1 poin combo. Hanya dalam Wujud Serigala.",
+        "specNote_feral": "Setiap pukulan yang mengenai menambah 1 Darah Tua (maks 3)."
       },
       "revive_pet": {
         "name": "Obati",
@@ -10646,6 +12434,18 @@ export const id_ID: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "Tali Kekang Raptor Drakemaw"
       },
+      "rimefang": {
+        "name": "Taring Beku"
+      },
+      "marrowpoint": {
+        "name": "Ujung Sumsum"
+      },
+      "duskwhisper": {
+        "name": "Bisikan Senja"
+      },
+      "boneglass_shiv": {
+        "name": "Belati Kaca Tulang"
+      },
       "moggers_hide_quiver": {
         "name": "Tabung Panah Kulit Mogger"
       },
@@ -10667,11 +12467,17 @@ export const id_ID: EnTranslations = {
       "pristine_claw": {
         "name": "Cakar Murni"
       },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
+      },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
       },
       "conjured_bread4": {
         "name": "Roti Perjamuan Sihir"
+      },
+      "soul_stone": {
+        "name": "Batu Jiwa"
       },
       "bristleback_maul": {
         "name": "Palu Gallowglass"
@@ -12076,9 +13882,6 @@ export const id_ID: EnTranslations = {
       "gloomshade": {
         "name": "Gloomshade"
       },
-      "duskborn": {
-        "name": "Duskborn"
-      },
       "grix_the_tunnelking": {
         "name": "Grix sang Raja Terowongan"
       },
@@ -12100,17 +13903,8 @@ export const id_ID: EnTranslations = {
       "wraithbinder_maldrec": {
         "name": "Pengikat Arwah Maldrec"
       },
-      "spellhound": {
-        "name": "Spellhound"
-      },
-      "warfiend": {
-        "name": "Warfiend"
-      },
       "pyre_colossus": {
         "name": "Raksasa Pyre"
-      },
-      "wraithborn": {
-        "name": "Wraithborn"
       },
       "choirmother_selthe": {
         "name": "Ibu Paduan Suara Selthe"
@@ -12150,6 +13944,18 @@ export const id_ID: EnTranslations = {
       },
       "water_elemental": {
         "name": "Elemental Air"
+      },
+      "graveguard": {
+        "name": "Graveguard"
+      },
+      "necromancy_skeletal_warrior": {
+        "name": "Skeletal Warrior"
+      },
+      "necromancy_bone_mage": {
+        "name": "Bone Mage"
+      },
+      "necromancy_gravewing": {
+        "name": "Gravewing"
       }
     },
     "npcs": {
@@ -12791,6 +14597,16 @@ export const id_ID: EnTranslations = {
           }
         }
       },
+      "q_divine_tome": {
+        "title": "Kitab Terikat Fajar",
+        "text": "Cahaya tidak beristirahat dengan tenang dalam dirimu, {playerName}. Aku telah melihatmu membaringkan yang mati dalam damai, dan aku percaya kamu siap untuk hal yang jarang diajarkan kepada paladin mana pun: Ritus Pemanggilan, yang dengannya jiwa yang gugur dipanggil kembali kepada yang hidup. Kata-katanya tersimpan dalam Kitab Terikat Fajar, di sini dalam penjagaanku, tetapi sebuah buku bukanlah berkat selama orang mati yang gelisah masih berjalan di tanah ini. Kembalikan 6 Tulang Gelisah lagi ke tanah, dan aku akan mulai mengajarimu.",
+        "completion": "Halaman kapel menjadi hening. Kamu siap untuk kata-katanya, {playerName}, tetapi Ritus Pemanggilan tidak dapat diucapkan di kapel yang hangat. Ia harus dinyanyikan di tempat tabir antara hidup dan mati menipis. Aku berniat membawa Kitab ke utara, ke Rawa Mirefen. Ikuti aku ke sana, dan kita akan menyelesaikannya.",
+        "objectives": {
+          "0": {
+            "label": "Tulang Gelisah dibaringkan"
+          }
+        }
+      },
       "q_bandits": {
         "title": "Bandit Lembah",
         "text": "Segerombolan penyamun telah berkemah di perbukitan barat daya. Mereka merampok tiga gerobak pekan ini. Usir mereka, bunuh 10 Bandit Lembah.",
@@ -12944,6 +14760,16 @@ export const id_ID: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Drowned Dead diistirahatkan"
+          }
+        }
+      },
+      "q_rite_of_redemption": {
+        "title": "Ritus Pemanggilan",
+        "text": "Jadi kamu mengikutiku ke lumpur, {playerName}. Bagus. Kitab Terikat Fajar ada padaku, dan tanah tenggelam ini adalah tempat kata-katanya berada: tidak ada tempat di mana tabir antara hidup dan mati lebih tipis daripada tempat orang mati enggan tetap terkubur. Tetapi yang tenggelam akan menyeret suaramu di tengah bait. Bersihkan ruang yang layak bagi ritus: baringkan 8 dari Mayat Tenggelam, dan kita akan menyucikannya bersama.",
+        "completion": "Berlututlah, {playerName}, dan bacakan kata-katanya dengan lantang. Nah. Kamu merasakannya? Cahaya di tanganmu tidak lagi hanya memulihkan yang hidup, ia dapat memanggil kembali mereka yang telah menyeberang. Gunakan dengan bijak. Jiwa yang dipanggil kembali ke pertempuran tanpa harapan adalah kekejaman, bukan belas kasih. Bangkitlah, Sang Penebus.",
+        "objectives": {
+          "0": {
+            "label": "Mayat Tenggelam dibaringkan"
           }
         }
       },
@@ -15228,6 +17054,11 @@ export const id_ID: EnTranslations = {
         "enterText": "The willow does not move. The water does not either.",
         "leaveText": "You leave the willow to its quiet."
       },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
+      },
       "drowned_temple": {
         "name": "Kuil Tenggelam",
         "enterText": "Kau melangkah melewati gerbang bulan, udara berubah menjadi air dingin dan cahaya pucat, dan nyanyian itu menutup di atas kepalamu.",
@@ -15479,33 +17310,33 @@ export const id_ID: EnTranslations = {
       },
       "warfare_ashstalker": {
         "name": "Perlengkapan Ashstalker",
-        "bonus2": "Meningkatkan Rating Pertahanan PERANG sebesar 40.",
-        "bonus4": "Meningkatkan Rating Serangan PERANG sebesar 40, dan kontrol kerumunan yang dirapalkan oleh pemain musuh terhadapmu bertahan 15% lebih singkat.",
-        "bonus7": "Meningkatkan Rating Serangan dan Pertahanan PERANG sebesar 80. Membunuh pemain musuh memberikan Langkah Abu, meningkatkan kecepatan gerak sebesar 40% selama 6 detik."
+        "bonus2": "Meningkatkan Peringkat Pertahanan Perang sebesar 40.",
+        "bonus4": "Meningkatkan Peringkat Serangan Perang sebesar 40, dan kendali massa yang dirapal pemain lawan padamu bertahan 15% lebih singkat.",
+        "bonus7": "Meningkatkan Peringkat Serangan dan Pertahanan Perang sebesar 80. Membunuh pemain lawan memberi Langkah Abu, yang meningkatkan kecepatan gerak sebesar 40% selama 6 dtk."
       },
       "warfare_cinderweave": {
         "name": "Regalia Cinderweave",
-        "bonus2": "Meningkatkan Rating Pertahanan PERANG sebesar 40.",
-        "bonus4": "Meningkatkan Rating Serangan PERANG sebesar 40, dan kontrol kerumunan yang dirapalkan oleh pemain musuh terhadapmu bertahan 15% lebih singkat.",
-        "bonus7": "Meningkatkan Rating Serangan dan Pertahanan PERANG sebesar 80. Mantramu memiliki peluang 15% memberikan Pelindung Bara, menyerap 120 kerusakan selama 8 detik."
+        "bonus2": "Meningkatkan Peringkat Pertahanan Perang sebesar 40.",
+        "bonus4": "Meningkatkan Peringkat Serangan Perang sebesar 40, dan kendali massa yang dirapal pemain lawan padamu bertahan 15% lebih singkat.",
+        "bonus7": "Meningkatkan Peringkat Serangan dan Pertahanan Perang sebesar 80. Mantramu punya peluang 15% memberi Jaga Bara, yang menyerap 120 kerusakan selama 8 dtk."
       },
       "warfare_furyforged": {
         "name": "Perlengkapan Tempur Furyforged",
-        "bonus2": "Meningkatkan Rating Pertahanan PERANG sebesar 40.",
-        "bonus4": "Meningkatkan Rating Serangan PERANG sebesar 40, dan kontrol kerumunan yang dirapalkan oleh pemain musuh terhadapmu bertahan 15% lebih singkat.",
-        "bonus7": "Meningkatkan Rating Serangan dan Pertahanan PERANG sebesar 80. Membunuh pemain musuh memberikan Sumpah Teguh, menyerap 200 kerusakan selama 10 detik."
+        "bonus2": "Meningkatkan Peringkat Pertahanan Perang sebesar 40.",
+        "bonus4": "Meningkatkan Peringkat Serangan Perang sebesar 40, dan kendali massa yang dirapal pemain lawan padamu bertahan 15% lebih singkat.",
+        "bonus7": "Meningkatkan Peringkat Serangan dan Pertahanan Perang sebesar 80. Membunuh pemain lawan memberi Sumpah Tak Terpatahkan, yang menyerap 200 kerusakan selama 10 dtk."
       },
       "warfare_stormbound": {
         "name": "Jubah Stormbound",
-        "bonus2": "Meningkatkan Rating Pertahanan PERANG sebesar 40.",
-        "bonus4": "Meningkatkan Rating Serangan PERANG sebesar 40, dan kontrol kerumunan yang dirapalkan oleh pemain musuh terhadapmu bertahan 15% lebih singkat.",
-        "bonus7": "Meningkatkan Rating Serangan dan Pertahanan PERANG sebesar 80. Mantramu memiliki peluang 15% memberikan Pelindung Bara, menyerap 120 kerusakan selama 8 detik."
+        "bonus2": "Meningkatkan Peringkat Pertahanan Perang sebesar 40.",
+        "bonus4": "Meningkatkan Peringkat Serangan Perang sebesar 40, dan kendali massa yang dirapal pemain lawan padamu bertahan 15% lebih singkat.",
+        "bonus7": "Meningkatkan Peringkat Serangan dan Pertahanan Perang sebesar 80. Mantramu punya peluang 15% memberi Jaga Bara, yang menyerap 120 kerusakan selama 8 dtk."
       },
       "warfare_thornhide": {
         "name": "Jubah Thornhide",
-        "bonus2": "Meningkatkan Rating Pertahanan PERANG sebesar 40.",
-        "bonus4": "Meningkatkan Rating Serangan PERANG sebesar 40, dan kontrol kerumunan yang dirapalkan oleh pemain musuh terhadapmu bertahan 15% lebih singkat.",
-        "bonus7": "Meningkatkan Rating Serangan dan Pertahanan PERANG sebesar 80. Mantramu memiliki peluang 15% memberikan Penjaga Duri, meningkatkan elakan sebesar 15% selama 6 detik."
+        "bonus2": "Meningkatkan Peringkat Pertahanan Perang sebesar 40.",
+        "bonus4": "Meningkatkan Peringkat Serangan Perang sebesar 40, dan kendali massa yang dirapal pemain lawan padamu bertahan 15% lebih singkat.",
+        "bonus7": "Meningkatkan Peringkat Serangan dan Pertahanan Perang sebesar 80. Mantramu punya peluang 15% memberi Jaga Duri, yang meningkatkan elakan sebesar 15% selama 6 dtk."
       },
       "wyrmshadow": {
         "name": "Jubah Nightfang",

@@ -11,6 +11,7 @@
 // only on the KEPT legacy rollback arms, and the route layer adds module-private
 // test/runtime seams (setAccountDbForTests, configureAccountRuntime).
 import type http from 'node:http';
+import { deleteAccountAttribution } from './attribution_db';
 import {
   hashPassword,
   MAX_PASSWORD_LENGTH,
@@ -44,6 +45,7 @@ import {
   listCharacters,
   listCompanionTokens,
   moderationStatusForAccount,
+  pool,
   revokeCompanionToken,
   revokeToken,
   revokeTokensExcept,
@@ -339,6 +341,10 @@ export async function handleAccountDeactivate(
     });
   }
   await setAccountDeactivated(accountId, true);
+  // User-facing removal is a soft delete, which never fires the attribution
+  // table's FK CASCADE; erase the ad-click identifiers explicitly so leaving
+  // the game also ends the acquisition linkage (attribution_db.ts header).
+  await deleteAccountAttribution(pool, accountId);
   await revokeTokensExcept(accountId, null);
   hooks.disconnectAccount(accountId, 'This account has been deactivated.');
   emailAccountDeleted(acct);

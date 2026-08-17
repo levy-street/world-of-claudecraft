@@ -32,20 +32,64 @@ export const table: DeedLocaleTable = {
     name: '균열 군주',
     desc: '균열이 생성될 수 있는 가장 어려운 등급인 S등급 균열을 정복하십시오.',
   },
+  col_reliquary_rank_2: {
+    name: '전리품 수호자',
+    desc: '성물고에서 큐레이터 등급 2를 달성하십시오 (고유 성물 10종 수록).',
+    title: '전리품 수호자',
+  },
+  col_reliquary_rank_3: {
+    name: '목록 편찬가',
+    desc: '성물고에서 큐레이터 등급 3을 달성하십시오 (고유 성물 25종 수록).',
+    title: '목록 편찬가',
+  },
+  col_reliquary_rank_4: {
+    name: '수석 큐레이터',
+    desc: '성물고에서 큐레이터 등급 4를 달성하십시오 (고유 성물 50종 수록).',
+    title: '수석 큐레이터',
+  },
+  col_reliquary_rank_5: {
+    name: '영원한 전리품',
+    desc: '성물고에서 큐레이터 등급 5를 달성하십시오 (고유 성물 100종 수록).',
+  },
   pvp_honor_sergeant: {
-    name: '병장',
+    name: '전열파쇄자',
     desc: '평생 명예 10,000을 획득하십시오. 명예를 소비해도 계급은 사라지지 않습니다.',
-    title: '병장',
+    title: '전열파쇄자',
   },
   pvp_honor_knight_lieutenant: {
-    name: '기사-소위',
+    name: '전장약탈자',
     desc: '평생 명예 40,000을 획득하십시오. 진짜 전쟁을 한 계절 치른 셈입니다.',
-    title: '기사-소위',
+    title: '전장약탈자',
   },
   pvp_honor_field_marshal: {
-    name: '원수',
+    name: '전쟁왕관',
     desc: '평생 명예 150,000을 획득하십시오. 어느 서버에서든 드물며, 마땅히 그래야 합니다.',
-    title: '원수',
+    title: '전쟁왕관',
+  },
+  col_reliquary_complete: {
+    name: '위대한 성물고',
+    desc: '캐릭터가 간직할 수 있는 성물고의 모든 성물을 수록하십시오. 이후 목록이 늘어나도 이 기록은 사라지지 않습니다.',
+    title: '보물고의 큐레이터',
+  },
+  col_reliquary_conquerors: {
+    name: '정복자의 서가',
+    desc: '성물고의 정복자 서가에 있는 모든 성물을 수록하십시오. 이후 목록이 늘어나도 이 기록은 사라지지 않습니다.',
+    title: '보물고를 부순 자',
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    name: '조명된 니트락시스',
+    desc: '영웅: 니트락시스 공격대 페이지를 성물고에서 조명하십시오.',
+    title: '니트락시스의 빛',
+  },
+  col_reliquary_illum_thunzharr: {
+    name: '조명된 천자르',
+    desc: '천자르, 깨어나는 봉우리 페이지를 성물고에서 조명하십시오.',
+    title: '천자르의 빛',
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    name: '조명된 성소',
+    desc: '영웅: 무덤고룡 성소 페이지를 성물고에서 조명하십시오.',
+    title: '성소의 빛',
   },
   chr_drakemaw_broodlord: {
     name: '둥지 파괴자',

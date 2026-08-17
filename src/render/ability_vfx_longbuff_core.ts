@@ -41,7 +41,10 @@ export function buffAuraDurationSec(abilityId: string): number {
           case 'aoeAllyAttackPower':
           case 'aoeAllyHaste':
           case 'aoeAllyAbsorb':
-            if (eff.duration > max) max = eff.duration;
+            // A permanent aura authors duration 0 but never ages out
+            // (Requital Aura): indefinite, not instant.
+            if ('permanent' in eff && eff.permanent === true) max = Number.POSITIVE_INFINITY;
+            else if (eff.duration > max) max = eff.duration;
             break;
         }
       }
@@ -60,5 +63,12 @@ export function holdsBuffVfxWhileWorn(
   const style = full?.buff?.style;
   if (style === 'morph' || style === 'veil') return true;
   if (full?.buff?.persist === true) return true;
+  // An always-on passive that authors a PERSISTENT orbit primitive is worn
+  // forever, so the worn-forever policy silences it (Burning Oath's heartbeat
+  // rings). Proc-marker passives author orbit 'none': their shell pop expires
+  // by itself and keeps the default hold.
+  const def = ABILITIES[abilityId];
+  const orbit = full?.buff?.orbit;
+  if (def?.passive === true && orbit !== undefined && orbit !== 'none') return false;
   return buffAuraDurationSec(abilityId) < LONG_BUFF_VFX_SECONDS;
 }

@@ -33,19 +33,19 @@ export const table: DeedLocaleTable = {
     desc: 'Supera una Brecha de rango S, el nivel más difícil que puede abrir un portal de Brecha.',
   },
   pvp_honor_sergeant: {
-    name: 'Sargento',
+    name: 'Rompefilas',
     desc: 'Gana 10.000 de honor a lo largo de tu vida. Gastarlo nunca te cuesta el rango.',
-    title: 'Sargento',
+    title: 'Rompefilas',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Caballero Teniente',
+    name: 'Asolacampos',
     desc: 'Gana 40.000 de honor a lo largo de tu vida, toda una temporada de guerra real a tus espaldas.',
-    title: 'Caballero Teniente',
+    title: 'Asolacampos',
   },
   pvp_honor_field_marshal: {
-    name: 'Mariscal de Campo',
+    name: 'Coronado por la guerra',
     desc: 'Gana 150.000 de honor a lo largo de tu vida. Poco común en cualquier reino, y así debe ser.',
-    title: 'Mariscal de Campo',
+    title: 'Coronado por la guerra',
   },
   chr_drakemaw_broodlord: {
     name: 'Rompenidos',
@@ -992,6 +992,50 @@ export const table: DeedLocaleTable = {
   prog_armorcrafting_rare: {
     name: 'Blindado a la perfección',
     desc: 'Fabrica tu primer objeto de calidad rara en Fabricación de armaduras.',
+  },
+  col_reliquary_rank_2: {
+    name: 'Guardabotines',
+    desc: 'Alcanza el rango de Curador 2 en El Relicario (10 reliquias únicas catalogadas).',
+    title: 'Guardabotines',
+  },
+  col_reliquary_rank_3: {
+    name: 'El Catalogador',
+    desc: 'Alcanza el rango de Curador 3 en El Relicario (25 reliquias únicas catalogadas).',
+    title: 'el Catalogador',
+  },
+  col_reliquary_rank_4: {
+    name: 'Archicurador',
+    desc: 'Alcanza el rango de Curador 4 en El Relicario (50 reliquias únicas catalogadas).',
+    title: 'Archicurador',
+  },
+  col_reliquary_rank_5: {
+    name: 'Botines Eternos',
+    desc: 'Alcanza el rango de Curador 5 en El Relicario (100 reliquias únicas catalogadas).',
+  },
+  col_reliquary_complete: {
+    name: 'El Gran Relicario',
+    desc: 'Cataloga todas las reliquias de El Relicario que un personaje pueda conservar. Que el catálogo crezca después nunca te lo quita.',
+    title: 'Curador de la Cámara',
+  },
+  col_reliquary_conquerors: {
+    name: 'Estante de Conquistadores',
+    desc: 'Cataloga todas las reliquias del estante Conquistadores de El Relicario. Que el catálogo crezca después nunca te lo quita.',
+    title: 'Rompecámaras',
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    name: 'Nythraxis iluminada',
+    desc: 'Ilumina la página Heroico: Incursión de Nythraxis de El Relicario.',
+    title: 'Luz de Nythraxis',
+  },
+  col_reliquary_illum_thunzharr: {
+    name: 'Thunzharr iluminada',
+    desc: 'Ilumina la página Thunzharr, el Pico Despierto de El Relicario.',
+    title: 'Luz de Thunzharr',
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    name: 'Santuario iluminado',
+    desc: 'Ilumina la página Heroico: Santuario del Gravewyrm de El Relicario.',
+    title: 'Luz del Santuario',
   },
 };
 

@@ -18,10 +18,11 @@ import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { retryDelayMs as gltfRetryDelayMs } from '../assets/load_retry';
-import { loadGltf, loadTexture } from '../assets/loader';
+import { loadGltf, loadKtx2Texture, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
 import { addRimGlow, EMISSIVE_GLOW, GFX, type GfxSettings } from '../gfx';
 import { applySurfaceDetail, riggedWornFamilyFor } from '../worn_stone';
+import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
 import { dequantizeAttribute } from './dequantize_attribute';
 import { buildMakeupDecal } from './makeup';
 import {
@@ -30,9 +31,11 @@ import {
   itemOffhandModelUrl,
   itemWeaponModelUrl,
   manifestUrlsForGraphics,
+  modularVisualKey,
   offhandModelUrl,
   SKIN_EMISSIVE,
   SKINS,
+  SKINS_DIR,
   VISUALS,
   type VisualDef,
   visibleAttachmentsForGraphics,
@@ -43,7 +46,6 @@ import {
 import {
   bandMaterialSpec,
   DEFAULT_LOOK,
-  type DyeRule,
   earringMaterialSpec,
   eyeColor,
   hairColor,
@@ -69,11 +71,20 @@ import {
 } from './modular';
 import { flattenPropScene, mountProp } from './prop_mount';
 import { isHandslotBone, modelBasename } from './prop_placement_core';
+import {
+  createPaladinBastionSweepClip,
+  PALADIN_BASTION_SWEEP_CLIP,
+} from './paladin_bastion_sweep_clip';
+import {
+  createPaladinTemplarsVerdictClip,
+  PALADIN_TEMPLARS_VERDICT_CLIP,
+} from './paladin_templars_verdict_clip';
 import { animatedNodeNames, mergeSkinnedParts } from './rig_merge';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { optimizeSkinGpuLayout } from './skin_gpu_layout';
 import { primeSkinnedSortSpheres } from './skinned_sort_spheres';
 import { buildStubbleDecal, headNodeName } from './stubble';
+import { TINTED_MATERIAL_IDLE_CACHE_MAX, TintedMaterialCache } from './tinted_material_cache_core';
 import { markOwnedWeaponSkinMaterials } from './weapon_skin_materials';
 
 const DEFAULT_TINT_STRENGTH = 0.4;
@@ -217,17 +228,20 @@ function assetUrl(url: string): string {
 // world entry crashes (the character-side twin of the v0.16.0 props P0).
 const allPreloadUrls = characterPreloadUrls(false);
 
-// Packaged iOS carves the mob bodies out of the boot gate and STREAMS them after
-// first frame instead. They are the heaviest character content (creature +
-// skeleton-family GLBs with embedded 1024-class atlases; 47 files, and by far
-// the largest share of the decoded character residency) and nothing on the
-// launcher, the character-select preview, or the player's own spawn needs them:
-// mob views are created fail-soft (createCharacterVisual returns null and
-// view_create_retry retries, the #2079 seam; mounts already stream exactly this
-// way), so a mob whose GLB is still arriving pops in a beat later instead of
-// crashing anything. Measured on an iPhone 17 Pro, decoding the full set inside
-// the entry gate put WebContent at 1.54 GB before the renderer ever existed;
-// streaming defers that mass to after the entry spike has cleared. Weapons and
+// Every iOS WebKit host (Mobile Safari, any other iOS browser, and the packaged
+// native app: see GFX.iosMemoryProfile in gfx.ts) carves the mob bodies out of
+// the boot gate and STREAMS them after first frame instead. They are the
+// heaviest character content (creature + skeleton-family GLBs with embedded
+// 1024-class atlases; 47 files, and by far the largest share of the decoded
+// character residency) and nothing on the launcher, the character-select
+// preview, or the player's own spawn needs them: mob views are created
+// fail-soft (createCharacterVisual returns null and view_create_retry retries,
+// the #2079 seam; mounts already stream exactly this way), so a mob whose GLB
+// is still arriving pops in a beat later instead of crashing anything.
+// Measured on an iPhone 17 Pro, decoding the full set inside the entry gate put
+// WebContent at 1.54 GB before the renderer ever existed; streaming defers that
+// mass to after the entry spike has cleared, and that WebContent ceiling is
+// identical whether the process hosts Safari or the packaged app. Weapons and
 // NPC bodies stay in the gate: the char-select preview builds CharacterVisual
 // DIRECTLY (not through the fail-soft factory), so a missing held-weapon GLB
 // there would throw.
@@ -242,7 +256,7 @@ const streamableUrls = allPreloadUrls.filter(
   (url) =>
     STREAMED_URL_PREFIXES.some((prefix) => url.includes(prefix)) || streamedSkinUrls.has(url),
 );
-let streamedUrls = GFX.nativeIosMemoryProfile ? streamableUrls : [];
+let streamedUrls = GFX.iosMemoryProfile ? streamableUrls : [];
 let streamedUrlSet = new Set(streamedUrls);
 const preloadUrls = allPreloadUrls.filter((url) => !streamedUrlSet.has(url));
 const characterLoadTasks = new Map<string, Promise<void>>();
@@ -302,8 +316,9 @@ let streamedStarted = false;
 /**
  * Start the post-entry mob-body stream (idempotent; returns how many fetches
  * this call started). main.ts calls it once the entry is past its allocation
- * spike (prewarm complete). Empty everywhere but the packaged iOS shell, where
- * the boot gate above deliberately excluded these urls. A failed fetch re-arms
+ * spike (prewarm complete). Empty everywhere but iOS WebKit hosts (Safari,
+ * other iOS browsers, and the packaged app), where the boot gate above
+ * deliberately excluded these urls. A failed fetch re-arms
  * when a visual build next needs the body: resolvedGltf kicks
  * ensureCharacterUrl for a non-resident streamed url before its fail-soft
  * throw, and the view-create retry gate re-attempts the build.
@@ -328,9 +343,21 @@ export function startStreamedCharacterPreloads(): number {
 const skinTexByUrl = new Map<string, THREE.Texture>();
 const skinEmisTexByUrl = new Map<string, THREE.Texture>();
 
+// scripts/assets/compress_standalone_textures.mjs ships a `.ktx2` sibling next
+// to every atlas under this prefix, so those ~34 1024x1024 atlases stay
+// GPU-compressed in memory instead of decoding to full RGBA bitmaps (the
+// eagerSkinAtlases comment below has the numbers). The player_mech chromas
+// (MECH_DIR) are not under this prefix, stay on the plain PNG path, and are
+// out of scope here: they are lazyPreload-only, never part of the eager boot
+// sweep this pass targets.
+const KTX2_ATLAS_PREFIX = `${SKINS_DIR}/`;
+
 /** Load a skin/emissive atlas with the glTF body-UV conventions (sRGB, no flip). */
 function loadSkinTexInto(url: string, into: Map<string, THREE.Texture>): Promise<void> {
-  return loadTexture(url, { srgb: true }).then((t) => {
+  const load = url.startsWith(KTX2_ATLAS_PREFIX)
+    ? loadKtx2Texture(`${url.slice(0, -'.png'.length)}.ktx2`)
+    : loadTexture(url, { srgb: true });
+  return load.then((t) => {
     t.flipY = false;
     t.needsUpdate = true;
     into.set(url, t);
@@ -344,7 +371,7 @@ for (const [key, list] of Object.entries(SKINS)) {
   if (VISUALS[key]?.lazyPreload) continue;
   for (const u of list) if (u) bootSkinUrls.add(u);
 }
-// The packaged iOS shell, plus iOS Safari after a confirmed entry kill, defers
+// Every iOS WebKit host (Safari, other iOS browsers, and the packaged app) defers
 // the whole alternate-atlas sweep out of the boot gate: ~34 1024x1024 atlases
 // decode to well over 100 MB of RGBA inside the same WebContent process whose
 // jetsam ceiling the entry spike already presses against (the iPhone 13 report),
@@ -355,20 +382,20 @@ for (const [key, list] of Object.entries(SKINS)) {
 // profile hints derive from static boot signals (never the tier), so this
 // import-time read cannot drift from the live profile the way an import-time
 // TIER read would (the farmCrate P0).
-const eagerSkinAtlases = !(GFX.nativeIosMemoryProfile || GFX.tightMemory);
+const eagerSkinAtlases = !(GFX.iosMemoryProfile || GFX.tightMemory);
 if (eagerSkinAtlases) {
   for (const url of bootSkinUrls) registerPreload(loadSkinTexInto(url, skinTexByUrl));
 }
 
 /** Prepare character sources and cosmetic atlases selected by an explicit target profile. */
 export async function prepareCharacterProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
-  const nextStreamedUrls = target.nativeIosMemoryProfile ? streamableUrls : [];
+  const nextStreamedUrls = target.iosMemoryProfile ? streamableUrls : [];
   const nextStreamedSet = new Set(nextStreamedUrls);
   const requiredGltf = manifestUrlsForGraphics(target.standardMaterials).filter(
     (url) => !nextStreamedSet.has(url),
   );
   const skinTasks =
-    target.nativeIosMemoryProfile || target.tightMemory
+    target.iosMemoryProfile || target.tightMemory
       ? []
       : [...bootSkinUrls].map((url) =>
           skinTexByUrl.has(url) ? Promise.resolve() : loadSkinTexInto(url, skinTexByUrl),
@@ -399,8 +426,8 @@ export async function prepareCharacterProfileAssets(target: Readonly<GfxSettings
 export async function charactersReady(maxAttempts = 3): Promise<void> {
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     const missingGltf = preloadUrls.filter((u) => !gltfByUrl.has(assetUrl(u)));
-    // Deferred atlases (native iOS) are not boot assets: gating the preview on
-    // them would re-create the exact entry-footprint spike the deferral removes.
+    // Deferred atlases (every iOS WebKit host) are not boot assets: gating the
+    // preview on them would re-create the exact entry-footprint spike the deferral removes.
     const missingSkins = eagerSkinAtlases
       ? [...bootSkinUrls].filter((url) => !skinTexByUrl.has(url))
       : [];
@@ -619,19 +646,170 @@ function optimizedScene(url: string): THREE.Object3D {
 // material swap over shared geometry.
 // ---------------------------------------------------------------------------
 
-// Never evicted, matching the shared per-asset caches this file already keeps
-// (see src/render/characters/CLAUDE.md): SkeletonUtils clones SHARE geometry
-// with their source, so dropping a variant would strand any live character
-// still drawn from it. Growth is bounded by the part-set combinatorics
-// (gender x hair x brows x worn slots), and creation only walks a few dozen.
-const modularVariantCache = new Map<string, THREE.Object3D>();
-/** Dev-only tripwire on that growth (see the warn at the bottom of the builder). */
-const MODULAR_VARIANT_WARN_AT = 64;
+/** One cached composed part set: the merged root every character with this set
+ *  is cloned from, a live-clone count, and the far-LOD bake taken off it. */
+interface ModularVariant {
+  root: THREE.Object3D;
+  /** The GLB this was pruned from: needed at eviction to tell the geometry
+   *  this variant MINTED from the geometry it merely points at. */
+  url: string;
+  /** Live composed clones still drawn from this root's geometry. */
+  refs: number;
+  /** Baked idle-pose far LOD for this part set, minted on first far-band
+   *  entry. Shares the entry's lifetime (see evictModularVariants). */
+  far: ModularFarBake | null;
+}
 
-function modularVariant(url: string, names: readonly string[]): THREE.Object3D {
-  const key = `${url}|${names.join(',')}`;
-  const hit = modularVariantCache.get(key);
+// BOUNDED AND REFCOUNTED, and it used to be neither.
+//
+// The cache is keyed by PART SET, and the original reasoning ("creation only
+// walks a few dozen") held while a single character composed: the local player.
+// Now every peer composes, so what mints entries is no longer one player at a
+// turntable but the population of a zone (a distinct set per distinct look),
+// and it grows for as long as the session lasts as players come and go. At
+// ~6.7k merged vertices a set, an evening in a capital would run to hundreds of
+// megabytes of geometry nothing on screen is using.
+//
+// Eviction has to be refcounted rather than plain-LRU because SkeletonUtils
+// clones SHARE geometry with the root they came from, so disposing a root that
+// a live character is still drawn from would blank that character. Every clone
+// is therefore retained in assembleModular and released in
+// CharacterVisual.dispose, and only entries with NO live clone are eligible.
+// When every entry is live the cache is allowed past the cap rather than
+// breaking a body on screen: the bound is on garbage, not on the crowd.
+const modularVariantCache = new Map<string, ModularVariant>();
+/** Retained clones over the cap keep their variant; only idle ones are dropped. */
+const MODULAR_VARIANT_CACHE_MAX = 96;
+/** Dev-only tripwire on live (unevictable) variants: the one growth the cap
+ *  cannot bound, and the signal that a release site was missed. */
+const MODULAR_VARIANT_WARN_AT = 128;
+
+/** The cache key for a composed part set: the GLB plus the picked node names. */
+function modularVariantKey(url: string, names: readonly string[]): string {
+  return `${url}|${names.join(',')}`;
+}
+
+/** Every BufferGeometry the parsed GLB owns, memoized against the PARSED SCENE.
+ *
+ *  This is the set a variant must NOT dispose. A variant root is a
+ *  SkeletonUtils clone, which SHARES geometry with its source, and
+ *  mergeSkinnedParts only mints new geometry for the buckets it can prove safe:
+ *  it refuses anything carrying morph targets (head, eyes, ears, lashes, brows,
+ *  mouth) and skips buckets of one. Every one of those meshes is still pointing
+ *  at the parsed scene's buffers, which every other variant and every future
+ *  compose also point at, and nothing re-creates them. Disposing one would be
+ *  the recolorCache bug in a worse place.
+ *
+ *  Keyed by scene OBJECT, not by url, and that is the whole point of the
+ *  WeakMap: a url-keyed memo is a promise that a url always parses to the same
+ *  buffers, which nothing enforces. Re-parse a character GLB (a hot reload, an
+ *  asset-cache eviction, any future re-fetch) and a variant built from the new
+ *  scene would be diffed against the OLD scene's set, so every one of its
+ *  unmerged parts reads as "minted here" and eviction frees the live parse's
+ *  buffers: exactly the bug this predicate exists to close, re-opened by a stale
+ *  key. Against the scene object the question cannot be asked of the wrong
+ *  parse, and a dropped parse takes its entry with it. */
+const sourceGeometryCache = new WeakMap<THREE.Object3D, Set<THREE.BufferGeometry>>();
+
+/**
+ * The geometries an evicted variant is allowed to free: the ones it MINTED,
+ * never the ones it merely points at.
+ *
+ * Exported for the test rather than for a caller: this predicate is the whole
+ * safety of eviction, and getting it wrong is silent (a body keeps rendering
+ * until the renderer next needs the buffer). `shared` is the parsed GLB's own
+ * geometry set: see sourceGeometries for why so much of a variant is still in
+ * it.
+ */
+export function variantOwnedGeometries(
+  root: THREE.Object3D,
+  shared: ReadonlySet<THREE.BufferGeometry>,
+): THREE.BufferGeometry[] {
+  const owned: THREE.BufferGeometry[] = [];
+  root.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (mesh.isMesh && mesh.geometry && !shared.has(mesh.geometry)) owned.push(mesh.geometry);
+  });
+  return owned;
+}
+
+// Exported for the test rather than for a caller (test seam, no behavior change):
+// evictModularVariants diffs against this set to know what a variant may free.
+export function sourceGeometries(url: string): Set<THREE.BufferGeometry> {
+  const scene = resolvedGltf(url).scene;
+  const hit = sourceGeometryCache.get(scene);
   if (hit) return hit;
+  const owned = new Set<THREE.BufferGeometry>();
+  scene.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (mesh.isMesh && mesh.geometry) owned.add(mesh.geometry);
+  });
+  sourceGeometryCache.set(scene, owned);
+  return owned;
+}
+
+/** Drop idle variants, least-recently-used first, until the cache is back under
+ *  the cap. Map iteration is insertion order and every hit re-inserts, so the
+ *  head is the least recently composed. */
+function evictModularVariants(): void {
+  if (modularVariantCache.size <= MODULAR_VARIANT_CACHE_MAX) return;
+  for (const [key, entry] of modularVariantCache) {
+    if (modularVariantCache.size <= MODULAR_VARIANT_CACHE_MAX) break;
+    if (entry.refs > 0) continue;
+    modularVariantCache.delete(key);
+    // Now provably unreferenced, so the buffers this variant MINTED can go
+    // back: dropping the map entry alone would leak them (three.js frees a
+    // geometry on dispose(), not on GC). Only the minted ones: see
+    // sourceGeometries for what the unmerged parts are still pointing at.
+    for (const geo of variantOwnedGeometries(entry.root, sourceGeometries(entry.url))) {
+      geo.dispose();
+    }
+    // The far bake is always minted here (bakeStaticPose builds it), so it is
+    // unconditionally ours to free.
+    entry.far?.geo.dispose();
+  }
+  if (import.meta.env?.DEV && modularVariantCache.size >= MODULAR_VARIANT_WARN_AT) {
+    console.warn(
+      `[modular] ${modularVariantCache.size} composed variants live at once (cap ${MODULAR_VARIANT_CACHE_MAX}); every one is still on screen`,
+    );
+  }
+}
+
+/** Note that a composed clone is no longer drawn, freeing its part set to be
+ *  evicted. Called from CharacterVisual.dispose; safe on any root (a
+ *  non-composed one carries no key). */
+export function releaseModularVariant(root: THREE.Object3D): void {
+  const key = root.userData.modularVariantKey as string | undefined;
+  if (!key) return;
+  root.userData.modularVariantKey = undefined;
+  const entry = modularVariantCache.get(key);
+  if (!entry || entry.refs === 0) return;
+  entry.refs--;
+  // Sweeping only on a miss leaves a cache that went over the cap while every
+  // entry was live sitting there forever if it then only ever hits. Going idle
+  // is the other moment eviction can make progress, so take it.
+  if (entry.refs === 0) evictModularVariants();
+}
+
+/** Composed-body cache occupancy, for the crowd-perf probe on `window.__game`:
+ *  how many part sets are cached, how many of those a live character is still
+ *  drawn from (and so cannot be evicted), and how many recoloured materials are
+ *  warm. Read beside `renderer.webgl.info` when checking a throng. */
+export function modularCacheStats(): { variants: number; live: number; recolors: number } {
+  let live = 0;
+  for (const entry of modularVariantCache.values()) if (entry.refs > 0) live++;
+  return { variants: modularVariantCache.size, live, recolors: recolorCache.size };
+}
+
+function modularVariant(url: string, names: readonly string[]): ModularVariant {
+  const key = modularVariantKey(url, names);
+  const hit = modularVariantCache.get(key);
+  if (hit) {
+    // re-insert so the eviction sweep above reads insertion order as recency
+    modularVariantCache.delete(key);
+    modularVariantCache.set(key, hit);
+    return hit;
+  }
   const root = cloneSkinned(resolvedGltf(url).scene);
   const keep = new Set(names);
   const drop: THREE.Object3D[] = [];
@@ -657,173 +835,34 @@ function modularVariant(url: string, names: readonly string[]): THREE.Object3D {
   for (const o of empty) o.removeFromParent();
   mergeSkinnedParts(root);
   primeSkinnedSortSpheres(root);
-  modularVariantCache.set(key, root);
-  // No silent growth: the key is the whole discrete part set (gender x eyes x
-  // lashes x mouth x ears x brows x hair x beard x earrings x worn slots), and
-  // Randomize rolls most of those at once, so a long creation session keeps a
-  // merged body per combination it visited. Eviction is not the fix (clones
-  // share geometry with the cached variant, so dropping one strands any live
-  // character drawn from it): if this ever fires in anger the answer is a
-  // variant budget on the creator. Say so rather than growing quietly.
-  if (import.meta.env?.DEV && modularVariantCache.size === MODULAR_VARIANT_WARN_AT) {
-    console.warn(
-      `[modular] ${MODULAR_VARIANT_WARN_AT} composed variants cached this session (never evicted)`,
-    );
-  }
-  return root;
+  // Sweep BEFORE inserting, never after. The new entry is born at refs 0 and
+  // the caller only retains it once this returns, so a sweep run after the
+  // insert reaches the newest entry last, finds it unreferenced, and disposes
+  // the very root it is about to hand back: the caller then clones a disposed
+  // root, the far bake writes to an orphaned entry forever, and the release
+  // finds nothing. Trimming first cannot see it at all.
+  evictModularVariants();
+  const entry: ModularVariant = { root, url, refs: 0, far: null };
+  modularVariantCache.set(key, entry);
+  return entry;
 }
 
 // Bounded, because a colour WHEEL is a continuous input: dragging it emits a
 // new hex every pointermove, and each distinct hex would otherwise strand a
-// material here forever (and a second one in tintedMaterial's cache, which is
-// keyed off this material's uuid). An LRU keeps a drag's worth of shades warm,
-// re-picking a recent colour is still free, and disposes what falls out.
-const RECOLOR_CACHE_MAX = 48;
+// material here forever. (Its downstream twin in tintedMaterial's cache, keyed
+// off this material's uuid, becomes a dead-source entry when the LRU evicts
+// here; the tinted cache reclaims those through its own idle bound, see
+// tinted_material_cache_core.ts.) An LRU keeps a drag's worth of shades warm,
+// and re-picking a recent colour is still free.
+//
+// SIZED FOR A CROWD, NOT FOR ONE COLOUR PICKER. 48 was a drag's worth of shades
+// for the single character being authored. Now every peer composes, and the
+// keys are (source material x colour) across everyone in view: skin, skin
+// detail, hair, stubble, eye, lash, lipstick and an outfit dye per person. A
+// populated zone blows past 48 immediately, and each eviction means the next
+// character with that colour rebuilds a material that was already made.
+const RECOLOR_CACHE_MAX = 512;
 const recolorCache = new Map<string, THREE.Material>();
-
-/**
- * The outfit-colorway dye, as a shader layer on a clone of an armour material.
- *
- * The class atlases ship ktx2-compressed, so a colorway cannot be painted into
- * the pixels, instead the fragment stage remaps HSV zones of the atlas right
- * after the map sample. A spec is a list of up to MAX_DYE_RULES rules; each
- * selects a zone (hue band + sat/val smoothstep windows, measured off the
- * atlases, steel, gold trim, leather, the set's cloth band) and remaps
- * hue/sat/val inside it. The additive sat/val terms are what let near-gray
- * steel take real gold or bone colour, a legacy hue colorway is one rule
- * whose windows reproduce the old single-band dye exactly.
- *
- * Every rule is evaluated from the ORIGINAL texel and the results are blended
- * in sequence, so overlapping selector edges cross-fade instead of compounding.
- *
- * One uniform-driven program serves every set and every colorway: the hook is
- * byte-identical across clones and customProgramCacheKey pins the key, so
- * picking through the customizer's swatches never compiles a second program.
- */
-interface ArmorDyeSpec {
-  rules: DyeRule[];
-}
-
-const MAX_DYE_RULES = 5;
-
-/** Flatten a spec into the fixed-size uniform arrays the shader reads: per
- *  rule A=(ref, band, satLo0, satLo1), B=(satHi0, satHi1, valLo0, valLo1),
- *  C=(valHi0, valHi1, hueTarget, hueMode), D=(satMul, satAdd, valMul, valAdd).
- *  Unused slots get zero weight via an empty hue band. */
-function dyeUniforms(dye: ArmorDyeSpec): {
-  a: number[];
-  b: number[];
-  c: number[];
-  d: number[];
-  n: number;
-} {
-  const a: number[] = [];
-  const b: number[] = [];
-  const c: number[] = [];
-  const d: number[] = [];
-  const rules = dye.rules.slice(0, MAX_DYE_RULES);
-  for (let i = 0; i < MAX_DYE_RULES; i++) {
-    const r = rules[i];
-    if (!r) {
-      a.push(0, -1, 0, 0);
-      b.push(0, 0, 0, 0);
-      c.push(0, 0, 0, 0);
-      d.push(1, 0, 1, 0);
-      continue;
-    }
-    const mode = r.hueMode === 'keep' ? 0 : r.hueMode === 'abs' ? 1 : 2;
-    a.push(r.ref, r.band, r.sat[0], r.sat[1]);
-    b.push(r.sat[2], r.sat[3], r.val[0], r.val[1]);
-    c.push(r.val[2], r.val[3], r.hue, mode);
-    d.push(r.satMul, r.satAdd, r.valMul, r.valAdd);
-  }
-  return { a, b, c, d, n: rules.length };
-}
-
-/** Attach the dye hook to a material IN PLACE, recording a JSON-safe spec in
- *  userData: Material.clone() copies userData but silently DROPS
- *  onBeforeCompile (the worn_stone precedent), and tintedMaterial() clones
- *  again downstream of recolored(), so every clone site re-attaches from the
- *  spec it finds. */
-function attachArmorDye(mat: THREE.MeshStandardMaterial, dye: ArmorDyeSpec): void {
-  mat.userData.armorDye = {
-    rules: dye.rules.map((r) => ({ ...r, sat: [...r.sat], val: [...r.val] })),
-  };
-  // Compose with whatever hook the material may already carry (the
-  // surface-detail layer composes the same way from its side), and fold the
-  // previous program key in rather than clobbering it.
-  const prev = mat.onBeforeCompile;
-  const prevKey = typeof prev === 'function' ? prev.toString() : '';
-  const u = dyeUniforms(dye);
-  mat.onBeforeCompile = (shader, renderer) => {
-    prev?.call(mat, shader, renderer);
-    shader.uniforms.uDyeA = { value: u.a };
-    shader.uniforms.uDyeB = { value: u.b };
-    shader.uniforms.uDyeC = { value: u.c };
-    shader.uniforms.uDyeD = { value: u.d };
-    shader.uniforms.uDyeCount = { value: u.n };
-    shader.fragmentShader = shader.fragmentShader
-      .replace(
-        'void main() {',
-        `uniform vec4 uDyeA[${MAX_DYE_RULES}];
-uniform vec4 uDyeB[${MAX_DYE_RULES}];
-uniform vec4 uDyeC[${MAX_DYE_RULES}];
-uniform vec4 uDyeD[${MAX_DYE_RULES}];
-uniform int uDyeCount;
-vec3 wocRgb2Hsv(vec3 c) {
-  vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
-  vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
-  vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
-  float d = q.x - min(q.w, q.y);
-  float e = 1.0e-10;
-  return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
-}
-vec3 wocHsv2Rgb(vec3 c) {
-  vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-  vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-  return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
-}
-// The dye works in sRGB: diffuseColor is LINEAR after map_fragment, and the
-// zone selectors are calibrated against the atlases' sRGB values (a pale
-// gold that measures s=0.31 in sRGB reads s=0.57 in linear, selectors
-// written for one space silently miss in the other).
-vec3 wocLin2Srgb(vec3 c) { return pow(max(c, vec3(0.0)), vec3(1.0 / 2.2)); }
-vec3 wocSrgb2Lin(vec3 c) { return pow(max(c, vec3(0.0)), vec3(2.2)); }
-void main() {`,
-      )
-      .replace(
-        '#include <map_fragment>',
-        `#include <map_fragment>
-{
-  vec3 dyeSrgb = wocLin2Srgb(diffuseColor.rgb);
-  vec3 dyeHsv = wocRgb2Hsv(dyeSrgb);
-  float dyeHueDeg = dyeHsv.x * 360.0;
-  vec3 dyeOut = dyeSrgb;
-  for (int i = 0; i < ${MAX_DYE_RULES}; i++) {
-    if (i >= uDyeCount) break;
-    float dHue = mod(dyeHueDeg - uDyeA[i].x + 540.0, 360.0) - 180.0;
-    float w = 1.0 - smoothstep(uDyeA[i].y * 0.7, uDyeA[i].y, abs(dHue));
-    w *= smoothstep(uDyeA[i].z, uDyeA[i].w, dyeHsv.y) * (1.0 - smoothstep(uDyeB[i].x, uDyeB[i].y, dyeHsv.y));
-    w *= smoothstep(uDyeB[i].z, uDyeB[i].w, dyeHsv.z) * (1.0 - smoothstep(uDyeC[i].x, uDyeC[i].y, dyeHsv.z));
-    if (w > 0.001) {
-      float mode = uDyeC[i].w;
-      float h = mode < 0.5 ? dyeHueDeg : mode < 1.5 ? uDyeC[i].z : uDyeC[i].z + dHue;
-      vec3 dyed = wocHsv2Rgb(vec3(
-        mod(h, 360.0) / 360.0,
-        clamp(dyeHsv.y * uDyeD[i].x + uDyeD[i].y, 0.0, 1.0),
-        clamp(dyeHsv.z * uDyeD[i].z + uDyeD[i].w, 0.0, 1.0)));
-      dyeOut = mix(dyeOut, dyed, w);
-    }
-  }
-  diffuseColor.rgb = wocSrgb2Lin(dyeOut);
-}`,
-      );
-  };
-  // One key for every colorway (the GLSL is identical; only uniforms differ),
-  // with the PREVIOUS hook's source folded in so a dyed and an undyed armour
-  // material can never share a program.
-  mat.customProgramCacheKey = () => `woc_armor_dye|${prevKey}`;
-}
 
 function armorDyed(src: THREE.Material, dye: ArmorDyeSpec): THREE.Material {
   const mat = src.clone() as THREE.MeshStandardMaterial;
@@ -931,12 +970,21 @@ function recolored(
   while (recolorCache.size > RECOLOR_CACHE_MAX) {
     const oldestKey = recolorCache.keys().next().value as string | undefined;
     if (oldestKey === undefined) break;
-    const oldest = recolorCache.get(oldestKey);
     recolorCache.delete(oldestKey);
-    // Safe to drop: any live clone derived from one owns its own instance, and
-    // the only map any of these carries (the stubble decal's) is shared and
-    // owned by stubble.ts, Material.dispose() never touches a texture.
-    oldest?.dispose();
+    // NOT disposed, and the old dispose() here was a live-object bug the moment
+    // peers started composing. assembleModular assigns these instances straight
+    // onto the clone's meshes, so a cached material is SHARED by every character
+    // wearing that colour: evicting one while ten peers are drawn with it
+    // dropped the renderer's state for a material still in the scene, and it had
+    // to be re-initialized on the next frame.
+    //
+    // Dropping the reference alone is the whole job here, and it leaks nothing
+    // worth naming: these are colour-only clones that own no GPU buffer of their
+    // own (their textures belong to the source material, and to stubble.ts for
+    // the decal map), and the dye variant pins customProgramCacheKey to one
+    // string, so every dyed material in the game shares a single compiled
+    // program however many colourways are live. What is reclaimed on eviction is
+    // the JS object, once nothing on screen points at it.
   }
   return mat;
 }
@@ -964,7 +1012,10 @@ function attachStubbleDecal(root: THREE.Object3D, look: ModularLook): void {
   const decal = buildStubbleDecal(head, sel);
   // Sibling, not child: the head is skinned, so a child would inherit its
   // (bind-pose) transform on top of the skinning it already does.
-  if (decal) (head as THREE.SkinnedMesh).parent?.add(decal);
+  if (decal) {
+    markFaceDecal(decal);
+    (head as THREE.SkinnedMesh).parent?.add(decal);
+  }
 }
 
 /**
@@ -989,7 +1040,10 @@ function attachMakeupDecal(root: THREE.Object3D, look: ModularLook): void {
   });
   if (!head) return;
   const decal = buildMakeupDecal(head, sel);
-  if (decal) (head as THREE.SkinnedMesh).parent?.add(decal);
+  if (decal) {
+    markFaceDecal(decal);
+    (head as THREE.SkinnedMesh).parent?.add(decal);
+  }
 }
 
 /** Compose a modular character: pick parts, recolour skin/hair, attach weapons. */
@@ -999,7 +1053,9 @@ export function assembleModular(
   weaponItemId?: string | null,
   offhandItemId?: string | null,
 ): THREE.Object3D {
-  const root = cloneSkinned(modularVariant(def.url, modularPartNames(look.app, look.worn)));
+  const names = modularPartNames(look.app, look.worn);
+  const variant = modularVariant(def.url, names);
+  const root = cloneSkinned(variant.root);
   attachStubbleDecal(root, look);
   attachMakeupDecal(root, look);
   root.traverse((o) => {
@@ -1024,6 +1080,33 @@ export function assembleModular(
   });
   applyMorphs(root, look);
   attachAllProps(root, def, weaponItemId ?? null, null, false, offhandItemId ?? null);
+  // The far LOD's material slots, captured HERE and nowhere else, off the SAME
+  // filter (composedFarMeshes) the composed bake walks, so slot N here is group
+  // N there. Resolving by material NAME could not promise that: `mod_skin` is on
+  // both the head and the mouth's lip body, and a first-wins lookup could paint
+  // an entire distant body in lipstick.
+  //
+  // Captured AFTER attachAllProps on purpose, so the two walks see the same tree
+  // shape whichever order the caller assembles in. What makes the orders agree
+  // is composedFarMeshes dropping held props entirely: modularFarBake composes
+  // its throwaway with NO weapon ids, so its temp carries the class default
+  // while this root carries whatever this character actually equipped, and a
+  // held prop lands mid-traversal (under the bone root, which the GLB stores
+  // LAST, while mergeSkinnedParts appends the merged body after it). Counting
+  // props would therefore shift every merged group by the prop's mesh count and
+  // paint the armour and cloth in the material of the slot before it.
+  root.userData.farMaterials = composedFarMeshes(root).map((mesh) =>
+    Array.isArray(mesh.material) ? mesh.material[0] : mesh.material,
+  );
+  // Retain LAST, after every throw point above. attachAllProps throws for a
+  // streamed weapon GLB that has not landed yet, and that throw is a designed
+  // path: the fail-soft visual build catches it and the retry gate re-attempts
+  // on a cooldown. A retain taken before it leaked one ref per attempt with no
+  // dispose ever running, which made the entry permanently unevictable: the
+  // precise failure the cap exists to prevent. Down here, a throw anywhere in
+  // assembly means no ref was ever taken, so there is nothing to leak.
+  root.userData.modularVariantKey = modularVariantKey(def.url, names);
+  variant.refs++;
   return root;
 }
 
@@ -1033,8 +1116,8 @@ export function assembleModular(
  * Safe to do on the shared-geometry clone: three copies `morphTargetInfluences`
  * per instance in Mesh.copy(), so two characters can wear different faces off
  * one buffer. That is the whole reason the face is morphs rather than a CPU
- * deform: a deform would mint a cache entry per slider position, and the
- * variant cache is never evicted.
+ * deform: a deform would mint a variant per slider position, turning a cache
+ * keyed by a discrete part set into one keyed by a continuous input.
  */
 function applyMorphs(root: THREE.Object3D, look: ModularLook): void {
   const want = morphInfluences(look.app);
@@ -1264,10 +1347,11 @@ export function setHeldOffhand(
 export function weaponSkinDisplayModel(skinId: string): THREE.Object3D | null {
   const url = weaponSkinModelUrl(skinId);
   if (!url) return null;
-  // Streamed skin not arrived yet (packaged iOS: the Armory prewarm starts
-  // microseconds after the stream pass): degrade to null, which the preview
-  // rig treats as unavailable, and kick the fetch. Throwing here lost the
-  // whole 29-skin warmup and could escape an ArmoryInspect click handler.
+  // Streamed skin not arrived yet: degrade to null, which the preview rig
+  // treats as unavailable, and kick the fetch. This used to guard a 29-skin
+  // warmup that ran microseconds after the stream pass; that warming is gone
+  // (docs/design/armory-preview-warming.md) and the guard now protects the
+  // CLICK path, where throwing would escape an ArmoryInspect handler.
   if (residentOrEnsure(url) === null) return null;
   const payload = flattenPropScene(cloneSkinned(resolvedGltf(url).scene));
   payload.traverse((o) => {
@@ -1306,10 +1390,17 @@ export function setWeaponsStowed(
 }
 
 // ---------------------------------------------------------------------------
-// Tinted material cache (shared across all instances; never disposed)
+// Tinted material cache (shared across all instances; claim-counted and
+// bounded, see tinted_material_cache_core.ts). Two visuals asking for the
+// same (source, tint, tier, atlases, role) still share one clone; a clone is
+// disposed only once nothing claims it (idle LRU overflow, or a profile
+// reset's retire-on-last-release), so eviction can never touch a material a
+// live mesh still mounts.
 // ---------------------------------------------------------------------------
 
-const matCache = new Map<string, THREE.Material>();
+const matCache = new TintedMaterialCache<THREE.Material>(TINTED_MATERIAL_IDLE_CACHE_MAX, (mat) =>
+  mat.dispose(),
+);
 const sourceMaterials = new WeakMap<THREE.Mesh, THREE.Material | THREE.Material[]>();
 const tintScratch = new THREE.Color();
 const lowReadabilityWhite = new THREE.Color(0xffffff);
@@ -1334,6 +1425,8 @@ function applyLowReadabilityLift(
 function applyWeaponMaterialPolish(
   mat: THREE.MeshStandardMaterial | THREE.MeshLambertMaterial | THREE.MeshBasicMaterial,
 ): void {
+  // Colorless sources never reach here: tintedMaterial returns them unchanged
+  // before cloning, so every mat this helper sees carries a color.
   mat.color.lerp(weaponHighlight, 0.08);
   const std = mat as THREE.MeshStandardMaterial;
   if (std.isMeshStandardMaterial) {
@@ -1360,6 +1453,27 @@ function applyWeaponMaterialPolish(
   }
 }
 
+/**
+ * A lease of shared tinted-material cache keys. A material sweep passes its
+ * visual's lease so every cache entry it mounts stays claimed (pinned against
+ * eviction) until the visual releases the lease via releaseTintedMaterials
+ * (on the next full re-apply sweep, and at dispose). The set also makes
+ * claims idempotent per lease: a sweep meeting the same source material on
+ * several meshes claims its key once.
+ *
+ * A caller that passes NO lease (tests, tools) still shares the memoized
+ * clone, but its entry stays evictable: never mount a leaseless result on a
+ * long-lived mesh.
+ */
+export type TintedMaterialClaims = Set<string>;
+
+/** Release one lease's claims (see TintedMaterialClaims). Keys the cache no
+ *  longer tracks are a refused no-op, so a double release cannot underflow
+ *  another visual's pin. */
+export function releaseTintedMaterials(claims: Iterable<string>): void {
+  for (const key of claims) matCache.release(key);
+}
+
 export function tintedMaterial(
   src: THREE.Material,
   tint: number | null,
@@ -1367,12 +1481,48 @@ export function tintedMaterial(
   skinTex: THREE.Texture | null = null,
   emisTex: THREE.Texture | null = null,
   role: MaterialRole = 'body',
+  claims: TintedMaterialClaims | null = null,
 ): THREE.Material {
+  // A source with no color property (the weapon-skin fresnel shell's
+  // ShaderMaterial) has nothing this factory can tint, lift, or polish.
+  // Return it unchanged: cloning would detach the rig's live uniform handles
+  // (its per-frame uTime/uStr writes would land on a material nothing
+  // renders), and caching that clone would strand it forever.
+  if (!(src as THREE.MeshStandardMaterial).color) return src;
   const key = `${src.uuid}|${tint ?? 'n'}|${tint === null ? 0 : strength}|${GFX.standardMaterials ? 's' : 'l'}|${skinTex ? skinTex.uuid : 'n'}|${emisTex ? emisTex.uuid : 'n'}|${role}`;
-  const cached = matCache.get(key);
-  if (cached) return cached;
+  const build = () =>
+    buildTintedClone(src as THREE.MeshStandardMaterial, tint, strength, skinTex, emisTex, role);
+  if (claims) {
+    if (claims.has(key)) {
+      // This lease already claimed the key (the same source material on an
+      // earlier mesh of the sweep): serve the held clone without a second
+      // claim, keeping claims and releases exactly paired per lease.
+      const held = matCache.peek(key);
+      if (held) return held;
+    }
+    claims.add(key);
+    return matCache.claim(key, build);
+  }
+  // Leaseless: share the memo and stay warm, but hold no claim (claim then
+  // release parks the entry at the idle tail). Every production mount path
+  // leases; see TintedMaterialClaims.
+  const mat = matCache.claim(key, build);
+  matCache.release(key);
+  return mat;
+}
 
-  const s = src as THREE.MeshStandardMaterial;
+/** The tinted-clone derivation: a pure function of its arguments plus the
+ *  static graphics tier, which is why an evicted cache entry rebuilds
+ *  identically on the next request (see tinted_material_cache_core.ts). */
+function buildTintedClone(
+  s: THREE.MeshStandardMaterial,
+  tint: number | null,
+  strength: number,
+  skinTex: THREE.Texture | null,
+  emisTex: THREE.Texture | null,
+  role: MaterialRole,
+): THREE.Material {
+  const src: THREE.Material = s;
   let mat: THREE.MeshStandardMaterial | THREE.MeshLambertMaterial | THREE.MeshBasicMaterial;
   if (GFX.standardMaterials) {
     mat = s.clone();
@@ -1400,7 +1550,7 @@ export function tintedMaterial(
     if ((src as THREE.MeshBasicMaterial).isMeshBasicMaterial) {
       mat = (src as THREE.MeshBasicMaterial).clone();
     } else {
-      // low tier: Lambert with the same texture map — no PBR, no rim
+      // low tier: Lambert with the same texture map (no PBR, no rim)
       mat = new THREE.MeshLambertMaterial({
         map: s.map ?? null,
         color: s.color ? s.color.clone() : new THREE.Color(0xffffff),
@@ -1421,7 +1571,7 @@ export function tintedMaterial(
     }
   }
   if (tint !== null) {
-    // subtle pull toward the template color — hard multiplies turn the
+    // subtle pull toward the template color: hard multiplies turn the
     // hand-painted textures muddy
     mat.color.lerp(tintScratch.set(tint), strength);
   }
@@ -1446,7 +1596,6 @@ export function tintedMaterial(
     std.roughness = Math.min(Math.max(std.roughness, 0.55), 0.9);
   }
   if (!GFX.standardMaterials) applyLowReadabilityLift(mat, role);
-  matCache.set(key, mat);
   return mat;
 }
 
@@ -1456,13 +1605,17 @@ function tintFor(def: VisualDef, entityColor: number): number | null {
 }
 
 /** Swap every mesh material in an assembled clone for the shared tinted
- *  (and tier-appropriate) variant. Returns nothing — mutates the clone. */
+ *  (and tier-appropriate) variant. Returns nothing, mutates the clone. Pass
+ *  the owning visual's `claims` lease so every mounted cache entry stays
+ *  pinned against eviction until the visual releases it (see
+ *  TintedMaterialClaims). */
 export function applyMaterials(
   root: THREE.Object3D,
   def: VisualDef,
   entityColor: number,
   skinTex: THREE.Texture | null = null,
   emisTex: THREE.Texture | null = null,
+  claims: TintedMaterialClaims | null = null,
 ): void {
   const tint = tintFor(def, entityColor);
   const strength = def.tintStrength ?? DEFAULT_TINT_STRENGTH;
@@ -1490,9 +1643,11 @@ export function applyMaterials(
     const sk = skinTex && mesh.userData.bodyMesh ? skinTex : null;
     const em = emisTex && mesh.userData.bodyMesh ? emisTex : null;
     if (Array.isArray(source)) {
-      mesh.material = source.map((m) => tintedMaterial(m, materialTint, strength, sk, em, role));
+      mesh.material = source.map((m) =>
+        tintedMaterial(m, materialTint, strength, sk, em, role, claims),
+      );
     } else {
-      mesh.material = tintedMaterial(source, materialTint, strength, sk, em, role);
+      mesh.material = tintedMaterial(source, materialTint, strength, sk, em, role, claims);
     }
   });
 }
@@ -1510,11 +1665,20 @@ export function tintedFarMaterials(
   isBody: boolean[],
   skinTex: THREE.Texture | null = null,
   emisTex: THREE.Texture | null = null,
+  claims: TintedMaterialClaims | null = null,
 ): THREE.Material[] {
   const tint = tintFor(def, entityColor);
   const strength = def.tintStrength ?? DEFAULT_TINT_STRENGTH;
   return srcMats.map((m, i) =>
-    tintedMaterial(m, tint, strength, isBody[i] ? skinTex : null, isBody[i] ? emisTex : null),
+    tintedMaterial(
+      m,
+      tint,
+      strength,
+      isBody[i] ? skinTex : null,
+      isBody[i] ? emisTex : null,
+      'body',
+      claims,
+    ),
   );
 }
 
@@ -1546,12 +1710,34 @@ export interface PreparedVisual {
 
 const prepared = new Map<string, PreparedVisual>();
 
-/** Drop profile-derived character templates/materials while retaining loaded source assets. */
+/** Drop profile-derived character templates/materials while retaining loaded
+ *  source assets. The tinted-material cache resets rather than clears: idle
+ *  clones dispose now, and any clone a not-yet-torn-down visual still mounts
+ *  is retired to dispose on that visual's release instead of leaking (see
+ *  tinted_material_cache_core.ts). In the graphics-rebuild flow every visual
+ *  is already disposed before this runs, so normally everything disposes
+ *  here. */
 export function resetCharacterProfileCaches(): void {
   optimizedSceneCache.clear();
-  matCache.clear();
+  matCache.reset();
   prepared.clear();
 }
+
+// The two paladin attack clips synthesized at prepare time rather than baked
+// into a GLB, keyed to the source clip each derives from. Both the classic and
+// the modular paladin play them (the modular def mirrors the class clip map),
+// so prepareVisual synthesizes for both keys, and the modular clip-resolution
+// test resolves these names through their sources.
+export const PALADIN_SYNTHESIZED_CLIP_SOURCES: Readonly<Record<string, string>> = {
+  [PALADIN_TEMPLARS_VERDICT_CLIP]: '2H_Melee_Attack_Chop',
+  [PALADIN_BASTION_SWEEP_CLIP]: '1H_Melee_Attack_Slice_Diagonal',
+};
+
+/** Test-only observation window into the shared tinted-material cache. */
+export const tintedMaterialInternalsForTest = {
+  cacheSize: (): number => matCache.size,
+  cacheIdleSize: (): number => matCache.idleSize,
+};
 
 export function prepareVisual(key: string): PreparedVisual {
   const hit = prepared.get(key);
@@ -1564,6 +1750,19 @@ export function prepareVisual(key: string): PreparedVisual {
   for (const clip of gltf.animations) clips.set(clip.name, clip);
   for (const url of def.animUrls ?? []) {
     for (const clip of resolvedGltf(url).animations) clips.set(clip.name, clip);
+  }
+  // The modular paladin mirrors the classic clip map (attackByAbility includes
+  // the synthesized Verdict and Sweep names), so it needs the same synthesis:
+  // its animUrls lead with the class GLB, which supplies both source clips.
+  if (key === 'player_paladin' || key === modularVisualKey('paladin')) {
+    const verdictBase = clips.get(PALADIN_SYNTHESIZED_CLIP_SOURCES[PALADIN_TEMPLARS_VERDICT_CLIP]);
+    if (!verdictBase) throw new Error('Paladin Templar Verdict requires 2H_Melee_Attack_Chop');
+    clips.set(PALADIN_TEMPLARS_VERDICT_CLIP, createPaladinTemplarsVerdictClip(verdictBase));
+    const sweepBase = clips.get(PALADIN_SYNTHESIZED_CLIP_SOURCES[PALADIN_BASTION_SWEEP_CLIP]);
+    if (!sweepBase) {
+      throw new Error('Paladin Bastion Sweep requires 1H_Melee_Attack_Slice_Diagonal');
+    }
+    clips.set(PALADIN_BASTION_SWEEP_CLIP, createPaladinBastionSweepClip(sweepBase));
   }
 
   // Pose a throwaway clone mid-idle, measure it, and bake the static mesh.
@@ -1638,7 +1837,12 @@ export function prepareVisual(key: string): PreparedVisual {
     .multiply(new THREE.Matrix4().makeRotationY(def.yaw ?? 0))
     .multiply(new THREE.Matrix4().makeScale(normScale, normScale, normScale));
 
-  const { geo, mats, isBody } = bakeStaticPose(temp, norm);
+  const { geo, mats, isBody } = bakeStaticPose(norm, farBakeMeshes(temp));
+  // The throwaway retained a variant when the def is modular (assembleModular
+  // retains every clone it makes). It exists only to be measured and flattened,
+  // so give it back rather than pinning one part set per modular key forever
+  // and reading the live count one high.
+  releaseModularVariant(temp);
 
   const prep: PreparedVisual = {
     key,
@@ -1655,6 +1859,196 @@ export function prepareVisual(key: string): PreparedVisual {
   return prep;
 }
 
+/** A composed body's baked far LOD: the same single-draw idle-pose mesh
+ *  prepareVisual bakes for a fixed rig, but taken off THIS part set.
+ *
+ *  It carries no materials. The geometry is shared by every character with this
+ *  part set while the COLOURS are per character, so group N is resolved against
+ *  the character's own `userData.farMaterials[N]`: captured in assembleModular
+ *  off a clone of the same variant walked by the same filter, which is what
+ *  makes the two orders one list. Resolving by material NAME could not promise
+ *  that: `mod_skin` is on both the head and the mouth's lip body, so a
+ *  first-wins lookup could paint a whole distant body in lipstick. */
+export interface ModularFarBake {
+  geo: THREE.BufferGeometry;
+  /** One entry per geometry group: whether that group is the character's own
+   *  body, the distinction applyMaterials uses to gate the skin override. */
+  isBody: boolean[];
+}
+
+/** An already-minted far bake for this key + look, or null (WITHOUT baking).
+ *  The cheap arm of the budgeted far path: a character whose part set was
+ *  already baked (by anyone sharing the look) assembles its far mesh for the
+ *  cost of the material tint alone, so only genuinely new part sets compete
+ *  for the per-frame bake budget below. Never mints a variant: a peek that
+ *  composed would be the cost it exists to avoid. */
+export function peekModularFarBake(key: string, look: ModularLook): ModularFarBake | null {
+  const def = VISUALS[key];
+  if (!def?.modular) return null;
+  const entry = modularVariantCache.get(
+    modularVariantKey(def.url, modularPartNames(look.app, look.worn)),
+  );
+  return entry?.far ?? null;
+}
+
+// The composed far bake is real synchronous work (a full compose, a mixer
+// step, a static rebake), and setFar drives it on the crossing EDGE, so a
+// camera riding away from a capital used to flip every composed peer to far in
+// one frame and pay for every distinct unbaked part set in that frame. The
+// budget spreads the mint: at most one bake per window, everyone else stays
+// articulated (correct, just not yet cheap) and retries from their per-frame
+// update until a slot frees. Cached bakes bypass it entirely via the peek
+// above, so a crowd sharing looks drains in a frame or two.
+let lastFarBakeAtMs = Number.NEGATIVE_INFINITY;
+/** One bake per ~2 frames at 60 Hz: long enough that a burst cannot own a
+ *  frame, short enough that a 20-look crowd finishes inside a second. */
+const FAR_BAKE_MIN_INTERVAL_MS = 30;
+
+/** Claim the current bake slot, or false to retry next frame. */
+export function takeFarBakeBudget(): boolean {
+  const now = performance.now();
+  if (now - lastFarBakeAtMs < FAR_BAKE_MIN_INTERVAL_MS) return false;
+  lastFarBakeAtMs = now;
+  return true;
+}
+
+/**
+ * The far-LOD bake for a COMPOSED body, minted once per part set.
+ *
+ * WHY THIS EXISTS. prepareVisual bakes one idle-pose mesh per visual KEY, from
+ * `assembleModel(def)` with no look, which falls through to DEFAULT_LOOK. That
+ * was harmless while only the local player composed, because the local player
+ * never crosses into the far band. Peers do, constantly: the band starts around
+ * 58yd and pulls IN toward ~35yd exactly when a crowd makes it matter. Without
+ * this, every composed peer changed gender, hair and outfit as they crossed it.
+ *
+ * WHAT IT SHARES AND WHAT IT DOES NOT. The geometry is keyed by part set, so a
+ * hundred players in a hundred colourways with the same haircut share one baked
+ * mesh; the materials are resolved per character from their own composed body.
+ * Face and body SLIDERS are therefore not in the silhouette: two characters
+ * with the same parts and different cheekbones bake to one mesh. That is a
+ * millimetre of jaw at 35+ yards, against a per-slider mesh being a cache keyed
+ * on a continuous input (the reason the face is morphs at all; see applyMorphs).
+ *
+ * Returns null for a non-modular def, or a look that bakes to nothing.
+ */
+export function modularFarBake(key: string, look: ModularLook): ModularFarBake | null {
+  const prep = prepareVisual(key);
+  const def = prep.def;
+  if (!def.modular) return null;
+  const variant = modularVariant(def.url, modularPartNames(look.app, look.worn));
+  if (variant.far) return variant.far;
+
+  // Pose a throwaway composed clone mid-idle and bake it, exactly as
+  // prepareVisual does for a fixed rig. The clone is released immediately: it
+  // exists only to be flattened, and holding a ref would pin the part set.
+  const temp = assembleModular(def, look);
+  const idle = prep.clips.get(def.clips.idle);
+  if (idle) {
+    const mixer = new THREE.AnimationMixer(temp);
+    mixer.clipAction(idle).play();
+    mixer.update(Math.min(0.5, idle.duration * 0.5));
+    temp.updateMatrixWorld(true);
+    temp.traverse((o) => {
+      const sm = o as THREE.SkinnedMesh;
+      if (sm.isSkinnedMesh) sm.skeleton.update();
+    });
+    mixer.stopAllAction();
+    mixer.uncacheRoot(temp);
+  } else {
+    temp.updateMatrixWorld(true);
+  }
+  // The SAME normalization the key's near model is placed with (modelWrap reads
+  // prep.normScale/yOffset/yaw), so the far mesh lands in the identical spot and
+  // the swap is a change of detail rather than of pose.
+  const norm = new THREE.Matrix4()
+    .makeTranslation(0, prep.yOffset, 0)
+    .multiply(new THREE.Matrix4().makeRotationY(def.yaw ?? 0))
+    .multiply(new THREE.Matrix4().makeScale(prep.normScale, prep.normScale, prep.normScale));
+  const { geo, isBody } = bakeStaticPose(norm, composedFarMeshes(temp));
+  // Pin the entry across the handover. Giving the throwaway's ref back can drop
+  // this variant to zero live clones, and a release at zero sweeps: without the
+  // pin the sweep could evict the very entry the bake is about to be written to,
+  // leaving the bake attached to an orphan (never cached, never freed). Pinning
+  // first keeps refs above zero through the release, so no sweep runs, and the
+  // unpin below leaves the entry idle for the next sweep to judge normally.
+  variant.refs++;
+  releaseModularVariant(temp);
+  variant.far = geo ? { geo, isBody } : null;
+  variant.refs--;
+  return variant.far;
+}
+
+/** Tag an attached face decal so the far-LOD passes skip it. Decals vary WITHIN
+ *  a part set (buzz and bald pick the same nodes; the decal is the only thing
+ *  that tells them apart), so counting them would break the one guarantee the
+ *  far bake rests on: that the bake's group order and the character's captured
+ *  material order are the same list. They are also face detail nobody can see
+ *  from 35 yards. */
+function markFaceDecal(decal: THREE.Object3D): void {
+  decal.userData.faceDecal = true;
+  decal.traverse((o) => {
+    o.userData.faceDecal = true;
+  });
+}
+
+/** The meshes a far-LOD bake flattens, in traversal order. Face decals are out
+ *  (they vary WITHIN a part set: buzz and bald pick the same nodes and only the
+ *  decal tells them apart, so counting them would break the order guarantee),
+ *  as is anything hidden or without positions.
+ *
+ *  This arm keeps held props, and prepareVisual's fixed-rig bake is its only
+ *  caller: that bake reads its materials back out of the SAME walk, so it is
+ *  self-consistent whatever it collects, and weapons are gameplay-readable
+ *  silhouettes worth carrying into the distance. */
+function farBakeMeshes(root: THREE.Object3D): THREE.Mesh[] {
+  const out: THREE.Mesh[] = [];
+  root.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (!mesh.isMesh || mesh.userData.faceDecal) return;
+    if (!meshChainVisible(mesh, root)) return;
+    if (!mesh.geometry?.getAttribute('position')) return;
+    out.push(mesh);
+  });
+  return out;
+}
+
+/** The meshes a COMPOSED far-LOD bake flattens: farBakeMeshes minus held props.
+ *
+ *  ONE function, called from two places on purpose: modularFarBake walks it to
+ *  build the geometry groups, and assembleModular walks it to capture the
+ *  matching material slots. Two hand-written traversals that had to agree would
+ *  be a silent mis-colouring the day one of them changed.
+ *
+ *  Props are dropped rather than merely ordered around because the composed bake
+ *  is shared by PART SET and a part set says nothing about what anyone is
+ *  holding: modularFarBake composes its throwaway with no weapon ids, so its
+ *  temp wears the class default while the characters resolving materials
+ *  against it wear whatever they equipped. Keeping props would mean baking one
+ *  player's sword into every peer who shares their haircut, on top of shifting
+ *  every group after it. Exported for the test that pins the two walks to one
+ *  list. */
+export function composedFarMeshes(root: THREE.Object3D): THREE.Mesh[] {
+  return farBakeMeshes(root).filter((mesh) => !mesh.userData.weaponMesh);
+}
+
+/** This composed body's far-LOD material slots, in bake-group order (captured by
+ *  assembleModular). Padded to `count` so a mismatch can never leave a group
+ *  without a material rather than mis-colouring one, and loud about it in dev:
+ *  the pad is a fail-soft, and a length that does not match means the two walks
+ *  have drifted and everything past the drift is drawing the wrong colour. */
+export function farSourceMaterials(root: THREE.Object3D, count: number): THREE.Material[] {
+  const slots = (root.userData.farMaterials as THREE.Material[] | undefined) ?? [];
+  if (import.meta.env?.DEV && slots.length > 0 && slots.length !== count) {
+    console.warn(
+      `[modular] far bake wants ${count} material slots, the composed body captured ${slots.length}; the two far walks have drifted`,
+    );
+  }
+  return Array.from({ length: count }, (_, i) => slots[i] ?? FAR_MATERIAL_FALLBACK);
+}
+
+const FAR_MATERIAL_FALLBACK = new THREE.MeshStandardMaterial();
+
 function meshChainVisible(o: THREE.Object3D, stopAt: THREE.Object3D): boolean {
   let cur: THREE.Object3D | null = o;
   while (cur) {
@@ -1668,8 +2062,8 @@ function meshChainVisible(o: THREE.Object3D, stopAt: THREE.Object3D): boolean {
 /** Bake every visible mesh of a posed clone into one static BufferGeometry
  *  (skinned verts via applyBoneTransform), normalized into world units. */
 function bakeStaticPose(
-  root: THREE.Object3D,
   norm: THREE.Matrix4,
+  meshes: THREE.Mesh[],
 ): { geo: THREE.BufferGeometry | null; mats: THREE.Material[]; isBody: boolean[] } {
   const geos: THREE.BufferGeometry[] = [];
   const mats: THREE.Material[] = [];
@@ -1677,12 +2071,13 @@ function bakeStaticPose(
   const v = new THREE.Vector3();
   const full = new THREE.Matrix4();
 
-  root.traverse((o) => {
-    const mesh = o as THREE.Mesh;
-    if (!mesh.isMesh || !meshChainVisible(mesh, root)) return;
+  // The caller passes the walk, so which filter a bake belongs to is decided at
+  // the one place that also knows where its materials come from: the composed
+  // bake is handed composedFarMeshes, the same list assembleModular captured its
+  // slots from, and group N here is slot N there.
+  for (const mesh of meshes) {
     const srcGeo = mesh.geometry;
     const srcPos = srcGeo.getAttribute('position') as THREE.BufferAttribute;
-    if (!srcPos) return;
     const out = new THREE.BufferGeometry();
     const baked = new Float32Array(srcPos.count * 3);
     const skinned = (mesh as unknown as THREE.SkinnedMesh).isSkinnedMesh
@@ -1714,7 +2109,7 @@ function bakeStaticPose(
     // GLTFLoader emits one Mesh per primitive — materials are never arrays here
     mats.push(Array.isArray(mesh.material) ? mesh.material[0] : mesh.material);
     isBody.push(!!mesh.userData.bodyMesh);
-  });
+  }
 
   if (geos.length === 0) return { geo: null, mats: [], isBody: [] };
   // uv presence must agree for merging — drop uvs entirely if any geo lacks them

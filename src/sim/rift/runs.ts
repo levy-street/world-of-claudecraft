@@ -35,6 +35,7 @@ import { cancelProfessionSessionOnDisplacement } from '../professions/session_te
 import type { SimContext } from '../sim_context';
 import { DT, dist2d, type Entity, type Vec3 } from '../types';
 import { isInWaterBody } from '../world';
+import { riftFx } from './fx';
 import { closeNaturalRiftPortal, RIFT_MIN_LEVEL, RIFT_TIER_INFO } from './portals';
 import { addRiftClearGearLoot, addRiftProgressionLoot } from './progression';
 import { claimRiftFirstClear, markRiftEventActive } from './race';
@@ -73,21 +74,6 @@ const PLAYER_BODY_R = 0.6;
 const ROLLER_HIT_COOLDOWN = 0.6; // seconds between rolling-boulder hits on one player
 const ROLLER_KB_SIDE = 3.2; // sideways shove (to the aisle) when a boulder bowls you over
 const ROLLER_KB_FWD = 1.4; // forward nudge along the boulder's travel
-
-/** Play a themed impact VFX at a WORLD spot for every interactive rift moment (the
- * ice-slide launch, a boulder shove, a rune flare, a lava burn, a roller wallop). It
- * reuses the already-wired `spellfxAt` world event, so it interest-scopes to everyone
- * in the instance and renders on all three hosts with no new event/wire surface. It
- * is render-only (draws no rng, touches no sim state), so it is determinism-safe. */
-function riftFx(
-  ctx: SimContext,
-  x: number,
-  z: number,
-  school: string,
-  fx: 'burst' | 'nova' = 'burst',
-): void {
-  ctx.emit({ type: 'spellfxAt', x, z, school, fx });
-}
 
 /** Whether an instance-local point sits on this floor's ice sheet. */
 function inIceZone(
@@ -428,6 +414,20 @@ function dropObjects(ctx: SimContext, ids: number[]): void {
   }
 }
 
+/** Cancel every pending lethal death zone and tell online mirrors to drop
+ * theirs too. The sim-side clears (boss death, boss evade, floor teardown)
+ * are otherwise invisible to ClientWorld, which counts zones down locally
+ * from riftDeathZoneSpawn and would keep strobing a phantom "about to
+ * detonate" telegraph for the rest of the fuse. Personal events per instance
+ * member so delivery never depends on interest radius; draws no rng. */
+export function clearRiftBossDeathZones(ctx: SimContext, inst: RiftInstance): void {
+  if (inst.bossDeathZones.length === 0) return;
+  inst.bossDeathZones = [];
+  for (const pid of instancePlayerIds(ctx, inst)) {
+    ctx.emit({ type: 'riftDeathZoneClear', pid });
+  }
+}
+
 function freeRiftFloorEntities(ctx: SimContext, inst: RiftInstance): void {
   for (const id of inst.mobIds) {
     if (!ctx.entities.has(id)) continue;
@@ -467,7 +467,7 @@ function freeRiftFloorEntities(ctx: SimContext, inst: RiftInstance): void {
   inst.minibossId = null;
   inst.orbId = null;
   inst.orbActive = false;
-  inst.bossDeathZones = [];
+  clearRiftBossDeathZones(ctx, inst);
   // A floor's mobs are torn down here (descendRift, or a full teardown below):
   // any remembered mid-combat exit still holding their ids can never resolve
   // again once IDs are freed, but the map is inert only because `nextId` is
@@ -740,6 +740,7 @@ export function enterRift(
   p.autoAttack = false;
   inst.emptyFor = 0;
   emitRiftState(ctx, r.meta.entityId, inst, true);
+  riftFx(ctx, p.pos.x, p.pos.z, 'arcane', 'burst', 'rift_portal_enter', r.meta.entityId);
   ctx.emit({
     type: 'log',
     text: `You step through the rift into ${floor.name}.`,
@@ -966,7 +967,7 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
           p.riftSlideDirX = 0;
           p.riftSlideDirZ = 0;
           p.riftSliding = false;
-          riftFx(ctx, p.pos.x, p.pos.z, 'frost'); // spray as you skid to a halt
+          riftFx(ctx, p.pos.x, p.pos.z, 'frost', 'burst', 'rift_ice_stop'); // spray as you skid to a halt
         }
       } else if (onIce) {
         // Push off: capture the heading the moment the player drives on the ice.
@@ -977,7 +978,7 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
           p.riftSlideDirX = dx / moved;
           p.riftSlideDirZ = dz / moved;
           p.riftSliding = true;
-          riftFx(ctx, p.pos.x, p.pos.z, 'frost'); // frost spray kicks up as you launch
+          riftFx(ctx, p.pos.x, p.pos.z, 'frost', 'burst', 'rift_ice_start'); // frost spray kicks up as you launch
         }
       }
     } else if ((p.riftSlideDirX ?? 0) !== 0 || (p.riftSlideDirZ ?? 0) !== 0 || p.riftSliding) {
@@ -1127,7 +1128,7 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
           const gate = inst.gateId !== null ? ctx.entities.get(inst.gateId) : null;
           if (gate) gate.templateId = 'rift_gate_open';
           riftFx(ctx, orb.pos.x, orb.pos.z, 'fire', 'nova');
-          if (gate) riftFx(ctx, gate.pos.x, gate.pos.z, 'holy', 'nova');
+          if (gate) riftFx(ctx, gate.pos.x, gate.pos.z, 'holy', 'nova', 'rift_gate_grind');
           for (const pid of instancePlayerIds(ctx, inst)) {
             ctx.emit({
               type: 'log',
@@ -1148,7 +1149,7 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
         const gate = inst.gateId !== null ? ctx.entities.get(inst.gateId) : null;
         if (gate) gate.templateId = 'rift_gate_open';
         riftFx(ctx, sw.pos.x, sw.pos.z, 'arcane', 'nova');
-        if (gate) riftFx(ctx, gate.pos.x, gate.pos.z, 'holy', 'nova');
+        if (gate) riftFx(ctx, gate.pos.x, gate.pos.z, 'holy', 'nova', 'rift_gate_grind');
         for (const pid of instancePlayerIds(ctx, inst)) {
           ctx.emit({ type: 'log', text: 'The gate grinds open.', color: '#adf', pid });
         }
@@ -1534,8 +1535,27 @@ function tickRiftHazards(
       riftRankForBaseLevel(inst.baseLevel) === 'S'
         ? p.hp + p.maxHp
         : Math.max(1, Math.round(p.maxHp * 0.06 * (tier === 'deep' ? 2 : 1)));
-    ctx.dealDamage(null, p, dmg, false, 'fire', 'Molten Rift', 'hit', true);
-    riftFx(ctx, p.pos.x, p.pos.z, 'fire'); // flames lick up as the lava sears you (1 Hz)
+    // Stable 'rift_hazard_molten' abilityId (last positional arg) is what
+    // combat_sfx.ts's RIFT_HAZARD_ABILITY_IDS keys the impact-suppression set
+    // off of, not the 'Molten Rift' display label above, so a display-only
+    // rename can never silently reintroduce the doubled impact cue (review
+    // finding on PR #2687).
+    ctx.dealDamage(
+      null,
+      p,
+      dmg,
+      false,
+      'fire',
+      'Molten Rift',
+      'hit',
+      true,
+      undefined,
+      true,
+      false,
+      false,
+      'rift_hazard_molten',
+    );
+    riftFx(ctx, p.pos.x, p.pos.z, 'fire', 'burst', 'rift_lava_tick'); // flames lick up as the lava sears you (1 Hz)
   }
 }
 
@@ -1586,6 +1606,9 @@ function tickRiftRollers(
       p.pos = ctx.groundPos(dest.x, dest.z);
       p.prevPos = { ...p.pos };
       ctx.rebucket(p);
+      // Same stable-id contract as the Molten Rift hazard above: the
+      // 'rift_hazard_boulder' abilityId, not the 'Rolling Boulder' label, is
+      // what combat_sfx.ts keys the impact-suppression set off of.
       ctx.dealDamage(
         null,
         p,
@@ -1595,8 +1618,13 @@ function tickRiftRollers(
         'Rolling Boulder',
         'hit',
         true,
+        undefined,
+        true,
+        false,
+        false,
+        'rift_hazard_boulder',
       );
-      riftFx(ctx, p.pos.x, p.pos.z, 'physical', 'nova'); // a heavy dusty wallop as it bowls you
+      riftFx(ctx, p.pos.x, p.pos.z, 'physical', 'nova', 'rift_boulder_impact'); // a heavy dusty wallop as it bowls you
     }
   }
 }
@@ -1654,7 +1682,7 @@ export function liftRiftEntities(ctx: SimContext): void {
 export function tickRiftBossDeathZones(ctx: SimContext): void {
   for (const inst of ctx.riftInstances) {
     if (inst.partyKey === null || inst.bossDeathZones.length === 0) continue;
-    const live: Array<{ x: number; z: number; radius: number; remaining: number }> = [];
+    const live: typeof inst.bossDeathZones = [];
     for (const zone of inst.bossDeathZones) {
       zone.remaining -= DT;
       if (zone.remaining > 0) {
@@ -1708,7 +1736,7 @@ export function updateRiftInstances(ctx: SimContext): void {
       // Clear any pending lethal death zones so a zone placed just before the
       // killing blow cannot execute the winning party. Symmetric with the evade
       // clear in locomotion.ts.
-      inst.bossDeathZones = [];
+      clearRiftBossDeathZones(ctx, inst);
     }
   }
   if (ctx.tickCount % 20 !== 0) return; // once a second

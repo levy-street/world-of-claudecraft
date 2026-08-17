@@ -105,7 +105,9 @@ export const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   emberwish_mote_of_the_dying_sun: 'VAR_WAND',
   meteorlatch_the_sky_s_last_judgment: 'VAR_CROSSBOW',
   starfall_judgment_of_the_heavens: 'VAR_MACE',
-  ice_fang: 'VAR_SWORD',
+  // A fang-shaped blade carries like a dagger, not a sword (the release's
+  // fang-weapons ruling; ported here when the grip tables moved).
+  ice_fang: 'VAR_DAGGER',
   glaciersplit: 'VAR_AXE',
   rimecrusher: 'VAR_MACE',
   frostbite: 'VAR_DAGGER',

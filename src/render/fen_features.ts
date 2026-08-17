@@ -44,10 +44,6 @@ for (const key of Object.keys(FEN_PROP_URLS) as FenPropKey[]) {
   );
 }
 
-export const fenFeaturesPreloadInternalsForTest = {
-  propUrls: Object.values(FEN_PROP_URLS),
-};
-
 interface Placement {
   x: number;
   y: number;

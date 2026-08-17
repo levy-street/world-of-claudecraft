@@ -29,6 +29,8 @@ import type { SimContext } from '../sim_context';
 import { addThreat, HEAL_THREAT_FACTOR } from '../threat';
 import type { Entity } from '../types';
 import { runWeaponProcs } from './equip_procs';
+import { BEACON_HEAL_FRACTION, BEACON_OF_LIGHT_NAME, beaconTransferTarget } from './paladin_beacon';
+import { paladinHealingDoneMultiplier } from './paladin_support';
 import { onSpellCrit } from './talent_procs';
 
 // Combined incoming-healing multiplier from Mortal Wound debuffs (classic
@@ -101,20 +103,36 @@ export function applyHeal(
   // can suppress either source of rng independently without bypassing normal
   // healing, threat, absorbs, or emitted combat text.
   canTriggerWeaponProcs = true,
+  // Beacon only copies an explicitly eligible direct-heal effect. Periodic,
+  // area, chained, proc, echoed, and self-heal paths keep the default false.
+  beaconTransferEligible = false,
+  // Copies of an already-resolved effective heal must not receive source/target
+  // multipliers a second time. They still use absorbs, overheal, threat, and events.
+  alreadyResolved = false,
+  // Out-param, last so the two flags above keep the positions their callers use.
+  resolution?: { resolved: number },
   // Returns the effective heal applied (post-crit, post-mult, post-overheal-clamp,
   // the same number emitted). Callers that ignore it are unaffected; Power Echo
   // reads it to repeat a direct heal at a fraction of the resolved amount.
 ): number {
   if (target.dead) return 0;
-  const crit = canCrit ? ctx.rng.chance(ctx.spellCrit(source)) : false;
-  let healed = Math.round(
-    amount *
-      (crit ? 1.5 + source.critDmgHealBonus : 1) *
-      hexOutputMult(ctx, source) *
-      healingTakenMult(ctx, target),
-  );
+  const crit = !alreadyResolved && canCrit ? ctx.rng.chance(ctx.spellCrit(source)) : false;
+  let healDone = 0;
+  for (const aura of source.auras) if (aura.kind === 'buff_heal_done') healDone += aura.value;
+  // An already-resolved copy skips EVERY source/target multiplier, healDone included.
+  let healed = alreadyResolved
+    ? Math.round(amount)
+    : Math.round(
+        amount *
+          (1 + healDone) *
+          (crit ? 1.5 + source.critDmgHealBonus : 1) *
+          paladinHealingDoneMultiplier(source) *
+          hexOutputMult(ctx, source) *
+          healingTakenMult(ctx, target),
+      );
   const beforeAbsorb = healed;
   healed = consumeHealAbsorb(ctx, target, healed);
+  if (resolution) resolution.resolved = healed;
   // How much a necrotic blight devoured. Carried on the event because a fully
   // absorbed heal also lands as amount 0, and the client must not read that as
   // "already at full health": the target can be at 30 percent and blighted.
@@ -146,7 +164,37 @@ export function applyHeal(
   // Legendary on-heal weapon procs (e.g. Deathless Heartwood's Lifebloom). No-op
   // (no rng draw) unless the healer wields a proc weapon with a heal proc.
   if (canTriggerWeaponProcs) runWeaponProcs(ctx, source, target, 'heal');
+  if (beaconTransferEligible) applyBeaconTransfer(ctx, source, target, healed);
   return healed;
+}
+
+function applyBeaconTransfer(
+  ctx: SimContext,
+  source: Entity,
+  healedTarget: Entity,
+  effectiveHeal: number,
+): void {
+  if (effectiveHeal <= 0) return;
+  const beacon = beaconTransferTarget(ctx, source, healedTarget);
+  if (!beacon) return;
+
+  let healed = Math.round(effectiveHeal * BEACON_HEAL_FRACTION * healingTakenMult(ctx, beacon));
+  healed = consumeHealAbsorb(ctx, beacon, healed);
+  const intended = healed;
+  healed = Math.min(healed, beacon.maxHp - beacon.hp);
+  if (healed <= 0) return;
+  beacon.hp += healed;
+  const overheal = intended - healed;
+  ctx.emit({
+    type: 'heal2',
+    sourceId: source.id,
+    targetId: beacon.id,
+    amount: healed,
+    crit: false,
+    ability: BEACON_OF_LIGHT_NAME,
+    ...(overheal > 0 ? { overheal } : {}),
+  });
+  healingThreat(ctx, source, beacon, healed);
 }
 
 // Classic healing threat: 0.5 per point of EFFECTIVE healing (overheal is

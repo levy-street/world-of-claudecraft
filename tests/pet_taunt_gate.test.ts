@@ -5,10 +5,8 @@ import { petCanForceTaunt } from '../src/sim/pet/pet_taunt_gate';
 // the passive AI (pet_ai.ts), and the HUD pet bar (hud.ts) all read, so a ranged
 // pet's Growl/taunt control can never disagree with what the sim actually allows.
 describe('petCanForceTaunt', () => {
-  it('is false for every petRanged warlock pet (Emberkin, Spellhound, Wraithborn)', () => {
+  it('is false for the ranged Warlock pet Emberkin', () => {
     expect(petCanForceTaunt('emberkin')).toBe(false);
-    expect(petCanForceTaunt('spellhound')).toBe(false);
-    expect(petCanForceTaunt('wraithborn')).toBe(false);
   });
 
   it('is false for the explicitly flagged mage Water Elemental', () => {

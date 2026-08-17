@@ -3,11 +3,28 @@ import { MAX_LEVEL } from '../src/sim/types';
 import {
   buildDevCommand,
   DEV_COMMAND_ACTIONS,
+  devCategoryVisible,
   filteredDevActions,
   isDevGuiCommand,
 } from '../src/ui/dev_command_view';
 
 describe('developer command view', () => {
+  it('builds the BIS-20 kit command with the same optional-spec contract as the fresh kit', () => {
+    expect(buildDevCommand('biskit', { bisSpec: '' })).toBe('/dev bis');
+    expect(buildDevCommand('biskit', { bisSpec: 'protection' })).toBe('/dev bis protection');
+    // Token-gated like every other field: an injection-shaped value never ships.
+    expect(buildDevCommand('biskit', { bisSpec: 'prot; /dev gold 999' })).toBe('/dev bis');
+  });
+
+  it('shows the Spawns tab only to admin accounts', () => {
+    expect(devCategoryVisible('spawns', true)).toBe(true);
+    expect(devCategoryVisible('spawns', false)).toBe(false);
+    // Every other tab is unaffected by the admin flag.
+    for (const category of ['player', 'inventory', 'progress', 'travel', 'scenarios'] as const) {
+      expect(devCategoryVisible(category, false)).toBe(true);
+    }
+  });
+
   it('recognizes only the exact GUI command', () => {
     expect(isDevGuiCommand('/dev gui')).toBe(true);
     expect(isDevGuiCommand('  /DEV GUI  ')).toBe(true);
@@ -36,11 +53,12 @@ describe('developer command view', () => {
     expect(filteredDevActions('spawns', 'selected', searchCopy).map((action) => action.id)).toEqual(
       ['killtarget', 'despawntarget'],
     );
-    // give, kit, gold. Named rather than counted so a future add says WHICH action
-    // appeared instead of just moving a number.
+    // give, kit, biskit, gold. Named rather than counted so a future add says WHICH
+    // action appeared instead of just moving a number.
     expect(filteredDevActions('inventory', '').map((action) => action.id)).toEqual([
       'give',
       'kit',
+      'biskit',
       'gold',
     ]);
   });

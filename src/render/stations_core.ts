@@ -23,14 +23,6 @@ import { STATION_PROP_CLUSTERS as CLUSTERS, type StationPropKind } from '../sim/
  *  EXISTING GLB in stations.ts; no new assets). */
 export type { StationPropKind };
 
-/** One prop in a station-type cluster, offset (yd) from the station pos. */
-export interface StationClusterProp {
-  kind: StationPropKind;
-  dx: number;
-  dz: number;
-  rot: number;
-}
-
 /** A placed station prop in world space, ready for the Three half. */
 export interface StationPropPlacement {
   stationId: string;

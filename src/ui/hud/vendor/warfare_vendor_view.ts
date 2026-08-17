@@ -22,11 +22,14 @@ import type { IWorld } from '../../../world_api';
  *  the stock carries that is NOT named here still gets a section, appended in
  *  first-seen order, so a sixth family cannot silently vanish from the shop. */
 export const WARFARE_SHOP_SET_ORDER: readonly string[] = [
-  'warfare_furyforged',
-  'warfare_stormbound',
-  'warfare_ashstalker',
-  'warfare_cinderweave',
-  'warfare_thornhide',
+  // Ordered by ARMOR CLASS, heaviest first, so the list reads mail -> leather ->
+  // cloth and a player scans straight to the block they can wear. Thornhide sat
+  // last, which put cloth (Cinderweave) between the two leather families.
+  'warfare_furyforged', // mail, Strength
+  'warfare_stormbound', // mail, caster
+  'warfare_ashstalker', // leather, Agility
+  'warfare_thornhide', // leather, caster
+  'warfare_cinderweave', // cloth, caster
 ];
 
 /** Section keys for the two non-set sections. Set sections key on their set id,

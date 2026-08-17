@@ -365,6 +365,10 @@ export const CHARACTER_TAKEOVER_POLICY: RateLimitPolicy = characterMutationPolic
   'character_takeover',
   'takeover',
 );
+export const CHARACTER_REROLL_POLICY: RateLimitPolicy = characterMutationPolicy(
+  'character_reroll',
+  'reroll',
+);
 
 // The report-creation limiter. 'ip+account' (so it mounts BEHIND the
 // route's auth guard, which populates ctx.account), running the fused per-IP AND

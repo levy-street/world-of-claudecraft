@@ -213,6 +213,22 @@ describe('inspect_window painter instance threading (source pins)', () => {
   });
 
   it('hud.ts openInspect is now a thin delegate to the painter', () => {
-    expect(hud).toContain('this.inspectWindow.openInspect(e, Date.now())');
+    // Retargeted at Phase 20 QA, and the cause is a real call-shape change, not
+    // a formatting churn: the delegate grew a THIRD argument (the viewer's own
+    // live Curator standing, handed over only for the local player), so the old
+    // single-line `openInspect(e, Date.now())` spelling no longer exists. The
+    // pin still says the same thing, that hud.ts hands the entity and the clock
+    // straight to the painter instead of building the card itself, now across
+    // the wrap. The third argument and its pid gate are pinned separately in
+    // tests/inspect_window.test.ts, beside the parameter they feed.
+    //
+    // Comment-stripped, so the prose above the call in hud.ts (which discusses
+    // the delegate) cannot satisfy the pin on its own.
+    const hudCode = hud.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+    const at = hudCode.indexOf('openInspect(pid: number): void {');
+    expect(at, 'Hud.openInspect is missing').toBeGreaterThan(-1);
+    expect(hudCode.slice(at, at + 320)).toMatch(
+      /this\.inspectWindow\.openInspect\(\s*e,\s*Date\.now\(\),/,
+    );
   });
 });

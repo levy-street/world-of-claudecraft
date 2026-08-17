@@ -1,5 +1,6 @@
-// Render small weapon-thumbnail JPGs from staged weapon GLBs, for use as 2D
-// item icons in the HUD. Drives a headless browser (puppeteer-core + system
+// Render small weapon-preview JPGs from staged weapon GLBs for Armory and asset-pipeline
+// inspection. Inventory UI uses bespoke /ui/items/<item-id>.webp paintings instead. Drives a
+// headless browser (puppeteer-core + system
 // Chrome via browser_path.mjs) running the esbuild bundle of
 // scripts/weapon_render_entry.js. Each GLB is passed as base64 and parsed in
 // the page (no network), rendered, and the canvas saved as a downscaled JPG.

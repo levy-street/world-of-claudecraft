@@ -139,7 +139,7 @@ balloons the count toward the frame count (thousands), so the headroom costs no 
 |---|---|---|
 | frameLong50 | 12 | ARM 3 anchor: frames at or over 50 ms in the tour window (worst healthy capture 7) |
 | tourMinFrames | 500 | ARM 3 floor: minimum real frames the tour must render (worst healthy capture 873) |
-| hudHotDomWrites | 640 | ARM 3 anchor: elision-bypass writes, every viewport (worst healthy capture 632, mobile) |
+| hudHotDomWrites | 706 | ARM 3 anchor: elision-bypass writes, every viewport (worst healthy capture 698, mobile). Re-captured 2026-08-08: release-side growth inherited at the v0.36.0 base, branch-neutral (the reliquary branch measures 695 and the clean release tip 696 to 698, byte-identical write sets across 1232 and 3007-frame runs; Phase 16 QA attribution plus the Phase 17 re-measure). Same 8-write headroom discipline as the 632-to-640 original. |
 
 All rows are single canonical rows valid for every viewport: each committed anchor covers
 the worst viewport, the committed floor the slowest one. `frameLong50` is windowed by the

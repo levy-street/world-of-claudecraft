@@ -16,27 +16,23 @@ import { createMob } from '../src/sim/entity';
 import { petRangedAttack } from '../src/sim/pet/pet_ai';
 import { advancePendingProjectiles } from '../src/sim/projectile_travel';
 import { Sim } from '../src/sim/sim';
-import { type Entity, type SimEvent, spellHitChance } from '../src/sim/types';
-import { expectDefined } from './helpers/defined';
+import { type Entity, spellHitChance } from '../src/sim/types';
 
-type DamageEvent = Extract<SimEvent, { type: 'damage' }>;
-
-function isDamageTo(event: SimEvent, targetId: number): event is DamageEvent {
-  return event.type === 'damage' && event.targetId === targetId;
-}
+type AnySim = Sim & Record<string, any>;
+type AnyEntity = Entity & Record<string, any>;
 
 // Summon the warlock's imp for real (cast summon_imp to completion) so the pet
 // carries genuine owned-pet state, then hand back sim + imp + a spawned target.
 function makeImpVsTarget(targetLevel: number): {
-  sim: Sim;
-  imp: Entity;
-  mob: Entity;
+  sim: AnySim;
+  imp: AnyEntity;
+  mob: AnyEntity;
 } {
-  const sim = new Sim({ seed: 7, playerClass: 'warlock', autoEquip: true });
+  const sim = new Sim({ seed: 7, playerClass: 'warlock', autoEquip: true }) as AnySim;
   sim.setPlayerLevel(12);
   sim.castAbility('summon_imp');
   for (let i = 0; i < 20 * 12 && sim.player.castingAbility; i++) sim.tick();
-  const imp = expectDefined(sim.petOf(sim.playerId));
+  const imp = sim.petOf(sim.playerId) as AnyEntity;
   expect(imp).not.toBeNull();
   expect(imp.templateId).toBe('emberkin');
   const p = sim.player;
@@ -44,7 +40,7 @@ function makeImpVsTarget(targetLevel: number): {
     x: p.pos.x,
     y: p.pos.y,
     z: p.pos.z + 4,
-  });
+  }) as AnyEntity;
   mob.maxHp = 50000;
   mob.hp = 50000;
   mob.hostile = true;
@@ -55,13 +51,13 @@ function makeImpVsTarget(targetLevel: number): {
 
 // Hurl one bolt directly at the unit under test and step it to impact.
 function hurlBolt(
-  sim: Sim,
-  imp: Entity,
-  mob: Entity,
-  ranged = expectDefined(MOBS.emberkin.petRanged),
-): SimEvent[] {
-  const events: SimEvent[] = [];
-  sim.ctx.emit = (e: SimEvent) => events.push(e);
+  sim: AnySim,
+  imp: AnyEntity,
+  mob: AnyEntity,
+  ranged = MOBS.emberkin.petRanged!,
+): any[] {
+  const events: any[] = [];
+  sim.ctx.emit = (e: any) => events.push(e);
   petRangedAttack(sim.ctx, imp, mob, ranged);
   for (let i = 0; i < 200 && sim.ctx.pendingProjectiles.length > 0; i++)
     advancePendingProjectiles(sim.ctx);
@@ -93,13 +89,16 @@ describe('pet ranged bolt spell resist', () => {
 
     // Assert: the bolt resolves as a full resist, never as damage, attributed
     // to the pet with its real school and no crit styling on the zero.
-    const dmg = events.filter((e) => isDamageTo(e, mob.id));
+    const dmg = events.filter((e) => e.type === 'damage' && e.targetId === mob.id);
     expect(dmg.length).toBeGreaterThan(0);
     expect(dmg.every((e) => e.kind === 'resist')).toBe(true);
     expect(dmg.every((e) => e.amount === 0)).toBe(true);
     expect(dmg[0].sourceId).toBe(imp.id);
     expect(dmg[0].school).toBe('fire');
     expect(dmg[0].crit).toBe(false);
+    // The resist keeps the bolt's display label (this branch names the
+    // Emberkin's bolt), never a hardcoded or blank one.
+    expect(dmg[0].ability).toBe('Felbolt');
     expect(rolled[0]).toBeCloseTo(spellHitChance(imp.level, 60), 6);
     // Draw economy: a resisted bolt consumes exactly the one resist draw and
     // skips the crit and damage-range draws (the parity digest pins the stream
@@ -120,10 +119,10 @@ describe('pet ranged bolt spell resist', () => {
     sim.rng.chance = () => false;
 
     // Act
-    const events = hurlBolt(sim, imp, mob, expectDefined(MOBS.water_elemental.petRanged));
+    const events = hurlBolt(sim, imp, mob, MOBS.water_elemental.petRanged!);
 
     // Assert
-    const dmg = events.filter((e) => isDamageTo(e, mob.id));
+    const dmg = events.filter((e) => e.type === 'damage' && e.targetId === mob.id);
     expect(dmg.length).toBeGreaterThan(0);
     expect(dmg.every((e) => e.kind === 'resist')).toBe(true);
     expect(dmg[0].school).toBe('frost');
@@ -164,7 +163,7 @@ describe('pet ranged bolt spell resist', () => {
     const events = hurlBolt(sim, imp, mob);
 
     // Assert
-    const dmg = events.filter((e) => isDamageTo(e, mob.id));
+    const dmg = events.filter((e) => e.type === 'damage' && e.targetId === mob.id);
     expect(dmg.length).toBeGreaterThan(0);
     expect(dmg.some((e) => e.amount > 0)).toBe(true);
     expect(dmg.some((e) => e.kind === 'resist')).toBe(false);

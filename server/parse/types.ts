@@ -8,6 +8,9 @@ import type { ParseCounters } from './counters';
 export interface RecorderEntityView {
   id: number;
   templateId: string;
+  /** Display name; feeds the fight_close actor roster so the dashboard can
+   * label mob entity ids. The live Sim entity always carries one. */
+  name: string;
   level: number;
   hp?: number;
   maxHp?: number;
@@ -19,6 +22,15 @@ export interface RecorderEntityView {
   castTotal?: number;
   castTargetId?: number | null;
   threat?: ReadonlyMap<number, number>;
+  /** Who the mob is actually swinging at; the threat sampler ships it so the
+   * dashboard can show whether the top-threat player is the one being hit. */
+  aggroTargetId?: number | null;
+  /** Primary resource pool, read by the resource sampler. A druid's type
+   * changes with form, so it is sampled every tick alongside the value rather
+   * than assumed fixed for the fight. */
+  resource?: number;
+  maxResource?: number;
+  resourceType?: 'rage' | 'mana' | 'energy' | 'focus' | null;
   auras?: readonly { id: string; name: string; sourceId: number; stacks?: number }[];
 }
 

@@ -162,6 +162,67 @@ describe('bank grid instanced-slot marker', () => {
   });
 });
 
+describe('bank grid fine-grade mark', () => {
+  // The fine mark (rim/wash class + corner seal) followed the stack into the
+  // bank: the grade is an item fact, not a bag fact, so depositing must not
+  // strip it (the fix that extended the bags-only mark to both banks). The
+  // on/off decision itself is pinned in bag_fine_mark_view.test.ts; these
+  // cases pin the bank painter's composition of it.
+  it('a banked fine material wears the rim class and the fine corner seal', () => {
+    const root = windowFor([
+      slot('fine_copper_ore', undefined, 3),
+      slot('copper_ore', undefined, 3),
+    ]);
+    const cells = root.querySelectorAll('button.bank-item');
+    expect(cells.length).toBe(2);
+    expect(cells[0].classList.contains('bag-fine')).toBe(true);
+    const seal = cells[0].querySelector('.bi-fine-seal');
+    expect(seal).not.toBeNull();
+    expect(seal?.getAttribute('aria-hidden')).toBe('true');
+    // Exactly one corner treatment, and the quality class survives the rim.
+    expect(
+      cells[0].querySelectorAll(
+        '.bi-glyph, .bi-instance, .bi-masterwork-seal, .bi-quest-seal, .bi-fine-seal',
+      ).length,
+    ).toBe(1);
+    expect(cells[0].classList.contains('q-common')).toBe(true);
+    // Aria stays the plain wording: the item NAME carries the grade word, so
+    // no dedicated grade sentence exists (the bags decision, pinned here too).
+    expect(cells[0].getAttribute('aria-label')).toBe('Fine Copper Ore, quantity 3');
+    // The base-grade sibling gets neither the rim nor the seal.
+    expect(cells[1].classList.contains('bag-fine')).toBe(false);
+    expect(cells[1].querySelector('.bi-fine-seal')).toBeNull();
+  });
+
+  it('masterwork wins the corner over fine while the rim stays', () => {
+    const root = windowFor([
+      slot('fine_copper_ore', { rolled: { masterwork: true, stats: { sta: 1 } } }),
+    ]);
+    const cell = root.querySelector('button.bank-item');
+    expect(cell?.classList.contains('bag-fine')).toBe(true);
+    expect(cell?.querySelector('.bi-masterwork-seal')).not.toBeNull();
+    expect(cell?.querySelector('.bi-fine-seal')).toBeNull();
+  });
+
+  it('fine outranks the per-copy glyphs in the corner, keeping the per-copy aria', () => {
+    const root = windowFor([slot('fine_copper_ore', { signer: 'Anna' })]);
+    const cell = root.querySelector('button.bank-item');
+    expect(cell?.querySelector('.bi-fine-seal')).not.toBeNull();
+    expect(cell?.querySelector('.bi-glyph')).toBeNull();
+    expect(cell?.querySelector('.bi-instance')).toBeNull();
+    expect(cell?.getAttribute('aria-label')).toBe('Fine Copper Ore, quantity 1, maker-marked copy');
+  });
+
+  it('an unknown id never composes the fine mark', () => {
+    // A fine-looking id this bundle predates is not in the local grade table:
+    // the stale-client cell stays unmarked instead of guessing a grade.
+    const root = windowFor([slot('fine_unmapped_future_material')]);
+    const cell = root.querySelector('button.bank-item');
+    expect(cell?.classList.contains('bag-fine')).toBe(false);
+    expect(cell?.querySelector('.bi-fine-seal')).toBeNull();
+  });
+});
+
 describe('bank-item instance mark stylesheet contract', () => {
   const components = readFileSync(join(__dirname, '../src/styles/components.css'), 'utf8');
 
@@ -173,9 +234,12 @@ describe('bank-item instance mark stylesheet contract', () => {
     expect(components).toMatch(
       /\.bag-item \.bi-masterwork-seal,\s*\.bank-item \.bi-masterwork-seal \{/,
     );
-    // The glyph box is a wider family rule (quest / fine seals ride it too,
-    // bag-only); the pin is the bank twin sitting right beside its bag half.
+    // The glyph box is a wider family rule (the quest seal rides it bag-only,
+    // the fine seal with its bank twin); the pin is each bank twin sitting
+    // right beside its bag half.
     expect(components).toMatch(/\.bag-item \.bi-glyph,\s*\.bank-item \.bi-glyph,/);
+    expect(components).toMatch(/\.bag-item \.bi-fine-seal,\s*\.bank-item \.bi-fine-seal \{/);
+    expect(components).toMatch(/\.bag-item\.bag-fine,\s*\.bank-item\.bag-fine \{/);
     expect(components).toMatch(/\.bag-item \.bi-instance,\s*\.bank-item \.bi-instance \{/);
     expect(components).not.toContain('.bank-item:hover .bi-masterwork-seal');
     expect(components).not.toContain('.bank-item:hover .bi-glyph');
@@ -197,15 +261,27 @@ describe('bank-item instance mark stylesheet contract', () => {
     const painter = readFileSync(join(__dirname, '../src/ui/bank_window.ts'), 'utf8')
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/\/\/[^\n]*/g, '');
-    expect(painter).toContain('instanceGlyphMarkHtml(glyphKind)');
+    expect(painter).toContain('cornerMarkHtml(cornerMark)');
     expect(painter).toContain('bagInstanceGlyphKind(slot.instance)');
     // The KNOWN key family must be used on its own: the lookbehind skips the
     // UNKNOWN_ sibling, whose name contains this one as a substring (a bare
     // contain could never fail while the import line exists).
     expect(painter).toMatch(/(?<!UNKNOWN_)INSTANCE_GLYPH_ARIA_KEYS\[glyphKind\]/);
     expect(painter).toContain('UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS[glyphKind]');
+    // The fine mark composes through the same pure cores and shared mint bags
+    // use: id-based decision, corner priority from bag_corner_mark_view, rim
+    // class from bagRimClasses (quest arm pinned null: quest items cannot
+    // enter the bank), markup from the one exhaustive cornerMarkHtml dispatch
+    // pinned above (no fineSealMarkHtml or glyph call here: a painter that
+    // re-derived the corner from the raw glyph kind is the drift this closes).
+    expect(painter).toContain('bagFineMark(slot.itemId)');
+    expect(painter).toContain('bagCornerMark(glyphKind, null, fineMark)');
+    expect(painter).toContain('${bagRimClasses(null, fineMark)}');
+    expect(painter).not.toContain('instanceGlyphMarkHtml');
+    expect(painter).not.toContain('fineSealMarkHtml');
     // No private seal URL or class fork that could drift from bags.
     expect(painter).not.toContain('MASTERWORK_SEAL_IMAGE_URL');
     expect(painter).not.toContain('bi-masterwork-seal');
+    expect(painter).not.toContain('bi-fine-seal');
   });
 });

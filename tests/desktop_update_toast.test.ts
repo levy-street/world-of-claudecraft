@@ -175,6 +175,32 @@ describe('desktop update card DOM', () => {
     expect(root()?.hidden).toBe(true);
   });
 
+  it('offers the release-notes link on the ready card only', () => {
+    const { fire } = init();
+    const link = () => q('.desktop-update-whats-new') as HTMLAnchorElement | null;
+    fire({ type: 'checking' });
+    expect(link()?.hidden).toBe(true);
+    fire({ type: 'available', version: '0.30.0' });
+    expect(link()?.hidden).toBe(true);
+
+    fire({ type: 'downloaded', version: '0.30.0' });
+    expect(link()?.hidden).toBe(false);
+    // The literal destination, pinned here rather than against the constant the
+    // module imports (that would only compare the module to itself).
+    expect(link()?.getAttribute('href')).toBe(
+      'https://github.com/levy-street/world-of-claudecraft/releases',
+    );
+    // A plain external hop: _blank plus the noopener pair is what routes it to
+    // the system browser (and keeps the opener out of the new context).
+    expect(link()?.getAttribute('target')).toBe('_blank');
+    expect(link()?.getAttribute('rel')).toBe('noopener noreferrer');
+    expect(link()?.textContent).toBe('See what changed in your browser');
+
+    // Later hides the whole card, the link with it.
+    q('.desktop-update-later')?.click();
+    expect(root()?.hidden).toBe(true);
+  });
+
   it('dismissing the checking card hides it without suppressing the download notice', () => {
     const { fire } = init();
     fire({ type: 'checking' });

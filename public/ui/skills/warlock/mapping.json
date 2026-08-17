@@ -1,10 +1,11 @@
 {
   "class": "warlock",
-  "license": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+  "license": "Mixed: CraftPix premium for legacy entries; project-owned OpenAI-generated art for generatedBatches",
   "iconSize": 128,
   "sourcePacks": [
     "tmp/asset_src/warlock-skill-icons",
-    "tmp/asset_src/demon-skill-icons (summons + life_tap/searing_pain)"
+    "tmp/asset_src/demon-skill-icons (summons + life_tap/searing_pain)",
+    "OpenAI image generation (Warlock spell and talent completion, 2026-08-01)"
   ],
   "runtimeDir": "public/ui/skills/warlock",
   "abilities": [
@@ -360,8 +361,165 @@
         }
       ],
       "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for warlock\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Voidfeast (voidfeast)\nCanonical mechanic: Voidfeast requires a dispellable effect, removes one enemy buff or allied debuff, and heals the caster for 6% maximum health; 15 sec cooldown.\nSubject: A void maw swallowing a gold-green magic mote while a healing pulse returns to the caster.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "emberkin_felbolt",
+      "sourcePack": "woc_openai_release_art_audit_2026_08_10",
+      "sourceFile": "tmp/imagegen/release-art-audit-v036/pet-actions/raw/emberkin_felbolt.png",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019fe6e9-7ed7-7bc3-a44e-c7475af3a73f/exec-7977f613-1012-474c-86f3-1326b00f66aa.png",
+      "output": "emberkin_felbolt.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "An Emberkin launching a fast orange fel-flame bolt from one claw.",
+      "references": [
+        {
+          "path": "public/guide-stills/mob_emberkin.webp",
+          "role": "subject identity reference",
+          "provenance": "Deterministic project render of the credited project-generated Emberkin model",
+          "license": "World of ClaudeCraft project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/skills/warlock/shadow_bolt.webp",
+          "role": "composition reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/warlock/searing_pain.webp",
+          "role": "palette reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        },
+        {
+          "path": "public/ui/skills/warlock/summon_infernal.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Create one finished square fantasy MMORPG ability icon for the World of ClaudeCraft Warlock pet action “Emberkin Felbolt”. Use the supplied images only as visual references: the Emberkin still establishes the fiery horned demon identity, while the three skill icons establish the game’s premium hand-painted, borderless, full-composition icon style. Paint a single fast diagonal bolt of compressed fel flame launched from a small Emberkin claw, with a white-hot orange core, ember-red flame tail, and restrained sickly green sparks against a deep charcoal-violet atmospheric background. Make the projectile and claw silhouette immediately readable at 28 px, centered with generous safe margins, strong dark-to-bright contrast, crisp focal edges and softer peripheral smoke. Opaque full-square artwork. Fresh original composition. No text, letters, numbers, runes, pseudo-writing, UI frame, border, rarity chrome, logo, watermark, photorealism, flat vector glyph, or cropped subject."
+    },
+    {
+      "abilityId": "gloomshade_abyssal_chain",
+      "sourcePack": "woc_openai_release_art_audit_2026_08_10",
+      "sourceFile": "tmp/imagegen/release-art-audit-v036/pet-actions/raw/gloomshade_abyssal_chain.png",
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/019fe6e9-7ed7-7bc3-a44e-c7475af3a73f/exec-12573b07-c935-4fe7-b65a-64ee9de4daea.png",
+      "output": "gloomshade_abyssal_chain.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A Gloomshade hurling a dark-iron chain through violet void energy to pull an enemy.",
+      "references": [
+        {
+          "path": "public/guide-stills/mob_gloomshade.webp",
+          "role": "subject identity reference",
+          "provenance": "Deterministic project render of the credited project-generated Gloomshade model",
+          "license": "World of ClaudeCraft project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/skills/warlock/umbral_anchor.webp",
+          "role": "composition reference",
+          "provenance": "World of ClaudeCraft project-generated art",
+          "license": "World of ClaudeCraft project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/skills/warlock/possess_evil_eye.webp",
+          "role": "palette reference",
+          "provenance": "World of ClaudeCraft project-generated art",
+          "license": "World of ClaudeCraft project asset, rights reserved"
+        },
+        {
+          "path": "public/ui/skills/warlock/summon_voidwalker.webp",
+          "role": "style reference",
+          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
+          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+        }
+      ],
+      "generationPrompt": "Create one finished square fantasy MMORPG ability icon for the World of ClaudeCraft Warlock pet action “Gloomshade Abyssal Chain”. Use the supplied images only as visual references: the Gloomshade still establishes the hulking indigo abyssal guardian identity, while the three skill icons establish the game’s premium hand-painted, borderless, full-composition icon style. Paint a massive spectral chain of dark iron and violet void energy whipping forward from one Gloomshade fist, the nearest links large and unmistakable, hooked around a distant enemy silhouette as it pulls them through smoky shadow. Deep indigo, black-purple and restrained cold cyan highlights, strong rim lighting, centered diagonal action, subject fills 75 to 88 percent with safe margins, readable at 28 px, crisp focal links and softer peripheral atmosphere. Opaque full-square artwork. Fresh original composition. No text, letters, numbers, runes, pseudo-writing, UI frame, border, rarity chrome, logo, watermark, photorealism, flat vector glyph, or cropped subject."
     }
   ],
   "deferredStayProcedural": {},
-  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 entries are project-generated and explicitly override it."
+  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 entries are project-generated and explicitly override it.",
+  "generatedBatches": [
+    {
+      "name": "warlock-spell-completion",
+      "generator": "OpenAI image generation",
+      "artDirection": "Compact low-poly fantasy MMORPG icons with faceted KayKit-inspired materials, unique silhouettes, no text or UI frames",
+      "abilityIds": [
+        "evil_eye",
+        "maledict_gaze",
+        "needle_of_fate",
+        "sentence",
+        "cursed_accomplice",
+        "hex_of_violence",
+        "cruel_pact",
+        "vicarious_suffering",
+        "possess_evil_eye",
+        "coven",
+        "soul_lance",
+        "litany_of_guilt",
+        "umbral_anchor",
+        "ruinous_brand",
+        "soul_harvest",
+        "raise_graveguard",
+        "raise_skeletal_warrior",
+        "raise_bone_mage",
+        "bone_armor",
+        "corpse_explosion",
+        "funeral_harvest",
+        "ossuary_mark",
+        "unholy_command",
+        "reaping_command",
+        "sacrifice_undead",
+        "army_of_the_dead",
+        "sacrilegious_march",
+        "dark_pact",
+        "abyssal_rift"
+      ]
+    },
+    {
+      "name": "warlock-choice-talent-icons",
+      "generator": "OpenAI image generation",
+      "artDirection": "Unique low-poly talent emblems that do not reuse the associated spell composition",
+      "talentIds": [
+        "wlk_r5_bane",
+        "wlk_r5_improved_corruption",
+        "wlk_r5_improved_immolate",
+        "wlk_r8_voidfeast",
+        "wlk_r8_howl_of_terror",
+        "wlk_r8_curse_of_exhaustion",
+        "wlk_r11_improved_life_tap",
+        "wlk_r11_fel_concentration",
+        "wlk_r11_demon_armor",
+        "wlk_r14_amplify_curse",
+        "wlk_r14_ruin",
+        "wlk_r14_shadow_mastery",
+        "wlk_r17_death_coil",
+        "wlk_r17_improved_fear",
+        "wlk_r17_demonic_resilience",
+        "wlk_r20_chaos_bolt",
+        "wlk_r20_grimoire_of_haste",
+        "wlk_r20_curse_mastery"
+      ]
+    },
+    {
+      "name": "warlock-soulwell",
+      "generator": "OpenAI built-in image generation",
+      "artDirection": "Original low-poly fantasy MMORPG Soulwell with dark faceted stone, green basin energy, violet soul wisps, and three orbiting stones; no text, border, logo, or copied franchise design",
+      "abilityIds": [
+        "soulwell"
+      ]
+    },
+    {
+      "name": "warlock-final-kit-completion",
+      "generator": "OpenAI built-in image generation",
+      "artDirection": "Original painted dark-fantasy MMORPG icons with high-contrast Warlock silhouettes, no text, border, logo, or copied franchise design",
+      "abilityIds": [
+        "hour_of_judgment",
+        "cinderhide",
+        "raise_gravewing"
+      ]
+    }
+  ]
 }

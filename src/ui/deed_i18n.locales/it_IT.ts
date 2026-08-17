@@ -33,19 +33,19 @@ export const table: DeedLocaleTable = {
     desc: 'Completa uno Squarcio di rango S, il livello più difficile che un portale di Squarcio può generare.',
   },
   pvp_honor_sergeant: {
-    name: 'Sergente',
+    name: 'Spezzalinee',
     desc: 'Guadagna 10.000 Onore nel corso della tua vita. Spenderlo non ti farà mai perdere il grado.',
-    title: 'Sergente',
+    title: 'Spezzalinee',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Cavaliere-Luogotenente',
+    name: 'Devastacampi',
     desc: 'Guadagna 40.000 Onore nel corso della tua vita, una stagione di guerra vera alle spalle.',
-    title: 'Cavaliere-Luogotenente',
+    title: 'Devastacampi',
   },
   pvp_honor_field_marshal: {
-    name: 'Maresciallo di Campo',
+    name: 'Coronato dalla guerra',
     desc: 'Guadagna 150.000 Onore nel corso della tua vita. Raro in qualsiasi reame, ed è giusto che sia così.',
-    title: 'Maresciallo di Campo',
+    title: 'Coronato dalla guerra',
   },
   chr_drakemaw_broodlord: {
     name: 'Spezzacovata',
@@ -1019,5 +1019,49 @@ export const table: DeedLocaleTable = {
   prog_armorcrafting_rare: {
     name: 'Placcato alla perfezione',
     desc: 'Forgia il tuo primo oggetto di qualità rara in Forgiatura di Armature.',
+  },
+  col_reliquary_rank_2: {
+    name: 'Custode dei bottini',
+    desc: 'Raggiungi il grado di Curatore 2 nel Reliquiario (10 reliquie uniche catalogate).',
+    title: 'Custode dei bottini',
+  },
+  col_reliquary_rank_3: {
+    name: 'Il Catalogatore',
+    desc: 'Raggiungi il grado di Curatore 3 nel Reliquiario (25 reliquie uniche catalogate).',
+    title: 'il Catalogatore',
+  },
+  col_reliquary_rank_4: {
+    name: 'Arcicuratore',
+    desc: 'Raggiungi il grado di Curatore 4 nel Reliquiario (50 reliquie uniche catalogate).',
+    title: 'Arcicuratore',
+  },
+  col_reliquary_rank_5: {
+    name: 'Bottini Eterni',
+    desc: 'Raggiungi il grado di Curatore 5 nel Reliquiario (100 reliquie uniche catalogate).',
+  },
+  col_reliquary_complete: {
+    name: 'Il Grande Reliquiario',
+    desc: 'Cataloga ogni reliquia del Reliquiario che un personaggio possa conservare. Se il catalogo cresce in seguito, non te lo toglie mai.',
+    title: 'Curatore della Camera del Tesoro',
+  },
+  col_reliquary_conquerors: {
+    name: 'Scaffale dei Conquistatori',
+    desc: 'Cataloga ogni reliquia dello scaffale Conquistatori del Reliquiario. Se il catalogo cresce in seguito, non te lo toglie mai.',
+    title: 'Sfondacamere',
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    name: 'Nythraxis miniata',
+    desc: 'Minia la pagina Eroico: Raid di Nythraxis del Reliquiario.',
+    title: 'Luce di Nythraxis',
+  },
+  col_reliquary_illum_thunzharr: {
+    name: 'Thunzharr miniata',
+    desc: 'Minia la pagina Thunzharr, il Picco Risvegliato del Reliquiario.',
+    title: 'Luce di Thunzharr',
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    name: 'Santuario miniato',
+    desc: 'Minia la pagina Eroico: Santuario del Gravewyrm del Reliquiario.',
+    title: 'Luce del Santuario',
   },
 };

@@ -4,6 +4,7 @@
 // purpose (the Drakemaw brood belt, pinned by composition at the bottom).
 import { describe, expect, it } from 'vitest';
 import { CAMPS, MOBS, zoneContaining } from '../src/sim/data';
+import { isSelfScheduled } from '../src/sim/respawn_policy';
 import type { MobTemplate } from '../src/sim/types';
 import {
   type CampYield,
@@ -74,21 +75,16 @@ const cappedClusters = () =>
 const FAST_RESPAWN_SECONDS = 100;
 
 /**
- * Farmable trash: not a rare, boss, dummy or ambient prop, and carrying no
- * authored respawnMult (which marks a mob with its own tuned schedule). This is
- * exactly the population the zone respawn tiers govern. Fed the FARM template
- * (farmTemplate above), so a hatching shell is classified as the hatchling a
- * farmer actually cycles, and a shell that ever hatched a rare would drop out of
- * the trash cap on its own.
+ * Farmable trash: not a boss, dummy or ambient prop, and not self-scheduled
+ * (rare, or an authored respawnMult/respawnWindow marking a mob with its own
+ * tuned schedule; the sim's own classification is imported so the two
+ * definitions cannot drift). This is exactly the population the zone respawn
+ * tiers govern. Fed the FARM template (farmTemplate above), so a hatching shell
+ * is classified as the hatchling a farmer actually cycles, and a shell that
+ * ever hatched a rare would drop out of the trash cap on its own.
  */
 function isTrash(template: MobTemplate): boolean {
-  return (
-    !template.rare &&
-    !template.boss &&
-    !template.dummy &&
-    !template.ambient &&
-    template.respawnMult === undefined
-  );
+  return !template.boss && !template.dummy && !template.ambient && !isSelfScheduled(template);
 }
 
 function fastTrashCount(camps: readonly CampYield[]): number {

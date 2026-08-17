@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "batch": "vale-cup-ball-portrait-2026-08-10",
+  "generator": "OpenAI built-in image generation",
+  "owner": "World of ClaudeCraft",
+  "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+  "generationPrompt": "Create one finished square fantasy MMORPG target portrait for the World of ClaudeCraft Vale Cup boarball. The supplied images establish the game's current mob portrait language only: centered single subject, hand-painted low-poly fantasy rendering, dark oval atmospheric backdrop, crisp silhouette, restrained jewel-color lighting, readable at 54 px. Paint exactly one round tournament ball, not a creature: an ivory leather sphere with classic dark charcoal pentagonal panels, thin stitched seams, subtle scuffs and warm harvest-gold rim light, hovering just above a small shadow and a wisp of field dust. It should feel like Eastbrook's prized boarball match object, centered and filling about 68 percent of the square with generous safe margins. Opaque full-square art. No wolf, boar, animal, person, hands, text, letters, numbers, logo, watermark, UI frame, badge, inventory border, pseudo-writing, or cropped subject.",
+  "generatedResultPath": "/Users/fernando/.codex/generated_images/019fe6e9-7ed7-7bc3-a44e-c7475af3a73f/exec-b4dd6091-fe31-46d0-b49e-cf0b3cc48217.png",
+  "references": [
+    {
+      "path": "public/ui/mobs/wild_boar.webp",
+      "bytes": 2830,
+      "sha256": "6320f39a7635c1cea37c4dbf4d01df4b0ce2d59a27dd6899bac5740caf9a47ca"
+    },
+    {
+      "path": "public/ui/mobs/training_dummy.webp",
+      "bytes": 1788,
+      "sha256": "2f3e963f5346db997e4dd990ed65bf83f9915d10a5ecbe29260b28d9ac247d0e"
+    },
+    {
+      "path": "public/ui/mobs/stable_horse.webp",
+      "bytes": 1964,
+      "sha256": "31890dd22504f073007c69adb70dfd65d0208ec4cf938a5eed55c9d82c107dd9"
+    },
+    {
+      "path": "public/ui/mobs/old_greyjaw.webp",
+      "bytes": 2126,
+      "sha256": "6aae314b86b040c9b19c01b87b5c2c03d8de6b4e1d391d71873a1f7084464d5e"
+    }
+  ],
+  "retainedRaw": {
+    "path": "tmp/imagegen/release-art-audit-v036/vale-cup-ball/raw/vale_cup_ball.png",
+    "bytes": 1911842,
+    "sha256": "953137699d496a25839853f7b797b6cc07cfb06688ec4dfc688499c0666f06a6",
+    "width": 1254,
+    "height": 1254,
+    "format": "png",
+    "colorspace": "sRGB",
+    "opaque": true
+  },
+  "processing": {
+    "library": "Sharp 0.35.3",
+    "resize": {
+      "width": 128,
+      "height": 128,
+      "fit": "cover",
+      "kernel": "lanczos3"
+    },
+    "removeAlpha": true,
+    "colorspace": "sRGB",
+    "format": "webp",
+    "quality": 88,
+    "alphaQuality": 100,
+    "effort": 6
+  },
+  "shipping": {
+    "path": "public/ui/portraits/vale_cup_ball.webp",
+    "bytes": 2068,
+    "sha256": "a7c60d03e01897459a70d9d79aaf575ea6c12fc13db38e981fee3614a8076670",
+    "width": 128,
+    "height": 128,
+    "format": "webp",
+    "colorspace": "sRGB",
+    "opaque": true
+  },
+  "visualReview": {
+    "accepted": true,
+    "attempts": 1,
+    "retries": 0,
+    "reviewedSizes": [128, 54, 40, 28],
+    "grayscaleSizes": [28],
+    "criteria": [
+      "exact ball identity",
+      "small target-frame readability",
+      "safe framing",
+      "mob portrait house-style match",
+      "no animal or wolf silhouette",
+      "no text or pseudo-writing"
+    ]
+  }
+}

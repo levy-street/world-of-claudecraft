@@ -12,6 +12,8 @@
 // back next frame, so the core stays allocation-light (a single returned object,
 // or the shared HIDDEN constant when the bar is off).
 
+import { clamp01 } from './clamp';
+
 // Epsilon for detecting the swing reset edge: the timer jumping UP past the last
 // value means a fresh swing began, so the full interval is recovered.
 const SWING_EDGE_EPSILON = 1e-4;
@@ -62,12 +64,19 @@ export function swingTimerState(
   if (!player.autoAttack || !liveTarget) return HIDDEN;
 
   const swingTimer = player.swingTimer;
-  // Recover the full interval on the reset edge (timer jumped up) or first show;
-  // otherwise carry the previous period so the fill stays smooth as it counts down.
+  // Recover the full interval on the reset edge (timer jumped up): the freshly
+  // reset timer IS the interval, so trust it outright. The equipped weapon's
+  // speed must not floor it (Wolf Form swings a fixed 1.0s on a slow staff, and
+  // haste shortens any swing below the weapon speed). On first show mid-swing
+  // the true interval is unknown, so max(timer, weapon speed) stays the best
+  // guess until the first edge corrects it; otherwise carry the previous
+  // period so the fill grows smoothly as the timer counts down.
   const period =
-    swingTimer > prevTimer + SWING_EDGE_EPSILON || prevPeriod <= 0
-      ? Math.max(swingTimer, player.weapon.speed)
-      : prevPeriod;
+    swingTimer > prevTimer + SWING_EDGE_EPSILON
+      ? swingTimer
+      : prevPeriod <= 0
+        ? Math.max(swingTimer, player.weapon.speed)
+        : prevPeriod;
   const frac = period > 0 ? clamp01(1 - swingTimer / period) : 1;
   const ready = swingTimer <= 0;
   return {
@@ -79,8 +88,4 @@ export function swingTimerState(
     nextPeriod: period,
     nextTimer: swingTimer,
   };
-}
-
-function clamp01(v: number): number {
-  return Math.max(0, Math.min(1, v));
 }

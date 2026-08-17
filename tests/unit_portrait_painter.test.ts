@@ -99,6 +99,85 @@ describe('UnitPortraitPainter', () => {
     expect(context.drawImage).toHaveBeenCalledWith(FakeImage.instances[0], 0, 0, 54, 54);
   });
 
+  it('shows a synchronous crest fallback until its painted replacement decodes', () => {
+    const { canvas, context } = fakeCanvas();
+    const painter = new UnitPortraitPainter(() => 1);
+
+    painter.drawCrest(canvas, 'status_npc');
+
+    expect(context.drawImage).toHaveBeenCalledWith(
+      crestCanvas,
+      -4.859999999999999,
+      -4.859999999999999,
+      63.72,
+      63.72,
+    );
+    expect(canvas.dataset.portrait).toBe('/ui/crests/status/npc.webp');
+    expect(FakeImage.instances).toHaveLength(1);
+
+    FakeImage.instances[0].complete = true;
+    FakeImage.instances[0].naturalWidth = 256;
+    FakeImage.instances[0].dispatch('load');
+
+    expect(context.drawImage).toHaveBeenLastCalledWith(
+      FakeImage.instances[0],
+      -4.859999999999999,
+      -4.859999999999999,
+      63.72,
+      63.72,
+    );
+  });
+
+  it('ignores a painted crest that decodes after the framed unit changes', () => {
+    const { canvas, context } = fakeCanvas();
+    const painter = new UnitPortraitPainter(() => 1);
+
+    painter.drawCrest(canvas, 'status_npc');
+    const staleImage = FakeImage.instances[0];
+    painter.drawCrest(canvas, 'family_humanoid');
+    const currentImage = FakeImage.instances[1];
+    const drawCountBeforeDecode = context.drawImage.mock.calls.length;
+
+    staleImage.complete = true;
+    staleImage.naturalWidth = 256;
+    staleImage.dispatch('load');
+
+    expect(context.drawImage).toHaveBeenCalledTimes(drawCountBeforeDecode);
+    expect(canvas.dataset.portrait).toBe('/ui/crests/families/humanoid.webp');
+
+    currentImage.complete = true;
+    currentImage.naturalWidth = 256;
+    currentImage.dispatch('load');
+
+    expect(context.drawImage).toHaveBeenLastCalledWith(
+      currentImage,
+      -4.859999999999999,
+      -4.859999999999999,
+      63.72,
+      63.72,
+    );
+  });
+
+  it('reuses a decoded painted crest without losing crest overscan', () => {
+    const { canvas, context } = fakeCanvas();
+    const painter = new UnitPortraitPainter(() => 1);
+
+    painter.drawCrest(canvas, 'status_npc');
+    const decodedImage = FakeImage.instances[0];
+    decodedImage.complete = true;
+    decodedImage.naturalWidth = 256;
+    decodedImage.dispatch('load');
+    context.drawImage.mockClear();
+
+    painter.drawCrest(canvas, 'status_npc');
+
+    expect(FakeImage.instances).toHaveLength(1);
+    expect(context.drawImage.mock.calls).toEqual([
+      [crestCanvas, -4.859999999999999, -4.859999999999999, 63.72, 63.72],
+      [decodedImage, -4.859999999999999, -4.859999999999999, 63.72, 63.72],
+    ]);
+  });
+
   it('bounds decoded headshot retention with least-recently-used eviction', () => {
     const { canvas } = fakeCanvas();
     const painter = new UnitPortraitPainter(() => 1);

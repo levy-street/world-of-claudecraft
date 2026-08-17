@@ -1959,25 +1959,26 @@ describe('guild billboard (motd)', () => {
 // the ignore filter, and the id-based event shape.
 // ---------------------------------------------------------------------------
 
-describe('broadcastDeedUnlock', () => {
-  // Earner 1 leads a guild seating 2 and 3; 4 follows the earner from outside
-  // the guild; 5 is unrelated.
-  async function deedSetup() {
-    const h = setup();
-    h.add(1, 'Earner');
-    h.add(2, 'Guildie');
-    h.add(3, 'Officerin');
-    h.add(4, 'Follower');
-    h.add(5, 'Stranger');
-    for (const id of [1, 2, 3, 4, 5]) h.tx.setOnline(id);
-    const created = await h.db.createGuildWithLeader('Bookbinders', 1);
-    if ('error' in created) throw new Error('guild seed failed');
-    await h.db.addGuildMemberAtomic(created.guildId, 2, 'member', 50);
-    await h.db.addGuildMemberAtomic(created.guildId, 3, 'officer', 50);
-    await h.db.addFriend(4, 1); // 4 put the earner on THEIR list
-    return h;
-  }
+// Earner 1 leads a guild seating 2 and 3; 4 follows the earner from outside
+// the guild; 5 is unrelated. Shared by broadcastDeedUnlock and its Phase 18
+// sibling broadcastIllumination, which fan out to the same audience.
+async function deedSetup() {
+  const h = setup();
+  h.add(1, 'Earner');
+  h.add(2, 'Guildie');
+  h.add(3, 'Officerin');
+  h.add(4, 'Follower');
+  h.add(5, 'Stranger');
+  for (const id of [1, 2, 3, 4, 5]) h.tx.setOnline(id);
+  const created = await h.db.createGuildWithLeader('Bookbinders', 1);
+  if ('error' in created) throw new Error('guild seed failed');
+  await h.db.addGuildMemberAtomic(created.guildId, 2, 'member', 50);
+  await h.db.addGuildMemberAtomic(created.guildId, 3, 'officer', 50);
+  await h.db.addFriend(4, 1); // 4 put the earner on THEIR list
+  return h;
+}
 
+describe('broadcastDeedUnlock', () => {
   it('delivers one id-based frame to online guildmates and followers, never the earner', async () => {
     const h = await deedSetup();
     await h.svc.broadcastDeedUnlock(h.actor(1), 'prog_veteran');
@@ -2032,7 +2033,9 @@ describe('broadcastDeedUnlock', () => {
     // SimEvent so the one client event switch stays well-typed) and the client
     // casts one to the other on the events-frame passthrough. A field added or
     // retyped on either side alone reds tsc here: the literal must satisfy the
-    // SocialEvent arm AND annotate as the SimEvent arm, and flow back.
+    // SocialEvent arm AND annotate as the SimEvent arm, and flow back. The
+    // runtime toEqual below is a tautology (one object compared with itself);
+    // the pin lives in the annotations, enforced by tsc --noEmit, not vitest.
     const fromSocial: Extract<SimEvent, { type: 'deedBroadcast' }> = {
       type: 'deedBroadcast',
       characterName: 'Earner',
@@ -2040,6 +2043,89 @@ describe('broadcastDeedUnlock', () => {
     } satisfies Extract<SocialEvent, { type: 'deedBroadcast' }>;
     const fromSim: Extract<SocialEvent, { type: 'deedBroadcast' }> = fromSocial;
     expect(fromSim).toEqual(fromSocial);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Reliquary Illumination broadcast (Phase 18): first-ever page Illuminations
+// fan out to the same audience as marquee deed unlocks. The caller (game.ts)
+// owns the first-ever gate, the retro gate, the fail-closed page validation,
+// and the opt-out; this layer owns audience resolution, the block filters,
+// and the id-based event shape, exactly as for broadcastDeedUnlock.
+// ---------------------------------------------------------------------------
+
+describe('broadcastIllumination', () => {
+  const PAGE_ID = 'conquerors_thunzharr';
+
+  it('delivers one id-based illumination frame to guildmates and followers, never the earner', async () => {
+    const h = await deedSetup();
+    await h.svc.broadcastIllumination(h.actor(1), PAGE_ID);
+    // The exact wire shape: the page id and the earner's name only. Pinning
+    // the FULL object also proves no `text` field rides along (the server
+    // never sends English for this event; the client composes the line from
+    // reliquary_i18n plus its own chrome key).
+    const expected = {
+      type: 'reliquaryIlluminationBroadcast',
+      characterName: 'Earner',
+      pageId: PAGE_ID,
+    };
+    expect(h.tx.eventsFor(2)).toEqual([expected]);
+    expect(h.tx.eventsFor(3)).toEqual([expected]);
+    expect(h.tx.eventsFor(4)).toEqual([expected]);
+    expect(h.tx.eventsFor(1)).toEqual([]); // the earner's banner is client-side
+    expect(h.tx.eventsFor(5)).toEqual([]); // strangers never hear it
+  });
+
+  it('skips offline members and recipients who ignore the illumination earner', async () => {
+    const h = await deedSetup();
+    h.tx.setOffline(2);
+    await h.db.addBlock(3, 1); // 3 ignores the earner
+    await h.svc.broadcastIllumination(h.actor(1), PAGE_ID);
+    expect(h.tx.eventsFor(2)).toEqual([]);
+    expect(h.tx.eventsFor(3)).toEqual([]);
+    expect(h.tx.eventsFor(4)).toHaveLength(1);
+  });
+
+  it('skips a recipient the illumination earner has ignored', async () => {
+    const h = await deedSetup();
+    await h.db.addBlock(1, 2); // the earner blocks guildmate 2
+    await h.db.addBlock(1, 4); // and follower 4 (blockAdd cannot unfriend THEIR edge)
+    await h.svc.broadcastIllumination(h.actor(1), PAGE_ID);
+    expect(h.tx.eventsFor(2)).toEqual([]);
+    expect(h.tx.eventsFor(4)).toEqual([]);
+    expect(h.tx.eventsFor(3)).toHaveLength(1); // unblocked guildmate still hears it
+  });
+
+  it('delivers the illumination exactly once to a follower who is also a guildmate', async () => {
+    const h = await deedSetup();
+    await h.db.addFriend(2, 1); // guildmate 2 also follows the earner
+    await h.svc.broadcastIllumination(h.actor(1), PAGE_ID);
+    expect(h.tx.eventsFor(2)).toHaveLength(1);
+  });
+
+  it('is a quiet no-op for a guildless illumination earner nobody follows', async () => {
+    const h = setup();
+    h.add(9, 'Hermit');
+    h.tx.setOnline(9);
+    await h.svc.broadcastIllumination(h.actor(9), PAGE_ID);
+    expect(h.tx.delivered.size).toBe(0);
+  });
+
+  it('keeps the illumination SocialEvent and SimEvent declarations structurally identical', () => {
+    // The deedBroadcast pin's Phase 18 twin: the literal must satisfy the
+    // SocialEvent arm AND annotate as the SimEvent arm, and flow back.
+    // The runtime toEqual below is a tautology (one object compared with
+    // itself): the real pin is the two type annotations plus satisfies, which
+    // only `tsc --noEmit` in the gate enforces, never vitest.
+    const fromSocial: Extract<SimEvent, { type: 'reliquaryIlluminationBroadcast' }> = {
+      type: 'reliquaryIlluminationBroadcast',
+      characterName: 'Earner',
+      pageId: PAGE_ID,
+    } satisfies Extract<SocialEvent, { type: 'reliquaryIlluminationBroadcast' }>;
+    const fromSim: Extract<SocialEvent, { type: 'reliquaryIlluminationBroadcast' }> = fromSocial;
+    expect(fromSim).toEqual(fromSocial);
+    // The one runtime-decisive claim: the wire shape is exactly these keys.
+    expect(Object.keys(fromSim).sort()).toEqual(['characterName', 'pageId', 'type']);
   });
 });
 

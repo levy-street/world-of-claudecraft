@@ -46,6 +46,28 @@ describe('loadParseFlags', () => {
     }
   });
 
+  test('http to an RFC1918 private IP literal is allowed (VPC-internal ingest)', () => {
+    for (const host of ['10.0.23.7', '172.16.4.9', '172.31.255.1', '192.168.1.50']) {
+      const flags = loadParseFlags({ ...BASE, PARSE_INGEST_URL: `http://${host}:8788/ingest` });
+      expect(flags.enabled).toBe(true);
+      expect(flags.ingestUrl).toBe(`http://${host}:8788/ingest`);
+    }
+  });
+
+  test('http to a public IP literal or near-private range is still rejected', () => {
+    for (const host of ['8.8.8.8', '172.32.0.1', '172.15.0.1', '11.0.0.1', '192.169.0.1']) {
+      const flags = loadParseFlags({ ...BASE, PARSE_INGEST_URL: `http://${host}:8788/ingest` });
+      expect(flags.enabled).toBe(false);
+      expect(flags.ingestUrl).toBeNull();
+    }
+  });
+
+  test('http to a private-looking DNS name is rejected (only IP literals can be checked at boot)', () => {
+    const flags = loadParseFlags({ ...BASE, PARSE_INGEST_URL: 'http://parses.internal:8788/x' });
+
+    expect(flags.enabled).toBe(false);
+  });
+
   test('a malformed URL is rejected rather than shipped to', () => {
     const flags = loadParseFlags({ ...BASE, PARSE_INGEST_URL: 'not a url' });
 

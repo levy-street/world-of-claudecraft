@@ -9,6 +9,7 @@
 // math can be snapshot tested directly (mirrors xp_bar.ts).
 
 import type { Aura } from '../sim/types';
+import { clamp01 } from './clamp';
 
 export interface AbsorbBarInput {
   hp: number;
@@ -66,8 +67,4 @@ export function absorbBarViewInto(out: AbsorbBarView, input: AbsorbBarInput): Ab
   out.sizeFrac = sizeFrac;
   out.overshield = overshield;
   return out;
-}
-
-function clamp01(v: number): number {
-  return Math.max(0, Math.min(1, v));
 }

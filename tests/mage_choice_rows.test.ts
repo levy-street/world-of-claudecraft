@@ -12,13 +12,20 @@ import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
+import { EMPTY_TEST_WORLD } from './sim_shared';
+
+// This suite never reaches into the built-in world's camps, npcs, or ground
+// objects: every combat rig hand-spawns its own training_dummy target (or
+// addPlayer ally) and every tick loop only advances a mage's own auras and
+// cooldowns. EMPTY_TEST_WORLD (no ambient mobs) keeps Sim construction and
+// per-tick AI cost proportional to what these tests actually exercise.
 
 function rig(
   rows: Record<number, string>,
   level = 20,
   spec: 'arcane' | 'fire' | 'frost' = 'frost',
 ) {
-  const sim = new Sim({ seed: 17, playerClass: 'mage', autoEquip: true });
+  const sim = new Sim({ seed: 17, playerClass: 'mage', autoEquip: true, world: EMPTY_TEST_WORLD });
   sim.setPlayerLevel(level);
   // Spec-selected rig: Chronomancy gating means these rows can no longer be
   // exercised reliably with a spec-less mage.
@@ -154,7 +161,12 @@ describe('mage choice rows (owner tree)', () => {
   });
 
   it("Warded scales an ally's Temporal Barrier heal from the mage, not the ally", () => {
-    const sim = new Sim({ seed: 17, playerClass: 'mage', autoEquip: true });
+    const sim = new Sim({
+      seed: 17,
+      playerClass: 'mage',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     sim.setPlayerLevel(20);
     expect(sim.applyTalents({ spec: 'arcane', rows: { 8: 'mag_r8_warded' } } as never)).toBe(true);
     sim.tick();
@@ -526,18 +538,24 @@ describe('mage choice rows (owner tree)', () => {
   it('Power Echo also repeats a direct HEAL (Temporal Mend) at 50% on the same target, once', () => {
     // Arcane rig: Temporal Mend is the arcane-spec direct heal; Power Echo is the
     // class-wide row-14 grant. The echo must fire for heals, not only damage.
-    const sim = new Sim({ seed: 17, playerClass: 'mage', autoEquip: true });
+    const sim = new Sim({
+      seed: 17,
+      playerClass: 'mage',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     sim.setPlayerLevel(20);
     expect(sim.applyTalents({ spec: 'arcane', rows: { 14: 'mag_r14_power_echo' } })).toBe(true);
     const p = sim.player;
     p.resource = p.maxResource;
-    // Deep HP hole so neither the heal nor its echo overheals (which would clamp).
-    p.maxHp = 100000;
-    p.hp = 1;
     sim.castAbility('power_echo');
     (p as { gcdRemaining: number }).gcdRemaining = 0;
     sim.targetEntity(p.id); // Temporal Mend targets a friendly; heal self.
     sim.castAbility('temporal_mend');
+    // Start-cast stat refresh has now run. Open the deep HP hole afterwards so
+    // neither the stronger rank-4 heal nor its echo overheals (which would clamp).
+    p.maxHp = 100000;
+    p.hp = 1;
     // Ride the 2s hard cast to completion, collecting heal events.
     const collected: { type: string; amount?: number; targetId?: number }[] = [];
     for (let i = 0; i < 60; i++) collected.push(...(sim.tick() as never[]));
@@ -549,7 +567,12 @@ describe('mage choice rows (owner tree)', () => {
   });
 
   it('Power Echo repeats Temporal Echo healing once and still places its mark', () => {
-    const sim = new Sim({ seed: 17, playerClass: 'mage', autoEquip: true });
+    const sim = new Sim({
+      seed: 17,
+      playerClass: 'mage',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     sim.setPlayerLevel(20);
     expect(sim.applyTalents({ spec: 'arcane', rows: { 14: 'mag_r14_power_echo' } })).toBe(true);
     const p = sim.player;
@@ -570,7 +593,12 @@ describe('mage choice rows (owner tree)', () => {
   });
 
   it('Power Echo heal copy does not roll a second on-heal weapon proc', () => {
-    const sim = new Sim({ seed: 17, playerClass: 'mage', autoEquip: true });
+    const sim = new Sim({
+      seed: 17,
+      playerClass: 'mage',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     sim.setPlayerLevel(20);
     expect(sim.applyTalents({ spec: 'arcane', rows: { 14: 'mag_r14_power_echo' } })).toBe(true);
     const p = sim.player;
@@ -639,7 +667,7 @@ describe('mage choice rows (owner tree)', () => {
   });
 
   it('overlapping Runes of Power refresh one shared buff instead of stacking', () => {
-    const sim = new Sim({ seed: 18, playerClass: 'mage', noPlayer: true });
+    const sim = new Sim({ seed: 18, playerClass: 'mage', noPlayer: true, world: EMPTY_TEST_WORLD });
     const first = sim.addPlayer('mage', 'First');
     const second = sim.addPlayer('mage', 'Second');
     for (const pid of [first, second]) {
@@ -676,7 +704,12 @@ describe('the talents-window registry mirror', () => {
   });
 
   it('the window flow works: a mage selectTalentRow pick applies its effect live', () => {
-    const sim = new Sim({ seed: 17, playerClass: 'mage', autoEquip: true });
+    const sim = new Sim({
+      seed: 17,
+      playerClass: 'mage',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     sim.setPlayerLevel(20);
     expect(sim.setSpec('frost')).toBe(true);
     const p = sim.player;

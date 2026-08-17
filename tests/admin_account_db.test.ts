@@ -147,6 +147,8 @@ describe('admin account detail query', () => {
             is_ai: false,
             is_streamer: false,
             streamer_links: {},
+            general_chat_quota_messages: 7,
+            general_chat_quota_window_minutes: 15,
             last_login_ip: null,
             playtime_seconds: 0,
           },
@@ -181,6 +183,12 @@ describe('admin account detail query', () => {
       guildName: 'Keepers',
       guildRank: 'leader',
     });
+    expect(detail?.generalChatRateLimit).toEqual({ messages: 7, windowMinutes: 15 });
+    expect(mocks.query.mock.calls[0][0]).toContain(
+      'LEFT JOIN account_general_chat_rate_limits general_chat_quota',
+    );
+    // The quota comes from the existing primary account-row read, so account
+    // detail still fans out to exactly the same five bounded reads.
     expect(mocks.query).toHaveBeenCalledTimes(5);
   });
 

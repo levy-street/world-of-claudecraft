@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   awsEndpointArgs,
+  buildManifestEntries,
   bundleFileName,
+  manifestFileName,
   parseOtaArgs,
   planOtaPublish,
 } from '../scripts/ota/publish_bundle.mjs';
@@ -58,6 +60,68 @@ describe('planOtaPublish', () => {
     );
     expect(() => planOtaPublish({ ...BASE, minNative: 'builtin' })).toThrow(/MAJOR\.MINOR\.PATCH/);
   });
+
+  it('derives the per-version delta artifacts and advertises them only when asked', () => {
+    const plan = planOtaPublish({ ...BASE, withFileManifest: true });
+    expect(plan.fileManifestKey).toBe('ota/manifests/wocc-web-0.33.0.manifest.json');
+    expect(plan.filesKeyPrefix).toBe('ota/files/');
+    expect(plan.fileManifestUrl).toBe(
+      'https://updates.example.com/ota/manifests/wocc-web-0.33.0.manifest.json',
+    );
+    expect(plan.manifest.fileManifestUrl).toBe(plan.fileManifestUrl);
+    // Without the flag (a rollback target published before the delta channel
+    // existed), latest.json must NOT advertise a document that is not there.
+    expect(planOtaPublish({ ...BASE }).manifest.fileManifestUrl).toBeUndefined();
+  });
+});
+
+describe('buildManifestEntries', () => {
+  const HASH_A = 'a'.repeat(64);
+  const HASH_B = 'b'.repeat(64);
+  const FILES = [
+    { path: 'index.html', sha256: HASH_B },
+    { path: 'assets/index-abc.js', sha256: HASH_A.toUpperCase() },
+  ];
+
+  it('builds sorted, content-addressed entries in the plugin wire shape', () => {
+    expect(
+      buildManifestEntries({ files: FILES, publicBaseUrl: 'https://u.example.com/', prefix: '' }),
+    ).toEqual([
+      {
+        file_name: 'assets/index-abc.js',
+        file_hash: HASH_A,
+        download_url: `https://u.example.com/files/${HASH_A}`,
+      },
+      {
+        file_name: 'index.html',
+        file_hash: HASH_B,
+        download_url: `https://u.example.com/files/${HASH_B}`,
+      },
+    ]);
+    expect(
+      buildManifestEntries({
+        files: [FILES[0]],
+        publicBaseUrl: BASE.publicBaseUrl,
+        prefix: 'ota',
+      })[0].download_url,
+    ).toBe(`https://updates.example.com/ota/files/${HASH_B}`);
+  });
+
+  it('refuses what the endpoint entry validation would reject', () => {
+    const one = (path: string, sha256 = HASH_A) =>
+      buildManifestEntries({ files: [{ path, sha256 }], publicBaseUrl: BASE.publicBaseUrl });
+    expect(() => one('../escape.js')).toThrow(/unsafe manifest path/);
+    expect(() => one('/abs.js')).toThrow(/unsafe manifest path/);
+    expect(() => one('a\\b.js')).toThrow(/unsafe manifest path/);
+    expect(() => one('')).toThrow(/unsafe manifest path/);
+    expect(() => one('ok.js', 'beef')).toThrow(/sha256/);
+    expect(() => buildManifestEntries({ files: [], publicBaseUrl: BASE.publicBaseUrl })).toThrow(
+      /at least one file/,
+    );
+    expect(() =>
+      buildManifestEntries({ files: FILES, publicBaseUrl: 'http://u.example.com' }),
+    ).toThrow(/https/);
+  });
 });
 
 describe('parseOtaArgs', () => {
@@ -89,6 +153,7 @@ describe('parseOtaArgs', () => {
 describe('bundleFileName', () => {
   it('names artifacts by version', () => {
     expect(bundleFileName('0.33.0')).toBe('wocc-web-0.33.0.zip');
+    expect(manifestFileName('0.33.0')).toBe('wocc-web-0.33.0.manifest.json');
   });
 });
 

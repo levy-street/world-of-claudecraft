@@ -15,6 +15,7 @@ function mockGltfLoad(): void {
     loadGltf: vi.fn(() => Promise.resolve({ scene: {}, animations: [] })),
     loadHdr: vi.fn(() => new Promise(() => undefined)),
     loadTexture: vi.fn(() => new Promise(() => undefined)),
+    loadKtx2Texture: vi.fn(() => new Promise(() => undefined)),
     releaseGltf: vi.fn(),
   }));
 }
@@ -70,6 +71,7 @@ describe('createCharacterVisual happy path (issue 2079)', () => {
       loadGltf: vi.fn(() => Promise.resolve(stubGltf())),
       loadHdr: vi.fn(() => new Promise(() => undefined)),
       loadTexture: vi.fn(() => new Promise(() => undefined)),
+      loadKtx2Texture: vi.fn(() => new Promise(() => undefined)),
       releaseGltf: vi.fn(),
     }));
     const errSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
@@ -105,6 +107,7 @@ describe('CharacterVisual dispose() clears every cosmetic-overlay material cache
       loadGltf: vi.fn(() => Promise.resolve(stubGltf())),
       loadHdr: vi.fn(() => new Promise(() => undefined)),
       loadTexture: vi.fn(() => new Promise(() => undefined)),
+      loadKtx2Texture: vi.fn(() => new Promise(() => undefined)),
       releaseGltf: vi.fn(),
     }));
     const errSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
@@ -129,8 +132,6 @@ describe('CharacterVisual dispose() clears every cosmetic-overlay material cache
     visual.setShadowform(false);
     visual.setMoonkin(true);
     visual.setMoonkin(false);
-    visual.setMetamorph(true);
-    visual.setMetamorph(false);
     visual.setAuraGlow(0xffffff, 0.5);
     visual.setAuraGlow(0xffffff, 0);
 
@@ -139,7 +140,6 @@ describe('CharacterVisual dispose() clears every cosmetic-overlay material cache
       'soulRendMaterials',
       'shadowformMaterials',
       'moonkinMaterials',
-      'metamorphMaterials',
       'auraGlowMaterials',
     ] as const;
     const caches = visual as unknown as Record<string, Map<unknown, unknown>>;

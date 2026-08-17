@@ -107,6 +107,8 @@ describe('Hud action-bar facade', () => {
       },
       playerClass: 'warrior',
       playerName: 'ReinsFacade',
+      playerLevel: () => 10,
+      talentSpec: () => null,
       knownAbilityIds: () => [],
       hasAura: () => false,
       isInSportMatch: () => false,

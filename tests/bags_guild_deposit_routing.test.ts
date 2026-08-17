@@ -79,7 +79,16 @@ function harness(
   const sink =
     (name: string) =>
     (...a: unknown[]) =>
-      calls.push(`${name}:${a.filter((x) => x !== undefined).join(',')}`);
+      calls.push(
+        // Objects are JSON-stringified rather than left to String(), which renders
+        // every one of them as "[object Object]". The copy selection passed to
+        // useItem is an object, so without this a recorded call could not be told
+        // apart from any other object argument.
+        `${name}:${a
+          .filter((x) => x !== undefined)
+          .map((x) => (typeof x === 'object' && x !== null ? JSON.stringify(x) : String(x)))
+          .join(',')}`,
+      );
   const world = {
     inventory,
     bags: [null, null, null, null],
@@ -222,7 +231,12 @@ describe('guild-tab bag click routing (behavioral, real BagsWindow)', () => {
     // click must still reach the use ladder, and each armed pane must deposit.
     const closed = harness([{ itemId: plainId, count: 1 }], false, false, false);
     clickCellFor(closed.root, plainId);
-    expect(closed.calls).toEqual([`useItem:${plainId}`]);
+    // useItem now also carries WHICH bag copy was clicked, so the sink records a
+    // second argument. Asserted as a prefix plus the selection rather than as one
+    // exact string: this test is about the click REACHING the use ladder, and
+    // pinning the stringified argument object here would make it fail on any
+    // future field the selection gains.
+    expect(closed.calls).toEqual([`useItem:${plainId},{"slotIndex":0}`]);
     expect(closed.errors).toEqual([]);
   });
 

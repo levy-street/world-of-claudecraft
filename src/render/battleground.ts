@@ -82,15 +82,82 @@ export function ensureBattlegroundAssets(): Promise<void> {
   return battlegroundAssetsPromise;
 }
 
-// The DEFERRED lane: the field's art is only ever needed by a player who enters
-// the band, so it must not compete with the launcher's own fetches.
-if (typeof window !== 'undefined') registerDeferredPreload(() => ensureBattlegroundAssets());
+// The BACKGROUND lane, not just deferred: the field's art is only ever needed
+// by a player who enters the band, and buildBattleground() (below) already
+// streams its own pieces in as they resolve rather than reading the cache
+// synchronously (a player who arrives mid-stream sees the field fill in
+// rather than nothing at all), so it tolerates its preload finishing after
+// first frame too. Boot must not spend time on tens of MB of match art most
+// sessions never load into, on top of not competing with the launcher's own
+// fetches.
+if (typeof window !== 'undefined') {
+  registerDeferredPreload(() => ensureBattlegroundAssets(), 'background');
+}
 
 /** The renderer-owned hooks the field plugs into (the yumi signature shape). */
 export interface BattlegroundLightHooks {
   lowGfx: boolean;
+  /** Unused by this field, unlike the yumi maze it mirrors: Thornhollow's fire
+   *  is one shader-animated Points draw per fixture family
+   *  (`buildLanternFlames`), never a Mesh the renderer's flicker pass rescales. */
   flames?: THREE.Mesh[];
+  /** The renderer's shared fire-light registry. The field's authored lights MUST
+   *  land here (see buildBgFieldLights). */
   fireLights?: THREE.PointLight[];
+  /** Called after the field pushes lights into, or splices them out of,
+   *  `fireLights`, so the renderer can rebuild its light rank. */
+  onFireLightsChanged?: () => void;
+}
+
+/** Authored intensities are map units; the renderer's lights are much dimmer. */
+const BG_LIGHT_INTENSITY_SCALE = 0.05;
+
+/**
+ * Build the field's authored point lights INTO the renderer's shared fire-light
+ * budget, and return them so the view can hand them back on dispose.
+ *
+ * They MUST be ranked there. Three counts a light into numPointLights iff
+ * `visible`, that count is part of every lit material's program cache key, and
+ * the field streams in mid-session: up to 14 unranked lights appearing at once
+ * is a synchronous relink of every lit material in view, the exact stall the
+ * pinned point-light count exists to prevent.
+ */
+export function buildBgFieldLights(fireLights?: THREE.PointLight[]): THREE.PointLight[] {
+  const budget = BG_LIGHT_BUDGET_BY_TIER[GFX.tier] ?? 6;
+  const authored = [...bgFieldLights()]
+    .sort((a, b) => b.intensity * b.range - a.intensity * a.range)
+    .slice(0, budget);
+  const built: THREE.PointLight[] = [];
+  for (const l of authored) {
+    const intensity = l.intensity * BG_LIGHT_INTENSITY_SCALE;
+    const light = new THREE.PointLight(l.color, intensity, l.range, 2);
+    light.position.set(l.x, l.y, l.z);
+    // The budget's flicker pass drives contributing fire lights from
+    // userData.baseIntensity and falls back to its own bright default: these are
+    // deliberately dim cosmetic warmth, so state their level and let it flicker
+    // around THAT (the Mirefen impact-site light does the same, impact_site.ts).
+    light.userData.baseIntensity = intensity;
+    // Hidden until the first budget pass ranks it, exactly like the fire lights
+    // the renderer hides at boot: the field lands between frames, and a visible
+    // light the rank has never seen would change the pinned count.
+    light.visible = false;
+    built.push(light);
+    fireLights?.push(light);
+  }
+  return built;
+}
+
+/** Hand the field's lights back to the shared budget. Idempotent, and it leaves
+ *  every other owner's light in place. */
+export function releaseBgFieldLights(
+  lights: readonly THREE.PointLight[],
+  fireLights?: THREE.PointLight[],
+): void {
+  if (!fireLights) return;
+  for (const light of lights) {
+    const index = fireLights.indexOf(light);
+    if (index >= 0) fireLights.splice(index, 1);
+  }
 }
 
 export interface BattlegroundView {
@@ -294,16 +361,15 @@ export function buildBattleground(
         }
       }
 
-      const budget = BG_LIGHT_BUDGET_BY_TIER[GFX.tier] ?? 6;
-      const authored = [...bgFieldLights()]
-        .sort((a, b) => b.intensity * b.range - a.intensity * a.range)
-        .slice(0, budget);
-      for (const l of authored) {
-        const light = new THREE.PointLight(l.color, l.intensity * 0.05, l.range, 2);
-        light.position.set(l.x, l.y, l.z);
+      // The awaits above can resolve after the view was torn down (the decal
+      // load has no early-out of its own): a light registered then would rank,
+      // and shine, for a field that no longer exists.
+      if (disposed) return;
+      for (const light of buildBgFieldLights(opts.fireLights)) {
         lights.push(light);
         group.add(light);
       }
+      if (lights.length > 0) opts.onFireLightsChanged?.();
 
       freezeStaticMatrices(group);
     } catch (err) {
@@ -322,6 +388,11 @@ export function buildBattleground(
     dispose(): void {
       disposed = true;
       group.removeFromParent();
+      // Out of the shared budget BEFORE the lights are disposed: a left-behind
+      // registry entry would keep ranking (and could keep counting) a light
+      // that no longer belongs to any scene.
+      releaseBgFieldLights(lights, opts.fireLights);
+      if (lights.length > 0) opts.onFireLightsChanged?.();
       wards?.dispose();
       terrain?.dispose();
       placements?.dispose();

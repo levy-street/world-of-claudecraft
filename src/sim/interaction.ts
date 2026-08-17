@@ -67,7 +67,10 @@ import {
   bestWieldableAnyGatherToolTier,
   minWieldRequirementToWorkAny,
 } from './professions/wield_gate';
+import { isQuestGatedGroundObjectHidden } from './quest_gated_entity';
+import { noteReliquaryMark } from './reliquary';
 import type { SimContext } from './sim_context';
+import { interactSoulwell } from './soulwell';
 import {
   cloneItemInstancePayload,
   dist2d,
@@ -502,7 +505,10 @@ export function harvestCorpse(
       isSignableMaterialRarity(rarity) &&
       !canHarvestMonsterMaterial(bestAny, monsterMaterialTierFor(y.component))
     ) {
-      ctx.addItem(itemId, qty, meta.entityId, { silent: true, callerLogs: true });
+      ctx.addItem(itemId, qty, meta.entityId, {
+        silent: true,
+        callerLogs: true,
+      });
       recordHarvestYield(granted, { itemId, qty, rarity, kind: 'plain' });
       if (!toolDeniedEmitted) {
         toolDeniedEmitted = true;
@@ -528,13 +534,24 @@ export function harvestCorpse(
       ? HARVEST_COMPONENT_SPECIMENS[y.component]
       : undefined;
     if (specimenId !== undefined) {
-      ctx.addItem(itemId, qty, meta.entityId, { silent: true, callerLogs: true });
+      ctx.addItem(itemId, qty, meta.entityId, {
+        silent: true,
+        callerLogs: true,
+      });
       recordHarvestYield(granted, { itemId, qty, rarity, kind: 'plain' });
-      signedGrants.push({ itemId: specimenId, specimen: true, plainQty: 0, rarity });
+      signedGrants.push({
+        itemId: specimenId,
+        specimen: true,
+        plainQty: 0,
+        rarity,
+      });
     } else if (isSignableMaterialRarity(rarity)) {
       signedGrants.push({ itemId, specimen: false, plainQty: qty, rarity });
     } else {
-      ctx.addItem(itemId, qty, meta.entityId, { silent: true, callerLogs: true });
+      ctx.addItem(itemId, qty, meta.entityId, {
+        silent: true,
+        callerLogs: true,
+      });
       recordHarvestYield(granted, { itemId, qty, rarity, kind: 'plain' });
     }
   }
@@ -614,7 +631,10 @@ export function harvestCorpse(
         kind: 'signed',
       });
     } else {
-      ctx.addItem(grant.itemId, grant.plainQty, meta.entityId, { silent: true, callerLogs: true });
+      ctx.addItem(grant.itemId, grant.plainQty, meta.entityId, {
+        silent: true,
+        callerLogs: true,
+      });
       // Recorded 'plain', not 'signed': the ledger reports what LANDED, and
       // this arm landed an unsigned top-up. The gatherDowngrade toast below
       // still tells the player the mark was the thing that got away.
@@ -626,7 +646,12 @@ export function harvestCorpse(
       });
       if (!downgradeEmitted) {
         downgradeEmitted = true;
-        ctx.emit({ type: 'gatherDowngrade', pid: meta.entityId, surface: 'corpse', lost: 'mark' });
+        ctx.emit({
+          type: 'gatherDowngrade',
+          pid: meta.entityId,
+          surface: 'corpse',
+          lost: 'mark',
+        });
       }
     }
   }
@@ -651,12 +676,19 @@ export function harvestCorpse(
       // the LANDED jackpot only (a truncated find got away, like a fish with
       // no bag room). Every rarity draw happened in the roll loop above, so
       // this mark write cannot perturb the pinned draw sequence.
+      // Reliquary field-note trophy reuses the same gather_event:* id.
       ctx.markVisited(meta, 'gather_event:perfect_specimen');
+      noteReliquaryMark(ctx, meta, 'gather_event:perfect_specimen');
     } else if (!downgradeEmitted) {
       // A truncated specimen contributes NO ledger entry: nothing landed, so
       // no line claims it did. The 'find' toast is the whole feedback.
       downgradeEmitted = true;
-      ctx.emit({ type: 'gatherDowngrade', pid: meta.entityId, surface: 'corpse', lost: 'find' });
+      ctx.emit({
+        type: 'gatherDowngrade',
+        pid: meta.entityId,
+        surface: 'corpse',
+        lost: 'find',
+      });
     }
   }
   // #2457: one result event for the whole command, after every grant has
@@ -758,6 +790,7 @@ export function pickUpObject(
   }
   const objectItemId = obj.objectItemId;
   if (!objectItemId) return false;
+  if (interactSoulwell(ctx, obj, meta.entityId)) return true;
   const beforeCastingAbility = p.castingAbility;
   const beforeChanneling = p.channeling;
   if (tryStartNythraxisWardChannel(ctx, obj, p)) {
@@ -947,7 +980,16 @@ export function interact(
       bestCorpse = e;
       bestCorpseD2 = d2;
     }
-    if (e.kind === 'object' && e.lootable && d2 < bestObjD2) {
+    if (
+      e.kind === 'object' &&
+      e.lootable &&
+      d2 < bestObjD2 &&
+      // A quest collectable this player is not on the quest for is not in their
+      // world (the client withholds its view entirely), so the interact key must
+      // not select it either: picking it would refuse below, and worse, a shiny
+      // nobody can see would outrank a visible NPC or node standing further away.
+      !isQuestGatedGroundObjectHidden(e, r.meta.questLog)
+    ) {
       const noticeboardDef = noticeboardDefByEntityId(noticeboardDefinitions, e.id);
       if (!noticeboardDef || d2 <= noticeboardDef.interactionRadius ** 2) {
         bestObj = e;

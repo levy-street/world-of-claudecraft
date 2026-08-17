@@ -30,6 +30,7 @@ import { Sim } from '../src/sim/sim';
 import { directHealBonus, directHitBonus } from '../src/sim/spell_scaling';
 import { resolveTalentHitMult } from '../src/sim/talent_hit_mult';
 import type { AbilityEffect, Entity } from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 function directDamageEffect(effects: AbilityEffect[]) {
   const found = effects.find((e) => e.type === 'directDamage');
@@ -123,7 +124,12 @@ describe('mastery/talent damage percent scales the whole hit, not just the base 
     const baseline = emptyModifiers();
 
     const tickValue = (mods: TalentModifiers, spellPower: number): number => {
-      const sim = new Sim({ seed: 11, playerClass: 'warlock', autoEquip: true });
+      const sim = new Sim({
+        seed: 11,
+        playerClass: 'warlock',
+        autoEquip: true,
+        world: EMPTY_TEST_WORLD,
+      });
       sim.setPlayerLevel(20);
       installMods(sim, mods);
       sim.player.spellPower = spellPower;
@@ -152,7 +158,12 @@ describe('mastery/talent damage percent scales the whole hit, not just the base 
     const baseline = emptyModifiers();
 
     const tickValue = (mods: TalentModifiers, spellPower: number): number => {
-      const sim = new Sim({ seed: 21, playerClass: 'priest', autoEquip: true });
+      const sim = new Sim({
+        seed: 21,
+        playerClass: 'priest',
+        autoEquip: true,
+        world: EMPTY_TEST_WORLD,
+      });
       sim.setPlayerLevel(20);
       installMods(sim, mods);
       sim.player.spellPower = spellPower;
@@ -180,7 +191,12 @@ describe('mastery/talent damage percent scales the whole hit, not just the base 
 
     const shieldValue = (mods: TalentModifiers, spellPower: number): number => {
       const modsWithSpec: TalentModifiers = { ...mods, spec: 'frost' }; // ice_barrier is frost-spec-gated
-      const sim = new Sim({ seed: 31, playerClass: 'mage', autoEquip: true });
+      const sim = new Sim({
+        seed: 31,
+        playerClass: 'mage',
+        autoEquip: true,
+        world: EMPTY_TEST_WORLD,
+      });
       sim.setPlayerLevel(20);
       installMods(sim, modsWithSpec);
       sim.player.spellPower = spellPower;
@@ -210,19 +226,21 @@ describe('mastery/talent damage percent scales the whole hit, not just the base 
     const dmgPct = 0.3;
     const baseline = emptyModifiers();
     const boosted = emptyModifiers();
-    // Aura Surge is talent-granted (talent_abilities_v2_a.ts), not part of the
-    // paladin base kit, so both variants need the grant to know it at all.
-    accumulateTalentEffect(baseline, { grant: { ability: 'aura_surge' } });
-    accumulateTalentEffect(boosted, { grant: { ability: 'aura_surge' } });
-    accumulateTalentEffect(boosted, { ability: [{ ability: 'aura_surge', dmgPct }] });
+    // Sunward Disc carries the paladin chainDamage identity now (the overhaul
+    // retired talent-granted Aura Surge). It is Protection spec-gated base kit;
+    // the explicit grant reveals it here without a spec commit (grants bypass
+    // the spec gate in abilitiesKnownAt).
+    accumulateTalentEffect(baseline, { grant: { ability: 'sunward_disc' } });
+    accumulateTalentEffect(boosted, { grant: { ability: 'sunward_disc' } });
+    accumulateTalentEffect(boosted, { ability: [{ ability: 'sunward_disc', dmgPct }] });
 
     const baseAbility = abilitiesKnownAt('paladin', 20, baseline).find(
-      (a) => a.def.id === 'aura_surge',
+      (a) => a.def.id === 'sunward_disc',
     );
     const boostedAbility = abilitiesKnownAt('paladin', 20, boosted).find(
-      (a) => a.def.id === 'aura_surge',
+      (a) => a.def.id === 'sunward_disc',
     );
-    if (!baseAbility || !boostedAbility) throw new Error('missing aura_surge');
+    if (!baseAbility || !boostedAbility) throw new Error('missing sunward_disc');
     const baseEff = chainDamageEffect(baseAbility.effects);
     const boostedEff = chainDamageEffect(boostedAbility.effects);
 
@@ -247,22 +265,27 @@ describe('mastery/talent damage percent scales the whole hit, not just the base 
     expect(unfixedHit / baselineHit).toBeLessThan(1 + dmgPct);
   });
 
-  it('Aura Surge bounce hits (chainDamage) scale under a global spellDmgPct, matching the primary hit, end to end', () => {
+  it('Sunward Disc bounce hits (chainDamage) scale under a global spellDmgPct, matching the primary hit, end to end', () => {
     const dmgPct = 0.3;
 
-    // Casts Hallowed Wall / holy_shield (directDamage primary + a chainDamage
-    // rider: 2 jumps, no falloff) against three hostile dummies laid out so
-    // hop selection (nearest distance, then lowest id) is deterministic, and
-    // returns the three resulting damage amounts: primary, then the two
-    // chainDamage bounces. `boost` layers a global spellDmgPct (the shape a
-    // mastery like Earthen Fury advertises) on top of the spec commit that
-    // grants holy_shield as the Protection signature, rather than replacing
-    // meta.talentMods wholesale, so the grant survives.
+    // Casts Sunward Disc (directDamage primary + a chainDamage rider: 2 jumps,
+    // no falloff) against three hostile dummies laid out so hop selection
+    // (nearest distance, then lowest id) is deterministic, and returns the
+    // three resulting damage amounts: primary, then the two chainDamage
+    // bounces. `boost` layers a global spellDmgPct (the shape a mastery like
+    // Earthen Fury advertises) on top of the Protection spec commit that
+    // reveals sunward_disc, rather than replacing meta.talentMods wholesale,
+    // so the spec grant survives.
     const castHits = (boost: boolean): number[] => {
-      const sim = new Sim({ seed: 41, playerClass: 'paladin', autoEquip: true });
+      const sim = new Sim({
+        seed: 41,
+        playerClass: 'paladin',
+        autoEquip: true,
+        world: EMPTY_TEST_WORLD,
+      });
       sim.setPlayerLevel(20);
-      // holy_shield (Hallowed Wall) is granted as the Protection signature
-      // ability (talents.ts: spec.signature), not base kit by def alone.
+      // sunward_disc is Protection spec-gated base kit: known only once the
+      // spec commit lands (and it requires a shield, which autoEquip provides).
       if (!sim.setSpec('protection')) throw new Error('failed to set protection spec');
       const meta = sim.meta(sim.playerId);
       if (!meta) throw new Error('missing player meta');
@@ -294,17 +317,19 @@ describe('mastery/talent damage percent scales the whole hit, not just the base 
         primary.pos.z - sim.player.pos.z,
       );
       sim.drainEvents();
-      sim.castAbility('holy_shield');
+      sim.castAbility('sunward_disc');
       // tick() itself drains and returns the events queued so far (including
       // the ones the instant cast above just emitted), so collect from its
       // return value rather than a trailing drainEvents() call. Filter to the
       // cast's OWN damage events (by ability name), since the same ticks also
       // resolve the dummies' retaliation swings on the player.
       const ticked: import('../src/sim/types').SimEvent[] = [];
-      for (let i = 0; i < 5; i++) ticked.push(...sim.tick());
+      // The disc is a projectile: give the primary flight plus both bounce
+      // hops time to land before collecting.
+      for (let i = 0; i < 20; i++) ticked.push(...sim.tick());
       const hits = ticked
         .filter(
-          (e) => e.type === 'damage' && (e as { ability?: string }).ability === 'Hallowed Wall',
+          (e) => e.type === 'damage' && (e as { ability?: string }).ability === 'Sunward Disc',
         )
         .map((e) => (e as unknown as { amount: number }).amount);
       expect(hits).toHaveLength(3); // directDamage primary + 2 chainDamage bounces
@@ -377,7 +402,12 @@ describe('mastery/talent damage percent scales the whole hit, not just the base 
     const healPct = 0.2;
 
     const castInitialHeals = (boost: boolean): number[] => {
-      const sim = new Sim({ seed: 51, playerClass: 'mage', autoEquip: true });
+      const sim = new Sim({
+        seed: 51,
+        playerClass: 'mage',
+        autoEquip: true,
+        world: EMPTY_TEST_WORLD,
+      });
       sim.setPlayerLevel(20);
       if (!sim.setSpec('arcane')) throw new Error('failed to set arcane spec');
       const meta = sim.meta(sim.playerId);

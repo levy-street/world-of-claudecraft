@@ -19,6 +19,7 @@ describe('modelViewerEmbed', () => {
     });
     expect(html).toContain('src="/guide-stills/mob_wolf__abc.webp"');
     expect(html).not.toContain('src="data:crest"'); // still wins over the crest
+    expect(html).toContain('data-poster-fallback="data:crest"');
     expect(html).toContain('guide-viewer-poster-still');
     // the still IS the content now, so its alt names the subject (non-empty)
     const alt = html.match(/class="guide-viewer-poster[^"]*"[^>]*\salt="([^"]*)"/)?.[1] ?? '';
@@ -27,15 +28,22 @@ describe('modelViewerEmbed', () => {
   });
 
   it('falls back to the 2D crest as a DECORATIVE image (alt="") when there is no still', () => {
-    const html = modelViewerEmbed({ modelKey: 'mage', name: 'Mage', poster: 'data:crest' });
-    expect(html).toContain('src="data:crest"');
+    const html = modelViewerEmbed({
+      modelKey: 'mage',
+      name: 'Mage',
+      poster: '/ui/classes/mage.webp',
+      posterCrestId: 'class_mage',
+    });
+    expect(html).toContain('src="/ui/classes/mage.webp"');
     expect(html).not.toContain('guide-viewer-poster-still');
+    expect(html).not.toContain('data-poster-fallback');
+    expect(html).toContain('data-crest-fallback-id="class_mage"');
     const alt = html.match(/class="guide-viewer-poster[^"]*"[^>]*\salt="([^"]*)"/)?.[1] ?? null;
     expect(alt).toBe(''); // decorative crest, not announced
   });
 
   it('emits no poster image when neither a still nor a crest is provided', () => {
-    const html = modelViewerEmbed({ modelKey: 'spellhound', name: 'Spellhound' });
+    const html = modelViewerEmbed({ modelKey: 'gloomshade', name: 'Gloomshade' });
     expect(html).not.toContain('class="guide-viewer-poster');
   });
 

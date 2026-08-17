@@ -363,6 +363,7 @@ const QUEST_IDS = [
   'q_hollow',
   'q_sexton',
   'q_gravecallers_trail',
+  'q_divine_tome',
   'q_bandits',
   'q_ringleader',
   'q_fenbridge_muster',
@@ -378,6 +379,7 @@ const QUEST_IDS = [
   'q_drowned',
   'q_drowned_censers',
   'q_no_rest',
+  'q_rite_of_redemption',
   'q_trolls',
   'q_troll_fetishes',
   'q_grubjaw',
@@ -592,6 +594,7 @@ const DUNGEON_IDS = [
   'lb_breach',
   'lb_lastwatch',
   'lb_willowfen',
+  'dawnhold_castle',
 ] as const;
 const DELVE_IDS = ['collapsed_reliquary', 'drowned_litany'] as const;
 // Ravenpost authored letters (src/sim/content/letters.ts): the welcome letter

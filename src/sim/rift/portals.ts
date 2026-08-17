@@ -24,6 +24,7 @@ import { Rng } from '../rng';
 import type { SimContext } from '../sim_context';
 import { RIFT_TIER_COLORS, type RiftTier, type ZoneDef } from '../types';
 import { groundHeight, terrainSteepnessAt, WATER_LEVEL } from '../world';
+import { riftFx } from './fx';
 import { RIFT_RANK_BASE_LEVEL } from './ranks';
 import { generateRiftPlan } from './rift_gen';
 import type { RiftEvent } from './types';
@@ -276,6 +277,7 @@ export function spawnNaturalRiftPortal(
   portalEntity.riftTier = tier;
   portalEntity.riftEventId = eventId;
   ctx.addEntity(portalEntity);
+  riftFx(ctx, position.x, position.z, 'arcane', 'burst', 'rift_portal_spawn');
 
   const portal: NaturalRiftPortal = {
     id: portalEntity.id,

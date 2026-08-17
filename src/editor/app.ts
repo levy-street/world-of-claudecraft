@@ -81,7 +81,7 @@ import {
 import { confirmDialog, promptDialog, Toasts } from './toasts';
 import { type EditorTool, TOOL_BY_KEY, Toolbar } from './toolbar';
 import { Topbar } from './topbar';
-import { EditorTutorial } from './tutorial';
+import { TutorialLoader } from './tutorial_loader';
 import { UndoStack } from './undo_core';
 import { isUserAssetId, registerUserAssets, userAssetIdFor, userAssetLabel } from './user_assets';
 import { Camera, pickHandle, type ScreenPoint, type Vec2, type Viewport } from './view';
@@ -138,7 +138,7 @@ export class EditorApp {
   private readonly assets: AssetBrowser;
   private readonly drawer: MapDrawer;
   private readonly toasts: Toasts;
-  private readonly tutorial: EditorTutorial;
+  private readonly tutorial: TutorialLoader;
 
   // ---- stage -----------------------------------------------------------------
   private readonly stage2d: HTMLElement;
@@ -375,8 +375,9 @@ export class EditorApp {
     this.boot3d();
 
     // Help modal + first-run tour (auto-starts once; Help > Begin tutorial
-    // replays it any time).
-    this.tutorial = new EditorTutorial(this.root);
+    // replays it any time). Loaded lazily: maybeAutoStart() skips the import
+    // outright for a returning-user session, the large majority.
+    this.tutorial = new TutorialLoader(this.root);
     this.tutorial.maybeAutoStart();
   }
 

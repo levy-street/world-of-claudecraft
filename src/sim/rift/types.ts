@@ -96,16 +96,6 @@ export interface RiftEvent {
   } | null;
 }
 
-/** The whole wire/persistence footprint of a rift instance. Both hosts turn this
- * into identical content via rift_gen. `origin` is the instance-space anchor the
- * floor's local coordinates are offset by (see rift/runs.ts). */
-export interface RiftDescriptor {
-  seed: number;
-  baseLevel: number;
-  floorIndex: number;
-  origin: { x: number; z: number };
-}
-
 /** One placed creature, instance-local. `color`/`scale` are per-run re-grades of
  * the base template so the same creature reads differently across rifts; when
  * omitted the template's own values are used. `level` is already resolved. */
@@ -351,7 +341,7 @@ export interface RiftInstance {
    * deathZoneStrike mechanics). Each zone starts with a `remaining` fuse equal
    * to the boss's cast time; at zero it detonates (lethal to anyone inside `radius`).
    * Cleared on boss death or floor reset. */
-  bossDeathZones: Array<{ x: number; z: number; radius: number; remaining: number }>;
+  bossDeathZones: Array<{ x: number; z: number; radius: number; remaining: number; total: number }>;
   /** Recently-exited-mid-combat memory (issue #2653): a player who left this run
    * through the beacon/exit while a mob was actively fighting them has their
    * dropped threat snapshotted here for a short window. Re-entering before it

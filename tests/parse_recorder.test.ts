@@ -8,7 +8,7 @@ import type { SimEvent } from '../src/sim/types';
 import { FAKE_PARSE_FLAGS, type FakeSim, fakeSim } from './helpers/parse_fake_sim';
 
 function player(id: number): RecorderEntityView {
-  return { id, templateId: 'mage', level: 20 };
+  return { id, templateId: 'mage', name: `Player${id}`, level: 20 };
 }
 
 function participantResolver(sim: FakeSim): (pid: number) => FightParticipant | null {
@@ -191,7 +191,7 @@ describe('ParseRecorder enrichment', () => {
     const sim = fakeSim();
     const match = arenaMatch();
     seedArena(sim, match);
-    sim.entities.set(77, { id: 77, templateId: 'wolf', level: 20, ownerId: 5 });
+    sim.entities.set(77, { id: 77, templateId: 'wolf', name: 'Wolf', level: 20, ownerId: 5 });
     const { recorder, records } = makeRecorder(sim);
 
     sim.tickCount = 10;

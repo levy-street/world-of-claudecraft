@@ -157,6 +157,18 @@ export const DEV_COMMAND_ACTIONS: readonly DevCommandAction[] = [
     },
   },
   {
+    id: 'biskit',
+    category: 'inventory',
+    labelKey: 'devCommand.actions.biskit.label',
+    descriptionKey: 'devCommand.actions.biskit.description',
+    // Same optional-spec contract as the fresh-20 kit: blank means the server
+    // dresses whatever the character is currently specced into.
+    command: (values) => {
+      const spec = token(values, 'bisSpec');
+      return spec ? `/dev bis ${spec}` : '/dev bis';
+    },
+  },
+  {
     id: 'gold',
     category: 'inventory',
     labelKey: 'devCommand.actions.gold.label',
@@ -267,6 +279,14 @@ export const DEV_COMMAND_ACTIONS: readonly DevCommandAction[] = [
     command: fixed('/dev lfg board'),
   },
 ];
+
+// The Spawns tab is staff-only: conjuring or deleting mobs reshapes the shared
+// world every other tester is standing in, so on a hosted realm it is shown only
+// to admin accounts. Advert only: the server re-checks the spawn family per
+// message, so a client that lies to itself gets an inert tab.
+export function devCategoryVisible(category: DevCommandCategory, accountAdmin: boolean): boolean {
+  return category !== 'spawns' || accountAdmin;
+}
 
 export function isDevGuiCommand(value: string): boolean {
   return /^\/dev\s+gui\s*$/i.test(value.trim());

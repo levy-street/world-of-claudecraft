@@ -38,15 +38,31 @@ import {
   RIFT_MECHANIC_WINDUP_SEC,
   RIFT_POST_MECHANIC_SWING_GAP_SEC,
 } from '../src/sim/mob/rift_escape_window';
+import {
+  RIFT_MIN_ZONE_REACTION_SEC,
+  RIFT_RANK_MECHANIC_BUDGET,
+  RIFT_S_ZONE_TEMPO,
+  riftDeathZoneFuse,
+  riftDeathZoneReactionBudget,
+} from '../src/sim/rift/ranks';
 import { Sim } from '../src/sim/sim';
 import { addThreat } from '../src/sim/threat';
-import { DT, dist2d, type Entity, type SimEvent } from '../src/sim/types';
+import {
+  DT,
+  dist2d,
+  type Entity,
+  type MobTemplate,
+  type RiftTier,
+  RUN_SPEED,
+  type SimEvent,
+} from '../src/sim/types';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const SPACING = RIFT_MECHANIC_SPACING_SEC;
 const WINDUP = RIFT_MECHANIC_WINDUP_SEC;
 
 function makeSim(seed = 42) {
-  return new Sim({ seed, playerClass: 'warrior', autoEquip: true });
+  return new Sim({ seed, playerClass: 'warrior', autoEquip: true, world: EMPTY_TEST_WORLD });
 }
 
 const stunAura = (e: Entity) => e.auras.find((a) => a.id === 'stomp_stun');
@@ -95,7 +111,13 @@ function captureEvents(sim: Sim): SimEvent[] {
 // and hand-place a stamped boss of the given template on the player inside the
 // instance (its id joined to inst.mobIds so the death-zone driver finds it).
 function enterRiftWithBoss(templateId: string): { sim: Sim; mob: Entity } {
-  const sim = new Sim({ seed: 3, playerClass: 'warrior', autoEquip: true, devCommands: true });
+  const sim = new Sim({
+    seed: 3,
+    playerClass: 'warrior',
+    autoEquip: true,
+    devCommands: true,
+    world: EMPTY_TEST_WORLD,
+  });
   sim.enterRift(3, 20, sim.player.id);
   const inst = sim.riftInstances.find((i) => i.partyKey !== null)!;
   for (const id of inst.mobIds) {
@@ -379,6 +401,75 @@ describe('on-hit control procs respect escape windows', () => {
     }
     expect(moved).toBe(true);
   });
+
+  // The suppression is INSTANCE-wide, not swinger-scoped: a dais guard's root
+  // or stun during the boss's death-zone fuse eats the escape window exactly
+  // like the boss's own procs would (the fuse math assumes an unimpaired
+  // runner and samples impairment only at spawn), which is how an S-rank
+  // Venom Pool stayed a coin toss after the boss's own kit was suppressed
+  // (v0.36.0 player feedback: "adding stuns, slows, ensnares into the mix").
+  function riftGuardOnBossFloor(): { sim: Sim; boss: Entity; guard: Entity } {
+    const { sim, mob: boss } = enterRiftWithBoss('rift_boss_venom');
+    const inst = sim.riftInstances.find((i) => i.partyKey !== null)!;
+    const guard = createMob(920500, MOBS.rift_venom_weaver, 22, { ...sim.player.pos });
+    guard.spawnPos = { ...sim.player.pos };
+    guard.aiState = 'attack';
+    guard.aggroTargetId = sim.playerId;
+    guard.inCombat = true;
+    addThreat(guard, sim.playerId, 1000);
+    (sim as any).addEntity(guard);
+    inst.mobIds.push(guard.id);
+    return { sim, boss, guard };
+  }
+
+  it("a dais guard's web root skips while the BOSS's telegraph is in flight", () => {
+    const { sim, boss, guard } = riftGuardOnBossFloor();
+    boss.escapeWindowUntil = 1e9;
+    for (let i = 0; i < 80; i++) {
+      sim.player.hp = sim.player.maxHp;
+      (sim as any).mobSwing(guard, sim.player);
+    }
+    expect(
+      sim.player.auras.find((a) => a.id === 'ensnare_rift_venom_weaver'),
+      'guard root suppressed by the boss window',
+    ).toBeUndefined();
+  });
+
+  it("the guard's web root still lands with no boss telegraph in flight (same seed control)", () => {
+    const { sim, guard } = riftGuardOnBossFloor();
+    let rooted = false;
+    for (let i = 0; i < 80 && !rooted; i++) {
+      sim.player.hp = sim.player.maxHp;
+      (sim as any).mobSwing(guard, sim.player);
+      rooted = sim.player.auras.some((a) => a.id === 'ensnare_rift_venom_weaver');
+    }
+    expect(rooted, 'no window means the guard kit plays normally').toBe(true);
+  });
+
+  it('an open-world mob with the same kit is never suppressed by rift state', () => {
+    // The predicate must key on the swinger's INSTANCE, not on any rift boss
+    // anywhere in the world: an overworld spider keeps its web while some
+    // unrelated rift party is dodging a zone.
+    const { sim, boss } = riftGuardOnBossFloor();
+    boss.escapeWindowUntil = 1e9;
+    const outside = createMob(920600, MOBS.rift_venom_weaver, 22, {
+      x: sim.player.pos.x,
+      y: sim.player.pos.y,
+      z: sim.player.pos.z,
+    });
+    outside.aiState = 'attack';
+    outside.aggroTargetId = sim.playerId;
+    outside.inCombat = true;
+    addThreat(outside, sim.playerId, 1000);
+    (sim as any).addEntity(outside); // deliberately NOT joined to inst.mobIds
+    let rooted = false;
+    for (let i = 0; i < 80 && !rooted; i++) {
+      sim.player.hp = sim.player.maxHp;
+      (sim as any).mobSwing(outside, sim.player);
+      rooted = sim.player.auras.some((a) => a.id === 'ensnare_rift_venom_weaver');
+    }
+    expect(rooted, 'a mob outside the instance is untouched').toBe(true);
+  });
 });
 
 describe('rift boss cleave is a frontal arc', () => {
@@ -387,7 +478,12 @@ describe('rift boss cleave is a frontal arc', () => {
   });
 
   function cleaveSplashAt(offX: number, offZ: number, stamped: boolean): boolean {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const mainId = sim.addPlayer('warrior', 'Tank');
     const offId = sim.addPlayer('warrior', 'Bystander');
     const mob = createMob((sim as any).nextId++, MOBS.rift_boss_brute, 22, { x: 0, y: 0, z: 0 });
@@ -543,5 +639,72 @@ describe('windup lifecycle and invariants', () => {
       return (sim as any).rng.next();
     };
     expect(drawAfterSwings(true)).toBe(drawAfterSwings(false));
+  });
+});
+
+// 5. The fuse is not the reaction window. A zone anchors ON a player, so the
+//    anchor spends radius/RUN_SPEED of the fuse just running clear and only the
+//    remainder is time to notice the circle and commit to moving. Nothing
+//    checked that remainder, so Bonelord Xarreth shipped v0.37.0 with a 2.5s
+//    Soul Grave (0.46s left at S) and a 3.0s Death Sentence (0.53s, and at S
+//    that one is the barrage, one zone under every living member) while the
+//    rest of the roster sat at 1.16s or better. Both read as undodgeable in
+//    playtest. This guard is roster-wide and rank-wide on purpose: the defect
+//    was authored per boss, so a per-boss assertion would have missed it too.
+describe('every lethal death zone leaves real time to react', () => {
+  const RANKS: RiftTier[] = ['C', 'B', 'A', 'S'];
+  const ZONE_KEYS = ['deathZoneCast', 'deathZoneStrike'] as const;
+
+  /** Ranks a gated mechanic actually fires at: a boss runs the head of its
+   * rankMechanics list (C=1 .. S=4), and an unlisted gated key never fires. */
+  const liveRanks = (tmpl: MobTemplate, key: string): RiftTier[] => {
+    const index = tmpl.rankMechanics?.indexOf(key) ?? -1;
+    if (index < 0) return [];
+    return RANKS.filter((rank) => index < RIFT_RANK_MECHANIC_BUDGET[rank]);
+  };
+
+  const zones = RIFT_BOSS_IDS.flatMap((id) =>
+    ZONE_KEYS.flatMap((key) => {
+      const tmpl = MOBS[id];
+      const def = tmpl?.[key];
+      if (!def) return [];
+      return liveRanks(tmpl, key).map((rank) => ({ id, name: tmpl.name, def, rank }));
+    }),
+  );
+
+  it('covers the whole roster (the list is not silently empty)', () => {
+    // A budget guard that enumerates nothing passes vacuously. Every rift boss
+    // authors both zones, and both sit at rankMechanics indices 2 and 3 across
+    // the procedural roster, so the live set is substantial at A and S.
+    expect(zones.length).toBeGreaterThan(15);
+    expect(new Set(zones.map((z) => z.id)).size).toBeGreaterThan(5);
+  });
+
+  it.each(zones)(
+    '$name $def.name at rank $rank leaves at least the reaction floor',
+    ({ def, rank }) => {
+      const budget = riftDeathZoneReactionBudget(def.castTime, def.radius, rank);
+      expect(budget).toBeGreaterThanOrEqual(RIFT_MIN_ZONE_REACTION_SEC);
+    },
+  );
+
+  it('the budget is the fuse minus the run out of the zone, not the fuse', () => {
+    // Pins the shape of the math itself, so a future edit cannot quietly
+    // redefine "budget" as the fuse and turn the guard above vacuous.
+    const castTime = 3.5;
+    const radius = 9;
+    expect(riftDeathZoneFuse(castTime, 'A')).toBeCloseTo(3.5, 5);
+    expect(riftDeathZoneFuse(castTime, 'S')).toBeCloseTo(3.5 * RIFT_S_ZONE_TEMPO, 5);
+    expect(riftDeathZoneReactionBudget(castTime, radius, 'S')).toBeCloseTo(
+      3.5 * RIFT_S_ZONE_TEMPO - radius / RUN_SPEED,
+      5,
+    );
+  });
+
+  it('would have failed on the shipped v0.37.0 Xarreth cast times', () => {
+    // The regression itself, stated as a number: this is what the guard exists
+    // to catch, and it must stay below the floor or the floor means nothing.
+    expect(riftDeathZoneReactionBudget(2.5, 9, 'S')).toBeLessThan(RIFT_MIN_ZONE_REACTION_SEC);
+    expect(riftDeathZoneReactionBudget(3.0, 11, 'S')).toBeLessThan(RIFT_MIN_ZONE_REACTION_SEC);
   });
 });

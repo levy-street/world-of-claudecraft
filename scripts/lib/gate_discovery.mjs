@@ -21,7 +21,7 @@ import {
 /**
  * Vitest's own default include is `**\/*.{test,spec}.?(c|m)[jt]s?(x)`, and
  * vite.config.ts excludes node_modules, dist, the agent-runtime dirs, .worktrees,
- * .venv, tmp/, tests/browser/, and *.browser.test.ts. Discovery MUST match, or
+ * .wt, .venv, tmp/, tests/browser/, and *.browser.test.ts. Discovery MUST match, or
  * the always-run set silently omits files the full suite runs: the first cut
  * matched only `.test.ts` and skipped every directory named `helpers`, hiding 20
  * collected files (5 `.test.mjs`, 15 under `helpers/`), 8 of which classify as
@@ -38,6 +38,7 @@ export const SKIP_DIRS = Object.freeze([
   '.codex',
   '.agents',
   '.worktrees',
+  '.wt',
   '.venv',
   'tmp',
   'browser',
@@ -162,13 +163,19 @@ export function collectSuiteVisibility(io) {
  * A merge bar diffs the BRANCH, so the base is resolved here and its absence is
  * an error rather than a silent narrowing.
  *
- * @param {{ env?: Record<string, string | undefined>, run: (cmd: string, args: string[]) => { status: number | null, stdout?: string } }} io
+ * @param {{ env?: Record<string, string | undefined>, run: (cmd: string, args: string[]) => { status: number | null, stdout?: string, error?: Error } }} io
  * @returns {{ base: string | null, reason: string }}
  */
 export function resolveSelectBase({ env = {}, run }) {
+  /** @param {{ error?: Error }} result */
+  const launchFailure = (result) =>
+    result.error === undefined ? null : `git failed to launch: ${result.error.message}`;
+
   const explicit = env.GATE_SELECT_BASE?.trim();
   if (explicit) {
     const ok = run('git', ['rev-parse', '--verify', `${explicit}^{commit}`]);
+    const failure = launchFailure(ok);
+    if (failure) return { base: null, reason: failure };
     if (ok.status !== 0) {
       return { base: null, reason: `GATE_SELECT_BASE="${explicit}" does not resolve to a commit` };
     }
@@ -185,6 +192,8 @@ export function resolveSelectBase({ env = {}, run }) {
     '--sort=-v:refname',
     'refs/remotes/origin/release',
   ]);
+  const releaseFailure = launchFailure(releases);
+  if (releaseFailure) return { base: null, reason: releaseFailure };
   const newestRelease =
     releases.status === 0
       ? (releases.stdout ?? '')
@@ -194,6 +203,8 @@ export function resolveSelectBase({ env = {}, run }) {
       : undefined;
   for (const candidate of [newestRelease, 'origin/main', 'origin/HEAD'].filter(Boolean)) {
     const probe = run('git', ['rev-parse', '--verify', `${candidate}^{commit}`]);
+    const failure = launchFailure(probe);
+    if (failure) return { base: null, reason: failure };
     if (probe.status === 0) return { base: candidate, reason: `integration base ${candidate}` };
   }
   return { base: null, reason: 'no release branch or origin base could be resolved' };

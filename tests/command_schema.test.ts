@@ -42,11 +42,25 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // (the activity log's on-demand READ request; its answer comes back on its own
 // one-shot 'gbanklog' frame, not the snapshot), the battleground surface
 // (bg_queue/bg_leave/bg_flag sends plus the dev-only bg_queue force start),
-// and stopAutoAttackOnTargetSwitch joining as a send + dispatch pair (issue #1358).
-// This branch adds set_helm as a send + dispatch pair (the paperdoll
-// helmet-visibility eye; helmHidden persists per character like weaponStowed).
-const EXPECTED_SEND_COUNT = 191;
-const EXPECTED_DISPATCH_COUNT = 204;
+// stopAutoAttackOnTargetSwitch joining as a send + dispatch pair (issue #1358),
+// the controlled Warlock pet's signature-skill command and autocast toggle
+// (+2 send/dispatch from the class-overhauls integration), set_helm as a
+// send + dispatch pair (the paperdoll helmet-visibility eye; helmHidden
+// persists per character like weaponStowed), inv_sort as a send + dispatch
+// pair (the one-shot bag clean-up; no payload, the sim re-derives the whole
+// arrangement deterministically), and bg_respond as a send + dispatch pair
+// (the release's battleground queue-pop confirmation).
+// The Reliquary packet's nameplate border adds deed_set_border as a send +
+// dispatch pair, the exact sibling of deed_set_title, and this branch adds
+// tabPrev as a send + dispatch pair (the backward half of the Tab target
+// cycle, Shift+Tab by default; no payload, the sim walks the same ordered
+// list in reverse). NOTE (merge trap): both
+// sides of every v0.36.0 sync bump these counts independently, and git has
+// auto-merged identical numbers before while the real total was higher; the
+// merged tree carries BOTH sides' pairs. Only the suite says what they really
+// are, and the numbers below were set from a run, not from this narrative.
+const EXPECTED_SEND_COUNT = 199;
+const EXPECTED_DISPATCH_COUNT = 212;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

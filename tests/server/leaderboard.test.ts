@@ -14,6 +14,7 @@
 // exercised here touch only the injected runtime, never the real db reads.
 process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_phase10_units';
 
+import { readFileSync } from 'node:fs';
 import type * as http from 'node:http';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { SHEET_RECENT_DEEDS, type SheetRank } from '../../server/character_sheet';
@@ -27,6 +28,7 @@ import {
   buildStandardBoard,
   configureLeaderboardRuntime,
   decodeArenaFormat,
+  decodedRouteName,
   decodeLegacyLimit,
   decodePage,
   decodePageSize,
@@ -105,7 +107,7 @@ function deedsRow(rank: number): DeedsLeaderboardEntry {
 }
 
 function arenaRow(name: string): ArenaLeaderRow {
-  return { name, class: 'mage', level: 60, rating: 1800, wins: 20, losses: 5 };
+  return { name, class: 'mage', level: 60, rating: 1800, wins: 20, losses: 5, draws: 0 };
 }
 
 function characterRow(id: number, name: string): CharacterRow {
@@ -410,6 +412,32 @@ describe('readPublicSheet (FakeCharactersDb, resolved by name)', () => {
     const out = await readPublicSheet(db, 'Nobody', sheetDeps);
     expect(out).toEqual({ status: 404, body: { error: 'character not found' } });
     expect(spy).not.toHaveBeenCalled();
+  });
+
+  it('a malformed percent-escape in the name 404s instead of throwing a 500', async () => {
+    // decodedRouteName is the handler's decode arm: a good escape decodes, a
+    // malformed one falls back to the raw segment (which then misses the name
+    // lookup), mirroring the /c/ page's arm for the identical lookup. The
+    // URIError path used to escape the handler and turn the route into a 500.
+    expect(decodedRouteName('Mira%20Vale')).toBe('Mira Vale');
+    expect(decodedRouteName('%E0%A4%A')).toBe('%E0%A4%A');
+    const db = new FakeCharactersDb();
+    const out = await readPublicSheet(db, decodedRouteName('%E0%A4%A'), sheetDeps);
+    expect(out).toEqual({ status: 404, body: { error: 'character not found' } });
+  });
+
+  it('BOTH sheet arms route the name through decodedRouteName (wiring pin)', () => {
+    // The helper tests above prove decodedRouteName's behavior; this pins the
+    // WIRING, without which reverting either call site to a bare
+    // decodeURIComponent would leave every test green while the route 500s
+    // again. Two arms serve the same path: the RouteDef handler here, and the
+    // retained legacy ladder in main.ts that API_DISPATCH=legacy (the
+    // documented one-flag production rollback) switches back to.
+    const here = readFileSync(new URL('../../server/leaderboard.ts', import.meta.url), 'utf8');
+    expect(here).toMatch(/readPublicSheet\(dbReads, decodedRouteName\(ctx\.params\.name\)/);
+    expect(here.match(/decodeURIComponent\(/g) ?? []).toHaveLength(1); // only inside the helper
+    const legacy = readFileSync(new URL('../../server/main.ts', import.meta.url), 'utf8');
+    expect(legacy).toMatch(/const rawName = decodedRouteName\(publicSheetMatch\[1\]\);/);
   });
 
   it('resolves by name (case-insensitively) and returns a 200 public sheet with guild + rank', async () => {

@@ -1,8 +1,14 @@
 import * as THREE from 'three';
 import { loadTexture, releaseTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import {
+  type DrainLifeParticleKind,
+  type DrainLifeParticleSink,
+  DrainLifeVfx,
+} from './drain_life_vfx';
 import { GFX } from './gfx';
-import type { VfxAnchorResolver } from './vfx_anchor';
+import { PaladinSpellVfxController, type PaladinSpellVfxSprite } from './paladin_spell_vfx';
+import type { VfxAnchorResolver, VfxOffsetAnchorResolver } from './vfx_anchor';
 import {
   insertActiveParticleSlot,
   pointSpriteBoundingRadius,
@@ -116,6 +122,19 @@ const SPR = {
   debris: 14,
   ring: 15,
 } as const;
+
+const PALADIN_SPRITES: Record<PaladinSpellVfxSprite, number> = {
+  glowSoft: SPR.glowSoft,
+  glowCore: SPR.glowCore,
+  flash: SPR.flash,
+  sparkle: SPR.sparkle,
+  sparkBurst: SPR.sparkBurst,
+  star: SPR.star,
+  magicRune: SPR.magicRune,
+  trace: SPR.trace,
+  slash: SPR.slash,
+  ring: SPR.ring,
+};
 
 const spriteImages: (TexImageSource | null)[] = SPRITE_FILES.map(() => null);
 for (let i = 0; i < SPRITE_FILES.length; i++) {
@@ -254,6 +273,7 @@ interface Projectile {
   // Visual heft multiplier (Pyroblast's heavyBolt = 2): scales the comet core,
   // trail and impact flash; mechanics and speed are untouched.
   scale?: number;
+  onImpact?: (position: THREE.Vector3) => void;
 }
 
 interface BubbleBeam {
@@ -302,6 +322,7 @@ export class Vfx {
   private head = 0;
   private projectiles: Projectile[] = [];
   private bubbleBeams: BubbleBeam[] = [];
+  private drainLifeVfx: DrainLifeVfx;
   private tmpColor = new THREE.Color();
   private tmpDirection = new THREE.Vector3();
   private readonly beamUp = new THREE.Vector3(0, 1, 0);
@@ -319,10 +340,15 @@ export class Vfx {
   private fwCols: THREE.Color[] = [];
   private fwFlash = new THREE.Color();
   private quality = 1;
+  private paladinSpellFx: PaladinSpellVfxController;
 
   constructor(
     private scene: THREE.Scene,
     private anchor: EntityAnchor,
+    // Offset-capable anchor for the drain-life channels (the familiar-side
+    // beam end). Hosts without one fall back to the plain anchor, reading the
+    // local offset as zero: the beam still draws, from the caster's center.
+    offsetAnchor?: VfxOffsetAnchorResolver,
   ) {
     this.pos = new Float32Array(CAPACITY * 3);
     this.vel = new Float32Array(CAPACITY * 3);
@@ -443,6 +469,60 @@ export class Vfx {
       if (this.points.geometry.drawRange.count === 0) this.points.visible = false;
     };
     scene.add(this.points);
+    this.paladinSpellFx = new PaladinSpellVfxController(anchor, (particle) => {
+      const essential =
+        particle.tag.includes('core') ||
+        particle.tag.includes('impact') ||
+        particle.tag.includes('rune') ||
+        particle.tag.includes('ring') ||
+        particle.tag === 'bastion-leading-edge' ||
+        particle.tag === 'bastion-ground-wave';
+      if (!essential && Math.random() * 100 >= this.scaledCount(100)) return;
+      this.spawn(
+        particle.position.x,
+        particle.position.y,
+        particle.position.z,
+        particle.velocity.x,
+        particle.velocity.y,
+        particle.velocity.z,
+        particle.color,
+        particle.size,
+        particle.lifetime,
+        particle.gravity,
+        PALADIN_SPRITES[particle.sprite],
+        particle.rotation,
+      );
+    });
+    const drainParticleSink: DrainLifeParticleSink = (
+      kind,
+      x,
+      y,
+      z,
+      vx,
+      vy,
+      vz,
+      color,
+      size,
+      lifetime,
+      gravity,
+    ) => {
+      this.spawn(
+        x,
+        y,
+        z,
+        vx,
+        vy,
+        vz,
+        color,
+        size,
+        lifetime,
+        gravity,
+        this.drainParticleSprite(kind),
+      );
+    };
+    const drainAnchor: VfxOffsetAnchorResolver =
+      offsetAnchor ?? ((id, frac, _localX, _localZ, out) => anchor(id, frac, out));
+    this.drainLifeVfx = new DrainLifeVfx(scene, drainAnchor, drainParticleSink);
   }
 
   setViewportScale(heightPx: number, fovDeg: number): void {
@@ -453,6 +533,7 @@ export class Vfx {
 
   setQuality(level: number): void {
     this.quality = Math.min(1, Math.max(0, Number.isFinite(level) ? level : 1));
+    this.drainLifeVfx.setQuality(this.quality);
   }
 
   prewarm(at: THREE.Vector3): void {
@@ -479,7 +560,9 @@ export class Vfx {
 
   clear(): void {
     this.projectiles.length = 0;
+    this.paladinSpellFx.clear();
     for (let i = this.bubbleBeams.length - 1; i >= 0; i--) this.removeBubbleBeam(i);
+    this.drainLifeVfx.clear();
     this.life.fill(0);
     this.size.fill(0);
     this.alphaAttr.fill(0);
@@ -619,6 +702,20 @@ export class Vfx {
     this.packRenderCloud(camera);
   }
 
+  private drainParticleSprite(kind: DrainLifeParticleKind): number {
+    switch (kind) {
+      case 'extraction':
+        return SPR.magicWisp;
+      case 'absorption':
+      case 'transfer':
+        return SPR.glowCore;
+      case 'tick':
+        return SPR.sparkBurst;
+      case 'residue':
+        return SPR.smoke;
+    }
+  }
+
   // ---------------------------------------------------------------------
   // High-level effects
   // ---------------------------------------------------------------------
@@ -626,6 +723,18 @@ export class Vfx {
   projectile(sourceId: number, targetId: number, school: string, scale = 1, color?: number): void {
     const from = this.anchor(sourceId, 0.62);
     if (!from) return;
+    this.projectileFrom(from, targetId, school, scale, 26, undefined, color);
+  }
+
+  private projectileFrom(
+    from: THREE.Vector3,
+    targetId: number,
+    school: string,
+    scale: number,
+    speed = 26,
+    onImpact?: (position: THREE.Vector3) => void,
+    color?: number,
+  ): void {
     const colors = projectileSchoolColors(school, color);
     const sprites = projectileSprites(school);
     this.projectiles.push({
@@ -634,12 +743,88 @@ export class Vfx {
       color: colors.base,
       coreColor: colors.core,
       trailColor: colors.trail,
-      speed: 26,
+      speed,
       ttl: 3,
       coreSprite: sprites.core,
       trailSprite: sprites.trail,
       scale,
+      onImpact,
     });
+  }
+
+  deathBolt(leftHand: THREE.Vector3, rightHand: THREE.Vector3, targetId: number): void {
+    this.projectileFrom(leftHand, targetId, 'shadow', 1.28, 31);
+    this.projectileFrom(rightHand, targetId, 'shadow', 1.28, 31);
+    for (const hand of [leftHand, rightHand]) {
+      for (let i = 0; i < this.scaledCount(7); i++) {
+        const angle = (i / 7) * Math.PI * 2;
+        this.spawn(
+          hand.x,
+          hand.y,
+          hand.z,
+          Math.cos(angle) * 1.4,
+          0.25 + Math.random() * 0.8,
+          Math.sin(angle) * 1.4,
+          i % 2 === 0 ? 0xe5b8ff : 0x8f35db,
+          0.28,
+          0.38,
+          0.4,
+          SPR.magicWisp,
+        );
+      }
+    }
+  }
+
+  soulTravel(
+    x: number,
+    y: number,
+    z: number,
+    targetId: number,
+    onImpact?: (position: THREE.Vector3) => void,
+  ): void {
+    this.projectileFrom(new THREE.Vector3(x, y, z), targetId, 'shadow', 1.2, 14, onImpact);
+    for (let i = 0; i < this.scaledCount(14); i++) {
+      const angle = (i / 14) * Math.PI * 2;
+      this.spawn(
+        x,
+        y,
+        z,
+        Math.cos(angle) * (0.8 + Math.random()),
+        0.8 + Math.random() * 1.2,
+        Math.sin(angle) * (0.8 + Math.random()),
+        i % 3 === 0 ? 0xead0ff : 0xa84dff,
+        0.3 + Math.random() * 0.18,
+        0.7,
+        -0.35,
+        SPR.magicWisp,
+      );
+    }
+  }
+
+  lichTransform(entityId: number): void {
+    const feet = this.anchor(entityId, 0.08);
+    const center = this.anchor(entityId, 0.48);
+    if (!feet || !center) return;
+    for (let i = 0; i < this.scaledCount(52); i++) {
+      const angle = (i / 52) * Math.PI * 2 + Math.random() * 0.08;
+      const speed = 3.2 + Math.random() * 5.2;
+      const rising = i % 3 === 0;
+      this.spawn(
+        rising ? center.x + (Math.random() - 0.5) * 0.7 : feet.x,
+        rising ? center.y - 0.6 + Math.random() * 1.2 : feet.y,
+        rising ? center.z + (Math.random() - 0.5) * 0.7 : feet.z,
+        Math.cos(angle) * (rising ? 0.8 : speed),
+        rising ? 3.6 + Math.random() * 3.8 : 0.7 + Math.random() * 2.4,
+        Math.sin(angle) * (rising ? 0.8 : speed),
+        rising ? 0xe2b6ff : i % 2 === 0 ? 0xad4cff : 0x4b176c,
+        rising ? 0.38 : 0.54,
+        0.85 + Math.random() * 0.5,
+        rising ? -0.6 : 2.5,
+        rising ? SPR.magicWisp : SPR.sparkBurst,
+      );
+    }
+    this.spawn(center.x, center.y, center.z, 0, 0.4, 0, 0xf1d6ff, 2.6, 0.28, 0, SPR.flash);
+    this.spawn(feet.x, feet.y, feet.z, 0, 0.1, 0, 0xbd59ff, 3.4, 0.5, 0, SPR.ring);
   }
 
   beam(sourceId: number, targetId: number, school: string, colorOverride?: number): void {
@@ -704,6 +889,7 @@ export class Vfx {
     water.renderOrder = 5;
     core.renderOrder = 6;
     const group = new THREE.Group();
+    group.name = 'drain-life-beam';
     group.userData.renderCategory = 'vfx';
     group.add(water, core);
     this.scene.add(group);
@@ -718,6 +904,28 @@ export class Vfx {
     (stream.water.material as THREE.Material).dispose();
     (stream.core.material as THREE.Material).dispose();
     this.bubbleBeams.splice(index, 1);
+  }
+
+  /** Drain Life's sustained tether: a narrow green core with life motes flowing
+   * from the victim back toward the caster. */
+  drainBeam(sourceId: number, targetId: number, duration: number): void {
+    this.drainLifeVfx.drain(sourceId, targetId, duration);
+  }
+
+  /** Possessed companion contribution to Drain Life, from the Eye beside the
+   * caster to the same victim as the caster's ordinary tether. */
+  demonicDrainBeam(casterId: number, targetId: number, duration: number): void {
+    this.drainLifeVfx.demonicDrain(casterId, targetId, duration);
+  }
+
+  /** The Affliction companion's own attack: a very brief sickly-green ray
+   * wrapped in violet shadow, fired from the Eye rather than the caster. */
+  evilEyeGaze(casterId: number, targetId: number, duration = 0.28): void {
+    this.drainLifeVfx.evilEyeGaze(casterId, targetId, duration);
+  }
+
+  drainLifeTick(casterId: number): void {
+    this.drainLifeVfx.tick(casterId);
   }
 
   // Chain Heal's signature arc: a bright green cord that lifts in a gentle parabola
@@ -886,6 +1094,178 @@ export class Vfx {
       );
     }
     this.spawn(at.x, at.y + 0.3, at.z, 0, 0.4, 0, core, 2.2, 0.45, 0, SPR.flash);
+  }
+
+  paladinAscensionImpact(
+    sourceId: number,
+    targetId: number,
+    impact: 'healing' | 'defensive' | 'offensive' | 'area' = 'offensive',
+  ): void {
+    const anchorId = impact === 'area' ? sourceId : targetId;
+
+    if (impact === 'healing') {
+      this.healGlow(anchorId);
+      this.buffSwirl(anchorId, 0xfff0c7);
+      return;
+    }
+    if (impact === 'defensive') {
+      this.wardBloom(anchorId, 'holy');
+      this.buffSwirl(anchorId, 0x9fd7ff);
+      return;
+    }
+
+    if (impact === 'area') this.nova(sourceId, 'holy');
+
+    const at = this.anchor(anchorId, 0.46);
+    if (!at) return;
+    const gold = new THREE.Color(impact === 'area' ? 0xffb52f : 0xffd85c).multiplyScalar(hdr(2.5));
+    const white = new THREE.Color(0xfff8d8).multiplyScalar(hdr(2.9));
+    const count = this.scaledCount(impact === 'area' ? 58 : 46);
+    for (let index = 0; index < count; index++) {
+      const angle = (index / count) * Math.PI * 2;
+      const speed = 4.5 + Math.random() * 4;
+      this.spawn(
+        at.x + Math.cos(angle) * 0.15,
+        at.y,
+        at.z + Math.sin(angle) * 0.15,
+        Math.cos(angle) * speed,
+        1.8 + Math.random() * 3.2,
+        Math.sin(angle) * speed,
+        index % 4 === 0 ? white : gold,
+        index % 4 === 0 ? 0.72 : 0.48,
+        0.55 + Math.random() * 0.35,
+        -4,
+        index % 4 === 0 ? SPR.star : SPR.sparkle,
+      );
+    }
+    this.spawn(at.x, at.y + 0.18, at.z, 0, 0.4, 0, white, 2.4, 0.28, 0, SPR.flash);
+    this.spawn(at.x, at.y - 0.2, at.z, 0, 0.2, 0, gold, 2.2, 0.48, 0, SPR.ring, 0);
+  }
+
+  paladinHolyShock(sourceId: number, targetId: number, mode: 'heal' | 'damage'): void {
+    this.paladinSpellFx.holyShock({ mode, sourceId, targetId });
+  }
+
+  paladinSunwardDisc(sourceId: number, targetId: number, hopIndex: number, totalHits = 3): void {
+    this.paladinSpellFx.sunwardDisc({
+      sourceId,
+      targetId,
+      hopIndex,
+      totalHits,
+      awaitImpact: true,
+    });
+  }
+
+  paladinSunwardDiscImpact(
+    sourceId: number,
+    targetId: number,
+    hopIndex: number,
+    totalHits = 3,
+  ): void {
+    this.paladinSpellFx.sunwardDiscImpact(sourceId, targetId, hopIndex, totalHits);
+  }
+
+  paladinBastionSweep(sourceId: number, radius: number, arcDegrees: number, facing: number): void {
+    this.paladinSpellFx.bastionSweep({
+      sourceId,
+      radius,
+      halfAngle: THREE.MathUtils.degToRad(arcDegrees) * 0.5,
+      facing,
+    });
+  }
+
+  paladinBastionSweepImpact(targetId: number): void {
+    this.paladinSpellFx.bastionSweepTarget(targetId);
+  }
+
+  // Dawnfall uses a timed dawn rune, circular slash, six short-lived radiant
+  // blades, and a shockwave clamped to the supplied gameplay radius.
+  paladinDawnfall(sourceId: number, radius: number): void {
+    this.paladinSpellFx.dawnfall({
+      casterId: sourceId,
+      radius,
+      bladeCount: this.scaledCount(6),
+    });
+  }
+
+  paladinDawnfallImpact(targetId: number): void {
+    this.paladinSpellFx.dawnfallTarget(targetId);
+  }
+
+  // Final Edict is deliberately tighter than Dawnfall: one descending blade,
+  // a compact seal under the victim, and a dense vertical impact shower.
+  paladinFinalEdict(sourceId: number, targetId: number): void {
+    const target = this.anchor(targetId, 0.08);
+    if (!target) return;
+    const source = this.anchor(sourceId, 0.45);
+    let sideX = 1;
+    let sideZ = 0;
+    if (source) {
+      const dx = target.x - source.x;
+      const dz = target.z - source.z;
+      const length = Math.hypot(dx, dz);
+      if (length > 0.001) {
+        sideX = -dz / length;
+        sideZ = dx / length;
+      }
+    }
+    const gold = new THREE.Color(0xffb91f).multiplyScalar(hdr(2.8));
+    const white = new THREE.Color(0xffffdc).multiplyScalar(hdr(3.2));
+
+    const bladeSegments = this.scaledCount(14);
+    for (let index = 0; index < bladeSegments; index++) {
+      const progress = index / Math.max(1, bladeSegments - 1);
+      this.spawn(
+        target.x,
+        target.y + 0.25 + progress * 2.55,
+        target.z,
+        0,
+        -4.6,
+        0,
+        index % 3 === 0 ? white : gold,
+        0.78 - progress * 0.28,
+        0.5,
+        0,
+        SPR.slash,
+        0,
+      );
+    }
+    const guardSegments = this.scaledCount(8);
+    for (let index = 0; index < guardSegments; index++) {
+      const offset = (index / Math.max(1, guardSegments - 1) - 0.5) * 1.4;
+      this.spawn(
+        target.x + sideX * offset,
+        target.y + 0.62,
+        target.z + sideZ * offset,
+        0,
+        -4,
+        0,
+        index % 2 === 0 ? white : gold,
+        0.5,
+        0.48,
+        0,
+        SPR.sparkle,
+      );
+    }
+    const impactCount = this.scaledCount(12);
+    for (let index = 0; index < impactCount; index++) {
+      const angle = (index / impactCount) * Math.PI * 2;
+      this.spawn(
+        target.x,
+        target.y + 0.2,
+        target.z,
+        Math.cos(angle) * 2.6,
+        2.2 + (index % 3) * 0.5,
+        Math.sin(angle) * 2.6,
+        index % 3 === 0 ? white : gold,
+        0.52,
+        0.5,
+        -5,
+        SPR.star,
+      );
+    }
+    this.spawn(target.x, target.y + 0.3, target.z, 0, 0.2, 0, white, 2.6, 0.28, 0, SPR.flash);
+    this.spawn(target.x, target.y + 0.05, target.z, 0, 0.1, 0, gold, 1.5, 0.45, 0, SPR.ring, 0);
   }
 
   // A stored heal-echo firing: a fountain of life-green motes bursting upward
@@ -1575,6 +1955,35 @@ export class Vfx {
     }
   }
 
+  lichAura(entityId: number, dt: number, soulFragments: number): void {
+    const full = soulFragments >= 5;
+    const count = this.emitCount(full ? 42 : 26, dt);
+    if (!count) return;
+    const feet = this.anchor(entityId, 0.1);
+    if (!feet) return;
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const radius = 0.35 + Math.random() * (full ? 0.85 : 0.62);
+      const smoke = Math.random() < 0.34;
+      this.spawn(
+        feet.x + Math.cos(angle) * radius,
+        feet.y + Math.random() * 0.45,
+        feet.z + Math.sin(angle) * radius,
+        -Math.sin(angle) * 0.34,
+        0.65 + Math.random() * (full ? 1.35 : 0.8),
+        Math.cos(angle) * 0.34,
+        smoke ? 0x271032 : full ? 0xe1a7ff : 0x9b4be5,
+        smoke ? 0.55 : full ? 0.32 : 0.26,
+        smoke ? 1.4 : 0.9 + Math.random() * 0.5,
+        -0.35,
+        smoke ? SPR.smoke : SPR.magicWisp,
+      );
+    }
+    if (full && this.emitChance(3.5, dt)) {
+      this.spawn(feet.x, feet.y + 0.12, feet.z, 0, 0.15, 0, 0xd995ff, 2.3, 0.55, 0, SPR.ring);
+    }
+  }
+
   campfireEmber(at: THREE.Vector3, dt: number): void {
     if (!this.emitChance(6, dt)) return;
     if (Math.random() < 0.3) {
@@ -1613,7 +2022,9 @@ export class Vfx {
 
   // ---------------------------------------------------------------------
 
-  update(dt: number): void {
+  update(dt: number, reducedMotion = false): void {
+    this.drainLifeVfx.update(dt, reducedMotion);
+
     for (let i = this.bubbleBeams.length - 1; i >= 0; i--) {
       const stream = this.bubbleBeams[i];
       stream.remaining -= dt;
@@ -1717,6 +2128,7 @@ export class Vfx {
             k % 2 === 0 ? SPR.sparkle : SPR.sparkBurst,
           );
         }
+        pr.onImpact?.(target);
         this.projectiles.splice(i, 1);
         continue;
       }
@@ -1829,5 +2241,6 @@ export class Vfx {
       this.activeSlotFlags[slot] = 0;
     }
     this.activeCount = write;
+    this.paladinSpellFx.update(dt);
   }
 }

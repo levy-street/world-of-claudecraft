@@ -22,17 +22,20 @@ import {
   createPlayerReport,
   createSuspiciousRegistrationReport,
   forceCharacterRename,
+  ignoreReport,
   liftAccountChatMute,
   moderateAccount,
   moderationQueue,
   moderationReportsForAccount,
   muteAccountChat,
+  prunePlayerReportsBatch,
   reactivateAccountAudited,
   recordInGameAction,
   resetChatStrikesAudited,
   setDailyRewardsBan,
   setDailyRewardsIpBan,
   setOnAccountModerated,
+  setOnModerationQueueChanged,
 } from '../server/moderation_db';
 
 const { query, connect } = db;
@@ -1085,5 +1088,154 @@ describe('moderation bust hook wiring', () => {
     expect(statements(client)).toContain('COMMIT');
     expect(errorSpy).toHaveBeenCalled();
     errorSpy.mockRestore();
+  });
+});
+
+// setOnModerationQueueChanged backs the moderation queue's cached base read
+// (server/moderation_queue_cache.ts): every write that changes what that read
+// would return must fire it exactly once, after commit, so the cache never
+// serves a resolved report or a stale account status for a whole TTL window.
+// Kept separate from the onAccountModerated suite above: the two hooks are
+// independent (moderateAccount fires both; muteAccountChat and ignoreReport
+// fire only this one), so a regression in one must never hide inside the
+// other's assertions.
+describe('moderation queue cache bust hook wiring', () => {
+  afterEach(() => {
+    setOnModerationQueueChanged(null);
+  });
+
+  it('fires once, after COMMIT, when moderateAccount bans an account', async () => {
+    const client = clientStub();
+    connect.mockResolvedValue(client as unknown as PoolClient);
+    const hook = vi.fn();
+    setOnModerationQueueChanged(hook);
+
+    await moderateAccount({
+      accountId: 2,
+      adminAccountId: 1,
+      action: 'ban',
+      reason: 'cheating',
+    });
+
+    expect(hook).toHaveBeenCalledTimes(1);
+    expect(client.query.mock.calls.at(-1)?.[0]).toBe('COMMIT');
+  });
+
+  it('fires once when muteAccountChat resolves the account open reports', async () => {
+    const client = clientStub();
+    connect.mockResolvedValue(client as unknown as PoolClient);
+    const hook = vi.fn();
+    setOnModerationQueueChanged(hook);
+
+    await muteAccountChat({
+      accountId: 2,
+      adminAccountId: 1,
+      reason: 'harassment',
+      expiresAt: '2999-01-01T00:00:00.000Z',
+    });
+
+    expect(hook).toHaveBeenCalledTimes(1);
+  });
+
+  it('fires once when ignoreReport actually resolves an open report', async () => {
+    query.mockResolvedValueOnce(queryResult([], 1));
+    const hook = vi.fn();
+    setOnModerationQueueChanged(hook);
+
+    await expect(ignoreReport(5, 1, 'not actionable')).resolves.toBe(true);
+
+    expect(hook).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not fire when ignoreReport matches no open report', async () => {
+    query.mockResolvedValueOnce(queryResult([], 0));
+    const hook = vi.fn();
+    setOnModerationQueueChanged(hook);
+
+    await expect(ignoreReport(5, 1, 'not actionable')).resolves.toBe(false);
+
+    expect(hook).not.toHaveBeenCalled();
+  });
+
+  it('does not fire when the moderateAccount transaction fails', async () => {
+    const client = clientStub();
+    client.query.mockImplementation(async (text: string) => {
+      if (/UPDATE accounts/.test(text)) throw new Error('boom');
+      return queryResult([]);
+    });
+    connect.mockResolvedValue(client as unknown as PoolClient);
+    const hook = vi.fn();
+    setOnModerationQueueChanged(hook);
+
+    await expect(
+      moderateAccount({ accountId: 2, adminAccountId: 1, action: 'ban', reason: 'cheating' }),
+    ).rejects.toThrow('boom');
+
+    expect(hook).not.toHaveBeenCalled();
+  });
+
+  it('a throwing hook never turns a committed ban into an error', async () => {
+    const client = clientStub();
+    connect.mockResolvedValue(client as unknown as PoolClient);
+    setOnModerationQueueChanged(() => {
+      throw new Error('hook exploded');
+    });
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    await expect(
+      moderateAccount({ accountId: 2, adminAccountId: 1, action: 'ban', reason: 'cheating' }),
+    ).resolves.toBeUndefined();
+
+    expect(client.query.mock.calls.at(-1)?.[0]).toBe('COMMIT');
+    expect(errorSpy).toHaveBeenCalled();
+    errorSpy.mockRestore();
+  });
+});
+
+describe('prunePlayerReportsBatch (the retention-sweep primitive)', () => {
+  // Mirrors tests/unstuck_db.test.ts's pruneUnstuckReportsBatch suite: the
+  // sweep owns cadence, budget, and batching, this primitive owns exactly
+  // one bounded delete on the shared pool.
+  it('runs one sibling-shaped bounded delete that excludes open reports', async () => {
+    query.mockResolvedValueOnce(queryResult([], 3));
+
+    await expect(prunePlayerReportsBatch(180, 1000)).resolves.toBe(3);
+
+    expect(connect).not.toHaveBeenCalled();
+    expect(query).toHaveBeenCalledTimes(1);
+    const [sql, params] = query.mock.calls[0];
+    expect(sql).toContain('DELETE FROM player_reports');
+    // An open report must never be eligible: moderationQueue and
+    // moderationReportsForAccount above only ever read status = 'open' rows,
+    // so the exclusion is what keeps a still-visible report from vanishing.
+    expect(sql).toContain("status != 'open'");
+    expect(sql).toContain("created_at < now() - ($1::int * INTERVAL '1 day')");
+    expect(sql).toContain('ORDER BY created_at ASC, id ASC');
+    expect(sql).toContain('LIMIT $2');
+    expect(params).toEqual([180, 1000]);
+  });
+
+  it('keeps forever on zero and negative retention (the destructive-delete safe side)', async () => {
+    await expect(prunePlayerReportsBatch(0, 1000)).resolves.toBe(0);
+    await expect(prunePlayerReportsBatch(-3, 1000)).resolves.toBe(0);
+    await expect(prunePlayerReportsBatch(Number.NaN, 1000)).resolves.toBe(0);
+    expect(query).not.toHaveBeenCalled();
+  });
+
+  it('normalizes fractional retention days up to one full day, never to zero', async () => {
+    query.mockResolvedValueOnce(queryResult([], 0));
+    await prunePlayerReportsBatch(0.5, 1000);
+    expect(query.mock.calls[0][1]).toEqual([1, 1000]);
+  });
+
+  it('floors the batch size at one row (no LIMIT 0 infinite no-op)', async () => {
+    query.mockResolvedValueOnce(queryResult([], 0));
+    await prunePlayerReportsBatch(180, 0);
+    expect(query.mock.calls[0][1]).toEqual([180, 1]);
+  });
+
+  it('a driver null rowCount reads as zero deleted, not a crash or NaN', async () => {
+    query.mockResolvedValueOnce(queryResult([], null as unknown as number));
+    await expect(prunePlayerReportsBatch(180, 1000)).resolves.toBe(0);
   });
 });

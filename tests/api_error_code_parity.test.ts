@@ -58,6 +58,7 @@ const KNOWN_CODES = [
   'body.unsupported_media_type',
   'character.already_in_world',
   'character.delete_confirm',
+  'character.invalid_appearance',
   'character.invalid_class',
   'character.limit_reached',
   'character.name_invalid',
@@ -67,6 +68,7 @@ const KNOWN_CODES = [
   'character.online',
   'character.rename_not_permitted',
   'character.rename_required',
+  'character.reroll_unavailable',
   'character.taken_over',
   'db.conflict',
   'discord.already_linked',
@@ -116,6 +118,10 @@ const KNOWN_CODES = [
   'epic.upstream',
   'wallet.handoff_invalid',
   'ota_updates.invalid_input',
+  'cheater_mark.admin_target',
+  'cheater_mark.reason_required',
+  'cheater_mark.invalid_duration',
+  'cheater_mark.not_marked',
 ];
 
 // The parametric contract pins: the matcher

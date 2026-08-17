@@ -15,6 +15,12 @@
 //      in place, at the cost of Resurrection Sickness (RES_SICKNESS_*). For corpses
 //      that are unreachable.
 //
+// Every one of those ways back to life runs through the shared reviveAt below, so
+// that is also where the owner's PET is handed back: the death dragged it down
+// with them (the handleDeath owner arm), and the resurrection undoes both. The
+// rules live in pet/pet_owner_revive.ts; releasing the spirit is not a
+// resurrection, so a released ghost's pet stays down until they actually stand up.
+//
 // Sitting beside that loop but NOT part of it: the two /unstuck outcomes
 // (moveToGraveyardForUnstuck / reviveAtGraveyardForUnstuck). Unstuck never kills and never
 // leaves a corpse; it moves the player to the nearest graveyard, raises them if they were
@@ -39,6 +45,7 @@ import {
 } from './data';
 import { createNpc, recalcPlayerStats } from './entity';
 import { releaseSpiritInDelve } from './entity_roster';
+import { restorePetOnOwnerRevive } from './pet/pet_owner_revive';
 import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
 import {
   aurasSurvivingDeath,
@@ -274,7 +281,12 @@ function releaseAtNearestGraveyard(
   // A ghost shows a full (greyed) bar even though it is still `dead`. recalc forces
   // hp to 0 while dead, so set the display pools afterward.
   p.hp = p.maxHp;
-  p.resource = p.resourceType === 'mana' ? p.maxResource : p.resourceType === 'energy' ? 100 : 0;
+  p.resource =
+    p.resourceType === 'mana'
+      ? p.maxResource
+      : p.resourceType === 'energy' || p.resourceType === 'focus'
+        ? 100
+        : 0;
   p.targetId = null;
   p.autoAttack = false;
   p.queuedOnSwing = null;
@@ -412,6 +424,12 @@ function reviveAt(
   // fractions just set, so hp settles at RES_HP_FRACTION of the reduced max.
   if (sickness === 'resurrection') applyResurrectionSickness(ctx, p);
   else if (sickness === 'unstuck') applyUnstuckSickness(ctx, p);
+  // Last of all, and here rather than in each caller, because EVERY way back to
+  // life funnels through this one body: the pet the player's death took comes back
+  // with them. Placed after the body has been moved and its pools rebuilt, so the
+  // pet is put down beside where its owner actually stands and reads a finished
+  // owner. No-ops when the death took no pet.
+  restorePetOnOwnerRevive(ctx, p);
 }
 
 // Apply one of the two sicknesses, dropping the other first. Both are `buff_allstats_pct`

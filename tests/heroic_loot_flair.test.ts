@@ -4,6 +4,7 @@
 // green/uncommon drops and the existing
 // item-level-31 heroic set are untouched.
 import { describe, expect, it } from 'vitest';
+import { HEROIC_BOSS_LOOT, NYTHRAXIS_RAID_BOSS_ID } from '../src/sim/content/heroic_loot';
 import { heroicVariantId } from '../src/sim/content/heroic_variants';
 import { ITEMS, MOBS } from '../src/sim/data';
 import { enterDungeon } from '../src/sim/instances/dungeons';
@@ -24,13 +25,20 @@ const weaponPower = (item: ItemDef) => {
 
 describe('heroic loot flair: variant generation', () => {
   it('generates a Heroic variant for base epic/rare/legendary drops at or above its tier budget', () => {
-    // Five-man heroic variants read item level 28 (epic) / 25 (rare). The Nythraxis
-    // raid boss's own set pieces and legendaries are one tier up: epics at 33,
-    // legendaries at 37 (anchored on the raid boss's normal loot).
+    // Five-man heroic variants read item level 28 (epic) / 25 (rare). A variant a
+    // five-man HEROIC BOSS table lists directly (heroic_duskwhisper on the
+    // Fanglord Beastmaster) is an ilvl-31 boss piece of the one-rating tier. The
+    // Nythraxis raid boss's own set pieces and legendaries are one tier up again:
+    // epics at 33, legendaries at 37 (anchored on the raid boss's normal loot).
     const raidBases = new Set(
       (MOBS.nythraxis_scourge_of_thornpeak?.loot ?? []).flatMap((e: any) =>
         e.itemId ? [e.itemId] : [],
       ),
+    );
+    const fiveManBossVariantIds = new Set(
+      Object.entries(HEROIC_BOSS_LOOT)
+        .filter(([bossId]) => bossId !== NYTHRAXIS_RAID_BOSS_ID)
+        .flatMap(([, entries]) => entries.flatMap((e) => (e.itemId ? [e.itemId] : []))),
     );
     const all = variants();
     expect(all.length).toBeGreaterThan(0);
@@ -38,6 +46,8 @@ describe('heroic loot flair: variant generation', () => {
       expect(['epic', 'rare', 'legendary']).toContain(v.quality);
       if (raidBases.has(v.heroicOf ?? '')) {
         expect(itemLevel(v), v.id).toBe(v.quality === 'legendary' ? 37 : 33);
+      } else if (fiveManBossVariantIds.has(v.id)) {
+        expect(itemLevel(v), v.id).toBe(31);
       } else {
         expect(itemLevel(v), v.id).toBe(v.quality === 'epic' ? 28 : 25);
       }

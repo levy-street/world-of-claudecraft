@@ -26,6 +26,7 @@ import {
 } from '../sim/last_bell_field';
 import { terrainHeight } from '../sim/world';
 import { GFX, surfaceMat } from './gfx';
+import type { FireLightSink } from './point_light_budget';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 import { radialGlowTexture } from './textures';
 
@@ -829,7 +830,9 @@ export interface LastBellStoryInteriorDeps {
   seed: number;
   lowGfx: boolean;
   flames: THREE.Mesh[];
-  fireLights: THREE.PointLight[];
+  // The renderer's budgeted point-light sink (a plain array satisfies it too):
+  // these builders only ever push, so the budget pass owns visibility.
+  fireLights: FireLightSink;
 }
 
 // Build one copy of a Last Bell story space at instance-local origin (0,0);

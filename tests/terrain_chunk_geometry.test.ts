@@ -125,30 +125,29 @@ describe('generated chunk geometry is stable', () => {
     expect(inRect.length).toBe(36);
     expect(gapFill.length).toBe(22);
 
-    // Re-minted for the Eastbrook camp respacing (PR #2584, maintainer-ordered):
-    // camp radii drive the terrain flatten aprons, so the deliberate, reviewed
-    // spread of the starter camps regrades the Vale rect. The prior pin
-    // (6f7fb63da247a5eb272dd9d7a42a5fcd) dated from before that change; the
-    // gap-cell fill must still not perturb a single byte of in-rect geometry.
-    // Re-minted for the asymmetric campaign bounds: the same positions/colors
-    // now carry UVs normalized over WORLD_MIN_X..WORLD_MAX_X instead of the
-    // obsolete symmetric -WORLD_MAX_X..WORLD_MAX_X range.
-    expect(digestOf(inRect)).toBe('6e57b2b3457fd7612e6ace78247a2f22');
-    // The gap super-chunks' own pin. Re-mint ONLY for a deliberate, reviewed
-    // visual change.
-    // Re-minted for the ferry fidelity program's harbor terrain edits: the
-    // mainland shore pad and re-authored berth basins (HARBOR_TERRAIN_EDITS,
-    // F2.1/F2.2) deliberately regrade gap chunks around both harbors. The
-    // in-rect Eastbrook pin above is untouched: not one Vale byte moved.
-    // Re-minted for the voyage crossing channel (J2): three deep-level
-    // HARBOR_TERRAIN_EDITS stamps carve honest depth under the filmed
-    // open-water leg on the crossing track. Mid-sea gap cells only; the
-    // in-rect Eastbrook pin above did not move.
-    // Re-minted for the J9 arrival lanes: two deep-level HARBOR_TERRAIN_EDITS
-    // stamps carve the stern-reach water under the re-authored bow-first
-    // docking glides (mainland north strait side, Gullhaven north bay).
-    // Mid-sea gap cells only; the in-rect Eastbrook pin above did not move.
-    expect(digestOf(gapFill)).toBe('d4e5c50eb6f1c475a0227b9c22a7ee1a');
+    // Re-minted for the natural-relief heightfield plus the shared height
+    // lattice in terrain_chunk_build.ts (vertex normals now difference the
+    // lattice at the chunk's own spacing instead of a fixed 1.5yd stencil).
+    // Both were intended, reviewed visual changes. Re-minted again for the
+    // gather-node placement fix (herb_eastbrook_4 moved off the boarball
+    // pitch to (6,-69) is the move these chunks see): an authored node pos
+    // is a calm-anchor world fixture, so the pads around the old and new
+    // spots reshape nearby vertices. Localization checked against the dense
+    // height atlas (tests/terrain_height_parity.test.ts fixture, re-minted
+    // in the same commit): the whole ten-node placement fix moves 146 of
+    // its 140639 points, 0.1 percent, all inside the moved nodes' pad
+    // footprints.
+    // Re-minted again for the northwest coast spit carve in applyValeCoast
+    // (src/sim/world.ts): the low beach shelf that aproned the grey cliff foot
+    // is submerged so the bay water meets the cliff, an intended, looked-at
+    // visual change. The carve only ever lowers and stays local: sampled on a
+    // 0.5yd lattice over the vale and its gap cells it moves 8704 of 1589721
+    // points, 0.5 percent, every one inside x -211.5..-132.5, z 116.5..145.5,
+    // and nothing rises anywhere. Both digests move because that window
+    // straddles the rect edge at x = -180.
+    expect(digestOf(inRect)).toBe('39afe77d61ac348961d01e890aaddb00');
+    // The gap super-chunks take the same re-mint.
+    expect(digestOf(gapFill)).toBe('c4839177e825dbcf8dc5bcf501336fc2');
 
     terrain.cancelStreaming();
   });

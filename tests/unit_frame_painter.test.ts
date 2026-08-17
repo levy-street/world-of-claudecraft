@@ -11,9 +11,15 @@
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
+import { borderAccent } from '../src/ui/deed_border_view';
 import type { PainterHostWriters } from '../src/ui/painter_host';
+import { makeWriterFacet } from '../src/ui/painter_host';
 import { type UnitFrameDescriptor, unitFrameView } from '../src/ui/unit_frame';
 import {
+  PORTRAIT_BORDER_ATTR,
+  PORTRAIT_BORDER_EDGE_PROP,
+  PORTRAIT_BORDER_FRAME_PROP,
+  PORTRAIT_BORDER_GLOW_PROP,
   type UnitFrameElements,
   type UnitFrameOptions,
   UnitFramePainter,
@@ -116,6 +122,7 @@ describe('UnitFramePainter: the player instance routes every write through the e
       { m: 'toggleClass', args: [ABSORB, 'overshield', false] },
       { m: 'toggleClass', args: [RES_CONTAINER, 'rage', false] },
       { m: 'toggleClass', args: [RES_CONTAINER, 'energy', false] },
+      { m: 'toggleClass', args: [RES_CONTAINER, 'focus', false] },
       { m: 'toggleClass', args: [RES_CONTAINER, 'mana', true] },
       { m: 'setTransform', args: [RES_FILL, 'scaleX(0.8)'] },
       { m: 'setText', args: [RES_TEXT, '80 / 100'] },
@@ -129,12 +136,15 @@ describe('UnitFramePainter: the player instance routes every write through the e
     expect(calls.some((c) => c.args[1] === 'dead' || c.args[1] === 'oor')).toBe(false);
   });
 
-  it('drives the rage/energy discriminator exclusively (folds the className swap)', () => {
+  it('drives the rage, energy, and focus discriminator exclusively', () => {
     const rage = paint(playerDescriptor({ resourceKind: 'rage' }));
     expect(rage).toContainEqual({ m: 'toggleClass', args: [RES_CONTAINER, 'rage', true] });
     expect(rage).toContainEqual({ m: 'toggleClass', args: [RES_CONTAINER, 'mana', false] });
     const energy = paint(playerDescriptor({ resourceKind: 'energy' }));
     expect(energy).toContainEqual({ m: 'toggleClass', args: [RES_CONTAINER, 'energy', true] });
+    const focus = paint(playerDescriptor({ resourceKind: 'focus' }));
+    expect(focus).toContainEqual({ m: 'toggleClass', args: [RES_CONTAINER, 'focus', true] });
+    expect(focus).toContainEqual({ m: 'toggleClass', args: [RES_CONTAINER, 'mana', false] });
   });
 
   it('folds the absorb overshield toggle onto the elided writers', () => {
@@ -360,5 +370,152 @@ describe('UnitFramePainter: the title-decoration spans (Book of Deeds)', () => {
     );
     expect(calls.some((c) => c.args[0] === TITLE_PRE || c.args[0] === TITLE_POST)).toBe(false);
     expect(calls.some((c) => c.args[1] === '[Pre] ' || c.args[1] === ' [Post]')).toBe(false);
+  });
+});
+
+describe('UnitFramePainter: the portrait border ring (Book of Deeds)', () => {
+  const PORTRAIT_BORDER = { tag: 'portraitBorder' } as unknown as HTMLElement;
+  const BORDERED_ELEMENTS: UnitFrameElements = {
+    ...FULL_ELEMENTS,
+    portraitBorder: PORTRAIT_BORDER,
+  };
+  const ACCENT = borderAccent('reliquary_gilt');
+
+  it('writes the slug attribute and the palette custom properties through the writers', () => {
+    const calls = paint(playerDescriptor({ borderSlug: 'reliquary_gilt' }), BORDERED_ELEMENTS, {
+      shownDisplay: 'flex',
+    });
+    expect(ACCENT).not.toBeNull();
+    expect(calls).toContainEqual({
+      m: 'setAttr',
+      args: [PORTRAIT_BORDER, PORTRAIT_BORDER_ATTR, 'reliquary_gilt'],
+    });
+    expect(calls).toContainEqual({
+      m: 'setStyleProp',
+      args: [PORTRAIT_BORDER, PORTRAIT_BORDER_FRAME_PROP, ACCENT?.frame],
+    });
+    expect(calls).toContainEqual({
+      m: 'setStyleProp',
+      args: [PORTRAIT_BORDER, PORTRAIT_BORDER_EDGE_PROP, ACCENT?.edge],
+    });
+    expect(calls).toContainEqual({
+      m: 'setStyleProp',
+      args: [PORTRAIT_BORDER, PORTRAIT_BORDER_GLOW_PROP, ACCENT?.glow],
+    });
+  });
+
+  it('clears all four slots for a borderless unit (a cleared border removes the ring)', () => {
+    // '' is also what a stale id and a title-reward deed resolve to at the call
+    // site, so this one arm covers every no-accent case the view can carry.
+    const calls = paint(playerDescriptor({ borderSlug: '' }), BORDERED_ELEMENTS, {
+      shownDisplay: 'flex',
+    });
+    expect(calls).toContainEqual({
+      m: 'setAttr',
+      args: [PORTRAIT_BORDER, PORTRAIT_BORDER_ATTR, ''],
+    });
+    for (const prop of [
+      PORTRAIT_BORDER_FRAME_PROP,
+      PORTRAIT_BORDER_EDGE_PROP,
+      PORTRAIT_BORDER_GLOW_PROP,
+    ]) {
+      expect(calls).toContainEqual({ m: 'setStyleProp', args: [PORTRAIT_BORDER, prop, ''] });
+    }
+  });
+
+  it('renders an unknown slug as borderless: the palette gates the attribute (content drift)', () => {
+    // A slug with no palette (a drifted id the table cannot color) writes '' into
+    // the gate attribute AND the three props, so the CSS :not([data-border=""])
+    // gate stays closed and no transparent ::after box paints. This matches the
+    // nameplate, which early-returns to nothing for the same case, so both
+    // surfaces of one identity render a drifted id identically.
+    const calls = paint(playerDescriptor({ borderSlug: 'slug_with_no_palette' }), BORDERED_ELEMENTS)
+      .filter((c) => c.args[0] === PORTRAIT_BORDER)
+      .map((c) => c.args[2]);
+    expect(calls).toEqual(['', '', '', '']);
+  });
+
+  it('elides every border write on a repeat paint (the facet caches, no local field)', () => {
+    // The painter holds NO lastBorderSlug: the multi-slot writer caches own the
+    // elision, so a steady frame costs zero DOM writes. This drives the REAL
+    // makeWriterFacet over element stubs rather than the recording facet, which
+    // records but never elides.
+    const attrs: Record<string, string> = {};
+    const props: Record<string, string> = {};
+    const stub = (): HTMLElement =>
+      ({
+        style: {
+          setProperty: (prop: string, value: string) => {
+            props[prop] = value;
+          },
+        },
+        classList: { toggle: () => {} },
+        setAttribute: (name: string, value: string) => {
+          attrs[name] = value;
+        },
+      }) as unknown as HTMLElement;
+    let writes = 0;
+    let skips = 0;
+    const host = stub();
+    const facet = makeWriterFacet(
+      new Map(),
+      new Map(),
+      new Map(),
+      new Map(),
+      () => {
+        writes++;
+      },
+      () => {
+        skips++;
+      },
+    );
+    const elements: UnitFrameElements = {
+      frame: stub(),
+      name: stub(),
+      level: stub(),
+      hpFill: stub(),
+      hpText: stub(),
+      portraitBorder: host,
+    };
+    const painter = new UnitFramePainter(facet, elements, { shownDisplay: 'flex' });
+    const view = unitFrameView(playerDescriptor({ borderSlug: 'deepward' }));
+
+    painter.paint(view);
+    expect(attrs[PORTRAIT_BORDER_ATTR]).toBe('deepward');
+    expect(props[PORTRAIT_BORDER_FRAME_PROP]).toBe(borderAccent('deepward')?.frame);
+    const firstWrites = writes;
+    const firstSkips = skips;
+
+    painter.paint(view);
+    expect(writes).toBe(firstWrites);
+    expect(skips).toBeGreaterThan(firstSkips);
+
+    // A real change still lands, and the palette follows the slug.
+    painter.paint(unitFrameView(playerDescriptor({ borderSlug: 'prestige_laurels' })));
+    expect(attrs[PORTRAIT_BORDER_ATTR]).toBe('prestige_laurels');
+    expect(props[PORTRAIT_BORDER_FRAME_PROP]).toBe(borderAccent('prestige_laurels')?.frame);
+    expect(writes).toBeGreaterThan(firstWrites);
+  });
+
+  it('an instance without the border host pays zero border writes', () => {
+    const calls = paint(playerDescriptor({ borderSlug: 'deepward' }), FULL_ELEMENTS, {
+      shownDisplay: 'flex',
+    });
+    expect(calls.some((c) => c.args[0] === PORTRAIT_BORDER)).toBe(false);
+    expect(calls.some((c) => c.m === 'setAttr' || c.m === 'setStyleProp')).toBe(false);
+  });
+
+  it('writes nothing but the hide when the unit is absent (the family contract)', () => {
+    // Hiding stays byte-faithful to every other field: nothing is cleared while the
+    // frame is display:none. The reset lands on the next PRESENT paint, which
+    // always rewrites all four slots (the borderless arm above).
+    const calls = paint(
+      playerDescriptor({ present: false, borderSlug: 'deepward' }),
+      BORDERED_ELEMENTS,
+      {
+        shownDisplay: 'flex',
+      },
+    );
+    expect(calls).toEqual([{ m: 'setDisplay', args: [FRAME, 'none'] }]);
   });
 });

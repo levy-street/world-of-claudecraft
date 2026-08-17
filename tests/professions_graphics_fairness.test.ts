@@ -7,7 +7,7 @@
 //   - The fishing bobber and its bite state (the reel window's one visual
 //     affordance): fishing_bobber.ts and its core read neither the static
 //     preset profile nor the FPS governor.
-//   - The minimap's node markers (ready/cooldown, the lock strike): the
+//   - The minimap's node markers (ready/cooldown, the lock badge): the
 //     touch player's only node-spotting surface, so the marker build and
 //     paint stay profile-free.
 //   - The node props' TIER differentiation (nodeTierScale): tier is the
@@ -43,7 +43,12 @@ const read = (rel: string): string =>
 // governor tokens name the REAL module and class (src/render/render_budget.ts
 // RenderBudgetGovernor): the phase 14 QA found the original pair matched
 // nothing in the repo, leaving the governor arm of this guard inert.
-const PROFILE_TOKENS = ['ui_effects_profile', 'render_budget', 'RenderBudgetGovernor'];
+const PROFILE_TOKENS = [
+  'ui_effects_profile',
+  'ui_tier_knobs',
+  'render_budget',
+  'RenderBudgetGovernor',
+];
 
 function expectProfileFree(rel: string): void {
   const source = read(rel);
@@ -73,6 +78,11 @@ describe('professions graphics fairness (actionable surfaces stay preset-identic
     // the painter both stay preset- and governor-free.
     expectProfileFree('src/ui/map_window_view.ts');
     expectProfileFree('src/ui/map_window_painter.ts');
+  });
+
+  it('the shared painted marker catalog and decode cache are identical across graphics tiers', () => {
+    expectProfileFree('src/ui/map_marker_icon_art.ts');
+    expectProfileFree('src/ui/map_marker_icon_loader.ts');
   });
 
   it('the node prop tier ladder is static and profile-free', () => {

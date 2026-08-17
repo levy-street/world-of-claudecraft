@@ -30,6 +30,10 @@ function stubSource(): GameStateSource {
     simTickHz: () => 20,
     tickPhaseMillis: () => ({}),
     dbPool: () => ({ total: 0, idle: 0, waiting: 0 }),
+    generalChatQuotaDbPool: () => ({ total: 0, idle: 0, waiting: 0 }),
+    generalChatQuotaInFlight: () => 0,
+    generalChatQuotaCachedAccounts: () => 0,
+    generalChatQuotaListener: () => ({ connected: 0, reconnects: 0, pendingRefreshes: 0 }),
     lastTickAt: () => 1_700_000_000_000,
     loopStartedAt: () => 1_700_000_000_000,
     guildBankLogCache: () => ({

@@ -30,6 +30,26 @@ npm run i18n:worklist   # writes one batch per language under docs/i18n-scaling/
 Batches are per-language and independent: fan out one fill agent per language when the
 volume is large, then regenerate once at the end.
 
+## 1b. The chunk families OUTSIDE the registry (deeds and reliquary)
+
+The Deeds and Reliquary systems keep their locale tables in lazy per-base-locale chunks
+that the registry and `scripts/i18n_fill_worklist.mjs` never see:
+`src/ui/deed_i18n.locales/<locale>.ts` and `src/ui/reliquary_i18n.locales/<locale>.ts`
+(loader contract pinned by `tests/deed_i18n_lazy.test.ts` and
+`tests/reliquary_i18n_lazy.test.ts`). Consequences:
+
+- **Zero pending registry rows does NOT prove full coverage.** A fill pass driven only by
+  the worklist ships English deed/reliquary rows while the registry reads clean. Their
+  coverage is enforced only by the release-tier arms (`it.runIf(I18N_RELEASE_TIER === '1')`)
+  in `tests/deed_i18n.test.ts` and `tests/reliquary_i18n.test.ts`, which walk
+  `deedTranslationManifest()` / `reliquaryTranslationManifest()` against every base
+  locale table. Run those release-tier to prove this surface, not the pending count.
+- Fill every base locale chunk in the family; a chunk carries only real catalog ids (the
+  same tests reject a stale id or a title on a deed that rewards none).
+- **The overlay punctuation exemption does NOT extend here.** These chunk files sit
+  outside the `src/ui/i18n.locales` copy-scan exemption: no em/en dashes or emoji in any
+  value, even where the locale would natively use them (the pin tests enforce it).
+
 ## 2. The fill contract
 
 - **Translate, never transplant.** The registry counts PRESENCE, not language: pasting the
@@ -59,7 +79,9 @@ volume is large, then regenerate once at the end.
    diffs the regenerated output against the staged/committed copies; unstaged artifacts fail it.
 4. Prove completion: run the i18n steps release-tier,
    `I18N_RELEASE_TIER=1 npm run gate` (or at minimum `i18n:gen` + the guard tests), and
-   confirm zero `pending` rows remain.
+   confirm zero `pending` rows remain. Zero pending covers the REGISTRY only: the
+   deed/reliquary chunk families (section 1b) are proven by their own release-tier test
+   arms, not by the pending count.
 
 ## 4. Reword staleness (the silent trap)
 

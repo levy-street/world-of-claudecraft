@@ -65,6 +65,7 @@ describe('class halo geometry', () => {
       loadGltf: vi.fn(() => Promise.resolve(stubGltf())),
       loadHdr: vi.fn(() => new Promise(() => undefined)),
       loadTexture: vi.fn(() => Promise.resolve(new THREE.Texture())),
+      loadKtx2Texture: vi.fn(() => Promise.resolve(new THREE.Texture())),
       releaseGltf: vi.fn(),
     }));
     const { charactersReady } = await import('../src/render/characters/assets');

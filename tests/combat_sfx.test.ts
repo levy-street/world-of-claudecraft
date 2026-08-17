@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { SFX_CLIPS, SFX_MOB_EXTENSION_FAMILIES } from '../src/game/sfx_manifest.generated';
+import { ABILITIES } from '../src/sim/content/classes';
 import type { Aura, Entity, SimEvent } from '../src/sim/types';
 import {
   auraApplyCue,
   castCueForAbility,
   consumeHealCue,
+  groundTickAbilityCue,
   impactCueForDamage,
   MOB_VOICE_CUES,
   mobVoiceActionForDamage,
@@ -253,8 +255,38 @@ describe('combat SFX policy', () => {
     ).toEqual({ key: 'spell_nova', anchorId: 20 });
   });
 
-  it('gives the three AoE fear shouts their own nova cue instead of the shared spell_nova', () => {
-    for (const ability of ['psychic_scream', 'howl_of_terror', 'intimidating_shout']) {
+  it('gives each empowered Ascension impact a distinct sampled cue', () => {
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 20,
+        school: 'holy',
+        fx: 'paladinAscensionStart',
+      }),
+    ).toBeNull();
+    for (const [impact, key, anchorId] of [
+      ['offensive', 'wand_holy', 20],
+      ['area', 'proj_holy', 10],
+      ['defensive', 'combat_block', 20],
+      ['healing', 'cast_chain_heal', 20],
+    ] as const) {
+      expect(
+        spellFxCue({
+          type: 'spellfx',
+          sourceId: 10,
+          targetId: 20,
+          school: 'holy',
+          fx: 'paladinAscensionImpact',
+          impact,
+        }),
+      ).toEqual({ key, anchorId });
+      expect(key in SFX_CLIPS).toBe(true);
+    }
+  });
+
+  it('keeps the two AoE fear shouts on the shared fear_shout cue', () => {
+    for (const ability of ['psychic_scream', 'howl_of_terror']) {
       expect(
         spellFxCue({
           type: 'spellfx',
@@ -277,6 +309,68 @@ describe('combat SFX policy', () => {
         ability: 'arcane_explosion',
       }),
     ).toEqual({ key: 'spell_nova', anchorId: 10 });
+  });
+
+  it('gives Intimidating Shout its own distinct nova cue, not the shared fear_shout', () => {
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 10,
+        school: 'shadow',
+        fx: 'nova',
+        ability: 'intimidating_shout',
+      }),
+    ).toEqual({ key: 'intimidating_shout', anchorId: 10 });
+  });
+
+  it('gives Battle Shout, Demoralizing Shout, Emboldening Roar, Defiant Bellow, and Valor Roar their own cast cue via fx:shout', () => {
+    for (const [ability, key] of [
+      ['battle_shout', 'battle_shout'],
+      ['demoralizing_shout', 'demoralizing_shout'],
+      ['emboldening_roar', 'emboldening_roar'],
+      ['defiant_bellow', 'defiant_bellow'],
+      ['rallying_cry', 'rallying_cry'],
+    ] as const) {
+      expect(
+        spellFxCue({
+          type: 'spellfx',
+          sourceId: 10,
+          targetId: 10,
+          school: 'physical',
+          fx: 'shout',
+          ability,
+        }),
+      ).toEqual({ key, anchorId: 10 });
+    }
+    // Intimidating Shout also carries castFx:'shout', but its cue resolves
+    // through the nova path above (its aoeFear effect emits fx:'nova'
+    // unconditionally); deliberately absent from SHOUT_ABILITY_CUES so the
+    // same cast never plays two different cues.
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 10,
+        school: 'physical',
+        fx: 'shout',
+        ability: 'intimidating_shout',
+      }),
+    ).toBeNull();
+    // A real ability id that is not one of the five recorded shouts (Charge,
+    // a warrior ability with no cast-time fx of its own) stays silent too:
+    // a fx:'shout' event carrying it must not accidentally resolve through
+    // some other lookup keyed off the same id.
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 10,
+        school: 'physical',
+        fx: 'shout',
+        ability: 'charge',
+      }),
+    ).toBeNull();
   });
 
   it('gives Frost Nova its own cast cue instead of the shared spell_nova', () => {
@@ -318,6 +412,18 @@ describe('combat SFX policy', () => {
         }),
       ).toEqual({ key: ability, anchorId: 20 });
     }
+    // Low Blow (kidney_shot) reuses Gut Punch's (cheap_shot) recording, not
+    // its own key, same reuse mechanism as Eviscerate/Rupture.
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 20,
+        school: 'physical',
+        fx: 'ccImpact',
+        ability: 'kidney_shot',
+      }),
+    ).toEqual({ key: 'cheap_shot', anchorId: 20 });
     // No ability id, or an ability not in the covered set: no cue at all
     // (the sim only ever emits ccImpact for this set, but the client
     // resolver stays defensive regardless).
@@ -356,6 +462,15 @@ describe('combat SFX policy', () => {
         ability: 'flamestrike',
       }),
     ).toEqual({ key: 'flamestrike', anchorId: 10 });
+  });
+
+  it('gives Meteor its own ground-tick cue instead of staying silent', () => {
+    expect(groundTickAbilityCue('meteor')).toBe('meteor');
+    // Every other groundAoE zone (Consecration, Blizzard's damage pulse, ...)
+    // has no dedicated recording and stays silent here (procedural VFX synth
+    // carries it, see ability_sfx_coverage.ts's PULSE_IMPACT_ABILITIES).
+    expect(groundTickAbilityCue('consecration')).toBeNull();
+    expect(groundTickAbilityCue(undefined)).toBeNull();
   });
 
   it('gives Scorch and Pyroblast their own impact instead of the shared impact_fire', () => {
@@ -544,6 +659,44 @@ describe('combat SFX policy', () => {
     ).toBeNull();
   });
 
+  it('suppresses the generic impact cue for the two rift hazards with their own custom recording', () => {
+    // src/sim/rift/runs.ts fires its own spellfxAt(sfxKey: 'rift_lava_tick'|
+    // 'rift_boulder_impact') on the same damage event; without this the generic
+    // school/material impact would double up alongside the custom one. Keyed
+    // off the stable abilityId ('rift_hazard_molten'/'rift_hazard_boulder'),
+    // never the 'Molten Rift'/'Rolling Boulder' display label, so a
+    // display-only rename can't silently reintroduce the double cue.
+    expect(
+      impactCueForDamage(
+        damage({ school: 'fire', ability: 'Molten Rift', abilityId: 'rift_hazard_molten' }),
+        target('player', 'player'),
+      ),
+    ).toBeNull();
+    expect(
+      impactCueForDamage(
+        damage({
+          school: 'physical',
+          ability: 'Rolling Boulder',
+          abilityId: 'rift_hazard_boulder',
+        }),
+        target('player', 'player'),
+      ),
+    ).toBeNull();
+    // A display-only rename of either hazard label alone (abilityId absent or
+    // different) must NOT suppress the generic cue: the stable id is what
+    // gates this, not the label (review finding, PR #2687).
+    expect(
+      impactCueForDamage(
+        damage({ school: 'fire', ability: 'Molten Rift' }),
+        target('player', 'player'),
+      ),
+    ).toBe('impact_fire');
+    // A real fire spell (not the rift hazard) is unaffected.
+    expect(
+      impactCueForDamage(damage({ school: 'fire', ability: 'fireball' }), target('mob', 'boar')),
+    ).toBe('impact_fire');
+  });
+
   it('preserves v0.25 mob families and loaded subfamily overrides', () => {
     expect(mobVoiceFamily('mudfin_murloc')).toBe('mudfin');
     expect(mobVoiceCue('mudfin_murloc', 'aggro')).toBe('mob_mudfin_aggro');
@@ -663,6 +816,9 @@ describe('combat SFX policy', () => {
     expect(auraApplyCue(gained, aura('buff_ap'))).toBe('buff_apply');
     expect(auraApplyCue(gained, aura('dot'))).toBe('debuff_apply');
     expect(auraApplyCue(gained, aura('buff_ap', -5))).toBe('debuff_apply');
+    for (const id of ['divine_ascension', 'dawns_path_speed', 'aegis_of_devotion_dr']) {
+      expect(auraApplyCue(gained, { ...aura('buff_ap', 5), id })).toBeNull();
+    }
     expect(auraApplyCue({ ...gained, gained: false }, aura('dot'))).toBeNull();
     expect(auraApplyCue(gained, null)).toBeNull();
   });
@@ -687,6 +843,24 @@ describe('combat SFX policy', () => {
     const gained = { type: 'aura', targetId: 1, name: 'Test Aura', gained: true } as const;
     expect(auraApplyCue(gained, { ...aura('stealth'), id: 'vanish' })).toBe('vanish');
     expect(auraApplyCue(gained, { ...aura('stealth'), id: 'stealth' })).toBe('stealth');
+  });
+
+  it('reuses the Stealth recording for Greater Invisibility, Prowl, and Shadowform', () => {
+    // Pin these ids to real content: if any got renamed in classes.ts, this
+    // fails loudly instead of silently reverting to the buff_apply fallback.
+    for (const id of ['greater_invisibility', 'prowl', 'shadowform']) {
+      expect(ABILITIES[id]?.id).toBe(id);
+    }
+    const gained = { type: 'aura', targetId: 1, name: 'Test Aura', gained: true } as const;
+    expect(auraApplyCue(gained, { ...aura('stealth'), id: 'greater_invisibility' })).toBe(
+      'stealth',
+    );
+    expect(auraApplyCue(gained, { ...aura('stealth'), id: 'prowl' })).toBe('stealth');
+    // Shadowform is kind:'form_shadow', not 'stealth': the override is keyed
+    // off Aura.id, not Aura.kind, so it still resolves regardless of the
+    // aura's real kind. Not a debuff (form_shadow is absent from
+    // DEBUFF_AURA_KINDS), so it reaches the buff-apply table at all.
+    expect(auraApplyCue(gained, { ...aura('form_shadow'), id: 'shadowform' })).toBe('stealth');
   });
 
   it('uses unarmed swings in both druid combat forms', () => {

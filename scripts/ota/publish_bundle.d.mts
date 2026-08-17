@@ -15,6 +15,7 @@ export interface OtaPublishManifest {
   version: string;
   url: string;
   checksum?: string;
+  fileManifestUrl?: string;
   minNativeVersion?: string;
   builtAt?: string;
 }
@@ -23,14 +24,29 @@ export interface OtaPublishPlan {
   bucket: string;
   bundleKey: string;
   manifestKey: string;
+  fileManifestKey: string;
+  filesKeyPrefix: string;
   bundleUrl: string;
   manifestUrl: string;
+  fileManifestUrl: string;
   manifest: OtaPublishManifest;
 }
 
+export interface OtaPublishManifestEntry {
+  file_name: string;
+  file_hash: string;
+  download_url: string;
+}
+
 export function bundleFileName(version: string): string;
+export function manifestFileName(version: string): string;
 export function awsEndpointArgs(endpointUrl: string | undefined | null): string[];
 export function parseOtaArgs(argv: string[]): OtaPublishArgs;
+export function buildManifestEntries(input: {
+  files: ReadonlyArray<{ path: string; sha256: string }>;
+  publicBaseUrl: string;
+  prefix?: string;
+}): OtaPublishManifestEntry[];
 export function planOtaPublish(input: {
   version: string;
   bucket: string;
@@ -39,4 +55,5 @@ export function planOtaPublish(input: {
   checksum?: string;
   minNative?: string | null;
   builtAt?: string;
+  withFileManifest?: boolean;
 }): OtaPublishPlan;

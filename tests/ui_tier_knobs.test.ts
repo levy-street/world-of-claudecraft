@@ -26,10 +26,11 @@ import {
 } from '../src/game/ui_tier_knobs';
 
 // Per-element graphics-tier knobs. The headline gate is the two-controller hazard:
-// every knob is a pure function of the STATIC tier and NEVER reads the FPS governor, so
-// only the static preset can move a knob. These tests pin that (import-absence +
-// behavioral), the no-op-on-full invariant (medium/high/ultra are byte-equivalent to
-// pre-tiering), and that low measurably sheds on every knob.
+// every knob is pure over explicit inputs and NEVER reads the FPS governor. The
+// STATIC tier owns cost shedding; the Rift's explicit actionability flag may only
+// restore full minimap cadence. These tests pin that (import-absence + behavioral),
+// the no-op-on-full invariant (medium/high/ultra are byte-equivalent to pre-tiering),
+// and that low measurably sheds where safety permits.
 
 // The four published tiers and the three that must stay at full effects (only low sheds).
 const ALL_TIERS: readonly UiEffectsTier[] = ['low', 'medium', 'high', 'ultra'];
@@ -103,6 +104,16 @@ describe('ui_tier_knobs - low sheds cost on every knob', () => {
     expect(auraVisibleCap('low')).toBeLessThan(AURA_VISIBLE_CAP_FULL);
     expect(auraRefreshIntervalMs('low')).toBe(AURA_REFRESH_INTERVAL_LOW_MS);
     expect(targetFrameNonSelfIntervalMs('low')).toBe(TARGET_FRAME_NONSELF_INTERVAL_LOW_MS);
+  });
+
+  it('never tier-throttles a Rift minimap with lethal dynamic mechanics', () => {
+    expect(minimapRedrawIntervalMs('low', true)).toBe(0);
+    expect(cadenceDue(1000, 1100, minimapRedrawIntervalMs('low', true))).toBe(true);
+    expect(minimapRedrawIntervalMs('low', false)).toBe(MINIMAP_REDRAW_INTERVAL_LOW_MS);
+    for (const tier of FULL_TIERS) {
+      expect(minimapRedrawIntervalMs(tier, true)).toBe(0);
+      expect(minimapRedrawIntervalMs(tier, false)).toBe(0);
+    }
   });
 });
 
@@ -271,8 +282,8 @@ describe('ui_tier_knobs - import absence + two-controller hazard (source scan)',
   });
 });
 
-describe('ui_tier_knobs - behavioral: only the tier moves a knob', () => {
-  it('the only input that changes a knob is the tier argument (no hidden state)', () => {
+describe('ui_tier_knobs - behavioral: only explicit inputs move a knob', () => {
+  it('repeated explicit inputs produce the same complete knob vector (no hidden state)', () => {
     // Capture the full knob vector for each tier, then re-read after arbitrary unrelated
     // work: the vectors are identical, so nothing outside the tier argument (e.g. a
     // governor, a clock) can move a knob.
@@ -280,6 +291,7 @@ describe('ui_tier_knobs - behavioral: only the tier moves a knob', () => {
       fctCap: fctMaxConcurrent(tier, FCT_POOL_CAP),
       fctTtl: fctTtlScale(tier),
       minimap: minimapRedrawIntervalMs(tier),
+      minimapFullCadence: minimapRedrawIntervalMs(tier, true),
       auraCap: auraVisibleCap(tier),
       auraRefresh: auraRefreshIntervalMs(tier),
       target: targetFrameNonSelfIntervalMs(tier),
@@ -293,6 +305,7 @@ describe('ui_tier_knobs - behavioral: only the tier moves a knob', () => {
     expect(before[0].fctCap).toBeLessThan(before[3].fctCap);
     expect(before[0].auraCap).toBeLessThan(before[3].auraCap);
     expect(before[0].minimap).toBeGreaterThan(before[3].minimap);
+    expect(before[0].minimapFullCadence).toBe(before[3].minimapFullCadence);
   });
 });
 

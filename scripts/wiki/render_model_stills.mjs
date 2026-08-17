@@ -53,6 +53,7 @@ const bundled = await esbuild.build({
   define: {
     'import.meta.env.DEV': 'true',
     'import.meta.env.PROD': 'false',
+    'import.meta.env.TEST': 'false',
     // src/client_origin.ts and src/runtime.ts (pulled in transitively via the guide
     // viewer's asset chain) also read import.meta.env at module scope; esbuild replaces
     // the whole import.meta object with {} for a non-ESM output format, so an undefined

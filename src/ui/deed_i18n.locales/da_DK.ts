@@ -33,19 +33,19 @@ export const table: DeedLocaleTable = {
     desc: 'Ryd en S-rangs Rift, det hårdeste niveau en Rift-portal kan spawne.',
   },
   pvp_honor_sergeant: {
-    name: 'Sergent',
+    name: 'Linjebryder',
     desc: 'Optjen 10.000 Ære i din levetid. At bruge den koster dig aldrig rangen.',
-    title: 'Sergent',
+    title: 'Linjebryder',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Ridderløjtnant',
+    name: 'Markhærger',
     desc: 'Optjen 40.000 Ære i din levetid, en hel sæsons rigtig krig bag dig.',
-    title: 'Ridderløjtnant',
+    title: 'Markhærger',
   },
   pvp_honor_field_marshal: {
-    name: 'Feltmarskal',
+    name: 'Krigskronet',
     desc: 'Optjen 150.000 Ære i din levetid. Sjælden på ethvert rige, og sådan bør det være.',
-    title: 'Feltmarskal',
+    title: 'Krigskronet',
   },
   chr_drakemaw_broodlord: {
     name: 'Yngelknuseren',
@@ -919,5 +919,49 @@ export const table: DeedLocaleTable = {
   prog_armorcrafting_rare: {
     name: 'Pladet til perfektion',
     desc: 'Skab dit første sjældne udstyrsstykke i Rustningsfremstilling.',
+  },
+  col_reliquary_rank_2: {
+    name: 'Byttevogter',
+    desc: 'Nå Kurator-rang 2 i Relikvariet (10 enestående katalogiserede relikvier).',
+    title: 'Byttevogter',
+  },
+  col_reliquary_rank_3: {
+    name: 'Katalogisatoren',
+    desc: 'Nå Kurator-rang 3 i Relikvariet (25 enestående katalogiserede relikvier).',
+    title: 'Katalogisatoren',
+  },
+  col_reliquary_rank_4: {
+    name: 'Ærkekurator',
+    desc: 'Nå Kurator-rang 4 i Relikvariet (50 enestående katalogiserede relikvier).',
+    title: 'Ærkekurator',
+  },
+  col_reliquary_rank_5: {
+    name: 'Evigt bytte',
+    desc: 'Nå Kurator-rang 5 i Relikvariet (100 enestående katalogiserede relikvier).',
+  },
+  col_reliquary_complete: {
+    name: 'Det Store Relikvarium',
+    desc: 'Katalogiser hver relikvie i Relikvariet, som en figur kan beholde. At kataloget vokser senere, tager det aldrig fra dig.',
+    title: 'Hvælvingens kurator',
+  },
+  col_reliquary_conquerors: {
+    name: 'Erobrernes hylde',
+    desc: 'Katalogiser hver relikvie på Relikvariets hylde Erobrere. At kataloget vokser senere, tager det aldrig fra dig.',
+    title: 'Hvælvingsbryder',
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    name: 'Nythraxis illumineret',
+    desc: 'Illuminer siden Heroisk: Nythraxis-raid i Relikvariet.',
+    title: "Nythraxis' lys",
+  },
+  col_reliquary_illum_thunzharr: {
+    name: 'Thunzharr illumineret',
+    desc: 'Illuminer siden Thunzharr, den Vågnende Tinde i Relikvariet.',
+    title: 'Thunzharrs lys',
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    name: 'Helligdommen illumineret',
+    desc: 'Illuminer siden Heroisk: Gravormens Helligdom i Relikvariet.',
+    title: 'Helligdommens lys',
   },
 };

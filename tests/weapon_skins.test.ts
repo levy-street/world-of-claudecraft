@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import * as THREE from 'three';
+import { describe, expect, it, vi } from 'vitest';
 import { WEAPON_VFX } from '../src/render/weapon_vfx';
 import {
   eligibleClassesForWeaponSkinType,
@@ -113,6 +114,10 @@ describe('weapon type classification', () => {
   it('stays in lockstep with the render variant family for mapped items', () => {
     const familyOf = (variant: string): string | null => {
       if (/^(adv_)?sword/.test(variant)) return 'sword';
+      // The bespoke dagger skins carry thematic names; assets.ts tags each of
+      // these variants VAR_DAGGER, which is the render-side family authority.
+      if (/^(ice_fang|redskull_dagger|purple_dagger|whittler_s_knife)$/.test(variant))
+        return 'dagger';
       if (/^(adv_)?dagger/.test(variant)) return 'dagger';
       if (/^(adv_)?(druid_)?staff|^adv_druid_staff/.test(variant)) return 'staff';
       if (/^hammer/.test(variant)) return 'mace';
@@ -431,6 +436,21 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
     expect(fn).toContain('!this.deadLock');
   });
 
+  it('the full re-attach returns non-mirrored offhand payloads for the compile gate', () => {
+    // A weapon swap or skin change re-attaches BOTH hands, but the
+    // non-mirrored offhand (a shield, a held offhand) used to be dropped from
+    // the returned payload list, so the caller's compile gate never saw it
+    // and its first draw linked synchronously. It must ride the RETURN while
+    // staying out of the skin material/VFX set (pixel-untouched).
+    const src = readFileSync(join(ROOT, 'src/render/characters/visual.ts'), 'utf8');
+    const fn = src.slice(
+      src.indexOf('private reattachHeldWeapon('),
+      src.indexOf('private finishWeaponAttach('),
+    );
+    expect(fn).toContain('this.finishWeaponAttach(payloads)');
+    expect(fn).toContain('return [...payloads, ...offPayloads]');
+  });
+
   it('a drawn bow holds its draw while CASTING, instead of the caster gesture', async () => {
     const { weaponSkinCastClip, weaponSkinHandling, SKIN_ATTACK_CLIP_NAMES } = await import(
       '../src/render/characters/skin_attack'
@@ -646,6 +666,86 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
     expect(launch).not.toContain('weaponSkinAttackClips(source.weaponSkinId)');
     expect(damage).not.toContain('weaponSkinAttackClips(source.weaponSkinId)');
   });
+
+  it('a displayed bow skin still wins over a hunter ability-specific attackByAbility override (PR #2958 review)', async () => {
+    // Regression for the CharacterVisual.playAttack precedence bug flagged in
+    // review: hunter_ability_anims.glb's per-ability overrides (aimed_shot ->
+    // Hunter_Shot_LongDraw) must not shadow the bow-skin substitution, or a
+    // visible bow would fire the crossbow-shoulder ability pose instead of
+    // Bow_Draw_Shot.
+    vi.resetModules();
+    const clip = (name: string) => new THREE.AnimationClip(name, 1, []);
+    vi.doMock('../src/render/assets/loader', () => ({
+      loadGltf: vi.fn(() =>
+        Promise.resolve({
+          scene: new THREE.Group(),
+          animations: [
+            '2H_Ranged_Shoot',
+            'Hunter_Shot_LongDraw',
+            'Hunter_Melee_Gut',
+            'Spellcast_Raise',
+            'Bow_Draw_Shot',
+            'Idle',
+            'Walk',
+            'Run',
+          ].map(clip),
+        }),
+      ),
+      loadHdr: vi.fn(() => new Promise(() => undefined)),
+      loadTexture: vi.fn(() => Promise.resolve(new THREE.Texture())),
+      loadKtx2Texture: vi.fn(() => Promise.resolve(new THREE.Texture())),
+      releaseGltf: vi.fn(),
+    }));
+    const { charactersReady } = await import('../src/render/characters/assets');
+    await charactersReady();
+    const { createCharacterVisual } = await import('../src/render/characters/index');
+    const { CharacterVisual } = await import('../src/render/characters/visual');
+    type ActionPeek = { current: { getClip(): { name: string } } | null };
+
+    const hunterEntity = {
+      kind: 'player',
+      id: 1,
+      templateId: 'hunter',
+      color: 0xffffff,
+      skin: 0,
+      mainhandItemId: null,
+      offhandItemId: null,
+    } as unknown as import('../src/sim/types').Entity;
+
+    const visual = createCharacterVisual(hunterEntity);
+    expect(visual).not.toBeNull();
+    if (!visual) return;
+    expect(visual).toBeInstanceOf(CharacterVisual);
+
+    // No skin displayed: the authored ability override plays.
+    visual.playAttack('aimed_shot');
+    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('Hunter_Shot_LongDraw');
+
+    // A bow skin displayed: the same ability call must fall back to the
+    // draw clip instead, not the crossbow-shoulder ability pose.
+    visual.setWeaponSkin('winterbite');
+    visual.playAttack('aimed_shot');
+    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('Bow_Draw_Shot');
+
+    // A melee ability (range 0) keeps its bespoke Hunter_Melee_* swing even
+    // with the same bow skin displayed: the bow substitution is a RANGED-only
+    // precedence, since a displayed bow never changes how a melee hit is
+    // thrown (second review round on PR #2958).
+    visual.playAttack('raptor_strike');
+    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('Hunter_Melee_Gut');
+
+    // A self-buff aspect toggle (range-agnostic, no swing) also keeps its
+    // authored Spellcast_Raise raise/buff ceremony with the same bow skin
+    // displayed: casting Harrier's Guise or Fevered Draw must never play the
+    // draw-shot attack (Rubsey's OSSBrain review on PR #2958).
+    visual.playAttack('aspect_of_the_hawk');
+    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('Spellcast_Raise');
+    visual.playAttack('rapid_fire');
+    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('Spellcast_Raise');
+    // A full charactersReady() reload pulls in this branch's much larger
+    // manifest (release/v0.35.0's own content growth), so this single test's
+    // real preload pass runs well past the 20s default under host load.
+  }, 60000);
 });
 
 describe('grip override wiring (editor saves reach the game)', () => {

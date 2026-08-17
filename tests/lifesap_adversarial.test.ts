@@ -28,7 +28,9 @@ type SimInternals = {
 function druidWithLifesap(): Sim {
   const sim = new Sim({ seed: 11, playerClass: 'druid', autoEquip: true });
   sim.setPlayerLevel(20);
-  expect(sim.applyTalents({ spec: null, rows: { 11: 'dru_r11_innervate' } })).toBe(true);
+  expect(sim.applyTalents({ spec: null, rows: { 17: 'dru_r17_survival_of_the_fittest' } })).toBe(
+    true,
+  );
   return sim;
 }
 
@@ -77,12 +79,38 @@ function stepTicks(sim: Sim, ticks: number): void {
   for (let i = 0; i < ticks; i++) sim.tick();
 }
 
-function stepTicksWithoutManaRegen(sim: Sim, ticks: number): void {
+// Tick with the druid pinned "in combat" (five-second rule active), the state these
+// adversarial checks exercise Lifesap in.
+function stepInCombat(sim: Sim, ticks: number): void {
   for (let i = 0; i < ticks; i++) {
     sim.player.fiveSecondRule = 0;
     sim.player.inCombat = true;
     sim.tick();
   }
+}
+
+// A mana-form druid now passively regenerates Spirit mana even in combat (the
+// Spirit-as-mp5 change), so a raw resource read no longer isolates Lifesap. Measure
+// the sap's MARGINAL contribution instead: run the identical in-combat window twice,
+// once with the sap applied and once without, and return the difference. `setup`
+// primes any extra auras (e.g. hard control) on BOTH runs; `applySap` applies the sap
+// only to the measured run. The passive regen is identical in both and cancels out.
+function lifesapGain(
+  applySap: (sim: Sim, p: Entity) => void,
+  setup: (sim: Sim, p: Entity) => void = () => {},
+  ticks = CLASSIC_TICK,
+): number {
+  const run = (withSap: boolean): number => {
+    const sim = druidWithLifesap();
+    const p = sim.player;
+    p.resource = 0;
+    p.inCombat = true;
+    setup(sim, p);
+    if (withSap) applySap(sim, p);
+    stepInCombat(sim, ticks);
+    return p.resource;
+  };
+  return run(true) - run(false);
 }
 
 function measureLifesapPotential(form: 'bear_form' | 'cat_form'): number {
@@ -213,8 +241,15 @@ describe('Lifesap adversarial balance checks', () => {
     sim.castAbility('innervate');
 
     expect(p.auras.filter((a) => a.kind === 'resource_sap')).toHaveLength(1);
-    stepTicksWithoutManaRegen(sim, CLASSIC_TICK);
-    expect(p.resource).toBe(20);
+    // A single refreshed sap (not two stacked) restores one sap's worth over the
+    // classic tick, net of the passive Spirit combat regen.
+    const gain = lifesapGain((s, pl) => {
+      s.castAbility('innervate');
+      pl.cooldowns.delete('innervate');
+      pl.gcdRemaining = 0;
+      s.castAbility('innervate');
+    });
+    expect(gain).toBe(20);
   });
 
   it('normal death strips Lifesap and prevents dead-player resource ticks', () => {
@@ -244,31 +279,31 @@ describe('Lifesap adversarial balance checks', () => {
     ['polymorph', 'polymorph'],
     ['fear-style incapacitate', 'incapacitate'],
   ] as const)('is stilled while under %s control (the PvP banking fix)', (_label, kind) => {
-    const sim = druidWithLifesap();
-    const p = sim.player;
-    p.resource = 0;
-    p.inCombat = true;
-    (sim as unknown as SimInternals).applyAura(p, resourceSapAura(p));
-    (sim as unknown as SimInternals).applyAura(p, controlAura(p, kind));
-
-    stepTicksWithoutManaRegen(sim, CLASSIC_TICK);
-    expect(p.resource).toBe(0); // hard control stills the sap
+    // Under hard control the sap adds nothing beyond the passive Spirit combat
+    // regen: its marginal contribution is zero.
+    const gain = lifesapGain(
+      (s, pl) => (s as unknown as SimInternals).applyAura(pl, resourceSapAura(pl)),
+      (s, pl) => (s as unknown as SimInternals).applyAura(pl, controlAura(pl, kind)),
+    );
+    expect(gain).toBe(0); // hard control stills the sap
   });
 
   it('caps harmlessly at full resource and rounds fractional sap values per tick', () => {
+    // At full resource the sap (and the passive regen) clamp: resource stays full.
     const sim = druidWithLifesap();
     const p = sim.player;
     p.resource = p.maxResource;
     p.inCombat = true;
     (sim as unknown as SimInternals).applyAura(p, resourceSapAura(p));
-    stepTicksWithoutManaRegen(sim, CLASSIC_TICK);
+    stepInCombat(sim, CLASSIC_TICK);
     expect(p.resource).toBe(p.maxResource);
 
-    p.auras = [];
-    p.resource = 0;
-    (sim as unknown as SimInternals).applyAura(p, resourceSapAura(p, 2.5));
-    stepTicksWithoutManaRegen(sim, CLASSIC_TICK);
-    expect(p.resource).toBe(3);
+    // A fractional sap value rounds per tick (round(2.5) = 3), isolated from the
+    // passive Spirit combat regen.
+    const gain = lifesapGain((s, pl) =>
+      (s as unknown as SimInternals).applyAura(pl, resourceSapAura(pl, 2.5)),
+    );
+    expect(gain).toBe(3);
   });
 
   it('is mob-purgeable (the counterplay fix) and player-cancelable as a helpful aura', () => {

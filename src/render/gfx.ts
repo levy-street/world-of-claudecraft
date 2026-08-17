@@ -196,6 +196,15 @@ export interface GfxSettings {
   readonly lowPlus: boolean;
   /** Use the cheaper low-foliage density/LOD policy while keeping the rest of the tier. */
   readonly leanFoliage: boolean;
+  /**
+   * Ground-dressing density compensation (foliage.ts: the denser dress step,
+   * the 1.24 density scale, the 1.08 spot boost). The lowPlus weak-GPU art
+   * cohort plus the leanFoliage MEDIUM session (weak integrated GPU keeping
+   * the lean model set at medium): the boost compensates the lean set's
+   * thinner ground read, so the medium-weak cohort keeps it even though plain
+   * low deliberately does not (low must stay monotonically lighter).
+   */
+  readonly denseDressing: boolean;
   readonly grassRadius: number;
   readonly grassStep: number;
   /** Stable-prefix floor for grass cards already inside their far alpha-fade band. */
@@ -213,8 +222,13 @@ export interface GfxSettings {
    * can see or react to: every knob here is cosmetic sharpness only (fairness rule).
    */
   readonly constrainedMemory: boolean;
-  /** Packaged iOS WKWebView profile that bounds retained GPU resources independently of FPS. */
-  readonly nativeIosMemoryProfile: boolean;
+  /**
+   * Every iOS WebKit host (Mobile Safari, any other iOS browser, and the packaged native
+   * WKWebView shell) shares the same WebContent process and its memory ceiling, so this
+   * bounds retained GPU resources independently of FPS on ALL of them, not just the native
+   * app. Set purely from `platform === 'ios'`; it does not require `nativeApp`.
+   */
+  readonly iosMemoryProfile: boolean;
   /** Global cap for inactive skinned character rigs retained for reuse. */
   readonly maxPooledCharacterVisuals: number;
   /** Global cap for inactive ground-object views (harvest nodes, loot, quest pickups) retained for reuse. */
@@ -375,18 +389,26 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
       cost: 'gpu',
       governable: true,
     },
+    // Low's four governor-ladder buckets (grass, foliage, lighting, vfx; the other
+    // governable-flagged rows predate the rule and keep their own values) are derived
+    // FROM medium so the tier is monotonically lighter: baseline and max are
+    // medium's x 0.95 (2 decimals), and the minima equal
+    // medium's so low can always shed at least as far. These used to sit ABOVE medium
+    // (grass/foliage baseline 0.9 vs 0.78/0.74, floors 0.62/0.68 vs 0.5), which made
+    // plain low render more than medium. The caps floors in render_budget.ts mirror
+    // these minima.
     grass: {
-      min: 0.62,
-      baseline: 0.9,
-      max: 1.0,
+      min: 0.5,
+      baseline: 0.74,
+      max: 0.86,
       roi: 0.9,
       cost: 'gpu',
       governable: true,
     },
     foliage: {
-      min: 0.68,
-      baseline: 0.9,
-      max: 1.0,
+      min: 0.5,
+      baseline: 0.7,
+      max: 0.82,
       roi: 0.84,
       cost: 'gpu',
       governable: true,
@@ -400,9 +422,9 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
       governable: false,
     },
     lighting: {
-      min: 0.78,
-      baseline: 1.0,
-      max: 1.0,
+      min: 0.45,
+      baseline: 0.68,
+      max: 0.78,
       roi: 0.72,
       cost: 'gpu',
       governable: true,
@@ -424,15 +446,18 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
       governable: false,
     },
     vfx: {
-      min: 0.84,
-      baseline: 1.0,
-      max: 1.0,
+      min: 0.58,
+      baseline: 0.76,
+      max: 0.86,
       roi: 0.9,
       cost: 'mixed',
       governable: true,
     },
     characters: {
-      min: 1.0,
+      // Dormant while governable is false, but the shed floor still states how
+      // far the tier COULD go: low matches medium's so the monotonicity sweep
+      // holds on every row.
+      min: 0.86,
       baseline: 1.0,
       max: 1.0,
       roi: 1.0,
@@ -924,12 +949,27 @@ export function configureMaskedDoubleSidedVegetationMaterial<T extends THREE.Mat
 function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettings {
   const bucketBands = GFX_BUCKET_BANDS[tier];
   const weakIntegratedGpu = isWeakIntegratedGpu(hints?.gpuRenderer);
+  // The one shared adapter classifier ('weak' already delegates to isWeakIntegratedGpu).
+  const gpuClass = classifyGpuRenderer(hints?.gpuRenderer);
   // WKWebView's WebContent/GPU process has a hard resident-memory ceiling which is independent
   // of frame rate. The runtime governor can reduce draw cost after a slow submit, but it cannot
   // reclaim already-created textures, programs, materials, or rigs. Keep the player's selected
-  // tier (and its density/VFX progression) while routing the packaged iOS app through the
+  // tier (and its density/VFX progression) while routing every iOS WebKit host through the
   // bounded-residency material/world path from scene construction onward.
-  const nativeIosMemoryProfile = hints?.nativeApp === true && hints.platform === 'ios';
+  //
+  // This used to require hints.nativeApp === true, restricting the whole profile (render
+  // settings AND the streamed/deferred asset-loading paths it also gates: see
+  // characters/assets.ts streamedUrls/eagerSkinAtlases, foliage.ts/props.ts extractParts) to
+  // the packaged app. Mobile Safari and every other iOS browser run under the SAME WebKit
+  // engine and the SAME per-process WebContent memory ceiling (see safeStartupGraphicsPreset's
+  // isIosWebkit and the sibling tightMemoryProfile below, both of which already treated Safari
+  // and the native shell identically): only two narrow signals (nativeApp, or a stamped
+  // tightMemory marker) ever routed a plain-browser iOS session through the bounded path, so an
+  // un-flagged iPhone (e.g. any iPhone with more than the 4 GB-class RAM the tightMemory marker
+  // requires, which is most modern iPhones) playing in Safari got the full eager/unbounded
+  // residency profile and crashed under ordinary play exactly the way the packaged app used to
+  // before this profile existed for it.
+  const iosMemoryProfile = hints?.platform === 'ios';
   // The stricter 4 GB-class rung. The native shell can measure physicalMemory,
   // while either native WKWebView or iOS Safari can stamp the same marker after
   // a foreground entry kill. Both WebKit hosts share the WebContent ceiling.
@@ -939,7 +979,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
   // texels, MSAA, and DPR are cosmetic sharpness only, so this never crosses the
   // graphics-settings fairness line.
   const constrainedMemory =
-    nativeIosMemoryProfile ||
+    iosMemoryProfile ||
     isConstrainedBrowser({
       deviceMemory: hints?.deviceMemory,
       maxTouchPoints: hints?.maxTouchPoints ?? 0,
@@ -948,9 +988,18 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     });
   const aaPolicy = gfxAaPolicy(tier, {
     constrainedMemory,
-    nativeIosMemoryProfile,
+    iosMemoryProfile,
     tightMemory: tightMemoryProfile,
   });
+  // lowPlus is art direction for fragment-bound weak GPUs (fatter grass cards, the
+  // terrain lowShade emissive), not a load reduction: applying it to EVERY low-tier
+  // session made plain low draw richer than medium. Gate it to the cohort it was
+  // authored for, reusing the file's one adapter classifier rather than a second
+  // regex set. classifyGpuRenderer returns 'unknown' for a masked or absent adapter
+  // string, so an unclassifiable session lands on plain low, the lighter default.
+  // Hoisted out of the literal so denseDressing below can extend the cohort.
+  const lowPlus =
+    iosMemoryProfile || (tier === 'low' && (gpuClass === 'weak' || gpuClass === 'software'));
   let settings: GfxSettings = {
     graphicsConfigVersion: GFX_CONFIG_VERSION,
     tier,
@@ -959,17 +1008,17 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     bucketBaselines: bucketBaselines(bucketBands),
     budget: GFX_BUDGETS[tier],
     autoGovernor: shouldUseAutoGovernor(tier, hints?.search ?? ''),
-    composer: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'high'),
-    gradePass: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'medium'),
+    composer: !iosMemoryProfile && gfxTierAtLeast(tier, 'high'),
+    gradePass: !iosMemoryProfile && gfxTierAtLeast(tier, 'medium'),
     // N8AO runs on the composer tiers: half-res + Low quality on high keeps
     // it ~1ms-class on real GPUs; ultra and insane get full-res Medium
-    ao: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'high'),
+    ao: !iosMemoryProfile && gfxTierAtLeast(tier, 'high'),
     msaaSamples: aaPolicy.msaaSamples,
     pixelRatioCap: aaPolicy.pixelRatioCap,
     // Shadows are cosmetic and duplicate the visible scene draw. Both constrained browsers and
-    // the stricter native-iOS residency profile remove that duplicate pass.
+    // the stricter iOS WebKit residency profile remove that duplicate pass.
     dynamicShadows: tier !== 'low' && !constrainedMemory,
-    shadowMap: nativeIosMemoryProfile
+    shadowMap: iosMemoryProfile
       ? 1024
       : tier === 'low'
         ? 2048
@@ -980,24 +1029,24 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
           : constrainedMemory
             ? 2048
             : 4096,
-    standardMaterials: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'medium'),
+    standardMaterials: !iosMemoryProfile && gfxTierAtLeast(tier, 'medium'),
     // Round-10 detail-knob defaults (see the interface comment): High takes the
     // existing Advanced-Medium profile to bound its steady cost (basic worn
     // surface, reduced carpet, cavity-only relief). Ultra retains the full
     // 3-tap layers; Insane remains the 4-tap everything-on showcase.
-    surfaceDetail: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'high'),
+    surfaceDetail: !iosMemoryProfile && gfxTierAtLeast(tier, 'high'),
     surfaceDetailTaps: tier === 'insane' ? 4 : gfxTierAtLeast(tier, 'ultra') ? 3 : 0,
     surfaceDetailClampK: tier === 'insane' ? 1 : tier === 'ultra' ? 0.85 : 0,
-    bladeCarpetRadius: nativeIosMemoryProfile
+    bladeCarpetRadius: iosMemoryProfile
       ? 0
       : gfxTierAtLeast(tier, 'ultra')
         ? 34
         : tier === 'high'
           ? 24
           : 0,
-    cliffScree: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'ultra'),
-    canopyDetail: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'ultra'),
-    terrainRelief: nativeIosMemoryProfile
+    cliffScree: !iosMemoryProfile && gfxTierAtLeast(tier, 'ultra'),
+    canopyDetail: !iosMemoryProfile && gfxTierAtLeast(tier, 'ultra'),
+    terrainRelief: iosMemoryProfile
       ? 0
       : gfxTierAtLeast(tier, 'ultra')
         ? 3
@@ -1006,19 +1055,23 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
           : 0,
     aoFullRes: gfxTierAtLeast(tier, 'ultra'),
     smaa: aaPolicy.postAa === 'smaa',
-    bloom: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'high'),
+    bloom: !iosMemoryProfile && gfxTierAtLeast(tier, 'high'),
     terrainCastShadows: tier !== 'low' && !constrainedMemory,
-    lowPlus: tier === 'low' || nativeIosMemoryProfile,
+    lowPlus,
     // Tree and rock placement must match across clients because those decorations
     // occlude world sightlines. Keep the constrained profile on the full placement
     // set and reduce only non-occluding grass below.
     leanFoliage: tier === 'low' || (tier === 'medium' && weakIntegratedGpu),
+    // The dressing compensation cohort (interface comment carries the why):
+    // lowPlus plus the leanFoliage medium session, which the lowPlus re-key
+    // had silently stripped of its denser-dressing compensation.
+    denseDressing: lowPlus || (tier === 'medium' && weakIntegratedGpu),
     grassRadius: tightMemoryProfile
       ? 34
-      : nativeIosMemoryProfile
+      : iosMemoryProfile
         ? 52
         : tier === 'low'
-          ? 80
+          ? 72
           : tier === 'medium'
             ? constrainedMemory
               ? 62
@@ -1026,7 +1079,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
             : 82,
     grassStep: tightMemoryProfile
       ? 3.8
-      : nativeIosMemoryProfile
+      : iosMemoryProfile
         ? 2.75
         : tier === 'low'
           ? 2.05
@@ -1035,7 +1088,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
               ? 2.35
               : 2.0
             : 1.8,
-    farGrassDensityFloor: nativeIosMemoryProfile
+    farGrassDensityFloor: iosMemoryProfile
       ? 0.5
       : constrainedMemory
         ? 0.55
@@ -1048,30 +1101,36 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
               : tier === 'ultra'
                 ? 0.75
                 : 0.8,
-    terrainSplat: !nativeIosMemoryProfile && gfxTierAtLeast(tier, 'medium'),
+    terrainSplat: !iosMemoryProfile && gfxTierAtLeast(tier, 'medium'),
     windSway: true,
-    maxPointLights: nativeIosMemoryProfile ? 2 : constrainedMemory ? 3 : 6,
+    maxPointLights: iosMemoryProfile ? 2 : constrainedMemory ? 3 : 6,
     constrainedMemory,
-    nativeIosMemoryProfile,
+    iosMemoryProfile,
     tightMemory: tightMemoryProfile,
-    // Every OTHER budget in this function falls back through constrainedMemory (the
-    // cross-platform touch/coarse-pointer/narrow-viewport/deviceMemory detector, see
-    // maxPointLights above) before reaching its desktop default; this one used to jump
-    // straight from the two narrow iOS profiles to POSITIVE_INFINITY, so any Android
-    // browser or native shell, and any iOS session that never stamped tightMemory, kept
-    // every despawned mob/NPC CharacterVisual (and its per-instance Skeleton + GPU
-    // bone-matrix DataTexture) forever: visualPool is keyed per template+color+scale, so
-    // roaming through a zone with any per-mob variance mints new keys continuously and
-    // never reuses, never shrinks. Bounded to a working set a bit above the crowd_lod
-    // "soft" articulated-rig band (CROWD_LOD_SOFT_RIGS) so ordinary reuse still avoids the
-    // GPU skeleton re-upload hitch pooling exists for, without growing without bound.
+    // Bounded on EVERY profile, desktop included. A pooled visual retains its
+    // per-instance Skeleton and GPU bone-matrix DataTexture so a re-entering
+    // mob/NPC skips the skeleton re-upload hitch pooling exists for, and the
+    // pool evicts least-recently-released first (characters/visual_pool.ts),
+    // so a finite cap trims the cold tail, never the hot working set: an
+    // evicted key transparently rebuilds on its next request. Desktop 128: the
+    // hitch referee's crowd/churn/soak calibration peaked at 57 to 72
+    // simultaneously pooled visuals (docs/perf/hitch), production crowds run
+    // larger, and pool keys are per template (per-instance rift color/scale
+    // jitter is applied at acquire time, no longer minting dead
+    // never-matching keys), so roughly 2x the observed peak keeps ordinary
+    // reuse intact while capping worst-case retention. The historical desktop
+    // POSITIVE_INFINITY retained every despawned character visual until
+    // profile reset, the C1 memory ratchet in crowded sessions. The
+    // constrained ladder sheds reuse for memory headroom: 24 on
+    // constrained-memory browsers, then 6/4 on the two iOS WebKit residency
+    // profiles, mirroring maxPooledObjects below.
     maxPooledCharacterVisuals: tightMemoryProfile
       ? 4
-      : nativeIosMemoryProfile
+      : iosMemoryProfile
         ? 6
         : constrainedMemory
           ? 24
-          : Number.POSITIVE_INFINITY,
+          : 128,
     // The ground-object reuse pool (harvest nodes, loot piles, quest pickups) had NO cap at
     // all on any platform, not even the two narrow iOS memory profiles: every distinct item
     // template a player interacted with stayed retained (Group/Object3D graph, never GPU
@@ -1082,7 +1141,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     // maxPooledCharacterVisuals above; desktop keeps the historical unbounded pool.
     maxPooledObjects: tightMemoryProfile
       ? 4
-      : nativeIosMemoryProfile
+      : iosMemoryProfile
         ? 6
         : constrainedMemory
           ? 24
@@ -1091,7 +1150,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     // memory profiles and the low tier (which includes software GL) opt out and
     // keep the straight-to-frozen far LOD.
     farCharacterAnimScale:
-      tier === 'low' || constrainedMemory || nativeIosMemoryProfile ? 1 : FAR_ANIM_RANGE_SCALE_MAX,
+      tier === 'low' || constrainedMemory || iosMemoryProfile ? 1 : FAR_ANIM_RANGE_SCALE_MAX,
     vistaTier: tier,
     waterTier: tier,
   };
@@ -1184,14 +1243,17 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
       };
     else if (effectsValue < 0.75)
       settings = { ...settings, ao: true, aoFullRes: false, bloom: false, smaa: false };
-    // Shadow Quality: pure map-size steps (1024 / 2560 / 4096 / 8192);
-    // terrain-cast shadows join at High, matching the tier ladder where every
-    // dynamic-shadow tier casts terrain.
+    // Shadow Quality: pure map-size steps (1024 / 2560 / 4096); terrain-cast
+    // shadows join at High, matching the tier ladder where every
+    // dynamic-shadow tier casts terrain. The ladder caps at High's 4096 map:
+    // the retired Insane rung's single 8192x8192 target was a ~256 MB-class
+    // GPU allocation redrawn every frame for marginal visible gain, so a
+    // historical stored Insane value falls through to the High base here
+    // (and the settings store clamps it to High on its next write).
     const shadowLevel = levelOf(hints.shadowQuality ?? 1);
     if (shadowLevel === 0) settings = { ...settings, shadowMap: 1024, terrainCastShadows: false };
     else if (shadowLevel === 1)
       settings = { ...settings, shadowMap: 2560, terrainCastShadows: false };
-    else if (shadowLevel === 3) settings = { ...settings, shadowMap: 8192 };
     // Per-effect switches (round 12), layered AFTER Effects & Lighting and
     // authoritative over its per-effect writes: Effects & Lighting stays the
     // post-CHAIN master (its Low arm sheds the composer, and with no composer
@@ -1330,6 +1392,18 @@ function readGpuRendererString(): string | undefined {
   } finally {
     gl?.getExtension('WEBGL_lose_context')?.loseContext();
   }
+}
+
+/**
+ * The session's UNMASKED_RENDERER_WEBGL adapter-name string (probed at most
+ * once, cached; see probeGpuRenderer above). Undefined in Node or when the
+ * browser refuses debug renderer info. Consumed by
+ * src/game/hybrid_gpu_detect.ts for the boot-time hybrid-GPU notice, which
+ * needs the same adapter string classifyGpuRenderer/isWeakIntegratedGpu
+ * already classify, without re-probing a second throwaway context.
+ */
+export function activeGpuRendererName(): string | undefined {
+  return probeGpuRenderer();
 }
 
 /** Tier explicitly requested via URL, or null when it should be auto-detected. */

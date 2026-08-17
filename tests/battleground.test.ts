@@ -2,11 +2,21 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 import { isDispellableAura } from '../src/sim/aura_classify';
-import { BG_GRAVEYARDS, BG_POWER_RUNES, BG_SPEED_RUNES } from '../src/sim/battleground_layout';
+import {
+  BG_BASES,
+  BG_GRAVEYARDS,
+  BG_POWER_RUNES,
+  BG_SPEED_RUNES,
+  bgFieldPlanWalls,
+} from '../src/sim/battleground_layout';
+import { resolvePosition } from '../src/sim/colliders';
 import { GREATER_INVISIBILITY_DR_AURA_ID } from '../src/sim/combat/greater_invisibility';
 import { offerResurrection } from '../src/sim/combat/resurrection_offer';
-import { battlegroundOrigin, instanceOrigin, isBgPos } from '../src/sim/data';
+import { battlegroundOrigin, DUNGEON_X_THRESHOLD, instanceOrigin, isBgPos } from '../src/sim/data';
+import { enterDungeon } from '../src/sim/instances/dungeons';
 import { summonMountItem, toggleMount } from '../src/sim/mounts';
+import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
+import { restorePet, summonPet } from '../src/sim/pet/pet_commands';
 import {
   awardBattlegroundHonor,
   BATTLEGROUND_ASSIST_HONOR,
@@ -15,6 +25,7 @@ import {
   BATTLEGROUND_LOSS_HONOR,
   BATTLEGROUND_WIN_HONOR,
 } from '../src/sim/pvp';
+import { UNSTUCK_SICKNESS_ID } from '../src/sim/resurrection';
 import { eloDelta, Sim } from '../src/sim/sim';
 import {
   BG_CAPS_TO_WIN,
@@ -35,7 +46,9 @@ import {
   type BgMatch,
   bgAllPids,
   bgCarryingFlag,
+  bgQueueSize,
   bgResolveDesertion,
+  bgRespond,
   CARRIED_FLAG_AURA_ID,
   devEndBg,
   devStartBg,
@@ -49,8 +62,16 @@ import {
   drainBgOutcomes,
   recordBgOutcome,
 } from '../src/sim/social/battleground_outcomes';
-import { DT, type SimEvent } from '../src/sim/types';
+import {
+  BG_PROPOSAL_SECONDS,
+  bgProposalFor,
+  bgRequeueLockedUntil,
+} from '../src/sim/social/battleground_proposal';
+import { addThreat } from '../src/sim/threat';
+import { DT, type Entity, type SimEvent } from '../src/sim/types';
+import { UNSTUCK_COUNTDOWN_SECONDS } from '../src/sim/unstuck';
 import { groundHeight } from '../src/sim/world';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // The staged 5v5 arms (graveyard no-auto-release, the 720s cap, the fairness
 // clocks, the honor-DR rollover) legitimately run 10 to 19s each and flake
@@ -59,17 +80,42 @@ import { groundHeight } from '../src/sim/world';
 vi.setConfig({ testTimeout: 30000 });
 
 function makeWorld() {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: EMPTY_TEST_WORLD });
 }
 
 function tp(sim: Sim, pid: number, x: number, z: number) {
-  const e = sim.entities.get(pid)!;
+  const e = must(sim.entities.get(pid), 'entity');
   e.pos = { x, y: groundHeight(x, z, sim.cfg.seed), z };
   e.prevPos = { ...e.pos };
   sim.ctx.rebucket(e);
 }
 
-// Ten solo players, queued, advanced one tick so matchmaking seats a 5v5.
+function must<T>(value: T | null | undefined, label: string): T {
+  if (value == null) throw new Error(label);
+  return value;
+}
+
+/** Answer a live queue-pop offer for every listed fighter. */
+/** Answer a backfill offer and drain the tick it seats on, so a caller can
+ *  assert on the events the seat emits. */
+function acceptBackfillOffer(sim: Sim, pid: number): SimEvent[] {
+  bgRespond(sim.ctx, true, pid);
+  return sim.drainEvents();
+}
+
+function acceptBgOffer(sim: Sim, pids: number[]): void {
+  for (const pid of pids) bgRespond(sim.ctx, true, pid);
+}
+
+/** Accept EVERY live offer, seating whatever the matchmaker just picked. For
+ *  tests whose subject is the pick itself, which do not know the pids up front. */
+function acceptAllBgOffers(sim: Sim): void {
+  for (const proposal of [...sim.ctx.bgProposals]) {
+    acceptBgOffer(sim, [...proposal.teams[0], ...proposal.teams[1]]);
+  }
+}
+
+// Ten solo players, queued, offered, and accepted, so a 5v5 is live.
 function tenInQueue(): { sim: Sim; pids: number[] } {
   const sim = makeWorld();
   const pids: number[] = [];
@@ -77,11 +123,14 @@ function tenInQueue(): { sim: Sim; pids: number[] } {
   for (let i = 0; i < 10; i++) {
     const pid = sim.addPlayer(classes[i % 5], `P${i}`);
     tp(sim, pid, (i % 5) * 2 - 4, -40);
-    sim.entities.get(pid)!.level = 20; // the queue floor (BG_MIN_LEVEL)
+    must(sim.entities.get(pid), 'entity').level = 20; // the queue floor (BG_MIN_LEVEL)
     pids.push(pid);
   }
   for (const pid of pids) sim.bgQueueJoin(pid);
-  sim.tick(); // matchmakeBg seats them
+  // The pop lands as an OFFER now (battleground_proposal.ts); accepting it is
+  // what seats the match, so every helper that wants a live 5v5 answers first.
+  sim.tick();
+  acceptBgOffer(sim, pids);
   return { sim, pids };
 }
 
@@ -93,10 +142,35 @@ function toActive(sim: Sim, match: BgMatch) {
 function inGraveyard(sim: Sim, match: BgMatch, pid: number, team: 0 | 1): boolean {
   const o = battlegroundOrigin(match.slot);
   const plot = BG_GRAVEYARDS[team];
-  const e = sim.entities.get(pid)!;
+  const e = must(sim.entities.get(pid), 'entity');
   return (
     Math.abs(e.pos.x - (o.x + plot.x)) <= plot.hw && Math.abs(e.pos.z - (o.z + plot.z)) <= plot.hd
   );
+}
+
+function expectClearPlayerPosition(sim: Sim, e: Entity): void {
+  const resolved = resolvePosition(sim.cfg.seed, e.pos.x, e.pos.z, PLAYER_BODY_RADIUS);
+  expect(Math.hypot(resolved.x - e.pos.x, resolved.z - e.pos.z)).toBeLessThanOrEqual(1e-6);
+}
+
+function forceIntoBgWallTrap(sim: Sim, match: BgMatch, pid: number): Entity {
+  const wall = must(
+    bgFieldPlanWalls().find((candidate) => candidate.height >= 3),
+    'battleground wall collider',
+  );
+  const e = must(sim.entities.get(pid), 'entity');
+  const origin = battlegroundOrigin(match.slot);
+  e.pos = sim.ctx.groundPos(origin.x + wall.x, origin.z + wall.z);
+  e.prevPos = { ...e.pos };
+  e.vx = 0.25;
+  e.vy = 0;
+  e.vz = 0;
+  e.onGround = false;
+  e.jumping = true;
+  sim.ctx.rebucket(e);
+  const resolved = resolvePosition(sim.cfg.seed, e.pos.x, e.pos.z, PLAYER_BODY_RADIUS);
+  expect(Math.hypot(resolved.x - e.pos.x, resolved.z - e.pos.z)).toBeGreaterThan(0.01);
+  return e;
 }
 
 function errorTexts(events: SimEvent[]): string[] {
@@ -116,9 +190,12 @@ function logPidsFor(events: SimEvent[], text: string): number[] {
 const bgPartyJoinLine = (count: number): string =>
   `Your party of ${count} joins the Thornhollow Fields queue.`;
 
+const joinInProgressLine = (team: string): string =>
+  `Thornhollow Fields: you join a battle already under way for the ${team}. This match will not change your rating.`;
+
 function kill(sim: Sim, pid: number, killerPid: number | null = null) {
-  const e = sim.entities.get(pid)!;
-  const killer = killerPid !== null ? sim.entities.get(killerPid)! : null;
+  const e = must(sim.entities.get(pid), 'entity');
+  const killer = killerPid !== null ? must(sim.entities.get(killerPid), 'entity') : null;
   sim.ctx.dealDamage(killer, e, 9_999_999, false, 'physical', null, 'hit');
 }
 
@@ -144,12 +221,12 @@ describe('Thornhollow Fields: the whole match is fought on foot', () => {
     for (let i = 0; i < 10; i++) {
       const pid = sim.addPlayer(classes[i % 5], `P${i}`);
       tp(sim, pid, (i % 5) * 2 - 4, -40);
-      sim.entities.get(pid)!.level = 20;
+      must(sim.entities.get(pid), 'entity').level = 20;
       pids.push(pid);
     }
     for (const pid of pids) sim.bgQueueJoin(pid);
     const rider = pids[0];
-    const e = sim.entities.get(rider)!;
+    const e = must(sim.entities.get(rider), 'entity');
     e.mountKey = 'valorsteed';
     e.mountCastRemaining = 1.5;
     e.mountCastKey = 'valorsteed';
@@ -158,9 +235,10 @@ describe('Thornhollow Fields: the whole match is fought on foot', () => {
 
   it('dismounts every fighter the moment the match seats them on the field', () => {
     const { sim, rider } = tenQueuedWithRider();
-    const e = sim.entities.get(rider)!;
+    const e = must(sim.entities.get(rider), 'entity');
     expect(e.mountKey, 'the fixture really did put them in the saddle').toBe('valorsteed');
-    sim.tick(); // matchmakeBg seats the two teams (placeInBg)
+    sim.tick(); // the pop lands as an offer...
+    acceptAllBgOffers(sim);
     expect(sim.bgMatchFor(rider), 'the seat really happened').not.toBeNull();
     expect(e.mountKey, 'rode into the battleground').toBe('');
     expect(e.mountCastRemaining, 'a summon survived the seat').toBe(0);
@@ -169,14 +247,14 @@ describe('Thornhollow Fields: the whole match is fought on foot', () => {
 
   it('refuses the reins during form-up AND during the active match', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     expect(match.state, 'the form-up gate is where this starts').toBe('countdown');
     const pid = match.teams[0][0];
-    const e = sim.entities.get(pid)!;
+    const e = must(sim.entities.get(pid), 'entity');
     sim.addItem('reins_valorsteed', 1, pid);
     // Riding is a permanent capability gate and answers first, so train the
     // rider: what is under test is the battleground rule.
-    sim.players.get(pid)!.ridingTrained = true;
+    must(sim.players.get(pid), 'player meta').ridingTrained = true;
 
     expect(summonMountItem(sim.ctx, pid, 'valorsteed')).toBe(false);
     expect(errorTexts(sim.tick())).toContain("You can't ride in a battleground.");
@@ -193,13 +271,13 @@ describe('Thornhollow Fields: the whole match is fought on foot', () => {
 
   it('refuses the riding-lesson toggle in-match too', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const pid = match.teams[0][0];
-    const e = sim.entities.get(pid)!;
+    const e = must(sim.entities.get(pid), 'entity');
     // The lesson branch is the one summon path with no reins to click, so it
     // carries its own copy of every gate.
-    sim.players.get(pid)!.mountTraining = {
+    must(sim.players.get(pid), 'player meta').mountTraining = {
       sessionId: 'mt_test',
       ownerId: pid,
       anchor: { x: 0, z: 0 },
@@ -214,17 +292,17 @@ describe('Thornhollow Fields: the whole match is fought on foot', () => {
 
   it('gives riding back once the match is over and the fighters go home', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const pid = match.teams[0][0];
     sim.addItem('reins_valorsteed', 1, pid);
-    sim.players.get(pid)!.ridingTrained = true;
+    must(sim.players.get(pid), 'player meta').ridingTrained = true;
     expect(summonMountItem(sim.ctx, pid, 'valorsteed')).toBe(false);
 
     endBgMatch(sim.ctx, match, 0, 'caps');
     for (let i = 0; i < 20 * (BG_END_HOLD + 1); i++) sim.tick(); // run out the hold
     expect(sim.bgMatchFor(pid), 'released home').toBeNull();
-    const e = sim.entities.get(pid)!;
+    const e = must(sim.entities.get(pid), 'entity');
     e.dead = false;
     e.ghost = false;
     e.inCombat = false;
@@ -233,10 +311,10 @@ describe('Thornhollow Fields: the whole match is fought on foot', () => {
 
   it('throws a mounted runner out of the saddle when they take the flag', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const crimson = match.teams[0][0];
-    const e = sim.entities.get(crimson)!;
+    const e = must(sim.entities.get(crimson), 'entity');
     // In the saddle, and mid-summon of another mount at the same time: both
     // have to be gone the moment the flag is in hand, or the grab lands the
     // runner back on a mount a second and a half later.
@@ -258,14 +336,14 @@ describe('Thornhollow Fields: the whole match is fought on foot', () => {
   // has not ended. This arm used to assert the narrower message.
   it('keeps refusing the saddle after the carrier drops the flag: the match is the rule', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const crimson = match.teams[0][0];
-    const e = sim.entities.get(crimson)!;
+    const e = must(sim.entities.get(crimson), 'entity');
     sim.addItem('reins_valorsteed', 1, crimson);
     // Riding is a permanent capability gate and answers before this one, so
     // train the rider: what is under test is the battleground rule.
-    sim.players.get(crimson)!.ridingTrained = true;
+    must(sim.players.get(crimson), 'player meta').ridingTrained = true;
     const azure = match.flags[1];
     tp(sim, crimson, azure.pos.x, azure.pos.z);
     sim.bgFlagAction(crimson);
@@ -283,7 +361,7 @@ describe('Thornhollow Fields: the whole match is fought on foot', () => {
     sim.tick();
     expect(azure.carrier).toBeNull();
     expect(bgCarryingFlag(sim.ctx, crimson)).toBe(false);
-    const revived = sim.entities.get(crimson)!;
+    const revived = must(sim.entities.get(crimson), 'entity');
     revived.dead = false;
     revived.ghost = false;
     revived.inCombat = false;
@@ -299,7 +377,7 @@ describe('Thornhollow Fields: queue + matchmaking', () => {
     for (let i = 0; i < 9; i++) {
       const pid = sim.addPlayer('warrior', `W${i}`);
       tp(sim, pid, 0, -40);
-      sim.entities.get(pid)!.level = BG_MIN_LEVEL;
+      must(sim.entities.get(pid), 'entity').level = BG_MIN_LEVEL;
       pids.push(pid);
       sim.bgQueueJoin(pid);
     }
@@ -308,15 +386,16 @@ describe('Thornhollow Fields: queue + matchmaking', () => {
 
     const tenth = sim.addPlayer('mage', 'Tenth');
     tp(sim, tenth, 0, -40);
-    sim.entities.get(tenth)!.level = BG_MIN_LEVEL;
+    must(sim.entities.get(tenth), 'entity').level = BG_MIN_LEVEL;
     sim.bgQueueJoin(tenth);
     sim.tick();
-    const match = sim.bgMatchFor(pids[0])!;
+    acceptBgOffer(sim, [...pids, tenth]);
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     expect(match).toBeTruthy();
     expect(match.teams[0]).toHaveLength(5);
     expect(match.teams[1]).toHaveLength(5);
     for (const pid of [...match.teams[0], ...match.teams[1]]) {
-      expect(isBgPos(sim.entities.get(pid)!.pos.x)).toBe(true);
+      expect(isBgPos(must(sim.entities.get(pid), 'entity').pos.x)).toBe(true);
     }
     expect(match.state).toBe('countdown');
   });
@@ -325,12 +404,12 @@ describe('Thornhollow Fields: queue + matchmaking', () => {
     const sim = makeWorld();
     const leader = sim.addPlayer('warrior', 'Leader');
     tp(sim, leader, 0, -40);
-    sim.entities.get(leader)!.level = BG_MIN_LEVEL;
+    must(sim.entities.get(leader), 'entity').level = BG_MIN_LEVEL;
     const party = [leader];
     for (let i = 0; i < 3; i++) {
       const m = sim.addPlayer('priest', `Mate${i}`);
       tp(sim, m, 0, -40);
-      sim.entities.get(m)!.level = BG_MIN_LEVEL;
+      must(sim.entities.get(m), 'entity').level = BG_MIN_LEVEL;
       sim.partyInvite(m, leader);
       sim.partyAccept(m);
       party.push(m);
@@ -339,7 +418,7 @@ describe('Thornhollow Fields: queue + matchmaking', () => {
     for (let i = 0; i < 6; i++) {
       const s = sim.addPlayer('rogue', `Solo${i}`);
       tp(sim, s, 0, -40);
-      sim.entities.get(s)!.level = BG_MIN_LEVEL;
+      must(sim.entities.get(s), 'entity').level = BG_MIN_LEVEL;
       solos.push(s);
       sim.bgQueueJoin(s);
     }
@@ -349,52 +428,268 @@ describe('Thornhollow Fields: queue + matchmaking', () => {
     sim.tick();
     expect(sim.bgMatchFor(leader), 'a premade vs pugs must not seat instantly').toBeNull();
     // ...and then it seats anyway rather than stranding the queue.
-    for (let i = 0; i < 20 * (BG_PREMADE_HOLD + 1) && !sim.bgMatchFor(leader); i++) sim.tick();
-    const match = sim.bgMatchFor(leader)!;
+    for (let i = 0; i < 20 * (BG_PREMADE_HOLD + 1) && !sim.bgMatchFor(leader); i++) {
+      sim.tick();
+      acceptAllBgOffers(sim);
+    }
+    const match = must(sim.bgMatchFor(leader), 'bg match');
     expect(match).toBeTruthy();
     const teamOfLeader = match.teams[0].includes(leader) ? 0 : 1;
     for (const m of party) expect(match.teams[teamOfLeader]).toContain(m);
   });
 
-  it('refuses to queue from inside an instance, while dead, or twice', () => {
+  it('queues while dead and from inside an instance, and still refuses a double queue', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'A');
-    sim.entities.get(a)!.level = BG_MIN_LEVEL;
+    must(sim.entities.get(a), 'entity').level = BG_MIN_LEVEL;
     const dungeonInstance = instanceOrigin(0, 0);
     tp(sim, a, dungeonInstance.x, dungeonInstance.z); // a dungeon instance band
     sim.bgQueueJoin(a);
-    expect(sim.bgInfoFor(a)!.queued).toBe(false);
+    expect(must(sim.bgInfoFor(a), 'bg info').queued, 'a dungeon pull must not cost the spot').toBe(
+      true,
+    );
+    sim.bgQueueLeave(a);
 
     tp(sim, a, 0, -40);
     kill(sim, a);
     sim.bgQueueJoin(a);
-    expect(sim.bgInfoFor(a)!.queued).toBe(false);
+    expect(must(sim.bgInfoFor(a), 'bg info').queued, 'a corpse run must not cost the spot').toBe(
+      true,
+    );
+    // The matchmaker tick is where the old eviction happened, so the wait has to
+    // survive one: pressing Queue and being dropped a tick later is the bug.
+    sim.tick();
+    expect(
+      must(sim.bgInfoFor(a), 'bg info').queued,
+      'the matchmaker tick must not evict a corpse',
+    ).toBe(true);
+    sim.bgQueueLeave(a);
 
     const b = sim.addPlayer('mage', 'B');
     tp(sim, b, 0, -40);
-    sim.entities.get(b)!.level = BG_MIN_LEVEL;
+    must(sim.entities.get(b), 'entity').level = BG_MIN_LEVEL;
     sim.bgQueueJoin(b);
     sim.bgQueueJoin(b); // idempotent re-queue
-    expect(sim.bgInfoFor(b)!.queued).toBe(true);
-    expect(sim.bgInfoFor(b)!.queueSize).toBe(1);
+    expect(must(sim.bgInfoFor(b), 'bg info').queued).toBe(true);
+    expect(must(sim.bgInfoFor(b), 'bg info').queueSize).toBe(1);
     sim.bgQueueLeave(b);
-    expect(sim.bgInfoFor(b)!.queued).toBe(false);
+    expect(must(sim.bgInfoFor(b), 'bg info').queued).toBe(false);
+  });
+});
+
+// Ten queued champions on ONE tick short of seating, so a caller can do
+// something to one of them (kill them, walk them into a dungeon) and then let
+// the pop land on that state.
+function tenQueuedUnseated(): { sim: Sim; pids: number[] } {
+  const sim = makeWorld();
+  const pids: number[] = [];
+  const classes = ['warrior', 'mage', 'priest', 'rogue', 'hunter'] as const;
+  for (let i = 0; i < 10; i++) {
+    const pid = sim.addPlayer(classes[i % 5], `Q${i}`);
+    tp(sim, pid, (i % 5) * 2 - 4, -40);
+    must(sim.entities.get(pid), 'entity').level = BG_MIN_LEVEL;
+    pids.push(pid);
+    sim.bgQueueJoin(pid);
+  }
+  return { sim, pids };
+}
+
+describe('Thornhollow Fields: the queue survives the wait', () => {
+  it('seats a fighter who died waiting, alive and whole rather than as a corpse', () => {
+    const { sim, pids } = tenQueuedUnseated();
+    const corpse = pids[3];
+    kill(sim, corpse);
+    const dead = must(sim.entities.get(corpse), 'entity');
+    expect(dead.dead, 'the arrangement itself must hold').toBe(true);
+
+    sim.tick(); // the pop, which is now an OFFER (battleground_proposal.ts)
+    acceptAllBgOffers(sim);
+    const match = must(sim.bgMatchFor(corpse), 'bg match');
+    expect(bgAllPids(match)).toContain(corpse);
+    // Seated alive: every arm of the spirit state, since ghost implies dead
+    // everywhere else and a stale corpsePos would strand a rez prompt on the field.
+    expect(dead.dead).toBe(false);
+    expect(dead.ghost).toBe(false);
+    expect(dead.corpsePos).toBeNull();
+    expect(dead.hp).toBe(dead.maxHp);
+    expect(isBgPos(dead.pos.x)).toBe(true);
+
+    // ...and they go home ALIVE, not back to the corpse they left behind. The
+    // match is a parenthesis: pools are handed back as carried in, and a corpse
+    // carried in nothing, so the floor of 1 hp is what they leave with. That is
+    // the deliberate cost of the free trip past a corpse run, and the reason we
+    // do not restore the death: a stale corpsePos outlives the body it named.
+    endBgMatch(sim.ctx, match, 0, 'caps');
+    expect(dead.dead).toBe(false);
+    expect(dead.ghost).toBe(false);
+    expect(dead.hp).toBe(1);
+    expect(isBgPos(dead.pos.x)).toBe(false);
+  });
+
+  it('holds the spot through a dungeon pull, then detaches the fighter at the door', () => {
+    const { sim, pids } = tenQueuedUnseated();
+    const diver = pids[6];
+    enterDungeon(sim.ctx, 'gravewyrm_sanctum', diver);
+    const e = must(sim.entities.get(diver), 'entity');
+    expect(e.pos.x, 'the arrangement itself must hold').toBeGreaterThan(DUNGEON_X_THRESHOLD);
+
+    // Put the diver on a live hate table so the scrub has something to undo.
+    const inst = must(
+      sim.ctx.instances.find((i) => i.partyKey !== null),
+      'instance',
+    );
+    const mob = must(
+      inst.mobIds.map((id) => sim.entities.get(id)).find((m) => m && !m.dead),
+      'mob',
+    );
+    addThreat(mob, diver, 500);
+    expect(mob.threat.get(diver)).toBe(500);
+
+    sim.tick(); // the pop, which is now an OFFER (battleground_proposal.ts)
+    acceptAllBgOffers(sim);
+    const match = must(sim.bgMatchFor(diver), 'bg match');
+    expect(isBgPos(e.pos.x)).toBe(true);
+
+    // Leaving through the battleground must cost exactly what leaving through
+    // the door costs: the instance no longer holds any aggro on them.
+    expect(mob.threat.has(diver), 'the pop must scrub instance threat').toBe(false);
+
+    // ...and the return point is the door OUTSIDE, never the interior
+    // coordinates, whose claim may be gone by the time the match ends.
+    const ret = must(match.returns.get(diver), 'return point');
+    expect(ret.x).toBeLessThanOrEqual(DUNGEON_X_THRESHOLD);
+    endBgMatch(sim.ctx, match, 0, 'caps');
+    expect(e.pos.x, 'the fighter must not be sent back inside').toBeLessThanOrEqual(
+      DUNGEON_X_THRESHOLD,
+    );
+    expect(e.dead).toBe(false);
+  });
+
+  it('still drops a waiting player who commits to an arena match, and says so', () => {
+    const { sim, pids } = tenQueuedUnseated();
+    const defector = pids[2];
+    const opponent = sim.addPlayer('warrior', 'ArenaFoe');
+    tp(sim, opponent, 0, -40);
+    must(sim.entities.get(opponent), 'entity').level = BG_MIN_LEVEL;
+    sim.arenaQueueJoin(defector);
+    sim.arenaQueueJoin(opponent);
+
+    const events: SimEvent[] = [];
+    for (let i = 0; i < 20 * 60 && !sim.ctx.arenaMatches.has(defector); i++) {
+      events.push(...sim.tick());
+    }
+    expect(sim.ctx.arenaMatches.has(defector), 'the arrangement itself must hold').toBe(true);
+
+    // The instance-position check used to do this job as a side effect (the
+    // arena band sits past DUNGEON_X_THRESHOLD); it is now explicit, so pin it.
+    expect(must(sim.bgInfoFor(defector), 'bg info').queued).toBe(false);
+    expect(sim.bgMatchFor(defector)).toBeNull();
+    expect(logPidsFor(events, 'You leave the Thornhollow Fields queue.')).toContain(defector);
+    // Only the defector: the other nine keep waiting.
+    for (const pid of pids.filter((p) => p !== defector)) {
+      expect(must(sim.bgInfoFor(pid), 'bg info').queued).toBe(true);
+    }
   });
 });
 
 describe('Thornhollow Fields: team parties for the match', () => {
+  it('evicts a deserter who was the party BASE, not just an auto-added member', () => {
+    // Review catch: formBgTeamParty returns everyone the formation ADDED, and
+    // the base unit kept its own party object, so it never appears in
+    // autoPartyPids. A base deserter was therefore left in the match party,
+    // reading its chat and holding a frame for a fight they had walked out of.
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    const team = match.teams[0];
+    // An all-solo side's party is entirely this system's invention, so EVERY
+    // member is recorded as auto-added, base included. That is the arrangement
+    // the fix rests on: the base is unwound by id rather than by inferring
+    // "system-built" from who else sits in the party.
+    expect(
+      [...match.autoPartyPids[0]].sort((a, b) => a - b),
+      'an all-solo side records its whole roster, base included',
+    ).toEqual([...team].sort((a, b) => a - b));
+    const base = team[0];
+
+    bgResolveDesertion(sim.ctx, base);
+
+    const stayer = must(
+      team.find((p) => p !== base),
+      'stayer',
+    );
+    const party = sim.partyOf(stayer);
+    expect(party, 'the rest of the team keeps its party').toBeTruthy();
+    expect(must(party, 'party').members, 'the deserting base is out of it').not.toContain(base);
+    expect(sim.partyOf(base), 'and holds no match party of their own').toBeNull();
+  });
+
+  it('leaves a PARTIAL premade deserter with their own friends', () => {
+    // Review catch, and the reason the base rule is spelled by id rather than
+    // inferred: formBgTeamParty picks the premade's own party as the base and
+    // MERGES the solos into it. So on a partial premade the match party IS the
+    // players' group and merely contains auto-added solos, and any rule that
+    // read "shares a party with an auto-added member" as "system built" would
+    // throw a deserting friend out of their own group.
+    const sim = makeWorld();
+    const leader = sim.addPlayer('warrior', 'Leader');
+    tp(sim, leader, 0, -40);
+    must(sim.entities.get(leader), 'entity').level = BG_MIN_LEVEL;
+    const friends = [leader];
+    for (let i = 0; i < 2; i++) {
+      const m = sim.addPlayer('priest', `Friend${i}`);
+      tp(sim, m, 0, -40);
+      must(sim.entities.get(m), 'entity').level = BG_MIN_LEVEL;
+      sim.partyInvite(m, leader);
+      sim.partyAccept(m);
+      friends.push(m);
+    }
+    for (let i = 0; i < 7; i++) {
+      const s = sim.addPlayer('rogue', `Solo${i}`);
+      tp(sim, s, 0, -40);
+      must(sim.entities.get(s), 'entity').level = BG_MIN_LEVEL;
+      sim.bgQueueJoin(s);
+    }
+    sim.bgQueueJoin(leader);
+    sim.tick();
+    acceptAllBgOffers(sim);
+    const match = must(sim.bgMatchFor(leader), 'bg match');
+    const team = match.teams[0].includes(leader) ? 0 : 1;
+
+    // The arrangement that makes this the partial case: the friends are the
+    // base, so none of them is recorded as auto-added, and the party they kept
+    // really does hold a solo.
+    for (const f of friends) expect(match.autoPartyPids[team]).not.toContain(f);
+    const merged = must(sim.partyOf(leader), 'party');
+    expect(
+      match.autoPartyPids[team].some((p) => merged.members.includes(p)),
+      'the premade party really did absorb a solo',
+    ).toBe(true);
+
+    const deserter = friends[1];
+    bgResolveDesertion(sim.ctx, deserter);
+
+    const stillTogether = sim.partyOf(leader);
+    expect(stillTogether, 'the friends keep their group').toBeTruthy();
+    expect(
+      must(stillTogether, 'stillTogether').members,
+      'a deserting friend stays with the friends they queued with',
+    ).toContain(deserter);
+  });
+
   it('welds each all-solo team into one party at start and disbands both at the end', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     for (const team of [0, 1] as const) {
       const roster = match.teams[team];
-      const party = sim.partyOf(roster[0])!;
+      const party = must(sim.partyOf(roster[0]), 'party');
       expect(party).toBeTruthy();
       expect([...party.members].sort((a, b) => a - b)).toEqual([...roster].sort((a, b) => a - b));
       for (const pid of roster) expect(sim.partyOf(pid)?.id).toBe(party.id);
     }
     // two teams, two DIFFERENT parties: party chat can never leak cross-team
-    expect(sim.partyOf(match.teams[0][0])!.id).not.toBe(sim.partyOf(match.teams[1][0])!.id);
+    expect(must(sim.partyOf(match.teams[0][0]), 'party').id).not.toBe(
+      must(sim.partyOf(match.teams[1][0]), 'party').id,
+    );
     endBgMatch(sim.ctx, match, 0, 'caps');
     for (const pid of pids) expect(sim.partyOf(pid)).toBe(null);
   });
@@ -403,35 +698,36 @@ describe('Thornhollow Fields: team parties for the match', () => {
     const sim = makeWorld();
     const leader = sim.addPlayer('warrior', 'Leader');
     tp(sim, leader, 0, -40);
-    sim.entities.get(leader)!.level = BG_MIN_LEVEL;
+    must(sim.entities.get(leader), 'entity').level = BG_MIN_LEVEL;
     const premade = [leader];
     for (let i = 0; i < 2; i++) {
       const m = sim.addPlayer('priest', `Mate${i}`);
       tp(sim, m, 0, -40);
-      sim.entities.get(m)!.level = BG_MIN_LEVEL;
+      must(sim.entities.get(m), 'entity').level = BG_MIN_LEVEL;
       sim.partyInvite(m, leader);
       sim.partyAccept(m);
       premade.push(m);
     }
-    const beforeId = sim.partyOf(leader)!.id;
+    const beforeId = must(sim.partyOf(leader), 'party').id;
     for (let i = 0; i < 7; i++) {
       const s = sim.addPlayer('rogue', `Solo${i}`);
       tp(sim, s, 0, -40);
-      sim.entities.get(s)!.level = BG_MIN_LEVEL;
+      must(sim.entities.get(s), 'entity').level = BG_MIN_LEVEL;
       sim.bgQueueJoin(s);
     }
     sim.bgQueueJoin(leader); // queues the whole premade as one group
     sim.tick();
-    const match = sim.bgMatchFor(leader)!;
+    acceptAllBgOffers(sim);
+    const match = must(sim.bgMatchFor(leader), 'bg match');
     const team = match.teams[0].includes(leader) ? 0 : 1;
-    const party = sim.partyOf(leader)!;
+    const party = must(sim.partyOf(leader), 'party');
     expect(party.id).toBe(beforeId); // the premade's party object survived
     expect(party.leader).toBe(leader);
     expect([...party.members].sort((a, b) => a - b)).toEqual(
       [...match.teams[team]].sort((a, b) => a - b),
     );
     endBgMatch(sim.ctx, match, null, 'timeout');
-    const after = sim.partyOf(leader)!;
+    const after = must(sim.partyOf(leader), 'party');
     expect(after.id).toBe(beforeId);
     expect([...after.members].sort((a, b) => a - b)).toEqual([...premade].sort((a, b) => a - b));
     for (const pid of match.teams[team]) {
@@ -441,12 +737,12 @@ describe('Thornhollow Fields: team parties for the match', () => {
 
   it('an auto-added deserter leaves the team party; the rest stay grouped', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     const roster = [...match.teams[0]];
     const deserter = roster[1]; // never the base solo the fresh party formed on
     bgResolveDesertion(sim.ctx, deserter);
     expect(sim.partyOf(deserter)).toBe(null);
-    const party = sim.partyOf(roster[0])!;
+    const party = must(sim.partyOf(roster[0]), 'party');
     expect(party.members).toHaveLength(4);
     expect(party.members).not.toContain(deserter);
   });
@@ -455,7 +751,7 @@ describe('Thornhollow Fields: team parties for the match', () => {
 describe('Thornhollow Fields: the post-match hold (frozen result screen)', () => {
   function playToCaps() {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const carrier = match.teams[0][0];
     for (let i = 0; i < 5; i++) captureOnce(sim, match, carrier);
@@ -468,19 +764,24 @@ describe('Thornhollow Fields: the post-match hold (frozen result screen)', () =>
     expect(match.winner).toBe(0);
     expect(match.resultRecorded).toBe(true);
     // ratings + W/L landed at the freeze, not at the release
-    expect(sim.players.get(carrier)!.bgWins).toBe(1);
-    expect(sim.players.get(carrier)!.bgRating).toBeGreaterThan(1500);
+    expect(must(sim.players.get(carrier), 'player meta').bgWins).toBe(1);
+    expect(must(sim.players.get(carrier), 'player meta').bgRating).toBeGreaterThan(1500);
     // everyone is still inside the band, and cross-team combat is off
     for (const pid of [...match.teams[0], ...match.teams[1]]) {
-      expect(isBgPos(sim.entities.get(pid)!.pos.x)).toBe(true);
+      expect(isBgPos(must(sim.entities.get(pid), 'entity').pos.x)).toBe(true);
       expect(sim.bgMatchFor(pid)).toBe(match);
     }
     const enemy = match.teams[1][0];
     // The hostility arm requires state 'active': the two sides read friendly
     // again the moment the screen freezes, so no ability can target across.
-    expect(sim.isHostileTo(sim.entities.get(carrier)!, sim.entities.get(enemy)!)).toBe(false);
+    expect(
+      sim.isHostileTo(
+        must(sim.entities.get(carrier), 'entity'),
+        must(sim.entities.get(enemy), 'entity'),
+      ),
+    ).toBe(false);
     // the wire view carries the hold: state, winner, and the countdown slot
-    const view = sim.bgInfoFor(carrier)!.match!;
+    const view = must(must(sim.bgInfoFor(carrier), 'bg info').match, 'bg info match');
     expect(view.state).toBe('ended');
     expect(view.winner).toBe(0);
     expect(view.countdown).toBeGreaterThan(0);
@@ -495,7 +796,7 @@ describe('Thornhollow Fields: the post-match hold (frozen result screen)', () =>
     for (let i = 0; i < 20 * (BG_END_HOLD + 1); i++) sim.tick();
     for (const pid of pids) {
       expect(sim.bgMatchFor(pid)).toBe(null);
-      expect(isBgPos(sim.entities.get(pid)!.pos.x)).toBe(false);
+      expect(isBgPos(must(sim.entities.get(pid), 'entity').pos.x)).toBe(false);
       expect(sim.partyOf(pid)).toBe(null);
     }
     expect(match.fightersReleased).toBe(true);
@@ -503,7 +804,7 @@ describe('Thornhollow Fields: the post-match hold (frozen result screen)', () =>
 
   it('a desertion-forfeit still ends immediately (no hold with an empty side)', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     for (const pid of [...match.teams[1]]) bgResolveDesertion(sim.ctx, pid);
     expect(match.resultRecorded).toBe(true);
@@ -518,7 +819,7 @@ describe('Thornhollow Fields: release is never gated by a stale arena entry (pla
     // made releasePlayerSpirit silently no-op for one player all match. The
     // bg membership must WIN over the arena guard.
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const victim = match.teams[0][1];
     kill(sim, victim, match.teams[1][0]);
@@ -528,7 +829,7 @@ describe('Thornhollow Fields: release is never gated by a stale arena entry (pla
     // asks arenaMatches.has, which is exactly what the real leak exposed).
     sim.arenaMatches.set(victim, {} as never);
     sim.releaseSpirit(victim);
-    const e = sim.entities.get(victim)!;
+    const e = must(sim.entities.get(victim), 'entity');
     expect(e.ghost).toBe(true);
     expect(inGraveyard(sim, match, victim, 0)).toBe(true);
     sim.arenaMatches.delete(victim);
@@ -538,26 +839,26 @@ describe('Thornhollow Fields: release is never gated by a stale arena entry (pla
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'A');
     tp(sim, a, 0, -40);
-    sim.entities.get(a)!.level = BG_MIN_LEVEL;
+    must(sim.entities.get(a), 'entity').level = BG_MIN_LEVEL;
     sim.arenaMatches.set(a, {} as never);
     sim.bgQueueJoin(a);
-    expect(sim.bgInfoFor(a)!.queued).toBe(false);
+    expect(must(sim.bgInfoFor(a), 'bg info').queued).toBe(false);
     sim.arenaMatches.delete(a);
     sim.bgQueueJoin(a);
-    expect(sim.bgInfoFor(a)!.queued).toBe(true);
+    expect(must(sim.bgInfoFor(a), 'bg info').queued).toBe(true);
   });
 
   it('a fighter seated by the form-up never keeps ghost/corpse state into the battle', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     expect(match.state).toBe('countdown');
     const victim = match.teams[0][0];
     kill(sim, victim); // environmental death during the form-up
     sim.tick();
     sim.releaseSpirit(victim);
-    expect(sim.entities.get(victim)!.ghost).toBe(true);
+    expect(must(sim.entities.get(victim), 'entity').ghost).toBe(true);
     toActive(sim, match);
-    const e = sim.entities.get(victim)!;
+    const e = must(sim.entities.get(victim), 'entity');
     expect(e.dead).toBe(false);
     expect(e.ghost).toBe(false);
     expect(e.corpsePos).toBe(null);
@@ -571,33 +872,33 @@ describe('Thornhollow Fields: dev-forced matches are unrated (jgyy review)', () 
     for (let i = 0; i < 4; i++) {
       const pid = sim.addPlayer('warrior', `D${i}`);
       tp(sim, pid, 0, -40);
-      sim.entities.get(pid)!.level = BG_MIN_LEVEL;
+      must(sim.entities.get(pid), 'entity').level = BG_MIN_LEVEL;
       pids.push(pid);
       sim.bgQueueJoin(pid);
     }
     devStartBg(sim.ctx);
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     expect(match.rated).toBe(false);
     toActive(sim, match);
     const carrier = match.teams[0][0];
     for (let i = 0; i < 5; i++) captureOnce(sim, match, carrier);
     expect(match.state).toBe('ended');
     for (const pid of pids) {
-      expect(sim.meta(pid)!.bgRating).toBe(1500);
-      expect(sim.meta(pid)!.bgWins).toBe(0);
-      expect(sim.meta(pid)!.bgLosses).toBe(0);
-      expect(sim.meta(pid)!.honor ?? 0).toBe(0);
+      expect(must(sim.meta(pid), 'player meta').bgRating).toBe(1500);
+      expect(must(sim.meta(pid), 'player meta').bgWins).toBe(0);
+      expect(must(sim.meta(pid), 'player meta').bgLosses).toBe(0);
+      expect(must(sim.meta(pid), 'player meta').honor ?? 0).toBe(0);
     }
     // a queue-made match stays rated (the flag defaults true)
     const { sim: sim2, pids: pids2 } = tenInQueue();
-    expect(sim2.bgMatchFor(pids2[0])!.rated).toBe(true);
+    expect(must(sim2.bgMatchFor(pids2[0]), 'bg match').rated).toBe(true);
   });
 });
 
 describe('Thornhollow Fields: /dev bg end (early resolve)', () => {
   it('resolves the match on the current score through the normal hold, once', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     captureOnce(sim, match, match.teams[0][0]);
     expect(devEndBg(sim.ctx, pids[0])).toBe(true);
@@ -615,31 +916,31 @@ describe('Thornhollow Fields: the level 20 queue floor', () => {
     expect(BG_MIN_LEVEL).toBe(20);
     const sim = makeWorld();
     const low = sim.addPlayer('warrior', 'Lowbie');
-    sim.entities.get(low)!.level = BG_MIN_LEVEL - 1;
+    must(sim.entities.get(low), 'entity').level = BG_MIN_LEVEL - 1;
     sim.bgQueueJoin(low);
-    expect(sim.bgInfoFor(low)!.queued).toBe(false);
+    expect(must(sim.bgInfoFor(low), 'bg info').queued).toBe(false);
     const ready = sim.addPlayer('mage', 'Ready');
-    sim.entities.get(ready)!.level = BG_MIN_LEVEL;
+    must(sim.entities.get(ready), 'entity').level = BG_MIN_LEVEL;
     sim.bgQueueJoin(ready);
-    expect(sim.bgInfoFor(ready)!.queued).toBe(true);
+    expect(must(sim.bgInfoFor(ready), 'bg info').queued).toBe(true);
   });
 
   it('refuses a party containing a single under-leveled member', () => {
     const sim = makeWorld();
     const leader = sim.addPlayer('warrior', 'Leader');
     const buddy = sim.addPlayer('mage', 'Buddy');
-    sim.entities.get(leader)!.level = BG_MIN_LEVEL;
-    sim.entities.get(buddy)!.level = BG_MIN_LEVEL - 1;
+    must(sim.entities.get(leader), 'entity').level = BG_MIN_LEVEL;
+    must(sim.entities.get(buddy), 'entity').level = BG_MIN_LEVEL - 1;
     sim.partyInvite(buddy, leader);
     sim.partyAccept(buddy);
     sim.bgQueueJoin(leader);
-    expect(sim.bgInfoFor(leader)!.queued).toBe(false);
-    expect(sim.bgInfoFor(buddy)!.queued).toBe(false);
+    expect(must(sim.bgInfoFor(leader), 'bg info').queued).toBe(false);
+    expect(must(sim.bgInfoFor(buddy), 'bg info').queued).toBe(false);
     // level the buddy and the same queue press works
-    sim.entities.get(buddy)!.level = BG_MIN_LEVEL;
+    must(sim.entities.get(buddy), 'entity').level = BG_MIN_LEVEL;
     sim.bgQueueJoin(leader);
-    expect(sim.bgInfoFor(leader)!.queued).toBe(true);
-    expect(sim.bgInfoFor(buddy)!.queued).toBe(true);
+    expect(must(sim.bgInfoFor(leader), 'bg info').queued).toBe(true);
+    expect(must(sim.bgInfoFor(buddy), 'bg info').queued).toBe(true);
   });
 });
 
@@ -649,12 +950,12 @@ describe('Thornhollow Fields: only the party leader queues the group', () => {
     const sim = makeWorld();
     const leader = sim.addPlayer('warrior', 'Leader');
     tp(sim, leader, 0, -40);
-    sim.entities.get(leader)!.level = BG_MIN_LEVEL;
+    must(sim.entities.get(leader), 'entity').level = BG_MIN_LEVEL;
     const members = [leader];
     for (let i = 0; i < 2; i++) {
       const m = sim.addPlayer('priest', `Mate${i}`);
       tp(sim, m, 0, -40);
-      sim.entities.get(m)!.level = BG_MIN_LEVEL;
+      must(sim.entities.get(m), 'entity').level = BG_MIN_LEVEL;
       sim.partyInvite(m, leader);
       sim.partyAccept(m);
       members.push(m);
@@ -665,15 +966,15 @@ describe('Thornhollow Fields: only the party leader queues the group', () => {
   it('refuses a non-leader member with the leader-only error and leaves the queue untouched', () => {
     const { sim, leader, members } = partyOfThree();
     const member = members[1];
-    expect(sim.partyOf(member)!.leader).toBe(leader);
+    expect(must(sim.partyOf(member), 'party').leader).toBe(leader);
     sim.events.length = 0;
     sim.bgQueueJoin(member);
     expect(errorTexts(sim.events)).toEqual([
       'Only the party leader may queue your team for Thornhollow Fields.',
     ]);
     // Nothing entered the queue: not the presser, not the party, not the leader.
-    for (const m of members) expect(sim.bgInfoFor(m)!.queued).toBe(false);
-    expect(sim.bgInfoFor(leader)!.queueSize).toBe(0);
+    for (const m of members) expect(must(sim.bgInfoFor(m), 'bg info').queued).toBe(false);
+    expect(must(sim.bgInfoFor(leader), 'bg info').queueSize).toBe(0);
     // The refusal is a toast, never a silent no-op with a queue line behind it.
     expect(logPidsFor(sim.events, bgPartyJoinLine(members.length))).toEqual([]);
   });
@@ -687,7 +988,7 @@ describe('Thornhollow Fields: only the party leader queues the group', () => {
     // bgInfoFor is MEMBERSHIP-based, not caller-based: a member who never
     // pressed the button still reads their group's queued state.
     for (const m of members) {
-      const info = sim.bgInfoFor(m)!;
+      const info = must(sim.bgInfoFor(m), 'bg info');
       expect(info.queued, `member ${m} must see the queued group`).toBe(true);
       expect(info.queuedParty).toBe(members.length);
       expect(info.queueSize).toBe(members.length);
@@ -706,13 +1007,13 @@ describe('Thornhollow Fields: only the party leader queues the group', () => {
     const sim = makeWorld();
     const solo = sim.addPlayer('mage', 'Solo');
     tp(sim, solo, 0, -40);
-    sim.entities.get(solo)!.level = BG_MIN_LEVEL;
+    must(sim.entities.get(solo), 'entity').level = BG_MIN_LEVEL;
     expect(sim.partyOf(solo)).toBe(null);
     sim.events.length = 0;
     sim.bgQueueJoin(solo);
     expect(errorTexts(sim.events)).toEqual([]);
-    expect(sim.bgInfoFor(solo)!.queued).toBe(true);
-    expect(sim.bgInfoFor(solo)!.queuedParty).toBe(1);
+    expect(must(sim.bgInfoFor(solo), 'bg info').queued).toBe(true);
+    expect(must(sim.bgInfoFor(solo), 'bg info').queuedParty).toBe(1);
     expect(
       logPidsFor(
         sim.events,
@@ -724,14 +1025,14 @@ describe('Thornhollow Fields: only the party leader queues the group', () => {
   it('still lets a non-leader member leave the queue (no leader gate on leave)', () => {
     const { sim, leader, members } = partyOfThree();
     sim.bgQueueJoin(leader);
-    for (const m of members) expect(sim.bgInfoFor(m)!.queued).toBe(true);
+    for (const m of members) expect(must(sim.bgInfoFor(m), 'bg info').queued).toBe(true);
     const member = members[2];
     sim.events.length = 0;
     sim.bgQueueLeave(member); // never the leader
     expect(errorTexts(sim.events)).toEqual([]);
     // Unchanged behaviour: the member's press pulls the whole group out.
-    for (const m of members) expect(sim.bgInfoFor(m)!.queued).toBe(false);
-    expect(sim.bgInfoFor(leader)!.queueSize).toBe(0);
+    for (const m of members) expect(must(sim.bgInfoFor(m), 'bg info').queued).toBe(false);
+    expect(must(sim.bgInfoFor(leader), 'bg info').queueSize).toBe(0);
     expect(logPidsFor(sim.events, 'You leave the Thornhollow Fields queue.')).toEqual(
       [...members].sort((a, b) => a - b),
     );
@@ -741,13 +1042,13 @@ describe('Thornhollow Fields: only the party leader queues the group', () => {
 describe('Thornhollow Fields: match tallies (kills, deaths, captures)', () => {
   it('counts deaths, credits only enemy killers, and counts captures on the wire rows', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const killer = match.teams[0][0];
     const victim = match.teams[1][0];
     kill(sim, victim, killer);
     sim.tick();
-    let rows = sim.bgInfoFor(killer)!.match!.players;
+    let rows = must(must(sim.bgInfoFor(killer), 'bg info').match, 'bg info match').players;
     expect(rows.find((p) => p.pid === killer)).toMatchObject({ kills: 1, deaths: 0, captures: 0 });
     expect(rows.find((p) => p.pid === victim)).toMatchObject({ kills: 0, deaths: 1, captures: 0 });
     // a same-team death counts the death and credits nobody
@@ -755,7 +1056,7 @@ describe('Thornhollow Fields: match tallies (kills, deaths, captures)', () => {
     const tkDealer = match.teams[0][2];
     kill(sim, tkVictim, tkDealer);
     sim.tick();
-    rows = sim.bgInfoFor(killer)!.match!.players;
+    rows = must(must(sim.bgInfoFor(killer), 'bg info').match, 'bg info match').players;
     expect(rows.find((p) => p.pid === tkVictim)).toMatchObject({ deaths: 1 });
     expect(rows.find((p) => p.pid === tkDealer)).toMatchObject({ kills: 0 });
     // and NOBODY else picked the team kill up by mistake (jgyy review): the
@@ -763,23 +1064,26 @@ describe('Thornhollow Fields: match tallies (kills, deaths, captures)', () => {
     expect(rows.reduce((sum, p) => sum + p.kills, 0)).toBe(1);
     // a capture lands on the carrier's row
     captureOnce(sim, match, killer);
-    rows = sim.bgInfoFor(killer)!.match!.players;
+    rows = must(must(sim.bgInfoFor(killer), 'bg info').match, 'bg info match').players;
     expect(rows.find((p) => p.pid === killer)).toMatchObject({ kills: 1, captures: 1 });
   });
 
   it('feeds every match member a bgKill event with names and teams', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const killer = match.teams[0][0];
     const victim = match.teams[1][0];
     kill(sim, victim, killer);
     const evs = sim.tick().filter((e) => e.type === 'bgKill');
     expect(evs).toHaveLength(10); // one per match member, both teams
-    const mine = evs.find((e) => 'pid' in e && e.pid === killer)!;
+    const mine = must(
+      evs.find((e) => 'pid' in e && e.pid === killer),
+      'kill event',
+    );
     expect(mine).toMatchObject({
-      killerName: sim.players.get(killer)!.name,
-      victimName: sim.players.get(victim)!.name,
+      killerName: must(sim.players.get(killer), 'player meta').name,
+      victimName: must(sim.players.get(victim), 'player meta').name,
       killerTeam: 0,
       victimTeam: 1,
     });
@@ -795,17 +1099,23 @@ describe('Thornhollow Fields: power runes (Battle / Ward)', () => {
   it('opens both pads on the same seeded face, applies the right buff, and flips per claim', () => {
     // determinism: the same seed opens the same face
     const face = (seed: number) => {
-      const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true });
+      const sim = new Sim({
+        seed,
+        playerClass: 'warrior',
+        noPlayer: true,
+        world: EMPTY_TEST_WORLD,
+      });
       const pids: number[] = [];
       const classes = ['warrior', 'mage', 'priest', 'rogue', 'hunter'] as const;
       for (let i = 0; i < 10; i++) {
         const pid = sim.addPlayer(classes[i % 5], `P${i}`);
-        sim.entities.get(pid)!.level = 20;
+        must(sim.entities.get(pid), 'entity').level = 20;
         pids.push(pid);
         sim.bgQueueJoin(pid);
       }
       sim.tick();
-      return { sim, match: sim.bgMatchFor(pids[0])! };
+      acceptBgOffer(sim, pids);
+      return { sim, match: must(sim.bgMatchFor(pids[0]), 'bg match') };
     };
     // The sprint pads are spawned first, the power pads after, so the field's
     // own pad counts decide where the power block starts.
@@ -827,11 +1137,11 @@ describe('Thornhollow Fields: power runes (Battle / Ward)', () => {
     const openingFace = power.type;
     tp(sim, runner, power.pos.x, power.pos.z);
     sim.tick();
-    const e = sim.entities.get(runner)!;
+    const e = must(sim.entities.get(runner), 'entity');
     const expectedKind = openingFace === 'damage' ? 'buff_dmg_done' : 'shield_wall';
     const buff = e.auras.find((au) => au.kind === expectedKind);
     expect(buff).toBeTruthy();
-    expect(buff!.value).toBeCloseTo(BG_POWER_RUNE_VALUE, 5);
+    expect(must(buff, 'buff').value).toBeCloseTo(BG_POWER_RUNE_VALUE, 5);
     // the claimed pad flips its face for the next spawn
     expect(power.type).toBe(openingFace === 'damage' ? 'defense' : 'damage');
     expect(power.active).toBe(false);
@@ -841,13 +1151,13 @@ describe('Thornhollow Fields: power runes (Battle / Ward)', () => {
 describe('Thornhollow Fields: the form-up hold', () => {
   it('a runner slipping out during the countdown is set back and told why', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     expect(match.state).toBe('countdown');
     const runner = match.teams[0][0];
     const o = battlegroundOrigin(match.slot);
     tp(sim, runner, o.x, o.z - 60); // out past the keep, into the field chamber
     const evs = sim.tick();
-    const e = sim.entities.get(runner)!;
+    const e = must(sim.entities.get(runner), 'entity');
     const lz = e.pos.z - o.z;
     expect(lz).toBeGreaterThanOrEqual(-128); // back inside the Crimson keep box
     expect(lz).toBeLessThanOrEqual(-108);
@@ -863,28 +1173,220 @@ describe('Thornhollow Fields: the form-up hold', () => {
 });
 
 describe('Thornhollow Fields: the graveyard rite', () => {
+  it('Unstuck recovers a living fighter from a wall trap without leaving the match', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    const e = forceIntoBgWallTrap(sim, match, pid);
+    e.facing = Math.PI / 2;
+    e.prevFacing = -Math.PI / 2;
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+    for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) sim.tick();
+
+    expect(sim.bgMatchFor(pid)).toBe(match);
+    expect(e.dead).toBe(false);
+    expect(e.ghost).toBe(false);
+    expect(inGraveyard(sim, match, pid, 0)).toBe(true);
+    expectClearPlayerPosition(sim, e);
+    expect(e.prevPos).toEqual(e.pos);
+    expect(e.facing).toBe(0);
+    expect(e.prevFacing).toBe(e.facing);
+    expect(e.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(true);
+  });
+
+  it('combat still cancels a battleground wall-trap Unstuck countdown', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    const e = forceIntoBgWallTrap(sim, match, pid);
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+    e.inCombat = true;
+    e.combatTimer = 0;
+
+    expect(sim.tick()).toContainEqual(
+      expect.objectContaining({
+        type: 'unstuck',
+        phase: 'cancelled',
+        reason: 'combat',
+        pid,
+      }),
+    );
+    expect(sim.meta(pid)?.pendingUnstuck).toBeNull();
+    expect(sim.bgMatchFor(pid)).toBe(match);
+  });
+
+  it('Unstuck falls back to a clear team spawn when the graveyard plot is obstructed', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    const e = must(sim.entities.get(pid), 'entity');
+    const origin = battlegroundOrigin(match.slot);
+    e.pos = sim.ctx.groundPos(origin.x + 50, origin.z);
+    e.prevPos = { ...e.pos };
+    e.vx = 0;
+    e.vy = 0;
+    e.vz = 0;
+    e.onGround = true;
+    e.jumping = false;
+    sim.ctx.rebucket(e);
+
+    const originalPlot = { ...BG_GRAVEYARDS[0] };
+    Object.assign(BG_GRAVEYARDS[0], { x: 50, z: -140, hw: 0.25, hd: 0.25 });
+    try {
+      expect(sim.unstuck(pid)).toBe(true);
+      sim.drainEvents();
+      for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) sim.tick();
+
+      expect(sim.bgMatchFor(pid)).toBe(match);
+      expect(e.dead).toBe(false);
+      expect(e.ghost).toBe(false);
+      expect(isBgPos(e.pos.x)).toBe(true);
+      expectClearPlayerPosition(sim, e);
+      expect(
+        BG_BASES[0].spawns.some(
+          (spawn) =>
+            Math.abs(e.pos.x - (origin.x + spawn.x)) < 1e-6 &&
+            Math.abs(e.pos.z - (origin.z + spawn.z)) < 1e-6,
+        ),
+      ).toBe(true);
+      expect(e.prevPos).toEqual(e.pos);
+      expect(e.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(true);
+    } finally {
+      Object.assign(BG_GRAVEYARDS[0], originalPlot);
+    }
+  });
+
+  it('Unstuck relocates a fighter trapped on their indexed spawn point', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    const e = must(sim.entities.get(pid), 'entity');
+    const origin = battlegroundOrigin(match.slot);
+    const trapped = BG_BASES[0].spawns[0];
+    e.pos = sim.ctx.groundPos(origin.x + trapped.x, origin.z + trapped.z);
+    e.prevPos = { ...e.pos };
+    e.vx = 0;
+    e.vy = 0;
+    e.vz = 0;
+    e.onGround = true;
+    e.jumping = false;
+    sim.ctx.rebucket(e);
+    const before = { ...e.pos };
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+    const events: SimEvent[] = [];
+    for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) events.push(...sim.tick());
+
+    const completed = events.find(
+      (event): event is Extract<SimEvent, { type: 'unstuck'; phase: 'completed' }> =>
+        event.type === 'unstuck' && event.phase === 'completed' && event.pid === pid,
+    );
+    expect(completed).toBeTruthy();
+    expect(sim.bgMatchFor(pid)).toBe(match);
+    expect(e.dead).toBe(false);
+    expect(e.ghost).toBe(false);
+    expect(inGraveyard(sim, match, pid, 0)).toBe(true);
+    expectClearPlayerPosition(sim, e);
+    expect(Math.hypot(e.pos.x - before.x, e.pos.z - before.z)).toBeGreaterThan(10);
+    expect(completed?.distance).toBeGreaterThan(10);
+    expect(e.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(true);
+  });
+
+  it('refuses Unstuck for an alive flag carrier before the completion teleport can run', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+    const carrier = match.teams[0][0];
+    const flag = match.flags[1];
+    tp(sim, carrier, flag.pos.x, flag.pos.z);
+    sim.bgFlagAction(carrier);
+    sim.tick();
+    expect(flag.carrier).toBe(carrier);
+    expect(bgCarryingFlag(sim.ctx, carrier)).toBe(true);
+
+    const e = must(sim.entities.get(carrier), 'entity');
+    forceIntoBgWallTrap(sim, match, carrier);
+    e.inCombat = false;
+    e.combatTimer = 999;
+
+    expect(sim.unstuck(carrier)).toBe(false);
+    expect(sim.meta(carrier)?.pendingUnstuck).toBeNull();
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'unstuck',
+        phase: 'blocked',
+        reason: 'competitive',
+        pid: carrier,
+      }),
+    );
+
+    const events: SimEvent[] = [];
+    for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) events.push(...sim.tick());
+    expect(events).not.toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'completed', pid: carrier }),
+    );
+    expect(sim.bgMatchFor(carrier)).toBe(match);
+    expect(flag.carrier).toBe(carrier);
+    expect(inGraveyard(sim, match, carrier, 0)).toBe(false);
+  });
+
+  it('Unstuck moves a trapped battleground corpse to its graveyard without respawning it', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+    const pid = match.teams[1][0];
+    kill(sim, pid);
+    sim.tick();
+    const e = must(sim.entities.get(pid), 'entity');
+    const origin = battlegroundOrigin(match.slot);
+    e.pos = sim.ctx.groundPos(origin.x - 50, origin.z);
+    e.prevPos = { ...e.pos };
+    sim.ctx.rebucket(e);
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+    for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) sim.tick();
+
+    expect(sim.bgMatchFor(pid)).toBe(match);
+    expect(e.dead).toBe(true);
+    expect(e.ghost).toBe(false);
+    expect(inGraveyard(sim, match, pid, 1)).toBe(true);
+    expectClearPlayerPosition(sim, e);
+  });
+
   it('a corpse NEVER auto-releases (the press is the player own move); the ward binds the ghost', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const victim = match.teams[0][0];
     kill(sim, victim);
     sim.tick();
-    const e = sim.entities.get(victim)!;
+    const e = must(sim.entities.get(victim), 'entity');
     // a full half minute (three whole waves) later, the corpse still lies
     // where it fell: no timer touches it, and no wave raises an unreleased body
     for (let i = 0; i < 20 * 30; i++) sim.tick();
     expect(e.dead).toBe(true);
     expect(e.ghost).toBeFalsy();
     // and the corpse shows NO respawn countdown (the wave readout is a ghost's)
-    expect(sim.bgInfoFor(victim)!.match!.respawnIn).toBe(0);
+    expect(must(must(sim.bgInfoFor(victim), 'bg info').match, 'bg info match').respawnIn).toBe(0);
     // the deliberate press releases into the plot...
     sim.releaseSpirit(victim);
     expect(e.ghost).toBe(true);
     expect(inGraveyard(sim, match, victim, 0)).toBe(true);
     // ...where the wave countdown NOW shows
     sim.tick();
-    expect(sim.bgInfoFor(victim)!.match!.respawnIn).toBeGreaterThan(0);
+    expect(
+      must(must(sim.bgInfoFor(victim), 'bg info').match, 'bg info match').respawnIn,
+    ).toBeGreaterThan(0);
     // the ward: teleport the spirit outside the plot and the next tick pulls
     // it back inside (a spirit cannot scout or leave before its wave)
     tp(sim, victim, 0, -40);
@@ -894,7 +1396,7 @@ describe('Thornhollow Fields: the graveyard rite', () => {
 
   it('the wave raises only released spirits: an unreleased corpse waits for a later wave', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const a = match.teams[0][0];
     const b = match.teams[0][1];
@@ -907,24 +1409,24 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     sim.releaseSpirit(a); // a releases immediately; b lies on its corpse
     const target = Math.ceil(match.timer / BG_WAVE_PERIOD) * BG_WAVE_PERIOD + 0.3;
     while (match.timer < target) sim.tick();
-    expect(sim.entities.get(a)!.dead).toBe(false); // the released spirit rose
-    expect(sim.entities.get(b)!.dead).toBe(true); // the corpse waited
+    expect(must(sim.entities.get(a), 'entity').dead).toBe(false); // the released spirit rose
+    expect(must(sim.entities.get(b), 'entity').dead).toBe(true); // the corpse waited
     // b releases LATE and the following wave raises it too
     sim.releaseSpirit(b);
-    while (sim.entities.get(b)!.dead && match.timer < 60) sim.tick();
-    expect(sim.entities.get(b)!.dead).toBe(false);
+    while (must(sim.entities.get(b), 'entity').dead && match.timer < 60) sim.tick();
+    expect(must(sim.entities.get(b), 'entity').dead).toBe(false);
     expect(inGraveyard(sim, match, b, 0)).toBe(true);
   });
 
   it('corpse and Spirit Healer resurrection are refused inside a match (wave-only)', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const victim = match.teams[0][0];
     kill(sim, victim);
     sim.tick();
     sim.releaseSpirit(victim);
-    const e = sim.entities.get(victim)!;
+    const e = must(sim.entities.get(victim), 'entity');
     expect(e.ghost).toBe(true);
     // teleport the ghost onto its own corpse: the corpse rez still refuses
     if (e.corpsePos) tp(sim, victim, e.corpsePos.x, e.corpsePos.z);
@@ -937,13 +1439,13 @@ describe('Thornhollow Fields: the graveyard rite', () => {
 describe('Thornhollow Fields: ghost-state teardown (review pins)', () => {
   it('a match ending while a spirit waits clears ghost and corpse state on the way home', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const victim = match.teams[1][0];
     kill(sim, victim);
     sim.tick();
     sim.releaseSpirit(victim);
-    const e = sim.entities.get(victim)!;
+    const e = must(sim.entities.get(victim), 'entity');
     expect(e.ghost).toBe(true);
     updateBattleground(sim.ctx); // seat the release fully
     endBgMatch(sim.ctx, match, 0, 'caps');
@@ -955,13 +1457,13 @@ describe('Thornhollow Fields: ghost-state teardown (review pins)', () => {
 
   it('deserting while a spirit restores the body and sends it home', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const leaver = match.teams[1][0];
     kill(sim, leaver);
     sim.tick();
     sim.releaseSpirit(leaver);
-    const e = sim.entities.get(leaver)!;
+    const e = must(sim.entities.get(leaver), 'entity');
     expect(e.ghost).toBe(true);
     sim.bgResolveDesertion(leaver);
     expect(e.dead).toBe(false);
@@ -972,14 +1474,14 @@ describe('Thornhollow Fields: ghost-state teardown (review pins)', () => {
 
   it('a player-cast resurrection offer is refused in-match (the wave is the one way back)', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
-    const caster = sim.entities.get(match.teams[0][0])!;
+    const caster = must(sim.entities.get(match.teams[0][0]), 'entity');
     const fallen = match.teams[0][1];
     kill(sim, fallen);
     sim.tick();
-    const target = sim.entities.get(fallen)!;
-    expect(offerResurrection(sim.ctx, caster, target, 1)).toBe(false);
+    const target = must(sim.entities.get(fallen), 'entity');
+    expect(offerResurrection(sim.ctx, caster, target, 1, 40)).toBe(false);
     expect(sim.ctx.pendingResurrections.has(fallen)).toBe(false);
     expect(target.dead).toBe(true);
   });
@@ -988,7 +1490,7 @@ describe('Thornhollow Fields: ghost-state teardown (review pins)', () => {
 describe('Thornhollow Fields: deliberate pickup + automatic return', () => {
   it('walking over a flag never picks it up; the deliberate press does', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     expect(match.state).toBe('active');
     const raider = match.teams[0][0];
@@ -1004,7 +1506,7 @@ describe('Thornhollow Fields: deliberate pickup + automatic return', () => {
 
   it('the flag action errors politely with no flag in reach and never grabs the OWN flag', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const crimson = match.teams[0][0];
     // own flag: pressing on it does nothing (only a dropped own flag returns, by proximity)
@@ -1017,10 +1519,10 @@ describe('Thornhollow Fields: deliberate pickup + automatic return', () => {
 
   it('grab, run it home, score; first to BG_CAPS_TO_WIN captures wins and cleans up', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const carrier = match.teams[0][0];
-    const returnPos = match.returns.get(carrier)!;
+    const returnPos = must(match.returns.get(carrier), 'return point');
 
     let ended = false;
     for (let cap = 0; cap < BG_CAPS_TO_WIN; cap++) {
@@ -1038,19 +1540,19 @@ describe('Thornhollow Fields: deliberate pickup + automatic return', () => {
     expect(ended).toBe(true);
     expect(match.scores[0]).toBe(BG_CAPS_TO_WIN);
     // restored to the overworld exactly where they queued
-    const e = sim.entities.get(carrier)!;
+    const e = must(sim.entities.get(carrier), 'entity');
     expect(isBgPos(e.pos.x)).toBe(false);
     expect(e.pos.x).toBeCloseTo(returnPos.x, 3);
     expect(e.pos.z).toBeCloseTo(returnPos.z, 3);
     // meta recorded the result + captures
-    expect(sim.meta(carrier)!.bgWins).toBe(1);
-    expect(sim.meta(carrier)!.bgCaptures).toBe(BG_CAPS_TO_WIN);
-    expect(sim.meta(match.teams[1][0])!.bgLosses).toBe(1);
+    expect(must(sim.meta(carrier), 'player meta').bgWins).toBe(1);
+    expect(must(sim.meta(carrier), 'player meta').bgCaptures).toBe(BG_CAPS_TO_WIN);
+    expect(must(sim.meta(match.teams[1][0]), 'player meta').bgLosses).toBe(1);
   });
 
   it('a dropped flag auto-returns home after 20 seconds untouched', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const enemy = match.teams[1][0];
     tp(sim, enemy, match.flags[0].home.x, match.flags[0].home.z);
@@ -1072,7 +1574,7 @@ describe('Thornhollow Fields: deliberate pickup + automatic return', () => {
 
   it('the flag OWN team returns a dropped flag by proximity, instantly', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const enemy = match.teams[1][0];
     tp(sim, enemy, match.flags[0].home.x, match.flags[0].home.z);
@@ -1091,7 +1593,7 @@ describe('Thornhollow Fields: deliberate pickup + automatic return', () => {
 
   it('same-tick race: an automatic return beats a pickup press', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const thief = match.teams[1][0];
     tp(sim, thief, match.flags[0].home.x, match.flags[0].home.z);
@@ -1117,10 +1619,10 @@ describe('Thornhollow Fields: deliberate pickup + automatic return', () => {
 
   it('flags and invisibility never mix: a grab reveals, going hidden drops', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const runner = match.teams[0][0];
-    const e = sim.entities.get(runner)!;
+    const e = must(sim.entities.get(runner), 'entity');
     const hide = () =>
       sim.ctx.applyAura(e, {
         id: 'stealth',
@@ -1155,7 +1657,10 @@ describe('Thornhollow Fields: deliberate pickup + automatic return', () => {
     expect(match.flags[1].pos.x).toBeCloseTo(e.pos.x, 3);
     expect(match.flags[1].pos.z).toBeCloseTo(e.pos.z, 3);
     // and the dropped flag then behaves like any drop: an enemy re-press takes it
-    const azure = match.teams[1].find((pid) => pid !== runner)!;
+    const azure = must(
+      match.teams[1].find((pid) => pid !== runner),
+      'azure fighter',
+    );
     tp(sim, azure, match.flags[1].pos.x, match.flags[1].pos.z);
     sim.bgFlagAction(azure);
     sim.tick();
@@ -1164,13 +1669,13 @@ describe('Thornhollow Fields: deliberate pickup + automatic return', () => {
 
   it('a grab out of Greater Invisibility still pays the aftereffect the vanish owes', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     // The mage vanish, shaped exactly as effect_dispatch applies it: the
     // configured damage cut rides in value2 and its duration in value3, so
     // every normal removal path can pay the same aftereffect.
     const vanish = (pid: number) =>
-      sim.ctx.applyAura(sim.entities.get(pid)!, {
+      sim.ctx.applyAura(must(sim.entities.get(pid), 'entity'), {
         id: 'greater_invisibility',
         name: 'Greater Invisibility',
         kind: 'stealth',
@@ -1179,11 +1684,11 @@ describe('Thornhollow Fields: deliberate pickup + automatic return', () => {
         value3: 2,
         remaining: 20,
         duration: 20,
-        sourceId: sim.entities.get(pid)!.id,
+        sourceId: must(sim.entities.get(pid), 'entity').id,
         school: 'arcane',
       });
     const runner = match.teams[0][0];
-    const e = sim.entities.get(runner)!;
+    const e = must(sim.entities.get(runner), 'entity');
     vanish(runner);
     tp(sim, runner, match.flags[1].home.x, match.flags[1].home.z);
     sim.bgFlagAction(runner);
@@ -1196,12 +1701,19 @@ describe('Thornhollow Fields: deliberate pickup + automatic return', () => {
     // ...and it is the SAME grant breaking the same vanish any other way makes
     // (the shared path an attack out of hiding takes), never a bespoke one.
     const other = match.teams[0][1];
-    const oe = sim.entities.get(other)!;
+    const oe = must(sim.entities.get(other), 'entity');
     vanish(other);
     sim.ctx.breakStealth(oe);
-    const reference = oe.auras.find((a) => a.id === GREATER_INVISIBILITY_DR_AURA_ID)!;
+    const reference = must(
+      oe.auras.find((a) => a.id === GREATER_INVISIBILITY_DR_AURA_ID),
+      'greater invisibility aura',
+    );
     expect(reference, 'the shared break is the reference grant').toBeTruthy();
-    expect({ kind: after!.kind, value: after!.value, duration: after!.duration }).toEqual({
+    expect({
+      kind: must(after, 'after').kind,
+      value: must(after, 'after').value,
+      duration: must(after, 'after').duration,
+    }).toEqual({
       kind: reference.kind,
       value: reference.value,
       duration: reference.duration,
@@ -1214,7 +1726,7 @@ describe('Thornhollow Fields: deliberate pickup + automatic return', () => {
 describe('Thornhollow Fields: death, release, and the team wave respawn', () => {
   it('carrier death drops the flag in place and releasing does nothing', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const carrier = match.teams[0][0];
     tp(sim, carrier, match.flags[1].home.x, match.flags[1].home.z);
@@ -1223,7 +1735,7 @@ describe('Thornhollow Fields: death, release, and the team wave respawn', () => 
     expect(match.flags[1].carrier).toBe(carrier);
     kill(sim, carrier);
     sim.tick();
-    const e = sim.entities.get(carrier)!;
+    const e = must(sim.entities.get(carrier), 'entity');
     expect(e.dead).toBe(true);
     expect(match.flags[1].state).toBe('dropped');
     // The classic rite: releasing rises the spirit in the CRIMSON keep
@@ -1237,7 +1749,7 @@ describe('Thornhollow Fields: death, release, and the team wave respawn', () => 
 
   it('wave respawn: 10s period, the two team clocks offset by 5s, whole wave together', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     expect(match.waveIn[0]).toBeCloseTo(BG_WAVE_PERIOD, 1);
     expect(match.waveIn[1]).toBeCloseTo(BG_WAVE_OFFSET, 1);
@@ -1255,26 +1767,26 @@ describe('Thornhollow Fields: death, release, and the team wave respawn', () => 
     sim.tick();
     sim.releaseSpirit(c2);
     // Azure's first wave fires at 5s: a1 back up, both Crimson still down
-    while (match.waveIn[1] < BG_WAVE_PERIOD - 0.5 || sim.entities.get(a1)!.dead) {
+    while (match.waveIn[1] < BG_WAVE_PERIOD - 0.5 || must(sim.entities.get(a1), 'entity').dead) {
       sim.tick();
       if (match.timer > 6) break;
     }
-    expect(sim.entities.get(a1)!.dead).toBe(false);
-    expect(sim.entities.get(c1)!.dead).toBe(true);
-    expect(sim.entities.get(c2)!.dead).toBe(true);
+    expect(must(sim.entities.get(a1), 'entity').dead).toBe(false);
+    expect(must(sim.entities.get(c1), 'entity').dead).toBe(true);
+    expect(must(sim.entities.get(c2), 'entity').dead).toBe(true);
     // Crimson's wave fires at 10s: BOTH fallen Crimson respawn together
-    while (sim.entities.get(c1)!.dead && match.timer < 11) sim.tick();
-    expect(sim.entities.get(c1)!.dead).toBe(false);
-    expect(sim.entities.get(c2)!.dead).toBe(false); // died later, joined the same wave
+    while (must(sim.entities.get(c1), 'entity').dead && match.timer < 11) sim.tick();
+    expect(must(sim.entities.get(c1), 'entity').dead).toBe(false);
+    expect(must(sim.entities.get(c2), 'entity').dead).toBe(false); // died later, joined the same wave
     // risen inside the keep graveyard plot (in place), not where they fell
-    expect(isBgPos(sim.entities.get(c1)!.pos.x)).toBe(true);
+    expect(isBgPos(must(sim.entities.get(c1), 'entity').pos.x)).toBe(true);
     expect(inGraveyard(sim, match, c1, 0)).toBe(true);
     expect(inGraveyard(sim, match, c2, 0)).toBe(true);
   });
 
   it('a death just after a wave waits for the NEXT wave (never respawns instantly)', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const victim = match.teams[0][0];
     // wait for Crimson's first wave to fire, then die immediately after
@@ -1282,19 +1794,19 @@ describe('Thornhollow Fields: death, release, and the team wave respawn', () => 
     kill(sim, victim);
     sim.tick();
     sim.releaseSpirit(victim);
-    expect(sim.entities.get(victim)!.dead).toBe(true);
+    expect(must(sim.entities.get(victim), 'entity').dead).toBe(true);
     // still dead 8s later; alive after the full next tick at 20s
     while (match.timer < BG_WAVE_PERIOD + 8) sim.tick();
-    expect(sim.entities.get(victim)!.dead).toBe(true);
+    expect(must(sim.entities.get(victim), 'entity').dead).toBe(true);
     while (match.timer < BG_WAVE_PERIOD * 2 + 0.5) sim.tick();
-    expect(sim.entities.get(victim)!.dead).toBe(false);
+    expect(must(sim.entities.get(victim), 'entity').dead).toBe(false);
   });
 });
 
 describe('Thornhollow Fields: the classic capture gate', () => {
   it('a capture only resolves while your OWN flag is home, and fires the moment it returns', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const raider = match.teams[0][0]; // Crimson, carrying the Azure flag
     const thief = match.teams[1][0]; // Azure, stealing the Crimson flag
@@ -1328,7 +1840,7 @@ describe('Thornhollow Fields: the classic capture gate', () => {
 describe('Thornhollow Fields: carrier vulnerability (Focused Assault lineage)', () => {
   it('stacks after the fatigue delay (75s), one more every 15s, and amplifies damage taken', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const carrier = match.teams[0][0];
     const attacker = match.teams[1][0];
@@ -1336,23 +1848,23 @@ describe('Thornhollow Fields: carrier vulnerability (Focused Assault lineage)', 
     sim.bgFlagAction(carrier);
     sim.tick();
     tp(sim, carrier, match.flags[1].home.x + 6, match.flags[1].home.z - 8); // off the stand
-    const e = sim.entities.get(carrier)!;
+    const e = must(sim.entities.get(carrier), 'entity');
     expect(e.auras.some((a) => a.id === 'bg_carrier_vulnerability')).toBe(false);
     // fast-forward the hold clock to just before the threshold
     match.flags[1].carrySeconds = BG_CARRIER_VULN_DELAY - 0.2;
     for (let i = 0; i < 8; i++) sim.tick();
     let vuln = e.auras.find((a) => a.id === 'bg_carrier_vulnerability');
     expect(vuln).toBeTruthy();
-    expect(vuln!.stacks).toBe(1);
+    expect(must(vuln, 'vuln').stacks).toBe(1);
     // one more interval, one more stack (uncapped)
     match.flags[1].carrySeconds += BG_CARRIER_VULN_INTERVAL;
     sim.tick();
     vuln = e.auras.find((a) => a.id === 'bg_carrier_vulnerability');
-    expect(vuln!.stacks).toBe(2);
-    expect(vuln!.value).toBeCloseTo(0.2, 5);
+    expect(must(vuln, 'vuln').stacks).toBe(2);
+    expect(must(vuln, 'vuln').value).toBeCloseTo(0.2, 5);
     // decisive damage check: two stacks take 20% more than clean (sub-lethal
     // amounts, or the overkill clamp equalizes both hits)
-    const atk = sim.entities.get(attacker)!;
+    const atk = must(sim.entities.get(attacker), 'entity');
     e.hp = e.maxHp;
     sim.ctx.dealDamage(
       atk,
@@ -1397,7 +1909,7 @@ describe('Thornhollow Fields: carrier vulnerability (Focused Assault lineage)', 
 
   it('clears on capture and on return', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const carrier = match.teams[0][0];
     tp(sim, carrier, match.flags[1].home.x, match.flags[1].home.z);
@@ -1405,7 +1917,7 @@ describe('Thornhollow Fields: carrier vulnerability (Focused Assault lineage)', 
     sim.tick();
     match.flags[1].carrySeconds = BG_CARRIER_VULN_DELAY + 1;
     sim.tick();
-    const e = sim.entities.get(carrier)!;
+    const e = must(sim.entities.get(carrier), 'entity');
     expect(e.auras.some((a) => a.id === 'bg_carrier_vulnerability')).toBe(true);
     // capture clears the stacks
     tp(sim, carrier, match.flags[0].home.x, match.flags[0].home.z);
@@ -1421,7 +1933,7 @@ describe('Thornhollow Fields: the carried-flag buff and the voluntary drop', () 
   // enemy flag they run and flags[0] (crimson) is their own stand.
   function carryingMatch() {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const carrier = match.teams[0][0];
     tp(sim, carrier, match.flags[1].home.x, match.flags[1].home.z);
@@ -1429,11 +1941,17 @@ describe('Thornhollow Fields: the carried-flag buff and the voluntary drop', () 
     sim.tick();
     // Off the stand, so nothing in an arm resolves as an incidental capture.
     tp(sim, carrier, match.flags[1].home.x + 6, match.flags[1].home.z - 8);
-    return { sim, match, carrier, e: sim.entities.get(carrier)!, flag: match.flags[1] };
+    return {
+      sim,
+      match,
+      carrier,
+      e: must(sim.entities.get(carrier), 'entity'),
+      flag: match.flags[1],
+    };
   }
 
   const hasFlagAura = (sim: Sim, pid: number) =>
-    sim.entities.get(pid)!.auras.some((a) => a.id === CARRIED_FLAG_AURA_ID);
+    must(sim.entities.get(pid), 'entity').auras.some((a) => a.id === CARRIED_FLAG_AURA_ID);
 
   it('is worn from the FIRST tick of the carry, not after the fatigue delay', () => {
     const { sim, carrier, e, flag } = carryingMatch();
@@ -1441,7 +1959,10 @@ describe('Thornhollow Fields: the carried-flag buff and the voluntary drop', () 
     expect(hasFlagAura(sim, carrier)).toBe(true);
     // The point of the pair: fatigue is still 75s away, the carry buff is not.
     expect(e.auras.some((a) => a.id === 'bg_carrier_vulnerability')).toBe(false);
-    const aura = e.auras.find((a) => a.id === CARRIED_FLAG_AURA_ID)!;
+    const aura = must(
+      e.auras.find((a) => a.id === CARRIED_FLAG_AURA_ID),
+      'flag aura',
+    );
     expect(aura.name).toBe('Carrying the Flag');
     expect(aura.kind).toBe('flag_carried');
     // Longer than any match, so natural expiry can never take it mid-carry.
@@ -1521,7 +2042,10 @@ describe('Thornhollow Fields: the carried-flag buff and the voluntary drop', () 
 
   it('no enemy dispel can take it (that would strip the buff and keep the flag)', () => {
     const { sim, carrier, e } = carryingMatch();
-    const aura = e.auras.find((a) => a.id === CARRIED_FLAG_AURA_ID)!;
+    const aura = must(
+      e.auras.find((a) => a.id === CARRIED_FLAG_AURA_ID),
+      'flag aura',
+    );
     // The physical school is what refuses it: an offensive dispel strips helpful
     // MAGIC only, so the one removal path a player could aim at it is the cancel.
     expect(isDispellableAura(aura, true)).toBe(false);
@@ -1544,7 +2068,7 @@ describe('Thornhollow Fields: the carried-flag buff and the voluntary drop', () 
       expect(hasFlagAura(sim, carrier)).toBe(false);
       expect(bgCarryingFlag(sim.ctx, carrier)).toBe(false);
       // The ground entity followed it, so it is a real object on the field.
-      const body = sim.entities.get(flag.entityId)!;
+      const body = must(sim.entities.get(flag.entityId), 'entity');
       expect(body.pos.x).toBeCloseTo(feet.x, 6);
       // ...and the state machine took no new cause: it is the ordinary drop.
       const events = sim.tick().filter((ev) => ev.type === 'bgFlag');
@@ -1620,7 +2144,7 @@ describe('Thornhollow Fields: the carried-flag buff and the voluntary drop', () 
       // player can never take off. No match, so nothing to drop.
       const sim = makeWorld();
       const pid = sim.addPlayer('warrior', 'Stranded');
-      const e = sim.entities.get(pid)!;
+      const e = must(sim.entities.get(pid), 'entity');
       expect(sim.bgMatchFor(pid)).toBeNull();
       e.auras.push({
         id: CARRIED_FLAG_AURA_ID,
@@ -1686,30 +2210,30 @@ describe('Thornhollow Fields: runes, hostility, and the match clock', () => {
 
   it('the rating floor holds a loss at BG_MIN_RATING while the winner keeps the full delta', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const winner = match.teams[0][0];
     const loser = match.teams[1][0];
-    sim.meta(loser)!.bgRating = BG_MIN_RATING + 1; // one point above the floor
+    must(sim.meta(loser), 'player meta').bgRating = BG_MIN_RATING + 1; // one point above the floor
     for (let cap = 0; cap < BG_CAPS_TO_WIN; cap++) captureOnce(sim, match, winner);
-    expect(sim.meta(loser)!.bgRating).toBe(BG_MIN_RATING); // clamped, not negative
-    expect(sim.meta(winner)!.bgRating).toBeGreaterThan(1500); // winner unaffected
+    expect(must(sim.meta(loser), 'player meta').bgRating).toBe(BG_MIN_RATING); // clamped, not negative
+    expect(must(sim.meta(winner), 'player meta').bgRating).toBeGreaterThan(1500); // winner unaffected
   });
 
   it('stepping on a sprint rune grants 1.4x haste for 10s and the rune recharges over 30s', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const runner = match.teams[0][0];
     const rune = match.runes[0];
     expect(rune.active).toBe(true);
     tp(sim, runner, rune.pos.x, rune.pos.z);
     sim.tick();
-    const e = sim.entities.get(runner)!;
+    const e = must(sim.entities.get(runner), 'entity');
     const sprint = e.auras.find((a) => a.id === 'bg_sprint_rune');
     expect(sprint).toBeTruthy();
-    expect(sprint!.value).toBeCloseTo(1.4, 5);
-    expect(sprint!.duration).toBeCloseTo(10, 5);
+    expect(must(sprint, 'sprint').value).toBeCloseTo(1.4, 5);
+    expect(must(sprint, 'sprint').duration).toBeCloseTo(10, 5);
     expect(rune.active).toBe(false); // consumed, now recharging
     tp(sim, runner, rune.pos.x + 20, rune.pos.z); // step away
     rune.cooldown = 0.1; // fast-forward the 30s recharge
@@ -1721,11 +2245,11 @@ describe('Thornhollow Fields: runes, hostility, and the match clock', () => {
 
   it('enemies are hostile, teammates are not (and cannot be healed cross-team)', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
-    const a = sim.entities.get(match.teams[0][0])!;
-    const mate = sim.entities.get(match.teams[0][1])!;
-    const foe = sim.entities.get(match.teams[1][0])!;
+    const a = must(sim.entities.get(match.teams[0][0]), 'entity');
+    const mate = must(sim.entities.get(match.teams[0][1]), 'entity');
+    const foe = must(sim.entities.get(match.teams[1][0]), 'entity');
     expect(sim.isHostileTo(a, foe)).toBe(true);
     expect(sim.isHostileTo(a, mate)).toBe(false);
     expect(sim.isHostileTo(foe, a)).toBe(true);
@@ -1733,10 +2257,10 @@ describe('Thornhollow Fields: runes, hostility, and the match clock', () => {
 
   it('an equal score at the 720s cap is a draw: Elo moves by the 0.5 draw math, no W/L', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     // skew the team averages so the draw math must move points
-    for (const pid of match.teams[0]) sim.meta(pid)!.bgRating = 1600;
-    for (const pid of match.teams[1]) sim.meta(pid)!.bgRating = 1400;
+    for (const pid of match.teams[0]) must(sim.meta(pid), 'player meta').bgRating = 1600;
+    for (const pid of match.teams[1]) must(sim.meta(pid), 'player meta').bgRating = 1400;
     match.ratingAvg = [1600, 1400];
     toActive(sim, match);
     captureOnce(sim, match, match.teams[0][0]);
@@ -1756,11 +2280,12 @@ describe('Thornhollow Fields: runes, hostility, and the match clock', () => {
     const expected = eloDelta(1600, 1400, 0.5); // negative: the favorite dropped a draw
     expect(expected).toBeLessThan(0);
     for (const pid of match.teams[0]) {
-      expect(sim.meta(pid)!.bgRating).toBe(1600 + expected);
-      expect(sim.meta(pid)!.bgWins).toBe(0);
-      expect(sim.meta(pid)!.bgLosses).toBe(0);
+      expect(must(sim.meta(pid), 'player meta').bgRating).toBe(1600 + expected);
+      expect(must(sim.meta(pid), 'player meta').bgWins).toBe(0);
+      expect(must(sim.meta(pid), 'player meta').bgLosses).toBe(0);
     }
-    for (const pid of match.teams[1]) expect(sim.meta(pid)!.bgRating).toBe(1400 - expected);
+    for (const pid of match.teams[1])
+      expect(must(sim.meta(pid), 'player meta').bgRating).toBe(1400 - expected);
   });
 
   it('pins the decisive Elo delta to a literal (jgyy review: catches uniform scaling)', () => {
@@ -1772,39 +2297,42 @@ describe('Thornhollow Fields: runes, hostility, and the match clock', () => {
 
   it('team Elo is zero-sum on a decisive result', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const before = [...match.teams[0], ...match.teams[1]].reduce(
-      (s, p) => s + sim.meta(p)!.bgRating,
+      (s, p) => s + must(sim.meta(p), 'player meta').bgRating,
       0,
     );
     const winners = [...match.teams[0]];
     const losers = [...match.teams[1]];
     for (let cap = 0; cap < BG_CAPS_TO_WIN; cap++) captureOnce(sim, match, winners[0]);
-    const after = [...winners, ...losers].reduce((s, p) => s + sim.meta(p)!.bgRating, 0);
+    const after = [...winners, ...losers].reduce(
+      (s, p) => s + must(sim.meta(p), 'player meta').bgRating,
+      0,
+    );
     expect(after).toBe(before); // zero-sum (no one near the floor)
-    expect(sim.meta(winners[0])!.bgRating).toBeGreaterThan(1500);
-    expect(sim.meta(losers[0])!.bgRating).toBeLessThan(1500);
+    expect(must(sim.meta(winners[0]), 'player meta').bgRating).toBeGreaterThan(1500);
+    expect(must(sim.meta(losers[0]), 'player meta').bgRating).toBeLessThan(1500);
   });
 
   it('a team that fully leaves forfeits: rating moves, no honor is paid', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const winners = [...match.teams[0]];
-    const honorBefore = sim.meta(winners[0])!.honor;
+    const honorBefore = must(sim.meta(winners[0]), 'player meta').honor;
     for (const pid of [...match.teams[1]]) sim.removePlayer(pid);
     expect(sim.bgMatchFor(winners[0])).toBe(null);
-    expect(sim.meta(winners[0])!.bgRating).toBeGreaterThan(1500);
-    expect(sim.meta(winners[0])!.bgWins).toBe(1);
-    expect(sim.meta(winners[0])!.honor).toBe(honorBefore); // forfeits pay nothing
+    expect(must(sim.meta(winners[0]), 'player meta').bgRating).toBeGreaterThan(1500);
+    expect(must(sim.meta(winners[0]), 'player meta').bgWins).toBe(1);
+    expect(must(sim.meta(winners[0]), 'player meta').honor).toBe(honorBefore); // forfeits pay nothing
   });
 });
 
 describe('Thornhollow Fields: review-hardening pins', () => {
   it('the ACTIVE battleground phase draws ZERO rng (the one draw is at match start)', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     // Drive the phase DIRECTLY (not sim.tick, whose other phases draw) across
     // countdown tail, wave respawns, rune claims (sprint AND power, so the
@@ -1835,7 +2363,7 @@ describe('Thornhollow Fields: review-hardening pins', () => {
     for (let i = 0; i < 20 * 20; i++) updateBattleground(sim.ctx);
     expect(draws).toBe(0); // zero draws across 20s of battleground
     expect(match.timer).toBeGreaterThan(timerBefore + 10); // and the phase really ran
-    expect(sim.entities.get(match.teams[1][1])!.dead).toBe(false); // released + wave-raised
+    expect(must(sim.entities.get(match.teams[1][1]), 'entity').dead).toBe(false); // released + wave-raised
     // ...and both claims the zero-draw pin is about really happened: the two
     // runes were taken (still spent, the 30s recharge outlasts the window) and
     // the power pad flipped its face without asking the rng for one.
@@ -1856,23 +2384,23 @@ describe('Thornhollow Fields: review-hardening pins', () => {
 
   it('a single deserter takes the rating loss and the recorded L; the team fights on', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const leaver = match.teams[1][0];
     const stayer = match.teams[1][1];
-    const before = sim.meta(leaver)!.bgRating;
+    const before = must(sim.meta(leaver), 'player meta').bgRating;
     // the server's pre-save path resolves the desertion while the meta is live
     sim.bgResolveDesertion(leaver);
-    expect(sim.meta(leaver)!.bgRating).toBeLessThan(before); // the loss delta landed
-    expect(sim.meta(leaver)!.bgLosses).toBe(1);
-    const afterFirst = sim.meta(leaver)!.bgRating;
+    expect(must(sim.meta(leaver), 'player meta').bgRating).toBeLessThan(before); // the loss delta landed
+    expect(must(sim.meta(leaver), 'player meta').bgLosses).toBe(1);
+    const afterFirst = must(sim.meta(leaver), 'player meta').bgRating;
     sim.bgResolveDesertion(leaver); // idempotent: already off the roster
-    expect(sim.meta(leaver)!.bgRating).toBe(afterFirst);
+    expect(must(sim.meta(leaver), 'player meta').bgRating).toBe(afterFirst);
     // the match continues a player down; nobody else was scored yet
     expect(sim.bgMatchFor(stayer)).toBe(match);
     expect(sim.bgMatchFor(leaver)).toBe(null);
     expect(match.teams[1]).toHaveLength(4);
-    expect(sim.meta(stayer)!.bgLosses).toBe(0);
+    expect(must(sim.meta(stayer), 'player meta').bgLosses).toBe(0);
   });
 
   it('an over-size group (a raid) is refused with a message, never silently truncated', () => {
@@ -1895,62 +2423,67 @@ describe('Thornhollow Fields: review-hardening pins', () => {
     machine.parties.set(77, { id: 77, leader, members: [...members] });
     for (const m of members) machine.partyByPid.set(m, 77);
     sim.bgQueueJoin(leader); // group of six
-    expect(sim.bgInfoFor(leader)!.queued).toBe(false);
-    expect(sim.bgInfoFor(leader)!.queueSize).toBe(0);
+    expect(must(sim.bgInfoFor(leader), 'bg info').queued).toBe(false);
+    expect(must(sim.bgInfoFor(leader), 'bg info').queueSize).toBe(0);
   });
 
-  it('a queued player who walks into an instance is evicted with the leave notice', () => {
+  it('a queued player who walks into an instance keeps the spot, silently', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'A');
     tp(sim, a, 0, -40);
-    sim.entities.get(a)!.level = BG_MIN_LEVEL;
+    must(sim.entities.get(a), 'entity').level = BG_MIN_LEVEL;
     sim.bgQueueJoin(a);
     sim.tick();
-    expect(sim.bgInfoFor(a)!.queued).toBe(true);
+    expect(must(sim.bgInfoFor(a), 'bg info').queued).toBe(true);
     const dungeonInstance = instanceOrigin(0, 0);
     tp(sim, a, dungeonInstance.x, dungeonInstance.z); // a dungeon instance band
     const evs = sim.tick();
-    expect(sim.bgInfoFor(a)!.queued).toBe(false);
-    expect(evs.some((e) => e.type === 'bgUnqueued' && e.pid === a)).toBe(true);
+    expect(must(sim.bgInfoFor(a), 'bg info').queued).toBe(true);
+    // Nothing happened, so nothing is announced: the un-queue notice is now
+    // reserved for the one cause that is still a real eviction (an arena match).
+    expect(evs.some((e) => e.type === 'bgUnqueued' && e.pid === a)).toBe(false);
   });
 
   it('a live participant cannot enter a delve mid-match', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const pid = match.teams[0][0];
     sim.enterDelve('collapsed_reliquary', 'tier1', pid);
     sim.tick();
     expect(sim.bgMatchFor(pid)).toBe(match); // still in the match, not in a delve
-    expect(isBgPos(sim.entities.get(pid)!.pos.x)).toBe(true);
+    expect(isBgPos(must(sim.entities.get(pid), 'entity').pos.x)).toBe(true);
   });
 
   it('the honor DR window round-trips through CharacterState and clears on UTC rollover', () => {
     const { sim, pids } = tenInQueue();
-    sim.utcDay = '2026-07-26';
-    const match = sim.bgMatchFor(pids[0])!;
+    sim.resetDay = '2026-07-26';
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const winner = match.teams[0][0];
     for (let cap = 0; cap < BG_CAPS_TO_WIN; cap++) captureOnce(sim, match, winner);
-    const daily = sim.meta(winner)!.honorArenaDaily!;
+    const daily = must(must(sim.meta(winner), 'player meta').honorArenaDaily, 'honor daily');
     expect(daily.bgResultsByOpponent).toBeTruthy();
-    expect(Object.values(daily.bgResultsByOpponent!)).toEqual([1]);
+    expect(Object.values(must(daily.bgResultsByOpponent, 'bg results'))).toEqual([1]);
     expect(daily.date).toBe('2026-07-26');
     // ROLLOVER: the next award on a new UTC day re-keys the window and pays
     // the full price again (the reset arm in pvp/honor.ts dailyWindow)
-    const honorAfterDayOne = sim.meta(winner)!.honor;
+    const honorAfterDayOne = must(sim.meta(winner), 'player meta').honor;
     for (let i = 0; i < 20 * (BG_END_HOLD + 1); i++) sim.tick(); // run out the result screen
-    sim.utcDay = '2026-07-27';
+    sim.resetDay = '2026-07-27';
     for (const pid of pids) sim.bgQueueJoin(pid);
     sim.tick();
-    const rematch = sim.bgMatchFor(winner)!;
+    acceptAllBgOffers(sim);
+    const rematch = must(sim.bgMatchFor(winner), 'bg match');
     toActive(sim, rematch);
     const rewinner = rematch.teams[0].includes(winner) ? winner : rematch.teams[1][0];
     for (let cap = 0; cap < BG_CAPS_TO_WIN; cap++) captureOnce(sim, rematch, rematch.teams[0][0]);
     const team0Won = rematch.teams[0].includes(rewinner);
-    const meta = sim.meta(rewinner)!;
-    expect(meta.honorArenaDaily!.date).toBe('2026-07-27'); // window re-keyed
-    expect(Object.values(meta.honorArenaDaily!.bgResultsByOpponent ?? {})).toEqual([1]);
+    const meta = must(sim.meta(rewinner), 'player meta');
+    expect(must(meta.honorArenaDaily, 'honor daily').date).toBe('2026-07-27'); // window re-keyed
+    expect(
+      Object.values(must(meta.honorArenaDaily, 'honor daily').bgResultsByOpponent ?? {}),
+    ).toEqual([1]);
     // full price again, NOT the same-day repeat decay. A WIN on the new day
     // also re-arms the first-win-of-the-day bonus, so it pays base + bonus.
     const paid = meta.honor - (rewinner === winner ? honorAfterDayOne : 0);
@@ -1960,13 +2493,16 @@ describe('Thornhollow Fields: review-hardening pins', () => {
         : BATTLEGROUND_LOSS_HONOR,
     );
     // persists across a save/load round trip (the anti-win-trading window)
-    const state = sim.serializeCharacter(winner)!;
-    expect(state.honorArenaDaily!.bgResultsByOpponent).toEqual(daily.bgResultsByOpponent);
-    const sim2 = makeWorld();
-    const reloaded = sim2.addPlayer('warrior', 'Reload', { state });
-    expect(sim2.meta(reloaded)!.honorArenaDaily!.bgResultsByOpponent).toEqual(
+    const state = must(sim.serializeCharacter(winner), 'character');
+    expect(must(state.honorArenaDaily, 'honor daily').bgResultsByOpponent).toEqual(
       daily.bgResultsByOpponent,
     );
+    const sim2 = makeWorld();
+    const reloaded = sim2.addPlayer('warrior', 'Reload', { state });
+    expect(
+      must(must(sim2.meta(reloaded), 'player meta').honorArenaDaily, 'honor daily')
+        .bgResultsByOpponent,
+    ).toEqual(daily.bgResultsByOpponent);
   });
 });
 
@@ -1977,8 +2513,8 @@ describe('Thornhollow Fields: matchmaking fairness', () => {
     for (let i = 0; i < ratings.length; i++) {
       const pid = sim.addPlayer('warrior', `R${i}`);
       tp(sim, pid, 0, -40);
-      sim.entities.get(pid)!.level = BG_MIN_LEVEL;
-      sim.meta(pid)!.bgRating = ratings[i];
+      must(sim.entities.get(pid), 'entity').level = BG_MIN_LEVEL;
+      must(sim.meta(pid), 'player meta').bgRating = ratings[i];
       pids.push(pid);
     }
     return { sim, pids };
@@ -1995,6 +2531,7 @@ describe('Thornhollow Fields: matchmaking fairness', () => {
     // queue always drains: an empty battleground is the worse outcome.
     for (let i = 0; i < 20 * (BG_FAIRNESS_MAX_WAIT + 1) && !sim.bgMatchFor(pids[0]); i++) {
       sim.tick();
+      acceptAllBgOffers(sim);
     }
     expect(sim.bgMatchFor(pids[0]), 'the queue must never starve').toBeTruthy();
   });
@@ -2008,11 +2545,12 @@ describe('Thornhollow Fields: matchmaking fairness', () => {
     for (let i = 0; i < 15; i++) {
       const pid = sim.addPlayer('warrior', `Q${i}`);
       tp(sim, pid, 0, -40);
-      sim.entities.get(pid)!.level = BG_MIN_LEVEL;
+      must(sim.entities.get(pid), 'entity').level = BG_MIN_LEVEL;
       pids.push(pid);
     }
     for (const pid of pids) sim.bgQueueJoin(pid);
     sim.tick();
+    acceptAllBgOffers(sim);
     expect(sim.bgMatchFor(pids[0]), 'an even ten seats on the tick').toBeTruthy();
     const left = sim.ctx.bgQueue;
     expect(
@@ -2033,14 +2571,14 @@ describe('Thornhollow Fields: matchmaking fairness', () => {
     const stack = (size: number, rating: number, tag: string): number[] => {
       const leader = sim.addPlayer('warrior', `${tag}0`);
       tp(sim, leader, 0, -40);
-      sim.entities.get(leader)!.level = BG_MIN_LEVEL;
-      sim.meta(leader)!.bgRating = rating;
+      must(sim.entities.get(leader), 'entity').level = BG_MIN_LEVEL;
+      must(sim.meta(leader), 'player meta').bgRating = rating;
       const members = [leader];
       for (let i = 1; i < size; i++) {
         const m = sim.addPlayer('warrior', `${tag}${i}`);
         tp(sim, m, 0, -40);
-        sim.entities.get(m)!.level = BG_MIN_LEVEL;
-        sim.meta(m)!.bgRating = rating;
+        must(sim.entities.get(m), 'entity').level = BG_MIN_LEVEL;
+        must(sim.meta(m), 'player meta').bgRating = rating;
         sim.partyInvite(m, leader);
         sim.partyAccept(m);
         members.push(m);
@@ -2050,12 +2588,15 @@ describe('Thornhollow Fields: matchmaking fairness', () => {
     };
     const stale = stack(3, 1500, 'S');
     const high = stack(5, 1800, 'H');
-    const low = stack(5, 1500, 'L');
+    const _low = stack(5, 1500, 'L');
     sim.tick();
     expect(sim.bgMatchFor(high[0]), 'a 300 gap is past the fresh band').toBeNull();
     expect(sim.bgMatchFor(stale[0]), 'the three-stack fits neither side').toBeNull();
     // Park the stale group's clock past every concession the gates make.
-    const staleGroup = sim.ctx.bgQueue.find((g) => g.pids.includes(stale[0]))!;
+    const staleGroup = must(
+      sim.ctx.bgQueue.find((g) => g.pids.includes(stale[0])),
+      'stale queue group',
+    );
     staleGroup.waited = BG_FAIRNESS_MAX_WAIT + 1;
     for (let i = 0; i < 20; i++) sim.tick(); // a full second of matchmaker passes
     expect(
@@ -2069,8 +2610,9 @@ describe('Thornhollow Fields: matchmaking fairness', () => {
     // queue never starves: the band widens until the 300 gap fits.
     for (let i = 0; i < 20 * (BG_FAIRNESS_MAX_WAIT + 1) && !sim.bgMatchFor(high[0]); i++) {
       sim.tick();
+      acceptAllBgOffers(sim);
     }
-    const match = sim.bgMatchFor(high[0])!;
+    const match = must(sim.bgMatchFor(high[0]), 'bg match');
     expect(match, 'the queue must never starve').toBeTruthy();
     for (const pid of stale) {
       expect(sim.bgMatchFor(pid), 'the unpackable three-stack is still waiting').toBeNull();
@@ -2085,31 +2627,32 @@ describe('Thornhollow Fields: matchmaking fairness', () => {
     const { sim, pids } = tenAtRatings([2400, 2400, 2400, 2400, 900, 900, 900, 900, 900, 900]);
     for (const pid of pids) sim.bgQueueJoin(pid);
     sim.tick();
+    acceptAllBgOffers(sim);
     const match = sim.bgMatchFor(pids[0]);
     expect(match, 'a packable ten seats on the tick').toBeTruthy();
     const avg = (team: number[]) =>
-      team.reduce((sum, p) => sum + sim.meta(p)!.bgRating, 0) / team.length;
-    expect(Math.abs(avg(match!.teams[0]) - avg(match!.teams[1]))).toBeLessThanOrEqual(
-      BG_RATING_BAND,
-    );
+      team.reduce((sum, p) => sum + must(sim.meta(p), 'player meta').bgRating, 0) / team.length;
+    expect(
+      Math.abs(avg(must(match, 'match').teams[0]) - avg(must(match, 'match').teams[1])),
+    ).toBeLessThanOrEqual(BG_RATING_BAND);
   });
 });
 
 describe('Thornhollow Fields: the kill and assist honor drip', () => {
   it('pays the blow, pays the helpers less, and pays the helper only once', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const killer = match.teams[0][0];
     const helper = match.teams[0][1];
     const bystander = match.teams[0][2];
     const victim = match.teams[1][0];
-    const honorOf = (pid: number) => sim.meta(pid)!.honor;
+    const honorOf = (pid: number) => must(sim.meta(pid), 'player meta').honor;
     const before = [honorOf(killer), honorOf(helper), honorOf(bystander)];
     // The helper softens the target, someone else lands the blow.
     sim.ctx.dealDamage(
-      sim.entities.get(helper)!,
-      sim.entities.get(victim)!,
+      must(sim.entities.get(helper), 'entity'),
+      must(sim.entities.get(victim), 'entity'),
       5,
       false,
       'physical',
@@ -2122,29 +2665,29 @@ describe('Thornhollow Fields: the kill and assist honor drip', () => {
     expect(honorOf(helper) - before[1], 'the assist pays less').toBe(BATTLEGROUND_ASSIST_HONOR);
     expect(honorOf(bystander) - before[2], 'a bystander is paid nothing').toBe(0);
     // The scoreboard shows the same story.
-    expect(match.stats.get(killer)!.kills).toBe(1);
-    expect(match.stats.get(helper)!.assists).toBe(1);
-    expect(match.stats.get(helper)!.kills).toBe(0);
-    expect(match.stats.get(bystander)!.assists).toBe(0);
+    expect(must(match.stats.get(killer), 'killer stats').kills).toBe(1);
+    expect(must(match.stats.get(helper), 'helper stats').assists).toBe(1);
+    expect(must(match.stats.get(helper), 'helper stats').kills).toBe(0);
+    expect(must(match.stats.get(bystander), 'bystander stats').assists).toBe(0);
   });
 
   it('decays a repeated victim, so a graveyard camp stops paying', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const killer = match.teams[0][0];
     const victim = match.teams[1][0];
     const gains: number[] = [];
     // Four kills on the SAME victim: the DR curve is 1, 0.5, 0.25, 0.
     for (let i = 0; i < 4; i++) {
-      const before = sim.meta(killer)!.honor;
-      const e = sim.entities.get(victim)!;
+      const before = must(sim.meta(killer), 'player meta').honor;
+      const e = must(sim.entities.get(victim), 'entity');
       e.dead = false;
       e.ghost = false;
       e.hp = e.maxHp;
       kill(sim, victim, killer);
       sim.tick();
-      gains.push(sim.meta(killer)!.honor - before);
+      gains.push(must(sim.meta(killer), 'player meta').honor - before);
     }
     expect(gains[0]).toBe(BATTLEGROUND_KILL_HONOR);
     expect(gains[1]).toBe(Math.floor(BATTLEGROUND_KILL_HONOR * 0.5));
@@ -2152,15 +2695,15 @@ describe('Thornhollow Fields: the kill and assist honor drip', () => {
     expect(gains[3], 'the fourth repeat pays nothing').toBe(0);
     // A DIFFERENT victim is its own counter, so honest fighting still pays.
     const other = match.teams[1][1];
-    const before = sim.meta(killer)!.honor;
+    const before = must(sim.meta(killer), 'player meta').honor;
     kill(sim, other, killer);
     sim.tick();
-    expect(sim.meta(killer)!.honor - before).toBe(BATTLEGROUND_KILL_HONOR);
+    expect(must(sim.meta(killer), 'player meta').honor - before).toBe(BATTLEGROUND_KILL_HONOR);
   });
 
   it('pays the healer who kept the killer standing, and never the enemy healer', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const killer = match.teams[0][0];
     const healer = match.teams[0][1];
@@ -2168,39 +2711,53 @@ describe('Thornhollow Fields: the kill and assist honor drip', () => {
     const enemyHealer = match.teams[1][1];
     // The enemy healer heals their OWN teammate: allied support, but for the
     // losing side, so it must never pay when that side takes the death.
-    const victimEntity = sim.entities.get(victim)!;
+    const victimEntity = must(sim.entities.get(victim), 'entity');
     victimEntity.hp = Math.max(1, victimEntity.maxHp - 50);
-    sim.ctx.applyHeal(sim.entities.get(enemyHealer)!, victimEntity, 10, 'test', null, false);
+    sim.ctx.applyHeal(
+      must(sim.entities.get(enemyHealer), 'entity'),
+      victimEntity,
+      10,
+      'test',
+      null,
+      false,
+    );
     // Our healer tops up the fighter who then lands the blow: that IS support.
-    const killerEntity = sim.entities.get(killer)!;
+    const killerEntity = must(sim.entities.get(killer), 'entity');
     killerEntity.hp = Math.max(1, killerEntity.maxHp - 50);
-    sim.ctx.applyHeal(sim.entities.get(healer)!, killerEntity, 10, 'test', null, false);
-    const healerBefore = sim.meta(healer)!.honor;
-    const enemyHealerBefore = sim.meta(enemyHealer)!.honor;
+    sim.ctx.applyHeal(
+      must(sim.entities.get(healer), 'entity'),
+      killerEntity,
+      10,
+      'test',
+      null,
+      false,
+    );
+    const healerBefore = must(sim.meta(healer), 'player meta').honor;
+    const enemyHealerBefore = must(sim.meta(enemyHealer), 'player meta').honor;
     kill(sim, victim, killer);
     sim.tick();
     expect(
-      sim.meta(healer)!.honor - healerBefore,
+      must(sim.meta(healer), 'player meta').honor - healerBefore,
       'a healer who never swung still earns from the kill they enabled',
     ).toBe(BATTLEGROUND_ASSIST_HONOR);
-    expect(match.stats.get(healer)!.assists).toBe(1);
+    expect(must(match.stats.get(healer), 'healer stats').assists).toBe(1);
     expect(
-      sim.meta(enemyHealer)!.honor - enemyHealerBefore,
+      must(sim.meta(enemyHealer), 'player meta').honor - enemyHealerBefore,
       'the dead side is never paid for the death',
     ).toBe(0);
   });
 
   it('never pays a teammate, and never pays an unrated dev match', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const a = match.teams[0][0];
     const teammate = match.teams[0][1];
-    const before = sim.meta(a)!.honor;
+    const before = must(sim.meta(a), 'player meta').honor;
     kill(sim, teammate, a); // friendly fire earns nothing
     sim.tick();
-    expect(sim.meta(a)!.honor).toBe(before);
-    expect(match.stats.get(a)!.kills).toBe(0);
+    expect(must(sim.meta(a), 'player meta').honor).toBe(before);
+    expect(must(match.stats.get(a), 'fighter stats').kills).toBe(0);
   });
 
   it('tallies assists in an UNRATED dev match too, while paying no honor for them', () => {
@@ -2211,22 +2768,22 @@ describe('Thornhollow Fields: the kill and assist honor drip', () => {
     for (let i = 0; i < 4; i++) {
       const pid = sim.addPlayer('warrior', `D${i}`);
       tp(sim, pid, 0, -40);
-      sim.entities.get(pid)!.level = BG_MIN_LEVEL;
+      must(sim.entities.get(pid), 'entity').level = BG_MIN_LEVEL;
       pids.push(pid);
       sim.bgQueueJoin(pid);
     }
     devStartBg(sim.ctx);
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     expect(match.rated).toBe(false);
     toActive(sim, match);
     const killer = match.teams[0][0];
     const helper = match.teams[0][1];
     const victim = match.teams[1][0];
-    const helperBefore = sim.meta(helper)!.honor ?? 0;
-    const killerBefore = sim.meta(killer)!.honor ?? 0;
+    const helperBefore = must(sim.meta(helper), 'player meta').honor ?? 0;
+    const killerBefore = must(sim.meta(killer), 'player meta').honor ?? 0;
     sim.ctx.dealDamage(
-      sim.entities.get(helper)!,
-      sim.entities.get(victim)!,
+      must(sim.entities.get(helper), 'entity'),
+      must(sim.entities.get(victim), 'entity'),
       5,
       false,
       'physical',
@@ -2235,21 +2792,30 @@ describe('Thornhollow Fields: the kill and assist honor drip', () => {
     );
     kill(sim, victim, killer);
     sim.tick();
-    expect(match.stats.get(killer)!.kills, 'kills count unrated').toBe(1);
-    expect(match.stats.get(victim)!.deaths, 'deaths count unrated').toBe(1);
-    expect(match.stats.get(helper)!.assists, 'and so do assists').toBe(1);
-    expect(match.stats.get(killer)!.assists, 'the blow is never also an assist').toBe(0);
+    expect(must(match.stats.get(killer), 'killer stats').kills, 'kills count unrated').toBe(1);
+    expect(must(match.stats.get(victim), 'victim stats').deaths, 'deaths count unrated').toBe(1);
+    expect(must(match.stats.get(helper), 'helper stats').assists, 'and so do assists').toBe(1);
+    expect(
+      must(match.stats.get(killer), 'killer stats').assists,
+      'the blow is never also an assist',
+    ).toBe(0);
     // The honor half of the drip stays rated-only: a dev-forced match must
     // never move real currency.
-    expect((sim.meta(helper)!.honor ?? 0) - helperBefore, 'no assist honor unrated').toBe(0);
-    expect((sim.meta(killer)!.honor ?? 0) - killerBefore, 'no kill honor unrated').toBe(0);
+    expect(
+      (must(sim.meta(helper), 'player meta').honor ?? 0) - helperBefore,
+      'no assist honor unrated',
+    ).toBe(0);
+    expect(
+      (must(sim.meta(killer), 'player meta').honor ?? 0) - killerBefore,
+      'no kill honor unrated',
+    ).toBe(0);
   });
 });
 
 describe('Thornhollow Fields: honor + persistence', () => {
   it('a played-out win pays BATTLEGROUND_WIN_HONOR, the losers BATTLEGROUND_LOSS_HONOR, repeat-decayed', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const winner = match.teams[0][0];
     const loser = match.teams[1][0];
@@ -2258,10 +2824,10 @@ describe('Thornhollow Fields: honor + persistence', () => {
     // decay arm below is what this case is really about, and it is measured
     // against the win award alone once the bonus is spent.
     const firstDayWin = BATTLEGROUND_WIN_HONOR + BATTLEGROUND_FIRST_WIN_BONUS_HONOR;
-    expect(sim.meta(winner)!.honor).toBe(firstDayWin);
-    expect(sim.meta(winner)!.lifetimeHonor).toBe(firstDayWin);
+    expect(must(sim.meta(winner), 'player meta').honor).toBe(firstDayWin);
+    expect(must(sim.meta(winner), 'player meta').lifetimeHonor).toBe(firstDayWin);
     // A LOSS never arms or claims the daily bonus.
-    expect(sim.meta(loser)!.honor).toBe(BATTLEGROUND_LOSS_HONOR);
+    expect(must(sim.meta(loser), 'player meta').honor).toBe(BATTLEGROUND_LOSS_HONOR);
     for (let i = 0; i < 20 * (BG_END_HOLD + 1); i++) sim.tick(); // run out the result screen
 
     // The SAME two teams meet again: the repeat pays half. Seated directly
@@ -2273,14 +2839,14 @@ describe('Thornhollow Fields: honor + persistence', () => {
     const teamA = [...match.teams[0]];
     const teamB = [...match.teams[1]];
     startBgMatch(sim.ctx, teamA, teamB);
-    const rematch = sim.bgMatchFor(winner)!;
+    const rematch = must(sim.bgMatchFor(winner), 'bg match');
     expect(rematch).toBeTruthy();
     expect(rematch.teams[0]).toEqual(teamA);
     expect(rematch.teams[1]).toEqual(teamB);
     toActive(sim, rematch);
     const winner2 = rematch.teams[0][0];
     for (let cap = 0; cap < BG_CAPS_TO_WIN; cap++) captureOnce(sim, rematch, winner2);
-    const w2meta = sim.meta(winner2)!;
+    const w2meta = must(sim.meta(winner2), 'player meta');
     // The second win of the same day pays the decayed base and NOTHING else:
     // the daily bonus was already claimed by the first win above.
     expect(w2meta.honor).toBe(firstDayWin + Math.floor(BATTLEGROUND_WIN_HONOR * 0.5));
@@ -2290,22 +2856,22 @@ describe('Thornhollow Fields: honor + persistence', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('druid', 'Keeper');
     // untouched standing: the save carries NO bg fields (byte-stable saves)
-    const clean = sim.serializeCharacter(a)!;
+    const clean = must(sim.serializeCharacter(a), 'character');
     expect(clean.bgRating).toBeUndefined();
     expect(clean.bgWins).toBeUndefined();
-    sim.meta(a)!.bgRating = 1633;
-    sim.meta(a)!.bgWins = 7;
-    sim.meta(a)!.bgCaptures = 19;
-    const state = sim.serializeCharacter(a)!;
+    must(sim.meta(a), 'player meta').bgRating = 1633;
+    must(sim.meta(a), 'player meta').bgWins = 7;
+    must(sim.meta(a), 'player meta').bgCaptures = 19;
+    const state = must(sim.serializeCharacter(a), 'character');
     expect(state.bgRating).toBe(1633);
     expect(state.bgWins).toBe(7);
     expect(state.bgLosses).toBe(0);
     expect(state.bgCaptures).toBe(19);
     const sim2 = makeWorld();
     const a2 = sim2.addPlayer('druid', 'Keeper', { state });
-    expect(sim2.meta(a2)!.bgRating).toBe(1633);
-    expect(sim2.meta(a2)!.bgWins).toBe(7);
-    expect(sim2.meta(a2)!.bgCaptures).toBe(19);
+    expect(must(sim2.meta(a2), 'player meta').bgRating).toBe(1633);
+    expect(must(sim2.meta(a2), 'player meta').bgWins).toBe(7);
+    expect(must(sim2.meta(a2), 'player meta').bgCaptures).toBe(19);
   });
 });
 
@@ -2346,10 +2912,10 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
     expect(firstWin / BATTLEGROUND_WIN_HONOR).toBeLessThan(1.5);
   });
 
-  it('pays exactly once per UTC day, under its own honor reason', () => {
+  it('pays exactly once per reset day, under its own honor reason', () => {
     const { sim, pids } = tenInQueue();
-    sim.utcDay = '2026-07-26';
-    const match = sim.bgMatchFor(pids[0])!;
+    sim.resetDay = '2026-07-26';
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const winner = match.teams[0][0];
     const loser = match.teams[1][0];
@@ -2358,24 +2924,28 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
     const paid = bonusEvents(evs, winner);
     expect(paid.length, 'exactly one bonus grant').toBe(1);
     expect(paid[0].amount).toBe(BATTLEGROUND_FIRST_WIN_BONUS_HONOR);
-    expect(sim.meta(winner)!.honor).toBe(
+    expect(must(sim.meta(winner), 'player meta').honor).toBe(
       BATTLEGROUND_WIN_HONOR + BATTLEGROUND_FIRST_WIN_BONUS_HONOR,
     );
-    expect(sim.meta(winner)!.honorArenaDaily!.bgFirstWinClaimed).toBe(true);
+    expect(
+      must(must(sim.meta(winner), 'player meta').honorArenaDaily, 'honor daily').bgFirstWinClaimed,
+    ).toBe(true);
     // The LOSING side neither claims nor is paid it.
     expect(bonusEvents(evs, loser).length).toBe(0);
-    expect(sim.meta(loser)!.honorArenaDaily!.bgFirstWinClaimed).toBeUndefined();
-    expect(sim.meta(loser)!.honor).toBe(BATTLEGROUND_LOSS_HONOR);
+    expect(
+      must(must(sim.meta(loser), 'player meta').honorArenaDaily, 'honor daily').bgFirstWinClaimed,
+    ).toBeUndefined();
+    expect(must(sim.meta(loser), 'player meta').honor).toBe(BATTLEGROUND_LOSS_HONOR);
   });
 
   it('a SECOND win the same day pays the base award only', () => {
     const { sim, pids } = tenInQueue();
-    sim.utcDay = '2026-07-26';
-    const match = sim.bgMatchFor(pids[0])!;
+    sim.resetDay = '2026-07-26';
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const winner = match.teams[0][0];
     playedOutWin(sim, match, winner);
-    const afterFirst = sim.meta(winner)!.honor;
+    const afterFirst = must(sim.meta(winner), 'player meta').honor;
     for (let i = 0; i < 20 * (BG_END_HOLD + 1); i++) sim.tick();
 
     // Fresh opposing identity so the repeat DR on the BASE award is not what is
@@ -2384,72 +2954,118 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
     for (let i = 0; i < 5; i++) {
       const p = sim.addPlayer('mage', `Fresh${i}`);
       tp(sim, p, 0, -40);
-      sim.entities.get(p)!.level = BG_MIN_LEVEL;
+      must(sim.entities.get(p), 'entity').level = BG_MIN_LEVEL;
       fresh.push(p);
     }
     startBgMatch(sim.ctx, [...match.teams[0]], fresh);
-    const rematch = sim.bgMatchFor(winner)!;
+    const rematch = must(sim.bgMatchFor(winner), 'bg match');
     toActive(sim, rematch);
     const evs = playedOutWin(sim, rematch, winner);
     expect(bonusEvents(evs, winner).length, 'the day is spent').toBe(0);
-    expect(sim.meta(winner)!.honor - afterFirst).toBe(BATTLEGROUND_WIN_HONOR);
+    expect(must(sim.meta(winner), 'player meta').honor - afterFirst).toBe(BATTLEGROUND_WIN_HONOR);
   });
 
   it('the UTC rollover re-arms it, and the claim survives a save/load round trip', () => {
     const { sim, pids } = tenInQueue();
-    sim.utcDay = '2026-07-26';
-    const match = sim.bgMatchFor(pids[0])!;
+    sim.resetDay = '2026-07-26';
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const winner = match.teams[0][0];
     playedOutWin(sim, match, winner);
 
     // PERSISTENCE: the claimed flag is written and reloaded, so a relog on the
     // same day cannot re-earn it.
-    const state = sim.serializeCharacter(winner)!;
-    expect(state.honorArenaDaily!.bgFirstWinClaimed).toBe(true);
+    const state = must(sim.serializeCharacter(winner), 'character');
+    expect(must(state.honorArenaDaily, 'honor daily').bgFirstWinClaimed).toBe(true);
     const sim2 = makeWorld();
-    sim2.utcDay = '2026-07-26';
+    sim2.resetDay = '2026-07-26';
     const reloaded = sim2.addPlayer('warrior', 'Reload', { state });
-    expect(sim2.meta(reloaded)!.honorArenaDaily!.bgFirstWinClaimed).toBe(true);
-    expect(sim2.bgInfoFor(reloaded)!.firstWinBonusReady, 'still spent after a relog').toBe(false);
+    expect(
+      must(must(sim2.meta(reloaded), 'player meta').honorArenaDaily, 'honor daily')
+        .bgFirstWinClaimed,
+    ).toBe(true);
+    expect(
+      must(sim2.bgInfoFor(reloaded), 'bg info').firstWinBonusReady,
+      'still spent after a relog',
+    ).toBe(false);
     // ...and the NEXT day re-arms it without any award having run.
-    sim2.utcDay = '2026-07-27';
-    expect(sim2.bgInfoFor(reloaded)!.firstWinBonusReady).toBe(true);
+    sim2.resetDay = '2026-07-27';
+    expect(must(sim2.bgInfoFor(reloaded), 'bg info').firstWinBonusReady).toBe(true);
 
     // A clean character writes NOTHING (byte-stable saves): absent until claimed.
     const sim3 = makeWorld();
     const clean = sim3.addPlayer('warrior', 'Clean');
-    expect(sim3.serializeCharacter(clean)!.honorArenaDaily?.bgFirstWinClaimed).toBeUndefined();
+    expect(
+      must(sim3.serializeCharacter(clean), 'character').honorArenaDaily?.bgFirstWinClaimed,
+    ).toBeUndefined();
 
     for (let i = 0; i < 20 * (BG_END_HOLD + 1); i++) sim.tick();
-    sim.utcDay = '2026-07-27';
-    expect(sim.bgInfoFor(winner)!.firstWinBonusReady, 'a new day re-arms the chip').toBe(true);
-    const before = sim.meta(winner)!.honor;
+    sim.resetDay = '2026-07-27';
+    expect(
+      must(sim.bgInfoFor(winner), 'bg info').firstWinBonusReady,
+      'a new day re-arms the chip',
+    ).toBe(true);
+    const before = must(sim.meta(winner), 'player meta').honor;
     startBgMatch(sim.ctx, [...match.teams[0]], [...match.teams[1]]);
-    const rematch = sim.bgMatchFor(winner)!;
+    const rematch = must(sim.bgMatchFor(winner), 'bg match');
     toActive(sim, rematch);
     const evs = playedOutWin(sim, rematch, winner);
     expect(bonusEvents(evs, winner).length).toBe(1);
     // The base award decays (same opponents, but the DR window rolled over too),
     // so the bonus is measured on its own.
-    expect(sim.meta(winner)!.honor - before).toBe(
+    expect(must(sim.meta(winner), 'player meta').honor - before).toBe(
       BATTLEGROUND_WIN_HONOR + BATTLEGROUND_FIRST_WIN_BONUS_HONOR,
     );
   });
 
+  it('re-arms on the RESET window, and never on the UTC calendar date alone', () => {
+    // The reported bug: the banner read "First win of the day" at 6 PM Pacific to
+    // a player who had already won that afternoon, because midnight UTC had
+    // passed at 5 PM and rolled the window mid-evening. The two clocks are now
+    // separate fields, so moving the calendar date must do nothing at all.
+    const { sim, pids } = tenInQueue();
+    sim.resetDay = '2026-08-07';
+    sim.utcDay = '2026-08-07';
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+    const winner = match.teams[0][0];
+    playedOutWin(sim, match, winner);
+    expect(must(sim.bgInfoFor(winner), 'bg info').firstWinBonusReady, 'claimed by the win').toBe(
+      false,
+    );
+
+    // 6 PM Pacific: the UTC calendar has ticked over to the 8th, the realm's own
+    // reset (3 AM Eastern) has not.
+    sim.utcDay = '2026-08-08';
+    expect(
+      must(sim.bgInfoFor(winner), 'bg info').firstWinBonusReady,
+      'a UTC rollover must not re-arm the day',
+    ).toBe(false);
+    expect(
+      must(must(sim.meta(winner), 'player meta').honorArenaDaily, 'honor daily').bgFirstWinClaimed,
+    ).toBe(true);
+
+    // The realm's reset is what re-arms it.
+    sim.resetDay = '2026-08-08';
+    expect(
+      must(sim.bgInfoFor(winner), 'bg info').firstWinBonusReady,
+      'the realm reset re-arms it',
+    ).toBe(true);
+  });
+
   it('an UNRATED dev match never claims it', () => {
     const sim = makeWorld();
-    sim.utcDay = '2026-07-26';
+    sim.resetDay = '2026-07-26';
     const pids: number[] = [];
     for (let i = 0; i < 4; i++) {
       const p = sim.addPlayer('warrior', `D${i}`);
       tp(sim, p, 0, -40);
-      sim.entities.get(p)!.level = BG_MIN_LEVEL;
+      must(sim.entities.get(p), 'entity').level = BG_MIN_LEVEL;
       sim.bgQueueJoin(p);
       pids.push(p);
     }
     devStartBg(sim.ctx);
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     expect(match.rated).toBe(false);
     toActive(sim, match);
     const winner = match.teams[0][0];
@@ -2457,50 +3073,67 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
     endBgMatch(sim.ctx, match, 0, 'caps');
     evs.push(...sim.tick());
     expect(bonusEvents(evs, winner).length).toBe(0);
-    expect(sim.meta(winner)!.honorArenaDaily?.bgFirstWinClaimed).toBeUndefined();
-    expect(sim.bgInfoFor(winner)!.firstWinBonusReady, 'still on the table').toBe(true);
+    expect(
+      must(sim.meta(winner), 'player meta').honorArenaDaily?.bgFirstWinClaimed,
+    ).toBeUndefined();
+    expect(must(sim.bgInfoFor(winner), 'bg info').firstWinBonusReady, 'still on the table').toBe(
+      true,
+    );
   });
 
   it('a FORFEIT win never claims it (forfeits pay no honor at all)', () => {
     const { sim, pids } = tenInQueue();
-    sim.utcDay = '2026-07-26';
-    const match = sim.bgMatchFor(pids[0])!;
+    sim.resetDay = '2026-07-26';
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const winner = match.teams[0][0];
-    const before = sim.meta(winner)!.honor;
+    const before = must(sim.meta(winner), 'player meta').honor;
     endBgMatch(sim.ctx, match, 0, 'forfeit');
     const evs = sim.tick();
     expect(bonusEvents(evs, winner).length).toBe(0);
-    expect(sim.meta(winner)!.honor).toBe(before);
-    expect(sim.meta(winner)!.honorArenaDaily?.bgFirstWinClaimed).toBeUndefined();
+    expect(must(sim.meta(winner), 'player meta').honor).toBe(before);
+    expect(
+      must(sim.meta(winner), 'player meta').honorArenaDaily?.bgFirstWinClaimed,
+    ).toBeUndefined();
   });
 
   it('a DRAW never claims it', () => {
     const { sim, pids } = tenInQueue();
-    sim.utcDay = '2026-07-26';
-    const match = sim.bgMatchFor(pids[0])!;
+    sim.resetDay = '2026-07-26';
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const pid = match.teams[0][0];
     endBgMatch(sim.ctx, match, null, 'timeout');
     const evs = sim.tick();
     expect(bonusEvents(evs, pid).length).toBe(0);
-    expect(sim.meta(pid)!.honorArenaDaily!.bgFirstWinClaimed).toBeUndefined();
-    expect(sim.bgInfoFor(pid)!.firstWinBonusReady).toBe(true);
+    expect(
+      must(must(sim.meta(pid), 'player meta').honorArenaDaily, 'honor daily').bgFirstWinClaimed,
+    ).toBeUndefined();
+    expect(must(sim.bgInfoFor(pid), 'bg info').firstWinBonusReady).toBe(true);
   });
 
   it('the bgEnd event carries the bonus so the finish surface can name it', () => {
     const { sim, pids } = tenInQueue();
-    sim.utcDay = '2026-07-26';
-    const match = sim.bgMatchFor(pids[0])!;
+    sim.resetDay = '2026-07-26';
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const winner = match.teams[0][0];
     const loser = match.teams[1][0];
     const evs = playedOutWin(sim, match, winner);
     const ends = evs.filter((e): e is Extract<SimEvent, { type: 'bgEnd' }> => e.type === 'bgEnd');
-    expect(ends.find((e) => e.pid === winner)!.firstWinBonus).toBe(
-      BATTLEGROUND_FIRST_WIN_BONUS_HONOR,
-    );
-    expect(ends.find((e) => e.pid === loser)!.firstWinBonus, 'a loss pays no bonus').toBe(0);
+    expect(
+      must(
+        ends.find((e) => e.pid === winner),
+        'winner end event',
+      ).firstWinBonus,
+    ).toBe(BATTLEGROUND_FIRST_WIN_BONUS_HONOR);
+    expect(
+      must(
+        ends.find((e) => e.pid === loser),
+        'loser end event',
+      ).firstWinBonus,
+      'a loss pays no bonus',
+    ).toBe(0);
   });
 
   it('bgInfoFor REPORTS the window without rolling it over', () => {
@@ -2508,15 +3141,20 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
     // stored date reads as re-armed, and the stored date is left for the next
     // real award to roll over.
     const { sim, pids } = tenInQueue();
-    sim.utcDay = '2026-07-26';
-    const match = sim.bgMatchFor(pids[0])!;
+    sim.resetDay = '2026-07-26';
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const winner = match.teams[0][0];
     playedOutWin(sim, match, winner);
-    sim.utcDay = '2026-07-27';
-    expect(sim.bgInfoFor(winner)!.firstWinBonusReady).toBe(true);
-    expect(sim.meta(winner)!.honorArenaDaily!.date, 'the read wrote nothing').toBe('2026-07-26');
-    expect(sim.meta(winner)!.honorArenaDaily!.bgFirstWinClaimed).toBe(true);
+    sim.resetDay = '2026-07-27';
+    expect(must(sim.bgInfoFor(winner), 'bg info').firstWinBonusReady).toBe(true);
+    expect(
+      must(must(sim.meta(winner), 'player meta').honorArenaDaily, 'honor daily').date,
+      'the read wrote nothing',
+    ).toBe('2026-07-26');
+    expect(
+      must(must(sim.meta(winner), 'player meta').honorArenaDaily, 'honor daily').bgFirstWinClaimed,
+    ).toBe(true);
   });
 });
 
@@ -2528,7 +3166,7 @@ describe('Thornhollow Fields: the finish surface knows WHY the match ended', () 
 
   it("a match played to the capture target carries ended:'caps'", () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const winner = match.teams[0][0];
     const seen: SimEvent[] = [];
@@ -2549,7 +3187,7 @@ describe('Thornhollow Fields: the finish surface knows WHY the match ended', () 
 
   it("the match cap resolving on score carries ended:'timer', for all ten", () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     // One capture so the timeout resolves on SCORE rather than as a draw: the
     // cause must be 'timer' whichever way the score fell.
@@ -2564,7 +3202,7 @@ describe('Thornhollow Fields: the finish surface knows WHY the match ended', () 
 
   it("a forfeit carries ended:'forfeit'", () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const survivor = match.teams[0][0];
     endBgMatch(sim.ctx, match, 0, 'forfeit');
@@ -2586,7 +3224,7 @@ describe('Thornhollow Fields: the clock calls out its last minutes', () => {
 
   it('each threshold fires exactly once, on its crossing tick, to all ten', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const roster = bgAllPids(match);
     expect(roster.length).toBe(10);
@@ -2596,7 +3234,7 @@ describe('Thornhollow Fields: the clock calls out its last minutes', () => {
       const before = warnings(sim.tick());
       expect(before.length, `the ${mark}s call fans to all ten`).toBe(10);
       for (const w of before) expect(w.secondsLeft).toBe(mark);
-      expect([...before.map((w) => w.pid!)].sort((a, b) => a - b)).toEqual(
+      expect([...before.map((w) => must(w.pid, 'warning pid'))].sort((a, b) => a - b)).toEqual(
         [...roster].sort((a, b) => a - b),
       );
       // Rewinding the clock cannot make it speak twice: the once-only claim
@@ -2608,7 +3246,7 @@ describe('Thornhollow Fields: the clock calls out its last minutes', () => {
 
   it('says nothing during the form-up countdown', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     expect(match.state).toBe('countdown');
     const seen: SimEvent[] = [];
     for (let i = 0; i < 20 * 12 && match.state !== 'active'; i++) seen.push(...sim.tick());
@@ -2617,7 +3255,7 @@ describe('Thornhollow Fields: the clock calls out its last minutes', () => {
 
   it('a match decided by captures before the threshold never announces it', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const winner = match.teams[0][0];
     const seen: SimEvent[] = [];
@@ -2638,7 +3276,7 @@ describe('Thornhollow Fields: the clock calls out its last minutes', () => {
 
   it('the one-minute call precedes the ended:timer result it warned about', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const seen: SimEvent[] = [];
     armAt(match, 60);
@@ -2656,7 +3294,7 @@ describe('Thornhollow Fields: the clock calls out its last minutes', () => {
     // The crossing rule, not a "remaining <= mark" read: a match seated with
     // less clock than a threshold must not open by announcing that threshold.
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     // Straight past the 120s mark without a tick in between, then cross 60s.
     match.timer = BG_MAX_DURATION - 61;
@@ -2676,7 +3314,7 @@ describe('Thornhollow Fields: resolved matches leave one operator record', () =>
     // bgEnd events: bgEnd is PERSONAL, so an event-driven counter would book
     // every match ten times.
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     const winner = match.teams[0][0];
     for (let cap = 0; cap < BG_CAPS_TO_WIN - 1; cap++) captureOnce(sim, match, winner);
@@ -2703,7 +3341,7 @@ describe('Thornhollow Fields: resolved matches leave one operator record', () =>
 
   it('records the timer ending and the elapsed active seconds', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
     captureOnce(sim, match, match.teams[0][0]);
     match.timer = BG_MAX_DURATION - DT;
@@ -2719,12 +3357,12 @@ describe('Thornhollow Fields: resolved matches leave one operator record', () =>
     for (let i = 0; i < 4; i++) {
       const p = sim.addPlayer('warrior', `D${i}`);
       tp(sim, p, 0, -40);
-      sim.entities.get(p)!.level = BG_MIN_LEVEL;
+      must(sim.entities.get(p), 'entity').level = BG_MIN_LEVEL;
       sim.bgQueueJoin(p);
       pids.push(p);
     }
     devStartBg(sim.ctx);
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     expect(match.rated).toBe(false);
     toActive(sim, match);
     endBgMatch(sim.ctx, match, 0, 'caps');
@@ -2737,23 +3375,24 @@ describe('Thornhollow Fields: resolved matches leave one operator record', () =>
     const sim = makeWorld();
     const leader = sim.addPlayer('warrior', 'Leader');
     tp(sim, leader, 0, -40);
-    sim.entities.get(leader)!.level = BG_MIN_LEVEL;
+    must(sim.entities.get(leader), 'entity').level = BG_MIN_LEVEL;
     for (let i = 0; i < 2; i++) {
       const m = sim.addPlayer('priest', `Mate${i}`);
       tp(sim, m, 0, -40);
-      sim.entities.get(m)!.level = BG_MIN_LEVEL;
+      must(sim.entities.get(m), 'entity').level = BG_MIN_LEVEL;
       sim.partyInvite(m, leader);
       sim.partyAccept(m);
     }
     for (let i = 0; i < 7; i++) {
       const s = sim.addPlayer('rogue', `Solo${i}`);
       tp(sim, s, 0, -40);
-      sim.entities.get(s)!.level = BG_MIN_LEVEL;
+      must(sim.entities.get(s), 'entity').level = BG_MIN_LEVEL;
       sim.bgQueueJoin(s);
     }
     sim.bgQueueJoin(leader); // queues the whole premade as one group
     sim.tick();
-    const match = sim.bgMatchFor(leader)!;
+    acceptAllBgOffers(sim);
+    const match = must(sim.bgMatchFor(leader), 'bg match');
     // The flag is snapshotted at START, which is the only moment it is knowable:
     // by resolve time both teams are welded into match parties.
     expect(match.grouped).toBe(true);
@@ -2773,7 +3412,7 @@ describe('Thornhollow Fields: resolved matches leave one operator record', () =>
     for (let i = 0; i < 10; i++) {
       const p = sim2.addPlayer('warrior', `S${i}`);
       tp(sim2, p, 0, -40);
-      sim2.entities.get(p)!.level = BG_MIN_LEVEL;
+      must(sim2.entities.get(p), 'entity').level = BG_MIN_LEVEL;
       sim2.bgQueueJoin(p); // every one of them SOLO
       queued.push(p);
     }
@@ -2781,16 +3420,17 @@ describe('Thornhollow Fields: resolved matches leave one operator record', () =>
     sim2.partyInvite(queued[1], queued[0]);
     sim2.partyAccept(queued[1]);
     sim2.tick();
-    const match2 = sim2.bgMatchFor(queued[0])!;
+    acceptAllBgOffers(sim2);
+    const match2 = must(sim2.bgMatchFor(queued[0]), 'bg match');
     expect(match2.grouped, 'nobody queued as a group').toBe(false);
-    expect(sim.bgMatchFor(pids[0])!.grouped, 'the plain solo ten too').toBe(false);
+    expect(must(sim.bgMatchFor(pids[0]), 'bg match').grouped, 'the plain solo ten too').toBe(false);
   });
 
   it('a /dev forced ending writes NOTHING, even on a genuinely rated match', () => {
     // `rated` alone cannot keep it out: this is a real queued match whose clock
     // and ending are a dev's, so it would poison the caps-vs-timer ratio.
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     expect(match.rated).toBe(true);
     toActive(sim, match);
     expect(devEndBg(sim.ctx, pids[0])).toBe(true);
@@ -2800,7 +3440,7 @@ describe('Thornhollow Fields: resolved matches leave one operator record', () =>
 
   it('records a forfeit during form-up as a zero duration, never a countdown value', () => {
     const { sim, pids } = tenInQueue();
-    const match = sim.bgMatchFor(pids[0])!;
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     expect(match.state).toBe('countdown');
     endBgMatch(sim.ctx, match, 0, 'forfeit');
     const [record] = drainBgOutcomes(sim.bgOutcomes);
@@ -2834,9 +3474,9 @@ describe('Thornhollow Fields: the honor award reports what it paid', () => {
     // The bgEnd event needs the BONUS on its own (the finish surface names it),
     // and the caller needs the total to stay honest about what was credited.
     const sim = makeWorld();
-    sim.utcDay = '2026-07-26';
+    sim.resetDay = '2026-07-26';
     const pid = sim.addPlayer('warrior', 'Champ');
-    const meta = sim.meta(pid)!;
+    const meta = must(sim.meta(pid), 'player meta');
 
     const first = awardBattlegroundHonor(sim.ctx, meta, 'team:enemies', 'win');
     expect(first.firstWinBonus).toBe(BATTLEGROUND_FIRST_WIN_BONUS_HONOR);
@@ -2860,15 +3500,18 @@ describe('Thornhollow Fields: the honor award reports what it paid', () => {
     // grantHonor credits zero once a purse is at the honor ceiling; spending the
     // day's one bonus for zero honor is the wrong way to lose that race.
     const sim = makeWorld();
-    sim.utcDay = '2026-07-26';
+    sim.resetDay = '2026-07-26';
     const pid = sim.addPlayer('warrior', 'Capped');
-    const meta = sim.meta(pid)!;
+    const meta = must(sim.meta(pid), 'player meta');
     meta.honor = Number.MAX_SAFE_INTEGER;
     meta.lifetimeHonor = Number.MAX_SAFE_INTEGER;
 
     const award = awardBattlegroundHonor(sim.ctx, meta, 'team:enemies', 'win');
     expect(award.firstWinBonus).toBe(0);
-    expect(meta.honorArenaDaily!.bgFirstWinClaimed, 'the claim is still armed').toBeUndefined();
+    expect(
+      must(meta.honorArenaDaily, 'honor daily').bgFirstWinClaimed,
+      'the claim is still armed',
+    ).toBeUndefined();
   });
 });
 
@@ -2893,5 +3536,944 @@ describe('the outcome log stays observability-only', () => {
       'src/sim/sim_context.ts', // the live view
       'src/sim/social/battleground.ts', // the one write site
     ]);
+  });
+});
+
+describe('Thornhollow Fields: a queued solo backfills a deserted seat', () => {
+  it('does not let one ineligible oldest solo starve the backfill behind them', () => {
+    // Review catch: liveness used to be tested AFTER picking the oldest solo, so
+    // an ineligible candidate made the loop skip to the next MATCH. A live 4v5
+    // then stayed unfilled while perfectly good solos waited behind the stale
+    // one. Selection now filters first.
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+
+    // Queue both BEFORE any seat opens, so neither is backfilled early and the
+    // older one genuinely carries the longer wait.
+    const stale = sim.addPlayer('warrior', 'Stale');
+    tp(sim, stale, 0, -40);
+    must(sim.entities.get(stale), 'entity').level = BG_MIN_LEVEL;
+    sim.bgQueueJoin(stale);
+    for (let i = 0; i < 20 * 3; i++) sim.tick();
+    const fresh = sim.addPlayer('rogue', 'Fresh');
+    tp(sim, fresh, 2, -40);
+    must(sim.entities.get(fresh), 'entity').level = BG_MIN_LEVEL;
+    sim.bgQueueJoin(fresh);
+    const staleGroup = must(
+      sim.ctx.bgQueue.find((g) => g.pids.includes(stale)),
+      'stale queue group',
+    );
+    const freshGroup = must(
+      sim.ctx.bgQueue.find((g) => g.pids.includes(fresh)),
+      'fresh queue group',
+    );
+    expect(staleGroup.waited, 'the stale one really is the older candidate').toBeGreaterThan(
+      freshGroup.waited,
+    );
+
+    // Make the OLDER one ineligible the way a real one is: already seated.
+    sim.ctx.bgMatches.set(stale, match);
+    // ...and only NOW open the seat.
+    bgResolveDesertion(sim.ctx, match.teams[0][4]);
+    expect(match.teams[0]).toHaveLength(BG_TEAM_SIZE - 1);
+
+    sim.tick();
+    bgRespond(sim.ctx, true, fresh); // the seat is an OFFER now
+
+    expect(match.teams[0], 'the younger eligible solo filled the seat').toContain(fresh);
+    expect(match.teams[0]).toHaveLength(BG_TEAM_SIZE);
+  });
+
+  // The leaver already pays (bgResolveDesertion charges rating and an L). This
+  // is the other half: the four who stayed get their fifth back rather than
+  // playing out a rated 4v5, which at BG_TEAM_SIZE 5 is most of a match.
+  const staged = (): { sim: Sim; match: BgMatch; pids: number[] } => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.ctx.bgMatches.get(pids[0]), 'bg match');
+    toActive(sim, match);
+    return { sim, match, pids };
+  };
+
+  // One more level-20 solo waiting in the queue, ready to be seated.
+  const queueSpare = (sim: Sim, name = 'Spare'): number => {
+    const pid = sim.addPlayer('warrior', name);
+    tp(sim, pid, 6, -40);
+    must(sim.entities.get(pid), 'entity').level = 20;
+    sim.bgQueueJoin(pid);
+    return pid;
+  };
+
+  it('seats the spare into the empty seat and tells both sides', () => {
+    const { sim, match, pids } = staged();
+    const deserter = match.teams[0][0];
+    const spare = queueSpare(sim);
+    bgResolveDesertion(sim.ctx, deserter);
+    expect(match.teams[0]).toHaveLength(BG_TEAM_SIZE - 1);
+
+    sim.tick(); // opens the OFFER
+    const events = acceptBackfillOffer(sim, spare);
+    expect(match.teams[0]).toHaveLength(BG_TEAM_SIZE);
+    expect(match.teams[0]).toContain(spare);
+    expect(sim.ctx.bgMatches.get(spare)).toBe(match);
+    expect(sim.ctx.bgQueue).toHaveLength(0);
+    // The seat carries the same per-fighter bookkeeping a start-of-match one
+    // does, or the release path would strand them on the field.
+    expect(match.returns.has(spare)).toBe(true);
+    expect(match.preMatchPools.has(spare)).toBe(true);
+    expect(match.stats.get(spare)).toEqual({ kills: 0, deaths: 0, captures: 0, assists: 0 });
+
+    // Welded into the team's match party like everyone else, and recorded as an
+    // auto-added link so the release path unwinds it (a silent false from
+    // joinBgTeamParty would leave them fighting outside party chat and frames).
+    const teamParty = sim.ctx.partyOf(match.teams[0][0]);
+    expect(teamParty?.members).toContain(spare);
+    expect(match.autoPartyPids[0]).toContain(spare);
+
+    expect(logPidsFor(events, joinInProgressLine('Crimson'))).toEqual([spare]);
+    // Everyone still in the match hears it except the joiner, who got their own line.
+    expect(logPidsFor(events, 'A fresh fighter joins the Crimson.')).toEqual(
+      bgAllPids(match)
+        .filter((p) => p !== spare)
+        .sort((a, b) => a - b),
+    );
+    expect(pids).toContain(deserter);
+  });
+
+  it('detaches a DUNGEON-STANDING backfill at the door, like a start-of-match seat', () => {
+    // Post-#3122 the queue hygiene deliberately keeps a player queued through a
+    // dungeon pull, so a backfill candidate really can be standing inside an
+    // instance. startBgMatch detaches such a fighter and stores the DOOR as
+    // their return point; the backfill seat has to do the same, or the match
+    // ends by teleporting them back to interior coordinates whose claim may be
+    // gone, with the instance still holding their aggro.
+    const { sim, match } = staged();
+    const deserter = match.teams[0][0];
+    const spare = queueSpare(sim);
+    enterDungeon(sim.ctx, 'gravewyrm_sanctum', spare);
+    const e = must(sim.entities.get(spare), 'entity');
+    expect(e.pos.x, 'the arrangement itself must hold').toBeGreaterThan(DUNGEON_X_THRESHOLD);
+
+    // Put them on a live hate table so the scrub has something to undo.
+    const inst = must(
+      sim.ctx.instances.find((i) => i.partyKey !== null),
+      'instance',
+    );
+    const mob = must(
+      inst.mobIds.map((id) => sim.entities.get(id)).find((m) => m && !m.dead),
+      'mob',
+    );
+    addThreat(mob, spare, 500);
+    expect(mob.threat.get(spare)).toBe(500);
+
+    bgResolveDesertion(sim.ctx, deserter);
+    sim.tick();
+    bgRespond(sim.ctx, true, spare); // the seat is an OFFER now
+    expect(match.teams[0], 'the arrangement needs the seat actually filled').toContain(spare);
+
+    expect(mob.threat.has(spare), 'the seat must scrub instance threat').toBe(false);
+    const ret = must(match.returns.get(spare), 'return point');
+    expect(ret.x, 'the return point must be the door, not the interior').toBeLessThanOrEqual(
+      DUNGEON_X_THRESHOLD,
+    );
+    endBgMatch(sim.ctx, match, 0, 'caps');
+    expect(e.pos.x, 'the fighter must not be sent back inside').toBeLessThanOrEqual(
+      DUNGEON_X_THRESHOLD,
+    );
+    expect(e.dead).toBe(false);
+  });
+
+  it('leaves the backfilled fighter off the ladder while the rest are scored', () => {
+    const { sim, match } = staged();
+    const deserter = match.teams[0][0];
+    const spare = queueSpare(sim);
+    bgResolveDesertion(sim.ctx, deserter);
+    sim.tick();
+    bgRespond(sim.ctx, true, spare); // the seat is an OFFER now
+    expect(match.backfilled.has(spare)).toBe(true);
+
+    const stayer = must(
+      match.teams[0].find((p) => p !== spare),
+      'stayer',
+    );
+    const spareBefore = must(sim.ctx.players.get(spare), 'player meta').bgRating;
+    const stayerBefore = must(sim.ctx.players.get(stayer), 'player meta').bgRating;
+    endBgMatch(sim.ctx, match, 1, 'caps'); // the backfilled side LOSES
+
+    const spareMeta = must(sim.ctx.players.get(spare), 'player meta');
+    const stayerMeta = must(sim.ctx.players.get(stayer), 'player meta');
+    expect(spareMeta.bgRating).toBe(spareBefore);
+    expect(spareMeta.bgLosses).toBe(0);
+    // Decisive only against a teammate who really did move: same match, same result.
+    expect(stayerMeta.bgRating).toBeLessThan(stayerBefore);
+    expect(stayerMeta.bgLosses).toBe(1);
+  });
+
+  it('records no DRAW for the backfilled fighter either, only for the rest', () => {
+    // The interaction the W-L-D record creates with the unrated seat. A draw is
+    // now a counter in its own right, so the ladder gate has to cover it too:
+    // counting one here would put a backfilled fighter back on the record by the
+    // side door, which is the whole thing the unrated seat promises it will not
+    // do. Neither change could see this case on its own.
+    const { sim, match } = staged();
+    const deserter = match.teams[0][0];
+    const spare = queueSpare(sim);
+    bgResolveDesertion(sim.ctx, deserter);
+    sim.tick();
+    bgRespond(sim.ctx, true, spare);
+    expect(match.backfilled.has(spare)).toBe(true);
+
+    const stayer = must(
+      match.teams[0].find((p) => p !== spare),
+      'stayer',
+    );
+    endBgMatch(sim.ctx, match, null, 'caps'); // a DRAW: no winner
+
+    const spareMeta = must(sim.ctx.players.get(spare), 'player meta');
+    const stayerMeta = must(sim.ctx.players.get(stayer), 'player meta');
+    expect(spareMeta.bgDraws).toBe(0);
+    expect(spareMeta.bgWins).toBe(0);
+    expect(spareMeta.bgLosses).toBe(0);
+    // Decisive only against a teammate who really did record one: same match,
+    // same result, same tick.
+    expect(stayerMeta.bgDraws).toBe(1);
+  });
+
+  it('ASKS before seating, and an away player never consumes the seat', () => {
+    // The reason the seat is an offer rather than a teleport. An away-but-
+    // connected player is exactly who the queue-pop prompt exists to catch, and
+    // a backfill is worse for them than a fresh pop: a filled side is never
+    // offered a backfill again, and a body that never disconnects never
+    // deserts, so a seat burned on someone at their desk-but-away could never
+    // reopen. There is no idle desertion in a live match to recover it.
+    const { sim, match } = staged();
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+    const away = queueSpare(sim);
+    sim.tick();
+
+    // Offered, NOT seated.
+    expect(bgProposalFor(sim.ctx, away), 'the candidate is holding an offer').toBeTruthy();
+    expect(match.teams[0], 'and is not on the field yet').not.toContain(away);
+    expect(match.teams[0]).toHaveLength(BG_TEAM_SIZE - 1);
+
+    // Silence for the whole window is a decline, exactly as for a queue pop.
+    for (let i = 0; i < 20 * (BG_PROPOSAL_SECONDS + 1); i++) sim.tick();
+    expect(match.teams[0], 'silence never seats them').not.toContain(away);
+    // Not merely "still exists": the point is the offer lapsed WITHOUT seating
+    // them and without leaving a stale offer behind.
+    expect(bgProposalFor(sim.ctx, away), 'the lapsed offer is gone').toBeNull();
+    expect(sim.ctx.bgMatches.has(away), 'and never put them in the match').toBe(false);
+  });
+
+  it('holds ONE offer per match while a candidate is deciding', () => {
+    // The seat stays open for the whole answer window, so the pass that reads
+    // "this side is short" reads it again on every tick. Without a guard it
+    // offers the chair to a second candidate, then a third, draining the queue
+    // into competing invitations for one seat (and, found the hard way, slowing
+    // the tick to a crawl as the proposals piled up).
+    const { sim, match } = staged();
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+    const first = queueSpare(sim);
+    const second = queueSpare(sim);
+    sim.tick();
+
+    const offered = [first, second].filter((p) => bgProposalFor(sim.ctx, p));
+    expect(offered, 'exactly one candidate is asked').toHaveLength(1);
+
+    // Ticking through most of the window must not recruit the other one.
+    for (let i = 0; i < 20 * (BG_PROPOSAL_SECONDS - 2); i++) sim.tick();
+    expect(
+      [first, second].filter((p) => bgProposalFor(sim.ctx, p)),
+      'and still only one while they decide',
+    ).toHaveLength(1);
+    expect(sim.ctx.bgProposals.filter((p) => p.backfill?.match === match)).toHaveLength(1);
+  });
+
+  it('does not evict a partial premade friend when the NEXT backfill lands', () => {
+    // The deferred half of the same eviction. joinBgTeamParty sweeps members
+    // who have left the match so the merge is not refused for capacity, and
+    // that sweep used to run over everyone present. On a partial premade the
+    // departed friend is sitting in the party legitimately, so the first
+    // accepted backfill threw them out: same eviction, later and conditional.
+    const sim = makeWorld();
+    const leader = sim.addPlayer('warrior', 'Leader');
+    tp(sim, leader, 0, -40);
+    must(sim.entities.get(leader), 'entity').level = BG_MIN_LEVEL;
+    const friends = [leader];
+    for (let i = 0; i < 2; i++) {
+      const m = sim.addPlayer('priest', `Friend${i}`);
+      tp(sim, m, 0, -40);
+      must(sim.entities.get(m), 'entity').level = BG_MIN_LEVEL;
+      sim.partyInvite(m, leader);
+      sim.partyAccept(m);
+      friends.push(m);
+    }
+    for (let i = 0; i < 7; i++) {
+      const so = sim.addPlayer('rogue', `Solo${i}`);
+      tp(sim, so, 0, -40);
+      must(sim.entities.get(so), 'entity').level = BG_MIN_LEVEL;
+      sim.bgQueueJoin(so);
+    }
+    sim.bgQueueJoin(leader);
+    sim.tick();
+    acceptAllBgOffers(sim);
+    const match = must(sim.bgMatchFor(leader), 'bg match');
+    const team = match.teams[0].includes(leader) ? 0 : 1;
+    toActive(sim, match);
+
+    const deserter = friends[1];
+    bgResolveDesertion(sim.ctx, deserter);
+    expect(
+      must(sim.partyOf(leader), 'party').members,
+      'the friend is still with their group',
+    ).toContain(deserter);
+
+    // Now land a backfill on that same team, which is what runs the sweep.
+    const spare = queueSpare(sim);
+    sim.tick();
+    if (bgProposalFor(sim.ctx, spare)) bgRespond(sim.ctx, true, spare);
+
+    expect(
+      must(sim.partyOf(leader), 'party').members,
+      'and is STILL with them after a backfill joins',
+    ).toContain(deserter);
+    expect(match.teams[team].length + match.teams[1 - team].length).toBeGreaterThan(0);
+  });
+
+  it('charges a DECLINE nothing, and never re-asks that match', () => {
+    // A queue pop charges a decline the lockout, because the fighter is
+    // refusing the thing they queued for. A backfill is not that thing: it is
+    // live, unrated, and carries a scoreline they had no part in. Charging the
+    // whole wait for saying no to a different offer teaches people to stop
+    // answering, and silence is already worse for the team.
+    const { sim, match } = staged();
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+    const picky = queueSpare(sim);
+    sim.tick();
+    expect(bgProposalFor(sim.ctx, picky)).toBeTruthy();
+
+    bgRespond(sim.ctx, false, picky);
+
+    expect(bgRequeueLockedUntil(sim.ctx, picky), 'no lockout for a decline').toBe(0);
+    expect(
+      sim.ctx.bgQueue.some((g) => g.pids.includes(picky)),
+      'and they keep their place in line',
+    ).toBe(true);
+
+    // The seat is still open, so the pass runs again: it must not ask the same
+    // person forever just because refusing was free.
+    for (let i = 0; i < 20 * 3; i++) sim.tick();
+    expect(bgProposalFor(sim.ctx, picky), 'this match does not ask them again').toBeNull();
+    expect(match.teams[0], 'and they were never seated').not.toContain(picky);
+  });
+
+  it('charges SILENCE the lockout, and reopens the seat for the next candidate', () => {
+    // The away player this whole prompt exists to catch. Unlike a decline, a
+    // lapse costs the lockout, or an idle client would be re-offered the seat
+    // every time it reopened and burn it indefinitely.
+    const { sim, match } = staged();
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+    const away = queueSpare(sim);
+    sim.tick();
+    expect(bgProposalFor(sim.ctx, away)).toBeTruthy();
+
+    for (let i = 0; i < 20 * (BG_PROPOSAL_SECONDS + 1); i++) sim.tick();
+    expect(bgRequeueLockedUntil(sim.ctx, away), 'silence costs the lockout').toBeGreaterThan(0);
+
+    // ...and the seat is genuinely back on offer after a LAPSE, not only after
+    // a decline, which was the arm with no coverage.
+    const next = queueSpare(sim);
+    sim.tick();
+    expect(bgProposalFor(sim.ctx, next), 'the seat reopens for the next candidate').toBeTruthy();
+    bgRespond(sim.ctx, true, next);
+    expect(match.teams[0]).toContain(next);
+  });
+
+  it('gives a WHOLE premade no party seat for its backfill, and keeps them together', () => {
+    // The premade arms so far are partial (3+2). A team that queued as one
+    // whole five records no auto-added links at all, so the join has nothing to
+    // sweep and correctly refuses for capacity rather than inventing a group or
+    // evicting one of the five.
+    const sim = makeWorld();
+    const leader = sim.addPlayer('warrior', 'Cap');
+    tp(sim, leader, 0, -40);
+    must(sim.entities.get(leader), 'entity').level = BG_MIN_LEVEL;
+    const five = [leader];
+    for (let i = 0; i < 4; i++) {
+      const m = sim.addPlayer('priest', `Mate${i}`);
+      tp(sim, m, 0, -40);
+      must(sim.entities.get(m), 'entity').level = BG_MIN_LEVEL;
+      sim.partyInvite(m, leader);
+      sim.partyAccept(m);
+      five.push(m);
+    }
+    for (let i = 0; i < 5; i++) {
+      const so = sim.addPlayer('rogue', `Sol${i}`);
+      tp(sim, so, 0, -40);
+      must(sim.entities.get(so), 'entity').level = BG_MIN_LEVEL;
+      sim.bgQueueJoin(so);
+    }
+    sim.bgQueueJoin(leader);
+    // A whole five against five solos is the premade-vs-pugs shape the
+    // matchmaker deliberately holds back, so wait it out rather than fighting
+    // the fairness rule.
+    for (let i = 0; i < 20 * (BG_PREMADE_HOLD + 2) && !sim.bgMatchFor(leader); i++) {
+      sim.tick();
+      acceptAllBgOffers(sim);
+    }
+    const match = must(sim.bgMatchFor(leader), 'bg match');
+    expect(match, 'the arrangement needs a live match').toBeTruthy();
+    const team = match.teams[0].includes(leader) ? 0 : 1;
+    expect(match.autoPartyPids[team], 'a whole premade records no auto links').toEqual([]);
+    toActive(sim, match);
+
+    const deserter = five[2];
+    bgResolveDesertion(sim.ctx, deserter);
+    const spare = queueSpare(sim);
+    sim.tick();
+    if (bgProposalFor(sim.ctx, spare)) bgRespond(sim.ctx, true, spare);
+
+    // The four who stayed still have their own group, with the deserter in it.
+    const party = must(sim.partyOf(leader), 'party');
+    expect(party.members, 'the friends are not broken up').toContain(deserter);
+    expect(party.members, 'and the backfill got no seat in their group').not.toContain(spare);
+  });
+
+  it('does not seat into a match that ENDED while the offer was open', () => {
+    // The blocker the offer design introduced. Teardown is once-only, so a
+    // fighter seated after releaseBgFighters has run is in bgMatches with
+    // nothing left to take them out: they can neither play nor queue again,
+    // and the slot has already been freed for a fresh match on the same field.
+    const { sim, match } = staged();
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+    const spare = queueSpare(sim);
+    sim.tick();
+    expect(bgProposalFor(sim.ctx, spare), 'the offer is live').toBeTruthy();
+
+    endBgMatch(sim.ctx, match, 1, 'caps');
+    expect(match.fightersReleased, 'the arrangement really did tear the match down').toBe(true);
+
+    bgRespond(sim.ctx, true, spare); // accept AFTER the end
+
+    expect(sim.ctx.bgMatches.has(spare), 'the joiner is not stranded in a dead match').toBe(false);
+    expect(match.teams[0], 'and never joined its roster').not.toContain(spare);
+    // ...and it costs them nothing: the seat vanishing is not their fault.
+    expect(bgQueueSize(sim.ctx), 'they keep their place in line').toBeGreaterThan(0);
+    expect(sim.ctx.bgQueue.some((g) => g.pids.includes(spare))).toBe(true);
+  });
+
+  it('re-checks the seat rule at ACCEPT time, not only when the offer opened', () => {
+    // Both cutoffs (a match not nearly over, a side not one capture from
+    // losing) are read when the offer opens and can be 30 seconds stale by the
+    // time it is answered. Here the enemy takes the deciding capture during
+    // the window, which is exactly the loss nobody should be dropped into.
+    const { sim, match } = staged();
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+    const spare = queueSpare(sim);
+    sim.tick();
+    expect(bgProposalFor(sim.ctx, spare)).toBeTruthy();
+
+    match.scores = match.scores[0] === undefined ? match.scores : [0, BG_CAPS_TO_WIN - 1];
+    bgRespond(sim.ctx, true, spare);
+
+    expect(match.teams[0], 'the seat is refused on the fresh numbers').not.toContain(spare);
+    expect(
+      sim.ctx.bgQueue.some((g) => g.pids.includes(spare)),
+      'and they keep their place',
+    ).toBe(true);
+  });
+
+  it('offers the seat to the NEXT candidate after one declines', () => {
+    // The seat must survive a refusal, or declining would cost the four
+    // remaining fighters their backfill entirely.
+    const { sim, match } = staged();
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+    const first = queueSpare(sim);
+    sim.tick();
+    expect(bgProposalFor(sim.ctx, first)).toBeTruthy();
+
+    bgRespond(sim.ctx, false, first); // decline
+    expect(match.teams[0], 'declining seats nobody').not.toContain(first);
+
+    const second = queueSpare(sim);
+    sim.tick();
+    bgRespond(sim.ctx, true, second);
+    expect(match.teams[0], 'the seat went to the next candidate').toContain(second);
+    expect(match.teams[0]).toHaveLength(BG_TEAM_SIZE);
+  });
+
+  it('never frees the live match slot when a backfill offer lapses', () => {
+    // A backfill offer reserves no slot: the match it fills is already standing
+    // on one. Releasing it on teardown would hand a LIVE field to the matchmaker.
+    const { sim, match } = staged();
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+    const away = queueSpare(sim);
+    sim.tick();
+    expect(sim.ctx.bgBusySlots.has(match.slot), 'the match holds its slot').toBe(true);
+
+    for (let i = 0; i < 20 * (BG_PROPOSAL_SECONDS + 1); i++) sim.tick();
+    expect(sim.ctx.bgBusySlots.has(match.slot), 'and still holds it after the offer lapses').toBe(
+      true,
+    );
+    expect(sim.ctx.bgMatches.has(away), 'and never seated the candidate').toBe(false);
+  });
+
+  it('charges a backfilled fighter nothing if they leave too', () => {
+    const { sim, match } = staged();
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+    const spare = queueSpare(sim);
+    sim.tick();
+    bgRespond(sim.ctx, true, spare); // the seat is an OFFER now
+    expect(match.backfilled.has(spare)).toBe(true);
+
+    const before = must(sim.ctx.players.get(spare), 'player meta').bgRating;
+    bgResolveDesertion(sim.ctx, spare);
+    expect(must(sim.ctx.players.get(spare), 'player meta').bgRating).toBe(before);
+    expect(must(sim.ctx.players.get(spare), 'player meta').bgLosses).toBe(0);
+  });
+
+  it('refuses the seat once the short side is one capture from losing', () => {
+    const { sim, match } = staged();
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+    const spare = queueSpare(sim);
+    match.scores[1] = BG_CAPS_TO_WIN - 1;
+
+    sim.tick();
+    expect(match.teams[0]).toHaveLength(BG_TEAM_SIZE - 1);
+    expect(sim.ctx.bgMatches.has(spare)).toBe(false);
+    // Still queued, not silently dropped: the match refused them, nothing else.
+    expect(bgQueueSize(sim.ctx)).toBe(1);
+  });
+
+  it('never breaks up a queued pair to fill one seat', () => {
+    const { sim, match } = staged();
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+    const a = sim.addPlayer('warrior', 'PairA');
+    const b = sim.addPlayer('priest', 'PairB');
+    for (const pid of [a, b]) {
+      tp(sim, pid, 8, -40);
+      must(sim.entities.get(pid), 'entity').level = 20;
+    }
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
+    sim.bgQueueJoin(a);
+
+    sim.tick();
+    expect(match.teams[0]).toHaveLength(BG_TEAM_SIZE - 1);
+    expect(sim.ctx.bgMatches.has(a)).toBe(false);
+    expect(sim.ctx.bgMatches.has(b)).toBe(false);
+  });
+});
+
+describe('Thornhollow Fields: a drawn match is recorded, not swallowed', () => {
+  // A draw moved the ladder (eloDelta at score 0.5) but incremented no counter,
+  // so the match vanished from the player's record entirely: someone with one
+  // win and one draw read "1-0". It is now the third figure of W-L-D.
+  it('counts a draw for every fighter and leaves wins and losses alone', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.ctx.bgMatches.get(pids[0]), 'bg match');
+    toActive(sim, match);
+    const fighter = match.teams[0][0];
+    const before = must(sim.ctx.players.get(fighter), 'player meta');
+    expect(before.bgDraws).toBe(0);
+
+    endBgMatch(sim.ctx, match, null, 'timeout'); // null winner = drawn
+
+    for (const pid of pids) {
+      const meta = must(sim.ctx.players.get(pid), 'player meta');
+      expect(meta.bgDraws).toBe(1);
+      // Decisive against the old behavior, which would have moved neither and
+      // against a naive fix that counts a draw as a loss for one side.
+      expect(meta.bgWins).toBe(0);
+      expect(meta.bgLosses).toBe(0);
+    }
+  });
+
+  it('surfaces the draw on the readout the record is rendered from', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.ctx.bgMatches.get(pids[0]), 'bg match');
+    toActive(sim, match);
+    endBgMatch(sim.ctx, match, null, 'timeout');
+    expect(must(sim.bgInfoFor(pids[0], []), 'bg info').draws).toBe(1);
+  });
+
+  it('persists the draw across a save and load', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.ctx.bgMatches.get(pids[0]), 'bg match');
+    toActive(sim, match);
+    endBgMatch(sim.ctx, match, null, 'timeout');
+
+    const state = sim.serializeCharacter(pids[0]);
+    if (!state) throw new Error('failed to serialize the fighter');
+    const restored = makeWorld();
+    const reloaded = restored.addPlayer('warrior', 'Reloaded', { state });
+    expect(must(restored.ctx.players.get(reloaded), 'player meta').bgDraws).toBe(1);
+  });
+
+  it('writes no draws field for a character who has never drawn', () => {
+    // The saves of every existing character must stay byte-equal, which is the
+    // parity-stable rule the battleground block already followed.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Fresh');
+    const state = sim.serializeCharacter(pid) as unknown as Record<string, unknown>;
+    expect(state.bgDraws).toBeUndefined();
+    expect(state.arena1v1Draws).toBeUndefined();
+  });
+
+  it('writes no draws field for a character with a record but no draw', () => {
+    // The case above uses a FRESH character, whose battleground block is not
+    // written at all, so it proves the outer gate rather than the conditional
+    // spread inside it. This one has a real record, which is the population the
+    // byte-equal promise actually matters for: their saves must not gain a key.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Veteran');
+    const meta = must(sim.ctx.players.get(pid), 'player meta');
+    meta.bgWins = 1;
+    meta.bgDraws = 0;
+    meta.arenaWins = 1;
+    meta.arenaDraws = 0;
+
+    const state = sim.serializeCharacter(pid) as unknown as Record<string, unknown>;
+    expect(state.bgWins, 'the arrangement really did write the block').toBe(1);
+    expect(state.bgDraws, 'a zero draw count adds no key').toBeUndefined();
+    expect(state.arena1v1Draws).toBeUndefined();
+  });
+});
+
+describe('Thornhollow Fields: talents are the fighter own to change', () => {
+  // A queue pop can catch a player in a farming build, and the match is rated,
+  // so being seated in the wrong spec costs rating with no counterplay. Gear
+  // was already swappable in here (equipItem carries no match gate at all), so
+  // the talent block was the one half of a build a fighter could not fix.
+  // Combat is still the line: the refusal moves from "during a battleground"
+  // to the same in-combat rule that governs the open world.
+  const seatedFighter = (): { sim: Sim; match: BgMatch; pid: number } => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.ctx.bgMatches.get(pids[0]), 'bg match');
+    toActive(sim, match);
+    return { sim, match, pid: pids[0] };
+  };
+
+  it('lets a fighter respec inside a live match while out of combat', () => {
+    const { sim, match, pid } = seatedFighter();
+    expect(match.state).toBe('active');
+    expect(sim.ctx.bgMatches.has(pid)).toBe(true);
+    const fighter = must(sim.entities.get(pid), 'entity');
+    fighter.inCombat = false;
+
+    expect(sim.setSpec('fury', pid)).toBe(true);
+    expect(must(sim.ctx.players.get(pid), 'player meta').talents.spec).toBe('fury');
+    expect(sim.selectTalentRow(5, 'war_row_double_charge', pid)).toBe(true);
+    expect(must(sim.ctx.players.get(pid), 'player meta').talents.rows[5]).toBe(
+      'war_row_double_charge',
+    );
+    expect(sim.respec(pid)).toBe(true);
+    expect(must(sim.ctx.players.get(pid), 'player meta').talents.rows[5]).toBeUndefined();
+  });
+
+  it('still refuses a respec in combat, and says so without naming the battleground', () => {
+    const { sim, pid } = seatedFighter();
+    const fighter = must(sim.entities.get(pid), 'entity');
+    fighter.inCombat = true;
+
+    const before = must(sim.ctx.players.get(pid), 'player meta').talents.spec;
+    expect(sim.setSpec('fury', pid)).toBe(false);
+    expect(sim.respec(pid)).toBe(false);
+    expect(must(sim.ctx.players.get(pid), 'player meta').talents.spec).toBe(before);
+    // The refusal a fighter now sees is the plain combat rule. The old
+    // battleground-specific line is gone from the emit surface entirely, which
+    // is why its matcher entry is deleted in the same change.
+    const texts = errorTexts(sim.tick());
+    expect(texts).toContain('You cannot change talents in combat.');
+    expect(texts).not.toContain('You cannot change talents during a battleground.');
+  });
+
+  it('leaves the arena lock alone', () => {
+    const sim = makeWorld();
+    const a = sim.addPlayer('warrior', 'ArenaA');
+    must(sim.entities.get(a), 'entity').level = 20;
+    must(sim.entities.get(a), 'entity').inCombat = false;
+    // Out of combat and out of any match, the same calls go through: that is
+    // what makes the refusals below attributable to the arena entry alone.
+    expect(sim.setSpec('fury', a)).toBe(true);
+    expect(sim.respec(a)).toBe(true);
+
+    // talentLockReason only asks arenaMatches.has(), so the membership is the
+    // whole fixture; a full ArenaMatch would drag updateArena into the assert.
+    sim.ctx.arenaMatches.set(a, {} as never);
+    expect(sim.setSpec('arms', a)).toBe(false);
+    expect(sim.respec(a)).toBe(false);
+    expect(must(sim.ctx.players.get(a), 'player meta').talents.spec).toBe('fury');
+  });
+});
+
+describe('Thornhollow Fields: a pet that walks in alive walks back out alive', () => {
+  // The arena has kept this parenthesis since issue #1600 (ArenaMatch.preMatchPets),
+  // but the battleground never had it, and a wave respawn raises only the fighter.
+  // So a hunter, warlock or mage who lost their companion mid-match left the field
+  // still without it: most of their kit gone for one death, in rated content.
+  const petOwnerInMatch = (
+    cls: 'hunter' | 'warlock',
+  ): { sim: Sim; match: BgMatch; owner: number; pet: Entity } => {
+    const sim = makeWorld();
+    const pids: number[] = [];
+    for (let i = 0; i < 10; i++) {
+      const pid = sim.addPlayer(i === 0 ? cls : 'warrior', `P${i}`);
+      tp(sim, pid, (i % 5) * 2 - 4, -40);
+      must(sim.entities.get(pid), 'entity').level = 20;
+      pids.push(pid);
+    }
+    const owner = pids[0];
+    let pet: Entity;
+    if (cls === 'hunter') {
+      restorePet(sim.ctx, must(sim.entities.get(owner), 'entity'), {
+        templateId: 'wild_boar',
+        name: 'Rip',
+        level: 20,
+        hp: 40,
+        dead: false,
+        mode: 'defensive',
+      });
+      pet = must(sim.petOf(owner, true), 'pet');
+    } else {
+      summonPet(sim.ctx, must(sim.entities.get(owner), 'entity'), 'emberkin');
+      pet = must(sim.petOf(owner), 'pet');
+    }
+    for (const pid of pids) sim.bgQueueJoin(pid);
+    // The pop lands as an OFFER now (battleground_proposal.ts); accepting it is
+    // what seats the match, same as tenInQueue above.
+    sim.tick();
+    acceptBgOffer(sim, pids);
+    const match = must(sim.ctx.bgMatches.get(owner), 'bg match');
+    toActive(sim, match);
+    return { sim, match, owner, pet };
+  };
+
+  it('stands a beast back up beside its owner when the match ends', () => {
+    const { sim, match, owner, pet } = petOwnerInMatch('hunter');
+    expect(match.preMatchPets.has(owner)).toBe(true);
+    kill(sim, pet.id);
+    expect(must(sim.entities.get(pet.id), 'entity').dead).toBe(true);
+
+    endBgMatch(sim.ctx, match, 0, 'caps');
+    const back = sim.petOf(owner, true);
+    expect(back).toBeTruthy();
+    expect(must(back, 'back').dead).toBe(false);
+    // Beside the owner at their return spot, never left out on the field.
+    const ownerEntity = must(sim.entities.get(owner), 'entity');
+    expect(
+      Math.hypot(
+        must(back, 'back').pos.x - ownerEntity.pos.x,
+        must(back, 'back').pos.z - ownerEntity.pos.z,
+      ),
+    ).toBeLessThan(12);
+  });
+
+  it('rebuilds a warlock demon, whose corpse does not survive its death', () => {
+    const { sim, match, owner, pet } = petOwnerInMatch('warlock');
+    const originalId = pet.id;
+    kill(sim, pet.id);
+    // Let the demon's corpse unravel: this is the arm that cannot revive in place.
+    for (let i = 0; i < 20 * 6; i++) sim.tick();
+
+    endBgMatch(sim.ctx, match, 0, 'caps');
+    const back = sim.petOf(owner);
+    expect(back).toBeTruthy();
+    expect(must(back, 'back').dead).toBe(false);
+    expect(must(back, 'back').id).not.toBe(originalId); // a rebuild, not a revive in place
+  });
+
+  it('hands the pet back to a deserter too, since leaving is also an exit', () => {
+    const { sim, owner, pet } = petOwnerInMatch('hunter');
+    kill(sim, pet.id);
+    bgResolveDesertion(sim.ctx, owner);
+    const back = sim.petOf(owner, true);
+    expect(back).toBeTruthy();
+    expect(must(back, 'back').dead).toBe(false);
+  });
+
+  it('never hands back a pet that was already a corpse on the way in', () => {
+    // Only what the match took is owed back, the same rule the arena applies.
+    const { match, owner, pet } = petOwnerInMatch('hunter');
+    expect(match.preMatchPets.has(owner)).toBe(true);
+    const other = match.teams[0].find((p) => p !== owner) ?? match.teams[1][0];
+    expect(match.preMatchPets.has(other)).toBe(false);
+    expect(pet.dead).toBe(false);
+  });
+
+  it('snapshots a BACKFILLED hunter too, so their pet also walks back out', () => {
+    // seatBackfill copies the same per-fighter state startBgMatch takes
+    // (returns, pools, stats); the pet snapshot is part of that promise, or a
+    // backfiller whose pet dies leaves the field without it while a
+    // start-of-match fighter gets theirs back.
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.ctx.bgMatches.get(pids[0]), 'bg match');
+    toActive(sim, match);
+
+    const spare = sim.addPlayer('hunter', 'Spare');
+    tp(sim, spare, 6, -40);
+    const spareEntity = must(sim.entities.get(spare), 'spare entity');
+    spareEntity.level = 20;
+    restorePet(sim.ctx, spareEntity, {
+      templateId: 'wild_boar',
+      name: 'Rip',
+      level: 20,
+      hp: 40,
+      dead: false,
+      mode: 'defensive',
+    });
+    const pet = must(sim.petOf(spare, true), 'pet');
+    sim.bgQueueJoin(spare);
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+    sim.tick(); // opens the OFFER
+    acceptBackfillOffer(sim, spare);
+    expect(match.teams[0]).toContain(spare);
+    expect(match.preMatchPets.has(spare)).toBe(true);
+
+    kill(sim, pet.id);
+    expect(must(sim.entities.get(pet.id), 'pet entity').dead).toBe(true);
+    endBgMatch(sim.ctx, match, 0, 'caps');
+    const back = sim.petOf(spare, true);
+    expect(back).toBeTruthy();
+    expect(must(back, 'back').dead).toBe(false);
+  });
+});
+
+describe('Thornhollow Fields: the wave brings your pet back too', () => {
+  // The wave raises fighters directly and never calls reviveAt, so the pet
+  // hand-back had to be asked for at that site as well. Without it a hunter,
+  // warlock or mage played the rest of the match without a companion after one
+  // death, while every other class came back whole.
+  const hunterInMatch = (): { sim: Sim; match: BgMatch; owner: number; pet: Entity } => {
+    const sim = makeWorld();
+    const pids: number[] = [];
+    for (let i = 0; i < 10; i++) {
+      const pid = sim.addPlayer(i === 0 ? 'hunter' : 'warrior', `W${i}`);
+      tp(sim, pid, (i % 5) * 2 - 4, -40);
+      must(sim.entities.get(pid), 'entity').level = 20;
+      pids.push(pid);
+    }
+    const owner = pids[0];
+    restorePet(sim.ctx, must(sim.entities.get(owner), 'entity'), {
+      templateId: 'wild_boar',
+      name: 'Rip',
+      level: 20,
+      hp: 40,
+      dead: false,
+      mode: 'defensive',
+    });
+    const pet = must(sim.petOf(owner, true), 'pet');
+    for (const pid of pids) sim.bgQueueJoin(pid);
+    // The pop lands as an OFFER now (battleground_proposal.ts); accepting it is
+    // what seats the match, same as tenInQueue above.
+    sim.tick();
+    acceptBgOffer(sim, pids);
+    const match = must(sim.ctx.bgMatches.get(owner), 'bg match');
+    toActive(sim, match);
+    return { sim, match, owner, pet };
+  };
+
+  it('stands the pet back up when the wave raises its owner', () => {
+    const { sim, owner, pet } = hunterInMatch();
+    kill(sim, owner); // the owner arm kills the pet with them
+    expect(must(sim.entities.get(pet.id), 'entity').dead).toBe(true);
+    sim.releaseSpirit(owner); // become a ghost so the wave is eligible to raise you
+
+    // Run past a full wave period so the raise definitely lands.
+    for (let i = 0; i < 20 * (BG_WAVE_PERIOD + BG_WAVE_OFFSET + 2); i++) sim.tick();
+
+    expect(must(sim.entities.get(owner), 'entity').dead).toBe(false);
+    const back = sim.petOf(owner, true);
+    expect(back).toBeTruthy();
+    expect(must(back, 'back').dead).toBe(false);
+  });
+
+  it('hands nothing back to an owner who had no pet', () => {
+    // The negative that keeps the case above honest: the wave must not conjure a
+    // companion for the nine warriors it raises alongside the hunter.
+    const { sim, match, owner } = hunterInMatch();
+    const warrior = match.teams[0].find((p) => p !== owner) ?? match.teams[1][0];
+    kill(sim, warrior);
+    sim.releaseSpirit(warrior);
+    for (let i = 0; i < 20 * (BG_WAVE_PERIOD + BG_WAVE_OFFSET + 2); i++) sim.tick();
+    expect(must(sim.entities.get(warrior), 'entity').dead).toBe(false);
+    expect(sim.petOf(warrior, true)).toBeFalsy();
+  });
+});
+
+describe('Thornhollow Fields: /bg reaches the whole match, both teams', () => {
+  // Players were falling back to General to say anything to the opposing side,
+  // which broadcasts it realm-wide. /bg is deliberately CROSS-TEAM for exactly
+  // that reason; the team already has /p, since the match welds each side into
+  // one party.
+  const chatPidsFor = (events: SimEvent[], text: string): number[] =>
+    events
+      .filter(
+        (e): e is Extract<SimEvent, { type: 'chat' }> =>
+          e.type === 'chat' && e.channel === 'battleground' && e.text === text,
+      )
+      .map((e) => e.pid ?? -1)
+      .sort((a, b) => a - b);
+
+  it('delivers to every fighter in the match, including the enemy team', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.ctx.bgMatches.get(pids[0]), 'bg match');
+    toActive(sim, match);
+    const speaker = match.teams[0][0];
+
+    const sent = sim.chat('/bg incoming mid', speaker);
+    expect(sent).toEqual({ channel: 'battleground', message: 'incoming mid' });
+    const heard = chatPidsFor(sim.tick(), 'incoming mid');
+    expect(heard).toEqual(bgAllPids(match).sort((a, b) => a - b));
+    // Decisive on the cross-team claim: the OTHER side really is in that list.
+    for (const enemy of match.teams[1]) expect(heard).toContain(enemy);
+  });
+
+  it('refuses outside a match, and says so', () => {
+    const sim = makeWorld();
+    const lone = sim.addPlayer('warrior', 'Lone');
+    must(sim.entities.get(lone), 'entity').level = 20;
+
+    expect(sim.chat('/bg anyone there', lone)).toBeNull();
+    expect(errorTexts(sim.tick())).toContain('You are not in a battleground.');
+  });
+
+  it('reaches a backfilled or mid-match roster, not a snapshot taken at start', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.ctx.bgMatches.get(pids[0]), 'bg match');
+    toActive(sim, match);
+    const speaker = match.teams[1][0];
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+
+    sim.chat('/bg they are a man down', speaker);
+    const heard = chatPidsFor(sim.tick(), 'they are a man down');
+    // The deserter is gone from the roster, so they are gone from the channel.
+    expect(heard).toEqual(bgAllPids(match).sort((a, b) => a - b));
+    expect(heard).toHaveLength(BG_TEAM_SIZE * 2 - 1);
+  });
+
+  it('accepts a live fighter even if their per-player match index is stale', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.ctx.bgMatches.get(pids[0]), 'bg match');
+    toActive(sim, match);
+    const speaker = match.teams[0][0];
+    sim.ctx.bgMatches.delete(speaker);
+
+    const sent = sim.chat('/bg still in the fight', speaker);
+    expect(sent).toEqual({ channel: 'battleground', message: 'still in the fight' });
+    const heard = chatPidsFor(sim.tick(), 'still in the fight');
+    expect(heard).toEqual(bgAllPids(match).sort((a, b) => a - b));
+    expect(errorTexts(sim.tick())).not.toContain('You are not in a battleground.');
+  });
+
+  it('refuses after the match leaves the active phase', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.ctx.bgMatches.get(pids[0]), 'bg match');
+    toActive(sim, match);
+    const speaker = match.teams[0][0];
+    match.state = 'ended';
+
+    expect(sim.chat('/bg postgame leak check', speaker)).toBeNull();
+    expect(errorTexts(sim.tick())).toContain('You are not in a battleground.');
   });
 });

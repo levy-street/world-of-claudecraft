@@ -29,9 +29,9 @@ import type { Entity, SimEvent } from '../src/sim/types';
 // The ladder, restated independently of the catalog so a threshold, renown
 // value, or title text edited in content reds here too.
 const LADDER = [
-  { id: 'pvp_honor_sergeant', amount: 10_000, renown: 10, title: 'Sergeant' },
-  { id: 'pvp_honor_knight_lieutenant', amount: 40_000, renown: 25, title: 'Knight-Lieutenant' },
-  { id: 'pvp_honor_field_marshal', amount: 150_000, renown: 50, title: 'Field Marshal' },
+  { id: 'pvp_honor_sergeant', amount: 10_000, renown: 10, title: 'Linebreaker' },
+  { id: 'pvp_honor_knight_lieutenant', amount: 40_000, renown: 25, title: 'Fieldreaver' },
+  { id: 'pvp_honor_field_marshal', amount: 150_000, renown: 50, title: 'Warcrowned' },
 ] as const;
 
 function world(): Sim {
@@ -108,8 +108,13 @@ function unlockEvents(events: SimEvent[]): { deedId: string; retro?: boolean }[]
 describe('the lifetime-honor rank ladder (catalog)', () => {
   it('ships three appended pvp title deeds on the meter, in ascending order', () => {
     // Appended, never inserted: DEED_ORDER derives from table order, so the
-    // three must be the LAST three ids, in ladder order.
-    expect(DEED_ORDER.slice(-3)).toEqual(LADDER.map((rank) => rank.id));
+    // three must sit contiguous in ladder order at their release point. The pin
+    // is anchored at the ladder's own position because tail-relative indexing
+    // breaks on every later catalog append (the absolute tail is deeds_content's
+    // pin, not this file's).
+    const at = DEED_ORDER.indexOf(LADDER[0].id);
+    expect(at).toBeGreaterThanOrEqual(0);
+    expect(DEED_ORDER.slice(at, at + LADDER.length)).toEqual(LADDER.map((rank) => rank.id));
     for (const rank of LADDER) {
       const def = DEEDS[rank.id];
       expect(def, rank.id).toBeDefined();

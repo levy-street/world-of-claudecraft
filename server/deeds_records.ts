@@ -77,13 +77,15 @@ export function isPubliclyListableDeedId(id: string): boolean {
 export const FIRST_KOI_DEED_ID = 'col_glimmerfin';
 
 /** The Discord activity-feed payload for one deed unlock, or null when the
- *  unlock is not feed-worthy. Feed-worthy is exactly a title-rewarding deed or
- *  the first-koi deed: the professions moments the rareloot detector cannot see
- *  (no loot roll fires for a catch, a craft, or a deed; the first masterwork
- *  rides prog_masterwright's title). A Discord channel is precisely the
- *  third-party public surface the hidden-deed contract covers, so this routes
- *  through isPubliclyListableDeedId and fails CLOSED on hidden or unknown ids.
- *  Pure so the gate is unit-testable. */
+ *  unlock is not feed-worthy. Feed-worthy is exactly a title-rewarding deed, a
+ *  border-rewarding deed (Phase 18: every cosmetic-reward deed is already
+ *  marquee, and its card is name-only, no title and no item), or the first-koi
+ *  deed: the moments the rareloot detector cannot see (no loot roll fires for
+ *  a catch, a craft, or a deed; the first masterwork rides prog_masterwright's
+ *  title). A Discord channel is precisely the third-party public surface the
+ *  hidden-deed contract covers, so this routes through isPubliclyListableDeedId
+ *  and fails CLOSED on hidden or unknown ids. Pure so the gate is
+ *  unit-testable. */
 export function discordFeedDeed(
   deedId: string,
 ): { deedName: string; deedTitle?: string; itemName?: string } | null {
@@ -92,6 +94,7 @@ export function discordFeedDeed(
   if (deedId === FIRST_KOI_DEED_ID) {
     return { deedName: def.name, itemName: ITEMS[FISHING_RARE_ID]?.name ?? FISHING_RARE_ID };
   }
+  if (def.reward?.kind === 'border') return { deedName: def.name };
   if (def.reward?.kind === 'title') return { deedName: def.name, deedTitle: def.reward.text };
   return null;
 }

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -20,6 +20,15 @@ function gridInRadius(grid: SpatialGrid, x: number, z: number, radius: number): 
   return out;
 }
 
+function insertDistantEntities(grid: SpatialGrid, count: number, firstId = 100): void {
+  for (let offset = 0; offset < count; offset++) {
+    grid.insert({
+      id: firstId + offset,
+      pos: { x: 1_000 + offset * 40, y: 0, z: 1_000 },
+    } as Entity);
+  }
+}
+
 describe('spatial grid', () => {
   it('radius queries match a brute-force scan across the whole world', () => {
     const sim = new Sim({ seed: 20061, playerClass: 'warrior' });
@@ -32,8 +41,92 @@ describe('spatial grid', () => {
     }
     probes.push([900, 0, 120]); // dungeon strip
     for (const [x, z, r] of probes) {
-      expect(gridInRadius(sim.grid, x, z, r)).toEqual(bruteForceInRadius(sim, x, z, r));
+      const bruteForce = bruteForceInRadius(sim, x, z, r);
+      expect(gridInRadius(sim.grid, x, z, r)).toEqual(bruteForce);
+      expect(sim.grid.hasInRadius(x, z, r)).toBe(bruteForce.size > 0);
     }
+  });
+
+  it('keeps inclusive boundaries and one-unit stale-cell drift exact', () => {
+    for (const fillerCount of [0, 32]) {
+      const boundaryGrid = new SpatialGrid();
+      const boundary = { id: 1, pos: { x: 3, y: 0, z: 4 } } as Entity;
+      boundaryGrid.insert(boundary);
+      insertDistantEntities(boundaryGrid, fillerCount);
+      expect(boundaryGrid.hasInRadius(0, 0, 5)).toBe(true);
+      boundary.pos.z = 4.0001;
+      expect(boundaryGrid.hasInRadius(0, 0, 5)).toBe(false);
+    }
+
+    const drifts = [
+      { id: 2, storedX: 31.5, currentX: 32.25, queryX: 64.1 },
+      { id: 3, storedX: -31.5, currentX: -32.25, queryX: -64.1 },
+    ];
+    for (const drift of drifts) {
+      const grid = new SpatialGrid();
+      const entity = { id: drift.id, pos: { x: drift.storedX, y: 0, z: 0 } } as Entity;
+      grid.insert(entity);
+      insertDistantEntities(grid, 32);
+      entity.pos.x = drift.currentX;
+      expect(grid.hasInRadius(drift.queryX, 0, 31.9)).toBe(true);
+    }
+  });
+
+  it('stops an existence query after the first matching entity', () => {
+    for (const fillerCount of [0, 31]) {
+      const grid = new SpatialGrid();
+      const first = { id: 1, pos: { x: 0, y: 0, z: 0 } } as Entity;
+      const unread = { id: 2, pos: { x: 1, y: 0, z: 0 } } as Entity;
+      grid.insert(first);
+      grid.insert(unread);
+      insertDistantEntities(grid, fillerCount);
+      Object.defineProperty(unread, 'pos', {
+        configurable: true,
+        get() {
+          throw new Error('query did not stop after its first match');
+        },
+      });
+
+      expect(grid.hasInRadius(0, 0, 5)).toBe(true);
+    }
+  });
+
+  it('limits direct entity walks to small grids before switching to cell lookups', () => {
+    type InspectableGrid = { cells: Map<number, Entity[]> };
+
+    const atLinearCap = new SpatialGrid();
+    insertDistantEntities(atLinearCap, 32);
+    const capCells = (atLinearCap as unknown as InspectableGrid).cells;
+    const capCellLookup = vi.spyOn(capCells, 'get');
+
+    expect(atLinearCap.hasInRadius(0, 0, 100)).toBe(false);
+    expect(capCellLookup).not.toHaveBeenCalled();
+
+    const large = new SpatialGrid();
+    for (let id = 1; id <= 33; id++) {
+      large.insert({ id, pos: { x: 500 + id, y: 0, z: 0 } } as Entity);
+    }
+    const largeCells = (large as unknown as InspectableGrid).cells;
+    const largeCellLookup = vi.spyOn(largeCells, 'get');
+
+    expect(large.hasInRadius(0, 0, 100)).toBe(false);
+    expect(largeCellLookup).toHaveBeenCalled();
+
+    const atCellWindowSize = new SpatialGrid();
+    insertDistantEntities(atCellWindowSize, 1);
+    const windowCells = (atCellWindowSize as unknown as InspectableGrid).cells;
+    const windowCellLookup = vi.spyOn(windowCells, 'get');
+
+    expect(atCellWindowSize.hasInRadius(16, 16, 1)).toBe(false);
+    expect(windowCellLookup).not.toHaveBeenCalled();
+
+    const overCellWindowSize = new SpatialGrid();
+    insertDistantEntities(overCellWindowSize, 2);
+    const overWindowCells = (overCellWindowSize as unknown as InspectableGrid).cells;
+    const overWindowCellLookup = vi.spyOn(overWindowCells, 'get');
+
+    expect(overCellWindowSize.hasInRadius(16, 16, 1)).toBe(false);
+    expect(overWindowCellLookup).toHaveBeenCalled();
   });
 
   it('keeps the roster exact on spawn and despawn without a tick', () => {

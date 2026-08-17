@@ -2,10 +2,18 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   type CharacterWeaponAura,
+  characterAvengingWrathActive,
+  characterPaladinWingsActive,
   characterRecklessnessActive,
   characterSoulRendActive,
+  characterVeilboundState,
   characterWeaponAuraColor,
   characterWeaponAuraInto,
+  characterWeaponAuraMode,
+  hunterPetFerocityStage,
+  hunterPetFrenzyActive,
+  hunterPetVisualScale,
+  tithefiendEmpoweredActive,
 } from '../src/render/character_effects';
 import {
   CHARACTER_EFFECT_RECKLESSNESS,
@@ -85,7 +93,72 @@ function entity(partial: Partial<Entity>): Entity {
   } as unknown as Entity;
 }
 
+function aura(
+  id: string,
+  kind: Entity['auras'][number]['kind'],
+  sourceId: number,
+  duration: number,
+): Entity['auras'][number] {
+  return {
+    id,
+    name: id,
+    kind,
+    remaining: duration,
+    duration,
+    value: 0,
+    sourceId,
+    school: 'holy',
+  };
+}
+
 describe('character visual effects', () => {
+  it('shows Avenging Wrath wings only on a living Paladin carrying the exact aura', () => {
+    const avenging = aura('avenging_wrath', 'buff_dmg_done', 1, 15);
+    expect(characterAvengingWrathActive(entity({ templateId: 'paladin', auras: [avenging] }))).toBe(
+      true,
+    );
+    expect(characterAvengingWrathActive(entity({ templateId: 'warrior', auras: [avenging] }))).toBe(
+      false,
+    );
+    expect(
+      characterAvengingWrathActive(
+        entity({ templateId: 'paladin', dead: true, auras: [avenging] }),
+      ),
+    ).toBe(false);
+    expect(
+      characterAvengingWrathActive(
+        entity({
+          templateId: 'paladin',
+          auras: [aura('avenging_wrath_buff_healing_done', 'buff_healing_done', 1, 15)],
+        }),
+      ),
+    ).toBe(false);
+  });
+
+  it('shows the same golden wings on any living ally protected by either Paladin covenant', () => {
+    const guardian = aura('guardian_covenant', 'buff_dr', 1, 8);
+    const covenant = aura('life_covenant', 'buff_dr', 1, 6);
+    expect(characterPaladinWingsActive(entity({ templateId: 'warrior', auras: [guardian] }))).toBe(
+      true,
+    );
+    expect(characterPaladinWingsActive(entity({ templateId: 'priest', auras: [covenant] }))).toBe(
+      true,
+    );
+    expect(
+      characterPaladinWingsActive(entity({ templateId: 'warrior', dead: true, auras: [covenant] })),
+    ).toBe(false);
+    expect(
+      characterPaladinWingsActive(
+        entity({ templateId: 'priest', auras: [aura('other_guard', 'buff_dr', 1, 6)] }),
+      ),
+    ).toBe(false);
+    expect(
+      characterPaladinWingsActive(
+        entity({ templateId: 'paladin', auras: [aura('avenging_wrath', 'buff_dmg_done', 1, 15)] }),
+      ),
+    ).toBe(true);
+  });
+
   it('detects Soul Rend as a model-level effect instead of a nameplate marker', () => {
     expect(characterSoulRendActive(entity({ auras: [] }))).toBe(false);
     expect(
@@ -134,6 +207,108 @@ describe('character visual effects', () => {
     expect(characterRecklessnessActive(entity({ auras: [reckless] }))).toBe(true);
     expect(characterWeaponAuraColor(entity({ auras: [reckless] }))).toBe(null);
     expect(characterRecklessnessActive(entity({ auras: [sanguine] }))).toBe(false);
+  });
+
+  it('derives Pack Ferocity presentation from the owner without changing pet state', () => {
+    const owner = entity({
+      id: 7,
+      auras: [
+        {
+          id: 'pack_ferocity',
+          name: 'Pack Ferocity',
+          kind: 'hunter_ferocity',
+          remaining: 20,
+          duration: 30,
+          value: 2,
+          stacks: 2,
+          sourceId: 7,
+          school: 'physical',
+        },
+      ],
+    });
+    const pet = entity({ id: 8, kind: 'mob', ownerId: owner.id });
+
+    expect(hunterPetFerocityStage(pet, owner)).toBe(2);
+    expect(hunterPetVisualScale(2, false)).toBe(1.08);
+    expect(pet.scale).toBe(1);
+    expect(hunterPetFerocityStage(pet, entity({ id: 9 }))).toBe(0);
+  });
+
+  it('keeps the unleashed frenzy visually distinct after Ferocity is consumed', () => {
+    const owner = entity({
+      id: 7,
+      auras: [
+        {
+          id: 'pack_frenzy',
+          name: 'Unleashed Frenzy',
+          kind: 'hunter_frenzy',
+          remaining: 8,
+          duration: 8,
+          value: 0.25,
+          sourceId: 7,
+          school: 'physical',
+        },
+      ],
+    });
+    const pet = entity({ id: 8, kind: 'mob', ownerId: owner.id });
+
+    expect(hunterPetFerocityStage(pet, owner)).toBe(0);
+    expect(hunterPetFrenzyActive(pet, owner)).toBe(true);
+    expect(hunterPetVisualScale(0, true)).toBe(1.1);
+  });
+
+  it('shows the shadow glow only on a living five-stack Tithefiend', () => {
+    expect(
+      tithefiendEmpoweredActive(
+        entity({ kind: 'mob', templateId: 'guardian_tithefiend', scale: 1.1 }),
+      ),
+    ).toBe(true);
+    expect(
+      tithefiendEmpoweredActive(
+        entity({ kind: 'mob', templateId: 'guardian_tithefiend', scale: 0.82 }),
+      ),
+    ).toBe(false);
+    expect(
+      tithefiendEmpoweredActive(
+        entity({ kind: 'mob', templateId: 'guardian_tithefiend', scale: 1.1, dead: true }),
+      ),
+    ).toBe(false);
+  });
+
+  it('keeps Stonebound structurally visible and gives it priority over color-only auras', () => {
+    const stonebound = {
+      id: 'shaman_stonebound_armor',
+      name: 'Stonebound Armor',
+      kind: 'buff_armor_pct',
+      remaining: 300,
+      duration: 300,
+      value: 30,
+      sourceId: 1,
+      school: 'nature',
+    } as const;
+    const sanguine = {
+      id: 'sanguine_aura',
+      name: 'Sanguine Aura',
+      kind: 'sanguine',
+      remaining: 12,
+      duration: 12,
+      value: 0.1,
+      sourceId: 1,
+      school: 'physical',
+    } as const;
+
+    expect(characterWeaponAuraMode(entity({ auras: [] }))).toBe('none');
+    expect(characterWeaponAuraMode(entity({ auras: [sanguine] }))).toBe('sanguine');
+    expect(characterWeaponAuraMode(entity({ auras: [stonebound, sanguine] }))).toBe('stonebound');
+  });
+
+  it('distinguishes the ethereal marcher from a white-gold Veil Mark silhouette', () => {
+    const march = aura('veilbound_march', 'buff_speed', 1, 4);
+    const mark = aura('veilbound_mark', 'dot', 1, 6);
+
+    expect(characterVeilboundState(entity({ auras: [] }))).toBe('none');
+    expect(characterVeilboundState(entity({ auras: [march] }))).toBe('march');
+    expect(characterVeilboundState(entity({ auras: [mark] }))).toBe('mark');
   });
 
   it('resolves the shaman imbues to their full-duration weapon soak colors', () => {

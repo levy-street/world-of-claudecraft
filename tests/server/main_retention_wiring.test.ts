@@ -44,6 +44,9 @@ describe('retention sweep wiring in server/main.ts', () => {
       'prunePasswordResetRequestsBatch(',
       'pruneEmailChangeRequestsBatch(',
       'pruneEmailLogBatch(',
+      'prunePlayerReportsBatch(',
+      'pruneBugReportsBatch(',
+      'pruneChatViolationsBatch(',
     ]) {
       expect(preListen).not.toContain(call);
     }
@@ -89,6 +92,19 @@ describe('retention sweep wiring in server/main.ts', () => {
       'prunePasswordResetRequestsBatch(',
       'pruneEmailChangeRequestsBatch(',
       'pruneEmailLogBatch(',
+      // player_reports / bug_reports / chat_violations used to be absent from
+      // this table list entirely: moderation reports piled up with no bound
+      // (a closed report is never re-read but was never deleted either), bug
+      // reports could each carry a ~900 KB screenshot, and the hard-word
+      // incident log grew forever even though its only reader is already
+      // LIMIT-bounded. These three close that gap.
+      'prunePlayerReportsBatch(',
+      'pruneBugReportsBatch(',
+      'pruneChatViolationsBatch(',
+      // The UA progression event logs (level_up_events / ftue_events) grow
+      // per event; each registers its bounded prune with the sweep.
+      'pruneLevelUpEventsBatch(',
+      'pruneFtueEventsBatch(',
     ]) {
       expect(count(MAIN, call)).toBe(1);
     }
@@ -138,6 +154,9 @@ describe('retention sweep wiring in server/main.ts', () => {
       'pruneEmailChangeRequestsBatch(config.emailChangeRequestRetentionDays, n)',
     );
     expect(MAIN).toContain('pruneEmailLogBatch(config.emailLogRetentionDays, n)');
+    expect(MAIN).toContain('prunePlayerReportsBatch(config.playerReportRetentionDays, n)');
+    expect(MAIN).toContain('pruneBugReportsBatch(config.bugReportRetentionDays, n)');
+    expect(MAIN).toContain('pruneChatViolationsBatch(config.chatViolationRetentionDays, n)');
   });
 
   it('sweeps the play-session fold before the association ager', () => {

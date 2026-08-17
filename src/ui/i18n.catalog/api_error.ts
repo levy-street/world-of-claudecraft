@@ -117,6 +117,10 @@ export const apiErrorStrings = {
     taken_over: 'Your character was taken over by another session.',
     // reuses errors.api.renameBeforeEntering
     rename_required: 'This character must be renamed before entering the world.',
+    // the redesign editor's malformed-look rejection
+    invalid_appearance: 'That appearance could not be saved. Adjust the design and try again.',
+    // the ordinary redesign failure: token already spent, or two racing tabs
+    reroll_unavailable: 'This character does not have a free redesign available.',
   },
   // moderation: enforcement states set by a moderator.
   moderation: {
@@ -205,5 +209,13 @@ export const apiErrorStrings = {
     genesis_token_claimed: 'That Seeker Genesis Token has already been claimed.',
     entitlement_required: 'Verified Seeker entitlement is required.',
     current_ownership_required: 'Current Seeker Genesis Token ownership is required.',
+  },
+  // cheater_mark: the operator-applied public Cheater tag (server/cheater_mark_api.ts).
+  // Operator-facing copy: only the admin dashboard ever receives these codes.
+  cheater_mark: {
+    admin_target: 'Operator accounts cannot be marked.',
+    reason_required: 'A reason is required.',
+    invalid_duration: 'Enter a mark duration of at least one second.',
+    not_marked: 'That account is not marked.',
   },
 };

@@ -268,7 +268,12 @@ describe('SFX production bundle', () => {
       const blobIdentities = (files.get('install-blobs.txt')?.toString('utf8') ?? '')
         .trim()
         .split('\n');
-      const corruptIdentity = blobIdentities.at(-1);
+      // Corrupt the FIRST identity in the sorted install-blobs list, not the last: the
+      // installer's per-blob source checksum loop reads this file top to bottom and
+      // exits on the first mismatch, so picking the first identity fails fast instead
+      // of spawning sha256sum against every other real blob before finally failing.
+      // Same corruption-detection code path either way, just a cheaper fixture pick.
+      const corruptIdentity = blobIdentities[0];
       if (!corruptIdentity) throw new Error('export has no audio blobs to corrupt');
       const corruptBlob = join(
         corruptArtifactRoot,

@@ -3,6 +3,7 @@
 // in the Sim).
 import { describe, expect, it } from 'vitest';
 import { bagCapacity } from '../src/sim/bags';
+import { isCataloguedRelicItem } from '../src/sim/content/reliquary';
 import { DELVE_SHOPS, DELVES, ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
@@ -73,6 +74,52 @@ describe('delve shop, buying', () => {
     sim.delveBuyShopItem('collapsed_reliquary', availableEntry.itemId);
     expect(countOf(sim, availableEntry.itemId) - before).toBe(1);
     expect(sim.delveMarks).toBe(100 - availableEntry.marks);
+  });
+
+  it('a Marks purchase of a catalogued relic COUNTS on the obtain tally', () => {
+    // The positive arm of the Reliquary movement doctrine, pinned nowhere
+    // else: a CURRENCY vendor counts, on purpose (the coin was earned in the
+    // world), where every player-to-player pipe is movement-flagged and never
+    // counts. The facet doc (src/world_api/reliquary.ts) names the four delve
+    // Marks relics as the canonical case; buying one twice must move the
+    // player-visible tally 1 then 2 through the real buy path.
+    const sim = makeSim();
+    teleportToReliquaryDoor(sim);
+    const meta = metaOf(sim);
+    meta.delveClears['collapsed_reliquary:heroic'] = 1;
+    meta.delveMarks = 100;
+    const RELIC = 'deacon_reliquary_helm';
+    expect(isCataloguedRelicItem(RELIC), 'the premise: the shop relic is catalogued').toBe(true);
+    expect(shop.some((e) => e.itemId === RELIC)).toBe(true);
+
+    sim.delveBuyShopItem('collapsed_reliquary', RELIC);
+    expect(countOf(sim, RELIC)).toBe(1);
+    expect(meta.reliquary.counts[RELIC]).toBe(1);
+    sim.delveBuyShopItem('collapsed_reliquary', RELIC);
+    expect(countOf(sim, RELIC)).toBe(2);
+    expect(meta.reliquary.counts[RELIC]).toBe(2);
+
+    // The facet doc's six-id premise, pinned as an EXACT set equality: the
+    // catalogued relics stocked across all delve shops are precisely the six
+    // ids the doc names (four Phase 12 originals plus the two chase rods the
+    // Phase 21 specimens growth catalogued off the Litany board), so a
+    // seventh catalogued relic landing in any delve shop reds here and
+    // forces the doc sentence to be revisited (the ids' properties are what
+    // this pins; the prose itself cannot be pinned).
+    const DOC_RELICS = [
+      'deacon_reliquary_helm',
+      'varric_shadow_cowl',
+      'sister_nhalia_choir_plate',
+      'drowned_choir_fang',
+      'stormreel_fishing_rod',
+      'tidewrought_fishing_rod',
+    ];
+    const stocked = new Set(
+      Object.values(DELVE_SHOPS).flatMap((entries) => entries.map((e) => e.itemId)),
+    );
+    expect([...stocked].filter((id) => isCataloguedRelicItem(id)).sort()).toEqual(
+      [...DOC_RELICS].sort(),
+    );
   });
 
   it('rejects when Marks are insufficient, no item, no debit', () => {

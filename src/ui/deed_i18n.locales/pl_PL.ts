@@ -33,19 +33,19 @@ export const table: DeedLocaleTable = {
     desc: 'Oczyść Szczelinę rangi S, najtrudniejszy poziom, jaki może wygenerować portal Szczeliny.',
   },
   pvp_honor_sergeant: {
-    name: 'Sierżant',
+    name: 'Łamacz szyków',
     desc: 'Zdobądź 10 000 Honoru w ciągu całej kariery. Wydawanie go nigdy nie kosztuje cię rangi.',
-    title: 'Sierżant',
+    title: 'Łamacz szyków',
   },
   pvp_honor_knight_lieutenant: {
-    name: 'Rycerz-Porucznik',
+    name: 'Pustoszyciel pól',
     desc: 'Zdobądź 40 000 Honoru w ciągu całej kariery, mając za sobą sezon prawdziwej wojny.',
-    title: 'Rycerz-Porucznik',
+    title: 'Pustoszyciel pól',
   },
   pvp_honor_field_marshal: {
-    name: 'Marszałek Polny',
+    name: 'Ukoronowany wojną',
     desc: 'Zdobądź 150 000 Honoru w ciągu całej kariery. Rzadkość na każdym królestwie, i tak powinno być.',
-    title: 'Marszałek Polny',
+    title: 'Ukoronowany wojną',
   },
   chr_drakemaw_broodlord: {
     name: 'Pogromca Wylęgu',
@@ -977,5 +977,49 @@ export const table: DeedLocaleTable = {
   prog_armorcrafting_rare: {
     name: 'Opancerzone do perfekcji',
     desc: 'Wykonaj swój pierwszy przedmiot rzadkiej jakości w Wytwarzaniu Pancerzy.',
+  },
+  col_reliquary_rank_2: {
+    name: 'Strażnik Łupów',
+    desc: 'Osiągnij rangę Kustosza 2 w Relikwiarzu (10 wyjątkowych skatalogowanych relikwii).',
+    title: 'Strażnik Łupów',
+  },
+  col_reliquary_rank_3: {
+    name: 'Katalogista',
+    desc: 'Osiągnij rangę Kustosza 3 w Relikwiarzu (25 wyjątkowych skatalogowanych relikwii).',
+    title: 'Katalogista',
+  },
+  col_reliquary_rank_4: {
+    name: 'Arcykustosz',
+    desc: 'Osiągnij rangę Kustosza 4 w Relikwiarzu (50 wyjątkowych skatalogowanych relikwii).',
+    title: 'Arcykustosz',
+  },
+  col_reliquary_rank_5: {
+    name: 'Wieczne Łupy',
+    desc: 'Osiągnij rangę Kustosza 5 w Relikwiarzu (100 wyjątkowych skatalogowanych relikwii).',
+  },
+  col_reliquary_complete: {
+    name: 'Wielki Relikwiarz',
+    desc: 'Skataloguj w Relikwiarzu każdą relikwię, którą postać może zachować. Późniejszy rozrost katalogu nigdy ci tego nie odbierze.',
+    title: 'Kustosz Skarbca',
+  },
+  col_reliquary_conquerors: {
+    name: 'Półka Zdobywców',
+    desc: 'Skataloguj każdą relikwię z półki Zdobywcy w Relikwiarzu. Późniejszy rozrost katalogu nigdy ci tego nie odbierze.',
+    title: 'Łamacz Skarbca',
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    name: 'Nythraxis iluminowany',
+    desc: 'Iluminuj w Relikwiarzu kartę Heroiczny: Rajd Nythraxis.',
+    title: 'Światło Nythraxis',
+  },
+  col_reliquary_illum_thunzharr: {
+    name: 'Thunzharr iluminowany',
+    desc: 'Iluminuj w Relikwiarzu kartę Thunzharr, Budzący się Szczyt.',
+    title: 'Światło Thunzharru',
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    name: 'Sanktuarium iluminowane',
+    desc: 'Iluminuj w Relikwiarzu kartę Heroiczne: Sanktuarium Grobowego Żmija.',
+    title: 'Światło Sanktuarium',
   },
 };

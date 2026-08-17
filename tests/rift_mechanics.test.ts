@@ -5,6 +5,7 @@ import { solveLockActions } from '../src/sim/lockpick';
 import { generateRiftFloor, isSetPieceSeed, riftPlatformLift } from '../src/sim/rift/rift_gen';
 import type { RiftFloorPlan } from '../src/sim/rift/types';
 import { Sim } from '../src/sim/sim';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // The rift's variety mechanics (v3): ice-slide, strength-boulder, sequence, the
 // way-out beacon, lava, and the rolling-boulder hazard. Puzzle/hazard kind is a
@@ -39,7 +40,13 @@ function killAll(sim: Sim): void {
 // player invulnerable for puzzle-solving cases (a dead player skips triggers). The
 // damage tests pass god:false so hazard/roller hits register.
 function enter(seed: number, { god = true }: { god?: boolean } = {}): Sim {
-  const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: true, devCommands: true });
+  const sim = new Sim({
+    seed,
+    playerClass: 'warrior',
+    autoEquip: true,
+    devCommands: true,
+    world: EMPTY_TEST_WORLD,
+  });
   sim.enterRift(seed, 20, sim.player.id);
   killAll(sim);
   sim.player.gm = god;
@@ -156,6 +163,33 @@ describe('rift mechanics: ice-slide goal', () => {
     // * DT = 13 * 0.05 = 0.65yd), never the whole sheet in one jump.
     expect(maxStep, 'per-tick advance is a small glide step').toBeLessThan(1.5);
   });
+
+  it('skating off the sheet stops the glide and plays the custom stop cue', () => {
+    const seed = seedWithFloor0((f) => f.puzzle.kind === 'ice_slide');
+    const sim = enter(seed);
+    const origin = riftInstanceOrigin(active(sim).slot, 0);
+    const floor = generateRiftFloor(seed, 20, 0);
+    const ice = floor.iceZone!;
+    // Already gliding north, parked one step short of the sheet's north edge
+    // so the very next tick skates off onto solid ground and stops.
+    sim.player.pos = { x: origin.x, y: 0, z: origin.z + ice.z + ice.hd - 0.3 };
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.player.riftSlideDirX = 0;
+    sim.player.riftSlideDirZ = 1;
+    sim.player.riftSliding = true;
+
+    let stoppedKey: string | undefined;
+    for (let i = 0; i < 10 && sim.player.riftSliding; i++) {
+      sim.player.hp = sim.player.maxHp;
+      const events = sim.tick();
+      if (!sim.player.riftSliding) {
+        const fx = events.find((e) => e.type === 'spellfxAt' && e.school === 'frost');
+        stoppedKey = fx && fx.type === 'spellfxAt' ? fx.sfxKey : undefined;
+      }
+    }
+    expect(sim.player.riftSliding, 'the glide stopped').toBe(false);
+    expect(stoppedKey).toBe('rift_ice_stop');
+  });
 });
 
 describe('rift mechanics: off-path treasure (every wall is solid)', () => {
@@ -258,9 +292,14 @@ describe('rift mechanics: switch-gate', () => {
     const sw = sim.entities.get(inst.switchId!)!;
     sim.player.pos = { ...sw.pos };
     sim.player.prevPos = { ...sim.player.pos };
-    sim.tick();
+    const gateEvents = sim.tick();
     expect(inst.gateOpen).toBe(true);
     expect(sim.entities.get(inst.gateId!)?.templateId).toBe('rift_gate_open');
+    // The custom grind recording (src/sim/rift/fx.ts) replaces the generic
+    // nova/impact combo for the gate's own spellfxAt.
+    expect(gateEvents.some((e) => e.type === 'spellfxAt' && e.sfxKey === 'rift_gate_grind')).toBe(
+      true,
+    );
 
     // Now the player can cross north past the gate line.
     sim.player.pos = { x: origin.x, y: 0, z: origin.z + gate.z + 3 };
@@ -387,13 +426,21 @@ describe('rift mechanics: interaction VFX (animated feedback)', () => {
     const hz = floor.hazards[0];
     const origin = riftInstanceOrigin(inst.slot, 0);
     let sawFire = false;
+    let sawKey = false;
     for (let i = 0; i < 21 && !sawFire; i++) {
       sim.player.pos = { ...sim.player.pos, x: origin.x + hz.x, z: origin.z + hz.z };
       sim.player.jumping = false;
       const events = sim.tick();
-      if (events.some((e) => e.type === 'spellfxAt' && e.school === 'fire')) sawFire = true;
+      for (const e of events) {
+        if (e.type !== 'spellfxAt' || e.school !== 'fire') continue;
+        sawFire = true;
+        if (e.sfxKey === 'rift_lava_tick') sawKey = true;
+      }
     }
     expect(sawFire).toBe(true);
+    // The custom recording (src/sim/rift/fx.ts) replaces the generic fire
+    // impact; combat_sfx.ts's impactCueForDamage suppresses the duplicate.
+    expect(sawKey).toBe(true);
   });
 });
 
@@ -584,10 +631,16 @@ describe('rift mechanics: rolling boulder', () => {
     sim.player.prevPos = { ...sim.player.pos };
     sim.player.hp = sim.player.maxHp;
     const beforeHp = sim.player.hp;
-    sim.tick();
+    const hitEvents = sim.tick();
     expect(sim.player.hp).toBeLessThan(beforeHp);
     expect(sim.player.riftRollerUntil ?? 0).toBeGreaterThan(0);
     // Shoved clear of the lane centre (dodged sideways into the aisle).
     expect(Math.abs(sim.player.pos.x - roller.pos.x)).toBeGreaterThan(0.5);
+    // The custom wallop recording (src/sim/rift/fx.ts) replaces the generic
+    // nova/impact combo; combat_sfx.ts's impactCueForDamage suppresses the
+    // duplicate generic physical impact from the damage event itself.
+    expect(
+      hitEvents.some((e) => e.type === 'spellfxAt' && e.sfxKey === 'rift_boulder_impact'),
+    ).toBe(true);
   });
 });

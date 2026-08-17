@@ -47,6 +47,9 @@ describe('loadConfig', () => {
     expect(cfg.passwordResetRequestRetentionDays).toBe(30);
     expect(cfg.emailChangeRequestRetentionDays).toBe(30);
     expect(cfg.emailLogRetentionDays).toBe(90);
+    expect(cfg.playerReportRetentionDays).toBe(180);
+    expect(cfg.bugReportRetentionDays).toBe(90);
+    expect(cfg.chatViolationRetentionDays).toBe(90);
     expect(cfg.retentionSweepUtcHour).toBe(5);
     expect(cfg.retentionSweepMaxRowsPerRun).toBe(50000);
     expect(cfg.requireWebLogin).toBe(false);
@@ -299,6 +302,9 @@ describe('loadConfig', () => {
         dflt: 30,
       },
       { key: 'EMAIL_LOG_RETENTION_DAYS', field: 'emailLogRetentionDays', dflt: 90 },
+      { key: 'PLAYER_REPORT_RETENTION_DAYS', field: 'playerReportRetentionDays', dflt: 180 },
+      { key: 'BUG_REPORT_RETENTION_DAYS', field: 'bugReportRetentionDays', dflt: 90 },
+      { key: 'CHAT_VIOLATION_RETENTION_DAYS', field: 'chatViolationRetentionDays', dflt: 90 },
     ] as const;
     for (const { key, field, dflt } of cases) {
       // A set value overrides the default.

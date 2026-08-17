@@ -95,6 +95,7 @@ Linux artifacts on Linux). Cross-building is not part of this runbook.
 | Epic EOS client id/secret (+ `EPIC_ENABLED=1`, product/deployment ids) | Book of Deeds achievement mirror + account link (`server/epic/`) | game-server runtime env (see `DEPLOY.md`); never the BPT client secret |
 | Epic BPT client id/secret + organization/artifact ids | BuildPatchTool binary upload to Dev sandbox | local shell only; never commit; see `docs/epic-games-integration/bpt-upload.md` |
 | Optional: a crash-minidump endpoint (e.g. a Sentry project's minidump URL) | crash uploads | build env `WOC_CRASH_SUBMIT_URL` (https only) |
+| Discord application registration, NAMED "World of ClaudeCraft" (the registration name is what Discord renders as "Playing X") | Discord Rich Presence (`electron/discord_presence.cjs`) | PROVISIONED 2026-08-15: the official application id ships baked in (`DEFAULT_DISCORD_APP_ID`, pinned to its literal in `tests/electron_discord_presence.test.ts`), so presence works out of the box in every build. `WOC_DISCORD_APP_ID` remains the operator override at shell launch (`resolveDiscordClientId`); a set-but-invalid value (for example `WOC_DISCORD_APP_ID=off`) resolves to inert, which is both the typo failure mode and the opt-out for forks. App Verification status on the portal does not gate rich presence |
 
 Never commit any of these values; they are env vars in CI or the local shell.
 
@@ -246,9 +247,11 @@ Linux publish and vice versa.
 
 Triggers:
 
-- Pushing a release tag `v<version>` (the tagged commit must be on `main`, the tag
-  must match `package.json` `version`, and `DESKTOP_VERSION` must match too; the
-  workflow hard-fails on any mismatch so a half-bumped release cannot publish).
+- Pushing a release tag `v<version>` (the tagged commit must be on `main` and the
+  tag must match `package.json` `version`; the workflow hard-fails on a mismatch
+  so a half-bumped release cannot publish). The download page's version derives
+  from `package.json` at build time, so there is no second constant to keep in
+  step with the tag.
 - Manual `workflow_dispatch` (Actions tab, "Desktop publish", pick a branch).
   By default this is a DRY RUN: it builds, signs, verifies, and checksums
   exactly like a release, then attaches the artifacts to the workflow run
@@ -308,10 +311,13 @@ SHA256SUMS-mac --ignore-missing` on macOS) from their download directory.
 
 ## Publishing a website update
 
-1. Bump `version` in `package.json` (the feed is version-ordered; see rollback),
-   and match `DESKTOP_VERSION` in `src/game/desktop_download.ts` so the download
-   page links point at the new build (the static hrefs in `index.html` and
-   `play.html` are the no-JS fallback; keep them on the same version). The page
+1. Bump `version` in `package.json` (the feed is version-ordered; see rollback).
+   `DESKTOP_VERSION` in `src/game/desktop_download.ts` derives from it at build
+   time through the `__APP_VERSION__` define, so the download page links follow
+   the bump on their own; `scripts/release_version.mjs prepare` rewrites the
+   static hrefs in `index.html` and `play.html` (the no-JS fallback) to the same
+   version, and `tests/desktop_download_dom.test.ts` pins them against the
+   module. Artifact names key off `package.json` `version` too. The page
    offers macOS (dmg), Windows (the x64 NSIS installer; `build.nsis.
    buildUniversalInstaller: false` makes electron-builder emit one installer per
    arch instead of a single dual-arch exe, and the download page links x64,
@@ -516,6 +522,34 @@ product exist. Coding and merge stay dark-safe without those credentials.
   can read dumps, set a retention window, and disclose the upload in the privacy
   policy. The log redaction strips bearer tokens and obvious credential patterns
   before writing.
+- Desktop prefs and the GPU-force no-boot rescue: the shell persists its own
+  small store as `desktop-prefs.json` under the per-user profile directory
+  (`app.getPath('userData')`: macOS
+  `~/Library/Application Support/world-of-claudecraft/`; Windows
+  `%APPDATA%\world-of-claudecraft\`; Linux `~/.config/world-of-claudecraft/`),
+  holding window memory plus `gpuForceOptOut` (see `electron/desktop_prefs.cjs`).
+  The in-game toggle (Options, Interface, "Use the Dedicated Gaming GPU")
+  writes it, but a machine the GPU force prevents from booting can never reach
+  that toggle. The supported rescue for "the game will not start at all on a
+  hybrid-GPU machine": quit the game, edit the file so it contains
+  `{"version":1,"gpuForceOptOut":true}` (or set just that field in the existing
+  JSON), and relaunch; the next launch skips both GPU levers. The loader
+  tolerates hand-edits, including a Windows editor's UTF-8 BOM; a corrupt or
+  deleted file resolves to defaults, which is force ON. Faster one-launch
+  variant needing no file edit: start the game with `WOC_DISABLE_GPU_FORCE=1`
+  in the environment (strict `1`), which skips both levers for that launch
+  without touching the stored preference; use it to boot far enough to flip
+  the in-game toggle off for good.
+- V8 code cache: the app:// scheme registers `codeCache: true` (electron/main.cjs,
+  pinned key by key in `tests/electron_scheme_privileges.test.ts`), so Chromium
+  persists compiled bytecode for the bundled scripts under the per-user profile
+  (`Code Cache/`, sibling of the log paths above) to cut cold-start compile time.
+  Known integrity tradeoff: the `onlyLoadAppFromAsar` and
+  `enableEmbeddedAsarIntegrityValidation` fuses do not cover this cache, so it is a
+  user-writable input to the JS engine outside the asar integrity envelope. Accepted
+  because poisoning it requires same-user code execution and the payload executes
+  inside the OS-sandboxed renderer (sandbox and context isolation stay on), not the
+  main process; the cache holds application bytecode only, never player data.
 
 ## Post-release verification checklist (each OS, each channel)
 

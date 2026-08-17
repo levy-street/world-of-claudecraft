@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import type { WaterView } from '../src/render/water';
 
 // The horizon apron and the per-zone surface planes OVERLAP (the apron runs
 // under every zone rect) and share one transparent material with depthWrite
@@ -35,54 +36,47 @@ function mockWaterShaderAssets(): void {
 
 const SEED = 20061;
 
-afterEach(() => {
-  vi.useRealTimers();
-  vi.restoreAllMocks();
-});
-
 describe('water paint order is pinned, not camera-derived', () => {
-  it('draws the horizon apron under every zone surface plane', async () => {
+  let water: WaterView;
+  let apron: THREE.Mesh;
+  let zonePlaneA: THREE.Mesh;
+  let zoneAtFn: (x: number, z: number) => import('../src/sim/types').ZoneDef;
+
+  beforeAll(async () => {
     vi.resetModules();
-    vi.useFakeTimers();
     mockWaterShaderAssets();
     const { buildWater } = await import('../src/render/water');
     const { zoneAt } = await import('../src/sim/data');
+    zoneAtFn = zoneAt;
     await Promise.resolve();
 
-    const water = buildWater(SEED);
-    const [apron] = water.meshes;
-    const built = water.ensureZone(zoneAt(0, 0));
-    await vi.runAllTimersAsync();
-    const [zonePlane] = await built;
+    water = buildWater(SEED);
+    [apron] = water.meshes;
+    const built = water.ensureZone(zoneAtFn(0, 0));
+    [zonePlaneA] = await built;
+  });
 
+  afterAll(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('draws the horizon apron under every zone surface plane', () => {
     // Both are transparent with depth writes off, so paint order alone decides.
-    const material = zonePlane.material as THREE.Material;
+    const material = zonePlaneA.material as THREE.Material;
     expect(material.transparent).toBe(true);
     expect(material.depthWrite).toBe(false);
     expect(apron.material).toBe(material); // one shared material, one program
 
     // The apron carries a constant deep shore depth and no foam; the zone plane
     // carries the real shoreline. The zone plane must win, at every camera angle.
-    expect(apron.renderOrder).toBeLessThan(zonePlane.renderOrder);
+    expect(apron.renderOrder).toBeLessThan(zonePlaneA.renderOrder);
   });
 
   it('gives every zone surface plane the same order, so zones cannot reorder', async () => {
-    vi.resetModules();
-    vi.useFakeTimers();
-    mockWaterShaderAssets();
-    const { buildWater } = await import('../src/render/water');
-    const { zoneAt } = await import('../src/sim/data');
-    await Promise.resolve();
-
-    const water = buildWater(SEED);
-    const first = water.ensureZone(zoneAt(0, 0));
-    await vi.runAllTimersAsync();
-    const [planeA] = await first;
-    const second = water.ensureZone(zoneAt(0, 600));
-    await vi.runAllTimersAsync();
+    const second = water.ensureZone(zoneAtFn(0, 600));
     const [planeB] = await second;
 
     expect(planeB).toBeInstanceOf(THREE.Mesh);
-    expect(planeB.renderOrder).toBe(planeA.renderOrder);
+    expect(planeB.renderOrder).toBe(zonePlaneA.renderOrder);
   });
 });

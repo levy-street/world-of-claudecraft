@@ -14,7 +14,8 @@
 // step): underwater canyons are invisible and legal; dry walls are not.
 
 import { describe, expect, it } from 'vitest';
-import { groundHeight, WATER_LEVEL, waterLevelAt } from '../src/sim/world';
+import { WORLD_MAX_X } from '../src/sim/data';
+import { groundHeight, terrainHeight, WATER_LEVEL, waterLevelAt } from '../src/sim/world';
 
 // The production seed: the reported cliffs are seed-pinned world geometry.
 const SEED = 20061;
@@ -86,5 +87,34 @@ describe('the world edges end in coast, not cliff', () => {
     sweep('amber north', (d, x) => [x, 2380 - d], -530, -190);
     sweep('frost north bay', (d, x) => [x, 2040 - d], -170, 170);
     expect(bad, bad.slice(0, 10).join('\n')).toEqual([]);
+  });
+
+  it('the Evergarden east edge stays under the waterline (no dry tongue past the map bound)', () => {
+    // The Moonmere's east-cap lobe (GARDEN_LAND_LOBES {522,726}) carried dry
+    // lawn all the way to the world bound at x = WORLD_MAX_X near z = 726, so
+    // the near terrain mesh ended on dry ground and the far-terrain apron could
+    // not drown the exterior: a dry tongue of lawn jutted ~17yd past the edge
+    // and cliffed to the seabed (player report at ~538, 726). The far-terrain
+    // open-coast guard (render/far_terrain_core.ts) drowns the exterior only
+    // where the edge SAMPLE already sits under water, so the whole open east
+    // edge of the garden must itself sit at or below the waterline.
+    const bad: string[] = [];
+    for (let z = 704; z <= 1248; z += 2) {
+      const edgeY = terrainHeight(WORLD_MAX_X, z, SEED);
+      if (edgeY >= WATER_LEVEL) bad.push(`z=${z}: edgeY ${edgeY.toFixed(2)}`);
+    }
+    expect(bad, bad.slice(0, 10).join('\n')).toEqual([]);
+    // ...and just past the bound (the band the far-terrain apron samples) the
+    // seabed must fall to real depth, not linger a shallow slab just under the
+    // surface: that shallow shelf is what read as a murky ribbon on the water.
+    const shallow: string[] = [];
+    for (let z = 706; z <= 758; z += 2) {
+      const outY = terrainHeight(WORLD_MAX_X + 20, z, SEED);
+      if (outY > WATER_LEVEL - 3) shallow.push(`z=${z}: outY ${outY.toFixed(2)}`);
+    }
+    expect(shallow, shallow.slice(0, 10).join('\n')).toEqual([]);
+    // ...but the recede must not creep inland onto the Old Mill headland,
+    // whose windmills (x ~504, z ~754) stand well clear of the map edge.
+    expect(terrainHeight(504, 754, SEED)).toBeGreaterThan(WATER_LEVEL);
   });
 });

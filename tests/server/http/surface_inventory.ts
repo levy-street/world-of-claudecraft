@@ -1151,6 +1151,20 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: null,
   },
+  // Reliquary (server/reliquary.ts): the population-rarity aggregate, a
+  // registry-only RouteDef born after the migration like the deeds family, and
+  // the deeds-rarity row shape exactly (anonymous public JSON read, budgeted
+  // in-handler with publicReadRateLimited).
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/reliquary/rarity',
+    handler: 'server/reliquary.ts rarityHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.public,
+    limiter: 'publicReadRateLimited',
+    requireOwnedExpected: null,
+  },
   // Thornhollow Fields (server/battleground.ts): a registry-only RouteDef born after
   // the migration, per the same new-route rule as the deeds family. Public
   // anonymous ladder read, rate-limited in-handler with publicReadRateLimited
@@ -1476,6 +1490,34 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     requireOwnedExpected: REQUIRE_OWNED.operator404,
     match: /^\/admin\/api\/moderation\/accounts\/(\d+)\/chat-mute$/,
   },
+  // The Cheater mark pair (src/sim/moderation/): registry-only RouteDefs born
+  // AFTER the migration (the new-route rule, server/http/CLAUDE.md), so neither
+  // has a legacy handleAdminApi arm and neither carries a `match` regex; there is
+  // no dispatcher regex literal for the freshness gate to compare one against,
+  // and the legacy rollback answers 404 for both by design. Their RouteDef path
+  // template is their one dispatch source, so surface_inventory.test.ts lists
+  // both in REGISTRY_ONLY_PARAM_PATHS. The operator gate pair and the envelope
+  // are the chat-mute row's exactly.
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/cheater-mark',
+    handler: 'server/admin.ts cheaterMarkHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/lift-cheater-mark',
+    handler: 'server/admin.ts liftCheaterMarkHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+  },
   {
     dispatcher: DISPATCH.admin,
     method: 'POST',
@@ -1608,6 +1650,17 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     requireOwnedExpected: REQUIRE_OWNED.operator404,
     match: /^\/admin\/api\/accounts\/(\d+)\/reset-password$/,
   },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
+    path: '/admin/api/accounts/:id/general-chat-rate-limit',
+    handler: 'generalChatRateLimitMatch',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+    match: /^\/admin\/api\/accounts\/(\d+)\/general-chat-rate-limit$/,
+  },
   // Account flair: the operator-set AI mark and an official streamer's links.
   {
     dispatcher: DISPATCH.admin,
@@ -1729,6 +1782,39 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     method: 'GET',
     path: '/admin/api/overview',
     handler: 'handleAdminApi arm: /admin/api/overview',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  // Ad-spend ledger: registry-only RouteDefs born AFTER the migration (the
+  // new-route rule, server/http/CLAUDE.md): no legacy ladder arm, so the
+  // legacy rollback answers 404 for them by design.
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'GET',
+    path: '/admin/api/ad-spend',
+    handler: 'server/ad_spend.ts listHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
+    path: '/admin/api/ad-spend',
+    handler: 'server/ad_spend.ts upsertHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
+    path: '/admin/api/ad-spend/delete',
+    handler: 'server/ad_spend.ts deleteHandler (registry-only RouteDef)',
     contentType: PROBLEM_JSON,
     authScope: AUTH_SCOPE.admin,
     limiter: null,

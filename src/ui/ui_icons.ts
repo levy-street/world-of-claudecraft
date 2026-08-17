@@ -65,6 +65,7 @@ export type UiIconName =
   | 'jump'
   | 'autorun'
   | 'swap'
+  | 'sort'
   | 'nameplates'
   | 'vibrate'
   | 'lock'
@@ -81,7 +82,8 @@ export type UiIconName =
   | 'bond-link'
   | 'download'
   | 'eye'
-  | 'eye-off';
+  | 'eye-off'
+  | 'wiki';
 
 // Inner SVG markup per icon (one or more <path>). Default fill rule is nonzero
 // (correct for game-icons.net art incl. overlaps); the two hand-authored cut-out
@@ -178,6 +180,9 @@ const ICONS: Record<UiIconName, string> = {
   // hand-authored swap: two opposing horizontal arrows (the mobile action-ring
   // page-cycle badge), matching the jump/autorun glyph weight
   swap: '<path d="M96 150 340 150 340 118 436 174 340 230 340 198 96 198ZM416 314 172 314 172 282 76 338 172 394 172 362 416 362Z"/>',
+  // hand-authored sort: three shrinking bars plus a down arrow (the bag
+  // clean-up button; matches the swap/meters geometric weight)
+  sort: '<path d="M64 104h288v48H64zM64 232h208v48H64zM64 360h128v48H64zM402 104h48v224h-48z"/><path d="M362 328h128l-64 88z"/>',
   // hand-authored download: arrow into a base line (the desktop update card),
   // matching the jump glyph weight
   download:
@@ -218,6 +223,11 @@ const ICONS: Record<UiIconName, string> = {
   // crosshair this button used to borrow (the same glyph the mobile target-cycle uses).
   professions:
     '<path d="M104 268h304v36h-30l-22 92a44 44 0 0 1-43 34h-114a44 44 0 0 1-43-34l-22-92h-30z"/><path d="M318 104 246 236" stroke="currentColor" stroke-width="34" fill="none" stroke-linecap="round"/><circle cx="238" cy="250" r="30"/>',
+  // hand-authored question mark (the Wiki launcher): a stroked hook over a dot,
+  // the universal "look it up" affordance, drawn bold so it reads at
+  // micro-button size and stays tellable apart from the emote speech bubble
+  // (a filled balloon) and the deeds book (a solid tome)
+  wiki: '<path d="M168 180c0-72 176-80 176 6 0 62-88 64-88 132" stroke="currentColor" stroke-width="46" fill="none" stroke-linecap="round"/><circle cx="256" cy="412" r="36"/>',
   // World of ClaudeCraft maker's mark: the exact project-owned calligraphic
   // stroke used beside a crafted copy's provenance line. Unlike the filled
   // chrome glyphs above, this mark is intentionally an open currentColor line.
@@ -275,15 +285,28 @@ function chromeArtIcon(url: string): string {
  *
  * A name with committed painted art (CHROME_ART_IDS) hydrates as that `<img>` instead of
  * the inline SVG: these placeholders ARE the primary destinations (the side rail, the
- * mobile bar, the More tray), which DESIGN.md section 6 gives painted art. The SVG stays
- * the source everywhere else, including every direct `svgIcon()` call, so the small inline
- * uses beside text keep tinting with `currentColor`.
+ * mobile bar, the More tray), which DESIGN.md section 6 gives painted art. A failed image
+ * load swaps that one icon slot to the existing SVG glyph. The SVG stays the source
+ * everywhere else, including every direct `svgIcon()` call, so the small inline uses beside
+ * text keep tinting with `currentColor`.
  */
 export function hydrateIcons(root: ParentNode = document): void {
   root.querySelectorAll<HTMLElement>('[data-icon]').forEach((el) => {
     const name = el.dataset.icon;
     if (!name || !hasUiIcon(name) || el.querySelector(':scope > .ui-icon')) return;
     const art = chromeIconUrl(name);
-    el.insertAdjacentHTML('afterbegin', art ? chromeArtIcon(art) : svgIcon(name));
+    if (!art) {
+      el.insertAdjacentHTML('afterbegin', svgIcon(name));
+      return;
+    }
+    el.insertAdjacentHTML('afterbegin', chromeArtIcon(art));
+    const image = el.querySelector<HTMLImageElement>(':scope > img.ui-icon-art');
+    image?.addEventListener(
+      'error',
+      () => {
+        image.outerHTML = svgIcon(name);
+      },
+      { once: true },
+    );
   });
 }

@@ -1,5 +1,41 @@
 import * as THREE from 'three';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { TerrainView } from '../src/render/terrain';
+import { owningRectIndex, type WorldRect } from '../src/render/terrain_region_core';
+import {
+  STRIP_MAX_X,
+  STRIP_MIN_X,
+  WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_Z,
+  ZONES,
+} from '../src/sim/data';
+
+// Mirrors terrain.ts's private cellOwnerId: every cell (cx, cz) belongs to the
+// zone whose rectangle contains its center, else the nearest rectangle (the
+// 14 zone rects do not tile the world). Used to exhaustively check unloadZone
+// against every cell it should (and should not) touch, including the far-band
+// gap cells a zone owns outside its own rectangle.
+function cellsOwnedBy(zoneId: string, chunkSize: number): [number, number][] {
+  const zoneRects: WorldRect[] = ZONES.map((zone) => ({
+    minX: zone.xMin ?? STRIP_MIN_X,
+    maxX: zone.xMax ?? STRIP_MAX_X,
+    minZ: zone.zMin,
+    maxZ: zone.zMax,
+  }));
+  const chunksX = Math.ceil((WORLD_MAX_X * 2) / chunkSize);
+  const chunksZ = Math.ceil((WORLD_MAX_Z - WORLD_MIN_Z) / chunkSize);
+  const owned: [number, number][] = [];
+  for (let cz = 0; cz < chunksZ; cz++) {
+    for (let cx = 0; cx < chunksX; cx++) {
+      const x = -WORLD_MAX_X + (cx + 0.5) * chunkSize;
+      const z = WORLD_MIN_Z + (cz + 0.5) * chunkSize;
+      const owner = ZONES[owningRectIndex(x, z, zoneRects)];
+      if (owner.id === zoneId) owned.push([cx, cz]);
+    }
+  }
+  return owned;
+}
 
 function mockEmptyAssetLoads(): void {
   vi.doMock('../src/render/assets/loader', () => ({
@@ -60,6 +96,75 @@ describe('progressive terrain build', () => {
 
     expect(terrain.group.children.length).toBeGreaterThan(0);
     expect(terrain.isZoneLoaded(zone.id)).toBe(true);
+  });
+
+  it('unloadZone releases every cell a zone owns (including gap cells outside its rectangle), leaves a neighbouring zone untouched, and a later ensureZone rebuilds it identically', async () => {
+    vi.resetModules();
+    mockEmptyAssetLoads();
+    const { buildTerrain, CHUNK_SIZE } = await import('../src/render/terrain');
+    const { zoneAt } = await import('../src/sim/data');
+
+    const terrain = buildTerrain(20061);
+    const zone = zoneAt(0, 0); // eastbrook_vale: owns gap cells up to 360 yd
+    // outside its own rectangle (see zone_eviction_core.test.ts), so this
+    // exercises the far-band 2x2 super-chunk span-clearing path too, not
+    // just single near-band cells.
+    const ownedCells = cellsOwnedBy(zone.id, CHUNK_SIZE);
+    expect(ownedCells.length).toBeGreaterThan(0);
+
+    // mirefen_marsh is eastbrook_vale's northern neighbour: prepare it too,
+    // so unloading eastbrook_vale alone can be checked to leave it intact.
+    const neighbor = zoneAt(0, 300);
+    expect(neighbor.id).not.toBe(zone.id);
+    const neighborCells = cellsOwnedBy(neighbor.id, CHUNK_SIZE);
+    expect(neighborCells.length).toBeGreaterThan(0);
+
+    const firstTask = terrain.ensureZone(zone);
+    await vi.runAllTimersAsync();
+    await firstTask;
+    const neighborTask = terrain.ensureZone(neighbor);
+    await vi.runAllTimersAsync();
+    await neighborTask;
+
+    const builtChunkCount = terrain.group.children.length;
+    expect(builtChunkCount).toBeGreaterThan(0);
+    const before = terrain.groundResidency();
+    for (const [cx, cz] of ownedCells) expect(before.isPending(cx, cz)).toBe(false);
+    for (const [cx, cz] of neighborCells) expect(before.isPending(cx, cz)).toBe(false);
+
+    terrain.unloadZone(zone);
+
+    // Same state an unvisited zone starts in: not loaded, and the chunk-level
+    // fog clamp treats every one of its owned cells as owed again.
+    expect(terrain.isZoneLoaded(zone.id)).toBe(false);
+    const after = terrain.groundResidency();
+    for (const [cx, cz] of ownedCells) expect(after.isPending(cx, cz)).toBe(true);
+    // The neighbouring zone's own cells (including ITS gap cells) must
+    // survive: unloadZone must not over-clear past the evicted zone's
+    // ownership, e.g. by mis-sizing a far-band super-chunk span.
+    for (const [cx, cz] of neighborCells) expect(after.isPending(cx, cz)).toBe(false);
+    expect(terrain.isZoneLoaded(neighbor.id)).toBe(true);
+
+    // A later visit rebuilds through the ordinary streaming path, with the
+    // same chunk coverage as the first build (neighbor's chunks untouched).
+    const secondTask = terrain.ensureZone(zone);
+    await vi.runAllTimersAsync();
+    await secondTask;
+    expect(terrain.group.children.length).toBe(builtChunkCount);
+    expect(terrain.isZoneLoaded(zone.id)).toBe(true);
+  });
+
+  it('unloadZone on a zone with nothing built is a no-op', async () => {
+    vi.resetModules();
+    mockEmptyAssetLoads();
+    const { buildTerrain } = await import('../src/render/terrain');
+    const { zoneAt } = await import('../src/sim/data');
+
+    const terrain = buildTerrain(20061);
+    const zone = zoneAt(0, 0);
+    expect(() => terrain.unloadZone(zone)).not.toThrow();
+    expect(terrain.group.children).toHaveLength(0);
+    expect(terrain.isZoneLoaded(zone.id)).toBe(false);
   });
 
   it('cancelStreaming stops an in-flight zone build from ever completing', async () => {
@@ -381,56 +486,64 @@ describe('terrain covers the whole world, gaps between zone rectangles included'
     terrain.cancelStreaming();
   });
 
-  it('leaves no uncovered cell anywhere once every zone is built', async () => {
-    vi.resetModules();
-    mockEmptyAssetLoads();
-    const { buildTerrain } = await import('../src/render/terrain');
-    const { ZONES, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_X, WORLD_MIN_Z } = await import(
-      '../src/sim/data'
-    );
+  // These two tests both build every zone across the whole map (the most
+  // expensive shape in this file, ~800 chunk cells of real geometry) and only
+  // ever READ terrain.group afterward, so building it once in a beforeAll and
+  // sharing it is byte-identical to each test rebuilding its own copy: same
+  // seed, same deterministic zone-order build, no test mutates the result.
+  describe('with every zone built', () => {
+    let terrain: TerrainView;
 
-    const terrain = buildTerrain(WORLD_SEED);
-    for (const zone of ZONES) {
-      const task = terrain.ensureZone(zone);
-      await vi.runAllTimersAsync();
-      await task;
-    }
+    beforeAll(async () => {
+      vi.useFakeTimers();
+      vi.resetModules();
+      mockEmptyAssetLoads();
+      const { buildTerrain } = await import('../src/render/terrain');
+      const { ZONES } = await import('../src/sim/data');
 
-    // Sample every 60u chunk cell's centre across the whole world box. Before
-    // the gap-cell fix this found 96 uncovered cells (the south-west quadrant,
-    // the centre column north of Frostveil, and the overhanging north row).
-    const CHUNK = 60;
-    const uncovered: [number, number][] = [];
-    for (let z = WORLD_MIN_Z + CHUNK / 2; z < WORLD_MAX_Z; z += CHUNK) {
-      for (let x = WORLD_MIN_X + CHUNK / 2; x < WORLD_MAX_X; x += CHUNK) {
-        if (!coversPoint(terrain.group, x, z)) uncovered.push([x, z]);
+      terrain = buildTerrain(WORLD_SEED);
+      for (const zone of ZONES) {
+        const task = terrain.ensureZone(zone);
+        await vi.runAllTimersAsync();
+        await task;
       }
-    }
-    expect(uncovered).toEqual([]);
-    terrain.cancelStreaming();
-  }, 60_000);
-
-  it('builds every cell exactly once across all zones', async () => {
-    vi.resetModules();
-    mockEmptyAssetLoads();
-    const { buildTerrain } = await import('../src/render/terrain');
-    const { ZONES } = await import('../src/sim/data');
-
-    // Nearest-rect ownership must stay single-owner: a cell claimed by two
-    // zones would mesh twice and z-fight, which is the failure mode a plain
-    // "nearest zone" fallback in each zone's own loop would have.
-    const terrain = buildTerrain(WORLD_SEED);
-    for (const zone of ZONES) {
-      const task = terrain.ensureZone(zone);
-      await vi.runAllTimersAsync();
-      await task;
-    }
-
-    const footprints = terrain.group.children.map((mesh) => {
-      const box = new THREE.Box3().setFromObject(mesh);
-      return `${box.min.x.toFixed(2)},${box.min.z.toFixed(2)},${box.max.x.toFixed(2)},${box.max.z.toFixed(2)}`;
+      vi.useRealTimers();
     });
-    expect(new Set(footprints).size).toBe(footprints.length);
-    terrain.cancelStreaming();
-  }, 60_000);
+
+    afterAll(() => {
+      terrain.cancelStreaming();
+    });
+
+    it('leaves no uncovered cell anywhere once every zone is built', async () => {
+      const { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_X, WORLD_MIN_Z } = await import(
+        '../src/sim/data'
+      );
+
+      // Sample every 60u chunk cell's centre across the whole world box.
+      // Before the gap-cell fix this found 96 uncovered cells (the
+      // south-west quadrant, the centre column north of Frostveil, and the
+      // overhanging north row).
+      const CHUNK = 60;
+      const uncovered: [number, number][] = [];
+      for (let z = WORLD_MIN_Z + CHUNK / 2; z < WORLD_MAX_Z; z += CHUNK) {
+        // The campaign bounds are asymmetric (the Farshore extends east), so the
+        // scan runs WORLD_MIN_X..WORLD_MAX_X, never the mirrored -MAX form.
+        for (let x = WORLD_MIN_X + CHUNK / 2; x < WORLD_MAX_X; x += CHUNK) {
+          if (!coversPoint(terrain.group, x, z)) uncovered.push([x, z]);
+        }
+      }
+      expect(uncovered).toEqual([]);
+    });
+
+    it('builds every cell exactly once across all zones', () => {
+      // Nearest-rect ownership must stay single-owner: a cell claimed by two
+      // zones would mesh twice and z-fight, which is the failure mode a plain
+      // "nearest zone" fallback in each zone's own loop would have.
+      const footprints = terrain.group.children.map((mesh) => {
+        const box = new THREE.Box3().setFromObject(mesh);
+        return `${box.min.x.toFixed(2)},${box.min.z.toFixed(2)},${box.max.x.toFixed(2)},${box.max.z.toFixed(2)}`;
+      });
+      expect(new Set(footprints).size).toBe(footprints.length);
+    });
+  });
 });

@@ -892,6 +892,20 @@ body.guide-has-sidebar .guide-layout {
   color: var(--g-text-dim);
 }
 
+/* The Reliquary catalog's outside-completion label (Retired / Personal):
+   muted and plain on both the heading tag and the explanatory note, never
+   the celebratory gold (the in-game chip rule, mirrored on the wiki). */
+.guide-reliquary-flag {
+  color: var(--g-text-dim);
+  font-size: 0.85em;
+  font-weight: 400;
+}
+.guide-reliquary-note {
+  margin: 0;
+  color: var(--g-text-dim);
+  font-style: italic;
+}
+
 /* controls reference table */
 .guide-keytable {
   width: 100%;
@@ -2030,6 +2044,20 @@ h2.guide-related-h {
   flex: none;
   border-radius: var(--g-radius-sm);
   border: 1px solid var(--g-border);
+}
+.guide-spec-icon-art {
+  display: block;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.guide-spec-icon-fallback {
+  display: grid;
+  place-items: center;
+  background: var(--g-bg);
+  color: var(--g-gold);
+  font-family: var(--g-font-display);
+  font-weight: 700;
 }
 .guide-spec-body {
   min-width: 0;
@@ -3484,4 +3512,9 @@ a.guide-poi:hover {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--g-text-muted);
+}
+img.crest-image-fallback {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }

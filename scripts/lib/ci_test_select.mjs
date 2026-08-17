@@ -40,7 +40,11 @@
 // planner understands. Any doubt resolves to 'full'.
 
 import { isRelatedSourcePath, isTestPath, normalizeRepoPath } from './gate_fast_plan.mjs';
-import { classifySelectPaths, isGeneratedI18nArtifactPath } from './gate_select_plan.mjs';
+import {
+  classifySelectPaths,
+  isGeneratedI18nArtifactPath,
+  isGeneratedManifestArtifactPath,
+} from './gate_select_plan.mjs';
 
 /**
  * The selection pipeline's own source files: the modules whose code computes
@@ -62,6 +66,7 @@ export const SELECTION_PIPELINE_FILES = Object.freeze([
   'scripts/lib/ci_test_select.mjs',
   'scripts/lib/ci_shard_plan.mjs',
   'scripts/lib/ci_leg_runner.mjs',
+  'scripts/lib/gate_artifact_skip.mjs',
   'scripts/lib/gate_discovery.mjs',
   'scripts/lib/gate_select_plan.mjs',
   'scripts/lib/gate_fast_plan.mjs',
@@ -186,6 +191,11 @@ export function decideTestMode({ eventName, code, files }) {
           `removed or renamed generated i18n artifact (${JSON.stringify(gone)}): full suite`,
         );
       }
+      if (isGeneratedManifestArtifactPath(gone)) {
+        return full(
+          `removed or renamed generated manifest artifact (${JSON.stringify(gone)}): full suite`,
+        );
+      }
     }
     changedPaths.push(name);
   }
@@ -204,7 +214,7 @@ export function decideTestMode({ eventName, code, files }) {
   // every mode, and the shard plan feeds the artifact paths to `vitest
   // related` as graph nodes so their consumer suites stay selected (the
   // rationale lives in lib/gate_select_plan.mjs).
-  const { testFiles, relatedSources, broadConfigs, generatedI18n } =
+  const { testFiles, relatedSources, broadConfigs, generatedI18n, generatedManifests } =
     classifySelectPaths(changedPaths);
   if (broadConfigs.length > 0) {
     const shown = broadConfigs.slice(0, 3).map((p) => JSON.stringify(p));
@@ -214,11 +224,18 @@ export function decideTestMode({ eventName, code, files }) {
   }
 
   const inertCount =
-    changedPaths.length - relatedSources.length - testFiles.length - generatedI18n.length;
+    changedPaths.length -
+    relatedSources.length -
+    testFiles.length -
+    generatedI18n.length -
+    generatedManifests.length;
   const artifactNote =
-    generatedI18n.length > 0
+    (generatedI18n.length > 0
       ? `, ${generatedI18n.length} generated i18n artifact(s) fed to related (freshness-guarded)`
-      : '';
+      : '') +
+    (generatedManifests.length > 0
+      ? `, ${generatedManifests.length} generated manifest artifact(s) fed to related (freshness-guarded)`
+      : '');
   return {
     mode: 'selective',
     reason:

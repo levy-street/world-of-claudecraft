@@ -41,8 +41,8 @@ export const NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL = 27;
 // archetype; healer-facing pieces never take Hit (heals are not resisted by level).
 // The ilvl 33/37 raid variants scale these up + add a secondary rating (see
 // heroic_variants.ts). See docs/prd/combat-ratings-and-jewelry.md.
-const ARMOR_RATING = 40; // 40 rating = 4.0%
-const FIVE_MAN_WEAPON_RATING = 50; // 50 rating = 5.0%
+export const ARMOR_RATING = 40; // 40 rating = 4.0%
+export const FIVE_MAN_WEAPON_RATING = 50; // 50 rating = 5.0%
 const RAID_WEAPON_PRIMARY_RATING = 65; // 65 rating = 6.5%
 const RAID_SECONDARY_RATING = 20; // 20 rating = 2.0%
 
@@ -62,6 +62,9 @@ const CASTER_WEAPON_CLASSES = [
 ] as ItemDef['requiredClass'];
 
 export const HEROIC_ITEMS: Record<string, ItemDef> = {
+  // heroic_duskwhisper is NOT hand-written: buildHeroicVariants auto-generates it
+  // from the base Duskwhisper (WILDHEART_ITEMS) because the Fanglord Beastmaster
+  // heroic loot table below references it. It inherits the base proc and variant.
   // ================= Heroic Hollow Crypt: Morthen =================
   morthens_cryptforged_hauberk: {
     id: 'morthens_cryptforged_hauberk',
@@ -698,6 +701,9 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     // Rare mount (0.1%): heroic-gated only, never on a normal table.
     { itemId: 'reins_stalkglider_snail', chance: HEROIC_BLUE_MOUNT_CHANCE },
   ],
+  // Heroic mid-boss table: the Fanglord Beastmaster drops the heroic twin of
+  // Duskwhisper (the normal drops from his normal-mode kill in WILDHEART_ITEMS).
+  wildheart_beastmaster: [{ itemId: 'heroic_duskwhisper', chance: 0.18 }],
   wildheart_high_priest: [
     // Two groups of three DISTINCT items, the shape every other heroic
     // five-man uses: per-item rates stay at the house 0.33-0.34 (the earlier

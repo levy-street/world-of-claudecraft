@@ -4,17 +4,46 @@
 // the success credit that readies the quest.
 import { describe, expect, it } from 'vitest';
 import { visualKeyFor } from '../src/render/characters/manifest';
-import { ESCORTS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
+import { BUILTIN_WORLD, ESCORTS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import { dist2d, type Entity, LEASH_DISTANCE, type SimEvent } from '../src/sim/types';
+import {
+  dist2d,
+  type Entity,
+  LEASH_DISTANCE,
+  type SimEvent,
+  type WorldContent,
+} from '../src/sim/types';
 import { groundHeight, WATER_LEVEL } from '../src/sim/world';
 
 const ESCORT_ID = 'esc_fv_wren';
 const QUEST_ID = 'q_fv_seeing_wren_home';
 const ESCORTEE_TEMPLATE = 'apprentice_wren';
 
+// Every escortee and ambush wave in this file spawns directly off the ESCORTS
+// content table (escort.ts initEscorts/fireAmbushes), never off world camps,
+// so the suite needs none of the shipped 11-zone world's ambient camps or
+// ground objects. The one non-escort world NPC any test here actually reaches
+// for is Aurorist Veyla, the Wren chain turn-in (the "credits the quest" test
+// calls sim.talkToNpc on her), so she is the only entry kept in npcs. Terrain
+// and colliders read the real, untouched active world content
+// (getActiveWorldContent; see the invariant comment above the cfg.world spawn
+// loop in src/sim/sim.ts), so trimming camps/npcs/groundObjects here changes
+// only which ambient entities exist to tick, never the ground the escortees
+// and ambush waves actually walk and fight on.
+const ESCORT_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: { aurorist_veyla: NPCS.aurorist_veyla },
+  groundObjects: [],
+};
+
 function makeSim(): Sim {
-  const sim = new Sim({ seed: 424242, playerClass: 'warrior', playerName: 'Escorter' });
+  const sim = new Sim({
+    seed: 424242,
+    playerClass: 'warrior',
+    playerName: 'Escorter',
+    world: ESCORT_TEST_WORLD,
+  });
   sim.player.level = 20;
   return sim;
 }

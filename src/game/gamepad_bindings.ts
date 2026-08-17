@@ -5,11 +5,12 @@
 // from localStorage (matching Keybinds/Settings), so the bind/clear/reset logic
 // is testable.
 import {
-  DEFAULT_GAMEPAD_BINDINGS,
   BINDABLE_BUTTONS,
+  DEFAULT_GAMEPAD_BINDINGS,
   GAMEPAD_NONE,
   type GamepadActionId,
 } from './gamepad_map';
+import { parseStoredJson } from './local_storage_json';
 
 const STORE_KEY = 'woc_gamepad';
 const BINDABLE = new Set(BINDABLE_BUTTONS);
@@ -24,8 +25,7 @@ export class GamepadBindings {
 
   private load(): void {
     this.map = new Map(Object.entries(DEFAULT_GAMEPAD_BINDINGS).map(([k, v]) => [Number(k), v]));
-    let stored: unknown = null;
-    try { stored = JSON.parse(localStorage.getItem(STORE_KEY) ?? 'null'); } catch { /* corrupt */ }
+    const stored = parseStoredJson(STORE_KEY);
     if (stored && typeof stored === 'object') {
       for (const [k, v] of Object.entries(stored as Record<string, unknown>)) {
         const idx = Number(k);
@@ -37,7 +37,11 @@ export class GamepadBindings {
   private save(): void {
     const obj: Record<string, string> = {};
     for (const [k, v] of this.map) obj[k] = v;
-    try { localStorage.setItem(STORE_KEY, JSON.stringify(obj)); } catch { /* storage unavailable */ }
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify(obj));
+    } catch {
+      /* storage unavailable */
+    }
   }
 
   /** Action bound to a button, or 'none' if unbound. */

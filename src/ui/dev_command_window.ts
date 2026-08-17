@@ -7,6 +7,7 @@ import {
   buildDevCommand,
   type DevCommandAction,
   type DevCommandCategory,
+  devCategoryVisible,
   filteredDevActions,
 } from './dev_command_view';
 import {
@@ -129,13 +130,15 @@ function actionFields(actionId: string): string {
     case 'give':
       return `${itemPickerField()}${textField('devCommand.fields.count', 'itemCount', '1', 'number')}`;
     case 'kit':
+    case 'biskit':
       // Every spec across all nine classes, grouped by class so the list reads as the
       // talent tree does. Only this character's class actually applies, but the field
       // is built statically without a world handle, so the server does the rejecting
-      // and names the legal specs back. Blank = the spec already chosen.
+      // and names the legal specs back. Blank = the spec already chosen. The BIS-20
+      // card shares the selector (its own field key) so both kits read identically.
       return selectField(
         'devCommand.fields.spec',
-        'kitSpec',
+        actionId === 'kit' ? 'kitSpec' : 'bisSpec',
         `<option value="">${esc(t('devCommand.kitCurrentSpec'))}</option>${ALL_CLASSES.map(
           (cls) =>
             `<optgroup label="${esc(classDisplayName(cls))}">${(DEV_KIT_ROLES[cls] ?? [])
@@ -358,11 +361,13 @@ export class DevCommandWindow {
       }
     });
     // mousedown, not click: blur fires first on click and would have already torn the
-    // list down before the handler ran.
+    // list down before the handler ran. preventDefault runs for EVERY mousedown in
+    // the box, row or not: grabbing the scrollbar (or the box padding) must not blur
+    // the input, because the blur teardown below would drop the list mid-drag.
     box.addEventListener('mousedown', (event) => {
+      event.preventDefault();
       const row = (event.target as HTMLElement).closest<HTMLElement>('.dev-item-opt');
       if (!row) return;
-      event.preventDefault();
       this.chooseItem(input, box, Number(row.dataset.i));
     });
     input.addEventListener('blur', () => {
@@ -409,13 +414,24 @@ export class DevCommandWindow {
 
   private render(focusSelector?: string): void {
     const root = this.root();
+    // Staff-only tabs (Spawns) are dropped for non-admin accounts; if the active
+    // tab just became invisible (an admin advert can land after open), fall back.
+    const accountAdmin = this.deps.world().accountAdmin;
+    if (!devCategoryVisible(this.category, accountAdmin)) this.category = 'player';
     const actions = filteredDevActions(this.category, this.query, (key) => t(key));
     root.innerHTML = `<header class="dev-command-header">
       <div><div class="dev-command-kicker">${esc(t('devCommand.kicker'))}</div><h2>${esc(t('devCommand.title'))}</h2><p>${esc(t('devCommand.subtitle'))}</p></div>
       <button type="button" class="x-btn" data-dev-close aria-label="${esc(t('devCommand.closeAria'))}">${svgIcon('close')}</button>
     </header>
     <div class="dev-command-toolbar">
-      <nav class="dev-command-tabs" aria-label="${esc(t('devCommand.categoryNavAria'))}">${CATEGORIES.map((category) => `<button type="button" data-dev-category="${category.id}" aria-pressed="${category.id === this.category}">${esc(t(category.labelKey))}</button>`).join('')}</nav>
+      <nav class="dev-command-tabs" aria-label="${esc(t('devCommand.categoryNavAria'))}">${CATEGORIES.filter(
+        (category) => devCategoryVisible(category.id, accountAdmin),
+      )
+        .map(
+          (category) =>
+            `<button type="button" data-dev-category="${category.id}" aria-pressed="${category.id === this.category}">${esc(t(category.labelKey))}</button>`,
+        )
+        .join('')}</nav>
       <label class="dev-command-search"><span>${esc(t('devCommand.filterLabel'))}</span><input type="search" data-dev-search value="${esc(this.query)}" placeholder="${esc(t('devCommand.filterPlaceholder'))}"></label>
     </div>
     <div class="dev-command-grid">${actions.length ? actions.map(actionHtml).join('') : `<div class="dev-command-empty">${esc(t('devCommand.noMatches'))}</div>`}</div>

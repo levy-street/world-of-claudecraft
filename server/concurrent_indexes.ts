@@ -28,6 +28,11 @@ import {
   BANK_LEDGER_CONTAINER_INVALID_INDEX_DROP_SQL,
 } from './bank_ledger_indexes';
 import {
+  CHAT_VIOLATIONS_RETENTION_INDEX_SQL,
+  CHAT_VIOLATIONS_RETENTION_INVALID_INDEX_CHECK_SQL,
+  CHAT_VIOLATIONS_RETENTION_INVALID_INDEX_DROP_SQL,
+} from './chat_violations_retention_index';
+import {
   CLIENT_PERF_WORST10S_INDEX_SQL,
   CLIENT_PERF_WORST10S_INVALID_INDEX_CHECK_SQL,
   CLIENT_PERF_WORST10S_INVALID_INDEX_DROP_SQL,
@@ -45,6 +50,11 @@ import {
   PLAYER_METRICS_INVALID_INDEX_CHECK_SQL,
   PLAYER_METRICS_INVALID_INDEX_DROP_SQL,
 } from './player_metrics_db';
+import {
+  PLAYER_REPORTS_RETENTION_INDEX_SQL,
+  PLAYER_REPORTS_RETENTION_INVALID_INDEX_CHECK_SQL,
+  PLAYER_REPORTS_RETENTION_INVALID_INDEX_DROP_SQL,
+} from './player_reports_retention_index';
 
 export interface ConcurrentIndexMigration {
   name: string;
@@ -103,5 +113,22 @@ export const CONCURRENT_INDEX_MIGRATIONS: readonly ConcurrentIndexMigration[] = 
     createSql: BANK_LEDGER_CONTAINER_INDEX_SQL,
     checkSql: BANK_LEDGER_CONTAINER_INVALID_INDEX_CHECK_SQL,
     dropSql: BANK_LEDGER_CONTAINER_INVALID_INDEX_DROP_SQL,
+  },
+  // The player_reports retention-sweep prune (moderation_db.ts
+  // prunePlayerReportsBatch). Partial on the resolved-report predicate the
+  // prune actually scans; see player_reports_retention_index.ts.
+  {
+    name: 'player_reports_retention_created',
+    createSql: PLAYER_REPORTS_RETENTION_INDEX_SQL,
+    checkSql: PLAYER_REPORTS_RETENTION_INVALID_INDEX_CHECK_SQL,
+    dropSql: PLAYER_REPORTS_RETENTION_INVALID_INDEX_DROP_SQL,
+  },
+  // The chat_violations retention-sweep prune (chat_filter_db.ts
+  // pruneChatViolationsBatch). See chat_violations_retention_index.ts.
+  {
+    name: 'chat_violations_retention_created',
+    createSql: CHAT_VIOLATIONS_RETENTION_INDEX_SQL,
+    checkSql: CHAT_VIOLATIONS_RETENTION_INVALID_INDEX_CHECK_SQL,
+    dropSql: CHAT_VIOLATIONS_RETENTION_INVALID_INDEX_DROP_SQL,
   },
 ];

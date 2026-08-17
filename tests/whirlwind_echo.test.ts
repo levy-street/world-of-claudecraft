@@ -27,7 +27,7 @@ type TestSim = Sim & {
   addEntity(entity: Entity): void;
 };
 
-function makeSim(seed = 31337, spec: 'fury' | 'arms' = 'fury'): { sim: TestSim; p: Entity } {
+function makeSim(seed = 31338, spec: 'fury' | 'arms' = 'fury'): { sim: TestSim; p: Entity } {
   const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: true }) as TestSim;
   sim.setPlayerLevel(20);
   expect(sim.setSpec(spec)).toBe(true);

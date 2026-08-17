@@ -20,6 +20,7 @@
 // fiestaStandardize / updateFiestaActive / fiestaRestoreChar / clearFiestaAugments
 // are consumed here via SimContext callbacks (points-at Sim until A3 flips them).
 
+import { emitRainOfFireStop } from '../combat/warlock_meteor_events';
 import { ARENA_SLOT_COUNT, arenaOrigin, DUNGEON_X_THRESHOLD } from '../data';
 import * as deedsMod from '../deeds';
 import { arenaMapForSlot } from '../dungeon_layout';
@@ -30,8 +31,8 @@ import {
   restoreMatchPet,
   snapshotMatchPet,
 } from '../pet/pet_match_return';
-import { awardFiestaCompletionHonor, awardRankedArenaWinHonor, honorTeamIdentity } from '../pvp';
-import { SICKNESS_AURA_IDS, UNSTUCK_SICKNESS_ID } from '../resurrection';
+import { awardFiestaCompletionHonor, awardRankedArenaResultHonor, honorTeamIdentity } from '../pvp';
+import { aurasSurvivingCleanSlate, SICKNESS_AURA_IDS, UNSTUCK_SICKNESS_ID } from '../resurrection';
 import type { ArenaMatch, ArenaQueueUnit, ArenaReturnPools, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { applyResurrectionSickness, applyUnstuckSickness } from '../spirit';
@@ -121,6 +122,13 @@ export const ARENA_BASE_RATING = 1500; // every character starts here, unranked
 const ARENA_MIN_RATING = 100; // a rating floor so a losing streak can't go absurd
 const ARENA_K_FACTOR = 32; // Elo sensitivity per match
 const FIESTA_COUNTDOWN = 5;
+// Ranked (1v1/2v2) matchmaking is pure Elo: every character starts at the same
+// base rating regardless of level, so without a floor a fresh level-1 could
+// queue straight into ranked play. Reuse the Frostreach Frontier open-PvP-zone
+// entry level (docs/prd/frontier-pvp-honor.md) rather than inventing a number.
+// Fiesta needs no gate (fiestaStandardize normalizes every fighter to the same
+// level for the bout) and neither does Protect Yumi (unranked, out of scope here).
+export const ARENA_MIN_LEVEL = 15;
 
 // Standard Elo. Returns the points the winner gains (and the loser loses) for
 // an outright result; a draw moves each toward its expected score by half.
@@ -184,6 +192,10 @@ export function arenaQueueJoin(
   }
 
   if (fmt === '1v1') {
+    if (r.e.level < ARENA_MIN_LEVEL) {
+      ctx.error(id, `You must be level ${ARENA_MIN_LEVEL} to queue for the arena.`);
+      return;
+    }
     const party = ctx.partyOf(id);
     if (party && party.members.length > 1) {
       ctx.error(id, 'Leave your party before queueing for 1v1.');
@@ -286,6 +298,12 @@ export function arenaQueueJoin(
   // destination queue and the flavour text differ.
   const isFiesta = fmt === 'fiesta';
   const label = isFiesta ? 'Fiesta' : '2v2';
+  // Ranked 2v2 only: Fiesta standardizes every fighter to the same level for
+  // the bout, so it needs no level gate (see ARENA_MIN_LEVEL above).
+  if (!isFiesta && r.e.level < ARENA_MIN_LEVEL) {
+    ctx.error(id, `You must be level ${ARENA_MIN_LEVEL} to queue for the arena.`);
+    return;
+  }
   const party = ctx.partyOf(id);
   let unitPids: number[];
   if (!party || party.members.length === 1) {
@@ -330,6 +348,13 @@ export function arenaQueueJoin(
     }
     if (ctx.trades.has(mPid)) {
       ctx.error(id, `${mMeta.name} must finish trading before queueing.`);
+      return;
+    }
+    if (!isFiesta && e.level < ARENA_MIN_LEVEL) {
+      ctx.error(
+        id,
+        `${mMeta.name} must be at least level ${ARENA_MIN_LEVEL} to queue for the arena.`,
+      );
       return;
     }
     if (e.pos.x > DUNGEON_X_THRESHOLD) {
@@ -502,8 +527,18 @@ export function arenaAllPids(match: ArenaMatch): number[] {
 
 export function arenaStanding(meta: PlayerMeta, format: ArenaFormat): ArenaStanding {
   return format === '2v2'
-    ? { rating: meta.arena2v2Rating, wins: meta.arena2v2Wins, losses: meta.arena2v2Losses }
-    : { rating: meta.arenaRating, wins: meta.arenaWins, losses: meta.arenaLosses };
+    ? {
+        rating: meta.arena2v2Rating,
+        wins: meta.arena2v2Wins,
+        losses: meta.arena2v2Losses,
+        draws: meta.arena2v2Draws,
+      }
+    : {
+        rating: meta.arenaRating,
+        wins: meta.arenaWins,
+        losses: meta.arenaLosses,
+        draws: meta.arenaDraws,
+      };
 }
 
 export function arenaRatingForPid(ctx: SimContext, pid: number, format: ArenaFormat): number {
@@ -523,10 +558,12 @@ export function addArenaResult(
     meta.arena2v2Rating = after;
     if (won === true) meta.arena2v2Wins++;
     else if (won === false) meta.arena2v2Losses++;
+    else meta.arena2v2Draws++;
   } else {
     meta.arenaRating = after;
     if (won === true) meta.arenaWins++;
     else if (won === false) meta.arenaLosses++;
+    else meta.arenaDraws++;
   }
   return { before, after };
 }
@@ -687,6 +724,7 @@ export function updateArena(ctx: SimContext): void {
 export function matchmakeArena1v1(ctx: SimContext): void {
   let guard = ARENA_SLOT_COUNT + 1;
   while (guard-- > 0) {
+    const pruned: number[] = [];
     ctx.arenaQueue1v1 = ctx.arenaQueue1v1.filter((id) => {
       const e = ctx.entities.get(id);
       // A queued player who walked into a dungeon/instance is not matchable: the
@@ -695,14 +733,30 @@ export function matchmakeArena1v1(ctx: SimContext): void {
       // a Vale Cup match/queue after joining here (arenaQueueJoin already blocks
       // this at entry; this is the defense-in-depth re-check for paths that seat
       // a player into Vale Cup without going through that guard, e.g. practice).
-      return (
+      const keep =
         !!e &&
         !e.dead &&
         !ctx.arenaMatches.has(id) &&
         e.pos.x <= DUNGEON_X_THRESHOLD &&
-        !ctx.vcupSeatedOrQueued(id)
-      );
+        !ctx.vcupSeatedOrQueued(id);
+      // Only a still-connected player needs the notice below (a disconnected
+      // one has no session left to receive it).
+      if (!keep && e) pruned.push(id);
+      return keep;
     });
+    // A still-connected player silently pruned from the queue (dead, walked
+    // into an instance, or seated in Vale Cup) gets the same notice an
+    // explicit arenaQueueLeave gives, rather than finding out only when the
+    // arena window stops showing them as queued.
+    for (const pid of pruned) {
+      ctx.emit({ type: 'arenaUnqueued', pid });
+      ctx.emit({
+        type: 'log',
+        text: 'You leave the Ashen Coliseum queue.',
+        color: '#ffa040',
+        pid,
+      });
+    }
     if (ctx.arenaQueue1v1.length < 2 || freeArenaSlot(ctx, '1v1') === null) return;
     const aPid = ctx.arenaQueue1v1[0];
     const aRating = arenaRatingForPid(ctx, aPid, '1v1');
@@ -739,8 +793,31 @@ export function pruneTeamQueue(ctx: SimContext, fmt: '2v2' | 'fiesta'): void {
         !ctx.vcupSeatedOrQueued(id)
       );
     });
-  if (fmt === 'fiesta') ctx.arenaQueueFiesta = ctx.arenaQueueFiesta.filter(keep);
-  else ctx.arenaQueue2v2 = ctx.arenaQueue2v2.filter(keep);
+  const queue = fmt === 'fiesta' ? ctx.arenaQueueFiesta : ctx.arenaQueue2v2;
+  const pruned: ArenaQueueUnit[] = [];
+  const survivors = queue.filter((unit) => {
+    if (keep(unit)) return true;
+    pruned.push(unit);
+    return false;
+  });
+  if (fmt === 'fiesta') ctx.arenaQueueFiesta = survivors;
+  else ctx.arenaQueue2v2 = survivors;
+  if (pruned.length === 0) return;
+  // A dropped unit can carry a teammate who did nothing wrong (the OTHER member
+  // walked into an instance, died, or got seated in Vale Cup): give every
+  // still-connected member of the unit the same notice an explicit
+  // arenaQueueLeave gives, rather than leaving them silently unqueued.
+  const leaveText =
+    fmt === 'fiesta'
+      ? 'You leave the 2v2 Fiesta queue.'
+      : 'You leave the Ashen Coliseum 2v2 queue.';
+  for (const unit of pruned) {
+    for (const pid of unit.pids) {
+      if (!ctx.entities.get(pid)) continue;
+      ctx.emit({ type: 'arenaUnqueued', pid });
+      ctx.emit({ type: 'log', text: leaveText, color: '#ffa040', pid });
+    }
+  }
 }
 
 export function removeTeamQueueUnits(
@@ -1000,8 +1077,10 @@ export function readyArenaFighter(
   if (opts.clearPrep) {
     // Arena is a clean competitive slate: unlike the overworld/delve death paths it
     // intentionally strips ALL auras (including The Keeper's Toll) so a PvE penalty
-    // never carries into a normalized match.
-    e.auras = [];
+    // never carries into a normalized match. The one exception is the operator-applied
+    // Cheater mark, which is account state rather than something the fighter walked in
+    // carrying: queueing must not be a way to shed a sanction (see resurrection.ts).
+    e.auras = aurasSurvivingCleanSlate(e.auras);
     clearCooldownsPreservingUnstuck(e.cooldowns);
     e.abilityCharges = undefined; // charge pools refill (recreated lazily at full)
     e.ccDr.clear();
@@ -1010,7 +1089,12 @@ export function readyArenaFighter(
   if (meta)
     recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   e.hp = e.maxHp;
-  e.resource = e.resourceType === 'mana' ? e.maxResource : e.resourceType === 'energy' ? 100 : 0;
+  e.resource =
+    e.resourceType === 'mana'
+      ? e.maxResource
+      : e.resourceType === 'energy' || e.resourceType === 'focus'
+        ? 100
+        : 0;
   // Target retention is a separate concern from clearPrep (clean slate vs
   // fight-start top-off): only the countdown-end call site passes
   // keepValidTargetPids, so a selection made during prep survives the gates
@@ -1031,6 +1115,7 @@ export function readyArenaFighter(
   delete e.queuedOnSwingCostMultiplier;
   e.queuedCastAbility = null;
   e.queuedCastAim = null;
+  emitRainOfFireStop(ctx, e);
   e.castingAbility = null;
   e.castRemaining = 0;
   e.castTargetId = null;
@@ -1119,7 +1204,21 @@ export function endArenaMatch(
           delta,
           won,
         ));
-        if (won === true) awardRankedArenaWinHonor(ctx, meta, match.format, opponentTeamKey);
+        // Rating (addArenaResult above) and Deeds (onArenaMatchEndForDeeds below)
+        // are deliberately forfeit-inclusive; Honor is not, mirroring Fiesta's
+        // completion-honor guard a few lines down. Every played-out result pays,
+        // win or not: the loss and draw share is the award module's call
+        // (RANKED_ARENA_LOSS_HONOR), so this call site stays a plain report of
+        // what happened.
+        if (reason !== 'forfeit') {
+          awardRankedArenaResultHonor(
+            ctx,
+            meta,
+            match.format,
+            opponentTeamKey,
+            won === true ? 'win' : won === null ? 'draw' : 'loss',
+          );
+        }
       } else {
         ratingBefore = ratingAfter = arenaStanding(meta, match.format).rating;
         if (match.fiesta && !match.practice && reason !== 'forfeit') {

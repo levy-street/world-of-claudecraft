@@ -131,17 +131,31 @@ describe('ground-targeted casting (Flamestrike)', () => {
   });
 });
 
-// The thematic per-class ground-targeted spells. Rain of Fire (warlock), Volley
-// (hunter) and Hurricane (druid) are CHANNELED: casting begins a channel aimed at
-// the (clamped) point, and each tick pulses an AoE there via the channel-tick path.
-// Earthquake (shaman) is an instant lingering ground zone (groundAoE).
+// The thematic per-class ground-targeted spells. Volley (hunter) and Hurricane
+// (druid) are channeled. Reworked Rain of Fire and Earthquake are instant
+// lingering ground zones.
 describe('ground-targeted casting (thematic per-class spells)', () => {
   function castGroundSpell(cls: PlayerClass, spell: string, aim: { x: number; z: number }): Sim {
     const sim = new Sim({ seed: 7, playerClass: cls, noPlayer: true });
     const pid = sim.addPlayer(cls, 'Caster');
     sim.setPlayerLevel(20, pid);
+    if (cls === 'shaman' && !sim.setSpec('elemental', pid)) throw new Error('no elemental spec');
     const me = sim.entities.get(pid);
     if (!me) throw new Error('no caster');
+    if (cls === 'warlock') {
+      if (!sim.setSpec('destruction', pid)) throw new Error('no destruction spec');
+      me.auras.push({
+        id: 'destruction_ruin',
+        name: 'Ruin',
+        kind: 'destruction_ruin',
+        value: 5,
+        stacks: 5,
+        remaining: 3600,
+        duration: 3600,
+        sourceId: pid,
+        school: 'fire',
+      });
+    }
     me.resource = 9999;
     place(sim, pid, 0, 0);
     sim.castAbility(spell, pid, aim);
@@ -149,7 +163,6 @@ describe('ground-targeted casting (thematic per-class spells)', () => {
   }
 
   const channeled = [
-    { cls: 'warlock', spell: 'rain_of_fire' },
     { cls: 'hunter', spell: 'volley' },
     { cls: 'druid', spell: 'hurricane' },
   ] as const;
@@ -184,7 +197,7 @@ describe('ground-targeted casting (thematic per-class spells)', () => {
     });
   }
 
-  it('a channeled ground spell damages enemies in the aimed area over its ticks', () => {
+  it('Rain of Fire creates an instant lingering zone that damages the aimed area', () => {
     // Flat dungeon-floor band (x > 600) for deterministic clear line-of-sight.
     const FLAT_X = 700;
     const sim = new Sim({ seed: 7, playerClass: 'warlock', noPlayer: true });
@@ -192,7 +205,19 @@ describe('ground-targeted casting (thematic per-class spells)', () => {
     sim.setPlayerLevel(20, pid);
     const me = sim.entities.get(pid);
     if (!me) throw new Error('no warlock');
+    expect(sim.setSpec('destruction', pid)).toBe(true);
     me.resource = 9999;
+    me.auras.push({
+      id: 'destruction_ruin',
+      name: 'Ruin',
+      kind: 'destruction_ruin',
+      value: 3,
+      stacks: 3,
+      remaining: 3600,
+      duration: 3600,
+      sourceId: pid,
+      school: 'fire',
+    });
     place(sim, pid, FLAT_X, 0);
     const mob = createMob(9100, MOBS.forest_wolf, 20, sim.groundPos(FLAT_X + 6, 0));
     mob.hostile = true;
@@ -200,14 +225,57 @@ describe('ground-targeted casting (thematic per-class spells)', () => {
     const hp0 = mob.hp;
 
     sim.castAbility('rain_of_fire', pid, { x: FLAT_X + 6, z: 0 });
-    // advance through enough of the 4 s channel for at least one tick to land
+    expect(me.channeling).toBe(false);
+    expect(me.castingAbility).toBeNull();
+    expect(
+      (sim as unknown as { groundAoEs: GroundAoE[] }).groundAoEs.some(
+        (zone) => zone.ability === 'Rain of Fire',
+      ),
+    ).toBe(true);
+    // The base zone delays its first pulse by one second.
     for (let i = 0; i < 40; i++) sim.tick();
 
     expect(mob.hp).toBeLessThan(hp0);
   });
 
+  it('Rain of Fire emits one authored fel meteor shower for its full ground-zone lifetime', () => {
+    const sim = castGroundSpell('warlock', 'rain_of_fire', { x: 16, z: 3 });
+    const events = sim.tick();
+
+    expect(
+      events.filter(
+        (event) =>
+          event.type === 'spellfxAt' &&
+          event.fx === 'felMeteorRain' &&
+          event.ability === 'rain_of_fire',
+      ),
+    ).toEqual([
+      expect.objectContaining({
+        x: 16,
+        z: 3,
+        radius: 7,
+        duration: 6,
+        sourceId: sim.playerId,
+      }),
+    ]);
+
+    const channelEvents = [...events];
+    for (let tick = 0; tick < 80; tick++) channelEvents.push(...sim.tick());
+    expect(
+      channelEvents.filter(
+        (event) =>
+          event.type === 'spellfxAt' &&
+          event.fx === 'felMeteorRain' &&
+          event.ability === 'rain_of_fire',
+      ),
+    ).toHaveLength(1);
+    expect(channelEvents.some((event) => event.type === 'spellfxAt' && event.fx === 'nova')).toBe(
+      false,
+    );
+  });
+
   it('a completed ground-targeted channel clears castAim (always cleared on resolve)', () => {
-    const sim = castGroundSpell('warlock', 'rain_of_fire', { x: 16, z: 0 });
+    const sim = castGroundSpell('druid', 'hurricane', { x: 16, z: 0 });
     const me = sim.entities.get(sim.playerId);
     expect(me?.channeling).toBe(true);
     expect(me?.castAim).not.toBeNull();
@@ -221,7 +289,7 @@ describe('ground-targeted casting (thematic per-class spells)', () => {
     const fx = aimedFx(sim);
     expect(fx?.radius).toBe(8);
     const zone = (sim as unknown as { groundAoEs: GroundAoE[] }).groundAoEs.find(
-      (z) => z.ability === 'Earthquake',
+      (z) => z.ability === 'Faultwake',
     );
     expect(zone).toBeDefined();
     expect(zone?.pos.x).toBeCloseTo(16, 1);

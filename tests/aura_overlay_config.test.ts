@@ -87,29 +87,32 @@ describe('aura overlay config', () => {
   });
 
   it('provides stable class palettes and row slots for generated talent procs', () => {
-    expect(defaultAuraOverlayConfig('hun_deathless_will')).toMatchObject({
-      iconPosX: 0.44,
+    // Pinned against the live CHOICE_ROWS: only a proc whose responses map to
+    // a drawable aura kind earns generated meta, and the reworked hunter,
+    // paladin, and shaman trees currently carry none, so those classes resolve
+    // through the generic fallback and are intentionally absent here.
+    expect(defaultAuraOverlayConfig('dru_ironhide_reflex')).toMatchObject({
+      iconPosX: 0.38,
       iconPosY: 0.7,
       scale: 0.8,
+      arcsScale: 0.9,
+      color: '#f59e0b',
+    });
+    expect(defaultAuraOverlayConfig('rog_slipstream')).toMatchObject({
+      iconPosX: 0.32,
+      iconPosY: 0.7,
+      arcsScale: 0.8,
+      color: '#facc15',
+    });
+    expect(defaultAuraOverlayConfig('dru_gripping_ambush')).toMatchObject({
+      iconPosX: 0.44,
+      iconPosY: 0.7,
       arcsScale: 1,
-      color: '#f5b942',
+      color: '#60a5fa',
     });
-    expect(defaultAuraOverlayConfig('sha_storm_recall')).toMatchObject({
-      iconPosX: 0.62,
-      iconPosY: 0.7,
-      arcsScale: 1.3,
-      color: '#38bdf8',
-    });
-    expect(defaultAuraOverlayConfig('dru_survival_of_the_fittest')).toMatchObject({
-      iconPosX: 0.56,
-      iconPosY: 0.7,
-      arcsScale: 1.2,
-      color: '#84cc16',
-    });
-    expect(defaultAuraOverlayConfig('rog_master_assassin').color).toBe('#a855f7');
-    expect(defaultAuraOverlayConfig('pri_inner_fire').color).toBe('#f8fafc');
-    expect(defaultAuraOverlayConfig('wlk_curse_mastery').color).toBe('#a855f7');
-    expect(defaultAuraOverlayConfig('pal_divine_wisdom').color).toBe('#fde047');
+    expect(defaultAuraOverlayConfig('rog_improved_evasion').color).toBe('#dc2626');
+    expect(defaultAuraOverlayConfig('pri_inner_fire').color).toBe('#facc15');
+    expect(defaultAuraOverlayConfig('wlk_curse_mastery').color).toBe('#c026d3');
   });
 
   it('clamps malformed values and rejects invalid colors', () => {

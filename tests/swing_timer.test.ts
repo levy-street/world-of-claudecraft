@@ -60,8 +60,8 @@ describe('swingTimerState: edge-tracked period recovery (parameter-in / next-sta
   });
 
   it('re-recovers the interval on the reset edge (timer jumps up past the epsilon)', () => {
-    // prevTimer 0.1, now swingTimer 1.5 jumped up -> a new swing; weapon speed 1.2,
-    // so period = max(1.5, 1.2) = 1.5, frac = 1 - 1.5/1.5 = 0.
+    // prevTimer 0.1, now swingTimer 1.5 jumped up -> a new swing; the freshly
+    // reset timer IS the true interval, so period = 1.5, frac = 1 - 1.5/1.5 = 0.
     const s = swingTimerState(
       player({ swingTimer: 1.5, weapon: { speed: 1.2 } }),
       LIVE_TARGET,
@@ -69,6 +69,21 @@ describe('swingTimerState: edge-tracked period recovery (parameter-in / next-sta
       0.1,
     );
     expect(s.nextPeriod).toBe(1.5);
+    expect(s.frac).toBe(0);
+  });
+
+  it('trusts the reset-edge timer when the true cadence beats the equipped weapon', () => {
+    // Wolf Form: a fixed 1.0s swing while carrying a 2.9-speed staff (haste
+    // does the same). The old max(timer, weapon speed) stretched the period to
+    // 2.9, so the bar started ~66% pre-filled every swing; the reset edge must
+    // trust the sim's freshly reset timer instead.
+    const s = swingTimerState(
+      player({ swingTimer: 1.0, weapon: { speed: 2.9 } }),
+      LIVE_TARGET,
+      2.9,
+      0.05,
+    );
+    expect(s.nextPeriod).toBe(1.0);
     expect(s.frac).toBe(0);
   });
 

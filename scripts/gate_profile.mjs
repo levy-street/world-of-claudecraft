@@ -11,6 +11,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { resolveAvailableMemoryBytes } from './lib/gate_memory.mjs';
+import { checkAudioTooling } from './lib/gate_preflight.mjs';
 import {
   buildGateProfileSteps,
   collectMachineFacts,
@@ -27,7 +28,6 @@ import {
   parseInstallProblems,
   shouldCheckInstallSync,
 } from './lib/npm_install_sync.mjs';
-import { FFMPEG_PATH, FFPROBE_PATH } from './sfx/ffmpeg_paths.mjs';
 
 const shell = process.platform === 'win32';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -119,13 +119,13 @@ let failed = false;
 if (args.steps) {
   // Mirror gate.mjs preflights so a profile run is comparable to a real gate.
   if (!args.dryRun) {
-    const dep = timePreflight('dependency sync', runDependencySync);
+    const dep = await timePreflight('dependency sync', runDependencySync);
     timed.push(dep);
     if (dep.status === 'fail') {
       failed = true;
       if (!args.continueOnError) finishAndExit(1, timed, null);
     }
-    const audio = timePreflight('ffmpeg/ffprobe probe', runAudioToolProbe);
+    const audio = await timePreflight('ffmpeg/ffprobe probe', runAudioToolProbe);
     timed.push(audio);
     if (audio.status === 'fail') {
       failed = true;
@@ -150,6 +150,7 @@ if (args.steps) {
     skipBuilds: args.skipBuilds,
     skipVitest: args.skipVitest,
     skipTypes: args.skipTypes,
+    repoRoot: ROOT,
   });
 
   if (args.dryRun) {
@@ -299,9 +300,9 @@ function writeJsonIfRequested(payload) {
   console.log(`\n[gate_profile] wrote ${abs}`);
 }
 
-function timePreflight(name, fn) {
+async function timePreflight(name, fn) {
   const started = performance.now();
-  const result = fn();
+  const result = await fn();
   const seconds = round1((performance.now() - started) / 1000);
   return {
     name,
@@ -339,18 +340,18 @@ function runDependencySync() {
   return { ok: true };
 }
 
-function runAudioToolProbe() {
-  const missing = [
-    ['ffmpeg', FFMPEG_PATH],
-    ['ffprobe', FFPROBE_PATH],
-  ].filter(([, toolPath]) => {
-    const probe = spawnSync(toolPath, ['-version'], { stdio: 'ignore', shell });
-    return probe.error !== undefined || probe.status !== 0;
+// Delegates to the shared checkAudioTooling (lib/gate_preflight.mjs) so a
+// profile run's timing stays comparable to a real gate: this used to keep its
+// own serial copy of the two version probes, which drifted the moment the
+// real preflight started running them concurrently instead.
+async function runAudioToolProbe() {
+  const error = await checkAudioTooling({
+    label: 'gate_profile',
+    shell,
+    command: 'node scripts/gate_profile.mjs',
   });
-  if (missing.length > 0) {
-    console.error(
-      `[gate_profile] missing required SFX audio tooling: ${missing.map(([n]) => n).join(', ')}`,
-    );
+  if (error) {
+    console.error(error);
     return { ok: false, exitCode: 1 };
   }
   return { ok: true };

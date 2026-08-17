@@ -18,7 +18,9 @@
 
 import { audio } from '../game/audio';
 import { ITEMS } from '../sim/data';
+import { isItemLocked } from '../sim/item_lock';
 import type { IWorld } from '../world_api';
+import { bagCornerMark, bagRimClasses } from './bag_corner_mark_view';
 import {
   BAG_CATEGORIES,
   BAG_SORTS,
@@ -30,6 +32,7 @@ import {
   parseBagFilter,
   serializeBagFilter,
 } from './bag_filter';
+import { bagFineMark } from './bag_fine_mark_view';
 import { bagInstanceGlyphKind } from './bag_instance_glyph_view';
 import { filterBankSlots } from './bank_filter';
 import { showQuantityPrompt } from './bank_quantity_prompt';
@@ -58,8 +61,9 @@ import {
 import { formatMoney, formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import {
+  cornerMarkHtml,
   INSTANCE_GLYPH_ARIA_KEYS,
-  instanceGlyphMarkHtml,
+  lockMarkHtml,
   UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS,
 } from './item_instance_glyph_mark';
 import { knownItemDef } from './known_item';
@@ -716,16 +720,28 @@ export class BankWindow {
       const item = knownItemDef(ITEMS, slot.itemId);
       const cell = document.createElement('button');
       cell.type = 'button';
-      cell.className = `bank-item q-${slot.qualityKey}`;
+      // Fine-grade mark (bag_fine_mark_view.ts): a banked fine_* stack keeps the
+      // .bag-fine rim/wash bags gave it, so the grade never disappears on
+      // deposit. Id-based, so no def is needed; a stale-client unknown id is
+      // never in the local grade table and simply stays unmarked.
+      const fineMark = bagFineMark(slot.itemId);
+      cell.className = `bank-item q-${slot.qualityKey}${bagRimClasses(null, fineMark)}`;
       const qColor = QUALITY_COLOR[slot.qualityKey] ?? QUALITY_DEFAULT_COLOR;
       cell.style.setProperty('--bank-slot-quality', qColor);
-      // Per-copy corner marks (masterwork seal, enchanted / signed / bound glyph,
-      // or the generic wedge): same shared helper bags use so a banked masterwork
-      // keeps its seal visible at a glance. Aria-hidden mark; the cell name
-      // carries the per-copy fact. Quest items cannot enter the bank, so no
-      // quest seal composes here.
+      // Corner marks (masterwork seal, fine seal, enchanted / signed / bound
+      // glyph, or the generic wedge): same shared helpers and priority core
+      // bags use (bag_corner_mark_view.ts), so a banked masterwork or fine
+      // stack keeps its seal visible at a glance. Aria-hidden mark; the cell
+      // name carries the per-copy fact (the fine grade rides the item NAME).
+      // Quest items cannot enter the bank, so the quest arm is always null.
       const glyphKind = bagInstanceGlyphKind(slot.instance);
-      const instanceMark = instanceGlyphMarkHtml(glyphKind);
+      const cornerMark = bagCornerMark(glyphKind, null, fineMark);
+      const instanceMark = cornerMarkHtml(cornerMark);
+      // Player item lock (issue 3042): its own bottom-left badge (all-surfaces
+      // family, item_instance_glyph_mark.ts), so a locked copy keeps its mark
+      // visible after deposit exactly like the masterwork/fine seals above.
+      const locked = isItemLocked(slot.instance);
+      const lockSeal = lockMarkHtml(locked);
       // Stale-client guard (R34): an id this bundle predates still holds a
       // real, counted bank slot, so it renders (fallback icon, raw id as the
       // label) instead of vanishing. The withdraw click stays live because the
@@ -735,10 +751,17 @@ export class BankWindow {
       cell.setAttribute(
         'aria-label',
         item
-          ? t(glyphKind ? INSTANCE_GLYPH_ARIA_KEYS[glyphKind] : 'itemUi.bags.itemAria', {
-              item: itemDisplayName(item),
-              count: countLabel,
-            })
+          ? t(
+              locked
+                ? 'hudChrome.bags.itemAriaLocked'
+                : glyphKind
+                  ? INSTANCE_GLYPH_ARIA_KEYS[glyphKind]
+                  : 'itemUi.bags.itemAria',
+              {
+                item: itemDisplayName(item),
+                count: countLabel,
+              },
+            )
           : t(
               glyphKind
                 ? UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS[glyphKind]
@@ -746,7 +769,7 @@ export class BankWindow {
               { id: slot.itemId, count: countLabel },
             ),
       );
-      cell.innerHTML = `${item ? this.deps.itemIcon(item) : unknownItemIconHtml(slot.itemId)}${instanceMark}<span class="bank-count">${slot.showCount ? esc(t('itemUi.bags.stackCount', { count: countLabel })) : ''}</span>`;
+      cell.innerHTML = `${item ? this.deps.itemIcon(item) : unknownItemIconHtml(slot.itemId)}${instanceMark}${lockSeal}<span class="bank-count">${slot.showCount ? esc(t('itemUi.bags.stackCount', { count: countLabel })) : ''}</span>`;
       cell.addEventListener('click', (ev) => {
         // On touch, the click that ends a long-press peek inspects the slot (its
         // tooltip is already shown) instead of withdrawing: the release dismisses

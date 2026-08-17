@@ -30,34 +30,32 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
 
 | File | Role |
 |---|---|
-| `main.ts` | HTTP server + the prefix-ladder dispatch (`routeHttpRequest` sends `/api` `/admin/api` `/oauth` `/internal` to four flag-gated entries) + the RETAINED legacy handler ladder, WS `/ws` upgrade wiring (builds the `createWsAuth` deps bag), boot/shutdown, leaderboard cache. Migrated routes live in per-domain `RouteDef` modules behind `server/http/` (see `server/http/CLAUDE.md`), NOT in a route table here |
+| `main.ts` | HTTP server + the prefix-ladder dispatch (`routeHttpRequest` sends `/api` `/admin/api` `/oauth` `/internal` to four flag-gated entries) + the RETAINED legacy handler ladder, WS `/ws` upgrade wiring (builds the `createWsAuth` deps bag), boot/shutdown, leaderboard cache (migrated routes live behind `server/http/`, see its `CLAUDE.md`) |
 | `game.ts` | `GameServer`: owns the `Sim`, the 50 ms loop, interest-scoped snapshots, command dispatch, chat. **Largest file; extract beside it, never grow it** (Module-first above) |
 | `ws_auth.ts` | the whole WS auth handshake behind an injected deps bag (`createWsAuth`): strict first-frame `ONLINE_WORLD_AUTH_TYPE` check before credential or DB work, moderation/character checks, per-IP cap, the realm admission cap (`MAX_PLAYERS_PER_REALM`, default 5000, explicit 0 disables; checked with an in-flight admission counter so racing handshakes cannot admit past it; resumes and admins exempt), lease acquire, `game.join`. Unit-testable without a DB or HTTP server. Its rejection literals are wire contract the client matches verbatim (`src/ui/api_error_i18n.ts`): change one and the matcher in the SAME commit. Every refusal sends an `{t:'error'}` frame before closing (never a bare close code): the client classifies the literal, so a frameless refusal turns into a silent retry loop |
-| `ws_buffer.ts` | buffers in-flight WS frames during the async auth handshake, then replays them |
 | `msg_rate_limit.ts` / `msg_lanes.ts` / `list_read_guard.ts` | the inbound WS flood defense: the pre-parse gate (frame + byte buckets and the shared abuse window that kicks), the post-parse per-class lanes, and the ignore/block list-readout meter (see "Inbound WS flood defense") |
+| `ws_backpressure.ts` | the OUTBOUND counterpart to the flood defense: terminates a session whose `ws.bufferedAmount` climbs past the hard limit. `ws.send()` never blocks and a non-draining client's socket stays OPEN, so without this one frozen tab or deliberately non-reading attacker accumulates an unbounded write buffer and can OOM the realm; `readyState` checks do not catch it |
 | `linkdead.ts` | pure session-lifecycle decision core: `planJoin` (resume/reject/join) + `LINKDEAD_GRACE_MS` (see Persistence) |
 | `keepalive_sweep.ts` | pure self-clocked keepalive-sweep decision (`keepaliveSweepDelayed`, `KEEPALIVE_STALL_FACTOR`): a sweep that fires late (an event-loop stall) re-arms every session instead of terminating them, so one stall can never mass-disconnect the realm; a genuinely dead socket still reaps one clean interval later |
 | `db.ts` | `pg` pool, core `SCHEMA` DDL + `ensureSchema`, character/account/token/world-state queries. Owns the timeout ladder (connect < statement default < the `runWithStatementTimeout` heavy allowance < the driver-side `query_timeout` backstop; constants + rationale at the top, relation pinned by `tests/server/tunables.test.ts`): wrap a known-long read in `runWithStatementTimeout`, never lift the session default, and remember `SET LOCAL` cannot lift the driver backstop. Boot DDL runs on a dedicated non-pool `Client` so schema setup is never capped |
-| `auth.ts` | scrypt hashing, `newToken`, name/password validators (`obscenity` profanity) |
 | `account.ts`, `totp.ts` | account self-service routes: password change/forgot/reset, verified email change, data export, TOTP 2FA (`totp.ts` is the pure RFC 6238 core) |
-| `social.ts`/`social_db.ts` | friends/guilds/blocks/presence, logic / SQL |
-| `admin.ts`/`admin_db.ts` | admin API + dashboard reads |
 | `admin_permissions.ts`/`admin_routes.ts`/`staff_db.ts` | fine-grained admin authz: permission vocabulary + role bundles / declarative route-to-permission map (fail-closed, guarded by `tests/admin_routes.test.ts`) / `accounts.admin_roles` SQL + `admin_role_changes` audit |
 | `moderation_commands.ts`/`moderation_service.ts`/`moderation_db.ts` | pure parser for the in-game moderator chat commands (`/kick` `/mute` `/ban` `/suspend` `/spectate` `/jail`, ..., with duration caps) / the moderation service behind a host interface, wired into `GameServer` / writes + unified history |
 | `chat_filter.ts`/`chat_filter_db.ts` | host-agnostic profanity/slur filter (soft cosmetic + hard server-enforced tiers) / admin word-list SQL |
 | `bot_detector/contract.ts` / `stub.ts` | `BotDetector` seam (`#bot-detector`): the contract interface / the no-op stub used when the private clone is absent |
 | `antibot_config_db.ts` | per-realm JSONB state plus append-only audit history for the bot-detector runtime config (the admin Bot Detector > Configuration panel); validation and live apply happen inside the detector (`BotDetector.applyConfig`) |
-| `turnstile.ts`, `web_login_guard.ts` | Cloudflare Turnstile siteverify / auth-endpoint Origin guard (anti-bot) |
-| `realm.ts` | `REALM`, `REALM_DIRECTORY`, `REALM_ORIGINS` from `REALM_NAME`/`REALMS` env |
-| `ratelimit.ts` | per-IP sliding-window limiter + `X-Forwarded-For` resolution |
-| `internal.ts` | secret-gated `/internal/*` ops endpoints (e.g. restart-countdown trigger) |
-| `woc_balance.ts` | the sole Solana RPC reader: holder-tier flair and connected-wallet balance, cached |
-| `player_card.ts` | shareable player-card PNGs, Open Graph unfurl, referral capture |
+| `woc_balance.ts` | $WOC Solana RPC reads: holder-tier flair and connected-wallet balance, cached per wallet so the RPC URL (and any embedded key) never ships in the client bundle. No longer the only Solana RPC reader: the Seeker cluster below reads `SOLANA_RPC_URL` through its own transport |
+| `seeker_*.ts` | the Solana Seeker genesis-token entitlement cluster: attestation-gated claim routes (`seeker_entitlement.ts`) with ownership verified against Solana RPC through its own hardened transport (`seeker_rpc_transport.ts`: `validatedSeekerRpcUrl` HTTPS-only, no embedded credentials, responses capped at `SEEKER_RPC_MAX_RESPONSE_BYTES`) |
 | `bank_ledger.ts` | append-only `bank_ledger` observer: diffs `Sim.bankInfoFor` around each bank dispatch and writes the moved delta via a fire-and-forget FIFO (audited offline by `scripts/bank_audit.mjs`) |
 | `bank_entitlements.ts` | pure bonus-slot source registry + `computeBankBonus` (email verified / Discord / wallet / qualified referrals); stamped at the fresh-join handshake via the injected `WsAuthDeps.bankBonusForAccount`, never client-supplied |
-| `deeds_db.ts` / `deeds_records.ts` | deeds SQL boundary (`character_deeds` upserts, rarity counts, recent earns, broadcast opt-out; the board roll-up is `deedsBoardRanked` in `db.ts`, aggregated SQL-side with Renown passed as parameters) / the `deedUnlocked` observer: fire-and-forget FIFO upserts, the `isMarqueeDeed` predicate, and the env-gated Steam mirror hook (the marquee guild/friend broadcast fan-out itself lives in `game.ts`); the sim decides unlocks, this only records them |
+| `deeds_db.ts` / `deeds_records.ts` | deeds SQL boundary (`character_deeds` upserts, rarity counts, recent earns, broadcast opt-out; the board roll-up is `deedsBoardRanked` in `db.ts`, aggregated SQL-side with Renown passed as parameters) / the `deedUnlocked` observer: fire-and-forget FIFO upserts, the `isMarqueeDeed` predicate, and the dual storefront mirror fan-out (BOTH the Steam and Epic `onDeedRecorded` hooks fire after each upsert, D21; the marquee guild/friend broadcast fan-out itself lives in `game.ts`); the sim decides unlocks, this only records them |
 | `deeds_board.ts` / `deeds.ts` | the Renown leaderboard's pure scoring core (account-level dedupe, entry floor, score-then-earliest tie-break; Renown values come from the content table, never SQL) / the `RouteDef` API surface (public rarity read, broadcast toggle), TTL-cached in `main.ts` |
-| `steam/` | the env-gated (`STEAM_ENABLED`, off by default) Steam achievements mirror: link-not-login ticket handshake, `achievement_map.ts` (deed id to `ACH_*`, hard cap 100), publisher Web API push + reconcile-on-link |
+| `steam/` / `epic/` | the env-gated (`STEAM_ENABLED` / `EPIC_ENABLED`, off by default) storefront achievement mirrors: link-not-login association plus the deed-to-achievement push, mirror-never-authority. The shared pattern is documented in `server/steam/CLAUDE.md`; `server/epic/CLAUDE.md` covers only the Epic deltas |
+| `reliquary.ts` / `reliquary_rarity_db.ts` | the Reliquary API surface: registry-only `RouteDef`s mirroring the deeds rarity rung (static `routes`, `configureReliquaryRuntime` injection, no legacy twin); the rarity aggregate unnests `characters.state` JSONB in place and shares the deeds rarity TTL cache + single flight in `main.ts`, so the characters walk never gains a second cadence |
+| `guild_bank_state.ts` (+ `guild_bank_op_guard`/`op_log`/`counterparty`/`log`) | guild bank host glue: the escrow-merge save path (a session persists only its OWN unflushed op deltas, never the shared live book; the row is rebuilt inside the transaction, and a refused book half aborts the paired character half via `GuildBankEscrowRefused`), the dedicated op token bucket, unflushed-op-log compaction, counterparty ledger rows, and the member-visible activity-log read. SQL seam: `db.ts` `loadGuildBankRows`/`saveCharacterAndGuildBankState`; design record `docs/guild-bank/escrow-fix-plan.md` |
+| `claudium.ts` / `claudium_proxy.ts` | CLAUDIUM, the server-authoritative soft currency: a thin authenticated pass-through that computes NO peg/price/balance (ALL economy logic lives in the external service), proxied through `claudium_proxy.ts`, which fails closed with typed unavailable results and never throws when the service is unset or unreachable. The shared `handleClaudiumApi` core is called by BOTH dispatch arms (mirrors the daily-rewards twin) |
+| `parse/` | the combat parse recorder: a read-only observer at the tick drain that segments play into fights and ships gzip NDJSON to the external parse service; see `server/parse/CLAUDE.md` |
+| `email/` | transactional + marketing email, the ONE place `server/` renders final localized text itself; see `server/email/CLAUDE.md` |
 | `daily_rewards.ts`/`daily_rewards_db.ts` | wallet-gated daily reward tasks + Discord winner announcements; participation bans are WRITTEN in `moderation_db.ts` (`setDailyRewardsBan`, permanent or timed via `durationHours`, recorded in the moderation audit; `tests/moderation_db.test.ts`), this pair owns only the eligibility read (`banForAccount`, `tests/daily_rewards_ban_db.test.ts`) |
 | `discord.ts` (+ `discord_oauth`/`discord_db`/`discord_relay`/`discord_activity`/`discord_link_changes`/`discord_status_cache`/`discord_bot_counters`/`http/discord_bot_metrics`) | Discord integration: link/unlink OAuth shell + rewards, in-game `!` community-command relay, activity feed the bot drains, the bounded linked-member change feed the outbox carries, the keyed `/api/discord` status cache busted on every write, and the bot's governor counters exposed as prometheus series |
 | `github.ts` (+ `github_oauth`/`github_db`/`github_contributors`) | GitHub contributor linking for the developer badge + merged-PR tally |
@@ -65,7 +63,6 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
 | `maps.ts`/`maps_db.ts`/`maps_routes.ts`, `user_assets*.ts` | map editor: custom-map persistence with fork lineage / hardened player GLB uploads (both mirror the `SocialService`/`SocialDb` split) |
 | `tick_profiler.ts` / `tick_rate_meter.ts` | debugging the 50 ms budget: rolling per-phase loop timings, achieved wall-clock tick rate (the two can disagree, see the meter header) |
 | `mob_scan_tick_stats.ts` | folds the sim's per-tick mob-scan visit counters (`Sim.mobScanCounters`, observer-only) into the `PERF_TICK_LOG` heartbeat tokens (`aggroVisits=`/`threatVisits=`) and the admin tick-capture accumulators; `game.ts` keeps only the holder and the apply call |
-| `perf_report.ts` / `provider_usage.ts` | rate-limited client perf-report ingestion / process-local provider and usage telemetry for the admin dashboard |
 | `cached_read.ts` / `deeds_board_warm.ts` / `discord_status_cache.ts` | the three shared-read cache shapes: single-key `createCachedRead` (TTL, single-flight, stale-on-error, joiner-refusing bust) / the extended `singleFlight(run, epochOf?)` for per-scope epoch-keyed board flights / the keyed bounded per-account cache behind `GET /api/discord` (see Hot paths) |
 | `retention_sweep.ts` | the advisory-locked, self-clocked nightly sweep of batched per-table prunes; every table that grows without bound registers here (see Hot paths) |
 | `concurrent_indexes.ts` | post-boot `CREATE INDEX CONCURRENTLY` seam for new indexes on big live tables |
@@ -155,8 +152,8 @@ Three seams keep it flat; use them, never re-invent them.
   NOT EXISTS over NOT IN for referent guards (NOT IN falls off a work_mem cliff).
 
 - **SQL shape on hot paths.** A query the planner should serve from an expression index
-  must share the index's SQL text verbatim (one exported constant, e.g.
-  `LIFETIME_XP_EXPR`, used by both the query and the DDL). Hot views prefer plain UNION
+  must share the index's SQL text verbatim (one shared module-level constant, e.g.
+  `LIFETIME_XP_EXPR` in `db.ts`, used by both the query and the DDL). Hot views prefer plain UNION
   arms over OR-joined EXISTS (`DAILY_REWARD_EXCLUDED_ACCOUNTS_VIEW_SQL`). Known-long
   reads ride `runWithStatementTimeout` (see the `db.ts` timeout ladder), and new indexes
   on big live tables go through `concurrent_indexes.ts`, never boot DDL.
@@ -259,9 +256,9 @@ prefix ladder: `routeHttpRequest` sends each prefix to one of four flag-gated en
 `selectApiEntry`. Under `API_DISPATCH=new` (the default) a matched `RouteDef` from the registry
 runs the middleware onion; an unmatched path (and HEAD) delegates to the retained legacy handler
 for that prefix. `API_DISPATCH=legacy` is the one-flag rollback to the old ladder. A migrated
-route is served by BOTH arms until the ladder-deletion follow-up, so any behavior edit to one twin
-MUST land in the other in the SAME change (the flag model, the `RouteDef`/envelope contract, and
-this dual-edit rule live in `server/http/CLAUDE.md`).
+route is served by BOTH arms until the ladder-deletion follow-up; the dual-edit rule (with its
+`known_deviations.ts` ledger), the flag model, and the `RouteDef`/envelope contract live in
+`server/http/CLAUDE.md`.
 
 ## Adding an endpoint (REST)
 0. **Scaffold it.** `npm run new:endpoint -- --domain <slug> --method <METHOD> --path </api/...>

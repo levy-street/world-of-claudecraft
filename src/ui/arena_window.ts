@@ -19,6 +19,7 @@
 
 import { audio } from '../game/audio';
 import type { ArenaMapId } from '../sim/dungeon_layout';
+import { ARENA_MIN_LEVEL } from '../sim/social/arena';
 import { BG_TEAM_SIZE } from '../sim/social/battleground';
 import type { PlayerClass } from '../sim/types';
 import type { ArenaFormat, IWorld } from '../world_api';
@@ -43,6 +44,7 @@ import {
   buildBgWindowView,
 } from './hud/battleground';
 import { formatNumber, t } from './i18n';
+import { formatPvpRecord } from './pvp_record_core';
 import { buildPvpTabs, type PvpTabId, type PvpTabsModel } from './pvp_tabs_view';
 import { svgIcon } from './ui_icons';
 
@@ -267,6 +269,7 @@ export class ArenaWindow {
       playerName: world.player.name,
       party: world.partyInfo,
       allTime: this.allTime,
+      playerLevel: world.player.level,
     });
 
     if (view.kind === 'offline') {
@@ -348,7 +351,11 @@ export class ArenaWindow {
     const rank =
       `<div class="bg-rank"><span class="rating">${esc(num(view.rating))}</span>` +
       `<span class="wl">${esc(
-        t('hudChrome.bg.ratingSummary', { wins: num(view.wins), losses: num(view.losses) }),
+        t('hudChrome.bg.ratingSummary', {
+          wins: num(view.wins),
+          losses: num(view.losses),
+          draws: num(view.draws),
+        }),
       )}</span></div>` +
       `<div class="bg-captures">${esc(t('hudChrome.bg.careerCaptures', { count: num(view.captures) }))}</div>`;
     // The LIVE online ladder sits above the all-time board, the same order the
@@ -450,7 +457,7 @@ export class ArenaWindow {
             t('hudChrome.bg.playerClassTitle', { name: r.name, className: cls }),
           )}">${esc(r.name)}</span>` +
           `<span class="lr-rating">${esc(num(r.rating))}</span>` +
-          `<span class="lr-wl">${esc(num(r.wins))}-${esc(num(r.losses))}</span></div>`
+          `<span class="lr-wl">${esc(formatPvpRecord(r))}</span></div>`
         );
       })
       .join('');
@@ -471,7 +478,7 @@ export class ArenaWindow {
             }),
           )}">${esc(r.name)}</span>` +
           `<span class="lr-rating">${esc(num(r.rating))}</span>` +
-          `<span class="lr-wl">${esc(num(r.wins))}-${esc(num(r.losses))}</span></div>`
+          `<span class="lr-wl">${esc(formatPvpRecord(r))}</span></div>`
         );
       })
       .join('');
@@ -484,6 +491,7 @@ export class ArenaWindow {
         t('hud.arena.ratingSummary', {
           wins: num(view.standing.wins),
           losses: num(view.standing.losses),
+          draws: num(view.standing.draws),
         }),
       )}</span></div>`;
     const allTimeSection =
@@ -541,9 +549,14 @@ export class ArenaWindow {
       );
     }
     const btnCls = action.queueDisabled ? 'btn disabled' : 'btn';
+    const note = action.belowMinLevel
+      ? t('hudChrome.arenaGate.minLevelNote', {
+          level: formatNumber(ARENA_MIN_LEVEL, { maximumFractionDigits: 0 }),
+        })
+      : t('hud.arena.queueNote');
     return (
       `<button class="${btnCls}" data-act="queue"${action.queueDisabled ? ' disabled' : ''}>${esc(t('hud.arena.enterQueue'))}</button>` +
-      `<div class="arena-note">${esc(t('hud.arena.queueNote'))}</div>`
+      `<div class="arena-note">${esc(note)}</div>`
     );
   }
 
@@ -555,7 +568,7 @@ export class ArenaWindow {
           `<div class="ladder-row${r.me ? ' me' : ''}"><span class="rank">${esc(num(r.rank))}</span>` +
           `<span class="lr-name" title="${esc(t('hud.arena.playerClassTitle', { name: r.name, className: cls }))}">${esc(r.name)}</span>` +
           `<span class="lr-rating">${esc(num(r.rating))}</span>` +
-          `<span class="lr-wl">${esc(num(r.wins))}-${esc(num(r.losses))}</span></div>`
+          `<span class="lr-wl">${esc(formatPvpRecord(r))}</span></div>`
         );
       })
       .join('');
@@ -576,7 +589,7 @@ export class ArenaWindow {
             }),
           )}">${esc(r.name)}</span>` +
           `<span class="lr-rating">${esc(num(r.rating))}</span>` +
-          `<span class="lr-wl">${esc(num(r.wins))}-${esc(num(r.losses))}</span></div>`
+          `<span class="lr-wl">${esc(formatPvpRecord(r))}</span></div>`
         );
       })
       .join('');

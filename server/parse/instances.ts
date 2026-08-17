@@ -101,6 +101,7 @@ export class DungeonSegmenter {
     );
     if (isBoss) fight.primaryBossId = mobId;
     fight.mobIds.add(mobId);
+    fight.noteActor(mobId, mob.name);
     state.activeFight = fight;
     return fight;
   }

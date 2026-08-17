@@ -497,11 +497,13 @@ describe('marker stylesheet contract (source pins)', () => {
     // One shared corner-mark BOX carries the geometry for the per-copy glyphs
     // and the quest / fine seals (rule of three); each kind's own rule holds
     // only its color. The grouped selector is the pin that every member is in
-    // the family, the bank glyph twin included (a banked masterwork keeps the
-    // same seal art; tests/bank_window_instance_marker.test.ts pins the bank
-    // half from its side, keep the pair in sync).
+    // the family, the bank glyph and fine-seal twins included (a banked
+    // masterwork or fine stack keeps the same seal art; only the quest seal
+    // has no bank twin, quest items cannot enter either bank;
+    // tests/bank_window_instance_marker.test.ts pins the bank half from its
+    // side, keep the pair in sync).
     const boxStart = components.search(
-      /\.bag-item \.bi-glyph,\s*\.bank-item \.bi-glyph,\s*\.bag-item \.bi-quest-seal,\s*\.bag-item \.bi-fine-seal \{/,
+      /\.bag-item \.bi-glyph,\s*\.bank-item \.bi-glyph,\s*\.bag-item \.bi-quest-seal,\s*\.bag-item \.bi-fine-seal,\s*\.bank-item \.bi-fine-seal \{/,
     );
     expect(boxStart).toBeGreaterThan(-1);
     const glyphBlock = components.slice(boxStart, components.indexOf('}', boxStart));
@@ -576,15 +578,23 @@ describe('marker stylesheet contract (source pins)', () => {
     expect(components).toMatch(
       /prefers-reduced-motion:\s*reduce[\s\S]*?\.bi-quest-seal-ready[\s\S]*?animation:\s*none/,
     );
-    // Painter paints classes only; no raw quest hex in bags_window.
+    // Painter paints classes only; no raw quest hex in bags_window. The quest
+    // seal markup itself now lives in the shared cornerMarkHtml dispatch
+    // (item_instance_glyph_mark.ts), so the class pins land there; the
+    // painter keeps the decision calls and threads questReady through.
     const painter = readFileSync(join(__dirname, '../src/ui/bags_window.ts'), 'utf8');
     expect(painter).not.toContain('#ffd12d');
     expect(painter).not.toContain('#ffd100');
-    expect(painter).toContain('bag-quest');
-    expect(painter).toContain('bi-quest-seal');
     expect(painter).toContain('bagQuestMarkKind');
-    expect(painter).toContain('bag-quest-ready');
-    expect(painter).toContain('bi-quest-seal-ready');
+    expect(painter).toContain('cornerMarkHtml(cornerMark, { questReady })');
+    const markHelper = readFileSync(
+      join(__dirname, '../src/ui/item_instance_glyph_mark.ts'),
+      'utf8',
+    );
+    expect(markHelper).not.toContain('#ffd12d');
+    expect(markHelper).not.toContain('#ffd100');
+    expect(markHelper).toContain('class="bi-quest-seal');
+    expect(markHelper).toContain('bi-quest-seal-ready');
   });
 
   it('fine bag treatment is always-on, tokenized, and never an --fx gate', () => {
@@ -596,38 +606,57 @@ describe('marker stylesheet contract (source pins)', () => {
     // Bounded to the declaration ([^;]*): an unbounded gap would skate past a
     // raw-hex wash to the -seal line below it and pin nothing.
     expect(tokens).toMatch(/--color-bag-fine-wash:[^;]*var\(--color-bag-fine\)/);
-    const commonStart = components.indexOf('.bag-item.q-common');
-    const fineCellStart = components.indexOf('.bag-item.bag-fine {');
+    const bagCommonStart = components.indexOf('.bag-item.q-common');
+    const bankCommonStart = components.indexOf('.bank-item.q-common');
+    const fineCellStart = components.indexOf('.bag-item.bag-fine,');
     expect(fineCellStart).toBeGreaterThan(-1);
-    // Fine rim must follow the common/poor neutral reset so equal-specificity
-    // !important border-color wins for the refined grade color. (Order against
-    // .bag-quest is not load-bearing: bagRimClasses never emits both, pinned
-    // in bag_corner_mark_view.test.ts.)
-    expect(commonStart).toBeGreaterThan(-1);
-    expect(fineCellStart).toBeGreaterThan(commonStart);
+    // One dual-selector rim rule for bags AND both bank grids (the treatment
+    // cannot drift per surface), placed after BOTH common/poor neutral resets
+    // so its equal-specificity !important border-color wins the refined grade
+    // color everywhere. (Order against .bag-quest is not load-bearing:
+    // bagRimClasses never emits both, pinned in bag_corner_mark_view.test.ts.)
+    expect(bagCommonStart).toBeGreaterThan(-1);
+    expect(bankCommonStart).toBeGreaterThan(-1);
+    expect(fineCellStart).toBeGreaterThan(bagCommonStart);
+    expect(fineCellStart).toBeGreaterThan(bankCommonStart);
     const fineCellBlock = components.slice(fineCellStart, components.indexOf('}', fineCellStart));
+    expect(fineCellBlock).toContain('.bank-item.bag-fine {');
     expect(fineCellBlock).toContain('border-color:');
     expect(fineCellBlock).toContain('!important');
     expect(fineCellBlock).toContain('box-shadow:');
     expect(fineCellBlock).toContain('var(--color-bag-fine-rim)');
     expect(fineCellBlock).toContain('var(--color-bag-fine-wash)');
     expect(fineCellBlock).not.toContain('--fx-');
+    // No solo second definition anywhere: each cell selector appears exactly
+    // once, both inside the one dual block (a stray `.bank-item.bag-fine`
+    // opener elsewhere would be a fork that can drift).
+    expect(components.split('.bag-item.bag-fine').length).toBe(2);
+    expect(components.split('.bank-item.bag-fine').length).toBe(2);
     // The fine seal shares the corner-mark box (geometry pinned in the
     // per-kind glyph test above, whose grouped selector includes this seal);
-    // its own rule is color-only, pinned as an exact single-declaration shape
+    // its own rule is color-only, one dual-selector shape for bags and banks
     // (an indexOf slice lands on the grouped box rule, where fine is the last
     // selector in the list).
     expect(components).toMatch(
-      /\.bag-item \.bi-fine-seal \{\s*color: var\(--color-bag-fine-seal\);\s*\}/,
+      /\.bag-item \.bi-fine-seal,\s*\.bank-item \.bi-fine-seal \{\s*color: var\(--color-bag-fine-seal\);\s*\}/,
     );
     expect(components).not.toContain('.bag-item:hover .bi-fine-seal');
-    // The painter paints classes only: no inline style and no raw fine teal
-    // (the token literal must live in tokens.css alone).
+    expect(components).not.toContain('.bank-item:hover .bi-fine-seal');
+    // The painter paints classes only and mints the seal through the shared
+    // cornerMarkHtml dispatch (no inline seal markup or raw fine teal
+    // anywhere; the token literal must live in tokens.css alone).
     const painter = readFileSync(join(__dirname, '../src/ui/bags_window.ts'), 'utf8');
     expect(painter).toContain('bagFineMark');
-    expect(painter).toContain('bi-fine-seal');
-    expect(painter).not.toContain('bi-fine-seal" style=');
+    expect(painter).toContain('cornerMarkHtml(cornerMark, { questReady })');
+    expect(painter).not.toContain('fineSealMarkHtml');
     expect(painter).not.toContain('#6ec8d4');
+    const markHelper = readFileSync(
+      join(__dirname, '../src/ui/item_instance_glyph_mark.ts'),
+      'utf8',
+    );
+    expect(markHelper).toContain('class="bi-fine-seal"');
+    expect(markHelper).not.toContain('bi-fine-seal" style=');
+    expect(markHelper).not.toContain('#6ec8d4');
     // Rim exclusivity is consumed from the pure core, not re-derived inline:
     // the className template defers to bagRimClasses (code literal, so a
     // comment mentioning the name cannot satisfy this pin).

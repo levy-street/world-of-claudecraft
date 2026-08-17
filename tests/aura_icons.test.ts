@@ -6,7 +6,7 @@ import {
   SPRINT_RUNE_AURA_ID,
   WARD_RUNE_AURA_ID,
 } from '../src/sim/social/battleground';
-import { hasAuraRecipe, iconDataUrl } from '../src/ui/icons';
+import { auraIconRecipe, hasAuraRecipe, iconDataUrl, isUnknownIconRecipe } from '../src/ui/icons';
 
 // Buff/debuff aura frames (the player buff bar and a mob's DoT debuffs, both via
 // Hud.renderAuras) request their icon with kind 'aura'. When the aura carries a
@@ -73,5 +73,59 @@ describe('aura icons reuse image-based ability art', () => {
     expect(hasAuraRecipe(CARRIED_FLAG_AURA_ID), 'the carried-flag buff needs its recipe').toBe(
       true,
     );
+  });
+
+  it('keeps a readable attack-power-percent safety fallback', () => {
+    expect(hasAuraRecipe('aura_buff_ap_pct')).toBe(true);
+  });
+
+  it('keeps painted modifier timers meaningful before their WebPs decode', () => {
+    for (const id of [
+      'battle_rhythm',
+      'bloodbath',
+      'colossal_might',
+      'elemental_convergence',
+      'overflowing_power',
+      'pursuit',
+    ]) {
+      expect(hasAuraRecipe(id), id).toBe(true);
+      expect(isUnknownIconRecipe(auraIconRecipe(id)), id).toBe(false);
+    }
+  });
+
+  it('never paints the unknown rune for a reachable generic aura kind', () => {
+    const genericKinds = [
+      'battle_trance',
+      'buff_allstats_pct',
+      'buff_energyregen',
+      'cauterize_fatigue',
+      'enrage',
+      'sated',
+      'buff_scale',
+      'buff_jump',
+      'blind',
+      'silence',
+      'corrode',
+      'critvuln',
+      'disarm',
+      'expose',
+      'hex',
+      'lockout',
+      'mortal_wound',
+      'resource_sap',
+      'spellvuln',
+      'vulnerability',
+      'next_cast_cheap',
+      'heal_echo',
+    ];
+    for (const kind of genericKinds) {
+      expect(isUnknownIconRecipe(auraIconRecipe(`aura_${kind}`)), kind).toBe(false);
+    }
+  });
+
+  it('does not treat prototype-chain keys as authored aura recipes', () => {
+    for (const id of ['__proto__', 'constructor', 'toString', 'hasOwnProperty']) {
+      expect(hasAuraRecipe(id), id).toBe(false);
+    }
   });
 });

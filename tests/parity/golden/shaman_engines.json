@@ -1,0 +1,3986 @@
+{
+  "scenario": "shaman_engines",
+  "seed": 2929,
+  "sampleEvery": 20,
+  "ticks": 306,
+  "coverage": [
+    "class:shaman (Thundercall, Warspirit, Spiritmend)",
+    "Thundercall Arc Bolt build and Earthen Jolt vent",
+    "Warspirit dual-wield cadence and Stormcast state",
+    "Stonebound posture riders (armor, Vigor stamina, guard) and the Earthen Jolt compel",
+    "Spiritmend Tidecall deposit and Cascading Mend consumption",
+    "Shaman spec state in deterministic headless snapshots"
+  ],
+  "draws": 2568,
+  "drawDigest": "79076f6d",
+  "frames": [
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 964,
+      "state": "5bc471b0",
+      "events": "741638a5",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "init",
+      "players": [],
+      "entities": []
+    },
+    {
+      "tick": 20,
+      "time": 1,
+      "nextId": 969,
+      "state": "4840d992",
+      "events": "b5859331",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      }
+    },
+    {
+      "tick": 40,
+      "time": 2,
+      "nextId": 969,
+      "state": "0f18ee82",
+      "events": "741638a5",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      }
+    },
+    {
+      "tick": 60,
+      "time": 3,
+      "nextId": 969,
+      "state": "63ec85a0",
+      "events": "d019fe0d",
+      "rng": {
+        "draws": 154,
+        "digest": "63603153"
+      }
+    },
+    {
+      "tick": 80,
+      "time": 4,
+      "nextId": 969,
+      "state": "d62accef",
+      "events": "741638a5",
+      "rng": {
+        "draws": 328,
+        "digest": "40f16490"
+      }
+    },
+    {
+      "tick": 100,
+      "time": 5,
+      "nextId": 969,
+      "state": "5c1993b5",
+      "events": "eb38ae90",
+      "rng": {
+        "draws": 508,
+        "digest": "d2e4d967"
+      }
+    },
+    {
+      "tick": 100,
+      "time": 5,
+      "nextId": 969,
+      "state": "5c1993b5",
+      "events": "741638a5",
+      "rng": {
+        "draws": 508,
+        "digest": "d2e4d967"
+      },
+      "label": "thundercall-vent",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "shaman",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 226
+          },
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "dummyDamage": 226
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "spring_water",
+              "training_mace"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_specialized",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 964,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "training_mace"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 65,
+          "talents": {
+            "rows": {},
+            "spec": "elemental"
+          },
+          "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "shaman",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "spring_water",
+              "training_mace"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_specialized",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 965,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "training_mace"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 65,
+          "talents": {
+            "rows": {},
+            "spec": "enhancement"
+          },
+          "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "shaman",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "spring_water",
+              "training_mace"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_specialized",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 966,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "training_mace"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 65,
+          "talents": {
+            "rows": {},
+            "spec": "restoration"
+          },
+          "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 967,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 55,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 74,
+          "auras": [
+            {
+              "duration": 86400,
+              "id": "shaman_thunder_charges",
+              "kind": "internal_cd",
+              "name": "Thunder Charges",
+              "remaining": 86400,
+              "school": "nature",
+              "sourceId": 964,
+              "stacks": 1
+            }
+          ],
+          "castTotal": 2.181818,
+          "combatTimer": 0.9,
+          "comboUntil": -1,
+          "cooldowns": [
+            [
+              "earth_shock",
+              5
+            ],
+            [
+              "flame_shock",
+              5
+            ],
+            [
+              "frost_shock",
+              5
+            ]
+          ],
+          "critChance": 0.0675,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0675,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 1,
+          "gcdRemaining": 0.363636,
+          "hp": 733,
+          "id": 964,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 733,
+          "maxResource": 1188,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 3
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1133,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellHaste": 0.1,
+          "spellPower": 32,
+          "stats": {
+            "agi": 35,
+            "armor": 314,
+            "int": 64,
+            "spi": 56,
+            "sta": 58,
+            "str": 37
+          },
+          "targetId": 968,
+          "templateId": "shaman",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 120,
+          "combatTimer": 104,
+          "comboUntil": -1,
+          "critChance": 0.0675,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0675,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 104,
+          "hp": 733,
+          "id": 965,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 733,
+          "maxResource": 1098,
+          "meleeHaste": 0.1,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 3
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1098,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 29,
+          "stats": {
+            "agi": 35,
+            "armor": 314,
+            "int": 58,
+            "spi": 56,
+            "sta": 58,
+            "str": 37
+          },
+          "targetId": 968,
+          "templateId": "shaman",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 74,
+          "combatTimer": 104,
+          "comboUntil": -1,
+          "critChance": 0.0675,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0675,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 104,
+          "hp": 733,
+          "id": 966,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 733,
+          "maxResource": 1158,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1158,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 31,
+          "stats": {
+            "agi": 35,
+            "armor": 314,
+            "int": 62,
+            "spi": 56,
+            "sta": 58,
+            "str": 37
+          },
+          "templateId": "shaman",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3595,
+              "school": "physical",
+              "sourceId": 967
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 104,
+          "comboUntil": -1,
+          "critChance": 0.0695,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0695,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 104,
+          "hp": 822,
+          "id": 967,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 822,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 39,
+            "armor": 410,
+            "int": 10,
+            "spi": 11,
+            "sta": 61,
+            "str": 61
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 0.9,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 999774,
+          "id": 968,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 2,
+            "y": 1.5,
+            "z": 6
+          },
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 1000000,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 6
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 6
+          },
+          "stats": {},
+          "tappedById": 964,
+          "templateId": "training_dummy",
+          "threat": [
+            [
+              964,
+              226
+            ]
+          ],
+          "weapon": {
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 120,
+      "time": 6,
+      "nextId": 969,
+      "state": "b7e36b02",
+      "events": "00613fac",
+      "rng": {
+        "draws": 695,
+        "digest": "ff70d1e3"
+      }
+    },
+    {
+      "tick": 140,
+      "time": 7,
+      "nextId": 969,
+      "state": "cbc3acfb",
+      "events": "741638a5",
+      "rng": {
+        "draws": 923,
+        "digest": "0ac0a2b6"
+      }
+    },
+    {
+      "tick": 160,
+      "time": 8,
+      "nextId": 969,
+      "state": "4e99c576",
+      "events": "f325ce3f",
+      "rng": {
+        "draws": 1157,
+        "digest": "0901d425"
+      }
+    },
+    {
+      "tick": 180,
+      "time": 9,
+      "nextId": 969,
+      "state": "828678f2",
+      "events": "741638a5",
+      "rng": {
+        "draws": 1413,
+        "digest": "77cb1437"
+      }
+    },
+    {
+      "tick": 182,
+      "time": 9.1,
+      "nextId": 969,
+      "state": "dc58c98e",
+      "events": "741638a5",
+      "rng": {
+        "draws": 1440,
+        "digest": "e0c89283"
+      },
+      "label": "warspirit-cadence",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "shaman",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 226
+          },
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "dummyDamage": 226
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "spring_water",
+              "training_mace"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_specialized",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 964,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "training_mace"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 65,
+          "talents": {
+            "rows": {},
+            "spec": "elemental"
+          },
+          "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "shaman",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 125
+          },
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "dummyDamage": 125
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "spring_water",
+              "training_mace"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_specialized",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 965,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "training_mace",
+            "offhand": "training_mace"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 65,
+          "talents": {
+            "rows": {},
+            "spec": "enhancement"
+          },
+          "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "shaman",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "spring_water",
+              "training_mace"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_specialized",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 966,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "training_mace"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 65,
+          "talents": {
+            "rows": {},
+            "spec": "restoration"
+          },
+          "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 967,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 55,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 74,
+          "auras": [
+            {
+              "duration": 86400,
+              "id": "shaman_thunder_charges",
+              "kind": "internal_cd",
+              "name": "Thunder Charges",
+              "remaining": 86400,
+              "school": "nature",
+              "sourceId": 964,
+              "stacks": 1
+            }
+          ],
+          "castTotal": 2.181818,
+          "combatTimer": 5,
+          "comboUntil": -1,
+          "cooldowns": [
+            [
+              "earth_shock",
+              0.9
+            ],
+            [
+              "flame_shock",
+              0.9
+            ],
+            [
+              "frost_shock",
+              0.9
+            ]
+          ],
+          "critChance": 0.0675,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0675,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 5.1,
+          "hp": 733,
+          "id": 964,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 733,
+          "maxResource": 1188,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 3
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1149,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellHaste": 0.1,
+          "spellPower": 32,
+          "stats": {
+            "agi": 35,
+            "armor": 314,
+            "int": 64,
+            "spi": 56,
+            "sta": 58,
+            "str": 37
+          },
+          "targetId": 968,
+          "templateId": "shaman",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 120,
+          "auras": [
+            {
+              "duration": 1800,
+              "id": "galeheart_weapon",
+              "kind": "imbue",
+              "name": "Galeheart Weapon",
+              "remaining": 1795.9,
+              "school": "nature",
+              "sourceId": 965
+            },
+            {
+              "duration": 12,
+              "empowerAbilities": [
+                "lightning_bolt",
+                "earth_shock",
+                "flame_shock",
+                "frost_shock",
+                "healing_wave"
+              ],
+              "id": "shaman_stormcast",
+              "kind": "next_cast_instant",
+              "name": "Stormcast",
+              "remaining": 10.4,
+              "school": "nature",
+              "sourceId": 965,
+              "value": 1
+            },
+            {
+              "duration": 12,
+              "empowerAbilities": [
+                "lightning_bolt",
+                "earth_shock",
+                "flame_shock",
+                "frost_shock",
+                "healing_wave"
+              ],
+              "id": "shaman_stormcast_cheap",
+              "kind": "next_cast_cheap",
+              "name": "Stormcast",
+              "remaining": 10.4,
+              "school": "nature",
+              "sourceId": 965,
+              "value": 0.5
+            },
+            {
+              "duration": 86400,
+              "id": "shaman_warspirit_cadence",
+              "kind": "internal_cd",
+              "name": "Warspirit Cadence",
+              "remaining": 86400,
+              "school": "nature",
+              "sourceId": 965,
+              "stacks": 1
+            }
+          ],
+          "autoAttack": true,
+          "combatTimer": 1.6,
+          "comboUntil": -1,
+          "critChance": 0.0675,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0675,
+          "dualWielding": true,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 4.1,
+          "hp": 733,
+          "id": 965,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 733,
+          "maxResource": 1098,
+          "meleeHaste": 0.1,
+          "moveSpeed": 7,
+          "offhandItemId": "training_mace",
+          "offhandSwingTimer": 0.813636,
+          "offhandWeapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          },
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 3
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1089,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 29,
+          "stats": {
+            "agi": 35,
+            "armor": 314,
+            "int": 58,
+            "spi": 56,
+            "sta": 58,
+            "str": 37
+          },
+          "swingTimer": 0.813636,
+          "targetId": 968,
+          "templateId": "shaman",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 74,
+          "combatTimer": 108.1,
+          "comboUntil": -1,
+          "critChance": 0.0675,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0675,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 108.1,
+          "hp": 733,
+          "id": 966,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 733,
+          "maxResource": 1158,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1158,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 31,
+          "stats": {
+            "agi": 35,
+            "armor": 314,
+            "int": 62,
+            "spi": 56,
+            "sta": 58,
+            "str": 37
+          },
+          "templateId": "shaman",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3590.9,
+              "school": "physical",
+              "sourceId": 967
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 108.1,
+          "comboUntil": -1,
+          "critChance": 0.0695,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0695,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 108.1,
+          "hp": 822,
+          "id": 967,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 822,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 39,
+            "armor": 410,
+            "int": 10,
+            "spi": 11,
+            "sta": 61,
+            "str": 61
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 1.6,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 999649,
+          "id": 968,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 2,
+            "y": 1.5,
+            "z": 6
+          },
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 1000000,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 6
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 6
+          },
+          "stats": {},
+          "tappedById": 964,
+          "templateId": "training_dummy",
+          "threat": [
+            [
+              964,
+              226
+            ],
+            [
+              965,
+              125
+            ]
+          ],
+          "weapon": {
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 200,
+      "time": 10,
+      "nextId": 969,
+      "state": "02f74b18",
+      "events": "001081bf",
+      "rng": {
+        "draws": 1681,
+        "digest": "40b82402"
+      }
+    },
+    {
+      "tick": 220,
+      "time": 11,
+      "nextId": 969,
+      "state": "2819c211",
+      "events": "741638a5",
+      "rng": {
+        "draws": 1834,
+        "digest": "533b0dee"
+      }
+    },
+    {
+      "tick": 224,
+      "time": 11.2,
+      "nextId": 969,
+      "state": "37af8d1e",
+      "events": "741638a5",
+      "rng": {
+        "draws": 1870,
+        "digest": "894237fd"
+      },
+      "label": "stonebound-posture",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "shaman",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 226
+          },
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "dummyDamage": 226
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "spring_water",
+              "training_mace"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_specialized",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 964,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "training_mace"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 65,
+          "talents": {
+            "rows": {},
+            "spec": "elemental"
+          },
+          "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "shaman",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 281
+          },
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "dummyDamage": 281
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "spring_water",
+              "training_mace"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_specialized",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 965,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "training_mace",
+            "offhand": "training_mace"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 65,
+          "talents": {
+            "rows": {},
+            "spec": "enhancement"
+          },
+          "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "shaman",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "spring_water",
+              "training_mace"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_specialized",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 966,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "training_mace"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 65,
+          "talents": {
+            "rows": {},
+            "spec": "restoration"
+          },
+          "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 967,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 55,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 74,
+          "auras": [
+            {
+              "duration": 86400,
+              "id": "shaman_thunder_charges",
+              "kind": "internal_cd",
+              "name": "Thunder Charges",
+              "remaining": 86400,
+              "school": "nature",
+              "sourceId": 964,
+              "stacks": 1
+            }
+          ],
+          "castTotal": 2.181818,
+          "combatTimer": 7.1,
+          "comboUntil": -1,
+          "critChance": 0.0675,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0675,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 7.2,
+          "hp": 733,
+          "id": 964,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 733,
+          "maxResource": 1188,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 3
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1176,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellHaste": 0.1,
+          "spellPower": 32,
+          "stats": {
+            "agi": 35,
+            "armor": 314,
+            "int": 64,
+            "spi": 56,
+            "sta": 58,
+            "str": 37
+          },
+          "targetId": 968,
+          "templateId": "shaman",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 120,
+          "auras": [
+            {
+              "duration": 1800,
+              "id": "rockbiter_weapon",
+              "kind": "imbue",
+              "name": "Stonebound Weapon",
+              "remaining": 1797.9,
+              "school": "nature",
+              "sourceId": 965,
+              "value": 20
+            },
+            {
+              "duration": 1800,
+              "id": "shaman_stonebound_armor",
+              "kind": "buff_armor_pct",
+              "name": "Stonebound Armor",
+              "remaining": 1797.9,
+              "school": "nature",
+              "sourceId": 965,
+              "value": 40
+            },
+            {
+              "duration": 1800,
+              "id": "shaman_stonebound_dr",
+              "kind": "buff_dr",
+              "name": "Stonebound Guard",
+              "remaining": 1797.9,
+              "school": "nature",
+              "sourceId": 965,
+              "value": 0.15
+            },
+            {
+              "duration": 1800,
+              "id": "shaman_stonebound_stamina",
+              "kind": "buff_sta_pct",
+              "name": "Stonebound Vigor",
+              "remaining": 1797.9,
+              "school": "nature",
+              "sourceId": 965,
+              "value": 20
+            },
+            {
+              "duration": 12,
+              "empowerAbilities": [
+                "lightning_bolt",
+                "earth_shock",
+                "flame_shock",
+                "frost_shock",
+                "healing_wave"
+              ],
+              "id": "shaman_stormcast",
+              "kind": "next_cast_instant",
+              "name": "Stormcast",
+              "remaining": 10.7,
+              "school": "nature",
+              "sourceId": 965,
+              "value": 1
+            },
+            {
+              "duration": 12,
+              "empowerAbilities": [
+                "lightning_bolt",
+                "earth_shock",
+                "flame_shock",
+                "frost_shock",
+                "healing_wave"
+              ],
+              "id": "shaman_stormcast_cheap",
+              "kind": "next_cast_cheap",
+              "name": "Stormcast",
+              "remaining": 10.7,
+              "school": "nature",
+              "sourceId": 965,
+              "value": 0.5
+            }
+          ],
+          "autoAttack": true,
+          "combatTimer": 1.3,
+          "comboUntil": -1,
+          "cooldowns": [
+            [
+              "earth_shock",
+              4
+            ],
+            [
+              "flame_shock",
+              4
+            ],
+            [
+              "frost_shock",
+              4
+            ]
+          ],
+          "critChance": 0.0675,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0675,
+          "dualWielding": true,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 2,
+          "hp": 853,
+          "id": 965,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 853,
+          "maxResource": 1098,
+          "meleeHaste": 0.1,
+          "moveSpeed": 7,
+          "offhandItemId": "training_mace",
+          "offhandSwingTimer": 1.113636,
+          "offhandWeapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          },
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 3
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1080,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 29,
+          "stats": {
+            "agi": 35,
+            "armor": 440,
+            "int": 58,
+            "spi": 56,
+            "sta": 70,
+            "str": 37
+          },
+          "swingTimer": 1.113636,
+          "targetId": 968,
+          "templateId": "shaman",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 74,
+          "combatTimer": 110.2,
+          "comboUntil": -1,
+          "critChance": 0.0675,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0675,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 110.2,
+          "hp": 733,
+          "id": 966,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 733,
+          "maxResource": 1158,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1158,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 31,
+          "stats": {
+            "agi": 35,
+            "armor": 314,
+            "int": 62,
+            "spi": 56,
+            "sta": 58,
+            "str": 37
+          },
+          "templateId": "shaman",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3588.8,
+              "school": "physical",
+              "sourceId": 967
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 110.2,
+          "comboUntil": -1,
+          "critChance": 0.0695,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0695,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 110.2,
+          "hp": 822,
+          "id": 967,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 822,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 39,
+            "armor": 410,
+            "int": 10,
+            "spi": 11,
+            "sta": 61,
+            "str": 61
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 1.3,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 999493,
+          "id": 968,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 2,
+            "y": 1.5,
+            "z": 6
+          },
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 1000000,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 6
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 6
+          },
+          "stats": {},
+          "tappedById": 964,
+          "templateId": "training_dummy",
+          "threat": [
+            [
+              964,
+              226
+            ],
+            [
+              965,
+              554
+            ]
+          ],
+          "weapon": {
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 240,
+      "time": 12,
+      "nextId": 969,
+      "state": "718fa999",
+      "events": "29bd6e55",
+      "rng": {
+        "draws": 1978,
+        "digest": "73bb4fb1"
+      }
+    },
+    {
+      "tick": 260,
+      "time": 13,
+      "nextId": 969,
+      "state": "47427c8c",
+      "events": "e1bf1dc1",
+      "rng": {
+        "draws": 2123,
+        "digest": "b7c4e5fd"
+      }
+    },
+    {
+      "tick": 280,
+      "time": 14,
+      "nextId": 969,
+      "state": "3cd3c303",
+      "events": "d7884150",
+      "rng": {
+        "draws": 2315,
+        "digest": "1866b130"
+      }
+    },
+    {
+      "tick": 300,
+      "time": 15,
+      "nextId": 969,
+      "state": "d3c5664b",
+      "events": "70d13274",
+      "rng": {
+        "draws": 2513,
+        "digest": "52a850b9"
+      }
+    },
+    {
+      "tick": 306,
+      "time": 15.3,
+      "nextId": 969,
+      "state": "aa75d220",
+      "events": "741638a5",
+      "rng": {
+        "draws": 2568,
+        "digest": "79076f6d"
+      },
+      "label": "spiritmend-consume",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "shaman",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 226
+          },
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "dummyDamage": 226
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "spring_water",
+              "training_mace"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_specialized",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 964,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "training_mace"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 65,
+          "talents": {
+            "rows": {},
+            "spec": "elemental"
+          },
+          "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "shaman",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 415
+          },
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "dummyDamage": 415
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "spring_water",
+              "training_mace"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_specialized",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 965,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "training_mace",
+            "offhand": "training_mace"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 65,
+          "talents": {
+            "rows": {},
+            "spec": "enhancement"
+          },
+          "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "shaman",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "spring_water",
+              "training_mace"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_specialized",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 966,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "training_mace"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 65,
+          "talents": {
+            "rows": {},
+            "spec": "restoration"
+          },
+          "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 967,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 55,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 74,
+          "auras": [
+            {
+              "duration": 86400,
+              "id": "shaman_thunder_charges",
+              "kind": "internal_cd",
+              "name": "Thunder Charges",
+              "remaining": 86400,
+              "school": "nature",
+              "sourceId": 964,
+              "stacks": 1
+            }
+          ],
+          "castTotal": 2.181818,
+          "combatTimer": 11.2,
+          "comboUntil": -1,
+          "critChance": 0.0675,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0675,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 11.3,
+          "hp": 733,
+          "id": 964,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 733,
+          "maxResource": 1188,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 3
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1188,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellHaste": 0.1,
+          "spellPower": 32,
+          "stats": {
+            "agi": 35,
+            "armor": 314,
+            "int": 64,
+            "spi": 56,
+            "sta": 58,
+            "str": 37
+          },
+          "targetId": 968,
+          "templateId": "shaman",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 120,
+          "auras": [
+            {
+              "duration": 1800,
+              "id": "rockbiter_weapon",
+              "kind": "imbue",
+              "name": "Stonebound Weapon",
+              "remaining": 1793.8,
+              "school": "nature",
+              "sourceId": 965,
+              "value": 20
+            },
+            {
+              "duration": 1800,
+              "id": "shaman_stonebound_armor",
+              "kind": "buff_armor_pct",
+              "name": "Stonebound Armor",
+              "remaining": 1793.8,
+              "school": "nature",
+              "sourceId": 965,
+              "value": 40
+            },
+            {
+              "duration": 1800,
+              "id": "shaman_stonebound_dr",
+              "kind": "buff_dr",
+              "name": "Stonebound Guard",
+              "remaining": 1793.8,
+              "school": "nature",
+              "sourceId": 965,
+              "value": 0.15
+            },
+            {
+              "duration": 1800,
+              "id": "shaman_stonebound_stamina",
+              "kind": "buff_sta_pct",
+              "name": "Stonebound Vigor",
+              "remaining": 1793.8,
+              "school": "nature",
+              "sourceId": 965,
+              "value": 20
+            },
+            {
+              "duration": 12,
+              "empowerAbilities": [
+                "lightning_bolt",
+                "earth_shock",
+                "flame_shock",
+                "frost_shock",
+                "healing_wave"
+              ],
+              "id": "shaman_stormcast",
+              "kind": "next_cast_instant",
+              "name": "Stormcast",
+              "remaining": 11.4,
+              "school": "nature",
+              "sourceId": 965,
+              "value": 1
+            },
+            {
+              "duration": 12,
+              "empowerAbilities": [
+                "lightning_bolt",
+                "earth_shock",
+                "flame_shock",
+                "frost_shock",
+                "healing_wave"
+              ],
+              "id": "shaman_stormcast_cheap",
+              "kind": "next_cast_cheap",
+              "name": "Stormcast",
+              "remaining": 11.4,
+              "school": "nature",
+              "sourceId": 965,
+              "value": 0.5
+            }
+          ],
+          "autoAttack": true,
+          "combatTimer": 0.6,
+          "comboUntil": -1,
+          "critChance": 0.0675,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0675,
+          "dualWielding": true,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 6.1,
+          "hp": 853,
+          "id": 965,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 853,
+          "maxResource": 1098,
+          "meleeHaste": 0.1,
+          "moveSpeed": 7,
+          "offhandItemId": "training_mace",
+          "offhandSwingTimer": 1.813636,
+          "offhandWeapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          },
+          "onGround": true,
+          "overpowerUntil": 17.35,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 3
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1096,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 29,
+          "stats": {
+            "agi": 35,
+            "armor": 440,
+            "int": 58,
+            "spi": 56,
+            "sta": 70,
+            "str": 37
+          },
+          "swingTimer": 1.813636,
+          "targetId": 968,
+          "templateId": "shaman",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          }
+        },
+        {
+          "abilityCharges": {
+            "tidecall": {
+              "charges": 1,
+              "maxCharges": 2,
+              "recharge": 7.9,
+              "rechargeLength": 12,
+              "recharges": [
+                7.9
+              ]
+            }
+          },
+          "aiState": "idle",
+          "attackPower": 74,
+          "castTotal": 2.5,
+          "combatTimer": 114.3,
+          "comboUntil": -1,
+          "critChance": 0.0675,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0675,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 1.55,
+          "hp": 733,
+          "id": 966,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 733,
+          "maxResource": 1158,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -4
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1118,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 31,
+          "stats": {
+            "agi": 35,
+            "armor": 314,
+            "int": 62,
+            "spi": 56,
+            "sta": 58,
+            "str": 37
+          },
+          "targetId": 967,
+          "templateId": "shaman",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3584.7,
+              "school": "physical",
+              "sourceId": 967
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 114.3,
+          "comboUntil": -1,
+          "critChance": 0.0695,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0695,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 114.3,
+          "hp": 787,
+          "id": 967,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 822,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 39,
+            "armor": 410,
+            "int": 10,
+            "spi": 11,
+            "sta": 61,
+            "str": 61
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 0.6,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 999359,
+          "id": 968,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 2,
+            "y": 1.5,
+            "z": 6
+          },
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 1000000,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 6
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 6
+          },
+          "stats": {},
+          "tappedById": 964,
+          "templateId": "training_dummy",
+          "threat": [
+            [
+              964,
+              226
+            ],
+            [
+              965,
+              922.5
+            ]
+          ],
+          "weapon": {
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 306,
+      "time": 15.3,
+      "nextId": 969,
+      "state": "aa75d220",
+      "events": "741638a5",
+      "rng": {
+        "draws": 2568,
+        "digest": "79076f6d"
+      },
+      "label": "final",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "shaman",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 226
+          },
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "dummyDamage": 226
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "spring_water",
+              "training_mace"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_specialized",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 964,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "training_mace"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 65,
+          "talents": {
+            "rows": {},
+            "spec": "elemental"
+          },
+          "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "shaman",
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 415
+          },
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "dummyDamage": 415
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "spring_water",
+              "training_mace"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_specialized",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 965,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "training_mace",
+            "offhand": "training_mace"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 65,
+          "talents": {
+            "rows": {},
+            "spec": "enhancement"
+          },
+          "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "shaman",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "footpad_jerkin",
+              "spring_water",
+              "training_mace"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_specialized",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 966,
+          "equipment": {
+            "chest": "footpad_jerkin",
+            "mainhand": "training_mace"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 65,
+          "talents": {
+            "rows": {},
+            "spec": "restoration"
+          },
+          "townFocus": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ],
+            "visited": [
+              "poi:eastbrook_vale:eastbrook"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 967,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 55,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {}
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 74,
+          "auras": [
+            {
+              "duration": 86400,
+              "id": "shaman_thunder_charges",
+              "kind": "internal_cd",
+              "name": "Thunder Charges",
+              "remaining": 86400,
+              "school": "nature",
+              "sourceId": 964,
+              "stacks": 1
+            }
+          ],
+          "castTotal": 2.181818,
+          "combatTimer": 11.2,
+          "comboUntil": -1,
+          "critChance": 0.0675,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0675,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 11.3,
+          "hp": 733,
+          "id": 964,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 733,
+          "maxResource": 1188,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 3
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1188,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellHaste": 0.1,
+          "spellPower": 32,
+          "stats": {
+            "agi": 35,
+            "armor": 314,
+            "int": 64,
+            "spi": 56,
+            "sta": 58,
+            "str": 37
+          },
+          "targetId": 968,
+          "templateId": "shaman",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 120,
+          "auras": [
+            {
+              "duration": 1800,
+              "id": "rockbiter_weapon",
+              "kind": "imbue",
+              "name": "Stonebound Weapon",
+              "remaining": 1793.8,
+              "school": "nature",
+              "sourceId": 965,
+              "value": 20
+            },
+            {
+              "duration": 1800,
+              "id": "shaman_stonebound_armor",
+              "kind": "buff_armor_pct",
+              "name": "Stonebound Armor",
+              "remaining": 1793.8,
+              "school": "nature",
+              "sourceId": 965,
+              "value": 40
+            },
+            {
+              "duration": 1800,
+              "id": "shaman_stonebound_dr",
+              "kind": "buff_dr",
+              "name": "Stonebound Guard",
+              "remaining": 1793.8,
+              "school": "nature",
+              "sourceId": 965,
+              "value": 0.15
+            },
+            {
+              "duration": 1800,
+              "id": "shaman_stonebound_stamina",
+              "kind": "buff_sta_pct",
+              "name": "Stonebound Vigor",
+              "remaining": 1793.8,
+              "school": "nature",
+              "sourceId": 965,
+              "value": 20
+            },
+            {
+              "duration": 12,
+              "empowerAbilities": [
+                "lightning_bolt",
+                "earth_shock",
+                "flame_shock",
+                "frost_shock",
+                "healing_wave"
+              ],
+              "id": "shaman_stormcast",
+              "kind": "next_cast_instant",
+              "name": "Stormcast",
+              "remaining": 11.4,
+              "school": "nature",
+              "sourceId": 965,
+              "value": 1
+            },
+            {
+              "duration": 12,
+              "empowerAbilities": [
+                "lightning_bolt",
+                "earth_shock",
+                "flame_shock",
+                "frost_shock",
+                "healing_wave"
+              ],
+              "id": "shaman_stormcast_cheap",
+              "kind": "next_cast_cheap",
+              "name": "Stormcast",
+              "remaining": 11.4,
+              "school": "nature",
+              "sourceId": 965,
+              "value": 0.5
+            }
+          ],
+          "autoAttack": true,
+          "combatTimer": 0.6,
+          "comboUntil": -1,
+          "critChance": 0.0675,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0675,
+          "dualWielding": true,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 6.1,
+          "hp": 853,
+          "id": 965,
+          "inCombat": true,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 853,
+          "maxResource": 1098,
+          "meleeHaste": 0.1,
+          "moveSpeed": 7,
+          "offhandItemId": "training_mace",
+          "offhandSwingTimer": 1.813636,
+          "offhandWeapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          },
+          "onGround": true,
+          "overpowerUntil": 17.35,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 3
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1096,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 29,
+          "stats": {
+            "agi": 35,
+            "armor": 440,
+            "int": 58,
+            "spi": 56,
+            "sta": 70,
+            "str": 37
+          },
+          "swingTimer": 1.813636,
+          "targetId": 968,
+          "templateId": "shaman",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          }
+        },
+        {
+          "abilityCharges": {
+            "tidecall": {
+              "charges": 1,
+              "maxCharges": 2,
+              "recharge": 7.9,
+              "rechargeLength": 12,
+              "recharges": [
+                7.9
+              ]
+            }
+          },
+          "aiState": "idle",
+          "attackPower": 74,
+          "castTotal": 2.5,
+          "combatTimer": 114.3,
+          "comboUntil": -1,
+          "critChance": 0.0675,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0675,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 1.55,
+          "hp": 733,
+          "id": 966,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 733,
+          "maxResource": 1158,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -4
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1118,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 31,
+          "stats": {
+            "agi": 35,
+            "armor": 314,
+            "int": 62,
+            "spi": 56,
+            "sta": 58,
+            "str": 37
+          },
+          "targetId": 967,
+          "templateId": "shaman",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2.6
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 122,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3584.7,
+              "school": "physical",
+              "sourceId": 967
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 114.3,
+          "comboUntil": -1,
+          "critChance": 0.0695,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.0695,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 114.3,
+          "hp": 787,
+          "id": 967,
+          "kind": "player",
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 822,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 39,
+            "armor": 410,
+            "int": 10,
+            "spi": 11,
+            "sta": 61,
+            "str": 61
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 0.6,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hostile": true,
+          "hp": 999359,
+          "id": 968,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": 2,
+            "y": 1.5,
+            "z": 6
+          },
+          "level": 20,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 1000000,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 6
+          },
+          "potionCooldownUntil": -1,
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": 6
+          },
+          "stats": {},
+          "tappedById": 964,
+          "templateId": "training_dummy",
+          "threat": [
+            [
+              964,
+              226
+            ],
+            [
+              965,
+              922.5
+            ]
+          ],
+          "weapon": {
+            "speed": 2
+          }
+        }
+      ]
+    }
+  ]
+}

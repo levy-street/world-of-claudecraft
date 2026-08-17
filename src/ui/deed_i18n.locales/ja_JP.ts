@@ -32,20 +32,64 @@ export const table: DeedLocaleTable = {
     name: 'リフトの君主',
     desc: 'Sランクのリフトを攻略する。リフトポータルが出現させうる最高難度の階級だ。',
   },
+  col_reliquary_rank_2: {
+    name: '戦利品の守り手',
+    desc: '聖遺物庫でキュレーターランク2に到達する（固有の聖遺物10種を収蔵）。',
+    title: '戦利品の守り手',
+  },
+  col_reliquary_rank_3: {
+    name: '目録編纂者',
+    desc: '聖遺物庫でキュレーターランク3に到達する（固有の聖遺物25種を収蔵）。',
+    title: '目録編纂者',
+  },
+  col_reliquary_rank_4: {
+    name: '首席キュレーター',
+    desc: '聖遺物庫でキュレーターランク4に到達する（固有の聖遺物50種を収蔵）。',
+    title: '首席キュレーター',
+  },
+  col_reliquary_rank_5: {
+    name: '永遠の戦利品',
+    desc: '聖遺物庫でキュレーターランク5に到達する（固有の聖遺物100種を収蔵）。',
+  },
   pvp_honor_sergeant: {
-    name: '軍曹',
+    name: '陣砕き',
     desc: '生涯名誉10,000を獲得する。使っても階級を失うことはない。',
-    title: '軍曹',
+    title: '陣砕き',
   },
   pvp_honor_knight_lieutenant: {
-    name: '騎士中尉',
+    name: '野荒らし',
     desc: '生涯名誉40,000を獲得する。本物の戦を一シーズン戦い抜いてきた証だ。',
-    title: '騎士中尉',
+    title: '野荒らし',
   },
   pvp_honor_field_marshal: {
-    name: '元帥',
+    name: '戦の冠',
     desc: '生涯名誉150,000を獲得する。どのレルムでも希少であり、それでいい。',
-    title: '元帥',
+    title: '戦の冠',
+  },
+  col_reliquary_complete: {
+    name: '大いなる聖遺物庫',
+    desc: 'キャラクターが所蔵できる聖遺物庫のすべての聖遺物を収蔵する。のちに目録が増えても、この記録が取り消されることはない。',
+    title: '宝物庫のキュレーター',
+  },
+  col_reliquary_conquerors: {
+    name: '征服者の棚',
+    desc: '聖遺物庫の征服者の棚にあるすべての聖遺物を収蔵する。のちに目録が増えても、この記録が取り消されることはない。',
+    title: '宝物庫破り',
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    name: 'ナイスラクシスの照耀',
+    desc: '聖遺物庫の「英雄: ナイスラクシスのレイド」のページを照耀する。',
+    title: 'ナイスラクシスの光',
+  },
+  col_reliquary_illum_thunzharr: {
+    name: 'サンザールの照耀',
+    desc: '聖遺物庫の「サンザール、目覚めし峰」のページを照耀する。',
+    title: 'サンザールの光',
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    name: '聖所の照耀',
+    desc: '聖遺物庫の「英雄: 墓ワームの聖所」のページを照耀する。',
+    title: '聖所の光',
   },
   chr_drakemaw_broodlord: {
     name: '卵砕き',

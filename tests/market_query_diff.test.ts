@@ -16,7 +16,9 @@ const baseQuery: MarketQuery = {
   armorClass: 'cloth',
   primaryStat: 'int',
   rarity: 'rare',
+  sort: 'price',
   page: 0,
+  collapseLowest: true,
 };
 
 // Only the fields queryDiffersFromEcho reads; the rest of MarketInfo is irrelevant
@@ -31,6 +33,8 @@ function echoOf(overrides: Partial<MarketInfo> = {}): MarketInfo {
     armorClass: baseQuery.armorClass,
     primaryStat: baseQuery.primaryStat,
     rarity: baseQuery.rarity,
+    sort: baseQuery.sort,
+    collapseLowest: baseQuery.collapseLowest,
     page: 0,
     pageCount: 1,
     collectionCopper: 0,
@@ -40,6 +44,8 @@ function echoOf(overrides: Partial<MarketInfo> = {}): MarketInfo {
     cutPct: 5,
     maxListings: 12,
     myListingCount: 0,
+    sellPriceItemId: null,
+    sellLowestPrice: null,
     ...overrides,
   };
 }
@@ -61,6 +67,8 @@ describe('queryDiffersFromEcho (issue #2416)', () => {
       armorClass: 'all',
       primaryStat: 'all',
       rarity: 'all',
+      sort: 'name',
+      collapseLowest: false,
     });
     expect(queryDiffersFromEcho(baseQuery, echo)).toBe(true);
   });
@@ -71,6 +79,8 @@ describe('queryDiffersFromEcho (issue #2416)', () => {
     ['armorClass', { armorClass: 'mail' as const }],
     ['primaryStat', { primaryStat: 'str' as const }],
     ['rarity', { rarity: 'epic' as const }],
+    ['sort', { sort: 'name' as const }],
+    ['collapseLowest', { collapseLowest: false as const }],
   ])('detects drift on the %s axis alone', (_axis, overrides) => {
     expect(queryDiffersFromEcho(baseQuery, echoOf(overrides))).toBe(true);
   });

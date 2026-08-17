@@ -566,6 +566,7 @@ describe('Fenbridge content projection and preservation', () => {
       'q_drowned',
       'q_drowned_censers',
       'q_no_rest',
+      'q_rite_of_redemption',
       'q_trolls',
       'q_troll_fetishes',
       'q_grubjaw',
@@ -644,8 +645,10 @@ describe('Fenbridge content projection and preservation', () => {
 
   it('pins the complete stable NPC payload while projecting only position and facing', () => {
     expect(Object.keys(ZONE2_NPCS)).toEqual(FENBRIDGE_LAYOUT.services.npcs.map((npc) => npc.id));
+    // Re-pinned for q_rite_of_redemption joining brother_aldric_fen's quest
+    // list (the only NPC-payload delta vs the prior pin; zone2.ts diff-checked).
     expect(createHash('sha256').update(JSON.stringify(stableNpcPayload())).digest('hex')).toBe(
-      'eaa2414ac05d11818a74c519b28f2b24361c71ea445542486648c2abf399ef5b',
+      '7ba7c8ae4db5470fd76b7410698f113322e77df9fdad03415320a8988cccac0d',
     );
     for (const placement of FENBRIDGE_LAYOUT.services.npcs) {
       expect(FENBRIDGE_NPC_PLACEMENTS_BY_ID[placement.id]).toBe(placement);

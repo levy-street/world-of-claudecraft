@@ -257,7 +257,7 @@ describe('combat-rating tier ladder', () => {
     // The rift legendary neck is class-neutral and carries no combat ratings:
     // its differentiation is a large multi-stat primary-stat block, not ratings.
     // This is intentional (pinned here so a future tuner does not silently add one).
-    const legendary = ITEMS['heart_of_the_rift'];
+    const legendary = ITEMS.heart_of_the_rift;
     expect(legendary, 'heart_of_the_rift must exist').toBeTruthy();
     if (legendary) {
       expect(ratingCount(legendary), 'rift legendary carries no ratings').toBe(0);
@@ -267,7 +267,7 @@ describe('combat-rating tier ladder', () => {
   it('a spell-facing raid legendary (Heartwood staff) takes throughput ratings, never Hit', () => {
     // A rating-less caster/healer base must not default to the game's largest Hit
     // allowance: heals are not resisted by level, matching the healer-facing rule.
-    const staff = ITEMS['heroic_deathless_heartwood'];
+    const staff = ITEMS.heroic_deathless_heartwood;
     expect(staff, 'heroic Heartwood variant should be generated').toBeTruthy();
     if (staff) {
       expect(staff.hitRating ?? 0).toBe(0);

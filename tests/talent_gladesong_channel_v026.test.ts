@@ -28,7 +28,9 @@ describe('Gladesong channel healing', () => {
   it('pulses four times on the caster and nearby visible allies only', () => {
     const sim = new Sim({ seed: 260_1756, playerClass: 'druid', autoEquip: false }) as TestSim;
     sim.setPlayerLevel(20);
-    expect(sim.applyTalents({ spec: null, rows: { 20: 'dru_r20_tranquility' } })).toBe(true);
+    expect(sim.applyTalents({ spec: null, rows: { 17: 'dru_r17_frenzied_regeneration' } })).toBe(
+      true,
+    );
 
     const nearbyId = sim.addPlayer('priest', 'Nearby');
     const blockedId = sim.addPlayer('shaman', 'Blocked');

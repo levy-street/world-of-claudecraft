@@ -155,17 +155,53 @@ interface FakeEl {
 }
 
 function fakeEl(tag: string): FakeEl {
+  const classNames = (el: Record<string, unknown>): string[] =>
+    String(el.className ?? '')
+      .split(/\s+/)
+      .filter(Boolean);
   const el = {
     tagName: tag.toUpperCase(),
+    className: '',
     parentNode: null as FakeEl | null,
     childNodes: [] as FakeEl[],
     _mutations: 0,
     listeners: {} as Record<string, Array<(ev: unknown) => void>>,
+    // Crest images are ordinary HTMLImageElements in production. Model the small
+    // class/style/loading surface used by setCrestImageWithFallback so this Node fake
+    // exercises the real seam instead of bypassing it.
+    classList: {
+      add(...tokens: string[]) {
+        const names = new Set(classNames(el as unknown as Record<string, unknown>));
+        for (const token of tokens) names.add(token);
+        el.className = [...names].join(' ');
+      },
+      remove(...tokens: string[]) {
+        const removed = new Set(tokens);
+        el.className = classNames(el as unknown as Record<string, unknown>)
+          .filter((name) => !removed.has(name))
+          .join(' ');
+      },
+      contains(token: string) {
+        return classNames(el as unknown as Record<string, unknown>).includes(token);
+      },
+    },
+    style: {
+      backgroundImage: '',
+      removeProperty(property: string) {
+        if (property === 'background-image') this.backgroundImage = '';
+      },
+    },
+    src: '',
+    complete: false,
+    naturalWidth: 0,
     setAttribute(k: string, v: string) {
       (el as Record<string, unknown>)[k] = v;
     },
     getAttribute(k: string) {
       return ((el as Record<string, unknown>)[k] as string) ?? null;
+    },
+    removeAttribute(k: string) {
+      delete (el as Record<string, unknown>)[k];
     },
     addEventListener(type: string, fn: (ev: unknown) => void) {
       el.listeners[type] ??= [];

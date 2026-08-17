@@ -12,7 +12,7 @@ export interface BgKillFeedLine {
   expiresAt: number; // seconds on the caller's clock
 }
 
-export const BG_KILL_FEED_TTL = 8; // seconds a line stays up
+export const BG_KILL_FEED_TTL = 9; // seconds a line stays up
 export const BG_KILL_FEED_MAX = 5; // the feed never stacks past this; oldest drops first
 
 /** Append a kill, stamping its expiry; trims the oldest lines past the cap. */

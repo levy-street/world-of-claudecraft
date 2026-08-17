@@ -9,6 +9,7 @@ import {
   NAMEPLATE_TEXT_SPRITE_LIMIT,
   NameplateCanvasSurface,
 } from '../src/render/nameplate_canvas';
+import { BORDER_ACCENT_SLUGS, borderAccent } from '../src/ui/deed_border_view';
 
 interface ContextTrace {
   canvas: HTMLCanvasElement;
@@ -64,6 +65,15 @@ function context(trace: ContextTrace): CanvasRenderingContext2D {
   };
   return ctx as unknown as CanvasRenderingContext2D;
 }
+
+// The surface's private sprite cache, for the no-new-raster pin below: the border
+// accent is SHAPES, so flipping it must mint no cache entry and no cache key.
+interface SpriteCacheAccess {
+  text: { size: number };
+}
+
+const spriteCount = (surface: NameplateCanvasSurface): number =>
+  (surface as unknown as SpriteCacheAccess).text.size;
 
 let traces: ContextTrace[];
 
@@ -166,6 +176,35 @@ describe('nameplate canvas surface', () => {
     );
     expect(secondRasterCount).toBe(firstRasterCount);
     expect(traces[0].drawImage).toHaveBeenCalledTimes(2);
+  });
+
+  it('draws the byte-identical prebuilt guild wrapper, redrawn only on change', () => {
+    const parent = document.createElement('div');
+    const surface = new NameplateCanvasSurface(parent);
+    const state = createNameplateCanvasState();
+    state.initialized = true;
+    state.name = 'Guilded Hero';
+    // resolveContent prebuilds the label alongside guild (its only writer);
+    // drawBase consumes it without allocating.
+    state.guild = 'The Testers';
+    state.guildLabel = '<The Testers>';
+
+    surface.beginFrame(320, 180, 1);
+    surface.drawBase(state, 160, 90);
+    surface.beginFrame(320, 180, 1);
+    surface.drawBase(state, 160, 90);
+
+    const drawnText = (): string[] =>
+      traces.flatMap((trace) => trace.fillText.mock.calls.map(([value]) => value as string));
+    // Same content as the old per-frame template build: the exact `<...>` form
+    // rasterized ONCE, then re-blitted from the sprite cache on later frames.
+    expect(drawnText().filter((text) => text === '<The Testers>')).toHaveLength(1);
+
+    state.guild = 'New Banner';
+    state.guildLabel = '<New Banner>';
+    surface.beginFrame(320, 180, 1);
+    surface.drawBase(state, 160, 90);
+    expect(drawnText()).toContain('<New Banner>');
   });
 
   it('rasterizes text at capped high DPR and blits it at logical dimensions', () => {
@@ -413,6 +452,7 @@ describe('nameplate canvas surface', () => {
       name: 'Canvas Boss',
       level: '63+',
       guild: 'The Testers',
+      guildLabel: '<The Testers>',
       title: 'Gate Keeper',
       marker: '!',
       markerTone: 'active',
@@ -467,6 +507,81 @@ describe('nameplate canvas surface', () => {
     expect(imageBlits).toHaveLength(4);
   });
 
+  it('strokes the Book of Deeds accent as shapes, minting no new text sprite', () => {
+    const parent = document.createElement('div');
+    const surface = new NameplateCanvasSurface(parent);
+    const state = createNameplateCanvasState();
+    Object.assign(state, { initialized: true, name: 'Gilded One', level: '20' });
+    const accent = borderAccent('reliquary_gilt');
+    expect(accent).not.toBeNull();
+
+    // Borderless: the name row is text only, so it strokes NOTHING. That zero is
+    // what makes the three accent strokes below an exact count rather than a delta.
+    surface.beginFrame(640, 360, 1);
+    surface.drawBase(state, 320, 220);
+    expect(traces[0].stroke).toHaveBeenCalledTimes(0);
+    const spritesWithoutAccent = spriteCount(surface);
+    expect(spritesWithoutAccent).toBeGreaterThan(0);
+
+    state.border = 'reliquary_gilt';
+    surface.beginFrame(640, 360, 1);
+    surface.drawBase(state, 320, 220);
+
+    // Three strokes: the dark contour, the slug's frame line, the inner hairline.
+    expect(traces[0].stroke).toHaveBeenCalledTimes(3);
+    expect(traces[0].strokeStyles).toEqual(
+      expect.arrayContaining([accent?.frame, accent?.edge, accent?.glow]),
+    );
+    expect(new Set([accent?.frame, accent?.edge, accent?.glow]).size).toBe(3);
+    // Shapes, not a second text pass: no raster is keyed on the slug, so a player
+    // flipping borders can never grow the sprite budget.
+    expect(spriteCount(surface)).toBe(spritesWithoutAccent);
+
+    // Flip through EVERY border slug and assert the sprite count stays flat the
+    // whole way. The single flip above sees one border; a scheme that minted a
+    // per-slug border sprite while evicting another under a byte budget could net
+    // zero on one flip and slip past. Cycling all four (twice) makes any per-slug
+    // mint show as growth.
+    for (const slug of [...BORDER_ACCENT_SLUGS, ...BORDER_ACCENT_SLUGS]) {
+      state.border = slug;
+      surface.beginFrame(640, 360, 1);
+      surface.drawBase(state, 320, 220);
+      expect(spriteCount(surface), `${slug} must mint no border sprite`).toBe(spritesWithoutAccent);
+    }
+  });
+
+  it('adds no vertical space, so the emote anchor walk still lands on the name row', () => {
+    // drawEmote re-walks drawBase's y-steps to find its anchor. An accent that
+    // added height would desync the two silently, floating the emote plate.
+    vi.spyOn(HTMLImageElement.prototype, 'complete', 'get').mockReturnValue(true);
+    vi.spyOn(HTMLImageElement.prototype, 'naturalWidth', 'get').mockReturnValue(32);
+    const surface = new NameplateCanvasSurface(document.createElement('div'));
+    const state = createNameplateCanvasState();
+    Object.assign(state, {
+      initialized: true,
+      name: 'Gilded One',
+      level: '20',
+      guild: 'The Testers',
+      title: 'Gate Keeper',
+      emoteIconUrl: 'data:image/svg+xml,emote',
+      emoteLabel: 'Cheers',
+    });
+    const emoteBlits = (): unknown[][] =>
+      traces[0].drawImage.mock.calls.filter(([source]) => source instanceof HTMLImageElement);
+
+    surface.beginFrame(640, 360, 1);
+    surface.drawBase(state, 320, 220);
+    surface.drawEmote(state, 320, 220);
+    const withoutAccent = emoteBlits().at(-1);
+
+    state.border = 'deepward';
+    surface.beginFrame(640, 360, 1);
+    surface.drawBase(state, 320, 220);
+    surface.drawEmote(state, 320, 220);
+
+    expect(emoteBlits().at(-1)).toEqual(withoutAccent);
+  });
+
   it('uses system colors for actionable shapes and text in forced-colors mode', () => {
     const previousMatchMedia = Object.getOwnPropertyDescriptor(window, 'matchMedia');
     Object.defineProperty(window, 'matchMedia', {
@@ -481,6 +596,7 @@ describe('nameplate canvas surface', () => {
         initialized: true,
         name: 'High Contrast Hero',
         guild: 'Readers',
+        guildLabel: '<Readers>',
         title: 'Visible',
         marker: '!',
         hpVisible: true,
@@ -489,6 +605,7 @@ describe('nameplate canvas surface', () => {
         castFill: 0.5,
         castLabel: 'Interrupt Me',
         comboPips: 2,
+        border: 'deepward',
         emoteIconUrl: 'missing-emote',
         emoteLabel: 'Hello',
       });
@@ -501,6 +618,11 @@ describe('nameplate canvas surface', () => {
       const strokeStyles = traces.flatMap((trace) => trace.strokeStyles);
       expect(fillStyles).toEqual(expect.arrayContaining(['Canvas', 'CanvasText', 'Highlight']));
       expect(strokeStyles).toEqual(expect.arrayContaining(['Canvas', 'CanvasText']));
+      // The border accent collapses onto the same system pair: no palette color
+      // survives, and the identity it carries is cosmetic, so nothing is lost.
+      const accent = borderAccent('deepward');
+      expect(strokeStyles).not.toContain(accent?.frame);
+      expect(strokeStyles).not.toContain(accent?.glow);
     } finally {
       if (previousMatchMedia) {
         Object.defineProperty(window, 'matchMedia', previousMatchMedia);

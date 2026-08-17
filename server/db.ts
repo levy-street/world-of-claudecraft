@@ -10,11 +10,17 @@ import { sanitizeRemovedZone1Content } from '../src/sim/removed_zone1_content';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
 import type { ActionBarLayout } from '../src/world_api/action_bar';
+import { AD_SPEND_SCHEMA } from './ad_spend_db';
 import { bustAdminGuildListReads } from './admin_guilds_read';
 import { ADMIN_GUILDS_SCHEMA } from './admin_guilds_schema';
 import { APPLE_AUTH_SCHEMA } from './apple_auth_db';
+import { ACCOUNT_ATTRIBUTION_SCHEMA, accountAttributionForExport } from './attribution_db';
 import { validCharName } from './auth';
 import type { BankBonusFacts } from './bank_entitlements';
+import {
+  configureLifetimeXpRankCache,
+  readLifetimeXpRankForCharacter,
+} from './character_rank_cache';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
 import {
@@ -30,6 +36,12 @@ import type { RankedDeedsAccount } from './deeds_board';
 import { DISCORD_SCHEMA } from './discord_db';
 import { enqueueLinkChange } from './discord_link_changes';
 import { bustDiscordStatus } from './discord_status_cache';
+import {
+  GENERAL_CHAT_QUOTA_DB_POOL_MAX_CLIENTS,
+  GENERAL_CHAT_QUOTA_LISTENER_CONNECTIONS,
+} from './general_chat_quota_config';
+import type { GeneralChatRateLimit } from './general_chat_quota_db';
+import { GENERAL_CHAT_QUOTA_SCHEMA } from './general_chat_quota_schema';
 import { GITHUB_SCHEMA } from './github_db';
 import {
   GuildBankEscrowRefused,
@@ -55,6 +67,7 @@ import {
   PLAYER_METRICS_SCHEMA,
   recordCharacterCreation,
 } from './player_metrics_db';
+import { PROGRESS_EVENTS_SCHEMA } from './progress_events_db';
 import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
 import { REALM, REALM_DIRECTORY } from './realm';
 import { chooseArchiveName } from './reclaim_name';
@@ -101,10 +114,10 @@ const DB_POOL_MAX_CLIENTS_DEFAULT = 10;
 // shipped deployment: stock postgres:16 serves max_connections 100 with 3
 // superuser-reserved, so 97 are usable. Every realm process builds its own pool
 // on the one DATABASE_URL and pools have no cross-process coordination, so
-// realms x DB_POOL_MAX_CLIENTS + tooling is what must stay at or under 97, plus
-// one more per realm for ensureSchema's dedicated boot Client (outside the
-// pool, held while that process applies the schema, and a rolling restart pays
-// it on every realm at once). Past that, logins fail with "too many clients"
+// realms x (the shared pool + two General-quota consume clients + one LISTEN client) +
+// tooling is what must stay at or under 97. ensureSchema also uses a dedicated
+// boot Client before LISTEN starts (and a rolling restart can overlap them
+// across old/new processes). Past that, logins fail with "too many clients"
 // exactly at peak.
 // Connections are not the binding constraint on the shipped deployment, though:
 // the game process and Postgres share ONE 4-vCPU box, where the database is
@@ -160,9 +173,14 @@ console.log(
 // rather than raw comma segments. Unset REALMS parses to the single-realm
 // fallback entry, which can never trip the ceiling on its own.
 const configuredRealmCount = REALM_DIRECTORY.length;
-if (configuredRealmCount * DB_POOL_MAX_CLIENTS > DB_POOL_MAX_CLIENTS_CEILING) {
+const configuredSteadyConnections =
+  configuredRealmCount *
+  (DB_POOL_MAX_CLIENTS +
+    GENERAL_CHAT_QUOTA_DB_POOL_MAX_CLIENTS +
+    GENERAL_CHAT_QUOTA_LISTENER_CONNECTIONS);
+if (configuredSteadyConnections > DB_POOL_MAX_CLIENTS_CEILING) {
   console.warn(
-    `db pool: ${configuredRealmCount} realms x ${DB_POOL_MAX_CLIENTS} clients = ${configuredRealmCount * DB_POOL_MAX_CLIENTS} connections, past the ${DB_POOL_MAX_CLIENTS_CEILING} usable on stock postgres:16 (max_connections 100, 3 superuser-reserved) and before ensureSchema's one boot client per realm. If every realm shares this DATABASE_URL, logins will fail with "too many clients" at peak: lower DB_POOL_MAX_CLIENTS or raise max_connections.`,
+    `db pool: ${configuredRealmCount} realms x (${DB_POOL_MAX_CLIENTS} shared + ${GENERAL_CHAT_QUOTA_DB_POOL_MAX_CLIENTS} quota + ${GENERAL_CHAT_QUOTA_LISTENER_CONNECTIONS} listener) = ${configuredSteadyConnections} steady connections, past the ${DB_POOL_MAX_CLIENTS_CEILING} usable on stock postgres:16 (max_connections 100, 3 superuser-reserved), before tooling, the transient concurrent-index client, and rolling-restart overlap. If every realm shares this DATABASE_URL, logins will fail with "too many clients" at peak: lower DB_POOL_MAX_CLIENTS or raise max_connections.`,
   );
 }
 
@@ -341,6 +359,19 @@ ALTER TABLE characters ADD COLUMN IF NOT EXISTS last_login TIMESTAMPTZ;
 -- saves one; the server treats the value as opaque and re-validates its bounds
 -- (sanitizeActionBarLayout) on both read and write.
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS hotbar_layout JSONB;
+-- The character's authored modular-creator look (ModularAppearance). Client
+-- PRESENTATION state exactly like hotbar_layout above: its own additive column,
+-- never inside the sim-owned state blob, so sim serialization stays
+-- byte-identical. Written once at create (normalized server-side through
+-- normalizeAppearance) and at most once more by the one-shot appearance
+-- reroll. NULL = authored before the modular creator shipped; such a
+-- character renders the legacy class rig everywhere.
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS appearance JSONB;
+-- One-shot redesign token for characters authored before the modular creator
+-- shipped (created_at earlier than the reroll cutoff). Flipped TRUE by the
+-- reroll endpoint in the same statement that writes the new appearance, so a
+-- token can never be spent twice.
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS appearance_reroll_used BOOLEAN NOT NULL DEFAULT FALSE;
 -- Max-Level XP Overflow leaderboard: indexed lifetime-XP sort key. The first
 -- index serves the realm-scoped in-game panel; the second serves the global
 -- (cross-realm) home-page board. Both are expression indexes on the bare
@@ -386,6 +417,15 @@ ALTER TABLE accounts ADD COLUMN IF NOT EXISTS created_ip TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS created_user_agent TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS last_login_ip TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS last_login_user_agent TEXT;
+-- ISO 3166-1 alpha-2 country at signup, resolved from a trusted edge geo
+-- header (GEOIP_COUNTRY_HEADER; see server/signup_attribution.ts). Analytics
+-- only, never authorization.
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS created_country TEXT;
+-- Once-guard for the D7Retained ad conversion event: stamped by the atomic
+-- claim in server/ua_capi_db.ts the first time the account opens a session
+-- during day seven after signup, so the event can never double-fire across
+-- sessions, realms, or restarts.
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS d7_capi_sent_at TIMESTAMPTZ;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS cosmetics JSONB NOT NULL DEFAULT '{}'::jsonb;
 -- Paid weapon ownership and loadouts live outside accounts.cosmetics. Older game
 -- binaries replace that JSON document wholesale, so keeping paid state there would
@@ -741,6 +781,16 @@ CREATE INDEX IF NOT EXISTS bot_detector_config_changes_realm
 -- hard-word (slur) enforcement ladder. A mute blocks chat only, never login.
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS chat_muted_until TIMESTAMPTZ;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS chat_strikes INT NOT NULL DEFAULT 0;
+-- The operator-applied Cheater mark (src/sim/moderation/): a public tag every
+-- character on the account wears until a budget of PLAYED seconds burns down.
+-- A REMAINING-SECONDS counter and not an expiry timestamp on purpose: a
+-- wall-clock sanction runs out while the account is logged out, which is exactly
+-- the window it would otherwise be waited out in. The sim owns the countdown
+-- while a character is in world and the session save writes the remainder back,
+-- so 0 (the default) means unmarked and is never written for an unmarked row.
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS cheater_mark_seconds INT NOT NULL DEFAULT 0;
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS cheater_mark_reason TEXT;
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS cheater_mark_set_at TIMESTAMPTZ;
 -- Admin-managed filter word lists. tier 'soft' = cosmetic (masked client-side
 -- when the player's filter is on); tier 'hard' = enforced (blocked + escalated).
 CREATE TABLE IF NOT EXISTS chat_filter_words (
@@ -1219,6 +1269,17 @@ export async function ensureSchema(): Promise<void> {
     // association arm, so it is created after the retention schema above; on a
     // fresh database SCHEMA alone could not create it.
     await client.query(DAILY_REWARD_EXCLUDED_ACCOUNTS_VIEW_SQL);
+    // Progression analytics event logs (level_up_events, ftue_events).
+    // FK-references accounts(id) and characters(id), so they run after SCHEMA.
+    // Applied unconditionally (idempotent), like the other schema modules.
+    await client.query(PROGRESS_EVENTS_SCHEMA);
+    // First-touch signup attribution (one row per account, written at
+    // registration). FK-references accounts(id), so it runs after SCHEMA.
+    await client.query(ACCOUNT_ATTRIBUTION_SCHEMA);
+    // The hand-entered ad-spend ledger (admin API); no FK dependencies, kept
+    // beside the other analytics schemas. Bounded (one row per campaign-day),
+    // deliberately keep-forever (see ad_spend_db.ts).
+    await client.query(AD_SPEND_SCHEMA);
     await client.query(SOCIAL_SCHEMA);
     await client.query(ADMIN_GUILDS_SCHEMA);
     await client.query(SEEKER_ENTITLEMENT_SCHEMA);
@@ -1233,6 +1294,7 @@ export async function ensureSchema(): Promise<void> {
     // FK-references accounts(id), so it runs after SCHEMA. Applied unconditionally
     // (idempotent), like the Discord tables.
     await client.query(GITHUB_SCHEMA);
+    await client.query(GENERAL_CHAT_QUOTA_SCHEMA);
     // Tier-2 global rate-limit backstop table (pg-backed fixed-window counters,
     // one row per (policy, key)) for the multi-realm deployment. Applied
     // unconditionally (idempotent), like the Discord/GitHub tables. See
@@ -1396,6 +1458,9 @@ export interface AccountModerationStatus {
   // so the WS auth handshake can seed the live session without a second query.
   chatMutedUntil: string | null;
   chatStrikes: number;
+  // Sparse account policy. Null means Unlimited. Loaded in this existing auth
+  // read so a known-unlimited session never performs quota database work.
+  generalChatRateLimit?: GeneralChatRateLimit | null;
 }
 
 export interface AccountChatMuteStatus {
@@ -2389,6 +2454,23 @@ export async function exportAccountData(
       ORDER BY claimed_at`,
     [accountId],
   );
+  // Subject-access completeness for the UA instrumentation: the signup
+  // country, the first-touch attribution row, and the per-account analytics
+  // event rows are all account-linked personal data, so they ride the export.
+  const createdCountry = await pool.query('SELECT created_country FROM accounts WHERE id = $1', [
+    accountId,
+  ]);
+  const attribution = await accountAttributionForExport(pool, accountId);
+  const levelUpEvents = await pool.query(
+    `SELECT character_id, level, earned_at
+       FROM level_up_events WHERE account_id = $1 ORDER BY earned_at`,
+    [accountId],
+  );
+  const ftueEvents = await pool.query(
+    `SELECT character_id, kind, quest_id, level, zone, killer, occurred_at
+       FROM ftue_events WHERE account_id = $1 ORDER BY occurred_at`,
+    [accountId],
+  );
   return {
     exportedAt: new Date().toISOString(),
     account: {
@@ -2397,9 +2479,13 @@ export async function exportAccountData(
       email: acct.email,
       createdAt: acct.created_at,
       locale: acct.locale,
+      createdCountry: createdCountry.rows[0]?.created_country ?? null,
       marketingOptIn: acct.marketing_opt_in,
       twoFactorEnabled,
     },
+    signupAttribution: attribution,
+    levelUpEvents: levelUpEvents.rows,
+    ftueEvents: ftueEvents.rows,
     characters: characters.map((c) => ({
       id: c.id,
       name: c.name,
@@ -2407,6 +2493,9 @@ export async function exportAccountData(
       level: c.level,
       state: c.state,
       realm: c.realm,
+      // The authored modular look: per-character personal data the account
+      // created, so it belongs in the export beside the state blob.
+      appearance: c.appearance ?? null,
     })),
     playtimeTotals: playtimeTotals.rows,
     ipAssociations: ipAssociations.rows,
@@ -2709,7 +2798,11 @@ export async function lifetimeXpStanding(
 // still sees their own rank. Returns null when no such character exists on this
 // realm OR when the viewed account is delisted (the callers render name/level
 // with no rank line on null, so this is not a 404).
-export async function lifetimeXpRankForCharacter(
+//
+// The raw two-COUNT(*) read; exported uncached so its SQL shape and eligibility
+// branching stay directly testable. Every production caller goes through
+// lifetimeXpRankForCharacter below (the cached wrapper) instead.
+export async function lifetimeXpRankForCharacterUncached(
   characterId: number,
 ): Promise<{ rank: number; total: number } | null> {
   const res = await pool.query(
@@ -2735,12 +2828,30 @@ export async function lifetimeXpRankForCharacter(
   return { rank: (res.rows[0]?.ahead ?? 0) + 1, total: res.rows[0]?.total ?? 0 };
 }
 
+configureLifetimeXpRankCache(lifetimeXpRankForCharacterUncached);
+
+// Called by all 4 sites that need a character's public rank (the owner and
+// public character-sheet handlers in characters.ts/leaderboard.ts/main.ts, and
+// the unauthenticated crawlable profile_page.ts SEO route): a keyed, bounded
+// TTL cache (server/character_rank_cache.ts) in front of the two-COUNT(*) read
+// above, so a repeat view or crawl of the same character within the TTL costs
+// no query. See that module's header for the cache shape and the moderation
+// bust wiring (server/main.ts bustBoardCaches).
+export async function lifetimeXpRankForCharacter(
+  characterId: number,
+): Promise<{ rank: number; total: number } | null> {
+  return readLifetimeXpRankForCharacter(characterId);
+}
+
 export async function moderationStatusForAccount(
   accountId: number,
 ): Promise<AccountModerationStatus> {
   const res = await pool.query(
-    `SELECT banned_at, suspended_until, moderation_reason, chat_muted_until, chat_strikes, deactivated_at
-     FROM accounts WHERE id = $1`,
+    `SELECT a.banned_at, a.suspended_until, a.moderation_reason, a.chat_muted_until,
+            a.chat_strikes, a.deactivated_at, q.messages, q.window_minutes
+     FROM accounts a
+     LEFT JOIN account_general_chat_rate_limits q ON q.account_id = a.id
+     WHERE a.id = $1`,
     [accountId],
   );
   const row = res.rows[0];
@@ -2753,12 +2864,20 @@ export async function moderationStatusForAccount(
       message: '',
       chatMutedUntil: null,
       chatStrikes: 0,
+      generalChatRateLimit: null,
     };
   }
   const mutedUntilDate = row.chat_muted_until ? new Date(row.chat_muted_until) : null;
   const chatMutedUntil =
     mutedUntilDate && mutedUntilDate.getTime() > Date.now() ? mutedUntilDate.toISOString() : null;
   const chatStrikes = Number(row.chat_strikes ?? 0);
+  const generalChatRateLimit =
+    row.messages === null || row.messages === undefined
+      ? null
+      : {
+          messages: Number(row.messages),
+          windowMinutes: Number(row.window_minutes),
+        };
   // Admin-imposed states (ban, then active suspension) outrank a self-imposed
   // deactivation: a banned+deactivated account must still surface the ban reason
   // and label, not be relabelled "deactivated". All branches resolve to locked.
@@ -2771,6 +2890,7 @@ export async function moderationStatusForAccount(
       message: 'This account has been banned.',
       chatMutedUntil,
       chatStrikes,
+      generalChatRateLimit,
     };
   }
   const suspendedUntil = row.suspended_until ? new Date(row.suspended_until) : null;
@@ -2783,6 +2903,7 @@ export async function moderationStatusForAccount(
       message: `This account is suspended until ${suspendedUntil.toUTCString()}.`,
       chatMutedUntil,
       chatStrikes,
+      generalChatRateLimit,
     };
   }
   // A self-deactivated account is locked out of login + WS auth (same gate as
@@ -2797,6 +2918,7 @@ export async function moderationStatusForAccount(
       message: 'This account has been deactivated.',
       chatMutedUntil,
       chatStrikes,
+      generalChatRateLimit,
     };
   }
   return {
@@ -2807,6 +2929,7 @@ export async function moderationStatusForAccount(
     message: '',
     chatMutedUntil,
     chatStrikes,
+    generalChatRateLimit,
   };
 }
 
@@ -2839,6 +2962,15 @@ export interface CharacterRow {
   // Per-character action-bar layout (own JSONB column, not the sim state blob).
   // Opaque to the server beyond bounds validation; only the join path selects it.
   hotbar_layout?: ActionBarLayout | null;
+  // The authored modular-creator look (own JSONB column, hotbar_layout's
+  // pattern). Normalized at write; NULL = pre-creator character (legacy rig).
+  appearance?: Record<string, unknown> | null;
+  // One-shot redesign token spent (see the reroll endpoint). Selected by the
+  // list path only.
+  appearance_reroll_used?: boolean;
+  // Selected by the list path only, for the reroll-cutoff check and the
+  // char-select payload.
+  created_at?: Date | string | null;
 }
 
 // The account's "top" character on this realm (highest level, then lifetime XP),
@@ -2872,6 +3004,7 @@ export async function highestCharacterForAccount(accountId: number): Promise<Cha
 export async function listCharacters(accountId: number): Promise<CharacterRow[]> {
   const res = await pool.query(
     `SELECT c.id, c.account_id, c.name, c.class, c.level, c.state, c.is_gm, c.force_rename,
+            c.appearance, c.appearance_reroll_used, c.created_at,
             GREATEST(ps.last_played, totals.last_played) AS last_played,
             (COALESCE(ps.playtime_seconds, 0) + COALESCE(totals.playtime_seconds, 0))::bigint AS playtime_seconds
        FROM characters c
@@ -2899,13 +3032,15 @@ export async function listCharacters(accountId: number): Promise<CharacterRow[]>
 // self-service surface, same as characterCountForAccount, so it must not stop
 // at this process's realm the way listCharacters above deliberately does.
 // Selects the realm column so the export can label which realm each character
-// belongs to. One query, no per-realm loop: `characters` is already indexed
+// belongs to, and `appearance`: the authored look is per-character personal
+// data the account created, so the GDPR export must carry it. One query, no per-realm loop: `characters` is already indexed
 // on account_id (characters_account), so this stays a single indexed read.
 export async function listCharactersAllRealms(
   accountId: number,
 ): Promise<(CharacterRow & { realm: string })[]> {
   const res = await pool.query(
-    `SELECT id, account_id, name, class, level, state, is_gm, force_rename, realm
+    `SELECT id, account_id, name, class, level, state, is_gm, force_rename, realm,
+            appearance
        FROM characters
       WHERE account_id = $1
       ORDER BY realm, id`,
@@ -2919,7 +3054,7 @@ export async function getCharacter(
   characterId: number,
 ): Promise<CharacterRow | null> {
   const res = await pool.query(
-    'SELECT id, account_id, name, class, level, state, is_gm, force_rename, hotbar_layout FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3',
+    'SELECT id, account_id, name, class, level, state, is_gm, force_rename, hotbar_layout, appearance FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3',
     [characterId, accountId, REALM],
   );
   return res.rows[0] ?? null;
@@ -2939,6 +3074,77 @@ export async function setCharacterHotbarLayout(
   ]);
 }
 
+/** Spend a character's one-shot appearance reroll: write the new look and burn
+ *  the token in ONE statement, so two concurrent rerolls cannot both succeed.
+ *  All eligibility lives in the WHERE arm: ownership + realm (BOLA, matching
+ *  getCharacter's scoping), inside the free window or never designed, and the
+ *  unspent token, and the row is only touched when every check passes. Returns
+ *  whether the reroll was applied; false = not owned / outside the window with a
+ *  look already / already spent, which the route maps to its error body. The appearance is already normalized by the
+ *  caller (untrusted client input, hotbar_layout's contract).
+ *
+ *  Two ways into the WHERE arm, and the unspent token is what keeps it one-shot
+ *  either way. `created_at < $6` is the PRODUCT rule: every character that
+ *  existed before the cutoff gets one redesign on the house, whether or not it
+ *  already carries an authored look. `appearance IS NULL` is the safety net
+ *  under it, and it is why the date alone is not enough: a cutoff strands every
+ *  character created after it by a client too old to post an appearance, which
+ *  would then have neither a look nor any way to choose one. The OR can only
+ *  ever widen eligibility, so the window stays exactly what it says.
+ *
+ *  The helm preference rides the SAME statement, because the redesign editor's
+ *  helmet toggle is the creation toggle: a standing wardrobe choice, not a
+ *  turntable view. It is sim state, so it patches the one key inside the state
+ *  blob rather than rewriting it (a whole-blob write from an HTTP route would
+ *  clobber a live session's progress), and follows the sim's zero-default
+ *  omission convention: hidden writes the key, shown removes it, and BOTH
+ *  arms are guarded on an actual change, because jsonb_set and `-` each mint a
+ *  whole new datum: an unguarded write detoasts, re-serializes and re-TOASTs
+ *  the entire state blob even when the value is identical, leaving dead chunks
+ *  behind for autovacuum. A NULL
+ *  helmHidden means the client did not offer the toggle at all and the blob is
+ *  left untouched: defaulting that to false would actively UN-hide a helm the
+ *  player had hidden in world. A character that has never been saved (state IS
+ *  NULL) is likewise left alone; its blob is written
+ *  fresh on first entry. A LIVE session still holds the old value in memory and
+ *  would autosave over this, which is what the route's setHelmHiddenForCharacter
+ *  push exists to prevent.
+ *
+ *  Unlike characterUpdateStatement, this write carries no character_leases fence.
+ *  That is deliberate, not an oversight: the UPDATE only ever patches the single
+ *  helmHidden key inside the state blob (never the whole thing), so a takeover
+ *  racing this cannot tear it the way a full state write could, and the
+ *  applyAppearanceForCharacter/setHelmHiddenForCharacter push onto the live
+ *  session right after is what reconciles an online character with the row it
+ *  just wrote. */
+export async function consumeAppearanceReroll(
+  accountId: number,
+  characterId: number,
+  appearance: Record<string, unknown>,
+  helmHidden: boolean | null,
+  createdBefore: Date,
+): Promise<boolean> {
+  const res = await pool.query(
+    `UPDATE characters
+        SET appearance = $3::jsonb,
+            appearance_reroll_used = TRUE,
+            state = CASE
+                      WHEN state IS NULL OR $5::boolean IS NULL THEN state
+                      WHEN $5::boolean AND state->'helmHidden' IS DISTINCT FROM 'true'::jsonb
+                        THEN jsonb_set(state, '{helmHidden}', 'true'::jsonb, true)
+                      WHEN NOT $5::boolean AND state ? 'helmHidden'
+                        THEN state - 'helmHidden'
+                      ELSE state
+                    END,
+            updated_at = now()
+      WHERE id = $1 AND account_id = $2 AND realm = $4
+        AND (created_at < $6 OR appearance IS NULL)
+        AND appearance_reroll_used = FALSE`,
+    [characterId, accountId, JSON.stringify(appearance), REALM, helmHidden, createdBefore],
+  );
+  return (res.rowCount ?? 0) > 0;
+}
+
 // Active character names on this realm for the public character sitemap, ranked
 // by lifetime XP so the most significant players lead the file. Capped by the
 // caller (sitemap protocol allows 50k URLs/file).
@@ -2953,6 +3159,9 @@ export async function listCharacterNamesForSitemap(limit = 50000): Promise<strin
 // Realm-scoped character read by id WITHOUT an ownership check, for the public
 // character sheet / profile page, which serve any character on the realm. Returns
 // the same shape as getCharacter so the sheet normalizer treats both alike.
+// `appearance` is deliberately NOT selected here: no public-path consumer reads
+// it, and every surface that does (roster, ws join, reroll) has its own
+// account-scoped query that re-sanitizes the column on the way out.
 export async function getCharacterById(characterId: number): Promise<CharacterRow | null> {
   const res = await pool.query(
     'SELECT id, account_id, name, class, level, state, is_gm, force_rename FROM characters WHERE id = $1 AND realm = $2',
@@ -3001,6 +3210,9 @@ export async function createCharacterCapped(
   cls: PlayerClass,
   limit = 10,
   state: CharacterState | null = null,
+  // The authored modular look, already normalized by the route handler.
+  // Null = created without the creator (legacy rig).
+  appearance: Record<string, unknown> | null = null,
 ): Promise<CharacterRow | null> {
   const client = await pool.connect();
   try {
@@ -3021,8 +3233,15 @@ export async function createCharacterCapped(
       return null;
     }
     const res = await client.query(
-      'INSERT INTO characters (account_id, name, class, realm, state) VALUES ($1, $2, $3, $4, $5) RETURNING id, account_id, name, class, level, state, is_gm, force_rename',
-      [accountId, name, cls, REALM, state ? JSON.stringify(state) : null],
+      'INSERT INTO characters (account_id, name, class, realm, state, appearance) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, account_id, name, class, level, state, is_gm, force_rename, appearance',
+      [
+        accountId,
+        name,
+        cls,
+        REALM,
+        state ? JSON.stringify(state) : null,
+        appearance ? JSON.stringify(appearance) : null,
+      ],
     );
     await recordCharacterCreation(client, accountId, REALM);
     await client.query('COMMIT');
@@ -3578,6 +3797,7 @@ export interface ArenaLeaderRow {
   rating: number;
   wins: number;
   losses: number;
+  draws: number;
 }
 
 export async function topArenaRatings(
@@ -3597,16 +3817,23 @@ export async function topArenaRatings(
     fmt === '2v2'
       ? "COALESCE((state->>'arena2v2Losses')::int, 0)"
       : "COALESCE((state->>'arena1v1Losses')::int, (state->>'arenaLosses')::int, 0)";
+  // No legacy alias: draws were never persisted before the W-L-D change, so an
+  // untouched row correctly reads 0 rather than borrowing another field.
+  const drawsExpr =
+    fmt === '2v2'
+      ? "COALESCE((state->>'arena2v2Draws')::int, 0)"
+      : "COALESCE((state->>'arena1v1Draws')::int, 0)";
   const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
     query(
       `SELECT name, class, level,
             ${ratingExpr} AS rating,
             ${winsExpr} AS wins,
-            ${lossesExpr} AS losses
+            ${lossesExpr} AS losses,
+            ${drawsExpr} AS draws
        FROM characters
       WHERE realm = $1
         AND state IS NOT NULL
-        AND ${winsExpr} + ${lossesExpr} > 0
+        AND ${winsExpr} + ${lossesExpr} + ${drawsExpr} > 0
         AND EXISTS (SELECT 1 FROM accounts a
                      WHERE a.id = characters.account_id AND ${ELIGIBLE_ACCOUNT_SQL})
       ORDER BY rating DESC, wins DESC, name ASC
@@ -3621,6 +3848,7 @@ export async function topArenaRatings(
     rating: Number(r.rating),
     wins: Number(r.wins),
     losses: Number(r.losses),
+    draws: Number(r.draws),
   }));
 }
 
@@ -3638,6 +3866,7 @@ export interface BgLeaderRow {
   rating: number;
   wins: number;
   losses: number;
+  draws: number;
 }
 
 // ACCEPTED COST (the arena twin's trade, doubled): predicating and ordering on
@@ -3654,16 +3883,18 @@ export async function topBgRatings(limit = 20): Promise<BgLeaderRow[]> {
   const ratingExpr = "COALESCE((state->>'bgRating')::int, 1500)";
   const winsExpr = "COALESCE((state->>'bgWins')::int, 0)";
   const lossesExpr = "COALESCE((state->>'bgLosses')::int, 0)";
+  const drawsExpr = "COALESCE((state->>'bgDraws')::int, 0)";
   const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
     query(
       `SELECT name, class, level,
             ${ratingExpr} AS rating,
             ${winsExpr} AS wins,
-            ${lossesExpr} AS losses
+            ${lossesExpr} AS losses,
+            ${drawsExpr} AS draws
        FROM characters
       WHERE realm = $1
         AND state IS NOT NULL
-        AND ${winsExpr} + ${lossesExpr} > 0
+        AND ${winsExpr} + ${lossesExpr} + ${drawsExpr} > 0
         AND EXISTS (SELECT 1 FROM accounts a
                      WHERE a.id = characters.account_id AND ${ELIGIBLE_ACCOUNT_SQL})
       ORDER BY rating DESC, wins DESC, name ASC
@@ -3678,6 +3909,7 @@ export async function topBgRatings(limit = 20): Promise<BgLeaderRow[]> {
     rating: Number(r.rating),
     wins: Number(r.wins),
     losses: Number(r.losses),
+    draws: Number(r.draws),
   }));
 }
 

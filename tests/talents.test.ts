@@ -32,7 +32,8 @@ import {
 } from '../src/sim/content/talents';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import { ALL_CLASSES, MAX_LEVEL, type PlayerClass, type SimEvent } from '../src/sim/types';
-import { talentRowOptionIconRef } from '../src/ui/talent_icons';
+import { PALADIN_TALENT_IMAGE_IDS, talentRowOptionIconRef } from '../src/ui/talent_icons';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // 'personal_barrier' is the shieldConsumed SLOT sentinel (combat/talent_procs.ts):
 // it resolves at runtime to whichever personal barrier the spec provides.
@@ -70,7 +71,7 @@ function requiredMeta(sim: Sim, pid = sim.playerId): PlayerMeta {
 }
 
 function warriorAtCap(seed = 7): Sim {
-  const sim = new Sim({ seed, playerClass: 'warrior' });
+  const sim = new Sim({ seed, playerClass: 'warrior', world: EMPTY_TEST_WORLD });
   sim.setPlayerLevel(MAX_LEVEL);
   return sim;
 }
@@ -156,13 +157,21 @@ describe('Talents V2 registry and reachability', () => {
     }
   });
 
-  it('derives an ability or procedural crest icon for every active option', () => {
+  it('derives a painted image, ability, or procedural crest icon for every active option', () => {
     for (const cls of ALL_CLASSES) {
       for (const row of requiredTree(cls)) {
         for (const option of row.options) {
           const icon = talentRowOptionIconRef(option);
-          expect(icon.kind, `${cls}:${option.id}`).toMatch(/^(ability|crest)$/);
-          expect(icon.id, `${cls}:${option.id}`).toMatch(/^[a-z0-9_]+$/);
+          expect(icon.kind, `${cls}:${option.id}`).toMatch(/^(image|ability|crest)$/);
+          if (icon.kind === 'image') {
+            expect(cls, option.id).toBe('paladin');
+            expect(PALADIN_TALENT_IMAGE_IDS.has(option.icon ?? ''), option.id).toBe(true);
+            expect(icon.url, `${cls}:${option.id}`).toMatch(
+              /^\/ui\/skills\/[a-z_]+\/[a-z0-9_]+\.webp$/,
+            );
+          } else {
+            expect(icon.id, `${cls}:${option.id}`).toMatch(/^[a-z0-9_]+$/);
+          }
         }
       }
     }
@@ -268,14 +277,19 @@ describe('canonical allocation, unlocks, and repair', () => {
 
 describe('modifier bake and known-ability resolution', () => {
   it('folds the selected row once and never folds its two alternatives', () => {
-    const doubleCharge = computeTalentModifiers(
+    // `war_row_double_charge` is the FROZEN id of the level-5 row's first option, kept
+    // stable across the Double Charge -> Intervene content swap so saved picks survive.
+    // It now grants an ability rather than adding a stored Onrush use.
+    const intervene = computeTalentModifiers(
       'warrior',
       allocation(null, { 5: 'war_row_double_charge' }),
     );
-    expect(doubleCharge.abilities.charge?.bonusCharges).toBe(1);
-    expect(doubleCharge.global.onKillSpeedPct).toBe(0);
+    expect(intervene.grants.some((g) => g.ability === 'intervene')).toBe(true);
+    expect(intervene.abilities.charge?.bonusCharges).toBeUndefined();
+    expect(intervene.global.onKillSpeedPct).toBe(0);
 
     const pursuit = computeTalentModifiers('warrior', allocation(null, { 5: 'war_row_pursuit' }));
+    expect(pursuit.grants.some((g) => g.ability === 'intervene')).toBe(false);
     expect(pursuit.abilities.charge).toBeUndefined();
     expect(pursuit.global.onKillSpeedPct).toBeCloseTo(0.3);
   });
@@ -295,12 +309,25 @@ describe('modifier bake and known-ability resolution', () => {
 
     const prot = computeTalentModifiers('warrior', allocation('prot'));
     expect(prot.grants).toContainEqual({ ability: 'shield_slam', rank: 1 });
-    expect(prot.global.threatPct).toBeCloseTo(0.3);
+    expect(prot.global.threatPct).toBeCloseTo(0.8);
     expect(prot.stats).toMatchObject({ armorPct: 0.1, staPct: 0.4, armorFromStrPct: 0.7 });
   });
 
+  // The paladin is the one class that does NOT hand its signature over at spec
+  // choice. Its overhauled kit authors its own progression (the paladinBaseKitGrant
+  // branch in abilitiesKnownAt keeps these levels authoritative instead of letting
+  // the generic signature grant reveal them early), so specializing is the promise
+  // and the signature is the payoff a few levels later. Pinned by level rather than
+  // skipped, so drifting one of them still reddens.
+  const PALADIN_SIGNATURE_LEVELS: Record<string, number> = {
+    holy: 8, // Mercy Lance
+    protection: 10, // Sunward Disc
+    retribution: 8, // Final Edict
+  };
+
   it('makes every spec signature known at the first unlock level', () => {
     for (const cls of ALL_CLASSES) {
+      if (cls === 'paladin') continue;
       for (const spec of requiredTalents(cls).specs) {
         const known = abilitiesKnownAt(
           cls,
@@ -312,6 +339,34 @@ describe('modifier bake and known-ability resolution', () => {
           `${cls}:${spec.id}:${spec.signature}`,
         ).toBe(true);
       }
+    }
+  });
+
+  it('gives the paladin its signatures at its own authored levels, not at spec choice', () => {
+    for (const spec of requiredTalents('paladin').specs) {
+      const level = PALADIN_SIGNATURE_LEVELS[spec.id];
+      expect(level, `paladin:${spec.id} has no pinned signature level`).toBeDefined();
+      expect(level).toBeGreaterThan(FIRST_TALENT_LEVEL);
+
+      const knownAtSpecChoice = abilitiesKnownAt(
+        'paladin',
+        FIRST_TALENT_LEVEL,
+        computeTalentModifiers('paladin', allocation(spec.id), FIRST_TALENT_LEVEL),
+      );
+      expect(
+        knownAtSpecChoice.some((ability) => ability.def.id === spec.signature),
+        `paladin:${spec.id}:${spec.signature} must not arrive at spec choice`,
+      ).toBe(false);
+
+      const knownAtLevel = abilitiesKnownAt(
+        'paladin',
+        level,
+        computeTalentModifiers('paladin', allocation(spec.id), level),
+      );
+      expect(
+        knownAtLevel.some((ability) => ability.def.id === spec.signature),
+        `paladin:${spec.id}:${spec.signature} at level ${level}`,
+      ).toBe(true);
     }
   });
 
@@ -381,7 +436,7 @@ describe('canonical build strings', () => {
 
 describe('Sim authoritative Talent V2 integration', () => {
   it('commits a spec at level 5 and applies its signature and mastery immediately', () => {
-    const sim = new Sim({ seed: 7, playerClass: 'warrior' });
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', world: EMPTY_TEST_WORLD });
     sim.setPlayerLevel(4);
     expect(sim.setSpec('fury')).toBe(false);
     expect(sim.known.some((ability) => ability.def.id === 'bloodthirst')).toBe(false);
@@ -422,7 +477,7 @@ describe('Sim authoritative Talent V2 integration', () => {
   });
 
   it('rejects locked, unknown, and cross-class row selections', () => {
-    const sim = new Sim({ seed: 7, playerClass: 'warrior' });
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', world: EMPTY_TEST_WORLD });
     sim.setPlayerLevel(5);
     expect(sim.selectTalentRow(8, 'war_row_die_by_the_sword')).toBe(false);
     expect(sim.selectTalentRow(5, 'missing')).toBe(false);
@@ -475,7 +530,12 @@ describe('Sim authoritative Talent V2 integration', () => {
     const state = sim.serializeCharacter(sim.playerId);
     if (!state) throw new Error('Failed to serialize the Warrior');
 
-    const restored = new Sim({ seed: 9, playerClass: 'warrior', noPlayer: true });
+    const restored = new Sim({
+      seed: 9,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const pid = restored.addPlayer('warrior', 'Reloaded', { state });
     const meta = requiredMeta(restored, pid);
     expect(meta.talents).toEqual(
@@ -484,7 +544,7 @@ describe('Sim authoritative Talent V2 integration', () => {
         8: 'war_row_die_by_the_sword',
       }),
     );
-    expect(meta.talentMods.abilities.charge?.bonusCharges).toBe(1);
+    expect(meta.known.some((ability) => ability.def.id === 'intervene')).toBe(true);
     expect(meta.known.some((ability) => ability.def.id === 'die_by_sword')).toBe(true);
   });
 
@@ -502,7 +562,12 @@ describe('Sim authoritative Talent V2 integration', () => {
     if (!state) throw new Error('Failed to serialize the Warrior');
     state.level = 8;
 
-    const restored = new Sim({ seed: 9, playerClass: 'warrior', noPlayer: true });
+    const restored = new Sim({
+      seed: 9,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const pid = restored.addPlayer('warrior', 'Repaired', { state });
     expect(requiredMeta(restored, pid).talents).toEqual(
       allocation('arms', { 5: 'war_row_double_charge' }),
@@ -589,7 +654,7 @@ describe('Sim loadouts and stable hot-path bake', () => {
   });
 
   it('repairs an untrusted next loadout before auto-applying it on deletion', () => {
-    const sim = new Sim({ seed: 7, playerClass: 'warrior' });
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', world: EMPTY_TEST_WORLD });
     sim.setPlayerLevel(8);
     expect(sim.saveLoadout('Safe', [], allocation('arms', { 5: 'war_row_double_charge' }))).toBe(0);
     const meta = requiredMeta(sim);
@@ -622,7 +687,7 @@ describe('Sim loadouts and stable hot-path bake', () => {
 
 describe('spec switch cancels orphaned form auras', () => {
   it('drops Moonkin Form (and its buffs) when respeccing away from Balance', () => {
-    const sim = new Sim({ seed: 11, playerClass: 'druid' });
+    const sim = new Sim({ seed: 11, playerClass: 'druid', world: EMPTY_TEST_WORLD });
     sim.setPlayerLevel(MAX_LEVEL);
     expect(sim.setSpec('balance')).toBe(true);
     sim.castAbility('moonkin_form', sim.playerId);
@@ -637,7 +702,7 @@ describe('spec switch cancels orphaned form auras', () => {
   });
 
   it('drops Gloamveil Form when respeccing a priest away from Shadow', () => {
-    const sim = new Sim({ seed: 12, playerClass: 'priest' });
+    const sim = new Sim({ seed: 12, playerClass: 'priest', world: EMPTY_TEST_WORLD });
     sim.setPlayerLevel(MAX_LEVEL);
     expect(sim.setSpec('shadow')).toBe(true);
     sim.castAbility('shadowform', sim.playerId);

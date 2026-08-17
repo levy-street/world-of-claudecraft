@@ -55,7 +55,7 @@ import { REALM } from '../../server/realm';
 import { type FakeRes, fakeCtx, makeReq } from './helpers';
 
 function bgRow(name: string): BgLeaderRow {
-  return { name, class: 'warrior', level: 60, rating: 1650, wins: 9, losses: 4 };
+  return { name, class: 'warrior', level: 60, rating: 1650, wins: 9, losses: 4, draws: 0 };
 }
 
 function fakeRuntime(overrides: Partial<BattlegroundRuntime> = {}): BattlegroundRuntime {
@@ -135,7 +135,15 @@ describe('battleground leaderboard handler (through the injected cache-fronted r
     expect(status).toBe(200);
     expect(body).toEqual({
       leaders: [
-        { name: 'Riftlord', class: 'warrior', level: 60, rating: 1650, wins: 9, losses: 4 },
+        {
+          name: 'Riftlord',
+          class: 'warrior',
+          level: 60,
+          rating: 1650,
+          wins: 9,
+          losses: 4,
+          draws: 0,
+        },
       ],
     });
   });
@@ -225,9 +233,13 @@ describe('topBgRatings SQL conventions', () => {
     expect(sql).toContain("state->>'bgWins'");
     expect(sql).toContain("state->>'bgLosses'");
     // Only characters with at least one result appear (absent fields COALESCE
-    // to 0, so a never-queued character never rides the board at 1500).
+    // to 0, so a never-queued character never rides the board at 1500). Draws
+    // count toward that: a player whose only rated matches ended level has
+    // still played and still carries a rating, and their absence before was an
+    // artifact of draws not being recorded at all.
     expect(sql).toContain(
-      "COALESCE((state->>'bgWins')::int, 0) + COALESCE((state->>'bgLosses')::int, 0) > 0",
+      "COALESCE((state->>'bgWins')::int, 0) + COALESCE((state->>'bgLosses')::int, 0) +" +
+        " COALESCE((state->>'bgDraws')::int, 0) > 0",
     );
     expect(sql).toContain('ORDER BY rating DESC, wins DESC, name ASC');
   });
@@ -243,11 +255,19 @@ describe('topBgRatings SQL conventions', () => {
   it('coerces numeric rating/record fields from JSONB strings', async () => {
     dbMock.query.mockResolvedValueOnce({
       rows: [
-        { name: 'Riftlord', class: 'paladin', level: 60, rating: '1712', wins: '8', losses: '2' },
+        {
+          name: 'Riftlord',
+          class: 'paladin',
+          level: 60,
+          rating: '1712',
+          wins: '8',
+          losses: '2',
+          draws: '3',
+        },
       ],
     });
     await expect(topBgRatings(5)).resolves.toEqual([
-      { name: 'Riftlord', class: 'paladin', level: 60, rating: 1712, wins: 8, losses: 2 },
+      { name: 'Riftlord', class: 'paladin', level: 60, rating: 1712, wins: 8, losses: 2, draws: 3 },
     ]);
   });
 });

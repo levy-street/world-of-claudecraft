@@ -44,4 +44,24 @@ describe('death recap feedback', () => {
       values: { killer: 'Bogthane', ability: 'Falling' },
     });
   });
+
+  it('gives Cauterize its own self-inflicted sentence instead of "Slain by Cauterized" (issue #3029)', () => {
+    // Regression: the fire mage's own Cauterized burn (aura id 'cauterizing')
+    // is self-sourced, so handleDeath drops the killer id (killer === target)
+    // and only the raw aura name 'Cauterized' survives as abilityRaw. Before
+    // this fix that fell through to the generic {ability} path and read as
+    // "Slain by Cauterized", implying an enemy named Cauterized landed the kill.
+    expect(deathRecapFeedback(undefined, 'Cauterized', 'Cauterized')).toEqual({
+      key: 'hud.system.deathRecapCauterized',
+    });
+    expect(t('hud.system.deathRecapCauterized')).toBe(
+      "You have died. Cauterize's burn overwhelmed you.",
+    );
+    // Defensive mirror of the Falling/Fatigue case: an attributed kill still
+    // takes the generic path even if the raw source string happens to collide.
+    expect(deathRecapFeedback('Bogthane', 'Cauterized', 'Cauterized')).toEqual({
+      key: 'hud.system.deathRecapKillerAbility',
+      values: { killer: 'Bogthane', ability: 'Cauterized' },
+    });
+  });
 });

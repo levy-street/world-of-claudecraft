@@ -25,6 +25,7 @@ import { Sim } from '../src/sim/sim';
 import type { Entity, MoveInput } from '../src/sim/types';
 import { groundHeight, terrainHeight, terrainSteepness, WATER_LEVEL } from '../src/sim/world';
 import { expectDefined } from './helpers/defined';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // The shipped seed: the report is seed-pinned world geometry.
 const SEED = 20061;
@@ -71,7 +72,12 @@ const NO_INPUT: MoveInput = {
 let walkerBody: Entity | null = null;
 function bodyForWalking(): Entity {
   if (!walkerBody) {
-    const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true });
+    const sim = new Sim({
+      seed: SEED,
+      playerClass: 'warrior',
+      autoEquip: true,
+      world: EMPTY_TEST_WORLD,
+    });
     sim.setPlayerLevel(20);
     walkerBody = sim.player;
   }
@@ -141,7 +147,12 @@ function scanWedges(step: number): { x: number; z: number }[] {
 // --- a walker on the real Sim ----------------------------------------------
 
 function makeSimWalker(spot: { x: number; z: number }) {
-  const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true });
+  const sim = new Sim({
+    seed: SEED,
+    playerClass: 'warrior',
+    autoEquip: true,
+    world: EMPTY_TEST_WORLD,
+  });
   sim.setPlayerLevel(20);
   const p = sim.player;
   const meta = expectDefined(

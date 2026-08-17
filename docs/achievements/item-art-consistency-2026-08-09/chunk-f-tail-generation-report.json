@@ -1,0 +1,2561 @@
+{
+  "schemaVersion": 1,
+  "batchId": "item-art-consistency-2026-08-09",
+  "chunk": "F-tail",
+  "recordRange": {
+    "start": 257,
+    "end": 266
+  },
+  "count": 10,
+  "generatedAt": "2026-08-09T20:51:24.534Z",
+  "sourcePlan": "tmp/imagegen/item-art-consistency/generation-plan.json",
+  "houseStyle": {
+    "name": "World of ClaudeCraft premium hand-painted classic fantasy MMO inventory art",
+    "canonicalDescription": "Tactile materials, crisp focal edges, softer peripheral brushwork, restrained magical accents, top-left warm key light with cool deep shadow, and an opaque deep charcoal, umber, navy, or zone-tinted painted vignette with subtle atmospheric haze and grounded contact shadow.",
+    "framing": "Square and borderless, one centered inventory subject filling about 68 to 76 percent of the tile with safe padding and a clear silhouette at small sizes.",
+    "prohibited": "Text, letters, numbers, labels, UI borders, rarity frames, watermarks, checkerboards, transparency, split sheets, collages, mannequins, hand-held presentation, and cropped subjects."
+  },
+  "execution": {
+    "generationMode": "built-in image_gen",
+    "cliFallbackUsed": false,
+    "oneInitialCallPerRecord": true,
+    "targetedRetriesOnlyForDocumentedDefects": true,
+    "promptPolicy": "Initial attempts use the exact generation-plan prompt. The one documented retry appends only a focused correction for matching pair symmetry.",
+    "referencePolicy": "All four generation-plan references supplied in recorded order.",
+    "normalization": "magick <generated> -auto-orient -colorspace sRGB -alpha off -resize 512x512! -strip -type TrueColor PNG24:<master>",
+    "shippingEncoding": "sharp(<master>).rotate().resize(128, 128, { fit: fill, kernel: lanczos3 }).removeAlpha().toColourspace(srgb).webp({ quality: 82, alphaQuality: 100, smartSubsample: true, effort: 6 })",
+    "sharpVersion": "0.35.3"
+  },
+  "contactSheets": [
+    {
+      "kind": "512px master overview",
+      "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/previews/contact-512-masters.png",
+      "sha256": "fb9e54e7302562ec43392061413606119cc1286421178f9ca9ddfb89665dad90",
+      "bytes": 975913,
+      "width": 1400,
+      "height": 596,
+      "format": "png",
+      "colorSpace": "srgb",
+      "channels": 3,
+      "depth": "uchar",
+      "hasAlpha": false,
+      "opaque": true,
+      "itemPixelSize": 256,
+      "mode": "color",
+      "grid": {
+        "columns": 5,
+        "rows": 2
+      },
+      "order": [
+        {
+          "index": 257,
+          "id": "woven_robe"
+        },
+        {
+          "index": 258,
+          "id": "wyrmcult_grand_robe"
+        },
+        {
+          "index": 259,
+          "id": "wyrmcult_orders"
+        },
+        {
+          "index": 260,
+          "id": "wyrmcult_soulsteps"
+        },
+        {
+          "index": 261,
+          "id": "wyrmscale_jerkin"
+        },
+        {
+          "index": 262,
+          "id": "wyrmshadow_harness"
+        },
+        {
+          "index": 263,
+          "id": "wyrmshadow_legguards"
+        },
+        {
+          "index": 264,
+          "id": "wyrmshadow_talongrips"
+        },
+        {
+          "index": 265,
+          "id": "wyrmshadow_treads"
+        },
+        {
+          "index": 266,
+          "id": "ysols_pearl_greaves"
+        }
+      ],
+      "labeled": true,
+      "reviewed": true,
+      "independentlyReviewed": true,
+      "passed": true,
+      "notes": "All ten subjects remain distinct, centered, uncropped, and readable at this review size."
+    },
+    {
+      "kind": "128px color",
+      "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/previews/contact-128-color.png",
+      "sha256": "d23e580328fb99bdc60a7679b13d10868be06c45102a53cd48e9725001d625f4",
+      "bytes": 248080,
+      "width": 1100,
+      "height": 340,
+      "format": "png",
+      "colorSpace": "srgb",
+      "channels": 3,
+      "depth": "uchar",
+      "hasAlpha": false,
+      "opaque": true,
+      "itemPixelSize": 128,
+      "mode": "color",
+      "grid": {
+        "columns": 5,
+        "rows": 2
+      },
+      "order": [
+        {
+          "index": 257,
+          "id": "woven_robe"
+        },
+        {
+          "index": 258,
+          "id": "wyrmcult_grand_robe"
+        },
+        {
+          "index": 259,
+          "id": "wyrmcult_orders"
+        },
+        {
+          "index": 260,
+          "id": "wyrmcult_soulsteps"
+        },
+        {
+          "index": 261,
+          "id": "wyrmscale_jerkin"
+        },
+        {
+          "index": 262,
+          "id": "wyrmshadow_harness"
+        },
+        {
+          "index": 263,
+          "id": "wyrmshadow_legguards"
+        },
+        {
+          "index": 264,
+          "id": "wyrmshadow_talongrips"
+        },
+        {
+          "index": 265,
+          "id": "wyrmshadow_treads"
+        },
+        {
+          "index": 266,
+          "id": "ysols_pearl_greaves"
+        }
+      ],
+      "labeled": true,
+      "reviewed": true,
+      "independentlyReviewed": true,
+      "passed": true,
+      "notes": "All ten subjects remain distinct, centered, uncropped, and readable at this review size."
+    },
+    {
+      "kind": "40px color",
+      "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/previews/contact-40-color.png",
+      "sha256": "ab48d3dc7527876b5505a4310dd1ce12d8400fd30e2d1dff9431fa844c20f7e0",
+      "bytes": 53775,
+      "width": 1100,
+      "height": 164,
+      "format": "png",
+      "colorSpace": "srgb",
+      "channels": 3,
+      "depth": "uchar",
+      "hasAlpha": false,
+      "opaque": true,
+      "itemPixelSize": 40,
+      "mode": "color",
+      "grid": {
+        "columns": 5,
+        "rows": 2
+      },
+      "order": [
+        {
+          "index": 257,
+          "id": "woven_robe"
+        },
+        {
+          "index": 258,
+          "id": "wyrmcult_grand_robe"
+        },
+        {
+          "index": 259,
+          "id": "wyrmcult_orders"
+        },
+        {
+          "index": 260,
+          "id": "wyrmcult_soulsteps"
+        },
+        {
+          "index": 261,
+          "id": "wyrmscale_jerkin"
+        },
+        {
+          "index": 262,
+          "id": "wyrmshadow_harness"
+        },
+        {
+          "index": 263,
+          "id": "wyrmshadow_legguards"
+        },
+        {
+          "index": 264,
+          "id": "wyrmshadow_talongrips"
+        },
+        {
+          "index": 265,
+          "id": "wyrmshadow_treads"
+        },
+        {
+          "index": 266,
+          "id": "ysols_pearl_greaves"
+        }
+      ],
+      "labeled": true,
+      "reviewed": true,
+      "independentlyReviewed": true,
+      "passed": true,
+      "notes": "All ten subjects remain distinct, centered, uncropped, and readable at this review size."
+    },
+    {
+      "kind": "28px color",
+      "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/previews/contact-28-color.png",
+      "sha256": "283d675affb7be2414a9b35b252bfc46605459a4a61b774cb4bcbd2f166141a0",
+      "bytes": 39542,
+      "width": 1100,
+      "height": 140,
+      "format": "png",
+      "colorSpace": "srgb",
+      "channels": 3,
+      "depth": "uchar",
+      "hasAlpha": false,
+      "opaque": true,
+      "itemPixelSize": 28,
+      "mode": "color",
+      "grid": {
+        "columns": 5,
+        "rows": 2
+      },
+      "order": [
+        {
+          "index": 257,
+          "id": "woven_robe"
+        },
+        {
+          "index": 258,
+          "id": "wyrmcult_grand_robe"
+        },
+        {
+          "index": 259,
+          "id": "wyrmcult_orders"
+        },
+        {
+          "index": 260,
+          "id": "wyrmcult_soulsteps"
+        },
+        {
+          "index": 261,
+          "id": "wyrmscale_jerkin"
+        },
+        {
+          "index": 262,
+          "id": "wyrmshadow_harness"
+        },
+        {
+          "index": 263,
+          "id": "wyrmshadow_legguards"
+        },
+        {
+          "index": 264,
+          "id": "wyrmshadow_talongrips"
+        },
+        {
+          "index": 265,
+          "id": "wyrmshadow_treads"
+        },
+        {
+          "index": 266,
+          "id": "ysols_pearl_greaves"
+        }
+      ],
+      "labeled": true,
+      "reviewed": true,
+      "independentlyReviewed": true,
+      "passed": true,
+      "notes": "All ten subjects remain distinct, centered, uncropped, and readable at this review size."
+    },
+    {
+      "kind": "28px grayscale",
+      "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/previews/contact-28-grayscale.png",
+      "sha256": "d36bbc85b10dbd43491d836f3212640af8b1e6405b15d6a9d04fcc4f24e718a5",
+      "bytes": 35106,
+      "width": 1100,
+      "height": 140,
+      "format": "png",
+      "colorSpace": "srgb",
+      "channels": 3,
+      "depth": "uchar",
+      "hasAlpha": false,
+      "opaque": true,
+      "itemPixelSize": 28,
+      "mode": "grayscale",
+      "grid": {
+        "columns": 5,
+        "rows": 2
+      },
+      "order": [
+        {
+          "index": 257,
+          "id": "woven_robe"
+        },
+        {
+          "index": 258,
+          "id": "wyrmcult_grand_robe"
+        },
+        {
+          "index": 259,
+          "id": "wyrmcult_orders"
+        },
+        {
+          "index": 260,
+          "id": "wyrmcult_soulsteps"
+        },
+        {
+          "index": 261,
+          "id": "wyrmscale_jerkin"
+        },
+        {
+          "index": 262,
+          "id": "wyrmshadow_harness"
+        },
+        {
+          "index": 263,
+          "id": "wyrmshadow_legguards"
+        },
+        {
+          "index": 264,
+          "id": "wyrmshadow_talongrips"
+        },
+        {
+          "index": 265,
+          "id": "wyrmshadow_treads"
+        },
+        {
+          "index": 266,
+          "id": "ysols_pearl_greaves"
+        }
+      ],
+      "labeled": true,
+      "reviewed": true,
+      "independentlyReviewed": true,
+      "passed": true,
+      "notes": "All ten subjects remain distinct, centered, uncropped, and readable at this review size."
+    },
+    {
+      "kind": "64px circular crop",
+      "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/previews/contact-64-circular.png",
+      "sha256": "46fb5f1ffab2a3c64e0066057555f8a61a38d67000c468090ed00d71f9f53705",
+      "bytes": 86895,
+      "width": 1100,
+      "height": 212,
+      "format": "png",
+      "colorSpace": "srgb",
+      "channels": 3,
+      "depth": "uchar",
+      "hasAlpha": false,
+      "opaque": true,
+      "itemPixelSize": 64,
+      "mode": "circular",
+      "grid": {
+        "columns": 5,
+        "rows": 2
+      },
+      "order": [
+        {
+          "index": 257,
+          "id": "woven_robe"
+        },
+        {
+          "index": 258,
+          "id": "wyrmcult_grand_robe"
+        },
+        {
+          "index": 259,
+          "id": "wyrmcult_orders"
+        },
+        {
+          "index": 260,
+          "id": "wyrmcult_soulsteps"
+        },
+        {
+          "index": 261,
+          "id": "wyrmscale_jerkin"
+        },
+        {
+          "index": 262,
+          "id": "wyrmshadow_harness"
+        },
+        {
+          "index": 263,
+          "id": "wyrmshadow_legguards"
+        },
+        {
+          "index": 264,
+          "id": "wyrmshadow_talongrips"
+        },
+        {
+          "index": 265,
+          "id": "wyrmshadow_treads"
+        },
+        {
+          "index": 266,
+          "id": "ysols_pearl_greaves"
+        }
+      ],
+      "labeled": true,
+      "reviewed": true,
+      "independentlyReviewed": true,
+      "passed": true,
+      "notes": "All ten subjects remain distinct, centered, uncropped, and readable at this review size."
+    }
+  ],
+  "summary": {
+    "generated": 10,
+    "accepted": 10,
+    "generationCalls": 11,
+    "retries": 1,
+    "rejections": 1,
+    "mastersReviewed": 10,
+    "contactSheetsReviewed": 6,
+    "shippingMaximumBytes": 15360,
+    "exactPlanSlicePassed": true,
+    "sliceHashUnique": true,
+    "globalItemHashUnique": true,
+    "globalDuplicateHashes": [],
+    "deterministicQuality82ParityPassed": true,
+    "allPassed": true
+  },
+  "records": [
+    {
+      "index": 257,
+      "id": "woven_robe",
+      "name": "Valewoven Robe",
+      "kind": "armor",
+      "slot": "chest",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Valewoven Robe (woven_robe) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one front-facing torso garment with no mannequin, head, or detached limbs\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+      "orderedReferences": [
+        {
+          "order": 1,
+          "path": "public/ui/items/woven_robe.webp",
+          "role": "subject identity reference"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/items/cinderweave_raiment.webp",
+          "role": "same-family house-style reference"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "global house-style reference"
+        },
+        {
+          "order": 4,
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "global house-style reference"
+        }
+      ],
+      "previousShipping": {
+        "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/originals/woven_robe.webp",
+        "sha256": "d8b0ec523d57845552532bf86b2ce1aa48e902fe5cc3392af052aa732dbeeabc",
+        "bytes": 3044,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true
+      },
+      "generation": {
+        "tool": "built-in image_gen",
+        "cliFallbackUsed": false,
+        "acceptedAttempt": 1,
+        "acceptedPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Valewoven Robe (woven_robe) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one front-facing torso garment with no mannequin, head, or detached limbs\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+        "attemptCount": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Valewoven Robe (woven_robe) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one front-facing torso garment with no mannequin, head, or detached limbs\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+            "orderedReferences": [
+              {
+                "order": 1,
+                "path": "public/ui/items/woven_robe.webp",
+                "role": "subject identity reference"
+              },
+              {
+                "order": 2,
+                "path": "public/ui/items/cinderweave_raiment.webp",
+                "role": "same-family house-style reference"
+              },
+              {
+                "order": 3,
+                "path": "public/ui/items/eastbrook_buckler.webp",
+                "role": "global house-style reference"
+              },
+              {
+                "order": 4,
+                "path": "public/ui/items/linen_pouch.webp",
+                "role": "global house-style reference"
+              }
+            ],
+            "accepted": true,
+            "sourceGenerationPath": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-c17ac07e-5c3b-48ca-8e49-dd831a432c83.png",
+            "outputHint": "Generated images are saved to /Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b as /Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-c17ac07e-5c3b-48ca-8e49-dd831a432c83.png by default.",
+            "sourceGeneration": {
+              "path": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-c17ac07e-5c3b-48ca-8e49-dd831a432c83.png",
+              "sha256": "c160a324df2a5c9f547f8adadaf1fa02e2dfc91f871fe09ffb982a961f33db03",
+              "bytes": 1770633,
+              "width": 1254,
+              "height": 1254,
+              "format": "png",
+              "colorSpace": "srgb",
+              "channels": 3,
+              "depth": "uchar",
+              "hasAlpha": false,
+              "opaque": true
+            },
+            "retainedHighRes": {
+              "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/results/woven_robe-attempt-1.png",
+              "sha256": "c160a324df2a5c9f547f8adadaf1fa02e2dfc91f871fe09ffb982a961f33db03",
+              "bytes": 1770633,
+              "width": 1254,
+              "height": 1254,
+              "format": "png",
+              "colorSpace": "srgb",
+              "channels": 3,
+              "depth": "uchar",
+              "hasAlpha": false,
+              "opaque": true
+            },
+            "rejectionReason": null
+          }
+        ],
+        "sourceGeneration": {
+          "path": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-c17ac07e-5c3b-48ca-8e49-dd831a432c83.png",
+          "sha256": "c160a324df2a5c9f547f8adadaf1fa02e2dfc91f871fe09ffb982a961f33db03",
+          "bytes": 1770633,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        },
+        "retainedHighRes": {
+          "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/results/woven_robe-attempt-1.png",
+          "sha256": "c160a324df2a5c9f547f8adadaf1fa02e2dfc91f871fe09ffb982a961f33db03",
+          "bytes": 1770633,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        },
+        "retryNotes": [],
+        "rejectionNotes": []
+      },
+      "master": {
+        "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/masters/woven_robe.png",
+        "sha256": "9ec21ddd9bb1270729fc37da880987b338753b62e948f2c4683188e6b174d98d",
+        "bytes": 323067,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true
+      },
+      "shipping": {
+        "path": "public/ui/items/woven_robe.webp",
+        "sha256": "470558d929f6a369f3cf8ba70fceefb14d4e4ce9eaa1b8fd33d7a6fa5438221a",
+        "bytes": 2220,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true,
+        "encoder": "sharp 0.35.3",
+        "quality": 82,
+        "alphaQuality": 100,
+        "smartSubsample": true,
+        "effort": 6,
+        "resizeFit": "fill",
+        "resizeKernel": "lanczos3",
+        "metadataCopied": false,
+        "maximumBytes": 15360,
+        "maximumBytesPassed": true,
+        "deterministicQuality82Parity": true,
+        "quality82Verification": {
+          "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/ship/woven_robe.webp",
+          "sha256": "470558d929f6a369f3cf8ba70fceefb14d4e4ce9eaa1b8fd33d7a6fa5438221a",
+          "bytes": 2220,
+          "width": 128,
+          "height": 128,
+          "format": "webp",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        }
+      },
+      "qa": {
+        "currentTargetInspectedBeforeGeneration": true,
+        "acceptedRawInspectedIndividually": true,
+        "masterReviewedInLabeledOverview": true,
+        "contact128ColorReviewed": true,
+        "contact40ColorReviewed": true,
+        "contact28ColorReviewed": true,
+        "contact28GrayscaleReviewed": true,
+        "contact64CircularReviewed": true,
+        "independentFreshVisualReview": true,
+        "objectIdentityPreserved": true,
+        "houseStyleApplied": true,
+        "centeredAndUncropped": true,
+        "opaqueBackground": true,
+        "noTextOrWatermark": true,
+        "thumbnailReadable": true,
+        "passed": true,
+        "notes": "Passed raw, master, small-size, grayscale, and circular-crop review with no genuine defect found."
+      }
+    },
+    {
+      "index": 258,
+      "id": "wyrmcult_grand_robe",
+      "name": "Wyrmcult Grand Robe",
+      "kind": "armor",
+      "slot": "chest",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Wyrmcult Grand Robe (wyrmcult_grand_robe) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one front-facing torso garment with no mannequin, head, or detached limbs\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+      "orderedReferences": [
+        {
+          "order": 1,
+          "path": "public/ui/items/wyrmcult_grand_robe.webp",
+          "role": "subject identity reference"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/items/cinderweave_raiment.webp",
+          "role": "same-family house-style reference"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "global house-style reference"
+        },
+        {
+          "order": 4,
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "global house-style reference"
+        }
+      ],
+      "previousShipping": {
+        "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/originals/wyrmcult_grand_robe.webp",
+        "sha256": "eaf8d62dd0f12ffbec839042feb6c37589aa7b4e9fe17eb848b8b22d21fbc091",
+        "bytes": 4410,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true
+      },
+      "generation": {
+        "tool": "built-in image_gen",
+        "cliFallbackUsed": false,
+        "acceptedAttempt": 1,
+        "acceptedPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Wyrmcult Grand Robe (wyrmcult_grand_robe) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one front-facing torso garment with no mannequin, head, or detached limbs\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+        "attemptCount": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Wyrmcult Grand Robe (wyrmcult_grand_robe) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one front-facing torso garment with no mannequin, head, or detached limbs\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+            "orderedReferences": [
+              {
+                "order": 1,
+                "path": "public/ui/items/wyrmcult_grand_robe.webp",
+                "role": "subject identity reference"
+              },
+              {
+                "order": 2,
+                "path": "public/ui/items/cinderweave_raiment.webp",
+                "role": "same-family house-style reference"
+              },
+              {
+                "order": 3,
+                "path": "public/ui/items/eastbrook_buckler.webp",
+                "role": "global house-style reference"
+              },
+              {
+                "order": 4,
+                "path": "public/ui/items/linen_pouch.webp",
+                "role": "global house-style reference"
+              }
+            ],
+            "accepted": true,
+            "sourceGenerationPath": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-a3699760-69c8-4083-887b-e6db28a7ef41.png",
+            "outputHint": "Generated images are saved to /Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b as /Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-a3699760-69c8-4083-887b-e6db28a7ef41.png by default.",
+            "sourceGeneration": {
+              "path": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-a3699760-69c8-4083-887b-e6db28a7ef41.png",
+              "sha256": "cb6a5719f2f38e447a5145732bc656b5d78f009f8aab0d856e11093092577f84",
+              "bytes": 2053078,
+              "width": 1254,
+              "height": 1254,
+              "format": "png",
+              "colorSpace": "srgb",
+              "channels": 3,
+              "depth": "uchar",
+              "hasAlpha": false,
+              "opaque": true
+            },
+            "retainedHighRes": {
+              "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/results/wyrmcult_grand_robe-attempt-1.png",
+              "sha256": "cb6a5719f2f38e447a5145732bc656b5d78f009f8aab0d856e11093092577f84",
+              "bytes": 2053078,
+              "width": 1254,
+              "height": 1254,
+              "format": "png",
+              "colorSpace": "srgb",
+              "channels": 3,
+              "depth": "uchar",
+              "hasAlpha": false,
+              "opaque": true
+            },
+            "rejectionReason": null
+          }
+        ],
+        "sourceGeneration": {
+          "path": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-a3699760-69c8-4083-887b-e6db28a7ef41.png",
+          "sha256": "cb6a5719f2f38e447a5145732bc656b5d78f009f8aab0d856e11093092577f84",
+          "bytes": 2053078,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        },
+        "retainedHighRes": {
+          "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/results/wyrmcult_grand_robe-attempt-1.png",
+          "sha256": "cb6a5719f2f38e447a5145732bc656b5d78f009f8aab0d856e11093092577f84",
+          "bytes": 2053078,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        },
+        "retryNotes": [],
+        "rejectionNotes": []
+      },
+      "master": {
+        "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/masters/wyrmcult_grand_robe.png",
+        "sha256": "58c8a4a7a7f6b7b0199f9a0bbd0b186083cba92c1aecca8a106083307d193f31",
+        "bytes": 346228,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true
+      },
+      "shipping": {
+        "path": "public/ui/items/wyrmcult_grand_robe.webp",
+        "sha256": "78d2cd75bf13833739137bafff3bd7b1a5575ca2553276ff4ded931435743989",
+        "bytes": 2792,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true,
+        "encoder": "sharp 0.35.3",
+        "quality": 82,
+        "alphaQuality": 100,
+        "smartSubsample": true,
+        "effort": 6,
+        "resizeFit": "fill",
+        "resizeKernel": "lanczos3",
+        "metadataCopied": false,
+        "maximumBytes": 15360,
+        "maximumBytesPassed": true,
+        "deterministicQuality82Parity": true,
+        "quality82Verification": {
+          "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/ship/wyrmcult_grand_robe.webp",
+          "sha256": "78d2cd75bf13833739137bafff3bd7b1a5575ca2553276ff4ded931435743989",
+          "bytes": 2792,
+          "width": 128,
+          "height": 128,
+          "format": "webp",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        }
+      },
+      "qa": {
+        "currentTargetInspectedBeforeGeneration": true,
+        "acceptedRawInspectedIndividually": true,
+        "masterReviewedInLabeledOverview": true,
+        "contact128ColorReviewed": true,
+        "contact40ColorReviewed": true,
+        "contact28ColorReviewed": true,
+        "contact28GrayscaleReviewed": true,
+        "contact64CircularReviewed": true,
+        "independentFreshVisualReview": true,
+        "objectIdentityPreserved": true,
+        "houseStyleApplied": true,
+        "centeredAndUncropped": true,
+        "opaqueBackground": true,
+        "noTextOrWatermark": true,
+        "thumbnailReadable": true,
+        "passed": true,
+        "notes": "Passed raw, master, small-size, grayscale, and circular-crop review with no genuine defect found."
+      }
+    },
+    {
+      "index": 259,
+      "id": "wyrmcult_orders",
+      "name": "Wyrmcult Orders",
+      "kind": "quest",
+      "slot": null,
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Wyrmcult Orders (wyrmcult_orders) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: One tangible named object or a compact coherent bundle, centered, uncropped, and physically readable at 28px rather than an abstract UI glyph.\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+      "orderedReferences": [
+        {
+          "order": 1,
+          "path": "public/ui/items/wyrmcult_orders.webp",
+          "role": "subject identity reference"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/items/hollow_sealstone.webp",
+          "role": "same-family house-style reference"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "global house-style reference"
+        },
+        {
+          "order": 4,
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "global house-style reference"
+        }
+      ],
+      "previousShipping": {
+        "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/originals/wyrmcult_orders.webp",
+        "sha256": "ecd933e058012cad8d9e419d648f440a11fa0f14f78e92c181e9c5fa9860ca26",
+        "bytes": 2808,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "srgb",
+        "channels": 4,
+        "depth": "uchar",
+        "hasAlpha": true,
+        "opaque": false
+      },
+      "generation": {
+        "tool": "built-in image_gen",
+        "cliFallbackUsed": false,
+        "acceptedAttempt": 1,
+        "acceptedPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Wyrmcult Orders (wyrmcult_orders) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: One tangible named object or a compact coherent bundle, centered, uncropped, and physically readable at 28px rather than an abstract UI glyph.\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+        "attemptCount": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Wyrmcult Orders (wyrmcult_orders) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: One tangible named object or a compact coherent bundle, centered, uncropped, and physically readable at 28px rather than an abstract UI glyph.\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+            "orderedReferences": [
+              {
+                "order": 1,
+                "path": "public/ui/items/wyrmcult_orders.webp",
+                "role": "subject identity reference"
+              },
+              {
+                "order": 2,
+                "path": "public/ui/items/hollow_sealstone.webp",
+                "role": "same-family house-style reference"
+              },
+              {
+                "order": 3,
+                "path": "public/ui/items/eastbrook_buckler.webp",
+                "role": "global house-style reference"
+              },
+              {
+                "order": 4,
+                "path": "public/ui/items/linen_pouch.webp",
+                "role": "global house-style reference"
+              }
+            ],
+            "accepted": true,
+            "sourceGenerationPath": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-8b27952e-3b2f-46f0-8c0c-b049a83e7e31.png",
+            "outputHint": "Generated images are saved to /Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b as /Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-8b27952e-3b2f-46f0-8c0c-b049a83e7e31.png by default.",
+            "sourceGeneration": {
+              "path": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-8b27952e-3b2f-46f0-8c0c-b049a83e7e31.png",
+              "sha256": "bad2290cd13ee8455098821d15515e968c32867c21dff79dec7ae1d565519f3b",
+              "bytes": 1920700,
+              "width": 1254,
+              "height": 1254,
+              "format": "png",
+              "colorSpace": "srgb",
+              "channels": 3,
+              "depth": "uchar",
+              "hasAlpha": false,
+              "opaque": true
+            },
+            "retainedHighRes": {
+              "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/results/wyrmcult_orders-attempt-1.png",
+              "sha256": "bad2290cd13ee8455098821d15515e968c32867c21dff79dec7ae1d565519f3b",
+              "bytes": 1920700,
+              "width": 1254,
+              "height": 1254,
+              "format": "png",
+              "colorSpace": "srgb",
+              "channels": 3,
+              "depth": "uchar",
+              "hasAlpha": false,
+              "opaque": true
+            },
+            "rejectionReason": null
+          }
+        ],
+        "sourceGeneration": {
+          "path": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-8b27952e-3b2f-46f0-8c0c-b049a83e7e31.png",
+          "sha256": "bad2290cd13ee8455098821d15515e968c32867c21dff79dec7ae1d565519f3b",
+          "bytes": 1920700,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        },
+        "retainedHighRes": {
+          "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/results/wyrmcult_orders-attempt-1.png",
+          "sha256": "bad2290cd13ee8455098821d15515e968c32867c21dff79dec7ae1d565519f3b",
+          "bytes": 1920700,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        },
+        "retryNotes": [],
+        "rejectionNotes": []
+      },
+      "master": {
+        "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/masters/wyrmcult_orders.png",
+        "sha256": "4556959ddbf68c0bc24c604e2699fb3bbdd282da4eb4198a9738b829acf855f6",
+        "bytes": 323083,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true
+      },
+      "shipping": {
+        "path": "public/ui/items/wyrmcult_orders.webp",
+        "sha256": "02eb36b2d9176e28c0a658777251b8622497e71bfafc099de12a20234aa3c7b2",
+        "bytes": 2116,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true,
+        "encoder": "sharp 0.35.3",
+        "quality": 82,
+        "alphaQuality": 100,
+        "smartSubsample": true,
+        "effort": 6,
+        "resizeFit": "fill",
+        "resizeKernel": "lanczos3",
+        "metadataCopied": false,
+        "maximumBytes": 15360,
+        "maximumBytesPassed": true,
+        "deterministicQuality82Parity": true,
+        "quality82Verification": {
+          "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/ship/wyrmcult_orders.webp",
+          "sha256": "02eb36b2d9176e28c0a658777251b8622497e71bfafc099de12a20234aa3c7b2",
+          "bytes": 2116,
+          "width": 128,
+          "height": 128,
+          "format": "webp",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        }
+      },
+      "qa": {
+        "currentTargetInspectedBeforeGeneration": true,
+        "acceptedRawInspectedIndividually": true,
+        "masterReviewedInLabeledOverview": true,
+        "contact128ColorReviewed": true,
+        "contact40ColorReviewed": true,
+        "contact28ColorReviewed": true,
+        "contact28GrayscaleReviewed": true,
+        "contact64CircularReviewed": true,
+        "independentFreshVisualReview": true,
+        "objectIdentityPreserved": true,
+        "houseStyleApplied": true,
+        "centeredAndUncropped": true,
+        "opaqueBackground": true,
+        "noTextOrWatermark": true,
+        "thumbnailReadable": true,
+        "passed": true,
+        "notes": "Passed raw, master, small-size, grayscale, and circular-crop review with no genuine defect found."
+      }
+    },
+    {
+      "index": 260,
+      "id": "wyrmcult_soulsteps",
+      "name": "Wyrmcult Soulsteps",
+      "kind": "armor",
+      "slot": "feet",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Wyrmcult Soulsteps (wyrmcult_soulsteps) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one symmetric pair of boots, shoes, or sandals\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+      "orderedReferences": [
+        {
+          "order": 1,
+          "path": "public/ui/items/wyrmcult_soulsteps.webp",
+          "role": "subject identity reference"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/items/ashstalker_treads.webp",
+          "role": "same-family house-style reference"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "global house-style reference"
+        },
+        {
+          "order": 4,
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "global house-style reference"
+        }
+      ],
+      "previousShipping": {
+        "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/originals/wyrmcult_soulsteps.webp",
+        "sha256": "d8634d1380ea86c25ef5d71bad2bf913cd0f9ade972ac3a514faa7ee8e44211e",
+        "bytes": 3308,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true
+      },
+      "generation": {
+        "tool": "built-in image_gen",
+        "cliFallbackUsed": false,
+        "acceptedAttempt": 1,
+        "acceptedPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Wyrmcult Soulsteps (wyrmcult_soulsteps) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one symmetric pair of boots, shoes, or sandals\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+        "attemptCount": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Wyrmcult Soulsteps (wyrmcult_soulsteps) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one symmetric pair of boots, shoes, or sandals\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+            "orderedReferences": [
+              {
+                "order": 1,
+                "path": "public/ui/items/wyrmcult_soulsteps.webp",
+                "role": "subject identity reference"
+              },
+              {
+                "order": 2,
+                "path": "public/ui/items/ashstalker_treads.webp",
+                "role": "same-family house-style reference"
+              },
+              {
+                "order": 3,
+                "path": "public/ui/items/eastbrook_buckler.webp",
+                "role": "global house-style reference"
+              },
+              {
+                "order": 4,
+                "path": "public/ui/items/linen_pouch.webp",
+                "role": "global house-style reference"
+              }
+            ],
+            "accepted": true,
+            "sourceGenerationPath": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-e32ae2dc-7014-4152-be6e-4b918a99cd23.png",
+            "outputHint": "Generated images are saved to /Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b as /Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-e32ae2dc-7014-4152-be6e-4b918a99cd23.png by default.",
+            "sourceGeneration": {
+              "path": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-e32ae2dc-7014-4152-be6e-4b918a99cd23.png",
+              "sha256": "dfe181749c44e47e1d4d3c5146fb31d689ba81569d1b3327b8aa9f86589a9559",
+              "bytes": 2268679,
+              "width": 1254,
+              "height": 1254,
+              "format": "png",
+              "colorSpace": "srgb",
+              "channels": 3,
+              "depth": "uchar",
+              "hasAlpha": false,
+              "opaque": true
+            },
+            "retainedHighRes": {
+              "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/results/wyrmcult_soulsteps-attempt-1.png",
+              "sha256": "dfe181749c44e47e1d4d3c5146fb31d689ba81569d1b3327b8aa9f86589a9559",
+              "bytes": 2268679,
+              "width": 1254,
+              "height": 1254,
+              "format": "png",
+              "colorSpace": "srgb",
+              "channels": 3,
+              "depth": "uchar",
+              "hasAlpha": false,
+              "opaque": true
+            },
+            "rejectionReason": null
+          }
+        ],
+        "sourceGeneration": {
+          "path": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-e32ae2dc-7014-4152-be6e-4b918a99cd23.png",
+          "sha256": "dfe181749c44e47e1d4d3c5146fb31d689ba81569d1b3327b8aa9f86589a9559",
+          "bytes": 2268679,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        },
+        "retainedHighRes": {
+          "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/results/wyrmcult_soulsteps-attempt-1.png",
+          "sha256": "dfe181749c44e47e1d4d3c5146fb31d689ba81569d1b3327b8aa9f86589a9559",
+          "bytes": 2268679,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        },
+        "retryNotes": [],
+        "rejectionNotes": []
+      },
+      "master": {
+        "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/masters/wyrmcult_soulsteps.png",
+        "sha256": "68c9e7579a98af87d83eac72059f7e90c15043391cef8569d76ec45e379024b6",
+        "bytes": 395696,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true
+      },
+      "shipping": {
+        "path": "public/ui/items/wyrmcult_soulsteps.webp",
+        "sha256": "33e141d696d6cf3e7203218f135db2a001887692a1a5c2216dd220a780ff3390",
+        "bytes": 3354,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true,
+        "encoder": "sharp 0.35.3",
+        "quality": 82,
+        "alphaQuality": 100,
+        "smartSubsample": true,
+        "effort": 6,
+        "resizeFit": "fill",
+        "resizeKernel": "lanczos3",
+        "metadataCopied": false,
+        "maximumBytes": 15360,
+        "maximumBytesPassed": true,
+        "deterministicQuality82Parity": true,
+        "quality82Verification": {
+          "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/ship/wyrmcult_soulsteps.webp",
+          "sha256": "33e141d696d6cf3e7203218f135db2a001887692a1a5c2216dd220a780ff3390",
+          "bytes": 3354,
+          "width": 128,
+          "height": 128,
+          "format": "webp",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        }
+      },
+      "qa": {
+        "currentTargetInspectedBeforeGeneration": true,
+        "acceptedRawInspectedIndividually": true,
+        "masterReviewedInLabeledOverview": true,
+        "contact128ColorReviewed": true,
+        "contact40ColorReviewed": true,
+        "contact28ColorReviewed": true,
+        "contact28GrayscaleReviewed": true,
+        "contact64CircularReviewed": true,
+        "independentFreshVisualReview": true,
+        "objectIdentityPreserved": true,
+        "houseStyleApplied": true,
+        "centeredAndUncropped": true,
+        "opaqueBackground": true,
+        "noTextOrWatermark": true,
+        "thumbnailReadable": true,
+        "passed": true,
+        "notes": "Passed raw, master, small-size, grayscale, and circular-crop review with no genuine defect found."
+      }
+    },
+    {
+      "index": 261,
+      "id": "wyrmscale_jerkin",
+      "name": "Wyrmscale Jerkin",
+      "kind": "armor",
+      "slot": "chest",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Wyrmscale Jerkin (wyrmscale_jerkin) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one front-facing torso garment with no mannequin, head, or detached limbs\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+      "orderedReferences": [
+        {
+          "order": 1,
+          "path": "public/ui/items/wyrmscale_jerkin.webp",
+          "role": "subject identity reference"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/items/cinderweave_raiment.webp",
+          "role": "same-family house-style reference"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "global house-style reference"
+        },
+        {
+          "order": 4,
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "global house-style reference"
+        }
+      ],
+      "previousShipping": {
+        "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/originals/wyrmscale_jerkin.webp",
+        "sha256": "4004840720a2141fcd72d4449f4ce7e3ef4c199064ed24798208f5388374f955",
+        "bytes": 2676,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true
+      },
+      "generation": {
+        "tool": "built-in image_gen",
+        "cliFallbackUsed": false,
+        "acceptedAttempt": 1,
+        "acceptedPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Wyrmscale Jerkin (wyrmscale_jerkin) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one front-facing torso garment with no mannequin, head, or detached limbs\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+        "attemptCount": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Wyrmscale Jerkin (wyrmscale_jerkin) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one front-facing torso garment with no mannequin, head, or detached limbs\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+            "orderedReferences": [
+              {
+                "order": 1,
+                "path": "public/ui/items/wyrmscale_jerkin.webp",
+                "role": "subject identity reference"
+              },
+              {
+                "order": 2,
+                "path": "public/ui/items/cinderweave_raiment.webp",
+                "role": "same-family house-style reference"
+              },
+              {
+                "order": 3,
+                "path": "public/ui/items/eastbrook_buckler.webp",
+                "role": "global house-style reference"
+              },
+              {
+                "order": 4,
+                "path": "public/ui/items/linen_pouch.webp",
+                "role": "global house-style reference"
+              }
+            ],
+            "accepted": true,
+            "sourceGenerationPath": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-53958751-b73a-4e91-93f7-a1b66925e249.png",
+            "outputHint": "Generated images are saved to /Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b as /Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-53958751-b73a-4e91-93f7-a1b66925e249.png by default.",
+            "sourceGeneration": {
+              "path": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-53958751-b73a-4e91-93f7-a1b66925e249.png",
+              "sha256": "b00f7a4b69bd68ee5a5287419a336462d8f91fd56188aa9c76152676bdeee6dc",
+              "bytes": 1987992,
+              "width": 1254,
+              "height": 1254,
+              "format": "png",
+              "colorSpace": "srgb",
+              "channels": 3,
+              "depth": "uchar",
+              "hasAlpha": false,
+              "opaque": true
+            },
+            "retainedHighRes": {
+              "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/results/wyrmscale_jerkin-attempt-1.png",
+              "sha256": "b00f7a4b69bd68ee5a5287419a336462d8f91fd56188aa9c76152676bdeee6dc",
+              "bytes": 1987992,
+              "width": 1254,
+              "height": 1254,
+              "format": "png",
+              "colorSpace": "srgb",
+              "channels": 3,
+              "depth": "uchar",
+              "hasAlpha": false,
+              "opaque": true
+            },
+            "rejectionReason": null
+          }
+        ],
+        "sourceGeneration": {
+          "path": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-53958751-b73a-4e91-93f7-a1b66925e249.png",
+          "sha256": "b00f7a4b69bd68ee5a5287419a336462d8f91fd56188aa9c76152676bdeee6dc",
+          "bytes": 1987992,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        },
+        "retainedHighRes": {
+          "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/results/wyrmscale_jerkin-attempt-1.png",
+          "sha256": "b00f7a4b69bd68ee5a5287419a336462d8f91fd56188aa9c76152676bdeee6dc",
+          "bytes": 1987992,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        },
+        "retryNotes": [],
+        "rejectionNotes": []
+      },
+      "master": {
+        "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/masters/wyrmscale_jerkin.png",
+        "sha256": "6f3fb37b96a3b03dbda7077481d3241566320383cd0dabbc599a3998f56e5b00",
+        "bytes": 348709,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true
+      },
+      "shipping": {
+        "path": "public/ui/items/wyrmscale_jerkin.webp",
+        "sha256": "a6e665351dd977a2079039283b9a60e61f3eb85e5787862d786206a941f4e59b",
+        "bytes": 2680,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true,
+        "encoder": "sharp 0.35.3",
+        "quality": 82,
+        "alphaQuality": 100,
+        "smartSubsample": true,
+        "effort": 6,
+        "resizeFit": "fill",
+        "resizeKernel": "lanczos3",
+        "metadataCopied": false,
+        "maximumBytes": 15360,
+        "maximumBytesPassed": true,
+        "deterministicQuality82Parity": true,
+        "quality82Verification": {
+          "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/ship/wyrmscale_jerkin.webp",
+          "sha256": "a6e665351dd977a2079039283b9a60e61f3eb85e5787862d786206a941f4e59b",
+          "bytes": 2680,
+          "width": 128,
+          "height": 128,
+          "format": "webp",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        }
+      },
+      "qa": {
+        "currentTargetInspectedBeforeGeneration": true,
+        "acceptedRawInspectedIndividually": true,
+        "masterReviewedInLabeledOverview": true,
+        "contact128ColorReviewed": true,
+        "contact40ColorReviewed": true,
+        "contact28ColorReviewed": true,
+        "contact28GrayscaleReviewed": true,
+        "contact64CircularReviewed": true,
+        "independentFreshVisualReview": true,
+        "objectIdentityPreserved": true,
+        "houseStyleApplied": true,
+        "centeredAndUncropped": true,
+        "opaqueBackground": true,
+        "noTextOrWatermark": true,
+        "thumbnailReadable": true,
+        "passed": true,
+        "notes": "Passed raw, master, small-size, grayscale, and circular-crop review with no genuine defect found."
+      }
+    },
+    {
+      "index": 262,
+      "id": "wyrmshadow_harness",
+      "name": "Nightfang Harness",
+      "kind": "armor",
+      "slot": "chest",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Nightfang Harness (wyrmshadow_harness) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one front-facing torso garment with no mannequin, head, or detached limbs\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+      "orderedReferences": [
+        {
+          "order": 1,
+          "path": "public/ui/items/wyrmshadow_harness.webp",
+          "role": "subject identity reference"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/items/cinderweave_raiment.webp",
+          "role": "same-family house-style reference"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "global house-style reference"
+        },
+        {
+          "order": 4,
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "global house-style reference"
+        }
+      ],
+      "previousShipping": {
+        "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/originals/wyrmshadow_harness.webp",
+        "sha256": "90411bbffbabae779b62da30b817573d7aef8283f81a6cd85cfa050134995419",
+        "bytes": 2754,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true
+      },
+      "generation": {
+        "tool": "built-in image_gen",
+        "cliFallbackUsed": false,
+        "acceptedAttempt": 1,
+        "acceptedPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Nightfang Harness (wyrmshadow_harness) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one front-facing torso garment with no mannequin, head, or detached limbs\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+        "attemptCount": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Nightfang Harness (wyrmshadow_harness) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one front-facing torso garment with no mannequin, head, or detached limbs\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+            "orderedReferences": [
+              {
+                "order": 1,
+                "path": "public/ui/items/wyrmshadow_harness.webp",
+                "role": "subject identity reference"
+              },
+              {
+                "order": 2,
+                "path": "public/ui/items/cinderweave_raiment.webp",
+                "role": "same-family house-style reference"
+              },
+              {
+                "order": 3,
+                "path": "public/ui/items/eastbrook_buckler.webp",
+                "role": "global house-style reference"
+              },
+              {
+                "order": 4,
+                "path": "public/ui/items/linen_pouch.webp",
+                "role": "global house-style reference"
+              }
+            ],
+            "accepted": true,
+            "sourceGenerationPath": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-8158b341-9f8f-407e-85a6-0e8bec7051f6.png",
+            "outputHint": "Generated images are saved to /Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b as /Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-8158b341-9f8f-407e-85a6-0e8bec7051f6.png by default.",
+            "sourceGeneration": {
+              "path": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-8158b341-9f8f-407e-85a6-0e8bec7051f6.png",
+              "sha256": "f38c69de9d55f4cc0af4f471e78e1aa0141767d19f81c3e4a15ee355dc6c6972",
+              "bytes": 1713132,
+              "width": 1254,
+              "height": 1254,
+              "format": "png",
+              "colorSpace": "srgb",
+              "channels": 3,
+              "depth": "uchar",
+              "hasAlpha": false,
+              "opaque": true
+            },
+            "retainedHighRes": {
+              "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/results/wyrmshadow_harness-attempt-1.png",
+              "sha256": "f38c69de9d55f4cc0af4f471e78e1aa0141767d19f81c3e4a15ee355dc6c6972",
+              "bytes": 1713132,
+              "width": 1254,
+              "height": 1254,
+              "format": "png",
+              "colorSpace": "srgb",
+              "channels": 3,
+              "depth": "uchar",
+              "hasAlpha": false,
+              "opaque": true
+            },
+            "rejectionReason": null
+          }
+        ],
+        "sourceGeneration": {
+          "path": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-8158b341-9f8f-407e-85a6-0e8bec7051f6.png",
+          "sha256": "f38c69de9d55f4cc0af4f471e78e1aa0141767d19f81c3e4a15ee355dc6c6972",
+          "bytes": 1713132,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        },
+        "retainedHighRes": {
+          "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/results/wyrmshadow_harness-attempt-1.png",
+          "sha256": "f38c69de9d55f4cc0af4f471e78e1aa0141767d19f81c3e4a15ee355dc6c6972",
+          "bytes": 1713132,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        },
+        "retryNotes": [],
+        "rejectionNotes": []
+      },
+      "master": {
+        "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/masters/wyrmshadow_harness.png",
+        "sha256": "6c93206443cb984b0224066f175481637e5e6f2a6391142e524df1449c38ee2d",
+        "bytes": 306852,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true
+      },
+      "shipping": {
+        "path": "public/ui/items/wyrmshadow_harness.webp",
+        "sha256": "034fb7b63041c06a8f70ae0676c8c9387adc4dc1abc3664c98fb138a83bdb32c",
+        "bytes": 2168,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true,
+        "encoder": "sharp 0.35.3",
+        "quality": 82,
+        "alphaQuality": 100,
+        "smartSubsample": true,
+        "effort": 6,
+        "resizeFit": "fill",
+        "resizeKernel": "lanczos3",
+        "metadataCopied": false,
+        "maximumBytes": 15360,
+        "maximumBytesPassed": true,
+        "deterministicQuality82Parity": true,
+        "quality82Verification": {
+          "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/ship/wyrmshadow_harness.webp",
+          "sha256": "034fb7b63041c06a8f70ae0676c8c9387adc4dc1abc3664c98fb138a83bdb32c",
+          "bytes": 2168,
+          "width": 128,
+          "height": 128,
+          "format": "webp",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        }
+      },
+      "qa": {
+        "currentTargetInspectedBeforeGeneration": true,
+        "acceptedRawInspectedIndividually": true,
+        "masterReviewedInLabeledOverview": true,
+        "contact128ColorReviewed": true,
+        "contact40ColorReviewed": true,
+        "contact28ColorReviewed": true,
+        "contact28GrayscaleReviewed": true,
+        "contact64CircularReviewed": true,
+        "independentFreshVisualReview": true,
+        "objectIdentityPreserved": true,
+        "houseStyleApplied": true,
+        "centeredAndUncropped": true,
+        "opaqueBackground": true,
+        "noTextOrWatermark": true,
+        "thumbnailReadable": true,
+        "passed": true,
+        "notes": "Passed raw, master, small-size, grayscale, and circular-crop review with no genuine defect found."
+      }
+    },
+    {
+      "index": 263,
+      "id": "wyrmshadow_legguards",
+      "name": "Nightfang Legguards",
+      "kind": "armor",
+      "slot": "legs",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Nightfang Legguards (wyrmshadow_legguards) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one front-facing pair of leggings or legguards\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+      "orderedReferences": [
+        {
+          "order": 1,
+          "path": "public/ui/items/wyrmshadow_legguards.webp",
+          "role": "subject identity reference"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/items/ashstalker_legguards.webp",
+          "role": "same-family house-style reference"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "global house-style reference"
+        },
+        {
+          "order": 4,
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "global house-style reference"
+        }
+      ],
+      "previousShipping": {
+        "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/originals/wyrmshadow_legguards.webp",
+        "sha256": "9425a50ce40c6ec2ff3877cfb5b419487536e757ba5549aa7ee99037a229fc12",
+        "bytes": 2052,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true
+      },
+      "generation": {
+        "tool": "built-in image_gen",
+        "cliFallbackUsed": false,
+        "acceptedAttempt": 1,
+        "acceptedPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Nightfang Legguards (wyrmshadow_legguards) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one front-facing pair of leggings or legguards\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+        "attemptCount": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Nightfang Legguards (wyrmshadow_legguards) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one front-facing pair of leggings or legguards\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+            "orderedReferences": [
+              {
+                "order": 1,
+                "path": "public/ui/items/wyrmshadow_legguards.webp",
+                "role": "subject identity reference"
+              },
+              {
+                "order": 2,
+                "path": "public/ui/items/ashstalker_legguards.webp",
+                "role": "same-family house-style reference"
+              },
+              {
+                "order": 3,
+                "path": "public/ui/items/eastbrook_buckler.webp",
+                "role": "global house-style reference"
+              },
+              {
+                "order": 4,
+                "path": "public/ui/items/linen_pouch.webp",
+                "role": "global house-style reference"
+              }
+            ],
+            "accepted": true,
+            "sourceGenerationPath": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-28ab79f8-da41-457c-b24f-5ccf545ddc46.png",
+            "outputHint": "Generated images are saved to /Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b as /Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-28ab79f8-da41-457c-b24f-5ccf545ddc46.png by default.",
+            "sourceGeneration": {
+              "path": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-28ab79f8-da41-457c-b24f-5ccf545ddc46.png",
+              "sha256": "9e7e46ab5f8a384ddf93f372240f29c1757218fdba1aaa89deadecb9e6bb5892",
+              "bytes": 1894607,
+              "width": 1254,
+              "height": 1254,
+              "format": "png",
+              "colorSpace": "srgb",
+              "channels": 3,
+              "depth": "uchar",
+              "hasAlpha": false,
+              "opaque": true
+            },
+            "retainedHighRes": {
+              "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/results/wyrmshadow_legguards-attempt-1.png",
+              "sha256": "9e7e46ab5f8a384ddf93f372240f29c1757218fdba1aaa89deadecb9e6bb5892",
+              "bytes": 1894607,
+              "width": 1254,
+              "height": 1254,
+              "format": "png",
+              "colorSpace": "srgb",
+              "channels": 3,
+              "depth": "uchar",
+              "hasAlpha": false,
+              "opaque": true
+            },
+            "rejectionReason": null
+          }
+        ],
+        "sourceGeneration": {
+          "path": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-28ab79f8-da41-457c-b24f-5ccf545ddc46.png",
+          "sha256": "9e7e46ab5f8a384ddf93f372240f29c1757218fdba1aaa89deadecb9e6bb5892",
+          "bytes": 1894607,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        },
+        "retainedHighRes": {
+          "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/results/wyrmshadow_legguards-attempt-1.png",
+          "sha256": "9e7e46ab5f8a384ddf93f372240f29c1757218fdba1aaa89deadecb9e6bb5892",
+          "bytes": 1894607,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        },
+        "retryNotes": [],
+        "rejectionNotes": []
+      },
+      "master": {
+        "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/masters/wyrmshadow_legguards.png",
+        "sha256": "75aa9a1c30f27b95115bba59360eac4173d44a7281f5f4ddd50aebe052f4e0a9",
+        "bytes": 319819,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true
+      },
+      "shipping": {
+        "path": "public/ui/items/wyrmshadow_legguards.webp",
+        "sha256": "7bdcb7d12cac28b99de45355028e6f4cd9e2d6fbf7fcf6b924bd546edc6b8de2",
+        "bytes": 1734,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true,
+        "encoder": "sharp 0.35.3",
+        "quality": 82,
+        "alphaQuality": 100,
+        "smartSubsample": true,
+        "effort": 6,
+        "resizeFit": "fill",
+        "resizeKernel": "lanczos3",
+        "metadataCopied": false,
+        "maximumBytes": 15360,
+        "maximumBytesPassed": true,
+        "deterministicQuality82Parity": true,
+        "quality82Verification": {
+          "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/ship/wyrmshadow_legguards.webp",
+          "sha256": "7bdcb7d12cac28b99de45355028e6f4cd9e2d6fbf7fcf6b924bd546edc6b8de2",
+          "bytes": 1734,
+          "width": 128,
+          "height": 128,
+          "format": "webp",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        }
+      },
+      "qa": {
+        "currentTargetInspectedBeforeGeneration": true,
+        "acceptedRawInspectedIndividually": true,
+        "masterReviewedInLabeledOverview": true,
+        "contact128ColorReviewed": true,
+        "contact40ColorReviewed": true,
+        "contact28ColorReviewed": true,
+        "contact28GrayscaleReviewed": true,
+        "contact64CircularReviewed": true,
+        "independentFreshVisualReview": true,
+        "objectIdentityPreserved": true,
+        "houseStyleApplied": true,
+        "centeredAndUncropped": true,
+        "opaqueBackground": true,
+        "noTextOrWatermark": true,
+        "thumbnailReadable": true,
+        "passed": true,
+        "notes": "Passed raw, master, small-size, grayscale, and circular-crop review with no genuine defect found."
+      }
+    },
+    {
+      "index": 264,
+      "id": "wyrmshadow_talongrips",
+      "name": "Nightfang Talongrips",
+      "kind": "armor",
+      "slot": "gloves",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Nightfang Talongrips (wyrmshadow_talongrips) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one symmetric pair of gloves or gauntlets\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+      "orderedReferences": [
+        {
+          "order": 1,
+          "path": "public/ui/items/wyrmshadow_talongrips.webp",
+          "role": "subject identity reference"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/items/ashstalker_grips.webp",
+          "role": "same-family house-style reference"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "global house-style reference"
+        },
+        {
+          "order": 4,
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "global house-style reference"
+        }
+      ],
+      "previousShipping": {
+        "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/originals/wyrmshadow_talongrips.webp",
+        "sha256": "8901591f398458a9640352cfd7ecd08665f152c90a2c72b987bb9eb837a03a09",
+        "bytes": 4042,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true
+      },
+      "generation": {
+        "tool": "built-in image_gen",
+        "cliFallbackUsed": false,
+        "acceptedAttempt": 2,
+        "acceptedPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Nightfang Talongrips (wyrmshadow_talongrips) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one symmetric pair of gloves or gauntlets\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.\nRetry correction: render two unmistakably matching gloves of equal scale with the same black leather, teal-green trim, and teal talon fingertips on both hands; vary only their natural mirrored pose.",
+        "attemptCount": 2,
+        "attempts": [
+          {
+            "attempt": 1,
+            "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Nightfang Talongrips (wyrmshadow_talongrips) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one symmetric pair of gloves or gauntlets\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+            "orderedReferences": [
+              {
+                "order": 1,
+                "path": "public/ui/items/wyrmshadow_talongrips.webp",
+                "role": "subject identity reference"
+              },
+              {
+                "order": 2,
+                "path": "public/ui/items/ashstalker_grips.webp",
+                "role": "same-family house-style reference"
+              },
+              {
+                "order": 3,
+                "path": "public/ui/items/eastbrook_buckler.webp",
+                "role": "global house-style reference"
+              },
+              {
+                "order": 4,
+                "path": "public/ui/items/linen_pouch.webp",
+                "role": "global house-style reference"
+              }
+            ],
+            "accepted": false,
+            "sourceGenerationPath": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-5ca5e144-4934-41c9-9a12-7bc01d64f14d.png",
+            "outputHint": "Generated images are saved to /Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b as /Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-5ca5e144-4934-41c9-9a12-7bc01d64f14d.png by default.",
+            "sourceGeneration": {
+              "path": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-5ca5e144-4934-41c9-9a12-7bc01d64f14d.png",
+              "sha256": "f431905bbb8936eebf5922fd8663f80acb0c9266331e53f1f7decb4558f52ad2",
+              "bytes": 2035606,
+              "width": 1254,
+              "height": 1254,
+              "format": "png",
+              "colorSpace": "srgb",
+              "channels": 3,
+              "depth": "uchar",
+              "hasAlpha": false,
+              "opaque": true
+            },
+            "retainedHighRes": {
+              "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/retries/wyrmshadow_talongrips-attempt-1-rejected-asymmetric.png",
+              "sha256": "f431905bbb8936eebf5922fd8663f80acb0c9266331e53f1f7decb4558f52ad2",
+              "bytes": 2035606,
+              "width": 1254,
+              "height": 1254,
+              "format": "png",
+              "colorSpace": "srgb",
+              "channels": 3,
+              "depth": "uchar",
+              "hasAlpha": false,
+              "opaque": true
+            },
+            "rejectionReason": "Rejected during visual QA because the first attempt depicted two materially different gauntlets at different scales, violating the required symmetric matching pair."
+          },
+          {
+            "attempt": 2,
+            "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Nightfang Talongrips (wyrmshadow_talongrips) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one symmetric pair of gloves or gauntlets\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.\nRetry correction: render two unmistakably matching gloves of equal scale with the same black leather, teal-green trim, and teal talon fingertips on both hands; vary only their natural mirrored pose.",
+            "orderedReferences": [
+              {
+                "order": 1,
+                "path": "public/ui/items/wyrmshadow_talongrips.webp",
+                "role": "subject identity reference"
+              },
+              {
+                "order": 2,
+                "path": "public/ui/items/ashstalker_grips.webp",
+                "role": "same-family house-style reference"
+              },
+              {
+                "order": 3,
+                "path": "public/ui/items/eastbrook_buckler.webp",
+                "role": "global house-style reference"
+              },
+              {
+                "order": 4,
+                "path": "public/ui/items/linen_pouch.webp",
+                "role": "global house-style reference"
+              }
+            ],
+            "accepted": true,
+            "sourceGenerationPath": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-d62ba908-3f79-47e5-bfad-379ed5ca71c1.png",
+            "outputHint": "Generated images are saved to /Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b as /Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-d62ba908-3f79-47e5-bfad-379ed5ca71c1.png by default.",
+            "sourceGeneration": {
+              "path": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-d62ba908-3f79-47e5-bfad-379ed5ca71c1.png",
+              "sha256": "7266b60770b5a95feafcc248467f65ef2a6b93368940b5ba9d3c0c337e7f4bd5",
+              "bytes": 1955231,
+              "width": 1254,
+              "height": 1254,
+              "format": "png",
+              "colorSpace": "srgb",
+              "channels": 3,
+              "depth": "uchar",
+              "hasAlpha": false,
+              "opaque": true
+            },
+            "retainedHighRes": {
+              "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/results/wyrmshadow_talongrips-attempt-2.png",
+              "sha256": "7266b60770b5a95feafcc248467f65ef2a6b93368940b5ba9d3c0c337e7f4bd5",
+              "bytes": 1955231,
+              "width": 1254,
+              "height": 1254,
+              "format": "png",
+              "colorSpace": "srgb",
+              "channels": 3,
+              "depth": "uchar",
+              "hasAlpha": false,
+              "opaque": true
+            },
+            "rejectionReason": null
+          }
+        ],
+        "sourceGeneration": {
+          "path": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-d62ba908-3f79-47e5-bfad-379ed5ca71c1.png",
+          "sha256": "7266b60770b5a95feafcc248467f65ef2a6b93368940b5ba9d3c0c337e7f4bd5",
+          "bytes": 1955231,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        },
+        "retainedHighRes": {
+          "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/results/wyrmshadow_talongrips-attempt-2.png",
+          "sha256": "7266b60770b5a95feafcc248467f65ef2a6b93368940b5ba9d3c0c337e7f4bd5",
+          "bytes": 1955231,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        },
+        "retryNotes": [
+          "A single targeted retry corrected the mismatched-gauntlet defect."
+        ],
+        "rejectionNotes": [
+          "Rejected during visual QA because the first attempt depicted two materially different gauntlets at different scales, violating the required symmetric matching pair."
+        ]
+      },
+      "master": {
+        "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/masters/wyrmshadow_talongrips.png",
+        "sha256": "ee63ee0699a4c05e3c77ec0d9750eed64694e8db4c3322b6fd132a9a8145074c",
+        "bytes": 366259,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true
+      },
+      "shipping": {
+        "path": "public/ui/items/wyrmshadow_talongrips.webp",
+        "sha256": "04e22e1b23a36d5f6d87a547585949f35fc09c1816d0c0807007516651d48b04",
+        "bytes": 2372,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true,
+        "encoder": "sharp 0.35.3",
+        "quality": 82,
+        "alphaQuality": 100,
+        "smartSubsample": true,
+        "effort": 6,
+        "resizeFit": "fill",
+        "resizeKernel": "lanczos3",
+        "metadataCopied": false,
+        "maximumBytes": 15360,
+        "maximumBytesPassed": true,
+        "deterministicQuality82Parity": true,
+        "quality82Verification": {
+          "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/ship/wyrmshadow_talongrips.webp",
+          "sha256": "04e22e1b23a36d5f6d87a547585949f35fc09c1816d0c0807007516651d48b04",
+          "bytes": 2372,
+          "width": 128,
+          "height": 128,
+          "format": "webp",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        }
+      },
+      "qa": {
+        "currentTargetInspectedBeforeGeneration": true,
+        "acceptedRawInspectedIndividually": true,
+        "masterReviewedInLabeledOverview": true,
+        "contact128ColorReviewed": true,
+        "contact40ColorReviewed": true,
+        "contact28ColorReviewed": true,
+        "contact28GrayscaleReviewed": true,
+        "contact64CircularReviewed": true,
+        "independentFreshVisualReview": true,
+        "objectIdentityPreserved": true,
+        "houseStyleApplied": true,
+        "centeredAndUncropped": true,
+        "opaqueBackground": true,
+        "noTextOrWatermark": true,
+        "thumbnailReadable": true,
+        "passed": true,
+        "notes": "Accepted attempt 2 after rejecting the asymmetric mismatched pair. The corrected matching pair passed raw, master, small-size, grayscale, and circular-crop review."
+      }
+    },
+    {
+      "index": 265,
+      "id": "wyrmshadow_treads",
+      "name": "Nightfang Treads",
+      "kind": "armor",
+      "slot": "feet",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Nightfang Treads (wyrmshadow_treads) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one symmetric pair of boots, shoes, or sandals\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+      "orderedReferences": [
+        {
+          "order": 1,
+          "path": "public/ui/items/wyrmshadow_treads.webp",
+          "role": "subject identity reference"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/items/ashstalker_treads.webp",
+          "role": "same-family house-style reference"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "global house-style reference"
+        },
+        {
+          "order": 4,
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "global house-style reference"
+        }
+      ],
+      "previousShipping": {
+        "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/originals/wyrmshadow_treads.webp",
+        "sha256": "db0c782d06fa21428e6acb3cf5a341be1a5654baa0806dd1e113acc833e84e92",
+        "bytes": 3486,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true
+      },
+      "generation": {
+        "tool": "built-in image_gen",
+        "cliFallbackUsed": false,
+        "acceptedAttempt": 1,
+        "acceptedPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Nightfang Treads (wyrmshadow_treads) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one symmetric pair of boots, shoes, or sandals\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+        "attemptCount": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Nightfang Treads (wyrmshadow_treads) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one symmetric pair of boots, shoes, or sandals\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+            "orderedReferences": [
+              {
+                "order": 1,
+                "path": "public/ui/items/wyrmshadow_treads.webp",
+                "role": "subject identity reference"
+              },
+              {
+                "order": 2,
+                "path": "public/ui/items/ashstalker_treads.webp",
+                "role": "same-family house-style reference"
+              },
+              {
+                "order": 3,
+                "path": "public/ui/items/eastbrook_buckler.webp",
+                "role": "global house-style reference"
+              },
+              {
+                "order": 4,
+                "path": "public/ui/items/linen_pouch.webp",
+                "role": "global house-style reference"
+              }
+            ],
+            "accepted": true,
+            "sourceGenerationPath": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-c56787e3-2b9e-4709-b68d-907e657c0bd6.png",
+            "outputHint": "Generated images are saved to /Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b as /Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-c56787e3-2b9e-4709-b68d-907e657c0bd6.png by default.",
+            "sourceGeneration": {
+              "path": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-c56787e3-2b9e-4709-b68d-907e657c0bd6.png",
+              "sha256": "7153efd3c2eb0bd362c837add847181ca362d74afb1e8be3d8767e52e397bc35",
+              "bytes": 1857224,
+              "width": 1254,
+              "height": 1254,
+              "format": "png",
+              "colorSpace": "srgb",
+              "channels": 3,
+              "depth": "uchar",
+              "hasAlpha": false,
+              "opaque": true
+            },
+            "retainedHighRes": {
+              "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/results/wyrmshadow_treads-attempt-1.png",
+              "sha256": "7153efd3c2eb0bd362c837add847181ca362d74afb1e8be3d8767e52e397bc35",
+              "bytes": 1857224,
+              "width": 1254,
+              "height": 1254,
+              "format": "png",
+              "colorSpace": "srgb",
+              "channels": 3,
+              "depth": "uchar",
+              "hasAlpha": false,
+              "opaque": true
+            },
+            "rejectionReason": null
+          }
+        ],
+        "sourceGeneration": {
+          "path": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-c56787e3-2b9e-4709-b68d-907e657c0bd6.png",
+          "sha256": "7153efd3c2eb0bd362c837add847181ca362d74afb1e8be3d8767e52e397bc35",
+          "bytes": 1857224,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        },
+        "retainedHighRes": {
+          "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/results/wyrmshadow_treads-attempt-1.png",
+          "sha256": "7153efd3c2eb0bd362c837add847181ca362d74afb1e8be3d8767e52e397bc35",
+          "bytes": 1857224,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        },
+        "retryNotes": [],
+        "rejectionNotes": []
+      },
+      "master": {
+        "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/masters/wyrmshadow_treads.png",
+        "sha256": "29b3bddcca0936f4515595292774d18ee9f2c5b5d6dc77e13447b9329d85b608",
+        "bytes": 343450,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true
+      },
+      "shipping": {
+        "path": "public/ui/items/wyrmshadow_treads.webp",
+        "sha256": "1f746e15fd88a8c6a207f411f0873ad2a78d9ed3bf4d5a73f5b3363c12eb97f0",
+        "bytes": 2862,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true,
+        "encoder": "sharp 0.35.3",
+        "quality": 82,
+        "alphaQuality": 100,
+        "smartSubsample": true,
+        "effort": 6,
+        "resizeFit": "fill",
+        "resizeKernel": "lanczos3",
+        "metadataCopied": false,
+        "maximumBytes": 15360,
+        "maximumBytesPassed": true,
+        "deterministicQuality82Parity": true,
+        "quality82Verification": {
+          "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/ship/wyrmshadow_treads.webp",
+          "sha256": "1f746e15fd88a8c6a207f411f0873ad2a78d9ed3bf4d5a73f5b3363c12eb97f0",
+          "bytes": 2862,
+          "width": 128,
+          "height": 128,
+          "format": "webp",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        }
+      },
+      "qa": {
+        "currentTargetInspectedBeforeGeneration": true,
+        "acceptedRawInspectedIndividually": true,
+        "masterReviewedInLabeledOverview": true,
+        "contact128ColorReviewed": true,
+        "contact40ColorReviewed": true,
+        "contact28ColorReviewed": true,
+        "contact28GrayscaleReviewed": true,
+        "contact64CircularReviewed": true,
+        "independentFreshVisualReview": true,
+        "objectIdentityPreserved": true,
+        "houseStyleApplied": true,
+        "centeredAndUncropped": true,
+        "opaqueBackground": true,
+        "noTextOrWatermark": true,
+        "thumbnailReadable": true,
+        "passed": true,
+        "notes": "Passed raw, master, small-size, grayscale, and circular-crop review with no genuine defect found."
+      }
+    },
+    {
+      "index": 266,
+      "id": "ysols_pearl_greaves",
+      "name": "Ysolei's Pearl Greaves",
+      "kind": "armor",
+      "slot": "legs",
+      "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Ysolei's Pearl Greaves (ysols_pearl_greaves) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one front-facing pair of leggings or legguards\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+      "orderedReferences": [
+        {
+          "order": 1,
+          "path": "public/ui/items/ysols_pearl_greaves.webp",
+          "role": "subject identity reference"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/items/ashstalker_legguards.webp",
+          "role": "same-family house-style reference"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "global house-style reference"
+        },
+        {
+          "order": 4,
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "global house-style reference"
+        }
+      ],
+      "previousShipping": {
+        "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/originals/ysols_pearl_greaves.webp",
+        "sha256": "bf2dc7832ce56b23059071634d1e1f6e5eefbaf0198a6cfb53421dc9c9df1d66",
+        "bytes": 3286,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true
+      },
+      "generation": {
+        "tool": "built-in image_gen",
+        "cliFallbackUsed": false,
+        "acceptedAttempt": 1,
+        "acceptedPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Ysolei's Pearl Greaves (ysols_pearl_greaves) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one front-facing pair of leggings or legguards\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+        "attemptCount": 1,
+        "attempts": [
+          {
+            "attempt": 1,
+            "prompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: repaint Ysolei's Pearl Greaves (ysols_pearl_greaves) into the World of ClaudeCraft house item-art style.\nSubject and identity: preserve the recognizable object identity, material cues, lore palette, and silhouette from input image 1, but replace its legacy rendering style.\nComposition: one front-facing pair of leggings or legguards\nScene and backdrop: deep charcoal, umber, navy, or zone-tinted painted vignette; subtle atmospheric haze and grounded contact shadow; no transparent exterior and no black void product shot.\nStyle: premium hand-painted classic fantasy MMO inventory art; tactile materials; crisp focal edges; softer peripheral brushwork; restrained magical accents; top-left warm key light with cool deep shadow.\nFraming: square, borderless, visually centered; subject fills about 68 to 76 percent of the tile with safe padding on every side; readable at 22px, 28px, 40px, and 64px circular crop.\nInput image roles: image 1 is subject identity only. Remaining images are house-style, lighting, material, and composition references only. Do not copy unrelated shapes from style references.\nConstraints: opaque full-square background; one inventory icon only; no text, letters, numbers, labels, UI border, rarity frame, watermark, checkerboard, transparency, split sheet, collage, mannequin, hand-held presentation, or cropped subject.",
+            "orderedReferences": [
+              {
+                "order": 1,
+                "path": "public/ui/items/ysols_pearl_greaves.webp",
+                "role": "subject identity reference"
+              },
+              {
+                "order": 2,
+                "path": "public/ui/items/ashstalker_legguards.webp",
+                "role": "same-family house-style reference"
+              },
+              {
+                "order": 3,
+                "path": "public/ui/items/eastbrook_buckler.webp",
+                "role": "global house-style reference"
+              },
+              {
+                "order": 4,
+                "path": "public/ui/items/linen_pouch.webp",
+                "role": "global house-style reference"
+              }
+            ],
+            "accepted": true,
+            "sourceGenerationPath": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-5fedbd8b-4389-44a4-b8cc-bdbf96411ec3.png",
+            "outputHint": "Generated images are saved to /Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b as /Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-5fedbd8b-4389-44a4-b8cc-bdbf96411ec3.png by default.",
+            "sourceGeneration": {
+              "path": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-5fedbd8b-4389-44a4-b8cc-bdbf96411ec3.png",
+              "sha256": "d62eb2b9d624f99ab9aaa4287c039743848e1d285c054826ffadfaef54d16ef4",
+              "bytes": 1855503,
+              "width": 1254,
+              "height": 1254,
+              "format": "png",
+              "colorSpace": "srgb",
+              "channels": 3,
+              "depth": "uchar",
+              "hasAlpha": false,
+              "opaque": true
+            },
+            "retainedHighRes": {
+              "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/results/ysols_pearl_greaves-attempt-1.png",
+              "sha256": "d62eb2b9d624f99ab9aaa4287c039743848e1d285c054826ffadfaef54d16ef4",
+              "bytes": 1855503,
+              "width": 1254,
+              "height": 1254,
+              "format": "png",
+              "colorSpace": "srgb",
+              "channels": 3,
+              "depth": "uchar",
+              "hasAlpha": false,
+              "opaque": true
+            },
+            "rejectionReason": null
+          }
+        ],
+        "sourceGeneration": {
+          "path": "/Users/fernando/.codex/generated_images/019fe83e-62e6-7642-84b4-db214d464e0b/exec-5fedbd8b-4389-44a4-b8cc-bdbf96411ec3.png",
+          "sha256": "d62eb2b9d624f99ab9aaa4287c039743848e1d285c054826ffadfaef54d16ef4",
+          "bytes": 1855503,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        },
+        "retainedHighRes": {
+          "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/results/ysols_pearl_greaves-attempt-1.png",
+          "sha256": "d62eb2b9d624f99ab9aaa4287c039743848e1d285c054826ffadfaef54d16ef4",
+          "bytes": 1855503,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        },
+        "retryNotes": [],
+        "rejectionNotes": []
+      },
+      "master": {
+        "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/masters/ysols_pearl_greaves.png",
+        "sha256": "018d0d2f02204b9243e727de8774f2327142a4829aa813ab11b3fe36d679e17d",
+        "bytes": 334347,
+        "width": 512,
+        "height": 512,
+        "format": "png",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true
+      },
+      "shipping": {
+        "path": "public/ui/items/ysols_pearl_greaves.webp",
+        "sha256": "c4fd7e60ab6a19e64026c6ee2ccf939bb551f33368cff6706e7063e0f0b63667",
+        "bytes": 2656,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "srgb",
+        "channels": 3,
+        "depth": "uchar",
+        "hasAlpha": false,
+        "opaque": true,
+        "encoder": "sharp 0.35.3",
+        "quality": 82,
+        "alphaQuality": 100,
+        "smartSubsample": true,
+        "effort": 6,
+        "resizeFit": "fill",
+        "resizeKernel": "lanczos3",
+        "metadataCopied": false,
+        "maximumBytes": 15360,
+        "maximumBytesPassed": true,
+        "deterministicQuality82Parity": true,
+        "quality82Verification": {
+          "path": "tmp/imagegen/item-art-consistency/chunk-f-tail/ship/ysols_pearl_greaves.webp",
+          "sha256": "c4fd7e60ab6a19e64026c6ee2ccf939bb551f33368cff6706e7063e0f0b63667",
+          "bytes": 2656,
+          "width": 128,
+          "height": 128,
+          "format": "webp",
+          "colorSpace": "srgb",
+          "channels": 3,
+          "depth": "uchar",
+          "hasAlpha": false,
+          "opaque": true
+        }
+      },
+      "qa": {
+        "currentTargetInspectedBeforeGeneration": true,
+        "acceptedRawInspectedIndividually": true,
+        "masterReviewedInLabeledOverview": true,
+        "contact128ColorReviewed": true,
+        "contact40ColorReviewed": true,
+        "contact28ColorReviewed": true,
+        "contact28GrayscaleReviewed": true,
+        "contact64CircularReviewed": true,
+        "independentFreshVisualReview": true,
+        "objectIdentityPreserved": true,
+        "houseStyleApplied": true,
+        "centeredAndUncropped": true,
+        "opaqueBackground": true,
+        "noTextOrWatermark": true,
+        "thumbnailReadable": true,
+        "passed": true,
+        "notes": "Passed raw, master, small-size, grayscale, and circular-crop review with no genuine defect found."
+      }
+    }
+  ]
+}

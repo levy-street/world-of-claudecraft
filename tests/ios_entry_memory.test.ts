@@ -30,13 +30,19 @@ describe('entry probe covers the await window', () => {
   it('arms the probe before the locale and asset awaits and re-stamps the build', () => {
     const startAt = mainSource.indexOf("entryDiagnostics.start(settings.get('graphicsPreset'));");
     const awaitCheckpointAt = mainSource.indexOf("entryDiagnostics.checkpoint('assets-await'");
-    const localeAwaitAt = mainSource.indexOf(
-      'await Promise.all([ensureLocaleLoaded(getLanguage()), ensureDeedLocalesLoaded(getLanguage())]);',
+    // Reflow-proof: the boot block must await all THREE locale-chunk loaders
+    // together (the catalog chunk, the deed chunk, the Reliquary page-name
+    // chunk). Matching on names and structure rather than on a pasted
+    // indentation literal, so a biome reformat does not read as a dropped
+    // loader, while dropping one really does fail.
+    const localeAwaitAt = mainSource.search(
+      /await Promise\.all\(\[\s*ensureLocaleLoaded\(getLanguage\(\)\),\s*\.\.\.CONTENT_LOCALE_CHANNEL_ENSURERS\.map\(\s*\(ensure\)\s*=>\s*ensure\(getLanguage\(\)\),?\s*\),?\s*\]\);/,
     );
     const assetsAwaitAt = mainSource.indexOf('await assetsReady(');
     const sceneRestampAt = mainSource.indexOf("entryDiagnostics.checkpoint('scene-build-start'");
     expect(startAt).toBeGreaterThan(-1);
     expect(awaitCheckpointAt).toBeGreaterThan(startAt);
+    expect(localeAwaitAt, 'the three-loader await block form drifted').toBeGreaterThan(-1);
     expect(localeAwaitAt).toBeGreaterThan(awaitCheckpointAt);
     expect(assetsAwaitAt).toBeGreaterThan(localeAwaitAt);
     expect(sceneRestampAt).toBeGreaterThan(assetsAwaitAt);
@@ -63,20 +69,38 @@ describe('entry-crash recovery arms tight memory', () => {
 });
 
 describe('tight-memory residency diet', () => {
-  it('skips the two secondary-context preview prewarms on the tight profile', () => {
-    const gateAt = mainSource.indexOf('if (!GFX.tightMemory) {');
-    const characterPrewarmAt = mainSource.indexOf('await hud.prewarmCharacterPreview();');
-    const armoryPrewarmAt = mainSource.indexOf('await hud.prewarmArmoryPreview();');
+  it('skips the secondary-context preview prewarm schedule on the tight profile', () => {
+    const startAt = mainSource.indexOf('if (!GFX.tightMemory) hud.startPostEntryPreviewPrewarm();');
+    expect(startAt).toBeGreaterThan(-1);
+    // The schedule runs BEHIND the live frame (post-reveal), so the secondary
+    // preview contexts never add to the curtained entry allocation spike; the
+    // tight profile skips them entirely and keeps the lazy first-open path.
+    const revealAt = mainSource.indexOf('const revealWorld = (): void => {');
+    expect(revealAt).toBeGreaterThan(-1);
+    expect(startAt).toBeGreaterThan(revealAt);
+  });
+
+  it('keeps the curtain-side paperdoll shell build inside the tight-memory gate', () => {
+    const callAt = mainSource.indexOf('hud.prewarmCharPreviewShell();');
+    expect(callAt).toBeGreaterThan(-1);
+    // Anchor on the NEAREST preceding gate, not the first one in the file: a
+    // plain indexOf-ordering check (gate index before call index) would still
+    // pass if some unrelated earlier "!GFX.tightMemory" text existed anywhere
+    // above the call.
+    const gateAt = mainSource.lastIndexOf('if (!GFX.tightMemory) {', callAt);
     expect(gateAt).toBeGreaterThan(-1);
-    expect(characterPrewarmAt).toBeGreaterThan(gateAt);
-    expect(armoryPrewarmAt).toBeGreaterThan(characterPrewarmAt);
+    // The gate's own closing brace must not appear between the gate and the
+    // call: that would mean the block already ended and the call runs
+    // unconditionally, even though the ordering check above would still hold.
+    const between = mainSource.slice(gateAt, callAt);
+    expect(between).not.toMatch(/\n {2}\}/);
   });
 });
 
-describe('deferred skin atlases on the packaged iOS shell', () => {
-  it('gates the boot atlas sweep on the hint-stable native profile', () => {
+describe('deferred skin atlases on every iOS WebKit host', () => {
+  it('gates the boot atlas sweep on the hint-stable iOS profile', () => {
     expect(assetsSource).toContain(
-      'const eagerSkinAtlases = !(GFX.nativeIosMemoryProfile || GFX.tightMemory);',
+      'const eagerSkinAtlases = !(GFX.iosMemoryProfile || GFX.tightMemory);',
     );
     // The character-preview gate must not re-await atlases the boot deferred.
     expect(assetsSource).toContain('const missingSkins = eagerSkinAtlases');
@@ -87,9 +111,13 @@ describe('deferred skin atlases on the packaged iOS shell', () => {
   });
 
   it('never caches a portrait rendered while its atlas is still in flight', () => {
+    // The pending guard lives in trackSkinAtlasPending, shared by the sync
+    // capture path (returns null, fallback crest) AND the paced async prewarm
+    // (early-outs before building anything).
     expect(portraitSource).toContain('const atlasPending = ensureSkinTexture(visualKey, skin);');
-    expect(portraitSource).toContain('if (atlasPending) {');
-    expect(portraitSource).toContain('return null;');
+    expect(portraitSource).toContain('if (!atlasPending) return false;');
+    expect(portraitSource).toContain('if (trackSkinAtlasPending(visualKey, skin)) return null;');
+    expect(portraitSource).toContain('atlasPending: () => trackSkinAtlasPending(visualKey, skin),');
     expect(portraitChipSource).toContain('onPortraitUpdate((visualKey, skin) => {');
     expect(mainSource).toContain('refreshStartSkinPickerPortraits(');
   });
@@ -190,10 +218,11 @@ describe('preload registry retains no resolution values', () => {
   });
 });
 
-describe('post-entry mob-body streaming (packaged iOS)', () => {
+describe('post-entry mob-body streaming (every iOS WebKit host)', () => {
   // The heaviest character content (creatures + the skeleton family, embedded
-  // 1024-class atlases) is carved out of the boot gate on the packaged shell and
-  // streamed after prewarm, through the fail-soft view-create seam (#2079).
+  // 1024-class atlases) is carved out of the boot gate on every iOS WebKit host
+  // (Safari, other iOS browsers, and the packaged app) and streamed after prewarm,
+  // through the fail-soft view-create seam (#2079).
   // Measured before this: WebContent at 1.54 GB pre-renderer on an iPhone 17 Pro.
   it('streams mob bodies and Armory skin models; base weapons stay in the gate', () => {
     expect(assetsSource).toContain(
@@ -232,12 +261,18 @@ describe('post-entry mob-body streaming (packaged iOS)', () => {
   });
 
   it('degrades a not-yet-resident skin in the Armory display-model path', () => {
-    // weaponSkinDisplayModel feeds the store preview (prewarm loops every skin
-    // id microseconds after the stream pass starts): a non-resident streamed
-    // skin returns null (the rig treats it as unavailable) instead of letting
-    // resolvedGltf throw away the whole warmup or escape a click handler.
+    // weaponSkinDisplayModel feeds the store preview. The catalog is no longer
+    // warmed ahead of time (docs/design/armory-preview-warming.md), so this now
+    // guards the CLICK path: a non-resident streamed skin returns null, which
+    // the rig treats as unavailable, instead of letting resolvedGltf escape an
+    // ArmoryInspect click handler. Note the weapon rig retries on the reselect
+    // once the GLB lands; the character rig cache does not, which is a separate
+    // pre-existing defect recorded in the handoff notes.
     expect(assetsSource).toContain('if (residentOrEnsure(url) === null) return null;');
-    // The preview recovers on reselect: same-skin no-op only while a rig exists.
+    // Only the WEAPON preview recovers on reselect (same-skin no-op is guarded
+    // on the rig existing). The character rig cache has no such retry, so a card
+    // opened before its GLB lands keeps a rig wearing the base weapon: a
+    // separate pre-existing defect, recorded in the handoff notes.
     const previewSource = readFileSync(
       new URL('../src/render/armory_preview.ts', import.meta.url),
       'utf8',
@@ -264,10 +299,18 @@ describe('post-entry mob-body streaming (packaged iOS)', () => {
     expect(streamAt).toBeGreaterThan(assetsAwaitAt);
   });
 
-  it('extracts props and foliage as they land on the packaged shell', () => {
+  it('extracts props and foliage as they land on every iOS WebKit host', () => {
     const propsSource = read('../src/render/props.ts');
     const foliageSource = read('../src/render/foliage.ts');
-    expect(propsSource).toContain('if (GFX.nativeIosMemoryProfile) propAsset(key);');
-    expect(foliageSource).toContain('if (GFX.nativeIosMemoryProfile) extractParts(url);');
+    expect(propsSource).toContain('if (GFX.iosMemoryProfile) propAsset(key);');
+    // Foliage additionally gates extraction on live-tier membership (see
+    // tests/foliage_preload_boot.test.ts): the FETCH stays unconditional (the
+    // pine_2.glb crash fix), but eagerly baking a HIGH-only variant the current
+    // tier guess will never place would cost exactly the iOS memory this profile
+    // protects, for nothing.
+    expect(foliageSource).toContain(
+      'if (GFX.iosMemoryProfile && Object.values(foliageModelUrlsFor(GFX)).flat().includes(url)) {',
+    );
+    expect(foliageSource).toContain('extractParts(url);');
   });
 });

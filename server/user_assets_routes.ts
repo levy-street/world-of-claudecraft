@@ -46,11 +46,6 @@ export function resetUserAssetsServiceForTests(): void {
   userAssetsService = REAL_USER_ASSETS_SERVICE;
 }
 
-/** The live user-assets service (read at call time so the test seam applies). */
-export function liveUserAssetsService(): UserAssetsService {
-  return userAssetsService;
-}
-
 // ---------------------------------------------------------------------------
 // Legacy wire bodies shared by both arms (stable snake_case codes; see maps.ts).
 // ---------------------------------------------------------------------------

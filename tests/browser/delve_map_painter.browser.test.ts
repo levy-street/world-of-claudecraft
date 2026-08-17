@@ -104,7 +104,7 @@ function makeWorld(): IWorld {
 // DOM write, the #zone-label text, through setText).
 function realWriterFacet(): PainterHostWriters {
   return makeWriterFacet(
-    new Map<HTMLElement, string>(),
+    new Map(),
     new Map<HTMLElement, Map<string, string>>(),
     new Map<HTMLElement, Map<string, string>>(),
     new Map<HTMLElement, Map<string, string>>(),

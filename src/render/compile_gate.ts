@@ -4,8 +4,11 @@
 // program link off the main thread, but the returned work cannot be cancelled.
 // A timeout is therefore diagnostic only: revealing the target at that point
 // would make its first draw synchronously finish the same link while the async
-// compile remains active. The queue also keeps multiple streamed views from
-// starting overlapping driver work during an online snapshot burst.
+// compile remains active. The queue also BOUNDS how many streamed views can
+// have driver link work in flight during an online snapshot burst: the shared
+// queue's released-tail cap, or strict serialization on the local fallback.
+
+import type { GpuWorkRunOptions } from './background_gpu_queue';
 
 export interface CompileGateScheduler {
   setTimeout: (cb: () => void, ms: number) => number;
@@ -20,11 +23,18 @@ export interface CompileGateResult {
 export interface CompileGateOptions {
   onTimeout?: () => void;
   priority?: number;
+  /** Names this gate's unit in the shared queue's per-unit timing stats. */
+  label?: string;
   scheduler?: CompileGateScheduler;
 }
 
 export interface CompileGateWorkQueue {
-  run<T>(work: () => T | Promise<T>, priority?: number): Promise<T>;
+  run<T>(
+    work: () => T | Promise<T>,
+    priority?: number,
+    label?: string,
+    options?: GpuWorkRunOptions,
+  ): Promise<T>;
 }
 
 const defaultScheduler: CompileGateScheduler = {
@@ -69,7 +79,15 @@ export function awaitCompileGate(
   });
 }
 
-/** Serializes live compile gates so online entity bursts cannot overlap them. */
+/** Bounds live compile gates so online entity bursts cannot pile up driver
+ *  work: strictly serial on the local fallback, cap-bounded on the shared
+ *  queue. There, a gate declares releaseTail: after the synchronous compile
+ *  prologue, the awaited remainder is the driver's off-thread link (three
+ *  polls KHR_parallel_shader_compile on a timer), so the queue keeps draining
+ *  other lanes while it settles, under the queue's released-tail cap. Gates
+ *  may therefore overlap and settle OUT OF ORDER. The gate's own contract is
+ *  unchanged: its result still resolves only when the link settles, so a
+ *  gated view is revealed no earlier than before. */
 export class CompileGateQueue {
   private tail: Promise<unknown> = Promise.resolve();
 
@@ -81,7 +99,9 @@ export class CompileGateQueue {
     options: CompileGateOptions = {},
   ): Promise<CompileGateResult> {
     const work = () => awaitCompileGate(compile, timeoutMs, options);
-    if (this.sharedQueue) return this.sharedQueue.run(work, options.priority);
+    if (this.sharedQueue) {
+      return this.sharedQueue.run(work, options.priority, options.label, { releaseTail: true });
+    }
     const result = this.tail.then(work);
     this.tail = result;
     return result;
@@ -94,9 +114,10 @@ export class CompileGateQueue {
  * across a family of mutually exclusive gated swaps instead of one pending flag
  * per swap target (e.g. shapeshift-form creation: sheep/bear/cat/travel share a
  * single formCompilePending token because at most one of them is ever active or
- * newly built per entity per frame). The shared CompileGateQueue runs gates one
- * at a time, but a NEWER swap can still be registered while an OLDER one is
- * still in flight (a fast form-to-form reswap before the first compile settles).
+ * newly built per entity per frame). The shared CompileGateQueue bounds gates
+ * to a small overlap (they can settle out of order), so a NEWER swap can be
+ * registered, or even settle, while an OLDER one is still in flight (a fast
+ * form-to-form reswap before the first compile settles).
  * Without this guard, the older gate's onSettled would clear the token as soon
  * as it resolves, revealing the newer target before its own compile is done:
  * exactly the freeze this gate exists to prevent. Passing the raw setter

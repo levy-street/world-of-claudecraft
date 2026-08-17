@@ -9,11 +9,37 @@
 // Run:
 //   node scripts/render_music.mjs [outDir=tmp/music_renders] [theme ...]
 // With no theme args it renders every theme in buildMusicThemes().
+//
+// Publishing a remaster:
+//   node scripts/render_music.mjs --hash [public/audio/music/<file>.mp3 ...]
+// Prints the `?v=<hash12>` content-hash query src/game/music_tracks.ts embeds
+// in each track URL (server/static_cache.ts caches only an exact match
+// immutably). With no file args it hashes every committed
+// public/audio/music/*.mp3. Run this after adding or replacing a remaster and
+// paste the printed hash into every ZONE_STREAM_URLS/COMBAT_STREAM_URLS entry
+// that references the file.
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
+
+if (process.argv[2] === '--hash') {
+  const musicDir = 'public/audio/music';
+  const files =
+    process.argv.length > 3
+      ? process.argv.slice(3)
+      : readdirSync(musicDir)
+          .filter((name) => name.endsWith('.mp3'))
+          .sort()
+          .map((name) => path.join(musicDir, name));
+  for (const file of files) {
+    const hash = createHash('sha256').update(readFileSync(file)).digest('hex').slice(0, 12);
+    console.log(`${file}\t?v=${hash}`);
+  }
+  process.exit(0);
+}
 
 const OUT = process.argv[2] || 'tmp/music_renders';
 const ONLY = process.argv.slice(3);

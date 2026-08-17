@@ -9,7 +9,10 @@ export type Surface = 'grass' | 'dirt' | 'stone' | 'wood' | 'snow' | 'water';
 
 export interface AmbientPointSource {
   readonly id: string;
-  readonly kind: 'campfire' | 'forge';
+  // 'rift_portal'/'rift_roller'/'rift_ice_glide' are dynamic (spawn/move/
+  // despawn during play, or track a gliding player), unlike the static
+  // world-built campfire/forge set; see src/render/rift_ambience.ts.
+  readonly kind: 'campfire' | 'forge' | 'rift_portal' | 'rift_roller' | 'rift_ice_glide';
   readonly x: number;
   readonly y: number;
   readonly z: number;
@@ -65,6 +68,26 @@ export interface SpatialAudioSink {
   ): void;
   /** One custom running stride for a mounted entity. */
   mountRun(x: number, y: number, z: number, mountKey: string, self: boolean): void;
+  /** Windup/loop/winddown engine audio for a mount with a dedicated take set
+   *  (see src/game/mount_engine_state.ts); call every frame a rider is
+   *  mounted and grounded. Returns true when `mountKey` actually has an
+   *  engine take set, so the caller can skip mountRun's gait beat for it;
+   *  false means fall back to the ordinary per-stride mountRun cue instead. */
+  mountEngine(
+    x: number,
+    y: number,
+    z: number,
+    mountKey: string,
+    moving: boolean,
+    entityId: number,
+  ): boolean;
+  /** Drop an entity's mountEngine state and silence its loop (dismount,
+   *  interest culled, disconnect). */
+  mountEngineReset(entityId: number): void;
+  /** Warm a mount's engine clips (windup/loop/winddown) ahead of first use,
+   *  e.g. on the mountKey transition that also calls mountEngineReset. A
+   *  no-op for a mount with no engine take set. */
+  preloadMountEngine(mountKey: string): void;
   /** A discrete movement event (jump / land / water entry / swim stroke). */
   movement(
     kind: 'jump' | 'land' | 'splash' | 'swim',
@@ -72,6 +95,15 @@ export interface SpatialAudioSink {
     y: number,
     z: number,
     self: boolean,
+  ): void;
+  /** Lich Form entry, ambient pulse, and a sacrificed soul reaching its owner. */
+  necromancy(
+    kind: 'lichTransform' | 'lichHeartbeat' | 'soulConsume',
+    x: number,
+    y: number,
+    z: number,
+    self: boolean,
+    sourceId?: number,
   ): void;
   /** Per-frame ambience state around the player; the engine cross-fades loops.
    *  `biome` is the full `BiomeId` union (covers both the grid-world biomes and

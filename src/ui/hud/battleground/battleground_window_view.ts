@@ -30,6 +30,9 @@ export interface BgAllTimeEntry {
   rating: number;
   wins: number;
   losses: number;
+  /** Absent on a board served by a realm that predates the W-L-D
+   *  change, so the consumer defaults it rather than rendering NaN. */
+  draws?: number;
 }
 
 /** A LIVE-ladder row: rank + the raw class id (painter localizes when known).
@@ -44,6 +47,8 @@ export interface BgLadderRow {
   rating: number;
   wins: number;
   losses: number;
+  /** Matches that ended level, the third figure of the W-L-D record. */
+  draws: number;
 }
 
 /** An all-time ladder row: a live row plus the player level the title shows. */
@@ -74,6 +79,7 @@ export type BgWindowView =
       rating: number;
       wins: number;
       losses: number;
+      draws: number;
       captures: number;
       action: BgWindowAction;
       /** The first-win-of-the-day Honor bonus chip, or null once today's win has
@@ -138,6 +144,10 @@ export function buildBgWindowView(input: BgWindowViewInput): BgWindowView {
     rating: r.rating,
     wins: r.wins,
     losses: r.losses,
+    // `?? 0` for the same rolling-deploy reason as the `?? []` above: a
+    // snapshot mirrored from a server that predates this field carries no
+    // draws, and an undefined would render as NaN in the W-L-D record.
+    draws: r.draws ?? 0,
   }));
 
   const allTimeRows: BgAllTimeRow[] | null = allTime
@@ -151,6 +161,7 @@ export function buildBgWindowView(input: BgWindowViewInput): BgWindowView {
         rating: r.rating,
         wins: r.wins,
         losses: r.losses,
+        draws: r.draws ?? 0,
       }))
     : null;
 
@@ -159,6 +170,7 @@ export function buildBgWindowView(input: BgWindowViewInput): BgWindowView {
     rating: b.rating,
     wins: b.wins,
     losses: b.losses,
+    draws: b.draws ?? 0,
     captures: b.captures,
     action,
     // `=== true` on purpose, not a truthiness read: a snapshot mirrored from a

@@ -2,6 +2,8 @@
 // The Three adapters own colors, textures, and scene writes; this core only
 // advances deterministic scalar and keyed blend state from caller-provided dt.
 
+import { clamp01 } from './num_clamp';
+
 /** Response for fog, tint, and lighting targets. About 97 percent settled in 5 seconds. */
 export const ZONE_ENVIRONMENT_RESPONSE = 0.7;
 
@@ -29,10 +31,6 @@ export interface EnvironmentMapTransition<K extends string> {
   current: K;
   pending: K | null;
   intensity: number;
-}
-
-function clamp01(value: number): number {
-  return value < 0 ? 0 : value > 1 ? 1 : value;
 }
 
 /** Exponential damping alpha, stable across frame rates for the same elapsed time. */

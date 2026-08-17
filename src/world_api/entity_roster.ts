@@ -10,4 +10,8 @@ export interface IWorldEntityRoster {
   moveInput: MoveInput;
   // the realm (world/shard) this character lives on; '' in offline play
   realm: string;
+  // whether this session's ACCOUNT holds a staff/admin role. Advert only: every
+  // admin-gated action is re-checked server-side, so a forged true opens inert
+  // UI. Offline play is true (the player owns the world).
+  accountAdmin: boolean;
 }

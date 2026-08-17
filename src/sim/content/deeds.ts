@@ -2660,47 +2660,185 @@ export const DEEDS: Record<string, DeedDef> = {
     trigger: { kind: 'visit', markId: 'fish:evergarden' },
   },
 
+  // The Reliquary Curator ranks (cosmetic prestige over unique catalogued
+  // relic fills). Zero Renown: catalog / luck prestige never scores the
+  // board (docs/design/reliquary.md + deeds.md rule 2). Manual: granted by
+  // syncCuratorRankDeeds when the pure rank threshold is crossed (and on
+  // join retro for veterans who already crossed). Titles/borders only.
+  // Appended after the starter-zone chronicle block so DEED_ORDER stays
+  // append-only across the release merge.
+  col_reliquary_rank_2: {
+    id: 'col_reliquary_rank_2',
+    name: 'Spoilskeeper',
+    desc: 'Reach Curator rank 2 in The Reliquary (10 unique catalogued relics).',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Spoilskeeper' },
+  },
+  col_reliquary_rank_3: {
+    id: 'col_reliquary_rank_3',
+    name: 'The Cataloguer',
+    desc: 'Reach Curator rank 3 in The Reliquary (25 unique catalogued relics).',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'the Cataloguer' },
+  },
+  col_reliquary_rank_4: {
+    id: 'col_reliquary_rank_4',
+    name: 'Arch-Curator',
+    desc: 'Reach Curator rank 4 in The Reliquary (50 unique catalogued relics).',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Arch-Curator' },
+  },
+  col_reliquary_rank_5: {
+    id: 'col_reliquary_rank_5',
+    name: 'Eternal Spoils',
+    desc: 'Reach Curator rank 5 in The Reliquary (100 unique catalogued relics).',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'border', slug: 'reliquary_gilt' },
+  },
   // The WARFARE lifetime-honor ladder: what honor is FOR once the set is
   // bought. The meter reads PlayerMeta.lifetimeHonor, which is monotonic
   // (grantHonor only ever adds), so spending at the quartermaster can never
   // take a rank back, and a veteran who earned the honor before these deeds
-  // shipped is credited by the join-time retro pass. Rank names follow the
-  // classic-era PvP ladder and lead up to Warmarshal Draven Kole, so the
-  // quartermaster reads as the top of the chain of command being climbed.
+  // shipped is credited by the join-time retro pass.
+  // Rank names are IP-SAFE COINAGES in this world's title voice (the
+  // Peakbreaker / Wyrmfeller / Craftsworn shape), NOT the classic-era PvP ladder
+  // they originally copied: Sergeant, Knight-Lieutenant and Field Marshal are
+  // verbatim ranks from another game. They still climb toward Warmarshal Draven
+  // Kole and stop deliberately short of his rank, so the quartermaster stays the
+  // top of the chain of command being climbed.
   // Thresholds derive from a modelled ~900 honor per committed day of
   // Thornhollow Fields (result honor plus the uncapped per-kill drip, after the
   // per-opponent daily decay in src/sim/pvp/honor.ts), so roughly 11, 44 and 167
-  // committed days. Sergeant deliberately lands a little AFTER the 7,550-honor
+  // committed days. Linebreaker deliberately lands a little AFTER the 7,550-honor
   // complete kit, so the first title rewards finishing the gear grind rather than
   // being a step along it. The thresholds are the tunable here; the income
   // assumption they rest on is written down so they can be moved with evidence
   // rather than by feel.
   pvp_honor_sergeant: {
     id: 'pvp_honor_sergeant',
-    name: 'Sergeant',
+    name: 'Linebreaker',
     desc: 'Earn 10,000 honor in your lifetime. Spending it never costs you the rank.',
     category: 'pvp',
     renown: 10,
     trigger: { kind: 'meter', meter: 'lifetimeHonor', amount: 10_000 },
-    reward: { kind: 'title', text: 'Sergeant' },
+    reward: { kind: 'title', text: 'Linebreaker' },
   },
   pvp_honor_knight_lieutenant: {
     id: 'pvp_honor_knight_lieutenant',
-    name: 'Knight-Lieutenant',
+    name: 'Fieldreaver',
     desc: 'Earn 40,000 honor in your lifetime, a season of real war behind you.',
     category: 'pvp',
     renown: 25,
     trigger: { kind: 'meter', meter: 'lifetimeHonor', amount: 40_000 },
-    reward: { kind: 'title', text: 'Knight-Lieutenant' },
+    reward: { kind: 'title', text: 'Fieldreaver' },
   },
   pvp_honor_field_marshal: {
     id: 'pvp_honor_field_marshal',
-    name: 'Field Marshal',
+    name: 'Warcrowned',
     desc: 'Earn 150,000 honor in your lifetime. Rare on any realm, and it should be.',
     category: 'pvp',
     renown: 50,
     trigger: { kind: 'meter', meter: 'lifetimeHonor', amount: 150_000 },
-    reward: { kind: 'title', text: 'Field Marshal' },
+    reward: { kind: 'title', text: 'Warcrowned' },
+  },
+  // The Reliquary completion ladder (Phase 18): catalog-wide and shelf-wide
+  // completion plus the three flagship page Illuminations. Zero Renown:
+  // catalog / luck prestige never scores the board (docs/design/reliquary.md +
+  // deeds.md rule 2). Manual: granted by syncReliquaryCompletionDeeds when the
+  // pure completion read holds (and on join retro for veterans who already
+  // hold it). STICKY: later catalog growth lowers the live completion read but
+  // never revokes the earned record (the feat_book_complete precedent: the
+  // requirement is "the catalog as shipped when you finished it", not a moving
+  // target). Titles only. Appended after the WARFARE honor ladder so
+  // DEED_ORDER stays append-only across the release merge. The GRANT-CHECK
+  // order lives in RELIQUARY_COMPLETION_DEED_IDS (src/sim/reliquary.ts) and
+  // deliberately differs from this table's order: illuminations before the
+  // shelf before the catalog, so a title granted earlier in one pass is
+  // visible to the later checks.
+  // feat: true, uniquely off the feat_ prefix (pinned with rationale in
+  // tests/deeds_content.test.ts): the capstone is a dynamic meta over a
+  // growing catalog, the feat_book_complete class, and the flag is what
+  // keeps it OUT of BOOK_COMPLETE_REQUIREMENTS. Three catalog slots are
+  // owner-pended today (masterwork:engineering, reins_drakemaw_raptor,
+  // reins_terrorspark_groundshaker), so a non-feat capstone would dead-end
+  // The Whole Book for every player (the retroFallbackGrants stranded-heal
+  // doctrine names exactly that failure). It stays on the Collection shelf
+  // beside its ladder; grant, marquee, and feed behavior are unaffected.
+  col_reliquary_complete: {
+    id: 'col_reliquary_complete',
+    name: 'The Grand Reliquary',
+    desc: 'Catalogue every relic in The Reliquary that a character can keep. Later catalog growth never takes it back.',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Curator of the Vault' },
+    feat: true,
+  },
+  col_reliquary_conquerors: {
+    id: 'col_reliquary_conquerors',
+    name: 'Shelf of Conquerors',
+    desc: 'Catalogue every relic on the Conquerors shelf of The Reliquary. Later catalog growth never takes it back.',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Vaultbreaker' },
+  },
+  col_reliquary_illum_nythraxis_heroic: {
+    id: 'col_reliquary_illum_nythraxis_heroic',
+    name: 'Nythraxis Illuminated',
+    desc: 'Illuminate the Heroic Nythraxis Raid page of The Reliquary.',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Light of Nythraxis' },
+  },
+  col_reliquary_illum_thunzharr: {
+    id: 'col_reliquary_illum_thunzharr',
+    name: 'Thunzharr Illuminated',
+    desc: 'Illuminate the Thunzharr, the Waking Peak page of The Reliquary.',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Light of Thunzharr' },
+  },
+  col_reliquary_illum_gravewyrm_heroic: {
+    id: 'col_reliquary_illum_gravewyrm_heroic',
+    name: 'Sanctum Illuminated',
+    desc: 'Illuminate the Heroic Gravewyrm Sanctum page of The Reliquary.',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Light of the Sanctum' },
+  },
+
+  // The walk-in castle visits, appended per the append-only DEED_ORDER
+  // contract. The Last Keep one retro-fixes a rule gap: the keep shipped
+  // without its deeds (every new conquerable content authors deeds in the
+  // same change; docs/design/deeds.md). Both key on the dungeon: visit mark
+  // enterDungeon writes, the drowned_temple moongate precedent.
+  exp_the_last_keep: {
+    id: 'exp_the_last_keep',
+    name: 'The Quiet Halls',
+    desc: 'Step through the doors of the Last Keep and walk its silent halls.',
+    category: 'exploration',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'dungeon:the_last_keep' },
+  },
+  exp_dawnhold_castle: {
+    id: 'exp_dawnhold_castle',
+    name: 'An Open Door in the Garden',
+    desc: 'Call on Dawnhold Castle and wander its sunlit garden halls.',
+    category: 'exploration',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'dungeon:dawnhold_castle' },
   },
 };
 

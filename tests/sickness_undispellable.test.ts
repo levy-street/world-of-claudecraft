@@ -21,6 +21,7 @@ import {
   UNSTUCK_SICKNESS_ID,
 } from '../src/sim/resurrection';
 import { Sim } from '../src/sim/sim';
+import { ARENA_MIN_LEVEL } from '../src/sim/social/arena';
 import { applyResurrectionSickness, applyUnstuckSickness } from '../src/sim/spirit';
 import type { Aura, Entity, PlayerClass } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
@@ -191,78 +192,20 @@ describe('the flag reaches the online client', () => {
   });
 });
 
-describe('warlock Voidfeast cannot devour a sickness', () => {
-  it.each(['resurrection', 'unstuck'] as const)(
-    'refuses the self-cast on %s sickness before billing',
-    (which) => {
-      const { sim, p, events } = rig('warlock', 'wlk_r8_voidfeast');
-      sicken(sim, p, which);
-      const manaBefore = p.resource;
-      const hpBefore = p.hp;
-      sim.targetEntity(p.id);
-      sim.castAbility('voidfeast');
-      sim.tick();
-      expect(
-        events.some((e) => e.type === 'error' && /nothing to devour/i.test(e.text ?? '')),
-      ).toBe(true);
-      expect(has(p, idOf(which))).toBe(true);
-      // The gate refuses before billing, so the 6% devour heal never pays out either.
-      expect(p.resource).toBe(manaBefore);
-      expect(p.cooldowns.has('voidfeast')).toBe(false);
-      expect(p.hp).toBe(hpBefore);
-    },
-  );
-
-  it('refuses an ally carrying only Resurrection Sickness', () => {
-    const sim = new Sim({
-      seed: 7,
-      playerClass: 'warlock',
-      autoEquip: true,
-      noPlayer: true,
-    }) as AnySim;
-    const lockId = sim.addPlayer('warlock', 'Lock') as number;
-    const allyId = sim.addPlayer('warrior', 'Ally') as number;
-    sim.setPlayerLevel(12, lockId);
-    sim.setPlayerLevel(12, allyId);
-    expect(sim.applyTalents({ spec: null, rows: { 8: 'wlk_r8_voidfeast' } }, lockId)).toBe(true);
-    const lock = sim.entities.get(lockId) as Entity;
-    const ally = sim.entities.get(allyId) as Entity;
-    ally.pos = { ...lock.pos, x: lock.pos.x + 2 };
-    ally.prevPos = { ...ally.pos };
-    sim.rebucket(ally);
-    lock.resource = lock.maxResource;
-    applyResurrectionSickness(sim.ctx, ally);
-    const manaBefore = lock.resource;
-    sim.targetEntity(allyId, lockId);
-    sim.castAbility('voidfeast', lockId);
-    for (let i = 0; i < 15; i++) sim.tick();
-    expect(has(ally, RESURRECTION_SICKNESS_ID)).toBe(true);
-    expect(lock.resource).toBe(manaBefore);
-    expect(lock.cooldowns.has('voidfeast')).toBe(false);
-  });
-
-  it('still devours an ordinary debuff sitting under a sickness', () => {
-    const { sim, p } = rig('warlock', 'wlk_r8_voidfeast');
-    // Order matters: the dispel executor scans from the END of the aura array and
-    // stops at its `count`, so the sickness must be the FIRST candidate it meets.
-    // With the wail pushed last the test would pass with no fix at all.
-    p.auras.push(witheringWail(p.id));
-    sicken(sim, p, 'resurrection');
-    sim.targetEntity(p.id);
-    sim.castAbility('voidfeast');
-    for (let i = 0; i < 15; i++) sim.tick();
-    expect(has(p, 'test_withering_wail')).toBe(false);
-    expect(has(p, RESURRECTION_SICKNESS_ID)).toBe(true);
-  });
-});
+// The warlock devour (Voidfeast) was deliberately retired by the three-spec
+// overhaul (PR #2742: the row-8 option became Abyssal Gag / spell_lock, and
+// the def survives hidden for persisted action bars only); no warlock arm
+// exists for this invariant. Mage Spellsteal and Cold Coffin, covered below,
+// are the surviving dispel surfaces.
 
 // The arena/fiesta clean slate wipes every aura outright (readyArenaFighter), which
 // is deliberate: nobody should fight a normalized bout at a quarter of their stats.
 // But the wipe also meant one queue laundered the whole penalty, so the debt is now
 // stashed in preMatchPools and handed back on the way out (restoreArenaReturnPools).
 
-// Seat a real ranked bout, at a level where a sickness has a non-zero duration
-// (applySickness is a no-op below level 10, which is what makes the level matter here).
+// Seat a real ranked bout, at a level that clears both floors in play here:
+// applySickness is a no-op below level 10 (which is what makes the level matter
+// for this suite), and ranked queueing itself is gated at ARENA_MIN_LEVEL.
 function seatArenaBout(): { sim: AnySim; a: number; b: number } {
   const sim = new Sim({
     seed: 42,
@@ -276,7 +219,7 @@ function seatArenaBout(): { sim: AnySim; a: number; b: number } {
     [a, 0],
     [b, 6],
   ] as const) {
-    sim.setPlayerLevel(12, pid);
+    sim.setPlayerLevel(ARENA_MIN_LEVEL, pid);
     const e = sim.entities.get(pid) as Entity;
     e.pos.x = x;
     e.pos.z = -40;
@@ -342,36 +285,10 @@ describe('an arena bout is a parenthesis, not a way to shed a sickness', () => {
   });
 });
 
-describe('paladin Cleansing Verdict cannot purge a sickness', () => {
-  it.each(['resurrection', 'unstuck'] as const)(
-    'leaves %s sickness on the target and takes the debuff beneath it',
-    (which) => {
-      const { sim, p } = rig('paladin', 'pal_r8_cleansing_verdict');
-      // Wail FIRST, sickness second: Cleansing Verdict carries no requiresDispellable
-      // gate and dispels count 1 scanning from the end, so this ordering is what makes
-      // the case decisive. It must skip the sickness and take the wail underneath.
-      p.auras.push(witheringWail(p.id));
-      sicken(sim, p, which);
-      sim.targetEntity(p.id);
-      sim.castAbility('cleansing_verdict');
-      for (let i = 0; i < 15; i++) sim.tick();
-      expect(has(p, 'test_withering_wail')).toBe(false);
-      expect(has(p, idOf(which))).toBe(true);
-    },
-  );
-
-  it.each(['resurrection', 'unstuck'] as const)(
-    'finds nothing to purge when %s sickness is the only debuff',
-    (which) => {
-      const { sim, p } = rig('paladin', 'pal_r8_cleansing_verdict');
-      sicken(sim, p, which);
-      sim.targetEntity(p.id);
-      sim.castAbility('cleansing_verdict');
-      for (let i = 0; i < 15; i++) sim.tick();
-      expect(has(p, idOf(which))).toBe(true);
-    },
-  );
-});
+// The paladin purge (Cleansing Verdict) was deliberately removed by the
+// paladin overhaul (PR #2428: row 8 became the survival theme, and the ability
+// def was dropped in the same PR's cleanup commit); the class has no dispel
+// today, so no paladin arm exists for this invariant.
 
 describe('mage Cold Coffin (cleanseSelf) cannot strip a sickness', () => {
   it.each(['resurrection', 'unstuck'] as const)('leaves %s sickness on the caster', (which) => {

@@ -1,6 +1,6 @@
 {
   "name": "world-of-claudecraft",
-  "version": "0.35.1",
+  "version": "0.38.3",
   "private": true,
   "license": "MIT",
   "author": {
@@ -16,7 +16,7 @@
     "release:prepare": "node scripts/release_version.mjs prepare",
     "version:sync": "node scripts/version_sync.mjs",
     "version": "node scripts/version_sync.mjs && git add android/app/build.gradle ios/App/App.xcodeproj/project.pbxproj",
-    "build:bundle": "npm run sitemap:build && npm run sfx:manifest && node scripts/build_media_manifest.mjs generate && vite build && node scripts/check_backdrop_survival.mjs && node scripts/build_media_manifest.mjs emit",
+    "build:bundle": "node scripts/build_bundle_pregen.mjs && vite build && node scripts/check_backdrop_survival.mjs && node scripts/build_media_manifest.mjs emit",
     "build": "npm run i18n:gen && npm run wiki:content && npm run build:bundle",
     "wiki:content": "node scripts/wiki/build_content.mjs",
     "wiki:stills": "node scripts/wiki/render_model_stills.mjs",
@@ -41,7 +41,7 @@
     "lint:fix": "biome lint --write .",
     "check": "biome check .",
     "check:fix": "biome check --write .",
-    "ci:changed": "biome ci --changed --no-errors-on-unmatched",
+    "ci:changed": "node scripts/ci_changed.mjs",
     "check:admin": "svelte-check --tsconfig ./tsconfig.admin.json",
     "check:ts": "tsc --noEmit --incremental --tsBuildInfoFile node_modules/.cache/tsc/buildinfo.json",
     "check:ts:bot": "tsc -p tsconfig.bot.json",
@@ -73,6 +73,8 @@
     "feel:smoke": "node scripts/feel_smoke.mjs",
     "asset:budget": "node scripts/asset_budget.mjs",
     "assets:mapbg": "node scripts/build_map_backgrounds.mjs",
+    "assets:lastkeepmap": "node scripts/build_lastkeep_map.mjs",
+    "assets:dawnholdmap": "node scripts/build_dawnhold_map.mjs",
     "assets:items": "node scripts/convert_item_icons_webp.mjs",
     "assets:skills": "node scripts/convert_skill_icons_webp.mjs",
     "assets:chrome": "node scripts/convert_chrome_icons_webp.mjs",
@@ -85,7 +87,7 @@
     "perf:professions": "node scripts/load_professions.mjs",
     "audit:quests": "node scripts/quest_audit_graph.mjs",
     "audit:zone1": "npm run audit:quests",
-    "db:up": "docker compose up -d postgres",
+    "db:up": "docker compose up -d --wait postgres",
     "db:down": "docker compose down",
     "db:cleanup-zone1-removed": "tsx scripts/cleanup_removed_zone1_content.ts",
     "db:migrate-old-cragmaw-pelt": "tsx scripts/migrate_old_cragmaw_pelt.ts",
@@ -125,12 +127,12 @@
     "bs58": "^6.0.0",
     "electron-log": "^5.4.4",
     "electron-updater": "^6.8.9",
-    "n8ao": "^1.10.1",
+    "n8ao": "^2.0.0",
     "obscenity": "^0.4.6",
     "pg": "^8.21.0",
-    "postprocessing": "6.36.0",
+    "postprocessing": "6.39.4",
     "prom-client": "15.1.3",
-    "three": "^0.165.0",
+    "three": "0.185.1",
     "tweetnacl": "1.0.3",
     "ws": "^8.21.0"
   },
@@ -146,14 +148,14 @@
     "@testing-library/svelte": "^5.4.2",
     "@types/node": "^26.1.1",
     "@types/pg": "^8.20.0",
-    "@types/three": "^0.165.0",
+    "@types/three": "^0.185.4",
     "@types/ws": "^8.18.1",
     "@typescript/native": "npm:typescript@^7.0.2",
     "@vitest/browser": "4.1.10",
     "@vitest/browser-playwright": "4.1.10",
     "axe-core": "4.12.1",
-    "electron": "^43.0.0",
-    "electron-builder": "^26.15.6",
+    "electron": "^43.3.0",
+    "electron-builder": "^26.15.7",
     "esbuild": "^0.28.1",
     "ffmpeg-static": "^5.3.0",
     "ffprobe-static": "^3.1.0",
@@ -327,6 +329,9 @@
       "electron-winstaller",
       "fsevents",
       "@reown/appkit"
-    ]
+    ],
+    "patchedDependencies": {
+      "three@0.185.1": "patches/three@0.185.1.patch"
+    }
   }
 }

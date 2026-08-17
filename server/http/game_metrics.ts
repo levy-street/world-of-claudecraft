@@ -37,7 +37,7 @@
 // depends on either yet; they still must not be renamed apart later, and the
 // label reads against its metric, never across families.
 
-import { Counter, Gauge, type Registry } from 'prom-client';
+import { Counter, Gauge, Histogram, type Registry } from 'prom-client';
 import {
   BG_COMPOSITIONS,
   BG_END_CAUSES,
@@ -64,6 +64,10 @@ import {
 } from '../fishing_telemetry';
 import {
   type GameMetricsCounters,
+  GENERAL_CHAT_QUOTA_DB_OUTCOMES,
+  GENERAL_CHAT_QUOTA_OUTCOMES,
+  type GeneralChatQuotaDbOutcome,
+  type GeneralChatQuotaOutcome,
   GUILD_BANK_INCIDENTS,
   type GuildBankIncident,
   WS_DROP_CAUSES,
@@ -109,11 +113,26 @@ export const WOC_INPUT_FRAMES_MISSED_TOTAL = 'woc_input_frames_missed_total';
 /** Total player chat messages routed to other players (any channel). */
 export const WOC_CHAT_MESSAGES_TOTAL = 'woc_chat_messages_total';
 
+/** Configured General quota decisions, labeled by bounded outcome. */
+export const WOC_GENERAL_CHAT_QUOTA_TOTAL = 'woc_general_chat_quota_total';
+
+/** Current General quota database calls in flight in this realm process. */
+export const WOC_GENERAL_CHAT_QUOTA_IN_FLIGHT = 'woc_general_chat_quota_in_flight';
+export const WOC_GENERAL_CHAT_QUOTA_DB_CALLS_TOTAL = 'woc_general_chat_quota_db_calls_total';
+export const WOC_GENERAL_CHAT_QUOTA_DB_DURATION_SECONDS =
+  'woc_general_chat_quota_db_duration_seconds';
+export const WOC_GENERAL_CHAT_QUOTA_DB_POOL = 'woc_general_chat_quota_db_pool';
+export const WOC_GENERAL_CHAT_QUOTA_LISTENER = 'woc_general_chat_quota_listener';
+export const WOC_GENERAL_CHAT_QUOTA_CACHE_ACCOUNTS = 'woc_general_chat_quota_cache_accounts';
+
 /** Total characters successfully created. */
 export const WOC_CHARACTERS_CREATED_TOTAL = 'woc_characters_created_total';
 
 /** Total guild-bank incidents on the dupe-sensitive paths, by kind. */
 export const WOC_GUILD_BANK_INCIDENTS_TOTAL = 'woc_guild_bank_incidents_total';
+
+/** Rift forge wire commands refused while the gate is closed (server/rift_forge_gate.ts). */
+export const WOC_RIFT_FORGE_REFUSED_TOTAL = 'woc_rift_forge_refused_total';
 
 /** Guild bank activity log cache readout, labeled by counter name. ONE metric
  *  with a `kind` label rather than six names: the vocabulary is closed and
@@ -225,6 +244,10 @@ export interface GameStateSource {
   tickPhaseMillis(): Record<string, TickPhaseMillis>;
   /** pg pool saturation snapshot (pg Pool totalCount/idleCount/waitingCount). */
   dbPool(): { total: number; idle: number; waiting: number };
+  generalChatQuotaDbPool(): { total: number; idle: number; waiting: number };
+  generalChatQuotaInFlight(): number;
+  generalChatQuotaCachedAccounts(): number;
+  generalChatQuotaListener(): { connected: number; reconnects: number; pendingRefreshes: number };
   /**
    * Wall clock (epoch millis) of the last COMPLETED tick pass, null during warmup.
    * This one is NOT a Prometheus gauge (loop rate is already covered by
@@ -379,10 +402,84 @@ export function registerGameStateMetrics(
     registers: [registry],
   });
 
+  const riftForgeRefusals = new Counter({
+    name: WOC_RIFT_FORGE_REFUSED_TOTAL,
+    help: 'Total rift forge wire commands refused while the gate is closed; the stock client sends none, so a non-zero rate means a modified client is probing.',
+    registers: [registry],
+  });
+
   const chatMessages = new Counter({
     name: WOC_CHAT_MESSAGES_TOTAL,
     help: 'Total player chat messages routed to other players (any channel).',
     registers: [registry],
+  });
+
+  const generalChatQuota = new Counter({
+    name: WOC_GENERAL_CHAT_QUOTA_TOTAL,
+    help: 'Configured General chat quota decisions by bounded outcome.',
+    labelNames: ['outcome'],
+    registers: [registry],
+  });
+  for (const outcome of GENERAL_CHAT_QUOTA_OUTCOMES) generalChatQuota.inc({ outcome }, 0);
+
+  const generalChatQuotaDbCalls = new Counter({
+    name: WOC_GENERAL_CHAT_QUOTA_DB_CALLS_TOTAL,
+    help: 'Dedicated General quota database calls by bounded outcome.',
+    labelNames: ['outcome'],
+    registers: [registry],
+  });
+  const generalChatQuotaDbDuration = new Histogram({
+    name: WOC_GENERAL_CHAT_QUOTA_DB_DURATION_SECONDS,
+    help: 'End-to-end dedicated General quota database call duration.',
+    labelNames: ['outcome'],
+    buckets: [0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 1.5],
+    registers: [registry],
+  });
+  for (const outcome of GENERAL_CHAT_QUOTA_DB_OUTCOMES) {
+    generalChatQuotaDbCalls.inc({ outcome }, 0);
+    // Pre-seed the histogram series too, so the first post-boot scrape has it.
+    generalChatQuotaDbDuration.zero({ outcome });
+  }
+
+  new Gauge({
+    name: WOC_GENERAL_CHAT_QUOTA_IN_FLIGHT,
+    help: 'Current General chat quota database calls in flight in this realm process.',
+    registers: [registry],
+    collect() {
+      this.set(source.generalChatQuotaInFlight());
+    },
+  });
+  new Gauge({
+    name: WOC_GENERAL_CHAT_QUOTA_DB_POOL,
+    help: 'Dedicated General quota pool clients by fixed state.',
+    labelNames: ['state'],
+    registers: [registry],
+    collect() {
+      const state = source.generalChatQuotaDbPool();
+      this.set({ state: 'total' }, state.total);
+      this.set({ state: 'idle' }, state.idle);
+      this.set({ state: 'waiting' }, state.waiting);
+    },
+  });
+  new Gauge({
+    name: WOC_GENERAL_CHAT_QUOTA_LISTENER,
+    help: 'General quota policy listener state by fixed measure.',
+    labelNames: ['measure'],
+    registers: [registry],
+    collect() {
+      const state = source.generalChatQuotaListener();
+      this.set({ measure: 'connected' }, state.connected);
+      this.set({ measure: 'reconnects' }, state.reconnects);
+      this.set({ measure: 'pending_refreshes' }, state.pendingRefreshes);
+    },
+  });
+  new Gauge({
+    name: WOC_GENERAL_CHAT_QUOTA_CACHE_ACCOUNTS,
+    help: 'Accounts retained in the bounded local General quota refusal/notice cache.',
+    registers: [registry],
+    collect() {
+      this.set(source.generalChatQuotaCachedAccounts());
+    },
   });
 
   const charactersCreated = new Counter({
@@ -573,9 +670,35 @@ export function registerGameStateMetrics(
         // Drop the sample rather than propagate into the input path.
       }
     },
+    riftForgeRefused(): void {
+      try {
+        riftForgeRefusals.inc();
+      } catch {
+        // Drop the sample rather than propagate into the dispatch path.
+      }
+    },
     chatMessage(): void {
       try {
         chatMessages.inc();
+      } catch {
+        // Drop the sample rather than propagate into the chat path.
+      }
+    },
+    generalChatQuota(outcome: GeneralChatQuotaOutcome): void {
+      try {
+        if (!GENERAL_CHAT_QUOTA_OUTCOMES.includes(outcome)) return;
+        generalChatQuota.inc({ outcome });
+      } catch {
+        // Drop the sample rather than propagate into the chat path.
+      }
+    },
+    generalChatQuotaDbCall(outcome: GeneralChatQuotaDbOutcome, durationSeconds: number): void {
+      try {
+        if (!GENERAL_CHAT_QUOTA_DB_OUTCOMES.includes(outcome)) return;
+        generalChatQuotaDbCalls.inc({ outcome });
+        if (Number.isFinite(durationSeconds) && durationSeconds >= 0) {
+          generalChatQuotaDbDuration.observe({ outcome }, durationSeconds);
+        }
       } catch {
         // Drop the sample rather than propagate into the chat path.
       }

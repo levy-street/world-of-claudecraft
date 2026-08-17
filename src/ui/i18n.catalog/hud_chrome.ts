@@ -10,6 +10,33 @@
 import { armoryCollectionStrings, armorySkinStrings } from './armory';
 
 export const hudChromeStrings = {
+  warlock: {
+    doomLabel: 'Condemnation',
+    fateThreadsLabel: 'Fate Threads',
+    doomMeterUnlock: 'Move Affliction resource bar',
+    doomMeterLock: 'Lock Affliction resource bar',
+    doomEmptyStatus: '{value} of {max} Condemnation.',
+    doomStatus: '{value} of {max} Condemnation; {remaining}.',
+    fateThreadsStatus: '{value} of {max} Fate Threads.',
+    fateThreadsConsumeReady:
+      'Three Fate Threads: Consume can weave them into additional Condemnation.',
+    fateThreadsSentenceReady:
+      'Three Fate Threads: Sentence can consume them for 18% increased damage.',
+  },
+  procOverlay: {
+    soulFragmentsMeter: 'Soul Fragments',
+    ruinMeter: 'Wrack',
+    ruinStatus: '{value} of {max} Wrack',
+  },
+  // Combo Points meter (#combo-row): the 0-5 pip row next to the player frame
+  // for the energy-resource classes. Kept NON-WORDY (no run of four-plus
+  // lowercase after stripping {tokens}) so an English-filled non-Latin locale
+  // does not trip the M16 untranslated-leak guard, the same convention as
+  // unitFrame below. The live "N of max" valuetext reuses the generic
+  // auraEffect.resourceCount status pattern rather than a second wordy key.
+  comboMeter: {
+    label: 'CP',
+  },
   spectate: {
     banner: 'Spectating {name}',
   },
@@ -37,6 +64,16 @@ export const hudChromeStrings = {
       "The Pale Keeper will revive you here, but the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to your corpse revives you with no penalty.",
     healerConfirmAccept: 'Revive Me',
     healerConfirmCancel: 'Cancel',
+  },
+  // Wiki launcher (#mm-wiki, the Esc-menu row, the mobile More tray). The
+  // button label reuses nav.wiki; these are the confirm dialog's strings
+  // (confirm-first so a mid-fight tap never opens the browser by accident).
+  wiki: {
+    confirmTitle: 'Open the Wiki?',
+    confirmBody:
+      'This opens the World of ClaudeCraft wiki in your browser. The game keeps running.',
+    confirmOpen: 'Open Wiki',
+    confirmCancel: 'Cancel',
   },
   // Countdown-to-graveyard recovery. Stable event phases/reasons come from the
   // authoritative sim; new semantics use new keys so stale safe-spot translations
@@ -93,7 +130,7 @@ export const hudChromeStrings = {
   },
   // Floating combat text self-notes (proc consume labels, absorb readout).
   fct: {
-    absorbed: 'Absorbed {amount}',
+    absorbed: 'Absorbed ({amount})',
     cheap: 'Cheap!',
   },
   // Overhead emote display names (wheel tooltips/labels, editor items, overhead
@@ -371,6 +408,12 @@ export const hudChromeStrings = {
     resetAction: 'Reset',
     note: 'Drag the chat tab strip to move the window, or the corner grip to resize it. Reset returns it to the default position and size.',
   },
+  chatQuota: {
+    // {seconds} is an already-localized duration phrase, for example "3 seconds".
+    limitReached: 'General chat limit reached. Try again in {seconds}.',
+    pending: 'Your previous General chat message is still sending. Try again in a moment.',
+    unavailable: 'General chat is temporarily unavailable. Try again shortly.',
+  },
   swing: {
     ready: 'Swing',
     seconds: '{seconds}s',
@@ -382,6 +425,14 @@ export const hudChromeStrings = {
   },
   rest: {
     resting: 'Resting',
+  },
+  paladin: {
+    devotion: 'Devotion',
+    devotionValue: 'Devotion {value} of {max}',
+    devotionAscensionCharges: 'Devotion {value} of {max}. Ascension {charges} charges.',
+    devotionAscensionLast: 'Devotion {value} of {max}. Ascension final charge.',
+    ascensionLastAnnouncement: 'Ascension final charge',
+    ascensionSpenderAria: 'Action slot {slot}: {ability}. Consumes one Ascension charge.',
   },
   // The Spell Power / Attack Power contribution appended to an ability tooltip's
   // base damage, e.g. "66 to 74 (+29)". Punctuation + a formatted number only (no
@@ -480,6 +531,7 @@ export const hudChromeStrings = {
     deeds: 'Deeds',
     mounts: 'Mounts',
     professions: 'Professions',
+    reliquary: 'Reliquary',
     nameplates: 'Names',
     haptics: 'Haptics',
     hapticsOff: 'Haptics Off',
@@ -589,6 +641,22 @@ export const hudChromeStrings = {
     notNow: 'Not now',
     update: 'Update',
   },
+  // The visible OTA gate (src/ui/ota_update_overlay.ts + net/ota_update_gate):
+  // in-app bundle downloads, distinct from the store-update prompt above.
+  otaUpdate: {
+    title: 'Game Update',
+    downloading: 'Downloading update: {percent}',
+    applying: 'Update downloaded. Restarting the game to apply it.',
+    incompatible:
+      'An update is required to play. It will be applied as soon as it finishes downloading.',
+    // RETIRED from the overlay (the OTA dialog is deliberately
+    // non-dismissable) but kept on purpose: deleting an English leaf whose
+    // translations are already filled would force edits across every
+    // i18n.locales overlay, which contributors must never touch. Do not
+    // "clean this up"; the maintainer prunes retired keys at release.
+    continueAnyway: 'Continue without updating',
+    progressLabel: 'Update download progress',
+  },
   // First-run camera-mode prompt (issue #1727): a one-shot modal on the first world
   // entry in a browser, offering Classic vs Mouse Camera. The mouse option title
   // reuses hud.options.mouseCamera; these are the surrounding strings. The setting
@@ -667,6 +735,29 @@ export const hudChromeStrings = {
     closesIn: 'Closes in {time}',
     clockMs: '{minutes}:{seconds}',
     clockHms: '{hours}:{minutes}:{seconds}',
+  },
+  // The Last Keep interior map (the castle floor plan the minimap / world map
+  // show inside the instance). The title composes the localized dungeon name
+  // (entities.dungeons.the_last_keep.name, via dungeonDisplayName) with the
+  // story the player currently stands on.
+  lastkeepMap: {
+    title: '{keep}: {story}',
+    story: {
+      undercroft: 'The Undercroft',
+      state: 'The State Floor',
+      residence: 'The Residence',
+      tower: 'The Watch Tower',
+    },
+  },
+  // Dawnhold Castle interior map (the Evergarden garden palace), same shape:
+  // the title composes the localized dungeon name
+  // (entities.dungeons.dawnhold_castle.name) with the current story.
+  dawnholdMap: {
+    title: '{keep}: {story}',
+    story: {
+      ground: 'The Garden Floor',
+      solar: 'The Solar',
+    },
   },
   // Eight-point compass abbreviations as drawn on the heading strip. Each locale
   // overrides with its own established compass abbreviations (e.g. West = "O" in
@@ -749,6 +840,11 @@ export const hudChromeStrings = {
     emoteWheel: 'Emote Wheel',
     targetFriendly: 'Target Nearest Friendly',
     targetFriendlyNext: 'Cycle Friendly Target',
+    // The backward half of the Tab cycle (Shift+Tab by default); the forward
+    // half is the `hud` catalog's existing `target` row. Worded as a CYCLE, not
+    // as "previous enemy", so it cannot read as a classic last-target memory:
+    // this bind walks the same ordered list backwards, it remembers nothing.
+    targetPrev: 'Cycle Target Backward',
     // Discord is a brand name; it stays identical across locales.
     discord: 'Discord',
     valecup: 'Vale Cup',
@@ -901,7 +997,7 @@ export const hudChromeStrings = {
       'Two ruined keeps face each other across a walled hollow in the shadow of Thornpeak: Crimson to the south, Azure to the north, and the older Ruin Courtyard between them that neither has ever held. Five a side, one banner each, and the first to carry three of theirs home takes the field.',
     modeTag: '5v5 Capture the Flag',
     offlineNote: 'Thornhollow Fields is syncing. The queue opens once the realm answers.',
-    ratingSummary: 'Rating. {wins} wins / {losses} losses',
+    ratingSummary: 'Rating. {wins} wins / {losses} losses / {draws} draws',
     careerCaptures: 'Career captures: {count}',
     enterQueue: 'Enter the Queue',
     enterQueueParty: 'Enter the Queue (party of {count})',
@@ -1264,6 +1360,23 @@ export const hudChromeStrings = {
       'Keeps the mouse cursor inside the window while you drag to rotate the camera, so it cannot reach the screen edge or move to another monitor. Turn off if you prefer a free cursor.',
     showWalletOnCharacterScreen: 'Show Wallet on Character Screen',
     showWalletOnPlayerCard: 'Show Wallet on Player Card',
+    // Interface panel twin of the character sheet's privacy eye: the same
+    // per-device settings.showPlaytime preference, discoverable from Options.
+    showPlaytime: 'Show Time Played on Character Screen',
+    // Desktop-app only Interface row (the row renders only when the installed
+    // shell exposes the GPU preference over the bridge). The stored shell field
+    // is the inverse opt-out; the note carries the next-launch caveat, because
+    // the shell picks its adapter at startup and cannot switch a live session
+    // (both values are wordy, M16: the five non-Latin fills land in this same
+    // change).
+    forceHighPerfGpu: 'Use the Dedicated Gaming GPU',
+    forceHighPerfGpuNote:
+      'On by default: the desktop app asks this computer for its dedicated gaming GPU. Turn this off if the game will not start, opens to a black screen, or the laptop display goes blank. Takes effect the next time the game starts.',
+    // Interface panel toggle: publish the current zone to Discord as an
+    // activity (desktop app only, on by default).
+    discordPresence: 'Discord Rich Presence',
+    discordPresenceNote:
+      'Shows the zone you are in and how long you have been playing this session as your Discord activity, and anyone who can see your Discord profile can see both. Only the zone name, your session time, and the game are shared, never your character, your account, or who you are playing with. Needs the Discord app running on this computer.',
     // Interface panel toggle: nameplate glyph/outline, inspect block, player
     // card, and the Developers leaderboard tab (on by default).
     showDevBadges: 'Show Developer Badges',
@@ -1404,7 +1517,8 @@ export const hudChromeStrings = {
   // Performance overlay (the customizable in-game stats panel + its Options
   // sub-view). Player-facing, so every label is a key here; the live numbers in
   // the overlay run through formatNumber and these unit strings. Distinct from
-  // the dev `?perf` diagnostic, which stays English like console.*.
+  // the older dev `?perf` trace output, which stays English like console.*. The real-DOM
+  // `?diagnostics=1` panel below is localized because its chrome is user-visible.
   perf: {
     title: 'Performance Overlay',
     enable: 'Show Performance Overlay',
@@ -1481,6 +1595,193 @@ export const hudChromeStrings = {
     badges: {
       backgrounded: 'Backgrounded',
       offline: 'Offline',
+    },
+    diagnostics: {
+      panelAria: 'World of ClaudeCraft performance diagnostics',
+      title: 'ClaudeCraft Performance Doctor',
+      subtitle: 'A game-specific scan with evidence and code-level fixes.',
+      aria: {
+        liveMeasurements: 'Live performance measurements',
+        scanProgress: 'Diagnostic scan progress',
+        findings: 'Ranked diagnostic findings',
+      },
+      controls: {
+        minimize: 'Minimize',
+        expand: 'Expand',
+        start: 'Start 15-second scan',
+        refreshCensus: 'Refresh scene census',
+        copyReport: 'Copy clear report',
+        downloadReport: 'Download report',
+        scanning: 'Scanning...',
+        scanAnother: 'Scan another area',
+        reportLogged: 'Report logged to console',
+        copied: 'Copied',
+        copyBlocked: 'Copy blocked: report logged',
+        retestLowGraphics: 'Retest on Low graphics',
+      },
+      instruction:
+        'For the best signal, enter Play Offline, move through the slow area, rotate the camera, and trigger the effect that stutters while the scan is running.',
+      status: {
+        pausedHiddenRestart:
+          'Scan paused while this tab is hidden. It will restart when you return.',
+        restoredRestart: 'Tab restored. Restarting a clean 15-second active-gameplay capture.',
+        worldLoaded: 'World loaded. Waiting for the first playable frame.',
+        pausedHiddenContinue:
+          'Scan paused while this tab is hidden. Return to the game to continue.',
+        collectingRemaining: {
+          one: 'Collecting active gameplay: {seconds} second remaining',
+          other: 'Collecting active gameplay: {seconds} seconds remaining',
+        },
+        waitingFrames: 'Waiting for representative gameplay frames: {current}/{minimum}',
+        collectingNow: 'Collecting active gameplay: move through the problem area now.',
+        ready: 'Ready to scan. Press Start and reproduce the slowdown.',
+        waitingWorld:
+          'Waiting for the game world. Choose Play Offline or enter an online character.',
+      },
+      metrics: {
+        waitingRenderer: 'renderer: waiting',
+        waitingCensus: 'scene census: waiting',
+        waitingHitch: 'hitch attribution: armed on world entry',
+        recent: 'recent  {fps} FPS | p95 {p95} ms | >50 ms {longFrames}',
+        render: 'render  submit {submit} ms | world {world} ms | entities {entities} ms',
+        scene: 'scene   {calls} calls | {triangles} tris | {views} views',
+        hitches: 'hitches {hitches} | shaders {shaders} | uploads {uploads} | views {views}',
+        gpu: 'GPU     {renderer}',
+        waitingValue: 'waiting',
+      },
+      scoreHeadline: '{score}/100: {headline}',
+      healthyNoFindings:
+        'No actionable threshold fired. If a short hitch still bothers you, rerun the scan along the exact movement path that triggers it.',
+      findingMeta: '{severity} | {confidence} confidence',
+      sections: {
+        evidence: 'Evidence',
+        tryNow: 'Try now',
+        codeFix: 'Code fix',
+        source: 'Relevant source',
+      },
+      severity: {
+        critical: 'CRITICAL',
+        warning: 'WARNING',
+        info: 'INFO',
+      },
+      confidence: {
+        high: 'high',
+        medium: 'medium',
+        low: 'low',
+      },
+      diagnosis: {
+        noProblemTitle: 'No material performance problem detected',
+        summary: {
+          findings: {
+            one: '{findings} actionable finding from the last 10 seconds at {fps} FPS and {p95} frame p95.',
+            other:
+              '{findings} actionable findings from the last 10 seconds at {fps} FPS and {p95} frame p95.',
+          },
+          healthy:
+            'The last 10 seconds held {fps} FPS with a {p95} frame p95. No game, browser, GPU, memory, asset, or network threshold fired.',
+        },
+        titles: {
+          hardwareAcceleration: 'Software rendering is active',
+          integratedGpu: 'The game is using the integrated GPU',
+          highDpi: 'High resolution rendering is expensive here',
+          forcedHighGraphics: 'Forced high graphics is reducing performance',
+          lowMemory: 'Available device memory is low',
+          browserStalls: 'Browser or extension stalls were detected',
+          heapPressure: 'Browser memory pressure was detected',
+          contextLoss: 'The graphics context was reset',
+          gpuSubmit: 'GPU submission is the main frame bottleneck',
+          sceneDraw: 'Scene draw cost exceeds the active graphics budget',
+          shadowPass: 'The shadow pass uses a large share of draw calls',
+          rendererWorld: 'World renderer updates are CPU-bound',
+          rendererEntities: 'Entity view updates are CPU-bound',
+          rendererNameplates: 'Nameplate painting is expensive',
+          simCpu: 'Simulation work is consuming the frame',
+          hudCpu: 'HUD updates are consuming the frame',
+          eventCpu: 'Event processing is consuming the frame',
+          shaderCompile: 'Shaders are compiling during gameplay',
+          textureUpload: 'Texture uploads are causing gameplay hitches',
+          viewCreate: 'Entity view creation is causing hitches',
+          otherHitch: 'Unattributed long frames remain',
+          assetStartup: 'Game startup is delayed by asset work',
+          longTasks: 'Long browser tasks are blocking frames',
+          networkLatency: 'Network delivery is delaying visible response',
+          snapshotApply: 'Snapshot processing is blocking the client',
+          generic: 'Performance rule {rule} needs attention',
+        },
+        causes: {
+          environment:
+            'A detected browser, GPU, memory, or device setting can limit performance before the game renders a frame.',
+          graphics:
+            'Measured graphics work is above the active frame or scene budget for this capture.',
+          cpu: 'A measured CPU phase is taking enough main-thread time to miss the frame budget.',
+          loading:
+            'Resource preparation or first-use work happened on a visible gameplay or startup path.',
+          network:
+            'Network delivery or client snapshot processing is delaying the latest playable state.',
+        },
+        evidence: {
+          environment: 'The environment rule {rule} matched this device and browser.',
+          gpuSubmit: 'WebGL submission p95 is {submit}, or {share} of renderer p95.',
+          frame: 'The recent window measured {fps} FPS with a {p95} frame p95.',
+          sceneCalls: 'The scene uses {calls} draw calls against a target of {target}.',
+          sceneTriangles: 'The scene submits {triangles} triangles against a target of {target}.',
+          sceneCategory:
+            'Scene category {category} contributes {calls} calls and {triangles} measured triangles.',
+          censusNeeded: 'Refresh the scene census to identify the leading render category.',
+          shadow:
+            'The shadow pass submits {calls} calls, {share} of the baseline, and {triangles} triangles.',
+          cpuPhase: 'Measured phase {phase} has a p95 of {p95}.',
+          hitch: '{count} of {total} recorded hitches matched cause {cause}.',
+          assets: 'The preload gate waited {wait} for {tasks} registered tasks.',
+          failedAssets: 'Failed asset groups: {groups}.',
+          longTasks: '{count} long tasks were measured, with p95 {p95} and maximum {max}.',
+          network:
+            'Snapshot interval is {interval}, latest age is {age}, and input echo p95 is {echo}.',
+          snapshot: 'Snapshot parse and apply p95 is {work}; network gap p95 is {gap}.',
+          generic: 'Diagnostic rule {rule} matched this capture.',
+        },
+        tryNow: {
+          environment:
+            'Correct the detected environment setting, restart, and repeat the same scan.',
+          graphics: 'Retest the same camera path on Low graphics to confirm graphics pressure.',
+          cpu: 'Repeat the scan while idle and while moving to isolate the CPU phase.',
+          loading: 'Repeat the same route or first-use action to confirm when the hitch occurs.',
+          network: 'Compare Play Offline with the same movement and camera path.',
+        },
+        codeFix: {
+          environment:
+            'Keep the detected fallback path within the shared graphics and memory budgets.',
+          graphics:
+            'Use the existing render budget, instancing, material sharing, LOD, and hidden-work skips.',
+          cpu: 'Profile the named phase, remove repeated work and allocations, and preserve gameplay behavior.',
+          loading:
+            'Preload, pool, or spread the identified first-use work through the existing startup and streaming budgets.',
+          network:
+            'Reduce delivery or snapshot processing cost without weakening the authoritative server model.',
+        },
+      },
+      report: {
+        title: 'World of ClaudeCraft performance diagnosis',
+        statusLine: 'Status: {status} ({score}/100)',
+        capturedLine: 'Captured: {captured}',
+        topFindingLine: 'Top finding: {finding}',
+        summaryLine: 'Summary: {summary}',
+        gpuLine: 'GPU: {gpu}',
+        graphicsLine: 'Graphics: {tier}, render scale {scale}',
+        recentLine:
+          'Recent: {fps} FPS, p95 {p95}, {longFrames} frames over 50 ms, {frames} measured frames',
+        resultHeading: 'Result',
+        noThreshold: 'No actionable threshold fired in this capture.',
+        findingHeading: '{index}. {title}',
+        findingMeta: 'Severity: {severity}. Confidence: {confidence}.',
+        rawSnapshotHeading: 'Raw snapshot',
+        notAvailable: 'not available',
+        status: {
+          critical: 'critical',
+          needsAttention: 'needs attention',
+          healthy: 'healthy',
+        },
+      },
     },
   },
   auraOverlay: {
@@ -1560,6 +1861,9 @@ export const hudChromeStrings = {
     notEnoughHonor: 'Not enough Honor.',
     reasons: {
       arenaWin: 'Arena victory',
+      // Paid for a ranked loss and for a draw alike, so the line names the bout
+      // rather than the result (the same reading as battlegroundComplete below).
+      arenaComplete: 'Arena bout fought',
       fiestaKill: 'Fiesta takedown',
       fiestaComplete: 'Fiesta completed',
       fiestaWin: 'Fiesta victory',
@@ -1610,6 +1914,19 @@ export const hudChromeStrings = {
   charSheet: {
     offense: 'Offense',
     defense: 'Defense',
+    // The lifetime "Time Played" line at the foot of the sheet (the same
+    // running total the /playtime chat command reports). The value composes
+    // the two coarsest units from the plurals.playtime* fragments through
+    // playtimeParts ({major}/{minor} arrive pre-localized), so a locale can
+    // reorder or drop the separator.
+    playtimeLabel: 'Time Played',
+    playtimeParts: '{major}, {minor}',
+    playtimeUnderMinute: 'Less than a minute',
+    // Shown in place of the value while the eye toggle conceals it
+    // (screenshot/stream privacy; the total keeps accruing).
+    playtimeHidden: 'Hidden',
+    showPlaytimeAria: 'Show time played',
+    hidePlaytimeAria: 'Hide time played',
   },
   // Character-screen stat tooltips (hover a stat on the C panel). The stat NAMES
   // reuse itemUi.stats.*; only these descriptions / effect lines / notes are new.
@@ -1637,7 +1954,7 @@ export const hudChromeStrings = {
       agi: 'Sharpens your reflexes and aim, improving several of your combat stats.',
       sta: 'Toughens your body, raising your maximum health and how quickly you recover health while resting.',
       int: "Expands a spellcaster's mana pool and improves their chance to land a spell critical strike.",
-      spi: "Quickens how fast a spellcaster's mana returns while resting, out of combat.",
+      spi: "Quickens how fast a spellcaster's mana returns. Most of it flows while resting, out of combat, and a portion keeps returning even in combat.",
       armor:
         'Softens incoming physical blows. The reduction is greater against lower-level attackers and is capped at 75%.',
       attackPower: 'Powers your weapon attacks. Every 14 attack power adds 1 damage per second.',
@@ -1669,6 +1986,7 @@ export const hudChromeStrings = {
       spellCritPct: '+{value}% Spell Critical Strike',
       healthRegen: 'About {value} health every 5 sec while resting',
       manaRegen: 'About {value} mana every 5 sec while resting',
+      manaRegenCombat: 'About {value} mana every 5 sec in combat',
       damageReduction: 'Damage reduction against a level {level} attacker: {value}%',
       dpsFromAp: 'Adds {value} damage per second to your attacks',
     },
@@ -1695,6 +2013,14 @@ export const hudChromeStrings = {
   // Default name pre-filled into the Save-Build-As dialog, e.g. "Build 3".
   talents: {
     defaultBuildName: 'Build {n}',
+    // The gear-capturing save entry, beside the plain one in the loadout menu.
+    newBuildWithGear: 'New Build (save gear too)',
+    // Applying a loadout that captured gear. Counts come from the text-free
+    // loadoutGearResult event, so the sim carries none of this copy.
+    gearRestored: 'Restored {n} gear pieces from this build.',
+    gearNotHeld: "You no longer have {n} of this build's saved pieces.",
+    gearCopyGone: '{n} saved pieces were not the copy this build pinned.',
+    gearTakenByOtherSlot: '{n} saved pieces need another copy you do not have.',
   },
   // One-off chat-log tips shown at HUD bootstrap. The /join command tokens stay
   // literal (they are commands); the surrounding prose localizes.
@@ -1708,6 +2034,11 @@ export const hudChromeStrings = {
   // (content/heroic_variants.ts), e.g. "Epic Armor [HEROIC]". The variant shares the
   // base item's name; this tag is the only heroic marker, shown in gold.
   itemHeroicTag: '[HEROIC]',
+  // The bare "Heroic" word as a STANDALONE accessible name (no brackets): the
+  // market Browse row's heroic star uses it for its aria-label, where the
+  // bracketed tag above is tooltip-line chrome, not a label a screen reader
+  // should read as "left-bracket HEROIC right-bracket".
+  itemHeroicLabel: 'Heroic',
   // Tooltip marker for a soulbound item (bound to its owner: cannot be traded, mailed,
   // listed, sold, or destroyed). Currency-like reward tokens (Heroic Marks) carry this.
   itemSoulbound: 'Soulbound',
@@ -1780,6 +2111,26 @@ export const hudChromeStrings = {
       many: '{count} seconds remaining',
       other: '{count} seconds remaining',
     },
+    // Unit fragments for the character sheet's Time Played line ({count} is
+    // pre-formatted through formatNumber at the call site).
+    playtimeDays: {
+      one: '{count} day',
+      few: '{count} days',
+      many: '{count} days',
+      other: '{count} days',
+    },
+    playtimeHours: {
+      one: '{count} hour',
+      few: '{count} hours',
+      many: '{count} hours',
+      other: '{count} hours',
+    },
+    playtimeMinutes: {
+      one: '{count} minute',
+      few: '{count} minutes',
+      many: '{count} minutes',
+      other: '{count} minutes',
+    },
     playersOnline: {
       one: 'Who: {count} player online on {realm}.',
       few: 'Who: {count} players online on {realm}.',
@@ -1791,6 +2142,68 @@ export const hudChromeStrings = {
       few: 'Who: {count} players matching "{query}" on {realm}.',
       many: 'Who: {count} players matching "{query}" on {realm}.',
       other: 'Who: {count} players matching "{query}" on {realm}.',
+    },
+    // The on-join back-credit pass, one line for the whole seed rather than a
+    // toast per relic or per deed. The reliquary and deeds summaries are
+    // siblings and always move together; both went CLDR here so count 1 reads
+    // "1 relic" / "1 deed" instead of the old hardcoded plural.
+    reliquaryRetroSummary: {
+      one: 'Your reliquary catches up: {count} relic catalogued.',
+      few: 'Your reliquary catches up: {count} relics catalogued.',
+      many: 'Your reliquary catches up: {count} relics catalogued.',
+      other: 'Your reliquary catches up: {count} relics catalogued.',
+    },
+    // Reliquary search / filter result count, announced through the window's
+    // SR-only live region (the narrowed list itself is a silent paragraph swap).
+    // Count-neutral on purpose: this one line serves the page grid (relics), the
+    // shelf list (pages), and Overview (recent finds plus nearly-complete rows),
+    // so naming any single noun would be wrong on two of the three surfaces.
+    reliquarySearchResults: {
+      one: '{count} result.',
+      few: '{count} results.',
+      many: '{count} results.',
+      other: '{count} results.',
+    },
+    // How many relics a nearly-complete page still wants. Count-neutral in
+    // English (the row already names the page and shows the pair), but CLDR so
+    // a locale that inflects the noun can say it properly.
+    reliquaryToGo: {
+      one: '{count} to go',
+      few: '{count} to go',
+      many: '{count} to go',
+      other: '{count} to go',
+    },
+    // How many times an owned relic has been taken from the world, on its own
+    // tooltip line and folded into the cell's aria label. English really does
+    // inflect here ("1 time" / "2 times"), unlike the count-neutral pair above.
+    // The two aria bases spell the WHOLE sentence rather than stitching the
+    // tooltip line onto a label fragment: clause order and the punctuation
+    // between clauses are the translator's to choose. Their clear number rides
+    // a separate {clears} slot because tPlural owns {count} and selects on it,
+    // and the number whose noun inflects is the obtain count, not the clear.
+    reliquaryObtainedTimes: {
+      one: 'Obtained {count} time',
+      few: 'Obtained {count} times',
+      many: 'Obtained {count} times',
+      other: 'Obtained {count} times',
+    },
+    reliquaryCellOwnedObtainedAria: {
+      one: '{name}, catalogued, obtained {count} time',
+      few: '{name}, catalogued, obtained {count} times',
+      many: '{name}, catalogued, obtained {count} times',
+      other: '{name}, catalogued, obtained {count} times',
+    },
+    reliquaryCellOwnedClearsObtainedAria: {
+      one: '{name}, catalogued, first found on clear {clears}, obtained {count} time',
+      few: '{name}, catalogued, first found on clear {clears}, obtained {count} times',
+      many: '{name}, catalogued, first found on clear {clears}, obtained {count} times',
+      other: '{name}, catalogued, first found on clear {clears}, obtained {count} times',
+    },
+    deedsRetroSummary: {
+      one: 'Your chronicle catches up: {count} deed recorded.',
+      few: 'Your chronicle catches up: {count} deeds recorded.',
+      many: 'Your chronicle catches up: {count} deeds recorded.',
+      other: 'Your chronicle catches up: {count} deeds recorded.',
     },
   },
   // "Report a Bug" options sub-view (online only). Captures realm/character/
@@ -2148,6 +2561,15 @@ export const hudChromeStrings = {
     // that the rim/wash/seal show sighted players. Purpose class, not a quality
     // tier; whole sentence in one key so punctuation stays localizable.
     itemAriaQuest: '{item}, quantity {count}, quest item',
+    // Accessible-name arm of the player item lock (issue #3042,
+    // src/sim/item_lock.ts): outranks every other per-copy announcement, since
+    // the locked fact is the most actionable one for a bag/bank cell.
+    itemAriaLocked: '{item}, quantity {count}, locked',
+    // The tooltip line for a locked copy (item_instance_tooltip.ts instanceLockLine).
+    itemLockedLine: 'Locked',
+    // Context-menu row labels for the lock toggle (bag_item_context_menu.ts).
+    lockItem: 'Lock Item',
+    unlockItem: 'Unlock Item',
     filterGroupAria: 'Filter bags by category',
     filterAll: 'All',
     filterWeapon: 'Weapons',
@@ -2165,6 +2587,12 @@ export const hudChromeStrings = {
     sortRecent: 'Recent',
     sortQuality: 'Quality',
     sortName: 'Name',
+    // The one-shot clean-up button beside the view controls: combines partial
+    // stacks and rearranges the real cells server-side (IWorldInventory
+    // sortInventory), unlike the view-only dropdown above it.
+    sortButton: 'Sort',
+    sortButtonAria: 'Sort your bags',
+    sortButtonHint: 'Combine stacks and group items by type',
     searchPlaceholder: 'Search items',
     searchAria: 'Search bag items by name',
     noMatch: 'No items match your filters.',
@@ -2207,14 +2635,25 @@ export const hudChromeStrings = {
   auraEffect: {
     dot: 'Deals {value} {school} damage every {interval} sec',
     hot: 'Restores {value} health every {interval} sec',
+    mendingCurrent: 'Stores {value} healing, released over time or consumed by Cascading Mend',
+    mendingCurrentPercent: 'Stores healing equal to {pct}% of maximum health for Cascading Mend',
     absorb: 'Absorbs {value} damage',
     healAbsorb: 'Absorbs {value} incoming healing',
     thorns: 'Deals {value} {school} damage to attackers',
+    stasis: 'Immune and unable to act',
     slow: 'Reduces movement speed by {pct}%',
     speed: 'Increases movement speed by {pct}%',
     attackSpeedSlow: 'Slows attack speed by {pct}%',
     attackSpeedFast: 'Increases attack speed by {pct}%',
     haste: 'Increases attack and casting speed by {pct}%',
+    imbueRange: 'Weapon imbued: {min} to {max} bonus damage on Verdict',
+    petDamage: 'Increases pet damage by {pct}%',
+    petHaste: 'Increases pet action speed by {pct}%',
+    spellDamage: 'Increases spell damage by {pct}%',
+    spellHaste: 'Increases spell casting speed by {pct}%',
+    sated: 'Cannot benefit from another group haste effect',
+    cauterizeFatigue: 'Cauterize cannot prevent another lethal hit',
+    castShield: 'Casting cannot be interrupted or delayed by damage',
     // wordy (M16): filled in the five non-Latin locales in this change.
     dmgDone: 'Increases damage dealt by {pct}%',
     dmgDoneReduce: 'Reduces damage dealt by {pct}%',
@@ -2222,6 +2661,13 @@ export const hudChromeStrings = {
       'Your next consecutive Fire builder critical strike grants Hot Streak; a non-critical builder removes Heating Up',
     elementalConvergencePrimed:
       'Your next spell from the other elemental school grants Elemental Convergence',
+    hunterFerocity: '{stacks} Pack Ferocity: your pet deals {pct}% more damage',
+    cooldownCap: '{used} of {cap} sec of cooldown reduction used in this window',
+    funeralHarvestLock: 'Funeral Harvest cannot create another Soul Fragment yet',
+    leadenHexLock: 'Leaden Hex cannot root this target again yet',
+    forbiddenReflectionReady: 'Your next eligible Warlock cooldown can be cast again',
+    forbiddenReflectionLock: 'Forbidden Reflection cannot be prepared again yet',
+    internalCooldown: 'This effect cannot trigger again until the timer expires',
     // The carried-flag buff's tooltip: the ONLY place the voluntary-drop
     // affordance is spelled out, so the player can find it without folklore.
     carriedFlag: 'You are carrying the enemy flag. Cancel this buff to drop it.',
@@ -2240,6 +2686,17 @@ export const hudChromeStrings = {
     revengeFree: 'Your next Revenge costs no Rage',
     victoryRush: 'Victory Rush is ready',
     maxHpPct: 'Increases maximum health by {pct}%',
+    enrage:
+      'Damage dealt increased by {damagePct}%, attack speed by {hastePct}%, and movement speed by {movePct}%',
+    suddenDeath: 'Your next Execute costs no Rage and ignores its health requirement',
+    aoeEcho:
+      '{charges} echoes remain: single-target abilities deal {pct}% damage to up to {targets} nearby enemies',
+    sureCrit: '{charges} damaging ability casts are guaranteed critical strikes',
+    temporalEcho:
+      "The caster's Arcane damage heals you for {singlePct}% of single-target or {areaPct}% of area damage",
+    arcaneCharge:
+      '{stacks} Arcane Charges: Aether Surge deals {damagePct}% more damage, casts {castPct}% faster, and costs {costMult}x mana',
+    physicalReduction: 'Reduces Physical damage taken by {pct}%',
     temporalHourglass:
       'Immune and unable to act; restores health and accelerates cooldown recovery. Right-click to cancel.',
     tongues: 'Increases casting time by {pct}%',
@@ -2250,6 +2707,33 @@ export const hudChromeStrings = {
     freeCast: 'Your next cast costs nothing',
     instantCast: 'Your next spell with a cast time is instant',
     cheapCast: 'Your next spell costs {pct}% less',
+    radiantResonance:
+      "Your next Mending Light is instant, or your next Dawn's Embrace costs {pct}% less mana and casts in {castTime} sec",
+    solarReprisal:
+      'Your next Sunward Disc costs no mana, ignores its cooldown, and deals {pct}% more damage; Hammer of Grace ignores its cooldown and heals for 100% of damage dealt; or Mending Light is instant',
+    dawnsWrath: 'HoW: all HP · +1 use · CD 0 · +{pct}% DMG',
+    // Rogue spec-engine states; wordy (M16): filled in the five non-Latin
+    // locales in this change.
+    venomRitual:
+      'Venom Ritual {stacks}/{max}. Craven Thrust, Wicked Slash, and Venom Dart each add 1. At {max}, Dirt Nap becomes Venomrend',
+    gloam:
+      'Gloam {stacks}/{max}. Openers used from Duskveil each add 1. At {max}, your openers work without stealth, and the next one is free, spends all 3, and starts the Shadow Veil',
+    redline:
+      'Redline {stacks}/{max}. Each Haymaker adds 1. Lights Out hits {pct}% harder for each one and ends Redline. If the timer runs out first, the knockout is lost',
+    veilstrikeWindow:
+      'Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%',
+    veiledEdge: "Your next Lurker's Strike strikes for double",
+    duskEconomy: 'Abilities cost {pct}% less energy',
+    moontide:
+      'Moontide {stacks}/{max}. Wildbolt, Skyfall, and Moonseed casts in Moonwing Form each add 1. At {max}: Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and using either spends all 3',
+    oldBlood:
+      'Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Wolf Form, Bonecrush becomes Marrowbreak in Bruin Form',
+    verdance:
+      'Verdance {stacks}/{max}. Each NEW Wildbloom or Second Bloom you plant adds 1. At {max}, Swiftmend becomes Overbloom',
+    freeExecute: 'Your next eligible execute ability costs nothing',
+    resourceSap: 'Restores {value} of your current resource every {interval} sec',
+    nextAttackCrit: 'Your next attack is guaranteed to critically strike',
+    healEcho: 'Falling below {threshold}% health restores {value} health',
     increase: {
       ap: 'Increases attack power by {value}',
       sp: 'Increases spell power by {value}',
@@ -2291,6 +2775,8 @@ export const hudChromeStrings = {
     mortalWound: 'Reduces healing received by {pct}%',
     vulnerability: 'Increases damage taken by {pct}%',
     physVuln: 'Increases physical damage taken by {pct}%',
+    bleedVuln: 'Increases bleed damage taken by {pct}%',
+    sourceVuln: 'Takes {pct}% more damage from the caster who applied this effect',
     spellVuln: 'Increases magic damage taken by {pct}%',
     critVuln: 'Increases chance to be critically hit by {pct}%',
     costTax: 'Increases ability costs by {pct}%',
@@ -2304,14 +2790,63 @@ export const hudChromeStrings = {
     disarm: 'Disarmed: cannot use weapon attacks',
     lockout: 'Spell school locked out',
     imbue: 'Weapon imbued with bonus effects',
-    imbueRange: 'Weapon imbued: {min} to {max} bonus damage on Verdict',
+    galeheartWeapon:
+      'Completing the {steps}-hit Warspirit cadence echoes the strike {count} times for {pct}% of its damage as Nature damage',
+    elementalTrance:
+      'Damage taken reduced by {pct}%. {mana}% of all damage you deal is converted to mana',
     stealth: 'Concealed; movement speed reduced by {pct}%',
     formBear: 'Bruin Form: increased health and armor',
     formCat: 'Wolf Form: melee damage and energy',
     formTravel: 'Fleet Form: movement speed increased by {pct}%',
     formFireball: 'Ember Form: movement speed increased by {pct}%; attacks and spells are disabled',
+    formMoonkin:
+      'Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%',
+    formShadow: 'Gloamveil Form: Shadow damage increased by {pct}%',
+    resourceCount: '{value} of {max}',
+    formLich: 'Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage',
+    afflictionEye:
+      'Maledict Gaze attacks every {interval} sec; effects at this Eye generate {pct}% Condemnation',
+    afflictionEyeSecondary:
+      'Effects at this Eye generate {doomPct}% Condemnation; Sentence echoes here for {echoPct}% damage',
+    afflictionAccomplice:
+      'Qualifying damage grants {value} Condemnation, at most once every {interval} sec',
+    afflictionViolence:
+      '{charges} reprisals remain; an enemy attack grants {doom} Condemnation and deals {damage} Shadow damage back',
+    afflictionVicarious:
+      'Redirects or reduces {pct}% of incoming damage and can generate up to {max} Condemnation',
+    afflictionPossession: 'Empowers Needle of Fate, Consume, Maledict Gaze, and Sentence',
+    afflictionJudgment:
+      'Primary Eye generates {eyePct}% more Condemnation; Sentence deals {sentencePct}% more damage and the first refunds {refund} Condemnation',
+    afflictionLitany:
+      'Condemnation gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec',
+    afflictionFateThreads:
+      '{stacks} Fate Threads: Sentence deals {sentencePct}% more damage, or Consume gains {doom} extra Condemnation per tick',
+    afflictionConsumeThreads:
+      'Consume is devouring {stacks} Fate Threads for {doom} extra Condemnation per tick',
+    necromancyHarvestMark: 'Death can create 1 Soul Fragment',
+    necromancyOssuaryMark:
+      'Stores {storedPct}% of your and your undead damage, plus {lancePct}% of Soul Lance damage; recast to detonate. Death explodes within {radius} yd and creates 1 Soul Fragment',
+    necromancyDeathEcho: 'Legacy Death Echo; no current ability consumes it',
+    warlockAnchor: 'Recast within {range} yd to return here and consume the anchor',
+    formMetamorph: 'Demon form: body size increased by {pct}%; other bonuses ride separate buffs',
+    energyRegen: 'Increases Energy regeneration by {pct}%',
     defensiveStance: 'Guarded Stance: reduced damage taken, more threat',
     righteousFury: 'Burning Oath: greatly increased threat from Holy damage',
+    overpowerCharge: '{stacks} charges: your next Maiming Strike deals {pct}% more damage',
+    sweepingStrikes: 'Single-target strikes also hit {targets} nearby enemy for {pct}% damage',
+    fingersOfFrost:
+      '{charges} charges: Ice Lance treats its target as frozen and deals {pct}% frozen damage',
+    brainFreeze: 'Your next Flurry is instant and ignores its cooldown',
+    wintersChill: '{charges} charges: compatible spells treat this target as frozen',
+    icicles: '{value} of {max} Icicles; at {max}, Glacial Spike can be cast',
+    desolation:
+      '{charges} charges: your next Chaos Bolt casts {castPct}% faster or your next Rain of Fire lands immediately',
+    ruinousBrand:
+      '{charges} copies remain: direct spells copy {otherPct}% damage here, or {selfPct}% when this is their target',
+    duskfireClaim: 'Death grants {value} Wrack',
+    pyreGuardian:
+      'Generates {ruin} Wrack every {ruinInterval} sec and deals {damage} Fire damage within {radius} yd every {damageInterval} sec',
+    perfectMoment: 'Aether Darts does not consume Arcane Charges',
     scale: 'Size increased by {pct}%',
     jump: 'Jump height increased by {pct}%',
     // Localized damage-school names spliced into {school} above.
@@ -2391,6 +2926,12 @@ export const hudChromeStrings = {
     // /afk tag prefixed to a player's overhead name (nameplate_painter.ts wraps
     // it in angle brackets: "<AFK> Name"). Short label, not a sentence.
     afkTag: 'AFK',
+    // The operator-applied Cheater sanction (src/sim/moderation/), resolved for
+    // the nameplate and the target frame through src/ui/cheater_tag.ts. Unlike
+    // afkTag the brackets are part of the VALUE, so a locale that punctuates a
+    // tag differently owns its own wrapper instead of inheriting an English one.
+    // Wordy (M16), so the five non-Latin fills ship in this same change.
+    cheaterTag: '< Cheater >',
   },
   // World mouseover tooltip shown when hovering a mob (mob_tooltip_view.ts):
   // name (colored by the nameplate con-color), then "Level N <type>" ({family}
@@ -3469,6 +4010,15 @@ export const hudChromeStrings = {
     // rather than claiming the slot is full.
     toolEffectRechargeToolCapped: 'Carry a better {profession} tool to charge {effect} further.',
     toolEffectRechargeMaterials: 'Recharging {effect} needs {material} x{count}.',
+    // In-progress readouts for the four crafting/gathering-service actions plus
+    // tool-effect recharging (social/chat_readouts.ts describeActiveAction):
+    // countdown chat lines shown while the action channels.
+    craftingProgress: 'You are crafting: {remaining}s of {total}s remaining.',
+    disenchantingProgress: 'You are disenchanting: {remaining}s of {total}s remaining.',
+    enchantingProgress: 'You are enchanting: {remaining}s of {total}s remaining.',
+    salvagingProgress: 'You are salvaging: {remaining}s of {total}s remaining.',
+    rechargingToolEffectProgress:
+      'You are recharging a tool effect: {remaining}s of {total}s remaining.',
     tierPipAria: 'Tier {tier}',
     nextUnlockTier: '{points} points to the next tier: masterwork odds improve',
     nextUnlockSpecialized: '{points} points to Specialized: material costs drop',
@@ -3544,6 +4094,10 @@ export const hudChromeStrings = {
     craftedToast: 'Crafted: {name}',
     craftedToastQty: 'Crafted: {name} x{qty}',
     insufficientMaterials: 'You do not have the materials for that.',
+    // Player item lock (issue 3042): fired instead of insufficientMaterials
+    // when the reagent shortfall is caused solely by a locked copy, so the
+    // denial names the real cause rather than reading as a generic shortage.
+    reagentLocked: 'A reagent for that is locked.',
     unknownRecipe: 'That recipe does not exist.',
     comboRequirementUnmet:
       'You do not have both required crafts at the required tier for that recipe.',
@@ -3761,6 +4315,10 @@ export const hudChromeStrings = {
     notHeld: 'You do not have that item.',
     notDisenchantable: 'You cannot disenchant that.',
     notSalvageable: 'You cannot salvage that.',
+    // Player item lock (issue #3042): fired when the exact copy a salvage
+    // targeted is locked. Distinct from notSalvageable, which means the item
+    // type itself is never salvageable.
+    salvageLocked: 'That item is locked.',
     // Craft Cast System Phase 4/5: cast busy gate when another cast is already
     // running (the retired 'throttled' wire reason renders the same copy).
     disenchantBusy: 'You are busy.',
@@ -4000,6 +4558,20 @@ export const hudChromeStrings = {
   // Dungeon Finder window (docs/prd/dungeon-finder.md). Dungeon, creature,
   // item, quest, and zone NAMES resolve through tEntity/world_entity_i18n,
   // never through these keys.
+  // The Thornhollow Fields queue-pop prompt (src/ui/hud/battleground/
+  // battleground_proposal_popup.ts). Counts only, never names: the ten have not
+  // been introduced and a decline must not leak who was opposite.
+  bgOffer: {
+    title: 'Thornhollow Fields is ready',
+    backfillTitle: 'Thornhollow Fields needs a fighter',
+    backfillBody:
+      'This battle is already under way. You will join the side that is short, and this match will not change your rating.',
+    accepted: '{accepted} of {size} ready',
+    remaining: '{seconds}s to answer',
+    accept: 'Accept',
+    decline: 'Decline',
+    acceptedWait: 'Waiting for the others...',
+  },
   finder: {
     title: 'Dungeon Finder',
     close: 'Close',
@@ -4114,6 +4686,230 @@ export const hudChromeStrings = {
   // the unlock moment (banner, log lines, retro catch-up summary). Deed
   // names, descriptions, and title strings are sim content localized through
   // deed_i18n.ts, never through these keys.
+  // The Reliquary: cold collection trophy window (Overview + shelf chrome in
+  // Phase 4; page grids and Illumination celebration land later).
+  reliquary: {
+    title: 'The Reliquary',
+    close: 'Close The Reliquary',
+    countLabel: '{owned}/{total} relics',
+    completionAria: 'Relics filled: {owned} of {total}',
+    curatorRank: 'Curator rank {rank}',
+    curatorUnranked: 'Unranked Curator',
+    // Phase 6: named Curator ranks (cosmetic window chrome + rank-up toast).
+    curatorRankName1: 'Apprentice Curator',
+    curatorRankName2: 'Spoilskeeper',
+    curatorRankName3: 'Master Curator',
+    curatorRankName4: 'Grand Curator',
+    curatorRankName5: 'Eternal Curator',
+    rankUpBanner: 'Curator rank {rank}: {name}',
+    rankUpToast: 'Curator rank {rank} reached: {name}',
+    // Phase 19: the one Curator rank whose deed bridge rewards a wearable
+    // nameplate border. ONE key for both surfaces that say it (the rank-up
+    // chat line and the standing Overview note), so the moment and the durable
+    // readout cannot drift; {name} is that deed's name, resolved through
+    // deed_i18n, never the reward slug.
+    borderWearableNote: 'The {name} border can be worn from the Book of Deeds.',
+    // Phase 20: the rank-5 Curator sigil badge on the click-inspect card. This
+    // names the honor on the badge row's VISIBLE sub-line, the slot the three
+    // sibling tier badges use for their own descriptive line. The art itself
+    // carries alt="" like those siblings, so this string is read once by
+    // everyone rather than announced a second time off the image. Sink is a
+    // visible label, NOT an aria/alt string: length and tone should match the
+    // sub-lines beside it, not an accessibility annotation.
+    sigilCaption: 'Curator sigil',
+    recentLabel: 'Recent finds:',
+    nearlyLabel: 'Nearly complete:',
+    nearlyJumpAria: 'Open {name}, {owned} of {total} filled',
+    progressText: '{owned}/{total}',
+    shelvesAria: 'Reliquary shelves',
+    navOverview: 'Overview',
+    navConquerors: 'Conquerors',
+    navProfessions: 'Professions',
+    navHorizons: 'Horizons',
+    navCountAria: '{shelf}: {owned} of {total} relics filled',
+    shelfEmpty: 'No pages on this shelf yet.',
+    pageComplete: 'Illuminated',
+    clearsLabel: '{count} clears',
+    // Phase 21: the Rift page's display-only SECOND meter, rendered beside
+    // clearsLabel on the page header (secondaryClearSource, riftSRankClears).
+    srankClearsLabel: '{count} S-rank clears',
+    // Phase 21: the chip a retired (excludeFromCompletion) page carries on
+    // its shelf row and page header (the Vault of Ages).
+    retiredLabel: 'Retired',
+    // Phase 21: the same chip on the OTHER outside-completion reason, a
+    // class-personal page no one character can fill (the Riftbound bands).
+    personalLabel: 'Personal',
+    backToShelf: 'Back to shelf',
+    // Phase 5: page grid, live unlock toast, Illumination celebration.
+    gridAria: 'Relics on {name}',
+    pageProgressAria: 'Page progress: {owned} of {total} relics filled',
+    cellOwnedAria: '{name}, catalogued',
+    cellMissingAria: '{name}, not yet found',
+    ownedTooltipStatus: 'Catalogued in The Reliquary',
+    missingTooltipStatus: 'Not yet found',
+    // {count} here is the CLEAR number, not the obtain tally: the plural
+    // obtain bases (hudChrome.plurals.reliquaryObtainedTimes and friends)
+    // reuse the {count} name for the OBTAIN count because tPlural selects on
+    // it, and their clear number rides {clears} instead. Renaming this key's
+    // slot would invalidate every shipped overlay fill, so the two meanings
+    // coexist and this note is the guard.
+    firstFindClears: 'First found on clear {count}',
+    unlockToast: 'Relic catalogued: {name}',
+    illuminateBanner: 'Page illuminated: {name}',
+    illuminateToast: 'Every relic on {name} is filled.',
+    // Phase 18: another player's FIRST-EVER page Illumination, the
+    // hudChrome.deeds.broadcastLine sibling (guild-chat green, page name
+    // spliced in as a clickable jump; the wire event carries the page id
+    // only and the client resolves {page} through reliquary_i18n).
+    illuminationBroadcastLine: '{name} has illuminated a Reliquary page: {page}',
+    // Phase 7: profession mark find labels (player-visible chrome). Catalog page
+    // names are NOT keys here: they resolve from the page id through
+    // src/ui/reliquary_i18n.ts, the deed_i18n entity-style channel.
+    markFind: {
+      masterwork_first: 'First Masterwork',
+      masterwork_weaponcrafting: 'Weaponcrafting Masterwork',
+      masterwork_armorcrafting: 'Armorcrafting Masterwork',
+      masterwork_tailoring: 'Tailoring Masterwork',
+      masterwork_leatherworking: 'Leatherworking Masterwork',
+      masterwork_engineering: 'Engineering Masterwork',
+      gather_event_pristine_vein: 'Pristine Vein',
+      gather_event_ancient_heartwood: 'Ancient Heartwood',
+      gather_event_moonlit_bloom: 'Moonlit Bloom',
+      gather_event_perfect_specimen: 'Perfect Specimen',
+      // Phase 21: Rares of the Realm kill proofs, 'Slain: <mob display name>'
+      // with names verbatim from MOBS (the server table and the wiki generator
+      // carry the identical strings; tests/character_sheet.test.ts cross-pins).
+      slain_old_greyjaw: 'Slain: Old Greyjaw',
+      slain_mogger: 'Slain: Mogger',
+      slain_grix_the_tunnelking: 'Slain: Grix the Tunnelking',
+      slain_captain_verlan: 'Slain: Captain Verlan',
+      slain_wraithbinder_maldrec: 'Slain: Wraithbinder Maldrec',
+      slain_mirejaw_the_ravenous: 'Slain: Mirejaw the Ravenous',
+      slain_sloomtooth_the_drowned: 'Slain: Sloomtooth the Drowned',
+      slain_sister_nhalia: 'Slain: Sister Nhalia',
+      slain_grubjaw: 'Slain: Grubjaw the Glutton',
+      slain_ironvein_foreman: 'Slain: Ironvein Foreman',
+      slain_brutok_skullsmasher: 'Slain: Brutok Skullsmasher',
+      slain_voskar_emberwing: 'Slain: Voskar the Emberwing',
+      slain_marrowlord_varkas: 'Slain: Marrowlord Varkas',
+      slain_old_cragmaw: 'Slain: Old Cragmaw',
+      slain_shardlord_kazzix: 'Slain: Shardlord Kazzix',
+      slain_gleamstag: 'Slain: The Gleamstag',
+      slain_old_marrowshell: 'Slain: Old Marrowshell',
+      slain_aurelhorn: 'Slain: Aurelhorn, First of the Herd',
+      slain_drakemaw_broodlord: 'Slain: Drakemaw Broodlord',
+    },
+    // Phase 8: Horizons account-scope chrome for weapon skins (account cosmetics).
+    accountScopeBadge: 'Account',
+    accountScopeNote: 'Account collection: unlocked across every character on this account.',
+    // Phase 13: one display-name ladder (no humanized ids), authored source
+    // lines for missing relics, page blurbs, and the search / ownership filter.
+    unknownRelic: 'Unrecorded relic',
+    sourceBossDungeon: 'Drops from {boss} in {dungeon}',
+    sourceBoss: 'Drops from {boss}',
+    sourceZone: 'Found in {zone}',
+    sourceProfession: 'Earned through {profession}',
+    sourceDeed: 'Awarded by the deed {deed}',
+    sourceVendor: 'Sold by {vendor}',
+    // A relic with several live routes shows one line per route, so these read
+    // as siblings of the six above rather than as a summary of them.
+    // {boss} here is the open-world rare and {zone} where it camps: half an
+    // answer either way, which is why they share one line.
+    sourceBossZone: 'Drops from {boss} in {zone}',
+    sourceDelve: 'Found in the delve {delve}',
+    // "{rank}-rank" matches the established Rift wording (itemTooltip.riftTier,
+    // sim.rift.raceWorldWin), and the reins come off the CLEAR, not one boss.
+    sourceRift: 'Drops from {rank}-rank Rift clears',
+    sourceQuest: 'Reward from the quest {quest}',
+    sourceStore: 'Purchased from the WOC Store',
+    // Award activities: the player action itself is the source, with no mob,
+    // vendor, or quest in between.
+    sourceActivityCorpseHarvest: 'Recovered while harvesting creature corpses',
+    sourceActivityMasterworkCraft: 'Earned by crafting a masterwork',
+    // The Riftbound bands: minted per participant for the party that wins a
+    // ranked rift's first-clear race (addRiftProgressionLoot), any rank. The
+    // English names the RACE, not a personal milestone: a party that clears a
+    // ranked event after its first clear mints nothing (claimRiftFirstClear
+    // returns won: false). The five non-Latin fills were sharpened WITH this
+    // English at Phase 21 QA (both gained the ranked and party qualifiers;
+    // the old fills carried the race reading but not those qualifiers).
+    sourceActivityRiftFirstClear:
+      "Awarded to every member of the party that wins a ranked Rift's first clear",
+    // The aria label folds the lines through formatList (Intl.ListFormat), so
+    // there is no join key to translate: CLDR owns the separators per locale,
+    // including the final-conjunction shapes a pairwise key cannot express.
+    // Missing cells fold the source line into the label so a keyboard or screen
+    // reader user gets everything a hover tooltip shows; owned cells fold in the
+    // first-find clear number on the same rule.
+    cellMissingSourceAria: '{name}, not yet found, {source}',
+    // {count} is the CLEAR number here too (see the firstFindClears note);
+    // the obtain-count aria lives on the plurals bases with {clears}/{count}
+    // split the other way round.
+    cellOwnedClearsAria: '{name}, catalogued, first found on clear {count}',
+    searchPlaceholder: 'Search relics',
+    searchAria: 'Search The Reliquary by name',
+    searchEmpty: 'No relics match that search.',
+    // Distinct from searchEmpty: clicking Catalogued with nothing typed must not
+    // blame a search the player never made.
+    filterEmpty: 'No relics match this filter.',
+    filterGroupAria: 'Filter relics by whether you have found them',
+    // SR-only description on the relic grid: roving tabindex leaves one tab
+    // stop, and list/listitem announces no keyboard model of its own.
+    gridKeyboardHint: 'Use the arrow keys to move between relics, Home and End for the ends.',
+    filterAll: 'All',
+    filterOwned: 'Catalogued',
+    filterMissing: 'Missing',
+    // Phase 14: the Overview becomes the way IN to the catalog. Recent finds
+    // are jump buttons, each strip keeps its label and explains itself when
+    // empty, and three shelf cards summarize the shelves the rail lists.
+    recentJumpAria: 'Open the page for {name}',
+    recentEmpty: 'No finds yet. Relics you catalogue from now on land here.',
+    nearlyEmpty: 'Pages within reach of completion gather here.',
+    // A live needle that empties ONE strip while the other keeps matches: the
+    // whole-Overview searchEmpty line stays reserved for the nothing-anywhere
+    // case, so the emptied strip explains itself instead of sitting as a bare
+    // label over nothing.
+    stripNoMatch: 'Nothing here matches your search.',
+    shelfRecent: 'Latest find: {name}',
+    shelfNoFinds: 'Nothing catalogued on this shelf yet.',
+    shelfOpenAria: 'Open the {name} shelf, {owned} of {total} filled',
+    // Why a page can read full while the catalog total is smaller than the sum
+    // of the page totals: a relic on two pages is one relic.
+    sharedUniquesNote:
+      'Your overall total counts each relic once; shelf and page counts list every slot, so a relic shown on more than one page is counted by each of them.',
+    // Phase 9: character sheet labeled completion pair + Curator rank.
+    charCompletionLabel: 'Reliquary',
+    charCompletion: '{owned}/{total}',
+    charRankLabel: 'Curator',
+    charOpen: 'The Reliquary',
+    // Phase 15: the always-on HUD tracker (#reliquary-tracker) and the pin
+    // control that fills it. The row tally reuses hudChrome.questTracker.count
+    // and the row progress reuses progressText above, so neither is duplicated
+    // here. The pin cap note is a real refusal, not a silent no-op (the deeds
+    // watchFull precedent).
+    trackerLabel: 'Reliquary',
+    collapseHint: 'Collapse Reliquary tracker',
+    expandHint: 'Expand Reliquary tracker',
+    openWindowHint: 'Open The Reliquary',
+    pin: 'Pin',
+    unpin: 'Unpin',
+    pinFull: 'The tracker is full (up to {cap} pages)',
+    pinAria: 'Pin {name} to the HUD tracker',
+    unpinAria: 'Unpin {name}',
+    // Phase 22: realm population rarity (the hudChrome.deeds.rarityLine
+    // sibling). {percent} arrives pre-formatted through formatNumber's percent
+    // style. "Found" is deliberate over "Owned": the aggregate counts sticky
+    // first discovery (items) and kill proofs (marks), so it stays true for a
+    // mount whose reins were later sold or traded away.
+    rarityLine: 'Found by {percent} of collectors',
+    pageRarityLine: 'Illuminated by {percent} of collectors',
+    // Joins a cell's base aria sentence and the rarity sentence; the key owns
+    // the punctuation so locales can reorder or repunctuate the pair.
+    cellAriaWithRarity: '{base}, {rarity}',
+    // Joins a cell's base aria sentence and the account-scope badge, so the
+    // weapon-skin scope fact is not hover-only; the key owns the punctuation.
+    cellAriaWithAccountScope: '{base}, {scope}',
+  },
   deeds: {
     title: 'Book of Deeds',
     close: 'Close the Book of Deeds',
@@ -4150,18 +4946,32 @@ export const hudChromeStrings = {
     featRibbon: 'Feat',
     hiddenBadge: 'Hidden',
     titleChip: 'Title reward',
+    borderChip: 'Border reward',
     watch: 'Watch',
     unwatch: 'Unwatch',
     watchFull: 'Watchlist full ({cap} max)',
     watchAria: 'Watch {name} on the HUD tracker',
     unwatchAria: 'Stop watching {name}',
+    // The worn-cosmetics shelf: the rail button names both pickers it holds,
+    // then one heading, group label, None option and empty line per picker.
+    // Border options are named by their DEED (a border reward carries a slug,
+    // never player-facing display text of its own).
+    cosmeticsSection: 'Titles and Borders',
     titlesSection: 'Titles',
+    // UNRENDERED since the picker groups took their accessible name from the
+    // visible headings (aria-labelledby); kept because the shipped locale
+    // fills carry it. Candidate for removal at a release locale fill.
     titlesAria: 'Choose your displayed title',
     titlesNone: 'No Title',
     titlesEmpty: 'Earn a title-bearing deed to unlock this shelf.',
+    bordersSection: 'Borders',
+    bordersNone: 'No Border',
+    bordersEmpty: 'Earn a border-bearing deed to unlock this shelf.',
     unlockedBanner: 'Deed accomplished: {name}',
     unlockedTitleHint: 'New title earned: {title}. Choose it in the Book of Deeds.',
-    retroSummary: 'Your chronicle catches up: {count} deeds recorded.',
+    // The border sibling. It names the DEED rather than a reward text, since a
+    // border reward carries only a palette slug.
+    unlockedBorderHint: 'New border earned: {name}. Wear it from the Book of Deeds.',
     broadcastLine: '{name} has accomplished a deed: {deed}',
     rarityLine: 'Earned by {percent} of adventurers',
     trackerLabel: 'Deeds',
@@ -4173,6 +4983,9 @@ export const hudChromeStrings = {
     charTitleLabel: 'Title',
     charTitleNone: 'No title chosen',
     charOpenBook: 'Book of Deeds',
+    // The character sheet's earned-border badges: the worn one says so in its
+    // own label, so the state never rides the badge colour alone.
+    charBorderWorn: '{name} (worn)',
     // The Renown tab of the high-score window: tab label, the deeds-board
     // column headers (rank/name reuse the shared game.leaderboard.* headers,
     // the Renown column reuses renownLabel above), the visible account-scope
@@ -4213,5 +5026,11 @@ export const hudChromeStrings = {
     toggleAria: 'Switch between the world map and the zone map',
     // Hover tooltip over a zone region: its name plus the suggested level band.
     levels: 'Levels {min} to {max}',
+  },
+  // Ranked Arena's minimum-level queue gate (src/sim/social/arena.ts
+  // arenaQueueJoin, 1v1/2v2 only): the arena window's disabled-queue note
+  // when the local character is below the floor.
+  arenaGate: {
+    minLevelNote: 'Requires level {level}',
   },
 };

@@ -1,7 +1,7 @@
 <!-- src/render/: the Three.js renderer. Root + src CLAUDE.md (the IWorld seam,
      the import-direction rules, determinism, build commands) already apply, do
-     NOT repeat them. This file is render-local only. characters/ has its own
-     CLAUDE.md. -->
+     NOT repeat them. This file is render-local only. characters/ and
+     ability_vfx/ have their own CLAUDE.md. -->
 
 # src/render/: Three.js renderer
 
@@ -20,14 +20,14 @@ Everything else is a sibling module in one of these families:
   owns: `terrain.ts` (chunked LOD + PBR splat), `props.ts`/`foliage.ts`/
   `dungeon.ts` (instanced/merged GLBs), `water.ts` (terrain-aware water bodies;
   shore-depth and tier core in `water_core.ts`, sleeping GPU height field and
-  facing-aligned character volume wakes in `water_simulation.ts`), `sky.ts`. Event/minigame scenes follow
-  the same pattern: `jail_scene.ts`, `vale_cup_*.ts`, `yumi_*.ts`, `battleground*.ts`
-  (Thornhollow Fields: kit-module field from the pure `battleground_core.ts` manifest,
-  entity props in `battleground_props.ts`).
-  the same pattern: `jail_scene.ts`, `vale_cup_*.ts`, `yumi_*.ts`. Rift
-  portals: `door_portal.ts` also builds the bespoke world-rift gate GLB with
-  its rank-tinted energy membrane (`buildRiftGateBody`), and `rift_rank.ts` is
-  the floating C/B/A/S rank badge above a world rift portal.
+  facing-aligned character volume wakes in `water_simulation.ts`), `sky.ts`.
+  Event/minigame scenes follow the same pattern: `jail_scene.ts`,
+  `vale_cup_*.ts`, `yumi_*.ts`, `battleground*.ts` (Thornhollow Fields:
+  kit-module field from the pure `battleground_core.ts` manifest, entity props
+  in `battleground_props.ts`). Rift portals: `door_portal.ts` also builds the
+  bespoke world-rift gate GLB with its rank-tinted energy membrane
+  (`buildRiftGateBody`), and `rift_rank.ts` is the floating C/B/A/S rank badge
+  above a world rift portal.
 - **Per-frame overlay/FX modules** ticked from `sync()`: `vfx.ts` (pooled
   particles), `weather.ts` (any weathered biome inside the camera box drives
   precipitation and masked spawns keep it over that zone's own cells, so a
@@ -57,6 +57,22 @@ Everything else is a sibling module in one of these families:
   crowd knee, the per-tier `GFX.farCharacterAnimScale` ceiling, and live budget
   pressure; cosmetic-only, and `showsStaticFarMesh` keeps anything a player
   reacts to out of the frozen mesh inside the uncrowded base range).
+- **Zone streaming + residency:** `zone_streaming.ts` (pure policy: WHICH
+  zones to materialize and in what order, feeding the renderer's background
+  prepare queue), `chunk_residency_core.ts` (chunk-level "how far can the
+  camera see before unbuilt ground" answer the outdoor fog clamp keys off),
+  `resident_scenery_core.ts` (whole-scene traversal/shadow skip policy), and
+  `assets/residency_budget.ts` (dev-channel accounting of where decoded bytes
+  sit; English console output by design).
+- **WebGL context lifecycle:** `context_recycle.ts` (`recycleWebGL2Context`
+  cycles the ONE WebGL2 context through `WEBGL_lose_context` on a renderer
+  rebuild so the same canvas + context is reused instead of a second context
+  being minted), `context_release.ts` (forces context loss on `pagehide`:
+  browsers cap live WebGL contexts per GPU process at ~16 and reclaim lost
+  ones lazily, and the client reloads on every logout), and
+  `software_renderer.ts` (the SINGLE source of truth for detecting a software
+  rasterizer from the adapter string; `gfx.ts`, `perf_doctor.ts`, and
+  `perf_reporter.ts` all consume it so the detectors cannot drift).
 - `view_create_retry.ts`: bounded cooldown state for fail-soft character builds
   in per-frame paths, including required targets, form swaps, and visual-key
   swaps (`tests/view_create_retry.test.ts`).
@@ -79,9 +95,6 @@ Everything else is a sibling module in one of these families:
   moves). All display-only, all gated by the reduced-motion switch; driven
   from `renderer.ts` `updateCamera` and the hud event hooks
   (`tests/camera_*_core.test.ts`).
-- `voxel_terrain.ts`: verification-only prototype (proposal #1611, driven by
-  `scripts/`, NOT the live path); live terrain is `terrain.ts` sampling sim heights.
-
 ## Module-first: pure core + thin painter (where NEW render logic lands)
 New per-frame decision logic (visibility, anchors, interpolation, region/LOD
 selection) is its own Three/DOM/i18n-free `*_core.ts` or `*_view.ts` module,
@@ -90,24 +103,28 @@ every on-disk `src/render` `*_view`/`*_core`, fails CI on unregistered ones,
 and scans the set Three/DOM/i18n-free and deterministic). The Three/DOM half
 is a thin painter the renderer drives; reference pair: `nameplate_view.ts` +
 `nameplate_painter.ts` (the render twin of src/ui's `unit_portrait` pattern).
-The core's test is a plain Vitest importing it directly. Fix bugs test-first:
-reproduce in the matching Vitest (extract buried logic into a core if needed),
-then the smallest change that turns it green; a repro never needs a browser.
+The core's test is a plain Vitest importing it directly; a repro never needs a
+browser (the bug-fix workflow itself lives in root CLAUDE.md and the
+`extract-and-test` skill).
 
 ## The nameplate suite (overhead text/badges land here, never renderer.ts)
 `nameplate_view.ts` is the pure plan (show/hide, anchor lift, urgency, threat,
 combo; allocation-free: `nameplatePlanInto` fills a caller-owned `NameplatePlan`).
 `nameplate_painter.ts` does the Three projection, DOM writes, and ALL the
-localization (per-tier cadence via `ui_tier_knobs.nameplateIntervalSec`); the
-significant-contributor name glow lives there too. Narrow helpers:
+localization; the significant-contributor name glow lives there too. The
+per-tier cadence lever (`ui_tier_knobs.nameplateIntervalSec`) is applied by
+`renderer.ts`, which gates how often the painter runs; the painter has no
+cadence logic of its own. Narrow helpers:
 `nameplate_combo/threat/projection/declutter.ts` plus `entity_labels.ts`
 (shared localized display names). Drive changes from `tests/nameplate_*.test.ts`.
 
 ## gfx.ts: the shared core (read this before touching any subsystem)
-- **`GFX` quality tiers** (`low`/`medium`/`high`/`ultra`). Every tier-dependent knob lives
-  here, not in scattered ternaries. The renderer MUST call `initGfxTier(webgl)`
-  right after creating the `WebGLRenderer` and before building scene content
-  (software GL maps to `low`; `?gfx=low|medium|high|ultra` / `?lowgfx` force a tier).
+- **`GFX` quality tiers** (the `GfxTier` ladder; ranks are monotone, so gate a
+  knob via `gfxTierAtLeast`, never a `=== 'ultra'` string compare a new top
+  tier silently skips). Every tier-dependent knob lives here, not in scattered
+  ternaries. The renderer MUST call `initGfxTier(webgl)` right after creating
+  the `WebGLRenderer` and before building scene content (software GL defaults
+  to `low`; `?gfx=<tier>` / `?lowgfx` force a tier).
 - **`surfaceMat(opts)`** is the material factory: it dedupes by
   `(color|maps|flags)` so hundreds of boxes share a few programs. Use it instead
   of `new MeshStandardMaterial`; `MeshLambertMaterial` is auto-substituted on low.
@@ -122,6 +139,15 @@ significant-contributor name glow lives there too. Narrow helpers:
 - **VFX:** add an effect to `vfx.ts` (emit into the pooled particle cloud; HDR
   colour multipliers via `hdr()` so it blooms on composer tiers). Sprite atlas
   cells are append-only (`SPRITE_FILES`/`SPR` must stay in sync).
+- **Per-ability class VFX have two sanctioned landing spots.** Default: a
+  declarative spec in a class-owned `*_vfx_specs.ts` module (exemplars:
+  `destruction_vfx_specs.ts`, `necromancy_vfx_specs.ts`,
+  `warlock_vfx_specs.ts`) REGISTERED in `ability_vfx_registry.ts`, which plays
+  the gallery anatomy on the pooled `ability_vfx/` engine (see its CLAUDE.md).
+  A bespoke `src/render/` module (the `paladin_*_visual.ts` set,
+  `warlock_meteor_fx.ts`, `necromancy_*_fx.ts`, the frost/mage modules) is for
+  effects that need scene objects the pooled primitive families cannot
+  express; even then the pure math lands in a registered `_core`.
 - **Models are real GLB assets** (CC0 kits, Tripo-generated models, and the
   image-to-GLB procedural exporters: props, foliage, dungeon, fish, gather nodes,
   mailbox, delve props, characters, the Eastbrook town kit), loaded via
@@ -135,6 +161,9 @@ significant-contributor name glow lives there too. Narrow helpers:
 rules, all CI-enforced:
 - **Cache results are IMMUTABLE: clone before mutating.** `releaseGltf(url)` drops
   the cache entry after geometry is extracted.
+- **Never `dispose()` a shared GLB-cache texture that may still be drawn.** With the
+  KTX2 mip release (`assets/ktx2_mip_release.ts`) its CPU data is full-shape stubs and
+  its restore source drops on dispose, so a later re-upload renders black.
 - **`preload.ts` is the boot gate, and it has TWO lanes.** `startGame` awaits
   `assetsReady()` either way, so `build*()` still reads resolved assets
   synchronously; the lanes differ only in WHEN the fetch starts. A new module-load
@@ -161,6 +190,51 @@ rules, all CI-enforced:
   `tests/render_glb_replacement_assets.test.ts` fails on a GLB missing from
   disk or the manifest; export a `*PreloadInternalsForTest` (see `fish.ts`)
   so it covers your module.
+
+## World-entry prewarm (warm-up is a manifest entry, never ad-hoc)
+`renderer.ts`'s prewarm runs a manifest of explicit entries (ids like
+`vfx.ability-primitives`) so the first in-world frames do not hitch. Any heavy
+NEW subsystem's warm-up must land as a manifest entry, in the right lane:
+- `prewarm_policy.ts` is the pure decision layer. Constrained (phone-class
+  WebKit) devices run a deliberately MINIMAL manifest
+  (`CONSTRAINED_PREWARM_KEEP`) because a full one is a world-entry
+  process-kill risk two ways: main-thread occupancy trips iOS's
+  responsiveness watchdog, and a fully warmed manifest re-inflates GPU memory
+  past the per-process ceiling. That rationale is written only in this
+  module's header; read it before changing any entry.
+- Entries dropped by the entry deadline resume in the background as explicit
+  SMALL units (`prewarm_resume.ts`; deliberately no whole-entry callback,
+  because `requestIdleCallback` cannot preempt synchronous work once it
+  starts; `CONSTRAINED_PREWARM_RESUME` in `prewarm_policy.ts` names what
+  constrained devices push to the background instead of the entry).
+- `prewarm_pass.ts` sequences the BACKGROUND zone prewarm (live frames keep
+  rendering, so its groups MUST stay invisible; hidden objects still link
+  their programs because compile traverses via `scene.traverse`, not
+  `traverseVisible`).
+- Shared machinery: `compile_gate.ts` (fail-soft async shader-compile gating
+  that also BOUNDS in-flight driver links during snapshot bursts),
+  `background_gpu_queue.ts` (the one priority arbiter for idle-time work that
+  reaches WebGL), `idle_queue.ts` (idle-slot queue draining). Use these, never
+  a bespoke idle loop.
+- **A program only ONE encounter can reach warms at that interior's attach,
+  never in the boot manifest** (`interior_encounter_prewarm.ts` spec +
+  `_pass.ts` + `_host.ts`, kill switch `?encounterPrewarm=0`). The Nythraxis
+  tenant is Soul Rend: its mark clones every marked body's materials
+  `transparent` with `depthWrite = false`, which three keys as a NEW program per
+  body AND per mesh SHAPE, so the first mark linked ~32 programs inside one
+  frame. Two halves, because neither covers the other: a CATALOG (class rigs,
+  VFX weapon skins) and the LIVE looks in the room, since real players carry dye
+  and jewel variants no default rig has. Three rules the measurements paid for:
+  the stand-in must be SKINNED (a `PlaneGeometry` proxy links a different
+  variant and changes nothing), the clone materials are kept alive and never
+  disposed (three releases the program with the last material), and BOTH the
+  build and the compile drain across idle slots, per body, chained, because a
+  raid arrives together and independent idle waits otherwise resolve in one idle
+  period and concatenate into a single long task.
+  Warm nothing whose cost you have not measured: Brother Aldric was in this
+  spec until an A/B from a start zone that had never compiled his model showed
+  his spawn linking ZERO programs (the player bodies on screen already carry
+  them).
 
 ## i18n: overhead labels are the only string surface here
 One deliberate exception: `scene_census_core.ts`'s table/format helpers feed the
@@ -202,7 +276,10 @@ collision/movement.
   here patch the pinned release's shader chunks via `onBeforeCompile`, so any
   bump means re-verifying every patched chunk. A bump also touches KTX2:
   `assets/ktx2_support.ts` hand-builds a `workerConfig` on its no-context
-  fallback arm (a shape KTX2Loader owns and can change between releases), and
+  fallback arm (a shape KTX2Loader owns and can change between releases), wraps
+  the private `_createTexture` hook to capture restore sources for
+  `assets/ktx2_mip_release.ts` (fails soft to resident mips if the hook moves,
+  see `tests/ktx2_support.test.ts`), and
   the shipped `public/basis/` transcoder must be regenerated from the new three
   via `node scripts/patch_basis_transcoder.mjs` (never a raw copy: the shipped
   JS carries an eval-free embind patch so the KTX2 blob worker survives the
@@ -237,7 +314,8 @@ collision/movement.
   userData but silently DROPS `onBeforeCompile`, and three keys its program cache
   on `customProgramCacheKey()`, whose default return value IS
   `onBeforeCompile.toString()`. So a bare clone of a patched material (rim glow,
-  the worn surface-detail layer) both renders un-patched AND links a whole new
+  the worn surface-detail layer, the armour dye that carries a player's outfit
+  colorway, `characters/armor_dye.ts`) both renders un-patched AND links a whole new
   program on its first draw, wherever that draw lands. `cloneMaterialWithHooks`
   re-attaches exactly the layers the source carried, in the source's order, so
   the composed key comes out identical and the clone reuses the linked program.

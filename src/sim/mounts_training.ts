@@ -6,9 +6,10 @@
 // FINISHING the course passes the lesson and credits its quest objective
 // (mountTrainingRaceFinished, called from src/sim/mount_race.ts). Marla takes the
 // steed back afterward (an instant force-dismount; the player never keeps the
-// unowned mount), and turning in q_riding_lessons at her grants reins_valorsteed
-// (the first Valorsteed reins, sold for 10g). Dismounting or leaving the paddock
-// abandons the attempt (re-entrant: the player can start another race).
+// unowned mount). Turning in q_riding_lessons awards gold and XP only (its
+// itemRewards is empty); the reins_valorsteed themselves are a separate 10g
+// purchase from Marla's vendor stock afterwards. Dismounting or leaving the
+// paddock abandons the attempt (re-entrant: the player can start another race).
 //
 // The legacy mount_train_begin command remains append-only compatible, but no
 // current HUD button sends it. The session lives directly on PlayerMeta.mountTraining. The NPC

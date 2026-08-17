@@ -5,6 +5,8 @@ export type WeightedItem = {
 };
 
 export declare const DURATION_WEIGHT_OVERLAY: Readonly<Record<string, number>>;
+export declare const MEASURED_WEIGHTS: Readonly<Record<string, number>>;
+export declare const MEASURED_FALLBACK_MS: number;
 
 export declare function partitionByStripe(
   items: ReadonlyArray<WeightedItem>,
@@ -16,7 +18,7 @@ export declare function partitionByLpt(
   count: number,
 ): WeightedItem[][];
 
-export declare const partitionForCi: typeof partitionByStripe;
+export declare const partitionForCi: typeof partitionByLpt;
 
 export declare function weightForTestFile(relPath: string, body: string, size: number): number;
 

@@ -160,6 +160,49 @@ describe('guild bank grid instanced-slot marker', () => {
     expect(cell.querySelector('.bi-masterwork-seal')).not.toBeNull();
     expect(cell.getAttribute('aria-label')).toBe('Unknown item, quantity 1, masterwork');
   });
+
+  it('a guild-banked fine material wears the rim class and the fine corner seal', () => {
+    // The grade is an item fact, not a bag fact: depositing into the guild
+    // bank must not strip the mark bags painted (the fix that extended the
+    // bags-only fine mark to both banks). Fine ids are tradeable common
+    // reagents, so the fixture is never dormant and the plain aria pin holds.
+    const root = harness([
+      { itemId: 'fine_copper_ore', count: 2 },
+      { itemId: 'copper_ore', count: 2 },
+    ]);
+    const cells = cellsOf(root);
+    expect(cells.length).toBe(2);
+    expect(cells[0].classList.contains('bag-fine')).toBe(true);
+    const seal = cells[0].querySelector('.bi-fine-seal');
+    expect(seal).not.toBeNull();
+    expect(seal?.getAttribute('aria-hidden')).toBe('true');
+    // Aria stays the plain wording: the item NAME carries the grade word.
+    expect(cells[0].getAttribute('aria-label')).toBe('Fine Copper Ore, quantity 2');
+    // The base-grade sibling gets neither the rim nor the seal.
+    expect(cells[1].classList.contains('bag-fine')).toBe(false);
+    expect(cells[1].querySelector('.bi-fine-seal')).toBeNull();
+  });
+
+  it('masterwork wins the corner over fine in the guild grid while the rim stays', () => {
+    const root = harness([{ itemId: 'fine_copper_ore', count: 1, instance: MASTERWORK }]);
+    const cell = cellsOf(root)[0];
+    expect(cell.classList.contains('bag-fine')).toBe(true);
+    expect(cell.querySelector('.bi-masterwork-seal')).not.toBeNull();
+    expect(cell.querySelector('.bi-fine-seal')).toBeNull();
+    expect(
+      cell.querySelectorAll('.bi-glyph, .bi-instance, .bi-masterwork-seal, .bi-fine-seal').length,
+    ).toBe(1);
+  });
+
+  it('an unknown fine-looking id never composes the fine mark', () => {
+    // Not in the local grade table means no grade guess: the removed-def cell
+    // keeps its unknown styling with no rim and no seal.
+    const root = harness([{ itemId: 'fine_unmapped_future_material', count: 1 }]);
+    const cell = cellsOf(root)[0];
+    expect(cell.classList.contains('gbank-unknown')).toBe(true);
+    expect(cell.classList.contains('bag-fine')).toBe(false);
+    expect(cell.querySelector('.bi-fine-seal')).toBeNull();
+  });
 });
 
 describe('guild bank painter mark contract (source pins)', () => {
@@ -169,14 +212,25 @@ describe('guild bank painter mark contract (source pins)', () => {
     const painter = readFileSync('src/ui/guild_bank_window.ts', 'utf8')
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/\/\/[^\n]*/g, '');
-    expect(painter).toContain('instanceGlyphMarkHtml(glyphKind)');
+    expect(painter).toContain('cornerMarkHtml(cornerMark)');
     expect(painter).toContain('bagInstanceGlyphKind(slot.instance)');
     expect(painter).toMatch(/(?<!UNKNOWN_)INSTANCE_GLYPH_ARIA_KEYS\[glyphKind\]/);
     // The guild pane never uses the UNKNOWN_ key family (see the aria case
     // above); a switch to it must be a deliberate edit, not drift.
     expect(painter).not.toContain('UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS');
+    // The fine mark composes through the same pure cores and the one
+    // exhaustive cornerMarkHtml dispatch the bags and personal-bank painters
+    // use (quest arm pinned null: quest items cannot enter the guild bank).
+    // Both arms of the known/unknown branch emit the rim through
+    // bagRimClasses, so the seal and rim can never split across the branch.
+    expect(painter).toContain('bagFineMark(slot.itemId)');
+    expect(painter).toContain('bagCornerMark(glyphKind, null, fineMark)');
+    expect(painter.split('${bagRimClasses(null, fineMark)}').length).toBe(3);
+    expect(painter).not.toContain('instanceGlyphMarkHtml');
+    expect(painter).not.toContain('fineSealMarkHtml');
     // No private seal URL or class fork that could drift from bags.
     expect(painter).not.toContain('MASTERWORK_SEAL_IMAGE_URL');
     expect(painter).not.toContain('bi-masterwork-seal');
+    expect(painter).not.toContain('bi-fine-seal');
   });
 });

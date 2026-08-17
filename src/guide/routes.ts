@@ -9,9 +9,20 @@ import type { TranslationKey } from '../ui/i18n';
 
 export const GUIDE_BASE = '/wiki';
 
-// Sidebar groupings, in display order.
-export type GuideGroup = 'start' | 'compendium' | 'reference';
-export const GUIDE_GROUP_ORDER: GuideGroup[] = ['start', 'compendium', 'reference'];
+// Sidebar groupings, in display order. The single 'compendium' bucket held every
+// subject page and reached seventeen entries once Rifts and Mounts landed, which is
+// past the point a sidebar stays scannable. It is split by what a reader came for:
+// where they are (world), who they are (character), what they run at the top
+// (endgame), and how they fight other players (compete).
+export type GuideGroup = 'start' | 'world' | 'character' | 'endgame' | 'compete' | 'reference';
+export const GUIDE_GROUP_ORDER: GuideGroup[] = [
+  'start',
+  'world',
+  'character',
+  'endgame',
+  'compete',
+  'reference',
+];
 
 export interface GuideRoute {
   /** Stable id, also the page-registry key. */
@@ -78,7 +89,7 @@ export const GUIDE_ROUTES: GuideRoute[] = [
     id: 'classes',
     sub: 'classes',
     navKey: 'guide.nav.classes',
-    group: 'compendium',
+    group: 'character',
     topbar: true,
     descKey: 'guide.classList.sub',
   },
@@ -86,7 +97,7 @@ export const GUIDE_ROUTES: GuideRoute[] = [
     id: 'bestiary',
     sub: 'bestiary',
     navKey: 'guide.nav.bestiary',
-    group: 'compendium',
+    group: 'world',
     topbar: true,
     descKey: 'guide.bestiary.intro',
   },
@@ -94,14 +105,14 @@ export const GUIDE_ROUTES: GuideRoute[] = [
     id: 'models',
     sub: 'models',
     navKey: 'guide.nav.models',
-    group: 'compendium',
+    group: 'world',
     descKey: 'guide.models.intro',
   },
   {
     id: 'world',
     sub: 'world',
     navKey: 'guide.nav.world',
-    group: 'compendium',
+    group: 'world',
     topbar: true,
     descKey: 'guide.worldPage.intro',
   },
@@ -109,71 +120,94 @@ export const GUIDE_ROUTES: GuideRoute[] = [
     id: 'gear',
     sub: 'gear',
     navKey: 'guide.nav.gear',
-    group: 'compendium',
+    group: 'character',
     descKey: 'guide.gear.intro',
   },
   {
     id: 'professions',
     sub: 'professions',
     navKey: 'guide.nav.professions',
-    group: 'compendium',
+    group: 'character',
     descKey: 'guide.professions.intro',
   },
   {
     id: 'economy',
     sub: 'economy',
     navKey: 'guide.nav.economy',
-    group: 'compendium',
+    group: 'character',
     descKey: 'guide.economy.intro',
   },
   {
     id: 'quests',
     sub: 'quests',
     navKey: 'guide.nav.quests',
-    group: 'compendium',
+    group: 'world',
     descKey: 'guide.questsPage.intro',
   },
   {
     id: 'dungeons',
     sub: 'dungeons',
     navKey: 'guide.nav.dungeons',
-    group: 'compendium',
+    group: 'endgame',
     descKey: 'guide.dungeonsPage.intro',
   },
   {
     id: 'delves',
     sub: 'delves',
     navKey: 'guide.nav.delves',
-    group: 'compendium',
+    group: 'endgame',
     descKey: 'guide.delvesPage.intro',
+  },
+  {
+    id: 'rifts',
+    sub: 'rifts',
+    navKey: 'guide.nav.rifts',
+    group: 'endgame',
+    descKey: 'guide.riftsPage.intro',
+  },
+  {
+    id: 'mounts',
+    sub: 'mounts',
+    navKey: 'guide.nav.mounts',
+    group: 'world',
+    descKey: 'guide.mountsPage.intro',
   },
   {
     id: 'arena',
     sub: 'arena',
     navKey: 'guide.nav.arena',
-    group: 'compendium',
+    group: 'compete',
     descKey: 'guide.arenaPage.intro',
   },
   {
     id: 'vale-cup',
     sub: 'vale-cup',
     navKey: 'guide.nav.valeCup',
-    group: 'compendium',
+    group: 'compete',
     descKey: 'guide.valeCupPage.intro',
   },
   {
     id: 'thornhollow-fields',
     sub: 'thornhollow-fields',
     navKey: 'guide.nav.thornhollow',
-    group: 'compendium',
+    group: 'compete',
     descKey: 'guide.thornhollowPage.intro',
   },
   {
     id: 'deeds',
     sub: 'deeds',
     navKey: 'guide.nav.deeds',
-    group: 'compendium',
+    group: 'endgame',
     descKey: 'guide.deedsPage.intro',
+  },
+  {
+    id: 'reliquary',
+    sub: 'reliquary',
+    navKey: 'guide.nav.reliquary',
+    // Filed with deeds/dungeons/delves/rifts: the release's sidebar regroup
+    // retired the old catch-all 'compendium' this page was authored into.
+    group: 'endgame',
+    descKey: 'guide.reliquaryPage.intro',
   },
   {
     id: 'controls',
@@ -181,6 +215,13 @@ export const GUIDE_ROUTES: GuideRoute[] = [
     navKey: 'guide.nav.controls',
     group: 'reference',
     descKey: 'guide.controls.intro',
+  },
+  {
+    id: 'interface',
+    sub: 'reference/interface',
+    navKey: 'guide.nav.interface',
+    group: 'reference',
+    descKey: 'guide.interfacePage.intro',
   },
   {
     id: 'settings',
@@ -218,11 +259,25 @@ export const GUIDE_ROUTES: GuideRoute[] = [
     descKey: 'guide.talentsPage.intro',
   },
   {
+    id: 'commands',
+    sub: 'reference/commands',
+    navKey: 'guide.nav.commands',
+    group: 'reference',
+    descKey: 'guide.commandsPage.intro',
+  },
+  {
     id: 'glossary',
     sub: 'reference/glossary',
     navKey: 'guide.nav.glossary',
     group: 'reference',
     descKey: 'guide.glossary.intro',
+  },
+  {
+    id: 'editor',
+    sub: 'reference/editor',
+    navKey: 'guide.nav.editor',
+    group: 'reference',
+    descKey: 'guide.editorPage.intro',
   },
 ];
 

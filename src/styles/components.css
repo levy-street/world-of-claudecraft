@@ -1736,6 +1736,86 @@
     color: #7c7256;
     font-style: italic;
   }
+  /* The lifetime "Time Played" line footing the character sheet: the shared
+     inset-card treatment laid out as one slim row (label, value, then the
+     reveal/conceal eye pushed to the far edge). */
+  .char-playtime {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .char-playtime .cp-title {
+    margin-bottom: 0;
+  }
+  .char-playtime-value {
+    font-size: 13px;
+    color: #fff;
+    font-weight: normal;
+    font-variant-numeric: tabular-nums;
+  }
+  .char-playtime-value-hidden {
+    /* Information-bearing text (the concealed state's only signal), so the
+       readable muted token, not the fainter .cp-none gray. */
+    color: var(--color-text-muted);
+    font-style: italic;
+  }
+  /* The value's privacy eye: the helm eye's circle chrome, seated inline at
+     the row's far edge instead of on a socket corner. */
+  .char-playtime-eye {
+    position: relative;
+    flex: none;
+    margin-left: auto;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(202, 164, 114, 0.5);
+    background: rgba(40, 26, 20, 0.85);
+    color: var(--color-text-secondary, #d6c1a0);
+    cursor: var(--cursor-point);
+    transition:
+      border-color 0.12s,
+      box-shadow 0.12s,
+      color 0.12s;
+  }
+  .char-playtime-eye .ui-icon {
+    width: 14px;
+    height: 14px;
+  }
+  /* Invisible hit extension to the 36px desktop / 40px mobile floors
+     (DESIGN.md 10.1: padding where the visual is smaller). */
+  .char-playtime-eye::after {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+  }
+  body.mobile-touch .char-playtime-eye::after {
+    inset: -8px;
+  }
+  .char-playtime-eye[aria-pressed="true"] {
+    color: rgba(214, 193, 160, 0.55);
+  }
+  .char-playtime-eye:hover,
+  .char-playtime-eye:focus-visible {
+    border-color: rgba(255, 218, 160, 0.8);
+    color: #fff;
+    box-shadow: 0 0 7px rgba(202, 164, 114, 0.4);
+  }
+  /* Steady keyboard ring, distinct from hover (the HUD-chrome WCAG contract):
+     never transitioned (the transition list above excludes outline). */
+  .char-playtime-eye:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .char-playtime-eye {
+      transition: none;
+    }
+  }
   .ms-badge {
     display: inline-block;
     font-size: 10.5px;
@@ -4669,6 +4749,22 @@
     color: #ffe6a8;
   }
 
+  /* OTA update gate (src/ui/ota_update_overlay.ts): the native-update dialog
+     family plus a download progress bar driven by the updater plugin. */
+  .ota-update-progress {
+    margin-top: 12px;
+    height: 12px;
+    border: 1px solid #5a4413;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.55);
+    overflow: hidden;
+  }
+  .ota-update-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(#8a6a26, #5a4413 55%, #473409);
+  }
+
   /* ---------- first-run camera mode prompt ---------- */
   .camera-prompt-backdrop {
     position: fixed;
@@ -6498,25 +6594,12 @@
       inset 0 1px 4px #000c,
       0 0 5px color-mix(in srgb, var(--color-bag-quest-rim) 28%, transparent);
   }
-  /* Fine-grade material cells (material_grades fine_* ids): cool refined
-     teal-silver rim + soft wash so craft reagents stand apart from plain
-     white common stacks. Grade class, not a rarity tier: never reuses
-     green/blue/purple quality borders or quest gold. Placed after the
-     common/poor neutral reset so the fine rim wins at equal specificity;
-     the rim glow is a deliberate, nine-id exception to that reset's
-     no-glow-on-commons rule (the whole point of the mark). Purpose outranks
-     grade: the painter (bag_corner_mark_view.ts bagRimClasses) never emits
-     .bag-fine together with .bag-quest, so this block's source order against
-     .bag-quest above is not load-bearing. Always-on, no --fx-* gate
-     (fairness). */
-  .bag-item.bag-fine {
-    border-color: var(--color-bag-fine-rim) !important;
-    box-shadow:
-      inset 0 0 10px var(--color-bag-fine-wash),
-      inset 0 0 0 1px color-mix(in srgb, var(--color-bag-fine-rim) 45%, transparent),
-      inset 0 1px 4px #000c,
-      0 0 6px color-mix(in srgb, var(--color-bag-fine-rim) 32%, transparent);
-  }
+  /* The fine-grade rim/wash block lives BELOW the bank grid's common/poor
+     neutral reset as one dual-selector cell rule (search for the bag-fine
+     class): it must sit after BOTH commons resets to win them at equal
+     specificity, and the bag reset is above while the bank reset is far
+     below. Order against the cell focus rings is not load-bearing (they are
+     outline-based). */
   .bag-item .bi-count {
     position: absolute;
     right: 2px;
@@ -6556,14 +6639,15 @@
      quest seal, fine seal): top-left, clear of the bottom-right count badge,
      one dark drop-shadow for contrast; each kind carries only its color below.
      The masterwork seal is the one outlier (a 16px authored image).
-     Bank cells share the per-copy glyph mark so a banked masterwork keeps its
-     seal: the payload always survived deposit in the sim, but the bank grids
-     never painted the mark bags already had. Quest and fine seals stay
-     bag-only (quest items cannot enter the bank; fine needs the def). */
+     Bank cells share the per-copy glyph mark AND the fine seal so a banked
+     masterwork or fine stack keeps the mark bags gave it (marks are an
+     all-surfaces family, see item_instance_glyph_mark.ts). Only the quest
+     seal stays bag-only: quest items cannot enter either bank. */
   .bag-item .bi-glyph,
   .bank-item .bi-glyph,
   .bag-item .bi-quest-seal,
-  .bag-item .bi-fine-seal {
+  .bag-item .bi-fine-seal,
+  .bank-item .bi-fine-seal {
     position: absolute;
     top: 1px;
     left: 1px;
@@ -6576,7 +6660,8 @@
   .bag-item .bi-glyph .ui-icon,
   .bank-item .bi-glyph .ui-icon,
   .bag-item .bi-quest-seal .ui-icon,
-  .bag-item .bi-fine-seal .ui-icon {
+  .bag-item .bi-fine-seal .ui-icon,
+  .bank-item .bi-fine-seal .ui-icon {
     display: block;
     width: 100%;
     height: 100%;
@@ -6612,10 +6697,12 @@
     color: var(--color-bag-quest-seal);
   }
   /* Fine-grade corner seal: small crafting glyph in refined teal (box shared
-     with .bi-glyph above). Aria-hidden; the item NAME carries the grade word,
-     so the cell accessible name needs no dedicated sentence. Glyph priority:
-     masterwork > quest > fine > instance marks (bag_corner_mark_view.ts). */
-  .bag-item .bi-fine-seal {
+     with .bi-glyph above), identical in bags and both banks. Aria-hidden; the
+     item NAME carries the grade word, so the cell accessible name needs no
+     dedicated sentence. Glyph priority: masterwork > quest > fine > instance
+     marks (bag_corner_mark_view.ts). */
+  .bag-item .bi-fine-seal,
+  .bank-item .bi-fine-seal {
     color: var(--color-bag-fine-seal);
   }
   /* Ready-to-turn-in: brighter static seal (shape stays primary). Optional
@@ -6647,6 +6734,30 @@
     .bag-item.bag-quest-ready .bi-quest-seal-ready {
       animation: none;
     }
+  }
+  /* Player item lock (issue 3042): a small padlock badge, bottom-left, clear
+     of both the top-left glyph box and the bottom-right count badge, so it
+     composes with any other corner mark instead of competing for it (a locked
+     copy can also be masterwork/enchanted/signed/bound). Always visible on
+     desktop and touch, identical on every graphics preset (no --fx-* gate);
+     aria-hidden, the cell accessible name carries the locked fact. All-surfaces
+     family (item_instance_glyph_mark.ts): bags and both banks share this rule. */
+  .bag-item .bi-lock-seal,
+  .bank-item .bi-lock-seal {
+    position: absolute;
+    left: 2px;
+    bottom: 1px;
+    width: 11px;
+    height: 11px;
+    color: var(--color-bag-lock-seal);
+    pointer-events: none;
+    filter: drop-shadow(0 1px 1px #000);
+  }
+  .bag-item .bi-lock-seal .ui-icon,
+  .bank-item .bi-lock-seal .ui-icon {
+    display: block;
+    width: 100%;
+    height: 100%;
   }
   .bag-item.empty {
     cursor: default;
@@ -6801,12 +6912,16 @@
   }
   .bag-tools {
     display: flex;
+    /* Wrap rather than clip: in the half-width mobile pairings (char/vendor/
+       bank/market) the row is too narrow for search + sort + Sort button, and
+       overflow:hidden on the sheet would silently eat the last control. */
+    flex-wrap: wrap;
     gap: 6px;
     align-items: center;
   }
   .bag-search {
     flex: 1 1 auto;
-    min-width: 0;
+    min-width: 96px;
     font-family: var(--ui-font);
     font-size: 16px;
     padding: 4px 7px;
@@ -6829,6 +6944,62 @@
     background: #14110b;
     color: inherit;
     cursor: var(--cursor-point);
+  }
+  /* The one-shot clean-up button beside the view dropdown (the
+     .bank-deposit-all action-button shape: same row, same gold treatment). */
+  .bag-sort-btn {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--ui-font);
+    font-size: 12px;
+    padding: 4px 9px;
+    border-radius: 4px;
+    border: 1px solid #6a5320;
+    background: linear-gradient(#8a6a26, #5a4413 55%, #473409);
+    color: #ffe6a8;
+    cursor: var(--cursor-point);
+    white-space: nowrap;
+  }
+  .bag-sort-btn:hover {
+    filter: brightness(1.12);
+  }
+  .bag-sort-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .bag-sort-btn .ui-icon {
+    width: 14px;
+    height: 14px;
+  }
+  body.mobile-touch .bag-sort-btn {
+    min-height: 40px;
+  }
+  /* One-shot settle ripple after a clean-up: each square eases in with a
+     small per-cell stagger (--settle-i, capped painter-side). Opacity plus a
+     3px drop only (DESIGN.md motion rules); reduced motion turns it off. */
+  .bag-grid-settle > * {
+    animation: bag-sort-settle calc(160ms * var(--motion-scale, 1)) ease-out backwards;
+    animation-delay: calc(var(--settle-i, 0) * 14ms * var(--motion-scale, 1));
+  }
+  @keyframes bag-sort-settle {
+    from {
+      opacity: 0.35;
+      transform: translateY(-3px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bag-grid-settle > * {
+      animation: none;
+    }
+  }
+  body.reduce-motion .bag-grid-settle > * {
+    animation: none;
   }
   .money {
     margin-top: 8px;
@@ -6986,6 +7157,32 @@
   .bank-item.q-common {
     border-color: #4a3d26 !important;
     box-shadow: inset 0 1px 4px #000c;
+  }
+  /* Fine-grade material cells (material_grades fine_* ids): cool refined
+     teal-silver rim + soft wash so craft reagents stand apart from plain
+     white common stacks, in bags AND both banks (one dual-selector rule so
+     the treatment cannot drift per surface). Grade class, not a rarity tier:
+     never reuses green/blue/purple quality borders or quest gold. Placed
+     after BOTH common/poor neutral resets (the bag reset sits in the bags
+     section far above) so the fine rim wins them at equal specificity; the
+     rim glow is a deliberate, nine-id exception to those resets'
+     no-glow-on-commons rule (the whole point of the mark). Purpose outranks
+     grade: the painter (bag_corner_mark_view.ts bagRimClasses) never emits
+     .bag-fine together with .bag-quest, so source order against .bag-quest
+     is not load-bearing; nor is order against the cell focus rings, which
+     are outline-based. This box-shadow REPLACES the quality-glow rule at the
+     same specificity, which is inert while every fine id is common quality
+     (the commons resets kill that glow anyway); a future non-common fine
+     grade must revisit this composition or lose its quality glow. Always-on,
+     no --fx-* gate (fairness). */
+  .bag-item.bag-fine,
+  .bank-item.bag-fine {
+    border-color: var(--color-bag-fine-rim) !important;
+    box-shadow:
+      inset 0 0 10px var(--color-bag-fine-wash),
+      inset 0 0 0 1px color-mix(in srgb, var(--color-bag-fine-rim) 45%, transparent),
+      inset 0 1px 4px #000c,
+      0 0 6px color-mix(in srgb, var(--color-bag-fine-rim) 32%, transparent);
   }
   .bank-count {
     position: absolute;
@@ -7753,11 +7950,25 @@
     color: var(--gold-dim);
     text-align: center;
   }
-  .deeds-titles {
+  .deeds-titles,
+  .deeds-borders {
     display: flex;
     flex-direction: column;
     gap: 4px;
     padding: 2px;
+  }
+  /* Which picker a run of options belongs to. The two groups sit in one
+     scroll column, so without a heading the border options read as more
+     titles. It is an h3 (the window family's section-heading level; the group
+     is named by it through aria-labelledby), so BOTH the size and the weight
+     are declared here: the UA sheet renders h3 bold and at 1.17em, and this
+     shelf label is neither. The base reset already zeroes the UA margins. */
+  .deeds-picker-head {
+    font-family: var(--title-font);
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--gold-dim);
+    padding: 6px 2px 2px;
   }
   .deed-title-option {
     font-family: var(--title-font);
@@ -7837,12 +8048,811 @@
     color: #d9c2f2;
     background: #201628;
   }
+  /* The border currently worn. The badge label already carries the worn word
+     (charBorderWorn), so this is reinforcement, never the only cue. */
+  .ms-badge.ms-deed-border.ms-active {
+    border-color: #c97bff;
+    color: #f0e2ff;
+    background: #33204a;
+  }
   .inspect-title {
     font-size: 12px;
     font-style: italic;
     color: #ffe9a0;
     font-family: var(--title-font);
     margin-top: -2px;
+  }
+  /* ---------- reliquary ---------- */
+  /* The Reliquary: cold collection browser (summary strip, shelf rail,
+     Overview recent/nearly, shelf page rows, page grids, search + filter).
+     Progress bars are build-time writes; no per-frame rebuild. Semantic colours
+     come from tokens (--gold, --color-border-showcase, --color-border-focus);
+     the focus ring is always token-drawn and never transitioned off.
+     Surface fills are plain literals shared with the Book of Deeds section
+     (its .deed-bar / chip / .deeds-cat treatments), NOT var(--x, literal)
+     pseudo-tokens: --color-surface-inset, --color-surface-hover,
+     --color-border-active, and --color-surface-active-top were never defined
+     anywhere, so the fallback always painted, and the "inset" name carried two
+     different values in this one section. Recorded debt: these interaction
+     surfaces want real per-preset values out of themeCssVars (src/ui/theme.ts),
+     not new static tokens, so they stay literals until that family lands. */
+  #reliquary-window {
+    width: 720px;
+    max-height: calc(var(--app-vh, 100vh) * 0.82 / var(--window-scale) - 24px);
+    flex-direction: column;
+  }
+  #reliquary-window .panel-title {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #reliquary-window .panel-title > span {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  /* 16px is an iOS floor, not a taste call: a smaller font-size makes Safari
+     zoom the whole window on focus (the .deed-search contract). */
+  .reliquary-search {
+    flex: 0 1 190px;
+    min-width: 100px;
+    font-family: var(--ui-font);
+    font-size: 16px;
+    padding: 3px 7px;
+    border-radius: 4px;
+    border: 1px solid #5a4a2e;
+    background: #14110b;
+    color: inherit;
+  }
+  .reliquary-search:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  /* The 16px font-size above is the iOS anti-zoom floor, not a touch target.
+     The .bag-search precedent settles the height in-family. */
+  body.mobile-touch .reliquary-search {
+    min-height: 40px;
+  }
+  .reliquary-summary {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 2px 0 6px;
+    font-family: var(--title-font);
+    font-size: 12px;
+    color: var(--gold-dim);
+    flex-wrap: wrap;
+  }
+  .reliquary-summary b,
+  .reliquary-rank {
+    color: var(--gold);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  /* The owned/total pair is a readout under the window title, not a second
+     title: demote it below the summary's own size and off the gold. */
+  .reliquary-count {
+    font-family: var(--ui-font);
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--color-text-muted);
+  }
+  /* Phase 6: Curator rank seal chrome (cosmetic only; no combat info).
+     Phase 14 removed this block's reduced-motion box-shadow suppression on
+     purpose: the tier glows are STATIC shadows that never animate, so hiding
+     them under prefers-reduced-motion suppressed decoration, not motion. */
+  .reliquary-rank-seal {
+    display: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid var(--color-border-showcase);
+    background: #14110b;
+    box-shadow: inset 0 0 0 2px #1c1812;
+    flex: none;
+  }
+  .reliquary-summary.has-seal .reliquary-rank-seal {
+    display: inline-block;
+  }
+  .reliquary-summary[data-seal="apprentice"] .reliquary-rank-seal {
+    border-color: var(--gold-dim);
+    background: linear-gradient(to bottom, var(--gold-dim), #14110b);
+  }
+  .reliquary-summary[data-seal="keeper"] .reliquary-rank-seal {
+    border-color: var(--gold);
+    background: linear-gradient(to bottom, var(--gold-dim), var(--gold));
+  }
+  .reliquary-summary[data-seal="master"] .reliquary-rank-seal {
+    border-color: var(--gold);
+    background: linear-gradient(to bottom, var(--gold), var(--gold-dim));
+    box-shadow: 0 0 4px color-mix(in srgb, var(--gold) 40%, transparent);
+  }
+  .reliquary-summary[data-seal="grand"] .reliquary-rank-seal {
+    border-color: var(--gold);
+    background: radial-gradient(circle at 35% 30%, var(--gold), var(--gold-dim) 70%);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--gold) 55%, transparent);
+  }
+  .reliquary-summary[data-seal="eternal"] .reliquary-rank-seal {
+    border-color: var(--gold);
+    background: radial-gradient(
+      circle at 35% 30%,
+      color-mix(in srgb, var(--gold) 35%, white),
+      var(--gold) 45%,
+      var(--gold-dim) 85%
+    );
+    box-shadow: 0 0 8px color-mix(in srgb, var(--gold) 70%, transparent);
+  }
+  .reliquary-pct {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+  }
+  .reliquary-bar {
+    display: inline-block;
+    width: 100px;
+    height: 8px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    background: #14110b;
+    overflow: hidden;
+    vertical-align: middle;
+  }
+  /* One fill rule for every bar in the window (summary, page header, the
+     nearly mini bar, the shelf cards): the painter writes the percentage into
+     --reliquary-fill instead of an inline width, the range-slider track idiom
+     (var(--range-fill, 0%) in base.css). The 0% fallback keeps an unset bar
+     empty rather than full, so a bar that lost its custom property reads as no
+     progress instead of complete. */
+  .reliquary-bar-fill {
+    display: block;
+    height: 100%;
+    width: var(--reliquary-fill, 0%);
+    background: linear-gradient(to bottom, var(--gold), var(--gold-dim));
+  }
+  .reliquary-body {
+    flex: 1 1 auto;
+    display: flex;
+    gap: 10px;
+    min-height: 140px;
+  }
+  .reliquary-rail {
+    flex: 0 0 148px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow-y: auto;
+  }
+  .reliquary-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    font-family: var(--title-font);
+    font-size: 12px;
+    text-align: left;
+    padding: 6px 8px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    background: none;
+    color: var(--gold-dim);
+    cursor: var(--cursor-point);
+    min-height: 32px;
+  }
+  .reliquary-nav:hover {
+    color: var(--gold);
+    background: #1c1812;
+  }
+  .reliquary-nav.active {
+    color: var(--gold);
+    border-color: #6a5320;
+    background: linear-gradient(to bottom, #2a220f, #1c1812);
+  }
+  .reliquary-nav:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .reliquary-nav-count {
+    font-size: 11px;
+    opacity: 0.85;
+  }
+  body.mobile-touch .reliquary-nav {
+    min-height: 40px;
+  }
+  .reliquary-scroll {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 100px;
+    overflow-y: auto;
+    padding-right: 2px;
+  }
+  .reliquary-overview {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .reliquary-recent,
+  .reliquary-nearly {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--gold-dim);
+  }
+  .reliquary-strip-label {
+    font-family: var(--title-font);
+    color: var(--gold);
+  }
+  /* The trailing note on a strip (what the strip is counting, or where the
+     rest of it lives). Muted against the strip's own gold-dim body so it reads
+     as an aside, and no chip chrome: it is prose, not a target. */
+  .reliquary-strip-hint {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  /* A recent-find chip. It is a BUTTON that jumps to the relic's page, so it
+     declares its own font and colour (a button inherits neither) and the base
+     rule stays shared with the plain span form the strip still renders when
+     there is nothing to jump to. */
+  .reliquary-recent-item {
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    padding: 3px 8px;
+    font-family: var(--ui-font);
+    font-size: 12px;
+    text-align: left;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 8px;
+    background: #171309;
+    color: var(--gold-dim);
+  }
+  /* The pointer is scoped to the button form: on the span form it would
+     promise a click that does not exist, which is the .reliquary-cell lesson.
+     Hover and focus stay on the bare class: a keyline is honest either way
+     (the span still opens the shared tooltip), and only a focusable element
+     can match :focus-visible in the first place. */
+  .reliquary-recent-item:is(button) {
+    cursor: var(--cursor-point);
+  }
+  /* A fixed icon box, so a tall or wide glyph cannot stretch the chip. Sized
+     on the outer element and again on an inner one, because the icon helpers
+     return either a bare <img> or a wrapper around one. */
+  .reliquary-recent-icon {
+    display: block;
+    flex: none;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+  }
+  .reliquary-recent-icon img,
+  .reliquary-recent-icon .item-icon {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+  }
+  /* A long relic name wraps inside its chip instead of truncating: an
+     ellipsis would hide the tail from keyboard players, who have no pointer
+     to fire the shared hover tooltip (wire()) that repeats the name. The cap
+     only bounds the line length, and overflow-wrap keeps that true for an
+     unbreakable compound (German or Finnish single-word names), which would
+     otherwise spill past the chip border. */
+  .reliquary-recent-name {
+    max-width: 160px;
+    overflow-wrap: anywhere;
+  }
+  .reliquary-nearly-row,
+  .reliquary-page-row,
+  .reliquary-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--ui-font);
+    font-size: 13px;
+    text-align: left;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--color-border-showcase);
+    background: #171309;
+    color: var(--gold-dim);
+    cursor: var(--cursor-point);
+    min-height: 32px;
+  }
+  /* One hover keyline and one focus ring for the whole jump family: the rows,
+     the Back button, the recent chips, and the shelf cards share the surface,
+     so they share these too (the chip's hover stays on the bare class: a
+     keyline is honest on its inert span form as well). */
+  .reliquary-nearly-row:hover,
+  .reliquary-page-row:hover,
+  .reliquary-back:hover,
+  .reliquary-recent-item:hover,
+  .reliquary-shelf-card:hover {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+  }
+  .reliquary-nearly-row:focus-visible,
+  .reliquary-page-row:focus-visible,
+  .reliquary-back:focus-visible,
+  .reliquary-recent-item:focus-visible,
+  .reliquary-shelf-card:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  body.mobile-touch .reliquary-nearly-row,
+  body.mobile-touch .reliquary-page-row,
+  body.mobile-touch .reliquary-back {
+    min-height: 40px;
+  }
+  /* Inside a nearly row the bar is a glance, not the readout: the row already
+     carries the owned/total text, so the bar shrinks to a mini variant that
+     leaves room for the name to wrap. */
+  .reliquary-nearly-row .reliquary-bar {
+    width: 64px;
+    height: 6px;
+  }
+  .reliquary-to-go {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .reliquary-progress-text,
+  .reliquary-clears {
+    font-size: 11px;
+    opacity: 0.9;
+  }
+  .reliquary-complete-badge {
+    font-family: var(--title-font);
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 0.04em;
+  }
+  /* The outside-completion chips (Retired, Personal) share the badge's type but
+     never its celebratory gold: those pages can never be finished, so wearing
+     the Illuminated color would read as a reward. */
+  .reliquary-complete-badge[data-retired],
+  .reliquary-complete-badge[data-personal] {
+    color: var(--color-text-muted);
+  }
+  /* The illuminated page detail frames every badge inside it (further down this
+     section). A veteran CAN complete the retired vault, so the chip has to opt
+     out of that gold frame here, where it would otherwise inherit it. */
+  .reliquary-page-detail.is-illuminated .reliquary-complete-badge[data-retired],
+  .reliquary-page-detail.is-illuminated .reliquary-complete-badge[data-personal] {
+    border-color: var(--color-border-default);
+    background: none;
+  }
+  /* A real ul/li list (the .prof-list structure). role="list" is kept on the
+     element as well: Safari VoiceOver drops list semantics once list-style is
+     none, which is exactly what this rule sets. */
+  .reliquary-page-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .reliquary-page-item {
+    display: flex;
+    gap: 6px;
+  }
+  /* min-width: 0 so the row yields to its pin sibling instead of pushing it out
+     of the list: width: 100% only sets the flex BASE size, and a flex item
+     cannot shrink past its content without this. */
+  .reliquary-page-row {
+    width: 100%;
+    min-width: 0;
+    justify-content: space-between;
+  }
+  /* The HUD-tracker pin: a SIBLING of the row button, never nested inside it
+     (a button in a button is invalid and unreachable), styled as the deeds
+     .deed-watch control so the two collection windows offer the same affordance.
+     The pressed state is aria-pressed; .pinned is only its paint. */
+  .reliquary-pin {
+    flex: 0 0 auto;
+    font-family: var(--ui-font);
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid #6a5320;
+    background: linear-gradient(#8a6a26, #5a4413 55%, #473409);
+    color: #ffe6a8;
+    cursor: var(--cursor-point);
+    white-space: nowrap;
+  }
+  .reliquary-pin:hover:not(:disabled):not([aria-disabled="true"]) {
+    filter: brightness(1.12);
+  }
+  /* The at-cap refusal is aria-disabled (never native disabled) so the control
+     stays a tab stop and its aria-describedby reason stays reachable; both
+     forms take the same dimmed paint. */
+  .reliquary-pin:disabled,
+  .reliquary-pin[aria-disabled="true"] {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .reliquary-pin:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .reliquary-pin.pinned {
+    border-color: #8a6a26;
+    background: #241c0c;
+  }
+  body.mobile-touch .reliquary-pin {
+    min-width: 40px;
+    min-height: 40px;
+  }
+  .reliquary-page-main {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  .reliquary-page-name {
+    color: var(--gold);
+    font-family: var(--title-font);
+  }
+  /* Second line: the authored page blurb. The shared row-subtitle truncation
+     idiom (.soc-sub / .mail-row-sender), so a long blurb ellipsizes inside its
+     min-width: 0 column instead of stretching the row. No title attribute. */
+  .reliquary-page-sub {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .reliquary-page-desc {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--color-text-muted);
+  }
+  /* The population line under the blurb (the .deed-rarity sibling): a muted
+     one-liner, absent entirely when there is no aggregate to report. */
+  .reliquary-page-rarity {
+    margin: 0;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  /* flex: none matches the .deeds-filterbar twin: inside the page-detail flex
+     column the chip row would otherwise shrink under pressure. */
+  .reliquary-filterbar {
+    flex: none;
+    display: flex;
+    gap: 6px;
+    padding-top: 6px;
+    flex-wrap: wrap;
+  }
+  .reliquary-filter-chip {
+    font-family: var(--ui-font);
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 10px;
+    border: 1px solid #56472a;
+    background: #1d1810;
+    color: #d8c489;
+    cursor: var(--cursor-point);
+    min-height: 24px;
+  }
+  .reliquary-filter-chip:hover {
+    color: var(--gold);
+  }
+  .reliquary-filter-chip.active {
+    border-color: #b8902a;
+    color: #ffe27a;
+    background: #2a210c;
+  }
+  .reliquary-filter-chip:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  body.mobile-touch .reliquary-filter-chip {
+    min-width: 40px;
+    min-height: 40px;
+  }
+  .reliquary-page-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .reliquary-page-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    /* The is-illuminated frame below only recolors this transparent border:
+       keeping the box metrics identical in both states stops the whole grid
+       from jumping inward at the exact moment the celebration plays. */
+    padding: 8px 8px 10px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+  }
+  .reliquary-page-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .reliquary-page-title {
+    margin: 0;
+    font-family: var(--title-font);
+    font-size: 16px;
+    color: var(--gold);
+  }
+  .reliquary-page-progress-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .reliquary-page-bar {
+    width: 140px;
+    max-width: 100%;
+  }
+  .reliquary-page-progress,
+  .reliquary-page-clears,
+  .reliquary-account-scope {
+    margin: 0;
+    font-size: 13px;
+    color: var(--gold-dim);
+  }
+  .reliquary-account-scope {
+    margin-bottom: 6px;
+  }
+  /* An illuminated page is the payoff of the whole window, so it keeps a
+     standing gold frame rather than the letter-spacing it used to carry alone:
+     that spacing was invisible next to an unfinished page, which left a
+     completed page looking identical to a page one relic short. The badge
+     fills in to match. The celebration one-shot further down the section is
+     authored after this rule, so it wins the frame for the moment it plays. */
+  .reliquary-page-detail.is-illuminated {
+    border-color: var(--gold-dim);
+    box-shadow: inset 0 0 12px color-mix(in srgb, var(--gold) 12%, transparent);
+  }
+  .reliquary-page-detail.is-illuminated .reliquary-complete-badge {
+    padding: 1px 8px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 9px;
+    background: color-mix(in srgb, var(--gold) 14%, transparent);
+  }
+  .reliquary-page-detail.is-illuminated .reliquary-page-illuminated {
+    letter-spacing: 0.06em;
+  }
+  /* Page relic grid: owned art vs quality silhouettes. Tokens only; no
+     raw hex on the focus ring. Touch targets meet the 40px mobile floor. */
+  .reliquary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .reliquary-cell {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    min-width: 48px;
+    min-height: 48px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 6px;
+    background: #171309;
+    outline: none;
+  }
+  /* No cursor: var(--cursor-point) here. A cell has no click handler; the
+     pointer affordance promised an action that does not exist. Hover still
+     reads (it opens the relic tooltip), so it gets an honest keyline instead,
+     matching the row family's hover treatment. No transform on hover/focus. */
+  .reliquary-cell:hover {
+    border-color: var(--gold-dim);
+  }
+  .reliquary-cell:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .reliquary-cell-art {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .reliquary-cell-art .item-icon {
+    width: 70%;
+    height: 70%;
+    object-fit: contain;
+  }
+  .reliquary-cell--owned {
+    box-shadow: inset 0 0 0 1px #6a5320;
+  }
+  .reliquary-cell--missing {
+    opacity: 0.72;
+  }
+  .reliquary-cell--missing .item-icon {
+    filter: brightness(0.18) contrast(1.1);
+    opacity: 0.9;
+  }
+  /* Opaque-art carve-out: Armory store thumbnails AND procedural crests
+     (category fallbacks, bespoke crests whose art trails) paint their own
+     bright background, so the item silhouette treatment above reads as a
+     near-black tile instead of a shape. Grayscale plus a gentler darken
+     keeps the art's silhouette visible while still reading locked. The
+     window stamps data-cell-art="opaque" from the resolver's own family
+     answer (reliquaryCellArtOpaque), so this rule never grows a second kind
+     literal when a new opaque family appears. */
+  .reliquary-cell--missing[data-cell-art="opaque"] .item-icon {
+    filter: grayscale(1) brightness(0.45) contrast(1.05);
+  }
+  /* Forced-colors mode does not remap img content but the filters above
+     still apply, turning a locked relic into an unreadable dark blob, so
+     both filter rules drop (the second selector is load-bearing: the
+     carve-out is one specificity rung above the plain missing rule, and a
+     media query adds none). Forced colors also strips the owned cell's
+     box-shadow ring, which normally separates the two states alongside the
+     darkened art, so the missing state gains a dashed border as a
+     color-independent cue; the aria label carries the state for readers
+     either way. Same @layer as the rules it overrides; a later layer could
+     outrank this, which is why the declaration pin in
+     tests/reliquary_window.test.ts is content-bound. */
+  @media (forced-colors: active) {
+    .reliquary-cell--missing .item-icon,
+    .reliquary-cell--missing[data-cell-art="opaque"] .item-icon {
+      filter: none;
+    }
+    .reliquary-cell--missing {
+      border-style: dashed;
+    }
+  }
+  .reliquary-empty {
+    padding: 16px 8px;
+    font-size: 13px;
+    color: var(--gold-dim);
+    text-align: center;
+  }
+  /* Overview shelf cards: one card per shelf, three up, the flagship the
+     Overview leads with. A card is a jump button to its shelf, so it carries
+     the pointer, the row family's hover keyline, and the token focus ring. The
+     palette is the recent chip's (showcase hairline over the dark fill), not a
+     new surface. */
+  .reliquary-shelf-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .reliquary-shelf-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    min-width: 0;
+    min-height: 92px;
+    padding: 10px;
+    font-family: var(--ui-font);
+    font-size: 12px;
+    text-align: left;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 8px;
+    background: #171309;
+    color: var(--gold-dim);
+    cursor: var(--cursor-point);
+  }
+  .reliquary-shelf-card-name {
+    font-family: var(--title-font);
+    font-weight: 700;
+    color: var(--gold);
+  }
+  /* The card bar spans the card. Without this it is a flex item under
+     align-items: flex-start and shrinks to its own 100px inline-block width. */
+  .reliquary-shelf-card .reliquary-bar {
+    width: 100%;
+  }
+  /* The newest find on the shelf. It wraps instead of truncating, the
+     .reliquary-recent-name contract: the card is a button, so an ellipsis
+     would need a hover tooltip a keyboard player has no pointer to fire. */
+  .reliquary-shelf-card-recent {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    overflow-wrap: anywhere;
+  }
+  /* The reconciliation line under the Overview header: it says why the owned
+     count and the shelf counts added up do not have to match. */
+  .reliquary-uniques-note,
+  .reliquary-border-note {
+    margin: 0;
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  /* Illumination celebration: the one-shots the painter fires on the repaint
+     that first sees a page complete. Every class here is added by that repaint
+     and removed on animationend, so nothing loops and the painter runs no
+     timer. The page frame flashes gold (the .deed-card-flash pattern) while
+     the grid brightens once underneath it. */
+  .reliquary-page-detail.reliquary-page-celebrate {
+    animation: reliquary-page-celebrate 1.6s ease-out 1;
+  }
+  @keyframes reliquary-page-celebrate {
+    0% {
+      box-shadow:
+        inset 0 0 0 2px var(--gold),
+        0 0 14px 3px color-mix(in srgb, var(--gold) 55%, transparent);
+    }
+    /* Settle on the standing is-illuminated glow, not transparent: the
+       animated shadow REPLACES the standing rule for its whole run, so a
+       transparent end frame would pop back to the glow at animationend. */
+    100% {
+      box-shadow:
+        inset 0 0 12px color-mix(in srgb, var(--gold) 12%, transparent),
+        0 0 0 0 transparent;
+    }
+  }
+  /* The grid sweep is brightness only: it lifts what is already on screen and
+     hides nothing, so a silhouette stays a silhouette and an owned relic stays
+     legible for the whole 1.6s. */
+  .reliquary-page-celebrate .reliquary-grid {
+    animation: reliquary-grid-shimmer 1.6s ease-out 1;
+  }
+  @keyframes reliquary-grid-shimmer {
+    0% {
+      filter: brightness(1);
+    }
+    30% {
+      filter: brightness(1.35);
+    }
+    100% {
+      filter: brightness(1);
+    }
+  }
+  /* One cell lighting up as its relic lands: the same one-shot, shorter,
+     scoped to the cell so a single find does not flash the whole page. */
+  .reliquary-cell-flash {
+    animation: reliquary-cell-flash 1s ease-out 1;
+  }
+  @keyframes reliquary-cell-flash {
+    0% {
+      box-shadow:
+        inset 0 0 0 2px var(--gold),
+        0 0 8px 1px color-mix(in srgb, var(--gold) 50%, transparent);
+    }
+    100% {
+      box-shadow:
+        inset 0 0 0 2px transparent,
+        0 0 0 0 transparent;
+    }
+  }
+  /* Reduced motion drops the movement and none of the news: the completed page
+     holds a static gold frame, the grid stays at its own brightness, and a
+     fresh cell keeps a static ring. animationend never fires for an animation
+     that never runs, so both classes clear on the next repaint instead (the
+     .deed-card-flash contract). That repaint is signature-driven, so on a
+     quiet world the static ring can stand for minutes: deliberate, since
+     both stuck states read as true statements (the page IS complete, the
+     cell IS owned), and a timer to shorten the wait is the one thing the
+     cold painter must never own. */
+  @media (prefers-reduced-motion: reduce) {
+    /* Bright --gold on purpose, NOT the deed precedent's --gold-dim: a
+       celebrating page always also wears is-illuminated, whose standing frame
+       is already --gold-dim, so a dim ring would be indistinguishable from
+       the settled state it must momentarily outshine. */
+    .reliquary-page-detail.reliquary-page-celebrate {
+      animation: none;
+      box-shadow: inset 0 0 0 2px var(--gold);
+    }
+    .reliquary-page-celebrate .reliquary-grid {
+      animation: none;
+      filter: none;
+    }
+    .reliquary-cell-flash {
+      animation: none;
+      box-shadow: inset 0 0 0 2px var(--gold);
+    }
   }
   /* ---------- professions ---------- */
   /* The Professions window: a cold, read-only identity browser (identity
@@ -9234,6 +10244,72 @@
     font-size: 12px;
     color: var(--color-text-muted);
   }
+  /* The Thornhollow Fields queue-pop prompt. Same placement and z-index as the
+     finder's, because it answers the same question and only one of the two can
+     ever be open at once (a live offer refuses the other queue). */
+  #bg-proposal-popup {
+    display: none;
+    position: fixed;
+    top: 64px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 500;
+    width: 320px;
+    max-width: 94%;
+    padding: 12px 14px;
+    border: 1px solid #8a6a28;
+    border-radius: 6px;
+    background: linear-gradient(180deg, #2c2110, #1a1207);
+    box-shadow: 0 6px 24px #000c;
+    text-align: center;
+  }
+  .bgp-head {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-family: var(--title-font);
+    font-size: 14px;
+    color: #ffd9a0;
+    margin-bottom: 8px;
+  }
+  .bgp-head .ui-icon {
+    width: 16px;
+    height: 16px;
+  }
+  .bgp-tally {
+    font-size: 15px;
+    color: var(--color-text-muted);
+    margin: 2px 0 4px;
+  }
+  .bgp-tally.full {
+    color: #9fdc8f;
+  }
+  .bgp-remaining {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin: 4px 0 8px;
+  }
+  .bgp-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .bgp-actions .btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-align: center;
+  }
+  .bgp-actions .ui-icon {
+    width: 13px;
+    height: 13px;
+  }
+  .bgp-waiting {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
   .df-proposal {
     border: 1px solid #8a6a28;
     border-radius: 5px;
@@ -9758,11 +10834,16 @@
     position: absolute;
     top: 285px;
     right: 12px;
-    width: 380px;
+    /* A ceiling, not a fixed box: every line shrinks to fit (align-items:
+       flex-end), so the wider ceiling only ever buys room for long names. The
+       percentage cap is against the full-screen HUD layer, so a narrow phone
+       keeps its 12px gutters without needing a mobile arm or a viewport unit. */
+    width: 420px;
+    max-width: calc(100% - 24px);
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 7px;
+    gap: 6px;
     pointer-events: none;
     z-index: 17;
   }
@@ -9772,20 +10853,21 @@
     gap: 9px;
     max-width: 100%;
     font-family: var(--title-font);
-    font-size: 19px;
+    font-size: 16px;
     letter-spacing: 0.4px;
     color: #d8d2c0;
     background: linear-gradient(100deg, #10131add, #080a0eee);
     border: 1px solid #3a4a66;
     border-right-width: 5px;
     border-radius: 8px;
-    padding: 7px 14px;
+    /* The right pad is the wider one on purpose: it clears the 5px team stripe
+       so a name never runs straight into the colored edge. */
+    padding: 5px 18px 5px 12px;
     text-shadow: 1px 1px 3px #000;
     box-shadow: 0 2px 12px #0009;
     animation: bgkf-in 0.32s cubic-bezier(0.2, 1.4, 0.4, 1);
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
   }
   .bgkf-line.crimson {
     border-right-color: var(--color-team-red);
@@ -9794,15 +10876,28 @@
     border-right-color: var(--color-team-blue);
   }
   .bgkf-mark {
-    width: 19px;
-    height: 19px;
+    width: 16px;
+    height: 16px;
     flex: none;
     color: var(--gold);
     filter: drop-shadow(1px 1px 2px #000);
   }
+  /* The ellipsis belongs HERE, on the name, and never on .bgkf-line:
+     text-overflow applies to a block box's own text, so on the flex CONTAINER
+     it did nothing at all and an over-long name was hard-sheared mid-glyph.
+     min-width:0 is what lets a flex item shrink below its text width, which is
+     the other half of making the ellipsis reachable. The 3px padding with the
+     matching negative margin is clip bleed: overflow:hidden clips to the
+     padding box, so the line's text-shadow survives, and the negative margin
+     hands the 3px back to the layout. */
   .bgkf-name {
     font-weight: 700;
-    font-size: 21px;
+    font-size: 17px;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 3px;
+    margin: 0 -3px;
   }
   .bgkf-name.crimson {
     color: #ff6a5c;
@@ -9812,7 +10907,9 @@
   }
   .bgkf-verb {
     color: #b8b09a;
-    font-size: 16px;
+    font-size: 13px;
+    /* the short connective never shrinks; the names absorb the squeeze */
+    flex: none;
   }
   @keyframes bgkf-in {
     from {
@@ -11400,9 +12497,9 @@
   .mkt-controls {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
-    gap: 10px 8px;
+    gap: var(--spacing-sm);
     align-items: end;
-    margin: 2px 0 8px;
+    margin: 2px 0 var(--spacing-md);
     position: relative;
     z-index: 3;
   }
@@ -11445,6 +12542,23 @@
     letter-spacing: 0.4px;
     color: var(--color-text-muted);
     text-transform: uppercase;
+  }
+  /* The "lowest price of each" Browse toggle: a real labeled checkbox sharing the
+     controls grid with search and the filter selects (issue #3103). Own class, not
+     `.mkt-filter`, so its inline label text does not inherit that rule's tiny
+     uppercase filter-name styling meant for the select cells above it. */
+  .mkt-collapse-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    max-width: none;
+    cursor: var(--cursor-point);
+  }
+  .mkt-collapse-toggle span {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    color: #f0e4c8;
   }
   .mkt-select {
     position: relative;
@@ -11577,7 +12691,7 @@
   .mkt-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 4px 10px;
+    gap: 3px var(--spacing-md);
     align-content: start;
   }
   .mkt-note,
@@ -11592,55 +12706,255 @@
     margin: 2px 0 8px;
     font-family: Georgia, serif;
   }
+  /* Single-line rows: the name and seller sit inline (below), so each listing is
+     one line and the list stays dense without feeling heavy. Row padding and the
+     inter-column gap come from the spacing scale, with a little vertical air so
+     rows breathe rather than crowd (DESIGN.md: compress spacing before shrinking
+     type, and give elements room). */
   .mkt-row {
     display: grid;
-    grid-template-columns: 30px 1fr auto auto;
-    gap: 9px;
+    grid-template-columns: 28px 1fr auto auto;
+    gap: var(--spacing-sm);
     align-items: center;
-    padding: 5px 6px;
-    border-radius: 4px;
+    padding: 4px var(--spacing-xs);
+    border-radius: var(--radius-sm);
     font-size: 12px;
-    min-height: 40px;
+    min-height: 32px;
   }
   .mkt-row:hover {
     background: #ffffff0d;
   }
+  /* Inline layout: the name and the seller share ONE baseline row instead of
+     stacking, so each listing is a single line. That keeps the rows short (the
+     compact density) and stops the name looming over a subtitle. The name takes
+     priority and the seller truncates with an ellipsis when a long name leaves
+     it no room, so a single line always holds. */
   .mkt-row .mkt-name {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
     overflow: hidden;
+    min-width: 0;
   }
+  /* The item name is the row's headline, in the serif face at regular weight,
+     14.5px: warm and easy to read across a dense grid without the heaviness a
+     bolder weight brings at this size. The quality color comes from the painter's
+     market_name_color tokens; this only sets face/weight/size, never color. */
   .mkt-row .mkt-name .nm {
-    display: block;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* The name holds its full width and shrinks only after the seller has given
+       up all of its space (order matters: seller shrinks first). */
+    flex: 0 1 auto;
+    min-width: 0;
   }
   .mkt-row .mkt-name .stack {
     color: var(--color-text-light);
   }
+  /* The seller sits inline after the name, quiet, prefixed with a dot separator.
+     It yields FIRST when the row is tight: flex-shrink 100 vs the name's 1, so a
+     long name eats the seller before the name itself ever truncates. */
   .mkt-row .mkt-name .seller {
     font-size: 10.5px;
-    color: #8c8468;
+    color: #6f6853;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 0 100 auto;
+    min-width: 0;
+  }
+  .mkt-row .mkt-name .seller::before {
+    content: "\00b7\00a0";
+    color: #4a4230;
   }
   .mkt-row .mkt-name .seller.house {
     color: var(--gold-dim);
   }
+  /* The icon cell is the positioning parent for the armor-class pip chip that
+     rides its corner. */
+  .mkt-ico {
+    position: relative;
+    display: block;
+    width: 28px;
+    height: 28px;
+  }
+  /* Cloth/leather/mail armor-class cue (issue #3104): a weight-pips symbol, NOT a
+     colored dot. The pip COUNT (cloth 1, leather 2, mail 3) carries the
+     distinction with color removed, so the cue survives grayscale/colorblindness
+     and is not color-only (WCAG 1.4.1); the color is a bonus fast-scan channel.
+     The chip sits on the icon corner so it costs no room on the name line. The
+     localized armor word rides the element's aria-label/title (set in the
+     painter) for screen readers and hover. */
+  .mkt-armor-pips {
+    position: absolute;
+    right: -4px;
+    bottom: -4px;
+    display: grid;
+    place-items: center;
+    min-width: 13px;
+    height: 13px;
+    padding: 0 2.5px;
+    border-radius: 4px;
+    background: #0d0b07;
+    border: 1px solid var(--mkt-pip-color);
+    box-shadow: 0 1px 2px #000a;
+  }
+  .mkt-pip-row {
+    display: flex;
+    gap: 2px;
+    align-items: center;
+  }
+  /* 3px dots with a 2px gap: large and separated enough that three of them read
+     as three countable pips, not a text ellipsis ("..."), which the earlier
+     2.5px/1.5px sizing suggested at 1x (mail = 3 pips). */
+  .mkt-pip {
+    display: block;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--mkt-pip-color);
+  }
+  /* Per-class color: a fast-scan bonus on top of the countable pips, never the
+     sole cue. Values match the shipped armor-badge palette. */
+  .mkt-armor-pips--cloth {
+    --mkt-pip-color: #6fc0e8;
+  }
+  .mkt-armor-pips--leather {
+    --mkt-pip-color: #d79a55;
+  }
+  .mkt-armor-pips--mail {
+    --mkt-pip-color: #b6c0cd;
+  }
+  /* Heroic-tier mark: a small gold star on the icon's TOP-LEFT corner, opposite
+     the armor pips (bottom-right) so the two never collide. Warm gold, distinct
+     from any quality color; the localized "Heroic" word rides its aria-label. */
+  .mkt-heroic-star {
+    position: absolute;
+    left: -4px;
+    top: -4px;
+    font-size: 12px;
+    line-height: 1;
+    color: #ffcf6a;
+    text-shadow:
+      0 1px 2px #000,
+      0 0 3px #000;
+    pointer-events: none;
+  }
+  /* Price is the number a shopper is actually comparing, so give it real weight.
+     The market paints a gold-dominant, coinless, copper-trimmed block
+     (market_price_view.ts): the largest denomination is the big headline, the
+     rest sit small beside it, and the number's COLOR carries the denomination
+     instead of a coin circle. */
   .mkt-row .mkt-price {
-    font-size: 11.5px;
-    color: var(--color-accent);
+    text-align: right;
     white-space: nowrap;
+  }
+  /* Side-by-side: the sub-units sit on the same baseline as the gold headline
+     (e.g. "138g 60s" on one line), which keeps each row a single line and reads
+     left to right like a normal amount. */
+  .mkt-price-stack {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 5px;
+    line-height: 1.1;
+  }
+  .mkt-price-main {
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    font-size: 14px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  /* The single-unit number right-aligns in the price lane, so the last digit of
+     a "5g" and a "48,500g" line up down the column for fast comparison. */
+  .mkt-price-num {
+    display: inline-block;
     text-align: right;
   }
+  /* Denomination by color (the coinless cue), with a small unit letter as the
+     non-color backup so it is never color-only. Gold is yellow, copper a clear
+     orange-brown, kept distinct so a copper price never reads as gold. */
+  .mkt-price-main--gold {
+    color: #e8c874;
+  }
+  .mkt-price-main--silver {
+    color: #dfe3ea;
+  }
+  .mkt-price-main--copper {
+    color: #d17a4e;
+  }
+  /* The denomination letter (g/s/c) is the NON-COLOR cue, so it stays large and
+     fully opaque, set off by a clear gap: it anchors the value (colorblind-safe)
+     and never reads as color-only. */
+  .mkt-price-unit {
+    font-style: normal;
+    font-size: 0.9em;
+    font-weight: 800;
+    opacity: 1;
+    margin-left: 3px;
+  }
+  /* The per-unit "each" subline stays quiet: it is context, not the headline. */
+  .mkt-row .mkt-price .seller {
+    font-size: 10.5px;
+    font-weight: 400;
+    color: #8c8468;
+  }
+  /* Buy button: a forged, dimensional button in the shared .btn recipe
+     (DESIGN.md 10.1), not a flat chip: a gradient fill, a one-pixel bronze
+     border over a black keyline, an inset top highlight with a drop shadow, and
+     a one-pixel press. Buy reads green for "purchase"; Reclaim keeps the warm
+     brown of a returning action. */
   .mkt-btn {
     font-family: var(--title-font);
     font-size: 11px;
+    letter-spacing: 0.3px;
     cursor: var(--cursor-point);
-    border-radius: 4px;
-    padding: 4px 11px;
-    border: 1px solid #5a4a18;
-    background: linear-gradient(#3a6a28, #244a18 60%, #1a3812);
-    color: #d6ffc8;
+    border-radius: var(--radius-sm);
+    padding: 4px 12px;
+    border: 1px solid var(--color-gold-800);
+    outline: 1px solid #000;
+    background: linear-gradient(var(--color-gold-900), #241d0e 55%, #1a140a);
+    color: #ffe6a8;
     white-space: nowrap;
+    text-shadow: 1px 1px 1px #000;
+    box-shadow:
+      inset 0 1px 0 #ffffff26,
+      0 2px 4px #0007;
+    transition:
+      filter var(--transition-speed),
+      box-shadow var(--transition-speed),
+      border-color var(--transition-speed);
   }
   .mkt-btn:hover {
-    filter: brightness(1.18);
+    filter: brightness(1.22);
+    border-color: var(--color-gold-600);
+    box-shadow:
+      inset 0 1px 0 #ffffff26,
+      0 2px 4px #0007,
+      0 0 8px var(--color-primary-glow);
   }
+  .mkt-btn:active {
+    transform: translateY(1px);
+    box-shadow: inset 0 1px 2px #0009;
+  }
+  /* Keyboard focus: the black keyline above is a static border effect that would
+     otherwise sit where a focus ring belongs, and (living in @layer components,
+     after base) it beats the shared .btn:focus-visible from base.css on layer
+     order. Restore a visible ring in the same layer, mirroring .btn:focus-visible
+     (components.css) so every Buy / Reclaim button shows keyboard focus again. */
+  .mkt-btn:focus-visible {
+    outline: 3px solid var(--color-border-focus) !important;
+    outline-offset: 2px !important;
+    box-shadow: 0 0 8px var(--color-primary-glow) !important;
+  }
+  /* Reclaim: the same forged button in the warm returning-action palette. */
   .mkt-btn.cancel {
     background: linear-gradient(#6a3a18, #4a2810 60%, #381c0c);
     color: #ffd8b8;
@@ -11693,13 +13007,17 @@
     padding: 10px 6px;
     text-align: center;
   }
+  /* The staged item card matches a Browse card (bordered, accent spine) instead
+     of the old dashed box, so the Sell tab reads like the rest of the window. */
   .mkt-sell-pick {
     display: flex;
     gap: 10px;
     align-items: center;
     padding: 8px;
-    border: 1px dashed #5a4a2a;
-    border-radius: 6px;
+    border: 1px solid #2a2418;
+    border-left: 3px solid #6f5a2a;
+    background: linear-gradient(180deg, #ffffff07, #ffffff02);
+    border-radius: 7px;
     margin-bottom: 10px;
   }
   .mkt-sell-pick.empty {
@@ -11707,9 +13025,28 @@
     font-size: 12px;
     justify-content: center;
     font-style: italic;
+    border-left-color: #2a2418;
   }
+  /* Serif name, matching the Browse row headline. */
   .mkt-sell-pick .ps-name {
-    font-size: 13px;
+    font-family: var(--font-serif);
+    font-size: 15px;
+    font-weight: 500;
+  }
+  /* The Sell tab's current-lowest-price reference (issue #3043): a same-page
+     market check. Muted like the adjacent .mkt-price-row labels, so the
+     reference reads as informational context, not competing emphasis with the
+     price the player is about to set. Empty (no text) while the server's echo
+     has not confirmed a value yet; a separate off-screen .mkt-sell-price-status
+     live region announces the same text once it lands (see market_window.ts). */
+  .mkt-sell-price-ref {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin: 0 0 10px;
+    font-family: var(--font-ui);
+  }
+  .mkt-sell-price-ref .mkt-price {
+    margin-left: 4px;
   }
   .mkt-price-form {
     display: flex;
@@ -11741,41 +13078,89 @@
     font-size: 11px;
     margin-right: 6px;
   }
+  /* The primary List / Collect-all action is the forged GOLD PRIMARY button
+     (DESIGN.md 10.1: at most one per surface): a subdued gold-brown gradient over
+     ink, a bronze border on a black keyline, an inset top highlight with a drop
+     shadow, and the standard 14px/700 label. Sized to its label and left-aligned
+     under the form, distinct from the green Buy buttons in the rows. */
   .mkt-list-btn {
+    display: inline-block;
     font-family: var(--title-font);
-    font-size: 13px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
     cursor: var(--cursor-point);
-    border-radius: 5px;
-    padding: 8px;
-    border: 1px solid #5a4a18;
-    background: linear-gradient(#5a4a18, #3a2f0d 55%, #2a2208);
+    border-radius: var(--radius-sm);
+    padding: 9px 22px;
+    border: 1px solid var(--color-gold-700);
+    outline: 1px solid #000;
+    background: linear-gradient(var(--color-gold-900), #241d0e 60%, #1a140a);
     color: #ffe6a8;
-    margin-top: 4px;
+    text-shadow: 1px 1px 1px #000;
+    box-shadow:
+      inset 0 1px 0 #ffffff1f,
+      0 2px 4px #0007;
+    margin-top: var(--spacing-sm);
+    transition:
+      filter var(--transition-speed),
+      box-shadow var(--transition-speed),
+      border-color var(--transition-speed);
   }
   .mkt-list-btn:hover {
     filter: brightness(1.15);
+    border-color: var(--color-gold-500);
+    box-shadow:
+      inset 0 1px 0 #ffffff1f,
+      0 2px 4px #0007,
+      0 0 8px var(--color-primary-glow);
+  }
+  .mkt-list-btn:active {
+    transform: translateY(1px);
+    box-shadow: inset 0 1px 2px #0009;
+  }
+  /* Restore keyboard focus over the black keyline (see .mkt-btn:focus-visible
+     above for why the same-layer override is needed). Covers List and
+     Collect-all. */
+  .mkt-list-btn:focus-visible {
+    outline: 3px solid var(--color-border-focus) !important;
+    outline-offset: 2px !important;
+    box-shadow: 0 0 8px var(--color-primary-glow) !important;
   }
   .mkt-list-btn:disabled {
-    opacity: 0.5;
+    filter: grayscale(1) brightness(0.7);
     cursor: default;
-    filter: none;
+    box-shadow: none;
   }
+  /* Collect rows get the Browse card treatment (bordered, accent spine) so the
+     tab matches the rest of the window. */
   .mkt-collect {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
     padding: 8px;
-    background: #ffffff0a;
-    border-radius: 6px;
+    border: 1px solid #241f16;
+    border-left: 3px solid #6f5a2a;
+    background: linear-gradient(180deg, #ffffff07, #ffffff02);
+    border-radius: 7px;
     margin-bottom: 8px;
   }
   /* The icon + name cluster inside a collect row (was an inline flex literal in
-     market_window.ts; moved here so the painter carries no layout px). */
+     market_window.ts; moved here so the painter carries no layout px). The item
+     name (the span after the icon) is serif, matching the Browse row headline. */
   .mkt-collect-item {
     display: flex;
     gap: 8px;
     align-items: center;
+  }
+  /* The collect-row item name. Selected by class, NOT position: the sale ledger
+     reuses .mkt-collect-item with a two-line .mkt-sale-name as its last child, so
+     a :last-child rule here would turn the buyer line serif too (it has its own
+     .mkt-sale-name > span:first-child rule below). */
+  .mkt-collect-name {
+    font-family: var(--font-serif);
+    font-size: 15px;
+    font-weight: 500;
   }
   /* The sale ledger under the proceeds line: what sold, to whom, for how much.
      Indented and dimmer than a .mkt-collect row because it itemizes the purse
@@ -11796,6 +13181,13 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
+  }
+  /* The item name line (first child; the buyer line stays the small sans below).
+     Serif, matching the Browse row headline but a touch smaller for the ledger. */
+  .mkt-sale-name > span:first-child {
+    font-family: var(--font-serif);
+    font-size: 14px;
+    font-weight: 500;
   }
   .mkt-sale-buyer,
   .mkt-sale-more {
@@ -14669,14 +16061,22 @@
   .dev-item-suggest {
     position: absolute;
     left: 0;
-    right: 0;
     top: calc(100% + 3px);
     display: none;
     z-index: 30;
     background: #14110d;
     border: 1px solid #6f5a2a;
     border-radius: 5px;
-    max-height: 210px;
+    /* Wide enough that name + tags + id fit on one line (the input is narrow, so
+       an input-width list truncated every row and grew a horizontal scrollbar),
+       and tall enough that the full DEV_ITEM_PICKER_LIMIT of rows fits WITHOUT a
+       vertical scrollbar: a scrollbar here is a trap, since grabbing it blurs
+       the input and the blur teardown drops the list mid-drag. max-height stays
+       as the safety net that keeps the old taller-than-the-viewport bug dead. */
+    min-width: 100%;
+    width: max-content;
+    max-width: min(560px, 72vw);
+    max-height: 480px;
     overflow-y: auto;
     box-shadow: 0 6px 18px #000a;
   }

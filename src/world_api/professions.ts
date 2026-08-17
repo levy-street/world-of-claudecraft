@@ -78,6 +78,9 @@ export interface CraftResultView {
   reason?:
     | 'unknown_recipe'
     | 'insufficient_materials'
+    // Issue 3042: the player holds every reagent in the required quantity
+    // in aggregate, but a locked copy is what is blocking the craft.
+    | 'locked'
     | 'combo_requirement_unmet'
     | 'recipe_not_learned'
     | 'throttled'
@@ -122,7 +125,14 @@ export interface SalvageResultView {
   itemId: string;
   materialItemId?: string;
   count?: number;
-  reason?: 'unknown_item' | 'not_salvageable' | 'not_held' | 'throttled' | 'no_bag_space' | 'busy';
+  reason?:
+    | 'unknown_item'
+    | 'not_salvageable'
+    | 'not_held'
+    | 'throttled'
+    | 'no_bag_space'
+    | 'busy'
+    | 'locked';
 }
 
 // Disenchant-result surface (Professions 2.0): mirrors
@@ -351,7 +361,7 @@ export interface IWorldProfessions {
   // pre-feature form, and the sim re-validates the target either way (the flag
   // can never overwrite anything the dedicated replace arm would not).
   applyEnchant(itemId: string, enchantId: string, slot?: EquipSlot, confirmReplace?: boolean): void;
-  salvageItem(itemId: string): void;
+  salvageItem(itemId: string, target?: { slotIndex: number }): void;
   // Maker's Bond unbind service (Professions 2.0): clear the
   // boundTo lock on ONE held bound copy of `itemId`, for the tier-scaled
   // gold fee, while standing at any static crafting station (every station

@@ -120,6 +120,7 @@ function nodesSection(g: GuideProfGathering): string {
       ${paras('guide.profPages.nodesNote', {
         respawn: formatNumber(g.respawnSeconds ?? 0),
       })}
+      ${paras('guide.profPages.findingNodesNote')}
       <div class="guide-table-scroll"><table class="guide-keytable guide-prof-table">
         <thead><tr>
           <th scope="col">${esc(t('guide.profPages.colZone'))}</th>
@@ -165,7 +166,7 @@ function rareSection(): string {
         oneIn: formatNumber(rare.oneIn),
         mult: formatNumber(rare.yieldMult),
       })}
-      ${paras('guide.profPages.specimenBody', {
+      ${paras('guide.profPages.specimenBodyFamilies', {
         pct: formatNumber(GUIDE_PROF_CURVE.specimenChancePct),
       })}
     </section>`;
@@ -173,12 +174,27 @@ function rareSection(): string {
 
 // Corpse harvesting and Town Focus, shared with the overview catalog block
 // (guide.professions.harvest*/focus*): the mechanics apply to every gatherer.
+// Both bodies render the CURRENT keys (harvestBodyFamilies, focusBodyTiers):
+// the retired harvestBodyChoice/focusBody values stay in the catalog with
+// their reviewed translations rather than being reworded in place, the
+// #2514 precedent the catalog already documents.
 function corpseSection(): string {
   return `<section class="guide-block" id="prof-corpse">
       <h2>${esc(t('guide.professions.harvestTitle'))}</h2>
-      ${paras('guide.professions.harvestBodyChoice')}
+      ${paras('guide.professions.harvestBodyFamilies')}
       <h3>${esc(t('guide.professions.focusTitle'))}</h3>
-      ${paras('guide.professions.focusBody')}
+      ${paras('guide.professions.focusBodyTiers')}
+    </section>`;
+}
+
+// Slotted tool effects (the enchanter's charms): what a charm does, how its
+// charges are spent, how tool rarity scales them, and how the owner refills
+// one. Land trades only: the harvest path is what reads a slot
+// (sim/professions/gathering.ts), so the fishing page never renders this.
+function toolEffectsSection(): string {
+  return `<section class="guide-block" id="prof-tool-effects">
+      <h2>${esc(t('guide.professions.toolEffectsHeading'))}</h2>
+      ${paras('guide.professions.toolEffectsBody')}
     </section>`;
 }
 
@@ -297,6 +313,7 @@ export function gatheringDetailHtml(g: GuideProfGathering): string {
       </dl>
       ${isFishing ? fishingSections(g) : rhythmSection(g) + nodesSection(g) + yieldsSection()}
       ${toolsSection(g)}
+      ${isFishing ? '' : toolEffectsSection()}
       ${bandsSection(g)}
       ${isFishing ? '' : rareSection() + corpseSection()}
       ${deedsSection(g)}

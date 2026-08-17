@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { buildFullGateSteps, I18N_RELEASE_TIER_SUITES } from '../scripts/lib/gate_steps.mjs';
 import { tsFilesUnder } from './helpers/ts_files_under';
@@ -33,7 +34,7 @@ const READS_TIER_FLAG = /process\.env\.I18N_RELEASE_TIER/;
 const SELF = 'release_i18n_tier_coverage.test.ts';
 
 function suitesReadingTierFlag(): string[] {
-  return tsFilesUnder(new URL('.', import.meta.url).pathname)
+  return tsFilesUnder(fileURLToPath(new URL('.', import.meta.url)))
     .filter((entry) => entry.file.endsWith('.test.ts') && !entry.file.endsWith(SELF))
     .filter((entry) => READS_TIER_FLAG.test(readFileSync(entry.full, 'utf8')))
     .map((entry) => `tests/${entry.file}`)
@@ -55,7 +56,7 @@ describe('release-tier i18n job covers every tier-sensitive suite', () => {
   it('scans a non-empty set (a scan that finds nothing would pass everything)', () => {
     // Vacuity floor: if the scan silently stopped matching, every equality below
     // would hold trivially over two empty lists.
-    expect(suitesReadingTierFlag().length).toBeGreaterThanOrEqual(5);
+    expect(suitesReadingTierFlag().length).toBeGreaterThanOrEqual(6);
   });
 
   it('matches the shared list the local gate runs', () => {
@@ -75,6 +76,7 @@ describe('release-tier i18n job covers every tier-sensitive suite', () => {
       'tests/i18n_t_behavior.test.ts',
       'tests/localization_coverage.test.ts',
       'tests/localization_fixes.test.ts',
+      'tests/reliquary_i18n.test.ts',
     ]);
   });
 });
@@ -96,7 +98,7 @@ describe('the tier flag lives in exactly one job', () => {
       WORKFLOW.indexOf('  release-checks:'),
     );
     expect(releaseI18n).toContain("\n    env:\n      I18N_RELEASE_TIER: '1'");
-    // Unsharded on purpose: five files, seconds long. A matrix here would be cost
+    // Unsharded on purpose: six files, seconds long. A matrix here would be cost
     // with no benefit, and would reintroduce per-shard tier confusion.
     expect(releaseI18n).not.toContain('matrix:');
   });
