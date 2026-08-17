@@ -22,6 +22,8 @@
 //                               on BOTH outcomes (survived and withered)
 //   harvest, every deny arm ... 0
 //   convert_husks ............. 0 (both outcomes)
+//   the farm objective credit . 0 (quests/quest_credit.ts, pure state and
+//                               events, called after plant and harvest)
 //   growth deadline passing ... 0 (nothing runs at expiry: there is no timer)
 //   login / save+load ......... 0
 //   the tick sweep ............ 0 (updateFarming below draws nothing)
