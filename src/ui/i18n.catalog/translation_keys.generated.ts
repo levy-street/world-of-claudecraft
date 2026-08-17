@@ -6017,6 +6017,8 @@ export type TranslationKeyFlat =
   | 'guide.profPages.faq.q8'
   | 'guide.profPages.faq.q9'
   | 'guide.profPages.faq.title'
+  | 'guide.profPages.farm.bedsBody'
+  | 'guide.profPages.farm.bedsHeading'
   | 'guide.profPages.findingNodesNote'
   | 'guide.profPages.fish.bandHeading'
   | 'guide.profPages.fish.belowFmt'

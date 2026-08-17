@@ -3,7 +3,8 @@
 // trade renders only the sections whose data exists; the tools and nodes
 // sections length-guard rather than print prose over an empty table (farming
 // ships its hoe ladder but deliberately no nodes: it is fishing-shaped on
-// land, so its nodes section stays guarded off forever).
+// land, so its nodes section stays guarded off forever, and it carries its
+// own planting-loop section instead, the fishing sections' precedent).
 // Renders entirely from GUIDE_PROF_* generated data plus guide.*
 // t() keys; item/vendor names are baked English proper nouns and
 // profession/quality labels localize via their existing catalog keys.
@@ -314,9 +315,21 @@ function fishingSections(g: GuideProfGathering): string {
     </section>`;
 }
 
+// -------------------------------------------------------- farming only
+// The planting loop as a player works it (counter, knobs, journal, husks,
+// kitchens): farming has no nodes to map, so this is the section that tells a
+// reader where the trade actually happens. Prose only, no generated data.
+function farmingSection(): string {
+  return `<section class="guide-block" id="prof-farm-beds">
+      <h2>${esc(t('guide.profPages.farm.bedsHeading'))}</h2>
+      ${paras('guide.profPages.farm.bedsBody')}
+    </section>`;
+}
+
 // ------------------------------------------------------------- page assembly
 export function gatheringDetailHtml(g: GuideProfGathering): string {
   const isFishing = g.id === 'fishing';
+  const isFarming = g.id === 'farming';
   return `
     <article class="guide-article guide-prof-page">
       <p class="guide-section-more"><a href="${esc(hrefFor('professions'))}">${esc(t('guide.profPages.back'))}</a></p>
@@ -325,6 +338,7 @@ export function gatheringDetailHtml(g: GuideProfGathering): string {
       <dl class="guide-class-facts guide-prof-facts">
         <div class="guide-fact"><dt>${esc(t('guide.profPages.capLabel'))}</dt><dd>${esc(formatNumber(g.maxSkill))}</dd></div>
       </dl>
+      ${isFarming ? farmingSection() : ''}
       ${isFishing ? fishingSections(g) : rhythmSection(g) + nodesSection(g) + yieldsSection()}
       ${toolsSection(g)}
       ${isFishing ? '' : toolEffectsSection()}
