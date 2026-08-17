@@ -391,6 +391,9 @@ describe('character list handlers', () => {
           // player one free design (created_at is null in this fixture, so it
           // is the never-designed arm carrying it, not the window).
           appearanceRerollAvailable: true,
+          // No Stylist credits bought: absent from the state blob reads as 0,
+          // so the roster's Edit Appearance button stays hidden on this row.
+          redesignCredits: 0,
         },
         {
           id: 2,
@@ -413,6 +416,9 @@ describe('character list handlers', () => {
           // player one free design (created_at is null in this fixture, so it
           // is the never-designed arm carrying it, not the window).
           appearanceRerollAvailable: true,
+          // No Stylist credits bought: absent from the state blob reads as 0,
+          // so the roster's Edit Appearance button stays hidden on this row.
+          redesignCredits: 0,
         },
       ],
     };

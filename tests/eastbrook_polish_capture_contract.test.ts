@@ -184,8 +184,12 @@ interface AttributionTargetFixture {
 // Re-minted for the r185 frozen-camera aim fix: updateCamera now aims through
 // lookAtFrozen, so renderer.ts moves and the composite follows its bytes. No
 // capture was retaken.
+// Re-minted for the Stylist after merging release/v0.39.0: the authoritative
+// layout gains ONE appended NPC placement (stylist_verena), so
+// authoritativeLayout.sha256 moves and the composite follows it. Layout data
+// only; no capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '0adbb7066e1857e4fb9f76c4a9e24e73f890d1382bd2197d8d0a20484db6f428';
+  '65ff7c43e93a349644f0dc6682ef58f4b78933fdef9ad1165d08e6fc09284bb4';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

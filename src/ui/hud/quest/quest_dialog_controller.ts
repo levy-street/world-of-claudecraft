@@ -1,3 +1,4 @@
+import { redesignPriceCopper } from '../../../sim/content/redesign_pricing';
 import { DELVES, ITEMS, NPCS, QUESTS, questRewardItem } from '../../../sim/data';
 import { CHRONICLER_TEMPLATE_IDS } from '../../../sim/deeds';
 import { craftsForPairTarget } from '../../../sim/professions/archetype';
@@ -11,7 +12,7 @@ import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import type { FocusTrapHandle } from '../../focus_manager';
-import { t } from '../../i18n';
+import { formatMoney, t } from '../../i18n';
 import { QUALITY_COLOR } from '../../icons';
 import { NPC_WINDOW_CLOSE_RANGE } from '../../npc_service_range';
 import { archetypeImageUrl } from '../../profession_art';
@@ -378,6 +379,7 @@ export class QuestDialogController {
     );
     const hasValeCup = npc.templateId === 'groundskeeper_bram';
     const hasCardMaster = !!definition?.cardMaster;
+    const hasStylist = !!definition?.stylist;
     if (
       closeIfEmpty &&
       gossipMenuIsEmpty({
@@ -390,6 +392,7 @@ export class QuestDialogController {
         hasDelveBoard,
         hasVcup: hasValeCup,
         hasCardMaster,
+        hasStylist,
         hasTraining,
       })
     ) {
@@ -491,6 +494,17 @@ export class QuestDialogController {
     if (hasCardMaster) {
       html += `<button type="button" class="qd-list-item" data-card-duel="1" aria-label="${esc(t('cardDuel.title'))}"><span class="gold">&#9824;</span> ${esc(t('cardDuel.title'))}</button>`;
     }
+    if (hasStylist) {
+      // The one purchase the Stylist offers. The price is quoted from the SAME
+      // pure band table the sim charges from (content/redesign_pricing.ts), read
+      // off the viewer's live level, so the row can never advertise a number the
+      // authoritative purchase then disagrees with. Rendered through the
+      // locale-aware formatMoney like every other price in the HUD.
+      const priceText = formatMoney(
+        redesignPriceCopper(world.player.level, world.redesignPurchases),
+      );
+      html += `<button type="button" class="qd-list-item" data-stylist-buy="1" aria-label="${esc(t('stylist.buyCreditAria', { price: priceText }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('stylist.buyCredit', { price: priceText }))}</button>`;
+    }
     this.deps.element.innerHTML = html;
     this.deps.element.querySelectorAll<HTMLElement>('[data-quest]').forEach((item) => {
       item.addEventListener('click', () => this.renderQuestDetail(npc, item.dataset.quest ?? ''));
@@ -515,6 +529,10 @@ export class QuestDialogController {
     this.bindRoute('[data-delve-board]', () => this.deps.openDelveBoard(npc.id));
     this.bindRoute('[data-vcup]', this.deps.openValeCup);
     this.bindRoute('[data-card-duel]', this.deps.openCardDuel);
+    // Buys straight through the live world (the discuss row's own idiom), no
+    // confirm: the 80 gold riding skill is an ordinary unconfirmed vendor row,
+    // and the Sim re-validates identity, range, liveness, cap, and funds anyway.
+    this.bindRoute('[data-stylist-buy]', () => this.deps.world().buyRedesignCredit(npc.id));
     this.bindClose();
     this.showAndFocus();
   }

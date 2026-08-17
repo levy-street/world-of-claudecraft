@@ -312,7 +312,7 @@ describe('Eastbrook authored gameplay data integration', () => {
     ]);
   });
 
-  it('moves only the 15 town NPC placement fields and preserves key order and all other payload', () => {
+  it('moves only the 16 town NPC placement fields and preserves key order and all other payload', () => {
     expect(Object.keys(ZONE1_NPCS)).toEqual([
       'the_merchant',
       'marshal_redbrook',
@@ -324,6 +324,7 @@ describe('Eastbrook authored gameplay data integration', () => {
       'foreman_odell',
       'bursar_fernando',
       'card_master',
+      'stylist_verena',
       'groundskeeper_bram',
       'chronicler_saul',
       'forgemistress_darva',
@@ -331,6 +332,9 @@ describe('Eastbrook authored gameplay data integration', () => {
       'weaver_ottilie',
       'tinker_gizzel',
     ]);
+    // Re-minted for the Stylist (stylist_verena), the redesign-credit service desk
+    // added to the east service apron: a NEW town NPC record is a content change to
+    // this payload, not placement drift.
     // Reminted for the paladin-only Dawnbound Tome chain, which hangs q_divine_tome
     // off Brother Aldric. The payload covers everything but pos/facing, so a quest
     // added to a town NPC moves it; the placement assertions below still pin every
@@ -380,9 +384,9 @@ describe('Eastbrook authored gameplay data integration', () => {
       'arcanite_bar',
     ]);
     expect(createHash('sha256').update(JSON.stringify(stableTownNpcPayload())).digest('hex')).toBe(
-      '4c9400baeef7c04572881440cd4ba97e231f23f08ea0af355a3e7bac249cd1c2',
+      '971a44cd9f3cdc9a75b19cf02765e1d1efa52bdfd9b3ce0958cd9df3d281c319',
     );
-    expect(ZONE1_TOWN_NPC_IDS).toHaveLength(15);
+    expect(ZONE1_TOWN_NPC_IDS).toHaveLength(16);
     for (const id of ZONE1_TOWN_NPC_IDS) {
       const placement = EASTBROOK_NPC_PLACEMENTS_BY_ID[id];
       expect(ZONE1_NPCS[id].pos).toEqual(placement.position);
@@ -712,7 +716,7 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
         (building) => ({ id: `${building.id}:entrance`, point: building.frontStandingPoint }),
       ),
     ];
-    expect(destinations).toHaveLength(36);
+    expect(destinations).toHaveLength(37);
     const moverProfiles = [
       { id: 'player', bodyRadius: PLAYER_BODY_RADIUS },
       // Pet locomotion deliberately shares PLAYER_BODY_RADIUS; keep this

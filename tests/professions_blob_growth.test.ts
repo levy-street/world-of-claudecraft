@@ -157,6 +157,13 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'pendingSkinItemId',
   'mountTrainingFeePaid',
   'ridingTrained',
+  // Unspent Stylist redesign credits: a cosmetic entitlement, nothing to do with
+  // professions. Absent while zero, so it costs a shipped blob nothing until the
+  // character actually buys one.
+  'redesignCredits',
+  // Lifetime Stylist purchases behind the doubling price ladder; also cosmetic,
+  // also absent until the character buys one.
+  'redesignPurchases',
   'pbeBoostKit',
   'delveMarks',
   'delveClears',

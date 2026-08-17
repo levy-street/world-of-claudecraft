@@ -953,6 +953,22 @@ export const en_XA: EnTranslations = {
       "clockMs": "[{minutes}:{seconds}]",
       "clockHms": "[{hours}:{minutes}:{seconds}]"
     },
+    "lastkeepMap": {
+      "title": "[{keep}: {story}]",
+      "story": {
+        "undercroft": "[Ţĥé Úñðéŕçŕóƒţ]",
+        "state": "[Ţĥé Šţáţé Ƒļóóŕ]",
+        "residence": "[Ţĥé Ŕéšíðéñçé]",
+        "tower": "[Ţĥé Ŵáţçĥ Ţóŵéŕ]"
+      }
+    },
+    "dawnholdMap": {
+      "title": "[{keep}: {story}]",
+      "story": {
+        "ground": "[Ţĥé Ĝáŕðéñ Ƒļóóŕ]",
+        "solar": "[Ţĥé Šóļáŕ]"
+      }
+    },
     "compass": {
       "N": "[Ñ]",
       "NE": "[ÑÉ]",
@@ -3875,7 +3891,8 @@ export const en_XA: EnTranslations = {
       "taken_over": "[Ýóúŕ çĥáŕáçţéŕ ŵáš ţáķéñ óʋéŕ ƀý áñóţĥéŕ šéššíóñ.]",
       "rename_required": "[Ţĥíš çĥáŕáçţéŕ ɱúšţ ƀé ŕéñáɱéð ƀéƒóŕé éñţéŕíñĝ ţĥé ŵóŕļð.]",
       "invalid_appearance": "[Ţĥáţ áþþéáŕáñçé çóúļð ñóţ ƀé šáʋéð. Áðĵúšţ ţĥé ðéšíĝñ áñð ţŕý áĝáíñ.]",
-      "reroll_unavailable": "[Ţĥíš çĥáŕáçţéŕ ðóéš ñóţ ĥáʋé á ƒŕéé ŕéðéšíĝñ áʋáíļáƀļé.]"
+      "reroll_unavailable": "[Ţĥíš çĥáŕáçţéŕ ðóéš ñóţ ĥáʋé á ƒŕéé ŕéðéšíĝñ áʋáíļáƀļé.]",
+      "no_redesign_credit": "[Ţĥíš çĥáŕáçţéŕ ĥáš ñó ŕéðéšíĝñ çŕéðíţ ļéƒţ. Ʋíšíţ ţĥé Šţýļíšţ íñ Éášţƀŕóóķ ţó ƀúý óñé.]"
     },
     "moderation": {
       "suspended_until": "[Ţĥíš áççóúñţ íš šúšþéñðéð úñţíļ {date}.]",
@@ -7287,6 +7304,10 @@ export const en_XA: EnTranslations = {
     "waitingOnOpponent": "[Ŵáíţíñĝ óñ ýóúŕ óþþóñéñţ'š çáŕð...]",
     "yourTurn": "[Þļáý á çáŕð]"
   },
+  "stylist": {
+    "buyCredit": "[Ɓúý á ŕéðéšíĝñ ({price})]",
+    "buyCreditAria": "[Ɓúý óñé çĥáŕáçţéŕ ŕéðéšíĝñ ƒóŕ {price}]"
+  },
   "delveUi": {
     "board": {
       "title": "[Ðéļʋé Ɓóáŕð]",
@@ -7878,7 +7899,11 @@ export const en_XA: EnTranslations = {
     "redesignHint": "[Ţĥíš çĥáŕáçţéŕ þŕéðáţéš ţĥé ñéŵ çĥáŕáçţéŕ çŕéáţóŕ. Ýóú ĝéţ óñé ƒŕéé ŕéðéšíĝñ; íţ íš úšéð ŵĥéñ ýóú šáʋé.]",
     "redesignTitle": "[Ŕéðéšíĝñ {name}]",
     "redesignSave": "[Šáʋé Ñéŵ Ļóóķ]",
-    "redesignCancel": "[Ķééþ Çúŕŕéñţ Ļóóķ]"
+    "redesignCancel": "[Ķééþ Çúŕŕéñţ Ļóóķ]",
+    "editAppearance": "[Éðíţ Áþþéáŕáñçé]",
+    "editAppearanceAria": "[Éðíţ ţĥé áþþéáŕáñçé óƒ {name}]",
+    "editAppearanceHint": "[Ýóú ĥóļð {count} ŕéðéšíĝñ çŕéðíţš ƒŕóɱ ţĥé Šţýļíšţ. Óñé íš šþéñţ ŵĥéñ ýóú šáʋé.]",
+    "editAppearanceHintOne": "[Ýóú ĥóļð 1 ŕéðéšíĝñ çŕéðíţ ƒŕóɱ ţĥé Šţýļíšţ. Íţ íš šþéñţ ŵĥéñ ýóú šáʋé.]"
   },
   "deleteCharacter": {
     "title": "[Ðéļéţé Çĥáŕáçţéŕ]",
@@ -12378,6 +12403,9 @@ export const en_XA: EnTranslations = {
       "pristine_claw": {
         "name": "[Þŕíšţíñé Çļáŵ]"
       },
+      "dawnhold_posy": {
+        "name": "[Ðáŵñĥóļð Ĝáŕðéñ Þóšý]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },
@@ -13978,6 +14006,11 @@ export const en_XA: EnTranslations = {
         "name": "[Çáŕð Ɱášţéŕ]",
         "title": "[Ðéáļéŕ óƒ Çĥáñçé]",
         "greeting": "[Çáŕé ƒóŕ á Çáŕð Ðúéļ? Ɓéšţ óƒ ţĥŕéé, ŵíññéŕ ţáķéš ţĥé ƀŕáĝĝíñĝ ŕíĝĥţš.]"
+      },
+      "stylist_verena": {
+        "name": "[Ʋéŕéñá Ášĥļóçķ]",
+        "title": "[Šţýļíšţ]",
+        "greeting": "[Šíţ ðóŵñ, {className}. Á çóɱƀ, á ĝóóð ɱíŕŕóŕ, áñð çóíñ éñóúĝĥ, áñð ýóú çáñ ŵáļķ óúţ ļóóķíñĝ ļíķé šóɱéóñé éļšé éñţíŕéļý.]"
       },
       "bursar_petra_vell": {
         "name": "[Ɓúŕšáŕ Þéţŕá Ʋéļļ]",
@@ -16861,6 +16894,11 @@ export const en_XA: EnTranslations = {
         "name": "[Ţĥé Ļášţ Ķééþ]",
         "enterText": "[Ýóú šţéþ íñţó ţĥé çóļð, šíļéñţ ĥáļļš óƒ ţĥé Ļášţ Ķééþ.]",
         "leaveText": "[Ýóú þúļļ ţĥé ķééþ ðóóŕ šĥúţ áñð šţéþ ƀáçķ íñţó ţĥé Ðŕáķéļáñðš ŵíñð.]"
+      },
+      "dawnhold_castle": {
+        "name": "[Ðáŵñĥóļð Çášţļé]",
+        "enterText": "[Ýóú šţéþ íñţó ţĥé ŵáŕɱ, ƒļóŵéŕ-šçéñţéð ĥáļļš óƒ Ðáŵñĥóļð Çášţļé.]",
+        "leaveText": "[Ýóú šļíþ ƀáçķ óúţ óñţó ţĥé šúñļíţ ĝáŕðéñ ļáŵñ.]"
       },
       "drowned_temple": {
         "name": "[Ţĥé Ðŕóŵñéð Ţéɱþļé]",

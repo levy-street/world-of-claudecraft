@@ -953,6 +953,22 @@ export const ko_KR: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "지하 저장고",
+        "state": "의전층",
+        "residence": "주거층",
+        "tower": "망루"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "정원층",
+        "solar": "일광실"
+      }
+    },
     "compass": {
       "N": "북",
       "NE": "북동",
@@ -3875,7 +3891,8 @@ export const ko_KR: EnTranslations = {
       "taken_over": "다른 세션이 캐릭터를 넘겨받았습니다.",
       "rename_required": "이 캐릭터는 세계에 들어가기 전에 이름을 변경해야 합니다.",
       "invalid_appearance": "해당 외형을 저장할 수 없습니다. 디자인을 조정한 뒤 다시 시도하세요.",
-      "reroll_unavailable": "이 캐릭터는 무료 재디자인을 사용할 수 없습니다."
+      "reroll_unavailable": "이 캐릭터는 무료 재디자인을 사용할 수 없습니다.",
+      "no_redesign_credit": "이 캐릭터에게 남은 외형 변경권이 없습니다. 이스트브룩 골짜기의 스타일리스트에게서 구매하세요."
     },
     "moderation": {
       "suspended_until": "이 계정은 {date}까지 정지되었습니다.",
@@ -7287,6 +7304,10 @@ export const ko_KR: EnTranslations = {
     "waitingOnOpponent": "상대의 카드를 기다리는 중...",
     "yourTurn": "카드를 내세요"
   },
+  "stylist": {
+    "buyCredit": "외형 변경 구매 ({price})",
+    "buyCreditAria": "{price}에 캐릭터 외형 변경 1회 구매"
+  },
   "delveUi": {
     "board": {
       "title": "탐굴 게시판",
@@ -7878,7 +7899,11 @@ export const ko_KR: EnTranslations = {
     "redesignHint": "이 캐릭터는 새 캐릭터 편집기 이전에 생성되었습니다. 무료 재디자인 기회가 1회 있으며, 저장할 때 사용됩니다.",
     "redesignTitle": "{name} 재디자인",
     "redesignSave": "새 외형 저장",
-    "redesignCancel": "현재 외형 유지"
+    "redesignCancel": "현재 외형 유지",
+    "editAppearance": "외형 편집",
+    "editAppearanceAria": "{name}의 외형 편집",
+    "editAppearanceHint": "스타일리스트 외형 변경권을 {count}개 보유하고 있습니다. 저장할 때 1개가 사용됩니다.",
+    "editAppearanceHintOne": "스타일리스트 외형 변경권을 1개 보유하고 있습니다. 저장할 때 사용됩니다."
   },
   "deleteCharacter": {
     "title": "캐릭터 삭제",
@@ -12378,6 +12403,9 @@ export const ko_KR: EnTranslations = {
       "pristine_claw": {
         "name": "온전한 발톱"
       },
+      "dawnhold_posy": {
+        "name": "던홀드 정원 꽃다발"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
@@ -13978,6 +14006,11 @@ export const ko_KR: EnTranslations = {
         "name": "카드 마스터",
         "title": "운명의 딜러",
         "greeting": "카드 대결 한 판 어떻소? 삼판양승, 승자에게는 자랑거리가 생기지."
+      },
+      "stylist_verena": {
+        "name": "베레나 애슐록",
+        "title": "스타일리스트",
+        "greeting": "앉으세요, {className}. 빗 한 자루와 좋은 거울 하나, 그리고 넉넉한 금화만 있으면 완전히 딴사람이 되어 걸어 나갈 수 있답니다."
       },
       "bursar_petra_vell": {
         "name": "출납관 페트라 벨",
@@ -16861,6 +16894,11 @@ export const ko_KR: EnTranslations = {
         "name": "마지막 요새",
         "enterText": "마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.",
         "leaveText": "요새의 문을 닫고 드레이크랜드의 바람 속으로 돌아갑니다."
+      },
+      "dawnhold_castle": {
+        "name": "던홀드 성",
+        "enterText": "꽃향기 가득한 던홀드 성의 따뜻한 홀 안으로 들어섭니다.",
+        "leaveText": "햇살 가득한 정원 잔디밭으로 다시 나옵니다."
       },
       "drowned_temple": {
         "name": "익사한 신전",

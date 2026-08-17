@@ -807,6 +807,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorial.nextTipMap': 'ワールドマップ（{key}）でクエストの場所を確認しましょう。',
   'hudChrome.tutorial.nextTipSocial':
     'ソーシャル（{key}）を開いて、手強い戦いに備えるパーティーを探しましょう。',
+  'hudChrome.lastkeepMap.story.undercroft': '地下蔵',
+  'hudChrome.lastkeepMap.story.state': '公務の階',
+  'hudChrome.lastkeepMap.story.residence': '居住の階',
+  'hudChrome.lastkeepMap.story.tower': '見張り塔',
+  'hudChrome.dawnholdMap.story.ground': '庭園の階',
+  'hudChrome.dawnholdMap.story.solar': '日だまりの間',
   'hudChrome.raidLockout.title': 'レイドロックアウト',
   'hudChrome.raidLockout.allReady': 'すべてのレイドが利用可能',
   'hudChrome.raidLockout.daysHours': '{d}日{h}時間',
@@ -3836,6 +3842,20 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.card_master.title': '運命の胴元',
   'entities.npcs.card_master.greeting':
     'カードデュエルはいかが？三本勝負、勝者には自慢の種が手に入る。',
+  'entities.npcs.stylist_verena.name': 'ヴェレナ・アシュロック',
+  'entities.npcs.stylist_verena.title': 'スタイリスト',
+  'entities.npcs.stylist_verena.greeting':
+    'お掛けなさい、{className}。櫛が一本、上等な鏡が一枚、そして十分な金貨があれば、まるで別人になって出ていけるわ。',
+  'apiError.character.no_redesign_credit':
+    'このキャラクターにはイメージチェンジの残り回数がありません。イーストブルック渓谷のスタイリストで購入してください。',
+  'stylist.buyCredit': 'イメージチェンジを購入（{price}）',
+  'stylist.buyCreditAria': '{price} でキャラクターのイメージチェンジを一回購入する',
+  'character.editAppearance': '外見を編集',
+  'character.editAppearanceAria': '{name} の外見を編集する',
+  'character.editAppearanceHint':
+    'スタイリストのイメージチェンジを {count} 回分保有しています。保存時に一回消費されます。',
+  'character.editAppearanceHintOne':
+    'スタイリストのイメージチェンジを 1 回保有しています。保存時に消費されます。',
   'cardDuel.title': 'カードデュエル',
   'cardDuel.close': '閉じる',
   'cardDuel.join': 'キューに参加',
@@ -10389,10 +10409,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '温かな雨が古い石の上で音を立てる。ワイルドハート盆地が目の前に開けた。',
   'entities.dungeons.wildheart_basin.leaveText': '石の牙の下をくぐり、パームリーチの陽光へ戻った。',
   'entities.dungeons.the_last_keep.name': '最後の砦',
-  'entities.dungeons.the_last_keep.enterText': '最後の砦の冷たく静まり返った広間へ足を踏み入れた。',
   'entities.items.last_keep_signet.name': '最後の砦の印章',
+  'entities.dungeons.the_last_keep.enterText': '最後の砦の冷たく静まり返った広間へ足を踏み入れた。',
   'entities.items.reins_terrorspark_groundshaker.name': 'テラースパークの始動キー',
   'entities.dungeons.the_last_keep.leaveText': '砦の扉を閉め、ドレイクランドの風の中へ戻った。',
+  'entities.dungeons.dawnhold_castle.name': 'ドーンホールド城',
+  'entities.items.dawnhold_posy.name': 'ドーンホールド庭園の小さな花束',
+  'entities.dungeons.dawnhold_castle.enterText':
+    '花の香り漂うドーンホールド城の暖かな広間へ足を踏み入れた。',
+  'entities.dungeons.dawnhold_castle.leaveText': '日差しあふれる庭園の芝生へと戻った。',
   'entities.items.wildheart_tuskblade.name': 'ワイルドハートの牙大剣',
   'entities.items.wildheart_hexwood_staff.name': '盆地の呪木杖',
   'entities.items.wildheart_fangknife.name': 'ズルガーの牙小刀',

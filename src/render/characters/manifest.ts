@@ -3090,6 +3090,11 @@ const FAMILY_KEYS: Record<string, string> = {
 const NPC_KEYS: Record<string, string> = {
   bursar_fernando: 'npc_fernando',
   card_master: 'npc_villager_robed',
+  // The Stylist. Explicit rather than falling through to the tinted villager
+  // body: she is a service counter on the same apron as the Card Master, and
+  // the robed silhouette reads as a tradesperson at a desk. Reuses an existing
+  // asset, so this needs no new model.
+  stylist_verena: 'npc_villager_robed',
   marshal_redbrook: 'npc_knight',
   warden_fenwick: 'npc_knight',
   captain_thessaly: 'npc_knight',

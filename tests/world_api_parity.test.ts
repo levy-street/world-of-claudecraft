@@ -172,6 +172,8 @@ export const IWORLD_MEMBERS = [
   { name: 'changeWeaponSkin', kind: 'method' },
   { name: 'toggleWeaponStow', kind: 'method' },
   { name: 'setHelmHidden', kind: 'method' },
+  { name: 'buyRedesignCredit', kind: 'method' },
+  { name: 'redesignPurchases', kind: 'data' },
   { name: 'unstuck', kind: 'method' },
   { name: 'releaseSpirit', kind: 'method' },
   { name: 'resurrectAtCorpse', kind: 'method' },
@@ -606,9 +608,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // even when the total agrees. Only running the suite says what these
     // numbers really are; never reconcile them by arithmetic in the diff (the
     // numbers below were set from a suite run, not from this narrative).
-    expect(IWORLD_MEMBERS.length).toBe(323);
-    expect(DATA_MEMBERS.length).toBe(86);
-    expect(METHOD_MEMBERS.length).toBe(237);
+    expect(IWORLD_MEMBERS.length).toBe(325);
+    expect(DATA_MEMBERS.length).toBe(87);
+    expect(METHOD_MEMBERS.length).toBe(238);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -661,6 +663,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'buyBackItem',
       'buyHeroicVendorItem',
       'buyItem',
+      'buyRedesignCredit',
       'cancelAura',
       'cancelCommissionOrder',
       'cardMinigameInfo',
@@ -849,6 +852,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'realm',
       'rechargeToolEffect',
       'recipeList',
+      'redesignPurchases',
       'releaseEmpoweredAbility',
       'releaseSpirit',
       'reliquaryCatalogCompletion',
@@ -1014,6 +1018,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'questsDone',
       'realm',
       'recipeList',
+      'redesignPurchases',
       'reliquaryFirstFind',
       'reliquaryMarks',
       'reliquaryObtainCounts',
@@ -1065,6 +1070,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'buyBackItem',
       'buyHeroicVendorItem',
       'buyItem',
+      'buyRedesignCredit',
       'cancelAura',
       'cancelCommissionOrder',
       'castAbility',
@@ -1440,6 +1446,8 @@ const FACET_COSMETICS = [
   'changeWeaponSkin',
   'toggleWeaponStow',
   'setHelmHidden',
+  'buyRedesignCredit',
+  'redesignPurchases',
 ] as const satisfies readonly (keyof IWorldCosmetics)[];
 type _ExhaustCosmetics = AssertNever<
   Exclude<keyof IWorldCosmetics, (typeof FACET_COSMETICS)[number]>
@@ -1885,8 +1893,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(323);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(323);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(325);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(325);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

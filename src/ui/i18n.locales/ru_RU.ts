@@ -815,6 +815,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Проверьте карту мира ({key}), чтобы увидеть, где вас ждут задания.',
   'hudChrome.tutorial.nextTipSocial':
     'Откройте раздел «Общение» ({key}), чтобы найти группу для сложных боёв.',
+  'hudChrome.lastkeepMap.story.undercroft': 'Подклет',
+  'hudChrome.lastkeepMap.story.state': 'Парадный этаж',
+  'hudChrome.lastkeepMap.story.residence': 'Жилой этаж',
+  'hudChrome.lastkeepMap.story.tower': 'Дозорная башня',
+  'hudChrome.dawnholdMap.story.ground': 'Садовый этаж',
+  'hudChrome.dawnholdMap.story.solar': 'Светлица',
   'hudChrome.raidLockout.title': 'Блокировки рейдов',
   'hudChrome.raidLockout.allReady': 'Все рейды доступны',
   'hudChrome.raidLockout.daysHours': '{d}д {h}ч',
@@ -3863,6 +3869,20 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.card_master.title': 'Дилер удачи',
   'entities.npcs.card_master.greeting':
     'Не сыграть ли партию в карточную дуэль? До двух побед, победителю достанется слава.',
+  'entities.npcs.stylist_verena.name': 'Верена Эшлок',
+  'entities.npcs.stylist_verena.title': 'Стилист',
+  'entities.npcs.stylist_verena.greeting':
+    'Присаживайтесь, {className}. Гребень, хорошее зеркало и довольно монет, и вы выйдете отсюда совсем другим человеком.',
+  'apiError.character.no_redesign_credit':
+    'У этого персонажа не осталось смен облика. Купите её у стилиста в Истврукской долине.',
+  'stylist.buyCredit': 'Купить смену облика ({price})',
+  'stylist.buyCreditAria': 'Купить одну смену облика персонажа за {price}',
+  'character.editAppearance': 'Изменить облик',
+  'character.editAppearanceAria': 'Изменить облик персонажа {name}',
+  'character.editAppearanceHint':
+    'У вас есть смен облика от стилиста: {count}. Одна будет потрачена при сохранении.',
+  'character.editAppearanceHintOne':
+    'У вас есть 1 смена облика от стилиста. Она будет потрачена при сохранении.',
   'cardDuel.title': 'Карточная дуэль',
   'cardDuel.close': 'Закрыть',
   'cardDuel.join': 'Встать в очередь',
@@ -10561,10 +10581,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.wildheart_basin.leaveText':
     'Вы проходите под каменными клыками и возвращаетесь к солнцу Палмрича.',
   'entities.dungeons.the_last_keep.name': 'Последний оплот',
-  'entities.dungeons.the_last_keep.enterText': 'Вы входите в холодные безмолвные залы Последнего оплота.',
   'entities.items.last_keep_signet.name': 'Печатка Последнего оплота',
+  'entities.dungeons.the_last_keep.enterText': 'Вы входите в холодные безмолвные залы Последнего оплота.',
   'entities.items.reins_terrorspark_groundshaker.name': 'Ключ зажигания Страхоискра',
   'entities.dungeons.the_last_keep.leaveText': 'Вы затворяете дверь оплота и возвращаетесь под ветер Земель Драконов.',
+  'entities.dungeons.dawnhold_castle.name': 'Замок Рассвета',
+  'entities.items.dawnhold_posy.name': 'Букетик из сада Замка Рассвета',
+  'entities.dungeons.dawnhold_castle.enterText':
+    'Вы входите в теплые, напоенные ароматом цветов залы Замка Рассвета.',
+  'entities.dungeons.dawnhold_castle.leaveText':
+    'Вы возвращаетесь на залитую солнцем садовую лужайку.',
   'entities.items.wildheart_tuskblade.name': 'Клыкастый клинок Дикого Сердца',
   'entities.items.wildheart_hexwood_staff.name': 'Посох колдовского дерева из Котловины',
   'entities.items.wildheart_fangknife.name': 'Клыковый нож Зулгара',

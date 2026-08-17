@@ -953,6 +953,22 @@ export const es: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "The Undercroft",
+        "state": "The State Floor",
+        "residence": "The Residence",
+        "tower": "The Watch Tower"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
+    },
     "compass": {
       "N": "N",
       "NE": "NE",
@@ -3875,7 +3891,8 @@ export const es: EnTranslations = {
       "taken_over": "Otra sesión tomó el control de tu personaje.",
       "rename_required": "Este personaje debe cambiar de nombre antes de entrar al mundo.",
       "invalid_appearance": "No se pudo guardar esa apariencia. Ajusta el diseño e inténtalo de nuevo.",
-      "reroll_unavailable": "Este personaje no tiene disponible un rediseño gratuito."
+      "reroll_unavailable": "Este personaje no tiene disponible un rediseño gratuito.",
+      "no_redesign_credit": "This character has no redesign credit left. Visit the Stylist in Eastbrook to buy one."
     },
     "moderation": {
       "suspended_until": "Esta cuenta está suspendida hasta {date}.",
@@ -7287,6 +7304,10 @@ export const es: EnTranslations = {
     "waitingOnOpponent": "Esperando la carta de tu rival...",
     "yourTurn": "Juega una carta"
   },
+  "stylist": {
+    "buyCredit": "Buy a redesign ({price})",
+    "buyCreditAria": "Buy one character redesign for {price}"
+  },
   "delveUi": {
     "board": {
       "title": "Tablón de Expediciones",
@@ -7878,7 +7899,11 @@ export const es: EnTranslations = {
     "redesignHint": "Este personaje es anterior al nuevo creador de personajes. Tienes un rediseño gratuito; se consume al guardar.",
     "redesignTitle": "Rediseñar a {name}",
     "redesignSave": "Guardar nuevo aspecto",
-    "redesignCancel": "Conservar aspecto actual"
+    "redesignCancel": "Conservar aspecto actual",
+    "editAppearance": "Edit Appearance",
+    "editAppearanceAria": "Edit the appearance of {name}",
+    "editAppearanceHint": "You hold {count} redesign credits from the Stylist. One is spent when you save.",
+    "editAppearanceHintOne": "You hold 1 redesign credit from the Stylist. It is spent when you save."
   },
   "deleteCharacter": {
     "title": "Eliminar personaje",
@@ -12378,6 +12403,9 @@ export const es: EnTranslations = {
       "pristine_claw": {
         "name": "Garra Prístina"
       },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
+      },
       "conjured_water4": {
         "name": "Agua de Manantial Conjurada"
       },
@@ -13978,6 +14006,11 @@ export const es: EnTranslations = {
         "name": "Maestro de Cartas",
         "title": "Repartidor del Azar",
         "greeting": "¿Un Duelo de Cartas? Al mejor de tres; el ganador se lleva los derechos de presumir."
+      },
+      "stylist_verena": {
+        "name": "Verena Ashlock",
+        "title": "Stylist",
+        "greeting": "Sit down, {className}. A comb, a good mirror, and coin enough, and you can walk out looking like someone else entirely."
       },
       "bursar_petra_vell": {
         "name": "Tesorera Petra Vell",
@@ -16861,6 +16894,11 @@ export const es: EnTranslations = {
         "name": "La Última Fortaleza",
         "enterText": "Entras en los fríos y silenciosos salones del Last Keep.",
         "leaveText": "Cierras tras de ti la puerta de la fortaleza y vuelves al viento de los Drakelands."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
       },
       "drowned_temple": {
         "name": "El Templo Ahogado",

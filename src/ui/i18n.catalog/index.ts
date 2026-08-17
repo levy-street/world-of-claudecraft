@@ -1134,6 +1134,13 @@ export const en = {
     waitingOnOpponent: "Waiting on your opponent's card...",
     yourTurn: 'Play a card',
   },
+  // The Stylist's gossip row: the one purchase she offers. {price} is a
+  // formatMoney fragment, so the number and its coin units are already
+  // localized before they reach this string.
+  stylist: {
+    buyCredit: 'Buy a redesign ({price})',
+    buyCreditAria: 'Buy one character redesign for {price}',
+  },
   delveUi: {
     board: {
       title: 'Delve Board',

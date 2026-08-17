@@ -953,6 +953,22 @@ export const vi_VN: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "The Undercroft",
+        "state": "The State Floor",
+        "residence": "The Residence",
+        "tower": "The Watch Tower"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
+    },
     "compass": {
       "N": "B",
       "NE": "ĐB",
@@ -3875,7 +3891,8 @@ export const vi_VN: EnTranslations = {
       "taken_over": "Nhân vật của bạn đã bị một phiên khác chiếm quyền.",
       "rename_required": "Nhân vật này phải được đổi tên trước khi vào thế giới.",
       "invalid_appearance": "Không thể lưu ngoại hình đó. Hãy chỉnh sửa thiết kế rồi thử lại.",
-      "reroll_unavailable": "Nhân vật này hiện không có lượt làm lại ngoại hình miễn phí nào."
+      "reroll_unavailable": "Nhân vật này hiện không có lượt làm lại ngoại hình miễn phí nào.",
+      "no_redesign_credit": "This character has no redesign credit left. Visit the Stylist in Eastbrook to buy one."
     },
     "moderation": {
       "suspended_until": "Tài khoản này bị đình chỉ đến {date}.",
@@ -7287,6 +7304,10 @@ export const vi_VN: EnTranslations = {
     "waitingOnOpponent": "Đang đợi bài của đối thủ...",
     "yourTurn": "Đánh một lá bài"
   },
+  "stylist": {
+    "buyCredit": "Buy a redesign ({price})",
+    "buyCreditAria": "Buy one character redesign for {price}"
+  },
   "delveUi": {
     "board": {
       "title": "Bảng Hang Sâu",
@@ -7878,7 +7899,11 @@ export const vi_VN: EnTranslations = {
     "redesignHint": "Nhân vật này có trước trình tạo nhân vật mới. Bạn có một lần thiết kế lại miễn phí; nó được dùng khi bạn lưu.",
     "redesignTitle": "Thiết Kế Lại {name}",
     "redesignSave": "Lưu Diện Mạo Mới",
-    "redesignCancel": "Giữ Diện Mạo Hiện Tại"
+    "redesignCancel": "Giữ Diện Mạo Hiện Tại",
+    "editAppearance": "Edit Appearance",
+    "editAppearanceAria": "Edit the appearance of {name}",
+    "editAppearanceHint": "You hold {count} redesign credits from the Stylist. One is spent when you save.",
+    "editAppearanceHintOne": "You hold 1 redesign credit from the Stylist. It is spent when you save."
   },
   "deleteCharacter": {
     "title": "Xóa Nhân Vật",
@@ -12378,6 +12403,9 @@ export const vi_VN: EnTranslations = {
       "pristine_claw": {
         "name": "Móng Vuốt Nguyên Vẹn"
       },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
+      },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
       },
@@ -13978,6 +14006,11 @@ export const vi_VN: EnTranslations = {
         "name": "Bậc Thầy Bài",
         "title": "Kẻ Chia Bài May Rủi",
         "greeting": "Muốn thử Đấu Bài không? Chơi ba ván, người thắng lấy quyền khoe."
+      },
+      "stylist_verena": {
+        "name": "Verena Ashlock",
+        "title": "Stylist",
+        "greeting": "Sit down, {className}. A comb, a good mirror, and coin enough, and you can walk out looking like someone else entirely."
       },
       "bursar_petra_vell": {
         "name": "Thủ Quỹ Petra Vell",
@@ -16861,6 +16894,11 @@ export const vi_VN: EnTranslations = {
         "name": "Pháo Đài Cuối Cùng",
         "enterText": "Bạn bước vào những đại sảnh lạnh lẽo, tĩnh lặng của Last Keep.",
         "leaveText": "Bạn kéo cánh cửa pháo đài đóng sập lại và bước trở về với cơn gió của Drakelands."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
       },
       "drowned_temple": {
         "name": "Ngôi Đền Chết Chìm",

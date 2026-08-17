@@ -953,6 +953,22 @@ export const sv_SE: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "The Undercroft",
+        "state": "The State Floor",
+        "residence": "The Residence",
+        "tower": "The Watch Tower"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
+    },
     "compass": {
       "N": "N",
       "NE": "NÖ",
@@ -3875,7 +3891,8 @@ export const sv_SE: EnTranslations = {
       "taken_over": "Din karaktär togs över av en annan session.",
       "rename_required": "Denna karaktär måste byta namn innan den går in i världen.",
       "invalid_appearance": "Det utseendet kunde inte sparas. Justera designen och försök igen.",
-      "reroll_unavailable": "Den här karaktären har ingen gratis omformning tillgänglig."
+      "reroll_unavailable": "Den här karaktären har ingen gratis omformning tillgänglig.",
+      "no_redesign_credit": "This character has no redesign credit left. Visit the Stylist in Eastbrook to buy one."
     },
     "moderation": {
       "suspended_until": "Detta konto är avstängt till {date}.",
@@ -7287,6 +7304,10 @@ export const sv_SE: EnTranslations = {
     "waitingOnOpponent": "Väntar på motståndarens kort...",
     "yourTurn": "Spela ett kort"
   },
+  "stylist": {
+    "buyCredit": "Buy a redesign ({price})",
+    "buyCreditAria": "Buy one character redesign for {price}"
+  },
   "delveUi": {
     "board": {
       "title": "Delve-tavla",
@@ -7878,7 +7899,11 @@ export const sv_SE: EnTranslations = {
     "redesignHint": "Den här rollfiguren skapades före den nya figurskaparen. Du har en gratis omformning; den används när du sparar.",
     "redesignTitle": "Omforma {name}",
     "redesignSave": "Spara nytt utseende",
-    "redesignCancel": "Behåll nuvarande utseende"
+    "redesignCancel": "Behåll nuvarande utseende",
+    "editAppearance": "Edit Appearance",
+    "editAppearanceAria": "Edit the appearance of {name}",
+    "editAppearanceHint": "You hold {count} redesign credits from the Stylist. One is spent when you save.",
+    "editAppearanceHintOne": "You hold 1 redesign credit from the Stylist. It is spent when you save."
   },
   "deleteCharacter": {
     "title": "Radera karaktär",
@@ -12378,6 +12403,9 @@ export const sv_SE: EnTranslations = {
       "pristine_claw": {
         "name": "Orörd klo"
       },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
+      },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"
       },
@@ -13978,6 +14006,11 @@ export const sv_SE: EnTranslations = {
         "name": "Kortmästare",
         "title": "Slumpmakare",
         "greeting": "Hur är det med en kortduell? Bäst av tre, vinnaren tar skryträtten."
+      },
+      "stylist_verena": {
+        "name": "Verena Ashlock",
+        "title": "Stylist",
+        "greeting": "Sit down, {className}. A comb, a good mirror, and coin enough, and you can walk out looking like someone else entirely."
       },
       "bursar_petra_vell": {
         "name": "Kamrer Petra Vell",
@@ -16861,6 +16894,11 @@ export const sv_SE: EnTranslations = {
         "name": "Sista fästet",
         "enterText": "Du kliver in i de kalla, tysta hallarna i Sista fästet.",
         "leaveText": "Du drar igen fästningsporten och kliver ut i Drakländernas vind."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
       },
       "drowned_temple": {
         "name": "Det dränkta templet",

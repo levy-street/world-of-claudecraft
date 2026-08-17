@@ -324,6 +324,7 @@ import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_even
 import { nextRaidResetMs, resetDayKey } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
+import { spendRedesignCreditOnSessions } from './redesign_credit_session';
 import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
 import { refusedRiftForgeCommand } from './rift_forge_gate';
 import { RiftUpgradeCoordinator, riftUpgraderConfigFromEnv } from './rift_upgrader';
@@ -5713,6 +5714,12 @@ export class GameServer {
     return pushed;
   }
 
+  /** Mirror a SPENT redesign credit onto a live session; rules and the reason it
+   *  must exist live in server/redesign_credit_session.ts. */
+  spendRedesignCreditForCharacter(characterId: number): boolean {
+    return spendRedesignCreditOnSessions(this.sim, this.clients.values(), characterId);
+  }
+
   /**
    * Push a freshly saved look onto a LIVE session, if the character has one.
    *
@@ -7227,6 +7234,12 @@ export class GameServer {
       case 'learn_riding':
         if (typeof msg.npc === 'number' && Number.isInteger(msg.npc))
           sim.learnRidingFor(msg.npc, pid);
+        break;
+      // Stylist redesign credit: the Sim re-validates NPC identity, range,
+      // liveness, the credit cap, and funds, then charges in the same tick.
+      case 'buy_redesign_credit':
+        if (typeof msg.npc === 'number' && Number.isInteger(msg.npc))
+          sim.buyRedesignCreditFor(msg.npc, pid);
         break;
       // Show-jumping race: the Sim re-validates the glowing platform, lesson or
       // mount eligibility, and liveness before arming the countdown.
@@ -9426,6 +9439,10 @@ export class GameServer {
     // trainer UI without waiting on a mount/select command to fail. Wire key
     // `mntRtd`; delta-guarded, only changes once (false to true, never back).
     maybe('mntRtd', meta.ridingTrained === true ? true : null);
+    // Lifetime Stylist redesign purchases: the Stylist dialog prices its button
+    // off this (the band doubles per prior purchase), so without it the button
+    // would quote the first-purchase price forever. Delta-guarded and monotonic.
+    maybe('rdsgnP', meta.redesignPurchases ? meta.redesignPurchases : null);
     // Session-only lesson and race state must still reconcile after linkdead:
     // events sent while the socket is absent are not replayed on resume. These
     // self deltas are authoritative and clear stale client mirrors with false/null.

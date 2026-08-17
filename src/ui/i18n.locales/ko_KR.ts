@@ -805,6 +805,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorial.nextTipQuestLog': '퀘스트 기록({key})을 열어 근처의 다음 임무를 확인하세요.',
   'hudChrome.tutorial.nextTipMap': '월드 맵({key})에서 퀘스트가 있는 곳을 확인하세요.',
   'hudChrome.tutorial.nextTipSocial': '소셜({key})을 열어 강력한 전투를 위한 파티를 찾아보세요.',
+  'hudChrome.lastkeepMap.story.undercroft': '지하 저장고',
+  'hudChrome.lastkeepMap.story.state': '의전층',
+  'hudChrome.lastkeepMap.story.residence': '주거층',
+  'hudChrome.lastkeepMap.story.tower': '망루',
+  'hudChrome.dawnholdMap.story.ground': '정원층',
+  'hudChrome.dawnholdMap.story.solar': '일광실',
   'hudChrome.raidLockout.title': '공격대 잠금',
   'hudChrome.raidLockout.allReady': '모든 공격대 준비됨',
   'hudChrome.raidLockout.daysHours': '{d}일 {h}시간',
@@ -3812,6 +3818,20 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.card_master.title': '운명의 딜러',
   'entities.npcs.card_master.greeting':
     '카드 대결 한 판 어떻소? 삼판양승, 승자에게는 자랑거리가 생기지.',
+  'entities.npcs.stylist_verena.name': '베레나 애슐록',
+  'entities.npcs.stylist_verena.title': '스타일리스트',
+  'entities.npcs.stylist_verena.greeting':
+    '앉으세요, {className}. 빗 한 자루와 좋은 거울 하나, 그리고 넉넉한 금화만 있으면 완전히 딴사람이 되어 걸어 나갈 수 있답니다.',
+  'apiError.character.no_redesign_credit':
+    '이 캐릭터에게 남은 외형 변경권이 없습니다. 이스트브룩 골짜기의 스타일리스트에게서 구매하세요.',
+  'stylist.buyCredit': '외형 변경 구매 ({price})',
+  'stylist.buyCreditAria': '{price}에 캐릭터 외형 변경 1회 구매',
+  'character.editAppearance': '외형 편집',
+  'character.editAppearanceAria': '{name}의 외형 편집',
+  'character.editAppearanceHint':
+    '스타일리스트 외형 변경권을 {count}개 보유하고 있습니다. 저장할 때 1개가 사용됩니다.',
+  'character.editAppearanceHintOne':
+    '스타일리스트 외형 변경권을 1개 보유하고 있습니다. 저장할 때 사용됩니다.',
   'cardDuel.title': '카드 대결',
   'cardDuel.close': '닫기',
   'cardDuel.join': '대기열 참가',
@@ -10375,11 +10395,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.wildheart_basin.leaveText':
     '돌송곳니 아래를 지나 팜리치의 햇살 속으로 돌아갑니다.',
   'entities.dungeons.the_last_keep.name': '마지막 요새',
-  'entities.dungeons.the_last_keep.enterText': '마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.',
   'entities.items.last_keep_signet.name': '마지막 요새의 인장',
+  'entities.dungeons.the_last_keep.enterText': '마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.',
   'entities.items.reins_terrorspark_groundshaker.name': '테러스파크 시동 열쇠',
   'entities.dungeons.the_last_keep.leaveText':
     '요새의 문을 닫고 드레이크랜드의 바람 속으로 돌아갑니다.',
+  'entities.dungeons.dawnhold_castle.name': '던홀드 성',
+  'entities.items.dawnhold_posy.name': '던홀드 정원 꽃다발',
+  'entities.dungeons.dawnhold_castle.enterText':
+    '꽃향기 가득한 던홀드 성의 따뜻한 홀 안으로 들어섭니다.',
+  'entities.dungeons.dawnhold_castle.leaveText': '햇살 가득한 정원 잔디밭으로 다시 나옵니다.',
   'entities.items.wildheart_tuskblade.name': '야생심장 엄니대검',
   'entities.items.wildheart_hexwood_staff.name': '분지의 사술나무 지팡이',
   'entities.items.wildheart_fangknife.name': '줄가르의 송곳니칼',

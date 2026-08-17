@@ -953,6 +953,22 @@ export const ru_RU: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "Подклет",
+        "state": "Парадный этаж",
+        "residence": "Жилой этаж",
+        "tower": "Дозорная башня"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "Садовый этаж",
+        "solar": "Светлица"
+      }
+    },
     "compass": {
       "N": "С",
       "NE": "СВ",
@@ -3875,7 +3891,8 @@ export const ru_RU: EnTranslations = {
       "taken_over": "Вашего персонажа перехватила другая сессия.",
       "rename_required": "Перед входом в мир этому персонажу нужно сменить имя.",
       "invalid_appearance": "Не удалось сохранить этот облик. Измените дизайн и попробуйте снова.",
-      "reroll_unavailable": "У этого персонажа нет доступного бесплатного редизайна."
+      "reroll_unavailable": "У этого персонажа нет доступного бесплатного редизайна.",
+      "no_redesign_credit": "У этого персонажа не осталось смен облика. Купите её у стилиста в Истврукской долине."
     },
     "moderation": {
       "suspended_until": "Эта учетная запись заблокирована до {date}.",
@@ -7287,6 +7304,10 @@ export const ru_RU: EnTranslations = {
     "waitingOnOpponent": "Ожидание карты соперника...",
     "yourTurn": "Разыграйте карту"
   },
+  "stylist": {
+    "buyCredit": "Купить смену облика ({price})",
+    "buyCreditAria": "Купить одну смену облика персонажа за {price}"
+  },
   "delveUi": {
     "board": {
       "title": "Доска Вылазок",
@@ -7878,7 +7899,11 @@ export const ru_RU: EnTranslations = {
     "redesignHint": "Этот персонаж создан до появления нового редактора внешности. У вас есть одна бесплатная переделка; она расходуется при сохранении.",
     "redesignTitle": "Переделать: {name}",
     "redesignSave": "Сохранить новый облик",
-    "redesignCancel": "Оставить текущий облик"
+    "redesignCancel": "Оставить текущий облик",
+    "editAppearance": "Изменить облик",
+    "editAppearanceAria": "Изменить облик персонажа {name}",
+    "editAppearanceHint": "У вас есть смен облика от стилиста: {count}. Одна будет потрачена при сохранении.",
+    "editAppearanceHintOne": "У вас есть 1 смена облика от стилиста. Она будет потрачена при сохранении."
   },
   "deleteCharacter": {
     "title": "Удалить персонажа",
@@ -12378,6 +12403,9 @@ export const ru_RU: EnTranslations = {
       "pristine_claw": {
         "name": "Безупречный коготь"
       },
+      "dawnhold_posy": {
+        "name": "Букетик из сада Замка Рассвета"
+      },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
       },
@@ -13978,6 +14006,11 @@ export const ru_RU: EnTranslations = {
         "name": "Карточный мастер",
         "title": "Дилер удачи",
         "greeting": "Не сыграть ли партию в карточную дуэль? До двух побед, победителю достанется слава."
+      },
+      "stylist_verena": {
+        "name": "Верена Эшлок",
+        "title": "Стилист",
+        "greeting": "Присаживайтесь, {className}. Гребень, хорошее зеркало и довольно монет, и вы выйдете отсюда совсем другим человеком."
       },
       "bursar_petra_vell": {
         "name": "Казначей Петра Велль",
@@ -16861,6 +16894,11 @@ export const ru_RU: EnTranslations = {
         "name": "Последний оплот",
         "enterText": "Вы входите в холодные безмолвные залы Последнего оплота.",
         "leaveText": "Вы затворяете дверь оплота и возвращаетесь под ветер Земель Драконов."
+      },
+      "dawnhold_castle": {
+        "name": "Замок Рассвета",
+        "enterText": "Вы входите в теплые, напоенные ароматом цветов залы Замка Рассвета.",
+        "leaveText": "Вы возвращаетесь на залитую солнцем садовую лужайку."
       },
       "drowned_temple": {
         "name": "Утонувший храм",

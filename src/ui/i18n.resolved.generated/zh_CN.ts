@@ -953,6 +953,22 @@ export const zh_CN: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "地下穹室",
+        "state": "正殿层",
+        "residence": "起居层",
+        "tower": "瞭望塔"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "庭园层",
+        "solar": "日光厅"
+      }
+    },
     "compass": {
       "N": "北",
       "NE": "东北",
@@ -3875,7 +3891,8 @@ export const zh_CN: EnTranslations = {
       "taken_over": "你的角色已被另一个会话接管。",
       "rename_required": "此角色必须先改名才能进入世界。",
       "invalid_appearance": "无法保存该外观。请调整设计后重试。",
-      "reroll_unavailable": "此角色没有可用的免费重新设计。"
+      "reroll_unavailable": "此角色没有可用的免费重新设计。",
+      "no_redesign_credit": "该角色已没有改造次数。前往东溪谷的造型师处购买。"
     },
     "moderation": {
       "suspended_until": "此账号被停用至 {date}。",
@@ -7287,6 +7304,10 @@ export const zh_CN: EnTranslations = {
     "waitingOnOpponent": "正在等待对手出牌……",
     "yourTurn": "出一张牌"
   },
+  "stylist": {
+    "buyCredit": "购买一次改造（{price}）",
+    "buyCreditAria": "以 {price} 购买一次角色改造"
+  },
   "delveUi": {
     "board": {
       "title": "探秘面板",
@@ -7878,7 +7899,11 @@ export const zh_CN: EnTranslations = {
     "redesignHint": "该角色创建于新角色编辑器之前。你有一次免费重新设计的机会，保存时即会消耗。",
     "redesignTitle": "重新设计{name}",
     "redesignSave": "保存新外观",
-    "redesignCancel": "保留当前外观"
+    "redesignCancel": "保留当前外观",
+    "editAppearance": "编辑外观",
+    "editAppearanceAria": "编辑 {name} 的外观",
+    "editAppearanceHint": "你持有 {count} 次造型师改造。保存时消耗一次。",
+    "editAppearanceHintOne": "你持有 1 次造型师改造。保存时将消耗它。"
   },
   "deleteCharacter": {
     "title": "删除角色",
@@ -12378,6 +12403,9 @@ export const zh_CN: EnTranslations = {
       "pristine_claw": {
         "name": "完美的爪"
       },
+      "dawnhold_posy": {
+        "name": "晨曦堡花园小花束"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -13978,6 +14006,11 @@ export const zh_CN: EnTranslations = {
         "name": "牌局大师",
         "title": "运气经销人",
         "greeting": "来一局纸牌对决？三局两胜，赢家赢得吹嘘的资本。"
+      },
+      "stylist_verena": {
+        "name": "维蕾娜·阿什洛克",
+        "title": "造型师",
+        "greeting": "请坐，{className}。一把梳子、一面好镜子，再加上足够的钱币，你就能改头换面地走出去。"
       },
       "bursar_petra_vell": {
         "name": "司库佩特拉·维尔",
@@ -16861,6 +16894,11 @@ export const zh_CN: EnTranslations = {
         "name": "最后的堡垒",
         "enterText": "你踏入最后的堡垒那冰冷而寂静的大厅。",
         "leaveText": "你带上堡门，重新走进龙裔荒原的寒风中。"
+      },
+      "dawnhold_castle": {
+        "name": "晨曦堡",
+        "enterText": "你走进晨曦堡温暖而花香四溢的厅堂。",
+        "leaveText": "你回到阳光洒落的花园草坪上。"
       },
       "drowned_temple": {
         "name": "溺亡神殿",

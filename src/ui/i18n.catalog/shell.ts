@@ -255,6 +255,15 @@ export const shellStrings = {
       redesignTitle: 'Redesign {name}',
       redesignSave: 'Save New Look',
       redesignCancel: 'Keep Current Look',
+      // The paid Stylist path, distinct from the one-shot legacy token above:
+      // this button appears whenever the character holds at least one redesign
+      // credit bought from the Stylist, and stays for as long as credits remain.
+      editAppearance: 'Edit Appearance',
+      editAppearanceAria: 'Edit the appearance of {name}',
+      editAppearanceHint:
+        'You hold {count} redesign credits from the Stylist. One is spent when you save.',
+      editAppearanceHintOne:
+        'You hold 1 redesign credit from the Stylist. It is spent when you save.',
     },
     deleteCharacter: {
       title: 'Delete Character',
