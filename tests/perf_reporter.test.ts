@@ -225,6 +225,7 @@ function snapshot(): PerfSnapshot {
     seconds: 80,
     frames: 4800,
     fps: 60,
+    hiddenPresentSkips: 0,
     hitchForensics: [],
     frameMs: { avg: 16.6, p50: 16, p95: 19, p99: 28, max: 52, long50: 1 },
     windows: {
@@ -507,6 +508,12 @@ describe('perf reporter payload', () => {
     expect(body.source).toBe('benchmark');
     expect(body.zoneOrScenario).toBe('bench_dense_foliage');
     expect(JSON.stringify(body.rawSummary)).not.toContain('Safari/605');
+    // hiddenPresentSkips ships in rawSummary (review reversal of the phase 4
+    // decision): sends are skipped while hidden, but an after-restore session
+    // still beacons cumulative numbers whose spans included minimized time,
+    // and the counter is the only fleet-visible evidence of that residue. It
+    // rides in rawSummary (the no-DDL home), never as a top-level column.
+    expect((body.rawSummary as { hiddenPresentSkips?: number }).hiddenPresentSkips).toBe(0);
     expect((body.rawSummary as { graphicsConfigVersion?: number }).graphicsConfigVersion).toBe(16);
     expect(
       (body.rawSummary as { rendererQualityBuckets?: { levels?: { foliage?: number } } })
@@ -571,6 +578,17 @@ describe('perf reporter payload', () => {
       (body.rawSummary as { rendererFoliage?: { modelVisibleTrianglesByLod?: { core?: number } } })
         .rendererFoliage?.modelVisibleTrianglesByLod?.core,
     ).toBe(420_000);
+  });
+
+  it('carries a nonzero hiddenPresentSkips into raw summary (the after-restore evidence)', () => {
+    // A session minimized for a while and then restored: the skip counter is
+    // what disambiguates its diluted-looking spans from a genuinely slow
+    // machine, since no beacon goes out DURING the hidden span itself.
+    const settings = new Settings();
+    const snap = snapshot();
+    snap.hiddenPresentSkips = 4321;
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(snap, settings, 'sess1', 42)!;
+    expect((body.rawSummary as { hiddenPresentSkips?: number }).hiddenPresentSkips).toBe(4321);
   });
 
   it('carries the four dropped browser longtask fields into raw summary (#2479)', () => {
@@ -1210,6 +1228,66 @@ describe('perf reporter worst-window drain', () => {
       expect(lastScheduledDelay()).toBe(
         jitteredPerfReportDelay(300_000, 'reporter-test-session', 2),
       );
+    } finally {
+      stop();
+    }
+  });
+
+  it('skips the send while the desktop shell is hidden, even though the page reads visible', async () => {
+    const fetchImpl = vi.fn(async () => ({ ok: true, status: 204, text: async () => '' }));
+    installReporterFlowGlobals(fetchImpl);
+    // The shell disables background throttling, so a minimized window still
+    // reports 'visible' here: without the shell's own signal this session would
+    // keep beaconing reports for frames it never drew.
+    (globalThis as any).document.visibilityState = 'visible';
+    let shellHidden = true;
+    const { perf } = fakePerf();
+    const stop = startPerfReporter({
+      perf,
+      settings: new Settings(),
+      tokenProvider: () => null,
+      characterIdProvider: () => null,
+      shellHidden: () => shellHidden,
+    });
+    try {
+      await vi.advanceTimersByTimeAsync(
+        jitteredPerfReportDelay(75_000, 'reporter-test-session', 0),
+      );
+      expect(fetchImpl).not.toHaveBeenCalled();
+      // Same retry cadence as the page-hidden skip: it IS the 'hidden' skip.
+      const hiddenRetry = jitteredPerfReportDelay(300_000, 'reporter-test-session', 1);
+      expect(lastScheduledDelay()).toBe(hiddenRetry);
+
+      // Negative arm: nothing about the page changed, only the shell verdict,
+      // and the report goes out.
+      shellHidden = false;
+      await vi.advanceTimersByTimeAsync(hiddenRetry);
+      expect(fetchImpl).toHaveBeenCalledTimes(1);
+      expect(lastScheduledDelay()).toBe(
+        jitteredPerfReportDelay(300_000, 'reporter-test-session', 2),
+      );
+    } finally {
+      stop();
+    }
+  });
+
+  it('sends normally when the shell hook is present and reports shown', async () => {
+    const fetchImpl = vi.fn(async () => ({ ok: true, status: 204, text: async () => '' }));
+    installReporterFlowGlobals(fetchImpl);
+    (globalThis as any).document.visibilityState = 'visible';
+    const { perf } = fakePerf();
+    const stop = startPerfReporter({
+      perf,
+      settings: new Settings(),
+      tokenProvider: () => null,
+      characterIdProvider: () => null,
+      shellHidden: () => false,
+    });
+    try {
+      await vi.advanceTimersByTimeAsync(
+        jitteredPerfReportDelay(75_000, 'reporter-test-session', 0),
+      );
+      expect(fetchImpl).toHaveBeenCalledTimes(1);
     } finally {
       stop();
     }

@@ -156,13 +156,15 @@ describe('CharacterVisual keeps something driving the rig', () => {
 
     visual.root.updateMatrixWorld(true);
     skeleton.update();
-    const firstPalette = [...skeleton.boneMatrices];
+    // r185 types boneMatrices nullable; a bound rig always has a palette.
+    const firstPalette = [...(skeleton.boneMatrices ?? [])];
+    expect(firstPalette).not.toHaveLength(0);
 
     visual.update(FRAME, anim(), true);
     visual.root.updateMatrixWorld(true);
     skeleton.update();
 
-    expect([...skeleton.boneMatrices]).not.toEqual(firstPalette);
+    expect([...(skeleton.boneMatrices ?? [])]).not.toEqual(firstPalette);
     expect(visual.skeletonUpdateStats()).toMatchObject({ requests: 2, updates: 2, skips: 0 });
   });
 

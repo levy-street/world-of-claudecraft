@@ -13179,4 +13179,26 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'auth.designCodeErrVersion': 'Den udseendeskode stammer fra en nyere spilversion.',
   'auth.designCodeErrMalformed': 'Den udseendeskode er beskadiget. Kopiér hele koden, og prøv igen.',
   'hudChrome.nameplate.cheaterTag': '< Snyder >',
+  'hud.options.displayMode': 'Skærmtilstand',
+  'hud.options.displayModeBorderless': 'Kantløs fuldskærm',
+  'hud.options.displayModeWindowed': 'Vindue',
+  'hudChrome.options.discordPresence': 'Detaljeret Discord-tilstedeværelse',
+  'hudChrome.options.discordPresenceNote':
+    'Viser den zone, du er i, og hvor længe du har spillet i denne session, som din Discord-aktivitet, og alle, der kan se din Discord-profil, kan se begge dele. Kun zonens navn, din sessionstid og spillet deles, aldrig din karakter, din konto eller hvem du spiller med. Kræver, at Discord-appen kører på denne computer.',
+  'hudChrome.options.forceHighPerfGpu': 'Brug den dedikerede gaming-GPU',
+  'hudChrome.options.forceHighPerfGpuNote':
+    'Slået til som standard: skrivebordsappen beder denne computer om dens dedikerede gaming-GPU. Slå dette fra, hvis spillet ikke vil starte, åbner til en sort skærm, eller den bærbares skærm går i sort. Træder i kraft, næste gang spillet starter.',
+  'desktop.notify.partyInviteBody': '{name} inviterede dig til en gruppe.',
+  'desktop.notify.partyInviteTitle': 'Gruppeinvitation',
+  'desktop.notify.updateReadyBody': 'Genstart World of ClaudeCraft for at anvende opdateringen.',
+  'desktop.notify.updateReadyTitle': 'Opdatering {version} er klar',
+  'desktop.notify.updateReadyTitleNoVersion': 'Opdatering er klar',
+  'desktop.update.whatsNew': 'Se ændringerne i din browser',
+  'entities.abilities.challenging_roar.description':
+    'Et rædselsvækkende brøl: alle fjender inden for 10 meter bliver ægget, så deres trussel mod dig stiger til at matche deres mest forhadte fjende, og de tvinges til at angribe dig i 3 sek. Kun i Bruin-form.',
+  'entities.abilities.challenging_roar.name': 'Rædselsbrøl',
+  'entities.abilities.cheap_shot.descriptionNoStealth':
+    'Slå målet for {damage} skade og bedøv det i 4 sek. Giver 2 combopoint.',
+  'gpuNotice.bodyDiscreteInactive':
+    'Spillet bruger ikke den dedikerede (gaming-)GPU og kører i stedet på den strømbesparende GPU, så ydeevnen forringes. Opdater dine grafikdrivere og genstart derefter spillet. På Windows skal du også indstille spillet til Høj ydeevne under Indstillinger, System, Skærm, Grafik.',
 };

@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { type GamepadCallbacks, GamepadManager } from '../src/game/gamepad';
 import { GamepadBindings } from '../src/game/gamepad_bindings';
 import {
+  AXIS,
   GAMEPAD_ZOOM_IN,
   GAMEPAD_ZOOM_OUT,
   GAMEPAD_ZOOM_STEP,
@@ -498,5 +499,220 @@ describe('GamepadManager right-stick turning', () => {
       manager.poll(1 / 60);
       expect(input.isMouselookActive()).toBe(false);
     });
+  });
+});
+
+// The desktop shell cannot see gamepad input: a pad is polled inside the
+// renderer and never reaches the window as an OS event, so a pad-only session
+// looks idle to the machine and the display can sleep mid-fight. The poll
+// therefore says so out loud, but ONLY on real input: firing for a connected
+// but motionless pad would defeat every idle timer on the machine for as long
+// as a pad is plugged in.
+describe('GamepadManager: onActivity', () => {
+  function padWith(pressed: number[] = [], axes: number[] = [0, 0, 0, 0]): Gamepad {
+    const pad = gamepadWithPressed(...pressed);
+    (pad as unknown as { axes: number[] }).axes = axes;
+    return pad;
+  }
+
+  function rig(pointerMode = false) {
+    const onActivity = vi.fn();
+    const input = {
+      applyGamepadLook: vi.fn(),
+      clearGamepadMove: vi.fn(),
+      setGamepadLookActive: vi.fn(),
+      setGamepadMove: vi.fn(),
+      triggerGamepadJump: vi.fn(),
+    } as unknown as Input;
+    const callbacks = {
+      onAction: vi.fn(),
+      onInputEdge: vi.fn(),
+      isPointerMode: () => pointerMode,
+      onActivity,
+    } satisfies GamepadCallbacks;
+    const manager = new GamepadManager(input, new GamepadBindings(), callbacks);
+    (manager as unknown as { index: number | null }).index = 0;
+    return { manager, onActivity };
+  }
+
+  function stubPad(pad: Gamepad): void {
+    Object.defineProperty(globalThis, 'navigator', {
+      configurable: true,
+      value: { getGamepads: () => [pad] },
+    });
+  }
+
+  const stickAxes = (axis: number, value: number): number[] => {
+    const axes = [0, 0, 0, 0];
+    axes[axis] = value;
+    return axes;
+  };
+
+  // This suite runs in the node environment (no DOM), but the pointer-mode
+  // cursor and the focus gate both read one. The stub is exactly the surface
+  // the manager touches, and the teardown puts the globals back so the DOM-free
+  // tests around it keep running DOM-free.
+  function installDocumentStub(focused: boolean): () => void {
+    const makeEl = () => ({
+      className: '',
+      style: {} as Record<string, string>,
+      setAttribute: () => {},
+      appendChild: () => {},
+      remove: () => {},
+    });
+    const hadDocument = 'document' in globalThis;
+    const hadWindow = 'window' in globalThis;
+    Object.defineProperty(globalThis, 'document', {
+      configurable: true,
+      value: { createElement: makeEl, body: makeEl(), hasFocus: () => focused },
+    });
+    Object.defineProperty(globalThis, 'window', {
+      configurable: true,
+      value: { innerWidth: 1280, innerHeight: 720 },
+    });
+    return () => {
+      if (!hadDocument) Reflect.deleteProperty(globalThis, 'document');
+      if (!hadWindow) Reflect.deleteProperty(globalThis, 'window');
+    };
+  }
+
+  it('fires on a button edge alone (no stick moved at all)', () => {
+    stubPad(padWith([GP.A]));
+    const { manager, onActivity } = rig();
+    manager.poll(1 / 60);
+    expect(onActivity).toHaveBeenCalledTimes(1);
+  });
+
+  it('fires on left-stick movement alone (no button pressed)', () => {
+    stubPad(padWith([], stickAxes(AXIS.LEFT_Y, -1)));
+    const { manager, onActivity } = rig();
+    manager.poll(1 / 60);
+    expect(onActivity).toHaveBeenCalledTimes(1);
+  });
+
+  it('fires on right-stick look alone (camera-only, the classic idle-timeout case)', () => {
+    stubPad(padWith([], stickAxes(AXIS.RIGHT_X, 1)));
+    const { manager, onActivity } = rig();
+    manager.poll(1 / 60);
+    expect(onActivity).toHaveBeenCalledTimes(1);
+  });
+
+  it('fires on each remaining movement direction alone (every flag feeds the predicate)', () => {
+    // Per-arm coverage: one axis, one direction, no buttons, so a flag dropped
+    // from the `acted` OR cannot hide behind a sibling arm or a button edge.
+    const arms: Array<[string, number, number]> = [
+      ['back', AXIS.LEFT_Y, 1],
+      ['strafe left', AXIS.LEFT_X, -1],
+      ['strafe right', AXIS.LEFT_X, 1],
+    ];
+    for (const [label, axis, value] of arms) {
+      stubPad(padWith([], stickAxes(axis, value)));
+      const { manager, onActivity } = rig();
+      manager.poll(1 / 60);
+      expect(onActivity, `${label} alone must count as activity`).toHaveBeenCalledTimes(1);
+    }
+  });
+
+  it('fires on UI cursor movement alone while a window is open (pointer mode)', () => {
+    // Pointer mode returns before the movement/look arms, so it needs its own
+    // signal: a player navigating the bags with the stick is still present.
+    const restore = installDocumentStub(true);
+    try {
+      stubPad(padWith([], stickAxes(AXIS.LEFT_X, 1)));
+      const { manager, onActivity } = rig(true);
+      manager.poll(1 / 60);
+      expect(onActivity).toHaveBeenCalledTimes(1);
+      // and a still stick in the same mode is silent, so the arm is the cursor
+      // MOVING, not merely being drawn
+      stubPad(padWith());
+      const idle = rig(true);
+      idle.manager.poll(1 / 60);
+      expect(idle.onActivity).not.toHaveBeenCalled();
+    } finally {
+      restore();
+    }
+  });
+
+  it('fires on vertical cursor movement alone (both cursor dimensions count)', () => {
+    // The horizontal case above cannot see a dropped `my` arm in the cursor's
+    // moved-this-frame predicate; this one isolates it.
+    const restore = installDocumentStub(true);
+    try {
+      stubPad(padWith([], stickAxes(AXIS.LEFT_Y, 1)));
+      const { manager, onActivity } = rig(true);
+      manager.poll(1 / 60);
+      expect(onActivity).toHaveBeenCalledTimes(1);
+    } finally {
+      restore();
+    }
+  });
+
+  it('fires AT MOST once per poll, however much happened that frame', () => {
+    // Several edges plus both sticks in one frame is one notify, not five: the
+    // shell only needs to hear that the player is there.
+    stubPad(padWith([GP.A, GP.B, GP.X], [1, -1, 1, -1]));
+    const { manager, onActivity } = rig();
+    manager.poll(1 / 60);
+    expect(onActivity).toHaveBeenCalledTimes(1);
+  });
+
+  it('stays silent for a connected pad nobody is touching', () => {
+    // Connection alone is not activity: this is the state a pad sits in for
+    // hours while its owner reads a quest log or walks away.
+    stubPad(padWith());
+    const { manager, onActivity } = rig();
+    for (let i = 0; i < 5; i++) manager.poll(1 / 60);
+    expect(onActivity).not.toHaveBeenCalled();
+  });
+
+  it('stays silent for a held-still button after its edge frame', () => {
+    const pad = padWith([GP.A]);
+    stubPad(pad);
+    const { manager, onActivity } = rig();
+    manager.poll(1 / 60);
+    expect(onActivity).toHaveBeenCalledTimes(1);
+    // the same button still down: no new edge, no new activity
+    manager.poll(1 / 60);
+    manager.poll(1 / 60);
+    expect(onActivity).toHaveBeenCalledTimes(1);
+  });
+
+  it('stays silent while the window is unfocused, in both poll modes', () => {
+    // The focus gate returns before every dispatch, so it must suppress this
+    // for free: a background window is not the window the OS should stay awake
+    // for, and pad state is consumed there without firing anything.
+    const restore = installDocumentStub(false);
+    try {
+      for (const pointerMode of [false, true]) {
+        stubPad(padWith([GP.A], [1, -1, 1, -1]));
+        const { manager, onActivity } = rig(pointerMode);
+        manager.poll(1 / 60);
+        manager.poll(1 / 60);
+        expect(onActivity, `pointerMode=${pointerMode}`).not.toHaveBeenCalled();
+      }
+    } finally {
+      restore();
+    }
+  });
+
+  it('drives the poll with no notifier at all (the callback is optional)', () => {
+    // main.ts on the web build hands the manager a no-op notifier, but the
+    // callback itself is optional and every other host (tests, the editor)
+    // omits it: the poll must not depend on it existing.
+    stubPad(padWith([GP.A], [1, -1, 0, 0]));
+    const input = {
+      applyGamepadLook: vi.fn(),
+      clearGamepadMove: vi.fn(),
+      setGamepadLookActive: vi.fn(),
+      setGamepadMove: vi.fn(),
+      triggerGamepadJump: vi.fn(),
+    } as unknown as Input;
+    const manager = new GamepadManager(input, new GamepadBindings(), {
+      onAction: vi.fn(),
+      onInputEdge: vi.fn(),
+      isPointerMode: () => false,
+    } satisfies GamepadCallbacks);
+    (manager as unknown as { index: number | null }).index = 0;
+    expect(() => manager.poll(1 / 60)).not.toThrow();
   });
 });

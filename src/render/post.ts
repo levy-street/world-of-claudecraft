@@ -239,7 +239,7 @@ export function buildComposer(
   // Edge AA, after the grade so it works on the display-space image (SMAA's
   // edge detector expects the gamma-encoded color OutputGradePass produces).
   // It stays the LAST pass; the screen-fx pass above feeds into it.
-  // Construction size is provisional; addPass and the setSize() member resize
+  // r185 SMAAPass constructs sizeless; addPass and the setSize() member resize
   // every pass to the live drawing-buffer extent.
   // The AA policy uses SMAA on the full composer tiers. Ultra and insane run
   // the same 1.75 cap as high: when both caps bind, 1.75 squared is 49 percent of
@@ -247,7 +247,7 @@ export function buildComposer(
   // edge pass.
   // ?smaa=off is the dev-only perf-attribution kill switch. It keeps the
   // post-AA cost attributable while comparing the revised tier policy.
-  if (plan.composerPasses.includes('smaa')) composer.addPass(new SMAAPass(size.x, size.y));
+  if (plan.composerPasses.includes('smaa')) composer.addPass(new SMAAPass());
 
   return {
     composer,

@@ -124,7 +124,11 @@ export function worldCampYields(camps: readonly CampDef[] = CAMPS): CampYield[] 
   for (const camp of camps) {
     const template = MOBS[camp.mobId];
     if (!template) continue;
-    const y = campYield(camp, resolveRespawnSeconds(template, camp.center, undefined));
+    // A null roll prices a windowed mob at its FASTEST respawn (the window
+    // floor), which is the deliberate choice here: these yields are a CEILING
+    // the economy guards compare against, so the conservative bound is the one
+    // that must not trip. A rolled value would make the ceiling non-deterministic.
+    const y = campYield(camp, resolveRespawnSeconds(template, camp.center, undefined, null));
     if (y) out.push(y);
   }
   return out;

@@ -1299,6 +1299,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showWalletOnCharacterScreen': '캐릭터 화면에 지갑 표시',
   'hudChrome.options.showPlaytime': '캐릭터 화면에 플레이 시간 표시',
   'hudChrome.options.showWalletOnPlayerCard': '플레이어 카드에 지갑 표시',
+  'hudChrome.options.forceHighPerfGpu': '전용 게이밍 GPU 사용',
+  'hudChrome.options.forceHighPerfGpuNote':
+    '기본값 켜짐: 데스크톱 앱이 이 컴퓨터의 전용 게이밍 GPU를 요청합니다. 게임이 시작되지 않거나, 시작 후 검은 화면만 보이거나, 노트북 화면이 나오지 않으면 끄세요. 이 설정은 다음에 게임을 시작할 때 적용됩니다.',
+  'hudChrome.options.discordPresence': 'Discord 리치 프레즌스',
+  'hudChrome.options.discordPresenceNote':
+    '플레이하는 동안 현재 있는 지역과 이번 세션의 플레이 시간을 Discord 활동으로 표시하며, 당신의 Discord 프로필을 볼 수 있는 사람은 누구나 둘 다 볼 수 있습니다. 공유되는 것은 지역 이름, 이번 세션의 플레이 시간, 게임뿐이며, 캐릭터나 계정, 함께 플레이하는 사람은 절대 공유되지 않습니다. 이 컴퓨터에서 Discord 앱이 실행 중이어야 합니다.',
   'hudChrome.options.showDevBadges': '개발자 배지 표시',
   'hudChrome.options.showOwnNameplate': '내 이름표 표시',
   'hudChrome.options.showPlayerNameplates': '플레이어 이름표 표시',
@@ -2053,6 +2059,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.options.invertLook': '시점 반전 (터치)',
   'hud.options.graphicsReloadNote': '그래픽 품질과 지형 세부 묘사는 새로고침 후 적용됩니다.',
   'hud.options.reloadNow': '지금 새로고침',
+  'hud.options.displayMode': '디스플레이 모드',
+  'hud.options.displayModeBorderless': '테두리 없는 전체 화면',
+  'hud.options.displayModeWindowed': '창 모드',
   'hud.options.fullscreen': '전체 화면',
   'hud.options.touchLookSpeed': '터치 시점 속도',
   'hud.options.joystickSize': '조이스틱 크기',
@@ -7825,6 +7834,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'desktop.update.restart': '지금 다시 시작',
   'desktop.update.later': '나중에',
   'desktop.update.dismiss': '닫기',
+  'desktop.update.whatsNew': '변경 사항을 브라우저에서 보기',
+  'desktop.notify.updateReadyTitle': '업데이트 {version} 준비 완료',
+  'desktop.notify.updateReadyTitleNoVersion': '업데이트 준비 완료',
+  'desktop.notify.updateReadyBody': '업데이트를 적용하려면 World of ClaudeCraft를 다시 시작하세요.',
+  'desktop.notify.partyInviteTitle': '파티 초대',
+  'desktop.notify.partyInviteBody': '{name}님이 파티에 초대했습니다.',
   'desktop.crash.title': 'World of ClaudeCraft',
   'desktop.crash.body': '게임 화면이 응답하지 않습니다. 다시 불러올까요?',
   'desktop.crash.reload': '다시 불러오기',
@@ -7832,6 +7847,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.fatalBody': 'World of ClaudeCraft에 예기치 않은 오류가 발생하여 종료해야 합니다.',
   'gpuNotice.bodyDesktop':
     '게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 그래픽 드라이버를 업데이트한 뒤 게임을 다시 시작하세요. Windows에서는 설정 > 시스템 > 디스플레이 > 그래픽에서 이 게임을 "고성능"으로 설정하세요.',
+  'gpuNotice.bodyDiscreteInactive':
+    '게임이 전용(게이밍) GPU를 사용하지 않고 절전형 GPU에서 실행되고 있어 성능이 떨어집니다. 그래픽 드라이버를 업데이트한 뒤 게임을 다시 시작하세요. Windows에서는 설정 > 시스템 > 디스플레이 > 그래픽에서 이 게임을 "고성능"으로 설정하세요.',
   'gpuNotice.bodyWeb':
     '게임이 GPU 가속 없이 실행되고 있어 매우 느립니다. 브라우저 설정에서 하드웨어 가속을 켜고 그래픽 드라이버를 업데이트한 뒤 브라우저를 다시 시작하세요.',
   'gpuNotice.hybridBodyWindows':

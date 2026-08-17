@@ -17,7 +17,7 @@ export const PERF_ATTRIB_KNOB_CASES = [
   { knob: 'cliffScree', gfxo: 'cliffScree:0' },
   { knob: 'canopyDetail', gfxo: 'canopyDetail:0' },
   { knob: 'pixelRatioCap', gfxo: 'pixelRatioCap:1.48' },
-  { knob: 'grassRadius', gfxo: 'grassRadius:80' },
+  { knob: 'grassRadius', gfxo: 'grassRadius:72' },
   { knob: 'grassStep', gfxo: 'grassStep:2.05' },
   { knob: 'leanFoliage', gfxo: 'leanFoliage:1' },
   { knob: 'standardMaterials', gfxo: 'standardMaterials:0' },

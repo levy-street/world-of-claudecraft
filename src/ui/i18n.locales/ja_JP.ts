@@ -1303,6 +1303,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showWalletOnCharacterScreen': 'キャラクター画面にウォレットを表示',
   'hudChrome.options.showPlaytime': 'キャラクター画面にプレイ時間を表示',
   'hudChrome.options.showWalletOnPlayerCard': 'プレイヤーカードにウォレットを表示',
+  'hudChrome.options.forceHighPerfGpu': '専用ゲーミングGPUを使用',
+  'hudChrome.options.forceHighPerfGpuNote':
+    '既定でオン：デスクトップ版はこのコンピューターの専用ゲーミングGPUを要求します。ゲームが起動しない、起動後に画面が真っ暗になる、またはノートパソコンの画面が映らない場合はオフにしてください。この設定は次回ゲームを起動したときに反映されます。',
+  'hudChrome.options.discordPresence': 'Discord リッチプレゼンス',
+  'hudChrome.options.discordPresenceNote':
+    'プレイ中、現在いるゾーンとこのセッションのプレイ時間をDiscordのアクティビティとして表示します。あなたのDiscordプロフィールを見られる人は誰でもその両方を見られます。共有されるのはゾーン名、このセッションのプレイ時間、ゲーム名だけで、キャラクターやアカウント、一緒に遊んでいる相手が共有されることはありません。このコンピューターでDiscordアプリが起動している必要があります。',
   'hudChrome.options.showDevBadges': '開発者バッジを表示',
   'hudChrome.options.showOwnNameplate': '自分のネームプレートを表示',
   'hudChrome.options.showPlayerNameplates': 'プレイヤーのネームプレートを表示',
@@ -2072,6 +2078,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.options.invertLook': '視点反転（タッチ）',
   'hud.options.graphicsReloadNote': 'グラフィック品質と地形の詳細は再読み込み後に適用されます。',
   'hud.options.reloadNow': '今すぐ再読み込み',
+  'hud.options.displayMode': '表示モード',
+  'hud.options.displayModeBorderless': 'ボーダーレスフルスクリーン',
+  'hud.options.displayModeWindowed': 'ウィンドウ',
   'hud.options.fullscreen': 'フルスクリーン',
   'hud.options.touchLookSpeed': 'タッチ視点速度',
   'hud.options.joystickSize': 'ジョイスティックの大きさ',
@@ -7835,6 +7844,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'desktop.update.restart': '今すぐ再起動',
   'desktop.update.later': '後で',
   'desktop.update.dismiss': '閉じる',
+  'desktop.update.whatsNew': '変更内容をブラウザで見る',
+  'desktop.notify.updateReadyTitle': 'アップデート {version} の準備ができました',
+  'desktop.notify.updateReadyTitleNoVersion': 'アップデートの準備ができました',
+  'desktop.notify.updateReadyBody': 'アップデートを適用するには World of ClaudeCraft を再起動してください。',
+  'desktop.notify.partyInviteTitle': 'パーティ招待',
+  'desktop.notify.partyInviteBody': '{name}があなたをパーティに招待しています。',
   'desktop.crash.title': 'World of ClaudeCraft',
   'desktop.crash.body': 'ゲーム画面が停止しました。再読み込みしますか？',
   'desktop.crash.reload': '再読み込み',
@@ -7842,6 +7857,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.fatalBody': 'World of ClaudeCraft で予期しないエラーが発生したため、終了します。',
   'gpuNotice.bodyDesktop':
     'ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。グラフィックドライバーを更新してから、ゲームを再起動してください。Windowsでは、設定 > システム > ディスプレイ > グラフィック でこのゲームを「高パフォーマンス」に設定してください。',
+  'gpuNotice.bodyDiscreteInactive':
+    'ゲームが専用（ゲーミング）GPUを使用しておらず、省電力GPUで動作しているため、パフォーマンスが低下します。グラフィックドライバーを更新してから、ゲームを再起動してください。Windowsでは、設定 > システム > ディスプレイ > グラフィック でこのゲームを「高パフォーマンス」に設定してください。',
   'gpuNotice.bodyWeb':
     'ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。ブラウザーの設定でハードウェアアクセラレーションを有効にし、グラフィックドライバーを更新してから、ブラウザーを再起動してください。',
   'gpuNotice.hybridBodyWindows':

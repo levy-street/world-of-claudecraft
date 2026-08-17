@@ -1369,6 +1369,10 @@ export const ja_JP: EnTranslations = {
       "showWalletOnCharacterScreen": "キャラクター画面にウォレットを表示",
       "showWalletOnPlayerCard": "プレイヤーカードにウォレットを表示",
       "showPlaytime": "キャラクター画面にプレイ時間を表示",
+      "forceHighPerfGpu": "専用ゲーミングGPUを使用",
+      "forceHighPerfGpuNote": "既定でオン：デスクトップ版はこのコンピューターの専用ゲーミングGPUを要求します。ゲームが起動しない、起動後に画面が真っ暗になる、またはノートパソコンの画面が映らない場合はオフにしてください。この設定は次回ゲームを起動したときに反映されます。",
+      "discordPresence": "Discord リッチプレゼンス",
+      "discordPresenceNote": "プレイ中、現在いるゾーンとこのセッションのプレイ時間をDiscordのアクティビティとして表示します。あなたのDiscordプロフィールを見られる人は誰でもその両方を見られます。共有されるのはゾーン名、このセッションのプレイ時間、ゲーム名だけで、キャラクターやアカウント、一緒に遊んでいる相手が共有されることはありません。このコンピューターでDiscordアプリが起動している必要があります。",
       "showDevBadges": "開発者バッジを表示",
       "showOwnNameplate": "自分のネームプレートを表示",
       "showPlayerNameplates": "プレイヤーのネームプレートを表示",
@@ -7791,7 +7795,15 @@ export const ja_JP: EnTranslations = {
       "readyBody": "ゲーム終了時に自動でインストールされます。今すぐ再起動もできます。",
       "restart": "今すぐ再起動",
       "later": "後で",
-      "dismiss": "閉じる"
+      "dismiss": "閉じる",
+      "whatsNew": "変更内容をブラウザで見る"
+    },
+    "notify": {
+      "updateReadyTitle": "アップデート {version} の準備ができました",
+      "updateReadyTitleNoVersion": "アップデートの準備ができました",
+      "updateReadyBody": "アップデートを適用するには World of ClaudeCraft を再起動してください。",
+      "partyInviteTitle": "パーティ招待",
+      "partyInviteBody": "{name}があなたをパーティに招待しています。"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7803,6 +7815,7 @@ export const ja_JP: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。グラフィックドライバーを更新してから、ゲームを再起動してください。Windowsでは、設定 > システム > ディスプレイ > グラフィック でこのゲームを「高パフォーマンス」に設定してください。",
+    "bodyDiscreteInactive": "ゲームが専用（ゲーミング）GPUを使用しておらず、省電力GPUで動作しているため、パフォーマンスが低下します。グラフィックドライバーを更新してから、ゲームを再起動してください。Windowsでは、設定 > システム > ディスプレイ > グラフィック でこのゲームを「高パフォーマンス」に設定してください。",
     "bodyWeb": "ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。ブラウザーの設定でハードウェアアクセラレーションを有効にし、グラフィックドライバーを更新してから、ブラウザーを再起動してください。",
     "hybridBodyWindows": "このセッションは統合（省電力）GPUで描画しています。このパソコンにディスクリート（専用）ゲーミングGPUも搭載されている場合は、設定 > システム > ディスプレイ > グラフィックス でブラウザを「高パフォーマンス」に設定してから再起動してください。デスクトップアプリでは自動的にディスクリートGPUが選択されます。",
     "hybridBodyLinux": "このセッションは統合（省電力）GPUで描画しています。このパソコンにディスクリート（専用）ゲーミングGPUも搭載されている場合は、ブラウザやグラフィックスドライバに独自のGPU選択設定があるか、お使いのディストリビューションにGPU切り替えツール（PRIMEやoptimus-managerなど）が用意されている場合があります。デスクトップアプリでは自動的にディスクリートGPUが選択されます。",
@@ -8170,6 +8183,9 @@ export const ja_JP: EnTranslations = {
       "graphicsReloadNote": "グラフィック品質と地形の詳細は再読み込み後に適用されます。",
       "reloadNow": "今すぐ再読み込み",
       "fullscreen": "フルスクリーン",
+      "displayMode": "表示モード",
+      "displayModeBorderless": "ボーダーレスフルスクリーン",
+      "displayModeWindowed": "ウィンドウ",
       "touchLookSpeed": "タッチ視点速度",
       "joystickSize": "ジョイスティックの大きさ",
       "buttonSize": "ボタンの大きさ",

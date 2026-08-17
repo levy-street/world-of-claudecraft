@@ -1369,6 +1369,10 @@ export const zh_TW: EnTranslations = {
       "showWalletOnCharacterScreen": "在角色畫面顯示錢包",
       "showWalletOnPlayerCard": "在玩家卡片顯示錢包",
       "showPlaytime": "在角色畫面顯示遊戲時長",
+      "forceHighPerfGpu": "使用獨立遊戲顯示卡",
+      "forceHighPerfGpuNote": "預設開啟：桌面版會向本機要求使用獨立遊戲顯示卡。若遊戲無法啟動、啟動後黑屏，或筆記型電腦螢幕沒有畫面，請關閉此選項。此設定會在下次啟動遊戲時生效。",
+      "discordPresence": "Discord 遊戲狀態",
+      "discordPresenceNote": "遊玩時將你目前所在的區域以及本次遊戲時長顯示為你的 Discord 活動狀態，任何能看到你 Discord 個人資料的人都能看到這兩項。只會分享區域名稱、本次遊戲時長和遊戲名稱，絕不會分享你的角色、帳號或與你同行的人。需要本機正在執行 Discord 應用程式。",
       "showDevBadges": "顯示開發者徽章",
       "showOwnNameplate": "顯示我的姓名板",
       "showPlayerNameplates": "顯示玩家姓名板",
@@ -7791,7 +7795,15 @@ export const zh_TW: EnTranslations = {
       "readyBody": "離開遊戲時將自動安裝，也可立即重新啟動。",
       "restart": "立即重新啟動",
       "later": "稍後",
-      "dismiss": "關閉"
+      "dismiss": "關閉",
+      "whatsNew": "在瀏覽器中查看更新內容"
+    },
+    "notify": {
+      "updateReadyTitle": "更新 {version} 已就緒",
+      "updateReadyTitleNoVersion": "更新已就緒",
+      "updateReadyBody": "重新啟動 World of ClaudeCraft 以套用更新。",
+      "partyInviteTitle": "組隊邀請",
+      "partyInviteBody": "{name} 邀請你加入隊伍。"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7803,6 +7815,7 @@ export const zh_TW: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請更新顯示卡驅動程式後重新啟動遊戲。在 Windows 上，還請在 設定 > 系統 > 顯示器 > 顯示卡 中將本遊戲設為「高效能」。",
+    "bodyDiscreteInactive": "遊戲並未使用獨立（遊戲）顯示卡，而是在省電顯示晶片上執行，因此效能會下降。請更新顯示卡驅動程式後重新啟動遊戲。在 Windows 上，還請在 設定 > 系統 > 顯示器 > 顯示卡 中將本遊戲設為「高效能」。",
     "bodyWeb": "遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請在瀏覽器設定中啟用硬體加速，更新顯示卡驅動程式，然後重新啟動瀏覽器。",
     "hybridBodyWindows": "本次工作階段正在集成（省電）顯示卡上算圖。如果這台電腦還配有獨立遊戲顯示卡，請在 設定 > 系統 > 顯示 > 圖形 中將瀏覽器設為「高效能」，然後重新啟動瀏覽器。桌面版會自動選擇獨立顯示卡。",
     "hybridBodyLinux": "本次工作階段正在集成（省電）顯示卡上算圖。如果這台電腦還配有獨立遊戲顯示卡，您的瀏覽器或顯示卡驅動程式可能提供自己的顯示卡選擇設定，或您的發行版可能提供顯示卡切換工具（例如 PRIME 或 optimus-manager）。桌面版會自動選擇獨立顯示卡。",
@@ -8170,6 +8183,9 @@ export const zh_TW: EnTranslations = {
       "graphicsReloadNote": "圖形品質和地形細節會在重新載入後生效。",
       "reloadNow": "立即重新載入",
       "fullscreen": "全螢幕",
+      "displayMode": "顯示模式",
+      "displayModeBorderless": "無邊框全螢幕",
+      "displayModeWindowed": "視窗",
       "touchLookSpeed": "觸控視角速度",
       "joystickSize": "搖桿大小",
       "buttonSize": "按鍵大小",

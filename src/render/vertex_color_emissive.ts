@@ -17,11 +17,12 @@ export function modulateEmissiveByVertexColor<T extends THREE.Material>(material
     previousCompile(shader, renderer);
     shader.fragmentShader = shader.fragmentShader.replace(
       EMISSIVE_CHUNK,
+      // r185 declares vColor as vec4 under BOTH USE_COLOR and USE_COLOR_ALPHA
+      // (color_pars_fragment; r165 used vec3 for plain USE_COLOR), so both
+      // arms take .rgb.
       `${EMISSIVE_CHUNK}
-#if defined( USE_COLOR_ALPHA )
+#if defined( USE_COLOR_ALPHA ) || defined( USE_COLOR )
   totalEmissiveRadiance *= vColor.rgb;
-#elif defined( USE_COLOR )
-  totalEmissiveRadiance *= vColor;
 #endif`,
     );
   };

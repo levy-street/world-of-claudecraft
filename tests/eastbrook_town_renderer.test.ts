@@ -460,7 +460,7 @@ describe('Eastbrook town renderer', () => {
           shader as THREE.WebGLProgramParametersWithUniforms,
           null as unknown as THREE.WebGLRenderer,
         );
-        expect(shader.fragmentShader).toContain('totalEmissiveRadiance *= vColor;');
+        expect(shader.fragmentShader).toContain('totalEmissiveRadiance *= vColor.rgb;');
         expect(material.customProgramCacheKey()).toContain(
           vertexColorEmissiveInternalsForTest.programCacheKey,
         );

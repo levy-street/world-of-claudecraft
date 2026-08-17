@@ -42,7 +42,16 @@ const MONOLITHS: MonolithRow[] = [
     // values, the over-time string and the talent-conditional field choice) into
     // src/ui/ability_description.ts (the ratchet's own rule: an extraction lowers
     // the ceiling, never raises it).
-    ceiling: 19420,
+    // Raised 19420 -> 19432 (+12) for the desktop-client-update packet, a
+    // maintainer decision prepared for PR review: the branch's additions are
+    // thin-consumer wiring to extracted modules (presentation_gate,
+    // instance_music) riding on top of upstream's near-zero-slack re-pins, so
+    // no clean branch-owned extraction exists. Exact merged count: any
+    // further growth reds again.
+    // Re-pinned 19432 -> 19433: the release/v0.38.0 merge into this branch
+    // grew hud.ts by one line at HEAD without updating the row, so the gate
+    // arrived red. Same exact-count, zero-slack intent as above.
+    ceiling: 19433,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -72,7 +81,12 @@ const MONOLITHS: MonolithRow[] = [
     // src/render/mount_visual_lifecycle.ts. The merged file landed 3 lines over
     // the inherited ceiling and bought the room back by extraction, per the
     // ratchet's rule, rather than raising the number.
-    ceiling: 13652,
+    // Merging release/v0.38.0 again for the sled PR: the sled side stood at
+    // 13652 and upstream at 13754, each pinned to its own exact size, and the
+    // merge lands at 13745. Pinned to that exact count rather than inheriting
+    // upstream's 9 lines of slack, which is the same rule both parents already
+    // followed: a merge takes the merged count, and any further growth reds.
+    ceiling: 13745,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

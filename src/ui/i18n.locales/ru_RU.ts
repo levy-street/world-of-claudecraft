@@ -1321,6 +1321,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showWalletOnCharacterScreen': 'Показывать кошелек на экране персонажей',
   'hudChrome.options.showPlaytime': 'Показывать время в игре на экране персонажей',
   'hudChrome.options.showWalletOnPlayerCard': 'Показывать кошелек на карточке игрока',
+  'hudChrome.options.forceHighPerfGpu': 'Использовать дискретную игровую видеокарту',
+  'hudChrome.options.forceHighPerfGpuNote':
+    'Включено по умолчанию: настольное приложение запрашивает у компьютера дискретную игровую видеокарту. Отключите, если игра не запускается, показывает черный экран или экран ноутбука гаснет. Настройка применится при следующем запуске игры.',
+  'hudChrome.options.discordPresence': 'Статус в Discord',
+  'hudChrome.options.discordPresenceNote':
+    'Показывает зону, в которой вы находитесь, и время этой игровой сессии как вашу активность в Discord, и это видит любой, кому доступен ваш профиль Discord. Передаются только название зоны, время сессии и название игры, но никогда ваш персонаж, ваша учетная запись или те, с кем вы играете. Требуется запущенное приложение Discord на этом компьютере.',
   'hudChrome.options.showDevBadges': 'Показывать значки разработчика',
   'hudChrome.options.showOwnNameplate': 'Показывать свою табличку с именем',
   'hudChrome.options.showPlayerNameplates': 'Показывать таблички с именами игроков',
@@ -2098,6 +2104,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.options.graphicsReloadNote':
     'Качество графики и детализация местности применяются после перезагрузки.',
   'hud.options.reloadNow': 'Перезагрузить сейчас',
+  'hud.options.displayMode': 'Режим отображения',
+  'hud.options.displayModeBorderless': 'Полноэкранный без рамки',
+  'hud.options.displayModeWindowed': 'Оконный',
   'hud.options.fullscreen': 'Полный экран',
   'hud.options.touchLookSpeed': 'Скорость обзора (касание)',
   'hud.options.joystickSize': 'Размер джойстика',
@@ -7951,6 +7960,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'desktop.update.restart': 'Перезапустить сейчас',
   'desktop.update.later': 'Позже',
   'desktop.update.dismiss': 'Закрыть',
+  'desktop.update.whatsNew': 'Посмотреть изменения в браузере',
+  'desktop.notify.updateReadyTitle': 'Обновление {version} готово',
+  'desktop.notify.updateReadyTitleNoVersion': 'Обновление готово',
+  'desktop.notify.updateReadyBody': 'Перезапустите World of ClaudeCraft, чтобы применить обновление.',
+  'desktop.notify.partyInviteTitle': 'Приглашение в группу',
+  'desktop.notify.partyInviteBody': '{name} приглашает вас в группу.',
   'desktop.crash.title': 'World of ClaudeCraft',
   'desktop.crash.body': 'Игровой экран перестал отвечать. Перезагрузить его?',
   'desktop.crash.reload': 'Перезагрузить',
@@ -7959,6 +7974,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'World of ClaudeCraft столкнулась с непредвиденной ошибкой и будет закрыта.',
   'gpuNotice.bodyDesktop':
     'Игра работает без GPU-ускорения и будет сильно тормозить. Обновите драйверы видеокарты и перезапустите игру. В Windows также выберите для игры режим «Высокая производительность» в разделе Параметры > Система > Дисплей > Графика.',
+  'gpuNotice.bodyDiscreteInactive':
+    'Игра не использует дискретную (игровую) видеокарту и работает на энергосберегающем графическом процессоре, поэтому производительность будет ниже. Обновите драйверы видеокарты и перезапустите игру. В Windows также выберите для игры режим «Высокая производительность» в разделе Параметры > Система > Дисплей > Графика.',
   'gpuNotice.bodyWeb':
     'Игра работает без GPU-ускорения и будет сильно тормозить. Включите аппаратное ускорение в настройках браузера, обновите драйверы видеокарты и перезапустите браузер.',
   'gpuNotice.hybridBodyWindows':

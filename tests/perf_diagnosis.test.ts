@@ -12,6 +12,7 @@ function baseSnapshot(): PerfSnapshot {
   return {
     seconds: 20,
     frames: 1200,
+    hiddenPresentSkips: 0,
     fps: 60,
     frameMs: { avg: 16, p50: 16, p95: 16, p99: 18, max: 22, long50: 0 },
     windows: {

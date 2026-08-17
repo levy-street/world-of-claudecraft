@@ -7,6 +7,8 @@
 // census switches to manual mode so shadow-pass draws survive the read on
 // every tier), and the shadow pass only renders while shadowAutoUpdate holds.
 
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { DrawStatsCounters } from '../src/render/draw_stats_core';
 import {
@@ -68,16 +70,17 @@ function makeHost(
       renders++;
       if (opts.throwOnRender === renders) throw new Error('boom');
       autoResetDuringRenders.push(autoReset);
-      // three r165 semantics: the shadow pass draws FIRST; with autoReset on,
-      // render() then calls info.reset() before the scene pass, so a
-      // post-render read drops the shadow draws. The census must therefore
-      // hold the counters in manual-reset mode or its shadow share reads 0.
+      // three r185 semantics: with autoReset on, render() calls info.reset()
+      // at the TOP of the pass, before the shadow pass (r165 reset after it).
+      // Under auto-reset a post-render read therefore holds only this
+      // render's counters, which zeroes the census's cross-render diffs; the
+      // census must hold the counters in manual-reset mode either way.
+      if (autoReset) counters = zero();
       if (shadowsEnabled && shadowAuto) {
         for (const c of children) {
           if (c.visible) counters.calls += c.shadowCalls;
         }
       }
-      if (autoReset) counters = zero();
       for (const c of children) {
         if (!c.visible) continue;
         counters.calls += c.calls;
@@ -183,9 +186,9 @@ describe('captureSceneCensus', () => {
     // 5 measurement renders in manual mode, then the trailing restore render
     // after the mode has been handed back.
     expect(during).toEqual([false, false, false, false, false, true]);
-    // Decisive: with three's auto-reset semantics the post-render read drops
-    // the shadow pass, so this nonzero share exists only because of the
-    // manual mode (the fake models the reset-after-shadow-pass ordering).
+    // Decisive: under auto-reset every render() zeroes the counters, so the
+    // census's cross-render visibility diffs would collapse; the nonzero
+    // shadow share exists only because the capture held manual mode.
     expect(report.shadow.calls).toBe(12);
   });
 
@@ -353,5 +356,22 @@ describe('createHitchTracker', () => {
     expect(cleared.hitches).toBe(0);
     expect(cleared.programsAdded).toBe(0);
     expect(cleared.recent).toEqual([]);
+  });
+});
+
+describe('the fake host models the installed three reset ordering', () => {
+  it('pins info.reset() ahead of the shadow pass in the shipped renderer', () => {
+    // The stub above encodes r185 ordering (reset at the top of render(),
+    // before shadowMap.render); this source pin stops a future three train
+    // from silently invalidating the fixture the way r165's ordering did.
+    const renderer = readFileSync(
+      path.resolve(__dirname, '../node_modules/three/src/renderers/WebGLRenderer.js'),
+      'utf8',
+    );
+    const resetAt = renderer.indexOf('if ( this.info.autoReset === true ) this.info.reset();');
+    const shadowAt = renderer.indexOf('shadowMap.render(');
+    expect(resetAt).toBeGreaterThan(-1);
+    expect(shadowAt).toBeGreaterThan(-1);
+    expect(resetAt).toBeLessThan(shadowAt);
   });
 });

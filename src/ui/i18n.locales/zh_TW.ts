@@ -1262,6 +1262,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showWalletOnCharacterScreen': '在角色畫面顯示錢包',
   'hudChrome.options.showPlaytime': '在角色畫面顯示遊戲時長',
   'hudChrome.options.showWalletOnPlayerCard': '在玩家卡片顯示錢包',
+  'hudChrome.options.forceHighPerfGpu': '使用獨立遊戲顯示卡',
+  'hudChrome.options.forceHighPerfGpuNote':
+    '預設開啟：桌面版會向本機要求使用獨立遊戲顯示卡。若遊戲無法啟動、啟動後黑屏，或筆記型電腦螢幕沒有畫面，請關閉此選項。此設定會在下次啟動遊戲時生效。',
+  'hudChrome.options.discordPresence': 'Discord 遊戲狀態',
+  'hudChrome.options.discordPresenceNote':
+    '遊玩時將你目前所在的區域以及本次遊戲時長顯示為你的 Discord 活動狀態，任何能看到你 Discord 個人資料的人都能看到這兩項。只會分享區域名稱、本次遊戲時長和遊戲名稱，絕不會分享你的角色、帳號或與你同行的人。需要本機正在執行 Discord 應用程式。',
   'hudChrome.options.showDevBadges': '顯示開發者徽章',
   'hudChrome.options.showOwnNameplate': '顯示我的姓名板',
   'hudChrome.options.showPlayerNameplates': '顯示玩家姓名板',
@@ -1979,6 +1985,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.options.invertLook': '反轉視角（觸控）',
   'hud.options.graphicsReloadNote': '圖形品質和地形細節會在重新載入後生效。',
   'hud.options.reloadNow': '立即重新載入',
+  'hud.options.displayMode': '顯示模式',
+  'hud.options.displayModeBorderless': '無邊框全螢幕',
+  'hud.options.displayModeWindowed': '視窗',
   'hud.options.fullscreen': '全螢幕',
   'hud.options.touchLookSpeed': '觸控視角速度',
   'hud.options.joystickSize': '搖桿大小',
@@ -7530,6 +7539,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'desktop.update.restart': '立即重新啟動',
   'desktop.update.later': '稍後',
   'desktop.update.dismiss': '關閉',
+  'desktop.update.whatsNew': '在瀏覽器中查看更新內容',
+  'desktop.notify.updateReadyTitle': '更新 {version} 已就緒',
+  'desktop.notify.updateReadyTitleNoVersion': '更新已就緒',
+  'desktop.notify.updateReadyBody': '重新啟動 World of ClaudeCraft 以套用更新。',
+  'desktop.notify.partyInviteTitle': '組隊邀請',
+  'desktop.notify.partyInviteBody': '{name} 邀請你加入隊伍。',
   'desktop.crash.title': 'World of ClaudeCraft',
   'desktop.crash.body': '遊戲畫面已停止運作。要重新載入嗎？',
   'desktop.crash.reload': '重新載入',
@@ -7537,6 +7552,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.fatalBody': 'World of ClaudeCraft 發生未預期的錯誤，必須關閉。',
   'gpuNotice.bodyDesktop':
     '遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請更新顯示卡驅動程式後重新啟動遊戲。在 Windows 上，還請在 設定 > 系統 > 顯示器 > 顯示卡 中將本遊戲設為「高效能」。',
+  'gpuNotice.bodyDiscreteInactive':
+    '遊戲並未使用獨立（遊戲）顯示卡，而是在省電顯示晶片上執行，因此效能會下降。請更新顯示卡驅動程式後重新啟動遊戲。在 Windows 上，還請在 設定 > 系統 > 顯示器 > 顯示卡 中將本遊戲設為「高效能」。',
   'gpuNotice.bodyWeb':
     '遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請在瀏覽器設定中啟用硬體加速，更新顯示卡驅動程式，然後重新啟動瀏覽器。',
   'gpuNotice.hybridBodyWindows':

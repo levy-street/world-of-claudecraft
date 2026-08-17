@@ -12990,4 +12990,26 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'auth.designCodeErrVersion': 'Mã ngoại hình đó đến từ phiên bản trò chơi mới hơn.',
   'auth.designCodeErrMalformed': 'Mã ngoại hình đó bị hỏng. Hãy sao chép toàn bộ mã rồi thử lại.',
   'hudChrome.nameplate.cheaterTag': '< Kẻ Gian Lận >',
+  'hud.options.displayMode': 'Chế Độ Hiển Thị',
+  'hud.options.displayModeBorderless': 'Toàn Màn Hình Không Viền',
+  'hud.options.displayModeWindowed': 'Cửa Sổ',
+  'hudChrome.options.discordPresence': 'Hoạt Động Discord',
+  'hudChrome.options.discordPresenceNote':
+    'Hiển thị vùng bạn đang ở và thời gian bạn đã chơi trong phiên chơi này dưới dạng hoạt động Discord của bạn, và bất kỳ ai xem được hồ sơ Discord của bạn đều thấy được cả hai. Chỉ tên vùng, thời gian phiên chơi của bạn, và tên trò chơi được chia sẻ, không bao giờ là nhân vật, tài khoản, hay những ai bạn đang chơi cùng. Cần ứng dụng Discord đang chạy trên máy tính này.',
+  'hudChrome.options.forceHighPerfGpu': 'Dùng Card Đồ Họa Chơi Game',
+  'hudChrome.options.forceHighPerfGpuNote':
+    'Mặc định bật: ứng dụng máy tính yêu cầu máy này dùng card đồ họa chơi game của nó. Hãy tắt tùy chọn này nếu trò chơi không khởi động được, mở ra màn hình đen, hoặc màn hình laptop bị tối đen. Có hiệu lực vào lần khởi động trò chơi tiếp theo.',
+  'desktop.notify.partyInviteBody': '{name} đã mời bạn gia nhập tổ đội của họ.',
+  'desktop.notify.partyInviteTitle': 'Lời mời tổ đội',
+  'desktop.notify.updateReadyBody': 'Khởi động lại World of ClaudeCraft để áp dụng bản cập nhật.',
+  'desktop.notify.updateReadyTitle': 'Bản cập nhật {version} đã sẵn sàng',
+  'desktop.notify.updateReadyTitleNoVersion': 'Bản cập nhật đã sẵn sàng',
+  'desktop.update.whatsNew': 'Xem những gì đã thay đổi trong trình duyệt của bạn',
+  'entities.abilities.challenging_roar.description':
+    'Một tiếng gầm hiểm độc: mọi kẻ địch trong vòng 10 thước bị khiêu khích, mối đe dọa của chúng đối với bạn tăng lên ngang bằng kẻ địch mà chúng căm ghét nhất, và chúng bị buộc phải tấn công bạn trong 3 giây. Chỉ dùng được ở Bruin Form.',
+  'entities.abilities.challenging_roar.name': 'Tiếng Gầm Hiểm Độc',
+  'entities.abilities.cheap_shot.descriptionNoStealth':
+    'Đánh mục tiêu gây {damage} sát thương, làm choáng nó trong 4 giây. Nhận 2 điểm liên hoàn.',
+  'gpuNotice.bodyDiscreteInactive':
+    'Trò chơi hiện không dùng card đồ họa chơi game mà đang chạy trên GPU tích hợp (tiết kiệm điện), nên hiệu năng sẽ giảm sút. Hãy cập nhật trình điều khiển đồ họa, sau đó khởi động lại trò chơi. Trên Windows, cũng hãy đặt trò chơi thành Hiệu suất cao trong Cài đặt > Hệ thống > Màn hình > Đồ họa.',
 };

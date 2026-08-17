@@ -5,6 +5,7 @@ import type { MountKey } from './content/mounts';
 import type { GatheringProfessionId, ToolEffectId } from './content/professions';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { HarvestYield } from './professions/harvest_yields';
+import type { RespawnWindow } from './respawn_policy';
 
 export const TICK_RATE = 20; // sim ticks per second
 export const DT = 1 / TICK_RATE;
@@ -1519,6 +1520,11 @@ export interface MobTemplate {
   // Ignores taunt/growl forced-target windows. Used by special add AI only.
   ignoreTaunt?: boolean;
   respawnMult?: number;
+  // A RANDOM respawn window authored INSTEAD of respawnMult, in the same
+  // 25s-base units: each death draws its multiplier uniformly in the half-open
+  // [minMult, maxMult) (src/sim/respawn_policy.ts). Both bounds in one field, so
+  // a lone bound or an inverted window cannot be written.
+  respawnWindow?: RespawnWindow;
   // Fixed respawn delay in seconds, overriding respawnSeconds*respawnMult; also
   // caps corpse decay so the mob returns on schedule. (Training dummy: 10s.)
   respawnSeconds?: number;

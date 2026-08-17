@@ -50,9 +50,14 @@ The Thornhollow Fields 5v5 capture-the-flag HUD surface behind the `index.ts` ba
   to break it with). A backfill is a materially different offer (a live match,
   a scoreline the joiner had no part in, no rating either way), so the prompt
   body says so itself rather than relying on the chat line that scrolls away.
-  Perf contract: closed it does zero work (it only OPENS from the bgProposed
+  Perf contract: closed it does zero work (it only ARMS from the bgProposed
   SimEvent); open, it rebuilds DOM only when the structural sig changes and
-  refreshes the countdown text slot in place.
+  refreshes the countdown text slot in place. The event and the offer state
+  travel separately online (the events frame lands before the `bg` snapshot),
+  so show() arms a hidden pending state and the DOM opens on the first render
+  that can read the offer, bounded by OFFER_SNAPSHOT_GRACE_POLLS; reading the
+  gap as a resolved offer was the v0.36.0 queue-pop outage
+  (tests/battleground_pop_wire_order.test.ts pins the arrival order).
 - `battleground_map_view.ts` + `battleground_map_painter.ts`: the M-key world
   map's Thornhollow surface. The view is the HONEST marker model (self plus
   same-team mates and the static flag stands; never enemies, never live flag

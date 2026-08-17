@@ -13202,4 +13202,26 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'auth.designCodeErrVersion': 'Den utseendekoden kommer från en nyare spelversion.',
   'auth.designCodeErrMalformed': 'Den utseendekoden är skadad. Kopiera hela koden och försök igen.',
   'hudChrome.nameplate.cheaterTag': '< Fuskare >',
+  'hud.options.displayMode': 'Visningsläge',
+  'hud.options.displayModeBorderless': 'Kantlös helskärm',
+  'hud.options.displayModeWindowed': 'Fönsterläge',
+  'hudChrome.options.discordPresence': 'Discord-aktivitet',
+  'hudChrome.options.discordPresenceNote':
+    'Visar zonen du befinner dig i och hur länge du har spelat den här sessionen som din Discord-aktivitet, och alla som kan se din Discord-profil kan se båda. Endast zonnamnet, din sessionstid och spelet delas, aldrig din karaktär, ditt konto eller vem du spelar med. Kräver att Discord-appen körs på den här datorn.',
+  'hudChrome.options.forceHighPerfGpu': 'Använd det separata spelgrafikkortet',
+  'hudChrome.options.forceHighPerfGpuNote':
+    'På som standard: skrivbordsappen begär datorns separata spelgrafikkort. Stäng av det här om spelet inte startar, öppnas med en svart skärm, eller om den bärbara datorns skärm blir svart. Träder i kraft nästa gång spelet startar.',
+  'desktop.notify.partyInviteBody': '{name} bjöd in dig till en grupp.',
+  'desktop.notify.partyInviteTitle': 'Gruppinbjudan',
+  'desktop.notify.updateReadyBody': 'Starta om World of ClaudeCraft för att tillämpa uppdateringen.',
+  'desktop.notify.updateReadyTitle': 'Uppdatering {version} är klar',
+  'desktop.notify.updateReadyTitleNoVersion': 'Uppdatering är klar',
+  'desktop.update.whatsNew': 'Se vad som har ändrats i din webbläsare',
+  'entities.abilities.challenging_roar.description':
+    'Ett olycksbådande vrål: varje fiende inom 10 meter eggas, dess hot mot dig stiger till nivån hos dess mest hatade fiende, och den tvingas anfalla dig i 3 sek. Endast i Bruinform.',
+  'entities.abilities.challenging_roar.name': 'Olycksbådande vrål',
+  'entities.abilities.cheap_shot.descriptionNoStealth':
+    'Slå till målet för {damage} skada, vilket bedövar det i 4 sek. Ger 2 kombopoäng.',
+  'gpuNotice.bodyDiscreteInactive':
+    'Spelet använder inte det separata (spel-)grafikkortet och körs i stället på det strömsparande grafikkortet, vilket försämrar prestandan. Uppdatera dina grafikdrivrutiner och starta sedan om spelet. I Windows anger du även spelet till Höga prestanda under Inställningar > System > Skärm > Grafik.',
 };

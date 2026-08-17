@@ -408,6 +408,7 @@ const UI_PURE_CORES = [
   'src/ui/reconnect_status_core.ts',
   'src/ui/chat_bubble_style.ts',
   'src/game/graphics_rebuild_core.ts',
+  'src/game/presentation_gate.ts',
   'src/game/perf_diagnosis_core.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
@@ -488,6 +489,7 @@ const RENDER_PURE_CORES = [
   'src/render/umbral_anchor_vfx_core.ts',
   'src/render/foliage_shader_core.ts',
   'src/render/foliage_shadow_core.ts',
+  'src/render/frame_present.ts',
   'src/render/shadow_cadence_core.ts',
   'src/render/shadow_texel_snap_core.ts',
   'src/render/frost_ice_fields_core.ts',
@@ -595,6 +597,8 @@ const BARE_NAMED = [
   'src/ui/market_name_color.ts',
   'src/ui/market_armor_badge.ts',
   'src/render/foliage_lod.ts',
+  'src/render/frame_present.ts',
+  'src/game/presentation_gate.ts',
   'src/render/compile_gate.ts',
   'src/render/link_rate_budget.ts',
   'src/render/prewarm_compile_lifecycle.ts',
@@ -1388,11 +1392,13 @@ function deriveBareNamedCores(uiCores: string[], renderCores: string[]): string[
 // allowlist, so a synchronized delete leaves BARE_NAMED disagreeing with THIS list
 // instead of only agreeing with itself.
 const EXPECTED_BARE_NAMED = [
+  'src/game/presentation_gate.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
   'src/render/cast_bar.ts',
   'src/render/compile_gate.ts',
   'src/render/foliage_lod.ts',
+  'src/render/frame_present.ts',
   'src/render/interior_encounter_prewarm.ts',
   'src/render/link_rate_budget.ts',
   'src/render/preview_prewarm_lane.ts',

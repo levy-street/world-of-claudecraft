@@ -13376,4 +13376,26 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'auth.designCodeErrVersion': 'Ce code d\'apparence provient d\'une version plus récente du jeu.',
   'auth.designCodeErrMalformed': 'Ce code d\'apparence est endommagé. Copiez le code en entier et réessayez.',
   'hudChrome.nameplate.cheaterTag': '< Tricheur >',
+  'hud.options.displayMode': 'Mode d\'affichage',
+  'hud.options.displayModeBorderless': 'Plein écran sans bordure',
+  'hud.options.displayModeWindowed': 'Fenêtré',
+  'hudChrome.options.discordPresence': 'Présence enrichie Discord',
+  'hudChrome.options.discordPresenceNote':
+    'Affiche la zone où vous vous trouvez et depuis combien de temps vous jouez cette session comme votre activité Discord, et toute personne pouvant voir votre profil Discord peut voir les deux. Seuls le nom de la zone, votre temps de session et le jeu sont partagés, jamais votre personnage, votre compte, ou avec qui vous jouez. Nécessite que l\'application Discord soit lancée sur cet ordinateur.',
+  'hudChrome.options.forceHighPerfGpu': 'Utiliser le GPU de jeu dédié',
+  'hudChrome.options.forceHighPerfGpuNote':
+    'Activé par défaut : l\'application de bureau demande à cet ordinateur son GPU de jeu dédié. Désactivez cette option si le jeu ne démarre pas, s\'ouvre sur un écran noir, ou si l\'écran de l\'ordinateur portable reste éteint. Prend effet au prochain démarrage du jeu.',
+  'desktop.notify.partyInviteBody': '{name} vous invite à rejoindre son groupe.',
+  'desktop.notify.partyInviteTitle': 'Invitation de groupe',
+  'desktop.notify.updateReadyBody': 'Redémarrez World of ClaudeCraft pour appliquer la mise à jour.',
+  'desktop.notify.updateReadyTitle': 'La mise à jour {version} est prête',
+  'desktop.notify.updateReadyTitleNoVersion': 'La mise à jour est prête',
+  'desktop.update.whatsNew': 'Voir les changements dans votre navigateur',
+  'entities.abilities.challenging_roar.description':
+    'Un rugissement funeste : chaque ennemi dans un rayon de 10 mètres est provoqué, sa menace envers vous rejoignant celle de son ennemi le plus haï, et il est forcé de vous attaquer pendant 3 s. Forme de Bruin uniquement.',
+  'entities.abilities.challenging_roar.name': 'Rugissement funeste',
+  'entities.abilities.cheap_shot.descriptionNoStealth':
+    'Frappe la cible pour {damage} points de dégâts, l\'étourdissant pendant 4 s. Confère 2 points de combo.',
+  'gpuNotice.bodyDiscreteInactive':
+    'Le jeu n\'utilise pas le GPU de jeu dédié et fonctionne à la place sur le GPU intégré (économie d\'énergie), ce qui nuira aux performances. Mettez à jour vos pilotes graphiques, puis redémarrez le jeu. Sous Windows, définissez également le jeu sur Performances élevées dans Paramètres, Système, Affichage, Graphiques.',
 };

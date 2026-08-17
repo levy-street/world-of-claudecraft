@@ -1,14 +1,23 @@
-// Regenerate public/basis/basis_transcoder.js from three's vendored copy with
-// the embind dynamic-code sites replaced by eval-free implementations.
+// Regenerate public/basis/ (basis_transcoder.js + .wasm) from three's
+// vendored copy with the embind dynamic-code sites replaced by eval-free
+// implementations.
 //
 // Why: KTX2Loader runs the transcoder inside a blob-URL worker, and a blob
 // worker inherits the CSP of the page that created it. The Electron shell CSP
 // (electron/shell_guards.cjs) allows 'wasm-unsafe-eval' but never
-// 'unsafe-eval', so embind's four code-generating sites (new Function, and
-// new_(Function, ...)) throw EvalError inside the worker, the transcoder's
-// ready promise never settles, and every KTX2-textured GLB load hangs: the
-// v0.32.2/v0.32.3 desktop "Loading world" freeze. The replacements below are
-// the generic shapes Emscripten itself emits with -sDYNAMIC_EXECUTION=0.
+// 'unsafe-eval', so embind's code-generating sites (newFunc(Function, ...))
+// throw EvalError inside the worker, the transcoder's ready promise never
+// settles, and every KTX2-textured GLB load hangs: the v0.32.2/v0.32.3
+// desktop "Loading world" freeze. The replacements below are the generic
+// shapes Emscripten itself emits with -sDYNAMIC_EXECUTION=0.
+//
+// three 0.185.1's vendored transcoder (newer Emscripten) ships
+// createNamedFunction already eval-free and dropped craftEmvalAllocator, so
+// TWO dynamic sites remain: craftInvokerFunction (function declaration, new
+// isAsync parameter) and __emval_get_method_caller (now an arrow with a kind
+// parameter: 0 = method call on obj, 1 = construct, otherwise call with the
+// first arg as receiver). Both build their function body as a string and run
+// it through newFunc(Function, ...).
 //
 // Run after any three bump that changes the vendored transcoder:
 //   node scripts/patch_basis_transcoder.mjs
@@ -20,9 +29,9 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-const BANNER = `/* WoC local patch (see scripts/patch_basis_transcoder.mjs): the four embind
- * dynamic-code sites (createNamedFunction, craftInvokerFunction,
- * craftEmvalAllocator, __emval_get_method_caller) are replaced with the
+const BANNER = `/* WoC local patch (see scripts/patch_basis_transcoder.mjs): the two embind
+ * dynamic-code sites in three 0.185's vendored transcoder
+ * (craftInvokerFunction, __emval_get_method_caller) are replaced with
  * eval-free generic implementations (what Emscripten emits with
  * -sDYNAMIC_EXECUTION=0), so the transcoder runs inside the Electron shell's
  * blob worker, whose inherited CSP has no 'unsafe-eval'. Re-vendoring this
@@ -30,25 +39,35 @@ const BANNER = `/* WoC local patch (see scripts/patch_basis_transcoder.mjs): the
  */
 `;
 
-const REPLACEMENTS = {
-  createNamedFunction: `function createNamedFunction(name,body){name=makeLegalFunctionName(name);var namedFunction=function(){"use strict";return body.apply(this,arguments)};try{Object.defineProperty(namedFunction,"name",{value:name})}catch(e){}return namedFunction}`,
-  craftEmvalAllocator: `function craftEmvalAllocator(argCount){return function(constructor,argTypes,args){var argsArray=new Array(argCount);for(var i=0;i<argCount;++i){var argType=requireRegisteredType(Module["HEAP32"][(argTypes>>>2)+i],"parameter "+i);argsArray[i]=argType.readValueFromPointer(args);args+=argType["argPackAdvance"]}var obj=Reflect.construct(constructor,argsArray);return __emval_register(obj)}}`,
-  craftInvokerFunction: `function craftInvokerFunction(humanName,argTypes,classType,cppInvokerFunc,cppTargetFunc){var argCount=argTypes.length;if(argCount<2){throwBindingError("argTypes array size mismatch! Must at least get return value and 'this' types!")}var isClassMethodFunc=argTypes[1]!==null&&classType!==null;var needsDestructorStack=false;for(var i=1;i<argTypes.length;++i){if(argTypes[i]!==null&&argTypes[i].destructorFunction===undefined){needsDestructorStack=true;break}}var returns=argTypes[0].name!=="void";var expectedArgCount=argCount-2;var invokerBody=function(){if(arguments.length!==expectedArgCount){throwBindingError("function "+humanName+" called with "+arguments.length+" arguments, expected "+expectedArgCount+" args!")}var destructors=needsDestructorStack?[]:null;var dtorStack=needsDestructorStack?destructors:null;var callArgs=[cppTargetFunc];var thisWired=null;if(isClassMethodFunc){thisWired=argTypes[1].toWireType(dtorStack,this);callArgs.push(thisWired)}var argsWired=new Array(expectedArgCount);for(var i=0;i<expectedArgCount;++i){argsWired[i]=argTypes[i+2].toWireType(dtorStack,arguments[i]);callArgs.push(argsWired[i])}var rv=cppInvokerFunc.apply(null,callArgs);if(needsDestructorStack){runDestructors(destructors)}else{for(var i=isClassMethodFunc?1:2;i<argTypes.length;++i){var param=i===1?thisWired:argsWired[i-2];if(argTypes[i].destructorFunction!==null){argTypes[i].destructorFunction(param)}}}if(returns){return argTypes[0].fromWireType(rv)}};return createNamedFunction(makeLegalFunctionName(humanName),invokerBody)}`,
-  __emval_get_method_caller: `function __emval_get_method_caller(argCount,argTypes){var types=__emval_lookupTypes(argCount,argTypes);var retType=types[0];var argN=argCount-1;var invokerFunction=function(handle,name,destructors,args){var offset=0;var callArgs=new Array(argN);for(var i=0;i<argN;++i){callArgs[i]=types[i+1].readValueFromPointer(args+offset);offset+=types[i+1]["argPackAdvance"]}var rv=handle[name].apply(handle,callArgs);for(var i=0;i<argN;++i){if(types[i+1]["deleteObject"]){types[i+1]["deleteObject"](callArgs[i])}}if(!retType.isVoid){return retType.toWireType(destructors,rv)}};return __emval_addMethodCaller(invokerFunction)}`,
-};
+// Faithful eval-free equivalents of the code each site GENERATES, against the
+// same closure protocol (usesDestructorStack, throwBindingError,
+// runDestructors, createNamedFunction, emval_lookupTypes, emval_returnValue,
+// emval_addMethodCaller, reflectConstruct all exist in the vendored scope).
+const SITES = [
+  {
+    name: 'craftInvokerFunction',
+    marker: 'function craftInvokerFunction(',
+    replacement: `function craftInvokerFunction(humanName,argTypes,classType,cppInvokerFunc,cppTargetFunc,isAsync){var argCount=argTypes.length;if(argCount<2){throwBindingError("argTypes array size mismatch! Must at least get return value and 'this' types!")}var isClassMethodFunc=argTypes[1]!==null&&classType!==null;var needsDestructorStack=usesDestructorStack(argTypes);var returns=argTypes[0].name!=="void";var expectedArgCount=argCount-2;var retType=argTypes[0];var classParam=argTypes[1];var invokerFn=function(){if(arguments.length!==expectedArgCount){throwBindingError("function "+humanName+" called with "+arguments.length+" arguments, expected "+expectedArgCount)}var destructors=needsDestructorStack?[]:null;var callArgs=[cppTargetFunc];var thisWired=null;if(isClassMethodFunc){thisWired=classParam["toWireType"](destructors,this);callArgs.push(thisWired)}var argsWired=new Array(expectedArgCount);for(var i=0;i<expectedArgCount;++i){argsWired[i]=argTypes[i+2]["toWireType"](destructors,arguments[i]);callArgs.push(argsWired[i])}var rv=cppInvokerFunc.apply(null,callArgs);if(needsDestructorStack){runDestructors(destructors)}else{for(var i=isClassMethodFunc?1:2;i<argTypes.length;++i){var param=i===1?thisWired:argsWired[i-2];if(argTypes[i].destructorFunction!==null){argTypes[i].destructorFunction(param)}}}if(returns){return retType["fromWireType"](rv)}};return createNamedFunction(humanName,invokerFn)}`,
+  },
+  {
+    name: '__emval_get_method_caller',
+    marker: 'var __emval_get_method_caller=(argCount,argTypes,kind)=>',
+    replacement: `var __emval_get_method_caller=(argCount,argTypes,kind)=>{var types=emval_lookupTypes(argCount,argTypes);var retType=types.shift();argCount--;var argN=argCount;var invokerFunction=function(obj,func,destructorsRef,args){var offset=0;var callArgs=new Array(argN);for(var i=0;i<argN;++i){callArgs[i]=types[i].readValueFromPointer(args+offset);offset+=types[i]["argPackAdvance"]}var rv;if(kind===1){rv=reflectConstruct(func,callArgs)}else if(kind===0){rv=func.apply(obj,callArgs)}else{rv=func.apply(callArgs[0],callArgs.slice(1))}if(!retType.isVoid){return emval_returnValue(retType,destructorsRef,rv)}};var functionName="methodCaller<("+types.map(t=>t.name).join(", ")+") => "+retType.name+">";return emval_addMethodCaller(createNamedFunction(functionName,invokerFunction))}`,
+  },
+];
 
-// The paren is part of the marker so a prefix-renamed site (an upstream
-// craftInvokerFunctionV2) throws "not found" instead of silently patching the
-// wrong function and leaving dangling call sites behind a green pin.
-function extractFunction(source, name) {
-  const marker = `function ${name}(`;
+// The paren/arrow head is part of the marker so a prefix-renamed site (an
+// upstream craftInvokerFunctionV2) throws "not found" instead of silently
+// patching the wrong function and leaving dangling call sites behind a green
+// pin.
+function extractSite(source, marker, name) {
   const start = source.indexOf(marker);
   if (start < 0) throw new Error(`patch_basis_transcoder: ${name} not found`);
   if (source.indexOf(marker, start + 1) >= 0) {
     throw new Error(`patch_basis_transcoder: ${name} is ambiguous`);
   }
   let depth = 0;
-  let i = source.indexOf('{', start);
+  let i = source.indexOf('{', start + marker.length - 1);
   for (; i < source.length; i++) {
     if (source[i] === '{') depth++;
     else if (source[i] === '}') {
@@ -60,12 +79,11 @@ function extractFunction(source, name) {
 }
 
 /** Behavior-shaped scan for dynamic-code use of the Function constructor:
- *  matches `new Function(`, `new_(Function,`, and a bare `Function("...")`
+ *  matches `new Function(`, `newFunc(Function,`, and a bare `Function("...")`
  *  call, while skipping identifiers that merely end in Function (the file has
- *  dozens, e.g. createNamedFunction). The one construct it deliberately does
- *  not match is emval_get_global's `{return Function}` reference, which is
- *  unreachable in every host with globalThis and never CALLS the constructor
- *  at that site. */
+ *  dozens, e.g. createNamedFunction) and the `instanceof Function` check in
+ *  the (dead after patching) newFunc helper, which never CALLS the
+ *  constructor. */
 export const DYNAMIC_FUNCTION_CALL = /(^|[^\w.$])Function\s*[(,]/;
 
 /** Any eval reference at all, including indirect `(0,eval)(...)` and
@@ -83,9 +101,9 @@ export function withoutBanner(source) {
  *  three bump that reshapes embind fails loudly instead of shipping evals. */
 export function patchBasisTranscoderSource(source) {
   let out = source;
-  for (const [name, replacement] of Object.entries(REPLACEMENTS)) {
-    const original = extractFunction(out, name);
-    if (!original.includes('new Function') && !original.includes('new_(Function')) {
+  for (const { name, marker, replacement } of SITES) {
+    const original = extractSite(out, marker, name);
+    if (!original.includes('newFunc(Function')) {
       throw new Error(
         `patch_basis_transcoder: ${name} has no dynamic-code marker; already patched?`,
       );
@@ -124,4 +142,10 @@ if (isMain) {
   const patched = patchBasisTranscoderSource(fs.readFileSync(vendored, 'utf8'));
   fs.writeFileSync(shipped, patched);
   console.log(`patched ${shipped} (${patched.length} chars) from three's vendored transcoder`);
+  // The wasm pairs with its glue: ship the matching binary in the same run so
+  // a JS regen can never leave a mismatched module behind.
+  const vendoredWasm = path.join(ROOT, ...VENDORED_TRANSCODER_DIR, 'basis_transcoder.wasm');
+  const shippedWasm = path.join(ROOT, ...SHIPPED_TRANSCODER_DIR, 'basis_transcoder.wasm');
+  fs.copyFileSync(vendoredWasm, shippedWasm);
+  console.log(`copied ${shippedWasm} (${fs.statSync(shippedWasm).size} bytes)`);
 }

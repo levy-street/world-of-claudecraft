@@ -13412,4 +13412,26 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'auth.designCodeErrVersion': 'Ese código de apariencia proviene de una versión más reciente del juego.',
   'auth.designCodeErrMalformed': 'Ese código de apariencia está dañado. Copia el código completo e inténtalo de nuevo.',
   'hudChrome.nameplate.cheaterTag': '< Tramposo >',
+  'hud.options.displayMode': 'Modo de pantalla',
+  'hud.options.displayModeBorderless': 'Pantalla completa sin bordes',
+  'hud.options.displayModeWindowed': 'Ventana',
+  'hudChrome.options.discordPresence': 'Presencia enriquecida de Discord',
+  'hudChrome.options.discordPresenceNote':
+    'Muestra la zona en la que estás y cuánto llevas jugando esta sesión como tu actividad de Discord, y cualquiera que pueda ver tu perfil de Discord puede ver ambos datos. Solo se comparten el nombre de la zona, tu tiempo de sesión y el juego, nunca tu personaje, tu cuenta ni con quién estás jugando. Necesita que la aplicación de Discord esté abierta en este equipo.',
+  'hudChrome.options.forceHighPerfGpu': 'Usar la GPU dedicada para videojuegos',
+  'hudChrome.options.forceHighPerfGpuNote':
+    'Activado de forma predeterminada: la aplicación de escritorio le pide a este equipo su GPU dedicada para videojuegos. Desactívalo si el juego no inicia, se abre con una pantalla en negro, o la pantalla del portátil se queda en blanco. Se aplica la próxima vez que inicies el juego.',
+  'desktop.notify.partyInviteBody': '{name} te invitó a un grupo.',
+  'desktop.notify.partyInviteTitle': 'Invitación de grupo',
+  'desktop.notify.updateReadyBody': 'Reinicia World of ClaudeCraft para aplicar la actualización.',
+  'desktop.notify.updateReadyTitle': 'La actualización {version} está lista',
+  'desktop.notify.updateReadyTitleNoVersion': 'La actualización está lista',
+  'desktop.update.whatsNew': 'Ver qué cambió en tu navegador',
+  'entities.abilities.challenging_roar.description':
+    'Un rugido funesto: todos los enemigos en un radio de 10 m son provocados, su amenaza hacia ti sube hasta igualar la de su enemigo más odiado, y quedan obligados a atacarte durante 3 s. Solo en Forma de Bruin.',
+  'entities.abilities.challenging_roar.name': 'Rugido Funesto',
+  'entities.abilities.cheap_shot.descriptionNoStealth':
+    'Golpea al objetivo por {damage} de daño y lo aturde durante 4 s. Otorga 2 puntos de combo.',
+  'gpuNotice.bodyDiscreteInactive':
+    'El juego no está usando la GPU dedicada para videojuegos y se está ejecutando en la GPU integrada (de ahorro de energía), así que el rendimiento se verá afectado. Actualiza los controladores de gráficos y reinicia el juego. En Windows, establece también el juego como Alto rendimiento en Configuración > Sistema > Pantalla > Gráficos.',
 };

@@ -5,15 +5,19 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 // perf-doctor analyzer runs REAL so the ids the toast receives come from the
 // same rules the beacon reports.
 vi.mock('../src/ui/perf_nudge_toast', () => ({ initPerfNudgeToast: vi.fn(() => true) }));
-vi.mock('../src/game/software_render_notice', () => ({ softwareNoticeShown: vi.fn(() => false) }));
+vi.mock('../src/game/software_render_notice', () => ({
+  softwareNoticeShown: vi.fn(() => false),
+  discreteNoticeShown: vi.fn(() => false),
+}));
 
 import type { PerfSnapshot } from '../src/game/perf';
 import { initPerfNudge } from '../src/game/perf_nudge';
-import { softwareNoticeShown } from '../src/game/software_render_notice';
+import { discreteNoticeShown, softwareNoticeShown } from '../src/game/software_render_notice';
 import { initPerfNudgeToast } from '../src/ui/perf_nudge_toast';
 
 const toast = vi.mocked(initPerfNudgeToast);
 const noticeShown = vi.mocked(softwareNoticeShown);
+const discreteShown = vi.mocked(discreteNoticeShown);
 
 const CHECK_MS = 30_000;
 
@@ -61,6 +65,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   toast.mockReturnValue(true);
   noticeShown.mockReturnValue(false);
+  discreteShown.mockReturnValue(false);
   (globalThis as any).window = {
     setInterval: (fn: () => void, ms: number) => setInterval(fn, ms),
     clearInterval: (id: ReturnType<typeof setInterval>) => clearInterval(id),
@@ -82,6 +87,7 @@ describe('initPerfNudge', () => {
     expect(toast).toHaveBeenCalledWith({
       suggestionIds: ['hardware-acceleration'],
       softwareNoticeAlreadyShown: false,
+      discreteNoticeAlreadyShown: false,
       desktopShell: false,
     });
 
@@ -132,16 +138,34 @@ describe('initPerfNudge', () => {
   });
 
   it('threads the boot-notice memo and desktop shell flag into the toast', () => {
-    noticeShown.mockReturnValue(true);
+    // Sampled at CHECK time, not at init: the predicate flips to true only
+    // AFTER the poller is armed, so an implementation that snapshots it at
+    // init would hand the toast false here and fail the exact-object pin.
     const report = vi.fn(() => snap({ glRenderer: 'Google SwiftShader' }));
     initPerfNudge({ perf: { report }, desktopShell: true });
+    noticeShown.mockReturnValue(true);
 
     vi.advanceTimersByTime(CHECK_MS);
     expect(toast).toHaveBeenCalledWith({
       suggestionIds: ['hardware-acceleration'],
       softwareNoticeAlreadyShown: true,
+      discreteNoticeAlreadyShown: false,
       desktopShell: true,
     });
+  });
+
+  it('threads the shell inactive-GPU notice memo into the toast', () => {
+    // Same check-time contract for the shell verdict: it can land long after
+    // the nudge is armed (the shell pushes on its own schedule), so the flip
+    // happens after init and the check that fires next must still see it.
+    const report = vi.fn(() => snap({ glRenderer: 'Google SwiftShader' }));
+    initPerfNudge({ perf: { report }, desktopShell: true });
+    discreteShown.mockReturnValue(true);
+
+    vi.advanceTimersByTime(CHECK_MS);
+    expect(toast).toHaveBeenCalledWith(
+      expect.objectContaining({ discreteNoticeAlreadyShown: true }),
+    );
   });
 
   it('stops cleanly when the caller tears it down', () => {
