@@ -68,6 +68,7 @@ import { FARM_BED_IDS, farmBedById } from '../content/farm_patches';
 import { ITEMS } from '../data';
 import { countUnlockedInSlots, removeUnlockedFromSlots } from '../item_lock';
 import { forceDismount } from '../mounts';
+import { onCropFarmedForQuests } from '../quests/quest_credit';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Entity, FARMING_CAST_ID, INTERACT_RANGE, isConsuming } from '../types';
@@ -646,6 +647,16 @@ export function plantCrop(
   // Text-free on purpose (the gatherResult idiom): the client logs its own
   // localized line.
   ctx.emit({ type: 'farmPlanted', pid: meta.entityId, bedId, cropId: crop.id });
+  // The farm ACTION objective credit (quests/quest_credit.ts), LAST: after
+  // the plot write and the farmPlanted event, so a credited plant is always
+  // a committed one, and after ctx.onInventoryChangedForQuests above (the
+  // seed spend), so the collect re-count lands before the action credit.
+  // Never reached from a deny arm. Draw-free, so the two-draw contract above
+  // is untouched. Direct import rather than a SimContext callback: the
+  // gathering-grant precedent (./gathering) is the same module-to-module
+  // shape, and the sim.ts coordinator has no headroom for a sixth wiring
+  // site (tests/monolith_budget.test.ts).
+  onCropFarmedForQuests(ctx, 'plant', crop.id, meta);
 }
 
 /** Insert a plot PRESERVING sorted bed order.
@@ -792,6 +803,11 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
       // never fires for a cropless plot, so the terms always agree).
       ...(seedBackCount > 0 && crop ? { seedBackCount } : {}),
     });
+    // The farm ACTION objective credit fires on EVERY harvest outcome, the
+    // withered one included (the visit is the deed; quests/quest_credit.ts),
+    // after the husk grant and its event. Draw-free (the harvest contract
+    // above holds); direct import, see the plantCrop call site's comment.
+    onCropFarmedForQuests(ctx, 'harvest', plot.cropId, meta);
     return;
   }
   // A crop whose catalog row retired between planting and harvesting: the
@@ -816,6 +832,9 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
       // id reads tier 1 (farmCropTier's fallback), so the seed-back block
       // above never rolled for this plot.
     });
+    // Every outcome credits, this defensive one included: the visit still
+    // happened, whatever the catalog did to the crop id in between.
+    onCropFarmedForQuests(ctx, 'harvest', plot.cropId, meta);
     return;
   }
   // An absent yieldSeed reads as 0 rather than refusing: the load side derives
@@ -938,6 +957,11 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
   // queued from a command body lands on the NEXT tick, the same cadence every
   // other gathering grant has.
   queueGatheringGrant(meta, 'farming', farmingHarvestGainAt(skill, cropTier));
+  // The farm ACTION objective credit, the survived arm: after the produce
+  // grants, the farmHarvested event, and the proficiency queue, so a credited
+  // harvest is always a committed one. Draw-free; direct import (see the
+  // plantCrop call site's comment). Never reached from a deny arm.
+  onCropFarmedForQuests(ctx, 'harvest', plot.cropId, meta);
 }
 
 // ---------------------------------------------------------------------------
