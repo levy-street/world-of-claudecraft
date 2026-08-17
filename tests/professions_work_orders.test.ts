@@ -148,3 +148,45 @@ describe.each(WORK_ORDERS)('$questId turn-in behavior (Sim)', ({ questId, master
     expect(sim.questLog.has(questId)).toBe(false);
   });
 });
+
+describe('the produce orders take plain produce only (farming twins have no grade substitution)', () => {
+  // The forge order accepts Fine Copper Ore for copper ore because
+  // MATERIAL_GRADES maps the node grades downward; farming's fine twins are
+  // NOT MATERIAL_GRADES rows (their consumers are their own reagent slots in
+  // the hoe ladder and the dishes), so a fine twin neither counts toward a
+  // produce order nor gets spent by its turn-in. Both arms are exercised so a
+  // later grade-table change that folds the twins in reds this on purpose.
+  const PRODUCE_ORDERS = [
+    { questId: 'q_prof_workorder_kitchens_wheat', plain: 'vale_wheat', fine: 'fine_vale_wheat' },
+    { questId: 'q_prof_workorder_kitchens_rice', plain: 'marsh_rice', fine: 'fine_marsh_rice' },
+  ] as const;
+
+  it.each(PRODUCE_ORDERS)(
+    '$questId: the fine twin never counts, the plain produce does',
+    ({ questId, plain, fine }) => {
+      const sim = makeSim();
+      const { itemId, count } = collectObjective(questId);
+      expect(itemId).toBe(plain);
+      moveToNpc(sim, 'cook_marlow');
+      sim.acceptQuest(questId);
+      const qp = sim.questLog.get(questId);
+      if (!qp) throw new Error(`${questId} was not accepted`);
+      // Negative arm: a full stack of the fine twin moves nothing.
+      sim.addItem(fine, count, sim.playerId);
+      expect(qp.counts[0]).toBe(0);
+      expect(qp.state).not.toBe('ready');
+      // Positive arm: the plain produce fills the order and the turn-in spends
+      // exactly the plain stack, leaving the fine twin untouched.
+      sim.addItem(plain, count, sim.playerId);
+      expect(qp.counts[0]).toBe(count);
+      expect(qp.state).toBe('ready');
+      const meta = sim.players.get(sim.playerId)!;
+      const copperBefore = meta.copper;
+      moveToNpc(sim, 'cook_marlow');
+      sim.turnInQuest(questId);
+      expect(sim.countItem(plain)).toBe(0);
+      expect(sim.countItem(fine)).toBe(count);
+      expect(meta.copper).toBe(copperBefore + QUESTS[questId].copperReward);
+    },
+  );
+});
