@@ -27,6 +27,8 @@ import {
   type SupplySnapshot,
 } from './economy_reconcile';
 import type { EconomyWindowRow, PurseDisagreement } from './economy_reconcile_db';
+import type { EconomyPassSnapshot } from './http/economy_metrics';
+import { economyMetricsCounters } from './http/economy_signals';
 
 // Advisory lock namespace for this pass. The siblings are db.ts's boot-DDL lock
 // ("WOC\x01", module-private there) and retention_sweep.ts's "WOC\x02"; the
@@ -123,6 +125,13 @@ export interface EconomyReconcileJob {
   stop(): Promise<void>;
   /** One pass, for tests and for an operator-triggered run. */
   runOnce(): Promise<EconomyReconcilePassResult | null>;
+  /**
+   * What the last completed pass measured, for the /metrics gauges. Null until
+   * one completes, which the exporter publishes as an ABSENT series rather than
+   * zero: a realm that has never reconciled has an unknown coin supply, and a
+   * flat 0 would read as every coin in the world having vanished.
+   */
+  lastPass(): EconomyPassSnapshot | null;
 }
 
 /**
@@ -182,6 +191,19 @@ export function createEconomyReconcileJob(deps: EconomyReconcileDeps): EconomyRe
   let timer: ReturnType<typeof setInterval> | null = null;
   let inFlight: Promise<void> | null = null;
   let stopping = false;
+  // What the last completed pass measured, for the exporter's gauges. Held here
+  // rather than re-read at scrape time on purpose: these figures cost two
+  // aggregate sums each, and a scrape must never be able to put that load on
+  // the database.
+  let lastPass: EconomyPassSnapshot | null = null;
+
+  // Wall clock is read through Date.now() at exactly two points (the pass
+  // timestamp below, and the exporter's age gauge). Nothing in the CHECKS ever
+  // sees a clock: their verdicts must depend only on the evidence, or a slow
+  // pass would reach different conclusions than a fast one.
+  function stamp(supply: SupplySnapshot, unsettledCopper: number, backlogRows: number): void {
+    lastPass = { atMs: Date.now(), supply, unsettledCopper, backlogRows };
+  }
 
   // The pass proper, already holding the lock.
   async function pass(): Promise<EconomyReconcilePassResult> {
@@ -207,6 +229,8 @@ export function createEconomyReconcileJob(deps: EconomyReconcileDeps): EconomyRe
         supply.marketEscrow;
       const cursor = { lastRowId: untilId, openingSupply: opening };
       await deps.saveCursor(cursor);
+      stamp(supply, 0, 0);
+      economyMetricsCounters().reconcilePass('baseline');
       onInfo(
         `economy reconcile: baseline established at ledger id ${untilId}, ${opening} copper in circulation`,
       );
@@ -236,6 +260,13 @@ export function createEconomyReconcileJob(deps: EconomyReconcileDeps): EconomyRe
       alerts.push(...checkPersistedBalance(d.characterId, d.ledgerBalance, d.persistedCopper));
     }
 
+    const metrics = economyMetricsCounters();
+    // Counted from what the pass FOUND, before the alert table dedupes against
+    // its open queue. A still-recurring violation must keep showing a rate here,
+    // or a panel would flatline after the incident's first sighting and read as
+    // resolved.
+    for (const a of alerts) metrics.finding(a.kind, a.severity);
+
     const filed = alerts.length > 0 ? await deps.insertAlerts(alerts) : 0;
 
     // The cursor advances to the last row READ, never to `untilId`: the window
@@ -260,6 +291,8 @@ export function createEconomyReconcileJob(deps: EconomyReconcileDeps): EconomyRe
         }
       : { lastRowId, openingSupply: stored.openingSupply };
     await deps.saveCursor(cursor);
+    stamp(closingSupply, unsettledCopper, Math.max(0, untilId - lastRowId));
+    metrics.reconcilePass(complete ? 'complete' : 'capped');
 
     // One line per pass, findings or not. A reconciler that only speaks when it
     // is unhappy is indistinguishable from a reconciler that has stopped
@@ -294,16 +327,25 @@ export function createEconomyReconcileJob(deps: EconomyReconcileDeps): EconomyRe
         acquired = res.rows[0]?.acquired === true;
       } catch (err) {
         onError('lock', err);
+        economyMetricsCounters().reconcilePass('failed');
         destroyClient = true;
         return null;
       }
       if (!acquired) {
         // A peer is mid-pass. Nothing is deferred and nothing is lost: the
         // cursor is shared, so the peer's pass covers this window.
+        economyMetricsCounters().reconcilePass('peer_locked');
         return null;
       }
       try {
         return await pass();
+      } catch (err) {
+        // Counted here and rethrown: the caller still handles it, but a pass
+        // that keeps throwing must be visible as a rate. A reconciler failing
+        // every fifteen minutes and a reconciler finding nothing are the same
+        // silence from the outside.
+        economyMetricsCounters().reconcilePass('failed');
+        throw err;
       } finally {
         try {
           await client.query('SELECT pg_advisory_unlock($1, $2)', [
@@ -359,5 +401,6 @@ export function createEconomyReconcileJob(deps: EconomyReconcileDeps): EconomyRe
       }
     },
     runOnce,
+    lastPass: () => lastPass,
   };
 }

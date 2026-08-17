@@ -213,7 +213,7 @@ import {
   loadPurseDisagreements,
   maxGoldLedgerId,
 } from './economy_reconcile_db';
-import { createEconomyReconcileJob } from './economy_reconcile_job';
+import { createEconomyReconcileJob, type EconomyReconcileJob } from './economy_reconcile_job';
 import { emailAccountCreated } from './email';
 import { stopEpicMirror } from './epic/mirror';
 import { GameServer } from './game';
@@ -244,6 +244,8 @@ import {
   createApiDispatcher,
   selectApiEntry,
 } from './http/dispatch';
+import { registerEconomyMetrics } from './http/economy_metrics';
+import { setEconomyMetricsCounters } from './http/economy_signals';
 import { type GameStateSource, registerGameStateMetrics } from './http/game_metrics';
 import { setGameMetricsCounters } from './http/game_signals';
 import {
@@ -3291,6 +3293,11 @@ export async function startServer(): Promise<http.Server> {
   // (mirrors setAttackSignalSink). Wired here, after `game` and `wss` exist, so the
   // gauges read live state at scrape time; ws_connections is the raw open-socket
   // count (joined or not), distinct from players_online (joined sessions).
+  // Built further down (it needs the pool and the live session map), but named
+  // here so the /metrics registration just below can close over the slot instead
+  // of the exporter having to be registered after the whole game is wired.
+  let economyReconcile: EconomyReconcileJob | null = null;
+
   const gameStateSource: GameStateSource = {
     playersOnline: () => game.clients.size,
     accountsOnline: () => game.liveAccountIds().size,
@@ -3323,6 +3330,19 @@ export async function startServer(): Promise<http.Server> {
   };
   setGameMetricsCounters(registerGameStateMetrics(httpMetrics.registry, gameStateSource));
   registerParseMetrics(httpMetrics.registry, game.parseCapture.counters);
+  // The gold-integrity exporter. Registered HERE, well before the reconciliation
+  // pass is constructed below, because the counters must exist before the first
+  // coin moves; the gauges reach the pass through the `economyReconcile` slot,
+  // which reads null until it is built and publishes NO supply series rather
+  // than a zero one (a realm that has not reconciled has an unknown supply, and
+  // a flat 0 reads as every coin in the world having vanished).
+  setEconomyMetricsCounters(
+    registerEconomyMetrics(httpMetrics.registry, {
+      ledgerQueueDepth: () => goldLedgerStats().queueDepth,
+      lastPass: () => economyReconcile?.lastPass() ?? null,
+      nowMs: () => Date.now(),
+    }),
+  );
   // Hand the same live source to /livez, so a wedged loop answers 503 from outside
   // the process. Registered HERE rather than read from the route arm: the /livez arm
   // must never touch liveGame() (a health probe constructing a GameServer is the bug
@@ -3525,7 +3545,7 @@ export async function startServer(): Promise<http.Server> {
   // than a cron container for one reason it cannot do without: only this process
   // knows which characters have a live session, and an online character's purse
   // is mid-flight and must never be compared against the ledger.
-  const economyReconcile =
+  economyReconcile =
     config.economyReconcileIntervalMinutes > 0
       ? createEconomyReconcileJob({
           realm: REALM,

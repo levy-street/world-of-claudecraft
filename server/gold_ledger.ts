@@ -18,6 +18,7 @@
 import type { EconomyEventKind } from '../src/sim/economy_event_kinds';
 import type { SimEvent } from '../src/sim/types';
 import { flattenCounterparty, type GoldLedgerInsert } from './gold_ledger_types';
+import { economyMetricsCounters } from './http/economy_signals';
 
 /**
  * How many pending rows the queue holds before it starts dropping. Sized for a
@@ -257,6 +258,7 @@ export class LedgerWriter {
   private push(insert: GoldLedgerInsert): void {
     if (this.queue.length >= this.queueMax) {
       this.droppedWrites += 1;
+      economyMetricsCounters().ledgerWritesDropped(1);
       return;
     }
     this.queue.push({ insert });
@@ -327,6 +329,9 @@ export class LedgerWriter {
       // most likely fail the same way while the queue behind it keeps growing.
       this.failedFlushes += 1;
       this.droppedWrites += rows.length;
+      const metrics = economyMetricsCounters();
+      metrics.ledgerFlushFailed();
+      metrics.ledgerWritesDropped(rows.length);
       console.error('gold_ledger batch insert failed:', err);
       // The chain heads for these characters may now be wrong, so forget them:
       // the next write re-seeds from the database and lands a NULL prev at
@@ -338,10 +343,16 @@ export class LedgerWriter {
       return;
     }
     this.rowsWritten += ids.length;
+    const metrics = economyMetricsCounters();
+    metrics.ledgerRowsWritten(ids.length);
     for (let i = 0; i < rows.length; i++) {
       const id = ids[i];
       const row = rows[i];
       if (id === undefined) continue;
+      // Booked from the WRITTEN row, not the observed event: a movement the
+      // writer dropped must not appear in the flow totals, or the metrics would
+      // claim coin the ledger has no record of.
+      metrics.goldMovement(row.kind as EconomyEventKind, row.amount);
       // Pool rows never advance the head: the chain is a purse's history, and a
       // pool balance parked there would be the predecessor of the character's
       // next real movement.
