@@ -3351,6 +3351,13 @@ export interface NpcDef {
   // The Card Master: talking to this NPC joins/leaves the Card Duel minigame
   // queue (src/sim/social/card_duel.ts) instead of any vendor/bank flow.
   cardMaster?: boolean;
+  // A farmer NPC (the farming go-live): the range anchor of the husk-to-compost
+  // trade (src/sim/professions/farming.ts convertHusks refuses out of reach of
+  // one) and the gossip row that offers it. A FLAG rather than a hard-keyed id
+  // list (the warfareVendor precedent) so a fifth farmer needs no constant
+  // widened. Vending stays emergent from vendorItems; the watch fee is a
+  // plant-time bag payment and never gates on this flag (D9).
+  farmer?: true;
   greeting: string;
   // Registered but not surface-placed at world init. The owning system spawns
   // the entity on demand (e.g. the Nythraxis encounter walks Brother Aldric in
