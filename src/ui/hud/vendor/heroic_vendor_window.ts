@@ -6,6 +6,7 @@
 // callbacks. Reuses the vendor window's CSS classes (.vendor-item, .vi-name,
 // .vi-price) so the shop reads as the same window family. It owns no state.
 
+import { heroicMarkIconHtml } from '../../currency_art';
 import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
@@ -48,9 +49,11 @@ export function renderHeroicVendorWindow(
 
   const balance = document.createElement('div');
   balance.className = 'vendor-section-title';
-  balance.textContent = t('heroicShop.balance', {
-    count: formatNumber(view.balance, { maximumFractionDigits: 0 }),
-  });
+  balance.innerHTML = `${heroicMarkIconHtml()}${esc(
+    t('heroicShop.balance', {
+      count: formatNumber(view.balance, { maximumFractionDigits: 0 }),
+    }),
+  )}`;
   el.appendChild(balance);
 
   // Same landscape tile grid as the goods/buyback vendor (.vendor-goods-grid
@@ -70,7 +73,7 @@ export function renderHeroicVendorWindow(
     const itemName = itemDisplayName(item);
     const marksLabel = formatNumber(marks, { maximumFractionDigits: 0 });
     row.setAttribute('aria-label', t('heroicShop.buyAria', { item: itemName, marks: marksLabel }));
-    row.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}</span><span class="vi-price${affordable ? '' : ' unaffordable'}">${esc(t('delveUi.shop.price', { marks: marksLabel }))}</span>`;
+    row.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}</span><span class="vi-price${affordable ? '' : ' unaffordable'}">${heroicMarkIconHtml()}${esc(t('delveUi.shop.price', { marks: marksLabel }))}</span>`;
     row.addEventListener('click', () => deps.onBuy(itemId));
     deps.attachTooltip(
       row,

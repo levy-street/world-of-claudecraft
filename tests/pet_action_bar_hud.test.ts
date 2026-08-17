@@ -20,34 +20,38 @@ vi.mock('../src/ui/icons', () => ({
   iconDataUrl: (kind: string, id: string) => `mock:${kind}:${id}`,
   QUALITY_COLOR: {},
   raidMarkerDataUrl: vi.fn(() => ''),
-  // hud.ts dereferences these two at MODULE scope (createAuraIconResolver's
-  // call site), not just inside a method, so a mock missing either throws
+  // hud.ts dereferences these three at MODULE scope (createAuraIconResolver's
+  // call site), not just inside a method, so a mock missing any of them throws
   // "No export is defined" the instant hud.ts is imported, before any test
   // body runs. The other three are only read inside methods this suite never
   // calls, but are stubbed too so a future call path does not repeat the hunt.
-  abilityImageUrl: vi.fn(() => null),
+  auraImageUrl: vi.fn(() => null),
   cachedProceduralIconDataUrl: vi.fn((kind: string, id: string) => `mock:${kind}:${id}`),
   hasAbilityIconIdentity: vi.fn(() => false),
+  hasAuraImageIdentity: vi.fn(() => false),
   hasAuraRecipe: vi.fn(() => false),
   proceduralIconDataUrl: vi.fn((kind: string, id: string) => `mock:${kind}:${id}`),
 }));
 
 import { Hud } from '../src/ui/hud';
 
-type PetTemplateId = 'emberkin' | 'gloomshade';
+type PetTemplateId = 'emberkin' | 'forest_wolf' | 'gloomshade' | 'water_elemental';
+type PetOwnerClass = 'hunter' | 'mage' | 'warlock';
 
 interface PetBarHarness {
   sim: {
-    cfg: { playerClass: 'warlock' };
+    cfg: { playerClass: PetOwnerClass };
     entities: Map<number, Record<string, unknown>>;
     playerId: number;
     petSpecialCommandsSupported: boolean;
     petAttack: ReturnType<typeof vi.fn>;
     petSpecial: ReturnType<typeof vi.fn>;
     petTaunt: ReturnType<typeof vi.fn>;
+    petWaterJet: ReturnType<typeof vi.fn>;
     healPet: ReturnType<typeof vi.fn>;
     setPetAutoSpecial: ReturnType<typeof vi.fn>;
     setPetAutoTaunt: ReturnType<typeof vi.fn>;
+    setPetAutoWaterJet: ReturnType<typeof vi.fn>;
     setPetMode: ReturnType<typeof vi.fn>;
   };
   lastPetPresent: boolean;
@@ -57,6 +61,10 @@ interface PetBarHarness {
   peekGuard: { consume(): boolean };
   attachTooltip(): void;
   hideTooltip(): void;
+  hasPetFood(): boolean;
+  cancelPetFeed(): void;
+  renderBags(): void;
+  showError(): void;
   renderPetBar(pet: unknown): void;
 }
 
@@ -72,7 +80,14 @@ function pointerEvent(type: string): Event {
 function makeHud(
   templateId: PetTemplateId,
   capability = true,
-  petState: { petSkillTimer?: number; petAutoSkill?: boolean } = {},
+  petState: {
+    hp?: number;
+    maxHp?: number;
+    petAutoSkill?: boolean;
+    petMode?: 'passive' | 'defensive' | 'aggressive';
+    petSkillTimer?: number;
+  } = {},
+  ownerClass: PetOwnerClass = 'warlock',
 ): PetBarHarness {
   const hud = Object.create(Hud.prototype) as unknown as PetBarHarness;
   const owner = { id: 1, kind: 'player', ownerId: null, auras: [] };
@@ -93,7 +108,7 @@ function makeHud(
     ...petState,
   };
   hud.sim = {
-    cfg: { playerClass: 'warlock' },
+    cfg: { playerClass: ownerClass },
     entities: new Map<number, Record<string, unknown>>([
       [1, owner],
       [2, pet],
@@ -103,9 +118,11 @@ function makeHud(
     petAttack: vi.fn(),
     petSpecial: vi.fn(),
     petTaunt: vi.fn(),
+    petWaterJet: vi.fn(),
     healPet: vi.fn(),
     setPetAutoSpecial: vi.fn(),
     setPetAutoTaunt: vi.fn(),
+    setPetAutoWaterJet: vi.fn(),
     setPetMode: vi.fn(),
   };
   hud.lastPetPresent = false;
@@ -115,6 +132,10 @@ function makeHud(
   hud.peekGuard = { consume: () => false };
   hud.attachTooltip = vi.fn();
   hud.hideTooltip = vi.fn();
+  hud.hasPetFood = () => true;
+  hud.cancelPetFeed = vi.fn();
+  hud.renderBags = vi.fn();
+  hud.showError = vi.fn();
   return hud;
 }
 
@@ -134,6 +155,21 @@ describe('Hud Warlock pet signature bar', () => {
 
     const felbolt = document.querySelector<HTMLButtonElement>('[title="Felbolt"]');
     expect(felbolt).not.toBeNull();
+    expect(
+      document.querySelector<HTMLElement>('[data-focus-key="pet_attack"] .icon-label')?.style
+        .backgroundImage,
+    ).toContain('mock:ability:pet_attack');
+    expect(felbolt?.querySelector<HTMLElement>('.icon-label')?.style.backgroundImage).toContain(
+      'mock:ability:emberkin_felbolt',
+    );
+    expect(
+      document.querySelector<HTMLElement>('[data-focus-key="pet_mend"] .icon-label')?.style
+        .backgroundImage,
+    ).toContain('mock:ability:pet_mend');
+    expect(
+      document.querySelector<HTMLElement>('[data-focus-key="stance-menu"] .icon-label')?.style
+        .backgroundImage,
+    ).toContain('mock:ability:pet_defensive');
     expect(document.querySelector('[title="Taunt"]')).toBeNull();
     expect(felbolt?.getAttribute('aria-description')).toBe(
       'Autocast on. Right-click, touch-hold, or press Shift+Enter to turn it off.',
@@ -169,6 +205,9 @@ describe('Hud Warlock pet signature bar', () => {
 
     const chain = document.querySelector<HTMLButtonElement>('[title="Abyssal Chain"]');
     expect(chain).not.toBeNull();
+    expect(chain?.querySelector<HTMLElement>('.icon-label')?.style.backgroundImage).toContain(
+      'mock:ability:gloomshade_abyssal_chain',
+    );
     expect(document.querySelector('[title="Taunt"]')).not.toBeNull();
 
     chain?.dispatchEvent(pointerEvent('pointerdown'));
@@ -177,6 +216,39 @@ describe('Hud Warlock pet signature bar', () => {
     chain?.dispatchEvent(pointerEvent('pointerup'));
     chain?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(hud.sim.petSpecial).not.toHaveBeenCalled();
+  });
+
+  it('renders all eight synthetic command identities into their live button branches', () => {
+    const expectIcon = (selector: string, id: string): void => {
+      expect(document.querySelector<HTMLElement>(selector)?.style.backgroundImage, id).toContain(
+        `mock:ability:${id}`,
+      );
+    };
+
+    const mage = makeHud('water_elemental', true, { hp: 50, maxHp: 100 }, 'mage');
+    mage.renderPetBar(mage.sim.entities.get(2) ?? null);
+    expectIcon('[data-focus-key="pet_attack"] .icon-label', 'pet_attack');
+    expectIcon('[data-focus-key="pet_water_jet"] .icon-label', 'pet_water_jet');
+    expectIcon('[data-focus-key="pet_feed"] .icon-label', 'pet_feed');
+
+    document.body.innerHTML = '<div id="petbar"></div>';
+    const hunter = makeHud(
+      'forest_wolf',
+      true,
+      { hp: 50, maxHp: 100, petMode: 'aggressive' },
+      'hunter',
+    );
+    hunter.petModeMenuOpen = true;
+    hunter.renderPetBar(hunter.sim.entities.get(2) ?? null);
+    expectIcon('[data-focus-key="pet_growl"] .icon-label', 'pet_growl');
+    expectIcon('[data-focus-key="stance-passive"] .icon-label', 'pet_passive');
+    expectIcon('[data-focus-key="stance-defensive"] .icon-label', 'pet_defensive');
+    expectIcon('[data-focus-key="stance-aggressive"] .icon-label', 'pet_aggressive');
+
+    document.body.innerHTML = '<div id="petbar"></div>';
+    const warlock = makeHud('emberkin');
+    warlock.renderPetBar(warlock.sim.entities.get(2) ?? null);
+    expectIcon('[data-focus-key="pet_mend"] .icon-label', 'pet_mend');
   });
 
   it('renders cooldown as inert and toggles an initially disabled autocast on', () => {

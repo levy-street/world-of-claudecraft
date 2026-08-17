@@ -51,7 +51,12 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned 19432 -> 19433: the release/v0.38.0 merge into this branch
     // grew hud.ts by one line at HEAD without updating the row, so the gate
     // arrived red. Same exact-count, zero-slack intent as above.
-    ceiling: 19433,
+    // Re-pinned 19433 -> 19488 when the castle branch merged main: the castle
+    // additions are thin-consumer wiring to extracted modules (the two
+    // LastKeepMapPainter declarations and the two walk-in map branches on the
+    // clearMapHitState pattern), riding on main's zero-slack pin. Exact merged
+    // count: any further growth reds again.
+    ceiling: 19488,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -65,35 +70,14 @@ const MONOLITHS: MonolithRow[] = [
     // per-status manifest rollup to summarizePrewarmManifest
     // (prewarm_compile_lifecycle.ts, beside the interface it fills) and the
     // resume-lane bookkeeping to prewarm_resume_ledger_core.ts.
-    // Merging release/v0.38.0: both sides had pinned their own size (13699 here,
-    // 13700 there), and the merged file is smaller than either, so the ceiling
-    // follows it down rather than inheriting a parent's slack.
-    // Lowered again after extracting the zone prewarm's template selection into
-    // src/render/zone_prewarm_templates_core.ts, which paid for the encounter
-    // prewarm's five call-site lines: the ratchet's rule is that a file over its
-    // ceiling buys the room back by extraction, never by raising the number.
-    // Lowered again after folding the five near-identical lazy form-visual
-    // builds into buildFormVisual, which paid for the review's prewarm re-queue
-    // sites (form rigs, the base-visual replace, both held-weapon swaps).
-    // Lowered again after the Goblin Rocket Sled merge: the mount-visual
-    // teardown had three near-identical copies (live swap, dismount, view
-    // disposal), now releaseMountVisual/releaseMountFx in
-    // src/render/mount_visual_lifecycle.ts. The merged file landed 3 lines over
-    // the inherited ceiling and bought the room back by extraction, per the
-    // ratchet's rule, rather than raising the number.
-    // Merging release/v0.38.0 again for the sled PR: the sled side stood at
-    // 13652 and upstream at 13754, each pinned to its own exact size, and the
-    // merge lands at 13745. Pinned to that exact count rather than inheriting
-    // upstream's 9 lines of slack, which is the same rule both parents already
-    // followed: a merge takes the merged count, and any further growth reds.
-    // Lowered after extracting the landing/scuff dust into
-    // src/render/ground_puff.ts. The merged pin above had zero slack by design,
-    // so wiring the sled's summon call reddened it by exactly its one line; the
-    // extraction bought that back and then some, which is the ratchet's rule.
-    // Nudged by one for the r185 frozen-camera aim fix taken from upstream's
-    // fix/r185-camera-lookat-stale-matrix: a bare lookAt composes from a stale
-    // matrix under r185 and reads in game as camera drift.
-    ceiling: 13731,
+    // Merging release/v0.39.0 into the sled: this side stood at 13731 (its own
+    // exact size, after the ground_puff.ts extraction paid for the summon call)
+    // and upstream at 13689, and the merge lands at 13665, below both. Pinned to
+    // that exact merged count, which is the rule both parents already followed:
+    // a merge takes the merged count and any further growth reds. Upstream also
+    // carries the r185 frozen-camera aim fix now, so this branch's cherry-pick
+    // of it converges here rather than diverging.
+    ceiling: 13665,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

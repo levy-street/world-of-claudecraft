@@ -110,10 +110,13 @@ describe('druid spell pack — definitions', () => {
 describe('druid spell pack — level gating', () => {
   it('gates each pack spell at its learn level and teaches everything by 20', () => {
     // The choice-row unlock guard moved travel_form (11), bash (8), and rip (14)
-    // earlier so the rows that modify them are live at unlock; the rest of the
-    // pack still lands 16 to 20.
+    // earlier so the rows that modify them are live at unlock, and the feral
+    // enablement pass moved pounce to 8 so Stalk has an early payoff; the rest
+    // of the pack still lands 16 to 20.
     const known15 = abilitiesKnownAt('druid', 15).map((k) => k.def.id);
-    const stillLate = NEW_DRUID.filter((id) => !['travel_form', 'bash', 'rip'].includes(id));
+    const stillLate = NEW_DRUID.filter(
+      (id) => !['travel_form', 'bash', 'rip', 'pounce'].includes(id),
+    );
     for (const id of stillLate) expect(known15).not.toContain(id);
     for (const id of NEW_DRUID) {
       const before = abilitiesKnownAt('druid', ABILITIES[id].learnLevel - 1).map((k) => k.def.id);
@@ -137,8 +140,16 @@ describe('druid spell pack — casting applies effects', () => {
     const e = sim.entities.get(a)!;
     sim.setPlayerLevel(20, a);
     giveForm(sim, a, 'form_cat', 'Wolf Form');
-    e.resource = 100;
+    // The giveForm shortcut leaves the pool mid-conversion (still mana), and
+    // the next cast finishes the switch by refilling to max, which would mask
+    // the surge. Settle the pool as energy FIRST, then the free cast plus 30
+    // surge is exact: 10 becomes 40 before the next tick's regen, and both a
+    // charged cost and a doubled surge fail.
+    e.resourceType = 'energy';
+    e.maxResource = 100;
+    e.resource = 10;
     sim.castAbility('tigers_fury', a);
+    expect(e.resource).toBe(40);
     sim.tick();
     const buff = e.auras.find((au) => au.kind === 'buff_ap' && au.value === 40);
     expect(buff, 'tigers_fury should apply a +40 buff_ap aura').toBeTruthy();
@@ -248,7 +259,7 @@ describe('druid spell pack — casting applies effects', () => {
     const base = distanceOver(false);
     const prowl = distanceOver(true);
     expect(base).toBeGreaterThan(0);
-    expect(prowl / base).toBeCloseTo(0.5, 1);
+    expect(prowl / base).toBeCloseTo(0.95, 1);
   });
 
   it('Travel Form toggles off cleanly, removing the form and the speed', () => {
@@ -376,7 +387,7 @@ describe('druid spell pack — casting applies effects', () => {
     sim.castAbility('prowl', pid);
     sim.tick();
     expect(e.auras.some((a) => a.id === 'prowl' && a.kind === 'stealth')).toBe(true);
-    expect((sim as any).moveSpeedMult(e)).toBeCloseTo(0.5);
+    expect((sim as any).moveSpeedMult(e)).toBeCloseTo(0.95);
     advanceTicks(sim, 40);
 
     e.resource = e.maxResource;

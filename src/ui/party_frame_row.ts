@@ -41,13 +41,6 @@ const CREST_ICON_SIZE = 20;
 // The portrait-gate key prefix: the crest repaints only when the member's class
 // changes (a row recycled to a same-class member keeps its crest).
 export const PARTY_CREST_KEY_PREFIX = 'crest:';
-// The out-of-range badge glyph (a resize arrow), kept as a named constant rather than
-// a bare literal. The dead / combat badges are the svgIcon skull / arena icons.
-const OUT_OF_RANGE_GLYPH = '⤢';
-// The leader marker glyph prefixed to the level chip, byte-faithful to the inline
-// `info.leader === m.pid ? '★' : ''`.
-export const PARTY_LEADER_GLYPH = '★';
-
 /** A pooled row's live, mutable member record. The painter overwrites `member` in
  *  place every rebuild; the row's listeners and the crest gate read it live, so a row
  *  recycled to a different pid acts on the current member, not a captured one. */
@@ -214,8 +207,7 @@ export function createPartyRow(
   meta.className = 'pfm-meta';
   const deadBadge = buildBadge(doc, 'dead', svgIcon('skull'));
   const combatBadge = buildBadge(doc, 'combat', svgIcon('arena'));
-  const oorBadge = buildBadge(doc, 'oor', '');
-  oorBadge.textContent = OUT_OF_RANGE_GLYPH;
+  const oorBadge = buildBadge(doc, 'oor', svgIcon('out-of-range'));
   const offlineBadge = buildBadge(doc, 'offline', '');
   offlineBadge.textContent = '!';
   // Re-localize the three badge tooltips (called once now, and again by the pool on a
@@ -238,6 +230,7 @@ export function createPartyRow(
   const leadStar = doc.createElement('span');
   leadStar.className = 'lead-star';
   leadStar.setAttribute('aria-hidden', 'true');
+  leadStar.innerHTML = svgIcon('crown');
   const leadNum = doc.createElement('span');
   leadNum.className = 'lead-num';
   lead.append(leadStar, leadNum);

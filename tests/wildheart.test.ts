@@ -418,7 +418,7 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
       0.06, 0.06, 0.06,
     ]);
     expect(groupSum('wildheart_bonus')).toBeCloseTo(0.18, 9);
-    expect(loot.some((e) => e.copper === 55000 && e.chance === 1)).toBe(true);
+    expect(loot.some((e) => e.copper === 15000 && e.chance === 1)).toBe(true);
     expect(loot.some((e) => e.itemId === 'bone_fragments' && e.chance === 0.8)).toBe(true);
   });
 

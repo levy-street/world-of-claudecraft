@@ -43,6 +43,7 @@ import type {
 } from '../sim/types';
 import type { Decoration } from '../sim/world';
 import type { FriendInfo, IWorld } from '../world_api';
+import { buildCastlePlanMarkers, type CastlePlanMarker } from './castle_plan_core';
 import { viewerUsableToolTier } from './gathering_view';
 import { overworldDungeonPortals } from './map_dungeon_portals';
 import type { MapMarkerProfile } from './map_marker_profile_core';
@@ -716,6 +717,10 @@ export interface OverworldMapModel {
   zoneId: string;
   pois: MapPoiMarker[];
   portals: MapPortalMarker[];
+  /** Both castles' curtain plans, drawn at every zone zoom (see
+   *  castle_plan_core: the walls are lift field, so the baked plate that
+   *  paints from terrainHeight never shows them). */
+  castles: CastlePlanMarker[];
   npcs: MapNpcMarker[];
   questAreas: MapQuestAreaMarker[];
   /** Gather nodes in the committed zone (all zoom levels). Empty only when
@@ -936,6 +941,11 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     });
   }
 
+  // The castle plans. Drawn like portals at every zone zoom rather than
+  // behind the DETAIL_SPAN gate: a castle is the landmark you navigate by,
+  // and the plate cannot show it at any zoom.
+  const castles = buildCastlePlanMarkers(region, toMap);
+
   // Quest-giver glyphs, resolved from the static NPCS content table (like the
   // quest-area blobs above) rather than world.entities, so the online interest
   // radius never hides a distant giver's '!'/'?' glyph. questsDone and the
@@ -1126,6 +1136,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     zoneId: zone.id,
     pois,
     portals,
+    castles,
     npcs,
     questAreas,
     gatherNodes,

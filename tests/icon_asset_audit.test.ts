@@ -921,6 +921,37 @@ describe('icon asset audit', () => {
     }
     expect(resolvedSupersessions).toBe(6);
 
+    const legacyDruidHunterPath = path.join(
+      REPO_ROOT,
+      'docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-druid-hunter.json',
+    );
+    const legacyDruidHunter = JSON.parse(readFileSync(legacyDruidHunterPath, 'utf8')) as {
+      assets: Array<{
+        kind: 'ability';
+        abilityId: string;
+        oldShipping: { path: string; sha256: string; bytes: number };
+        accepted: { output: string; sha256: string; bytes: number };
+      }>;
+    };
+    let resolvedAbilitySupersessions = 0;
+    for (const asset of value.assets) {
+      if (asset.kind !== 'ability') continue;
+      const supersession = legacyDruidHunter.assets.find(({ abilityId }) => abilityId === asset.id);
+      if (!supersession) continue;
+      resolvedAbilitySupersessions += 1;
+      expect(supersession.oldShipping, `${asset.id} historical pin`).toMatchObject({
+        path: `public${asset.runtimeUrl}`,
+        sha256: asset.acceptedSha256,
+        bytes: asset.acceptedBytes,
+      });
+      expect(supersession.accepted.output, `${asset.id} replacement path`).toBe(
+        `public${asset.runtimeUrl}`,
+      );
+      asset.acceptedSha256 = supersession.accepted.sha256;
+      asset.acceptedBytes = supersession.accepted.bytes;
+    }
+    expect(resolvedAbilitySupersessions).toBe(1);
+
     // The 512px human-review sheets normally use ignored generation sources. This CI fixture
     // changes those review paths to committed shipping WebPs while preserving every accepted
     // identity and contract from the checked-in manifest.

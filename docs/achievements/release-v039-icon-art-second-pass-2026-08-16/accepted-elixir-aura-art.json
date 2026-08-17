@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "release-v039-icon-art-second-pass-elixir-aura-2026-08-16",
+    "acceptedDate": "2026-08-16",
+    "baseRelease": "release/v0.39.0",
+    "baseCommit": "d2d1a8ad5c11",
+    "rasterGenerator": "OpenAI built-in image generation",
+    "owner": "World of ClaudeCraft",
+    "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
+  },
+  "scope": {
+    "exactRuntimeAuras": 1,
+    "runtimeIdentity": "elixir_buff_sta",
+    "liveSourceItems": [
+      "elixir_of_the_bear",
+      "elixir_of_the_boar",
+      "venomfire_elixir",
+      "elixir_of_the_serpent"
+    ]
+  },
+  "generationContract": {
+    "oneCallPerDistinctAsset": true,
+    "builtInImagegenCalls": 1,
+    "acceptedFirstOutputs": 1,
+    "rejectedOutputs": 0,
+    "sourceRetention": "The accepted 1254px master remains under tmp/imagegen/v039-second-pass/elixir-aura in this worktree.",
+    "processing": "The opaque square sRGB master was scaled to exact 128px and encoded as WebP at quality 82 within the 15 KiB aura-art gate.",
+    "review": "The source and shipping icon were inspected at 128px, 48px, 32px, 16px, and 16px grayscale."
+  },
+  "assets": [
+    {
+      "auraId": "elixir_buff_sta",
+      "displayName": "Battle Elixir Vigor",
+      "sourceProvenance": "tmp/imagegen/v039-second-pass/elixir-aura/provenance.json",
+      "sourceFile": "tmp/imagegen/v039-second-pass/elixir-aura/raw/elixir_buff_sta.png",
+      "mechanic": "Any of four battle elixirs grants a long-duration Stamina increase through one shared runtime aura identity; same-stat elixirs replace one another.",
+      "intendedVisualSubject": "One heavy dark-bronze heart rising from an open green elixir flask while broad amber and emerald vapor ribbons communicate durable alchemical vigor.",
+      "references": [
+        {
+          "path": "public/ui/items/elixir_of_the_bear.webp",
+          "role": "Warm amber bottle, tactile glass, and battle-elixir subject reference."
+        },
+        {
+          "path": "public/ui/items/elixir_of_the_serpent.webp",
+          "role": "Green higher-tier alchemy palette and dark atmospheric finish reference."
+        },
+        {
+          "path": "public/ui/skills/priest/power_word_fortitude.webp",
+          "role": "Broad-body fortitude and strong small-icon value-structure reference."
+        }
+      ],
+      "prompt": "Use case: stylized-concept\nAsset type: borderless square MMORPG aura icon for World of ClaudeCraft\nPrimary request: create one fresh, distinct, premium hand-painted dark-fantasy MMORPG aura painting for Battle Elixir Vigor (runtime identity elixir_buff_sta).\nCanonical mechanic: drinking any of four battle elixirs grants a long-duration Stamina increase. The same runtime aura identity deliberately represents Bear, Boar, Vipersear, and Serpent elixirs, so the painting must communicate neutral alchemical endurance without depicting one animal family.\nInput images: Image 1 is the warm amber bottle and tactile glass reference; Image 2 is the green higher-tier alchemy palette and dark atmospheric finish reference; Image 3 is the broad-body fortitude and strong small-icon value structure reference. Create a new composition and do not copy their exact subjects.\nScene/backdrop: fully opaque full-square soot-black and deep umber painted atmosphere, restrained amber and emerald alchemical haze.\nSubject: one heavy dark-bronze anatomical heart made sturdy and whole, with broad hammered plates rather than gore, rising from a single small open alchemical flask. Two thick ribbons of amber and emerald vapor wrap upward around the heart without forming a badge or complete ring. The heart must read as stamina and enduring vigor, while the flask and mixed vapor make the shared elixir source unmistakable.\nComposition/framing: one dominant centered heart and flask silhouette, fills about 82 percent with safe margins, broad value groups, crisp focal edges, readable at 16, 28, 32, 40, and 48 pixels.\nLighting/mood: warm top-left amber key, cool emerald underlight from the flask, deep values, controlled saturation, resilient and empowering rather than healing.\nStyle/medium: premium hand-painted classic fantasy MMORPG ability and aura art, tactile bronze and glass, soft atmospheric periphery, no flat vector treatment.\nConstraints: opaque square; one heart, one flask, two vapor ribbons; no text, letters, numbers, runes, UI frame, border, badge, rarity chrome, watermark, logo, medical cross, shield, full character, animal head, bear, boar, snake, viper, blood, gore, photorealism, modern graphic design, or accidental writing.",
+      "decision": "Accepted after source and 128/48/32/16 plus 16px grayscale review.",
+      "sourceBytes": 2045691,
+      "sourceSha256": "9283d2446c1f1f61863208177633ae8f38abbf1389d91fdaf8de9251e1bf811d",
+      "acceptedBytes": 3278,
+      "acceptedSha256": "1589f693f8f19f9e1dbc0e28710a52b7a4af14376271a9fbd2e73185d3b6a01f",
+      "output": "elixir_buff_sta.webp",
+      "runtimeUrl": "/ui/auras/elixir_buff_sta.webp"
+    }
+  ]
+}

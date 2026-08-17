@@ -1481,7 +1481,7 @@ describe('Thornhollow Fields: ghost-state teardown (review pins)', () => {
     kill(sim, fallen);
     sim.tick();
     const target = must(sim.entities.get(fallen), 'entity');
-    expect(offerResurrection(sim.ctx, caster, target, 1)).toBe(false);
+    expect(offerResurrection(sim.ctx, caster, target, 1, 40)).toBe(false);
     expect(sim.ctx.pendingResurrections.has(fallen)).toBe(false);
     expect(target.dead).toBe(true);
   });

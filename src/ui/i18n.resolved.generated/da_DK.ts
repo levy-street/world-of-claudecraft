@@ -953,6 +953,22 @@ export const da_DK: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "The Undercroft",
+        "state": "The State Floor",
+        "residence": "The Residence",
+        "tower": "The Watch Tower"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
+    },
     "compass": {
       "N": "N",
       "NE": "NØ",
@@ -10060,7 +10076,7 @@ export const da_DK: EnTranslations = {
       "ferocious_bite": {
         "name": "Blodbid",
         "description": "Afsluttende manøvre, der giver {damage}. Kun i Ulveform.",
-        "specNote_feral": "Hvert slag, der rammer, tilføjer 1 Gammelt Blod; ved 3 Gammelt Blod bliver denne knap til Rød Høst: et bid for 70 plus 43 pr. combopoint, der også øjeblikkeligt giver al den skade, dine Flæns og Sønderriv stadig ville have givet, og gendanner 30 energi."
+        "specNote_feral": "Hvert slag, der rammer, tilføjer 1 Gammelt Blod; ved 3 Gammelt Blod bliver denne knap til Rød Høst, som forbruger dit Gamle Blod til et kraftigere slag, der også øjeblikkeligt giver al den skade, dine Flæns og Sønderriv stadig ville have givet, og gendanner energi."
       },
       "swipe": {
         "name": "Fejende Kløer",
@@ -10123,7 +10139,7 @@ export const da_DK: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Ulveblod",
-        "description": "Øger angrebskraft med {buff} i {duration} sek. Kun i Ulveform."
+        "description": "Frembringer {rage} energi og øger angrebskraft med {buff} i {duration} sek. Kun i Ulveform."
       },
       "rip": {
         "name": "Blodrevne",
@@ -10344,7 +10360,7 @@ export const da_DK: EnTranslations = {
       },
       "redharvest": {
         "name": "Rød Høst",
-        "description": "Forbruger dine 3 Gammelt Blod: et slag for {damage}, der øjeblikkeligt giver al den skade, dine Flæns og Sønderriv stadig ville have givet, fjerner begge blødninger og gendanner 30 energi. Virker uden kombopoint."
+        "description": "Forbruger dine 3 Gammelt Blod: et slag for {damage}, der øjeblikkeligt giver al den skade, dine Flæns og Sønderriv stadig ville have givet, fjerner begge blødninger og gendanner {rage} energi. Virker uden kombopoint."
       },
       "marrowbreak": {
         "name": "Marvbrækker",
@@ -10592,7 +10608,7 @@ export const da_DK: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Vild heling",
-        "description": "Genopretter 180 helbred over 10 sek. Kun i Bjørneform. (druidentalent)"
+        "description": "Genopretter 40% af dit maksimale helbred over 10 sek. Kun i Bjørneform. (druidentalent)"
       },
       "frost_trap": {
         "name": "Rimfælde",
@@ -10825,7 +10841,7 @@ export const da_DK: EnTranslations = {
       },
       "prowl": {
         "name": "Snig",
-        "description": "Gå i sneg-tilstand mens du er i Ulveform, og bevæg dig 50 % langsommere. Kan ikke bruges i kamp."
+        "description": "Gå i sneg-tilstand mens du er i Ulveform, og bevæg dig 5 % langsommere. Kan ikke bruges i kamp."
       },
       "rake": {
         "name": "Flæns",
@@ -12382,6 +12398,9 @@ export const da_DK: EnTranslations = {
       },
       "pristine_claw": {
         "name": "Uberørt Klo"
+      },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
       },
       "conjured_water4": {
         "name": "Fremmanet kildevand"
@@ -16866,6 +16885,11 @@ export const da_DK: EnTranslations = {
         "name": "Den Sidste Borg",
         "enterText": "Du træder ind i Den Sidste Borgs kolde, stille haller.",
         "leaveText": "Du trækker borgdøren i og træder tilbage ud i Dragelandets vind."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
       },
       "drowned_temple": {
         "name": "Det Druknede Tempel",

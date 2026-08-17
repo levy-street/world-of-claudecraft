@@ -4,6 +4,7 @@ import type {
 } from '../net/mobile_wallet_deeplink';
 import type { FocusManager } from './focus_manager';
 import { t } from './i18n';
+import { svgIcon } from './ui_icons';
 
 function walletConnectionCancelled(): Error {
   const error = new Error('wallet connection cancelled');
@@ -36,7 +37,7 @@ export function showMobileWalletLauncher(
     closeBtn.type = 'button';
     closeBtn.className = 'x-btn wallet-picker-close';
     closeBtn.setAttribute('aria-label', t('skinEvent.close'));
-    closeBtn.textContent = '×';
+    closeBtn.innerHTML = svgIcon('close');
     titleRow.append(title, closeBtn);
 
     const help = document.createElement('p');

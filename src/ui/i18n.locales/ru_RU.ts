@@ -815,6 +815,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Проверьте карту мира ({key}), чтобы увидеть, где вас ждут задания.',
   'hudChrome.tutorial.nextTipSocial':
     'Откройте раздел «Общение» ({key}), чтобы найти группу для сложных боёв.',
+  'hudChrome.lastkeepMap.story.undercroft': 'Подклет',
+  'hudChrome.lastkeepMap.story.state': 'Парадный этаж',
+  'hudChrome.lastkeepMap.story.residence': 'Жилой этаж',
+  'hudChrome.lastkeepMap.story.tower': 'Дозорная башня',
+  'hudChrome.dawnholdMap.story.ground': 'Садовый этаж',
+  'hudChrome.dawnholdMap.story.solar': 'Светлица',
   'hudChrome.raidLockout.title': 'Блокировки рейдов',
   'hudChrome.raidLockout.allReady': 'Все рейды доступны',
   'hudChrome.raidLockout.daysHours': '{d}д {h}ч',
@@ -3286,7 +3292,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Враг атакован роем насекомых и получает {damage} ед. урона от сил Природы в течение 12 сек.',
   'entities.abilities.tigers_fury.name': 'Волчья кровь',
   'entities.abilities.tigers_fury.description':
-    'Повышает силу атаки на {buff} на {duration} сек. Только в облике волка.',
+    'Мгновенно восстанавливает {rage} ед. энергии и повышает силу атаки на {buff} на {duration} сек. Только в облике волка.',
   'entities.abilities.rip.name': 'Кровавый разлом',
   'entities.abilities.rip.description': 'Завершающий приём, заставляющий цель кровоточить каждые 2 сек. в течение 24 сек.: 36 урона плюс 24 за каждую потраченную серию приёмов (5 серий приёмов: {damage} суммарно). Только в облике волка.',
   'entities.abilities.mortal_strike.name': 'Калечащий удар',
@@ -3330,7 +3336,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Деморализует врагов поблизости, снижая их силу атаки на 20 на 20 сек. Только в облике бурого.',
   'entities.abilities.prowl.name': 'Скрадывание',
   'entities.abilities.prowl.description':
-    'Переход в скрытность в облике волка: вы двигаетесь на 50% медленнее. Нельзя использовать в бою.',
+    'Переход в скрытность в облике волка: вы двигаетесь на 5% медленнее. Нельзя использовать в бою.',
   'entities.abilities.rake.name': 'Свежевание',
   'entities.abilities.rake.description': 'Полосует врага на урон оружия плюс {damage} и вызывает кровотечение на 18 сек. Даёт 1 серию приёмов. Только в облике волка.',
   'entities.abilities.revive_pet.name': 'Подлатать',
@@ -9954,7 +9960,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description': 'Обездвиживает врагов в пределах 4 м от точки цели на 2 сек., затем замедляет их на 40% на 6 сек. (талант шамана)',
   'entities.abilities.evocation.description': 'Быстро восполняет ману. (Талант мага)',
   'entities.abilities.frenzied_regeneration.description':
-    'Восстанавливает 180 ед. здоровья за 10 сек. Только в облике медведя. (талант друида)',
+    'Восстанавливает 40% максимального запаса здоровья за 10 сек. Только в облике медведя. (талант друида)',
   'entities.abilities.frost_trap.description':
     'Замораживает противников в выбранной области на 3 сек., не позволяя им двигаться или действовать. (талант охотника)',
   'entities.abilities.ghostly_strike.description': 'Бьёт врага на урон оружия плюс {damage} и повышает ваш шанс уклонения на 15% на 7 сек. Даёт 1 серию приёмов. (талант разбойника)',
@@ -10563,11 +10569,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.wildheart_basin.leaveText':
     'Вы проходите под каменными клыками и возвращаетесь к солнцу Палмрича.',
   'entities.dungeons.the_last_keep.name': 'Последний оплот',
-  'entities.dungeons.the_last_keep.enterText': 'Вы входите в холодные безмолвные залы Последнего оплота.',
   'entities.items.last_keep_signet.name': 'Печатка Последнего оплота',
+  'entities.dungeons.the_last_keep.enterText': 'Вы входите в холодные безмолвные залы Последнего оплота.',
   'entities.items.reins_terrorspark_groundshaker.name': 'Ключ зажигания Страхоискра',
   'entities.items.reins_goblin_rocket_sled.name': 'Ключ зажигания гоблинских ракетных саней',
   'entities.dungeons.the_last_keep.leaveText': 'Вы затворяете дверь оплота и возвращаетесь под ветер Земель Драконов.',
+  'entities.dungeons.dawnhold_castle.name': 'Замок Рассвета',
+  'entities.items.dawnhold_posy.name': 'Букетик из сада Замка Рассвета',
+  'entities.dungeons.dawnhold_castle.enterText':
+    'Вы входите в теплые, напоенные ароматом цветов залы Замка Рассвета.',
+  'entities.dungeons.dawnhold_castle.leaveText':
+    'Вы возвращаетесь на залитую солнцем садовую лужайку.',
   'entities.items.wildheart_tuskblade.name': 'Клыкастый клинок Дикого Сердца',
   'entities.items.wildheart_hexwood_staff.name': 'Посох колдовского дерева из Котловины',
   'entities.items.wildheart_fangknife.name': 'Клыковый нож Зулгара',
@@ -12068,7 +12080,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'В течение 8 сек. следующий удар врага получает ответ: до {buff} ед. урона поглощается и возвращается атакующему как урон Светом, а вы получаете 1 ед. преданности. Ответ дается только на один удар. Вознесение увеличивает отражаемое количество на 50%.',
   'entities.abilities.faithforged_guard.name': 'Долг Света',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Каждый попавший удар добавляет 1 стадию Старой крови; при 3 стадиях эта кнопка становится Кровавой жатвой: укус на 91 плюс 55 за каждый прием серии, который также мгновенно наносит весь урон, что еще нанесли бы ваши Свежевание и Кровавый разлом, и восстанавливает 30 ед. энергии.',
+    'Каждый попавший удар добавляет 1 стадию Старой крови; при 3 стадиях эта кнопка становится Кровавой жатвой: укус, расходующий Старую кровь на более мощный удар, который также мгновенно наносит весь урон, что еще нанесли бы ваши Свежевание и Кровавый разлом, и восстанавливает энергию.',
   'entities.abilities.fieldcraft_reentry.description':
     'Пассивно: Разрыв следа обновляет Охотничий натиск и на 12 сек. усиливает следующий Потрошащий удар или Кровавый крюк. Потрошащий удар наносит на 15% больше урона за каждый заряд. Кровавый крюк наносит еще от 18 до 24 ед. физического урона, увеличенного на 15% за каждый заряд и зависящего от силы атаки дальнего боя. При 3 зарядах любая атака поглощает Охотничий натиск. (Полевая выучка)',
   'entities.abilities.fieldcraft_reentry.name': 'Подготовленное возвращение',
@@ -12198,7 +12210,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Возвращает погибшего участника группы к жизни с 35% здоровья и маны.',
   'entities.abilities.recall_the_fallen.name': 'Возвращение павших',
   'entities.abilities.redharvest.description':
-    'Расходует ваши 3 стадии Старой крови: удар на {damage} ед. урона, который мгновенно наносит весь урон, что еще нанесли бы ваши Свежевание и Кровавый разлом, снимает оба кровотечения и восстанавливает 30 ед. энергии. Работает даже без очков серии приемов.',
+    'Расходует ваши 3 стадии Старой крови: удар на {damage} ед. урона, который мгновенно наносит весь урон, что еще нанесли бы ваши Свежевание и Кровавый разлом, снимает оба кровотечения и восстанавливает {rage} ед. энергии. Работает даже без очков серии приемов.',
   'entities.abilities.redharvest.name': 'Кровавая жатва',
   'entities.abilities.regrowth.specNote_restoration':
     'Посадка НОВОГО расцвета добавляет 1 стадию Зелени (максимум 5).',

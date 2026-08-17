@@ -69,6 +69,84 @@ export function stoneTexture(): THREE.CanvasTexture {
   });
 }
 
+// The two castle surfaces below are HIGH KEY on purpose: they are always
+// multiplied by a castle's own authored stone tone (render/castle_stone.ts),
+// so their job is to carry the joints, the course pattern, and the grit
+// while leaving the VALUE near white. A mid-grey albedo times a mid-grey
+// tone lands near a third of either, which reads as wet slate.
+
+/**
+ * Laid paving: regular courses of dressed flagstone with deep joints, each
+ * slab shaded a little differently so a large paved floor (a castle bailey)
+ * reads as stonework rather than a flat plane. Courses are half-offset row
+ * to row, the way a mason lays a yard.
+ */
+export function flagstoneTexture(): THREE.CanvasTexture {
+  return makeCanvas(256, (ctx, s) => {
+    const rows = 4;
+    const cols = 4;
+    const h = s / rows;
+    const w = s / cols;
+    ctx.fillStyle = '#8f8b85'; // the joint bed showing between the slabs
+    ctx.fillRect(0, 0, s, s);
+    for (let r = 0; r < rows; r++) {
+      const off = (r % 2) * (w / 2);
+      for (let c = -1; c <= cols; c++) {
+        const x = c * w + off;
+        const y = r * h;
+        const v = 214 + Math.floor(rnd() * 30);
+        ctx.fillStyle = `rgb(${v},${v - 2},${v - 7})`;
+        ctx.fillRect(x + 1.5, y + 1.5, w - 3, h - 3);
+        // a worn highlight along each slab's top edge and grit in the face
+        ctx.fillStyle = 'rgba(255,255,255,0.35)';
+        ctx.fillRect(x + 1.5, y + 1.5, w - 3, 2);
+        for (let g = 0; g < 14; g++) {
+          const gv = v - 26 + Math.floor(rnd() * 30);
+          ctx.fillStyle = `rgba(${gv},${gv},${gv - 4},0.45)`;
+          ctx.fillRect(x + 2 + rnd() * (w - 5), y + 2 + rnd() * (h - 5), 2, 2);
+        }
+      }
+    }
+  });
+}
+
+/**
+ * Coursed castle ashlar: dressed blocks in regular courses, half-offset row
+ * to row, with recessed joints and per-block weathering. The masonry every
+ * raw castle mass wears (wall-walk caps, tower cores, stair wedges, the
+ * flower court's garden walls).
+ */
+export function castleAshlarTexture(): THREE.CanvasTexture {
+  return makeCanvas(256, (ctx, s) => {
+    const rows = 6;
+    const h = s / rows;
+    const w = s / 4;
+    ctx.fillStyle = '#8a867e'; // the recessed joint
+    ctx.fillRect(0, 0, s, s);
+    for (let r = 0; r < rows; r++) {
+      const off = (r % 2) * (w / 2);
+      for (let c = -1; c <= 4; c++) {
+        const x = c * w + off;
+        const y = r * h;
+        const v = 208 + Math.floor(rnd() * 34);
+        ctx.fillStyle = `rgb(${v},${v - 3},${v - 9})`;
+        ctx.fillRect(x + 2, y + 2, w - 4, h - 4);
+        // the chamfered top arris catches light, the bed below sits in shade
+        ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.fillRect(x + 2, y + 2, w - 4, 1.5);
+        ctx.fillStyle = 'rgba(90,86,80,0.28)';
+        ctx.fillRect(x + 2, y + h - 4, w - 4, 2);
+        // weathering: a few darker pits and a pale lime bloom per block
+        for (let g = 0; g < 10; g++) {
+          const gv = v - 30 + Math.floor(rnd() * 26);
+          ctx.fillStyle = `rgba(${gv},${gv - 2},${gv - 6},0.4)`;
+          ctx.fillRect(x + 3 + rnd() * (w - 7), y + 3 + rnd() * (h - 7), 2, 2);
+        }
+      }
+    }
+  });
+}
+
 export function waterNormalish(): THREE.CanvasTexture {
   const tex = makeCanvas(256, (ctx, s) => {
     ctx.fillStyle = '#7f7fff';

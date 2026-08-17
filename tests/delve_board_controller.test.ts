@@ -127,6 +127,38 @@ describe('DelveBoardController', () => {
     expect(test.focusFirst).toHaveBeenCalledWith('.delve-enter-btn');
   });
 
+  it('renders distinct Delve Mark placements for balance, companion upgrade, and shop price', () => {
+    const test = makeHarness();
+    test.controller.open(7);
+
+    const imageIdentity = (selector: string) => {
+      const matches = test.panel.querySelectorAll<HTMLImageElement>(selector);
+      expect(matches, selector).toHaveLength(1);
+      const image = matches[0];
+      return {
+        className: image.className,
+        src: image.getAttribute('src'),
+        alt: image.getAttribute('alt'),
+        draggable: image.getAttribute('draggable'),
+      };
+    };
+    const delveMarkIdentity = {
+      className: 'currency-inline currency-delve_mark',
+      src: '/ui/currency/delve_mark.webp',
+      alt: '',
+      draggable: 'false',
+    };
+
+    expect(imageIdentity('.delve-board-meta > img')).toEqual(delveMarkIdentity);
+    expect(imageIdentity('[data-companion-upgrade] > img')).toEqual(delveMarkIdentity);
+    expect(test.panel.querySelector('.delve-shop-price')).toBeNull();
+
+    test.panel.querySelector<HTMLButtonElement>('[data-board-tab="shop"]')?.click();
+    expect(imageIdentity('.delve-board-meta > img')).toEqual(delveMarkIdentity);
+    expect(imageIdentity('.delve-shop-price > img')).toEqual(delveMarkIdentity);
+    expect(test.panel.querySelector('[data-companion-upgrade]')).toBeNull();
+  });
+
   it('sends the selected heroic tier through IWorld and preloads the same interior event', () => {
     const test = makeHarness();
     test.controller.open(7);

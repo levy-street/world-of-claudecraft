@@ -22,8 +22,69 @@
     },
     {
       "abilityId": "rejuvenation",
-      "sourceFile": "50.png",
-      "output": "rejuvenation.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-druid-hunter/raw/rejuvenation.png",
+      "output": "rejuvenation.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-druid-hunter.json",
+      "intendedVisualSubject": "A fresh luminous wildflower unfurling along a friendly forearm with three gradual green-gold healing beads.",
+      "references": [
+        {
+          "order": 1,
+          "path": "public/ui/skills/druid/regrowth.webp",
+          "role": "match its natural leaf textures, gentle living-green light, and premium Restoration painterliness"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/skills/druid/overbloom.webp",
+          "role": "use its luminous blooming-flower subject, layered petals, and verdant depth, but make this a smaller newly opening bloom"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/skills/druid/swiftmend.webp",
+          "role": "borrow its warm healing highlights and dense action-bar contrast without using a heart symbol"
+        }
+      ],
+      "generationPrompt": "Create a new square 1:1 ability icon for World of ClaudeCraft's Druid Restoration spell \"Wildbloom\" (runtime ID rejuvenation). It instantly places a Nature heal-over-time on a friendly target for twelve seconds; a newly planted bloom also contributes to the Druid's Verdance cycle.\n\nPremium borderless opaque hand-painted dark-fantasy MMORPG action-bar art. Show one fresh pale-green wildflower unfurling from a tender curled leaf at center, its stem wrapped gently around a weathered friendly forearm. Three evenly spaced beads of soft green-gold light rise along the stem, communicating gradual healing over time rather than one burst. Flower, leaf, stem, and forearm form one centered organic silhouette filling about 82% of the square with safe margins. Deep emerald forest, leaf green, creamy petal white, and restrained warm gold; lush painterly materials and broad readable value shapes at 16, 32, and 48 pixels.\n\nReference roles, in exact supplied order:\n1. regrowth.webp - match its natural leaf textures, gentle living-green light, and premium Restoration painterliness.\n2. overbloom.webp - use its luminous blooming-flower subject, layered petals, and verdant depth, but make this a smaller newly opening bloom.\n3. swiftmend.webp - borrow its warm healing highlights and dense action-bar contrast without using a heart symbol.\n\nNo heart, medical cross, potion bottle, water splash, burst explosion, multiple flowers, thorn damage, text, letters, numbers, border, frame, badge, UI chrome, watermark, transparent corner, empty black corner, flat vector, cartoon sticker, glossy mobile-game glyph, or modern graphic design.",
+      "sourceSha256": "da1ba88122faf20af0edd5865317ac4c026e6d87b4486cc3558661c58ea34af9",
+      "sourceBytes": 2130535,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "6af8ec04dae87e6044dd29763cbc0c44a281800dd7055d087461d6fa2b2f22c7",
+      "acceptedBytes": 3870,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "tmp/asset_src/druid-skill-game-icons (CraftPix premium)",
+        "sourceFile": "50.png",
+        "ownerOrLicense": "Levy Street account (callum@levystreet.com), as identified by the top-level CraftPix license notice",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "rejuvenation.webp",
+        "shippingSha256": "cc04587de746bbdbf5a60b041fb1faf247fbe6f5d3acc1ef430d34c88450f9a1",
+        "shippingBytes": 4142,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "thorns",
@@ -37,38 +98,465 @@
     },
     {
       "abilityId": "bear_form",
-      "sourceFile": "13.png",
-      "output": "bear_form.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-druid-hunter/raw/bear_form.png",
+      "output": "bear_form.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-druid-hunter.json",
+      "intendedVisualSubject": "A calm, resolute brown bear head emerging from living bark, moss-green leaves, and restrained amber shapeshift light.",
+      "references": [
+        {
+          "order": 1,
+          "path": "public/ui/skills/druid/primal_reflexes.webp",
+          "role": "match its premium fur rendering, moss-green druid palette, depth, and painterly finish"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/skills/druid/bear_charge.webp",
+          "role": "use its believable bear anatomy and muscular facial planes, but make this pose calm and stationary"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/skills/druid/berserk.webp",
+          "role": "borrow its dramatic warm rim light and dense action-bar contrast, not its rage pose"
+        }
+      ],
+      "generationPrompt": "Create a new square 1:1 ability icon for World of ClaudeCraft's Druid skill \"Bruin Form\" (runtime ID bear_form). It is a toggled shapeshift into a durable bear form that raises armor, health, attack power, rage generation, and threat.\n\nPremium borderless opaque hand-painted dark-fantasy MMORPG action-bar art. Show one calm, resolute brown bear head and upper shoulders facing slightly left, closed mouth, dense fur merging into a single wreath-like surge of living bark, moss-green leaves, and restrained amber shapeshift light. The bear is already fully formed and powerful, not attacking. Keep the head as the unmistakable central silhouette, filling about 82% of the square with safe margins. Deep forest-umber and moss atmospheric full-bleed background; controlled highlights on brow, muzzle, and fur. Strong value separation and chunky readable shapes at 16, 32, and 48 pixels.\n\nReference roles, in exact supplied order:\n1. primal_reflexes.webp - match its premium fur rendering, moss-green druid palette, depth, and painterly finish.\n2. bear_charge.webp - use its believable bear anatomy and muscular facial planes, but make this pose calm and stationary.\n3. berserk.webp - borrow its dramatic warm rim light and dense action-bar contrast, not its rage pose.\n\nNo paw-print glyph, human face, cat or wolf, roaring open mouth, attack impact, sleep cue, healing symbol, text, letters, numbers, border, frame, badge, UI chrome, watermark, transparent corner, empty black corner, flat vector, cartoon sticker, glossy mobile-game glyph, or modern graphic design.",
+      "sourceSha256": "02f91c48f0c9065bb667f5105fbde1567cfa0141e01aa43ec5b8a95adad0454d",
+      "sourceBytes": 2588198,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "bf4b54b9653f1bad37f533e3390251a196bad47fd60f7a0333023be34fc00b7d",
+      "acceptedBytes": 5920,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "tmp/asset_src/druid-skill-game-icons (CraftPix premium)",
+        "sourceFile": "13.png",
+        "ownerOrLicense": "Levy Street account (callum@levystreet.com), as identified by the top-level CraftPix license notice",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "bear_form.webp",
+        "shippingSha256": "c11836dc21183a3a025e21746dec23cecebe870e18b4a4183bb758119f035ab2",
+        "shippingBytes": 4282,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "maul",
-      "sourceFile": "9.png",
-      "output": "maul.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-druid-hunter/raw/maul.png",
+      "output": "maul.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-druid-hunter.json",
+      "intendedVisualSubject": "An enormous furred bear paw crushing and cracking one thick weathered bone against dark steel.",
+      "references": [
+        {
+          "order": 1,
+          "path": "public/ui/skills/druid/marrowbreak.webp",
+          "role": "use its bear-paw subject, dense dark-fantasy material rendering, and visceral but controlled impact"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/skills/druid/bear_charge.webp",
+          "role": "match its believable bear anatomy, fur texture, and directional force"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/skills/druid/berserk.webp",
+          "role": "borrow its premium warm rim lighting and aggressive action-bar contrast, not its roaring face"
+        }
+      ],
+      "generationPrompt": "Create a new square 1:1 ability icon for World of ClaudeCraft's Druid Bruin-form skill \"Bonecrush\" (runtime ID maul). It is a rage-fueled next-swing bear strike that adds physical damage and high threat.\n\nPremium borderless opaque hand-painted dark-fantasy MMORPG action-bar art. Show one enormous furred bear forepaw hammering downward onto a single thick weathered bone laid across a battered dark-steel surface. The bone is cracking at the center under the paw's weight; a compact ochre impact flare and a few bone splinters communicate the heavy next swing. Paw, claws, and broken bone form one unmistakable centered silhouette occupying about 84% of the square with safe margins. Use deep umber fur, blackened steel, bone ivory, moss shadow, and restrained amber-red impact light. Chunky high-contrast forms must read instantly at 16, 32, and 48 pixels.\n\nReference roles, in exact supplied order:\n1. marrowbreak.webp - use its bear-paw subject, dense dark-fantasy material rendering, and visceral but controlled impact.\n2. bear_charge.webp - match its believable bear anatomy, fur texture, and directional force.\n3. berserk.webp - borrow its premium warm rim lighting and aggressive action-bar contrast, not its roaring face.\n\nNo human hand, handheld mace, standalone generic paw-print symbol, skull, severed limb, excessive gore, wide slash trails, spell rune, text, letters, numbers, border, frame, badge, UI chrome, watermark, transparent corner, empty black corner, flat vector, cartoon sticker, glossy mobile-game glyph, or modern graphic design.",
+      "sourceSha256": "f59f309a10c81a27899ac25f60259e3278453350d4206dc3e0b91c5d6ee8256f",
+      "sourceBytes": 2265631,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "f9936595377b22b79325a9d0fc563c0a98f69e7b05786c3a16a9a4cb8075f6ae",
+      "acceptedBytes": 4766,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "tmp/asset_src/druid-skill-game-icons (CraftPix premium)",
+        "sourceFile": "9.png",
+        "ownerOrLicense": "Levy Street account (callum@levystreet.com), as identified by the top-level CraftPix license notice",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "maul.webp",
+        "shippingSha256": "8e44e643fbe01e24137d4e118d8b9beaf6ddffa8d64b574923f791a3cc1dc32a",
+        "shippingBytes": 3834,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "growl",
-      "sourceFile": "42.png",
-      "output": "growl.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-druid-hunter/raw/growl.png",
+      "output": "growl.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-druid-hunter.json",
+      "intendedVisualSubject": "A lowered bear muzzle directing narrow amber pressure ripples toward one shadowed enemy helm and eye.",
+      "references": [
+        {
+          "order": 1,
+          "path": "public/ui/skills/druid/challenging_roar.webp",
+          "role": "borrow its warm sound-pressure treatment and forceful bear expression, but reduce it to a narrow single-target growl"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/skills/druid/bear_charge.webp",
+          "role": "use its believable bear anatomy, fur, and weight"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/skills/druid/primal_reflexes.webp",
+          "role": "match its premium moss-green Druid atmosphere and painterly finish"
+        }
+      ],
+      "generationPrompt": "Create a new square 1:1 ability icon for World of ClaudeCraft's Druid Bruin-form skill \"Menace\" (runtime ID growl). It is a single-target taunt: the bear matches the enemy's highest threat and compels that one foe to attack for three seconds.\n\nPremium borderless opaque hand-painted dark-fantasy MMORPG action-bar art. Show a close side profile of one brown bear's lowered muzzle giving a controlled, teeth-bared growl toward one distant shadowed enemy helm and its single amber eye. Two narrow ochre sound-pressure ripples connect bear and target, making the one-to-one taunt unmistakable. Keep the bear muzzle and one target as a bold centered horizontal interaction occupying about 82% of the square with safe margins. Deep umber, moss, smoky black, and restrained amber palette; dramatic painterly depth and strong value separation at 16, 32, and 48 pixels. The mouth is only partly open: threatening, not a full roar.\n\nReference roles, in exact supplied order:\n1. challenging_roar.webp - borrow its warm sound-pressure treatment and forceful bear expression, but reduce it to a narrow single-target growl.\n2. bear_charge.webp - use its believable bear anatomy, fur, and weight.\n3. primal_reflexes.webp - match its premium moss-green Druid atmosphere and painterly finish.\n\nNo crowd of enemies, broad circular shockwave, wide roaring mouth, claw or paw strike, comic speech bubble, text, letters, numbers, border, frame, badge, UI chrome, watermark, transparent corner, empty black corner, flat vector, cartoon sticker, glossy mobile-game glyph, or modern graphic design.",
+      "sourceSha256": "c934624d39d0aff32193281c015ae91c82b6c280d094fc2651b307a3c0a209f5",
+      "sourceBytes": 2205908,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "5aff29325572f0657e55e0860c111709b12a55516ffd95eacc35a39a42b00c40",
+      "acceptedBytes": 4018,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "tmp/asset_src/druid-skill-game-icons (CraftPix premium)",
+        "sourceFile": "42.png",
+        "ownerOrLicense": "Levy Street account (callum@levystreet.com), as identified by the top-level CraftPix license notice",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "growl.webp",
+        "shippingSha256": "55aadfa3663c2e1e450f8ec61b2e942c5e01787655f0c909c4e48fb7f185f235",
+        "shippingBytes": 4020,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "cat_form",
-      "sourceFile": "44.png",
-      "output": "cat_form.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-druid-hunter/raw/cat_form.png",
+      "output": "cat_form.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-druid-hunter.json",
+      "intendedVisualSubject": "An alert gray wolf head emerging from moss-green leaves and muted moon-silver shapeshift mist.",
+      "references": [
+        {
+          "order": 1,
+          "path": "public/ui/skills/druid/primal_reflexes.webp",
+          "role": "match its feral Druid eye treatment, mossy shadow palette, and premium painterly depth"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/skills/druid/redharvest.webp",
+          "role": "borrow its dark-fur rendering and dense high-contrast action-bar finish, not its blood effect"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/skills/druid/dash.webp",
+          "role": "use its readable canine motion anatomy and warm edge lighting, but make this portrait calm and stationary"
+        }
+      ],
+      "generationPrompt": "Create a new square 1:1 ability icon for World of ClaudeCraft's Druid skill \"Wolf Form\" (legacy runtime ID cat_form). It is a toggled shapeshift into a gray wolf form that gains agility, attack power, energy, combo attacks, and reduced threat. The live form is specifically a wolf, never a cat.\n\nPremium borderless opaque hand-painted dark-fantasy MMORPG action-bar art. Show one alert, poised gray wolf head and upper shoulders in three-quarter view, mouth closed, ears high, with fur emerging from a single curved surge of moss-green leaves and muted moon-silver shapeshift mist. The animal is fully formed and ready, not attacking. Make the wolf's long muzzle, triangular ears, and gray ruff unmistakable as the centered silhouette, filling roughly 82% of the square with safe margins. Deep moonlit forest background, charcoal-gray fur, moss green, cool silver, and a restrained amber eye. Strong value grouping and painterly detail that survives at 16, 32, and 48 pixels.\n\nReference roles, in exact supplied order:\n1. primal_reflexes.webp - match its feral Druid eye treatment, mossy shadow palette, and premium painterly depth.\n2. redharvest.webp - borrow its dark-fur rendering and dense high-contrast action-bar finish, not its blood effect.\n3. dash.webp - use its readable canine motion anatomy and warm edge lighting, but make this portrait calm and stationary.\n\nNo feline, lion, tiger, bear, human face, paw-print glyph, open roaring mouth, attack impact, blood, healing symbol, text, letters, numbers, border, frame, badge, UI chrome, watermark, transparent corner, empty black corner, flat vector, cartoon sticker, glossy mobile-game glyph, or modern graphic design.",
+      "sourceSha256": "b5bf8ce0ab9a46140b45276429e534add8bc7ef932494794bf7c4729501bff22",
+      "sourceBytes": 2433120,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "3406475c02688aaf6f11bcadd3bcda7e9561a222af5bad0e4ec7413e1aed08db",
+      "acceptedBytes": 4156,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "tmp/asset_src/druid-skill-game-icons (CraftPix premium)",
+        "sourceFile": "44.png",
+        "ownerOrLicense": "Levy Street account (callum@levystreet.com), as identified by the top-level CraftPix license notice",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "cat_form.webp",
+        "shippingSha256": "9375a7cd37a4c828d7f14eed549cf27d0a0655aef64d2af24306a5e38861a079",
+        "shippingBytes": 4320,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "prowl",
-      "sourceFile": "41.png",
-      "output": "prowl.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-druid-hunter/raw/prowl.png",
+      "output": "prowl.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-druid-hunter.json",
+      "intendedVisualSubject": "A low stalking gray wolf beneath twisted roots and a thin crescent moon, mostly concealed in moss-black shadow.",
+      "references": [
+        {
+          "order": 1,
+          "path": "public/ui/skills/druid/primal_reflexes.webp",
+          "role": "match its concealed animal-eye focus, green-black forest depth, and premium Druid finish"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/skills/druid/moonseed.webp",
+          "role": "use its subdued moonlit violet-silver atmosphere and soft magical haze, not its central seed subject"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/skills/druid/dash.webp",
+          "role": "use its believable canine body anatomy, but slow the pose into a compressed stalk with no bright motion trail"
+        }
+      ],
+      "generationPrompt": "Create a new square 1:1 ability icon for World of ClaudeCraft's Druid Wolf-form skill \"Stalk\" (runtime ID prowl). Out of combat, the wolf enters indefinite stealth while moving at half speed.\n\nPremium borderless opaque hand-painted dark-fantasy MMORPG action-bar art. Depict one gray wolf in a low, slow stalking profile moving left to right beneath arching black tree roots. Most of the body dissolves into layered moss-black shadow; the long muzzle, triangular ears, shoulder line, and one dim amber eye remain readable under a thin moon-silver rim. A small veiled crescent moon sits deep in the background, partially obscured by branches. The low wolf silhouette occupies about 80% of the square with safe margins. Quiet charcoal, moss, desaturated silver, and a single amber focal point; rich hand-painted atmosphere and broad value shapes at 16, 32, and 48 pixels.\n\nReference roles, in exact supplied order:\n1. primal_reflexes.webp - match its concealed animal-eye focus, green-black forest depth, and premium Druid finish.\n2. moonseed.webp - use its subdued moonlit violet-silver atmosphere and soft magical haze, not its central seed subject.\n3. dash.webp - use its believable canine body anatomy, but slow the pose into a compressed stalk with no bright motion trail.\n\nNo cat, bear, human rogue, paw-print glyph, bright glowing full body, sprinting leap, attack impact, blood, sleep symbol, text, letters, numbers, border, frame, badge, UI chrome, watermark, transparent corner, empty black corner, flat vector, cartoon sticker, glossy mobile-game glyph, or modern graphic design.",
+      "sourceSha256": "16deeac27e4157599b8b6d0a96e488b600978933bc5df5c83efd4f14f9524f43",
+      "sourceBytes": 2021569,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "e9965dfe5abbaa94410175f2b4aae984edbc5616f2f4181e25b299bfc62ee5a3",
+      "acceptedBytes": 2112,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "tmp/asset_src/druid-skill-game-icons (CraftPix premium)",
+        "sourceFile": "41.png",
+        "ownerOrLicense": "Levy Street account (callum@levystreet.com), as identified by the top-level CraftPix license notice",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "prowl.webp",
+        "shippingSha256": "298aef26a1a4387418902d01256e1f8e69b08ee19993fe82caf6cd9dd2d6c384",
+        "shippingBytes": 3742,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "rake",
-      "sourceFile": "10.png",
-      "output": "rake.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-druid-hunter/raw/rake.png",
+      "output": "rake.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-druid-hunter.json",
+      "intendedVisualSubject": "A gray-wolf forepaw drawing three fresh shallow crimson wounds down one dark hide target.",
+      "references": [
+        {
+          "order": 1,
+          "path": "public/ui/skills/druid/redharvest.webp",
+          "role": "match its dark-fur texture, controlled crimson wound energy, and premium action-bar finish"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/skills/druid/marrowbreak.webp",
+          "role": "use its believable paw anatomy, close crop, and tactile claw/material rendering"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/skills/druid/primal_reflexes.webp",
+          "role": "match its mossy Druid shadows and atmospheric depth"
+        }
+      ],
+      "generationPrompt": "Create a new square 1:1 ability icon for World of ClaudeCraft's Druid Wolf-form skill \"Flense\" (runtime ID rake). It spends energy on a weapon strike that leaves an eighteen-second bleed and awards one combo point.\n\nPremium borderless opaque hand-painted dark-fantasy MMORPG action-bar art. Show one charcoal-gray wolf forepaw dragging downward across a single taut hide or leather target. Three claws remain visibly engaged at the top of three fresh, shallow parallel wounds; the wounds trail a restrained dark-crimson glow to communicate a lingering bleed. Paw, engaged claws, and three short wound lines form one clean diagonal silhouette occupying about 84% of the square with safe margins. Use charcoal fur, dark brown hide, moss-black shadow, bone-ivory claws, controlled crimson, and a thin amber rim. Strong tactile painterly forms that stay legible at 16, 32, and 48 pixels.\n\nReference roles, in exact supplied order:\n1. redharvest.webp - match its dark-fur texture, controlled crimson wound energy, and premium action-bar finish.\n2. marrowbreak.webp - use its believable paw anatomy, close crop, and tactile claw/material rendering.\n3. primal_reflexes.webp - match its mossy Druid shadows and atmospheric depth.\n\nNo broad area sweep, multiple targets, clean uninjured leather, deep torn-open chasm, detached generic slash glyph, wolf jaws, bear paw, excessive gore, dripping blood, text, letters, numbers, border, frame, badge, UI chrome, watermark, transparent corner, empty black corner, flat vector, cartoon sticker, glossy mobile-game glyph, or modern graphic design.",
+      "sourceSha256": "379ab7ae7ee48fc7aa865e3b70149719579a3b49f4073ac35ddf941bc04d2bb1",
+      "sourceBytes": 2487191,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "b4945369b032095dd5872453cfc443b948bb8feab5664706c1f70f993e6b9251",
+      "acceptedBytes": 3532,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "tmp/asset_src/druid-skill-game-icons (CraftPix premium)",
+        "sourceFile": "10.png",
+        "ownerOrLicense": "Levy Street account (callum@levystreet.com), as identified by the top-level CraftPix license notice",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "rake.webp",
+        "shippingSha256": "bc4038f34c6b3d80c92334d7fe9f2f0c6ae092c68a12e62f8fa1a910ef5167a0",
+        "shippingBytes": 5066,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "claw",
-      "sourceFile": "46.png",
-      "output": "claw.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-druid-hunter/raw/claw.png",
+      "output": "claw.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-druid-hunter.json",
+      "intendedVisualSubject": "A gray-wolf forepaw catching one battered leather target with three claws and a compact pale-gold strike crescent.",
+      "references": [
+        {
+          "order": 1,
+          "path": "public/ui/skills/druid/redharvest.webp",
+          "role": "use its premium close-up claw anatomy, dark-fur texture, and strong focal contrast, while removing its blood effect"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/skills/druid/primal_reflexes.webp",
+          "role": "match its moss-green Druid shadows and feral atmospheric depth"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/skills/druid/dash.webp",
+          "role": "borrow its sense of canine momentum and warm rim light, not its full-body pose"
+        }
+      ],
+      "generationPrompt": "Create a new square 1:1 ability icon for World of ClaudeCraft's Druid Wolf-form skill \"Rendclaw\" (runtime ID claw). It spends energy on a direct weapon strike and awards one combo point; it is the clean baseline claw attack, not a bleed or area sweep.\n\nPremium borderless opaque hand-painted dark-fantasy MMORPG action-bar art. Show one gray-wolf forepaw thrusting forward from lower left, three hooked claws catching a single battered leather target at center. A compact pale-gold strike crescent hugs the claws at contact; the leather is dented but not bleeding. Paw, three claws, and one target form a simple bold diagonal silhouette occupying about 82% of the square with safe margins. Charcoal fur, dark leather, moss-black atmosphere, moon-silver claw highlights, and restrained amber energy. Tactile painterly materials, clear at 16, 32, and 48 pixels.\n\nReference roles, in exact supplied order:\n1. redharvest.webp - use its premium close-up claw anatomy, dark-fur texture, and strong focal contrast, while removing its blood effect.\n2. primal_reflexes.webp - match its moss-green Druid shadows and feral atmospheric depth.\n3. dash.webp - borrow its sense of canine momentum and warm rim light, not its full-body pose.\n\nNo broad area sweep, multiple targets, open wounds, dripping blood, long lingering slash trails, detached generic claw glyph, bear paw, feline paw, text, letters, numbers, border, frame, badge, UI chrome, watermark, transparent corner, empty black corner, flat vector, cartoon sticker, glossy mobile-game glyph, or modern graphic design.",
+      "sourceSha256": "3f7ce32e8af14236275ffadca4fd52c202d52309c049b63ea4264ada8881a76b",
+      "sourceBytes": 2166243,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "ceb332a3c96da85958ac5cbc944861f4a932c4601f2cf88c3786b7453764c784",
+      "acceptedBytes": 3802,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "tmp/asset_src/druid-skill-game-icons (CraftPix premium)",
+        "sourceFile": "46.png",
+        "ownerOrLicense": "Levy Street account (callum@levystreet.com), as identified by the top-level CraftPix license notice",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "claw.webp",
+        "shippingSha256": "f81dd996d89973a429bd9d5967d9e3722d46f24bd4f1529bedf8938074a8f33a",
+        "shippingBytes": 3884,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "regrowth",
@@ -77,8 +565,69 @@
     },
     {
       "abilityId": "ferocious_bite",
-      "sourceFile": "22.png",
-      "output": "ferocious_bite.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-druid-hunter/raw/ferocious_bite.png",
+      "output": "ferocious_bite.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-druid-hunter.json",
+      "intendedVisualSubject": "Gray-wolf jaws clamping the edge of blackened shoulder armor in one decisive finishing bite.",
+      "references": [
+        {
+          "order": 1,
+          "path": "public/ui/skills/druid/redharvest.webp",
+          "role": "match its premium dark-fur, crimson feral energy, and high-contrast finisher mood without copying its claw subject"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/skills/druid/primal_reflexes.webp",
+          "role": "use its readable feral eye and moss-green Druid atmosphere"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/skills/druid/berserk.webp",
+          "role": "borrow its powerful animal anatomy, warm rim light, and dense action-bar finish"
+        }
+      ],
+      "generationPrompt": "Create a new square 1:1 ability icon for World of ClaudeCraft's Druid Wolf-form finisher \"Gorebite\" (runtime ID ferocious_bite). It spends combo points and energy on a decisive physical bite; with enough Old Blood it becomes Redharvest. This icon must read as the baseline finishing bite, not the empowered replacement.\n\nPremium borderless opaque hand-painted dark-fantasy MMORPG action-bar art. Depict a close three-quarter view of one gray wolf's jaws clamping decisively onto the edge of a battered blackened-steel shoulder plate. Upper and lower fangs create a bold crescent around the metal; a compact crimson-gold impact flare sits at the bite point, with only a restrained smear of blood. The wolf muzzle and closed bite fill roughly 84% of the square with safe margins. Charcoal-gray fur, ivory fangs, blackened steel, moss-black atmosphere, controlled crimson and amber highlights. Dense tactile painterly rendering and a decisive silhouette at 16, 32, and 48 pixels.\n\nReference roles, in exact supplied order:\n1. redharvest.webp - match its premium dark-fur, crimson feral energy, and high-contrast finisher mood without copying its claw subject.\n2. primal_reflexes.webp - use its readable feral eye and moss-green Druid atmosphere.\n3. berserk.webp - borrow its powerful animal anatomy, warm rim light, and dense action-bar finish.\n\nNo bear or feline, open roaring portrait, detached fang glyph, paw or claw strike, multiple enemies, excessive gore, severed flesh, magical beam, text, letters, numbers, border, frame, badge, UI chrome, watermark, transparent corner, empty black corner, flat vector, cartoon sticker, glossy mobile-game glyph, or modern graphic design.",
+      "sourceSha256": "3dfb6ac2807130bfcbf481d273d7f75ad3d622967beca29789fbdc2831bd95fc",
+      "sourceBytes": 2365585,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "04ddddf7d472507cd680f74d34dd07a9e6eb0af290ce13417a03e41d1b83124d",
+      "acceptedBytes": 3620,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "tmp/asset_src/druid-skill-game-icons (CraftPix premium)",
+        "sourceFile": "22.png",
+        "ownerOrLicense": "Levy Street account (callum@levystreet.com), as identified by the top-level CraftPix license notice",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "ferocious_bite.webp",
+        "shippingSha256": "ee674968c726131e79a44b4828ca3852afaa937a6b666df6d7a591c1afbe77c9",
+        "shippingBytes": 5878,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "barkskin",
@@ -87,8 +636,69 @@
     },
     {
       "abilityId": "swipe",
-      "sourceFile": "1.png",
-      "output": "swipe.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-druid-hunter/raw/swipe.png",
+      "output": "swipe.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-druid-hunter.json",
+      "intendedVisualSubject": "A huge bear forepaw sweeping three broad claw trails across three compact enemy silhouettes in one area strike.",
+      "references": [
+        {
+          "order": 1,
+          "path": "public/ui/skills/druid/marrowbreak.webp",
+          "role": "use its premium bear-paw anatomy, close crop, tactile claws, and dark material finish"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/skills/druid/bear_charge.webp",
+          "role": "match its believable bear fur and physical momentum"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/skills/druid/berserk.webp",
+          "role": "borrow its warm aggressive contrast and feral Druid energy, without using a roaring face"
+        }
+      ],
+      "generationPrompt": "Create a new square 1:1 ability icon for World of ClaudeCraft's Druid Bruin-form skill \"Sweeping Claws\" (runtime ID swipe). It spends rage to strike all nearby enemies and produces extra threat.\n\nPremium borderless opaque hand-painted dark-fantasy MMORPG action-bar art. Show one huge furred bear forepaw sweeping decisively from lower left to upper right. Three broad ivory-amber claw trails travel with the paw across three compact shadowed enemy silhouettes arranged in a shallow arc, clearly an area sweep. Use a single clean motion, not a tangle of scratches. Paw and three parallel trails form one bold diagonal silhouette occupying about 84% of the square with safe margins. Deep umber fur, moss-black atmosphere, blackened steel targets, restrained amber-red edge light; tactile painterly rendering and strong readability at 16, 32, and 48 pixels.\n\nReference roles, in exact supplied order:\n1. marrowbreak.webp - use its premium bear-paw anatomy, close crop, tactile claws, and dark material finish.\n2. bear_charge.webp - match its believable bear fur and physical momentum.\n3. berserk.webp - borrow its warm aggressive contrast and feral Druid energy, without using a roaring face.\n\nNo broken bone, single-target headbutt, lone generic paw-print glyph, detached floating claws, excessive blood or gore, more than three slash trails, text, letters, numbers, border, frame, badge, UI chrome, watermark, transparent corner, empty black corner, flat vector, cartoon sticker, glossy mobile-game glyph, or modern graphic design.",
+      "sourceSha256": "418258255afc23680405665c5730dbdd54afa8e7cebb51c8dfbba6d4860fef24",
+      "sourceBytes": 2186735,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "630f19527678bdb716a209f581669bfb4fdf716da78fb45545721b28cceea964",
+      "acceptedBytes": 5010,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "tmp/asset_src/druid-skill-game-icons (CraftPix premium)",
+        "sourceFile": "1.png",
+        "ownerOrLicense": "Levy Street account (callum@levystreet.com), as identified by the top-level CraftPix license notice",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "swipe.webp",
+        "shippingSha256": "c550468035ee03d4ddc6f51e610e6e8b8ffe700b861e4ef7140225fddc48cde4",
+        "shippingBytes": 3628,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "starfire",
@@ -107,8 +717,69 @@
     },
     {
       "abilityId": "bash",
-      "sourceFile": "29.png",
-      "output": "bash.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-druid-hunter/raw/bash.png",
+      "output": "bash.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-druid-hunter.json",
+      "intendedVisualSubject": "A brown bear forehead smashing into battered iron at the instant of a compact concussive impact.",
+      "references": [
+        {
+          "order": 1,
+          "path": "public/ui/skills/druid/bear_charge.webp",
+          "role": "use its believable attacking-bear anatomy, fur treatment, and forward momentum"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/skills/druid/marrowbreak.webp",
+          "role": "match its premium close-cropped impact composition, battered-material detail, and high-contrast focal burst"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/skills/druid/primal_reflexes.webp",
+          "role": "match its mossy Druid color harmony, atmospheric depth, and painterly finish"
+        }
+      ],
+      "generationPrompt": "Create a new square 1:1 ability icon for World of ClaudeCraft's Druid Bruin-form skill \"Concuss\" (runtime ID bash). It spends rage to deliver a close-range two-second stun.\n\nPremium borderless opaque hand-painted dark-fantasy MMORPG action-bar art. Depict the massive brow and upper muzzle of a brown bear driving forward in a brutal forehead smash against one battered iron helm or round iron plate. Center the instant of impact: a compact amber-white concussion burst, a few heavy metal cracks, and short blunt shock ripples. The bear's forehead and the struck metal must form one bold diagonal collision silhouette, filling roughly 84% of the square with safe margins. Dark forest-umber backdrop, muted iron, moss shadows, and controlled amber impact light. Readable as \"bear headbutt stun\" at 16, 32, and 48 pixels, not a claw attack.\n\nReference roles, in exact supplied order:\n1. bear_charge.webp - use its believable attacking-bear anatomy, fur treatment, and forward momentum.\n2. marrowbreak.webp - match its premium close-cropped impact composition, battered-material detail, and high-contrast focal burst.\n3. primal_reflexes.webp - match its mossy Druid color harmony, atmospheric depth, and painterly finish.\n\nNo wooden club or handheld weapon, skull, severed head, cartoon stars, lightning-bolt glyph, wide roaring mouth, claw slashes, blood or gore, text, letters, numbers, border, frame, badge, UI chrome, watermark, transparent corner, empty black corner, flat vector, cartoon sticker, glossy mobile-game glyph, or modern graphic design.",
+      "sourceSha256": "97eca7f6677cea0b09aee7cbbc7e0e50704d22cde6615293019bc3aa54134eb0",
+      "sourceBytes": 2293619,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "43eb6bd7e190ceb6a74834f4a3ddc736f705e36bb29425e65c74d80cd8686d0a",
+      "acceptedBytes": 4820,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "tmp/asset_src/druid-skill-game-icons (CraftPix premium)",
+        "sourceFile": "29.png",
+        "ownerOrLicense": "Levy Street account (callum@levystreet.com), as identified by the top-level CraftPix license notice",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "bash.webp",
+        "shippingSha256": "a1d342cc7279456b5eeb2caba4f9b09471aca2bf62aa8191c19d594c378c2e2b",
+        "shippingBytes": 4522,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "faerie_fire",
@@ -122,31 +793,333 @@
     },
     {
       "abilityId": "tigers_fury",
-      "sourceFile": "38.png",
-      "output": "tigers_fury.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-druid-hunter/raw/tigers_fury.png",
+      "output": "tigers_fury.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-druid-hunter.json",
+      "intendedVisualSubject": "A gray wolf head and neck infused by one rising crimson-gold physical power surge.",
+      "references": [
+        {
+          "order": 1,
+          "path": "public/ui/skills/druid/berserk.webp",
+          "role": "match its premium feral-animal anatomy, ember-red intensity, and powerful rim lighting, but keep the mouth mostly closed"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/skills/druid/redharvest.webp",
+          "role": "use its controlled crimson energy integrated through dark fur, not its claw or wound subject"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/skills/druid/primal_reflexes.webp",
+          "role": "preserve its wolf-like eye focus, mossy Druid shadows, and painterly depth"
+        }
+      ],
+      "generationPrompt": "Create a new square 1:1 ability icon for World of ClaudeCraft's Druid Wolf-form skill \"Wolfsblood\" (legacy runtime ID tigers_fury). It spends energy to grant the wolf a strong attack-power increase for six seconds. The live skill is wolf-themed, never a tiger.\n\nPremium borderless opaque hand-painted dark-fantasy MMORPG action-bar art. Show one gray wolf head and powerful neck in side profile, jaw clenched and teeth barely visible, as a single thick crimson-gold surge rises through the neck and fans into hot rim light along the fur. A compact burnt-amber pulse halo behind the shoulders conveys a brief physical power buff; there is no target or strike. Wolf head, neck, and rising surge form one centered S-shaped silhouette occupying about 84% of the square with safe margins. Charcoal fur, deep blood-red, ember gold, and moss-black atmosphere. Dense painterly rendering, high action-bar contrast, and clear readability at 16, 32, and 48 pixels.\n\nReference roles, in exact supplied order:\n1. berserk.webp - match its premium feral-animal anatomy, ember-red intensity, and powerful rim lighting, but keep the mouth mostly closed.\n2. redharvest.webp - use its controlled crimson energy integrated through dark fur, not its claw or wound subject.\n3. primal_reflexes.webp - preserve its wolf-like eye focus, mossy Druid shadows, and painterly depth.\n\nNo tiger, feline stripes, bear, enemy target, bite contact, claw wounds, healing heart, blood droplet glyph, dripping gore, broad sound wave, text, letters, numbers, border, frame, badge, UI chrome, watermark, transparent corner, empty black corner, flat vector, cartoon sticker, glossy mobile-game glyph, or modern graphic design.",
+      "sourceSha256": "c4ac78117f42b90e77261228986968590eabed7f8ece17d82a5b6e5a96916ade",
+      "sourceBytes": 2595626,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "647e550f9b35dabbd83b2957589006e54340630a57aea44e97edd2ea9f09e451",
+      "acceptedBytes": 6268,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "tmp/asset_src/druid-skill-game-icons (CraftPix premium)",
+        "sourceFile": "38.png",
+        "ownerOrLicense": "Levy Street account (callum@levystreet.com), as identified by the top-level CraftPix license notice",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "tigers_fury.webp",
+        "shippingSha256": "c640c8326ebb461569c70836ca10dbe86be1e05400a28af9bec7d6a02686135f",
+        "shippingBytes": 3538,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "rip",
-      "sourceFile": "32.png",
-      "output": "rip.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-druid-hunter/raw/rip.png",
+      "output": "rip.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-druid-hunter.json",
+      "intendedVisualSubject": "Three deep crimson rifts torn through dark hide with one narrow gray-wolf eye watching from shadow.",
+      "references": [
+        {
+          "order": 1,
+          "path": "public/ui/skills/druid/redharvest.webp",
+          "role": "use its premium restrained blood palette, torn-energy texture, and dark-fur integration"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/skills/druid/berserk.webp",
+          "role": "borrow its deep crimson/umber contrast and feral finisher intensity"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/skills/druid/primal_reflexes.webp",
+          "role": "use its focused animal-eye treatment, mossy shadow depth, and Druid atmosphere"
+        }
+      ],
+      "generationPrompt": "Create a new square 1:1 ability icon for World of ClaudeCraft's Druid Wolf-form finisher \"Bloodrift\" (runtime ID rip). It spends combo points to inflict a deep bleed every two seconds for twenty-four seconds. This must feel heavier and longer-lasting than the shallow Flense bleed.\n\nPremium borderless opaque hand-painted dark-fantasy MMORPG action-bar art. Depict three deep parallel rifts torn through dark hide, their ragged edges pulled apart to reveal a controlled ember-crimson depth. Behind the wounds in shadow, one narrow gray-wolf eye watches, tying the effect to Wolf Form without adding a paw. The three torn rifts create the dominant centered diagonal silhouette and fill about 82% of the square with safe margins. Dark hide, charcoal fur shadow, dried-blood burgundy, restrained crimson inner glow, and a muted amber eye. Painterly and visceral but not graphic; strong value blocks at 16, 32, and 48 pixels.\n\nReference roles, in exact supplied order:\n1. redharvest.webp - use its premium restrained blood palette, torn-energy texture, and dark-fur integration.\n2. berserk.webp - borrow its deep crimson/umber contrast and feral finisher intensity.\n3. primal_reflexes.webp - use its focused animal-eye treatment, mossy shadow depth, and Druid atmosphere.\n\nNo visible paw or claws, broad sweep motion, shallow surface scratches, wolf jaws, exposed anatomy, organs, excessive gore, dripping blood, detached modern slash logo, text, letters, numbers, border, frame, badge, UI chrome, watermark, transparent corner, empty black corner, flat vector, cartoon sticker, glossy mobile-game glyph, or modern graphic design.",
+      "sourceSha256": "509417ea49749faead1653449a3d7a39d482d61fe16fdad5768ce8dd9c772c26",
+      "sourceBytes": 2666111,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "8b71692c6dcc8773b248fc888cbc5edbab00445a2c6d85693bcac894011a1b1b",
+      "acceptedBytes": 3514,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "tmp/asset_src/druid-skill-game-icons (CraftPix premium)",
+        "sourceFile": "32.png",
+        "ownerOrLicense": "Levy Street account (callum@levystreet.com), as identified by the top-level CraftPix license notice",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "rip.webp",
+        "shippingSha256": "7f40c4ee1e54a58a5a72e69409b6e8598465c5f2fb08c61dcccb6afefa39798b",
+        "shippingBytes": 4014,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "moonfire",
-      "sourcePack": "generic-skill100",
-      "sourceFile": "skill icon 13.png",
-      "output": "moonfire.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-druid-hunter/raw/moonfire.png",
+      "output": "moonfire.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-druid-hunter.json",
+      "intendedVisualSubject": "A silver-blue crescent launching one lunar bolt into armor where a violet flame remains burning.",
+      "references": [
+        {
+          "order": 1,
+          "path": "public/ui/skills/druid/moonseed.webp",
+          "role": "match its premium lunar-violet glow, deep indigo atmosphere, and hand-painted particle finish"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/skills/druid/moonlash.webp",
+          "role": "use its readable crescent energy motion and cool arcane color language"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/skills/druid/sunlance.webp",
+          "role": "borrow its strong source-to-target beam composition and crisp impact contrast, translated from sunlight to moonlight"
+        }
+      ],
+      "generationPrompt": "Create a new square 1:1 ability icon for World of ClaudeCraft's Druid Balance spell \"Lunar Tempest\" (runtime ID moonfire). It instantly burns one enemy with Arcane damage and leaves a lingering moonfire damage-over-time effect.\n\nPremium borderless opaque hand-painted dark-fantasy MMORPG action-bar art. Show a sharp silver-blue crescent moon in the upper left releasing one concentrated diagonal lunar bolt into a single shadowed enemy breastplate at lower right. At impact, a compact violet-white burst clings to the armor as a small enduring blue-violet flame, clearly showing both immediate hit and lingering burn. Crescent, bolt, target, and attached flame form one bold diagonal composition occupying about 82% of the square with safe margins. Midnight indigo, moon silver, restrained violet, and deep forest black; luminous painterly magic with strong value separation at 16, 32, and 48 pixels.\n\nReference roles, in exact supplied order:\n1. moonseed.webp - match its premium lunar-violet glow, deep indigo atmosphere, and hand-painted particle finish.\n2. moonlash.webp - use its readable crescent energy motion and cool arcane color language.\n3. sunlance.webp - borrow its strong source-to-target beam composition and crisp impact contrast, translated from sunlight to moonlight.\n\nNo abstract standalone crescent glyph, ocean wave, healing flower, multiple targets, stars as symbols, readable rune, fire-orange sun, text, letters, numbers, border, frame, badge, UI chrome, watermark, transparent corner, empty black corner, flat vector, cartoon sticker, glossy mobile-game glyph, or modern graphic design.",
+      "sourceSha256": "da79eb46e95a271167243505bfe9fedbb5d8b21997dfe636214f814c49a2846f",
+      "sourceBytes": 2382070,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "7b07b3c3b7d3c931d57a921c47a41671576218e96e60966f03e4908e6eb8c61d",
+      "acceptedBytes": 3666,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "generic-skill100",
+        "sourceFile": "skill icon 13.png",
+        "ownerOrLicense": "Levy Street account (callum@levystreet.com), as identified by the top-level CraftPix license notice",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "moonfire.webp",
+        "shippingSha256": "984b11a3f9b06166011248bf4ba7a5834760aacbbb8e9f411457a96027e9867a",
+        "shippingBytes": 1568,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "demoralizing_roar",
-      "sourcePack": "generic-rpg100",
-      "sourceFile": "skill 6.png",
-      "output": "demoralizing_roar.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-druid-hunter/raw/demoralizing_roar.png",
+      "output": "demoralizing_roar.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-druid-hunter.json",
+      "intendedVisualSubject": "A roaring brown bear and broad pressure ring forcing three enemy weapon silhouettes to droop and lose power.",
+      "references": [
+        {
+          "order": 1,
+          "path": "public/ui/skills/druid/challenging_roar.webp",
+          "role": "preserve its readable roaring-bear subject and circular sound-wave vocabulary"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/skills/druid/berserk.webp",
+          "role": "match its premium feral facial rendering, deep reds, and action-bar intensity"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/skills/druid/bear_charge.webp",
+          "role": "use its believable brown-bear anatomy, fur texture, and grounded weight"
+        }
+      ],
+      "generationPrompt": "Create a new square 1:1 ability icon for World of ClaudeCraft's Druid Bruin-form skill \"Craven Roar\" (runtime ID demoralizing_roar). It spends rage to roar at nearby enemies, lowering their attack power for twenty seconds.\n\nPremium borderless opaque hand-painted dark-fantasy MMORPG action-bar art. Depict a powerful brown bear head roaring straight outward, mouth open, with one broad burnt-amber pressure ring expanding across the square. Along the lower outer arc, three small dark enemy weapon silhouettes - a sword, axe, and spear - visibly droop downward and lose their red glow under the wave, communicating reduced attack power rather than damage. Bear face and circular wave occupy about 84% of the square with safe margins. Deep forest-umber, ember orange, blackened steel, and muted moss; dense painterly atmosphere, bold shapes, and hard focal contrast that reads at 16, 32, and 48 pixels.\n\nReference roles, in exact supplied order:\n1. challenging_roar.webp - preserve its readable roaring-bear subject and circular sound-wave vocabulary.\n2. berserk.webp - match its premium feral facial rendering, deep reds, and action-bar intensity.\n3. bear_charge.webp - use its believable brown-bear anatomy, fur texture, and grounded weight.\n\nNo single highlighted target eye, narrow beam, physical impact, paw strike, comedy fear faces, skulls, blood or gore, text, letters, numbers, border, frame, badge, UI chrome, watermark, transparent corner, empty black corner, flat vector, cartoon sticker, glossy mobile-game glyph, or modern graphic design.",
+      "sourceSha256": "1ef6411e629f2e59fd39bd79ee256bc976a3cd05a419e94c27a17079d6633eb8",
+      "sourceBytes": 2460027,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "1742fccb7a2e8dfd180c5cd2d8576e138ac5acac453eaf11686962168578dce3",
+      "acceptedBytes": 5364,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "generic-rpg100",
+        "sourceFile": "skill 6.png",
+        "ownerOrLicense": "Levy Street account (callum@levystreet.com), as identified by the top-level CraftPix license notice",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "demoralizing_roar.webp",
+        "shippingSha256": "426ed2cddfad31aa298041cc949a0eb4b6e1f35aa7312824757950ba0bb50f95",
+        "shippingBytes": 4878,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "insect_swarm",
-      "sourcePack": "generic-rpg100",
-      "sourceFile": "skill 71.png",
-      "output": "insect_swarm.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-druid-hunter/raw/insect_swarm.png",
+      "output": "insect_swarm.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-druid-hunter.json",
+      "intendedVisualSubject": "Three readable hornets and smaller biting silhouettes engulfing one battered enemy helm.",
+      "references": [
+        {
+          "order": 1,
+          "path": "public/ui/skills/druid/faerie_fire.webp",
+          "role": "use its luminous green airborne-particle treatment and dark forest depth, but replace every butterfly-like shape with hostile hornets"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/skills/druid/entangling_roots.webp",
+          "role": "match its earthy moss palette, organic texture, and premium full-bleed atmosphere"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/skills/druid/redharvest.webp",
+          "role": "borrow its dense high-contrast focal composition and restrained red damage accents"
+        }
+      ],
+      "generationPrompt": "Create a new square 1:1 ability icon for World of ClaudeCraft's Druid Nature spell \"Stinging Swarm\" (runtime ID insect_swarm). It afflicts one enemy with a stinging insect swarm that deals damage every three seconds for twelve seconds.\n\nPremium borderless opaque hand-painted dark-fantasy MMORPG action-bar art. Depict one dark battered enemy helm at center being engulfed by a tight spiral of three large readable hornets and a cloud of smaller biting silhouettes. The hornets have dark amber bodies, translucent moss-green wings, and sharp ochre highlights; short red pinprick impacts on the helm communicate repeated stings. Keep the helm and three major insects as a compact circular subject filling roughly 84% of the square with safe margins. Deep forest green, smoke-black steel, amber, and restrained sickly yellow; tactile painterly insects and strong silhouette grouping at 16, 32, and 48 pixels.\n\nReference roles, in exact supplied order:\n1. faerie_fire.webp - use its luminous green airborne-particle treatment and dark forest depth, but replace every butterfly-like shape with hostile hornets.\n2. entangling_roots.webp - match its earthy moss palette, organic texture, and premium full-bleed atmosphere.\n3. redharvest.webp - borrow its dense high-contrast focal composition and restrained red damage accents.\n\nNo butterflies, fireflies, friendly pollination scene, spider, single giant insect portrait, vines restraining the target, poison bottle, text, letters, numbers, border, frame, badge, UI chrome, watermark, transparent corner, empty black corner, flat vector, cartoon sticker, glossy mobile-game glyph, or modern graphic design.",
+      "sourceSha256": "063d80ca2afbcee1b6f8b46f4f4e102c368a8673752fbc801779b5acd6b7c011",
+      "sourceBytes": 2241734,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "ea25d7e0467a98c3254785806f6dbf5316555b9fb6c01a5bc67b21bab6afabfb",
+      "acceptedBytes": 5016,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "generic-rpg100",
+        "sourceFile": "skill 71.png",
+        "ownerOrLicense": "Levy Street account (callum@levystreet.com), as identified by the top-level CraftPix license notice",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "insect_swarm.webp",
+        "shippingSha256": "e9d312553ec0f9789f13a3fabf3606dab94b74d1d0d020488af50b9d3c41743f",
+        "shippingBytes": 4324,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "bear_charge",
@@ -156,15 +1129,135 @@
     },
     {
       "abilityId": "hibernate",
-      "sourcePack": "_Missing_Icons_Druid",
-      "sourceFile": "skill 7.png",
-      "output": "hibernate.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-druid-hunter/raw/hibernate.png",
+      "output": "hibernate.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-druid-hunter.json",
+      "intendedVisualSubject": "A sleeping tusked forest beast beneath a fern and moon-silver crescent with one fragile broken dream ring.",
+      "references": [
+        {
+          "order": 1,
+          "path": "public/ui/skills/druid/moonseed.webp",
+          "role": "use its quiet moonlit violet-blue glow and premium mystical depth"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/skills/druid/regrowth.webp",
+          "role": "borrow its gentle living-leaf treatment, organic highlights, and restorative Druid painterliness without implying healing"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/skills/druid/entangling_roots.webp",
+          "role": "match its earthen forest textures and full-bleed mossy atmosphere"
+        }
+      ],
+      "generationPrompt": "Create a new square 1:1 ability icon for World of ClaudeCraft's Druid Nature spell \"Slumber\" (runtime ID hibernate). After a short cast it incapacitates one target for eight seconds, and any damage wakes the target.\n\nPremium borderless opaque hand-painted dark-fantasy MMORPG action-bar art. Show one rugged wild boar or tusked forest beast curled and resting beneath a single drooping fern frond, eyes fully closed and posture peaceful but temporary. A thin moon-silver crescent and one delicate ring of pale green dream mist hover above the brow; the ring has one visible hairline break to suggest fragile, damage-breakable sleep. Beast and leaf canopy fill about 82% of the square with safe margins. Moonlit indigo, muted moss, earthen brown, and restrained silver-green highlights. Soft painterly atmosphere with a clear closed-eye silhouette at 16, 32, and 48 pixels.\n\nReference roles, in exact supplied order:\n1. moonseed.webp - use its quiet moonlit violet-blue glow and premium mystical depth.\n2. regrowth.webp - borrow its gentle living-leaf treatment, organic highlights, and restorative Druid painterliness without implying healing.\n3. entangling_roots.webp - match its earthen forest textures and full-bleed mossy atmosphere.\n\nNo letters or Z symbols, bed, pillow, clock, healing heart, medical cross, glowing wound closure, chained or rooted target, dead animal, human sleeper, text, numbers, border, frame, badge, UI chrome, watermark, transparent corner, empty black corner, flat vector, cartoon sticker, glossy mobile-game glyph, or modern graphic design.",
+      "sourceSha256": "62a86e1d90bf49fc9d713b5861e70625e057f748b1d0d0b049bd6dce4e3f912a",
+      "sourceBytes": 2480384,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "ddb85671e65882a4ffc9d25e9da05664b5873be5af18897e5ab0753977f67d7c",
+      "acceptedBytes": 4074,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "_Missing_Icons_Druid",
+        "sourceFile": "skill 7.png",
+        "ownerOrLicense": "Levy Street account (callum@levystreet.com), as identified by the top-level CraftPix license notice",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "hibernate.webp",
+        "shippingSha256": "cda94b782478dd836e5c2e671a98199807225f7effc68be57aeff4c5d6771302",
+        "shippingBytes": 6066,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "pounce",
-      "sourcePack": "_Missing_Icons_Druid",
-      "sourceFile": "skill 37.png",
-      "output": "pounce.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-druid-hunter/raw/pounce.png",
+      "output": "pounce.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-druid-hunter.json",
+      "intendedVisualSubject": "A gray wolf lunging from forest shadow into one enemy helm with a compact amber-white stun burst.",
+      "references": [
+        {
+          "order": 1,
+          "path": "public/ui/skills/druid/dash.webp",
+          "role": "use its readable canine motion, directional silhouette, and warm edge light"
+        },
+        {
+          "order": 2,
+          "path": "public/ui/skills/druid/primal_reflexes.webp",
+          "role": "match its stealthy moss-green Druid atmosphere, feral focus, and deep painterly shadows"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/skills/druid/redharvest.webp",
+          "role": "borrow its premium dark-fur texture and compact action-bar contrast, not its blood effect"
+        }
+      ],
+      "generationPrompt": "Create a new square 1:1 ability icon for World of ClaudeCraft's Druid Wolf-form skill \"Slinkstrike\" (runtime ID pounce). It can be used only from stealth, lunges at a nearby target, stuns for two seconds, and awards one combo point.\n\nPremium borderless opaque hand-painted dark-fantasy MMORPG action-bar art. Show a compact gray wolf exploding from a curtain of black-green woodland shadow at upper left, forelegs tucked and body stretched in one low pounce toward a single blackened-steel enemy helm at lower right. A tight pale-gold impact flare at the helm and one muted crescent shock ring communicate the stun. Wolf and target form one bold descending diagonal silhouette filling about 82% of the square with safe margins. Charcoal fur, moss-black shadow, moon-silver rim light, restrained amber impact. Painterly, tense, and instantly readable at 16, 32, and 48 pixels.\n\nReference roles, in exact supplied order:\n1. dash.webp - use its readable canine motion, directional silhouette, and warm edge light.\n2. primal_reflexes.webp - match its stealthy moss-green Druid atmosphere, feral focus, and deep painterly shadows.\n3. redharvest.webp - borrow its premium dark-fur texture and compact action-bar contrast, not its blood effect.\n\nNo cat, bear, stationary portrait, broad running trail, claw wounds, bite, blood or gore, cartoon stars, multiple enemies, text, letters, numbers, border, frame, badge, UI chrome, watermark, transparent corner, empty black corner, flat vector, cartoon sticker, glossy mobile-game glyph, or modern graphic design.",
+      "sourceSha256": "30a7cd19b5f4c6b96cc99abd1dee65be158186ec977e04abf12f8e3dcf676b6a",
+      "sourceBytes": 2367947,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "389bf19db7d26ae351b2d702fdb4672e8782da51410ea39ce3b36c408d963bf3",
+      "acceptedBytes": 4504,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "_Missing_Icons_Druid",
+        "sourceFile": "skill 37.png",
+        "ownerOrLicense": "Levy Street account (callum@levystreet.com), as identified by the top-level CraftPix license notice",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "pounce.webp",
+        "shippingSha256": "2786e05605f52987caf23a717a65eb7425abf86ae7f63981407f5a3402ac4c53",
+        "shippingBytes": 5882,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "berserk",
@@ -343,28 +1436,69 @@
     },
     {
       "abilityId": "skull_bash",
-      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
-      "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/druid/skull_bash.png",
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-druid-hunter/raw/skull_bash.png",
       "output": "skull_bash.webp",
       "source": "OpenAI built-in image generation",
       "owner": "World of ClaudeCraft",
       "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "intendedVisualSubject": "A bear skull driving through and cracking a spell rune.",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-druid-hunter.json",
+      "intendedVisualSubject": "A brown bear brow headbutting and collapsing one violet-blue enemy spell orb at the instant of interruption.",
       "references": [
         {
-          "path": "public/ui/skills/druid/bear_form.webp",
-          "role": "subject reference",
-          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
-          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          "order": 1,
+          "path": "public/ui/skills/druid/bear_charge.webp",
+          "role": "use its believable attacking-bear anatomy, fur, and forward momentum"
         },
         {
-          "path": "public/ui/skills/druid/faerie_fire.webp",
-          "role": "composition reference",
-          "provenance": "CraftPix Premium art licensed to Levy Street for this project",
-          "license": "CraftPix premium royalty-free commercial license, non-transferable"
+          "order": 2,
+          "path": "public/ui/skills/druid/marrowbreak.webp",
+          "role": "match its close-cropped physical impact, material depth, and dark-fantasy contrast"
+        },
+        {
+          "order": 3,
+          "path": "public/ui/skills/druid/moonseed.webp",
+          "role": "use its premium violet-blue arcane glow and spell-particle treatment only for the interrupted orb"
         }
       ],
-      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for druid\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Headbutt (skull_bash)\nCanonical mechanic: Headbutt interrupts a target within 8 yd and locks that spell school for 4 sec; 15 sec cooldown.\nSubject: A bear skull driving through and cracking a spell rune.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+      "generationPrompt": "Create a new square 1:1 ability icon for World of ClaudeCraft's Druid talent \"Headbutt\" (runtime ID skull_bash). In Bruin Form it spends rage to interrupt a nearby enemy spell and lock that spell school for four seconds. Despite the legacy runtime ID, the live skill is a bear headbutt, not a skull attack.\n\nPremium borderless opaque hand-painted dark-fantasy MMORPG action-bar art. Show a brown bear's heavy brow and forehead lunging from lower left into one luminous violet-blue enemy spell orb at upper right. The orb is visibly collapsing and cracking at the instant of impact, its concentric spell filaments broken into a few dim shards; a tight amber-white collision flare marks the interrupt. Bear head and broken spell orb form one bold diagonal silhouette occupying about 84% of the square with safe margins. Deep moss-black forest atmosphere, umber fur, restrained violet magic, and amber impact light. Strong readable shapes at 16, 32, and 48 pixels.\n\nReference roles, in exact supplied order:\n1. bear_charge.webp - use its believable attacking-bear anatomy, fur, and forward momentum.\n2. marrowbreak.webp - match its close-cropped physical impact, material depth, and dark-fantasy contrast.\n3. moonseed.webp - use its premium violet-blue arcane glow and spell-particle treatment only for the interrupted orb.\n\nNo animal or human skull, bone, handheld weapon, paw strike, intact magic shield, readable rune, text, letters, numbers, border, frame, badge, UI chrome, watermark, transparent corner, empty black corner, flat vector, cartoon sticker, glossy mobile-game glyph, or modern graphic design.",
+      "sourceSha256": "5b69216f1321eba26f5247fa0cde7abcffbf01a51de4a0286e84496a63e7f1bf",
+      "sourceBytes": 2638354,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "31df591f21d194848a9db722596a7505f5ea5f5c2dd0d0385b13839f0f515397",
+      "acceptedBytes": 4990,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+        "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/druid/skull_bash.png",
+        "ownerOrLicense": "World of ClaudeCraft",
+        "inheritedClassLicense": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+        "output": "skull_bash.webp",
+        "shippingSha256": "bbd01ec9d5d00685489657922706a2cbd428f4e3cbffbabc4031c79f508e0859",
+        "shippingBytes": 5904,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "swiftmend",
@@ -593,5 +1727,5 @@
     }
   ],
   "deferredStayProcedural": {},
-  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 entries are project-generated and explicitly override it."
+  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 and woc_openai_release_v039_icon_art_second_pass_2026_08_16 entries are project-generated and explicitly override it."
 }

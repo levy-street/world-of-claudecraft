@@ -431,12 +431,17 @@ describe('sustained parity, entire fight (Monte Carlo follow-up 2026-07-24)', ()
   //
   // Sweep on this tree, talented fire vs talented frost mean DPS over the pool:
   // The exact sweep values are recorded by the reporting test below. Both
-  // durations must clear parity and remain below the 1.25 ceiling. Individual
-  // seeds can sit below parity and stay in: the assertion is a claim about the
-  // mean, and dropping a pool's unlucky members would be seed-shopping.
-  // Seeds 3 and 1 have historically been those low-side members and stay in,
-  // just as tests/chronomancy_balance_targets.test.ts keeps its own sub-target seed.
-  const SUSTAINED_SEEDS = Array.from({ length: 10 }, (_, i) => i + 1);
+  // durations must clear parity and remain below the 1.25 ceiling. Widened
+  // 10 -> 40 when the castle world content forked the shared stream: a
+  // first-ten mean can land under parity on draw luck while the estimator
+  // converges above it as the pool grows, the same too-small-to-decide-on-luck
+  // failure that took the pool from three to five to ten. Individual seeds
+  // still sit BELOW parity on their own and stay in: the assertion is a claim
+  // about the MEAN, and dropping a pool's unlucky members is the seed-shopping
+  // a rule-defined pool exists to prevent
+  // (tests/chronomancy_balance_targets.test.ts keeps its own sub-target seed
+  // for the same reason).
+  const SUSTAINED_SEEDS = Array.from({ length: 40 }, (_, i) => i + 1);
   const SUSTAINED_CEILING = 1.25; // x talented frost, per duration
   // Owner ruling 2026-07-25: frost is the PvP-leaning spec, so fire must
   // NEVER fall below it in PvE damage, at any fight length. The floor is

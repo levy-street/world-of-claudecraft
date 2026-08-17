@@ -5566,6 +5566,20 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "feat": false,
     "rewardTitle": "Light of the Sanctum",
     "crest": "/ui/deeds/col_reliquary_illum_gravewyrm_heroic.webp"
+  },
+  {
+    "id": "exp_the_last_keep",
+    "name": "The Quiet Halls",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_dawnhold_castle",
+    "name": "An Open Door in the Garden",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
   }
 ];
 

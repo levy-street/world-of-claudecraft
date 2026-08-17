@@ -846,6 +846,12 @@
     height: 44%;
     color: #ffdf9c;
   }
+  /* Vale Cup remaps the fixed primary seat to the first sport move. The shared
+     action-bar painter marks that state as an ability, so the painted move can
+     replace the hydrated Attack sword instead of stacking underneath it. */
+  body.mobile-touch #mobile-action-attack.ability .ui-icon {
+    display: none;
+  }
   body.mobile-touch #mobile-action-ring button .cd-overlay {
     position: absolute;
     inset: 0;
@@ -6237,5 +6243,68 @@
   body.mobile-touch #bg-proposal-popup .btn {
     min-height: 40px;
     box-sizing: border-box;
+  }
+
+  /* Painted Delve affixes are focusable tooltip targets. Keep the artwork and
+     its keyboard/touch affordance on the same 40px box instead of leaving a
+     phone player to hit the desktop 18px chip. */
+  body.mobile-touch #delve-tracker .dt-affix-icon {
+    box-sizing: border-box;
+    width: 40px;
+    height: 40px;
+  }
+
+  /* #ui is zoomed by --ui-scale, so fixed viewport offsets must be converted
+     back into its logical coordinate space. Top anchoring keeps the augment
+     offer on-screen in short phone landscapes; the former 200px bottom seat
+     pushed the cards above an 844x390 viewport at larger UI scales. */
+  body.mobile-touch #fiesta-augments {
+    top: calc(max(8px, env(safe-area-inset-top)) / var(--ui-scale, 1));
+    bottom: auto;
+    max-width: calc(var(--app-vw) / var(--ui-scale, 1) - 16px);
+    max-height: calc(
+      var(--app-vh) /
+      var(--ui-scale, 1) -
+      (max(16px, env(safe-area-inset-top) + env(safe-area-inset-bottom)) / var(--ui-scale, 1))
+    );
+    overflow-y: auto;
+  }
+  body.mobile-touch #fiesta-augments .fa-cards {
+    box-sizing: border-box;
+    max-width: 100%;
+    overflow-x: auto;
+    padding: 2px 4px 6px;
+    scroll-snap-type: x proximity;
+  }
+  body.mobile-touch #fiesta-augments .fa-card {
+    flex: 0 0 150px;
+    scroll-snap-align: center;
+  }
+  @media (max-height: 480px) and (orientation: landscape) {
+    body.mobile-touch #fiesta-augments {
+      gap: 4px;
+    }
+    body.mobile-touch #fiesta-augments .fa-cards {
+      gap: 6px;
+    }
+    body.mobile-touch #fiesta-augments .fa-card {
+      min-height: 0;
+      padding: 8px;
+      gap: 4px;
+    }
+    body.mobile-touch #fiesta-augments .fa-icon {
+      width: 36px;
+      height: 36px;
+    }
+    body.mobile-touch #fiesta-augments .fa-name {
+      font-size: 15px;
+    }
+    body.mobile-touch #fiesta-augments .fa-desc {
+      font-size: 11.5px;
+      line-height: 1.22;
+    }
+    body.mobile-touch #fiesta-augments .fa-cat {
+      font-size: 9px;
+    }
   }
 }

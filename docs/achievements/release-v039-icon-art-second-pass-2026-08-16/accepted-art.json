@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "release-v039-icon-art-second-pass-2026-08-16",
+    "acceptedDate": "2026-08-16",
+    "baseRelease": "release/v0.39.0",
+    "baseCommit": "d2d1a8ad5c11",
+    "rasterGenerator": "OpenAI built-in image generation",
+    "owner": "World of ClaudeCraft",
+    "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
+  },
+  "scope": {
+    "acceptedPaintings": 223,
+    "newPaintedIdentities": 165,
+    "legacySkillReplacements": 58,
+    "families": {
+      "runtimeAuras": 128,
+      "delveAffixes": 6,
+      "fiesta": 24,
+      "currency": 6,
+      "reliquary": 1,
+      "legacySkills": 58
+    }
+  },
+  "generation": {
+    "builtInImagegenCalls": 224,
+    "acceptedPaintings": 223,
+    "acceptedFirstOutputs": 222,
+    "rejectedOutputs": 1,
+    "retriedAssets": ["dismiss_pet"],
+    "review": "Every raster was reviewed at its native 128px size and relevant runtime sizes down to 13px or 16px, with grayscale and circular-crop review where the runtime surface requires it."
+  },
+  "acceptedRecords": [
+    {
+      "family": "runtime-auras",
+      "acceptedCount": 82,
+      "path": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-aura-art.json",
+      "sha256": "bdf2aeaf3db9c63f0952f55fbcde2458d9c0706aa9f08cf9f26ab4eff9ec83fe"
+    },
+    {
+      "family": "shared-elixir-aura",
+      "acceptedCount": 1,
+      "path": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-elixir-aura-art.json",
+      "sha256": "28c725f7828c607b613d7fea47b32a016aff17d0d1f653cfb77fcd51db8233e9"
+    },
+    {
+      "family": "mob-aura-families",
+      "acceptedCount": 44,
+      "path": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-mob-aura-art.json",
+      "sha256": "db55c232d88c6f0b4dc9bdac72d0b497166f1f5ec8455db87aace35b80a428c1"
+    },
+    {
+      "family": "shared-fear-aura",
+      "acceptedCount": 1,
+      "path": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-fear-aura-art.json",
+      "sha256": "230a8deef4869b88061f12bccdb75bd1bc8b480a14ccc3bbfb5d178103a3c0da"
+    },
+    {
+      "family": "currency",
+      "acceptedCount": 6,
+      "path": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-currency-art.json",
+      "sha256": "d71254050852510a7d1eb374e6693d360291bc5db261a55e146be67d9d7a3cb4"
+    },
+    {
+      "family": "delve-affixes",
+      "acceptedCount": 6,
+      "path": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-delve-affix-art.json",
+      "sha256": "b89b9937aff53fc43e60750c9b658f465c09bc61f65b2f458d854cd4e707a6cf"
+    },
+    {
+      "family": "legacy-druid-hunter-skills",
+      "acceptedCount": 22,
+      "path": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-druid-hunter.json",
+      "sha256": "94edf6a115a79391aa36e89077d86823f01de135e9a8bff4aac16e97729689ee"
+    },
+    {
+      "family": "legacy-shaman-rogue-priest-skills",
+      "acceptedCount": 15,
+      "path": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-shaman-rogue-priest.json",
+      "sha256": "b8f4f855109fd7e00429c7466957754b3e8b3b402f55925c10074775b6fba184"
+    },
+    {
+      "family": "legacy-warrior-warlock-mage-skills",
+      "acceptedCount": 21,
+      "path": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-warrior-warlock-mage.json",
+      "sha256": "475d4cd186299792b2508ffe8b120eb0902638a8632390945ea7aa8d3c079f13"
+    }
+  ],
+  "shippingCatalogs": [
+    {
+      "family": "auras",
+      "assetCount": 129,
+      "secondPassAssetCount": 128,
+      "path": "public/ui/auras/mapping.json",
+      "sha256": "38d8f41e4b8f6194d827d21ffd6257738352a06fc97f959de41d213b8243313a"
+    },
+    {
+      "family": "currency",
+      "assetCount": 6,
+      "secondPassAssetCount": 6,
+      "path": "public/ui/currency/mapping.json",
+      "sha256": "186a8e4363f3d4246015ddb1538ec77d4edef08dcdd53846bc18d4208065e8b7"
+    },
+    {
+      "family": "delve-affixes",
+      "assetCount": 6,
+      "secondPassAssetCount": 6,
+      "path": "public/ui/delve-affixes/mapping.json",
+      "sha256": "94b581d5e2611b80fd8523e733a13e81a7ceed3ccb8780d41fcdc6724dc905a0"
+    },
+    {
+      "family": "fiesta",
+      "assetCount": 24,
+      "secondPassAssetCount": 24,
+      "path": "public/ui/fiesta/mapping.json",
+      "sha256": "8134adaa29ba4671315549eb36258ccdd4debfad8900249b5a9e924933301df7"
+    },
+    {
+      "family": "reliquary",
+      "assetCount": 1,
+      "secondPassAssetCount": 1,
+      "path": "public/ui/reliquary/mapping.json",
+      "sha256": "743b622fa332470580ca5fffb713e9c30f80b03a43f6e157f94fe73deb47d9b3"
+    }
+  ],
+  "runtimeClosure": {
+    "abilities": {
+      "live": 410,
+      "painted": 410
+    },
+    "hotbarItems": {
+      "live": 72,
+      "painted": 72
+    },
+    "fixedActions": {
+      "attack": 1,
+      "petCommands": 8,
+      "petSpecials": 2,
+      "painted": 11
+    },
+    "mobAuraRouting": {
+      "paintedFamilies": 44,
+      "exactRuntimeIds": 89,
+      "liveCarrierRows": 108
+    },
+    "fiesta": {
+      "augments": 20,
+      "powerups": 4,
+      "painted": 24
+    },
+    "rollableDelveAffixes": {
+      "live": 6,
+      "painted": 6
+    },
+    "remainingExactLiveSemanticRasterGaps": 0
+  }
+}

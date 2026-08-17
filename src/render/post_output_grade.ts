@@ -47,13 +47,32 @@ export const OUTPUT_GRADE_FRAGMENT_SHADER = /* glsl */ `
     return vec3(rg, b);
   }
 
+  // A stray NaN fragment in the HalfFloat beauty target poisons the whole frame:
+  // the bloom high-pass reads the beauty and its Gaussian blur smears the NaN
+  // across every mip, so OutputGradePass adds a frame-wide NaN and the tonemap
+  // maps it to black. NaN survives only in the float composer targets (the
+  // direct-to-canvas UNSIGNED_BYTE tiers clamp it away), which is why low/medium
+  // are fine while the composer tiers go black. The IBL / PBR shader path emits
+  // those NaNs on some drivers (observed on ANGLE's OpenGL backend with NVIDIA on
+  // Linux). Every NaN comparison is false, so the (x < 0.0 || x >= 0.0) test
+  // keeps finite and infinite values and rewrites only NaN to zero. This must
+  // stay on the beauty AND the bloom read, since the blur already spread the NaN.
+  vec3 sanitizeFinite(vec3 v) {
+    return vec3(
+      (v.x < 0.0 || v.x >= 0.0) ? v.x : 0.0,
+      (v.y < 0.0 || v.y >= 0.0) ? v.y : 0.0,
+      (v.z < 0.0 || v.z >= 0.0) ? v.z : 0.0
+    );
+  }
+
   void main() {
     vec2 inputUv = min(vUv * uInputUvRect.xy, uInputUvRect.zw);
     vec4 outputColor = texture(tDiffuse, inputUv);
+    outputColor.rgb = sanitizeFinite(outputColor.rgb);
 
     #ifdef BLOOM_PREPARED
       vec4 bloom = texture(tBloom, inputUv);
-      outputColor.rgb = quantizeHalf(outputColor.rgb + bloom.rgb * bloom.a);
+      outputColor.rgb = quantizeHalf(outputColor.rgb + sanitizeFinite(bloom.rgb * bloom.a));
     #endif
 
     #ifdef LINEAR_TONE_MAPPING

@@ -259,6 +259,34 @@ describe('Wildfang engine', () => {
     expect(player.auras.some((aura) => aura.id === OLD_BLOOD_ID)).toBe(false);
   });
 
+  it('casts rank 1 Redharvest through the transformed button at level 8', () => {
+    // Redharvest now ranks 1/2/3 at levels 5/10/16 and Gorebite learns at 8,
+    // so a level-8 feral is the first with the transforming button. The
+    // transform resolves the actor-level rank: rank 1 bites for 35 plus 20 per
+    // combo and refunds 15, so the cast nets minus 20 energy (35 cost, 15 back).
+    const sim = new Sim({ seed: 29, playerClass: 'druid', autoEquip: true });
+    sim.setPlayerLevel(8);
+    expect(sim.applyTalents({ spec: 'feral', rows: {} })).toBe(true);
+    const player = sim.player;
+    const mob = targetMob(sim);
+    const engineCtx = ctx(sim);
+    player.auras.push(formAura(player, 'form_cat'));
+    druidEngineOnLandedStrike(engineCtx, player, 'claw');
+    druidEngineOnLandedStrike(engineCtx, player, 'rake');
+    druidEngineOnLandedStrike(engineCtx, player, 'claw');
+    expect(stacks(player, OLD_BLOOD_ID)).toBe(3);
+    const resolvedRank = sim.resolvedAbility('ferocious_bite');
+    expect(resolvedRank?.def.id).toBe('redharvest');
+    expect(resolvedRank?.rank).toBe(1);
+
+    player.comboPoints = 0;
+    player.resource = 50;
+    sim.castAbility('ferocious_bite');
+    expect(mob.hp).toBeLessThan(mob.maxHp);
+    expect(player.resource).toBe(30);
+    expect(player.auras.some((aura) => aura.id === OLD_BLOOD_ID)).toBe(false);
+  });
+
   it('resolves offensive Marrowbreak through the Bruin button with mastery and snap threat', () => {
     const { sim, player } = rig('feral');
     const mob = targetMob(sim);

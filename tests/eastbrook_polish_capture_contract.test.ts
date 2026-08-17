@@ -181,8 +181,11 @@ interface AttributionTargetFixture {
 // Re-minted for the review fixes on this branch (Soul Rend warms every rig a
 // live body can take, plus the lazy form-visual fold): renderer.ts moves
 // again, so the composite follows its bytes. No capture was retaken.
+// Re-minted for the r185 frozen-camera aim fix: updateCamera now aims through
+// lookAtFrozen, so renderer.ts moves and the composite follows its bytes. No
+// capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'f138414dd6a0a218a37a6c31c134c0d8c389cd523c91a05f3fa4e2251d7a8ede';
+  '63eae2164f990137dccffd0df83eb3c048a1c8927d125501b717ea3b27b39495';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

@@ -1,5 +1,6 @@
 import { borderAccent } from '../ui/deed_border_view';
 import { TextSpriteCache, type TextSpriteStyle } from '../ui/text_sprite_cache';
+import { drawNameplateLootIcon } from './nameplate_loot_icon';
 
 export type NameplateFrame = '' | 'elite' | 'boss';
 export type NameplateMarkerTone = 'none' | 'quest' | 'active' | 'loot' | 'repeat' | 'cooldown';
@@ -174,12 +175,6 @@ const MARKER_STYLE: TextSpriteStyle = {
   stroke: '#000',
   lineWidth: 2,
 };
-const LOOT_STYLE: TextSpriteStyle = {
-  font: `700 14px ${TITLE_FONT}`,
-  fill: '#f2c84b',
-  stroke: '#000',
-  lineWidth: 2,
-};
 const CAST_STYLE: TextSpriteStyle = {
   font: '700 9px Arial, sans-serif',
   fill: '#fff',
@@ -326,7 +321,6 @@ export class NameplateCanvasSurface {
   private readonly guildStyle: TextSpriteStyle = { ...GUILD_STYLE };
   private readonly targetGuildStyle: TextSpriteStyle = { ...TARGET_GUILD_STYLE };
   private readonly markerStyle: TextSpriteStyle = { ...MARKER_STYLE };
-  private readonly lootStyle: TextSpriteStyle = { ...LOOT_STYLE };
   private readonly castStyle: TextSpriteStyle = { ...CAST_STYLE };
   private readonly emoteStyle: TextSpriteStyle = { ...EMOTE_STYLE };
   private width = 0;
@@ -428,42 +422,53 @@ export class NameplateCanvasSurface {
     y -= rowHeight;
     y -= NAMEPLATE_MARKER_ROW_HEIGHT;
     if (state.marker) {
-      const style = state.markerTone === 'loot' ? this.lootStyle : this.markerStyle;
-      // The glyph channel's cross-surface color contract (pinned by
-      // quest_marker_styles): gold for the first-offer '!' and ready '?',
-      // gray for the in-progress '?', and the rare-item blue for the
-      // repeatable arms, with the cooldown mark dimmed at the shared 0.55.
-      this.configureTextStyle(
-        style,
-        state.markerTone === 'active'
-          ? '#b9b9b9'
-          : state.markerTone === 'repeat' || state.markerTone === 'cooldown'
-            ? '#0070dd'
-            : '#f2c84b',
-      );
-      const dimmed = state.markerTone === 'cooldown';
-      if (dimmed) ctx.globalAlpha = state.opacity * 0.55;
-      this.text.draw(ctx, state.marker, screenX, y + 21, style);
-      // Forced colors collapses gold and blue to one CanvasText, so the two
-      // offers would read identically (the failure class the DOM plates'
-      // forced-colors rule closed). Underline the repeat mark as the
-      // redundant non-color cue, dotted for the cooldown mark so the dimmed
-      // not-yet state stays distinguishable too.
-      if (
-        this.forcedColorsActive() &&
-        (state.markerTone === 'repeat' || state.markerTone === 'cooldown')
-      ) {
-        const half = this.text.measureAdvance(state.marker, style) / 2;
-        ctx.beginPath();
-        if (dimmed) ctx.setLineDash([2, 2]);
-        ctx.moveTo(screenX - half, y + 24);
-        ctx.lineTo(screenX + half, y + 24);
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = 'CanvasText';
-        ctx.stroke();
-        if (dimmed) ctx.setLineDash([]);
+      if (state.markerTone === 'loot') {
+        const forced = this.forcedColorsActive();
+        drawNameplateLootIcon(
+          ctx,
+          screenX,
+          y + 14,
+          forced ? 'CanvasText' : '#f2c84b',
+          forced ? 'Canvas' : '#1b1205',
+        );
+      } else {
+        const style = this.markerStyle;
+        // The glyph channel's cross-surface color contract (pinned by
+        // quest_marker_styles): gold for the first-offer '!' and ready '?',
+        // gray for the in-progress '?', and the rare-item blue for the
+        // repeatable arms, with the cooldown mark dimmed at the shared 0.55.
+        this.configureTextStyle(
+          style,
+          state.markerTone === 'active'
+            ? '#b9b9b9'
+            : state.markerTone === 'repeat' || state.markerTone === 'cooldown'
+              ? '#0070dd'
+              : '#f2c84b',
+        );
+        const dimmed = state.markerTone === 'cooldown';
+        if (dimmed) ctx.globalAlpha = state.opacity * 0.55;
+        this.text.draw(ctx, state.marker, screenX, y + 21, style);
+        // Forced colors collapses gold and blue to one CanvasText, so the two
+        // offers would read identically (the failure class the DOM plates'
+        // forced-colors rule closed). Underline the repeat mark as the
+        // redundant non-color cue, dotted for the cooldown mark so the dimmed
+        // not-yet state stays distinguishable too.
+        if (
+          this.forcedColorsActive() &&
+          (state.markerTone === 'repeat' || state.markerTone === 'cooldown')
+        ) {
+          const half = this.text.measureAdvance(state.marker, style) / 2;
+          ctx.beginPath();
+          if (dimmed) ctx.setLineDash([2, 2]);
+          ctx.moveTo(screenX - half, y + 24);
+          ctx.lineTo(screenX + half, y + 24);
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = 'CanvasText';
+          ctx.stroke();
+          if (dimmed) ctx.setLineDash([]);
+        }
+        if (dimmed) ctx.globalAlpha = state.opacity;
       }
-      if (dimmed) ctx.globalAlpha = state.opacity;
     }
     if (state.comboPips > 0) {
       y -= 9;

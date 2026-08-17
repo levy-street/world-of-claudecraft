@@ -83,10 +83,13 @@ describe('Bruin Form tank kit', () => {
         if (event.type === 'heal2' && event.targetId === druid.id) healed += event.amount;
       }
     }
-    // Authored as 180 over 10 sec; healing modifiers may lift it, but it must
-    // land in the window rather than arriving as one lump or not at all.
-    expect(healed).toBeGreaterThanOrEqual(180);
-    expect(healed).toBeLessThanOrEqual(320);
+    // Authored as 40% of maximum health over 10 sec (5 ticks): derive the
+    // floor from THIS bear's pool so the pin proves the percentage, and give
+    // healing modifiers bounded headroom above it. It must land across the
+    // window rather than arriving as one lump or not at all.
+    const perTick = Math.max(1, Math.round(Math.round(druid.maxHp * 0.4) / 5));
+    expect(healed).toBeGreaterThanOrEqual(perTick * 5);
+    expect(healed).toBeLessThanOrEqual(Math.round(perTick * 5 * 1.4));
     expect(druid.hp).toBeLessThanOrEqual(druid.maxHp);
     // The cooldown is real: a second cast inside the window is refused.
     druid.resource = druid.maxResource;
