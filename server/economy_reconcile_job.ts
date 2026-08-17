@@ -18,6 +18,13 @@
 // The whole file is deps-injected and clock-injected: every read, the online
 // set, the alert write, and the cursor arrive through `EconomyReconcileDeps`,
 // so the pass unit-tests against a fake evidence bag with no `pg` and no world.
+//
+// The advisory lock/unlock pair is the only raw SQL in this module, the
+// retention_sweep.ts precedent exactly: the lock is not a data read, it rides
+// the caller-supplied client because a session lock belongs to one backend
+// connection, and hiding it behind the deps bag would bury the one statement
+// whose CONNECTION identity is the point. Every other statement lives in
+// economy_reconcile_db.ts (server/CLAUDE.md: logic modules carry zero SQL).
 
 import {
   checkPersistedBalance,
