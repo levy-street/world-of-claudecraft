@@ -4094,6 +4094,12 @@ export const id_ID: EnTranslations = {
         "fenBlurb": "Melewati mahkota musim gugur, sebuah rawa cerah berisi pohon willow dan air yang tenang, serta sebuah kota di balik parit.",
         "farshoreName": "Pesisir Jauh",
         "farshoreBlurb": "Sebuah pulau di seberang gosong pasir, tempat langit terkoyak di atas Riftfields dan Gullhaven membunyikan loncengnya setiap kali sebuah celah terbuka.",
+        "rotmireName": "The Rotmire Expanse",
+        "rotmireBlurb": "A drowned grave-country where carrion flowers feed on an army of empty dead.",
+        "marchName": "The Petrified March",
+        "marchBlurb": "A royal road held by stone soldiers who have begun remembering their final command.",
+        "crownrootName": "The Crownroot Wilds",
+        "crownrootBlurb": "A frozen forest whose roots all descend toward the sealed royal Sepulcher.",
         "nightName": "Kuntum Malam",
         "nightBlurb": "Sebuah negeri tengah malam berbintang tempat bunga-bunga menerangi jalan setapak dan Moonrest menjaga kesiagaannya.",
         "hauntName": "Hutan Arwah",
@@ -4803,6 +4809,18 @@ export const id_ID: EnTranslations = {
       "none": "Tak ada kelas yang cocok dengan semua saringan. Bersihkan satu untuk melihat lebih banyak."
     },
     "abilityHook": {
+      "pestilent_bolt": "Hurls a reliable Shadow bolt while your afflictions wear the enemy down.",
+      "the_wasting": "Afflicts one enemy with a long-lasting Shadow disease.",
+      "blood_tithe": "Trades health for mana when a long fight drains your reserves.",
+      "gravecaller_bone_coat": "Wraps you in bone to blunt incoming damage.",
+      "plague_wind": "Spreads a damaging plague through enemies around you.",
+      "deaths_bargain": "Calls on forbidden power when survival matters more than safety.",
+      "briar_skin": "Keeps a permanent thorn shield ready to punish every attacker.",
+      "withering_presence": "Weakens nearby enemies simply by walking among them.",
+      "barbed_aegis": "Raises a stronger damage shield before entering a dangerous pack.",
+      "spore_hex": "Afflicts one enemy with lingering Nature damage.",
+      "vindictive_growth": "Turns sustained enemy pressure into still more reflected damage.",
+      "walking_calamity": "Surrounds your path with the strongest thorns in your kit.",
       "evil_eye": "Menandai musuh yang tindakan dan penderitaannya akan mengisi Kecaman-mu.",
       "heroic_strike": "Mengantrekan ayunan lebih berat yang menghabiskan amarah pada pukulanmu berikutnya.",
       "revenge": "Menyapu musuh di depanmu dan dapat menjadi gratis setelah menghindar atau menangkis.",
@@ -5054,6 +5072,18 @@ export const id_ID: EnTranslations = {
       "farshoreGreeting": "Kau datang lewat Ferrywalk? Berarti kau yang pertama dalam seminggu, dan Sang Penjaga akan ingin memeriksamu.",
       "farshoreGreeter": "Penjaga Lonceng Tam, Dermaga",
       "farshorePlaceNotes": "Gullhaven adalah satu-satunya kota sekaligus benteng pertahanan pulau ini. Dermaga adalah tempat Ferrywalk mencapai daratan, dengan sebuah lonceng waspada berdiri di atas tanjungnya; Padang Rumput Jaga menguasai dataran tinggi di tenggara kota, tempat seorang pengawas rift mendengarkan celah berikutnya; Tebing Terbelah retak terbuka di ujung selatan pulau; dan Ladang Rift adalah barisan gandum yang porak-poranda di timur Gullhaven, masih dipenuhi makhluk yang datang lewat celah di sana.",
+      "rotmireBlurb": "The old north road sinks into a grave-country where carrion flowers bloom from emptied dead.",
+      "rotmireGreeting": "The graves are empty, traveler. Help me learn what the bloom has taken from them.",
+      "rotmireGreeter": "Mortician Ella, Wakefort",
+      "rotmirePlaceNotes": "Wakefort keeps the last dry road. The Carrion Gardens spread west through broken graves, while Sporefall Basin gathers the largest blooms beneath its poisoned mist.",
+      "marchBlurb": "A petrified royal army stands mid-charge along the road, and every stone face has begun listening.",
+      "marchGreeting": "The stone host remembers its final command. We must reach the Crownroot before it marches.",
+      "marchGreeter": "Captain Orren, Cairnwall",
+      "marchPlaceNotes": "Cairnwall watches the southern pass. The Stone Host blocks the old road, and the Rootscar Front marks where the buried forest first broke through the royal formation.",
+      "crownrootBlurb": "Frost grips a forest growing from a buried crown, and every root points toward its sealed Sepulcher.",
+      "crownrootGreeting": "Every living root is pointing toward the Sepulcher. Walk carefully, traveler.",
+      "crownrootGreeter": "Sister Briar, Lastbough",
+      "crownrootPlaceNotes": "Lastbough is the final refuge. The Ashen Canopy knots over the eastern wilds, and the Sepulcher Approach climbs between frozen roots toward the royal tomb.",
       "travelTitle": "Berkeliling",
       "travelBody": "Setiap jalan di realm ini ditempuh dengan berjalan kaki atau berkuda. Tidak ada jalur terbang, tidak ada taksi, dan tidak ada jaringan teleportasi: peta ini adalah satu daratan menyambung, dan setiap sambungannya adalah sesuatu yang bisa kamu injak. Punggung bukit memisahkan satu realm dari yang berikutnya, dan di tempat dua realm berbagi sebuah punggung bukit, jalan itu mendaki lewat sebuah celah gunung. Namun tidak setiap perbatasan bekerja seperti itu. Di utara, sebuah jalan layang panjang membawa jalan itu keluar melintasi air dari Ceruk Terselubung menuju negeri bersalju di seberangnya, dan di selatan sana sebuah gosong pasir alami yang tipis bernama Ferrywalk membentang ke timur dari pesisir Lembah menuju Dermaga di pulau Pesisir Jauh, yang sama sekali tak memiliki perbatasan darat. Dan hanya ada satu pintu sejati di seluruh dunia luar: sebuah selubung senja tinggi di Thornpeak yang terbuka menuju Ceruk Terselubung. Punggung bukit selatan sang Ceruk tertutup rapat tanpa celah yang menembusnya, sehingga selubung itulah caramu pertama kali masuk, dan ia menutup di belakangmu dalam perjalanan kembali.\n\nKe mana pun kamu tumbang, perjalanan kembali selalu singkat. Setiap zona menyimpan setidaknya satu kuburan dengan Sang Penjaga Pucat melayang di atas bebatuannya, dan roh yang dilepaskan bangkit di kuburan terdekat.\n\nPeta ini tidak berakhir pada dinding tak kasatmata. Daratan berakhir menjadi pantai dan tanjung, lalu menjadi laut lepas. Penyeberangan yang memang dimaksudkan dunia ini untuk kamu renangi, selat dan rawa di antara satu realm dengan yang berikutnya, tenang dan aman untuk diseberangi. Namun berenanglah menuju laut lepas dan jarak itu sendiri akan mendorongmu kembali: kamu diperingatkan, dan diperingatkan lagi, dan jika kamu terus berenang, laut akan menguras tenagamu hingga membunuhmu. Menyelam memiliki batasnya sendiri, karena napasmu habis di bawah permukaan, jadi naiklah untuk bernapas dan berbaliklah saat air itu menyuruhmu.",
       "mountsTitle": "Tunggangan",
@@ -5138,6 +5168,10 @@ export const id_ID: EnTranslations = {
       "templeBody": "Tempat pemujaan bermandi cahaya bulan yang tenggelam di bawah danau bercahaya tinggi di puncak gunung, dijangkau melalui sebuah gerbang cahaya dingin. Sebuah pemujaan yang tenggelam masih bernyanyi di bawah sana dalam jubah lapuk mereka, dan peringatan yang terukir di tepian mengatakan sesuatu di bawah hanya tertidur. Sebuah misteri yang berdiri sendiri, terpisah dari kisah utama, untuk mereka yang penasaran dan siap sedia.",
       "sanctumBody": "Jantung kelam Thornpeak, tempat pekerjaan panjang sang pemuja mencapai puncaknya yang mengerikan.",
       "wildheartBody": "Sebuah kaldera rimba yang basah oleh hujan tempat dua jalur perburuan yang ditinggikan mengelilingi cenote giok. Lintasi sarang-sarang binatang buas dan reruntuhan leluhur, lalu daki piramida ritual untuk melihat siapa yang menunggu di puncaknya.",
+      "rotchapelBody": "A plague chapel whose incense draws the dead back to their knees. Break the congregation before its abbot completes the final service.",
+      "ossuaryBody": "A burial hall beneath the petrified army, where the oldest officers still enforce commands carved into their bones.",
+      "crownrootBody": "The living heart beneath the frozen forest has become a royal prison. Cut through the heartwood and confront the power wrapped around its roots.",
+      "sepulcherBody": "The level-cap raid descends into the royal Sepulcher, where living crownshards defend the throne and ten players must break the Ashen Bloom at its source.",
       "raidName": "Raid akhir permainan",
       "raidBody": "Di balik pintu kerajaan yang tersegel menanti cobaan untuk sepuluh pemain: pertarungan berfase banyak dan sebuah kekuatan abadi yang harus dipadamkan bersama oleh seluruh raid. Raih jalanmu untuk masuk, lalu bawa sembilan kawan.",
       "heroicTitle": "Mode heroik",
@@ -7021,6 +7055,8 @@ export const id_ID: EnTranslations = {
     "mage": "Penyihir",
     "warlock": "Penyihir Iblis",
     "druid": "Druid",
+    "gravecaller": "Gravecaller",
+    "briar_warden": "Briar Warden",
     "warriorAria": "Kelas Prajurit",
     "paladinAria": "Kelas Paladin",
     "hunterAria": "Kelas Pemburu",
@@ -7029,7 +7065,9 @@ export const id_ID: EnTranslations = {
     "shamanAria": "Kelas Dukun",
     "mageAria": "Kelas Penyihir",
     "warlockAria": "Kelas Penyihir Iblis",
-    "druidAria": "Kelas Druid"
+    "druidAria": "Kelas Druid",
+    "gravecallerAria": "Gravecaller class",
+    "briar_wardenAria": "Briar Warden class"
   },
   "controls": {
     "title": "Panduan Kontrol",
@@ -7918,7 +7956,9 @@ export const id_ID: EnTranslations = {
       "shaman": "Penyembuh / DPS Jarak Dekat atau Jauh",
       "mage": "DPS Jarak Jauh",
       "warlock": "DPS Jarak Jauh",
-      "druid": "Tank / Penyembuh / DPS Jarak Dekat atau Jauh"
+      "druid": "Tank / Penyembuh / DPS Jarak Dekat atau Jauh",
+      "gravecaller": "Ranged DPS",
+      "briar_warden": "Tank / Healer / Ranged DPS"
     },
     "armor": {
       "chainLeatherCloth": "Zirah Rantai, Kulit, Kain",
@@ -7942,7 +7982,9 @@ export const id_ID: EnTranslations = {
       "shaman": "Dukun memerintah unsur-unsur alam, mengisi senjata dengan kekuatan, mengejutkan musuh dengan petir, dan memulihkan sekutu.",
       "mage": "Penyihir menundukkan kekuatan Api, Beku, dan Arkana untuk membinasakan musuh, memanggil air, dan membekukan ancaman di tempat.",
       "warlock": "Penyihir Iblis memanggil iblis, menebar kutukan dan sihir kerusakan berkelanjutan, serta menyedot nyawa musuh untuk bertahan.",
-      "druid": "Druid menyalurkan kekuatan alam, menyembuhkan luka, membelit musuh, dan berubah ke wujud hewan untuk bertahan atau menyerang."
+      "druid": "Druid menyalurkan kekuatan alam, menyembuhkan luka, membelit musuh, dan berubah ke wujud hewan untuk bertahan atau menyerang.",
+      "gravecaller": "Gravecallers spread disease, drain life, trade health for magic, and command death from a safe distance.",
+      "briar_warden": "Briar Wardens layer boons and curses, then destroy attackers with powerful retaliatory damage shields."
     },
     "aria": "Detail kelas untuk {className}: peran {role}. Statistik awal: Kekuatan {str}, Kegesitan {agi}, Stamina {sta}, Kecerdasan {int}, Semangat {spi}.",
     "statBarAria": "{stat}: {value} dari 25"
@@ -9148,6 +9190,110 @@ export const id_ID: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "pestilent_bolt": {
+        "name": "Pestilent Bolt",
+        "description": "Hurls diseased shadow for {damage} Shadow damage. Damage increases with Spell Power."
+      },
+      "blood_tithe": {
+        "name": "Blood Tithe",
+        "description": "Sacrifices 8% of your maximum health to restore 28 mana."
+      },
+      "the_wasting": {
+        "name": "The Wasting",
+        "description": "Afflicts the enemy for 48 Shadow damage over 18 sec in 6 ticks."
+      },
+      "grave_dread": {
+        "name": "Dread",
+        "description": "Leaves the enemy cowering for up to 8 sec. Damage breaks the effect."
+      },
+      "gravecaller_bone_coat": {
+        "name": "Bone Coat",
+        "description": "Absorbs damage equal to 20% of your maximum health for 12 sec."
+      },
+      "soul_siphon": {
+        "name": "Soul Siphon",
+        "description": "Drains 24 Shadow damage each second for 4 sec and restores health equal to the damage dealt."
+      },
+      "grave_chill": {
+        "name": "Grave Chill",
+        "description": "Deals {damage} Frost damage and slows movement by 50% for 8 sec."
+      },
+      "plague_wind": {
+        "name": "Plague Wind",
+        "description": "Blasts enemies within 8 yd for {damage} Shadow damage."
+      },
+      "deaths_bargain": {
+        "name": "Death's Bargain",
+        "description": "Reduces all damage you take by 40% for 10 sec."
+      },
+      "briar_skin": {
+        "name": "Briar Skin",
+        "description": "Covers the target in briars for 30 min. Each melee attacker takes {buff} Nature damage. The shield has no charges."
+      },
+      "withering_presence": {
+        "name": "Withering Presence",
+        "description": "Slows the attacks of enemies within 10 yd by 15% for 12 sec."
+      },
+      "barbed_aegis": {
+        "name": "Barbed Aegis",
+        "description": "For 12 sec, each melee attacker takes 42 Nature damage. The shield has no charges."
+      },
+      "spore_hex": {
+        "name": "Spore Hex",
+        "description": "Infects the enemy for 42 Nature damage over 12 sec in 4 ticks."
+      },
+      "ironbark_boon": {
+        "name": "Ironbark Boon",
+        "description": "Increases the armor of all party members by {buff}% for 30 min."
+      },
+      "pollen_cloud": {
+        "name": "Pollen Cloud",
+        "description": "Scours enemies within 10 yd for {damage} Nature damage."
+      },
+      "vindictive_growth": {
+        "name": "Vindictive Growth",
+        "description": "For 15 sec, melee attackers take 120 Nature damage and you take 20% less damage."
+      },
+      "walking_calamity": {
+        "name": "Walking Calamity",
+        "description": "For 20 sec, melee attackers take 240 Nature damage and you take 35% less damage."
+      },
+      "gravebreaker": {
+        "name": "Gravebreaker",
+        "description": "Smashes the ground, dealing {damage} Physical damage to enemies within 8 yd."
+      },
+      "last_light": {
+        "name": "Last Light",
+        "description": "Reduces all damage you take by 35% for 12 sec."
+      },
+      "blackfletch": {
+        "name": "Blackfletch",
+        "description": "Fires an ashen arrow for {damage} Physical damage."
+      },
+      "duskstep": {
+        "name": "Duskstep",
+        "description": "Strikes for 80% weapon damage plus {damage} Physical damage."
+      },
+      "memorial_grace": {
+        "name": "Memorial Grace",
+        "description": "Heals a friendly target for {damage}."
+      },
+      "ancestor_storm": {
+        "name": "Ancestor Storm",
+        "description": "Calls ancestral lightning for {damage} Nature damage to enemies within 10 yd."
+      },
+      "cinder_comet": {
+        "name": "Cinder Comet",
+        "description": "Calls down a comet for {damage} Fire damage to enemies within 8 yd of the target area."
+      },
+      "funeral_pyre": {
+        "name": "Funeral Pyre",
+        "description": "Burns the enemy for 240 Shadow damage over 12 sec in 4 ticks."
+      },
+      "crown_of_briars": {
+        "name": "Crown of Briars",
+        "description": "For 20 sec, each melee attacker that strikes the target takes 96 Nature damage."
+      },
       "sport_kick": {
         "name": "Tendang",
         "description": "Tendang bola menyusur tanah ke arah titik bidik."
@@ -13736,6 +13882,66 @@ export const id_ID: EnTranslations = {
       "wildheart_high_priest": {
         "name": "Zulgar, Suara Cekungan"
       },
+      "rotmire_husk": {
+        "name": "Rotmire Husk"
+      },
+      "carrion_bloom": {
+        "name": "Carrion Bloom"
+      },
+      "sporebound_brute": {
+        "name": "Sporebound Brute"
+      },
+      "mother_morva": {
+        "name": "Mother Morva"
+      },
+      "stone_legionary": {
+        "name": "Stone Legionary"
+      },
+      "crownless_knight": {
+        "name": "Crownless Knight"
+      },
+      "rootscar_widow": {
+        "name": "Rootscar Widow"
+      },
+      "marshal_veyr": {
+        "name": "Marshal Veyr"
+      },
+      "frostroot_stalker": {
+        "name": "Frostroot Stalker"
+      },
+      "ashen_dryad": {
+        "name": "Ashen Dryad"
+      },
+      "sepulcher_guardian": {
+        "name": "Sepulcher Guardian"
+      },
+      "the_hollow_crown": {
+        "name": "The Hollow Crown"
+      },
+      "rotchapel_cultist": {
+        "name": "Rotchapel Cultist"
+      },
+      "abbot_of_flies": {
+        "name": "Abbot of Flies"
+      },
+      "cairnwall_revenant": {
+        "name": "Cairnwall Revenant"
+      },
+      "general_silex": {
+        "name": "General Silex"
+      },
+      "crownroot_heartwood": {
+        "name": "Heartwood Horror"
+      },
+      "queen_under_roots": {
+        "name": "The Queen Under Roots"
+      },
+      "sepulcher_crownshard": {
+        "name": "Living Crownshard"
+      },
+      "king_in_ashes": {
+        "name": "The King in Ashes"
+      },
       "ironvein_foreman": {
         "name": "Mandor Ironvein"
       },
@@ -14298,6 +14504,21 @@ export const id_ID: EnTranslations = {
         "name": "Alkemis Verane",
         "title": "Master Apoteker",
         "greeting": "Ukur dua kali dan tuang sekali, {className}. Apoteker tidak mempunyai kesabaran terhadap reagen yang tumpah."
+      },
+      "mortician_ella": {
+        "name": "Mortician Ella",
+        "title": "Keeper of Wakefort",
+        "greeting": "The graves are empty, {className}. Help me learn what the bloom has taken from them."
+      },
+      "captain_orren": {
+        "name": "Captain Orren",
+        "title": "Cairnwall Commander",
+        "greeting": "The stone host remembers its last command. We must reach the Crownroot before it marches."
+      },
+      "sister_briar": {
+        "name": "Sister Briar",
+        "title": "Warden of Lastbough",
+        "greeting": "Every living root is pointing toward the Sepulcher. Walk carefully, {className}."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -16358,6 +16579,126 @@ export const id_ID: EnTranslations = {
           }
         }
       },
+      "q_ab_01_wakefort": {
+        "title": "Wake the Fort",
+        "text": "Defeat 8 Rotmire Husk.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Rotmire Husk slain"
+          }
+        }
+      },
+      "q_ab_02_carrion": {
+        "title": "The Carrion Gardens",
+        "text": "Defeat 8 Carrion Bloom.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Carrion Bloom slain"
+          }
+        }
+      },
+      "q_ab_03_sporefall": {
+        "title": "Sporefall",
+        "text": "Defeat 6 Sporebound Brute.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Sporebound Brute slain"
+          }
+        }
+      },
+      "q_ab_04_morva": {
+        "title": "Mother of the Bloom",
+        "text": "Defeat 1 Mother Morva.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Mother Morva slain"
+          }
+        }
+      },
+      "q_ab_05_cairnwall": {
+        "title": "The Silent March",
+        "text": "Defeat 8 Stone Legionary.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Stone Legionary slain"
+          }
+        }
+      },
+      "q_ab_06_stone_host": {
+        "title": "Crownless",
+        "text": "Defeat 8 Crownless Knight.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Crownless Knight slain"
+          }
+        }
+      },
+      "q_ab_07_rootscar": {
+        "title": "Webs in the Scar",
+        "text": "Defeat 8 Rootscar Widow.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Rootscar Widow slain"
+          }
+        }
+      },
+      "q_ab_08_veyr": {
+        "title": "The Last Marshal",
+        "text": "Defeat 1 Marshal Veyr.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Marshal Veyr slain"
+          }
+        }
+      },
+      "q_ab_09_lastbough": {
+        "title": "Under the Last Bough",
+        "text": "Defeat 8 Frostroot Stalker.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Frostroot Stalker slain"
+          }
+        }
+      },
+      "q_ab_10_canopy": {
+        "title": "Ash in the Canopy",
+        "text": "Defeat 8 Ashen Dryad.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Ashen Dryad slain"
+          }
+        }
+      },
+      "q_ab_11_guardians": {
+        "title": "The Sepulcher Guard",
+        "text": "Defeat 8 Sepulcher Guardian.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Sepulcher Guardian slain"
+          }
+        }
+      },
+      "q_ab_12_crown": {
+        "title": "Break the Hollow Crown",
+        "text": "Defeat 1 The Hollow Crown.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "The Hollow Crown slain"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "Paduan Suara Tenggelam",
         "text": "Para pengarung tak bergerak sendiri. Di antara mereka berjalan para Pemuja Tenggelam, sekte yang karam bersama kuil, masih dalam busana lapuk, masih menyanyikan doa dari batu karang tepi pantai. Bungkam delapan dari mereka, dan bawakan padaku enam persembahan yang mereka bawa. Aku ingin tahu apa yang hendak mereka berikan pada dewi mereka.",
@@ -16824,6 +17165,51 @@ export const id_ID: EnTranslations = {
             "label": "Ladang Rift"
           }
         }
+      },
+      "rotmire_expanse": {
+        "name": "The Rotmire Expanse",
+        "welcome": "The dead feed a bloom that should never have taken root. Wakefort holds the last dry road north.",
+        "pois": {
+          "0": {
+            "label": "Wakefort"
+          },
+          "1": {
+            "label": "The Carrion Gardens"
+          },
+          "2": {
+            "label": "Sporefall Basin"
+          }
+        }
+      },
+      "petrified_march": {
+        "name": "The Petrified March",
+        "welcome": "A royal army stands petrified mid-charge, and something beneath the road has begun calling their names.",
+        "pois": {
+          "0": {
+            "label": "Cairnwall"
+          },
+          "1": {
+            "label": "The Stone Host"
+          },
+          "2": {
+            "label": "Rootscar Front"
+          }
+        }
+      },
+      "crownroot_wilds": {
+        "name": "The Crownroot Wilds",
+        "welcome": "Frost grips a forest growing from a buried crown. Beyond Lastbough, every root points toward the Sepulcher.",
+        "pois": {
+          "0": {
+            "label": "Lastbough"
+          },
+          "1": {
+            "label": "The Ashen Canopy"
+          },
+          "2": {
+            "label": "Sepulcher Approach"
+          }
+        }
       }
     },
     "dungeons": {
@@ -16861,6 +17247,26 @@ export const id_ID: EnTranslations = {
         "name": "Benteng Terakhir",
         "enterText": "Kau melangkah masuk ke aula-aula dingin dan sunyi Last Keep.",
         "leaveText": "Kau menutup pintu benteng itu dan melangkah kembali ke angin Drakelands."
+      },
+      "rotchapel": {
+        "name": "Rotchapel",
+        "enterText": "Rotten incense hangs beneath the chapel vault.",
+        "leaveText": "You return to the Rotmire air."
+      },
+      "ossuary_of_the_march": {
+        "name": "Ossuary of the March",
+        "enterText": "Stone soldiers turn their heads toward the living.",
+        "leaveText": "You escape the silent formation."
+      },
+      "heart_of_crownroot": {
+        "name": "Heart of Crownroot",
+        "enterText": "The root-heart beats once beneath your feet.",
+        "leaveText": "You climb back into the frozen wilds."
+      },
+      "sepulcher_of_ashes": {
+        "name": "Sepulcher of Ashes",
+        "enterText": "The Hollow Crown closes around the raid.",
+        "leaveText": "The Sepulcher releases you."
       },
       "drowned_temple": {
         "name": "Kuil Tenggelam",

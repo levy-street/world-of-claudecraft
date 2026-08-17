@@ -311,11 +311,11 @@ const CHEST_FN_BY_DELVE: Record<string, { chest: ChestFn; floor: number }> = {
 
 describe('Reliquary Conqueror catalog structure', () => {
   it('ships Conquerors + Professions + Horizons (full three-shelf product)', () => {
-    expect(CONQUEROR_PAGES.length).toBe(27);
+    expect(CONQUEROR_PAGES.length).toBe(31);
     expect(PROFESSION_PAGES.length).toBe(3);
     expect(HORIZON_PAGES.length).toBe(5);
     // Literal: update when product adds a page.
-    expect(RELIQUARY_PAGES.length).toBe(35);
+    expect(RELIQUARY_PAGES.length).toBe(39);
     expect(
       RELIQUARY_PAGES.every(
         (p) => p.shelf === 'conquerors' || p.shelf === 'professions' || p.shelf === 'horizons',
@@ -362,7 +362,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // and the flag keeps each whole page out of owned AND total (the dedicated
     // vault and riftbound pins in this file and tests/reliquary_state.test.ts
     // hold both sides), so neither page moves these two literals.
-    expect(full).toEqual({ owned: 340, total: 340 });
+    // Ashen Bloom adds nine distinct completion relics across four instance pages.
+    expect(full).toEqual({ owned: 349, total: 349 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -373,7 +374,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // pair above, including the three release-merged daggers; marks are
     // character-scoped, so this trails the overview by the 29 account-scoped
     // weapon skins).
-    expect(character).toEqual({ owned: 311, total: 311 });
+    expect(character).toEqual({ owned: 320, total: 320 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -394,7 +395,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(375);
+    ).toBe(384);
     // Distinct mark ids: the 10 shipped before Phase 21 plus the 19
     // rare-slain proofs of conquerors_rares_of_the_realm.
     expect(
@@ -609,7 +610,7 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // ids, plus the three daggers the v0.36.0 release merge added: 240 (the
     // sixth figure of the ledger row's "all pinned" claim; the other five are
     // the page/overview/character/slot/mark literals nearby).
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(240);
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(247);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -1479,6 +1480,10 @@ const EQUALITY_PAGES: Record<string, { pageId: string; floor: number }> = {
   gravewyrm_sanctum: { pageId: 'conquerors_gravewyrm_sanctum', floor: 31 },
   wildheart_basin: { pageId: 'conquerors_wildheart_basin', floor: 4 },
   nythraxis_boss_arena: { pageId: 'conquerors_nythraxis', floor: 16 },
+  rotchapel: { pageId: 'conquerors_rotchapel', floor: 1 },
+  ossuary_of_the_march: { pageId: 'conquerors_ossuary_of_the_march', floor: 1 },
+  heart_of_crownroot: { pageId: 'conquerors_heart_of_crownroot', floor: 2 },
+  sepulcher_of_ashes: { pageId: 'conquerors_sepulture_of_ashes', floor: 3 },
 };
 
 describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
@@ -1551,6 +1556,8 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
       conquerors_wildheart_basin_heroic: ['wildheart_high_priest'],
       conquerors_hollow_crypt_heroic: ['morthen'],
       conquerors_nythraxis: ['nythraxis_scourge_of_thornpeak'],
+      conquerors_rotchapel: ['abbot_of_flies'],
+      conquerors_ossuary_of_the_march: ['general_silex'],
     };
     for (const [pageId, mobIds] of Object.entries(DESC_BOSSES)) {
       const page = RELIQUARY_PAGES_BY_ID[pageId];
@@ -2439,7 +2446,7 @@ function slotKey(pageId: string, slotId: string): string {
   return `${pageId}:${slotId}`;
 }
 
-/** Distinct resolved sources per page. Literal and COMPLETE (all 28 pages), so
+/** Distinct resolved sources per page. Literal and COMPLETE, so
  *  partial authoring cannot pass: a page that loses half its hints reds here
  *  even while every surviving hint still validates. Update deliberately with
  *  the authoring, the same regime as the totals pins above. */
@@ -2456,6 +2463,10 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   conquerors_wildheart_basin_heroic: 1,
   conquerors_nythraxis: 1,
   conquerors_nythraxis_heroic: 1,
+  conquerors_rotchapel: 1,
+  conquerors_ossuary_of_the_march: 1,
+  conquerors_heart_of_crownroot: 1,
+  conquerors_sepulture_of_ashes: 1,
   conquerors_thunzharr: 1,
   conquerors_collapsed_reliquary: 2,
   conquerors_drowned_litany: 2,
@@ -2478,7 +2489,7 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   horizons_weapon_skins: 1,
   // Every title relic's source is its own deed, so the count tracks the page
   // rows: 36 + the four Phase 18 completion-ladder titles.
-  horizons_titles: 40,
+  horizons_titles: 42,
   // 29 = 27 distinct rift mobs across the ten rare multi-hints (eight theme
   // bosses + both citadel bosses + 17 trash carriers), plus the B and S rank
   // doors. The rift_first_clear activity left with the bands.
@@ -3830,9 +3841,8 @@ describe('Reliquary source hint coverage', () => {
       if (inherited === 0) offenders.push(`${page.id} defaults but every relic owns a hint`);
     }
     expect(offenders).toEqual([]);
-    // All ten defaults are live today (nine boss pages plus the storefront on
-    // the skins page); update deliberately with the authoring.
-    expect(defaults).toBe(10);
+    // Four Ashen Bloom instance pages extend the established boss-page defaults.
+    expect(defaults).toBe(14);
   });
 });
 

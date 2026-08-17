@@ -290,8 +290,8 @@ describe('guide.html shell', () => {
 });
 
 describe('Guide generated class content', () => {
-  it('covers all nine classes with grounded data', () => {
-    expect(GUIDE_CLASSES).toHaveLength(9);
+  it('covers every playable class with grounded data', () => {
+    expect(GUIDE_CLASSES).toHaveLength(11);
     for (const c of GUIDE_CLASSES) {
       expect(c.color).toMatch(/^#[0-9a-f]{6}$/);
       expect(['rage', 'mana', 'energy', 'focus']).toContain(c.resource);

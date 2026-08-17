@@ -125,6 +125,8 @@ export const SKIN_COUNTS: Record<PlayerClass, number> = {
   warlock: 6,
   shaman: 6,
   druid: 6,
+  gravecaller: 6,
+  briar_warden: 6,
 };
 
 /** Whether `skin` is a valid appearance index for `cls` (0 = default). */

@@ -98,10 +98,20 @@ export const DEV_KIT_ROLES: Readonly<Record<PlayerClass, readonly DevKitRole[]>>
     { spec: 'feral', weights: TANK_AGI, melee: true, tank: true },
     { spec: 'restoration', weights: HEALER, melee: false },
   ],
+  gravecaller: [
+    { spec: 'plagueweaver', weights: CASTER, melee: false },
+    { spec: 'ossuary', weights: CASTER, melee: false },
+    { spec: 'bloodsage', weights: CASTER, melee: false },
+  ],
+  briar_warden: [
+    { spec: 'thornbound', weights: TANK_STR, melee: true, tank: true, hands: 'shield' },
+    { spec: 'blightkeeper', weights: CASTER, melee: false, hands: 'shield' },
+    { spec: 'grove_covenant', weights: HEALER, melee: false, hands: 'shield' },
+  ],
 });
 
 // Every class-and-spec pair, flattened. 27 entries: 9 classes times 3 specs.
-export const DEV_KIT_ROLE_COUNT = 27;
+export const DEV_KIT_ROLE_COUNT = 33;
 
 export function devKitRole(cls: PlayerClass, spec: string): DevKitRole | null {
   return DEV_KIT_ROLES[cls]?.find((role) => role.spec === spec) ?? null;

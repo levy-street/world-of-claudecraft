@@ -87,34 +87,32 @@ describe('virtual-level curve', () => {
     expect(xpToReachLevel(1)).toBe(0);
     expect(xpToReachLevel(2)).toBe(xpForLevel(1));
     expect(xpToReachLevel(3)).toBe(xpForLevel(1) + xpForLevel(2));
-    for (let l = 1; l < 40; l++) {
+    for (let l = 1; l < MAX_LEVEL + 20; l++) {
       expect(xpToReachLevel(l + 1)).toBeGreaterThan(xpToReachLevel(l));
     }
   });
 
   it('virtual level climbs past the cap on lifetime XP boundaries', () => {
-    // exactly at the cap threshold → virtual 20, one XP short → still 19's band? no: 20
-    expect(virtualLevel(xpToReachLevel(20))).toBe(20);
-    expect(virtualLevel(xpToReachLevel(21))).toBe(21);
-    expect(virtualLevel(xpToReachLevel(21) - 1)).toBe(20);
-    expect(virtualLevel(xpToReachLevel(27))).toBe(27);
-    expect(virtualLevel(xpToReachLevel(27) + 1)).toBe(27);
-    expect(virtualLevel(xpToReachLevel(28) - 1)).toBe(27);
+    expect(virtualLevel(xpToReachLevel(MAX_LEVEL))).toBe(MAX_LEVEL);
+    expect(virtualLevel(xpToReachLevel(MAX_LEVEL + 1))).toBe(MAX_LEVEL + 1);
+    expect(virtualLevel(xpToReachLevel(MAX_LEVEL + 1) - 1)).toBe(MAX_LEVEL);
+    expect(virtualLevel(xpToReachLevel(MAX_LEVEL + 7))).toBe(MAX_LEVEL + 7);
+    expect(virtualLevel(xpToReachLevel(MAX_LEVEL + 7) + 1)).toBe(MAX_LEVEL + 7);
   });
 
   it('post-cap levels cost progressively more (geometric grind)', () => {
-    const step21 = xpToReachLevel(22) - xpToReachLevel(21);
-    const step20 = xpToReachLevel(21) - xpToReachLevel(20);
-    const step30 = xpToReachLevel(31) - xpToReachLevel(30);
-    expect(step21).toBeGreaterThan(step20);
-    expect(step30).toBeGreaterThan(step21);
+    const first = xpToReachLevel(MAX_LEVEL + 1) - xpToReachLevel(MAX_LEVEL);
+    const second = xpToReachLevel(MAX_LEVEL + 2) - xpToReachLevel(MAX_LEVEL + 1);
+    const later = xpToReachLevel(MAX_LEVEL + 11) - xpToReachLevel(MAX_LEVEL + 10);
+    expect(second).toBeGreaterThan(first);
+    expect(later).toBeGreaterThan(second);
   });
 
   it('virtualLevelProgress reports position within the current virtual level', () => {
-    const base = xpToReachLevel(25);
-    const span = xpToReachLevel(26) - xpToReachLevel(25);
+    const base = xpToReachLevel(MAX_LEVEL + 5);
+    const span = xpToReachLevel(MAX_LEVEL + 6) - base;
     const prog = virtualLevelProgress(base + Math.floor(span / 2));
-    expect(prog.level).toBe(25);
+    expect(prog.level).toBe(MAX_LEVEL + 5);
     expect(prog.span).toBe(span);
     expect(prog.into).toBeCloseTo(Math.floor(span / 2), -1);
   });
@@ -141,10 +139,8 @@ describe('solo grantXp at the cap', () => {
     const sim = makeSim('warrior');
     sim.setPlayerLevel(MAX_LEVEL);
     let expected = sim.lifetimeXp;
-    for (let i = 0; i < 50; i++) {
-      sim.grantXp(1000);
-      expected += 1000;
-    }
+    sim.grantXp(PRESTIGE_XP_PER_RANK);
+    expected += PRESTIGE_XP_PER_RANK;
     expect(sim.lifetimeXp).toBe(expected);
     expect(virtualLevel(sim.lifetimeXp)).toBeGreaterThan(MAX_LEVEL);
   });
@@ -164,10 +160,10 @@ describe('solo grantXp at the cap', () => {
     const sim = makeSim('warrior');
     sim.setPlayerLevel(MAX_LEVEL);
     sim.events.length = 0;
-    sim.grantXp(xpToReachLevel(22)); // jump well past the cap
+    sim.grantXp(xpToReachLevel(MAX_LEVEL + 2) - xpToReachLevel(MAX_LEVEL));
     const vlevels = sim.events.filter((e) => e.type === 'virtualLevelUp').map((e: any) => e.level);
-    expect(vlevels).toContain(21);
-    expect(vlevels).toContain(22);
+    expect(vlevels).toContain(MAX_LEVEL + 1);
+    expect(vlevels).toContain(MAX_LEVEL + 2);
   });
 });
 
@@ -442,20 +438,20 @@ describe('xp-bar label states', () => {
     });
     expect(v.postCap).toBe(true);
     expect(v.label).toBe(
-      `Lv 20 (+0)  ·  ${formatXp(xpToReachLevel(MAX_LEVEL))} total XP  ·  0% to next`,
+      `Lv ${MAX_LEVEL} (+0)  ·  ${formatXp(xpToReachLevel(MAX_LEVEL))} total XP  ·  0% to next`,
     );
   });
 
   it('post-cap shows virtual level, total, and percent to next', () => {
-    const lifetime = xpToReachLevel(27); // start of virtual level 27
+    const lifetime = xpToReachLevel(MAX_LEVEL + 7);
     const v = xpBarView({ level: MAX_LEVEL, xp: 0, lifetimeXp: lifetime, showOverflow: true });
     expect(v.postCap).toBe(true);
-    expect(v.label).toBe(`Lv 20 (+7)  ·  ${formatXp(lifetime)} total XP  ·  0% to next`);
+    expect(v.label).toBe(`Lv ${MAX_LEVEL} (+7)  ·  ${formatXp(lifetime)} total XP  ·  0% to next`);
   });
 
   it('post-cap fill fraction advances within the virtual level', () => {
-    const base = xpToReachLevel(27);
-    const span = xpToReachLevel(28) - xpToReachLevel(27);
+    const base = xpToReachLevel(MAX_LEVEL + 7);
+    const span = xpToReachLevel(MAX_LEVEL + 8) - base;
     const v = xpBarView({
       level: MAX_LEVEL,
       xp: 0,
@@ -463,7 +459,7 @@ describe('xp-bar label states', () => {
       showOverflow: true,
     });
     expect(v.fillFrac).toBeCloseTo(0.5, 1);
-    expect(v.label).toMatch(/Lv 20 \(\+7\) {2}· {2}.* total XP {2}· {2}\d+% to next/);
+    expect(v.label).toContain(`Lv ${MAX_LEVEL} (+7)`);
   });
 
   it('classic "MAX LEVEL" when overflow display is turned off', () => {

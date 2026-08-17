@@ -67,7 +67,12 @@ export interface ZoneTeaser {
 //
 // One rule when adding a zone: every stem must be unique across GUIDE_ZONES. Give any
 // zone whose biome is already spoken for a stem of its own here, and nowhere else.
-const ZONE_KEY_STEM: Record<string, string> = { farshore_isle: 'farshore' };
+const ZONE_KEY_STEM: Record<string, string> = {
+  farshore_isle: 'farshore',
+  rotmire_expanse: 'rotmire',
+  petrified_march: 'march',
+  crownroot_wilds: 'crownroot',
+};
 
 /** The stem that names a zone's curated catalog keys and its world-page anchor. */
 export function zoneKeyStem(zone: GuideZoneInfo): string {

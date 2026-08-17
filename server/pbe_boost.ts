@@ -266,6 +266,18 @@ export const CLASS_ROLES: Record<PlayerClass, readonly BoostRole[]> = {
     { id: 'balance', weights: { int: 1, spi: 0.7, sta: 0.5 }, melee: false },
     { id: 'feral', weights: { agi: 1, str: 0.6, sta: 0.6 }, melee: true },
   ],
+  gravecaller: [
+    { id: 'plagueweaver', weights: { int: 1, sta: 0.7, spi: 0.5 }, melee: false },
+  ],
+  briar_warden: [
+    {
+      id: 'thornbound',
+      weights: { sta: 1, str: 0.5, int: 0.3 },
+      melee: true,
+      tank: true,
+      hands: 'shield',
+    },
+  ],
 };
 
 const ARMOR_PER_POINT = 12;

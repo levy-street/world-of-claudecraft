@@ -201,6 +201,12 @@ export const guideStrings = {
       farshoreName: 'The Farshore',
       farshoreBlurb:
         'An island across the sandbar, where the sky tears open over the Riftfields and Gullhaven rings its bell for every breach.',
+      rotmireName: 'The Rotmire Expanse',
+      rotmireBlurb: 'A drowned grave-country where carrion flowers feed on an army of empty dead.',
+      marchName: 'The Petrified March',
+      marchBlurb: 'A royal road held by stone soldiers who have begun remembering their final command.',
+      crownrootName: 'The Crownroot Wilds',
+      crownrootBlurb: 'A frozen forest whose roots all descend toward the sealed royal Sepulcher.',
       nightName: 'The Nightbloom',
       nightBlurb:
         'A country of starry midnight where the flowers light the paths and Moonrest keeps its vigil.',
@@ -1312,6 +1318,18 @@ export const guideStrings = {
   // One spoiler-safe, number-free line per signature ability (what it is for, when you
   // press it). Keyed by the sim ability id.
   abilityHook: {
+    pestilent_bolt: 'Hurls a reliable Shadow bolt while your afflictions wear the enemy down.',
+    the_wasting: 'Afflicts one enemy with a long-lasting Shadow disease.',
+    blood_tithe: 'Trades health for mana when a long fight drains your reserves.',
+    gravecaller_bone_coat: 'Wraps you in bone to blunt incoming damage.',
+    plague_wind: 'Spreads a damaging plague through enemies around you.',
+    deaths_bargain: 'Calls on forbidden power when survival matters more than safety.',
+    briar_skin: 'Keeps a permanent thorn shield ready to punish every attacker.',
+    withering_presence: 'Weakens nearby enemies simply by walking among them.',
+    barbed_aegis: 'Raises a stronger damage shield before entering a dangerous pack.',
+    spore_hex: 'Afflicts one enemy with lingering Nature damage.',
+    vindictive_growth: 'Turns sustained enemy pressure into still more reflected damage.',
+    walking_calamity: 'Surrounds your path with the strongest thorns in your kit.',
     evil_eye: 'Names the enemy whose actions and suffering will feed your Condemnation.',
     heroic_strike: 'Queues a heavier swing that spends rage on your next hit.',
     revenge: 'Sweeps enemies in front of you, with a chance to become free after a dodge or parry.',
@@ -1680,6 +1698,27 @@ export const guideStrings = {
     farshoreGreeter: 'Bellkeeper Tam, the Landing',
     farshorePlaceNotes:
       "Gullhaven is the island's only town and its redoubt. The Landing is where the Ferrywalk comes ashore, with a watchbell standing over the point; the Watch Meadow keeps the high ground southeast of town, where a riftwatcher listens for the next break; the Sundered Cliffs crack open at the island's southern end; and the Riftfields are the wracked grain rows east of Gullhaven, still crawling with what came through the break there.",
+    rotmireBlurb:
+      'The old north road sinks into a grave-country where carrion flowers bloom from emptied dead.',
+    rotmireGreeting:
+      'The graves are empty, traveler. Help me learn what the bloom has taken from them.',
+    rotmireGreeter: 'Mortician Ella, Wakefort',
+    rotmirePlaceNotes:
+      'Wakefort keeps the last dry road. The Carrion Gardens spread west through broken graves, while Sporefall Basin gathers the largest blooms beneath its poisoned mist.',
+    marchBlurb:
+      'A petrified royal army stands mid-charge along the road, and every stone face has begun listening.',
+    marchGreeting:
+      'The stone host remembers its final command. We must reach the Crownroot before it marches.',
+    marchGreeter: 'Captain Orren, Cairnwall',
+    marchPlaceNotes:
+      'Cairnwall watches the southern pass. The Stone Host blocks the old road, and the Rootscar Front marks where the buried forest first broke through the royal formation.',
+    crownrootBlurb:
+      'Frost grips a forest growing from a buried crown, and every root points toward its sealed Sepulcher.',
+    crownrootGreeting:
+      'Every living root is pointing toward the Sepulcher. Walk carefully, traveler.',
+    crownrootGreeter: 'Sister Briar, Lastbough',
+    crownrootPlaceNotes:
+      'Lastbough is the final refuge. The Ashen Canopy knots over the eastern wilds, and the Sepulcher Approach climbs between frozen roots toward the royal tomb.',
     // Getting around: the on-foot rule, the passes and causeways, the one overworld
     // doorway, the graveyards, and the sea at the map's edge. Paragraphs are split on
     // blank lines by paras().
@@ -1828,6 +1867,14 @@ export const guideStrings = {
       "The dark heart of Thornpeak, where the cult's long work reaches its terrible peak.",
     wildheartBody:
       'A rain-soaked jungle caldera where two raised hunting trails circle a jade cenote. Cross beast dens and ancestor ruins, then climb the ritual pyramid to see who waits at the top.',
+    rotchapelBody:
+      'A plague chapel whose incense draws the dead back to their knees. Break the congregation before its abbot completes the final service.',
+    ossuaryBody:
+      'A burial hall beneath the petrified army, where the oldest officers still enforce commands carved into their bones.',
+    crownrootBody:
+      'The living heart beneath the frozen forest has become a royal prison. Cut through the heartwood and confront the power wrapped around its roots.',
+    sepulcherBody:
+      'The level-cap raid descends into the royal Sepulcher, where living crownshards defend the throne and ten players must break the Ashen Bloom at its source.',
     raidName: 'The endgame raid',
     raidBody:
       'Beyond a sealed royal door waits a ten-player trial: a multi-stage fight and a deathless power the whole raid must shut down together. Earn your way in, then bring nine friends.',

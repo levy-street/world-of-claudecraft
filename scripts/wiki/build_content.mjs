@@ -325,12 +325,12 @@ const dungeons = Object.values(DUNGEONS)
     const isRaid = (d.suggestedPlayers ?? 0) >= 10;
     const band = dungeonBand(d);
     return {
-      id: isRaid ? 'raid' : d.id,
+      id: d.id === 'nythraxis_boss_arena' ? 'raid' : d.id,
       isRaid,
       suggestedPlayers: d.suggestedPlayers,
       min: band.min,
       max: band.max,
-      ...(isRaid ? {} : { name: d.name }),
+      ...(d.id === 'nythraxis_boss_arena' ? {} : { name: d.name }),
     };
   })
   .sort((a, b) => (a.min ?? 99) - (b.min ?? 99) || a.suggestedPlayers - b.suggestedPlayers);

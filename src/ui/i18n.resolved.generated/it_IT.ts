@@ -4094,6 +4094,12 @@ export const it_IT: EnTranslations = {
         "fenBlurb": "Oltre la corona di autunno, una palude luminosa di salici e acque immobili, e un paese dietro un fossato.",
         "farshoreName": "Farshore",
         "farshoreBlurb": "Un'isola oltre la barra di sabbia, dove il cielo si squarcia sopra i Campi degli Squarci e Gullhaven suona la sua campana per ogni breccia.",
+        "rotmireName": "The Rotmire Expanse",
+        "rotmireBlurb": "A drowned grave-country where carrion flowers feed on an army of empty dead.",
+        "marchName": "The Petrified March",
+        "marchBlurb": "A royal road held by stone soldiers who have begun remembering their final command.",
+        "crownrootName": "The Crownroot Wilds",
+        "crownrootBlurb": "A frozen forest whose roots all descend toward the sealed royal Sepulcher.",
         "nightName": "Nightbloom",
         "nightBlurb": "Una terra di mezzanotte stellata dove i fiori illuminano i sentieri e Moonrest veglia senza sosta.",
         "hauntName": "Wraithwood",
@@ -4803,6 +4809,18 @@ export const it_IT: EnTranslations = {
       "none": "Nessuna classe corrisponde a tutti i filtri. Azzerane uno per vederne di più."
     },
     "abilityHook": {
+      "pestilent_bolt": "Hurls a reliable Shadow bolt while your afflictions wear the enemy down.",
+      "the_wasting": "Afflicts one enemy with a long-lasting Shadow disease.",
+      "blood_tithe": "Trades health for mana when a long fight drains your reserves.",
+      "gravecaller_bone_coat": "Wraps you in bone to blunt incoming damage.",
+      "plague_wind": "Spreads a damaging plague through enemies around you.",
+      "deaths_bargain": "Calls on forbidden power when survival matters more than safety.",
+      "briar_skin": "Keeps a permanent thorn shield ready to punish every attacker.",
+      "withering_presence": "Weakens nearby enemies simply by walking among them.",
+      "barbed_aegis": "Raises a stronger damage shield before entering a dangerous pack.",
+      "spore_hex": "Afflicts one enemy with lingering Nature damage.",
+      "vindictive_growth": "Turns sustained enemy pressure into still more reflected damage.",
+      "walking_calamity": "Surrounds your path with the strongest thorns in your kit.",
       "evil_eye": "Nomina il nemico le cui azioni e sofferenza alimentano la tua Condanna.",
       "heroic_strike": "Mette in coda un fendente più pesante che spende ira al tuo prossimo colpo.",
       "revenge": "Colpisce i nemici davanti a te e può diventare gratuita dopo una schivata o una parata.",
@@ -5054,6 +5072,18 @@ export const it_IT: EnTranslations = {
       "farshoreGreeting": "Sei venuto attraverso il Ferrywalk? Allora sei il primo in una settimana, e il Guardiano vorrà darti un'occhiata.",
       "farshoreGreeter": "Guardiano della Campana Tam, l'Approdo",
       "farshorePlaceNotes": "Gullhaven è l'unico paese dell'isola e il suo ridotto. L'Approdo è dove il Ferrywalk tocca la riva, con una campana di vedetta che sovrasta la punta; il Prato della Vedetta tiene l'altura a sud-est del paese, dove una sentinella degli squarci ascolta la prossima breccia; le Scogliere Squarciate si spaccano all'estremità meridionale dell'isola; e i Campi degli Squarci sono i filari di grano devastati a est di Gullhaven, ancora brulicanti di ciò che è passato attraverso la breccia lì.",
+      "rotmireBlurb": "The old north road sinks into a grave-country where carrion flowers bloom from emptied dead.",
+      "rotmireGreeting": "The graves are empty, traveler. Help me learn what the bloom has taken from them.",
+      "rotmireGreeter": "Mortician Ella, Wakefort",
+      "rotmirePlaceNotes": "Wakefort keeps the last dry road. The Carrion Gardens spread west through broken graves, while Sporefall Basin gathers the largest blooms beneath its poisoned mist.",
+      "marchBlurb": "A petrified royal army stands mid-charge along the road, and every stone face has begun listening.",
+      "marchGreeting": "The stone host remembers its final command. We must reach the Crownroot before it marches.",
+      "marchGreeter": "Captain Orren, Cairnwall",
+      "marchPlaceNotes": "Cairnwall watches the southern pass. The Stone Host blocks the old road, and the Rootscar Front marks where the buried forest first broke through the royal formation.",
+      "crownrootBlurb": "Frost grips a forest growing from a buried crown, and every root points toward its sealed Sepulcher.",
+      "crownrootGreeting": "Every living root is pointing toward the Sepulcher. Walk carefully, traveler.",
+      "crownrootGreeter": "Sister Briar, Lastbough",
+      "crownrootPlaceNotes": "Lastbough is the final refuge. The Ashen Canopy knots over the eastern wilds, and the Sepulcher Approach climbs between frozen roots toward the royal tomb.",
       "travelTitle": "Come spostarsi",
       "travelBody": "Ogni strada del reame si percorre a piedi o a cavallo. Non ci sono percorsi di volo, non ci sono taxi, e non c'è una rete di teletrasporto: la mappa è un'unica massa continentale, e ogni collegamento è qualcosa su cui puoi mettere i piedi. Le creste dividono un reame dal successivo, e dove due reami condividono una cresta la strada sale attraverso un passo. Non tutti i confini funzionano così, però. A nord una lunga strada rialzata porta la via sull'acqua dalla Valletta Velata fino alle terre innevate oltre, e più a sud un sottile banco di sabbia naturale chiamato Ferrywalk corre a est dalla costa della Valle fino all'Approdo sull'isola del Farshore, che non ha alcun confine di terra. E c'è esattamente un'unica vera porta in tutto il mondo aperto: un velo di crepuscolo alto su Thornpeak che si apre sulla Valletta Velata. Il crinale meridionale della Valletta è sigillato, senza alcun passo che lo attraversi, quindi quel velo è il modo in cui vi entri la prima volta, e si richiude alle tue spalle sulla via del ritorno.\n\nOvunque tu cada, la strada del ritorno è breve. Ogni zona custodisce almeno un cimitero con un Custode Pallido che aleggia sulle pietre, e uno spirito liberato risorge nel più vicino di essi.\n\nLa mappa non finisce contro un muro invisibile. La terra sfuma in spiagge e promontori, e poi in acque aperte. I tratti d'acqua che il mondo prevede tu attraversi a nuoto, gli stretti e i laghetti tra un reame e l'altro, sono calmi e sicuri da attraversare. Se ti spingi invece verso il mare aperto, è la distanza stessa a respingerti: vieni avvisato, e avvisato di nuovo, e se continui a nuotare il mare ti prosciuga le forze finché non ti uccide. Anche immergersi ha il proprio limite, dato che il fiato si esaurisce sott'acqua, quindi risali per respirare e torna indietro quando l'acqua te lo dice.",
       "mountsTitle": "Cavalcature",
@@ -5138,6 +5168,10 @@ export const it_IT: EnTranslations = {
       "templeBody": "Un santuario sommerso lungo la strada della palude, una deviazione per i curiosi e i ben preparati.",
       "sanctumBody": "Il cuore oscuro di Thornpeak, dove la lunga opera del culto raggiunge il suo apice terribile.",
       "wildheartBody": "Una caldera di giungla battuta dalla pioggia, dove due sentieri di caccia rialzati circondano un cenote di giada. Attraversa tane di bestie e rovine ataviche, poi sali la piramide rituale per scoprire chi ti aspetta in cima.",
+      "rotchapelBody": "A plague chapel whose incense draws the dead back to their knees. Break the congregation before its abbot completes the final service.",
+      "ossuaryBody": "A burial hall beneath the petrified army, where the oldest officers still enforce commands carved into their bones.",
+      "crownrootBody": "The living heart beneath the frozen forest has become a royal prison. Cut through the heartwood and confront the power wrapped around its roots.",
+      "sepulcherBody": "The level-cap raid descends into the royal Sepulcher, where living crownshards defend the throne and ten players must break the Ashen Bloom at its source.",
       "raidName": "L'incursione di fine gioco",
       "raidBody": "Oltre una porta reale sigillata attende una prova per dieci giocatori: uno scontro a più fasi e un potere immortale che l'intera incursione deve neutralizzare insieme. Guadagnati l'ingresso, poi porta nove amici.",
       "heroicTitle": "Modalità eroica",
@@ -7021,6 +7055,8 @@ export const it_IT: EnTranslations = {
     "mage": "Mago",
     "warlock": "Stregone",
     "druid": "Druido",
+    "gravecaller": "Gravecaller",
+    "briar_warden": "Briar Warden",
     "warriorAria": "Classe Guerriero",
     "paladinAria": "Classe Paladino",
     "hunterAria": "Classe Cacciatore",
@@ -7029,7 +7065,9 @@ export const it_IT: EnTranslations = {
     "shamanAria": "Classe Sciamano",
     "mageAria": "Classe Mago",
     "warlockAria": "Classe Stregone",
-    "druidAria": "Classe Druido"
+    "druidAria": "Classe Druido",
+    "gravecallerAria": "Gravecaller class",
+    "briar_wardenAria": "Briar Warden class"
   },
   "controls": {
     "title": "Guida ai controlli",
@@ -7918,7 +7956,9 @@ export const it_IT: EnTranslations = {
       "shaman": "Guaritore / DPS da mischia o a distanza",
       "mage": "DPS a distanza",
       "warlock": "DPS a distanza",
-      "druid": "Tank / Guaritore / DPS da mischia o a distanza"
+      "druid": "Tank / Guaritore / DPS da mischia o a distanza",
+      "gravecaller": "Ranged DPS",
+      "briar_warden": "Tank / Healer / Ranged DPS"
     },
     "armor": {
       "chainLeatherCloth": "Maglia, cuoio, stoffa",
@@ -7942,7 +7982,9 @@ export const it_IT: EnTranslations = {
       "shaman": "Gli sciamani comandano gli elementi, infondono potere nelle armi, colpiscono con fulmini e curano gli alleati.",
       "mage": "I maghi manipolano Fuoco, Gelo e forza arcana per distruggere i nemici, evocare acqua e congelare le minacce sul posto.",
       "warlock": "Gli stregoni evocano demoni, applicano maledizioni e magie di danno nel tempo, e sottraggono vita ai nemici per resistere.",
-      "druid": "I druidi canalizzano la natura, curano ferite, intralciano nemici e assumono forme animali per difendere o attaccare."
+      "druid": "I druidi canalizzano la natura, curano ferite, intralciano nemici e assumono forme animali per difendere o attaccare.",
+      "gravecaller": "Gravecallers spread disease, drain life, trade health for magic, and command death from a safe distance.",
+      "briar_warden": "Briar Wardens layer boons and curses, then destroy attackers with powerful retaliatory damage shields."
     },
     "aria": "Dettagli classe per {className}: ruolo {role}. Statistiche iniziali: Forza {str}, Agilità {agi}, Tempra {sta}, Intelletto {int}, Spirito {spi}.",
     "statBarAria": "{stat}: {value} su 25"
@@ -9148,6 +9190,110 @@ export const it_IT: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "pestilent_bolt": {
+        "name": "Pestilent Bolt",
+        "description": "Hurls diseased shadow for {damage} Shadow damage. Damage increases with Spell Power."
+      },
+      "blood_tithe": {
+        "name": "Blood Tithe",
+        "description": "Sacrifices 8% of your maximum health to restore 28 mana."
+      },
+      "the_wasting": {
+        "name": "The Wasting",
+        "description": "Afflicts the enemy for 48 Shadow damage over 18 sec in 6 ticks."
+      },
+      "grave_dread": {
+        "name": "Dread",
+        "description": "Leaves the enemy cowering for up to 8 sec. Damage breaks the effect."
+      },
+      "gravecaller_bone_coat": {
+        "name": "Bone Coat",
+        "description": "Absorbs damage equal to 20% of your maximum health for 12 sec."
+      },
+      "soul_siphon": {
+        "name": "Soul Siphon",
+        "description": "Drains 24 Shadow damage each second for 4 sec and restores health equal to the damage dealt."
+      },
+      "grave_chill": {
+        "name": "Grave Chill",
+        "description": "Deals {damage} Frost damage and slows movement by 50% for 8 sec."
+      },
+      "plague_wind": {
+        "name": "Plague Wind",
+        "description": "Blasts enemies within 8 yd for {damage} Shadow damage."
+      },
+      "deaths_bargain": {
+        "name": "Death's Bargain",
+        "description": "Reduces all damage you take by 40% for 10 sec."
+      },
+      "briar_skin": {
+        "name": "Briar Skin",
+        "description": "Covers the target in briars for 30 min. Each melee attacker takes {buff} Nature damage. The shield has no charges."
+      },
+      "withering_presence": {
+        "name": "Withering Presence",
+        "description": "Slows the attacks of enemies within 10 yd by 15% for 12 sec."
+      },
+      "barbed_aegis": {
+        "name": "Barbed Aegis",
+        "description": "For 12 sec, each melee attacker takes 42 Nature damage. The shield has no charges."
+      },
+      "spore_hex": {
+        "name": "Spore Hex",
+        "description": "Infects the enemy for 42 Nature damage over 12 sec in 4 ticks."
+      },
+      "ironbark_boon": {
+        "name": "Ironbark Boon",
+        "description": "Increases the armor of all party members by {buff}% for 30 min."
+      },
+      "pollen_cloud": {
+        "name": "Pollen Cloud",
+        "description": "Scours enemies within 10 yd for {damage} Nature damage."
+      },
+      "vindictive_growth": {
+        "name": "Vindictive Growth",
+        "description": "For 15 sec, melee attackers take 120 Nature damage and you take 20% less damage."
+      },
+      "walking_calamity": {
+        "name": "Walking Calamity",
+        "description": "For 20 sec, melee attackers take 240 Nature damage and you take 35% less damage."
+      },
+      "gravebreaker": {
+        "name": "Gravebreaker",
+        "description": "Smashes the ground, dealing {damage} Physical damage to enemies within 8 yd."
+      },
+      "last_light": {
+        "name": "Last Light",
+        "description": "Reduces all damage you take by 35% for 12 sec."
+      },
+      "blackfletch": {
+        "name": "Blackfletch",
+        "description": "Fires an ashen arrow for {damage} Physical damage."
+      },
+      "duskstep": {
+        "name": "Duskstep",
+        "description": "Strikes for 80% weapon damage plus {damage} Physical damage."
+      },
+      "memorial_grace": {
+        "name": "Memorial Grace",
+        "description": "Heals a friendly target for {damage}."
+      },
+      "ancestor_storm": {
+        "name": "Ancestor Storm",
+        "description": "Calls ancestral lightning for {damage} Nature damage to enemies within 10 yd."
+      },
+      "cinder_comet": {
+        "name": "Cinder Comet",
+        "description": "Calls down a comet for {damage} Fire damage to enemies within 8 yd of the target area."
+      },
+      "funeral_pyre": {
+        "name": "Funeral Pyre",
+        "description": "Burns the enemy for 240 Shadow damage over 12 sec in 4 ticks."
+      },
+      "crown_of_briars": {
+        "name": "Crown of Briars",
+        "description": "For 20 sec, each melee attacker that strikes the target takes 96 Nature damage."
+      },
       "sport_kick": {
         "name": "Calcio",
         "description": "Spingi la palla rasoterra verso il punto mirato."
@@ -13736,6 +13882,66 @@ export const it_IT: EnTranslations = {
       "wildheart_high_priest": {
         "name": "Zulgar, Voce del Bacino"
       },
+      "rotmire_husk": {
+        "name": "Rotmire Husk"
+      },
+      "carrion_bloom": {
+        "name": "Carrion Bloom"
+      },
+      "sporebound_brute": {
+        "name": "Sporebound Brute"
+      },
+      "mother_morva": {
+        "name": "Mother Morva"
+      },
+      "stone_legionary": {
+        "name": "Stone Legionary"
+      },
+      "crownless_knight": {
+        "name": "Crownless Knight"
+      },
+      "rootscar_widow": {
+        "name": "Rootscar Widow"
+      },
+      "marshal_veyr": {
+        "name": "Marshal Veyr"
+      },
+      "frostroot_stalker": {
+        "name": "Frostroot Stalker"
+      },
+      "ashen_dryad": {
+        "name": "Ashen Dryad"
+      },
+      "sepulcher_guardian": {
+        "name": "Sepulcher Guardian"
+      },
+      "the_hollow_crown": {
+        "name": "The Hollow Crown"
+      },
+      "rotchapel_cultist": {
+        "name": "Rotchapel Cultist"
+      },
+      "abbot_of_flies": {
+        "name": "Abbot of Flies"
+      },
+      "cairnwall_revenant": {
+        "name": "Cairnwall Revenant"
+      },
+      "general_silex": {
+        "name": "General Silex"
+      },
+      "crownroot_heartwood": {
+        "name": "Heartwood Horror"
+      },
+      "queen_under_roots": {
+        "name": "The Queen Under Roots"
+      },
+      "sepulcher_crownshard": {
+        "name": "Living Crownshard"
+      },
+      "king_in_ashes": {
+        "name": "The King in Ashes"
+      },
       "ironvein_foreman": {
         "name": "Caposquadra Venaferrata"
       },
@@ -14298,6 +14504,21 @@ export const it_IT: EnTranslations = {
         "name": "L'alchimista Verane",
         "title": "Maestro dello speziale",
         "greeting": "Misura due volte e versa una volta, {className}. Il farmacista non ha pazienza per i reagenti versati."
+      },
+      "mortician_ella": {
+        "name": "Mortician Ella",
+        "title": "Keeper of Wakefort",
+        "greeting": "The graves are empty, {className}. Help me learn what the bloom has taken from them."
+      },
+      "captain_orren": {
+        "name": "Captain Orren",
+        "title": "Cairnwall Commander",
+        "greeting": "The stone host remembers its last command. We must reach the Crownroot before it marches."
+      },
+      "sister_briar": {
+        "name": "Sister Briar",
+        "title": "Warden of Lastbough",
+        "greeting": "Every living root is pointing toward the Sepulcher. Walk carefully, {className}."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -16358,6 +16579,126 @@ export const it_IT: EnTranslations = {
           }
         }
       },
+      "q_ab_01_wakefort": {
+        "title": "Wake the Fort",
+        "text": "Defeat 8 Rotmire Husk.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Rotmire Husk slain"
+          }
+        }
+      },
+      "q_ab_02_carrion": {
+        "title": "The Carrion Gardens",
+        "text": "Defeat 8 Carrion Bloom.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Carrion Bloom slain"
+          }
+        }
+      },
+      "q_ab_03_sporefall": {
+        "title": "Sporefall",
+        "text": "Defeat 6 Sporebound Brute.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Sporebound Brute slain"
+          }
+        }
+      },
+      "q_ab_04_morva": {
+        "title": "Mother of the Bloom",
+        "text": "Defeat 1 Mother Morva.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Mother Morva slain"
+          }
+        }
+      },
+      "q_ab_05_cairnwall": {
+        "title": "The Silent March",
+        "text": "Defeat 8 Stone Legionary.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Stone Legionary slain"
+          }
+        }
+      },
+      "q_ab_06_stone_host": {
+        "title": "Crownless",
+        "text": "Defeat 8 Crownless Knight.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Crownless Knight slain"
+          }
+        }
+      },
+      "q_ab_07_rootscar": {
+        "title": "Webs in the Scar",
+        "text": "Defeat 8 Rootscar Widow.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Rootscar Widow slain"
+          }
+        }
+      },
+      "q_ab_08_veyr": {
+        "title": "The Last Marshal",
+        "text": "Defeat 1 Marshal Veyr.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Marshal Veyr slain"
+          }
+        }
+      },
+      "q_ab_09_lastbough": {
+        "title": "Under the Last Bough",
+        "text": "Defeat 8 Frostroot Stalker.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Frostroot Stalker slain"
+          }
+        }
+      },
+      "q_ab_10_canopy": {
+        "title": "Ash in the Canopy",
+        "text": "Defeat 8 Ashen Dryad.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Ashen Dryad slain"
+          }
+        }
+      },
+      "q_ab_11_guardians": {
+        "title": "The Sepulcher Guard",
+        "text": "Defeat 8 Sepulcher Guardian.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Sepulcher Guardian slain"
+          }
+        }
+      },
+      "q_ab_12_crown": {
+        "title": "Break the Hollow Crown",
+        "text": "Defeat 1 The Hollow Crown.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "The Hollow Crown slain"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "Il Coro Annegato",
         "text": "I guadatori non agiscono da soli. Tra loro camminano i Devoti Annegati — la setta che affondò col tempio, ancora nelle loro vesti marcite, ancora intenti a cantare la preghiera dalle rocce della riva. Riducine otto al silenzio e portami sei delle offerte che recano. Voglio sapere cosa intendono donare alla loro dea.",
@@ -16824,6 +17165,51 @@ export const it_IT: EnTranslations = {
             "label": "I Campi degli Squarci"
           }
         }
+      },
+      "rotmire_expanse": {
+        "name": "The Rotmire Expanse",
+        "welcome": "The dead feed a bloom that should never have taken root. Wakefort holds the last dry road north.",
+        "pois": {
+          "0": {
+            "label": "Wakefort"
+          },
+          "1": {
+            "label": "The Carrion Gardens"
+          },
+          "2": {
+            "label": "Sporefall Basin"
+          }
+        }
+      },
+      "petrified_march": {
+        "name": "The Petrified March",
+        "welcome": "A royal army stands petrified mid-charge, and something beneath the road has begun calling their names.",
+        "pois": {
+          "0": {
+            "label": "Cairnwall"
+          },
+          "1": {
+            "label": "The Stone Host"
+          },
+          "2": {
+            "label": "Rootscar Front"
+          }
+        }
+      },
+      "crownroot_wilds": {
+        "name": "The Crownroot Wilds",
+        "welcome": "Frost grips a forest growing from a buried crown. Beyond Lastbough, every root points toward the Sepulcher.",
+        "pois": {
+          "0": {
+            "label": "Lastbough"
+          },
+          "1": {
+            "label": "The Ashen Canopy"
+          },
+          "2": {
+            "label": "Sepulcher Approach"
+          }
+        }
       }
     },
     "dungeons": {
@@ -16861,6 +17247,26 @@ export const it_IT: EnTranslations = {
         "name": "L'Ultima Rocca",
         "enterText": "Metti piede nelle sale fredde e silenziose della Ultima Rocca.",
         "leaveText": "Chiudi il portone della rocca e torni nel vento delle Drakelands."
+      },
+      "rotchapel": {
+        "name": "Rotchapel",
+        "enterText": "Rotten incense hangs beneath the chapel vault.",
+        "leaveText": "You return to the Rotmire air."
+      },
+      "ossuary_of_the_march": {
+        "name": "Ossuary of the March",
+        "enterText": "Stone soldiers turn their heads toward the living.",
+        "leaveText": "You escape the silent formation."
+      },
+      "heart_of_crownroot": {
+        "name": "Heart of Crownroot",
+        "enterText": "The root-heart beats once beneath your feet.",
+        "leaveText": "You climb back into the frozen wilds."
+      },
+      "sepulcher_of_ashes": {
+        "name": "Sepulcher of Ashes",
+        "enterText": "The Hollow Crown closes around the raid.",
+        "leaveText": "The Sepulcher releases you."
       },
       "drowned_temple": {
         "name": "Il Tempio Annegato",

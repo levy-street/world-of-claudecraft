@@ -424,6 +424,8 @@ export const RELIQUARY_HORIZON_TITLES = [
   'col_reliquary_illum_nythraxis_heroic',
   'col_reliquary_illum_thunzharr',
   'col_reliquary_illum_gravewyrm_heroic',
+  'prog_ashen_bloom_40',
+  'dgn_sepulcher_clear',
 ] as const;
 
 // Profession lifetime mark ids (Phase 7). Prefer existing visited namespaces
@@ -1051,6 +1053,47 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     clearSource: { kind: 'dungeon', dungeonId: 'wildheart_basin', difficulty: 'heroic' },
     sourceDefault: fromBoss('wildheart_high_priest'),
     relics: items(...RELIQUARY_HEROIC_GEAR.wildheart_high_priest),
+  },
+  // ---- The Ashen Bloom ----
+  {
+    id: 'conquerors_rotchapel',
+    shelf: 'conquerors',
+    name: 'Rotchapel',
+    desc: 'The surviving relic of the Abbot of Flies.',
+    clearSource: { kind: 'dungeon', dungeonId: 'rotchapel', difficulty: 'normal' },
+    sourceDefault: fromBoss('abbot_of_flies'),
+    relics: items('flyblown_censer'),
+  },
+  {
+    id: 'conquerors_ossuary_of_the_march',
+    shelf: 'conquerors',
+    name: 'Ossuary of the March',
+    desc: 'A crownshard claimed from General Silex.',
+    clearSource: {
+      kind: 'dungeon',
+      dungeonId: 'ossuary_of_the_march',
+      difficulty: 'normal',
+    },
+    sourceDefault: fromBoss('general_silex'),
+    relics: items('crownshard_ring'),
+  },
+  {
+    id: 'conquerors_heart_of_crownroot',
+    shelf: 'conquerors',
+    name: 'Heart of Crownroot',
+    desc: 'Regalia reclaimed from the Queen Under Roots.',
+    clearSource: { kind: 'dungeon', dungeonId: 'heart_of_crownroot', difficulty: 'normal' },
+    sourceDefault: fromBoss('queen_under_roots'),
+    relics: items('gravecallers_crozier', 'mantle_of_walking_thorns'),
+  },
+  {
+    id: 'conquerors_sepulture_of_ashes',
+    shelf: 'conquerors',
+    name: 'Sepulcher of Ashes',
+    desc: 'Royal armaments taken from the King in Ashes.',
+    clearSource: { kind: 'dungeon', dungeonId: 'sepulcher_of_ashes', difficulty: 'normal' },
+    sourceDefault: fromBoss('king_in_ashes'),
+    relics: items('sepulcher_bulwark', 'king_in_ashes_blade', 'royal_ash_phial'),
   },
   // ---- Raid ----
   {

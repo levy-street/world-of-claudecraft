@@ -67,6 +67,8 @@ const LOOT_ARCHETYPE: Record<PlayerClass, 'WAR' | 'ROG' | 'MAG'> = {
   priest: 'MAG',
   warlock: 'MAG',
   druid: 'MAG',
+  gravecaller: 'MAG',
+  briar_warden: 'WAR',
 };
 
 /**

@@ -16,6 +16,8 @@ import {
   TEMPORAL_HOURGLASS_SELF_RADIUS,
   type WeaponInfo,
 } from '../types';
+import { EXPANSION_CLASS_ABILITIES, EXPANSION_CLASSES } from './expansion_classes';
+import { LEVEL_40_CLASS_ABILITIES } from './level40_abilities';
 import { PALADIN_CORE_ABILITIES } from './paladin_core_abilities';
 import { PRIEST_ABILITIES } from './priest';
 import { MENDING_WATERS_MANA_COST, TIDECALL_MANA_COST } from './shaman_tuning';
@@ -66,6 +68,7 @@ const START_RATIONS_MANA = [
 ];
 
 export const CLASSES: Record<PlayerClass, ClassDef> = {
+  ...EXPANSION_CLASSES,
   warrior: {
     id: 'warrior',
     name: 'Warrior',
@@ -127,6 +130,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'sweeping_strikes',
       'deep_wounds',
       'enrage_passive',
+      'gravebreaker',
     ],
     color: 0xd67a54,
   },
@@ -223,6 +227,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'temporal_acceleration',
       'perfect_moment',
       'fireball_form',
+      'cinder_comet',
     ],
     color: 0x33c1f1,
   },
@@ -264,6 +269,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'stealth',
       'kick',
       'venom_dart',
+      'duskstep',
     ],
     color: 0xfcee58,
   },
@@ -330,6 +336,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'bastion_sweep',
       'oath_chain',
       'veilbound_march',
+      'last_light',
     ],
     color: 0xf58ca0,
   },
@@ -375,6 +382,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'bloodtrail_assault',
       'volley',
       'counter_shot',
+      'blackfletch',
     ],
     color: 0xa6d84f,
   },
@@ -419,6 +427,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'seraphic_vigil',
       'shadowform',
       'summon_tithefiend',
+      'memorial_grace',
     ],
     color: 0xc6d4f0,
   },
@@ -457,6 +466,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'ghost_wolf',
       'earthquake',
       'bloodlust',
+      'ancestor_storm',
     ],
     color: 0x4e8aea,
   },
@@ -529,6 +539,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'sacrifice_undead',
       'raise_gravewing',
       'army_of_the_dead',
+      'funeral_pyre',
     ],
     color: 0xa785e6,
   },
@@ -596,6 +607,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'hurricane',
       'skull_bash',
       'primal_reflexes',
+      'crown_of_briars',
     ],
     color: 0xff8c1a,
   },
@@ -610,6 +622,8 @@ const MAGE_TEMPORAL_BARRIER_SPELL_POWER_COEFF = 0.25;
 
 export const ABILITIES: Record<string, AbilityDef> = {
   ...PALADIN_CORE_ABILITIES,
+  ...EXPANSION_CLASS_ABILITIES,
+  ...LEVEL_40_CLASS_ABILITIES,
   // ====================== WARRIOR ======================
   heroic_strike: {
     id: 'heroic_strike',

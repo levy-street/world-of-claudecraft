@@ -4094,6 +4094,12 @@ export const ko_KR: EnTranslations = {
         "fenBlurb": "가을의 왕관 너머, 버드나무와 고요한 물의 밝은 늪과 해자 뒤의 마을이 있다.",
         "farshoreName": "먼바다 해안",
         "farshoreBlurb": "균열의 들판 위로 하늘이 찢어지고, 틈이 열릴 때마다 걸헤이븐이 종을 울리는 모래톱 건너의 섬.",
+        "rotmireName": "The Rotmire Expanse",
+        "rotmireBlurb": "A drowned grave-country where carrion flowers feed on an army of empty dead.",
+        "marchName": "The Petrified March",
+        "marchBlurb": "A royal road held by stone soldiers who have begun remembering their final command.",
+        "crownrootName": "The Crownroot Wilds",
+        "crownrootBlurb": "A frozen forest whose roots all descend toward the sealed royal Sepulcher.",
         "nightName": "밤꽃 평원",
         "nightBlurb": "꽃이 길을 밝히고 문레스트가 밤을 지새우는, 별이 쏟아지는 한밤의 나라.",
         "hauntName": "망령숲",
@@ -4803,6 +4809,18 @@ export const ko_KR: EnTranslations = {
       "none": "모든 조건에 맞는 직업이 없습니다. 조건을 하나 지우면 더 많은 직업이 나타납니다."
     },
     "abilityHook": {
+      "pestilent_bolt": "Hurls a reliable Shadow bolt while your afflictions wear the enemy down.",
+      "the_wasting": "Afflicts one enemy with a long-lasting Shadow disease.",
+      "blood_tithe": "Trades health for mana when a long fight drains your reserves.",
+      "gravecaller_bone_coat": "Wraps you in bone to blunt incoming damage.",
+      "plague_wind": "Spreads a damaging plague through enemies around you.",
+      "deaths_bargain": "Calls on forbidden power when survival matters more than safety.",
+      "briar_skin": "Keeps a permanent thorn shield ready to punish every attacker.",
+      "withering_presence": "Weakens nearby enemies simply by walking among them.",
+      "barbed_aegis": "Raises a stronger damage shield before entering a dangerous pack.",
+      "spore_hex": "Afflicts one enemy with lingering Nature damage.",
+      "vindictive_growth": "Turns sustained enemy pressure into still more reflected damage.",
+      "walking_calamity": "Surrounds your path with the strongest thorns in your kit.",
       "evil_eye": "적 하나를 지정해 그 행동과 고통으로 단죄를 축적합니다.",
       "heroic_strike": "다음 타격에 분노를 소모해 더 강하게 휘두르도록 예약합니다.",
       "revenge": "전방의 적을 휩쓸며, 회피하거나 무기 막기 후 자원 소모 없이 사용할 수 있습니다.",
@@ -5054,6 +5072,18 @@ export const ko_KR: EnTranslations = {
       "farshoreGreeting": "Ferrywalk를 건너오셨소? 그렇다면 일주일 만의 첫 손님이오. 워든이 한 번 살펴보고 싶어 할 게요.",
       "farshoreGreeter": "종지기 탐, 선착장",
       "farshorePlaceNotes": "걸헤이븐은 섬의 유일한 마을이자 마지막 보루입니다. 선착장은 Ferrywalk가 뭍에 닿는 곳으로, 곶 위에 경종이 서 있습니다. 감시 초원은 마을 남동쪽 고지를 지키며, 그곳에서 균열감시자가 다음 찢김의 기척에 귀를 기울입니다. 찢겨진 절벽은 섬 남쪽 끝에서 갈라져 있고, 균열의 들판은 걸헤이븐 동쪽의 망가진 곡식 이랑으로, 그곳의 찢김을 통해 넘어온 것들이 아직 기어다니고 있습니다.",
+      "rotmireBlurb": "The old north road sinks into a grave-country where carrion flowers bloom from emptied dead.",
+      "rotmireGreeting": "The graves are empty, traveler. Help me learn what the bloom has taken from them.",
+      "rotmireGreeter": "Mortician Ella, Wakefort",
+      "rotmirePlaceNotes": "Wakefort keeps the last dry road. The Carrion Gardens spread west through broken graves, while Sporefall Basin gathers the largest blooms beneath its poisoned mist.",
+      "marchBlurb": "A petrified royal army stands mid-charge along the road, and every stone face has begun listening.",
+      "marchGreeting": "The stone host remembers its final command. We must reach the Crownroot before it marches.",
+      "marchGreeter": "Captain Orren, Cairnwall",
+      "marchPlaceNotes": "Cairnwall watches the southern pass. The Stone Host blocks the old road, and the Rootscar Front marks where the buried forest first broke through the royal formation.",
+      "crownrootBlurb": "Frost grips a forest growing from a buried crown, and every root points toward its sealed Sepulcher.",
+      "crownrootGreeting": "Every living root is pointing toward the Sepulcher. Walk carefully, traveler.",
+      "crownrootGreeter": "Sister Briar, Lastbough",
+      "crownrootPlaceNotes": "Lastbough is the final refuge. The Ashen Canopy knots over the eastern wilds, and the Sepulcher Approach climbs between frozen roots toward the royal tomb.",
       "travelTitle": "돌아다니기",
       "travelBody": "왕국의 모든 길은 걷거나 말을 타고 갑니다. 비행 경로도, 마차도, 순간이동망도 없습니다. 지도는 하나로 이어진 땅덩어리이며, 모든 연결은 직접 발을 딛고 설 수 있는 것입니다. 산등성이가 한 왕국과 다음 왕국을 가르고, 두 왕국이 산등성이를 나눠 가진 곳에서는 길이 고개를 넘어 올라갑니다. 다만 모든 경계가 그런 것은 아닙니다. 북쪽에서는 긴 둑길이 장막의 골짜기에서 물 위를 가로질러 그 너머 눈의 땅으로 이어지고, 다시 남쪽에서는 Ferrywalk라 불리는 가느다란 천연 모래톱이 골짜기 해안에서 동쪽으로 뻗어 먼바다 해안의 선착장에 닿습니다. 그 섬에는 땅으로 이어진 경계가 아예 없습니다. 그리고 바깥 세계를 통틀어 진짜 문은 정확히 하나뿐입니다. 쏜피크 높은 곳에 걸린 황혼의 장막이 장막의 골짜기로 이어집니다. 장막의 골짜기 남쪽 산등성이는 고개 하나 없이 막혀 있으므로 그 장막이 처음 들어가는 길이며, 돌아 나올 때는 등 뒤에서 닫힙니다.\n\n어디에서 쓰러지든 돌아오는 길은 짧습니다. 모든 지역에는 묘석 위를 맴도는 영혼 치유사가 있는 묘지가 적어도 하나 있고, 풀려난 영혼은 그중 가장 가까운 곳에서 일어납니다.\n\n지도는 보이지 않는 벽으로 끝나지 않습니다. 땅은 백사장과 곶으로 이어지다가 트인 바다로 넘어갑니다. 세계가 헤엄쳐 건너라고 마련해 둔 물길, 곧 왕국과 왕국 사이의 해협과 호수는 잔잔하고 안전합니다. 대신 먼바다로 나아가면 거리 자체가 당신을 돌려세웁니다. 한 번 경고하고 다시 한 번 경고하며, 그래도 계속 헤엄치면 바다가 당신을 깎아 내려 끝내 목숨을 앗아 갑니다. 잠수에도 나름의 한계가 있어 수면 아래에서는 숨이 다하니, 물이 신호를 보내면 숨을 쉬러 올라와 뱃머리를 돌리세요.",
       "mountsTitle": "탈것",
@@ -5138,6 +5168,10 @@ export const ko_KR: EnTranslations = {
       "templeBody": "습지 길에서 벗어난 곳에 가라앉은 신전으로, 호기심 많고 만반의 준비를 갖춘 이들을 위한 샛길입니다.",
       "sanctumBody": "가시봉우리의 어두운 심장부로, 교단의 오랜 작업이 끔찍한 정점에 다다르는 곳.",
       "wildheartBody": "따뜻한 비에 젖은 정글 칼데라에서 두 개의 높은 사냥길이 비취빛 세노테를 감싼다. 야수 소굴과 선조의 폐허를 지나 의식 피라미드에 올라 정상에서 누가 기다리는지 확인하라.",
+      "rotchapelBody": "A plague chapel whose incense draws the dead back to their knees. Break the congregation before its abbot completes the final service.",
+      "ossuaryBody": "A burial hall beneath the petrified army, where the oldest officers still enforce commands carved into their bones.",
+      "crownrootBody": "The living heart beneath the frozen forest has become a royal prison. Cut through the heartwood and confront the power wrapped around its roots.",
+      "sepulcherBody": "The level-cap raid descends into the royal Sepulcher, where living crownshards defend the throne and ten players must break the Ashen Bloom at its source.",
       "raidName": "최종 단계 공격대",
       "raidBody": "봉인된 왕실 문 너머에는 10인 시련이 기다립니다. 여러 단계로 이어지는 전투와, 공격대 전원이 함께 꺼뜨려야 하는 불사의 힘입니다. 입장할 자격을 스스로 얻은 뒤, 친구 아홉을 데려오세요.",
       "heroicTitle": "영웅 난이도",
@@ -7021,6 +7055,8 @@ export const ko_KR: EnTranslations = {
     "mage": "마법사",
     "warlock": "흑마법사",
     "druid": "드루이드",
+    "gravecaller": "Gravecaller",
+    "briar_warden": "Briar Warden",
     "warriorAria": "전사 직업",
     "paladinAria": "성기사 직업",
     "hunterAria": "사냥꾼 직업",
@@ -7029,7 +7065,9 @@ export const ko_KR: EnTranslations = {
     "shamanAria": "주술사 직업",
     "mageAria": "마법사 직업",
     "warlockAria": "흑마법사 직업",
-    "druidAria": "드루이드 직업"
+    "druidAria": "드루이드 직업",
+    "gravecallerAria": "Gravecaller class",
+    "briar_wardenAria": "Briar Warden class"
   },
   "controls": {
     "title": "조작 가이드",
@@ -7918,7 +7956,9 @@ export const ko_KR: EnTranslations = {
       "shaman": "치유 / 근접 또는 원거리 DPS",
       "mage": "원거리 DPS",
       "warlock": "원거리 DPS",
-      "druid": "탱커 / 치유 / 근접 또는 원거리 DPS"
+      "druid": "탱커 / 치유 / 근접 또는 원거리 DPS",
+      "gravecaller": "Ranged DPS",
+      "briar_warden": "Tank / Healer / Ranged DPS"
     },
     "armor": {
       "chainLeatherCloth": "사슬, 가죽, 천",
@@ -7942,7 +7982,9 @@ export const ko_KR: EnTranslations = {
       "shaman": "주술사는 정령을 다루고 무기에 힘을 불어넣으며 번개로 적을 충격시키고 아군을 회복시킵니다.",
       "mage": "마법사는 화염, 냉기, 비전의 힘으로 적을 파괴하고 물을 만들어내며 위협을 얼립니다.",
       "warlock": "흑마법사는 악마를 소환하고 저주와 지속 피해 마법을 걸며 적에게서 생명력을 흡수해 버팁니다.",
-      "druid": "드루이드는 자연의 힘으로 치유하고 적을 묶으며 동물 형태로 변신해 방어하거나 피해를 줍니다."
+      "druid": "드루이드는 자연의 힘으로 치유하고 적을 묶으며 동물 형태로 변신해 방어하거나 피해를 줍니다.",
+      "gravecaller": "Gravecallers spread disease, drain life, trade health for magic, and command death from a safe distance.",
+      "briar_warden": "Briar Wardens layer boons and curses, then destroy attackers with powerful retaliatory damage shields."
     },
     "aria": "{className} 직업 세부 정보: 역할 {role}. 시작 능력치: 힘 {str}, 민첩 {agi}, 체력 {sta}, 지능 {int}, 정신력 {spi}.",
     "statBarAria": "{stat}: {value}/25"
@@ -9148,6 +9190,110 @@ export const ko_KR: EnTranslations = {
   },
   "entities": {
     "abilities": {
+      "pestilent_bolt": {
+        "name": "Pestilent Bolt",
+        "description": "Hurls diseased shadow for {damage} Shadow damage. Damage increases with Spell Power."
+      },
+      "blood_tithe": {
+        "name": "Blood Tithe",
+        "description": "Sacrifices 8% of your maximum health to restore 28 mana."
+      },
+      "the_wasting": {
+        "name": "The Wasting",
+        "description": "Afflicts the enemy for 48 Shadow damage over 18 sec in 6 ticks."
+      },
+      "grave_dread": {
+        "name": "Dread",
+        "description": "Leaves the enemy cowering for up to 8 sec. Damage breaks the effect."
+      },
+      "gravecaller_bone_coat": {
+        "name": "Bone Coat",
+        "description": "Absorbs damage equal to 20% of your maximum health for 12 sec."
+      },
+      "soul_siphon": {
+        "name": "Soul Siphon",
+        "description": "Drains 24 Shadow damage each second for 4 sec and restores health equal to the damage dealt."
+      },
+      "grave_chill": {
+        "name": "Grave Chill",
+        "description": "Deals {damage} Frost damage and slows movement by 50% for 8 sec."
+      },
+      "plague_wind": {
+        "name": "Plague Wind",
+        "description": "Blasts enemies within 8 yd for {damage} Shadow damage."
+      },
+      "deaths_bargain": {
+        "name": "Death's Bargain",
+        "description": "Reduces all damage you take by 40% for 10 sec."
+      },
+      "briar_skin": {
+        "name": "Briar Skin",
+        "description": "Covers the target in briars for 30 min. Each melee attacker takes {buff} Nature damage. The shield has no charges."
+      },
+      "withering_presence": {
+        "name": "Withering Presence",
+        "description": "Slows the attacks of enemies within 10 yd by 15% for 12 sec."
+      },
+      "barbed_aegis": {
+        "name": "Barbed Aegis",
+        "description": "For 12 sec, each melee attacker takes 42 Nature damage. The shield has no charges."
+      },
+      "spore_hex": {
+        "name": "Spore Hex",
+        "description": "Infects the enemy for 42 Nature damage over 12 sec in 4 ticks."
+      },
+      "ironbark_boon": {
+        "name": "Ironbark Boon",
+        "description": "Increases the armor of all party members by {buff}% for 30 min."
+      },
+      "pollen_cloud": {
+        "name": "Pollen Cloud",
+        "description": "Scours enemies within 10 yd for {damage} Nature damage."
+      },
+      "vindictive_growth": {
+        "name": "Vindictive Growth",
+        "description": "For 15 sec, melee attackers take 120 Nature damage and you take 20% less damage."
+      },
+      "walking_calamity": {
+        "name": "Walking Calamity",
+        "description": "For 20 sec, melee attackers take 240 Nature damage and you take 35% less damage."
+      },
+      "gravebreaker": {
+        "name": "Gravebreaker",
+        "description": "Smashes the ground, dealing {damage} Physical damage to enemies within 8 yd."
+      },
+      "last_light": {
+        "name": "Last Light",
+        "description": "Reduces all damage you take by 35% for 12 sec."
+      },
+      "blackfletch": {
+        "name": "Blackfletch",
+        "description": "Fires an ashen arrow for {damage} Physical damage."
+      },
+      "duskstep": {
+        "name": "Duskstep",
+        "description": "Strikes for 80% weapon damage plus {damage} Physical damage."
+      },
+      "memorial_grace": {
+        "name": "Memorial Grace",
+        "description": "Heals a friendly target for {damage}."
+      },
+      "ancestor_storm": {
+        "name": "Ancestor Storm",
+        "description": "Calls ancestral lightning for {damage} Nature damage to enemies within 10 yd."
+      },
+      "cinder_comet": {
+        "name": "Cinder Comet",
+        "description": "Calls down a comet for {damage} Fire damage to enemies within 8 yd of the target area."
+      },
+      "funeral_pyre": {
+        "name": "Funeral Pyre",
+        "description": "Burns the enemy for 240 Shadow damage over 12 sec in 4 ticks."
+      },
+      "crown_of_briars": {
+        "name": "Crown of Briars",
+        "description": "For 20 sec, each melee attacker that strikes the target takes 96 Nature damage."
+      },
       "sport_kick": {
         "name": "킥",
         "description": "조준 지점을 향해 공을 땅볼로 차 보냅니다."
@@ -13736,6 +13882,66 @@ export const ko_KR: EnTranslations = {
       "wildheart_high_priest": {
         "name": "분지의 목소리 줄가르"
       },
+      "rotmire_husk": {
+        "name": "Rotmire Husk"
+      },
+      "carrion_bloom": {
+        "name": "Carrion Bloom"
+      },
+      "sporebound_brute": {
+        "name": "Sporebound Brute"
+      },
+      "mother_morva": {
+        "name": "Mother Morva"
+      },
+      "stone_legionary": {
+        "name": "Stone Legionary"
+      },
+      "crownless_knight": {
+        "name": "Crownless Knight"
+      },
+      "rootscar_widow": {
+        "name": "Rootscar Widow"
+      },
+      "marshal_veyr": {
+        "name": "Marshal Veyr"
+      },
+      "frostroot_stalker": {
+        "name": "Frostroot Stalker"
+      },
+      "ashen_dryad": {
+        "name": "Ashen Dryad"
+      },
+      "sepulcher_guardian": {
+        "name": "Sepulcher Guardian"
+      },
+      "the_hollow_crown": {
+        "name": "The Hollow Crown"
+      },
+      "rotchapel_cultist": {
+        "name": "Rotchapel Cultist"
+      },
+      "abbot_of_flies": {
+        "name": "Abbot of Flies"
+      },
+      "cairnwall_revenant": {
+        "name": "Cairnwall Revenant"
+      },
+      "general_silex": {
+        "name": "General Silex"
+      },
+      "crownroot_heartwood": {
+        "name": "Heartwood Horror"
+      },
+      "queen_under_roots": {
+        "name": "The Queen Under Roots"
+      },
+      "sepulcher_crownshard": {
+        "name": "Living Crownshard"
+      },
+      "king_in_ashes": {
+        "name": "The King in Ashes"
+      },
       "ironvein_foreman": {
         "name": "철맥 감독관"
       },
@@ -14298,6 +14504,21 @@ export const ko_KR: EnTranslations = {
         "name": "연금술사 베레인",
         "title": "약방의 주인",
         "greeting": "두 번 재고 한 번에 부어라, {className}. 약방에서는 쏟은 시약을 봐주지 않는다."
+      },
+      "mortician_ella": {
+        "name": "Mortician Ella",
+        "title": "Keeper of Wakefort",
+        "greeting": "The graves are empty, {className}. Help me learn what the bloom has taken from them."
+      },
+      "captain_orren": {
+        "name": "Captain Orren",
+        "title": "Cairnwall Commander",
+        "greeting": "The stone host remembers its last command. We must reach the Crownroot before it marches."
+      },
+      "sister_briar": {
+        "name": "Sister Briar",
+        "title": "Warden of Lastbough",
+        "greeting": "Every living root is pointing toward the Sepulcher. Walk carefully, {className}."
       },
       "tidewatcher_ondrel": {
         "name": "온드렐 베인",
@@ -16358,6 +16579,126 @@ export const ko_KR: EnTranslations = {
           }
         }
       },
+      "q_ab_01_wakefort": {
+        "title": "Wake the Fort",
+        "text": "Defeat 8 Rotmire Husk.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Rotmire Husk slain"
+          }
+        }
+      },
+      "q_ab_02_carrion": {
+        "title": "The Carrion Gardens",
+        "text": "Defeat 8 Carrion Bloom.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Carrion Bloom slain"
+          }
+        }
+      },
+      "q_ab_03_sporefall": {
+        "title": "Sporefall",
+        "text": "Defeat 6 Sporebound Brute.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Sporebound Brute slain"
+          }
+        }
+      },
+      "q_ab_04_morva": {
+        "title": "Mother of the Bloom",
+        "text": "Defeat 1 Mother Morva.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Mother Morva slain"
+          }
+        }
+      },
+      "q_ab_05_cairnwall": {
+        "title": "The Silent March",
+        "text": "Defeat 8 Stone Legionary.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Stone Legionary slain"
+          }
+        }
+      },
+      "q_ab_06_stone_host": {
+        "title": "Crownless",
+        "text": "Defeat 8 Crownless Knight.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Crownless Knight slain"
+          }
+        }
+      },
+      "q_ab_07_rootscar": {
+        "title": "Webs in the Scar",
+        "text": "Defeat 8 Rootscar Widow.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Rootscar Widow slain"
+          }
+        }
+      },
+      "q_ab_08_veyr": {
+        "title": "The Last Marshal",
+        "text": "Defeat 1 Marshal Veyr.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Marshal Veyr slain"
+          }
+        }
+      },
+      "q_ab_09_lastbough": {
+        "title": "Under the Last Bough",
+        "text": "Defeat 8 Frostroot Stalker.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Frostroot Stalker slain"
+          }
+        }
+      },
+      "q_ab_10_canopy": {
+        "title": "Ash in the Canopy",
+        "text": "Defeat 8 Ashen Dryad.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Ashen Dryad slain"
+          }
+        }
+      },
+      "q_ab_11_guardians": {
+        "title": "The Sepulcher Guard",
+        "text": "Defeat 8 Sepulcher Guardian.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "Sepulcher Guardian slain"
+          }
+        }
+      },
+      "q_ab_12_crown": {
+        "title": "Break the Hollow Crown",
+        "text": "Defeat 1 The Hollow Crown.",
+        "completion": "The road is safer, but the bloom still grows.",
+        "objectives": {
+          "0": {
+            "label": "The Hollow Crown slain"
+          }
+        }
+      },
       "q_drowned_choir": {
         "title": "익사한 성가대",
         "text": "물거리들은 홀로 움직이지 않는다네. 그들 사이를 익사한 신도들이 걷고 있지 — 신전과 함께 가라앉은 그 광신도들은, 썩어버린 제의를 여전히 걸친 채 물가 바위에서 부르던 기도를 아직도 노래하고 있네. 그들 중 여덟을 침묵시키고, 그들이 지닌 제물 여섯 개를 내게 가져오게. 그들이 그 여신에게 무엇을 바치려는지 알고 싶네.",
@@ -16824,6 +17165,51 @@ export const ko_KR: EnTranslations = {
             "label": "균열의 들판"
           }
         }
+      },
+      "rotmire_expanse": {
+        "name": "The Rotmire Expanse",
+        "welcome": "The dead feed a bloom that should never have taken root. Wakefort holds the last dry road north.",
+        "pois": {
+          "0": {
+            "label": "Wakefort"
+          },
+          "1": {
+            "label": "The Carrion Gardens"
+          },
+          "2": {
+            "label": "Sporefall Basin"
+          }
+        }
+      },
+      "petrified_march": {
+        "name": "The Petrified March",
+        "welcome": "A royal army stands petrified mid-charge, and something beneath the road has begun calling their names.",
+        "pois": {
+          "0": {
+            "label": "Cairnwall"
+          },
+          "1": {
+            "label": "The Stone Host"
+          },
+          "2": {
+            "label": "Rootscar Front"
+          }
+        }
+      },
+      "crownroot_wilds": {
+        "name": "The Crownroot Wilds",
+        "welcome": "Frost grips a forest growing from a buried crown. Beyond Lastbough, every root points toward the Sepulcher.",
+        "pois": {
+          "0": {
+            "label": "Lastbough"
+          },
+          "1": {
+            "label": "The Ashen Canopy"
+          },
+          "2": {
+            "label": "Sepulcher Approach"
+          }
+        }
       }
     },
     "dungeons": {
@@ -16861,6 +17247,26 @@ export const ko_KR: EnTranslations = {
         "name": "마지막 요새",
         "enterText": "마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.",
         "leaveText": "요새의 문을 닫고 드레이크랜드의 바람 속으로 돌아갑니다."
+      },
+      "rotchapel": {
+        "name": "Rotchapel",
+        "enterText": "Rotten incense hangs beneath the chapel vault.",
+        "leaveText": "You return to the Rotmire air."
+      },
+      "ossuary_of_the_march": {
+        "name": "Ossuary of the March",
+        "enterText": "Stone soldiers turn their heads toward the living.",
+        "leaveText": "You escape the silent formation."
+      },
+      "heart_of_crownroot": {
+        "name": "Heart of Crownroot",
+        "enterText": "The root-heart beats once beneath your feet.",
+        "leaveText": "You climb back into the frozen wilds."
+      },
+      "sepulcher_of_ashes": {
+        "name": "Sepulcher of Ashes",
+        "enterText": "The Hollow Crown closes around the raid.",
+        "leaveText": "The Sepulcher releases you."
       },
       "drowned_temple": {
         "name": "익사한 신전",

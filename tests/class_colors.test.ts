@@ -28,6 +28,8 @@ const PALETTE: Record<PlayerClass, number> = {
   shaman: 0x4e8aea,
   warlock: 0xa785e6,
   druid: 0xff8c1a,
+  gravecaller: 0x66507c,
+  briar_warden: 0x698744,
 };
 const CLASS_IDS = Object.keys(PALETTE) as PlayerClass[];
 

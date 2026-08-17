@@ -9,6 +9,7 @@ import {
   SHAMAN_CHOICE_ROWS,
   WARLOCK_CHOICE_ROWS,
 } from './choice_rows_classic';
+import { BRIAR_WARDEN_ROWS, GRAVECALLER_ROWS } from './expansion_talents';
 import type { TalentEffect } from './talents';
 import { WARRIOR_ROWS } from './warrior_rows';
 
@@ -46,6 +47,8 @@ export const CHOICE_ROWS: Record<PlayerClass, ClassChoiceRows> & Record<string, 
   mage: MAGE_CHOICE_ROWS,
   warlock: WARLOCK_CHOICE_ROWS,
   druid: DRUID_CHOICE_ROWS,
+  gravecaller: { rows: GRAVECALLER_ROWS },
+  briar_warden: { rows: BRIAR_WARDEN_ROWS },
 };
 
 const CHOICE_ROW_LEVEL_SET = new Set<number>(CHOICE_ROW_LEVELS);

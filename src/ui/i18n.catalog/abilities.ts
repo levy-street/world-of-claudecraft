@@ -610,6 +610,32 @@ function abilityTranslations(
 const classAbilityNamesEn = {
   entities: {
     abilities: abilityTranslations([
+      ['pestilent_bolt', 'Pestilent Bolt', 'Hurls diseased shadow for {damage} Shadow damage. Damage increases with Spell Power.'],
+      ['blood_tithe', 'Blood Tithe', 'Sacrifices 8% of your maximum health to restore 28 mana.'],
+      ['the_wasting', 'The Wasting', 'Afflicts the enemy for 48 Shadow damage over 18 sec in 6 ticks.'],
+      ['grave_dread', 'Dread', 'Leaves the enemy cowering for up to 8 sec. Damage breaks the effect.'],
+      ['gravecaller_bone_coat', 'Bone Coat', 'Absorbs damage equal to 20% of your maximum health for 12 sec.'],
+      ['soul_siphon', 'Soul Siphon', 'Drains 24 Shadow damage each second for 4 sec and restores health equal to the damage dealt.'],
+      ['grave_chill', 'Grave Chill', 'Deals {damage} Frost damage and slows movement by 50% for 8 sec.'],
+      ['plague_wind', 'Plague Wind', 'Blasts enemies within 8 yd for {damage} Shadow damage.'],
+      ['deaths_bargain', "Death's Bargain", 'Reduces all damage you take by 40% for 10 sec.'],
+      ['briar_skin', 'Briar Skin', 'Covers the target in briars for 30 min. Each melee attacker takes {buff} Nature damage. The shield has no charges.'],
+      ['withering_presence', 'Withering Presence', 'Slows the attacks of enemies within 10 yd by 15% for 12 sec.'],
+      ['barbed_aegis', 'Barbed Aegis', 'For 12 sec, each melee attacker takes 42 Nature damage. The shield has no charges.'],
+      ['spore_hex', 'Spore Hex', 'Infects the enemy for 42 Nature damage over 12 sec in 4 ticks.'],
+      ['ironbark_boon', 'Ironbark Boon', 'Increases the armor of all party members by {buff}% for 30 min.'],
+      ['pollen_cloud', 'Pollen Cloud', 'Scours enemies within 10 yd for {damage} Nature damage.'],
+      ['vindictive_growth', 'Vindictive Growth', 'For 15 sec, melee attackers take 120 Nature damage and you take 20% less damage.'],
+      ['walking_calamity', 'Walking Calamity', 'For 20 sec, melee attackers take 240 Nature damage and you take 35% less damage.'],
+      ['gravebreaker', 'Gravebreaker', 'Smashes the ground, dealing {damage} Physical damage to enemies within 8 yd.'],
+      ['last_light', 'Last Light', 'Reduces all damage you take by 35% for 12 sec.'],
+      ['blackfletch', 'Blackfletch', 'Fires an ashen arrow for {damage} Physical damage.'],
+      ['duskstep', 'Duskstep', 'Strikes for 80% weapon damage plus {damage} Physical damage.'],
+      ['memorial_grace', 'Memorial Grace', 'Heals a friendly target for {damage}.'],
+      ['ancestor_storm', 'Ancestor Storm', 'Calls ancestral lightning for {damage} Nature damage to enemies within 10 yd.'],
+      ['cinder_comet', 'Cinder Comet', 'Calls down a comet for {damage} Fire damage to enemies within 8 yd of the target area.'],
+      ['funeral_pyre', 'Funeral Pyre', 'Burns the enemy for 240 Shadow damage over 12 sec in 4 ticks.'],
+      ['crown_of_briars', 'Crown of Briars', 'For 20 sec, each melee attacker that strikes the target takes 96 Nature damage.'],
       // The Vale Cup sport kit (docs/prd/vale-cup.md).
       ['sport_kick', 'Kick', 'Knock the ball along the ground toward the aim point.'],
       [

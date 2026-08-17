@@ -30,4 +30,6 @@ export const CLASS_META: Record<string, ClassMeta> = {
   mage: { style: 'ranged', play: 'solo', complexity: 'med', goodFirst: false },
   warlock: { style: 'ranged', play: 'solo', complexity: 'high', goodFirst: false },
   druid: { style: 'both', play: 'flexible', complexity: 'high', goodFirst: false },
+  gravecaller: { style: 'ranged', play: 'solo', complexity: 'high', goodFirst: false },
+  briar_warden: { style: 'both', play: 'solo', complexity: 'med', goodFirst: true },
 };

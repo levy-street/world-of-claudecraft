@@ -4,6 +4,21 @@
 // merges those records into the flat tables the rest of the engine consumes,
 // and owns the world-layout constants.
 
+import {
+  ASHEN_BLOOM_CAMPS,
+  ASHEN_BLOOM_DUNGEONS,
+  ASHEN_BLOOM_INSTANCE_MOBS,
+  ASHEN_BLOOM_ITEMS,
+  ASHEN_BLOOM_MOBS,
+  ASHEN_BLOOM_NPCS,
+  ASHEN_BLOOM_PROPS,
+  ASHEN_BLOOM_QUEST_ORDER,
+  ASHEN_BLOOM_QUESTS,
+  ASHEN_BLOOM_ROADS,
+  CROWNROOT_ZONE,
+  PETRIFIED_MARCH_ZONE,
+  ROTMIRE_ZONE,
+} from './content/ashen_bloom';
 import { BASE_ITEMS } from './content/items';
 import type {
   CampDef,
@@ -349,6 +364,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   GALECREST_ITEMS,
   FARSHORE_ITEMS,
   WILDHEART_ITEMS,
+  ASHEN_BLOOM_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -359,6 +375,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...ZONE2_MOBS,
   ...ZONE3_MOBS,
   ...DUNGEON_MOBS,
+  ...ASHEN_BLOOM_INSTANCE_MOBS,
   ...WARLOCK_PET_MOBS,
   ...NECROMANCY_MOBS,
   ...MAGE_PET_MOBS,
@@ -379,6 +396,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...EVERGARDEN_MOBS,
   ...GALECREST_MOBS,
   ...FARSHORE_MOBS,
+  ...ASHEN_BLOOM_MOBS,
   // The Vale Cup boarball: an inert, non-hostile ball entity (never camp-spawned;
   // the match driver in social/vale_cup.ts spawns and despawns it).
   [VALE_CUP_BALL_TEMPLATE_ID]: VALE_CUP_BALL_MOB,
@@ -410,6 +428,7 @@ export const NPCS: Record<string, NpcDef> = {
   ...EVERGARDEN_NPCS,
   ...GALECREST_NPCS,
   ...FARSHORE_NPCS,
+  ...ASHEN_BLOOM_NPCS,
   // The Spirit Healer template (dynamic: true, so the ctor's surface-placement
   // loop skips it). Kept in NPCS so the online client and world_entity_i18n can
   // resolve its name; spirit.ts spawns a copy at every graveyard.
@@ -436,6 +455,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...EVERGARDEN_QUESTS,
   ...GALECREST_QUESTS,
   ...FARSHORE_QUESTS,
+  ...ASHEN_BLOOM_QUESTS,
 };
 
 export const QUEST_ORDER: string[] = [
@@ -454,6 +474,7 @@ export const QUEST_ORDER: string[] = [
   ...EVERGARDEN_QUEST_ORDER,
   ...GALECREST_QUEST_ORDER,
   ...FARSHORE_QUEST_ORDER,
+  ...ASHEN_BLOOM_QUEST_ORDER,
 ];
 
 // The Book of Deeds catalog (content/deeds.ts) is deliberately NOT re-exported
@@ -503,6 +524,7 @@ export const CAMPS: CampDef[] = [
   // The Drakelands dragonkin brood belt (v0.35 rework) arrived after the
   // knights: same append-last rule, so every camp above keeps its draws.
   ...DRAKELANDS_BROOD_CAMPS,
+  ...ASHEN_BLOOM_CAMPS,
 ];
 
 // Escort quest runs (src/sim/escort.ts): defs authored per realm, merged here
@@ -556,6 +578,7 @@ export const ROADS: { x: number; z: number }[][] = [
   ...EVERGARDEN_ROADS,
   ...GALECREST_ROADS,
   ...FARSHORE_ROADS,
+  ...ASHEN_BLOOM_ROADS,
 ];
 
 // Paired overworld portals (src/sim/portals.ts checks these each tick).
@@ -588,6 +611,7 @@ export const PROPS: ZonePropsDef = mergeProps([
   EVERGARDEN_PROPS,
   GALECREST_PROPS,
   FARSHORE_PROPS,
+  ASHEN_BLOOM_PROPS,
 ]);
 
 function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
@@ -631,6 +655,8 @@ export const REWARD_ARCHETYPE: Record<PlayerClass, PlayerClass> = {
   priest: 'mage',
   warlock: 'mage',
   druid: 'mage',
+  gravecaller: 'mage',
+  briar_warden: 'warrior',
 };
 
 // Resolve the item a quest awards a given class: a class-specific reward if the
@@ -669,6 +695,9 @@ export const ZONES: ZoneDef[] = [
   EVERGARDEN_ZONE,
   GALECREST_ZONE,
   FARSHORE_ZONE,
+  ROTMIRE_ZONE,
+  PETRIFIED_MARCH_ZONE,
+  CROWNROOT_ZONE,
 ];
 
 export const WORLD_SIZE = 360; // the original strip's width (one grid column)
@@ -970,6 +999,7 @@ export const DUNGEONS: Record<string, DungeonDef> = {
   ...DUNGEON_DEFS,
   ...TEMPLE_DUNGEON_DEFS,
   ...WILDHEART_DUNGEON_DEFS,
+  ...ASHEN_BLOOM_DUNGEONS,
 };
 
 export const DUNGEON_LIST: DungeonDef[] = Object.values(DUNGEONS).sort((a, b) => a.index - b.index);
