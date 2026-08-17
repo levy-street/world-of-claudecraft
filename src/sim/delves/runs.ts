@@ -497,6 +497,10 @@ export function spawnDelveModule(ctx: SimContext, run: DelveRun): void {
   run.objectIds = [];
   run.objectState = {};
   run.raiseDeadChannel = null;
+  // Pending Restless Graves spawns are room state: a spawn queued in the old
+  // room must die with it, or it rises there after the advance and joins the
+  // NEW room's mob list, sealing that room's portal forever.
+  run.restlessPending = [];
   run.exitPortalOpen = false;
   run.rewardChestId = null;
   run.surfaceExitId = null;
@@ -614,11 +618,12 @@ export function updateDelveRuns(ctx: SimContext): void {
     let occupied = false;
     for (const meta of ctx.players.values()) {
       const e = ctx.entities.get(meta.entityId);
-      if (
-        e &&
-        Math.abs(e.pos.x - origin.x) < 120 &&
-        Math.abs(e.pos.z - origin.z) < delveOccupancyRadius(run)
-      ) {
+      // Rooms extend only NORTH of the origin (module z offsets are
+      // non-negative), so the band is asymmetric: a symmetric +-radius check
+      // reached ~528u south into the NEIGHBOR slot's rooms (slots sit 620u
+      // apart), letting busy neighbors pin an abandoned run claimed forever.
+      const dz = e ? e.pos.z - origin.z : 0;
+      if (e && Math.abs(e.pos.x - origin.x) < 120 && dz > -40 && dz < delveOccupancyRadius(run)) {
         occupied = true;
         break;
       }
@@ -1014,6 +1019,12 @@ export function tryOpenDelveExitPortal(ctx: SimContext, run: DelveRun): void {
     return e && !e.dead;
   });
   if (liveMobs) return;
+  // Queued Restless Graves spawns count as live: killing the LAST trash in a
+  // room must not open (and latch) the portal inside the 3s grave delay, or the
+  // risen Bonewalkers appear behind an open portal and seal the NEXT room's
+  // gate instead. The tick driver re-checks, so the portal opens normally once
+  // the risen are down.
+  if (run.restlessPending.length > 0) return;
   // Room puzzle gate: every pressure plate in the module must be triggered before
   // the exit opens (Drowned Litany "activate N valves/tablets/candles/ropes"; the
   // Reliquary's plated rooms already require all plates to raise the portcullis, so
