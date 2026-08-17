@@ -46,10 +46,15 @@ function harness(
   const acceptQuest = vi.fn();
   const turnInQuest = vi.fn();
   const reportTelemetry = vi.fn();
+  const buyRedesignCredit = vi.fn();
   const world = {
     entities,
     cfg: { playerClass: 'warrior' },
     player: { name: 'Ari', pos: { x: 0, y: 0, z: 0 } },
+    // The Stylist row buys through the LIVE WORLD (deps.world()), the same way
+    // the discuss row reaches targetEntity/interact, rather than through a
+    // bespoke dialog dep.
+    buyRedesignCredit,
     questLog: new Map(),
     partyInfo: null,
     stationPlacements: STATIONS,
@@ -100,7 +105,6 @@ function harness(
   const openDelveBoard = vi.fn();
   const openValeCup = vi.fn();
   const openCardDuel = vi.fn();
-  const buyRedesignCredit = vi.fn();
   const openTrain = vi.fn();
   const openUnbind = vi.fn();
   const openCrafting = vi.fn();
@@ -138,7 +142,6 @@ function harness(
     openDelveBoard,
     openValeCup,
     openCardDuel,
-    buyRedesignCredit,
     openTrain,
     openUnbind,
     openCrafting,
@@ -158,6 +161,7 @@ function harness(
     acceptQuest,
     turnInQuest,
     reportTelemetry,
+    buyRedesignCredit,
     release,
     focusFirst,
     trapOpener,
@@ -171,7 +175,6 @@ function harness(
     openDelveBoard,
     openValeCup,
     openCardDuel,
-    buyRedesignCredit,
     openTrain,
     openUnbind,
     openCrafting,

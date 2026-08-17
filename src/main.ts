@@ -370,7 +370,10 @@ import {
   maybeShowFirstRunCameraPrompt,
 } from './ui/camera_prompt';
 import { deleteCharButtonHtml } from './ui/char_delete_button';
-import { editAppearanceButtonHtml, RedesignSubmitRouter } from './ui/charselect_edit_appearance';
+import {
+  createRedesignSubmitRouter,
+  editAppearanceButtonHtml,
+} from './ui/charselect_edit_appearance';
 import { loadCharselectNews } from './ui/charselect_news';
 import { CharselectRedesignEditor } from './ui/charselect_redesign';
 import { ChatCommandMenu } from './ui/chat_command_menu';
@@ -6754,10 +6757,6 @@ async function refreshCharacters(): Promise<void> {
       const rerollBtn = c.appearanceRerollAvailable
         ? `<button type="button" class="btn reroll-char-btn" title="${escapeHtml(t('character.redesignHint'))}" aria-label="${escapeHtml(t('character.redesignTitle', { name: c.name }))}">${escapeHtml(t('character.redesign'))}</button>`
         : '';
-      // The PAID redesign (a Stylist credit). Its own module owns both the
-      // eligibility decision and the markup; it renders '' whenever the free
-      // token above applies, so the two buttons never appear together.
-      const editAppearanceBtn = editAppearanceButtonHtml(c);
       // The chip draws the character's REAL body: their authored modular look
       // (or the mech cosmetic), matching the 3D stage and the world.
       const chipHtml = () =>
@@ -6794,10 +6793,10 @@ async function refreshCharacters(): Promise<void> {
         </div>
         ${
           c.forceRename
-            ? `<input class="rename-input" placeholder="${escapeHtml(t('character.newNamePlaceholder'))}" maxlength="16" /><span class="char-actions"><button class="btn rename-btn">${escapeHtml(t('character.rename'))}</button>${rerollBtn}${editAppearanceBtn}${deleteCharButtonHtml(c.online)}</span>`
+            ? `<input class="rename-input" placeholder="${escapeHtml(t('character.newNamePlaceholder'))}" maxlength="16" /><span class="char-actions"><button class="btn rename-btn">${escapeHtml(t('character.rename'))}</button>${rerollBtn}${editAppearanceButtonHtml(c)}${deleteCharButtonHtml(c.online)}</span>`
             : c.online
-              ? `<span class="char-actions"><button class="btn take-over-btn" title="${escapeHtml(t('character.takeOverConfirm'))}" aria-label="${escapeHtml(t('character.takeOverConfirm'))}">${escapeHtml(t('character.takeOver'))}</button>${rerollBtn}${editAppearanceBtn}${deleteCharButtonHtml(true)}</span>`
-              : `<span class="char-actions"><button class="btn enter-world-btn">${escapeHtml(t('auth.enterWorld'))}</button>${rerollBtn}${editAppearanceBtn}${deleteCharButtonHtml(false)}</span>`
+              ? `<span class="char-actions"><button class="btn take-over-btn" title="${escapeHtml(t('character.takeOverConfirm'))}" aria-label="${escapeHtml(t('character.takeOverConfirm'))}">${escapeHtml(t('character.takeOver'))}</button>${rerollBtn}${editAppearanceButtonHtml(c)}${deleteCharButtonHtml(true)}</span>`
+              : `<span class="char-actions"><button class="btn enter-world-btn">${escapeHtml(t('auth.enterWorld'))}</button>${rerollBtn}${editAppearanceButtonHtml(c)}${deleteCharButtonHtml(false)}</span>`
         }`;
 
       row.querySelector('.delete-char-btn')?.addEventListener('click', (e) => {
@@ -6862,32 +6861,18 @@ async function refreshCharacters(): Promise<void> {
           selectRow();
         }
       });
-      row.querySelector('.reroll-char-btn')?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        // Captured before selectRow(), whose own close(false) call (on
-        // whatever editor is already open) would otherwise leave
-        // document.activeElement pointing at the OLD row's button by the
-        // time open() ran. Passing this button explicitly is the fix (see
-        // charselect_redesign.ts open()).
-        const opener = e.currentTarget as HTMLButtonElement;
-        // Select the row first so the stage, name, and Enter World button all
-        // agree on which character is being redesigned.
-        selectRow();
-        // Latch which endpoint this editor session saves to BEFORE opening, so a
-        // roster refresh mid-edit cannot flip a free redesign into a paid one.
-        redesignSubmitRouter.noteOpen(c);
-        redesignEditor.open(c, opener);
-      });
-      // The PAID redesign opens the SAME editor, preloaded with the character's
-      // current look (the creator reused as-is, never forked). Only the latched
-      // save route differs.
-      row.querySelector('.edit-appearance-btn')?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const opener = e.currentTarget as HTMLButtonElement;
-        selectRow();
-        redesignSubmitRouter.noteOpen(c);
-        redesignEditor.open(c, opener);
-      });
+      // Both redesign buttons open the SAME editor; only the save route differs,
+      // latched from the row before opening. Opener passed explicitly: selectRow
+      // closes any open editor, stranding focus (charselect_redesign.ts open()).
+      for (const btn of row.querySelectorAll('.reroll-char-btn, .edit-appearance-btn')) {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const opener = e.currentTarget as HTMLButtonElement;
+          selectRow();
+          redesignSubmitRouter.noteOpen(c);
+          redesignEditor.open(c, opener);
+        });
+      }
       // Double-click a row to jump straight into the world (classic-select
       // muscle memory). It routes through the shared desktop Enter World button
       // so entry owns its loading state; the button only exists in the docked
@@ -7164,15 +7149,7 @@ function showCharselectCharacter(c: CharacterSummary): void {
  *  button). Owns its own panel, draft and customizer in
  *  src/ui/charselect_redesign.ts; everything it needs from this file arrives
  *  through these deps. */
-// Which endpoint the open redesign editor saves to. Latched at open (see the
-// roster row handlers) so a roster refresh mid-edit cannot turn a free redesign
-// into a paid one, or the reverse.
-const redesignSubmitRouter = new RedesignSubmitRouter({
-  saveWithFreeToken: (characterId, app, helmHidden) =>
-    api.rerollAppearance(characterId, app, helmHidden),
-  saveWithCredit: (characterId, app, helmHidden) =>
-    api.spendRedesignCredit(characterId, app, helmHidden),
-});
+const redesignSubmitRouter = createRedesignSubmitRouter(api);
 
 const redesignEditor = new CharselectRedesignEditor({
   previewModular: (app, worn, cls, mainhandItemId, offhandItemId, weaponSkinId) => {
@@ -7185,8 +7162,6 @@ const redesignEditor = new CharselectRedesignEditor({
     if (charselectSelected) showCharselectCharacter(charselectSelected);
   },
   setPreviewName: setCharselectPreviewName,
-  // Dispatched by the route latched when the editor opened, so a Save always
-  // posts to the endpoint the player was actually offered.
   saveAppearance: (characterId, app, helmHidden) =>
     redesignSubmitRouter.submit(characterId, app, helmHidden),
   refreshRoster: () => refreshCharacters(),
@@ -10395,8 +10370,7 @@ function wireStartScreens(): void {
     .getElementById('btn-reroll-save')
     ?.addEventListener('click', () => void redesignEditor.save());
   document.getElementById('btn-reroll-cancel')?.addEventListener('click', () => {
-    // Drop the latched route with the draft: nothing was posted, so the next
-    // open must latch afresh rather than inherit this session's endpoint.
+    // Drop the latched route with the draft, so the next open latches afresh.
     redesignSubmitRouter.clear();
     redesignEditor.close(true);
   });

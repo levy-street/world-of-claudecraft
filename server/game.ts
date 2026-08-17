@@ -324,6 +324,7 @@ import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_even
 import { nextRaidResetMs, resetDayKey } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
+import { spendRedesignCreditOnSessions } from './redesign_credit_session';
 import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
 import { refusedRiftForgeCommand } from './rift_forge_gate';
 import { RiftUpgradeCoordinator, riftUpgraderConfigFromEnv } from './rift_upgrader';
@@ -5713,35 +5714,10 @@ export class GameServer {
     return pushed;
   }
 
-  /**
-   * Mirror a SPENT redesign credit onto a LIVE session. Returns whether anything
-   * was in world to push to.
-   *
-   * The paid redesign route (server/character_redesign.ts) decrements the credit
-   * inside the stored state blob, and a character who is IN WORLD while that
-   * lands still holds the old count in memory: its 30 s autosave would write the
-   * spent credit straight back and hand the player a free second redesign. This
-   * is the credit-side twin of setHelmHiddenForCharacter above, and it is the one
-   * push whose absence is an economy bug rather than a cosmetic lag.
-   *
-   * Clamped at zero: the row is the authority on how many remain, and a live
-   * session that somehow reads low must never go negative.
-   */
+  /** Mirror a SPENT redesign credit onto a live session; rules and the reason it
+   *  must exist live in server/redesign_credit_session.ts. */
   spendRedesignCreditForCharacter(characterId: number): boolean {
-    let pushed = false;
-    for (const s of this.clients.values()) {
-      if (s.characterId !== characterId) continue;
-      const meta = this.sim.players.get(s.pid);
-      if (!meta) continue;
-      const held = typeof meta.redesignCredits === 'number' ? meta.redesignCredits : 0;
-      const left = Math.max(0, Math.floor(held) - 1);
-      // Zero-default omission, matching serializeCharacter: the key is dropped
-      // rather than written as 0, so a pushed session and a fresh load agree.
-      if (left > 0) meta.redesignCredits = left;
-      else meta.redesignCredits = undefined;
-      pushed = true;
-    }
-    return pushed;
+    return spendRedesignCreditOnSessions(this.sim, this.clients.values(), characterId);
   }
 
   /**
@@ -7259,9 +7235,8 @@ export class GameServer {
         if (typeof msg.npc === 'number' && Number.isInteger(msg.npc))
           sim.learnRidingFor(msg.npc, pid);
         break;
-      // Stylist redesign credit: player buys one character redesign for gold,
-      // banded by level. The Sim re-validates NPC identity, range, liveness, the
-      // credit cap, and funds, then charges and increments in the same tick.
+      // Stylist redesign credit: the Sim re-validates NPC identity, range,
+      // liveness, the credit cap, and funds, then charges in the same tick.
       case 'buy_redesign_credit':
         if (typeof msg.npc === 'number' && Number.isInteger(msg.npc))
           sim.buyRedesignCreditFor(msg.npc, pid);

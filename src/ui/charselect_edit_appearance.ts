@@ -92,6 +92,23 @@ export interface RedesignSubmitDeps {
   saveWithCredit(characterId: number, app: object, helmHidden: boolean): Promise<unknown>;
 }
 
+/** The api surface the router needs. Structural, so the online client satisfies
+ *  it without this module importing the net layer. */
+export interface RedesignApi {
+  rerollAppearance(characterId: number, app: object, helmHidden: boolean): Promise<unknown>;
+  spendRedesignCredit(characterId: number, app: object, helmHidden: boolean): Promise<unknown>;
+}
+
+/** Build the router for a live api client. Lives here, not at the call site, so
+ *  the free-vs-paid endpoint pairing is decided in the one module that owns that
+ *  distinction and the char-select screen just holds the result. */
+export function createRedesignSubmitRouter(api: RedesignApi): RedesignSubmitRouter {
+  return new RedesignSubmitRouter({
+    saveWithFreeToken: (id, app, helm) => api.rerollAppearance(id, app, helm),
+    saveWithCredit: (id, app, helm) => api.spendRedesignCredit(id, app, helm),
+  });
+}
+
 /**
  * Remembers which route the OPEN editor was opened under, so Save posts to the
  * endpoint the player was actually offered.

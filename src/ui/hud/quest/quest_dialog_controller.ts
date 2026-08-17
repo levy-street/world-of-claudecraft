@@ -78,11 +78,6 @@ export interface QuestDialogControllerDeps {
   openDelveBoard(npcId: number): void;
   openValeCup(): void;
   openCardDuel(): void;
-  /** Buy one character-redesign credit from the Stylist. Fires the world command
-   *  directly (no window to open): the credit is spent later at character
-   *  select, so the only in-world feedback is the purchase notice or the vendor
-   *  error toast the Sim emits. */
-  buyRedesignCredit(npcId: number): void;
   onOpenChange(open: boolean): void;
   voice: {
     play(key: string): void;
@@ -532,10 +527,10 @@ export class QuestDialogController {
     this.bindRoute('[data-delve-board]', () => this.deps.openDelveBoard(npc.id));
     this.bindRoute('[data-vcup]', this.deps.openValeCup);
     this.bindRoute('[data-card-duel]', this.deps.openCardDuel);
-    // Buys straight through, no confirm, matching the shipped service precedent:
-    // the 80 gold riding skill is an ordinary unconfirmed vendor row. The Sim
-    // re-validates identity, range, liveness, cap, and funds regardless.
-    this.bindRoute('[data-stylist-buy]', () => this.deps.buyRedesignCredit(npc.id));
+    // Buys straight through the live world (the discuss row's own idiom), no
+    // confirm: the 80 gold riding skill is an ordinary unconfirmed vendor row,
+    // and the Sim re-validates identity, range, liveness, cap, and funds anyway.
+    this.bindRoute('[data-stylist-buy]', () => this.deps.world().buyRedesignCredit(npc.id));
     this.bindClose();
     this.showAndFocus();
   }
