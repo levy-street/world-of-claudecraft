@@ -28,9 +28,10 @@ const URL = process.env.GAME_URL ?? 'http://localhost:5173';
 // while the Q0 accept refuses ("That quest is not available"). Level up first so
 // this exercises the true first-crossing path: campaign quest plus full voyage.
 const RIDER_LEVEL = 5;
-// The Q0 voyage runs past its 26.95s toll beat before the gangplank walk lands,
-// so watch well beyond the teleport and the arrival shot.
-const WATCH_MARKS_S = [1, 3, 6, 10, 15, 22, 30, 38];
+// The Q0 voyage runs past its 29.9s toll beat before the gangplank walk lands,
+// so watch well beyond the teleport and the arrival shot. The last mark clears
+// the 37.65s scene end, since the post-scene frame is what gets captured.
+const WATCH_MARKS_S = [1, 3, 6, 10, 15, 22, 30, 39];
 
 fs.mkdirSync('tmp', { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
