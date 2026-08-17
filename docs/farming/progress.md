@@ -2113,6 +2113,10 @@ fixture; the goldens, plates, and PNGs are inert nonCode with their consumers
 on the always-run floor). qa-checklist: READY, 0 BLOCKING (its should-fixes:
 the (bg) and (bh) maintainer reads, and the garden_hoe reagent knock-on now
 in (bg)).
+MERGE: fix/farming-phase-09-world-presence merged --no-ff into
+feature/farming-plan as 695ab09bfb (phase tip dde3b0a59a; the branch deleted);
+the agent worktrees woc-farm-p9-{a,b,c} and branches p9/agent-{a,b,c} removed
+after the merge.
 
 ### Phase 10
 (not started)
