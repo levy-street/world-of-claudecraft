@@ -283,6 +283,10 @@ export function delveRunForPlayer(ctx: SimContext, pid: number): DelveRun | null
   for (const run of ctx.delveRuns) {
     if (run.partyKey !== key) continue;
     const dx = Math.abs(e.pos.x - run.origin.x);
+    // Symmetric band ON PURPOSE, unlike the updateDelveRuns empty sweep's
+    // asymmetric one: this lookup is key-gated (one run per delveId+key, and
+    // delves sit 600u apart in x), so it can never bind a player to a NEIGHBOR
+    // slot's run; the generous band only ever re-finds the caller's own run.
     const dz = Math.abs(e.pos.z - run.origin.z);
     if (dx <= 120 && dz <= delveOccupancyRadius(run)) return run;
   }
@@ -618,12 +622,17 @@ export function updateDelveRuns(ctx: SimContext): void {
     let occupied = false;
     for (const meta of ctx.players.values()) {
       const e = ctx.entities.get(meta.entityId);
-      // Rooms extend only NORTH of the origin (module z offsets are
-      // non-negative), so the band is asymmetric: a symmetric +-radius check
-      // reached ~528u south into the NEIGHBOR slot's rooms (slots sit 620u
-      // apart), letting busy neighbors pin an abandoned run claimed forever.
-      const dz = e ? e.pos.z - origin.z : 0;
-      if (e && Math.abs(e.pos.x - origin.x) < 120 && dz > -40 && dz < delveOccupancyRadius(run)) {
+      if (!e) continue;
+      // Rooms START at DELVE_MODULE_Z_START + layout.zMin (about -11, so a
+      // player can stand a few units SOUTH of the origin) and extend north up
+      // to ~536u; the neighbor slot's rooms begin 620u away. The old symmetric
+      // +-radius band reached [-536, -143] into the SOUTH neighbor's rooms,
+      // letting busy neighbors pin an abandoned run claimed forever. The -40
+      // south margin covers the walkable south lip with slack while staying
+      // far clear of the neighbor (delveRunForPlayer keeps its symmetric band
+      // on purpose: it is key-gated, so cross-slot binding is unreachable).
+      const dz = e.pos.z - origin.z;
+      if (Math.abs(e.pos.x - origin.x) < 120 && dz > -40 && dz < delveOccupancyRadius(run)) {
         occupied = true;
         break;
       }

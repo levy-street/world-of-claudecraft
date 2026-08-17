@@ -903,6 +903,32 @@ describe('delve interactables and affixes', () => {
     expect(run.emptyFor).toBe(0);
   });
 
+  it('a player on module 0 south lip (just south of the origin) still pins the run', () => {
+    // Module 0 starts at DELVE_MODULE_Z_START + layout.zMin (about -11), so the
+    // south margin must reach past the walkable lip. This pins the margin from
+    // the inside: shrinking -40 toward 0 frees a run under a standing player.
+    const sim = makeSim();
+    enterReliquary(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    teleport(sim, run.origin.x, run.origin.z - 10);
+    run.emptyFor = INSTANCE_EMPTY_TIMEOUT - 1;
+    for (let i = 0; i < 21; i++) sim.tick();
+    expect(run.partyKey).not.toBe(null);
+    expect(run.emptyFor).toBe(0);
+  });
+
+  it('the south margin ends just past the lip, well before the neighbor band', () => {
+    // Pins the margin from the outside: growing -40 back toward the old
+    // symmetric radius re-opens the neighbor-slot pinning bug.
+    const sim = makeSim();
+    enterReliquary(sim);
+    const run = sim.delveRunForPlayer(sim.playerId)!;
+    teleport(sim, run.origin.x, run.origin.z - 45);
+    run.emptyFor = INSTANCE_EMPTY_TIMEOUT - 1;
+    for (let i = 0; i < 21; i++) sim.tick();
+    expect(run.partyKey).toBe(null);
+  });
+
   it('bad_air affix applies a periodic Bad Air DoT to the party (PRD §6.7)', () => {
     const sim = makeSim();
     enterReliquary(sim);
