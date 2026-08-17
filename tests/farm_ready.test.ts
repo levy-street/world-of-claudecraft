@@ -237,10 +237,10 @@ describe('the ready notice on the 1 Hz sweep', () => {
     expect(notices).toHaveLength(1);
     expect(notices[0]).toEqual({ type: 'farmReady', pid: h.pid, ready: 1 });
 
-    // Two more seconds of ticks over the same untouched, still-ready plot:
-    // silence. This is the arm the `notified` flag exists for, and it fails
-    // the moment the flag stops gating the emit.
-    expect(h.tick(45)).toEqual([]);
+    // Six more seconds of ticks over the same untouched, still-ready plot
+    // (a dozen 1 Hz residues): silence. This is the arm the `notified` flag
+    // exists for, and it fails the moment the flag stops gating the emit.
+    expect(h.tick(125)).toEqual([]);
     expect(h.sim.farmPlotsFor(h.pid)[0]?.status).toBe('ready');
   });
 
@@ -308,6 +308,60 @@ describe('the ready notice on the 1 Hz sweep', () => {
     // Anti-vacuous: the counted window is the one that actually announced.
     expect(emitted).toHaveLength(1);
     expect(draws).toBe(0);
+  });
+});
+
+describe('the ready notice across two farmers in one sim', () => {
+  it('announces each farmer separately, in player-map insertion order, on ONE sweep tick', () => {
+    // Deviation (bc): the sweep walks ctx.players in insertion order and
+    // draws nothing, so two farmers whose plots finish inside the same second
+    // hear two personal notices on the same tick, first-joined first. Pinned
+    // so a future sharding or filtering of the loop cannot silently reorder
+    // (or merge) the per-player events.
+    let nowMs = START_MS;
+    const sim = new Sim({
+      seed: 77,
+      playerClass: 'warrior',
+      noPlayer: true,
+      lockoutNowMs: () => nowMs,
+    });
+    const first = sim.addPlayer('warrior', 'First');
+    const second = sim.addPlayer('warrior', 'Second');
+    for (const [pid, bedId] of [
+      [first, BED],
+      [second, BED2],
+    ] as const) {
+      (sim.players.get(pid) as PlayerMeta).farmPlots.set(bedId, {
+        cropId: CROP_ID,
+        plantedAtMs: nowMs - CROP.durationMs,
+        readyAtMs: nowMs + 1,
+        survivalRoll: 0.01,
+        yieldSeed: 1,
+        compost: false,
+        watch: false,
+        tonic: false,
+        notified: false,
+      });
+    }
+    // Still growing for a full second of ticks: silence for both.
+    const before: FarmReadyEvent[] = [];
+    for (let i = 0; i < 20; i++) {
+      for (const ev of sim.tick()) if (ev.type === 'farmReady') before.push(ev);
+    }
+    expect(before).toEqual([]);
+    nowMs += 1;
+    const notices: FarmReadyEvent[] = [];
+    let noticeTicks = 0;
+    for (let i = 0; i < 20; i++) {
+      const drained = sim.tick().filter((ev): ev is FarmReadyEvent => ev.type === 'farmReady');
+      if (drained.length > 0) noticeTicks++;
+      notices.push(...drained);
+    }
+    expect(noticeTicks).toBe(1);
+    expect(notices).toEqual([
+      { type: 'farmReady', pid: first, ready: 1 },
+      { type: 'farmReady', pid: second, ready: 1 },
+    ]);
   });
 });
 

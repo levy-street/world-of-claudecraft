@@ -329,12 +329,16 @@ describe('farm_event_feedback: the ready notice', () => {
     expect(calls[2].color).toBe('#a8a8a8');
     expect(calls[2].text).not.toBe(calls[1].text);
     expect(calls[1].text).toContain('2');
+    // Still ONE cue for the whole event, however many halves it has: asserted
+    // BEFORE the cross-check drive below so the claim is local to the mixed
+    // notice (a two-cues-on-mixed, zero-on-withered regression would still
+    // total two after that second drive).
+    expect(audioMock.farmReady).toHaveBeenCalledTimes(1);
     // The withered line is the SAME sentence a withered-only notice leads
     // with, cross-checked against that arm rather than against a copy
     // literal, so the two paths can never drift into different wording.
     expect(calls[2].text).toBe(drive({ type: 'farmReady', pid: 1, ready: 0, withered: 1 })[0].text);
-    // Still ONE cue for the whole event, however many halves it has.
-    expect(audioMock.farmReady).toHaveBeenCalledTimes(2); // this arm drove twice
+    expect(audioMock.farmReady).toHaveBeenCalledTimes(2); // the cross-check drove once more
   });
 
   it('a withered-only notice banners the withered sentence and logs only the grey line', () => {

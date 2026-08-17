@@ -197,6 +197,13 @@ describe('professions graphics fairness (actionable surfaces stay preset-identic
     // the countdown is: drawn on every tier, never preset-gated.
     expectProfileFree('src/ui/minimap_markers.ts');
     expectProfileFree('src/ui/map_window_view.ts');
+    // The two PAINTERS that draw the sprout as well, so this row is complete
+    // on its own: a preset gate wrapped around either draw block would keep
+    // the model rows green while the pin vanished on LOW. (Both painters are
+    // also pinned wholesale by the gather-marker rows above; the farm row
+    // names them so the pin's own contract is provable in one place.)
+    expectProfileFree('src/ui/map_window_painter.ts');
+    expectProfileFree('src/ui/minimap_painter.ts');
   });
 
   it('the farm modules reach ./gfx ONLY for the sanctioned fallback material', () => {
