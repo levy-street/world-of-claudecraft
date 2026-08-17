@@ -60,6 +60,34 @@ export interface EconomyEmitContext {
 export const SERVER_ONLY_SIM_EVENT_TYPES: ReadonlySet<string> = new Set(['economy']);
 
 /**
+ * Normalise a CLIENT-SUPPLIED copper amount into something safe to reason about.
+ *
+ * Every command that lets a player name a sum (a trade offer, a mail
+ * attachment, a listing price, a guild deposit) reads a number straight off the
+ * wire, and each of them used to guard it slightly differently: one checked
+ * `Number.isFinite`, one checked `typeof === 'number'`, one clamped with
+ * `Math.max`. That last shape is the dangerous one, because `Math.max(0, NaN)`
+ * is NaN rather than 0, so a clamp that LOOKS like a floor passes the poison
+ * straight through. Downstream, every comparison against NaN is false, which
+ * means an affordability check reads as "they can afford it".
+ *
+ * So the rule is stated once, here, and it is deliberately blunt: anything that
+ * is not already a safe non-negative integer becomes 0. Not an error and not a
+ * clamp to some maximum, because both of those invent an intent the player did
+ * not express; 0 is the amount that changes nothing, and every caller already
+ * has a "you named no money" path.
+ *
+ * `applyMoneyDelta` refuses unsafe values too. This is not redundant with it:
+ * that refusal happens AFTER the caller's affordability check and after the
+ * gameplay decision that check gates, and the whole point is to keep a poisoned
+ * number from reaching those at all.
+ */
+export function sanitizeCopperInput(value: unknown): number {
+  if (typeof value !== 'number' || !Number.isSafeInteger(value) || value <= 0) return 0;
+  return value;
+}
+
+/**
  * Coarsen a world coordinate to a whole unit. Enough to tell "farming the
  * Deepfen camps" from "standing at the Highwatch bank" without turning a
  * keep-forever audit table into a movement recording. A non-finite input

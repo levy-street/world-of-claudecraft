@@ -15,7 +15,7 @@ import type { TradeInfo } from '../../world_api';
 import { addStacked, bagCapacity, countFit, removeStacked } from '../bags';
 import { RIFT_GEAR_ITEM_IDS } from '../content/rift/items';
 import { ITEMS } from '../data';
-import { applyMoneyDelta } from '../economy_events';
+import { applyMoneyDelta, sanitizeCopperInput } from '../economy_events';
 import {
   removeVendorSellUnits,
   sellerSignedCharmDeprioritize,
@@ -173,7 +173,10 @@ export function tradeSetOffer(
   if (boundDenied) ctx.error(r.meta.entityId, 'That item is bound and cannot be traded.');
   const offer = {
     items: cleaned,
-    copper: Math.max(0, Math.min(Math.floor(copper), r.meta.copper)),
+    // Sanitised BEFORE the clamp rather than by it. `Math.max(0, Math.min(NaN,
+    // held))` is NaN, so the floor that looks like it rejects a poisoned offer
+    // actually stores one, and every later comparison against it reads false.
+    copper: Math.min(sanitizeCopperInput(Math.floor(copper)), r.meta.copper),
   };
   if (session.a === r.meta.entityId) session.offerA = offer;
   else session.offerB = offer;
