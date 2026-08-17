@@ -4,7 +4,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { ABILITIES, ITEMS } from '../src/sim/data';
 import { ActionBarController } from '../src/ui/hud/action_bar/action_bar_controller';
-import { abilityImageUrl, itemImageUrl } from '../src/ui/icons';
+import { abilityImageUrl, ITEM_ART_PENDING, itemImageUrl } from '../src/ui/icons';
 
 interface AcceptedAsset {
   kind: 'ability' | 'aura';
@@ -405,8 +405,18 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     const liveHotbarItemIds = Object.keys(ITEMS).filter((id) =>
       inventoryController.isHotbarItemId(id),
     );
+    // The ART-SUBJECT split, the same rule scripts/item_art_audit.mjs applies:
+    // ids in ITEM_ART_PENDING are declared procedural-art debt (exact-set
+    // pinned in tests/item_icons.test.ts; the hotbar paints them through the
+    // art-or-procedural resolver iconDataUrl), so the painted closure sealed
+    // in the record is over the art-subject universe, live minus pending. The
+    // debt is policed both directions here: a pending hotbar item may ship NO
+    // committed webp (a stale entry once art lands), and the pending hotbar
+    // count is a hard literal so new debt is a visible, deliberate edit.
+    const pendingHotbarItemIds = liveHotbarItemIds.filter((id) => ITEM_ART_PENDING.has(id));
+    const artSubjectHotbarItemIds = liveHotbarItemIds.filter((id) => !ITEM_ART_PENDING.has(id));
     const paintedHotbarItemIds = new Set(
-      liveHotbarItemIds.filter((id) => shippingImageExists(itemImageUrl(id))),
+      artSubjectHotbarItemIds.filter((id) => shippingImageExists(itemImageUrl(id))),
     );
 
     expect(new Set(liveAbilityIds).size, 'live ability ids remain unique').toBe(
@@ -425,13 +435,23 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     expect(new Set(liveHotbarItemIds).size, 'live hotbar item ids remain unique').toBe(
       liveHotbarItemIds.length,
     );
-    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(72);
     expect(
-      liveHotbarItemIds.filter((id) => !paintedHotbarItemIds.has(id)),
-      'every production-eligible hotbar item resolves to committed painted art',
+      artSubjectHotbarItemIds,
+      'production isHotbarItemId art-subject inventory (live minus ITEM_ART_PENDING)',
+    ).toHaveLength(72);
+    // The farming branch's declared debt on the hotbar: eight farm dishes
+    // (kind 'food') and the four-rung hoe ladder (use.type 'gatherTool').
+    expect(pendingHotbarItemIds, 'ITEM_ART_PENDING hotbar items').toHaveLength(12);
+    expect(
+      pendingHotbarItemIds.filter((id) => shippingImageExists(`/ui/items/${id}.webp`)),
+      'no pending hotbar item ships committed art (a stale ITEM_ART_PENDING entry)',
+    ).toEqual([]);
+    expect(
+      artSubjectHotbarItemIds.filter((id) => !paintedHotbarItemIds.has(id)),
+      'every art-subject hotbar item resolves to committed painted art',
     ).toEqual([]);
     expect(aggregate.runtimeClosure.hotbarItems).toEqual({
-      live: liveHotbarItemIds.length,
+      live: artSubjectHotbarItemIds.length,
       painted: paintedHotbarItemIds.size,
     });
   });
