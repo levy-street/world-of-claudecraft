@@ -4420,7 +4420,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.power_word_shield.description': 'Khiên chắn cho một mục tiêu đồng minh, hấp thụ {damage} sát thương trong 30 giây. Kỷ Luật còn liên kết mục tiêu ấy với sát thương Thần Thánh của bạn trong 30 giây.',
   'entities.abilities.power_word_shield.name': 'Thánh Thi Hộ Mệnh',
   'entities.abilities.prowl.description':
-    'Vào trạng thái ẩn thân khi ở Hình Sói, di chuyển chậm hơn 50%. Không thể dùng trong chiến đấu.',
+    'Vào trạng thái ẩn thân khi ở Hình Sói, di chuyển chậm hơn 5%. Không thể dùng trong chiến đấu.',
   'entities.abilities.prowl.name': 'Rình Rập',
   'entities.abilities.pyroblast.description':
     'Ném ra một tảng lửa khổng lồ gây {damage} sát thương Hỏa cùng sát thương cộng dồn theo thời gian.',
@@ -4517,7 +4517,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Giáng đòn lên các kẻ địch lân cận gây {damage} sát thương và làm chậm 10% đòn tấn công của chúng trong 10 giây.',
   'entities.abilities.thunder_clap.name': 'Đòn Chấn Rung',
   'entities.abilities.tigers_fury.description':
-    'Tăng {buff} sức mạnh tấn công trong {duration} giây. Chỉ dùng được ở Hình Sói.',
+    'Trào dâng {rage} năng lượng và tăng {buff} sức mạnh tấn công trong {duration} giây. Chỉ dùng được ở Hình Sói.',
   'entities.abilities.tigers_fury.name': 'Huyết Sói',
   'entities.abilities.travel_form.description':
     'Tức thì biến thành Fleet Form nhanh nhẹn, tăng 40% tốc độ di chuyển. Bạn không thể dùng các kỹ năng khác khi đã biến hình, nhưng có thể biến hình trong hoặc ngoài chiến đấu, lý tưởng để chạy trốn.',
@@ -10798,7 +10798,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description': 'Trói chân kẻ địch trong 4 m quanh điểm mục tiêu suốt 2 giây, rồi làm chậm chúng 40% trong 6 giây. (Thiên phú pháp sư tự nhiên)',
   'entities.abilities.evocation.description': 'Restaura mana rápidamente. (thiên phú pháp sư)',
   'entities.abilities.frenzied_regeneration.description':
-    'Hồi 180 máu trong 10 giây. Chỉ dùng được ở Dạng Gấu. (thiên phú Druid)',
+    'Hồi 40% máu tối đa trong 10 giây. Chỉ dùng được ở Dạng Gấu. (thiên phú Druid)',
   'entities.abilities.frost_trap.description':
     'Đóng băng kẻ địch trong khu vực mục tiêu trong 3 giây, khiến chúng không thể di chuyển hoặc hành động. (thiên phú Thợ săn)',
   'entities.abilities.hammer_of_wrath.description': 'Phóng một chiếc búa thần thánh gây {damage} sát thương và tạo ra 1 Sùng Tín. Dùng được khi mục tiêu dưới 20% máu, hoặc trong lúc Thăng Thiên Thần Thánh hay Cuồng Nộ Báo Thù. Cuồng Nộ Bình Minh ban thêm một lần niệm lên bất cứ mục tiêu nào, bỏ qua thời gian hồi đang chạy và gây thêm 20% sát thương. Thăng Thiên tăng sát thương của nó thêm 30%.',
@@ -12291,7 +12291,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Tiêu 5 Sắc Xanh. Thu hoạch mọi hồi máu theo thời gian của bạn trên tất cả đồng minh với 60% lượng hồi còn lại, gỡ bỏ các hiệu ứng đó và trồng một Hoa Nở Hoang Dã mới lên mục tiêu.',
   'entities.abilities.redharvest.name': 'Thu Hoạch Đỏ',
   'entities.abilities.redharvest.description':
-    'Tiêu 3 Huyết Cổ của bạn: đánh gây {damage}, lập tức gây toàn bộ sát thương mà Lóc Xé và Xé Rách của bạn còn sẽ gây ra, xóa cả hai hiệu ứng chảy máu và hồi 30 năng lượng. Dùng được cả khi không có điểm liên hoàn.',
+    'Tiêu 3 Huyết Cổ của bạn: đánh gây {damage}, lập tức gây toàn bộ sát thương mà Lóc Xé và Xé Rách của bạn còn sẽ gây ra, xóa cả hai hiệu ứng chảy máu và hồi {rage} năng lượng. Dùng được cả khi không có điểm liên hoàn.',
   'entities.abilities.sunlance.name': 'Vệt Dương',
   'entities.abilities.sunlance.description':
     'Tiêu 3 Triều Nguyệt của bạn cho một đòn gây {damage} sát thương Tự Nhiên cộng thêm {overTime} thiêu đốt trong 9 giây, và hồi 35 mana: lựa chọn mana. Nguyệt Trào cũng tiêu đúng 3 Triều Nguyệt đó, nên hãy chọn một.',
@@ -12576,7 +12576,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.description': 'Chiêu kết liễu phơi bày mục tiêu trong 30 giây: mỗi điểm liên hoàn tiêu hao giảm giáp của nó 2% (5 điểm liên hoàn: {damage}%).',
   'entities.abilities.faerie_fire.description': 'Giảm giáp của mục tiêu {damage}% trong 40 giây.',
   'entities.abilities.ferocious_bite.description': 'Chiêu kết liễu gây {damage} sát thương. Chỉ dùng được ở Hình Sói.',
-  'entities.abilities.ferocious_bite.specNote_feral': 'Mỗi đòn đánh trúng thêm 1 Huyết Cổ; ở 3 Huyết Cổ, nút này trở thành Thu Hoạch Đỏ: một cú cắn gây 70 cộng 43 mỗi điểm liên hoàn, đồng thời lập tức gây toàn bộ sát thương còn lại của Lóc Xé và Xé Rách, và hồi 30 năng lượng.',
+  'entities.abilities.ferocious_bite.specNote_feral': 'Mỗi đòn đánh trúng thêm 1 Huyết Cổ; ở 3 Huyết Cổ, nút này trở thành Thu Hoạch Đỏ, tiêu Huyết Cổ cho một cú cắn mạnh hơn, đồng thời lập tức gây toàn bộ sát thương còn lại của Lóc Xé và Xé Rách, và hồi năng lượng.',
   'entities.abilities.funeral_harvest.description': 'Khi một kẻ địch vừa bị bạn hoặc thuộc hạ Bất Tử của bạn gây sát thương chết đi, bạn nhận 1 Mảnh Linh Hồn. Điều này có thể xảy ra một lần mỗi 3 giây.',
   'entities.abilities.funeral_harvest.name': 'Thu Hoạch Tang Lễ',
   'entities.abilities.garrote.description': 'Siết dây quanh cổ kẻ địch, gây ngay {damage} sát thương và khiến nó chảy máu {overTime} sát thương trong 18 giây. Phải đang ẩn thân. Nhận 1 điểm liên hoàn.',
@@ -12990,4 +12990,26 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'auth.designCodeErrVersion': 'Mã ngoại hình đó đến từ phiên bản trò chơi mới hơn.',
   'auth.designCodeErrMalformed': 'Mã ngoại hình đó bị hỏng. Hãy sao chép toàn bộ mã rồi thử lại.',
   'hudChrome.nameplate.cheaterTag': '< Kẻ Gian Lận >',
+  'hud.options.displayMode': 'Chế Độ Hiển Thị',
+  'hud.options.displayModeBorderless': 'Toàn Màn Hình Không Viền',
+  'hud.options.displayModeWindowed': 'Cửa Sổ',
+  'hudChrome.options.discordPresence': 'Hoạt Động Discord',
+  'hudChrome.options.discordPresenceNote':
+    'Hiển thị vùng bạn đang ở và thời gian bạn đã chơi trong phiên chơi này dưới dạng hoạt động Discord của bạn, và bất kỳ ai xem được hồ sơ Discord của bạn đều thấy được cả hai. Chỉ tên vùng, thời gian phiên chơi của bạn, và tên trò chơi được chia sẻ, không bao giờ là nhân vật, tài khoản, hay những ai bạn đang chơi cùng. Cần ứng dụng Discord đang chạy trên máy tính này.',
+  'hudChrome.options.forceHighPerfGpu': 'Dùng Card Đồ Họa Chơi Game',
+  'hudChrome.options.forceHighPerfGpuNote':
+    'Mặc định bật: ứng dụng máy tính yêu cầu máy này dùng card đồ họa chơi game của nó. Hãy tắt tùy chọn này nếu trò chơi không khởi động được, mở ra màn hình đen, hoặc màn hình laptop bị tối đen. Có hiệu lực vào lần khởi động trò chơi tiếp theo.',
+  'desktop.notify.partyInviteBody': '{name} đã mời bạn gia nhập tổ đội của họ.',
+  'desktop.notify.partyInviteTitle': 'Lời mời tổ đội',
+  'desktop.notify.updateReadyBody': 'Khởi động lại World of ClaudeCraft để áp dụng bản cập nhật.',
+  'desktop.notify.updateReadyTitle': 'Bản cập nhật {version} đã sẵn sàng',
+  'desktop.notify.updateReadyTitleNoVersion': 'Bản cập nhật đã sẵn sàng',
+  'desktop.update.whatsNew': 'Xem những gì đã thay đổi trong trình duyệt của bạn',
+  'entities.abilities.challenging_roar.description':
+    'Một tiếng gầm hiểm độc: mọi kẻ địch trong vòng 10 thước bị khiêu khích, mối đe dọa của chúng đối với bạn tăng lên ngang bằng kẻ địch mà chúng căm ghét nhất, và chúng bị buộc phải tấn công bạn trong 3 giây. Chỉ dùng được ở Bruin Form.',
+  'entities.abilities.challenging_roar.name': 'Tiếng Gầm Hiểm Độc',
+  'entities.abilities.cheap_shot.descriptionNoStealth':
+    'Đánh mục tiêu gây {damage} sát thương, làm choáng nó trong 4 giây. Nhận 2 điểm liên hoàn.',
+  'gpuNotice.bodyDiscreteInactive':
+    'Trò chơi hiện không dùng card đồ họa chơi game mà đang chạy trên GPU tích hợp (tiết kiệm điện), nên hiệu năng sẽ giảm sút. Hãy cập nhật trình điều khiển đồ họa, sau đó khởi động lại trò chơi. Trên Windows, cũng hãy đặt trò chơi thành Hiệu suất cao trong Cài đặt > Hệ thống > Màn hình > Đồ họa.',
 };

@@ -276,7 +276,11 @@ describe('mount running audio', () => {
     // Engine mounts use mount_run_ as the sustain take of an authored
     // windup/loop/winddown set. Those entries genuinely run through
     // Sfx.loop(); every other mount's entry is a per-stride one-shot.
-    const ENGINE_LOOP_MOUNTS = new Set(['goblin_rocket_sled', 'terrorspark_groundshaker']);
+    const ENGINE_LOOP_MOUNTS = new Set([
+      'goblin_rocket_sled',
+      'rallycart_rxt',
+      'terrorspark_groundshaker',
+    ]);
     for (const mountKey of MOUNT_KEYS) {
       const entry = SFX_CLIPS[`mount_run_${mountKey}`];
       expect(entry).toMatchObject({
@@ -292,6 +296,10 @@ describe('mount running audio', () => {
   // Engine mounts ship start and stop transitions beside their base loop.
   const ENGINE_MOUNT_EXTRA_SUFFIXES: Partial<Record<string, string[]>> = {
     goblin_rocket_sled: ['_start', '_stop', '_reverse_start', '_reverse', '_reverse_stop'],
+    // The cart adds a parked IDLE take on top of the sled's set: its reverse is
+    // that idle pitched at runtime, so the printed reverse takes ship but are
+    // not resolved by the engine state machine.
+    rallycart_rxt: ['_start', '_stop', '_idle', '_reverse_start', '_reverse', '_reverse_stop'],
     terrorspark_groundshaker: ['_start', '_stop'],
   };
 

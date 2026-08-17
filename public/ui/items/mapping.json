@@ -124,6 +124,14 @@
    "license": "World of ClaudeCraft original art (project-owned, created for this game)"
   },
   {
+   "itemId": "dawnhold_posy",
+   "name": "Dawnhold Garden Posy",
+   "sourcePack": "project-authored",
+   "sourceFile": "dawnhold_posy.svg (original in-repo vector illustration)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft project-authored vector illustration (original SVG rendered to WebP), project asset, rights reserved"
+  },
+  {
    "itemId": "elderwood_log",
    "name": "Highpine Log",
    "sourcePack": "woc_professions_art",

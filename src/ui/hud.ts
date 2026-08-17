@@ -2,7 +2,7 @@ import { audio } from '../game/audio';
 import { corpseLootAvailability, localPartyMemberIds } from '../game/corpse_loot_availability';
 import type { GamepadKind } from '../game/gamepad_map';
 import type { GraphicsSettingsSnapshot } from '../game/graphics_rebuild_core';
-import { InstanceMusicController } from '../game/instance_music';
+import { InstanceMusicController, type InstanceMusicDecision } from '../game/instance_music';
 import { type Keybinds, keyCapLabel, keyLabel } from '../game/keybinds';
 import { music } from '../game/music';
 import type { GameSettings, Settings } from '../game/settings';
@@ -165,7 +165,7 @@ import {
   auraEffectMaximumFractionDigits,
 } from './aura_effect';
 import { auraGainLogKeyFor, findAuraForGainEvent } from './aura_gain_log';
-import { auraIconCssBackground, createAuraIconResolver } from './aura_icon_view';
+import { resolveHudAuraIconId, resolveHudAuraIconUrl } from './aura_icon_runtime';
 import { AuraOverlayController } from './aura_overlay_controller';
 import { renderAuraTooltipBodyHtml } from './aura_tooltip';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
@@ -247,7 +247,7 @@ import {
   craftOwnsTab,
 } from './crafting_view';
 import { craftCastStripElements, renderCraftingWindow, stationNameText } from './crafting_window';
-import { classCrestId, crestIconUrl } from './crest_icon_art';
+import { classCrestId } from './crest_icon_art';
 import { hydrateCrestImageFallbacks } from './crest_image_fallback';
 import { shouldRefreshDailyRewardsLauncher } from './daily_rewards_launcher_core';
 import { DailyRewardsWindow } from './daily_rewards_window';
@@ -491,16 +491,7 @@ import {
   tOptional,
   tPlural,
 } from './i18n';
-import {
-  abilityImageUrl,
-  cachedProceduralIconDataUrl,
-  hasAbilityIconIdentity,
-  hasAuraRecipe,
-  iconDataUrl,
-  proceduralIconDataUrl,
-  QUALITY_COLOR,
-  raidMarkerDataUrl,
-} from './icons';
+import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
 import { InspectWindow } from './inspect_window';
 import { itemArmorTypeLabelKey } from './item_armor_type';
 import { requiredClassesForTooltip } from './item_class_restriction';
@@ -520,6 +511,8 @@ import { itemNameColor } from './item_name_color';
 import { itemSetMemberCounts, itemSetTooltipModel } from './item_set_tooltip_view';
 import { itemSlotLabel as itemSlotName } from './item_slot_labels';
 import { knownItemDef, ownEntry } from './known_item';
+import { DAWNHOLD_MAP_PAINTER_SPEC, LastKeepMapPainter } from './lastkeep_map_painter';
+import { dawnholdMapActive, lastKeepMapActive } from './lastkeep_map_view';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
 import { isCombatFlavorLog } from './log_event_route';
@@ -895,17 +888,6 @@ const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.quer
 // painter's repaint gate never fires for it; the constant just pins the key so the
 // gate stays a no-op (target/party pass a per-unit key).
 const PLAYER_PORTRAIT_KEY = 'player';
-const resolveHudAuraIconId = createAuraIconResolver(hasAbilityIconIdentity, hasAuraRecipe);
-const HUD_AURA_STATIC_FALLBACK_URL = crestIconUrl('status_combat');
-if (!HUD_AURA_STATIC_FALLBACK_URL) throw new Error('Missing painted combat-status crest');
-const resolveHudAuraIconUrl = (iconId: string): string =>
-  auraIconCssBackground(
-    iconId,
-    abilityImageUrl,
-    (id) => cachedProceduralIconDataUrl('aura', id),
-    HUD_AURA_STATIC_FALLBACK_URL,
-    (id) => proceduralIconDataUrl('aura', id),
-  );
 // Vale Cup hold-to-charge shoot: full power after this long held, and the charge
 // a NON-held tap (touch / gamepad / a mouse click on the slot) fires at.
 const SHOOT_CHARGE_MS = 850;
@@ -1616,6 +1598,11 @@ export class Hud {
   private subzoneTimer: number | undefined;
   private lastSubzone: string | null = null;
   private readonly instanceMusic = new InstanceMusicController(music);
+  // The last music-machine decision, computed ABOVE the paint cut (music keeps
+  // playing on hidden frames, so its transitions must too); the paint half
+  // reads this instead of driving the machine itself. Null only before the
+  // first medium-band tick.
+  private lastMusicDecision: InstanceMusicDecision | null = null;
   private minimapCtx: CanvasRenderingContext2D;
   private minimapBg: HTMLCanvasElement;
   private clockEl: HTMLElement | null = null;
@@ -4141,6 +4128,16 @@ export class Hud {
     (name, rank) => riftFloorLabel(name, rank),
     this.mapMarkerArt,
     this.mapMarkerProfile,
+  );
+  // The Last Keep interior map (the castle floor plan): both surfaces routed
+  // by the lastKeepMapActive position guard, exactly like the delve branch.
+  private readonly lastKeepMapPainter = new LastKeepMapPainter(this.writerFacet, classCss);
+  // Dawnhold Castle rides the same parameterized painter with its own spec
+  // (plates, title keys, and pure-core builders), routed by dawnholdMapActive.
+  private readonly dawnholdMapPainter = new LastKeepMapPainter(
+    this.writerFacet,
+    classCss,
+    DAWNHOLD_MAP_PAINTER_SPEC,
   );
   // The Protect Yumi match strip + bench overlay (yumi_match_painter.ts):
   // facet-routed; structure from arenaInfo.match.yumi, dynamics from the
@@ -6768,16 +6765,20 @@ export class Hud {
     this.castSportMove(abilityId, abilityId === 'sport_shoot' ? SHOOT_TAP_CHARGE * range : range);
   }
 
-  // My first sport move (Shoot) while seated in a Vale Cup match, else null. Used
-  // so key 1 (the class Attack slot, inert under the harvest truce) casts a real
-  // move on the pitch instead of toggling a useless auto-attack.
-  private firstSportAbilityId(): string | null {
+  // My first sport move (Shoot) while seated in a Vale Cup match, else null. The
+  // fixed primary action seat uses this same resolved record for its cast, art,
+  // cooldown, range state, accessible name, and tooltip.
+  private firstSportAbility(): ResolvedAbility | null {
     // Seated in a match => my known list IS the sport kit (Shoot first). Keyed off
     // cupInfo.match, not the bar form, so it holds the instant the whistle swaps
     // the kit in (the bar-form flip can lag a frame behind).
     if (!this.sim.cupInfo?.match) return null;
     const first = this.sim.known[0];
-    return first && this.isSportAbilityId(first.def.id) ? first.def.id : null;
+    return first && this.isSportAbilityId(first.def.id) ? first : null;
+  }
+
+  private firstSportAbilityId(): string | null {
+    return this.firstSportAbility()?.def.id ?? null;
   }
 
   // The ability a bar slot would cast right now (slot 0 remaps to the first sport
@@ -6793,7 +6794,7 @@ export class Hud {
   }
 
   private shootRangeForSlot(slot: number): number {
-    if (slot === 0) return this.sim.known[0]?.def.range ?? MELEE_RANGE;
+    if (slot === 0) return this.firstSportAbility()?.def.range ?? MELEE_RANGE;
     return this.abilityForSlot(slot)?.def.range ?? MELEE_RANGE;
   }
 
@@ -6981,9 +6982,9 @@ export class Hud {
     // On the pitch, key 1 casts your first sport move (Kick) instead of the
     // harvest-truce-inert auto-attack, which would be a dead key with no useful
     // effect. Off the pitch it is the normal auto-attack toggle.
-    const sportFirst = this.firstSportAbilityId();
+    const sportFirst = this.firstSportAbility();
     if (sportFirst) {
-      this.castSportTap(sportFirst, this.sim.known[0]?.def.range ?? MELEE_RANGE);
+      this.castSportTap(sportFirst.def.id, sportFirst.def.range);
       this.flashActionSlot(0);
       return;
     }
@@ -7265,6 +7266,8 @@ export class Hud {
       });
       this.attachTooltip(btn, () => {
         if (slot === 0 && this.attackSlotIsAttack()) {
+          const sportFirst = this.firstSportAbility();
+          if (sportFirst) return this.abilityTooltip(sportFirst);
           return `<div class="tt-title">${esc(t('abilityUi.actionBar.attackName'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackTooltip'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackRemoveHint'))}</div>`;
         }
         const known = this.abilityForSlot(slot);
@@ -7492,12 +7495,16 @@ export class Hud {
             slotIndex: i,
             // Live accessor: slot 0 stops being the Attack toggle when the player
             // removes it (Interface option showAttackButton off / right-click).
-            isAttack: () => i === 0 && this.attackSlotIsAttack(),
+            isAttack: () =>
+              i === 0 && this.attackSlotIsAttack() && this.firstSportAbility() === null,
             // Raw binding presence (any assigned slot, even one whose ability is
             // unlearned or item id is unknown): the many-spells count source, kept
             // byte-identical to the former hotbarActions.filter(a => a !== null).
             hasAction: () => this.actionForSlot(i) !== null,
-            ability: () => this.abilityForSlot(i),
+            ability: () =>
+              i === 0 && this.attackSlotIsAttack()
+                ? this.firstSportAbility()
+                : this.abilityForSlot(i),
             item: () => this.itemForSlot(i),
             keybindLabel: () => keyCapLabel(this.keybinds.primaryLabel(slotKey)),
           };
@@ -7596,6 +7603,11 @@ export class Hud {
       this.hideTooltip();
       audio.click();
       const p = this.sim.player;
+      if (this.firstSportAbility()) {
+        this.activateFixedAttackSlot();
+        attackBtn.blur();
+        return;
+      }
       const target = p.targetId !== null ? this.sim.entities.get(p.targetId) : null;
       const hasLiveHostileTarget = !!target && !target.dead && target.hostile;
       handleMobileAttackTap(
@@ -7647,9 +7659,9 @@ export class Hud {
         slots: [
           {
             slotIndex: 0,
-            isAttack: () => true,
-            hasAction: () => false,
-            ability: () => null,
+            isAttack: () => this.firstSportAbility() === null,
+            hasAction: () => this.firstSportAbility() !== null,
+            ability: () => this.firstSportAbility(),
             item: () => null,
             keybindLabel: () => '',
           },
@@ -8870,7 +8882,7 @@ export class Hud {
       });
   }
 
-  update(): void {
+  update(paint = true): void {
     const sim = this.sim;
     const p = sim.player;
     const now = performance.now();
@@ -8897,12 +8909,43 @@ export class Hud {
     if (fastHud) this.chatAnnouncer.flush(now);
 
     this.questDialog.updateVoice();
+    // Self-contained timer controller: a roll must keep expiring on schedule
+    // whether or not this frame paints.
+    this.lootRolls.update(now);
+    // The zone/combat/boss music state machine, hoisted above the cut (phase 4
+    // QA F1): music keeps PLAYING on hidden frames, so its transitions (combat
+    // over, zone change, boss engage, Sowfield) must keep executing or a
+    // minimized player hears the stale track until restore. Same medium
+    // cadence the painted path always drove it at; the paint half reads the
+    // stored decision instead of driving the machine itself.
+    if (mediumHud) {
+      this.lastMusicDecision = this.instanceMusic.update({
+        now,
+        lastCombatEventAt: this.lastCombatEventAt,
+        lastBossCombatEventAt: this.lastNythraxisCombatEventAt,
+        playerId: sim.playerId,
+        playerPos: p.pos,
+        zone: zoneAt(p.pos.x, p.pos.z),
+        inDungeon: p.pos.x > DUNGEON_X_THRESHOLD,
+        entities: sim.entities.values(),
+        cupInfo: sim.cupInfo,
+        riftFloor: sim.riftFloor,
+      });
+    }
+
+    // The cut between the non-paint half of the frame and the paint half. A
+    // hidden desktop window calls update(false) and still runs everything
+    // above: the fast-tier reconcileSfx sweep (which unloops a stale
+    // cast:<id> loop the player would otherwise keep hearing after the caster
+    // leaves interest, and prunes the mob bark maps), the idle-bark sweep, the
+    // combat and chat live-region flushes, quest voice, the loot timers, and
+    // the music state machine. Nothing below this line does anything but paint.
+    if (!paint) return;
     this.meters.update();
     this.mountRaceStrip.repaintIfChanged();
     this.mountRaceControls.update();
     this.lockpickController.repaintIfChanged();
     this.tutorial.update(sim, this.renderer, this.keybinds);
-    this.lootRolls.update(now);
     if (slowHud) this.updateRaidLockoutBadge();
     if (slowHud) this.refreshDailyRewardsLauncher();
     this.maybeRestoreActionBarLayout();
@@ -9572,20 +9615,11 @@ export class Hud {
         }
       }
 
-      const musicState = this.instanceMusic.update({
-        now,
-        lastCombatEventAt: this.lastCombatEventAt,
-        lastBossCombatEventAt: this.lastNythraxisCombatEventAt,
-        playerId: sim.playerId,
-        playerPos: p.pos,
-        zone: currentZone,
-        inDungeon,
-        entities: sim.entities.values(),
-        cupInfo: sim.cupInfo,
-        riftFloor: sim.riftFloor,
-      });
-      const inCombat = musicState.inCombat;
-      const { atSowfield } = musicState;
+      // The music machine ran in the non-paint head this same frame (same
+      // mediumHud divider); this half only reads its decision.
+      const musicState = this.lastMusicDecision;
+      const inCombat = musicState?.inCombat === true;
+      const atSowfield = musicState?.atSowfield === true;
 
       // classic combat indicator: crossed swords + red ring on the player portrait.
       // Routed through the cached ref + the elided toggleClass writer: a counted,
@@ -10636,6 +10670,29 @@ export class Hud {
       );
       return;
     }
+    // Inside The Last Keep: the baked floor plan for the player's current
+    // story, with the '#zone-label' story title (the delve branch pattern).
+    if (lastKeepMapActive(this.sim)) {
+      this.lastKeepMapPainter.paintMinimap(
+        ctx,
+        this.sim,
+        $('#zone-label'),
+        MINIMAP_SIZE,
+        this.minimapZoom,
+      );
+      return;
+    }
+    // Inside Dawnhold Castle: the same castle-plan surface, dawnhold spec.
+    if (dawnholdMapActive(this.sim)) {
+      this.dawnholdMapPainter.paintMinimap(
+        ctx,
+        this.sim,
+        $('#zone-label'),
+        MINIMAP_SIZE,
+        this.minimapZoom,
+      );
+      return;
+    }
     // The overworld minimap: a pure marker core (minimap_markers) + the thin canvas
     // painter. It owns the cached terrain blit + the marker draws and writes
     // '#zone-label' through the write-elision facet. It blits the current zone's
@@ -10945,6 +11002,26 @@ export class Hud {
       return;
     }
     this.continentRegions = [];
+
+    // Inside The Last Keep: the whole-plan floor plate for the player's
+    // current story (title drawn on-canvas, the delve branch pattern); the
+    // continent overview above still wins when the player toggles up to it.
+    if (lastKeepMapActive(this.sim)) {
+      this.clearMapHitState(canvas);
+      const title = this.lastKeepMapPainter.paintWorldMap(ctx, this.sim, S);
+      this.setText(summaryEl, t('hud.core.mapSummary', { zone: title }));
+      this.setText(markerSummaryEl, this.mapMarkerInteraction.semantics.updateSimple(title, S));
+      return;
+    }
+
+    // Inside Dawnhold Castle: the same castle-plan surface, dawnhold spec.
+    if (dawnholdMapActive(this.sim)) {
+      this.clearMapHitState(canvas);
+      const title = this.dawnholdMapPainter.paintWorldMap(ctx, this.sim, S);
+      this.setText(summaryEl, t('hud.core.mapSummary', { zone: title }));
+      this.setText(markerSummaryEl, this.mapMarkerInteraction.semantics.updateSimple(title, S));
+      return;
+    }
 
     // inside an instance, show the zone the dungeon's door is in (dungeonAt owns
     // the instance x-band layout); outdoors, follow the committed zone so
@@ -18296,7 +18373,7 @@ export class Hud {
         current === i
           ? t('hud.markers.markerSelectedAria', { marker: markerName })
           : t('hud.markers.markerAria', { marker: markerName });
-      const check = current === i ? ' ✓' : '';
+      const check = current === i ? `<span class="ctx-selected">${svgIcon('check')}</span>` : '';
       html += `<div class="ctx-item" role="button" tabindex="0" data-act="m${i}" aria-label="${esc(aria)}"><span class="ctx-mark" style="background-image:url(${raidMarkerDataUrl(i)})"></span>${esc(markerName)}${check}</div>`;
     }
     html += `<div class="ctx-item" role="button" tabindex="0" data-act="clear">${esc(t('hud.markers.clear'))}</div>`;

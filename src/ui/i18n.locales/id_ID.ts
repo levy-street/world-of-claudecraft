@@ -4495,7 +4495,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.power_word_shield.description': 'Melindungi sasaran sekutu, menyerap {damage} kerusakan selama 30 dtk. Disiplin juga menautkan sasaran itu pada kerusakan Sucimu selama 30 dtk.',
   'entities.abilities.power_word_shield.name': 'Mazmur Penangkal',
   'entities.abilities.prowl.description':
-    'Masuk ke siluman saat dalam Wujud Serigala, bergerak 50% lebih lambat. Tidak dapat digunakan dalam pertempuran.',
+    'Masuk ke siluman saat dalam Wujud Serigala, bergerak 5% lebih lambat. Tidak dapat digunakan dalam pertempuran.',
   'entities.abilities.prowl.name': 'Mengintai',
   'entities.abilities.pyroblast.description':
     'Melontarkan bongkahan berkobar raksasa yang menimbulkan {damage} kerusakan Api ditambah kerusakan tambahan seiring waktu.',
@@ -4593,7 +4593,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menghantam musuh di sekitar sebesar {damage} kerusakan dan memperlambat serangan mereka sebesar 10% selama 10 detik.',
   'entities.abilities.thunder_clap.name': 'Pukulan Gempa',
   'entities.abilities.tigers_fury.description':
-    'Meningkatkan daya serang sebesar {buff} selama {duration} detik. Hanya Wujud Serigala.',
+    'Memunculkan {rage} energi dan meningkatkan daya serang sebesar {buff} selama {duration} detik. Hanya Wujud Serigala.',
   'entities.abilities.tigers_fury.name': 'Darah Serigala',
   'entities.abilities.travel_form.description':
     'Seketika berubah menjadi wujud Fleet yang gesit, meningkatkan kecepatan gerak sebesar 40%. Kau tidak bisa menggunakan kemampuan lain saat berubah wujud, tetapi bisa berubah masuk atau keluar dari pertempuran, ideal untuk melarikan diri.',
@@ -10981,7 +10981,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description': 'Mengakarkan musuh dalam 4 m dari titik sasaran selama 2 dtk, lalu memperlambat mereka 40% selama 6 dtk. (Talenta shaman)',
   'entities.abilities.evocation.description': 'Restaura mana rápidamente. (talenta mage)',
   'entities.abilities.frenzied_regeneration.description':
-    'Memulihkan 180 nyawa selama 10 detik. Hanya dalam Bentuk Beruang. (talenta Druid)',
+    'Memulihkan 40% nyawa maksimummu selama 10 detik. Hanya dalam Bentuk Beruang. (talenta Druid)',
   'entities.abilities.frost_trap.description':
     'Membekukan musuh di area target selama 3 detik sehingga mereka tidak dapat bergerak atau bertindak. (talenta Hunter)',
   'entities.abilities.hammer_of_wrath.description': 'Melontarkan palu suci sebesar {damage} kerusakan dan menghasilkan 1 Pengabdian. Bisa dipakai di bawah 20% nyawa, atau selama Kenaikan Ilahi maupun Murka Pembalas. Murka Fajar memberi satu rapalan tambahan terhadap sasaran mana pun yang mengabaikan waktu jedanya yang sedang berjalan dan memberi 20% kerusakan lebih besar. Kenaikan meningkatkan kerusakannya sebesar 30%.',
@@ -12502,7 +12502,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menghabiskan 5 Kehijauan. Memanen setiap penyembuhan berkala milikmu pada semua sekutu sebesar 60% dari penyembuhan tersisa, menghapus efek itu, dan menanam Mekar Liar segar pada sasaran.',
   'entities.abilities.redharvest.name': 'Panen Merah',
   'entities.abilities.redharvest.description':
-    'Menghabiskan 3 Darah Tua milikmu: menyerang sebesar {damage}, langsung memberikan semua kerusakan yang masih akan diberikan Kupasan dan Robekan milikmu, menghapus kedua pendarahan, dan memulihkan 30 energi. Berfungsi tanpa poin combo.',
+    'Menghabiskan 3 Darah Tua milikmu: menyerang sebesar {damage}, langsung memberikan semua kerusakan yang masih akan diberikan Kupasan dan Robekan milikmu, menghapus kedua pendarahan, dan memulihkan {rage} energi. Berfungsi tanpa poin combo.',
   'entities.abilities.sunlance.name': 'Jejak Surya',
   'entities.abilities.sunlance.description':
     'Menghabiskan 3 Pasang Rembulan milikmu untuk serangan sebesar {damage} kerusakan Alam ditambah bakaran {overTime} selama 9 dtk, dan memulihkan 35 mana: pilihan mana. Gelombang Rembulan menghabiskan 3 Pasang Rembulan yang sama, jadi pilih salah satu.',
@@ -12814,7 +12814,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Jurus penutup yang menyebabkan {damage}. Hanya dalam Wujud Serigala.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Setiap pukulan yang mengenai menambah 1 Darah Tua; pada 3 Darah Tua tombol ini berubah menjadi Redharvest: gigitan sebesar 70 plus 43 per poin combo yang juga seketika menimbulkan seluruh kerusakan yang masih akan diberikan Flense dan Bloodrift-mu, dan memulihkan 30 energi.',
+    'Setiap pukulan yang mengenai menambah 1 Darah Tua; pada 3 Darah Tua tombol ini berubah menjadi Redharvest, yang menghabiskan Darah Tua untuk serangan yang lebih kuat, juga seketika menimbulkan seluruh kerusakan yang masih akan diberikan Flense dan Bloodrift-mu, dan memulihkan energi.',
   'entities.abilities.funeral_harvest.description':
     'Saat musuh yang baru saja kamu atau mayat hidupmu lukai mati, kamu memperoleh 1 Serpihan Jiwa. Ini dapat terjadi sekali setiap 3 detik.',
   'entities.abilities.funeral_harvest.name': 'Funeral Harvest',
@@ -13331,4 +13331,21 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'auth.designCodeErrVersion': 'Kode tampilan itu berasal dari versi gim yang lebih baru.',
   'auth.designCodeErrMalformed': 'Kode tampilan itu rusak. Salin seluruh kode lalu coba lagi.',
   'hudChrome.nameplate.cheaterTag': '< Pemain Curang >',
+  'hud.options.displayMode': 'Mode Layar',
+  'hud.options.displayModeBorderless': 'Layar Penuh Tanpa Bingkai',
+  'hud.options.displayModeWindowed': 'Jendela',
+  'hudChrome.options.discordPresence': 'Status Aktivitas Discord',
+  'hudChrome.options.discordPresenceNote': 'Menampilkan zona tempatmu berada dan sudah berapa lama kamu bermain dalam sesi ini sebagai aktivitas Discord-mu, dan siapa pun yang bisa melihat profil Discord-mu bisa melihat keduanya. Hanya nama zona, waktu sesimu, dan permainan yang dibagikan, tidak pernah karaktermu, akunmu, atau dengan siapa kamu bermain. Membutuhkan aplikasi Discord yang berjalan di komputer ini.',
+  'hudChrome.options.forceHighPerfGpu': 'Gunakan GPU Gaming Diskret',
+  'hudChrome.options.forceHighPerfGpuNote': 'Aktif secara bawaan: aplikasi desktop meminta GPU gaming diskret dari komputer ini. Nonaktifkan ini jika permainan tidak mau dimulai, terbuka dengan layar hitam, atau layar laptop menjadi kosong. Berlaku mulai lain kali kamu membuka permainan.',
+  'desktop.notify.partyInviteBody': '{name} telah mengundangmu ke kelompoknya.',
+  'desktop.notify.partyInviteTitle': 'Undangan Kelompok',
+  'desktop.notify.updateReadyBody': 'Mulai ulang World of ClaudeCraft untuk menerapkan pembaruan.',
+  'desktop.notify.updateReadyTitle': 'Pembaruan {version} siap',
+  'desktop.notify.updateReadyTitleNoVersion': 'Pembaruan siap',
+  'desktop.update.whatsNew': 'Lihat apa yang berubah di browsermu',
+  'entities.abilities.challenging_roar.description': 'Sebuah auman garang: semua musuh dalam 10 yard terhasut, ancaman mereka terhadapmu naik menyamai musuh yang paling mereka benci, dan mereka terpaksa menyerangmu selama 3 detik. Hanya dalam Wujud Bruin.',
+  'entities.abilities.challenging_roar.name': 'Auman Garang',
+  'entities.abilities.cheap_shot.descriptionNoStealth': 'Serang target sebesar {damage} kerusakan, membuatnya terpana selama 4 detik. Memberi 2 poin combo.',
+  'gpuNotice.bodyDiscreteInactive': 'Permainan tidak menggunakan GPU gaming diskret dan sebagai gantinya berjalan pada GPU terintegrasi (hemat daya), sehingga performa akan menurun. Perbarui driver grafismu, lalu nyalakan ulang permainan. Di Windows, juga atur permainan ke Performa tinggi di Pengaturan > Sistem > Tampilan > Grafis.',
 };

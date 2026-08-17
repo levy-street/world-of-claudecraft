@@ -953,6 +953,22 @@ export const vi_VN: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "The Undercroft",
+        "state": "The State Floor",
+        "residence": "The Residence",
+        "tower": "The Watch Tower"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
+    },
     "compass": {
       "N": "B",
       "NE": "ĐB",
@@ -1371,6 +1387,10 @@ export const vi_VN: EnTranslations = {
       "showWalletOnCharacterScreen": "Hiện Ví Tiền Ở Màn Hình Nhân Vật",
       "showWalletOnPlayerCard": "Hiện Ví Tiền Trên Thẻ Người Chơi",
       "showPlaytime": "Hiện Thời Gian Chơi Ở Màn Hình Nhân Vật",
+      "forceHighPerfGpu": "Dùng Card Đồ Họa Chơi Game",
+      "forceHighPerfGpuNote": "Mặc định bật: ứng dụng máy tính yêu cầu máy này dùng card đồ họa chơi game của nó. Hãy tắt tùy chọn này nếu trò chơi không khởi động được, mở ra màn hình đen, hoặc màn hình laptop bị tối đen. Có hiệu lực vào lần khởi động trò chơi tiếp theo.",
+      "discordPresence": "Hoạt Động Discord",
+      "discordPresenceNote": "Hiển thị vùng bạn đang ở và thời gian bạn đã chơi trong phiên chơi này dưới dạng hoạt động Discord của bạn, và bất kỳ ai xem được hồ sơ Discord của bạn đều thấy được cả hai. Chỉ tên vùng, thời gian phiên chơi của bạn, và tên trò chơi được chia sẻ, không bao giờ là nhân vật, tài khoản, hay những ai bạn đang chơi cùng. Cần ứng dụng Discord đang chạy trên máy tính này.",
       "showDevBadges": "Hiện Huy Hiệu Nhà Phát Triển",
       "showOwnNameplate": "Hiện Bảng Tên Của Tôi",
       "showPlayerNameplates": "Hiện Bảng Tên Người Chơi",
@@ -7793,7 +7813,15 @@ export const vi_VN: EnTranslations = {
       "readyBody": "Sẽ tự cài khi bạn thoát, hoặc khởi động lại ngay.",
       "restart": "Khởi động lại ngay",
       "later": "Để sau",
-      "dismiss": "Bỏ Qua"
+      "dismiss": "Bỏ Qua",
+      "whatsNew": "Xem những gì đã thay đổi trong trình duyệt của bạn"
+    },
+    "notify": {
+      "updateReadyTitle": "Bản cập nhật {version} đã sẵn sàng",
+      "updateReadyTitleNoVersion": "Bản cập nhật đã sẵn sàng",
+      "updateReadyBody": "Khởi động lại World of ClaudeCraft để áp dụng bản cập nhật.",
+      "partyInviteTitle": "Lời mời tổ đội",
+      "partyInviteBody": "{name} đã mời bạn gia nhập tổ đội của họ."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7805,6 +7833,7 @@ export const vi_VN: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "Trò chơi đang chạy mà không có tăng tốc GPU và sẽ chậm. Hãy cập nhật trình điều khiển đồ họa, sau đó khởi động lại trò chơi. Trên Windows, hãy đặt trò chơi thành Hiệu suất cao trong Cài đặt > Hệ thống > Màn hình > Đồ họa.",
+    "bodyDiscreteInactive": "Trò chơi hiện không dùng card đồ họa chơi game mà đang chạy trên GPU tích hợp (tiết kiệm điện), nên hiệu năng sẽ giảm sút. Hãy cập nhật trình điều khiển đồ họa, sau đó khởi động lại trò chơi. Trên Windows, cũng hãy đặt trò chơi thành Hiệu suất cao trong Cài đặt > Hệ thống > Màn hình > Đồ họa.",
     "bodyWeb": "Trò chơi đang chạy mà không có tăng tốc GPU và sẽ chậm. Hãy bật tăng tốc phần cứng trong cài đặt trình duyệt, cập nhật trình điều khiển đồ họa, sau đó khởi động lại trình duyệt.",
     "hybridBodyWindows": "Phiên chơi này đang hiển thị trên GPU tích hợp (tiết kiệm điện). Nếu máy tính này còn có card đồ họa chơi game, hãy đặt trình duyệt thành Hiệu năng cao trong Cài đặt > Hệ thống > Màn hình > Đồ họa, rồi khởi động lại trình duyệt. Ứng dụng máy tính tự động chọn card đồ họa chơi game.",
     "hybridBodyLinux": "Phiên chơi này đang hiển thị trên GPU tích hợp (tiết kiệm điện). Nếu máy tính này còn có card đồ họa chơi game, trình duyệt hoặc trình điều khiển đồ họa của bạn có thể có tùy chọn chọn GPU riêng, hoặc bản phân phối Linux của bạn có thể cung cấp công cụ chuyển GPU (như PRIME hoặc optimus-manager). Ứng dụng máy tính tự động chọn card đồ họa chơi game.",
@@ -8172,6 +8201,9 @@ export const vi_VN: EnTranslations = {
       "graphicsReloadNote": "Chất Lượng Đồ Họa và Chi Tiết Địa Hình áp dụng sau khi tải lại.",
       "reloadNow": "Tải Lại Ngay",
       "fullscreen": "Toàn Màn Hình",
+      "displayMode": "Chế Độ Hiển Thị",
+      "displayModeBorderless": "Toàn Màn Hình Không Viền",
+      "displayModeWindowed": "Cửa Sổ",
       "touchLookSpeed": "Tốc Độ Nhìn Cảm Ứng",
       "joystickSize": "Kích Thước Cần Điều Khiển",
       "buttonSize": "Kích thước nút",
@@ -9511,7 +9543,7 @@ export const vi_VN: EnTranslations = {
       "cheap_shot": {
         "name": "Thụi Bụng",
         "description": "Đánh mục tiêu gây {damage} sát thương, làm choáng nó trong 4 giây. Phải đang ẩn thân. Nhận 2 điểm liên hoàn.",
-        "descriptionNoStealth": "Strike the target for {damage} damage, stunning it for 4 sec. Awards 2 combo points.",
+        "descriptionNoStealth": "Đánh mục tiêu gây {damage} sát thương, làm choáng nó trong 4 giây. Nhận 2 điểm liên hoàn.",
         "specNote_subtlety": "Dùng từ Màn Chạng Vạng sẽ thêm 1 U Ám (tối đa 3). Ở 3 U Ám, bạn có thể dùng đòn này MÀ KHÔNG CẦN ẩn thân: lần dùng đó không tốn gì, tiêu hết 3 U Ám, và kích hoạt Màn Bóng Tối 6 giây."
       },
       "sap": {
@@ -10031,8 +10063,8 @@ export const vi_VN: EnTranslations = {
         "description": "Gầm gừ với mục tiêu: mối đe dọa của bạn tăng lên ngang bằng kẻ địch mà nó căm ghét nhất và nó bị buộc phải tấn công bạn trong 3 giây. Chỉ dùng được ở Bruin Form."
       },
       "challenging_roar": {
-        "name": "Baleful Roar",
-        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
+        "name": "Tiếng Gầm Hiểm Độc",
+        "description": "Một tiếng gầm hiểm độc: mọi kẻ địch trong vòng 10 thước bị khiêu khích, mối đe dọa của chúng đối với bạn tăng lên ngang bằng kẻ địch mà chúng căm ghét nhất, và chúng bị buộc phải tấn công bạn trong 3 giây. Chỉ dùng được ở Bruin Form."
       },
       "cat_form": {
         "name": "Hình Sói",
@@ -10046,7 +10078,7 @@ export const vi_VN: EnTranslations = {
       "ferocious_bite": {
         "name": "Cắn Xé Máu",
         "description": "Chiêu kết liễu gây {damage} sát thương. Chỉ dùng được ở Hình Sói.",
-        "specNote_feral": "Mỗi đòn đánh trúng thêm 1 Huyết Cổ; ở 3 Huyết Cổ, nút này trở thành Thu Hoạch Đỏ: một cú cắn gây 70 cộng 43 mỗi điểm liên hoàn, đồng thời lập tức gây toàn bộ sát thương còn lại của Lóc Xé và Xé Rách, và hồi 30 năng lượng."
+        "specNote_feral": "Mỗi đòn đánh trúng thêm 1 Huyết Cổ; ở 3 Huyết Cổ, nút này trở thành Thu Hoạch Đỏ, tiêu Huyết Cổ cho một cú cắn mạnh hơn, đồng thời lập tức gây toàn bộ sát thương còn lại của Lóc Xé và Xé Rách, và hồi năng lượng."
       },
       "swipe": {
         "name": "Vuốt Quét Ngang",
@@ -10109,7 +10141,7 @@ export const vi_VN: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Huyết Sói",
-        "description": "Tăng {buff} sức mạnh tấn công trong {duration} giây. Chỉ dùng được ở Hình Sói."
+        "description": "Trào dâng {rage} năng lượng và tăng {buff} sức mạnh tấn công trong {duration} giây. Chỉ dùng được ở Hình Sói."
       },
       "rip": {
         "name": "Vết Nứt Máu",
@@ -10330,7 +10362,7 @@ export const vi_VN: EnTranslations = {
       },
       "redharvest": {
         "name": "Thu Hoạch Đỏ",
-        "description": "Tiêu 3 Huyết Cổ của bạn: đánh gây {damage}, lập tức gây toàn bộ sát thương mà Lóc Xé và Xé Rách của bạn còn sẽ gây ra, xóa cả hai hiệu ứng chảy máu và hồi 30 năng lượng. Dùng được cả khi không có điểm liên hoàn."
+        "description": "Tiêu 3 Huyết Cổ của bạn: đánh gây {damage}, lập tức gây toàn bộ sát thương mà Lóc Xé và Xé Rách của bạn còn sẽ gây ra, xóa cả hai hiệu ứng chảy máu và hồi {rage} năng lượng. Dùng được cả khi không có điểm liên hoàn."
       },
       "marrowbreak": {
         "name": "Đoạn Tủy",
@@ -10578,7 +10610,7 @@ export const vi_VN: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Hồi Phục Hoang Dã",
-        "description": "Hồi 180 máu trong 10 giây. Chỉ dùng được ở Dạng Gấu. (thiên phú Druid)"
+        "description": "Hồi 40% máu tối đa trong 10 giây. Chỉ dùng được ở Dạng Gấu. (thiên phú Druid)"
       },
       "frost_trap": {
         "name": "Bẫy Sương Giá",
@@ -10811,7 +10843,7 @@ export const vi_VN: EnTranslations = {
       },
       "prowl": {
         "name": "Rình Rập",
-        "description": "Vào trạng thái ẩn thân khi ở Hình Sói, di chuyển chậm hơn 50%. Không thể dùng trong chiến đấu."
+        "description": "Vào trạng thái ẩn thân khi ở Hình Sói, di chuyển chậm hơn 5%. Không thể dùng trong chiến đấu."
       },
       "rake": {
         "name": "Lóc Xé",
@@ -12371,6 +12403,9 @@ export const vi_VN: EnTranslations = {
       },
       "pristine_claw": {
         "name": "Móng Vuốt Nguyên Vẹn"
+      },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
@@ -16855,6 +16890,11 @@ export const vi_VN: EnTranslations = {
         "name": "Pháo Đài Cuối Cùng",
         "enterText": "Bạn bước vào những đại sảnh lạnh lẽo, tĩnh lặng của Last Keep.",
         "leaveText": "Bạn kéo cánh cửa pháo đài đóng sập lại và bước trở về với cơn gió của Drakelands."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
       },
       "drowned_temple": {
         "name": "Ngôi Đền Chết Chìm",

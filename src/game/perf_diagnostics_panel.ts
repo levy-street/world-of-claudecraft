@@ -115,6 +115,9 @@ export class PerfDiagnosticsPanel {
   private activeElapsedMs = 0;
   private activeSegmentStartedAt: number | null = null;
   private scanInterrupted = false;
+  // hiddenPresentSkips as of the last update, or null before a collection
+  // baselines it: pre-scan skips must not trip the gap detector.
+  private lastSeenHiddenSkips: number | null = null;
   private diagnosis: PerfDiagnosis | null = null;
   private finalSnapshot: PerfSnapshot | null = null;
   private completedAt: string | null = null;
@@ -296,6 +299,29 @@ export class PerfDiagnosticsPanel {
     this.renderMetrics(snapshot);
     if (this.state !== 'collecting') return;
     const now = performance.now();
+    // The desktop shell pins document.visibilityState at 'visible', so a
+    // minimized shell window never fires onVisibilityChange, and while it is
+    // hidden perf.tick (this panel's only driver) stops entirely. The truthful
+    // record that a hidden stretch happened between two updates is the
+    // monitor's hiddenPresentSkips counter: a delta means the active segment
+    // spans renderless wall-clock, so restart the scan exactly like the web
+    // visibility pause path in onVisibilityChange (phase 4 QA F12).
+    const hiddenSkips = snapshot.hiddenPresentSkips;
+    const sawShellHiddenGap =
+      this.lastSeenHiddenSkips !== null && hiddenSkips > this.lastSeenHiddenSkips;
+    this.lastSeenHiddenSkips = hiddenSkips;
+    if (sawShellHiddenGap) {
+      this.activeElapsedMs = 0;
+      this.activeSegmentStartedAt = now;
+      this.options.startMeasurement();
+      this.startButton.textContent = t('hudChrome.perf.diagnostics.controls.scanning');
+      setButtonDisabled(this.startButton, true);
+      this.progressFill.style.width = '0';
+      this.progress.setAttribute('aria-valuenow', '0');
+      this.status.style.color = DEFAULT_STATUS_COLOR;
+      this.status.textContent = t('hudChrome.perf.diagnostics.status.restoredRestart');
+      return;
+    }
     const activeMs =
       this.activeElapsedMs +
       (this.activeSegmentStartedAt !== null ? Math.max(0, now - this.activeSegmentStartedAt) : 0);
@@ -343,6 +369,7 @@ export class PerfDiagnosticsPanel {
     this.activeElapsedMs = 0;
     this.activeSegmentStartedAt = document.visibilityState === 'visible' ? now : null;
     this.scanInterrupted = false;
+    this.lastSeenHiddenSkips = null;
     this.diagnosis = null;
     this.finalSnapshot = null;
     this.completedAt = null;

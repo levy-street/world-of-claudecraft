@@ -449,8 +449,8 @@ export class NameplatePainter {
         });
     state.levelColor = mobNameColor(entity.level - player.level, entity.dead, state.friendlyPet);
     state.hpVisible = !entity.dead;
-    state.marker = entity.lootable ? '$' : elite && !entity.dead ? '◆' : '';
-    state.markerTone = state.marker ? 'loot' : 'none';
+    state.marker = entity.lootable ? 'loot' : elite && !entity.dead ? '◆' : '';
+    state.markerTone = entity.lootable ? 'loot' : 'none';
     state.frame = entity.dead ? '' : boss ? 'boss' : elite ? 'elite' : '';
   }
 

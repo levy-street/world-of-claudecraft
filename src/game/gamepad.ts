@@ -38,6 +38,12 @@ export interface GamepadCallbacks {
   // A pad connected or disconnected, so the detected brand (and thus the button
   // glyphs shown in the Controller options panel) may have changed. Optional.
   onConnectionChange?(): void;
+  // The player actually moved something this frame (a button edge, either
+  // stick, or the UI cursor), at most once per poll. The desktop shell uses it
+  // to keep the OS from sleeping the display during a pad-only session, which
+  // the OS cannot see: pad input never reaches the window as an event. A held
+  // still pad, a connection, and an unfocused window are all silent. Optional.
+  onActivity?(): void;
 }
 
 const CURSOR_SPEED = 900; // px/sec at full stick deflection in UI cursor mode
@@ -193,7 +199,7 @@ export class GamepadManager {
       // movement on its own) and skip camera/ability dispatch.
       this.input.clearGamepadMove();
       this.input.setGamepadLookActive(false);
-      this.updateCursor(pad, cur, dt);
+      if (this.updateCursor(pad, cur, dt)) this.cb.onActivity?.();
       this.prevPressed = cur;
       return;
     }
@@ -202,7 +208,8 @@ export class GamepadManager {
     // Movement: left stick.
     const lx = pad.axes[AXIS.LEFT_X] ?? 0;
     const ly = pad.axes[AXIS.LEFT_Y] ?? 0;
-    this.input.setGamepadMove(stickToMoveFlags(lx, ly, this.deadzone));
+    const move = stickToMoveFlags(lx, ly, this.deadzone);
+    this.input.setGamepadMove(move);
 
     // Camera: right stick. A non-centered stick also turns the player, the
     // same way the touch camera joystick does (setGamepadLookActive folds into
@@ -214,11 +221,21 @@ export class GamepadManager {
     this.input.applyGamepadLook(look.yaw, look.pitch);
     this.input.setGamepadLookActive(look.active);
 
+    // Real input this frame, for the activity notify below: either stick past
+    // its deadzone (the flags and look.active are already the deadzone verdict,
+    // so this costs four reads, not another hypot) or a button edge. A pad
+    // sitting connected and still leaves every one of them false.
+    let acted = move.forward || move.back || move.strafeLeft || move.strafeRight || look.active;
+
     // Edge actions: one-shot on each button's rising edge.
     for (const idx of risingEdges(this.prevPressed, cur)) {
+      acted = true;
       this.cb.onInputEdge();
       this.dispatch(idx);
     }
+    // Once per poll, never once per edge: the shell only needs to hear that the
+    // player is there, and the notifier throttles anyway.
+    if (acted) this.cb.onActivity?.();
 
     this.prevPressed = cur;
   }
@@ -294,7 +311,9 @@ export class GamepadManager {
     return this.cursorEl;
   }
 
-  private updateCursor(pad: Gamepad, cur: boolean[], dt: number): void {
+  /** Drives the virtual pointer; answers whether the player moved it or pressed
+   *  something this frame, which is the pointer-mode half of onActivity. */
+  private updateCursor(pad: Gamepad, cur: boolean[], dt: number): boolean {
     const el = this.ensureCursor();
     if (!this.cursorInit) {
       this.cursorX = window.innerWidth / 2;
@@ -318,11 +337,16 @@ export class GamepadManager {
     el.style.left = `${this.cursorX}px`;
     el.style.top = `${this.cursorY}px`;
 
+    // The post-deadzone stick (and the d-pad overrides above) are the cursor's
+    // own movement verdict, so activity here costs one comparison.
+    let acted = mx !== 0 || my !== 0;
     for (const idx of risingEdges(this.prevPressed, cur)) {
+      acted = true;
       this.cb.onInputEdge();
       if (idx === GP.A) this.clickAtCursor();
       else if (idx === GP.B || idx === GP.START) this.cb.onAction('escape');
     }
+    return acted;
   }
 
   // Synthesizes mousedown/mouseup/click at the cursor, reusing every existing DOM

@@ -44,6 +44,12 @@
       "maxTex": 512
     },
     {
+      "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/buildings/green/building_tower_catapult_green.gltf",
+      "out": "models/biome/hex_tower_catapult.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
       "src": "<redacted-local-path> Complete KayKit Collection v5/KayKit Medieval Hexagon Pack 1.0.1/Assets/gltf/decoration/props/cannonball_pallet.gltf",
       "out": "models/biome/hex_cannonballs.glb",
       "type": "static",

@@ -86,6 +86,7 @@ import {
   createBlobShadowSlot,
 } from './blob_shadow_core';
 import { BlobShadows } from './blob_shadows';
+import { type BulwarkFeaturesView, buildBulwarkFeatures } from './bulwark_features';
 import { BurningPactMarkers } from './burning_pact_markers';
 import { createCameraBoom, stepCameraBoom } from './camera_boom_core';
 import {
@@ -193,6 +194,7 @@ import {
   showsStaticFarMesh,
 } from './crowd_lod';
 import { daisVisualLift } from './dais_lift';
+import { buildDawnholdFeatures, type DawnholdFeaturesView } from './dawnhold_features';
 import { currentDayNightPhase, currentLunarPhase, dayNightPhaseOverride } from './day_night_clock';
 import {
   aboveHorizon,
@@ -222,6 +224,7 @@ import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
 import { detailHorizonStarved } from './detail_horizon_core';
 import { buildDoorBody, buildRiftGateBody, buildRiftPuzzleProp } from './door_portal';
+import { watchDevicePixelRatio } from './dpr_watch';
 import { DrainChannelStopLatch, drainChannelVisualPlan } from './drain_channel_visual_core';
 import { createLogicalFrameDrawStats, type LogicalFrameDrawStats } from './draw_stats_core';
 import { DungeonInteriors, dungeonDaisHasRaisedPlatform, ensureDungeonAssets } from './dungeon';
@@ -289,6 +292,7 @@ import {
   setFoliageShadowVolume,
 } from './foliage';
 import { activeFarFieldPolicy } from './foliage_impostor';
+import { type FramePresentHost, presentFrame } from './frame_present';
 import {
   type FrostNovaRootVisual,
   isFrostNovaRootAura,
@@ -322,6 +326,7 @@ import {
   storePooledObject as storeGroundObjectInPool,
   takeOrBuildGroundObject,
 } from './ground_object_pool';
+import { emitGroundPuff } from './ground_puff';
 import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { buildHollowGates } from './hollow_gates';
@@ -330,6 +335,7 @@ import { idleSlot } from './idle_queue';
 import { buildImpactSite, type ImpactSiteView, MIREFEN_IMPACT_SITE } from './impact_site';
 import * as encounterPrewarm from './interior_encounter_prewarm_pass';
 import { ensureDelveInteriorKit } from './interior_kit';
+import { applyInteriorLightRig, applyRiftLightRig, type FogSceneState } from './interior_light_rig';
 import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
 import { stepLichHeartbeat } from './lich_audio_state_core';
@@ -520,6 +526,7 @@ import {
 import { createRevealGate } from './reveal_gate';
 import { collectRiftAmbientSources } from './rift_ambience';
 import { buildRiftRankBadge } from './rift_rank';
+import { syncRigMatrixFreeze, unfreezeRigMatrices } from './rig_visibility_freeze';
 import { RingOfFrostVisuals } from './ring_of_frost_visual';
 import {
   captureSceneCensus,
@@ -559,7 +566,12 @@ import { zoneArrivalReady } from './sky_residency_core';
 import { SkyResidencyDriver } from './sky_residency_driver';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { buildSoulwell, disposeSoulwellVisual, syncSoulwellVisual } from './soulwell';
-import { freezeStaticMatrices, freezeStaticSubtreeMatrices } from './static_matrix';
+import {
+  freezeStaticMatrices,
+  freezeStaticSubtreeMatrices,
+  lookAtFrozen,
+  refreshFrozenWorldMatrix,
+} from './static_matrix';
 import { buildStationProps } from './stations';
 import { shouldRenderStealthGhost } from './stealth';
 import { createStepSmooth, type StepSmoothState, stepSmoothHeight } from './step_smooth_core';
@@ -731,7 +743,8 @@ const PREWARM_BUILD_RESERVE_MS = 3000;
 // See prewarmCompileAwaitDeadline.
 const PREWARM_COMPILE_AWAIT_RESERVE_MS = 2000;
 // Compile roots per entry unit: one unit launches its batch's compileAsync
-// calls and awaits them together, so r165's 10 ms poll floors overlap instead
+// calls and awaits them together, so three's 10 ms poll floors (r165 through
+// the installed 0.185, see patches/three@0.185.1.patch) overlap instead
 // of stacking (>1000 serial awaits measured 10+ s of pure timer wait). Small
 // enough that a batch's synchronous submission prologues stay a bounded slice
 // between the yields of the early-submission loop (submitCompileUnits).
@@ -884,21 +897,9 @@ const hemiOutdoorIntensity = (): number =>
 
 const SUN_INTENSITY = 3.5;
 const ENV_INTENSITY = 0.37;
-// dungeon interiors: kill the daylight so torchlight carries the scene
-// (env at 0.15 still lit rigs sky-blue against the pitch-dark crypt)
-const DUNGEON_SUN_INTENSITY = 0.34;
-const DUNGEON_ENV_INTENSITY = 0.05;
-// The authored Infernal Citadel is larger than a procedural floor and carries
-// real budgeted brazier lights. A stronger ambient floor preserves the black-red
-// infernal grade while keeping its loops, bosses, and doors readable between pools.
-const INFERNAL_SUN_INTENSITY = 0.54;
-const INFERNAL_HEMI_INTENSITY = 0.32;
-const INFERNAL_ENV_INTENSITY = 0.1;
-const INFERNAL_RIM_BOOST = 2.15;
 // raw HDRI PMREMs integrate the real sun the dome shader clamps away,
 // rescale so ambient matches the dome-capture look (see lookdev-hookup.md)
 const IBL_RAW_SCALE = 0.55;
-const DUNGEON_HEMI_INTENSITY = 0.22; // floor of readability — bosses crushed to black at 0.14
 // day/night: at night the key sun and sky bounce cool toward moonlight. These
 // are the fully-night blend weights (scaled each frame by the grade's nightAmt).
 const MOON_SUN_COLOR = 0x9fb2e0; // pale cool moonlight the warm sun eases toward
@@ -923,31 +924,6 @@ const DAY_HEMI_SKY_WARMTH = 0.3;
 const DAY_HEMI_GROUND_WARMTH = 0.22;
 // the moving sun/moon key light rides at the same distance the fixed anchor did
 const SUN_TRAVEL_DISTANCE = SUN_ANCHOR.length();
-// character rim glow scales up underground so silhouettes split from the murk
-const DUNGEON_RIM_BOOST = 2.4;
-// The Protect Yumi maze is a torch-lit NIGHT ARENA, not a crypt: a moon-key
-// plus a healthy hemisphere keep the whole competitive space readable, with
-// the braziers/torches adding warmth rather than carrying the scene alone.
-const YUMI_MAZE_SUN_INTENSITY = 1.32;
-const YUMI_MAZE_HEMI_INTENSITY = 0.38;
-const YUMI_MAZE_ENV_INTENSITY = 0.25;
-const YUMI_MAZE_RIM_BOOST = 1.7;
-const WILDHEART_SUN_INTENSITY = 1.75;
-const WILDHEART_HEMI_INTENSITY = 0.59;
-const WILDHEART_ENV_INTENSITY = 0.28;
-const WILDHEART_RIM_BOOST = 1.5;
-// The Last Keep is a LIVED-IN castle interior, not a crypt: a higher, warmed
-// ambient floor (over the candle-orange torch lights the interior itself
-// carries) so its halls read golden and inhabited while staying indoors-dim.
-// Scoped to interior 'lastkeep' only; every other underground interior keeps
-// the DUNGEON_* rig.
-const LASTKEEP_SUN_INTENSITY = 0.66;
-const LASTKEEP_HEMI_INTENSITY = 0.46;
-const LASTKEEP_ENV_INTENSITY = 0.14;
-const LASTKEEP_RIM_BOOST = 1.9;
-const LASTKEEP_SUN_COLOR = 0xffd9a8;
-const LASTKEEP_HEMI_SKY_COLOR = 0xffe4c4;
-const LASTKEEP_HEMI_GROUND_COLOR = 0x4a3826;
 const RENDERER_PHASE_SAMPLE_LIMIT = 720;
 const RENDER_STALL_ATTRIBUTION_MS = 80;
 const PREWARM_MOB_TEMPLATE_IDS = [
@@ -1539,7 +1515,6 @@ export class Renderer {
   // brightness without moving anything across BLOOM_THRESHOLD.
   private baseExposure = 1;
   private tmpV = new THREE.Vector3();
-  private tmpPuff = new THREE.Vector3();
   private viewCandidates: ViewCandidate[] = [];
   private viewCandidatePool: ViewCandidate[] = [];
   private readonly characterLodPlan: CharacterLodBands = {
@@ -1685,7 +1660,9 @@ export class Renderer {
   private impactSite: ImpactSiteView;
   private realmFlora: RealmFloraView | null = null;
   private emberFeatures: EmberFeaturesView | null = null;
+  private bulwarkFeatures: BulwarkFeaturesView | null = null;
   private castleFeatures: CastleFeaturesView | null = null;
+  private dawnholdFeatures: DawnholdFeaturesView | null = null;
   private frostSky: FrostSkyView | null = null;
   private fenFeatures: FenFeaturesView | null = null;
   private amberFeatures: AmberFeaturesView | null = null;
@@ -1987,6 +1964,8 @@ export class Renderer {
   // seed-bound ground sampler, built once so the per-frame Vale Cup ring update
   // allocates no closure (see the drape path in vale_cup_team_ring.ts).
   private groundSample = (x: number, z: number): number => groundHeight(x, z, this.sim.cfg.seed);
+  /** Bound once: the puff runs per landing and must not allocate a closure. */
+  private surfaceAtForPuff = (x: number, z: number, y: number) => this.surfaceAt(x, z, y);
   private selectionDrapeSupportY = 0;
   private selectionGroundSample = (x: number, z: number): number =>
     Math.max(this.groundSample(x, z), this.selectionDrapeSupportY);
@@ -2011,6 +1990,15 @@ export class Renderer {
   private readonly onWebGLContextRestored = (): void => {
     this.contextRestoredCount++;
     this.captureGlIdentity();
+    // three's onContextRestore re-runs initGLContext, which REPLACES
+    // webgl.info with a fresh WebGLInfo; the composer-tier draw-stats session
+    // captured the old object at construction and would read a dead
+    // accumulator (governor draw signal and opaque-sort input pinned at zero)
+    // for the rest of the session. Re-create it against the live info; the
+    // fresh session's first beginFrame re-baselines safely. Pre-existing on
+    // the release branch (not a phase 6 regression); r185 even preserves
+    // autoReset onto the new object, so only this rebind is needed.
+    if (this.drawStats) this.drawStats = createLogicalFrameDrawStats(this.webgl.info);
     this.vfx?.onContextRestored();
   };
   private readonly onViewportResize = (): void => {
@@ -2116,8 +2104,9 @@ export class Renderer {
     // The scene root sits at identity forever, but with the default
     // matrixAutoUpdate the root recomposes each frame, which flags
     // matrixWorldNeedsUpdate and FORCE-cascades a matrixWorld multiply through
-    // every node in the graph (three r165 updateMatrixWorld), defeating both
-    // the static-subtree freeze and the hidden-rig gate below. Freeze the root:
+    // the graph (three updateMatrixWorld; r185's force still bypasses the
+    // dirty check for every auto-update descendant), defeating both the
+    // static-subtree freeze and the hidden-rig gate below. Freeze the root:
     // children with auto-update still recompose themselves normally.
     this.scene.updateMatrix();
     this.scene.matrixAutoUpdate = false;
@@ -2148,9 +2137,10 @@ export class Renderer {
       initGfxTier(this.webgl); // software-GL autodetect needs the live context
     }
     if (GFX.composer || GFX.gradePass) {
-      // three r165's render() resets info per pass (after the shadow pass, see
-      // draw_stats_core.ts header), so with the composer's multiple passes every
-      // post-frame reader saw only the final fullscreen pass (1 call/1 triangle).
+      // three's render() resets info per pass (since r185 at the top of the
+      // pass, see draw_stats_core.ts header), so with the composer's multiple
+      // passes every post-frame reader saw only the final fullscreen pass
+      // (1 call/1 triangle).
       // The session owns manual accumulation and every downstream consumer.
       // Direct profiles keep Three's normal auto-reset path.
       this.drawStats = createLogicalFrameDrawStats(this.webgl.info);
@@ -2234,7 +2224,10 @@ export class Renderer {
       this.farVista.enabled ? this.farVista.cameraFar : 950,
     );
     // updateCamera owns the one explicit camera matrix refresh. Prevent each
-    // WebGLRenderer pass from repeating it for an unchanged camera.
+    // WebGLRenderer pass from repeating it for an unchanged camera. r185 also
+    // gates the camera's own compose on this flag, so every explicit refresh
+    // goes through refreshFrozenWorldMatrix and every aim through lookAtFrozen
+    // (a plain updateMatrixWorld/lookAt no longer composes a frozen node).
     this.camera.matrixWorldAutoUpdate = false;
     // Nameplate Three/DOM ownership lives in the painter; it reads the
     // viewport / mob-nameplate toggle lazily (the renderer reassigns viewport on
@@ -3218,6 +3211,12 @@ export class Renderer {
     window.visualViewport?.addEventListener('resize', this.onViewportResize);
     window.visualViewport?.addEventListener('scroll', this.onViewportResize);
     document.addEventListener('fullscreenchange', this.onViewportResize);
+    // Moving the window to a display with a different scale factor fires no
+    // resize event of its own when the CSS viewport size is unchanged, so the
+    // backing store would keep the old ratio until something else resized.
+    this.dprUnwatch = watchDevicePixelRatio(() => {
+      if (!this.shutdownStarted) this.resizeViewport();
+    });
     } catch (error) {
       this.beginRendererShutdown();
       this.disposeRendererResources();
@@ -3252,6 +3251,8 @@ export class Renderer {
     window.visualViewport?.removeEventListener('resize', this.onViewportResize);
     window.visualViewport?.removeEventListener('scroll', this.onViewportResize);
     document.removeEventListener('fullscreenchange', this.onViewportResize);
+    this.dprUnwatch?.();
+    this.dprUnwatch = null;
     for (const timer of this.resizeTimers) window.clearTimeout(timer);
     this.resizeTimers = [];
     if (this.devProbeTimer !== null) {
@@ -3449,6 +3450,43 @@ export class Renderer {
     this.applyResolution();
   }
 
+  private dprUnwatch: (() => void) | null = null;
+
+  // Reused presentFrame host, refreshed field-by-field each sync (see the call
+  // site): class-field init runs before the constructor assigns the real
+  // surfaces, so it starts empty and is never read before the first refresh.
+  private readonly framePresentHost = {
+    vfx: null,
+    post: null,
+    webgl: null,
+    scene: null,
+    camera: null,
+  } as unknown as FramePresentHost;
+
+  // Frames whose terminal draw actually submitted, counted at the one
+  // presentFrame call site. Every other counter sits UPSTREAM of the sync
+  // present argument, so this is the only evidence downstream of the skip
+  // decision; the E2E probe (scripts/desktop_hidden_skip_probe.mjs) asserts
+  // it freezes while hidden, which kills a forced-present mutation
+  // deterministically instead of leaning on SwiftShader frame-rate collapse
+  // (phase 4 QA F4).
+  private presentedFrameCount = 0;
+
+  /** Frames whose terminal draw actually submitted this session. */
+  presentedFrames(): number {
+    return this.presentedFrameCount;
+  }
+
+  /**
+   * A display change the page cannot observe on its own (the window moved to
+   * another monitor, or its scale factor changed). resizeViewport re-measures
+   * and applyResolution re-reads window.devicePixelRatio live, so this is the
+   * whole fix.
+   */
+  noteDisplayChanged(): void {
+    if (!this.shutdownStarted) this.resizeViewport();
+  }
+
   // Allocate at the manual resolution ceiling. Automatic changes on the supported
   // grade-only path update only the live region below, never target storage.
   private applyResolution(): void {
@@ -3603,14 +3641,15 @@ export class Renderer {
         for (const key of skyKeys) this.prewarmTexture(this.skyView.domeTexture(key));
         return;
       }
-      // A DataTexture upload is synchronous even from requestIdleCallback. Newer
-      // Three runtimes can split HDRIs into row batches; pinned r165 lacks update
-      // ranges and pays one full upload. Either way each atomic WebGL call enters
-      // the shared queue so it cannot overlap a live shader compile.
+      // A DataTexture upload is synchronous even from requestIdleCallback. The
+      // installed 0.185 ships native update ranges, so the idle arm row-batches
+      // the HDRI instead of paying one full upload. Either way each atomic
+      // WebGL call enters the shared queue so it cannot overlap a live shader
+      // compile.
       await this.prewarmTextureInIdle(this.skyView.envTexture(zone.biome));
-      // PMREM generation is indivisible in Three r165. Defer two timed-out
-      // callbacks before deliberately paying that single unit under sustained
-      // load, rather than running it on the first forced callback.
+      // PMREM generation is indivisible in three (0.185 included). Defer two
+      // timed-out callbacks before deliberately paying that single unit under
+      // sustained load, rather than running it on the first forced callback.
       await idleSlot(IDLE_PREWARM_TIMEOUT_MS, { maxTimeoutDeferrals: 2 });
       await this.backgroundGpuWork.run(
         () => this.ensureEnvironmentBiome(zone.biome),
@@ -4173,6 +4212,10 @@ export class Renderer {
           this.castleFeatures = buildCastleFeatures();
           this.attachZoneFeature(this.castleFeatures);
         }
+        if (!this.bulwarkFeatures) {
+          this.bulwarkFeatures = buildBulwarkFeatures();
+          this.attachZoneFeature(this.bulwarkFeatures);
+        }
         break;
       case 'frost':
         if (!this.frostSky) {
@@ -4215,6 +4258,10 @@ export class Renderer {
           this.gardenFeatures = buildGardenFeatures(this.sim.cfg.seed);
           this.attachZoneFeature(this.gardenFeatures);
         }
+        if (!this.dawnholdFeatures) {
+          this.dawnholdFeatures = buildDawnholdFeatures();
+          this.attachZoneFeature(this.dawnholdFeatures);
+        }
         break;
       case 'gale':
         if (!this.galeFeatures) {
@@ -4242,24 +4289,6 @@ export class Renderer {
   // Ground impact dust at a body's feet, coloured by the surface underfoot.
   // Water is skipped: splashes are the water system's job, and dust on a lake
   // reads as a bug. Power below the floor emits nothing at all.
-  private emitGroundPuff(x: number, y: number, z: number, power: number): void {
-    const p = Math.min(1, power);
-    if (p <= 0.02) return;
-    const surface = this.surfaceAt(x, z, y);
-    if (surface === 'water') return;
-    const color =
-      surface === 'stone'
-        ? 0x9b9a95
-        : surface === 'wood'
-          ? 0xa8895f
-          : surface === 'snow'
-            ? 0xe6eef5
-            : surface === 'dirt'
-              ? 0xa38257
-              : 0x8d9a63;
-    this.tmpPuff.set(x, y, z);
-    this.vfx.groundPuff(this.tmpPuff, p, color);
-  }
 
   private surfaceAt(x: number, z: number, y: number): Surface {
     return footstepSurfaceAt(this.sim.cfg.seed, x, y, z, this.weatherOn);
@@ -4467,7 +4496,9 @@ export class Renderer {
       // monotonic there, so it already includes the off-screen water-simulation
       // passes); other profiles keep the live post-frame read, where three's
       // per-render auto-reset drops those passes, so add them back at 1 draw call
-      // and 2 triangles each.
+      // and 2 triangles each. (Since r185 that live read would also include
+      // the shadow pass; empty on every shipped direct profile, which never
+      // enables dynamic shadows, pinned in tests/gfx.test.ts.)
       calls: drawStatsFrame
         ? drawStatsFrame.calls
         : info.render.calls + this.lastWaterSimulationPasses,
@@ -4695,7 +4726,12 @@ export class Renderer {
     // auto-reset drops the off-screen water-simulation passes: add them back
     // (1 draw call / 2 triangles per pass). Composer tiers pass drawSignal
     // through untouched, and their water passes are already present in
-    // the logical-frame session, so they must not be counted twice.
+    // the logical-frame session, so they must not be counted twice. Since
+    // r185 the live read would include the shadow pass too (r165 excluded
+    // it), but every shipped direct profile also disables dynamic shadows
+    // (low tier and the iOS memory profile; pinned in tests/gfx.test.ts), so
+    // the governor signal did not move; only a dev override pairing
+    // composer:false with shadows on would see the shadow-inclusive read.
     sample.calls = drawSignal.calls + (this.drawStats ? 0 : this.lastWaterSimulationPasses);
     sample.triangles =
       drawSignal.triangles + (this.drawStats ? 0 : this.lastWaterSimulationPasses * 2);
@@ -5539,8 +5575,9 @@ export class Renderer {
 
   /**
    * Link a root's exact live colour-program variant before a bounded upload.
-   * Three r165 chooses output colour space from the current render target in
-   * compileAsync's synchronous prologue. Restore that global before awaiting
+   * Three chooses output colour space from the current render target in
+   * compileAsync's synchronous prologue (authored on r165; the r185 prewarm
+   * re-audit kept this restore). Restore that global before awaiting
    * the parallel linker so live frames never inherit the prewarm target.
    */
   private async compilePrewarmColorPrograms(
@@ -5722,6 +5759,9 @@ export class Renderer {
     const focusX = this.cameraLookAt.x;
     const focusZ = this.cameraLookAt.z;
     const input = this.opaqueSortPolicyInput;
+    // The direct arm's live read would include the shadow pass since r185
+    // (r165 excluded it), but shipped direct profiles never render shadows
+    // (pinned in tests/gfx.test.ts), so the sort threshold did not move.
     input.drawCalls = this.drawStats
       ? this.drawStats.currentFrame().calls
       : this.webgl.info.render.calls;
@@ -6145,6 +6185,7 @@ export class Renderer {
                 morphNormalCount: morphs?.normal?.length ?? 0,
                 morphColorCount: morphs?.color?.length ?? 0,
                 hasTangents: mesh.geometry?.attributes?.tangent !== undefined,
+                hasNormals: mesh.geometry?.attributes?.normal !== undefined,
                 vertexColorItemSize: colorAttribute?.itemSize ?? 0,
                 castShadow: mesh.castShadow === true,
               },
@@ -6977,11 +7018,12 @@ export class Renderer {
         category: 'sky',
         priority: 64,
         required: true,
-        // Exempt unconditionally: uploadDataTextureInChunks falls back to one
-        // full upload on pinned r165, so the 2k RGBA16F dome upload is an
-        // indivisible ~183ms call that must stay behind the loading screen
-        // even when a slow MACHINE spent the soft budget while the network
-        // stayed healthy. The exemption adds no network wait (the inline wait
+        // Exempt unconditionally: the exemption was sized when pinned r165
+        // paid the 2k RGBA16F dome upload as one indivisible ~183ms call; the
+        // installed 0.185 row-batches it via native update ranges, but the
+        // batches still total the same GPU work, which must stay behind the
+        // loading screen even when a slow MACHINE spent the soft budget while
+        // the network stayed healthy. The exemption adds no network wait (the inline wait
         // below is already 0 past the reserve boundary) and the hard deadline
         // still bounds the entry via prewarmEntryShouldDefer. Constrained
         // profiles never run this entry, so the conditional exemption form
@@ -8730,9 +8772,10 @@ export class Renderer {
     if (reconciledLights.changed && viewLights.length > 0) {
       this.lightRankDirty = true;
       // A light-owning view is exempt from the hidden-view matrix gate below:
-      // the light budget reads light.getWorldPosition, and r165's
-      // updateWorldMatrix does NOT heal through a matrixWorldAutoUpdate=false
-      // ancestor, so a gated group would rank the light at a stale position.
+      // the light budget reads light.getWorldPosition, and updateWorldMatrix
+      // does NOT heal through a matrixWorldAutoUpdate=false ancestor (r185
+      // visits the gated ancestor but skips its compose; r165 never healed it
+      // either), so a gated group would rank the light at a stale position.
       this.lightOwnerGroups.add(group);
     }
     this.views.set(e.id, {
@@ -9251,19 +9294,7 @@ export class Renderer {
   // Cached with riftFogKey: whether the current rift floor is an authored set
   // piece, so the per-frame lighting read avoids regenerating the floor.
   private riftFogAuthored = false;
-  private fogState:
-    | 'outdoor'
-    | 'dungeon'
-    | 'temple'
-    | 'nythraxis'
-    | 'delve'
-    | 'yumiMaze'
-    | 'battleground'
-    | 'underwater'
-    | 'rift'
-    | 'practice'
-    | 'wildheartField'
-    | 'lastkeep' = 'outdoor';
+  private fogState: FogSceneState = 'outdoor';
 
   /** Drop a retired interior's scene nodes and prune its lights/flames out of
    * the per-frame registries. See riftInteriorGroups for why nothing here
@@ -9460,6 +9491,27 @@ export class Renderer {
   private outdoorFogPreset(): { color: number; near: number; far: number } {
     if (this.lowGfx) return Renderer.LOW_FOG;
     return Renderer.BIOME_FOG[zoneBiomeAt(this.sim.player.pos.x, this.sim.player.pos.z)];
+  }
+
+  /** Settle the light rig for a fog state (interior_light_rig.ts owns the
+   * per-state numbers; the outdoor legs carry this frame's day/night grade,
+   * so leaving an interior at night stays night). */
+  private applyStateLightRig(state: FogSceneState): void {
+    const targets = {
+      sun: this.sun,
+      hemi: this.hemi,
+      scene: this.scene,
+      rim: sharedUniforms.uRimBoost,
+    };
+    if (state === 'rift') {
+      applyRiftLightRig(this.riftFogAuthored, targets);
+      return;
+    }
+    applyInteriorLightRig(state, targets, {
+      sunIntensity: SUN_INTENSITY * this.dnGrade.lightScale,
+      hemiIntensity: hemiOutdoorIntensity() * this.dnGrade.ambientScale,
+      envIntensity: this.envOutdoorIntensity * this.dnGrade.ambientScale,
+    });
   }
 
   /**
@@ -9802,6 +9854,7 @@ export class Renderer {
     // sky dome and the daylight rig and only swaps in its own field haze.
     const inWildheartField = interior === 'wildheart';
     const inLastKeep = interior === 'lastkeep';
+    const inDawnhold = interior === 'dawnhold';
     const desired = inPractice
       ? 'practice'
       : inDelve
@@ -9818,17 +9871,19 @@ export class Renderer {
                   ? 'wildheartField'
                   : inLastKeep
                     ? 'lastkeep'
-                    : inside
-                      ? 'dungeon'
-                      : camY <
-                          waterLevelAt(
-                            this.camera.position.x,
-                            this.camera.position.z,
-                            this.sim.cfg.seed,
-                          ) -
-                            0.05
-                        ? 'underwater'
-                        : 'outdoor';
+                    : inDawnhold
+                      ? 'dawnhold'
+                      : inside
+                        ? 'dungeon'
+                        : camY <
+                            waterLevelAt(
+                              this.camera.position.x,
+                              this.camera.position.z,
+                              this.sim.cfg.seed,
+                            ) -
+                              0.05
+                          ? 'underwater'
+                          : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
     // Procedural rift: dynamic fog from the generated floor style, re-applied when
     // the floor changes (descent keeps fogState='rift' but swaps the palette).
@@ -9851,11 +9906,7 @@ export class Renderer {
       }
       this.fogState = 'rift';
       if (!this.lowGfx) {
-        const authored = this.riftFogAuthored;
-        this.sun.intensity = authored ? INFERNAL_SUN_INTENSITY : DUNGEON_SUN_INTENSITY;
-        this.hemi.intensity = authored ? INFERNAL_HEMI_INTENSITY : DUNGEON_HEMI_INTENSITY;
-        this.scene.environmentIntensity = authored ? INFERNAL_ENV_INTENSITY : DUNGEON_ENV_INTENSITY;
-        sharedUniforms.uRimBoost.value = authored ? INFERNAL_RIM_BOOST : DUNGEON_RIM_BOOST;
+        this.applyStateLightRig('rift');
       }
       return;
     }
@@ -9889,6 +9940,13 @@ export class Renderer {
         fog.color.setHex(0x241610);
         fog.near = 30;
         fog.far = 150;
+      } else if (desired === 'dawnhold') {
+        // Dawnhold Castle: brighter and greener-warm than the keep's hearth
+        // murk: a pale sage-gold air pushed even further back, so the garden
+        // palace reads sunlit end to end.
+        fog.color.setHex(0x3d422a);
+        fog.near = 40;
+        fog.far = 190;
       } else if (desired === 'delve') {
         // the collapsed reliquary breathes a warm ember murk, dried-blood
         // charcoal, tighter than the overworld crypt's cold near-black, so the
@@ -9936,65 +9994,9 @@ export class Renderer {
       // interiors must not leak daylight: drop sun + sky ambient + IBL
       // underground so the torch point lights own the scene; restore outside.
       // The rim glow cranks up instead, silhouettes must split from the murk.
+      // Which numbers each state means is interior_light_rig.ts's to own.
       if (!this.lowGfx) {
-        const mazeNight = desired === 'yumiMaze';
-        const wildheartSun = desired === 'wildheartField';
-        const keepHearth = desired === 'lastkeep';
-        const underground =
-          desired === 'dungeon' ||
-          desired === 'temple' ||
-          desired === 'nythraxis' ||
-          desired === 'delve';
-        // The maze runs its own night rig; otherwise returning outdoors restores the
-        // full daylight rig scaled by the current day/night grade, so stepping out
-        // of a cave at night stays night.
-        this.sun.intensity = mazeNight
-          ? YUMI_MAZE_SUN_INTENSITY
-          : wildheartSun
-            ? WILDHEART_SUN_INTENSITY
-            : keepHearth
-              ? LASTKEEP_SUN_INTENSITY
-              : underground
-                ? DUNGEON_SUN_INTENSITY
-                : SUN_INTENSITY * this.dnGrade.lightScale;
-        this.hemi.intensity = mazeNight
-          ? YUMI_MAZE_HEMI_INTENSITY
-          : wildheartSun
-            ? WILDHEART_HEMI_INTENSITY
-            : keepHearth
-              ? LASTKEEP_HEMI_INTENSITY
-              : underground
-                ? DUNGEON_HEMI_INTENSITY
-                : hemiOutdoorIntensity() * this.dnGrade.ambientScale;
-        this.scene.environmentIntensity = mazeNight
-          ? YUMI_MAZE_ENV_INTENSITY
-          : wildheartSun
-            ? WILDHEART_ENV_INTENSITY
-            : keepHearth
-              ? LASTKEEP_ENV_INTENSITY
-              : underground
-                ? DUNGEON_ENV_INTENSITY
-                : this.envOutdoorIntensity * this.dnGrade.ambientScale;
-        sharedUniforms.uRimBoost.value = mazeNight
-          ? YUMI_MAZE_RIM_BOOST
-          : wildheartSun
-            ? WILDHEART_RIM_BOOST
-            : keepHearth
-              ? LASTKEEP_RIM_BOOST
-              : underground
-                ? DUNGEON_RIM_BOOST
-                : 1;
-        if (wildheartSun) {
-          this.sun.color.setHex(0xffd48c);
-          this.hemi.color.setHex(0xd8ebca);
-          this.hemi.groundColor.setHex(0x5b4a2d);
-        } else if (keepHearth) {
-          // hearth-gold key and bounce; the outdoor path re-grades these
-          // colors every frame once the player steps back outside
-          this.sun.color.setHex(LASTKEEP_SUN_COLOR);
-          this.hemi.color.setHex(LASTKEEP_HEMI_SKY_COLOR);
-          this.hemi.groundColor.setHex(LASTKEEP_HEMI_GROUND_COLOR);
-        }
+        this.applyStateLightRig(desired);
       }
       return;
     }
@@ -10380,6 +10382,7 @@ export class Renderer {
     // pooled and reused) view.
     this.weaponSkinApplies.cancel(id);
     this.scene.remove(v.group);
+    unfreezeRigMatrices(v.group); // a pooled visual must not keep hide-frozen flags
     this.lightOwnerGroups.delete(v.group);
     if (v.viewLights.length > 0) {
       for (const light of v.viewLights) {
@@ -10541,6 +10544,10 @@ export class Renderer {
     selfAlphaLead = 0,
     selfMotion: SelfMotionFrame | null = null,
     selfAuthoritativeDiscontinuity = false,
+    // False while the window is hidden: everything below still runs (view
+    // lifecycle, mixers, uTime, the viewport poll) so coming back costs no
+    // create burst or shader link, and only the terminal draw is skipped.
+    present = true,
   ): void {
     if (this.shutdownStarted) return;
     const totalStart = performance.now();
@@ -10561,7 +10568,10 @@ export class Renderer {
     // reads its draw signal below. The WebGL counters themselves stay monotonic
     // (autoReset is off); out-of-band renders reset them via discardOutOfBandDraws.
     if (this.drawStats) this.drawStats.beginFrame();
-    this.updateAdaptiveResolution(dt);
+    // A skipped frame draws nothing, so it carries no rendering signal at all:
+    // feeding its wall-clock dt to the governor would read hidden time as free
+    // headroom and ratchet quality up for the first frame back on screen.
+    if (present) this.updateAdaptiveResolution(dt);
     this.viewportPollTimer += dt;
     if (this.viewportPollTimer >= 0.25) {
       this.viewportPollTimer = 0;
@@ -10926,7 +10936,7 @@ export class Renderer {
         if (wardstoneLit) {
           this.vfx.castSparkle(e.id, 'arcane', dt * 2.6);
         }
-        if (v.portal && vis) {
+        if (v.portal && vis && !v.portal.userData.staticDoor) {
           v.portal.rotation.z = this.time * 1.4;
           (v.portal.material as THREE.MeshBasicMaterial).opacity =
             0.45 + Math.sin(this.time * 2.2 + e.id) * 0.15;
@@ -11631,11 +11641,11 @@ export class Renderer {
           // Impact dust, scaled by how hard the body actually came down and
           // tinted by what it came down on. This is the visual half of the
           // landing the camera already thumps for.
-          this.emitGroundPuff(ax, ay, az, (v.fallSpeed - 5) / 14);
+          emitGroundPuff(this.vfx, this.surfaceAtForPuff, ax, ay, az, (v.fallSpeed - 5) / 14);
         }
         // Striding up onto a ledge scuffs the surface: a wisp, not a landing.
         if (settled && dyRaw > 0.28 && !visuallyDead) {
-          this.emitGroundPuff(ax, ay, az, 0.08);
+          emitGroundPuff(this.vfx, this.surfaceAtForPuff, ax, ay, az, 0.08);
         }
         if (swimming && !v.wasSwimming && !visuallyDead)
           sink.movement('splash', ax, ay, az, isSelf);
@@ -11979,14 +11989,16 @@ export class Renderer {
           sink?.preloadMountSummon(e.mountCastKey);
         }
         v.wasMountCasting = mountCasting;
-        // mountKey change = summon completed, dismount completed, or a live swap:
-        // fire the shimmer at the rider. Tracked separately from mountVisualKey,
-        // which lags async asset loading.
+        // mountKey change = summon completed, dismount completed, or a live
+        // swap: shimmer always, the mount's own call only on an APPEARANCE.
+        // Tracked separately from mountVisualKey, which lags asset loading.
         if (e.mountKey !== v.lastMountKey) {
           v.lastMountKey = e.mountKey;
           if (runCharacterPresentation) this.vfx.mountSummonGlow(e.id);
           // Same edge as the glow, minus dismounts: a mountKey going empty is a
-          // put-away, not an appearance.
+          // put-away, not an appearance. This branch's call carries the entity
+          // id as well, which the sled's does not: the cart gates its parked
+          // idle loop on the summon take finishing, and that gate is per entity.
           if (e.mountKey !== '') {
             sink?.mountSummon(ax, ay, az, e.mountKey, e.id === this.sim.playerId, e.id);
           }
@@ -12116,18 +12128,18 @@ export class Renderer {
         ? collectBodyNightLights(this.views, sim.entities, p.pos.x, p.pos.z, this.nightBodyLights)
         : 0;
 
-    // Hidden views skip their whole matrix subtree: three recomposes even
-    // invisible hierarchies, and a distance-culled or off-screen rig is 30-60
-    // nodes of dead per-frame compose+multiply. Re-showing flips the gate back
-    // on, and the next scene update revisits the subtree and recomposes it
-    // from the live position/rotation properties, so nothing renders stale.
-    // (pick() skips hidden views, so a frozen matrix never ghosts a hitbox.
-    // CAUTION: getWorldPosition on a node inside a GATED subtree does not heal
-    // the chain in r165, hence the light-owner exemption; any new world-space
-    // read of a view child must use group.position or exempt the view too.)
+    // Hidden views hide-freeze their WHOLE rig subtree's matrix flags (r185
+    // recurses children unconditionally, so the old root-only gate left every
+    // default-flag descendant recomposing per frame; rig_visibility_freeze.ts
+    // carries the semantics). Flag walks run on transitions only, and the
+    // reveal forces one recompose of the current pose, so nothing renders
+    // stale. (pick() skips hidden views, so a frozen matrix never ghosts a
+    // hitbox. CAUTION: getWorldPosition inside a frozen subtree does not heal
+    // the chain, hence the light-owner exemption; any new world-space read of
+    // a hidden view's child must use group.position or exempt the view too.)
     let visibleViews = 0;
     for (const [, v] of this.views) {
-      v.group.matrixWorldAutoUpdate = v.group.visible || this.lightOwnerGroups.has(v.group);
+      syncRigMatrixFreeze(v.group, v.group.visible || this.lightOwnerGroups.has(v.group));
       if (v.group.visible) visibleViews++;
     }
 
@@ -12679,14 +12691,17 @@ export class Renderer {
       this.valeCupStadium.updateShadowVisibility(this.camera, this.shadowLightDirection, true);
     }
     this.updateOpaqueDrawOrder(dt);
-    if (shakeX !== 0 || shakeY !== 0) this.camera.updateMatrixWorld();
-    this.vfx.prepareDraw(this.camera);
-    if (this.post) {
-      // screen-fx pass state (ripple re-projection, flash decay) advances
-      // with the camera finalized for this frame
-      this.post.updateScreenFx(dt);
-      this.post.render();
-    } else this.webgl.render(this.scene, this.camera);
+    if (shakeX !== 0 || shakeY !== 0) refreshFrozenWorldMatrix(this.camera);
+    // Refresh the reused host every frame instead of building a literal: sync
+    // is the rAF hot path (no per-frame allocation), and post can be torn down
+    // and rebuilt by a graphics rebuild, so a cached reference would go stale.
+    const host = this.framePresentHost;
+    host.vfx = this.vfx;
+    host.post = this.post;
+    host.webgl = this.webgl;
+    host.scene = this.scene;
+    host.camera = this.camera;
+    if (presentFrame(host, dt, present)) this.presentedFrameCount++;
     if (shakeX !== 0 || shakeY !== 0) {
       this.camera.position.x -= shakeX;
       this.camera.position.y -= shakeY;
@@ -12777,7 +12792,7 @@ export class Renderer {
   async captureScreenshot(maxEdge = 1280, quality = 0.7): Promise<string | null> {
     if (this.shutdownStarted) return null;
     try {
-      this.camera.updateMatrixWorld();
+      refreshFrozenWorldMatrix(this.camera);
       this.vfx.prepareDraw(this.camera);
       if (this.post) this.post.render();
       else this.webgl.render(this.scene, this.camera);
@@ -13157,8 +13172,7 @@ export class Renderer {
         this.camera.fov = CAMERA_BASE_FOV;
         this.camera.updateProjectionMatrix();
       }
-      this.camera.lookAt(this.cameraLookAt);
-      this.camera.updateMatrixWorld();
+      lookAtFrozen(this.camera, this.cameraLookAt);
       return;
     }
     const p = this.sim.player;
@@ -13282,8 +13296,8 @@ export class Renderer {
       this.camera.updateProjectionMatrix();
     }
     this.cameraLookAt.set(px, eyeY, pz);
-    this.camera.lookAt(this.cameraLookAt);
-    this.camera.updateMatrixWorld();
+    // lookAtFrozen, never a bare lookAt (r185 frozen-matrix aim, static_matrix.ts).
+    lookAtFrozen(this.camera, this.cameraLookAt);
 
     // Spatial-audio listener (at the camera, facing the player) + ambience state.
     const sink = this.audioSink;

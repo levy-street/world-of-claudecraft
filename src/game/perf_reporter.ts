@@ -37,6 +37,12 @@ export interface PerfReporterOptions {
   // (PR #1991), so the perf-doctor 'integrated-gpu' suggestion never fires
   // there (ruling R15). Absent (benchmark harness callers) means false.
   desktopShell?: boolean;
+  // The desktop shell keeps document.visibilityState pinned at 'visible' even
+  // while the window is minimized (backgroundThrottling is off), so the hidden
+  // check in send() needs the shell's own signal: without it a minimized
+  // session keeps beaconing reports whose frames were never rendered, diluting
+  // the fleet fps average with zeros. Absent means never shell-hidden.
+  shellHidden?: () => boolean;
 }
 
 export type PerfReporterSkipReason = 'disabled' | 'hidden' | 'not-ready' | 'no-renderer';
@@ -454,6 +460,13 @@ function payloadFromSnapshot(
       graphicsConfigVersion: renderer.graphicsConfigVersion,
       seconds: snapshot.seconds,
       frames: snapshot.frames,
+      // Frames the desktop presentation gate skipped while hidden (never
+      // counted in `frames`, see PerfSnapshot). Sends are already skipped
+      // while hidden, so this is the AFTER-RESTORE evidence: the counter is
+      // what says a session's cumulative numbers spanned minimized time, and
+      // the only fleet-visible proof the skip is working. Rides in rawSummary
+      // (the no-DDL home, like the longtask block below), not as a column.
+      hiddenPresentSkips: snapshot.hiddenPresentSkips,
       windows: snapshot.windows,
       mainMs: snapshot.mainMs,
       rendererPhaseMs: renderer.phaseMs,
@@ -536,7 +549,10 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
   function send(sendOptions: { allowHidden?: boolean; final?: boolean } = {}): void {
     timer = null;
     if (stopped) return;
-    if (!sendOptions.allowHidden && document.visibilityState !== 'visible') {
+    if (
+      !sendOptions.allowHidden &&
+      (document.visibilityState !== 'visible' || options.shellHidden?.() === true)
+    ) {
       skip('hidden', cadenceDelay(REPEAT_REPORT_MS));
       return;
     }

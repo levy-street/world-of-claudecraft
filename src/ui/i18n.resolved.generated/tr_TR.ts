@@ -953,6 +953,22 @@ export const tr_TR: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "The Undercroft",
+        "state": "The State Floor",
+        "residence": "The Residence",
+        "tower": "The Watch Tower"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
+    },
     "compass": {
       "N": "K",
       "NE": "KD",
@@ -1371,6 +1387,10 @@ export const tr_TR: EnTranslations = {
       "showWalletOnCharacterScreen": "Cüzdanı Karakter Ekranında Göster",
       "showWalletOnPlayerCard": "Cüzdanı Oyuncu Kartında Göster",
       "showPlaytime": "Karakter Ekranında Oynama Süresini Göster",
+      "forceHighPerfGpu": "Ayrık Oyun GPU'sunu Kullan",
+      "forceHighPerfGpuNote": "Varsayılan olarak açık: masaüstü uygulaması bu bilgisayardan ayrık oyun GPU'sunu ister. Oyun başlamıyorsa, siyah bir ekranla açılıyorsa ya da dizüstü bilgisayarın ekranı karararsa bunu kapat. Değişiklik oyunun bir sonraki başlangıcında etkili olur.",
+      "discordPresence": "Discord Zengin Durumu",
+      "discordPresenceNote": "Bulunduğun bölgeyi ve bu oturumda ne kadar süredir oynadığını Discord etkinliğin olarak gösterir, Discord profilini görebilen herkes ikisini de görebilir. Yalnızca bölge adı, oturum süren ve oyun paylaşılır; karakterin, hesabın ya da kiminle oynadığın asla paylaşılmaz. Bu bilgisayarda Discord uygulamasının çalışıyor olması gerekir.",
       "showDevBadges": "Geliştirici Rozetlerini Göster",
       "showOwnNameplate": "Kendi İsim Etiketimi Göster",
       "showPlayerNameplates": "Oyuncu İsim Etiketlerini Göster",
@@ -7793,7 +7813,15 @@ export const tr_TR: EnTranslations = {
       "readyBody": "Çıkış yaptığında kurulur ya da şimdi yeniden başlat.",
       "restart": "Şimdi Yeniden Başlat",
       "later": "Daha Sonra",
-      "dismiss": "Kapat"
+      "dismiss": "Kapat",
+      "whatsNew": "Değişiklikleri Tarayıcında Gör"
+    },
+    "notify": {
+      "updateReadyTitle": "{version} güncellemesi hazır",
+      "updateReadyTitleNoVersion": "Güncelleme hazır",
+      "updateReadyBody": "Güncellemeyi uygulamak için World of ClaudeCraft'ı yeniden başlat.",
+      "partyInviteTitle": "Grup daveti",
+      "partyInviteBody": "{name} seni grubuna davet etti."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7805,6 +7833,7 @@ export const tr_TR: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "Oyun GPU hızlandırması olmadan çalışıyor ve yavaş olacak. Grafik sürücülerini güncelleyip oyunu yeniden başlat. Windows'ta ayrıca Ayarlar > Sistem > Ekran > Grafikler altında oyunu Yüksek performans olarak ayarla.",
+    "bodyDiscreteInactive": "Oyun, ayrık (oyun) GPU'sunu kullanmıyor ve bunun yerine güç tasarruflu GPU üzerinde çalışıyor, bu yüzden performans düşecek. Grafik sürücülerini güncelleyip oyunu yeniden başlat. Windows'ta ayrıca oyunu Ayarlar > Sistem > Ekran > Grafikler altında Yüksek performans olarak ayarla.",
     "bodyWeb": "Oyun GPU hızlandırması olmadan çalışıyor ve yavaş olacak. Tarayıcı ayarlarından donanım hızlandırmayı etkinleştir, grafik sürücülerini güncelleyip tarayıcını yeniden başlat.",
     "hybridBodyWindows": "Bu oturum, tümleşik (güç tasarruflu) GPU üzerinde çalışıyor. Bu bilgisayarda ayrıca ayrık bir oyun GPU’su varsa tarayıcını Ayarlar > Sistem > Ekran > Grafikler altında Yüksek performans olarak ayarla, ardından yeniden başlat. Masaüstü uygulaması ayrık GPU’yu otomatik olarak seçer.",
     "hybridBodyLinux": "Bu oturum, tümleşik (güç tasarruflu) GPU üzerinde çalışıyor. Bu bilgisayarda ayrıca ayrık bir oyun GPU’su varsa tarayıcın veya grafik sürücün kendi GPU seçim ayarını sunabilir, ya da dağıtımın PRIME veya optimus-manager gibi bir GPU değiştirme aracı sağlayabilir. Masaüstü uygulaması ayrık GPU’yu otomatik olarak seçer.",
@@ -8172,6 +8201,9 @@ export const tr_TR: EnTranslations = {
       "graphicsReloadNote": "Grafik Kalitesi ve Arazi Ayrıntısı, yeniden yükledikten sonra uygulanır.",
       "reloadNow": "Şimdi Yeniden Yükle",
       "fullscreen": "Tam Ekran",
+      "displayMode": "Görüntü Modu",
+      "displayModeBorderless": "Kenarlıksız Tam Ekran",
+      "displayModeWindowed": "Pencereli",
       "touchLookSpeed": "Dokunmatik Bakış Hızı",
       "joystickSize": "Yönelteç Boyutu",
       "buttonSize": "Düğme Boyutu",
@@ -9511,7 +9543,7 @@ export const tr_TR: EnTranslations = {
       "cheap_shot": {
         "name": "Mide Yumruğu",
         "description": "Hedefe {damage} hasar vererek onu 4 sn sersemlet. Gizlenmiş olmalısın. 2 kombo puanı kazandırır.",
-        "descriptionNoStealth": "Strike the target for {damage} damage, stunning it for 4 sec. Awards 2 combo points.",
+        "descriptionNoStealth": "Hedefe {damage} hasar vererek onu 4 sn sersemlet. 2 kombo puanı kazandırır.",
         "specNote_subtlety": "Alacakaranlık Perdesinden kullanıldığında 1 Alacakaranlık ekler (en fazla 3). 3 Alacakaranlıkta gizlilik OLMADAN kullanabilirsin: bu kullanım hiçbir şeye mal olmaz, 3 Alacakaranlığın tümünü harcar ve 6 sn'lik Gölge Perdesini başlatır."
       },
       "sap": {
@@ -10031,8 +10063,8 @@ export const tr_TR: EnTranslations = {
         "description": "Hedefe hırlar: tehdidin onun en nefret ettiği düşmanla eşitlenir ve 3 saniye boyunca sana saldırmaya zorlanır. Yalnızca Bruin Formu."
       },
       "challenging_roar": {
-        "name": "Baleful Roar",
-        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
+        "name": "Uğursuz Kükreme",
+        "description": "Uğursuz bir kükreme: 10 yarda içindeki her düşman kışkırtılır, tehdidi onun en nefret ettiği düşmanla eşitlenir ve 3 saniye boyunca sana saldırmaya zorlanır. Yalnızca Bruin Formu."
       },
       "cat_form": {
         "name": "Kurt Formu",
@@ -10046,7 +10078,7 @@ export const tr_TR: EnTranslations = {
       "ferocious_bite": {
         "name": "Kanlı Isırık",
         "description": "{damage} veren bitirici hamle. Yalnızca Kurt Formu.",
-        "specNote_feral": "İsabet eden her vuruş 1 Kadim Kan ekler; 3 Kadim Kanda bu düğme Kızıl Hasata dönüşür: kombo puanı başına 70 artı 43 hasar veren, ayrıca Deri Yüzme ve Parçalamanın kalan tüm hasarını anında vuran ve 30 enerji geri kazandıran bir ısırık."
+        "specNote_feral": "İsabet eden her vuruş 1 Kadim Kan ekler; 3 Kadim Kanda bu düğme Kızıl Hasata dönüşür: Kadim Kanı harcayarak daha güçlü bir ısırık gerçekleştirir, ayrıca Deri Yüzme ve Parçalamanın kalan tüm hasarını anında vurur ve enerji geri kazandırır."
       },
       "swipe": {
         "name": "Süpüren Pençeler",
@@ -10109,7 +10141,7 @@ export const tr_TR: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Kurt Kanı",
-        "description": "Saldırı gücünü {duration} saniye boyunca {buff} artırır. Yalnızca Kurt Formu."
+        "description": "Anında {rage} enerji kazandırır ve saldırı gücünü {duration} saniye boyunca {buff} artırır. Yalnızca Kurt Formu."
       },
       "rip": {
         "name": "Kanlı Yarık",
@@ -10330,7 +10362,7 @@ export const tr_TR: EnTranslations = {
       },
       "redharvest": {
         "name": "Kızıl Hasat",
-        "description": "3 Kadim Kanı tüketir: {damage} hasarlık bir vuruş yapar, Deri Yüzme ve Parçalamanın hedefe vereceği kalan tüm hasarı anında verir, iki kanamayı da kaldırır ve 30 enerji geri kazandırır. Sıfır combo puanıyla da çalışır."
+        "description": "3 Kadim Kanı tüketir: {damage} hasarlık bir vuruş yapar, Deri Yüzme ve Parçalamanın hedefe vereceği kalan tüm hasarı anında verir, iki kanamayı da kaldırır ve {rage} enerji geri kazandırır. Sıfır combo puanıyla da çalışır."
       },
       "marrowbreak": {
         "name": "İlik Kıran",
@@ -10578,7 +10610,7 @@ export const tr_TR: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Yaban Onarımı",
-        "description": "10 sn. boyunca 180 sağlık yeniler. Yalnızca Ayı Formunda kullanılabilir. (Druid yeteneği)"
+        "description": "10 sn. boyunca azami sağlığının %40 kadarını yeniler. Yalnızca Ayı Formunda kullanılabilir. (Druid yeteneği)"
       },
       "frost_trap": {
         "name": "Kırağı Tuzağı",
@@ -10811,7 +10843,7 @@ export const tr_TR: EnTranslations = {
       },
       "prowl": {
         "name": "Sinsi Sokulma",
-        "description": "Kurt Formundayken gizliliğe geçer ve 50% daha yavaş hareket edersin. Dövüş sırasında kullanılamaz."
+        "description": "Kurt Formundayken gizliliğe geçer ve 5% daha yavaş hareket edersin. Dövüş sırasında kullanılamaz."
       },
       "rake": {
         "name": "Deri Yüzme",
@@ -12371,6 +12403,9 @@ export const tr_TR: EnTranslations = {
       },
       "pristine_claw": {
         "name": "Kusursuz Pençe"
+      },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
       },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"
@@ -16855,6 +16890,11 @@ export const tr_TR: EnTranslations = {
         "name": "Son Kale",
         "enterText": "Son Kale'nin soğuk, sessiz koridorlarına adım atıyorsun.",
         "leaveText": "Kale kapısını arkandan kapatıp Ejder Topraklarının rüzgarına geri dönüyorsun."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
       },
       "drowned_temple": {
         "name": "Boğulmuş Tapınak",

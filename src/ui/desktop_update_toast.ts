@@ -29,6 +29,7 @@ import {
   type UpdateToastState,
 } from './desktop_update_view';
 import { formatNumber, t } from './i18n';
+import { GITHUB_RELEASES_URL } from './news_feed';
 import { svgIcon } from './ui_icons';
 
 // How long the "up to date" confirmation lingers before hiding itself.
@@ -103,6 +104,21 @@ export function initDesktopUpdateToast(bridge: DesktopBridge): void {
   });
   actions.append(restartButton, laterButton);
 
+  // A plain external anchor, the news-surface precedent (src/ui/news_feed.ts
+  // links the same releases page bare): each native shell routes a
+  // target=_blank http(s) anchor to the system browser, so the release notes
+  // open outside and the game keeps running. Deliberately NOT the wiki
+  // confirm-first hop: this card's own primary action (Restart now) is a
+  // strictly more disruptive unconfirmed click, so confirming only the link
+  // would make the card incoherent, and the label names the browser hop so the
+  // player is not surprised by the interruption.
+  const whatsNew = document.createElement('a');
+  whatsNew.id = 'desktop-update-whats-new';
+  whatsNew.className = 'desktop-update-whats-new';
+  whatsNew.href = GITHUB_RELEASES_URL;
+  whatsNew.target = '_blank';
+  whatsNew.rel = 'noopener noreferrer';
+
   const closeButton = document.createElement('button');
   closeButton.type = 'button';
   closeButton.className = 'desktop-update-close';
@@ -112,7 +128,7 @@ export function initDesktopUpdateToast(bridge: DesktopBridge): void {
     render();
   });
 
-  content.append(title, body, progress, actions);
+  content.append(title, body, progress, whatsNew, actions);
   root.append(icon, content, closeButton);
   document.body.appendChild(root);
 
@@ -199,10 +215,12 @@ export function initDesktopUpdateToast(bridge: DesktopBridge): void {
 
     const ready = state.mode === 'ready';
     actions.hidden = !ready;
+    whatsNew.hidden = !ready;
     // The ready card keeps its explicit "Later" choice; every other mode gets
     // the corner dismiss instead.
     closeButton.hidden = ready;
     if (ready) {
+      setText(whatsNew, t('desktop.update.whatsNew'));
       setText(restartButton, t('desktop.update.restart'));
       setText(laterButton, t('desktop.update.later'));
     }

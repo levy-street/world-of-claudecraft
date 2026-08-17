@@ -953,6 +953,22 @@ export const en_CA: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "The Undercroft",
+        "state": "The State Floor",
+        "residence": "The Residence",
+        "tower": "The Watch Tower"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
+    },
     "compass": {
       "N": "N",
       "NE": "NE",
@@ -1371,6 +1387,10 @@ export const en_CA: EnTranslations = {
       "showWalletOnCharacterScreen": "Show Wallet on Character Screen",
       "showWalletOnPlayerCard": "Show Wallet on Player Card",
       "showPlaytime": "Show Time Played on Character Screen",
+      "forceHighPerfGpu": "Use the Dedicated Gaming GPU",
+      "forceHighPerfGpuNote": "On by default: the desktop app asks this computer for its dedicated gaming GPU. Turn this off if the game will not start, opens to a black screen, or the laptop display goes blank. Takes effect the next time the game starts.",
+      "discordPresence": "Discord Rich Presence",
+      "discordPresenceNote": "Shows the zone you are in and how long you have been playing this session as your Discord activity, and anyone who can see your Discord profile can see both. Only the zone name, your session time, and the game are shared, never your character, your account, or who you are playing with. Needs the Discord app running on this computer.",
       "showDevBadges": "Show Developer Badges",
       "showOwnNameplate": "Show My Nameplate",
       "showPlayerNameplates": "Show Player Nameplates",
@@ -7793,7 +7813,15 @@ export const en_CA: EnTranslations = {
       "readyBody": "Restart to install now, or keep playing and it installs when you quit.",
       "restart": "Restart now",
       "later": "Later",
-      "dismiss": "Dismiss"
+      "dismiss": "Dismiss",
+      "whatsNew": "See what changed in your browser"
+    },
+    "notify": {
+      "updateReadyTitle": "Update {version} is ready",
+      "updateReadyTitleNoVersion": "Update is ready",
+      "updateReadyBody": "Restart World of ClaudeCraft to apply the update.",
+      "partyInviteTitle": "Party invite",
+      "partyInviteBody": "{name} invited you to a party."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7805,6 +7833,7 @@ export const en_CA: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "The game is running without GPU acceleration and will be slow. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
+    "bodyDiscreteInactive": "The game is not using the dedicated (gaming) GPU and is running on the power-saving GPU instead, so performance will suffer. Update your graphics drivers, then restart the game. On Windows, also set the game to High performance under Settings > System > Display > Graphics.",
     "bodyWeb": "The game is running without GPU acceleration and will be slow. Enable hardware acceleration in your browser settings, update your graphics drivers, then restart your browser.",
     "hybridBodyWindows": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, set your browser to High performance under Settings > System > Display > Graphics, then restart it. The desktop app picks the discrete GPU automatically.",
     "hybridBodyLinux": "This session is rendering on the integrated (power-saving) GPU. If this computer also has a discrete gaming GPU, your browser or graphics driver may offer its own GPU selection setting, or your distribution may offer a GPU switching tool (such as PRIME or optimus-manager). The desktop app picks the discrete GPU automatically.",
@@ -8172,6 +8201,9 @@ export const en_CA: EnTranslations = {
       "graphicsReloadNote": "Graphics Quality and Terrain Detail apply after a reload.",
       "reloadNow": "Reload Now",
       "fullscreen": "Fullscreen",
+      "displayMode": "Display Mode",
+      "displayModeBorderless": "Borderless Fullscreen",
+      "displayModeWindowed": "Windowed",
       "touchLookSpeed": "Touch Look Speed",
       "joystickSize": "Joystick Size",
       "buttonSize": "Button Size",
@@ -9604,7 +9636,7 @@ export const en_CA: EnTranslations = {
       },
       "recall_the_fallen": {
         "name": "Recall the Fallen",
-        "description": "Returns a dead group member to life with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group."
+        "description": "Returns a dead group member to life at your side with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group within 30 yards and in your line of sight."
       },
       "beacon_of_light": {
         "name": "Beacon of Light",
@@ -10046,7 +10078,7 @@ export const en_CA: EnTranslations = {
       "ferocious_bite": {
         "name": "Gorebite",
         "description": "Finishing move that causes {damage}. Wolf Form only.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: a bite for 70 plus 43 per combo point that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores 30 energy."
+        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest, which spends the Old Blood for a stronger strike that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores energy."
       },
       "swipe": {
         "name": "Sweeping Claws",
@@ -10109,7 +10141,7 @@ export const en_CA: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Wolfsblood",
-        "description": "Increases attack power by {buff} for {duration} sec. Wolf Form only."
+        "description": "Surges {rage} energy and increases attack power by {buff} for {duration} sec. Wolf Form only."
       },
       "rip": {
         "name": "Bloodrift",
@@ -10330,7 +10362,7 @@ export const en_CA: EnTranslations = {
       },
       "redharvest": {
         "name": "Redharvest",
-        "description": "Spends your 3 Old Blood: strike for {damage}, instantly deal all the damage your Flense and Bloodrift would still have dealt, remove both bleeds, and restore 30 energy. Works with zero combo points."
+        "description": "Spends your 3 Old Blood: strike for {damage}, instantly deal all the damage your Flense and Bloodrift would still have dealt, remove both bleeds, and restore {rage} energy. Works with zero combo points."
       },
       "marrowbreak": {
         "name": "Marrowbreak",
@@ -10578,7 +10610,7 @@ export const en_CA: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Savage Mending",
-        "description": "Restores 180 health over 10 sec. Bruin Form only."
+        "description": "Restores 40% of your maximum health over 10 sec. Bruin Form only."
       },
       "frost_trap": {
         "name": "Rime Snare",
@@ -10646,15 +10678,15 @@ export const en_CA: EnTranslations = {
       },
       "temporal_reversal": {
         "name": "Temporal Reversal",
-        "description": "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)"
+        "description": "Rewinds a fallen ally's timeline, returning them to life at your side with 35% of their health and mana, even in the thick of combat. (Chronomancy)"
       },
       "collective_reversal": {
         "name": "Collective Reversal",
-        "description": "Rewinds every fallen member of your group or raid, returning them to life at their body with 30% health and mana. Cannot be cast in combat. (Chronomancy)"
+        "description": "Rewinds every fallen member of your group or raid within 40 yards and in your line of sight, returning them to life at your side with 30% health and mana. Cannot be cast in combat. (Chronomancy)"
       },
       "ancestor_return": {
         "name": "Ancestors' Return",
-        "description": "Call every fallen member of your group or raid back to life at their body with 30% health and mana. Cannot be cast in combat. (Spiritmend)"
+        "description": "Call every fallen member of your group or raid within 40 yards and in your line of sight back to your side with 30% health and mana. Cannot be cast in combat. (Spiritmend)"
       },
       "temporal_rewind": {
         "name": "Rewind",
@@ -10811,7 +10843,7 @@ export const en_CA: EnTranslations = {
       },
       "prowl": {
         "name": "Stalk",
-        "description": "Enter stealth while in Wolf Form, moving 50% slower. Cannot be used in combat."
+        "description": "Enter stealth while in Wolf Form, moving 5% slower. Cannot be used in combat."
       },
       "rake": {
         "name": "Flense",
@@ -12371,6 +12403,9 @@ export const en_CA: EnTranslations = {
       },
       "pristine_claw": {
         "name": "Pristine Claw"
+      },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
       },
       "conjured_water4": {
         "name": "Conjured Springwater"
@@ -16855,6 +16890,11 @@ export const en_CA: EnTranslations = {
         "name": "The Last Keep",
         "enterText": "You step into the cold, silent halls of the Last Keep.",
         "leaveText": "You pull the keep door shut and step back into the Drakelands wind."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
       },
       "drowned_temple": {
         "name": "The Drowned Temple",

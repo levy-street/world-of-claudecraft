@@ -4338,7 +4338,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.power_word_shield.description': 'Skjolder et venligt mål og absorberer {damage} skade i 30 sek. Disciplin forbinder desuden målet med jeres Hellige skade i 30 sek.',
   'entities.abilities.power_word_shield.name': 'Værnets Salme',
   'entities.abilities.prowl.description':
-    'Gå i sneg-tilstand mens du er i Ulveform, og bevæg dig 50 % langsommere. Kan ikke bruges i kamp.',
+    'Gå i sneg-tilstand mens du er i Ulveform, og bevæg dig 5 % langsommere. Kan ikke bruges i kamp.',
   'entities.abilities.prowl.name': 'Snig',
   'entities.abilities.pyroblast.description':
     'Slynger en enorm flammende kampesten, der volder {damage} ildskade plus yderligere skade over tid.',
@@ -4434,7 +4434,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Sprænger nærliggende fjender for {damage} skade og sløver deres angreb med 10 % i 10 sek.',
   'entities.abilities.thunder_clap.name': 'Rystende Slag',
   'entities.abilities.tigers_fury.description':
-    'Øger angrebskraft med {buff} i {duration} sek. Kun i Ulveform.',
+    'Frembringer {rage} energi og øger angrebskraft med {buff} i {duration} sek. Kun i Ulveform.',
   'entities.abilities.tigers_fury.name': 'Ulveblod',
   'entities.abilities.travel_form.description':
     'Skift øjeblikkeligt til en hurtig Fleet-form, der øger bevægelseshastighed med 40 %. Du kan ikke bruge andre evner mens du er forvandlet, men kan skifte ind eller ud af kamp, ideelt til at flygte.',
@@ -10874,7 +10874,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description': 'Rodfæster fjender inden for 4 m fra målpunktet i 2 sek. og sinker dem derefter med 40% i 6 sek. (Shamantalent)',
   'entities.abilities.evocation.description': 'Restaura mana rápidamente. (magikertalent)',
   'entities.abilities.frenzied_regeneration.description':
-    'Genopretter 180 helbred over 10 sek. Kun i Bjørneform. (druidentalent)',
+    'Genopretter 40% af dit maksimale helbred over 10 sek. Kun i Bjørneform. (druidentalent)',
   'entities.abilities.frost_trap.description':
     'Fryser fjender i målområdet i 3 sek., så de hverken kan bevæge sig eller handle. (jægertalent)',
   'entities.abilities.hammer_of_wrath.description': 'Slynger en hellig hammer for {damage} skade og skaber 1 Hengivenhed. Kan bruges under 20% helbred, eller under Guddommelig Ophøjelse eller Hævnende Vrede. Daggryets Vrede giver en ekstra kastning mod ethvert mål, som ser bort fra dens igangværende nedkølingstid og volder 20% mere skade. Ophøjelse øger dens skade med 30%.',
@@ -12256,7 +12256,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Forbruger 5 Grønske. Høster hver af dine helbredelser over tid på alle allierede for 60% af den resterende helbredelse, fjerner de virkninger og planter en frisk Vildblomst på målet.',
   'entities.abilities.redharvest.name': 'Rød Høst',
   'entities.abilities.redharvest.description':
-    'Forbruger dine 3 Gammelt Blod: et slag for {damage}, der øjeblikkeligt giver al den skade, dine Flæns og Sønderriv stadig ville have givet, fjerner begge blødninger og gendanner 30 energi. Virker uden kombopoint.',
+    'Forbruger dine 3 Gammelt Blod: et slag for {damage}, der øjeblikkeligt giver al den skade, dine Flæns og Sønderriv stadig ville have givet, fjerner begge blødninger og gendanner {rage} energi. Virker uden kombopoint.',
   'entities.abilities.sunlance.name': 'Solspor',
   'entities.abilities.sunlance.description':
     'Forbruger dine 3 Måneflod til et slag med {damage} naturskade plus en forbrænding på {overTime} over 9 sek. og gendanner 35 mana: manavalget. Månebølge forbruger de samme 3 Måneflod, så vælg et.',
@@ -12669,7 +12669,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Afsluttende manøvre, der giver {damage}. Kun i Ulveform.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Hvert slag, der rammer, tilføjer 1 Gammelt Blod; ved 3 Gammelt Blod bliver denne knap til Rød Høst: et bid for 70 plus 43 pr. combopoint, der også øjeblikkeligt giver al den skade, dine Flæns og Sønderriv stadig ville have givet, og gendanner 30 energi.',
+    'Hvert slag, der rammer, tilføjer 1 Gammelt Blod; ved 3 Gammelt Blod bliver denne knap til Rød Høst, som forbruger dit Gamle Blod til et kraftigere slag, der også øjeblikkeligt giver al den skade, dine Flæns og Sønderriv stadig ville have givet, og gendanner energi.',
   'entities.abilities.funeral_harvest.description':
     'Når en fjende, du eller dine udøde for nylig har skadet, dør, får du 1 Sjælesplint. Dette kan ske højst én gang hvert 3. sek.',
   'entities.abilities.funeral_harvest.name': 'Funeral Harvest',
@@ -13179,4 +13179,26 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'auth.designCodeErrVersion': 'Den udseendeskode stammer fra en nyere spilversion.',
   'auth.designCodeErrMalformed': 'Den udseendeskode er beskadiget. Kopiér hele koden, og prøv igen.',
   'hudChrome.nameplate.cheaterTag': '< Snyder >',
+  'hud.options.displayMode': 'Skærmtilstand',
+  'hud.options.displayModeBorderless': 'Kantløs fuldskærm',
+  'hud.options.displayModeWindowed': 'Vindue',
+  'hudChrome.options.discordPresence': 'Detaljeret Discord-tilstedeværelse',
+  'hudChrome.options.discordPresenceNote':
+    'Viser den zone, du er i, og hvor længe du har spillet i denne session, som din Discord-aktivitet, og alle, der kan se din Discord-profil, kan se begge dele. Kun zonens navn, din sessionstid og spillet deles, aldrig din karakter, din konto eller hvem du spiller med. Kræver, at Discord-appen kører på denne computer.',
+  'hudChrome.options.forceHighPerfGpu': 'Brug den dedikerede gaming-GPU',
+  'hudChrome.options.forceHighPerfGpuNote':
+    'Slået til som standard: skrivebordsappen beder denne computer om dens dedikerede gaming-GPU. Slå dette fra, hvis spillet ikke vil starte, åbner til en sort skærm, eller den bærbares skærm går i sort. Træder i kraft, næste gang spillet starter.',
+  'desktop.notify.partyInviteBody': '{name} inviterede dig til en gruppe.',
+  'desktop.notify.partyInviteTitle': 'Gruppeinvitation',
+  'desktop.notify.updateReadyBody': 'Genstart World of ClaudeCraft for at anvende opdateringen.',
+  'desktop.notify.updateReadyTitle': 'Opdatering {version} er klar',
+  'desktop.notify.updateReadyTitleNoVersion': 'Opdatering er klar',
+  'desktop.update.whatsNew': 'Se ændringerne i din browser',
+  'entities.abilities.challenging_roar.description':
+    'Et rædselsvækkende brøl: alle fjender inden for 10 meter bliver ægget, så deres trussel mod dig stiger til at matche deres mest forhadte fjende, og de tvinges til at angribe dig i 3 sek. Kun i Bruin-form.',
+  'entities.abilities.challenging_roar.name': 'Rædselsbrøl',
+  'entities.abilities.cheap_shot.descriptionNoStealth':
+    'Slå målet for {damage} skade og bedøv det i 4 sek. Giver 2 combopoint.',
+  'gpuNotice.bodyDiscreteInactive':
+    'Spillet bruger ikke den dedikerede (gaming-)GPU og kører i stedet på den strømbesparende GPU, så ydeevnen forringes. Opdater dine grafikdrivere og genstart derefter spillet. På Windows skal du også indstille spillet til Høj ydeevne under Indstillinger, System, Skærm, Grafik.',
 };

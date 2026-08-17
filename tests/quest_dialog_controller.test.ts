@@ -474,6 +474,7 @@ describe('QuestDialogController', () => {
     const vendor = harness(vendorNpc);
     vendor.controller.open(vendorNpc.id);
     const vendorButton = vendor.element.querySelector<HTMLButtonElement>('[data-vendor]');
+    expect(vendorButton?.innerHTML).toContain('/ui/currency/coin_gold.webp');
     vendorButton?.focus();
     vendorButton?.click();
     expect(vendor.openVendor).toHaveBeenCalledWith(vendorNpc.id, vendor.trapOpener);
@@ -491,6 +492,7 @@ describe('QuestDialogController', () => {
     const heroic = harness(npc(42, heroicId));
     heroic.controller.open(42);
     const heroicButton = heroic.element.querySelector<HTMLButtonElement>('[data-heroic-shop]');
+    expect(heroicButton?.innerHTML).toContain('/ui/items/heroic_mark.webp');
     heroicButton?.focus();
     heroicButton?.click();
     expect(heroic.openHeroicVendor).toHaveBeenCalledWith(42, heroic.trapOpener);
@@ -536,6 +538,7 @@ describe('QuestDialogController', () => {
     const shop = both.element.querySelector<HTMLButtonElement>('[data-warfare-shop]');
     expect(goods, 'no generic goods row at a flagged NPC, even with stock').toBeNull();
     expect(shop, 'the WARFARE shop row').not.toBeNull();
+    expect(shop?.innerHTML).toContain('/ui/currency/honor.webp');
     expect(shop?.textContent).toContain(t('hudChrome.warfareShop.gossipOption'));
     expect(shop?.getAttribute('aria-label')).toBe(
       t('hudChrome.warfareShop.gossipOptionAria', { name: `npc:${flaggedId}` }),

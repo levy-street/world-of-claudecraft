@@ -1,7 +1,9 @@
 import { DELVE_AFFIXES, DELVES } from '../../../sim/data';
 import type { IWorld } from '../../../world_api';
+import { currencyIconHtml } from '../../currency_art';
 import { esc } from '../../esc';
 import { formatNumber, type TranslationKey, t } from '../../i18n';
+import { delveAffixImageUrl } from './delve_affix_art';
 
 const DELVE_AFFIX_COLORS: Record<string, string> = {
   restless_graves: '#8b7355',
@@ -13,6 +15,9 @@ const DELVE_AFFIX_COLORS: Record<string, string> = {
   unstable_roof: '#8a6a5a',
   cult_remnants: '#7a4a8a',
   chapel_candle: '#ffd100',
+  high_water: '#2f718c',
+  lively_choir: '#5f70a5',
+  belligerent_dead: '#6f5a46',
 };
 
 export interface DelveTrackerControllerDeps {
@@ -118,14 +123,10 @@ export class DelveTrackerController {
       `<div class="dt-obj${run.objective.complete ? ' done' : ''}">- ${esc(t('delveUi.tracker.objective'))}: ${esc(objectiveLine)}</div>` +
       riteHint +
       exitHint +
-      `<div class="dt-obj">- ${esc(t('delveUi.tracker.marks', { count: marks }))}</div>` +
+      `<div class="dt-obj">- ${currencyIconHtml('delve_mark')}${esc(t('delveUi.tracker.marks', { count: marks }))}</div>` +
       affixHtml;
     element.querySelectorAll<HTMLElement>('.dt-affix-icon').forEach((icon) => {
-      const affixId = icon.dataset.affix ?? '';
-      this.deps.attachTooltip(
-        icon,
-        () => `<div class="tt-title">${esc(this.affixLabel(affixId))}</div>`,
-      );
+      this.attachAffixIcon(icon);
     });
   }
 
@@ -146,12 +147,41 @@ export class DelveTrackerController {
     return t(`delveUi.affix.${affixId}` as TranslationKey);
   }
 
+  private attachAffixIcon(icon: HTMLElement): void {
+    const affixId = icon.dataset.affix ?? '';
+    this.deps.attachTooltip(
+      icon,
+      () => `<div class="tt-title">${esc(this.affixLabel(affixId))}</div>`,
+    );
+    if (icon.tagName !== 'IMG') return;
+    icon.addEventListener(
+      'error',
+      () => {
+        const fallback = icon.ownerDocument.createElement('span');
+        fallback.className = icon.className;
+        fallback.dataset.affix = affixId;
+        fallback.style.background = DELVE_AFFIX_COLORS[affixId] ?? '#888';
+        fallback.setAttribute('role', 'img');
+        fallback.tabIndex = 0;
+        fallback.setAttribute('aria-label', this.affixLabel(affixId));
+        icon.replaceWith(fallback);
+        this.attachAffixIcon(fallback);
+      },
+      { once: true },
+    );
+  }
+
   private affixHtml(affixes: readonly string[]): string {
     if (affixes.length === 0) return '';
     let html = `<div class="dt-affix-row"><span class="dt-affix-label">${esc(t('delveUi.tracker.affix'))}</span>`;
     for (const affixId of affixes) {
-      const color = DELVE_AFFIX_COLORS[affixId] ?? '#888';
-      html += `<span class="dt-affix-icon" data-affix="${esc(affixId)}" style="background:${color}" role="img" tabindex="0" aria-label="${esc(this.affixLabel(affixId))}"></span>`;
+      const imageUrl = delveAffixImageUrl(affixId);
+      if (imageUrl) {
+        html += `<img class="dt-affix-icon" data-affix="${esc(affixId)}" src="${imageUrl}" alt="" draggable="false" role="img" tabindex="0" aria-label="${esc(this.affixLabel(affixId))}">`;
+      } else {
+        const color = DELVE_AFFIX_COLORS[affixId] ?? '#888';
+        html += `<span class="dt-affix-icon" data-affix="${esc(affixId)}" style="background:${color}" role="img" tabindex="0" aria-label="${esc(this.affixLabel(affixId))}"></span>`;
+      }
     }
     return `${html}</div>`;
   }

@@ -558,6 +558,11 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     expect(prewarmProgramContentKeys({ morphNormalCount: 2 }, ['mat-1'])).not.toEqual(flat);
     expect(prewarmProgramContentKeys({ morphColorCount: 1 }, ['mat-1'])).not.toEqual(flat);
     expect(prewarmProgramContentKeys({ hasTangents: true }, ['mat-1'])).not.toEqual(flat);
+    // r185 keys vertexNormals (normal-attribute presence) for every material.
+    expect(prewarmProgramContentKeys({ hasNormals: true }, ['mat-1'])).not.toEqual(flat);
+    expect(prewarmProgramContentKeys({ hasNormals: true }, ['mat-1'])).not.toEqual(
+      prewarmProgramContentKeys({ hasTangents: true }, ['mat-1']),
+    );
     expect(prewarmProgramContentKeys({ vertexColorItemSize: 3 }, ['mat-1'])).not.toEqual(
       prewarmProgramContentKeys({ vertexColorItemSize: 4 }, ['mat-1']),
     );
@@ -1378,8 +1383,10 @@ describe('boot prewarm ordering: the sky fetch never starves the compute stages'
   it('keeps the sky entry deadline-exempt so the dome upload stays behind the cover', () => {
     // At priority 64 the entry sits behind every build, texture, and VFX
     // stage, so without the exemption a long compute tail deadline-skips it
-    // and the 2k RGBA16F dome upload (one indivisible call on pinned r165)
-    // lands in the in-game lane. Exemption adds no network wait:
+    // and the 2k RGBA16F dome upload (pinned r165 paid it as one indivisible
+    // call; the installed 0.185 row-batches it via native update ranges, the
+    // same total GPU work, per the renderer's sky-entry ruling) lands in the
+    // in-game lane. Exemption adds no network wait:
     // skyAssetInlineWaitMs returns 0 once the reserve boundary has passed,
     // and prewarmEntryShouldDefer still bounds the entry by the hard
     // deadline. Unconditional on purpose: constrained profiles never run the

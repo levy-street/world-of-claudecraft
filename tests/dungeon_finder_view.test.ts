@@ -130,7 +130,8 @@ describe('dungeon finder view core', () => {
     // below 1 and must NOT claim a guaranteed drop.
     expect(boss?.groups[0].guaranteed).toBe(true);
     expect(boss?.groups[1].guaranteed).toBe(false);
-    expect(boss?.copper).toBeGreaterThan(0);
+    // Normal difficulty previews the normal money base, never the heroic one.
+    expect(boss?.copper).toBe(2500);
     expect(boss?.heroicGroups).toEqual([]);
     // Attunement quest drops never appear in the preview.
     const crypt = live(
@@ -166,6 +167,10 @@ describe('dungeon finder view core', () => {
     expect(boss?.heroicGroups.length).toBe(2);
     expect(boss?.heroicGroups.every((g) => g.guaranteed)).toBe(true);
     expect(view.detail?.heroicMarks).toBe(1);
+    // The heroic finale preview advertises the raised heroicCopper base the
+    // kill actually pays; a non-finale encounter keeps its normal copper.
+    expect(boss?.copper).toBe(100000);
+    expect(view.detail?.encounters.find((e) => e.mobId === 'sexton_marrow')?.copper).toBe(400);
   });
 
   it('maps raid entrances to the Abandoned Crypt door with its zone', () => {

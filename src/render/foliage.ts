@@ -13,6 +13,7 @@ import {
   WORLD_MAX_Z,
   WORLD_MIN_Z,
 } from '../sim/data';
+import { inDawnholdBailey } from '../sim/dawnhold_layout';
 import { ROCK_SINK_UNITS, rockHeightOf } from '../sim/decoration_dims';
 import { galeDeckSurface } from '../sim/gale_harbor';
 import type { BiomeId } from '../sim/types';
@@ -2025,8 +2026,15 @@ const DRESS_DENSITY: Record<BiomeId, number> = {
 const DRESS_DENSITY_LOW_SCALE = 1.24;
 const DRESS_LOW_SCALE_BOOST = 1.08;
 
+// The denser step, the 1.24 density scale and the 1.08 spot boost are the same
+// compensation art direction as the fatter lowPlus grass cards (a fuller ground
+// read for weak fragment-bound GPUs), so they ride GFX.denseDressing: lowPlus
+// plus the leanFoliage MEDIUM session (weak integrated GPU), whose lean model
+// set earns the same compensation. A plain low session takes medium-parity
+// dressing density; leanFoliage alone keeps only the LIGHTER lean knobs
+// (model set, variants, deco filter, tint softening).
 function dressStep(): number {
-  return GFX.leanFoliage ? DRESS_STEP_LOW : DRESS_STEP_HIGH;
+  return GFX.denseDressing ? DRESS_STEP_LOW : DRESS_STEP_HIGH;
 }
 
 function dressKindFor(biome: BiomeId, r: number): DressKind {
@@ -2150,7 +2158,7 @@ function generateDressing(seed: number): DressingSpot[] {
   const activeContent = getActiveWorldContent();
   const xHalf = WORLD_MAX_X - 16;
   const step = dressStep();
-  const scaleBoost = GFX.leanFoliage ? DRESS_LOW_SCALE_BOOST : 1;
+  const scaleBoost = GFX.denseDressing ? DRESS_LOW_SCALE_BOOST : 1;
   for (let gx = -xHalf; gx < xHalf; gx += step) {
     for (let gz = WORLD_MIN_Z + 16; gz < WORLD_MAX_Z - 16; gz += step) {
       const r = hashAt(gx, gz, 41);
@@ -2158,7 +2166,7 @@ function generateDressing(seed: number): DressingSpot[] {
       // the Evergarden takes NO random dressing: every bush there belongs to
       // an authored parterre arrangement (appended after this scatter loop)
       if (biome === 'garden') continue;
-      const density = DRESS_DENSITY[biome] * (GFX.leanFoliage ? DRESS_DENSITY_LOW_SCALE : 1);
+      const density = DRESS_DENSITY[biome] * (GFX.denseDressing ? DRESS_DENSITY_LOW_SCALE : 1);
       if (r > density) continue;
       const x = gx + (hashAt(gx, gz, 42) - 0.5) * step;
       const z = gz + (hashAt(gx, gz, 43) - 0.5) * step;
@@ -2965,6 +2973,9 @@ function buildGrassRing(
         if (isInSowfieldShell(x, z)) continue; // the Sowfield is a mown pitch, not meadow
         // the stable yard is worked dirt; deck planks grow nothing through
         if (tuftBiome === 'gale' && (inStableYard(x, z) || onHarborDeck(x, z, seed))) continue;
+        // Dawnhold's bailey is paved wall to wall: no tuft, and so no flower
+        // anchor either (the anchors above are what bloom the garden pass)
+        if (tuftBiome === 'garden' && inDawnholdBailey(x, z, 0.5)) continue;
         // the Willowfen grows no grass blades: each would-be tuft stays an
         // unseen flower anchor (the bloom pass below), so the fen floor
         // reads as open flower fields instead (density 0 would kill the
@@ -3040,6 +3051,7 @@ function buildGrassRing(
             }
             // a band-edge bloom must not stray into the worked yard
             if (tuftBiome === 'gale' && inStableYard(fx, fz)) continue;
+            if (tuftBiome === 'garden' && inDawnholdBailey(fx, fz, 0.5)) continue;
             const fs = 0.55 + hashAt(i + rep, j + rep, 9) * 0.5;
             q.setFromAxisAngle(up, hashAt(i, j, 10 + rep) * 12.4);
             m.compose(v.set(fx, fh, fz), q, sv.set(fs, fs, fs));
@@ -3100,6 +3112,7 @@ function buildGrassRing(
             const fx = i * step + (hashAt(i + rep * 37, j, 15) - 0.5) * step * 1.5;
             const fz = j * step + (hashAt(i, j + rep * 37, 16) - 0.5) * step * 1.5;
             if (fx < minX || fx >= maxX || fz < minZ || fz >= maxZ) continue;
+            if (inDawnholdBailey(fx, fz, 0.5)) continue; // the paved parade ground
             // beds and walk ribbons first, then the open-lawn meadow drifts
             let tint = parterreFlowerTintAt(fx, fz);
             if (tint < 0 && rep < 2) tint = gardenMeadowTintAt(fx, fz);
@@ -3486,6 +3499,7 @@ function buildGrassRing(
 }
 
 export const foliageGrassInternalsForTest = { buildGrassRing };
+export const foliageDressingInternalsForTest = { generateDressing, dressStep };
 
 // ---------------------------------------------------------------------------
 // Entry point

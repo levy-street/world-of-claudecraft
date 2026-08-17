@@ -953,6 +953,22 @@ export const sv_SE: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "The Undercroft",
+        "state": "The State Floor",
+        "residence": "The Residence",
+        "tower": "The Watch Tower"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
+    },
     "compass": {
       "N": "N",
       "NE": "NÖ",
@@ -1371,6 +1387,10 @@ export const sv_SE: EnTranslations = {
       "showWalletOnCharacterScreen": "Visa plånbok på karaktärsskärmen",
       "showWalletOnPlayerCard": "Visa plånbok på spelarkortet",
       "showPlaytime": "Visa tid spelad på karaktärsskärmen",
+      "forceHighPerfGpu": "Använd det separata spelgrafikkortet",
+      "forceHighPerfGpuNote": "På som standard: skrivbordsappen begär datorns separata spelgrafikkort. Stäng av det här om spelet inte startar, öppnas med en svart skärm, eller om den bärbara datorns skärm blir svart. Träder i kraft nästa gång spelet startar.",
+      "discordPresence": "Discord-aktivitet",
+      "discordPresenceNote": "Visar zonen du befinner dig i och hur länge du har spelat den här sessionen som din Discord-aktivitet, och alla som kan se din Discord-profil kan se båda. Endast zonnamnet, din sessionstid och spelet delas, aldrig din karaktär, ditt konto eller vem du spelar med. Kräver att Discord-appen körs på den här datorn.",
       "showDevBadges": "Visa utvecklarmärken",
       "showOwnNameplate": "Visa min namnskylt",
       "showPlayerNameplates": "Visa spelares namnskyltar",
@@ -7793,7 +7813,15 @@ export const sv_SE: EnTranslations = {
       "readyBody": "Den installeras när du avslutar, eller starta om nu.",
       "restart": "Starta om nu",
       "later": "Senare",
-      "dismiss": "Stäng"
+      "dismiss": "Stäng",
+      "whatsNew": "Se vad som har ändrats i din webbläsare"
+    },
+    "notify": {
+      "updateReadyTitle": "Uppdatering {version} är klar",
+      "updateReadyTitleNoVersion": "Uppdatering är klar",
+      "updateReadyBody": "Starta om World of ClaudeCraft för att tillämpa uppdateringen.",
+      "partyInviteTitle": "Gruppinbjudan",
+      "partyInviteBody": "{name} bjöd in dig till en grupp."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7805,6 +7833,7 @@ export const sv_SE: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "Spelet körs utan GPU-acceleration och kommer att vara långsamt. Uppdatera dina grafikdrivrutiner och starta sedan om spelet. I Windows anger du även spelet till Höga prestanda under Inställningar > System > Skärm > Grafik.",
+    "bodyDiscreteInactive": "Spelet använder inte det separata (spel-)grafikkortet och körs i stället på det strömsparande grafikkortet, vilket försämrar prestandan. Uppdatera dina grafikdrivrutiner och starta sedan om spelet. I Windows anger du även spelet till Höga prestanda under Inställningar > System > Skärm > Grafik.",
     "bodyWeb": "Spelet körs utan GPU-acceleration och kommer att vara långsamt. Aktivera hårdvaruacceleration i din webbläsares inställningar, uppdatera dina grafikdrivrutiner och starta sedan om din webbläsare.",
     "hybridBodyWindows": "Den här sessionen renderas på det integrerade (strömsparande) grafikkortet. Om den här datorn även har ett separat spelgrafikkort, ställ in din webbläsare på Höga prestanda under Inställningar > System > Bildskärm > Grafik, och starta sedan om den. Skrivbordsappen väljer det separata grafikkortet automatiskt.",
     "hybridBodyLinux": "Den här sessionen renderas på det integrerade (strömsparande) grafikkortet. Om den här datorn även har ett separat spelgrafikkort kan din webbläsare eller grafikdrivrutin erbjuda en egen inställning för val av grafikkort, eller så kan din distribution erbjuda ett verktyg för att växla grafikkort (till exempel PRIME eller optimus-manager). Skrivbordsappen väljer det separata grafikkortet automatiskt.",
@@ -8172,6 +8201,9 @@ export const sv_SE: EnTranslations = {
       "graphicsReloadNote": "Grafikkvalitet och terrängdetalj tillämpas efter en omladdning.",
       "reloadNow": "Ladda om nu",
       "fullscreen": "Helskärm",
+      "displayMode": "Visningsläge",
+      "displayModeBorderless": "Kantlös helskärm",
+      "displayModeWindowed": "Fönsterläge",
       "touchLookSpeed": "Pekblickens hastighet",
       "joystickSize": "Styrspakens storlek",
       "buttonSize": "Knappstorlek",
@@ -9511,7 +9543,7 @@ export const sv_SE: EnTranslations = {
       "cheap_shot": {
         "name": "Magslag",
         "description": "Slå till målet för {damage} skada, vilket bedövar det i 4 sek. Du måste vara dold. Ger 2 kombopoäng.",
-        "descriptionNoStealth": "Strike the target for {damage} damage, stunning it for 4 sec. Awards 2 combo points.",
+        "descriptionNoStealth": "Slå till målet för {damage} skada, vilket bedövar det i 4 sek. Ger 2 kombopoäng.",
         "specNote_subtlety": "Använd från Skymningsslöja lägger detta till 1 Skymningsförråd (max 3). Vid 3 Skymningsförråd kan du använda den UTAN att vara dold: den användningen kostar inget, förbrukar alla 3 Skymningsförråd och startar den 6 sekunder långa Skuggslöjan."
       },
       "sap": {
@@ -10031,8 +10063,8 @@ export const sv_SE: EnTranslations = {
         "description": "Morrar åt målet: ditt hot stiger till nivån hos dess mest hatade fiende och den tvingas anfalla dig i 3 sek. Endast i Bruinform."
       },
       "challenging_roar": {
-        "name": "Baleful Roar",
-        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
+        "name": "Olycksbådande vrål",
+        "description": "Ett olycksbådande vrål: varje fiende inom 10 meter eggas, dess hot mot dig stiger till nivån hos dess mest hatade fiende, och den tvingas anfalla dig i 3 sek. Endast i Bruinform."
       },
       "cat_form": {
         "name": "Vargform",
@@ -10046,7 +10078,7 @@ export const sv_SE: EnTranslations = {
       "ferocious_bite": {
         "name": "Blodsbett",
         "description": "Avslutande drag som orsakar {damage}. Endast i Vargform.",
-        "specNote_feral": "Varje träffande slag lägger till 1 Gammalt Blod; vid 3 Gammalt Blod blir denna knapp Röd Skörd: ett bett för 70 plus 43 per kombopoäng som också omedelbart ger all skada som dina Flå och Riv upp ännu skulle ha gett, och återställer 30 energi."
+        "specNote_feral": "Varje träffande slag lägger till 1 Gammalt Blod; vid 3 Gammalt Blod blir denna knapp Röd Skörd, som förbrukar ditt Gamla Blod för ett kraftigare slag som också omedelbart ger all skada som dina Flå och Riv upp ännu skulle ha gett, och återställer energi."
       },
       "swipe": {
         "name": "Svepande klor",
@@ -10109,7 +10141,7 @@ export const sv_SE: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Vargblod",
-        "description": "Ökar attackstyrkan med {buff} i {duration} sek. Endast vargform."
+        "description": "Frigör {rage} energi och ökar attackstyrkan med {buff} i {duration} sek. Endast vargform."
       },
       "rip": {
         "name": "Blodsspricka",
@@ -10330,7 +10362,7 @@ export const sv_SE: EnTranslations = {
       },
       "redharvest": {
         "name": "Röd Skörd",
-        "description": "Förbrukar dina 3 Gammalt Blod: ett slag för {damage} som omedelbart ger all skada som dina Flå och Riv upp ännu skulle ha gett, tar bort båda blödningarna och återställer 30 energi. Fungerar utan kombopoäng."
+        "description": "Förbrukar dina 3 Gammalt Blod: ett slag för {damage} som omedelbart ger all skada som dina Flå och Riv upp ännu skulle ha gett, tar bort båda blödningarna och återställer {rage} energi. Fungerar utan kombopoäng."
       },
       "marrowbreak": {
         "name": "Märgbräckare",
@@ -10578,7 +10610,7 @@ export const sv_SE: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Vild läkning",
-        "description": "Återställer 180 hälsa under 10 sek. Endast i Björngestalt. (druidtalang)"
+        "description": "Återställer 40% av din maximala hälsa under 10 sek. Endast i Björngestalt. (druidtalang)"
       },
       "frost_trap": {
         "name": "Rimfälla",
@@ -10811,7 +10843,7 @@ export const sv_SE: EnTranslations = {
       },
       "prowl": {
         "name": "Smygjaga",
-        "description": "Gå i smyg medan du är i vargform och rör dig 50 % långsammare. Kan inte användas i strid."
+        "description": "Gå i smyg medan du är i vargform och rör dig 5 % långsammare. Kan inte användas i strid."
       },
       "rake": {
         "name": "Flå",
@@ -12371,6 +12403,9 @@ export const sv_SE: EnTranslations = {
       },
       "pristine_claw": {
         "name": "Orörd klo"
+      },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
       },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"
@@ -16855,6 +16890,11 @@ export const sv_SE: EnTranslations = {
         "name": "Sista fästet",
         "enterText": "Du kliver in i de kalla, tysta hallarna i Sista fästet.",
         "leaveText": "Du drar igen fästningsporten och kliver ut i Drakländernas vind."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
       },
       "drowned_temple": {
         "name": "Det dränkta templet",

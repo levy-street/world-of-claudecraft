@@ -24,6 +24,11 @@ import { createWorstWindow, type WorstWindowSummary } from './worst_window';
 export interface PerfSnapshot {
   seconds: number;
   frames: number;
+  // Frames the desktop shell skipped because the window was hidden. These are
+  // deliberately NOT counted in `frames` or sampled into frameMs (a renderless
+  // frame would fake a healthy fps and p95), so this counter is the only
+  // evidence the skip is working.
+  hiddenPresentSkips: number;
   fps: number;
   frameMs: { avg: number; p50: number; p95: number; p99: number; max: number; long50: number };
   windows: {
@@ -484,6 +489,13 @@ export class PerfMonitor {
     this.inputDebugProvider = provider;
   }
 
+  private hiddenPresentSkips = 0;
+
+  /** A frame the presentation gate skipped: counted, never sampled. */
+  noteHiddenPresentSkip(): void {
+    this.hiddenPresentSkips++;
+  }
+
   frame(dt: number, now = performance.now()): void {
     if (this.skipNextFrameSample) {
       this.skipNextFrameSample = false;
@@ -547,7 +559,40 @@ export class PerfMonitor {
     return performance.now();
   }
 
+  // Whether per-frame bucket and trace samples record this frame. The desktop
+  // shell drops it on hidden frames (main.ts sets it from the presentation
+  // gate every frame): a web hidden tab records nothing because rAF pauses
+  // outright, and the hidden desktop frame must reproduce that shape, or the
+  // sim/events rings would grow a hidden-only population no web session has
+  // and the first post-refocus report window would carry it. Counters that
+  // are not per-frame samples (hiddenPresentSkips, the frame counter) are
+  // unaffected.
+  private frameSampling = true;
+
+  // Hidden-time ledger for the cumulative fps denominator: a hidden desktop
+  // span stops frames while wall seconds keep counting, so without it the
+  // session fps average is permanently diluted after a restore. Accumulated on
+  // the sampling-flag transitions main.ts drives from the presentation gate
+  // every frame; snapshot() subtracts it from the fps denominator only (wall
+  // `seconds` keeps its meaning for every other reader).
+  private hiddenAccumMs = 0;
+  private hiddenSince: number | null = null;
+
+  setFrameSampling(on: boolean, now = performance.now()): void {
+    if (on === this.frameSampling) return;
+    this.frameSampling = on;
+    if (!on) {
+      this.hiddenSince = now;
+      return;
+    }
+    if (this.hiddenSince !== null) {
+      this.hiddenAccumMs += Math.max(0, now - this.hiddenSince);
+      this.hiddenSince = null;
+    }
+  }
+
   finishTime(bucket: TimedBucket, start: number): void {
+    if (!this.frameSampling) return;
     const ms = performance.now() - start;
     this.lastBucketMs[bucket] = round(ms);
     this.buckets[bucket].push(ms);
@@ -582,7 +627,7 @@ export class PerfMonitor {
   ): void {
     // Callers pass interned keys and primitive values, so the default disabled
     // path reaches this return without allocating a detail object or callback.
-    if (!this.traceEnabled) return;
+    if (!this.traceEnabled || !this.frameSampling) return;
     let detail: Record<string, unknown> | undefined;
     if (detailKey1 !== undefined) {
       detail = { [detailKey1]: detailValue1 };
@@ -939,6 +984,14 @@ export class PerfMonitor {
 
   snapshot(now = performance.now()): PerfSnapshot {
     const seconds = Math.max(0.001, (now - this.startedAt) / 1000);
+    // The fps denominator discounts hidden desktop spans, including one still
+    // open at snapshot time: hidden frames are skipped, never sampled, so
+    // counting their wall time would dilute the session average forever after
+    // a restore (the hiddenPresentSkips counter is the matching numerator-side
+    // evidence in the fleet report).
+    const hiddenMs =
+      this.hiddenAccumMs + (this.hiddenSince !== null ? Math.max(0, now - this.hiddenSince) : 0);
+    const visibleSeconds = Math.max(0.001, seconds - hiddenMs / 1000);
     const mainMs = Object.fromEntries(
       (Object.keys(this.buckets) as TimedBucket[]).map((key) => [
         key,
@@ -962,7 +1015,8 @@ export class PerfMonitor {
     const snapshot: PerfSnapshot = {
       seconds: round(seconds),
       frames: this.frames,
-      fps: round(this.frames / seconds),
+      hiddenPresentSkips: this.hiddenPresentSkips,
+      fps: round(this.frames / visibleSeconds),
       frameMs: summarizeFrames(this.frameMs.toArray()),
       windows: {
         last10s: windowSummary(10_000),
@@ -1073,6 +1127,11 @@ export class PerfMonitor {
   reset(): void {
     this.startedAt = performance.now();
     this.frames = 0;
+    this.hiddenPresentSkips = 0;
+    this.hiddenAccumMs = 0;
+    // A reset mid-hidden re-opens the span from the new epoch, so the fps
+    // discount stays truthful without waiting for the next visibility flip.
+    this.hiddenSince = this.frameSampling ? null : this.startedAt;
     this.frameMs.clear();
     this.frameWindow.clear();
     this.lastCensus = null;
@@ -1163,8 +1222,14 @@ export class PerfMonitor {
       ? `hitch ${h.hitches} (compile ${h.byCause['shader-compile']} tex ${h.byCause['texture-upload']} view ${h.byCause['view-create']} other ${h.byCause.other})  prog +${h.programsAdded}`
       : null;
     const censusLines = this.lastCensusLines;
+    // The hidden-skip counter's one live sink (phase 4 QA F11): sampled frames
+    // exclude skipped desktop-hidden frames, so a session that spent time
+    // minimized shows its denominator here instead of leaving a diluted fps
+    // unexplained. Zero on web builds and never-hidden sessions.
+    const hiddenLine = s.hiddenPresentSkips > 0 ? `hidden skips ${s.hiddenPresentSkips}` : null;
     this.overlayText.textContent = [
       `fps ${s.fps}  p95 ${s.frameMs.p95}ms  >50 ${s.frameMs.long50}`,
+      ...(hiddenLine ? [hiddenLine] : []),
       `10s fps ${s.windows.last10s.fps}  p95 ${s.windows.last10s.frameMs.p95}ms  >50 ${s.windows.last10s.frameMs.long50}`,
       `longtask ${lt.count}  p95 ${lt.p95}ms  max ${lt.max}ms  heap ${mem ? `${mem.usedMB}/${mem.limitMB}MB` : '-'}`,
       `render ${s.mainMs.renderer.avg}/${s.mainMs.renderer.p95}ms  hud ${s.mainMs.hud.avg}/${s.mainMs.hud.p95}ms`,

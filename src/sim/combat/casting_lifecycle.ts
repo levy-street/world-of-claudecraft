@@ -138,7 +138,11 @@ import { empoweredCastProgress, empoweredStageForProgress } from './glacial_fron
 import { bloodhookStartError } from './hunter_fieldcraft';
 import { packCommandError } from './hunter_packlord';
 import { cancelRecedingShell, noteHunterFocusSpend } from './hunter_shared';
-import { hasDeadGroupMember, isMassResurrectionAbility } from './mass_resurrection';
+import {
+  hasDeadGroupMember,
+  hasDeadGroupMemberInReach,
+  isMassResurrectionAbility,
+} from './mass_resurrection';
 import {
   hasActiveOssuaryMark,
   necromancyCastError,
@@ -166,6 +170,7 @@ import {
 import { paladinManaCostMultiplier } from './paladin_support';
 import { isValkyrsCallingAirborne } from './paladin_valkyrs_calling_state';
 import { hasTithefiendTarget } from './priest/vespers';
+import { resurrectionCastRange, resurrectionReachError } from './resurrection_reach';
 import {
   detonatorFreeMultiplier,
   gloamBankArmed,
@@ -363,6 +368,43 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
     if (!hasDeadGroupMember(ctx, p)) {
       cancelCast(ctx, p);
       ctx.error(p.id, 'There are no dead group members to resurrect.');
+      return;
+    }
+    // Cancel as soon as no reachable body remains (the caster was displaced, or
+    // the members in reach were raised by another source), instead of letting the
+    // cast run on to a completion that must refuse anyway.
+    if (!hasDeadGroupMemberInReach(ctx, p, resurrectionCastRange(activeCast.def.range))) {
+      cancelCast(ctx, p);
+      ctx.error(p.id, 'Out of range.');
+      return;
+    }
+  }
+  // The single-target twin of the mass-rez gate above: a combat res whose target
+  // was raised by another source, or whose caster was displaced out of reach
+  // (range + line of sight to the body), cancels now instead of channeling the
+  // rest of an up-to-8-second cast into a certain finish-side refusal.
+  if (activeCast?.def.requiresTarget && activeCast.def.targetsDead) {
+    const dead = resolveDeadAllyTarget(ctx, p, p.castTargetId);
+    if (!dead) {
+      cancelCast(ctx, p);
+      ctx.error(p.id, 'You must target a dead ally in your group.');
+      return;
+    }
+    const reach = resurrectionReachError(
+      ctx,
+      p,
+      dead,
+      resurrectionCastRange(activeCast.def.range),
+      2,
+    );
+    if (reach === 'range') {
+      cancelCast(ctx, p);
+      ctx.error(p.id, 'Out of range.');
+      return;
+    }
+    if (reach === 'los') {
+      cancelCast(ctx, p);
+      ctx.error(p.id, 'Line of sight.');
       return;
     }
   }
@@ -1080,9 +1122,19 @@ export function castAbility(
     emitActiveCastRestrictionError(ctx, p.id, restriction);
     return;
   }
-  if (isMassResurrectionAbility(ability) && !hasDeadGroupMember(ctx, p)) {
-    ctx.error(p.id, 'There are no dead group members to resurrect.');
-    return;
+  if (isMassResurrectionAbility(ability)) {
+    if (!hasDeadGroupMember(ctx, p)) {
+      ctx.error(p.id, 'There are no dead group members to resurrect.');
+      return;
+    }
+    // Dead members exist but every body is beyond resurrection reach (range +
+    // line of sight): refuse up front rather than burn the mana and cooldown on
+    // a cast that can raise nobody. Reach itself is re-applied per member at
+    // completion (resurrectDeadGroupMembers).
+    if (!hasDeadGroupMemberInReach(ctx, p, resurrectionCastRange(ability.range))) {
+      ctx.error(p.id, 'Out of range.');
+      return;
+    }
   }
 
   let target: Entity | null = null;
@@ -1103,14 +1155,20 @@ export function castAbility(
       return;
     }
   } else if (ability.requiresTarget && ability.targetsDead) {
-    // Combat res: the target must be a DEAD group/raid member (no self-cast fallback).
+    // Combat res: the target must be a DEAD group/raid member (no self-cast fallback),
+    // and their body must be within resurrection reach (range + line of sight).
     const dead = resolveDeadAllyTarget(ctx, p, castTargetId);
     if (!dead) {
       ctx.error(p.id, 'You must target a dead ally in your group.');
       return;
     }
-    if (dist2d(p.pos, dead.corpsePos ?? dead.pos) > ability.range) {
+    const reach = resurrectionReachError(ctx, p, dead, resurrectionCastRange(ability.range));
+    if (reach === 'range') {
       ctx.error(p.id, 'Out of range.');
+      return;
+    }
+    if (reach === 'los') {
+      ctx.error(p.id, 'Line of sight.');
       return;
     }
     target = dead;
@@ -2206,6 +2264,14 @@ function applyAbility(
       ctx.error(p.id, 'There are no dead group members to resurrect.');
       return;
     }
+    // The finish-side backstop of the per-tick updateCasting reach gate, which
+    // cancels first for any timed cast: this arm arbitrates only a same-tick
+    // displacement or a future instant-cast mass rez, and keeps the completion
+    // unable to spend mana and cooldown on a sweep that can raise nobody.
+    if (!hasDeadGroupMemberInReach(ctx, p, resurrectionCastRange(res.def.range))) {
+      ctx.error(p.id, 'Out of range.');
+      return;
+    }
   }
   // Overload (mage choice row): the armed amplifier bakes the next MANA spell
   // 40% stronger and 50% costlier into a scaled COPY of the resolved ability
@@ -2307,9 +2373,21 @@ function applyAbility(
   } else if (ability.requiresTarget && ability.targetsDead) {
     // Combat res finish: the dead ally's id was stored in castTarget at cast start
     // (it is auto-deselected from p.targetId once dead, so we cannot re-derive it).
+    // Reach is re-checked with the same +2 drift slack the other finish arms grant:
+    // the body cannot move, but the caster can be displaced during the cast, and a
+    // finish that skipped the gate would hand out a cross-map resurrection offer.
     const dead = resolveDeadAllyTarget(ctx, p, castTarget);
     if (!dead) {
       ctx.error(p.id, 'You must target a dead ally in your group.');
+      return;
+    }
+    const reach = resurrectionReachError(ctx, p, dead, resurrectionCastRange(ability.range), 2);
+    if (reach === 'range') {
+      ctx.error(p.id, 'Out of range.');
+      return;
+    }
+    if (reach === 'los') {
+      ctx.error(p.id, 'Line of sight.');
       return;
     }
     target = dead;

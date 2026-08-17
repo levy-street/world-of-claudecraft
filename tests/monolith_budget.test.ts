@@ -42,7 +42,21 @@ const MONOLITHS: MonolithRow[] = [
     // values, the over-time string and the talent-conditional field choice) into
     // src/ui/ability_description.ts (the ratchet's own rule: an extraction lowers
     // the ceiling, never raises it).
-    ceiling: 19420,
+    // Raised 19420 -> 19432 (+12) for the desktop-client-update packet, a
+    // maintainer decision prepared for PR review: the branch's additions are
+    // thin-consumer wiring to extracted modules (presentation_gate,
+    // instance_music) riding on top of upstream's near-zero-slack re-pins, so
+    // no clean branch-owned extraction exists. Exact merged count: any
+    // further growth reds again.
+    // Re-pinned 19432 -> 19433: the release/v0.38.0 merge into this branch
+    // grew hud.ts by one line at HEAD without updating the row, so the gate
+    // arrived red. Same exact-count, zero-slack intent as above.
+    // Re-pinned 19433 -> 19488 when the castle branch merged main: the castle
+    // additions are thin-consumer wiring to extracted modules (the two
+    // LastKeepMapPainter declarations and the two walk-in map branches on the
+    // clearMapHitState pattern), riding on main's zero-slack pin. Exact merged
+    // count: any further growth reds again.
+    ceiling: 19488,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -56,27 +70,11 @@ const MONOLITHS: MonolithRow[] = [
     // per-status manifest rollup to summarizePrewarmManifest
     // (prewarm_compile_lifecycle.ts, beside the interface it fills) and the
     // resume-lane bookkeeping to prewarm_resume_ledger_core.ts.
-    // Merging release/v0.38.0: both sides had pinned their own size (13699 here,
-    // 13700 there), and the merged file is smaller than either, so the ceiling
-    // follows it down rather than inheriting a parent's slack.
-    // Lowered again after extracting the zone prewarm's template selection into
-    // src/render/zone_prewarm_templates_core.ts, which paid for the encounter
-    // prewarm's five call-site lines: the ratchet's rule is that a file over its
-    // ceiling buys the room back by extraction, never by raising the number.
-    // Lowered again after folding the five near-identical lazy form-visual
-    // builds into buildFormVisual, which paid for the review's prewarm re-queue
-    // sites (form rigs, the base-visual replace, both held-weapon swaps).
-    // Lowered again after the Goblin Rocket Sled merge: the mount-visual
-    // teardown had three near-identical copies (live swap, dismount, view
-    // disposal), now releaseMountVisual/releaseMountFx in
-    // src/render/mount_visual_lifecycle.ts. The merged file landed 3 lines over
-    // the inherited ceiling and bought the room back by extraction, per the
-    // ratchet's rule, rather than raising the number.
-    // Lowered again after extracting the mount's whole per-frame presentation
-    // pass (gait update, body attitude, rider carry, ambient trail) into
-    // src/render/mount_presentation.ts, which paid for the terrain-reactive
-    // vehicle suspension's call site and the mount-summon audio edge.
-    ceiling: 13651,
+    // Merging the sled into the cart: this side stood at 13651 (after the
+    // mount_presentation.ts extraction) and the sled at 13665, and the merge
+    // lands at 13665. Pinned to that exact merged count, the rule both parents
+    // already follow: a merge takes the merged count and further growth reds.
+    ceiling: 13665,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

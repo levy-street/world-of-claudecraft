@@ -283,6 +283,9 @@
     --color-map-building-chapel: #9b9080;
     --color-map-building-inn: #8a6233;
     --color-map-building-house: #7a5630;
+    --color-map-castle-wall: #9b9080;
+    --color-map-castle-tower: #b3a894;
+    --color-map-castle-court: rgba(120, 150, 96, 0.35);
     --color-map-well: #5a7fa8;
     --color-map-stall: #b07a3a;
     --color-map-tent: #9a8a5a;

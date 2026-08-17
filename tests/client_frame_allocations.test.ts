@@ -274,7 +274,8 @@ describe('client frame allocation guards', () => {
     const disabledReturn = method.body.statements.find(
       (statement): statement is ts.IfStatement =>
         ts.isIfStatement(statement) &&
-        statement.expression.getText(perfSourceFile) === '!this.traceEnabled' &&
+        statement.expression.getText(perfSourceFile) ===
+          '!this.traceEnabled || !this.frameSampling' &&
         ts.isReturnStatement(statement.thenStatement),
     );
     const detailObjects: ts.ObjectLiteralExpression[] = [];

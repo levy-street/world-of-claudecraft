@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "family": "delve-affixes",
+  "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+  "iconSize": 128,
+  "runtimeDir": "public/ui/delve-affixes",
+  "acceptedArtManifest": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-art.json",
+  "acceptedCohortManifest": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-delve-affix-art.json",
+  "acceptedCohortSha256": "b89b9937aff53fc43e60750c9b658f465c09bc61f65b2f458d854cd4e707a6cf",
+  "assets": [
+    {
+      "id": "bad_air",
+      "output": "bad_air.webp",
+      "sourceFile": "tmp/imagegen/v039-second-pass/delve-encounters/raw/bad_air.png",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A cracked plague censer exhaling poisonous vapor shaped like a choking spectral claw.",
+      "references": ["public/ui/items/corpse_candle_focus.webp", "public/ui/items/pristine_venom_gland.webp", "public/ui/skills/warlock/raise_graveguard.webp", "public/ui/skills/druid/faerie_fire.webp"],
+      "sourceSha256": "b5d8aa01c0f074bf6efb8565230de7d60531c179ab20c03af3e74c6afaf47637",
+      "acceptedSha256": "ae221adbcd98dade908b1139636b155eb173379786049e744d6efaa03161458c",
+      "acceptedBytes": 4146
+    },
+    {
+      "id": "belligerent_dead",
+      "output": "belligerent_dead.webp",
+      "sourceFile": "tmp/imagegen/v039-second-pass/delve-encounters/raw/belligerent_dead.png",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "An armored drowned revenant surging behind a battered grave-silt bulwark.",
+      "references": ["public/ui/skills/shaman/tidecall.webp", "public/ui/skills/priest/choir_of_deliverance.webp", "public/ui/items/nhalias_bell_maul.webp", "public/ui/deeds/dgn_drowned_temple_heroic.webp"],
+      "sourceSha256": "bc1b5db000a1435946318849dbd7f5e8f74ab06dcc211f515a06bdb386b97983",
+      "acceptedSha256": "67a419ed2dc3aa12500faf79848ce3928ec7f7a48ab02973ebb4456dcc5ff66b",
+      "acceptedBytes": 5134
+    },
+    {
+      "id": "candleblind",
+      "output": "candleblind.webp",
+      "sourceFile": "tmp/imagegen/v039-second-pass/delve-encounters/raw/candleblind.png",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A guttering corpse candle flaring across a watchful eye until its pupil disappears.",
+      "references": ["public/ui/items/corpse_candle_focus.webp", "public/ui/items/pristine_venom_gland.webp", "public/ui/skills/warlock/raise_graveguard.webp", "public/ui/skills/druid/faerie_fire.webp"],
+      "sourceSha256": "b6e78f5304fcaebb683217c922eb052b641aa121819c6777e4ab7ae59ad6c7eb",
+      "acceptedSha256": "91502e2624e037b82c7d528e379c8cb3497eedbb4a8402b7af520d72e86be65a",
+      "acceptedBytes": 3766
+    },
+    {
+      "id": "high_water",
+      "output": "high_water.webp",
+      "sourceFile": "tmp/imagegen/v039-second-pass/delve-encounters/raw/high_water.png",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A blackwater crest surging over reliquary steps and a sinking iron lantern.",
+      "references": ["public/ui/skills/shaman/tidecall.webp", "public/ui/skills/priest/choir_of_deliverance.webp", "public/ui/items/nhalias_bell_maul.webp", "public/ui/deeds/dgn_drowned_temple_heroic.webp"],
+      "sourceSha256": "21fc7d388981c0cb2fa41db87049557c8509076cccd7128ead555a1710efaae7",
+      "acceptedSha256": "5738154620d18fbe2ddd57afccf6e18be472cb17a1329bf29ad80508e51640ee",
+      "acceptedBytes": 4544
+    },
+    {
+      "id": "lively_choir",
+      "output": "lively_choir.webp",
+      "sourceFile": "tmp/imagegen/v039-second-pass/delve-encounters/raw/lively_choir.png",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Three drowned cantor masks singing luminous sound ribbons around a tolling bell.",
+      "references": ["public/ui/skills/shaman/tidecall.webp", "public/ui/skills/priest/choir_of_deliverance.webp", "public/ui/items/nhalias_bell_maul.webp", "public/ui/deeds/dgn_drowned_temple_heroic.webp"],
+      "sourceSha256": "4acaca68c9c14cd7ad9f077f0c210ca716a28d4690394b28694cf3869e802720",
+      "acceptedSha256": "8550459f71168e229bb324ba25ed9c31b88e0618f169f27283874d46a5bae13b",
+      "acceptedBytes": 4848
+    },
+    {
+      "id": "restless_graves",
+      "output": "restless_graves.webp",
+      "sourceFile": "tmp/imagegen/v039-second-pass/delve-encounters/raw/restless_graves.png",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A skeletal hand erupting through a cracked ancient grave slab.",
+      "references": ["public/ui/items/corpse_candle_focus.webp", "public/ui/items/pristine_venom_gland.webp", "public/ui/skills/warlock/raise_graveguard.webp", "public/ui/skills/druid/faerie_fire.webp"],
+      "sourceSha256": "2b2bb706a10f49adfd253edf735ddfe9bc938e929aba439bac354d9f6791888d",
+      "acceptedSha256": "ad3bc775ea21fd1024d9cff5f373f13d0c5b6efc20fe1e7838795876b970d5c3",
+      "acceptedBytes": 4350
+    }
+  ]
+}

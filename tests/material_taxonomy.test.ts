@@ -98,12 +98,14 @@ const HONEST_MATERIALS = [
 ] as const;
 
 // The ONLY non-poor junk allowed outside the material set: four rare-mob
-// trophies plus the placed keep keepsake (Q4 ruled them out of the sweep).
+// trophies plus the two placed castle keepsakes (Q4 ruled them out of the
+// sweep; the Dawnhold garden posy follows the keep signet's ruling).
 // A new junk item landing in this assertion's diff must be classified: either
 // author it into a source table (a node yield, grade, component, specimen,
 // salvage return, or junk-kind reagent) so it derives IN, or add it here as a
 // deliberate non-material with the maintainer's sign-off.
 const ALLOWED_UNCLASSIFIED_JUNK = [
+  'dawnhold_posy',
   'emberwing_cinderscale',
   'gleamstag_charm',
   'guardian_core',
@@ -399,7 +401,7 @@ describe('deriveMaterialItemIds: every source table is actually consulted (injec
 });
 
 describe('completeness tripwire: unclassified non-poor junk', () => {
-  it('is exactly the five allowed oddments, no more and no fewer', () => {
+  it('is exactly the six allowed oddments, no more and no fewer', () => {
     const unclassified = Object.values(ITEMS)
       .filter((d) => d.kind === 'junk' && d.quality !== 'poor' && !MATERIAL_ITEM_IDS.has(d.id))
       .map((d) => d.id)

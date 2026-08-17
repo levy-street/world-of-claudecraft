@@ -786,6 +786,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorial.nextTipQuestLog': '打开任务日志（{key}）查找附近的下一个任务。',
   'hudChrome.tutorial.nextTipMap': '查看世界地图（{key}）了解任务所在位置。',
   'hudChrome.tutorial.nextTipSocial': '打开社交面板（{key}）寻找队伍应对更强的战斗。',
+  'hudChrome.lastkeepMap.story.undercroft': '地下穹室',
+  'hudChrome.lastkeepMap.story.state': '正殿层',
+  'hudChrome.lastkeepMap.story.residence': '起居层',
+  'hudChrome.lastkeepMap.story.tower': '瞭望塔',
+  'hudChrome.dawnholdMap.story.ground': '庭园层',
+  'hudChrome.dawnholdMap.story.solar': '日光厅',
   'hudChrome.raidLockout.title': '团队副本锁定',
   'hudChrome.raidLockout.allReady': '所有团队副本就绪',
   'hudChrome.raidLockout.daysHours': '{d}天{h}小时',
@@ -1260,6 +1266,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showWalletOnCharacterScreen': '在角色界面显示钱包',
   'hudChrome.options.showPlaytime': '在角色界面显示游戏时长',
   'hudChrome.options.showWalletOnPlayerCard': '在玩家卡片显示钱包',
+  'hudChrome.options.forceHighPerfGpu': '使用独立游戏显卡',
+  'hudChrome.options.forceHighPerfGpuNote':
+    '默认开启：桌面版会向本机申请使用独立游戏显卡。如果游戏无法启动、启动后黑屏，或笔记本屏幕没有画面，请关闭此选项。该设置将在下次启动游戏时生效。',
+  'hudChrome.options.discordPresence': 'Discord 游戏状态',
+  'hudChrome.options.discordPresenceNote':
+    '游戏时将你当前所在的区域以及本次游戏时长显示为你的 Discord 活动状态，任何能看到你 Discord 个人资料的人都能看到这两项。只会分享区域名称、本次游戏时长和游戏名称，绝不会分享你的角色、账号或与你同行的人。需要本机正在运行 Discord 应用。',
   'hudChrome.options.showDevBadges': '显示开发者徽章',
   'hudChrome.options.showOwnNameplate': '显示我的姓名板',
   'hudChrome.options.showPlayerNameplates': '显示玩家姓名板',
@@ -1977,6 +1989,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.options.invertLook': '反转视角（触控）',
   'hud.options.graphicsReloadNote': '图形质量和地形细节会在重新加载后生效。',
   'hud.options.reloadNow': '立即重新加载',
+  'hud.options.displayMode': '显示模式',
+  'hud.options.displayModeBorderless': '无边框全屏',
+  'hud.options.displayModeWindowed': '窗口',
   'hud.options.fullscreen': '全屏',
   'hud.options.touchLookSpeed': '触屏视角速度',
   'hud.options.joystickSize': '摇杆大小',
@@ -3118,7 +3133,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '敌人被虫群侵袭，在 12 秒内受到 {damage} 点自然伤害。',
   'entities.abilities.tigers_fury.name': '狼血',
   'entities.abilities.tigers_fury.description':
-    '使攻击强度提高 {buff}，持续 {duration} 秒。仅限狼形态。',
+    '涌起{rage}点能量，并使攻击强度提高 {buff}，持续 {duration} 秒。仅限狼形态。',
   'entities.abilities.rip.name': '血隙',
   'entities.abilities.rip.description': '终结技，使目标每 2 秒流血一次，持续 24 秒：36 点伤害外加每消耗 1 点连击点 24 点（5 点连击点：共 {damage} 点）。仅限狼形态。',
   'entities.abilities.mortal_strike.name': '致残打击',
@@ -3161,7 +3176,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '震慑附近的敌人，使其攻击强度降低 20 点，持续 20 秒。仅限巨熊形态使用。',
   'entities.abilities.prowl.name': '潜行',
   'entities.abilities.prowl.description':
-    '在狼形态下进入潜行状态，移动速度降低 50%。无法在战斗中使用。',
+    '在狼形态下进入潜行状态，移动速度降低 5%。无法在战斗中使用。',
   'entities.abilities.rake.name': '剐削',
   'entities.abilities.rake.description': '撕裂敌人，造成武器伤害外加 {damage} 点，并造成持续 18 秒的流血伤害。给予 1 点连击点。仅限狼形态。',
   'entities.abilities.revive_pet.name': '修补',
@@ -7531,6 +7546,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'desktop.update.restart': '立即重启',
   'desktop.update.later': '稍后',
   'desktop.update.dismiss': '关闭',
+  'desktop.update.whatsNew': '在浏览器中查看更新内容',
+  'desktop.notify.updateReadyTitle': '更新 {version} 已就绪',
+  'desktop.notify.updateReadyTitleNoVersion': '更新已就绪',
+  'desktop.notify.updateReadyBody': '重启 World of ClaudeCraft 以应用更新。',
+  'desktop.notify.partyInviteTitle': '组队邀请',
+  'desktop.notify.partyInviteBody': '{name} 邀请你加入队伍。',
   'desktop.crash.title': 'World of ClaudeCraft',
   'desktop.crash.body': '游戏画面已停止响应。要重新加载吗？',
   'desktop.crash.reload': '重新加载',
@@ -7538,6 +7559,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.fatalBody': 'World of ClaudeCraft 遇到意外错误，需要关闭。',
   'gpuNotice.bodyDesktop':
     '游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。',
+  'gpuNotice.bodyDiscreteInactive':
+    '游戏没有使用独立（游戏）显卡，而是运行在节能显卡上，因此性能会下降。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。',
   'gpuNotice.bodyWeb':
     '游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请在浏览器设置中启用硬件加速，更新显卡驱动，然后重启浏览器。',
   'gpuNotice.hybridBodyWindows':
@@ -9357,7 +9380,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description': '将目标点 4 米内的敌人定身 2 秒，随后使其减速 40%，持续 6 秒。（萨满天赋）',
   'entities.abilities.evocation.description': '快速恢复法力。（法师天赋）',
   'entities.abilities.frenzied_regeneration.description':
-    '在10秒内恢复180点生命值。只能在熊形态下使用。（德鲁伊天赋）',
+    '在10秒内恢复相当于最大生命值40%的生命。只能在熊形态下使用。（德鲁伊天赋）',
   'entities.abilities.frost_trap.description':
     '冻结目标区域内的敌人3秒，使其无法移动或行动。（猎人天赋）',
   'entities.abilities.ghostly_strike.description': '以武器伤害外加 {damage} 点击打敌人，并将你的躲闪几率提高 15%，持续 7 秒。给予 1 点连击点。（潜行者天赋）',
@@ -9913,11 +9936,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '温热的雨水在古老石面上嘶嘶作响。荒野之心盆地在你眼前展开。',
   'entities.dungeons.wildheart_basin.leaveText': '你从石牙之下穿回棕榈之境的阳光中。',
   'entities.dungeons.the_last_keep.name': '最后的堡垒',
-  'entities.dungeons.the_last_keep.enterText': '你踏入最后的堡垒那冰冷而寂静的大厅。',
   'entities.items.last_keep_signet.name': '最后的堡垒印戒',
+  'entities.dungeons.the_last_keep.enterText': '你踏入最后的堡垒那冰冷而寂静的大厅。',
   'entities.items.reins_terrorspark_groundshaker.name': '惊雷撼地者点火钥匙',
   'entities.items.reins_goblin_rocket_sled.name': '哥布林火箭雪橇点火钥匙',
   'entities.dungeons.the_last_keep.leaveText': '你带上堡门，重新走进龙裔荒原的寒风中。',
+  'entities.dungeons.dawnhold_castle.name': '晨曦堡',
+  'entities.items.dawnhold_posy.name': '晨曦堡花园小花束',
+  'entities.dungeons.dawnhold_castle.enterText': '你走进晨曦堡温暖而花香四溢的厅堂。',
+  'entities.dungeons.dawnhold_castle.leaveText': '你回到阳光洒落的花园草坪上。',
   'entities.items.wildheart_tuskblade.name': '荒野之心獠牙巨刃',
   'entities.items.wildheart_hexwood_staff.name': '盆地巫木法杖',
   'entities.items.wildheart_fangknife.name': '祖尔加的獠牙匕首',
@@ -11370,7 +11397,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '在 8 秒内，你受到的下一次敌人攻击将被回敬：至多抵消 {buff} 点伤害，并以等量神圣伤害返还给攻击者，同时你获得 1 点虔诚。只回敬一次攻击。升华使可回敬的数值提高 50%。',
   'entities.abilities.faithforged_guard.name': '圣光之债',
   'entities.abilities.ferocious_bite.specNote_feral':
-    '每次命中累积1层古血；古血达到3层时，此按钮变为血收：一次撕咬，造成91点伤害，每个连击点额外造成55点，并立即引爆你的剐削与血裂的全部剩余伤害，同时恢复30点能量。',
+    '每次命中累积1层古血；古血达到3层时，此按钮变为血收：消耗古血发动一次更强的撕咬，立即引爆你的剐削与血裂的全部剩余伤害，同时恢复能量。',
   'entities.abilities.fieldcraft_reentry.description':
     '被动：断迹会刷新狩猎势能，并使你在12秒内的下一次剖膛一击或血钩获得返场强化。剖膛一击每层造成15%额外伤害。血钩造成18至24点额外物理伤害，每层再提高15%，并随远程攻击强度提高。达到3层时，任一攻击都会消耗狩猎势能。（野战技艺）',
   'entities.abilities.fieldcraft_reentry.name': '蓄势返场',
@@ -11496,7 +11523,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '使一名死亡的小队成员复活，并恢复 35% 的生命值和法力值。',
   'entities.abilities.recall_the_fallen.name': '唤回逝者',
   'entities.abilities.redharvest.description':
-    '消耗你的3层古血：造成{damage}点伤害，立即引爆你的剐削与血裂的全部剩余伤害，移除这两个流血效果，并恢复30点能量。无需连击点也可使用。',
+    '消耗你的3层古血：造成{damage}点伤害，立即引爆你的剐削与血裂的全部剩余伤害，移除这两个流血效果，并恢复{rage}点能量。无需连击点也可使用。',
   'entities.abilities.redharvest.name': '血收',
   'entities.abilities.regrowth.specNote_restoration': '种下新的绽放会累积1层繁茂（最多5层）。',
   'entities.abilities.rejuvenation.specNote_restoration':

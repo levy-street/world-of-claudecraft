@@ -953,6 +953,22 @@ export const fr_CA: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "The Undercroft",
+        "state": "The State Floor",
+        "residence": "The Residence",
+        "tower": "The Watch Tower"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
+    },
     "compass": {
       "N": "N",
       "NE": "NE",
@@ -1371,6 +1387,10 @@ export const fr_CA: EnTranslations = {
       "showWalletOnCharacterScreen": "Afficher le portefeuille sur l’écran des personnages",
       "showWalletOnPlayerCard": "Afficher le portefeuille sur la carte de joueur",
       "showPlaytime": "Afficher le temps de jeu sur l'écran des personnages",
+      "forceHighPerfGpu": "Utiliser le GPU de jeu dédié",
+      "forceHighPerfGpuNote": "Activé par défaut : l'application de bureau demande à cet ordinateur son GPU de jeu dédié. Désactivez cette option si le jeu ne démarre pas, s'ouvre sur un écran noir, ou si l'écran de l'ordinateur portable reste éteint. Prend effet au prochain démarrage du jeu.",
+      "discordPresence": "Présence enrichie Discord",
+      "discordPresenceNote": "Affiche la zone où vous vous trouvez et depuis combien de temps vous jouez cette session comme votre activité Discord, et toute personne pouvant voir votre profil Discord peut voir les deux. Seuls le nom de la zone, votre temps de session et le jeu sont partagés, jamais votre personnage, votre compte, ou avec qui vous jouez. Nécessite que l'application Discord soit lancée sur cet ordinateur.",
       "showDevBadges": "Afficher les badges de développeur",
       "showOwnNameplate": "Afficher ma plaque de nom",
       "showPlayerNameplates": "Afficher les plaques de noms des joueurs",
@@ -7793,7 +7813,15 @@ export const fr_CA: EnTranslations = {
       "readyBody": "Elle s'installe à la fermeture, ou redémarrez maintenant.",
       "restart": "Redémarrer maintenant",
       "later": "Plus tard",
-      "dismiss": "Fermer"
+      "dismiss": "Fermer",
+      "whatsNew": "Voir les changements dans votre navigateur"
+    },
+    "notify": {
+      "updateReadyTitle": "La mise à jour {version} est prête",
+      "updateReadyTitleNoVersion": "La mise à jour est prête",
+      "updateReadyBody": "Redémarrez World of ClaudeCraft pour appliquer la mise à jour.",
+      "partyInviteTitle": "Invitation de groupe",
+      "partyInviteBody": "{name} vous invite à rejoindre son groupe."
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7805,6 +7833,7 @@ export const fr_CA: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "Le jeu fonctionne sans accélération GPU et sera lent. Mettez à jour vos pilotes graphiques, puis redémarrez le jeu. Sous Windows, définissez également le jeu sur Performances élevées dans Paramètres, Système, Affichage, Graphiques.",
+    "bodyDiscreteInactive": "Le jeu n'utilise pas le GPU de jeu dédié et fonctionne à la place sur le GPU intégré (économie d'énergie), ce qui nuira aux performances. Mettez à jour vos pilotes graphiques, puis redémarrez le jeu. Sous Windows, définissez également le jeu sur Performances élevées dans Paramètres, Système, Affichage, Graphiques.",
     "bodyWeb": "Le jeu fonctionne sans accélération GPU et sera lent. Activez l'accélération matérielle dans les paramètres de votre navigateur, mettez à jour vos pilotes graphiques, puis redémarrez votre navigateur.",
     "hybridBodyWindows": "Cette session s'exécute sur le GPU intégré (économie d'énergie). Si cet ordinateur possède aussi un GPU de jeu dédié, définissez votre navigateur sur Performances élevées dans Paramètres > Système > Affichage > Graphiques, puis redémarrez-le. L'application de bureau choisit automatiquement le GPU de jeu.",
     "hybridBodyLinux": "Cette session s'exécute sur le GPU intégré (économie d'énergie). Si cet ordinateur possède aussi un GPU de jeu dédié, votre navigateur ou votre pilote graphique propose peut-être son propre réglage de sélection du GPU, ou votre distribution propose peut-être un outil de bascule de GPU (comme PRIME ou optimus-manager). L'application de bureau choisit automatiquement le GPU de jeu.",
@@ -8172,6 +8201,9 @@ export const fr_CA: EnTranslations = {
       "graphicsReloadNote": "La qualité graphique et le détail du terrain s'appliquent après un rechargement.",
       "reloadNow": "Recharger maintenant",
       "fullscreen": "Plein écran",
+      "displayMode": "Mode d'affichage",
+      "displayModeBorderless": "Plein écran sans bordure",
+      "displayModeWindowed": "Fenêtré",
       "touchLookSpeed": "Vitesse caméra tactile",
       "joystickSize": "Taille du joystick",
       "buttonSize": "Taille des boutons",
@@ -9511,7 +9543,7 @@ export const fr_CA: EnTranslations = {
       "cheap_shot": {
         "name": "Coup au ventre",
         "description": "Frappe la cible pour {damage} points de dégâts, l'étourdissant pendant 4 s. Camouflage requis. Confère 2 points de combo.",
-        "descriptionNoStealth": "Strike the target for {damage} damage, stunning it for 4 sec. Awards 2 combo points.",
+        "descriptionNoStealth": "Frappe la cible pour {damage} points de dégâts, l'étourdissant pendant 4 s. Confère 2 points de combo.",
         "specNote_subtlety": "Utilisée depuis le Voile du crépuscule, elle ajoute 1 Pénombre (maximum 3). À 3 Pénombre, vous pouvez l'utiliser SANS camouflage : cette utilisation ne coûte rien, dépense les 3 Pénombre, et déclenche le voile d'ombre de 6 s."
       },
       "sap": {
@@ -10031,8 +10063,8 @@ export const fr_CA: EnTranslations = {
         "description": "Gronde la cible : votre menace rejoint celle de son ennemi le plus haï et elle est forcée de vous attaquer pendant 3 s. Forme de Bruin uniquement."
       },
       "challenging_roar": {
-        "name": "Baleful Roar",
-        "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
+        "name": "Rugissement funeste",
+        "description": "Un rugissement funeste : chaque ennemi dans un rayon de 10 mètres est provoqué, sa menace envers vous rejoignant celle de son ennemi le plus haï, et il est forcé de vous attaquer pendant 3 s. Forme de Bruin uniquement."
       },
       "cat_form": {
         "name": "Forme de loup",
@@ -10046,7 +10078,7 @@ export const fr_CA: EnTranslations = {
       "ferocious_bite": {
         "name": "Morsure sanglante",
         "description": "Technique de finition qui inflige {damage}. Forme de loup uniquement.",
-        "specNote_feral": "Chaque coup porté ajoute 1 Sang ancien ; à 3 Sang ancien, ce bouton devient Moisson rouge : une morsure pour 70 plus 43 par point de combo qui inflige aussi instantanément tous les dégâts que vos Écorcher et Lacération auraient encore infligés, et restaure 30 énergie."
+        "specNote_feral": "Chaque coup porté ajoute 1 Sang ancien ; à 3 Sang ancien, ce bouton devient Moisson rouge, qui consomme le Sang ancien pour une frappe plus puissante qui inflige aussi instantanément tous les dégâts que vos Écorcher et Lacération auraient encore infligés, et restaure de l’énergie."
       },
       "swipe": {
         "name": "Griffes balayantes",
@@ -10109,7 +10141,7 @@ export const fr_CA: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Sang de loup",
-        "description": "Augmente la puissance d'attaque de {buff} pendant {duration} s. Forme de loup uniquement."
+        "description": "Libère {rage} points d'énergie et augmente la puissance d'attaque de {buff} pendant {duration} s. Forme de loup uniquement."
       },
       "rip": {
         "name": "Faille sanglante",
@@ -10330,7 +10362,7 @@ export const fr_CA: EnTranslations = {
       },
       "redharvest": {
         "name": "Moisson rouge",
-        "description": "Consomme vos 3 Sang ancien : frappe pour {damage}, inflige instantanément tous les dégâts que vos Écorcher et Lacération auraient encore infligés, retire les deux saignements et rend 30 points d'énergie. Fonctionne sans aucun point de combo."
+        "description": "Consomme vos 3 Sang ancien : frappe pour {damage}, inflige instantanément tous les dégâts que vos Écorcher et Lacération auraient encore infligés, retire les deux saignements et rend {rage} points d'énergie. Fonctionne sans aucun point de combo."
       },
       "marrowbreak": {
         "name": "Brise-moelle",
@@ -10578,7 +10610,7 @@ export const fr_CA: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Régénération sauvage",
-        "description": "Rend 180 points de vie en 10 s. Forme d'ours uniquement. (talent de Druide)"
+        "description": "Rend 40% de vos points de vie maximum en 10 s. Forme d'ours uniquement. (talent de Druide)"
       },
       "frost_trap": {
         "name": "Piège de givre",
@@ -10811,7 +10843,7 @@ export const fr_CA: EnTranslations = {
       },
       "prowl": {
         "name": "Traquer",
-        "description": "Passe en camouflage tant que vous êtes en forme de loup, avec une vitesse de déplacement réduite de 50%. Inutilisable en combat."
+        "description": "Passe en camouflage tant que vous êtes en forme de loup, avec une vitesse de déplacement réduite de 5%. Inutilisable en combat."
       },
       "rake": {
         "name": "Écorcher",
@@ -12371,6 +12403,9 @@ export const fr_CA: EnTranslations = {
       },
       "pristine_claw": {
         "name": "Griffe immaculée"
+      },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
       },
       "conjured_water4": {
         "name": "Eau de source conjurée"
@@ -16855,6 +16890,11 @@ export const fr_CA: EnTranslations = {
         "name": "Le Dernier Donjon",
         "enterText": "Vous pénétrez dans les salles froides et silencieuses de The Last Keep.",
         "leaveText": "Vous refermez la porte du donjon et retrouvez le vent des Drakelands."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
       },
       "drowned_temple": {
         "name": "Le Temple noyé",

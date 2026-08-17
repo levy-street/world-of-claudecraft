@@ -16,14 +16,16 @@ import {
   CASTLE_GATES,
   CASTLE_RAMPS,
   CASTLE_TOWERS,
+  CASTLE_WALL_LEDGES,
   GARDEN,
   WARD_STEP_RUN,
   WARD_STEPS,
 } from '../sim/castle_layout';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
-import { GFX, surfaceMat } from './gfx';
-import { cloneMaterialWithHooks } from './material_clone_hooks';
+import { bannerClothMaterial, isBannerKey } from './castle_kit';
+import { castleStoneBox, castleStoneMat } from './castle_stone';
+import { GFX } from './gfx';
 import { PROP_ASSET_DEFS } from './props';
 import { applyWornStone } from './worn_stone';
 
@@ -186,30 +188,18 @@ export function buildCastleFeatures(): CastleFeaturesView {
     list.push(p);
   };
 
-  // stone slab helper: the visible floor caps and stair masses. Both carry
-  // the shared worn-stone triplanar layer (one system with the kcas walls and
-  // the other stone structures) so the big flat caps read as laid masonry
-  // instead of painted plastic. The surfaceMat result is CLONED first:
-  // surfaceMat dedupes by (color|maps|flags) across modules, and the layer
-  // must not leak onto an unrelated consumer of the same key. The clone goes
-  // through material_clone_hooks so it keeps surfaceMat's zone-haze layer and
-  // its program-cache-key identity (a bare clone dropped both: un-hazed slabs
-  // plus a fresh program link on the first frame the castle streamed in).
-  const stoneSlab = (color: number, roughness: number): THREE.Material => {
-    if (!GFX.standardMaterials) return surfaceMat({ color, roughness });
-    const mat = cloneMaterialWithHooks(surfaceMat({ color, roughness }));
-    applyWornStone(mat as THREE.MeshStandardMaterial);
-    return mat;
-  };
-  const slabMat = stoneSlab(0x8a7568, 0.95);
-  // the solid wedge masses (the wall flights and the ward's stair cuts) are
-  // hand-wound triangle soups, so they draw both faces. The hook-preserving
-  // clone re-attaches haze and the worn layer itself (and never shares the
-  // lambert tier's deduped instance, which must not go DoubleSide for
-  // everyone).
-  const wedgeMat = cloneMaterialWithHooks(stoneSlab(0x8a7568, 0.95));
-  wedgeMat.side = THREE.DoubleSide;
-  const capMat = stoneSlab(0x97826f, 0.9);
+  // Every raw mass here is coursed stone tiled to its own footprint (the
+  // shared castle_stone surfacing, the same masonry Dawnhold wears): flat
+  // color read as grey cardboard beside the textured kit modules bolted
+  // onto it. The wedge masses (the wall flights and the ward's stair cuts)
+  // are hand-wound triangle soups, so theirs draws both faces.
+  const stoneMat = castleStoneMat({ color: 0x8a7568, roughness: 0.95 });
+  const capMat = castleStoneMat({ color: 0x97826f, roughness: 0.9 });
+  const wedgeMat = castleStoneMat({
+    color: 0x8a7568,
+    roughness: 0.95,
+    side: THREE.DoubleSide,
+  });
   const slab = (
     cx: number,
     cz: number,
@@ -217,9 +207,9 @@ export function buildCastleFeatures(): CastleFeaturesView {
     sz: number,
     topY: number,
     thick = 0.36,
-    mat = capMat,
+    mat?: THREE.Material,
   ): void => {
-    const mesh = new THREE.Mesh(new THREE.BoxGeometry(sx, thick, sz), mat);
+    const mesh = new THREE.Mesh(castleStoneBox(sx, thick, sz), mat ?? capMat);
     mesh.position.set(cx, topY - thick / 2, cz);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
@@ -272,11 +262,17 @@ export function buildCastleFeatures(): CastleFeaturesView {
     },
   ];
   const M = CASTLE.module;
+  // the wall body is DOUBLE-SKINNED: a row of modules on each face of the
+  // thicker walk strip, so both sides read as built stone and the gate
+  // modules pair into a short tunnel under the walk
+  const skinOff = CASTLE.wallTh / 2 - 0.85;
   const place = (run: WallRun, along: number, key: CastleKey, s = S): void => {
-    const x = run.axis === 'z' ? run.line : along;
-    const z = run.axis === 'z' ? along : run.line;
-    const rot = run.axis === 'z' ? Math.PI / 2 : 0;
-    put(key, { x, y: padY, z, rot, s });
+    for (const face of [-1, 1] as const) {
+      const x = run.axis === 'z' ? run.line + face * skinOff : along;
+      const z = run.axis === 'z' ? along : run.line + face * skinOff;
+      const rot = run.axis === 'z' ? Math.PI / 2 : 0;
+      put(key, { x, y: padY, z, rot, s });
+    }
   };
   for (const run of runs) {
     const count = Math.round((run.a1 - run.a0) / M);
@@ -346,8 +342,8 @@ export function buildCastleFeatures(): CastleFeaturesView {
     // the shell tops and the cap slab reads as open air from outside
     {
       const core = new THREE.Mesh(
-        new THREE.BoxGeometry(thw * 2 - 0.4, t.hAbs - padY, thw * 2 - 0.4),
-        slabMat,
+        castleStoneBox(thw * 2 - 0.4, t.hAbs - padY, thw * 2 - 0.4),
+        stoneMat,
       );
       core.position.set(t.x, padY + (t.hAbs - padY) / 2, t.z);
       core.castShadow = true;
@@ -404,8 +400,8 @@ export function buildCastleFeatures(): CastleFeaturesView {
     {
       const inset = 0.05;
       const mesh = new THREE.Mesh(
-        new THREE.BoxGeometry(w.x1 - w.x0 - inset * 2, rise + 0.4, w.z1 - w.z0 - inset * 2),
-        slabMat,
+        castleStoneBox(w.x1 - w.x0 - inset * 2, rise + 0.4, w.z1 - w.z0 - inset * 2),
+        stoneMat,
       );
       mesh.position.set((w.x0 + w.x1) / 2, w.h - (rise + 0.4) / 2, (w.z0 + w.z1) / 2);
       mesh.castShadow = true;
@@ -441,26 +437,24 @@ export function buildCastleFeatures(): CastleFeaturesView {
         });
       }
     }
-    // the stair cuts: wide stone steps down from the terrace, over a solid
-    // wedge whose TOP is the ramp surface castlePadTarget authors (the mesh
-    // leaves the cuts out with the rest of the ward, so this carries them)
+    // the stair cuts: broad stepped treads built from exact slabs riding
+    // the upstream solid wedge (the kcas stairs module never fit the cut:
+    // its treads read backwards one way and sank into the mass the other).
+    // Each tread top meets the walk surface at its back edge plus a hair,
+    // stepping down in eight fine treads, so feet stay within a third of a
+    // yard of the visible stone; the wedge beneath carries the cut's sides
+    // down to a buried base so the ramp reads solid from every angle.
     for (const cut of WARD_STEPS) {
       const cx = (cut.x0 + cut.x1) / 2;
-      // kcasStairsWide climbs toward -z at rot 0 (the wall-flight foot treads
-      // below set the convention: rot PI climbs +z, -PI/2 climbs +x). This cut
-      // rises from the bailey at z1+run UP to the terrace at z1, i.e. toward -z,
-      // so the tread faces must point -z; the authored PI had the whole flight
-      // reversed (players read the steps as leading the wrong way off the
-      // terrace). The wedge below is symmetric, so only the mesh yaw was wrong.
-      // Nudged a touch south (+z, toward the bailey) off the terrace edge so the
-      // flight's high back no longer buries itself in the terrace face.
-      put('kcasStairsWide', {
-        x: cx,
-        y: padY,
-        z: w.z1 + WARD_STEP_RUN / 2 + WARD_STEP_MESH_PUSH,
-        rot: 0,
-        s: 0.62,
-      });
+      const width = cut.x1 - cut.x0;
+      const treads = 8;
+      const run = WARD_STEP_RUN / treads;
+      const drop = (w.h - padY) / treads;
+      for (let ti = 0; ti < treads; ti++) {
+        const zBack = w.z1 + ti * run;
+        const topY = w.h - ti * drop + 0.04;
+        slab(cx, zBack + run / 2, width, run + 0.06, topY, 0.42);
+      }
       const z0 = w.z1;
       const z1 = w.z1 + WARD_STEP_RUN;
       const base = padY - 0.4;
@@ -511,20 +505,28 @@ export function buildCastleFeatures(): CastleFeaturesView {
   // the decorProps path) ----
   {
     const kx = 421;
-    const kz = 2003;
-    put('hexrTowerA', { x: kx - 5.5, y: wardY + 21, z: kz - 4.5, rot: 0.4, s: 5 });
-    put('hexrTowerA', { x: kx + 5.5, y: wardY + 24, z: kz + 4.5, rot: 2.2, s: 5 });
-    put('hexrTowerA', { x: kx, y: wardY + 29, z: kz, rot: 1.1, s: 5.5 });
-    put('kcasBannerRedTriple', { x: kx, y: wardY + 41, z: kz + 1.2, rot: Math.PI, s: 1.6 });
+    const kz = 2001.5;
+    // the side turrets tuck INTO the keep's upper mass (small offsets, low
+    // seats) so they read as corbelled bartizans, not floating drums; a
+    // stone corbel block bridges each one into the keep body (seats track
+    // the keep's 9.5 scale)
+    put('hexrTowerA', { x: kx - 3.4, y: wardY + 17.5, z: kz - 2.8, rot: 0.4, s: 4.6 });
+    put('hexrTowerA', { x: kx + 3.4, y: wardY + 19.5, z: kz + 2.8, rot: 2.2, s: 4.6 });
+    put('hexrTowerA', { x: kx, y: wardY + 26.5, z: kz, rot: 1.1, s: 5.4 });
+    slab(kx - 3.4, kz - 2.8, 3.6, 3.6, wardY + 18.2, 2.4, stoneMat);
+    slab(kx + 3.4, kz + 2.8, 3.6, 3.6, wardY + 20.2, 2.4, stoneMat);
+    put('kcasBannerRedTriple', { x: kx, y: wardY + 38.5, z: kz + 1.2, rot: Math.PI, s: 1.6 });
   }
 
   // ---- gate dressing ----
   const gm = (CASTLE_GATES.main.a0 + CASTLE_GATES.main.a1) / 2;
   for (const side of [-1, 1] as const) {
+    // the pillar module is a full 7yd wall piece at this scale: its center
+    // stays far enough out that its ends clear the walkable gate span
     put('kcasWallPillar', {
       x: CASTLE.wx0,
       y: padY,
-      z: gm + side * (M / 2 + 1.3),
+      z: gm + side * (M / 2 + 2.4),
       rot: Math.PI / 2,
     });
     put('kcasBannerRedA', {
@@ -567,7 +569,9 @@ export function buildCastleFeatures(): CastleFeaturesView {
     for (let k = 0; k < n; k++) {
       const cz = b.z0 + 2 + k * 4;
       if (cz > CASTLE_GATES.outer.a0 - 2.2 && cz < CASTLE_GATES.outer.a1 + 2.2) {
-        put('kcasWallDoorway', { x: b.x, y: padY, z: om, rot: Math.PI / 2, s: 1 });
+        // the doorway stays ON its grid slot center so the wall run stays
+        // sealed; the walkable span is centered on the slot (castle_layout)
+        put('kcasWallDoorway', { x: b.x, y: padY, z: cz, rot: Math.PI / 2, s: 1 });
         continue;
       }
       put('kcasWall', { x: b.x, y: padY, z: cz, rot: Math.PI / 2, s: 1 });
@@ -621,26 +625,31 @@ export function buildCastleFeatures(): CastleFeaturesView {
     const g = GARDEN;
     const gs = 0.75; // wall piece: 1.5 long, 3 tall (tops at abs 9)
     const inGap = (v: number): boolean =>
-      g.gates.some((gap) => v > gap.a0 - 0.8 && v < gap.a1 + 0.8);
-    for (let cx = g.x0 + 0.75; cx <= g.x1 - 0.75; cx += 1.5) {
-      if (inGap(cx)) continue;
-      put('kcasWallHalf', { x: cx, y: padY, z: g.wallZ, rot: 0, s: gs });
+      g.gates.some((gap) => v > gap.a0 - 0.7 && v < gap.a1 + 0.7);
+    // south wall: fixed piece count with the last piece clamped flush to
+    // x1, so the render covers the whole lift span (73 is not a multiple
+    // of 1.5 and an open tail reads as an invisible wall)
+    {
+      const n = Math.ceil((g.x1 - g.x0) / 1.5);
+      for (let k = 0; k < n; k++) {
+        const cx = Math.min(g.x0 + 0.75 + k * 1.5, g.x1 - 0.75);
+        if (inGap(cx)) continue;
+        put('kcasWallHalf', { x: cx, y: padY, z: g.wallZ, rot: 0, s: gs });
+      }
     }
+    // end returns: start flush against the rendered curtain face and run
+    // to the south wall line
     for (const rx of [g.x0, g.x1]) {
-      for (let cz = CASTLE.wz1 + 2.4; cz <= g.wallZ - 0.7; cz += 1.5) {
+      const rz0 = CASTLE.wz1 + 1.6;
+      const n = Math.ceil((g.wallZ - rz0) / 1.5);
+      for (let k = 0; k < n; k++) {
+        const cz = Math.min(rz0 + 0.75 + k * 1.5, g.wallZ - 0.75);
         put('kcasWallHalf', { x: rx, y: padY, z: cz, rot: Math.PI / 2, s: gs });
       }
     }
+    // doorway dressing: torchlight only (the wall pillar module is a full
+    // 4yd wall piece and would visually seal the walkable gap)
     for (const gap of g.gates) {
-      for (const side of [-1, 1] as const) {
-        put('kcasWallPillar', {
-          x: side === -1 ? gap.a0 - 0.4 : gap.a1 + 0.4,
-          y: padY,
-          z: g.wallZ,
-          rot: 0,
-          s: 0.9,
-        });
-      }
       put('kcasTorch', {
         x: (gap.a0 + gap.a1) / 2 + 1.4,
         y: padY,
@@ -713,17 +722,9 @@ export function buildCastleFeatures(): CastleFeaturesView {
     mesh.castShadow = true;
     mesh.receiveShadow = true;
     group.add(mesh);
-    if (rmp.h0 <= padY + 0.1) {
-      const fx = rmp.axis === 'x' ? rmp.a0 - 1.2 : (rmp.b0 + rmp.b1) / 2;
-      const fz = rmp.axis === 'x' ? (rmp.b0 + rmp.b1) / 2 : rmp.a0 - 1.2;
-      put('kcasStairsWide', {
-        x: fx,
-        y: padY,
-        z: fz,
-        rot: rmp.axis === 'x' ? -Math.PI / 2 : Math.PI,
-        s: 0.62,
-      });
-    }
+    // no foot tread pieces: the stairs module is wider than the flight
+    // bands and its treads fought the wedge's own slope; the solid pier
+    // reads as the stair
   }
 
   // ---- the bailey court: a tiled plaza south of the ward steps, torches
@@ -755,6 +756,21 @@ export function buildCastleFeatures(): CastleFeaturesView {
   glowLights.push(gateLight);
   group.add(gateLight);
 
+  // ---- the outside climbing chain: each shelf is a real standable
+  // collider, so it must be drawn or a player vaults onto thin air ----
+  for (const l of CASTLE_WALL_LEDGES) {
+    const thick = 0.45;
+    slab(l.x, l.z, l.hw * 2, l.hd * 2, l.top, thick);
+    const corbel = new THREE.Mesh(
+      castleStoneBox(l.hw * 1.1, l.top - thick - padY, l.hd * 1.1),
+      capMat,
+    );
+    corbel.position.set(l.x, padY + (l.top - thick - padY) / 2, l.z);
+    corbel.castShadow = true;
+    corbel.receiveShadow = true;
+    group.add(corbel);
+  }
+
   // ---- instance every placed piece ----
   const m4 = new THREE.Matrix4();
   const q = new THREE.Quaternion();
@@ -765,7 +781,10 @@ export function buildCastleFeatures(): CastleFeaturesView {
     const scene = castleScenes[key];
     if (!scene || list.length === 0) continue;
     for (const part of extractParts(scene, SKIP_PARTS[key])) {
-      const mesh = new THREE.InstancedMesh(part.geo, part.mat, list.length);
+      // banner cloth is one-sided in the kit and must read from the field
+      // outside the walls too, not only from the bailey (castle_kit rule)
+      const mat = isBannerKey(key) ? bannerClothMaterial(part.mat) : part.mat;
+      const mesh = new THREE.InstancedMesh(part.geo, mat, list.length);
       list.forEach((p, i) => {
         const s = p.s ?? S;
         q.setFromAxisAngle(up, p.rot);

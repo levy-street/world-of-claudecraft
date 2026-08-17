@@ -593,7 +593,8 @@ default-remap changes out-of-box visuals for M-series users (Decision 2: accepte
 ### Packet 5: Graphics settings rationalization (the audit)
 
 - Fix inverted knobs so LOW never covers more than MEDIUM: fogFar 520 -> at most 470,
-  grassRadius 80 -> at most 76 (fairness-reviewed; sightline-parity rule respected), and
+  grassRadius 80 -> LANDED at 72 in the desktop-client-update phase 5 (fairness
+  re-verified there: grass is non-occluding, sightline-parity rule respected), and
   align LOW's grass chunk cache (96) with medium's 128 to stop LOW-only rebuild churn.
 - Delete dead config: msaaSamples, LOW's unused shadowMap row, dead constrained shadow
   values; align the governor budget constants across tiers where unjustified.

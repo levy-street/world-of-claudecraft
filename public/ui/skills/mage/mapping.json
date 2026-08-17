@@ -6,7 +6,8 @@
     "pyromancer (fire)",
     "cryomancer (frost)",
     "lightning-mage (arcane)",
-    "aeromancer (unused \u2014 mage has no wind)"
+    "aeromancer (unused - mage has no wind)",
+    "OpenAI built-in image generation (release v0.39 second-pass legacy repaint cohort, 2026-08-16)"
   ],
   "runtimeDir": "public/ui/skills/mage",
   "abilities": [
@@ -42,9 +43,66 @@
     },
     {
       "abilityId": "conjure_water",
-      "sourcePack": "cryomancer",
-      "sourceFile": "34.png",
-      "output": "conjure_water.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/mage_conjure_water.png",
+      "output": "conjure_water.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-warrior-warlock-mage.json",
+      "intendedVisualSubject": "one ornate stoppered glass bottle condensing from a broad violet spell ring, filled with radiant pure cobalt water; two thick water ribbons spiral into the neck and a second smaller bottle silhouette is suggested in the glow behind it.",
+      "references": [
+        {
+          "path": "public/ui/items/conjured_water4.webp",
+          "role": "approved associated item: live stoppered bottle, brilliant water, glass shape"
+        },
+        {
+          "path": "public/ui/skills/mage/warded.webp",
+          "role": "approved sibling: luminous blue Arcane geometry and premium texture"
+        },
+        {
+          "path": "public/ui/skills/mage/arcane_power.webp",
+          "role": "approved sibling: violet spell-circle energy and class consistency"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: 128x128 Mage conjuration action-bar icon, brand-new replacement painting\nPrimary request: Paint Waterbind, a three-second Arcane cast that conjures two bottles of mana-restoring water; higher ranks create purer water.\nInput images: Image 1 (Conjured Water rank 4): approved associated-item reference for the live stoppered bottle, brilliant blue water, and glass shape. Image 2 (Warded): approved sibling reference for luminous blue Arcane geometry and premium magical texture. Image 3 (Arcane Power): approved sibling reference for violet spell-circle energy and class consistency.\nSubject: one ornate stoppered glass bottle condensing from a broad violet spell ring, filled with radiant pure cobalt water; two thick water ribbons spiral into the neck and a second smaller bottle silhouette is suggested in the glow behind it.\nScene/backdrop: fully painted midnight-blue Arcane mist to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG utility art; luminous glass and liquid, dimensional magic, strong original silhouette.\nComposition/framing: square, main bottle fills 70-75%, ring and ribbons inside circular safe crop, readable at 16/32/48 px.\nLighting/mood: crystalline cyan, cobalt, rich violet; pure, refreshing, magical.\nConstraints: opaque, borderless; no text, letters, numbers, readable runes, UI frame, badge, bevel, watermark, laboratory test tube, potion label, flat glyph, or copied sibling composition.\nAvoid: ice block, wine bottle, many tiny containers, transparent checkerboard, pale background, low contrast.",
+      "sourceSha256": "850e28dfee95abc877ff542c95dc99d278c7edaa5eb5547f0fb6b4ec659d9746",
+      "sourceBytes": 2521225,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "9df97093e7bcfe40040dbc0433b1332820be839fe46e078395ef065e8df4b824",
+      "acceptedBytes": 5964,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "cryomancer",
+        "sourceFile": "34.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "conjure_water.webp",
+        "shippingSha256": "b84ea5c567c043472467f88b7a4f0dcaba36ee9a687ba37caf752ab87c1c8ffd",
+        "shippingBytes": 4074,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "fire_blast",
@@ -90,15 +148,133 @@
     },
     {
       "abilityId": "conjure_food",
-      "sourcePack": "_Missing_Mage",
-      "sourceFile": "11.png",
-      "output": "conjure_food.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/mage_conjure_food.png",
+      "output": "conjure_food.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-warrior-warlock-mage.json",
+      "intendedVisualSubject": "one hearty golden round loaf materializing above an open dark-gloved hand, with two thick bread slices separating from it inside a broad violet-blue arcane spiral; sparkling flour motes become solid crust near the center.",
+      "references": [
+        {
+          "path": "public/ui/items/conjured_bread4.webp",
+          "role": "approved associated item: live golden loaf crust, score marks, food identity"
+        },
+        {
+          "path": "public/ui/skills/mage/arcane_power.webp",
+          "role": "approved sibling: violet spell circles and Mage-class glow"
+        },
+        {
+          "path": "public/ui/skills/mage/spellsteal.webp",
+          "role": "approved sibling: dark-gloved casting hand and blue-violet finish"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: 128x128 Mage conjuration action-bar icon, brand-new replacement painting\nPrimary request: Paint Breadbind, a three-second Arcane cast that conjures two servings of bread; higher ranks create heartier fare.\nInput images: Image 1 (Conjured Bread rank 4): approved associated-item reference for the live golden loaf's crust, score marks, and warm food identity. Image 2 (Arcane Power): approved sibling reference for concentrated violet spell circles and Mage-class glow. Image 3 (Spellsteal): approved sibling reference for a dark-gloved casting hand and blue-violet magic finish.\nSubject: one hearty golden round loaf materializing above an open dark-gloved hand, with two thick bread slices separating from it inside a broad violet-blue arcane spiral; sparkling flour motes become solid crust near the center.\nScene/backdrop: fully painted midnight-blue magical haze to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG utility art; appetizing bread texture, dimensional Arcane energy, crisp original silhouette.\nComposition/framing: square, loaf and two slices fill 72-78%, hand secondary, safe circular crop, readable at 16/32/48 px.\nLighting/mood: warm bakery gold against cool violet and cobalt; wondrous, sustaining, arcane.\nConstraints: opaque, borderless; no text, letters, numbers, runic writing, UI frame, badge, bevel, watermark, plate, picnic, cartoon food, flat glyph, or copied sibling composition.\nAvoid: croissant, meat, many tiny loaves, white background, low contrast.",
+      "sourceSha256": "1174feaeb8850134f3e07015a5bd2014ce360e5e0d2dd5359aec629ff77db169",
+      "sourceBytes": 2429317,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "5105ef160bc559e729deb41efa7586c068cc2bf4740f12e1f2412e4d50233bbd",
+      "acceptedBytes": 4422,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "_Missing_Mage",
+        "sourceFile": "11.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "conjure_food.webp",
+        "shippingSha256": "7cae820108954f9fb1b765365a06943e6ba6f2c5d9e6118044aef34be50b45af",
+        "shippingBytes": 3172,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "polymorph",
-      "sourcePack": "_Missing_Mage",
-      "sourceFile": "32.png",
-      "output": "polymorph.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/mage_polymorph.png",
+      "output": "polymorph.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-warrior-warlock-mage.json",
+      "intendedVisualSubject": "one unmistakable squat green TOAD seated front-facing, broad mouth and amber eyes, caught mid-transformation inside a violet-white Arcane spiral; a few fading black-iron armor fragments dissolve into sparkles around it, showing an enemy changed into the toad.",
+      "references": [
+        {
+          "path": "public/ui/mobs/bogtoad.webp",
+          "role": "approved repository anatomy: squat green toad head and broad mouth"
+        },
+        {
+          "path": "public/ui/items/reins_shadowjump_toad.webp",
+          "role": "approved repository anatomy/material: full seated fantasy toad; ignore saddle and hat"
+        },
+        {
+          "path": "public/ui/skills/mage/snap_polymorph.webp",
+          "role": "approved sibling: violet transformation burst and Mage finish"
+        },
+        {
+          "path": "public/ui/skills/mage/arcane_power.webp",
+          "role": "approved sibling: concentrated arcane ring energy"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: 128x128 Mage crowd-control action-bar icon, brand-new replacement painting\nPrimary request: Paint Bewitch, the live Polymorph spell that transforms a beast or humanoid enemy into a TOAD for up to 15-20 seconds; the toad wanders, heals rapidly, and any damage breaks the effect.\nInput images: Image 1 (Bogtoad portrait): approved repository anatomy reference for the live squat green toad head and broad mouth. Image 2 (Shadow-Jump Toad reins): approved repository anatomy/material reference for a full seated fantasy toad; ignore its saddle and hat. Image 3 (Snap Polymorph): approved sibling reference for violet transformation burst and Mage finish. Image 4 (Arcane Power): approved sibling reference for concentrated arcane ring energy.\nSubject: one unmistakable squat green TOAD seated front-facing, broad mouth and amber eyes, caught mid-transformation inside a violet-white Arcane spiral; a few fading black-iron armor fragments dissolve into sparkles around it, showing an enemy changed into the toad.\nScene/backdrop: fully painted midnight-violet magical haze to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG crowd-control art; tactile warty toad skin, dimensional spell light, charming but not childish, original design.\nComposition/framing: square, toad head and body fill about 72%, face centered, magic spiral and armor fragments within circular safe crop, readable at 16/32/48 px.\nLighting/mood: luminous violet and blue-white magic around moss-green skin and amber eyes; uncanny, mischievous, controlled.\nConstraints: opaque, borderless; depict a TOAD, not a monkey, sheep, alpaca, cat, or generic frog mascot; no text, letters, numbers, UI frame, badge, bevel, watermark, saddle, hat, flat glyph, or copied sibling composition.\nAvoid: monkey, sheep, baby animal, cartoon sticker, long-legged tree frog, photoreal nature photo, low contrast.",
+      "sourceSha256": "742aa8ec6a15ad927b26961228a5fc6dce4e06ab917387da0eb8c53f87f55833",
+      "sourceBytes": 2755487,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "a409ba425954a0a36f190f2722d4a07d157c2cbd673e9f4627591fb7955565af",
+      "acceptedBytes": 6504,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "_Missing_Mage",
+        "sourceFile": "32.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "polymorph.webp",
+        "shippingSha256": "771745943629981de79e85f8d48d6aeecd6829df2aee7f685525c98a05f78685",
+        "shippingBytes": 4326,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "counterspell",
@@ -502,5 +678,5 @@
     }
   ],
   "deferredStayProcedural": [],
-  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 entries are project-generated and explicitly override it."
+  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 and woc_openai_release_v039_icon_art_second_pass_2026_08_16 entries are project-generated and explicitly override it."
 }

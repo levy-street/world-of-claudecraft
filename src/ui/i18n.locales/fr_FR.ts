@@ -6389,7 +6389,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "L'ennemi est assailli par une nuée d'insectes, subissant {damage} points de dégâts de Nature sur 12 s.",
   'entities.abilities.tigers_fury.name': 'Sang de loup',
   'entities.abilities.tigers_fury.description':
-    "Augmente la puissance d'attaque de {buff} pendant {duration} s. Forme de loup uniquement.",
+    "Libère {rage} points d'énergie et augmente la puissance d'attaque de {buff} pendant {duration} s. Forme de loup uniquement.",
   'entities.abilities.rip.name': 'Faille sanglante',
   'entities.abilities.mortal_strike.name': 'Frappe mutilante',
   'entities.abilities.mortal_strike.description':
@@ -6433,7 +6433,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Démoralise les ennemis proches, réduisant leur puissance d'attaque de 20 pendant 20 s. Forme de Bruin uniquement.",
   'entities.abilities.prowl.name': 'Traquer',
   'entities.abilities.prowl.description':
-    'Passe en camouflage tant que vous êtes en forme de loup, avec une vitesse de déplacement réduite de 50%. Inutilisable en combat.',
+    'Passe en camouflage tant que vous êtes en forme de loup, avec une vitesse de déplacement réduite de 5%. Inutilisable en combat.',
   'entities.abilities.rake.name': 'Écorcher',
   'entities.abilities.revive_pet.name': 'Rafistoler',
   'entities.abilities.revive_pet.description':
@@ -11440,7 +11440,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description': 'Immobilise les ennemis dans un rayon de 4 m autour du point visé pendant 2 s, puis les ralentit de 40% pendant 6 s. (Talent de chaman)',
   'entities.abilities.evocation.description': 'Restaura mana rápidamente. (talent de mage)',
   'entities.abilities.frenzied_regeneration.description':
-    "Rend 180 points de vie en 10 s. Forme d'ours uniquement. (talent de Druide)",
+    "Rend 40% de vos points de vie maximum en 10 s. Forme d'ours uniquement. (talent de Druide)",
   'entities.abilities.frost_trap.description':
     "Gèle les ennemis dans la zone ciblée pendant 3 s, les empêchant de se déplacer et d'agir. (talent de Chasseur)",
   'entities.abilities.hammer_of_wrath.description': "Lance un marteau sacré pour {damage} points de dégâts et génère 1 Dévotion. Utilisable sous 20% de points de vie, ou pendant Ascension divine ou Colère vengeresse. Courroux de l'aube accorde une utilisation supplémentaire contre n'importe quelle cible, qui ignore son temps de recharge en cours et inflige 20% de dégâts en plus. Ascension augmente ses dégâts de 30%.",
@@ -12826,7 +12826,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Consomme 5 Verdoyance. Récolte chaque soin sur la durée que vous possédez sur tous les alliés pour 60% de ses soins restants, retire ces effets et plante une Floraison sauvage fraîche sur la cible.',
   'entities.abilities.redharvest.name': 'Moisson rouge',
   'entities.abilities.redharvest.description':
-    "Consomme vos 3 Sang ancien : frappe pour {damage}, inflige instantanément tous les dégâts que vos Écorcher et Lacération auraient encore infligés, retire les deux saignements et rend 30 points d'énergie. Fonctionne sans aucun point de combo.",
+    "Consomme vos 3 Sang ancien : frappe pour {damage}, inflige instantanément tous les dégâts que vos Écorcher et Lacération auraient encore infligés, retire les deux saignements et rend {rage} points d'énergie. Fonctionne sans aucun point de combo.",
   'entities.abilities.sunlance.name': 'Sillage solaire',
   'entities.abilities.sunlance.description':
     'Consomme vos 3 Marée lunaire pour une frappe de {damage} points de dégâts de Nature plus une brûlure de {overTime} sur 9 s, et rend 35 points de mana : le choix du mana. Déferlante lunaire consomme les mêmes 3 Marée lunaire, alors choisissez-en un.',
@@ -12956,7 +12956,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.description': 'Technique de finition qui expose la cible pendant 30 s : chaque point de combo dépensé réduit son armure de 2% (5 combo points : {damage}%).',
   'entities.abilities.faerie_fire.description': "Réduit l'armure de la cible de {damage}% pendant 40 s.",
   'entities.abilities.ferocious_bite.description': 'Technique de finition qui inflige {damage}. Forme de loup uniquement.',
-  'entities.abilities.ferocious_bite.specNote_feral': 'Chaque coup porté ajoute 1 Sang ancien ; à 3 Sang ancien, ce bouton devient Moisson rouge : une morsure pour 70 plus 43 par point de combo qui inflige aussi instantanément tous les dégâts que vos Écorcher et Lacération auraient encore infligés, et restaure 30 énergie.',
+  'entities.abilities.ferocious_bite.specNote_feral': 'Chaque coup porté ajoute 1 Sang ancien ; à 3 Sang ancien, ce bouton devient Moisson rouge, qui consomme le Sang ancien pour une frappe plus puissante qui inflige aussi instantanément tous les dégâts que vos Écorcher et Lacération auraient encore infligés, et restaure de l’énergie.',
   'entities.abilities.funeral_harvest.description': "Quand un ennemi récemment endommagé par vous ou vos morts-vivants meurt, vous gagnez 1 Fragment d'âme. Cela peut se produire une fois toutes les 3 s.",
   'entities.abilities.funeral_harvest.name': 'Moisson funéraire',
   'entities.abilities.garrote.description': "Enroule un fil autour de la gorge de l'ennemi, infligeant {damage} points de dégâts immédiatement et le faisant saigner pour {overTime} sur 18 s. Camouflage requis. Confère 1 point de combo.",
@@ -13376,4 +13376,26 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'auth.designCodeErrVersion': 'Ce code d\'apparence provient d\'une version plus récente du jeu.',
   'auth.designCodeErrMalformed': 'Ce code d\'apparence est endommagé. Copiez le code en entier et réessayez.',
   'hudChrome.nameplate.cheaterTag': '< Tricheur >',
+  'hud.options.displayMode': 'Mode d\'affichage',
+  'hud.options.displayModeBorderless': 'Plein écran sans bordure',
+  'hud.options.displayModeWindowed': 'Fenêtré',
+  'hudChrome.options.discordPresence': 'Présence enrichie Discord',
+  'hudChrome.options.discordPresenceNote':
+    'Affiche la zone où vous vous trouvez et depuis combien de temps vous jouez cette session comme votre activité Discord, et toute personne pouvant voir votre profil Discord peut voir les deux. Seuls le nom de la zone, votre temps de session et le jeu sont partagés, jamais votre personnage, votre compte, ou avec qui vous jouez. Nécessite que l\'application Discord soit lancée sur cet ordinateur.',
+  'hudChrome.options.forceHighPerfGpu': 'Utiliser le GPU de jeu dédié',
+  'hudChrome.options.forceHighPerfGpuNote':
+    'Activé par défaut : l\'application de bureau demande à cet ordinateur son GPU de jeu dédié. Désactivez cette option si le jeu ne démarre pas, s\'ouvre sur un écran noir, ou si l\'écran de l\'ordinateur portable reste éteint. Prend effet au prochain démarrage du jeu.',
+  'desktop.notify.partyInviteBody': '{name} vous invite à rejoindre son groupe.',
+  'desktop.notify.partyInviteTitle': 'Invitation de groupe',
+  'desktop.notify.updateReadyBody': 'Redémarrez World of ClaudeCraft pour appliquer la mise à jour.',
+  'desktop.notify.updateReadyTitle': 'La mise à jour {version} est prête',
+  'desktop.notify.updateReadyTitleNoVersion': 'La mise à jour est prête',
+  'desktop.update.whatsNew': 'Voir les changements dans votre navigateur',
+  'entities.abilities.challenging_roar.description':
+    'Un rugissement funeste : chaque ennemi dans un rayon de 10 mètres est provoqué, sa menace envers vous rejoignant celle de son ennemi le plus haï, et il est forcé de vous attaquer pendant 3 s. Forme de Bruin uniquement.',
+  'entities.abilities.challenging_roar.name': 'Rugissement funeste',
+  'entities.abilities.cheap_shot.descriptionNoStealth':
+    'Frappe la cible pour {damage} points de dégâts, l\'étourdissant pendant 4 s. Confère 2 points de combo.',
+  'gpuNotice.bodyDiscreteInactive':
+    'Le jeu n\'utilise pas le GPU de jeu dédié et fonctionne à la place sur le GPU intégré (économie d\'énergie), ce qui nuira aux performances. Mettez à jour vos pilotes graphiques, puis redémarrez le jeu. Sous Windows, définissez également le jeu sur Performances élevées dans Paramètres, Système, Affichage, Graphiques.',
 };

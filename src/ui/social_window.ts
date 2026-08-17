@@ -174,9 +174,9 @@ export function guildMemberRowHtml(m: GuildRow, now: number): string {
   if (m.canTransfer)
     actions += `<button type="button" class="soc-x" data-act="gtransfer" data-name="${esc(m.name)}" title="${esc(t('hud.social.makeGuildMasterTitle', { name: m.name }))}">${svgIcon('crown')}</button>`;
   if (m.canPromote)
-    actions += `<button type="button" class="soc-x" data-act="promote" data-name="${esc(m.name)}" title="${esc(t('hud.social.promoteTitle', { name: m.name }))}">▲</button>`;
+    actions += `<button type="button" class="soc-x" data-act="promote" data-name="${esc(m.name)}" title="${esc(t('hud.social.promoteTitle', { name: m.name }))}">${svgIcon('promote')}</button>`;
   if (m.canDemote)
-    actions += `<button type="button" class="soc-x" data-act="demote" data-name="${esc(m.name)}" title="${esc(t('hud.social.demoteTitle', { name: m.name }))}">▼</button>`;
+    actions += `<button type="button" class="soc-x" data-act="demote" data-name="${esc(m.name)}" title="${esc(t('hud.social.demoteTitle', { name: m.name }))}">${svgIcon('demote')}</button>`;
   if (m.canKick)
     actions += `<button type="button" class="soc-x" data-act="gkick" data-name="${esc(m.name)}" title="${esc(t('hud.social.removeGuildTitle', { name: m.name }))}">${svgIcon('close')}</button>`;
   const tip = esc(dotTitle(m.online, m.status, m.zone));

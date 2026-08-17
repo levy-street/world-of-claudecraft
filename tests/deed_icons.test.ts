@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { DEED_ORDER, DEEDS } from '../src/sim/content/deeds';
 import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
 import { DEED_BESPOKE_CRESTS, deedCrestId } from '../src/ui/deeds_view';
-import { DEED_ART_PENDING, deedImageUrl, iconDataUrl } from '../src/ui/icons';
+import { DEED_ART_PENDING, deedImageUrl, hasCrestRecipe, iconDataUrl } from '../src/ui/icons';
 
 // Gate for the committed Book of Deeds WebP icons (mirror of tests/skill_icons.test.ts and
 // tests/item_icons.test.ts). Art under public/ui/deeds/<deed_id>.webp is the source of truth
@@ -359,13 +359,27 @@ describe('Book of Deeds webp icons', () => {
     }
   });
 
-  it('resolves every live deed to its own painted WebP with no release art debt', () => {
+  it('resolves every painted deed to its WebP; artless deeds sit in the pinned pending set', () => {
     const artless = DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id));
-    expect(DEED_ART_PENDING_IDS, 'release-live deed art debt must stay empty').toEqual([]);
-    expect(artless, 'every release-live deed must have painted art').toEqual([]);
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(271);
-    expect(DEED_IMAGE_IDS.size, 'every live deed is painted').toBe(271);
-    for (const id of DEED_ORDER) {
+    expect(artless, 'only the pinned art-pending deeds may lack painted art').toEqual([
+      ...DEED_ART_PENDING_IDS,
+    ]);
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(273);
+    expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(271);
+    for (const id of artless) {
+      const catCrestId = deedCrestId(id, DEEDS[id].category);
+      expect(catCrestId, `${id} must fall back to a category base crest`).toMatch(/^deed_cat_/);
+      expect(
+        hasCrestRecipe(catCrestId),
+        `${id} -> ${catCrestId} must be a real procedural recipe, not the generic fallback`,
+      ).toBe(true);
+      expect(
+        deedImageUrl(catCrestId),
+        `${id} -> ${catCrestId} must have no committed image`,
+      ).toBeNull();
+      expect(deedImageUrl(`deed_${id}`), `${id} itself must have no committed image`).toBeNull();
+    }
+    for (const id of DEED_ORDER.filter((liveId) => DEED_IMAGE_IDS.has(liveId))) {
       const crestId = deedCrestId(id, DEEDS[id].category);
       expect(crestId, `${id} must keep its bespoke crest identity`).toBe(`deed_${id}`);
       expect(deedImageUrl(crestId), id).toBe(`/ui/deeds/${id}.webp`);

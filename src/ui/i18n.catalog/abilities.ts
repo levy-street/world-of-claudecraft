@@ -1144,7 +1144,7 @@ const classAbilityNamesEn = {
       [
         'recall_the_fallen',
         'Recall the Fallen',
-        'Returns a dead group member to life with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group.',
+        'Returns a dead group member to life at your side with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group within 30 yards and in your line of sight.',
       ],
       [
         'beacon_of_light',
@@ -1682,7 +1682,7 @@ const classAbilityNamesEn = {
         'Finishing move that causes {damage}. Wolf Form only.',
         {
           feral:
-            'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: a bite for 70 plus 43 per combo point that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores 30 energy.',
+            'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest, which spends the Old Blood for a stronger strike that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores energy.',
         },
       ],
       [
@@ -1749,7 +1749,7 @@ const classAbilityNamesEn = {
       [
         'tigers_fury',
         'Wolfsblood',
-        'Increases attack power by {buff} for {duration} sec. Wolf Form only.',
+        'Surges {rage} energy and increases attack power by {buff} for {duration} sec. Wolf Form only.',
       ],
       [
         'rip',
@@ -2025,7 +2025,7 @@ const classAbilityNamesEn = {
       [
         'redharvest',
         'Redharvest',
-        'Spends your 3 Old Blood: strike for {damage}, instantly deal all the damage your Flense and Bloodrift would still have dealt, remove both bleeds, and restore 30 energy. Works with zero combo points.',
+        'Spends your 3 Old Blood: strike for {damage}, instantly deal all the damage your Flense and Bloodrift would still have dealt, remove both bleeds, and restore {rage} energy. Works with zero combo points.',
       ],
       [
         'marrowbreak',
@@ -2323,7 +2323,7 @@ const classAbilityNamesEn = {
       [
         'frenzied_regeneration',
         'Savage Mending',
-        'Restores 180 health over 10 sec. Bruin Form only.',
+        'Restores 40% of your maximum health over 10 sec. Bruin Form only.',
       ],
       [
         'frost_trap',
@@ -2405,17 +2405,17 @@ const classAbilityNamesEn = {
       [
         'temporal_reversal',
         'Temporal Reversal',
-        "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)",
+        "Rewinds a fallen ally's timeline, returning them to life at your side with 35% of their health and mana, even in the thick of combat. (Chronomancy)",
       ],
       [
         'collective_reversal',
         'Collective Reversal',
-        'Rewinds every fallen member of your group or raid, returning them to life at their body with 30% health and mana. Cannot be cast in combat. (Chronomancy)',
+        'Rewinds every fallen member of your group or raid within 40 yards and in your line of sight, returning them to life at your side with 30% health and mana. Cannot be cast in combat. (Chronomancy)',
       ],
       [
         'ancestor_return',
         "Ancestors' Return",
-        'Call every fallen member of your group or raid back to life at their body with 30% health and mana. Cannot be cast in combat. (Spiritmend)',
+        'Call every fallen member of your group or raid within 40 yards and in your line of sight back to your side with 30% health and mana. Cannot be cast in combat. (Spiritmend)',
       ],
       [
         'temporal_rewind',

@@ -1,11 +1,12 @@
 {
   "class": "warlock",
-  "license": "Mixed: CraftPix premium for legacy entries; project-owned OpenAI-generated art for generatedBatches",
+  "license": "Mixed: CraftPix premium for legacy entries; project-owned OpenAI-generated art for generatedBatches and entries with an explicit project license",
   "iconSize": 128,
   "sourcePacks": [
     "tmp/asset_src/warlock-skill-icons",
     "tmp/asset_src/demon-skill-icons (summons + life_tap/searing_pain)",
-    "OpenAI image generation (Warlock spell and talent completion, 2026-08-01)"
+    "OpenAI image generation (Warlock spell and talent completion, 2026-08-01)",
+    "OpenAI built-in image generation (release v0.39 second-pass legacy repaint cohort, 2026-08-16)"
   ],
   "runtimeDir": "public/ui/skills/warlock",
   "abilities": [
@@ -72,21 +73,196 @@
     },
     {
       "abilityId": "summon_succubus",
-      "sourcePack": "warlock",
-      "sourceFile": "48.png",
-      "output": "summon_succubus.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warlock_summon_succubus.png",
+      "output": "summon_succubus.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-warrior-warlock-mage.json",
+      "intendedVisualSubject": "one sleek Duskborn demon springing through a crescent violet portal, with narrow swept horns, two folded batlike wings, black-magenta plated skin, and a single long crescent foreclaw cutting a bright pink afterimage; athletic and predatory, not sexualized.",
+      "references": [
+        {
+          "path": "public/ui/skills/warlock/raise_gravewing.webp",
+          "role": "approved sibling: premium wing silhouette and violet summoning energy"
+        },
+        {
+          "path": "public/ui/skills/warlock/summon_imp.webp",
+          "role": "approved sibling: agile demon horns and class palette"
+        },
+        {
+          "path": "public/ui/skills/warlock/hour_of_judgment.webp",
+          "role": "approved sibling: violet-black radial portal finish"
+        },
+        {
+          "path": "public/ui/skills/warlock/needle_of_fate.webp",
+          "role": "approved sibling: magenta weapon-light and speed lines"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: 128x128 Warlock demon-summon action-bar icon, brand-new replacement painting\nPrimary request: Paint Summon Duskborn, calling a fragile but extremely fast and hard-hitting melee demon.\nInput images: Image 1 (Raise Gravewing): approved sibling reference for premium wing silhouette and violet summoning energy. Image 2 (Summon Emberkin): approved sibling reference for a small agile demon's horns and class palette. Image 3 (Hour of Judgment): approved sibling reference for violet-black radial portal finish. Image 4 (Needle of Fate): approved sibling reference for sharp magenta weapon-light and speed lines.\nSubject: one sleek Duskborn demon springing through a crescent violet portal, with narrow swept horns, two folded batlike wings, black-magenta plated skin, and a single long crescent foreclaw cutting a bright pink afterimage; athletic and predatory, not sexualized.\nScene/backdrop: fully painted dusk-purple void smoke to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG summon art; agile original demon anatomy, sharp materials, luminous motion, strong silhouette.\nComposition/framing: square, dynamic upper-body lunge fills 75-80%, face and one claw centered, wings inside circular safe crop, readable at 16/32/48 px.\nLighting/mood: hot magenta claw light, violet portal, midnight black; swift, dangerous, ephemeral.\nConstraints: opaque, borderless; no text, letters, numbers, UI frame, badge, bevel, watermark, sexualized costume, human pin-up, whip, heart symbol, cute creature, flat glyph, or copied sibling composition.\nAvoid: stationary portrait, giant bulky tank, many limbs, pale skin, low contrast.",
+      "sourceSha256": "80916dcb9aba0a7e9adf5496d079317361fcb7a5ddd32c345459b1ceaa4c68a5",
+      "sourceBytes": 2243692,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "51a750f99334c4208be49bee256fa43331ef2849a966a97897c0976ba6d57ffc",
+      "acceptedBytes": 5134,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "warlock",
+        "sourceFile": "48.png",
+        "ownerOrLicense": "CraftPix premium legacy entry",
+        "inheritedClassLicense": "Mixed: CraftPix premium for legacy entries; project-owned OpenAI-generated art for generatedBatches",
+        "output": "summon_succubus.webp",
+        "shippingSha256": "43ddc3c529fa4db48044ef5ccf6e7244f9735cf92c652736b078482242845ec7",
+        "shippingBytes": 4372,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "summon_felhunter",
-      "sourcePack": "demon",
-      "sourceFile": "19.png",
-      "output": "summon_felhunter.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warlock_summon_felhunter.png",
+      "output": "summon_felhunter.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-warrior-warlock-mage.json",
+      "intendedVisualSubject": "one eyeless armored Spellhound lunging head-first through a violet summoning tear, with a long wedge-shaped jaw, four heavy fangs, swept-back sensory horns, and a bright blue-violet Gloombite building in its mouth; green runic veins hunt toward a small spell-glow at the edge.",
+      "references": [
+        {
+          "path": "public/ui/skills/warlock/evil_eye.webp",
+          "role": "approved sibling: focused violet occult sight and clean contrast"
+        },
+        {
+          "path": "public/ui/skills/warlock/soul_lance.webp",
+          "role": "approved sibling: blue-violet piercing spell energy"
+        },
+        {
+          "path": "public/ui/skills/warlock/cinderhide.webp",
+          "role": "approved sibling: infernal plated skin and acid-green fissures"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: 128x128 Warlock demon-summon action-bar icon, brand-new replacement painting\nPrimary request: Paint Summon Spellhound, calling a ranged demon that attacks with Gloombite and excels at hunting enemy spellcasters.\nInput images: Image 1 (Evil Eye): approved sibling reference for focused violet occult sight and clean Warlock contrast. Image 2 (Soul Lance): approved sibling reference for blue-violet piercing spell energy. Image 3 (Cinderhide): approved sibling reference for infernal plated skin and acid-green fissures.\nSubject: one eyeless armored Spellhound lunging head-first through a violet summoning tear, with a long wedge-shaped jaw, four heavy fangs, swept-back sensory horns, and a bright blue-violet Gloombite building in its mouth; green runic veins hunt toward a small spell-glow at the edge.\nScene/backdrop: fully painted abyss-black and indigo smoke to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG summon art; original quadrupedal demon anatomy, plated hide, luminous shadow magic, strong silhouette.\nComposition/framing: square, three-quarter hound head and fore-shoulders fill 78%, jaws centered, horns within circular safe crop, readable at 16/32/48 px.\nLighting/mood: blue-violet mouth core, acid-green veins, black armor; predatory, arcane-hunting, alien.\nConstraints: opaque, borderless; no text, letters, numbers, UI frame, badge, bevel, watermark, ordinary wolf, floating face, cute pet, flat glyph, or copied sibling composition.\nAvoid: cartoon grin, human demon, multiple heads, tiny teeth, red-only palette, low contrast.",
+      "sourceSha256": "7cdff051f68d8c9572c1979c1c078657a40fd61ee9b841af7e2f75ad57164c62",
+      "sourceBytes": 2367791,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "fe9f76981a4c8613c2482ee6e1fb91bfc375f5378d0cd7db162cacf189ceaff5",
+      "acceptedBytes": 4800,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "demon",
+        "sourceFile": "19.png",
+        "ownerOrLicense": "CraftPix premium legacy entry",
+        "inheritedClassLicense": "Mixed: CraftPix premium for legacy entries; project-owned OpenAI-generated art for generatedBatches",
+        "output": "summon_felhunter.webp",
+        "shippingSha256": "f73df7c8031455fa49fd7f77fba5d3fb6865f567bec684cc6b7650f67695948f",
+        "shippingBytes": 4144,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "summon_felguard",
-      "sourcePack": "demon",
-      "sourceFile": "25.png",
-      "output": "summon_felguard.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warlock_summon_felguard.png",
+      "output": "summon_felguard.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-warrior-warlock-mage.json",
+      "intendedVisualSubject": "one massive horned Warfiend rising chest-first through a violet summoning rift, shoulders encased in jagged black iron, one broad cleaver held close; thick acid-green cracks glow through its plated hide and its eyes burn white-violet.",
+      "references": [
+        {
+          "path": "public/ui/skills/warlock/cinderhide.webp",
+          "role": "approved sibling: infernal plated hide and acid-green fissure light"
+        },
+        {
+          "path": "public/ui/skills/warlock/summon_doomguard.webp",
+          "role": "approved sibling: demon emerging beneath violet summoning rings"
+        },
+        {
+          "path": "public/ui/skills/warlock/hour_of_judgment.webp",
+          "role": "approved sibling: violet-black radial energy and small-size silhouette"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: 128x128 Warlock demon-summon action-bar icon, brand-new replacement painting\nPrimary request: Paint Summon Warfiend, calling a durable melee demon that wades into battle and holds its own.\nInput images: Image 1 (Cinderhide): approved sibling reference for infernal plated-hide texture and acid-green fissure light. Image 2 (Summon Wraithborn): approved sibling reference for a demon emerging beneath violet summoning rings. Image 3 (Hour of Judgment): approved sibling reference for premium Warlock violet-black radial energy and crisp small-size silhouette.\nSubject: one massive horned Warfiend rising chest-first through a violet summoning rift, shoulders encased in jagged black iron, one broad cleaver held close; thick acid-green cracks glow through its plated hide and its eyes burn white-violet.\nScene/backdrop: fully painted abyss-black and smoky violet atmosphere to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG summon art; intimidating demon anatomy, heavy armor, dimensional portal light, original non-franchise design.\nComposition/framing: square, centered head/shoulders/cleaver cluster fills 78%, broad horns within circular safe crop, readable at 16/32/48 px.\nLighting/mood: violet portal, sickly green fissures, black iron; durable, brutal, obedient.\nConstraints: opaque, borderless; no text, letters, numbers, UI frame, badge, bevel, watermark, cute creature, full-body scene, flat glyph, or copied sibling composition.\nAvoid: red human warrior, skull-only face, oversized wings, tiny weapon, low contrast.",
+      "sourceSha256": "fab75d6b233b718a5105c09b0e16ebc668b8b0e120aebd8826ed4fac6ff336dc",
+      "sourceBytes": 2754672,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "d5c7aea76d3f051e72b0dcbbdaf67a024eb683d2a0c530ba6bd2bcb148c268ba",
+      "acceptedBytes": 6046,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "demon",
+        "sourceFile": "25.png",
+        "ownerOrLicense": "CraftPix premium legacy entry",
+        "inheritedClassLicense": "Mixed: CraftPix premium for legacy entries; project-owned OpenAI-generated art for generatedBatches",
+        "output": "summon_felguard.webp",
+        "shippingSha256": "86792cac6a199da2a82183481ac80e92d46ee9944d6367a884a8f45eaa3b16f4",
+        "shippingBytes": 4856,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "summon_infernal",
@@ -440,7 +616,7 @@
     }
   ],
   "deferredStayProcedural": {},
-  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 entries are project-generated and explicitly override it.",
+  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 and woc_openai_release_v039_icon_art_second_pass_2026_08_16 entries are project-generated and explicitly override it.",
   "generatedBatches": [
     {
       "name": "warlock-spell-completion",

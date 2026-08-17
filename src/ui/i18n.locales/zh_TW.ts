@@ -786,6 +786,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorial.nextTipQuestLog': '開啟任務日誌（{key}）尋找附近的下一個任務。',
   'hudChrome.tutorial.nextTipMap': '查看世界地圖（{key}）了解任務所在位置。',
   'hudChrome.tutorial.nextTipSocial': '開啟社交面板（{key}）尋找隊伍應對更強的戰鬥。',
+  'hudChrome.lastkeepMap.story.undercroft': '地下穹室',
+  'hudChrome.lastkeepMap.story.state': '正殿層',
+  'hudChrome.lastkeepMap.story.residence': '起居層',
+  'hudChrome.lastkeepMap.story.tower': '瞭望塔',
+  'hudChrome.dawnholdMap.story.ground': '庭園層',
+  'hudChrome.dawnholdMap.story.solar': '日光廳',
   'hudChrome.raidLockout.title': '團隊副本鎖定',
   'hudChrome.raidLockout.allReady': '所有團隊副本就緒',
   'hudChrome.raidLockout.daysHours': '{d}天{h}小時',
@@ -1262,6 +1268,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showWalletOnCharacterScreen': '在角色畫面顯示錢包',
   'hudChrome.options.showPlaytime': '在角色畫面顯示遊戲時長',
   'hudChrome.options.showWalletOnPlayerCard': '在玩家卡片顯示錢包',
+  'hudChrome.options.forceHighPerfGpu': '使用獨立遊戲顯示卡',
+  'hudChrome.options.forceHighPerfGpuNote':
+    '預設開啟：桌面版會向本機要求使用獨立遊戲顯示卡。若遊戲無法啟動、啟動後黑屏，或筆記型電腦螢幕沒有畫面，請關閉此選項。此設定會在下次啟動遊戲時生效。',
+  'hudChrome.options.discordPresence': 'Discord 遊戲狀態',
+  'hudChrome.options.discordPresenceNote':
+    '遊玩時將你目前所在的區域以及本次遊戲時長顯示為你的 Discord 活動狀態，任何能看到你 Discord 個人資料的人都能看到這兩項。只會分享區域名稱、本次遊戲時長和遊戲名稱，絕不會分享你的角色、帳號或與你同行的人。需要本機正在執行 Discord 應用程式。',
   'hudChrome.options.showDevBadges': '顯示開發者徽章',
   'hudChrome.options.showOwnNameplate': '顯示我的姓名板',
   'hudChrome.options.showPlayerNameplates': '顯示玩家姓名板',
@@ -1979,6 +1991,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.options.invertLook': '反轉視角（觸控）',
   'hud.options.graphicsReloadNote': '圖形品質和地形細節會在重新載入後生效。',
   'hud.options.reloadNow': '立即重新載入',
+  'hud.options.displayMode': '顯示模式',
+  'hud.options.displayModeBorderless': '無邊框全螢幕',
+  'hud.options.displayModeWindowed': '視窗',
   'hud.options.fullscreen': '全螢幕',
   'hud.options.touchLookSpeed': '觸控視角速度',
   'hud.options.joystickSize': '搖桿大小',
@@ -3120,7 +3135,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '敵人被蟲群侵襲，在 12 秒內受到 {damage} 點自然傷害。',
   'entities.abilities.tigers_fury.name': '狼血之力',
   'entities.abilities.tigers_fury.description':
-    '使攻擊強度提高 {buff}，持續 {duration} 秒。僅限狼形態。',
+    '湧起{rage}點能量，並使攻擊強度提高 {buff}，持續 {duration} 秒。僅限狼形態。',
   'entities.abilities.rip.name': '血隙',
   'entities.abilities.rip.description': '終結技，使目標每 2 秒流血一次，持續 24 秒：36 點傷害外加每消耗 1 點連擊點 24 點（5 點連擊點：共 {damage} 點）。僅限狼形態。',
   'entities.abilities.mortal_strike.name': '致殘打擊',
@@ -3163,7 +3178,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '挫敗附近敵人的士氣，使其攻擊強度降低 20，持續 20 秒。僅限巨熊形態。',
   'entities.abilities.prowl.name': '潛獵',
   'entities.abilities.prowl.description':
-    '在狼形態下進入隱匿狀態，移動速度降低 50%。無法於戰鬥中使用。',
+    '在狼形態下進入隱匿狀態，移動速度降低 5%。無法於戰鬥中使用。',
   'entities.abilities.rake.name': '剮擊',
   'entities.abilities.rake.description': '撕裂敵人，造成武器傷害外加 {damage} 點，並造成持續 18 秒的流血傷害。給予 1 點連擊點。僅限狼形態。',
   'entities.abilities.revive_pet.name': '修補',
@@ -7530,6 +7545,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'desktop.update.restart': '立即重新啟動',
   'desktop.update.later': '稍後',
   'desktop.update.dismiss': '關閉',
+  'desktop.update.whatsNew': '在瀏覽器中查看更新內容',
+  'desktop.notify.updateReadyTitle': '更新 {version} 已就緒',
+  'desktop.notify.updateReadyTitleNoVersion': '更新已就緒',
+  'desktop.notify.updateReadyBody': '重新啟動 World of ClaudeCraft 以套用更新。',
+  'desktop.notify.partyInviteTitle': '組隊邀請',
+  'desktop.notify.partyInviteBody': '{name} 邀請你加入隊伍。',
   'desktop.crash.title': 'World of ClaudeCraft',
   'desktop.crash.body': '遊戲畫面已停止運作。要重新載入嗎？',
   'desktop.crash.reload': '重新載入',
@@ -7537,6 +7558,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.fatalBody': 'World of ClaudeCraft 發生未預期的錯誤，必須關閉。',
   'gpuNotice.bodyDesktop':
     '遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請更新顯示卡驅動程式後重新啟動遊戲。在 Windows 上，還請在 設定 > 系統 > 顯示器 > 顯示卡 中將本遊戲設為「高效能」。',
+  'gpuNotice.bodyDiscreteInactive':
+    '遊戲並未使用獨立（遊戲）顯示卡，而是在省電顯示晶片上執行，因此效能會下降。請更新顯示卡驅動程式後重新啟動遊戲。在 Windows 上，還請在 設定 > 系統 > 顯示器 > 顯示卡 中將本遊戲設為「高效能」。',
   'gpuNotice.bodyWeb':
     '遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請在瀏覽器設定中啟用硬體加速，更新顯示卡驅動程式，然後重新啟動瀏覽器。',
   'gpuNotice.hybridBodyWindows':
@@ -9356,7 +9379,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description': '將目標點 4 公尺內的敵人定身 2 秒，隨後使其減速 40%，持續 6 秒。（薩滿天賦）',
   'entities.abilities.evocation.description': '快速恢復法力。（法師天賦）',
   'entities.abilities.frenzied_regeneration.description':
-    '在10秒內恢復180點生命值。只能在熊形態下使用。（德魯伊天賦）',
+    '在10秒內恢復相當於最大生命值40%的生命。只能在熊形態下使用。（德魯伊天賦）',
   'entities.abilities.frost_trap.description':
     '凍結目標區域內的敵人3秒，使其無法移動或行動。（獵人天賦）',
   'entities.abilities.ghostly_strike.description': '以武器傷害外加 {damage} 點擊打敵人，並將你的閃避機率提高 15%，持續 7 秒。給予 1 點連擊點。（盜賊天賦）',
@@ -9915,11 +9938,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '溫熱的雨水在古老石面上嘶嘶作響。荒野之心盆地在你眼前展開。',
   'entities.dungeons.wildheart_basin.leaveText': '你從石牙之下穿回棕櫚之境的陽光中。',
   'entities.dungeons.the_last_keep.name': '最後的堡壘',
-  'entities.dungeons.the_last_keep.enterText': '你踏入最後的堡壘那冰冷而寂靜的大廳。',
   'entities.items.last_keep_signet.name': '最後的堡壘印戒',
+  'entities.dungeons.the_last_keep.enterText': '你踏入最後的堡壘那冰冷而寂靜的大廳。',
   'entities.items.reins_terrorspark_groundshaker.name': '驚雷撼地者點火鑰匙',
   'entities.items.reins_goblin_rocket_sled.name': '哥布林火箭雪橇點火鑰匙',
   'entities.dungeons.the_last_keep.leaveText': '你帶上堡門，重新走進龍裔荒原的寒風中。',
+  'entities.dungeons.dawnhold_castle.name': '晨曦堡',
+  'entities.items.dawnhold_posy.name': '晨曦堡花園小花束',
+  'entities.dungeons.dawnhold_castle.enterText': '你走進晨曦堡溫暖而花香四溢的廳堂。',
+  'entities.dungeons.dawnhold_castle.leaveText': '你回到陽光灑落的花園草坪上。',
   'entities.items.wildheart_tuskblade.name': '荒野之心獠牙巨刃',
   'entities.items.wildheart_hexwood_staff.name': '盆地巫木法杖',
   'entities.items.wildheart_fangknife.name': '祖爾加的獠牙匕首',
@@ -11373,7 +11400,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '在 8 秒內，你受到的下一次敵人攻擊將被回敬：至多抵消 {buff} 點傷害，並以等量神聖傷害返還給攻擊者，同時你獲得 1 點虔誠。只回敬一次攻擊。昇華使可回敬的數值提高 50%。',
   'entities.abilities.faithforged_guard.name': '聖光之債',
   'entities.abilities.ferocious_bite.specNote_feral':
-    '每次命中的攻擊累積 1 層古血；古血達 3 層時，此按鈕變為血收：撕咬造成 91 點傷害，每個連擊點額外造成 55 點，並立即引爆你的剮擊與血裂的剩餘傷害，恢復 30 點能量。',
+    '每次命中的攻擊累積 1 層古血；古血達 3 層時，此按鈕變為血收：消耗古血發動更強的撕咬，立即引爆你的剮擊與血裂的剩餘傷害，並恢復能量。',
   'entities.abilities.fieldcraft_reentry.description':
     '被動：斷跡會刷新狩獵動能，並使你在12秒內的下一次剖膛打擊或血鉤獲得再入強化。剖膛打擊每層造成15%額外傷害。血鉤造成18至24點額外物理傷害，每層再提高15%，並隨遠程攻擊強度提高。達到3層時，任一攻擊都會消耗狩獵動能。（野戰技藝）',
   'entities.abilities.fieldcraft_reentry.name': '蓄勢再入',
@@ -11499,7 +11526,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '使一名死亡的隊伍成員復活，並恢復 35% 的生命值和法力值。',
   'entities.abilities.recall_the_fallen.name': '喚回逝者',
   'entities.abilities.redharvest.description':
-    '消耗3層古血：造成{damage}點傷害，立即引爆你的剮擊與血裂的剩餘傷害，移除這兩個流血效果，並恢復30點能量。沒有連擊點也能使用。',
+    '消耗3層古血：造成{damage}點傷害，立即引爆你的剮擊與血裂的剩餘傷害，移除這兩個流血效果，並恢復{rage}點能量。沒有連擊點也能使用。',
   'entities.abilities.redharvest.name': '血收',
   'entities.abilities.regrowth.specNote_restoration': '種下全新的綻放累積 1 層繁茂（最多 5 層）。',
   'entities.abilities.rejuvenation.specNote_restoration':

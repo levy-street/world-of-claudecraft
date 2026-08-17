@@ -953,6 +953,22 @@ export const zh_CN: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "地下穹室",
+        "state": "正殿层",
+        "residence": "起居层",
+        "tower": "瞭望塔"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "庭园层",
+        "solar": "日光厅"
+      }
+    },
     "compass": {
       "N": "北",
       "NE": "东北",
@@ -1371,6 +1387,10 @@ export const zh_CN: EnTranslations = {
       "showWalletOnCharacterScreen": "在角色界面显示钱包",
       "showWalletOnPlayerCard": "在玩家卡片显示钱包",
       "showPlaytime": "在角色界面显示游戏时长",
+      "forceHighPerfGpu": "使用独立游戏显卡",
+      "forceHighPerfGpuNote": "默认开启：桌面版会向本机申请使用独立游戏显卡。如果游戏无法启动、启动后黑屏，或笔记本屏幕没有画面，请关闭此选项。该设置将在下次启动游戏时生效。",
+      "discordPresence": "Discord 游戏状态",
+      "discordPresenceNote": "游戏时将你当前所在的区域以及本次游戏时长显示为你的 Discord 活动状态，任何能看到你 Discord 个人资料的人都能看到这两项。只会分享区域名称、本次游戏时长和游戏名称，绝不会分享你的角色、账号或与你同行的人。需要本机正在运行 Discord 应用。",
       "showDevBadges": "显示开发者徽章",
       "showOwnNameplate": "显示我的姓名板",
       "showPlayerNameplates": "显示玩家姓名板",
@@ -7793,7 +7813,15 @@ export const zh_CN: EnTranslations = {
       "readyBody": "退出游戏时将自动安装，也可立即重启。",
       "restart": "立即重启",
       "later": "稍后",
-      "dismiss": "关闭"
+      "dismiss": "关闭",
+      "whatsNew": "在浏览器中查看更新内容"
+    },
+    "notify": {
+      "updateReadyTitle": "更新 {version} 已就绪",
+      "updateReadyTitleNoVersion": "更新已就绪",
+      "updateReadyBody": "重启 World of ClaudeCraft 以应用更新。",
+      "partyInviteTitle": "组队邀请",
+      "partyInviteBody": "{name} 邀请你加入队伍。"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -7805,6 +7833,7 @@ export const zh_CN: EnTranslations = {
   },
   "gpuNotice": {
     "bodyDesktop": "游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。",
+    "bodyDiscreteInactive": "游戏没有使用独立（游戏）显卡，而是运行在节能显卡上，因此性能会下降。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。",
     "bodyWeb": "游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请在浏览器设置中启用硬件加速，更新显卡驱动，然后重启浏览器。",
     "hybridBodyWindows": "本次会话正在集成（节能）显卡上渲染。如果这台电脑还配有独立游戏显卡，请在 设置 > 系统 > 显示 > 显示卡 中将浏览器设为“高性能”，然后重启浏览器。桌面版会自动选择独立显卡。",
     "hybridBodyLinux": "本次会话正在集成（节能）显卡上渲染。如果这台电脑还配有独立游戏显卡，您的浏览器或显卡驱动可能提供了自己的显卡选择设置，或者您的发行版可能提供了显卡切换工具（例如 PRIME 或 optimus-manager）。桌面版会自动选择独立显卡。",
@@ -8172,6 +8201,9 @@ export const zh_CN: EnTranslations = {
       "graphicsReloadNote": "图形质量和地形细节会在重新加载后生效。",
       "reloadNow": "立即重新加载",
       "fullscreen": "全屏",
+      "displayMode": "显示模式",
+      "displayModeBorderless": "无边框全屏",
+      "displayModeWindowed": "窗口",
       "touchLookSpeed": "触屏视角速度",
       "joystickSize": "摇杆大小",
       "buttonSize": "按钮大小",
@@ -10046,7 +10078,7 @@ export const zh_CN: EnTranslations = {
       "ferocious_bite": {
         "name": "血噬",
         "description": "终结技，造成 {damage}。仅限狼形态。",
-        "specNote_feral": "每次命中累积1层古血；古血达到3层时，此按钮变为血收：一次撕咬，造成91点伤害，每个连击点额外造成55点，并立即引爆你的剐削与血裂的全部剩余伤害，同时恢复30点能量。"
+        "specNote_feral": "每次命中累积1层古血；古血达到3层时，此按钮变为血收：消耗古血发动一次更强的撕咬，立即引爆你的剐削与血裂的全部剩余伤害，同时恢复能量。"
       },
       "swipe": {
         "name": "横扫利爪",
@@ -10109,7 +10141,7 @@ export const zh_CN: EnTranslations = {
       },
       "tigers_fury": {
         "name": "狼血",
-        "description": "使攻击强度提高 {buff}，持续 {duration} 秒。仅限狼形态。"
+        "description": "涌起{rage}点能量，并使攻击强度提高 {buff}，持续 {duration} 秒。仅限狼形态。"
       },
       "rip": {
         "name": "血隙",
@@ -10330,7 +10362,7 @@ export const zh_CN: EnTranslations = {
       },
       "redharvest": {
         "name": "血收",
-        "description": "消耗你的3层古血：造成{damage}点伤害，立即引爆你的剐削与血裂的全部剩余伤害，移除这两个流血效果，并恢复30点能量。无需连击点也可使用。"
+        "description": "消耗你的3层古血：造成{damage}点伤害，立即引爆你的剐削与血裂的全部剩余伤害，移除这两个流血效果，并恢复{rage}点能量。无需连击点也可使用。"
       },
       "marrowbreak": {
         "name": "碎髓",
@@ -10578,7 +10610,7 @@ export const zh_CN: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "野性愈合",
-        "description": "在10秒内恢复180点生命值。只能在熊形态下使用。（德鲁伊天赋）"
+        "description": "在10秒内恢复相当于最大生命值40%的生命。只能在熊形态下使用。（德鲁伊天赋）"
       },
       "frost_trap": {
         "name": "霜纹陷阱",
@@ -10811,7 +10843,7 @@ export const zh_CN: EnTranslations = {
       },
       "prowl": {
         "name": "潜行",
-        "description": "在狼形态下进入潜行状态，移动速度降低 50%。无法在战斗中使用。"
+        "description": "在狼形态下进入潜行状态，移动速度降低 5%。无法在战斗中使用。"
       },
       "rake": {
         "name": "剐削",
@@ -12371,6 +12403,9 @@ export const zh_CN: EnTranslations = {
       },
       "pristine_claw": {
         "name": "完美的爪"
+      },
+      "dawnhold_posy": {
+        "name": "晨曦堡花园小花束"
       },
       "conjured_water4": {
         "name": "魔法泉水"
@@ -16855,6 +16890,11 @@ export const zh_CN: EnTranslations = {
         "name": "最后的堡垒",
         "enterText": "你踏入最后的堡垒那冰冷而寂静的大厅。",
         "leaveText": "你带上堡门，重新走进龙裔荒原的寒风中。"
+      },
+      "dawnhold_castle": {
+        "name": "晨曦堡",
+        "enterText": "你走进晨曦堡温暖而花香四溢的厅堂。",
+        "leaveText": "你回到阳光洒落的花园草坪上。"
       },
       "drowned_temple": {
         "name": "溺亡神殿",

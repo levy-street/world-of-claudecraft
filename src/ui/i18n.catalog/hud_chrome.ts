@@ -728,6 +728,29 @@ export const hudChromeStrings = {
     clockMs: '{minutes}:{seconds}',
     clockHms: '{hours}:{minutes}:{seconds}',
   },
+  // The Last Keep interior map (the castle floor plan the minimap / world map
+  // show inside the instance). The title composes the localized dungeon name
+  // (entities.dungeons.the_last_keep.name, via dungeonDisplayName) with the
+  // story the player currently stands on.
+  lastkeepMap: {
+    title: '{keep}: {story}',
+    story: {
+      undercroft: 'The Undercroft',
+      state: 'The State Floor',
+      residence: 'The Residence',
+      tower: 'The Watch Tower',
+    },
+  },
+  // Dawnhold Castle interior map (the Evergarden garden palace), same shape:
+  // the title composes the localized dungeon name
+  // (entities.dungeons.dawnhold_castle.name) with the current story.
+  dawnholdMap: {
+    title: '{keep}: {story}',
+    story: {
+      ground: 'The Garden Floor',
+      solar: 'The Solar',
+    },
+  },
   // Eight-point compass abbreviations as drawn on the heading strip. Each locale
   // overrides with its own established compass abbreviations (e.g. West = "O" in
   // Spanish, "O" in French/Italian/Portuguese, "З" in Russian).
@@ -1344,6 +1367,20 @@ export const hudChromeStrings = {
     // Interface panel twin of the character sheet's privacy eye: the same
     // per-device settings.showPlaytime preference, discoverable from Options.
     showPlaytime: 'Show Time Played on Character Screen',
+    // Desktop-app only Interface row (the row renders only when the installed
+    // shell exposes the GPU preference over the bridge). The stored shell field
+    // is the inverse opt-out; the note carries the next-launch caveat, because
+    // the shell picks its adapter at startup and cannot switch a live session
+    // (both values are wordy, M16: the five non-Latin fills land in this same
+    // change).
+    forceHighPerfGpu: 'Use the Dedicated Gaming GPU',
+    forceHighPerfGpuNote:
+      'On by default: the desktop app asks this computer for its dedicated gaming GPU. Turn this off if the game will not start, opens to a black screen, or the laptop display goes blank. Takes effect the next time the game starts.',
+    // Interface panel toggle: publish the current zone to Discord as an
+    // activity (desktop app only, on by default).
+    discordPresence: 'Discord Rich Presence',
+    discordPresenceNote:
+      'Shows the zone you are in and how long you have been playing this session as your Discord activity, and anyone who can see your Discord profile can see both. Only the zone name, your session time, and the game are shared, never your character, your account, or who you are playing with. Needs the Discord app running on this computer.',
     // Interface panel toggle: nameplate glyph/outline, inspect block, player
     // card, and the Developers leaderboard tab (on by default).
     showDevBadges: 'Show Developer Badges',
