@@ -12593,8 +12593,8 @@ export class Sim {
 
   // Trade withered husks for compost. Thin delegate like its two siblings
   // above; draw-free on every path (the ratio is a constant), and the
-  // permissive location gate is documented at the action (the farmer-NPC
-  // range arm lands with the NPCs in the go-live phase).
+  // farmer-NPC range gate lives at the action (professions/farmer_npcs.ts
+  // nearFarmerNpc: in reach of a farmer-flagged NPC, else farmDenied).
   convertHusks(pid?: number): void {
     const r = this.ctx.resolve(pid);
     if (!r) return;
