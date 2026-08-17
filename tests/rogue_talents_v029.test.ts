@@ -345,6 +345,7 @@ describe('Ghostfoot Ward (defense)', () => {
     for (let i = 0; i < 3; i++) sim.tick();
     const ward = p.auras.find((a) => a.kind === 'shield_wall');
     const dodge = p.auras.find((a) => a.kind === 'buff_dodge' && a.id === 'evasion');
+    expect(ward?.id).toBe('evasion_shield_wall');
     expect(ward?.value).toBeCloseTo(0.3);
     expect(ward?.duration).toBe(dodge?.duration);
 

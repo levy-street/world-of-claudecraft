@@ -835,11 +835,11 @@ describe('item-art audit builder', () => {
     // 817 reviewed art files and their shipping catalog sha are untouched.
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: 'a6918c8d242a31fdaac19b9f31ec21fef125cfd36b3c99cf95f294c82174db14',
-      catalogBytes: 451256,
+      catalogSha256: '103c2196e378eda1432c8b73b342f3d8e97e6ee1fe921e7615f6a9cce18eaa12',
+      catalogBytes: 451762,
       rendererFingerprint: '84410592a4686975e13d43d4fecc88fb7eb0e3b90f27f7b7dc38498cdf7e090c',
-      catalogCount: 822,
-      liveItemCount: 837,
+      catalogCount: 823,
+      liveItemCount: 838,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
@@ -848,7 +848,7 @@ describe('item-art audit builder', () => {
       sheetCount: 208,
       sheetModeCounts: Object.fromEntries(ITEM_ART_AUDIT_MODES.map((mode) => [mode, 26])),
       sheetSetSha256: null,
-      shippingCatalogSha256: '17fe7b0b1ca629831283710441306ef01c54b04cc8c26d70bec361439e07c2ff',
+      shippingCatalogSha256: 'cc5fc2f49d88532ef79bf342c0c56f14a798ff566f586dac55291ef44c88be87',
       machineChecksPassed: true,
       verdict: null,
     });

@@ -8,11 +8,14 @@ import { makeQuestObjectGate } from '../src/render/quest_object_gate_core';
 import { ITEMS } from '../src/sim/data';
 import type { Entity, QuestProgress } from '../src/sim/types';
 
+// An overworld position (x = 0 is in no instance band): the sim rule consults the
+// dungeon a collectable stands in for the interact-only exemption.
 const crate = (): Entity =>
   ({
     kind: 'object',
     templateId: 'ground_supply_crate',
     objectItemId: 'supply_crate',
+    pos: { x: 0, y: 0, z: 0 },
   }) as unknown as Entity;
 
 const questId = (): string => {

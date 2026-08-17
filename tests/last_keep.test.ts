@@ -11,6 +11,7 @@
 // clearance contract.
 import { describe, expect, it } from 'vitest';
 import { type KeepDressingSpot, lastKeepFurnishings } from '../src/render/lastkeep_dressing';
+import { PROP_ASSET_DEFS } from '../src/render/props';
 import { DUNGEON_LIST, DUNGEON_X_THRESHOLD, DUNGEONS, dungeonAt } from '../src/sim/data';
 import {
   type AuthoredDoor,
@@ -284,6 +285,17 @@ describe('The Last Keep layout', () => {
     expect(colliders.length).toBeGreaterThan(0);
     expect(colliders.some((c) => c.type === 'obb')).toBe(true); // wall runs
     expect(colliders.some((c) => c.type === 'circle')).toBe(true); // decor footprints
+  });
+
+  it('every furnishing kind resolves in the prop registry (an unknown key renders nothing)', () => {
+    // ensureLastKeepDressing swallows a missing PROP_ASSET_DEFS entry in a
+    // try/catch and caches an empty part list, so an unregistered kind
+    // ships as silently invisible furniture; pin the whole kind set here
+    const defs = PROP_ASSET_DEFS as Record<string, { url: string } | undefined>;
+    const missing = [...new Set(lastKeepFurnishings().map((s) => s.kind))].filter(
+      (k) => !defs[k]?.url,
+    );
+    expect(missing).toEqual([]);
   });
 
   it('furnishing plan: every kcas piece sits in a room, off ramps, off decor, off door lanes', () => {

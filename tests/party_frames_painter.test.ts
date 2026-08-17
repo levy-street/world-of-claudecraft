@@ -340,6 +340,7 @@ describe('createPartyRow: decorative badges + relocalize hook (a11y + live langu
     // group span is visually-hidden (in the a11y tree, clipped from sight) so the raid
     // group reaches a screen reader. Both attrs/classes are set ONCE here at build.
     expect(row.leadStar.getAttribute('aria-hidden')).toBe('true');
+    expect(String(row.leadStar.innerHTML)).toContain('<svg');
     expect(String(row.group.className)).toContain('visually-hidden');
   });
 
@@ -647,12 +648,11 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     // The compact party row never appends the absorb total to the HP text (that is a
     // player/target-frame affordance), so "(25)" must not appear.
     expect(has('setText', (c) => String(c.args[0]).includes('(25)'))).toBe(false);
-    // The leader star is its OWN aria-hidden write (★), and the level element
-    // (.lead-num) holds the bare number (20), never the old concatenated '★20'. Both
-    // route through the elided setText (no raw write on the hot path).
-    expect(has('setText', (c) => c.args[0] === '★')).toBe(true);
+    // The leader crown is static aria-hidden SVG whose visibility routes through
+    // setDisplay. The level element holds the bare number, never a glyph concat.
+    expect(has('setText', (c) => c.args[0] === '\u2605')).toBe(false);
     expect(has('setText', (c) => c.args[0] === '20')).toBe(true);
-    expect(has('setText', (c) => c.args[0] === '★20')).toBe(false);
+    expect(has('setText', (c) => c.args[0] === '\u260520')).toBe(false);
     expect(has('setText', (c) => c.args[0] === 'Alice')).toBe(true);
     // Outside raid, no group label is emitted (the group span stays empty).
     expect(has('setText', (c) => c.args[0] === 'Group 1')).toBe(false);

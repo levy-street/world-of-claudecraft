@@ -13,6 +13,7 @@ import {
   buildingTerrainEnvelope,
   isEastbrookGrandArmoury,
 } from './building_layout';
+import { CASTLE_WALL_LEDGES, castleParapetSegments, PARAPET_HALF } from './castle_layout';
 import { MOUNT_RACE_JUMP_FIXTURES, raceGateSegment } from './content/mounts';
 import {
   arenaOriginAt,
@@ -42,6 +43,7 @@ import {
   STRIP_MIN_X,
   yumiMazeOriginAt,
 } from './data';
+import { DAWNHOLD_WALL_LEDGES, dawnholdParapetSegments } from './dawnhold_layout';
 import {
   ROCK_COLLIDER_MIN_SCALE,
   ROCK_RADIUS_PER_SCALE,
@@ -54,6 +56,7 @@ import { dungeonInstanceAt, INTERIOR_LAYOUTS } from './dungeon_floor';
 import {
   ARENA_LAYOUT,
   CRYPT_LAYOUT,
+  DAWNHOLD_LAYOUT,
   DROWNED_COURT_LAYOUT,
   LASTKEEP_LAYOUT,
   layoutColliders,
@@ -102,12 +105,20 @@ import type { WorldContent } from './types';
 import { valeCupColliders } from './vale_cup_layout';
 import { WILDHEART_FIELD_COLLIDER_SPECS, WILDHEART_FIELD_WALLS } from './wildheart_field';
 import {
-  crossesGardenHedge,
   crossesSealedBorder,
   type Decoration,
   farshorePalmSpots,
+  gardenMazeCellPieces,
+  generateDecorations,
   generateDecorationsInBounds,
   groundHeight,
+  MAZE_CELL,
+  MAZE_COLS,
+  MAZE_ROWS,
+  MAZE_WALL_DEPTH,
+  MAZE_WALL_HEIGHT,
+  MAZE_X0,
+  MAZE_Z1,
   reachPalmSpots,
   roadDistance,
   terrainHeight,
@@ -480,6 +491,61 @@ function staticWorldColliders(seed: number): Collider[] {
       r: w.r,
       cameraTopY: topY(seed, w.x, w.z, 6),
     });
+  // The castles' outside climbing chains: corbelled shelves up each curtain
+  // so the wall-walk is reachable by parkour as well as by the flights.
+  // These are the only STANDABLE tops either castle has outdoors, because
+  // the walls themselves are lift terrain rather than colliders and terrain
+  // grants no ledge to grab.
+  for (const l of CASTLE_WALL_LEDGES) {
+    out.push({
+      type: 'obb',
+      x: l.x,
+      z: l.z,
+      hw: l.hw,
+      hd: l.hd,
+      rot: 0,
+      moveTopY: l.top,
+      standable: true,
+      cameraTopY: l.top,
+    });
+  }
+  for (const l of DAWNHOLD_WALL_LEDGES) {
+    out.push({
+      type: 'obb',
+      x: l.x,
+      z: l.z,
+      hw: l.hw,
+      hd: l.hd,
+      rot: 0,
+      moveTopY: l.top,
+      standable: true,
+      cameraTopY: l.top,
+    });
+  }
+  // ...and the crenellated parapet along each wall-walk's OUTER edge, from the
+  // same plan the renderer lays its battlement modules from. The curtain is
+  // terrain, and terrain gives a body no standoff at a DOWN edge, so the walk
+  // was a 3.0yd strip with nothing at either lip and four ticks of drift put a
+  // player over the side.
+  //
+  // moveTopY WITHOUT standable, the campfire's semantic further down this file:
+  // a body whose feet are below the stone is blocked by it, and nobody may ever
+  // the shelves right beside it, so the chase camera does not yank in on a
+  // knee-high rail.
+  for (const seg of [...castleParapetSegments(), ...dawnholdParapetSegments()]) {
+    const alongHalf = (seg.a1 - seg.a0) / 2;
+    const mid = (seg.a0 + seg.a1) / 2;
+    out.push({
+      type: 'obb',
+      x: seg.axis === 'z' ? seg.line : mid,
+      z: seg.axis === 'z' ? mid : seg.line,
+      hw: seg.axis === 'z' ? PARAPET_HALF : alongHalf,
+      hd: seg.axis === 'z' ? alongHalf : PARAPET_HALF,
+      rot: 0,
+      moveTopY: seg.top,
+      cameraTopY: seg.top,
+    });
+  }
   // ...and the Drakelands' giant ember lilies: the huge and giant tiers
   // carry a rocky-bed collider (r 0 skirt lilies stay walk-through
   // dressing), same one-list contract as the willows
@@ -686,9 +752,26 @@ function staticWorldColliders(seed: number): Collider[] {
     }
   }
 
-  // hand-placed GLB decor: circle collider matched to the model footprint;
-  // r 0/absent entries are walk-through dressing and add no collider
+  // Hand-placed GLB decor. r 0/absent entries are walk-through dressing and add
+  // no collider. An entry carrying hw AND hd collides as the model's real BOX,
+  // oriented by its own rot; everything else keeps the circle it always had.
+  // The box exists because these models are rectangles: a circle drawn round one
+  // stands off its flat walls (that is the invisible wall players walk into) and
+  // a circle drawn inside one cuts its corners off instead.
   for (const d of PROPS.decorProps ?? []) {
+    const cameraTopY = topY(seed, d.x, d.z, d.h ?? 4);
+    if (d.hw !== undefined && d.hd !== undefined) {
+      out.push({
+        type: 'obb',
+        x: d.x,
+        z: d.z,
+        hw: d.hw,
+        hd: d.hd,
+        rot: d.rot ?? 0,
+        cameraTopY,
+      });
+      continue;
+    }
     if (!d.r) continue;
     out.push({
       type: 'circle',
@@ -697,6 +780,48 @@ function staticWorldColliders(seed: number): Collider[] {
       r: d.r,
       cameraTopY: topY(seed, d.x, d.z, d.h ?? 4),
     });
+  }
+
+  // THE GREAT MAZE's hedges. One box per drawn piece, straight off the same
+  // grid the renderer lays the hedge GLBs from, so the blocked ground IS the
+  // modeled hedge footprint.
+  //
+  // These are new, and their absence was a silent regression rather than a
+  // deletion. The hedge used to be enforced by crossesGardenHedge, a bespoke
+  // segment test living inside resolveMovement. When the parkour physics engine
+  // landed, the OPEN WORLD moved onto moveCharacter (player_motion.ts) and
+  // resolveMovement became the instanced-interior path, so the test simply
+  // stopped being reached for players on foot. Nothing errored: mobs, pets and
+  // Charge still route through resolveMove and still collided, so the maze went
+  // on looking enforced while players walked through the hedges. Two unrelated
+  // branches, the modeled hedge and the physics engine, auto-merged with no
+  // conflict and neither author saw the other's half.
+  //
+  // Real colliders instead of a second bespoke test: the solver, pathfinding and
+  // every mover get it from one place, and the next kernel rewrite inherits it.
+  // Length is the CELL, not the drawn piece: the 0.75yd overlap at each end is
+  // cosmetic leaf interlock, and where a run continues the neighbour's own box
+  // covers the joint. Deliberately NOT merged into colinear runs: colliderBounds
+  // and pruneCandidates both take an OBB's extent as hypot(hw, hd) on both axes,
+  // so one 153yd run registers as a 153yd blob across cells nowhere near it.
+  for (let r = 0; r < MAZE_ROWS; r++) {
+    for (let c = 0; c < MAZE_COLS; c++) {
+      const piece = gardenMazeCellPieces(c, r);
+      if (!piece) continue;
+      const x = MAZE_X0 + (c + 0.5) * MAZE_CELL;
+      const z = MAZE_Z1 - (r + 0.5) * MAZE_CELL;
+      const camTop = topY(seed, x, z, MAZE_WALL_HEIGHT);
+      const half = MAZE_CELL / 2;
+      const depth = MAZE_WALL_DEPTH / 2;
+      // full height on purpose: a 6.1yd hedge is nobody's platform, so no
+      // moveTopY and nothing to stand on or mantle
+      if (piece.h) {
+        out.push({ type: 'obb', x, z, hw: half, hd: depth, rot: 0, cameraTopY: camTop });
+      }
+      if (piece.v) {
+        out.push({ type: 'obb', x, z, hw: depth, hd: half, rot: 0, cameraTopY: camTop });
+      }
+    }
   }
 
   // Ravenpost mailboxes: authored civic furniture, spawned by the Sim at this
@@ -1256,6 +1381,9 @@ function bandSlotColliders(): Collider[] {
 // authoredColliders). Seated on DUNGEON_FLOOR_Y like every derived interior
 // set below, so its standable tops read in the same frame.
 const LASTKEEP_COLLIDERS: Collider[] = layoutColliders(LASTKEEP_LAYOUT, undefined, DUNGEON_FLOOR_Y);
+// Dawnhold Castle: the Evergarden garden palace, same authored room-graph
+// derivation as The Last Keep (walls minus doorways plus decor footprints).
+const DAWNHOLD_COLLIDERS: Collider[] = layoutColliders(DAWNHOLD_LAYOUT, undefined, DUNGEON_FLOOR_Y);
 
 // Wildheart follows the same open-field contract, but its walkable bridges and
 // water ribbons are heightfield surfaces rather than blocking props.
@@ -1296,6 +1424,7 @@ export function arenaCollidersForSlot(slot: number): Collider[] {
 const STATIC_INTERIOR_COLLIDERS: Record<string, Collider[]> = {
   wildheart: WILDHEART_COLLIDERS,
   lastkeep: LASTKEEP_COLLIDERS,
+  dawnhold: DAWNHOLD_COLLIDERS,
 };
 
 // Per-DUNGEON interior sets: dungeons sharing a room plan (Hollow Crypt and
@@ -2237,21 +2366,19 @@ export function resolveMovement(
     z = fromZ;
   for (let i = 1; i <= steps; i++) {
     const t = i / steps;
-    let nextX = fromX + dx * t;
+    const nextX = fromX + dx * t;
     // A sealed zone border is a hard wall regardless of terrain slope (the
     // climb gate projects rise along the movement direction, so a shallow
     // diagonal would otherwise sneak over the crest). Clamp z at the crest
     // and keep the x component, so pushing into the wall slides along it.
-    let nextZ = crossesSealedBorder(x, z, fromZ + dz * t) ? z : fromZ + dz * t;
-    // The Great Maze's hedges are hard walls for the same reason, tested as
-    // a segment crossing (an endpoint-only test teleports a stalled mover
-    // across once its target passes the wall). The faces are axis-aligned,
-    // so slide by dropping whichever axis component pushes into the hedge.
-    if (crossesGardenHedge(x, z, nextX, nextZ)) {
-      if (!crossesGardenHedge(x, z, x, nextZ)) nextX = x;
-      else if (!crossesGardenHedge(x, z, nextX, z)) nextZ = z;
-      else break; // cornered against the hedge
-    }
+    const nextZ = crossesSealedBorder(x, z, fromZ + dz * t) ? z : fromZ + dz * t;
+    // The Great Maze's hedges used to be tested here as a segment crossing.
+    // They are real collider boxes now (staticWorldColliders), which the slide
+    // below handles like any other wall, and keeping the segment test as well
+    // would be actively harmful: a body that ends up INSIDE a hedge is pushed
+    // out by resolvePosition, and a segment test from where it was to where it
+    // was pushed crosses hedge by definition, so the escape would be cancelled
+    // and the body held there.
     if (!ignoreFences && crossesFence(x, z, nextX, nextZ, r)) break;
     const resolved = resolvePosition(
       seed,
@@ -2266,7 +2393,6 @@ export function resolveMovement(
     // ...and a static-collider slide (a tree hugging the crest) must not
     // shove the resolved position across it either
     if (crossesSealedBorder(x, z, resolved.z)) break;
-    if (crossesGardenHedge(x, z, resolved.x, resolved.z)) break;
     // Rift interiors: a resolution is a SLIDE, never a teleport. When a wide
     // obstacle abuts a thin wall (a chamber-waist stub reaching the side wall),
     // chained pushOuts can walk the centre across the wall centreline and eject

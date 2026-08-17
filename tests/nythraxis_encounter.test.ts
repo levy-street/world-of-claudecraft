@@ -150,6 +150,7 @@ describe('Nythraxis encounter module (N1)', () => {
       hpFrac: 0.35,
       fallbackDestination: { ...tank.pos },
       expiresAt: ctx.time + 30,
+      maxRange: 40,
     });
     boss.hp = Math.floor(boss.maxHp * 0.69);
     nythraxis.updateNythraxisEncounter(ctx, boss);
@@ -208,6 +209,7 @@ describe('Nythraxis encounter module (N1)', () => {
       hpFrac: 0.35,
       fallbackDestination: { ...tank.pos },
       expiresAt: ctx.time + 30,
+      maxRange: 40,
     });
 
     boss.hp = Math.floor(boss.maxHp * 0.69);
@@ -241,12 +243,14 @@ describe('Nythraxis encounter module (N1)', () => {
       hpFrac: 0.35,
       fallbackDestination: { ...arrivalAnchor.pos },
       expiresAt: ctx.time + 30,
+      maxRange: 40,
     });
     ctx.pendingResurrections.set(arrivalAnchor.id, {
       casterId: tank.id,
       hpFrac: 0.35,
       fallbackDestination: { ...tank.pos },
       expiresAt: ctx.time + 30,
+      maxRange: 40,
     });
 
     boss.hp = Math.floor(boss.maxHp * 0.69);

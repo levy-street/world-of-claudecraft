@@ -109,6 +109,78 @@ describe('renderVendorWindow / renderHeroicVendorWindow: dialog root (accessible
   });
 });
 
+describe('vendor painters: painted currency identities', () => {
+  function imageIdentity(image: HTMLImageElement | null) {
+    expect(image).not.toBeNull();
+    return {
+      className: image?.className,
+      src: image?.getAttribute('src'),
+      alt: image?.getAttribute('alt'),
+      draggable: image?.getAttribute('draggable'),
+    };
+  }
+
+  it('renders Honor art independently in the generic vendor balance and item price', () => {
+    const view: VendorView = {
+      goods: [
+        {
+          itemId: 'honor_blade',
+          item: item('honor_blade'),
+          price: { copper: 0, honor: 9 },
+          quantity: 1,
+          affordable: true,
+          requirementUnmet: false,
+        },
+      ],
+      buyback: [],
+      honorBalance: 73,
+      hasHonorGoods: true,
+      multiple: 1,
+    };
+    const el = document.createElement('div');
+
+    renderVendorWindow(el, 'Honor Vendor', view, deps());
+
+    const honorIdentity = {
+      className: 'currency-inline currency-honor',
+      src: '/ui/currency/honor.webp',
+      alt: '',
+      draggable: 'false',
+    };
+    expect(imageIdentity(el.querySelector<HTMLImageElement>('.warfare-balance > img'))).toEqual(
+      honorIdentity,
+    );
+    expect(
+      imageIdentity(el.querySelector<HTMLImageElement>('.vendor-item .warfare-price > img')),
+    ).toEqual(honorIdentity);
+    expect(el.querySelectorAll('img.currency-honor')).toHaveLength(2);
+  });
+
+  it('renders Heroic Mark art independently in the quartermaster balance and item price', () => {
+    const view: HeroicShopView = {
+      rows: [{ itemId: 'heroic_blade', item: item('heroic_blade'), marks: 11, affordable: true }],
+      balance: 29,
+    };
+    const el = document.createElement('div');
+
+    renderHeroicVendorWindow(el, 'Heroic Quartermaster', view, heroicDeps());
+
+    const heroicMarkIdentity = {
+      className: 'currency-inline currency-heroic-mark',
+      src: '/ui/items/heroic_mark.webp',
+      alt: '',
+      draggable: 'false',
+    };
+    expect(
+      imageIdentity(el.querySelector<HTMLImageElement>('.vendor-section-title > img')),
+    ).toEqual(heroicMarkIdentity);
+    expect(
+      imageIdentity(el.querySelector<HTMLImageElement>('.vendor-item .vi-price > img')),
+    ).toEqual(heroicMarkIdentity);
+    expect(el.querySelectorAll('img.currency-heroic-mark')).toHaveLength(2);
+  });
+});
+
 describe('renderVendorWindow: goods/buyback grid wrapping', () => {
   it('appends goods rows as children of .vendor-goods-grid', () => {
     const goods: VendorGoodsRow[] = [

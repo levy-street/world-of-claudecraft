@@ -303,10 +303,10 @@ describe('scripted playthrough (one sim, live sites only)', () => {
         sawBiteOnKoiSession = bit;
       }
     }
-    // Hunted literal (seed 4242, after every beat above), re-recorded with the
-    // craft-cast system: shared-stream draws shift vs the instant-craft era.
-    // The merged world lands the koi on session index 20.
-    expect(koiSession).toBe(20);
+    // Hunted literal (seed 4242, after every beat above), re-recorded on the
+    // release/v0.37.0 base with the castle world content: the koi bites on
+    // the very first session, index 0.
+    expect(koiSession).toBe(0);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -333,18 +333,18 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Hunted literals (seed 4242, after every beat above): the harvest index
     // where each flavor's 1-in-90 event fires under the shared stream.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 128 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 338 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 116,
+        hitAt: 130,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 4,
+        hitAt: 25,
       },
     ];
     for (const hunt of hunts) {
@@ -402,9 +402,9 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       sim.harvestCorpse(mob.id, ['hide'], pid);
       if (sim.countItem('pristine_hide', pid) > 0) hitAt = i;
     }
-    // Hunted literal (seed 4242, after every beat above), re-recorded with the
-    // craft-cast system: the rare-or-better rarity roll that mints the signed
-    // specimen lands on attempt index 8.
+    // Hunted literal (seed 4242, after every beat above), re-recorded on the
+    // release/v0.37.0 base with the castle world content: the rare-or-better
+    // rarity roll that mints the signed specimen lands on attempt index 8.
     expect(hitAt).toBe(8);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe(meta.name);

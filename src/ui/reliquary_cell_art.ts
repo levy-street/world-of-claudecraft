@@ -19,16 +19,15 @@
 // A slot with no answer returns null and the window keeps its previous
 // behavior, so an id this bundle does not know still renders something.
 //
-// One mark has no committed art anywhere and takes an authored inline glyph
-// instead of the ghost: gather_event:perfect_specimen fires on corpse harvest,
-// which belongs to no gathering profession, so there is no profession image
-// to borrow. The 19 slain:* rare kill proofs use their exact committed mob
-// portraits and retain the authored trophy skull only as a load-error fallback.
+// One mark has no gathering profession image to borrow:
+// gather_event:perfect_specimen fires on corpse harvest. It therefore owns a
+// dedicated painted Reliquary image. The 19 slain:* rare kill proofs use their
+// exact committed mob portraits and retain the authored trophy skull only as a
+// load-error fallback.
 //
-// This module is an ART SOURCE (the icons.ts family), not a painter, which is
-// why the authored glyph's palette lives here as literal colors: the painter
-// hygiene scan that bans hex out of reliquary_window.ts is about a painter
-// re-deciding a token, and that file still carries none.
+// This module is an ART SOURCE (the icons.ts family), not a painter. The
+// painter hygiene scan that bans color decisions from reliquary_window.ts
+// still applies; this resolver only returns existing asset identities.
 
 import { DEEDS } from '../sim/content/deeds';
 import { FIELD_NOTE_PROFESSIONS, RELIQUARY_MARK_IDS } from '../sim/content/reliquary';
@@ -66,27 +65,18 @@ export interface ReliquaryArtSlot {
 const MASTERWORK_PREFIX = 'masterwork:';
 /** The lifetime first-masterwork mark, which names no single craft. */
 const MASTERWORK_FIRST_ID = 'masterwork:first';
-/** The corpse-harvest field note, the one catalogued relic no committed art
- *  covers (see the header). */
+/** The corpse-harvest field note that owns dedicated Reliquary art. */
 const PERFECT_SPECIMEN_MARK_ID = 'gather_event:perfect_specimen';
 /** Painted-art id prefixes on the profession sheet (profession_art.ts). */
 const CRAFT_IMAGE_PREFIX = 'prof_';
 const GATHER_IMAGE_PREFIX = 'gather_';
 
-/** Marker id carried by the specimen glyph, so a test can pin the authored art
- *  by something stabler than a color. */
+/** Dedicated painted corpse-harvest specimen trophy. */
+export const RELIQUARY_PERFECT_SPECIMEN_IMAGE_URL = '/ui/reliquary/perfect_specimen.webp';
+
+/** Marker id carried by the specimen's decode-failure fallback. */
 export const RELIQUARY_SPECIMEN_GLYPH_ID = 'woc-specimen-glyph';
 
-// The corpse-harvest specimen flask: a corked glass vial of a preserved
-// sample, painted in the direction DESIGN.md section 6 sets for this surface
-// (rich color, heavy dark outline, light from the top left) rather than a flat
-// monochrome vector, which would read as foreign next to the painted profession
-// sheet it sits beside. Authored inline as an SVG data URL so it needs no
-// asset pipeline, no canvas, and no network, and so a Node test can assert the
-// exact bytes the window paints. Double-quoted attributes only, and NO
-// apostrophes anywhere in the markup: encodeURIComponent leaves an apostrophe
-// unescaped, and the window's unconditional esc() would rewrite it inside the
-// src attribute (the encoding-survives-esc pin in the module's test).
 const SPECIMEN_FLASK_PATH = 'M26 13v11L13 47a20 20 0 0 0 38 0L38 24V13z';
 const SPECIMEN_GLYPH_SVG =
   `<svg id="${RELIQUARY_SPECIMEN_GLYPH_ID}" xmlns="http://www.w3.org/2000/svg" ` +
@@ -113,26 +103,21 @@ const SPECIMEN_GLYPH_SVG =
   'opacity="0.8"/>' +
   '</svg>';
 
-/** The specimen glyph as an `<img>`-ready src. Percent-encoded rather than
- *  base64: it survives the window's unconditional esc() byte for byte (the
- *  encoding leaves no `&`, `<`, `>`, `"` or `'` behind), and it stays greppable
- *  in a rendered page. */
+/** Inline fallback kept for mixed deploys and decode failures. */
 export const RELIQUARY_SPECIMEN_GLYPH_URL = `data:image/svg+xml,${encodeURIComponent(
   SPECIMEN_GLYPH_SVG,
 )}`;
 
-/** Marker id carried by the slain-trophy glyph, the RELIQUARY_SPECIMEN_GLYPH_ID
- *  sibling, so a test can pin the authored art by something stabler than a
- *  color. */
+/** Marker id carried by the slain-trophy fallback glyph. */
 export const RELIQUARY_SLAIN_GLYPH_ID = 'woc-slain-glyph';
 
 /** The `slain:` visited namespace prefix the kill-credit site writes
  *  (src/sim/deeds.ts). */
 const SLAIN_MARK_PREFIX = 'slain:';
 
-// The rare-slain trophy: a horned beast skull, same authored-inline regime and
-// DESIGN.md section 6 direction as the specimen flask above (rich color, heavy
-// dark outline, light from the top left; double-quoted attributes, no
+// The rare-slain trophy: a horned beast skull in the DESIGN.md section 6
+// direction (rich color, heavy dark outline, light from the top left;
+// double-quoted attributes, no
 // apostrophes, encoding survives the window's esc()). It is the safe fallback
 // for the exact mob portraits, so a missing/mixed-deploy WebP still paints a
 // recognizable slain trophy rather than browser-broken art.
@@ -164,8 +149,7 @@ const SLAIN_GLYPH_SVG =
   'stroke-linecap="round" opacity="0.8"/>' +
   '</svg>';
 
-/** The slain-trophy glyph as an `<img>`-ready src (percent-encoded for the
- *  same esc()-survival reason as the specimen glyph). */
+/** The slain-trophy glyph as an `<img>`-ready percent-encoded src. */
 export const RELIQUARY_SLAIN_GLYPH_URL = `data:image/svg+xml,${encodeURIComponent(
   SLAIN_GLYPH_SVG,
 )}`;
@@ -238,7 +222,11 @@ export function reliquaryCellArtOpaque(art: ReliquaryCellArt): boolean {
 function markArt(markId: string): ReliquaryCellArt | null {
   if (markId === MASTERWORK_FIRST_ID) return { kind: 'url', url: MASTERWORK_SEAL_IMAGE_URL };
   if (markId === PERFECT_SPECIMEN_MARK_ID) {
-    return { kind: 'url', url: RELIQUARY_SPECIMEN_GLYPH_URL };
+    return {
+      kind: 'url',
+      url: RELIQUARY_PERFECT_SPECIMEN_IMAGE_URL,
+      fallbackUrl: RELIQUARY_SPECIMEN_GLYPH_URL,
+    };
   }
   if (markId.startsWith(MASTERWORK_PREFIX)) {
     const craft = markId.slice(MASTERWORK_PREFIX.length);

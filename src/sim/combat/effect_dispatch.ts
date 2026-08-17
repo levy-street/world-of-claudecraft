@@ -202,6 +202,7 @@ import { priestAfterAbility, priestOnGroupHeal } from './priest/talents';
 import { gloomtitheStacksForCast, vespersAfterAbility } from './priest/vespers';
 import { isPullEligible } from './pull_eligibility';
 import { offerResurrection } from './resurrection_offer';
+import { resurrectionCastRange } from './resurrection_reach';
 import { applyRewind } from './rewind';
 import { spawnRingOfFrost } from './ring_of_frost';
 import {
@@ -1126,15 +1127,24 @@ export function runEffects(
         break;
       }
       case 'resurrectAlly': {
-        // Temporal Reversal: rewind a dead group/raid member to life at their corpse
-        // (resolved upstream as a dead party/raid member), no resurrection sickness.
+        // Temporal Reversal: offer a dead group/raid member (resolved upstream,
+        // reach-gated by the casting lifecycle) a return to life at the caster's
+        // side, no resurrection sickness.
         const ally = target;
         if (!ally?.dead) break;
         // A Sunmender's rite answers for the whole group from level 16 (see
         // combat/paladin_rite_of_many.ts). Same button, same cast, same body to
-        // begin it over: only who stands up afterwards changes.
+        // begin it over: only who stands up afterwards changes. The sweep runs
+        // at the rite's own authored range, never the mass-rez ceiling.
         if (riteAnswersTheWholeGroup(ability.id, mods.spec, p.level)) {
-          resurrectDeadGroupMembers(ctx, p, eff.hpFrac, ability.id, ability.school);
+          resurrectDeadGroupMembers(
+            ctx,
+            p,
+            eff.hpFrac,
+            ability.id,
+            resurrectionCastRange(ability.range),
+            ability.school,
+          );
           ctx.emit({
             type: 'spellfx',
             sourceId: p.id,
@@ -1144,7 +1154,7 @@ export function runEffects(
           });
           break;
         }
-        offerResurrection(ctx, p, ally, eff.hpFrac);
+        offerResurrection(ctx, p, ally, eff.hpFrac, resurrectionCastRange(ability.range));
         ctx.emit({
           type: 'spellfx',
           sourceId: p.id,
@@ -1156,7 +1166,14 @@ export function runEffects(
         break;
       }
       case 'massResurrectGroup': {
-        resurrectDeadGroupMembers(ctx, p, eff.hpFrac, ability.id, ability.school);
+        resurrectDeadGroupMembers(
+          ctx,
+          p,
+          eff.hpFrac,
+          ability.id,
+          resurrectionCastRange(ability.range),
+          ability.school,
+        );
         break;
       }
       case 'perfectMoment': {

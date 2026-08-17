@@ -2445,6 +2445,7 @@ const ITEM_ENTITY_IDS = [
   'sharp_claw',
   'curved_tusk',
   'pristine_claw',
+  'dawnhold_posy',
   'vale_wheat_seed',
   'vale_wheat',
   'fine_vale_wheat',
@@ -2612,6 +2613,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   thornhide_leggings: 'Thornhide Leggings',
   thornhide_gloves: 'Thornhide Gloves',
   thornhide_boots: 'Thornhide Boots',
+  dawnhold_posy: 'Dawnhold Garden Posy',
   // Farming's tier-1 crop line (the growth-engine phase): the seed, its
   // produce, the fine twin a skill-scaled harvest roll upgrades a pick into,
   // and the husks a failed crop pays. Same English-appended treatment as the

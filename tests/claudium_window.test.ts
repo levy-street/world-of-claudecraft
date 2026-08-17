@@ -296,6 +296,7 @@ describe('ClaudiumWindow refresh stability', () => {
       html.indexOf(`data-rail="${rail}"`),
     );
     expect(railOrder).toEqual([...railOrder].sort((left, right) => left - right));
+    expect(html).toContain('src="/ui/currency/woc_token.webp"');
     expect(html).toContain('src="/claudium/icons/solana-icon.webp"');
     expect(html).toContain('src="/claudium/icons/usdc-icon.webp"');
     expect(html).toContain('USDC: 12.35');

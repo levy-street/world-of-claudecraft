@@ -280,8 +280,17 @@ export function rollLoot(
       continue;
     }
     if (!ctx.rng.chance(entry.chance)) continue;
-    if (entry.copper)
-      copper += ctx.rng.int(Math.ceil(entry.copper * 0.6), Math.ceil(entry.copper * 1.4));
+    if (entry.copper) {
+      // A heroic claim substitutes the raised finale money base (see
+      // LootEntry.heroicCopper): a VALUE swap on the same single int draw at
+      // THIS site, never an extra draw here. (Downstream, the fair-split
+      // remainder loop draws per leftover coin, so a different rolled total
+      // still changes ITS draw count; that was already true of any money
+      // value change.)
+      const moneyBase =
+        heroicClaim && entry.heroicCopper !== undefined ? entry.heroicCopper : entry.copper;
+      copper += ctx.rng.int(Math.ceil(moneyBase * 0.6), Math.ceil(moneyBase * 1.4));
+    }
     if (entry.itemId) items.push({ itemId: heroicItem(entry.itemId), count: 1 });
   }
   // Heroic-only drops: when the mob's claimed instance is heroic and it has a

@@ -20,6 +20,7 @@ import type {
   QuestDef,
   ZonePropsDef,
 } from '../types';
+import { HEROIC_FINALE_COPPER } from './dungeon_difficulty';
 
 // Archetype class-locks (match content/items.ts so REWARD_ARCHETYPE hand-offs
 // land on an item the whole group can equip).
@@ -292,7 +293,7 @@ export const TEMPLE_DUNGEON_MOBS: Record<string, MobTemplate> = {
     summonAdds: { mobId: 'moonspawn', count: 2, atHpPct: [0.6, 0.3] },
     enrage: { belowHpPct: 0.3, dmgMult: 1.4, hasteMult: 1.3 },
     loot: [
-      { copper: 6000, chance: 1 },
+      { copper: 6000, heroicCopper: HEROIC_FINALE_COPPER, chance: 1 },
       { itemId: 'ysols_pearl_greaves', chance: 0.5 },
       // exclusive "one of three" blue chests (weights sum to 1.0)
       { itemId: 'moonshroud_breastplate', chance: 0.34, rollGroup: 'ysolei_blue' },

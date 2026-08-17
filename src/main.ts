@@ -469,7 +469,7 @@ import {
   isCompleteTotpCode,
 } from './ui/two_factor_setup';
 import { UiEffectsApplier } from './ui/ui_effects_applier';
-import { hydrateIcons } from './ui/ui_icons';
+import { hydrateIcons, svgIcon } from './ui/ui_icons';
 import {
   resolveWocBalanceUpdate,
   setWalletConnectionAddresses,
@@ -4641,8 +4641,8 @@ async function startGame(
     }
     perfNetworkStats.connected = net.connected;
     perfNetworkStats.snapInterval = Math.round(net.snapInterval);
-    perfNetworkStats.lastSnapAge =
-      net.lastSnapAt > 0 ? Math.round(performance.now() - net.lastSnapAt) : -1;
+    const cameraLastSnapAge = net.lastSnapAt > 0 ? performance.now() - net.lastSnapAt : -1;
+    perfNetworkStats.lastSnapAge = Math.round(cameraLastSnapAge);
     perfNetworkStats.alpha = Math.round(alpha * 100) / 100;
     perf.setNetwork(perfNetworkStats);
     // Always-on net-pipeline counters (net_pipeline_stats.ts): fold the
@@ -4680,8 +4680,9 @@ async function startGame(
           onlineJitterMs,
           alpha,
           frameDt,
+          Math.max(0, cameraLastSnapAge),
+          net.snapInterval,
         );
-    const cameraLastSnapAge = net.lastSnapAt > 0 ? performance.now() - net.lastSnapAt : -1;
     traceStart = perf.startTrace();
     try {
       updateCamera(frameDt, kbFacing ?? interpServerFacing);
@@ -8076,7 +8077,7 @@ function showWalletPicker(
     closeBtn.type = 'button';
     closeBtn.className = 'x-btn wallet-picker-close';
     closeBtn.setAttribute('aria-label', t('skinEvent.close'));
-    closeBtn.textContent = '×';
+    closeBtn.innerHTML = svgIcon('close');
     titleRow.append(title, closeBtn);
 
     const help = document.createElement('p');

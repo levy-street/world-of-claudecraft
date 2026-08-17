@@ -92,3 +92,16 @@ Collection, completion ladder:
 - [v1] `col_reliquary_illum_nythraxis_heroic`, Nythraxis Illuminated: a blank illuminated manuscript bearing a crowned skeletal warlord emblem in violet-black flame and gold leaf.
 - [v1] `col_reliquary_illum_thunzharr`, Thunzharr Illuminated: a blank illuminated manuscript bearing the split Waking Peak and a single blue-white lightning strike.
 - [v1] `col_reliquary_illum_gravewyrm_heroic`, Sanctum Illuminated: a blank illuminated manuscript bearing a regal skeletal dragon emblem in bone, blue enamel, and gold leaf.
+
+## The walk-in castle crests (2026-08-08)
+
+Two new ids from the castle content pass, same delivery contract as above: one
+512x512 RGBA PNG per deed, named exactly by deed id, ingested with
+`npm run assets:deeds <source-dir>`. Both ride the procedural exploration
+category crest until the paintings land (enumerated in `DEED_ART_PENDING`,
+`src/ui/icons.ts`).
+
+Exploration (the walk-in castles):
+
+- [v1] `exp_the_last_keep`, The Quiet Halls: the Last Keep's gatehouse arch half in shadow, one banner stirring in a cold draught, dusk grey on ember red.
+- [v1] `exp_dawnhold_castle`, An Open Door in the Garden: Dawnhold's garden gate standing open, petals drifting across the threshold, warm morning gold on hedge green.

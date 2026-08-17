@@ -958,6 +958,22 @@ export const da_DK: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "The Undercroft",
+        "state": "The State Floor",
+        "residence": "The Residence",
+        "tower": "The Watch Tower"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "The Garden Floor",
+        "solar": "The Solar"
+      }
+    },
     "compass": {
       "N": "N",
       "NE": "NØ",
@@ -12456,6 +12472,9 @@ export const da_DK: EnTranslations = {
       "pristine_claw": {
         "name": "Uberørt Klo"
       },
+      "dawnhold_posy": {
+        "name": "Dawnhold Garden Posy"
+      },
       "vale_wheat_seed": {
         "name": "Vale Wheat Seed"
       },
@@ -17056,6 +17075,11 @@ export const da_DK: EnTranslations = {
         "name": "Den Sidste Borg",
         "enterText": "Du træder ind i Den Sidste Borgs kolde, stille haller.",
         "leaveText": "Du trækker borgdøren i og træder tilbage ud i Dragelandets vind."
+      },
+      "dawnhold_castle": {
+        "name": "Dawnhold Castle",
+        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
+        "leaveText": "You slip back out onto the sunlit garden lawn."
       },
       "drowned_temple": {
         "name": "Det Druknede Tempel",

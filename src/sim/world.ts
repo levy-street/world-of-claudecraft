@@ -1,6 +1,7 @@
 import { bgFieldHeightLocal } from './battleground_field';
 import { beaconSpiralLift } from './beacon_spiral';
 import { BORDER_EDGES } from './border_edges';
+import { bulwarkLift, bulwarkPadTarget, bulwarkPadWeight } from './bulwark_layout';
 import {
   castleLift,
   castlePadTarget,
@@ -34,9 +35,10 @@ import {
   ZONES,
   zoneAt,
 } from './data';
+import { dawnholdLift, dawnholdPadTarget, dawnholdPadWeight } from './dawnhold_layout';
 import { dockLocalPoint, dockSectionAtLocal, dockSurfaceLine, dockSurfaceYAt } from './dock_layout';
 import { dungeonFloorLift } from './dungeon_floor';
-import { lastKeepLiftAt } from './dungeon_layout';
+import { dawnholdKeepLiftAt, lastKeepLiftAt } from './dungeon_layout';
 import {
   EMBER_FLAT_POOLS,
   EMBER_LAVA_LINKS,
@@ -1263,6 +1265,10 @@ const bedGroup = (ax: number, az: number, r: number, sats: [number, number][]): 
   ...sats.map(([x, z]) => ({ x, z, r: 3.25, ax, az })),
 ];
 export const GARDEN_BED_PADS: readonly GardenBedPad[] = [
+  // (Dawnhold's own planting is the flower court's procedural fields, which
+  // stand on the castle pad's dead-flat ground and need no pad of their own.
+  // Every entry below is a MODELED bed, mirrored one-to-one against
+  // PARTERRE_PLOTS and the content decorProps by tests/garden_parterre.)
   ...bedGroup(322, 878, 10, [
     [322, 892.8],
     [322, 863.2],
@@ -1418,6 +1424,12 @@ export const MAZE_Z0 = MAZE_Z1 - MAZE_ROWS * MAZE_CELL;
 // corners/junctions read as crossing pieces. Collision is the union of the
 // same boxes, so the blocked ground IS the modeled hedge's footprint.
 export const MAZE_WALL_DEPTH = 4.2; // yd across a hedge piece (tracks the modeled hedge scale)
+// The piece's drawn size, kept HERE rather than beside the renderer because
+// colliders.ts needs the height for the camera top and src/sim may not import
+// src/render. render/garden_maze_core.ts re-exports all three.
+export const MAZE_WALL_OVERLAP = 0.75; // yd each piece reaches into its neighbor
+export const MAZE_WALL_SCALE = (MAZE_CELL + 2 * MAZE_WALL_OVERLAP) / 0.98; // 10.5 x 6.1 x 4.1
+export const MAZE_WALL_HEIGHT = 0.57 * MAZE_WALL_SCALE; // 6.1yd, the hedges' visual top
 
 /** Inside the maze footprint (small margin), where dressing must not spawn. */
 export function inGardenMaze(x: number, z: number): boolean {
@@ -2435,7 +2447,10 @@ function applyEmberLavaNetwork(x: number, z: number, h: number): number {
   }
   for (const link of EMBER_LAVA_LINKS) {
     const s = emberNearestOnLink(link, x, z);
-    const half = link.w * 0.62; // the channel model overhangs its melt line
+    // the river model now spans exactly link.w across the flow (the
+    // render scales it by its cross extent), so the bed only needs a
+    // shoulder either side rather than the old generous overhang
+    const half = link.w * 0.55;
     if (s.dist < half + 6.5) {
       const w = 1 - smoothstep(half, half + 3.5, s.dist);
       // low banks shouldering the channel, parted at every pool mouth
@@ -2514,6 +2529,14 @@ function applyCastlePad(x: number, z: number, h: number): number {
   return h + (castlePadTarget(x, z) - h) * w;
 }
 
+// The Ashen Bulwark's graded grounds on the Drakelands west headland (the
+// castle pad idiom at barracks scale; the plan lives in bulwark_layout.ts).
+function applyBulwarkPad(x: number, z: number, h: number): number {
+  const w = bulwarkPadWeight(x, z);
+  if (w <= 0) return h;
+  return h + (bulwarkPadTarget() - h) * w;
+}
+
 // The pad's northeast apron meets the Last Spring pool, and the pad yields to
 // the pool over castlePadWeight's own ring: the bailey's level floor ends on an
 // arc about 16yd out from the pool center and the ground then falls to the pool
@@ -2559,6 +2582,14 @@ function applyLastSpringBank(x: number, z: number, h: number): number {
   const w = castleSkirtWeight(x, z) * (1 - smoothstep(b.rim - b.ease, b.rim, d));
   if (w <= 0) return h;
   return h + (target - h) * w;
+}
+
+// Dawnhold Castle's graded grounds in the Evergarden (the same idiom at a
+// smaller scale; the plan lives in dawnhold_layout.ts).
+function applyDawnholdPad(x: number, z: number, h: number): number {
+  const w = dawnholdPadWeight(x, z);
+  if (w <= 0) return h;
+  return h + (dawnholdPadTarget() - h) * w;
 }
 
 // ---------------------------------------------------------------------------
@@ -3920,6 +3951,13 @@ export function groundHeight(x: number, z: number, seed: number): number {
       const origin = instanceOrigin(dungeon.index, instanceSlotForZ(z));
       return DUNGEON_FLOOR_Y + lastKeepLiftAt(x - origin.x, z - origin.z);
     }
+    if (dungeon?.interior === 'dawnhold') {
+      // Dawnhold Castle's interior rides the same authored-lift idiom as the
+      // Last Keep: the solar story and its stair ramps come from the shared
+      // room plan (src/sim/dungeon_layout.ts).
+      const origin = instanceOrigin(dungeon.index, instanceSlotForZ(z));
+      return DUNGEON_FLOOR_Y + dawnholdKeepLiftAt(x - origin.x, z - origin.z);
+    }
     // Every other interior is the flat room floor plus the raised boss dais
     // where its room plan stacks one (dungeon_floor.ts).
     return DUNGEON_FLOOR_Y + dungeonFloorLift(x, z);
@@ -3938,7 +3976,12 @@ export function groundHeight(x: number, z: number, seed: number): number {
   // (castleLift): the wall mass is a sheer riser the climb gate refuses,
   // and its flat top is the wall-walk.
   const terrain =
-    terrainHeight(x, z, seed) + sowfieldStandLift(x, z) + beaconSpiralLift(x, z) + castleLift(x, z);
+    terrainHeight(x, z, seed) +
+    sowfieldStandLift(x, z) +
+    beaconSpiralLift(x, z) +
+    castleLift(x, z) +
+    dawnholdLift(x, z) +
+    bulwarkLift(x, z);
   return Math.max(terrain, dockSurfaceHeight(x, z, seed));
 }
 
@@ -3975,6 +4018,10 @@ function applyTerrainPads(x: number, z: number, seed: number, h0: number): numbe
   // after the shore grading that forms them (see REACH_POOL_RIM_EASE for the freeze
   // it closes and REACH_POOL_DECK_TIE_IN for the one-way edge it closes).
   h = applyReachPoolWalkwayBed(x, z, h);
+  // Dawnhold Castle's garden pad, same late application.
+  h = applyDawnholdPad(x, z, h);
+  // the Drakelands' headland barracks, graded the same way
+  h = applyBulwarkPad(x, z, h);
   // Level pads under the Evergarden's modeled flower beds, applied over the
   // FINISHED height (the garden seam reshapes the lawn per position, so an
   // early flatten would drift apart again): each bed ensemble sits flush on
@@ -3987,7 +4034,12 @@ function applyTerrainPads(x: number, z: number, seed: number, h0: number): numbe
       const padGate = pad.r + 4;
       if (dx * dx + dz * dz >= padGate * padGate) continue;
       const d = Math.sqrt(dx * dx + dz * dz);
-      const ch = terrainHeightUnpadded(pad.ax, pad.az, seed);
+      // the anchor height honors Dawnhold's castle pad (the courtyard
+      // parterres must sit on the graded bailey, not dig back down to the
+      // raw lawn beneath it); beds outside the pad are unaffected (w 0)
+      let ch = terrainHeightUnpadded(pad.ax, pad.az, seed);
+      const dw = dawnholdPadWeight(pad.ax, pad.az);
+      if (dw > 0) ch = ch + (dawnholdPadTarget() - ch) * dw;
       const blend = smoothstep(pad.r + 1, pad.r + 4, d);
       h = h * blend + ch * (1 - blend);
     }
@@ -5049,6 +5101,9 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
     if (gz > 2160 && gz < 2360 && emberLinkDistanceNorm(gx, gz) < 1.1) return null;
     // the Last Keep's graded grounds carry no wild scatter
     if (castlePadWeight(gx, gz) > 0) return null;
+    // ...nor the Ashen Bulwark's headland pad (a boulder in the drill yard
+    // is also a stray collider standing in the muster lane)
+    if (bulwarkPadWeight(gx, gz) > 0) return null;
     for (const pool of EMBER_FLAT_POOLS) {
       if (Math.hypot(gx - pool.x, gz - pool.z) < pool.r * 1.6 + 4) return null;
     }
@@ -5083,8 +5138,10 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
     kind = r < 0.1 ? 'tree' : r < 0.5 ? 'tree2' : 'rock';
   } else if (biome === 'garden') {
     // open parkland: sparse specimen trees on the lawns, and the maze
-    // keeps its corridors clear (the hedges are terrain, not dressing)
+    // keeps its corridors clear (the hedges are terrain, not dressing);
+    // Dawnhold's graded grounds take no wild scatter either
     if (inGardenMaze(gx, gz)) return null;
+    if (dawnholdPadWeight(gx, gz) > 0) return null;
     if (r > 0.3) return null;
     kind = r < 0.16 ? 'tree' : r < 0.2 ? 'tree2' : 'rock';
   } else if (biome === 'gale') {

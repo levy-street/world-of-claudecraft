@@ -958,6 +958,22 @@ export const zh_TW: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "undercroft": "地下穹室",
+        "state": "正殿層",
+        "residence": "起居層",
+        "tower": "瞭望塔"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}: {story}",
+      "story": {
+        "ground": "庭園層",
+        "solar": "日光廳"
+      }
+    },
     "compass": {
       "N": "北",
       "NE": "東北",
@@ -12456,6 +12472,9 @@ export const zh_TW: EnTranslations = {
       "pristine_claw": {
         "name": "完美的爪"
       },
+      "dawnhold_posy": {
+        "name": "晨曦堡花園小花束"
+      },
       "vale_wheat_seed": {
         "name": "谷地小麥種子"
       },
@@ -17056,6 +17075,11 @@ export const zh_TW: EnTranslations = {
         "name": "最後的堡壘",
         "enterText": "你踏入最後的堡壘那冰冷而寂靜的大廳。",
         "leaveText": "你帶上堡門，重新走進龍裔荒原的寒風中。"
+      },
+      "dawnhold_castle": {
+        "name": "晨曦堡",
+        "enterText": "你走進晨曦堡溫暖而花香四溢的廳堂。",
+        "leaveText": "你回到陽光灑落的花園草坪上。"
       },
       "drowned_temple": {
         "name": "溺亡神殿",

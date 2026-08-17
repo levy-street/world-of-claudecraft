@@ -12,9 +12,13 @@
 //   and the pickup deny stays the authority. Objects that are merely INTERACTED with
 //   (bells, huts, wardstones) stay visible: they are scenery in their own right, which
 //   is why the arm keys on a `collect` objective for that exact itemId, not on the
-//   item carrying a questId.
+//   item carrying a questId. An INSTANCE may reuse a collectable's item id for an
+//   interact-only mechanic (the Nythraxis arena wardstones are the Sunken Bastion ward
+//   stone); its dungeon declares those objects `interactOnly`, and the arm reads that
+//   off the instance the object stands in, so the raid keeps its wards while the zone
+//   2 pickup stays a gated collectable.
 // Pure: no DOM, no rng, no clock.
-import { ITEMS, MOBS, QUESTS } from './data';
+import { dungeonAt, ITEMS, MOBS, QUESTS } from './data';
 import type { Entity, QuestProgress } from './types';
 
 /** Active or ready: the two states in which a quest's own entities are shown, and the
@@ -37,6 +41,15 @@ function collectQuestForObject(entity: Entity): string | null {
   return collected ? questId : null;
 }
 
+/** Whether the instance this object stands in declares its item an interact-only
+ *  mechanic (`DungeonObjectSpawn.interactOnly`). Overworld objects have no dungeon and
+ *  are never exempt this way. */
+function isInteractOnlyInstanceObject(entity: Entity): boolean {
+  const dungeon = dungeonAt(entity.pos.x);
+  if (!dungeon?.objects) return false;
+  return dungeon.objects.some((o) => o.interactOnly === true && o.itemId === entity.objectItemId);
+}
+
 /** The GROUND OBJECT arm on its own. Separate from the general predicate because the
  *  two arms want different treatment in the scene graph: a gated mob keeps its body
  *  (inert scenery), while a gated collectable is never built at all, so the renderer
@@ -47,7 +60,8 @@ export function isQuestGatedGroundObjectHidden(
 ): boolean {
   if (entity.kind !== 'object') return false;
   const questId = collectQuestForObject(entity);
-  return questId !== null && !onQuest(questLog, questId);
+  if (questId === null || onQuest(questLog, questId)) return false;
+  return !isInteractOnlyInstanceObject(entity);
 }
 
 export function isQuestGatedEntityHidden(

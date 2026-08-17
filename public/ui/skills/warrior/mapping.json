@@ -4,15 +4,73 @@
   "iconSize": 128,
   "sourcePacks": [
     "tmp/asset_src/warrior-skill-icons",
-    "tmp/asset_src/berserker-skill-icons (fallback for rage/fury)"
+    "tmp/asset_src/berserker-skill-icons (fallback for rage/fury)",
+    "OpenAI built-in image generation (release v0.39 second-pass legacy repaint cohort, 2026-08-16)"
   ],
   "runtimeDir": "public/ui/skills/warrior",
   "abilities": [
     {
       "abilityId": "heroic_strike",
-      "sourcePack": "warrior",
-      "sourceFile": "3.png",
-      "output": "heroic_strike.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_heroic_strike.png",
+      "output": "heroic_strike.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-warrior-warlock-mage.json",
+      "intendedVisualSubject": "a single heavy battle sword pulled back then surging forward in one decisive diagonal swing, represented by a dark steel blade with one broad molten-gold afterimage; its tip bursts against black plate in a compact star of sparks.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/revenge.webp",
+          "role": "approved sibling: steel-on-armor impact and bronze finish"
+        },
+        {
+          "path": "public/ui/skills/warrior/execute.webp",
+          "role": "approved sibling: blade foreshortening and orange impact"
+        },
+        {
+          "path": "public/ui/skills/warrior/cleave.webp",
+          "role": "approved sibling: broad sweeping weapon arc and small-size clarity"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior on-next-swing action-bar icon, brand-new replacement painting\nPrimary request: Paint Reaver Strike, a strong attack queued onto the Warrior's next melee swing for bonus damage.\nInput images: Image 1 (Revenge): approved sibling reference for close steel-on-armor impact and premium bronze finish. Image 2 (Execute): approved sibling reference for forceful blade foreshortening and orange impact. Image 3 (Cleave): approved sibling reference for broad sweeping weapon arc and small-size clarity.\nSubject: a single heavy battle sword pulled back then surging forward in one decisive diagonal swing, represented by a dark steel blade with one broad molten-gold afterimage; its tip bursts against black plate in a compact star of sparks.\nScene/backdrop: fully painted charcoal and deep burgundy combat haze to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG attack art; worn steel, muscular momentum, simple high-impact value grouping, original design.\nComposition/framing: square, blade and one afterimage form a strong diagonal filling 78%, impact near center, readable at 16/32/48 px and in a circular crop.\nLighting/mood: burnished gold, hot orange sparks, cool steel; committed, martial, forceful.\nConstraints: opaque, borderless; no text, letters, numbers, UI frame, badge, bevel, watermark, hand-only photo, multiple weapons, flat glyph, or copied sibling composition.\nAvoid: thrown sword, magic projectile, three-hit frenzy, thin blade, empty background, low contrast.",
+      "sourceSha256": "f33042f58c1fe40b99f3747f0d9f69511a9cb4570106a42327feb50968e1ba7f",
+      "sourceBytes": 2439583,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "b883a9c133778d87fea466bc8081d11f8b82038ac378d62778357e322140d57e",
+      "acceptedBytes": 5018,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "warrior",
+        "sourceFile": "3.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account unless sourcePack is custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "heroic_strike.webp",
+        "shippingSha256": "5e9778fe29ad437dd0bbe67611f53603fcdf884097dbdfec8a3aaa84ba21133c",
+        "shippingBytes": 4442,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "pursuit",
@@ -28,9 +86,66 @@
     },
     {
       "abilityId": "battle_shout",
-      "sourcePack": "custom-user",
-      "sourceFile": "desktop/grito de guerra.png",
-      "output": "battle_shout.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_battle_shout.png",
+      "output": "battle_shout.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-warrior-warlock-mage.json",
+      "intendedVisualSubject": "a scarred iron-helmed Warrior roaring upward, one fist raised, while two broad molten-gold sound waves expand behind the head and three dark weapon silhouettes rise in response along the lower edge; communicate martial rally and shared attack power.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/defiant_bellow.webp",
+          "role": "approved sibling: armored shout posture, circular force, premium red-gold finish"
+        },
+        {
+          "path": "public/ui/skills/warrior/emboldening_roar.webp",
+          "role": "approved sibling: shout posture and expanding amber sound rings"
+        },
+        {
+          "path": "public/ui/skills/warrior/rallying_cry.webp",
+          "role": "approved sibling: triumphant class lighting and rallying silhouette"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior party-buff action-bar icon, brand-new replacement painting\nPrimary request: Paint Iron Bellow, a shout that raises every party member's attack power by 10% for 30 minutes.\nInput images: Image 1 (Defiant Bellow): approved sibling reference for armored Warrior, circular force wave, and premium red-gold finish. Image 2 (Emboldening Roar): approved sibling reference for shout posture and expanding amber sound rings. Image 3 (Rallying Cry): approved sibling reference for triumphant class lighting and rallying silhouette.\nSubject: a scarred iron-helmed Warrior roaring upward, one fist raised, while two broad molten-gold sound waves expand behind the head and three dark weapon silhouettes rise in response along the lower edge; communicate martial rally and shared attack power.\nScene/backdrop: fully painted dark red battlefield smoke to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG ability art; textured armor, forceful brushwork, rich red/amber class palette, original design.\nComposition/framing: square, centered head-and-fist cluster filling 75-80%, broad rings and strong mouth silhouette, readable at 16/32/48 px and in a circular crop.\nLighting/mood: furnace gold from the throat and rings, blood-red rim, black steel; commanding, energizing, victorious.\nConstraints: opaque, borderless; no text, letters, numbers, line-art face, UI frame, badge, bevel, watermark, speech bubble, microphone, flat glyph, or copied sibling composition.\nAvoid: comic-book burst, friendly smile, tiny party characters, white background, low contrast.",
+      "sourceSha256": "0a1b4ec528b9476a0ba592f9ca9b3e77a6ec90f552e2100e0c933d4529f22c4c",
+      "sourceBytes": 2291223,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "21d24805132c6034cab8b7957a507565e87f1d12cf7e02e36d2a9e3f9efc20fe",
+      "acceptedBytes": 6694,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "custom-user",
+        "sourceFile": "desktop/grito de guerra.png",
+        "ownerOrLicense": "custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "battle_shout.webp",
+        "shippingSha256": "bfe117c3e7381130d6109f91fdea22da7ed49035d61a124b590b70035eb6fb3b",
+        "shippingBytes": 5076,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "raised_guard",
@@ -64,9 +179,66 @@
     },
     {
       "abilityId": "charge",
-      "sourcePack": "berserker",
-      "sourceFile": "27.png",
-      "output": "charge.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_charge.png",
+      "output": "charge.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-warrior-warlock-mage.json",
+      "intendedVisualSubject": "one armored Warrior driving shoulder-first diagonally forward behind a lowered shield, boots trailing a broad red-orange wake; the shield meets a dark enemy silhouette in a compact white-gold stun burst.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/heroic_leap.webp",
+          "role": "approved sibling: airborne armored silhouette and gold impact light"
+        },
+        {
+          "path": "public/ui/skills/warrior/pursuit.webp",
+          "role": "approved sibling: explosive forward motion and small-size contrast"
+        },
+        {
+          "path": "public/ui/skills/warrior/raised_guard.webp",
+          "role": "approved sibling: worn shield/steel material and blue impact sparks"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior mobility action-bar icon, brand-new replacement painting\nPrimary request: Paint Onrush, the Warrior's 8-25 yard charge that generates rage and stuns the enemy for one second.\nInput images: Image 1 (Heroic Leap): approved sibling reference for a readable airborne armored silhouette and gold impact light. Image 2 (Pursuit): approved sibling reference for explosive forward motion and small-size contrast. Image 3 (Raised Guard): approved sibling reference for worn shield/steel material and blue impact sparks.\nSubject: one armored Warrior driving shoulder-first diagonally forward behind a lowered shield, boots trailing a broad red-orange wake; the shield meets a dark enemy silhouette in a compact white-gold stun burst.\nScene/backdrop: fully painted black battlefield haze streaking backward to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG action art; heavy steel and leather, kinetic foreshortening, decisive impact, original design.\nComposition/framing: square, dynamic diagonal centered on shield impact, subject fills roughly 80%, broad silhouette readable at 16/32/48 px and inside a circular crop.\nLighting/mood: hot amber wake, steel-blue impact, deep crimson shadow; sudden, unstoppable, brutal.\nConstraints: opaque, borderless; no text, letters, numbers, UI frame, badge, bevel, watermark, horse, sports runner, flat glyph, or copied sibling composition.\nAvoid: static standing pose, multiple warriors, thin speed lines, excessive background scenery, low contrast.",
+      "sourceSha256": "e4fc7138db67159ad06292adcb1c7f9c9c64c98c058854862d274ada642249ed",
+      "sourceBytes": 2414279,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "eeee184519b791d97fd376942b18bb697ee2a898531bd786d9aacb989cfecf6f",
+      "acceptedBytes": 6366,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "berserker",
+        "sourceFile": "27.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account unless sourcePack is custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "charge.webp",
+        "shippingSha256": "05c5e019eb9c04730d26f76258a4cb3dcb89c3893e2ce1f16b279256968932ea",
+        "shippingBytes": 4036,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "lingering_dread",
@@ -76,15 +248,129 @@
     },
     {
       "abilityId": "thunder_clap",
-      "sourcePack": "warrior",
-      "sourceFile": "7.png",
-      "output": "thunder_clap.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_thunder_clap.png",
+      "output": "thunder_clap.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-warrior-warlock-mage.json",
+      "intendedVisualSubject": "one plated Warrior fist smashing a stone plate dead center, releasing a broad circular shockwave of blue-white thunder and amber rock; three enemy weapon heads around the perimeter are driven backward and trapped in the slowed wave.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/faultline.webp",
+          "role": "approved sibling: seismic radial impact and black-orange finish"
+        },
+        {
+          "path": "public/ui/skills/warrior/heroic_leap.webp",
+          "role": "approved sibling: grounded Warrior force"
+        },
+        {
+          "path": "public/ui/skills/warrior/raised_guard.webp",
+          "role": "approved sibling: cold steel-blue impact energy"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior area-damage and attack-slow action-bar icon, brand-new replacement painting\nPrimary request: Paint Quaking Blow, a Protection ground blast that damages nearby enemies, creates high threat, and slows their attacks by 10% for ten seconds.\nInput images: Image 1 (Faultline): approved sibling reference for seismic radial impact and premium black-orange finish. Image 2 (Heroic Leap): approved sibling reference for grounded Warrior force. Image 3 (Raised Guard): approved sibling reference for cold steel-blue impact energy.\nSubject: one plated Warrior fist smashing a stone plate dead center, releasing a broad circular shockwave of blue-white thunder and amber rock; three enemy weapon heads around the perimeter are driven backward and trapped in the slowed wave.\nScene/backdrop: fully painted storm-black battlefield dust to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG area attack art; heavy gauntlet, electric fracture, bold radial value grouping, original design.\nComposition/framing: square top-down impact cluster filling 82%, fist central and three broad perimeter weapons inside circular safe crop, readable at 16/32/48 px.\nLighting/mood: cobalt-white thunder core, amber fractures, soot black; seismic, controlling, high-threat.\nConstraints: opaque, borderless; no text, letters, numbers, clock, UI frame, badge, bevel, watermark, full character, hammer, flat glyph, or copied sibling composition.\nAvoid: weather landscape, thin lightning web, magical caster hand, tiny debris, low contrast.",
+      "sourceSha256": "4c400c6be926cfe595b025ec19856dd4e2e608282f683f2f9ff86a5210d37b55",
+      "sourceBytes": 2718416,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "a300fdced475f2ca0a37870c6ba68d2634463e45722fd73b32914981ba49a44c",
+      "acceptedBytes": 7282,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "warrior",
+        "sourceFile": "7.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account unless sourcePack is custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "thunder_clap.webp",
+        "shippingSha256": "5c9dffbc6f02a4b7fc7803a4b89aa97fecc84e588257394c29d20ed4e206283b",
+        "shippingBytes": 8126,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "hamstring",
-      "sourcePack": "warrior",
-      "sourceFile": "33.png",
-      "output": "hamstring.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_hamstring.png",
+      "output": "hamstring.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-warrior-warlock-mage.json",
+      "intendedVisualSubject": "one broad notched sword sweeping low through the back of an armored greave at the ankle, opening a vivid red cut; a thick cold-blue drag trail coils around the boot to communicate crippled movement.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/execute.webp",
+          "role": "approved sibling: sharp steel, hot-orange impact, readable weapon motion"
+        },
+        {
+          "path": "public/ui/skills/warrior/revenge.webp",
+          "role": "approved sibling: plated enemy material and close-range impact"
+        },
+        {
+          "path": "public/ui/skills/warrior/deep_wounds.webp",
+          "role": "approved sibling: concentrated crimson wound and premium dark rendering"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior melee slow action-bar icon, brand-new replacement painting\nPrimary request: Paint Hobbling Cut, a maiming weapon strike that deals damage and slows the enemy's movement by 50% for 15 seconds.\nInput images: Image 1 (Execute): approved sibling reference for sharp steel, hot orange impact, and readable weapon motion. Image 2 (Revenge): approved sibling reference for plated enemy material and close-range Warrior impact. Image 3 (Deep Wounds): approved sibling reference for a concentrated crimson wound with premium dark rendering.\nSubject: one broad notched sword sweeping low through the back of an armored greave at the ankle, opening a vivid red cut; a thick cold-blue drag trail coils around the boot to communicate crippled movement.\nScene/backdrop: fully painted near-black battlefield ground and smoke to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG ability art; tactile steel and leather, brutal macro action, bold original silhouette.\nComposition/framing: square close-up, diagonal blade and boot fill roughly 80%, wound centered, readable at 16/32/48 px and in a circular crop.\nLighting/mood: hot red-orange wound light against cold steel-blue drag energy; ruthless, heavy, disabling.\nConstraints: opaque, borderless; no text, letters, numbers, UI frame, badge, bevel, watermark, full character, medical diagram, flat glyph, or copied sibling composition.\nAvoid: detached leg, gore overload, three scratch marks, tiny chains, bright background, low contrast.",
+      "sourceSha256": "a94d9a5d50b76cbd79498126d128855359f7b70ab63ce1436aed4bf1838161a8",
+      "sourceBytes": 2591606,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "683b4ddb07c2e2544e834d3a19e66fbc8dd1fcca151d919988cfb46f369743e1",
+      "acceptedBytes": 4500,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "warrior",
+        "sourceFile": "33.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account unless sourcePack is custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "hamstring.webp",
+        "shippingSha256": "c9ab9d54402ee936d4eb9c794b6464a6eaff4e8520a411ec8d284c84ce01e571",
+        "shippingBytes": 2950,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "bloodrage",
@@ -106,9 +392,66 @@
     },
     {
       "abilityId": "overpower",
-      "sourcePack": "berserker",
-      "sourceFile": "12.png",
-      "output": "overpower.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_overpower.png",
+      "output": "overpower.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-warrior-warlock-mage.json",
+      "intendedVisualSubject": "one enormous crimson-lit armored gauntlet seizing and forcing aside an enemy sword while the Warrior's own dark blade crashes through behind it; two broad red echo crescents flank the gauntlet to indicate stored paired charges and stacking power.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/revenge.webp",
+          "role": "approved sibling: close armored counter-impact"
+        },
+        {
+          "path": "public/ui/skills/warrior/raging_gale.webp",
+          "role": "approved sibling: paired weapon motion and saturated red energy"
+        },
+        {
+          "path": "public/ui/skills/warrior/iron_resolve.webp",
+          "role": "approved sibling: plated Warrior body and amber finish"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior two-charge attack action-bar icon, brand-new replacement painting\nPrimary request: Paint Redhand, an unavoidable instant attack with two charges that empowers the next Maiming Strike, stacking twice.\nInput images: Image 1 (Revenge): approved sibling reference for a close armored counter-impact. Image 2 (Twinstrike): approved sibling reference for paired weapon motion and saturated red energy. Image 3 (Iron Resolve): approved sibling reference for a powerful plated Warrior body and premium amber finish.\nSubject: one enormous crimson-lit armored gauntlet seizing and forcing aside an enemy sword while the Warrior's own dark blade crashes through behind it; two broad red echo crescents flank the gauntlet to indicate stored paired charges and stacking power.\nScene/backdrop: fully painted black and furnace-red combat haze to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG attack art; tactile gauntlet steel, decisive counterforce, bold original silhouette.\nComposition/framing: square macro action, gauntlet dominates center and blades form a clean X, fills roughly 80%, readable at 16/32/48 px and circular crop.\nLighting/mood: molten red, hard gold sparks, black steel; overwhelming, inevitable, controlled.\nConstraints: opaque, borderless; no text, letters, numbers, UI frame, badge, bevel, watermark, disembodied cartoon hand, flat glyph, or copied sibling composition.\nAvoid: open palm spell, two full characters, tiny weapons, shield, low contrast.",
+      "sourceSha256": "4183702848f8318260374e00f83d9bb2ff9f96d2bcc2285fe7e7fc9c03e38bbe",
+      "sourceBytes": 2311893,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "10bbba52b08521dfde0881c7fd38668eca9f3ea075fef35df53d3994fe657e0b",
+      "acceptedBytes": 5026,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "berserker",
+        "sourceFile": "12.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account unless sourcePack is custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "overpower.webp",
+        "shippingSha256": "ea303e376830e2cc015cc8d80fec59e3f0c5b7caa8406f9cbe24e43a1db7b7a3",
+        "shippingBytes": 4044,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "raging_gale",
@@ -124,15 +467,133 @@
     },
     {
       "abilityId": "slam",
-      "sourcePack": "warrior",
-      "sourceFile": "4.png",
-      "output": "slam.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_slam.png",
+      "output": "slam.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-warrior-warlock-mage.json",
+      "intendedVisualSubject": "one two-handed war hammer descending vertically from an armored grip into a cracked stone plate, producing one broad V-shaped amber shock burst; the heavy head and downward momentum dominate, with no magic lightning.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/heroic_leap.webp",
+          "role": "approved sibling: airborne armored force and gold landing light"
+        },
+        {
+          "path": "public/ui/skills/warrior/execute.webp",
+          "role": "approved sibling: heavy blade foreshortening"
+        },
+        {
+          "path": "public/ui/skills/warrior/faultline.webp",
+          "role": "approved sibling: seismic impact and orange-black rendering"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior Arms builder action-bar icon, brand-new replacement painting\nPrimary request: Paint Brute Swing, a brutal half-weapon-damage blow that generates eight rage.\nInput images: Image 1 (Heroic Leap): approved sibling reference for airborne armored force and gold landing light. Image 2 (Execute): approved sibling reference for heavy blade foreshortening. Image 3 (Faultline): approved sibling reference for seismic ground impact and premium orange-black rendering.\nSubject: one two-handed war hammer descending vertically from an armored grip into a cracked stone plate, producing one broad V-shaped amber shock burst; the heavy head and downward momentum dominate, with no magic lightning.\nScene/backdrop: fully painted soot-black battlefield ground and dust to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG attack art; battered steel, raw physical force, thick brushwork, original design.\nComposition/framing: square, hammer head and impact fill roughly 80%, strong vertical silhouette, safe circular crop, readable at 16/32/48 px.\nLighting/mood: hot amber fracture light, dark steel, red dust; brutal, grounded, rage-building.\nConstraints: opaque, borderless; no text, letters, numbers, UI frame, badge, bevel, watermark, floating weapon, lightning, shield, flat glyph, or copied sibling composition.\nAvoid: heroic leap body pose, multiple hammers, thin cracks, bright scenic background, low contrast.",
+      "sourceSha256": "5ec4a05567a404321f5b5d5fa6ec2c1fb7879bce241819226f8b0246045f1493",
+      "sourceBytes": 2688463,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "23adcdc76ef4b840d3017103a357b8afb15d3f7a244cb7af86cbcdd5e1ab4211",
+      "acceptedBytes": 5454,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "warrior",
+        "sourceFile": "4.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account unless sourcePack is custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "slam.webp",
+        "shippingSha256": "bbc02cc07fcdf91ee09741eb356378126da47fdf360a25350dfcce7f36787b8b",
+        "shippingBytes": 3210,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "red_harvest",
-      "sourcePack": "custom-user",
-      "sourceFile": "desktop/Desenfreno wow.png",
-      "output": "red_harvest.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_red_harvest.png",
+      "output": "red_harvest.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-warrior-warlock-mage.json",
+      "intendedVisualSubject": "a berserk black-armored Warrior at center executing three unmistakable crimson weapon arcs - one high, one crossing, one low - around a single two-handed axe; the three arcs converge into a white-hot blood-red impact while an ember mane flares behind the helm.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/bloodthirst.webp",
+          "role": "approved sibling: blood-red melee ferocity and armor rendering"
+        },
+        {
+          "path": "public/ui/skills/warrior/raging_gale.webp",
+          "role": "approved sibling: multi-hit weapon rhythm"
+        },
+        {
+          "path": "public/ui/skills/warrior/enrage_passive.webp",
+          "role": "approved sibling: flaming Enrage silhouette"
+        },
+        {
+          "path": "public/ui/skills/warrior/bladestorm.webp",
+          "role": "approved sibling: compact circular blade motion"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior Fury spender action-bar icon, brand-new replacement painting\nPrimary request: Paint Red Harvest, the all-rage Fury attack that strikes three times in a frenzy and always Enrages the Warrior.\nInput images: Image 1 (Bloodletting): approved sibling reference for blood-red melee ferocity and premium armor rendering. Image 2 (Twinstrike): approved sibling reference for multi-hit weapon rhythm. Image 3 (Mayhem): approved sibling reference for the flaming Enrage silhouette. Image 4 (Bladestorm): approved sibling reference for compact circular blade motion.\nSubject: a berserk black-armored Warrior at center executing three unmistakable crimson weapon arcs - one high, one crossing, one low - around a single two-handed axe; the three arcs converge into a white-hot blood-red impact while an ember mane flares behind the helm.\nScene/backdrop: fully painted near-black battlefield smoke to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG signature art; savage motion, rich steel and blood-light, strong original silhouette.\nComposition/framing: square, central berserker and exactly three broad arcs fill 80%, safe circular crop, readable at 16/32/48 px.\nLighting/mood: saturated crimson, white-hot center, ember orange; frenzied, costly, explosive.\nConstraints: opaque, borderless; no text, letters, numbers, UI frame, badge, bevel, watermark, gore, more than three major arcs, flat glyph, or copied sibling composition.\nAvoid: calm single swing, generic whirlwind circle, tiny character, rainbow trails, low contrast.",
+      "sourceSha256": "41536a3156fa7730c2b2ec676e2e796f03ab89140799e24afe29a879260db0ab",
+      "sourceBytes": 2316948,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "76674a34a222f69e4256f57434862a717746c38cfcb4458e9ddb8344d9b12a72",
+      "acceptedBytes": 4986,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "custom-user",
+        "sourceFile": "desktop/Desenfreno wow.png",
+        "ownerOrLicense": "custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "red_harvest.webp",
+        "shippingSha256": "a2a3a22163452b654f4e15a7a043a921b5a9158b655bf3c02a9a7f10d28095ca",
+        "shippingBytes": 15074,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "heroic_leap",
@@ -172,15 +633,129 @@
     },
     {
       "abilityId": "defensive_stance",
-      "sourcePack": "custom-user",
-      "sourceFile": "desktop/Actitud defensiva wow.png",
-      "output": "defensive_stance.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_defensive_stance.png",
+      "output": "defensive_stance.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-warrior-warlock-mage.json",
+      "intendedVisualSubject": "one heavily armored Warrior planted low behind a broad battered shield, shoulders squared, sword held close rather than attacking; a compact amber ring braces around the shield while hostile red sparks bend toward the Warrior, communicating guarded threat and mitigation.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/raised_guard.webp",
+          "role": "approved sibling: steel shield material, blue impact light, tight silhouette"
+        },
+        {
+          "path": "public/ui/skills/warrior/iron_resolve.webp",
+          "role": "approved sibling: premium plated Warrior rendering and amber protective energy"
+        },
+        {
+          "path": "public/ui/skills/warrior/battle_stance.webp",
+          "role": "approved sibling: full-body stance readability and warm class palette"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior action-bar stance icon, brand-new replacement painting\nPrimary request: Paint Guarded Stance, the Warrior stance that increases threat by 30% while reducing damage dealt and taken by 10%.\nInput images: Image 1 (Raised Guard): approved sibling reference for steel shield material, blue impact light, and tight action-bar silhouette. Image 2 (Iron Resolve): approved sibling reference for premium plated Warrior rendering and amber protective energy. Image 3 (Battle Stance): approved sibling reference for full-body stance readability and warm class palette.\nSubject: one heavily armored Warrior planted low behind a broad battered shield, shoulders squared, sword held close rather than attacking; a compact amber ring braces around the shield while hostile red sparks bend toward the Warrior, communicating guarded threat and mitigation.\nScene/backdrop: fully painted charcoal battlefield smoke to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG ability art; blackened steel, worn bronze, muscular silhouette, dramatic light, original design.\nComposition/framing: square, centered defensive silhouette filling about 78%; face mostly hidden; thick forms and protected center remain clear at 16, 32, and 48 px and inside a circular crop.\nLighting/mood: cold steel-blue front light, amber rim, restrained crimson sparks; immovable, disciplined, dangerous.\nConstraints: opaque, borderless; no text, letters, numbers, UI frame, badge, bevel, watermark, modern iconography, flat glyph, cartoon anatomy, or copied sibling composition.\nAvoid: passive shield floating alone, heroic portrait bust, ornate thin details, empty margins, low contrast.",
+      "sourceSha256": "7ea64401c638c1527ce5dad1bbf6ce5c8407c7d1ee3c85a8b8d22b69539156dc",
+      "sourceBytes": 2574935,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "82d494e2eaec84d574b763fb47ba1186f016e47cd366567ca56e0d2e9c8f24a0",
+      "acceptedBytes": 5068,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "custom-user",
+        "sourceFile": "desktop/Actitud defensiva wow.png",
+        "ownerOrLicense": "custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "defensive_stance.webp",
+        "shippingSha256": "bbd61b9715851b9d392802cc4fcf153eb4d2ed97132667fbefd5a0733e5618cf",
+        "shippingBytes": 6122,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "demoralizing_shout",
-      "sourcePack": "warrior",
-      "sourceFile": "36.png",
-      "output": "demoralizing_shout.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_demoralizing_shout.png",
+      "output": "demoralizing_shout.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-warrior-warlock-mage.json",
+      "intendedVisualSubject": "a black-iron Warrior helm roaring at the center of a wide dark-red shockwave; two enemy weapon silhouettes at the sides visibly dim, crack, and bow away under violet dread pressure.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/defiant_bellow.webp",
+          "role": "approved sibling: armored shout posture and circular force"
+        },
+        {
+          "path": "public/ui/skills/warrior/lingering_dread.webp",
+          "role": "approved sibling: violet terror, spectral faces, debuff darkness"
+        },
+        {
+          "path": "public/ui/skills/warrior/iron_resolve.webp",
+          "role": "approved sibling: premium blackened armor and amber edge light"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior enemy-debuff action-bar icon, brand-new replacement painting\nPrimary request: Paint Direhowl, a fearsome shout that makes all nearby enemies deal 20% less damage for 20 seconds.\nInput images: Image 1 (Defiant Bellow): approved sibling reference for armored shout posture and circular force. Image 2 (Lingering Dread): approved sibling reference for violet terror, spectral faces, and debuff darkness. Image 3 (Iron Resolve): approved sibling reference for premium blackened armor rendering and amber edge light.\nSubject: a black-iron Warrior helm roaring at the center of a wide dark-red shockwave; two enemy weapon silhouettes at the sides visibly dim, crack, and bow away under violet dread pressure.\nScene/backdrop: fully painted soot-black and bruised crimson smoke to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG debuff art; heavy armor, supernatural pressure, bold value grouping, original design.\nComposition/framing: square, centered helm and broad shockwave filling 75-80%, simple side weapons, readable at 16/32/48 px and in a circular crop.\nLighting/mood: ember-red throat light, violet-black wave, muted steel; oppressive, terrifying, weakening.\nConstraints: opaque, borderless; no text, letters, numbers, comic speech burst, UI frame, badge, bevel, watermark, flat glyph, or copied sibling composition.\nAvoid: cheerful rally, fleeing full characters, tiny details, bright gold-dominant buff look, low contrast.",
+      "sourceSha256": "2f7c1086c882dcf55dbebf4959c06df583890501bf4e5c143c7e1f872762f163",
+      "sourceBytes": 2476963,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "3a27eb70b3f9f539748b8c9c7b7cc019a104bb9bd1013c8cd5e9aeac3943b1ed",
+      "acceptedBytes": 4752,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "warrior",
+        "sourceFile": "36.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account unless sourcePack is custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "demoralizing_shout.webp",
+        "shippingSha256": "fd821f47ad86bc8c1c59a7996cd5b0aef6bce5e641bdb16505bf4e0a6728907c",
+        "shippingBytes": 4962,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "berserker_stance",
@@ -202,21 +777,192 @@
     },
     {
       "abilityId": "intimidating_shout",
-      "sourcePack": "custom-user",
-      "sourceFile": "desktop/Fear en area wow.png",
-      "output": "intimidating_shout.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_intimidating_shout.png",
+      "output": "intimidating_shout.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-warrior-warlock-mage.json",
+      "intendedVisualSubject": "one horned black-steel Warrior helm roaring from the center of a bone-white and red shockwave; three large shadow faces recoil outward at the perimeter, eyes wide in violet terror, suggesting a crowd without tiny figures.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/defiant_bellow.webp",
+          "role": "approved sibling: plated Warrior shout posture and radial force"
+        },
+        {
+          "path": "public/ui/skills/warrior/lingering_dread.webp",
+          "role": "approved sibling: spectral terror faces and violet-black atmosphere"
+        },
+        {
+          "path": "public/ui/skills/warrior/emboldening_roar.webp",
+          "role": "approved sibling: concentric sound waves and face readability"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior area-fear action-bar icon, brand-new replacement painting\nPrimary request: Paint Intimidating Shout, a terrifying roar that sends up to five nearby enemies fleeing for four seconds.\nInput images: Image 1 (Defiant Bellow): approved sibling reference for plated Warrior shout posture and radial force. Image 2 (Lingering Dread): approved sibling reference for spectral terror faces and violet-black atmosphere. Image 3 (Emboldening Roar): approved sibling reference for powerful concentric sound waves and close-up face readability.\nSubject: one horned black-steel Warrior helm roaring from the center of a bone-white and red shockwave; three large shadow faces recoil outward at the perimeter, eyes wide in violet terror, suggesting a crowd without tiny figures.\nScene/backdrop: fully painted black-purple battlefield smoke to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG crowd-control art; textured plate, spectral fear, dramatic high contrast, original design.\nComposition/framing: square, central roaring helm fills half the canvas, broad circular wave and three perimeter faces stay inside safe crop; readable at 16/32/48 px and circular crop.\nLighting/mood: white-hot throat, blood-red ring, violet shadows; primal, shocking, panic-inducing.\nConstraints: opaque, borderless; no text, letters, numbers, comic burst, UI frame, badge, bevel, watermark, flat silhouette, or copied sibling composition.\nAvoid: smiling rally, five tiny bodies, skull-only icon, white checkerboard, low contrast.",
+      "sourceSha256": "8c870750bfc29464b6b7ae8d34e85b972705484fb6bbe8fd00ca7a116da3e1b9",
+      "sourceBytes": 2585867,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "2bf22332aa09f46882736c6e6aa8980af077c3e3e9daa7b0fe77162fe30a5bf9",
+      "acceptedBytes": 6364,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "custom-user",
+        "sourceFile": "desktop/Fear en area wow.png",
+        "ownerOrLicense": "custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "intimidating_shout.webp",
+        "shippingSha256": "5965bdaa1c377d7723c232e256e8cd855acf6010ddd7505d1ddf1751bf85d2f3",
+        "shippingBytes": 16168,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "sunder_armor",
-      "sourcePack": "berserker",
-      "sourceFile": "8.png",
-      "output": "sunder_armor.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_sunder_armor.png",
+      "output": "sunder_armor.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-warrior-warlock-mage.json",
+      "intendedVisualSubject": "one wedge-shaped war axe biting through a blackened breastplate, splitting it into five large readable plate fragments around a deep glowing orange fissure; the armor is clearly being peeled and broken away layer by layer.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/faultline.webp",
+          "role": "approved sibling: fracturing and amber impact light"
+        },
+        {
+          "path": "public/ui/skills/warrior/revenge.webp",
+          "role": "approved sibling: steel-on-plate collision"
+        },
+        {
+          "path": "public/ui/skills/warrior/raised_guard.webp",
+          "role": "approved sibling: battered shield-grade metal texture"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior armor-debuff action-bar icon, brand-new replacement painting\nPrimary request: Paint Armor Shear, a high-threat strike that reduces armor per application and stacks up to five times.\nInput images: Image 1 (Faultline): approved sibling reference for dramatic fracturing and amber impact light. Image 2 (Revenge): approved sibling reference for close steel-on-plate collision. Image 3 (Raised Guard): approved sibling reference for battered shield-grade metal texture.\nSubject: one wedge-shaped war axe biting through a blackened breastplate, splitting it into five large readable plate fragments around a deep glowing orange fissure; the armor is clearly being peeled and broken away layer by layer.\nScene/backdrop: fully painted charcoal battlefield smoke to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG debuff art; tactile dented steel, heavy fracture, bold original silhouette.\nComposition/framing: square macro impact, axe and breastplate fill roughly 82%, five broad fragments stay within circular safe crop, readable at 16/32/48 px.\nLighting/mood: furnace orange fracture light, cool steel, deep red dust; destructive, deliberate, threatening.\nConstraints: opaque, borderless; no text, letters, numbers, UI frame, badge, bevel, watermark, full character, floating armor icon, flat glyph, or copied sibling composition.\nAvoid: shield block, stone-only crack, many tiny shards, gore, low contrast.",
+      "sourceSha256": "d4aad04f5a510c01044669c90fcd09395a951061e331d8daa7e2f4af65e22172",
+      "sourceBytes": 2364801,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "884a8ebb9e8a67db9bf329923b1cd77d3adf4193790833332f4f741e731a9531",
+      "acceptedBytes": 5838,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "berserker",
+        "sourceFile": "8.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account unless sourcePack is custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "sunder_armor.webp",
+        "shippingSha256": "1cf71e3e80f4e58806e848d5950a1c592ca53a1a42758a14c77609c1d08e7125",
+        "shippingBytes": 4928,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "mortal_strike",
-      "sourcePack": "warrior",
-      "sourceFile": "21.png",
-      "output": "mortal_strike.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_mortal_strike.png",
+      "output": "mortal_strike.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-warrior-warlock-mage.json",
+      "intendedVisualSubject": "one massive dark-steel axe cleaving through a glowing green life-vine wrapped around black armor; the vine snaps and withers at the red wound, making blocked healing and lasting bleed readable without using a medical symbol.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/bloodthirst.webp",
+          "role": "approved sibling: brutal red-black melee energy and premium rendering"
+        },
+        {
+          "path": "public/ui/skills/warrior/deep_wounds.webp",
+          "role": "approved sibling: focused bleeding cut"
+        },
+        {
+          "path": "public/ui/skills/warrior/execute.webp",
+          "role": "approved sibling: heavy steel weapon impact and amber sparks"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior signature attack action-bar icon, brand-new replacement painting\nPrimary request: Paint Maiming Strike, a vicious Arms attack that deals heavy weapon damage, halves healing received for ten seconds, and leaves a bleeding wound.\nInput images: Image 1 (Bloodletting): approved sibling reference for brutal red-black melee energy and premium rendering. Image 2 (Deep Wounds): approved sibling reference for a focused bleeding cut. Image 3 (Execute): approved sibling reference for heavy steel weapon impact and amber sparks.\nSubject: one massive dark-steel axe cleaving through a glowing green life-vine wrapped around black armor; the vine snaps and withers at the red wound, making blocked healing and lasting bleed readable without using a medical symbol.\nScene/backdrop: fully painted soot-black and deep crimson haze to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG signature art; tactile steel, torn vine and armor, bold value grouping, original design.\nComposition/framing: square macro impact, axe diagonal fills 75-80%, red wound and broken green vine at center, readable at 16/32/48 px and in a circular crop.\nLighting/mood: saturated blood red, dying emerald, hot gold edge light; vicious, final, anti-healing.\nConstraints: opaque, borderless; no text, letters, numbers, red cross, UI frame, badge, bevel, watermark, full character, flat glyph, or copied sibling composition.\nAvoid: generic sword slash, ordinary plant-cutting scene, gore overload, tiny leaves, low contrast.",
+      "sourceSha256": "fb17def38a5c3ca99163944a6841f4c529653c2826c5f86d474c960f9b2bff2b",
+      "sourceBytes": 2234124,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "60a951bfe1bb836372a4d40e79252d63f130adfd8118ac4925302f1cb7ee9957",
+      "acceptedBytes": 4810,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "warrior",
+        "sourceFile": "21.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account unless sourcePack is custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "mortal_strike.webp",
+        "shippingSha256": "17e1fb6fae3144fd4ca101729d3d9fefc54f623ca00e5ed734ed7dc41b4ae83a",
+        "shippingBytes": 2298,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "bloodthirst",
@@ -244,9 +990,66 @@
     },
     {
       "abilityId": "shield_slam",
-      "sourcePack": "berserker",
-      "sourceFile": "25.png",
-      "output": "shield_slam.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_shield_slam.png",
+      "output": "shield_slam.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-warrior-warlock-mage.json",
+      "intendedVisualSubject": "a broad iron shield exploding forward into a horned enemy helm, bending the helm backward in one compact white-gold impact; the Warrior's braced shoulder is visible behind the shield and a red rage flare erupts from its rim.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/raised_guard.webp",
+          "role": "approved sibling: battered shield material and blue-white impact"
+        },
+        {
+          "path": "public/ui/skills/warrior/revenge.webp",
+          "role": "approved sibling: close armored collision and hot sparks"
+        },
+        {
+          "path": "public/ui/skills/warrior/iron_resolve.webp",
+          "role": "approved sibling: premium plated Warrior lighting"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior Protection signature action-bar icon, brand-new replacement painting\nPrimary request: Paint Shieldcrack, a shield-required slam that deals weapon damage, creates massive threat, and generates 15 rage.\nInput images: Image 1 (Raised Guard): approved sibling reference for battered shield materials and blue-white shield impact. Image 2 (Revenge): approved sibling reference for close armored collision and hot sparks. Image 3 (Iron Resolve): approved sibling reference for premium plated Warrior lighting.\nSubject: a broad iron shield exploding forward into a horned enemy helm, bending the helm backward in one compact white-gold impact; the Warrior's braced shoulder is visible behind the shield and a red rage flare erupts from its rim.\nScene/backdrop: fully painted charcoal battlefield smoke to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG melee art; dented steel, physical weight, bold collision, original design.\nComposition/framing: square macro impact, shield fills the left-center and helm the right-center, overall cluster fills 82%, readable at 16/32/48 px and circular crop.\nLighting/mood: steel blue, white-gold impact, deep red rim; concussive, commanding, high-threat.\nConstraints: opaque, borderless; no text, letters, numbers, UI frame, badge, bevel, watermark, floating shield, full scene, flat glyph, or copied sibling composition.\nAvoid: defensive static pose, sword as main subject, broken shield, tiny face, low contrast.",
+      "sourceSha256": "04c1539a7dc2309aa6619841776b8d0f7c862b0797709f42ab45618390f1b211",
+      "sourceBytes": 2622838,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "8b419980157fff97eb73274b148adf68ab879763620dae5ab67cf35a4eeaf924",
+      "acceptedBytes": 6008,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "berserker",
+        "sourceFile": "25.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account unless sourcePack is custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "shield_slam.webp",
+        "shippingSha256": "3619e8acc39ef49af683f0aab434f08492bb4f66fa409b040045a9bce7d1ac07",
+        "shippingBytes": 4706,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "sanguine_aura",
@@ -316,9 +1119,66 @@
     },
     {
       "abilityId": "taunt",
-      "sourcePack": "generic-skill100",
-      "sourceFile": "skill icon 37.png",
-      "output": "taunt.webp"
+      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
+      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_taunt.png",
+      "output": "taunt.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "provenanceRecord": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-warrior-warlock-mage.json",
+      "intendedVisualSubject": "a massive armored Warrior fist clenched in the foreground, connected by one thick molten-red threat tether to a snarling horned enemy helm being yanked to face it; a compact red target glare locks between their eyes.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/defiant_bellow.webp",
+          "role": "approved sibling: commanding red radial force"
+        },
+        {
+          "path": "public/ui/skills/warrior/iron_resolve.webp",
+          "role": "approved sibling: dominant plated Warrior presence"
+        },
+        {
+          "path": "public/ui/skills/warrior/revenge.webp",
+          "role": "approved sibling: hostile helmet and impact materials"
+        }
+      ],
+      "generationPrompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior threat-control action-bar icon, brand-new replacement painting\nPrimary request: Paint Goad, the off-global taunt that matches the target's highest threat and compels it to attack the Warrior for three seconds.\nInput images: Image 1 (Defiant Bellow): approved sibling reference for commanding red radial force. Image 2 (Iron Resolve): approved sibling reference for dominant plated Warrior presence. Image 3 (Revenge): approved sibling reference for close hostile helmet and Warrior impact materials.\nSubject: a massive armored Warrior fist clenched in the foreground, connected by one thick molten-red threat tether to a snarling horned enemy helm being yanked to face it; a compact red target glare locks between their eyes.\nScene/backdrop: fully painted black and dark-red battlefield haze to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG control art; heavy steel, supernatural threat force, simple original silhouette.\nComposition/framing: square close-up, fist and enemy helm occupy opposing halves joined through center, fills 78%, readable at 16/32/48 px and circular crop.\nLighting/mood: molten red tether, amber eye glare, black steel; provocative, commanding, unavoidable.\nConstraints: opaque, borderless; no text, letters, numbers, bullseye symbol, pointing finger, UI frame, badge, bevel, watermark, full bodies, flat glyph, or copied sibling composition.\nAvoid: comic insult, speech bubble, fishing hook, tiny chain, friendly handshake, low contrast.",
+      "sourceSha256": "5c536592065786e6077dcc682dc81b419c3edc33d6ac94ea008b5a91f6de9330",
+      "sourceBytes": 1917815,
+      "sourceWidth": 1254,
+      "sourceHeight": 1254,
+      "acceptedSha256": "3d854a88d08457bc6fa075380a18b86137e6a49a7787eef61e081101f103d583",
+      "acceptedBytes": 4040,
+      "acceptedWidth": 128,
+      "acceptedHeight": 128,
+      "acceptedColorSpace": "sRGB",
+      "acceptedOpaque": true,
+      "review": {
+        "sizesPx": [
+          128,
+          48,
+          32,
+          16
+        ],
+        "grayscale": "accepted",
+        "circularCrop": "accepted",
+        "semantic": "accepted",
+        "crop": "accepted",
+        "style": "accepted"
+      },
+      "supersedes": {
+        "sourcePack": "generic-skill100",
+        "sourceFile": "skill icon 37.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account unless sourcePack is custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
+        "output": "taunt.webp",
+        "shippingSha256": "ba8b656e5a4bbb0974b63689760b5753a6aa904085c6e68135d0d36694f7a4a9",
+        "shippingBytes": 2168,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "reason": "Release v0.39 second-pass audit replaced a high-confidence legacy flat/cartoon outlier with mechanic-accurate premium painted art."
+      }
     },
     {
       "abilityId": "double_charge",
@@ -831,5 +1691,5 @@
     }
   ],
   "deferredStayProcedural": {},
-  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 entries are project-generated and explicitly override it."
+  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 and woc_openai_release_v039_icon_art_second_pass_2026_08_16 entries are project-generated and explicitly override it."
 }

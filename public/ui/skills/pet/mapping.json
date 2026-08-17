@@ -1,0 +1,156 @@
+{
+  "class": "pet",
+  "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+  "iconSize": 128,
+  "sourcePacks": [
+    "OpenAI built-in image generation, release-v039-pet-action-icons-2026-08-16"
+  ],
+  "runtimeDir": "public/ui/skills/pet",
+  "acceptedArtManifest": "docs/achievements/release-v039-icon-art-first-pass-2026-08-16/accepted-art.json",
+  "abilities": [
+    {
+      "abilityId": "pet_attack",
+      "sourcePack": "release-v039-pet-action-icons-2026-08-16",
+      "sourceFile": "tmp/imagegen/v039-pet-action-icons/raw/pet_attack.png",
+      "output": "pet_attack.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A creature-neutral companion paw driving toward one hostile target spark.",
+      "references": [
+        { "path": "public/ui/skills/hunter/bestial_wrath.webp", "role": "animal-energy reference" },
+        { "path": "public/ui/skills/hunter/counter_shot.webp", "role": "impact and finish reference" },
+        { "path": "public/ui/skills/warrior/deep_wounds.webp", "role": "dark-value and crimson reference" }
+      ],
+      "sourceSha256": "d5cae82f10bc9d1d79c6c52bd642fc6da481ecce50d232463b4b03b3fa97f87e",
+      "acceptedSha256": "0c76dc1ae06ab0ce3fe4870ef57d5ae3f82f554a4aef3209e296066f0805df24",
+      "acceptedBytes": 3374
+    },
+    {
+      "abilityId": "pet_growl",
+      "sourcePack": "release-v039-pet-action-icons-2026-08-16",
+      "sourceFile": "tmp/imagegen/v039-pet-action-icons/raw/pet_growl.png",
+      "output": "pet_growl.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A snarling companion muzzle projecting two threat waves toward one hostile eye.",
+      "references": [
+        { "path": "public/ui/skills/druid/challenging_roar.webp", "role": "growling subject reference" },
+        { "path": "public/ui/skills/hunter/bestial_wrath.webp", "role": "animal-energy and palette reference" },
+        { "path": "public/ui/skills/hunter/counter_shot.webp", "role": "action direction and finish reference" }
+      ],
+      "sourceSha256": "83e019b6f890dd2f36d1fd4595e1278138be656dd4956f752ae512b33ca9fdab",
+      "acceptedSha256": "6d0a72d49deeb79855c8899d9b07d566b6279548da21cc35132be38c1522bb17",
+      "acceptedBytes": 3800
+    },
+    {
+      "abilityId": "pet_water_jet",
+      "sourcePack": "release-v039-pet-action-icons-2026-08-16",
+      "sourceFile": "tmp/imagegen/v039-pet-action-icons/raw/pet_water_jet.png",
+      "output": "pet_water_jet.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "An elemental hand channels one continuous turquoise slowing stream into a hostile target.",
+      "references": [
+        { "path": "public/ui/skills/mage/deep_freeze.webp", "role": "deep-blue value and finish reference" },
+        { "path": "public/ui/skills/mage/ice_lance.webp", "role": "Mage frost palette reference" },
+        { "path": "public/ui/skills/hunter/counter_shot.webp", "role": "target-directed action reference" }
+      ],
+      "sourceSha256": "f585c7472a90892b0679f472aaf0db36b22dde1bd50d90d8211965a6acfa41e1",
+      "acceptedSha256": "ad2716d07210c5c3c6a41635f7ede47c90ddd5784264e44446ab66b5e7b82077",
+      "acceptedBytes": 5458
+    },
+    {
+      "abilityId": "pet_feed",
+      "sourcePack": "release-v039-pet-action-icons-2026-08-16",
+      "sourceFile": "tmp/imagegen/v039-pet-action-icons/raw/pet_feed.png",
+      "output": "pet_feed.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A leather-gloved hunter hand offers a roasted meat haunch to a companion muzzle.",
+      "references": [
+        { "path": "public/ui/skills/hunter/bestial_wrath.webp", "role": "painted animal reference" },
+        { "path": "public/ui/skills/hunter/mend_pet.webp", "role": "pet-care reference" },
+        { "path": "public/ui/skills/warlock/gloomshade_abyssal_chain.webp", "role": "dark finish reference" }
+      ],
+      "sourceSha256": "b4d346252229950fecc6541bfd3c13f54742c100118a173b2ac59e56aa5c7611",
+      "acceptedSha256": "7c0606789fc652abcc161e6d2983c0ea75b21ab472d365185a91b838d64e2f20",
+      "acceptedBytes": 4050
+    },
+    {
+      "abilityId": "pet_mend",
+      "sourcePack": "release-v039-pet-action-icons-2026-08-16",
+      "sourceFile": "tmp/imagegen/v039-pet-action-icons/raw/pet_mend.png",
+      "output": "pet_mend.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A spectral Warlock hand channels violet energy into the cracked core of a horned demon.",
+      "references": [
+        { "path": "public/ui/skills/warlock/death_coil.webp", "role": "violet energy-flow and finish reference" },
+        { "path": "public/ui/skills/warlock/gloomshade_abyssal_chain.webp", "role": "demonic material reference" },
+        { "path": "public/ui/skills/warlock/drain_life.webp", "role": "sustained channel reference" }
+      ],
+      "sourceSha256": "5ed59bfca74d16e199b32b95d1bb5e2e1be2cfff2c05372bd42dd4c10238722b",
+      "acceptedSha256": "ca3b1c453100b20a457a0044fccaf704d4825da304913770d03ef0ea01499b61",
+      "acceptedBytes": 3600
+    },
+    {
+      "abilityId": "pet_passive",
+      "sourcePack": "release-v039-pet-action-icons-2026-08-16",
+      "sourceFile": "tmp/imagegen/v039-pet-action-icons/raw/pet_passive.png",
+      "output": "pet_passive.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A calm alert companion paw resting with its claws fully retracted.",
+      "references": [
+        { "path": "public/ui/skills/hunter/bestial_wrath.webp", "role": "painted animal reference" },
+        { "path": "public/ui/skills/hunter/mend_pet.webp", "role": "pet-care reference" },
+        { "path": "public/ui/skills/warlock/gloomshade_abyssal_chain.webp", "role": "dark finish reference" }
+      ],
+      "sourceSha256": "827939d774a90e7157f6e95b88e24228168727612f3715064900e8a2caa15c20",
+      "acceptedSha256": "8e73cfaf51c6f7494a392c52bd4b18d95762765f60c2a38db8a3d64d067efd58",
+      "acceptedBytes": 3214
+    },
+    {
+      "abilityId": "pet_defensive",
+      "sourcePack": "release-v039-pet-action-icons-2026-08-16",
+      "sourceFile": "tmp/imagegen/v039-pet-action-icons/raw/pet_defensive.png",
+      "output": "pet_defensive.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "A companion paw braces against a battered steel-and-leather shield.",
+      "references": [
+        { "path": "public/ui/skills/hunter/bestial_wrath.webp", "role": "painted animal reference" },
+        { "path": "public/ui/skills/hunter/mend_pet.webp", "role": "pet-care reference" },
+        { "path": "public/ui/skills/paladin/holy_shield.webp", "role": "shield subject reference" }
+      ],
+      "sourceSha256": "5f7fef746b165ecb241945566112438639877271be7391328ef658b1265f217e",
+      "acceptedSha256": "b2d04ae1e2e0cf1cc3c751a0be4cd6181a3981d72471c1d676e8217fe75a8242",
+      "acceptedBytes": 3294
+    },
+    {
+      "abilityId": "pet_aggressive",
+      "sourcePack": "release-v039-pet-action-icons-2026-08-16",
+      "sourceFile": "tmp/imagegen/v039-pet-action-icons/raw/pet_aggressive.png",
+      "output": "pet_aggressive.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Three crimson claw slashes reveal one lunging predator eye in shadow.",
+      "references": [
+        { "path": "public/ui/skills/hunter/bestial_wrath.webp", "role": "painted animal reference" },
+        { "path": "public/ui/skills/hunter/mend_pet.webp", "role": "small-size finish reference" },
+        { "path": "public/ui/skills/warlock/gloomshade_abyssal_chain.webp", "role": "dark finish reference" }
+      ],
+      "sourceSha256": "afb1f3d392a1f10b7fa4921875d10f6cf793a4843819aceeaf80a2b047b83717",
+      "acceptedSha256": "2bddd621dc9d530964f9eaafec9144a63a9e4083b26fe0475f4449a9d4bd2531",
+      "acceptedBytes": 3060
+    }
+  ]
+}

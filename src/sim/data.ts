@@ -65,7 +65,7 @@ import {
   DRAKELANDS_ROADS,
   DRAKELANDS_ZONE,
 } from './content/drakelands';
-import { DUNGEON_DEFS, DUNGEON_MOBS } from './content/dungeons';
+import { DUNGEON_DEFS, DUNGEON_KEEPSAKE_ITEMS, DUNGEON_MOBS } from './content/dungeons';
 import {
   EVERGARDEN_CAMPS,
   EVERGARDEN_ITEMS,
@@ -349,6 +349,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   GALECREST_ITEMS,
   FARSHORE_ITEMS,
   WILDHEART_ITEMS,
+  DUNGEON_KEEPSAKE_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
