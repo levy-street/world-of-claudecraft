@@ -1053,6 +1053,8 @@ export const zh_CN: EnTranslations = {
       "rarity_epic": "史诗",
       "spec_speed": "+{pct}%额外移动力",
       "name_valorsteed": "英勇战马",
+      "name_pet_rock": "宠物石头",
+      "name_shiny_pet_rock": "闪亮宠物石头",
       "name_grag_bear": "歌利亚格拉格巨熊",
       "name_stalkglider_snail": "苔壳滑行蜗牛",
       "name_aether_hover_cycle": "以太骑士悬浮机车",
@@ -1062,6 +1064,8 @@ export const zh_CN: EnTranslations = {
       "name_terrorspark_groundshaker": "惊雷撼地者",
       "name_drakemaw_raptor": "龙喉迅猛龙",
       "desc_valorsteed": "一匹坚韧稳健的骏马，可提升旅行速度。",
+      "desc_pet_rock": "一块裂隙推石谜题中的石头，对反复推动它的人生出了感情，如今载着你缓缓碾行，速度恰好与租来的马相同。",
+      "desc_shiny_pet_rock": "同一块石头，终于嵌进了凹槽，被它开启的裂隙照成金色，从此得意得让人受不了。",
       "desc_grag_bear": "一头坚韧稳健的巨熊，可提升旅行速度。",
       "desc_stalkglider_snail": "一只坚毅耐久的蜗牛，可提升旅行速度。",
       "desc_aether_hover_cycle": "一辆强大的魔导机车，专为快速贴地悬浮的战斗穿行而设计。",
@@ -12344,6 +12348,12 @@ export const zh_CN: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "龙喉迅猛龙的缰绳"
+      },
+      "reins_pet_rock": {
+        "name": "宠物石头的缰绳"
+      },
+      "reins_shiny_pet_rock": {
+        "name": "闪亮宠物石头的缰绳"
       },
       "rimefang": {
         "name": "霜牙"

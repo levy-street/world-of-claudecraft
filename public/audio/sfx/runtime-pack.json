@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "2074fac9f3d7a778014af595331a137a7c1f44acb53ebe2250d901044d89da52",
-  "catalogHash": "3955e4baa75a2d284a7a67b26d653aaed5bd61d5f8b82fd048bcbeb1b07239a1",
+  "bundleId": "a2f6e894d34e41f264d8755c9a42c478544034721eb7ceeb2cd597094c259964",
+  "catalogHash": "617b449da6cea4fba780ff179758308c014ec45fa8c38b3ef16962367a1d5ee2",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -2890,6 +2890,18 @@
       "gain": 1,
       "playbackRate": 1
     },
+    "mount_run_pet_rock": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_pet_rock.mp3?v=3c31cf72c851",
+          "bytes": 21986,
+          "sha256": "3c31cf72c8511936ad3acd85eec934c65c0d693cd2a5356c9fe920f2a724a5e8"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
     "mount_run_shadowjump_toad": {
       "variants": [
         {
@@ -2897,6 +2909,18 @@
           "url": "/audio/sfx/mount_run_shadowjump_toad.mp3?v=4d7e8c7bbb5b",
           "bytes": 13835,
           "sha256": "4d7e8c7bbb5bb2a6b90f0908c2bb0b7883cf591278a7665f479d2e0f5c5ee91d"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_run_shiny_pet_rock": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_shiny_pet_rock.mp3?v=643d0c909bbe",
+          "bytes": 21986,
+          "sha256": "643d0c909bbeca576c12afa92f98de0b055210f15ceb15ce28b83bce8eac1c47"
         }
       ],
       "gain": 1,

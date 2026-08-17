@@ -1053,6 +1053,8 @@ export const en_CA: EnTranslations = {
       "rarity_epic": "Epic",
       "spec_speed": "+{pct}% extra mobility",
       "name_valorsteed": "Valorsteed",
+      "name_pet_rock": "Pet Rock",
+      "name_shiny_pet_rock": "Shiny Pet Rock",
       "name_grag_bear": "Goliath Grag-Bear",
       "name_stalkglider_snail": "Moss-Shell Stalk-Glider",
       "name_aether_hover_cycle": "Aether-Jouster Hover-Cycle",
@@ -1062,6 +1064,8 @@ export const en_CA: EnTranslations = {
       "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
       "name_drakemaw_raptor": "Drakemaw Raptor",
       "desc_valorsteed": "A hardy, sure-footed steed that provides enhanced travel speed.",
+      "desc_pet_rock": "A rift push-puzzle rock that grew fond of whoever kept shoving it, grinding along beneath you at exactly the pace of a rented horse.",
+      "desc_shiny_pet_rock": "The same rock, socketed at last and lit gold by the rift it opened, and insufferably pleased about it ever since.",
       "desc_grag_bear": "A hardy, sure-footed bear that provides enhanced travel speed.",
       "desc_stalkglider_snail": "A hearty, slow-burning snail that provides enhanced travel speed.",
       "desc_aether_hover_cycle": "A powerful magitech bike designed for swift, low-hovering combat traversal.",
@@ -12344,6 +12348,12 @@ export const en_CA: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Reins of the Drakemaw Raptor"
+      },
+      "reins_pet_rock": {
+        "name": "Reins of the Pet Rock"
+      },
+      "reins_shiny_pet_rock": {
+        "name": "Reins of the Shiny Pet Rock"
       },
       "rimefang": {
         "name": "Rimefang"

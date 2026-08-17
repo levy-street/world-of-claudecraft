@@ -8369,6 +8369,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_grag_bear.name': '골리앗 그라그곰의 고삐',
   'entities.items.riding_training.name': '탑승 훈련',
   'entities.items.reins_valorsteed.name': '발러스티드의 고삐',
+  'entities.items.reins_pet_rock.name': '애완 돌의 고삐',
+  'entities.items.reins_shiny_pet_rock.name': '반짝이는 애완 돌의 고삐',
   'entities.items.reins_stalkglider_snail.name': '이끼껍질 활공달팽이의 고삐',
   'entities.items.reins_aether_hover_cycle.name': '시동 열쇠: 에테르 기사 호버사이클',
   'entities.items.reins_shadowjump_toad.name': '그림자 도약 두꺼비 카마카게의 고삐',
@@ -9579,6 +9581,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.rarity_epic': '서사',
   'hudChrome.mounts.spec_speed': '+{pct}% 추가 기동력',
   'hudChrome.mounts.name_valorsteed': '발러스티드',
+  'hudChrome.mounts.name_pet_rock': '애완 돌',
+  'hudChrome.mounts.name_shiny_pet_rock': '반짝이는 애완 돌',
   'hudChrome.mounts.name_grag_bear': '골리앗 그라그곰',
   'hudChrome.mounts.name_stalkglider_snail': '이끼껍질 활공달팽이',
   'hudChrome.mounts.name_aether_hover_cycle': '에테르 기사 호버사이클',
@@ -9591,6 +9595,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_terrorspark_groundshaker': '대지를 뒤흔드는 테러스파크',
   'hudChrome.mounts.desc_valorsteed': '여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.',
   'hudChrome.mounts.desc_grag_bear': '여행 속도를 높여 주는 튼튼하고 발이 안정된 곰입니다.',
+  'hudChrome.mounts.desc_pet_rock':
+    '자신을 계속 밀어 준 이에게 정이 든 균열 밀기 퍼즐의 돌로, 빌린 말과 똑같은 속도로 당신을 태우고 갈려 나아갑니다.',
+  'hudChrome.mounts.desc_shiny_pet_rock':
+    '같은 돌이지만 마침내 받침대에 끼워져, 자신이 연 균열의 빛으로 금빛이 되었고, 그 뒤로 견딜 수 없이 우쭐합니다.',
   'hudChrome.mounts.desc_stalkglider_snail': '여행 속도를 높여 주는 끈질기고 느긋한 달팽이입니다.',
   'hudChrome.mounts.desc_aether_hover_cycle':
     '낮게 떠서 빠르게 전장을 가로지르도록 설계된 강력한 마도 바이크입니다.',

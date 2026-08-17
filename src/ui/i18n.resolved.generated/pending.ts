@@ -9,25 +9,130 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "entities.items.reins_pet_rock.name",
+    "entities.items.reins_shiny_pet_rock.name",
+    "hudChrome.mounts.desc_pet_rock",
+    "hudChrome.mounts.desc_shiny_pet_rock",
+    "hudChrome.mounts.name_pet_rock",
+    "hudChrome.mounts.name_shiny_pet_rock"
+  ],
+  "es_ES": [
+    "entities.items.reins_pet_rock.name",
+    "entities.items.reins_shiny_pet_rock.name",
+    "hudChrome.mounts.desc_pet_rock",
+    "hudChrome.mounts.desc_shiny_pet_rock",
+    "hudChrome.mounts.name_pet_rock",
+    "hudChrome.mounts.name_shiny_pet_rock"
+  ],
+  "fr_FR": [
+    "entities.items.reins_pet_rock.name",
+    "entities.items.reins_shiny_pet_rock.name",
+    "hudChrome.mounts.desc_pet_rock",
+    "hudChrome.mounts.desc_shiny_pet_rock",
+    "hudChrome.mounts.name_pet_rock",
+    "hudChrome.mounts.name_shiny_pet_rock"
+  ],
+  "fr_CA": [
+    "entities.items.reins_pet_rock.name",
+    "entities.items.reins_shiny_pet_rock.name",
+    "hudChrome.mounts.desc_pet_rock",
+    "hudChrome.mounts.desc_shiny_pet_rock",
+    "hudChrome.mounts.name_pet_rock",
+    "hudChrome.mounts.name_shiny_pet_rock"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "entities.items.reins_pet_rock.name",
+    "entities.items.reins_shiny_pet_rock.name",
+    "hudChrome.mounts.desc_pet_rock",
+    "hudChrome.mounts.desc_shiny_pet_rock",
+    "hudChrome.mounts.name_pet_rock",
+    "hudChrome.mounts.name_shiny_pet_rock"
+  ],
+  "de_DE": [
+    "entities.items.reins_pet_rock.name",
+    "entities.items.reins_shiny_pet_rock.name",
+    "hudChrome.mounts.desc_pet_rock",
+    "hudChrome.mounts.desc_shiny_pet_rock",
+    "hudChrome.mounts.name_pet_rock",
+    "hudChrome.mounts.name_shiny_pet_rock"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "entities.items.reins_pet_rock.name",
+    "entities.items.reins_shiny_pet_rock.name",
+    "hudChrome.mounts.desc_pet_rock",
+    "hudChrome.mounts.desc_shiny_pet_rock",
+    "hudChrome.mounts.name_pet_rock",
+    "hudChrome.mounts.name_shiny_pet_rock"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "entities.items.reins_pet_rock.name",
+    "entities.items.reins_shiny_pet_rock.name",
+    "hudChrome.mounts.desc_pet_rock",
+    "hudChrome.mounts.desc_shiny_pet_rock",
+    "hudChrome.mounts.name_pet_rock",
+    "hudChrome.mounts.name_shiny_pet_rock"
+  ],
+  "nl_NL": [
+    "entities.items.reins_pet_rock.name",
+    "entities.items.reins_shiny_pet_rock.name",
+    "hudChrome.mounts.desc_pet_rock",
+    "hudChrome.mounts.desc_shiny_pet_rock",
+    "hudChrome.mounts.name_pet_rock",
+    "hudChrome.mounts.name_shiny_pet_rock"
+  ],
+  "pl_PL": [
+    "entities.items.reins_pet_rock.name",
+    "entities.items.reins_shiny_pet_rock.name",
+    "hudChrome.mounts.desc_pet_rock",
+    "hudChrome.mounts.desc_shiny_pet_rock",
+    "hudChrome.mounts.name_pet_rock",
+    "hudChrome.mounts.name_shiny_pet_rock"
+  ],
+  "id_ID": [
+    "entities.items.reins_pet_rock.name",
+    "entities.items.reins_shiny_pet_rock.name",
+    "hudChrome.mounts.desc_pet_rock",
+    "hudChrome.mounts.desc_shiny_pet_rock",
+    "hudChrome.mounts.name_pet_rock",
+    "hudChrome.mounts.name_shiny_pet_rock"
+  ],
+  "tr_TR": [
+    "entities.items.reins_pet_rock.name",
+    "entities.items.reins_shiny_pet_rock.name",
+    "hudChrome.mounts.desc_pet_rock",
+    "hudChrome.mounts.desc_shiny_pet_rock",
+    "hudChrome.mounts.name_pet_rock",
+    "hudChrome.mounts.name_shiny_pet_rock"
+  ],
+  "sv_SE": [
+    "entities.items.reins_pet_rock.name",
+    "entities.items.reins_shiny_pet_rock.name",
+    "hudChrome.mounts.desc_pet_rock",
+    "hudChrome.mounts.desc_shiny_pet_rock",
+    "hudChrome.mounts.name_pet_rock",
+    "hudChrome.mounts.name_shiny_pet_rock"
+  ],
+  "vi_VN": [
+    "entities.items.reins_pet_rock.name",
+    "entities.items.reins_shiny_pet_rock.name",
+    "hudChrome.mounts.desc_pet_rock",
+    "hudChrome.mounts.desc_shiny_pet_rock",
+    "hudChrome.mounts.name_pet_rock",
+    "hudChrome.mounts.name_shiny_pet_rock"
+  ],
+  "da_DK": [
+    "entities.items.reins_pet_rock.name",
+    "entities.items.reins_shiny_pet_rock.name",
+    "hudChrome.mounts.desc_pet_rock",
+    "hudChrome.mounts.desc_shiny_pet_rock",
+    "hudChrome.mounts.name_pet_rock",
+    "hudChrome.mounts.name_shiny_pet_rock"
+  ]
 };

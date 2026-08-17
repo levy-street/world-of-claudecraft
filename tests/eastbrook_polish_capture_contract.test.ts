@@ -182,7 +182,7 @@ interface AttributionTargetFixture {
 // live body can take, plus the lazy form-visual fold): renderer.ts moves
 // again, so the composite follows its bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'a3c695469afdc4732476008e9a423bc5f9745a7103648d7205b3c6205509d947';
+  '6058df21f7ccecff73cefad0b935c7d7ddfe1c6f251f28d1b2ca2603e561527e';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

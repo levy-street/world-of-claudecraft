@@ -100,6 +100,19 @@ export const SFX = [
     custom: true,
   },
   {
+    // The rock mount: a per-stride grind of stone dragging over stone,
+    // derived from the rift boulder's own roll take so the mount sounds
+    // like the puzzle boulder it is.
+    key: 'mount_run_pet_rock',
+    custom: true,
+  },
+  {
+    // The socketed twin: the same grind pitched up and ringing, so the epic
+    // reads as the charged version of the common by ear as well as by eye.
+    key: 'mount_run_shiny_pet_rock',
+    custom: true,
+  },
+  {
     key: 'mount_run_stalkglider_snail',
     custom: true,
   },

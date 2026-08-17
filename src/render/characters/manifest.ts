@@ -1622,6 +1622,30 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 12,
     lazyPreload: true,
   },
+  // The joke mount: a purpose-built saddled boulder generated through the asset
+  // pipeline (scripts/asset_pipeline, Tripo image-to-model), not a re-dressed
+  // scenery rock. It ships baked granite and leather textures, so like every
+  // other mount it takes NO tint. A STATIC prop like the snail: zero animations
+  // and no skin, so it renders its rest pose and the hop bob in mount_visuals.ts
+  // carries the motion. Deliberately squat (1.19 tall against the 2.6 humanoid)
+  // so it reads as a rock you perch on, not a mountain.
+  mount_pet_rock: {
+    url: `${MOUNTS_DIR}/pet_rock.glb`,
+    height: 1.9,
+    clips: MOUNT_RIGGED,
+    lazyPreload: true,
+  },
+  // The socketed twin, generated from the same concept lineage as the dormant
+  // rock so the pair reads as one object in two states. Its molten rune veins are
+  // BAKED into the texture rather than faked with a tint, which is what lets the
+  // epic read as genuinely charged instead of recoloured; a tint here would only
+  // muddy them, so it takes none either.
+  mount_shiny_pet_rock: {
+    url: `${MOUNTS_DIR}/shiny_pet_rock.glb`,
+    height: 1.9,
+    clips: MOUNT_RIGGED,
+    lazyPreload: true,
+  },
   mount_grag_bear: {
     url: `${MOUNTS_DIR}/grag_bear.glb`,
     height: 4.0,

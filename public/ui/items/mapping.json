@@ -236,6 +236,24 @@
    "license": "World of ClaudeCraft original art (project-owned, created for this game)"
   },
   {
+   "itemId": "reins_pet_rock",
+   "name": "Reins of the Pet Rock",
+   "sourcePack": "woc_mount_reins_art",
+   "sourceFile": "rock-mount/masters/reins_pet_rock.png (accepted v2, painted)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, created for this game)",
+   "note": "Painted inventory art generated through scripts/asset_pipeline (Tripo text-to-image), normalized to a 1024 square opaque master and shipped through the standard item-icon converter. Supersedes the vector-authored v1 icon, which did not meet the woc-item-icon-v1 style contract against the painted reins_* family."
+  },
+  {
+   "itemId": "reins_shiny_pet_rock",
+   "name": "Reins of the Shiny Pet Rock",
+   "sourcePack": "woc_mount_reins_art",
+   "sourceFile": "rock-mount/masters/reins_shiny_pet_rock.png (accepted v2, painted)",
+   "confidence": "high",
+   "license": "World of ClaudeCraft original art (project-owned, created for this game)",
+   "note": "Painted inventory art generated through scripts/asset_pipeline (Tripo text-to-image), normalized to a 1024 square opaque master and shipped through the standard item-icon converter. Supersedes the vector-authored v1 icon, which did not meet the woc-item-icon-v1 style contract against the painted reins_* family."
+  },
+  {
    "itemId": "resonant_hide",
    "name": "Resonant Hide",
    "sourcePack": "woc_professions_art",

@@ -29,8 +29,10 @@ export interface MountVisualSpec {
   /** Bob shape: a smooth hover sine, or gallop-style hops (abs sine). */
   bobShape: 'hover' | 'hop';
   /** Ambient particle effect the renderer emits for this mount: the snail's
-   *  slime path while moving, the hover cycle's aether exhaust. */
-  fx: 'slime' | 'exhaust' | null;
+   *  slime path while moving, the hover cycle's aether exhaust, the rock's
+   *  ground grit while grinding, and the socketed rock's shed rift light.
+   *  Emission math lives in mount_fx_core.ts. */
+  fx: 'slime' | 'exhaust' | 'grit' | 'riftglow' | null;
 }
 
 const spec = (
@@ -39,7 +41,7 @@ const spec = (
   rigged: boolean,
   bob?: { amp: number; hz: number; idle?: boolean; shape?: 'hover' | 'hop' },
   seatFwd = 0,
-  fx: 'slime' | 'exhaust' | null = null,
+  fx: 'slime' | 'exhaust' | 'grit' | 'riftglow' | null = null,
 ): MountVisualSpec => ({
   visualKey,
   seat,
@@ -57,6 +59,20 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // origin and lower than the old Tripo build, so the rider shifts toward the
   // neck and drops a touch
   valorsteed: spec('mount_valorsteed', 2.4, true, undefined, 0.15),
+  // The pet boulder is a STATIC rock (no clips at all), so the hop bob IS its
+  // locomotion: it lurches forward the way it does when a player shoves it onto
+  // a rift socket, and sits dead still the moment you stop.
+  pet_rock: spec('mount_pet_rock', 1.78, false, { amp: 0.18, hz: 1.6, shape: 'hop' }, 0, 'grit'),
+  // Socketed and lit: it stops grinding and floats, so the epic reads as the
+  // charged state of the common rather than a different rock.
+  shiny_pet_rock: spec(
+    'mount_shiny_pet_rock',
+    1.78,
+    false,
+    { amp: 0.1, hz: 0.9, idle: true, shape: 'hover' },
+    0,
+    'riftglow',
+  ),
   grag_bear: spec('mount_grag_bear', 3.35, true, undefined, -0.8),
   stalkglider_snail: spec('mount_stalkglider_snail', 2.65, false, undefined, -0.3, 'slime'),
   aether_hover_cycle: spec(

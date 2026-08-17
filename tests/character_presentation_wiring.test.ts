@@ -59,8 +59,12 @@ describe('character presentation sleep wiring', () => {
 
     const mountBlock = renderer.slice(mountStart, abilityStart);
     expect(mountBlock).toContain('if (runCharacterPresentation) {');
-    expect(mountBlock).toContain('this.vfx.mountSlimeTrail');
-    expect(mountBlock).toContain('this.vfx.mountExhaust');
+    expect(mountBlock).toContain('emitMountFx(this.vfx, mountSpec');
+    // The per-kind emitters live behind mount_fx.ts's exhaustive dispatch now, so
+    // the renderer must not reach past it to a specific effect: a direct call here
+    // would be a branch that skips the never-guard the extraction exists to give.
+    expect(renderer).not.toContain('this.vfx.mountSlimeTrail');
+    expect(renderer).not.toContain('this.vfx.mountExhaust');
     expect(renderer.slice(abilityStart)).toContain(
       'this.abilityVfx.syncEntity(e, runCharacterPresentation);',
     );

@@ -1053,6 +1053,8 @@ export const zh_TW: EnTranslations = {
       "rarity_epic": "史詩",
       "spec_speed": "+{pct}% 額外移動力",
       "name_valorsteed": "英勇戰馬",
+      "name_pet_rock": "寵物石頭",
+      "name_shiny_pet_rock": "閃亮寵物石頭",
       "name_grag_bear": "歌利亞格拉格巨熊",
       "name_stalkglider_snail": "苔殼滑行蝸牛",
       "name_aether_hover_cycle": "乙太騎士懸浮機車",
@@ -1062,6 +1064,8 @@ export const zh_TW: EnTranslations = {
       "name_terrorspark_groundshaker": "驚雷撼地者",
       "name_drakemaw_raptor": "龍喉迅猛龍",
       "desc_valorsteed": "一匹堅韌穩健的駿馬，可提升旅行速度。",
+      "desc_pet_rock": "一塊裂隙推石謎題中的石頭，對反覆推動它的人生出了感情，如今載著你緩緩輾行，速度恰好與租來的馬相同。",
+      "desc_shiny_pet_rock": "同一塊石頭，終於嵌進了凹槽，被它開啟的裂隙照成金色，從此得意得讓人受不了。",
       "desc_grag_bear": "一頭堅韌穩健的巨熊，可提升旅行速度。",
       "desc_stalkglider_snail": "一隻堅毅耐久的蝸牛，可提升旅行速度。",
       "desc_aether_hover_cycle": "一輛強大的魔導機車，專為快速貼地懸浮的戰鬥穿行而設計。",
@@ -12344,6 +12348,12 @@ export const zh_TW: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "龍喉迅猛龍的韁繩"
+      },
+      "reins_pet_rock": {
+        "name": "寵物石頭的韁繩"
+      },
+      "reins_shiny_pet_rock": {
+        "name": "閃亮寵物石頭的韁繩"
       },
       "rimefang": {
         "name": "霜牙"

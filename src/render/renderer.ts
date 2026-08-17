@@ -355,6 +355,7 @@ import { buildMailboxPillar } from './mailbox';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
+import { emitMountFx } from './mount_fx';
 import { mountBobY, mountVisualSpec } from './mount_visuals';
 import { NameplatePainter } from './nameplate_painter';
 import {
@@ -12037,13 +12038,10 @@ export class Renderer {
           const bob = mountBobY(mountSpec, this.time, moving);
           v.mountVisual.root.position.y = bob;
           v.visual.root.position.y = v.mountLift + bob;
-          // ambient mount particles: the snail paints its slime path while
-          // gliding, the hover cycle streams aether exhaust off its tail
-          if (mountSpec.fx === 'slime') {
-            if (moving) this.vfx.mountSlimeTrail(v.group.position, dt);
-          } else if (mountSpec.fx === 'exhaust') {
-            this.vfx.mountExhaust(v.group.position, facing, dt, moving);
-          }
+          // ambient mount particles (slime, exhaust, grit, rift glow): the
+          // kind-to-emitter mapping lives in mount_fx.ts behind an exhaustive
+          // switch, so a new fx kind is a compile error rather than silence
+          emitMountFx(this.vfx, mountSpec, v.group.position, facing, st.speed, dt, moving);
         } else {
           v.mountVisual.advanceOffscreen(dt);
         }

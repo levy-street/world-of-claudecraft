@@ -2381,6 +2381,17 @@
       }
     ]
   },
+  "mount_run_pet_rock": {
+    "ceilingDb": 5.6,
+    "tracks": [
+      {
+        "filename": "mount_run_pet_rock.mp3",
+        "sha256": "3c31cf72c8511936ad3acd85eec934c65c0d693cd2a5356c9fe920f2a724a5e8",
+        "size": 21986,
+        "peakDb": -6.6
+      }
+    ]
+  },
   "mount_run_shadowjump_toad": {
     "ceilingDb": 5.3,
     "tracks": [
@@ -2389,6 +2400,17 @@
         "sha256": "4d7e8c7bbb5bb2a6b90f0908c2bb0b7883cf591278a7665f479d2e0f5c5ee91d",
         "size": 13835,
         "peakDb": -6.3
+      }
+    ]
+  },
+  "mount_run_shiny_pet_rock": {
+    "ceilingDb": 6.9,
+    "tracks": [
+      {
+        "filename": "mount_run_shiny_pet_rock.mp3",
+        "sha256": "643d0c909bbeca576c12afa92f98de0b055210f15ceb15ce28b83bce8eac1c47",
+        "size": 21986,
+        "peakDb": -7.9
       }
     ]
   },

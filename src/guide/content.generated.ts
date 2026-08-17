@@ -6456,6 +6456,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "mount",
+        "name": "Pet Rock"
+      },
+      {
+        "kind": "mount",
         "name": "Sky-Reach Stormfeather"
       },
       {
@@ -6481,6 +6485,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "mount",
         "name": "Drakemaw Raptor"
+      },
+      {
+        "kind": "mount",
+        "name": "Shiny Pet Rock"
       },
       {
         "kind": "mount",

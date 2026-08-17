@@ -8035,6 +8035,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_grag_bear.name': '歌利亞格拉格巨熊的韁繩',
   'entities.items.riding_training.name': '騎術訓練',
   'entities.items.reins_valorsteed.name': '英勇戰馬的韁繩',
+  'entities.items.reins_pet_rock.name': '寵物石頭的韁繩',
+  'entities.items.reins_shiny_pet_rock.name': '閃亮寵物石頭的韁繩',
   'entities.items.reins_stalkglider_snail.name': '苔殼滑行蝸牛的韁繩',
   'entities.items.reins_aether_hover_cycle.name': '點火鑰匙：乙太騎士懸浮機車',
   'entities.items.reins_shadowjump_toad.name': '影躍蟾蜍卡瑪影的韁繩',
@@ -9185,6 +9187,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.rarity_epic': '史詩',
   'hudChrome.mounts.spec_speed': '+{pct}% 額外移動力',
   'hudChrome.mounts.name_valorsteed': '英勇戰馬',
+  'hudChrome.mounts.name_pet_rock': '寵物石頭',
+  'hudChrome.mounts.name_shiny_pet_rock': '閃亮寵物石頭',
   'hudChrome.mounts.name_grag_bear': '歌利亞格拉格巨熊',
   'hudChrome.mounts.name_stalkglider_snail': '苔殼滑行蝸牛',
   'hudChrome.mounts.name_aether_hover_cycle': '乙太騎士懸浮機車',
@@ -9197,6 +9201,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_terrorspark_groundshaker': '驚雷撼地者',
   'hudChrome.mounts.desc_valorsteed': '一匹堅韌穩健的駿馬，可提升旅行速度。',
   'hudChrome.mounts.desc_grag_bear': '一頭堅韌穩健的巨熊，可提升旅行速度。',
+  'hudChrome.mounts.desc_pet_rock':
+    '一塊裂隙推石謎題中的石頭，對反覆推動它的人生出了感情，如今載著你緩緩輾行，速度恰好與租來的馬相同。',
+  'hudChrome.mounts.desc_shiny_pet_rock':
+    '同一塊石頭，終於嵌進了凹槽，被它開啟的裂隙照成金色，從此得意得讓人受不了。',
   'hudChrome.mounts.desc_stalkglider_snail': '一隻堅毅耐久的蝸牛，可提升旅行速度。',
   'hudChrome.mounts.desc_aether_hover_cycle':
     '一輛強大的魔導機車，專為快速貼地懸浮的戰鬥穿行而設計。',

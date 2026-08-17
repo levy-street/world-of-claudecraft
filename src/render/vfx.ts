@@ -7,6 +7,7 @@ import {
   DrainLifeVfx,
 } from './drain_life_vfx';
 import { GFX } from './gfx';
+import { gritEmitRate, gritMote, riftGlowEmitRate, riftGlowMote } from './mount_fx_core';
 import { PaladinSpellVfxController, type PaladinSpellVfxSprite } from './paladin_spell_vfx';
 import type { VfxAnchorResolver, VfxOffsetAnchorResolver } from './vfx_anchor';
 import {
@@ -1920,6 +1921,50 @@ export class Vfx {
       Math.random() < 0.3 ? 0xd98aff : 0x8ed2ff,
       0.28 + Math.random() * 0.2,
       0.5 + Math.random() * 0.3,
+      0,
+      SPR.sparkle,
+    );
+  }
+
+  /** Gravel the grinding rock mount throws while it moves: rate and
+   *  placement come from mount_fx_core, this only spends particles. */
+  mountGrit(at: THREE.Vector3, yaw: number, speed: number, dt: number): void {
+    const rate = gritEmitRate(speed, true);
+    if (rate <= 0 || !this.emitChance(rate, dt)) return;
+    const m = gritMote(yaw, speed, Math.random);
+    this.spawn(
+      at.x + m.dx,
+      at.y + m.dy,
+      at.z + m.dz,
+      m.vx,
+      m.vy,
+      m.vz,
+      m.color,
+      m.size,
+      m.lifetime,
+      -3.4,
+      SPR.debris,
+    );
+  }
+
+  /** Gold rift light shed by the socketed rock mount: on at idle too, since
+   *  the mount hovers rather than resting, and denser on the move. */
+  mountRiftGlow(at: THREE.Vector3, dt: number, moving: boolean): void {
+    if (!this.emitChance(riftGlowEmitRate(moving), dt)) return;
+    const m = riftGlowMote(Math.random);
+    // Rift light is a GLOW, so it rides the bloom pass like every other emissive
+    // emitter here; hdr() collapses to 1 on tiers with no composer, leaving the
+    // authored colour untouched rather than a blown-out flat sprite.
+    this.spawn(
+      at.x + m.dx,
+      at.y + m.dy,
+      at.z + m.dz,
+      m.vx,
+      m.vy,
+      m.vz,
+      new THREE.Color(m.color).multiplyScalar(hdr(2.1)),
+      m.size,
+      m.lifetime,
       0,
       SPR.sparkle,
     );

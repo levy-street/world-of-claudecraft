@@ -13,6 +13,8 @@
 
 export type MountKey =
   | 'grag_bear'
+  | 'pet_rock'
+  | 'shiny_pet_rock'
   | 'stalkglider_snail'
   | 'valorsteed'
   | 'aether_hover_cycle'
@@ -48,6 +50,17 @@ export const MOUNTS: Record<MountKey, MountDef> = {
   valorsteed: {
     key: 'valorsteed',
     name: 'Valorsteed',
+    rarity: 'common',
+    moveSpeedPct: 0.6,
+  },
+  // The joke mount, and the second common: a rift push-puzzle rock that
+  // followed its shover home. Deliberately the horse-tier 60%, so the gag
+  // costs nothing in power (the rarity/speed tiering above still holds): it
+  // is the stablemaster horse's numbers wearing a rock. No acquisition path
+  // yet (owner call), like the Drakemaw Raptor.
+  pet_rock: {
+    key: 'pet_rock',
+    name: 'Pet Rock',
     rarity: 'common',
     moveSpeedPct: 0.6,
   },
@@ -91,6 +104,16 @@ export const MOUNTS: Record<MountKey, MountDef> = {
   thunderstrut_gobbler: {
     key: 'thunderstrut_gobbler',
     name: 'Thunderstrut the Grand Gobbler',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
+  // The Pet Rock socketed: the same boulder after it has been shoved onto
+  // its pad and the rift has lit it up, so it rides the epic tier at 80%
+  // like every other epic. The gag is that the ONLY difference between the
+  // common and the epic is that this one has been put where it belongs.
+  shiny_pet_rock: {
+    key: 'shiny_pet_rock',
+    name: 'Shiny Pet Rock',
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },
