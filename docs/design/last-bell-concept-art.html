@@ -1698,24 +1698,24 @@ footer.book ul{padding-left:20px;margin:8px 0 0}
 <script>
 // Turntables: cycle the pre-rendered stations, and let the reader scrub or drag.
 // Honours prefers-reduced-motion by starting paused.
-(function () {
+(() => {
   var calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Playable clips: CSS drives the frames, so this only owns play/pause.
-  document.querySelectorAll('.anims').forEach(function (block) {
+  document.querySelectorAll('.anims').forEach((block) => {
     var btn = block.querySelector('.anims-toggle');
     var cells = block.querySelectorAll('.anim');
     function set(paused) {
-      cells.forEach(function (c) { c.classList.toggle('paused', paused); });
+      cells.forEach((c) => { c.classList.toggle('paused', paused); });
       btn.textContent = paused ? 'Play all' : 'Pause all';
       btn.setAttribute('aria-pressed', String(!paused));
     }
     if (calm) set(true);
-    btn.addEventListener('click', function () {
+    btn.addEventListener('click', () => {
       set(!cells[0].classList.contains('paused'));
     });
   });
-  document.querySelectorAll('.turn-wrap').forEach(function (wrap) {
+  document.querySelectorAll('.turn-wrap').forEach((wrap) => {
     var stage = wrap.querySelector('.turn');
     var img = wrap.querySelector('.turn-img');
     var btn = wrap.querySelector('.spin');
@@ -1724,16 +1724,16 @@ footer.book ul{padding-left:20px;margin:8px 0 0}
     var dir = stage.dataset.dir;
     var i = 0, timer = null;
 
-    frames.forEach(function (f) { var p = new Image(); p.src = dir + '/' + f; });
+    frames.forEach((f) => { var p = new Image(); p.src = `${dir}/${f}`; });
 
     function show(n) {
       i = ((n % frames.length) + frames.length) % frames.length;
-      img.src = dir + '/' + frames[i];
+      img.src = `${dir}/${frames[i]}`;
       scrub.value = String(i);
     }
     function play() {
       if (timer) return;
-      timer = setInterval(function () { show(i + 1); }, 110);
+      timer = setInterval(() => { show(i + 1); }, 110);
       btn.textContent = 'Pause';
       btn.setAttribute('aria-pressed', 'true');
     }
@@ -1742,26 +1742,26 @@ footer.book ul{padding-left:20px;margin:8px 0 0}
       btn.textContent = 'Spin';
       btn.setAttribute('aria-pressed', 'false');
     }
-    btn.addEventListener('click', function () { timer ? stop() : play(); });
-    scrub.addEventListener('input', function () { stop(); show(Number(scrub.value)); });
+    btn.addEventListener('click', () => { timer ? stop() : play(); });
+    scrub.addEventListener('input', () => { stop(); show(Number(scrub.value)); });
 
     var dragging = false, startX = 0, startI = 0;
-    stage.addEventListener('pointerdown', function (e) {
+    stage.addEventListener('pointerdown', (e) => {
       dragging = true; startX = e.clientX; startI = i; stop();
       stage.setPointerCapture(e.pointerId); stage.style.cursor = 'grabbing';
     });
-    stage.addEventListener('pointermove', function (e) {
+    stage.addEventListener('pointermove', (e) => {
       if (!dragging) return;
       show(startI + Math.round((e.clientX - startX) / 14));
     });
-    stage.addEventListener('pointerup', function (e) {
+    stage.addEventListener('pointerup', (e) => {
       dragging = false; stage.releasePointerCapture(e.pointerId); stage.style.cursor = 'grab';
     });
     stage.style.cursor = 'grab';
 
     // only spin what the reader can actually see
-    var io = new IntersectionObserver(function (rows) {
-      rows.forEach(function (r) {
+    var io = new IntersectionObserver((rows) => {
+      rows.forEach((r) => {
         if (r.isIntersecting && !calm && !dragging) play(); else stop();
       });
     }, { threshold: 0.25 });

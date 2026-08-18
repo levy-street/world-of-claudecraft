@@ -23,8 +23,8 @@ interface AcceptedReference {
 describe('Vale Cup ball target portrait art', () => {
   it('pins the accepted generation and processing record', () => {
     const bytes = readFileSync(EVIDENCE_PATH);
-    expect(bytes.byteLength).toBe(3358);
-    expect(sha256(bytes)).toBe('e6a9fa95757f5af7e19038f431339e1fd0c6ccfea358de4ad358fc1714f9a47d');
+    expect(bytes.byteLength).toBe(3316);
+    expect(sha256(bytes)).toBe('ff16d7f2dae949e4a85a60696d62b4dd24cec50b150e4524850a6a3dcb70d1a5');
     const evidence = JSON.parse(bytes.toString('utf8')) as {
       generationPrompt: string;
       references: AcceptedReference[];

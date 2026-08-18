@@ -26,8 +26,8 @@ import {
   ZONES,
 } from '../src/sim/data';
 import { canEquipItem } from '../src/sim/equipment_rules';
-import { allScenarios } from '../src/sim/scenarios/registry';
 import { HARVEST_COMPONENT_ITEMS, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
+import { allScenarios } from '../src/sim/scenarios/registry';
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES, MAX_LEVEL, XP_TABLE, type ZoneDef } from '../src/sim/types';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';

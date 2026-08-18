@@ -238,8 +238,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
 }
 
 export interface FakeClient {
-  // biome-ignore lint/suspicious/noExplicitAny: sent frames are untyped wire JSON, read all
-  // over the calling suites (msg.t, msg.list, ...); matches the idiom's prior local type.
+  // biome-ignore lint/suspicious/noExplicitAny: sent frames are untyped wire JSON read all over the calling suites (msg.t, msg.list, ...); matches the idiom's prior local type.
   sent: any[];
   // biome-ignore lint/suspicious/noExplicitAny: mirrors the `ws` field GameServer.join expects
   ws: any;

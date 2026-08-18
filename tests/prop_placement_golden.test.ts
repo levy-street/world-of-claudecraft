@@ -79,7 +79,8 @@ const GOLDEN: Record<string, string> = {
   'player_paladin#1': 'p:0,0.017,0.1617 q:0,0,0,1 s:0.5964',
   'player_paladin#1+stow': 'p:0,0.2,-0.32 q:0,-1,0,0 s:0.5964',
   'player_paladin_modular#0': 'p:0.231697,0.382471,0 q:0,1,0,0 s:0.622211',
-  'player_paladin_modular#0+stow': 'p:0.16,0.14,-0.27 q:0.02128,-0.045223,0.903696,0.425247 s:0.622211',
+  'player_paladin_modular#0+stow':
+    'p:0.16,0.14,-0.27 q:0.02128,-0.045223,0.903696,0.425247 s:0.622211',
   'player_paladin_modular#1': 'p:0,0.017,0.1617 q:0,0,0,1 s:0.5964',
   'player_paladin_modular#1+stow': 'p:0,0.2,-0.32 q:0,-1,0,0 s:0.5964',
   'player_priest#0': 'p:-0.0427,0.1769,0 q:0,1,0,0 s:1.0773',
@@ -93,13 +94,15 @@ const GOLDEN: Record<string, string> = {
   'player_rogue_modular#0': 'p:-0.0095,0.378,0 q:0,1,0,0 s:0.6029',
   'player_rogue_modular#0+stow': 'p:0.5,-0.38,-0.08 q:0.078391,0.009339,0.902799,0.422755 s:0.6029',
   'player_rogue_modular#1': 'p:0.0095,0.378,0 q:0,0,0,1 s:0.6029',
-  'player_rogue_modular#1+stow': 'p:-0.5,-0.38,-0.08 q:0.078391,-0.009339,-0.902799,0.422755 s:0.6029',
+  'player_rogue_modular#1+stow':
+    'p:-0.5,-0.38,-0.08 q:0.078391,-0.009339,-0.902799,0.422755 s:0.6029',
   'player_shaman#0': 'p:0.231697,0.382471,0 q:0,1,0,0 s:0.622211',
   'player_shaman#0+stow': 'p:0.16,0.14,-0.27 q:0.02128,-0.045223,0.903696,0.425247 s:0.622211',
   'player_shaman#1': 'p:0,0.017,0.1771 q:0,0,0,1 s:0.4413',
   'player_shaman#1+stow': 'p:0,0.24,-0.32 q:0,-1,0,0 s:0.4413',
   'player_shaman_modular#0': 'p:0.231697,0.382471,0 q:0,1,0,0 s:0.622211',
-  'player_shaman_modular#0+stow': 'p:0.16,0.14,-0.27 q:0.02128,-0.045223,0.903696,0.425247 s:0.622211',
+  'player_shaman_modular#0+stow':
+    'p:0.16,0.14,-0.27 q:0.02128,-0.045223,0.903696,0.425247 s:0.622211',
   'player_shaman_modular#1': 'p:0,0.017,0.1771 q:0,0,0,1 s:0.4413',
   'player_shaman_modular#1+stow': 'p:0,0.24,-0.32 q:0,-1,0,0 s:0.4413',
   'player_warlock#0': 'p:0,0.2174,0 q:0,1,0,0 s:0.4831',
@@ -107,7 +110,8 @@ const GOLDEN: Record<string, string> = {
   'player_warlock#1': 'NONE',
   'player_warlock#1+stow': 'p:-0.16,0.14,-0.27 q:0.02128,0.045223,-0.903696,0.425247',
   'player_warlock_modular#0': 'p:0,0.2174,0 q:0,1,0,0 s:0.4831',
-  'player_warlock_modular#0+stow': 'p:0.5,-0.38,-0.08 q:0.078391,0.009339,0.902799,0.422755 s:0.4831',
+  'player_warlock_modular#0+stow':
+    'p:0.5,-0.38,-0.08 q:0.078391,0.009339,0.902799,0.422755 s:0.4831',
   'player_warlock_modular#1': 'NONE',
   'player_warlock_modular#1+stow': 'p:-0.16,0.14,-0.27 q:0.02128,0.045223,-0.903696,0.425247',
   'player_warrior#0': 'p:0,0.555174,0 q:0,1,0,0 s:0.8876',
@@ -115,7 +119,8 @@ const GOLDEN: Record<string, string> = {
   'player_warrior#1': 'p:0,0.017,0.1771 q:0,0,0,1 s:0.4413',
   'player_warrior#1+stow': 'p:0,0.24,-0.32 q:0,-1,0,0 s:0.4413',
   'player_warrior_modular#0': 'p:0,0.555174,0 q:0,1,0,0 s:0.8876',
-  'player_warrior_modular#0+stow': 'p:0.16,0.14,-0.27 q:0.02128,-0.045223,0.903696,0.425247 s:0.8876',
+  'player_warrior_modular#0+stow':
+    'p:0.16,0.14,-0.27 q:0.02128,-0.045223,0.903696,0.425247 s:0.8876',
   'player_warrior_modular#1': 'p:0,0.017,0.1771 q:0,0,0,1 s:0.4413',
   'player_warrior_modular#1+stow': 'p:0,0.24,-0.32 q:0,-1,0,0 s:0.4413',
   'skel_boss#0': 'NONE',

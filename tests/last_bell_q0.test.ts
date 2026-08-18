@@ -4,7 +4,12 @@
 // stalker calls its add waves, the doorway stage brings Coalfast and Tam in
 // with Tam's line, and the quest turns in at Warden Coalfast.
 import { describe, expect, it } from 'vitest';
-import { MOBS } from '../src/sim/data';
+// The Last Bell chain ships data-held (every island quest retired: the
+// PRE-RELEASE HOLD comment on Q0 in content/last_bell_campaign.ts). This
+// suite exercises the OPEN campaign machinery so it cannot rot while held;
+// un-hold before any Sim is built, because fixture spawning and the ferry's
+// Q0 arm read the flag from the quest data itself.
+import { QUESTS as __QUESTS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { GULLHAVEN_HARBOR, MAINLAND_HARBOR } from '../src/sim/harbor_layout';
 import { scenarioRunFor } from '../src/sim/scenarios/scenarios';
@@ -13,15 +18,7 @@ import { Sim } from '../src/sim/sim';
 import { squadActorEntity } from '../src/sim/squad/squad';
 import type { Entity, SimEvent } from '../src/sim/types';
 
-// The Last Bell chain ships data-held (every island quest retired: the
-// PRE-RELEASE HOLD comment on Q0 in content/last_bell_campaign.ts). This
-// suite exercises the OPEN campaign machinery so it cannot rot while held;
-// un-hold before any Sim is built, because fixture spawning and the ferry's
-// Q0 arm read the flag from the quest data itself.
-import { QUESTS as __QUESTS } from '../src/sim/data';
-
 (__QUESTS.q_lb_q0_ashore as { retired?: boolean }).retired = false;
-
 
 const QUEST = 'q_lb_q0_ashore';
 

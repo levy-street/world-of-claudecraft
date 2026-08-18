@@ -1405,7 +1405,7 @@ function showView(id) {
   document.querySelectorAll("section.view").forEach(s => {
     s.classList.remove("active");
   });
-  $("#view-" + id).classList.add("active");
+  $(`#view-${id}`).classList.add("active");
   document.querySelectorAll("nav.tabs button").forEach(b => {
     b.classList.toggle("active", b.dataset.view === id);
   });
@@ -1418,7 +1418,7 @@ function openQuest(qid) {
   document.querySelectorAll(".quest-list button").forEach(b => {
     b.classList.toggle("active", b.dataset.qid === qid);
   });
-  location.hash = "quest:" + qid;
+  location.hash = `quest:${qid}`;
 }
 
 function spaceChip(s) {
@@ -1429,7 +1429,7 @@ function spaceChip(s) {
 function renderBeat(b) {
   if (b.p) return `<p>${esc(b.p)}</p>`;
   if (b.note) return `<div class="note">Design note: ${esc(b.note)}</div>`;
-  if (b.d) return `<blockquote class="dlg">` + b.d.map(x => `<p><strong>${esc(x.s)}:</strong> &quot;${esc(x.l)}&quot;</p>`).join("") + `</blockquote>`;
+  if (b.d) return `<blockquote class="dlg">${b.d.map(x => `<p><strong>${esc(x.s)}:</strong> &quot;${esc(x.l)}&quot;</p>`).join("")}</blockquote>`;
   if (b.choice) {
     return `<div class="note"><b>Choice: ${esc(b.choice.name)}.</b><br>` +
       b.choice.options.map(o => `${esc(o.pick)} &rarr; ${esc(o.reply)}`).join("<br>") + `</div>`;
@@ -1441,7 +1441,7 @@ function renderQuestDetail(qid) {
   const q = QUESTS.find(x => x.id === qid) || QUESTS[0];
   let h = `<p class="label">${esc(ACTS[q.act])}</p>`;
   h += `<h2 style="margin-top:0.2rem">${esc(q.code)}. ${esc(q.title)}</h2>`;
-  h += `<p>` + q.space.map(spaceChip).join("") + `</p>`;
+  h += `<p>${q.space.map(spaceChip).join("")}</p>`;
   if (q.purpose) h += `<div class="kv"><b>Purpose</b> ${esc(q.purpose)}</div>`;
   if (q.squad) h += `<div class="kv"><b>Squad present</b> ${esc(q.squad)}</div>`;
   if (q.location) h += `<div class="kv"><b>Location</b> ${esc(q.location)}</div>`;
@@ -1450,21 +1450,21 @@ function renderQuestDetail(qid) {
 
   h += `<div class="quest-card"><p class="qc-title">Quest card</p>`;
   if (q.giver) h += `<p class="giver">${esc(q.giver)}</p>`;
-  h += `<ul>` + q.objectives.map(o => {
+  h += `<ul>${q.objectives.map(o => {
     if (typeof o === "string") return `<li>${esc(o)}</li>`;
     return `<li><span class="upd">(updated)</span> ${esc(o.t)}</li>`;
-  }).join("") + `</ul>`;
+  }).join("")}</ul>`;
   if (q.rewards) h += `<p class="rewards">Rewards: ${esc(q.rewards)}</p>`;
   h += `</div>`;
 
-  if (q.flags && q.flags.length) {
+  if (q.flags?.length) {
     h += q.flags.map(f => `<div class="flagged"><p class="label">Flagged for rework</p><p>${esc(f)}</p></div>`).join("");
   }
 
   h += `<p class="label">Story and dialogue</p>`;
   h += q.beats.map(renderBeat).join("");
 
-  if (q.scenes && q.scenes.length) {
+  if (q.scenes?.length) {
     h += `<p class="label">Scenes in this quest</p><ul>`;
     h += q.scenes.map(s =>
       `<li><b>${esc(s.name)}</b> <span class="chip ${s.locked ? "" : "shared"}">${esc(s.type)}</span>${s.dur ? ` <span class="chip solid">${esc(s.dur)}</span>` : ""} ${esc(s.desc)}${s.why ? ` <i>(Why the camera: ${esc(s.why)})</i>` : ""}</li>`
@@ -1511,12 +1511,12 @@ function linesFor(speaker) {
   for (const q of QUESTS) {
     const blocks = [];
     for (const b of q.beats) {
-      if (b.d && b.d.some(x => x.s === speaker)) blocks.push(b.d);
+      if (b.d?.some(x => x.s === speaker)) blocks.push(b.d);
       if (b.choice) {
         for (const o of b.choice.options) {
           const m = o.reply.match(/^([A-Za-z]+)([^:"]*):\s*"(.*)"$/);
           if (m && m[1] === speaker) {
-            blocks.push([{s: speaker, l: m[3], ctx: "(reply to: " + o.pick + ")"}]);
+            blocks.push([{s: speaker, l: m[3], ctx: `(reply to: ${o.pick})`}]);
           }
         }
       }
@@ -1540,8 +1540,8 @@ function openCastModal(c) {
   for (const g of groups) {
     h += `<h3><a href="#" data-qid="${g.q.id}" class="modal-quest">${esc(g.q.code)}. ${esc(g.q.title)}</a></h3>`;
     for (const blk of g.blocks) {
-      h += `<blockquote class="dlg">` + blk.map(x =>
-        `<p class="${x.s === c.speaker ? "hit" : ""}"><strong>${esc(x.s)}:</strong> &quot;${esc(x.l)}&quot;${x.ctx ? ` <i>${esc(x.ctx)}</i>` : ""}</p>`).join("") + `</blockquote>`;
+      h += `<blockquote class="dlg">${blk.map(x =>
+        `<p class="${x.s === c.speaker ? "hit" : ""}"><strong>${esc(x.s)}:</strong> &quot;${esc(x.l)}&quot;${x.ctx ? ` <i>${esc(x.ctx)}</i>` : ""}</p>`).join("")}</blockquote>`;
     }
   }
   if (!groups.length) h += `<p>No indexed lines yet.</p>`;

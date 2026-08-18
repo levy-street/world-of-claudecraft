@@ -67,15 +67,8 @@
     "accepted": true,
     "attempts": 1,
     "retries": 0,
-    "reviewedSizes": [
-      128,
-      54,
-      40,
-      28
-    ],
-    "grayscaleSizes": [
-      28
-    ],
+    "reviewedSizes": [128, 54, 40, 28],
+    "grayscaleSizes": [28],
     "criteria": [
       "exact ball identity",
       "small target-frame readability",

@@ -6,6 +6,12 @@
 // once, party members pay individually (no leader-answers on the dock), and
 // the return leg charges the same fare.
 import { describe, expect, it } from 'vitest';
+// The Last Bell chain ships data-held (every island quest retired: the
+// PRE-RELEASE HOLD comment on Q0 in content/last_bell_campaign.ts). This
+// suite exercises the OPEN campaign machinery so it cannot rot while held;
+// un-hold before any Sim is built, because fixture spawning and the ferry's
+// Q0 arm read the flag from the quest data itself.
+import { QUESTS as __QUESTS } from '../src/sim/data';
 import { GULLHAVEN_HARBOR, MAINLAND_HARBOR } from '../src/sim/harbor_layout';
 import {
   FERRY_FARE_COPPER,
@@ -16,15 +22,7 @@ import { answerSceneChoice } from '../src/sim/scenes/choices';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
 
-// The Last Bell chain ships data-held (every island quest retired: the
-// PRE-RELEASE HOLD comment on Q0 in content/last_bell_campaign.ts). This
-// suite exercises the OPEN campaign machinery so it cannot rot while held;
-// un-hold before any Sim is built, because fixture spawning and the ferry's
-// Q0 arm read the flag from the quest data itself.
-import { QUESTS as __QUESTS } from '../src/sim/data';
-
 (__QUESTS.q_lb_q0_ashore as { retired?: boolean }).retired = false;
-
 
 const Q0 = 'q_lb_q0_ashore';
 const OUT = 'ch_lb_ferry_fare_out';

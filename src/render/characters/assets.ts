@@ -69,8 +69,6 @@ import {
   stubbleDecals,
   wearsFaceDecal,
 } from './modular';
-import { flattenPropScene, mountProp } from './prop_mount';
-import { isHandslotBone, modelBasename } from './prop_placement_core';
 import {
   createPaladinBastionSweepClip,
   PALADIN_BASTION_SWEEP_CLIP,
@@ -79,6 +77,8 @@ import {
   createPaladinTemplarsVerdictClip,
   PALADIN_TEMPLARS_VERDICT_CLIP,
 } from './paladin_templars_verdict_clip';
+import { flattenPropScene, mountProp } from './prop_mount';
+import { isHandslotBone, modelBasename } from './prop_placement_core';
 import { animatedNodeNames, mergeSkinnedParts } from './rig_merge';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { optimizeSkinGpuLayout } from './skin_gpu_layout';

@@ -11,6 +11,12 @@ import {
   LAST_BELL_PROP_PATH_SEGMENTS,
   LB_PROP_CUE_PARK,
 } from '../src/sim/content/last_bell_cinematics';
+// The Last Bell chain ships data-held (every island quest retired: the
+// PRE-RELEASE HOLD comment on Q0 in content/last_bell_campaign.ts). This
+// suite exercises the OPEN campaign machinery so it cannot rot while held;
+// un-hold before any Sim is built, because fixture spawning and the ferry's
+// Q0 arm read the flag from the quest data itself.
+import { QUESTS as __QUESTS } from '../src/sim/data';
 import { GULLHAVEN_HARBOR, MAINLAND_HARBOR } from '../src/sim/harbor_layout';
 import { registerScenario, scenarioRunFor, startScenario } from '../src/sim/scenarios/scenarios';
 import { answerSceneChoice } from '../src/sim/scenes/choices';
@@ -25,15 +31,7 @@ import { Sim } from '../src/sim/sim';
 import { squadActorEntity } from '../src/sim/squad/squad';
 import type { SimEvent } from '../src/sim/types';
 
-// The Last Bell chain ships data-held (every island quest retired: the
-// PRE-RELEASE HOLD comment on Q0 in content/last_bell_campaign.ts). This
-// suite exercises the OPEN campaign machinery so it cannot rot while held;
-// un-hold before any Sim is built, because fixture spawning and the ferry's
-// Q0 arm read the flag from the quest data itself.
-import { QUESTS as __QUESTS } from '../src/sim/data';
-
 (__QUESTS.q_lb_q0_ashore as { retired?: boolean }).retired = false;
-
 
 const QUEST_ID = 'q_fs_hold_the_riftfields';
 

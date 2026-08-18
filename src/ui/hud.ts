@@ -452,12 +452,12 @@ import { LootRollController } from './hud/loot/loot_roll_controller';
 import { lootSettingsView } from './hud/loot/loot_settings_view';
 import { renderLootSettingsWindow } from './hud/loot/loot_settings_window';
 import { LootWindowController } from './hud/loot/loot_window_controller';
+import { MapMarkerInteractionController, MapMarkerTooltipContent } from './hud/map';
 import {
   buildMemorialPlaqueModel,
   closeMemorialPlaque,
   renderMemorialPlaque,
 } from './hud/memorial';
-import { MapMarkerInteractionController, MapMarkerTooltipContent } from './hud/map';
 import { CARD_POSES } from './hud/player_card/player_card';
 import { PlayerCardController } from './hud/player_card/player_card_controller';
 import { QuestDialogController } from './hud/quest/quest_dialog_controller';

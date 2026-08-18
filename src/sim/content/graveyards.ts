@@ -41,7 +41,7 @@ export const OVERWORLD_GRAVEYARDS: GraveyardDef[] = [
   // the nearest, so death in any new realm returns you locally, not to a far-off
   // strip graveyard across a sealed border.
   { id: 'gy_veiled_hollow', name: 'Eldergleam Rest', x: -60, z: 1004 },
-    // x 839, not 836: the churchyard's west fence run lies exactly on x 836
+  // x 839, not 836: the churchyard's west fence run lies exactly on x 836
   // (gullhaven.ts GULLHAVEN_CHURCHYARD_FENCE), so the anchor sat ON the wall
   // and the Pale Keeper spawned inside the prop. Three yards east puts the
   // keeper and the 3x2 headstone grid in the yard's open middle.
