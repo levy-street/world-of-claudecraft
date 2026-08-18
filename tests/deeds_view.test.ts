@@ -810,7 +810,7 @@ describe('real catalog integration', () => {
     expect(view.summary.visibleTotal).toBe(262);
     // The bucket sum adds the feat-flagged rows back on top (3 on the Feats
     // shelf plus the off-prefix capstone on Collection).
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(264);
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(266);
   });
 
   it('offers exactly the live catalog border deeds once they are earned', () => {
