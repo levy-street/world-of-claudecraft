@@ -13434,9 +13434,6 @@ export const vi_VN: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, Đỉnh Núi Thức Giấc"
       },
-      "balgath_foreman": {
-        "name": "Balgath, the Buried Foreman"
-      },
       "balgath_cyclops": {
         "name": "Balgath, the One-Eyed Foreman"
       },
@@ -16517,6 +16514,9 @@ export const vi_VN: EnTranslations = {
           },
           "7": {
             "label": "Pháo Đài Chìm"
+          },
+          "8": {
+            "label": "Lãnh Địa Đốc Công"
           }
         }
       },

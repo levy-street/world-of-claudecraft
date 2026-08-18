@@ -6915,6 +6915,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Tumuli troll',
   'entities.zones.mirefen_marsh.pois.6.label': 'Campo Gravecaller',
   'entities.zones.mirefen_marsh.pois.7.label': 'Il Bastione Sommerso',
+  'entities.zones.mirefen_marsh.pois.8.label': 'Il Dominio del Caposquadra',
   'entities.zones.thornpeak_heights.name': 'Alture di Thornpeak',
   'entities.zones.thornpeak_heights.welcome':
     'Il capitano Thessaly tiene a stento il muro di Highwatch.',

@@ -4342,6 +4342,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'トロルの塚',
   'entities.zones.mirefen_marsh.pois.6.label': 'グレイブコーラーの野営地',
   'entities.zones.mirefen_marsh.pois.7.label': '沈んだ砦',
+  'entities.zones.mirefen_marsh.pois.8.label': '監督の領域',
   'entities.zones.thornpeak_heights.name': 'ソーンピーク高地',
   'entities.zones.thornpeak_heights.welcome':
     'テサリー隊長がかろうじてハイウォッチの壁を保っています。',
@@ -5840,7 +5841,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.soulflame_cord.name': '魂炎の腰紐',
   'entities.items.stormcallers_waistguard.name': '嵐呼びの腰当て',
   'entities.mobs.thunzharr_waking_peak.name': 'サンザール、目覚めし峰',
-  'entities.mobs.balgath_foreman.name': 'バルガス、埋もれし監督',
   'entities.mobs.balgath_cyclops.name': 'バルガス、単眼の監督',
   'entities.mobs.thunzharr_stormling.name': '目覚めた嵐の精',
   'entities.mobs.stable_horse.name': '厩舎の馬',

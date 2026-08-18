@@ -6365,6 +6365,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Gò Mộ Troll',
   'entities.zones.mirefen_marsh.pois.6.label': 'Doanh Trại Triệu Mộ',
   'entities.zones.mirefen_marsh.pois.7.label': 'Pháo Đài Chìm',
+  'entities.zones.mirefen_marsh.pois.8.label': 'Lãnh Địa Đốc Công',
   'entities.zones.mirefen_marsh.welcome': 'Hãy trình diện Hộ Vệ Fenwick tại cổng Cầu Đầm.',
   'entities.zones.thornpeak_heights.name': 'Cao Nguyên Đỉnh Gai',
   'entities.zones.thornpeak_heights.pois.0.label': 'Vọng Đài Cao',

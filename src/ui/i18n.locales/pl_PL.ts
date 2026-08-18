@@ -5783,6 +5783,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Kurhany Trolli',
   'entities.zones.mirefen_marsh.pois.6.label': 'Obozowisko Grobowych Przyzywaczy',
   'entities.zones.mirefen_marsh.pois.7.label': 'Zatopiony Bastion',
+  'entities.zones.mirefen_marsh.pois.8.label': 'Włości Sztygara',
   'entities.zones.mirefen_marsh.welcome':
     'Zamelduj się u Strażnika Fenwicka przy bramie Mostu na Trzęsawisku.',
   'entities.zones.thornpeak_heights.name': 'Wyżyny Ciernistego Szczytu',

@@ -18,44 +18,51 @@ import { canEquipItem } from '../sim/equipment_rules';
 import { itemLevel } from '../sim/item_level';
 import type { EquipSlot, ItemDef, PlayerClass } from '../sim/types';
 
-/** The Troll Mounds POI in Mirefen Marsh: the barrow the trolls dug him out of. */
-export const BOSS_TEST_DRIVE_POS = { x: -95, z: 440 };
+/**
+ * The Foreman's Reach, mid-Mirefen: the open ground he claimed.
+ *
+ * Chosen by measurement, not by eye (scripts scouted the zone for clearance, relief and
+ * water). Every camp edge is 60 units away, the terrain moves 3 units across a 26-unit
+ * arena, and none of it is under water. The Troll Mounds, where he used to stand, sits
+ * between two fen-troll camps and grubjaw: a 13-unit giant there is wedged in a corridor
+ * of other people's mobs, with no room for a circle-smash and no sightline to see him
+ * coming.
+ */
+export const BOSS_TEST_DRIVE_POS = { x: 0, z: 390 };
 
 /**
  * How far off the spawn point the player stands, per axis.
  *
- * 22 puts the true distance around 31 yards, which is deliberately OUTSIDE his 18-yard
- * aggro: left alone he wanders his spawn area, which is the thing you actually want to
- * watch first, and a nine-unit giant needs the room to fit in frame anyway. Walk in to
- * pull him and see the slams; god mode means the fight has no failure state.
+ * Sized to the body, not picked round: at scale 4.2 he stands about 13.4 world units, so
+ * anything closer than this fills the screen with shin. 38 frames him whole and still sits
+ * outside his 26-yard aggro, so the first thing you see is him moving under his own AI
+ * rather than already walking at you. Step in to pull; god mode means there is no failure
+ * state either way.
  */
-export const BOSS_TEST_DRIVE_STANDOFF = 22;
+export const BOSS_TEST_DRIVE_STANDOFF = 38;
 
 export interface BossTestDrivePlan {
   /** Mob template id to spawn. */
   templateId: string;
-  /** Which silhouette the param asked for, for the console line. */
-  variant: 'foreman' | 'cyclops';
 }
 
-const VARIANTS: Record<string, BossTestDrivePlan> = {
-  foreman: { templateId: 'balgath_foreman', variant: 'foreman' },
-  cyclops: { templateId: 'balgath_cyclops', variant: 'cyclops' },
-};
+const BALGATH: BossTestDrivePlan = { templateId: 'balgath_cyclops' };
 
 /**
  * Read the test-drive request out of a query string, or null for an ordinary session.
  *
- * Pure and total: any unknown value answers null rather than throwing or guessing, so a
- * typo (`?boss=cylcops`) starts a normal game instead of silently test-driving the
- * wrong body. A bare `?boss` picks the foreman, which is the recommended one.
+ * Pure and total: an unrecognised value answers null and starts a normal game rather
+ * than guessing, so a typo can never quietly put you somewhere you did not ask to be.
+ * `?boss`, `?boss=1` and `?boss=balgath` all mean the same thing now that the design
+ * bake-off is settled and there is one body.
  */
 export function parseBossTestDrive(search: string): BossTestDrivePlan | null {
   const raw = new URLSearchParams(search).get('boss');
   if (raw === null) return null;
   const key = raw.trim().toLowerCase();
-  if (key === '' || key === '1' || key === 'true') return VARIANTS.foreman;
-  return VARIANTS[key] ?? null;
+  return key === '' || key === '1' || key === 'true' || key === 'balgath' || key === 'cyclops'
+    ? BALGATH
+    : null;
 }
 
 /**
@@ -104,11 +111,26 @@ interface TestDriveSim {
  * equip checks the character's level against the item's requirement and a level-1
  * warrior silently refuses every piece worth looking at.
  */
+/**
+ * The first-run camera prompt is a modal that opens over the world on a fresh profile.
+ * This entry skips the start screens that would otherwise have dealt with it, so it
+ * would open directly on top of the thing you loaded the URL to look at. Marking it seen
+ * is what the E2E harness does for the same reason (scripts/enter_offline_game.mjs).
+ */
+function dismissFirstRunCameraPrompt(): void {
+  try {
+    localStorage.setItem('woc.cameraModePrompt.shown', '1');
+  } catch {
+    // Private mode or a blocked store: the prompt is cosmetic friction, never fatal.
+  }
+}
+
 export function applyBossTestDrive(
   sim: TestDriveSim,
   plan: BossTestDrivePlan,
   cls: PlayerClass,
 ): number {
+  dismissFirstRunCameraPrompt();
   sim.setPlayerLevel(20, sim.playerId);
   sim.setGm(sim.playerId, true);
   for (const item of bestInSlot(cls)) {

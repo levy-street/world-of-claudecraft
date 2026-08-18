@@ -1519,6 +1519,20 @@ export interface MobTemplate {
   // the steep-wall gate. For mountain-sized movers (world bosses) that must never
   // wedge on camp furniture while closing on a target.
   phasesThroughObstacles?: boolean;
+  /**
+   * Seconds of spacing between this mob's boss mechanics, and the opt-in that turns
+   * its instant AoEs (`aoePulse`, `stomp`) into TELEGRAPHED ones: a ground ring drawn
+   * at the true blast radius, a windup, then the blast measured from the ring's centre
+   * rather than from wherever the boss has since walked.
+   *
+   * Set it on any boss whose counterplay is meant to be reading the ground and stepping
+   * out. Leaving it undefined keeps the shipped instant fire, which is right for trash
+   * and for bosses whose AoE is a soak rather than a dodge.
+   *
+   * Rift bosses get the same treatment stamped per spawn instead (rift/runs.ts), which
+   * is why the entity-side field it feeds is still called `riftMechanicSpacing`.
+   */
+  telegraphedMechanics?: number;
   ccImmune?: boolean;
   // Immune to movement-speed slow auras (kind 'slow'). Distinct from ccImmune, which
   // blocks the hard control auras (stun/root/incapacitate/polymorph) but intentionally
@@ -4713,11 +4727,17 @@ export interface Entity extends ClientMirroredEntityFields {
   // list are live on THIS spawn (C=1, B=2, A=3, S=4; rift/ranks.ts). Undefined
   // (every non-rift mob, and rift trash) suppresses nothing.
   riftMechanicLimit?: number;
-  // Rift boss mechanic spacing: the minimum gap in seconds between two boss
-  // mechanic fires on THIS spawn, so mechanics never land on top of each other
-  // (mob/mechanic_spacing.ts). Stamped by rift/runs.ts on every rift boss and
-  // miniboss, including the authored citadel set-piece. Undefined (every
-  // non-rift mob) disables the shared lock entirely.
+  // Mechanic spacing: the minimum gap in seconds between two boss mechanic fires
+  // on THIS spawn, so mechanics never land on top of each other
+  // (mob/mechanic_spacing.ts), AND the switch that turns the instant AoEs into
+  // TELEGRAPHED ones (a ground ring, a windup, then the blast at the snapshot
+  // centre). Undefined disables both, which is every ordinary mob.
+  //
+  // The `rift` in the name is historical: rifts were the first and for a long
+  // time the only consumer, stamped per spawn by rift/runs.ts. It is now also set
+  // from `MobTemplate.telegraphedMechanics` for authored bosses whose design is
+  // dodge-the-circle. The name is kept because it is recorded in the parity golden
+  // entity samples, and a cosmetic rename there would force a golden regeneration.
   riftMechanicSpacing?: number;
   // Countdown on the shared mechanic lock (mob/mechanic_spacing.ts). Armed each
   // time a spacing-governed mechanic fires (plus the cast time for a hardcast,

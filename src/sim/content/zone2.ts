@@ -48,6 +48,10 @@ export const ZONE2_ZONE: ZoneDef = {
     { x: -95, z: 440, label: 'Troll Mounds', id: 'troll_mounds' },
     { x: 0, z: 485, label: 'Gravecaller Encampment', id: 'gravecaller_encampment' },
     { x: 45, z: 515, label: 'The Sunken Bastion', id: 'the_sunken_bastion' },
+    // APPENDED, never inserted: `entities.zones.<id>.pois.<n>.label` is keyed by index in
+    // the locale overlays, so adding a POI anywhere but the end shifts every later label
+    // onto the wrong translation and drops the last one entirely.
+    { x: 0, z: 390, label: "The Foreman's Reach", id: 'foremans_reach' },
   ],
   welcome: 'Report to Warden Fenwick at the Fenbridge gate.',
 };
@@ -305,100 +309,6 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
   // ordinary play yet. Structure follows thunzharr_waking_peak (content/zone3.ts) so
   // the two read the same to a raid; the numbers are that template's shape, NOT an
   // independently tuned encounter, and nothing here claims otherwise.
-  balgath_foreman: {
-    id: 'balgath_foreman',
-    name: 'Balgath, the Buried Foreman',
-    minLevel: 20,
-    maxLevel: 20,
-    family: 'elemental',
-    boss: true,
-    elite: true,
-    canSwim: false,
-    // A fen is all water and reed banks; pathing a 9-unit giant around them wedges him
-    // on the first collider, so he walks the straight line as Thunzharr does.
-    phasesThroughObstacles: true,
-    quietMechanics: true,
-    ccImmune: true,
-    slowImmune: true,
-    hpBase: 4000,
-    hpPerLevel: 800,
-    dmgBase: 54,
-    dmgPerLevel: 10.3,
-    attackSpeed: 2.4,
-    armorPerLevel: 46,
-    // SLOWER than a player's base run of 7, which is the design rather than an
-    // oversight: his damage lives in telegraphed circles you walk out of, so reading
-    // the ground beats out-gearing him. It also keeps both bodies' gait inside
-    // locomotionTimeScale's clamp at scale 2.8, so his feet plant instead of skating
-    // (refs measured by scripts/anim/measure_gait.mjs; see BALGATH_SCALE in
-    // render/characters/manifest.ts).
-    moveSpeed: 6.4,
-    aggroRadius: 18,
-    // Deliberately the literal, not an import: `src/sim/` may never import from
-    // `src/render/`, and this has a render-side twin the gait refs were measured at.
-    // A test welds the two rather than a cross-layer import.
-    scale: 2.8,
-    // The circle smash: big, slow, telegraphed. Long cadence and a wide footprint so
-    // the ground ring reads from across the fen.
-    aoePulse: {
-      min: 36,
-      max: 50,
-      radius: 12,
-      every: 14,
-      name: 'Barrow Smash',
-      school: 'physical',
-      fx: 'nova',
-    },
-    // The shockwave stomp: tighter and quicker, and the smaller radius is also how the
-    // renderer tells the two slams apart when it draws their ground rings.
-    stomp: {
-      radius: 7,
-      every: 22,
-      duration: 1.5,
-      min: 18,
-      max: 28,
-      name: 'Shockwave Stomp',
-      school: 'physical',
-    },
-    // The scry: his one channelled ability, which is why `cast` in the shared BALGATH
-    // ClipMap is the eye rather than a generic cast. The bar and the pose are one event.
-    bigCast: {
-      castId: 'balgath_scry',
-      name: 'Loomshard Scry',
-      castTime: 3.5,
-      every: 40,
-      radius: 30,
-      min: 70,
-      max: 90,
-      school: 'arcane',
-      yell: 'The shard sees you. All of you.',
-    },
-    // The heavy mitigation the concept called for: what makes him want numbers rather
-    // than gear, since a small group cannot out-damage the refresh.
-    stoneskin: {
-      amount: 500,
-      every: 27,
-      duration: 9,
-      name: 'Barrowhide',
-      school: 'physical',
-    },
-    knockback: { chance: 0.3, distance: 7, name: 'Backhand' },
-    // Copper only, ON PURPOSE, and the single most load-bearing line in this template.
-    // An item's level derives from its highest source level, so a level-20 boss
-    // dropping this zone's level-10 gear silently re-levels it; sharing the existing
-    // level-20 tier instead drags in four class-set Reliquary pages that would have to
-    // start naming a Mirefen boss. Both were tried and both were wrong. Real spoils
-    // need items of his own, which is reward design, so until that lands he drops
-    // nothing that can distort the economy. This is also why neither body carries
-    // `worldBoss: true` yet: that flag is what obliges a Reliquary page, and a page
-    // with no relics of his own is a page you complete without meeting him.
-    loot: [{ copper: 2500, chance: 1 }],
-    yells: {
-      engage: 'The Smith set me to dig. You are in the way of the digging.',
-      enrage: 'The mound breaks! Let it all come down!',
-    },
-    color: 0x9c9382,
-  },
   balgath_cyclops: {
     id: 'balgath_cyclops',
     name: 'Balgath, the One-Eyed Foreman',
@@ -412,6 +322,13 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     // on the first collider, so he walks the straight line as Thunzharr does.
     phasesThroughObstacles: true,
     quietMechanics: true,
+    // THE mechanic of this fight. Without it his AoEs fire instantly with no warning,
+    // which makes "walk out of the circle" impossible and reduces him to a damage check
+    // you either out-gear or die to. With it, both slams draw a ground ring at their true
+    // blast radius, wind up, and detonate from the ring's centre even if he has walked
+    // on: what you were shown is what you have to leave. 4.5s also spaces the mechanics
+    // so two never land together.
+    telegraphedMechanics: 4.5,
     ccImmune: true,
     slowImmune: true,
     hpBase: 4000,
@@ -420,18 +337,31 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     dmgPerLevel: 10.3,
     attackSpeed: 2.4,
     armorPerLevel: 46,
-    // SLOWER than a player's base run of 7, which is the design rather than an
-    // oversight: his damage lives in telegraphed circles you walk out of, so reading
-    // the ground beats out-gearing him. It also keeps both bodies' gait inside
-    // locomotionTimeScale's clamp at scale 2.8, so his feet plant instead of skating
-    // (refs measured by scripts/anim/measure_gait.mjs; see BALGATH_SCALE in
-    // render/characters/manifest.ts).
-    moveSpeed: 6.4,
-    aggroRadius: 18,
+    // 5.0 is doing two jobs and neither is arbitrary.
+    //
+    // Design: it is well under a player's base run of 7, so he can always be outrun.
+    // His damage lives in telegraphed circles you walk out of, which only works as
+    // counterplay if walking out is possible.
+    //
+    // Animation: it sits just under the renderer's GAIT_RUN_ENTER (5.2), so he is
+    // ALWAYS in the walk gait and never flip-flops across that threshold mid-chase,
+    // and 5.0 divided by his measured walkRef of 4.14 is 1.21x the clip's natural
+    // rate, which is inside the clamp and therefore actually plants his feet. The
+    // previous 6.4 divided out to 2.3x, pinned at the 1.8 ceiling, and read as a
+    // giant jogging frantically in place while sliding forward.
+    moveSpeed: 5.0,
+    // Wide, because he is 13 units tall and visible from far outside it: an aggro
+    // radius smaller than his silhouette reads as a statue you can walk up and touch.
+    aggroRadius: 26,
     // Deliberately the literal, not an import: `src/sim/` may never import from
-    // `src/render/`, and this has a render-side twin the gait refs were measured at.
-    // A test welds the two rather than a cross-layer import.
-    scale: 2.8,
+    // `src/render/`, and this has a render-side twin (BALGATH_SCALE) the gait refs were
+    // measured at. A test welds the two rather than a cross-layer import.
+    //
+    // It also sets his melee reach through `scaledDefaultMobMeleeRange`, and that is
+    // wanted here: unlike Thunzharr, who is rendered at scale 8 and has his reach pinned
+    // down to a scale-5 body so he cannot swing past his own model at kiters, Balgath is
+    // MEANT to be outrun. His reach matching his arms is the honest read.
+    scale: 4.2,
     // The circle smash: big, slow, telegraphed. Long cadence and a wide footprint so
     // the ground ring reads from across the fen.
     aoePulse: {

@@ -40,7 +40,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 232,
+  "portraitCount": 231,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -308,40 +308,6 @@
         "path": "public/ui/mobs/balgath_cyclops.webp",
         "bytes": 2366,
         "sha256": "d69090635e96fb49e0fde896f3246a76d49e4ad2e3b21d396f843b77391770a3"
-      }
-    },
-    {
-      "id": "balgath_foreman",
-      "family": "elemental",
-      "finderEncounter": false,
-      "visualKey": "mob_balgath_foreman",
-      "renderSpec": {
-        "model": {
-          "url": "models/creatures/balgath_foreman.glb",
-          "path": "public/models/creatures/balgath_foreman.glb",
-          "bytes": 1659644,
-          "sha256": "49d88beb65203dc6563786dae849ea300b3cc9db099ea98f70f2b3b465dd2405"
-        },
-        "idle": "Idle",
-        "height": 3.2,
-        "yaw": null,
-        "hover": null,
-        "show": null,
-        "attach": [],
-        "weaponFix": null,
-        "tintStrength": 0.15
-      },
-      "tint": {
-        "source": "fixed",
-        "authored": "#9c9382",
-        "resolved": "#9c9382",
-        "strength": 0.15
-      },
-      "sourceFingerprint": "ac015ec4e58ad2ca8726ba3dec07fe143e7a51884dc06f7ec03ff5d24771b6c3",
-      "output": {
-        "path": "public/ui/mobs/balgath_foreman.webp",
-        "bytes": 2212,
-        "sha256": "64c357e457120933a09fae7d10101f2c6c98def468ab86acb58019f303147f4d"
       }
     },
     {

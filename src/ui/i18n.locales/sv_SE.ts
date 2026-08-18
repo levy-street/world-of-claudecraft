@@ -5649,6 +5649,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Trollhögarna',
   'entities.zones.mirefen_marsh.pois.6.label': 'Gravkallarlägret',
   'entities.zones.mirefen_marsh.pois.7.label': 'Den sjunkna bastionen',
+  'entities.zones.mirefen_marsh.pois.8.label': 'Förmannens Domän',
   'entities.zones.mirefen_marsh.welcome': 'Anmäl dig hos väktare Fenwick vid Kärrbrons port.',
   'entities.zones.thornpeak_heights.name': 'Törntoppshöjderna',
   'entities.zones.thornpeak_heights.pois.0.label': 'Högvakten',

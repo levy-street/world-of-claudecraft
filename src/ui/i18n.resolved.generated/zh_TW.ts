@@ -13434,9 +13434,6 @@ export const zh_TW: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "桑扎爾，覺醒之峰"
       },
-      "balgath_foreman": {
-        "name": "巴爾加斯，被埋葬的工頭"
-      },
       "balgath_cyclops": {
         "name": "巴爾加斯，獨眼工頭"
       },
@@ -16517,6 +16514,9 @@ export const zh_TW: EnTranslations = {
           },
           "7": {
             "label": "沉沒堡壘"
+          },
+          "8": {
+            "label": "工頭的領地"
           }
         }
       },

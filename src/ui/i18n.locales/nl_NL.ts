@@ -5876,6 +5876,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Trollenheuvels',
   'entities.zones.mirefen_marsh.pois.6.label': 'Grafroeper-Kampement',
   'entities.zones.mirefen_marsh.pois.7.label': 'Het Verzonken Bastion',
+  'entities.zones.mirefen_marsh.pois.8.label': 'Het Domein van de Opzichter',
   'entities.zones.mirefen_marsh.welcome': 'Meld je bij Wachter Fenwick bij de poort van Veenbrug.',
   'entities.zones.thornpeak_heights.name': 'Doorntop-Hoogten',
   'entities.zones.thornpeak_heights.pois.0.label': 'Hoogwacht',

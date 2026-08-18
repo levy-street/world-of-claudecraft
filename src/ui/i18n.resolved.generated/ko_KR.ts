@@ -13434,9 +13434,6 @@ export const ko_KR: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "천자르, 깨어나는 봉우리"
       },
-      "balgath_foreman": {
-        "name": "발가스, 묻힌 감독관"
-      },
       "balgath_cyclops": {
         "name": "발가스, 외눈의 감독관"
       },
@@ -16517,6 +16514,9 @@ export const ko_KR: EnTranslations = {
           },
           "7": {
             "label": "가라앉은 요새"
+          },
+          "8": {
+            "label": "감독관의 영역"
           }
         }
       },

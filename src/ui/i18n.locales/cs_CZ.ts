@@ -7419,6 +7419,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Trollí mohyly',
   'entities.zones.mirefen_marsh.pois.6.label': 'Tábor Hrobovolajících',
   'entities.zones.mirefen_marsh.pois.7.label': 'Potopená bašta',
+  'entities.zones.mirefen_marsh.pois.8.label': 'Předákovo panství',
   'entities.zones.mirefen_marsh.welcome': 'Ohlas se u strážce Fenwicka u brány Fenbridge.',
   'entities.zones.thornpeak_heights.name': 'Thornpeakské výšiny',
   'entities.zones.thornpeak_heights.pois.0.label': 'Highwatch',

@@ -6934,6 +6934,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Trollhügel',
   'entities.zones.mirefen_marsh.pois.6.label': 'Gravecaller-Lager',
   'entities.zones.mirefen_marsh.pois.7.label': 'Die versunkene Bastion',
+  'entities.zones.mirefen_marsh.pois.8.label': 'Das Revier des Vorarbeiters',
   'entities.zones.thornpeak_heights.name': 'Thornpeak-Höhen',
   'entities.zones.thornpeak_heights.welcome':
     'Hauptmann Thessaly hält die Mauer von Highwatch, gerade so.',

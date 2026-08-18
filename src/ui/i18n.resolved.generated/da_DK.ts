@@ -13434,9 +13434,6 @@ export const da_DK: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, den Vågnende Tinde"
       },
-      "balgath_foreman": {
-        "name": "Balgath, the Buried Foreman"
-      },
       "balgath_cyclops": {
         "name": "Balgath, the One-Eyed Foreman"
       },
@@ -16517,6 +16514,9 @@ export const da_DK: EnTranslations = {
           },
           "7": {
             "label": "Den Sunkne Bastion"
+          },
+          "8": {
+            "label": "Formandens Domæne"
           }
         }
       },

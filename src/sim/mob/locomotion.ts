@@ -789,7 +789,62 @@ function startRiftMechanicWindup(
     radius,
     duration: RIFT_MECHANIC_WINDUP_SEC,
   });
+  // Animate the windup, for a TEMPLATE-declared telegrapher only.
+  //
+  // The cue is the shipped 'windup' spellfx path (mob_swing.ts's brood_cleave is the
+  // precedent): the renderer routes it through triggerAttack, whose attackByAbility map
+  // picks the authored one-shot. Gated on the template rather than fired for everything
+  // that telegraphs, because a rift boss has no attackByAbility row for these ids and
+  // playAttack would fall through to its ORDINARY swing clip: every rift boss would
+  // start throwing a punch at the start of every ground ring. Rift bosses are stamped at
+  // spawn and carry no such template field, so they keep exactly the visuals they ship.
+  if (MOBS[mob.templateId]?.telegraphedMechanics !== undefined) {
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: mob.id,
+      targetId: mob.id,
+      school,
+      fx: 'windup',
+      ability: kind === 'stomp' ? 'mob_stomp_windup' : 'mob_pulse_windup',
+    });
+  }
   return true;
+}
+
+/**
+ * A POSITIONED impact cue at the ring the players were shown.
+ *
+ * The shared detonations (fireWarStomp / fireAoePulse) emit an entity-anchored `spellfx`
+ * carrying no place and no size, so the renderer can only draw them ON the boss. For a
+ * telegraphed mechanic that is wrong twice over: the damage lands at the ring's snapshot
+ * centre, not wherever he has walked to since, and the effect has no radius so it cannot
+ * be drawn at the size the ring promised. This gives the renderer both, so the flash
+ * lands exactly where the ring was.
+ *
+ * Template-declared telegraphers only, for the same reason as the windup cue: a rift boss
+ * would otherwise start drawing a second, differently-placed impact it never had before.
+ */
+function emitTelegraphedImpact(
+  ctx: SimContext,
+  mob: Entity,
+  center: Vec3,
+  radius: number,
+  school: Aura['school'],
+): void {
+  if (MOBS[mob.templateId]?.telegraphedMechanics === undefined) return;
+  // sourceId, so the renderer can identify the caster EXACTLY. It cannot be inferred
+  // from the position: the whole point of a telegraphed blast is that it lands where the
+  // ring was drawn rather than where the boss now stands, so matching the event's
+  // coordinates against live bodies fails precisely when the mechanic works.
+  ctx.emit({
+    type: 'spellfxAt',
+    sourceId: mob.id,
+    x: center.x,
+    z: center.z,
+    school,
+    fx: 'nova',
+    radius,
+  });
 }
 
 // Tick the in-flight instant-mechanic windups and detonate at zero. Runs from
@@ -806,11 +861,19 @@ function tickRiftMechanicWindups(ctx: SimContext, mob: Entity): void {
     if (mob.stompWindupRemaining === 0) {
       const stomp = MOBS[mob.templateId]?.stomp;
       if (stomp) {
-        fireWarStomp(ctx, mob, stomp, {
+        const center = {
           x: mob.stompWindupX ?? mob.pos.x,
           y: mob.pos.y,
           z: mob.stompWindupZ ?? mob.pos.z,
-        });
+        };
+        fireWarStomp(ctx, mob, stomp, center);
+        emitTelegraphedImpact(
+          ctx,
+          mob,
+          center,
+          stomp.radius,
+          (stomp.school ?? 'physical') as Aura['school'],
+        );
       }
       mob.swingTimer = Math.max(mob.swingTimer, RIFT_POST_MECHANIC_SWING_GAP_SEC);
     }
@@ -820,11 +883,19 @@ function tickRiftMechanicWindups(ctx: SimContext, mob: Entity): void {
     if (mob.pulseWindupRemaining === 0) {
       const pulse = MOBS[mob.templateId]?.aoePulse;
       if (pulse) {
-        fireAoePulse(ctx, mob, pulse, {
+        const center = {
           x: mob.pulseWindupX ?? mob.pos.x,
           y: mob.pos.y,
           z: mob.pulseWindupZ ?? mob.pos.z,
-        });
+        };
+        fireAoePulse(ctx, mob, pulse, center);
+        emitTelegraphedImpact(
+          ctx,
+          mob,
+          center,
+          pulse.radius,
+          (pulse.school ?? 'shadow') as Aura['school'],
+        );
       }
       mob.swingTimer = Math.max(mob.swingTimer, RIFT_POST_MECHANIC_SWING_GAP_SEC);
     }

@@ -76,10 +76,39 @@ export const BALGATH_SMASH_MIN_RADIUS = 9;
 /**
  * How Balgath is recognised as the source of a shared mob-mechanic effect.
  *
- * The template prefix covers both silhouettes (`balgath_foreman`, `balgath_cyclops`),
- * which is deliberate: they are two bodies for ONE encounter and must throw the same
- * ground effects. The match radius is one yard squared, because the mechanic emitters
- * fire at `mob.pos` exactly and anything looser starts claiming other bosses' blasts.
+ * A prefix rather than an exact id so a future second body (a phase-two form, a heroic
+ * variant) throws the same ground effects without a second registration. Identity itself
+ * is resolved from the event's `sourceId`, never from where the effect landed.
  */
 export const BALGATH_TEMPLATE_PREFIX = 'balgath_';
-export const BALGATH_MECHANIC_MATCH_SQ = 1;
+
+/**
+ * Camera trauma for each slam, and the two are deliberately different.
+ *
+ * `addShake` squares its input on apply, so these are not linear: 0.45 lands as a real
+ * jolt and 0.22 as a thud you feel more than see. The smash is the telegraphed
+ * circle-breaker and gets the bigger kick; the stomp is the quicker cousin and must not
+ * compete with it, or the two mechanics stop being distinguishable by feel. Both route
+ * through `Renderer.addShake`, which is already a no-op under reduced motion.
+ */
+export const BALGATH_SMASH_TRAUMA = 0.45;
+export const BALGATH_STOMP_TRAUMA = 0.22;
+
+/**
+ * Yards of travel between footfall puffs.
+ *
+ * Spacing dust by DISTANCE rather than by a timer is what ties it to a footfall: it stays
+ * in step when he is slowed and stops dead when he stops, where a timer keeps puffing at
+ * a standing giant. 4.4 is roughly his half-stride at scale 4.2, so it reads as one puff
+ * per planted foot rather than a continuous smear.
+ */
+export const BALGATH_STRIDE_UNITS = 4.4;
+
+/**
+ * How long each frame's eye-pool refresh keeps the ground lit.
+ *
+ * A short lease re-armed every frame of the channel, rather than a latch set on a cast
+ * start: an interrupted or cancelled cast simply stops refreshing and the pool goes out
+ * on its own, with no cancel event to miss.
+ */
+export const EYE_POOL_LEASE_SECONDS = 0.25;

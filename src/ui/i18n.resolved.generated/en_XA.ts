@@ -13434,9 +13434,6 @@ export const en_XA: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "[Ţĥúñžĥáŕŕ, ţĥé Ŵáķíñĝ Þéáķ]"
       },
-      "balgath_foreman": {
-        "name": "[Ɓáļĝáţĥ, ţĥé Ɓúŕíéð Ƒóŕéɱáñ]"
-      },
       "balgath_cyclops": {
         "name": "[Ɓáļĝáţĥ, ţĥé Óñé-Éýéð Ƒóŕéɱáñ]"
       },
@@ -16517,6 +16514,9 @@ export const en_XA: EnTranslations = {
           },
           "7": {
             "label": "[Ţĥé Šúñķéñ Ɓášţíóñ]"
+          },
+          "8": {
+            "label": "[Ţĥé Ƒóŕéɱáñ'š Ŕéáçĥ]"
           }
         }
       },

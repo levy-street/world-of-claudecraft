@@ -7378,6 +7378,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Tertres trolls',
   'entities.zones.mirefen_marsh.pois.6.label': 'Campement Gravecaller',
   'entities.zones.mirefen_marsh.pois.7.label': 'Le Bastion englouti',
+  'entities.zones.mirefen_marsh.pois.8.label': 'Le Domaine du Contremaître',
   'entities.zones.thornpeak_heights.name': 'Hauteurs de Thornpeak',
   'entities.zones.thornpeak_heights.welcome':
     'La capitaine Thessaly tient le mur de Highwatch, à peine.',

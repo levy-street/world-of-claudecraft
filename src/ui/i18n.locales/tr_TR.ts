@@ -6390,6 +6390,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Trol Höyükleri',
   'entities.zones.mirefen_marsh.pois.6.label': 'Mezar Çağıran Kampı',
   'entities.zones.mirefen_marsh.pois.7.label': 'Batık Kale',
+  'entities.zones.mirefen_marsh.pois.8.label': 'Ustabaşının Sahası',
   'entities.zones.mirefen_marsh.welcome': "Bataklık Köprüsü kapısında Muhafız Fenwick'e rapor ver.",
   'entities.zones.thornpeak_heights.name': 'Dikenzirve Tepeleri',
   'entities.zones.thornpeak_heights.pois.0.label': 'Yüksek Gözcü',

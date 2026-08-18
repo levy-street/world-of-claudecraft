@@ -5646,6 +5646,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Troldehøjene',
   'entities.zones.mirefen_marsh.pois.6.label': 'Gravkaldernes Lejr',
   'entities.zones.mirefen_marsh.pois.7.label': 'Den Sunkne Bastion',
+  'entities.zones.mirefen_marsh.pois.8.label': 'Formandens Domæne',
   'entities.zones.mirefen_marsh.welcome': 'Meld dig til Vogter Fenwick ved Sumpbroens port.',
   'entities.zones.thornpeak_heights.name': 'Tornetop Højder',
   'entities.zones.thornpeak_heights.pois.0.label': 'Højvagten',

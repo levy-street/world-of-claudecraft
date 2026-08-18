@@ -246,35 +246,37 @@ const MOUNT_RIGGED: ClipMap = {
  * references below are only correct AT this scale and would otherwise be four loose
  * numbers nobody could re-derive.
  *
- * 2.8 puts a 3.2-unit rig at roughly 9 world units, between the dragonkin broodlord
- * (2.25) and the matriarch (2.85): a boss that towers over a raid without losing its
- * feet off the bottom of the screen at melee range.
+ * 4.2 puts a 3.2-unit rig at roughly 13.4 world units, close to twice a player's height
+ * again over the dragonkin matriarch (2.85). At this size he reads as terrain from across
+ * the fen, which is the whole point of a world boss you can see coming.
+ *
+ * It is not a free number: `scaledDefaultMobMeleeRange` derives his reach from it, and the
+ * gait references below are measured AT it. Moving it means re-running the measurement and
+ * re-checking that his reach still matches where the model can actually reach.
  */
-export const BALGATH_SCALE = 2.8;
+export const BALGATH_SCALE = 4.2;
 
 // Gait references: the world speed each clip NATURALLY travels at, which
 // `locomotionTimeScale` divides the body's real speed by to pick a playback rate.
-// MEASURED, never guessed, per rig and at BALGATH_SCALE:
+// MEASURED, never guessed, at BALGATH_SCALE:
 //
-//   node scripts/anim/measure_gait.mjs public/models/creatures/<rig>.glb \
-//        --height 3.2 --scale 2.8
+//   node scripts/anim/measure_gait.mjs public/models/creatures/balgath_cyclops.glb \
+//        --height 3.2 --scale 4.2
 //
-// They differ between the two bodies even though the clips are identical, because the
-// cyclops is the leggier sculpt: its stride is ~8% longer and it normalizes at 3.93
-// against the foreman's 3.84. Handing it the foreman's numbers would over-drive its
-// cycle by about that much, which is the same mistake the dragonkin matriarch's own
-// def exists to avoid. Re-run the command above if BALGATH_SCALE or a Walk/Run clip
-// changes; `tests/balgath_boss_assets.test.ts` pins these against a live measurement.
+// These are what make his feet PLANT instead of skate, and getting them wrong is
+// invisible in code review and glaring in motion. At scale 2.8 with walkRef 2.76 his
+// 6.4 u/s chase divided out to 2.3, past `locomotionTimeScale`'s 1.8 walk clamp: the
+// cycle ran pinned at its ceiling and still could not cover the ground, which reads
+// exactly as a giant frantically jogging in place while sliding forward.
 //
-// What these imply for the encounter, since the matcher CLAMPS rather than
-// extrapolating (walk to [0.6, 1.8], run to [0.6, 1.6]): the foreman plants his feet
-// for body speeds of 1.6 to 4.7 walking and 3.0 to 8.1 running, the cyclops for 1.7 to
-// 5.0 and 3.4 to 8.9. A chase speed at or under 8 keeps BOTH inside the clamp, which
-// suits the design anyway: a giant you outrun and dodge, not one that runs you down.
-const BALGATH_FOREMAN_WALK_REF = 2.61;
-const BALGATH_FOREMAN_RUN_REF = 5.04;
-const BALGATH_CYCLOPS_WALK_REF = 2.76;
-const BALGATH_CYCLOPS_RUN_REF = 5.58;
+// He is also deliberately tuned to sit in ONE gait. His move speed (5.0, zone2.ts) is
+// just under the render-side GAIT_RUN_ENTER of 5.2, so he never crosses into the run
+// clip and never flip-flops across that boundary mid-chase. A stone giant that walks,
+// always, at 5.0/4.14 = 1.21x the clip's natural rate: deliberate, ground-covering, and
+// planted. The run reference is kept honest anyway, because a speed buff or a future
+// enrage could push him over and the clip must not over-drive when it does.
+const BALGATH_WALK_REF = 4.14;
+const BALGATH_RUN_REF = 8.38;
 
 // Balgath, the Mirefen world boss. ONE ClipMap for BOTH silhouettes (the buried
 // foreman and the cyclops), because they are two bodies for one encounter and their
@@ -303,7 +305,25 @@ const BALGATH: ClipMap = {
   idle: 'Idle',
   walk: 'Walk',
   run: 'Run',
-  attack: ['Balgath_Smash', 'Balgath_Stomp'],
+  // The ordinary auto-attack is the SMALL one. The two telegraphed slams are reached
+  // only through attackByAbility, off the windup cue the sim emits when a ground ring is
+  // drawn, so they stay rare: a boss who plays his circle-smash animation on every auto
+  // teaches the raid that the animation means nothing.
+  attack: ['Balgath_Swipe'],
+  attackByAbility: {
+    mob_pulse_windup: 'Balgath_Smash',
+    mob_stomp_windup: 'Balgath_Stomp',
+  },
+  // Timed so the clip's IMPACT frame lands on the detonation, not before it. The windup
+  // is 1.2s (RIFT_MECHANIC_WINDUP_SEC); the smash lands its blow 0.95s into its own
+  // 1.75s timeline and the stomp at 0.70s, so each plays at impact/1.2 and the fist and
+  // the shockwave arrive together. Left at the default 1.3x they both land early and the
+  // boss stands frozen through the rest of the ring, which is what makes a telegraph
+  // feel disconnected from its own hit.
+  attackTimeScaleByAbility: {
+    mob_pulse_windup: 0.79,
+    mob_stomp_windup: 0.58,
+  },
   death: 'Death',
   hit: ['Hit'],
   cast: 'Balgath_EyeFlare',
@@ -2862,29 +2882,12 @@ export const VISUALS: Record<string, VisualDef> = {
     // Gait refs MEASURED, not guessed, at the scale this boss actually spawns at
     // (`node scripts/anim/measure_gait.mjs public/models/creatures/balgath_cyclops.glb
     // --height 3.2 --scale 2.8`). Re-run it if BALGATH_SCALE moves.
-    walkRef: BALGATH_CYCLOPS_WALK_REF,
-    runRef: BALGATH_CYCLOPS_RUN_REF,
+    walkRef: BALGATH_WALK_REF,
+    runRef: BALGATH_RUN_REF,
     // Paler and cooler than the foreman: this one reads as bare quarried granite, so
     // the moss does the colour work.
     tint: 0xa8a496,
     tintStrength: 0.12,
-  },
-  // Balgath, the Buried Foreman: the Mirefen world boss (concept: the Smith's foreman
-  // the trolls dug out of the barrow-mounds, one Loom-shard eye). Tripo creature lane
-  // on the biped rig (41 joints), so the eight retargeted clips carry locomotion and
-  // the generic swing; the six BESPOKE ability clips ride the mesh-free donor baked by
-  // scripts/build_balgath_anims.mjs off this same rig's own poses.
-  mob_balgath_foreman: {
-    url: `${CREATURES}/balgath_foreman.glb`,
-    animUrls: [`${CREATURES}/balgath_ability_anims.glb`],
-    height: 3.2,
-    clips: BALGATH,
-    walkRef: BALGATH_FOREMAN_WALK_REF,
-    runRef: BALGATH_FOREMAN_RUN_REF,
-    // Silt-grey stone, lightly applied: he is already a pale sculpt, and a heavy wash
-    // flattens the barrow-moss and the shard-eye socket into one mass.
-    tint: 0x9c9382,
-    tintStrength: 0.15,
   },
   npc_chronicler: {
     url: `${PLAYERS}/mage.glb`,
@@ -3000,7 +3003,6 @@ const MOB_KEYS: Record<string, string> = {
   // The Mirefen boss, in both candidate bodies. Nothing spawns either in ordinary play
   // (no camp entry, no world-boss registration); they exist so the two silhouettes can
   // be compared in motion via ?boss=foreman|cyclops (src/game/boss_test_drive.ts).
-  balgath_foreman: 'mob_balgath_foreman',
   balgath_cyclops: 'mob_balgath_cyclops',
   drakemaw_broodlord: 'mob_dragonkin_broodlord',
   cindraleth_maw_matriarch: 'mob_dragonkin_matriarch',

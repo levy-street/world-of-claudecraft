@@ -13434,9 +13434,6 @@ export const en_CA: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, the Waking Peak"
       },
-      "balgath_foreman": {
-        "name": "Balgath, the Buried Foreman"
-      },
       "balgath_cyclops": {
         "name": "Balgath, the One-Eyed Foreman"
       },
@@ -16517,6 +16514,9 @@ export const en_CA: EnTranslations = {
           },
           "7": {
             "label": "The Sunken Bastion"
+          },
+          "8": {
+            "label": "The Foreman's Reach"
           }
         }
       },

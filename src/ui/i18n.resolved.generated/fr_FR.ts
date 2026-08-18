@@ -13434,9 +13434,6 @@ export const fr_FR: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, le Pic Éveillé"
       },
-      "balgath_foreman": {
-        "name": "Balgath, the Buried Foreman"
-      },
       "balgath_cyclops": {
         "name": "Balgath, the One-Eyed Foreman"
       },
@@ -16517,6 +16514,9 @@ export const fr_FR: EnTranslations = {
           },
           "7": {
             "label": "Le Bastion englouti"
+          },
+          "8": {
+            "label": "Le Domaine du Contremaître"
           }
         }
       },

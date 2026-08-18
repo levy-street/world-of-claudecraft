@@ -13434,9 +13434,6 @@ export const nl_NL: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, de Ontwakende Piek"
       },
-      "balgath_foreman": {
-        "name": "Balgath, the Buried Foreman"
-      },
       "balgath_cyclops": {
         "name": "Balgath, the One-Eyed Foreman"
       },
@@ -16517,6 +16514,9 @@ export const nl_NL: EnTranslations = {
           },
           "7": {
             "label": "Het Verzonken Bastion"
+          },
+          "8": {
+            "label": "Het Domein van de Opzichter"
           }
         }
       },

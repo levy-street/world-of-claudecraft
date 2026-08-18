@@ -25,13 +25,16 @@ import * as THREE from 'three';
 import {
   BALGATH_CRATER_SECONDS,
   BALGATH_EYE_POOL_RADIUS,
-  BALGATH_MECHANIC_MATCH_SQ,
   BALGATH_RING_SECONDS,
   BALGATH_SMASH_MIN_RADIUS,
+  BALGATH_SMASH_TRAUMA,
+  BALGATH_STOMP_TRAUMA,
+  BALGATH_STRIDE_UNITS,
   BALGATH_TEMPLATE_PREFIX,
   type BalgathRingPlan,
   balgathRingAlpha,
   balgathRingRadius,
+  EYE_POOL_LEASE_SECONDS,
   planBalgathRing,
 } from './balgath_fx_core';
 
@@ -61,8 +64,14 @@ function fxMaterial(color: number, alphaMap?: THREE.Texture): THREE.MeshBasicMat
 // animates (only the per-instance material opacity does), and the module-level
 // cache means the whole effect layer costs a single upload.
 let softDiscTex: THREE.CanvasTexture | null = null;
-function softDisc(): THREE.CanvasTexture {
+function softDisc(): THREE.CanvasTexture | undefined {
   if (softDiscTex) return softDiscTex;
+  // No document at all: a Node unit test driving this layer's timing and budgets. Answer
+  // undefined so the material simply carries no alpha map, exactly as it already does
+  // when the 2D context comes back null. The effects still spawn, retire and count
+  // correctly; they just lose the soft edge, which is what a headless caller cannot see
+  // anyway. The alternative is a DOM shim in every test that touches an impact.
+  if (typeof document === 'undefined') return undefined;
   const size = 128;
   const canvas = document.createElement('canvas');
   canvas.width = size;
@@ -102,6 +111,14 @@ const FENLIGHT = 0x58d2ac;
 const MAX_ACTIVE_RINGS = 12;
 const MAX_ACTIVE_CRATERS = 8;
 
+/** The entity shape this layer reads. Narrow on purpose: it never mutates the world. */
+export interface BalgathBody {
+  id: number;
+  templateId?: string;
+  pos: { x: number; z: number };
+  castingAbility?: string | null;
+}
+
 interface ActiveRing {
   mesh: THREE.Mesh;
   mat: THREE.MeshBasicMaterial;
@@ -119,47 +136,44 @@ interface ActiveCrater {
 /**
  * Route one `spellfxAt` event to Balgath's ground layer, or ignore it.
  *
- * The boss's mechanics ride the SHARED mob-mechanic emitters (`fx: 'runeCircle'` is
- * the telegraph, `fx: 'nova'` the detonation), which every boss in the game uses and
- * which carry no source id. So identity is resolved by POSITION: those emitters fire
- * at `mob.pos` exactly, so a Balgath standing on the event's own coordinates is the
- * caster. The match runs over the renderer's live entity list here rather than behind a
- * callback, so the whole rule (who counts as Balgath, how close is close enough) reads in
- * one place instead of being split across the coordinator. A tight radius keeps it honest:
- * if some other boss ever detonates on top of Balgath the worst case is one extra silt
- * ring, never a missing telegraph.
+ * Identity comes from `sourceId`, not from the event's coordinates. That is not a
+ * preference: a telegraphed blast detonates at the centre of the ring the players were
+ * shown, and the boss has usually walked several yards off it during the 1.2s windup, so
+ * a proximity match against live bodies fails exactly when the mechanic is working
+ * correctly. Matching the id is exact and cannot be fooled by two bosses fighting in the
+ * same place.
  *
- * Returns true when the event was consumed, so the caller can skip the generic path.
- * The telegraph deliberately is NOT consumed: the shared rune-circle ring is the
- * actionable information a player dodges, and replacing it with a cosmetic silt ring
- * would be a gameplay regression. Balgath's ring is drawn ON TOP of it, at impact.
+ * Returns true when the event was consumed, so the caller can skip the generic path. The
+ * telegraph itself is deliberately NOT consumed: the shared rune-circle ring is the
+ * actionable information a player dodges, and swapping it for a cosmetic silt ring would
+ * be a gameplay regression. Balgath's ring is drawn ON TOP of it, at impact.
  */
 export function routeBalgathSpellfxAt(
-  ev: { x: number; z: number; fx: string; radius?: number },
+  ev: { x: number; z: number; fx: string; radius?: number; sourceId?: number },
   fx: BalgathFx,
-  entities: () => Iterable<{ templateId?: string; pos: { x: number; z: number } }>,
+  entities: () => Iterable<{ id: number; templateId?: string }>,
 ): boolean {
   // Cheap guards BEFORE the entity walk, and `entities` is a thunk so the walk is not
-  // even reached for the overwhelming majority of effect events that are not a boss
-  // slam. This sits at the top of a per-event hot path, so an unconditional scan of
-  // every entity in interest range would be real per-frame cost for nothing, and it
-  // would also let an unrelated event throw in a caller whose world is not wired yet.
-  if (ev.fx !== 'nova' || !ev.radius) return false;
+  // even reached for the overwhelming majority of effect events that are not a boss slam.
+  // This sits at the top of a per-event hot path, and it also means a caller whose world
+  // is not wired yet cannot be made to throw by an unrelated effect event.
+  if (ev.fx !== 'nova' || !ev.radius || ev.sourceId === undefined) return false;
   let found = false;
   for (const e of entities()) {
-    if (!e.templateId?.startsWith(BALGATH_TEMPLATE_PREFIX)) continue;
-    const dx = e.pos.x - ev.x;
-    const dz = e.pos.z - ev.z;
-    if (dx * dx + dz * dz <= BALGATH_MECHANIC_MATCH_SQ) {
-      found = true;
-      break;
-    }
+    if (e.id !== ev.sourceId) continue;
+    found = e.templateId?.startsWith(BALGATH_TEMPLATE_PREFIX) === true;
+    break;
   }
   if (!found) return false;
-  // The two slams differ by footprint, which is also how a raid tells them apart:
-  // the smash is the big telegraphed circle, the stomp the tighter shockwave.
-  if (ev.radius >= BALGATH_SMASH_MIN_RADIUS) fx.smashImpact(ev.x, ev.z, ev.radius);
-  else fx.stompRing(ev.x, ev.z, ev.radius);
+  // The two slams differ by footprint, which is also how a raid tells them apart: the
+  // smash is the big telegraphed circle, the stomp the tighter shockwave.
+  if (ev.radius >= BALGATH_SMASH_MIN_RADIUS) {
+    fx.smashImpact(ev.x, ev.z, ev.radius);
+    fx.impactFelt(BALGATH_SMASH_TRAUMA);
+  } else {
+    fx.stompRing(ev.x, ev.z, ev.radius);
+    fx.impactFelt(BALGATH_STOMP_TRAUMA);
+  }
   return true;
 }
 
@@ -172,11 +186,21 @@ export class BalgathFx {
   private eyeUntil = 0;
   private clock = 0;
   private quality = 1;
+  /** Per-boss distance-travelled accumulator for footfall spacing. */
+  private stride = new Map<number, { x: number; z: number; left: boolean }>();
+  private seenThisFrame = new Set<number>();
 
   constructor(
     private scene: THREE.Scene,
     private groundHeightAt: (x: number, z: number) => number,
+    /** Camera trauma for a landed slam. Optional so a headless probe needs no camera. */
+    private onImpact: (trauma: number) => void = () => {},
   ) {}
+
+  /** Kick the camera for a landed slam. Reduced motion is handled by the consumer. */
+  impactFelt(trauma: number): void {
+    this.onImpact(trauma);
+  }
 
   setQuality(level: number): void {
     this.quality = Math.min(1, Math.max(0, level));
@@ -243,8 +267,56 @@ export class BalgathFx {
     this.craters.push({ mesh, mat, age: 0, life: BALGATH_CRATER_SECONDS });
   }
 
-  update(dt: number, reducedMotion = false): void {
+  /**
+   * Per-frame world integration, driven off the live entity list.
+   *
+   * Two things a giant needs that no event can carry, because both are continuous:
+   * dust under his feet while he walks, and the eye's ground pool while he channels.
+   * Reading them here rather than from renderer.ts hooks keeps the coordinator at two
+   * call sites total and puts the whole boss's presentation in one file.
+   */
+  private syncBosses(bosses: Iterable<BalgathBody>): void {
+    this.seenThisFrame.clear();
+    for (const e of bosses) {
+      if (!e.templateId?.startsWith(BALGATH_TEMPLATE_PREFIX)) continue;
+      this.seenThisFrame.add(e.id);
+      // The eye's pool tracks the channel exactly: lit while the bar runs, out the
+      // instant it stops. Re-armed every frame with a short lease rather than latched on
+      // a start event, so an interrupted cast cannot leave the ground lit forever.
+      if (e.castingAbility) this.eyeGlow(e.pos.x, e.pos.z, EYE_POOL_LEASE_SECONDS);
+
+      // Footfall dust, spaced by DISTANCE TRAVELLED rather than by a timer: that is what
+      // ties a puff to a footfall instead of to the frame rate, so it stays in step when
+      // he is slowed, and stops entirely when he stops.
+      const last = this.stride.get(e.id);
+      if (!last) {
+        this.stride.set(e.id, { x: e.pos.x, z: e.pos.z, left: false });
+        continue;
+      }
+      const moved = Math.hypot(e.pos.x - last.x, e.pos.z - last.z);
+      if (moved < BALGATH_STRIDE_UNITS) continue;
+      last.x = e.pos.x;
+      last.z = e.pos.z;
+      last.left = !last.left;
+      this.footfall(e.pos.x, e.pos.z, 1);
+    }
+    // Forget bosses that despawned, so the stride table cannot grow without bound.
+    for (const id of [...this.stride.keys()]) {
+      if (!this.seenThisFrame.has(id)) this.stride.delete(id);
+    }
+  }
+
+  /**
+   * Advance every effect by one frame.
+   *
+   * `bosses` is the live entity list; the continuous half of the presentation (footfall
+   * dust, the eye's ground pool) is read from it here rather than pushed in from the
+   * renderer, so the coordinator keeps ONE call and the two halves cannot drift out of
+   * step with each other.
+   */
+  update(dt: number, reducedMotion = false, bosses: Iterable<BalgathBody> = []): void {
     this.clock += dt;
+    this.syncBosses(bosses);
 
     for (let i = this.rings.length - 1; i >= 0; i--) {
       const ring = this.rings[i];
@@ -300,6 +372,7 @@ export class BalgathFx {
   }
 
   clear(): void {
+    this.stride.clear();
     for (let i = this.rings.length - 1; i >= 0; i--) this.retireRing(i);
     for (let i = this.craters.length - 1; i >= 0; i--) this.retireCrater(i);
     if (this.eyePool) this.eyePool.visible = false;

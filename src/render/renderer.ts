@@ -2907,7 +2907,7 @@ export class Renderer {
     // 'orb' release event (see src/render/frozen_orb_fx.ts).
     this.frozenOrbFx = new FrozenOrbFx(this.scene, (x, z) => groundHeight(x, z, this.sim.cfg.seed));
     // The Mirefen world boss's ground layer (src/render/balgath_fx.ts).
-    this.balgathFx = new BalgathFx(this.scene, (x, z) => groundHeight(x, z, this.sim.cfg.seed));
+    this.balgathFx = new BalgathFx(this.scene, this.groundSample, (t) => this.addShake(t));
     this.glacialFrontVisual = new GlacialFrontVisual(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
@@ -5094,7 +5094,7 @@ export class Renderer {
     this.needleOfFateVfx.update(dt, this.reducedMotion());
     this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);
-    this.balgathFx.update(dt, this.reducedMotion());
+    this.balgathFx.update(dt, this.reducedMotion(), this.sim.entities.values());
     this.mageGroundFx.update(dt);
     this.warlockMeteorFx.update(dt, this.reducedMotion());
     // The meteor fx registers and releases budget lights AFTER the pass (a
@@ -12349,7 +12349,7 @@ export class Renderer {
     this.needleOfFateVfx.update(dt, this.reducedMotion());
     this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);
-    this.balgathFx.update(dt, this.reducedMotion());
+    this.balgathFx.update(dt, this.reducedMotion(), this.sim.entities.values());
     this.mageGroundFx.update(dt);
     this.warlockMeteorFx.update(dt, this.reducedMotion());
     // Same post-fx budget recovery as the prewarm frame path: a landing or

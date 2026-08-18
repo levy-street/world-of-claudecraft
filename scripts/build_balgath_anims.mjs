@@ -1,4 +1,11 @@
-// Balgath, the Buried Foreman: the Mirefen world boss's bespoke clip set.
+// Balgath, the Mirefen world boss: his bespoke clip set.
+//
+// Sampled from `balgath_clip_donor.glb`, a mesh-free rig carrying the eight clips the
+// Tripo creature lane retargeted onto the FOREMAN candidate. That body lost the design
+// bake-off to the cyclops and its mesh is gone, but its retargeted poses are what these
+// clips were authored from and the two rigs share all 41 joint names, so the donor was
+// stripped to bones-and-clips (1.6 MB to 438 KB) rather than deleted: without it these
+// six clips would be unreproducible.
 //
 // Authored by POSE-SAMPLE-AND-BLEND off the poses already baked into his own rig
 // (`scripts/anim/pose_blend.mjs`, the technique `build_elemental_anims.mjs` and
@@ -31,9 +38,11 @@
 //   Balgath_Roar     the enrage flourish.
 //   Balgath_Wake     his rise out of the barrow at the scheduled spawn: held folded low,
 //                    then levered upright with both arms thrown up at full height.
+//   Balgath_Swipe    the ORDINARY auto-attack. Small and quick on purpose, so the two
+//                    telegraphed slams stay rare and therefore stay meaningful.
 //
 // Usage: node scripts/build_balgath_anims.mjs [--preview]
-// Output: public/models/creatures/balgath_ability_anims.glb (mesh-free, 6 clips)
+// Output: public/models/creatures/balgath_ability_anims.glb (mesh-free, 7 clips)
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { dedup, prune } from '@gltf-transform/functions';
@@ -52,7 +61,7 @@ import {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
-const SOURCE = resolve(ROOT, 'public/models/creatures/balgath_foreman.glb');
+const SOURCE = resolve(ROOT, 'public/models/creatures/balgath_clip_donor.glb');
 const OUT = resolve(ROOT, 'public/models/creatures/balgath_ability_anims.glb');
 const PREVIEW_OUT = resolve(ROOT, 'tmp/balgath_anims_preview.glb');
 const PREVIEW = process.argv.includes('--preview');
@@ -165,6 +174,18 @@ ramp(roar, 0.28, 0.55, 3, easeOutCubic, P_crouch, P_top);
 roar.push([0.95, (k) => poseValue(P_top, k, P_all)]); // held, chest open
 ramp(roar, 0.95, 1.6, 6, easeInOutQuad, P_top, P_idle);
 
+// --- Balgath_Swipe: 0.85s ---------------------------------------------------
+// His ORDINARY melee swing, and the reason the two big slams are not in the generic
+// attack array: a boss whose every auto-attack plays the telegraphed circle-smash
+// animation teaches players to ignore the telegraph, because they see it constantly and
+// it usually means nothing. This is short, flat and unmistakably smaller: a backhand off
+// the same swing donor, no windup ceremony, no held beat at the top.
+const swipe = [[0, (k) => poseValue(P_idle, k, P_all)]];
+ramp(swipe, 0, 0.18, 3, easeOutCubic, P_idle, P_swing);
+ramp(swipe, 0.18, 0.32, 2, easeOutCubic, P_swing, P_impact);
+ramp(swipe, 0.32, 0.55, 3, easeOutCubic, P_impact, P_recover);
+ramp(swipe, 0.55, 0.85, 4, easeInOutQuad, P_recover, P_idle);
+
 // --- Balgath_Wake: 3.40s ----------------------------------------------------
 // He levers himself up out of the barrow: held low and folded, then a slow push to
 // standing, then both arms thrown up as he takes his full height.
@@ -188,6 +209,7 @@ const CLIPS = [
   ['Balgath_Blinded', blinded],
   ['Balgath_Roar', roar],
   ['Balgath_Wake', wake],
+  ['Balgath_Swipe', swipe],
 ];
 
 const authored = [];

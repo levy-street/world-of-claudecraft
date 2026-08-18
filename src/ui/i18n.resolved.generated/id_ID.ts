@@ -13434,9 +13434,6 @@ export const id_ID: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, Puncak yang Terjaga"
       },
-      "balgath_foreman": {
-        "name": "Balgath, the Buried Foreman"
-      },
       "balgath_cyclops": {
         "name": "Balgath, the One-Eyed Foreman"
       },
@@ -16517,6 +16514,9 @@ export const id_ID: EnTranslations = {
           },
           "7": {
             "label": "Benteng Karam"
+          },
+          "8": {
+            "label": "Wilayah Mandor"
           }
         }
       },

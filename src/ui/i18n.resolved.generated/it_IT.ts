@@ -13434,9 +13434,6 @@ export const it_IT: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, il Picco Risvegliato"
       },
-      "balgath_foreman": {
-        "name": "Balgath, the Buried Foreman"
-      },
       "balgath_cyclops": {
         "name": "Balgath, the One-Eyed Foreman"
       },
@@ -16517,6 +16514,9 @@ export const it_IT: EnTranslations = {
           },
           "7": {
             "label": "Il Bastione Sommerso"
+          },
+          "8": {
+            "label": "Il Dominio del Caposquadra"
           }
         }
       },

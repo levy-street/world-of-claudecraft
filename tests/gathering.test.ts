@@ -287,11 +287,12 @@ describe('isHarvestableCorpse', () => {
     // `excluded` into this list, never through `untagged`. (184 before the
     // v0.32.0 base merge, plus the untagged dragonkin egg from the brood and
     // the four untagged camp mobs the quest-dedupe pass added, minus
-    // shoal_scuttler once it gained a mapped tag.) 187 with the Mirefen boss's two
-    // candidate bodies: both are carved stone, so neither carries componentTags and
-    // neither is skinnable, which is the same reason every other boss sits here.
+    // shoal_scuttler once it gained a mapped tag.) 186 with the Mirefen boss: he is carved
+    // stone, so he carries no componentTags and is not skinnable, the same reason every
+    // other boss sits here. (It was briefly 187 while a second candidate body was in the
+    // design bake-off; that one lost and is deleted.)
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
-    expect(untagged).toHaveLength(187);
+    expect(untagged).toHaveLength(186);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

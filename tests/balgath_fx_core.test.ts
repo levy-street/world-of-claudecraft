@@ -10,11 +10,14 @@ import { describe, expect, it } from 'vitest';
 // what this suite is about, so it is tested here beside the constants it keys on. The
 // module reaches for `document` only lazily inside the soft-disc texture, which none of
 // these paths hit, so a plain Node import is safe.
-import { type BalgathFx, routeBalgathSpellfxAt } from '../src/render/balgath_fx';
+import { BalgathFx, routeBalgathSpellfxAt } from '../src/render/balgath_fx';
 import {
   BALGATH_CRATER_SECONDS,
   BALGATH_EYE_POOL_RADIUS,
   BALGATH_RING_SECONDS,
+  BALGATH_SMASH_TRAUMA,
+  BALGATH_STOMP_TRAUMA,
+  BALGATH_STRIDE_UNITS,
   balgathRingAlpha,
   balgathRingRadius,
   planBalgathRing,
@@ -95,10 +98,7 @@ describe('balgath timing constants', () => {
 // failure modes are opposite and both bad: claim another boss's blast, or silently
 // claim none and leave the effect layer dead. Both are pinned.
 describe('routeBalgathSpellfxAt', () => {
-  const at = (x: number, z: number, templateId = 'balgath_foreman') => ({
-    templateId,
-    pos: { x, z },
-  });
+  const at = (id = 7, templateId = 'balgath_cyclops') => ({ id, templateId });
   function spy() {
     const calls: Array<[string, number]> = [];
     return {
@@ -106,6 +106,7 @@ describe('routeBalgathSpellfxAt', () => {
       fx: {
         smashImpact: (_x: number, _z: number, r: number) => calls.push(['smash', r]),
         stompRing: (_x: number, _z: number, r: number) => calls.push(['stomp', r]),
+        impactFelt: () => {},
       } as unknown as BalgathFx,
     };
   }
@@ -113,13 +114,17 @@ describe('routeBalgathSpellfxAt', () => {
   it('claims a nova standing on Balgath and picks the slam by footprint', () => {
     const big = spy();
     expect(
-      routeBalgathSpellfxAt({ x: 10, z: 20, fx: 'nova', radius: 12 }, big.fx, () => [at(10, 20)]),
+      routeBalgathSpellfxAt({ x: 10, z: 20, fx: 'nova', radius: 12, sourceId: 7 }, big.fx, () => [
+        at(),
+      ]),
     ).toBe(true);
     expect(big.calls).toEqual([['smash', 12]]);
 
     const small = spy();
     expect(
-      routeBalgathSpellfxAt({ x: 10, z: 20, fx: 'nova', radius: 6 }, small.fx, () => [at(10, 20)]),
+      routeBalgathSpellfxAt({ x: 10, z: 20, fx: 'nova', radius: 6, sourceId: 7 }, small.fx, () => [
+        at(),
+      ]),
     ).toBe(true);
     expect(small.calls).toEqual([['stomp', 6]]);
   });
@@ -129,35 +134,61 @@ describe('routeBalgathSpellfxAt', () => {
     // gameplay ring for a cosmetic one, which the graphics-neutrality invariant forbids.
     const s = spy();
     expect(
-      routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'runeCircle', radius: 12 }, s.fx, () => [at(0, 0)]),
+      routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'runeCircle', radius: 12, sourceId: 7 }, s.fx, () => [
+        at(),
+      ]),
     ).toBe(false);
     expect(s.calls).toEqual([]);
   });
 
-  it('ignores another boss detonating away from Balgath', () => {
+  it("ignores another boss's blast, however close it lands", () => {
+    // Identity is the id, so a different caster detonating on the exact same spot is
+    // still not his: this is what a positional match could never get right.
     const s = spy();
+    const other = { id: 9, templateId: 'thunzharr_waking_peak' };
     expect(
-      routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'nova', radius: 12 }, s.fx, () => [at(40, 40)]),
+      routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'nova', radius: 12, sourceId: 9 }, s.fx, () => [
+        at(),
+        other,
+      ]),
     ).toBe(false);
-    expect(routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'nova', radius: 12 }, s.fx, () => [])).toBe(
+    // An id nothing in the world answers to, and an empty world.
+    expect(
+      routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'nova', radius: 12, sourceId: 404 }, s.fx, () => [
+        at(),
+      ]),
+    ).toBe(false);
+    expect(
+      routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'nova', radius: 12, sourceId: 7 }, s.fx, () => []),
+    ).toBe(false);
+    // An anchorless event (every mechanic that is not a telegraphed one).
+    expect(routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'nova', radius: 12 }, s.fx, () => [at()])).toBe(
       false,
     );
     expect(s.calls).toEqual([]);
   });
 
-  it('claims for BOTH silhouettes, which are one encounter', () => {
-    for (const id of ['balgath_foreman', 'balgath_cyclops']) {
+  it('claims wherever the blast lands, however far he has walked from it', () => {
+    // The 1.2s windup lets him leave the ring entirely before it goes off. The effect has
+    // to draw at the ring, and it still has to be recognised as his.
+    const s = spy();
+    expect(
+      routeBalgathSpellfxAt({ x: 400, z: -400, fx: 'nova', radius: 12, sourceId: 7 }, s.fx, () => [
+        at(),
+      ]),
+    ).toBe(true);
+    expect(s.calls).toEqual([['smash', 12]]);
+  });
+
+  it('claims for any balgath body, so a future phase-two form needs no rewiring', () => {
+    for (const id of ['balgath_cyclops', 'balgath_awakened']) {
       const s = spy();
       expect(
-        routeBalgathSpellfxAt({ x: 5, z: 5, fx: 'nova', radius: 12 }, s.fx, () => [at(5, 5, id)]),
+        routeBalgathSpellfxAt({ x: 5, z: 5, fx: 'nova', radius: 12, sourceId: 7 }, s.fx, () => [
+          at(7, id),
+        ]),
       ).toBe(true);
     }
-    const other = spy();
-    expect(
-      routeBalgathSpellfxAt({ x: 5, z: 5, fx: 'nova', radius: 12 }, other.fx, () => [
-        at(5, 5, 'thunzharr_waking_peak'),
-      ]),
-    ).toBe(false);
   });
 
   it('never walks the entity list for an event that cannot be his', () => {
@@ -168,19 +199,141 @@ describe('routeBalgathSpellfxAt', () => {
     let walked = 0;
     const entities = () => {
       walked++;
-      return [at(0, 0)];
+      return [at()];
     };
-    routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'runeCircle', radius: 12 }, s.fx, entities);
-    routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'burst', radius: 12 }, s.fx, entities);
-    routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'nova' }, s.fx, entities);
+    routeBalgathSpellfxAt(
+      { x: 0, z: 0, fx: 'runeCircle', radius: 12, sourceId: 7 },
+      s.fx,
+      entities,
+    );
+    routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'burst', radius: 12, sourceId: 7 }, s.fx, entities);
+    routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'nova', sourceId: 7 }, s.fx, entities);
     expect(walked).toBe(0);
-    routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'nova', radius: 12 }, s.fx, entities);
+    routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'nova', radius: 12, sourceId: 7 }, s.fx, entities);
     expect(walked).toBe(1);
   });
 
   it('needs a radius, because the ring is drawn at the blast size', () => {
     const s = spy();
-    expect(routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'nova' }, s.fx, () => [at(0, 0)])).toBe(false);
+    expect(routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'nova', sourceId: 7 }, s.fx, () => [at()])).toBe(
+      false,
+    );
     expect(s.calls).toEqual([]);
+  });
+});
+
+// --- the continuous world layer ----------------------------------------------
+// Footfall dust and the eye pool are read from the live entity list every frame rather
+// than pushed from events, so their correctness is entirely about WHEN they fire.
+describe('BalgathFx world integration', () => {
+  function harness() {
+    const calls: string[] = [];
+    const fx = new BalgathFx({ add: () => {}, remove: () => {} } as never, () => 0);
+    (fx as unknown as { footfall: (x: number, z: number) => void }).footfall = (x) =>
+      calls.push(`foot:${Math.round(x)}`);
+    (fx as unknown as { eyeGlow: (x: number, z: number, s: number) => void }).eyeGlow = () =>
+      calls.push('eye');
+    return { fx, calls };
+  }
+  const body = (over: Record<string, unknown> = {}) => ({
+    id: 1,
+    templateId: 'balgath_cyclops',
+    pos: { x: 0, z: 0 },
+    castingAbility: null as string | null,
+    ...over,
+  });
+
+  it('puffs once per stride travelled, never on a standing giant', () => {
+    // A timer would keep puffing at a boss stood still; distance cannot.
+    const { fx, calls } = harness();
+    const e = body();
+    fx.update(0.016, false, [e]); // first frame only seeds the accumulator
+    expect(calls).toEqual([]);
+    for (let i = 0; i < 10; i++) fx.update(0.016, false, [e]);
+    expect(calls, 'stationary boss should never puff').toEqual([]);
+    e.pos.x = BALGATH_STRIDE_UNITS + 0.1;
+    fx.update(0.016, false, [e]);
+    expect(calls).toHaveLength(1);
+  });
+
+  it('spaces puffs by distance, so a slow walk still lands one per stride', () => {
+    const { fx, calls } = harness();
+    const e = body();
+    fx.update(0.016, false, [e]);
+    // Creep forward in small increments: the count follows ground covered, not frames.
+    // Asserted as a band rather than an exact count because the accumulator compares
+    // floating-point distance against the stride, so a step that lands exactly on the
+    // boundary can fall either side of it; what matters is one puff per stride, not
+    // which side of the epsilon the tenth one lands on.
+    const strides = 10;
+    for (let i = 0; i < strides * 4; i++) {
+      e.pos.x += BALGATH_STRIDE_UNITS / 4;
+      fx.update(0.016, false, [e]);
+    }
+    expect(calls.length).toBeGreaterThanOrEqual(strides - 1);
+    expect(calls.length).toBeLessThanOrEqual(strides + 1);
+  });
+
+  it('lights the eye pool only while the channel runs', () => {
+    const { fx, calls } = harness();
+    const e = body();
+    fx.update(0.016, false, [e]);
+    expect(calls.filter((c) => c === 'eye')).toHaveLength(0);
+    e.castingAbility = 'balgath_scry';
+    fx.update(0.016, false, [e]);
+    fx.update(0.016, false, [e]);
+    expect(calls.filter((c) => c === 'eye')).toHaveLength(2);
+    // An interrupted cast just stops refreshing; there is no cancel event to miss.
+    e.castingAbility = null;
+    fx.update(0.016, false, [e]);
+    expect(calls.filter((c) => c === 'eye')).toHaveLength(2);
+  });
+
+  it('ignores every other entity in the world', () => {
+    const { fx, calls } = harness();
+    const other = body({ id: 2, templateId: 'fen_troll' });
+    fx.update(0.016, false, [other]);
+    other.pos.x = 100;
+    fx.update(0.016, false, [other]);
+    expect(calls).toEqual([]);
+  });
+
+  it('forgets a despawned boss instead of leaking his stride entry', () => {
+    const { fx } = harness();
+    const e = body();
+    fx.update(0.016, false, [e]);
+    const stride = (fx as unknown as { stride: Map<number, unknown> }).stride;
+    expect(stride.size).toBe(1);
+    fx.update(0.016, false, []);
+    expect(stride.size, 'a killed boss must not stay in the table').toBe(0);
+  });
+});
+
+describe('slam camera trauma', () => {
+  it('kicks harder for the smash than the stomp, so they feel different', () => {
+    // addShake squares its input, so these are not linear: the telegraphed
+    // circle-breaker has to outweigh its quicker cousin or the two stop being
+    // distinguishable by feel alone.
+    expect(BALGATH_SMASH_TRAUMA).toBeGreaterThan(BALGATH_STOMP_TRAUMA);
+    for (const t of [BALGATH_SMASH_TRAUMA, BALGATH_STOMP_TRAUMA]) {
+      expect(t).toBeGreaterThan(0);
+      expect(t).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('reports the right trauma for each slam, and none when it does not claim', () => {
+    // The camera wire lives on the instance, not on the call: the layer owns how a slam
+    // feels, the same way it owns where the ground is.
+    const seen: number[] = [];
+    const fx = new BalgathFx(
+      { add: () => {}, remove: () => {} } as never,
+      () => 0,
+      (t) => seen.push(t),
+    );
+    const at = [{ id: 7, templateId: 'balgath_cyclops' }];
+    routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'nova', radius: 12, sourceId: 7 }, fx, () => at);
+    routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'nova', radius: 6, sourceId: 7 }, fx, () => at);
+    routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'runeCircle', radius: 12, sourceId: 7 }, fx, () => at);
+    expect(seen).toEqual([BALGATH_SMASH_TRAUMA, BALGATH_STOMP_TRAUMA]);
   });
 });

@@ -13434,9 +13434,6 @@ export const cs_CZ: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, probouzející se štít"
       },
-      "balgath_foreman": {
-        "name": "Balgath, the Buried Foreman"
-      },
       "balgath_cyclops": {
         "name": "Balgath, the One-Eyed Foreman"
       },
@@ -16517,6 +16514,9 @@ export const cs_CZ: EnTranslations = {
           },
           "7": {
             "label": "Potopená bašta"
+          },
+          "8": {
+            "label": "Předákovo panství"
           }
         }
       },

@@ -13434,9 +13434,6 @@ export const tr_TR: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, Uyanan Zirve"
       },
-      "balgath_foreman": {
-        "name": "Balgath, the Buried Foreman"
-      },
       "balgath_cyclops": {
         "name": "Balgath, the One-Eyed Foreman"
       },
@@ -16517,6 +16514,9 @@ export const tr_TR: EnTranslations = {
           },
           "7": {
             "label": "Batık Kale"
+          },
+          "8": {
+            "label": "Ustabaşının Sahası"
           }
         }
       },

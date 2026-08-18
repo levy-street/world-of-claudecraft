@@ -4319,6 +4319,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': '트롤 봉분',
   'entities.zones.mirefen_marsh.pois.6.label': '무덤부름 야영지',
   'entities.zones.mirefen_marsh.pois.7.label': '가라앉은 요새',
+  'entities.zones.mirefen_marsh.pois.8.label': '감독관의 영역',
   'entities.zones.thornpeak_heights.name': '쏜피크 고지',
   'entities.zones.thornpeak_heights.welcome':
     '테살리 대장이 간신히 하이워치 성벽을 지키고 있습니다.',
@@ -5825,7 +5826,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.soulflame_cord.name': '영혼불꽃 허리끈',
   'entities.items.stormcallers_waistguard.name': '폭풍소환사의 허리보호구',
   'entities.mobs.thunzharr_waking_peak.name': '천자르, 깨어나는 봉우리',
-  'entities.mobs.balgath_foreman.name': '발가스, 묻힌 감독관',
   'entities.mobs.balgath_cyclops.name': '발가스, 외눈의 감독관',
   'entities.mobs.thunzharr_stormling.name': '깨어난 폭풍 정령',
   'entities.mobs.stable_horse.name': '마구간 말',

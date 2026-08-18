@@ -6437,6 +6437,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Gundukan Troll',
   'entities.zones.mirefen_marsh.pois.6.label': 'Perkemahan Gravecaller',
   'entities.zones.mirefen_marsh.pois.7.label': 'Benteng Karam',
+  'entities.zones.mirefen_marsh.pois.8.label': 'Wilayah Mandor',
   'entities.zones.mirefen_marsh.welcome': 'Lapor pada Warden Fenwick di gerbang Jembatan Rawa.',
   'entities.zones.thornpeak_heights.name': 'Dataran Tinggi Thornpeak',
   'entities.zones.thornpeak_heights.pois.0.label': 'Menara Pengawas',

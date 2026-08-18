@@ -6865,6 +6865,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.5.label': 'Túmulos troll',
   'entities.zones.mirefen_marsh.pois.6.label': 'Acampamento Gravecaller',
   'entities.zones.mirefen_marsh.pois.7.label': 'O Bastião Submerso',
+  'entities.zones.mirefen_marsh.pois.8.label': 'O Domínio do Capataz',
   'entities.zones.thornpeak_heights.name': 'Alturas de Thornpeak',
   'entities.zones.thornpeak_heights.welcome': 'A capitã Thessaly mal segura o muro de Highwatch.',
   'entities.zones.thornpeak_heights.pois.0.label': 'Highwatch',

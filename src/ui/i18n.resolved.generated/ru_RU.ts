@@ -13434,9 +13434,6 @@ export const ru_RU: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Тунзарр, Пробуждающийся пик"
       },
-      "balgath_foreman": {
-        "name": "Балгат, Погребённый Десятник"
-      },
       "balgath_cyclops": {
         "name": "Балгат, Одноглазый Десятник"
       },
@@ -16517,6 +16514,9 @@ export const ru_RU: EnTranslations = {
           },
           "7": {
             "label": "Затонувший бастион"
+          },
+          "8": {
+            "label": "Владения Десятника"
           }
         }
       },
