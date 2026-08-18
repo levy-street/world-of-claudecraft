@@ -2449,7 +2449,7 @@ export const sv_SE: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} reser sig över {zone}!"
+      "spawn": "{name} reser sig över Törntoppshöjderna!"
     },
     "auth": {
       "appleLoginCta": "Fortsätt med Apple",
@@ -13433,9 +13433,6 @@ export const sv_SE: EnTranslations = {
       },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, den vaknande toppen"
-      },
-      "balgath_foreman": {
-        "name": "Balgath, the Buried Foreman"
       },
       "thunzharr_stormling": {
         "name": "Väckt stormyngel"

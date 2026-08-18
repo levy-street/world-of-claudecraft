@@ -2449,7 +2449,7 @@ export const tr_TR: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name}, {zone} üzerinde yükseliyor!"
+      "spawn": "{name}, Dikenzirve Tepeleri'nin üzerinde yükseliyor!"
     },
     "auth": {
       "appleLoginCta": "Apple ile Devam Et",
@@ -13433,9 +13433,6 @@ export const tr_TR: EnTranslations = {
       },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, Uyanan Zirve"
-      },
-      "balgath_foreman": {
-        "name": "Balgath, the Buried Foreman"
       },
       "thunzharr_stormling": {
         "name": "Uyanmış Fırtına Dölü"

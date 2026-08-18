@@ -3597,7 +3597,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitDays': 'd',
   'hudChrome.unitFrame.durationUnitHours': 't',
   'hudChrome.unitFrame.durationUnitMinutes': 'm',
-  'hudChrome.worldBoss.spawn': '{name} reser sig över {zone}!',
+  'hudChrome.worldBoss.spawn': '{name} reser sig över Törntoppshöjderna!',
   'itemUi.kind.bag': 'Väska',
   'itemUi.tooltip.bagSlots': 'Väska med {slots} platser',
   'questUi.tracker.hideFromMap': 'Dölj {name} på kartan',

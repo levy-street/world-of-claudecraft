@@ -156,33 +156,20 @@ describe('balgath world boss assets', () => {
     expect(map).toContain('Balgath_Smash');
   });
 
-  it('is spawnable, and therefore in the boot preload sweep', () => {
-    // The inverse of what this test asserted while the encounter was missing. Both
-    // halves matter now: a MOB_KEYS entry is what stops him rendering as the generic
-    // `elemental` family fallback, and `lazyPreload` would keep his GLB out of the
-    // tier-independent preload union that world entry reads synchronously.
+  it('stays out of the boot preload sweep while nothing can spawn him', () => {
+    // No MOB_KEYS entry exists yet, so preloading 3 MB of boss buys nothing: the
+    // encounter change is what makes him spawnable, and it drops both this flag and
+    // this test together. Scope the search to the MOB_KEYS literal, since a whole-file
+    // match hits the word in these defs' own comments and reports every state as live.
     const src = readFileSync(MANIFEST, 'utf8');
     const keysStart = src.indexOf('MOB_KEYS: Record');
     expect(keysStart, 'MOB_KEYS moved or was renamed').toBeGreaterThan(-1);
-    const keys = src.slice(keysStart, src.indexOf('\n};', keysStart));
-    expect(keys).toContain("balgath_foreman: 'mob_balgath_foreman'");
+    const spawnable = src.slice(keysStart, src.indexOf('\n};', keysStart)).includes('balgath');
     for (const key of ['mob_balgath_foreman', 'mob_balgath_cyclops']) {
-      expect(defBlock(key), `${key} must not be lazy once spawnable`).not.toContain('lazyPreload');
+      expect(defBlock(key), `${key} must stay lazy while unspawnable`).toContain(
+        'lazyPreload: true',
+      );
     }
-  });
-
-  it('keeps the sim scale and the measured gait references in agreement', () => {
-    // The refs are only correct AT the scale they were measured at, and the sim owns
-    // that scale while render owns the refs. `src/sim/` may never import from
-    // `src/render/`, so the two numbers cannot share a constant; this is the weld that
-    // replaces the import. Drift here is silent and shows up only as skating feet.
-    const manifest = readFileSync(MANIFEST, 'utf8');
-    const declared = manifest.match(/export const BALGATH_SCALE = ([\d.]+);/)?.[1];
-    expect(declared, 'BALGATH_SCALE is missing from the manifest').toBeTruthy();
-    const zone = readFileSync(resolve(ROOT, 'src/sim/content/zone2.ts'), 'utf8');
-    const tpl = zone.slice(zone.indexOf('balgath_foreman: {'));
-    const simScale = tpl.slice(0, tpl.indexOf('\n  },')).match(/scale: ([\d.]+),/)?.[1];
-    expect(simScale, "the mob template's scale is missing").toBeTruthy();
-    expect(Number(simScale)).toBe(Number(declared));
+    expect(spawnable, 'balgath is spawnable now: drop lazyPreload and rewrite this').toBe(false);
   });
 });

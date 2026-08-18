@@ -6144,7 +6144,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talents.defaultBuildName': 'Sestava {n}',
   'hudChrome.tips.joinChannels':
     'Tip: napiš /join world nebo /join lfg a chatuj s hráči napříč světem.',
-  'hudChrome.worldBoss.spawn': '{name} povstává nad {zone}!',
+  'hudChrome.worldBoss.spawn': '{name} povstává nad Thornpeak Heights!',
   'editor.a11y.dialog': 'Dialog editoru',
   'editor.a11y.stage': 'Zobrazení mapy',
   'editor.a11y.toasts': 'Oznámení editoru',

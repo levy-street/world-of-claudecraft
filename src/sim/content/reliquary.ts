@@ -1096,56 +1096,19 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     name: 'Thunzharr, the Waking Peak',
     desc: 'Personal epic spoils from the Waking Peak world boss.',
     clearSource: { kind: 'deed_stat', stat: 'thunzharrKills' },
-    // The world boss drops every relic on the page, with one exception that says so:
-    // the grove vestments are also Balgath's single tier-20 drop in Mirefen, and a relic
-    // listed on two pages must answer with the SAME source list on both (a pin enforces
-    // it), so that row names both bosses and inherits nothing.
-    // No `sourceDefault`: a page may not mix an inherited default with authored rows
-    // (an inheriting relic and an authoring one would answer differently for no reason
-    // a reader could see), so the eight Thunzharr-only pieces now say explicitly what
-    // the default used to say for them. Same hints, stated rather than implied.
+    // The world boss drops every relic on the page.
+    sourceDefault: fromBoss('thunzharr_waking_peak'),
     relics: items(
-      ['crownforged_gauntlets', fromBoss('thunzharr_waking_peak')],
-      ['nighttalon_grips', fromBoss('thunzharr_waking_peak')],
-      ['soulflame_gloves', fromBoss('thunzharr_waking_peak')],
-      ['stormcallers_handguards', fromBoss('thunzharr_waking_peak')],
-      ['crownforged_girdle', fromBoss('thunzharr_waking_peak')],
-      ['nighttalon_waistband', fromBoss('thunzharr_waking_peak')],
-      ['soulflame_cord', fromBoss('thunzharr_waking_peak')],
-      ['stormcallers_waistguard', fromBoss('thunzharr_waking_peak')],
-      [
-        'vestments_of_the_waking_grove',
-        [fromBoss('balgath_foreman'), fromBoss('thunzharr_waking_peak')],
-      ],
-    ),
-  },
-  {
-    id: 'conquerors_balgath',
-    shelf: 'conquerors',
-    name: 'Balgath, the Buried Foreman',
-    desc: 'Spoils dragged back out of the Mirefen barrow-mounds.',
-    // `none`, not a deed_stat counter like Thunzharr's. A counter would be the richer
-    // page, but it only exists to drive a completion meter and it drags in the whole
-    // deed chain (a DeedStatKey, a deed that reads it, a producer site that bumps it,
-    // and the five pinned catalog totals those move). Balgath has no authored deeds
-    // yet, so a counter here would be a meter for a deed nobody can earn. The
-    // encounter's reward design is what promotes this to a counter.
-    clearSource: { kind: 'none' },
-    // Balgath shares Thunzharr's level-20 tier rather than dropping Mirefen's own gear:
-    // item level derives from source level (item_level_req.ts), so a level-20 boss
-    // dropping a level-10 zone's pieces silently re-levels them until their stat budgets
-    // stop matching, which tests/item_level.test.ts catches.
-    //
-    // ONE shared piece, deliberately, and specifically the one that sits on no class-set
-    // page. The gloves and belts are each also catalogued on a `conquerors_set_*` page,
-    // and a relic's hint list has to agree across every page carrying it, so adding
-    // Balgath to those would mean rewriting four more pages to say something none of
-    // them is about. A second door onto one piece is the honest minimum; widening it is
-    // the encounter's reward design, with its own items.
-    relics: items([
+      'crownforged_gauntlets',
+      'nighttalon_grips',
+      'soulflame_gloves',
+      'stormcallers_handguards',
+      'crownforged_girdle',
+      'nighttalon_waistband',
+      'soulflame_cord',
+      'stormcallers_waistguard',
       'vestments_of_the_waking_grove',
-      [fromBoss('balgath_foreman'), fromBoss('thunzharr_waking_peak')],
-    ]),
+    ),
   },
   // ---- Delves (rare+ uniques; mark-shop signature pieces included) ----
   {

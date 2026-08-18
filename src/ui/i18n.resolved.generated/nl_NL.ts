@@ -2449,7 +2449,7 @@ export const nl_NL: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} verrijst boven {zone}!"
+      "spawn": "{name} verrijst boven Doorntop-Hoogten!"
     },
     "auth": {
       "appleLoginCta": "Ga verder met Apple",
@@ -13433,9 +13433,6 @@ export const nl_NL: EnTranslations = {
       },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, de Ontwakende Piek"
-      },
-      "balgath_foreman": {
-        "name": "Balgath, the Buried Foreman"
       },
       "thunzharr_stormling": {
         "name": "Gewekte Stormling"

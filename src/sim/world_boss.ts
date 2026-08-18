@@ -51,8 +51,7 @@ export interface WorldBossDef {
 }
 
 // The world bosses of the live world. One per entry; the scheduler tracks each
-// independently. Thunzharr rises at Stormcrag in Thornpeak Heights; Balgath rises from
-// the Troll Mounds in Mirefen Marsh.
+// independently. Thunzharr rises at Stormcrag in Thornpeak Heights.
 export const WORLD_BOSSES: readonly WorldBossDef[] = [
   {
     templateId: 'thunzharr_waking_peak',
@@ -63,22 +62,6 @@ export const WORLD_BOSSES: readonly WorldBossDef[] = [
     // not a heal), so a steep step made the bar visibly refill as a raid trickled in and
     // read as "he takes no damage". 5k/head keeps the fight scaling without stalling it.
     hpScale: { base: 40_000, perPlayer: 5_000, max: 1_000_000 },
-  },
-  {
-    templateId: 'balgath_foreman',
-    // Appended, never inserted ahead of Thunzharr: the scheduler keys its per-boss
-    // timers by INDEX into this array (`worldBossNextAt`), so reordering silently
-    // re-points every live timer and every test that forces a spawn by index.
-    // The Troll Mounds POI itself (zone2.ts): the barrow the trolls dug him out of, so
-    // the spawn point is the lore rather than a clearing that happened to be empty.
-    pos: { x: -95, z: 440 },
-    intervalSeconds: WORLD_BOSS_INTERVAL_SECONDS,
-    // Deliberately a smaller pool than Thunzharr's 40k, and a smaller step. Mirefen is
-    // the zone players quit in, so this boss has to be killable by whoever actually
-    // turns up rather than by a formed raid: a group that gathers gets there, and a
-    // bigger crowd still scales without the bar visibly refilling as they trickle in
-    // (scaleWorldBossHp adds each joiner's delta to CURRENT hp, not just to max).
-    hpScale: { base: 24_000, perPlayer: 3_500, max: 600_000 },
   },
 ];
 

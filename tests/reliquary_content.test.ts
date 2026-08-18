@@ -311,11 +311,11 @@ const CHEST_FN_BY_DELVE: Record<string, { chest: ChestFn; floor: number }> = {
 
 describe('Reliquary Conqueror catalog structure', () => {
   it('ships Conquerors + Professions + Horizons (full three-shelf product)', () => {
-    expect(CONQUEROR_PAGES.length).toBe(28);
+    expect(CONQUEROR_PAGES.length).toBe(27);
     expect(PROFESSION_PAGES.length).toBe(3);
     expect(HORIZON_PAGES.length).toBe(5);
     // Literal: update when product adds a page.
-    expect(RELIQUARY_PAGES.length).toBe(36);
+    expect(RELIQUARY_PAGES.length).toBe(35);
     expect(
       RELIQUARY_PAGES.every(
         (p) => p.shelf === 'conquerors' || p.shelf === 'professions' || p.shelf === 'horizons',
@@ -394,7 +394,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(376);
+    ).toBe(375);
     // Distinct mark ids: the 10 shipped before Phase 21 plus the 19
     // rare-slain proofs of conquerors_rares_of_the_realm.
     expect(
@@ -1657,7 +1657,6 @@ describe('Reliquary growth sweeps (new content must page or opt out)', () => {
     // pages; a NEW worldBoss: true mob reds here until it is paged and mapped.
     const WORLD_BOSS_PAGES: Record<string, string> = {
       thunzharr_waking_peak: 'conquerors_thunzharr',
-      balgath_foreman: 'conquerors_balgath',
     };
     const bossIds = Object.values(MOBS)
       .filter((m) => m.worldBoss === true)
@@ -2457,11 +2456,7 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   conquerors_wildheart_basin_heroic: 1,
   conquerors_nythraxis: 1,
   conquerors_nythraxis_heroic: 1,
-  // Two now: Balgath drops the grove vestments in Mirefen, so that one row names
-  // both bosses while the other eight stay Thunzharr's alone.
-  conquerors_thunzharr: 2,
-  // Two doors onto the one shared tier-20 piece: Balgath and Thunzharr.
-  conquerors_balgath: 2,
+  conquerors_thunzharr: 1,
   conquerors_collapsed_reliquary: 2,
   conquerors_drowned_litany: 2,
   conquerors_set_deathlord: 4,
@@ -3837,8 +3832,7 @@ describe('Reliquary source hint coverage', () => {
     expect(offenders).toEqual([]);
     // All ten defaults are live today (nine boss pages plus the storefront on
     // the skins page); update deliberately with the authoring.
-    // 9 now: the Thunzharr page dropped its default when every row became explicit.
-    expect(defaults).toBe(9);
+    expect(defaults).toBe(10);
   });
 });
 

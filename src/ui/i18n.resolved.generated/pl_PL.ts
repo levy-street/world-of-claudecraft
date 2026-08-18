@@ -2449,7 +2449,7 @@ export const pl_PL: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} wznosi się nad {zone}!"
+      "spawn": "{name} powstaje nad Wyżynami Ciernistego Szczytu!"
     },
     "auth": {
       "appleLoginCta": "Kontynuuj przez Apple",
@@ -13433,9 +13433,6 @@ export const pl_PL: EnTranslations = {
       },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, Budzący się Szczyt"
-      },
-      "balgath_foreman": {
-        "name": "Balgath, the Buried Foreman"
       },
       "thunzharr_stormling": {
         "name": "Zbudzony Burzowiec"

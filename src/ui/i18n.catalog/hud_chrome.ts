@@ -2862,7 +2862,7 @@ export const hudChromeStrings = {
   // world boss rises; src/ui/sim_i18n.ts re-localizes it through this key, splicing
   // the localized boss name. English-only domain so an English-only PR compiles.
   worldBoss: {
-    spawn: '{name} rises over {zone}!',
+    spawn: '{name} rises over Thornpeak Heights!',
   },
   // Password-reset ("forgot password") flow: the login-panel entry link, the
   // request-a-link panel, and the set-a-new-password panel (index.html +

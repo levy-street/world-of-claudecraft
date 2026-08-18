@@ -11006,8 +11006,8 @@ const RULES: Rule[] = [
   },
   { re: /^(.+) awakens!$/, build: (m) => tQuestExtra('awakens', { name: locMob(m[1]) }) },
   {
-    re: /^(.+) rises over (.+)!$/,
-    build: (m) => t('hudChrome.worldBoss.spawn', { name: locMob(m[1]), zone: locZone(m[2]) }),
+    re: /^(.+) rises over Thornpeak Heights!$/,
+    build: (m) => t('hudChrome.worldBoss.spawn', { name: locMob(m[1]) }),
   },
   {
     re: /^Fallen Captain Aldren yells, "None shall disturb the king's rest! For Thornpeak!"$/,

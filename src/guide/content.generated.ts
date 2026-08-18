@@ -6140,17 +6140,6 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
     ]
   },
   {
-    "id": "conquerors_balgath",
-    "shelf": "conquerors",
-    "name": "The Buried Foreman (World Boss)",
-    "relics": [
-      {
-        "kind": "item",
-        "name": "Vestments of the Waking Grove"
-      }
-    ]
-  },
-  {
     "id": "conquerors_collapsed_reliquary",
     "shelf": "conquerors",
     "name": "The Collapsed Reliquary",

@@ -137,11 +137,16 @@ interface ActiveCrater {
 export function routeBalgathSpellfxAt(
   ev: { x: number; z: number; fx: string; radius?: number },
   fx: BalgathFx,
-  entities: Iterable<{ templateId?: string; pos: { x: number; z: number } }>,
+  entities: () => Iterable<{ templateId?: string; pos: { x: number; z: number } }>,
 ): boolean {
+  // Cheap guards BEFORE the entity walk, and `entities` is a thunk so the walk is not
+  // even reached for the overwhelming majority of effect events that are not a boss
+  // slam. This sits at the top of a per-event hot path, so an unconditional scan of
+  // every entity in interest range would be real per-frame cost for nothing, and it
+  // would also let an unrelated event throw in a caller whose world is not wired yet.
   if (ev.fx !== 'nova' || !ev.radius) return false;
   let found = false;
-  for (const e of entities) {
+  for (const e of entities()) {
     if (!e.templateId?.startsWith(BALGATH_TEMPLATE_PREFIX)) continue;
     const dx = e.pos.x - ev.x;
     const dz = e.pos.z - ev.z;

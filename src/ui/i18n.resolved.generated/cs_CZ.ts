@@ -2449,7 +2449,7 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} povstává nad {zone}!"
+      "spawn": "{name} povstává nad Thornpeak Heights!"
     },
     "auth": {
       "appleLoginCta": "Pokračovat přes Apple",
@@ -13433,9 +13433,6 @@ export const cs_CZ: EnTranslations = {
       },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, probouzející se štít"
-      },
-      "balgath_foreman": {
-        "name": "Balgath, the Buried Foreman"
       },
       "thunzharr_stormling": {
         "name": "Probuzený bouřník"

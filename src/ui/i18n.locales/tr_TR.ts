@@ -3717,7 +3717,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitDays': 'g',
   'hudChrome.unitFrame.durationUnitHours': 'sa',
   'hudChrome.unitFrame.durationUnitMinutes': 'dk',
-  'hudChrome.worldBoss.spawn': '{name}, {zone} üzerinde yükseliyor!',
+  'hudChrome.worldBoss.spawn': "{name}, Dikenzirve Tepeleri'nin üzerinde yükseliyor!",
   'itemUi.kind.bag': 'Çanta',
   'itemUi.tooltip.bagSlots': '{slots} Yuvalı Çanta',
   'questUi.tracker.hideFromMap': '{name} görevini haritadan gizle',

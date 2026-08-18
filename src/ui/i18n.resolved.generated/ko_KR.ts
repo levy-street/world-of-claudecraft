@@ -2449,7 +2449,7 @@ export const ko_KR: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name}이(가) {zone} 위로 일어섰습니다!"
+      "spawn": "{name}이(가) 쏜피크 고지에 솟아올랐습니다!"
     },
     "auth": {
       "appleLoginCta": "Apple로 계속하기",
@@ -13433,9 +13433,6 @@ export const ko_KR: EnTranslations = {
       },
       "thunzharr_waking_peak": {
         "name": "천자르, 깨어나는 봉우리"
-      },
-      "balgath_foreman": {
-        "name": "발가스, 묻힌 감독관"
       },
       "thunzharr_stormling": {
         "name": "깨어난 폭풍 정령"

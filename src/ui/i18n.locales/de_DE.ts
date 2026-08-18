@@ -7420,7 +7420,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, der Erwachende Gipfel',
   'entities.mobs.thunzharr_stormling.name': 'Geweckter Sturmling',
   'entities.mobs.stable_horse.name': 'Stallpferd',
-  'hudChrome.worldBoss.spawn': '{name} erhebt sich über {zone}!',
+  'hudChrome.worldBoss.spawn': '{name} erhebt sich über den Thornpeak-Höhen!',
   'entities.items.stormcallers_spaulders.name': 'Galecall-Schulterplatten',
   'entities.items.bonewrought_greatsword.name': 'Bonewrought-Großschwert',
   'entities.items.direfang_greatblade.name': 'Direfang-Großklinge',

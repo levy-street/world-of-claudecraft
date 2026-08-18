@@ -2449,7 +2449,7 @@ export const pt_BR: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} se ergue sobre {zone}!"
+      "spawn": "{name} ergue-se sobre as Alturas de Thornpeak!"
     },
     "auth": {
       "appleLoginCta": "Continuar com a Apple",
@@ -13433,9 +13433,6 @@ export const pt_BR: EnTranslations = {
       },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, o Pico Desperto"
-      },
-      "balgath_foreman": {
-        "name": "Balgath, the Buried Foreman"
       },
       "thunzharr_stormling": {
         "name": "Elemental de tormenta desperto"

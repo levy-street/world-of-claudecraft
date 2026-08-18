@@ -3735,7 +3735,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitDays': 'h',
   'hudChrome.unitFrame.durationUnitHours': 'j',
   'hudChrome.unitFrame.durationUnitMinutes': 'm',
-  'hudChrome.worldBoss.spawn': '{name} bangkit di atas {zone}!',
+  'hudChrome.worldBoss.spawn': '{name} bangkit di atas Dataran Tinggi Thornpeak!',
   'itemUi.kind.bag': 'Tas',
   'itemUi.tooltip.bagSlots': 'Tas {slots} Slot',
   'questUi.tracker.hideFromMap': 'Sembunyikan {name} dari peta',

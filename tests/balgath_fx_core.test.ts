@@ -113,13 +113,13 @@ describe('routeBalgathSpellfxAt', () => {
   it('claims a nova standing on Balgath and picks the slam by footprint', () => {
     const big = spy();
     expect(
-      routeBalgathSpellfxAt({ x: 10, z: 20, fx: 'nova', radius: 12 }, big.fx, [at(10, 20)]),
+      routeBalgathSpellfxAt({ x: 10, z: 20, fx: 'nova', radius: 12 }, big.fx, () => [at(10, 20)]),
     ).toBe(true);
     expect(big.calls).toEqual([['smash', 12]]);
 
     const small = spy();
     expect(
-      routeBalgathSpellfxAt({ x: 10, z: 20, fx: 'nova', radius: 6 }, small.fx, [at(10, 20)]),
+      routeBalgathSpellfxAt({ x: 10, z: 20, fx: 'nova', radius: 6 }, small.fx, () => [at(10, 20)]),
     ).toBe(true);
     expect(small.calls).toEqual([['stomp', 6]]);
   });
@@ -129,17 +129,19 @@ describe('routeBalgathSpellfxAt', () => {
     // gameplay ring for a cosmetic one, which the graphics-neutrality invariant forbids.
     const s = spy();
     expect(
-      routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'runeCircle', radius: 12 }, s.fx, [at(0, 0)]),
+      routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'runeCircle', radius: 12 }, s.fx, () => [at(0, 0)]),
     ).toBe(false);
     expect(s.calls).toEqual([]);
   });
 
   it('ignores another boss detonating away from Balgath', () => {
     const s = spy();
-    expect(routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'nova', radius: 12 }, s.fx, [at(40, 40)])).toBe(
+    expect(
+      routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'nova', radius: 12 }, s.fx, () => [at(40, 40)]),
+    ).toBe(false);
+    expect(routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'nova', radius: 12 }, s.fx, () => [])).toBe(
       false,
     );
-    expect(routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'nova', radius: 12 }, s.fx, [])).toBe(false);
     expect(s.calls).toEqual([]);
   });
 
@@ -147,20 +149,38 @@ describe('routeBalgathSpellfxAt', () => {
     for (const id of ['balgath_foreman', 'balgath_cyclops']) {
       const s = spy();
       expect(
-        routeBalgathSpellfxAt({ x: 5, z: 5, fx: 'nova', radius: 12 }, s.fx, [at(5, 5, id)]),
+        routeBalgathSpellfxAt({ x: 5, z: 5, fx: 'nova', radius: 12 }, s.fx, () => [at(5, 5, id)]),
       ).toBe(true);
     }
     const other = spy();
     expect(
-      routeBalgathSpellfxAt({ x: 5, z: 5, fx: 'nova', radius: 12 }, other.fx, [
+      routeBalgathSpellfxAt({ x: 5, z: 5, fx: 'nova', radius: 12 }, other.fx, () => [
         at(5, 5, 'thunzharr_waking_peak'),
       ]),
     ).toBe(false);
   });
 
+  it('never walks the entity list for an event that cannot be his', () => {
+    // The thunk is the point. This runs at the top of a per-event hot path, and it also
+    // means a caller whose world is not wired yet (a bare-stub Renderer in a unit test)
+    // cannot be made to throw by an unrelated effect event, which is how it first broke.
+    const s = spy();
+    let walked = 0;
+    const entities = () => {
+      walked++;
+      return [at(0, 0)];
+    };
+    routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'runeCircle', radius: 12 }, s.fx, entities);
+    routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'burst', radius: 12 }, s.fx, entities);
+    routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'nova' }, s.fx, entities);
+    expect(walked).toBe(0);
+    routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'nova', radius: 12 }, s.fx, entities);
+    expect(walked).toBe(1);
+  });
+
   it('needs a radius, because the ring is drawn at the blast size', () => {
     const s = spy();
-    expect(routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'nova' }, s.fx, [at(0, 0)])).toBe(false);
+    expect(routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'nova' }, s.fx, () => [at(0, 0)])).toBe(false);
     expect(s.calls).toEqual([]);
   });
 });

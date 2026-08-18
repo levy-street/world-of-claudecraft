@@ -2449,7 +2449,7 @@ export const fr_CA: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} se dresse au-dessus de {zone} !"
+      "spawn": "{name} se dresse sur les Hauteurs de Thornpeak !"
     },
     "auth": {
       "appleLoginCta": "Continuer avec Apple",
@@ -13433,9 +13433,6 @@ export const fr_CA: EnTranslations = {
       },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, le Pic Éveillé"
-      },
-      "balgath_foreman": {
-        "name": "Balgath, the Buried Foreman"
       },
       "thunzharr_stormling": {
         "name": "Élémentaire de tempête éveillé"
