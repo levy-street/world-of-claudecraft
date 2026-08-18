@@ -486,6 +486,8 @@ describe('Fenbridge content projection and preservation', () => {
       { id: 'troll_mounds', x: -95, z: 440 },
       { id: 'gravecaller_encampment', x: 0, z: 485 },
       { id: 'the_sunken_bastion', x: 45, z: 515 },
+      // Appended, never inserted: the locale overlays key POI labels by index.
+      { id: 'barrowmound_reach', x: 0, z: 390 },
     ]);
     expect(ZONE2_ROADS).toEqual(
       FENBRIDGE_LAYOUT.roads.map((road) => road.points.map((point) => ({ ...point }))),

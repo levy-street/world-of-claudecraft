@@ -2087,7 +2087,7 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "Troll Mounds",
       "Gravecaller Encampment",
       "The Sunken Bastion",
-      "The Foreman's Reach"
+      "Barrowmound Reach"
     ],
     "welcome": "Report to Warden Fenwick at the Fenbridge gate.",
     "families": [
@@ -5581,6 +5581,20 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "exploration",
     "renown": 5,
     "feat": false
+  },
+  {
+    "id": "cmb_balgath",
+    "name": "Foreman No More",
+    "category": "combat",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "cmb_balgath_ten",
+    "name": "The Mound Keeps Nothing",
+    "category": "combat",
+    "renown": 10,
+    "feat": false
   }
 ];
 
@@ -6137,6 +6151,29 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Vestments of the Waking Grove"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_balgath",
+    "shelf": "conquerors",
+    "name": "Barrowmound Reach (World Boss)",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Foreman's Barrowmaul"
+      },
+      {
+        "kind": "item",
+        "name": "Barrowhide Pauldrons"
+      },
+      {
+        "kind": "item",
+        "name": "Mirestone Stride"
+      },
+      {
+        "kind": "item",
+        "name": "The Loomshard Eye"
       }
     ]
   },

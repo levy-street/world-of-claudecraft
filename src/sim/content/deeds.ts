@@ -2840,6 +2840,25 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 5,
     trigger: { kind: 'visit', markId: 'dungeon:dawnhold_castle' },
   },
+  // Appended, never inserted: DEED_ORDER is derived from this object's key order and its
+  // indices are pinned by tests/deeds_content.test.ts, so adding a deed anywhere but the
+  // end silently re-points every later one.
+  cmb_balgath: {
+    id: 'cmb_balgath',
+    name: 'Foreman No More',
+    desc: 'Put the Buried Foreman back in his barrow.',
+    category: 'combat',
+    renown: 10,
+    trigger: { kind: 'stat', stat: 'balgathKills', count: 1 },
+  },
+  cmb_balgath_ten: {
+    id: 'cmb_balgath_ten',
+    name: 'The Mound Keeps Nothing',
+    desc: 'Bring down the Buried Foreman ten times.',
+    category: 'combat',
+    renown: 10,
+    trigger: { kind: 'stat', stat: 'balgathKills', count: 10 },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

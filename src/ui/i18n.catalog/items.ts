@@ -2279,6 +2279,11 @@ const ITEM_ENTITY_IDS = [
   'marshlight_hauberk',
   'duskthorn_mantle',
   'fenshadow_maul',
+  // Mirefen world-boss spoils.
+  'foremans_barrowmaul',
+  'loomshard_eye',
+  'barrowhide_pauldrons',
+  'mirestone_stride',
   'wildgrove_cinch',
   'cragward_pauldrons',
   'cragthorn_greatstaff',
@@ -2455,6 +2460,11 @@ type ItemEntityTranslation = { name: string };
 type ItemEntityTranslations = Record<ItemEntityId, ItemEntityTranslation>;
 
 const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
+  // Mirefen world-boss spoils.
+  foremans_barrowmaul: "Foreman's Barrowmaul",
+  loomshard_eye: 'The Loomshard Eye',
+  barrowhide_pauldrons: 'Barrowhide Pauldrons',
+  mirestone_stride: 'Mirestone Stride',
   rimefang: 'Rimefang',
   marrowpoint: 'Marrowpoint',
   duskwhisper: 'Duskwhisper',

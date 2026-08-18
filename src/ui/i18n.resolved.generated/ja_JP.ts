@@ -2449,7 +2449,7 @@ export const ja_JP: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name}がソーンピーク高地に立ち上がった！"
+      "spawn": "{name}が{zone}にそびえ立つ！"
     },
     "auth": {
       "appleLoginCta": "Appleで続ける",
@@ -11896,6 +11896,18 @@ export const ja_JP: EnTranslations = {
       "fenshadow_maul": {
         "name": "沼影の大槌"
       },
+      "foremans_barrowmaul": {
+        "name": "監督の塚砕き"
+      },
+      "loomshard_eye": {
+        "name": "織機片の眼"
+      },
+      "barrowhide_pauldrons": {
+        "name": "塚山の肩当て"
+      },
+      "mirestone_stride": {
+        "name": "泥石の歩み"
+      },
       "wildgrove_cinch": {
         "name": "野林の締め帯"
       },
@@ -16516,7 +16528,7 @@ export const ja_JP: EnTranslations = {
             "label": "沈んだ砦"
           },
           "8": {
-            "label": "監督の領域"
+            "label": "塚山の領域"
           }
         }
       },

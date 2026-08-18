@@ -2449,7 +2449,7 @@ export const zh_CN: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name}在荆峰高地崛起！"
+      "spawn": "{name}在{zone}上空崛起！"
     },
     "auth": {
       "appleLoginCta": "通过 Apple 继续",
@@ -11896,6 +11896,18 @@ export const zh_CN: EnTranslations = {
       "fenshadow_maul": {
         "name": "沼影重锤"
       },
+      "foremans_barrowmaul": {
+        "name": "工头的冢锤"
+      },
+      "loomshard_eye": {
+        "name": "织机碎片之眼"
+      },
+      "barrowhide_pauldrons": {
+        "name": "古冢护肩"
+      },
+      "mirestone_stride": {
+        "name": "沼石步履"
+      },
       "wildgrove_cinch": {
         "name": "野林束带"
       },
@@ -16516,7 +16528,7 @@ export const zh_CN: EnTranslations = {
             "label": "沉没堡垒"
           },
           "8": {
-            "label": "工头的领地"
+            "label": "冢丘领地"
           }
         }
       },

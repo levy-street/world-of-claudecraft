@@ -2449,7 +2449,7 @@ export const ru_RU: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} поднимается над Терновыми высотами!"
+      "spawn": "{name} восстаёт над {zone}!"
     },
     "auth": {
       "appleLoginCta": "Продолжить с Apple",
@@ -11896,6 +11896,18 @@ export const ru_RU: EnTranslations = {
       "fenshadow_maul": {
         "name": "Молот болотной тени"
       },
+      "foremans_barrowmaul": {
+        "name": "Курганный молот Десятника"
+      },
+      "loomshard_eye": {
+        "name": "Око Осколка Ткацкого Стана"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Курганные наплечники"
+      },
+      "mirestone_stride": {
+        "name": "Поступь Топьекамня"
+      },
       "wildgrove_cinch": {
         "name": "Пояс Дикой рощи"
       },
@@ -16516,7 +16528,7 @@ export const ru_RU: EnTranslations = {
             "label": "Затонувший бастион"
           },
           "8": {
-            "label": "Владения Десятника"
+            "label": "Курганные Владения"
           }
         }
       },

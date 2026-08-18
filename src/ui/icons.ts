@@ -5200,6 +5200,10 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   // (docs/achievements/icon-brief.md).
   'exp_the_last_keep',
   'exp_dawnhold_castle',
+  // The Mirefen world boss pair: both are 'combat', so both fall back to the
+  // deed_cat_combat crest until their commissioned art lands.
+  'cmb_balgath',
+  'cmb_balgath_ten',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

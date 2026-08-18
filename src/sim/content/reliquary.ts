@@ -1110,6 +1110,23 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       'vestments_of_the_waking_grove',
     ),
   },
+  {
+    id: 'conquerors_balgath',
+    shelf: 'conquerors',
+    name: 'Balgath, the Buried Foreman',
+    desc: 'Spoils dragged back out of the Mirefen barrow-mounds.',
+    clearSource: { kind: 'deed_stat', stat: 'balgathKills' },
+    // Every relic here comes off the boss himself and nowhere else, which is what a world
+    // boss page is supposed to mean: no shared tier, no second door, no page you can
+    // complete without meeting him.
+    sourceDefault: fromBoss('balgath_cyclops'),
+    relics: items(
+      'foremans_barrowmaul',
+      'barrowhide_pauldrons',
+      'mirestone_stride',
+      'loomshard_eye',
+    ),
+  },
   // ---- Delves (rare+ uniques; mark-shop signature pieces included) ----
   {
     id: 'conquerors_collapsed_reliquary',

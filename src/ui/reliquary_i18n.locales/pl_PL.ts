@@ -62,6 +62,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Thunzharr, Budzący się Szczyt',
     desc: 'Osobiste epickie łupy od światowego bossa Budzącego się Szczytu.',
   },
+  conquerors_balgath: {
+    name: 'Balgath, Pogrzebany Sztygar',
+    desc: 'Łupy wywleczone z kurhanów Mirefen.',
+  },
   conquerors_collapsed_reliquary: {
     name: 'Zawalony Relikwiarz',
     desc: 'Charakterystyczne rzadkości ze skrzyni na zamek w Zawalonym Relikwiarzu.',

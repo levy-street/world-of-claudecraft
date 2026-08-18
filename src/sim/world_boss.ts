@@ -51,7 +51,8 @@ export interface WorldBossDef {
 }
 
 // The world bosses of the live world. One per entry; the scheduler tracks each
-// independently. Thunzharr rises at Stormcrag in Thornpeak Heights.
+// independently. Thunzharr rises at Stormcrag in Thornpeak Heights; Balgath rises at
+// Barrowmound Reach in Mirefen Marsh.
 export const WORLD_BOSSES: readonly WorldBossDef[] = [
   {
     templateId: 'thunzharr_waking_peak',
@@ -62,6 +63,25 @@ export const WORLD_BOSSES: readonly WorldBossDef[] = [
     // not a heal), so a steep step made the bar visibly refill as a raid trickled in and
     // read as "he takes no damage". 5k/head keeps the fight scaling without stalling it.
     hpScale: { base: 40_000, perPlayer: 5_000, max: 1_000_000 },
+  },
+  {
+    templateId: 'balgath_cyclops',
+    // APPENDED, never inserted ahead of Thunzharr: the scheduler keys its per-boss timers
+    // by INDEX into this array (`worldBossNextAt`), so reordering silently re-points every
+    // live timer and every test that forces a spawn by index.
+    //
+    // Barrowmound Reach, mid-Mirefen: open ground picked by measurement (60 units of
+    // clearance from every camp, 3 units of relief across the arena, none of it under
+    // water). A boss whose whole counterplay is stepping out of a circle needs room for
+    // the circle, and a sightline so a raid can see him coming.
+    pos: { x: 0, z: 390 },
+    intervalSeconds: WORLD_BOSS_INTERVAL_SECONDS,
+    // Deliberately a smaller pool and a gentler step than Thunzharr's. Mirefen is the zone
+    // players quit in, so this boss has to be killable by whoever actually turns up rather
+    // than by a formed raid: a gathered group gets there, and a bigger crowd still scales
+    // without the bar visibly refilling as they trickle in (scaleWorldBossHp adds each
+    // joiner's delta to CURRENT hp, not just to max).
+    hpScale: { base: 24_000, perPlayer: 3_500, max: 600_000 },
   },
 ];
 

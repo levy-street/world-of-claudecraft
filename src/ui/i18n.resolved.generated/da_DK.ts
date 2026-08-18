@@ -2449,7 +2449,7 @@ export const da_DK: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} rejser sig over Tornetop Højder!"
+      "spawn": "{name} rejser sig over {zone}!"
     },
     "auth": {
       "appleLoginCta": "Fortsæt med Apple",
@@ -11896,6 +11896,18 @@ export const da_DK: EnTranslations = {
       "fenshadow_maul": {
         "name": "Kærskygge-Hammer"
       },
+      "foremans_barrowmaul": {
+        "name": "Formandens Gravhøjshammer"
+      },
+      "loomshard_eye": {
+        "name": "Væverskår-Øjet"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Gravhøjsskulderværn"
+      },
+      "mirestone_stride": {
+        "name": "Mosestensskridt"
+      },
       "wildgrove_cinch": {
         "name": "Vildlund-Livbælte"
       },
@@ -16516,7 +16528,7 @@ export const da_DK: EnTranslations = {
             "label": "Den Sunkne Bastion"
           },
           "8": {
-            "label": "Formandens Domæne"
+            "label": "Gravhøjsområdet"
           }
         }
       },

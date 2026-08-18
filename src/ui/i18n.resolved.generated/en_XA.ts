@@ -2449,7 +2449,7 @@ export const en_XA: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "[{name} ŕíšéš óʋéŕ Ţĥóŕñþéáķ Ĥéíĝĥţš!]"
+      "spawn": "[{name} ŕíšéš óʋéŕ {zone}!]"
     },
     "auth": {
       "appleLoginCta": "[Çóñţíñúé ŵíţĥ Áþþļé]",
@@ -11896,6 +11896,18 @@ export const en_XA: EnTranslations = {
       "fenshadow_maul": {
         "name": "[Ƒéñšĥáðóŵ Ɱáúļ]"
       },
+      "foremans_barrowmaul": {
+        "name": "[Ƒóŕéɱáñ'š Ɓáŕŕóŵɱáúļ]"
+      },
+      "loomshard_eye": {
+        "name": "[Ţĥé Ļóóɱšĥáŕð Éýé]"
+      },
+      "barrowhide_pauldrons": {
+        "name": "[Ɓáŕŕóŵĥíðé Þáúļðŕóñš]"
+      },
+      "mirestone_stride": {
+        "name": "[Ɱíŕéšţóñé Šţŕíðé]"
+      },
       "wildgrove_cinch": {
         "name": "[Ŵíļðĝŕóʋé Çíñçĥ]"
       },
@@ -16516,7 +16528,7 @@ export const en_XA: EnTranslations = {
             "label": "[Ţĥé Šúñķéñ Ɓášţíóñ]"
           },
           "8": {
-            "label": "[Ţĥé Ƒóŕéɱáñ'š Ŕéáçĥ]"
+            "label": "[Ɓáŕŕóŵɱóúñð Ŕéáçĥ]"
           }
         }
       },

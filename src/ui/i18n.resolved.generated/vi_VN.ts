@@ -2449,7 +2449,7 @@ export const vi_VN: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} trỗi dậy trên Cao Nguyên Đỉnh Gai!"
+      "spawn": "{name} trỗi dậy trên {zone}!"
     },
     "auth": {
       "appleLoginCta": "Tiếp Tục với Apple",
@@ -11896,6 +11896,18 @@ export const vi_VN: EnTranslations = {
       "fenshadow_maul": {
         "name": "Búa Bóng Đầm Lầy"
       },
+      "foremans_barrowmaul": {
+        "name": "Búa Gò Mộ của Đốc Công"
+      },
+      "loomshard_eye": {
+        "name": "Mắt Mảnh Khung Cửi"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Giáp Vai Gò Mộ"
+      },
+      "mirestone_stride": {
+        "name": "Bước Đá Đầm Lầy"
+      },
       "wildgrove_cinch": {
         "name": "Đai Lưng Rừng Hoang"
       },
@@ -16516,7 +16528,7 @@ export const vi_VN: EnTranslations = {
             "label": "Pháo Đài Chìm"
           },
           "8": {
-            "label": "Lãnh Địa Đốc Công"
+            "label": "Lãnh Địa Gò Mộ"
           }
         }
       },

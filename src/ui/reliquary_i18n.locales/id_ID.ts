@@ -62,6 +62,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Thunzharr, Puncak yang Terjaga',
     desc: 'Rampasan epik pribadi dari bos dunia Puncak yang Terjaga.',
   },
+  conquerors_balgath: {
+    name: 'Balgath, Mandor yang Terkubur',
+    desc: 'Rampasan yang diseret keluar dari gundukan kubur Mirefen.',
+  },
   conquerors_collapsed_reliquary: {
     name: 'Reliquary yang Runtuh',
     desc: 'Barang langka khas dari peti berkunci di Reliquary yang Runtuh.',

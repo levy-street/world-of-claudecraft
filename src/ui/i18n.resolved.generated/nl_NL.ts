@@ -2449,7 +2449,7 @@ export const nl_NL: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} verrijst boven Doorntop-Hoogten!"
+      "spawn": "{name} verrijst boven {zone}!"
     },
     "auth": {
       "appleLoginCta": "Ga verder met Apple",
@@ -11896,6 +11896,18 @@ export const nl_NL: EnTranslations = {
       "fenshadow_maul": {
         "name": "Moeraschaduw-Knuppel"
       },
+      "foremans_barrowmaul": {
+        "name": "Grafheuvelhamer van de Opzichter"
+      },
+      "loomshard_eye": {
+        "name": "Het Weefsplinter-Oog"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Grafheuvelschouderstukken"
+      },
+      "mirestone_stride": {
+        "name": "Moersteentred"
+      },
       "wildgrove_cinch": {
         "name": "Wildwoud-Gordel"
       },
@@ -16516,7 +16528,7 @@ export const nl_NL: EnTranslations = {
             "label": "Het Verzonken Bastion"
           },
           "8": {
-            "label": "Het Domein van de Opzichter"
+            "label": "Grafheuvelgebied"
           }
         }
       },

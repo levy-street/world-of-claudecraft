@@ -2449,7 +2449,7 @@ export const de_DE: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} erhebt sich über den Thornpeak-Höhen!"
+      "spawn": "{name} erhebt sich über {zone}!"
     },
     "auth": {
       "appleLoginCta": "Mit Apple fortfahren",
@@ -11896,6 +11896,18 @@ export const de_DE: EnTranslations = {
       "fenshadow_maul": {
         "name": "Moorschatten-Streitkolben"
       },
+      "foremans_barrowmaul": {
+        "name": "Hügelgrabhammer des Vorarbeiters"
+      },
+      "loomshard_eye": {
+        "name": "Das Websplitter-Auge"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Hügelgrab-Schulterstücke"
+      },
+      "mirestone_stride": {
+        "name": "Moorsteinschritt"
+      },
       "wildgrove_cinch": {
         "name": "Wildhain-Gürtel"
       },
@@ -16516,7 +16528,7 @@ export const de_DE: EnTranslations = {
             "label": "Die versunkene Bastion"
           },
           "8": {
-            "label": "Das Revier des Vorarbeiters"
+            "label": "Hügelgrab-Revier"
           }
         }
       },

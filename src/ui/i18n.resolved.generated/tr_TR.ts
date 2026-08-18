@@ -2449,7 +2449,7 @@ export const tr_TR: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name}, Dikenzirve Tepeleri'nin üzerinde yükseliyor!"
+      "spawn": "{name}, {zone} üzerinde yükseliyor!"
     },
     "auth": {
       "appleLoginCta": "Apple ile Devam Et",
@@ -11896,6 +11896,18 @@ export const tr_TR: EnTranslations = {
       "fenshadow_maul": {
         "name": "Bataklık Gölgesi Balyozu"
       },
+      "foremans_barrowmaul": {
+        "name": "Ustabaşının Höyük Balyozu"
+      },
+      "loomshard_eye": {
+        "name": "Tezgah Kırığı Gözü"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Höyük Omuzlukları"
+      },
+      "mirestone_stride": {
+        "name": "Bataklıktaşı Adımı"
+      },
       "wildgrove_cinch": {
         "name": "Vahşi Koruluk Kemeri"
       },
@@ -16516,7 +16528,7 @@ export const tr_TR: EnTranslations = {
             "label": "Batık Kale"
           },
           "8": {
-            "label": "Ustabaşının Sahası"
+            "label": "Höyük Sahası"
           }
         }
       },

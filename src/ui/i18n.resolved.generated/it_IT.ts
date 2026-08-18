@@ -2449,7 +2449,7 @@ export const it_IT: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} si erge sulle Alture di Thornpeak!"
+      "spawn": "{name} si erge su {zone}!"
     },
     "auth": {
       "appleLoginCta": "Continua con Apple",
@@ -11896,6 +11896,18 @@ export const it_IT: EnTranslations = {
       "fenshadow_maul": {
         "name": "Maglio dell'Ombra Paludosa"
       },
+      "foremans_barrowmaul": {
+        "name": "Mazza Tumulare del Caposquadra"
+      },
+      "loomshard_eye": {
+        "name": "L'Occhio di Scheggia del Telaio"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Spallacci Tumulari"
+      },
+      "mirestone_stride": {
+        "name": "Passo di Pietrafanghiglia"
+      },
       "wildgrove_cinch": {
         "name": "Cintura del Bosco Selvaggio"
       },
@@ -16516,7 +16528,7 @@ export const it_IT: EnTranslations = {
             "label": "Il Bastione Sommerso"
           },
           "8": {
-            "label": "Il Dominio del Caposquadra"
+            "label": "Dominio dei Tumuli"
           }
         }
       },

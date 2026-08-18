@@ -62,6 +62,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Thunzharr, el Pico Despierto',
     desc: 'Botines épicos personales del jefe de mundo del Pico Despierto.',
   },
+  conquerors_balgath: {
+    name: 'Balgath, el Capataz Enterrado',
+    desc: 'Botín arrastrado de vuelta desde los túmulos de Mirefen.',
+  },
   conquerors_collapsed_reliquary: {
     name: 'El Relicario Hundido',
     desc: 'Objetos raros emblemáticos del cofre con cerradura del Relicario Hundido.',

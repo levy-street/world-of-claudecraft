@@ -62,6 +62,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Thunzharr, der Erwachende Gipfel',
     desc: 'Persönliche epische Beute vom Weltboss des Erwachenden Gipfels.',
   },
+  conquerors_balgath: {
+    name: 'Balgath, der Begrabene Vorarbeiter',
+    desc: 'Beute, zurückgeschleppt aus den Hügelgräbern des Mirefen.',
+  },
   conquerors_collapsed_reliquary: {
     name: 'Das Eingestürzte Reliquiar',
     desc: 'Bezeichnende seltene Stücke aus der Schlosstruhe des Eingestürzten Reliquiars.',

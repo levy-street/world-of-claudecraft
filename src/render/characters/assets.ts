@@ -201,6 +201,7 @@ const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   // grip family follows the handling, like the attach bone below.
   encore_the_second_falling_star: 'VAR_CROSSBOW',
   ...KAYKIT_SHIELD_ACCESSORIES,
+  balgath_barrowmaul_hammer: 'VAR_HAMMER',
 };
 
 // Per-family grip for the variant pack. The model origin IS the grip, so we attach

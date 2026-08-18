@@ -7107,6 +7107,7 @@ export type DeedStatKey =
   | 'groundObjectsLooted'
   | 'dungeonFinalBossKills'
   | 'thunzharrKills'
+  | 'balgathKills'
   | 'bloatCleanKills'
   | 'hubCraftsPerformed'
   | 'attunementsCompleted'
@@ -7137,6 +7138,7 @@ export const DEED_STAT_KEYS: readonly DeedStatKey[] = [
   'groundObjectsLooted',
   'dungeonFinalBossKills',
   'thunzharrKills',
+  'balgathKills',
   'bloatCleanKills',
   'hubCraftsPerformed',
   'attunementsCompleted',

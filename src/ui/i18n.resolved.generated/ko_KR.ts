@@ -2449,7 +2449,7 @@ export const ko_KR: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name}이(가) 쏜피크 고지에 솟아올랐습니다!"
+      "spawn": "{name}이(가) {zone} 위로 일어섰습니다!"
     },
     "auth": {
       "appleLoginCta": "Apple로 계속하기",
@@ -11896,6 +11896,18 @@ export const ko_KR: EnTranslations = {
       "fenshadow_maul": {
         "name": "늪그림자 철퇴"
       },
+      "foremans_barrowmaul": {
+        "name": "감독관의 봉분망치"
+      },
+      "loomshard_eye": {
+        "name": "베틀조각의 눈"
+      },
+      "barrowhide_pauldrons": {
+        "name": "봉분 어깨보호구"
+      },
+      "mirestone_stride": {
+        "name": "진흙돌 발걸음"
+      },
       "wildgrove_cinch": {
         "name": "야생숲 허리띠"
       },
@@ -16516,7 +16528,7 @@ export const ko_KR: EnTranslations = {
             "label": "가라앉은 요새"
           },
           "8": {
-            "label": "감독관의 영역"
+            "label": "봉분의 영역"
           }
         }
       },

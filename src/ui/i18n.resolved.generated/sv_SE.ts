@@ -2449,7 +2449,7 @@ export const sv_SE: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} reser sig över Törntoppshöjderna!"
+      "spawn": "{name} reser sig över {zone}!"
     },
     "auth": {
       "appleLoginCta": "Fortsätt med Apple",
@@ -11896,6 +11896,18 @@ export const sv_SE: EnTranslations = {
       "fenshadow_maul": {
         "name": "Kärrskuggans stridsklubba"
       },
+      "foremans_barrowmaul": {
+        "name": "Förmannens Gravhögshammare"
+      },
+      "loomshard_eye": {
+        "name": "Vävsplitteröga"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Gravhögsaxelskydd"
+      },
+      "mirestone_stride": {
+        "name": "Myrstenssteg"
+      },
       "wildgrove_cinch": {
         "name": "Vildlundsknippe"
       },
@@ -16516,7 +16528,7 @@ export const sv_SE: EnTranslations = {
             "label": "Den sjunkna bastionen"
           },
           "8": {
-            "label": "Förmannens Domän"
+            "label": "Gravhögsområdet"
           }
         }
       },

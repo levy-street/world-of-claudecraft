@@ -51,7 +51,7 @@ export const ZONE2_ZONE: ZoneDef = {
     // APPENDED, never inserted: `entities.zones.<id>.pois.<n>.label` is keyed by index in
     // the locale overlays, so adding a POI anywhere but the end shifts every later label
     // onto the wrong translation and drops the last one entirely.
-    { x: 0, z: 390, label: "The Foreman's Reach", id: 'foremans_reach' },
+    { x: 0, z: 390, label: 'Barrowmound Reach', id: 'barrowmound_reach' },
   ],
   welcome: 'Report to Warden Fenwick at the Fenbridge gate.',
 };
@@ -292,29 +292,23 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     scale: 0.55,
     color: 0x3a2740,
   },
-  // Balgath, the Mirefen boss, in TWO bodies.
+  // Balgath, the Buried Foreman: the Mirefen world boss.
   //
   // Mirefen is the churn choke point, so this boss exists to give the zone a reason to
   // gather. He is level 20 in a level 6 to 13 zone deliberately: that is what pulls
   // geared players back to Fenbridge, and the mechanics are shaped so the locals who
   // live here are participants rather than corpses.
   //
-  // Two templates rather than one because the whole point is to compare the
-  // silhouettes in the running game (`?boss=foreman` / `?boss=cyclops`, see
-  // src/game/boss_test_drive.ts). They are identical apart from identity: same rig,
-  // same 41 joints, same shared ClipMap, same numbers. Whichever one wins, the loser
-  // is deleted rather than kept as content.
-  //
-  // Neither is in a CAMPS list and neither is a world boss, so nothing spawns them in
-  // ordinary play yet. Structure follows thunzharr_waking_peak (content/zone3.ts) so
-  // the two read the same to a raid; the numbers are that template's shape, NOT an
-  // independently tuned encounter, and nothing here claims otherwise.
+  // He is in no CAMPS list: the world-boss scheduler owns his spawns (world_boss.ts), on
+  // the same cadence as Thunzharr. Structure follows that template so the two read the
+  // same to a raid.
   balgath_cyclops: {
     id: 'balgath_cyclops',
     name: 'Balgath, the One-Eyed Foreman',
     minLevel: 20,
     maxLevel: 20,
     family: 'elemental',
+    worldBoss: true,
     boss: true,
     elite: true,
     canSwim: false,
@@ -416,7 +410,14 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     // nothing that can distort the economy. This is also why neither body carries
     // `worldBoss: true` yet: that flag is what obliges a Reliquary page, and a page
     // with no relics of his own is a page you complete without meeting him.
-    loot: [{ copper: 2500, chance: 1 }],
+    loot: [
+      { copper: 2500, chance: 1 },
+      { itemId: 'bogiron_nugget', chance: 1 },
+      { itemId: 'foremans_barrowmaul', chance: 0.1, rollGroup: 'balgath_spoils' },
+      { itemId: 'barrowhide_pauldrons', chance: 0.1, rollGroup: 'balgath_spoils' },
+      { itemId: 'mirestone_stride', chance: 0.1, rollGroup: 'balgath_spoils' },
+      { itemId: 'loomshard_eye', chance: 0.08, rollGroup: 'balgath_spoils' },
+    ],
     yells: {
       engage: 'One eye is enough to find you.',
       enrage: 'The mound breaks! Let it all come down!',
@@ -1580,6 +1581,62 @@ const CASTER_WEAPON_CLASSES: PlayerClass[] = [
 ];
 
 export const ZONE2_ITEMS: Record<string, ItemDef> = {
+  // ---- Balgath, the Mirefen world boss: his own spoils --------------------
+  //
+  // A world boss needs loot that is HIS. Sharing another boss's tier looks like a
+  // shortcut and behaves like one: an item's level derives from its highest source, so
+  // handing him the zone's level-10 gear silently re-levels it, and handing him
+  // Thunzharr's tier-20 set means four class-set Reliquary pages have to start naming a
+  // Mirefen boss. One epic per archetype plus a trinket, so any group that kills him has
+  // someone who wants a drop, and the drop is unambiguously from this fight.
+  //
+  // Stat totals are NOT chosen. An item's level derives from its highest source (a
+  // level-20 boss), and tests/item_level.test.ts then enforces an exact primary-stat
+  // budget for that level and slot: 23 on the two-hander, 14 on the shoulders, 12 on the
+  // neck and the boots. The split between stats is the design decision; the total is
+  // arithmetic, and inventing a bigger one just fails the gate.
+  foremans_barrowmaul: {
+    id: 'foremans_barrowmaul',
+    name: "Foreman's Barrowmaul",
+    kind: 'weapon',
+    slot: 'mainhand',
+    quality: 'epic',
+    hand: 'twohand',
+    weapon: { min: 62, max: 94, speed: 3.4 },
+    stats: { str: 14, sta: 9 },
+    sellValue: 9200,
+    requiredClass: WAR,
+  },
+  loomshard_eye: {
+    id: 'loomshard_eye',
+    name: 'The Loomshard Eye',
+    kind: 'armor',
+    slot: 'neck',
+    quality: 'epic',
+    stats: { int: 7, spi: 5 },
+    sellValue: 8400,
+  },
+  barrowhide_pauldrons: {
+    id: 'barrowhide_pauldrons',
+    name: 'Barrowhide Pauldrons',
+    kind: 'armor',
+    slot: 'shoulder',
+    armorType: 'mail',
+    quality: 'epic',
+    stats: { armor: 148, sta: 8, str: 6 },
+    sellValue: 8800,
+  },
+  mirestone_stride: {
+    id: 'mirestone_stride',
+    name: 'Mirestone Stride',
+    kind: 'armor',
+    slot: 'feet',
+    armorType: 'leather',
+    quality: 'epic',
+    stats: { armor: 96, agi: 7, sta: 5 },
+    sellValue: 8600,
+  },
+
   // --- quest items ---
   fen_muster_order: {
     id: 'fen_muster_order',

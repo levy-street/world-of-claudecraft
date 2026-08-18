@@ -2449,7 +2449,7 @@ export const en: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} rises over Thornpeak Heights!"
+      "spawn": "{name} rises over {zone}!"
     },
     "auth": {
       "appleLoginCta": "Continue with Apple",
@@ -11896,6 +11896,18 @@ export const en: EnTranslations = {
       "fenshadow_maul": {
         "name": "Fenshadow Maul"
       },
+      "foremans_barrowmaul": {
+        "name": "Foreman's Barrowmaul"
+      },
+      "loomshard_eye": {
+        "name": "The Loomshard Eye"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Barrowhide Pauldrons"
+      },
+      "mirestone_stride": {
+        "name": "Mirestone Stride"
+      },
       "wildgrove_cinch": {
         "name": "Wildgrove Cinch"
       },
@@ -16516,7 +16528,7 @@ export const en: EnTranslations = {
             "label": "The Sunken Bastion"
           },
           "8": {
-            "label": "The Foreman's Reach"
+            "label": "Barrowmound Reach"
           }
         }
       },

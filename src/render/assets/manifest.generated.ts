@@ -1236,6 +1236,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/weapons/axe_b.glb": "/media/models/weapons/axe_b.7470e0ae3d2e.glb",
   "models/weapons/axe_c.glb": "/media/models/weapons/axe_c.b2b2e1e77894.glb",
   "models/weapons/axe_d.glb": "/media/models/weapons/axe_d.af192626d947.glb",
+  "models/weapons/balgath_barrowmaul_hammer.glb": "/media/models/weapons/balgath_barrowmaul_hammer.51755fc9f9e0.glb",
   "models/weapons/brasscap_hatchet.glb": "/media/models/weapons/brasscap_hatchet.7f9b18d0c287.glb",
   "models/weapons/brasscrown_walking_staff.glb": "/media/models/weapons/brasscrown_walking_staff.c59eafa4a294.glb",
   "models/weapons/cinderbrand.glb": "/media/models/weapons/cinderbrand.1d9b1cf91bca.glb",

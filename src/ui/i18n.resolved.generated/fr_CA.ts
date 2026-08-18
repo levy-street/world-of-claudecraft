@@ -2449,7 +2449,7 @@ export const fr_CA: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} se dresse sur les Hauteurs de Thornpeak !"
+      "spawn": "{name} se dresse au-dessus de {zone} !"
     },
     "auth": {
       "appleLoginCta": "Continuer avec Apple",
@@ -11896,6 +11896,18 @@ export const fr_CA: EnTranslations = {
       "fenshadow_maul": {
         "name": "Marteau des ombres des marais"
       },
+      "foremans_barrowmaul": {
+        "name": "Maillet Tumulaire du Contremaître"
+      },
+      "loomshard_eye": {
+        "name": "L'Oeil en Éclat du Métier"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Spallières Tumulaires"
+      },
+      "mirestone_stride": {
+        "name": "Foulée de Pierrebourbe"
+      },
       "wildgrove_cinch": {
         "name": "Ceinturon du bosquet sauvage"
       },
@@ -16516,7 +16528,7 @@ export const fr_CA: EnTranslations = {
             "label": "Le Bastion englouti"
           },
           "8": {
-            "label": "Le Domaine du Contremaître"
+            "label": "Le Domaine des Tertres"
           }
         }
       },

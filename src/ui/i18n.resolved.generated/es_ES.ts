@@ -2449,7 +2449,7 @@ export const es_ES: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "¡{name} se alza sobre las Alturas de Thornpeak!"
+      "spawn": "¡{name} se alza sobre {zone}!"
     },
     "auth": {
       "appleLoginCta": "Continuar con Apple",
@@ -11896,6 +11896,18 @@ export const es_ES: EnTranslations = {
       "fenshadow_maul": {
         "name": "Mazo sombra del pantano"
       },
+      "foremans_barrowmaul": {
+        "name": "Mazo Tumular del Capataz"
+      },
+      "loomshard_eye": {
+        "name": "El Ojo de Esquirla del Telar"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Hombreras Tumulares"
+      },
+      "mirestone_stride": {
+        "name": "Zancada de Piedracieno"
+      },
       "wildgrove_cinch": {
         "name": "Ceñidor del bosque salvaje"
       },
@@ -16516,7 +16528,7 @@ export const es_ES: EnTranslations = {
             "label": "El Bastión Sumergido"
           },
           "8": {
-            "label": "El Dominio del Capataz"
+            "label": "Dominio del Túmulo"
           }
         }
       },

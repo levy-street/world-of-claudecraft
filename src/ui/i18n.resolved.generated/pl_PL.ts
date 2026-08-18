@@ -2449,7 +2449,7 @@ export const pl_PL: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} powstaje nad Wyżynami Ciernistego Szczytu!"
+      "spawn": "{name} wznosi się nad {zone}!"
     },
     "auth": {
       "appleLoginCta": "Kontynuuj przez Apple",
@@ -11896,6 +11896,18 @@ export const pl_PL: EnTranslations = {
       "fenshadow_maul": {
         "name": "Obuch Bagiennego Cienia"
       },
+      "foremans_barrowmaul": {
+        "name": "Kurhanowy Młot Sztygara"
+      },
+      "loomshard_eye": {
+        "name": "Oko Odłamka Krosna"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Kurhanowe Naramienniki"
+      },
+      "mirestone_stride": {
+        "name": "Krok Bagiennego Kamienia"
+      },
       "wildgrove_cinch": {
         "name": "Pas Dzikich Ostępów"
       },
@@ -16516,7 +16528,7 @@ export const pl_PL: EnTranslations = {
             "label": "Zatopiony Bastion"
           },
           "8": {
-            "label": "Włości Sztygara"
+            "label": "Włości Kurhanu"
           }
         }
       },

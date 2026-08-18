@@ -188,7 +188,7 @@ interface AttributionTargetFixture {
 // module and the boss's ground-effect wiring came in, so renderer.ts moves and the
 // composite follows its bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'd152f22d43b13bfe7cfae62fe857a9f2a7b7a8d60c4d34374fb137014ca7e753';
+  '5ca1f19ca5c8e8279ded55b0852268b86f4fbabce2a13d8df3e8740f31cd3410';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

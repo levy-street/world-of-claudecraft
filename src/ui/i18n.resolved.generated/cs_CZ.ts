@@ -2449,7 +2449,7 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} povstává nad Thornpeak Heights!"
+      "spawn": "{name} povstává nad {zone}!"
     },
     "auth": {
       "appleLoginCta": "Pokračovat přes Apple",
@@ -11896,6 +11896,18 @@ export const cs_CZ: EnTranslations = {
       "fenshadow_maul": {
         "name": "Palice bahenního stínu"
       },
+      "foremans_barrowmaul": {
+        "name": "Předákovo mohylové kladivo"
+      },
+      "loomshard_eye": {
+        "name": "Oko z útržku Stavu"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Mohylové nárameníky"
+      },
+      "mirestone_stride": {
+        "name": "Bahnokamenný krok"
+      },
       "wildgrove_cinch": {
         "name": "Opasek divoké hájovny"
       },
@@ -16516,7 +16528,7 @@ export const cs_CZ: EnTranslations = {
             "label": "Potopená bašta"
           },
           "8": {
-            "label": "Předákovo panství"
+            "label": "Mohylové panství"
           }
         }
       },

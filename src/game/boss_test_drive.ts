@@ -19,7 +19,7 @@ import { itemLevel } from '../sim/item_level';
 import type { EquipSlot, ItemDef, PlayerClass } from '../sim/types';
 
 /**
- * The Foreman's Reach, mid-Mirefen: the open ground he claimed.
+ * Barrowmound Reach, mid-Mirefen: the open ground he claimed.
  *
  * Chosen by measurement, not by eye (scripts scouted the zone for clearance, relief and
  * water). Every camp edge is 60 units away, the terrain moves 3 units across a 26-unit

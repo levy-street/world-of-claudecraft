@@ -2449,7 +2449,7 @@ export const id_ID: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} bangkit di atas Dataran Tinggi Thornpeak!"
+      "spawn": "{name} bangkit di atas {zone}!"
     },
     "auth": {
       "appleLoginCta": "Lanjutkan dengan Apple",
@@ -11896,6 +11896,18 @@ export const id_ID: EnTranslations = {
       "fenshadow_maul": {
         "name": "Gada Bayangan Rawa"
       },
+      "foremans_barrowmaul": {
+        "name": "Godam Gundukan Sang Mandor"
+      },
+      "loomshard_eye": {
+        "name": "Mata Serpihan Alat Tenun"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Bahuan Gundukan"
+      },
+      "mirestone_stride": {
+        "name": "Langkah Batu Rawa"
+      },
       "wildgrove_cinch": {
         "name": "Sabuk Rumpun Liar"
       },
@@ -16516,7 +16528,7 @@ export const id_ID: EnTranslations = {
             "label": "Benteng Karam"
           },
           "8": {
-            "label": "Wilayah Mandor"
+            "label": "Wilayah Gundukan"
           }
         }
       },
