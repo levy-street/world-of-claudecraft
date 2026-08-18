@@ -56,7 +56,11 @@ const MONOLITHS: MonolithRow[] = [
     // LastKeepMapPainter declarations and the two walk-in map branches on the
     // clearMapHitState pattern), riding on main's zero-slack pin. Exact merged
     // count: any further growth reds again.
-    ceiling: 19488,
+    // Re-pinned 19488 -> 19554 when the Last Bell packet merged release/v0.39.0:
+    // the campaign side predates this ratchet, so the merged union exceeds the
+    // release pin by the campaign additions. Exact merged count, zero slack:
+    // any further growth reds again.
+    ceiling: 19554,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -80,27 +84,47 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again by the castle branch's interior_light_rig.ts extraction;
     // after merging main the merged file lands below both prior pins, so the
     // ceiling is the exact merged count.
-    ceiling: 13689,
+    // Re-pinned 13689 -> 13861 when the Last Bell packet merged release/v0.39.0:
+    // the campaign side predates this ratchet, so the merged union exceeds the
+    // release pin by the campaign additions. Exact merged count, zero slack:
+    // any further growth reds again.
+    ceiling: 13861,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
     file: 'src/sim/sim.ts',
-    ceiling: 12660,
+    // Re-pinned 12660 -> 12671 when the Last Bell packet merged release/v0.39.0:
+    // the campaign side predates this ratchet, so the merged union exceeds the
+    // release pin by the campaign additions. Exact merged count, zero slack:
+    // any further growth reds again.
+    ceiling: 12671,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
     file: 'src/main.ts',
-    ceiling: 11490,
+    // Re-pinned 11490 -> 11620 when the Last Bell packet merged release/v0.39.0:
+    // the campaign side predates this ratchet, so the merged union exceeds the
+    // release pin by the campaign additions. Exact merged count, zero slack:
+    // any further growth reds again.
+    ceiling: 11620,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
     file: 'server/game.ts',
-    ceiling: 10900,
+    // Re-pinned 10900 -> 10956 when the Last Bell packet merged release/v0.39.0:
+    // the campaign side predates this ratchet, so the merged union exceeds the
+    // release pin by the campaign additions. Exact merged count, zero slack:
+    // any further growth reds again.
+    ceiling: 10956,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
     file: 'src/net/online.ts',
-    ceiling: 5950,
+    // Re-pinned 5950 -> 6055 when the Last Bell packet merged release/v0.39.0:
+    // the campaign side predates this ratchet, so the merged union exceeds the
+    // release pin by the campaign additions. Exact merged count, zero slack:
+    // any further growth reds again.
+    ceiling: 6055,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -125,7 +149,11 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/sim/colliders.ts',
-    ceiling: 2660,
+    // Re-pinned 2660 -> 2725 when the Last Bell packet merged release/v0.39.0:
+    // the campaign side predates this ratchet, so the merged union exceeds the
+    // release pin by the campaign additions. Exact merged count, zero slack:
+    // any further growth reds again.
+    ceiling: 2725,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
 ];

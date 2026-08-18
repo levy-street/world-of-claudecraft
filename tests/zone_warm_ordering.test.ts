@@ -20,10 +20,11 @@
 // explanation left at the old call site names the function too, and a text
 // scan matches that comment and passes over any ordering at all.
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 
-const MAIN = new URL('../src/main.ts', import.meta.url).pathname;
+const MAIN = fileURLToPath(new URL('../src/main.ts', import.meta.url));
 
 /** The `frame(now)` render-loop body node in main.ts, with its source file. */
 function frameBody(): { body: ts.Block; sf: ts.SourceFile } {
