@@ -237,8 +237,11 @@ export const TALENT_ABILITIES_V2_B = {
     school: 'nature',
     requiresTarget: false,
     requiresForm: 'bear',
-    effects: [{ type: 'hot', total: 180, duration: 10, interval: 2 }],
-    description: 'Restores 180 health over 10 sec. Bruin Form only.',
+    // 40% of max health (was a flat 180, about 8% of a best-geared bear pool):
+    // a percentage keeps the heal meaningful as gear grows and scales through
+    // any future bear pool retune. total remains as the no-pct fallback value.
+    effects: [{ type: 'hot', total: 180, duration: 10, interval: 2, pctOfMax: 0.4 }],
+    description: 'Restores 40% of your maximum health over 10 sec. Bruin Form only.',
   },
   berserk: {
     id: 'berserk',

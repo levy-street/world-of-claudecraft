@@ -1378,7 +1378,11 @@ export function runEffects(
         // the direct component already took the cast-time coefficient, so scaling the
         // rider too would double-dip. Only pure HoTs (Rejuvenation) take the rider.
         const hybridHeal = res.effects.some((e) => e.type === 'heal');
-        const hotBase = Math.max(1, Math.round(eff.total / (eff.duration / eff.interval)));
+        // A pctOfMax hot totals a fraction of the target's max health at cast
+        // time; the flat total is the fallback for every other hot.
+        const hotTotal =
+          eff.pctOfMax !== undefined ? Math.round(hotTarget.maxHp * eff.pctOfMax) : eff.total;
+        const hotBase = Math.max(1, Math.round(hotTotal / (eff.duration / eff.interval)));
         const hotSp = hybridHeal
           ? 0
           : hotTickBonus(

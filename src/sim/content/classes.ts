@@ -6407,8 +6407,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     requiresForm: 'cat',
     requiresOutOfCombat: true,
-    effects: [{ type: 'selfBuff', kind: 'stealth', value: 0.5, duration: 3600 }],
-    description: 'Enter stealth while in Wolf Form, moving 50% slower. Cannot be used in combat.',
+    // 0.95: stealth at near-full speed is the feral scouting identity; the
+    // rogue Duskveil family deliberately keeps its slower 0.5 crawl.
+    effects: [{ type: 'selfBuff', kind: 'stealth', value: 0.95, duration: 3600 }],
+    description: 'Enter stealth while in Wolf Form, moving 5% slower. Cannot be used in combat.',
   },
   rake: {
     id: 'rake',
@@ -6468,7 +6470,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'ferocious_bite',
     name: 'Gorebite',
     class: 'druid',
-    learnLevel: 14,
+    // Learned at 8 (was 14) so the combo points Rendclaw and Flense build from
+    // level 5 have a spender for every druid, not only ferals with Redharvest.
+    learnLevel: 8,
     cost: 35,
     castTime: 0,
     cooldown: 0,
@@ -6482,7 +6486,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description: 'Finishing move that causes $d. Wolf Form only.',
     specNotes: {
       feral:
-        'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: a bite for 70 plus 43 per combo point that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores 30 energy.',
+        'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest, which spends the Old Blood for a stronger strike that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores energy.',
     },
   },
   swipe: {
@@ -6696,7 +6700,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'pounce',
     name: 'Slinkstrike',
     class: 'druid',
-    learnLevel: 18,
+    // Learned at 8 (was 18) so Stalk has its payoff soon after it is learned
+    // instead of thirteen levels later.
+    learnLevel: 8,
     cost: 50,
     castTime: 0,
     cooldown: 0,
@@ -6730,15 +6736,23 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Wolfsblood',
     class: 'druid',
     learnLevel: 20,
-    cost: 30,
+    // Free with a 30 energy surge: the classic-era fix for a cooldown top
+    // parses never pressed. As a 30 energy spend the buff returned less than
+    // the same energy pushed through the Flense/Redharvest cycle, so it was a
+    // DPS loss whenever it displaced cycle energy; as a surge it is feral's
+    // burst-window button and rewards timing a Flense inside the AP window.
+    cost: 0,
     castTime: 0,
     cooldown: 30, // balance pass: was 0 (spammable permanent +40 AP)
     range: 0,
     school: 'physical',
     requiresTarget: false,
     requiresForm: 'cat',
-    effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 40, duration: 6 }],
-    description: 'Increases attack power by $b for $t sec. Wolf Form only.',
+    effects: [
+      { type: 'selfBuff', kind: 'buff_ap', value: 40, duration: 6 },
+      { type: 'gainResource', amount: 30 },
+    ],
+    description: 'Surges 30 energy and increases attack power by $b for $t sec. Wolf Form only.',
   },
   rip: {
     id: 'rip',
@@ -7707,7 +7721,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Redharvest',
     class: 'druid',
     specs: ['feral'],
-    learnLevel: 10,
+    // The rank ladder starts at 5 where spec commitment does, but the
+    // finisher is REACHED through the transforming Gorebite button, which
+    // learns at 8: that is the first level the ladder is castable (combo
+    // points used to accrue unspendable until 14). Rank 3 restores the
+    // pre-rank live values, so level-20 balance and existing parses are
+    // untouched.
+    learnLevel: 5,
     cost: 35,
     castTime: 0,
     cooldown: 0,
@@ -7720,13 +7740,37 @@ export const ABILITIES: Record<string, AbilityDef> = {
     spendsCombo: true,
     comboOptional: true,
     effects: [
-      { type: 'finisherDamage', base: 70, perCombo: 43, variance: 10 },
+      { type: 'finisherDamage', base: 35, perCombo: 20, variance: 6 },
       { type: 'consumeDot', dot: 'rake' },
       { type: 'consumeDot', dot: 'rip' },
-      { type: 'gainResource', amount: 30 },
+      { type: 'gainResource', amount: 15 },
+    ],
+    ranks: [
+      {
+        rank: 2,
+        level: 10,
+        cost: 35,
+        effects: [
+          { type: 'finisherDamage', base: 52, perCombo: 32, variance: 8 },
+          { type: 'consumeDot', dot: 'rake' },
+          { type: 'consumeDot', dot: 'rip' },
+          { type: 'gainResource', amount: 22 },
+        ],
+      },
+      {
+        rank: 3,
+        level: 16,
+        cost: 35,
+        effects: [
+          { type: 'finisherDamage', base: 70, perCombo: 43, variance: 10 },
+          { type: 'consumeDot', dot: 'rake' },
+          { type: 'consumeDot', dot: 'rip' },
+          { type: 'gainResource', amount: 30 },
+        ],
+      },
     ],
     description:
-      'Spends your 3 Old Blood: strike for $d, instantly deal all the damage your Flense and Bloodrift would still have dealt, remove both bleeds, and restore 30 energy. Works with zero combo points.',
+      'Spends your 3 Old Blood: strike for $d, instantly deal all the damage your Flense and Bloodrift would still have dealt, remove both bleeds, and restore energy. Works with zero combo points.',
   },
   marrowbreak: {
     id: 'marrowbreak',
