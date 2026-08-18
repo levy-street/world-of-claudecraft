@@ -36,8 +36,7 @@ export interface IWorldFarming {
   // Server-derived: online it mirrors the `fplot` self delta, offline the
   // Sim projects its own PlayerMeta.farmPlots; `status` is always computed
   // by the authority (`withered` may surface only at or after readyAtMs),
-  // never predicted by the client. Empty until the growth phase ships a
-  // plant command.
+  // never predicted by the client. Empty until the caller plants a bed.
   // CLOCK-BASE CONTRACT: plantedAtMs and readyAtMs are absolutes in the
   // AUTHORITY'S own lockoutNowMs base (epoch ms online, sim-clock ms on the
   // offline and headless hosts). A consumer must never subtract a clock the
@@ -93,7 +92,10 @@ export interface IWorldFarming {
   // insurance. One call converts EVERY complete batch in the caller's bags;
   // the remainder stays. Carries NO payload: the ratio, the batch count and
   // both item ids resolve server-side from the sender's own bags, so there is
-  // nothing to forge. The location gate is deliberately permissive until the
-  // go-live phase ships the farmer NPCs, which add the NPC range arm.
+  // nothing to forge. Refused text-free (farmDenied reason 'no_farmer')
+  // unless a farmer-flagged NPC stands within FARMER_TRADE_RANGE of the
+  // caller (src/sim/professions/farmer_npcs.ts nearFarmerNpc): the trade's
+  // fiction is the farmer working the husks back into soil, and the range is
+  // the same INTERACT_RANGE + 2 the counter purchase uses.
   convertHusks(): void;
 }
