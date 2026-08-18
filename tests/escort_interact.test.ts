@@ -275,6 +275,12 @@ describe('the Interact action reaches the escort run (tryNearbyInteraction)', ()
       leaveDungeon: () => false as const,
       pickUpObject: () => false as const,
       nodeHarvestableByMe: () => true,
+      // Phase 9b bed-arm seam members: inert here (lane A's arms exercise them).
+      farmPatches: [] as const,
+      myFarmPlots: [] as const,
+      harvestCrop: (bedId: string) => {
+        calls.push(`harvestCrop:${bedId}`);
+      },
       harvestNode: (id: string) => {
         calls.push(`harvest:${id}`);
         return true;
@@ -286,6 +292,8 @@ describe('the Interact action reaches the escort run (tryNearbyInteraction)', ()
       openDelveBoard: () => {},
       showError: (text: string) => calls.push(`error:${text}`),
       requestSpiritHealerResurrect: () => {},
+      // Phase 9b bed-arm seam member: inert here (lane A's arms exercise it).
+      openPlantSheet: (bedId: string) => calls.push(`plantSheet:${bedId}`),
     };
     const press = (nodes: Parameters<typeof tryNearbyInteraction>[2] = []) =>
       tryNearbyInteraction(world, hud, nodes, null, 'too far', 'not ready', AWAY_TEXT, 'nothing');
@@ -386,6 +394,8 @@ describe('a right-click reaches the escort run (handlePickedEntity)', () => {
       showError: vi.fn(),
       closeContextMenu: vi.fn(),
       requestSpiritHealerResurrect: vi.fn(),
+      // Phase 9b bed-arm seam member: inert here (lane A's arms exercise it).
+      openPlantSheet: vi.fn(),
     };
     return { world, hud, interact, startAutoAttack };
   }

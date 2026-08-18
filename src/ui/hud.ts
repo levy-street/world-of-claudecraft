@@ -16475,6 +16475,10 @@ export class Hud {
     this.harvestJournalWindow.toggle();
   }
 
+  // Phase 9b seam stub: the bed arm's free-bed route (NearbyInteractionHud).
+  // The plant-sheet composition replaces this body in the same phase.
+  openPlantSheet(_bedId: string): void {}
+
   // Repaint the deed tracker from the live facet: the slow band, a watch
   // toggle, the collapse toggle, and language switches all funnel here; the
   // elided writers make an unchanged repaint free.

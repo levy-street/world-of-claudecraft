@@ -6,6 +6,7 @@ import {
   INTERACT_RANGE,
   type QuestProgress,
 } from '../sim/types';
+import type { FarmPatchDef, FarmPlotView } from '../world_api/farming';
 import { corpseLootAvailability, localPartyMemberIds } from './corpse_loot_availability';
 import { decideEscortPress, handleEscortPress } from './escort_interact';
 import {
@@ -40,6 +41,14 @@ export interface NearbyInteractionWorld {
   pickUpObject(id: number): InteractionOutcome;
   nodeHarvestableByMe(nodeId: string): boolean;
   harvestNode(nodeId: string, confirmEffectUse?: boolean): InteractionOutcome;
+  // The garden-bed arm (Phase 9b). Static bed content plus the caller's own
+  // plots; IWorld satisfies all three structurally, so the live call site
+  // (main.ts interactKey passing the world object whole) needs no change.
+  farmPatches: readonly FarmPatchDef[];
+  myFarmPlots: readonly FarmPlotView[];
+  // The client sends and the sim answers: a growing plot refuses not_ready
+  // through the sim's own farmDenied line, never a client-side prediction.
+  harvestCrop(bedId: string): void;
 }
 
 export interface NearbyInteractionHud {
@@ -48,6 +57,9 @@ export interface NearbyInteractionHud {
   openDelveBoard(npcId: number): void;
   showError(text: string): void;
   requestSpiritHealerResurrect(): void;
+  // A free bed opens the seed-and-knobs sheet (Phase 9b); choice-free
+  // harvest stays a direct world call above.
+  openPlantSheet(bedId: string): void;
 }
 
 type NearbyGatherNode = Pick<GatherNodeDef, 'id' | 'pos' | 'type' | 'tier'>;

@@ -62,6 +62,12 @@ function rig(targets: Entity[] = [], nodes: GatherNodeDef[] = []) {
       return true;
     },
     nodeHarvestableByMe: vi.fn(() => true),
+    // Phase 9b bed-arm seam members: inert here (lane A's arms exercise them).
+    farmPatches: [] as const,
+    myFarmPlots: [] as const,
+    harvestCrop: (bedId: string) => {
+      calls.push(`harvestCrop:${bedId}`);
+    },
     harvestNode: (id: string) => {
       calls.push(`harvest:${id}`);
       return true;
@@ -73,6 +79,8 @@ function rig(targets: Entity[] = [], nodes: GatherNodeDef[] = []) {
     openDelveBoard: (id: number) => calls.push(`board:${id}`),
     showError: (text: string) => calls.push(`error:${text}`),
     requestSpiritHealerResurrect: () => calls.push('requestResurrect'),
+    // Phase 9b bed-arm seam member: inert here (lane A's arms exercise it).
+    openPlantSheet: (bedId: string) => calls.push(`plantSheet:${bedId}`),
   };
   return { world, hud, nodes, calls, player };
 }
