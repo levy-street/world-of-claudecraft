@@ -9,6 +9,7 @@ import {
 import type { FarmPatchDef, FarmPlotView } from '../world_api/farming';
 import { corpseLootAvailability, localPartyMemberIds } from './corpse_loot_availability';
 import { decideEscortPress, handleEscortPress } from './escort_interact';
+import { decideFarmBedAction, nearestInteractableBed } from './farm_bed_interact';
 import {
   type GatherEffectConfirmGate,
   type GatherNodeToolGate,
@@ -220,6 +221,22 @@ export function tryNearbyInteraction(
       nodeToolGateFor?.(bestNode),
       effectConfirm,
     );
+  }
+  // The garden-bed arm (Phase 9b) sits below gather nodes (a node in reach
+  // keeps winning the press) and above the escort-away last resort. Harvest
+  // is choice-free, so a bed with MY plot goes straight to the world (the
+  // sim's own farmDenied answers a growing plot with not_ready; the client
+  // never reads plot.status here); a free bed opens the seed-and-knobs sheet.
+  if (!player.dead) {
+    const bedId = nearestInteractableBed(world.farmPatches, player.pos);
+    if (bedId !== null) {
+      if (decideFarmBedAction(world, bedId) === 'harvest') {
+        world.harvestCrop(bedId);
+      } else {
+        hud.openPlantSheet(bedId);
+      }
+      return true;
+    }
   }
   // The away line is a LAST resort that only replaces the generic
   // nothing-to-interact message: an absent escortee must never eat a press that

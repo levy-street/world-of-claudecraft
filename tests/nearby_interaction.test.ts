@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { tryNearbyInteraction } from '../src/game/nearby_interaction';
 import { ITEMS } from '../src/sim/data';
 import type { Entity, GatherNodeDef, QuestProgress } from '../src/sim/types';
+import type { FarmPatchDef, FarmPlotStatus, FarmPlotView } from '../src/world_api/farming';
 
 function entity(overrides: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Entity {
   return {
@@ -62,9 +63,10 @@ function rig(targets: Entity[] = [], nodes: GatherNodeDef[] = []) {
       return true;
     },
     nodeHarvestableByMe: vi.fn(() => true),
-    // Phase 9b bed-arm seam members: inert here (lane A's arms exercise them).
-    farmPatches: [] as const,
-    myFarmPlots: [] as const,
+    // Phase 9b bed-arm seam members: inert by default (the bed-arm describe
+    // below overrides them per test).
+    farmPatches: [] as readonly FarmPatchDef[],
+    myFarmPlots: [] as readonly FarmPlotView[],
     harvestCrop: (bedId: string) => {
       calls.push(`harvestCrop:${bedId}`);
     },
@@ -482,5 +484,101 @@ describe('tryNearbyInteraction: off-quest collectables are not there', () => {
     r.world.questLog.set(SUPPLY_QUEST, active());
     expect(interact(r)).toBe(true);
     expect(r.calls).toEqual(['pickup:2']);
+  });
+});
+
+describe('the garden-bed arm (Phase 9b)', () => {
+  const bedPatch: FarmPatchDef = {
+    id: 'patch_test',
+    zoneId: 'eastbrook_vale',
+    tier: 1,
+    x: 2,
+    z: 0,
+    beds: [{ id: 'bed_test_1', x: 2, z: 0 }],
+  };
+
+  function myPlot(status: FarmPlotStatus): FarmPlotView {
+    return {
+      bedId: 'bed_test_1',
+      cropId: 'vale_wheat',
+      plantedAtMs: 0,
+      readyAtMs: 1000,
+      compost: false,
+      watch: false,
+      tonic: false,
+      notified: false,
+      status,
+    };
+  }
+
+  function bedRig(
+    status: FarmPlotStatus | null,
+    targets: Entity[] = [],
+    nodes: GatherNodeDef[] = [],
+  ) {
+    const r = rig(targets, nodes);
+    r.world.farmPatches = [bedPatch];
+    r.world.myFarmPlots = status === null ? [] : [myPlot(status)];
+    return r;
+  }
+
+  // Status never gates the client press: the sim's own farmDenied not_ready
+  // answers a growing plot, so all three statuses send the same harvest.
+  it.each(['ready', 'withered', 'growing'] as const)(
+    'presses harvest exactly once beside my %s plot and never opens the sheet',
+    (status) => {
+      const r = bedRig(status);
+      expect(interact(r)).toBe(true);
+      expect(r.calls).toEqual(['harvestCrop:bed_test_1']);
+    },
+  );
+
+  it('opens the plant sheet once beside a free bed and never sends harvest', () => {
+    const r = bedRig(null);
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['plantSheet:bed_test_1']);
+  });
+
+  it('lets a gather node in range keep winning the press over a bed', () => {
+    const node = {
+      id: 'ore_1',
+      zoneId: 'zone',
+      type: 'ore',
+      pos: { x: 1, z: 0 },
+      level: 1,
+      tier: 1,
+    } as const;
+    const r = bedRig('ready', [], [node]);
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['harvest:ore_1']);
+  });
+
+  it('lets a corpse in range keep winning the press over a bed', () => {
+    const corpse = entity({
+      id: 2,
+      kind: 'mob',
+      dead: true,
+      lootable: true,
+      loot: { copper: 1, items: [] },
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const r = bedRig('ready', [corpse]);
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['loot:2']);
+  });
+
+  it('falls through to the nothing-to-interact line when every bed is out of range', () => {
+    const r = rig();
+    r.world.farmPatches = [{ ...bedPatch, beds: [{ id: 'bed_test_1', x: 10, z: 0 }] }];
+    r.world.myFarmPlots = [myPlot('ready')];
+    expect(interact(r)).toBe(false);
+    expect(r.calls).toEqual(['error:nothing']);
+  });
+
+  it('never fires for a dead player standing on a free bed', () => {
+    const r = bedRig(null);
+    r.player.dead = true;
+    expect(interact(r)).toBe(false);
+    expect(r.calls).toEqual(['error:nothing']);
   });
 });
