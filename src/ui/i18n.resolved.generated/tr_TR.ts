@@ -3891,7 +3891,8 @@ export const tr_TR: EnTranslations = {
       "taken_over": "Karakteriniz başka bir oturum tarafından devralındı.",
       "rename_required": "Bu karakter dünyaya girmeden önce yeniden adlandırılmalıdır.",
       "invalid_appearance": "Bu görünüm kaydedilemedi. Tasarımı düzenleyip tekrar deneyin.",
-      "reroll_unavailable": "Bu karakterin kullanılabilir bir ücretsiz yeniden tasarım hakkı yok."
+      "reroll_unavailable": "Bu karakterin kullanılabilir bir ücretsiz yeniden tasarım hakkı yok.",
+      "no_redesign_credit": "This character has no redesign credit left. Visit the Stylist in Eastbrook to buy one."
     },
     "moderation": {
       "suspended_until": "Bu hesap {date} tarihine kadar askıya alındı.",
@@ -7303,6 +7304,10 @@ export const tr_TR: EnTranslations = {
     "waitingOnOpponent": "Rakibinin kartı bekleniyor...",
     "yourTurn": "Kart oyna"
   },
+  "stylist": {
+    "buyCredit": "Buy a redesign ({price})",
+    "buyCreditAria": "Buy one character redesign for {price}"
+  },
   "delveUi": {
     "board": {
       "title": "Mağara Panosu",
@@ -7894,7 +7899,11 @@ export const tr_TR: EnTranslations = {
     "redesignHint": "Bu karakter yeni karakter oluşturucudan önce yaratıldı. Bir ücretsiz yeniden tasarım hakkınız var; kaydettiğinizde kullanılır.",
     "redesignTitle": "{name} karakterini yeniden tasarla",
     "redesignSave": "Yeni Görünümü Kaydet",
-    "redesignCancel": "Mevcut Görünümü Koru"
+    "redesignCancel": "Mevcut Görünümü Koru",
+    "editAppearance": "Edit Appearance",
+    "editAppearanceAria": "Edit the appearance of {name}",
+    "editAppearanceHint": "You hold {count} redesign credits from the Stylist. One is spent when you save.",
+    "editAppearanceHintOne": "You hold 1 redesign credit from the Stylist. It is spent when you save."
   },
   "deleteCharacter": {
     "title": "Karakteri Sil",
@@ -13997,6 +14006,11 @@ export const tr_TR: EnTranslations = {
         "name": "Kart Ustası",
         "title": "Şans Dağıtıcısı",
         "greeting": "Kart Düellosu ister misin? Üçte iki galip gelen övünme hakkını kazanır."
+      },
+      "stylist_verena": {
+        "name": "Verena Ashlock",
+        "title": "Stylist",
+        "greeting": "Sit down, {className}. A comb, a good mirror, and coin enough, and you can walk out looking like someone else entirely."
       },
       "bursar_petra_vell": {
         "name": "Veznedar Petra Vell",

@@ -68,6 +68,7 @@ const KNOWN_CODES = [
   'character.online',
   'character.rename_not_permitted',
   'character.rename_required',
+  'character.no_redesign_credit',
   'character.reroll_unavailable',
   'character.taken_over',
   'db.conflict',

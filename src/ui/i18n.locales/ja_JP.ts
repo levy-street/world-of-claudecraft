@@ -3842,6 +3842,20 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.card_master.title': '運命の胴元',
   'entities.npcs.card_master.greeting':
     'カードデュエルはいかが？三本勝負、勝者には自慢の種が手に入る。',
+  'entities.npcs.stylist_verena.name': 'ヴェレナ・アシュロック',
+  'entities.npcs.stylist_verena.title': 'スタイリスト',
+  'entities.npcs.stylist_verena.greeting':
+    'お掛けなさい、{className}。櫛が一本、上等な鏡が一枚、そして十分な金貨があれば、まるで別人になって出ていけるわ。',
+  'apiError.character.no_redesign_credit':
+    'このキャラクターにはイメージチェンジの残り回数がありません。イーストブルック渓谷のスタイリストで購入してください。',
+  'stylist.buyCredit': 'イメージチェンジを購入（{price}）',
+  'stylist.buyCreditAria': '{price} でキャラクターのイメージチェンジを一回購入する',
+  'character.editAppearance': '外見を編集',
+  'character.editAppearanceAria': '{name} の外見を編集する',
+  'character.editAppearanceHint':
+    'スタイリストのイメージチェンジを {count} 回分保有しています。保存時に一回消費されます。',
+  'character.editAppearanceHintOne':
+    'スタイリストのイメージチェンジを 1 回保有しています。保存時に消費されます。',
   'cardDuel.title': 'カードデュエル',
   'cardDuel.close': '閉じる',
   'cardDuel.join': 'キューに参加',

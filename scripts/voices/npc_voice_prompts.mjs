@@ -1054,6 +1054,15 @@ export const VOICE_ALIAS = {
   // own VOICE_PROMPTS entry, with the rank and the cold Highwatch authority the
   // greeting carries, once an ElevenLabs key is available to design and render it.
   warmarshal_draven_kole: 'fury',
+  // Verena Ashlock, the Eastbrook Stylist, borrows Weaver Ottilie's designed
+  // voice for now: the SECOND role match here rather than the same character
+  // recurring under a suffixed id (docs/design/npc_voices.md). Both are exacting
+  // female artisans working a craft desk in Eastbrook, and Ottilie's precise,
+  // unhurried mezzo carries the Stylist's "sit down and let me look at you"
+  // register without straining. Promote her to her own VOICE_PROMPTS entry, with
+  // the dry appraising warmth her greeting carries, once an ElevenLabs key is
+  // available to design and render it.
+  stylist_verena: 'weaver_ottilie',
 };
 
 /** Resolve any NPC content id to the id of the voice that should speak for it. */

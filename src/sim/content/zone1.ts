@@ -703,6 +703,21 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     cardMaster: true,
     greeting: 'Care for a Card Duel? Best of three, winner takes the bragging rights.',
   },
+  stylist_verena: {
+    id: 'stylist_verena',
+    name: 'Verena Ashlock',
+    title: 'Stylist',
+    pos: { ...EASTBROOK_NPC_PLACEMENTS_BY_ID.stylist_verena.position },
+    facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.stylist_verena.facing,
+    color: 0xc06c9e,
+    questIds: [],
+    // No vendorItems: she sells a per-character redesign credit, not an item.
+    // The purchase resolves in src/sim/stylist.ts; the price band table is
+    // src/sim/content/redesign_pricing.ts.
+    stylist: true,
+    greeting:
+      'Sit down, $C. A comb, a good mirror, and coin enough, and you can walk out looking like someone else entirely.',
+  },
   groundskeeper_bram: {
     id: 'groundskeeper_bram',
     name: 'Groundskeeper Bram',

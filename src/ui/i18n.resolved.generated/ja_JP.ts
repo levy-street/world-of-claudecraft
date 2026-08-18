@@ -3891,7 +3891,8 @@ export const ja_JP: EnTranslations = {
       "taken_over": "あなたのキャラクターは別のセッションに引き継がれました。",
       "rename_required": "このキャラクターは世界に入る前に名前変更が必要です。",
       "invalid_appearance": "この外見は保存できませんでした。デザインを調整してもう一度お試しください。",
-      "reroll_unavailable": "このキャラクターには無料の再デザインがありません。"
+      "reroll_unavailable": "このキャラクターには無料の再デザインがありません。",
+      "no_redesign_credit": "このキャラクターにはイメージチェンジの残り回数がありません。イーストブルック渓谷のスタイリストで購入してください。"
     },
     "moderation": {
       "suspended_until": "このアカウントは {date} まで停止されています。",
@@ -7303,6 +7304,10 @@ export const ja_JP: EnTranslations = {
     "waitingOnOpponent": "相手のカードを待っています……",
     "yourTurn": "カードを出してください"
   },
+  "stylist": {
+    "buyCredit": "イメージチェンジを購入（{price}）",
+    "buyCreditAria": "{price} でキャラクターのイメージチェンジを一回購入する"
+  },
   "delveUi": {
     "board": {
       "title": "デルヴボード",
@@ -7894,7 +7899,11 @@ export const ja_JP: EnTranslations = {
     "redesignHint": "このキャラクターは新しいキャラクターエディター以前に作成されました。無料の再デザインが1回できます。保存すると消費されます。",
     "redesignTitle": "{name}を再デザイン",
     "redesignSave": "新しい外見を保存",
-    "redesignCancel": "現在の外見を保持"
+    "redesignCancel": "現在の外見を保持",
+    "editAppearance": "外見を編集",
+    "editAppearanceAria": "{name} の外見を編集する",
+    "editAppearanceHint": "スタイリストのイメージチェンジを {count} 回分保有しています。保存時に一回消費されます。",
+    "editAppearanceHintOne": "スタイリストのイメージチェンジを 1 回保有しています。保存時に消費されます。"
   },
   "deleteCharacter": {
     "title": "キャラクターを削除",
@@ -13997,6 +14006,11 @@ export const ja_JP: EnTranslations = {
         "name": "カードマスター",
         "title": "運命の胴元",
         "greeting": "カードデュエルはいかが？三本勝負、勝者には自慢の種が手に入る。"
+      },
+      "stylist_verena": {
+        "name": "ヴェレナ・アシュロック",
+        "title": "スタイリスト",
+        "greeting": "お掛けなさい、{className}。櫛が一本、上等な鏡が一枚、そして十分な金貨があれば、まるで別人になって出ていけるわ。"
       },
       "bursar_petra_vell": {
         "name": "出納官ペトラ・ヴェル",

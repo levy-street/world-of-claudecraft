@@ -111,6 +111,11 @@ export const ERROR_CODES = deepFreeze({
   'character.invalid_appearance': { params: [] },
   // identity: "appearance reroll is not available for this character"
   'character.reroll_unavailable': { params: [] },
+  // identity: "no redesign credit available for this character". The PAID
+  // Stylist redesign, distinct from the free one-shot reroll above. Also the
+  // answer when a concurrent submit spent the last credit first: the caller's
+  // remedy (re-read the roster) is identical either way.
+  'character.no_redesign_credit': { params: [] },
 
   // moderation: enforcement states set by a moderator.
   // identity: "this account is suspended until {date}."

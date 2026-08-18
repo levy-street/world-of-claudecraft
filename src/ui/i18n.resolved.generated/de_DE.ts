@@ -3891,7 +3891,8 @@ export const de_DE: EnTranslations = {
       "taken_over": "Dein Charakter wurde von einer anderen Sitzung übernommen.",
       "rename_required": "Dieser Charakter muss vor dem Betreten der Welt umbenannt werden.",
       "invalid_appearance": "Dieses Aussehen konnte nicht gespeichert werden. Passe das Design an und versuche es erneut.",
-      "reroll_unavailable": "Für diesen Charakter ist keine kostenlose Umgestaltung mehr verfügbar."
+      "reroll_unavailable": "Für diesen Charakter ist keine kostenlose Umgestaltung mehr verfügbar.",
+      "no_redesign_credit": "This character has no redesign credit left. Visit the Stylist in Eastbrook to buy one."
     },
     "moderation": {
       "suspended_until": "Dieses Konto ist bis {date} suspendiert.",
@@ -7303,6 +7304,10 @@ export const de_DE: EnTranslations = {
     "waitingOnOpponent": "Warte auf die Karte deines Gegners...",
     "yourTurn": "Karte ausspielen"
   },
+  "stylist": {
+    "buyCredit": "Buy a redesign ({price})",
+    "buyCreditAria": "Buy one character redesign for {price}"
+  },
   "delveUi": {
     "board": {
       "title": "Tiefgang-Tafel",
@@ -7894,7 +7899,11 @@ export const de_DE: EnTranslations = {
     "redesignHint": "Diese Figur stammt aus der Zeit vor dem neuen Charaktereditor. Ihr habt eine kostenlose Umgestaltung; sie wird beim Speichern verbraucht.",
     "redesignTitle": "{name} umgestalten",
     "redesignSave": "Neues Aussehen speichern",
-    "redesignCancel": "Aktuelles Aussehen behalten"
+    "redesignCancel": "Aktuelles Aussehen behalten",
+    "editAppearance": "Edit Appearance",
+    "editAppearanceAria": "Edit the appearance of {name}",
+    "editAppearanceHint": "You hold {count} redesign credits from the Stylist. One is spent when you save.",
+    "editAppearanceHintOne": "You hold 1 redesign credit from the Stylist. It is spent when you save."
   },
   "deleteCharacter": {
     "title": "Charakter löschen",
@@ -13997,6 +14006,11 @@ export const de_DE: EnTranslations = {
         "name": "Kartenmeister",
         "title": "Händler des Zufalls",
         "greeting": "Lust auf einen Kartenkampf? Wer zwei von drei Runden gewinnt, darf sich brüsten."
+      },
+      "stylist_verena": {
+        "name": "Verena Ashlock",
+        "title": "Stylist",
+        "greeting": "Sit down, {className}. A comb, a good mirror, and coin enough, and you can walk out looking like someone else entirely."
       },
       "bursar_petra_vell": {
         "name": "Kämmerin Petra Vell",

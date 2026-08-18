@@ -1086,6 +1086,9 @@ describe('layout clearance and service anchors', () => {
         'station_eastbrook_toolworks',
       ],
       ['fury', -22.5, -7.5, 1.171280832795522, 'eastbrook_chapel'],
+      // Appended LAST, mirroring the NPCS array: seating resolves in array order,
+      // so the Stylist sits at the end where she cannot re-seat anyone before her.
+      ['stylist_verena', 12.5, 4, -1.7294515889812982, 'eastbrook_grand_armoury'],
     ]);
 
     const pointAnchors = [

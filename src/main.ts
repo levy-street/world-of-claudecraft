@@ -370,6 +370,10 @@ import {
   maybeShowFirstRunCameraPrompt,
 } from './ui/camera_prompt';
 import { deleteCharButtonHtml } from './ui/char_delete_button';
+import {
+  createRedesignSubmitRouter,
+  editAppearanceButtonHtml,
+} from './ui/charselect_edit_appearance';
 import { loadCharselectNews } from './ui/charselect_news';
 import { CharselectRedesignEditor } from './ui/charselect_redesign';
 import { ChatCommandMenu } from './ui/chat_command_menu';
@@ -6789,10 +6793,10 @@ async function refreshCharacters(): Promise<void> {
         </div>
         ${
           c.forceRename
-            ? `<input class="rename-input" placeholder="${escapeHtml(t('character.newNamePlaceholder'))}" maxlength="16" /><span class="char-actions"><button class="btn rename-btn">${escapeHtml(t('character.rename'))}</button>${rerollBtn}${deleteCharButtonHtml(c.online)}</span>`
+            ? `<input class="rename-input" placeholder="${escapeHtml(t('character.newNamePlaceholder'))}" maxlength="16" /><span class="char-actions"><button class="btn rename-btn">${escapeHtml(t('character.rename'))}</button>${rerollBtn}${editAppearanceButtonHtml(c)}${deleteCharButtonHtml(c.online)}</span>`
             : c.online
-              ? `<span class="char-actions"><button class="btn take-over-btn" title="${escapeHtml(t('character.takeOverConfirm'))}" aria-label="${escapeHtml(t('character.takeOverConfirm'))}">${escapeHtml(t('character.takeOver'))}</button>${rerollBtn}${deleteCharButtonHtml(true)}</span>`
-              : `<span class="char-actions"><button class="btn enter-world-btn">${escapeHtml(t('auth.enterWorld'))}</button>${rerollBtn}${deleteCharButtonHtml(false)}</span>`
+              ? `<span class="char-actions"><button class="btn take-over-btn" title="${escapeHtml(t('character.takeOverConfirm'))}" aria-label="${escapeHtml(t('character.takeOverConfirm'))}">${escapeHtml(t('character.takeOver'))}</button>${rerollBtn}${editAppearanceButtonHtml(c)}${deleteCharButtonHtml(true)}</span>`
+              : `<span class="char-actions"><button class="btn enter-world-btn">${escapeHtml(t('auth.enterWorld'))}</button>${rerollBtn}${editAppearanceButtonHtml(c)}${deleteCharButtonHtml(false)}</span>`
         }`;
 
       row.querySelector('.delete-char-btn')?.addEventListener('click', (e) => {
@@ -6857,19 +6861,18 @@ async function refreshCharacters(): Promise<void> {
           selectRow();
         }
       });
-      row.querySelector('.reroll-char-btn')?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        // Captured before selectRow(), whose own close(false) call (on
-        // whatever editor is already open) would otherwise leave
-        // document.activeElement pointing at the OLD row's button by the
-        // time open() ran. Passing this button explicitly is the fix (see
-        // charselect_redesign.ts open()).
-        const opener = e.currentTarget as HTMLButtonElement;
-        // Select the row first so the stage, name, and Enter World button all
-        // agree on which character is being redesigned.
-        selectRow();
-        redesignEditor.open(c, opener);
-      });
+      // Both redesign buttons open the SAME editor; only the save route differs,
+      // latched from the row before opening. Opener passed explicitly: selectRow
+      // closes any open editor, stranding focus (charselect_redesign.ts open()).
+      for (const btn of row.querySelectorAll('.reroll-char-btn, .edit-appearance-btn')) {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const opener = e.currentTarget as HTMLButtonElement;
+          selectRow();
+          redesignSubmitRouter.noteOpen(c);
+          redesignEditor.open(c, opener);
+        });
+      }
       // Double-click a row to jump straight into the world (classic-select
       // muscle memory). It routes through the shared desktop Enter World button
       // so entry owns its loading state; the button only exists in the docked
@@ -7146,6 +7149,8 @@ function showCharselectCharacter(c: CharacterSummary): void {
  *  button). Owns its own panel, draft and customizer in
  *  src/ui/charselect_redesign.ts; everything it needs from this file arrives
  *  through these deps. */
+const redesignSubmitRouter = createRedesignSubmitRouter(api);
+
 const redesignEditor = new CharselectRedesignEditor({
   previewModular: (app, worn, cls, mainhandItemId, offhandItemId, weaponSkinId) => {
     if (!characterPreview) return;
@@ -7158,7 +7163,7 @@ const redesignEditor = new CharselectRedesignEditor({
   },
   setPreviewName: setCharselectPreviewName,
   saveAppearance: (characterId, app, helmHidden) =>
-    api.rerollAppearance(characterId, app, helmHidden).then(() => undefined),
+    redesignSubmitRouter.submit(characterId, app, helmHidden),
   refreshRoster: () => refreshCharacters(),
   errorText: userFacingApiError,
 });
@@ -10364,9 +10369,11 @@ function wireStartScreens(): void {
   document
     .getElementById('btn-reroll-save')
     ?.addEventListener('click', () => void redesignEditor.save());
-  document
-    .getElementById('btn-reroll-cancel')
-    ?.addEventListener('click', () => redesignEditor.close(true));
+  document.getElementById('btn-reroll-cancel')?.addEventListener('click', () => {
+    // Drop the latched route with the draft, so the next open latches afresh.
+    redesignSubmitRouter.clear();
+    redesignEditor.close(true);
+  });
   // Close the realm dropdown on outside click or Escape.
   document.addEventListener('click', (e) => {
     if (!realmDropdownOpen) return;

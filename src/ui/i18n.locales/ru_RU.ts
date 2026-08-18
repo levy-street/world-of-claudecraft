@@ -3869,6 +3869,20 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.card_master.title': 'Дилер удачи',
   'entities.npcs.card_master.greeting':
     'Не сыграть ли партию в карточную дуэль? До двух побед, победителю достанется слава.',
+  'entities.npcs.stylist_verena.name': 'Верена Эшлок',
+  'entities.npcs.stylist_verena.title': 'Стилист',
+  'entities.npcs.stylist_verena.greeting':
+    'Присаживайтесь, {className}. Гребень, хорошее зеркало и довольно монет, и вы выйдете отсюда совсем другим человеком.',
+  'apiError.character.no_redesign_credit':
+    'У этого персонажа не осталось смен облика. Купите её у стилиста в Истврукской долине.',
+  'stylist.buyCredit': 'Купить смену облика ({price})',
+  'stylist.buyCreditAria': 'Купить одну смену облика персонажа за {price}',
+  'character.editAppearance': 'Изменить облик',
+  'character.editAppearanceAria': 'Изменить облик персонажа {name}',
+  'character.editAppearanceHint':
+    'У вас есть смен облика от стилиста: {count}. Одна будет потрачена при сохранении.',
+  'character.editAppearanceHintOne':
+    'У вас есть 1 смена облика от стилиста. Она будет потрачена при сохранении.',
   'cardDuel.title': 'Карточная дуэль',
   'cardDuel.close': 'Закрыть',
   'cardDuel.join': 'Встать в очередь',

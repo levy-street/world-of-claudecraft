@@ -121,6 +121,10 @@ export const apiErrorStrings = {
     invalid_appearance: 'That appearance could not be saved. Adjust the design and try again.',
     // the ordinary redesign failure: token already spent, or two racing tabs
     reroll_unavailable: 'This character does not have a free redesign available.',
+    // the PAID redesign failure: no credit held, or two racing tabs where the
+    // other one spent the last credit first
+    no_redesign_credit:
+      'This character has no redesign credit left. Visit the Stylist in Eastbrook to buy one.',
   },
   // moderation: enforcement states set by a moderator.
   moderation: {

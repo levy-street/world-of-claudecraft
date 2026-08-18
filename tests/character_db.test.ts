@@ -24,6 +24,7 @@ import {
   backfillAccountEmailIfEmpty,
   bankBonusFactsForAccount,
   consumeAppearanceReroll,
+  consumeRedesignCredit,
   createAccount,
   createCharacterCapped,
   deleteCharacter,
@@ -229,6 +230,74 @@ describe('consumeAppearanceReroll', () => {
     expect(await consumeAppearanceReroll(7, 42, LOOK, null, CUTOFF)).toBe(true);
     dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 0 } as any);
     expect(await consumeAppearanceReroll(7, 42, LOOK, null, CUTOFF)).toBe(false);
+  });
+});
+
+describe('consumeRedesignCredit', () => {
+  // The PAID redesign's eligibility AUTHORITY, and its whole double-submit
+  // defense. The JS mirror the roster button reads (redesignCreditsFromState) is
+  // pinned by tests/server/characters.test.ts; if THIS statement drifts, the
+  // button renders for a character the UPDATE refuses, or worse, the guard stops
+  // being conditional and one credit buys two redesigns. So the statement itself
+  // is pinned here, the consumeAppearanceReroll pattern above.
+  const LOOK = { gender: 'female' as const };
+
+  it('decides ownership, realm, and the credit guard inside the one UPDATE', async () => {
+    dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 1 } as any);
+    await consumeRedesignCredit(7, 42, LOOK, true);
+
+    const [sql, params] = dbMock.query.mock.calls.at(-1)!;
+    expect(sql).toMatch(/UPDATE characters/i);
+    // THE double-submit defense: the decrement is conditional on a credit still
+    // being there, in the same statement that writes the look. Without this
+    // predicate two racing submits both land and one credit buys two redesigns.
+    expect(sql).toMatch(/redesignCredits'\)::int,\s*0\)\s*>=\s*1/i);
+    // BOLA scoping, the getCharacter trio
+    expect(sql).toMatch(/id\s*=\s*\$1/);
+    expect(sql).toMatch(/account_id\s*=\s*\$2/);
+    expect(sql).toMatch(/realm\s*=\s*\$4/);
+    expect(params).toEqual([42, 7, JSON.stringify(LOOK), REALM, true]);
+  });
+
+  it('drops the key at the last credit instead of writing a zero', async () => {
+    dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 1 } as any);
+    await consumeRedesignCredit(7, 42, LOOK, null);
+    const [sql] = dbMock.query.mock.calls.at(-1)!;
+    // Zero-default omission, matching serializeCharacter: a blob this route
+    // writes and a blob the sim writes for the same character must be
+    // byte-identical, so the last spend REMOVES the key rather than storing 0.
+    expect(sql).toMatch(/state\s*-\s*'redesignCredits'/);
+    // ...and above the last one it decrements in place.
+    expect(sql).toMatch(/jsonb_set\(state,\s*'\{redesignCredits\}'/);
+    // Never a whole-blob rewrite from an HTTP route: that would clobber a live
+    // session's progress.
+    expect(sql).not.toMatch(/SET\s+state\s*=\s*\$\d/i);
+  });
+
+  it('composes the helm patch ON TOP of the decremented state, not instead of it', async () => {
+    dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 1 } as any);
+    await consumeRedesignCredit(7, 42, LOOK, true);
+    const [sql] = dbMock.query.mock.calls.at(-1)!;
+    // The helm arms must operate on the credit-patched blob; if they read bare
+    // `state` the decrement would be silently discarded whenever the client
+    // sent a helm choice, refunding the credit on every real save.
+    expect(sql).toMatch(/jsonb_set\(\(CASE[\s\S]*?END\),\s*'\{helmHidden\}'/i);
+    // Same change-guarded arms as the reroll: both operators mint a whole new
+    // datum, so an unguarded write re-TOASTs the blob for nothing.
+    expect(sql).toMatch(/IS DISTINCT FROM 'true'::jsonb/);
+    expect(sql).toMatch(/\? 'helmHidden'/);
+    // A NULL helm choice (client offered no toggle) still spends the credit but
+    // leaves the helm key alone.
+    expect(sql).toMatch(/\$5::boolean IS NULL THEN/);
+  });
+
+  it('maps rowCount to the applied/refused boolean the route answers with', async () => {
+    dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 1 } as any);
+    expect(await consumeRedesignCredit(7, 42, LOOK, null)).toBe(true);
+    // rowCount 0 is the loser of a double-submit, and the route turns it into
+    // character.no_redesign_credit rather than a second free redesign.
+    dbMock.query.mockResolvedValueOnce({ rows: [], rowCount: 0 } as any);
+    expect(await consumeRedesignCredit(7, 42, LOOK, null)).toBe(false);
   });
 });
 

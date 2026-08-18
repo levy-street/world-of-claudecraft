@@ -1003,6 +1003,10 @@ const WEAVER_POSITION = localToWorld(LOOM_STATION.position, WEAVING_HOUSE.rotati
 const TINKER_POSITION = localToWorld(TOOLWORKS_STATION.position, TOOLWORKS.rotation, 2, 0);
 const SAUL_POSITION = { x: 0, z: -14.5 } as const;
 const FURY_POSITION = { x: -22.5, z: -7.5 } as const;
+// The Stylist's stand on the east service apron: north of the Card Master
+// (10.5, 1) and south of the Bursar's bank front, on the same open civic ground
+// the rest of the service row keeps clear of buildings and roads.
+const STYLIST_POSITION = { x: 12.5, z: 4 } as const;
 
 const NPCS = [
   makeNpc('the_merchant', MERCHANT_POSITION, MARKET_STALLS[0].rotation, MARKET_STALLS[0].id),
@@ -1036,6 +1040,14 @@ const NPCS = [
   makeNpc('weaver_ottilie', WEAVER_POSITION, WEAVING_HOUSE.rotation, LOOM_STATION.id),
   makeNpc('tinker_gizzel', TINKER_POSITION, TOOLWORKS.rotation, TOOLWORKS_STATION.id),
   makeNpc('fury', FURY_POSITION, facingToward(FURY_POSITION, CIVIC_CENTER), 'eastbrook_chapel'),
+  // APPENDED at the END deliberately: NPC seating resolves in array order, so an
+  // entry inserted mid-array would re-seat every NPC after it on an existing seed.
+  makeNpc(
+    'stylist_verena',
+    STYLIST_POSITION,
+    facingToward(STYLIST_POSITION, CIVIC_CENTER),
+    PRESERVED_ARMOURY.id,
+  ),
 ] as const;
 
 const BURSAR = NPCS.find((npc) => npc.id === 'bursar_fernando');

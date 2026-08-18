@@ -46,10 +46,15 @@ function harness(
   const acceptQuest = vi.fn();
   const turnInQuest = vi.fn();
   const reportTelemetry = vi.fn();
+  const buyRedesignCredit = vi.fn();
   const world = {
     entities,
     cfg: { playerClass: 'warrior' },
     player: { name: 'Ari', pos: { x: 0, y: 0, z: 0 } },
+    // The Stylist row buys through the LIVE WORLD (deps.world()), the same way
+    // the discuss row reaches targetEntity/interact, rather than through a
+    // bespoke dialog dep.
+    buyRedesignCredit,
     questLog: new Map(),
     partyInfo: null,
     stationPlacements: STATIONS,
@@ -156,6 +161,7 @@ function harness(
     acceptQuest,
     turnInQuest,
     reportTelemetry,
+    buyRedesignCredit,
     release,
     focusFirst,
     trapOpener,
@@ -512,6 +518,13 @@ describe('QuestDialogController', () => {
     cardMaster.controller.open(45);
     cardMaster.element.querySelector<HTMLButtonElement>('[data-card-duel]')?.click();
     expect(cardMaster.openCardDuel).toHaveBeenCalledTimes(1);
+
+    // The Stylist's redesign row routes the NPC's own entity id through, so the
+    // Sim can re-validate which counter the player is standing at.
+    const stylist = harness(npc(46, 'stylist_verena'));
+    stylist.controller.open(46);
+    stylist.element.querySelector<HTMLButtonElement>('[data-stylist-buy]')?.click();
+    expect(stylist.buyRedesignCredit).toHaveBeenCalledWith(46);
   });
 
   it('REPLACES the generic goods row with the WARFARE shop row at a flagged NPC', () => {

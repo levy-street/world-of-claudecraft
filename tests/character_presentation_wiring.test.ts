@@ -106,9 +106,10 @@ describe('modular recompose guard (source pin)', () => {
 // up), pinned as source in the same style.
 describe('char-select roster wiring (source pins)', () => {
   it('captures the redesign opener before selectRow moves focus, and passes it to open()', () => {
-    const start = main.indexOf(
-      "row.querySelector('.reroll-char-btn')?.addEventListener('click', (e) => {",
-    );
+    // The anchor is the shared loop over BOTH redesign buttons (the free reroll
+    // and the paid Edit Appearance): they open the same editor, so one handler
+    // serves both and the opener-before-selectRow ordering is pinned once.
+    const start = main.indexOf("row.querySelectorAll('.reroll-char-btn, .edit-appearance-btn')");
     const end = main.indexOf('redesignEditor.open(c, opener);', start);
     expect(start).toBeGreaterThan(-1);
     expect(end).toBeGreaterThan(start);

@@ -127,6 +127,16 @@ const baseEnTable = {
   'log.mountTrainSuccess': "Marla takes the Valorsteed's reins. Well ridden.",
   'log.mountTrainLeftYard':
     'You leave the paddock and the lesson ends. Come back to Marla to try again.',
+  // Stylist redesign-credit purchase (src/sim/stylist.ts). The shared
+  // "Too far away." / "Not enough money." / "You can't do that while dead."
+  // refusals are reused verbatim and already registered above. All three are
+  // placeholder-free, so they register in the EXACT matcher automatically: the
+  // price is quoted by the dialog button through the locale-aware formatMoney,
+  // never baked into a string the language-agnostic sim emits.
+  'error.stylistWrongNpc': 'You must speak to the Stylist to change your look.',
+  'error.stylistCreditCap': 'You already hold as many redesigns as you can carry.',
+  'log.stylistCreditBought':
+    'The Stylist takes your coin. Your new look is ready to design at character select.',
   'error.invalidBuild': 'Invalid talent build.',
   'error.unknownSpec': 'Unknown specialization.',
   'error.unknownAbility': 'You do not know that ability.',

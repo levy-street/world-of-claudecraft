@@ -3891,7 +3891,8 @@ export const pl_PL: EnTranslations = {
       "taken_over": "Twoją postać przejęła inna sesja.",
       "rename_required": "Tę postać trzeba przemianować przed wejściem do świata.",
       "invalid_appearance": "Nie udało się zapisać tego wyglądu. Popraw projekt i spróbuj ponownie.",
-      "reroll_unavailable": "Ta postać nie ma już dostępnego darmowego przeprojektowania."
+      "reroll_unavailable": "Ta postać nie ma już dostępnego darmowego przeprojektowania.",
+      "no_redesign_credit": "This character has no redesign credit left. Visit the Stylist in Eastbrook to buy one."
     },
     "moderation": {
       "suspended_until": "To konto jest zawieszone do {date}.",
@@ -7303,6 +7304,10 @@ export const pl_PL: EnTranslations = {
     "waitingOnOpponent": "Oczekiwanie na kartę przeciwnika...",
     "yourTurn": "Zagraj kartę"
   },
+  "stylist": {
+    "buyCredit": "Buy a redesign ({price})",
+    "buyCreditAria": "Buy one character redesign for {price}"
+  },
   "delveUi": {
     "board": {
       "title": "Tablica Wypraw",
@@ -7894,7 +7899,11 @@ export const pl_PL: EnTranslations = {
     "redesignHint": "Ta postać powstała przed nowym kreatorem postaci. Masz jedno darmowe przeprojektowanie; zostanie użyte przy zapisie.",
     "redesignTitle": "Przeprojektuj postać {name}",
     "redesignSave": "Zapisz nowy wygląd",
-    "redesignCancel": "Zachowaj obecny wygląd"
+    "redesignCancel": "Zachowaj obecny wygląd",
+    "editAppearance": "Edit Appearance",
+    "editAppearanceAria": "Edit the appearance of {name}",
+    "editAppearanceHint": "You hold {count} redesign credits from the Stylist. One is spent when you save.",
+    "editAppearanceHintOne": "You hold 1 redesign credit from the Stylist. It is spent when you save."
   },
   "deleteCharacter": {
     "title": "Usuń postać",
@@ -13997,6 +14006,11 @@ export const pl_PL: EnTranslations = {
         "name": "Mistrz Kart",
         "title": "Rozdający Los",
         "greeting": "Masz ochotę na Pojedynek Karciany? Do trzech razy sztuka, zwycięzca bierze chwałę."
+      },
+      "stylist_verena": {
+        "name": "Verena Ashlock",
+        "title": "Stylist",
+        "greeting": "Sit down, {className}. A comb, a good mirror, and coin enough, and you can walk out looking like someone else entirely."
       },
       "bursar_petra_vell": {
         "name": "Skarbniczka Petra Vell",
