@@ -55,7 +55,7 @@ stable-content-key ledger idiom), src/sim/professions/farming.ts (updateFarming 
 tick append rule context), the entity snapshot path (locate the battleground-flag
 precedent by symbol across src/net/online.ts and server/game.ts), the wellfed
 application arm from Phase 11 in src/sim/items.ts, the cooking recipe content module,
-scripts/assets/build_farm_props.mjs, src/render/farm_patches.ts, src/game/audio.ts plus
+scripts/assets/farm_props/export_farm_props.mjs, src/render/farm_patches.ts, src/game/audio.ts plus
 scripts/sfx/sfx_prompts.mjs (the cue recipe), tests/snapshots.test.ts,
 tests/env_protocol.test.ts, tests/bandwidth.test.ts, and the CLAUDE.md files: root,
 src/sim/CLAUDE.md, src/sim/professions/CLAUDE.md, src/ui/CLAUDE.md,
@@ -76,7 +76,7 @@ The summary must return, explicitly:
   machinery (and whether that application owns any rng draw; none is expected).
 - The announce-and-route precedents: which existing test drives multiple online
   sessions, for the routing test.
-- The build_farm_props.mjs exporter structure and the src/render/farm_patches.ts
+- The farm_props/export_farm_props.mjs exporter structure and the src/render/farm_patches.ts
   adapter pattern (footprint and pivot conventions for a swap-ready prop), the VFX
   seam, and the full SFX cue recipe.
 - The cooking recipe module and the economy pins an expensive produce-heavy tier-4
@@ -121,7 +121,7 @@ plan.
   "{name}'s Harvest Feast" shape (the name is a value, the text is the key). English
   t() rows in the matching src/ui/i18n.catalog/ module; S3 coverage for every new emit.
 - Agent D, the look and the sound (render plus audio): the feast prop added to
-  scripts/assets/build_farm_props.mjs (swap-ready: fixed footprint and pivot per D19),
+  scripts/assets/farm_props/export_farm_props.mjs (swap-ready: fixed footprint and pivot per D19),
   the render surface (default: a small dedicated src/render/feast.ts adapter; an arm
   inside src/render/farm_patches.ts is acceptable if the phase judges it cohesive;
   state the choice in progress.md), placement VFX, and a feast
@@ -210,7 +210,7 @@ STEP 5 - ACCEPTANCE CRITERIA
       documented in the module.
 - [ ] The anti-abuse rule is decided, stated, and documented (one active feast per
       player or a placement cooldown).
-- [ ] The prop is in scripts/assets/build_farm_props.mjs (swap-ready), the chosen
+- [ ] The prop is in scripts/assets/farm_props/export_farm_props.mjs (swap-ready), the chosen
       render adapter draws it (the dedicated src/render/feast.ts default, or the
       farm_patches.ts arm if judged cohesive, the choice stated in progress.md),
       placement VFX fire, and the feast cue chain is complete (key, clip, manifest,

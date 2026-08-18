@@ -4,7 +4,33 @@ Read this file first in every phase session. It is the single authority for lock
 decisions. If a phase file contradicts this file, this file wins and the phase file
 gets swept in the same pass (amend the QA twin too, always).
 
-Current phase: Phase 9 QA done 2026-08-17 (verdict FAIL ON THE GO-LIVE
+Current phase: the NINETEENTH ABSORB done 2026-08-18 as its own sync mid-phase
+per the D22 triple-digit rule (release/v0.39.0 moved f42a67f341 to 7b45fdb9a9:
+285 commits, 833 files, 168-file farming intersection; branch
+fix/farming-sync-v0.39.0-r2, merge b9a025b2ee, opening Phase 9b which the
+maintainer-authored starter prompt ADOPTS). Absorb facts, superseding the older
+numbers below: count baselines HELD (commands 202/215, IWorld 329 = 88 + 241,
+facets 34, delta keys 87); farming_session golden md5 19c49aac to
+9a8fefa5e48c7e456db7ef2695bfb284 (the (am) shape again: the release's three
+Highwatch practice dummies shift ids +3; rng lanes and draw counts
+byte-identical); the 67 release-recorded goldens re-recorded for the branch's
++4 farmer statics, machine-classified with zero unexplained leaves; the terrain
+height fixture re-recorded (the release grew the corpus +76 points; 29 moved
+points, all inside the four farmer pad footprints, max 4.31 yd under Hollis);
+the Eastbrook seals and the portrait manifest re-minted per (al); the release's
+DelveInteriorTracker SUPERSEDES the branch's delve_interior_scheduler.ts
+(reconciled toward the release mechanism, the branch module and its suite
+deleted); the release's whole-slot item-lock rework rebuilt the four (ao) test
+rigs (grant-around-a-lock; production spend sites unmoved); monolith headroom
+after the sync heals: hud.ts 5 (19382/19387), renderer.ts 0 (13774/13774, the
+merge-rule exact-count re-pin), main.ts 6 (11454/11460, lowered after the
+turnstile extraction to src/game/turnstile_gate.ts), sim.ts 3 (12657/12660,
+after the mech-chroma extraction to src/sim/mech_chroma_ownership.ts),
+server/game.ts 109 (10791/10900). Release-hygiene flags recorded in
+progress.md's sync notes (the server's hand-rolled unequip-chroma duplicate,
+the unpinned release `sm` self field); the ONLINE_WORLD_LAYOUT_VERSION
+go-live question joined the OPEN list. Prior: Phase 9 QA done 2026-08-17
+(verdict FAIL ON THE GO-LIVE
 ACCEPTANCE, SCOPE STOP: branch fix/farming-phase-09-qa off feature/farming-plan
 at 2f0f2547de, merged --no-ff back as 59584a800a). Everything Phase 9
 built verifies (the live-client journey walked 39 checkpoints green at all four
@@ -400,7 +426,7 @@ visit or a punishment for lateness is violating the design, not tuning it.
   done. No pushes, no PRs, for anything farming. The integration branch is the LOCAL
   `feature/farming-plan` in this worktree (it carries docs/farming/; originally based
   on release/v0.36.0, it has absorbed every newer release tip since, release/v0.39.0
-  f42a67f341 as of the eighteenth absorb). Every phase: fetch, then branch `fix/farming-phase-NN-<slug>` off
+  7b45fdb9a9 as of the nineteenth absorb). Every phase: fetch, then branch `fix/farming-phase-NN-<slug>` off
   LOCAL `feature/farming-plan` (never off a bare release tip, which lacks the packet);
   if a newer `release/**` tip exists than the branch has absorbed, merge it INTO the
   phase branch first (release-merge-audit for a nontrivial merge, PLUS the
@@ -1313,6 +1339,16 @@ question does not arise (farming has no station).
   marker that has never existed in the scripts; judge gates by the
   FAIL/PASS lines alone (the validation matrix row above was corrected at
   this sync; phase-file sweeps are left to their own sessions).
+  NINETEENTH ABSORB (2026-08-18, release/v0.39.0 tip 7b45fdb9a9, the sync
+  mid-phase): the checklist held again. The portrait manifest re-minted
+  fingerprint-only through the CLI on the merged tree (both parents moved sim
+  content; new manifest sha 272e3562...), the accepted-art registry row
+  re-pointed, item_art_audit --verify-only machineChecksPassed with no verdict
+  refresh needed. The Eastbrook polish seals fired their both-parents-moved-
+  renderer shape (the release's DelveInteriorTracker vs the branch scheduler):
+  resolved ONLY by remint_polish_provenance.mjs on the merged tree, three pin
+  literals from its printed values, no capture retaken. No lockfile move, so
+  the farm-props seal family did not fire.
   (am) The farming_session parity golden was deliberately re-minted at the
   v0.38.0 sync (commit ddb718b95e), the ONE golden move of the phase and the
   mirror of D23's own recipe: the release samples the new Reliquary block
@@ -1324,6 +1360,18 @@ question does not arise (farming has no station).
   11 added reliquary blocks plus the 18 paired state-digest moves they
   cause, nothing else (no draws, tick, time, event, or entity lines). Golden
   md5 bf00c277b89e142446550f00c1035696 to f017045f5fa0e85f6d740c99ea4eb225.
+  SECOND (am) FIRING at the nineteenth absorb (2026-08-18, commit
+  9a16a50e16): the release added three Highwatch practice dummies as static
+  world entities and re-recorded its OWN goldens, but farming_session is
+  branch-only; re-minted after machine classification proved the diff exactly
+  a uniform +3 on every id-carrying leaf plus 45 paired digest moves, with the
+  rng lanes and draw counts byte-identical across all 27 blocks. Golden md5
+  19c49aac3bf333f59f7608af1f04d50b to 9a8fefa5e48c7e456db7ef2695bfb284. The
+  same commit re-recorded the 67 release-side goldens for the branch's +4
+  farmer statics (uniform id shift, paired digests, the culling wolf's known
+  idle-lane re-seed; zero unexplained leaves) and the terrain height fixture
+  followed under its own suite (29 pad-local points, all inside rOut 14 of a
+  farmer seat).
   (an) The release's monolith line-count ratchet
   (tests/monolith_budget.test.ts, ceilings minted against release-side
   sizes) was red on the merged tree because farming's pre-ratchet additions
@@ -1364,7 +1412,21 @@ question does not arise (farming has no station).
   server/farming_commands.ts); any future extraction that moves a maybe()
   emitter out of either file must join the scrape's source list in the same
   change or the pin silently narrows.
-  (ao) Farming's spends are LOCK-AWARE as of the sync (commit a4c4c33598):
+  NINETEENTH-ABSORB ADDENDUM (2026-08-18): the merge composed both parents
+  past three ceilings and the heals follow the ratchet's own rules.
+  renderer.ts: the release's DelveInteriorTracker supersedes the branch's
+  delve_interior_scheduler.ts (module and suite deleted, reconcile toward the
+  release mechanism), and the merged file re-pins at the exact merged count
+  13774 per the established merge rule (parents 13660 branch / 13744 release;
+  the +30 over the release pin is the branch's Phase 7 farm-patches wiring,
+  accepted under its own ceiling then). sim.ts healed by moving the mech
+  chroma unlock/unequip pair whole to src/sim/mech_chroma_ownership.ts (the
+  release's own module; Sim satisfies the structural host; direct unit suite
+  tests/mech_chroma_ownership.test.ts; ceiling 12660 stands as size 12657
+  plus the small margin). main.ts healed by moving the Cloudflare Turnstile
+  cluster whole to src/game/turnstile_gate.ts, ceiling lowered 11490 to
+  11460 (size 11454 plus margin). hud.ts SHRANK release-side (the ability
+  description extraction) to 19382 under the release's own re-pin 19387.
   the release's player item lock (issue 3042) names profession consumption a
   refusing boundary, and farming's seed, compost, watch-fee, tonic, and husk
   spends all ran through the lock-blind ctx.countItem/ctx.removeItem (a
@@ -2209,6 +2271,12 @@ question does not arise (farming has no station).
   Also owed from the QA lanes: the q_prof_intro-template overflow grant on a
   full bag (pre-existing, visible as 17/16), and the (bg) faucet's lack of a
   terminator while (bn) stands.
+- ONLINE_WORLD_LAYOUT_VERSION at farming go-live (raised by the nineteenth-absorb
+  cross-platform review): the epoch discriminator in src/world_api.ts scopes itself
+  to "the authoritative town layout" and went 6 to 7 release-side for an unrelated
+  reason; farm beds are world content with positions, so whether a farming
+  client/server pairing across the go-live deploy needs its own epoch bump is a
+  maintainer call, decided once at go-live.
 - Exact tuning constants: growth durations per tier inside the D5 bands, the gain
   schedule, harvest-lives save-chance endpoints, well-fed magnitudes and durations,
   feast charge count and expiry. Phases propose concrete values in the PR body and

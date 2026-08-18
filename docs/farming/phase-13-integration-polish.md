@@ -50,7 +50,7 @@ Spawn one Explore agent (very thorough) to read and summarize: docs/farming/stat
 docs/farming/progress.md (EVERY phase's Notes block, for the deferral sweep),
 docs/farming/phase-13-integration-polish.md, docs/farming/qa-checklist.md, and these
 sources: src/guide/CLAUDE.md (where guide.* prose keys land and the spoiler-safe
-rules), tests/guide.test.ts (the freshness gate), scripts/assets/build_farm_props.mjs
+rules), tests/guide.test.ts (the freshness gate), scripts/assets/farm_props/export_farm_props.mjs
 (the complete inventory of swap-ready farming assets as authored),
 src/render/farm_patches.ts and the feast adapter arm (footprints, pivots, tints, stage
 lists as consumed), plus the CLAUDE.md files: root, src/ui/CLAUDE.md,
@@ -91,7 +91,7 @@ bullets (never a planning doc to read); never run a teammate in plan mode.
   growth-stage mesh per family, the withered variants, the compost bin, the feast),
   each row carrying footprint, pivot, tints, stage list, and a replacement-intent note
   (what a sourced model must match to drop in without code changes). Cross-check the
-  manifest against scripts/assets/build_farm_props.mjs and the render adapters: every
+  manifest against scripts/assets/farm_props/export_farm_props.mjs and the render adapters: every
   exporter output and every adapter consumer has a row. This manifest is the
   maintainer's model-sourcing handoff and lives in docs/design so it SURVIVES packet
   teardown; it must not reference any docs/farming/ path. Then the full-journey
