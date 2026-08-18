@@ -160,7 +160,6 @@ import {
   classHasSkin,
   EVENT_SKIN_TOKEN_ID,
   MECH_CHROMAS,
-  mechChromaSkinIndex,
   rankAllowsMechChroma,
   rankAllowsSkin,
   rollSkinRank,
@@ -313,7 +312,12 @@ import {
 import { type MailSave, PostOffice } from './mail/post_office';
 import { Market, type MarketListing, type MarketSave } from './market';
 import { defaultMarketQuery, type MarketQuery } from './market_query';
-import { accountCosmeticsWithWornMechChroma } from './mech_chroma_ownership';
+import {
+  accountCosmeticsWithWornMechChroma,
+  type ItemUseResult,
+  unequipWornMechChroma,
+  unlockMechChromaFromItem,
+} from './mech_chroma_ownership';
 import {
   mobCombatProfile as mobCombatProfileFn,
   mobEffectiveMeleeRange as mobEffectiveMeleeRangeImpl,
@@ -1261,10 +1265,7 @@ export interface SkinClaimResult {
   chromaId?: string;
 }
 
-export interface ItemUseResult {
-  type: 'mechChroma';
-  chromaId: string;
-}
+export type { ItemUseResult } from './mech_chroma_ownership';
 
 // Opt-in global chat channels a player can /join and /leave. `general` is
 // always-on (everyone hears /general), so it is intentionally not joinable here.
@@ -4717,38 +4718,11 @@ export class Sim {
     return { catalog: 'class', skin };
   }
 
-  private unlockMechChromaFromItem(
-    meta: PlayerMeta,
-    itemId: string,
-    chromaId: string,
-  ): ItemUseResult | undefined {
-    const skin = mechChromaSkinIndex(chromaId);
-    if (skin < 0) return undefined;
-    if (this.countItem(itemId, meta.entityId) <= 0) return undefined;
-    this.removeItem(itemId, 1, meta.entityId);
-    const mechChromaIds = this.accountCosmetics.mechChromaIds.includes(chromaId)
-      ? this.accountCosmetics.mechChromaIds
-      : [...this.accountCosmetics.mechChromaIds, chromaId];
-    this.accountCosmetics = { ...this.accountCosmetics, mechChromaIds };
-    this.setPlayerSkin(meta.entityId, skin, 'mech');
-    return { type: 'mechChroma', chromaId };
-  }
-
-  /** Take the mech chroma off the resolved player's own current appearance,
-   *  reverting to the class body. The account-wide unlock
-   *  (accountCosmetics.mechChromaIds) is permanent, exactly like a purchased
-   *  Season 1 Armory weapon skin: this only changes what is CURRENTLY
-   *  displayed, never revokes ownership, so any character on the account can
-   *  freely re-select it later via changeSkin with no item involved. */
+  /** Ownership rules live in mech_chroma_ownership.ts; this resolves the player. */
   unequipMechChroma(chromaId: string, pid?: number): boolean {
     const r = this.resolve(pid);
     if (!r) return false;
-    const skin = mechChromaSkinIndex(chromaId);
-    if (skin < 0) return false;
-    const { meta } = r;
-    if (meta.skinCatalog !== 'mech' || meta.skin !== skin) return false;
-    this.setPlayerSkin(meta.entityId, 0, 'class');
-    return true;
+    return unequipWornMechChroma(this, r.meta, chromaId);
   }
 
   // -------------------------------------------------------------------------
@@ -5823,11 +5797,12 @@ export class Sim {
       // the pre-move `this.X` dynamic-dispatch semantics, including tests that reassign a
       // Sim method post-construction. startFishing/completeFishing flip points-at to the
       // fishing module (Professions 2.0), called with the live ctx the same way
-      // runEffects is above; no Sim fishing method remains. unlockMechChromaFromItem /
-      // openSkinSelect are private on Sim; isSwimming is public. The owning facets stay TBD.
+      // runEffects is above; no Sim fishing method remains. unlockMechChromaFromItem
+      // lives in mech_chroma_ownership.ts (Sim satisfies its host structurally);
+      // openSkinSelect is private on Sim; isSwimming is public. The owning facets stay TBD.
       startFishing: (p, meta) => fishing.startFishing(sim.ctx, p, meta),
       unlockMechChromaFromItem: (meta, itemId, chromaId) =>
-        sim.unlockMechChromaFromItem(meta, itemId, chromaId),
+        unlockMechChromaFromItem(sim, meta, itemId, chromaId),
       openSkinSelect: (meta, catalog, itemId) => sim.openSkinSelect(meta, catalog, itemId),
       isSwimming: (e) => sim.isSwimming(e),
       revalidateOffhandForSpec: (pid) => items.revalidateOffhandForSpec(sim.ctx, pid),

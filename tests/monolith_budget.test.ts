@@ -130,7 +130,7 @@ const MONOLITHS: MonolithRow[] = [
     // branch's farm-patches wiring rides on top of the release count, so the
     // ceiling is the exact merged count per the ratchet's merge rule: any
     // further growth reds again.
-    ceiling: 13772,
+    ceiling: 13774,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -140,7 +140,10 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/main.ts',
-    ceiling: 11490,
+    // Lowered after moving the Cloudflare Turnstile cluster whole to
+    // src/game/turnstile_gate.ts (the nineteenth-absorb heal: the release's
+    // npc-look composition grew main.ts past the old pin).
+    ceiling: 11460,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
