@@ -624,6 +624,10 @@ describe('plantCrop: the stated gate order, every arm draw-free', () => {
     expect(draws).toBe(0);
     expect(h.meta.farmPlots.has(BED2)).toBe(false);
     expect(h.sim.countItem(SEED_ID, h.pid)).toBe(1);
+    // The refusal is silent on the plant channel: no farmPlanted for the
+    // second bed (the sibling dead-farmer arm's shape; Phase 9 QA closed the
+    // unused `from`).
+    expect(eventsOf(h.sim, from, 'farmPlanted')).toEqual([]);
   });
 
   it('refuses a bed id that is not a bed (the hard gate at the command)', () => {
@@ -2427,6 +2431,13 @@ describe('convertHusks: the husk trade, draw-free on every path', () => {
     // exactly ONE compost.
     expect(FARM_HUSKS_PER_COMPOST).toBe(2);
     expect(FARM_HUSKS_PER_COMPOST).toBe(FARM_WITHERED_HUSK_COUNT);
+    // The two item ids the trade moves, pinned to their literals once (the
+    // wire-name-constant rule): every count above reads the same constants
+    // the trade grants through, so without these two lines a retargeted
+    // FARM_COMPOST_ITEM_ID would still "convert" green while the farmer
+    // counters keep selling the 'compost' row (Phase 9 QA).
+    expect(FARM_COMPOST_ITEM_ID).toBe('compost');
+    expect(FARM_WITHERED_HUSK_ITEM_ID).toBe('withered_husks');
   });
 
   it('converts EVERY complete batch in one call and leaves the remainder', () => {

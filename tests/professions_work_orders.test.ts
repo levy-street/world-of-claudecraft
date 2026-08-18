@@ -156,10 +156,38 @@ describe('the produce orders take plain produce only (farming twins have no grad
   // the hoe ladder and the dishes), so a fine twin neither counts toward a
   // produce order nor gets spent by its turn-in. Both arms are exercised so a
   // later grade-table change that folds the twins in reds this on purpose.
+  // The authored count and payout of each produce row, as literals: the guard
+  // above recomputes the payout from the live item rows, so a coordinated
+  // retune (count and reward moved together, or a produce sellValue retune
+  // with matching rewards) stays green there; these two literals make it a
+  // visible edit (deviation (bm): vale_wheat x8 -> 16 copper, marsh_rice x5
+  // -> 20 copper, both floor(0.5 x summed sellValue)).
   const PRODUCE_ORDERS = [
-    { questId: 'q_prof_workorder_kitchens_wheat', plain: 'vale_wheat', fine: 'fine_vale_wheat' },
-    { questId: 'q_prof_workorder_kitchens_rice', plain: 'marsh_rice', fine: 'fine_marsh_rice' },
+    {
+      questId: 'q_prof_workorder_kitchens_wheat',
+      plain: 'vale_wheat',
+      fine: 'fine_vale_wheat',
+      count: 8,
+      copperReward: 16,
+    },
+    {
+      questId: 'q_prof_workorder_kitchens_rice',
+      plain: 'marsh_rice',
+      fine: 'fine_marsh_rice',
+      count: 5,
+      copperReward: 20,
+    },
   ] as const;
+
+  it.each(PRODUCE_ORDERS)(
+    '$questId asks $count $plain for $copperReward copper (the authored literals)',
+    ({ questId, plain, count, copperReward }) => {
+      const objective = collectObjective(questId);
+      expect(objective.itemId).toBe(plain);
+      expect(objective.count).toBe(count);
+      expect(QUESTS[questId].copperReward).toBe(copperReward);
+    },
+  );
 
   it.each(PRODUCE_ORDERS)(
     '$questId: the fine twin never counts, the plain produce does',

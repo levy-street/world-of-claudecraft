@@ -55,6 +55,19 @@ describe('the farmer counters, purchased row by row', () => {
     // walk: the D9 fee vegetable and the husk trade's compost.
     expect(NPCS.farmer_jessica.vendorItems).toContain('brook_carrot');
     for (const id of FARMER_IDS) expect(NPCS[id].vendorItems, id).toContain('compost');
+    // The walk's WIDTH as literals: the per-row cases below are generated
+    // from the live stock, so a dropped row would delete its own case; the
+    // exact-stock table lives in tests/professions_zone_rollout.test.ts,
+    // this pin keeps the purchase walk honest on its own (Phase 9 QA).
+    const rowCounts: Record<string, number> = {
+      farmer_jessica: 5,
+      farmer_teasel: 3,
+      farmer_hollis: 1,
+      farmer_verbena: 1,
+    };
+    for (const id of FARMER_IDS) {
+      expect(NPCS[id].vendorItems?.length, `${id} row count`).toBe(rowCounts[id]);
+    }
   });
 
   for (const farmerId of FARMER_IDS) {

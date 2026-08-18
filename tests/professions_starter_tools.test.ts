@@ -338,6 +338,46 @@ describe('the tier-1 starter tools have no route to copper or market value', () 
     expect(meta.copper).toBe(ITEMS.bronze_sickle.sellValue);
   });
 
+  it('the intro seed is fenced like the tools: sellItem pays nothing, marketList refuses, the other seeds stay open', () => {
+    // vale_wheat_seed is the ONE seed q_farm_intro grants (deviation (bg): a
+    // CONSUMABLE under the starter-tools fence, so the per-talk re-grant can
+    // never be laundered for copper through the counter or the World
+    // Market). Both pipes exercised behaviorally, plus the negative arm the
+    // "vale_wheat_seed ALONE carries the fence" comment in items.ts promises:
+    // the bought seeds carry neither flag and sell for their sellValue.
+    const { sim, pid, meta } = simAtGiver('q_prof_intro');
+    const vendor = findNpc(sim, 'trader_wilkes');
+    teleport(sim, sim.entities.get(pid) as AnyEntity, vendor.pos.x, vendor.pos.z);
+    meta.copper = 0;
+    sim.addItem('vale_wheat_seed', 1, pid);
+    sellItem(sim.ctx, 'vale_wheat_seed', 1, pid);
+    expect(sim.countItem('vale_wheat_seed', pid), 'the seed was sold').toBe(1);
+    expect(meta.copper, 'the seed minted copper').toBe(0);
+    // A bought seed sells (the vendor path itself works), so the refusal
+    // above is the flag and nothing else.
+    sim.addItem('brook_carrot_seed', 1, pid);
+    sellItem(sim.ctx, 'brook_carrot_seed', 1, pid);
+    expect(sim.countItem('brook_carrot_seed', pid)).toBe(0);
+    expect(meta.copper).toBe(ITEMS.brook_carrot_seed.sellValue);
+    // The World Market refuses the fenced seed and lists a bought one.
+    const merchant = findNpc(sim, 'the_merchant');
+    teleport(sim, sim.entities.get(pid) as AnyEntity, merchant.pos.x, merchant.pos.z);
+    const before = sim.events.length;
+    sim.marketList('vale_wheat_seed', 1, 10, pid);
+    expect(sim.countItem('vale_wheat_seed', pid), 'the seed left the bags').toBe(1);
+    expect(
+      sim.events.slice(before).some((e) => e.type === 'error' && /cannot be listed/.test(e.text)),
+      'the market refusal names the fence',
+    ).toBe(true);
+    sim.addItem('brook_carrot_seed', 1, pid);
+    sim.marketList('brook_carrot_seed', 1, 10, pid);
+    expect(sim.countItem('brook_carrot_seed', pid), 'a bought seed lists').toBe(0);
+    for (const itemId of ['brook_carrot_seed', 'marsh_rice_seed', 'bog_beet_seed']) {
+      expect(ITEMS[itemId].noVendorSell ?? false, `${itemId} must stay sellable`).toBe(false);
+      expect(ITEMS[itemId].noMarketList ?? false, `${itemId} must stay listable`).toBe(false);
+    }
+  });
+
   // NOT a noVendorSell pin: junkSellableSlot gates on quality === 'poor' first,
   // and every tier-1 tool is 'common', so this stays green with the flag
   // removed. What it does pin is that a granted tool never becomes junk-quality,
