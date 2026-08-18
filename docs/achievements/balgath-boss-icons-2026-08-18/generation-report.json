@@ -4,10 +4,7 @@
   "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
   "styleContract": "woc-item-icon-v1",
   "model": "gpt-image-2 (image edit)",
-  "references": [
-    "public/ui/items/fenshadow_maul.webp",
-    "public/ui/items/marshlight_hauberk.webp"
-  ],
+  "references": ["public/ui/items/fenshadow_maul.webp", "public/ui/items/marshlight_hauberk.webp"],
   "referenceRoles": "house style, lighting, material and composition only; subject identity from the item definition",
   "masterSize": "1024x1024 generated, normalized to a reviewed 512x512 sRGB master before conversion",
   "processing": "npm run assets:items (128px sRGB WebP, q82); masters retained in ignored staging, not committed",
