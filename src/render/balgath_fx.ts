@@ -37,13 +37,50 @@ import {
 // exactly wrong here: every ring animates its OWN opacity, and a shared material would
 // make the newest ring's fade drive every older ring on screen. Short-lived, per-instance
 // animated effects own their material and dispose it on retire.
-function fxMaterial(color: number): THREE.MeshBasicMaterial {
+function fxMaterial(color: number, alphaMap?: THREE.Texture): THREE.MeshBasicMaterial {
   return new THREE.MeshBasicMaterial({
     color,
     transparent: true,
     depthWrite: false,
     opacity: 0,
+    alphaMap,
   });
+}
+
+// A radial falloff, white at the centre to nothing at the rim, used as an alpha
+// map by the two effects that are supposed to be LIGHT or STAIN rather than a
+// hard-bordered shape. Rendered without it, both read as a flat vinyl decal
+// stuck to the fen: real light has no edge, and neither does a shock-crushed
+// patch of ground. The shockwave RINGS deliberately keep their crisp edge; a
+// telegraph is actionable information and wants to be legible, not pretty.
+//
+// Built once and shared forever: it is one 128px greyscale canvas, it never
+// animates (only the per-instance material opacity does), and the module-level
+// cache means the whole effect layer costs a single upload.
+let softDiscTex: THREE.CanvasTexture | null = null;
+function softDisc(): THREE.CanvasTexture {
+  if (softDiscTex) return softDiscTex;
+  const size = 128;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+  const mid = size / 2;
+  const grad = ctx.createRadialGradient(mid, mid, 0, mid, mid, mid);
+  // Held near full out to 55% before it falls away, so the effect keeps a solid
+  // readable core and spends its falloff on the outer half.
+  grad.addColorStop(0, 'rgba(255,255,255,1)');
+  grad.addColorStop(0.55, 'rgba(255,255,255,0.92)');
+  grad.addColorStop(0.82, 'rgba(255,255,255,0.4)');
+  grad.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, size, size);
+  softDiscTex = new THREE.CanvasTexture(canvas);
+  // Clamp, not the repeat default: a repeating alpha map tiles the falloff and
+  // rings the disc with a bright seam at the UV edge.
+  softDiscTex.wrapS = THREE.ClampToEdgeWrapping;
+  softDiscTex.wrapT = THREE.ClampToEdgeWrapping;
+  return softDiscTex;
 }
 
 // Silt grey-brown for the shockwave, fenlight teal for anything the eye touches: the
@@ -113,7 +150,7 @@ export class BalgathFx {
     if (!this.eyePool) {
       const geo = new THREE.CircleGeometry(BALGATH_EYE_POOL_RADIUS, 40);
       geo.rotateX(-Math.PI / 2);
-      const mat = fxMaterial(FENLIGHT);
+      const mat = fxMaterial(FENLIGHT, softDisc());
       this.eyePool = new THREE.Mesh(geo, mat);
       this.eyePool.renderOrder = 2;
       this.eyePoolMat = mat;
@@ -141,7 +178,7 @@ export class BalgathFx {
     if (this.craters.length >= MAX_ACTIVE_CRATERS) this.retireCrater(0);
     const geo = new THREE.CircleGeometry(radius * 0.55, 32);
     geo.rotateX(-Math.PI / 2);
-    const mat = fxMaterial(SILT_DEEP);
+    const mat = fxMaterial(SILT_DEEP, softDisc());
     const mesh = new THREE.Mesh(geo, mat);
     mesh.position.set(x, this.groundHeightAt(x, z) + 0.04, z);
     mesh.renderOrder = 1;
