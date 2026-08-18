@@ -40,6 +40,7 @@ import { hunterPetFerocityDamageMultiplier } from '../combat/hunter_shared';
 import { isMobSpellResisted } from '../combat/spell_resist';
 import { MOBS } from '../data';
 import { pctValue } from '../entity';
+import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import { isTrivialTo } from '../mob/targeting';
 import { findPlayerPath, PLAYER_BODY_RADIUS } from '../pathfind';
 import { scheduleProjectile } from '../projectile_travel';
@@ -130,7 +131,13 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
   if (!travelling) pullNearbyMobs(ctx, pet);
 
   let target = pet.aggroTargetId !== null ? (ctx.entities.get(pet.aggroTargetId) ?? null) : null;
-  if (target && (target.dead || !ctx.isHostileTo(pet, target) || !petCanSeeTarget(pet, target)))
+  if (
+    target &&
+    (target.dead ||
+      !ctx.isHostileTo(pet, target) ||
+      !petCanSeeTarget(pet, target) ||
+      petQuestGateBlocksTarget(ctx, pet, target))
+  )
     target = null;
   // Both arms are the same rule: stop fighting something the owner has left behind.
   // Out of leash range they walked away from it; mounted they rode away from it.
@@ -164,9 +171,10 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
         pet.petTauntTimer <= 0 &&
         (pet.petAutoTaunt || pet.petManualTauntPending)
       ) {
-        ctx.applyTaunt(pet, target);
-        pet.petManualTauntPending = false;
-        pet.petTauntTimer = PET_GROWL_INTERVAL;
+        if (ctx.applyTaunt(pet, target)) {
+          pet.petManualTauntPending = false;
+          pet.petTauntTimer = PET_GROWL_INTERVAL;
+        }
       }
       // Water Elemental: auto-cast Water Jet on cooldown when the owner armed its
       // autocast (right-click), the same idiom as the Growl autocast above. The jet
@@ -235,6 +243,7 @@ function updateWaterJetChannel(ctx: SimContext, pet: Entity): boolean {
     !target ||
     target.dead ||
     !ctx.isHostileTo(pet, target) ||
+    petQuestGateBlocksTarget(ctx, pet, target) ||
     !petCanSeeTarget(pet, target) ||
     dist2d(pet.pos, target.pos) > range;
   if (canceled) {
@@ -615,6 +624,7 @@ export function petPickTarget(ctx: SimContext, pet: Entity, owner: Entity): Enti
   // callback's squared d2 to avoid a units mismatch silently changing the radius.
   ctx.grid.forEachInRadius(pet.pos.x, pet.pos.z, PET_ASSIST_RANGE, (m) => {
     if (m.id === pet.id || m.dead || !ctx.isHostileTo(pet, m)) return;
+    if (petQuestGateBlocksTarget(ctx, pet, m)) return;
     if (!petCanSeeTarget(pet, m)) return;
     const engagingUs =
       m.kind === 'mob' && (m.aggroTargetId === owner.id || m.aggroTargetId === pet.id);
@@ -641,6 +651,10 @@ export function petPickTarget(ctx: SimContext, pet: Entity, owner: Entity): Enti
     }
   });
   return best;
+}
+
+function petQuestGateBlocksTarget(ctx: SimContext, pet: Entity, target: Entity): boolean {
+  return target.kind === 'mob' && questGateBlocksAggro(ctx.players, target, pet);
 }
 
 // Stealth detection scales off a BASE RADIUS, not off how far the observer can be

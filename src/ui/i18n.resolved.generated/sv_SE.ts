@@ -961,17 +961,17 @@ export const sv_SE: EnTranslations = {
     "lastkeepMap": {
       "title": "{keep}: {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "Källarvalven",
+        "state": "Paradvåningen",
+        "residence": "Bostadsvåningen",
+        "tower": "Vakttornet"
       }
     },
     "dawnholdMap": {
       "title": "{keep}: {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "Trädgårdsvåningen",
+        "solar": "Solkammaren"
       }
     },
     "compass": {
@@ -4847,6 +4847,7 @@ export const sv_SE: EnTranslations = {
       "mageEleJet": "Vattenstråle har en egen knapp på djurraden: klicka på den för att låsa en kylande stråle på en fiende, eller högerklicka på den (håll intryckt på mobil) för att låta elementaren avfyra den på egen hand så snart den är redo.",
       "formsHeading": "Formskiftning",
       "formsNote": "En druid slåss genom att byta form. De flesta av druidens förmågor hör till en enda form, så formen du befinner dig i avgör vad du kan kasta, och att skifta kostar lite mana. Du kan skifta in eller ut ur strid, så ofta du vill.",
+      "formsAutoUnshift": "A heal or a damaging spell cast while shifted shifts you out for you. Leaving a shape that way is free and does not spend your global cooldown, so an instant spell goes off the moment you press it. Shifting back in is an ordinary ability, and still costs mana and your global cooldown.",
       "formsMoonwing": "En Månlund-druid får en form till, Månugglaform, besvärjarformen en Balans-druid strider i. Det är den enda djurformen som behåller dina besvärjelser, och din trollstav fungerar bara i den eller i din vanliga besvärjarform.",
       "formLine": {
         "form_bear": "Tankformen: en tjock hud, Raseri i stället för mana, och extra hot så att fiender fortsätter slå på dig.",
@@ -7270,6 +7271,7 @@ export const sv_SE: EnTranslations = {
       "shopMarksRequired": "Du behöver {marks} Fördjupningsmärken för att köpa {name}.",
       "shopSealPremiumOnly": "Detta sigill ger vika endast för en mästares hand. Endast Premium-insatsen kan öppna det.",
       "passageSealed": "Passagen är förseglad.",
+      "enemiesRemain": "Besegra de återstående fienderna först.",
       "moveCloserPassage": "Gå närmare passagen.",
       "moveCloserChest": "Gå närmare kistan.",
       "moveCloserReliquary": "Gå närmare relikvariet.",
@@ -10081,7 +10083,7 @@ export const sv_SE: EnTranslations = {
       },
       "fear": {
         "name": "Plåga",
-        "description": "Slår skräck i fienden och får den att huka sig i upp till 8 sek. All skada bryter effekten."
+        "description": "Slår skräck i fienden och får den att huka sig i upp till 5 sek. Skada som sammanlagt motsvarar 8% av målets maximala hälsa bryter effekten."
       },
       "searing_pain": {
         "name": "Sveda",
@@ -10327,7 +10329,7 @@ export const sv_SE: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Märker en fiende i 12 sek, vilket lagrar 20% av skadan du och dina odöda vållar. Kasta igen för att detonera märket. Om det märkta målet dör exploderar det inom 6 meter och skapar 1 Själfragment."
+        "description": "Märker en fiende i 15 sek, vilket lagrar 20% av skadan du och dina odöda vållar. Kasta igen för att detonera märket. Om det märkta målet dör exploderar det inom 6 yards och skapar 1 Själfragment."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10426,8 +10428,8 @@ export const sv_SE: EnTranslations = {
         "description": "Anta månugglaform och stärk besvärjelser tills du skiftar tillbaka. Kasta igen för att återgå till normal form. (Balanssignatur)"
       },
       "feral_charge": {
-        "name": "Vild rusning",
-        "description": "Rusa mot en fiende och rota den i 1 sek. 8-25 m räckvidd. (Vildhetssignatur)"
+        "name": "Urvåg",
+        "description": "Släpp lös en urvåg. I Vargform ökar er energiregenerering med 100% i 10 sek. I Bruinform får ni omedelbart 50 raseri. (Vildhetssignatur)"
       },
       "swiftmend": {
         "name": "Snabb läkning",
@@ -10683,7 +10685,7 @@ export const sv_SE: EnTranslations = {
       },
       "evocation": {
         "name": "Eterbrunn",
-        "description": "Restaura mana rápidamente. (magikertalang)"
+        "description": "Kanalisera i 6 sek.: varje sekund återställer ni 100 mana och bygger upp 8 besvärjelsekraft. Bonusen staplas under kanaliseringen och varar i 15 sek. (magikertalang)"
       },
       "flurry_of_knives": {
         "name": "Knivstorm",
@@ -10711,11 +10713,11 @@ export const sv_SE: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Skräckyl",
-        "description": "Skrämmer fiender i närheten i upp till 3 sek. Skada kan bryta effekten. (häxmästartalang)"
+        "description": "Skrämmer fiender i närheten i upp till 5 sek. Skada som sammanlagt motsvarar 8% av målets maximala hälsa bryter deras rädsla. (häxmästartalang)"
       },
       "ice_block": {
         "name": "Kall kista",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sek. (magikertalang)"
+        "description": "Innesluter er i fast is i 8 sek. och gör er immuna mot all skada. Tar bort befintliga vanliga skadliga effekter och förhindrar att nya vanliga kontrolleffekter tillämpas. Kan användas medan ni är bedövade eller förvandlade. Ni kan inte agera medan ni är inneslutna. Kasta igen för att avbryta. (magiker)"
       },
       "inner_focus": {
         "name": "Stillat sinne",
@@ -10807,7 +10809,7 @@ export const sv_SE: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Rusande sinne",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sek. (magikertalang)"
+        "description": "Gör er nästa besvärjelse med kasttid omedelbar. Varar i 60 sek. (magikertalang)"
       },
       "psychic_scream": {
         "name": "Psykiskt skrik",
@@ -12480,7 +12482,7 @@ export const sv_SE: EnTranslations = {
         "name": "Orörd klo"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Bukett från Dawnholds trädgård"
       },
       "vale_wheat_seed": {
         "name": "Vale Wheat Seed"
@@ -13443,6 +13445,15 @@ export const sv_SE: EnTranslations = {
       },
       "training_dummy": {
         "name": "Träningsdocka"
+      },
+      "friendly_player_dummy": {
+        "name": "Vänlig spelardocka"
+      },
+      "normal_boss_dummy": {
+        "name": "Normal bossdocka"
+      },
+      "heroic_boss_dummy": {
+        "name": "Heroisk bossdocka"
       },
       "ridge_stalker": {
         "name": "Åssmygare"
@@ -17137,9 +17148,9 @@ export const sv_SE: EnTranslations = {
         "leaveText": "Du drar igen fästningsporten och kliver ut i Drakländernas vind."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Dawnholds slott",
+        "enterText": "Du kliver in i de varma, blomsterdoftande salarna i Dawnholds slott.",
+        "leaveText": "Du kliver ut igen på trädgårdens solbelysta gräsmatta."
       },
       "drowned_temple": {
         "name": "Det dränkta templet",

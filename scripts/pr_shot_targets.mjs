@@ -9604,6 +9604,113 @@ export const TARGETS = [
     },
   },
   {
+    // Auto-unshift (src/sim/combat/form_auto_unshift.ts). The change is a
+    // behavior, so the evidence is a MOMENT, not a window: the same press, one
+    // second in. Before the change the druid is still wearing the beast and the
+    // refusal is on screen; after it, the beast is gone and the heal is casting.
+    // Both variants press through sim.castAbility rather than a bar slot,
+    // because the bear bar is a separate page a player has to populate and the
+    // shot must not depend on that.
+    key: 'druid-auto-unshift',
+    label: 'Wildmend pressed while shapeshifted: the form falls away and the cast runs',
+    when: ['sim/combat/form_auto_unshift', 'ui/hud/action_bar/action_bar_view.ts'],
+    variants: [
+      {
+        key: 'bruin-form-desktop',
+        charClass: 'druid',
+        charName: 'Thornmane',
+        formAbility: 'bear_form',
+        beforeLoad: lowGraphicsSeed,
+      },
+      {
+        key: 'fleet-form-desktop',
+        charClass: 'druid',
+        charName: 'Thornmane',
+        formAbility: 'travel_form',
+        beforeLoad: lowGraphicsSeed,
+      },
+      {
+        key: 'bruin-form-mobile',
+        charClass: 'druid',
+        charName: 'Thornmane',
+        formAbility: 'bear_form',
+        mobile: true,
+        beforeLoad: lowGraphicsSeed,
+      },
+    ],
+    async capture(page, variant) {
+      await page.waitForFunction(
+        () => {
+          const loading = document.querySelector('#loading-screen');
+          const ui = document.querySelector('#ui');
+          return (
+            document.body.classList.contains('game-active') &&
+            !!ui &&
+            getComputedStyle(ui).display !== 'none' &&
+            !!loading &&
+            !loading.classList.contains('visible')
+          );
+        },
+        { timeout: 90000, polling: 200 },
+      );
+      // Stage: high enough to know every rank of the kit, full mana, self-targeted
+      // so the friendly heal has somewhere to land, then shift through the REAL
+      // cast so the form aura, the parked mana, and the beast model are all live.
+      const staged = await page.evaluate((formAbility) => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const sim = window.__game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        sim.setPlayerLevel?.(20, player.id);
+        player.resource = player.maxResource;
+        sim.targetEntity?.(player.id, player.id);
+        sim.castAbility?.(formAbility, player.id);
+        return { ok: true };
+      }, variant.formAbility);
+      if (!staged.ok) throw new Error(staged.reason);
+      // Wait for the shift to resolve AND its global cooldown to lapse. Polled,
+      // not slept: the offline sim advances on animation frames, so the seconds
+      // just after game-active run at whatever rate the loading tail leaves, and
+      // a press inside the GCD returns silently (classic spams that button), which
+      // would shoot a frame where nothing happened at all.
+      await page.waitForFunction(
+        () => {
+          const player = window.__game?.sim?.player;
+          return (
+            !!player &&
+            player.auras.some((a) => a.kind.startsWith('form_')) &&
+            player.gcdRemaining <= 0 &&
+            player.castingAbility === null
+          );
+        },
+        { timeout: 30000, polling: 100 },
+      );
+      // The press, with an explicit pid (an omitted one is a silent no-op here,
+      // which shoots a frame where nothing happened at all). Read the event
+      // buffer's LENGTH around the call rather than draining it: draining would
+      // eat the very refusal the before-arm frame is supposed to show, and both
+      // arms must run this same recipe.
+      const pressed = await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        const before = sim.events?.length ?? 0;
+        sim.castAbility?.('healing_touch', player.id);
+        return {
+          ok: (sim.events?.length ?? 0) > before || player.castingAbility !== null,
+          reason: 'the press reached no gate: no cast started and the sim said nothing',
+        };
+      });
+      if (!pressed.ok) throw new Error(pressed.reason);
+      // One second in: long enough for the refusal to be painted on the old
+      // behavior, and short enough that the 2.5s heal is still visibly casting
+      // on the new one.
+      await wait(1000);
+      return { clip: '#ui' };
+    },
+  },
+  {
     key: 'swing-timer',
     label: 'Swing-timer bar sweep for a Wolf Form druid on a slow staff',
     when: ['src/ui/swing_timer', 'src/sim/combat/form_swing'],
@@ -9733,6 +9840,85 @@ export const TARGETS = [
           },
         });
       }
+      return {};
+    },
+  },
+  {
+    key: 'practice-row',
+    label: 'The Highwatch practice row seen from the approach',
+    when: ['practice_dummies'],
+    // Deliberately branch-agnostic: the camera is staged from FIXED world
+    // coordinates and the target frame locks onto whichever dummy stands
+    // furthest west (the heroic end of the row; engine east is minus x), so the
+    // same recipe runs unchanged on the base commit (one training dummy) and on
+    // the branch (four). That is what makes the before and after frames
+    // comparable instead of two differently-composed shots.
+    variants: [
+      { key: 'desktop', charClass: 'priest', charName: 'Wardmara', beforeLoad: lowGraphicsSeed },
+      {
+        key: 'mobile',
+        charClass: 'priest',
+        charName: 'Wardmara',
+        mobile: true,
+        beforeLoad: lowGraphicsSeed,
+      },
+    ],
+    async capture(page) {
+      await page.waitForFunction(
+        () => {
+          const loading = document.querySelector('#loading-screen');
+          const ui = document.querySelector('#ui');
+          return (
+            document.body.classList.contains('game-active') &&
+            !!ui &&
+            getComputedStyle(ui).display !== 'none' &&
+            !!loading &&
+            !loading.classList.contains('visible')
+          );
+        },
+        { timeout: 90000, polling: 200 },
+      );
+      const staged = await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        sim.setPlayerLevel?.(20, player.id);
+        // The anchor is the shipped training dummy, which exists on both sides
+        // of this comparison; its ground height is what the viewpoint stands on.
+        const anchor = [...sim.entities.values()].find(
+          (e) => e.templateId === 'training_dummy' && !e.dead && e.name !== 'Healing Dummy',
+        );
+        if (!anchor) return { ok: false, reason: 'the training dummy is unavailable' };
+        // Ten yards south of the row, looking north up the hill, so all of it is
+        // in frame with room for the nameplates.
+        player.pos.x = anchor.pos.x + 1;
+        player.pos.y = anchor.pos.y;
+        player.pos.z = anchor.pos.z - 10;
+        player.prevPos = { ...player.pos };
+        player.facing = 0;
+        player.prevFacing = 0;
+        sim.rebucket?.(player);
+        const westmost = [...sim.entities.values()]
+          .filter((e) => e.kind === 'mob' && !e.dead && e.name.toLowerCase().includes('dummy'))
+          .sort((a, b) => b.pos.x - a.pos.x)[0];
+        if (westmost) sim.targetEntity(westmost.id, player.id);
+        return { ok: true, targetName: westmost?.name ?? '', dummies: westmost ? 1 : 0 };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      // Moving across zones can start the streaming overlay on the next frame.
+      await wait(1500);
+      await page.waitForFunction(
+        () => !document.querySelector('#loading-screen')?.classList.contains('visible'),
+        { timeout: 90000, polling: 200 },
+      );
+      // The dummy body is lazy-preloaded (manifest.ts mob_training_dummy): the
+      // fetch only starts once one is in view, so a short settle races it and
+      // the mobile frame shot an empty hillside. This settle is sized for that
+      // round trip under SwiftShader, not for the HUD.
+      await wait(15000);
       return {};
     },
   },

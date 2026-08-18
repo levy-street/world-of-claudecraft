@@ -620,6 +620,33 @@ describe('auto_attack startAutoAttack: ranged engage must not pre-aggro (issue #
     expect(mob.aggroTargetId).toBe(p.id);
   });
 
+  it('melee engage against a quest-gated egg seeds no threat or combat for a non-quester', () => {
+    const { sim, p } = makeSim('warrior', 12);
+    const egg = createMob(sim.nextId++, MOBS.spider_egg, 10, {
+      x: p.pos.x,
+      y: p.pos.y,
+      z: p.pos.z + 2,
+    });
+    egg.hostile = true;
+    egg.aiState = 'idle';
+    sim.addEntity(egg);
+    p.facing = Math.atan2(egg.pos.x - p.pos.x, egg.pos.z - p.pos.z);
+    sim.targetEntity(egg.id, p.id);
+
+    startAutoAttack(sim.ctx, p.id);
+    expect(p.autoAttack).toBe(false);
+    expect(egg.aiState).toBe('idle');
+    expect(egg.aggroTargetId).toBeNull();
+    expect(egg.threat.size).toBe(0);
+    expect(p.inCombat).toBe(false);
+    expect(egg.inCombat).toBe(false);
+
+    for (let i = 0; i < 20 * 3; i++) sim.tick();
+    expect(egg.threat.size).toBe(0);
+    expect(p.inCombat).toBe(false);
+    expect(egg.inCombat).toBe(false);
+  });
+
   it('a wand caster still aggros the mob when the shot actually lands', () => {
     const { sim, p } = makeSim('mage', 12);
     const mob = spawnDummy(sim, p, 12, 25);

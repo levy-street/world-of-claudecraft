@@ -21,7 +21,12 @@
 @layer hud-mobile {
   /* Endfield-inspired glass chrome tokens: dark-fantasy gold-brown palette kept,
      but permanent chrome (action row, quick-access rail, the More tray) reads as
-     translucent glass over the world instead of solid opaque wood/stone panels. */
+     translucent glass over the world instead of solid opaque wood/stone panels.
+     The blur itself is never actually painted here: tokens.css's whole-rule
+     backdrop-filter removal fires on body.mobile-touch unconditionally (a
+     compositor-cost cut, not a 3D-tier one), so every backdrop-filter reference
+     below always resolves to none in the browser and this token's `8px` is the
+     translucent-panel look on a device that would otherwise pay the blur cost. */
   body.mobile-touch {
     --mobile-glass-bg: linear-gradient(160deg, #201d13b8, #0b0a08c7);
     --mobile-glass-border: #cba43d8c;

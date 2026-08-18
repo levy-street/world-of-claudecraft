@@ -365,9 +365,10 @@ export function sanitizeBankState(
       boundCraftedRecipeIdOnLoad(rawMarker, localDrops, 'bank');
       const craftedRecipeId = rawMarker.craftedRecipeId as string | undefined;
       // The shared tamper ceiling (bags.ts instancedCountCap, also applied to
-      // the carried-inventory hydration in Sim.addPlayer): merge-legal stack
-      // cap for a counted instanced slot, 1 for a charge-bearing payload, and
-      // an unknown item def stays dormant uncapped data like the plain arm.
+      // the carried-inventory hydration in Sim.addPlayer): stack cap for a
+      // counted instanced slot (including an in-place locked whole stack), 1
+      // for a charge-bearing payload, and an unknown item def stays dormant
+      // uncapped data like the plain arm.
       const instanceCap = instancedCountCap(
         ITEMS[e.itemId],
         hasInstance ? (e.instance as InvSlot['instance']) : undefined,

@@ -111,7 +111,6 @@ import type {
   SkinCatalog,
 } from '../sim/types';
 import {
-  type AbilityEffect,
   ALL_CLASSES,
   type AuraKind,
   CONSUME_DURATION,
@@ -121,7 +120,6 @@ import {
   dist2d,
   ENCHANT_CAST_ID,
   type Entity,
-  FAERIE_FIRE_ARMOR_PCT,
   FISHING_CAST_ID,
   GATHER_CAST_ID,
   type ItemDef,
@@ -131,7 +129,6 @@ import {
   MILESTONES,
   SALVAGE_CAST_ID,
   type SimEvent,
-  SUNDER_ARMOR_PCT_PER_STACK,
   TICK_RATE,
   TOOL_RECHARGE_CAST_ID,
   virtualLevel,
@@ -149,13 +146,13 @@ import {
   type OverheadEmoteId,
   type PartyInfo,
 } from '../world_api';
+import type { AbilityScaling } from './ability_damage';
 import {
-  type AbilityScaling,
-  abilityDamageBonus,
-  abilityPrimaryEffect,
-  abilitySecondaryEffect,
-} from './ability_damage';
-import { abilityDisplayDescription, formatAbilityNumber } from './ability_description';
+  abilityDisplayDescription,
+  abilityEffectAuraInput,
+  abilityEffectText,
+  formatAbilityNumber,
+} from './ability_description';
 import { abilityDisplayName, abilityDisplayNameFromSource } from './ability_display_name';
 import { ArenaWindow } from './arena_window';
 import { auraDisplayNameForHud, auraDisplayNameFromSource } from './aura_display_name';
@@ -5474,7 +5471,7 @@ export class Hud {
           rangedPower: p.rangedPower,
           attackPower: p.attackPower,
         };
-        return abilityDisplayDescription(res, abilityEffectText(res, scaling), scaling);
+        return abilityDisplayDescription(res, abilityEffectText(res, scaling), scaling, a);
       },
       effectHtml: (aura) => this.auraEffectTooltipHtml(aura),
       escapeHtml: esc,
@@ -6551,13 +6548,16 @@ export class Hud {
         }),
       );
     html += `<div class="tt-stat">${castLine.map(esc).join(' &nbsp; ')}</div>`;
-    html += `<div class="tt-desc">${esc(abilityDisplayDescription(res, damageText, scaling, this.sim.talents.spec))}</div>`;
+    html += `<div class="tt-desc">${esc(abilityDisplayDescription(res, damageText, scaling, undefined, this.sim.talents.spec))}</div>`;
     // Resolved buff/aura effect line(s). Reads the RESOLVED effect value, so a buff's
     // tooltip reflects rank AND talents that strengthen it (Improved Devotion Aura /
     // Aspect of the Hawk / Fortitude via buffPct) - which the static description can't.
     for (const eff of res.effects) {
       if (res.def.tooltipOmitEffectLines) break;
-      if (eff.type === 'selfBuff' || eff.type === 'buffTarget') {
+      const resolvedAuraEffect = abilityEffectAuraInput(eff);
+      if (resolvedAuraEffect) {
+        html += this.auraEffectTooltipHtml(resolvedAuraEffect);
+      } else if (eff.type === 'selfBuff' || eff.type === 'buffTarget') {
         // Pass the ability id so the effect line can resolve its damage school
         // (the {school} placeholder in the thorns/dot/absorb summaries).
         html += this.auraEffectTooltipHtml({
@@ -9011,16 +9011,7 @@ export class Hud {
     this.playerFramePainter.paint(unitFrameViewInto(this.playerFrameBuffer, playerFrame));
     this.updateLowHealthVignette(p.hp, p.maxHp);
     this.updateLowResource(p);
-    // Hoisted behind the spec check (review 3050): the thread count walks the
-    // whole entity map times each entity's auras, and for the eight other
-    // classes it produced a discarded 0 every frame.
-    const isAffliction = this.sim.talentSpec === 'affliction';
-    const fateThreads = isAffliction ? afflictionFateThreadCount(sim.entities.values(), p.id) : 0;
-    this.doomMeter.paint({
-      affliction: isAffliction,
-      auras: p.auras,
-      fateThreads,
-    });
+    const fateThreads = this.updateWarlockDoomMeter(p);
 
     // Energy users keep combo points on the character frame. Class resources
     // with their own identity are rendered by dedicated HUD overlays below.
@@ -9450,12 +9441,12 @@ export class Hud {
     this.renderStanceBar();
     this.flushPendingProcAuraNotes();
     if (this.spellbookWindow.isOpen) this.spellbookWindow.tickOpen();
-    this.actionBarPainter.paint(this.actionBarView.tick(actionBarWorld));
+    if (!this.isMobileLayout())
+      this.actionBarPainter.paint(this.actionBarView.tick(actionBarWorld));
 
-    // mobile action ring: the paged touch combat cluster, gated on the touch-mode
-    // signal so desktop skips the tick+paint entirely (both the view and painter
-    // stay undefined when the ring DOM never got built, e.g. an older cached
-    // template). Reuses the exact same world snapshot as the desktop bar.
+    // mobile action ring: the paged touch cluster replacing the bar above
+    // (view/painter stay undefined if the ring DOM never got built, e.g. an
+    // older cached template). Reuses the desktop bar's world snapshot.
     if (this.isMobileLayout() && this.mobileActionRingView && this.mobileActionRingPainter) {
       const mobileActionPage = this.currentMobileActionPage();
       const mobileActionSourceSlotCount = this.mobileActionSourceSlotCount();
@@ -9764,6 +9755,13 @@ export class Hud {
     if (slowHud && this.calendarWindow.isOpen) this.calendarWindow.refreshIfChanged();
     if (slowHud) this.updateMailIndicator();
     if (slowHud) this.updateMarketIndicator();
+  }
+
+  private updateWarlockDoomMeter(p: Entity): number {
+    const affliction = this.sim.talentSpec === 'affliction';
+    const fateThreads = affliction ? afflictionFateThreadCount(p.auras, p.id) : 0;
+    this.doomMeter.paint({ affliction, auras: p.auras, fateThreads });
+    return fateThreads;
   }
 
   private initMailIndicator(): void {
@@ -16733,12 +16731,21 @@ export class Hud {
    *  here with the real preview thunks. `includeCharFamily` is forwarded
    *  verbatim; see its doc on `PreviewPrewarmPlanDeps`. */
   private postEntryPreviewPrewarmUnits(includeCharFamily: boolean): PreviewPrewarmUnit[] {
+    // Login trims the schedule to what the local player hits unprompted or
+    // cheaply: skins only for a fixed rig (a modular body ignores the char-skin
+    // setSkin), no card poses (rare, lazy on Player Card open), headshots only
+    // (body is Inspect-only, lazy on open). See each flag's doc on the plan.
+    const self = this.sim.player;
+    const looksModular = !isMechWearer(self) && modularLookFor(self) != null;
     return buildPostEntryPreviewPrewarmUnits<(typeof CARD_POSES)[number]>({
       playerClass: this.sim.cfg.playerClass,
       allClasses: ALL_CLASSES,
       skinCount,
       cardPoses: CARD_POSES,
       includeCharFamily,
+      warmCharSkins: !looksModular,
+      includeCardPoses: false,
+      portraitFramings: ['headshot'],
       renderCharShell: () => {
         if (!this.charPreview) this.charWindow.render();
       },
@@ -19358,114 +19365,6 @@ export function abilityRequirementLines(
       default:
         return t('abilityUi.tooltip.selfOnly');
     }
-  });
-}
-
-// Builds the `$d` damage string for an ability tooltip. When `scaling` (the live
-// character's Spell Power / Ranged AP / Attack Power) is given, the BASE damage is
-// shown with the scaling contribution called out as a "(+N)" suffix, e.g.
-// "66 to 74 (+29)", so a caster sees both the base and exactly what their Spell
-// Power adds, and watches it climb as gear changes.
-export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling): string {
-  // " (+N)" callout for the scaling contribution (Spell Power / Attack Power),
-  // omitted when there is none. Punctuation + formatted number only (no words).
-  const suffix = (eff: AbilityEffect) => {
-    const b = scaling ? abilityDamageBonus(res, eff, scaling) : 0;
-    return b > 0
-      ? ` ${t('hudChrome.abilityScaling.bonus', { value: formatAbilityNumber(b) })}`
-      : '';
-  };
-  // The pickers live in ability_damage.ts so the consistency guard test shares
-  // them; this function only formats the picked effect.
-  const primary = abilityPrimaryEffect(res);
-  if (primary) {
-    switch (primary.type) {
-      case 'directDamage':
-      case 'aoeDamage':
-      case 'aoeHeal':
-      case 'chainHeal':
-      case 'aoeRoot':
-      case 'chainDamage':
-      case 'groundAoE':
-      case 'drainTick':
-      case 'valkyrsCalling':
-        return abilityAmountRange(primary.min, primary.max) + suffix(primary);
-      case 'hunterStampede':
-        return abilityAmountRange(primary.min, primary.max) + suffix(primary);
-      case 'heal':
-        return primary.casterMaxHpPct === undefined
-          ? abilityAmountRange(primary.min, primary.max) + suffix(primary)
-          : formatAbilityNumber(primary.casterMaxHpPct * 100);
-      case 'repositionToAim':
-        return primary.landingAoe
-          ? abilityAmountRange(primary.landingAoe.min, primary.landingAoe.max)
-          : '';
-      case 'consumeAura':
-        if (primary.deal) {
-          return abilityAmountRange(primary.deal.min, primary.deal.max) + suffix(primary);
-        }
-        if (primary.heal) {
-          return abilityAmountRange(primary.heal.min, primary.heal.max) + suffix(primary);
-        }
-        return '';
-      case 'weaponDamage':
-      case 'weaponStrike':
-        return formatAbilityNumber(primary.bonus);
-      case 'sunder':
-        return formatAbilityNumber(
-          SUNDER_ARMOR_PCT_PER_STACK *
-            (primary.full || primary.perCombo ? primary.maxStacks : 1) *
-            100,
-        );
-      case 'faerieFire':
-        return formatAbilityNumber(FAERIE_FIRE_ARMOR_PCT * 100);
-      case 'lifeTap':
-        return formatAbilityNumber(primary.hp);
-      case 'finisherDamage':
-        return (
-          t('abilityUi.tooltip.finisherDamage', {
-            base: formatAbilityNumber(primary.base),
-            perCombo: formatAbilityNumber(primary.perCombo),
-          }) + suffix(primary)
-        );
-      case 'hunterBloodhook':
-        return (
-          formatAbilityNumber(primary.bleedTotal * (primary.damageMult ?? 1)) + suffix(primary)
-        );
-    }
-  }
-
-  const secondary = abilitySecondaryEffect(res);
-  if (!secondary) return '';
-  switch (secondary.type) {
-    case 'dot':
-      if (secondary.perCombo !== undefined) {
-        return (
-          t('abilityUi.tooltip.finisherDamage', {
-            base: formatAbilityNumber(secondary.total),
-            perCombo: formatAbilityNumber(secondary.perCombo),
-          }) + suffix(secondary)
-        );
-      }
-      return formatAbilityNumber(secondary.total) + suffix(secondary);
-    case 'hot':
-      return formatAbilityNumber(secondary.total) + suffix(secondary);
-    case 'absorb':
-      return secondary.casterMaxHpPct === undefined
-        ? formatAbilityNumber(secondary.amount) + suffix(secondary)
-        : formatAbilityNumber(secondary.casterMaxHpPct * 100);
-    case 'imbue':
-      return formatAbilityNumber(secondary.bonus);
-    default:
-      return '';
-  }
-}
-
-function abilityAmountRange(min: number, max: number): string {
-  if (min === max) return formatAbilityNumber(min);
-  return t('abilityUi.tooltip.damageRange', {
-    min: formatAbilityNumber(min),
-    max: formatAbilityNumber(max),
   });
 }
 

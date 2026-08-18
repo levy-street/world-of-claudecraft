@@ -1197,6 +1197,59 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     expect(e.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(true);
   });
 
+  it('Unstuck accepts a wall-trapped fighter while movement input is still held', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    const e = forceIntoBgWallTrap(sim, match, pid);
+    const meta = must(sim.meta(pid), 'player meta');
+    meta.moveInput.forward = true;
+
+    expect(sim.unstuck(pid)).toBe(true);
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'started', pid }),
+    );
+
+    const events: SimEvent[] = [];
+    for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) events.push(...sim.tick());
+
+    expect(events).toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'completed', pid }),
+    );
+    expect(sim.bgMatchFor(pid)).toBe(match);
+    expect(inGraveyard(sim, match, pid, 0)).toBe(true);
+    expectClearPlayerPosition(sim, e);
+    expect(meta.pendingUnstuck).toBeNull();
+  });
+
+  it('Unstuck still refuses ordinary battleground movement input outside wall traps', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    const e = must(sim.entities.get(pid), 'entity');
+    const meta = must(sim.meta(pid), 'player meta');
+    e.vx = 0;
+    e.vy = 0;
+    e.vz = 0;
+    e.onGround = true;
+    e.jumping = false;
+    meta.moveInput.forward = true;
+    expectClearPlayerPosition(sim, e);
+
+    expect(sim.unstuck(pid)).toBe(false);
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'unstuck',
+        phase: 'blocked',
+        reason: 'moving',
+        pid,
+      }),
+    );
+    expect(sim.meta(pid)?.pendingUnstuck).toBeNull();
+  });
+
   it('combat still cancels a battleground wall-trap Unstuck countdown', () => {
     const { sim, pids } = tenInQueue();
     const match = must(sim.bgMatchFor(pids[0]), 'bg match');

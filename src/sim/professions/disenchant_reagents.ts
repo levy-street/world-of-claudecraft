@@ -4,8 +4,9 @@
 // its armor class (cloth/leather/mail); a weapon keys off its family (a melee
 // bucket yields steel, a caster/ranged haft-or-stock bucket yields timber).
 // Below `rare` (and for a piece with no typed material, e.g. jewelry, which
-// carries no armor class) there is no typed secondary, so the caller grants
-// only the universal ladder material and stays byte-identical to the
+// carries no armor class, or a held offhand, whose kind is neither armor nor
+// weapon) there is no typed secondary, so the caller grants only the
+// universal ladder material and stays byte-identical to the
 // pre-typed-secondary yield.
 //
 // A pure `src/sim` leaf: no SimContext, no rng, no clock, no DOM/Three/render/
@@ -61,9 +62,11 @@ export const TIMBER_WEAPON_TYPES: ReadonlySet<string> = new Set([
 /** The typed secondary material one disenchant of `def` yields, or null when
  *  the piece is below `rare` (sub-rare disenchants stay byte-identical to today,
  *  yielding only the universal ladder material) or carries no typed material
- *  (jewelry has no armor class, so no weave). Armor keys off armorType; a weapon
- *  keys off its family via weaponTypeForItem, an unclassified weapon falling
- *  back to resonant_steel. Pure: no rng, no side effects. */
+ *  (jewelry has no armor class, so no weave; a held offhand is neither armor
+ *  nor weapon, so it never reaches either branch below). Armor keys off
+ *  armorType; a weapon keys off its family via weaponTypeForItem, an
+ *  unclassified weapon falling back to resonant_steel. Pure: no rng, no side
+ *  effects. */
 export function typedSecondaryFor(def: ItemDef): string | null {
   if (def.quality !== 'rare' && def.quality !== 'epic' && def.quality !== 'legendary') return null;
   if (def.kind === 'armor') {

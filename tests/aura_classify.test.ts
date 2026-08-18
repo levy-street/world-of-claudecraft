@@ -30,7 +30,6 @@ const HARMFUL: AuraKind[] = [
   'cost_tax',
   'heal_absorb',
   'critvuln',
-  'affliction_fate_threads',
 ];
 
 const HELPFUL: AuraKind[] = [
@@ -59,6 +58,7 @@ const HELPFUL: AuraKind[] = [
   'buff_spi',
   'buff_scale',
   'buff_jump',
+  'affliction_fate_threads',
 ];
 
 describe('isDebuffAura', () => {

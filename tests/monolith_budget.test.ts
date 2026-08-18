@@ -51,12 +51,19 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned 19432 -> 19433: the release/v0.38.0 merge into this branch
     // grew hud.ts by one line at HEAD without updating the row, so the gate
     // arrived red. Same exact-count, zero-slack intent as above.
+    // Raised 19433 -> 19442 (+9) for the login preview-prewarm trim: thin-consumer
+    // wiring (a `looksModular` read plus three flag args to the pure
+    // buildPostEntryPreviewPrewarmUnits) that has no clean branch-owned
+    // extraction, landing on upstream's zero-slack re-pin. Maintainer decision,
+    // exact merged count: any further growth reds again.
     // Re-pinned 19433 -> 19488 when the castle branch merged main: the castle
     // additions are thin-consumer wiring to extracted modules (the two
     // LastKeepMapPainter declarations and the two walk-in map branches on the
     // clearMapHitState pattern), riding on main's zero-slack pin. Exact merged
     // count: any further growth reds again.
-    ceiling: 19488,
+    // Re-pinned to the moved-base v0.39 wrapper merge output. The combined tree
+    // lands below both branch ceilings, so keep the exact merged count.
+    ceiling: 19387,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -77,26 +84,73 @@ const MONOLITHS: MonolithRow[] = [
     // (zone_prewarm_templates_core.ts, the buildFormVisual fold), and the merged
     // file lands between the two pins, so the ceiling is the exact merged count
     // per the ratchet's rule: any further growth reds again.
+    // Lowered again after extracting the delve interior build-cache scheduling
+    // (the position-keyed rebuild/retire decision plus the async build loop)
+    // into src/render/delve_interior_tracker.ts.
+    // Extracted the shadow-depth material factory into
+    // src/render/prewarm_depth_material.ts so the self-spirit prewarm could add
+    // Renderer.warmSelfSpirit + the per-frame observe without growing the file.
+    // Merging the delve tracker and prewarm work plus the release-owned
+    // weapon-skin identity repair leaves renderer.ts at the exact count below;
+    // any further growth reds again.
+    // Raised +38 for the vfx.mount-programs manifest entry (#2571: mounts had
+    // ZERO prewarm coverage, so the first sighting of any mount could freeze a
+    // live frame, worse on hardware without KHR_parallel_shader_compile where
+    // the runtime fallback gate is a no-op). The rig-building logic itself was
+    // extracted to src/render/mount_prewarm.ts; this was the coordinator's
+    // unavoidable thin-wiring cost (the manifest entry, its group bookkeeping,
+    // and cleanup/hide registration).
+    // Raised a further +34 (13792 -> 13826) in review response: the group-
+    // staging/scene-bookkeeping logic that first cut left inline here (and
+    // that inline copy is what hid the bug, an `Object3D.add` reparent that
+    // silently detached every staged rig from its group) moved into
+    // mount_prewarm.ts's stageMountPrewarmVisual too, but run() also grew
+    // real synchronous-desktop-path work plus an honest progress() (the
+    // entry's run() was previously a no-op that still reported 'completed'),
+    // and resumeUnits now links the shadow-depth program half it was missing.
+    // What remains is the manifest entry itself, the shared
+    // mountPrewarmGroup/mountPrewarmWarmed variables, and cleanup/hide
+    // registration: exactly the seam this ratchet exists to bound, not grow
+    // unchecked.
+    // Merging PR #3447 onto the corrected PR #3446 v0.39 wrapper leaves the
+    // renderer below this bound; any further growth reds again.
     // Lowered again by the castle branch's interior_light_rig.ts extraction;
     // after merging main the merged file lands below both prior pins, so the
     // ceiling is the exact merged count.
-    // This branch lowered separately after extracting the delve module interior
-    // scheduler into src/render/delve_interior_scheduler.ts. Merging
-    // release/v0.39.0 (the castle and icon-art batch): the two extractions
-    // compose, the merged file lands below both prior pins (branch 13725,
-    // release 13689), so the ceiling is the exact merged count per the
-    // ratchet's rule: any further growth reds again.
-    ceiling: 13660,
+    // Merging approved PRs #3425 and #3447 into the moved-base v0.39 wrapper
+    // keeps the delve tracker and mount prewarm extractions while preserving
+    // the wrapper's later renderer wiring, so the ceiling is the exact
+    // resolved count.
+    // PR #3468 changes the shadow-depth prewarm material contract, but this
+    // wrapper's combined renderer remains at the same resolved count.
+    // Merging release/v0.39.0 at 7b45fdb9a9 into the farming branch: the
+    // release's DelveInteriorTracker supersedes the branch's
+    // delve_interior_scheduler extraction (reconciled toward the release
+    // mechanism; the scheduler module and its suite are deleted), and the
+    // branch's farm-patches wiring rides on top of the release count, so the
+    // ceiling is the exact merged count per the ratchet's merge rule: any
+    // further growth reds again. Relative to the release pin 13744 this is a
+    // +30 re-pin funded by discarding the branch's own scheduler extraction:
+    // a maintainer decision prepared for feature review (the hud row's raise
+    // precedent), recorded in docs/farming/state.md deviation (an).
+    ceiling: 13774,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
     file: 'src/sim/sim.ts',
+    // Held at the release pin after the nineteenth-absorb heal moved the mech
+    // chroma unlock/unequip pair to src/sim/mech_chroma_ownership.ts: the file
+    // sits at 12657, so this IS the post-extraction size plus a small margin
+    // (the plus-margin style the ratchet uses for sim.ts).
     ceiling: 12660,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
     file: 'src/main.ts',
-    ceiling: 11490,
+    // Lowered after moving the Cloudflare Turnstile cluster whole to
+    // src/game/turnstile_gate.ts (the nineteenth-absorb heal: the release's
+    // npc-look composition grew main.ts past the old pin).
+    ceiling: 11460,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -126,7 +180,7 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/render/foliage.ts',
-    ceiling: 4150,
+    ceiling: 4147,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

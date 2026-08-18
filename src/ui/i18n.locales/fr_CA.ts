@@ -187,6 +187,7 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
     "Vous ne pouvez pas entrer dans une excavation pendant un match d'arène.",
   'sim.delve.duringDuel': 'Vous ne pouvez pas entrer dans une excavation pendant un duel.',
   'sim.delve.graveFalters': 'Le rite funèbre vacille.',
+  'sim.delve.enemiesRemain': "Réglez d'abord le sort des ennemis restants.",
   'sim.delve.mechanismOpen':
     "Un mécanisme s'ouvre dans un déclic tout près. Un passage s'ouvre vers le nord : trouvez le portail de sortie devant vous.",
   'sim.delve.notInDelve': "Vous n'êtes pas dans une excavation.",

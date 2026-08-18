@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  exp_dawnhold_castle: {
+    name: 'Cánh Cửa Mở Trong Vườn',
+    desc: 'Ghé thăm Lâu Đài Dawnhold và dạo quanh những sảnh vườn ngập nắng.',
+  },
+  exp_the_last_keep: {
+    name: 'Những Sảnh Đường Tĩnh Lặng',
+    desc: 'Bước qua cánh cửa Pháo Đài Cuối Cùng và dạo bước qua những sảnh đường tĩnh lặng.',
+  },
   pvp_bg_first_capture: {
     name: 'Cờ Trong Tay',
     desc: 'Chiếm một lá cờ tại Cánh Đồng Trũng Gai.',

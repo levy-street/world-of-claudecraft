@@ -25,14 +25,14 @@ function setup(): { sim: Sim; player: Entity; mob: Entity } {
   return { sim, player, mob };
 }
 
-describe('Abyssal Gag level 8 control choice', () => {
+describe('Improved Abyssal Gag level 8 control choice', () => {
   it('unlocks the Warlock interrupt two levels early', () => {
     const untalented = new Sim({ seed: 7, playerClass: 'warlock', autoEquip: true });
     untalented.setPlayerLevel(8);
     expect(untalented.resolvedAbility('spell_lock')).toBeNull();
 
     const { sim } = setup();
-    expect(sim.resolvedAbility('spell_lock')).not.toBeNull();
+    expect(sim.resolvedAbility('spell_lock')?.def.name).toBe('Abyssal Gag');
   });
 
   it('interrupts the current cast and applies both school lockout and full silence for 4 sec', () => {

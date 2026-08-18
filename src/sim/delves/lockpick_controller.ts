@@ -61,7 +61,12 @@ import {
   dist2d,
   type Entity,
 } from '../types';
-import { delveBonusMarksFor, grantDelveRewards, openDelveSurfaceExit } from './runs';
+import {
+  delveBonusMarksFor,
+  delveHasLiveMobs,
+  grantDelveRewards,
+  openDelveSurfaceExit,
+} from './runs';
 
 /** Resolve the locked-chest object + run for an acting player, with all the
  * proximity/eligibility guards. Returns null (after emitting an error) on any
@@ -109,6 +114,10 @@ export function lockpickEngage(ctx: SimContext, objectId: number, ante: Ante, pi
   }
   if (state.looted) {
     ctx.emit({ type: 'log', text: 'The chest is empty.', color: '#aaa', pid: r.meta.entityId });
+    return;
+  }
+  if (delveHasLiveMobs(ctx, run)) {
+    ctx.error(r.meta.entityId, 'Clear the remaining enemies first.');
     return;
   }
   // attemptAvailable only ever goes false alongside `looted` (lockpickSucceed
@@ -375,6 +384,18 @@ function lockpickSucceed(
   session: LockSession,
   solved: boolean,
 ): void {
+  if (delveHasLiveMobs(ctx, run)) {
+    session.state = 'ABANDONED';
+    run.lockpick = null;
+    ctx.error(session.ownerId, 'Clear the remaining enemies first.');
+    ctx.emit({
+      type: 'lockpickEnd',
+      sessionId: session.sessionId,
+      outcome: 'abandoned',
+      pid: session.ownerId,
+    });
+    return;
+  }
   session.state = 'SUCCESS';
   const state = run.objectState[session.chestId];
   const obj = ctx.entities.get(session.chestId);

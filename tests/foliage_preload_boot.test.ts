@@ -18,7 +18,7 @@ const mocks = vi.hoisted(() => ({
   loadGltf: vi.fn(),
   releaseGltf: vi.fn(),
   releaseTexture: vi.fn(),
-  loadHdr: vi.fn(() => new Promise(() => {})),
+  loadKtx2Texture: vi.fn(() => new Promise(() => {})),
   loadTexture: vi.fn(() => new Promise(() => {})),
 }));
 
@@ -30,7 +30,7 @@ vi.mock('../src/render/assets/loader', () => ({
   loadGltf: mocks.loadGltf,
   releaseGltf: mocks.releaseGltf,
   releaseTexture: mocks.releaseTexture,
-  loadHdr: mocks.loadHdr,
+  loadKtx2Texture: mocks.loadKtx2Texture,
   loadTexture: mocks.loadTexture,
 }));
 

@@ -961,17 +961,17 @@ export const tr_TR: EnTranslations = {
     "lastkeepMap": {
       "title": "{keep}: {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "Mahzen",
+        "state": "Tören Katı",
+        "residence": "Yaşam Katı",
+        "tower": "Gözetleme Kulesi"
       }
     },
     "dawnholdMap": {
       "title": "{keep}: {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "Bahçe Katı",
+        "solar": "Güneş Odası"
       }
     },
     "compass": {
@@ -4847,6 +4847,7 @@ export const tr_TR: EnTranslations = {
       "mageEleJet": "Su Jeti, evcil çubuğunda kendi düğmesiyle durur: bir düşmana dondurucu bir ışın kilitlemek için tıkla, ya da elementalin onu hazır olduğunda kendiliğinden ateşlemesine izin vermek için sağ tıkla (mobilde dokunup basılı tut).",
       "formsHeading": "Şekil Değiştirme",
       "formsNote": "Bir druid, şekil değiştirerek dövüşür. Çoğu druid yeteneği tek bir şekle aittir, bu yüzden içinde bulunduğun form neyi büyüleyebileceğine karar verir, ve şekil değiştirmek biraz mana harcar. İstediğin kadar sık, dövüş içinde ya da dışında şekil değiştirebilirsin.",
+      "formsAutoUnshift": "A heal or a damaging spell cast while shifted shifts you out for you. Leaving a shape that way is free and does not spend your global cooldown, so an instant spell goes off the moment you press it. Shifting back in is an ordinary ability, and still costs mana and your global cooldown.",
       "formsMoonwing": "Bir Denge druidi bir şekil daha kazanır: Aykuşu Formu, bu uzmanlığın dövüştüğü büyücü şeklidir. Büyülerini koruyan tek hayvan şeklidir ve değneğin yalnızca bu şekilde ya da normal büyücü şeklinde çalışır.",
       "formLine": {
         "form_bear": "Tank şekli: ağır bir post, mana yerine öfke ve düşmanların sana vurmaya devam etmesini sağlayan ekstra tehdit.",
@@ -7270,6 +7271,7 @@ export const tr_TR: EnTranslations = {
       "shopMarksRequired": "{name} satın almak için {marks} Delve Nişanına ihtiyacın var.",
       "shopSealPremiumOnly": "Bu mühür yalnızca bir ustanın eline boyun eğer. Onu yalnızca Premium bedel açabilir.",
       "passageSealed": "Geçit mühürlü.",
+      "enemiesRemain": "Önce kalan düşmanları temizle.",
       "moveCloserPassage": "Geçide yaklaş.",
       "moveCloserChest": "Sandığa yaklaş.",
       "moveCloserReliquary": "Emanetliğe yaklaş.",
@@ -10081,7 +10083,7 @@ export const tr_TR: EnTranslations = {
       },
       "fear": {
         "name": "Dehşet",
-        "description": "Düşmanın yüreğine korku salar ve onu 8 saniyeye kadar sinmiş bırakır. Herhangi bir hasar etkiyi bozar."
+        "description": "Düşmanın yüreğine korku salar ve onu 5 saniyeye kadar sinmiş bırakır. Hedefin azami sağlığının toplam %8'i kadar hasar etkiyi bozar."
       },
       "searing_pain": {
         "name": "Dağlama",
@@ -10327,7 +10329,7 @@ export const tr_TR: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Kemik Damgası",
-        "description": "Bir düşmanı 12 sn süreyle işaretler, senin ve ölülerinin verdiği hasarın %20'sini depolar. Patlatmak için yeniden oku. İşaretli düşman ölürse, 6 yarda içinde patlar ve 1 Ruh Parçası oluşturur."
+        "description": "Bir düşmanı 15 sn süreyle işaretler, senin ve ölülerinin verdiği hasarın %20'sini depolar. Patlatmak için yeniden oku. İşaretli düşman ölürse, 6 yarda içinde patlar ve 1 Ruh Parçası oluşturur."
       },
       "unholy_command": {
         "name": "Kutsuz Emir",
@@ -10426,8 +10428,8 @@ export const tr_TR: EnTranslations = {
         "description": "Aykuşu formuna girer, geri dönene kadar büyü yapmayı güçlendirirsin. Normal forma dönmek için tekrar kullan. (Denge imzası)"
       },
       "feral_charge": {
-        "name": "Yabani Hücum",
-        "description": "Bir düşmana hücum eder ve onu 1 sn köklersin. 8-25 m menzil. (Yabanilik imzası)"
+        "name": "İlkel Dalga",
+        "description": "İlkel bir dalga salar. Kurt Formunda Enerji yenilenmesi 10 sn boyunca %100 artar. Bruin Formunda anında 50 Öfke üretir. (Yabanilik imzası)"
       },
       "swiftmend": {
         "name": "Hızlı İyileştirme",
@@ -10683,7 +10685,7 @@ export const tr_TR: EnTranslations = {
       },
       "evocation": {
         "name": "Eter Kuyusu",
-        "description": "Restaura manayı rápidamente. (büyücü yeteneği)"
+        "description": "6 sn kanalize eder: her saniye 100 mana yeniler ve 8 Büyü Gücü biriktirir. Bonus kanalize ederken birikir ve 15 sn sürer. (büyücü yeteneği)"
       },
       "flurry_of_knives": {
         "name": "Bıçak Sağanağı",
@@ -10711,11 +10713,11 @@ export const tr_TR: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Dehşet Uluması",
-        "description": "Yakındaki düşmanları 3 sn. kadar korkutur. Hasar etkiyi bozabilir. (Karabüyücü yeteneği)"
+        "description": "Yakındaki düşmanları 5 sn. kadar korkutur. Hedefin azami sağlığının toplam %8'i kadar hasar korkusunu bozar. (Karabüyücü yeteneği)"
       },
       "ice_block": {
         "name": "Soğuk Tabut",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sn. (büyücü yeteneği)"
+        "description": "Seni 8 sn boyunca katı buzun içine hapseder ve tüm hasara karşı bağışıklık kazandırır. Mevcut sıradan zararlı etkileri kaldırır ve yeni sıradan kontrol etkilerinin uygulanmasını engeller. Sersemlemiş veya polimorfa uğramışken kullanılabilir. Hapsedilmişken eylemde bulunamazsın. İptal etmek için tekrar kullan. (büyücü)"
       },
       "inner_focus": {
         "name": "Dingin Zihin",
@@ -10807,7 +10809,7 @@ export const tr_TR: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Atılgan Zihin",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sn. (büyücü yeteneği)"
+        "description": "Büyü yapma süresi olan bir sonraki büyünü anında kullanılır hâle getirir. 60 sn sürer. (büyücü yeteneği)"
       },
       "psychic_scream": {
         "name": "Psişik Çığlık",
@@ -12480,7 +12482,7 @@ export const tr_TR: EnTranslations = {
         "name": "Kusursuz Pençe"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Dawnhold Bahçesi Çiçek Demeti"
       },
       "vale_wheat_seed": {
         "name": "Vale Wheat Seed"
@@ -13443,6 +13445,15 @@ export const tr_TR: EnTranslations = {
       },
       "training_dummy": {
         "name": "Antrenman Kuklası"
+      },
+      "friendly_player_dummy": {
+        "name": "Dost Oyuncu Kuklası"
+      },
+      "normal_boss_dummy": {
+        "name": "Normal Boss Kuklası"
+      },
+      "heroic_boss_dummy": {
+        "name": "Kahramanca Boss Kuklası"
       },
       "ridge_stalker": {
         "name": "Sırt Sinsisi"
@@ -17137,9 +17148,9 @@ export const tr_TR: EnTranslations = {
         "leaveText": "Kale kapısını arkandan kapatıp Ejder Topraklarının rüzgarına geri dönüyorsun."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Dawnhold Şatosu",
+        "enterText": "Dawnhold Şatosu'nun sıcak, çiçek kokulu salonlarına adım atıyorsun.",
+        "leaveText": "Güneşli bahçe çimenliğine geri süzülüyorsun."
       },
       "drowned_temple": {
         "name": "Boğulmuş Tapınak",

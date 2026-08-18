@@ -25,6 +25,7 @@
 | Phase 8 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-17 | 2026-08-17; branch fix/farming-phase-08-qa, merged --no-ff as 327fa964bd; 0 BLOCKING across eight lanes plus a verification round; one behavior fix (deviation (be), the simplified-mode journal entry), the (bd) ledger corrected, the guide controls row landed, the coverage gaps pinned, 24/24 mutants killed |
 | Phase 9 (world presence, go-live) | DONE 2026-08-17 | fix/farming-phase-09-world-presence (seventeenth absorb 89030e4e0f first; merge hash in the Phase 9 notes tail) | 0 BLOCKING across architecture, cross-platform, frontend, content-obligations, test-coverage, privacy-security, and qa-checklist; every SHOULD-FIX taken in-phase or ledgered as (bg) to (bm); 14/14 mutants killed; farming is LIVE |
 | Phase 9 QA | done (FAIL on the go-live acceptance, scope stop; PASS on the phase's own diff) | 2026-08-17 | 2026-08-17; branch fix/farming-phase-09-qa (eighteenth absorb f4ca0f7000 first), merged --no-ff as 59584a800a; 1 BLOCKING scope finding (no player verb plants or harvests, state.md (bn)) plus the tier 3/4 seed bootstrap hole ((bo)); 0 BLOCKING on the diff across nine lanes; the live-client journey walked 39 checkpoints green at all four hubs; 16 of 16 new mutants killed; the QA fixes are the husk-trade focus restore, the stale-comment sweep, and the coverage pins |
+| Nineteenth absorb (v0.39.0 round-2 sync mid-phase) | DONE 2026-08-18 | fix/farming-sync-v0.39.0-r2, merge b9a025b2ee of tip 7b45fdb9a9 (285 commits, 833 files, 168-file intersection: the D22 triple-digit rule) | Heals: sim.ts and main.ts extraction (mech_chroma_ownership, turnstile_gate), renderer merge-rule re-pin 13774, classified golden re-record (+4 farmers vs the release recordings, +3 practice dummies in farming_session, zero unexplained leaves), terrain fixture re-record (29 pad-local points), Eastbrook and portrait re-mints per (al), lock-rig rebuild for the whole-slot rework; 4-lane release-merge audit + cross-platform APPROVE + architecture clean move + qa-checklist; details in the notes block |
 | Phase 10 (celebrations) | not started | | |
 | Phase 10 QA | not started | | |
 | Phase 11 (well-fed food) | not started | | |
@@ -2253,6 +2254,89 @@ browser regression 19 files 129 green, typecheck and the env/server/bot
 builds green, shell rc 0.
 MERGE: fix/farming-phase-09-qa merged --no-ff into feature/farming-plan as
 59584a800a (QA tip 224fdd138c; the branch deleted).
+
+### Nineteenth absorb (2026-08-18, the v0.39.0 round-2 sync mid-phase, local-only per D22)
+Branch fix/farming-sync-v0.39.0-r2 off feature/farming-plan at e3dd4a07cf.
+origin/release/v0.39.0 had moved f42a67f341 to 7b45fdb9a9 (285 commits, 833
+files, 168-file intersection with the farming footprint), firing the D22
+triple-digit sync-mid-phase rule, so the absorb ran on the phase-06b template
+BEFORE Phase 9b. Headline release systems absorbed: the druid shapeshift
+auto-unshift (verified NO interaction with the plant cast: plantCrop sets the
+farming cast directly and never enters castAbility; the classifier triggers
+only on healing/damaging defs), the three Highwatch practice dummies (39 yd
+from the nearest thornpeak bed, inert, no pad), the ogre body replacement, the
+battleground unstuck scoping, the v0.39.0 release-tier locale fill (the five
+non-Latin farming overlays survived byte-identical; the 660 Latin farming rows
+stay pending by design for the release-time fill), the whole-slot item-lock
+rework, the mech chroma permanence rework, and the DelveInteriorTracker.
+Commits: b9a025b2ee merge (81 conflicts: 67 goldens + terrain fixture +
+pending.ts + the (al) evidence pair + 4 Eastbrook JSONs taken release-side for
+re-mint; renderer.ts, monolith_budget, pr_shot_targets both-blocks stitch, and
+the two Eastbrook pin suites hand-resolved hunk by hunk); 09ff58d75b the
+monolith heals (mech chroma pair moved whole to the release's own
+src/sim/mech_chroma_ownership.ts, Sim satisfying the structural host,
+ItemUseResult moved and re-exported; the Cloudflare Turnstile cluster moved
+whole to src/game/turnstile_gate.ts; main.ts ceiling lowered 11490 to 11460);
+the renderer import fixup + pending.ts regen; 5c5a08a47c the (al) portrait
+re-mint (fingerprint-only, registry re-pointed, --verify-only clean);
+bc203c0ae3 the Eastbrook seal re-mint (remint_polish_provenance.mjs, three pin
+literals from its printed values); the terrain fixture re-record (the release
+grew the corpus +76 points; 29 moved points vs the release recording, ALL
+inside the four farmer pad footprints, max 4.31 yd under Hollis, zero
+outside); 9a16a50e16 the classified golden re-record (67 release recordings
+gain the branch's +4 farmer statics: uniform id shift incl. summonedIds,
+attemptParticipantIds, personalFor, crafter, chargeTargetId,
+wardChannels.objectId, paired digests, and the culling wolf's known idle-lane
+re-seed; farming_session gains the release's +3 dummies with rng lanes and
+draw counts byte-identical: the second (am) firing, md5 19c49aac to 9a8fefa5);
+the lock-rig rebuild (grant-around-a-lock, assertions unchanged); c60e733e7e
+the direct mech_chroma_ownership unit suite (architecture review should-fix).
+Reviews: 4-lane release-merge-audit Workflow 4/4 first try (overlaps CLEAN
+with byte-level ort-reproduction proof over 21 auto-merged files and a
+hand-resolution audit of pr_shot_targets; surfaces CLEAN, zero added
+routes/commands, setItemLocked fully re-bound, db-mock premise verified
+empty); premises FINDINGS all taken (this docs sweep); headline CLEAN);
+cross-platform-sync APPROVE (0 BLOCKING; farming facet untouched, fplot delta
+semantics verified both directions, all six farm events handled);
+architecture-reviewer clean move (0 BLOCKING; move fidelity
+statement-for-statement, purity, draw order, SimContext contract all pass).
+Release-hygiene flags recorded, not fixed (release-owned): the server's
+unequipAccountMechChroma hand-rolls the extracted rule (equivalent today via
+setPlayerSkin lockstep; drift hazard if the rule grows); the new self-wire
+field sm is unpinned in the snapshots registry (omit-when-default base field;
+absent-means-zero decode is correct only while it stays OFF the maybe() gate);
+three release-authored db-mock tests omit lease exports they never reach.
+The ONLINE_WORLD_LAYOUT_VERSION farming go-live question joined the state.md
+OPEN list. Count baselines HELD: 202/215, IWorld 329 = 88 + 241, facets 34,
+delta keys 87. Monolith after heals: hud 19382/19387, renderer 13774/13774,
+main 11454/11460, sim 12657/12660, server/game 10791/10900.
+QA-checklist verdict READY (0 BLOCKING); its three should-fixes taken: the
+renderer ceiling re-pin annotated as a maintainer decision prepared for
+feature review (funded by discarding the branch scheduler extraction), the
+payment-walk lock arm gained a direct locked-above-unlocked index assertion,
+and the two silently auto-merged third-shape files were eyeballed (the
+src/net/online.ts hunks are the release's own chroma-permanence rework plus
+the sm decode, coherent and cross-platform-approved; tests/architecture.test.ts
+gains the release's foliage_decimation_core RENDER_PURE_CORES row). Honest
+note from the same review: a green parity run over freshly re-recorded
+goldens is circular by construction; the evidence is the machine
+classification, not the green run.
+GATE RECORD: run 1 on the frozen tree 44619e5ab6 (BROWSER_PATH=<playwright
+chromium> GATE_MAX_WORKERS=8 node scripts/gate_select.mjs, mode=full on the
+terrain-fixture broad arm) FAILED at the full vitest step with exactly two
+reds, both the fallback-only census class: the release's npc-looks roster
+(tests/npc_looks.test.ts) demands an authored look for every NpcDef and the
+four farmers still leaned on the villager fallback (healed by authoring four
+distinct rows in the release's own mechanism; validity, distinctness, and
+manifest arms green; portrait manifest byte-identical), and the shard-weight
+coverage floor (tests/ci_shard_partition.test.ts) fell to 94.5 percent
+against the merged tree (healed by re-harvesting through the sanctioned CLI
+from green full-mode upstream run 32190441549, 2851 files). Heal commit
+9c17ac093f (also completes the chroma test's cosmetics literal, a tsc-only
+catch). Run 2 on the frozen tree 9c17ac093f: "[gate:select] PASS: all 12
+steps green (vitest workers: 8)", mode=full, 2881 test files passed / 12
+skipped, browser regression 20 files 131 green, zero FAIL lines, shell rc 0,
+no druid_engines timeout.
 
 ### Phase 10
 (not started)

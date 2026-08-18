@@ -29,6 +29,7 @@ interface StableAuraRecord {
   empowerAbilities: readonly string[] | undefined;
   sourceId: number;
   unbreakableControl: boolean;
+  undispellable: boolean;
   // Presence of a break threshold (Lingering Dread), never the live soak value
   // - that decrements per hit and would churn this cache (see game.ts WireAura.bt).
   breakArmed: boolean;
@@ -55,6 +56,7 @@ interface StableAuraWire {
   emp?: readonly string[];
   src?: number;
   ub?: 1;
+  und?: 1;
   bt?: 1;
 }
 
@@ -109,6 +111,7 @@ function auraMatches(
     sameStringList(record.empowerAbilities, aura.empowerAbilities) &&
     record.sourceId === aura.sourceId &&
     record.unbreakableControl === (aura.unbreakableControl === true) &&
+    record.undispellable === (aura.undispellable === true) &&
     record.breakArmed === (aura.breakThreshold !== undefined) &&
     record.paused === wirePaused &&
     record.permanent === permanent &&
@@ -133,6 +136,7 @@ function auraRecord(aura: Aura, simTime: number, paused: boolean): StableAuraRec
     empowerAbilities: aura.empowerAbilities ? [...aura.empowerAbilities] : undefined,
     sourceId: aura.sourceId,
     unbreakableControl: aura.unbreakableControl === true,
+    undispellable: aura.undispellable === true,
     breakArmed: aura.breakThreshold !== undefined,
     paused: wirePaused,
     permanent: aura.permanent === true,
@@ -160,6 +164,7 @@ function auraWire(record: StableAuraRecord): StableAuraWire {
   if (record.empowerAbilities !== undefined) wire.emp = record.empowerAbilities;
   if (record.sourceId) wire.src = record.sourceId;
   if (record.unbreakableControl) wire.ub = 1;
+  if (record.undispellable) wire.und = 1;
   if (record.breakArmed) wire.bt = 1;
   return wire;
 }

@@ -1,8 +1,11 @@
 // /dev bis: outfit the caller with a deterministic best-in-slot epic set so
-// playtesting at the level cap never starts with a vendor shopping trip. Dev
-// command only (never reachable in production); picks are pure functions of
-// the item table, the player's class, and the selected spec, so repeated runs
-// equip the identical set. Draws no rng.
+// playtesting at the level cap never starts with a vendor shopping trip. Two
+// consumers: the dev-gated /dev bis command, and the friendly practice dummy's
+// reference vitals (mob/practice_dummies.ts), which run at every world
+// construction, production included, so this module is NOT dev-only despite
+// its home. Picks are pure functions of the item table, the player's class,
+// and the selected spec, so repeated runs equip the identical set. Draws no
+// rng.
 //
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random or
 // Date.now (enforced by tests/architecture.test.ts).

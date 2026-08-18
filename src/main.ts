@@ -161,6 +161,12 @@ import {
 import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
 import { shouldClearTargetOnGroundClick } from './game/target_click';
 import {
+  ensureTurnstile,
+  resetTurnstile,
+  TURNSTILE_SITEKEY,
+  turnstileToken,
+} from './game/turnstile_gate';
+import {
   loadingCurtainFadeMs,
   resolveUiEffectsProfile,
   worldEntryGpuSettleCoverMs,
@@ -249,6 +255,7 @@ import {
 } from './render/assets/preload';
 import {
   CharacterPreview,
+  npcLookFor,
   type PreviewAppearance,
   setModularLookProvider,
 } from './render/characters';
@@ -648,54 +655,6 @@ function saveHomepageMusicMuted(muted: boolean): void {
   } catch {
     // Private browsing or storage failures should not block the control.
   }
-}
-
-// --- Cloudflare Turnstile (bot gate on the login/register form) ---------------
-// The site key is injected at build time; when it is empty (local/offline dev or
-// a build without the env var) the widget never renders and the token is '', so
-// the server, which also skips verification without its secret, lets requests
-// through unchanged. The api.js <script> is in index.html.
-const TURNSTILE_SITEKEY = String(import.meta.env.VITE_TURNSTILE_SITEKEY ?? '');
-
-interface TurnstileApi {
-  render: (el: string | HTMLElement, opts: { sitekey: string }) => string;
-  getResponse: (widgetId?: string) => string | undefined;
-  reset: (widgetId?: string) => void;
-}
-let turnstileWidgetId: string | undefined;
-
-function turnstileApi(): TurnstileApi | undefined {
-  return (window as unknown as { turnstile?: TurnstileApi }).turnstile;
-}
-
-// Render the widget once, retrying until the async api.js script is ready. Safe to
-// call repeatedly (idempotent) and a no-op when no site key is configured. The
-// Electron desktop shell never renders it: Cloudflare rejects the app:// origin
-// (widget error 110200), and the server bypasses Turnstile for desktop origins
-// (passesTurnstile in server/turnstile.ts), so a widget here could only wedge
-// the form.
-function ensureTurnstile(): void {
-  if (DESKTOP_APP || !TURNSTILE_SITEKEY || turnstileWidgetId !== undefined) return;
-  const ts = turnstileApi();
-  const el = document.getElementById('cf-turnstile-container');
-  if (!ts || !el) {
-    window.setTimeout(ensureTurnstile, 200);
-    return;
-  }
-  turnstileWidgetId = ts.render(el, { sitekey: TURNSTILE_SITEKEY });
-}
-
-// The current single-use token, or '' when verification is not configured / not
-// yet solved. Tokens are consumed server-side, so reset after each attempt.
-function turnstileToken(): string {
-  const ts = turnstileApi();
-  if (!TURNSTILE_SITEKEY || !ts || turnstileWidgetId === undefined) return '';
-  return ts.getResponse(turnstileWidgetId) ?? '';
-}
-
-function resetTurnstile(): void {
-  const ts = turnstileApi();
-  if (ts && turnstileWidgetId !== undefined) ts.reset(turnstileWidgetId);
 }
 
 function trackMetaPixel(
@@ -1490,7 +1449,13 @@ async function startGame(
     // paperdoll eye toggle), so peers see the owner's choice. Per-entity
     // wire JSON is normalized at compose time (visual build, not per frame):
     // hostile or stale payloads clamp to a valid body.
-    setModularLookProvider((e) => inWorldLookFor(e, armorSetForEntity(e.id === world.playerId)));
+    // Non-players compose too: NPCs resolve authored looks by templateId
+    // (static data on every host; the why lives in characters/npc_looks.ts).
+    setModularLookProvider((e) =>
+      e.kind === 'player'
+        ? inWorldLookFor(e, armorSetForEntity(e.id === world.playerId))
+        : npcLookFor(e.templateId, e.kind),
+    );
     // No helmet re-assert here on purpose. The preference is per CHARACTER
     // now: set from the creator's toggle at creation, changed by the paperdoll
     // eye afterwards, and serialized into that character's own saved state.
@@ -7351,7 +7316,7 @@ function renderClassDetails(
             // A combo-point bleed finisher (rupture, rip): `total` alone is the
             // damage at zero combo points, a state the caster can never reach.
             // Render base plus per-combo-point, the same composition the
-            // finisherDamage arm above and abilityEffectText in the HUD use.
+            // finisherDamage arm above and the shared abilityEffectText formatter use.
             dmgText = t('abilityUi.tooltip.finisherDamage', {
               base: formatClassDetailNumber(secondaryEffect.total),
               perCombo: formatClassDetailNumber(secondaryEffect.perCombo),

@@ -167,10 +167,11 @@ export function grantCopies(
 
 /** Rebuild a persisted exchange-escrow slot (market collection item, mail
  *  attachment): unknown ids stay dormant recoverable data, counts clamp to
- *  what identical-payload merges could legitimately have built (the character
- *  load's instancedCountCap rule), and payloads deep-clone so a loaded book
- *  never aliases the raw save object. `cap` is instancedCountCap(def, instance)
- *  from bags.ts, passed in so this module stays free of the ITEMS table. */
+ *  what identical-payload merges or an in-place whole-stack lock could
+ *  legitimately have built (the character load's instancedCountCap rule), and
+ *  payloads deep-clone so a loaded book never aliases the raw save object.
+ *  `cap` is instancedCountCap(def, instance) from bags.ts, passed in so this
+ *  module stays free of the ITEMS table. */
 export function sanitizeEscrowSlot(raw: InvSlot, cap: number, dropped?: string[]): InvSlot {
   const count = Math.min(Math.max(1, raw.count | 0), cap);
   if (!raw.instance || typeof raw.instance !== 'object') {

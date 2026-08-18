@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  exp_dawnhold_castle: {
+    name: '庭園に開かれた扉',
+    desc: 'ドーンホールド城を訪ね、日差しあふれる庭園の広間を巡ろう。',
+  },
+  exp_the_last_keep: {
+    name: '静寂の広間',
+    desc: '最後の砦の扉をくぐり、静まり返った広間を歩こう。',
+  },
   pvp_bg_first_capture: {
     name: '手中の軍旗',
     desc: 'ソーンホロウ平原で旗を奪う。',

@@ -192,6 +192,9 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       skinCount: (unitId) => (unitId === 'player_hunter' ? 2 : 1),
       cardPoses: ['heroic'],
       includeCharFamily: true,
+      warmCharSkins: true,
+      includeCardPoses: true,
+      portraitFramings: ['headshot', 'body'],
       renderCharShell: () => {
         calls.push('shell');
       },
@@ -253,6 +256,9 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       skinCount: () => 1,
       cardPoses: [],
       includeCharFamily: false,
+      warmCharSkins: false,
+      includeCardPoses: false,
+      portraitFramings: ['headshot'],
       renderCharShell: () => {},
       prewarmCharSkin: () => {},
       prewarmCardPose: () => {},
@@ -291,6 +297,9 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       skinCount: (unitId) => (unitId === 'player_hunter' ? 2 : 1),
       cardPoses: ['heroic'],
       includeCharFamily: false,
+      warmCharSkins: true,
+      includeCardPoses: true,
+      portraitFramings: ['headshot', 'body'],
       renderCharShell: () => {
         calls.push('shell');
       },
@@ -325,5 +334,70 @@ describe('buildPostEntryPreviewPrewarmUnits', () => {
       'portrait:mage:0:body',
     ]);
     expect(calls).not.toContain('shell');
+  });
+
+  const trimDeps = (
+    over: Partial<Parameters<typeof buildPostEntryPreviewPrewarmUnits<string>>[0]>,
+  ) =>
+    buildPostEntryPreviewPrewarmUnits<string>({
+      playerClass: 'hunter',
+      allClasses: ['hunter'],
+      skinCount: () => 2,
+      cardPoses: ['heroic', 'battle'],
+      includeCharFamily: true,
+      warmCharSkins: true,
+      includeCardPoses: true,
+      portraitFramings: ['headshot', 'body'],
+      renderCharShell: () => {},
+      prewarmCharSkin: () => {},
+      prewarmCardPose: () => {},
+      renderPortrait: () => {},
+      ...over,
+    });
+
+  it('WS2: warmCharSkins false drops every char-skin unit, keeps the shell (composed look)', () => {
+    const labels = trimDeps({ warmCharSkins: false }).map((u) => u.label);
+    expect(labels).toContain('preview:char-window');
+    expect(labels.some((l) => l.startsWith('preview:char-skin'))).toBe(false);
+    // warmCharSkins true still emits them (the fixed-rig / legacy arm).
+    const warm = trimDeps({ warmCharSkins: true }).map((u) => u.label);
+    expect(warm.filter((l) => l.startsWith('preview:char-skin'))).toEqual([
+      'preview:char-skin:0',
+      'preview:char-skin:1',
+    ]);
+  });
+
+  it('WS1: includeCardPoses false drops every card-pose unit', () => {
+    const labels = trimDeps({ includeCardPoses: false }).map((u) => u.label);
+    expect(labels.some((l) => l.startsWith('preview:card-pose'))).toBe(false);
+    // true still emits one per pose.
+    const warm = trimDeps({ includeCardPoses: true }).map((u) => u.label);
+    expect(warm.filter((l) => l.startsWith('preview:card-pose'))).toEqual([
+      'preview:card-pose:0',
+      'preview:card-pose:1',
+    ]);
+  });
+
+  it('WS3: portraitFramings gates exactly which framing units are emitted', () => {
+    const headshotOnly = trimDeps({ portraitFramings: ['headshot'] }).map((u) => u.label);
+    expect(headshotOnly).toContain('preview:portrait:hunter:0:headshot');
+    expect(headshotOnly.some((l) => l.endsWith(':body'))).toBe(false);
+    const bodyOnly = trimDeps({ portraitFramings: ['body'] }).map((u) => u.label);
+    expect(bodyOnly).toContain('preview:portrait:hunter:0:body');
+    expect(bodyOnly.some((l) => l.endsWith(':headshot'))).toBe(false);
+  });
+
+  it('the login trim (composed look) warms only shell + headshots, no skins/poses/body', () => {
+    // Mirrors what hud.ts passes for a modern composed-look player at login.
+    const labels = trimDeps({
+      warmCharSkins: false,
+      includeCardPoses: false,
+      portraitFramings: ['headshot'],
+    }).map((u) => u.label);
+    expect(labels).toEqual([
+      'preview:char-window',
+      'preview:portrait:hunter:0:headshot',
+      'preview:portrait:hunter:1:headshot',
+    ]);
   });
 });

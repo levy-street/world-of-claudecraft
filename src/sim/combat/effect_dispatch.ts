@@ -21,6 +21,7 @@ import { logCascadeCast, recordCascadeInitial } from '../dev/cascade_playtest';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
 import { SCRIPTED_INTERRUPTIBLE_CHANNELS } from '../mob/healer_channel';
+import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import {
   activateDivineAscension,
   ascensionImpactKind,
@@ -236,6 +237,7 @@ import {
 import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
 import { applyTemporalHourglass } from './temporal_hourglass';
+import { warlockFearBreakThreshold } from './warlock_fear';
 import { applyBlacktideReturnSpeed } from './warlock_talents';
 import { placeOrRecallUmbralAnchor } from './warlock_utility';
 
@@ -243,10 +245,10 @@ export { SWEEP_MULT } from './area_echo';
 
 const CHARGE_MAX_DURATION = 3; // seconds before a blocked charge gives up
 
-// Fear-family break scaling (G5): a single hit for this fraction of the
-// target's max health always breaks the fear; smaller hits break it with
-// proportional probability (combat/damage.ts). Applies to the fear family
-// only (aoeFear and fearDr incapacitates): plain incapacitates keep the
+// Generic fear-family break scaling (G5): a single hit for this fraction of
+// the target's max health always breaks the fear; smaller hits break it with
+// proportional probability (combat/damage.ts). Harrow and Dread Chorus use
+// the deterministic Warlock budget instead. Plain incapacitates keep the
 // classic break-on-any-damage rule.
 export const FEAR_BREAK_CHANCE_SCALE = 0.1;
 
@@ -1588,6 +1590,7 @@ export function runEffects(
           if (!ctx.hasLineOfSight(p, hostile)) continue;
           const duration = ctx.diminishedCrowdControlDuration(p, hostile, 'fear', eff.duration);
           if (duration === null) continue;
+          const warlockBreakThreshold = warlockFearBreakThreshold(ability.id, hostile.maxHp);
           feared++;
           ctx.applyAura(hostile, {
             id: 'fear_incap',
@@ -1599,9 +1602,13 @@ export function runEffects(
             sourceId: p.id,
             school: ability.school,
             breaksOnDamage: true,
-            breakChanceScale: FEAR_BREAK_CHANCE_SCALE,
+            breakChanceScale:
+              warlockBreakThreshold === undefined ? FEAR_BREAK_CHANCE_SCALE : undefined,
             breakThreshold:
-              fearBreakPct > 0 ? Math.max(1, Math.round(hostile.maxHp * fearBreakPct)) : undefined,
+              warlockBreakThreshold ??
+              (fearBreakPct > 0
+                ? Math.max(1, Math.round(hostile.maxHp * fearBreakPct))
+                : undefined),
           });
           // The shout above (fx:'nova') is the cast moment, once, at the
           // caster; this is the landed-fear moment, once per creature
@@ -1614,8 +1621,8 @@ export function runEffects(
             fx: 'fearImpact',
             ability: ability.id,
           });
-          ctx.enterCombat(p, hostile);
-          if (hostile.kind === 'mob' && hostile.hostile) {
+          const enteredCombat = ctx.enterCombat(p, hostile);
+          if (enteredCombat && hostile.kind === 'mob' && hostile.hostile) {
             addThreat(hostile, p.id, 10 * ctx.threatMod(p, ability.school));
           }
         }
@@ -2080,6 +2087,7 @@ export function runEffects(
           ? ctx.diminishedCrowdControlDuration(p, target, 'fear', eff.duration)
           : eff.duration;
         if (remaining === null) break;
+        const warlockBreakThreshold = warlockFearBreakThreshold(ability.id, target.maxHp);
         ctx.applyAura(target, {
           id: `${ability.id}_incap`,
           name: ability.name,
@@ -2090,9 +2098,14 @@ export function runEffects(
           sourceId: p.id,
           school: ability.school,
           breaksOnDamage: true,
-          // Fear-family members (fearDr: Harrow, Morrowlash) get the graded
-          // break; plain incapacitates (Eye Jab, Wyvern Sting) insta-break.
-          breakChanceScale: ability.fearDr ? FEAR_BREAK_CHANCE_SCALE : undefined,
+          // Generic fear-family members get the graded chance. Harrow uses
+          // the deterministic Warlock budget, while plain incapacitates
+          // (Eye Jab, Wyvern Sting) insta-break.
+          breakChanceScale:
+            ability.fearDr && warlockBreakThreshold === undefined
+              ? FEAR_BREAK_CHANCE_SCALE
+              : undefined,
+          breakThreshold: warlockBreakThreshold,
         });
         // Fear-flavored incapacitates (Harrow) sound at the target, distinct
         // from plain stuns/incapacitates (Eye Jab, Wyvern Sting), which have
@@ -2794,8 +2807,8 @@ export function runEffects(
               school: ability.school,
             });
           }
-          ctx.enterCombat(p, m);
-          if (m.kind === 'mob' && m.hostile)
+          const enteredCombat = ctx.enterCombat(p, m);
+          if (enteredCombat && m.kind === 'mob' && m.hostile)
             addThreat(m, p.id, 10 * ctx.threatMod(p, ability.school));
         }
         break;
@@ -2825,8 +2838,8 @@ export function runEffects(
             sourceId: p.id,
             school: ability.school,
           });
-          ctx.enterCombat(p, m);
-          if (m.kind === 'mob' && m.hostile)
+          const enteredCombat = ctx.enterCombat(p, m);
+          if (enteredCombat && m.kind === 'mob' && m.hostile)
             addThreat(m, p.id, 10 * ctx.threatMod(p, ability.school));
         }
         break;
@@ -3494,7 +3507,11 @@ export function runEffects(
           // value2/value3 are shared secondary slots: the generic selfBuff
           // passthrough and the Warlock drain/disable knobs both ride them, so
           // the explicit value wins and the Warlock knob is the fallback.
-          value2: eff.value2 ?? eff.healthDrainPctMax,
+          value2:
+            eff.value2 ??
+            (ability.id === 'demon_skin' && mods.global.warlockFiendhideMagicDrPct > 0
+              ? mods.global.warlockFiendhideMagicDrPct
+              : eff.healthDrainPctMax),
           value3: eff.value3 ?? eff.disableBelowHpPct,
           tickInterval: eff.healthDrainPctMax !== undefined ? 1 : undefined,
           tickTimer: eff.healthDrainPctMax !== undefined ? 1 : undefined,
@@ -3960,6 +3977,7 @@ export function runEffects(
           });
         }
         // sunder deals no damage: its threat is the flat value, stance-scaled
+        if (questGateBlocksAggro(ctx.players, target, p)) break;
         addThreat(target, p.id, res.threatFlat * ctx.threatMod(p, 'physical'));
         ctx.enterCombat(p, target);
         break;

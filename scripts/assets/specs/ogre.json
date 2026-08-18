@@ -1,0 +1,11 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/_Mob_Updates/built/ogre.glb",
+      "out": "models/creatures/ogre.glb",
+      "type": "character",
+      "maxTex": 512,
+      "keepClips": ["Idle", "Walk", "Run", "Attack", "Hit", "Death"]
+    }
+  ]
+}

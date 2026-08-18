@@ -33,7 +33,7 @@ const LEADEN_ROOT_LOCK_ID = 'wlk_leaden_hex_root_lock';
 const LEADEN_SLOW_PER_STACK = 0.05;
 const LEADEN_MAX_STACKS = 3;
 const LEADEN_DURATION = 5;
-const LEADEN_ROOT_DURATION = 1.5;
+const LEADEN_ROOT_DURATION = 3.5;
 const LEADEN_ROOT_LOCK = 15;
 
 const SHADOW_CREDIT_ID = 'wlk_shadow_credit';
@@ -77,8 +77,23 @@ export function reconcileWarlockTalentState(
   ctx: SimContext,
   player: Entity,
   meta: PlayerMeta,
-): void {
-  if (meta.cls !== 'warlock') return;
+): boolean {
+  if (meta.cls !== 'warlock') return false;
+  let statsChanged = false;
+  const fiendhide = player.auras.find((aura) => aura.id === 'demon_skin');
+  const resolvedFiendhide = meta.known.find((ability) => ability.def.id === 'demon_skin');
+  const armorEffect = resolvedFiendhide?.effects.find(
+    (effect) => effect.type === 'selfBuff' && effect.kind === 'buff_armor',
+  );
+  if (fiendhide && armorEffect?.type === 'selfBuff') {
+    const magicDr = meta.talentMods.global.warlockFiendhideMagicDrPct;
+    const nextMagicDr = magicDr > 0 ? magicDr : undefined;
+    if (fiendhide.value !== armorEffect.value || fiendhide.value2 !== nextMagicDr) {
+      fiendhide.value = armorEffect.value;
+      fiendhide.value2 = nextMagicDr;
+      statsChanged = true;
+    }
+  }
   const knownIds = new Set(meta.known.map((ability) => ability.def.id));
   const staleAuraIds = new Set<string>();
   if (!knownIds.has('sacrilegious_march')) staleAuraIds.add('sacrilegious_march');
@@ -103,6 +118,7 @@ export function reconcileWarlockTalentState(
     delete player.procState.counters[ASHEN_X_KEY];
     delete player.procState.counters[ASHEN_Z_KEY];
   }
+  return statsChanged;
 }
 
 function removeAura(ctx: SimContext, owner: Entity, aura: Aura): void {

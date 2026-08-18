@@ -14,9 +14,8 @@ import {
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { basename, join } from 'node:path';
-import ffmpegStaticPath from 'ffmpeg-static';
-import ffprobeStatic from 'ffprobe-static';
 import { inspectSfxConformance } from '../sfx/conform_audio.mjs';
+import { SFX_CONFORMANCE_FFMPEG_PATH, SFX_CONFORMANCE_FFPROBE_PATH } from '../sfx/ffmpeg_paths.mjs';
 import {
   buildSfxManifestData,
   catalogHashForEntries,
@@ -51,18 +50,14 @@ const customMasterPolicy = buildSfxConformPolicy(SFX, {}, []);
 
 // The published-conformance verdict must be measured with the same toolchain that
 // gates the checked-in assets: npm run sfx:check (scripts/sfx_conform.mjs) and the
-// SFX generators resolve ffmpeg-static/ffprobe-static, not the PATH ffmpeg the
-// Studio spawns for playback and encoding. A newer PATH ffmpeg reports MP3 duration
-// a few tens of milliseconds shorter, enough to flip a clip across the one-second
-// peak/LUFS branch boundary and demand the wrong loudness target, so a clip the gate
-// accepts would fail export. Keep validation bound to the bundled binaries.
-if (!ffmpegStaticPath || !ffprobeStatic?.path) {
-  // ffmpeg-static exports null on an unsupported platform; fail here with a
-  // clear message instead of handing inspectSfxConformance a null binary path.
-  throw new Error('sfx export: bundled ffmpeg-static/ffprobe-static unavailable on this platform');
-}
-export const CONFORMANCE_FFMPEG_PATH = ffmpegStaticPath;
-export const CONFORMANCE_FFPROBE_PATH = ffprobeStatic.path;
+// SFX generators prefer ffmpeg-static/ffprobe-static, not the Studio playback
+// overrides. A newer PATH ffmpeg reports MP3 duration a few tens of milliseconds
+// shorter, enough to flip a clip across the one-second peak/LUFS branch boundary
+// and demand the wrong loudness target, so a clip the gate accepts would fail
+// export. Keep validation bound to the shared conformance resolver; on Linux arm64
+// it uses PATH ffprobe because ffprobe-static@3.1.0 publishes no binary there.
+export const CONFORMANCE_FFMPEG_PATH = SFX_CONFORMANCE_FFMPEG_PATH;
+export const CONFORMANCE_FFPROBE_PATH = SFX_CONFORMANCE_FFPROBE_PATH;
 
 function sha256(bytes) {
   return createHash('sha256').update(bytes).digest('hex');

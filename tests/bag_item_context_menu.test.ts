@@ -53,6 +53,19 @@ describe('bag_item_context_menu: action eligibility', () => {
       'lock',
     ]);
   });
+  // A held offhand (a shield-less caster orb/tome or a hunter quiver) is
+  // equipment exactly like a weapon or armor piece: it carries quality and
+  // requiredClass, and a piece looted by the wrong class is otherwise stuck
+  // with no way to break it down for materials. Missing this offered only
+  // Equip (which fails the class check) and Lock, so this must mirror the
+  // weapon/armor row above verbatim.
+  it('offers Disenchant AND Salvage on a common+ held offhand too', () => {
+    expect(bagItemNewActions(def('held_offhand', 'uncommon'), 'lantern')).toEqual([
+      'disenchant',
+      'salvage',
+      'lock',
+    ]);
+  });
   // Every item now offers at least lock/unlock (issue #3042), so a
   // poor-quality or non-gear item is never truly empty; "offers nothing NEW
   // beyond the lock toggle" is the honest claim for a plain item today.

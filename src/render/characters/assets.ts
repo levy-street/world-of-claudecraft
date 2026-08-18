@@ -848,16 +848,24 @@ export function mechAssetsReady(): boolean {
 // Lazy fetch for rideable mount GLBs (the mech pattern, per visual key): a
 // mount loads on the first sight of a rider, so eight mount models never
 // weigh on every client's boot. Memoized per key; mounts have no skin or
-// emissive atlases, so the GLB is the whole job.
+// emissive atlases, so the GLB is the whole job. A rejection is evicted from
+// the map (not memoized): a stalled or dropped connection must not pin every
+// later sighting of that mount, including a real player's, to the same
+// failure for the rest of the session.
 const mountAssetPromises = new Map<string, Promise<void>>();
 export function preloadMountAssets(visualKey: string): Promise<void> {
   const existing = mountAssetPromises.get(visualKey);
   if (existing) return existing;
   const def = VISUALS[visualKey];
   if (!def) return Promise.resolve();
-  const job = loadGltf(def.url).then((g) => {
-    gltfByUrl.set(def.url, g);
-  });
+  const job = loadGltf(def.url)
+    .then((g) => {
+      gltfByUrl.set(def.url, g);
+    })
+    .catch((err) => {
+      mountAssetPromises.delete(visualKey);
+      throw err;
+    });
   mountAssetPromises.set(visualKey, job);
   return job;
 }

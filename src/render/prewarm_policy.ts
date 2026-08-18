@@ -42,6 +42,15 @@ export const CONSTRAINED_PREWARM_KEEP: readonly string[] = [
  * minimal manifest skips is skipped for GPU-footprint reasons (the phone-class
  * per-process memory ceiling) and must stay skipped. An id here is by
  * construction NOT in CONSTRAINED_PREWARM_KEEP.
+ *
+ * vfx.mount-programs is deliberately NOT here. Its units force nine skinned
+ * GLB rigs resident (roughly 10 MB of VRAM after KTX2 transcode, plus an
+ * equal retained CPU copy, since `mounts` is exempt from mip release), and
+ * those assets are lazyPreload precisely so they never weigh on a
+ * constrained client's footprint. That is exactly the GPU-footprint reason
+ * this list otherwise excludes an entry, and the iOS process-kill history in
+ * src/render/CLAUDE.md is reason enough to require a real measurement from a
+ * constrained device before opting this entry in.
  */
 export const CONSTRAINED_PREWARM_RESUME: readonly string[] = ['vfx.ability-primitives'];
 

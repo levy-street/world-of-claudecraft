@@ -209,4 +209,57 @@ describe('what a duel leaves behind', () => {
     for (let i = 0; i < 20 * 8; i++) sim.tick();
     expect(loser.dead, 'so it cannot kill the loser at 1 hp afterwards').toBe(false);
   });
+
+  it('clears a dot from a Necromancy temporary undead even after it despawns mid-duel', () => {
+    // The same residual as the pet case above, for a controlled entity petOf()
+    // deliberately does not track: a warlock's temporary Necromancy undead
+    // (isTemporaryNecromancyUndead) is excluded from petOf on purpose (it must
+    // never replace or persist as the owner's primary pet), so it never landed
+    // in duel.controlled either. The clamp already treats its damage as the
+    // opponent's (pvpController resolves ANY owned mob, not just petOf's one),
+    // but the despawned-entity fallback could not find it, so a dot it left
+    // behind rode out of the duel onto a body at 1 hp with no clamp left.
+    const { sim, a, b } = startedDuel();
+    const loser = sim.entities.get(b)!;
+    const undead = sim.entities.get(sim.addPlayer('warlock', 'Bonewalker', { autoEquip: true }))!;
+    undead.kind = 'mob';
+    undead.templateId = 'necromancy_skeletal_warrior';
+    undead.ownerId = a;
+    expect(
+      sim.ctx.petOf(a),
+      'temporary Necromancy undead are deliberately excluded from petOf',
+    ).toBeNull();
+    expect(
+      sim.ctx.pvpController(undead)?.id,
+      'the clamp already treats its damage as the opponent’s',
+    ).toBe(a);
+
+    // One tick with the undead alive is all the duel needs to remember it.
+    sim.tick();
+    loser.auras.push({
+      id: 'ghost_undead_dot',
+      name: 'Grave Rot',
+      kind: 'dot',
+      remaining: 30,
+      duration: 30,
+      value: 40,
+      tickInterval: 1,
+      tickTimer: 1,
+      sourceId: undead.id,
+      school: 'shadow',
+    } as Aura);
+
+    // ...and now the undead is gone, exactly as its timed summon expiring leaves it.
+    sim.entities.delete(undead.id);
+    expect(sim.ctx.entities.get(undead.id), 'the source really is unresolvable').toBeUndefined();
+
+    fightToTheEnd(sim, a, b);
+
+    expect(
+      loser.auras.some((x) => x.id === 'ghost_undead_dot'),
+      'a despawned Necromancy undead dot must not ride out of the duel',
+    ).toBe(false);
+    for (let i = 0; i < 20 * 8; i++) sim.tick();
+    expect(loser.dead, 'so it cannot kill the loser at 1 hp afterwards').toBe(false);
+  });
 });

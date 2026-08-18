@@ -23,7 +23,8 @@ const WORLD: WorldContent = {
 const GUILD_ID = 7;
 // A shipped, disenchantable common weapon (tests/professions_enchanting.test.ts
 // uses the same one) whose def is craft-provenance TRACKED
-// (crafting.ts isCraftedDisenchantTrackedOutput: weapon/armor, quality != poor).
+// (crafting.ts isCraftedDisenchantTrackedOutput, which IS isDisenchantable:
+// weapon/armor/held_offhand, quality != poor).
 const WEAPON = 'moggers_copper_cudgel';
 const RECIPE = 'recipe_moggers_copper_cudgel';
 

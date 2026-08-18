@@ -237,13 +237,15 @@ describe('kobold family bespoke attack (issue #2889 warrior/kobold batch)', () =
     expect(kobold).not.toContain('clips: ENEMY7,');
 
     // ENEMY7 itself (the constant definition, not a VisualDef using it) must
-    // still read the original shared attack: mob_ogre, on a completely
-    // different rig (giant.glb), sharing the SAME constant by reference,
-    // must be untouched by this change.
+    // still read the original shared attack: its remaining consumers
+    // (mob_goblin, mob_kobold_digger) share the SAME constant by reference
+    // and must be untouched by this change. mob_ogre, once the motivating
+    // shared-by-reference case, now rides its own authored body and OGRE
+    // ClipMap (ogre.glb), so the pin on it moved from ENEMY7 to OGRE.
     const enemy7ConstBlock = manifestBlock('const ENEMY7: ClipMap = {', '};');
     expect(enemy7ConstBlock).toContain("attack: ['Attack']");
 
     const ogreBlock = manifestBlock('mob_ogre: {', '};');
-    expect(ogreBlock).toContain('clips: ENEMY7,');
+    expect(ogreBlock).toContain('clips: OGRE,');
   });
 });

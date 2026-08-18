@@ -51,10 +51,12 @@ met and q_farm_intro completes through the client.
   resolver reads `IWorld.farmPatches` (static content) and `myFarmPlots`.
 - The world-space affordance (a highlighted bed, a ripe marker, a hover tooltip on the
   gather-node tooltip family) is a `src/render/<thing>.ts` sibling; `renderer.ts` has
-  ZERO monolith headroom. `hud.ts` (5 lines) and `main.ts` (1 line) cannot host the
+  ZERO monolith headroom. `hud.ts` (5 lines) cannot host the
   window field, the open route, or the widened `tryNearbyInteraction` bag either: an
-  extraction lands FIRST in each (the ratchet rule: extract, then LOWER the ceiling),
-  and a ceiling raise is a maintainer decision.
+  extraction lands FIRST (the ratchet rule: extract, then LOWER the ceiling),
+  and a ceiling raise is a maintainer decision. `main.ts` carries 6 lines from the
+  nineteenth-absorb turnstile extraction: enough for thin wiring, extraction-first
+  beyond that.
 - Mobile: the touch interact button already routes `tryNearbyInteraction`; the plant
   sheet must fit the 844x390 landscape viewport (the standing capture rule) and the
   knob toggles must be finger-sized. Gamepad: the interact edge action.
@@ -71,7 +73,7 @@ met and q_farm_intro completes through the client.
   dismissals, then the real gossip / vendor / dialog clicks.
 - Nothing here changes `IWorld`, the wire, the goldens, or the sim; the parity and
   command-schema baselines (329 = 88 + 241, 34 facets, 202/215, delta keys 87,
-  farming_session 19c49aac) must not move.
+  farming_session 9a8fefa5, the nineteenth-absorb re-mint) must not move.
 
 ## Acceptance (if adopted)
 
@@ -133,8 +135,10 @@ STEP 0 - PRE-FLIGHT
   source, and leave its OPEN line intact.
 - Re-resolve the NEWEST release/** branch: git fetch origin --prune, then
   git branch -r --list 'origin/release/*' | sort -V (VERSION sort) and take the last
-  row. The branch has absorbed release/v0.39.0 through f42a67f341 (the EIGHTEENTH
-  absorb, 2026-08-17). If a newer tip exists, merge it INTO the phase branch FIRST:
+  row. The branch has absorbed release/v0.39.0 through 7b45fdb9a9 (the NINETEENTH
+  absorb, run 2026-08-18 as its own sync mid-phase per the D22 triple-digit rule;
+  its record is in state.md's head block and progress.md). If a newer tip exists,
+  merge it INTO the phase branch FIRST:
   release-merge-audit skill plus the state.md deviation (al) absorb checklist
   (portrait manifest fingerprint-only re-mint through
   scripts/build_mob_portrait_source_manifest.mjs --write plus the accepted-art
@@ -156,14 +160,16 @@ STEP 0 - PRE-FLIGHT
   (restore with `git checkout -m -- <file>` and resolve hunk by hunk); the release's
   monolith ceilings can land BELOW your working count (heal by extraction, never a
   raise).
-- Baselines as of 03d70f2385, ALL of which this phase must leave UNCHANGED: IWorld
+- Baselines as of the nineteenth-absorb sync (2026-08-18), ALL of which this phase
+  must leave UNCHANGED: IWorld
   329 members (88 data, 241 method), facet count 34, command_schema 202/215, delta
-  keys 87, farming_session golden md5 19c49aac3bf333f59f7608af1f04d50b, every other
+  keys 87, farming_session golden md5 9a8fefa5e48c7e456db7ef2695bfb284, every other
   golden, the terrain atlas, the Eastbrook chunk digest, the map plates (do NOT move
   any NPC: every NPC is a terrain calm pad). MONOLITH HEADROOM: hud.ts 5 lines
-  (19483/19488), renderer.ts 0 (13660/13660), main.ts 1 (11489/11490), sim.ts 1
-  (12659/12660), server/game.ts 104 (10796/10900). This phase's wiring CANNOT land on
-  hud.ts, main.ts, or renderer.ts as they stand: for each one you must touch, an
+  (19382/19387), renderer.ts 0 (13774/13774), main.ts 6 (11454/11460), sim.ts 3
+  (12657/12660), server/game.ts 109 (10791/10900). This phase's wiring CANNOT land on
+  hud.ts or renderer.ts as they stand (main.ts has 6 lines from the sync's turnstile
+  extraction, enough for thin wiring only): for each one you must touch, an
   EXTRACTION lands FIRST as its own commit (move a self-contained block into a
   sibling module behind the file's existing seam, move-not-rewrite, then LOWER that
   file's ceiling in tests/monolith_budget.test.ts to the new size plus a small
@@ -208,7 +214,11 @@ STEP 0 - PRE-FLIGHT
   checkout, and verifies the restore); worktree-cwd-drift-misroutes-git;
   pkill-pattern-matches-own-shell (kill dev servers by port: fuser -k 5188/tcp);
   frozen-clock-rig-hangs-vitest (any injected lockoutNowMs must advance);
-  big-diff-reviewer-turn-budgets.
+  big-diff-reviewer-turn-budgets. Also note the nineteenth absorb's item-lock
+  rework: setItemLocked now locks the named slot WHOLE (no single-unit peel,
+  reason union reduced to not_held), so any plant-sheet bag read or test rig
+  that wants a locked/unlocked mix builds it by granting around a lock (the
+  rebuilt rigs in tests/professions_farming.test.ts are the template).
 - READ docs/farming/state.md's head block, deviation (bn) whole (the finding, its
   proof, and the design recipe), (bo) (read only), (bg) (the intro grant fence: the
   faucet closes only once the quest can turn ready, which this phase makes possible
