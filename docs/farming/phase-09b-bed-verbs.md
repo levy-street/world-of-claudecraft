@@ -1,6 +1,8 @@
 # Phase 9b: The bed verbs (PROPOSED by the Phase 9 QA, 2026-08-17)
 
-STATUS: PROPOSED, NOT ADOPTED. The Phase 9 QA (state.md deviation (bn)) established that
+STATUS: ADOPTED as Phase 9b, 2026-08-18, via the maintainer-authored starter prompt
+(authored 2026-08-17; using it adopts the phase per its own terms). Background: the
+Phase 9 QA (state.md deviation (bn)) established that
 no client-side player control plants or harvests a bed: `plantCrop` and `harvestCrop`
 exist on `IWorldFarming`, in `Sim`, in `ClientWorld`, and in `server/farming_commands.ts`,
 and every suite drives them, but nothing under `src/ui`, `src/game`, `src/render`, or
@@ -9,9 +11,7 @@ picker, and no `/dev plant` exists. So `q_farm_intro` is offered and accepted an
 never be completed by an ordinary player, and Phase 9's binding Live-surface note ("the
 full plant-grow-harvest-cook loop is reachable by ordinary players") is unmet while the
 quest and its teaching copy are live. No phase file in the packet ever planned the
-client verb; this file is the QA's proposal for the phase that does. The maintainer
-adopts it (add the row to implementation-plan.md's phase table between 9 QA and 10 and
-strike this paragraph) or strikes it and re-dormants the intro quest and copy instead.
+client verb; this file is the phase that does.
 docs/farming/state.md is the authority; if this file contradicts it, state.md wins.
 
 Live-surface note (binding, if adopted): After this phase merges, an ordinary player

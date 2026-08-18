@@ -2196,6 +2196,8 @@ question does not arise (farming has no station).
   Phase 10, or re-dormant the intro quest, Jessica's teaching sentence, and
   the guide's "Sow with a hoe" prose in one change until the verb ships.
   Until one of those lands the go-live is NOT player-complete.
+  ADOPTED as Phase 9b, 2026-08-18 (the maintainer-authored starter prompt,
+  authored 2026-08-17, whose use adopts the phase per its own terms).
   (bo) TIER 3 AND 4 SEEDS HAVE NO FIRST FAUCET: D11 says they "come from
   harvest seed-back rolls and the rare event", but the seed-back roll
   (professions/farming.ts, FARM_SEED_BACK_MIN_TIER 3) returns crop.seedItemId,
@@ -2261,7 +2263,9 @@ question does not arise (farming has no station).
   PROPOSED Phase 9b (docs/farming/phase-09b-bed-verbs.md: the bed interaction
   that plants and harvests through IWorldFarming, before Phase 10) or re-dormant
   q_farm_intro, Jessica's teaching sentence, and the guide's "Sow with a hoe"
-  prose until the verb ships; (bo) the tier 3/4 seed bootstrap: (1) a seed-back
+  prose until the verb ships (ADOPTED as Phase 9b, 2026-08-18, via the
+  maintainer-authored starter prompt; the (bn) close lands with the phase);
+  (bo) the tier 3/4 seed bootstrap: (1) a seed-back
   roll on a tier-N harvest that can return the NEXT tier's seed at low odds
   (upward drift, keeps "no counter sells them"), (2) the tier-3 and tier-4
   farmers stock their own seeds at a premium (amends D11's counter rule), (3) a
