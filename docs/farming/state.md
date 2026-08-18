@@ -6,7 +6,7 @@ gets swept in the same pass (amend the QA twin too, always).
 
 Current phase: Phase 9 QA done 2026-08-17 (verdict FAIL ON THE GO-LIVE
 ACCEPTANCE, SCOPE STOP: branch fix/farming-phase-09-qa off feature/farming-plan
-at 2f0f2547de, merged --no-ff back; hash in progress.md). Everything Phase 9
+at 2f0f2547de, merged --no-ff back as 59584a800a). Everything Phase 9
 built verifies (the live-client journey walked 39 checkpoints green at all four
 hubs, every vendor row purchase-tested, 16 of 16 new mutants killed, nine
 lanes 0 BLOCKING on the phase's own diff), but the QA established that NO
