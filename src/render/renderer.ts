@@ -13,6 +13,7 @@ import {
   BG_SLOT_COUNT,
   battlegroundOrigin,
   CLASSES,
+  DELVE_MODULE_Z_START,
   DUNGEON_LIST,
   DUNGEON_X_THRESHOLD,
   defaultDelveModules,
@@ -36,6 +37,7 @@ import {
   ZONES,
   zoneAt,
 } from '../sim/data';
+import type { DelveModuleId } from '../sim/delve_layout';
 import { generateRiftFloor, riftLiftAt } from '../sim/rift/rift_gen';
 import type { BiomeId, ZoneDef } from '../sim/types';
 import { ALL_CLASSES, type Entity, isMechWearer, type SimEvent } from '../sim/types';
