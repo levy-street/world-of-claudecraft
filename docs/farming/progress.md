@@ -2241,6 +2241,16 @@ sim.ts untouched by the QA; no golden moved.
 Handoff: the maintainer decides (bn) and (bo) before Phase 10 proceeds on
 the assumption that players can farm; the proposed 9b starter is in
 docs/farming/phase-09b-bed-verbs.md.
+GATE RECORD: run 1 on the frozen tree dc17a3f747, `BROWSER_PATH=<playwright
+chromium> GATE_MAX_WORKERS=8 node scripts/gate_select.mjs`: mode=full (the
+planner's broad/unclassified arm on tests/fixtures/terrain_height_parity
+.v1.f64le.gz plus tests/helpers/bare_client.ts, as recorded for the phase),
+"[gate:select] PASS: all 12 steps green (vitest workers: 8)", 2859 test
+files / 40,043 tests passed (the phase's 40,034 plus the QA's nine new
+pins), 2 expected fail, 115 skipped, zero "[gate:select] FAIL at" or
+"[gate] FAIL" lines, no druid_engines timeout, full-suite vitest 838 s,
+browser regression 19 files 129 green, typecheck and the env/server/bot
+builds green, shell rc 0.
 
 ### Phase 10
 (not started)
