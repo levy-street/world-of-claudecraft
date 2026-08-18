@@ -23,10 +23,13 @@ describe('gather node rendering', () => {
     // 120 nodes in 57 batches through v0.33.0; the phase 20 density pass
     // (the +36 bottom-three set) took the content to 156 nodes and 68
     // batches (11 new zone:type:band combos across willowfen, galecrest,
-    // and farshore_isle).
+    // and farshore_isle). Re-benching the 16 farshore_isle nodes onto the
+    // merged coast (the island moved to x 700-1300) spread them across three
+    // additional zone:type:band combos (wood:1, ore:1, wood:-2), 69 to 72;
+    // the node count is unchanged.
     expect(GATHER_NODES).toHaveLength(156);
-    expect(expectedBatches.size).toBe(69);
-    expect(meshes).toHaveLength(69);
+    expect(expectedBatches.size).toBe(72);
+    expect(meshes).toHaveLength(72);
     expect(meshes.reduce((sum, mesh) => sum + mesh.count, 0)).toBe(GATHER_NODES.length);
     expect(new Set(meshes.map((mesh) => mesh.geometry)).size).toBe(3);
     expect(new Set(meshes.map((mesh) => mesh.material)).size).toBe(3);

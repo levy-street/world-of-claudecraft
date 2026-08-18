@@ -366,12 +366,13 @@ describe('Skulduggery: the Gloam bank and its detonation', () => {
     // could never land outside a group (owner playtest bug).
     mob.facing = Math.PI;
 
-    // Hunted idle (seed 23, after every beat above, re-hunted on the
-    // release/v0.37.0 castle base): one tick parks the shared stream where
-    // the single detonation swing resolves as a plain non-crit hit (the
-    // formula dodge slot and the authored opener crit arm both stay live,
-    // see the pin comment above).
-    sim.tick();
+    // Hunted idle (seed 23, after every beat above, re-hunted for the
+    // restored camp spawn stream: constructor-time world gen now draws from
+    // createCampSpawnRngSelector, shifting the shared stream): ZERO idle
+    // ticks park the stream where the single detonation swing resolves as a
+    // plain non-crit hit (the formula dodge slot and the authored opener
+    // crit arm both stay live, see the pin comment above). If the draw
+    // order moves again, re-hunt the idle tick count here.
 
     // The detonation: one press, in the open, face to face. The veil rises
     // BEFORE the strike resolves, so this very hit is the doubled one.

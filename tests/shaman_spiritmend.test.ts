@@ -103,7 +103,12 @@ describe('Shaman v0.29 Spiritmend', () => {
     );
     expect(owned).toHaveLength(1);
     expect(owned[0].value).toBeGreaterThan(firstAmount);
-    expect(owned[0].value).toBeLessThanOrEqual(ally.maxHp * 0.3);
+    // The shipped cap is Math.round(maxHp * MENDING_CURRENT_MAX_HP_CAP)
+    // (depositRawMendingCurrent in src/sim/combat/shaman_spiritmend.ts), so
+    // assert the rounded cap, not the raw product: on the restored camp
+    // spawn stream the second deposit really lands on the cap (247 at
+    // maxHp 822), which the raw 246.6 bound misread as an overflow.
+    expect(owned[0].value).toBeLessThanOrEqual(Math.round(ally.maxHp * 0.3));
     // The helper continues ticking after the cast resolves; a refreshed
     // 12-second pool should still retain roughly nine seconds here.
     expect(owned[0].remaining).toBeGreaterThan(9);

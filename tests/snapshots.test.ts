@@ -397,9 +397,15 @@ describe('spectate client POV', () => {
     expect(client.sceneInputLockPending()).toBe(true);
     expect(client.moveInput).toEqual(emptyMoveInput());
     expect(lockChanges).toHaveBeenCalledExactlyOnceWith(true);
+    // Both convergence events carry the world-clock stamp (the scene
+    // presentation clock work: stampScenePresentationTime in
+    // src/net/presentation_clock.ts). This synthetic spectate frame omits
+    // `time`, so the mirror's presentationTime stays at its initial 0; the
+    // wire-time consumption arm is pinned by scene_presentation_clock.test.ts.
     expect(client.drainEvents()).toEqual([
       {
         type: 'sceneSync',
+        presentationTime: 0,
         state: {
           sceneId: 'scn_test_spectated',
           remainingSeconds: 4,
@@ -410,6 +416,7 @@ describe('spectate client POV', () => {
       },
       {
         type: 'sceneChoiceSync',
+        presentationTime: 0,
         state: {
           choiceId: 'ch_test_spectated',
           promptKey: 'lb.test.spectated.prompt',
@@ -491,6 +498,8 @@ describe('spectate client POV', () => {
     expect(client.drainEvents()).toEqual([
       {
         type: 'sceneSync',
+        // World-clock stamp; still 0 here, this frame carries no `time` either.
+        presentationTime: 0,
         state: {
           sceneId: 'scn_test_spectated_second',
           remainingSeconds: 6,
@@ -501,6 +510,7 @@ describe('spectate client POV', () => {
       },
       {
         type: 'sceneChoiceSync',
+        presentationTime: 0,
         state: {
           choiceId: 'ch_test_spectated_second',
           promptKey: 'lb.test.spectated.second.prompt',
@@ -531,8 +541,8 @@ describe('spectate client POV', () => {
     expect(client.sceneInputLockPending()).toBe(false);
     expect(lockChanges.mock.calls).toEqual([[true], [false]]);
     expect(client.drainEvents()).toEqual([
-      { type: 'sceneSync', state: null },
-      { type: 'sceneChoiceSync', state: null },
+      { type: 'sceneSync', presentationTime: 0, state: null },
+      { type: 'sceneChoiceSync', presentationTime: 0, state: null },
     ]);
   });
 });

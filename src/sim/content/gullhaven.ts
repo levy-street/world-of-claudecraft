@@ -107,7 +107,7 @@ const TOWN_BENCHES: readonly HeightStamp[] = Object.freeze([
   // the wall berm: the northwest run crosses the new tide flat, so the curtain
   // rides a raised shore berm the way a sea wall does, three pads rising with
   // the run plus a low toe under the extended west tip
-  { x: 789, z: 102, radius: 13, delta: 1.2, falloff: 'smooth', mode: 'level' },
+  { x: 789, z: 102, radius: 10.5, delta: 1.2, falloff: 'smooth', mode: 'level' },
   { x: 789, z: 102, radius: 10, delta: 1.2, falloff: 'smooth', mode: 'level' },
   { x: 789, z: 102, radius: 7, delta: 1.2, falloff: 'smooth', mode: 'level' },
   { x: 789, z: 102, radius: 4.5, delta: 1.2, falloff: 'flat', mode: 'level' },
@@ -119,8 +119,8 @@ const TOWN_BENCHES: readonly HeightStamp[] = Object.freeze([
   { x: 805, z: 95, radius: 10, delta: 2.4, falloff: 'smooth', mode: 'level' },
   { x: 805, z: 95, radius: 7, delta: 2.4, falloff: 'smooth', mode: 'level' },
   { x: 805, z: 95, radius: 4.5, delta: 2.4, falloff: 'flat', mode: 'level' },
-  { x: 779, z: 107.5, radius: 7, delta: 0.9, falloff: 'smooth', mode: 'level' },
-  { x: 779, z: 107.5, radius: 4, delta: 0.9, falloff: 'flat', mode: 'level' },
+  { x: 785.5, z: 106.5, radius: 4.5, delta: 1.2, falloff: 'smooth', mode: 'level' },
+  { x: 785.5, z: 106.5, radius: 2.5, delta: 1.2, falloff: 'flat', mode: 'level' },
   // the fisher-row aprons: wide smooth skirts at each cottage plot's own
   // height. On the natural-relief field the row's plots diverge seven-plus
   // yards from the shelf south of them, and softening that rim with the plot
@@ -295,13 +295,12 @@ export const GULLHAVEN_PLOT_PADS: readonly HeightStamp[] = Object.freeze(plotPad
  * pair of pieces steps more than half a yard.
  */
 export const GULLHAVEN_WALL_LINE: readonly (readonly [number, number])[] = Object.freeze([
-  // The west tip runs past the old shoreline point because the coast relief
-  // update pushed the water back: the run keeps going down the berm until the
-  // sea is again the flank. It holds z under 106 on the way out because the
-  // pier's seam ramp decks the band from z 107 up at these x, and a curtain
-  // piece must seat on terrain, not stand on the boardwalk (nor wall off the
-  // ramp itself).
-  [776.6, 105.9],
+  // The west head stands at the water's edge: the isleCoast relief carves
+  // open sea from x 779 west at this z, so (781, 106) is the last naturally
+  // dry footing and the sea itself is the flank beyond it. It holds z under
+  // 106 on the way out because the pier's seam ramp decks the band from
+  // z 107 up at these x, and a curtain piece must seat on terrain, not stand
+  // on the boardwalk (nor wall off the ramp itself).
   [781, 106],
   [790.5, 101],
   [800.5, 96.5],
@@ -321,12 +320,12 @@ export const GULLHAVEN_WALL_LINE: readonly (readonly [number, number])[] = Objec
   [813, 162.5],
   [802, 164.5],
   [795, 165],
-  // Southwest run to the water. The coast relief update raised the old south
-  // shore into downs, so the curtain keeps walking southwest until it stands
-  // over the bay again and the sea is the flank on this end too.
-  [787, 169],
-  [780, 173],
-  [774, 176.5],
+  // Southwest run to the water. The isleCoast relief brings the bay in to
+  // about x 790 here, so the curtain steps down the last dry shelf and ends
+  // at the tide line; past (790.5, 169.5) the ground is tide flat and then
+  // open sea, which is the flank on this end too.
+  [793.5, 165.8],
+  [792, 167.2],
 ] as const);
 
 /**
