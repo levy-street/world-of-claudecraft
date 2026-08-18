@@ -147,6 +147,9 @@ const FANOUT_ARMS: readonly string[] = [
   'this.mobileActionRingPainter.relocalize|',
   'this.mountRaceStrip.relocalize|',
   'this.mountRaceControls.relocalize|',
+  // The Last Bell scene chrome: the controller fans one relocalize into the
+  // overlay window (skip hint, subtitle caches) and the choice window.
+  'this.sceneController.relocalize|',
 ];
 
 const observedArms = scan.sites.map((s) => `${s.call}|${s.conditions.join(' && ')}`);
@@ -298,6 +301,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     memos: ['lastGossipRowSig', 'lastIntroHintVisible'],
     answer: 'this.questDialog.relocalize',
     why: 'the profession intro hint visibility latch, and the offerable-row signature (quest ids and marker kinds, text-independent by design; the phase 23 cadence-lapse watch)',
+  },
+  {
+    file: 'hud/scene/scene_overlay_window.ts',
+    memos: ['lastFadeOpacity'],
+    answer: 'this.sceneController.relocalize',
+    why: 'lastFadeOpacity gates only the fade layer opacity write (no text), but the construction-time skip hint and the language-keyed subtitle/announcement caches need the forced re-resolve the controller arm provides after a locale switch',
   },
   {
     file: 'hud/rift/rift_floor_tracker_controller.ts',

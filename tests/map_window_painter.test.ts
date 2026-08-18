@@ -15,6 +15,7 @@ import {
   BUILTIN_WORLD,
   CAMPS,
   DUNGEON_LIST,
+  NPCS,
   QUESTS,
   STRIP_MAX_X,
   STRIP_MIN_X,
@@ -678,10 +679,28 @@ const LABEL_ZONE = ZONES[0];
 const LABEL_ZONE_CZ = (LABEL_ZONE.zMin + LABEL_ZONE.zMax) / 2;
 
 // Real content rather than a synthetic fixture, so a rename in the quest tables
-// cannot leave this passing against a stale expectation.
+// cannot leave this passing against a stale expectation. The giver must stand
+// statically INSIDE the first zone's square map frame or the view's inZone
+// filter drops its glyph and every quest-art assertion below goes vacuous: the
+// Last Bell chain broke the bare any-giver premise (q_lb_q0_ashore's ferryman
+// stands at the Gullhaven harbor, x past eastbrook_vale's strip frame), so the
+// premise is spelled out here, mirroring map_window_view.test.ts.
 function questWithGiver() {
-  const quest = Object.values(QUESTS).find((q) => q.giverNpcId);
-  if (!quest) throw new Error('expected a quest with a giverNpcId');
+  const zoneMinX = LABEL_ZONE.xMin ?? STRIP_MIN_X;
+  const zoneMaxX = LABEL_ZONE.xMax ?? STRIP_MAX_X;
+  const quest = Object.values(QUESTS).find((q) => {
+    if (!q.giverNpcId) return false;
+    const npc = NPCS[q.giverNpcId];
+    return (
+      npc !== undefined &&
+      !npc.dynamic &&
+      npc.pos.x >= zoneMinX &&
+      npc.pos.x < zoneMaxX &&
+      npc.pos.z >= LABEL_ZONE.zMin &&
+      npc.pos.z < LABEL_ZONE.zMax
+    );
+  });
+  if (!quest) throw new Error('expected a quest with an in-frame static giver npc');
   return quest;
 }
 

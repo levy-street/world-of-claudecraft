@@ -40,8 +40,13 @@ const EXPORTER = path.join(
 // Re-mint deliberately (run the exporter, take the reported values) whenever
 // the art or the build intent changes. A surprise diff here means the shipped
 // boat is not the one this repo builds.
+// Re-pinned for the release/v0.39.0 merge: pnpm-lock.yaml (a fingerprint leaf)
+// moved, so only the stamped sourceFingerprint changed; the deterministic
+// rebuild was byte-identical outside the stamp, and the shipped GLB was
+// re-stamped in place via scripts/assets/remint_lockfile_fingerprints.mjs
+// (size-preserving, per scripts/assets/CLAUDE.md). No geometry was re-exported.
 const ASSET_BYTES = 224640;
-const ASSET_SHA256 = '4b5bc894743a1ec5fa8b22c896dc797ee261989ef220c35650f196d969463c3b';
+const ASSET_SHA256 = '85216850bc374edcfa2e328e7f0560a2003fe0155e035225c41aa19497bea27d';
 const ART_SHA256 = '9bfe1c2d385ce636488f01e0b4c31691e3aacbc5ef5b11e25e65e54d5fcf08d6';
 
 async function shippedTriangles(): Promise<number[][][]> {

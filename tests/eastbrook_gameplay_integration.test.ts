@@ -511,7 +511,7 @@ describe('Eastbrook authored gameplay data integration', () => {
       { x: -294, z: 815 },
       { x: 314, z: 816 },
       { x: 427, z: 355 },
-      { x: 299, z: 76 },
+      { x: 816, z: 124 }, // Gullhaven moved with the Last Bell campaign island (hub 822,118)
     ]);
     expect(PLAYER_START).toEqual({ x: 2, z: -2 });
     expect(EASTBROOK_LAYOUT.services.graveyard.position).toEqual({ x: -14, z: -14 });

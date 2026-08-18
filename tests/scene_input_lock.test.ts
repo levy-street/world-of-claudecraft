@@ -359,10 +359,17 @@ describe('scene input lock frame coordination', () => {
       main.indexOf('const echoSamples ='),
     );
 
-    expect(offline.indexOf('runOfflineSceneInputTick(')).toBeLessThan(
-      offline.indexOf('offlineSim.tick()'),
-    );
-    expect(offline.indexOf('offlineSim.tick()')).toBeLessThan(offline.indexOf('acc -= DT'));
+    // The offline loop inlines runOfflineSceneInputTick's tick-then-coordinator
+    // hand-off (the frame allocation guard forbids the per-tick callback
+    // closure, tests/client_frame_allocations.test.ts), so pin the same
+    // ordering on the inlined shape: the tick's scene events reach the
+    // coordinator before the HUD sees them and before the next tick boundary.
+    const offlineTickAt = offline.indexOf('offlineSim.tick()');
+    const offlineLockAt = offline.indexOf('sceneInputLock.handleEvents(');
+    expect(offlineTickAt).toBeGreaterThan(-1);
+    expect(offlineLockAt).toBeGreaterThan(offlineTickAt);
+    expect(offlineLockAt).toBeLessThan(offline.indexOf('hud.handleEvents('));
+    expect(offlineLockAt).toBeLessThan(offline.indexOf('acc -= DT'));
     expect(online.indexOf('drainMirroredSceneInput(')).toBeLessThan(online.indexOf('resolveMove('));
     expect(online.indexOf('resolveMove(')).toBeLessThan(online.indexOf('net.flushInput()'));
     expect(main).toContain('const mouselook =\n      intro === null && !sceneInputLocked');

@@ -645,7 +645,13 @@ function convertMaterial(
   // hasVertexColors and side must key the cache: kits share material names
   // between COLOR_0 meshes (trim 'Vertex' props) and colorless ones, and GLBs
   // may reuse a name for both single-sided and double-sided surfaces.
-  const key = `${kit}|${s.name}|${s.color?.getHexString() ?? ''}|${s.map ? 'm' : ''}|${s.side}|${hasVertexColors ? 'v' : ''}|${GFX.standardMaterials ? 's' : 'l'}`;
+  // The alpha cutout the asset authored (glTF alphaMode MASK + alphaCutoff,
+  // already resolved by GLTFLoader) must survive the rebuild and key the
+  // cache too: almost every prop is solid geometry, but a cutout one (the
+  // placeable oak's leaf cards) renders as opaque quads without it, and would
+  // otherwise share a cached material with an opaque namesake.
+  const alphaTest = s.alphaTest ?? 0;
+  const key = `${kit}|${s.name}|${s.color?.getHexString() ?? ''}|${s.map ? 'm' : ''}|${s.side}|${hasVertexColors ? 'v' : ''}|${GFX.standardMaterials ? 's' : 'l'}|a${alphaTest}`;
   const cached = matConvCache.get(key);
   if (cached) return cached;
   const color =
@@ -665,6 +671,7 @@ function convertMaterial(
     mat = new THREE.MeshStandardMaterial({
       color,
       map,
+      alphaTest,
       side: s.side,
       vertexColors: hasVertexColors,
       flatShading: hollow,
@@ -695,6 +702,7 @@ function convertMaterial(
     mat = new THREE.MeshLambertMaterial({
       color,
       map,
+      alphaTest,
       side: s.side,
       vertexColors: hasVertexColors,
       flatShading: hollow,

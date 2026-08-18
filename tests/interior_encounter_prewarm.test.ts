@@ -309,9 +309,9 @@ describe('live Soul Rend player-visual prewarm', () => {
     // The live interior is owned by the pass, not by a field on the monolith;
     // the renderer only REPORTS every change, including leaving one.
     expect(renderer).not.toContain('activeInterior: string | null = null');
-    expect(renderer).toContain(
-      'encounterPrewarm.setEncounterPrewarmInterior(this, interior ?? null)',
-    );
+    // The null coalesce moved up onto the dungeonHere derivation the story mood reads too.
+    expect(renderer).toContain('const interior = dungeonHere?.interior ?? null');
+    expect(renderer).toContain('encounterPrewarm.setEncounterPrewarmInterior(this, interior)');
     const createStart = renderer.indexOf('private createView(');
     const createEnd = renderer.indexOf('\n  // Shared core for every compile gate', createStart);
     const create = renderer.slice(createStart, createEnd);

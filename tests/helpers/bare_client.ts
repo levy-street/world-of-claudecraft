@@ -225,6 +225,13 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.onDisconnect = null;
   c.onConnectionLost = null;
   c.onReconnected = null;
+  // Scene presentation mirrors (the Last Bell campaign's scene overlay landed
+  // these on ClientWorld): the hello/spectate handlers converge them via
+  // queueSceneConvergence, so the fixture must carry the class defaults.
+  c.onSceneInputLockChanged = null;
+  c.presentationTime = 0;
+  c.sceneInputLockedBeforeDrain = false;
+  c.sceneActiveMirror = false;
 
   Object.assign(c, rest);
   return c;

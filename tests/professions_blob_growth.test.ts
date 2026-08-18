@@ -114,6 +114,9 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'vendorBuyback',
   'questLog',
   'questsDone',
+  // The Last Bell campaign progress flags (feature/last-bell-campaign):
+  // written right after questsDone, campaign state rather than professions.
+  'campaignFlags',
   'arenaRating',
   'arenaWins',
   'arenaLosses',

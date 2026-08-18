@@ -104,7 +104,11 @@ import {
 } from './game/interactions';
 import { createIntroLogoOverlay } from './game/intro_logo_overlay';
 import { Keybinds } from './game/keybinds';
-import { resetKeyboardTurnState, stepKeyboardTurnFacing } from './game/keyboard_turn_facing';
+import {
+  type KeyboardTurnArgs,
+  resetKeyboardTurnState,
+  stepKeyboardTurnFacing,
+} from './game/keyboard_turn_facing';
 import { applyMobileKeyboardViewport } from './game/keyboard_viewport_applier';
 import { shouldUseStaticBackdrop } from './game/landing_backdrop';
 import { createLandingThemeAudio } from './game/landing_theme';
@@ -143,7 +147,6 @@ import {
   drainMirroredSceneInput,
   newSceneFacingInputState,
   resetSceneFacingInputState,
-  runOfflineSceneInputTick,
   SceneInputLockCoordinator,
 } from './game/scene_input_lock';
 import { playSceneDirectiveSfx } from './game/scene_sfx';
@@ -4309,6 +4312,20 @@ async function startGame(
   // allocation guard polices the loop body), and the gate reads it
   // synchronously before returning a shared frozen decision.
   const gateInput = { hidden: false, desktopApp: DESKTOP_APP, graphicsRebuildPaused: false };
+  // Same allocation rule: the keyboard-turn args bag is rewritten in place each
+  // online frame (never a per-frame object literal), and the shared empty list
+  // is the offline placeholder for drainedEvents (the online branch overwrites
+  // it before any reader runs, and the offline branch returns before one does).
+  const kbTurnArgs: KeyboardTurnArgs = {
+    turnLeft: false,
+    turnRight: false,
+    turnAllowed: false,
+    sentFacing: null,
+    serverFacing: 0,
+    echoMs: 0,
+    frameDt: 0,
+  };
+  const NO_DRAINED_EVENTS: ReturnType<ClientWorld['drainEvents']> = [];
   function frame(now: number): void {
     requestAnimationFrame(frame);
     // The desktop shell keeps rAF running while hidden (backgroundThrottling is
@@ -4358,7 +4375,7 @@ async function startGame(
     // authoritative rider.
     const raceMovementLocked = world.mountRaceView()?.phase === 'countdown';
     let sceneInputLocked = online ? false : sceneInputLock.sync();
-    let drainedEvents: ReturnType<ClientWorld['drainEvents']> = [];
+    let drainedEvents = NO_DRAINED_EVENTS;
     let selfAuthoritativeDiscontinuity = false;
     if (online) {
       // Scene events must land before this frame derives or flushes movement:
@@ -4459,42 +4476,60 @@ async function startGame(
       offlineSim.utcDay = currentUtcDay();
       offlineSim.resetDay = currentResetDay();
       while (acc >= DT) {
-        const sceneStep = runOfflineSceneInputTick(
-          sceneInputLock,
-          sceneInputLocked,
-          (lockedAtTickStart) => {
-            const { mi, facing } = resolveMove(
-              mouselook,
-              offlineSim.player.pos,
-              offlineSim.player.facing,
-            );
-            Object.assign(offlineSim.moveInput, mi);
-            const stepFacing = lockedAtTickStart ? null : (movementFacing ?? facing);
-            // A stun locks facing (issue #2426): stepPlayerMotion already blocks
-            // turnLeft/turnRight while stunned, but mouselook/controller facing
-            // is applied out of band, here, before tick(), and must honor the
-            // same gate or a stunned player can still turn to face away from a
-            // positional attack.
-            if (stepFacing !== null && !isStunned(offlineSim.player)) {
-              offlineSim.player.facing = stepFacing;
-            }
-            offlineSim.updateFiestaBots(); // dev: steer Fiesta practice bots (no-op unless active)
-            perf.markInputSent(performance.now());
-            return perf.time('sim', () =>
-              perf.trace('sim.tick', () => offlineSim.tick(), { mode: 'offline' }),
-            );
-          },
+        const { mi, facing } = resolveMove(
+          mouselook,
+          offlineSim.player.pos,
+          offlineSim.player.facing,
         );
-        const events = sceneStep.events;
-        sceneInputLocked = sceneStep.locked;
+        Object.assign(offlineSim.moveInput, mi);
+        // sceneInputLocked still holds the lock as of this tick's START; the
+        // post-tick sceneInputLock.handleEvents below is what advances it.
+        const stepFacing = sceneInputLocked ? null : (movementFacing ?? facing);
+        // A stun locks facing (issue #2426): stepPlayerMotion already blocks
+        // turnLeft/turnRight while stunned, but mouselook/controller facing
+        // is applied out of band, here, before tick(), and must honor the
+        // same gate or a stunned player can still turn to face away from a
+        // positional attack.
+        if (stepFacing !== null && !isStunned(offlineSim.player)) {
+          offlineSim.player.facing = stepFacing;
+        }
+        offlineSim.updateFiestaBots(); // dev: steer Fiesta practice bots (no-op unless active)
+        perf.markInputSent(performance.now());
+        // The tick-then-coordinator hand-off below is runOfflineSceneInputTick
+        // by hand (scene_input_lock.ts owns the contract; its ordering pin is
+        // tests/scene_input_lock.test.ts): inlined so the rAF hot path passes
+        // no per-tick callback closure and keeps the startTrace/finishTrace
+        // try-finally shape (tests/client_frame_allocations.test.ts).
+        const simStart = perf.startTime();
+        let events: ReturnType<typeof offlineSim.tick>;
+        traceStart = perf.startTrace();
+        try {
+          events = offlineSim.tick();
+        } finally {
+          perf.finishTrace('sim.tick', traceStart, 'mode', 'offline');
+          perf.finishTime('sim', simStart);
+        }
+        // Scene events reach the input-lock coordinator before anything else
+        // reads this frame's lock, exactly as the helper orders it.
+        sceneInputLocked = sceneInputLock.handleEvents(events);
+        const eventsLength = events.length;
         desktopNotifyOnSimEvents(events, offlineSim.playerId);
         desktopPresenceOnFrame(offlineSim);
-        perf.time('events', () =>
-          perf.trace('hud.handleEvents', () => hud.handleEvents(events), {
-            mode: 'offline',
-            events: events.length,
-          }),
-        );
+        const eventsStart = perf.startTime();
+        traceStart = perf.startTrace();
+        try {
+          hud.handleEvents(events);
+        } finally {
+          perf.finishTrace(
+            'hud.handleEvents',
+            traceStart,
+            'mode',
+            'offline',
+            'events',
+            eventsLength,
+          );
+          perf.finishTime('events', eventsStart);
+        }
         // A tick consumed the latched release facing (movementFacing fed
         // stepFacing above); drop it so it is not re-applied next frame.
         sceneFacingInput.pendingReleaseFacing = null;
@@ -4610,17 +4645,18 @@ async function startGame(
     // while the local heading owns the channel, or the server would integrate
     // the turn a second time on top of the streamed facing.
     if (sceneInputLocked) resetKeyboardTurnState(sceneFacingInput.keyboardTurn);
+    // kbTurnArgs is the reused frame-loop bag (declared above frame()): written
+    // in place so the rAF hot path allocates no per-frame options object.
+    kbTurnArgs.turnLeft = resolved.mi.turnLeft;
+    kbTurnArgs.turnRight = resolved.mi.turnRight;
+    kbTurnArgs.turnAllowed = net.spectating === null && !movementFrozen() && !isStunned(pe);
+    kbTurnArgs.sentFacing = foreignFacing;
+    kbTurnArgs.serverFacing = interpServerFacing;
+    kbTurnArgs.echoMs = onlineInputEchoMs;
+    kbTurnArgs.frameDt = frameDt;
     const kbFacing = sceneInputLocked
       ? null
-      : stepKeyboardTurnFacing(sceneFacingInput.keyboardTurn, {
-          turnLeft: resolved.mi.turnLeft,
-          turnRight: resolved.mi.turnRight,
-          turnAllowed: net.spectating === null && !movementFrozen() && !isStunned(pe),
-          sentFacing: foreignFacing,
-          serverFacing: interpServerFacing,
-          echoMs: onlineInputEchoMs,
-          frameDt,
-        });
+      : stepKeyboardTurnFacing(sceneFacingInput.keyboardTurn, kbTurnArgs);
     // wireFacing, not kbFacing: only input-derived headings go on the wire.
     // Streaming the seam/glide corrections (which chase the mirror) would
     // close a feedback loop through the server that at high RTT never
@@ -4658,12 +4694,22 @@ async function startGame(
     if (net.spectating === null) desktopNotifyOnSimEvents(drainedEvents, net.playerId);
     // Same gate, second reason: a spectator's zone must not leak to presence.
     if (net.spectating === null) desktopPresenceOnFrame(net);
-    perf.time('events', () =>
-      perf.trace('hud.handleEvents', () => hud.handleEvents(drainedEvents), {
-        mode: 'online',
-        events: drainedEvents.length,
-      }),
-    );
+    const drainedEventsLength = drainedEvents.length;
+    const eventsStart = perf.startTime();
+    traceStart = perf.startTrace();
+    try {
+      hud.handleEvents(drainedEvents);
+    } finally {
+      perf.finishTrace(
+        'hud.handleEvents',
+        traceStart,
+        'mode',
+        'online',
+        'events',
+        drainedEventsLength,
+      );
+      perf.finishTime('events', eventsStart);
+    }
     if (net.consumeProfanityChanged()) {
       const profanityWordsLength = net.profanityWords.length;
       traceStart = perf.startTrace();

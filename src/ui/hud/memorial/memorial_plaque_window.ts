@@ -32,7 +32,11 @@ export function renderMemorialPlaque(
 ): HTMLElement {
   document.getElementById(ROOT_ID)?.remove();
   const el = document.createElement('div');
-  el.id = ROOT_ID;
+  // The literal id (same value as ROOT_ID) is deliberate: the dynamic-window
+  // scrape in tests/mobile_window_coverage.test.ts pairs `<var>.id = '<literal>'`
+  // with the `window` className on the same element, and a const-routed id is
+  // invisible to it, leaving this window outside the mobile coverage sweep.
+  el.id = 'memorial-plaque';
   el.className = 'window panel memorial-plaque';
   el.style.display = 'block';
   markDialogRoot(el, { labelledBy: TITLE_ID, modal: true });

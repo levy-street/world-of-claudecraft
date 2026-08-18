@@ -3470,6 +3470,12 @@ export class Hud {
         // never left hidden with a live trap (the confirm-dialog precedent).
         this.closeProfessionTutorial();
         break;
+      case 'memorial-plaque':
+        // Route through closeMemorialPlaque so the focus trap is released and
+        // the code-built panel is removed, never left hidden with a live trap
+        // (the profession-tutorial precedent; managed close registry #2517).
+        this.closeMemorialPlaque();
+        break;
       case 'options-menu':
         this.closeOptions();
         break;
@@ -6518,6 +6524,11 @@ export class Hud {
     this.spellbookWindow.relocalize();
     this.lockpickController.relocalize();
     this.tutorial.relocalize(this.sim, this.keybinds);
+    // The scene overlay's Skip hint is construction-time text and the fade
+    // opacity memo is a number, so a locale switch alone never repaints them;
+    // the controller re-resolves its own chrome and fans into the overlay and
+    // choice windows (each self-gated on its own state).
+    this.sceneController.relocalize();
     // The ring latches its page indicator on the page/count pair; dropping the
     // latch relabels it on the next paint (mobile layouts only build the ring).
     this.mobileActionRingPainter?.relocalize();

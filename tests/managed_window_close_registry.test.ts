@@ -43,6 +43,10 @@ const CODE_BUILT: Record<string, string> = {
   'confirm-dialog': 'src/ui/hud.ts (confirmDialog + inputDialog share the one id)',
   'profession-tutorial': 'src/ui/profession_tutorial_window.ts',
   'dev-command-window': 'src/ui/dev_command_window.ts',
+  // The Last Bell memorial Roll of Honour plaque (the v0.39.0 merge): built on
+  // interact, torn down through Hud.closeMemorialPlaque so its focus trap is
+  // released on the closeAll path (the profession-tutorial precedent).
+  'memorial-plaque': 'src/ui/hud/memorial/memorial_plaque_window.ts',
 };
 
 /**
@@ -333,6 +337,7 @@ describe('closeManagedWindow case registry', () => {
     expect(sites).toEqual({
       'ui/dev_command_window.ts': 1,
       'ui/hud.ts': 2, // confirmDialog + inputDialog share the one #confirm-dialog id
+      'ui/hud/memorial/memorial_plaque_window.ts': 1, // the Last Bell Roll of Honour plaque
       'ui/profession_tutorial_window.ts': 1,
     });
     for (const id of Object.keys(CODE_BUILT)) expect(caseIds).toContain(id);

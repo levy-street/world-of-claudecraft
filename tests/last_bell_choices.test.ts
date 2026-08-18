@@ -81,7 +81,10 @@ describe('dialogue choices', () => {
     const sim = makeSim();
     startScenario(sim.ctx, 'sc_test_vote');
     collect(sim, 2);
-    const controls = encodeObs(sim).slice(-8);
+    // The scene/choice block sits at slice(-11, -3): the v0.39.0 merge keeps
+    // the paladin devotion trio appended after it because the env protocol
+    // reads devotion at slice(-3) (pinned by tests/env_protocol.test.ts).
+    const controls = encodeObs(sim).slice(-11, -3);
     expect(controls.slice(0, 3)).toEqual([0, 1, 1]);
     expect(controls[3]).toBeGreaterThan(0);
     expect(controls.slice(4)).toEqual([1, 1, 0, 0]);
@@ -91,7 +94,7 @@ describe('dialogue choices', () => {
     applyAction(sim, ACTIONS.indexOf('scene_choice_1'));
     expect(choiceActiveFor(sim.ctx, claimIdOf(sim))).toBe(false);
     expect(sim.ctx.players.get(sim.playerId)?.campaignFlags.get('lastBellVote')).toBe('for');
-    expect(encodeObs(sim).slice(-8)).toEqual([0, 0, 0, 0, 0, 0, 0, 0]);
+    expect(encodeObs(sim).slice(-11, -3)).toEqual([0, 0, 0, 0, 0, 0, 0, 0]);
   });
 
   it('reports authoritative active and resolved choice state for reconnect', () => {

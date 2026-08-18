@@ -74,10 +74,29 @@ const FULL_SPAN = Math.max(ZONE_MAX_X - ZONE_MIN_X, ZONE.zMax - ZONE.zMin);
 const ZONE_CX = (ZONE_MIN_X + ZONE_MAX_X) / 2;
 const LABELS_ZOOM = 1;
 // A quest giver with a real giverNpcId, so the npc-marker branch exercises real
-// content rather than an undefined === undefined accident.
+// content rather than an undefined === undefined accident. The giver must also
+// stand statically INSIDE the first zone's square map frame: the fixtures below
+// place mailboxes/stations at the giver's pos and assert their markers render,
+// and buildOverworldMapModel's inZone filter frames eastbrook_vale at the strip
+// x band. The Last Bell chain broke the old premise (q_lb_q0_ashore's ferryman
+// stands at the Gullhaven harbor, x past the strip frame), so the premise is
+// now spelled out instead of assumed.
 function requireQuestWithGiver() {
-  const quest = Object.values(QUESTS).find((q) => q.giverNpcId);
-  if (!quest) throw new Error('expected a quest with a giverNpcId');
+  const zoneMinX = ZONE.xMin ?? STRIP_MIN_X;
+  const zoneMaxX = ZONE.xMax ?? STRIP_MAX_X;
+  const quest = Object.values(QUESTS).find((q) => {
+    if (!q.giverNpcId) return false;
+    const npc = NPCS[q.giverNpcId];
+    return (
+      npc !== undefined &&
+      !npc.dynamic &&
+      npc.pos.x >= zoneMinX &&
+      npc.pos.x < zoneMaxX &&
+      npc.pos.z >= ZONE.zMin &&
+      npc.pos.z < ZONE.zMax
+    );
+  });
+  if (!quest) throw new Error('expected a quest with an in-frame static giver npc');
   return quest;
 }
 const GIVER_QUEST = requireQuestWithGiver();

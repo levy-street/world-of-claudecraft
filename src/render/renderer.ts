@@ -9988,17 +9988,17 @@ export class Renderer {
                       ? 'lastkeep'
                       : inDawnhold
                         ? 'dawnhold'
-                      : inside
-                        ? 'dungeon'
-                        : camY <
-                            waterLevelAt(
-                              this.camera.position.x,
-                              this.camera.position.z,
-                              this.sim.cfg.seed,
-                            ) -
-                              0.05
-                          ? 'underwater'
-                          : 'outdoor';
+                        : inside
+                          ? 'dungeon'
+                          : camY <
+                              waterLevelAt(
+                                this.camera.position.x,
+                                this.camera.position.z,
+                                this.sim.cfg.seed,
+                              ) -
+                                0.05
+                            ? 'underwater'
+                            : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
     // Procedural rift: dynamic fog from the generated floor style, re-applied when
     // the floor changes (descent keeps fogState='rift' but swaps the palette).
@@ -10721,6 +10721,12 @@ export class Renderer {
     }
     this.time += dt;
     sharedUniforms.uTime.value = this.time;
+    // the paint-free carpet ring the terrain splat reads (see terrain.ts)
+    sharedUniforms.uCarpetRing.value.set(
+      this.sim.player.pos.x,
+      this.sim.player.pos.z,
+      GFX.bladeCarpetRadius,
+    );
     // Scene-cued harbor ship motion and transient deck visual lifecycle. This
     // performs one cheap stand-in decision per ship handle even with no live cue.
     const harborDeckStandInActive = updateHarborShips(this.sim.player, dt);
@@ -10766,10 +10772,11 @@ export class Renderer {
       const e = sim.entities.get(id);
       // The pure policy also retires quest objects after turn-in or abandon.
       if (
+        !e ||
         // Deck riders bypass parked-distance retirement: their entity stays
         // parked at a distant harbor while the group rides the ship cue (J8).
-        shouldDropView(e, p, sim.questLog, this.questObjectHidden, this.entityViewDestroyRangeSq) &&
-        !(e && harborDeckRiderActive(e))
+        (!harborDeckRiderActive(e) &&
+          shouldDropView(e, p, sim.questLog, this.questObjectHidden, this.entityViewDestroyRangeSq))
       ) {
         this.doomedIds.push(id);
       }
@@ -10925,8 +10932,8 @@ export class Renderer {
         combatTargetId,
         combatTarget?.ownerId ?? null,
       );
-      let wantShadow = true;
-      let inProxyBand = false;
+      const wantShadow = true;
+      const inProxyBand = false;
       if (isSelf) {
         // The authoritative rider is already parked at the destination ship
         // while the moving clone carries the voyage shots. The park cue drops
@@ -11011,7 +11018,8 @@ export class Renderer {
             for (const caster of v.objectCasters) (caster as THREE.Mesh).castShadow = wantShadow;
           }
         }
-        if (v.visual) v.isFar = !deckRiderActive && showsStaticFarMesh(d2, lodBands, actionablePose);
+        if (v.visual)
+          v.isFar = !deckRiderActive && showsStaticFarMesh(d2, lodBands, actionablePose);
       }
       // online, entities beyond nameplate range stream below snapshot rate;
       // each interpolates on its own clock so they move smoothly instead of

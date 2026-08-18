@@ -234,14 +234,19 @@ describe('mobile window coverage (Phase 5 parity)', () => {
     // Exact, not a floor. Minting a window at runtime is a rare, deliberate act,
     // and it is the arm the recursion widens: a fourth module joins this list in
     // the same change that gives its window a mobile rule or an exception below.
+    // The fourth module arrived with the Last Bell campaign (v0.39.0 merge): the
+    // memorial Roll of Honour plaque, sheeted by its own body.mobile-touch
+    // #memorial-plaque rule in src/styles/hud.mobile.css.
     expect(dyn.windowClassFiles).toEqual([
       'dev_command_window.ts',
+      'hud/memorial/memorial_plaque_window.ts',
       'hud.ts',
       'profession_tutorial_window.ts',
     ]);
     expect([...dyn.ids].sort()).toEqual([
       'confirm-dialog',
       'dev-command-window',
+      'memorial-plaque',
       'profession-tutorial',
     ]);
   });
