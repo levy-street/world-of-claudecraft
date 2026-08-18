@@ -18,11 +18,44 @@ so instead of forcing them through this pipeline.
 
 ## Tooling
 
-The `img2threejs` skill (version pinned by the runbook) drives the intake and review gates.
-Claude Code sessions install it at `~/.claude/skills/img2threejs`, Codex sessions at
-`~/.codex/skills/img2threejs` (`git clone https://github.com/hoainho/img2threejs` into that
-path). It is an authoring aid only, never a build dependency: the committed factory,
-exporter, spec, tests, and optimized GLB stay the reproducible source of truth.
+The `img2threejs` skill drives the intake and review gates at the exact reviewed commit
+`7b1c62ccf34957ac5d68b7863718af9eab777c7e` (version 1.3.0). Claude Code sessions
+install it at `~/.claude/skills/img2threejs`; Codex sessions use
+`~/.codex/skills/img2threejs`.
+
+Create a brand-new checkout at a path that does not exist, detach it at that commit, and
+verify both the full identity and a completely clean tree **before reading its instructions
+or executing any script**. The isolated Git configuration disables host-global/system
+configuration and checkout hooks for this intake:
+
+```bash
+set -euo pipefail
+IMG2THREEJS_PATH=/absolute/path/to/new/img2threejs-checkout
+test ! -e "${IMG2THREEJS_PATH}"
+env GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null \
+  git -c core.hooksPath=/dev/null clone --no-checkout \
+  https://github.com/hoainho/img2threejs "${IMG2THREEJS_PATH}"
+env GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null \
+  git -C "${IMG2THREEJS_PATH}" -c core.hooksPath=/dev/null fetch --depth 1 origin \
+  7b1c62ccf34957ac5d68b7863718af9eab777c7e
+env GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null \
+  git -C "${IMG2THREEJS_PATH}" -c core.hooksPath=/dev/null checkout --detach \
+  7b1c62ccf34957ac5d68b7863718af9eab777c7e
+test "$(env GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null \
+  git -C "${IMG2THREEJS_PATH}" -c core.hooksPath=/dev/null rev-parse HEAD)" = \
+  7b1c62ccf34957ac5d68b7863718af9eab777c7e
+test -z "$(env GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null \
+  git -C "${IMG2THREEJS_PATH}" -c core.hooksPath=/dev/null status \
+  --porcelain=v1 --untracked-files=all --ignored)"
+```
+
+Never reuse an existing checkout: tracked edits, untracked or ignored files, local hooks,
+filters, and repository configuration are all untrusted until after verification. Choose
+a new path; archive, inspect, or remove an old installation separately. `set -euo pipefail`
+makes every intake failure stop the sequence. Never run this workflow from the remote
+default branch or a tag alone. The skill is an authoring aid only, never a build dependency:
+the committed factory, exporter, spec, tests, and optimized GLB stay the reproducible source
+of truth.
 
 ## The pipeline, in order
 

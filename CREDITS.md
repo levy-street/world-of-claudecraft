@@ -97,6 +97,7 @@ than free, so ask before you rely on it.
 | Dungeon modular kit (walls, floors, pillars, torches, banners, chests, furniture; also the Drakelands castle structure set) | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Dungeon-Remastered-1.0 | CC0 1.0 | Yes |
 | Graveyard/crypt props, dead trees, lanterns | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0 | CC0 1.0 | Yes |
 | Extra character animation library (Rig_Medium) | Kay Lousberg (KayKit) | https://kaylousberg.itch.io/kaykit-character-animations | CC0 1.0 | Yes |
+| The Last Bell of Gullhaven cast (`models/chars/npcs/`): derivative bodies built onto the KayKit Adventurers and Skeletons rigs above, repainted palette atlases plus original geometry, by `scripts/assets/last_bell_crew/` | Kay Lousberg (KayKit), derivative work by this project | https://github.com/KayKit-Game-Assets | CC0 1.0 | Yes |
 | Animated creatures (wolf, bull, fox, stag, alpaca, spider, frog, goblin, orc, yeti, giant, demon, ghost, goleling, glub, tribal, velociraptor, dragon) | Quaternius | https://poly.pizza/u/Quaternius · https://quaternius.com | CC0 1.0 | Yes |
 | Stylized Nature MegaKit (trees, rocks, bushes, mushrooms, grass) | Quaternius | https://quaternius.itch.io/stylized-nature-megakit | CC0 1.0 | Yes |
 | Medieval Village Pack (houses, inn, blacksmith, well, market, cart) | Quaternius | https://quaternius.com/packs/medievalvillage.html | CC0 1.0 | Yes |
@@ -222,7 +223,7 @@ non-commercial. For commercial use, arrange your own licence with the author.
 
 | Assets | Author | Source | License | Redistribution |
 |---|---|---|---|---|
-| Remaining generated world, interface, event, and ambience sound effects not attributed below (`public/audio/sfx/*.mp3`, excluding `quest_*.mp3` and `mount_*.mp3`) | World of ClaudeCraft | Project-generated with the ElevenLabs Sound Effects API from `scripts/sfx/sfx_prompts.mjs` or deterministic FFmpeg synthesis via `scripts/gen_ui_sfx.mjs` | Project asset | With the project only |
+| Remaining generated world, interface, event, and ambience sound effects not attributed below (`public/audio/sfx/*.mp3`, excluding `quest_*.mp3` and `mount_*.mp3`) | World of ClaudeCraft | Project-generated with the ElevenLabs Sound Effects API from `scripts/sfx/sfx_prompts.mjs` or deterministic FFmpeg synthesis via `scripts/gen_ui_sfx.mjs` and `scripts/gen_last_bell_harbor_sfx.mjs` | Project asset | With the project only |
 | Valorsteed gallop layer (`mount_run_valorsteed.mp3`) | D4XX, adapted by congusbongus | [Horse gallop on different surfaces](https://opengameart.org/content/horse-gallop-on-different-surfaces), individual `ground.mp3` source identified as CC0 in the included credits | CC0 1.0 | Yes |
 | Mount footfall layers (`mount_run_grag_bear.mp3`, `mount_run_shadowjump_toad.mp3`, `mount_run_stormfeather_griffin.mp3`, `mount_run_thunderstrut_gobbler.mp3`) | Fantozzi, extracted by qubodup | [Fantozzi's Footsteps](https://opengameart.org/content/fantozzis-footsteps-grasssand-stone) | CC0 1.0 | Yes |
 | Stalk-Glider slime layer (`mount_run_stalkglider_snail.mp3`) | RandomUser | [Slime ultimate the best](https://opengameart.org/content/slime-ultimate-the-best) | CC0 1.0 | Yes |
@@ -320,6 +321,8 @@ non-commercial. For commercial use, arrange your own licence with the author.
 | Generated prop model (streetlamp_galecrest_mast) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (streetlamp_farshore_coral) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated creature model + animations (bear_form, the druid Bear Form quadruped) | World of ClaudeCraft | Project-generated Tripo AI 3D sculpt, owned under the Tripo paid-plan license; rigged and animated locally rather than auto-rigged (29 bone deform rig fitted to the sculpt by measurement, distance-solver skinning, and nine IK-authored clips), then KTX2-compressed via glTF-Transform | Project asset | With the project only |
+| Procedural prop model (grand_ferry_ship) | World of ClaudeCraft | Project-authored deterministic procedural reconstruction of the retired Tripo reference | Project asset | With the project only |
+| Procedural prop model (wardenHaleStatue) | World of ClaudeCraft + Kay Lousberg (KayKit) | Project-authored deterministic Blender reconstruction (scripts/assets/warden_hale_statue), replacing the retired Tripo generation; the bronze figure is the KayKit knight re-posed and the planted sword is KayKit sword_b, both CC0 (see the KayKit rows above) | Project asset (CC0 source geometry) | With the project only |
 Assets were optimized for shipping (animation clip pruning, meshopt compression,
 texture resizing) via `scripts/assets/build_assets.mjs`; raw packs are not
 committed.

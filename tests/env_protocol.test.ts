@@ -8,7 +8,7 @@ import {
 } from '../headless/protocol';
 import { gainDoom } from '../src/sim/combat/affliction';
 import { addSoulFragments } from '../src/sim/combat/necromancy';
-import { CLASSES, MOBS } from '../src/sim/data';
+import { CLASSES, MOBS, WORLD_MAX_X, WORLD_MIN_X } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { ACTIONS, encodeObs, NUM_ACTIONS, obsSize } from '../src/sim/obs';
 import { grantDevotion } from '../src/sim/paladin_devotion';
@@ -114,8 +114,23 @@ describe('headless environment protocol validation', () => {
     for (const cls of ALL_CLASSES) {
       expect(CLASSES[cls].abilities.length).toBeLessThanOrEqual(abilitySlots);
     }
-    // 13 fixed actions (10 move/target + interact/stop/eat_drink) plus the ability slots
-    expect(NUM_ACTIONS).toBe(13 + abilitySlots);
+    // Existing fixed actions + the five append-only scene controls.
+    expect(NUM_ACTIONS).toBe(18 + abilitySlots);
+    expect(ACTIONS.slice(-5)).toEqual([
+      'scene_skip',
+      'scene_choice_1',
+      'scene_choice_2',
+      'scene_choice_3',
+      'scene_choice_4',
+    ]);
+  });
+
+  it('normalizes the asymmetric world X bounds to the full observation range', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior' });
+    sim.player.pos.x = WORLD_MIN_X;
+    expect(encodeObs(sim)[4]).toBe(-1);
+    sim.player.pos.x = WORLD_MAX_X;
+    expect(encodeObs(sim)[4]).toBe(1);
   });
 
   it('observes Devotion, Ascension, and the real Divine Ascension readiness gate', () => {

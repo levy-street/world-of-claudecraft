@@ -93,8 +93,10 @@ describe('mob arcane rot (on-hit arcane DoT)', () => {
   });
 
   it('refreshes (does not infinitely stack) on repeated brands from the same deacon', () => {
-    // seed re-pinned after a content append shifted the world-gen rng stream
-    const sim = makeSim('warrior', 31338);
+    // seed re-pinned after a content append shifted the world-gen rng stream,
+    // then re-hunted 31338 to 31354 for the Last Bell packet's world content
+    // (31338's swing rolls now empty the 5000 hp pool and death strips the aura)
+    const sim = makeSim('warrior', 31354);
     const player = sim.entities.get(sim.playerId)!;
     player.maxHp = 5000;
     player.hp = 5000;

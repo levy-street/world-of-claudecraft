@@ -27,6 +27,7 @@ import {
 } from '../src/sim/data';
 import { canEquipItem } from '../src/sim/equipment_rules';
 import { HARVEST_COMPONENT_ITEMS, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
+import { allScenarios } from '../src/sim/scenarios/registry';
 import { Sim } from '../src/sim/sim';
 import { ALL_CLASSES, MAX_LEVEL, XP_TABLE, type ZoneDef } from '../src/sim/types';
 import { terrainHeight, WATER_LEVEL } from '../src/sim/world';
@@ -138,6 +139,9 @@ describe('content referential integrity', () => {
   it('QUEST_ORDER covers every quest exactly once', () => {
     expect([...QUEST_ORDER].sort()).toEqual(Object.keys(QUESTS).sort());
     expect(new Set(QUEST_ORDER).size).toBe(QUEST_ORDER.length);
+    // Observation slots are append-only: Last Bell may grow only at the tail,
+    // never by renumbering any established quest feature.
+    expect(QUEST_ORDER.at(-1)).toBe('q_lb_q0_ashore');
   });
 
   it('every camp-spawned mob has an unconditional loot entry (copper at minimum)', () => {
@@ -225,6 +229,15 @@ describe('content referential integrity', () => {
     const spawning = new Set<string>();
     for (const c of CAMPS) spawning.add(c.mobId);
     for (const d of DUNGEON_LIST) for (const s of d.spawns) spawning.add(s.mobId);
+    // Scenario stages are a spawn source too (the Tidemill stalker is Q0's
+    // kill target and exists only inside its solo instance), so sweep the
+    // registry instead of growing the raid exception list name by name.
+    for (const sc of allScenarios()) {
+      for (const stage of sc.stages) {
+        for (const s of stage.spawns ?? []) spawning.add(s.mobId);
+        for (const t of stage.timedSpawns ?? []) for (const s of t.spawns) spawning.add(s.mobId);
+      }
+    }
     const problems: string[] = [];
     for (const q of Object.values(QUESTS)) {
       for (const obj of q.objectives) {

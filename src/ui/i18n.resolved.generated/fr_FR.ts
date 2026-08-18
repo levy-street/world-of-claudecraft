@@ -396,6 +396,11 @@ export const fr_FR: EnTranslations = {
       "busy": "Terminez votre action en cours avant d'utiliser le Déblocage.",
       "unavailable": "Le Déblocage n'est pas disponible dans votre état actuel."
     },
+    "scene": {
+      "skipHint": "Skip scene (Esc)",
+      "waitingFor": "Waiting for {name}",
+      "timer": "{seconds}s"
+    },
     "fct": {
       "absorbed": "Absorbé ({amount})",
       "cheap": "Coût réduit !"
@@ -854,7 +859,7 @@ export const fr_FR: EnTranslations = {
       "leaderboard": "Classement",
       "dailyRewards": "Boutique",
       "deeds": "Hauts faits",
-      "mounts": "Montures",
+      "mounts": "Mounts",
       "professions": "Métiers",
       "reliquary": "Reliquaire",
       "nameplates": "Noms",
@@ -1052,21 +1057,21 @@ export const fr_FR: EnTranslations = {
       "resetConfirmBody": "La première barre retrouve ses touches par défaut. Les deuxième et troisième barres deviennent non assignées. Cette action est irréversible."
     },
     "mounts": {
-      "title": "Montures",
-      "close": "Fermer",
-      "select": "Choisir",
-      "selected": "Choisie",
-      "riding": "En selle",
+      "title": "Mounts",
+      "close": "Close",
+      "select": "Select",
+      "selected": "Selected",
+      "riding": "Riding",
       "mount": "Monter",
-      "dismount": "Descendre",
+      "dismount": "Dismount",
       "useToRide": "Utiliser pour invoquer cette monture.",
       "emptyTitle": "Aucune monture collectée",
       "emptyStableHint": "Atteignez le niveau 20 et prenez des leçons d’équitation auprès de la Maîtresse d’écurie Marla aux écuries à l’ouest de Highwatch.",
       "emptyDropHint": "Les montures plus rares sont lâchées par les boss de donjon et de raid.",
       "clickManage": "Cliquez pour choisir votre monture",
-      "rarity_common": "Commune",
+      "rarity_common": "Common",
       "rarity_rare": "Rare",
-      "rarity_epic": "Épique",
+      "rarity_epic": "Epic",
       "spec_speed": "+{pct}% de mobilité supplémentaire",
       "name_valorsteed": "Destrier de Bravoure",
       "name_grag_bear": "Ours-Grag Goliath",
@@ -1089,6 +1094,7 @@ export const fr_FR: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Appuyez sur {key} pour monter le Valorsteed d'entraînement.",
+      "buyReinsPrompt": "Riding learned. Buy Valorsteed reins from Marla for 10 gold, then use them to ride.",
       "ownedMountPrompt": "Vos rênes sont dans vos sacs. Utilisez-les pour chevaucher.",
       "ridePrompt": "Suivez le repère lumineux jusqu'à la ligne de départ, puis appuyez sur Démarrer la course.",
       "begin": "Commencer la leçon",
@@ -2811,6 +2817,13 @@ export const fr_FR: EnTranslations = {
     "noticeboard": {
       "empty": "Rien ne semble affiché."
     },
+    "memorial": {
+      "title": "Memorial",
+      "dedication": "To the wardens of Gullhaven who carried a seal into the Breach and did not come out again. The town keeps the bell for them.",
+      "rollHeading": "Roll of Honour ({count})",
+      "roomRemaining": "The stone below the last name has been left bare.",
+      "close": "Close memorial"
+    },
     "bank": {
       "title": "Banque",
       "subtitle": "Le Coffre doré",
@@ -3826,6 +3839,39 @@ export const fr_FR: EnTranslations = {
     },
     "arenaGate": {
       "minLevelNote": "Niveau requis : {level}"
+    }
+  },
+  "lb": {
+    "fixture": {
+      "ferry": "The Farshore Ferry",
+      "tidemill": "The Tidemill",
+      "breach": "The Breach"
+    },
+    "speaker": {
+      "tam": "Bellkeeper Tam",
+      "coalfast": "Warden Coalfast",
+      "ollun": "Riftwatch Ollun",
+      "edda": "Quartermaster Edda",
+      "saul": "Mender Saul"
+    },
+    "fare": {
+      "promptOut": "Passage to the Farshore: {price} copper.",
+      "promptBack": "Passage back to the mainland: {price} copper.",
+      "pay": "Pay the fare.",
+      "decline": "Not today."
+    },
+    "q0": {
+      "scene": {
+        "harbor": "A working harbor: nets drying, star-glass salvage crates stenciled for mainland buyers.",
+        "plinth": "Above the harbor steps a bronze warden faces inland. The newest name on the plinth is a century old: WARDEN HALE. There is room below it for more.",
+        "toll": "A bell tolls, once. Everyone in the street stops walking, and counts. Nothing follows, and the whole street exhales at once."
+      },
+      "tam": {
+        "stretchers": "The last one of those cost the whole watch a morning and two stretchers."
+      },
+      "coalfast": {
+        "look": "The grey man looks at the dead stalker, then at you, slightly longer. Then he walks back toward the cliffs."
+      }
     }
   },
   "gatherEvent": {
@@ -6097,6 +6143,33 @@ export const fr_FR: EnTranslations = {
     },
     "inspector": {
       "label": "Options de l'outil"
+    },
+    "cinematic": {
+      "title": "Cinematic",
+      "show": "Show panel",
+      "hide": "Hide panel",
+      "scene": "Scene",
+      "sceneOption": "{id} ({seconds}s)",
+      "time": "Time",
+      "timeReadout": "{current} / {duration}s",
+      "play": "Play",
+      "pause": "Pause",
+      "authoredCamera": "Authored camera",
+      "fade": "Fade: {percent}%",
+      "letterboxOn": "Letterbox: on",
+      "letterboxOff": "Letterbox: off",
+      "violations": "Violations",
+      "noViolations": "No violations at this time",
+      "violationRow": "{check} | op {opIndex} | {measured}",
+      "capture": "Capture keyframe",
+      "copy": "Copy block",
+      "output": "Generated camera capture",
+      "unavailable": "3D viewport loading",
+      "seedMismatch": "Capture needs the shipping world seed",
+      "captureSavedCopied": "Saved and copied",
+      "captureSaved": "Saved; block ready below",
+      "captureCopyOnly": "Copied; dev writer unavailable",
+      "captureReady": "Block ready below"
     },
     "brush": {
       "title": "Pinceau",
@@ -13728,6 +13801,24 @@ export const fr_FR: EnTranslations = {
       "fisher_bram": {
         "name": "Pêcheur Bram"
       },
+      "lb_actor_coalfast": {
+        "name": "Warden Coalfast"
+      },
+      "lb_actor_ollun": {
+        "name": "Riftwatch Ollun"
+      },
+      "lb_actor_edda": {
+        "name": "Quartermaster Edda"
+      },
+      "lb_actor_saul": {
+        "name": "Mender Saul"
+      },
+      "lb_actor_tam": {
+        "name": "Bellkeeper Tam"
+      },
+      "tidemill_stalker": {
+        "name": "The Tidemill Stalker"
+      },
       "rift_hellguard": {
         "name": "Garde infernal"
       },
@@ -14287,6 +14378,21 @@ export const fr_FR: EnTranslations = {
         "name": "Nell l'Effrayée",
         "title": "Pêcheuse de Gullhaven",
         "greeting": "Ça s'est ouvert juste là où sèchent les filets. Juste là, où je me tenais chaque matin de ma vie. Je ne descends plus jusqu'au rivage. Je ne vais plus beaucoup nulle part, en fait."
+      },
+      "ferryman_ewald": {
+        "name": "Ferryman Ewald",
+        "title": "The Farshore Crossing",
+        "greeting": "The Farshore, is it? Nobody crosses for the fishing anymore, friend. Board when you are ready, and mind the bell when you land: the town listens to it the way you listen to weather."
+      },
+      "ferryman_ewald_gullhaven": {
+        "name": "Ferryman Ewald",
+        "title": "The Farshore Crossing",
+        "greeting": "The Farshore, is it? Nobody crosses for the fishing anymore, friend. Board when you are ready, and mind the bell when you land: the town listens to it the way you listen to weather."
+      },
+      "sergeant_marsh": {
+        "name": "Sergeant Marsh",
+        "title": "Town Militia",
+        "greeting": "Trained? Then here is how tonight works. My line holds the road. If the rift coughs up something we cannot put down, I point at you. The mill is yours: nothing follows you in, nothing gets past us to town. Go."
       },
       "forgemistress_darva": {
         "name": "Maîtresse des forges Darva",
@@ -16284,6 +16390,22 @@ export const fr_FR: EnTranslations = {
           }
         }
       },
+      "q_lb_q0_ashore": {
+        "title": "Ashore",
+        "text": "Gullhaven takes the breaks day and night and holds anyway. If you mean to stand with them, start where the town bleeds: the militia line at the Watch Meadow, east past the harbor steps and the old statue.",
+        "completion": "The mill kill was yours alone, and Tam does not exaggerate about stretchers. I am short a scout and long on fields. You held ground tonight that was not yours to hold, and that is the whole job. Welcome to the watch.",
+        "objectives": {
+          "0": {
+            "label": "Report to Sergeant Marsh at the Watch Meadow"
+          },
+          "1": {
+            "label": "Riftspawn slain"
+          },
+          "2": {
+            "label": "Put down whatever is in the Tidemill"
+          }
+        }
+      },
       "q_gc_down_the_windway": {
         "title": "En descendant la Voie du Vent",
         "text": "Vous avez fait l'ascension, {playerName}, alors le vent a décidé de vous garder. Wickharbor se trouve à l'est le long de la route des landes, blottie sous le vent de sa crique. La Capitaine du port Odile compte chaque âme qui franchit le col, et elle voudra vous compter aussi. Dites-lui que la Voie du Vent est toujours ouverte.",
@@ -16841,6 +16963,12 @@ export const fr_FR: EnTranslations = {
           },
           "4": {
             "label": "Les Champs de la Faille"
+          },
+          "5": {
+            "label": "The Breach"
+          },
+          "6": {
+            "label": "The Wreckfields"
           }
         }
       }
@@ -16880,6 +17008,51 @@ export const fr_FR: EnTranslations = {
         "name": "Le Dernier Donjon",
         "enterText": "Vous pénétrez dans les salles froides et silencieuses de The Last Keep.",
         "leaveText": "Vous refermez la porte du donjon et retrouvez le vent des Drakelands."
+      },
+      "lb_tidemill": {
+        "name": "The Tidemill",
+        "enterText": "The mill door gives. Inside, the dark is listening.",
+        "leaveText": "You step out of the Tidemill into the evening air."
+      },
+      "lb_riftline": {
+        "name": "The Rift-Line at Dusk",
+        "enterText": "The meadow gate closes behind the patrol. The night belongs to the line.",
+        "leaveText": "You leave the rift-line to the dawn watch."
+      },
+      "lb_vault": {
+        "name": "The Drowned First Redoubt",
+        "enterText": "The rope pays out into the dark. Below, the old redoubt lies where it fell.",
+        "leaveText": "You come up the cliff rope into daylight."
+      },
+      "lb_council": {
+        "name": "The Redoubt Council",
+        "enterText": "The council room holds six chairs. One is empty.",
+        "leaveText": "You step out of the redoubt."
+      },
+      "lb_landing": {
+        "name": "The Landing at Night",
+        "enterText": "The guide fires burn down the beach. The fleet waits beyond the shoals.",
+        "leaveText": "You leave the Landing beach behind."
+      },
+      "lb_riftfields": {
+        "name": "The Riftfields Approach",
+        "enterText": "Four ward sites ring the breach. The rite has closed it for twelve centuries.",
+        "leaveText": "You walk back down out of the Riftfields."
+      },
+      "lb_breach": {
+        "name": "Inside the Breach",
+        "enterText": "The light is wrong and the sky is worse. The heart sits in open ground ahead.",
+        "leaveText": "You cross the threshold into ordinary night air."
+      },
+      "lb_lastwatch": {
+        "name": "The Last Watch",
+        "enterText": "The redoubt is clean and empty. Someone has to close the watch.",
+        "leaveText": "You close the redoubt door behind you."
+      },
+      "lb_willowfen": {
+        "name": "Willowweep",
+        "enterText": "The willow does not move. The water does not either.",
+        "leaveText": "You leave the willow to its quiet."
       },
       "dawnhold_castle": {
         "name": "Dawnhold Castle",

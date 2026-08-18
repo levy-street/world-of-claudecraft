@@ -141,6 +141,23 @@ const DOM_GLOBAL_RE = /\b(document|window|navigator|localStorage|sessionStorage)
 const DOM_GLOBAL_VALUE_RE =
   /\btypeof\s+(?:document|window|navigator|localStorage|sessionStorage)\b|\binstanceof\s+(?:Document|Window|Navigator|Storage)\b|(?:[=(]|\breturn\b)\s*(?:document|window|navigator|localStorage|sessionStorage)\s*[),;]/;
 const NONDETERMINISM_RE = /\b(Math\.random|Date\.now|performance\.now)\b/;
+const SCENE_WALL_CLOCK_RE = /\b(?:performance\.now|Date\.now)\b|\bnew\s+Date\s*\(\s*\)/;
+
+// Explicit scene-presentation clock surface. The impure adapters own the injected
+// clock reads, while the pure evaluators own camera, overlay, choice, and prop
+// timing. Keeping the list named prevents a moved subtitle or cue clock from
+// silently falling outside the one-clock guard.
+const SCENE_PRESENTATION_CLOCK_FILES = [
+  join(repoRoot, 'src', 'game', 'scene_director.ts'),
+  join(repoRoot, 'src', 'game', 'scene_director_core.ts'),
+  join(repoRoot, 'src', 'game', 'scene_teardown_watchdog_core.ts'),
+  join(repoRoot, 'src', 'ui', 'hud', 'scene', 'scene_controller.ts'),
+  join(repoRoot, 'src', 'ui', 'hud', 'scene', 'scene_overlay_view.ts'),
+  join(repoRoot, 'src', 'ui', 'hud', 'scene', 'scene_choice_view.ts'),
+  join(repoRoot, 'src', 'render', 'harbor.ts'),
+  join(repoRoot, 'src', 'render', 'harbor_ship_cue_registry.ts'),
+  join(repoRoot, 'src', 'render', 'prop_path_core.ts'),
+];
 
 const simFiles = walk(simRoot);
 
@@ -243,6 +260,8 @@ const UI_PURE_CORES = [
   'src/ui/hud/quest/master_craft_core.ts',
   'src/ui/quest_marker_tags.ts',
   'src/ui/hud/delve/delve_map.ts',
+  'src/ui/hud/scene/scene_overlay_view.ts',
+  'src/ui/hud/scene/scene_choice_view.ts',
   'src/ui/hud/rift/rift_map_core.ts',
   'src/ui/hud/battleground/battleground_map_view.ts',
   'src/ui/hud/battleground/battleground_kill_feed_view.ts',
@@ -291,6 +310,7 @@ const UI_PURE_CORES = [
   'src/ui/item_set_tooltip_view.ts',
   'src/ui/weapon_proc_view.ts',
   'src/ui/options_view.ts',
+  'src/ui/hud/memorial/memorial_plaque_view.ts',
   'src/ui/hud/vendor/vendor_view.ts',
   'src/ui/hud/vendor/heroic_vendor_view.ts',
   'src/ui/hud/vendor/warfare_vendor_view.ts',
@@ -414,6 +434,12 @@ const UI_PURE_CORES = [
   'src/game/perf_diagnosis_core.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
+  // Last Bell scene playback core: lives in src/game (its consumer is the
+  // frame loop, not the HUD) but holds the same pure-core contract, like the
+  // two src/game entries above.
+  'src/game/scene_director_core.ts',
+  'src/game/scene_rig_core.ts',
+  'src/game/scene_teardown_watchdog_core.ts',
   'src/ui/trade_view.ts',
   'src/ui/hud/rift/rift_floor_tracker_view.ts',
   'src/ui/safe_local_storage.ts',
@@ -426,10 +452,11 @@ const UI_PURE_CORES = [
 const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_storage.ts')]);
 
 // Pure logic cores that live in src/render (the painter half is Three-side):
-// cast_bar (the overhead cast/channel state) and nameplate_view (the per-entity
-// nameplate visibility / anchor / threat / combo model). Each emits state
-// from sim types with no Three import and no i18n, so a NameplatePainter /
-// cast_bar painter draws it and a Vitest drives it directly.
+// cast_bar (the overhead cast/channel state), prop_path_core (authored segment
+// interpolation), and nameplate_view (the per-entity nameplate visibility /
+// anchor / threat / combo model). Each emits state from sim types with no
+// Three import and no i18n, so a render consumer drives it and a Vitest can
+// sample it directly.
 // terrain_region_core (editor partial-rebuild chunk/texel selection math) and
 // water_core (the shore-depth sample shared by build + editor setLevel) follow
 // the same contract for the map editor's realtime terrain/water edits.
@@ -471,6 +498,14 @@ const RENDER_PURE_CORES = [
   'src/render/character_effects_core.ts',
   'src/render/character_presentation_core.ts',
   'src/render/character_view_core.ts',
+  'src/render/harbor_boarding_junction_core.ts',
+  'src/render/harbor_deck_rider_core.ts',
+  'src/render/harbor_deck_stand_in_core.ts',
+  'src/render/harbor_rail_profile_core.ts',
+  'src/render/harbor_ship_attach_core.ts',
+  'src/render/harbor_ship_tripwire_core.ts',
+  'src/render/harbor_ship_update_core.ts',
+  'src/render/prop_path_core.ts',
   'src/render/chunk_residency_core.ts',
   'src/render/cliff_scree_core.ts',
   'src/render/dashed_ring_core.ts',
@@ -581,6 +616,7 @@ const RENDER_PURE_CORES = [
   'src/render/characters/skeleton_update_core.ts',
   'src/render/characters/tinted_material_cache_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',
+  'src/render/characters/prop_placement_core.ts',
 ].map((rel) => join(repoRoot, rel));
 
 // Bare-named pure cores: registered cores (from UI_PURE_CORES + RENDER_PURE_CORES)
@@ -744,6 +780,42 @@ describe('src/sim architecture invariants', () => {
       violations,
       `all sim randomness/time goes through Rng (src/sim/rng.ts) and the sim clock:\n${violations.join('\n')}`,
     ).toEqual([]);
+  });
+});
+
+describe('scene presentation clock invariant', () => {
+  it('keeps the explicit scene timing modules on the mirrored world clock', () => {
+    for (const file of SCENE_PRESENTATION_CLOCK_FILES) {
+      expect(existsSync(file), `${relative(repoRoot, file)} is missing from the clock scan`).toBe(
+        true,
+      );
+    }
+    const violations = scanLines(SCENE_PRESENTATION_CLOCK_FILES, SCENE_WALL_CLOCK_RE);
+    expect(
+      violations,
+      `scene presentation must not read wall-clock time:\n${violations.join('\n')}`,
+    ).toEqual([]);
+  });
+
+  it('pins every wall-clock spelling the scene scan bans', () => {
+    for (const positive of ['performance.now()', 'Date.now()', 'new Date()']) {
+      expect(SCENE_WALL_CLOCK_RE.test(positive), positive).toBe(true);
+    }
+    expect(SCENE_WALL_CLOCK_RE.test('new Date(timestamp)')).toBe(false);
+  });
+
+  it('composes every injected presentation clock from IWorld.presentationTime', () => {
+    const mainSource = stripComments(readFileSync(join(repoRoot, 'src', 'main.ts'), 'utf8'));
+    const hudSource = stripComments(readFileSync(join(repoRoot, 'src', 'ui', 'hud.ts'), 'utf8'));
+    const rendererSource = stripComments(
+      readFileSync(join(repoRoot, 'src', 'render', 'renderer.ts'), 'utf8'),
+    );
+
+    expect(mainSource).toMatch(/nowSec:\s*\(\)\s*=>\s*world\.presentationTime/);
+    expect(hudSource).toMatch(/now:\s*\(\)\s*=>\s*this\.sim\.presentationTime/);
+    expect(rendererSource).toMatch(
+      /buildHarbors\(this\.sim\.cfg\.seed,\s*\{\s*nowSec:\s*\(\)\s*=>\s*this\.sim\.presentationTime,\s*\}\)/,
+    );
   });
 });
 
@@ -1814,6 +1886,7 @@ const UI_DOM_MODULES = [
   'src/ui/hud/cosmetics/skin_event_controller.ts',
   'src/ui/hud/delve/lockpick_controller.ts',
   'src/ui/hud/delve/lockpick_window.ts',
+  'src/ui/hud/memorial/memorial_plaque_window.ts',
   'src/ui/hud/delve/rite_controller.ts',
   'src/ui/hud/delve/rite_window.ts',
   'src/ui/hud/fiesta/fiesta_controller.ts',
@@ -1825,6 +1898,9 @@ const UI_DOM_MODULES = [
   'src/ui/hud/quest/quest_dialog_controller.ts',
   'src/ui/hud/quest/quest_tracker_controller.ts',
   'src/ui/hud/quest/questlog_window.ts',
+  'src/ui/hud/scene/scene_choice_window.ts',
+  'src/ui/hud/scene/scene_controller.ts',
+  'src/ui/hud/scene/scene_overlay_window.ts',
   'src/ui/hud/vendor/buy_quantity_prompt_window.ts',
   'src/ui/hud/vendor/heroic_vendor_window.ts',
   'src/ui/hud/vendor/train_window.ts',

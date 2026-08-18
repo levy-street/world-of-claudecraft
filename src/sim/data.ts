@@ -131,8 +131,18 @@ import {
   SPIRIT_HEALER_NPC_ID,
 } from './content/graveyards';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
+import { GULLHAVEN_PLOT_PADS, GULLHAVEN_TOWN_BENCHES } from './content/gullhaven';
+import { LAST_BELL_DUNGEON_DEFS } from './content/last_bell';
+import {
+  LAST_BELL_CAMPAIGN_MOBS,
+  LAST_BELL_CAMPAIGN_NPCS,
+  LAST_BELL_CAMPAIGN_QUEST_ORDER,
+  LAST_BELL_CAMPAIGN_QUESTS,
+} from './content/last_bell_campaign';
+import { LAST_BELL_SQUAD_MOBS } from './content/last_bell_squad';
 import { MAGE_PET_MOBS } from './content/mage_pets';
 import { MAILBOXES } from './content/mailboxes';
+import { MEMORIAL_TERRAIN_EDITS, MEMORIALS } from './content/memorials';
 import { NECROMANCY_MOBS } from './content/necromancy';
 import {
   NIGHTBLOOM_CAMPS,
@@ -270,6 +280,7 @@ import {
 } from './content/zone3';
 import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from './dungeon_layout';
 import { EASTBROOK_LAYOUT } from './eastbrook_layout';
+import { HARBOR_TERRAIN_EDITS } from './harbor_layout';
 import { JAIL_BLOCKERS, JAIL_TERRAIN_EDITS } from './jail';
 
 export type { DelveShopEntry, DelveShopGate, DelveShopOffer } from './content/delves';
@@ -380,6 +391,11 @@ export const MOBS: Record<string, MobTemplate> = {
   ...EVERGARDEN_MOBS,
   ...GALECREST_MOBS,
   ...FARSHORE_MOBS,
+  // Last Bell squad encounter actors (spawned only by src/sim/squad/squad.ts
+  // inside story instances, never camp-spawned).
+  ...LAST_BELL_SQUAD_MOBS,
+  // Last Bell campaign encounter mobs (scenario-spawned only).
+  ...LAST_BELL_CAMPAIGN_MOBS,
   // The Vale Cup boarball: an inert, non-hostile ball entity (never camp-spawned;
   // the match driver in social/vale_cup.ts spawns and despawns it).
   [VALE_CUP_BALL_TEMPLATE_ID]: VALE_CUP_BALL_MOB,
@@ -393,6 +409,7 @@ Object.assign(ITEMS, buildHeroicVariants(ITEMS, MOBS));
 // Realm NPCs are appended after brother_halven: NPCs spawn in insertion order
 // before camps, so existing entity ids stay stable (determinism).
 export const NPCS: Record<string, NpcDef> = {
+  ...LAST_BELL_CAMPAIGN_NPCS,
   ...ZONE1_NPCS,
   ...ZONE2_NPCS,
   ...ZONE3_NPCS,
@@ -422,6 +439,7 @@ export const NPCS: Record<string, NpcDef> = {
 export { type GraveyardDef, OVERWORLD_GRAVEYARDS, SPIRIT_HEALER, SPIRIT_HEALER_NPC_ID };
 
 export const QUESTS: Record<string, QuestDef> = {
+  ...LAST_BELL_CAMPAIGN_QUESTS,
   ...ZONE1_QUESTS,
   ...ZONE2_QUESTS,
   ...ZONE3_QUESTS,
@@ -455,6 +473,7 @@ export const QUEST_ORDER: string[] = [
   ...EVERGARDEN_QUEST_ORDER,
   ...GALECREST_QUEST_ORDER,
   ...FARSHORE_QUEST_ORDER,
+  ...LAST_BELL_CAMPAIGN_QUEST_ORDER,
 ];
 
 // The Book of Deeds catalog (content/deeds.ts) is deliberately NOT re-exported
@@ -598,6 +617,9 @@ function mergeProps(sets: ZonePropsDef[]): ZonePropsDef {
     stalls: sets.flatMap((s) => s.stalls),
     mines: sets.flatMap((s) => s.mines),
     docks: sets.flatMap((s) => s.docks),
+    // optional per-zone field (the delveMarkers trap below): forgetting the
+    // ?? [] here would silently drop every harbor from the merged world
+    harbors: sets.flatMap((s) => s.harbors ?? []),
     tents: sets.flatMap((s) => s.tents),
     marshReeds: sets.flatMap((s) => s.marshReeds),
     crates: sets.flatMap((s) => s.crates),
@@ -715,12 +737,28 @@ export const BUILTIN_WORLD: WorldContent = {
     mailboxes: MAILBOXES,
     noticeboards: NOTICEBOARDS,
     musterBoards: MUSTER_BOARDS,
+    memorials: MEMORIALS,
     graveyards: OVERWORLD_GRAVEYARDS,
   },
   // invisible collision walls: the moderation cage plus the Last Keep's
   // sealed building slot (castle_layout.ts CASTLE_BLOCKERS)
   blockers: [...JAIL_BLOCKERS, ...CASTLE_BLOCKERS],
-  terrainEdits: JAIL_TERRAIN_EDITS,
+  // The jail cage floor plus the harbor shore grading (harbor_layout.ts):
+  // both are pure HeightStamp data applied through terrainHeight's edit layer.
+  // Memorial grading lands LAST so its terrace wins locally over the
+  // broader harbor pads it overlaps at the berm.
+  // Gullhaven's town benches land after the harbour grading (whose 4.40 street
+  // pocket they stay clear of) and BEFORE the memorial's, which then cuts its
+  // own terrace and contour path into the result. Its building PLOT PADS land
+  // last of all: a house floor must be flat wherever it stands, and the
+  // memorial's outer domes reach the town's south bench.
+  terrainEdits: [
+    ...JAIL_TERRAIN_EDITS,
+    ...HARBOR_TERRAIN_EDITS,
+    ...GULLHAVEN_TOWN_BENCHES,
+    ...MEMORIAL_TERRAIN_EDITS,
+    ...GULLHAVEN_PLOT_PADS,
+  ],
 };
 
 let activeWorld: WorldContent = BUILTIN_WORLD;
@@ -971,6 +1009,7 @@ export const DUNGEONS: Record<string, DungeonDef> = {
   ...DUNGEON_DEFS,
   ...TEMPLE_DUNGEON_DEFS,
   ...WILDHEART_DUNGEON_DEFS,
+  ...LAST_BELL_DUNGEON_DEFS,
 };
 
 export const DUNGEON_LIST: DungeonDef[] = Object.values(DUNGEONS).sort((a, b) => a.index - b.index);

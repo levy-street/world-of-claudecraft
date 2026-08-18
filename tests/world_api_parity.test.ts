@@ -70,6 +70,7 @@ import type { IWorldProfessions } from '../src/world_api/professions';
 import type { IWorldProgressionXp } from '../src/world_api/progression_xp';
 import type { IWorldQuests } from '../src/world_api/quests';
 import type { IWorldReliquary } from '../src/world_api/reliquary';
+import type { IWorldScenes } from '../src/world_api/scenes';
 import type { IWorldSocialGraph } from '../src/world_api/social_graph';
 import type { IWorldTalents } from '../src/world_api/talents';
 import type { IWorldTargeting } from '../src/world_api/targeting';
@@ -442,6 +443,11 @@ export const IWORLD_MEMBERS = [
   { name: 'reliquaryCuratorRank', kind: 'method' },
   { name: 'reliquaryPageClearCount', kind: 'method' },
   { name: 'reliquaryRarity', kind: 'method' },
+  // --- Last Bell scenes (IWorldScenes): one presentation clock + commands ---
+  { name: 'presentationTime', kind: 'data' },
+  { name: 'sceneSkip', kind: 'method' },
+  { name: 'answerSceneChoice', kind: 'method' },
+  { name: 'sceneActiveForLocalPlayer', kind: 'method' },
   // IWorldActionBar: per-character action-bar layout persistence + login restore.
   { name: 'saveActionBarLayout', kind: 'method' },
   { name: 'takeActionBarLayoutRestore', kind: 'method' },
@@ -606,9 +612,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // even when the total agrees. Only running the suite says what these
     // numbers really are; never reconcile them by arithmetic in the diff (the
     // numbers below were set from a suite run, not from this narrative).
-    expect(IWORLD_MEMBERS.length).toBe(323);
-    expect(DATA_MEMBERS.length).toBe(86);
-    expect(METHOD_MEMBERS.length).toBe(237);
+    // The Last Bell scenes facet (IWorldScenes) adds presentationTime (data)
+    // plus sceneSkip / answerSceneChoice / sceneActiveForLocalPlayer (methods),
+    // leaving 327. Set from a suite run per the NOTE above.
+    expect(IWORLD_MEMBERS.length).toBe(327);
+    expect(DATA_MEMBERS.length).toBe(87);
+    expect(METHOD_MEMBERS.length).toBe(240);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -636,6 +645,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'activeMobileStationCraft',
       'activeTemporalHourglasses',
       'activeTitle',
+      'answerSceneChoice',
       'applyEnchant',
       'applyTalents',
       'archetypeTitle',
@@ -837,6 +847,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'player',
       'playerId',
       'playtimeSeconds',
+      'presentationTime',
       'prestige',
       'prestigeRank',
       'professionsState',
@@ -877,6 +888,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'salvageItem',
       'saveActionBarLayout',
       'saveLoadout',
+      'sceneActiveForLocalPlayer',
+      'sceneSkip',
       'searchCharacters',
       'selectTalentRow',
       'sellAllJunk',
@@ -1008,6 +1021,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'player',
       'playerId',
       'playtimeSeconds',
+      'presentationTime',
       'prestigeRank',
       'professionsState',
       'questLog',
@@ -1046,6 +1060,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'accountFlair',
       'activeLootRolls',
       'activeMasterLootRolls',
+      'answerSceneChoice',
       'applyEnchant',
       'applyTalents',
       'arenaAugmentPick',
@@ -1221,6 +1236,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'salvageItem',
       'saveActionBarLayout',
       'saveLoadout',
+      'sceneActiveForLocalPlayer',
+      'sceneSkip',
       'searchCharacters',
       'selectTalentRow',
       'sellAllJunk',
@@ -1779,6 +1796,14 @@ type _ExhaustProfessions = AssertNever<
   Exclude<keyof IWorldProfessions, (typeof FACET_PROFESSIONS)[number]>
 >;
 
+const FACET_SCENES = [
+  'presentationTime',
+  'sceneSkip',
+  'answerSceneChoice',
+  'sceneActiveForLocalPlayer',
+] as const satisfies readonly (keyof IWorldScenes)[];
+type _ExhaustScenes = AssertNever<Exclude<keyof IWorldScenes, (typeof FACET_SCENES)[number]>>;
+
 const FACET_DEEDS = [
   'deedsEarned',
   'deedStats',
@@ -1850,14 +1875,15 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   dungeonFinder: FACET_DUNGEON_FINDER,
   deeds: FACET_DEEDS,
   reliquary: FACET_RELIQUARY,
+  scenes: FACET_SCENES,
   actionBar: FACET_ACTION_BAR,
 };
 
 describe('W1: aggregate IWorld member set equals the disjoint union of the facets', () => {
   it('pins the facet count', () => {
     // +1 battleground facet (Thornhollow Fields) on the release line; +1
-    // Reliquary facet on this branch: 33 total.
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(33);
+    // Reliquary facet; +1 Last Bell scenes facet: 34 total.
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(34);
   });
 
   it('each facet array is non-empty and internally duplicate-free', () => {
@@ -1885,8 +1911,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(323);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(323);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(327);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(327);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

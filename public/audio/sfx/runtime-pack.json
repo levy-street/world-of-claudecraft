@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "2074fac9f3d7a778014af595331a137a7c1f44acb53ebe2250d901044d89da52",
-  "catalogHash": "3955e4baa75a2d284a7a67b26d653aaed5bd61d5f8b82fd048bcbeb1b07239a1",
+  "bundleId": "98b5af1cb21a9bf6167071a0952eca6e07319453bbeada3fdd1d448f9535b8d7",
+  "catalogHash": "e8472e2c65668a89f95fb903ddb3d5fe62d290d0501dca1b36018b3b1c16898d",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -1046,6 +1046,42 @@
         }
       ],
       "gain": 2.041738,
+      "playbackRate": 1
+    },
+    "lb_bell_toll": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/lb_bell_toll.mp3?v=c4ca29d4b549",
+          "bytes": 145493,
+          "sha256": "c4ca29d4b549619dfb2107a84481b203745f83284a5242cb692f3fea62fec573"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "lb_harbor_ambience": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/lb_harbor_ambience.mp3?v=f3dd1c46567f",
+          "bytes": 241415,
+          "sha256": "f3dd1c46567f85a16fa8837624c9242b4a0695b6b76da008e3d0dd551c818c8b"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "lb_ship_castoff": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/lb_ship_castoff.mp3?v=de2be972ba46",
+          "bytes": 97846,
+          "sha256": "de2be972ba467fd68050bceb9f0787c8dce908e3da8e025863c1a84355c238fa"
+        }
+      ],
+      "gain": 1,
       "playbackRate": 1
     },
     "lockpick_advanced_1": {

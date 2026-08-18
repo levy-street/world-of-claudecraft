@@ -236,14 +236,17 @@ describe('map terrain painter: the plate region', () => {
   it('never reaches past the world, however wide the square wants to be', () => {
     // terrainHeight answers for any coordinate, so an unclamped square paints
     // unreachable generator terrain as though it were a coastline. The
-    // Wraithwood's square is the case: it wants 100 yd past WORLD_MAX_X.
-    const zone = zoneById('wraithwood');
+    // Nightbloom's square is the case: it wants 100 yd past WORLD_MIN_X.
+    // (The Wraithwood used to be the east-bound case, but the asymmetric
+    // campaign bounds pushed WORLD_MAX_X out to the Farshore island's edge,
+    // so no square overruns east any more; the west columns still overrun.)
+    const zone = zoneById('nightbloom');
     const side = Math.max(
       (zone.xMax ?? STRIP_MAX_X) - (zone.xMin ?? STRIP_MIN_X),
       zone.zMax - zone.zMin,
     );
     const cx = ((zone.xMin ?? STRIP_MIN_X) + (zone.xMax ?? STRIP_MAX_X)) / 2;
-    expect(cx + side / 2).toBeGreaterThan(WORLD_MAX_X); // unclamped, it overruns
+    expect(cx - side / 2).toBeLessThan(WORLD_MIN_X); // unclamped, it overruns
     for (const z of ZONES) {
       const r = mapZoneRegion(z);
       expect(r.minX, `${z.id} west`).toBeGreaterThanOrEqual(WORLD_MIN_X);

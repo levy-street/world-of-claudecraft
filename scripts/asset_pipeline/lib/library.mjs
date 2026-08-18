@@ -248,7 +248,7 @@ export function collectInventory() {
   const registries = {
     variants: parseItemVariants(readFileSync(join(REPO_ROOT, 'src/ui/weapon_variants.ts'), 'utf8')),
     accessory: parseAccessoryMap(
-      readFileSync(join(REPO_ROOT, 'src/render/characters/assets.ts'), 'utf8'),
+      readFileSync(join(REPO_ROOT, 'src/render/characters/prop_placement_core.ts'), 'utf8'),
     ),
     grip: parseGripOverrides(
       readFileSync(join(REPO_ROOT, 'src/render/characters/weapon_grip.ts'), 'utf8'),

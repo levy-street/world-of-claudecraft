@@ -51,6 +51,7 @@
 //   deeds.ts            IWorldDeeds          earned deeds, lifetime stats, renown, active title,
 //                                            rarity + the account-Renown leaderboard reads
 //   reliquary.ts        IWorldReliquary      sparse firstFind / marks / recent + pure completion
+//   scenes.ts           IWorldScenes         scene presentation clock + skip/choice commands
 //
 // THREE GATES pin this seam (run before any facet edit; the literal counts are
 // pinned THERE and re-stale here, so this prose stays count-free):
@@ -90,6 +91,7 @@ import type { IWorldProfessions } from './world_api/professions';
 import type { IWorldProgressionXp } from './world_api/progression_xp';
 import type { IWorldQuests } from './world_api/quests';
 import type { IWorldReliquary } from './world_api/reliquary';
+import type { IWorldScenes } from './world_api/scenes';
 import type { IWorldSocialGraph } from './world_api/social_graph';
 import type { IWorldTalents } from './world_api/talents';
 import type { IWorldTargeting } from './world_api/targeting';
@@ -115,6 +117,9 @@ export type {
   DeedStats,
   OverheadEmoteId,
 } from './sim/types';
+
+// Wire cap shared by the client send guard and authoritative server dispatch.
+export const SCENE_ID_MAX_LENGTH = 64;
 
 // Online world-layout compatibility is encoded in the first WebSocket frame's
 // discriminator. Changing the authoritative town layout requires a new epoch:
@@ -312,8 +317,9 @@ export interface IWorld
     IWorldDungeonFinder,
     IWorldActionBar,
     IWorldDeeds,
+    IWorldMounts,
     IWorldReliquary,
-    IWorldMounts {}
+    IWorldScenes {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.
@@ -531,6 +537,9 @@ export const COMMAND_NAMES = [
   // arcane-material price and the R30 re-derived maximum
   // (Sim.rechargeToolEffect via professions/tools.ts resolveRechargeToolEffect).
   'recharge_tool_effect',
+  // Last Bell scenes: skip request and leader dialogue-choice answer.
+  'scene_skip',
+  'scene_choice',
   // Per-character action-bar layout persistence: the owning client uploads its
   // full arranged layout (debounced) so it restores at login on any device.
   'save_hotbar_layout',
@@ -695,8 +704,9 @@ export type WorldFacet =
   | 'IWorldDungeonFinder'
   | 'IWorldActionBar'
   | 'IWorldDeeds'
+  | 'IWorldMounts'
   | 'IWorldReliquary'
-  | 'IWorldMounts';
+  | 'IWorldScenes';
 
 export const COMMAND_FACETS = {
   // IWorldCombat: ability casts, auto-attack, spirit release.
@@ -900,7 +910,7 @@ export const COMMAND_FACETS = {
   vcup_ready: 'IWorldValeCup',
   vcup_bet: 'IWorldValeCup',
   vcup_practice: 'IWorldValeCup',
-  // IWorldMounts: pick + mount/dismount (snake_case wire strings, by design).
+  // IWorldMounts: summon/dismount (snake_case wire strings, by design).
   // The active mount is a self-snapshot read (terse `mnt`, no send, untagged);
   // summoning one is an item use (use_item), not a mount command.
   // mount_train_begin is the legacy riding-lesson entry point; its feedback
@@ -932,6 +942,10 @@ export const COMMAND_FACETS = {
   // (no send, untagged).
   deed_set_title: 'IWorldDeeds',
   deed_set_border: 'IWorldDeeds',
+  // IWorldScenes: Last Bell scene skip + leader dialogue-choice answer (all
+  // scene state arrives as personal SimEvents, so these are the only sends).
+  scene_skip: 'IWorldScenes',
+  scene_choice: 'IWorldScenes',
   // IWorldActionBar: the debounced action-bar layout upload. takeActionBarLayoutRestore
   // is a login-time read (no send, untagged).
   save_hotbar_layout: 'IWorldActionBar',

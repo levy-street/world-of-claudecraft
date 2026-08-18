@@ -53,7 +53,7 @@ The key MUST contain a family token: sword, dagger, staff, hammer, axe, halberd,
 scythe, or wand (`tests/held_weapon_models.test.ts` contract), or pass `--family`.
 `--apply` copies the GLB to `public/models/weapons/` and the legacy preview to
 `public/ui/weapons/`, registers the key in `KAYKIT_WEAPON_ACCESSORY`
-(`src/render/characters/assets.ts`), maps any `--items` ids in `ITEM_WEAPON_VARIANTS`
+(`src/render/characters/prop_placement_core.ts`, the one resolver every surface reads), maps any `--items` ids in `ITEM_WEAPON_VARIANTS`
 (`src/ui/weapon_variants.ts`), and appends the CREDITS.md row. Every mapped item must also gain
 bespoke painted inventory art at `public/ui/items/<item-id>.webp`; the item and weapon-art gates
 fail until it does. The ItemDef snippet is printed for the agent to place by hand (real
@@ -250,8 +250,8 @@ playback, a "vs player" scale toggle). What the viewer displays is discoverable 
 it; the save-route contracts are not:
 - **Grip fit** (weapon held by a character): per-weapon move/rotate/scale sliders layer ON
   TOP of the family variant grip via `WEAPON_GRIP_OVERRIDES` in
-  `src/render/characters/weapon_grip.ts` (the pure `variantGripTransform` the engine's
-  `applyVariantGrip` uses; the viewer mirrors the same math). "Save" POSTs to
+  `src/render/characters/weapon_grip.ts` (the pure `variantGripTransform` that `prop_placement_core.ts`'s
+  `resolvePropPlacement` composes; the viewer mirrors the same math). "Save" POSTs to
   `/api/grip/save` (`integrate.saveGripOverride`, an anchored numeric upsert keyed by
   weapon model basename, so no free text reaches the source); an identity override removes
   the key. Save is enabled only for APPLIED weapons (which have a stable registry key):

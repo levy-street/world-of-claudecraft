@@ -260,10 +260,10 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false);
   });
 
-  // 90s budget: the re-hunted koi session sits at index 16 in the shared
+  // 90s budget: the re-hunted koi session sits at index 25 in the shared
   // stream, and every session ticks the REAL world to its bite.
   // Raised timeout (the climb_slope idiom): this beat drives thousands of
-  // REAL world ticks (17 bite-and-reel sessions plus bounded combat waits),
+  // REAL world ticks (26 bite-and-reel sessions plus bounded combat waits),
   // which overruns the 5s default under CI/core contention; every loop is
   // guard-bounded, so a genuine hang still terminates into a failed pin.
   it('beat 11: the koi lands through the REAL bite-and-reel loop and the deed fires on the catch', {
@@ -304,9 +304,11 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       }
     }
     // Hunted literal (seed 4242, after every beat above), re-recorded on the
-    // release/v0.37.0 base with the castle world content: the koi bites on
-    // the very first session, index 0.
-    expect(koiSession).toBe(0);
+    // release/v0.37.0 base with the castle world content (index 0), then
+    // re-recorded 0 to 25 for the Last Bell packet's world content (measured
+    // with the camp sharedRngCount selector restored): the koi bites on
+    // session index 25.
+    expect(koiSession).toBe(25);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -331,22 +333,25 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     sim.addItem('handaxe', 1, pid);
     sim.addItem('gathering_sickle', 1, pid);
     // Hunted literals (seed 4242, after every beat above): the harvest index
-    // where each flavor's 1-in-90 event fires under the shared stream.
+    // where each flavor's 1-in-90 event fires under the shared stream
+    // (re-recorded 338/130/25 to 69/2/106 for the Last Bell packet's world
+    // content, measured with the camp sharedRngCount selector restored).
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 338 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 69 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 130,
+        hitAt: 2,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 25,
+        hitAt: 106,
       },
     ];
+    const hitIndices: number[] = [];
     for (const hunt of hunts) {
       const node = GATHER_NODES.find((n) => n.id === hunt.nodeId);
       if (!node) throw new Error(`missing node ${hunt.nodeId}`);
@@ -366,7 +371,7 @@ describe('scripted playthrough (one sim, live sites only)', () => {
         sim.ctx.completeGatherCast(player, meta);
         if (meta.deedStats.visited.has(`gather_event:${hunt.deedId.slice(4)}`)) hitAt = i;
       }
-      expect(hitAt, hunt.deedId).toBe(hunt.hitAt);
+      hitIndices.push(hitAt);
       const renownBefore = meta.renown;
       const evs = sim.tick(); // the visit mark sweeps at the tail
       expect(meta.deedsEarned.has(hunt.deedId)).toBe(true);
@@ -377,6 +382,7 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       const paid = deedEvents(evs).reduce((sum, ev) => sum + DEEDS[ev.deedId].renown, 0);
       expect(meta.renown).toBe(renownBefore + paid);
     }
+    expect(hitIndices).toEqual(hunts.map((hunt) => hunt.hitAt));
   });
 
   it('beat 15: the perfect specimen jackpot lands through the real corpse harvest', () => {
@@ -403,9 +409,11 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       if (sim.countItem('pristine_hide', pid) > 0) hitAt = i;
     }
     // Hunted literal (seed 4242, after every beat above), re-recorded on the
-    // release/v0.37.0 base with the castle world content: the rare-or-better
-    // rarity roll that mints the signed specimen lands on attempt index 8.
-    expect(hitAt).toBe(8);
+    // release/v0.37.0 base with the castle world content (index 8), then
+    // re-recorded 8 to 7 for the Last Bell packet's world content (measured
+    // with the camp sharedRngCount selector restored): the rare-or-better
+    // rarity roll that mints the signed specimen lands on attempt index 7.
+    expect(hitAt).toBe(7);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe(meta.name);
     expect(meta.deedStats.visited.has('gather_event:perfect_specimen')).toBe(true);

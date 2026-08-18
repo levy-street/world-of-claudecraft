@@ -11149,19 +11149,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.notInPartyError':
     'Vous devez être dans un groupe pour lancer une vérification de disponibilité.',
   'hudChrome.readyCheck.inProgressError': 'Une vérification de disponibilité est déjà en cours.',
-  // Rideable mounts: the Z keybind + the Mounts window (the stable).
+  // Rideable mounts: Z dismounts normally and summons the lesson steed during training.
   'hudChrome.keybinds.mount': 'Monter / Descendre',
-  'hudChrome.mobile.mounts': 'Montures',
-  'hudChrome.mounts.title': 'Montures',
-  'hudChrome.mounts.close': 'Fermer',
-  'hudChrome.mounts.select': 'Choisir',
-  'hudChrome.mounts.selected': 'Choisie',
-  'hudChrome.mounts.riding': 'En selle',
   'hudChrome.mounts.mount': 'Monter',
-  'hudChrome.mounts.dismount': 'Descendre',
-  'hudChrome.mounts.rarity_common': 'Commune',
-  'hudChrome.mounts.rarity_rare': 'Rare',
-  'hudChrome.mounts.rarity_epic': 'Épique',
   'hudChrome.mounts.spec_speed': '+{pct}% de mobilité supplémentaire',
   'hudChrome.mounts.name_valorsteed': 'Destrier de Bravoure',
   'hudChrome.mounts.name_grag_bear': 'Ours-Grag Goliath',

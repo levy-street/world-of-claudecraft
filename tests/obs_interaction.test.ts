@@ -7,7 +7,7 @@ import { Sim } from '../src/sim/sim';
 import { angleTo, dist2d, type Entity, INTERACT_RANGE, normAngle } from '../src/sim/types';
 
 const SEED = 20_061;
-const ABILITY_SLOTS = ACTIONS.length - 13;
+const ABILITY_SLOTS = ACTIONS.filter((action) => action.startsWith('ability_')).length;
 const INTERACTABLE_START = 16 + ABILITY_SLOTS * 2 + 9 + 5 * 6;
 const EMPTY_INTERACTABLE = [0, 1.5, 0, 0, 0];
 const FRIENDLY_QUEST_ID = 'q_nythraxis_scourges_end';

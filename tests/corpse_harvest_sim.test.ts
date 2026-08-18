@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { expectDefined } from './helpers/defined';
 
 // Mock the db layer so no Postgres is needed; only the wire encode/decode and
@@ -2615,6 +2615,17 @@ describe('corpse harvest claim over the live broadcast (delta + interest scope)'
 // normalizes a missing or malformed field to undefined, never [], so
 // sim.harvestCorpse sees the omission and derives the town-focus pick.
 describe('harvestCorpse omitted components over the wire', () => {
+  beforeEach(() => {
+    // ClientWorld's serializer checks the browser WebSocket readiness constant.
+    // Own that dependency locally so these wire tests neither require Node's
+    // optional global nor pass only because another suite leaked one.
+    vi.stubGlobal('WebSocket', { OPEN: 1 });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   function wireSetup() {
     const server = new GameServer();
     const fc = fakeWs();

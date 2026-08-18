@@ -1,0 +1,10 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/warden_hale_statue/warden_hale_statue-final.glb",
+      "out": "models/props/wardenHaleStatue.glb",
+      "type": "static",
+      "keepExtras": true
+    }
+  ]
+}

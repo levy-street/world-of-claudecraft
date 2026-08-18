@@ -9,6 +9,7 @@ Turns an `IWorld` snapshot into a frame, every frame. **Presentation only:** it
 reads the world and draws it; it MUST NOT mutate sim state (`Renderer`'s ctor
 takes `private sim: IWorld`). New data/action a draw path needs: extend
 `IWorld` first (see src CLAUDE.md), never reach into `Sim`/`ClientWorld`.
+- Scene presentation runs on the sim clock through `IWorld.presentationTime`; see `docs/design/cinematics-workflow.md`.
 
 ## Module map (families + exemplars; enumerate with `ls src/render/*.ts`)
 `renderer.ts` is the orchestrator: scene/camera/lights, the

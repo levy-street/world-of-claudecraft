@@ -45,7 +45,13 @@ import { petOf, serializePet, summonPet } from '../src/sim/pet/pet_commands';
 import { livePlaytimeSeconds } from '../src/sim/playtime';
 import { noteRelicItemFind, noteRelicObtain } from '../src/sim/reliquary';
 import { Sim } from '../src/sim/sim';
-import { type Aura, DT, type PlayerClass, type WorldContent } from '../src/sim/types';
+import {
+  type Aura,
+  DT,
+  emptyMoveInput,
+  type PlayerClass,
+  type WorldContent,
+} from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { absorbTotal } from '../src/ui/absorb_bar';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
@@ -356,8 +362,76 @@ describe('spectate client POV', () => {
         rtype: 'rage',
       },
     });
-    internals.onMessage(JSON.stringify({ t: 'spectate', name: 'Suspect' }));
+    const lockChanges = vi.fn();
+    client.onSceneInputLockChanged = lockChanges;
+    client.setMoveInput({ ...emptyMoveInput(), forward: true }, 1.25);
+    internals.onMessage(
+      JSON.stringify({
+        t: 'spectate',
+        name: 'Suspect',
+        pid: 2,
+        sceneState: {
+          sceneId: 'scn_test_spectated',
+          remainingSeconds: 4,
+          inputLocked: true,
+          letterbox: true,
+          musicSilenced: false,
+        },
+        sceneChoiceState: {
+          choiceId: 'ch_test_spectated',
+          promptKey: 'lb.test.spectated.prompt',
+          options: [
+            { id: 'stay', key: 'lb.test.spectated.stay' },
+            { id: 'leave', key: 'lb.test.spectated.leave' },
+          ],
+          defaultOptionId: 'leave',
+          leaderPid: 2,
+          values: { price: 12 },
+          windowSeconds: 8,
+          remainingSeconds: 3,
+        },
+      }),
+    );
     expect(client.spectating).toBe('Suspect');
+    expect(client.playerId).toBe(2);
+    expect(client.sceneInputLockPending()).toBe(true);
+    expect(client.moveInput).toEqual(emptyMoveInput());
+    expect(lockChanges).toHaveBeenCalledExactlyOnceWith(true);
+    // Both convergence events carry the world-clock stamp (the scene
+    // presentation clock work: stampScenePresentationTime in
+    // src/net/presentation_clock.ts). This synthetic spectate frame omits
+    // `time`, so the mirror's presentationTime stays at its initial 0; the
+    // wire-time consumption arm is pinned by scene_presentation_clock.test.ts.
+    expect(client.drainEvents()).toEqual([
+      {
+        type: 'sceneSync',
+        presentationTime: 0,
+        state: {
+          sceneId: 'scn_test_spectated',
+          remainingSeconds: 4,
+          inputLocked: true,
+          letterbox: true,
+          musicSilenced: false,
+        },
+      },
+      {
+        type: 'sceneChoiceSync',
+        presentationTime: 0,
+        state: {
+          choiceId: 'ch_test_spectated',
+          promptKey: 'lb.test.spectated.prompt',
+          options: [
+            { id: 'stay', key: 'lb.test.spectated.stay' },
+            { id: 'leave', key: 'lb.test.spectated.leave' },
+          ],
+          defaultOptionId: 'leave',
+          leaderPid: 2,
+          values: { price: 12 },
+          windowSeconds: 8,
+          remainingSeconds: 3,
+        },
+      },
+    ]);
 
     const snapshot = (facing: number, dead: boolean) => ({
       t: 'snap',
@@ -394,12 +468,82 @@ describe('spectate client POV', () => {
     expect(client.consumeSpectateFacing()).toBe(-0.75);
     expect(client.consumeSpectateFacing()).toBeNull();
 
-    internals.onMessage(JSON.stringify({ t: 'spectate', name: null }));
+    internals.onMessage(
+      JSON.stringify({
+        t: 'spectate',
+        name: 'Second',
+        pid: 3,
+        sceneState: {
+          sceneId: 'scn_test_spectated_second',
+          remainingSeconds: 6,
+          inputLocked: false,
+          letterbox: true,
+          musicSilenced: true,
+        },
+        sceneChoiceState: {
+          choiceId: 'ch_test_spectated_second',
+          promptKey: 'lb.test.spectated.second.prompt',
+          options: [{ id: 'continue', key: 'lb.test.spectated.continue' }],
+          defaultOptionId: 'continue',
+          leaderPid: 3,
+          windowSeconds: 8,
+          remainingSeconds: 5,
+        },
+      }),
+    );
+    expect(client.spectating).toBe('Second');
+    expect(client.playerId).toBe(3);
+    expect(client.sceneInputLockPending()).toBe(false);
+    expect(lockChanges.mock.calls).toEqual([[true], [false]]);
+    expect(client.drainEvents()).toEqual([
+      {
+        type: 'sceneSync',
+        // World-clock stamp; still 0 here, this frame carries no `time` either.
+        presentationTime: 0,
+        state: {
+          sceneId: 'scn_test_spectated_second',
+          remainingSeconds: 6,
+          inputLocked: false,
+          letterbox: true,
+          musicSilenced: true,
+        },
+      },
+      {
+        type: 'sceneChoiceSync',
+        presentationTime: 0,
+        state: {
+          choiceId: 'ch_test_spectated_second',
+          promptKey: 'lb.test.spectated.second.prompt',
+          options: [{ id: 'continue', key: 'lb.test.spectated.continue' }],
+          defaultOptionId: 'continue',
+          leaderPid: 3,
+          values: undefined,
+          windowSeconds: 8,
+          remainingSeconds: 5,
+        },
+      },
+    ]);
+
+    internals.onMessage(
+      JSON.stringify({
+        t: 'spectate',
+        name: null,
+        pid: 1,
+        sceneState: null,
+        sceneChoiceState: null,
+      }),
+    );
     expect(client.spectating).toBeNull();
     expect(client.playerId).toBe(1);
     expect(client.player.name).toBe('Moderator');
     expect(client.cfg.playerClass).toBe('warrior');
     expect(client.consumeSpectateFacing()).toBeNull();
+    expect(client.sceneInputLockPending()).toBe(false);
+    expect(lockChanges.mock.calls).toEqual([[true], [false]]);
+    expect(client.drainEvents()).toEqual([
+      { type: 'sceneSync', presentationTime: 0, state: null },
+      { type: 'sceneChoiceSync', presentationTime: 0, state: null },
+    ]);
   });
 });
 

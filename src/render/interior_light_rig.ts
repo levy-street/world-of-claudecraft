@@ -23,6 +23,7 @@ export type FogSceneState =
   | 'rift'
   | 'practice'
   | 'wildheartField'
+  | 'farshoreStory'
   | 'lastkeep'
   | 'dawnhold';
 

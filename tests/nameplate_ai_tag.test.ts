@@ -3,7 +3,7 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { NameplateCanvasState } from '../src/render/nameplate_canvas';
+import { type NameplateCanvasState, NameplateCanvasSurface } from '../src/render/nameplate_canvas';
 import { NameplatePainter } from '../src/render/nameplate_painter';
 import { FRIENDLY } from '../src/render/reaction';
 import type { EntityView } from '../src/render/renderer';
@@ -137,10 +137,25 @@ function harness(
     showPlayerNameplates: () => true,
     isHostilePlayer: options.isHostilePlayer ?? (() => false),
   });
-  return { painter, layer };
+  return { painter, layer, views };
 }
 
 describe('batched canvas nameplate state', () => {
+  it('does not redraw a painted plate when the owning render group is hidden', () => {
+    const target = entity({ id: 2 });
+    const { painter, views } = harness([target]);
+    const drawBase = vi.spyOn(NameplateCanvasSurface.prototype, 'drawBase');
+    painter.update(true);
+    expect(drawBase).toHaveBeenCalledTimes(1);
+
+    drawBase.mockClear();
+    const targetView = views.get(target.id);
+    if (!targetView) throw new Error(`Missing entity view for ${target.id}`);
+    targetView.group.visible = false;
+    painter.update(true);
+    expect(drawBase).not.toHaveBeenCalled();
+  });
+
   it('uses one canvas for many entities and creates no per-entity nameplate DOM', () => {
     const targets = [entity({ id: 2 }), entity({ id: 3, name: 'Other' })];
     const { painter, layer } = harness(targets);

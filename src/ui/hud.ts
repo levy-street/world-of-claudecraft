@@ -49,6 +49,7 @@ import { warriorParryChance } from '../sim/combat/warrior_hit_table';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
+import { MEMORIALS } from '../sim/content/memorials';
 import { isOnMountRaceStartPlatform, MOUNTS } from '../sim/content/mounts';
 import { recipeById } from '../sim/content/recipes';
 import {
@@ -452,6 +453,11 @@ import { lootSettingsView } from './hud/loot/loot_settings_view';
 import { renderLootSettingsWindow } from './hud/loot/loot_settings_window';
 import { LootWindowController } from './hud/loot/loot_window_controller';
 import { MapMarkerInteractionController, MapMarkerTooltipContent } from './hud/map';
+import {
+  buildMemorialPlaqueModel,
+  closeMemorialPlaque,
+  renderMemorialPlaque,
+} from './hud/memorial';
 import { CARD_POSES } from './hud/player_card/player_card';
 import { PlayerCardController } from './hud/player_card/player_card_controller';
 import { QuestDialogController } from './hud/quest/quest_dialog_controller';
@@ -461,6 +467,7 @@ import { QuestTrackerController } from './hud/quest/quest_tracker_controller';
 import { QuestLogWindow } from './hud/quest/questlog_window';
 import { RiftMapPainter } from './hud/rift';
 import { RiftFloorTrackerController } from './hud/rift/rift_floor_tracker_controller';
+import { SceneHudController } from './hud/scene/scene_controller';
 import { dismissBuyQuantityPrompts } from './hud/vendor/buy_quantity_prompt_window';
 import { buildHeroicVendorView } from './hud/vendor/heroic_vendor_view';
 import { renderHeroicVendorWindow } from './hud/vendor/heroic_vendor_window';
@@ -1824,6 +1831,10 @@ export class Hud {
   private readonly riftTracker: RiftFloorTrackerController;
   private readonly lockpickController: LockpickController;
   private readonly riteController: RiteController;
+  // Last Bell scene presentation (letterbox/subtitles/fade/skip + the
+  // dialogue-choice window); camera/input-lock/music are game-side
+  // (src/game/scene_director.ts).
+  private readonly sceneController: SceneHudController;
   private readonly questTracker: QuestTrackerController;
   private readonly questDialog: QuestDialogController;
   // swing timer: the period is captured from the reset edge (swingTimer jumping
@@ -1983,6 +1994,7 @@ export class Hud {
   private confirmOnCancel: (() => void) | null = null;
   // The first-tier tutorial modal's focus trap (#profession-tutorial).
   private professionTutorialTrap: FocusTrapHandle | null = null;
+  private memorialPlaqueTrap: FocusTrapHandle | null = null;
   private meters: Meters;
   private readonly targetAurasWindow: TargetAurasWindow;
   private tutorial = new TutorialOverlay();
@@ -2157,6 +2169,15 @@ export class Hud {
       showBanner: (text) => this.showBanner(text),
       log: (text, color) => this.log(text, color),
       hideTooltip: () => this.hideTooltip(),
+    });
+    this.sceneController = new SceneHudController({
+      document,
+      container: $('#ui'),
+      world: () => this.sim,
+      now: () => this.sim.presentationTime,
+      writers: this.writerFacet,
+      openFocusTrap: (root) => this.focusManager.open({ root: () => root }),
+      skip: () => this.sim.sceneSkip(),
     });
     this.fiesta = new FiestaController({
       document,
@@ -3428,6 +3449,12 @@ export class Hud {
         // (focus returns to the opener, WCAG 2.2 AA) and the modal is removed,
         // never left hidden with a live trap (the confirm-dialog precedent).
         this.closeProfessionTutorial();
+        break;
+      case 'memorial-plaque':
+        // Route through closeMemorialPlaque so the focus trap is released and
+        // the code-built panel is removed, never left hidden with a live trap
+        // (the profession-tutorial precedent; managed close registry #2517).
+        this.closeMemorialPlaque();
         break;
       case 'options-menu':
         this.closeOptions();
@@ -6067,8 +6094,7 @@ export class Hud {
     if (questModel) html += this.questItemTooltipStoryHtml(questModel);
     if (item.kind === 'bag' && item.bagSlots)
       html += `<div class="tt-stat">${esc(t('itemUi.tooltip.bagSlots', { slots: itemNumber(item.bagSlots) }))}</div>`;
-    // Collectible mount reins: the mount's flavor + specialty numbers + its
-    // ride-level gate (red below the gate, like gear's requires-level line).
+    // Collectible mount reins: the mount's flavor, speed, and item-use hint.
     if (item.kind === 'mount') {
       const mountDef = MOUNTS[item.mount];
       if (mountDef) {
@@ -6478,6 +6504,11 @@ export class Hud {
     this.spellbookWindow.relocalize();
     this.lockpickController.relocalize();
     this.tutorial.relocalize(this.sim, this.keybinds);
+    // The scene overlay's Skip hint is construction-time text and the fade
+    // opacity memo is a number, so a locale switch alone never repaints them;
+    // the controller re-resolves its own chrome and fans into the overlay and
+    // choice windows (each self-gated on its own state).
+    this.sceneController.relocalize();
     // The ring latches its page indicator on the page/count pair; dropping the
     // latch relabels it on the next paint (mobile layouts only build the ring).
     this.mobileActionRingPainter?.relocalize();
@@ -8945,6 +8976,7 @@ export class Hud {
     this.mountRaceStrip.repaintIfChanged();
     this.mountRaceControls.update();
     this.lockpickController.repaintIfChanged();
+    this.sceneController.update();
     this.tutorial.update(sim, this.renderer, this.keybinds);
     if (slowHud) this.updateRaidLockoutBadge();
     if (slowHud) this.refreshDailyRewardsLauncher();
@@ -11845,6 +11877,14 @@ export class Hud {
           deedUnlocks.push(ev);
           break;
         }
+        // Last Bell scenes: the overlay/choice controller owns all three.
+        case 'scene':
+        case 'sceneChoice':
+        case 'sceneChoiceResult':
+        case 'sceneSync':
+        case 'sceneChoiceSync':
+          this.sceneController.onEvent(ev);
+          break;
         case 'reliquaryUnlock': {
           reliquaryUnlocks.push(ev);
           break;
@@ -12577,6 +12617,10 @@ export class Hud {
           // Keyboard/sim interact at a banker NPC: open the bank window.
           this.openBank();
           break;
+        case 'memorial':
+          // Read a memorial: open the Roll of Honour plaque.
+          this.openMemorialPlaque(ev.memorialId);
+          break;
         case 'noticeboard':
           // The board has no posted content yet. The structured private event
           // keeps this feedback localized and identical offline and online.
@@ -12734,7 +12778,7 @@ export class Hud {
           sfx.playUi('quest_complete');
           if (ev.questId === 'q_riding_lessons') {
             this.showBanner(
-              t('hudChrome.mountTraining.ownedMountPrompt'),
+              t('hudChrome.mountTraining.buyReinsPrompt'),
               true,
               undefined,
               'default',
@@ -14292,6 +14336,28 @@ export class Hud {
       this.log(retroText, '#ffd100');
       this.combatAnnouncer.push(retroText, performance.now());
     }
+  }
+  // Reading a war memorial: the sim's `memorial` event carries the def id only,
+  // so the roll of honour is resolved here from the same content both hosts
+  // hold. Cold window, the profession-tutorial precedent for the focus trap.
+  private openMemorialPlaque(memorialId: string): void {
+    const def = MEMORIALS.find((m) => m.id === memorialId);
+    if (!def) return;
+    this.memorialPlaqueTrap?.release(false);
+    this.memorialPlaqueTrap = null;
+    const el = renderMemorialPlaque(buildMemorialPlaqueModel(def), {
+      onClose: () => this.closeMemorialPlaque(),
+    });
+    this.bringWindowToFront(el);
+    el.style.zIndex = String(Math.max(Number(el.style.zIndex) || 0, 96));
+    this.memorialPlaqueTrap = this.focusManager.open({ root: () => el });
+    el.querySelector<HTMLElement>('.cd-ok')?.focus();
+  }
+
+  private closeMemorialPlaque(): void {
+    this.memorialPlaqueTrap?.release();
+    this.memorialPlaqueTrap = null;
+    closeMemorialPlaque();
   }
 
   // The earned moment, planned purely (deeds_view buildDeedUnlockPlan) so the

@@ -1,9 +1,8 @@
 // ---------------------------------------------------------------------------
 // Rideable ground mounts: the declarative catalog, shared host-agnostic data.
 //
-// Used by the authoritative Sim (level gates, the speed/block/crit hooks), the
-// renderer (key -> mount GLB visual), and the HUD Mounts window (rows render
-// their names/descriptions through the UI's own t() keys, keyed by MountKey).
+// Used by the authoritative Sim (reins ownership and movement speed), renderer
+// (key -> mount GLB visual), and HUD labels/tooltips.
 // It lives in sim/ so it carries no DOM/render imports and runs unchanged on
 // the server, offline, and headless.
 //
@@ -43,8 +42,8 @@ export interface MountDef {
 // could not hold a mount before its gate anyway. The single real gate is
 // ridingTrained (purchased from Marla), enforced in src/sim/mounts.ts.
 export const MOUNTS: Record<MountKey, MountDef> = {
-  // The base mount: first in the catalog, the natural default pick, sold by the
-  // stablemaster (the only purchasable mount). Level 20 to match the buy gate.
+  // The base mount: first in the catalog and sold by the stablemaster (the only
+  // purchasable mount).
   valorsteed: {
     key: 'valorsteed',
     name: 'Valorsteed',
@@ -114,15 +113,11 @@ export const MOUNTS: Record<MountKey, MountDef> = {
 /** Catalog order: rarity tier, then declaration order. */
 export const MOUNT_KEYS = Object.keys(MOUNTS) as readonly MountKey[];
 
-/** The horse: the default stable pick and the fallback for every unknown/legacy
- *  persisted value. It is no longer free (a fresh player owns nothing): owning
- *  it means holding its reins item (reins_valorsteed), sold by the stablemaster.
- *  A persisted pick may name a mount the player does not own, which is harmless:
- *  toggleMount falls back to the first owned mount. */
+/** Stable fallback for persisted or unknown mount selections. */
 export const DEFAULT_MOUNT: MountKey = 'valorsteed';
 
 /** The steed the riding lesson lends the player. It is the same catalog mount
- *  reins_valorsteed eventually grants, ridden UNOWNED during the lesson (the one
+ *  that reins_valorsteed summons, ridden UNOWNED during the lesson (the one
  *  sanctioned unowned mount; see src/sim/mounts.ts). Shared by src/sim/mounts.ts
  *  (the summon special-case) and src/sim/mounts_training.ts. */
 export const TRAINING_MOUNT_KEY: MountKey = 'valorsteed';
@@ -137,9 +132,8 @@ export function normalizeMountKey(key: string | undefined | null): MountKey | ''
   return key && mountDef(key) ? (key as MountKey) : '';
 }
 
-/** Coerce a persisted/wire SELECTION to a valid catalog key. Unlike the live
- *  riding state (normalizeMountKey, where '' means dismounted), the stable pick
- *  always names a mount: absent/unknown values fall back to the horse. */
+/** Coerce a persisted selection to a valid catalog key. Unlike live riding
+ * state, the stable selection always names a mount. */
 export function normalizeSelectedMount(key: string | undefined | null): MountKey {
   const normalized = normalizeMountKey(key);
   return normalized === '' ? DEFAULT_MOUNT : normalized;

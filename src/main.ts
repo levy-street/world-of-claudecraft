@@ -106,7 +106,7 @@ import { createIntroLogoOverlay } from './game/intro_logo_overlay';
 import { Keybinds } from './game/keybinds';
 import {
   type KeyboardTurnArgs,
-  newKeyboardTurnState,
+  resetKeyboardTurnState,
   stepKeyboardTurnFacing,
 } from './game/keyboard_turn_facing';
 import { applyMobileKeyboardViewport } from './game/keyboard_viewport_applier';
@@ -131,7 +131,7 @@ import {
 } from './game/mobile_controls';
 import { applyMobileHudLayout } from './game/mobile_hud_layout_applier';
 import { watchMobileMoreState } from './game/mobile_more_diagnostics';
-import { mouselookReleaseFacing } from './game/mouselook_release';
+import { updateMouselookReleaseFacing } from './game/mouselook_release';
 import { diagonalMovementVisualFacing } from './game/movement_visual';
 import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
@@ -141,6 +141,15 @@ import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
 import { presentationGate } from './game/presentation_gate';
+import { SceneDirector } from './game/scene_director';
+import {
+  bindMirroredSceneInputLock,
+  drainMirroredSceneInput,
+  newSceneFacingInputState,
+  resetSceneFacingInputState,
+  SceneInputLockCoordinator,
+} from './game/scene_input_lock';
+import { playSceneDirectiveSfx } from './game/scene_sfx';
 import { adaptiveSelfAlphaLead } from './game/self_alpha_lead';
 import { SelfMotionFrameBuffer } from './game/self_motion_frame_buffer';
 import {
@@ -294,6 +303,7 @@ import {
   graphicsPresetLabel,
   resolveGfxProfile,
 } from './render/gfx';
+import { cueHarborShip, harborShipAttachFrame, resetHarborShipCues } from './render/harbor';
 import { Renderer } from './render/renderer';
 import {
   hasAuthoritativeSelfPositionDiscontinuity,
@@ -325,6 +335,7 @@ import { MARKET_HOUSE_STOCK } from './sim/market';
 import { bagOwnedMounts } from './sim/mounts';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { isSubmerged } from './sim/player_motion';
+import { playSceneForPlayer, registeredSceneIds, sceneById } from './sim/scenes/scenes';
 import { Sim } from './sim/sim';
 import { TAB_NEAR_RADIUS, TAB_QUERY_RADIUS, tabConeHalfAt } from './sim/tab_target';
 import {
@@ -1870,18 +1881,17 @@ async function startGame(
   chatDismiss?.addEventListener('click', () => chatInput.blur());
 
   // One keyboard/gamepad action gate for every blocking client surface. The
-  // camera prompt lives outside Hud, so it reports its open state explicitly, and
-  // chat reports both its presence and its focus (only the latter blocks; see
-  // gameplay_input_gate.ts).
+  // camera prompt lives outside Hud, so it reports its open state explicitly.
+  // The Last Bell scene input lock joins here so ability/UI keys are
+  // suppressed the same way the other blocking surfaces suppress them.
+  const sceneInputLockedNow = () =>
+    sceneDirector.inputLocked() || (online?.sceneInputLockPending() ?? false);
   const gameplayInputBlocked = () =>
-    isGameplayInputBlocked({
-      graphicsRebuildPaused,
-      modalOpen: hud.isModalOpen(),
-      promptModalOpen: hud.promptModalOpen(),
-      cameraPromptOpen: cameraPromptOpen(),
-      chatComposerVisible: chatInput.style.display === 'block',
-      chatComposerFocused: document.activeElement === chatInput,
-    });
+    hud.isModalOpen() ||
+    hud.promptModalOpen() ||
+    cameraPromptOpen() ||
+    sceneInputLockedNow() ||
+    chatInput.style.display === 'block';
 
   const input = new Input(
     canvas,
@@ -1996,6 +2006,12 @@ async function startGame(
             openChat();
             break;
           case 'escape':
+            // While a scene plays, Escape is the skip gesture (the sim ends
+            // the scene once every living participant asked), never the menu.
+            if (sceneDirector.sceneActive() || sceneInputLockedNow()) {
+              world.sceneSkip();
+              break;
+            }
             if (hud.cancelGroundAim()) break;
             // close the topmost panel; if nothing was open, open the game menu
             if (!hud.closeAll()) hud.toggleOptionsMenu();
@@ -2010,6 +2026,26 @@ async function startGame(
     keybinds,
   );
   input.camYaw = world.player.facing;
+  // Last Bell scene director (camera shots, input lock, music directives,
+  // prop cues). Presentation only: skips and choice answers go back through
+  // IWorld.
+  const sceneReducedMotionMedia =
+    typeof window.matchMedia === 'function'
+      ? window.matchMedia('(prefers-reduced-motion: reduce)')
+      : null;
+  const sceneDirector = new SceneDirector({
+    world: () => world,
+    nowSec: () => world.presentationTime,
+    musicSilence: (on) => music.setSceneSilence(on),
+    playDirective: (directive) => playSceneDirectiveSfx(directive),
+    propCue: (target, cue, startSec) => cueHarborShip(target, cue, startSec),
+    propReset: () => resetHarborShipCues(),
+    releaseInputLockMirror: () => online?.releaseSceneInputLockMirror(),
+    attachmentFrame: (target, out, presentationTimeSec) =>
+      harborShipAttachFrame(target, out, presentationTimeSec),
+    reducedMotion: () =>
+      settings.get('reduceMotion') || (sceneReducedMotionMedia?.matches ?? false),
+  });
   perf.setInputDebugProvider(() => ({
     ...input.debugState(),
     canUseGameKeys: !gameplayInputBlocked(),
@@ -2112,6 +2148,18 @@ async function startGame(
     },
   });
   mobileControls.start();
+  // The online receipt callback can observe a complete lock-on/lock-off batch
+  // before the next animation frame. Keep every facing edge/latch in one state
+  // object so the rising edge clears it immediately even when the batch ends
+  // unlocked.
+  const sceneFacingInput = newSceneFacingInputState();
+  const sceneInputLock = new SceneInputLockCoordinator(sceneDirector, input, () => {
+    mobileControls.syncAutorun(false);
+    resetSceneFacingInputState(sceneFacingInput);
+  });
+  if (online) {
+    bindMirroredSceneInputLock(online, sceneInputLock);
+  }
   const syncOverlayDiagnostics = (): void => {
     syncCharacterOpenDiagnostics();
     syncQuestDialogOpenDiagnostics();
@@ -2167,6 +2215,11 @@ async function startGame(
   const canUseGameKeysNow = () => !gameplayInputBlocked();
   function dispatchGamepadAction(id: string): void {
     if (id === 'escape') {
+      // Same order as the keyboard path: a live scene turns Escape into skip.
+      if (sceneDirector.sceneActive() || sceneInputLockedNow()) {
+        world.sceneSkip();
+        return;
+      }
       if (dismissCameraPrompt()) return;
       if (hud.cancelGroundAim()) return;
       if (!hud.closeAll()) hud.toggleOptionsMenu();
@@ -2835,9 +2888,7 @@ async function startGame(
     },
     resetInput: () => {
       input.resetForClientTransition();
-      pendingReleaseFacing = null;
-      prevCameraDrivenFacing = false;
-      Object.assign(kbTurn, newKeyboardTurnState());
+      resetSceneFacingInputState(sceneFacingInput);
       hud.cancelGroundAim();
       mobileControls.syncAutorun(false);
     },
@@ -3807,6 +3858,33 @@ async function startGame(
     if (!riftExit && renderer.isZoneReadyAt(player.pos.x, player.pos.z)) return;
     const zoneX = player.pos.x;
     const zoneZ = player.pos.z;
+    // A teleport that lands while a SCENE is running (the ferry fare moves
+    // the rider to the destination harbor before the voyage plays) must not
+    // raise the blocking loading screen: the scene's opening shots film the
+    // DEPARTURE harbor, which is already resident, and the destination has
+    // the whole crossing to stream in the background before the arrival
+    // shot needs it. Sim collision is procedural math, so the authoritative
+    // player standing on not-yet-rendered ground stays correct throughout.
+    // world.sceneActiveForLocalPlayer() is the SYNCHRONOUS truth (registry
+    // offline, receipt mirror online); the director flag lags it by up to a
+    // couple of frames because the fare answer teleports from the click
+    // handler while the scene events wait for the next tick's drain.
+    const sceneCovered =
+      !riftExit && (world.sceneActiveForLocalPlayer() || sceneDirector.sceneActive());
+    if (sceneCovered) {
+      zoneWarmup = renderer
+        .prepareZoneAt(zoneX, zoneZ)
+        .then(() => renderer.prepareZonesAround(zoneX, zoneZ, ARRIVAL_NEIGHBOR_STREAM_RADIUS))
+        .then(() => renderer.prewarmZoneAt(zoneX, zoneZ, { background: true }))
+        .catch((err) => {
+          console.warn('Scene-covered zone warmup failed', err);
+          return new Promise<void>((resolve) => window.setTimeout(resolve, 5000));
+        })
+        .finally(() => {
+          zoneWarmup = null;
+        });
+      return;
+    }
     if (!riftExit && zoneWarmupMode(displacement) === 'background') {
       // A walked crossing: the visible-zone streaming lane normally has the
       // destination resident long before the boundary, so landing here means
@@ -3894,36 +3972,8 @@ async function startGame(
   // eases back to zero so the camera settles in behind the character.
   let lastInterpFacing: number | null = null;
   let wasClickMoving = false;
-  // Tracks the player's dead/ghost state across frames so a respawn/release-spirit
-  // edge (see isRespawnFacingResyncEdge) can resync lastInterpFacing below, the same
-  // way the click-to-move release edge does just underneath it.
   let prevPlayerDead = world.player.dead;
   let prevPlayerGhost = world.player.ghost;
-  // Tracks camera-driven facing (classic right-mouse mouselook, or Mouse Camera
-  // mode while a movement key is held) across frames so its falling edge can
-  // commit the final camera yaw to the player facing (see mouselook_release.ts
-  // and camera_driven_facing.ts).
-  let prevCameraDrivenFacing = false;
-  // The release yaw, latched until a sim tick actually commits it. Offline a tick
-  // runs on only ~2/3 of frames (60Hz frames, 20Hz ticks), so committing only on
-  // the release frame would drop the one-shot when release lands on a zero-tick
-  // frame. Held here until consumed, then cleared.
-  let pendingReleaseFacing: number | null = null;
-  // Local integration of keyboard turns online, streamed on the facing channel
-  // (see the module docs). The module also decides the per-frame wire turn-flag
-  // gating (suppressTurnFlags): zeroed while the streamed heading owns the
-  // channel, passed through on the one engage-edge frame so the server still
-  // sees a manual turn (breaks /follow, marks anti-AFK activity).
-  const kbTurn = newKeyboardTurnState();
-  const kbTurnArgs: KeyboardTurnArgs = {
-    turnLeft: false,
-    turnRight: false,
-    turnAllowed: false,
-    sentFacing: null,
-    serverFacing: 0,
-    echoMs: 0,
-    frameDt: 0,
-  };
   function updateCamera(frameDt: number, interpFacing: number): void {
     const mi = input.readMoveInput();
     const clickMoving = !!input.clickMoveTarget && !input.suspendMovement && !movementFrozen();
@@ -4262,6 +4312,20 @@ async function startGame(
   // allocation guard polices the loop body), and the gate reads it
   // synchronously before returning a shared frozen decision.
   const gateInput = { hidden: false, desktopApp: DESKTOP_APP, graphicsRebuildPaused: false };
+  // Same allocation rule: the keyboard-turn args bag is rewritten in place each
+  // online frame (never a per-frame object literal), and the shared empty list
+  // is the offline placeholder for drainedEvents (the online branch overwrites
+  // it before any reader runs, and the offline branch returns before one does).
+  const kbTurnArgs: KeyboardTurnArgs = {
+    turnLeft: false,
+    turnRight: false,
+    turnAllowed: false,
+    sentFacing: null,
+    serverFacing: 0,
+    echoMs: 0,
+    frameDt: 0,
+  };
+  const NO_DRAINED_EVENTS: ReturnType<ClientWorld['drainEvents']> = [];
   function frame(now: number): void {
     requestAnimationFrame(frame);
     // The desktop shell keeps rAF running while hidden (backgroundThrottling is
@@ -4275,7 +4339,15 @@ async function startGame(
       acc = 0;
       return;
     }
-    maybeWarmCurrentZone();
+    // maybeWarmCurrentZone() deliberately does NOT run here. It reads the
+    // player's position AND the scene director, and at the top of the frame
+    // those two disagree: a synchronous world command (the ferry fare answers
+    // through world.answerSceneChoice straight off the click) teleports the
+    // entity immediately while the 'scene' start op it queues only reaches
+    // the director when this frame drains events. Deciding here saw the
+    // destination with no scene covering it and raised the blocking loading
+    // screen mid-voyage. Each host calls it below, once its own events for
+    // this frame have landed.
     let frameDt = (now - last) / 1000;
     last = now;
     if (frameDt > 0.25) frameDt = 0.25;
@@ -4302,6 +4374,20 @@ async function startGame(
     // enforces the same countdown lock, so online latency cannot move the
     // authoritative rider.
     const raceMovementLocked = world.mountRaceView()?.phase === 'countdown';
+    let sceneInputLocked = online ? false : sceneInputLock.sync();
+    let drainedEvents = NO_DRAINED_EVENTS;
+    let selfAuthoritativeDiscontinuity = false;
+    if (online) {
+      // Scene events must land before this frame derives or flushes movement:
+      // a queued inputLock:on is authoritative for the whole outgoing frame.
+      const sceneFrame = drainMirroredSceneInput(online, sceneInputLock);
+      drainedEvents = sceneFrame.events;
+      sceneInputLocked = sceneFrame.locked;
+      selfAuthoritativeDiscontinuity = hasAuthoritativeSelfPositionDiscontinuity(
+        drainedEvents,
+        online.playerId,
+      );
+    }
     if (raceMovementLocked && !raceMovementWasLocked) {
       input.clearClickMove();
       input.setAutorun(false);
@@ -4313,6 +4399,10 @@ async function startGame(
         hud.isModalOpen() ||
         cameraPromptOpen() ||
         intro !== null ||
+        // Last Bell scene input lock: presentation-side movement freeze, the
+        // same mechanism the intro cinematic uses (server combat authority is
+        // untouched either way).
+        sceneInputLocked ||
         raceMovementLocked,
     );
     const playerDead = world.player.dead;
@@ -4344,7 +4434,8 @@ async function startGame(
     updateBreathBar(frameDt);
     perf.markInputFrame(performance.now());
 
-    const mouselook = intro === null && input.isMouselookActive() && !movementFrozen();
+    const mouselook =
+      intro === null && !sceneInputLocked && input.isMouselookActive() && !movementFrozen();
     const controllerFacing = input.controllerFacingOverride();
     const renderFacing = renderFacingOverride();
     // On the frame the camera lets go of the player's heading (classic mouselook
@@ -4358,22 +4449,25 @@ async function startGame(
       input.isMouselookActive(),
       movementFrozen(),
     );
-    const edgeReleaseFacing = mouselookReleaseFacing(
-      prevCameraDrivenFacing,
+    const edgeReleaseFacing = updateMouselookReleaseFacing(
+      sceneFacingInput.cameraDrivenFacing,
       cameraDrivenFacing,
       input.camYaw,
+      sceneInputLocked,
     );
-    prevCameraDrivenFacing = cameraDrivenFacing;
-    if (renderFacing !== null || controllerFacing !== null) {
-      pendingReleaseFacing = null;
+    if (sceneInputLocked) {
+      sceneFacingInput.pendingReleaseFacing = null;
+    } else if (renderFacing !== null || controllerFacing !== null) {
+      sceneFacingInput.pendingReleaseFacing = null;
     } else if (edgeReleaseFacing !== null) {
-      pendingReleaseFacing = edgeReleaseFacing;
+      sceneFacingInput.pendingReleaseFacing = edgeReleaseFacing;
     }
     // A ghost (dead && ghost) is not movement-frozen and keeps its facing; only a
     // corpse-bound dead player (dead && !ghost) loses it.
-    const movementFacing = !movementFrozen()
-      ? (renderFacing ?? controllerFacing ?? pendingReleaseFacing)
-      : null;
+    const movementFacing =
+      !sceneInputLocked && !movementFrozen()
+        ? (renderFacing ?? controllerFacing ?? sceneFacingInput.pendingReleaseFacing)
+        : null;
 
     if (offlineSim) {
       acc += frameDt;
@@ -4388,16 +4482,24 @@ async function startGame(
           offlineSim.player.facing,
         );
         Object.assign(offlineSim.moveInput, mi);
-        const stepFacing = movementFacing ?? facing;
+        // sceneInputLocked still holds the lock as of this tick's START; the
+        // post-tick sceneInputLock.handleEvents below is what advances it.
+        const stepFacing = sceneInputLocked ? null : (movementFacing ?? facing);
         // A stun locks facing (issue #2426): stepPlayerMotion already blocks
-        // turnLeft/turnRight while stunned, but mouselook/controller facing is
-        // applied out of band, here, before tick(), and must honor the same gate
-        // or a stunned player can still turn to face away from a positional attack.
+        // turnLeft/turnRight while stunned, but mouselook/controller facing
+        // is applied out of band, here, before tick(), and must honor the
+        // same gate or a stunned player can still turn to face away from a
+        // positional attack.
         if (stepFacing !== null && !isStunned(offlineSim.player)) {
           offlineSim.player.facing = stepFacing;
         }
         offlineSim.updateFiestaBots(); // dev: steer Fiesta practice bots (no-op unless active)
         perf.markInputSent(performance.now());
+        // The tick-then-coordinator hand-off below is runOfflineSceneInputTick
+        // by hand (scene_input_lock.ts owns the contract; its ordering pin is
+        // tests/scene_input_lock.test.ts): inlined so the rAF hot path passes
+        // no per-tick callback closure and keeps the startTrace/finishTrace
+        // try-finally shape (tests/client_frame_allocations.test.ts).
         const simStart = perf.startTime();
         let events: ReturnType<typeof offlineSim.tick>;
         traceStart = perf.startTrace();
@@ -4407,6 +4509,9 @@ async function startGame(
           perf.finishTrace('sim.tick', traceStart, 'mode', 'offline');
           perf.finishTime('sim', simStart);
         }
+        // Scene events reach the input-lock coordinator before anything else
+        // reads this frame's lock, exactly as the helper orders it.
+        sceneInputLocked = sceneInputLock.handleEvents(events);
         const eventsLength = events.length;
         desktopNotifyOnSimEvents(events, offlineSim.playerId);
         desktopPresenceOnFrame(offlineSim);
@@ -4427,21 +4532,11 @@ async function startGame(
         }
         // A tick consumed the latched release facing (movementFacing fed
         // stepFacing above); drop it so it is not re-applied next frame.
-        pendingReleaseFacing = null;
+        sceneFacingInput.pendingReleaseFacing = null;
         acc -= DT;
       }
-      // Re-check immediately after the tick loop, before renderer.sync() below reads
-      // offlineSim.player.pos for this frame. The call at the top of frame() only sees
-      // the position as of the START of the frame; a tick above can itself teleport the
-      // player (release-spirit/resurrect landing in a different zone, a dungeon door or
-      // portal trigger reached mid-tick), which the top-of-frame call has no way to see.
-      // Left unchecked, this frame would still render the just-teleported position with
-      // no loading curtain and an unprepared destination zone (a one-frame flash of an
-      // empty/black view). maybeWarmCurrentZone() is idempotent per call (it early-returns
-      // once a warmup is already in flight or the zone is ready), so calling it twice in
-      // one frame is safe; it does not remove the top-of-frame call, which still owns the
-      // input-suspend handling and catches a teleport triggered from outside the tick
-      // (e.g. a UI action) before this frame's tick even runs.
+      // Offline: the tick above drained this frame's events, so the scene
+      // director now agrees with the entity's position.
       maybeWarmCurrentZone();
       const pp = offlineSim.player;
       traceStart = perf.startTrace();
@@ -4451,6 +4546,7 @@ async function startGame(
         perf.finishTrace('camera.follow', traceStart, 'mode', 'offline', 'frameDtMs', frameDtMs);
       }
       introCameraTick(now);
+      sceneCameraTick();
       renderer.camYaw = input.camYaw;
       renderer.camPitch = input.camPitch;
       renderer.camDist = input.camDist;
@@ -4516,6 +4612,10 @@ async function startGame(
     // online: inputs stream on a timer inside ClientWorld; here we mirror state
     const net = online;
     if (!net) return;
+    // Online: drainMirroredSceneInput above already applied this frame's scene
+    // ops, so the position/scene agreement maybeWarmCurrentZone needs holds
+    // here (see the top-of-frame comment for why it never runs earlier).
+    maybeWarmCurrentZone();
     // Stateless DOM badge: paint work; the first painted frame after a
     // restore re-syncs it from the live value (phase 4 QA F7).
     if (gate.paint) spectateBadge.update(net.spectating);
@@ -4544,6 +4644,9 @@ async function startGame(
     // stutter this feature has chased). The turn flags are zeroed on the wire
     // while the local heading owns the channel, or the server would integrate
     // the turn a second time on top of the streamed facing.
+    if (sceneInputLocked) resetKeyboardTurnState(sceneFacingInput.keyboardTurn);
+    // kbTurnArgs is the reused frame-loop bag (declared above frame()): written
+    // in place so the rAF hot path allocates no per-frame options object.
     kbTurnArgs.turnLeft = resolved.mi.turnLeft;
     kbTurnArgs.turnRight = resolved.mi.turnRight;
     kbTurnArgs.turnAllowed = net.spectating === null && !movementFrozen() && !isStunned(pe);
@@ -4551,23 +4654,27 @@ async function startGame(
     kbTurnArgs.serverFacing = interpServerFacing;
     kbTurnArgs.echoMs = onlineInputEchoMs;
     kbTurnArgs.frameDt = frameDt;
-    const kbFacing = stepKeyboardTurnFacing(kbTurn, kbTurnArgs);
+    const kbFacing = sceneInputLocked
+      ? null
+      : stepKeyboardTurnFacing(sceneFacingInput.keyboardTurn, kbTurnArgs);
     // wireFacing, not kbFacing: only input-derived headings go on the wire.
     // Streaming the seam/glide corrections (which chase the mirror) would
     // close a feedback loop through the server that at high RTT never
     // converges (the observed self-spinning resonance under netem).
-    const netFacing = foreignFacing ?? kbTurn.wireFacing;
+    const netFacing = sceneInputLocked
+      ? null
+      : (foreignFacing ?? sceneFacingInput.keyboardTurn.wireFacing);
     const onlineRenderFacing =
       visualFacingFor(resolved.mi, netFacing ?? kbFacing ?? interpServerFacing) ?? netFacing;
     Object.assign(net.moveInput, resolved.mi);
-    if (kbTurn.suppressTurnFlags) {
+    if (sceneFacingInput.keyboardTurn.suppressTurnFlags) {
       net.moveInput.turnLeft = false;
       net.moveInput.turnRight = false;
     }
     net.setMouselookFacing(netFacing);
     // Online streams facing every frame, so the mouselook release yaw is
     // consumed here; drop it so it is not re-applied next frame.
-    pendingReleaseFacing = null;
+    sceneFacingInput.pendingReleaseFacing = null;
     if (net.flushInput()) perf.markInputSent(performance.now());
     const echoSamples = net.consumeInputEchoSamples();
     for (const sample of echoSamples) {
@@ -4582,17 +4689,12 @@ async function startGame(
       perf.markInputEcho(sample);
     }
     net.pendingFacingDelta = 0; // superseded by the interpolated follow below
-    const drainedEvents = net.drainEvents();
-    const selfAuthoritativeDiscontinuity = hasAuthoritativeSelfPositionDiscontinuity(
-      drainedEvents,
-      net.playerId,
-    );
-    const drainedEventsLength = drainedEvents.length;
     // A spectating session remaps net.playerId to the watched player's pid, so
     // their personal events would read as addressed to us; never notify there.
     if (net.spectating === null) desktopNotifyOnSimEvents(drainedEvents, net.playerId);
     // Same gate, second reason: a spectator's zone must not leak to presence.
     if (net.spectating === null) desktopPresenceOnFrame(net);
+    const drainedEventsLength = drainedEvents.length;
     const eventsStart = perf.startTime();
     traceStart = perf.startTrace();
     try {
@@ -4695,6 +4797,7 @@ async function startGame(
       );
     }
     introCameraTick(now);
+    sceneCameraTick();
     renderer.camYaw = input.camYaw;
     renderer.camPitch = input.camPitch;
     renderer.camDist = input.camDist;
@@ -4856,14 +4959,47 @@ async function startGame(
     introLogo.tick(elapsed, intro.cinematic.durationSec);
     if (pose.done) finishIntro(false);
   };
+  // Last Bell scene camera: same frame slot as introCameraTick (after the
+  // follow-camera update, before the renderer reads the pose), so an authored
+  // shot wins over mouse/follow input while it runs. A shot with an entity
+  // focus re-reads the entity's live mirrored position via IWorld every frame
+  // (inside sceneDirector.cameraPose); the focus point rides to the renderer
+  // on sceneCameraFocus, re-anchoring the chase camera off the player.
+  const sceneLivePose = {
+    yaw: input.camYaw,
+    pitch: input.camPitch,
+    dist: input.camDist,
+    playerX: world.player.pos.x,
+    playerY: world.player.pos.y,
+    playerZ: world.player.pos.z,
+  };
+  const sceneFocus = { x: 0, y: 0, z: 0 };
+  const sceneCameraTick = (): void => {
+    sceneLivePose.yaw = input.camYaw;
+    sceneLivePose.pitch = input.camPitch;
+    sceneLivePose.dist = input.camDist;
+    sceneLivePose.playerX = world.player.pos.x;
+    sceneLivePose.playerY = world.player.pos.y;
+    sceneLivePose.playerZ = world.player.pos.z;
+    const pose = sceneDirector.cameraPose(sceneLivePose);
+    if (!pose) {
+      renderer.sceneCameraFocus = null;
+      return;
+    }
+    input.camYaw = pose.yaw;
+    input.camPitch = pose.pitch;
+    input.camDist = pose.dist;
+    sceneFocus.x = pose.focusX;
+    sceneFocus.y = pose.focusY;
+    sceneFocus.z = pose.focusZ;
+    renderer.sceneCameraFocus = sceneDirector.cameraActive() ? sceneFocus : null;
+  };
   // "Reduce motion" is the EFFECTIVE flag (the OS prefers-reduced-motion query OR the
   // in-game switch, the ui_effects_profile model): the intro is exactly the kind of
   // sweeping camera glide that contract exists for, and checking only the in-game
   // switch left OS-level reduce-motion players watching it (it also hid #ui from
   // them, silently dropping any focus() into the HUD while it ran).
-  const osReducedMotion =
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const osReducedMotion = sceneReducedMotionMedia?.matches ?? false;
   const introPolicy = decideSpawnCinematic({
     requested: playIntro,
     seen: introSeen,
@@ -5096,6 +5232,7 @@ async function startGame(
             controller,
             perf,
             gamepad,
+            scenes: { registeredSceneIds, sceneById, playSceneForPlayer },
             music,
             // The live content table, for E2E rigs that stage a template state
             // shipped content cannot reach (scripts/shot_2513_unmapped_corpse.mjs

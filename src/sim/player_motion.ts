@@ -280,7 +280,19 @@ export interface PlayerMotionDeps {
   ): void;
 }
 
-export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInput): void {
+export interface PlayerMotionOptions {
+  /** Scripted base speed in yards/second; normal movement uses RUN_SPEED. */
+  baseSpeed?: number;
+  /** Cap this tick's horizontal travel without bypassing the movement kernel. */
+  maxDistance?: number;
+}
+
+export function stepPlayerMotion(
+  deps: PlayerMotionDeps,
+  p: Entity,
+  inp: MoveInput,
+  options?: PlayerMotionOptions,
+): void {
   const stepStartX = p.pos.x;
   const stepStartZ = p.pos.z;
   // Convention: facing f points along (sin f, cos f); the camera sits behind
@@ -340,8 +352,9 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
     p.mountCastRemaining = 0;
     p.mountCastKey = '';
   }
-  // Keep the root ONLY during the dismount channel (mountCastKey === '' means dismounting).
-  // During a summon channel, movement is allowed (and handled above via move-to-cancel).
+  // Current code dismounts instantly. Preserve rooting only for an empty-key
+  // transition received from the retired put-away channel during a mixed-version
+  // session; keyed summons allow movement and cancel above.
   const mountLocked = p.mountCastRemaining > 0 && p.mountCastKey === '';
   const moving = hasMoveInput && !isRooted(p) && !steepGround && !mountLocked;
   let wishX = 0,
@@ -367,7 +380,10 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
     const len = Math.hypot(mx, mz);
     mx /= len;
     mz /= len;
-    let speed = RUN_SPEED * deps.moveSpeedMult(p);
+    let speed = (options?.baseSpeed ?? RUN_SPEED) * deps.moveSpeedMult(p);
+    if (options?.maxDistance !== undefined) {
+      speed = Math.min(speed, options.maxDistance / DT);
+    }
     if (mz < 0) speed *= BACKPEDAL_MULT;
     if (swimming) speed *= swimSpeedMult(p.swimStroke, submerged);
     // Shallow water pushes back. Reuses the waterline this tick already
@@ -595,9 +611,9 @@ function verticalPass(
   wishSpeed: number,
   swimming: boolean,
   steepGround: boolean,
-  // A dismount channel roots the rider outright, so it gates every jump arm
-  // here as well as the horizontal wish above (one rule, threaded rather than
-  // recomputed, so the two can never drift).
+  // A legacy empty-key transition roots the rider outright, so it gates every
+  // jump arm here as well as the horizontal wish above (one rule, threaded
+  // rather than recomputed, so the two can never drift).
   mountLocked: boolean,
 ): void {
   const ground = groundHeight(p.pos.x, p.pos.z, deps.seed);

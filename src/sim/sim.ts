@@ -32,6 +32,7 @@ import {
 import * as bankMod from './bank';
 import { type BankState, clampBonusSlots, sanitizeBankState } from './bank';
 import { campSpawnOffset } from './camp_scatter';
+import { createCampSpawnRngSelector } from './camp_spawn_rng';
 import { buildCivicServicePlacements } from './civic_service_placements';
 import { advanceClimb, tryStartClimb } from './climb';
 import {
@@ -276,6 +277,7 @@ import { meetsLevelRequirement } from './item_level_req';
 import { setItemLocked as setItemLockedCmd } from './item_lock';
 import * as items from './items';
 import type { JailState } from './jail';
+import { initLastBellCampaign as initLastBellCampaignImpl } from './last_bell/campaign';
 import {
   type DeedsLeaderboardPage,
   type DevLeaderboardPage,
@@ -533,6 +535,17 @@ import {
 import { sanitizeRemovedZone1Content } from './removed_zone1_content';
 import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
 import { Rng } from './rng';
+import type { ScenarioRun } from './scenarios/scenarios';
+import * as scenarioMod from './scenarios/scenarios';
+import type { ActiveChoice } from './scenes/choices';
+import * as choicesMod from './scenes/choices';
+import {
+  finishScriptedPlayerWalkStep,
+  prepareScriptedPlayerWalkStep,
+  type ScriptedPlayerWalk,
+} from './scenes/player_walk';
+import type { ScenePlayback } from './scenes/scenes';
+import * as scenesMod from './scenes/scenes';
 import { persistedResource } from './serialize_resource';
 import {
   createSimContext,
@@ -553,6 +566,8 @@ import {
   spawnOverworldSpiritHealers,
   UNSTUCK_SICKNESS_ID,
 } from './spirit';
+import type { SquadRun } from './squad/squad';
+import * as squadMod from './squad/squad';
 import { repairTalentLoadouts } from './talent_loadouts';
 import {
   CURRENT_CHARACTER_CONTENT_REVISION,
@@ -599,6 +614,7 @@ import {
   updateInstances as updateInstancesImpl,
 } from './instances/dungeons';
 import { buyHeroicVendorItem as buyHeroicVendorItemImpl } from './instances/heroic_vendor';
+import { enterStoryInstance as enterStoryInstanceImpl } from './instances/story_instances';
 import { updatePortalTriggers } from './portals';
 import * as questCommands from './quests/quest_commands';
 import {
@@ -750,6 +766,7 @@ import {
   type MasterLootPrompt,
   type MasterLootThreshold,
   MELEE_RANGE,
+  type MemorialDef,
   type MobFamily,
   type MountRaceSession,
   type MountTrainingSession,
@@ -1424,6 +1441,10 @@ export interface PlayerMeta {
   known: ResolvedAbility[];
   questLog: Map<string, QuestProgress>;
   questsDone: Set<string>;
+  // Last Bell campaign flags: small per-character story records written by
+  // dialogue choices (for example lastBellVote: 'for' | 'against'); later
+  // scenes read them to pick variant lines. Choices color, never branch.
+  campaignFlags: Map<string, string>;
   counters: RewardCounters;
   autoEquip: boolean;
   // sim.time when this character entered the world; powers /played. Session-only
@@ -1735,6 +1756,8 @@ export interface CharacterState {
   vendorBuyback?: InvSlot[];
   questLog: QuestProgress[];
   questsDone: string[];
+  // Optional so pre-campaign saves load cleanly (additive JSONB).
+  campaignFlags?: [string, string][];
   // Legacy arenaRating/Wins/Losses are treated as 1v1 data. The explicit
   // 1v1 fields are written by new saves, while old saves fall back cleanly.
   arenaRating?: number;
@@ -1989,6 +2012,10 @@ export class Sim {
   private readonly worldContent: WorldContent;
   /** Validated active-world noticeboards captured for this Sim at construction. */
   readonly noticeboardDefinitions: readonly NoticeboardDef[];
+  /** Active-world memorials captured for this Sim at construction. */
+  readonly memorialDefinitions: readonly MemorialDef[];
+  /** Spawned memorial anchor entity id -> the MemorialDef id it reads. */
+  readonly memorialEntityIds = new Map<number, string>();
   /** Civic services that this Sim actually spawned, captured at construction. */
   readonly civicServicePlacements: readonly CivicServicePlacement[];
   rng: Rng;
@@ -2127,6 +2154,18 @@ export class Sim {
   // Escort quest runs (src/sim/escort.ts), keyed by EscortDef id. Live
   // SimContext view; the module owns every mutation.
   escortRuns = new Map<string, EscortRunState>();
+  // Last Bell squad rosters, keyed by story-instance claim id (exitId).
+  // State stays on Sim (multi-Sim isolation); behavior in src/sim/squad/.
+  squadRuns = new Map<number, SquadRun>();
+  // Last Bell scenario runs, keyed by story-instance claim id (exitId).
+  scenarioRuns = new Map<number, ScenarioRun>();
+  // Last Bell scene playbacks, keyed by story-instance claim id (exitId).
+  scenePlaybacks = new Map<number, ScenePlayback>();
+  // Last Bell scripted walks, keyed by player entity id. State stays here;
+  // src/sim/scenes/player_walk.ts owns mutations through the SimContext view.
+  scriptedPlayerWalks = new Map<number, ScriptedPlayerWalk>();
+  // Last Bell active dialogue choices, keyed by claim id.
+  activeChoices = new Map<number, ActiveChoice>();
   // delve instances (separate slot pool from dungeons)
   delveRuns: DelveRun[] = [];
   private delvePetStash = new Map<number, PetState>();
@@ -2305,6 +2344,7 @@ export class Sim {
       assertCanonicalEastbrookNoticeboardDef(definition);
     }
     this.noticeboardDefinitions = Object.freeze([...activeNoticeboardDefinitions]);
+    this.memorialDefinitions = Object.freeze([...(activeWorldContent.services?.memorials ?? [])]);
     this.civicServicePlacements = buildCivicServicePlacements(
       this.worldContent.services?.mailboxes ?? [],
       this.noticeboardDefinitions,
@@ -2384,6 +2424,12 @@ export class Sim {
     // Mobs from camps
     for (const camp of worldContent.camps) {
       const template = MOBS[camp.mobId];
+      // Expansion rows may retain only their established shared-stream budget:
+      // added spawns still scatter deterministically, but from a private
+      // position-derived stream so content growth cannot re-roll later camps
+      // or immediate post-construction interactions. Creating the stream draws
+      // nothing from the shared rng.
+      const rngForSpawn = createCampSpawnRngSelector(this.rng, this.cfg.seed, camp);
       // Aquatic/flagged swimmers may wade in the shallows; everyone else
       // still spawns on dry land even though combat movement can enter water.
       const minHeight = this.mobCanSpawnInWater(template) ? waterLevel() - 0.5 : waterLevel() + 0.4;
@@ -2406,14 +2452,14 @@ export class Sim {
           this.addEntity(mob);
           continue;
         }
-        // An offStream camp scatters off a PRIVATE sub-stream, so it draws no
-        // shared rng at all and adding it leaves every later world draw (and
-        // therefore every seeded gameplay roll) bit-identical. Same principle
-        // as the dummy/ambient branch above, but it still gets real scatter.
-        // Seeded from the world seed plus the camp's AUTHORED identity (never
-        // its array index, so reordering the list cannot move it), and never
-        // from wall-clock, so all three hosts agree.
-        const campRng = camp.offStream ? this.campPrivateRng(camp, i) : this.rng;
+        // An offStream camp scatters off a PRIVATE sub-stream (seeded from the
+        // world seed plus the camp's AUTHORED identity, never its array index
+        // or wall-clock), so adding it leaves every later world draw
+        // bit-identical: the dummy/ambient principle, with real scatter. A
+        // non-offStream camp still routes through rngForSpawn so an expansion
+        // row's tail spawns (past sharedRngCount) draw camp-private: the
+        // v0.39.0 merge briefly dropped this, see tests/sim.test.ts.
+        const campRng = camp.offStream ? this.campPrivateRng(camp, i) : rngForSpawn(i);
         // Spread the camp's mobs with even nearest-neighbor spacing (a sunflower
         // spiral) instead of independent uniform sampling, which let mobs stack.
         // The two draws below feed campSpawnOffset as jitter and are consumed in the
@@ -2480,6 +2526,24 @@ export class Sim {
       box.lootable = true; // interactable
       this.addEntity(box);
       this.postOffice.mailboxIds.push(box.id);
+    }
+
+    // War memorials: one readable anchor per monument, spawned at its authored
+    // spot (the mailbox pattern). The stone is decor with its own collider, so
+    // this entity exists purely to carry the interaction; it must not relocate
+    // away from the silhouette. Draws no rng.
+    for (const memorial of worldContent.services?.memorials ?? []) {
+      const stone = createGroundObject(
+        this.nextId++,
+        '',
+        'Memorial',
+        this.groundPos(memorial.x, memorial.z),
+      );
+      stone.templateId = 'memorial';
+      stone.objectItemId = null;
+      stone.lootable = true; // interactable
+      this.addEntity(stone);
+      this.memorialEntityIds.set(stone.id, memorial.id);
     }
 
     // Dungeon entrances + their private instance slots
@@ -2696,6 +2760,9 @@ export class Sim {
     // no rng and only consume trailing entity ids, so every id and rng draw
     // above stays byte-identical to a world without escorts.
     initEscortsImpl(this.ctx);
+    // Last Bell campaign fixtures (ferry landings, scenario doors): rng-free,
+    // consumes entity ids (goldens re-minted with this world shift).
+    initLastBellCampaignImpl(this.ctx);
   }
 
   private spawnHealerPracticeDummy(): void {
@@ -2956,6 +3023,7 @@ export class Sim {
       known: [],
       questLog: new Map(),
       questsDone: new Set(),
+      campaignFlags: new Map(savedState?.campaignFlags ?? []),
       counters: freshCounters(),
       autoEquip: opts?.autoEquip ?? false,
       joinedAt: this.time,
@@ -3854,6 +3922,12 @@ export class Sim {
     // A leaving player's riding-lesson session is likewise abandoned (never
     // silently left IN_PROGRESS); the one-time fee stays paid either way.
     if (meta.mountTraining?.state === 'IN_PROGRESS') this.ctx.abandonMountTraining(meta);
+    // Personal (-pid keyed) scene/choice presentation dies with the session.
+    // Both would self-clean on the next tick once the entity is gone; the
+    // explicit delete keeps teardown hygienic with the rest of this cluster.
+    this.ctx.scenePlaybacks.delete(-pid);
+    this.ctx.scriptedPlayerWalks.delete(pid);
+    this.ctx.activeChoices.delete(-pid);
     this.preparePlayerLeave(pid);
     clearSpiritmendCurrents(this.ctx, pid);
     const leaving = this.entities.get(pid);
@@ -4138,6 +4212,7 @@ export class Sim {
         ...(q.rev === undefined ? {} : { rev: q.rev }),
       })),
       questsDone: [...meta.questsDone],
+      campaignFlags: [...meta.campaignFlags],
       arenaRating: meta.arenaRating,
       arenaWins: meta.arenaWins,
       arenaLosses: meta.arenaLosses,
@@ -4336,7 +4411,7 @@ export class Sim {
   /** The owned subset of the catalog for a player (the server wire path). */
   ownedMountsFor(pid: number): MountKey[] {
     const meta = this.players.get(pid);
-    return meta ? ownedMountsImpl(meta) : [DEFAULT_MOUNT];
+    return meta ? ownedMountsImpl(meta) : [];
   }
 
   // --- IWorldMounts ---
@@ -5242,6 +5317,21 @@ export class Sim {
       get escortRuns() {
         return sim.escortRuns;
       },
+      get squadRuns() {
+        return sim.squadRuns;
+      },
+      get scenarioRuns() {
+        return sim.scenarioRuns;
+      },
+      get scenePlaybacks() {
+        return sim.scenePlaybacks;
+      },
+      get scriptedPlayerWalks() {
+        return sim.scriptedPlayerWalks;
+      },
+      get activeChoices() {
+        return sim.activeChoices;
+      },
       get nextArenaMatchId() {
         return sim.nextArenaMatchId;
       },
@@ -5528,6 +5618,8 @@ export class Sim {
       instanceClaimIdAt: sim.instanceClaimIdAt.bind(sim),
       enterDungeon: sim.enterDungeon.bind(sim),
       leaveDungeon: sim.leaveDungeon.bind(sim),
+      enterStoryInstance: sim.enterStoryInstance.bind(sim),
+      playScene: sim.playScene.bind(sim),
       enterRift: sim.enterRift.bind(sim),
       leaveRift: sim.leaveRift.bind(sim),
       riftOpenTreasure: sim.riftOpenTreasure.bind(sim),
@@ -5541,6 +5633,12 @@ export class Sim {
       rebucket: sim.rebucket.bind(sim),
       resolve: sim.resolve.bind(sim),
       groundPos: sim.groundPos.bind(sim),
+      memorialIdForEntity: (entityId) => sim.memorialEntityIds.get(entityId) ?? null,
+      memorialInteractionRadius: (entityId) => {
+        const id = sim.memorialEntityIds.get(entityId);
+        if (!id) return null;
+        return sim.memorialDefinitions.find((m) => m.id === id)?.interactionRadius ?? null;
+      },
       playerMods: sim.playerMods.bind(sim),
       delveRunForPlayer: sim.delveRunForPlayer.bind(sim),
       delveModuleEntry: sim.delveModuleEntry.bind(sim),
@@ -6322,6 +6420,16 @@ export class Sim {
     if (this.cfg.riftPortals) updateRiftPortalsImpl(this.ctx);
     // Escort runs walk their NPC + watch ambush waves (rng-free; src/sim/escort.ts).
     updateEscortsImpl(this.ctx);
+    // Last Bell squad actors (src/sim/squad/squad.ts): zero work and zero rng
+    // while no squad is live, so the shared draw order never moves for the
+    // existing world; a live squad's draws happen only inside new content.
+    squadMod.updateSquads(this.ctx);
+    // Last Bell scenario stages advance after their actors act (same zero-work,
+    // zero-rng idle contract).
+    scenarioMod.updateScenarios(this.ctx);
+    // Scene op emission runs after the stage that cued it (same idle contract).
+    scenesMod.updateScenes(this.ctx);
+    choicesMod.updateChoices(this.ctx);
     lap?.('instances');
     this.updateDelveRuns();
     lap?.('delves');
@@ -6794,6 +6902,18 @@ export class Sim {
       // Moving under your own input clears an AFK flag (classic behavior); a
       // no-op unless the player is currently AFK. Do Not Disturb survives.
       clearAfkOnMove(this.ctx, meta, p);
+    }
+    // Scene-authored locomotion supplies a forward intent to the SAME motion
+    // kernel as real input. It owns this player's step while active, so stale
+    // held input cannot perturb the authoritative walk.
+    const scriptedWalk = prepareScriptedPlayerWalkStep(this.ctx, p);
+    if (scriptedWalk) {
+      stepPlayerMotion(this.playerMotionDeps, p, scriptedWalk.input, {
+        baseSpeed: scriptedWalk.speed,
+        maxDistance: scriptedWalk.maxDistance,
+      });
+      finishScriptedPlayerWalkStep(this.ctx, p);
+      return;
     }
     if (advanceValkyrsCalling(this.ctx, p)) return;
     // The race countdown is a real start lock, not just a client animation.
@@ -10155,6 +10275,12 @@ export class Sim {
     if (target.kind === 'mob' && escortMod.isActiveEscortee(this.ctx, target)) {
       return this.pvpController(caster) !== null;
     }
+    // A Last Bell squad actor is heal/shield-targetable by any player or
+    // player-owned pet; players can never attack one (isHostileTo resolves
+    // an ownerless mob to its hostile flag, false for actors).
+    if (target.kind === 'mob' && squadMod.isSquadActor(target)) {
+      return this.pvpController(caster) !== null;
+    }
     if (target.kind === 'mob' && target.ownerId !== null) {
       const owner = this.entities.get(target.ownerId);
       return !!owner && owner.kind === 'player' && !this.isHostileTo(caster, owner);
@@ -11427,6 +11553,56 @@ export class Sim {
 
   leaveDungeon(pid?: number): boolean {
     return leaveDungeonImpl(this.ctx, pid);
+  }
+
+  enterStoryInstance(dungeonId: string, pid?: number): boolean {
+    return enterStoryInstanceImpl(this.ctx, dungeonId, pid);
+  }
+
+  playScene(claimId: number, sceneId: string): boolean {
+    return scenesMod.playScene(this.ctx, claimId, sceneId);
+  }
+
+  sceneReconnectStateFor(pid: number) {
+    return scenesMod.sceneReconnectStateFor(this.ctx, pid);
+  }
+
+  sceneChoiceReconnectStateFor(pid: number) {
+    return choicesMod.sceneChoiceReconnectStateFor(this.ctx, pid);
+  }
+
+  requestSceneSkip(pid?: number): boolean {
+    return scenesMod.requestSceneSkip(this.ctx, pid);
+  }
+
+  // IWorldScenes facet adapters: presentation reads the same simulation clock
+  // the scene authority advances, and commands resolve the local primary player.
+  get presentationTime(): number {
+    return this.time;
+  }
+
+  sceneActiveForLocalPlayer(): boolean {
+    // Personal playbacks key by -pid; a claim playback lists the player in
+    // its started audience once its start op emitted. Both read the live
+    // registry, so this is true the instant playSceneForPlayer runs, before
+    // any tick drains the scene events.
+    if (scenesMod.sceneActiveFor(this.ctx, -this.playerId)) return true;
+    for (const playback of this.ctx.scenePlaybacks.values()) {
+      if (playback.startedAudience.has(this.playerId)) return true;
+    }
+    return false;
+  }
+
+  sceneSkip(): void {
+    scenesMod.requestSceneSkip(this.ctx);
+  }
+
+  answerSceneChoice(choiceId: string, optionId: string, pid?: number): boolean {
+    return choicesMod.answerSceneChoice(this.ctx, choiceId, optionId, pid);
+  }
+
+  answerActiveSceneChoiceByIndex(optionIndex: number, pid?: number): boolean {
+    return choicesMod.answerActiveSceneChoiceByIndex(this.ctx, optionIndex, pid);
   }
 
   resetDungeonInstances(pid?: number): void {

@@ -23,9 +23,7 @@ import { registerPreload } from '../assets/preload';
 import { addRimGlow, EMISSIVE_GLOW, GFX, type GfxSettings } from '../gfx';
 import { applySurfaceDetail, riggedWornFamilyFor } from '../worn_stone';
 import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
-import { backGripFor } from './back_grips';
 import { dequantizeAttribute } from './dequantize_attribute';
-import { type HandGrip, KAYKIT_SHIELD_ACCESSORIES, KAYKIT_SHIELD_GRIPS } from './held_item_grips';
 import { buildMakeupDecal } from './makeup';
 import {
   type AttachDef,
@@ -79,258 +77,17 @@ import {
   createPaladinTemplarsVerdictClip,
   PALADIN_TEMPLARS_VERDICT_CLIP,
 } from './paladin_templars_verdict_clip';
+import { flattenPropScene, mountProp } from './prop_mount';
+import { isHandslotBone, modelBasename } from './prop_placement_core';
 import { animatedNodeNames, mergeSkinnedParts } from './rig_merge';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { optimizeSkinGpuLayout } from './skin_gpu_layout';
 import { primeSkinnedSortSpheres } from './skinned_sort_spheres';
 import { buildStubbleDecal, headNodeName } from './stubble';
 import { TINTED_MATERIAL_IDLE_CACHE_MAX, TintedMaterialCache } from './tinted_material_cache_core';
-import { variantGripTransform, WEAPON_GRIP_OVERRIDES } from './weapon_grip';
 import { markOwnedWeaponSkinMaterials } from './weapon_skin_materials';
 
 const DEFAULT_TINT_STRENGTH = 0.4;
-
-// KayKit adventurer standalone weapon glbs ship a left-hand mesh offset on a
-// lone child node. handslot.r/l children in the character glbs carry the
-// authored grip — copy those (or this fallback table) after flattening.
-const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
-  axe_1handed: '1H_Axe',
-  axe_2handed: '2H_Axe',
-  crossbow_1handed: '1H_Crossbow',
-  crossbow_2handed: '2H_Crossbow',
-  sword_1handed: '1H_Sword',
-  sword_2handed: '2H_Sword',
-  staff: '2H_Staff',
-  dagger: 'Knife',
-  wand: '1H_Wand',
-  // Per-item weapon variants (ITEM_WEAPON_VARIANTS / public/models/weapons/<key>.glb)
-  // come from a different pack than the KayKit generics. Crucially, each variant's
-  // mesh ORIGIN is authored AT the grip (the handle/guard): minY is consistent
-  // within a family (~-0.4 for swords) while the blade length (maxY) varies. So we
-  // do NOT recenter (that would move the grip to mid-blade and make long blades
-  // drag); we attach at the origin and only clamp oversized models. VAR_* keys
-  // route to applyVariantGrip (no rig node matches them).
-  sword_a: 'VAR_SWORD',
-  sword_b: 'VAR_SWORD',
-  sword_c: 'VAR_SWORD',
-  sword_d: 'VAR_SWORD',
-  sword_e: 'VAR_SWORD',
-  sword_f: 'VAR_SWORD',
-  sword_g: 'VAR_SWORD',
-  dagger_a: 'VAR_DAGGER',
-  dagger_b: 'VAR_DAGGER',
-  dagger_c: 'VAR_DAGGER',
-  staff_a: 'VAR_STAFF',
-  staff_b: 'VAR_STAFF',
-  staff_c: 'VAR_STAFF',
-  staff_d: 'VAR_STAFF',
-  axe_a: 'VAR_AXE',
-  axe_b: 'VAR_AXE',
-  axe_c: 'VAR_AXE',
-  axe_d: 'VAR_AXE',
-  hammer_a: 'VAR_AXE',
-  hammer_b: 'VAR_AXE',
-  hammer_c: 'VAR_AXE',
-  hammer_d: 'VAR_AXE',
-  halberd: 'VAR_POLEARM',
-  // additional distinct models (KayKit Adventurers set + spears/scythe/wands) for
-  // weapon variety. adv_* swords/dagger/staff/axe share the variant-pack convention
-  // (float geo, origin-at-grip) so they reuse the same family grips.
-  adv_sword_1handed: 'VAR_SWORD',
-  adv_sword_2handed: 'VAR_SWORD',
-  adv_sword_2handed_color: 'VAR_SWORD',
-  adv_dagger: 'VAR_DAGGER',
-  adv_staff: 'VAR_STAFF',
-  adv_druid_staff: 'VAR_STAFF',
-  adv_axe_1handed: 'VAR_AXE',
-  adv_axe_2handed: 'VAR_AXE',
-  spear_a: 'VAR_POLEARM',
-  spear_b: 'VAR_POLEARM',
-  scythe: 'VAR_POLEARM',
-  wand_a: 'VAR_WAND',
-  wand_b: 'VAR_WAND',
-  adv_wand: 'VAR_WAND',
-  emberfang_sword: 'VAR_SWORD',
-  redskull_sword: 'VAR_SWORD',
-  redskull_dagger: 'VAR_DAGGER',
-  redskull_staff: 'VAR_STAFF',
-  redskull_wand: 'VAR_WAND',
-  redskull_hammer: 'VAR_AXE',
-  purple_sword: 'VAR_SWORD',
-  purple_dagger: 'VAR_DAGGER',
-  purple_axe: 'VAR_AXE',
-  purple_staff: 'VAR_STAFF',
-  purple_wand: 'VAR_WAND',
-  wrought_iron_longsword: 'VAR_SWORD',
-  notched_woodaxe: 'VAR_AXE',
-  iron_field_hammer: 'VAR_AXE',
-  peeled_birch_wand: 'VAR_WAND',
-  simple_farmhand_crossbow: 'VAR_CROSSBOW',
-  guildmark_arming_sword: 'VAR_SWORD',
-  skyrender_the_firmament_s_wound: 'VAR_AXE',
-  cosmarch_spire_of_the_endless_void: 'VAR_STAFF',
-  emberwish_mote_of_the_dying_sun: 'VAR_WAND',
-  meteorlatch_the_sky_s_last_judgment: 'VAR_CROSSBOW',
-  starfall_judgment_of_the_heavens: 'VAR_MACE',
-  ice_fang: 'VAR_DAGGER', // Rimefang (rogue dagger): dagger grip, not sword
-  glaciersplit: 'VAR_AXE',
-  rimecrusher: 'VAR_MACE',
-  frostbite: 'VAR_DAGGER',
-  hoarfrost_vigil: 'VAR_STAFF',
-  shard_of_everwinter: 'VAR_WAND',
-  solheim_last_light_of_the_dawn: 'VAR_SWORD',
-  astravyr_fang_of_the_fallen_star: 'VAR_DAGGER',
-  brasscap_hatchet: 'VAR_AXE',
-  knotted_oak_stave: 'VAR_STAFF',
-  whittler_s_knife: 'VAR_DAGGER',
-  winterbite: 'VAR_BOW',
-  cinderbrand: 'VAR_SWORD',
-  emberbite: 'VAR_AXE',
-  smoulderfall: 'VAR_HAMMER',
-  ashspark_shiv: 'VAR_DAGGER',
-  forgeheart_stave: 'VAR_STAFF',
-  emberwrought_wand: 'VAR_WAND',
-  cinderlatch: 'VAR_CROSSBOW',
-  tempered_flanged_mace: 'VAR_MACE',
-  guildmark_dirk: 'VAR_DAGGER',
-  brasscrown_walking_staff: 'VAR_STAFF',
-  lacquered_rod: 'VAR_WAND',
-  fletcher_s_guild_bow: 'VAR_BOW',
-  rude_awakening_sword: 'VAR_SWORD',
-  // Bow-SLOT skin with crossbow HANDLING (a gun aims, it is not drawn): the
-  // grip family follows the handling, like the attach bone below.
-  encore_the_second_falling_star: 'VAR_CROSSBOW',
-  ...KAYKIT_SHIELD_ACCESSORIES,
-};
-
-// Per-family grip for the variant pack. The model origin IS the grip, so we attach
-// at it: `lift` nudges the grip along the hand bone (tuned against the generic
-// look), `maxHeight` clamps an oversized model so a long blade doesn't drag (scale
-// is only ever reduced, so normal-size weapons keep their native scale and variety).
-interface VariantGrip {
-  lift: number;
-  maxHeight: number;
-}
-const VARIANT_GRIPS: Record<string, VariantGrip> = {
-  VAR_SWORD: { lift: 0.04, maxHeight: 2.0 },
-  VAR_DAGGER: { lift: 0.04, maxHeight: 1.4 },
-  VAR_STAFF: { lift: 0.18, maxHeight: 2.4 },
-  VAR_AXE: { lift: 0.04, maxHeight: 1.5 },
-  VAR_HAMMER: { lift: 0.04, maxHeight: 1.5 },
-  VAR_MACE: { lift: 0.04, maxHeight: 1.5 },
-  VAR_POLEARM: { lift: 0.18, maxHeight: 2.5 },
-  VAR_WAND: { lift: 0.04, maxHeight: 1.2 },
-  VAR_BOOK: { lift: 0.04, maxHeight: 1.2 },
-  VAR_CROSSBOW: { lift: 0.04, maxHeight: 1.6 },
-  VAR_BOW: { lift: 0.04, maxHeight: 2.0 },
-};
-
-const KAYKIT_HAND_GRIPS: Record<string, { r: HandGrip; l?: HandGrip }> = {
-  '1H_Axe': {
-    r: { position: [0.231697, 0.382471, 0], quaternion: [0, 1, 0, 0], scale: 0.622211 },
-    l: { position: [-0.231697, 0.382471, 0], quaternion: [0, 0, 0, 1], scale: 0.622211 },
-  },
-  '2H_Axe': {
-    r: { position: [0, 0.4626, 0], quaternion: [0, 1, 0, 0], scale: 0.8623 },
-  },
-  '1H_Crossbow': {
-    r: {
-      position: [0.2286, 0.0213, -0.0012],
-      quaternion: [0, 0.7071068, 0, 0.7071067],
-      scale: 0.6109,
-    },
-  },
-  '2H_Crossbow': {
-    r: { position: [0.3381, 0.058, 0], quaternion: [0, 0.7071068, 0, 0.7071067], scale: 0.7204 },
-  },
-  '1H_Sword': {
-    r: { position: [0, 0.555174, 0], quaternion: [0, 1, 0, 0], scale: 0.8876 },
-    l: { position: [0, 0.555174, 0], quaternion: [0, 0, 0, 1], scale: 0.8876 },
-  },
-  '2H_Sword': {
-    r: { position: [0, 0.8148, 0], quaternion: [0, 1, 0, 0], scale: 1.1829 },
-  },
-  '2H_Staff': {
-    r: { position: [-0.0427, 0.1769, 0], quaternion: [0, 1, 0, 0], scale: 1.0773 },
-  },
-  Knife: {
-    r: { position: [-0.0095, 0.378, 0], quaternion: [0, 1, 0, 0], scale: 0.6029 },
-    l: { position: [0.0095, 0.378, 0], quaternion: [0, 0, 0, 1], scale: 0.6029 },
-  },
-  '1H_Wand': {
-    r: { position: [0, 0.2174, 0], quaternion: [0, 1, 0, 0], scale: 0.4831 },
-  },
-  ...KAYKIT_SHIELD_GRIPS,
-};
-
-function isHandslotBone(name: string): boolean {
-  const n = name.replace(/[[\].:/]/g, '');
-  return n === 'handslotr' || n === 'handslotl';
-}
-
-function handSide(bone: string): 'r' | 'l' {
-  return bone.replace(/[[\].:/]/g, '').endsWith('l') ? 'l' : 'r';
-}
-
-function kaykitAccessoryFor(url: string): string | null {
-  const base =
-    url
-      .split('/')
-      .pop()
-      ?.replace(/\.glb$/, '') ?? '';
-  return KAYKIT_WEAPON_ACCESSORY[base] ?? null;
-}
-
-function findAccessoryNode(root: THREE.Object3D, name: string): THREE.Object3D | null {
-  return root.getObjectByName(name) ?? root.getObjectByName(name.replace(/[[\].:/]/g, '')) ?? null;
-}
-
-function accessoryNodeName(accessory: string, side: 'r' | 'l'): string {
-  if (side === 'l' && accessory === 'Knife') return 'Knife_Offhand';
-  if (side === 'l' && accessory === '1H_Sword') return '1H_Sword_Offhand';
-  return accessory;
-}
-
-function copyAccessoryTransform(payload: THREE.Object3D, ref: THREE.Object3D): void {
-  payload.position.copy(ref.position);
-  payload.quaternion.copy(ref.quaternion);
-  payload.scale.copy(ref.scale);
-}
-
-function applyHandGrip(
-  payload: THREE.Object3D,
-  root: THREE.Object3D,
-  bone: string,
-  url: string,
-): void {
-  const accessory = kaykitAccessoryFor(url);
-  if (!accessory) return;
-  const side = handSide(bone);
-  const ref = findAccessoryNode(root, accessoryNodeName(accessory, side));
-  if (ref) {
-    copyAccessoryTransform(payload, ref);
-    return;
-  }
-  const grips = KAYKIT_HAND_GRIPS[accessory];
-  if (!grips) return;
-  const grip = side === 'l' ? (grips.l ?? grips.r) : grips.r;
-  payload.position.set(...grip.position);
-  payload.quaternion.set(...grip.quaternion);
-  payload.scale.setScalar(grip.scale);
-}
-
-function flattenWeaponScene(src: THREE.Object3D): THREE.Object3D {
-  if (src.children.length !== 1) return src;
-  const holder = new THREE.Group();
-  const child = src.children[0];
-  holder.scale.copy(child.scale);
-  child.scale.set(1, 1, 1);
-  child.position.set(0, 0, 0);
-  child.rotation.set(0, 0, 0);
-  src.remove(child);
-  holder.add(child);
-  return holder;
-}
 
 // Mainhand and actual offhand holders have separate replacement cycles, so a
 // mainhand cosmetic swap cannot remove or reskin a shield or second weapon.
@@ -344,41 +101,6 @@ const HELD_PROP_TAG = 'heldPropHolder';
 // Sheathed props re-parent onto the chest bone (shared KayKit Rig_Medium).
 const STOW_BONE = 'chest';
 
-// Grip for a variant-pack weapon. Its origin is authored AT the grip, so we attach
-// at the origin (no recenter) and only clamp an oversized model so its blade does
-// not drag. `lift` nudges along the hand bone; the side picks the 180-degree flip.
-// A WEAPON_GRIP_OVERRIDES row (hand-tuned in the asset-pipeline inspector's grip
-// bar) layers a per-weapon pos/rot/scale fine-tune on top, composed by the SAME
-// pure variantGripTransform the inspector previews, so the editor fit IS the
-// in-game fit. With no row the transform is exactly the bare lift/flip/clamp.
-const variantBox = new THREE.Box3();
-function variantGripFor(url: string): VariantGrip | null {
-  const accessory = kaykitAccessoryFor(url);
-  return accessory ? (VARIANT_GRIPS[accessory] ?? null) : null;
-}
-function modelBasename(url: string): string {
-  return url.slice(url.lastIndexOf('/') + 1).replace(/\.glb$/, '');
-}
-function applyVariantGrip(
-  payload: THREE.Object3D,
-  bone: string,
-  grip: VariantGrip,
-  url: string,
-): void {
-  variantBox.setFromObject(payload);
-  const height = variantBox.max.y - variantBox.min.y;
-  const t = variantGripTransform(
-    height,
-    handSide(bone) === 'l',
-    grip.lift,
-    grip.maxHeight,
-    WEAPON_GRIP_OVERRIDES[modelBasename(url)],
-  );
-  payload.position.set(t.position[0], t.position[1], t.position[2]);
-  payload.quaternion.set(t.quaternion[0], t.quaternion[1], t.quaternion[2], t.quaternion[3]);
-  payload.scale.setScalar(t.scale);
-}
-
 function attachProp(
   root: THREE.Object3D,
   bone: THREE.Object3D,
@@ -386,7 +108,18 @@ function attachProp(
   swapKind: 'mainhand' | 'offhand' | null = null,
   stowed = false,
 ): THREE.Object3D {
-  const payload = flattenWeaponScene(cloneSkinned(resolvedGltf(att.url).scene));
+  // WHERE the prop goes is not decided here. `mountProp` flattens, asks
+  // `prop_placement_core` for the placement, writes it and parents it, and the /wiki
+  // guide viewer, the asset-pipeline inspector and the Blender concept pipeline ask the
+  // same core the same question. That is the point: this used to be one of four
+  // independent answers, and they disagreed.
+  const payload = mountProp({
+    root,
+    bone,
+    scene: cloneSkinned(resolvedGltf(att.url).scene),
+    att,
+    stowed,
+  });
   primeSkinnedSortSpheres(payload);
   payload.traverse((o) => {
     if ((o as THREE.Mesh).isMesh) o.userData.weaponMesh = true;
@@ -399,27 +132,6 @@ function attachProp(
     payload.userData.heldSlot = 1;
   }
   payload.userData[HELD_PROP_TAG] = true;
-  const variantGrip = isHandslotBone(att.bone) ? variantGripFor(att.url) : null;
-  if (variantGrip) {
-    applyVariantGrip(payload, att.bone, variantGrip, att.url);
-  } else if (att.position || att.rotationY !== undefined) {
-    if (att.position) payload.position.set(...att.position);
-    if (att.rotationY !== undefined) payload.rotation.y = att.rotationY;
-  } else if (att.gripRef) {
-    const ref = findAccessoryNode(root, att.gripRef);
-    if (ref) copyAccessoryTransform(payload, ref);
-  } else if (isHandslotBone(att.bone)) {
-    applyHandGrip(payload, root, att.bone, att.url);
-  }
-  // Sheathed: override where the prop SITS (on-back position/lean, chest-bone
-  // space; the caller resolved the chest bone) but keep the SCALE the normal
-  // grip pass just computed, so variant-pack size clamps carry over.
-  if (stowed && isHandslotBone(att.bone)) {
-    const grip = backGripFor(kaykitAccessoryFor(att.url), handSide(att.bone));
-    payload.position.set(...grip.position);
-    payload.quaternion.set(...grip.quaternion);
-  }
-  bone.add(payload);
   return payload;
 }
 
@@ -1641,7 +1353,7 @@ export function weaponSkinDisplayModel(skinId: string): THREE.Object3D | null {
   // (docs/design/armory-preview-warming.md) and the guard now protects the
   // CLICK path, where throwing would escape an ArmoryInspect handler.
   if (residentOrEnsure(url) === null) return null;
-  const payload = flattenWeaponScene(cloneSkinned(resolvedGltf(url).scene));
+  const payload = flattenPropScene(cloneSkinned(resolvedGltf(url).scene));
   payload.traverse((o) => {
     const mesh = o as THREE.Mesh;
     if (!mesh.isMesh) return;

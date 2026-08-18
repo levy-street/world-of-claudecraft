@@ -2797,104 +2797,6 @@
     cursor: var(--cursor-arrow);
   }
 
-  /* ---------- mount picker (character sheet) ---------- */
-  .mount-picker .mp-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-    gap: 6px;
-    margin-top: 4px;
-  }
-  .mp-card {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    text-align: left;
-    min-height: 44px;
-    padding: 8px;
-    border: 1px solid #463a1c;
-    background: #ffffff08;
-    border-radius: 4px;
-    color: inherit;
-    font: inherit;
-  }
-  .mp-face {
-    width: 40px;
-    height: 40px;
-    flex: none;
-    border: 1px solid #463a1c;
-    border-radius: 4px;
-    background: #00000040;
-  }
-  .mp-info {
-    min-width: 0;
-  }
-  button.mp-card {
-    cursor: var(--cursor-point);
-  }
-  button.mp-card:hover {
-    border-color: #cc9a3c;
-  }
-  .mp-card:focus-visible {
-    outline: 2px solid var(--color-border-focus);
-    outline-offset: 2px;
-  }
-  .mp-card.mp-selected {
-    border-color: #cc9a3c;
-    background: #ffe27a12;
-  }
-  .mp-card.mp-locked {
-    opacity: 0.55;
-  }
-  .mp-card.mp-highlight {
-    border-color: #ffe27a;
-    animation: mp-flash 1.4s ease-out 2;
-  }
-  @keyframes mp-flash {
-    0% {
-      background: #ffe27a2e;
-    }
-    100% {
-      background: #ffffff08;
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .mp-card.mp-highlight {
-      animation: none;
-    }
-  }
-  .mp-name {
-    font-size: 13px;
-    font-weight: 600;
-  }
-  .mp-state {
-    margin-left: 6px;
-    color: var(--color-text-muted);
-    font-size: 11px;
-    font-weight: 400;
-  }
-  .mp-state.mp-riding {
-    color: #ffe27a;
-  }
-  .mp-sub {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2px 10px;
-    margin-top: 3px;
-    color: var(--color-text-muted);
-    font-size: 11px;
-  }
-  .mp-spec {
-    color: #9fe29f;
-  }
-  .mp-lock {
-    color: #e08f8f;
-  }
-  .mp-hint {
-    margin-top: 6px;
-    color: var(--color-text-muted);
-    font-size: 11px;
-  }
-
   /* ---------- daily rewards ---------- */
   .dr-body {
     margin-top: 8px;
@@ -6094,6 +5996,72 @@
     margin-bottom: 0;
   }
   #profession-tutorial .cd-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 4px;
+  }
+
+  /* ---------- memorial plaque ---------- */
+  /* The Roll of Honour shown for reading a war memorial. Reuses the
+     confirm-dialog body chrome (the profession-tutorial precedent) and sizes
+     from existing tokens; the only bespoke part is the two-column name list,
+     which reads down each column in turn the way a cut stone roll does. */
+  #memorial-plaque {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 460px;
+    --window-pad: 14px;
+  }
+  #memorial-plaque .cd-body {
+    padding: 10px 0;
+  }
+  #memorial-plaque .memorial-plaque-dedication {
+    margin: 0 0 12px;
+    color: var(--color-text-light);
+    font-size: 12.5px;
+    line-height: 1.55;
+  }
+  #memorial-plaque .memorial-plaque-heading {
+    margin: 0 0 8px;
+    color: var(--color-accent);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+  #memorial-plaque .memorial-plaque-columns {
+    display: flex;
+    gap: 18px;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+    padding: 10px 0;
+  }
+  #memorial-plaque .memorial-plaque-column {
+    flex: 1 1 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    min-width: 0;
+  }
+  #memorial-plaque .memorial-plaque-name {
+    color: var(--color-text);
+    font-size: 12.5px;
+    line-height: 1.7;
+    /* a roll is read, not scanned: keep the names on one line each */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  /* The bare stone under the newest name is the point of the monument. */
+  #memorial-plaque .memorial-plaque-room {
+    margin: 10px 0 0;
+    color: var(--color-text-dim);
+    font-size: 11.5px;
+    font-style: italic;
+    line-height: 1.5;
+  }
+  #memorial-plaque .cd-actions {
     display: flex;
     justify-content: flex-end;
     margin-top: 4px;

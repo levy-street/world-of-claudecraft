@@ -8,16 +8,23 @@
 import { describe, expect, it } from 'vitest';
 import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
 import { HEROIC_MARK_LETTER, QUEST_LETTERS, WELCOME_LETTER } from '../src/sim/content/letters';
+import { BUILTIN_WORLD } from '../src/sim/data';
 import { MAIL_ATTACHMENT_EXPIRY_SECONDS, MAIL_DELIVERY_SECONDS } from '../src/sim/mail/post_office';
 import { Sim } from '../src/sim/sim';
-import { DT, type SimEvent } from '../src/sim/types';
-import { EMPTY_TEST_WORLD } from './sim_shared';
+import { DT, type SimEvent, type WorldContent } from '../src/sim/types';
 
-// Attachment-expiry cases only need PostOffice + players + mailbox positions.
-// Strip ambient camps/NPCs/objects so delivery ticks stay cheap (subsystem-world
-// pattern; mailboxes remain via BUILTIN_WORLD.services on EMPTY_TEST_WORLD).
+// Mailboxes are system-owned and still spawn with this fixture. Ambient camps,
+// NPCs and quest objects are irrelevant to delivery/expiry invariants and would
+// turn every simulated minute into a continent-wide AI benchmark.
+const MAIL_TEST_WORLD: WorldContent = {
+  ...BUILTIN_WORLD,
+  camps: [],
+  npcs: {},
+  groundObjects: [],
+};
+
 const makeWorld = () =>
-  new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: EMPTY_TEST_WORLD });
+  new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: MAIL_TEST_WORLD });
 
 function moveToMailbox(sim: Sim, pid: number): void {
   const box = sim.entities.get(sim.postOffice.mailboxIds[0]);

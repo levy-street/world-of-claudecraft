@@ -4,6 +4,7 @@ import { App } from '@capacitor/app';
 import type { PluginListenerHandle } from '@capacitor/core';
 import { apiUrl, DESKTOP_API_ORIGIN, NATIVE_API_ORIGIN, NATIVE_APP } from '../client_origin';
 import { normalizeOrigin, runtimeWebSocketUrl } from '../runtime';
+import { MAX_SCENE_CHOICE_OPTIONS } from '../scene_protocol';
 import {
   hasStreamerLink,
   normalizeStreamerLinks,
@@ -84,6 +85,8 @@ import {
   type QuestState,
   type RiftTier,
   type RiteIntensity,
+  type SceneChoiceReconnectState,
+  type SceneReconnectState,
   type SimEvent,
   type SportRole,
   TICK_RATE,
@@ -147,12 +150,113 @@ import {
   type ReliquaryPageCompletion,
   type ReliquaryRarity,
   type RiftFloorView,
+  SCENE_ID_MAX_LENGTH,
   type SocialInfo,
   type ToolEffectSlotView,
   type TradeInfo,
   type VcSharedCupInfo,
   type VcViewerReadout,
 } from '../world_api';
+
+function helloSceneState(value: unknown): SceneReconnectState | null {
+  if (value === null || typeof value !== 'object') return null;
+  const state = value as Record<string, unknown>;
+  if (
+    typeof state.sceneId !== 'string' ||
+    state.sceneId.length > 128 ||
+    typeof state.remainingSeconds !== 'number' ||
+    !Number.isFinite(state.remainingSeconds) ||
+    state.remainingSeconds < 0 ||
+    typeof state.inputLocked !== 'boolean' ||
+    typeof state.letterbox !== 'boolean' ||
+    typeof state.musicSilenced !== 'boolean'
+  ) {
+    return null;
+  }
+  return {
+    sceneId: state.sceneId,
+    remainingSeconds: state.remainingSeconds,
+    inputLocked: state.inputLocked,
+    letterbox: state.letterbox,
+    musicSilenced: state.musicSilenced,
+  };
+}
+
+function helloChoiceState(value: unknown): SceneChoiceReconnectState | null {
+  if (value === null || typeof value !== 'object') return null;
+  const state = value as Record<string, unknown>;
+  if (
+    typeof state.choiceId !== 'string' ||
+    state.choiceId.length > 128 ||
+    typeof state.promptKey !== 'string' ||
+    state.promptKey.length > 256 ||
+    !Array.isArray(state.options) ||
+    state.options.length === 0 ||
+    state.options.length > MAX_SCENE_CHOICE_OPTIONS ||
+    typeof state.defaultOptionId !== 'string' ||
+    !Number.isSafeInteger(state.leaderPid) ||
+    (state.leaderPid as number) <= 0 ||
+    typeof state.windowSeconds !== 'number' ||
+    !Number.isFinite(state.windowSeconds) ||
+    state.windowSeconds < 0 ||
+    !(
+      state.remainingSeconds === null ||
+      (typeof state.remainingSeconds === 'number' &&
+        Number.isFinite(state.remainingSeconds) &&
+        state.remainingSeconds >= 0)
+    )
+  ) {
+    return null;
+  }
+  const options: { id: string; key: string }[] = [];
+  for (const option of state.options) {
+    if (
+      option === null ||
+      typeof option !== 'object' ||
+      typeof option.id !== 'string' ||
+      option.id.length > 64 ||
+      typeof option.key !== 'string' ||
+      option.key.length > 256
+    ) {
+      return null;
+    }
+    options.push({ id: option.id, key: option.key });
+  }
+  if (!options.some((option) => option.id === state.defaultOptionId)) return null;
+  if (
+    (state.windowSeconds === 0 && state.remainingSeconds !== null) ||
+    (state.windowSeconds > 0 && state.remainingSeconds === null)
+  ) {
+    return null;
+  }
+  let values: Record<string, string | number> | undefined;
+  if (state.values !== null && typeof state.values === 'object' && !Array.isArray(state.values)) {
+    values = {};
+    let valueCount = 0;
+    for (const [key, item] of Object.entries(state.values as Record<string, unknown>)) {
+      if (valueCount >= 16) break;
+      if (key.length > 64) continue;
+      if (typeof item === 'string' && item.length <= 256) {
+        values[key] = item;
+        valueCount++;
+      } else if (typeof item === 'number' && Number.isFinite(item)) {
+        values[key] = item;
+        valueCount++;
+      }
+    }
+  }
+  return {
+    choiceId: state.choiceId,
+    promptKey: state.promptKey,
+    options,
+    defaultOptionId: state.defaultOptionId,
+    leaderPid: state.leaderPid as number,
+    values,
+    windowSeconds: state.windowSeconds,
+    remainingSeconds: state.remainingSeconds as number | null,
+  };
+}
+
 import {
   type ActionBarLayout,
   type ActionBarLayoutRestore,
@@ -176,8 +280,10 @@ import { decodeGuildBankLogFrame, GUILD_BANK_LOG_TTL_MS } from './guild_bank_log
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
 import { createNativeAttestationProof } from './native_attestation';
 import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
+import { presentationTimeAfterWire, stampScenePresentationTime } from './presentation_clock';
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
+import { sceneActiveAfterEvent, sceneInputLockAfterEvent } from './scene_input_lock_mirror';
 import { isInputSendBackpressured } from './send_backpressure';
 import {
   type SnapshotTimerWireMode,
@@ -1901,9 +2007,13 @@ export class ClientWorld implements IWorld {
   onConnectionLost: ((attempt: number, maxAttempts: number, nextRetryAtMs: number) => void) | null =
     null;
   onReconnected: (() => void) | null = null;
-  // Last value passed to setStopAutoAttackOnTargetSwitch, re-pushed once the
-  // client is genuinely able to send commands again (see the hello handler):
-  // null means "never set this session", so nothing is re-sent on reconnect.
+  onSceneInputLockChanged: ((locked: boolean) => void) | null = null;
+  // IWorldScenes: authoritative seconds from scene event, convergence, and
+  // mandatory snapshot frames. Independent of stable timer-wire negotiation.
+  presentationTime = 0;
+  private sceneInputLockedBeforeDrain = false;
+  // Last session preference sent by setStopAutoAttackOnTargetSwitch. Re-send it
+  // after reconnect so the new server-side session keeps the same behavior.
   private lastStopAutoAttackOnTargetSwitch: boolean | null = null;
   private reconnectAttempts = 0;
   // consecutive 'character already in world' rejections during a reconnect;
@@ -2216,6 +2326,19 @@ export class ClientWorld implements IWorld {
     return out;
   }
 
+  sceneInputLockPending(): boolean {
+    return this.sceneInputLockedBeforeDrain;
+  }
+
+  releaseSceneInputLockMirror(): void {
+    if (!this.sceneInputLockedBeforeDrain) return;
+    this.sceneInputLockedBeforeDrain = false;
+    this.onSceneInputLockChanged?.(false);
+    // Terminal scene teardown also clears the receipt-side active mirror so
+    // a dropped end op cannot leave the zone-warmup gate scene-covered.
+    this.sceneActiveMirror = false;
+  }
+
   setMoveInput(input: unknown, facing?: unknown): void {
     Object.assign(this.moveInput, sanitizeMoveInput(input));
     if (facing !== undefined) this.setMouselookFacing(facing);
@@ -2473,9 +2596,11 @@ export class ClientWorld implements IWorld {
       return;
     }
     if (msg.t === 'hello') {
+      const wasReconnecting = this.reconnectAttempts > 0;
       this.playerId = msg.pid;
       this.ownPlayerId = msg.pid;
       this.cfg.seed = msg.seed;
+      this.presentationTime = presentationTimeAfterWire(this.presentationTime, msg.time);
       if (typeof msg.realm === 'string') this.realm = msg.realm;
       this.accountAdmin = msg.admin === true;
       if (Array.isArray(msg.softWords)) {
@@ -2484,7 +2609,11 @@ export class ClientWorld implements IWorld {
         );
         this.profanityDirty = true;
       }
-      if (this.reconnectAttempts > 0) {
+      // The hello is ordered before any new tick event on this transport.
+      // Object-or-null convergence prevents a dropped end/result event from
+      // leaving the camera lock or choice focus trap stale forever.
+      this.queueSceneConvergence(msg.sceneState, msg.sceneChoiceState);
+      if (wasReconnecting) {
         // fresh transport after an auto-reconnect: the server restarts input
         // acking at 0 and resends the world from an empty interest set, and
         // any stale mirrored entities fall out via the snapshot prune
@@ -2541,7 +2670,13 @@ export class ClientWorld implements IWorld {
       this.pendingTargetEcho = null;
       this.pendingInputSeqSentAt.clear();
       this.inputEchoSamples = [];
-      if (typeof this.spectating !== 'string') {
+      if (typeof this.spectating === 'string' && Number.isSafeInteger(msg.pid) && msg.pid > 0) {
+        // Event routing switches anchors before the first spectated snapshot,
+        // so bind the represented pid from the transition frame itself. This
+        // keeps personal scene events in that pre-snapshot window correctly
+        // scoped on both target switches and initial entry.
+        this.playerId = msg.pid;
+      } else if (typeof this.spectating !== 'string') {
         this.playerId = this.ownPlayerId;
         this.cfg.playerClass = this.ownPlayerClass;
         // cmd() drops every non-chat command while spectating (see below), so
@@ -2551,6 +2686,11 @@ export class ClientWorld implements IWorld {
       }
       Object.assign(this.moveInput, emptyMoveInput());
       this.mouselookFacing = null;
+      this.presentationTime = presentationTimeAfterWire(this.presentationTime, msg.time);
+      // A spectate transition swaps the represented player without a hello.
+      // Converge both personal presentation streams at the same boundary so
+      // the prior identity cannot strand a scene lock or choice focus trap.
+      this.queueSceneConvergence(msg.sceneState, msg.sceneChoiceState);
       return;
     }
     if (msg.t === 'gbanklog') {
@@ -2608,23 +2748,27 @@ export class ClientWorld implements IWorld {
       return;
     }
     if (msg.t === 'events') {
+      this.presentationTime = presentationTimeAfterWire(this.presentationTime, msg.time);
       for (const ev of msg.list) {
-        this.applyLockpickEvent(ev as SimEvent);
-        this.applyMountRaceEvent(ev as SimEvent);
-        this.applyMountTrainEvent(ev as SimEvent);
-        this.applyCraftResultEvent(ev as SimEvent);
-        this.applyRiftStateEvent(ev as SimEvent);
-        this.applyRiftDeathZoneSpawnEvent(ev as SimEvent);
-        this.applyRiftDeathZoneClearEvent(ev as SimEvent);
-        this.applyMasterworkEvent(ev as SimEvent);
-        this.applyDisenchantResultEvent(ev as SimEvent);
-        this.applyEnchantResultEvent(ev as SimEvent);
-        this.applySalvageResultEvent(ev as SimEvent);
-        this.applyChatFlairEvent(ev as SimEvent);
-        this.applyUnstuckEvent(ev as SimEvent);
-        this.applyPrestigeEvent(ev as SimEvent);
-        this.applyGuildRenamedEvent(ev as SimEvent);
-        this.eventQueue.push(ev as SimEvent);
+        const event = stampScenePresentationTime(ev as SimEvent, this.presentationTime);
+        this.mirrorSceneInputLock(event);
+        this.mirrorSceneActive(event);
+        this.applyLockpickEvent(event);
+        this.applyMountRaceEvent(event);
+        this.applyMountTrainEvent(event);
+        this.applyCraftResultEvent(event);
+        this.applyRiftStateEvent(event);
+        this.applyRiftDeathZoneSpawnEvent(event);
+        this.applyRiftDeathZoneClearEvent(event);
+        this.applyMasterworkEvent(event);
+        this.applyDisenchantResultEvent(event);
+        this.applyEnchantResultEvent(event);
+        this.applySalvageResultEvent(event);
+        this.applyChatFlairEvent(event);
+        this.applyUnstuckEvent(event);
+        this.applyPrestigeEvent(event);
+        this.applyGuildRenamedEvent(event);
+        this.eventQueue.push(event);
       }
       return;
     }
@@ -2694,6 +2838,45 @@ export class ClientWorld implements IWorld {
         rawGapMs,
       });
     }
+  }
+
+  private sceneActiveMirror = false;
+
+  private mirrorSceneActive(event: SimEvent): void {
+    this.sceneActiveMirror = sceneActiveAfterEvent(this.sceneActiveMirror, event, this.playerId);
+  }
+
+  private mirrorSceneInputLock(event: SimEvent): void {
+    const locked = sceneInputLockAfterEvent(this.sceneInputLockedBeforeDrain, event, this.playerId);
+    if (locked === this.sceneInputLockedBeforeDrain) return;
+    this.sceneInputLockedBeforeDrain = locked;
+    if (locked) {
+      Object.assign(this.moveInput, emptyMoveInput());
+      this.mouselookFacing = null;
+    }
+    this.onSceneInputLockChanged?.(locked);
+  }
+
+  private queueSceneConvergence(sceneState: unknown, sceneChoiceState: unknown): void {
+    const sceneSync = stampScenePresentationTime(
+      {
+        type: 'sceneSync',
+        state: helloSceneState(sceneState),
+      },
+      this.presentationTime,
+    );
+    this.mirrorSceneInputLock(sceneSync);
+    this.mirrorSceneActive(sceneSync);
+    this.eventQueue.push(sceneSync);
+    this.eventQueue.push(
+      stampScenePresentationTime(
+        {
+          type: 'sceneChoiceSync',
+          state: helloChoiceState(sceneChoiceState),
+        },
+        this.presentationTime,
+      ),
+    );
   }
 
   consumeSocialChanged(): boolean {
@@ -2833,6 +3016,7 @@ export class ClientWorld implements IWorld {
     if (typeof this.spectating === 'string' && typeof snap.self?.id === 'number') {
       this.playerId = snap.self.id;
     }
+    this.presentationTime = presentationTimeAfterWire(this.presentationTime, snap.time);
     const timerWire = this.prepareSnapshotTimers(snap.tw, snap.time);
     // the interpolation alpha the render loop reached on its last frame
     // (same formula and caps as main.ts); used below to re-anchor the new
@@ -3169,9 +3353,9 @@ export class ClientWorld implements IWorld {
       e.castTotal = w.castTot ?? 0;
       e.castTargetId = w.castTgt ?? null;
       e.channeling = !!w.chan;
-      // Mount summon/dismount transition (volatile): absent decodes to idle. Feeds
-      // the summon FX / call pose and (for the local player) the self-extrapolator's
-      // movement root, which reads mountCastRemaining.
+      // Mount summon transition (volatile): absent decodes to idle. Feeds the
+      // summon FX / call pose and, for the local player, the self-extrapolator's
+      // move-to-cancel decision.
       e.mountCastRemaining = w.mcr ?? 0;
       e.mountCastKey = w.mck ?? '';
       e.sitting = !!w.sit;
@@ -5311,6 +5495,21 @@ export class ClientWorld implements IWorld {
     } catch {
       return null;
     }
+  }
+  // --- IWorldScenes: Last Bell scene commands. Fire-and-forget: the sim
+  // answers with the 'scene' end op / 'sceneChoiceResult' event, never an
+  // outcome frame. The id caps mirror the server-side validation, so an
+  // oversized id is dropped before it ever hits the wire. ---
+  sceneActiveForLocalPlayer(): boolean {
+    return this.sceneActiveMirror;
+  }
+
+  sceneSkip(): void {
+    this.cmd({ cmd: 'scene_skip' });
+  }
+  answerSceneChoice(choiceId: string, optionId: string): void {
+    if (choiceId.length > SCENE_ID_MAX_LENGTH || optionId.length > SCENE_ID_MAX_LENGTH) return;
+    this.cmd({ cmd: 'scene_choice', choiceId, optionId });
   }
   // The global rarity aggregate: a lazy anonymous REST read (the daily-rewards
   // async-read variant), resolving the endpoint payload verbatim or null on

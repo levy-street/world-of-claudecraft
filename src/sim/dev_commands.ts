@@ -1,11 +1,12 @@
 import { DEV_KIT_ROLES, devKitRole } from './content/dev_kit_roles';
-import { MOUNT_KEYS, TRAINING_MOUNT_KEY } from './content/mounts';
+import { MOUNT_KEYS } from './content/mounts';
 import { GATHERING_PROFESSIONS } from './content/professions';
-import { DUNGEONS, ITEMS, MOBS, NPCS } from './data';
+import { DUNGEONS, ITEMS, MOBS, NPCS, ZONES } from './data';
 import { equipBestInSlotForDev } from './dev/bis_gear';
 import { applyDevKit } from './dev_kit';
 import { createGroundObject, createMob } from './entity';
 import { enterDungeon } from './instances/dungeons';
+import { isStoryDungeonId } from './instances/story_instances';
 import { mountItemId, mountOwned } from './mounts';
 import { MOUNT_TRAIN_MIN_LEVEL } from './mounts_training';
 import { isGatheringProfessionId, queueGatheringGrant } from './professions/gathering';
@@ -15,6 +16,9 @@ import { completeAllQuestsForDev } from './quests/dev_quest_commands';
 import { riftFx } from './rift/fx';
 import { RIFT_RANK_BASE_LEVEL, riftRankForBaseLevel } from './rift/ranks';
 import { generateRiftFloor, generateRiftPlan, isSetPieceSeed } from './rift/rift_gen';
+import { scenarioById, startScenario } from './scenarios/scenarios';
+import { registeredSceneIds } from './scenes/registry';
+import { playSceneForPlayer, requestSceneSkip } from './scenes/scenes';
 import type { SentChat } from './sim';
 import type { SimContext } from './sim_context';
 import { bgQueueJoin, bgQueueSize, devEndBg, devStartBg } from './social/battleground';
@@ -151,6 +155,43 @@ export function handleDevChat(
       entity.prevPos = { ...pos };
       ctx.rebucket(entity);
       emitDevLog(ctx, pid, `[dev] Teleported to ${pos.x.toFixed(1)}, ${pos.z.toFixed(1)}.`);
+    }
+    return null;
+  }
+
+  // [dev] Teleport by NAME: a zone id (drops you at its hub or center) or a
+  // POI id from any zone (e.g. /dev tp gullhaven, /dev tp the_breach,
+  // /dev tp farshore_isle). Ids match with or without underscores.
+  const namedTpMatch = /^\/(?:dev\s+tp|devtp)\s+([a-z][\w]*)\s*$/i.exec(raw);
+  if (namedTpMatch) {
+    const q = namedTpMatch[1].toLowerCase().replace(/_/g, '');
+    let dest: { x: number; z: number; label: string } | null = null;
+    for (const zone of ZONES) {
+      if (zone.id.toLowerCase().replace(/_/g, '') === q) {
+        const at = zone.hub ?? {
+          x: (zone.xMin ?? -180) / 2 + (zone.xMax ?? 180) / 2,
+          z: zone.zMin / 2 + zone.zMax / 2,
+        };
+        dest = { x: at.x, z: at.z, label: zone.name };
+        break;
+      }
+      const poi = (zone.pois ?? []).find((p) => (p.id ?? '').toLowerCase().replace(/_/g, '') === q);
+      if (poi) {
+        dest = { x: poi.x, z: poi.z, label: poi.label };
+        break;
+      }
+    }
+    if (!dest) {
+      ctx.error(pid, `[dev] Unknown place '${namedTpMatch[1]}'.`);
+      return null;
+    }
+    const entity = ctx.entities.get(pid);
+    if (entity) {
+      const pos = ctx.groundPos(dest.x, dest.z);
+      entity.pos = pos;
+      entity.prevPos = { ...pos };
+      ctx.rebucket(entity);
+      emitDevLog(ctx, pid, `[dev] Teleported to ${dest.label}.`);
     }
     return null;
   }
@@ -486,6 +527,77 @@ export function handleDevChat(
     ctx.setDungeonDifficulty(difficulty, pid);
     enterDungeon(ctx, dungeonId, pid, true);
     emitDevLog(ctx, pid, `[dev] Entering ${dungeonId} (${difficulty}).`);
+    return null;
+  }
+
+  // [dev] Enter a Last Bell story instance directly (lb_tidemill, lb_riftline,
+  // lb_vault, lb_council, lb_landing, lb_riftfields, lb_breach, lb_lastwatch,
+  // lb_willowfen), bypassing the quest gate. Solo-always areas still claim per
+  // durable character, so this exercises the real claim path.
+  const storyMatch = /^\/(?:dev\s+story|devstory)\s+(\S+)\s*$/i.exec(raw);
+  if (storyMatch) {
+    const storyId = storyMatch[1];
+    if (!isStoryDungeonId(storyId)) {
+      ctx.error(pid, `[dev] Unknown story instance '${storyId}'.`);
+      return null;
+    }
+    ctx.enterStoryInstance(storyId, pid);
+    emitDevLog(ctx, pid, `[dev] Entering story instance ${storyId}.`);
+    return null;
+  }
+
+  // [dev] Watch a cinematic without playing up to its trigger: "/dev scene"
+  // lists every registered scene, "/dev scene <id>" plays one from where you
+  // stand. Ids match with or without underscores and on any unique substring,
+  // so "/dev scene voyage" finds scn_lb_q0_voyage. A scene already running
+  // holds this player's playback claim and would make playSceneForPlayer
+  // refuse, so a replay skips it first; the skip fast-forwards its remaining
+  // authoritative ops, which leaves world state where a watched scene would.
+  const sceneMatch = /^\/(?:dev\s+scene|devscene)(?:\s+(\S+))?\s*$/i.exec(raw);
+  if (sceneMatch) {
+    const ids = registeredSceneIds();
+    const query = sceneMatch[1];
+    if (query === undefined) {
+      emitDevLog(ctx, pid, `[dev] ${ids.length} scenes: ${ids.join(', ')}`);
+      return null;
+    }
+    const norm = (value: string): string => value.toLowerCase().replace(/_/g, '');
+    const target = norm(query);
+    const exact = ids.find((id) => norm(id) === target);
+    const matches = exact !== undefined ? [exact] : ids.filter((id) => norm(id).includes(target));
+    if (matches.length === 0) {
+      ctx.error(pid, `[dev] Unknown scene '${query}'.`);
+      return null;
+    }
+    if (matches.length > 1) {
+      ctx.error(pid, `[dev] Ambiguous scene '${query}': ${matches.join(', ')}`);
+      return null;
+    }
+    const sceneId = matches[0];
+    requestSceneSkip(ctx, pid);
+    if (playSceneForPlayer(ctx, pid, sceneId)) {
+      emitDevLog(ctx, pid, `[dev] Playing ${sceneId}.`);
+    } else {
+      ctx.error(pid, `[dev] Scene ${sceneId} refused to start.`);
+    }
+    return null;
+  }
+
+  // [dev] Start a Last Bell scenario by id, entering its story space and
+  // arming the run (the quest gate still applies; grant the quest first via
+  // /dev quest accept or play up to it).
+  const scenarioMatch = /^\/(?:dev\s+scenario|devscenario)\s+(\S+)\s*$/i.exec(raw);
+  if (scenarioMatch) {
+    const scenarioId = scenarioMatch[1];
+    if (!scenarioById(scenarioId)) {
+      ctx.error(pid, `[dev] Unknown scenario '${scenarioId}'.`);
+      return null;
+    }
+    if (startScenario(ctx, scenarioId, pid)) {
+      emitDevLog(ctx, pid, `[dev] Scenario ${scenarioId} started.`);
+    } else {
+      ctx.error(pid, `[dev] Scenario ${scenarioId} refused to start (quest gate?).`);
+    }
     return null;
   }
 

@@ -3,7 +3,7 @@
 //
 // The --apply edits are deliberately limited to pure data registries with a
 // test-enforced contract:
-//   - KAYKIT_WEAPON_ACCESSORY (src/render/characters/assets.ts)  weapon grip family
+//   - KAYKIT_WEAPON_ACCESSORY (src/render/characters/prop_placement_core.ts) grip family
 //   - ITEM_WEAPON_VARIANTS   (src/ui/weapon_variants.ts)         item -> variant key
 //   - SKINS['player_<cls>']  (src/render/characters/manifest.ts) class skin atlas list
 //   - SKIN_COUNTS[cls]       (src/sim/content/skins.ts)          sim-side lockstep count
@@ -18,7 +18,7 @@ import { dirname, resolve } from 'node:path';
 import { REPO_ROOT } from './env.mjs';
 
 const FILES = {
-  accessory: 'src/render/characters/assets.ts',
+  accessory: 'src/render/characters/prop_placement_core.ts',
   variants: 'src/ui/weapon_variants.ts',
   manifest: 'src/render/characters/manifest.ts',
   grip: 'src/render/characters/weapon_grip.ts',

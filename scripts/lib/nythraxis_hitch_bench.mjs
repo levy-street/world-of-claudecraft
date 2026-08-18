@@ -23,7 +23,9 @@ export const MOB_INTEREST_RADIUS = 90;
 // any of them has Aldric linked before the leg starts and the aldric row
 // measures nothing. Farshore Isle places none (pinned against the live NPC
 // table), and it is a level 3 to 7 hub, so a geared observer parks there safely.
-export const ALDRIC_FREE_PARK_POS = Object.freeze({ x: 296, z: 80 });
+// (296, 80) was the island before the Last Bell packet moved it east to
+// x 700-1300; the old point now reads eastbrook_vale, which places Aldric.
+export const ALDRIC_FREE_PARK_POS = Object.freeze({ x: 821, z: 116 });
 export const NYTHRAXIS_HITCH_PHASES = Object.freeze([
   'entry',
   'arrival',

@@ -10695,19 +10695,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.notInPartyError':
     'Devi essere in un gruppo per avviare un controllo di prontezza.',
   'hudChrome.readyCheck.inProgressError': 'È già in corso un controllo di prontezza.',
-  // Rideable mounts: the Z keybind + the Mounts window (the stable).
+  // Rideable mounts: Z dismounts normally and summons the lesson steed during training.
   'hudChrome.keybinds.mount': 'Monta / Smonta',
-  'hudChrome.mobile.mounts': 'Cavalcature',
-  'hudChrome.mounts.title': 'Cavalcature',
-  'hudChrome.mounts.close': 'Chiudi',
-  'hudChrome.mounts.select': 'Scegli',
-  'hudChrome.mounts.selected': 'Scelta',
-  'hudChrome.mounts.riding': 'In sella',
   'hudChrome.mounts.mount': 'Monta',
-  'hudChrome.mounts.dismount': 'Smonta',
-  'hudChrome.mounts.rarity_common': 'Comune',
-  'hudChrome.mounts.rarity_rare': 'Rara',
-  'hudChrome.mounts.rarity_epic': 'Epica',
   'hudChrome.mounts.spec_speed': '+{pct}% di mobilità extra',
   'hudChrome.mounts.name_valorsteed': 'Destriero del Valore',
   'hudChrome.mounts.name_grag_bear': 'Orso Grag Golia',

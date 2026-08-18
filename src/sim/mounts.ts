@@ -129,7 +129,7 @@ function trainingSummon(meta: PlayerMeta | undefined, key: string): boolean {
 }
 
 /** Force an instant dismount with no put-away channel: clears the live mount and
- *  any in-flight summon/dismount channel, then recomputes stats. Used by the riding
+ *  any in-flight mount transition, then recomputes stats. Used by the riding
  *  lesson to take the unowned training steed back the moment the lesson ends, and by
  *  the auto-attack loop and cast path to dismount on ability use. */
 export function forceDismount(ctx: SimContext, e: Entity): void {
@@ -267,7 +267,7 @@ export function toggleMount(ctx: SimContext, pid: number): boolean {
   const meta = ctx.players.get(pid);
   const e = ctx.entities.get(pid);
   if (!meta || !e) return false;
-  // A toggle while a summon/dismount is already channeling is ignored.
+  // A toggle while a summon is already channeling is ignored.
   if ((e.mountCastRemaining ?? 0) > 0) return false;
   if (e.mountKey) {
     // Dismounting is instant and never gated. There is no put-away channel: a
@@ -285,9 +285,9 @@ export function toggleMount(ctx: SimContext, pid: number): boolean {
   }
   // Riding-lesson tutorial: while a lesson is in progress the Mount/Dismount
   // toggle summons the training Valorsteed even though it is UNOWNED (teaching the
-  // Z keybind is the whole point). Runs the normal summon channel; it never touches
-  // the persisted pick and skips the ownership/level gates (begin already required
-  // level 20). Combat/water still cancel the channel via updateMountTransition.
+  // Z keybind is the whole point). Runs the normal summon channel and skips the
+  // ownership gate (begin already required level 20). Combat/water still cancel
+  // the channel via updateMountTransition.
   if (meta.mountTraining?.state === 'IN_PROGRESS') {
     // Same standing battleground rule, same position in the order as
     // summonMountItem: the lesson steed is still a mount, and a lesson left
@@ -320,7 +320,7 @@ export function toggleMount(ctx: SimContext, pid: number): boolean {
   return false;
 }
 
-/** Per-tick driver for the mount summon/dismount channel (called from the
+/** Per-tick driver for the mount summon channel (called from the
  *  coordinator's per-player loop). `swimming` is whether the entity is in
  *  fishable/deep water this tick. Water and death force an instant dismount;
  *  losing the reins dismounts too (ownership is re-validated while mounted,
@@ -356,8 +356,8 @@ export function updateMountTransition(ctx: SimContext, e: Entity, swimming: bool
   }
   // (b) Advance an in-flight summon/dismount channel.
   if ((e.mountCastRemaining ?? 0) > 0) {
-    // A summon (mountCastKey names a mount) cancels on entering combat or water,
-    // with no error toast. A dismount (mountCastKey === '') always proceeds.
+    // A keyed summon cancels on entering combat or water, with no error toast.
+    // A legacy empty-key transition always proceeds.
     if (e.mountCastKey !== '' && (e.inCombat || swimming)) {
       e.mountCastRemaining = 0;
       e.mountCastKey = '';

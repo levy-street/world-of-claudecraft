@@ -12,7 +12,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ClientWorld } from '../src/net/online';
 import { INPUT_SEND_BACKPRESSURE_LIMIT_BYTES } from '../src/net/send_backpressure';
-import type { PlayerClass } from '../src/sim/types';
+import { emptyMoveInput, type PlayerClass } from '../src/sim/types';
 
 const PROBE_CLASS: PlayerClass = 'warrior';
 
@@ -547,7 +547,166 @@ describe('ClientWorld reconnect error-frame tolerance (auth timeout)', () => {
     timeoutRejections: number;
     conflictRejections: number;
     sessionEnded: boolean;
+    reconnectAttempts: number;
   };
+
+  it('queues bounded hello convergence before every later scene event', () => {
+    withDomStubs(() => {
+      const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+      const w = world as unknown as WorldProbe & { mouselookFacing: number | null };
+      const lockChanges = vi.fn();
+      world.onSceneInputLockChanged = lockChanges;
+      world.setMoveInput({ ...emptyMoveInput(), forward: true, jump: true }, 1.25);
+      w.onMessage(
+        JSON.stringify({
+          t: 'hello',
+          pid: 1,
+          seed: 42,
+          time: 12.5,
+          sceneState: {
+            sceneId: 'scn_lb_q0_voyage',
+            remainingSeconds: 4.5,
+            inputLocked: true,
+            letterbox: true,
+            musicSilenced: false,
+          },
+          sceneChoiceState: {
+            choiceId: 'ch_lb_ferry_fare_out',
+            promptKey: 'lb.fare.promptOut',
+            options: [
+              { id: 'pay', key: 'lb.fare.pay' },
+              { id: 'decline', key: 'lb.fare.decline' },
+            ],
+            defaultOptionId: 'decline',
+            leaderPid: 1,
+            values: { price: 12 },
+            windowSeconds: 10,
+            remainingSeconds: 3,
+          },
+        }),
+      );
+      expect(world.sceneInputLockPending()).toBe(true);
+      expect(world.moveInput).toEqual(emptyMoveInput());
+      expect(w.mouselookFacing).toBeNull();
+      expect(lockChanges).toHaveBeenCalledExactlyOnceWith(true);
+      w.onMessage(
+        JSON.stringify({
+          t: 'events',
+          list: [{ type: 'sceneChoiceResult', choiceId: 'ch_lb_ferry_fare_out', optionId: 'pay' }],
+        }),
+      );
+
+      expect(world.drainEvents()).toEqual([
+        {
+          type: 'sceneSync',
+          presentationTime: 12.5,
+          state: {
+            sceneId: 'scn_lb_q0_voyage',
+            remainingSeconds: 4.5,
+            inputLocked: true,
+            letterbox: true,
+            musicSilenced: false,
+          },
+        },
+        {
+          type: 'sceneChoiceSync',
+          presentationTime: 12.5,
+          state: {
+            choiceId: 'ch_lb_ferry_fare_out',
+            promptKey: 'lb.fare.promptOut',
+            options: [
+              { id: 'pay', key: 'lb.fare.pay' },
+              { id: 'decline', key: 'lb.fare.decline' },
+            ],
+            defaultOptionId: 'decline',
+            leaderPid: 1,
+            values: { price: 12 },
+            windowSeconds: 10,
+            remainingSeconds: 3,
+          },
+        },
+        {
+          type: 'sceneChoiceResult',
+          choiceId: 'ch_lb_ferry_fare_out',
+          optionId: 'pay',
+          presentationTime: 12.5,
+        },
+      ]);
+      world.close();
+    });
+  });
+
+  it('treats absent or malformed reconnect state as authoritative null', () => {
+    withDomStubs(() => {
+      const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+      const w = world as unknown as WorldProbe;
+      w.reconnectAttempts = 1;
+      w.onMessage(
+        JSON.stringify({
+          t: 'hello',
+          pid: 1,
+          seed: 42,
+          sceneState: { sceneId: 'bad', remainingSeconds: -1 },
+          sceneChoiceState: {
+            choiceId: 'bad',
+            promptKey: 'bad',
+            options: new Array(5).fill({ id: 'x', key: 'x' }),
+            defaultOptionId: 'x',
+            leaderPid: 1,
+            windowSeconds: 1,
+            remainingSeconds: 1,
+          },
+        }),
+      );
+      expect(world.drainEvents()).toEqual([
+        { type: 'sceneSync', state: null, presentationTime: 0 },
+        { type: 'sceneChoiceSync', state: null, presentationTime: 0 },
+      ]);
+      world.close();
+    });
+  });
+
+  it('rejects internally inconsistent reconnect prompts before they can trap focus', () => {
+    withDomStubs(() => {
+      const valid = {
+        choiceId: 'ch_lb_ferry_fare_out',
+        promptKey: 'lb.fare.promptOut',
+        options: [
+          { id: 'pay', key: 'lb.fare.pay' },
+          { id: 'decline', key: 'lb.fare.decline' },
+        ],
+        defaultOptionId: 'decline',
+        leaderPid: 1,
+        windowSeconds: 10,
+        remainingSeconds: 3,
+      };
+      const invalidStates = [
+        { ...valid, options: [] },
+        { ...valid, defaultOptionId: 'missing' },
+        { ...valid, leaderPid: 0 },
+        { ...valid, remainingSeconds: null },
+        { ...valid, windowSeconds: 0, remainingSeconds: 1 },
+      ];
+      const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+      const w = world as unknown as WorldProbe;
+      for (const sceneChoiceState of invalidStates) {
+        w.onMessage(
+          JSON.stringify({
+            t: 'hello',
+            pid: 1,
+            seed: 42,
+            sceneState: null,
+            sceneChoiceState,
+          }),
+        );
+        expect(world.drainEvents()).toEqual([
+          { type: 'sceneSync', state: null, presentationTime: 0 },
+          { type: 'sceneChoiceSync', state: null, presentationTime: 0 },
+        ]);
+      }
+      world.close();
+    });
+  });
 
   it('tolerates the auth-timeout rejection mid-reconnect on its own counter and resets it on hello', () => {
     withDomStubs((doc, harness) => {

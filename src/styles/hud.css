@@ -7697,6 +7697,231 @@
     pointer-events: none;
     filter: drop-shadow(0 2px 14px #000a);
   }
+  /* ---------- Last Bell scene overlay ---------- */
+  /* Cinematic presentation layers (src/ui/hud/scene/): letterbox bars slide in
+     via a compositor-only transform transition (class-toggled by the painter);
+     the fade layer's opacity is driven per frame through the elided writers.
+     Everything except the skip button and the choice options is decorative and
+     never intercepts input. The fade sits above the letterbox and subtitle so
+     a fade-to-black covers the whole cinematic frame. */
+  .scene-letterbox {
+    position: fixed;
+    left: 0;
+    right: 0;
+    height: calc(var(--app-vh) * 0.12);
+    background: #000;
+    transform: scaleY(0);
+    transition: transform 0.6s ease;
+    pointer-events: none;
+    z-index: 38;
+  }
+  .scene-letterbox-top {
+    top: 0;
+    transform-origin: top;
+  }
+  .scene-letterbox-bottom {
+    bottom: 0;
+    transform-origin: bottom;
+  }
+  .scene-letterbox.on {
+    transform: scaleY(1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .scene-letterbox {
+      transition: none;
+    }
+  }
+  body.reduce-motion .scene-letterbox {
+    transition: none;
+  }
+  .scene-fade {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 42;
+    /* No display here: the painter owns it inline (resting 'none' set at
+       construction, cleared to reveal). A stylesheet display:none would win
+       whenever the painter clears the inline value, which is exactly the bug
+       that shipped the voyage with no fades at all: setDisplay(el, '')
+       removes the inline style and the class rule takes over. Same contract
+       as .scene-subtitle. */
+  }
+  .scene-subtitle {
+    position: fixed;
+    left: 50%;
+    bottom: calc(var(--app-vh) * 0.12 + 18px + env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    width: min(720px, calc(var(--app-vw) * 0.86));
+    text-align: center;
+    z-index: 39;
+    pointer-events: none;
+    color: var(--color-text-light);
+    font: 500 17px / 1.45 var(--ui-font);
+    text-shadow:
+      0 1px 3px #000,
+      0 0 12px #000c;
+  }
+  .scene-subtitle-speaker {
+    display: block;
+    color: var(--color-gold);
+    font-family: var(--title-font);
+    font-size: 14px;
+    letter-spacing: 0.6px;
+    margin-bottom: 3px;
+  }
+  .scene-skip {
+    position: fixed;
+    top: calc(14px + env(safe-area-inset-top));
+    right: calc(14px + env(safe-area-inset-right));
+    z-index: 39;
+    min-height: 40px;
+    padding: 8px 14px;
+    background: color-mix(in srgb, var(--panel-base) 78%, transparent);
+    border: 1px solid var(--color-border-default);
+    border-radius: 6px;
+    color: var(--color-text-muted);
+    font: 500 13px var(--ui-font);
+    cursor: pointer;
+  }
+  .scene-skip:hover {
+    color: var(--color-text-light);
+    border-color: var(--color-border-focus);
+  }
+  .scene-skip:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  /* Touch layouts keep the minimap in the top-right corner, so the skip button
+     centers along the top edge instead of stacking under it. */
+  @media (pointer: coarse) {
+    .scene-skip {
+      top: calc(10px + env(safe-area-inset-top));
+      right: auto;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+  .scene-choice {
+    position: fixed;
+    left: 50%;
+    bottom: calc(var(--app-vh) * 0.12 + 72px + env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: min(
+      480px,
+      calc(var(--app-vw) - 24px - env(safe-area-inset-left) - env(safe-area-inset-right))
+    );
+    z-index: 39;
+    padding: 14px 16px;
+    background: color-mix(in srgb, var(--panel-base) 92%, transparent);
+    border: 1px solid var(--color-border-default);
+    border-radius: 8px;
+    box-shadow: 0 6px 24px #000a;
+  }
+  .scene-choice-prompt {
+    text-align: center;
+    color: var(--color-text-light);
+    font: 500 16px / 1.4 var(--ui-font);
+    margin-bottom: 10px;
+  }
+  .scene-choice-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .scene-choice-option {
+    min-height: 40px;
+    padding: 8px 12px;
+    background: color-mix(in srgb, var(--panel-base) 90%, var(--color-gold) 10%);
+    border: 1px solid var(--color-border-default);
+    border-radius: 6px;
+    color: var(--color-text-light);
+    font: 500 14px / 1.3 var(--ui-font);
+    cursor: pointer;
+    text-align: center;
+  }
+  .scene-choice-option:hover {
+    border-color: var(--color-border-focus);
+    background: color-mix(in srgb, var(--panel-base) 82%, var(--color-gold) 18%);
+  }
+  .scene-choice-option:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .scene-choice-waiting {
+    text-align: center;
+    color: var(--color-text-muted);
+    font: 500 14px / 1.4 var(--ui-font);
+  }
+  .scene-choice-timer {
+    text-align: center;
+    color: var(--color-gold);
+    font: 600 13px var(--ui-font);
+    font-variant-numeric: tabular-nums;
+    margin-top: 8px;
+    min-height: 1.2em;
+  }
+  /* Cinematic mode (Last Bell scene, C0): while a scene runs the painter sets
+     body.cinematic-mode, and the whole HUD hides so the cutscene reads as film.
+     Only the scene overlay's own layers (.scene-letterbox, .scene-subtitle,
+     .scene-skip, .scene-fade) and the .scene-choice window stay visible, and
+     since none of them is in the enumerated hide set below they are untouched.
+     The end op (watched or skipped) clears the class, restoring the HUD in one
+     step. The roots are enumerated explicitly (NOT a blanket #ui hide), so a
+     future HUD addition is opt-in to hiding, not silently swept: #nameplates and
+     the mobile #mobile-controls are siblings of #ui, which is why the class lands
+     on <body>. #mobile-controls hides in hud.mobile.css (its owning module).
+     Two entries are BROAD-MATCH classes, not ids: .window (every feature window)
+     and .fct (floating combat text); a future component adopting either class
+     opts into cinematic hiding. #gpu-notice is informational, unlike the
+     #reconnect-overlay, which stays visible because connection loss is critical,
+     so the GPU notice hides during scenes.
+     DELIBERATELY NOT hidden, each a decision, not an oversight:
+     - #reconnect-overlay (a <body> child appended by reconnect_overlay.ts): a
+       player must never sit through a cutscene unaware the connection died;
+       fatal/connection status stays on screen.
+     - #dfinder-proposal-popup (class `panel`, not `window`): a time-limited
+       actionable prompt; missing it costs the queue slot, same rationale as the
+       reconnect overlay.
+     - #death-overlay and #ghost-prompt: death state must stay visible if a
+       player somehow dies with a scene up.
+     - #perf-overlay: opt-in diagnostic, visible on purpose (it is how scene
+       perf gets measured).
+     - #combat-live, #target-live, #chat-live: visually-hidden a11y live
+       regions; never display:none them, they announce to screen readers. */
+  body.cinematic-mode #nameplates,
+  body.cinematic-mode #target-frame,
+  body.cinematic-mode #party-frames,
+  body.cinematic-mode #buff-bar,
+  body.cinematic-mode #debuff-bar,
+  body.cinematic-mode #castbar,
+  body.cinematic-mode #swingbar,
+  body.cinematic-mode #minimap-wrap,
+  body.cinematic-mode #community-hud,
+  body.cinematic-mode #right-tracker-stack,
+  body.cinematic-mode #bottom-bar,
+  body.cinematic-mode #chatlog-wrap,
+  body.cinematic-mode #side-buttons,
+  body.cinematic-mode #ctx-menu,
+  body.cinematic-mode #prompt-stack,
+  body.cinematic-mode #tooltip,
+  body.cinematic-mode #quest-banner,
+  body.cinematic-mode #banner,
+  body.cinematic-mode #subzone-banner,
+  body.cinematic-mode #low-health-vignette,
+  body.cinematic-mode #click-move-marker,
+  body.cinematic-mode #arena-status,
+  body.cinematic-mode #vcup-indicator,
+  body.cinematic-mode #mount-race-strip,
+  body.cinematic-mode #race-start-btn,
+  body.cinematic-mode #race-countdown,
+  body.cinematic-mode #gpu-notice,
+  body.cinematic-mode .window,
+  body.cinematic-mode .fct {
+    display: none !important;
+  }
 }
 
 /* ------------------------------------------------------------------------ */

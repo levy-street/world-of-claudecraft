@@ -396,6 +396,11 @@ export const ko_KR: EnTranslations = {
       "busy": "현재 행동을 끝낸 뒤 갇힘 탈출을 사용하세요.",
       "unavailable": "현재 상태에서는 갇힘 탈출을 사용할 수 없습니다."
     },
+    "scene": {
+      "skipHint": "장면 건너뛰기 (Esc)",
+      "waitingFor": "{name} 대기 중",
+      "timer": "{seconds}s"
+    },
     "fct": {
       "absorbed": "흡수됨 ({amount})",
       "cheap": "비용 감소!"
@@ -1089,6 +1094,7 @@ export const ko_KR: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "{key} 키를 눌러 훈련용 발러스티드에 탑승한다.",
+      "buyReinsPrompt": "기수술을 익혔다. 마를라에게서 10골드에 발러스티드 고삐를 구입한 뒤, 사용해 탑승하자.",
       "ownedMountPrompt": "고삐가 가방에 있습니다. 사용하면 탈 수 있습니다.",
       "ridePrompt": "빛나는 표식을 따라 출발선으로 간 뒤 레이스 시작을 누르세요.",
       "begin": "수업 시작",
@@ -2811,6 +2817,13 @@ export const ko_KR: EnTranslations = {
     "noticeboard": {
       "empty": "게시된 내용이 없는 것 같습니다."
     },
+    "memorial": {
+      "title": "기념비",
+      "dedication": "봉인을 지니고 균열 속으로 들어가 끝내 돌아오지 못한 걸헤이븐의 워든들에게. 마을은 그들을 위해 이 종을 지킨다.",
+      "rollHeading": "명예의 명부({count})",
+      "roomRemaining": "마지막 이름 아래 돌판은 아직 비워 둔 채다.",
+      "close": "기념비 닫기"
+    },
     "bank": {
       "title": "은행",
       "subtitle": "도금 금고",
@@ -3826,6 +3839,39 @@ export const ko_KR: EnTranslations = {
     },
     "arenaGate": {
       "minLevelNote": "레벨 {level} 필요"
+    }
+  },
+  "lb": {
+    "fixture": {
+      "ferry": "먼바다 나룻배",
+      "tidemill": "조수 물방앗간",
+      "breach": "대균열"
+    },
+    "speaker": {
+      "tam": "종지기 탐",
+      "coalfast": "수호자 콜패스트",
+      "ollun": "균열감시자 올룬",
+      "edda": "보급관 에다",
+      "saul": "치유사 사울"
+    },
+    "fare": {
+      "promptOut": "먼기슭까지의 뱃삯: 동화 {price}닢.",
+      "promptBack": "뭍으로 돌아가는 뱃삯: 동화 {price}닢.",
+      "pay": "뱃삯을 낸다.",
+      "decline": "오늘은 됐다."
+    },
+    "q0": {
+      "scene": {
+        "harbor": "일하는 항구다. 그물이 마르고, 본토 구매자 앞으로 표기된 별유리 인양 상자들이 쌓여 있다.",
+        "plinth": "항구 계단 위, 청동 워든이 내륙을 향해 서 있다. 대좌에 새겨진 가장 새로운 이름도 백 년 전 것이다. 워든 헤일. 그 아래에는 아직 이름을 새길 자리가 남아 있다.",
+        "toll": "종이 한 번 울린다. 거리의 모든 사람이 걸음을 멈추고 수를 센다. 아무 일도 이어지지 않고, 거리 전체가 한꺼번에 숨을 내쉰다."
+      },
+      "tam": {
+        "stretchers": "지난번 저런 놈 하나에 경비대 전원의 오전과 들것 두 개가 들었지."
+      },
+      "coalfast": {
+        "look": "잿빛 사내는 쓰러진 추적자를 바라보고, 그다음 당신을, 조금 더 오래 바라본다. 그리고 절벽 쪽으로 걸어간다."
+      }
     }
   },
   "gatherEvent": {
@@ -6097,6 +6143,33 @@ export const ko_KR: EnTranslations = {
     },
     "inspector": {
       "label": "도구 옵션"
+    },
+    "cinematic": {
+      "title": "시네마틱",
+      "show": "패널 표시",
+      "hide": "패널 숨기기",
+      "scene": "장면",
+      "sceneOption": "{id} ({seconds}초)",
+      "time": "시간",
+      "timeReadout": "{current} / {duration}초",
+      "play": "재생",
+      "pause": "일시 정지",
+      "authoredCamera": "연출 카메라",
+      "fade": "페이드: {percent}%",
+      "letterboxOn": "레터박스: 켜짐",
+      "letterboxOff": "레터박스: 꺼짐",
+      "violations": "위반 항목",
+      "noViolations": "현재 위반 사항 없음",
+      "violationRow": "{check} | 작업 {opIndex} | {measured}",
+      "capture": "키프레임 캡처",
+      "copy": "블록 복사",
+      "output": "생성된 카메라 캡처",
+      "unavailable": "3D 뷰포트 불러오는 중",
+      "seedMismatch": "캡처에는 정식 월드 시드가 필요합니다",
+      "captureSavedCopied": "저장하고 복사했습니다",
+      "captureSaved": "저장했습니다. 아래에 블록이 준비되었습니다",
+      "captureCopyOnly": "복사했습니다. 개발용 기록기를 사용할 수 없습니다",
+      "captureReady": "아래에 블록이 준비되었습니다"
     },
     "brush": {
       "title": "브러시",
@@ -13728,6 +13801,24 @@ export const ko_KR: EnTranslations = {
       "fisher_bram": {
         "name": "어부 브람"
       },
+      "lb_actor_coalfast": {
+        "name": "숯불 워든"
+      },
+      "lb_actor_ollun": {
+        "name": "균열감시자 올룬"
+      },
+      "lb_actor_edda": {
+        "name": "병참관 에다"
+      },
+      "lb_actor_saul": {
+        "name": "치료사 사울"
+      },
+      "lb_actor_tam": {
+        "name": "종지기 탐"
+      },
+      "tidemill_stalker": {
+        "name": "밀물방앗간 추적자"
+      },
       "rift_hellguard": {
         "name": "지옥 수호병"
       },
@@ -14287,6 +14378,21 @@ export const ko_KR: EnTranslations = {
         "name": "겁먹은 넬",
         "title": "걸헤이븐 어부",
         "greeting": "그물을 말리던 바로 그 자리에서 열렸어요. 바로 거기, 제가 평생 매일 아침 서 있던 그 자리에서요. 이제 저는 해안으로 내려가지 않아요. 이제는 어디로도 잘 가지 않는답니다."
+      },
+      "ferryman_ewald": {
+        "name": "뱃사공 에발트",
+        "title": "건너편 해안 나루",
+        "greeting": "먼바다 해안으로 가나? 친구, 요즘은 고기잡이하러 바다를 건너는 사람이 없다네. 준비되면 배에 오르게. 내리면 종소리를 잘 듣게. 자네가 날씨를 살피듯, 마을 사람들은 종소리를 듣는다네."
+      },
+      "ferryman_ewald_gullhaven": {
+        "name": "뱃사공 에발트",
+        "title": "건너편 해안 나루",
+        "greeting": "먼바다 해안으로 가나? 친구, 요즘은 고기잡이하러 바다를 건너는 사람이 없다네. 준비되면 배에 오르게. 내리면 종소리를 잘 듣게. 자네가 날씨를 살피듯, 마을 사람들은 종소리를 듣는다네."
+      },
+      "sergeant_marsh": {
+        "name": "마시 중사",
+        "title": "마을 민병대",
+        "greeting": "훈련은 마쳤나? 그럼 오늘 밤 일은 이렇다. 내 대열이 길을 지킨다. 균열이 우리가 감당 못 할 것을 토해 내면, 나는 자네를 가리킨다. 물방앗간은 자네 몫이다. 아무것도 자네를 따라 들어가게 하지 말고, 아무것도 우리를 지나 마을로 가게 하지 마라. 가라."
       },
       "forgemistress_darva": {
         "name": "단조사 다르바",
@@ -16284,6 +16390,22 @@ export const ko_KR: EnTranslations = {
           }
         }
       },
+      "q_lb_q0_ashore": {
+        "title": "상륙",
+        "text": "걸헤이븐은 밤낮으로 균열의 습격을 받으면서도 버텨 낸다. 그들과 함께 서고자 한다면, 마을이 피 흘리는 곳에서 시작하라. 감시 초원의 민병 방어선이다. 항구 계단과 오래된 조각상 동쪽에 있다.",
+        "completion": "물방앗간 사냥은 오롯이 자네 혼자 해낸 일이고, 탐의 들것 이야기도 과장이 아니다. 정찰병은 모자라고 지킬 들판은 너무 많다. 오늘 밤 자네는 자네 몫이 아니었던 땅을 지켜 냈고, 그것이 이 일의 전부다. 감시대에 온 것을 환영한다.",
+        "objectives": {
+          "0": {
+            "label": "감시 초원의 마시 중사에게 보고"
+          },
+          "1": {
+            "label": "균열의 소생물 처치"
+          },
+          "2": {
+            "label": "밀물방앗간 안의 무언가를 처치"
+          }
+        }
+      },
       "q_gc_down_the_windway": {
         "title": "바람길을 내려가다",
         "text": "그 비탈을 올라 냈으니, {playerName}, 바람이 자네를 거두기로 한 모양이군. 윅하버는 구릉 길을 따라 동쪽, 후미의 바람그늘에 웅크리고 있네. 항만장 오딜은 고개를 넘어오는 사람을 하나하나 세는데, 자네도 세고 싶어 할 걸세. 그녀에게 바람길이 아직 열려 있다고 전하게.",
@@ -16841,6 +16963,12 @@ export const ko_KR: EnTranslations = {
           },
           "4": {
             "label": "균열의 들판"
+          },
+          "5": {
+            "label": "대균열"
+          },
+          "6": {
+            "label": "난파선 벌판"
           }
         }
       }
@@ -16880,6 +17008,51 @@ export const ko_KR: EnTranslations = {
         "name": "마지막 요새",
         "enterText": "마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.",
         "leaveText": "요새의 문을 닫고 드레이크랜드의 바람 속으로 돌아갑니다."
+      },
+      "lb_tidemill": {
+        "name": "밀물방앗간",
+        "enterText": "물방앗간 문이 열린다. 안에서는 어둠이 귀를 기울이고 있다.",
+        "leaveText": "밀물방앗간을 나와 저녁 공기 속으로 들어선다."
+      },
+      "lb_riftline": {
+        "name": "해질녘 균열 방어선",
+        "enterText": "초원의 문이 순찰대 뒤에서 닫힌다. 오늘 밤은 방어선의 것이다.",
+        "leaveText": "균열 방어선을 새벽 경비대에 맡기고 떠난다."
+      },
+      "lb_vault": {
+        "name": "가라앉은 첫 번째 보루",
+        "enterText": "밧줄이 어둠 속으로 풀려 내려간다. 아래에는 무너진 그대로의 옛 보루가 놓여 있다.",
+        "leaveText": "절벽 밧줄을 타고 햇빛 속으로 올라온다."
+      },
+      "lb_council": {
+        "name": "보루 평의회",
+        "enterText": "평의회실에는 의자가 여섯 개 있다. 하나는 비어 있다.",
+        "leaveText": "보루 밖으로 나온다."
+      },
+      "lb_landing": {
+        "name": "밤의 상륙지",
+        "enterText": "길잡이 화톳불이 해변을 따라 타내려간다. 함대는 여울 너머에서 기다린다.",
+        "leaveText": "상륙 해변을 뒤로하고 떠난다."
+      },
+      "lb_riftfields": {
+        "name": "균열 들판 진입로",
+        "enterText": "네 곳의 수호 제단이 균열을 둘러싸고 있다. 의식은 열두 세기 동안 그것을 봉인해 왔다.",
+        "leaveText": "균열 들판에서 아래로 걸어 내려온다."
+      },
+      "lb_breach": {
+        "name": "균열 안쪽",
+        "enterText": "빛이 이상하고, 하늘은 더 이상하다. 심장은 앞쪽 트인 땅에 놓여 있다.",
+        "leaveText": "경계를 넘어 평범한 밤공기 속으로 돌아온다."
+      },
+      "lb_lastwatch": {
+        "name": "마지막 경계",
+        "enterText": "보루는 말끔히 비어 있다. 누군가는 이 감시를 끝내야 한다.",
+        "leaveText": "뒤에서 보루의 문을 닫는다."
+      },
+      "lb_willowfen": {
+        "name": "우는버들 늪",
+        "enterText": "버드나무는 움직이지 않는다. 물도 마찬가지다.",
+        "leaveText": "버드나무를 고요 속에 남겨 두고 떠난다."
       },
       "dawnhold_castle": {
         "name": "던홀드 성",

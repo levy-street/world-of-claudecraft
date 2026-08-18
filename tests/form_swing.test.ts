@@ -10,8 +10,8 @@ import { CLASSES, ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import { type AuraKind, armorReduction } from '../src/sim/types';
 
-function makeWorld() {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+function makeWorld(seed = 42) {
+  return new Sim({ seed, playerClass: 'warrior', noPlayer: true });
 }
 
 // Mirror tests/form_command.ts: forms are a 3600s toggle aura on the player.
@@ -310,8 +310,10 @@ describe('Wolf Form swing speed', () => {
     // deliberately NOT rescaled (only the mainhand AUTO arm normalizes), its
     // AP-per-swing term follows baseSwingSpeed (the 1.0s cat cadence), the
     // form damage multiplier covers the roll + AP subtotal, and the flat
-    // ability bonus lands after the multiplier, before armor.
-    const sim = makeWorld();
+    // ability bonus lands after the multiplier, before armor. Seed re-hunted
+    // 42 to 43 for the Last Bell packet's world content (the strike's hit
+    // roll missed for the whole retry loop on the shared seed 42).
+    const sim = makeWorld(43);
     const a = sim.addPlayer('druid', 'Fang');
     sim.setPlayerLevel(5, a);
     sim.tick();

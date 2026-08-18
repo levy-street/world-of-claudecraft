@@ -10,25 +10,205 @@
 // and `pretest`). Reproducibility is checked by tests/i18n_admin_catalog.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "auth.authenticatorCode",
+    "auth.back",
+    "auth.recoveryCode",
+    "auth.twoFactorPrompt",
+    "auth.useAuthenticatorCode",
+    "auth.useRecoveryCode",
+    "auth.verify",
+    "error.invalidAuthenticationCode"
+  ],
+  "es_ES": [
+    "auth.authenticatorCode",
+    "auth.back",
+    "auth.recoveryCode",
+    "auth.twoFactorPrompt",
+    "auth.useAuthenticatorCode",
+    "auth.useRecoveryCode",
+    "auth.verify",
+    "error.invalidAuthenticationCode"
+  ],
+  "fr_FR": [
+    "auth.authenticatorCode",
+    "auth.back",
+    "auth.recoveryCode",
+    "auth.twoFactorPrompt",
+    "auth.useAuthenticatorCode",
+    "auth.useRecoveryCode",
+    "auth.verify",
+    "error.invalidAuthenticationCode"
+  ],
+  "fr_CA": [
+    "auth.authenticatorCode",
+    "auth.back",
+    "auth.recoveryCode",
+    "auth.twoFactorPrompt",
+    "auth.useAuthenticatorCode",
+    "auth.useRecoveryCode",
+    "auth.verify",
+    "error.invalidAuthenticationCode"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "auth.authenticatorCode",
+    "auth.back",
+    "auth.recoveryCode",
+    "auth.twoFactorPrompt",
+    "auth.useAuthenticatorCode",
+    "auth.useRecoveryCode",
+    "auth.verify",
+    "error.invalidAuthenticationCode"
+  ],
+  "de_DE": [
+    "auth.authenticatorCode",
+    "auth.back",
+    "auth.recoveryCode",
+    "auth.twoFactorPrompt",
+    "auth.useAuthenticatorCode",
+    "auth.useRecoveryCode",
+    "auth.verify",
+    "error.invalidAuthenticationCode"
+  ],
+  "zh_CN": [
+    "auth.authenticatorCode",
+    "auth.back",
+    "auth.recoveryCode",
+    "auth.twoFactorPrompt",
+    "auth.useAuthenticatorCode",
+    "auth.useRecoveryCode",
+    "auth.verify",
+    "error.invalidAuthenticationCode"
+  ],
+  "zh_TW": [
+    "auth.authenticatorCode",
+    "auth.back",
+    "auth.recoveryCode",
+    "auth.twoFactorPrompt",
+    "auth.useAuthenticatorCode",
+    "auth.useRecoveryCode",
+    "auth.verify",
+    "error.invalidAuthenticationCode"
+  ],
+  "ko_KR": [
+    "auth.authenticatorCode",
+    "auth.back",
+    "auth.recoveryCode",
+    "auth.twoFactorPrompt",
+    "auth.useAuthenticatorCode",
+    "auth.useRecoveryCode",
+    "auth.verify",
+    "error.invalidAuthenticationCode"
+  ],
+  "ja_JP": [
+    "auth.authenticatorCode",
+    "auth.back",
+    "auth.recoveryCode",
+    "auth.twoFactorPrompt",
+    "auth.useAuthenticatorCode",
+    "auth.useRecoveryCode",
+    "auth.verify",
+    "error.invalidAuthenticationCode"
+  ],
+  "pt_BR": [
+    "auth.authenticatorCode",
+    "auth.back",
+    "auth.recoveryCode",
+    "auth.twoFactorPrompt",
+    "auth.useAuthenticatorCode",
+    "auth.useRecoveryCode",
+    "auth.verify",
+    "error.invalidAuthenticationCode"
+  ],
+  "ru_RU": [
+    "auth.authenticatorCode",
+    "auth.back",
+    "auth.recoveryCode",
+    "auth.twoFactorPrompt",
+    "auth.useAuthenticatorCode",
+    "auth.useRecoveryCode",
+    "auth.verify",
+    "error.invalidAuthenticationCode"
+  ],
+  "cs_CZ": [
+    "auth.authenticatorCode",
+    "auth.back",
+    "auth.recoveryCode",
+    "auth.twoFactorPrompt",
+    "auth.useAuthenticatorCode",
+    "auth.useRecoveryCode",
+    "auth.verify",
+    "error.invalidAuthenticationCode"
+  ],
+  "nl_NL": [
+    "auth.authenticatorCode",
+    "auth.back",
+    "auth.recoveryCode",
+    "auth.twoFactorPrompt",
+    "auth.useAuthenticatorCode",
+    "auth.useRecoveryCode",
+    "auth.verify",
+    "error.invalidAuthenticationCode"
+  ],
+  "pl_PL": [
+    "auth.authenticatorCode",
+    "auth.back",
+    "auth.recoveryCode",
+    "auth.twoFactorPrompt",
+    "auth.useAuthenticatorCode",
+    "auth.useRecoveryCode",
+    "auth.verify",
+    "error.invalidAuthenticationCode"
+  ],
+  "id_ID": [
+    "auth.authenticatorCode",
+    "auth.back",
+    "auth.recoveryCode",
+    "auth.twoFactorPrompt",
+    "auth.useAuthenticatorCode",
+    "auth.useRecoveryCode",
+    "auth.verify",
+    "error.invalidAuthenticationCode"
+  ],
+  "tr_TR": [
+    "auth.authenticatorCode",
+    "auth.back",
+    "auth.recoveryCode",
+    "auth.twoFactorPrompt",
+    "auth.useAuthenticatorCode",
+    "auth.useRecoveryCode",
+    "auth.verify",
+    "error.invalidAuthenticationCode"
+  ],
+  "sv_SE": [
+    "auth.authenticatorCode",
+    "auth.back",
+    "auth.recoveryCode",
+    "auth.twoFactorPrompt",
+    "auth.useAuthenticatorCode",
+    "auth.useRecoveryCode",
+    "auth.verify",
+    "error.invalidAuthenticationCode"
+  ],
+  "vi_VN": [
+    "auth.authenticatorCode",
+    "auth.back",
+    "auth.recoveryCode",
+    "auth.twoFactorPrompt",
+    "auth.useAuthenticatorCode",
+    "auth.useRecoveryCode",
+    "auth.verify",
+    "error.invalidAuthenticationCode"
+  ],
+  "da_DK": [
+    "auth.authenticatorCode",
+    "auth.back",
+    "auth.recoveryCode",
+    "auth.twoFactorPrompt",
+    "auth.useAuthenticatorCode",
+    "auth.useRecoveryCode",
+    "auth.verify",
+    "error.invalidAuthenticationCode"
+  ]
 };

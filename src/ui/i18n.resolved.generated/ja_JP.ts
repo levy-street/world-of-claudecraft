@@ -396,6 +396,11 @@ export const ja_JP: EnTranslations = {
       "busy": "現在の行動を終えてからスタック解除を使用してください。",
       "unavailable": "現在の状態ではスタック解除を使用できません。"
     },
+    "scene": {
+      "skipHint": "シーンをスキップ（Esc）",
+      "waitingFor": "{name}を待っています",
+      "timer": "{seconds}s"
+    },
     "fct": {
       "absorbed": "吸収（{amount}）",
       "cheap": "低コスト!"
@@ -1089,6 +1094,7 @@ export const ja_JP: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "{key} キーを押して訓練用ヴァロースティードに騎乗する。",
+      "buyReinsPrompt": "騎乗を習得した。マーラから10ゴールドでヴァロースティードの手綱を購入し、使用して騎乗しよう。",
       "ownedMountPrompt": "手綱はバッグの中にあります。使用すると騎乗できます。",
       "ridePrompt": "光る目印をたどってスタートラインへ向かい、「レース開始」を押そう。",
       "begin": "レッスン開始",
@@ -2811,6 +2817,13 @@ export const ja_JP: EnTranslations = {
     "noticeboard": {
       "empty": "何も貼られていないようだ。"
     },
+    "memorial": {
+      "title": "記念碑",
+      "dedication": "封印を携えて裂け目へ入り、二度と戻らなかったカモメ港の守り手たちへ。町は彼らのためにこの鐘を守り続ける。",
+      "rollHeading": "栄誉の名簿（{count}）",
+      "roomRemaining": "最後の名の下の石面は、まだ空けられたままだ。",
+      "close": "記念碑を閉じる"
+    },
     "bank": {
       "title": "銀行",
       "subtitle": "金張りの金庫",
@@ -3826,6 +3839,39 @@ export const ja_JP: EnTranslations = {
     },
     "arenaGate": {
       "minLevelNote": "レベル {level} が必要です"
+    }
+  },
+  "lb": {
+    "fixture": {
+      "ferry": "遠つ岸の渡し船",
+      "tidemill": "潮の水車小屋",
+      "breach": "破れ目"
+    },
+    "speaker": {
+      "tam": "鐘守タム",
+      "coalfast": "守り手コールファスト",
+      "ollun": "裂け目見のオルン",
+      "edda": "兵站係エッダ",
+      "saul": "癒し手ソール"
+    },
+    "fare": {
+      "promptOut": "遠つ岸への渡し賃：銅貨{price}枚。",
+      "promptBack": "本土へ戻る渡し賃：銅貨{price}枚。",
+      "pay": "渡し賃を払う。",
+      "decline": "今日はやめておく。"
+    },
+    "q0": {
+      "scene": {
+        "harbor": "働く港。網が干され、星硝子のサルベージ箱には本土の買い手の刻印がある。",
+        "plinth": "港の石段の上で、青銅の守り手が内陸を向いて立つ。台座のいちばん新しい名は百年前のもの。ウォーデン・ヘイル。その下には、まだ名を刻む余白がある。",
+        "toll": "鐘がひとつ鳴る。通りの誰もが足を止め、数をかぞえる。何も続かず、通り全体がいっせいに息をつく。"
+      },
+      "tam": {
+        "stretchers": "ああいうのが前に出たときは、見張り全員の午前と担架二台が犠牲になった。"
+      },
+      "coalfast": {
+        "look": "灰色の男は倒れたストーカーを見つめ、それからあなたを、ほんの少し長く見る。そして崖の方へ歩き去っていく。"
+      }
     }
   },
   "gatherEvent": {
@@ -6097,6 +6143,33 @@ export const ja_JP: EnTranslations = {
     },
     "inspector": {
       "label": "ツールオプション"
+    },
+    "cinematic": {
+      "title": "シネマティック",
+      "show": "パネルを表示",
+      "hide": "パネルを隠す",
+      "scene": "シーン",
+      "sceneOption": "{id}（{seconds}秒）",
+      "time": "時間",
+      "timeReadout": "{current} / {duration}秒",
+      "play": "再生",
+      "pause": "一時停止",
+      "authoredCamera": "演出カメラ",
+      "fade": "フェード：{percent}%",
+      "letterboxOn": "レターボックス：オン",
+      "letterboxOff": "レターボックス：オフ",
+      "violations": "違反項目",
+      "noViolations": "現在、違反はありません",
+      "violationRow": "{check} | 操作 {opIndex} | {measured}",
+      "capture": "キーフレームを取得",
+      "copy": "ブロックをコピー",
+      "output": "生成されたカメラ取得データ",
+      "unavailable": "3Dビューポートを読み込み中",
+      "seedMismatch": "取得には正式なワールドシードが必要です",
+      "captureSavedCopied": "保存してコピーしました",
+      "captureSaved": "保存しました。下にブロックを表示しています",
+      "captureCopyOnly": "コピーしました。開発用ライターは利用できません",
+      "captureReady": "下にブロックを表示しています"
     },
     "brush": {
       "title": "ブラシ",
@@ -13728,6 +13801,24 @@ export const ja_JP: EnTranslations = {
       "fisher_bram": {
         "name": "漁師ブラム"
       },
+      "lb_actor_coalfast": {
+        "name": "守将コールファスト"
+      },
+      "lb_actor_ollun": {
+        "name": "裂け目監視のオルン"
+      },
+      "lb_actor_edda": {
+        "name": "補給将校エッダ"
+      },
+      "lb_actor_saul": {
+        "name": "癒し手サウル"
+      },
+      "lb_actor_tam": {
+        "name": "鐘守タム"
+      },
+      "tidemill_stalker": {
+        "name": "潮挽き水車場の追跡者"
+      },
       "rift_hellguard": {
         "name": "ヘルガード"
       },
@@ -14287,6 +14378,21 @@ export const ja_JP: EnTranslations = {
         "name": "怯えるネル",
         "title": "カモメ港の漁師",
         "greeting": "網を干す、まさにあの場所で開いたんだ。あそこだよ、私が生まれてからずっと毎朝立っていた場所さ。もう岸へは下りない。もう、どこへもろくに行かなくなっちまった。"
+      },
+      "ferryman_ewald": {
+        "name": "渡し守エーヴァルト",
+        "title": "対岸への渡し",
+        "greeting": "遠つ岸へ行くのかい？なあ、いまどき漁のために海を渡る者はいない。支度ができたら乗りな。着いたら鐘の音に気をつけろ。町の連中は、あんたが空模様を読むように鐘を聴くんだ。"
+      },
+      "ferryman_ewald_gullhaven": {
+        "name": "渡し守エーヴァルト",
+        "title": "対岸への渡し",
+        "greeting": "遠つ岸へ行くのかい？なあ、いまどき漁のために海を渡る者はいない。支度ができたら乗りな。着いたら鐘の音に気をつけろ。町の連中は、あんたが空模様を読むように鐘を聴くんだ。"
+      },
+      "sergeant_marsh": {
+        "name": "マーシュ軍曹",
+        "title": "町の民兵",
+        "greeting": "訓練は済んだな？なら今夜の段取りだ。俺の隊列が街道を守る。裂け目が手に負えんものを吐き出したら、俺はお前を指す。水車小屋はお前に任せる。何もお前を追わせるな。何も俺たちを抜けて町へ行かせるな。行け。"
       },
       "forgemistress_darva": {
         "name": "鍛冶長ダルヴァ",
@@ -16284,6 +16390,22 @@ export const ja_JP: EnTranslations = {
           }
         }
       },
+      "q_lb_q0_ashore": {
+        "title": "上陸",
+        "text": "カモメ港は昼も夜も裂け目の襲撃に耐え、なお持ちこたえている。共に立つ気なら、町が血を流す場所から始めろ。見張りの草原の民兵線だ。港の石段と古い像の東にある。",
+        "completion": "水車小屋の討伐はお前ひとりの手柄だ。タムの担架の話も誇張ではない。斥候は足りず、守る畑は多すぎる。今夜お前は、守る義理のなかった地を守り抜いた。それがこの仕事のすべてだ。見張り隊へようこそ。",
+        "objectives": {
+          "0": {
+            "label": "見張り草地のマーシュ軍曹に報告する"
+          },
+          "1": {
+            "label": "裂け目の落とし子を倒す"
+          },
+          "2": {
+            "label": "潮挽き水車場にいる何かを始末する"
+          }
+        }
+      },
       "q_gc_down_the_windway": {
         "title": "ウィンドウェイを下って",
         "text": "登りきったか、{playerName}。なら風はお前を生かしておくことに決めたわけだ。ウィックハーバーは丘陵の道を東へ行った先、入り江の風陰にうずくまっている。港務長オディールは峠を越えてくる者をひとり残らず数えている。お前のことも数えたがるだろう。ウィンドウェイはまだ開いている、と伝えてくれ。",
@@ -16841,6 +16963,12 @@ export const ja_JP: EnTranslations = {
           },
           "4": {
             "label": "裂け目野"
+          },
+          "5": {
+            "label": "破れ目"
+          },
+          "6": {
+            "label": "難破の原"
           }
         }
       }
@@ -16880,6 +17008,51 @@ export const ja_JP: EnTranslations = {
         "name": "最後の砦",
         "enterText": "最後の砦の冷たく静まり返った広間へ足を踏み入れた。",
         "leaveText": "砦の扉を閉め、ドレイクランドの風の中へ戻った。"
+      },
+      "lb_tidemill": {
+        "name": "潮挽き水車場",
+        "enterText": "水車場の扉が開く。中では、闇が耳を澄ませている。",
+        "leaveText": "潮挽き水車場を出て、夕暮れの空気へ戻る。"
+      },
+      "lb_riftline": {
+        "name": "黄昏の裂け目防衛線",
+        "enterText": "草原の門が巡回隊の背後で閉じる。今夜は防衛線のものだ。",
+        "leaveText": "裂け目防衛線を夜明けの見張りに任せる。"
+      },
+      "lb_vault": {
+        "name": "水没した第一要塞",
+        "enterText": "縄が闇へと繰り出されていく。眼下には、崩れ落ちたままの古い砦が横たわる。",
+        "leaveText": "崖の縄を登り、日の光の中へ戻る。"
+      },
+      "lb_council": {
+        "name": "要塞評議会",
+        "enterText": "評議室には椅子が六脚ある。一脚だけ空いている。",
+        "leaveText": "要塞の外へ出る。"
+      },
+      "lb_landing": {
+        "name": "夜の上陸地",
+        "enterText": "導き火が浜辺を焼く。船団は浅瀬の向こうで待っている。",
+        "leaveText": "上陸浜を後にする。"
+      },
+      "lb_riftfields": {
+        "name": "裂け野への道",
+        "enterText": "四つの護りの祭場が裂け目を囲む。儀式は十二の世紀にわたりそれを閉ざしてきた。",
+        "leaveText": "裂け野を下って戻る。"
+      },
+      "lb_breach": {
+        "name": "裂け目の内側",
+        "enterText": "光がおかしく、空はそれ以上におかしい。核心はこの先の開けた地にある。",
+        "leaveText": "境を越え、いつもの夜気へ戻る。"
+      },
+      "lb_lastwatch": {
+        "name": "最後の見張り",
+        "enterText": "砦は片付き、人けがない。誰かがこの見張りを終わらせねばならない。",
+        "leaveText": "背後で要塞の扉を閉じる。"
+      },
+      "lb_willowfen": {
+        "name": "泣き柳沼",
+        "enterText": "柳は動かない。水もまた動かない。",
+        "leaveText": "柳を静寂の中に残して立ち去る。"
       },
       "dawnhold_castle": {
         "name": "ドーンホールド城",

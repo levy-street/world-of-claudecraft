@@ -396,6 +396,11 @@ export const en_CA: EnTranslations = {
       "busy": "Finish your current action before using Unstuck.",
       "unavailable": "Unstuck is unavailable in your current state."
     },
+    "scene": {
+      "skipHint": "Skip scene (Esc)",
+      "waitingFor": "Waiting for {name}",
+      "timer": "{seconds}s"
+    },
     "fct": {
       "absorbed": "Absorbed ({amount})",
       "cheap": "Cheap!"
@@ -1089,6 +1094,7 @@ export const en_CA: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
+      "buyReinsPrompt": "Riding learned. Buy Valorsteed reins from Marla for 10 gold, then use them to ride.",
       "ownedMountPrompt": "Your reins are in your bags. Use them to ride.",
       "ridePrompt": "Follow the glowing marker to the start line, then press Start Race.",
       "begin": "Begin Lesson",
@@ -2811,6 +2817,13 @@ export const en_CA: EnTranslations = {
     "noticeboard": {
       "empty": "Nothing seems posted."
     },
+    "memorial": {
+      "title": "Memorial",
+      "dedication": "To the wardens of Gullhaven who carried a seal into the Breach and did not come out again. The town keeps the bell for them.",
+      "rollHeading": "Roll of Honour ({count})",
+      "roomRemaining": "The stone below the last name has been left bare.",
+      "close": "Close memorial"
+    },
     "bank": {
       "title": "Bank",
       "subtitle": "The Gilded Strongbox",
@@ -3826,6 +3839,39 @@ export const en_CA: EnTranslations = {
     },
     "arenaGate": {
       "minLevelNote": "Requires level {level}"
+    }
+  },
+  "lb": {
+    "fixture": {
+      "ferry": "The Farshore Ferry",
+      "tidemill": "The Tidemill",
+      "breach": "The Breach"
+    },
+    "speaker": {
+      "tam": "Bellkeeper Tam",
+      "coalfast": "Warden Coalfast",
+      "ollun": "Riftwatch Ollun",
+      "edda": "Quartermaster Edda",
+      "saul": "Mender Saul"
+    },
+    "fare": {
+      "promptOut": "Passage to the Farshore: {price} copper.",
+      "promptBack": "Passage back to the mainland: {price} copper.",
+      "pay": "Pay the fare.",
+      "decline": "Not today."
+    },
+    "q0": {
+      "scene": {
+        "harbor": "A working harbor: nets drying, star-glass salvage crates stenciled for mainland buyers.",
+        "plinth": "Above the harbor steps a bronze warden faces inland. The newest name on the plinth is a century old: WARDEN HALE. There is room below it for more.",
+        "toll": "A bell tolls, once. Everyone in the street stops walking, and counts. Nothing follows, and the whole street exhales at once."
+      },
+      "tam": {
+        "stretchers": "The last one of those cost the whole watch a morning and two stretchers."
+      },
+      "coalfast": {
+        "look": "The grey man looks at the dead stalker, then at you, slightly longer. Then he walks back toward the cliffs."
+      }
     }
   },
   "gatherEvent": {
@@ -6097,6 +6143,33 @@ export const en_CA: EnTranslations = {
     },
     "inspector": {
       "label": "Tool options"
+    },
+    "cinematic": {
+      "title": "Cinematic",
+      "show": "Show panel",
+      "hide": "Hide panel",
+      "scene": "Scene",
+      "sceneOption": "{id} ({seconds}s)",
+      "time": "Time",
+      "timeReadout": "{current} / {duration}s",
+      "play": "Play",
+      "pause": "Pause",
+      "authoredCamera": "Authored camera",
+      "fade": "Fade: {percent}%",
+      "letterboxOn": "Letterbox: on",
+      "letterboxOff": "Letterbox: off",
+      "violations": "Violations",
+      "noViolations": "No violations at this time",
+      "violationRow": "{check} | op {opIndex} | {measured}",
+      "capture": "Capture keyframe",
+      "copy": "Copy block",
+      "output": "Generated camera capture",
+      "unavailable": "3D viewport loading",
+      "seedMismatch": "Capture needs the shipping world seed",
+      "captureSavedCopied": "Saved and copied",
+      "captureSaved": "Saved; block ready below",
+      "captureCopyOnly": "Copied; dev writer unavailable",
+      "captureReady": "Block ready below"
     },
     "brush": {
       "title": "Brush",
@@ -13728,6 +13801,24 @@ export const en_CA: EnTranslations = {
       "fisher_bram": {
         "name": "Fisher Bram"
       },
+      "lb_actor_coalfast": {
+        "name": "Warden Coalfast"
+      },
+      "lb_actor_ollun": {
+        "name": "Riftwatch Ollun"
+      },
+      "lb_actor_edda": {
+        "name": "Quartermaster Edda"
+      },
+      "lb_actor_saul": {
+        "name": "Mender Saul"
+      },
+      "lb_actor_tam": {
+        "name": "Bellkeeper Tam"
+      },
+      "tidemill_stalker": {
+        "name": "The Tidemill Stalker"
+      },
       "rift_hellguard": {
         "name": "Hellguard"
       },
@@ -14287,6 +14378,21 @@ export const en_CA: EnTranslations = {
         "name": "Frightened Nell",
         "title": "Gullhaven Fisher",
         "greeting": "It opened right where the nets dry. Right there, where I stood every morning of my life. I do not go down to the shore anymore. I do not go much of anywhere anymore."
+      },
+      "ferryman_ewald": {
+        "name": "Ferryman Ewald",
+        "title": "The Farshore Crossing",
+        "greeting": "The Farshore, is it? Nobody crosses for the fishing anymore, friend. Board when you are ready, and mind the bell when you land: the town listens to it the way you listen to weather."
+      },
+      "ferryman_ewald_gullhaven": {
+        "name": "Ferryman Ewald",
+        "title": "The Farshore Crossing",
+        "greeting": "The Farshore, is it? Nobody crosses for the fishing anymore, friend. Board when you are ready, and mind the bell when you land: the town listens to it the way you listen to weather."
+      },
+      "sergeant_marsh": {
+        "name": "Sergeant Marsh",
+        "title": "Town Militia",
+        "greeting": "Trained? Then here is how tonight works. My line holds the road. If the rift coughs up something we cannot put down, I point at you. The mill is yours: nothing follows you in, nothing gets past us to town. Go."
       },
       "forgemistress_darva": {
         "name": "Forgemistress Darva",
@@ -16193,8 +16299,8 @@ export const en_CA: EnTranslations = {
       },
       "q_fs_bell_at_the_landing": {
         "title": "The Bell at the Landing",
-        "text": "You came over the Ferrywalk, {playerName}? Then you are the first in a week, and the Warden will want to look you over. Gullhaven sits up the shore road, past the drying racks nobody tends anymore. Tell Warden Coalfast the causeway still stands, and that Tam has not rung a three-toll today. Yet.",
-        "completion": "The causeway holds, and Tam still has breath enough to joke about the three-toll. Good. We are an island under siege, {playerName}, and every pair of hands that crosses that sandbar is a pair the breaks must get through before they reach my people. Welcome to Gullhaven.",
+        "text": "You came in on the ferry, {playerName}? Then you are the first in a week, and the Warden will want to look you over. Gullhaven sits up from the harbor, past the drying racks nobody tends anymore. Tell Warden Coalfast the crossing still runs, and that Tam has not rung a three-toll today. Yet.",
+        "completion": "The crossing holds, and Tam still has breath enough to joke about the three-toll. Good. We are an island under siege, {playerName}, and every pair of hands the ferry carries over is a pair the breaks must get through before they reach my people. Welcome to Gullhaven.",
         "objectives": {
           "0": {
             "label": "Report to Warden Coalfast"
@@ -16281,6 +16387,22 @@ export const en_CA: EnTranslations = {
         "objectives": {
           "0": {
             "label": "The Sundered Horror slain"
+          }
+        }
+      },
+      "q_lb_q0_ashore": {
+        "title": "Ashore",
+        "text": "Gullhaven takes the breaks day and night and holds anyway. If you mean to stand with them, start where the town bleeds: the militia line at the Watch Meadow, east past the harbor steps and the old statue.",
+        "completion": "The mill kill was yours alone, and Tam does not exaggerate about stretchers. I am short a scout and long on fields. You held ground tonight that was not yours to hold, and that is the whole job. Welcome to the watch.",
+        "objectives": {
+          "0": {
+            "label": "Report to Sergeant Marsh at the Watch Meadow"
+          },
+          "1": {
+            "label": "Riftspawn slain"
+          },
+          "2": {
+            "label": "Put down whatever is in the Tidemill"
           }
         }
       },
@@ -16480,7 +16602,7 @@ export const en_CA: EnTranslations = {
             "label": "The Sowfield"
           },
           "11": {
-            "label": "The Farshore Causeway"
+            "label": "The Farshore Ferry"
           }
         }
       },
@@ -16825,7 +16947,7 @@ export const en_CA: EnTranslations = {
       },
       "farshore_isle": {
         "name": "The Farshore",
-        "welcome": "Cross the sandbar and Gullhaven's bell will find you before the town does. The breaks tear open without warning, and the redoubt holds its shore against whatever pours through. They have been waiting a long while for someone like you.",
+        "welcome": "Step off the ferry and Gullhaven's bell will find you before the town does. The breaks tear open without warning, and the redoubt holds its shore against whatever pours through. They have been waiting a long while for someone like you.",
         "pois": {
           "0": {
             "label": "Gullhaven"
@@ -16841,6 +16963,12 @@ export const en_CA: EnTranslations = {
           },
           "4": {
             "label": "The Riftfields"
+          },
+          "5": {
+            "label": "The Breach"
+          },
+          "6": {
+            "label": "The Wreckfields"
           }
         }
       }
@@ -16880,6 +17008,51 @@ export const en_CA: EnTranslations = {
         "name": "The Last Keep",
         "enterText": "You step into the cold, silent halls of the Last Keep.",
         "leaveText": "You pull the keep door shut and step back into the Drakelands wind."
+      },
+      "lb_tidemill": {
+        "name": "The Tidemill",
+        "enterText": "The mill door gives. Inside, the dark is listening.",
+        "leaveText": "You step out of the Tidemill into the evening air."
+      },
+      "lb_riftline": {
+        "name": "The Rift-Line at Dusk",
+        "enterText": "The meadow gate closes behind the patrol. The night belongs to the line.",
+        "leaveText": "You leave the rift-line to the dawn watch."
+      },
+      "lb_vault": {
+        "name": "The Drowned First Redoubt",
+        "enterText": "The rope pays out into the dark. Below, the old redoubt lies where it fell.",
+        "leaveText": "You come up the cliff rope into daylight."
+      },
+      "lb_council": {
+        "name": "The Redoubt Council",
+        "enterText": "The council room holds six chairs. One is empty.",
+        "leaveText": "You step out of the redoubt."
+      },
+      "lb_landing": {
+        "name": "The Landing at Night",
+        "enterText": "The guide fires burn down the beach. The fleet waits beyond the shoals.",
+        "leaveText": "You leave the Landing beach behind."
+      },
+      "lb_riftfields": {
+        "name": "The Riftfields Approach",
+        "enterText": "Four ward sites ring the breach. The rite has closed it for twelve centuries.",
+        "leaveText": "You walk back down out of the Riftfields."
+      },
+      "lb_breach": {
+        "name": "Inside the Breach",
+        "enterText": "The light is wrong and the sky is worse. The heart sits in open ground ahead.",
+        "leaveText": "You cross the threshold into ordinary night air."
+      },
+      "lb_lastwatch": {
+        "name": "The Last Watch",
+        "enterText": "The redoubt is clean and empty. Someone has to close the watch.",
+        "leaveText": "You close the redoubt door behind you."
+      },
+      "lb_willowfen": {
+        "name": "Willowweep",
+        "enterText": "The willow does not move. The water does not either.",
+        "leaveText": "You leave the willow to its quiet."
       },
       "dawnhold_castle": {
         "name": "Dawnhold Castle",

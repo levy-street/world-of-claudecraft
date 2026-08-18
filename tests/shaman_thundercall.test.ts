@@ -14,8 +14,9 @@ function place(sim: Sim, entity: Entity, x: number, z: number): void {
 }
 
 // Default seed re-hunted (2801 to 2802) after the v0.34.0 catch-up merge shifted
-// the shared draw order; a missed Arc Bolt impact banks no charge.
-function setup(seed = 2802): { sim: Sim; shaman: Entity; target: Entity } {
+// the shared draw order; a missed Arc Bolt impact banks no charge. Re-hunted
+// 2802 to 2803 by the Last Bell packet's world content for the same reason.
+function setup(seed = 2803): { sim: Sim; shaman: Entity; target: Entity } {
   const sim = new Sim({ seed, playerClass: 'shaman', noPlayer: true });
   const pid = sim.addPlayer('shaman', 'Stormbank');
   sim.setPlayerLevel(20, pid);

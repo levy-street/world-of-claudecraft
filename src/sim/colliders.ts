@@ -14,6 +14,7 @@ import {
   isEastbrookGrandArmoury,
 } from './building_layout';
 import { CASTLE_WALL_LEDGES, castleParapetSegments, PARAPET_HALF } from './castle_layout';
+import { GULLHAVEN_WALL } from './content/gullhaven';
 import { MOUNT_RACE_JUMP_FIXTURES, raceGateSegment } from './content/mounts';
 import {
   arenaOriginAt,
@@ -64,6 +65,8 @@ import {
 import { emberLilySpots } from './ember_lilies';
 import { fenWillowSpots, hollowWillowSpots } from './fen_willows';
 import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
+import { HARBOR_RAIL_HALF_THICK, HARBOR_RAIL_HEIGHT, harborDressingRadius } from './harbor_layout';
+import { LAST_BELL_AREAS } from './last_bell_field';
 import {
   benchDrawnHeight,
   CHAPEL_HALL,
@@ -138,6 +141,8 @@ export interface CircleCollider {
   r: number;
   /** Absolute world-space visual top used by sight checks; movement ignores it. */
   cameraTopY?: number;
+  /** Movement blocks, but the chase camera passes through hideable render props. */
+  camGhost?: boolean;
   /**
    * Absolute world-space top of the PHYSICAL obstacle for movement (parkour):
    * a mover whose feet reach this height passes over instead of being walled
@@ -167,6 +172,8 @@ export interface ObbCollider {
   rot: number; // yaw, three.js rotation.y convention
   /** Absolute world-space visual top used by sight checks; movement ignores it. */
   cameraTopY?: number;
+  /** See {@link CircleCollider.camGhost}. */
+  camGhost?: boolean;
   /** See {@link CircleCollider.moveTopY}. */
   moveTopY?: number;
   /** See {@link CircleCollider.standable}. */
@@ -779,6 +786,7 @@ function staticWorldColliders(seed: number): Collider[] {
       z: d.z,
       r: d.r,
       cameraTopY: topY(seed, d.x, d.z, d.h ?? 4),
+      camGhost: true,
     });
   }
 
@@ -838,6 +846,62 @@ function staticWorldColliders(seed: number): Collider[] {
       rot: 0,
       cameraTopY: topY(seed, box.x, box.z, 2.9),
     });
+  }
+
+  // Gullhaven's redoubt curtain: one oriented box per piece (panels, the piers
+  // that terminate each run, and the gate jambs), from the SAME record the
+  // renderer places its props from, and sized to each piece's MEASURED asset
+  // footprint. The gate openings carry no piece and so no collider, which is
+  // what makes them walkable.
+  //
+  // Deliberately NOT routed through PROPS.walls: that loop is hard-wired to
+  // Eastbrook's parapet wing and would mint a standable parapet top plus two
+  // phantom pillar colliders per panel, none of which a plain kcas curtain
+  // panel has.
+  for (const piece of GULLHAVEN_WALL) {
+    out.push({
+      type: 'obb',
+      x: piece.x,
+      z: piece.z,
+      hw: piece.w / 2,
+      hd: piece.d / 2,
+      rot: piece.rot,
+      cameraTopY: topY(seed, piece.x, piece.z, piece.height),
+      camGhost: piece.camGhost ?? true,
+    });
+  }
+
+  // Memorial rails: one oriented box per post and per panel, derived from the
+  // SAME `def.rail` record the renderer places its props from, so the fence you
+  // see and the fence that stops you are the same geometry. A decorProp can
+  // only carry a circle, which is why the rail had no usable collision at all
+  // before this: a 4.0 long panel has no honest circle.
+  for (const memorial of content.services?.memorials ?? []) {
+    const { rail } = memorial;
+    for (const post of rail.posts) {
+      out.push({
+        type: 'obb',
+        x: post.x,
+        z: post.z,
+        hw: rail.postHalf,
+        hd: rail.postHalf,
+        rot: 0,
+        cameraTopY: topY(seed, post.x, post.z, rail.height),
+        camGhost: true,
+      });
+    }
+    for (const panel of rail.panels) {
+      out.push({
+        type: 'obb',
+        x: panel.x,
+        z: panel.z,
+        hw: rail.panelHalfLength,
+        hd: rail.panelHalfDepth,
+        rot: panel.rot ?? 0,
+        cameraTopY: topY(seed, panel.x, panel.z, rail.height),
+        camGhost: true,
+      });
+    }
   }
 
   // Gather nodes: the renderer draws every node's GLB at a fixed spot whether
@@ -990,6 +1054,50 @@ function staticWorldColliders(seed: number): Collider[] {
         cameraTopY: deckY + 0.3,
         moveTopY: deckY,
         standable: true,
+      });
+    }
+  }
+
+  // Harbor boardwalks are raised walkable ground too (harborWalkHeight in
+  // world.ts); what blocks is the authored dressing: the deck-edge railings
+  // (thin OBBs, so nobody strolls off the pier through them) and the chunky
+  // props. Rail points sit on deck edges, so topY reads the deck height.
+  for (const h of PROPS.harbors ?? []) {
+    for (const rail of [...h.rails, ...h.shipRails]) {
+      out.push({
+        type: 'obb',
+        x: rail.x,
+        z: rail.z,
+        hw: rail.hw,
+        hd: rail.halfThickness ?? HARBOR_RAIL_HALF_THICK,
+        rot: rail.rot,
+        cameraTopY: topY(seed, rail.x, rail.z, HARBOR_RAIL_HEIGHT + 0.2),
+        camGhost: true,
+      });
+    }
+    for (const blocker of h.shipBlockers) {
+      out.push({
+        type: 'obb',
+        x: blocker.x,
+        z: blocker.z,
+        hw: blocker.hw,
+        hd: blocker.hd,
+        rot: blocker.rot,
+        cameraTopY: blocker.cameraTopY,
+        camGhost: true,
+        ...(blocker.topY === undefined ? {} : { moveTopY: blocker.topY }),
+      });
+    }
+    for (const d of h.dressing) {
+      const r = harborDressingRadius(d.kind);
+      if (r <= 0) continue;
+      out.push({
+        type: 'circle',
+        x: d.x,
+        z: d.z,
+        r,
+        cameraTopY: topY(seed, d.x, d.z, d.kind === 'lamp' ? 2.8 : 1.4),
+        camGhost: true,
       });
     }
   }
@@ -1409,6 +1517,30 @@ const WILDHEART_COLLIDERS: Collider[] = [
   ),
 ];
 
+// Last Bell story spaces share one interior kind ('farshore_story') but each
+// area has its own walls and props, so their collider sets key on the
+// DUNGEON id and are consulted by interiorColliders() below.
+const LAST_BELL_COLLIDERS: Record<string, Collider[]> = Object.fromEntries(
+  Object.values(LAST_BELL_AREAS).map((area) => [
+    area.dungeonId,
+    [
+      ...area.walls.map(
+        (w): Collider => ({ type: 'obb', x: w.x, z: w.z, hw: w.hw, hd: w.hd, rot: 0 }),
+      ),
+      ...area.props.map(
+        (p): Collider => ({
+          type: 'circle',
+          x: p.x,
+          z: p.z,
+          r: p.r,
+          cameraTopY: p.h,
+          camGhost: true,
+        }),
+      ),
+    ],
+  ]),
+);
+
 // Arena slots host fixed maps by slot parity (EVEN = Coliseum, ODD = Drowned
 // Court; see ARENA_MAPS in dungeon_layout.ts). Both sets are built once at
 // module load, so per-slot collision stays fully static. Exported for the
@@ -1433,6 +1565,9 @@ const STATIC_INTERIOR_COLLIDERS: Record<string, Collider[]> = {
 // the walls do not. Built lazily, cached by dungeon id.
 const interiorSetByDungeon = new Map<string, Collider[]>();
 function interiorCollidersFor(dungeonId: string | null, interior: string): Collider[] {
+  if (interior === 'farshore_story' && dungeonId) {
+    return LAST_BELL_COLLIDERS[dungeonId] ?? [];
+  }
   const staticSet = STATIC_INTERIOR_COLLIDERS[interior];
   if (staticSet) return staticSet;
   const key = dungeonId ?? `interior:${interior}`;

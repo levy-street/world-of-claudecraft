@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { mouselookReleaseFacing } from '../src/game/mouselook_release';
+import {
+  mouselookReleaseFacing,
+  updateMouselookReleaseFacing,
+} from '../src/game/mouselook_release';
 
 // Bug: holding right-mouse to rotate the camera, then briefly releasing, left the
 // character a fraction of a turn behind the camera. Facing is only committed to
@@ -33,5 +36,14 @@ describe('mouselookReleaseFacing', () => {
     expect(mouselookReleaseFacing(true, false, 0.7)).toBe(0.7);
     // frame N+1: still disengaged -> no further commit (caller keeps prev=false)
     expect(mouselookReleaseFacing(false, false, 0.7)).toBeNull();
+  });
+
+  it('drops camera edge state during a scene lock so release cannot leak through unlock', () => {
+    const state = { active: true };
+
+    expect(updateMouselookReleaseFacing(state, true, 1.8, true)).toBeNull();
+    expect(state.active).toBe(false);
+    expect(updateMouselookReleaseFacing(state, false, 1.8, false)).toBeNull();
+    expect(state.active).toBe(false);
   });
 });

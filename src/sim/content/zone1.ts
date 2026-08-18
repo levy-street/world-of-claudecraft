@@ -8,6 +8,7 @@ import {
   EASTBROOK_NPC_PLACEMENTS_BY_ID,
   wallSegmentMirrored,
 } from '../eastbrook_layout';
+import { MAINLAND_HARBOR } from '../harbor_layout';
 import { WORK_ORDER_CADENCE_TICKS } from '../professions/cadence';
 import type {
   CampDef,
@@ -47,7 +48,7 @@ export const ZONE1_ZONE: ZoneDef = {
     { x: -5, z: -52, label: 'Reliquary Hill', id: 'reliquary_hill' },
     { x: 40, z: 140, label: 'Brightwood Glade', id: 'brightwood_glade' },
     { x: -11, z: -112, label: 'The Sowfield', id: 'the_sowfield' },
-    { x: 150, z: -46, label: 'The Farshore Causeway', id: 'the_farshore_causeway' },
+    { x: 172, z: -48, label: 'The Farshore Ferry', id: 'the_farshore_causeway' },
   ],
   welcome: 'Find Marshal Redbrook in town - he has work for you.',
   welcomeQuestId: 'q_wolves',
@@ -1702,6 +1703,10 @@ export const ZONE1_PROPS: ZonePropsDef = {
   })),
   mines: [{ x: -88, z: -68, rot: 0.8 }],
   docks: [{ x: -64, z: 60, rot: -2.2, hutLocal: { x: 2.8, z: 2.4, hw: 1.7, hd: 1.5 } }],
+  // The Farshore crossing's mainland harbor (boardwalk, moored ship, ferryman
+  // at the gangplank) replaced the interim two-section landing jetty here;
+  // the layout is authored in src/sim/harbor_layout.ts.
+  harbors: [MAINLAND_HARBOR],
   tents: [
     { x: 62, z: -61, rot: 0.4, scale: 1 },
     { x: 69, z: -69, rot: 2.1, scale: 1 },

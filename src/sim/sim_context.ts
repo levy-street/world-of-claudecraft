@@ -26,6 +26,10 @@ import type { PendingProjectile } from './projectile_travel';
 import type { NaturalRiftPortal } from './rift/portals';
 import type { RiftEvent, RiftInstance } from './rift/types';
 import type { Rng } from './rng';
+import type { ScenarioRun } from './scenarios/scenarios';
+import type { ActiveChoice } from './scenes/choices';
+import type { ScriptedPlayerWalk } from './scenes/player_walk';
+import type { ScenePlayback } from './scenes/scenes';
 import type {
   ArenaMatch,
   ArenaQueueUnit,
@@ -48,6 +52,7 @@ import type { CardDuelMatch } from './social/card_duel';
 import type { FinderFormationUnit } from './social/party';
 import type { VcState } from './social/vale_cup';
 import type { SpatialGrid } from './spatial';
+import type { SquadRun } from './squad/squad';
 import type {
   AbilityDef,
   Aura,
@@ -228,6 +233,19 @@ export interface SimContextPrimitives {
   // Escort quest runs keyed by EscortDef id (src/sim/escort.ts owns every
   // mutation; the backing map stays on Sim). Live view.
   readonly escortRuns: Map<string, EscortRunState>;
+  // Last Bell squad rosters keyed by story-instance claim id; owned by
+  // src/sim/squad/squad.ts, state lives on Sim as a live view.
+  readonly squadRuns: Map<number, SquadRun>;
+  // Last Bell scenario runs keyed by story-instance claim id; owned by
+  // src/sim/scenarios/scenarios.ts, state lives on Sim as a live view.
+  readonly scenarioRuns: Map<number, ScenarioRun>;
+  // Last Bell scene playbacks keyed by claim id; owned by src/sim/scenes/.
+  readonly scenePlaybacks: Map<number, ScenePlayback>;
+  // Active Last Bell player walks keyed by player entity id. State stays on
+  // Sim; src/sim/scenes/player_walk.ts owns every mutation.
+  readonly scriptedPlayerWalks: Map<number, ScriptedPlayerWalk>;
+  // Last Bell active dialogue choices keyed by claim id (scenes/choices.ts).
+  readonly activeChoices: Map<number, ActiveChoice>;
   // I2a delve runs: the live run pool (seeded in the Sim ctor, never reassigned) and
   // the transient pet stash both stay Sim-owned (the disconnect path + serializePet
   // poke them); exposed here as live views the run module reads/mutates in place.
@@ -370,6 +388,15 @@ export interface SimContextCallbacks {
   leaveDungeon(pid?: number): boolean;
   resetDungeonInstances(pid?: number): void;
   inheritDungeonResetLocks(pid: number): void;
+  // Last Bell story spaces (instances/story_instances.ts): claims a private
+  // story copy on the shared pool (durable-character key for solo-always
+  // areas). Exposed so quest interactions, the scenario sequencer, and the
+  // dev command reach it through the seam; leaving reuses leaveDungeon.
+  enterStoryInstance(dungeonId: string, pid?: number): boolean;
+  // Last Bell scene playback (src/sim/scenes/): the scenario sequencer cues
+  // a scene script for a claim's audience. False means the requested scene
+  // could not start, so a scene objective must remain unarmed.
+  playScene(claimId: number, sceneId: string): boolean;
   // Procedural Rift entry/exit (dev command + interaction click path). The per-tick
   // drivers (updateRiftTriggers/updateRiftInstances) are called directly from tick();
   // these two are on the seam so foreign callers reach them through ctx.
@@ -619,6 +646,10 @@ export interface SimContextCallbacks {
   // is the shared ground-AoE entry point the drain pulses.
   resolve(pid?: number): { meta: PlayerMeta; e: Entity } | null;
   groundPos(x: number, z: number): Vec3;
+  /** MemorialDef id for a spawned memorial anchor entity, else null. */
+  memorialIdForEntity(entityId: number): string | null;
+  /** Read radius for a memorial anchor entity, else null (not a memorial). */
+  memorialInteractionRadius(entityId: number): number | null;
   playerMods(meta: PlayerMeta): TalentModifiers;
   delveRunForPlayer(pid: number): DelveRun | null;
   delveModuleEntry(run: DelveRun): Vec3;
@@ -1309,6 +1340,21 @@ export function createSimContext(host: SimContextHost): SimContext {
     get escortRuns() {
       return host.escortRuns;
     },
+    get squadRuns() {
+      return host.squadRuns;
+    },
+    get scenarioRuns() {
+      return host.scenarioRuns;
+    },
+    get scenePlaybacks() {
+      return host.scenePlaybacks;
+    },
+    get scriptedPlayerWalks() {
+      return host.scriptedPlayerWalks;
+    },
+    get activeChoices() {
+      return host.activeChoices;
+    },
     get nextArenaMatchId() {
       return host.nextArenaMatchId;
     },
@@ -1405,6 +1451,8 @@ export function createSimContext(host: SimContextHost): SimContext {
     instanceClaimIdAt: host.instanceClaimIdAt,
     enterDungeon: host.enterDungeon,
     leaveDungeon: host.leaveDungeon,
+    enterStoryInstance: host.enterStoryInstance,
+    playScene: host.playScene,
     enterRift: host.enterRift,
     leaveRift: host.leaveRift,
     riftOpenTreasure: host.riftOpenTreasure,
@@ -1489,6 +1537,8 @@ export function createSimContext(host: SimContextHost): SimContext {
     rebucket: host.rebucket,
     resolve: host.resolve,
     groundPos: host.groundPos,
+    memorialIdForEntity: host.memorialIdForEntity,
+    memorialInteractionRadius: host.memorialInteractionRadius,
     playerMods: host.playerMods,
     delveRunForPlayer: host.delveRunForPlayer,
     delveModuleEntry: host.delveModuleEntry,

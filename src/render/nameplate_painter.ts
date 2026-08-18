@@ -182,6 +182,10 @@ export class NameplatePainter {
     for (const [id, view] of this.views) {
       const entity = world.entities.get(id);
       if (!entity) continue;
+      // Entity-level render visibility also owns its canvas label. Voyage
+      // shots hide the parked local rig while its moving deck stand-in is live,
+      // so the cleared frame must not redraw that rig's optional self plate.
+      if (!view.group.visible) continue;
       // Quest-gated mobs (Broodmother eggs): no nameplate or hp bar for players not
       // on the gating quest, so the clutch reads as inert scenery until you have it.
       // The canvas pass draws only what it reaches, so skipping the entity is the

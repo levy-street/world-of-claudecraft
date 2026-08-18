@@ -1,3 +1,4 @@
+import { MAX_SCENE_CHOICE_OPTIONS } from '../scene_protocol';
 import { AFFLICTION_DOOM_MAX, doomValue } from './combat/affliction';
 import { ruinAmount } from './combat/destruction';
 import { soulFragmentCount } from './combat/necromancy';
@@ -8,7 +9,16 @@ import {
 } from './combat/necromancy_dominion';
 import { canUseForbiddenReflection } from './combat/warlock_talents';
 import { noticeboardDefByEntityId } from './content/noticeboards';
-import { CLASSES, ITEMS, QUEST_ORDER, QUESTS, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from './data';
+import {
+  CLASSES,
+  ITEMS,
+  QUEST_ORDER,
+  QUESTS,
+  WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_X,
+  WORLD_MIN_Z,
+} from './data';
 import {
   ASCENSION_CHARGES,
   ASCENSION_DURATION,
@@ -56,6 +66,11 @@ export const ACTIONS = [
   'interact', // loot corpse / pick up object / talk to quest npc
   'stop', // stop moving + stop attacking
   'eat_drink', // consume best food (or water for mana classes) from bags
+  'scene_skip',
+  'scene_choice_1',
+  'scene_choice_2',
+  'scene_choice_3',
+  'scene_choice_4',
 ] as const;
 
 export const NUM_ACTIONS = ACTIONS.length;
@@ -125,11 +140,16 @@ export function applyAction(sim: Sim, action: number): void {
       }
       break;
     }
+    case 'scene_skip':
+      sim.sceneSkip();
+      break;
     case 'noop':
       break;
     default: {
       if (name.startsWith('ability_')) {
         sim.castAbilityBySlot(parseInt(name.slice(8), 10) - 1);
+      } else if (name.startsWith('scene_choice_')) {
+        sim.answerActiveSceneChoiceByIndex(parseInt(name.slice(13), 10) - 1);
       }
     }
   }
@@ -151,7 +171,7 @@ export function applyAction(sim: Sim, action: number): void {
 const NEARBY_MOBS = 5;
 
 export function obsSize(): number {
-  return 16 + ABILITY_SLOTS * 2 + 9 + NEARBY_MOBS * 6 + 5 + QUEST_ORDER.length * 2 + 3;
+  return 16 + ABILITY_SLOTS * 2 + 9 + NEARBY_MOBS * 6 + 5 + QUEST_ORDER.length * 2 + 3 + 8;
 }
 
 export function encodeObs(sim: Sim): number[] {
@@ -163,7 +183,9 @@ export function encodeObs(sim: Sim): number[] {
   obs.push(p.resource / Math.max(1, p.maxResource));
   obs.push(p.level / MAX_LEVEL);
   obs.push(p.level >= MAX_LEVEL ? 1 : sim.xp / xpForLevel(p.level));
-  obs.push(clamp(p.pos.x / WORLD_MAX_X, -1, 1));
+  obs.push(
+    clamp((p.pos.x - (WORLD_MIN_X + WORLD_MAX_X) / 2) / ((WORLD_MAX_X - WORLD_MIN_X) / 2), -1, 1),
+  );
   obs.push(
     clamp((p.pos.z - (WORLD_MIN_Z + WORLD_MAX_Z) / 2) / ((WORLD_MAX_Z - WORLD_MIN_Z) / 2), -1, 1),
   );
@@ -350,7 +372,23 @@ export function encodeObs(sim: Sim): number[] {
     }
   }
 
-  // --- Paladin class resource (3), appended to preserve every existing index ---
+  // --- scene/choice controls (8, appended so every established slot stays stable) ---
+  const scene = sim.sceneReconnectStateFor(p.id);
+  const choice = sim.sceneChoiceReconnectStateFor(p.id);
+  obs.push(scene === null ? 0 : 1);
+  obs.push(choice === null ? 0 : 1);
+  obs.push(choice?.leaderPid === p.id ? 1 : 0);
+  obs.push(
+    choice === null
+      ? 0
+      : choice.remainingSeconds === null || choice.windowSeconds <= 0
+        ? 1
+        : clamp(choice.remainingSeconds / choice.windowSeconds, 0, 1),
+  );
+  for (let index = 0; index < MAX_SCENE_CHOICE_OPTIONS; index++) {
+    obs.push(choice !== null && index < choice.options.length ? 1 : 0);
+  }
+  // --- Paladin class resource (3), appended LAST: the env protocol reads it at slice(-3) ---
   // Non-Paladins emit zeros so the cross-class observation shape stays fixed.
   const devotion = p.paladinDevotion;
   obs.push(devotion ? devotion.value / MAX_DEVOTION : 0);

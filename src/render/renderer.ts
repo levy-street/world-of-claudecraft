@@ -326,6 +326,15 @@ import {
   takeOrBuildGroundObject,
 } from './ground_object_pool';
 import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
+import {
+  applyHarborDeckRiderVisual,
+  buildHarbors,
+  harborDeckRiderActive,
+  harborDeckRiderVisualPlan,
+  updateHarborShips,
+  warnMissingHarborDeckRider,
+} from './harbor';
+import { authoritativeDeckRigVisible } from './harbor_deck_stand_in_core';
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { buildHollowGates } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
@@ -336,6 +345,8 @@ import { ensureDelveInteriorKit } from './interior_kit';
 import { applyInteriorLightRig, applyRiftLightRig, type FogSceneState } from './interior_light_rig';
 import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
+import { buildBreachMaw, buildFerryMooring, buildScenarioDoor } from './last_bell_fixtures';
+import { LAST_BELL_MOOD_AMBIENCE, type LastBellMood, lastBellMood } from './last_bell_props';
 import { stepLichHeartbeat } from './lich_audio_state_core';
 import { LightPulses } from './light_pulses';
 import { createPrewarmPacing, type PrewarmPacing } from './link_rate_budget';
@@ -1140,11 +1151,11 @@ export interface EntityView {
   swimKickPhase: number;
   // consecutive frames the foot-height heuristic read airborne (debounce)
   airborneHeurFrames: number;
-  // mount summon/dismount transition edge-detects. lastMountKey fires the summon
-  // glow when e.mountKey changes (a dedicated tracker: mountVisualKey above lags
-  // asset loading). wasMountCasting fires the rider's call pose on the idle ->
-  // summoning edge. Both seeded from the entity's current state so an already-
-  // mounted login does not flash a spurious glow or pose.
+  // Mount transition edge-detects. lastMountKey fires the shimmer whenever
+  // e.mountKey changes (a dedicated tracker: mountVisualKey above lags asset
+  // loading). wasMountCasting fires the rider's call pose on the idle -> summoning
+  // edge. Both seed from the entity's current state so an already-mounted login
+  // does not flash a spurious shimmer or pose.
   lastMountKey: string;
   wasMountCasting: boolean;
   /** Display-only vertical smoothing (step-up/step-down presentation). */
@@ -1392,6 +1403,11 @@ export class Renderer {
   camYaw = Math.PI;
   camPitch = 0.32;
   camDist = 12;
+  // Last Bell scene camera: when set (by main.ts's sceneCameraTick, from the
+  // SceneDirector pose), the chase camera anchors on this world point instead
+  // of the player, so a scene shot frames its focus actor. Presentation only;
+  // null whenever no scene shot is live.
+  sceneCameraFocus: { x: number; y: number; z: number } | null = null;
   // Map-editor 3D mode: when set, the camera uses this free-cam pose instead of
   // chasing the player (updateCamera honors it and returns early). Editor-only;
   // always null in the shipped game.
@@ -2542,6 +2558,16 @@ export class Renderer {
     freezeStaticMatrices(props.group);
     for (const flame of this.flames) flame.matrixAutoUpdate = true;
     for (const fan of this.windmillFans) fan.matrixAutoUpdate = true;
+    // The authored harbors (boardwalk + moored ship, src/sim/harbor_layout.ts):
+    // static world geometry like the props above. The ships un-freeze
+    // themselves only while a departure scene's cast-off cue is live
+    // (cueHarborShip / resetShip in ./harbor.ts).
+    const harbors = buildHarbors(this.sim.cfg.seed, {
+      nowSec: () => this.sim.presentationTime,
+    });
+    setRenderCategory(harbors.group, 'props');
+    this.scene.add(harbors.group);
+    freezeStaticMatrices(harbors.group);
     // The impact-site light rides the campfire point-light budget so the visible
     // point-light count stays constant as the player travels (constant
     // numPointLights -> materials never recompile for a light-count change).
@@ -4848,6 +4874,18 @@ export class Renderer {
       this.createRequiredView(player.id, createdViewTypes) +
       this.createRequiredView(player.targetId, createdViewTypes)
     );
+  }
+
+  private createHarborDeckRiderViews(createdViewTypes: string[]): number {
+    let created = 0;
+    for (const entity of this.sim.entities.values()) {
+      if (this.views.has(entity.id) || !harborDeckRiderActive(entity)) continue;
+      if (!this.viewCreateRetry.canAttempt(entity.id, 'view', performance.now())) continue;
+      this.createView(entity);
+      this.sampleCreatedViewType(createdViewTypes, entity);
+      created++;
+    }
+    return created;
   }
 
   private async createMandatoryLandmarkViews(
@@ -8509,6 +8547,24 @@ export class Renderer {
   // dungeon door/portal resources moved to door_portal.ts (same shared tagging).
   private sparkleMat: THREE.SpriteMaterial | null = null;
 
+  // The standard F-interactable gold glint (the same lazy shared material and
+  // placement the delve/ground-object branches build inline).
+  private attachInteractSparkle(group: THREE.Group): THREE.Sprite {
+    if (!this.sparkleMat) {
+      this.sparkleMat = new THREE.SpriteMaterial({
+        map: sparkleTexture(),
+        transparent: true,
+        depthWrite: false,
+      });
+      if (!this.lowGfx) this.sparkleMat.color.setScalar(SPARKLE_BOOST);
+    }
+    const sparkle = new THREE.Sprite(this.sparkleMat);
+    sparkle.scale.set(0.9, 0.9, 1);
+    sparkle.position.y = 1.35;
+    group.add(sparkle);
+    return sparkle;
+  }
+
   private buildDoorPrewarmGroup(): THREE.Group {
     const group = new THREE.Group();
     const entrance = buildDoorBody(true, null, this.lowGfx).body;
@@ -9339,6 +9395,9 @@ export class Renderer {
   // piece, so the per-frame lighting read avoids regenerating the floor.
   private riftFogAuthored = false;
   private fogState: FogSceneState = 'outdoor';
+  // Applied Last Bell story mood, keyed like riftFogKey: two story instances
+  // can differ in mood without the fogState passing through 'outdoor'.
+  private farshoreMoodKey: LastBellMood | null = null;
 
   /** Drop a retired interior's scene nodes and prune its lights/flames out of
    * the per-frame registries. See riftInteriorGroups for why nothing here
@@ -9877,7 +9936,13 @@ export class Renderer {
           const o = instanceOrigin(dungeon.index, i);
           if (Math.abs(px - o.x) < 200 && Math.abs(this.sim.player.pos.z - o.z) < 250) {
             this.builtInteriors.add(key);
-            this.buildInterior(dungeon.interior, o.x, o.z);
+            // The story interiors key their area on the dungeon id and mirror
+            // the island terrain off the world seed; the other interiors
+            // ignore both.
+            this.buildInterior(dungeon.interior, o.x, o.z, {
+              dungeonId: dungeon.id,
+              seed: this.sim.cfg.seed,
+            });
           }
         }
       }
@@ -9887,16 +9952,20 @@ export class Renderer {
     const inDelve = inside && isDelvePos(px);
     const inYumiMaze = inside && isYumiMazePos(px);
     const inBattleground = inside && isBgPos(px);
-    const interior =
+    const dungeonHere =
       inside && !inDelve && !inYumiMaze && !inBattleground && !isArenaPos(px)
-        ? dungeonAt(px)?.interior
+        ? dungeonAt(px)
         : null;
-    encounterPrewarm.setEncounterPrewarmInterior(this, interior ?? null);
+    const interior = dungeonHere?.interior ?? null;
+    encounterPrewarm.setEncounterPrewarmInterior(this, interior);
     const inTemple = interior === 'temple';
     const inNythraxis = interior === 'nythraxis';
     // Wildheart is an OPEN-AIR jungle caldera, not a closed room: it keeps the
     // sky dome and the daylight rig and only swaps in its own field haze.
     const inWildheartField = interior === 'wildheart';
+    // Last Bell story spaces: fog + rig follow the AREA's mood, so the state
+    // is resolved below (after the rift branch), keyed by the dungeon id.
+    const inFarshoreStory = interior === 'farshore_story';
     const inLastKeep = interior === 'lastkeep';
     const inDawnhold = interior === 'dawnhold';
     const desired = inPractice
@@ -9913,21 +9982,23 @@ export class Renderer {
                 ? 'nythraxis'
                 : inWildheartField
                   ? 'wildheartField'
-                  : inLastKeep
-                    ? 'lastkeep'
-                    : inDawnhold
-                      ? 'dawnhold'
-                      : inside
-                        ? 'dungeon'
-                        : camY <
-                            waterLevelAt(
-                              this.camera.position.x,
-                              this.camera.position.z,
-                              this.sim.cfg.seed,
-                            ) -
-                              0.05
-                          ? 'underwater'
-                          : 'outdoor';
+                  : inFarshoreStory
+                    ? 'farshoreStory'
+                    : inLastKeep
+                      ? 'lastkeep'
+                      : inDawnhold
+                        ? 'dawnhold'
+                        : inside
+                          ? 'dungeon'
+                          : camY <
+                              waterLevelAt(
+                                this.camera.position.x,
+                                this.camera.position.z,
+                                this.sim.cfg.seed,
+                              ) -
+                                0.05
+                            ? 'underwater'
+                            : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
     // Procedural rift: dynamic fog from the generated floor style, re-applied when
     // the floor changes (descent keeps fogState='rift' but swaps the palette).
@@ -9955,6 +10026,31 @@ export class Renderer {
       return;
     }
     this.riftFogKey = null;
+    // Last Bell story instances: fog + light rig keyed by the area's MOOD (one
+    // interior kind, nine areas), re-applied like the rift palette so moving
+    // between two story moods refreshes without passing through 'outdoor'.
+    if (desired === 'farshoreStory') {
+      const mood = lastBellMood(dungeonHere?.id ?? '') ?? 'night';
+      if (this.fogState !== 'farshoreStory' || this.farshoreMoodKey !== mood) {
+        this.fogState = 'farshoreStory';
+        this.farshoreMoodKey = mood;
+        const grade = LAST_BELL_MOOD_AMBIENCE[mood];
+        fog.color.setHex(grade.fog.color);
+        fog.near = grade.fog.near;
+        fog.far = grade.fog.far;
+        if (!this.lowGfx) {
+          this.sun.intensity = grade.sun;
+          this.hemi.intensity = grade.hemi;
+          this.scene.environmentIntensity = grade.env;
+          sharedUniforms.uRimBoost.value = grade.rim;
+          this.sun.color.setHex(grade.sunColor);
+          this.hemi.color.setHex(grade.hemiSky);
+          this.hemi.groundColor.setHex(grade.hemiGround);
+        }
+      }
+      return;
+    }
+    this.farshoreMoodKey = null;
     if (desired !== this.fogState) {
       this.fogState = desired;
       if (desired === 'dungeon') {
@@ -10631,6 +10727,9 @@ export class Renderer {
       this.sim.player.pos.z,
       GFX.bladeCarpetRadius,
     );
+    // Scene-cued harbor ship motion and transient deck visual lifecycle. This
+    // performs one cheap stand-in decision per ship handle even with no live cue.
+    const harborDeckStandInActive = updateHarborShips(this.sim.player, dt);
     for (const [id, remaining] of this.waterJetVisualChannels) {
       const next = remaining - dt;
       if (next <= 0) this.waterJetVisualChannels.delete(id);
@@ -10661,6 +10760,7 @@ export class Renderer {
     // Dynamic worlds create nearby views lazily and drop views for leavers or
     // entities that moved well outside the draw band.
     createdViews += this.createRequiredViews(p, createdViewTypes);
+    createdViews += this.createHarborDeckRiderViews(createdViewTypes);
     this.collectMissingViewCandidates(p, this.entityViewCreateRangeSq, false);
     createdViews += this.createCandidateViews(
       this.runtimeViewCreateBudget(dt),
@@ -10672,7 +10772,11 @@ export class Renderer {
       const e = sim.entities.get(id);
       // The pure policy also retires quest objects after turn-in or abandon.
       if (
-        shouldDropView(e, p, sim.questLog, this.questObjectHidden, this.entityViewDestroyRangeSq)
+        !e ||
+        // Deck riders bypass parked-distance retirement: their entity stays
+        // parked at a distant harbor while the group rides the ship cue (J8).
+        (!harborDeckRiderActive(e) &&
+          shouldDropView(e, p, sim.questLog, this.questObjectHidden, this.entityViewDestroyRangeSq))
       ) {
         this.doomedIds.push(id);
       }
@@ -10810,6 +10914,7 @@ export class Renderer {
         waterJetVisualChannel,
         visuallyDead,
       );
+      const deckRiderActive = !isSelf && harborDeckRiderActive(e);
       // Pose carries information the player acts on (own feedback, the read on
       // the current target, pet combat, a cast windup telegraph) rather than
       // mere cosmetic smoothness: such an entity is exempt from BOTH the cadence
@@ -10827,10 +10932,16 @@ export class Renderer {
         combatTargetId,
         combatTarget?.ownerId ?? null,
       );
-      let wantShadow = true;
-      let inProxyBand = false;
+      const wantShadow = true;
+      const inProxyBand = false;
       if (isSelf) {
-        v.group.visible = true;
+        // The authoritative rider is already parked at the destination ship
+        // while the moving clone carries the voyage shots. The park cue drops
+        // the clone under black, and this real rig returns on the next frame.
+        v.group.visible = authoritativeDeckRigVisible(
+          harborDeckStandInActive,
+          this.sceneCameraFocus !== null,
+        );
         v.isFar = false;
         if (shadowsEnabled) {
           v.visual?.setShadow(true);
@@ -10844,6 +10955,13 @@ export class Renderer {
         // actual on-screen boundary flicker. group.visible carries last frame's
         // state: once shown, keep it until past the 96yd destroy radius (where
         // the view is torn down anyway); while hidden, show only within 80yd.
+        const showCutoff = v.group.visible
+          ? this.entityViewDestroyRangeSq
+          : this.entityViewCreateRangeSq;
+        if (!deckRiderActive && d2 > showCutoff) {
+          v.group.visible = false;
+          continue;
+        }
         // hidden until its shaders finish linking off-thread (async-compile gate);
         // the object branch below may still re-hide loot
         v.group.visible = !v.compilePending;
@@ -10855,12 +10973,20 @@ export class Renderer {
           v.group.visible = false;
           continue;
         }
+        // mid-distance rigs keep rendering but leave the shadow pass.
+        // A deck rider on a live ship cue draws at the ship, right in front
+        // of the scene camera; its distance from the parked player entity is
+        // irrelevant, so it keeps the near articulated rig and a real shadow
+        // for the whole cue (J8: the ferryman froze or dropped his shadow
+        // mid-crossing because d2 measured the departure harbor).
+        let wantShadow = false;
+        let inProxyBand = false;
         if (v.visual) {
           visibleRigCount++; // crowd-density signal for next frame's adaptive LOD
         }
         if (shadowsEnabled) {
           // mid-distance rigs keep rendering but leave the shadow pass
-          wantShadow = d2 < shadowRangeSq;
+          wantShadow = deckRiderActive || d2 < shadowRangeSq;
           inProxyBand = d2 < ENTITY_PROXY_SHADOW_RANGE_SQ;
           v.visual?.setShadow(wantShadow);
           // past the articulated gate the static-pose proxy carries the
@@ -10892,7 +11018,8 @@ export class Renderer {
             for (const caster of v.objectCasters) (caster as THREE.Mesh).castShadow = wantShadow;
           }
         }
-        if (v.visual) v.isFar = showsStaticFarMesh(d2, lodBands, actionablePose);
+        if (v.visual)
+          v.isFar = !deckRiderActive && showsStaticFarMesh(d2, lodBands, actionablePose);
       }
       // online, entities beyond nameplate range stream below snapshot rate;
       // each interpolates on its own clock so they move smoothly instead of
@@ -10936,6 +11063,11 @@ export class Renderer {
         this.selfFacingLastTarget = r.lastTarget;
       }
       v.group.rotation.y = facing;
+      if (deckRiderActive) {
+        const riderPlan = harborDeckRiderVisualPlan(e, v.group);
+        applyHarborDeckRiderVisual(riderPlan, v.group);
+        if (import.meta.env.DEV) warnMissingHarborDeckRider(riderPlan, v.group);
+      }
 
       if (e.kind === 'object') {
         // The sim swaps delve interactable templates in place (pressure plate ->
@@ -11068,7 +11200,17 @@ export class Renderer {
       // Audio and state derivation below remain active even for hidden actors.
       let charOnScreen = true;
       if (this.cullCharacters && id !== p.id) {
-        this.cullSphere.center.set(x, y + v.height * 0.5 * v.liveScale, z);
+        // The sphere is centered on the group's LIVE position, not on the
+        // interpolated entity coordinates: a deck rider's group was moved to
+        // its resolved ship pose above, while its entity stays parked at a
+        // harbor that can be far outside the shot's frustum (J8: the
+        // ferryman vanished on the open-water leg on shadowless tiers).
+        // For every other rig the two positions are identical.
+        this.cullSphere.center.set(
+          v.group.position.x,
+          v.group.position.y + v.height * 0.5 * v.liveScale,
+          v.group.position.z,
+        );
         const characterRadius = (v.height * 0.7 + 1.5) * v.liveScale;
         this.cullSphere.radius = paladinAegisActive
           ? Math.max(characterRadius, PALADIN_AEGIS_DOME_RADIUS + 1)
@@ -11999,16 +12141,16 @@ export class Renderer {
         }
       }
 
-      // Mount summon/dismount transition FX (render-only; the wire fields carry
+      // Mount summon transition FX (render-only; the wire fields carry
       // the state to every client, so no SimEvent is needed). The rider throws up
       // a call pose the instant a summon begins, and a yellow-orange shimmer rings
       // them when the mount actually appears, swaps, or clears.
       if (e.kind === 'player') {
         const mountCasting = e.mountCastRemaining > 0;
         // idle -> summoning edge (mountCastKey set): play the arm-raise call pose
-        // for ~the transition window. A dismount (mountCastKey === '') gets no
-        // pose; its effect is the completion glow below. Gated like the emote path
-        // (the sim roots the player, so moving/airborne is unlikely regardless).
+        // for ~the transition window. A legacy empty-key transition gets no pose;
+        // its effect is the completion glow below. Gated like the emote path;
+        // movement cancels the authoritative keyed summon.
         if (
           mountCasting &&
           !v.wasMountCasting &&
@@ -12020,7 +12162,7 @@ export class Renderer {
           active.playCallPose(e.mountCastRemaining);
         }
         v.wasMountCasting = mountCasting;
-        // mountKey change = summon completed, dismount completed, or a live swap:
+        // mountKey change = summon completed, instant dismount, or a live swap:
         // fire the shimmer at the rider. Tracked separately from mountVisualKey,
         // which lags async asset loading.
         if (e.mountKey !== v.lastMountKey) {
@@ -13201,17 +13343,31 @@ export class Renderer {
     }
     const p = this.sim.player;
     const seed = this.sim.cfg.seed;
+    const sceneFocus = this.sceneCameraFocus;
+    const sceneCameraActive = sceneFocus !== null;
     const reduce = this.reducedMotion();
 
     // Spring-arm lag: the look pivot trails the avatar on a critically damped
     // spring (vertical softer), so runs, jumps, mantles, and landings carry
     // weight. Reduced motion stiffens it to near-rigid instead of branching.
-    stepCameraBoom(this.camBoom, selfPos.x, selfPos.y, selfPos.z, dt, reduce ? 4 : 1);
+    // An authored scene already owns its own easing, so it adopts the authored
+    // focus exactly instead of adding a second, host-side spring.
+    if (sceneFocus) {
+      this.camBoom.x = sceneFocus.x;
+      this.camBoom.y = sceneFocus.y;
+      this.camBoom.z = sceneFocus.z;
+      this.camBoom.vx = 0;
+      this.camBoom.vy = 0;
+      this.camBoom.vz = 0;
+      this.camBoom.active = true;
+    } else {
+      stepCameraBoom(this.camBoom, selfPos.x, selfPos.y, selfPos.z, dt, reduce ? 4 : 1);
+    }
 
     // Landing thump, detected from the display trajectory alone (works in
     // both hosts): a short FOV dip plus a touch of trauma, scaled by fall
     // speed. addShake/punchFov are reduced-motion no-ops already.
-    const thump = stepLandingDetector(this.camFeel, selfPos.y, dt);
+    const thump = sceneCameraActive ? 0 : stepLandingDetector(this.camFeel, selfPos.y, dt);
     if (thump > 0) {
       this.punchFov(-3.5 * thump);
       this.addShake(0.1 + 0.3 * thump);
@@ -13229,10 +13385,18 @@ export class Renderer {
         velZ = 0;
       }
     }
-    stepCameraFeel(this.camFeel, velX, velZ, dt, !reduce);
+    stepCameraFeel(this.camFeel, velX, velZ, dt, !reduce && !sceneCameraActive);
+    if (sceneCameraActive) {
+      // Authored shot math already supplies the complete pose. Do not let a
+      // residual gameplay lead or FOV impulse bend a dolly or attach shot.
+      this.camFeel.leadX = 0;
+      this.camFeel.leadZ = 0;
+      this.camFeel.speedKick = 0;
+      this.camFeel.punchKick = 0;
+    }
 
     // Flipping reduce motion on mid-directive blends any running move out.
-    if (reduce) cancelCameraDirective(this.camDirector);
+    if (reduce || sceneCameraActive) cancelCameraDirective(this.camDirector);
 
     // Death drift: one slow elevated drift per death while the body lies
     // unreleased. Armed only on the alive-to-dead EDGE of the SAME viewed
@@ -13252,7 +13416,12 @@ export class Renderer {
     if (!deadBody) {
       this.deathDriftArmed = false;
       if (this.camDirector.kind === 'deathDrift') cancelCameraDirective(this.camDirector);
-    } else if (this.deathDriftArmed && !reduce && this.camDirector.kind === null) {
+    } else if (
+      this.deathDriftArmed &&
+      !reduce &&
+      !sceneCameraActive &&
+      this.camDirector.kind === null
+    ) {
       startDeathDrift(this.camDirector);
       this.deathDriftArmed = false;
     }
@@ -13266,7 +13435,7 @@ export class Renderer {
       (Math.abs(this.camYaw - mirror.yaw) > 1e-4 ||
         Math.abs(this.camPitch - mirror.pitch) > 1e-4 ||
         Math.abs(this.camDist - mirror.dist) > 1e-4);
-    const pose = stepCameraDirector(
+    const gameplayPose = stepCameraDirector(
       this.camDirector,
       { yaw: this.camYaw, pitch: this.camPitch, dist: this.camDist },
       dt,
@@ -13275,6 +13444,9 @@ export class Renderer {
     mirror.yaw = this.camYaw;
     mirror.pitch = this.camPitch;
     mirror.dist = this.camDist;
+    const pose = sceneCameraActive
+      ? { yaw: this.camYaw, pitch: this.camPitch, dist: this.camDist }
+      : gameplayPose;
 
     // Follow a submerged swimmer UNDER the surface: a height CEILING folded
     // into the one cy assignment below (the graphics-overhaul contract pins
@@ -13295,7 +13467,7 @@ export class Renderer {
     // obstructors fade through their subsystem's occluder-fade pass.
     const px = this.camBoom.x + this.camFeel.leadX;
     const py = this.camBoom.y;
-    const pz = this.camBoom.z + this.camFeel.leadZ;
+    const pz = sceneFocus?.z ?? this.camBoom.z + this.camFeel.leadZ;
     const eyeY = py + 2.0;
     const cx = px - Math.sin(pose.yaw) * Math.cos(pose.pitch) * pose.dist;
     const cy = Math.min(eyeY + Math.sin(pose.pitch) * pose.dist, underwaterCeilingY);

@@ -25,7 +25,7 @@ import {
   propPlacementRoll,
 } from '../sim/prop_layout';
 import { hash2 } from '../sim/rng';
-import type { BuildingDef } from '../sim/types';
+import type { BuildingDef, ZonePropsDef } from '../sim/types';
 import { terrainHeight, WATER_LEVEL, waterLevel } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
@@ -158,9 +158,22 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   columnBroken: { url: '/models/props/column_broken.glb', kit: 'nature' },
   statueHead: { url: '/models/props/statue_head.glb', kit: 'nature' },
   statueBlock: { url: '/models/props/statue_block.glb', kit: 'nature' },
+  // Warden Hale's memorial above Gullhaven: a bronze warden stood at rest over
+  // a planted sword, on a European-style stone column. The dado carries the
+  // dedication alone (WARDEN HALE) with blank stone beneath it; the roll of
+  // every warden who carried a seal inside is on the plaque you get for
+  // interacting with it, where it stays legible and translatable. The figure is
+  // the warrior class model re-posed, so the memorial and the players standing
+  // under it are recognisably the same order of warden.
+  // Front faces +Z; authored by scripts/assets/warden_hale_statue/.
+  wardenHaleStatue: { url: '/models/props/wardenHaleStatue.glb', kit: 'qprops' },
   marshReeds: { url: '/models/props/reeds.glb', kit: 'nature' },
   dockPlatform: { url: '/models/props/dock_platform.glb', kit: 'pirate' },
   rowboat: { url: '/models/props/rowboat.glb', kit: 'pirate' },
+  // The harbor ferry ship: a deterministic procedural GLB whose factory also
+  // generates the walkable deck, rail opening, and blocker plan consumed by
+  // src/sim/harbor_layout.ts. The stable asset id and URL stay unchanged.
+  harborShip: { url: '/models/props/grand_ferry_ship.glb', kit: 'pirate' },
   graveRound: { url: '/models/props/gravestone_round.glb', kit: 'grave' },
   graveCross: { url: '/models/props/gravestone_cross.glb', kit: 'grave' },
   graveBevel: { url: '/models/props/gravestone_bevel.glb', kit: 'grave' },
@@ -379,7 +392,7 @@ export const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   hexrTowerBase2: { url: '/models/biome/hexr_tower_base.glb', kit: 'khex' },
 };
 
-type PropKey = keyof typeof PROP_ASSET_DEFS;
+export type PropKey = keyof typeof PROP_ASSET_DEFS;
 
 const loadedProps = new Map<string, GLTF>();
 const propLoadTasks = new Map<string, Promise<void>>();
@@ -431,6 +444,9 @@ const LOW_TIER_PROP_KEYS: readonly PropKey[] = [
   'courseArch',
   'jumpVertical',
   'jumpOxer',
+  // The harbor ship is a LANDMARK (the harbor must read as a harbor from
+  // 40 yd on every tier), so low gfx renders it like the race fixtures.
+  'harborShip',
 ];
 
 /**
@@ -578,13 +594,13 @@ const MAT_OVERRIDES: Record<
 // for any other consumer, and the static merge may freely dispose ours.
 // ---------------------------------------------------------------------------
 
-interface AssetPart {
+export interface AssetPart {
   geo: THREE.BufferGeometry;
   mat: THREE.Material;
   /** source mesh name (picks out animated parts like the windmill fan) */
   name: string;
 }
-interface PropAsset {
+export interface PropAsset {
   parts: AssetPart[];
   size: THREE.Vector3;
 }
@@ -626,16 +642,16 @@ function convertMaterial(
 ): THREE.Material {
   const s = src as THREE.MeshStandardMaterial; // basic (unlit) shares the fields we read
   const ov = MAT_OVERRIDES[`${kit}:${s.name}`] ?? MAT_OVERRIDES[s.name];
-  // hasVertexColors must key the cache: kits share material names between
-  // COLOR_0 meshes (trim 'Vertex' props) and colorless ones — a shared
-  // vertexColors:true material would render the colorless meshes black
-  // The alpha cutout and sidedness the asset authored (glTF alphaMode MASK +
-  // alphaCutoff + doubleSided, already resolved by GLTFLoader) must survive the
-  // rebuild, and must key the cache: almost every prop is solid geometry, but a
-  // cutout one (the placeable oak's leaf cards) renders as opaque quads without
-  // them, and would otherwise share a cached material with an opaque namesake.
+  // hasVertexColors and side must key the cache: kits share material names
+  // between COLOR_0 meshes (trim 'Vertex' props) and colorless ones, and GLBs
+  // may reuse a name for both single-sided and double-sided surfaces.
+  // The alpha cutout the asset authored (glTF alphaMode MASK + alphaCutoff,
+  // already resolved by GLTFLoader) must survive the rebuild and key the
+  // cache too: almost every prop is solid geometry, but a cutout one (the
+  // placeable oak's leaf cards) renders as opaque quads without it, and would
+  // otherwise share a cached material with an opaque namesake.
   const alphaTest = s.alphaTest ?? 0;
-  const key = `${kit}|${s.name}|${s.color?.getHexString() ?? ''}|${s.map ? 'm' : ''}|${hasVertexColors ? 'v' : ''}|${GFX.standardMaterials ? 's' : 'l'}|a${alphaTest}|d${s.side}`;
+  const key = `${kit}|${s.name}|${s.color?.getHexString() ?? ''}|${s.map ? 'm' : ''}|${s.side}|${hasVertexColors ? 'v' : ''}|${GFX.standardMaterials ? 's' : 'l'}|a${alphaTest}`;
   const cached = matConvCache.get(key);
   if (cached) return cached;
   const color =
@@ -720,8 +736,11 @@ function convertMaterial(
 }
 
 /** parts of a loaded asset, world-baked (incl. yaw), origin centered at the
- *  footprint center with min-y at 0, materials converted + deduped */
-function propAsset(key: PropKey): PropAsset {
+ *  footprint center with min-y at 0, materials converted + deduped.
+ *  Exported for sibling builders (render/harbor.ts) that assemble kit pieces
+ *  outside buildProps; browser-only callers must respect the preload contract
+ *  (throws when the GLB has not landed). */
+export function propAsset(key: PropKey): PropAsset {
   const cached = extractCache.get(key);
   if (cached) return cached;
   const def = PROP_ASSET_DEFS[key];
@@ -918,6 +937,45 @@ function buildingAssetPick(b: { x: number; z: number; kind: BuildingDef['kind'] 
 }
 
 type Scale = number | [number, number, number];
+
+type DecorPropDef = NonNullable<ZonePropsDef['decorProps']>[number];
+type DecorPartOptions = {
+  x?: number;
+  y?: number;
+  z?: number;
+  rot?: number;
+  scale: number;
+};
+type AddDecorPart<T> = (parent: THREE.Object3D, key: PropKey, options: DecorPartOptions) => T;
+
+function placeDecorPropGroup<T>(
+  group: THREE.Group,
+  decor: DecorPropDef,
+  baseY: number,
+  addPart: AddDecorPart<T>,
+): T {
+  const primary = addPart(group, decor.key as PropKey, { scale: decor.scale ?? 1 });
+  for (const part of decor.parts ?? []) {
+    addPart(group, part.key as PropKey, {
+      x: part.x,
+      y: part.y,
+      z: part.z,
+      rot: part.rot,
+      scale: part.scale ?? 1,
+    });
+  }
+  group.position.set(decor.x, baseY, decor.z);
+  group.rotation.y = decor.rot ?? 0;
+  return primary;
+}
+
+function decorPropCameraTopY(decor: DecorPropDef, baseY: number): number {
+  const groundedSink = decor.float === undefined ? 0.05 : 0;
+  return baseY + groundedSink + (decor.h ?? 4);
+}
+
+/** Test-only seam for composite decor grouping and local part transforms. */
+export const propPlacementInternalsForTest = { decorPropCameraTopY, placeDecorPropGroup };
 
 function setScale(o: THREE.Object3D, s: Scale): void {
   if (typeof s === 'number') o.scale.setScalar(s);
@@ -1395,12 +1453,21 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   // r > 0 entries mirror the circle collider in colliders.ts and camera-ghost;
   // r 0 dressing stays always-visible (small silhouettes, nothing to hide).
   for (const d of getActiveWorldContent().props.decorProps ?? []) {
-    if (!(d.key in PROP_ASSET_DEFS)) {
-      console.warn(`decorProps: unknown prop key "${d.key}" skipped`);
+    const unknownKey = [d.key, ...(d.parts ?? []).map((part) => part.key)].find(
+      (key) => !(key in PROP_ASSET_DEFS),
+    );
+    if (unknownKey !== undefined) {
+      console.warn(`decorProps: unknown prop key "${unknownKey}" skipped`);
       continue;
     }
     const g = new THREE.Group();
-    const holder = addParts(g, d.key as PropKey, { scale: d.scale ?? 1 });
+    // Floating decor (moored ships) rides the waterline at its draft depth
+    // instead of standing on the seabed.
+    const baseY =
+      d.float !== undefined
+        ? Math.max(ground(d.x, d.z), WATER_LEVEL - d.float)
+        : ground(d.x, d.z) - 0.05;
+    const holder = placeDecorPropGroup(g, d, baseY, addParts);
     // the windmill's sail cross is a distinct authored mesh: reparent it onto
     // a pivot at its axle so the renderer can spin it (kept out of the static
     // merge, the campfire-flame idiom)
@@ -1421,17 +1488,9 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
         windmillFans.push(pivot);
       }
     }
-    // floating decor (moored ships) rides the waterline at its draft depth
-    // instead of standing on the seabed
-    const baseY =
-      d.float !== undefined
-        ? Math.max(ground(d.x, d.z), WATER_LEVEL - d.float)
-        : ground(d.x, d.z) - 0.05;
-    g.position.set(d.x, baseY, d.z);
-    g.rotation.y = d.rot ?? 0;
     group.add(shadowed(g));
     if (d.r) {
-      registerHideable(g, circleFootprint(d.x, d.z, d.r, baseY + (d.h ?? 4)));
+      registerHideable(g, circleFootprint(d.x, d.z, d.r, decorPropCameraTopY(d, baseY)));
     }
   }
 

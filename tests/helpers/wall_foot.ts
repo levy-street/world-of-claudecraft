@@ -37,7 +37,16 @@ export interface WallFoot {
 
 const cache = new Map<string, WallFoot | null>();
 
-const WALL_FOOT_ANCHORS = new Map<number, { x: number; z: number }>([[20061, { x: 704, z: 624 }]]);
+// Seed 20061: a wall foot on the sealed Hollow border massif, north of the
+// z = 915 sealed border ridge. The previous anchor (158.5, 937.5) sat at the
+// ridge's north foot until the Last Bell packet's world content steepened its
+// footing past the flat limit and its standoff past one body radius;
+// re-hunted (158.5, 937.5) to (163.5, 954) for the Last Bell packet's world
+// content (the nearest cell that also keeps the standoff sim tests' settle,
+// no-sawtooth, and tangential-slide behavior).
+const WALL_FOOT_ANCHORS = new Map<number, { x: number; z: number }>([
+  [20061, { x: 163.5, z: 954 }],
+]);
 
 /** Return a pinned wall foot after proving it still satisfies the live terrain
  * contract. `minPush` rejects a wall that is only barely in reach. */

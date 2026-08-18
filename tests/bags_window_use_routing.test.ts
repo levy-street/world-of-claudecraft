@@ -119,4 +119,17 @@ describe('bags use-click gathering-tool routing (#2343)', () => {
     expect(gatherToolCalls.map((i) => i.id)).toEqual(['baked_bread']);
     expect(usedItems).toEqual(['baked_bread']);
   });
+
+  it('an accessible reins button summons through exactly one plain world.useItem call', () => {
+    const { root, usedItems, gatherToolCalls } = harness(
+      [{ itemId: 'reins_grag_bear', count: 1 }],
+      () => false,
+    );
+    const reins = root.querySelector<HTMLButtonElement>('button.bag-item');
+    expect(reins).not.toBeNull();
+    expect(reins?.getAttribute('aria-label')).toContain('Goliath Grag-Bear');
+    reins?.click();
+    expect(gatherToolCalls.map((i) => i.id)).toEqual(['reins_grag_bear']);
+    expect(usedItems).toEqual(['reins_grag_bear']);
+  });
 });

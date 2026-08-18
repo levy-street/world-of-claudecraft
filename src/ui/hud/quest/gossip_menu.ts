@@ -25,6 +25,7 @@ export interface GossipMenuContent {
   hasVcup: boolean;
   hasCardMaster: boolean;
   hasTraining: boolean;
+  hasFerry: boolean; // the Last Bell gangplank keepers' fare button
 }
 
 export function gossipMenuIsEmpty(content: GossipMenuContent): boolean {
@@ -38,6 +39,7 @@ export function gossipMenuIsEmpty(content: GossipMenuContent): boolean {
     !content.hasDelveBoard &&
     !content.hasVcup &&
     !content.hasCardMaster &&
-    !content.hasTraining
+    !content.hasTraining &&
+    !content.hasFerry
   );
 }

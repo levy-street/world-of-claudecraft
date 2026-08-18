@@ -83,7 +83,9 @@ describe('mob portrait source manifest', () => {
   it('covers every live mob and records each render dependency with a content hash', () => {
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as PortraitSourceManifest;
     const liveIds = Object.keys(MOBS).sort();
-    expect(liveIds).toHaveLength(230);
+    // 230 to 236: the six Last Bell break-spawned and cast mobs entered MOBS
+    // with the campaign packet.
+    expect(liveIds).toHaveLength(236);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

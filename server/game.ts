@@ -120,6 +120,7 @@ import {
   isOverheadEmoteId,
   PET_SPECIAL_WIRE_VERSION,
   type PetSpecialWireVersion,
+  SCENE_ID_MAX_LENGTH,
   STABLE_TIMER_WIRE_VERSION,
   type StableTimerWireVersion,
   type VcSharedCupInfo,
@@ -690,6 +691,7 @@ type ClientMessage = Record<string, unknown> & {
   bracket?: number;
   catalog?: string;
   choice?: 'need' | 'greed' | 'pass';
+  choiceId?: unknown;
   chroma?: string;
   cmd?: string;
   companionId?: string;
@@ -1358,9 +1360,8 @@ function identityFields(e: Entity): Record<string, unknown> {
   const out: Record<string, unknown> = { k: e.kind, tid: e.templateId, nm: e.name, lv: e.level };
   if (e.skinCatalog === 'mech') out.cat = 'mech';
   if (e.skin) out.sk = e.skin;
-  // Active rideable mount ('' omitted). This identity field is intentionally
-  // distinct from the self-only persisted pick (`mntSel`): using `mnt` for both
-  // made the appended self delta overwrite the live riding state in JSON.
+  // Active rideable mount ('' omitted). Reins use drives this live state; there
+  // is no separate persisted mount selection.
   if (e.mountKey) out.mnt = e.mountKey;
   if (e.mainhandItemId) out.mh = e.mainhandItemId; // equipped mainhand → held weapon model (render-only)
   if (e.offhandItemId) out.oh = e.offhandItemId; // equipped offhand → held weapon model (render-only)
@@ -2344,7 +2345,14 @@ export class GameServer {
     // comparison is keyed to whichever entity's meta is being wired, so
     // without this the target's heavy fields can silently fail to resend.
     moderator.selfHeavyDirty = true;
-    this.send(moderator, { t: 'spectate', name: target.name });
+    this.send(moderator, {
+      t: 'spectate',
+      name: target.name,
+      pid: target.pid,
+      time: round2(this.sim.time),
+      sceneState: this.sim.sceneReconnectStateFor(target.pid),
+      sceneChoiceState: this.sim.sceneChoiceReconnectStateFor(target.pid),
+    });
     this.sendSystemNotice(moderator, `Now spectating ${target.name}.`);
   }
 
@@ -2384,7 +2392,14 @@ export class GameServer {
     // moderator's OWN talents/inventory/equip/etc. resend immediately
     // instead of staying stuck on the spectated target's last-sent values.
     moderator.selfHeavyDirty = true;
-    this.send(moderator, { t: 'spectate', name: null });
+    this.send(moderator, {
+      t: 'spectate',
+      name: null,
+      pid: moderator.pid,
+      time: round2(this.sim.time),
+      sceneState: this.sim.sceneReconnectStateFor(moderator.pid),
+      sceneChoiceState: this.sim.sceneChoiceReconnectStateFor(moderator.pid),
+    });
     if (announce) this.sendSystemNotice(moderator, 'Stopped spectating.');
   }
 
@@ -2615,7 +2630,7 @@ export class GameServer {
       },
       onBlocksChanged: (id, ids) => {
         const s = this.sessionByCharacterId(id);
-        if (s) s.blockedIds = new Set(ids);
+        if (s) this.setLoadedBlockIds(s, ids);
       },
       onGuildFounded: (id) => {
         // The one server-produced deed stat (DeedStatKey doc, src/sim/types.ts):
@@ -2754,6 +2769,11 @@ export class GameServer {
     };
   }
 
+  private setLoadedBlockIds(session: ClientSession, ids: Iterable<number>): void {
+    session.blockedIds = new Set(ids);
+    session.blockListLoaded = true;
+  }
+
   private async sendSocialSnapshot(charId: number, firstJoin = false): Promise<void> {
     const session = this.sessionByCharacterId(charId);
     if (!session) return;
@@ -2764,6 +2784,16 @@ export class GameServer {
       // not overwrite them below.
       const seqBefore = session.guildStampSeq;
       const snap = await this.social.snapshot(charId);
+      // The full snapshot reads the same authoritative block relation as the
+      // dedicated startup query. If that first query failed, use this
+      // successful read to leave fail-closed mode without overwriting a newer
+      // live block mutation that already marked the session loaded.
+      if (!session.blockListLoaded) {
+        this.setLoadedBlockIds(
+          session,
+          snap.blocks.map((block) => block.id),
+        );
+      }
       this.send(session, { t: 'social', ...snap });
       // Stamp the guild name onto the player's world entity so it rides the
       // identity wire and shows under their nameplate for everyone nearby,
@@ -4051,6 +4081,9 @@ export class GameServer {
       // Epoch ms of an active chat mute, or null. Lets the client show status
       // at login; sending is still gated server-side regardless.
       chatMutedUntil: session.chatMutedUntil ?? null,
+      time: round2(this.sim.time),
+      sceneState: this.sim.sceneReconnectStateFor(pid),
+      sceneChoiceState: this.sim.sceneChoiceReconnectStateFor(pid),
     });
     // Only the entering player sees their own world-entry notice; we don't
     // broadcast it to everyone (and likewise don't broadcast departures below).
@@ -4208,6 +4241,9 @@ export class GameServer {
       admin: session.isAdmin,
       softWords: this.chatFilter.softWords(),
       chatMutedUntil: session.chatMutedUntil ?? null,
+      time: round2(this.sim.time),
+      sceneState: this.sim.sceneReconnectStateFor(session.pid),
+      sceneChoiceState: this.sim.sceneChoiceReconnectStateFor(session.pid),
     });
     // No self "entered the world" notice here: on a seamless reconnect the
     // player never saw themselves leave (and friends never got a presence
@@ -4285,8 +4321,10 @@ export class GameServer {
   // let friends + guildmates know they've come online.
   private async initSocial(session: ClientSession, firstJoin = false): Promise<void> {
     try {
-      session.blockedIds = new Set(await this.socialDb.blockedIds(session.characterId));
-      session.blockListLoaded = true;
+      const blockedIds = await this.socialDb.blockedIds(session.characterId);
+      // A live block mutation may resolve while this startup read is in
+      // flight. Do not replace that newer authoritative state on completion.
+      if (!session.blockListLoaded) this.setLoadedBlockIds(session, blockedIds);
     } catch (err) {
       console.error('failed to load block list:', err);
     }
@@ -6796,6 +6834,22 @@ export class GameServer {
       case 'interact':
         sim.interact(pid);
         break;
+      // Last Bell scenes: both verbs are cheap and fully re-validated in the
+      // sim (participant membership for the skip; leader identity, active
+      // choice, and option validity for the answer).
+      case 'scene_skip':
+        sim.requestSceneSkip(pid);
+        break;
+      case 'scene_choice':
+        if (
+          typeof msg.choiceId === 'string' &&
+          msg.choiceId.length <= SCENE_ID_MAX_LENGTH &&
+          typeof msg.optionId === 'string' &&
+          msg.optionId.length <= SCENE_ID_MAX_LENGTH
+        ) {
+          sim.answerSceneChoice(msg.choiceId, msg.optionId, pid);
+        }
+        break;
       case 'loot':
         this.sendCommandOutcome(
           session,
@@ -7202,8 +7256,8 @@ export class GameServer {
       case 'unequip_mech_chroma':
         if (typeof msg.chroma === 'string') this.unequipAccountMechChroma(session, msg.chroma);
         break;
-      // Rideable mounts: the Sim re-validates everything (catalog key, level
-      // gate, combat gate); the entity mirror + self `mnt` field carry the result.
+      // Rideable mounts: the lesson-only toggle is server-authoritative; ordinary
+      // mounts are summoned through the equally authoritative use-item command.
       case 'mount_toggle':
         sim.toggleMountFor(pid);
         break;
@@ -9423,7 +9477,7 @@ export class GameServer {
     if (tslotRows.length === 0) maybeSerialized('tslot', '[]');
     else maybe('tslot', tslotRows);
     // Riding skill: persisted, so the client knows whether to show the riding
-    // trainer UI without waiting on a mount/select command to fail. Wire key
+    // trainer UI without waiting on a reins-use command to fail. Wire key
     // `mntRtd`; delta-guarded, only changes once (false to true, never back).
     maybe('mntRtd', meta.ridingTrained === true ? true : null);
     // Session-only lesson and race state must still reconcile after linkdead:
@@ -10107,7 +10161,7 @@ export class GameServer {
     // Serialize each event exactly once for the whole batch (after the flair stamp
     // above, so the fragment carries the final wire shape). Every recipient's frame is
     // then assembled by joining the fragments it selects, index-aligned with `events`,
-    // instead of re-stringifying a per-session { t:'events', list } object. Byte-for-byte
+    // instead of re-stringifying a per-session { t:'events', time, list } object. Byte-for-byte
     // identical to the old per-session JSON.stringify; only the fan-out cost changes.
     // INVARIANT: nothing in the per-session loop below may mutate a SimEvent after this
     // point, or a recipient's fragment would stop matching its event. The one in-loop
@@ -10115,8 +10169,9 @@ export class GameServer {
     // tracking context and never the event; the once-per-batch flair stamp above is the
     // only event mutation and correctly precedes this serialization.
     const fragments = serializeEventFragments(events);
+    const presentationTime = round2(this.sim.time);
     // Resolved once per batch, applied per session below against that session's
-    // ANCHOR pid (so a spectator watching a fighter refreshes with them).
+    // anchor pid, so a spectator watching a fighter refreshes with them.
     const bgRespawnRefresh = this.bgRespawnRefreshPids(events);
     // A pet acts for its owner, so combat-event delivery resolves each side to
     // its controller before comparing against the viewer or viewer party.
@@ -10237,8 +10292,10 @@ export class GameServer {
           }
         }
         // sendRaw (not send) so the pre-serialized fragments are not re-stringified;
-        // the assembled string is byte-identical to send({ t:'events', list: events }).
-        if (mine.length > 0) this.sendRaw(session, assembleEventsFrame(mine));
+        // the assembled string is byte-identical to send({ t:'events', time, list: events }).
+        if (mine.length > 0) {
+          this.sendRaw(session, assembleEventsFrame(mine, presentationTime));
+        }
       },
       (err, session) =>
         console.error(`[events] failed to route events for pid ${session.pid}, skipping:`, err),
@@ -10825,10 +10882,10 @@ export class GameServer {
   }
 
   private canShowInWho(viewer: ClientSession, candidate: ClientSession): boolean {
-    // Fail closed while the candidate's block list is still loading: showing
-    // them in /who before we know their blocks could leak presence to
-    // someone they've blocked.
-    if (!candidate.blockListLoaded) return false;
+    // Fail closed while either block list is still loading: until both sides
+    // are authoritative, presence could leak across an existing block in
+    // either direction.
+    if (!viewer.blockListLoaded || !candidate.blockListLoaded) return false;
     if (viewer.blockedIds.has(candidate.characterId)) return false;
     if (
       candidate.characterId !== viewer.characterId &&

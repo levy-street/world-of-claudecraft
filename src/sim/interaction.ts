@@ -37,6 +37,7 @@ import {
 import { tryStartEscort } from './escort';
 import { isInRaidInstance } from './instances/dungeons';
 import { HUT_OBJECT_ID, tryBurnHut } from './interactions/firebottle_hut';
+import { tryLastBellInteract, tryLastBellNpcTalk } from './last_bell/campaign';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import {
   awardSharedLootItem,
@@ -761,10 +762,13 @@ export function pickUpObject(
   const obj = ctx.entities.get(objId);
   if (obj?.kind !== 'object' || !obj.lootable) return false;
   const noticeboardDef = noticeboardDefByEntityId(noticeboardDefinitions, obj.id);
+  const memorialId = ctx.memorialIdForEntity(obj.id);
   // Preserve the historical no-op for malformed/non-pickup objects. The board
-  // is the one intentional lootable object without an item payload.
-  if (!noticeboardDef && !obj.objectItemId) return false;
-  const interactionRange = noticeboardDef?.interactionRadius ?? INTERACT_RANGE;
+  // and a memorial are the intentional lootable objects without an item
+  // payload: both are read rather than taken.
+  if (!noticeboardDef && !memorialId && !obj.objectItemId) return false;
+  const interactionRange =
+    noticeboardDef?.interactionRadius ?? ctx.memorialInteractionRadius(obj.id) ?? INTERACT_RANGE;
   if (dist2d(p.pos, obj.pos) > interactionRange) {
     ctx.error(meta.entityId, 'Too far away.');
     return false;
@@ -776,6 +780,12 @@ export function pickUpObject(
       state: 'empty',
       pid: meta.entityId,
     });
+    return true;
+  }
+  // A memorial is read, not taken. The event carries only the def id: both
+  // hosts already hold the roll as content, so the names never cross the wire.
+  if (memorialId) {
+    ctx.emit({ type: 'memorial', memorialId, pid: meta.entityId });
     return true;
   }
   const objectItemId = obj.objectItemId;
@@ -889,6 +899,15 @@ export function interact(
           return;
         }
       }
+      // An explicitly targeted Last Bell fixture owns this interaction even
+      // when it is scenery. Without this arm, targeting a ferry mooring can
+      // fall through to the nearby ferryman and open the fare dialog.
+      if (target.kind === 'object' && tryLastBellInteract(ctx, target, p.id)) {
+        return;
+      }
+      // An explicit target on inert scenery consumes the interact. Falling
+      // through would activate an unrelated nearby NPC or object instead.
+      if (target.kind === 'object' && !target.lootable) return;
       if (target.kind === 'object' && target.lootable) {
         if (target.templateId === 'dungeon_door' && target.dungeonId) {
           ctx.enterDungeon(target.dungeonId, p.id);
@@ -933,6 +952,9 @@ export function interact(
         ctx.emit({ type: 'bank', pid: p.id });
         return;
       }
+      // Last Bell gangplank keepers: talk opens the fare dialog, not the
+      // quest-NPC greeting.
+      if (target.kind === 'npc' && tryLastBellNpcTalk(ctx, target, p.id)) return;
       if (ctx.isQuestInteractionEntity(target)) {
         ctx.talkToNpc(target.id, p.id);
         return;
@@ -1026,6 +1048,8 @@ export function interact(
       ctx.emit({ type: 'mailbox', pid: p.id });
       return;
     }
+    // Last Bell campaign fixtures: the ferry crossing and scenario doors.
+    if (obj.templateId?.startsWith('lb_') && tryLastBellInteract(ctx, obj, p.id)) return;
     if (tryStartNythraxisWardChannel(ctx, obj, p)) return;
     pickUpObject(ctx, obj.id, p.id, noticeboardDefinitions);
     return;
@@ -1036,5 +1060,8 @@ export function interact(
     ctx.emit({ type: 'bank', pid: p.id });
     return;
   }
+  // Last Bell gangplank keepers: talk opens the fare dialog, not the
+  // quest-NPC greeting.
+  if (questEntity?.kind === 'npc' && tryLastBellNpcTalk(ctx, questEntity, p.id)) return;
   if (questEntity) ctx.talkToNpc(questEntity.id, p.id);
 }

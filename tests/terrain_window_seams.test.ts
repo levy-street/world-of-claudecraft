@@ -48,12 +48,11 @@ function sweep(ax: 'x' | 'z', at: number, lo: number, hi: number): string[] {
 }
 
 describe('terrain applier windows end without a blocking step', () => {
-  // KNOWN-UNFIXED, documented by the Willowfen investigation: the same
-  // applier-edge bug class fixed for applyStripFlankCoast and greenSeamT,
-  // at two further sites. Expected-fail so the suite stays green while the
-  // defect exists and trips the day the applier gets its skirt without
-  // this pin being promoted to a real assertion.
-  it.fails('applyValeCoast: the x = 178 strait line and the z = 178 border segments', () => {
+  // Promoted from expected-fail: the Farshore campaign's vale-coast rework
+  // gave applyValeCoast its fade skirt (smoothstep windows on both lines;
+  // see the applier's header in src/sim/world.ts), so the pin holds for real
+  // now and guards the skirt against regressing back to a hard cut.
+  it('applyValeCoast: the x = 178 strait line and the z = 178 border segments', () => {
     const bad = [...sweep('x', 178, -180, 160), ...sweep('z', 178, -160, 160)];
     expect(bad, bad.slice(0, 8).join('\n')).toEqual([]);
   });

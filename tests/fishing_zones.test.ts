@@ -1074,11 +1074,12 @@ function spotForLake(zoneId: string, lake: { x: number; z: number; radius: numbe
 // docs/design/professions-tuning-packet-review.md): declared discs that hold
 // no swim-depth water, so no cast can accept on them. Both dried under a
 // terrain lift that post-dates their authoring: the farshore Hilltop Spring
-// under the Crown dome's +14 (the pre-R55 state, kept as scenery once Gull
-// Mere landed) and the Mirrormere under the western-highlands lift. Ruled
-// intentional; a lake that goes dry JOINS this list by a human edit, and one
-// that gains water must LEAVE it (the census arm reds).
-const DECORATIVE_LAKES = ['farshore_isle:388,26', 'veiled_hollow:-120,1105'];
+// under the Watch Meadow dome's +8 (the campaign island moved the spring
+// with the town; the pre-R55 state, kept as scenery once Gull Mere landed)
+// and the Mirrormere under the western-highlands lift. Ruled intentional; a
+// lake that goes dry JOINS this list by a human edit, and one that gains
+// water must LEAVE it (the census arm reds).
+const DECORATIVE_LAKES = ['farshore_isle:992,30', 'veiled_hollow:-120,1105'];
 
 describe('every rod-tier row stands on real water and a real schedule row', () => {
   it('the shipped rod-tier ladder is fully distinguished by the gain schedule', () => {
@@ -1338,7 +1339,9 @@ describe('every rod-tier row stands on real water and a real schedule row', () =
     expect(zone.xMin, 'farshore rect').toBeDefined();
     expect(zone.xMax, 'farshore rect').toBeDefined();
     if (zone.xMin === undefined || zone.xMax === undefined) return;
-    const OFF_STRAND_SEA_FLOOR = { x: 296, z: -172 };
+    // Moved with the campaign island (the old point at 296,-172 fell outside
+    // the re-sited x 700-1300 rect): open sea southwest of the Landing.
+    const OFF_STRAND_SEA_FLOOR = { x: 740, z: -200 };
     expect(OFF_STRAND_SEA_FLOOR.x).toBeGreaterThan(zone.xMin);
     expect(OFF_STRAND_SEA_FLOOR.x).toBeLessThan(zone.xMax);
     expect(OFF_STRAND_SEA_FLOOR.z).toBeGreaterThan(zone.zMin);
@@ -1407,17 +1410,18 @@ describe('every rod-tier row stands on real water and a real schedule row', () =
     // here.
     // Premise first, the sibling arms' idiom (the QA round): the water this
     // cast faces really is open sea (terrain below the WORLD plane, a real
-    // sea surface, outside every declared body: -7.70 against -4.5 at the
-    // 24yd sample when this landed), so a strand-lifting terrain edit cannot
-    // silently degrade this into a duplicate of the dry-hillside deny while
-    // it stays green.
-    expect(terrainHeight(295, -94, WORLD_SEED)).toBeLessThan(waterLevel());
-    expect(Number.isFinite(waterLevelAt(295, -94, WORLD_SEED))).toBe(true);
-    expect(isInWaterBody(295, -94)).toBe(false);
+    // sea surface, outside every declared body: -5.23 against -4.3 at the
+    // 24yd sample when this landed; the stand and sample moved with the
+    // campaign island, whose Landing strand now sits near x 790), so a
+    // strand-lifting terrain edit cannot silently degrade this into a
+    // duplicate of the dry-hillside deny while it stays green.
+    expect(terrainHeight(790, -84, WORLD_SEED)).toBeLessThan(waterLevel());
+    expect(Number.isFinite(waterLevelAt(790, -84, WORLD_SEED))).toBe(true);
+    expect(isInWaterBody(790, -84)).toBe(false);
     const sim = makeSim();
     const meta = sim.meta(sim.playerId) as PlayerMeta;
     sim.addItem('silverstream_fishing_rod', 1);
-    teleportTo(sim, 295, -70);
+    teleportTo(sim, 790, -60);
     sim.player.facing = Math.PI; // toward -z, off the strand and out to sea
     const evStart = sim.events.length;
     startFishing(sim.ctx, sim.player, meta);
@@ -1438,9 +1442,11 @@ describe('every rod-tier row stands on real water and a real schedule row', () =
     // decorative pre-R55 Hilltop state, or the 1 percent Glimmermere shape:
     // a dome-lifted bed zeroes the fraction). The 0.5 floor is deliberately
     // half the measured 0.82 so terrain noise never flakes it.
+    // Gull Mere moved with the campaign island (the old basin at 350,118 lay
+    // in the open strait once the isle re-sited to x 700-1300).
     const farshore = ZONES.find((z) => z.id === 'farshore_isle');
-    const mere = farshore?.lakes.find((l) => l.x === 350 && l.z === 118);
-    expect(mere).toEqual({ x: 350, z: 118, radius: 10 });
+    const mere = farshore?.lakes.find((l) => l.x === 866 && l.z === -2);
+    expect(mere).toEqual({ x: 866, z: -2, radius: 10 });
     const lake = mere as { x: number; z: number; radius: number };
     const seed = WORLD_SEED;
     let wet = 0;

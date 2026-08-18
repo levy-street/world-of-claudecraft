@@ -120,6 +120,14 @@ export const hudChromeStrings = {
     busy: 'Finish your current action before using Unstuck.',
     unavailable: 'Unstuck is unavailable in your current state.',
   },
+  // Last Bell scene overlay + dialogue-choice window. Generic scene UI only:
+  // scene CONTENT keys (prompts, options, dialogue lines, speakers) arrive on
+  // the wire with the campaign content and are rendered via t(key) directly.
+  scene: {
+    skipHint: 'Skip scene (Esc)',
+    waitingFor: 'Waiting for {name}',
+    timer: '{seconds}s',
+  },
   // Floating combat text self-notes (proc consume labels, absorb readout).
   fct: {
     absorbed: 'Absorbed ({amount})',
@@ -883,11 +891,10 @@ export const hudChromeStrings = {
     resetConfirmBody:
       'The first bar returns to its default keys. The second and third bars become unbound. This cannot be undone.',
   },
-  // The character sheet's mount picker (mount_picker.ts; the old Mounts window
-  // is retired, its keys stay per the retired-but-translated chrome precedent).
-  // Names and descriptions come from the reference cards
+  // Rideable mount labels and the shared reins affordance. Names and descriptions
+  // come from the reference cards
   // (src/sim/content/mounts.ts carries the canonical English names for the sim
-  // side); clickManage is the bag tooltip hint on a collected reins item.
+  // side); useToRide is shared by every reins tooltip surface.
   mounts: {
     title: 'Mounts',
     close: 'Close',
@@ -896,13 +903,7 @@ export const hudChromeStrings = {
     riding: 'Riding',
     mount: 'Mount',
     dismount: 'Dismount',
-    // Reins are usable items: the bag tooltip tells the player to use them. There
-    // is no per-mount level gate and no picker, so the old requiresLevel /
-    // pickFirst / keybindHint lines went with them.
     useToRide: 'Use to summon this mount.',
-    // The empty state, shown when the player owns no mount yet: a heading plus
-    // how to earn a first one (the stablemaster's riding lessons) and the rarer
-    // boss-drop mounts.
     emptyTitle: 'No mounts collected',
     emptyStableHint:
       'Reach level 20 and take riding lessons with Stablemaster Marla at the Highwatch Stables, west of Highwatch.',
@@ -944,9 +945,10 @@ export const hudChromeStrings = {
   // the current flow starts on the glowing race platform.
   mountTraining: {
     mountPrompt: 'Press {key} to mount the training Valorsteed.',
-    // Shown once the riding lesson is turned in and the reward reins land in the
-    // bags. It must teach the ITEM, not a keybind: summoning your own mount is a
-    // bag / action-bar click now.
+    // Shown once the riding lesson is turned in. The quest teaches riding but
+    // awards no reins; Marla sells the Valorsteed item separately.
+    buyReinsPrompt:
+      'Riding learned. Buy Valorsteed reins from Marla for 10 gold, then use them to ride.',
     ownedMountPrompt: 'Your reins are in your bags. Use them to ride.',
     ridePrompt: 'Follow the glowing marker to the start line, then press Start Race.',
     begin: 'Begin Lesson',
@@ -3354,6 +3356,17 @@ export const hudChromeStrings = {
   },
   noticeboard: {
     empty: 'Nothing seems posted.',
+  },
+  // The memorial plaque: the Roll of Honour shown for reading a war memorial.
+  // The names themselves are proper nouns spliced verbatim from content and are
+  // never translated; only this chrome is.
+  memorial: {
+    title: 'Memorial',
+    dedication:
+      'To the wardens of Gullhaven who carried a seal into the Breach and did not come out again. The town keeps the bell for them.',
+    rollHeading: 'Roll of Honour ({count})',
+    roomRemaining: 'The stone below the last name has been left bare.',
+    close: 'Close memorial',
   },
   // The bank window (the Gilded Strongbox): a pooled deposit box shown while standing
   // at a banker NPC. Plain click withdraws a stack; shift-click withdraws a partial

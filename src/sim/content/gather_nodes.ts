@@ -1476,11 +1476,24 @@ export const GATHER_NODES: GatherNodeDef[] = [
 
   // The Farshore, around Gullhaven: hub-outskirt veins, stands, and patches so every
   // profession can gather without backtracking to an older zone.
+  //
+  // The whole kit sits on the Last Bell campaign island (x 700 to 1300). The
+  // pre-campaign isle lay at x 180 to 540; when the island moved, fourteen of
+  // the eighteen nodes were still authored against the old ground and stood in
+  // open strait, so every spot below was re-surveyed against the merged
+  // heightfield: a yard of world-sea freeboard, the whole 5yd harvest disc dry,
+  // slope under the climb gate across the reach, standable unblocked ground,
+  // clear of the 5yd road band, hub-flood reachable, and spread so the zone
+  // holds the bottom-map coverage floor (measured 47.1 percent of walkable
+  // ground within 40yd of a node at the move).
   {
     id: 'ore_farshore_isle_1',
     zoneId: 'farshore_isle',
     type: 'ore',
-    pos: { x: 343, z: 44 },
+    // Hub-outskirt vein northeast of the town, off (860,40): that spot's
+    // harvest disc dipped 0.79yd under the sea plane in the low bowl north
+    // of Gull Mere. Now up the rise, 5.2yd of freeboard, whole reach 3.3 dry.
+    pos: { x: 850, z: 58 },
     level: 5,
     tier: 1,
   },
@@ -1488,7 +1501,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'ore_farshore_isle_2',
     zoneId: 'farshore_isle',
     type: 'ore',
-    pos: { x: 351, z: 84 },
+    pos: { x: 952, z: -62 },
     level: 5,
     tier: 1,
   },
@@ -1496,12 +1509,9 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'wood_farshore_isle_1',
     zoneId: 'farshore_isle',
     type: 'wood',
-    // Nudged off (263,92) at the v0.32.0 merge: a 1.9 rise/run bluff sat
-    // inside the authored spot's 5yd harvest reach. Moved uphill off
-    // (259,96) at the release/v0.34.0 merge: open-sea swim made the shore
-    // shallows real water and the old strand spot's harvest disc dipped to
-    // swim depth (its sea-plane exemption retired with the move).
-    pos: { x: 269, z: 83 },
+    // The Wreckfields' west hedge, north of the town walls (moved with the
+    // campaign island off the old isle's strand at (269,83)).
+    pos: { x: 836, z: 196 },
     level: 5,
     tier: 1,
   },
@@ -1509,7 +1519,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'wood_farshore_isle_2',
     zoneId: 'farshore_isle',
     type: 'wood',
-    pos: { x: 275, z: 32 },
+    pos: { x: 918, z: 152 },
     level: 5,
     tier: 1,
   },
@@ -1517,7 +1527,10 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'herb_farshore_isle_1',
     zoneId: 'farshore_isle',
     type: 'herb',
-    pos: { x: 323, z: 114 },
+    // Riftfields road verge, east side. Moved off (1002,-88): that spot stood
+    // 0.33yd from the Watch Meadow to Riftfields road's center line, in the
+    // roadway by the R11 standard; now 10.5yd clear of the band.
+    pos: { x: 1014, z: -86 },
     level: 5,
     tier: 1,
   },
@@ -1525,11 +1538,9 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'herb_farshore_isle_2',
     zoneId: 'farshore_isle',
     type: 'herb',
-    // Moved inland off (291,122) at the release/v0.34.0 merge: open-sea
-    // swim made the shore shallows real water, and the old spot sat at swim
-    // depth with no standable ground in harvest reach (its sea-plane
-    // exemption retired with the move). Still 33yd from its pair.
-    pos: { x: 291, z: 104 },
+    // The east fields, south of the wretch-held hedgerows (moved with the
+    // campaign island off the old isle at (291,104)).
+    pos: { x: 1052, z: 55 },
     level: 5,
     tier: 1,
   },
@@ -1539,8 +1550,8 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'ore_farshore_isle_3',
     zoneId: 'farshore_isle',
     type: 'ore',
-    // Causeway-approach meadow north of the Landing.
-    pos: { x: 232, z: 30 },
+    // Ferry-approach meadow north of the Landing.
+    pos: { x: 762, z: 6 },
     level: 5,
     tier: 1,
   },
@@ -1548,8 +1559,8 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'ore_farshore_isle_4',
     zoneId: 'farshore_isle',
     type: 'ore',
-    // South headland toward the cliffs.
-    pos: { x: 352, z: -48 },
+    // The Riftfields' west approach.
+    pos: { x: 930, z: -150 },
     level: 5,
     tier: 1,
   },
@@ -1557,8 +1568,8 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'ore_farshore_isle_5',
     zoneId: 'farshore_isle',
     type: 'ore',
-    // Sundered Cliffs meadow.
-    pos: { x: 430, z: -90 },
+    // The Sundered Cliffs' meadow, west of the massifs' foot.
+    pos: { x: 1040, z: -100 },
     level: 5,
     tier: 1,
   },
@@ -1566,9 +1577,8 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'ore_farshore_isle_6',
     zoneId: 'farshore_isle',
     type: 'ore',
-    // Riftfields east reach. Nudged off (454,93) at authoring (Q15): 1.02yd
-    // of world-sea freeboard; the moved spot clears at 1.50.
-    pos: { x: 450, z: 93 },
+    // The Wreckfields' tide-line rise, east of the wreck camps.
+    pos: { x: 940, z: 205 },
     level: 5,
     tier: 1,
   },
@@ -1576,8 +1586,8 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'wood_farshore_isle_3',
     zoneId: 'farshore_isle',
     type: 'wood',
-    // South strand west.
-    pos: { x: 279, z: -44 },
+    // South strand west, below the Riftfields plateau.
+    pos: { x: 944, z: -190 },
     level: 5,
     tier: 1,
   },
@@ -1585,8 +1595,8 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'wood_farshore_isle_4',
     zoneId: 'farshore_isle',
     type: 'wood',
-    // South headland stand.
-    pos: { x: 330, z: -70 },
+    // South headland stand, the strand's east end.
+    pos: { x: 980, z: -202 },
     level: 5,
     tier: 1,
   },
@@ -1594,10 +1604,8 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'wood_farshore_isle_5',
     zoneId: 'farshore_isle',
     type: 'wood',
-    // North coast east of Gull Mere, bundling with the fishing site. Nudged
-    // off (388,123) at authoring (Q15): 1.04yd of world-sea freeboard; the
-    // moved spot clears at 1.50.
-    pos: { x: 386, z: 120 },
+    // The Watch Meadow's west slope, off the vigil road.
+    pos: { x: 952, z: 8 },
     level: 5,
     tier: 1,
   },
@@ -1605,13 +1613,8 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'wood_farshore_isle_6',
     zoneId: 'farshore_isle',
     type: 'wood',
-    // Ferrywalk causeway approach. Moved inland off (210,-24): that spot sat
-    // on the last yard of the causeway spit with the sea 2 yards away and
-    // 1.32yd deep inside the harvest disc, so a fifth of the ground a player
-    // could legally gather from was open water and the logs read as standing
-    // in the surf. Now up the approach, 6.2yd of freeboard with the whole
-    // reach 2.7yd clear of the water.
-    pos: { x: 207, z: -18 },
+    // The Landing's south point, where the ferry puts ashore.
+    pos: { x: 766, z: -56 },
     level: 5,
     tier: 1,
   },
@@ -1620,7 +1623,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     zoneId: 'farshore_isle',
     type: 'herb',
     // West meadow off the shore road.
-    pos: { x: 245, z: 55 },
+    pos: { x: 800, z: 80 },
     level: 5,
     tier: 1,
   },
@@ -1628,17 +1631,10 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'herb_farshore_isle_4',
     zoneId: 'farshore_isle',
     type: 'herb',
-    // North shore east of Gull Mere, outside its blend footprint, bundling
-    // with the fishing site. Nudged off (358,140) at authoring (Q15): 1.16yd
-    // of world-sea freeboard; the moved spot clears at 1.52. Moved off
-    // (358,138) too: that spot stood on the NECK between the mere and the sea,
-    // open water on four of its eight compass bearings at 14 yards and the
-    // waterline on a fifth, with the shoreline tangent to its harvest reach
-    // (+0.07yd). That is the patch the player report meant by "in the water"
-    // even though every guard passed it. Now back off the neck onto the shore
-    // meadow, 2.5yd of freeboard with the whole reach 2.1yd dry, still walking
-    // distance from the fishing site.
-    pos: { x: 366, z: 128 },
+    // Shore meadow east of Gull Mere, outside its carve footprint, bundling
+    // with the fishing site (19yd off the mere's center against its 16yd
+    // carve reach, 2.7yd of freeboard, whole reach 1.8 dry).
+    pos: { x: 884, z: -8 },
     level: 5,
     tier: 1,
   },
@@ -1646,8 +1642,8 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'herb_farshore_isle_5',
     zoneId: 'farshore_isle',
     type: 'herb',
-    // South strand patch.
-    pos: { x: 295, z: -55 },
+    // The wracked grain rows' north patch.
+    pos: { x: 900, z: 95 },
     level: 5,
     tier: 1,
   },
@@ -1655,8 +1651,8 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'herb_farshore_isle_6',
     zoneId: 'farshore_isle',
     type: 'herb',
-    // Riftfields patch.
-    pos: { x: 430, z: 8 },
+    // The cliffs' south foot patch, off the Sundered Cliffs road's end.
+    pos: { x: 1090, z: -25 },
     level: 5,
     tier: 1,
   },

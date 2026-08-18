@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { ClientWorld } from '../src/net/online';
+import { bareClient } from './helpers/bare_client';
 
 // The market window painter is a DOM module; driving the live DOM + events is the
 // opt-in browser suite. This is the no-DOM-suite equivalent: it
@@ -688,26 +688,13 @@ describe('market_window: the Sell tab price-check stays in sync with the staged 
 // reconnect `hello` frame against a stub socket and asserts the command frame
 // actually lands.
 describe('ClientWorld: reconnect re-push of session preferences (#2723 review)', () => {
+  // Built on the shared bareClient fixture (tests/CLAUDE.md, issue #2088) so
+  // a new ClientWorld class field (the Last Bell scene mirrors landed four)
+  // never needs a manual sweep here: the hello handler now converges scene
+  // state through queueSceneConvergence, which reads eventQueue and the scene
+  // mirrors the old hand-rolled copy predated.
   function bareClientWithSocket(): { client: any; sent: Array<Record<string, unknown>> } {
-    const client: any = Object.create(ClientWorld.prototype);
-    client.cfg = { seed: 1, playerClass: 'warrior' };
-    client.entities = new Map();
-    client.playerId = 1;
-    client.ownPlayerId = 1;
-    client.ownPlayerClass = 'warrior';
-    client.spectating = null;
-    client.spectateFacingPending = false;
-    client.pendingSpectateFacing = null;
-    client.pendingTargetEcho = null;
-    client.pendingInputSeqSentAt = new Map();
-    client.inputEchoSamples = [];
-    client.missingSince = new Map();
-    client.marketInfo = null;
-    client.profanityWords = [];
-    client.profanityDirty = false;
-    client.moveInput = {};
-    client.mouselookFacing = null;
-    client.onReconnected = null;
+    const client: any = bareClient(1, { cfg: { seed: 1, playerClass: 'warrior' } });
     const sent: Array<Record<string, unknown>> = [];
     client.ws = { readyState: 1, send: (payload: string) => sent.push(JSON.parse(payload)) };
     return { client, sent };

@@ -214,6 +214,10 @@ describe('coverage: each scenario fires its subsystem', () => {
     // camp fix: the tie SHAPE is preserved (two rollers level at the top), only
     // which rollers tie, the third roll, and the tie-break's winner move, because
     // these branches shift the shared rng and never master-loot logic itself.
+    // The v0.39.0 merge reconciliation briefly re-hunted 38 -> 67 ([7, 85,
+    // 85]), but that shift was the merge dropping the camp sharedRngCount
+    // application; with the selector restored (rngForSpawn in sim.ts) the
+    // pre-merge seed-38 rolls hold again and the re-hunt is reverted.
     expect(needRolls).toEqual([46, 60, 60]); // c and d tie at the top, b below
     // The tie-break picked d, and that outcome is the one observable effect of the
     // master-loot-only draw, so it is pinned by name and by winning roll. WHICH of

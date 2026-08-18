@@ -59,8 +59,10 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // auto-merged identical numbers before while the real total was higher; the
 // merged tree carries BOTH sides' pairs. Only the suite says what they really
 // are, and the numbers below were set from a run, not from this narrative.
-const EXPECTED_SEND_COUNT = 199;
-const EXPECTED_DISPATCH_COUNT = 212;
+// +2 on the v0.39.0 merge: the Last Bell scene commands (scene_skip,
+// scene_choice) join the release's 199.
+const EXPECTED_SEND_COUNT = 201;
+const EXPECTED_DISPATCH_COUNT = 214;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

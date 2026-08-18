@@ -751,10 +751,11 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
 describe('grip override wiring (editor saves reach the game)', () => {
   it('the render attach path consumes WEAPON_GRIP_OVERRIDES via variantGripTransform', () => {
     // Round-1 port regression guard: weapon_grip.ts (the registry the
-    // inspector's grip Save writes) was once dead code because assets.ts kept
+    // inspector's grip Save writes) was once dead code because the attach path kept
     // its own bare lift/flip/clamp. The attach path must compose the per-weapon
-    // override through the same pure transform the inspector previews.
-    const src = readFileSync(join(ROOT, 'src/render/characters/assets.ts'), 'utf8');
+    // override through the same pure transform the inspector previews. That path is
+    // now `prop_placement_core`, the one resolver every surface shares.
+    const src = readFileSync(join(ROOT, 'src/render/characters/prop_placement_core.ts'), 'utf8');
     expect(src).toContain("from './weapon_grip'");
     expect(src).toContain('variantGripTransform(');
     expect(src).toContain('WEAPON_GRIP_OVERRIDES[');
@@ -922,7 +923,7 @@ describe('render registry integrity', () => {
   it('every skin model has a KAYKIT_WEAPON_ACCESSORY grip family', () => {
     // Without a grip family the model attaches at the bone origin untransformed.
     const gripped = new Set(
-      registryKeys('src/render/characters/assets.ts', 'const KAYKIT_WEAPON_ACCESSORY'),
+      registryKeys('src/render/characters/prop_placement_core.ts', 'const KAYKIT_WEAPON_ACCESSORY'),
     );
     expect(gripped.size).toBeGreaterThan(30);
     for (const skin of WEAPON_SKIN_LIST) {

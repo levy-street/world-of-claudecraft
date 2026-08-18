@@ -37,6 +37,7 @@ import type { PendingLootRoll } from '../../src/sim/loot/loot_roll';
 import { RIFT_MECHANIC_SPACING_SEC } from '../../src/sim/mob/mechanic_spacing';
 import { startFishing } from '../../src/sim/professions/fishing';
 import { gatherCastDurationSec, gatherNodeById } from '../../src/sim/professions/gathering';
+import { scenarioRunFor, startScenario } from '../../src/sim/scenarios/scenarios';
 import { type ArenaMatch, type PlayerMeta, Sim } from '../../src/sim/sim';
 import { ARENA_MIN_LEVEL } from '../../src/sim/social/arena';
 import { addThreat } from '../../src/sim/threat';
@@ -1660,7 +1661,11 @@ function masterLoot(): Scenario {
     // at the old seed the need rolls stopped TYING. The tie is the whole point
     // of the scenario's last coverage line (resolveLootRoll's tie-break
     // rng.int), so the seed is re-hunted to keep two rollers level rather than
-    // re-recorded to whatever the new draw happens to be.
+    // re-recorded to whatever the new draw happens to be. The v0.39.0 merge
+    // reconciliation briefly re-hunted 38 -> 67, but that shift was the merge
+    // DROPPING the camp sharedRngCount application (rngForSpawn in sim.ts),
+    // not real content drift; with the selector restored the pre-merge stream
+    // holds and seed 38 ties again, so the re-hunt is reverted.
     build: () =>
       new Sim({
         seed: 38,
@@ -4682,6 +4687,11 @@ function cardDuel(): Scenario {
 // byte-identical, exactly what a markVisited-only change predicts. The visit
 // write landed one commit before the re-record, so a bisect straddling that
 // pair sees a false parity red on the intermediate commit.
+// The v0.39.0 merge reconciliation briefly re-hunted seed 5 -> 6, but that
+// proc shift was the merge dropping the camp sharedRngCount application
+// (rngForSpawn in sim.ts), not real content drift; with the selector restored
+// the pre-merge stream holds and seed 5 procs again, so the re-hunt is
+// reverted.
 function professionsCraft(seed = 5): Scenario {
   return {
     name: 'professions_craft',
@@ -5809,6 +5819,80 @@ function catFormAutoSwing(): Scenario {
   };
 }
 
+function lastBellTidemill(): Scenario {
+  return {
+    name: 'last_bell_tidemill',
+    coverage: [
+      'Last Bell shipped scenario entry (sc_lb_q0_tidemill)',
+      'rng-free scenario spawn arming + tracked Tidemill Stalker',
+      'normal quest kill credit advances q_lb_q0_ashore',
+      'doorway scene start/ops/end + squad spawn/despawn',
+    ],
+    build: () =>
+      new Sim({
+        seed: 20_061,
+        playerClass: 'warrior',
+        playerName: 'Bell',
+        autoEquip: true,
+      }),
+    drive(rec: Recorder) {
+      const sim = rec.sim as AnySim;
+      sim.setPlayerLevel(20);
+      const pid = sim.playerId as number;
+      const meta = sim.players.get(pid);
+      if (!meta) throw new Error('Last Bell parity player missing');
+      meta.questLog.set('q_lb_q0_ashore', {
+        questId: 'q_lb_q0_ashore',
+        counts: [1, 12, 0],
+        state: 'active',
+      });
+      rec.notes.started = startScenario(sim.ctx, 'sc_lb_q0_tidemill', pid);
+      const claim = sim.ctx.instances.find(
+        (instance: { dungeonId: string; partyKey: string | null }) =>
+          instance.dungeonId === 'lb_tidemill' && instance.partyKey !== null,
+      );
+      if (!claim || claim.exitId === null) throw new Error('Last Bell Tidemill claim missing');
+      rec.notes.claimId = claim.exitId;
+      rec.snapshot('entered-tidemill');
+
+      rec.tick(1);
+      const run = scenarioRunFor(sim.ctx, claim.exitId);
+      if (!run) throw new Error('Last Bell Tidemill run missing');
+      const stalkerId = run.stageSpawnIds[0];
+      if (stalkerId === undefined) throw new Error('Tidemill Stalker did not spawn');
+      rec.notes.stalkerId = stalkerId;
+      rec.track(stalkerId);
+      rec.snapshot('stalker-armed');
+
+      const stalker = sim.entities.get(stalkerId) as AnyEntity | undefined;
+      if (!stalker) throw new Error('Tidemill Stalker entity missing');
+      lethal(sim, sim.player, stalker);
+      rec.tick(2);
+      const squadIds = [...sim.entities.values()]
+        .filter((entity: AnyEntity) =>
+          ['lb_actor_coalfast', 'lb_actor_tam'].includes(entity.templateId),
+        )
+        .map((entity: AnyEntity) => entity.id)
+        .sort((a: number, b: number) => a - b);
+      if (squadIds.length !== 2) throw new Error('Last Bell doorway squad did not spawn');
+      rec.notes.squadSpawned = true;
+      rec.notes.squadIds = squadIds;
+      for (const actorId of squadIds) rec.track(actorId);
+      rec.snapshot('doorway-scene-armed');
+
+      // The builder-authored scene ends at 15 seconds (subtitle read-time
+      // floors and the fade-in tail lengthened it); leave one second of runway
+      // for the scenario driver to observe completion and despawn the squad.
+      rec.tick(20 * 16);
+      rec.snapshot('tidemill-complete');
+    },
+  };
+}
+
+// Mount-reins integration seam: the collectible item is the summon command,
+// the per-tick transition applies its exact catalog mount, using the same reins
+// again dismounts instantly, and ownership remains because reins are reusable.
+
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
@@ -5867,6 +5951,7 @@ export const SCENARIOS: Scenario[] = [
   chatSocial(),
   professionsCraft(),
   professionsGather(),
+  lastBellTidemill(),
   shamanEngines(),
   druidEngines(),
   priestCodex(),

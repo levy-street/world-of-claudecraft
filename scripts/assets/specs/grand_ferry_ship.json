@@ -1,0 +1,10 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/grand_ferry_ship/grand_ferry_ship-final.glb",
+      "out": "models/props/grand_ferry_ship.glb",
+      "type": "static",
+      "keepExtras": true
+    }
+  ]
+}

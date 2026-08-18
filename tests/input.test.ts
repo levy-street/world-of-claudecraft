@@ -158,6 +158,85 @@ describe('Input autorun', () => {
     expect(input.readMoveInput().forward).toBe(false);
   });
 
+  it('hard-locks scene movement and clears persistent travel latches', () => {
+    const { input, windowListeners } = makeInput();
+    const now = vi.spyOn(performance, 'now').mockReturnValue(1_000);
+    input.setAutorun(true);
+    input.setClickMoveTarget({ x: 8, z: 3 }, 0.5);
+    input.triggerTouchJump();
+    input.setControllerFacing(1.25);
+    windowListeners.get('keydown')?.({
+      code: 'Space',
+      repeat: false,
+      preventDefault: vi.fn(),
+    });
+    windowListeners.get('keyup')?.({ code: 'Space' });
+
+    input.setSceneInputLocked(true);
+
+    expect(input.autorun).toBe(false);
+    expect(input.clickMoveTarget).toBeNull();
+    expect(input.clickMoveGoal).toBeNull();
+    expect(input.readMoveInput()).toEqual({
+      forward: false,
+      back: false,
+      turnLeft: false,
+      turnRight: false,
+      strafeLeft: false,
+      strafeRight: false,
+      jump: false,
+      dive: false,
+      surface: false,
+    });
+    expect(input.controllerFacingOverride()).toBeNull();
+
+    expect(input.toggleAutorun()).toBe(false);
+    expect(input.setAutorun(true)).toBe(false);
+    input.setClickMoveTarget({ x: 12, z: 7 }, 0.5);
+    input.setTouchMove({ forward: true, back: false, strafeLeft: false, strafeRight: false });
+    input.setGamepadMove({ forward: true, back: false, strafeLeft: false, strafeRight: false });
+    input.setControllerMoveInput({ forward: true });
+    input.setControllerFacing(2.5);
+    input.triggerTouchJump();
+
+    input.setSceneInputLocked(false);
+
+    expect(input.autorun).toBe(false);
+    expect(input.clickMoveTarget).toBeNull();
+    expect(input.readMoveInput().forward).toBe(false);
+    expect(input.readMoveInput().jump).toBe(false);
+    expect(input.controllerFacingOverride()).toBeNull();
+
+    input.setSceneInputLocked(true);
+    input.triggerGamepadJump();
+    input.setSceneInputLocked(false);
+    expect(input.readMoveInput().jump).toBe(false);
+
+    input.setTouchMove({ forward: true, back: false, strafeLeft: false, strafeRight: false });
+    input.setControllerMoveInput({ strafeRight: true });
+    input.setControllerFacing(0.75);
+    input.triggerTouchJump();
+
+    expect(input.readMoveInput()).toEqual({
+      forward: false,
+      back: false,
+      turnLeft: false,
+      turnRight: false,
+      strafeLeft: false,
+      strafeRight: true,
+      jump: false,
+      dive: false,
+      surface: false,
+      swimSteer: undefined,
+    });
+    expect(input.controllerFacingOverride()).toBe(0.75);
+
+    input.clearControllerMoveInput();
+    expect(input.readMoveInput().forward).toBe(true);
+    expect(input.readMoveInput().jump).toBe(true);
+    now.mockRestore();
+  });
+
   it('a forward touch-move cancels autorun (classic tap-to-stop)', () => {
     const { input } = makeInput();
     input.toggleAutorun();
@@ -766,6 +845,46 @@ describe('Input pointer lock', () => {
 
     now += 40;
     windowListeners.get('mouseup')!({ button: 0, clientX: 132, clientY: 163, target: canvas });
+    expect(cb.onClickPick).toHaveBeenCalledWith(120, 160, 0);
+  });
+
+  it('does not dispatch a canvas pick while gameplay input is blocked', () => {
+    const { canvas, cb, canvasListeners, windowListeners } = makeInput();
+    (cb as any).canUseGameKeys = vi.fn(() => false);
+
+    canvasListeners.get('mousedown')!({
+      button: 0,
+      clientX: 120,
+      clientY: 160,
+      preventDefault: vi.fn(),
+    });
+    windowListeners.get('mouseup')!({
+      button: 0,
+      clientX: 120,
+      clientY: 160,
+      target: canvas,
+    });
+
+    expect(cb.onClickPick).not.toHaveBeenCalled();
+  });
+
+  it('dispatches a canvas pick when the production gameplay gate explicitly allows it', () => {
+    const { canvas, cb, canvasListeners, windowListeners } = makeInput();
+    (cb as any).canUseGameKeys = vi.fn(() => true);
+
+    canvasListeners.get('mousedown')!({
+      button: 0,
+      clientX: 120,
+      clientY: 160,
+      preventDefault: vi.fn(),
+    });
+    windowListeners.get('mouseup')!({
+      button: 0,
+      clientX: 120,
+      clientY: 160,
+      target: canvas,
+    });
+
     expect(cb.onClickPick).toHaveBeenCalledWith(120, 160, 0);
   });
 

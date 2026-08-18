@@ -23,6 +23,10 @@ export const DUNGEON_DOORS: ReadonlyArray<{ x: number; z: number }> = (() => {
   const seen = new Set<string>();
   const doors: { x: number; z: number }[] = [];
   for (const d of Object.values(DUNGEONS)) {
+    // A def with no overworld door (story spaces, internal rooms) has no door
+    // to stand on: its doorPos is only a leave-teleport RETURN anchor, and it
+    // must not carve a spawn-clear ring out of the camps living there.
+    if (d.overworldDoor === false) continue;
     const door = d.doorPos;
     if (!door) continue;
     const key = `${door.x},${door.z}`;

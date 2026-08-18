@@ -61,6 +61,7 @@ import {
 import { rectShellWallSegments, stubFaceSegments } from './dungeon_wall_segments';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { EMISSIVE_LIGHT, GFX, sharedUniforms } from './gfx';
+import { buildLastBellStoryInterior } from './last_bell_props';
 import { buildLastKeepDressing, ensureLastKeepDressing } from './lastkeep_dressing';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
@@ -774,6 +775,11 @@ export class DungeonInteriors {
       // base kits. `style.kit` picks the wall/floor/prop mesh mix; `style.torch`
       // overrides the torch/light colours. Undefined for authored dungeons/delves.
       style?: InteriorStyle;
+      // Last Bell story spaces share one interior kind ('farshore_story') but
+      // each area keys on its DUNGEON id (the colliders.ts pattern); mirror
+      // areas also need the world seed to re-sample the island's terrain.
+      dungeonId?: string;
+      seed?: number;
     },
   ): Promise<THREE.Group> {
     await ensureDungeonAssets();
@@ -785,6 +791,21 @@ export class DungeonInteriors {
       });
       group.position.set(ox, 0, oz);
       group.userData.renderCategory = 'dungeon';
+      this.scene.add(group);
+      return group;
+    }
+    // Last Bell story spaces: one open-air interior kind, nine areas keyed by
+    // dungeon id (src/sim/last_bell_field.ts drives ground, walls, and props
+    // for render, sim terrain, and collision alike).
+    if (interior === 'farshore_story') {
+      const group = buildLastBellStoryInterior({
+        dungeonId: opts?.dungeonId ?? '',
+        seed: opts?.seed ?? 0,
+        lowGfx: this.lowGfx,
+        flames: this.flames,
+        fireLights: this.fireLights,
+      });
+      group.position.set(ox, 0, oz);
       this.scene.add(group);
       return group;
     }

@@ -1,5 +1,6 @@
 import { DELVES, ITEMS, NPCS, QUESTS, questRewardItem } from '../../../sim/data';
 import { CHRONICLER_TEMPLATE_IDS } from '../../../sim/deeds';
+import { FERRY_FARE_COPPER, ferryFareOfferFor } from '../../../sim/last_bell/campaign';
 import { craftsForPairTarget } from '../../../sim/professions/archetype';
 import { professionQuestSelectionTargets } from '../../../sim/quests/profession_quest_effects';
 import { npcQuestMarkerKind, type QuestMarkerKind } from '../../../sim/quests/quest_marker_kind';
@@ -12,7 +13,7 @@ import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import type { FocusTrapHandle } from '../../focus_manager';
-import { t } from '../../i18n';
+import { type TranslationKey, t } from '../../i18n';
 import { QUALITY_COLOR } from '../../icons';
 import { NPC_WINDOW_CLOSE_RANGE } from '../../npc_service_range';
 import { archetypeImageUrl } from '../../profession_art';
@@ -379,6 +380,9 @@ export class QuestDialogController {
     );
     const hasValeCup = npc.templateId === 'groundskeeper_bram';
     const hasCardMaster = !!definition?.cardMaster;
+    // Last Bell gangplank keepers sell passage straight from the dialog
+    // (owner spec: talk to the ferryman, press the button, sail).
+    const ferryFare = ferryFareOfferFor(npc.templateId);
     if (
       closeIfEmpty &&
       gossipMenuIsEmpty({
@@ -392,6 +396,7 @@ export class QuestDialogController {
         hasVcup: hasValeCup,
         hasCardMaster,
         hasTraining,
+        hasFerry: ferryFare !== null,
       })
     ) {
       this.close();
@@ -491,6 +496,12 @@ export class QuestDialogController {
     }
     if (hasCardMaster) {
       html += `<button type="button" class="qd-list-item" data-card-duel="1" aria-label="${esc(t('cardDuel.title'))}"><span class="gold">&#9824;</span> ${esc(t('cardDuel.title'))}</button>`;
+    }
+    if (ferryFare) {
+      const fareLabel = t(ferryFare.promptKey as TranslationKey, {
+        price: this.deps.text.number(FERRY_FARE_COPPER),
+      });
+      html += `<button type="button" class="qd-list-item" data-ferry="1" aria-label="${esc(fareLabel)}"><span class="quest-complete">$</span> ${esc(fareLabel)}</button>`;
     }
     this.deps.element.innerHTML = html;
     this.deps.element.querySelectorAll<HTMLElement>('[data-quest]').forEach((item) => {

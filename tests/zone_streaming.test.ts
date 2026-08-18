@@ -22,53 +22,53 @@ describe('renderer zone-streaming horizon', () => {
   });
 
   it('includes a neighbouring column before the player crosses its boundary', () => {
-    const ids = zonesWithinStreamingHorizon(ZONES, 150, 0, 80, 1, 0).map((zone) => zone.id);
-    expect(ids).toEqual(['eastbrook_vale', 'farshore_isle']);
-    const farshore = ZONES.find((zone) => zone.id === 'farshore_isle');
-    if (!farshore) throw new Error('expected Farshore in built-in zones');
-    expect(distanceSqToZone(farshore, 150, 0)).toBe(30 * 30);
+    // From the Mirefen, 30 yd shy of the Galecrest column's west boundary
+    // (x = 180), an 80 yd horizon already contains the column. (This used to
+    // pin the Farshore at the vale's east edge; the island is far offshore
+    // now, so the Galecrest is the nearest column boundary to stand at.)
+    const ids = zonesWithinStreamingHorizon(ZONES, 150, 250, 80, 1, 0).map((zone) => zone.id);
+    expect(ids).toEqual(['mirefen_marsh', 'galecrest', 'eastbrook_vale']);
+    const galecrest = ZONES.find((zone) => zone.id === 'galecrest');
+    if (!galecrest) throw new Error('expected Galecrest in built-in zones');
+    expect(distanceSqToZone(galecrest, 150, 250)).toBe(30 * 30);
   });
 
   it('limits the spawn horizon to nearby regions instead of the whole world', () => {
+    // the Farshore (700 yd east) no longer makes the cut: only the vale's
+    // true land neighbours are inside the 470 yd horizon
     const ids = zonesWithinStreamingHorizon(ZONES, 0, 0, 470, 1, 0).map((zone) => zone.id);
-    expect(ids).toEqual([
-      'eastbrook_vale',
-      'farshore_isle',
-      'mirefen_marsh',
-      'galecrest',
-      'willowfen',
-    ]);
+    expect(ids).toEqual(['eastbrook_vale', 'mirefen_marsh', 'galecrest', 'willowfen']);
     expect(ids.length).toBeLessThan(ZONES.length / 2);
   });
 
   it('limits loading-screen sky uploads to the active and immediately adjacent biomes', () => {
     const nearby = zonesWithinStreamingHorizon(ZONES, 2, -2, INITIAL_SKY_PREWARM_RADIUS);
-    expect(nearby.map((zone) => zone.id)).toEqual([
-      'eastbrook_vale',
-      'farshore_isle',
-      'mirefen_marsh',
-    ]);
+    expect(nearby.map((zone) => zone.id)).toEqual(['eastbrook_vale', 'mirefen_marsh']);
     expect([...new Set(nearby.map((zone) => zone.biome))]).toEqual(['vale', 'marsh']);
   });
 
   it('prioritizes the camera-facing zone when adjacent boundaries tie', () => {
+    // Galecrest and Willowfen both sit exactly sqrt(2) * 180 yd from (0, 0)
+    // (the diagonal corners east and west): the camera facing breaks the tie.
     const east = zonesWithinStreamingHorizon(ZONES, 0, 0, 470, 1, 0).map((zone) => zone.id);
-    const north = zonesWithinStreamingHorizon(ZONES, 0, 0, 470, 0, 1).map((zone) => zone.id);
-    expect(east.indexOf('farshore_isle')).toBeLessThan(east.indexOf('mirefen_marsh'));
-    expect(north.indexOf('mirefen_marsh')).toBeLessThan(north.indexOf('farshore_isle'));
+    const west = zonesWithinStreamingHorizon(ZONES, 0, 0, 470, -1, 0).map((zone) => zone.id);
+    expect(east.indexOf('galecrest')).toBeLessThan(east.indexOf('willowfen'));
+    expect(west.indexOf('willowfen')).toBeLessThan(west.indexOf('galecrest'));
   });
 
   it('prepares the travel-direction zone before a marginally nearer sideways zone', () => {
-    // Regression for the Mirefen crossing stall: from the spawn walk north,
-    // Farshore (178 yd east) is strictly nearer than Mirefen (182 yd north),
-    // so nearest-first ordering spent the whole approach building the isle
-    // while the player crossed into an unprepared marsh.
-    const ids = zonesWithinStreamingHorizon(ZONES, 2, -2, 470, 0, 1).map((zone) => zone.id);
+    // Regression for the Mirefen crossing stall (a travel-direction bias must
+    // beat marginal nearest-first ordering). The original fixture pair, the
+    // Farshore 178 yd east vs the Mirefen 182 yd north of spawn, is gone (the
+    // island is far offshore now); the surviving marginal pair from (2, -2)
+    // is Galecrest (sqrt(64808) yd, the nearer corner) vs Willowfen
+    // (sqrt(66248) yd): walking west must build Willowfen first anyway.
+    const ids = zonesWithinStreamingHorizon(ZONES, 2, -2, 470, -1, 0).map((zone) => zone.id);
     expect(ids[0]).toBe('eastbrook_vale');
-    expect(ids.indexOf('mirefen_marsh')).toBeLessThan(ids.indexOf('farshore_isle'));
-    // A stationary east-facing camera still takes the strictly nearer isle.
+    expect(ids.indexOf('willowfen')).toBeLessThan(ids.indexOf('galecrest'));
+    // A stationary east-facing camera still takes the strictly nearer corner.
     const east = zonesWithinStreamingHorizon(ZONES, 2, -2, 470, 1, 0).map((zone) => zone.id);
-    expect(east.indexOf('farshore_isle')).toBeLessThan(east.indexOf('mirefen_marsh'));
+    expect(east.indexOf('galecrest')).toBeLessThan(east.indexOf('willowfen'));
   });
 
   it('uses a non-zero movement threshold for cheap frame-loop rechecks', () => {

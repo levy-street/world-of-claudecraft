@@ -396,6 +396,11 @@ export const zh_TW: EnTranslations = {
       "busy": "請先完成目前動作再使用脫困。",
       "unavailable": "目前狀態下無法使用脫困。"
     },
+    "scene": {
+      "skipHint": "跳過場景（Esc）",
+      "waitingFor": "等待{name}",
+      "timer": "{seconds}s"
+    },
     "fct": {
       "absorbed": "已吸收（{amount}）",
       "cheap": "費用降低!"
@@ -1089,6 +1094,7 @@ export const zh_TW: EnTranslations = {
     },
     "mountTraining": {
       "mountPrompt": "按 {key} 鍵騎上訓練用英勇戰馬。",
+      "buyReinsPrompt": "騎術已學會。花10金幣向瑪拉購買英勇戰馬韁繩，使用後即可騎乘。",
       "ownedMountPrompt": "你的韁繩已在背包中，使用它即可騎乘。",
       "ridePrompt": "跟隨發光的標記前往起點線，然後點擊開始比賽。",
       "begin": "開始課程",
@@ -2811,6 +2817,13 @@ export const zh_TW: EnTranslations = {
     "noticeboard": {
       "empty": "看起來沒有張貼任何內容。"
     },
+    "memorial": {
+      "title": "紀念碑",
+      "dedication": "獻給那些帶著封印走進裂口、再未歸來的鷗港守望者。小鎮為他們守著這口鐘。",
+      "rollHeading": "英靈名錄（{count}）",
+      "roomRemaining": "最後一個名字下方的石面仍然空著。",
+      "close": "關閉紀念碑"
+    },
     "bank": {
       "title": "銀行",
       "subtitle": "鍍金保險箱",
@@ -3826,6 +3839,39 @@ export const zh_TW: EnTranslations = {
     },
     "arenaGate": {
       "minLevelNote": "需要等級 {level}"
+    }
+  },
+  "lb": {
+    "fixture": {
+      "ferry": "遠岸渡船",
+      "tidemill": "潮汐磨坊",
+      "breach": "裂口"
+    },
+    "speaker": {
+      "tam": "鐘守塔姆",
+      "coalfast": "守望者科爾法斯特",
+      "ollun": "裂隙觀察者奧倫",
+      "edda": "軍需官艾達",
+      "saul": "醫者掃羅"
+    },
+    "fare": {
+      "promptOut": "渡海去遠岸：{price} 銅幣。",
+      "promptBack": "渡海回大陸：{price} 銅幣。",
+      "pay": "付船錢。",
+      "decline": "今天不去。"
+    },
+    "q0": {
+      "scene": {
+        "harbor": "一座勞作中的港口：漁網晾曬著，星璃打撈箱上印著大陸買家的戳記。",
+        "plinth": "港口臺階上方，一尊青銅守望者面朝內陸。基座上最新的名字已有百年：守望者海爾。名字下方還留有餘位。",
+        "toll": "鐘聲響了一下。街上所有人都停下腳步，數著。沒有後續，整條街同時鬆了口氣。"
+      },
+      "tam": {
+        "stretchers": "上次出這麼一個，搭進去全體守望一個上午，外加兩副擔架。"
+      },
+      "coalfast": {
+        "look": "灰髮男人看了看死去的怪物，又看了看你，目光略久。然後他朝崖邊走了回去。"
+      }
     }
   },
   "gatherEvent": {
@@ -6097,6 +6143,33 @@ export const zh_TW: EnTranslations = {
     },
     "inspector": {
       "label": "工具選項"
+    },
+    "cinematic": {
+      "title": "電影場景",
+      "show": "顯示面板",
+      "hide": "隱藏面板",
+      "scene": "場景",
+      "sceneOption": "{id}（{seconds} 秒）",
+      "time": "時間",
+      "timeReadout": "{current} / {duration} 秒",
+      "play": "播放",
+      "pause": "暫停",
+      "authoredCamera": "使用編排鏡頭",
+      "fade": "淡出：{percent}%",
+      "letterboxOn": "寬銀幕：開啟",
+      "letterboxOff": "寬銀幕：關閉",
+      "violations": "違規項目",
+      "noViolations": "目前沒有違規項目",
+      "violationRow": "{check} | 操作 {opIndex} | {measured}",
+      "capture": "擷取關鍵影格",
+      "copy": "複製區塊",
+      "output": "已產生的鏡頭擷取",
+      "unavailable": "3D 視埠載入中",
+      "seedMismatch": "擷取需要正式世界種子",
+      "captureSavedCopied": "已儲存並複製",
+      "captureSaved": "已儲存，區塊已在下方產生",
+      "captureCopyOnly": "已複製，開發寫入器無法使用",
+      "captureReady": "區塊已在下方產生"
     },
     "brush": {
       "title": "筆刷",
@@ -13728,6 +13801,24 @@ export const zh_TW: EnTranslations = {
       "fisher_bram": {
         "name": "漁夫布蘭姆"
       },
+      "lb_actor_coalfast": {
+        "name": "守望者 煤堅"
+      },
+      "lb_actor_ollun": {
+        "name": "裂隙守望 歐倫"
+      },
+      "lb_actor_edda": {
+        "name": "軍需官 艾妲"
+      },
+      "lb_actor_saul": {
+        "name": "療者 索爾"
+      },
+      "lb_actor_tam": {
+        "name": "守鐘人 塔姆"
+      },
+      "tidemill_stalker": {
+        "name": "潮汐磨坊潛獵者"
+      },
       "rift_hellguard": {
         "name": "地獄衛士"
       },
@@ -14287,6 +14378,21 @@ export const zh_TW: EnTranslations = {
         "name": "受驚的 奈兒",
         "title": "鷗港漁人",
         "greeting": "它就開在曬網的地方。就在那裡，就在我這輩子每天清晨站立的地方。我再也不下海岸了。如今哪兒我都幾乎不再去了。"
+      },
+      "ferryman_ewald": {
+        "name": "渡船夫 艾瓦德",
+        "title": "遠岸航線",
+        "greeting": "去遠岸，是嗎？朋友，如今沒人為了打漁渡海了。準備好了就上船。上岸時留意鐘聲：鎮上的人聽鐘，就像你看天色一樣。"
+      },
+      "ferryman_ewald_gullhaven": {
+        "name": "渡船夫 艾瓦德",
+        "title": "遠岸航線",
+        "greeting": "去遠岸，是嗎？朋友，如今沒人為了打漁渡海了。準備好了就上船。上岸時留意鐘聲：鎮上的人聽鐘，就像你看天色一樣。"
+      },
+      "sergeant_marsh": {
+        "name": "馬許中士",
+        "title": "城鎮民兵",
+        "greeting": "受過訓練？那今晚就這麼辦。我的防線守住大路。要是裂隙吐出我們壓不住的東西，我就指向你。磨坊交給你：別讓任何東西跟著你進去，也別讓任何東西越過我們進鎮。去吧。"
       },
       "forgemistress_darva": {
         "name": "達爾瓦鍛造師",
@@ -16284,6 +16390,22 @@ export const zh_TW: EnTranslations = {
           }
         }
       },
+      "q_lb_q0_ashore": {
+        "title": "上岸",
+        "text": "鷗港日夜承受著裂口的衝擊，卻始終堅守。若你想與他們並肩，就從小鎮流血的地方開始：守望草甸的民兵防線，在港口臺階和舊雕像以東。",
+        "completion": "磨坊那一戰是你獨自打下的，塔姆說的擔架也毫不誇張。我缺一名斥候，田野卻嫌太多。今晚你守住了本不屬於你的陣地，而這正是這份職責的全部。歡迎加入守望隊。",
+        "objectives": {
+          "0": {
+            "label": "向守望草甸的馬許中士報到"
+          },
+          "1": {
+            "label": "消滅裂隙孽生體"
+          },
+          "2": {
+            "label": "解決潮汐磨坊裡的東西"
+          }
+        }
+      },
       "q_gc_down_the_windway": {
         "title": "走下風道",
         "text": "你爬完了這段山路，{playerName}，看來風決定留下你了。燭港在丘陵路往東，蜷在海灣的背風處。港務長奧蒂爾清點每一個翻過隘口的人，她也會想清點你。告訴她，風道還開著。",
@@ -16841,6 +16963,12 @@ export const zh_TW: EnTranslations = {
           },
           "4": {
             "label": "裂隙原野"
+          },
+          "5": {
+            "label": "裂口"
+          },
+          "6": {
+            "label": "沉船灘"
           }
         }
       }
@@ -16880,6 +17008,51 @@ export const zh_TW: EnTranslations = {
         "name": "最後的堡壘",
         "enterText": "你踏入最後的堡壘那冰冷而寂靜的大廳。",
         "leaveText": "你帶上堡門，重新走進龍裔荒原的寒風中。"
+      },
+      "lb_tidemill": {
+        "name": "潮汐磨坊",
+        "enterText": "磨坊的門讓開了。裡面，黑暗正在聆聽。",
+        "leaveText": "你走出潮汐磨坊，回到傍晚的空氣中。"
+      },
+      "lb_riftline": {
+        "name": "暮色裂隙防線",
+        "enterText": "草甸大門在巡邏隊身後關閉。今夜屬於這道防線。",
+        "leaveText": "你把裂隙防線留給黎明守衛。"
+      },
+      "lb_vault": {
+        "name": "沉沒的第一堡壘",
+        "enterText": "繩索向黑暗中放下。下方，舊堡壘躺在它墜落之處。",
+        "leaveText": "你沿懸崖繩索爬回日光之下。"
+      },
+      "lb_council": {
+        "name": "堡壘議會",
+        "enterText": "議事廳裡擺著六把椅子。其中一把空著。",
+        "leaveText": "你走出堡壘。"
+      },
+      "lb_landing": {
+        "name": "夜間登陸場",
+        "enterText": "引航火沿海灘漸次燃燒。艦隊在淺灘之外等待。",
+        "leaveText": "你把登陸海灘留在身後。"
+      },
+      "lb_riftfields": {
+        "name": "裂隙原進路",
+        "enterText": "四座守衛祭壇環繞著裂口。封裂儀式已經維繫了十二個世紀。",
+        "leaveText": "你從裂隙原向山下走去。"
+      },
+      "lb_breach": {
+        "name": "裂隙之內",
+        "enterText": "光線不對，天空更糟。那顆核心就在前方的開闊地上。",
+        "leaveText": "你跨過門檻，回到尋常的夜空之下。"
+      },
+      "lb_lastwatch": {
+        "name": "最後守望",
+        "enterText": "堡壘乾淨而空蕩。總得有人結束這場守望。",
+        "leaveText": "你在身後關上堡壘大門。"
+      },
+      "lb_willowfen": {
+        "name": "泣柳澤",
+        "enterText": "柳樹紋絲不動。水面也是。",
+        "leaveText": "你離開柳樹，任它繼續沉寂。"
       },
       "dawnhold_castle": {
         "name": "晨曦堡",

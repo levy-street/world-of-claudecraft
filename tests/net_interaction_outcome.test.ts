@@ -14,6 +14,8 @@ function rig(connected = true) {
     send: (payload: string) => sent.push(payload),
   };
   world.moveInput = {};
+  world.eventQueue = [];
+  world.sceneInputLockedBeforeDrain = false;
   world.pendingInputSeqSentAt = new Map();
   world.inputEchoSamples = [];
   world.reconnectAttempts = 0;

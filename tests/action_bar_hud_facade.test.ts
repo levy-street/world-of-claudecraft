@@ -1,6 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Hud } from '../src/ui/hud';
+import {
+  ACTION_BAR_ABILITY_SLOTS,
+  ActionBarController,
+} from '../src/ui/hud/action_bar/action_bar_controller';
 
 vi.mock('../src/render/characters', () => ({ CharacterPreview: class {} }));
 vi.mock('../src/render/characters/assets', () => ({ preloadMechAssets: vi.fn() }));
@@ -84,5 +88,48 @@ describe('Hud action-bar facade', () => {
     expect(hud.dragAction).toBeNull();
     expect(hud.mobileHotbarDrag).toBeNull();
     expect(clearTimeout).toHaveBeenCalledWith(99);
+  });
+
+  it('activates assigned reins through the shared item slot path', () => {
+    const useItem = vi.fn();
+    const flashActionSlot = vi.fn();
+    vi.stubGlobal('document', {
+      querySelector: () => ({ style: { display: 'none' } }),
+    });
+    const hud = Object.create(Hud.prototype) as any;
+    hud.isGroundAimActive = () => false;
+    hud.attackSlotIsAttack = () => false;
+    hud.actionBarController = new ActionBarController({
+      storage: {
+        getItem: () => null,
+        setItem: () => {},
+        removeItem: () => {},
+      },
+      playerClass: 'warrior',
+      playerName: 'ReinsFacade',
+      playerLevel: () => 10,
+      talentSpec: () => null,
+      knownAbilityIds: () => [],
+      hasAura: () => false,
+      isInSportMatch: () => false,
+      showAttackButton: () => true,
+    });
+    hud.actionBarController.replaceActions(
+      Array.from({ length: ACTION_BAR_ABILITY_SLOTS }, (_, index) =>
+        index === 0 ? { type: 'item', id: 'reins_grag_bear' } : null,
+      ),
+    );
+    hud.tryGatherToolUse = () => false;
+    hud.sim = { tradeInfo: null, useItem };
+    hud.flashActionSlot = flashActionSlot;
+
+    hud.castSlot(1);
+
+    expect(useItem).toHaveBeenCalledTimes(1);
+    expect(useItem).toHaveBeenCalledWith('reins_grag_bear');
+    expect(flashActionSlot).toHaveBeenCalledWith(1);
+    expect(
+      hud.actionBarController.isAssignableAction(hud.actionBarController.actionForSlot(1)),
+    ).toBe(true);
   });
 });

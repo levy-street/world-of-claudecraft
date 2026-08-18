@@ -3372,6 +3372,8 @@ export interface CampDef {
   // pinned by tests/off_stream_rng.test.ts: zero shared draws at world build, and
   // spawn stability under camp reordering.
   offStream?: boolean;
+  /** Shared-stream draws retained by established camp spawns. */
+  sharedRngCount?: number;
 }
 
 // Ground interactables (sparkle objects)
@@ -3452,7 +3454,15 @@ export interface DungeonDef {
   spawns: DungeonSpawn[];
   objects?: DungeonObjectSpawn[];
   // renderer + collider interior builder key
-  interior: 'crypt' | 'sanctum' | 'temple' | 'nythraxis' | 'wildheart' | 'lastkeep' | 'dawnhold';
+  interior:
+    | 'crypt'
+    | 'sanctum'
+    | 'temple'
+    | 'nythraxis'
+    | 'wildheart'
+    | 'farshore_story'
+    | 'lastkeep'
+    | 'dawnhold';
   /**
    * What dresses this dungeon's wall-side obstacle slots (matches the render
    * variant): coffins get one standable lid, cargo splits into the crate
@@ -3605,6 +3615,8 @@ export interface StaticObbPropDef {
   d: number;
   rot: number;
   height: number;
+  /** False when a merged mesh cannot hide this placement independently. */
+  camGhost?: boolean;
   /**
    * The asset renders x-mirrored (an asymmetric wing flipped end for end,
    * e.g. a town-wall wing whose tall lantern pillar swaps sides). Collision
@@ -3658,6 +3670,12 @@ export interface ZonePropsDef {
     rot: number;
     hutLocal: { x: number; z: number; hw: number; hd: number };
   }[];
+  // Authored boardwalk harbors (src/sim/harbor_layout.ts): raised walkable
+  // decks with authored heights, rail/prop colliders, a ship berth, and the
+  // campaign's gangplank/arrival anchors. The defs live in harbor_layout;
+  // zones reference them here so the world/collider arms stay content-gated
+  // (a custom map without harbors gets none).
+  harbors?: readonly import('./harbor_layout').HarborDef[];
   tents: { x: number; z: number; rot: number; scale: number }[];
   marshReeds: [number, number][];
   crates: [number, number][];
@@ -3699,13 +3717,15 @@ export interface ZonePropsDef {
   // colliders here, rendered by render/realm_flora.ts from the same record.
   greatTrees?: { x: number; z: number; r: number }[];
   // Hand-placed one-off GLB props (the generated storybook set). `key` names a
-  // PROP_ASSET_DEFS entry (render/props.ts); the GLB is authored at world scale
-  // with its front on +z, so `rot` alone orients it. r > 0 adds a circle
-  // collider of that radius (keep it matched to the model's measured footprint,
-  // or to the trunk for canopy trees); r 0/absent is walk-through dressing.
-  // h is the visual height, used only for the camera-ghost top. scale is a
-  // uniform visual multiplier over the authored world-scale model; when set,
-  // keep r and h matched to the SCALED footprint by hand.
+  // PROP_ASSET_DEFS entry (render/props.ts); optional `parts` add more catalog
+  // assets to the same local group for composite fixtures. The GLBs are authored
+  // at world scale with their fronts on +z, so `rot` alone orients the group.
+  // r > 0 adds a circle collider of that radius (keep it matched to the model's
+  // measured footprint, or to the trunk for canopy trees); r 0/absent is
+  // walk-through dressing. h is the full visual height, used only for the
+  // camera-ghost top. scale is a uniform visual multiplier over the authored
+  // world-scale model; when set, keep r and h matched to the SCALED footprint
+  // by hand.
   decorProps?: {
     key: string;
     x: number;
@@ -3724,6 +3744,15 @@ export interface ZonePropsDef {
      * it must stay set even when a box is given. */
     hw?: number;
     hd?: number;
+    /** Additional catalog assets in this prop's local, jointly ghosted group. */
+    parts?: {
+      key: string;
+      x?: number;
+      y?: number;
+      z?: number;
+      rot?: number;
+      scale?: number;
+    }[];
     /** ride the water surface instead of the seabed (moored ships/boats);
      * sunk this many yd below the waterline (the hull's draft) */
     float?: number;
@@ -4582,6 +4611,22 @@ export interface Entity extends ClientMirroredEntityFields {
   mobChargeTargetId?: number | null; // dash victim; null/undefined = not dashing
   healedThisPull: boolean; // desperation self-heal already used this pull
   nythraxis?: NythraxisEncounterState; // sim-only state for the Nythraxis raid encounter
+  // Last Bell squad actors (src/sim/squad/squad.ts). Sparse: set only on
+  // spawned actor entities, so existing parity goldens never move.
+  /** Which named actor this entity is (e.g. 'coalfast'); the inert arm in
+   *  mob/locomotion.ts keys on it (the squad brain owns all behavior). */
+  squadActorId?: string;
+  /** The owning story-instance claim (InstanceSlot.exitId). */
+  squadClaimId?: number;
+  /** Story-critical floor: lethal damage clamps to 1 hp and downs the actor
+   *  instead of killing it (combat/damage.ts). */
+  squadFloor?: boolean;
+  /** Downed at the floor: stops acting until a player relieves it. */
+  squadDowned?: boolean;
+  /** Outgoing-damage multiplier from group scaling at spawn. */
+  squadDamageMult?: number;
+  /** Last Bell scenario-entry door: interacting starts this scenario. */
+  scenarioId?: string;
   spawnPos: Vec3;
   leashAnchor: Vec3 | null; // refreshed by hostile player/pet actions; spawnPos remains the true home
   evadeStall: number; // seconds an evading mob has failed to get closer to home; snaps it home if it can't path back (e.g. across water)
@@ -4772,22 +4817,21 @@ export interface Entity extends ClientMirroredEntityFields {
   skinCatalog: SkinCatalog; // player appearance catalog: class texture set or cosmetic body.
   skin: number; // player appearance: index into SKINS[visualKey]; 0 = default. synced in identity fields.
   // Active rideable ground mount ('' = dismounted; players only). Unlike the
-  // render-only cosmetics below, the sim READS this: player_motion.moveSpeedMult
-  // (speed), auto_attack.meleeSwing (melee block), and recalcPlayerStats (crit)
-  // key off it, so it syncs in identity fields (terse `mnt`) like `skin` and the
-  // online self-extrapolator predicts mounted speed in lockstep. The persisted
-  // selection lives on PlayerMeta.selectedMount (src/sim/content/mounts.ts).
+  // render-only cosmetics below, player_motion.moveSpeedMult reads this for the
+  // mount's speed bonus, so it syncs in identity fields (terse `mnt`) and the
+  // online self-extrapolator predicts mounted speed in lockstep.
   mountKey: string;
-  // Mount summon/dismount transition (players only; 0 = idle). Seconds left in the
-  // call-the-mount summon or the dismount, driven per tick by updateMountTransition
-  // (src/sim/mounts.ts). The sim READS it: player_motion.stepPlayerMotion roots the
-  // player (no walk/strafe/jump) while it is > 0, so it must sync on the wire like
-  // mountKey (terse `mcr`) for the online self-extrapolator to root in lockstep and
-  // for other clients to time the summon FX. handleDeath clears it.
+  // Mount summon transition (players only; 0 = idle). Seconds left in the
+  // call-the-mount summon, driven per tick by updateMountTransition
+  // (src/sim/mounts.ts). Movement input cancels a keyed summon rather than rooting
+  // the player. It syncs on the wire like mountKey (terse `mcr`) so the online
+  // self-extrapolator predicts cancellation in lockstep and other clients can time
+  // the summon FX. handleDeath clears it.
   mountCastRemaining: number;
-  // The catalog key being summoned during a mount transition ('' while dismounting or
-  // idle). Render-only (the summon-FX / call-pose the client draws); the sim never
-  // reads it. Syncs on the wire (terse `mck`) alongside mountCastRemaining, and
+  // The catalog key being summoned during a mount transition ('' while idle).
+  // The sim reads it to revalidate and apply the exact owned mount at completion,
+  // and movement reads it to distinguish a live summon from an idle/legacy empty
+  // transition. Syncs on the wire (terse `mck`) alongside mountCastRemaining, and
   // handleDeath clears it.
   mountCastKey: string;
   // Equipped mainhand item id (players only; null otherwise). Render-only: the
@@ -5112,7 +5156,136 @@ export type DamageEventKind = 'hit' | 'miss' | 'dodge' | 'parry' | 'block' | 're
 
 // `pid` (when present) marks a personal event that should only be delivered to
 // that player entity's owner; events without pid are world-visible.
-export type SimEvent = { pid?: number } & (
+// Wire shape of one Last Bell scene op (sim resolves actor ids to entity
+// ids and instance-local coords to world coords before emitting; the client
+// scene director consumes these verbatim). Dialogue `key` and `speaker` are
+// stable i18n keys, never English prose (S3).
+export interface SceneRigPoint {
+  x: number;
+  y: number;
+  z: number;
+}
+
+export interface SceneAttachFrame {
+  position: SceneRigPoint;
+  /** Rotation about world +y in the renderer's local-frame convention. */
+  yaw: number;
+}
+
+export type SceneDollyLookAt =
+  | { kind: 'point'; point: SceneRigPoint }
+  | { kind: 'spline'; points: readonly SceneRigPoint[] }
+  | {
+      kind: 'subject';
+      entityId: number | null;
+      offset: SceneRigPoint;
+      fallback: SceneRigPoint;
+    };
+
+/** How a shot takes the camera from the previous pose: 'snap' holds the
+ * shot's own frame from its first tick (covered cuts, so the fade-in never
+ * reveals travel from the old shot); 'ease' or absent glides in from the
+ * live pose over SCENE_RIG_ENTRY_SEC. */
+export type SceneShotEntryWire = 'snap' | 'ease';
+
+export type SceneRigCameraShot =
+  | {
+      kind: 'dolly';
+      points: readonly SceneRigPoint[];
+      lookAt: SceneDollyLookAt;
+      dur: number;
+      entry?: SceneShotEntryWire;
+    }
+  | {
+      kind: 'attach';
+      target: string;
+      /** Authored time until the next camera composition, for midpoint sampling. */
+      dur?: number;
+      fallbackFrame: SceneAttachFrame;
+      /** Camera position in the target's local frame. */
+      offset: SceneRigPoint;
+      /** Exact look-at point in the target's local frame. */
+      lookAt: SceneRigPoint;
+      entry?: SceneShotEntryWire;
+    };
+
+/** Authored gameplay pose a release hands the camera back to. Without one the
+ * release restores the pre-scene pose, whose yaw is player state the author
+ * cannot know; a scene that has WALKED the player somewhere must author this
+ * so the restored camera has a clear line to the player (the voyage mast
+ * blocked exactly this hand-back). Focus stays on the live player position.
+ * dist is optional and rarely authored: the player's zoom is gameplay state,
+ * so a release keeps the pre-scene camera distance unless a scene explicitly
+ * needs a specific one. */
+export interface SceneReleasePose {
+  yaw: number;
+  pitch: number;
+  dist?: number;
+}
+
+export type SceneCameraShot =
+  | {
+      kind: 'focus';
+      entityId: number | null;
+      x: number;
+      y: number;
+      z: number;
+      dist: number;
+      pitch: number;
+      yaw: number;
+      dur: number;
+      entry?: SceneShotEntryWire;
+    }
+  | SceneRigCameraShot
+  | { kind: 'release'; pose?: SceneReleasePose };
+
+export type SceneWireOp =
+  | { kind: 'start'; duration: number }
+  // A skip drops the un-emitted camera/release op, so the end op re-carries
+  // the scene's authored release pose for the same clear hand-back.
+  | { kind: 'end'; releasePose?: SceneReleasePose }
+  | { kind: 'line'; speaker: string; speakerEntityId: number | null; key: string; dur: number }
+  | { kind: 'camera'; shot: SceneCameraShot }
+  | { kind: 'letterbox'; on: boolean }
+  | { kind: 'inputLock'; on: boolean }
+  | { kind: 'fade'; to: 'black' | 'clear'; dur: number }
+  | { kind: 'music'; directive: string }
+  // Authoritative sim cue. Offline the local Sim walks the player; online the
+  // server walks it and entity snapshots mirror the changing position. Client
+  // scene routing intentionally treats this resolved endpoint as a no-op.
+  | { kind: 'playerWalk'; to: SceneRigPoint; speed: number }
+  | { kind: 'anim'; entityId: number; anim: string }
+  // A render-prop path segment: pure presentation, client-resolved by target
+  // key plus the segment id in cue; the end op resets all active segments.
+  | { kind: 'prop'; target: string; cue: string };
+
+/** Authoritative persistent scene state sent in a reconnect hello. Historical
+ * one-shot presentation ops are intentionally not replayed. */
+export interface SceneReconnectState {
+  sceneId: string;
+  remainingSeconds: number;
+  inputLocked: boolean;
+  letterbox: boolean;
+  musicSilenced: boolean;
+}
+
+/** Authoritative active prompt sent in a reconnect hello. */
+export interface SceneChoiceReconnectState {
+  choiceId: string;
+  promptKey: string;
+  options: { id: string; key: string }[];
+  defaultOptionId: string;
+  leaderPid: number;
+  values?: Record<string, string | number>;
+  windowSeconds: number;
+  remainingSeconds: number | null;
+}
+
+export type SimEvent = {
+  pid?: number;
+  /** Client-only authoritative seconds attached while decoding scene wire frames. */
+  presentationTime?: number;
+} & (
   | {
       type: 'damage';
       sourceId: number;
@@ -5202,6 +5375,33 @@ export type SimEvent = { pid?: number } & (
        */
       retro?: boolean;
     }
+  // Last Bell scene op (src/sim/scenes/): personal, one per participant.
+  // The client's scene director interprets it; dialogue carries stable keys.
+  | { type: 'scene'; sceneId: string; op: SceneWireOp }
+  // Last Bell dialogue choice prompt + resolution (src/sim/scenes/choices.ts).
+  | {
+      type: 'sceneChoice';
+      choiceId: string;
+      promptKey: string;
+      options: { id: string; key: string }[];
+      windowSeconds: number;
+      defaultOptionId: string;
+      leaderPid: number;
+      /** Interpolation values for the prompt key (the fare price); the client
+       * formats numbers through formatNumber before t(). */
+      values?: Record<string, string | number>;
+    }
+  | {
+      type: 'sceneChoiceResult';
+      choiceId: string;
+      optionId: string;
+      replyKey?: string;
+      replySpeaker?: string;
+    }
+  // Client-only convergence events synthesized from the ordered hello frame.
+  // Explicit null means the authority confirms no state is active.
+  | { type: 'sceneSync'; state: SceneReconnectState | null }
+  | { type: 'sceneChoiceSync'; state: SceneChoiceReconnectState | null }
   | { type: 'learnAbility'; abilityId: string; rank: number }
   // The hub grant event. Two independent stand-down flags, both set only from
   // Sim.addItem/addItemInstance's opts param (the one place either gets set):
@@ -5331,6 +5531,9 @@ export type SimEvent = { pid?: number } & (
       x: number;
       z: number;
     }
+  // Read a war memorial. Carries the MemorialDef id only: both hosts hold the
+  // roll of honour as content, so the names never travel over the wire.
+  | { type: 'memorial'; memorialId: string }
   | { type: 'mailArrived'; senderName: string; letterId?: string }
   | { type: 'mailResult'; code: MailResultCode; value?: number; name?: string }
   // Guild calendar outcome. Emitted only by the server's SocialService (the
@@ -6763,12 +6966,76 @@ export interface GraveyardDef {
   z: number;
 }
 
+/** One name on a memorial's Roll of Honour. Proper nouns: never localized. */
+export interface MemorialRollEntry {
+  /** Space-separated initials, e.g. "J T". May be a single letter. */
+  initials: string;
+  surname: string;
+}
+
+/**
+ * An interactable war memorial. The monument itself is a decor prop with its
+ * own collider; this record is the gameplay anchor that makes it readable, so
+ * the roll of honour stays data rather than baked lettering.
+ */
+export interface MemorialDef {
+  id: string;
+  x: number;
+  z: number;
+  /** Yards from the anchor within which the plaque can be read. */
+  interactionRadius: number;
+  /** Where a reader stands to face the inscribed side. */
+  frontStandingPoint: { x: number; z: number };
+  /**
+   * Radius the scatter keeps clear of trees and rocks. A memorial precinct
+   * needs sky and sightlines; wild forest crowding the mound is what made the
+   * first pass read as a statue lost in a wood.
+   */
+  clearingRadius: number;
+  /** Oldest first, so the newest name is last and the space after it is bare. */
+  roll: readonly MemorialRollEntry[];
+  /** The rail ring: renders and collides from these same numbers. */
+  rail: MemorialRailDef;
+}
+
+/** One upright of a memorial's rail. Square in plan. */
+export interface MemorialRailPost {
+  x: number;
+  z: number;
+}
+
+/** One rail panel. `rot` 0 runs the panel's long axis along X. */
+export interface MemorialRailPanel {
+  x: number;
+  z: number;
+  rot?: number;
+}
+
+/**
+ * The rail ring around a memorial precinct. ONE source of truth: the renderer
+ * derives its prop placements from this and colliders.ts derives an oriented
+ * box per member from the same numbers, so what you see and what stops you
+ * cannot drift apart. Half-extents are measured off the shipping GLBs.
+ */
+export interface MemorialRailDef {
+  /** Half-extent of a square post (garden_iron_pillar is 0.5 across). */
+  postHalf: number;
+  /** Half-length of a panel along its own long axis (the panel is 4.0). */
+  panelHalfLength: number;
+  /** Half-depth of a panel across it (the panel is 0.5 thick). */
+  panelHalfDepth: number;
+  height: number;
+  posts: readonly MemorialRailPost[];
+  panels: readonly MemorialRailPanel[];
+}
+
 /** Optional static gameplay anchors supplied by a world definition. */
 export interface WorldServicesDef {
   stations?: readonly StationDef[];
   mailboxes?: readonly MailboxDef[];
   noticeboards?: readonly NoticeboardDef[];
   musterBoards?: readonly MusterBoardDef[];
+  memorials?: readonly MemorialDef[];
   graveyards?: readonly GraveyardDef[];
 }
 
@@ -6801,7 +7068,7 @@ export interface WorldContent {
   blockers?: BlockerDef[];
   // 2D biome paint overriding terrain shape (sim) and color (render).
   biomePaint?: BiomePaint;
-  // Water surface height for this map; absent = the built-in WATER_LEVEL (-4.5).
+  // Water surface height for this map; absent = the built-in WATER_LEVEL (-4.3).
   // Read through waterLevel() in src/sim/world.ts, never directly.
   waterLevel?: number;
 }

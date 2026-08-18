@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS content_moderation_actions (
 );
 CREATE INDEX IF NOT EXISTS content_moderation_actions_resource ON content_moderation_actions(resource_kind, resource_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS content_moderation_actions_created ON content_moderation_actions(created_at DESC, id DESC);
+CREATE INDEX IF NOT EXISTS content_moderation_actions_owner ON content_moderation_actions(owner_account_id);
 CREATE INDEX IF NOT EXISTS content_moderation_actions_admin_created ON content_moderation_actions(admin_account_id, created_at DESC, id DESC);
 `;
 

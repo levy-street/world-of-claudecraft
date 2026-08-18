@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>scn_lb_q0_doorway contact sheet</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #111; color: #eee; }
+    body { margin: 0; padding: 24px; }
+    header { margin-bottom: 20px; }
+    h1 { margin: 0 0 6px; font-size: 24px; }
+    p { margin: 4px 0; color: #bbb; }
+    main { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 16px; }
+    figure { margin: 0; overflow: hidden; border: 1px solid #333; border-radius: 6px; background: #1a1a1a; }
+    a { display: block; }
+    img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: contain; background: #000; }
+    figcaption { padding: 10px 12px 12px; font-size: 13px; }
+    .timing { display: flex; justify-content: space-between; gap: 12px; }
+    .timing span { color: #aaa; }
+    fieldset { display: grid; gap: 7px; margin: 10px 0 0; padding: 9px 10px 10px; border: 1px solid #444; }
+    legend { color: #ddd; padding: 0 5px; }
+    label { display: grid; grid-template-columns: auto 1fr; column-gap: 7px; align-items: start; }
+    label input { margin: 2px 0 0; }
+    label small { grid-column: 2; color: #aaa; overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>scn_lb_q0_doorway</h1>
+    <p>Offline world seed: 20061</p>
+    <p>The authored sampling plan and filenames are deterministic for this scene and seed.</p>
+  </header>
+  <main>
+<figure>
+        <a href="frame_0000_target_7_5s.png"><img src="frame_0000_target_7_5s.png" alt="scn_lb_q0_doorway target 7.5s, measured 7.55s" loading="lazy"></a>
+        <figcaption>
+          <div class="timing">
+            <strong>Target 7.5s</strong>
+            <span>Measured 7.55s</span>
+          </div>
+          <p>Cut window 0s to 15s. scene midpoint</p>
+          <fieldset>
+            <legend>Intent checklist</legend>
+            <label><input type="checkbox"> <span>Named subject visible</span><small>Expected: tam</small></label>
+            <label><input type="checkbox"> <span>Expected text visible</span><small>Expected: lb.q0.tam.stretchers</small></label>
+            <label><input type="checkbox"> <span>Frame differs from the previous one</span><small>First still, no previous comparison</small></label>
+          </fieldset>
+        </figcaption>
+      </figure>
+<figure>
+        <a href="frame_after_scene_end.png"><img src="frame_after_scene_end.png" alt="scn_lb_q0_doorway target 15s, measured not available" loading="lazy"></a>
+        <figcaption>
+          <div class="timing">
+            <strong>Target 15s</strong>
+            <span>Measured not available</span>
+          </div>
+          <p>Cut window 15s to 15s. after scene end</p>
+          <fieldset>
+            <legend>Intent checklist</legend>
+            <label><input type="checkbox"> <span>Named subject visible</span><small>Expected: none derived from authored ops</small></label>
+            <label><input type="checkbox"> <span>Expected text visible</span><small>Expected: none active at measured clock</small></label>
+            <label><input type="checkbox"> <span>Frame differs from the previous one</span><small>Compare with frame_0000_target_7_5s.png</small></label>
+          </fieldset>
+        </figcaption>
+      </figure>
+<figure>
+        <a href="frame_hud_restored.png"><img src="frame_hud_restored.png" alt="scn_lb_q0_doorway target 16s, measured not available" loading="lazy"></a>
+        <figcaption>
+          <div class="timing">
+            <strong>Target 16s</strong>
+            <span>Measured not available</span>
+          </div>
+          <p>Cut window 16s to 16s. HUD restored</p>
+          <fieldset>
+            <legend>Intent checklist</legend>
+            <label><input type="checkbox"> <span>Named subject visible</span><small>Expected: none derived from authored ops</small></label>
+            <label><input type="checkbox"> <span>Expected text visible</span><small>Expected: none active at measured clock</small></label>
+            <label><input type="checkbox"> <span>Frame differs from the previous one</span><small>Compare with frame_after_scene_end.png</small></label>
+          </fieldset>
+        </figcaption>
+      </figure>
+  </main>
+</body>
+</html>

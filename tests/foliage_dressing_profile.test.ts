@@ -60,13 +60,15 @@ describe('ground dressing richness profile', () => {
     // strictly-more assertion alone is satisfied by the tighter grid ((12/10)^2
     // is about 1.44x cells), so the phase 5 QA probe round set the density
     // scale to 1 and stayed green. Pin the RATIO instead: this seed lands at
-    // 1.586 (the July 1.79x compressed where density x 1.24 saturates past a
-    // biome's acceptance ceiling); a dropped density scale lands near 1.44 and
-    // reds the floor, a runaway one reds the ceiling.
+    // 1.692 (re-measured after the Last Bell campaign put the Farshore island
+    // terrain inside the world-wide sample; the pre-campaign value was 1.586,
+    // the July 1.79x compressed where density x 1.24 saturates past a biome's
+    // acceptance ceiling); a dropped density scale lands near 1.44 and reds
+    // the floor, a runaway one reds the ceiling. Band re-centered, same width.
     expect(weakLow.length).toBeGreaterThan(plainLow.length);
     const countRatio = weakLow.length / plainLow.length;
-    expect(countRatio).toBeGreaterThan(1.5);
-    expect(countRatio).toBeLessThan(1.7);
+    expect(countRatio).toBeGreaterThan(1.59);
+    expect(countRatio).toBeLessThan(1.79);
     // The 1.08 spot boost: the two grids sample different hash positions, so
     // compare the scale distribution maxima as a RATIO band around 1.08 (dense
     // sampling puts both maxima near the distribution ceiling). A dropped boost
@@ -120,11 +122,12 @@ describe('ground dressing richness profile', () => {
     expect(dressStep()).toBe(10);
     const compensatedSpots = generateDressing(20_061);
     Object.assign(live, snapshot);
-    // Same 1.5 to 1.7 richness band the lowPlus arm pins above: the cohort
-    // takes the full trio, not just the tighter grid.
+    // Same 1.59 to 1.79 richness band the lowPlus arm pins above (re-centered
+    // with the Last Bell Farshore terrain in the sample): the cohort takes the
+    // full trio, not just the tighter grid.
     expect(compensatedSpots.length).toBeGreaterThan(plainSpots.length);
     const countRatio = compensatedSpots.length / plainSpots.length;
-    expect(countRatio).toBeGreaterThan(1.5);
-    expect(countRatio).toBeLessThan(1.7);
+    expect(countRatio).toBeGreaterThan(1.59);
+    expect(countRatio).toBeLessThan(1.79);
   });
 });

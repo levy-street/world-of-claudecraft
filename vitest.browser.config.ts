@@ -1,3 +1,4 @@
+import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { playwright } from '@vitest/browser-playwright';
 import { defineConfig } from 'vitest/config';
 
@@ -14,6 +15,7 @@ import { defineConfig } from 'vitest/config';
 // across engines (WebKit, Firefox) in CI is P17b (decision 14), so only chromium is listed
 // here to keep the local run installable with `npx playwright install chromium`.
 export default defineConfig({
+  plugins: [svelte()],
   test: {
     include: ['tests/browser/**/*.browser.test.ts'],
     browser: {

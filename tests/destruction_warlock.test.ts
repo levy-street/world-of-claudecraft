@@ -15,8 +15,8 @@ import { Sim } from '../src/sim/sim';
 import { channelTickBonus } from '../src/sim/spell_scaling';
 import type { Entity, SimEvent } from '../src/sim/types';
 
-function destructionAt(level = 20) {
-  const sim = new Sim({ seed: 72, playerClass: 'warlock', autoEquip: true });
+function destructionAt(level = 20, seed = 72) {
+  const sim = new Sim({ seed, playerClass: 'warlock', autoEquip: true });
   sim.setPlayerLevel(level);
   expect(sim.setSpec('destruction')).toBe(true);
   sim.tick();
@@ -389,7 +389,9 @@ describe('Ruin engine and Desolation', () => {
   });
 
   it('Conflagrate needs Burning Pact, advances one future tick, and grants Ruin + Desolation', () => {
-    const { sim, p } = destructionAt();
+    // re-hunted 72 to 1 by the Last Bell packet's world content (the scripted
+    // Immolate application missed on the shared seed after the draw shift).
+    const { sim, p } = destructionAt(20, 1);
     const mob = addDummy(sim, 9702);
     sim.targetEntity(mob.id);
     p.facing = 0;
@@ -417,7 +419,9 @@ describe('Ruin engine and Desolation', () => {
   });
 
   it('Conflagrate spends two stored charges, rejects a third, and restores one after 18 seconds', () => {
-    const { sim, p } = destructionAt();
+    // re-hunted 72 to 1 by the Last Bell packet's world content (cascades from
+    // the same shifted Immolate hit roll as the Burning Pact test above).
+    const { sim, p } = destructionAt(20, 1);
     const mob = addDummy(sim, 9709);
     sim.targetEntity(mob.id);
     p.facing = 0;

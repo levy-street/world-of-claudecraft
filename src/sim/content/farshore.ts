@@ -1,9 +1,10 @@
-// The Farshore (levels 3-7). A small island in the starter sea east of
-// Eastbrook Vale, all but surrounded by open ocean and joined to the
-// mainland only by the Ferrywalk: a thin natural sandbar causeway from the
-// vale's east point to the island's Landing, walked on foot (no teleport;
-// the causeway terrain is in world.ts). The deeper strait to either side
-// keeps its swim fatigue.
+// The Farshore (levels 3-7). A LARGE island far out in the eastern sea,
+// hundreds of yards past the Eastbrook Vale coast across deep, fatiguing
+// ocean. There is no land link and no swimming it: the ferry is the only
+// crossing (the campaign's front door; terrain in world.ts,
+// applyFarshoreSea). The island carries the campaign's authored topology:
+// Gullhaven's harbor bay, the Landing beach, the Watch Meadow, the
+// Sundered Cliffs range, the Riftfields with the breach, the Wreckfields.
 //
 // The island is under siege. Rifts, the townsfolk call them "the breaks",
 // tear open across the Farshore without warning and spill monsters onto the
@@ -15,6 +16,7 @@
 // already made it through. Terrain: the ISLE_* tables in world.ts (biome
 // 'vale': the island shares the vale's sky, palette, and song).
 
+import { GULLHAVEN_HARBOR } from '../harbor_layout';
 import type {
   CampDef,
   EscortDef,
@@ -28,80 +30,138 @@ import type {
   ZonePropsDef,
 } from '../types';
 import { emptyZoneProps } from '../types';
+import {
+  GULLHAVEN_BUILDINGS,
+  GULLHAVEN_CHURCHYARD_FENCE,
+  GULLHAVEN_TOWN_PROPS,
+  gullhavenWallProps,
+} from './gullhaven';
+import { GULLHAVEN_MEMORIAL, memorialRailProps } from './memorials';
 
 export const FARSHORE_ZONE: ZoneDef = {
   id: 'farshore_isle',
   name: 'The Farshore',
   riftPortalEligible: true,
   riftTierWeights: { C: 0.7, B: 0.3 },
-  zMin: -180,
-  zMax: 180,
-  xMin: 180,
-  xMax: 540,
+  zMin: -250,
+  zMax: 290,
+  xMin: 700,
+  xMax: 1300,
   levelRange: [3, 7],
   biome: 'vale',
-  hub: { x: 305, z: 70, radius: 15, name: 'Gullhaven' },
-  graveyard: { x: 290, z: 86 },
+  hub: { x: 822, z: 118, radius: 16, name: 'Gullhaven' },
+  graveyard: { x: 839, z: 132 },
   lakes: [
-    { x: 388, z: 26, radius: 8 }, // the Hilltop Spring, under the Watch Meadow
+    // The Hilltop Spring, under the Watch Meadow. Both lakes moved with the
+    // campaign island (the pre-campaign isle sat at x 180-540; this rect is
+    // 700-1300, so the old spots lay in open strait). The spring keeps its
+    // decorative character: it sits inside the Watch Meadow dome's inner
+    // radius (isleDome 1000,10 in world.ts applyFarshoreSea), whose +8 lift
+    // re-raises the carved bed above the waterline, so it holds no
+    // swim-depth water and stays a scenery basin (the fishing suite's
+    // decorative exemption).
+    { x: 992, z: 30, radius: 8 },
     // Gull Mere, the fishing town's actual water (the packet review's R55).
-    // The isle shipped with ZERO fishable water: the Hilltop Spring sits
-    // 33.6 yd from the Crown dome's centre, whose +14 lift re-raises the
-    // carved bed to +2.85, and open ocean is never a water body, so the
-    // zone's tier-1 rod row was decorative. This basin sits on the north
-    // downs where the coast appliers are identity (landness 0.31 to 0.91
-    // around the whole 16 yd blend rim, dome contribution zero), carves to
-    // the world-wide canonical -7.60 bed, and was probed at 82 percent
-    // fishable over the disc with a complete castable, walkable shore ring
-    // from d=11.3 and a 1.28-steepness walk from Gullhaven (limit 1.5).
-    // Hazard gaps at placement: watchbell 24.0, breach_wretch camp 27.6,
-    // nearest herb node 27.3 (its own bar is 25), roads 50.8, causeway
-    // 100+, palms cannot generate off the beach apron. Radius 10 is
-    // deliberate: a 14-yd lake has NO fully-inland footprint anywhere in
-    // the rect.
-    { x: 350, z: 118, radius: 10 },
+    // Open ocean is never a water body, so without an inland basin the
+    // zone's tier-1 rod row would be decorative. This basin sits on the
+    // inland shelf southeast of Gullhaven where every isleDome contribution
+    // is negligible and the coast blend is identity, so the carve keeps a
+    // swim-deep bed (probed 72 percent swimmable over the disc at the
+    // shipped seed) with a dry shore ring at 16 yd all the way around and a
+    // dry-foot walk from the town square (822,118). Hazard gaps at
+    // placement: the Landing road 17.7 (carve reach is 16), the Watch
+    // Meadow road 55+, Bram's escort line 65, nearest camp 96, the hub
+    // flatten, benches, and harbor grading all well clear.
+    { x: 866, z: -2, radius: 10 },
   ],
   pois: [
-    { x: 305, z: 70, label: 'Gullhaven', id: 'gullhaven' },
-    { x: 250, z: 14, label: 'The Landing', id: 'the_landing' },
-    { x: 375, z: -5, label: 'The Watch Meadow', id: 'the_watch_meadow' },
-    { x: 402, z: -72, label: 'The Sundered Cliffs', id: 'the_sundered_cliffs' },
-    { x: 434, z: 58, label: 'The Riftfields', id: 'the_riftfields' },
+    { x: 822, z: 118, label: 'Gullhaven', id: 'gullhaven' },
+    { x: 780, z: -30, label: 'The Landing', id: 'the_landing' },
+    { x: 990, z: 10, label: 'The Watch Meadow', id: 'the_watch_meadow' },
+    { x: 1170, z: -35, label: 'The Sundered Cliffs', id: 'the_sundered_cliffs' },
+    { x: 1005, z: -125, label: 'The Riftfields', id: 'the_riftfields' },
+    { x: 1012, z: -172, label: 'The Breach', id: 'the_breach' },
+    { x: 885, z: 200, label: 'The Wreckfields', id: 'the_wreckfields' },
   ],
   welcome:
-    "Cross the sandbar and Gullhaven's bell will find you before the town does. The breaks tear open without warning, and the redoubt holds its shore against whatever pours through. They have been waiting a long while for someone like you.",
+    "Step off the ferry and Gullhaven's bell will find you before the town does. The breaks tear open without warning, and the redoubt holds its shore against whatever pours through. They have been waiting a long while for someone like you.",
   welcomeQuestId: 'q_fs_bell_at_the_landing',
 };
 
+// Every road through Gullhaven meets at ONE junction node, (822, 118), the
+// square's centre. They used to START a few yards apart from each other near it
+// (the Watch Meadow road at (826, 114), the Wreckfields road at (820, 128)),
+// which put three near-parallel painted bands through the middle of the town and
+// left the market and the houses as two clusters with a smear of track between
+// them. Sharing the node makes it read as a crossroads, which is what a market
+// square is, and gives the blocks between the roads back to the town.
 export const FARSHORE_ROADS: { x: number; z: number }[][] = [
   [
-    { x: 150, z: -46 },
-    { x: 173, z: -30 },
-    { x: 195, z: -14 },
-    { x: 217, z: 1 },
-    { x: 238, z: 12 },
-    { x: 252, z: 15 },
-  ], // the Ferrywalk causeway: the vale's east point -> the Landing
+    { x: 784, z: 118 },
+    { x: 791.5, z: 121 },
+    { x: 800, z: 122 },
+    { x: 812, z: 120 },
+    { x: 822, z: 118 },
+  ], // the harbour pier -> the west gate -> Gullhaven
   [
-    { x: 250, z: 14 },
-    { x: 276, z: 42 },
-    { x: 305, z: 68 },
-  ], // the Landing -> up the shore road -> Gullhaven
-  [
-    { x: 308, z: 66 },
-    { x: 340, z: 32 },
-    { x: 372, z: 0 },
+    { x: 822, z: 118 },
+    { x: 831, z: 110 },
+    { x: 880, z: 70 },
+    { x: 935, z: 35 },
+    { x: 985, z: 12 },
   ], // Gullhaven -> the Watch Meadow (the riftwatchers' vigil)
   [
-    { x: 374, z: -4 },
-    { x: 392, z: -40 },
-    { x: 402, z: -68 },
-  ], // the Watch Meadow -> the Sundered Cliffs
+    { x: 980, z: 4 },
+    { x: 900, z: -15 },
+    { x: 830, z: -25 },
+    { x: 788, z: -30 },
+  ], // the Watch Meadow -> the Landing
   [
-    { x: 376, z: 0 },
-    { x: 408, z: 30 },
-    { x: 432, z: 54 },
-  ], // the Watch Meadow -> the Riftfields
+    { x: 992, z: 2 },
+    { x: 1000, z: -60 },
+    { x: 1005, z: -120 },
+    { x: 1010, z: -155 },
+  ], // the Watch Meadow -> the Riftfields and the breach
+  [
+    { x: 1000, z: 14 },
+    { x: 1070, z: -10 },
+    { x: 1098, z: -24 },
+  ], // the Watch Meadow -> the Sundered Cliffs' foot
+  [
+    { x: 822, z: 118 },
+    { x: 826, z: 130 },
+    { x: 855, z: 165 },
+    { x: 880, z: 195 },
+  ], // Gullhaven -> the Wreckfields
+  // The shore road, up the west coast toward the Landing. Fisher Bram's escort
+  // (q_fs_bram_come_home) already walked this line home and the lore names it
+  // "the shore road", but it was not a road: he crossed open grass. It is a road
+  // now, so the redoubt's north gate stands on a way in rather than on turf.
+  [
+    { x: 808, z: 66 },
+    { x: 812.7, z: 91.6 },
+    { x: 818, z: 108 },
+    { x: 822, z: 118 },
+  ], // the shore road -> the north gate -> Gullhaven
+  // The town -> Warden Hale's memorial. It now BRANCHES at (807, 123) instead of
+  // starting at (814, 121): that first leg ran 1.5 to 2.6 yards from the harbour
+  // road and parallel to it, so the two painted bands merged into one wide smear
+  // across the square's west side rather than reading as a junction.
+  // It CONTOURS the mound's west flank
+  // rather than climbing the face: the same curve MEMORIAL_TERRAIN_EDITS
+  // grades, so the painted road always sits on graded ground and the climb
+  // stays at about 0.2 per yard. You come round the hill and the bronze
+  // arrives in view, instead of trudging straight at it.
+  [
+    { x: 807, z: 123 },
+    { x: 801, z: 124.5 },
+    { x: 797, z: 127.5 },
+    { x: 795.5, z: 131 },
+    { x: 797.5, z: 133.5 },
+    { x: 801, z: 134 },
+    { x: 805, z: 133.2 },
+    { x: 805, z: 137.5 },
+  ],
 ] as { x: number; z: number }[][];
 
 // No portals: the Farshore is reached on foot, across the Ferrywalk causeway
@@ -229,10 +289,11 @@ export const FARSHORE_NPCS: Record<string, NpcDef> = {
     id: 'warden_coalfast',
     name: 'Warden Coalfast',
     title: 'Redoubt Commander',
-    pos: { x: 305, z: 66 },
+    pos: { x: 822, z: 114 },
     facing: 0,
     color: 0x8a4b2b,
     questIds: [
+      'q_lb_q0_ashore',
       'q_fs_bell_at_the_landing',
       'q_fs_hold_the_riftfields',
       'q_fs_song_before_the_break',
@@ -245,7 +306,7 @@ export const FARSHORE_NPCS: Record<string, NpcDef> = {
     id: 'riftwatch_ollun',
     name: 'Riftwatch Ollun',
     title: 'Breach Scholar',
-    pos: { x: 372, z: 2 },
+    pos: { x: 988, z: 6 },
     facing: Math.PI,
     color: 0x3f5f8a,
     questIds: ['q_fs_song_before_the_break', 'q_fs_stalkers_off_the_light', 'q_fs_the_great_break'],
@@ -256,7 +317,7 @@ export const FARSHORE_NPCS: Record<string, NpcDef> = {
     id: 'quartermaster_edda',
     name: 'Quartermaster Edda',
     title: 'Redoubt Armorer',
-    pos: { x: 298, z: 74 },
+    pos: { x: 815, z: 122 },
     facing: Math.PI / 2,
     color: 0x6b6b3a,
     questIds: ['q_fs_steel_for_the_redoubt'],
@@ -267,7 +328,7 @@ export const FARSHORE_NPCS: Record<string, NpcDef> = {
     id: 'mender_saul',
     name: 'Mender Saul',
     title: 'Field Surgeon',
-    pos: { x: 312, z: 78 },
+    pos: { x: 827, z: 124 },
     facing: -Math.PI / 2,
     color: 0x9a3b3b,
     questIds: ['q_fs_moss_and_mending'],
@@ -278,7 +339,7 @@ export const FARSHORE_NPCS: Record<string, NpcDef> = {
     id: 'bellkeeper_tam',
     name: 'Bellkeeper Tam',
     title: 'Watchbell Keeper',
-    pos: { x: 252, z: 18 },
+    pos: { x: 784, z: -22 },
     facing: Math.PI / 2,
     color: 0x4a7b6b,
     questIds: ['q_fs_bell_at_the_landing', 'q_fs_the_three_bells'],
@@ -289,7 +350,7 @@ export const FARSHORE_NPCS: Record<string, NpcDef> = {
     id: 'fisher_nell',
     name: 'Frightened Nell',
     title: 'Gullhaven Fisher',
-    pos: { x: 296, z: 80 },
+    pos: { x: 811, z: 128 },
     facing: 0,
     color: 0x5a7a9a,
     questIds: ['q_fs_bram_come_home'],
@@ -301,12 +362,13 @@ export const FARSHORE_NPCS: Record<string, NpcDef> = {
 export const FARSHORE_QUESTS: Record<string, QuestDef> = {
   q_fs_bell_at_the_landing: {
     id: 'q_fs_bell_at_the_landing',
+    retired: true,
     name: 'The Bell at the Landing',
     giverNpcId: 'bellkeeper_tam',
     turnInNpcId: 'warden_coalfast',
-    text: 'You came over the Ferrywalk, $N? Then you are the first in a week, and the Warden will want to look you over. Gullhaven sits up the shore road, past the drying racks nobody tends anymore. Tell Warden Coalfast the causeway still stands, and that Tam has not rung a three-toll today. Yet.',
+    text: 'You came in on the ferry, $N? Then you are the first in a week, and the Warden will want to look you over. Gullhaven sits up from the harbor, past the drying racks nobody tends anymore. Tell Warden Coalfast the crossing still runs, and that Tam has not rung a three-toll today. Yet.',
     completionText:
-      'The causeway holds, and Tam still has breath enough to joke about the three-toll. Good. We are an island under siege, $N, and every pair of hands that crosses that sandbar is a pair the breaks must get through before they reach my people. Welcome to Gullhaven.',
+      'The crossing holds, and Tam still has breath enough to joke about the three-toll. Good. We are an island under siege, $N, and every pair of hands the ferry carries over is a pair the breaks must get through before they reach my people. Welcome to Gullhaven.',
     objectives: [
       {
         type: 'interact',
@@ -322,6 +384,7 @@ export const FARSHORE_QUESTS: Record<string, QuestDef> = {
   },
   q_fs_hold_the_riftfields: {
     id: 'q_fs_hold_the_riftfields',
+    retired: true,
     name: 'Hold the Riftfields',
     giverNpcId: 'warden_coalfast',
     turnInNpcId: 'warden_coalfast',
@@ -338,6 +401,7 @@ export const FARSHORE_QUESTS: Record<string, QuestDef> = {
   },
   q_fs_steel_for_the_redoubt: {
     id: 'q_fs_steel_for_the_redoubt',
+    retired: true,
     name: 'Steel for the Redoubt',
     giverNpcId: 'quartermaster_edda',
     turnInNpcId: 'quartermaster_edda',
@@ -358,6 +422,7 @@ export const FARSHORE_QUESTS: Record<string, QuestDef> = {
   },
   q_fs_the_three_bells: {
     id: 'q_fs_the_three_bells',
+    retired: true,
     name: 'The Three Bells',
     giverNpcId: 'bellkeeper_tam',
     turnInNpcId: 'bellkeeper_tam',
@@ -379,6 +444,7 @@ export const FARSHORE_QUESTS: Record<string, QuestDef> = {
   },
   q_fs_song_before_the_break: {
     id: 'q_fs_song_before_the_break',
+    retired: true,
     name: 'The Song Before the Break',
     giverNpcId: 'warden_coalfast',
     turnInNpcId: 'riftwatch_ollun',
@@ -396,6 +462,7 @@ export const FARSHORE_QUESTS: Record<string, QuestDef> = {
   },
   q_fs_moss_and_mending: {
     id: 'q_fs_moss_and_mending',
+    retired: true,
     name: 'Moss and Mending',
     giverNpcId: 'mender_saul',
     turnInNpcId: 'mender_saul',
@@ -414,6 +481,7 @@ export const FARSHORE_QUESTS: Record<string, QuestDef> = {
   },
   q_fs_bram_come_home: {
     id: 'q_fs_bram_come_home',
+    retired: true,
     name: 'Bram Come Home',
     giverNpcId: 'fisher_nell',
     turnInNpcId: 'fisher_nell',
@@ -436,6 +504,7 @@ export const FARSHORE_QUESTS: Record<string, QuestDef> = {
   },
   q_fs_stalkers_off_the_light: {
     id: 'q_fs_stalkers_off_the_light',
+    retired: true,
     name: 'Stalkers off the Light',
     giverNpcId: 'riftwatch_ollun',
     turnInNpcId: 'riftwatch_ollun',
@@ -453,6 +522,7 @@ export const FARSHORE_QUESTS: Record<string, QuestDef> = {
   },
   q_fs_the_great_break: {
     id: 'q_fs_the_great_break',
+    retired: true,
     name: 'The Great Break',
     giverNpcId: 'riftwatch_ollun',
     turnInNpcId: 'warden_coalfast',
@@ -541,14 +611,69 @@ export const FARSHORE_ITEMS: Record<string, ItemDef> = {
   },
 };
 export const FARSHORE_CAMPS: CampDef[] = [
-  // the break-spawned hold the island's fringe; the redoubt keeps the town
-  { mobId: 'breach_wretch', center: { x: 430, z: 44 }, radius: 12, count: 4 }, // the Riftfields
-  { mobId: 'breach_wretch', center: { x: 400, z: 96 }, radius: 11, count: 3 }, // the north downs
-  { mobId: 'riftspawn', center: { x: 452, z: 66 }, radius: 11, count: 3 }, // deep in the Riftfields
-  { mobId: 'riftspawn', center: { x: 388, z: -44 }, radius: 11, count: 3 }, // above the Sundered Cliffs
-  { mobId: 'void_stalker', center: { x: 418, z: -30 }, radius: 12, count: 2 }, // the cliff approach
-  { mobId: 'void_stalker', center: { x: 462, z: 20 }, radius: 11, count: 2 }, // the east reach
-  { mobId: 'sundered_horror', center: { x: 402, z: -78 }, radius: 6, count: 1 }, // the cliffs' great break
+  // the break-spawned pour from the breach and hold the island's north and
+  // east; the redoubt keeps the town and the harbor. sharedRngCount preserves
+  // the pre-campaign Farshore's 18 shared world-generation spawns (6
+  // riftspawn, 7 wretches, 4 stalkers, 1 horror). The 16 campaign additions
+  // scatter from deterministic camp-local streams, leaving the shared
+  // construction stream stable for later camps and immediate interactions.
+  {
+    mobId: 'riftspawn',
+    center: { x: 1030, z: -160 },
+    radius: 12,
+    count: 4,
+    sharedRngCount: 2,
+  }, // the breach's east lip
+  {
+    mobId: 'riftspawn',
+    center: { x: 985, z: -178 },
+    radius: 12,
+    count: 4,
+    sharedRngCount: 2,
+  }, // the breach's west lip
+  {
+    mobId: 'riftspawn',
+    center: { x: 1008, z: -112 },
+    radius: 14,
+    count: 5,
+    sharedRngCount: 1,
+  }, // the Riftfields
+  {
+    mobId: 'riftspawn',
+    center: { x: 890, z: 218 },
+    radius: 14,
+    count: 4,
+    sharedRngCount: 1,
+  }, // the Wreckfields tide line
+  {
+    mobId: 'breach_wretch',
+    center: { x: 940, z: 60 },
+    radius: 14,
+    count: 5,
+    sharedRngCount: 4,
+  }, // the wracked grain rows
+  {
+    mobId: 'breach_wretch',
+    center: { x: 1055, z: 92 },
+    radius: 14,
+    count: 5,
+    sharedRngCount: 3,
+  }, // the east fields
+  {
+    mobId: 'void_stalker',
+    center: { x: 1092, z: -72 },
+    radius: 12,
+    count: 3,
+    sharedRngCount: 2,
+  }, // the cliff approach
+  {
+    mobId: 'void_stalker',
+    center: { x: 1108, z: 38 },
+    radius: 12,
+    count: 3,
+    sharedRngCount: 2,
+  }, // the cliffs' south foot
+  { mobId: 'sundered_horror', center: { x: 1197, z: -157 }, radius: 6, count: 1 }, // the cliffs' great break
 ];
 export const FARSHORE_OBJECTS: GroundObjectDef[] = [
   {
@@ -557,9 +682,9 @@ export const FARSHORE_OBJECTS: GroundObjectDef[] = [
     // Bellkeeper Tam's three coastal watchbells (q_fs_the_three_bells): the
     // Landing point, the south strand below Gullhaven, the Riftfields shore.
     positions: [
-      { x: 256, z: 0 },
-      { x: 318, z: 94 },
-      { x: 442, z: 64 },
+      { x: 772, z: -48 },
+      { x: 852, z: 164 },
+      { x: 1032, z: -112 },
     ],
   },
 ];
@@ -579,14 +704,17 @@ export const FARSHORE_ESCORTS: Record<string, EscortDef> = {
     id: 'esc_fs_bram',
     npcMobId: 'fisher_bram',
     questId: 'q_fs_bram_come_home',
-    // The wreck sits at the beach edge on the Landing point's north strand
-    // (landness ~0.37: on sand, above the waterline).
-    start: { x: 252, z: -8 },
+    // The wreck sits at the beach edge west of the Landing. Main's coast
+    // relief redrew this strand: the waterline now runs north-south along
+    // x 762, so the wreck moved onto its edge to keep open sea a few yards
+    // to the SOUTH and none for sixty north (the escort test samples both).
+    start: { x: 762, z: -60 },
     waypoints: [
-      { x: 254, z: -4 },
-      { x: 252, z: 15 },
-      { x: 276, z: 42 },
-      { x: 298, z: 74 },
+      { x: 778, z: -44 },
+      { x: 792, z: -26 },
+      { x: 804, z: 20 },
+      { x: 810, z: 70 },
+      { x: 814, z: 110 },
     ],
     moveSpeed: 4.5,
     ambushes: [
@@ -608,45 +736,116 @@ export const FARSHORE_PROPS: ZonePropsDef = {
   // Gullhaven, the redoubt: a fishing town turned to holding a line. The
   // homes still stand, but a war camp crowds the market and the fences have
   // become a barricade ring.
-  buildings: [
-    { kind: 'inn', x: 298, z: 64, w: 6, d: 7, rot: 0.5 }, // the muster hall
-    { kind: 'house', x: 312, z: 78, w: 5, d: 5, rot: -1.1 },
-    { kind: 'house', x: 296, z: 78, w: 5, d: 5, rot: 2.1 },
-    { kind: 'chapel', x: 316, z: 62, w: 5, d: 7, rot: -2.4 }, // the menders' hall
+  // Gullhaven, the redoubt: a fishing town turned to holding a line. The homes
+  // still stand, but a war camp crowds the market and the curtain wall on the
+  // landward side is what the fences became.
+  //
+  // The buildings live in src/sim/content/gullhaven.ts, which also derives the
+  // plot pads that level their ground and the curtain that encloses them. The
+  // four original houses were RE-SITED rather than kept: three of them stood in
+  // the painted road (one dead centre of the memorial path, one dead centre of
+  // the Watch Meadow road) and two had an NPC standing inside their solid box.
+  buildings: GULLHAVEN_BUILDINGS.map(({ kind, x, z, w, d, rot }) => ({ kind, x, z, w, d, rot })),
+  // Warden Hale's memorial. It stands on the berm crest NORTH of the redoubt
+  // (graded to a level 10.4 terrace, about 5 yd above the town's flat 5.5
+  // pad, by MEMORIAL_TERRAIN_EDITS) rather than in the
+  // market it used to crowd: a memorial reads as a memorial with space around
+  // it, and from up here the bronze looks back down over the town and the
+  // harbor steps the way the histories describe. Facing south, inland over the
+  // town, per the Q0 line. One authored asset now, not two scaled nature-kit
+  // blocks; the collider radius is the measured circumscribed footprint so
+  // collision matches the silhouette.
+  //
+  // The bronze warden now stands on a European-style memorial column rather
+  // than a plinth, which took the asset from 4.8 to 7.48 yd: a shaft only has
+  // to out-measure the figure to read as a column at all. Both numbers below
+  // are measured off the shipping GLB, not chosen.
+  decorProps: [
+    {
+      key: 'wardenHaleStatue',
+      x: 805,
+      z: 139,
+      rot: Math.PI,
+      scale: 1,
+      r: 1.4,
+      h: 7.48,
+    },
+    // ---- Gullhaven's redoubt ---------------------------------------------
+    // The wall ring and the town fittings, DERIVED from src/sim/content/gullhaven.ts
+    // so the props here and the oriented boxes in colliders.ts stay one geometry.
+    ...gullhavenWallProps(),
+    ...GULLHAVEN_TOWN_PROPS,
+
+    // ---- the memorial precinct -------------------------------------------
+    // Rebuilt after the first pass read as scattered rubble in a forest. Three
+    // corrections, all from measuring the assets instead of picking them by
+    // name: hexFenceStone is 1.15 long and 0.27 high, so spacing it every 3
+    // yards left 1.85 yard gaps and it read as debris (dropped); kcasBench is
+    // a salmon-pink castle picnic table, absurd at a memorial (dropped); and
+    // gardenIronFence is 4.0 long with rot 0 running along X, so a run needs
+    // ~3.5 spacing to overlap rather than gap.
+    //
+    // Trees and rocks are cleared inside the memorial's clearingRadius
+    // (decorationAt in world.ts), so the planting below is the only greenery
+    // on the mound and the bronze keeps sky behind it.
+    //
+    // The path arrives from the WEST after contouring the mound, so the
+    // perimeter opens on that side and closes the south and east where the
+    // ground falls away.
+    // The rail, DERIVED from GULLHAVEN_MEMORIAL.rail so the props and the
+    // colliders in colliders.ts cannot drift apart. Do not hand-list these.
+    ...memorialRailProps(GULLHAVEN_MEMORIAL),
+    // Planting in matched pairs on the terrace diagonals: it frames the plinth
+    // and never stands on the axis you walk in on.
+    { key: 'shrubFlowering', x: 803.1, z: 137.7, scale: 1, r: 0.5, h: 1.4 },
+    { key: 'shrubFlowering', x: 806.9, z: 137.7, scale: 1, r: 0.5, h: 1.4 },
+    { key: 'shrubFlowering', x: 803.1, z: 141.5, scale: 1, r: 0.5, h: 1.4 },
+    { key: 'shrubFlowering', x: 806.9, z: 141.5, scale: 1, r: 0.5, h: 1.4 },
+    { key: 'oakTree', x: 786.5, z: 150, rot: 0.6, scale: 1.2, r: 0.8, h: 9 },
+    // Moved clear of the south bench: at (823.5, 149) it stood in the middle of
+    // the levelled building ground GULLHAVEN_TERRAIN_EDITS cuts there.
+    { key: 'oakTree', x: 836, z: 156, rot: -1.1, scale: 1.25, r: 0.8, h: 9 },
   ],
-  wells: [{ x: 305, z: 71, r: 1.5 }],
+  wells: [{ x: 820, z: 119, r: 1.5 }],
   stalls: [
-    { x: 310, z: 68, rot: 0.6, r: 1.6 }, // the quartermaster's arming table
-    { x: 300, z: 74, rot: -1.3, r: 1.6 },
+    { x: 825, z: 116, rot: 0.6, r: 1.6 }, // the quartermaster's arming table
+    { x: 815, z: 122, rot: -1.3, r: 1.6 },
   ],
   crates: [
-    [294, 68],
-    [312, 72],
-    [308, 60], // ration and quarrel stores against the siege
-    [290, 72],
+    [809, 116],
+    [827, 120],
+    [823, 108], // ration and quarrel stores against the siege
+    [805, 120],
   ],
+  // No watchfire in the square. Gullhaven builds in STONE: a stone curtain, a
+  // stone bell tower, mortared houses. A campfire on the market cobbles read as
+  // a war camp pitched on top of a town rather than a town holding a line. The
+  // two that remain are outposts with no roof over them, which is the point.
   campfires: [
-    [304, 66], // the muster fire
-    [252, 18], // the Landing's brazier, at the causeway's island end
-    [372, 4], // the Watch Meadow's signal fire, kept burning for the vigil
+    [782, -26], // the Landing's brazier on the west shore
+    [992, 6], // the Watch Meadow's signal fire, kept burning for the vigil
   ],
-  // the barricade ring: the town's old windward fences, doubled and closed
-  // into a defensive line around the muster
-  fences: [
-    { x1: 288, z1: 56, x2: 308, z2: 54 },
-    { x1: 314, z1: 56, x2: 322, z2: 64 },
-    { x1: 292, z1: 86, x2: 312, z2: 88 },
-    { x1: 284, z1: 66, x2: 286, z2: 78 },
-  ],
-  // the war camp: tents crowd the market where the fish stalls used to stand
-  tents: [
-    { x: 300, z: 60, rot: 0.4, scale: 1 },
-    { x: 314, z: 70, rot: -1.8, scale: 1 },
-    { x: 292, z: 62, rot: 2.3, scale: 1 },
-  ],
-  // the Landing's fishing pier, at the island end of the causeway. No stone
-  // hut on this dock: hw/hd 0 collapse the optional hut to nothing (with the
-  // old 0.1/0.1 it drew as a thin post floating out over the water).
-  docks: [{ x: 246, z: 12, rot: -1.7, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } }],
-  graveyards: [{ x: 290, z: 86 }],
+  // The barricade ring is retired. It read as clutter around the muster, and
+  // the north run (x 807-827, z 134-136) cut straight across the memorial's
+  // south approach: a solid line between the town and the monument, which is
+  // where the stray collision up there came from. The siege reads through the
+  // war camp, the watchfires and the redoubt itself, not a rail fence.
+  // The churchyard wall behind the menders' hall (src/sim/content/gullhaven.ts).
+  // The old barricade ring is still retired: it read as clutter round the muster
+  // and cut across the memorial's south approach.
+  fences: [...GULLHAVEN_CHURCHYARD_FENCE],
+  // No tents either, for the same reason: canvas beside a stone bell tower and
+  // mortared houses is two different towns in one frame. The siege now reads
+  // through the curtain wall, the gates and the salvage on the quay.
+  tents: [],
+  // The Landing's small fishing jetty on the west shore. Gullhaven's own
+  // waterfront is the authored harbor below, which replaced the interim
+  // single-dock town pier (a dock deck seats on its anchor's terrain, so it
+  // could never reach the bay's deep water; the harbor's decks carry
+  // authored heights instead).
+  docks: [{ x: 778, z: -36, rot: 2.4, hutLocal: { x: 40, z: 40, hw: 0, hd: 0 } }],
+  // Gullhaven's harbor: the boardwalk waterfront, the stepped pier over the
+  // bay drop, and the ship berth (src/sim/harbor_layout.ts).
+  harbors: [GULLHAVEN_HARBOR],
+  graveyards: [{ x: 839, z: 132 }],
 };

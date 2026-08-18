@@ -109,7 +109,6 @@ export type BagTooltipHintKey =
   | 'hudChrome.bank.guildDepositHint'
   | 'hudChrome.bank.guildCannotDeposit'
   | 'itemUi.tooltip.clickDestroy'
-  | 'hudChrome.mounts.clickManage'
   | 'itemUi.tooltip.clickEquip'
   | 'itemUi.tooltip.clickConsume'
   | 'itemUi.tooltip.clickUseInstant'
@@ -370,7 +369,7 @@ export function bagTooltipHintKey(
   // exact line the click raises, the way the vendor / market cannot-hints do.
   if (mode.bankOpen) return 'hudChrome.bank.cannotDepositNow';
   if (item.kind === 'quest') return 'itemUi.tooltip.clickDestroy';
-  if (item.kind === 'mount') return 'hudChrome.mounts.clickManage';
+  if (item.kind === 'mount') return '';
   if (
     item.kind === 'weapon' ||
     item.kind === 'armor' ||

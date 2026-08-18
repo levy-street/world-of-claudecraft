@@ -80,9 +80,9 @@ describe('generated chunk geometry is stable', () => {
     await task;
 
     const meshes = terrain.group.children.filter((c) => (c as THREE.Mesh).isMesh) as THREE.Mesh[];
-    // 36 in-rect chunks plus the 12 merged super-chunk meshes over the 21 gap
-    // cells nearest-rect ownership hands the Vale (the rects do not tile).
-    expect(meshes.length).toBe(48);
+    // 36 in-rect chunks plus the offshore-world gap meshes nearest-rect
+    // ownership hands the Vale (the rects do not tile).
+    expect(meshes.length).toBe(58);
 
     // Order the chunks by their own geometry bounds, so the pin does not depend
     // on build ORDER (which the worker move is expressly going to change).
@@ -112,12 +112,18 @@ describe('generated chunk geometry is stable', () => {
       return digest.digest('hex').slice(0, 32);
     };
 
-    // The in-rect chunks split from the gap fill by their bounds: every Vale
-    // rect chunk starts at x >= -180 (the skirt overhangs by under a yard).
-    const inRect = keyed.filter(({ box }) => box.min.x >= -181);
-    const gapFill = keyed.filter(({ box }) => box.min.x < -181);
+    // Split the realm's own cells from its nearest-owned sea/rim cells by each
+    // chunk's centre. The campaign adds open sea east of the Vale, so an
+    // x-only split no longer distinguishes the two sets.
+    const inRect = keyed.filter(({ box }) => {
+      const x = (box.min.x + box.max.x) / 2;
+      const z = (box.min.z + box.max.z) / 2;
+      return x >= -180 && x < 180 && z >= -180 && z < 180;
+    });
+    const inRectKeys = new Set(inRect.map(({ key }) => key));
+    const gapFill = keyed.filter(({ key }) => !inRectKeys.has(key));
     expect(inRect.length).toBe(36);
-    expect(gapFill.length).toBe(12);
+    expect(gapFill.length).toBe(22);
 
     // Re-minted for the natural-relief heightfield plus the shared height
     // lattice in terrain_chunk_build.ts (vertex normals now difference the
@@ -139,9 +145,17 @@ describe('generated chunk geometry is stable', () => {
     // points, 0.5 percent, every one inside x -211.5..-132.5, z 116.5..145.5,
     // and nothing rises anywhere. Both digests move because that window
     // straddles the rect edge at x = -180.
-    expect(digestOf(inRect)).toBe('39afe77d61ac348961d01e890aaddb00');
+    // Re-minted for the Last Bell packet's v0.39.0 merge: the campaign's
+    // asymmetric world bounds (WORLD_MIN_X) renormalize every chunk's UVs over
+    // WORLD_MIN_X..WORLD_MAX_X, so in-rect bytes move with the world box even
+    // though no Vale height changed.
+    expect(digestOf(inRect)).toBe('837397b5ae5c814a0832046cf0c8e0f1');
     // The gap super-chunks take the same re-mint.
-    expect(digestOf(gapFill)).toBe('c4839177e825dbcf8dc5bcf501336fc2');
+    // Re-minted for the Last Bell packet's v0.39.0 merge: the asymmetric
+    // world box moves gap-chunk UVs like the in-rect pin above, and the
+    // Gullhaven west-quarter benches, wall berm, and extended curtain line
+    // deliberately regrade the Farshore gap cells they stand on.
+    expect(digestOf(gapFill)).toBe('31e8f041534da521ccd54e8028b5ea07');
 
     terrain.cancelStreaming();
   });

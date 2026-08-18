@@ -511,7 +511,7 @@ describe('Eastbrook authored gameplay data integration', () => {
       { x: -294, z: 815 },
       { x: 314, z: 816 },
       { x: 427, z: 355 },
-      { x: 299, z: 76 },
+      { x: 816, z: 124 }, // Gullhaven moved with the Last Bell campaign island (hub 822,118)
     ]);
     expect(PLAYER_START).toEqual({ x: 2, z: -2 });
     expect(EASTBROOK_LAYOUT.services.graveyard.position).toEqual({ x: -14, z: -14 });
@@ -895,10 +895,10 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
   });
 
   it('keeps the fixed-seed world projection stable through wandering and respawn', {
-    // Two complete shipped-world simulations run through wandering and respawn.
-    // Loaded five-worker CI can exceed the old 90s budget while the bounded
-    // projection still completes deterministically.
-    timeout: 180000,
+    // The canonical four-worker gate can put this synchronous dual-world
+    // projection just over 90 seconds under CPU contention. Keep the full seed,
+    // tick, and equality contract; only give the worker enough wall-clock room.
+    timeout: 120000,
   }, () => {
     const stabilitySeed = 4_242;
     const legacyWorld = {

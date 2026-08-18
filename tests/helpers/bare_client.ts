@@ -225,14 +225,20 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.onDisconnect = null;
   c.onConnectionLost = null;
   c.onReconnected = null;
+  // Scene presentation mirrors (the Last Bell campaign's scene overlay landed
+  // these on ClientWorld): the hello/spectate handlers converge them via
+  // queueSceneConvergence, so the fixture must carry the class defaults.
+  c.onSceneInputLockChanged = null;
+  c.presentationTime = 0;
+  c.sceneInputLockedBeforeDrain = false;
+  c.sceneActiveMirror = false;
 
   Object.assign(c, rest);
   return c;
 }
 
 export interface FakeClient {
-  // biome-ignore lint/suspicious/noExplicitAny: sent frames are untyped wire JSON, read all
-  // over the calling suites (msg.t, msg.list, ...); matches the idiom's prior local type.
+  // biome-ignore lint/suspicious/noExplicitAny: sent frames are untyped wire JSON read all over the calling suites (msg.t, msg.list, ...); matches the idiom's prior local type.
   sent: any[];
   // biome-ignore lint/suspicious/noExplicitAny: mirrors the `ws` field GameServer.join expects
   ws: any;

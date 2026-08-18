@@ -58,14 +58,14 @@ function routeRaw(server: GameServer, events: SimEvent[]): void {
 }
 
 // The wire frame a session receives, byte-for-byte, is
-// JSON.stringify({ t: 'events', list: [...selected events...] }). The expected values
+// JSON.stringify({ t: 'events', time, list: [...selected events...] }). The expected values
 // below are built by JSON.stringify'ing INDEPENDENTLY AUTHORED event objects (matching
 // the key order routeEvents leaves on each event, flair appended last), so the pin
 // reds both on an authoring mistake here and on a refactor that assembles the frame
 // with different bytes (the refactor concatenates pre-serialized fragments, so this
 // comparison is a genuine oracle for it, not a tautology).
 function eventsFrame(...list: unknown[]): string {
-  return JSON.stringify({ t: 'events', list });
+  return JSON.stringify({ t: 'events', time: 0, list });
 }
 
 function entityPos(server: GameServer, pid: number): { x: number; y: number; z: number } {
@@ -88,6 +88,7 @@ describe('routeEvents frame bytes and session mutations', () => {
     const sa = joinServer(server, fa, 1, 'Ayla');
     const fb = fakeWs();
     joinServer(server, fb, 2, 'Bram');
+    expect(JSON.parse(fa.sent[0])).toMatchObject({ t: 'hello', time: 0 });
     fa.sent.length = 0;
     fb.sent.length = 0;
 
@@ -118,7 +119,7 @@ describe('routeEvents frame bytes and session mutations', () => {
     // A fully hardcoded pin (no JSON.stringify in the oracle) to foreclose any
     // stringify-vs-stringify tautology worry.
     expect(fb.sent[0]).toBe(
-      `{"t":"events","list":[{"type":"chat","fromPid":${sa.pid},"from":"Ayla","channel":"general","text":"hello all"},{"type":"chat","fromPid":${sa.pid},"from":"Ayla","channel":"world","text":"anyone around"}]}`,
+      `{"t":"events","time":0,"list":[{"type":"chat","fromPid":${sa.pid},"from":"Ayla","channel":"general","text":"hello all"},{"type":"chat","fromPid":${sa.pid},"from":"Ayla","channel":"world","text":"anyone around"}]}`,
     );
   });
 
@@ -150,7 +151,7 @@ describe('routeEvents frame bytes and session mutations', () => {
     });
     expect(fl.sent).toEqual([expected]);
     expect(fl.sent[0]).toBe(
-      `{"t":"events","list":[{"type":"chat","fromPid":${streamer.pid},"from":"Nova","channel":"general","text":"live now","flair":{"ai":true}}]}`,
+      `{"t":"events","time":0,"list":[{"type":"chat","fromPid":${streamer.pid},"from":"Nova","channel":"general","text":"live now","flair":{"ai":true}}]}`,
     );
   });
 
@@ -554,18 +555,18 @@ describe('event_frame pure assembly', () => {
       { type: 'chat', fromPid: 7, from: 'A', channel: 'general', text: 'hi' },
       { type: 'loot', text: 'gold', pid: 7 },
     ] as unknown as SimEvent[];
-    expect(assembleEventsFrame(serializeEventFragments(events))).toBe(
-      JSON.stringify({ t: 'events', list: events }),
+    expect(assembleEventsFrame(serializeEventFragments(events), 12.5)).toBe(
+      JSON.stringify({ t: 'events', time: 12.5, list: events }),
     );
   });
 
   it('assembleEventsFrame renders an empty list as the empty-array frame', () => {
-    expect(assembleEventsFrame([])).toBe('{"t":"events","list":[]}');
+    expect(assembleEventsFrame([], 12.5)).toBe('{"t":"events","time":12.5,"list":[]}');
   });
 
   it('assembleEventsFrame joins a single fragment with no trailing separator', () => {
-    expect(assembleEventsFrame(['{"type":"log","text":"x"}'])).toBe(
-      '{"t":"events","list":[{"type":"log","text":"x"}]}',
+    expect(assembleEventsFrame(['{"type":"log","text":"x"}'], 12.5)).toBe(
+      '{"t":"events","time":12.5,"list":[{"type":"log","text":"x"}]}',
     );
   });
 });

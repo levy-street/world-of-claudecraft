@@ -596,8 +596,11 @@ describe('farFieldPolicy: the ONE capability decision for sprites and the vista'
 describe('createFarShortfallSampler: session-scoped, never a stale surface', () => {
   // Inside the world on ground with real relief, and deliberately OFF the cell
   // diagonal (tx + tz > 1), so the reconstruction below exercises the second
-  // triangle rather than the seam where both halves agree.
-  const at = { x: 303, z: 100 };
+  // triangle rather than the seam where both halves agree. Moved off
+  // (303, 100): the Farshore island's move to x 700-1300 under the asymmetric
+  // campaign bounds left that spot in open strait, flat sea whose heights no
+  // longer vary by seed; this Galecrest spot keeps seed-driven relief.
+  const at = { x: 303, z: 340 };
 
   it('matches a fresh farVertexRenderY reconstruction over the rendered cell', () => {
     const spacing = 12;

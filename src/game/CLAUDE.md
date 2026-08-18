@@ -29,6 +29,7 @@ Turns the player's keyboard/mouse/touch/gamepad into **movement intent** +
 | `perf_doctor.ts` | pure perf-snapshot analyzer producing `PerfSuggestion[]` (no DOM); `perf_reporter.ts` is the telemetry reporter; `perf.ts` is the overlay/trace harness |
 
 ## Local invariants
+- Scene presentation runs on the sim clock through `IWorld.presentationTime`; see `docs/design/cinematics-workflow.md`.
 - **Never mutate sim state directly.** `input.ts` only records intent and fires
   callbacks. The world-touching modules (`interactions.ts`, `autoloot.ts`,
   `gather_tool_use.ts`, `escort_interact.ts`, and any future sibling) act only

@@ -1003,6 +1003,8 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/pet/pet_return.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/instances/dungeons.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/instances/heroic_vendor.ts'), 'utf8'),
+    // Last Bell scenario entry gates emit through ctx.error.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/scenarios/scenarios.ts'), 'utf8'),
     // Overworld portal transitions (the Veiled Hollow cave). The live flavor
     // lines are data-routed (PortalDef enterText/leaveText, matched by the
     // sim_i18n EXACT map via log.veilEnter/log.veilLeave); scanning the module
@@ -1175,8 +1177,8 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // Riding lesson: the mount_train_begin guard refusals and the driver's
     // notices (level/range/quest/in-progress/success/left-yard literals).
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mounts_training.ts'), 'utf8'),
-    // Mounts: the toggleMount/selectMount guard refusals and the ridingTrained
-    // error (RIDING_UNTRAINED_MSG) that the riding-skill gate emits.
+    // Mounts: the lesson toggle and usable-reins guard refusals, including the
+    // ridingTrained error (RIDING_UNTRAINED_MSG).
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mounts.ts'), 'utf8'),
     // Mount race: the 'Too far away.' start refusal. It localizes today only
     // because the literal is byte-identical to an already-scanned emit; being

@@ -550,8 +550,18 @@ describe('gather node placement: every node sits on ground a player can work', (
     // compass bearings at 14 yards, and the waterline on a fifth) rather than
     // because this arm failed it. Listing it would be claiming a red this arm
     // does not produce.
+    // wood_farshore_isle_6's old causeway spot (210,-24) left this list at
+    // the Last Bell merge: the campaign moved the island to x 700 to 1300 and
+    // retired the Ferrywalk sandbar, so that spot is open strait now (0.03yd
+    // of freeboard AT the point) and fails the point arm too, which
+    // disqualifies it as the dry-at-the-node counter-example. No farshore
+    // spot can take its seat: a gather node's calm pad moves with it
+    // (terrain_calm_anchors.ts), so every pre-move farshore spot lost the pad
+    // that held it to legacy ground and reads wet AT the point on the live
+    // field (ore_farshore_isle_1's old (860,40) measured -0.22yd there once
+    // its pad moved). The four spots that remain are in zones the campaign
+    // never touched and still carry the exact property the arm needs.
     const MOVED_OFF: [string, number, number][] = [
-      ['wood_farshore_isle_6', 210, -24],
       ['herb_galecrest_2', 406, 412],
       ['wood_willowfen_6', -417, 580],
       ['herb_amberfall_1', -342, 2110],

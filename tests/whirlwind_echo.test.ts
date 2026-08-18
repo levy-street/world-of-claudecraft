@@ -113,8 +113,10 @@ describe('single-target casts echo onto enemies near the target', () => {
     // Seed hunted like (d): the echo replays a RESOLVED amount, so the primary
     // Bloodletting has to connect for there to be anything to replay. The default
     // integration seed whiffs it since the Galecrest quest camps (#2887) added
-    // world-gen draws and moved the shared stream. Spares on record: 31340, 31341.
-    const { sim, p } = makeSim(31337);
+    // world-gen draws and moved the shared stream. Re-hunted 31337 to 31341 by
+    // the Last Bell packet's world content (the (c) third cast whiffed); 31340
+    // is burned. Spares on record: 31339, 31343.
+    const { sim, p } = makeSim(31341);
     const { primary, near, far } = arena(sim, p);
     p.resource = 100;
     sim.castAbility('whirlwind');
@@ -138,7 +140,7 @@ describe('single-target casts echo onto enemies near the target', () => {
   it('(c) the third single-target cast after both charges no longer echoes', () => {
     // Same hunted seed as (b): only a cast that actually dealt damage spends a
     // charge, so the 2 -> 1 -> 0 ladder only walks if every Bloodletting connects.
-    const { sim, p } = makeSim(31337);
+    const { sim, p } = makeSim(31341);
     const { primary, near } = arena(sim, p);
     p.resource = 100;
     sim.castAbility('whirlwind');
@@ -160,7 +162,7 @@ describe('single-target casts echo onto enemies near the target', () => {
   it('(d) Red Harvest consumes ONE charge and echoes all three strikes', () => {
     // This seed lands all three independently rolled weapon strikes. The
     // default integration seed deterministically whiffs one of them.
-    const { sim, p } = makeSim(31337);
+    const { sim, p } = makeSim(31341);
     const { primary, near, far } = arena(sim, p);
     p.resource = 100;
     sim.castAbility('whirlwind');
@@ -199,7 +201,7 @@ describe('single-target casts echo onto enemies near the target', () => {
 
 describe('Widening Arc (sweeping strikes) replays the full strike', () => {
   it('a single-target strike under sweeping_strikes hits ONE nearby enemy for the full amount', () => {
-    const { sim, p } = makeSim(31337, 'arms');
+    const { sim, p } = makeSim(31341, 'arms');
     const { primary, near, far } = arena(sim, p);
     p.resource = 100;
     sim.drainEvents();

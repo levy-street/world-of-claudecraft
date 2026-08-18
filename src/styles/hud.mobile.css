@@ -3928,6 +3928,26 @@
     );
     overflow-y: auto;
   }
+  /* The memorial plaque is a centered read-only card like the group above, but
+     narrower: it holds two short name columns, not a scrollable list. It
+     re-declares transform with its left pin (the left-pin transform guard). */
+  body.mobile-touch #memorial-plaque {
+    left: 50%;
+    right: auto;
+    top: 12px;
+    transform: translateX(-50%);
+    width: clamp(300px, 88vw, 460px);
+    max-width: calc(100vw - 20px);
+    max-height: calc(100dvh - 24px);
+    overflow-y: auto;
+  }
+  /* Portrait phones cannot hold two columns of names at a legible size, so the
+     roll stacks into one and keeps reading oldest-first straight down. */
+  @media (max-width: 420px) {
+    body.mobile-touch #memorial-plaque .memorial-plaque-columns {
+      display: block;
+    }
+  }
   body.mobile-touch #quest-log-window,
   body.mobile-touch #quest-dialog {
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 92px);
@@ -6239,6 +6259,16 @@
   body.mobile-touch #dfinder-proposal-popup .btn {
     min-height: 40px;
     box-sizing: border-box;
+  }
+  /* ---------- cinematic mode mobile controls (Last Bell scene) ---------- */
+  /* The touch joysticks and combat buttons hide with the rest of the HUD while
+     a scene runs (C0). #mobile-controls is a sibling of #ui, so it takes the
+     body.cinematic-mode class the scene painter sets; the game-active hide above
+     drives its display, and this override wins because both are in this layer and
+     this rule is later. The reconnect overlay is a <body> child and is not
+     touched here, so connection loss still surfaces during a cutscene. */
+  body.mobile-touch.cinematic-mode #mobile-controls {
+    display: none !important;
   }
   body.mobile-touch #bg-proposal-popup .btn {
     min-height: 40px;

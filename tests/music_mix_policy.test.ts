@@ -8,6 +8,7 @@ import {
 const baseState: MusicMixState = {
   enabled: true,
   menuPaused: false,
+  sceneSilenced: false,
   bossActive: false,
   sowfieldActive: false,
   vol: 0.5,
@@ -16,6 +17,10 @@ const baseState: MusicMixState = {
 describe('musicMixMasterTarget', () => {
   it('returns 0 when disabled', () => {
     expect(musicMixMasterTarget({ ...baseState, enabled: false }, 0.5)).toBe(0);
+  });
+
+  it("returns 0 while a scene's silence directive owns the mix", () => {
+    expect(musicMixMasterTarget({ ...baseState, sceneSilenced: true }, 0.5)).toBe(0);
   });
 
   it('returns 0 while the menu is paused', () => {
@@ -36,9 +41,10 @@ describe('musicMixMasterTarget', () => {
 });
 
 describe('isMusicMixAudible', () => {
-  it('mirrors the four duck conditions', () => {
+  it('mirrors the duck conditions, one per dimension', () => {
     expect(isMusicMixAudible({ ...baseState, enabled: false })).toBe(false);
     expect(isMusicMixAudible({ ...baseState, menuPaused: true })).toBe(false);
+    expect(isMusicMixAudible({ ...baseState, sceneSilenced: true })).toBe(false);
     expect(isMusicMixAudible({ ...baseState, bossActive: true })).toBe(false);
     expect(isMusicMixAudible({ ...baseState, sowfieldActive: true })).toBe(false);
   });

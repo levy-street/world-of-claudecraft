@@ -90,6 +90,8 @@ const CALLBACK_KEYS = [
   'rebucket',
   'resolve',
   'groundPos',
+  'memorialIdForEntity',
+  'memorialInteractionRadius',
   'playerMods',
   'delveRunForPlayer',
   'delveModuleEntry',
@@ -151,6 +153,8 @@ const CALLBACK_KEYS = [
   'instanceClaimIdAt',
   'enterDungeon',
   'leaveDungeon',
+  'enterStoryInstance',
+  'playScene',
   'resetDungeonInstances',
   'inheritDungeonResetLocks',
   'dungeonDifficulty',
@@ -433,6 +437,13 @@ function makeFakeHost() {
     instanceClaimIdAt: vi.fn(() => null),
     enterDungeon: vi.fn(),
     leaveDungeon: vi.fn(),
+    enterStoryInstance: vi.fn(),
+    squadRuns: new Map(),
+    scenarioRuns: new Map(),
+    scenePlaybacks: new Map(),
+    scriptedPlayerWalks: new Map(),
+    activeChoices: new Map(),
+    playScene: vi.fn(),
     enterRift: vi.fn(),
     leaveRift: vi.fn(),
     riftOpenTreasure: vi.fn(),
@@ -446,6 +457,8 @@ function makeFakeHost() {
     rebucket: vi.fn(),
     resolve: vi.fn(() => null),
     groundPos: vi.fn(() => ({ x: 0, y: 0, z: 0 })),
+    memorialIdForEntity: vi.fn(() => null),
+    memorialInteractionRadius: vi.fn(() => null),
     playerMods: vi.fn(),
     delveRunForPlayer: vi.fn(() => null),
     delveModuleEntry: vi.fn(() => ({ x: 0, y: 0, z: 0 })),
@@ -685,6 +698,7 @@ describe('Sim.ctx (real seam delegation)', () => {
     const sim = makeSim();
     expect(sim.ctx.rng).toBe(sim.rng);
     expect(sim.ctx.entities).toBe(sim.entities);
+    expect(sim.ctx.scriptedPlayerWalks).toBe(sim.scriptedPlayerWalks);
     expect(sim.ctx.time).toBe(sim.time);
     expect(sim.ctx.tickCount).toBe(sim.tickCount);
     sim.tick();
