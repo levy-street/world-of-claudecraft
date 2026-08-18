@@ -3005,12 +3005,20 @@ describe('item lock (issue 3042): locked copies are invisible to every farming s
   // gate, the fee planner callback, the tonic gate, and the husk trade's
   // count and spend.
 
-  function lockOneCopy(h: Harness, itemId: string): void {
+  // Since the v0.39.0 lock rework, setItemLocked toggles the named slot WHOLE
+  // (no single-unit peel into a fresh slot), so a locked/unlocked mix is built
+  // by granting AROUND a lock: a unit granted while a same-item slot is locked
+  // never merges into it (locked payloads are unmergeable) and starts its own
+  // unlocked slot instead.
+  function setSlotLocked(h: Harness, itemId: string, locked: boolean): void {
     const idx = h.meta.inventory.findIndex(
-      (s) => s.itemId === itemId && s.instance?.locked !== true,
+      (s) => s.itemId === itemId && (s.instance?.locked === true) !== locked,
     );
-    expect(idx, `no unlocked ${itemId} slot to lock`).toBeGreaterThanOrEqual(0);
-    expect(setItemLocked(h.sim.ctx, itemId, true, h.pid, idx).ok).toBe(true);
+    expect(idx, `no ${locked ? 'unlocked' : 'locked'} ${itemId} slot`).toBeGreaterThanOrEqual(0);
+    expect(setItemLocked(h.sim.ctx, itemId, locked, h.pid, idx).ok).toBe(true);
+  }
+  function lockOneCopy(h: Harness, itemId: string): void {
+    setSlotLocked(h, itemId, true);
   }
 
   // Hand-rolled reads (never the production lock helpers, which are the very
@@ -3040,11 +3048,19 @@ describe('item lock (issue 3042): locked copies are invisible to every farming s
 
   it('the payment walk spends the UNLOCKED seed and the locked spare survives', () => {
     const h = makeHarness();
-    giveSeeds(h, 2);
-    // Locking splits one unit into its own fresh END slot, exactly where the
-    // hub removal walk (highest bag index first) would consume FIRST; the
-    // lock-aware walk must never pick it.
+    // Build [unlocked at a low index, locked at the END slot]: the hub removal
+    // walk consumes highest bag index FIRST, so the locked copy sits exactly
+    // where a lock-blind walk would spend first. Whole-slot locks cannot split
+    // a stack, so the mix is built by the grant-around-a-lock dance plus one
+    // unlock: seed A granted and locked, seed B granted (fresh end slot, a
+    // locked slot never merges), B locked, A unlocked.
+    giveSeeds(h, 1);
     lockOneCopy(h, SEED_ID);
+    giveSeeds(h, 1);
+    lockOneCopy(h, SEED_ID);
+    setSlotLocked(h, SEED_ID, false);
+    expect(lockedUnits(h, SEED_ID)).toBe(1);
+    expect(unlockedUnits(h, SEED_ID)).toBe(1);
     const from = h.sim.events.length;
     plant(h);
     expect(eventsOf(h.sim, from, 'farmPlanted')).toHaveLength(1);
@@ -3073,9 +3089,11 @@ describe('item lock (issue 3042): locked copies are invisible to every farming s
     giveSeeds(h, 1);
     // Tier 1 fee is 2 produce; hold exactly 2 but lock 1, leaving the
     // planner one short while the RAW count still affords the fee: the
-    // deny-path re-plan proves locks alone denied it.
-    h.sim.addItem(PRODUCE_ID, 2, h.pid);
+    // deny-path re-plan proves locks alone denied it. Grant around the lock
+    // (whole-slot semantics): one locked slot, one fresh unlocked slot.
+    h.sim.addItem(PRODUCE_ID, 1, h.pid);
     lockOneCopy(h, PRODUCE_ID);
+    h.sim.addItem(PRODUCE_ID, 1, h.pid);
     const from = h.sim.events.length;
     expect(
       countDraws(h.sim, () =>
@@ -3121,10 +3139,10 @@ describe('item lock (issue 3042): locked copies are invisible to every farming s
   it('locked husks join neither the batch count nor the spend', () => {
     const h = makeHarness();
     standByNpc(h.sim);
-    h.sim.addItem(FARM_WITHERED_HUSK_ITEM_ID, 2 * FARM_HUSKS_PER_COMPOST, h.pid);
-    for (let i = 0; i < FARM_HUSKS_PER_COMPOST; i++) {
-      lockOneCopy(h, FARM_WITHERED_HUSK_ITEM_ID);
-    }
+    // One locked batch-sized stack, one unlocked (grant around the lock).
+    h.sim.addItem(FARM_WITHERED_HUSK_ITEM_ID, FARM_HUSKS_PER_COMPOST, h.pid);
+    lockOneCopy(h, FARM_WITHERED_HUSK_ITEM_ID);
+    h.sim.addItem(FARM_WITHERED_HUSK_ITEM_ID, FARM_HUSKS_PER_COMPOST, h.pid);
     const from = h.sim.events.length;
     convertHusks(h.sim.ctx, h.sim.player, h.meta);
     const ev = eventsOf(h.sim, from, 'farmHusksConverted');
@@ -3138,10 +3156,9 @@ describe('item lock (issue 3042): locked copies are invisible to every farming s
   it('all-locked husks refuse the trade as locked with the husks kept', () => {
     const h = makeHarness();
     standByNpc(h.sim);
+    // The whole batch-sized stack locked in place (whole-slot semantics).
     h.sim.addItem(FARM_WITHERED_HUSK_ITEM_ID, FARM_HUSKS_PER_COMPOST, h.pid);
-    for (let i = 0; i < FARM_HUSKS_PER_COMPOST; i++) {
-      lockOneCopy(h, FARM_WITHERED_HUSK_ITEM_ID);
-    }
+    lockOneCopy(h, FARM_WITHERED_HUSK_ITEM_ID);
     const from = h.sim.events.length;
     expect(countDraws(h.sim, () => convertHusks(h.sim.ctx, h.sim.player, h.meta))).toBe(0);
     // Raw count affords a batch, unlocked count does not: 'locked', never a
