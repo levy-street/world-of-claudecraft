@@ -37,9 +37,10 @@ describe('painted weapon inventory icons', () => {
     .sort();
 
   it('covers every authored base weapon exactly once', () => {
-    // 123 with the class-overhaul integration daggers (rimefang, marrowpoint,
-    // duskwhisper, boneglass_shiv), painted in integration-dagger-icons-2026-08-10.
-    expect(baseWeapons).toHaveLength(123);
+    // 124: 123 with the class-overhaul integration daggers (rimefang, marrowpoint,
+    // duskwhisper, boneglass_shiv, painted in integration-dagger-icons-2026-08-10), plus
+    // the Mirefen world boss's signature maul (balgath-boss-icons-2026-08-18).
+    expect(baseWeapons).toHaveLength(124);
     expect([...WEAPON_IMAGE_IDS].sort()).toEqual(baseWeapons);
     expect(Object.keys(ITEM_WEAPON_VARIANTS).sort()).toEqual(baseWeapons);
     for (const id of baseWeapons) {
@@ -68,7 +69,8 @@ describe('painted weapon inventory icons', () => {
     const weaponBatches = batches.filter((batch) =>
       batch.itemIds.some((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id)),
     );
-    expect(weaponBatches).toHaveLength(3);
+    // 4 with the Mirefen world-boss batch, whose maul is a weapon-registry item.
+    expect(weaponBatches).toHaveLength(4);
     const historicalBatch = weaponBatches.find(
       ({ batchId }) => batchId === 'placeholder-art-completion-weapons-2026-08-09',
     );
@@ -119,9 +121,22 @@ describe('painted weapon inventory icons', () => {
       'marrowpoint',
       'rimefang',
     ]);
+    // Weapons painted in LATER batches are excluded the same way the integration
+    // daggers are: the historical batch is the campaign's frozen scope, and every batch
+    // after it owns its own art.
+    const bossBatch = weaponBatches.find(
+      ({ batchId }) => batchId === 'balgath-boss-icons-2026-08-18',
+    );
+    const bossWeaponIds = (bossBatch?.itemIds ?? [])
+      .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
+      .sort();
+    expect(bossWeaponIds).toEqual(['foremans_barrowmaul']);
     expect(historicalBatch?.itemIds).toEqual(
       expected.filter(
-        (id) => !replacementWeaponIds.includes(id) && !integrationWeaponIds.includes(id),
+        (id) =>
+          !replacementWeaponIds.includes(id) &&
+          !integrationWeaponIds.includes(id) &&
+          !bossWeaponIds.includes(id),
       ),
     );
     expect(
@@ -160,10 +175,16 @@ describe('painted weapon inventory icons', () => {
     const chunkD = readJsonRecord(weaponGenerationRecordFiles[3]) as {
       finalAssets: Array<{ id: string }>;
     };
-    // The chunk records are the frozen weapon campaign's generation reports:
-    // they slice the pre-integration weapon roster, without the four
-    // integration daggers that postdate the campaign.
-    const campaignExpected = expected.filter((id) => !integrationWeaponIds.includes(id));
+    // The chunk records are the frozen weapon campaign's generation reports: they slice
+    // the pre-integration weapon roster, without the four integration daggers OR the
+    // world-boss maul, both of which postdate the campaign and own their own art.
+    const bossWeaponIdsForChunks = (
+      weaponBatches.find(({ batchId }) => batchId === 'balgath-boss-icons-2026-08-18')?.itemIds ??
+      []
+    ).filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id));
+    const campaignExpected = expected.filter(
+      (id) => !integrationWeaponIds.includes(id) && !bossWeaponIdsForChunks.includes(id),
+    );
     expect(chunkA.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(0, 40));
     expect(chunkB.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(40, 80));
     expect(chunkC).toEqual(campaignExpected.slice(80, 100));

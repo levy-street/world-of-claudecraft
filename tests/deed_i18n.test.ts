@@ -57,8 +57,9 @@ describe('deed_i18n English resolution', () => {
     // Reliquary Curator rank bridges (3 titles + 1 border; the border has no
     // title manifest row), the three WARFARE lifetime-honor rank titles, the
     // five Phase 18 Reliquary completion-ladder titles, and the walk-in
-    // castle visit pair (no title reward).
-    expect(manifest.length).toBe(273 * 2 + 42);
+    // castle visit pair (no title reward), and the Mirefen world-boss pair (also no
+    // title reward).
+    expect(manifest.length).toBe(275 * 2 + 42);
     expect(manifest.filter((row) => row.field === 'title').length).toBe(42);
     expect(manifest).toContainEqual({
       id: 'prog_veteran',

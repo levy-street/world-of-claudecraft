@@ -92,6 +92,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   drownedmoon_maul: 'mace',
   nhalias_bell_maul: 'mace',
   fenshadow_maul: 'mace',
+  foremans_barrowmaul: 'mace',
   gravewyrm_thornmaul: 'mace',
   maul_of_the_scourged_wilds: 'mace',
   wildsoul_maul: 'mace',

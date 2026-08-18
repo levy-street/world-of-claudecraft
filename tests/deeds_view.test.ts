@@ -807,7 +807,7 @@ describe('real catalog integration', () => {
     // Reliquary completion-ladder deeds, and the walk-in castle visit pair;
     // col_reliquary_complete is the catalog's one off-prefix feat, so it sits
     // outside the completion denominator like the three feat_ deeds).
-    expect(view.summary.visibleTotal).toBe(260);
+    expect(view.summary.visibleTotal).toBe(262);
     // The bucket sum adds the feat-flagged rows back on top (3 on the Feats
     // shelf plus the off-prefix capstone on Collection).
     expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(264);

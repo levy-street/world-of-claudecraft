@@ -283,7 +283,14 @@ describe('v0.36 placeholder-art completion evidence', () => {
     // The campaign's frozen weapon scope predates the class-overhaul
     // integration's four daggers (integration-dagger-icons-2026-08-10 owns
     // their art), so the live registry minus that batch is the campaign set.
-    const INTEGRATION_WEAPON_IDS = ['boneglass_shiv', 'duskwhisper', 'marrowpoint', 'rimefang'];
+    // ...and now also the Mirefen world boss's maul, painted in its own later batch.
+    const INTEGRATION_WEAPON_IDS = [
+      'boneglass_shiv',
+      'duskwhisper',
+      'foremans_barrowmaul',
+      'marrowpoint',
+      'rimefang',
+    ];
     expect(targets.weaponItems).toEqual(
       sorted(
         Object.keys(ITEM_WEAPON_VARIANTS).filter((id) => !INTEGRATION_WEAPON_IDS.includes(id)),

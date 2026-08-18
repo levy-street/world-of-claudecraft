@@ -1602,7 +1602,7 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'epic',
     hand: 'twohand',
-    weapon: { min: 62, max: 94, speed: 3.4 },
+    weapon: { min: 46, max: 67, speed: 3.4 },
     stats: { str: 14, sta: 9 },
     sellValue: 9200,
     requiredClass: WAR,

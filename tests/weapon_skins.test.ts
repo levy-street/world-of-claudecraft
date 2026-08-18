@@ -120,6 +120,10 @@ describe('weapon type classification', () => {
         return 'dagger';
       if (/^(adv_)?dagger/.test(variant)) return 'dagger';
       if (/^(adv_)?(druid_)?staff|^adv_druid_staff/.test(variant)) return 'staff';
+      // Bespoke boss weapons carry thematic names rather than a family prefix, exactly
+      // like the dagger skins above; assets.ts tags this one VAR_HAMMER, which is the
+      // render-side family authority.
+      if (/^balgath_barrowmaul_hammer$/.test(variant)) return 'mace';
       if (/^hammer/.test(variant)) return 'mace';
       if (/^(adv_)?axe/.test(variant)) return 'axe';
       if (/^(adv_)?wand/.test(variant)) return 'wand';
