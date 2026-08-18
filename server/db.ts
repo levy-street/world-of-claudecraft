@@ -17,6 +17,7 @@ import { APPLE_AUTH_SCHEMA } from './apple_auth_db';
 import { ACCOUNT_ATTRIBUTION_SCHEMA, accountAttributionForExport } from './attribution_db';
 import { validCharName } from './auth';
 import type { BankBonusFacts } from './bank_entitlements';
+import { CHARACTER_ADVISORY_LOCK_NAMESPACE } from './character_lock';
 import {
   configureLifetimeXpRankCache,
   readLifetimeXpRankForCharacter,
@@ -67,8 +68,8 @@ import {
   PLAYER_METRICS_SCHEMA,
   recordCharacterCreation,
 } from './player_metrics_db';
-import { PROGRESS_EVENTS_SCHEMA } from './progress_events_db';
 import { POKER_SCHEMA } from './poker_db';
+import { PROGRESS_EVENTS_SCHEMA } from './progress_events_db';
 import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
 import { REALM, REALM_DIRECTORY } from './realm';
 import { chooseArchiveName } from './reclaim_name';
@@ -4552,8 +4553,12 @@ export async function acquireCharacterLease(
     // uses PLAIN EQUALITY (never IS NOT DISTINCT FROM): SQL NULL semantics make a
     // NULL account_id row (a lease that predates this column) fail the account arm
     // and every arm except expiry, which is exactly the locked fail-closed behavior.
-    `INSERT INTO character_leases (character_id, realm, holder, nonce, account_id, acquired_at, heartbeat_at, expires_at)
-     VALUES ($1, $2, $3, $4, $5, now(), now(), now() + make_interval(secs => $6))
+    `WITH locked AS (
+       SELECT pg_advisory_xact_lock($7, $1)
+     )
+     INSERT INTO character_leases (character_id, realm, holder, nonce, account_id, acquired_at, heartbeat_at, expires_at)
+     SELECT $1, $2, $3, $4, $5, now(), now(), now() + make_interval(secs => $6)
+     FROM locked
      ON CONFLICT (character_id) DO UPDATE
        SET realm = EXCLUDED.realm,
            holder = EXCLUDED.holder,
@@ -4563,7 +4568,15 @@ export async function acquireCharacterLease(
            heartbeat_at = now(),
            expires_at = EXCLUDED.expires_at
        WHERE character_leases.expires_at < now() OR character_leases.holder = EXCLUDED.holder OR character_leases.account_id = EXCLUDED.account_id`,
-    [characterId, REALM, holder, nonce, accountId, LEASE_TTL_SECONDS],
+    [
+      characterId,
+      REALM,
+      holder,
+      nonce,
+      accountId,
+      LEASE_TTL_SECONDS,
+      CHARACTER_ADVISORY_LOCK_NAMESPACE,
+    ],
   );
   return (res.rowCount ?? 0) > 0;
 }

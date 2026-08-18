@@ -188,6 +188,7 @@ import {
   loadRiftState,
   markAccountQuestComplete,
   openPlaySession,
+  PROCESS_LEASE_HOLDER,
   pool,
   releaseCharacterLease,
   saveCharacterAndGuildBankState,
@@ -273,6 +274,7 @@ import { buildSharedInterestCandidates } from './interest_candidates';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
 import { keepaliveSweepDelayed } from './keepalive_sweep';
+import { KeyedSerialQueue } from './keyed_serial_queue';
 import { LINKDEAD_GRACE_MS, planJoin } from './linkdead';
 import {
   consumeListReadToken,
@@ -321,9 +323,10 @@ import {
 } from './parse';
 import { PartyFrameProjectionCache } from './party_frame_projection';
 import { applyBoostKitToPlayer, pbeBoostEnabled } from './pbe_boost';
-import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_events';
+import { PokerCurrencyCoordinator } from './poker_currency_runtime';
 import { createPokerService, type PokerService } from './poker_service';
 import { createPokerWireController, type PokerWireController } from './poker_wire';
+import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_events';
 import { nextRaidResetMs, resetDayKey } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
@@ -1899,6 +1902,7 @@ export class GameServer {
   private readonly generalChatRateLimitLiveState = new GeneralChatRateLimitLiveState();
   private readonly pokerService: PokerService;
   private readonly pokerWire: PokerWireController<ClientSession>;
+  private readonly pokerCurrency: PokerCurrencyCoordinator;
   private wireCache = new Map<number, EntityWireCache>();
   // partyFrameAggroTargets / partyFrameIncomingHeals scan the whole entity set and
   // are GLOBAL (identical for every grouped session), yet partyWire runs once for
@@ -1959,7 +1963,7 @@ export class GameServer {
   private saveTimer = 0;
   private socialPosTimer = 0;
   private saveAllInFlight: Promise<void> | null = null;
-  private readonly characterSaveQueues = new Map<number, Promise<boolean>>();
+  private readonly characterSaveQueue = new KeyedSerialQueue<number>();
   // Weapon-skin loadouts are whole-record replacements in their dedicated paid
   // state row. Keep one FIFO per account so rapid apply/detach commands cannot
   // commit on separate pool clients in reverse order and resurrect stale state.
@@ -2163,8 +2167,42 @@ export class GameServer {
     const pokerAuditHashKey = process.env.POKER_AUDIT_HASH_KEY?.trim() ?? '';
     const pokerFeatureEnabled = () =>
       process.env.POKER_FEATURE_ENABLED === '1' && pokerAuditHashKey.length >= 32;
+    this.pokerCurrency = new PokerCurrencyCoordinator({
+      queue: this.characterSaveQueue,
+      sessionForCharacter: (characterId) => this.sessionsByCharacterId.get(characterId) ?? null,
+      copperForCharacter: (characterId) => {
+        const session = this.sessionsByCharacterId.get(characterId);
+        return session ? (this.sim.meta(session.pid)?.copper ?? null) : null;
+      },
+      adjustCopper: (characterId, delta) => {
+        const session = this.sessionsByCharacterId.get(characterId);
+        const meta = session ? this.sim.meta(session.pid) : null;
+        if (!meta) return false;
+        const next = meta.copper + delta;
+        if (!Number.isSafeInteger(next) || next < 0) return false;
+        meta.copper = next;
+        return true;
+      },
+      setCopper: (characterId, copper) => {
+        const session = this.sessionsByCharacterId.get(characterId);
+        const meta = session ? this.sim.meta(session.pid) : null;
+        if (!meta || !Number.isSafeInteger(copper) || copper < 0) return false;
+        meta.copper = copper;
+        return true;
+      },
+      quarantineCharacter: (characterId) => {
+        const session = this.sessionsByCharacterId.get(characterId);
+        if (!session || session.escrowQuarantined) return;
+        session.escrowQuarantined = true;
+        void this.kickSession(session, 'poker currency outcome unknown', 'character taken over');
+      },
+    });
     this.pokerService = createPokerService({
-      db: { query: (text, values) => pool.query(text, values) },
+      db: {
+        query: (text, values) => pool.query(text, values),
+        connect: () => pool.connect(),
+        leaseHolder: PROCESS_LEASE_HOLDER,
+      },
       realm: REALM,
       featureEnabled: pokerFeatureEnabled,
       nowMs: () => Date.now(),
@@ -2187,6 +2225,7 @@ export class GameServer {
         );
       },
       onChanged: (tableId, result) => pokerWire?.broadcast(tableId, result),
+      currency: this.pokerCurrency,
     });
     this.pokerWire = createPokerWireController({
       enabled: pokerFeatureEnabled,
@@ -4507,8 +4546,7 @@ export class GameServer {
     // its book half could not, so persisting it is exactly the mint the
     // refusal prevented. It reloads from its durable row instead.
     if (session.escrowQuarantined) return false;
-    const previous = this.characterSaveQueues.get(session.characterId);
-    const run = (previous ? previous.catch(() => {}) : Promise.resolve()).then(async () => {
+    return this.characterSaveQueue.run(session.characterId, async () => {
       // Re-checked INSIDE the queue, not only at entry: a save enqueued before
       // the rollback would otherwise run after it, and by then this session's
       // book ops have been undone while its character blob still reflects
@@ -4836,14 +4874,6 @@ export class GameServer {
       }
       return true;
     });
-    this.characterSaveQueues.set(session.characterId, run);
-    try {
-      return await run;
-    } finally {
-      if (this.characterSaveQueues.get(session.characterId) === run) {
-        this.characterSaveQueues.delete(session.characterId);
-      }
-    }
   }
 
   async saveAll(reason: string): Promise<void> {
@@ -6709,6 +6739,7 @@ export class GameServer {
       void this.pokerWire.stopWatching(session, msg);
       return;
     }
+    if (this.pokerCurrency.isBusy(session.characterId)) return;
     if (msg.t !== 'cmd') {
       this.botDetector.observeProtocolAnomaly(
         session.botTrackingContext,
@@ -10138,7 +10169,7 @@ export class GameServer {
     // deed, and the marquee broadcast (cosmetic, no durability contract)
     // already fired above. One save covers every unlock the tick produced for
     // a session (a retro burst on join is a single blob write);
-    // characterSaveQueues plus the recorder's FIFO preserve per-character
+    // characterSaveQueue plus the recorder's FIFO preserve per-character
     // unlock order.
     for (const [session, deedIds] of deedUnlocks) {
       session.pendingDeedRecords.push(...deedIds);

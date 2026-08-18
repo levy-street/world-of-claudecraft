@@ -1,9 +1,14 @@
+import { randomUUID } from 'node:crypto';
 import { type PokerAction, PokerTable } from '../src/sim/poker/engine';
 import type { PokerClientSnapshot } from '../src/sim/poker/protocol';
 import { Rng } from '../src/sim/rng';
 import {
   createPokerStore,
+  type PokerConnect,
+  type PokerCurrencyMutation,
   type PokerQuery,
+  type PokerSaveResult,
+  type PokerSeatBalance,
   type PokerSeatMutation,
   type PokerStore,
   type PokerTableRow,
@@ -13,9 +18,9 @@ import {
   decodePokerSitOut,
   encodePokerSitOut,
   markPokerSitOut,
-  pokerSitOutLeavesAfterHand,
   type PokerSitOutEntry,
   type PokerSitOutState,
+  pokerSitOutLeavesAfterHand,
 } from './poker_sit_out';
 
 export const POKER_SMALL_BLIND = 10;
@@ -33,6 +38,19 @@ export const DEFAULT_POKER_TABLE_IDS = [
 
 export interface PokerDbLike {
   query: PokerQuery;
+  connect?: PokerConnect;
+  leaseHolder?: string;
+}
+
+export interface PokerCurrencyRuntime {
+  transact(
+    input: { accountId: number; characterId: number; copperDelta: number },
+    persist: (
+      leaseNonce: string | null,
+      copperBefore?: number,
+      copperAfter?: number,
+    ) => Promise<{ applied: boolean; characterCopper?: number }>,
+  ): Promise<void>;
 }
 
 export interface PokerServiceDeps {
@@ -58,6 +76,7 @@ export interface PokerServiceDeps {
     amount?: number;
     payouts?: Array<{ characterId: number; amount: number }>;
   }) => void;
+  currency?: PokerCurrencyRuntime;
 }
 
 export interface PokerTableCreateInput {
@@ -96,9 +115,11 @@ interface PokerTableRecord {
   tableId: string;
   state: PokerTable;
   revision: number;
+  currencyGeneration: string;
   watchers: Set<number>;
   leaveAfterHand: Set<number>;
   sitOut: PokerSitOutState;
+  participationByCharacter: Map<number, string>;
   turnDeadlineMs: number | null;
   nextHandAtMs: number | null;
   retryDelayMs: number;
@@ -134,7 +155,18 @@ function rowFor(record: PokerTableRecord, state = record.state): PokerTableRow {
     status: statusOf(state),
     handNumber: snapshot.handNumber,
     actionSequence: snapshot.actionSequence,
+    currencyVersion: 1,
+    escrowCopper: state.chipTotal(),
+    currencyGeneration: record.currencyGeneration,
   };
+}
+
+function seatBalances(state: PokerTable): PokerSeatBalance[] {
+  return state
+    .snapshotFor(null)
+    .seats.flatMap((seat) =>
+      seat ? [{ characterId: seat.playerId, balance: seat.stack + seat.committed }] : [],
+    );
 }
 
 function seatedEntries(state: PokerTable): Array<{ characterId: number; seatIndex: number }> {
@@ -150,7 +182,14 @@ function cloneTable(state: PokerTable): PokerTable {
 export function createPokerService(deps: PokerServiceDeps) {
   const resolvedStore =
     deps.store ??
-    (deps.db ? createPokerStore(deps.db.query.bind(deps.db), deps.realm ?? 'default') : null);
+    (deps.db
+      ? createPokerStore(
+          deps.db.query.bind(deps.db),
+          deps.realm ?? 'default',
+          deps.db.connect,
+          deps.db.leaseHolder,
+        )
+      : null);
   if (!resolvedStore) throw new Error('Poker store is required');
   const store: PokerStore = resolvedStore;
 
@@ -165,6 +204,7 @@ export function createPokerService(deps: PokerServiceDeps) {
   let initializePromise: Promise<void> | null = null;
   let ticking = false;
   let fallbackSeed = 0x504f4b45;
+  const operationRealm = deps.realm ?? 'default';
 
   function enabled(): void {
     if (!deps.featureEnabled()) throw new Error('Poker feature is disabled');
@@ -179,6 +219,9 @@ export function createPokerService(deps: PokerServiceDeps) {
   }
 
   function recordFromRow(row: PokerTableRow): PokerTableRecord {
+    if (row.currencyVersion === 1 && !/^[0-9a-f-]{36}$/.test(row.currencyGeneration ?? '')) {
+      throw new Error('Poker currency generation is invalid');
+    }
     const raw = row.payload as Partial<PokerPersistedPayload>;
     const wrapped = raw?.version === 1 && raw.table !== undefined;
     const tablePayload = wrapped ? raw.table : row.payload;
@@ -193,6 +236,9 @@ export function createPokerService(deps: PokerServiceDeps) {
     const state = PokerTable.restore(tablePayload);
     const snapshot = state.snapshotFor(null);
     const funded = snapshot.seats.filter((seat) => seat && seat.stack > 0).length;
+    if (row.currencyVersion === 1 && state.chipTotal() !== row.escrowCopper) {
+      throw new Error('Poker table chips do not match escrow');
+    }
     const sitOut = decodePokerSitOut(wrapped ? raw.sitOut : undefined);
     const seatedIds = new Set(seatedEntries(state).map((entry) => entry.characterId));
     for (const characterId of sitOut.keys()) {
@@ -211,6 +257,7 @@ export function createPokerService(deps: PokerServiceDeps) {
       tableId: row.tableId,
       state,
       revision: row.revision,
+      currencyGeneration: row.currencyGeneration ?? '',
       watchers: new Set(),
       leaveAfterHand: new Set(
         wrapped && Array.isArray(raw.leaveAfterHand)
@@ -218,6 +265,7 @@ export function createPokerService(deps: PokerServiceDeps) {
           : [],
       ),
       sitOut,
+      participationByCharacter: new Map(),
       turnDeadlineMs,
       nextHandAtMs: wrapped
         ? Number.isSafeInteger(raw.nextHandAtMs)
@@ -241,23 +289,112 @@ export function createPokerService(deps: PokerServiceDeps) {
     for (const { characterId } of entries) tableByCharacter.set(characterId, record.tableId);
   }
 
+  function emptyTableState(tableId: string, seats = 6): PokerTable {
+    const seed = deps.seed?.() ?? fallbackSeed++;
+    return PokerTable.create(
+      {
+        id: tableId,
+        numSeats: seats,
+        smallBlind: POKER_SMALL_BLIND,
+        bigBlind: POKER_BIG_BLIND,
+        minBuyIn: POKER_BUY_IN,
+        maxBuyIn: POKER_BUY_IN,
+      },
+      new Rng(seed),
+      deps.secureSeed?.(),
+    );
+  }
+
+  function emptyRecord(tableId: string, state: PokerTable, revision: number): PokerTableRecord {
+    return {
+      tableId,
+      state,
+      revision,
+      currencyGeneration: randomUUID(),
+      watchers: new Set(),
+      leaveAfterHand: new Set(),
+      sitOut: new Map(),
+      participationByCharacter: new Map(),
+      turnDeadlineMs: null,
+      nextHandAtMs: null,
+      retryDelayMs: 1_000,
+    };
+  }
+
   async function initialize(): Promise<void> {
     if (initialized) return;
     if (initializePromise) return initializePromise;
     initializePromise = (async () => {
       const rows = await store.list();
-      for (const row of rows) {
+      const persistedRows = new Map(rows.map((row) => [row.tableId, row]));
+      for (let row of rows) {
         try {
+          if (store.resetLegacy && row.currencyVersion !== 1) {
+            const resetRecord = emptyRecord(
+              row.tableId,
+              emptyTableState(row.tableId),
+              row.revision,
+            );
+            const resetRow = rowFor(resetRecord);
+            resetRow.revision = await store.resetLegacy(resetRow, row.revision);
+            row = resetRow;
+            persistedRows.set(row.tableId, row);
+          }
           const record = recordFromRow(row);
-          indexRecord(record);
           tables.set(record.tableId, record);
         } catch (error) {
           unavailableTables.add(row.tableId);
-          await store.close(row.tableId, row.revision).catch((closeError) => {
-            console.error('failed to quarantine poker table:', closeError);
-          });
+          if (row.currencyVersion === 1 && store.recover) {
+            try {
+              await store.recover(row.tableId, row.revision);
+              unavailableTables.delete(row.tableId);
+            } catch (recoveryError) {
+              console.error('failed to recover poker table:', recoveryError);
+            }
+          } else {
+            await store.close(row.tableId, row.revision).catch((closeError) => {
+              console.error('failed to quarantine poker table:', closeError);
+            });
+          }
           console.error('quarantined unrestorable poker table:', error);
         }
+      }
+      if (store.listSeats) {
+        for (const seat of await store.listSeats()) {
+          const record = tables.get(seat.tableId);
+          const stateSeat = record?.state.snapshotFor(null).seats[seat.seatIndex];
+          if (!record || stateSeat?.playerId !== seat.characterId || !seat.participationId) {
+            if (record) unavailableTables.add(record.tableId);
+            continue;
+          }
+          record.participationByCharacter.set(seat.characterId, seat.participationId);
+          accountByCharacter.set(seat.characterId, seat.accountId);
+          if (stateSeat.stack + stateSeat.committed !== seat.recoverableBalance) {
+            unavailableTables.add(record.tableId);
+          }
+        }
+      }
+      for (const [tableId, record] of [...tables]) {
+        const entries = seatedEntries(record.state);
+        if (
+          unavailableTables.has(tableId) ||
+          (store.listSeats &&
+            entries.some((entry) => !record.participationByCharacter.has(entry.characterId)))
+        ) {
+          tables.delete(tableId);
+          for (const entry of entries) accountByCharacter.delete(entry.characterId);
+          const row = persistedRows.get(tableId);
+          if (row?.currencyVersion === 1 && store.recover) {
+            try {
+              await store.recover(tableId, row.revision);
+              unavailableTables.delete(tableId);
+            } catch (error) {
+              console.error('failed to recover inconsistent poker seats:', error);
+            }
+          }
+          continue;
+        }
+        indexRecord(record);
       }
       if (deps.provisionDefaults !== false && deps.featureEnabled()) {
         for (const tableId of DEFAULT_POKER_TABLE_IDS) {
@@ -289,17 +426,59 @@ export function createPokerService(deps: PokerServiceDeps) {
     metadata?: Partial<
       Pick<PokerTableRecord, 'leaveAfterHand' | 'sitOut' | 'turnDeadlineMs' | 'nextHandAtMs'>
     >,
-  ): Promise<void> {
+    currency?: Omit<PokerCurrencyMutation, 'leaseNonce'>,
+  ): Promise<boolean> {
     const persistedRecord: PokerTableRecord = { ...record, ...metadata, state: next };
     const nextRow = rowFor(persistedRecord, next);
-    const revision = await store.save(nextRow, record.revision, seatMutation);
-    record.state = next;
-    record.revision = revision;
+    let saveResult: number | PokerSaveResult = 0;
+    const persist = async (
+      leaseNonce: string | null,
+      copperBefore?: number,
+      copperAfter?: number,
+    ): Promise<{ applied: boolean; characterCopper?: number }> => {
+      saveResult = await store.save(
+        nextRow,
+        record.revision,
+        seatMutation,
+        currency ? { ...currency, leaseNonce, copperBefore, copperAfter } : undefined,
+        seatBalances(next),
+      );
+      return typeof saveResult === 'number'
+        ? { applied: true }
+        : { applied: saveResult.applied, characterCopper: saveResult.characterCopper };
+    };
+    if (currency && currency.characterId !== null && currency.accountId !== null && deps.currency) {
+      await deps.currency.transact(
+        {
+          accountId: currency.accountId,
+          characterId: currency.characterId,
+          copperDelta: currency.copperDelta,
+        },
+        persist,
+      );
+    } else {
+      await persist(null);
+    }
+    const result =
+      typeof saveResult === 'number' ? { revision: saveResult, applied: true } : saveResult;
+    if (result.row) {
+      const restored = recordFromRow(result.row);
+      record.state = restored.state;
+      record.revision = restored.revision;
+      record.leaveAfterHand = restored.leaveAfterHand;
+      record.sitOut = restored.sitOut;
+      record.turnDeadlineMs = restored.turnDeadlineMs;
+      record.nextHandAtMs = restored.nextHandAtMs;
+    } else {
+      record.state = next;
+      record.revision = result.revision;
+      if (metadata?.leaveAfterHand) record.leaveAfterHand = metadata.leaveAfterHand;
+      if (metadata?.sitOut) record.sitOut = metadata.sitOut;
+      if (metadata?.turnDeadlineMs !== undefined) record.turnDeadlineMs = metadata.turnDeadlineMs;
+      if (metadata?.nextHandAtMs !== undefined) record.nextHandAtMs = metadata.nextHandAtMs;
+    }
     record.retryDelayMs = 1_000;
-    if (metadata?.leaveAfterHand) record.leaveAfterHand = metadata.leaveAfterHand;
-    if (metadata?.sitOut) record.sitOut = metadata.sitOut;
-    if (metadata?.turnDeadlineMs !== undefined) record.turnDeadlineMs = metadata.turnDeadlineMs;
-    if (metadata?.nextHandAtMs !== undefined) record.nextHandAtMs = metadata.nextHandAtMs;
+    return result.applied;
   }
 
   function turnDeadlineFor(
@@ -311,6 +490,24 @@ export function createPokerService(deps: PokerServiceDeps) {
     if (snapshot.street === null || snapshot.actorSeat === null) return null;
     const actor = snapshot.seats[snapshot.actorSeat]?.playerId;
     return actor && sitOut.has(actor) ? nowMs : nowMs + POKER_TURN_TIMEOUT_MS;
+  }
+
+  function rakeMutation(
+    tableId: string,
+    currencyGeneration: string,
+    handNumber: number,
+    rake: number,
+  ): PokerCurrencyMutation | undefined {
+    if (rake <= 0) return undefined;
+    return {
+      operationId: `rake:${operationRealm}:${tableId}:${currencyGeneration}:${handNumber}`,
+      accountId: null,
+      characterId: null,
+      handNumber,
+      operationType: 'rake',
+      copperDelta: 0,
+      escrowDelta: -rake,
+    };
   }
 
   async function mutate(record: PokerTableRecord, run: () => Promise<void>): Promise<void> {
@@ -339,33 +536,24 @@ export function createPokerService(deps: PokerServiceDeps) {
       throw new Error('Poker tables require 2 to 6 seats');
     }
     if (tables.has(input.tableId)) throw new Error('Poker table already exists');
-    const seed = deps.seed?.() ?? fallbackSeed++;
-    const state = PokerTable.create(
-      {
-        id: input.tableId,
-        numSeats: input.seats,
-        smallBlind: POKER_SMALL_BLIND,
-        bigBlind: POKER_BIG_BLIND,
-        minBuyIn: POKER_BUY_IN,
-        maxBuyIn: POKER_BUY_IN,
-      },
-      new Rng(seed),
-      deps.secureSeed?.(),
-    );
-    const record: PokerTableRecord = {
-      tableId: input.tableId,
-      state,
-      revision: 0,
-      watchers: new Set(),
-      leaveAfterHand: new Set(),
-      sitOut: new Map(),
-      turnDeadlineMs: null,
-      nextHandAtMs: null,
-      retryDelayMs: 1_000,
-    };
+    const state = emptyTableState(input.tableId, input.seats);
+    const record = emptyRecord(input.tableId, state, 0);
     if (!(await store.create(rowFor(record)))) {
       const existing = await store.load(input.tableId);
       if (!existing) throw new Error('Poker table could not be created');
+      if (store.resetLegacy && existing.currencyVersion !== 1) {
+        record.revision = await store.resetLegacy(rowFor(record), existing.revision);
+        tables.set(input.tableId, record);
+        return;
+      }
+      if (existing.currencyVersion === 1 && existing.status === 'closed' && store.recover) {
+        await store.recover(input.tableId, existing.revision);
+        if (!(await store.create(rowFor(record)))) {
+          throw new Error('Closed Poker table could not be replaced');
+        }
+        tables.set(input.tableId, record);
+        return;
+      }
       tables.set(input.tableId, recordFromRow(existing));
       return;
     }
@@ -388,11 +576,22 @@ export function createPokerService(deps: PokerServiceDeps) {
           pendingLeaves.add(characterId);
         }
       }
-      await saveClone(record, next, undefined, {
-        leaveAfterHand: pendingLeaves,
-        turnDeadlineMs: turnDeadlineFor(next, record.sitOut, nowMs),
-        nextHandAtMs: completed ? nowMs + POKER_NEXT_HAND_DELAY_MS : null,
-      });
+      await saveClone(
+        record,
+        next,
+        undefined,
+        {
+          leaveAfterHand: pendingLeaves,
+          turnDeadlineMs: turnDeadlineFor(next, record.sitOut, nowMs),
+          nextHandAtMs: completed ? nowMs + POKER_NEXT_HAND_DELAY_MS : null,
+        },
+        rakeMutation(
+          record.tableId,
+          record.currencyGeneration,
+          snapshot.handNumber,
+          snapshot.lastResult?.rake ?? 0,
+        ),
+      );
       if (completed) await retryPendingLeaves(record, nowMs);
     });
     deps.onChanged?.(tableId, completed);
@@ -400,33 +599,51 @@ export function createPokerService(deps: PokerServiceDeps) {
 
   async function completePendingLeaves(record: PokerTableRecord): Promise<void> {
     if (record.state.snapshotFor(null).street !== null) return;
-    let pendingLeaves = new Set(record.leaveAfterHand);
-    let sitOut = new Map(record.sitOut);
+    const pendingLeaves = new Set(record.leaveAfterHand);
+    const sitOut = new Map(record.sitOut);
     let metadataDirty = false;
     for (const characterId of [...pendingLeaves]) {
       const seat = seatedEntries(record.state).find((entry) => entry.characterId === characterId);
       pendingLeaves.delete(characterId);
       sitOut.delete(characterId);
       if (!seat) {
+        record.participationByCharacter.delete(characterId);
+        accountByCharacter.delete(characterId);
+        tableByCharacter.delete(characterId);
         metadataDirty = true;
         continue;
       }
       const next = cloneTable(record.state);
       const amount = next.standUp(characterId);
+      const participationId = record.participationByCharacter.get(characterId);
+      if (!participationId) throw new Error('Poker participation is missing');
+      const accountId = accountByCharacter.get(characterId);
+      if (!accountId) throw new Error('Poker account is missing');
       await saveClone(
         record,
         next,
         {
           type: 'leave',
-          accountId: accountByCharacter.get(characterId) ?? 0,
+          accountId,
           characterId,
           seatIndex: seat.seatIndex,
         },
         { leaveAfterHand: new Set(pendingLeaves), sitOut: new Map(sitOut) },
+        {
+          operationId: `cash_out:${participationId}`,
+          accountId,
+          characterId,
+          participationId,
+          handNumber: record.state.snapshotFor(null).handNumber,
+          operationType: 'cash_out',
+          copperDelta: amount,
+          escrowDelta: -amount,
+        },
       );
       metadataDirty = false;
       tableByCharacter.delete(characterId);
       accountByCharacter.delete(characterId);
+      record.participationByCharacter.delete(characterId);
       audit({ type: 'leave', tableId: record.tableId, characterId, amount });
     }
     if (metadataDirty) {
@@ -496,12 +713,23 @@ export function createPokerService(deps: PokerServiceDeps) {
         }
       }
       const nowMs = deps.nowMs();
-      await saveClone(record, next, undefined, {
-        leaveAfterHand: pendingLeaves,
-        sitOut,
-        turnDeadlineMs: turnDeadlineFor(next, sitOut, nowMs),
-        nextHandAtMs: completed ? nowMs + POKER_NEXT_HAND_DELAY_MS : null,
-      });
+      await saveClone(
+        record,
+        next,
+        undefined,
+        {
+          leaveAfterHand: pendingLeaves,
+          sitOut,
+          turnDeadlineMs: turnDeadlineFor(next, sitOut, nowMs),
+          nextHandAtMs: completed ? nowMs + POKER_NEXT_HAND_DELAY_MS : null,
+        },
+        rakeMutation(
+          record.tableId,
+          record.currencyGeneration,
+          nextSnapshot.handNumber,
+          nextSnapshot.lastResult?.rake ?? 0,
+        ),
+      );
       if (completed) await retryPendingLeaves(record, nowMs);
     });
     deps.onChanged?.(input.tableId, completed);
@@ -542,14 +770,33 @@ export function createPokerService(deps: PokerServiceDeps) {
       await mutate(record, async () => {
         const next = cloneTable(record.state);
         next.sitDown(input.seatIndex, input.characterId, POKER_BUY_IN);
-        await saveClone(record, next, {
-          type: 'join',
-          accountId: input.accountId,
-          characterId: input.characterId,
-          seatIndex: input.seatIndex,
-        });
+        const expectedRevision = record.revision;
+        const participationId = `participation:${record.currencyGeneration}:${input.characterId}:${expectedRevision}`;
+        await saveClone(
+          record,
+          next,
+          {
+            type: 'join',
+            accountId: input.accountId,
+            characterId: input.characterId,
+            seatIndex: input.seatIndex,
+            participationId,
+          },
+          undefined,
+          {
+            operationId: `buy_in:${record.currencyGeneration}:${input.characterId}:${expectedRevision}`,
+            accountId: input.accountId,
+            characterId: input.characterId,
+            participationId,
+            handNumber: next.snapshotFor(null).handNumber,
+            operationType: 'buy_in',
+            copperDelta: -POKER_BUY_IN,
+            escrowDelta: POKER_BUY_IN,
+          },
+        );
         tableByCharacter.set(input.characterId, input.tableId);
         accountByCharacter.set(input.characterId, input.accountId);
+        record.participationByCharacter.set(input.characterId, participationId);
       });
       deps.onChanged?.(input.tableId, false);
       audit({
@@ -578,7 +825,18 @@ export function createPokerService(deps: PokerServiceDeps) {
         if (amount <= 0) throw new Error('Rebuy not allowed');
         const next = cloneTable(record.state);
         next.addToStack(input.characterId, amount);
-        await saveClone(record, next);
+        const participationId = record.participationByCharacter.get(input.characterId);
+        if (!participationId) throw new Error('Poker participation is missing');
+        await saveClone(record, next, undefined, undefined, {
+          operationId: `rebuy:${participationId}:${record.revision}`,
+          accountId: input.accountId,
+          characterId: input.characterId,
+          participationId,
+          handNumber: snapshot.handNumber,
+          operationType: 'rebuy',
+          copperDelta: -amount,
+          escrowDelta: amount,
+        });
         rebuyAmount = amount;
       });
       deps.onChanged?.(input.tableId, false);
@@ -636,19 +894,34 @@ export function createPokerService(deps: PokerServiceDeps) {
         if (!seat) return;
         const next = cloneTable(record.state);
         const amount = next.standUp(input.characterId);
+        const participationId = record.participationByCharacter.get(input.characterId);
+        if (!participationId) throw new Error('Poker participation is missing');
+        const accountId = accountByCharacter.get(input.characterId) ?? 0;
+        if (accountId <= 0) throw new Error('Poker account is missing');
         await saveClone(
           record,
           next,
           {
             type: 'leave',
-            accountId: accountByCharacter.get(input.characterId) ?? 0,
+            accountId,
             characterId: input.characterId,
             seatIndex: seat.seatIndex,
           },
           { sitOut: clearPokerSitOut(record.sitOut, input.characterId) },
+          {
+            operationId: `cash_out:${participationId}`,
+            accountId,
+            characterId: input.characterId,
+            participationId,
+            handNumber: record.state.snapshotFor(null).handNumber,
+            operationType: 'cash_out',
+            copperDelta: amount,
+            escrowDelta: -amount,
+          },
         );
         tableByCharacter.delete(input.characterId);
         accountByCharacter.delete(input.characterId);
+        record.participationByCharacter.delete(input.characterId);
         audit({ type: 'leave', tableId: input.tableId, characterId: input.characterId, amount });
       });
       deps.onChanged?.(input.tableId, false);
@@ -683,6 +956,7 @@ export function createPokerService(deps: PokerServiceDeps) {
         seatedCount: number;
         inHand: boolean;
         openSeats: number[];
+        buyIn: number;
       }>
     > {
       enabled();
@@ -695,6 +969,7 @@ export function createPokerService(deps: PokerServiceDeps) {
           seatedCount: snapshot.seats.filter(Boolean).length,
           inHand: snapshot.street !== null,
           openSeats: snapshot.seats.flatMap((seat, index) => (seat ? [] : [index])),
+          buyIn: POKER_BUY_IN,
         };
       });
     },

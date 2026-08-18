@@ -2,7 +2,7 @@ import type { PokerClientPort, PokerErrorCode } from '../sim/poker/protocol';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
 import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
-import { formatNumber, t } from './i18n';
+import { formatMoney, formatNumber, t } from './i18n';
 import {
   buildPokerPlaytestView,
   type PokerPlaytestView,
@@ -135,6 +135,9 @@ export class PokerPlaytestWindow {
         `<li class=poker-table-row><div class=poker-table-summary><strong>${esc(table.tableId)}</strong>` +
         `<span>${esc(t('hudChrome.pokerPlaytest.seated', { count: formatNumber(table.seatedCount) }))}</span>` +
         `<span>${esc(t('hudChrome.pokerPlaytest.watchers', { count: formatNumber(table.watcherCount) }))}</span>` +
+        (table.buyIn === undefined
+          ? ''
+          : `<span>${esc(t('hudChrome.pokerPlaytest.buyIn', { amount: formatMoney(table.buyIn) }))}</span>`) +
         `<span>${esc(t(table.inHand ? 'hudChrome.pokerPlaytest.inHand' : 'hudChrome.pokerPlaytest.betweenHands'))}</span></div>` +
         `<div class=poker-table-controls>${join}${this.button('watch', table.tableId, t('hudChrome.pokerPlaytest.watch'), state.connected)}</div></li>`
       );

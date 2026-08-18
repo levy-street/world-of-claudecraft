@@ -6,6 +6,7 @@ export interface PokerTableSummary {
   seatedCount: number;
   inHand: boolean;
   openSeats: number[];
+  buyIn?: number;
 }
 
 export interface PokerClientSnapshot extends PokerViewerSnapshot {
@@ -19,6 +20,7 @@ export interface PokerClientSnapshot extends PokerViewerSnapshot {
 export type PokerErrorCode =
   | 'busy'
   | 'disabled'
+  | 'insufficient_funds'
   | 'invalid_action'
   | 'participation_suspended'
   | 'rebuy_not_allowed'
@@ -30,6 +32,7 @@ export type PokerErrorCode =
 const POKER_ERROR_CODES = new Set<PokerErrorCode>([
   'busy',
   'disabled',
+  'insufficient_funds',
   'invalid_action',
   'participation_suspended',
   'rebuy_not_allowed',
@@ -58,6 +61,7 @@ export function isPokerTableSummary(value: unknown): value is PokerTableSummary 
     return false;
   }
   if (value.seatedCount > 6 || typeof value.inHand !== 'boolean') return false;
+  if (value.buyIn !== undefined && !isNonNegativeInteger(value.buyIn)) return false;
   return (
     Array.isArray(value.openSeats) &&
     value.openSeats.length <= 6 &&

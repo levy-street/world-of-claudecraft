@@ -98,6 +98,7 @@ export function pokerErrorCode(error: unknown): PokerErrorCode {
   if (error instanceof PokerWireError) return error.code;
   const message = String(error instanceof Error ? error.message : error);
   if (/disabled/i.test(message)) return 'disabled';
+  if (/not enough copper/i.test(message)) return 'insufficient_funds';
   if (/not found/i.test(message)) return 'table_not_found';
   if (/busy|concurrently/i.test(message)) return 'busy';
   if (/stale/i.test(message)) return 'stale_action';

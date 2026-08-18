@@ -349,6 +349,7 @@ export const ko_KR: EnTranslations = {
       "refresh": "새로 고침",
       "noTables": "이용 가능한 포커 테이블이 없습니다.",
       "join": "참가",
+      "buyIn": "Buy-in: {amount}",
       "watch": "관전",
       "stopWatching": "관전 종료",
       "rebuy": "리바이",
@@ -372,6 +373,7 @@ export const ko_KR: EnTranslations = {
       "error": {
         "busy": "테이블이 처리 중입니다. 다시 시도하세요.",
         "disabled": "현재 포커를 이용할 수 없습니다.",
+        "insufficient_funds": "You need more Copper to join or rebuy.",
         "invalid_action": "허용되지 않는 행동입니다.",
         "participation_suspended": "이 계정의 포커 참가가 정지되었습니다.",
         "invalidAmount": "허용 범위 안의 정수를 입력하세요.",

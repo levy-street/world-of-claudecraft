@@ -349,6 +349,7 @@ export const en_CA: EnTranslations = {
       "refresh": "Refresh",
       "noTables": "No poker tables are available.",
       "join": "Join",
+      "buyIn": "Buy-in: {amount}",
       "watch": "Watch",
       "stopWatching": "Stop watching",
       "rebuy": "Rebuy",
@@ -372,6 +373,7 @@ export const en_CA: EnTranslations = {
       "error": {
         "busy": "The poker table is busy. Try again.",
         "disabled": "Poker is currently unavailable.",
+        "insufficient_funds": "You need more Copper to join or rebuy.",
         "invalid_action": "That action is not legal.",
         "participation_suspended": "Poker participation is suspended for this account.",
         "invalidAmount": "Enter a whole number within the allowed range.",

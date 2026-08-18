@@ -349,6 +349,7 @@ export const ru_RU: EnTranslations = {
       "refresh": "Обновить",
       "noTables": "Нет доступных покерных столов.",
       "join": "Сесть",
+      "buyIn": "Buy-in: {amount}",
       "watch": "Наблюдать",
       "stopWatching": "Прекратить наблюдение",
       "rebuy": "Докупить",
@@ -372,6 +373,7 @@ export const ru_RU: EnTranslations = {
       "error": {
         "busy": "Стол занят обработкой. Повторите попытку.",
         "disabled": "Покер сейчас недоступен.",
+        "insufficient_funds": "You need more Copper to join or rebuy.",
         "invalid_action": "Это действие недопустимо.",
         "participation_suspended": "Участие этого аккаунта в покере приостановлено.",
         "invalidAmount": "Введите целое число в допустимом диапазоне.",

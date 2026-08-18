@@ -349,6 +349,7 @@ export const en_XA: EnTranslations = {
       "refresh": "[Ŕéƒŕéšĥ]",
       "noTables": "[Ñó þóķéŕ ţáƀļéš áŕé áʋáíļáƀļé.]",
       "join": "[Ĵóíñ]",
+      "buyIn": "[Ɓúý-íñ: {amount}]",
       "watch": "[Ŵáţçĥ]",
       "stopWatching": "[Šţóþ ŵáţçĥíñĝ]",
       "rebuy": "[Ŕéƀúý]",
@@ -372,6 +373,7 @@ export const en_XA: EnTranslations = {
       "error": {
         "busy": "[Ţĥé þóķéŕ ţáƀļé íš ƀúšý. Ţŕý áĝáíñ.]",
         "disabled": "[Þóķéŕ íš çúŕŕéñţļý úñáʋáíļáƀļé.]",
+        "insufficient_funds": "[Ýóú ñééð ɱóŕé Çóþþéŕ ţó ĵóíñ óŕ ŕéƀúý.]",
         "invalid_action": "[Ţĥáţ áçţíóñ íš ñóţ ļéĝáļ.]",
         "participation_suspended": "[Þóķéŕ þáŕţíçíþáţíóñ íš šúšþéñðéð ƒóŕ ţĥíš áççóúñţ.]",
         "invalidAmount": "[Éñţéŕ á ŵĥóļé ñúɱƀéŕ ŵíţĥíñ ţĥé áļļóŵéð ŕáñĝé.]",

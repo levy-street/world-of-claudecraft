@@ -349,6 +349,7 @@ export const zh_TW: EnTranslations = {
       "refresh": "重新整理",
       "noTables": "沒有可用的撲克牌桌。",
       "join": "加入",
+      "buyIn": "Buy-in: {amount}",
       "watch": "觀戰",
       "stopWatching": "停止觀戰",
       "rebuy": "補充籌碼",
@@ -372,6 +373,7 @@ export const zh_TW: EnTranslations = {
       "error": {
         "busy": "牌桌正在處理。請重試。",
         "disabled": "目前無法使用撲克。",
+        "insufficient_funds": "You need more Copper to join or rebuy.",
         "invalid_action": "此操作不合法。",
         "participation_suspended": "此帳號的撲克參與權限已被暫停。",
         "invalidAmount": "請輸入允許範圍內的整數。",

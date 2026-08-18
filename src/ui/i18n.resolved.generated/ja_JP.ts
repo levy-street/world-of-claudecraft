@@ -349,6 +349,7 @@ export const ja_JP: EnTranslations = {
       "refresh": "更新",
       "noTables": "利用できるポーカーテーブルがありません。",
       "join": "参加",
+      "buyIn": "Buy-in: {amount}",
       "watch": "観戦",
       "stopWatching": "観戦を終了",
       "rebuy": "リバイ",
@@ -372,6 +373,7 @@ export const ja_JP: EnTranslations = {
       "error": {
         "busy": "テーブルが処理中です。もう一度お試しください。",
         "disabled": "現在ポーカーを利用できません。",
+        "insufficient_funds": "You need more Copper to join or rebuy.",
         "invalid_action": "そのアクションは選択できません。",
         "participation_suspended": "このアカウントのポーカー参加は停止されています。",
         "invalidAmount": "許可された範囲の整数を入力してください。",
