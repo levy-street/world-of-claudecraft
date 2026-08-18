@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { BG_GRAVEYARDS, bgFieldPlanWalls } from '../src/sim/battleground_layout';
+import { BG_BASES, BG_GRAVEYARDS, bgFieldPlanWalls } from '../src/sim/battleground_layout';
 import { resolvePosition } from '../src/sim/colliders';
 import {
   BUILTIN_WORLD,
@@ -830,6 +830,36 @@ describe('unstuck area identity', () => {
     expect(eventsOf(sim.tick())).toContainEqual(
       expect.objectContaining({ type: 'unstuck', phase: 'cancelled', reason: 'moved', pid }),
     );
+    expect(meta.pendingUnstuck).toBeNull();
+  });
+
+  it('blocks a moving battleground player on the legal flag stand', () => {
+    const { sim, match, pid } = activeBattleground();
+    const origin = battlegroundOrigin(match.slot);
+    const flag = BG_BASES[0].flag;
+    const player = required(sim.entities.get(pid), 'battleground player');
+    const meta = required(sim.meta(pid), 'battleground metadata');
+
+    player.pos = sim.groundPos(origin.x + flag.x, origin.z + flag.z);
+    player.prevPos = { ...player.pos };
+    player.vx = 0;
+    player.vy = 0;
+    player.vz = 0;
+    player.onGround = true;
+    player.jumping = false;
+    sim.ctx.rebucket(player);
+    meta.moveInput.forward = true;
+
+    const legacy = resolvePosition(sim.cfg.seed, player.pos.x, player.pos.z, PLAYER_BODY_RADIUS);
+    expect(Math.hypot(legacy.x - player.pos.x, legacy.z - player.pos.z)).toBeGreaterThan(1);
+
+    expect(sim.unstuck(pid)).toBe(false);
+    expect(eventsOf(sim.drainEvents())).toContainEqual({
+      type: 'unstuck',
+      phase: 'blocked',
+      reason: 'moving',
+      pid,
+    });
     expect(meta.pendingUnstuck).toBeNull();
   });
 

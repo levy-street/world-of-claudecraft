@@ -13,7 +13,7 @@
 // to 5 minutes), and neither outcome can be reached by an attempt that started on
 // the other side of the life/death line (see cancelReason).
 
-import { resolvePosition } from './colliders';
+import { moverHeight, resolvePosition } from './colliders';
 import { isRooted, isStunned } from './combat/cc';
 import {
   bgOriginAt,
@@ -221,7 +221,15 @@ function isFrozenCorpse(p: Entity): boolean {
 
 function battlegroundWallTrap(ctx: SimContext, p: Entity): boolean {
   if (!ctx.bgMatches.has(p.id) || !isBgPos(p.pos.x)) return false;
-  const resolved = resolvePosition(ctx.cfg.seed, p.pos.x, p.pos.z, PLAYER_BODY_RADIUS);
+  const resolved = resolvePosition(
+    ctx.cfg.seed,
+    p.pos.x,
+    p.pos.z,
+    PLAYER_BODY_RADIUS,
+    false,
+    undefined,
+    moverHeight(p),
+  );
   return Math.hypot(resolved.x - p.pos.x, resolved.z - p.pos.z) > POSITION_EPS;
 }
 
