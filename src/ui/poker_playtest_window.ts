@@ -11,6 +11,8 @@ import {
 } from './poker_playtest_view';
 import { svgIcon } from './ui_icons';
 
+const SHOWDOWN_REVEAL_MS = 900;
+
 export interface PokerPlaytestWindowDeps {
   root(): HTMLElement;
   launcher(): HTMLElement;
@@ -18,7 +20,7 @@ export interface PokerPlaytestWindowDeps {
   closeOthers(): void;
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
-  sound: { deal(): void; turn(): void };
+  sound: { deal(): void; turn(): void; check?(): void; showdown?(): void };
   now(): number;
   schedule(callback: () => void, delayMs: number): number;
   cancelSchedule(id: number): void;
@@ -33,6 +35,8 @@ export class PokerPlaytestWindow {
   private invalidAmount = false;
   private readonly wagerDraft = new Map<'bet' | 'raise', string>();
   private wagerActionSequence: number | null = null;
+  private lastCompletedHandNumber = -1;
+  private showdownUntilMs = 0;
 
   constructor(private readonly deps: PokerPlaytestWindowDeps) {
     deps.client.subscribe(() => {
@@ -149,6 +153,13 @@ export class PokerPlaytestWindow {
     const ownTurn = snapshot.viewerSeat !== null && snapshot.actorSeat === snapshot.viewerSeat;
     if (view.active && snapshot.handNumber !== this.lastHandNumber) this.deps.sound.deal();
     if (ownTurn && !this.wasPlayerTurn) this.deps.sound.turn();
+    const reachedShowdown =
+      snapshot.street === null && Boolean(snapshot.lastResult?.revealedHoleCards.length);
+    if (snapshot.street === null && snapshot.handNumber !== this.lastCompletedHandNumber) {
+      this.lastCompletedHandNumber = snapshot.handNumber;
+      this.showdownUntilMs = reachedShowdown ? this.deps.now() + SHOWDOWN_REVEAL_MS : 0;
+      if (reachedShowdown) this.deps.sound.showdown?.();
+    }
     this.lastHandNumber = snapshot.handNumber;
     this.wasPlayerTurn = ownTurn;
     const name = (seat: number): string => {
@@ -167,7 +178,11 @@ export class PokerPlaytestWindow {
   ): string {
     const snapshot = state.snapshot;
     if (!snapshot) return '';
-    const seats = view.seats.map((seat) => this.seatMarkup(seat, name(seat.seat))).join('');
+    const seats = view.seats
+      .map((seat) =>
+        this.seatMarkup(seat, name(seat.seat), snapshot.sitOutSeats?.includes(seat.seat) ?? false),
+      )
+      .join('');
     const result = snapshot.street === null ? snapshot.lastResult : null;
     const winners =
       result?.payouts
@@ -191,10 +206,14 @@ export class PokerPlaytestWindow {
   ): string {
     const snapshot = state.snapshot;
     if (!snapshot) return '';
+    const showingShowdown = rake !== null && this.showdownUntilMs > this.deps.now();
+    if (showingShowdown) this.armRender(this.showdownUntilMs - this.deps.now());
     const result =
       rake === null
         ? ''
-        : `<div class=poker-result-banner>${winners.map((line) => `<div>${esc(line)}</div>`).join('')}<div>${esc(t('hudChrome.pokerPlaytest.rake', { amount: formatNumber(rake) }))}</div></div>`;
+        : showingShowdown
+          ? `<div class=poker-showdown-banner role=status aria-live=polite>${esc(t('hudChrome.pokerPlaytest.showdown'))}</div>`
+          : `<div class=poker-result-banner>${winners.map((line) => `<div>${esc(line)}</div>`).join('')}<div>${esc(t('hudChrome.pokerPlaytest.rake', { amount: formatNumber(rake) }))}</div></div>`;
     return this.tableControls(state, view, name) + this.board(view, seats, result);
   }
 
@@ -203,10 +222,17 @@ export class PokerPlaytestWindow {
     return `<div class=poker-table-wrap><div class=poker-table-felt><div class=poker-board><div class=poker-pot>${pot}</div><div class=poker-cards>${this.cards(view.communityCards)}</div></div></div>${seats}${result}</div>`;
   }
 
-  private seatMarkup(seat: PokerPlaytestView['seats'][number], name: string): string {
-    const classes = `poker-table-seat seat-${seat.seat}${seat.acting ? ' acting' : ''}${seat.folded ? ' folded' : ''}${seat.occupied ? '' : ' empty'}`;
+  private seatMarkup(
+    seat: PokerPlaytestView['seats'][number],
+    name: string,
+    sittingOut: boolean,
+  ): string {
+    const classes = `poker-table-seat seat-${seat.seat}${seat.acting ? ' acting' : ''}${seat.folded ? ' folded' : ''}${sittingOut ? ' sitting-out' : ''}${seat.occupied ? '' : ' empty'}`;
     const cards = seat.cardsVisible ? this.cards(seat.cards, !seat.own) : '';
-    return `<div class='${esc(classes)}'><div class=poker-seat-cards>${cards}</div><div class=poker-avatar aria-hidden=true>${esc(seat.occupied ? name.slice(0, 2).toUpperCase() : '+')}</div>${this.markers(seat)}${this.seatText(seat, name)}</div>`;
+    const sitOut = sittingOut
+      ? `<div class=poker-sit-out>${esc(t('hudChrome.pokerPlaytest.sitOut'))}</div>`
+      : '';
+    return `<div class='${esc(classes)}'><div class=poker-seat-cards>${cards}</div><div class=poker-avatar aria-hidden=true>${esc(seat.occupied ? name.slice(0, 2).toUpperCase() : '+')}</div>${this.markers(seat)}${this.seatText(seat, name)}${sitOut}</div>`;
   }
 
   private markers(seat: PokerPlaytestView['seats'][number]): string {
@@ -237,14 +263,27 @@ export class PokerPlaytestWindow {
   ): string {
     const snapshot = state.snapshot;
     if (!snapshot) return '';
+    const sittingOut =
+      snapshot.viewerSeat !== null && Boolean(snapshot.sitOutSeats?.includes(snapshot.viewerSeat));
     const management = snapshot.watching
       ? this.button('stop-watch', '', t('hudChrome.pokerPlaytest.stopWatching'), state.connected)
-      : this.seatedButtons(state.connected, view.active);
+      : this.sitOutControls(snapshot, state.connected) +
+        this.seatedButtons(state.connected, view.active);
     const role = snapshot.watching
       ? t('hudChrome.pokerPlaytest.watching')
       : t('hudChrome.pokerPlaytest.seat', { seat: formatNumber((snapshot.viewerSeat ?? -1) + 1) });
     const updateTimer = state.connected && !this.invalidAmount && state.error === null;
-    return `<div class=poker-table-toolbar>${this.button('lobby', '', t('hudChrome.pokerPlaytest.tables'), true)}<strong>${esc(snapshot.tableId)}</strong><span>${esc(role)}</span>${management}</div>${this.status(snapshot, updateTimer)}${this.actionControls(view, state.connected)}`;
+    return `<div class=poker-table-toolbar>${this.button('lobby', '', t('hudChrome.pokerPlaytest.tables'), true)}<strong>${esc(snapshot.tableId)}</strong><span>${esc(role)}</span>${management}</div>${this.status(snapshot, updateTimer)}${sittingOut ? '' : this.actionControls(view, state.connected)}`;
+  }
+
+  private sitOutControls(
+    snapshot: NonNullable<ReturnType<PokerClientPort['pokerState']>['snapshot']>,
+    connected: boolean,
+  ): string {
+    if (snapshot.viewerSeat === null || !snapshot.sitOutSeats?.includes(snapshot.viewerSeat)) {
+      return '';
+    }
+    return this.button('sit-in', '', t('hudChrome.pokerPlaytest.sitIn'), connected, true);
   }
 
   private status(
@@ -264,10 +303,17 @@ export class PokerPlaytestWindow {
 
   private armTimer(seconds: number): void {
     if (seconds <= 0) return;
-    this.timer = this.deps.schedule(() => {
-      this.timer = null;
-      this.render();
-    }, 1_000);
+    this.armRender(1_000);
+  }
+
+  private armRender(delayMs: number): void {
+    this.timer = this.deps.schedule(
+      () => {
+        this.timer = null;
+        this.render();
+      },
+      Math.max(1, Math.ceil(delayMs)),
+    );
   }
 
   private seatedButtons(connected: boolean, active: boolean): string {
@@ -420,6 +466,10 @@ export class PokerPlaytestWindow {
       if (id) this.deps.client.leave(id);
       this.backToLobby();
     });
+    root.querySelector('[data-sit-in]')?.addEventListener('click', () => {
+      const id = this.currentTable();
+      if (id) this.deps.client.sitIn?.(id);
+    });
     this.bindPokerActions(root);
   }
 
@@ -457,6 +507,7 @@ export class PokerPlaytestWindow {
           return;
         }
         this.invalidAmount = false;
+        if (actionView.kind === 'check') this.deps.sound.check?.();
         if (actionView.kind === 'bet' || actionView.kind === 'raise') {
           this.wagerDraft.delete(actionView.kind);
         }

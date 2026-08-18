@@ -358,6 +358,8 @@ export const en_XA: EnTranslations = {
       "seated": "[{count} šéáţéð]",
       "watchers": "[{count} ŵáţçĥíñĝ]",
       "watching": "[Ŵáţçĥíñĝ]",
+      "sitOut": "[ŠÍŢ ÓÚŢ]",
+      "sitIn": "[Šíţ Íñ]",
       "tableFull": "[Ţáƀļé ƒúļļ]",
       "inHand": "[Ĥáñð íñ þŕóĝŕéšš]",
       "betweenHands": "[Ɓéţŵééñ ĥáñðš]",
@@ -390,6 +392,7 @@ export const en_XA: EnTranslations = {
       "bigBlind": "[Ɓíĝ ƀļíñð]",
       "bigBlindMarker": "[ƁƁ]",
       "yourTurn": "[Ýóúŕ ţúŕñ]",
+      "showdown": "[ŠĤÓŴÐÓŴÑ]",
       "winner": "[{name} Ŵóñ +{amount}]",
       "actionWithAmount": "[{action} {amount}]",
       "action": {

@@ -31,7 +31,8 @@ type PokerWireService = Pick<
   | 'tableForCharacter'
   | 'viewerIds'
   | 'watchTable'
->;
+> &
+  Partial<Pick<PokerService, 'sitIn'>>;
 
 export interface PokerWireDeps<Session extends PokerWireSession> {
   enabled: () => boolean;
@@ -82,6 +83,15 @@ function actionFrom(message: PokerWireMessage): PokerAction {
     return { type: action.type, to: action.to as number };
   }
   throw new PokerWireError('invalid_action');
+}
+
+function isSitInAction(message: PokerWireMessage): boolean {
+  return (
+    typeof message.action === 'object' &&
+    message.action !== null &&
+    !Array.isArray(message.action) &&
+    (message.action as Record<string, unknown>).type === 'sit-in'
+  );
 }
 
 export function pokerErrorCode(error: unknown): PokerErrorCode {
@@ -215,6 +225,14 @@ export function createPokerWireController<Session extends PokerWireSession>(
     action(session: Session, message: PokerWireMessage): Promise<void> {
       return request(session, async () => {
         requireParticipation(session);
+        if (isSitInAction(message)) {
+          if (!deps.service.sitIn) throw new PokerWireError('invalid_action');
+          await deps.service.sitIn({
+            tableId: tableIdFrom(message),
+            characterId: session.characterId,
+          });
+          return;
+        }
         await deps.service.act({
           tableId: tableIdFrom(message),
           accountId: session.accountId,

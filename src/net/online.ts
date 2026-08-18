@@ -2464,6 +2464,10 @@ export class ClientWorld implements IWorld, PokerClientPort {
     this.notifyPoker();
   }
 
+  sitIn(tableId: string): void {
+    this.sendPoker({ t: 'poker_action', tableId, action: { type: 'sit-in' } });
+  }
+
   act(action: PokerAction): void {
     const snapshot = this.pokerSnapshot;
     if (!snapshot) return;

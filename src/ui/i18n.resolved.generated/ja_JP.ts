@@ -358,6 +358,8 @@ export const ja_JP: EnTranslations = {
       "seated": "着席 {count}人",
       "watchers": "観戦 {count}人",
       "watching": "観戦中",
+      "sitOut": "SIT OUT",
+      "sitIn": "Sit In",
       "tableFull": "満席",
       "inHand": "ハンド進行中",
       "betweenHands": "ハンド間",
@@ -390,6 +392,7 @@ export const ja_JP: EnTranslations = {
       "bigBlind": "ビッグブラインド",
       "bigBlindMarker": "BB",
       "yourTurn": "あなたの手番です",
+      "showdown": "SHOWDOWN",
       "winner": "{name}が{amount}獲得",
       "actionWithAmount": "{action} {amount}",
       "action": {

@@ -5217,7 +5217,8 @@
       inset 0 0 28px var(--color-bg-dark),
       0 5px 16px var(--color-bg-dark);
   }
-  .poker-result-banner {
+  .poker-result-banner,
+  .poker-showdown-banner {
     position: absolute;
     z-index: 10;
     top: 50%;
@@ -5238,6 +5239,35 @@
       0 0 16px color-mix(in srgb, var(--gold) 45%, transparent),
       var(--art-shadow-md);
     pointer-events: none;
+  }
+  .poker-showdown-banner {
+    min-width: 260px;
+    padding: 16px 24px;
+    border-color: var(--color-text-light);
+    color: var(--color-text-light);
+    font-size: 28px;
+    letter-spacing: 0.18em;
+    box-shadow:
+      0 0 24px color-mix(in srgb, var(--gold) 65%, transparent),
+      inset 0 0 18px color-mix(in srgb, var(--gold) 20%, transparent),
+      var(--art-shadow-md);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .poker-showdown-banner {
+      animation: poker-showdown-arrive 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+  }
+  @keyframes poker-showdown-arrive {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.82);
+      letter-spacing: 0.38em;
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+      letter-spacing: 0.18em;
+    }
   }
   .poker-table-seat {
     position: absolute;
@@ -5296,6 +5326,21 @@
   }
   .poker-table-seat.folded {
     opacity: 0.52;
+  }
+  .poker-table-seat.sitting-out .poker-avatar {
+    border-color: var(--color-text-muted);
+    filter: grayscale(0.85);
+  }
+  .poker-sit-out {
+    display: inline-block;
+    margin-top: 2px;
+    padding: 1px 5px;
+    border: 1px solid var(--color-text-muted);
+    border-radius: 3px;
+    color: var(--color-text-muted);
+    font-family: var(--title-font);
+    font-size: 9px;
+    letter-spacing: 0.08em;
   }
   .poker-table-seat.empty {
     opacity: 0.38;

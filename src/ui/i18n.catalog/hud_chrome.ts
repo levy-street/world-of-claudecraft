@@ -55,6 +55,8 @@ export const hudChromeStrings = {
     seated: '{count} seated',
     watchers: '{count} watching',
     watching: 'Watching',
+    sitOut: 'SIT OUT',
+    sitIn: 'Sit In',
     tableFull: 'Table full',
     inHand: 'Hand in progress',
     betweenHands: 'Between hands',
@@ -87,6 +89,7 @@ export const hudChromeStrings = {
     bigBlind: 'Big blind',
     bigBlindMarker: 'BB',
     yourTurn: 'Your turn',
+    showdown: 'SHOWDOWN',
     winner: '{name} Won +{amount}',
     actionWithAmount: '{action} {amount}',
     action: {

@@ -2102,6 +2102,11 @@ export class Hud {
           sound: {
             deal: () => audio.cardShuffle(),
             turn: () => audio.cardReveal(),
+            check: () => {
+              audio.pokerCheck();
+              window.setTimeout(() => audio.pokerCheck(), 85);
+            },
+            showdown: () => audio.cardRoundPush(),
           },
           schedule: (callback, delayMs) => window.setTimeout(callback, delayMs),
           cancelSchedule: (id) => window.clearTimeout(id),

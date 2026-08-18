@@ -358,6 +358,8 @@ export const zh_CN: EnTranslations = {
       "seated": "{count}人已入座",
       "watchers": "{count}人观战",
       "watching": "观战中",
+      "sitOut": "SIT OUT",
+      "sitIn": "Sit In",
       "tableFull": "已满座",
       "inHand": "牌局进行中",
       "betweenHands": "牌局间歇",
@@ -390,6 +392,7 @@ export const zh_CN: EnTranslations = {
       "bigBlind": "大盲注",
       "bigBlindMarker": "BB",
       "yourTurn": "轮到你了",
+      "showdown": "SHOWDOWN",
       "winner": "{name}赢得{amount}",
       "actionWithAmount": "{action} {amount}",
       "action": {

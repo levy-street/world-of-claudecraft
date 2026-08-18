@@ -13,6 +13,7 @@ export interface PokerClientSnapshot extends PokerViewerSnapshot {
   viewerSeat: number | null;
   watching: boolean;
   turnDeadlineMs: number | null;
+  sitOutSeats?: number[];
 }
 
 export type PokerErrorCode =
@@ -89,6 +90,15 @@ export function isPokerClientSnapshot(value: unknown): value is PokerClientSnaps
     return false;
   }
   if (value.turnDeadlineMs !== null && !isNonNegativeInteger(value.turnDeadlineMs)) return false;
+  if (
+    value.sitOutSeats !== undefined &&
+    (!Array.isArray(value.sitOutSeats) ||
+      value.sitOutSeats.length > seatCount ||
+      !value.sitOutSeats.every((seat) => isNonNegativeInteger(seat) && seat < seatCount) ||
+      new Set(value.sitOutSeats).size !== value.sitOutSeats.length)
+  ) {
+    return false;
+  }
   return value.seats.every(
     (seat) =>
       seat === null ||
@@ -119,5 +129,6 @@ export interface PokerClientPort {
   stopWatching(tableId: string): void;
   rebuy(tableId: string): void;
   leave(tableId: string): void;
+  sitIn?(tableId: string): void;
   act(action: PokerAction): void;
 }

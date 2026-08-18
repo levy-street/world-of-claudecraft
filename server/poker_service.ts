@@ -8,6 +8,15 @@ import {
   type PokerStore,
   type PokerTableRow,
 } from './poker_db';
+import {
+  clearPokerSitOut,
+  decodePokerSitOut,
+  encodePokerSitOut,
+  markPokerSitOut,
+  pokerSitOutLeavesAfterHand,
+  type PokerSitOutEntry,
+  type PokerSitOutState,
+} from './poker_sit_out';
 
 export const POKER_SMALL_BLIND = 10;
 export const POKER_BIG_BLIND = 20;
@@ -37,7 +46,7 @@ export interface PokerServiceDeps {
   provisionDefaults?: boolean;
   onChanged?: (tableId: string, result: boolean) => void;
   audit?: (event: {
-    type: 'action' | 'join' | 'leave' | 'rebuy' | 'stop_watch' | 'watch';
+    type: 'action' | 'join' | 'leave' | 'rebuy' | 'sit_in' | 'stop_watch' | 'watch';
     tableId: string;
     accountId?: number;
     characterId: number;
@@ -78,6 +87,7 @@ export interface PokerActInput {
   handNumber: number;
   actionSequence: number;
   action: PokerAction;
+  automatic?: 'timeout' | 'sit_out';
 }
 
 export type PokerWireSnapshot = PokerClientSnapshot;
@@ -88,6 +98,7 @@ interface PokerTableRecord {
   revision: number;
   watchers: Set<number>;
   leaveAfterHand: Set<number>;
+  sitOut: PokerSitOutState;
   turnDeadlineMs: number | null;
   nextHandAtMs: number | null;
   retryDelayMs: number;
@@ -99,6 +110,7 @@ interface PokerPersistedPayload {
   turnDeadlineMs: number | null;
   nextHandAtMs: number | null;
   leaveAfterHand: number[];
+  sitOut?: PokerSitOutEntry[];
 }
 
 function statusOf(state: PokerTable): PokerTableRow['status'] {
@@ -113,6 +125,7 @@ function rowFor(record: PokerTableRecord, state = record.state): PokerTableRow {
     turnDeadlineMs: record.turnDeadlineMs,
     nextHandAtMs: record.nextHandAtMs,
     leaveAfterHand: [...record.leaveAfterHand],
+    sitOut: encodePokerSitOut(record.sitOut),
   };
   return {
     tableId: record.tableId,
@@ -180,6 +193,20 @@ export function createPokerService(deps: PokerServiceDeps) {
     const state = PokerTable.restore(tablePayload);
     const snapshot = state.snapshotFor(null);
     const funded = snapshot.seats.filter((seat) => seat && seat.stack > 0).length;
+    const sitOut = decodePokerSitOut(wrapped ? raw.sitOut : undefined);
+    const seatedIds = new Set(seatedEntries(state).map((entry) => entry.characterId));
+    for (const characterId of sitOut.keys()) {
+      if (!seatedIds.has(characterId)) sitOut.delete(characterId);
+    }
+    let turnDeadlineMs = wrapped
+      ? Number.isSafeInteger(raw.turnDeadlineMs)
+        ? (raw.turnDeadlineMs as number)
+        : null
+      : snapshot.street === null
+        ? null
+        : deps.nowMs() + POKER_TURN_TIMEOUT_MS;
+    const actor = snapshot.actorSeat === null ? null : snapshot.seats[snapshot.actorSeat]?.playerId;
+    if (snapshot.street !== null && actor && sitOut.has(actor)) turnDeadlineMs = deps.nowMs();
     return {
       tableId: row.tableId,
       state,
@@ -190,13 +217,8 @@ export function createPokerService(deps: PokerServiceDeps) {
           ? raw.leaveAfterHand.filter(Number.isSafeInteger)
           : [],
       ),
-      turnDeadlineMs: wrapped
-        ? Number.isSafeInteger(raw.turnDeadlineMs)
-          ? (raw.turnDeadlineMs as number)
-          : null
-        : snapshot.street === null
-          ? null
-          : deps.nowMs() + POKER_TURN_TIMEOUT_MS,
+      sitOut,
+      turnDeadlineMs,
       nextHandAtMs: wrapped
         ? Number.isSafeInteger(raw.nextHandAtMs)
           ? (raw.nextHandAtMs as number)
@@ -265,7 +287,7 @@ export function createPokerService(deps: PokerServiceDeps) {
     next: PokerTable,
     seatMutation?: PokerSeatMutation,
     metadata?: Partial<
-      Pick<PokerTableRecord, 'leaveAfterHand' | 'turnDeadlineMs' | 'nextHandAtMs'>
+      Pick<PokerTableRecord, 'leaveAfterHand' | 'sitOut' | 'turnDeadlineMs' | 'nextHandAtMs'>
     >,
   ): Promise<void> {
     const persistedRecord: PokerTableRecord = { ...record, ...metadata, state: next };
@@ -275,8 +297,20 @@ export function createPokerService(deps: PokerServiceDeps) {
     record.revision = revision;
     record.retryDelayMs = 1_000;
     if (metadata?.leaveAfterHand) record.leaveAfterHand = metadata.leaveAfterHand;
+    if (metadata?.sitOut) record.sitOut = metadata.sitOut;
     if (metadata?.turnDeadlineMs !== undefined) record.turnDeadlineMs = metadata.turnDeadlineMs;
     if (metadata?.nextHandAtMs !== undefined) record.nextHandAtMs = metadata.nextHandAtMs;
+  }
+
+  function turnDeadlineFor(
+    state: PokerTable,
+    sitOut: PokerSitOutState,
+    nowMs: number,
+  ): number | null {
+    const snapshot = state.snapshotFor(null);
+    if (snapshot.street === null || snapshot.actorSeat === null) return null;
+    const actor = snapshot.seats[snapshot.actorSeat]?.playerId;
+    return actor && sitOut.has(actor) ? nowMs : nowMs + POKER_TURN_TIMEOUT_MS;
   }
 
   async function mutate(record: PokerTableRecord, run: () => Promise<void>): Promise<void> {
@@ -324,6 +358,7 @@ export function createPokerService(deps: PokerServiceDeps) {
       revision: 0,
       watchers: new Set(),
       leaveAfterHand: new Set(),
+      sitOut: new Map(),
       turnDeadlineMs: null,
       nextHandAtMs: null,
       retryDelayMs: 1_000,
@@ -340,29 +375,44 @@ export function createPokerService(deps: PokerServiceDeps) {
   async function startHand(tableId: string): Promise<void> {
     enabled();
     const record = await ensureLoaded(tableId);
+    let completed = false;
     await mutate(record, async () => {
       const next = cloneTable(record.state);
       next.startHand();
+      const nowMs = deps.nowMs();
+      const snapshot = next.snapshotFor(null);
+      completed = snapshot.street === null;
+      const pendingLeaves = new Set(record.leaveAfterHand);
+      if (completed) {
+        for (const characterId of pokerSitOutLeavesAfterHand(record.sitOut, snapshot.handNumber)) {
+          pendingLeaves.add(characterId);
+        }
+      }
       await saveClone(record, next, undefined, {
-        turnDeadlineMs: deps.nowMs() + POKER_TURN_TIMEOUT_MS,
-        nextHandAtMs: null,
+        leaveAfterHand: pendingLeaves,
+        turnDeadlineMs: turnDeadlineFor(next, record.sitOut, nowMs),
+        nextHandAtMs: completed ? nowMs + POKER_NEXT_HAND_DELAY_MS : null,
       });
+      if (completed) await retryPendingLeaves(record, nowMs);
     });
-    deps.onChanged?.(tableId, false);
+    deps.onChanged?.(tableId, completed);
   }
 
   async function completePendingLeaves(record: PokerTableRecord): Promise<void> {
     if (record.state.snapshotFor(null).street !== null) return;
-    for (const characterId of [...record.leaveAfterHand]) {
+    let pendingLeaves = new Set(record.leaveAfterHand);
+    let sitOut = new Map(record.sitOut);
+    let metadataDirty = false;
+    for (const characterId of [...pendingLeaves]) {
       const seat = seatedEntries(record.state).find((entry) => entry.characterId === characterId);
+      pendingLeaves.delete(characterId);
+      sitOut.delete(characterId);
       if (!seat) {
-        record.leaveAfterHand.delete(characterId);
+        metadataDirty = true;
         continue;
       }
       const next = cloneTable(record.state);
       const amount = next.standUp(characterId);
-      const pendingLeaves = new Set(record.leaveAfterHand);
-      pendingLeaves.delete(characterId);
       await saveClone(
         record,
         next,
@@ -372,15 +422,42 @@ export function createPokerService(deps: PokerServiceDeps) {
           characterId,
           seatIndex: seat.seatIndex,
         },
-        { leaveAfterHand: pendingLeaves },
+        { leaveAfterHand: new Set(pendingLeaves), sitOut: new Map(sitOut) },
       );
+      metadataDirty = false;
       tableByCharacter.delete(characterId);
       accountByCharacter.delete(characterId);
       audit({ type: 'leave', tableId: record.tableId, characterId, amount });
     }
+    if (metadataDirty) {
+      await saveClone(record, cloneTable(record.state), undefined, {
+        leaveAfterHand: pendingLeaves,
+        sitOut,
+      });
+    }
+  }
+
+  async function retryPendingLeaves(record: PokerTableRecord, nowMs: number): Promise<boolean> {
+    try {
+      await completePendingLeaves(record);
+      return true;
+    } catch (error) {
+      record.nextHandAtMs = nowMs + record.retryDelayMs;
+      record.retryDelayMs = Math.min(record.retryDelayMs * 2, 30_000);
+      console.error('poker pending leave cleanup failed:', error);
+      return false;
+    }
   }
 
   async function maybeStartAfterJoin(record: PokerTableRecord): Promise<void> {
+    if (record.leaveAfterHand.size > 0) {
+      let cleaned = false;
+      await mutate(record, async () => {
+        cleaned = await retryPendingLeaves(record, deps.nowMs());
+      });
+      deps.onChanged?.(record.tableId, false);
+      if (!cleaned) return;
+    }
     const snapshot = record.state.snapshotFor(null);
     const funded = snapshot.seats.filter((seat) => seat && seat.stack > 0).length;
     if (snapshot.street === null && funded >= 2) await startHand(record.tableId);
@@ -404,12 +481,28 @@ export function createPokerService(deps: PokerServiceDeps) {
       }
       const next = cloneTable(record.state);
       next.act(input.characterId, input.action);
-      completed = next.snapshotFor(null).street === null;
+      const nextSnapshot = next.snapshotFor(null);
+      completed = nextSnapshot.street === null;
+      let sitOut = new Map(record.sitOut);
+      if (input.automatic === 'timeout') {
+        sitOut = markPokerSitOut(sitOut, input.characterId, current.handNumber);
+      } else if (input.automatic === undefined) {
+        sitOut = clearPokerSitOut(sitOut, input.characterId);
+      }
+      const pendingLeaves = new Set(record.leaveAfterHand);
+      if (completed) {
+        for (const characterId of pokerSitOutLeavesAfterHand(sitOut, nextSnapshot.handNumber)) {
+          pendingLeaves.add(characterId);
+        }
+      }
+      const nowMs = deps.nowMs();
       await saveClone(record, next, undefined, {
-        turnDeadlineMs: completed ? null : deps.nowMs() + POKER_TURN_TIMEOUT_MS,
-        nextHandAtMs: completed ? deps.nowMs() + POKER_NEXT_HAND_DELAY_MS : null,
+        leaveAfterHand: pendingLeaves,
+        sitOut,
+        turnDeadlineMs: turnDeadlineFor(next, sitOut, nowMs),
+        nextHandAtMs: completed ? nowMs + POKER_NEXT_HAND_DELAY_MS : null,
       });
-      if (completed) await completePendingLeaves(record);
+      if (completed) await retryPendingLeaves(record, nowMs);
     });
     deps.onChanged?.(input.tableId, completed);
     const result = record.state.snapshotFor(null).lastResult;
@@ -498,6 +591,28 @@ export function createPokerService(deps: PokerServiceDeps) {
       });
     },
 
+    async sitIn(input: { tableId: string; characterId: number }): Promise<void> {
+      enabled();
+      const record = await ensureLoaded(input.tableId);
+      let changed = false;
+      await mutate(record, async () => {
+        const seated = seatedEntries(record.state).some(
+          (entry) => entry.characterId === input.characterId,
+        );
+        if (!seated) throw new Error('Character is not seated');
+        if (!record.sitOut.has(input.characterId)) return;
+        const sitOut = clearPokerSitOut(record.sitOut, input.characterId);
+        await saveClone(record, cloneTable(record.state), undefined, {
+          sitOut,
+          turnDeadlineMs: turnDeadlineFor(record.state, sitOut, deps.nowMs()),
+        });
+        changed = true;
+      });
+      if (!changed) return;
+      deps.onChanged?.(input.tableId, false);
+      audit({ type: 'sit_in', tableId: input.tableId, characterId: input.characterId });
+    },
+
     async leaveTable(input: { tableId: string; characterId: number }): Promise<void> {
       const record = await ensureLoaded(input.tableId);
       if (record.state.snapshotFor(null).street !== null) {
@@ -521,12 +636,17 @@ export function createPokerService(deps: PokerServiceDeps) {
         if (!seat) return;
         const next = cloneTable(record.state);
         const amount = next.standUp(input.characterId);
-        await saveClone(record, next, {
-          type: 'leave',
-          accountId: accountByCharacter.get(input.characterId) ?? 0,
-          characterId: input.characterId,
-          seatIndex: seat.seatIndex,
-        });
+        await saveClone(
+          record,
+          next,
+          {
+            type: 'leave',
+            accountId: accountByCharacter.get(input.characterId) ?? 0,
+            characterId: input.characterId,
+            seatIndex: seat.seatIndex,
+          },
+          { sitOut: clearPokerSitOut(record.sitOut, input.characterId) },
+        );
         tableByCharacter.delete(input.characterId);
         accountByCharacter.delete(input.characterId);
         audit({ type: 'leave', tableId: input.tableId, characterId: input.characterId, amount });
@@ -548,6 +668,9 @@ export function createPokerService(deps: PokerServiceDeps) {
                 ?.seatIndex ?? null),
         watching: viewerId !== null && record.watchers.has(viewerId),
         turnDeadlineMs: record.turnDeadlineMs,
+        sitOutSeats: seatedEntries(record.state).flatMap((entry) =>
+          record.sitOut.has(entry.characterId) ? [entry.seatIndex] : [],
+        ),
       };
     },
 
@@ -630,7 +753,17 @@ export function createPokerService(deps: PokerServiceDeps) {
       try {
         await initialize();
         for (const record of tables.values()) {
-          const snapshot = record.state.snapshotFor(null);
+          let snapshot = record.state.snapshotFor(null);
+          if (snapshot.street === null && record.leaveAfterHand.size > 0) {
+            if (record.nextHandAtMs !== null && nowMs < record.nextHandAtMs) continue;
+            let cleaned = false;
+            await mutate(record, async () => {
+              cleaned = await retryPendingLeaves(record, nowMs);
+            });
+            if (cleaned) deps.onChanged?.(record.tableId, false);
+            continue;
+          }
+          snapshot = record.state.snapshotFor(null);
           if (
             snapshot.street !== null &&
             record.turnDeadlineMs !== null &&
@@ -643,6 +776,7 @@ export function createPokerService(deps: PokerServiceDeps) {
             const action: PokerAction = legal?.actions.includes('check')
               ? { type: 'check' }
               : { type: 'fold' };
+            const automatic = record.sitOut.has(actor) ? 'sit_out' : 'timeout';
             await act({
               tableId: record.tableId,
               accountId: accountByCharacter.get(actor) ?? 0,
@@ -650,6 +784,7 @@ export function createPokerService(deps: PokerServiceDeps) {
               handNumber: snapshot.handNumber,
               actionSequence: snapshot.actionSequence,
               action,
+              automatic,
             }).catch((error) => {
               record.turnDeadlineMs = nowMs + record.retryDelayMs;
               record.retryDelayMs = Math.min(record.retryDelayMs * 2, 30_000);

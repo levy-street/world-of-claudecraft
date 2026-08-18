@@ -358,6 +358,8 @@ export const ru_RU: EnTranslations = {
       "seated": "За столом: {count}",
       "watchers": "Наблюдают: {count}",
       "watching": "Наблюдение",
+      "sitOut": "SIT OUT",
+      "sitIn": "Sit In",
       "tableFull": "Нет свободных мест",
       "inHand": "Идет раздача",
       "betweenHands": "Между раздачами",
@@ -390,6 +392,7 @@ export const ru_RU: EnTranslations = {
       "bigBlind": "Большой блайнд",
       "bigBlindMarker": "BB",
       "yourTurn": "Ваш ход",
+      "showdown": "SHOWDOWN",
       "winner": "{name} получает {amount}",
       "actionWithAmount": "{action} {amount}",
       "action": {

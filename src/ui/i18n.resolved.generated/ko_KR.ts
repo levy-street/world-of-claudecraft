@@ -358,6 +358,8 @@ export const ko_KR: EnTranslations = {
       "seated": "{count}명 착석",
       "watchers": "{count}명 관전",
       "watching": "관전 중",
+      "sitOut": "SIT OUT",
+      "sitIn": "Sit In",
       "tableFull": "빈 좌석 없음",
       "inHand": "핸드 진행 중",
       "betweenHands": "핸드 사이",
@@ -390,6 +392,7 @@ export const ko_KR: EnTranslations = {
       "bigBlind": "빅 블라인드",
       "bigBlindMarker": "BB",
       "yourTurn": "당신의 차례입니다",
+      "showdown": "SHOWDOWN",
       "winner": "{name}님이 {amount} 획득",
       "actionWithAmount": "{action} {amount}",
       "action": {
