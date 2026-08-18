@@ -2816,6 +2816,19 @@ export const VISUALS: Record<string, VisualDef> = {
     // wash flattens the barrow-moss and the shard-eye socket into one mass.
     tint: 0x9c9382,
     tintStrength: 0.15,
+    // No walkRef/runRef ON PURPOSE, and the encounter change owes them.
+    //
+    // They are per-def and SCALE-dependent (the dragonkin matriarch needed her own
+    // def rather than the broodlord's refs, which over-strode her by 25%), and this
+    // boss has no mob template yet, so his entity scale is not decided. Measured at
+    // scale 1 by `node scripts/anim/measure_gait.mjs
+    // public/models/creatures/balgath_foreman.glb --height 3.2`: normScale 3.84,
+    // walkRef 0.93, runRef 1.80. Both refs scale LINEARLY with entity scale, so the
+    // encounter re-runs that command with `--scale <template scale>` and pastes the
+    // result here. Shipping the scale-1 pair now would be worse than shipping
+    // nothing: against ordinary wander and chase speeds both land past
+    // `locomotionTimeScale`'s clamp ceiling, which is exactly the skating gait the
+    // refs exist to prevent, while LOOKING like a measured value nobody rechecks.
   },
   // The three zone Chroniclers (Saul, Osric Fenn, Zenzie): one shared
   // scholarly-mage silhouette (hat, staff, open ledger in the off hand,
