@@ -67,8 +67,15 @@ function softDisc(): THREE.CanvasTexture {
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
-  const ctx = canvas.getContext('2d')!;
+  const ctx = canvas.getContext('2d');
   const mid = size / 2;
+  // A null 2D context means the document cannot rasterize at all. Fail soft to an
+  // un-mapped texture rather than throwing inside a per-effect spawn: the ring still
+  // draws, it just draws hard-edged, which is a cosmetic loss and not a dead frame.
+  if (!ctx) {
+    softDiscTex = new THREE.CanvasTexture(canvas);
+    return softDiscTex;
+  }
   const grad = ctx.createRadialGradient(mid, mid, 0, mid, mid, mid);
   // Held near full out to 55% before it falls away, so the effect keeps a solid
   // readable core and spends its falloff on the outer half.

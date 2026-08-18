@@ -1131,7 +1131,10 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     // No `sourceDefault` precisely because every relic here authors its own pair; a
     // default that nothing inherits is dead config, and a test says so.
     relics: items(
-      ['fenshadow_maul', [fromBoss('balgath_foreman'), fromBoss('deacon_voss'), fromQuest('q_deacon')]],
+      [
+        'fenshadow_maul',
+        [fromBoss('balgath_foreman'), fromBoss('deacon_voss'), fromQuest('q_deacon')],
+      ],
       ['marshlight_hauberk', [fromBoss('balgath_foreman'), fromBoss('fen_troll')]],
       ['mirejaw_scale_vest', [fromBoss('balgath_foreman'), fromBoss('mirejaw_the_ravenous')]],
       ['duskthorn_mantle', [fromBoss('balgath_foreman'), fromBoss('gravecaller_mender')]],

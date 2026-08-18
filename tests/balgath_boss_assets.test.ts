@@ -123,9 +123,7 @@ describe('balgath world boss assets', () => {
 
   it('gives both bodies the same ClipMap object, so they cannot drift', () => {
     for (const key of ['mob_balgath_foreman', 'mob_balgath_cyclops']) {
-      expect(defBlock(key), `${key} should share the BALGATH ClipMap`).toContain(
-        'clips: BALGATH,',
-      );
+      expect(defBlock(key), `${key} should share the BALGATH ClipMap`).toContain('clips: BALGATH,');
     }
   });
 
@@ -179,13 +177,12 @@ describe('balgath world boss assets', () => {
     // `src/render/`, so the two numbers cannot share a constant; this is the weld that
     // replaces the import. Drift here is silent and shows up only as skating feet.
     const manifest = readFileSync(MANIFEST, 'utf8');
-    const declared = manifest.match(/export const BALGATH_SCALE = ([\d.]+);/);
+    const declared = manifest.match(/export const BALGATH_SCALE = ([\d.]+);/)?.[1];
     expect(declared, 'BALGATH_SCALE is missing from the manifest').toBeTruthy();
     const zone = readFileSync(resolve(ROOT, 'src/sim/content/zone2.ts'), 'utf8');
     const tpl = zone.slice(zone.indexOf('balgath_foreman: {'));
-    const simScale = tpl.slice(0, tpl.indexOf('\n  },')).match(/scale: ([\d.]+),/);
+    const simScale = tpl.slice(0, tpl.indexOf('\n  },')).match(/scale: ([\d.]+),/)?.[1];
     expect(simScale, "the mob template's scale is missing").toBeTruthy();
-    expect(Number(simScale![1])).toBe(Number(declared![1]));
+    expect(Number(simScale)).toBe(Number(declared));
   });
-
 });
