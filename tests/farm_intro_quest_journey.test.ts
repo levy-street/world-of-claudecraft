@@ -7,6 +7,13 @@
 // giver, the shipped arm, in the order a new player walks them. Every step
 // is a real entry point (talkToNpc, buyItem, plantCrop, the tick sweep,
 // harvestCrop, talkToNpc again), never a hand-set quest state.
+//
+// LAYER HONESTY (Phase 9 QA, state.md deviation (bn)): the entry points here
+// are the SIM's. plantCrop and harvestCrop have no client-side caller yet
+// (no bed interaction, no plant sheet, no /dev plant), so this suite proves
+// the sim half of the journey and cannot see whether a player can reach it;
+// the client verb and its browser test are the (bn) follow-up, and until
+// they land the phase's "reachable by ordinary players" note is unmet.
 import { describe, expect, it } from 'vitest';
 import { FARM_CROPS, type FarmCropDef } from '../src/sim/content/farm_crops';
 import { farmBedById } from '../src/sim/content/farm_patches';
@@ -157,6 +164,13 @@ describe('the go-live journey: q_farm_intro at Farmer Jessica, end to end', () =
     const harvested = eventsOf(h.sim, from, 'farmHarvested').length;
     const withered = eventsOf(h.sim, from, 'farmWithered').length;
     expect(harvested + withered).toBe(1);
+    // Something really landed in the bags on either outcome: produce (plain or
+    // fine) on a survived crop, husks on a withered one.
+    expect(
+      h.sim.countItem(CROP_ID, h.pid) +
+        h.sim.countItem(`fine_${CROP_ID}`, h.pid) +
+        h.sim.countItem('withered_husks', h.pid),
+    ).toBeGreaterThan(0);
     expect(qp?.counts).toEqual([1, 1]);
     expect(qp?.state).toBe('ready');
     expect(h.sim.questState(QUEST_ID, h.pid)).toBe('ready');

@@ -10159,7 +10159,7 @@ export const es: EnTranslations = {
       "ferocious_bite": {
         "name": "Mordisco Sangriento",
         "description": "Movimiento final que causa {damage}. Solo en Forma de lobo.",
-        "specNote_feral": "Cada golpe conectado añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Cosecha Roja: un mordisco de 70 más 43 por punto de combo que también inflige al instante todo el daño que tus Desollar y Desgarrar aún habrían infligido, y restaura 30 de energía."
+        "specNote_feral": "Cada golpe conectado añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Cosecha Roja, que consume la Sangre Antigua para un golpe más fuerte que también inflige al instante todo el daño que tus Desollar y Desgarrar aún habrían infligido, y restaura energía."
       },
       "swipe": {
         "name": "Zarpas Barredoras",
@@ -10222,7 +10222,7 @@ export const es: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Sangre de Lobo",
-        "description": "Aumenta el poder de ataque en {buff} durante {duration} s. Solo en Forma de lobo."
+        "description": "Genera {rage} de energía y aumenta el poder de ataque en {buff} durante {duration} s. Solo en Forma de lobo."
       },
       "rip": {
         "name": "Grieta Sangrienta",
@@ -10443,7 +10443,7 @@ export const es: EnTranslations = {
       },
       "redharvest": {
         "name": "Cosecha Roja",
-        "description": "Consume tus 3 de Sangre Antigua: golpea por {damage}, inflige al instante todo el daño que tus Desollar y Desgarrar aún habrían infligido, elimina ambos sangrados y restaura 30 de energía. Funciona sin puntos de combo."
+        "description": "Consume tus 3 de Sangre Antigua: golpea por {damage}, inflige al instante todo el daño que tus Desollar y Desgarrar aún habrían infligido, elimina ambos sangrados y restaura {rage} de energía. Funciona sin puntos de combo."
       },
       "marrowbreak": {
         "name": "Quiebramédula",
@@ -10691,7 +10691,7 @@ export const es: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Remiendo Salvaje",
-        "description": "Restaura 180 de salud durante 10 s. Solo en Forma de Oso. (talento de Druida)"
+        "description": "Restaura un 40% de tu salud máxima durante 10 s. Solo en Forma de Oso. (talento de Druida)"
       },
       "frost_trap": {
         "name": "Trampa de Cencellada",
@@ -10924,7 +10924,7 @@ export const es: EnTranslations = {
       },
       "prowl": {
         "name": "Acechar",
-        "description": "Entra en sigilo mientras estás en Forma de lobo y te mueves un 50% más lento. No puede usarse en combate."
+        "description": "Entra en sigilo mientras estás en Forma de lobo y te mueves un 5% más lento. No puede usarse en combate."
       },
       "rake": {
         "name": "Desollar",

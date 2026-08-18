@@ -60,9 +60,26 @@ machine-classified as the +4 id shift with two explained consequences. The husk-
 dialog row shares the vendor family's 1-yd offered-but-refused band ((bi)). NO
 server/ file moved (a comment only), so the privacy-security row was dispatched on the
 session's instruction rather than the matrix rule and passed. The tier-1 watch fee is
-TWO produce: the day-one shopping list is seed + compost + two carrots (28 copper) and
-the intro quest's 50 copper covers it. The QA twin's live-client journey must play the
+TWO produce: the day-one shopping list is seed + compost + two carrots (44 copper: 4 +
+8 + two at 16; this note first said 28, an arithmetic slip the QA corrected) and the
+intro quest's 50 copper covers it. The QA twin's live-client journey must play the
 Highwatch shelf too ((bh)).
+
+PHASE 9 QA EXECUTED 2026-08-17 (verdict FAIL ON THE GO-LIVE ACCEPTANCE, scope stop;
+PASS on this phase's own diff; state.md (bn) and (bo), progress.md Phase 9 QA notes):
+everything above verifies on the live client and the sim, but the Live-surface note's
+"the full plant-grow-harvest-cook loop is reachable by ordinary players" is UNMET: no
+client-side control plants or harvests a bed (plantCrop / harvestCrop have no caller
+under src/ui, src/game, src/render, or src/main.ts, no bed is an interact target, no
+/dev plant exists), so q_farm_intro is offered and accepted and can never be completed
+by a player who does not open the browser console. Not this phase's omission: no phase
+file in the packet planned the client verb. The proposed owner is Phase 9b
+(docs/farming/phase-09b-bed-verbs.md, maintainer adopts or strikes); the alternative
+is re-dormanting the intro quest and the teaching copy until the verb ships. The QA
+also found that tier 3 and 4 seeds have no first faucet anywhere ((bo), a D11 ruling
+owed), so the Highwatch and Evergarden beds cannot be sown by anyone. The (bh)
+Highwatch shelf eyeball passed (no re-seat). Read the acceptance list above with
+"reachable at the sim and wire level" for the plant and harvest rows.
 
 ### Starter Prompt
 

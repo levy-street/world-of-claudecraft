@@ -412,7 +412,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Movimiento de remate que inflige {damage}. Solo en Forma de lobo.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Cada golpe que conecta añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Cosecha Roja: un mordisco de 70 más 43 por punto de combo que también inflige al instante todo el daño que tus Desollar y Desgarrar aún habrían infligido, y restaura 30 de energía.',
+    'Cada golpe que conecta añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Cosecha Roja, que consume la Sangre Antigua para un golpe más fuerte que también inflige al instante todo el daño que tus Desollar y Desgarrar aún habrían infligido, y restaura energía.',
   'entities.abilities.garrote.description':
     'Enrolla un alambre alrededor de la garganta del enemigo, infligiendo {damage} de daño al instante y {overTime} de sangrado a lo largo de 18 s. Debes estar en sigilo. Otorga 1 punto de combo.',
   'entities.abilities.garrote.specNote_subtlety':

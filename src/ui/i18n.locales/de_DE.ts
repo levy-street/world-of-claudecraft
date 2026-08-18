@@ -5944,7 +5944,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Der Gegner wird von Insekten umschwärmt und erleidet {damage} Naturschaden über 12 Sek.',
   'entities.abilities.tigers_fury.name': 'Wolfsblut',
   'entities.abilities.tigers_fury.description':
-    'Erhöht die Angriffskraft {duration} Sek. lang um {buff}. Nur in Wolfsgestalt.',
+    'Erzeugt sofort {rage} Energie und erhöht die Angriffskraft {duration} Sek. lang um {buff}. Nur in Wolfsgestalt.',
   'entities.abilities.rip.name': 'Blutriss',
   'entities.abilities.mortal_strike.name': 'Verstümmelnder Hieb',
   'entities.abilities.mortal_strike.description':
@@ -5988,7 +5988,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Demoralisiert nahe Gegner und senkt ihre Angriffskraft 20 Sek. lang um 20. Nur in Bruin Form.',
   'entities.abilities.prowl.name': 'Anpirschen',
   'entities.abilities.prowl.description':
-    'Geht in Wolfsgestalt in den Schleichmodus über und bewegt Euch 50% langsamer. Im Kampf nicht einsetzbar.',
+    'Geht in Wolfsgestalt in den Schleichmodus über und bewegt Euch 5% langsamer. Im Kampf nicht einsetzbar.',
   'entities.abilities.rake.name': 'Schinden',
   'entities.abilities.revive_pet.name': 'Zusammenflicken',
   'entities.abilities.revive_pet.description':
@@ -10219,7 +10219,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description': 'Macht Gegner im Umkreis von 4 m um den Zielpunkt 2 Sek. lang bewegungsunfähig und verlangsamt sie danach 6 Sek. lang um 40%. (Schamanentalent)',
   'entities.abilities.evocation.description': 'Restaura Mana rápidamente. (Magier-Talent)',
   'entities.abilities.frenzied_regeneration.description':
-    'Stellt im Verlauf von 10 Sek. 180 Gesundheit wieder her. Nur in Bärengestalt. (Druidentalent)',
+    'Stellt im Verlauf von 10 Sek. 40% Eurer maximalen Gesundheit wieder her. Nur in Bärengestalt. (Druidentalent)',
   'entities.abilities.frost_trap.description':
     'Friert Gegner im Zielgebiet 3 Sek. lang ein, sodass sie sich weder bewegen noch handeln können. (Jägertalent)',
   'entities.abilities.hammer_of_wrath.description': 'Schleudert einen heiligen Hammer für {damage} Schaden und erzeugt 1 Hingabe. Einsetzbar unter 20% Gesundheit oder während Göttlicher Aufstieg oder Zornige Vergeltung. Zorn der Dämmerung gewährt einen zusätzlichen Einsatz gegen jedes Ziel, der seine laufende Abklingzeit übergeht und 20% mehr Schaden verursacht. Aufstieg erhöht seinen Schaden um 30%.',
@@ -11370,7 +11370,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Verbraucht 5 Grünkraft. Erntet jede Eurer Heilungen über Zeit auf allen Verbündeten für 60% ihrer verbleibenden Heilung, entfernt diese Effekte und pflanzt eine frische Wildblüte auf das Ziel.',
   'entities.abilities.redharvest.name': 'Rote Ernte',
   'entities.abilities.redharvest.description':
-    'Verbraucht 3 Altes Blut: ein Schlag für {damage}, der sofort allen Schaden verursacht, den Euer Schinden und Zerfetzen noch verursacht hätten, beide Blutungen entfernt und 30 Energie wiederherstellt. Funktioniert auch ohne Combopunkte.',
+    'Verbraucht 3 Altes Blut: ein Schlag für {damage}, der sofort allen Schaden verursacht, den Euer Schinden und Zerfetzen noch verursacht hätten, beide Blutungen entfernt und {rage} Energie wiederherstellt. Funktioniert auch ohne Combopunkte.',
   'entities.abilities.sunlance.name': 'Sonnenspur',
   'entities.abilities.sunlance.description':
     'Verbraucht 3 Mondflut für einen Schlag mit {damage} Naturschaden plus einem Brand von {overTime} über 9 Sek. und stellt 35 Mana wieder her: die Manawahl. Mondwoge verbraucht dieselben 3 Mondflut, also wählt eine.',
@@ -12926,7 +12926,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Verringert die Rüstung des Ziels 40 Sek. lang um {damage}%.',
   'entities.abilities.ferocious_bite.description': 'Finishing-Move, der {damage} verursacht. Nur in Wolfsgestalt.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Jeder Treffer, der landet, fügt 1 Altes Blut hinzu; bei 3 Altem Blut wird diese Taste zu Rote Ernte: ein Biss für 70 plus 43 pro Combopunkt, der außerdem sofort allen Schaden verursacht, den Euer Schinden und Zerfetzen noch verursacht hätten, und 30 Energie wiederherstellt.',
+    'Jeder Treffer, der landet, fügt 1 Altes Blut hinzu; bei 3 Altem Blut wird diese Taste zu Rote Ernte, die das Alte Blut für einen stärkeren Schlag verbraucht, der außerdem sofort allen Schaden verursacht, den Euer Schinden und Zerfetzen noch verursacht hätten, und Energie wiederherstellt.',
   'entities.abilities.funeral_harvest.description':
     'Stirbt ein Gegner, der kürzlich von Euch oder Euren Untoten Schaden erlitten hat, erhaltet Ihr 1 Seelenfragment. Dies kann höchstens alle 3 Sek. eintreten.',
   'entities.abilities.funeral_harvest.name': 'Funeral Harvest',

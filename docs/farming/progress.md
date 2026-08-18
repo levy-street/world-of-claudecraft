@@ -24,7 +24,7 @@
 | Phase 8 (Harvest Journal) | DONE 2026-08-14 | fix/farming-phase-08-harvest-journal (merge hash in the Phase 8 notes tail) | 2 BLOCKING (language fan-out registry, focus-across-rebuild) found by the frontend review and fixed in-phase; 0 BLOCKING elsewhere across parity, architecture, hot-path, and qa-checklist; the parity gap (no golden farmReady) closed with a deliberate re-mint |
 | Phase 8 QA | done (PASS-WITH-FOLLOWUPS) | 2026-08-17 | 2026-08-17; branch fix/farming-phase-08-qa, merged --no-ff as 327fa964bd; 0 BLOCKING across eight lanes plus a verification round; one behavior fix (deviation (be), the simplified-mode journal entry), the (bd) ledger corrected, the guide controls row landed, the coverage gaps pinned, 24/24 mutants killed |
 | Phase 9 (world presence, go-live) | DONE 2026-08-17 | fix/farming-phase-09-world-presence (seventeenth absorb 89030e4e0f first; merge hash in the Phase 9 notes tail) | 0 BLOCKING across architecture, cross-platform, frontend, content-obligations, test-coverage, privacy-security, and qa-checklist; every SHOULD-FIX taken in-phase or ledgered as (bg) to (bm); 14/14 mutants killed; farming is LIVE |
-| Phase 9 QA | not started | | |
+| Phase 9 QA | done (FAIL on the go-live acceptance, scope stop; PASS on the phase's own diff) | 2026-08-17 | 2026-08-17; branch fix/farming-phase-09-qa (eighteenth absorb f4ca0f7000 first), merged --no-ff (hash in the Phase 9 QA notes tail); 1 BLOCKING scope finding (no player verb plants or harvests, state.md (bn)) plus the tier 3/4 seed bootstrap hole ((bo)); 0 BLOCKING on the diff across nine lanes; the live-client journey walked 39 checkpoints green at all four hubs; 16 of 16 new mutants killed; the QA fixes are the husk-trade focus restore, the stale-comment sweep, and the coverage pins |
 | Phase 10 (celebrations) | not started | | |
 | Phase 10 QA | not started | | |
 | Phase 11 (well-fed food) | not started | | |
@@ -2035,8 +2035,10 @@ clock; the probe file was deleted afterwards):
   cook vale_hearth_loaf: loaf=1 known=true cooking=1
 Notable facts the probe surfaced: the tier-1 watch fee is TWO produce (the
 first knobbed plant refused with no_fee_produce on one brook_carrot; the
-day-one shopping list is seed + compost + two carrots = 28 copper, and the
-intro quest's 50 copper covers it); a plant credits at the call (the cast is
+day-one shopping list is seed + compost + two carrots = 44 copper (seed 4 +
+compost 8 + two brook_carrot at 16; the phase's own transcript said 500 to
+456; the "28" this note first carried was an arithmetic slip the Phase 9 QA
+corrected), and the intro quest's 50 copper covers it with 6 to spare); a plant credits at the call (the cast is
 flavor); tick() hands the event buffer over and clears it, so a probe reads
 events before ticking or from the tick return.
 Review verdicts: architecture 0 BLOCKING / 5 SHOULD-FIX (all taken or
@@ -2117,6 +2119,138 @@ MERGE: fix/farming-phase-09-world-presence merged --no-ff into
 feature/farming-plan as 695ab09bfb (phase tip dde3b0a59a; the branch deleted);
 the agent worktrees woc-farm-p9-{a,b,c} and branches p9/agent-{a,b,c} removed
 after the merge.
+
+### Phase 9 QA (2026-08-17, FAIL on the go-live acceptance, scope stop; PASS on the phase's own diff; local-only per D22)
+Branch fix/farming-phase-09-qa off feature/farming-plan at 2f0f2547de (the
+QA-start commit); merged --no-ff into feature/farming-plan (hash in the
+notes tail; the branch deleted). Audit target: the phase-side chain
+2953d6ccb2 through dde3b0a59a of merge 695ab09bfb, the seventeenth-absorb
+commits excluded (they carry their own audit).
+
+Pre-flight: the EIGHTEENTH absorb opened the QA. origin/release/v0.39.0 had
+moved to f42a67f341 (5 commits, 53 files, 43-file farming intersection: all
+i18n overlays and resolved bundles plus src/sim/types.ts and
+i18n.catalog/merge.ts; the druid feral enablement: Wolfsblood surge,
+Redharvest ranks, earlier spenders, Savage Mending percentage, Stalk at 95
+percent, the threatFlat replacement-walk fix). Merged as f4ca0f7000 with
+ZERO conflicts (both intents present in the two overlap files: the
+QuestObjective 'farm' member beside the hot pctOfMax; the farming catalog
+rows beside the Stalk reword). No lockfile, patches, golden, or server/
+movement, so neither the farm-props seal runbook nor the (am) golden
+re-mint fired; i18n:gen and wiki:content byte-identical on the merged tree;
+the (al) checklist held: the portrait manifest re-minted fingerprint-only
+(the release moved classes.ts and talent_abilities_v2_b.ts inside the
+stills bundle graph; 38178b71d7, the accepted-art registry row re-pointed),
+item_art_audit --verify-only clean, tsc clean, the release's four suites
+green on the merged tree; parity 216 green, farming_session md5 19c49aac
+UNCHANGED, world_api_parity / snapshots / command_schema / monolith_budget
+green. Release-merge audit run inline (5 commits, no farming semantics): no
+legacy arm, no new endpoint, no injected helper, no premise moved; the
+Phase 10 deed totals stand at 273 / 3155 / 11.
+
+The live-client journey (the go-live acceptance): a puppeteer drive of the
+real dev client (vite on :5188, offline Sim world, playwright chromium under
+swiftshader, LOW preset seeded before boot, the camera prompt and gpu notice
+suppressed) as a fresh warrior, 39 checkpoints, ALL GREEN on the fifth run
+(runs 1 to 4 were probe defects: a shadowed URL global, bag-space and
+seed-clearing artifacts of the purchase probe, a turn-in click race). What
+it proved through the REAL UI: Jessica's gossip menu carries the quest row,
+Browse Goods, and Trade husks for compost, and her greeting carries the
+magic sentence and the journal pointer verbatim; the First Furrow detail
+paints both objectives ("Vale Wheat planted: 0/1", "Vale Wheat harvested:
+0/1") and the 150 xp / 50 copper reward; Accept grants hoe 1 + seed 1, and
+a second talk grants nothing; the vendor grid paints five goods rows and
+four Buy 20 bulk rows (the hoe excluded), every single row and every bulk
+row purchase-tests clean at Jessica (4 / 4 / 16 / 8 / 20 copper), a broke
+buyer is refused, and every row purchase-tests clean at Teasel (8 / 8 / 8),
+Hollis (8) and Verbena (8) including their bulk rows once the probe cleared
+its own bag space; Shift+K opens the Harvest Journal with the planted row
+("Ready in 44m 57s", Sprout, Compost, Farmer's Watch) and the professions
+window carries the Farming row with the Harvest Journal control; /dev
+farmgrow advances the plot and the 1 Hz sweep paints "A crop is ready to
+harvest."; the completion detail carries both sentences and Complete Quest
+pays +150 xp / +50 copper; the [data-husk-trade] row converts 2 husks into
+1 compost beside Jessica; 30 yd out and at 7.01 yd the trade refuses
+no_farmer with the toast "You must be near a farmer to trade husks for
+compost.", at 7.00 it converts; Cook Marlow trains recipe_vale_hearth_loaf
+for free through trainRecipe and the loaf cooks at the Eastbrook kitchens
+from the harvested wheat (cooking 0 to 1); Teasel, Hollis and Verbena offer
+goods + husk trade and no quest row, and each converts in range and refuses
+30 yd out. What it proved by ABSENCE: standing on bed_eastbrook_1 with the
+granted hoe and seed, the interact key (F, twice) planted nothing and no
+toast fired, the renderer exposes only gather-node and entity picks, and
+no DOM control anywhere in the HUD is labelled plant, sow, or harvest; the
+plant and the harvest then went through window.__game.sim.plantCrop /
+harvestCrop, i.e. the debug surface. The knobbed plant far from Jessica
+(8.86 yd, past FARMER_TRADE_RANGE) succeeded with the compost and the TWO
+brook_carrot fee spent (D9 holds), and the day-one list cost 44 copper.
+The (bh) eyeball: the Highwatch shelf framed from three angles reads as a
+natural terrace, no mound, no re-seat (screenshots below).
+
+Findings (nine lanes: correctness, coverage, dead code via Workflow;
+architecture, cross-platform (redispatched on the Agent tool after an
+empty Workflow return, the recurring class), frontend seam via Workflow;
+content-obligations, test-coverage, privacy-security, qa-checklist on the
+Agent tool with the SendMessage-first line, all delivered first try):
+- BLOCKING (scope, NOT fixed here per the stopping rules): (bn) no
+  client-side player verb plants or harvests a bed, so q_farm_intro is
+  uncompletable by an ordinary player and the Live-surface note is unmet
+  while the quest and its teaching copy are live. Every lane confirmed it
+  independently; the qa-checklist verdict is NOT READY. Fix owner: the
+  PROPOSED Phase 9b (docs/farming/phase-09b-bed-verbs.md) or a maintainer
+  re-dormanting of the quest and copy; details and the design recipe in
+  state.md (bn).
+- Packet-level design hole (not fixed): (bo) tier 3/4 seeds have no first
+  faucet (seed-back returns the same crop's seed from tier 3+ only; the
+  rare event is a yield multiplier); the Highwatch and Evergarden beds can
+  never be sown; D11 ruling owed (options in the OPEN list).
+- SHOULD-FIX taken: the husk-trade row dropped keyboard focus to <body>
+  (first bindRoute consumer with no successor window; now closes with the
+  trap's restore, pinned release(true)); the stale pre-go-live comments in
+  the IWorldFarming facet and the farm recipes suite; the coverage pins
+  (compost / husk item ids by literal; the four seats and the spawned stock
+  by literal, replacing a def-vs-def round trip; the vendor walk's width;
+  the produce orders' 8 for 16 and 5 for 20; the intro seed's fence through
+  sellItem and marketList with the bought seeds as the negative; the online
+  no_farmer arm over the wire with a positive control; the busy-farmer
+  no-farmPlanted arm; the journey suite's layer-honesty header and its
+  bags-received arm).
+- SHOULD-FIX ledgered, not fixed: the (bg) faucet has no terminator while
+  (bn) stands (security lane); the requiredItems grant bypasses bag
+  capacity (pre-existing q_prof_intro template, visible as 17/16); the
+  map_doc farmer flag; the tier 3/4 gap above.
+- NICE-TO-HAVE ledgered: the guide's "Shift+K" without "by default" (a
+  translated-key reword, release fill); the WCAG label-in-name aria
+  (family-wide); the icons.ts ITEM_ART_PENDING rationale comment (art
+  fingerprint family, Phase 13); nearFarmerNpc's no-early-out; the
+  hasFarmer static-flag assumption (now pinned by comment); the credit-route
+  registry comment (pinned by pointer, (bj)); patchless farm objectives
+  would circle every patch (latent, none shipped); questObjectiveAreas is an
+  if/else chain (a future type falls through silently).
+- Doc corrections: the day-one shopping list is 44 copper, not 28.
+Mutations (after committing, through the scratchpad runner that refuses a
+dirty target file, applies one exact-string mutant, records rc + failing
+test names + the summary line, restores via git checkout): 16 of 16 NEW
+mutants KILLED with named reds (the list in state.md (bn) paragraph).
+Screenshots (LOW preset, desktop): docs/screenshots/farming-phase-09/
+qa-highwatch-shelf-low.png and qa-highwatch-shelf-overview.png (the (bh)
+eyeball frames around Farmer Hollis).
+Baselines HELD: commands 202/215, IWorld 329 = 88 + 241, facets 34, delta
+keys 87, farming_session golden 19c49aac; hud.ts, renderer.ts, main.ts,
+sim.ts untouched by the QA; no golden moved.
+Handoff: the maintainer decides (bn) and (bo) before Phase 10 proceeds on
+the assumption that players can farm; the proposed 9b starter is in
+docs/farming/phase-09b-bed-verbs.md.
+GATE RECORD: run 1 on the frozen tree dc17a3f747, `BROWSER_PATH=<playwright
+chromium> GATE_MAX_WORKERS=8 node scripts/gate_select.mjs`: mode=full (the
+planner's broad/unclassified arm on tests/fixtures/terrain_height_parity
+.v1.f64le.gz plus tests/helpers/bare_client.ts, as recorded for the phase),
+"[gate:select] PASS: all 12 steps green (vitest workers: 8)", 2859 test
+files / 40,043 tests passed (the phase's 40,034 plus the QA's nine new
+pins), 2 expected fail, 115 skipped, zero "[gate:select] FAIL at" or
+"[gate] FAIL" lines, no druid_engines timeout, full-suite vitest 838 s,
+browser regression 19 files 129 green, typecheck and the env/server/bot
+builds green, shell rc 0.
 
 ### Phase 10
 (not started)

@@ -10159,7 +10159,7 @@ export const pl_PL: EnTranslations = {
       "ferocious_bite": {
         "name": "Krwawe ukąszenie",
         "description": "Umiejętność kończąca, która zadaje {damage}. Tylko w Postaci wilka.",
-        "specNote_feral": "Każdy trafiony cios dodaje 1 Starą Krew; przy 3 Starej Krwi ten przycisk zmienia się w Czerwone Żniwa: ukąszenie za 70 plus 43 za punkt combo, które dodatkowo natychmiast zadaje wszystkie obrażenia, jakie zadałyby jeszcze twoje Zdzieranie i Rozszarpanie, i przywraca 30 energii."
+        "specNote_feral": "Każdy trafiony cios dodaje 1 Starą Krew; przy 3 Starej Krwi ten przycisk zmienia się w Czerwone Żniwa, które zużywają Starą Krew na silniejszy cios, dodatkowo natychmiast zadają wszystkie obrażenia, jakie zadałyby jeszcze twoje Zdzieranie i Rozszarpanie, i przywracają energię."
       },
       "swipe": {
         "name": "Zamaszyste pazury",
@@ -10222,7 +10222,7 @@ export const pl_PL: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Wilcza krew",
-        "description": "Zwiększa moc ataku o {buff} na {duration} sek. Tylko w Postaci wilka."
+        "description": "Natychmiast przywraca {rage} energii i zwiększa moc ataku o {buff} na {duration} sek. Tylko w Postaci wilka."
       },
       "rip": {
         "name": "Krwawa szczelina",
@@ -10443,7 +10443,7 @@ export const pl_PL: EnTranslations = {
       },
       "redharvest": {
         "name": "Czerwone Żniwa",
-        "description": "Zużywa twoje 3 Starej Krwi: cios za {damage}, natychmiast zadaje wszystkie obrażenia, które twoje Zdzieranie i Rozszarpanie by jeszcze zadały, usuwa oba krwawienia i przywraca 30 energii. Działa bez punktów combo."
+        "description": "Zużywa twoje 3 Starej Krwi: cios za {damage}, natychmiast zadaje wszystkie obrażenia, które twoje Zdzieranie i Rozszarpanie by jeszcze zadały, usuwa oba krwawienia i przywraca {rage} energii. Działa bez punktów combo."
       },
       "marrowbreak": {
         "name": "Łamacz szpiku",
@@ -10691,7 +10691,7 @@ export const pl_PL: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Dzikie Gojenie",
-        "description": "Przywraca 180 zdrowia przez 10 sek. Tylko w Formie Niedźwiedzia. (talent Druida)"
+        "description": "Przywraca 40% maksymalnego zdrowia przez 10 sek. Tylko w Formie Niedźwiedzia. (talent Druida)"
       },
       "frost_trap": {
         "name": "Szronowa Pułapka",
@@ -10924,7 +10924,7 @@ export const pl_PL: EnTranslations = {
       },
       "prowl": {
         "name": "Podchody",
-        "description": "Wchodzi w skradanie w postaci wilka, poruszając się o 50% wolniej. Nie można użyć w walce."
+        "description": "Wchodzi w skradanie w postaci wilka, poruszając się o 5% wolniej. Nie można użyć w walce."
       },
       "rake": {
         "name": "Zdzieranie",

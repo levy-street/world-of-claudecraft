@@ -10159,7 +10159,7 @@ export const it_IT: EnTranslations = {
       "ferocious_bite": {
         "name": "Morso Cruento",
         "description": "Mossa finale che infligge {damage}. Solo Forma del Lupo.",
-        "specNote_feral": "Ogni colpo a segno aggiunge 1 Sangue Antico; a 3 Sangue Antico questo pulsante diventa Mietitura Rossa: un morso per 70 più 43 per punto combo che infligge anche istantaneamente tutti i danni che Scarnificare e Squartare avrebbero ancora inflitto, e ripristina 30 energia."
+        "specNote_feral": "Ogni colpo a segno aggiunge 1 Sangue Antico; a 3 Sangue Antico questo pulsante diventa Mietitura Rossa, che consuma il Sangue Antico per un colpo più forte che infligge anche istantaneamente tutti i danni che Scarnificare e Squartare avrebbero ancora inflitto, e ripristina energia."
       },
       "swipe": {
         "name": "Artigli Falcianti",
@@ -10222,7 +10222,7 @@ export const it_IT: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Sangue di Lupo",
-        "description": "Aumenta la potenza d'attacco di {buff} per {duration} sec. Solo Forma del Lupo."
+        "description": "Sprigiona {rage} energia e aumenta la potenza d'attacco di {buff} per {duration} sec. Solo Forma del Lupo."
       },
       "rip": {
         "name": "Faglia Sanguigna",
@@ -10443,7 +10443,7 @@ export const it_IT: EnTranslations = {
       },
       "redharvest": {
         "name": "Mietitura Rossa",
-        "description": "Consuma 3 Sangue Antico: colpisce per {damage}, infligge all'istante tutto il danno che i tuoi Scarnificare e Squartare avrebbero ancora inflitto, rimuove entrambe le emorragie e ripristina 30 energia. Funziona anche senza punti combo."
+        "description": "Consuma 3 Sangue Antico: colpisce per {damage}, infligge all'istante tutto il danno che i tuoi Scarnificare e Squartare avrebbero ancora inflitto, rimuove entrambe le emorragie e ripristina {rage} energia. Funziona anche senza punti combo."
       },
       "marrowbreak": {
         "name": "Spezzamidollo",
@@ -10691,7 +10691,7 @@ export const it_IT: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Rammendo Selvaggio",
-        "description": "Ripristina 180 salute in 10 sec. Utilizzabile solo in Forma d’Orso. (talento del Druido)"
+        "description": "Ripristina il 40% della salute massima in 10 sec. Utilizzabile solo in Forma d’Orso. (talento del Druido)"
       },
       "frost_trap": {
         "name": "Trappola di Brina",
@@ -10924,7 +10924,7 @@ export const it_IT: EnTranslations = {
       },
       "prowl": {
         "name": "Appostamento",
-        "description": "Entra in furtività mentre sei in Forma del Lupo, muovendoti il 50% più lentamente. Non utilizzabile in combattimento."
+        "description": "Entra in furtività mentre sei in Forma del Lupo, muovendoti il 5% più lentamente. Non utilizzabile in combattimento."
       },
       "rake": {
         "name": "Scarnificare",

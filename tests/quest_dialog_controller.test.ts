@@ -649,7 +649,14 @@ describe('QuestDialogController', () => {
     expect(farmer.convertHusks).not.toHaveBeenCalled();
     button?.click();
     expect(farmer.convertHusks).toHaveBeenCalledTimes(1);
-    expect(farmer.release).toHaveBeenCalledWith(false);
+    // The trade opens NO successor window (the sim's own event lines are the
+    // feedback), so the dialog closes WITH focus restore: the bindRoute
+    // family releases with false because it hands the trap opener to a
+    // successor that restores focus on its own close; with no successor that
+    // chain would drop keyboard focus to <body> (Phase 9 QA, the frontend
+    // seam's finding).
+    expect(farmer.release).toHaveBeenCalledWith(true);
+    expect(farmer.release).not.toHaveBeenCalledWith(false);
     expect(farmer.controller.isOpen).toBe(false);
   });
 

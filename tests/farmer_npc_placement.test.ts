@@ -23,11 +23,40 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 // The four farmers and the patch each one keeps, as LITERALS: the flag walk
 // below proves the set is exactly these four, so a fifth farmer (or a
 // re-homed one) reds here and re-decides its patch deliberately.
-const FARMERS: readonly { id: string; patchId: string; zoneId: string }[] = [
-  { id: 'farmer_jessica', patchId: 'patch_eastbrook', zoneId: 'eastbrook_vale' },
-  { id: 'farmer_teasel', patchId: 'patch_mirefen', zoneId: 'mirefen_marsh' },
-  { id: 'farmer_hollis', patchId: 'patch_thornpeak', zoneId: 'thornpeak_heights' },
-  { id: 'farmer_verbena', patchId: 'patch_evergarden', zoneId: 'evergarden' },
+// The four seats as authored (state.md's Phase 9 head block): a re-seat is a
+// deliberate content edit that also moves the terrain atlas, the Eastbrook
+// chunk digest, the map plates and every golden (deviation (bh)), so it must
+// red HERE first, by literal, not only in the full-suite-only seal family.
+const FARMERS: readonly {
+  id: string;
+  patchId: string;
+  zoneId: string;
+  seat: { x: number; z: number };
+}[] = [
+  {
+    id: 'farmer_jessica',
+    patchId: 'patch_eastbrook',
+    zoneId: 'eastbrook_vale',
+    seat: { x: 24.5, z: 32.5 },
+  },
+  {
+    id: 'farmer_teasel',
+    patchId: 'patch_mirefen',
+    zoneId: 'mirefen_marsh',
+    seat: { x: -21, z: 333.5 },
+  },
+  {
+    id: 'farmer_hollis',
+    patchId: 'patch_thornpeak',
+    zoneId: 'thornpeak_heights',
+    seat: { x: -18, z: 695.5 },
+  },
+  {
+    id: 'farmer_verbena',
+    patchId: 'patch_evergarden',
+    zoneId: 'evergarden',
+    seat: { x: 348.5, z: 867 },
+  },
 ];
 
 // How close a farmer stands to the nearest bed of their patch: near enough
@@ -117,10 +146,13 @@ describe('the farmer NPCs: seated beside their beds in the real world', () => {
   const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', noPlayer: true });
 
   it('spawns at EXACTLY the authored pos (findSafePos nudged nothing) with the authored facing', () => {
-    for (const { id } of FARMERS) {
+    for (const { id, seat } of FARMERS) {
       const def = NPCS[id];
       const entity = spawned(sim, id);
       expect({ x: entity.pos.x, z: entity.pos.z }, id).toEqual({ x: def.pos.x, z: def.pos.z });
+      // The def itself against the literal seat, so a re-seat inside the
+      // 3 to 9 yd band cannot pass this suite silently.
+      expect({ x: def.pos.x, z: def.pos.z }, `${id} authored seat`).toEqual(seat);
       expect(entity.facing, `${id} facing`).toBe(def.facing);
     }
   });
@@ -176,9 +208,26 @@ describe('the farmer NPCs: seated beside their beds in the real world', () => {
     }
   });
 
-  it('is a real vendor at spawn: the entity mirrors the def stock in order', () => {
+  it('is a real vendor at spawn: the entity carries the go-live stock in order', () => {
+    // The literal counters (the exact-stock table in
+    // tests/professions_zone_rollout.test.ts is the canonical pin; this arm
+    // proves the SPAWNED entity carries it, which the def-vs-def round trip
+    // it replaced could not: that compared the ctor's copy against its own
+    // source and passed with an empty or reordered stock).
+    const stock: Record<string, readonly string[]> = {
+      farmer_jessica: [
+        'vale_wheat_seed',
+        'brook_carrot_seed',
+        'brook_carrot',
+        'compost',
+        'garden_hoe',
+      ],
+      farmer_teasel: ['marsh_rice_seed', 'bog_beet_seed', 'compost'],
+      farmer_hollis: ['compost'],
+      farmer_verbena: ['compost'],
+    };
     for (const { id } of FARMERS) {
-      expect(spawned(sim, id).vendorItems, id).toEqual(NPCS[id].vendorItems);
+      expect(spawned(sim, id).vendorItems, id).toEqual(stock[id]);
     }
   });
 });

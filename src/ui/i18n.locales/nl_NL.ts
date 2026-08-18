@@ -4595,7 +4595,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.power_word_shield.description': 'Schildt een bevriend doelwit en absorbeert 30 sec lang {damage} schade. Discipline verbindt het doelwit bovendien 30 sec lang met uw Heilige schade.',
   'entities.abilities.power_word_shield.name': 'Psalm van Bescherming',
   'entities.abilities.prowl.description':
-    'Ga in sluiptocht terwijl je in Wolfsgedaante bent en beweeg 50% trager. Kan niet in gevecht worden gebruikt.',
+    'Ga in sluiptocht terwijl je in Wolfsgedaante bent en beweeg 5% trager. Kan niet in gevecht worden gebruikt.',
   'entities.abilities.prowl.name': 'Besluipen',
   'entities.abilities.pyroblast.description':
     'Werpt een immense vurige kei die {damage} Vuurschade toebrengt plus extra schade over tijd.',
@@ -4693,7 +4693,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Treft nabije vijanden voor {damage} schade en vertraagt hun aanvallen met 10% gedurende 10 sec.',
   'entities.abilities.thunder_clap.name': 'Schuddende Klap',
   'entities.abilities.tigers_fury.description':
-    'Verhoogt de aanvalskracht met {buff} gedurende {duration} sec. Alleen in Wolfsgedaante.',
+    'Wekt {rage} energie op en verhoogt de aanvalskracht met {buff} gedurende {duration} sec. Alleen in Wolfsgedaante.',
   'entities.abilities.tigers_fury.name': 'Wolvenbloed',
   'entities.abilities.travel_form.description':
     'Verander ogenblikkelijk in een snelle Fleetgedaante en verhoog je bewegingssnelheid met 40%. Je kunt geen andere vaardigheden gebruiken terwijl je veranderd bent, maar je kunt in of buiten gevecht van gedaante wisselen, ideaal om te ontsnappen.',
@@ -10959,7 +10959,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.earthbind.description': 'Wortelt vijanden binnen 4 m van het doelpunt 2 sec vast en vertraagt ze daarna 6 sec lang met 40%. (Sjamaantalent)',
   'entities.abilities.evocation.description': 'Restaura mana rápidamente. (magiertalent)',
   'entities.abilities.frenzied_regeneration.description':
-    'Herstelt 180 gezondheid gedurende 10 sec. Alleen in Berenvorm. (druïdetalent)',
+    'Herstelt 40% van je maximale gezondheid gedurende 10 sec. Alleen in Berenvorm. (druïdetalent)',
   'entities.abilities.frost_trap.description':
     'Bevriest vijanden in het doelgebied 3 sec. en verhindert dat ze bewegen of handelen. (jagertalent)',
   'entities.abilities.hammer_of_wrath.description': 'Werpt een heilige hamer voor {damage} schade en wekt 1 Toewijding op. Bruikbaar onder 20% gezondheid, of tijdens Goddelijke Verheffing of Wrekende Toorn. Toorn van de Dageraad verleent een extra worp tegen elk doelwit die de lopende afkoeltijd negeert en 20% meer schade toebrengt. Verheffing verhoogt de schade ervan met 30%.',
@@ -12401,7 +12401,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verbruikt 5 Groenkracht. Oogst elke genezing over tijd die je op alle bondgenoten hebt voor 60% van de resterende genezing, verwijdert die effecten en plant een verse Wildbloei op het doelwit.',
   'entities.abilities.redharvest.name': 'Rode Oogst',
   'entities.abilities.redharvest.description':
-    'Verbruikt je 3 Oud Bloed: een slag voor {damage} die meteen alle schade toebrengt die je Villen en Verscheuren nog zouden hebben toegebracht, beide bloedingen verwijdert en 30 energie herstelt. Werkt ook zonder combopunten.',
+    'Verbruikt je 3 Oud Bloed: een slag voor {damage} die meteen alle schade toebrengt die je Villen en Verscheuren nog zouden hebben toegebracht, beide bloedingen verwijdert en {rage} energie herstelt. Werkt ook zonder combopunten.',
   'entities.abilities.sunlance.name': 'Zonnespoor',
   'entities.abilities.sunlance.description':
     'Verbruikt je 3 Maanvloed voor een slag van {damage} Natuur-schade plus een brandwond van {overTime} over 9 sec, en herstelt 35 mana: de manakeuze. Maangolf verbruikt dezelfde 3 Maanvloed, dus kies er een.',
@@ -12818,7 +12818,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Afmaakactie die {damage} veroorzaakt. Alleen in Wolfsgedaante.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Elke slag die raakt voegt 1 Oud Bloed toe; bij 3 Oud Bloed wordt deze knop Rode Oogst: een beet voor 70 plus 43 per combopunt die ook meteen alle schade toebrengt die je Villen en Verscheuren nog zouden hebben toegebracht, en 30 energie herstelt.',
+    'Elke slag die raakt voegt 1 Oud Bloed toe; bij 3 Oud Bloed wordt deze knop Rode Oogst, die je Oude Bloed verbruikt voor een krachtigere slag die ook meteen alle schade toebrengt die je Villen en Verscheuren nog zouden hebben toegebracht, en energie herstelt.',
   'entities.abilities.funeral_harvest.description':
     'Wanneer een vijand die onlangs door jou of je ondoden is beschadigd sterft, krijg je 1 Zielfragment. Dit kan hoogstens eenmaal per 3 sec gebeuren.',
   'entities.abilities.funeral_harvest.name': 'Funeral Harvest',

@@ -621,16 +621,14 @@ describe('FARM_RECIPES: a dish crafts for real, and fine twins never substitute 
   });
 });
 
-describe('FARM_RECIPES: trainable before go-live is the INTENDED dormant-visible state', () => {
-  // Deviation (aj): the phase's binding Live-surface note makes the recipes
-  // "visible in the crafting window" before Phase 9, and trainer acquisition
-  // is the only mechanism that puts them there, so every row is trainable AND
-  // fee-charging in the live game while the farm itself is dormant (the
-  // garden_hoe priced-but-unstocked precedent, deviation (aa), extended to
-  // recipes). This arm pins that ruling so a future availability gate cannot
-  // land silently, and so the ruling itself stays falsifiable: if the
-  // maintainer wants training gated to go-live instead, THIS test is the one
-  // that reds and names the decision to revisit.
+describe('FARM_RECIPES: trainable at the stations on the settled R8 fee curve', () => {
+  // Deviation (aj), now historical: the rows were trainable AND fee-charging
+  // from Phase 6 on (the Live-surface note wanted them visible in the crafting
+  // window ahead of the go-live, and trainer acquisition is the only path
+  // there); the farm opened in Phase 9 and the ruling stands unchanged. This
+  // arm pins the acquisition shape so a future availability gate cannot land
+  // silently: if training is ever gated by farming skill or the intro quest,
+  // THIS test is the one that reds and names the decision to revisit.
   it('rung-0 rows train free and the rung-25/50 dishes charge, all resolving ok at their stations', () => {
     const sim = new Sim({ seed: 7, playerClass: 'warrior' });
     const meta = (sim as any).players.get(sim.playerId);
@@ -650,7 +648,7 @@ describe('FARM_RECIPES: trainable before go-live is the INTENDED dormant-visible
       const station = stationsOfType(STATIONS, stationType)[0];
       expect(station, `no placed ${stationType} station to train at`).toBeDefined();
       const result = resolveTrain(STATIONS, meta, station.pos, recipeId);
-      expect(result.ok, `${recipeId} must be trainable pre-go-live (deviation (aj))`).toBe(true);
+      expect(result.ok, `${recipeId} must be trainable at its station (deviation (aj))`).toBe(true);
       expect(result.fee, `${recipeId} fee off the settled R8 curve`).toBe(fee);
     }
   });

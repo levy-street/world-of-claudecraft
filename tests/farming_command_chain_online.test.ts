@@ -865,6 +865,50 @@ describe('the four farm events reach the actor, and only the actor', () => {
     expect(farmEvents(bystanderFc.sent, 'farmDenied')).toHaveLength(0);
   });
 
+  it('refuses convert_husks over the wire far from every farmer with the no_farmer reason, spending nothing', () => {
+    // The go-live range gate on the AUTHORITATIVE path: the frame carries no
+    // position and no npc id, the server reads its own roster, and the
+    // refusal reaches only the sender as the text-free reason literal the
+    // client matcher keys on (hudChrome.farming.denied.no_farmer). Same
+    // husks, same command, one walk away: the gate is the only difference.
+    const server = new GameServer();
+    const { session, fc } = joinWithSocket(server, 1, 'Wanderer');
+    const { fc: bystanderFc } = joinWithSocket(server, 2, 'Bystander');
+    const pid = session.pid as number;
+    server.sim.addItem('withered_husks', 2, pid);
+    const p = server.sim.entities.get(pid);
+    if (!p) throw new Error('no entity');
+    const jessica = [...server.sim.entities.values()].find(
+      (e) => e.kind === 'npc' && e.templateId === 'farmer_jessica',
+    );
+    if (!jessica) throw new Error('no farmer_jessica');
+    p.pos.x = jessica.pos.x + 30;
+    p.pos.z = jessica.pos.z;
+    p.prevPos = { ...p.pos };
+    routeTick(server);
+    fc.sent.length = 0;
+    bystanderFc.sent.length = 0;
+
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'convert_husks' }));
+    routeTick(server);
+    const denied = farmEvents(fc.sent, 'farmDenied');
+    expect(denied).toHaveLength(1);
+    expect(denied[0].pid).toBe(pid);
+    expect(denied[0].reason).toBe('no_farmer');
+    expect(farmEvents(fc.sent, 'farmHusksConverted')).toHaveLength(0);
+    expect(farmEvents(bystanderFc.sent, 'farmDenied')).toHaveLength(0);
+    expect(server.sim.countItem('withered_husks', pid)).toBe(2);
+    expect(server.sim.countItem('compost', pid)).toBe(0);
+    // Positive control on the same session: one walk to the counter and the
+    // identical frame converts, so the refusal above was the gate.
+    standByFarmer(server, pid);
+    fc.sent.length = 0;
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'convert_husks' }));
+    routeTick(server);
+    expect(farmEvents(fc.sent, 'farmHusksConverted')).toHaveLength(1);
+    expect(server.sim.countItem('compost', pid)).toBe(1);
+  });
+
   it('delivers farmHarvested for a ready plot and farmWithered for a doomed one', () => {
     const server = new GameServer();
     const { session, fc } = joinWithSocket(server, 1, 'Reaper');

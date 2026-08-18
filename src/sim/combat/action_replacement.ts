@@ -18,7 +18,7 @@ export function resolveActionReplacement(base: ResolvedAbility, actor: Entity): 
       (aura) => aura.kind === rule.auraKind && (aura.stacks ?? 1) >= (rule.minStacks ?? 1),
     );
     if (active) {
-      const replaced = replaceResolvedAbility(base, rule.abilityId);
+      const replaced = replaceResolvedAbility(base, rule.abilityId, actor.level);
       // One slot, one clock: an aura-state transform that carries its own
       // cooldown checks and arms the BASE button's cooldown (Swiftmend and
       // Overbloom share one 8 sec clock), while a cooldown-free payoff
@@ -37,17 +37,39 @@ export function resolveActionReplacement(base: ResolvedAbility, actor: Entity): 
 export function replaceResolvedAbility(
   base: ResolvedAbility,
   replacementId: string,
+  actorLevel?: number,
 ): ResolvedAbility {
   const replacement = ABILITIES[replacementId];
   if (!replacement) return base;
+  // A replacement target with ranks resolves the highest rank at the actor's
+  // level, mirroring abilitiesKnownAt's rank walk. Until Redharvest grew ranks
+  // no replacement target carried any, so the old hardcoded rank 1 was correct
+  // by construction; with ranks it would cast rank-1 values at every level.
+  // Callers without a level keep rank 1.
+  let rank = 1;
+  let cost = replacement.cost;
+  let castTime = replacement.castTime;
+  let effects = replacement.effects;
+  let threatFlat = replacement.threat?.flat ?? 0;
+  if (actorLevel !== undefined) {
+    for (const r of replacement.ranks ?? []) {
+      if (r.level <= actorLevel) {
+        rank = r.rank;
+        cost = r.cost;
+        effects = r.effects;
+        if (r.castTime !== undefined) castTime = r.castTime;
+        if (r.threatFlat !== undefined) threatFlat = r.threatFlat;
+      }
+    }
+  }
   return {
     def: replacement,
-    rank: 1,
-    cost: replacement.cost,
-    castTime: replacement.castTime,
+    rank,
+    cost,
+    castTime,
     cooldown: replacement.cooldown,
-    effects: replacement.effects.map((effect) => ({ ...effect })),
-    threatFlat: replacement.threat?.flat ?? 0,
+    effects: effects.map((effect) => ({ ...effect })),
+    threatFlat,
     threatMult: replacement.threat?.mult ?? 1,
     castWhileMoving: replacement.castWhileMoving,
     charges: replacement.maxCharges,

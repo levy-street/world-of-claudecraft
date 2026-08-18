@@ -10159,7 +10159,7 @@ export const fr_FR: EnTranslations = {
       "ferocious_bite": {
         "name": "Morsure sanglante",
         "description": "Technique de finition qui inflige {damage}. Forme de loup uniquement.",
-        "specNote_feral": "Chaque coup porté ajoute 1 Sang ancien ; à 3 Sang ancien, ce bouton devient Moisson rouge : une morsure pour 70 plus 43 par point de combo qui inflige aussi instantanément tous les dégâts que vos Écorcher et Lacération auraient encore infligés, et restaure 30 énergie."
+        "specNote_feral": "Chaque coup porté ajoute 1 Sang ancien ; à 3 Sang ancien, ce bouton devient Moisson rouge, qui consomme le Sang ancien pour une frappe plus puissante qui inflige aussi instantanément tous les dégâts que vos Écorcher et Lacération auraient encore infligés, et restaure de l’énergie."
       },
       "swipe": {
         "name": "Griffes balayantes",
@@ -10222,7 +10222,7 @@ export const fr_FR: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Sang de loup",
-        "description": "Augmente la puissance d'attaque de {buff} pendant {duration} s. Forme de loup uniquement."
+        "description": "Libère {rage} points d'énergie et augmente la puissance d'attaque de {buff} pendant {duration} s. Forme de loup uniquement."
       },
       "rip": {
         "name": "Faille sanglante",
@@ -10443,7 +10443,7 @@ export const fr_FR: EnTranslations = {
       },
       "redharvest": {
         "name": "Moisson rouge",
-        "description": "Consomme vos 3 Sang ancien : frappe pour {damage}, inflige instantanément tous les dégâts que vos Écorcher et Lacération auraient encore infligés, retire les deux saignements et rend 30 points d'énergie. Fonctionne sans aucun point de combo."
+        "description": "Consomme vos 3 Sang ancien : frappe pour {damage}, inflige instantanément tous les dégâts que vos Écorcher et Lacération auraient encore infligés, retire les deux saignements et rend {rage} points d'énergie. Fonctionne sans aucun point de combo."
       },
       "marrowbreak": {
         "name": "Brise-moelle",
@@ -10691,7 +10691,7 @@ export const fr_FR: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Régénération sauvage",
-        "description": "Rend 180 points de vie en 10 s. Forme d'ours uniquement. (talent de Druide)"
+        "description": "Rend 40% de vos points de vie maximum en 10 s. Forme d'ours uniquement. (talent de Druide)"
       },
       "frost_trap": {
         "name": "Piège de givre",
@@ -10924,7 +10924,7 @@ export const fr_FR: EnTranslations = {
       },
       "prowl": {
         "name": "Traquer",
-        "description": "Passe en camouflage tant que vous êtes en forme de loup, avec une vitesse de déplacement réduite de 50%. Inutilisable en combat."
+        "description": "Passe en camouflage tant que vous êtes en forme de loup, avec une vitesse de déplacement réduite de 5%. Inutilisable en combat."
       },
       "rake": {
         "name": "Écorcher",
