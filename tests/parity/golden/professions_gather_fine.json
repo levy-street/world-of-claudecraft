@@ -12,7 +12,7 @@
     "gatherResult itemId carries the resolved grade"
   ],
   "draws": 6,
-  "drawDigest": "4cb70479",
+  "drawDigest": "1272a77a",
   "frames": [
     {
       "tick": 0,
@@ -158,7 +158,7 @@
       "events": "aa2f0680",
       "rng": {
         "draws": 2,
-        "digest": "8b7913d3"
+        "digest": "00a2a78c"
       },
       "label": "fine-grade-at-full-tier-vein",
       "players": [
@@ -337,7 +337,7 @@
       "events": "1cc5682e",
       "rng": {
         "draws": 4,
-        "digest": "926596e4"
+        "digest": "49d036fe"
       },
       "label": "plain-grade-at-lower-tier-vein",
       "players": [
@@ -521,11 +521,11 @@
       "tick": 157,
       "time": 7.85,
       "nextId": 989,
-      "state": "929dff2b",
-      "events": "ba96727f",
+      "state": "e0819564",
+      "events": "a0ed65ba",
       "rng": {
         "draws": 6,
-        "digest": "4cb70479"
+        "digest": "1272a77a"
       },
       "label": "wrong-profession-tool-does-not-upgrade",
       "players": [
@@ -621,7 +621,7 @@
               "itemId": "iron_ore"
             },
             {
-              "count": 3,
+              "count": 2,
               "instance": {
                 "signer": "Adventurer"
               },
@@ -719,11 +719,11 @@
       "tick": 159,
       "time": 7.95,
       "nextId": 989,
-      "state": "e6370546",
+      "state": "4b1855b5",
       "events": "741638a5",
       "rng": {
         "draws": 6,
-        "digest": "4cb70479"
+        "digest": "1272a77a"
       },
       "label": "final",
       "players": [
@@ -819,7 +819,7 @@
               "itemId": "iron_ore"
             },
             {
-              "count": 3,
+              "count": 2,
               "instance": {
                 "signer": "Adventurer"
               },

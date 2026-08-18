@@ -17,7 +17,7 @@
     "R40 confirmed prompt use: two draws, bonus applied, charge spent (the consented digest)"
   ],
   "draws": 6,
-  "drawDigest": "4cb70479",
+  "drawDigest": "1272a77a",
   "frames": [
     {
       "tick": 0,
@@ -319,7 +319,7 @@
       "events": "6928df54",
       "rng": {
         "draws": 2,
-        "digest": "8b7913d3"
+        "digest": "00a2a78c"
       },
       "label": "harvest-with-effect-applied",
       "players": [
@@ -503,7 +503,7 @@
       "events": "b668bd38",
       "rng": {
         "draws": 2,
-        "digest": "8b7913d3"
+        "digest": "00a2a78c"
       },
       "label": "same-vein-denied-by-own-timer",
       "players": [
@@ -687,7 +687,7 @@
       "events": "9590c50d",
       "rng": {
         "draws": 2,
-        "digest": "8b7913d3"
+        "digest": "00a2a78c"
       },
       "label": "prompt-mode-reslotted",
       "players": [
@@ -871,7 +871,7 @@
       "events": "1cc5682e",
       "rng": {
         "draws": 4,
-        "digest": "926596e4"
+        "digest": "49d036fe"
       },
       "label": "prompt-unconfirmed-skips-whole",
       "players": [
@@ -1064,7 +1064,7 @@
       "events": "dc1e0e0e",
       "rng": {
         "draws": 6,
-        "digest": "4cb70479"
+        "digest": "1272a77a"
       },
       "label": "prompt-confirmed-fires-and-spends",
       "players": [
@@ -1265,7 +1265,7 @@
       "events": "741638a5",
       "rng": {
         "draws": 6,
-        "digest": "4cb70479"
+        "digest": "1272a77a"
       },
       "label": "final",
       "players": [

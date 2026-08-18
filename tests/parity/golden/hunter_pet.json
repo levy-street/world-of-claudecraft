@@ -8,8 +8,8 @@
     "updateRangedPetAttack friendly pet arm (~8093/8217)",
     "updateRangedPetAttack hostile-mob arm (~6776)"
   ],
-  "draws": 742,
-  "drawDigest": "405b620f",
+  "draws": 749,
+  "drawDigest": "e46716c7",
   "frames": [
     {
       "tick": 0,
@@ -137,77 +137,77 @@
       "tick": 20,
       "time": 1,
       "nextId": 992,
-      "state": "0693e54d",
-      "events": "30e9fa63",
+      "state": "64fbf41d",
+      "events": "6ff78de9",
       "rng": {
         "draws": 10,
-        "digest": "b15efe1e"
+        "digest": "cc772239"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 992,
-      "state": "7f8c5d02",
+      "state": "22965f26",
       "events": "741638a5",
       "rng": {
         "draws": 10,
-        "digest": "b15efe1e"
+        "digest": "cc772239"
       }
     },
     {
       "tick": 60,
       "time": 3,
       "nextId": 992,
-      "state": "2f3b54a7",
-      "events": "6fbeec90",
+      "state": "687713de",
+      "events": "e2ced0f8",
       "rng": {
-        "draws": 179,
-        "digest": "9495ce10"
+        "draws": 180,
+        "digest": "01bc34c5"
       }
     },
     {
       "tick": 80,
       "time": 4,
       "nextId": 992,
-      "state": "82f09b74",
+      "state": "8d9974cd",
       "events": "741638a5",
       "rng": {
-        "draws": 345,
-        "digest": "2bf8365f"
+        "draws": 350,
+        "digest": "83b2423c"
       }
     },
     {
       "tick": 100,
       "time": 5,
       "nextId": 992,
-      "state": "a951c4c6",
-      "events": "96e95b9e",
+      "state": "fc0ef248",
+      "events": "023c8748",
       "rng": {
-        "draws": 539,
-        "digest": "471cfb43"
+        "draws": 543,
+        "digest": "9e20788e"
       }
     },
     {
       "tick": 120,
       "time": 6,
       "nextId": 992,
-      "state": "8eb3893d",
+      "state": "b6cfaa4b",
       "events": "741638a5",
       "rng": {
-        "draws": 742,
-        "digest": "405b620f"
+        "draws": 749,
+        "digest": "e46716c7"
       }
     },
     {
       "tick": 120,
       "time": 6,
       "nextId": 992,
-      "state": "8eb3893d",
+      "state": "b6cfaa4b",
       "events": "741638a5",
       "rng": {
-        "draws": 742,
-        "digest": "405b620f"
+        "draws": 749,
+        "digest": "e46716c7"
       },
       "label": "final",
       "players": [
@@ -228,14 +228,13 @@
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 62,
-            "damageTaken": 55
+            "damageDealt": 31,
+            "damageTaken": 52
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "crits": 1,
-              "damageDealt": 62
+              "damageDealt": 31
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -304,7 +303,7 @@
           "dodgeChance": 0.079,
           "fallStartY": 1.5,
           "fiveSecondRule": 105,
-          "hp": 49945,
+          "hp": 49948,
           "id": 980,
           "inCombat": true,
           "kind": "player",
@@ -314,7 +313,7 @@
           "maxResource": 100,
           "moveSpeed": 7,
           "onGround": true,
-          "overpowerUntil": -1,
+          "overpowerUntil": 9.7,
           "petMode": "defensive",
           "pos": {
             "x": 2,
@@ -359,7 +358,7 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 64,
+          "hp": 69,
           "id": 989,
           "inCombat": true,
           "kind": "mob",
@@ -405,12 +404,12 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49881,
+          "hp": 49918,
           "id": 990,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 5.8,
+            "x": 7,
             "y": 1.5,
             "z": -2
           },
@@ -422,7 +421,7 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 5.8,
+            "x": 7,
             "y": 1.5,
             "z": -2
           },
@@ -442,11 +441,11 @@
           "threat": [
             [
               980,
-              62
+              31
             ],
             [
               989,
-              57
+              51
             ]
           ],
           "weapon": {

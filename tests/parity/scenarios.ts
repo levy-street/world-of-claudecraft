@@ -1661,12 +1661,14 @@ function masterLoot(): Scenario {
     // at the old seed the need rolls stopped TYING. The tie is the whole point
     // of the scenario's last coverage line (resolveLootRoll's tie-break
     // rng.int), so the seed is re-hunted to keep two rollers level rather than
-    // re-recorded to whatever the new draw happens to be. Re-hunted 38 -> 67
-    // by the Last Bell packet's v0.39.0 base merge (campaign world content
-    // shifts the shared stream before the rolls; loot_roll.ts is untouched).
+    // re-recorded to whatever the new draw happens to be. The v0.39.0 merge
+    // reconciliation briefly re-hunted 38 -> 67, but that shift was the merge
+    // DROPPING the camp sharedRngCount application (rngForSpawn in sim.ts),
+    // not real content drift; with the selector restored the pre-merge stream
+    // holds and seed 38 ties again, so the re-hunt is reverted.
     build: () =>
       new Sim({
-        seed: 67,
+        seed: 38,
         playerClass: 'warrior',
         noPlayer: true,
       }),
@@ -4685,9 +4687,12 @@ function cardDuel(): Scenario {
 // byte-identical, exactly what a markVisited-only change predicts. The visit
 // write landed one commit before the re-record, so a bisect straddling that
 // pair sees a false parity red on the intermediate commit.
-// Seed 5 -> 6: re-hunted by the Last Bell packet's v0.39.0 base merge so the
-// vestments masterwork proc still fires (the scenario's headline arm).
-function professionsCraft(seed = 6): Scenario {
+// The v0.39.0 merge reconciliation briefly re-hunted seed 5 -> 6, but that
+// proc shift was the merge dropping the camp sharedRngCount application
+// (rngForSpawn in sim.ts), not real content drift; with the selector restored
+// the pre-merge stream holds and seed 5 procs again, so the re-hunt is
+// reverted.
+function professionsCraft(seed = 5): Scenario {
   return {
     name: 'professions_craft',
     coverage: [

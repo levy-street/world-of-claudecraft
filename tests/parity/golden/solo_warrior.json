@@ -10,8 +10,8 @@
     "base mobSwing (mob swings the player)",
     "rollLoot via mob death (L1, ~5876/6036)"
   ],
-  "draws": 307,
-  "drawDigest": "d5209595",
+  "draws": 310,
+  "drawDigest": "b5becd02",
   "frames": [
     {
       "tick": 0,
@@ -153,44 +153,44 @@
       "tick": 20,
       "time": 1,
       "nextId": 990,
-      "state": "cb8a1840",
-      "events": "5f7f994f",
+      "state": "f9d73cf2",
+      "events": "4583448b",
       "rng": {
-        "draws": 5,
-        "digest": "1452e0fb"
+        "draws": 7,
+        "digest": "4f9a2cfb"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 990,
-      "state": "38803cbe",
+      "state": "8a111cba",
       "events": "741638a5",
       "rng": {
-        "draws": 5,
-        "digest": "1452e0fb"
+        "draws": 7,
+        "digest": "4f9a2cfb"
       }
     },
     {
       "tick": 60,
       "time": 3,
       "nextId": 990,
-      "state": "dffa38a5",
-      "events": "a25d1ac9",
+      "state": "3158e8be",
+      "events": "e7a2c41f",
       "rng": {
         "draws": 174,
-        "digest": "b1a305ce"
+        "digest": "847684f0"
       }
     },
     {
       "tick": 72,
       "time": 3.6,
       "nextId": 990,
-      "state": "0992c0bd",
+      "state": "091287bc",
       "events": "9151ee4e",
       "rng": {
         "draws": 265,
-        "digest": "747f1e33"
+        "digest": "b0a75673"
       },
       "label": "kill",
       "players": [
@@ -212,7 +212,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 7073,
-            "damageTaken": 8,
+            "damageTaken": 5,
             "kills": 1
           },
           "craftSkills": {},
@@ -302,13 +302,13 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.6,
-          "hp": 434,
+          "hp": 49995,
           "id": 980,
           "inCombat": true,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
-          "maxHp": 442,
+          "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -372,7 +372,7 @@
             "items": [
               {
                 "count": 1,
-                "itemId": "wolf_fang"
+                "itemId": "milepost_boots"
               }
             ]
           },
@@ -417,11 +417,11 @@
       "tick": 76,
       "time": 3.8,
       "nextId": 990,
-      "state": "0c148f99",
+      "state": "83ae9964",
       "events": "90331a13",
       "rng": {
-        "draws": 307,
-        "digest": "d5209595"
+        "draws": 310,
+        "digest": "b5becd02"
       },
       "label": "final",
       "players": [
@@ -443,7 +443,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 7073,
-            "damageTaken": 8,
+            "damageTaken": 5,
             "kills": 1
           },
           "craftSkills": {},
@@ -538,13 +538,13 @@
           "facing": 1.570796,
           "fallStartY": 1.5,
           "fiveSecondRule": 102.8,
-          "hp": 434,
+          "hp": 49995,
           "id": 980,
           "inCombat": true,
           "kind": "player",
           "level": 10,
           "lootFfaTimer": "Infinity",
-          "maxHp": 442,
+          "maxHp": 50000,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -608,7 +608,7 @@
             "items": [
               {
                 "count": 1,
-                "itemId": "wolf_fang"
+                "itemId": "milepost_boots"
               }
             ]
           },

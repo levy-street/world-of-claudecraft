@@ -9,8 +9,8 @@
     "Fingers of Frost proc draw from frostbolt",
     "Brain Freeze proc draw from frostbolt"
   ],
-  "draws": 359,
-  "drawDigest": "d5051f2c",
+  "draws": 370,
+  "drawDigest": "1c33bfda",
   "frames": [
     {
       "tick": 0,
@@ -142,22 +142,22 @@
       "tick": 20,
       "time": 1,
       "nextId": 990,
-      "state": "eaa02e1c",
-      "events": "9b2789b8",
+      "state": "d17125c4",
+      "events": "60cb3396",
       "rng": {
         "draws": 1,
-        "digest": "330ae050"
+        "digest": "cf5e57a1"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 990,
-      "state": "0f42e7a1",
+      "state": "0bda01bd",
       "events": "cb20c712",
       "rng": {
         "draws": 2,
-        "digest": "c4d27b1e"
+        "digest": "6d172bb5"
       }
     },
     {
@@ -165,32 +165,32 @@
       "time": 3,
       "nextId": 990,
       "state": "23bdaa68",
-      "events": "0e05507b",
+      "events": "63e953e9",
       "rng": {
-        "draws": 153,
-        "digest": "ced04f45"
+        "draws": 158,
+        "digest": "812032b0"
       }
     },
     {
       "tick": 80,
       "time": 4,
       "nextId": 990,
-      "state": "1b892d1e",
-      "events": "e3e2fc90",
+      "state": "a87004e8",
+      "events": "d606b31f",
       "rng": {
-        "draws": 318,
-        "digest": "9811e354"
+        "draws": 326,
+        "digest": "ac35f18e"
       }
     },
     {
       "tick": 84,
       "time": 4.2,
       "nextId": 990,
-      "state": "3bf84b6f",
-      "events": "618a9ecd",
+      "state": "ba06d360",
+      "events": "72a80c9d",
       "rng": {
-        "draws": 359,
-        "digest": "d5051f2c"
+        "draws": 370,
+        "digest": "1c33bfda"
       },
       "label": "frost-procs",
       "players": [
@@ -211,12 +211,12 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 211
+            "damageDealt": 212
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 211
+              "dummyDamage": 212
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -309,6 +309,15 @@
               "school": "frost",
               "sourceId": 980,
               "stacks": 5
+            },
+            {
+              "duration": 15,
+              "id": "brain_freeze",
+              "kind": "brain_freeze",
+              "name": "Brain Freeze",
+              "remaining": 14.95,
+              "school": "frost",
+              "sourceId": 980
             }
           ],
           "castTotal": 2.5,
@@ -399,7 +408,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499789,
+          "hp": 499788,
           "id": 989,
           "inCombat": true,
           "kind": "mob",
@@ -431,7 +440,7 @@
           "threat": [
             [
               980,
-              211
+              212
             ]
           ],
           "weapon": {
@@ -444,11 +453,11 @@
       "tick": 84,
       "time": 4.2,
       "nextId": 990,
-      "state": "3bf84b6f",
+      "state": "ba06d360",
       "events": "741638a5",
       "rng": {
-        "draws": 359,
-        "digest": "d5051f2c"
+        "draws": 370,
+        "digest": "1c33bfda"
       },
       "label": "final",
       "players": [
@@ -469,12 +478,12 @@
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 211
+            "damageDealt": 212
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 211
+              "dummyDamage": 212
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -567,6 +576,15 @@
               "school": "frost",
               "sourceId": 980,
               "stacks": 5
+            },
+            {
+              "duration": 15,
+              "id": "brain_freeze",
+              "kind": "brain_freeze",
+              "name": "Brain Freeze",
+              "remaining": 14.95,
+              "school": "frost",
+              "sourceId": 980
             }
           ],
           "castTotal": 2.5,
@@ -657,7 +675,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499789,
+          "hp": 499788,
           "id": 989,
           "inCombat": true,
           "kind": "mob",
@@ -689,7 +707,7 @@
           "threat": [
             [
               980,
-              211
+              212
             ]
           ],
           "weapon": {

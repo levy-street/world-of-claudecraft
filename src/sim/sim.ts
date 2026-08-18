@@ -2452,14 +2452,14 @@ export class Sim {
           this.addEntity(mob);
           continue;
         }
-        // An offStream camp scatters off a PRIVATE sub-stream, so it draws no
-        // shared rng at all and adding it leaves every later world draw (and
-        // therefore every seeded gameplay roll) bit-identical. Same principle
-        // as the dummy/ambient branch above, but it still gets real scatter.
-        // Seeded from the world seed plus the camp's AUTHORED identity (never
-        // its array index, so reordering the list cannot move it), and never
-        // from wall-clock, so all three hosts agree.
-        const campRng = camp.offStream ? this.campPrivateRng(camp, i) : this.rng;
+        // An offStream camp scatters off a PRIVATE sub-stream (seeded from the
+        // world seed plus the camp's AUTHORED identity, never its array index
+        // or wall-clock), so adding it leaves every later world draw
+        // bit-identical: the dummy/ambient principle, with real scatter. A
+        // non-offStream camp still routes through rngForSpawn so an expansion
+        // row's tail spawns (past sharedRngCount) draw camp-private: the
+        // v0.39.0 merge briefly dropped this, see tests/sim.test.ts.
+        const campRng = camp.offStream ? this.campPrivateRng(camp, i) : rngForSpawn(i);
         // Spread the camp's mobs with even nearest-neighbor spacing (a sunflower
         // spiral) instead of independent uniform sampling, which let mobs stack.
         // The two draws below feed campSpawnOffset as jitter and are consumed in the

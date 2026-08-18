@@ -10,7 +10,7 @@
     "combat_start/low_hp barks via maybeCompanionBark (stays on Sim)"
   ],
   "draws": 16,
-  "drawDigest": "d2b94961",
+  "drawDigest": "d89e0835",
   "frames": [
     {
       "tick": 0,
@@ -152,99 +152,99 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 998,
-      "state": "7c21ca4e",
-      "events": "6ffd5cd9",
+      "state": "1509a500",
+      "events": "d2976818",
       "rng": {
-        "draws": 7,
-        "digest": "f1e64900"
+        "draws": 5,
+        "digest": "59be7c21"
       }
     },
     {
       "tick": 10,
       "time": 0.5,
       "nextId": 998,
-      "state": "2ce6ef58",
+      "state": "c7b1bf11",
       "events": "741638a5",
       "rng": {
-        "draws": 7,
-        "digest": "f1e64900"
+        "draws": 5,
+        "digest": "59be7c21"
       }
     },
     {
       "tick": 15,
       "time": 0.75,
       "nextId": 998,
-      "state": "27176c70",
+      "state": "8591417c",
       "events": "741638a5",
       "rng": {
-        "draws": 7,
-        "digest": "f1e64900"
+        "draws": 5,
+        "digest": "59be7c21"
       }
     },
     {
       "tick": 20,
       "time": 1,
       "nextId": 998,
-      "state": "46b908cb",
+      "state": "9ae5db63",
       "events": "dc7e04aa",
       "rng": {
-        "draws": 7,
-        "digest": "f1e64900"
+        "draws": 5,
+        "digest": "59be7c21"
       }
     },
     {
       "tick": 25,
       "time": 1.25,
       "nextId": 998,
-      "state": "1e27397b",
+      "state": "1350bfb7",
       "events": "741638a5",
       "rng": {
-        "draws": 7,
-        "digest": "f1e64900"
+        "draws": 5,
+        "digest": "59be7c21"
       }
     },
     {
       "tick": 30,
       "time": 1.5,
       "nextId": 998,
-      "state": "2451852b",
-      "events": "f6b0ff46",
+      "state": "d3df6702",
+      "events": "ec61cdca",
       "rng": {
         "draws": 8,
-        "digest": "b1b06c39"
+        "digest": "6d2e6d5a"
       }
     },
     {
       "tick": 35,
       "time": 1.75,
       "nextId": 998,
-      "state": "f39ef781",
+      "state": "ff32832e",
       "events": "741638a5",
       "rng": {
         "draws": 8,
-        "digest": "b1b06c39"
+        "digest": "6d2e6d5a"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 998,
-      "state": "e359ace8",
+      "state": "a689ad86",
       "events": "741638a5",
       "rng": {
         "draws": 8,
-        "digest": "b1b06c39"
+        "digest": "6d2e6d5a"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 998,
-      "state": "e359ace8",
+      "state": "a689ad86",
       "events": "741638a5",
       "rng": {
         "draws": 8,
-        "digest": "b1b06c39"
+        "digest": "6d2e6d5a"
       },
       "label": "combat",
       "players": [
@@ -386,14 +386,14 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 1.95,
+          "combatTimer": 0.5,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": -1.570796,
           "fiveSecondRule": 99,
-          "hp": 77,
+          "hp": 119,
           "id": 993,
           "inCombat": true,
           "kind": "mob",
@@ -429,7 +429,7 @@
         {
           "aggroTargetId": 993,
           "aiState": "attack",
-          "combatTimer": 1.95,
+          "combatTimer": 0.55,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -437,12 +437,12 @@
           "facing": 1.570796,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 39991,
+          "hp": 39983,
           "id": 994,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 104200,
+            "x": 104202.45,
             "z": -1170
           },
           "level": 9,
@@ -471,7 +471,7 @@
           "threat": [
             [
               993,
-              10
+              18
             ]
           ],
           "weapon": {
@@ -486,11 +486,11 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 998,
-      "state": "f1a3c502",
+      "state": "6c47fb95",
       "events": "19986acd",
       "rng": {
         "draws": 16,
-        "digest": "d2b94961"
+        "digest": "d89e0835"
       },
       "label": "heal",
       "players": [
@@ -633,14 +633,14 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 2,
+          "combatTimer": 0.55,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": -1.570796,
           "fiveSecondRule": 99,
-          "hp": 77,
+          "hp": 119,
           "id": 993,
           "inCombat": true,
           "kind": "mob",
@@ -676,7 +676,7 @@
         {
           "aggroTargetId": 993,
           "aiState": "attack",
-          "combatTimer": 2,
+          "combatTimer": 0.6,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -684,12 +684,12 @@
           "facing": 1.570796,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 39991,
+          "hp": 39983,
           "id": 994,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
-            "x": 104200,
+            "x": 104202.45,
             "z": -1170
           },
           "level": 9,
@@ -718,7 +718,7 @@
           "threat": [
             [
               993,
-              10
+              18
             ]
           ],
           "weapon": {
@@ -733,22 +733,22 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 998,
-      "state": "dbb6046a",
+      "state": "b7764159",
       "events": "741638a5",
       "rng": {
         "draws": 16,
-        "digest": "d2b94961"
+        "digest": "d89e0835"
       }
     },
     {
       "tick": 49,
       "time": 2.45,
       "nextId": 998,
-      "state": "784be1d5",
+      "state": "8bef47d2",
       "events": "741638a5",
       "rng": {
         "draws": 16,
-        "digest": "d2b94961"
+        "digest": "d89e0835"
       },
       "label": "heel-walk",
       "players": [
@@ -889,14 +889,14 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 2.4,
+          "combatTimer": 0.95,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": 1.570796,
           "fiveSecondRule": 99,
-          "hp": 77,
+          "hp": 119,
           "id": 993,
           "kind": "mob",
           "level": 5,
@@ -934,22 +934,22 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 998,
-      "state": "31c931ed",
+      "state": "80cd852a",
       "events": "741638a5",
       "rng": {
         "draws": 16,
-        "digest": "d2b94961"
+        "digest": "d89e0835"
       }
     },
     {
       "tick": 51,
       "time": 2.55,
       "nextId": 998,
-      "state": "e4c99fb3",
+      "state": "63992be5",
       "events": "741638a5",
       "rng": {
         "draws": 16,
-        "digest": "d2b94961"
+        "digest": "d89e0835"
       },
       "label": "heel-teleport",
       "players": [
@@ -1090,14 +1090,14 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 2.5,
+          "combatTimer": 1.05,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": 1.570796,
           "fiveSecondRule": 99,
-          "hp": 77,
+          "hp": 119,
           "id": 993,
           "kind": "mob",
           "level": 5,
@@ -1136,11 +1136,11 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 998,
-      "state": "e4c99fb3",
+      "state": "63992be5",
       "events": "741638a5",
       "rng": {
         "draws": 16,
-        "digest": "d2b94961"
+        "digest": "d89e0835"
       },
       "label": "final",
       "players": [
@@ -1281,14 +1281,14 @@
         },
         {
           "aiState": "idle",
-          "combatTimer": 2.5,
+          "combatTimer": 1.05,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": 1.570796,
           "fiveSecondRule": 99,
-          "hp": 77,
+          "hp": 119,
           "id": 993,
           "kind": "mob",
           "level": 5,

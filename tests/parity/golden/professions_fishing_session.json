@@ -2,7 +2,7 @@
   "scenario": "professions_fishing_session",
   "seed": 1,
   "sampleEvery": 100,
-  "ticks": 106,
+  "ticks": 99,
   "coverage": [
     "class:warrior (angler)",
     "startFishing cast start: water probe + bite-delay rng draw",
@@ -12,7 +12,7 @@
     "post-completion re-press: a fresh cast begins (no stale session state)"
   ],
   "draws": 3,
-  "drawDigest": "4d737b8c",
+  "drawDigest": "1e79975d",
   "frames": [
     {
       "tick": 0,
@@ -154,11 +154,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 989,
-      "state": "85ea7c60",
+      "state": "13e8ccf3",
       "events": "9cf80ae7",
       "rng": {
         "draws": 1,
-        "digest": "2628396f"
+        "digest": "acd1c827"
       },
       "label": "cast-start",
       "players": [
@@ -251,7 +251,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
           "fallStartY": -2.902683,
-          "fishBiteAtTick": 98,
+          "fishBiteAtTick": 91,
           "fishCastZoneId": "eastbrook_vale",
           "fiveSecondRule": 99,
           "hp": 100,
@@ -297,14 +297,14 @@
       ]
     },
     {
-      "tick": 98,
-      "time": 4.9,
+      "tick": 91,
+      "time": 4.55,
       "nextId": 989,
-      "state": "605e8e57",
+      "state": "3fd3b4b0",
       "events": "7d1bb488",
       "rng": {
         "draws": 1,
-        "digest": "2628396f"
+        "digest": "acd1c827"
       },
       "label": "bite-armed",
       "players": [
@@ -381,25 +381,25 @@
               "id": "battle_stance",
               "kind": "battle_stance",
               "name": "Battle Stance",
-              "remaining": 3595.1,
+              "remaining": 3595.45,
               "school": "physical",
               "sourceId": 980
             }
           ],
           "blockChance": 0.05,
           "blockValue": 6,
-          "castRemaining": 10.1,
+          "castRemaining": 10.45,
           "castTotal": 15,
           "castingAbility": "fishing",
-          "combatTimer": 103.9,
+          "combatTimer": 103.55,
           "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
           "fallStartY": -2.902683,
           "fishCastZoneId": "eastbrook_vale",
-          "fishReelDeadlineTick": 148,
-          "fiveSecondRule": 103.9,
+          "fishReelDeadlineTick": 141,
+          "fiveSecondRule": 103.55,
           "hp": 100,
           "id": 980,
           "kind": "player",
@@ -443,14 +443,14 @@
       ]
     },
     {
-      "tick": 98,
-      "time": 4.9,
+      "tick": 91,
+      "time": 4.55,
       "nextId": 989,
-      "state": "c2029358",
+      "state": "88951022",
       "events": "e431634c",
       "rng": {
         "draws": 2,
-        "digest": "8b7913d3"
+        "digest": "00a2a78c"
       },
       "label": "reel-landed",
       "players": [
@@ -541,7 +541,7 @@
               "id": "battle_stance",
               "kind": "battle_stance",
               "name": "Battle Stance",
-              "remaining": 3595.1,
+              "remaining": 3595.45,
               "school": "physical",
               "sourceId": 980
             }
@@ -549,13 +549,13 @@
           "blockChance": 0.05,
           "blockValue": 6,
           "castTotal": 15,
-          "combatTimer": 103.9,
+          "combatTimer": 103.55,
           "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
           "fallStartY": -2.902683,
-          "fiveSecondRule": 103.9,
+          "fiveSecondRule": 103.55,
           "hp": 100,
           "id": 980,
           "kind": "player",
@@ -599,25 +599,14 @@
       ]
     },
     {
-      "tick": 100,
-      "time": 5,
+      "tick": 99,
+      "time": 4.95,
       "nextId": 989,
-      "state": "897e8192",
+      "state": "1744fd1f",
       "events": "cca7adba",
       "rng": {
         "draws": 3,
-        "digest": "4d737b8c"
-      }
-    },
-    {
-      "tick": 106,
-      "time": 5.3,
-      "nextId": 989,
-      "state": "ad051f65",
-      "events": "741638a5",
-      "rng": {
-        "draws": 3,
-        "digest": "4d737b8c"
+        "digest": "1e79975d"
       },
       "label": "final",
       "players": [
@@ -715,7 +704,7 @@
               "id": "battle_stance",
               "kind": "battle_stance",
               "name": "Battle Stance",
-              "remaining": 3594.7,
+              "remaining": 3595.05,
               "school": "physical",
               "sourceId": 980
             }
@@ -725,15 +714,15 @@
           "castRemaining": 14.6,
           "castTotal": 15,
           "castingAbility": "fishing",
-          "combatTimer": 104.3,
+          "combatTimer": 103.95,
           "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
           "fallStartY": -2.902683,
-          "fishBiteAtTick": 251,
+          "fishBiteAtTick": 234,
           "fishCastZoneId": "eastbrook_vale",
-          "fiveSecondRule": 104.3,
+          "fiveSecondRule": 103.95,
           "hp": 100,
           "id": 980,
           "kind": "player",

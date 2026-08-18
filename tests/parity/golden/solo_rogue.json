@@ -8,8 +8,8 @@
     "meleeSwing weaponStrike (sinister_strike via castAbility ~3736)",
     "combo points"
   ],
-  "draws": 256,
-  "drawDigest": "6c967e5a",
+  "draws": 260,
+  "drawDigest": "83eebb36",
   "frames": [
     {
       "tick": 0,
@@ -146,44 +146,44 @@
       "tick": 20,
       "time": 1,
       "nextId": 990,
-      "state": "e6668650",
-      "events": "bc63c8f8",
+      "state": "7610923d",
+      "events": "b55cc21c",
       "rng": {
-        "draws": 10,
-        "digest": "6d8ac040"
+        "draws": 12,
+        "digest": "f30c489f"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 990,
-      "state": "d375d2cd",
-      "events": "a52c5346",
+      "state": "461af93e",
+      "events": "2a1e828d",
       "rng": {
-        "draws": 17,
-        "digest": "70539217"
+        "draws": 19,
+        "digest": "d68c35cb"
       }
     },
     {
       "tick": 60,
       "time": 3,
       "nextId": 990,
-      "state": "cbe1b71c",
-      "events": "6c853ce6",
+      "state": "e6769c7d",
+      "events": "92241d05",
       "rng": {
-        "draws": 159,
-        "digest": "7de16927"
+        "draws": 170,
+        "digest": "ca5fcbfc"
       }
     },
     {
       "tick": 72,
       "time": 3.6,
       "nextId": 990,
-      "state": "171d78b6",
+      "state": "9157905d",
       "events": "741638a5",
       "rng": {
-        "draws": 256,
-        "digest": "6c967e5a"
+        "draws": 260,
+        "digest": "83eebb36"
       },
       "label": "final",
       "players": [
@@ -204,13 +204,14 @@
           "cls": "rogue",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 76,
+            "damageDealt": 119,
             "damageTaken": 8
           },
           "craftSkills": {},
           "deedStats": {
             "counters": {
-              "damageDealt": 76
+              "crits": 2,
+              "damageDealt": 119
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -301,7 +302,7 @@
             "speed": 1.8
           },
           "onGround": true,
-          "overpowerUntil": -1,
+          "overpowerUntil": 6.85,
           "petMode": "defensive",
           "pos": {
             "x": 2.5,
@@ -347,7 +348,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 8924,
+          "hp": 8881,
           "id": 989,
           "inCombat": true,
           "kind": "mob",
@@ -384,7 +385,7 @@
           "threat": [
             [
               980,
-              77
+              120
             ]
           ],
           "weapon": {

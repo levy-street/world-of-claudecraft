@@ -9,7 +9,7 @@
     "rebucket after delve respawn teleport"
   ],
   "draws": 1,
-  "drawDigest": "0aa29f7b",
+  "drawDigest": "368503ad",
   "frames": [
     {
       "tick": 0,
@@ -145,12 +145,12 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1000,
+      "nextId": 999,
       "state": "7827aec7",
       "events": "a4355306",
       "rng": {
         "draws": 1,
-        "digest": "0aa29f7b"
+        "digest": "368503ad"
       },
       "label": "delve-first-release",
       "players": [
@@ -276,12 +276,12 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 1000,
+      "nextId": 999,
       "state": "8236f467",
       "events": "2d51d132",
       "rng": {
         "draws": 1,
-        "digest": "0aa29f7b"
+        "digest": "368503ad"
       },
       "label": "delve-fail",
       "players": [
@@ -419,12 +419,12 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 1000,
+      "nextId": 999,
       "state": "8236f467",
       "events": "741638a5",
       "rng": {
         "draws": 1,
-        "digest": "0aa29f7b"
+        "digest": "368503ad"
       },
       "label": "final",
       "players": [

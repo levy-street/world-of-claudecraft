@@ -8,7 +8,7 @@
     "multi-player party"
   ],
   "draws": 2,
-  "drawDigest": "57f0cacf",
+  "drawDigest": "6f587c5e",
   "frames": [
     {
       "tick": 0,
@@ -28,11 +28,11 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 991,
-      "state": "1bff80f9",
-      "events": "29a5fb0e",
+      "state": "11fd2add",
+      "events": "fd3601d0",
       "rng": {
         "draws": 2,
-        "digest": "57f0cacf"
+        "digest": "6f587c5e"
       },
       "label": "final",
       "players": [
@@ -61,7 +61,6 @@
             "itemsDiscovered": [
               "baked_bread",
               "eastbrook_buckler",
-              "greyjaw_hide_boots",
               "recruit_tunic",
               "worn_sword"
             ]
@@ -87,25 +86,14 @@
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 1,
-              "itemId": "greyjaw_hide_boots"
             }
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
-            "counts": {
-              "greyjaw_hide_boots": 1
-            },
-            "firstFind": {
-              "greyjaw_hide_boots": {}
-            },
-            "recent": [
-              "greyjaw_hide_boots"
-            ]
+            "counts": {},
+            "firstFind": {}
           },
           "renown": 5,
           "talents": {
@@ -139,6 +127,7 @@
               "apprentice_robe",
               "baked_bread",
               "gnarled_staff",
+              "greyjaw_hide_boots",
               "spring_water"
             ]
           },
@@ -166,14 +155,25 @@
             {
               "count": 5,
               "itemId": "spring_water"
+            },
+            {
+              "count": 1,
+              "itemId": "greyjaw_hide_boots"
             }
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
           "reliquary": {
-            "counts": {},
-            "firstFind": {}
+            "counts": {
+              "greyjaw_hide_boots": 1
+            },
+            "firstFind": {
+              "greyjaw_hide_boots": {}
+            },
+            "recent": [
+              "greyjaw_hide_boots"
+            ]
           },
           "renown": 5,
           "talents": {

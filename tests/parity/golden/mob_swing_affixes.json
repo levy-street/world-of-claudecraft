@@ -10,8 +10,8 @@
     "mobSwing affix cascade: rampage stacking buff_ap (warlord_drogmar self-buff)",
     "friendly-pet mobSwing: mob.hostile=false short-circuits every proc (no debuff on its target)"
   ],
-  "draws": 374,
-  "drawDigest": "7b32db39",
+  "draws": 367,
+  "drawDigest": "29790ac3",
   "frames": [
     {
       "tick": 0,
@@ -153,44 +153,44 @@
       "tick": 20,
       "time": 1,
       "nextId": 995,
-      "state": "8f44c4f7",
-      "events": "99620eb4",
+      "state": "6329972b",
+      "events": "f88630eb",
       "rng": {
-        "draws": 60,
-        "digest": "6083fb31"
+        "draws": 56,
+        "digest": "7b458e00"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 995,
-      "state": "c537ac81",
-      "events": "3df1e0c1",
+      "state": "e5289841",
+      "events": "f5ac2488",
       "rng": {
-        "draws": 101,
-        "digest": "9ff4d479"
+        "draws": 92,
+        "digest": "4950606f"
       }
     },
     {
       "tick": 60,
       "time": 3,
       "nextId": 995,
-      "state": "778c2b4a",
-      "events": "d656bddb",
+      "state": "ae5c3b96",
+      "events": "af1a913b",
       "rng": {
-        "draws": 335,
-        "digest": "47bbf066"
+        "draws": 328,
+        "digest": "afc0202b"
       }
     },
     {
       "tick": 60,
       "time": 3,
       "nextId": 995,
-      "state": "2932ea10",
+      "state": "81d10a00",
       "events": "741638a5",
       "rng": {
-        "draws": 335,
-        "digest": "47bbf066"
+        "draws": 328,
+        "digest": "afc0202b"
       },
       "label": "affixes",
       "players": [
@@ -211,7 +211,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 1505
+            "damageTaken": 1481
           },
           "craftSkills": {},
           "deedStats": {
@@ -292,6 +292,16 @@
               "sourceId": 980
             },
             {
+              "duration": 10,
+              "id": "heal_absorb_gravecaller_summoner",
+              "kind": "heal_absorb",
+              "name": "Grave Blight",
+              "remaining": 7.05,
+              "school": "shadow",
+              "sourceId": 991,
+              "value": 120
+            },
+            {
               "duration": 3,
               "id": "ensnare_webwood_spider",
               "kind": "root",
@@ -299,16 +309,6 @@
               "remaining": 2,
               "school": "nature",
               "sourceId": 990
-            },
-            {
-              "duration": 10,
-              "id": "heal_absorb_gravecaller_summoner",
-              "kind": "heal_absorb",
-              "name": "Grave Blight",
-              "remaining": 9,
-              "school": "shadow",
-              "sourceId": 991,
-              "value": 120
             },
             {
               "duration": 1,
@@ -369,7 +369,7 @@
             "z": -21
           },
           "potionCooldownUntil": -1,
-          "resource": 91.972222,
+          "resource": 90.505556,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -404,7 +404,7 @@
           "fallStartY": 1.359999,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199991,
+          "hp": 199989,
           "id": 989,
           "inCombat": true,
           "kind": "mob",
@@ -441,7 +441,7 @@
           "threat": [
             [
               993,
-              9
+              11
             ]
           ],
           "weapon": {
@@ -603,7 +603,7 @@
         {
           "aggroTargetId": 989,
           "aiState": "idle",
-          "combatTimer": 0.5,
+          "combatTimer": 0.75,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -611,7 +611,7 @@
           "facing": 1.570796,
           "fallStartY": 1.359999,
           "fiveSecondRule": 99,
-          "hp": 75,
+          "hp": 114,
           "id": 993,
           "inCombat": true,
           "kind": "mob",
@@ -648,7 +648,7 @@
         {
           "aggroTargetId": 993,
           "aiState": "attack",
-          "combatTimer": 0.5,
+          "combatTimer": 0.75,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -657,7 +657,7 @@
           "fallStartY": 1.359999,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199916,
+          "hp": 199941,
           "id": 994,
           "inCombat": true,
           "kind": "mob",
@@ -693,7 +693,7 @@
           "threat": [
             [
               993,
-              85
+              60
             ]
           ],
           "weapon": {
@@ -708,11 +708,11 @@
       "tick": 64,
       "time": 3.2,
       "nextId": 995,
-      "state": "83921d0d",
+      "state": "4c973201",
       "events": "741638a5",
       "rng": {
-        "draws": 374,
-        "digest": "7b32db39"
+        "draws": 367,
+        "digest": "29790ac3"
       },
       "label": "final",
       "players": [
@@ -733,7 +733,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 1505
+            "damageTaken": 1481
           },
           "craftSkills": {},
           "deedStats": {
@@ -814,6 +814,16 @@
               "sourceId": 980
             },
             {
+              "duration": 10,
+              "id": "heal_absorb_gravecaller_summoner",
+              "kind": "heal_absorb",
+              "name": "Grave Blight",
+              "remaining": 6.85,
+              "school": "shadow",
+              "sourceId": 991,
+              "value": 120
+            },
+            {
               "duration": 3,
               "id": "ensnare_webwood_spider",
               "kind": "root",
@@ -821,16 +831,6 @@
               "remaining": 1.8,
               "school": "nature",
               "sourceId": 990
-            },
-            {
-              "duration": 10,
-              "id": "heal_absorb_gravecaller_summoner",
-              "kind": "heal_absorb",
-              "name": "Grave Blight",
-              "remaining": 8.8,
-              "school": "shadow",
-              "sourceId": 991,
-              "value": 120
             },
             {
               "duration": 1,
@@ -891,7 +891,7 @@
             "z": -21
           },
           "potionCooldownUntil": -1,
-          "resource": 91.972222,
+          "resource": 90.505556,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -926,7 +926,7 @@
           "fallStartY": 1.359999,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199991,
+          "hp": 199989,
           "id": 989,
           "inCombat": true,
           "kind": "mob",
@@ -963,7 +963,7 @@
           "threat": [
             [
               993,
-              9
+              11
             ]
           ],
           "weapon": {
@@ -1125,7 +1125,7 @@
         {
           "aggroTargetId": 989,
           "aiState": "idle",
-          "combatTimer": 0.7,
+          "combatTimer": 0.95,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -1133,7 +1133,7 @@
           "facing": 1.570796,
           "fallStartY": 1.359999,
           "fiveSecondRule": 99,
-          "hp": 75,
+          "hp": 114,
           "id": 993,
           "inCombat": true,
           "kind": "mob",
@@ -1170,7 +1170,7 @@
         {
           "aggroTargetId": 993,
           "aiState": "attack",
-          "combatTimer": 0.7,
+          "combatTimer": 0.95,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -1179,7 +1179,7 @@
           "fallStartY": 1.359999,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199916,
+          "hp": 199941,
           "id": 994,
           "inCombat": true,
           "kind": "mob",
@@ -1215,7 +1215,7 @@
           "threat": [
             [
               993,
-              85
+              60
             ]
           ],
           "weapon": {

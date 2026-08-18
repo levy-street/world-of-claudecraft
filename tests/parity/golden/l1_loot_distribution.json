@@ -10,7 +10,7 @@
     "looter-takes-all common item + personal-loot visibility"
   ],
   "draws": 3,
-  "drawDigest": "8f4c78f2",
+  "drawDigest": "9cfa0ceb",
   "frames": [
     {
       "tick": 0,
@@ -34,7 +34,7 @@
       "events": "9612b344",
       "rng": {
         "draws": 1,
-        "digest": "6b05d9e7"
+        "digest": "fc1f956a"
       },
       "label": "after-loot-a",
       "players": [
@@ -472,10 +472,10 @@
       "time": 0.05,
       "nextId": 992,
       "state": "e9100e8f",
-      "events": "f196cb09",
+      "events": "112a89e5",
       "rng": {
         "draws": 3,
-        "digest": "8f4c78f2"
+        "digest": "9cfa0ceb"
       },
       "label": "after-rolls",
       "players": [
@@ -955,7 +955,7 @@
       "events": "ede33353",
       "rng": {
         "draws": 3,
-        "digest": "8f4c78f2"
+        "digest": "9cfa0ceb"
       },
       "label": "after-loot-b",
       "players": [
@@ -1435,7 +1435,7 @@
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "8f4c78f2"
+        "digest": "9cfa0ceb"
       },
       "label": "final",
       "players": [

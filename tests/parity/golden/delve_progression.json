@@ -10,7 +10,7 @@
     "companionUpgrade rank bump + refreshDelveDaily day rollover"
   ],
   "draws": 3,
-  "drawDigest": "c4e7211b",
+  "drawDigest": "392af441",
   "frames": [
     {
       "tick": 0,
@@ -156,7 +156,7 @@
       "events": "7e48e315",
       "rng": {
         "draws": 1,
-        "digest": "cc673fde"
+        "digest": "38457ea8"
       }
     },
     {
@@ -167,7 +167,7 @@
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "c4e7211b"
+        "digest": "392af441"
       },
       "label": "advanced-to-finale",
       "players": [
@@ -313,7 +313,7 @@
       "events": "31e1f3f1",
       "rng": {
         "draws": 3,
-        "digest": "c4e7211b"
+        "digest": "392af441"
       },
       "label": "shop-daily",
       "players": [
@@ -467,7 +467,7 @@
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "c4e7211b"
+        "digest": "392af441"
       },
       "label": "final",
       "players": [
