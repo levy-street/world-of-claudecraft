@@ -815,6 +815,24 @@ describe('unstuck area identity', () => {
     expect(Math.abs(player.pos.z - (origin.z + plot.z))).toBeLessThanOrEqual(plot.hd);
   });
 
+  it('cancels a normal battleground attempt that drifts during the countdown', () => {
+    const { sim, pid } = activeBattleground();
+    const player = required(sim.entities.get(pid), 'battleground player');
+    const meta = required(sim.meta(pid), 'battleground metadata');
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+
+    player.pos = sim.groundPos(player.pos.x + 0.75, player.pos.z);
+    player.prevPos = { ...player.pos };
+    sim.ctx.rebucket(player);
+
+    expect(eventsOf(sim.tick())).toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'cancelled', reason: 'moved', pid }),
+    );
+    expect(meta.pendingUnstuck).toBeNull();
+  });
+
   it('reports content-local positions for dungeon, delve, and procedural rift clones', () => {
     const dungeon = makeWorld();
     dungeon.enterDungeon('hollow_crypt', dungeon.player.id);
