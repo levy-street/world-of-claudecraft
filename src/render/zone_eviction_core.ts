@@ -52,7 +52,10 @@ import { distanceSqToZone, MAX_OUTDOOR_FOG_FAR } from './zone_streaming';
  * not exact-rectangle: the 14 zone rectangles do not tile the world, so a
  * zone also owns every unclaimed "gap" cell nearest to it, which can sit well
  * outside its own rectangle (measured against the live ZONES table: up to
- * 360 yd for eastbrook_vale, see tests/zone_eviction_core.test.ts). unloadZone
+ * 780.6 yd for drakelands, whose rectangle is the nearest to the deep-sea
+ * cells north of the Farshore island now that the Last Bell campaign
+ * stretched the world rect east to x 1300; the pre-campaign worst case was
+ * 360 yd for eastbrook_vale. See tests/zone_eviction_core.test.ts). unloadZone
  * releases every cell a zone owns, but this radius is measured to the
  * rectangle alone, so the nearest chunk an eviction can actually remove may
  * be up to that overshoot CLOSER than the radius suggests. The margin over
@@ -60,11 +63,14 @@ import { distanceSqToZone, MAX_OUTDOOR_FOG_FAR } from './zone_streaming';
  * background prepare for the same zone) must clear that overshoot, or a
  * player standing near a border could see an evicted zone's ground before it
  * rebuilds, or thrash it: evict, immediately re-stream, evict again.
- * 850 + 600 clears the measured 360 yd worst case with room to spare;
+ * 850 + 850 clears the measured 780.6 yd worst case (the pre-campaign margin
+ * was 600, which the island's gap cells now eat whole) while staying under
+ * the ~1829 yd rectangle distance from the Eastbrook spawn to drakelands, so
+ * a fully-crossed world still sheds its far end;
  * tests/zone_eviction_core.test.ts pins the real margin against live zone
  * geometry so a future zone reshuffle cannot silently erode it.
  */
-export const ZONE_EVICTION_RADIUS = MAX_OUTDOOR_FOG_FAR + 600;
+export const ZONE_EVICTION_RADIUS = MAX_OUTDOOR_FOG_FAR + 850;
 
 /**
  * Prepared zones the player has left far enough behind to release, farthest

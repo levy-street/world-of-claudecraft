@@ -21,7 +21,9 @@ import {
   ZONES,
 } from '../src/sim/data';
 
-// The real lattice src/render/terrain.ts builds on: 18 x 44 cells of 60 yd.
+// The real lattice src/render/terrain.ts builds on: 31 x 45 cells of 60 yd
+// since the Last Bell campaign stretched the world rect (x -540..1300,
+// z -250..2420).
 const CHUNK_SIZE = 60;
 const GRID: ChunkGrid = {
   size: CHUNK_SIZE,
@@ -349,6 +351,12 @@ describe('the view wedge (turning on the spot must not move the horizon)', () =>
     // 90 degrees off the view axis, 235 with it 179 degrees off, i.e. squarely
     // behind the camera. Everything past that horizon is the coarse vista mesh,
     // which carries no splat texture and takes no shadows.
+    //
+    // The radial figure re-measures at 164 since the Last Bell merge: the
+    // campaign's Farshore extent moved WORLD_MIN_Z from -180 to -250, which
+    // slides every chunk row 10 yards (the lattice is 60-yard cells off
+    // originZ), so the binding Mirefen row's near edge now sits at z 170
+    // instead of 180. Same fix under test, one lattice shift in the input.
     const eastbrookOnly = pendingOutside(new Set(['eastbrook_vale']));
     const spawn = { x: 2, z: -2 };
     const served = [];
@@ -367,14 +375,14 @@ describe('the view wedge (turning on the spot must not move the horizon)', () =>
     }
     // Radially every heading was pinned at the one binding chunk.
     expect(fogFarForBuiltGround(GRID, eastbrookOnly, spawn.x, spawn.z, MAX_OUTDOOR_FOG_FAR)).toBe(
-      170,
+      164,
     );
     // Facing away from it the player now gets the world back, by a wide margin
     // rather than a few yards.
-    expect(Math.max(...served)).toBeGreaterThan(4 * 170);
+    expect(Math.max(...served)).toBeGreaterThan(4 * 164);
     // And the headings that DO face it still clamp: this widens the horizon,
     // it does not remove the no-holes guarantee.
-    expect(Math.min(...served)).toBe(170);
+    expect(Math.min(...served)).toBe(164);
   });
 });
 

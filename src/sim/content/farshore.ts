@@ -50,25 +50,29 @@ export const FARSHORE_ZONE: ZoneDef = {
   levelRange: [3, 7],
   biome: 'vale',
   hub: { x: 822, z: 118, radius: 16, name: 'Gullhaven' },
-  graveyard: { x: 836, z: 132 },
+  graveyard: { x: 839, z: 132 },
   lakes: [
-    { x: 388, z: 26, radius: 8 }, // the Hilltop Spring, under the Watch Meadow
+    // The Hilltop Spring, under the Watch Meadow. Both lakes moved with the
+    // campaign island (the pre-campaign isle sat at x 180-540; this rect is
+    // 700-1300, so the old spots lay in open strait). The spring keeps its
+    // decorative character: it sits inside the Watch Meadow dome's inner
+    // radius (isleDome 1000,10 in world.ts applyFarshoreSea), whose +8 lift
+    // re-raises the carved bed above the waterline, so it holds no
+    // swim-depth water and stays a scenery basin (the fishing suite's
+    // decorative exemption).
+    { x: 992, z: 30, radius: 8 },
     // Gull Mere, the fishing town's actual water (the packet review's R55).
-    // The isle shipped with ZERO fishable water: the Hilltop Spring sits
-    // 33.6 yd from the Crown dome's centre, whose +14 lift re-raises the
-    // carved bed to +2.85, and open ocean is never a water body, so the
-    // zone's tier-1 rod row was decorative. This basin sits on the north
-    // downs where the coast appliers are identity (landness 0.31 to 0.91
-    // around the whole 16 yd blend rim, dome contribution zero), carves to
-    // the world-wide canonical -7.60 bed, and was probed at 82 percent
-    // fishable over the disc with a complete castable, walkable shore ring
-    // from d=11.3 and a 1.28-steepness walk from Gullhaven (limit 1.5).
-    // Hazard gaps at placement: watchbell 24.0, breach_wretch camp 27.6,
-    // nearest herb node 27.3 (its own bar is 25), roads 50.8, causeway
-    // 100+, palms cannot generate off the beach apron. Radius 10 is
-    // deliberate: a 14-yd lake has NO fully-inland footprint anywhere in
-    // the rect.
-    { x: 350, z: 118, radius: 10 },
+    // Open ocean is never a water body, so without an inland basin the
+    // zone's tier-1 rod row would be decorative. This basin sits on the
+    // inland shelf southeast of Gullhaven where every isleDome contribution
+    // is negligible and the coast blend is identity, so the carve keeps a
+    // swim-deep bed (probed 72 percent swimmable over the disc at the
+    // shipped seed) with a dry shore ring at 16 yd all the way around and a
+    // dry-foot walk from the town square (822,118). Hazard gaps at
+    // placement: the Landing road 17.7 (carve reach is 16), the Watch
+    // Meadow road 55+, Bram's escort line 65, nearest camp 96, the hub
+    // flatten, benches, and harbor grading all well clear.
+    { x: 866, z: -2, radius: 10 },
   ],
   pois: [
     { x: 822, z: 118, label: 'Gullhaven', id: 'gullhaven' },
@@ -843,5 +847,5 @@ export const FARSHORE_PROPS: ZonePropsDef = {
   // Gullhaven's harbor: the boardwalk waterfront, the stepped pier over the
   // bay drop, and the ship berth (src/sim/harbor_layout.ts).
   harbors: [GULLHAVEN_HARBOR],
-  graveyards: [{ x: 836, z: 132 }],
+  graveyards: [{ x: 839, z: 132 }],
 };

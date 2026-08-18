@@ -33,13 +33,17 @@ describe('water flora placement core', () => {
     // future edit cannot silently reshape the world's water dressing. Minted
     // from the shipped walk at seed 42; re-mint only for a deliberate,
     // reviewed placement change. Re-minted once for Gull Mere (R55, the
-    // farshore lagoon): one new region, 3 lilies and 5 reeds on the new
-    // water, and farshore_isle becomes the walk's last zone. The first-spot
-    // coordinate pin is untouched, so the pre-existing walk is proven
-    // unmoved.
+    // farshore lagoon): one new region, and farshore_isle becomes the walk's
+    // last zone. Re-minted again at the Last Bell merge: the campaign moved
+    // both farshore waters onto the real island (the Hilltop Spring to
+    // (992,30), Gull Mere to (866,-2), src/sim/content/farshore.ts), and the
+    // farshore region re-rolled to 2 lilies and 4 reeds on the moved water
+    // (one lily and one reed fewer than the pre-campaign spots grew). The
+    // first-spot coordinate pin is untouched, so the pre-existing walk is
+    // proven unmoved.
     expect(regions.length).toBe(10);
-    expect(regions.reduce((n, r) => n + r.lilies.length, 0)).toBe(75);
-    expect(regions.reduce((n, r) => n + r.reeds.length, 0)).toBe(131);
+    expect(regions.reduce((n, r) => n + r.lilies.length, 0)).toBe(74);
+    expect(regions.reduce((n, r) => n + r.reeds.length, 0)).toBe(130);
     const first = regions[0].lilies[0] ?? regions[0].reeds[0];
     expect(first.x).toBeCloseTo(-97.7536, 3);
     expect(first.z).toBeCloseTo(98.1021, 3);

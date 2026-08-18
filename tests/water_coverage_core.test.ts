@@ -126,10 +126,28 @@ describe('water sheet coverage', () => {
     expect(frac).toBeLessThan(0.022);
     // The sliver it drops is off the play strip, so no on-strip coast is lost.
     expect(onStrip).toBe(false);
-    // On today's grid every un-zoned cell is open-sea-dominated, so nothing
-    // builds; the apron owns them all. A future grid that strands a REAL coast
-    // (fraction over the threshold) would appear here and be caught.
-    expect(builtGaps().map((g) => g.id)).toEqual([]);
+    // The built set, re-derived at the Last Bell merge. Before the campaign
+    // every un-zoned cell was open-sea-dominated and nothing built; the
+    // island pushed WORLD_MAX_X to 1300, which put the strait east of the
+    // world columns (x 540..700, z 290 north) INSIDE the partition, and the
+    // release's natural-relief rework gives that band real islet coastline
+    // (measured 7.1 to 13.7 percent dry against the 3 percent gate). By the
+    // module's own rule a cell with a real coastline gets a fine sheet, so
+    // exactly the nine strait-coast cells build, each streaming with the
+    // east-column zone it abuts (the attach arm below). The island-column
+    // cells north of the Farshore (x 700..1300) are pure open sea and stay
+    // skipped, as does the southwest corner above.
+    expect(builtGaps().map((g) => g.id)).toEqual([
+      'gap:540,290',
+      'gap:540,540',
+      'gap:540,700',
+      'gap:540,900',
+      'gap:540,1260',
+      'gap:540,1440',
+      'gap:540,1820',
+      'gap:540,1960',
+      'gap:540,2380',
+    ]);
   });
 
   it('a skipped gap does not abut as a sheet, so the neighbour feathers to apron', () => {
@@ -159,11 +177,28 @@ describe('water sheet coverage', () => {
     expect(gapSheetWorthBuilding(0.25)).toBe(true);
   });
 
-  it('attaches each gap to a zone that actually touches it', () => {
+  it('attaches each BUILT gap to a zone that actually touches it', () => {
+    // Scoped to the gaps that build since the Last Bell merge: gap sheets
+    // stream in alongside an adjacent zone's prepare (water.ts), so a BUILT
+    // gap with no adjacent zone would never appear, which is the defect this
+    // arm exists to catch. The campaign world also contains deep-sea cells
+    // north of the Farshore island (x 700..1300, z 540 north) that touch no
+    // zone at all; those never build, so having no builder is harmless, and
+    // the second loop pins the premise that makes it harmless: every
+    // zone-less gap is pure open sea (zero dry ground), so no coastline can
+    // ever be stranded behind the relaxation.
     const rects = zoneRects();
-    for (const gap of gaps()) {
+    for (const gap of builtGaps()) {
       const owners = rects.filter((r) => gapsAdjacentTo([gap], r).length > 0);
       expect(owners.length, `${gap.id} has no adjacent zone to build it`).toBeGreaterThan(0);
+    }
+    for (const gap of gaps()) {
+      const owners = rects.filter((r) => gapsAdjacentTo([gap], r).length > 0);
+      if (owners.length > 0) continue;
+      expect(
+        gapDryScan(gap).frac,
+        `${gap.id} touches no zone yet holds dry ground; a coast is stranded`,
+      ).toBe(0);
     }
   });
 

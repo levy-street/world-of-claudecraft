@@ -57,8 +57,12 @@ const COVERED_PROP_KEYS = [
 ];
 
 // Deliberately not padded: foliage-like dressing rides a slope fine, and
-// hub-internal line work sits on hub plateaus already.
-const SKIPPED_PROP_KEYS = ['marshReeds', 'greatTrees', 'fences', 'walls'];
+// hub-internal line work sits on hub plateaus already. Harbors (the Last Bell
+// boardwalk-and-ship kit, src/sim/harbor_layout.ts) carry AUTHORED deck
+// heights and ramp seams rather than seating on the heightfield, so terrain
+// under a deck is irrelevant by construction and a calm pad would guard
+// nothing the layout does not already own.
+const SKIPPED_PROP_KEYS = ['marshReeds', 'greatTrees', 'fences', 'walls', 'harbors'];
 
 describe('placement categories are classified', () => {
   it('every ZonePropsDef key is covered or deliberately skipped', () => {

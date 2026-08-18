@@ -86,7 +86,11 @@ export const TERRAIN_APPLIER_BOUNDS: readonly (readonly TerrainRegionBounds[] | 
   [bounds(172, 566, 692, 1268)],
   [bounds(172, 566, 172, 708)],
   null,
-  [bounds(166, 566, -188, 188)],
+  // isleCoast: applyFarshoreSea's full support since the campaign moved the
+  // island to x 700-1300 (nearArm from x 182, the east fade ends at 1520, the
+  // z window spans -400..368). The old bounds(166, 566, -188, 188) covered the
+  // pre-campaign island and left the applier masked off over the real one.
+  [bounds(182, 1520, -400, 368)],
   [bounds(126, 262, -80, 60)],
   null,
   null,

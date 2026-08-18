@@ -59,11 +59,13 @@ describe('the continent derives the right border set', () => {
     });
   });
 
-  it('has eleven horizontal borders and fifteen column edges', () => {
-    // the Farshore adds a v-edge against the vale and an h-line under the
-    // Galecrest: both are open-sea borders with no isthmus (ferry only)
-    expect(edges.filter((e) => e.kind === 'h').length).toBe(11);
-    expect(edges.filter((e) => e.kind === 'v').length).toBe(15);
+  it('has ten horizontal borders and fourteen column edges', () => {
+    // Under the asymmetric campaign bounds the Farshore island rect (x 700
+    // to 1300) floats far offshore and shares NO border line with any other
+    // zone (deep sea all around, ferry only), so it contributes no edges at
+    // all: the counts are the mainland grid's alone
+    expect(edges.filter((e) => e.kind === 'h').length).toBe(10);
+    expect(edges.filter((e) => e.kind === 'v').length).toBe(14);
   });
 
   it('every crossing sits where the atlas says', () => {

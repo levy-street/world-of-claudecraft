@@ -8,6 +8,7 @@ import {
   STRIP_MIN_X,
   WORLD_MAX_X,
   WORLD_MAX_Z,
+  WORLD_MIN_X,
   WORLD_MIN_Z,
   ZONES,
 } from '../src/sim/data';
@@ -26,12 +27,19 @@ function maxOwnedCellOvershoot(): number {
     minZ: zone.zMin,
     maxZ: zone.zMax,
   }));
-  const chunksX = Math.ceil((WORLD_MAX_X * 2) / CHUNK_SIZE);
+  // The grid mirrors terrain.ts's buildTerrain exactly: origin WORLD_MIN_X,
+  // width WORLD_MAX_X - WORLD_MIN_X. It was written as a mirrored origin
+  // (-WORLD_MAX_X, width WORLD_MAX_X * 2) while the zone table happened to be
+  // x-symmetric; the Last Bell island (xMax 1300 against xMin -540) broke the
+  // symmetry and the mirrored form swept 760yd of phantom cells the real grid
+  // never builds, inflating the measured overshoot with ground no eviction
+  // can ever remove.
+  const chunksX = Math.ceil((WORLD_MAX_X - WORLD_MIN_X) / CHUNK_SIZE);
   const chunksZ = Math.ceil((WORLD_MAX_Z - WORLD_MIN_Z) / CHUNK_SIZE);
   let worst = 0;
   for (let cz = 0; cz < chunksZ; cz++) {
     for (let cx = 0; cx < chunksX; cx++) {
-      const x0 = -WORLD_MAX_X + cx * CHUNK_SIZE;
+      const x0 = WORLD_MIN_X + cx * CHUNK_SIZE;
       const z0 = WORLD_MIN_Z + cz * CHUNK_SIZE;
       const owner = ZONES[owningRectIndex(x0 + CHUNK_SIZE / 2, z0 + CHUNK_SIZE / 2, zoneRects)];
       // The cell's farthest corner from its owner's rectangle: distanceSqToZone

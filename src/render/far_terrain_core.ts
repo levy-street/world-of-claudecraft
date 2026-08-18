@@ -164,7 +164,8 @@ export function horizonHazePlan(envelopeFar: number): { near: number; far: numbe
  * Per-tier vista plan. Low and constrained-memory devices keep the classic
  * renderer byte-for-byte (fog wall at the biome preset, camera far 950, no
  * far mesh); medium opens a shorter vista; high and above see the whole
- * world (the zone map's diagonal is about 2.9k units).
+ * world (the asymmetric campaign bounds put the zone map's diagonal at
+ * about 3.25k units since the Farshore island pushed WORLD_MAX_X to 1300).
  */
 export function farVistaPlan(
   tier: 'low' | 'medium' | 'high' | 'ultra' | 'insane',
@@ -177,7 +178,7 @@ export function farVistaPlan(
     return { enabled: true, spacing: 16, envelopeFar: 2200, cameraFar: 2600 };
   }
   if (tier === 'high') {
-    return { enabled: true, spacing: 12, envelopeFar: 3200, cameraFar: 3600 };
+    return { enabled: true, spacing: 12, envelopeFar: 3400, cameraFar: 3800 };
   }
   if (tier === 'ultra') {
     // Deliberately the SAME grid high runs, not a finer one. This layer only
@@ -192,10 +193,10 @@ export function farVistaPlan(
     // near-terrain streaming for the same idle slots. High has shipped the 12
     // yard grid all along. insane keeps the 8 yard grid for the same reason it
     // keeps everything else: it exists to be measured against.
-    return { enabled: true, spacing: 12, envelopeFar: 3200, cameraFar: 3600 };
+    return { enabled: true, spacing: 12, envelopeFar: 3400, cameraFar: 3800 };
   }
   if (tier === 'insane') {
-    return { enabled: true, spacing: 8, envelopeFar: 3200, cameraFar: 3600 };
+    return { enabled: true, spacing: 8, envelopeFar: 3400, cameraFar: 3800 };
   }
   // Unknown tier (a partial GFX in a unit test, a future addition that has
   // not chosen a plan): the classic fogged renderer, never a silent vista.

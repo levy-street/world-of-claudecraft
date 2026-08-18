@@ -6,7 +6,7 @@ import {
   MAX_DRAPE_STRIDE,
 } from '../src/render/drape_lod_core';
 import { drapeRingLocalY } from '../src/render/selection_ring';
-import { groundHeight, terrainHeight } from '../src/sim/world';
+import { groundHeight, terrainHeight, waterLevel } from '../src/sim/world';
 
 // The small ground-VFX drape distance LOD. Three contracts matter beyond "it is
 // cheaper": every sample it takes is one the exact drape would have taken too
@@ -200,11 +200,24 @@ describe('drapeFanLocalY', () => {
     // open world minus cliffs and hard steps (localRelief filter): the ground
     // these actually land on. The numbers are the reason the wide shockwave
     // rings were left exact, so pin them as literals.
+    //
+    // Two sweep changes at the Last Bell merge, both serving that same "the
+    // ground these actually land on" clause. The campaign turned most of the
+    // old x 60..900 window into the Farshore strait, whose seabed carries the
+    // deliberately-underwater row-bound carve steps (world.ts documents them
+    // as invisible by design: a 1 yd height step at z -180 runs 5 yd below
+    // the sea surface); the relief filter cannot see a step narrower than its
+    // 8-point ring, and a mark never drapes onto fatiguing open-sea floor, so
+    // the sweep now skips ground below the world waterline. And it starts at
+    // x -400 instead of 60, spanning the mainland strip as well as the
+    // island, which keeps the census above a thousand real samples after the
+    // sea cells drop out.
     const errors: number[] = [];
     const sampler = (x: number, z: number) => groundHeight(x, z, SEED);
     const scale = 1.55;
-    for (let x = 60; x <= 900; x += 13) {
+    for (let x = -400; x <= 900; x += 13) {
       for (let z = -400; z <= 400; z += 17) {
+        if (sampler(x, z) < waterLevel()) continue;
         if (localRelief(x, z, scale) > scale * 0.9) continue;
         const baseY = sampler(x, z);
         drapeRingLocalY(localXZ, x, z, baseY, scale, 0.08, sampler, exact);
