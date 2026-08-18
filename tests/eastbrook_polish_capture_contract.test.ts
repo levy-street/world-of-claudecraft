@@ -184,8 +184,11 @@ interface AttributionTargetFixture {
 // Re-minted for the r185 frozen-camera aim fix: updateCamera now aims through
 // lookAtFrozen, so renderer.ts moves and the composite follows its bytes. No
 // capture was retaken.
+// Re-minted again for the Balgath branch: prewarmDepthMaterial moved out to its own
+// module and the boss's ground-effect wiring came in, so renderer.ts moves and the
+// composite follows its bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '63eae2164f990137dccffd0df83eb3c048a1c8927d125501b717ea3b27b39495';
+  'd152f22d43b13bfe7cfae62fe857a9f2a7b7a8d60c4d34374fb137014ca7e753';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
