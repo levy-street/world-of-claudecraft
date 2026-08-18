@@ -63,7 +63,11 @@ const MONOLITHS: MonolithRow[] = [
     // count: any further growth reds again.
     // Re-pinned to the moved-base v0.39 wrapper merge output. The combined tree
     // lands below both branch ceilings, so keep the exact merged count.
-    ceiling: 19387,
+    // Lowered after Phase 9b's headroom extraction moved the report window
+    // body whole to src/ui/report_window_open.ts (a thin deps-bag wrapper
+    // stays); the margin above the new 19330 count is sized for the phase's
+    // planned plant-sheet composition lines, nothing more.
+    ceiling: 19352,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

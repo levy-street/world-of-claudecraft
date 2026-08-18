@@ -1876,6 +1876,9 @@ const UI_DOM_MODULES = [
   'src/ui/profession_identity_card.ts',
   'src/ui/profession_tutorial_window.ts',
   'src/ui/prompt_dialog.ts',
+  // The report window body moved whole out of hud.ts (the Phase 9b headroom
+  // extraction); it paints #report-window and owns its listeners.
+  'src/ui/report_window_open.ts',
   // professions_window.ts is BACK on the ledger: the focus_restore move left
   // it host-free for a while, but armSentGuard's one-shot re-arm timer is a
   // real host reach, now spelled window.setTimeout so this sweep can see it
