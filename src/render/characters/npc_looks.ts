@@ -355,6 +355,84 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     worn: kit('druid'),
     props: 'knife',
   },
+  // Farmer Jessica, the Eastbrook Allotment Keeper: sun-warm, sleeves rolled,
+  // a scythe over the shoulder and a smile for a first-furrow farmhand.
+  farmer_jessica: {
+    app: {
+      gender: 'female',
+      hair: 'lowbun',
+      ...hair(20, 0.55, 0.3),
+      brows: 'soft',
+      eyeShape: 'round',
+      ...eyes(90, 0.45, 0.35),
+      mouth: 'smile',
+      ...skin(26, 0.5, 0.55),
+      face: face({ cheeks: 0.35, chin: 0.1 }),
+      body: body({ hands: 0.2 }),
+      outfit: 'forest',
+    },
+    worn: kit('druid', { arms: null }),
+    props: 'scythe',
+  },
+  // Farmer Teasel, the Fen Paddy Farmer: grey, lean, and weathered by the
+  // marsh water; a walking staff for the bunds between the rice beds.
+  farmer_teasel: {
+    app: {
+      gender: 'male',
+      hair: 'sweptback',
+      ...hair(230, 0.08, 0.75),
+      beard: 'scruff',
+      brows: 'flat',
+      eyeShape: 'narrow',
+      ...eyes(210, 0.35, 0.5),
+      mouth: 'neutral',
+      ...skin(22, 0.45, 0.42),
+      face: face({ jaw: 0.3, brow: 0.2 }),
+      body: body({ shoulders: 0.15, hands: 0.25 }),
+      outfit: 'teal',
+    },
+    worn: kit('ranger', { arms: null }),
+    props: 'walking_staff',
+  },
+  // Farmer Hollis, the Highwatch Terrace Farmer: stocky as the drystone he
+  // stacks, a woodaxe for the brush that creeps onto the terraces.
+  farmer_hollis: {
+    app: {
+      gender: 'male',
+      hair: 'crew',
+      ...hair(14, 0.5, 0.22),
+      beard: 'full',
+      brows: 'bushy',
+      eyeShape: 'sharp',
+      ...eyes(40, 0.5, 0.3),
+      mouth: 'grin',
+      ...skin(20, 0.55, 0.35),
+      face: face({ chin: 0.3, cheeks: 0.2 }),
+      body: body({ shoulders: 0.35, chest: 0.25, hands: 0.25 }),
+      outfit: 'crimson',
+    },
+    worn: kit('barbarian', { arms: null }),
+    props: 'woodaxe',
+  },
+  // Farmer Verbena, the Parterre Gardener: the Evergarden showcase kept as
+  // trim as her hedges; lavender-silver hair up and out of the topiary.
+  farmer_verbena: {
+    app: {
+      gender: 'female',
+      hair: 'highbun',
+      ...hair(280, 0.25, 0.7),
+      brows: 'arched',
+      eyeShape: 'doe',
+      ...eyes(300, 0.4, 0.55),
+      mouth: 'lips',
+      ...skin(28, 0.4, 0.65),
+      face: face({ brow: 0.1, cheeks: 0.25 }),
+      body: body({ hips: 0.1 }),
+      outfit: 'emerald',
+    },
+    worn: kit('mage', { arms: null }),
+    props: 'none',
+  },
   // Weaver Ottilie: auburn braid crown, steady hands at the loom.
   weaver_ottilie: {
     app: {

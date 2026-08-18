@@ -22,7 +22,12 @@ interface FakeHost extends MechChromaOwnershipHost {
 
 function makeHost(counts: Record<string, number> = {}): FakeHost {
   const host: FakeHost = {
-    accountCosmetics: { mechChromaIds: [] },
+    accountCosmetics: {
+      completedQuestIds: [],
+      mechChromaIds: [],
+      weaponSkinIds: [],
+      weaponSkinLoadout: {},
+    },
     removed: [],
     skins: [],
     countItem: (itemId) => counts[itemId] ?? 0,
@@ -68,7 +73,7 @@ describe('unlockMechChromaFromItem', () => {
 
   it('does not duplicate an already-owned chroma id', () => {
     const host = makeHost({ chroma_item: 1 });
-    host.accountCosmetics = { mechChromaIds: [CHROMA.id] };
+    host.accountCosmetics = { ...host.accountCosmetics, mechChromaIds: [CHROMA.id] };
     const before = host.accountCosmetics;
     const result = unlockMechChromaFromItem(host, { entityId: 7 }, 'chroma_item', CHROMA.id);
     expect(result).toEqual({ type: 'mechChroma', chromaId: CHROMA.id });
@@ -81,7 +86,7 @@ describe('unlockMechChromaFromItem', () => {
 describe('unequipWornMechChroma', () => {
   it('reverts a worn chroma to the class body and keeps ownership', () => {
     const host = makeHost();
-    host.accountCosmetics = { mechChromaIds: [CHROMA.id] };
+    host.accountCosmetics = { ...host.accountCosmetics, mechChromaIds: [CHROMA.id] };
     const worn = { entityId: 7, skinCatalog: 'mech' as const, skin: CHROMA_SKIN };
     expect(unequipWornMechChroma(host, worn, CHROMA.id)).toBe(true);
     expect(host.skins).toEqual([{ pid: 7, skin: 0, catalog: 'class' }]);
