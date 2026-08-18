@@ -3117,6 +3117,12 @@ export const pt_BR: EnTranslations = {
       },
       "huskTrade": "Trade husks for compost",
       "huskTradeAria": "Trade withered husks for compost with {name}",
+      "plantSheet": {
+        "title": "Plant a Crop",
+        "plant": "Plant",
+        "sowAria": "Sow {name}",
+        "empty": "You have no seed you can sow at this bed."
+      },
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
       "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
       "readyLine": "A crop is ready to harvest.",

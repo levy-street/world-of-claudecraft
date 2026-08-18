@@ -3912,6 +3912,17 @@ export const hudChromeStrings = {
     // feedback is the husksConverted line below and the denied toasts above.
     huskTrade: 'Trade husks for compost',
     huskTradeAria: 'Trade withered husks for compost with {name}',
+    // The plant sheet (the bed-verbs phase): the window a press on a free
+    // garden bed opens. Seed and supply names come from itemDisplayName and
+    // the watch knob reuses the journal's careWatch label, so the copy here
+    // is only what no other family owns: the title, the one Plant control,
+    // the seed-row aria, and the no-sowable-seed empty state.
+    plantSheet: {
+      title: 'Plant a Crop',
+      plant: 'Plant',
+      sowAria: 'Sow {name}',
+      empty: 'You have no seed you can sow at this bed.',
+    },
     // The husk trade's one line (the knobs phase): names BOTH sides of the
     // trade, what left the bags and what arrived, because the compost grant's
     // hub line stands down for it (silent + callerLogs, the #2430 one-line

@@ -3117,6 +3117,12 @@ export const ko_KR: EnTranslations = {
       },
       "huskTrade": "껍질을 퇴비로 교환",
       "huskTradeAria": "{name}에게 시든 껍질을 퇴비로 교환",
+      "plantSheet": {
+        "title": "작물 심기",
+        "plant": "심기",
+        "sowAria": "{name} 뿌리기",
+        "empty": "이 밭에 뿌릴 수 있는 씨앗이 없습니다."
+      },
       "husksConvertedLine": "{husksName} x{husks}을(를) {name}(으)로 교환했습니다.",
       "husksConvertedLineQty": "{husksName} x{husks}을(를) {name} x{qty}(으)로 교환했습니다.",
       "readyLine": "작물 1구획을 수확할 수 있습니다.",
