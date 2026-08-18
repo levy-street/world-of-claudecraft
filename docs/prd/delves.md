@@ -184,7 +184,7 @@ delveDaily: {
 
 | id | name | themes | sim hook |
 |----|------|--------|----------|
-| `restless_graves` | Restless Graves | crypt | Trash may spawn weak undead add after 3s |
+| `restless_graves` | Restless Graves | crypt | Trash spawns a weak undead add 3s after death; pending and risen adds gate the room's exit portal like living trash |
 | `bad_air` | Bad Air | crypt, mine, sewer | Periodic poison aura in marked rooms |
 | `candleblind` | Candleblind | crypt, mine | Reduced `detectRange` in flagged zones |
 | `old_mechanisms` | Old Mechanisms | vault, sewer | Timed door/barrier objects |
