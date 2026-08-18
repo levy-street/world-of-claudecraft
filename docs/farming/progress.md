@@ -2321,7 +2321,22 @@ gains the release's foliage_decimation_core RENDER_PURE_CORES row). Honest
 note from the same review: a green parity run over freshly re-recorded
 goldens is circular by construction; the evidence is the machine
 classification, not the green run.
-GATE RECORD: (appended after the close run below)
+GATE RECORD: run 1 on the frozen tree 44619e5ab6 (BROWSER_PATH=<playwright
+chromium> GATE_MAX_WORKERS=8 node scripts/gate_select.mjs, mode=full on the
+terrain-fixture broad arm) FAILED at the full vitest step with exactly two
+reds, both the fallback-only census class: the release's npc-looks roster
+(tests/npc_looks.test.ts) demands an authored look for every NpcDef and the
+four farmers still leaned on the villager fallback (healed by authoring four
+distinct rows in the release's own mechanism; validity, distinctness, and
+manifest arms green; portrait manifest byte-identical), and the shard-weight
+coverage floor (tests/ci_shard_partition.test.ts) fell to 94.5 percent
+against the merged tree (healed by re-harvesting through the sanctioned CLI
+from green full-mode upstream run 32190441549, 2851 files). Heal commit
+9c17ac093f (also completes the chroma test's cosmetics literal, a tsc-only
+catch). Run 2 on the frozen tree 9c17ac093f: "[gate:select] PASS: all 12
+steps green (vitest workers: 8)", mode=full, 2881 test files passed / 12
+skipped, browser regression 20 files 131 green, zero FAIL lines, shell rc 0,
+no druid_engines timeout.
 
 ### Phase 10
 (not started)
