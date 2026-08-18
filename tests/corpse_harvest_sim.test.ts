@@ -3458,9 +3458,13 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // all-unmapped subsets fall out of refused and land in spent instead.
     // Exact totals are pinned against the shipped catalog, not derived, so a
     // template that gains or loses a mapped tag moves one of them.
-    expect(spent).toBe(188);
+    // 188 to 196 when frostmane_yeti left the ogre family for beast: the
+    // every-beast-pays-in-components rule then owes it hide/fang/meat, and three
+    // mapped families contribute all 8 of its masks to spent and none to
+    // refused (all three are mapped), exactly +8/+0.
+    expect(spent).toBe(196);
     expect(refused).toBe(6);
-    expect(spent + refused).toBe(194);
+    expect(spent + refused).toBe(202);
   });
 
   // The eight mapped families and their item ids, spelled out. Deriving them
@@ -3550,9 +3554,11 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // `unmappedOffered` to only the subsets naming gills or horn on the
     // templates left, while `extracted` rises with the extra families each
     // affected subset now extracts. Exact totals are pinned against the
-    // shipped catalog, not derived.
+    // shipped catalog, not derived. frostmane_yeti's move from the ogre family
+    // to beast then adds its hide/fang/meat subsets to `extracted` (286 to 301)
+    // and nothing to `unmappedOffered`, since all three tags are mapped.
     expect(unmappedOffered).toBe(14);
-    expect(extracted).toBe(286);
+    expect(extracted).toBe(301);
   });
 
   it('keeps every mixed template harvestable, so the gate is not a blanket refusal', () => {

@@ -1,7 +1,17 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { BUILTIN_WORLD, DELVES, INSTANCE_X_BASE, setActiveWorldContent } from '../src/sim/data';
+import { BG_GRAVEYARDS, bgFieldPlanWalls } from '../src/sim/battleground_layout';
+import { resolvePosition } from '../src/sim/colliders';
+import {
+  BUILTIN_WORLD,
+  battlegroundOrigin,
+  DELVES,
+  INSTANCE_X_BASE,
+  isBgPos,
+  setActiveWorldContent,
+} from '../src/sim/data';
 import { delveModuleEntry } from '../src/sim/delves/runs';
 import { DUNGEON_WALL_X } from '../src/sim/dungeon_layout';
+import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
 import { swimSurfaceY } from '../src/sim/player_motion';
 import {
   RES_SICKNESS_STAT_MULT,
@@ -88,6 +98,70 @@ function placeInWaterTrap(sim: Sim): void {
   p.jumping = false;
   sim.grid.update(p);
   sim.playerGrid.update(p);
+}
+
+function placeOnGround(sim: Sim, pid: number, x: number, z: number): void {
+  const p = required(sim.entities.get(pid), 'player to place');
+  p.pos = sim.groundPos(x, z);
+  p.prevPos = { ...p.pos };
+  p.vx = 0;
+  p.vy = 0;
+  p.vz = 0;
+  p.onGround = true;
+  p.jumping = false;
+  p.inCombat = false;
+  p.combatTimer = 999;
+  sim.grid.update(p);
+  sim.playerGrid.update(p);
+}
+
+function activeBattleground(): {
+  sim: Sim;
+  match: NonNullable<ReturnType<Sim['bgMatchFor']>>;
+  pid: number;
+} {
+  const sim = makeWorld();
+  const pids = [sim.player.id];
+  const classes = ['warrior', 'mage', 'priest', 'rogue', 'hunter'] as const;
+  for (let i = 1; i < 10; i++) pids.push(sim.addPlayer(classes[i % classes.length], `BG${i}`));
+  pids.forEach((pid, i) => {
+    const p = required(sim.entities.get(pid), 'battleground player');
+    p.level = 20;
+    placeOnGround(sim, pid, (i % 5) * 2 - 4, -40);
+    sim.bgQueueJoin(pid);
+  });
+  sim.tick();
+  for (const pid of pids) sim.bgRespond(true, pid);
+  const match = required(sim.bgMatchFor(pids[0]), 'accepted battleground match');
+  for (let i = 0; i < 20 * 12 && match.state !== 'active'; i++) sim.tick();
+  expect(match.state).toBe('active');
+  return { sim, match, pid: match.teams[0][0] };
+}
+
+function forceBattlegroundWallTrap(
+  sim: Sim,
+  match: NonNullable<ReturnType<Sim['bgMatchFor']>>,
+  pid: number,
+): Sim['player'] {
+  const wall = required(
+    bgFieldPlanWalls().find((candidate) => candidate.height >= 3),
+    'battleground wall collider',
+  );
+  const origin = battlegroundOrigin(match.slot);
+  const p = required(sim.entities.get(pid), 'trapped battleground player');
+  p.pos = sim.groundPos(origin.x + wall.x, origin.z + wall.z);
+  p.prevPos = { ...p.pos };
+  p.vx = 0.25;
+  p.vy = 0;
+  p.vz = 0;
+  p.onGround = false;
+  p.jumping = true;
+  p.inCombat = false;
+  p.combatTimer = 999;
+  sim.ctx.rebucket(p);
+  const resolved = resolvePosition(sim.cfg.seed, p.pos.x, p.pos.z, PLAYER_BODY_RADIUS);
+  expect(Math.hypot(resolved.x - p.pos.x, resolved.z - p.pos.z)).toBeGreaterThan(0.01);
+  return p;
 }
 
 function eventsOf(events: SimEvent[]): Event[] {
@@ -704,6 +778,43 @@ describe('unstuck while dead', () => {
 });
 
 describe('unstuck area identity', () => {
+  it('completes a battleground wall-trap attempt at a safe team graveyard location', () => {
+    const { sim, match, pid } = activeBattleground();
+    const player = forceBattlegroundWallTrap(sim, match, pid);
+    const origin = battlegroundOrigin(match.slot);
+
+    const start = required(
+      unstuckLocationAt(sim.ctx, pid, player.pos),
+      'battleground unstuck start location',
+    );
+    expect(start.area).toMatchObject({
+      kind: 'battleground',
+      id: 'thornhollow_fields',
+      instanceId: String(match.id),
+      slot: match.slot,
+    });
+    expect(start.point.localX).toBeCloseTo(player.pos.x - origin.x, 6);
+    expect(start.point.localZ).toBeCloseTo(player.pos.z - origin.z, 6);
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+    const events = tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20);
+    const completed = eventsOf(events).find((event) => event.phase === 'completed');
+    expect(completed?.area).toMatchObject(start.area);
+    expect(completed?.destination.localX).toBeCloseTo(player.pos.x - origin.x, 6);
+    expect(completed?.destination.localZ).toBeCloseTo(player.pos.z - origin.z, 6);
+    expect(sim.bgMatchFor(pid)).toBe(match);
+    expect(isBgPos(player.pos.x)).toBe(true);
+
+    const resolved = resolvePosition(sim.cfg.seed, player.pos.x, player.pos.z, PLAYER_BODY_RADIUS);
+    expect(Math.hypot(resolved.x - player.pos.x, resolved.z - player.pos.z)).toBeLessThanOrEqual(
+      1e-6,
+    );
+    const plot = BG_GRAVEYARDS[0];
+    expect(Math.abs(player.pos.x - (origin.x + plot.x))).toBeLessThanOrEqual(plot.hw);
+    expect(Math.abs(player.pos.z - (origin.z + plot.z))).toBeLessThanOrEqual(plot.hd);
+  });
+
   it('reports content-local positions for dungeon, delve, and procedural rift clones', () => {
     const dungeon = makeWorld();
     dungeon.enterDungeon('hollow_crypt', dungeon.player.id);

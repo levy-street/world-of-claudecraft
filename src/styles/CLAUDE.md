@@ -86,7 +86,11 @@ the throw (#2499, #2502).
   single central no-magic guard, each migrated painter scans its own source.
 - **Graphics-tier `--fx-*` tokens.** `tokens.css` seeds `--fx-shadow` / `--fx-ambient-anim` /
   `--motion-scale`; the low tier drops the glass rule and the heavy-shadow buckets so a
-  cheaper preset costs less to composite. Tier resolution is gameplay-neutral (the cosmetic
+  cheaper preset costs less to composite. The glass (`backdrop-filter`) removal ALSO fires
+  unconditionally on `body.mobile-touch`, independent of the chosen 3D preset: it is a
+  compositor cost against the live WebGL canvas, not a 3D-throughput one, so a touch
+  device's preset choice (which only auto-floors to low on a player's first boot) does not
+  predict it. Tier resolution is otherwise gameplay-neutral (the cosmetic
   richness a preset sheds, never actionable info; root `CLAUDE.md`). Guarded by
   `tests/ui_effects_profile.test.ts` (the static-preset resolver) and
   `tests/ui_effects_wiring.test.ts` (the `:root` seeds + tier rules cannot vanish from source).

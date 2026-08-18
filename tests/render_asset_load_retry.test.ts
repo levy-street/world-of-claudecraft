@@ -81,109 +81,56 @@ describe('loadGltf retries a transient failure before rejecting', () => {
   });
 });
 
-// releaseHdr is the HDR twin of releaseGltf/releaseTexture: the sky residency
-// lane disposes a far realm's decoded HDR, and unless the loader's promise
-// cache is dropped in the same step the next ensure is handed that disposed
-// texture straight back out of the cache.
-describe('loadHdr cache release', () => {
-  const url = '/env/vale_day_2k.hdr';
+// releaseKtx2Texture is the KTX2 twin of releaseGltf/releaseTexture: the sky
+// residency lane disposes a far realm's transcoded dome, and unless the
+// loader's promise cache is dropped in the same step the next ensure is handed
+// that disposed texture straight back out of the cache.
+describe('loadKtx2Texture cache release', () => {
+  const dome = '/env/vale_day_2k.ktx2';
+  const env = '/env/vale_day_512.ktx2';
 
   beforeEach(() => {
     vi.resetModules();
   });
 
-  it('re-fetches after a release, and discriminates on maxWidth', async () => {
+  it('re-fetches after a release, per url and per repeat key', async () => {
     const calls: string[] = [];
-    vi.doMock('three/addons/loaders/RGBELoader.js', () => ({
-      RGBELoader: class {
-        load(loaded: string, onLoad: (tex: unknown) => void): void {
+    vi.doMock('../src/render/assets/ktx2_support', () => ({
+      ktx2Loader: () => ({
+        load: (loaded: string, onLoad: (tex: unknown) => void): void => {
           calls.push(loaded);
-          const tex = new THREE.DataTexture(new Uint16Array(4 * 2 * 1), 2, 1);
-          tex.type = THREE.HalfFloatType;
-          onLoad(tex);
-        }
-      },
+          onLoad({ isCompressedTexture: true, id: calls.length });
+        },
+      }),
     }));
 
-    const { loadHdr, releaseHdr } = await import('../src/render/assets/loader');
-    const first = await loadHdr(url);
-    expect(calls).toHaveLength(1);
-    expect(await loadHdr(url)).toBe(first);
-    expect(calls).toHaveLength(1);
+    const { loadKtx2Texture, releaseKtx2Texture } = await import('../src/render/assets/loader');
+    const first = await loadKtx2Texture(dome, { large: true });
+    expect(calls).toEqual([dome]);
+    expect(await loadKtx2Texture(dome, { large: true })).toBe(first);
+    expect(calls).toEqual([dome]);
 
-    // A release under the WRONG key must not drop the entry: the maxWidth
-    // variant is a separate decode on its own cache line.
-    releaseHdr(url, { maxWidth: 512 });
-    expect(await loadHdr(url)).toBe(first);
-    expect(calls).toHaveLength(1);
+    // A release of the PMREM-source url must not drop the dome's entry: the
+    // two sky variants are separate files on separate cache lines.
+    releaseKtx2Texture(env);
+    expect(await loadKtx2Texture(dome, { large: true })).toBe(first);
+    expect(calls).toEqual([dome]);
 
-    releaseHdr(url);
-    const second = await loadHdr(url);
-    expect(calls).toHaveLength(2);
+    // Nor may a release under the wrong `repeat` key drop it, the same way
+    // releaseTexture discriminates on its own opts.
+    releaseKtx2Texture(dome, { repeat: true });
+    expect(await loadKtx2Texture(dome, { large: true })).toBe(first);
+    expect(calls).toEqual([dome]);
+
+    releaseKtx2Texture(dome);
+    const second = await loadKtx2Texture(dome, { large: true });
+    expect(calls).toEqual([dome, dome]);
     expect(second).not.toBe(first);
 
-    // ...and the same for the PMREM-source variant the sky module loads.
-    const small = await loadHdr(url, { maxWidth: 512 });
-    expect(calls).toHaveLength(3);
-    expect(await loadHdr(url, { maxWidth: 512 })).toBe(small);
-    releaseHdr(url, { maxWidth: 512 });
-    expect(await loadHdr(url, { maxWidth: 512 })).not.toBe(small);
-    expect(calls).toHaveLength(4);
-  });
-});
-
-describe('loadHdr evicts a terminal failure so a later ensure can recover', () => {
-  const url = '/env/marsh_overcast_2k.hdr';
-
-  beforeEach(() => {
-    vi.resetModules();
-  });
-
-  it('fail-all then recover, on both the default and maxWidth cache keys', async () => {
-    // Review round 2: a rejected promise left in hdrCache poisoned every
-    // later ensure for the session, defeating the sky evict-and-refetch lane
-    // after an outage outlived the bounded retry window.
-    let failing = true;
-    const calls: string[] = [];
-    vi.doMock('three/addons/loaders/RGBELoader.js', () => ({
-      RGBELoader: class {
-        load(
-          loaded: string,
-          onLoad: (tex: unknown) => void,
-          _onProgress: unknown,
-          onError: () => void,
-        ): void {
-          calls.push(loaded);
-          if (failing) {
-            onError();
-            return;
-          }
-          const tex = new THREE.DataTexture(new Uint16Array(4 * 2 * 1), 2, 1);
-          tex.type = THREE.HalfFloatType;
-          onLoad(tex);
-        }
-      },
-    }));
-
-    const { loadHdr } = await import('../src/render/assets/loader');
-    await expect(loadHdr(url)).rejects.toThrow('hdr load failed');
-    await expect(loadHdr(url, { maxWidth: 512 })).rejects.toThrow('hdr load failed');
-    const failedCalls = calls.length;
-    expect(failedCalls).toBeGreaterThanOrEqual(2 * MAX_LOAD_ATTEMPTS);
-
-    // Connectivity returns: the SAME urls must issue fresh attempts (a
-    // poisoned cache would resolve to the old rejection with zero new calls).
-    failing = false;
-    const dome = await loadHdr(url);
-    expect(dome).toBeTruthy();
-    const env = await loadHdr(url, { maxWidth: 512 });
-    expect(env).toBeTruthy();
-    expect(calls.length).toBe(failedCalls + 2);
-
-    // And the recovered entries cache normally again.
-    expect(await loadHdr(url)).toBe(dome);
-    expect(await loadHdr(url, { maxWidth: 512 })).toBe(env);
-    expect(calls.length).toBe(failedCalls + 2);
+    // `large` picks a fetch lane, not a cache line: a load without it must
+    // still be served the SAME texture rather than issuing a second request.
+    expect(await loadKtx2Texture(dome)).toBe(second);
+    expect(calls).toEqual([dome, dome]);
   });
 });
 

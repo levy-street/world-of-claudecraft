@@ -40,7 +40,7 @@ function cellsOwnedBy(zoneId: string, chunkSize: number): [number, number][] {
 function mockEmptyAssetLoads(): void {
   vi.doMock('../src/render/assets/loader', () => ({
     loadGltf: vi.fn(() => new Promise(() => {})),
-    loadHdr: vi.fn(() => new Promise(() => {})),
+    loadKtx2Texture: vi.fn(() => new Promise(() => {})),
     loadTexture: vi.fn(() => new Promise(() => {})),
     releaseGltf: vi.fn(),
   }));

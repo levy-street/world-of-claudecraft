@@ -76,6 +76,16 @@ COSMETIC (may be tiered down on lower presets):
   low-tier target-frame body throttle (about 10 Hz, target swap bypasses), a redraw-smoothness
   shed this list already sanctions for the portrait.
 
+- Edge anti-aliasing, and WHICH edge anti-aliasing a tier gets. High and above run the SMAA
+  tail; medium (and any mix that resolves to the grade-only chain) runs the FXAA arm fused
+  into `OutputGradePass`; low and the memory-constrained WebKit rungs run none, because they
+  have no grade pass to fuse into. All three arms filter the display-space image AFTER
+  everything a player reads has been drawn into it, and none of them removes, hides, delays,
+  or repositions anything: an aliased silhouette and an anti-aliased one carry the same
+  information at the same time. Which arm a session gets is a pure function of the STATIC
+  device policy (`gfxAaPolicy`) plus the Anti-Aliasing dial, never of the frame-budget
+  governor, so it cannot vary between two players standing in the same spot.
+
 The test for any new tier knob: if a knob hides or delays something a player READS AND REACTS
 TO, it is not allowed. If it only reduces visual richness or redraw smoothness, it is fine.
 
@@ -157,6 +167,43 @@ cosmetic surface as though it carried the read. `tests/map_terrain.test.ts` pins
 both directions, including that no pixel near the limit is drawn brighter than the water inside
 it, so the boundary cannot creep back in as decoration.
 
+### Low-tier rocks with a real collider stayed invisible (2026-08-15)
+
+Not a HUD tier this time: the same principle applies to a WORLD-scenery LOD trim, and the
+answer is that a physical collision is the sharpest form of actionable information there is,
+sharper than anything on this list so far.
+
+`src/render/foliage.ts` sheds triangle count on `GFX.leanFoliage` tiers (Low, and Medium on a
+weak integrated GPU) by randomly dropping a fraction of scatter decorations from rendering. That
+trim treated every rock the same, with no awareness that `src/sim/colliders.ts` had already given
+some of them a real physical collider (rocks at or above `ROCK_COLLIDER_MIN_SCALE`). The sim side
+is correctly tier-agnostic (the server is authoritative and knows nothing about a client's
+graphics preset), so the collider always existed; only the client's decision about what to draw
+was missing the check. A player on Low could walk into an empty-looking patch of ground and be
+stopped by a rock they could not see.
+
+The fix is a shared predicate, `decorationHasCollider` (`src/sim/decoration_dims.ts`), consumed
+by both `colliders.ts` (which already had the same check inline; it now calls the named,
+shared version instead) and a new pure core, `src/render/foliage_decimation_core.ts`
+(`survivesLeanDecimation`), which exempts any rock the predicate calls solid from the trim before
+falling back to the previous tuned keep rates for everything else. Trees carry the identical
+architectural gap (every tree/tree2 trunk gets an unconditional collider, with no size gate at
+all), but a correct fix there would exempt effectively every tree from the trim, a much larger
+triangle-count and frame-time tradeoff on the weak/software GPUs this tier targets than the rock
+fix is, so it is tracked separately rather than folded in blind: see
+levy-street/world-of-claudecraft#3415. A second, unrelated invisible-collision gap was found in
+the same review, in the Evergarden's parterre beds and garden-biome pines (a zone-curation
+exclusion, unconditional on every preset, not this tier trim), tracked at
+levy-street/world-of-claudecraft#3417.
+
+The rule this adds to the list at the top: ACTIONABLE now explicitly includes "the presence of
+any entity a player can physically collide with", not only HUD/map reads. A render-side decision
+about what to draw must never diverge from what the sim decides a player can be blocked by.
+`tests/foliage_decimation_core.test.ts` pins the predicate itself, and
+`tests/foliage_decimation_wiring.test.ts` source-scans `foliage.ts` so a future re-inlining of
+the old hash-vs-keep-rate filter (which is exactly what caused this) fails loudly instead of
+silently reopening the bug behind a green core test.
+
 ## Enforcing guards
 
 - `tests/auras_painter.test.ts`: a debuff past the buff cap still renders; an all-debuff bar
@@ -219,6 +266,15 @@ it, so the boundary cannot creep back in as decoration.
   that WON a slot, so a dropped one keeps reading through the burst. Pinned skips: a dead body,
   a frustum-culled non-actionable rig, and a cast-moment sequence for a band that is actually
   being drawn.
+- `tests/decoration_dims.test.ts`: `decorationHasCollider` classifies a rock at or above
+  `ROCK_COLLIDER_MIN_SCALE` as solid, one below it as dressing, and every tree/tree2 as solid
+  (colliders.ts gives every trunk a collider unconditionally).
+- `tests/foliage_decimation_core.test.ts`: `survivesLeanDecimation` never drops a solid rock
+  regardless of its hash draw, still decimates sub-floor dressing rocks at the tuned keep rates,
+  and leaves tree/tree2 decimation numerically unchanged.
+- `tests/foliage_decimation_wiring.test.ts`: source-scans `foliage.ts` to prove the leanFoliage
+  decoration filter actually calls `survivesLeanDecimation` and that the old bare
+  `hashAt(d.x, d.z, 83) < keep` shape has not been re-inlined.
   The band's TYPE is itself actionable, not decoration, which is why the cast-moment stand-down
   answers on any band type rather than stun alone: the `cc` archetype flashes the same yellow
   stars for every control ability, so a rooted victim would otherwise read as stunned for the

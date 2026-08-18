@@ -783,10 +783,44 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // f48c7a3a9b, the castle and icon-art batch): both parents moved renderer.ts
 // again, so the composite matches neither parent and this seal follows the
 // swept evidence bytes. No capture was retaken.
+// Re-minted again after extracting the delve interior build-cache scheduling
+// into src/render/delve_interior_tracker.ts (renderer.ts moved, no capture retaken).
+// Re-minted again for the login preview/self-spirit prewarm merge with the
+// delve interior tracker extraction. Renderer/prewarm bytes moved; captures
+// were adopted verbatim.
+// Re-minted for the sky KTX2 UASTC HDR conversion: the first-order composite
+// follows renderer.ts, then this seal follows the swept evidence bytes. No
+// capture was retaken.
+// Re-minted for the corrected PR #3446 merge: the v0.39 wrapper renderer and
+// prewarm repairs combine with the sky KTX2 renderer bytes, then this seal
+// follows the swept evidence bytes. No capture was retaken.
+// Re-minted for the vfx.mount-programs prewarm entry (#2571): the first-order
+// composite follows renderer.ts and prewarm_policy.ts, then this seal follows
+// the swept evidence bytes. No capture was retaken.
+// Re-minted for the vfx.mount-programs review fixes (scene-reparent bug,
+// honest desktop-path progress, depth compile, timeout-bounded fetch,
+// constrained-device removal): the first-order composite follows renderer.ts
+// and prewarm_policy.ts, then this seal follows the swept evidence bytes. No
+// capture was retaken.
+// Re-minted for the PR #3447 merge: the first-order composite follows the
+// combined v0.39 wrapper, corrected PR #3446 sky KTX2 renderer bytes, and
+// mount-program prewarm bytes, then this seal follows the swept evidence bytes.
+// No capture was retaken.
+// Re-minted for the moved-base v0.39 wrapper refresh: the first-order
+// composite follows the combined castle renderer bytes and v0.39 wrapper
+// bytes, then this seal follows the swept evidence bytes. No capture was
+// retaken.
+// Re-minted for the approved PR #3425 merge into the v0.39 wrapper: the
+// first-order composite follows the resolved renderer bytes, then this seal
+// follows the swept evidence bytes. No capture was retaken.
+// Re-minted after syncing current release/v0.39.0 into the v0.39 wrapper: the
+// first-order composite follows the retained self-spirit prewarm and delve
+// rebuild renderer bytes, then this seal follows the swept evidence bytes. No
+// capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '0cc85fc8a5b30d9a29ecc64785fd1ccff2509678d9eb129d5e50268faa2bc4a6';
+  '4e93793b42302a6fcb5e3dced6b2c232466331f40cc9a653d51fc262f8cdabb9';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'acf784470a62c55e7ce27e528429f7bc78f4022dc431f1efe544cc9cae2830cc';
+  '2772a342485f6158c9c05d7b2915e2535388775df9722d7a06fe68a4b412c5e4';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1789,6 +1823,35 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Re-minted for the r185 frozen-camera aim fix. The first-order composite
     // follows renderer.ts, then this second-order performance seal follows the
     // swept evidence bytes. No capture was retaken.
+    // Re-minted again after extracting the delve interior build-cache
+    // scheduling into src/render/delve_interior_tracker.ts. No capture retaken.
+    // Re-minted again for the merged prewarm and delve-tracker runtime inputs.
+    // No capture retaken.
+    // Re-minted for the vfx.mount-programs prewarm entry (#2571). The
+    // first-order composite follows renderer.ts and prewarm_policy.ts, then
+    // this second-order performance seal follows the swept evidence bytes. No
+    // capture was retaken.
+    // Re-minted for the vfx.mount-programs review fixes (scene-reparent bug,
+    // honest desktop-path progress, depth compile, timeout-bounded fetch,
+    // constrained-device removal). The first-order composite follows
+    // renderer.ts and prewarm_policy.ts, then this second-order performance
+    // seal follows the swept evidence bytes. No capture was retaken.
+    // Re-minted for the PR #3447 merge. The first-order composite follows the
+    // combined v0.39 wrapper, corrected PR #3446 sky KTX2 renderer bytes, and
+    // mount-program prewarm bytes, then this second-order performance seal
+    // follows the swept evidence bytes. No capture was retaken.
+    // Re-minted for the moved-base v0.39 wrapper refresh. The first-order
+    // composite follows the combined castle renderer bytes and v0.39 wrapper
+    // bytes, then this second-order performance seal follows the swept
+    // evidence bytes. No capture was retaken.
+    // Re-minted for the approved PR #3425 merge into the v0.39 wrapper. The
+    // first-order composite follows the resolved renderer bytes, then this
+    // second-order performance seal follows the swept evidence bytes. No
+    // capture was retaken.
+    // Re-minted after syncing current release/v0.39.0 into the v0.39 wrapper.
+    // The first-order composite follows the retained self-spirit prewarm and
+    // delve rebuild renderer bytes, then this second-order performance seal
+    // follows the swept evidence bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
@@ -1797,7 +1860,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // and the seventeenth (release/v0.39.0 tip f48c7a3a9b): this
       // second-order performance seal follows the swept evidence bytes.
       // No capture was retaken.
-    ).toBe('453956d0fad70eb9bd1d4cd7691cdfd389ffc38e286835d79fefa5b7d04f6493');
+    ).toBe('a9fa0e34745f766fd878f81e72a050f366b6e79322ec7acf6a3aea4ca8920e25');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

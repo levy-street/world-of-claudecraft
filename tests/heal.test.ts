@@ -347,6 +347,48 @@ describe('heal: healingThreat fan-out', () => {
     for (const m of [dead, friendly, ooc, empty]) expect(m.threat.has(src.id)).toBe(false);
     expect(real.threat.has(src.id)).toBe(true); // the lone qualifying mob got ALL the threat
   });
+
+  it('does not add a non-quester healer to a quest-gated mob already fighting a questing player', () => {
+    // A Broodmother egg (spider_egg, requiresQuestId q_broodmother) is already fighting
+    // the questing player. A non-quester who heals that player must not be added to the
+    // egg's hate table: healingThreat used to skip only the aggroMob/taunt/rally entry
+    // points, so a non-quester healer could still end up as the egg's threat leader and
+    // have it switch targets onto them, an opponent it will never let them damage back.
+    const sim = makeSim();
+    sim.questLog.set('q_broodmother', {
+      questId: 'q_broodmother',
+      counts: [0, 0],
+      state: 'active',
+    });
+    const tgt = sim.player; // the questing player, already fighting the egg
+    const egg = createMob(sim.nextId++, MOBS.spider_egg, 5, {
+      x: tgt.pos.x + 3,
+      y: tgt.pos.y,
+      z: tgt.pos.z,
+    });
+    egg.hostile = true;
+    egg.inCombat = true;
+    egg.threat.set(tgt.id, 10);
+    sim.addEntity(egg);
+
+    const nonQuester = addHealer(sim); // no q_broodmother quest at all
+    healingThreat(sim.ctx, nonQuester, tgt, 400);
+    expect(egg.threat.has(nonQuester.id)).toBe(false);
+
+    // A questing healer still generates threat on the same egg.
+    const secondPid = sim.addPlayer('priest', 'Quester');
+    const quester = sim.entities.get(secondPid);
+    if (!quester) throw new Error('expected second player entity');
+    const questerMeta = sim.players.get(secondPid);
+    if (!questerMeta) throw new Error('expected second player meta');
+    questerMeta.questLog.set('q_broodmother', {
+      questId: 'q_broodmother',
+      counts: [0, 0],
+      state: 'active',
+    });
+    healingThreat(sim.ctx, quester, tgt, 400);
+    expect(egg.threat.has(quester.id)).toBe(true);
+  });
 });
 
 describe('heal: threatEntryMatchesEntity', () => {

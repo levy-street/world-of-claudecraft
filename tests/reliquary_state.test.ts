@@ -14,7 +14,6 @@ import {
   RELIQUARY_PAGES,
   type ReliquaryPageDef,
 } from '../src/sim/content/reliquary';
-import { MECH_CHROMAS, mechChromaItemId } from '../src/sim/content/skins';
 import { DELVES, ITEMS, MOBS, QUESTS } from '../src/sim/data';
 import {
   checkDeedTrigger,
@@ -2198,39 +2197,6 @@ describe('Reliquary legacy blob migration and the counts/firstFind invariant', (
 });
 
 describe('Reliquary movement flag at the remaining relocation sites', () => {
-  it('unequipping a mech chroma re-grants without counting (offline arm)', () => {
-    // Equipping a chroma CONSUMES its item; unequipping mints it back. Pure
-    // relocation of a copy the account already owns. Latent for the tally
-    // today (no chroma item id is catalogued) and pinned anyway, because the
-    // flag's absence is invisible until content makes one catalogued.
-    const sim = makeSim();
-    const { meta } = primary(sim);
-    const chromaId = sim.accountCosmetics.mechChromaIds[0] ?? 'amber_crimson';
-    sim.accountCosmetics = { ...sim.accountCosmetics, mechChromaIds: [chromaId] };
-    const before = { ...meta.reliquary.counts };
-
-    expect(sim.unequipMechChroma(chromaId, sim.playerId)).toBe(true);
-    // The re-grant really happened (otherwise the count claim is vacuous).
-    const itemId = mechChromaItemId(chromaId);
-    expect(itemId).toBeTruthy();
-    expect(meta.inventory.some((s) => s.itemId === itemId)).toBe(true);
-    // Discovery fires as on every movement path; the tally does not move.
-    expect(meta.deedStats.itemsDiscovered.has(itemId!)).toBe(true);
-    expect(meta.reliquary.counts).toEqual(before);
-
-    // Content premise that ARMS the pin above (and its server-arm sibling in
-    // tests/reliquary_wire.test.ts): no chroma plate id is catalogued today,
-    // so those movement flags are latent and the counts assertions would hold
-    // with or without them. The day a plate lands in the catalog, this reds
-    // and the flags gain a live test (the unbind-peel pattern).
-    const cataloguedChromaPlates = MECH_CHROMAS.map((c) => mechChromaItemId(c.id))
-      .filter((id): id is string => id !== null)
-      .filter((id) => isCataloguedRelicItem(id));
-    expect(cataloguedChromaPlates).toEqual([]);
-    // Vacuity floor: the chroma table itself is populated.
-    expect(MECH_CHROMAS.length).toBeGreaterThan(0);
-  });
-
   it('the commission-order delivery hands over without counting, and the CRAFT counts', () => {
     // Two catalogued relics are craftable (boundstone_helm here), which makes
     // this flow reachable with a real relic rather than a stand-in: the

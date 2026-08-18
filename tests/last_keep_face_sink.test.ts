@@ -172,7 +172,7 @@ describe('the Last Keep is drawn on the ground the sim stands players on', () =>
     vi.resetModules();
     vi.doMock('../src/render/assets/loader', () => ({
       loadGltf: vi.fn(() => new Promise(() => {})),
-      loadHdr: vi.fn(() => new Promise(() => {})),
+      loadKtx2Texture: vi.fn(() => new Promise(() => {})),
       loadTexture: vi.fn(() => new Promise(() => {})),
       releaseGltf: vi.fn(),
     }));

@@ -123,10 +123,17 @@ describe('warlock low-level sustained damage tuning', () => {
     const impDps = rawPetDps('emberkin');
     const voidwalkerDps = rawPetDps('gloomshade');
 
-    expect(impDps).toBeCloseTo(13, 1);
+    expect(WARLOCK_PET_MOBS.emberkin).toMatchObject({
+      hpBase: 40,
+      hpPerLevel: 17,
+      dmgBase: 6,
+      dmgPerLevel: 1.25,
+      armorPerLevel: 12,
+    });
+    expect(impDps).toBeCloseTo(14.9, 1);
     expect(voidwalkerDps).toBeCloseTo(9.1, 1);
-    expect(voidwalkerDps / impDps).toBeLessThan(0.75);
-    expect(voidwalkerDps / impDps).toBeGreaterThan(0.65);
+    expect(voidwalkerDps / impDps).toBeLessThan(0.65);
+    expect(voidwalkerDps / impDps).toBeGreaterThan(0.55);
   });
 
   it('pins the maintenance DoTs and the Ruination Gloom Bolt capstone rank', () => {

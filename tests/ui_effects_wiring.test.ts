@@ -17,7 +17,7 @@ const hudCss = read('src/styles/hud.css');
 const applier = read('src/ui/ui_effects_applier.ts');
 const main = read('src/main.ts');
 
-describe('tokens.css - :root seeds (full-Ultra defaults) + glass low drop', () => {
+describe('tokens.css - :root seeds (full-Ultra defaults) + glass low/touch drop', () => {
   it('seeds the three --fx-* tokens to their full-effect values so calc/var reads are inert by default', () => {
     expect(tokensCss).toContain('--fx-shadow: 1;');
     expect(tokensCss).toContain('--fx-ambient-anim: running;');
@@ -31,6 +31,21 @@ describe('tokens.css - :root seeds (full-Ultra defaults) + glass low drop', () =
     const stdIdx = tokensCss.indexOf('\n    backdrop-filter: none !important;');
     expect(webkitIdx).toBeGreaterThan(-1);
     expect(stdIdx).toBeGreaterThan(webkitIdx);
+  });
+
+  it('ALSO drops glass whole-rule whenever the touch interface is up, independent of data-fx-level', () => {
+    // The touch chrome sits over the live WebGL canvas at ANY graphics preset (a
+    // compositor cost, not a 3D-tier one), so body.mobile-touch joins the same
+    // selector list as data-fx-level="low" rather than depending on it.
+    expect(tokensCss).toContain('body.mobile-touch *,');
+    expect(tokensCss).toContain('body.mobile-touch *::before,');
+    expect(tokensCss).toContain('body.mobile-touch *::after {');
+    // Both selector groups feed the SAME declaration block (one rule, not two
+    // separate ones that could drift apart in strength or ordering).
+    const dropRule = tokensCss.match(
+      /:root\[data-fx-level="low"\] \*,\s*:root\[data-fx-level="low"\] \*::before,\s*:root\[data-fx-level="low"\] \*::after,\s*body\.mobile-touch \*,\s*body\.mobile-touch \*::before,\s*body\.mobile-touch \*::after \{\s*-webkit-backdrop-filter: none !important;\s*backdrop-filter: none !important;\s*\}/,
+    );
+    expect(dropRule).not.toBeNull();
   });
 });
 

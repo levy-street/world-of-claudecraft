@@ -9,11 +9,11 @@ export interface FateThreadMarkerState {
 }
 
 export function fateThreadMarkerState(
-  entity: Pick<Entity, 'dead' | 'auras'>,
+  owner: Pick<Entity, 'dead' | 'auras'>,
   ownerId: number,
 ): FateThreadMarkerState | null {
-  if (entity.dead) return null;
-  const aura = entity.auras.find(
+  if (owner.dead) return null;
+  const aura = owner.auras.find(
     (candidate) =>
       candidate.kind === 'affliction_fate_threads' &&
       candidate.sourceId === ownerId &&
@@ -21,7 +21,7 @@ export function fateThreadMarkerState(
   );
   if (!aura) return null;
   return {
-    stacks: Math.max(0, Math.min(3, aura.stacks ?? 0)),
+    stacks: Math.max(0, Math.min(3, Math.round(aura.stacks ?? aura.value))),
     remaining: Math.max(0, aura.remaining),
     duration: Math.max(0.01, aura.duration),
   };

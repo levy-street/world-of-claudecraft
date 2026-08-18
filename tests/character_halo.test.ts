@@ -63,7 +63,6 @@ describe('class halo geometry', () => {
     };
     vi.doMock('../src/render/assets/loader', () => ({
       loadGltf: vi.fn(() => Promise.resolve(stubGltf())),
-      loadHdr: vi.fn(() => new Promise(() => undefined)),
       loadTexture: vi.fn(() => Promise.resolve(new THREE.Texture())),
       loadKtx2Texture: vi.fn(() => Promise.resolve(new THREE.Texture())),
       releaseGltf: vi.fn(),

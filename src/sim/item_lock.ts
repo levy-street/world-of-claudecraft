@@ -16,7 +16,6 @@
 // `src/sim`-pure: no DOM/render/ui/game/net imports, no rng, no clock
 // (enforced by tests/architecture.test.ts). Draws no rng.
 
-import { bagCapacity, canGrantItemInstance } from './bags';
 import { selectedInventorySlot } from './item_copy_ref';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -26,7 +25,7 @@ export interface SetItemLockedResult {
   ok: boolean;
   itemId: string;
   locked: boolean;
-  reason?: 'not_held' | 'no_bag_space';
+  reason?: 'not_held';
 }
 
 /** True when this copy is locked by its owner against salvage, profession
@@ -82,19 +81,22 @@ export function removeUnlockedFromSlots(inventory: InvSlot[], itemId: string, co
   }
 }
 
-/** The command body: lock or unlock the ONE bag copy the caller named. Mirrors
- *  the mutate-in-place recipe item_copy_ref.ts documents (rift forge/enchant
- *  apply): resolve the named slot WITHOUT consuming, refuse before anything
- *  mutates. Always requires a `slotIndex` (an id-only call is ambiguous
- *  the moment two copies of one item exist, and every caller here is a bag
- *  cell the player clicked, which always knows its own index).
+/** The command body: lock or unlock the ONE bag slot the caller named, WHOLE
+ *  (every unit the slot counts, issue: locking a stack was peeling exactly
+ *  one unit into a fresh slot, leaving the rest of the stack both unlocked
+ *  and stuck occupying a second slot). Mirrors the mutate-in-place recipe
+ *  item_copy_ref.ts documents (rift forge/enchant apply): resolve the named
+ *  slot WITHOUT consuming, refuse before anything mutates. Always requires a
+ *  `slotIndex` (an id-only call is ambiguous the moment two copies of one
+ *  item exist, and every caller here is a bag cell the player clicked, which
+ *  always knows its own index).
  *
- *  Locking a copy out of a STACKABLE slot (count > 1) splits one unit into
- *  its own fresh slot rather than tainting the whole stack (a locked payload
- *  is never mergeable, item_instance_merge.ts isMergeableInstancePayload), so
- *  it needs one free bag slot; refuses `no_bag_space` rather than silently
- *  locking the wrong quantity. Unlocking never needs capacity: it only ever
- *  shrinks a payload, never grows the slot count. */
+ *  Toggling the lock never changes `count` or the slot count, so it needs no
+ *  bag-space check either way: a locked payload is never mergeable
+ *  (item_instance_merge.ts isMergeableInstancePayload), which simply keeps a
+ *  freshly picked-up unlocked unit of the same item from silently merging
+ *  into (and inheriting the lock of) an already-locked stack; it starts its
+ *  own separate slot instead, same as any other non-mergeable payload. */
 export function setItemLocked(
   ctx: SimContext,
   itemId: string,
@@ -108,23 +110,6 @@ export function setItemLocked(
   const selected = selectedInventorySlot(meta.inventory, itemId, slotIndex);
   if (!selected) return { ok: false, itemId, locked, reason: 'not_held' };
   if (isItemLocked(selected.instance) === locked) return { ok: true, itemId, locked };
-  if (selected.count > 1) {
-    const nextInstance: ItemInstancePayload = { ...selected.instance, locked };
-    if (!canGrantItemInstance(meta.inventory, bagCapacity(meta.bags), itemId, nextInstance)) {
-      return { ok: false, itemId, locked, reason: 'no_bag_space' };
-    }
-    selected.count -= 1;
-    meta.inventory.push({
-      itemId,
-      count: 1,
-      instance: nextInstance,
-      ...(selected.craftedRecipeId === undefined
-        ? {}
-        : { craftedRecipeId: selected.craftedRecipeId }),
-    });
-    ctx.onInventoryChangedForQuests?.(meta);
-    return { ok: true, itemId, locked };
-  }
   if (!locked && selected.instance) {
     const { locked: _drop, ...rest } = selected.instance;
     selected.instance = Object.keys(rest).length > 0 ? rest : undefined;

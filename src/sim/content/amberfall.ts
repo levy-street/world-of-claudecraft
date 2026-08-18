@@ -142,7 +142,14 @@ export const AMBERFALL_MOBS: Record<string, MobTemplate> = {
     name: 'Orchard Treant',
     minLevel: 19,
     maxLevel: 20,
-    family: 'ogre',
+    // Animated wood, not a brute. It was tagged into the ogre family while that
+    // family's fallback body was a generic giant; the family now resolves to the
+    // authored ogre, and family also picks the unit-frame crest, the bestiary
+    // label, which mobs it rallies, and whether its camp tends a night brazier
+    // (FIRE_BUILDING_FAMILIES: ogres build fires, walking trees do not), so a
+    // treant reading "Ogre" was wrong on all five. Elemental, not beast: beast
+    // is tameable (TAMEABLE_FAMILIES).
+    family: 'elemental',
     hpBase: 110,
     hpPerLevel: 28,
     dmgBase: 14,

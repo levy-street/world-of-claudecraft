@@ -83,7 +83,7 @@ describe('mob portrait source manifest', () => {
   it('covers every live mob and records each render dependency with a content hash', () => {
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as PortraitSourceManifest;
     const liveIds = Object.keys(MOBS).sort();
-    expect(liveIds).toHaveLength(230);
+    expect(liveIds).toHaveLength(233);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

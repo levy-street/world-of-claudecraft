@@ -18,7 +18,6 @@ function mockGltfLoad(failFirstNCalls: number): { calls: Map<string, number> } {
       if (n <= failFirstNCalls) return Promise.reject(new Error(`transient failure: ${url}`));
       return Promise.resolve({ scene: {}, animations: [] });
     }),
-    loadHdr: vi.fn(() => new Promise(() => undefined)),
     loadTexture: vi.fn(() => Promise.resolve({})),
     loadKtx2Texture: vi.fn(() => Promise.resolve({})),
     releaseGltf: vi.fn(),

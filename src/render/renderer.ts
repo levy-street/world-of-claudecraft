@@ -15,6 +15,11 @@ import {
   CLASSES,
   DUNGEON_LIST,
   DUNGEON_X_THRESHOLD,
+  defaultDelveModules,
+  delveAt,
+  delveModuleStackEndRelZ,
+  delveOrigin,
+  delveSlotAt,
   dungeonAt,
   INSTANCE_SLOT_COUNT,
   ITEM_SETS,
@@ -212,11 +217,7 @@ import {
   warmDuskGrade,
 } from './day_night_core';
 import { shouldPlayDeedFirework } from './deed_fx_gate';
-import {
-  type DelveInteriorCtx,
-  ensureDelveInteriorsNear,
-  prebuildDelveInteriors,
-} from './delve_interior_scheduler';
+import { DelveInteriorTracker } from './delve_interior_tracker';
 import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
 import { detailHorizonStarved } from './detail_horizon_core';
 import { buildDoorBody, buildRiftGateBody, buildRiftPuzzleProp } from './door_portal';
@@ -354,6 +355,11 @@ import { buildMailboxPillar } from './mailbox';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
+import {
+  mountPrewarmKeys,
+  stageMountPrewarmVisual,
+  stageResidentMountPrewarmVisual,
+} from './mount_prewarm';
 import { mountBobY, mountVisualSpec } from './mount_visuals';
 import { NameplatePainter } from './nameplate_painter';
 import {
@@ -442,6 +448,7 @@ import {
   summarizePrewarmManifest,
 } from './prewarm_compile_lifecycle';
 import { submitPrewarmCompileUnit } from './prewarm_compile_submission_core';
+import { prewarmDepthMaterial } from './prewarm_depth_material';
 import {
   boundedPrewarmVisibility,
   runBackgroundPrewarm,
@@ -531,6 +538,7 @@ import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
 import { type SelfMotionFrame, SelfMotionPredictor, updateSelfRenderFallback } from './self_motion';
+import { SelfSpiritPrewarmer } from './self_spirit_prewarm';
 import { SentenceVfx } from './sentence_vfx';
 import { sentenceImpactPlan } from './sentence_vfx_core';
 import {
@@ -552,6 +560,7 @@ import {
   type SkyKey,
   type SkyView,
   skyBiomesAt,
+  skyResidencyTextures,
 } from './sky';
 import { zoneArrivalReady } from './sky_residency_core';
 import { SkyResidencyDriver } from './sky_residency_driver';
@@ -1780,10 +1789,17 @@ export class Renderer {
   // One shared lane for background work that touches WebGL. Idle callbacks from
   // independent zone/sky/archetype tasks can otherwise all start in one frame.
   private backgroundGpuWork = createBackgroundGpuQueue();
-  // Serial tail for spirit-puppet construction: several models resolve at once
-  // when a class is first sighted, so the builds queue behind one another and
-  // each spends its own idle slot instead of stacking into one combat frame.
   private spiritBuildLane: Promise<unknown> = Promise.resolve();
+  private selfSpirit = new SelfSpiritPrewarmer({
+    warm: () =>
+      this.backgroundGpuWork.run(
+        () => this.warmSelfSpirit(),
+        GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+        'self-spirit',
+        { releaseTail: true },
+      ),
+    idle: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS),
+  });
   // Static terrain/water/features just beyond the current zone are built in a
   // single background lane when their rectangles enter the relaxed fog
   // horizon, so a walked boundary crossing lands on already-resident ground.
@@ -2762,6 +2778,7 @@ export class Renderer {
               label: 'foliage parse cache',
               objects: foliageResidencySources().parsedScenes,
             },
+            { label: 'sky', textures: skyResidencyTextures() },
             {
               // The cost side of the KTX2 mip release: source bytes retained
               // for the context-loss re-transcode (the released mip chains
@@ -3637,11 +3654,9 @@ export class Renderer {
         for (const key of skyKeys) this.prewarmTexture(this.skyView.domeTexture(key));
         return;
       }
-      // A DataTexture upload is synchronous even from requestIdleCallback. The
-      // installed 0.185 ships native update ranges, so the idle arm row-batches
-      // the HDRI instead of paying one full upload. Either way each atomic
-      // WebGL call enters the shared queue so it cannot overlap a live shader
-      // compile.
+      // A texture upload is synchronous even from requestIdleCallback, and a
+      // CompressedTexture has no row-addressable buffer to range over, so the
+      // sky is ONE queued call rather than a DataTexture's row batches.
       await this.prewarmTextureInIdle(this.skyView.envTexture(zone.biome));
       // PMREM generation is indivisible in three (0.185 included). Defer two
       // timed-out callbacks before deliberately paying that single unit under
@@ -5591,50 +5606,6 @@ export class Renderer {
     return count;
   }
 
-  private prewarmDepthMaterial(source: THREE.Material): THREE.MeshDepthMaterial {
-    const textured = source as TextureBackedMaterial & {
-      displacementScale?: number;
-      displacementBias?: number;
-      wireframe?: boolean;
-    };
-    const shadowSide =
-      source.shadowSide ??
-      (source.side === THREE.FrontSide
-        ? THREE.BackSide
-        : source.side === THREE.BackSide
-          ? THREE.FrontSide
-          : THREE.DoubleSide);
-    const key = [
-      shadowSide,
-      textured.map ? 1 : 0,
-      textured.alphaMap ? 1 : 0,
-      source.alphaToCoverage || source.alphaTest > 0 ? 1 : 0,
-      textured.displacementMap ? 1 : 0,
-      textured.wireframe ? 1 : 0,
-    ].join('|');
-    let depth = this.prewarmDepthMaterials.get(key);
-    if (depth) return depth;
-    depth = new THREE.MeshDepthMaterial({
-      side: shadowSide,
-      map: textured.map ?? null,
-      alphaMap: textured.alphaMap ?? null,
-      alphaTest: source.alphaToCoverage ? 0.5 : source.alphaTest,
-      displacementMap: textured.displacementMap ?? null,
-      displacementScale: textured.displacementScale ?? 1,
-      displacementBias: textured.displacementBias ?? 0,
-      wireframe: textured.wireframe ?? false,
-      // Match the REAL shadow pass: three's shared shadow depth material uses
-      // RGBADepthPacking and depthPacking sits in the program cache key, so
-      // the default BasicDepthPacking linked a variant the shadow pass never
-      // draws, and every "prewarmed" caster relinked at its first shadow
-      // draw anyway (the residue probe measured all of them).
-      depthPacking: THREE.RGBADepthPacking,
-    });
-    depth.name = `prewarm-depth:${key}`;
-    this.prewarmDepthMaterials.set(key, depth);
-    return depth;
-  }
-
   /**
    * Link a root's exact live colour-program variant before a bounded upload.
    * Three chooses output colour space from the current render target in
@@ -5687,8 +5658,8 @@ export class Renderer {
       const material = mesh.material;
       swaps.push({ mesh, material });
       mesh.material = Array.isArray(material)
-        ? material.map((item) => this.prewarmDepthMaterial(item))
-        : this.prewarmDepthMaterial(material);
+        ? material.map((item) => prewarmDepthMaterial(this.prewarmDepthMaterials, item, mesh))
+        : prewarmDepthMaterial(this.prewarmDepthMaterials, material, mesh);
     });
     if (swaps.length === 0) return;
     // Match the real shadow pass's program key exactly. A bare
@@ -5723,6 +5694,33 @@ export class Renderer {
     await compilePromise;
   }
 
+  // Link the local player's own body spirit (ghost) transparent variants
+  // off-thread so a later spirit release reuses cached programs instead of
+  // linking ~20 inline on the ungated self view (the ~2.2 s death stall).
+  // Applies the ghost materials to the REAL skinned meshes (so the variant
+  // matches the flip's skinning/morph), runs compileAsync's synchronous
+  // prologue, then restores the opaque originals BEFORE awaiting the linker
+  // (the compileShadowPrograms restore-early pattern): no frame draws the ghost,
+  // and the clones the flip reuses stay cached on the visual.
+  private async warmSelfSpirit(): Promise<boolean> {
+    if (!this.asyncCompileSupported || this.sim.player.ghost) return false;
+    const visual = this.views.get(this.sim.player.id)?.visual;
+    if (!visual) return false;
+    const previousTarget = this.webgl.getRenderTarget();
+    // Composer tiers link the ghost variant against their offscreen colour space.
+    if (this.post) this.prewarmRenderTarget ??= new THREE.WebGLRenderTarget(8, 8);
+    let compilePromise: Promise<THREE.Object3D>;
+    visual.setGhost(true);
+    try {
+      this.webgl.setRenderTarget(this.post ? this.prewarmRenderTarget : null);
+      compilePromise = this.webgl.compileAsync(visual.root, this.camera, this.scene);
+    } finally {
+      this.webgl.setRenderTarget(previousTarget);
+      visual.setGhost(false);
+    }
+    await compilePromise;
+    return true;
+  }
   // A tiny throwaway target for background child uploads, so a prewarm root
   // that is briefly visible during its bounded call is never presented on
   // the canvas. Lazily built once and kept: 8x8 RGBA plus depth is negligible.
@@ -6043,6 +6041,10 @@ export class Renderer {
     let foliagePrewarmGroup: THREE.Group | null = null;
     let greatTreePrewarmGroup: THREE.Group | null = null;
     let weaponVfxPrewarmGroup: THREE.Group | null = null;
+    let mountPrewarmGroup: THREE.Group | null = null;
+    const mountPrewarmPlannedKeys = mountPrewarmKeys();
+    const mountPrewarmPendingKeys = new Set(mountPrewarmPlannedKeys);
+    let mountPrewarmWarmed = 0;
     let landmarkPrewarmGroup: THREE.Group | null = null;
     let weatherPrewarmActive = false;
     let surfaceDetailTexturesWarmed = 0;
@@ -6104,6 +6106,8 @@ export class Renderer {
       /** Explicit small units that may resume after world entry. The absence of
        * this hook is intentional: a whole manifest entry is never rerun live. */
       resumeUnits?: () => readonly PrewarmResumeUnit[];
+      /** Optional remainder for a started entry that reports partial progress. */
+      resumePartialUnits?: () => readonly PrewarmResumeUnit[];
       run: () => void | Promise<void>;
       /** Read after run(): how much of the planned work actually happened. A
        * trimmed report downgrades the entry to 'partial' (prewarm_policy.ts),
@@ -6143,6 +6147,7 @@ export class Renderer {
       ['foliage', foliagePrewarmGroup],
       ['great-tree', greatTreePrewarmGroup],
       ['weapon-vfx', weaponVfxPrewarmGroup],
+      ['mounts', mountPrewarmGroup],
       ['landmark', landmarkPrewarmGroup],
     ];
 
@@ -6415,6 +6420,10 @@ export class Renderer {
       // its counts, never 'completed'.
       const progress = entry.progress?.() ?? null;
       if (status === 'completed') status = resolvePrewarmEntryStatus(progress);
+      if (status === 'partial') {
+        const partialUnits = entry.resumePartialUnits?.() ?? [];
+        if (partialUnits.length > 0) droppedEntries.push({ id: entry.id, units: partialUnits });
+      }
       const after = this.prewarmCounts();
       const entryEnded = performance.now();
       target.push({
@@ -6456,6 +6465,7 @@ export class Renderer {
         ghostVariantPrewarmGroup,
         foliagePrewarmGroup,
         weaponVfxPrewarmGroup,
+        mountPrewarmGroup,
         landmarkPrewarmGroup,
       ]) {
         if (group) group.visible = false;
@@ -6505,6 +6515,9 @@ export class Renderer {
       // Removed, never disposed: disposing a material releases its linked
       // program, which is exactly what this group exists to warm.
       if (weaponVfxPrewarmGroup) this.scene.remove(weaponVfxPrewarmGroup);
+      // Same reason: a mount rig removed here keeps its program cached, it
+      // just stops taking a scene-graph traversal slot every frame.
+      if (mountPrewarmGroup) this.scene.remove(mountPrewarmGroup);
       if (landmarkPrewarmGroup) this.scene.remove(landmarkPrewarmGroup);
       if (weatherPrewarmActive) this.weather.endPrewarm();
       doorPrewarmGroup = null;
@@ -6522,11 +6535,26 @@ export class Renderer {
       foliagePrewarmGroup = null;
       greatTreePrewarmGroup = null;
       weaponVfxPrewarmGroup = null;
+      mountPrewarmGroup = null;
       landmarkPrewarmGroup = null;
       weatherPrewarmActive = false;
     };
 
     const settleMinPasses = this.lowGfx ? 8 : 10;
+
+    const mountPrewarmResumeUnits = (): PrewarmResumeUnit[] =>
+      [...mountPrewarmPendingKeys].map((key) => ({
+        id: `mount:${key}`,
+        run: async () => {
+          const staged = await stageMountPrewarmVisual(this.scene, mountPrewarmGroup, key);
+          if (!staged) return;
+          mountPrewarmGroup = staged.group;
+          await this.compilePrewarmColorPrograms(staged.visual.root, false);
+          await this.compileShadowPrograms(staged.visual.root);
+          mountPrewarmPendingKeys.delete(key);
+          mountPrewarmWarmed++;
+        },
+      }));
 
     const textureResumeUnits = (
       idPrefix: string,
@@ -7055,6 +7083,48 @@ export class Renderer {
             this.prewarmMaterialTextures(renderable.material);
           });
         },
+      },
+      {
+        // Rideable mounts: worn by whoever is riding one, so the FIRST
+        // sighting of any given mount links its programs the moment it
+        // appears, exactly like vfx.weapon-skins above. The runtime fallback
+        // (gateSwapFlagOnCompile at the mount-swap site, see updateEntity) is
+        // a no-op without KHR_parallel_shader_compile, so on that hardware
+        // this entry is the only mitigation there ever was (#2571). Mount
+        // GLBs are lazyPreload (characters/assets.ts): a fetch failure or a
+        // timed-out one (mount_prewarm.ts's MOUNT_PREWARM_FETCH_TIMEOUT_MS)
+        // drops only that one mount, never the whole entry.
+        //
+        // The loading-cover path stages only already-resident mount assets,
+        // then the shared programs.compile entry links both program halves
+        // for that staged group. Missing keys hand off to one explicit
+        // background resume unit per mount, where each lazy fetch has its own
+        // timeout and then self-compiles because programs.compile has already
+        // finished. progress() reports only keys actually staged or resumed,
+        // so a deadline-limited pass reports 'partial', never a false
+        // 'completed' (the failure mode resolvePrewarmEntryStatus documents).
+        id: 'vfx.mount-programs',
+        category: 'vfx',
+        priority: 63,
+        required: false,
+        resumeUnits: mountPrewarmResumeUnits,
+        resumePartialUnits: mountPrewarmResumeUnits,
+        run: async () => {
+          for (const key of mountPrewarmPlannedKeys) {
+            if (performance.now() >= buildDeadline) break;
+            const staged = stageResidentMountPrewarmVisual(this.scene, mountPrewarmGroup, key);
+            if (!staged) continue;
+            mountPrewarmGroup = staged.group;
+            mountPrewarmPendingKeys.delete(key);
+            mountPrewarmWarmed++;
+          }
+        },
+        progress: () => ({
+          done: mountPrewarmWarmed,
+          planned: mountPrewarmPlannedKeys.length,
+          trimmed: mountPrewarmPendingKeys.size > 0,
+        }),
+        detail: () => `mounts=${mountPrewarmGroup?.children.length ?? 0}`,
       },
       {
         // A 2k RGBA16F dome upload blocked a live Mirefen frame for 183ms.
@@ -8189,7 +8259,7 @@ export class Renderer {
         break;
       }
       case 'delveEntered':
-        prebuildDelveInteriors(this.delveInteriors, ev.delveId);
+        this.prebuildDelveInteriors(ev.delveId);
         break;
       case 'fishingBite': {
         // Personal bite signal (Professions 2.0): only the angler's
@@ -9350,17 +9420,14 @@ export class Renderer {
   private readonly umbralAnchorMarker = new UmbralAnchorMarker(this.groundSample);
   // The approved Maledict Eye is cosmetic: one local, non-targetable Affliction familiar.
   private readonly afflictionFamiliar = new AfflictionFamiliar();
-  // Delve module interiors build asynchronously; track in-flight keys so a
-  // per-frame ensureDelveInteriorsNear does not re-schedule a build mid-load.
-  private pendingInteriors = new Set<string>();
-  // Held once, not rebuilt per call: the near-check runs every frame inside a
-  // delve band, so a fresh literal there would allocate on the per-frame path.
-  private readonly delveInteriors: DelveInteriorCtx = {
-    dungeons: () => this.ensureDungeons(),
-    built: this.builtInteriors,
-    pending: this.pendingInteriors,
-    run: () => this.sim.delveRun,
-  };
+  // Delve module interiors build asynchronously; the tracker also retires a
+  // position's stale geometry when a new run puts a different module there
+  // (see delve_interior_tracker.ts).
+  private delveInteriors = new DelveInteriorTracker(
+    () => this.ensureDungeons(),
+    (group) => this.retireInteriorGroup(group),
+    this.builtInteriors,
+  );
   // Re-applied rift fog is keyed by the floor descriptor (seed:floorIndex) so a
   // descent (same 'rift' fogState, different palette) still refreshes the fog.
   private riftFogKey: string | null = null;
@@ -9642,6 +9709,40 @@ export class Renderer {
       : (this.scene.fog as THREE.Fog).far;
   }
 
+  /** Build every module in a delve run at its stacked z offset (parallel async). */
+  private buildAllDelveModules(
+    delveId: string,
+    slot: number,
+    origin: { x: number; z: number },
+    modules: readonly DelveModuleId[],
+  ): void {
+    this.delveInteriors.buildAll(delveId, slot, origin, modules);
+  }
+
+  /** Prebuild the full module stack when a delve run starts (offline + online). */
+  private prebuildDelveInteriors(delveId: string): void {
+    const run = this.sim.delveRun;
+    if (!run || run.delveId !== delveId || !run.modules.length) return;
+    this.buildAllDelveModules(delveId, run.slot, run.origin, run.modules as DelveModuleId[]);
+  }
+
+  private ensureDelveInteriorsNear(px: number, pz: number): void {
+    const delve = delveAt(px);
+    if (!delve) return;
+    const run = this.sim.delveRun;
+    const modules = (
+      run?.delveId === delve.id && run.modules.length ? run.modules : defaultDelveModules(delve.id)
+    ) as DelveModuleId[];
+    const slot = run?.delveId === delve.id ? run.slot : delveSlotAt(delve.index, pz, modules);
+    const origin = run?.delveId === delve.id ? run.origin : delveOrigin(delve.index, slot);
+    // Slot origins are 500u apart on z; nearest-slot heuristics mis-pick slot 1+
+    // once the player advances past module 1 (interiors build at the wrong oz).
+    if (Math.abs(px - origin.x) >= 120) return;
+    const stackEndZ = origin.z + delveModuleStackEndRelZ(modules);
+    if (pz < origin.z + DELVE_MODULE_Z_START - 30 || pz > stackEndZ) return;
+    this.buildAllDelveModules(delve.id, slot, origin, modules);
+  }
+
   // Which futuristic sky this practice bout flies: hashed off the match id so it
   // feels random and stays stable for the whole bout (a new bout, a new sky).
   private practiceSkyVariant(): number {
@@ -9738,7 +9839,7 @@ export class Renderer {
     setBiomeHazeGrade(this.dnGrade.fog);
     setBiomeHazeCamera(this.camera.position.x, this.camera.position.z);
     if (isDelvePos(px) && !inPractice) {
-      ensureDelveInteriorsNear(this.delveInteriors, px, pz);
+      this.ensureDelveInteriorsNear(px, pz);
     } else if (inside && isYumiMazePos(px)) {
       // build the Protect Yumi maze copy the player was matched into; the
       // update() call each frame lives in sync() (beacon anchors)
@@ -11160,6 +11261,17 @@ export class Renderer {
       }
       this.updateBaseVisual(e, v);
       if (!v.visual) continue;
+      // Warm the local player's own spirit variants once per distinct look, so
+      // a death spirit-release never links them inline on the ungated self view.
+      if (e.id === this.sim.player.id) {
+        this.selfSpirit.observe(
+          v.visual,
+          e.skin,
+          e.mainhandItemId,
+          e.offhandItemId,
+          e.weaponSkinId,
+        );
+      }
       if (iceBlockActivated) this.activeVisual(v)?.playEmote('wave', 1);
 
       // live skin swap: appearance changed (in-game changer or a multiplayer peer).

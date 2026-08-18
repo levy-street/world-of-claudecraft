@@ -961,17 +961,17 @@ export const vi_VN: EnTranslations = {
     "lastkeepMap": {
       "title": "{keep}: {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "Tầng Hầm",
+        "state": "Tầng Nghi Lễ",
+        "residence": "Tầng Sinh Hoạt",
+        "tower": "Tháp Canh"
       }
     },
     "dawnholdMap": {
       "title": "{keep}: {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "Tầng Vườn",
+        "solar": "Phòng Nắng"
       }
     },
     "compass": {
@@ -4847,6 +4847,7 @@ export const vi_VN: EnTranslations = {
       "mageEleJet": "Tia Nước nằm trên thanh thú cưng như một nút bấm riêng: nhấp vào đó để khóa một luồng tia lạnh lên một kẻ địch, hoặc nhấp chuột phải (chạm và giữ trên di động) để nguyên tố tự động tung chiêu bất cứ khi nào nó sẵn sàng.",
       "formsHeading": "Biến Hình",
       "formsNote": "Druid chiến đấu bằng cách đổi hình dạng. Hầu hết kỹ năng của Druid thuộc về một hình dạng riêng, nên hình bạn đang mang quyết định bạn có thể thi triển gì, và việc đổi hình tốn một chút mana. Bạn có thể đổi hình trong hoặc ngoài chiến đấu, bao nhiêu lần tùy thích.",
+      "formsAutoUnshift": "A heal or a damaging spell cast while shifted shifts you out for you. Leaving a shape that way is free and does not spend your global cooldown, so an instant spell goes off the moment you press it. Shifting back in is an ordinary ability, and still costs mana and your global cooldown.",
       "formsMoonwing": "Một Druid Moongrove có thêm một hình dạng nữa, Dạng Cú Mặt Trăng, hình dạng pháp thuật mà một Druid Cân Bằng chiến đấu trong đó. Đây là hình thú duy nhất giữ lại các phép của bạn, và đũa phép của bạn chỉ dùng được trong hình đó hoặc trong hình pháp sư bình thường.",
       "formLine": {
         "form_bear": "Dạng gánh chịu đòn: một lớp da dày, dùng Nộ Khí thay vì Mana, và tạo thêm đe dọa để kẻ địch luôn nhắm vào bạn.",
@@ -7270,6 +7271,7 @@ export const vi_VN: EnTranslations = {
       "shopMarksRequired": "Bạn cần {marks} Dấu Ấn Thám Hiểm để mua {name}.",
       "shopSealPremiumOnly": "Dấu niêm này chỉ chịu khuất phục trước bàn tay bậc thầy. Chỉ có mức cược Cao Cấp mới mở được nó.",
       "passageSealed": "Lối đi đã bị niêm phong.",
+      "enemiesRemain": "Hãy đánh bại những kẻ địch còn lại trước.",
       "moveCloserPassage": "Hãy lại gần lối đi hơn.",
       "moveCloserChest": "Hãy lại gần chiếc rương hơn.",
       "moveCloserReliquary": "Hãy lại gần hộp thánh tích hơn.",
@@ -10081,7 +10083,7 @@ export const vi_VN: EnTranslations = {
       },
       "fear": {
         "name": "Giày Vò",
-        "description": "Gieo nỗi kinh hoàng vào kẻ địch, khiến nó co rúm sợ hãi trong tối đa 8 giây. Mọi sát thương sẽ phá vỡ hiệu ứng."
+        "description": "Gieo nỗi kinh hoàng vào kẻ địch, khiến nó co rúm sợ hãi trong tối đa 5 giây. Tổng sát thương bằng 8% máu tối đa của mục tiêu sẽ phá vỡ hiệu ứng."
       },
       "searing_pain": {
         "name": "Nung Đốt",
@@ -10327,7 +10329,7 @@ export const vi_VN: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Dấu Ấn Cốt Táng",
-        "description": "Đánh dấu một kẻ địch trong 12 giây, lưu trữ 20% sát thương gây ra bởi bạn và thuộc hạ Bất Tử của bạn. Thi triển lại để kích nổ nó. Nếu kẻ địch bị đánh dấu chết, nó sẽ nổ trong bán kính 6 thước và tạo 1 Mảnh Linh Hồn."
+        "description": "Đánh dấu một kẻ địch trong 15 giây, lưu trữ 20% sát thương gây ra bởi bạn và thuộc hạ Bất Tử của bạn. Thi triển lại để kích nổ nó. Nếu kẻ địch bị đánh dấu chết, nó sẽ nổ trong bán kính 6 thước và tạo 1 Mảnh Linh Hồn."
       },
       "unholy_command": {
         "name": "Mệnh Lệnh Tà Ác",
@@ -10426,8 +10428,8 @@ export const vi_VN: EnTranslations = {
         "description": "Nhận dạng cú mặt trăng, cường hóa thi triển phép cho đến khi bạn đổi lại. Thi triển lần nữa để trở về dạng thường. (dấu ấn Cân Bằng)"
       },
       "feral_charge": {
-        "name": "Xung Phong Hoang Dã",
-        "description": "Xung phong vào kẻ địch và trói chân chúng trong 1 giây. Tầm 8-25 m. (dấu ấn Hoang Dã)"
+        "name": "Dâng Trào Nguyên Thủy",
+        "description": "Giải phóng một đợt dâng trào nguyên thủy. Trong Hình Sói, tốc độ hồi Năng Lượng tăng 100% trong 10 giây. Trong Hình Bruin, lập tức tạo 50 Nộ Khí. (dấu ấn Hoang Dã)"
       },
       "swiftmend": {
         "name": "Hồi Phục Nhanh",
@@ -10683,7 +10685,7 @@ export const vi_VN: EnTranslations = {
       },
       "evocation": {
         "name": "Giếng Ête",
-        "description": "Restaura mana rápidamente. (thiên phú pháp sư)"
+        "description": "Vận sức trong 6 giây: mỗi giây hồi 100 mana và cộng dồn 8 sức mạnh phép thuật. Hiệu ứng cộng dồn trong khi vận sức và kéo dài 15 giây. (thiên phú pháp sư)"
       },
       "flurry_of_knives": {
         "name": "Loạt Dao Xoáy",
@@ -10711,11 +10713,11 @@ export const vi_VN: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Tiếng Hú Kinh Hoàng",
-        "description": "Khiến kẻ địch ở gần sợ hãi trong tối đa 3 giây. Sát thương có thể phá hiệu ứng. (thiên phú Warlock)"
+        "description": "Khiến kẻ địch ở gần sợ hãi trong tối đa 5 giây. Tổng sát thương bằng 8% máu tối đa của mục tiêu sẽ phá vỡ nỗi sợ của nó. (thiên phú Warlock)"
       },
       "ice_block": {
         "name": "Quan Tài Lạnh",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 giây. (thiên phú pháp sư)"
+        "description": "Bao bọc bạn trong băng cứng suốt 8 giây, khiến bạn miễn nhiễm mọi sát thương. Xóa các hiệu ứng có hại thông thường đang tồn tại và ngăn các hiệu ứng khống chế thông thường mới được áp dụng. Có thể dùng khi bị choáng hoặc biến hình. Bạn không thể hành động khi bị bao bọc. Dùng lại để hủy. (pháp sư)"
       },
       "inner_focus": {
         "name": "Tâm Trí Tĩnh",
@@ -10807,7 +10809,7 @@ export const vi_VN: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Tâm Trí Tăng Tốc",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 giây. (thiên phú pháp sư)"
+        "description": "Khiến phép tiếp theo có thời gian niệm của bạn được thi triển tức thì. Kéo dài 60 giây. (thiên phú pháp sư)"
       },
       "psychic_scream": {
         "name": "Tiếng Thét Tâm Linh",
@@ -12480,7 +12482,7 @@ export const vi_VN: EnTranslations = {
         "name": "Móng Vuốt Nguyên Vẹn"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Bó Hoa Vườn Dawnhold"
       },
       "vale_wheat_seed": {
         "name": "Vale Wheat Seed"
@@ -13443,6 +13445,15 @@ export const vi_VN: EnTranslations = {
       },
       "training_dummy": {
         "name": "Hình Nộm Tập Luyện"
+      },
+      "friendly_player_dummy": {
+        "name": "Hình Nộm Người Chơi Đồng Minh"
+      },
+      "normal_boss_dummy": {
+        "name": "Hình Nộm Trùm Thường"
+      },
+      "heroic_boss_dummy": {
+        "name": "Hình Nộm Trùm Anh Hùng"
       },
       "ridge_stalker": {
         "name": "Kẻ Rình Sườn Núi"
@@ -17137,9 +17148,9 @@ export const vi_VN: EnTranslations = {
         "leaveText": "Bạn kéo cánh cửa pháo đài đóng sập lại và bước trở về với cơn gió của Drakelands."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Lâu Đài Dawnhold",
+        "enterText": "Bạn bước vào những sảnh đường ấm áp, thơm ngát hương hoa của Lâu Đài Dawnhold.",
+        "leaveText": "Bạn lách ra ngoài, trở lại bãi cỏ vườn ngập nắng."
       },
       "drowned_temple": {
         "name": "Ngôi Đền Chết Chìm",

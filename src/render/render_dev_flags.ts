@@ -12,6 +12,10 @@
 //   bladegrass  - the near-field blade-grass carpet
 //   canopy      - the canopy clump-detail layer
 //   n8ao        - the N8AO ambient-occlusion pass
+//   smaa        - the tail SMAA pass (high and above)
+//   fxaa        - the FXAA arm fused into the output grade pass (the
+//                 grade-only chain's edge AA); off leaves the grade otherwise
+//                 untouched, so it prices the extra taps on their own
 //   tmicroshadow - the terrain micro sun-shadow taps (ultra+)
 //   zonehaze    - the per-zone aerial haze field (biome_haze_field)
 //   nightlights - the night light field (night_light_field); off falls back

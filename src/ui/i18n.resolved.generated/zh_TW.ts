@@ -959,7 +959,7 @@ export const zh_TW: EnTranslations = {
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
     "lastkeepMap": {
-      "title": "{keep}: {story}",
+      "title": "{keep}：{story}",
       "story": {
         "undercroft": "地下穹室",
         "state": "正殿層",
@@ -968,7 +968,7 @@ export const zh_TW: EnTranslations = {
       }
     },
     "dawnholdMap": {
-      "title": "{keep}: {story}",
+      "title": "{keep}：{story}",
       "story": {
         "ground": "庭園層",
         "solar": "日光廳"
@@ -4847,6 +4847,7 @@ export const zh_TW: EnTranslations = {
       "mageEleJet": "水流噴射在寵物動作列上自成一個按鈕：點擊它可將一道冰寒光束鎖定在單一敵人身上，或是按右鍵（在手機上長按），讓水元素在冷卻結束後自行施放。",
       "formsHeading": "變形",
       "formsNote": "德魯伊靠變換形態作戰。大多數德魯伊技能都隸屬於某一種形態，因此你身處的形態決定了你能施放什麼，而變形本身會消耗少許法力。無論是否在戰鬥中，你都可以隨心所欲地變來變去。",
+      "formsAutoUnshift": "變身時施放治療或傷害法術會自動為你解除變身。以這種方式離開形態不消耗法力，也不占用全域冷卻，因此瞬發法術會在你按下的那一刻釋放。重新變身是普通技能，依然消耗法力並占用全域冷卻。",
       "formsMoonwing": "平衡專精的德魯伊會多獲得一種形態：梟獸形態，那是平衡德魯伊作戰時所處的施法形態。它是唯一保留你法術的動物形態，而你的魔杖也只有在它或你平常的施法形態下才能使用。",
       "formLine": {
         "form_bear": "坦克型態：厚實的皮毛、以怒氣取代法力，還有額外威脅值，好讓敵人繼續朝你揮拳。",
@@ -7270,6 +7271,7 @@ export const zh_TW: EnTranslations = {
       "shopMarksRequired": "購買 {name} 需要 {marks} 枚秘探印記。",
       "shopSealPremiumOnly": "此封印只向大師之手屈服，唯有上等投入方能開啟。",
       "passageSealed": "通道被封住了。",
+      "enemiesRemain": "先清除剩餘的敵人。",
       "moveCloserPassage": "再靠近通道一些。",
       "moveCloserChest": "再靠近寶箱一些。",
       "moveCloserReliquary": "再靠近聖物匣一些。",
@@ -10081,7 +10083,7 @@ export const zh_TW: EnTranslations = {
       },
       "fear": {
         "name": "折魂",
-        "description": "使敵人陷入恐懼並畏縮，最多持續 8 秒。任何傷害都會打破效果。"
+        "description": "使敵人陷入恐懼並畏縮，最多持續 5 秒。累計達到目標最大生命值 8% 的傷害會打破效果。"
       },
       "searing_pain": {
         "name": "焦灼",
@@ -10327,7 +10329,7 @@ export const zh_TW: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "骸骨印記",
-        "description": "為敵人標記12秒，儲存你與你的亡靈所造成傷害的20%。再次施放可將其引爆。若被標記的敵人死亡，印記會在6碼內爆炸，並產生1枚靈魂碎片。"
+        "description": "為敵人標記15秒，儲存你與你的亡靈所造成傷害的20%。再次施放可將其引爆。若被標記的敵人死亡，印記會在6碼內爆炸，並產生1枚靈魂碎片。"
       },
       "unholy_command": {
         "name": "邪穢號令",
@@ -10426,8 +10428,8 @@ export const zh_TW: EnTranslations = {
         "description": "進入梟獸形態，強化施法直到你切換回來。再次施放可返回普通形態。（平衡專精招牌）"
       },
       "feral_charge": {
-        "name": "野性衝鋒",
-        "description": "衝向敵人並使其定身1秒。8-25碼距離。（野性專精招牌）"
+        "name": "原始湧動",
+        "description": "釋放一股原始湧動。狼形態下，能量恢復速度提高100%，持續10秒。巨熊形態下，立即產生50點怒氣。（野性專精招牌）"
       },
       "swiftmend": {
         "name": "迅癒",
@@ -10683,7 +10685,7 @@ export const zh_TW: EnTranslations = {
       },
       "evocation": {
         "name": "乙太之井",
-        "description": "快速恢復法力。（法師天賦）"
+        "description": "引導6秒：每秒恢復100點法力並獲得8點法術強度，效果在引導期間疊加並持續15秒。（法師天賦）"
       },
       "flurry_of_knives": {
         "name": "刀刃亂舞",
@@ -10711,11 +10713,11 @@ export const zh_TW: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "恐懼嚎叫",
-        "description": "使附近的敵人恐懼，最多持續3秒。受到傷害可能打破該效果。（術士天賦）"
+        "description": "使附近的敵人恐懼，最多持續 5 秒。累計達到目標最大生命值 8% 的傷害會打破其恐懼。（術士天賦）"
       },
       "ice_block": {
         "name": "寒冰棺",
-        "description": "將你封入寒冰之中，吸收大量傷害，持續 8 秒。（法師天賦）"
+        "description": "將你封入堅冰8秒，使你免疫所有傷害。移除已存在的一般有害效果，並阻止新的一般控制效果施加於你。可在昏迷或變形狀態下使用。被封凍期間無法行動。再次施放可取消。（法師）"
       },
       "inner_focus": {
         "name": "靜心",
@@ -13443,6 +13445,15 @@ export const zh_TW: EnTranslations = {
       },
       "training_dummy": {
         "name": "訓練假人"
+      },
+      "friendly_player_dummy": {
+        "name": "友方玩家假人"
+      },
+      "normal_boss_dummy": {
+        "name": "普通首領假人"
+      },
+      "heroic_boss_dummy": {
+        "name": "英雄首領假人"
       },
       "ridge_stalker": {
         "name": "山脊潛獵者"

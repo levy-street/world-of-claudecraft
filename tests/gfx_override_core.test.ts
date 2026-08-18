@@ -16,6 +16,7 @@ const settings = {
   msaaSamples: 4,
   bloom: true,
   smaa: false,
+  fxaa: true,
   dynamicShadows: true,
   terrainCastShadows: true,
   shadowMap: 4096,
@@ -48,6 +49,7 @@ describe('gfx override parsing', () => {
           'msaaSamples:0',
           'bloom:0',
           'smaa:1',
+          'fxaa:0',
           'dynamicShadows:0',
           'terrainCastShadows:0',
           'shadowMap:2048',
@@ -76,6 +78,7 @@ describe('gfx override parsing', () => {
       msaaSamples: 0,
       bloom: false,
       smaa: true,
+      fxaa: false,
       dynamicShadows: false,
       terrainCastShadows: false,
       shadowMap: 2048,
@@ -163,13 +166,18 @@ describe('gfx override application', () => {
     // compensation cohort: lowPlus plus the leanFoliage medium session; see
     // gfx.ts and tests/gfx.test.ts). Its VALUE is false for every
     // desktop-default case here, only the serialized key name moves the bytes.
+    // Regenerated across the board for the `fxaa` field (edge AA fused into the
+    // output grade pass; see gfx_aa_policy_core.ts). Unlike the renames above
+    // this one moves a VALUE too: medium and the Advanced grade-only mix are
+    // the profiles the new AA policy grants it to, and low/high/ultra/insane
+    // move only by the serialized key name.
     expect(hashes).toEqual({
-      low: '006edec83b3b6a50ac1a94b74ea3db24850e1cfbb1da3f053b7a7d09c68a7ca5',
-      medium: '98315c6396e6040891566ca9847999b6338dc048cc4591545abf77a27e6cc1dc',
-      high: '02205267b8778d10f7a44cbbca2b686602f62dde95069d0b27c23534ae219ab8',
-      ultra: '8bb27a672caf9e0df5c85a6b7ed628e5fa14a0c1f96d15b2ceb5df72c8cb71e0',
-      insane: 'a7c8bf8dd913f204eda8262b53289b27e9ff2a5af534817209cc5400e8999010',
-      advanced: '738594d16e2d1233b2f3d27a9e35e798dee354c6a07d684bac28c5923437ffa2',
+      low: '49e537a97a367badeb8f9cbeb408bbb0832e886e164349eb682a0b3a128f2dcb',
+      medium: '7f724620474ca3dc4f4ffc18653a5b07ed02de35984fb65375bbd38b7d79644e',
+      high: 'eb82ae69bed246784b6db51df29edfcb928931d8174ed633c2a3eda5706bb9d1',
+      ultra: '08c271575220f6f332b4730a04a9e77be13ee1b9624eda37056f8d2660ea6c0f',
+      insane: 'f3399ea1e9439ea52e873be3decb7dc8ccbb77f04dcb28db2da2359c885d5ca0',
+      advanced: '5674b855481ede62fb55fbe0f8074d991227487bc152f6f0e8676ff94b0947e6',
     });
   });
 

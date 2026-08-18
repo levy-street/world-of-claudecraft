@@ -961,17 +961,17 @@ export const pl_PL: EnTranslations = {
     "lastkeepMap": {
       "title": "{keep}: {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "Podziemia",
+        "state": "Piętro reprezentacyjne",
+        "residence": "Piętro mieszkalne",
+        "tower": "Wieża strażnicza"
       }
     },
     "dawnholdMap": {
       "title": "{keep}: {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "Parter ogrodowy",
+        "solar": "Komnata słoneczna"
       }
     },
     "compass": {
@@ -4847,6 +4847,7 @@ export const pl_PL: EnTranslations = {
       "mageEleJet": "Strumień wody zajmuje własny przycisk na pasku zwierzęcia: kliknij go, aby zablokować spowalniającą wiązkę na jednym wrogu, albo kliknij go prawym przyciskiem (przytrzymaj dotyk na urządzeniu mobilnym), aby pozwolić żywiołakowi rzucać go samodzielnie, gdy tylko będzie gotowy.",
       "formsHeading": "Zmiana kształtu",
       "formsNote": "Druid walczy, zmieniając kształt. Większość zdolności druida należy do jednej postaci, więc to, w jakiej formie się znajdujesz, decyduje, co możesz rzucić, a przemiana kosztuje odrobinę many. Możesz przemieniać się w walce i poza nią, tak często, jak chcesz.",
+      "formsAutoUnshift": "A heal or a damaging spell cast while shifted shifts you out for you. Leaving a shape that way is free and does not spend your global cooldown, so an instant spell goes off the moment you press it. Shifting back in is an ordinary ability, and still costs mana and your global cooldown.",
       "formsMoonwing": "Druid o specjalizacji Równowaga zyskuje jeszcze jedną postać, Postać księżycowej sowy, formę rzucającego, w jakiej walczy. To jedyna zwierzęca postać, która zachowuje twoje zaklęcia, a różdżka działa tylko w niej albo w twojej zwykłej postaci rzucającego.",
       "formLine": {
         "form_bear": "Postać do tankowania: gruba skóra, wściekłość zamiast many i dodatkowe zagrożenie, dzięki któremu wrogowie wciąż atakują ciebie.",
@@ -7270,6 +7271,7 @@ export const pl_PL: EnTranslations = {
       "shopMarksRequired": "Potrzebujesz {marks} Znaków Eskapady, aby kupić: {name}.",
       "shopSealPremiumOnly": "Ta pieczęć ustępuje tylko ręce mistrza. Otworzyć ją może jedynie stawka Premium.",
       "passageSealed": "Przejście jest zapieczętowane.",
+      "enemiesRemain": "Najpierw pokonaj pozostałych wrogów.",
       "moveCloserPassage": "Podejdź bliżej przejścia.",
       "moveCloserChest": "Podejdź bliżej skrzyni.",
       "moveCloserReliquary": "Podejdź bliżej relikwiarza.",
@@ -10081,7 +10083,7 @@ export const pl_PL: EnTranslations = {
       },
       "fear": {
         "name": "Trwoga",
-        "description": "Wzbudza w przeciwniku przerażenie, zmuszając go do kulenia się przez nawet 8 sek. Każde obrażenie przerywa efekt."
+        "description": "Wzbudza w przeciwniku przerażenie, zmuszając go do kulenia się przez maksymalnie 5 sek. Obrażenia równe łącznie 8% maksymalnego zdrowia celu przerywają efekt."
       },
       "searing_pain": {
         "name": "Przypalenie",
@@ -10327,7 +10329,7 @@ export const pl_PL: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Oznacza wroga na 12 sekund, gromadząc 20% obrażeń zadanych przez ciebie i twoich nieumarłych. Rzuć ponownie, aby zdetonować znak. Jeśli oznaczony wróg umrze, znak eksploduje w promieniu 6 m i tworzy 1 Odłamek Duszy."
+        "description": "Oznacza wroga na 15 sekund, gromadząc 20% obrażeń zadanych przez ciebie i twoich nieumarłych. Rzuć ponownie, aby zdetonować znak. Jeśli oznaczony wróg umrze, znak eksploduje w promieniu 6 jardów i tworzy 1 Odłamek Duszy."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10426,8 +10428,8 @@ export const pl_PL: EnTranslations = {
         "description": "Przyjmujesz postać księżycowej sowy, wzmacniając rzucanie zaklęć do czasu powrotu. Rzuć ponownie, aby wrócić do zwykłej postaci. (specjalizacja Równowaga)"
       },
       "feral_charge": {
-        "name": "Dzika szarża",
-        "description": "Szarżujesz na wroga i unieruchamiasz go na 1 sek. Zasięg 8-25 m. (specjalizacja Dzikość)"
+        "name": "Pierwotny przypływ",
+        "description": "Wyzwalasz pierwotny przypływ. W Postaci wilka regeneracja energii wzrasta o 100% na 10 sek. W Postaci Bruina natychmiast zyskujesz 50 pkt. wściekłości. (specjalizacja Dzikość)"
       },
       "swiftmend": {
         "name": "Szybkie uzdrowienie",
@@ -10683,7 +10685,7 @@ export const pl_PL: EnTranslations = {
       },
       "evocation": {
         "name": "Studnia Eteru",
-        "description": "Restaura manę rápidamente. (talent maga)"
+        "description": "Kanalizujesz przez 6 sek.: co sekundę przywracasz 100 many i zyskujesz 8 mocy zaklęć. Premia kumuluje się podczas kanalizowania i trwa 15 sek. (talent maga)"
       },
       "flurry_of_knives": {
         "name": "Grad noży",
@@ -10711,11 +10713,11 @@ export const pl_PL: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Wycie Grozy",
-        "description": "Przeraża pobliskich wrogów na maksymalnie 3 sek. Obrażenia mogą przerwać efekt. (talent Czarnoksiężnika)"
+        "description": "Przeraża pobliskich wrogów na maksymalnie 5 sek. Obrażenia równe łącznie 8% maksymalnego zdrowia celu przerywają jego strach. (talent Czarnoksiężnika)"
       },
       "ice_block": {
         "name": "Zimna Trumna",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talent maga)"
+        "description": "Zamyka cię w litym lodzie na 8 sek., zapewniając odporność na wszystkie obrażenia. Usuwa istniejące zwykłe szkodliwe efekty i zapobiega nakładaniu nowych zwykłych efektów kontroli. Można użyć podczas ogłuszenia lub przemiany. W zamknięciu nie możesz działać. Użyj ponownie, aby anulować. (mag)"
       },
       "inner_focus": {
         "name": "Wyciszony Umysł",
@@ -10807,7 +10809,7 @@ export const pl_PL: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Pędzący Umysł",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (talent maga)"
+        "description": "Sprawia, że twoje następne zaklęcie z czasem rzucania jest natychmiastowe. Trwa 60 sek. (talent maga)"
       },
       "psychic_scream": {
         "name": "Psychiczny Krzyk",
@@ -12480,7 +12482,7 @@ export const pl_PL: EnTranslations = {
         "name": "Nieskazitelny Pazur"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Bukiecik z ogrodu zamku Dawnhold"
       },
       "vale_wheat_seed": {
         "name": "Vale Wheat Seed"
@@ -13443,6 +13445,15 @@ export const pl_PL: EnTranslations = {
       },
       "training_dummy": {
         "name": "Manekin treningowy"
+      },
+      "friendly_player_dummy": {
+        "name": "Manekin przyjaznego gracza"
+      },
+      "normal_boss_dummy": {
+        "name": "Manekin normalnego bossa"
+      },
+      "heroic_boss_dummy": {
+        "name": "Manekin heroicznego bossa"
       },
       "ridge_stalker": {
         "name": "Grzbietowy Tropiciel"
@@ -17137,9 +17148,9 @@ export const pl_PL: EnTranslations = {
         "leaveText": "Zamykasz za sobą bramę twierdzy i wracasz w wiatr Smoczych Ziem."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Zamek Dawnhold",
+        "enterText": "Wchodzisz do ciepłych, pachnących kwiatami sal zamku Dawnhold.",
+        "leaveText": "Wymykasz się z powrotem na skąpany w słońcu ogrodowy trawnik."
       },
       "drowned_temple": {
         "name": "Zatopiona Świątynia",

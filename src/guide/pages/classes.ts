@@ -389,6 +389,7 @@ function druidFormsHtml(): string {
     <section class="guide-block">
       <h2>${esc(t('guide.classPage.formsHeading'))}</h2>
       <p>${esc(t('guide.classPage.formsNote'))}</p>
+      <p>${esc(t('guide.classPage.formsAutoUnshift'))}</p>
       <ul class="guide-pet-list">${items}</ul>
       <p>${esc(t('guide.classPage.formsMoonwing'))}</p>
     </section>`;

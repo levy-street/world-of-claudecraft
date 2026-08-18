@@ -1,586 +1,580 @@
 {
- "items": [
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Characters/gltf/Barbarian.glb",
-   "out": "models/chars/barbarian.glb",
-   "type": "character",
-   "keepClips": [
-    "Idle",
-    "Walking_A",
-    "Walking_Backwards",
-    "Running_A",
-    "Running_Strafe_Left",
-    "Running_Strafe_Right",
-    "1H_Melee_Attack_Chop",
-    "1H_Melee_Attack_Slice_Diagonal",
-    "2H_Melee_Attack_Chop",
-    "Dualwield_Melee_Attack_Chop",
-    "2H_Ranged_Shoot",
-    "Block",
-    "Hit_A",
-    "Death_A",
-    "Death_A_Pose",
-    "Spellcast_Shoot",
-    "Spellcasting",
-    "Spellcast_Raise",
-    "Jump_Start",
-    "Jump_Idle",
-    "Jump_Land",
-    "Lie_Idle",
-    "Sit_Floor_Down",
-    "Sit_Floor_Idle",
-    "Interact",
-    "PickUp",
-    "Cheer",
-    "Use_Item"
-   ],
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Characters/gltf/Knight.glb",
-   "out": "models/chars/knight.glb",
-   "type": "character",
-   "keepClips": [
-    "Idle",
-    "Walking_A",
-    "Walking_Backwards",
-    "Running_A",
-    "Running_Strafe_Left",
-    "Running_Strafe_Right",
-    "1H_Melee_Attack_Chop",
-    "1H_Melee_Attack_Slice_Diagonal",
-    "2H_Melee_Attack_Chop",
-    "Dualwield_Melee_Attack_Chop",
-    "2H_Ranged_Shoot",
-    "Block",
-    "Hit_A",
-    "Death_A",
-    "Death_A_Pose",
-    "Spellcast_Shoot",
-    "Spellcasting",
-    "Spellcast_Raise",
-    "Jump_Start",
-    "Jump_Idle",
-    "Jump_Land",
-    "Lie_Idle",
-    "Sit_Floor_Down",
-    "Sit_Floor_Idle",
-    "Interact",
-    "PickUp",
-    "Cheer",
-    "Use_Item"
-   ],
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Characters/gltf/Mage.glb",
-   "out": "models/chars/mage.glb",
-   "type": "character",
-   "keepClips": [
-    "Idle",
-    "Walking_A",
-    "Walking_Backwards",
-    "Running_A",
-    "Running_Strafe_Left",
-    "Running_Strafe_Right",
-    "1H_Melee_Attack_Chop",
-    "1H_Melee_Attack_Slice_Diagonal",
-    "2H_Melee_Attack_Chop",
-    "Dualwield_Melee_Attack_Chop",
-    "2H_Ranged_Shoot",
-    "Block",
-    "Hit_A",
-    "Death_A",
-    "Death_A_Pose",
-    "Spellcast_Shoot",
-    "Spellcasting",
-    "Spellcast_Raise",
-    "Jump_Start",
-    "Jump_Idle",
-    "Jump_Land",
-    "Lie_Idle",
-    "Sit_Floor_Down",
-    "Sit_Floor_Idle",
-    "Interact",
-    "PickUp",
-    "Cheer",
-    "Use_Item"
-   ],
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Characters/gltf/Rogue.glb",
-   "out": "models/chars/rogue.glb",
-   "type": "character",
-   "keepClips": [
-    "Idle",
-    "Walking_A",
-    "Walking_Backwards",
-    "Running_A",
-    "Running_Strafe_Left",
-    "Running_Strafe_Right",
-    "1H_Melee_Attack_Chop",
-    "1H_Melee_Attack_Slice_Diagonal",
-    "2H_Melee_Attack_Chop",
-    "Dualwield_Melee_Attack_Chop",
-    "2H_Ranged_Shoot",
-    "Block",
-    "Hit_A",
-    "Death_A",
-    "Death_A_Pose",
-    "Spellcast_Shoot",
-    "Spellcasting",
-    "Spellcast_Raise",
-    "Jump_Start",
-    "Jump_Idle",
-    "Jump_Land",
-    "Lie_Idle",
-    "Sit_Floor_Down",
-    "Sit_Floor_Idle",
-    "Interact",
-    "PickUp",
-    "Cheer",
-    "Use_Item"
-   ],
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Characters/gltf/Rogue_Hooded.glb",
-   "out": "models/chars/rogue_hooded.glb",
-   "type": "character",
-   "keepClips": [
-    "Idle",
-    "Walking_A",
-    "Walking_Backwards",
-    "Running_A",
-    "Running_Strafe_Left",
-    "Running_Strafe_Right",
-    "1H_Melee_Attack_Chop",
-    "1H_Melee_Attack_Slice_Diagonal",
-    "2H_Melee_Attack_Chop",
-    "Dualwield_Melee_Attack_Chop",
-    "2H_Ranged_Shoot",
-    "Block",
-    "Hit_A",
-    "Death_A",
-    "Death_A_Pose",
-    "Spellcast_Shoot",
-    "Spellcasting",
-    "Spellcast_Raise",
-    "Jump_Start",
-    "Jump_Idle",
-    "Jump_Land",
-    "Lie_Idle",
-    "Sit_Floor_Down",
-    "Sit_Floor_Idle",
-    "Interact",
-    "PickUp",
-    "Cheer",
-    "Use_Item"
-   ],
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Skeletons-1.0/addons/kaykit_character_pack_skeletons/Characters/gltf/Skeleton_Mage.glb",
-   "out": "models/chars/skeleton_mage.glb",
-   "type": "character",
-   "keepClips": [
-    "Idle",
-    "Walking_A",
-    "Walking_Backwards",
-    "Running_A",
-    "Running_Strafe_Left",
-    "Running_Strafe_Right",
-    "1H_Melee_Attack_Chop",
-    "1H_Melee_Attack_Slice_Diagonal",
-    "2H_Melee_Attack_Chop",
-    "Dualwield_Melee_Attack_Chop",
-    "2H_Ranged_Shoot",
-    "Block",
-    "Hit_A",
-    "Death_A",
-    "Death_A_Pose",
-    "Spellcast_Shoot",
-    "Spellcasting",
-    "Spellcast_Raise",
-    "Jump_Start",
-    "Jump_Idle",
-    "Jump_Land",
-    "Lie_Idle",
-    "Sit_Floor_Down",
-    "Sit_Floor_Idle",
-    "Interact",
-    "PickUp",
-    "Cheer",
-    "Use_Item",
-    "Skeletons_Awaken_Standing",
-    "Taunt",
-    "Idle_Combat"
-   ],
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Skeletons-1.0/addons/kaykit_character_pack_skeletons/Characters/gltf/Skeleton_Minion.glb",
-   "out": "models/chars/skeleton_minion.glb",
-   "type": "character",
-   "keepClips": [
-    "Idle",
-    "Walking_A",
-    "Walking_Backwards",
-    "Running_A",
-    "Running_Strafe_Left",
-    "Running_Strafe_Right",
-    "1H_Melee_Attack_Chop",
-    "1H_Melee_Attack_Slice_Diagonal",
-    "2H_Melee_Attack_Chop",
-    "Dualwield_Melee_Attack_Chop",
-    "2H_Ranged_Shoot",
-    "Block",
-    "Hit_A",
-    "Death_A",
-    "Death_A_Pose",
-    "Spellcast_Shoot",
-    "Spellcasting",
-    "Spellcast_Raise",
-    "Jump_Start",
-    "Jump_Idle",
-    "Jump_Land",
-    "Lie_Idle",
-    "Sit_Floor_Down",
-    "Sit_Floor_Idle",
-    "Interact",
-    "PickUp",
-    "Cheer",
-    "Use_Item",
-    "Skeletons_Awaken_Standing",
-    "Taunt",
-    "Idle_Combat"
-   ],
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Skeletons-1.0/addons/kaykit_character_pack_skeletons/Characters/gltf/Skeleton_Rogue.glb",
-   "out": "models/chars/skeleton_rogue.glb",
-   "type": "character",
-   "keepClips": [
-    "Idle",
-    "Walking_A",
-    "Walking_Backwards",
-    "Running_A",
-    "Running_Strafe_Left",
-    "Running_Strafe_Right",
-    "1H_Melee_Attack_Chop",
-    "1H_Melee_Attack_Slice_Diagonal",
-    "2H_Melee_Attack_Chop",
-    "Dualwield_Melee_Attack_Chop",
-    "2H_Ranged_Shoot",
-    "Block",
-    "Hit_A",
-    "Death_A",
-    "Death_A_Pose",
-    "Spellcast_Shoot",
-    "Spellcasting",
-    "Spellcast_Raise",
-    "Jump_Start",
-    "Jump_Idle",
-    "Jump_Land",
-    "Lie_Idle",
-    "Sit_Floor_Down",
-    "Sit_Floor_Idle",
-    "Interact",
-    "PickUp",
-    "Cheer",
-    "Use_Item",
-    "Skeletons_Awaken_Standing",
-    "Taunt",
-    "Idle_Combat"
-   ],
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Skeletons-1.0/addons/kaykit_character_pack_skeletons/Characters/gltf/Skeleton_Warrior.glb",
-   "out": "models/chars/skeleton_warrior.glb",
-   "type": "character",
-   "keepClips": [
-    "Idle",
-    "Walking_A",
-    "Walking_Backwards",
-    "Running_A",
-    "Running_Strafe_Left",
-    "Running_Strafe_Right",
-    "1H_Melee_Attack_Chop",
-    "1H_Melee_Attack_Slice_Diagonal",
-    "2H_Melee_Attack_Chop",
-    "Dualwield_Melee_Attack_Chop",
-    "2H_Ranged_Shoot",
-    "Block",
-    "Hit_A",
-    "Death_A",
-    "Death_A_Pose",
-    "Spellcast_Shoot",
-    "Spellcasting",
-    "Spellcast_Raise",
-    "Jump_Start",
-    "Jump_Idle",
-    "Jump_Land",
-    "Lie_Idle",
-    "Sit_Floor_Down",
-    "Sit_Floor_Idle",
-    "Interact",
-    "PickUp",
-    "Cheer",
-    "Use_Item",
-    "Skeletons_Awaken_Standing",
-    "Taunt",
-    "Idle_Combat"
-   ],
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/sword_1handed.gltf",
-   "out": "models/weapons/sword_1handed.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/sword_2handed.gltf",
-   "out": "models/weapons/sword_2handed.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/dagger.gltf",
-   "out": "models/weapons/dagger.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/staff.gltf",
-   "out": "models/weapons/staff.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/wand.gltf",
-   "out": "models/weapons/wand.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/axe_1handed.gltf",
-   "out": "models/weapons/axe_1handed.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/axe_2handed.gltf",
-   "out": "models/weapons/axe_2handed.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/crossbow_1handed.gltf",
-   "out": "models/weapons/crossbow_1handed.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/crossbow_2handed.gltf",
-   "out": "models/weapons/crossbow_2handed.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/shield_round.gltf",
-   "out": "models/weapons/shield_round.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/shield_badge.gltf",
-   "out": "models/weapons/shield_badge.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/shield_square.gltf",
-   "out": "models/weapons/shield_square.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/quiver.gltf",
-   "out": "models/weapons/quiver.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/spellbook_open.gltf",
-   "out": "models/weapons/spellbook_open.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Skeletons-1.0/addons/kaykit_character_pack_skeletons/Assets/gltf/Skeleton_Blade.gltf",
-   "out": "models/weapons/skeleton_blade.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Skeletons-1.0/addons/kaykit_character_pack_skeletons/Assets/gltf/Skeleton_Staff.gltf",
-   "out": "models/weapons/skeleton_staff.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Skeletons-1.0/addons/kaykit_character_pack_skeletons/Assets/gltf/Skeleton_Crossbow.gltf",
-   "out": "models/weapons/skeleton_crossbow.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Skeletons-1.0/addons/kaykit_character_pack_skeletons/Assets/gltf/Skeleton_Axe.gltf",
-   "out": "models/weapons/skeleton_axe.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Skeletons-1.0/addons/kaykit_character_pack_skeletons/Assets/gltf/Skeleton_Shield_Large_A.gltf",
-   "out": "models/weapons/skeleton_shield_large_a.glb",
-   "type": "static",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/quaternius_creatures/Alpaca.glb",
-   "out": "models/creatures/alpaca.glb",
-   "type": "character",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/quaternius_creatures/Bull.glb",
-   "out": "models/creatures/bull.glb",
-   "type": "character",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/quaternius_creatures/CrabEnemy.glb",
-   "out": "models/creatures/crabenemy.glb",
-   "type": "character",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/quaternius_creatures/Demon.glb",
-   "out": "models/creatures/demon.glb",
-   "type": "character",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/quaternius_creatures/DemonAlt.glb",
-   "out": "models/creatures/demonalt.glb",
-   "type": "character",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/quaternius_creatures/DragonEvolved.glb",
-   "out": "models/creatures/dragonevolved.glb",
-   "type": "character",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/quaternius_creatures/Fox.glb",
-   "out": "models/creatures/fox.glb",
-   "type": "character",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/quaternius_creatures/Frog.glb",
-   "out": "models/creatures/frog.glb",
-   "type": "character",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/quaternius_creatures/Ghost.glb",
-   "out": "models/creatures/ghost.glb",
-   "type": "character",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/quaternius_creatures/Giant.glb",
-   "out": "models/creatures/giant.glb",
-   "type": "character",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/quaternius_creatures/GlubEvolved.glb",
-   "out": "models/creatures/glubevolved.glb",
-   "type": "character",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/quaternius_creatures/Goblin.glb",
-   "out": "models/creatures/goblin.glb",
-   "type": "character",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/quaternius_creatures/GolelingEvolved.glb",
-   "out": "models/creatures/golelingevolved.glb",
-   "type": "character",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/quaternius_creatures/Orc.glb",
-   "out": "models/creatures/orc.glb",
-   "type": "character",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/quaternius_creatures/OrcEnemy.glb",
-   "out": "models/creatures/orcenemy.glb",
-   "type": "character",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/quaternius_creatures/Spider.glb",
-   "out": "models/creatures/spider.glb",
-   "type": "character",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/quaternius_creatures/Stag.glb",
-   "out": "models/creatures/stag.glb",
-   "type": "character",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/quaternius_creatures/Tribal.glb",
-   "out": "models/creatures/tribal.glb",
-   "type": "character",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/quaternius_creatures/Velociraptor.glb",
-   "out": "models/creatures/velociraptor.glb",
-   "type": "character",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/quaternius_creatures/Wolf.glb",
-   "out": "models/creatures/wolf.glb",
-   "type": "character",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/quaternius_creatures/Yeti.glb",
-   "out": "models/creatures/yeti.glb",
-   "type": "character",
-   "maxTex": 512
-  },
-  {
-   "src": "tmp/asset_src/quaternius_creatures/YetiAlt.glb",
-   "out": "models/creatures/yetialt.glb",
-   "type": "character",
-   "maxTex": 512
-  }
- ]
+  "items": [
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Characters/gltf/Barbarian.glb",
+      "out": "models/chars/barbarian.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "Walking_A",
+        "Walking_Backwards",
+        "Running_A",
+        "Running_Strafe_Left",
+        "Running_Strafe_Right",
+        "1H_Melee_Attack_Chop",
+        "1H_Melee_Attack_Slice_Diagonal",
+        "2H_Melee_Attack_Chop",
+        "Dualwield_Melee_Attack_Chop",
+        "2H_Ranged_Shoot",
+        "Block",
+        "Hit_A",
+        "Death_A",
+        "Death_A_Pose",
+        "Spellcast_Shoot",
+        "Spellcasting",
+        "Spellcast_Raise",
+        "Jump_Start",
+        "Jump_Idle",
+        "Jump_Land",
+        "Lie_Idle",
+        "Sit_Floor_Down",
+        "Sit_Floor_Idle",
+        "Interact",
+        "PickUp",
+        "Cheer",
+        "Use_Item"
+      ],
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Characters/gltf/Knight.glb",
+      "out": "models/chars/knight.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "Walking_A",
+        "Walking_Backwards",
+        "Running_A",
+        "Running_Strafe_Left",
+        "Running_Strafe_Right",
+        "1H_Melee_Attack_Chop",
+        "1H_Melee_Attack_Slice_Diagonal",
+        "2H_Melee_Attack_Chop",
+        "Dualwield_Melee_Attack_Chop",
+        "2H_Ranged_Shoot",
+        "Block",
+        "Hit_A",
+        "Death_A",
+        "Death_A_Pose",
+        "Spellcast_Shoot",
+        "Spellcasting",
+        "Spellcast_Raise",
+        "Jump_Start",
+        "Jump_Idle",
+        "Jump_Land",
+        "Lie_Idle",
+        "Sit_Floor_Down",
+        "Sit_Floor_Idle",
+        "Interact",
+        "PickUp",
+        "Cheer",
+        "Use_Item"
+      ],
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Characters/gltf/Mage.glb",
+      "out": "models/chars/mage.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "Walking_A",
+        "Walking_Backwards",
+        "Running_A",
+        "Running_Strafe_Left",
+        "Running_Strafe_Right",
+        "1H_Melee_Attack_Chop",
+        "1H_Melee_Attack_Slice_Diagonal",
+        "2H_Melee_Attack_Chop",
+        "Dualwield_Melee_Attack_Chop",
+        "2H_Ranged_Shoot",
+        "Block",
+        "Hit_A",
+        "Death_A",
+        "Death_A_Pose",
+        "Spellcast_Shoot",
+        "Spellcasting",
+        "Spellcast_Raise",
+        "Jump_Start",
+        "Jump_Idle",
+        "Jump_Land",
+        "Lie_Idle",
+        "Sit_Floor_Down",
+        "Sit_Floor_Idle",
+        "Interact",
+        "PickUp",
+        "Cheer",
+        "Use_Item"
+      ],
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Characters/gltf/Rogue.glb",
+      "out": "models/chars/rogue.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "Walking_A",
+        "Walking_Backwards",
+        "Running_A",
+        "Running_Strafe_Left",
+        "Running_Strafe_Right",
+        "1H_Melee_Attack_Chop",
+        "1H_Melee_Attack_Slice_Diagonal",
+        "2H_Melee_Attack_Chop",
+        "Dualwield_Melee_Attack_Chop",
+        "2H_Ranged_Shoot",
+        "Block",
+        "Hit_A",
+        "Death_A",
+        "Death_A_Pose",
+        "Spellcast_Shoot",
+        "Spellcasting",
+        "Spellcast_Raise",
+        "Jump_Start",
+        "Jump_Idle",
+        "Jump_Land",
+        "Lie_Idle",
+        "Sit_Floor_Down",
+        "Sit_Floor_Idle",
+        "Interact",
+        "PickUp",
+        "Cheer",
+        "Use_Item"
+      ],
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Characters/gltf/Rogue_Hooded.glb",
+      "out": "models/chars/rogue_hooded.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "Walking_A",
+        "Walking_Backwards",
+        "Running_A",
+        "Running_Strafe_Left",
+        "Running_Strafe_Right",
+        "1H_Melee_Attack_Chop",
+        "1H_Melee_Attack_Slice_Diagonal",
+        "2H_Melee_Attack_Chop",
+        "Dualwield_Melee_Attack_Chop",
+        "2H_Ranged_Shoot",
+        "Block",
+        "Hit_A",
+        "Death_A",
+        "Death_A_Pose",
+        "Spellcast_Shoot",
+        "Spellcasting",
+        "Spellcast_Raise",
+        "Jump_Start",
+        "Jump_Idle",
+        "Jump_Land",
+        "Lie_Idle",
+        "Sit_Floor_Down",
+        "Sit_Floor_Idle",
+        "Interact",
+        "PickUp",
+        "Cheer",
+        "Use_Item"
+      ],
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Skeletons-1.0/addons/kaykit_character_pack_skeletons/Characters/gltf/Skeleton_Mage.glb",
+      "out": "models/chars/skeleton_mage.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "Walking_A",
+        "Walking_Backwards",
+        "Running_A",
+        "Running_Strafe_Left",
+        "Running_Strafe_Right",
+        "1H_Melee_Attack_Chop",
+        "1H_Melee_Attack_Slice_Diagonal",
+        "2H_Melee_Attack_Chop",
+        "Dualwield_Melee_Attack_Chop",
+        "2H_Ranged_Shoot",
+        "Block",
+        "Hit_A",
+        "Death_A",
+        "Death_A_Pose",
+        "Spellcast_Shoot",
+        "Spellcasting",
+        "Spellcast_Raise",
+        "Jump_Start",
+        "Jump_Idle",
+        "Jump_Land",
+        "Lie_Idle",
+        "Sit_Floor_Down",
+        "Sit_Floor_Idle",
+        "Interact",
+        "PickUp",
+        "Cheer",
+        "Use_Item",
+        "Skeletons_Awaken_Standing",
+        "Taunt",
+        "Idle_Combat"
+      ],
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Skeletons-1.0/addons/kaykit_character_pack_skeletons/Characters/gltf/Skeleton_Minion.glb",
+      "out": "models/chars/skeleton_minion.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "Walking_A",
+        "Walking_Backwards",
+        "Running_A",
+        "Running_Strafe_Left",
+        "Running_Strafe_Right",
+        "1H_Melee_Attack_Chop",
+        "1H_Melee_Attack_Slice_Diagonal",
+        "2H_Melee_Attack_Chop",
+        "Dualwield_Melee_Attack_Chop",
+        "2H_Ranged_Shoot",
+        "Block",
+        "Hit_A",
+        "Death_A",
+        "Death_A_Pose",
+        "Spellcast_Shoot",
+        "Spellcasting",
+        "Spellcast_Raise",
+        "Jump_Start",
+        "Jump_Idle",
+        "Jump_Land",
+        "Lie_Idle",
+        "Sit_Floor_Down",
+        "Sit_Floor_Idle",
+        "Interact",
+        "PickUp",
+        "Cheer",
+        "Use_Item",
+        "Skeletons_Awaken_Standing",
+        "Taunt",
+        "Idle_Combat"
+      ],
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Skeletons-1.0/addons/kaykit_character_pack_skeletons/Characters/gltf/Skeleton_Rogue.glb",
+      "out": "models/chars/skeleton_rogue.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "Walking_A",
+        "Walking_Backwards",
+        "Running_A",
+        "Running_Strafe_Left",
+        "Running_Strafe_Right",
+        "1H_Melee_Attack_Chop",
+        "1H_Melee_Attack_Slice_Diagonal",
+        "2H_Melee_Attack_Chop",
+        "Dualwield_Melee_Attack_Chop",
+        "2H_Ranged_Shoot",
+        "Block",
+        "Hit_A",
+        "Death_A",
+        "Death_A_Pose",
+        "Spellcast_Shoot",
+        "Spellcasting",
+        "Spellcast_Raise",
+        "Jump_Start",
+        "Jump_Idle",
+        "Jump_Land",
+        "Lie_Idle",
+        "Sit_Floor_Down",
+        "Sit_Floor_Idle",
+        "Interact",
+        "PickUp",
+        "Cheer",
+        "Use_Item",
+        "Skeletons_Awaken_Standing",
+        "Taunt",
+        "Idle_Combat"
+      ],
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Skeletons-1.0/addons/kaykit_character_pack_skeletons/Characters/gltf/Skeleton_Warrior.glb",
+      "out": "models/chars/skeleton_warrior.glb",
+      "type": "character",
+      "keepClips": [
+        "Idle",
+        "Walking_A",
+        "Walking_Backwards",
+        "Running_A",
+        "Running_Strafe_Left",
+        "Running_Strafe_Right",
+        "1H_Melee_Attack_Chop",
+        "1H_Melee_Attack_Slice_Diagonal",
+        "2H_Melee_Attack_Chop",
+        "Dualwield_Melee_Attack_Chop",
+        "2H_Ranged_Shoot",
+        "Block",
+        "Hit_A",
+        "Death_A",
+        "Death_A_Pose",
+        "Spellcast_Shoot",
+        "Spellcasting",
+        "Spellcast_Raise",
+        "Jump_Start",
+        "Jump_Idle",
+        "Jump_Land",
+        "Lie_Idle",
+        "Sit_Floor_Down",
+        "Sit_Floor_Idle",
+        "Interact",
+        "PickUp",
+        "Cheer",
+        "Use_Item",
+        "Skeletons_Awaken_Standing",
+        "Taunt",
+        "Idle_Combat"
+      ],
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/sword_1handed.gltf",
+      "out": "models/weapons/sword_1handed.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/sword_2handed.gltf",
+      "out": "models/weapons/sword_2handed.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/dagger.gltf",
+      "out": "models/weapons/dagger.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/staff.gltf",
+      "out": "models/weapons/staff.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/wand.gltf",
+      "out": "models/weapons/wand.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/axe_1handed.gltf",
+      "out": "models/weapons/axe_1handed.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/axe_2handed.gltf",
+      "out": "models/weapons/axe_2handed.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/crossbow_1handed.gltf",
+      "out": "models/weapons/crossbow_1handed.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/crossbow_2handed.gltf",
+      "out": "models/weapons/crossbow_2handed.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/shield_round.gltf",
+      "out": "models/weapons/shield_round.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/shield_badge.gltf",
+      "out": "models/weapons/shield_badge.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/shield_square.gltf",
+      "out": "models/weapons/shield_square.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/quiver.gltf",
+      "out": "models/weapons/quiver.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Adventures-1.0/addons/kaykit_character_pack_adventures/Assets/gltf/spellbook_open.gltf",
+      "out": "models/weapons/spellbook_open.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Skeletons-1.0/addons/kaykit_character_pack_skeletons/Assets/gltf/Skeleton_Blade.gltf",
+      "out": "models/weapons/skeleton_blade.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Skeletons-1.0/addons/kaykit_character_pack_skeletons/Assets/gltf/Skeleton_Staff.gltf",
+      "out": "models/weapons/skeleton_staff.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Skeletons-1.0/addons/kaykit_character_pack_skeletons/Assets/gltf/Skeleton_Crossbow.gltf",
+      "out": "models/weapons/skeleton_crossbow.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Skeletons-1.0/addons/kaykit_character_pack_skeletons/Assets/gltf/Skeleton_Axe.gltf",
+      "out": "models/weapons/skeleton_axe.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/kaykit/KayKit-Character-Pack-Skeletons-1.0/addons/kaykit_character_pack_skeletons/Assets/gltf/Skeleton_Shield_Large_A.gltf",
+      "out": "models/weapons/skeleton_shield_large_a.glb",
+      "type": "static",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_creatures/Alpaca.glb",
+      "out": "models/creatures/alpaca.glb",
+      "type": "character",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_creatures/Bull.glb",
+      "out": "models/creatures/bull.glb",
+      "type": "character",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_creatures/CrabEnemy.glb",
+      "out": "models/creatures/crabenemy.glb",
+      "type": "character",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_creatures/Demon.glb",
+      "out": "models/creatures/demon.glb",
+      "type": "character",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_creatures/DemonAlt.glb",
+      "out": "models/creatures/demonalt.glb",
+      "type": "character",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_creatures/DragonEvolved.glb",
+      "out": "models/creatures/dragonevolved.glb",
+      "type": "character",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_creatures/Fox.glb",
+      "out": "models/creatures/fox.glb",
+      "type": "character",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_creatures/Frog.glb",
+      "out": "models/creatures/frog.glb",
+      "type": "character",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_creatures/Ghost.glb",
+      "out": "models/creatures/ghost.glb",
+      "type": "character",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_creatures/GlubEvolved.glb",
+      "out": "models/creatures/glubevolved.glb",
+      "type": "character",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_creatures/Goblin.glb",
+      "out": "models/creatures/goblin.glb",
+      "type": "character",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_creatures/GolelingEvolved.glb",
+      "out": "models/creatures/golelingevolved.glb",
+      "type": "character",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_creatures/Orc.glb",
+      "out": "models/creatures/orc.glb",
+      "type": "character",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_creatures/OrcEnemy.glb",
+      "out": "models/creatures/orcenemy.glb",
+      "type": "character",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_creatures/Spider.glb",
+      "out": "models/creatures/spider.glb",
+      "type": "character",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_creatures/Stag.glb",
+      "out": "models/creatures/stag.glb",
+      "type": "character",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_creatures/Tribal.glb",
+      "out": "models/creatures/tribal.glb",
+      "type": "character",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_creatures/Velociraptor.glb",
+      "out": "models/creatures/velociraptor.glb",
+      "type": "character",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_creatures/Wolf.glb",
+      "out": "models/creatures/wolf.glb",
+      "type": "character",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_creatures/Yeti.glb",
+      "out": "models/creatures/yeti.glb",
+      "type": "character",
+      "maxTex": 512
+    },
+    {
+      "src": "tmp/asset_src/quaternius_creatures/YetiAlt.glb",
+      "out": "models/creatures/yetialt.glb",
+      "type": "character",
+      "maxTex": 512
+    }
+  ]
 }

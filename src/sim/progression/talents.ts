@@ -215,7 +215,9 @@ function recomputeTalents(ctx: SimContext, meta: PlayerMeta): void {
     cleanDruidEngineState(ctx, e, previousMods.spec, meta.talentMods.spec);
     normalizeAbilityCharges(e, meta, previousChargeCaps);
     stripOrphanedFormAuras(ctx, meta, e);
-    reconcileWarlockTalentState(ctx, e, meta);
+    if (reconcileWarlockTalentState(ctx, e, meta)) {
+      recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
+    }
   }
   // The heavy talent snapshot is wireRev-gated. Every live allocation change
   // reaches this one choke point, while character load uses the silent path in

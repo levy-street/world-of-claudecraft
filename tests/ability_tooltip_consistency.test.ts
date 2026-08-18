@@ -36,6 +36,8 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   // The Soul Stone heal fraction is SOUL_STONE_HEAL_PCT_MAX (src/sim/soulwell.ts),
   // an engine constant, not an effects-array value.
   soulwell: [25],
+  // Pact Deepened's magic reduction lives in the talent stat resolver.
+  demon_skin: [5],
   // Flash of Light's Devotion comes from the Paladin generation table, not its heal effect.
   flash_of_light: [1],
   // Lay on Hands Devotion comes from the Paladin generation table, not its heal effect.
@@ -118,6 +120,9 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   // values live in shaman_unleash_weapon.ts and shaman_spiritmend.ts rather
   // than one shared ability effect array.
   unleash_weapon: [54, 64, 30, 2, 20, 6, 75, 3, 4, 125, 8, 50],
+  // Harrow's deterministic break budget is WARLOCK_FEAR_DAMAGE_BUDGET_PCT
+  // (src/sim/combat/warlock_fear.ts), applied when the aura is created.
+  fear: [8],
   // The shared Temporal Exhaustion gate is owned by combat/haste_burst.ts.
   bloodlust: [10],
   // Divine Ascension's resource price, charge count and lifetime are owned by

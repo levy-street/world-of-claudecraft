@@ -4,10 +4,10 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ffmpegPath from 'ffmpeg-static';
-import ffprobeStatic from 'ffprobe-static';
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error scripts use the repository's untyped Node ESM convention
 import * as conformAudioModule from '../scripts/sfx/conform_audio.mjs';
+import { SFX_CONFORMANCE_FFPROBE_PATH } from '../scripts/sfx/ffmpeg_paths.mjs';
 import {
   channelProblem,
   classify,
@@ -39,6 +39,7 @@ import { PROBE_EXTENSIONS } from '../scripts/sfx/sfx_manifest_builder.mjs';
 import { UI_SFX_SPECS } from '../scripts/sfx/ui_sfx.mjs';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
+const ffprobePath = SFX_CONFORMANCE_FFPROBE_PATH;
 
 // A file already at every spec dimension.
 const AT_SPEC = { duration: 2.0, bitrate: TARGET_BITRATE, sampleRate: TARGET_SAMPLE_RATE };
@@ -155,7 +156,7 @@ describe('shared conform command', () => {
 
       const report = inspectSfxConformance(outputFile, {
         ffmpegPath,
-        ffprobePath: ffprobeStatic.path,
+        ffprobePath,
       });
       expect(report.peakDb).toBe(result.outputLevel);
       expect(report.problems.filter((problem: string) => problem.includes('dBFS'))).toEqual([]);
@@ -200,7 +201,7 @@ describe('shared conform command', () => {
     for (const spec of UI_SFX_SPECS) {
       const report = inspectSfxConformance(join(ROOT, 'public/audio/sfx', `${spec.key}.mp3`), {
         ffmpegPath,
-        ffprobePath: ffprobeStatic.path,
+        ffprobePath,
       });
       expect(report.reject, spec.key).toBe(false);
       expect(report.problems, spec.key).toEqual([]);
@@ -246,7 +247,7 @@ describe('shared conform command', () => {
 
       const source = inspectSfxConformance(inputFile, {
         ffmpegPath,
-        ffprobePath: ffprobeStatic.path,
+        ffprobePath,
       });
       expect(source.codec).toBe('aac');
       // ffmpeg's native AAC encoder approximates the requested bitrate rather than hitting it
@@ -764,7 +765,7 @@ describe('shared conform command: channel downmix', () => {
 
       const source = inspectSfxConformance(inputFile, {
         ffmpegPath,
-        ffprobePath: ffprobeStatic.path,
+        ffprobePath,
       });
       expect(source.channels).toBe(TARGET_STEREO_CHANNELS);
 
@@ -778,7 +779,7 @@ describe('shared conform command: channel downmix', () => {
 
       const conformed = inspectSfxConformance(outputFile, {
         ffmpegPath,
-        ffprobePath: ffprobeStatic.path,
+        ffprobePath,
       });
       expect(conformed.channels).toBe(TARGET_MONO_CHANNELS);
       expect(channelProblem(conformed.channels, TARGET_MONO_CHANNELS)).toBeNull();

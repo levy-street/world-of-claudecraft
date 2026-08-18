@@ -192,11 +192,14 @@ export function consumeEnchantedVictim(
 }
 
 /** Eligible for disenchant: same eligibility as plain salvage (an equippable
- *  weapon or armor piece, at least `common` quality). */
+ *  weapon, armor, or held-offhand piece, at least `common` quality). A held
+ *  offhand is equipment exactly like a weapon or armor piece (it carries
+ *  quality and requiredClass), so a copy the player's class cannot wield is
+ *  never stuck with no way to recover value from it. */
 export function isDisenchantable(def: ItemDef | undefined): boolean {
   return (
     !!def &&
-    (def.kind === 'weapon' || def.kind === 'armor') &&
+    (def.kind === 'weapon' || def.kind === 'armor' || def.kind === 'held_offhand') &&
     !!def.quality &&
     def.quality !== 'poor'
   );
@@ -294,7 +297,8 @@ export interface DisenchantResult {
   /** The typed, bind-on-trade secondary material a rare-or-better disenchant
    *  also yields (disenchant_reagents.ts typedSecondaryFor). Set only on a
    *  rare+ success whose piece has a typed material; absent on every sub-rare
-   *  success and on a rare+ piece with no typed material (jewelry). */
+   *  success and on a rare+ piece with no typed material (jewelry or a held
+   *  offhand). */
   secondaryItemId?: string;
   /** How many copies of secondaryItemId were granted: exactly 1 for a rare
    *  piece, 1 or 2 (one rng draw) for an epic/legendary piece. Set iff
@@ -421,7 +425,8 @@ export function resolveDisenchant(
   // ctx.addItemInstance with a { bindOnTrade: true } payload so a disenchant
   // windfall cannot be freely resold; the universal primary stays a plain
   // ctx.addItem (dust/essence/shard never bind). A rare+ piece with no typed
-  // material (jewelry: no armor class) yields only the primary and draws no rng.
+  // material (jewelry: no armor class; a held offhand: neither armor nor
+  // weapon) yields only the primary and draws no rng.
   let count: number;
   let secondaryCount: number | undefined;
   if (isRarePlus) {

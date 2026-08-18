@@ -116,6 +116,22 @@ describe('stable snapshot timer protocol', () => {
     }
   });
 
+  it('preserves undispellable protection from stable aura snapshots', () => {
+    const client = bareClient(1);
+    apply(client, {
+      tw: STABLE_TIMER_WIRE_VERSION,
+      time: 10,
+      self: playerWire(1, {
+        auras: [{ ...aura('fate_threads', { exp: 22 }), und: 1 }],
+      }),
+    });
+
+    expect(client.player.auras[0]).toMatchObject({
+      id: 'fate_threads',
+      undispellable: true,
+    });
+  });
+
   it('ages the nodeRespawnSeconds countdown off the stable ncd deadlines', () => {
     // The countdown read rides the same deadline set the readiness mirror
     // does: ncd { ore: 12 } at stable time 10 is a deadline, so the remaining

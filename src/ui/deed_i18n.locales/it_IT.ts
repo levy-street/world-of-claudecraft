@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  exp_dawnhold_castle: {
+    name: 'Una Porta Aperta nel Giardino',
+    desc: 'Fai visita al Castello Dawnhold e passeggia per le sue sale soleggiate del giardino.',
+  },
+  exp_the_last_keep: {
+    name: 'Le Sale Silenziose',
+    desc: "Varca le porte dell'Ultima Rocca e percorri le sue sale silenziose.",
+  },
   pvp_bg_first_capture: {
     name: 'Vessillo in Mano',
     desc: 'Cattura una bandiera ai Campi di Thornhollow.',

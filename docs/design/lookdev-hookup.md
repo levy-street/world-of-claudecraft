@@ -102,7 +102,7 @@ GradePass**. Notes:
 - Water uses the real three.js water normal maps (dual scroll + broad swell
   at distance). Low tier's Phong water gained a scrolling `normalMap`
   (clone of the swell map). Uniform additions only; renderer untouched.
-- All new textures load via `loadTexture`/`loadHdr` + `registerPreload` at
+- All new textures load via `loadTexture`/`loadKtx2Texture` + `registerPreload` at
   module import: anything constructing terrain/water/sky before
   `assetsReady()` resolves will throw with a clear message.
 

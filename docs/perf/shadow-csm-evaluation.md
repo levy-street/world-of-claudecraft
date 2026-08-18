@@ -92,6 +92,20 @@ material is
 into the four 8-bit color channels and the D24 renderbuffer only serves the
 depth test.
 
+**Superseded by three 0.185 (the shipped version since 2026-08-09).** Its
+`WebGLShadowMap` gives every non-VSM shadow target a native `DepthTexture` and
+samples it through `sampler2DShadow` (no RGBA unpack in
+`shadowmap_pars_fragment`), and its shared shadow material is a bare
+`new MeshDepthMaterial()`, i.e. the DEFAULT `BasicDepthPacking`. The memory math
+above still holds (the RGBA8 colour attachment is still allocated), but the
+packing statement does not, and it matters for the compile gate: `depthPacking`
+is part of three's program cache key, so a prewarm depth material that sets
+`RGBADepthPacking` links a program the shadow pass never draws. The factory that
+mirrors the real shadow material lives in `src/render/prewarm_depth_material.ts`
+and is pinned against three's `WebGLShadowMap` source by
+`tests/prewarm_depth_material.test.ts`; re-read three, never this paragraph, when
+the version moves again.
+
 Drivers pad a `DEPTH_COMPONENT24` renderbuffer to 32 bits per pixel in
 practice, so both attachments cost 4 bytes per texel:
 

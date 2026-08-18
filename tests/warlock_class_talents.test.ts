@@ -8,7 +8,7 @@ import { ABILITIES } from '../src/sim/content/classes';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
-import type { Entity } from '../src/sim/types';
+import { DT, type Entity } from '../src/sim/types';
 
 function rig(rows: Record<number, string>, spec = 'destruction') {
   const sim = new Sim({ seed: 73, playerClass: 'warlock', autoEquip: true });
@@ -69,7 +69,7 @@ describe('warlock class talent tree', () => {
     expect(player.auras.some((aura) => aura.id === 'sacrilegious_march')).toBe(false);
   });
 
-  it('makes Leaden Hex a 15% maximum snare followed by a 1.5 sec root', () => {
+  it('makes Leaden Hex a 15% maximum snare followed by a 3.5 sec root', () => {
     const { sim, player } = rig({ 8: 'wlk_r8_curse_of_exhaustion' });
     const target = addTarget(sim);
 
@@ -84,7 +84,7 @@ describe('warlock class talent tree', () => {
     expect(target.auras.some((aura) => aura.id === 'wlk_leaden_hex_slow')).toBe(false);
     expect(target.auras.find((aura) => aura.id === 'wlk_leaden_hex_root')).toMatchObject({
       kind: 'root',
-      remaining: 1.5,
+      remaining: 3.5,
     });
     expect(target.auras.find((aura) => aura.id === 'wlk_leaden_hex_root_lock')).toMatchObject({
       kind: 'internal_cd',
@@ -130,6 +130,9 @@ describe('warlock class talent tree', () => {
   });
 
   it('makes Pact Deepened double Fiendhide armor', () => {
+    expect(ABILITIES.demon_skin.description).toContain(
+      'Pact Deepened can double this armor and reduce magic damage taken while Fiendhide is active',
+    );
     const base = rig({});
     const deepened = rig({ 11: 'wlk_r11_improved_life_tap' });
     const baseArmor = base.player.stats.armor;
@@ -140,6 +143,11 @@ describe('warlock class talent tree', () => {
 
     expect(base.player.stats.armor - baseArmor).toBe(80);
     expect(deepened.player.stats.armor - deepenedArmor).toBe(160);
+    expect(base.player.auras.find((aura) => aura.id === 'demon_skin')?.value2).toBeUndefined();
+    expect(deepened.player.auras.find((aura) => aura.id === 'demon_skin')).toMatchObject({
+      value: 160,
+      value2: 0.05,
+    });
   });
 
   it('makes Pact Deepened reduce magic damage by 5% only while Fiendhide is active', () => {
@@ -158,6 +166,35 @@ describe('warlock class talent tree', () => {
     player.hp = hpBefore;
     dealDamage(sim.ctx, source, player, 100, false, 'physical', 'Test Strike', 'hit');
     expect(player.hp).toBe(hpBefore - 100);
+  });
+
+  it('keeps an active Fiendhide aura synchronized when Pact Deepened changes', () => {
+    const { sim, player } = rig({});
+    const baseArmor = player.stats.armor;
+    sim.castAbility('demon_skin');
+    expect(player.auras.find((aura) => aura.id === 'demon_skin')).toMatchObject({
+      value: 80,
+      value2: undefined,
+    });
+
+    expect(
+      sim.applyTalents({
+        spec: 'destruction',
+        rows: { 11: 'wlk_r11_improved_life_tap' },
+      }),
+    ).toBe(true);
+    expect(player.auras.find((aura) => aura.id === 'demon_skin')).toMatchObject({
+      value: 160,
+      value2: 0.05,
+    });
+    expect(player.stats.armor - baseArmor).toBe(160);
+
+    expect(sim.applyTalents({ spec: 'destruction', rows: {} })).toBe(true);
+    expect(player.auras.find((aura) => aura.id === 'demon_skin')).toMatchObject({
+      value: 80,
+      value2: undefined,
+    });
+    expect(player.stats.armor - baseArmor).toBe(80);
   });
 
   it('awards one or two Shadow Credit charges from real specialization spending', () => {
@@ -191,6 +228,19 @@ describe('warlock class talent tree', () => {
     tick(sim, 20);
     expect(player.cooldowns.get('umbral_anchor')).toBeCloseTo(8.5);
     expect(player.cooldowns.get('hex_of_violence')).toBeCloseTo(8.5);
+  });
+
+  it('reduces Possess the Evil Eye and Hour of Judgment while casting', () => {
+    const { sim, player } = rig({ 20: 'wlk_r20_chaos_bolt' }, 'affliction');
+    addTarget(sim);
+    player.cooldowns.set('possess_evil_eye', 10);
+    player.cooldowns.set('hour_of_judgment', 10);
+
+    sim.castAbility('needle_of_fate');
+    tick(sim, 20);
+
+    expect(player.cooldowns.get('possess_evil_eye')).toBeCloseTo(8.5);
+    expect(player.cooldowns.get('hour_of_judgment')).toBeCloseTo(8.5);
   });
 
   it('includes specialization signatures in Unbroken Ritual', () => {
@@ -305,6 +355,7 @@ describe('warlock class talent tree', () => {
     const hpBefore = target.hp;
     sim.castAbility('abyssal_rift', undefined, center);
     expect(target.hp).toBeLessThan(hpBefore);
+    expect(player.cooldowns.get('abyssal_rift')).toBe(45);
     expect(Math.hypot(target.pos.x - center.x, target.pos.z - center.z)).toBeLessThan(
       beforeDistance,
     );
@@ -312,6 +363,27 @@ describe('warlock class talent tree', () => {
       kind: 'stun',
       remaining: 2,
     });
+
+    player.gcdRemaining = 0;
+    player.resource = player.maxResource;
+    const hpDuringCooldown = target.hp;
+    sim.castAbility('abyssal_rift', undefined, center);
+    expect(target.hp).toBe(hpDuringCooldown);
+
+    target.hostile = false;
+    player.maxHp = player.hp = 1_000_000;
+    tick(sim, 20 * 45 - 1);
+    expect(player.cooldowns.get('abyssal_rift')).toBeGreaterThan(0);
+    tick(sim, 1);
+    expect(player.cooldowns.get('abyssal_rift')).toBeLessThan(DT);
+    tick(sim, 1);
+    expect(player.cooldowns.has('abyssal_rift')).toBe(false);
+
+    target.hostile = true;
+    player.gcdRemaining = 0;
+    player.resource = player.maxResource;
+    sim.castAbility('abyssal_rift', undefined, center);
+    expect(player.cooldowns.get('abyssal_rift')).toBe(45);
   });
 
   it('damages bosses with Abyssal Rift without pulling or stunning them', () => {

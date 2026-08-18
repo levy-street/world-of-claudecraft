@@ -961,17 +961,17 @@ export const it_IT: EnTranslations = {
     "lastkeepMap": {
       "title": "{keep}: {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "I sotterranei",
+        "state": "Il piano nobile",
+        "residence": "La residenza",
+        "tower": "La torre di guardia"
       }
     },
     "dawnholdMap": {
       "title": "{keep}: {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "Il piano del giardino",
+        "solar": "La sala del sole"
       }
     },
     "compass": {
@@ -4847,6 +4847,7 @@ export const it_IT: EnTranslations = {
       "mageEleJet": "Getto d'Acqua compare sulla barra del famiglio come pulsante a sé stante: cliccalo per bloccare un raggio gelido su un nemico, oppure fai clic destro su di esso (tocca e tieni premuto su mobile) per lasciare che l'elementale lo lanci da solo ogni volta che è pronto.",
       "formsHeading": "Trasformazioni",
       "formsNote": "Un druido combatte cambiando forma. La maggior parte delle abilità del druido appartiene a una forma specifica, quindi la forma in cui ti trovi decide cosa puoi lanciare, e trasformarti costa un po' di mana. Puoi trasformarti dentro o fuori dal combattimento, tutte le volte che vuoi.",
+      "formsAutoUnshift": "A heal or a damaging spell cast while shifted shifts you out for you. Leaving a shape that way is free and does not spend your global cooldown, so an instant spell goes off the moment you press it. Shifting back in is an ordinary ability, and still costs mana and your global cooldown.",
       "formsMoonwing": "Un druido di Equilibrio ottiene una forma in più, la Forma di Lunagufo, la forma da incantatore in cui combatte questa specializzazione. È l'unica forma animale che conserva i tuoi incantesimi, e la tua bacchetta funziona solo con essa o con la tua normale forma da incantatore.",
       "formLine": {
         "form_bear": "La forma da tank: una pelle spessa, rabbia al posto del mana, e minaccia extra così i nemici continuano ad attaccarti.",
@@ -7270,6 +7271,7 @@ export const it_IT: EnTranslations = {
       "shopMarksRequired": "Ti servono {marks} Sigilli d'Incursione per comprare {name}.",
       "shopSealPremiumOnly": "Questo sigillo cede solo alla mano di un maestro: solo la puntata Pregiata può aprirlo.",
       "passageSealed": "Il passaggio è sigillato.",
+      "enemiesRemain": "Elimina prima i nemici rimasti.",
       "moveCloserPassage": "Avvicinati al passaggio.",
       "moveCloserChest": "Avvicinati allo scrigno.",
       "moveCloserReliquary": "Avvicinati al reliquiario.",
@@ -10081,7 +10083,7 @@ export const it_IT: EnTranslations = {
       },
       "fear": {
         "name": "Tormento",
-        "description": "Terrorizza il nemico, lasciandolo tremante per un massimo di 8 s. Qualsiasi danno interrompe l'effetto."
+        "description": "Terrorizza il nemico, lasciandolo tremante per un massimo di 5 s. I danni pari in totale all'8% della salute massima del bersaglio interrompono l'effetto."
       },
       "searing_pain": {
         "name": "Bruciatura",
@@ -10327,7 +10329,7 @@ export const it_IT: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Marchia un nemico per 12 sec, accumulando il 20% dei danni inflitti da te e dai tuoi non morti. Rilancia per farlo detonare. Se il nemico marchiato muore, esplode entro 6 metri e crea 1 Frammento d'Anima."
+        "description": "Marchia un nemico per 15 sec, accumulando il 20% dei danni inflitti da te e dai tuoi non morti. Rilancia per farlo detonare. Se il nemico marchiato muore, esplode entro 6 metri e crea 1 Frammento d'Anima."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10426,8 +10428,8 @@ export const it_IT: EnTranslations = {
         "description": "Assume Forma di Lunagufo, potenziando il lancio di incantesimi finché non cambi di nuovo. Lancia ancora per tornare alla forma normale. (firma Equilibrio)"
       },
       "feral_charge": {
-        "name": "Carica Ferina",
-        "description": "Carica un nemico e lo immobilizza per 1 s. Portata 8-25 m. (firma Aggressore Ferino)"
+        "name": "Impeto Primordiale",
+        "description": "Scatena un impeto primordiale. In Forma del Lupo, la rigenerazione dell’energia aumenta del 100% per 10 s. In Forma di Bruin, genera istantaneamente 50 rabbia. (firma Aggressore Ferino)"
       },
       "swiftmend": {
         "name": "Rapidità di Guarigione",
@@ -10683,7 +10685,7 @@ export const it_IT: EnTranslations = {
       },
       "evocation": {
         "name": "Pozzo d’Etere",
-        "description": "Restaura mana rápidamente. (talento da mago)"
+        "description": "Canalizza per 6 s: ogni secondo ripristina 100 mana e accumula 8 potere magico. Il bonus si accumula durante la canalizzazione e dura 15 s. (talento da mago)"
       },
       "flurry_of_knives": {
         "name": "Raffica di coltelli",
@@ -10711,11 +10713,11 @@ export const it_IT: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Ululato del Terrore",
-        "description": "Terrorizza i nemici vicini per un massimo di 3 sec. I danni possono interrompere l’effetto. (talento dello Stregone)"
+        "description": "Terrorizza i nemici vicini per un massimo di 5 sec. I danni pari in totale all'8% della salute massima del bersaglio interrompono la sua paura. (talento dello Stregone)"
       },
       "ice_block": {
         "name": "Bara Fredda",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talento da mago)"
+        "description": "Ti racchiude nel ghiaccio solido per 8 s, rendendoti immune a tutti i danni. Rimuove gli effetti dannosi comuni già attivi e impedisce l’applicazione di nuovi effetti di controllo comuni. Utilizzabile mentre sei stordito o trasformato. Non puoi agire mentre sei racchiuso. Lancia di nuovo per annullare. (mago)"
       },
       "inner_focus": {
         "name": "Mente Quietata",
@@ -10807,7 +10809,7 @@ export const it_IT: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Mente Rapida",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (talento da mago)"
+        "description": "Rende istantaneo il prossimo incantesimo con tempo di lancio. Dura 60 s. (talento da mago)"
       },
       "psychic_scream": {
         "name": "Urlo Psichico",
@@ -12480,7 +12482,7 @@ export const it_IT: EnTranslations = {
         "name": "Artiglio Immacolato"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Mazzolino del giardino di Dawnhold"
       },
       "vale_wheat_seed": {
         "name": "Vale Wheat Seed"
@@ -13443,6 +13445,15 @@ export const it_IT: EnTranslations = {
       },
       "training_dummy": {
         "name": "Manichino d'allenamento"
+      },
+      "friendly_player_dummy": {
+        "name": "Manichino di giocatore alleato"
+      },
+      "normal_boss_dummy": {
+        "name": "Manichino di boss normale"
+      },
+      "heroic_boss_dummy": {
+        "name": "Manichino di boss eroico"
       },
       "ridge_stalker": {
         "name": "Braccatore della cresta"
@@ -17137,9 +17148,9 @@ export const it_IT: EnTranslations = {
         "leaveText": "Chiudi il portone della rocca e torni nel vento delle Drakelands."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Castello Dawnhold",
+        "enterText": "Metti piede nelle sale calde e profumate di fiori del Castello Dawnhold.",
+        "leaveText": "Esci di nuovo sul prato soleggiato del giardino."
       },
       "drowned_temple": {
         "name": "Il Tempio Annegato",

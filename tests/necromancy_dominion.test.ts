@@ -27,7 +27,7 @@ describe('Necromancy Dominion composition', () => {
     ).toEqual(['necromancy_gravewing']);
   });
 
-  it('sacrifices Bone Mage before Warrior and protects Gravewing for last', () => {
+  it('sacrifices Skeletal Warrior before Bone Mage and protects Gravewing for last', () => {
     const warrior = {
       id: 8,
       templateId: 'necromancy_skeletal_warrior',
@@ -48,8 +48,8 @@ describe('Necromancy Dominion composition', () => {
       despawnTimer: 3,
     };
 
-    expect(selectCorpseExplosionServant([warrior, mage, expiringGravewing])).toBe(mage);
-    expect(selectCorpseExplosionServant([warrior, expiringGravewing])).toBe(warrior);
+    expect(selectCorpseExplosionServant([warrior, mage, expiringGravewing])).toBe(warrior);
+    expect(selectCorpseExplosionServant([mage, expiringGravewing])).toBe(mage);
     expect(selectCorpseExplosionServant([expiringGravewing])).toBe(expiringGravewing);
   });
 

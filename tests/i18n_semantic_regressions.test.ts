@@ -20,6 +20,7 @@ import { tr_TR } from '../src/ui/i18n.locales/tr_TR';
 import { vi_VN } from '../src/ui/i18n.locales/vi_VN';
 import { zh_CN } from '../src/ui/i18n.locales/zh_CN';
 import { zh_TW } from '../src/ui/i18n.locales/zh_TW';
+import { pending, translations } from '../src/ui/i18n.resolved.generated';
 
 const locales: Record<string, Partial<Record<TranslationKey, string>>> = {
   cs_CZ,
@@ -46,6 +47,10 @@ function translation(locale: string, key: TranslationKey): string {
   const value = locales[locale]?.[key];
   if (typeof value !== 'string') throw new Error(`${locale} is missing ${key}`);
   return value;
+}
+
+function expectStandaloneNumber(value: string, n: number) {
+  expect(value).toMatch(new RegExp(`(^|\\D)${n}(\\D|$)`));
 }
 
 describe('reviewed localization semantics', () => {
@@ -155,6 +160,44 @@ describe('reviewed localization semantics', () => {
 
   it('pl_PL labels a heroic item rather than heroic mode', () => {
     expect(translation('pl_PL', 'hudChrome.itemHeroicTag')).toBe('[HEROICZNY]');
+  });
+
+  it('resolved Warlock control tooltips describe the current duration and break mechanics', () => {
+    const reviewedKeys: TranslationKey[] = [
+      'entities.abilities.fear.description',
+      'entities.abilities.howl_of_terror.description',
+      'entities.abilities.ossuary_mark.description',
+    ];
+    const localeNames = Object.keys(translations).filter(
+      (lang) => lang !== 'en' && lang !== 'en_CA',
+    );
+
+    for (const lang of localeNames) {
+      const table = translations[lang as keyof typeof translations];
+      const harrow = table.entities.abilities.fear.description;
+      const dreadChorus = table.entities.abilities.howl_of_terror.description;
+      const ossuaryMark = table.entities.abilities.ossuary_mark.description;
+
+      expectStandaloneNumber(harrow, 5);
+      expect(harrow, `${lang} Harrow break threshold`).toMatch(/8\s?%|%\s?8/);
+      expect(harrow, `${lang} Harrow old duration`).not.toMatch(
+        /(^|\D)8\s*(s|sec|sek|秒|초|giây)/i,
+      );
+
+      expectStandaloneNumber(dreadChorus, 5);
+      expect(dreadChorus, `${lang} Dread Chorus break threshold`).toMatch(/8\s?%|%\s?8/);
+      expect(dreadChorus, `${lang} Dread Chorus old duration`).not.toMatch(/(^|\D)3(\D|$)/);
+
+      expectStandaloneNumber(ossuaryMark, 15);
+      expect(ossuaryMark, `${lang} Ossuary Mark storage`).toMatch(/20\s?%|%\s?20/);
+      expect(ossuaryMark, `${lang} Ossuary Mark old duration`).not.toMatch(/(^|\D)12(\D|$)/);
+
+      for (const key of reviewedKeys) {
+        expect(pending[lang as keyof typeof pending] ?? [], `${lang} ${key} pending`).not.toContain(
+          key,
+        );
+      }
+    }
   });
 
   const warriorTooltipTerms: Record<string, { group: string; damage: string }> = {

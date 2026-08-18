@@ -6,6 +6,7 @@ export const PERF_ATTRIB_KNOB_CASES = [
   { knob: 'msaaSamples', gfxo: 'msaaSamples:0' },
   { knob: 'bloom', gfxo: 'bloom:0' },
   { knob: 'smaa', gfxo: 'smaa:0' },
+  { knob: 'fxaa', gfxo: 'fxaa:0' },
   { knob: 'dynamicShadows', gfxo: 'dynamicShadows:0' },
   { knob: 'terrainCastShadows', gfxo: 'terrainCastShadows:0' },
   { knob: 'shadowMap', gfxo: 'shadowMap:2048' },

@@ -281,7 +281,7 @@ exit "\${SHIM_FLOCK_EXIT:-0}"
   writeFileSync(join(dir, 'flock'), flockShim);
   chmodSync(join(dir, 'flock'), 0o755);
   const timeoutShim = `#!/usr/bin/env node
-const { spawn } = require('node:child_process');
+import { spawn } from 'node:child_process';
 const args = process.argv.slice(2);
 if (args[0] === '-k') args.splice(0, 2);
 const seconds = Number(args.shift());

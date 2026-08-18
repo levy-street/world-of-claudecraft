@@ -11,9 +11,22 @@ const insaneInput: PostPlanInput = {
   aoFullRes: true,
   bloom: true,
   smaa: true,
+  fxaa: false,
   n8aoDisabled: false,
   smaaDisabled: false,
+  fxaaDisabled: false,
   isWebGL2: true,
+  msaaSamples: 0,
+};
+
+const mediumInput: PostPlanInput = {
+  ...insaneInput,
+  gradeOnly: true,
+  ao: false,
+  aoFullRes: false,
+  bloom: false,
+  smaa: true,
+  fxaa: true,
   msaaSamples: 0,
 };
 
@@ -163,6 +176,7 @@ describe('post pipeline plan', () => {
       aoScale: null,
     });
     expect(plan.composerPasses).toEqual(['render', 'output-grade']);
+    expect(plan.gradeFxaa).toBe(false);
     expect(plan.singleComposerBuffer).toBe(true);
     expect(plan.supportsDynamicResolution).toBe(true);
     expect(plan.renderTargets).toEqual([
@@ -183,6 +197,41 @@ describe('post pipeline plan', () => {
       },
     ]);
     expect(plan.resolveCount).toBe(0);
+  });
+
+  it('gives the medium grade pass its FXAA arm without spending a pass or a target', () => {
+    const plain = postPipelinePlan({ ...mediumInput, fxaa: false });
+    const antialiased = postPipelinePlan(mediumInput);
+
+    expect(antialiased.gradeFxaa).toBe(true);
+    // The whole point of fusing it: the region contract is untouched, so the
+    // reduced-resolution region survives.
+    expect(antialiased.supportsDynamicResolution).toBe(true);
+    // Everything else about the chain is byte for byte the plain grade chain.
+    expect({ ...antialiased, gradeFxaa: false }).toEqual(plain);
+  });
+
+  it('keeps the fused FXAA on the grade-only chain and off every composer chain', () => {
+    // Beside the SMAA tail it would double-resolve the same image; and on a
+    // composer chain the grade writes an intermediate that ScreenFx re-aliases
+    // after it, so the arm would land before the pass that undoes it. Both are
+    // refused structurally here rather than left to the AA policy.
+    const withTail = postPipelinePlan({ ...insaneInput, fxaa: true, smaa: true });
+    expect(withTail.composerPasses).toContain('smaa');
+    expect(withTail.gradeFxaa).toBe(false);
+
+    const noTail = postPipelinePlan({ ...insaneInput, fxaa: true, smaa: false });
+    expect(noTail.composerPasses).toEqual(['n8ao', 'bloom', 'output-grade', 'screen-fx']);
+    expect(noTail.gradeFxaa).toBe(false);
+  });
+
+  it('drops the fused FXAA for the perf-attribution kill switch and nothing else', () => {
+    const plan = postPipelinePlan({ ...mediumInput, fxaaDisabled: true });
+
+    expect(plan.gradeFxaa).toBe(false);
+    expect(plan.composerPasses).toEqual(['render', 'output-grade']);
+    expect(plan.supportsDynamicResolution).toBe(true);
+    expect(plan.renderTargets).toEqual(postPipelinePlan(mediumInput).renderTargets);
   });
 
   it('keeps high AO half resolution and the two buffers required by tail SMAA', () => {

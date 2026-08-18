@@ -31,6 +31,7 @@ import {
   freeCostAuraActive,
   nextCastCheapMultiplierFromAuras,
 } from '../../../sim/combat/empower_next';
+import { willAutoUnshift } from '../../../sim/combat/form_auto_unshift';
 import { frostProcGlowActive } from '../../../sim/combat/frost_mage';
 import { packlordActionGlowActive } from '../../../sim/combat/hunter_packlord';
 import {
@@ -60,6 +61,7 @@ import {
   type ItemDef,
   MELEE_RANGE,
   POTION_COOLDOWN,
+  type ResourceType,
   type Vec3,
 } from '../../../sim/types';
 import type { InterpolationValues, TranslationKey } from '../../i18n';
@@ -184,6 +186,14 @@ export interface ActionBarPlayerInput {
   autoAttack: boolean;
   dead: boolean;
   resource: number;
+  /** Which pool the live bar shows. A druid form swaps it to rage or energy and
+   *  parks the real mana pool in savedMana, so it is what tells an in-form bar
+   *  apart from an ordinary caster's. */
+  resourceType: ResourceType | null;
+  /** Mana set aside while shapeshifted (0 when unshifted). The pool an
+   *  auto-unshifting cast is billed against; mirrored online as the self
+   *  snapshot's sparse `sm` key. */
+  savedMana: number;
   cooldowns: { get(id: string): number | undefined };
   gcdRemaining: number;
   /** Shared combat-potion cooldown, remaining seconds (0 when ready). Painted as a
@@ -643,8 +653,18 @@ export function createActionBarView(
           dominionReady =
             dominionSummonBlockFromMask(dominionComposition, dominionTemplateId) === null;
         }
+        // A druid pressing a heal or a nuke from Bruin/Wolf Form leaves the form
+        // and casts it, and the cast is billed against the PARKED mana pool, not
+        // the rage or energy bar the button is pressed from (the same predicate
+        // the sim's cast gate asks, so the bar cannot paint a slot unusable while
+        // the cast it refuses to advertise succeeds). Fleet Form never swapped the
+        // bar, so its pool is already the live one.
+        const castingPool =
+          player.resourceType !== 'mana' && willAutoUnshift(player.auras, def)
+            ? player.savedMana
+            : player.resource;
         slot.usable =
-          (!(player.resource < payableCost) || freeByProc || freeBySolarReprisal) &&
+          (!(castingPool < payableCost) || freeByProc || freeBySolarReprisal) &&
           (def.ruinCost ?? 0) <= ruin &&
           soulFragments >= (def.soulFragmentCost ?? 0) &&
           ascensionReady &&
