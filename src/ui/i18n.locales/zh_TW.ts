@@ -5646,6 +5646,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.soulflame_cord.name': '魂焰腰繩',
   'entities.items.stormcallers_waistguard.name': '喚雷者腰甲',
   'entities.mobs.thunzharr_waking_peak.name': '桑扎爾，覺醒之峰',
+  'entities.mobs.balgath_foreman.name': '巴爾加斯，被埋葬的工頭',
+  'entities.mobs.balgath_cyclops.name': '巴爾加斯，獨眼工頭',
   'entities.mobs.thunzharr_stormling.name': '被驚醒的風暴元素',
   'entities.mobs.stable_horse.name': '廄馬',
   'hudChrome.worldBoss.spawn': '{name}在荊峰高地崛起！',

@@ -5895,6 +5895,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.soulflame_cord.name': 'Шнур Пламени души',
   'entities.items.stormcallers_waistguard.name': 'Поясная защита призывателя бурь',
   'entities.mobs.thunzharr_waking_peak.name': 'Тунзарр, Пробуждающийся пик',
+  'entities.mobs.balgath_foreman.name': 'Балгат, Погребённый Десятник',
+  'entities.mobs.balgath_cyclops.name': 'Балгат, Одноглазый Десятник',
   'entities.mobs.thunzharr_stormling.name': 'Пробуждённый элементаль бури',
   'entities.mobs.stable_horse.name': 'Конюшенная лошадь',
   'hudChrome.worldBoss.spawn': '{name} поднимается над Терновыми высотами!',

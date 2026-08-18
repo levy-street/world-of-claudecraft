@@ -3021,6 +3021,8 @@ export type TranslationKeyFlat =
   | 'entities.mobs.ashbone_raider.name'
   | 'entities.mobs.ashbone_warcaller.name'
   | 'entities.mobs.aurelhorn.name'
+  | 'entities.mobs.balgath_cyclops.name'
+  | 'entities.mobs.balgath_foreman.name'
   | 'entities.mobs.barrow_king.name'
   | 'entities.mobs.barrow_wight.name'
   | 'entities.mobs.bastion_revenant.name'

@@ -3651,6 +3651,28 @@ export class Sim {
 
   // /dev vendor: spawn the free-epic Test Quartermaster next to the caller
   // (dev-command realms only). Returns the vendor entity id, or -1 on failure.
+  /**
+   * Drop a mob template into the world at an exact spot, for a dev playtest.
+   *
+   * Sibling of spawnDevBot / spawnDevVendor and dev-only for the same reason: it
+   * bypasses every spawner (camps, world-boss scheduler, rift stamping) and answers to
+   * a caller rather than to the world's own rules. Its one consumer is the boss
+   * test-drive URL param (src/game/boss_test_drive.ts), which is DEV-build gated.
+   *
+   * Draws no rng, so calling it cannot perturb the shared draw stream and desync a
+   * seeded run: the level is the template's own maximum and the facing is fixed, the
+   * same discipline spawnWorldBoss keeps for the same reason.
+   */
+  spawnDevBoss(templateId: string, x: number, z: number): number {
+    const template = MOBS[templateId];
+    if (!template) return -1;
+    const mob = createMob(this.nextId++, template, template.maxLevel, this.groundPos(x, z));
+    mob.facing = 0;
+    mob.prevFacing = 0;
+    this.addEntity(mob);
+    return mob.id;
+  }
+
   spawnDevVendor(pid?: number): number {
     const me = this.entities.get(pid ?? this.primaryId);
     if (!me) return -1;

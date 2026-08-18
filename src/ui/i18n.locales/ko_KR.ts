@@ -5825,6 +5825,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.soulflame_cord.name': '영혼불꽃 허리끈',
   'entities.items.stormcallers_waistguard.name': '폭풍소환사의 허리보호구',
   'entities.mobs.thunzharr_waking_peak.name': '천자르, 깨어나는 봉우리',
+  'entities.mobs.balgath_foreman.name': '발가스, 묻힌 감독관',
+  'entities.mobs.balgath_cyclops.name': '발가스, 외눈의 감독관',
   'entities.mobs.thunzharr_stormling.name': '깨어난 폭풍 정령',
   'entities.mobs.stable_horse.name': '마구간 말',
   'hudChrome.worldBoss.spawn': '{name}이(가) 쏜피크 고지에 솟아올랐습니다!',

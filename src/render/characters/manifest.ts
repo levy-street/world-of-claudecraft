@@ -2858,7 +2858,6 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/balgath_cyclops.glb`,
     animUrls: [`${CREATURES}/balgath_ability_anims.glb`],
     height: 3.2,
-    lazyPreload: true,
     clips: BALGATH,
     // Gait refs MEASURED, not guessed, at the scale this boss actually spawns at
     // (`node scripts/anim/measure_gait.mjs public/models/creatures/balgath_cyclops.glb
@@ -2879,7 +2878,6 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/balgath_foreman.glb`,
     animUrls: [`${CREATURES}/balgath_ability_anims.glb`],
     height: 3.2,
-    lazyPreload: true,
     clips: BALGATH,
     walkRef: BALGATH_FOREMAN_WALK_REF,
     runRef: BALGATH_FOREMAN_RUN_REF,
@@ -2999,6 +2997,11 @@ const MOB_KEYS: Record<string, string> = {
   // included, re-tinted gold by her template color) while the dragonkin
   // family fallback (the floating dragonevolved wyrm) stays for the sanctum,
   // temple, rift, and Galecrest dragonkin.
+  // The Mirefen boss, in both candidate bodies. Nothing spawns either in ordinary play
+  // (no camp entry, no world-boss registration); they exist so the two silhouettes can
+  // be compared in motion via ?boss=foreman|cyclops (src/game/boss_test_drive.ts).
+  balgath_foreman: 'mob_balgath_foreman',
+  balgath_cyclops: 'mob_balgath_cyclops',
   drakemaw_broodlord: 'mob_dragonkin_broodlord',
   cindraleth_maw_matriarch: 'mob_dragonkin_matriarch',
   dragonkin_broodguard: 'mob_dragonkin_broodguard',

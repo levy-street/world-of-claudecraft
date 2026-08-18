@@ -13434,6 +13434,12 @@ export const en_XA: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "[Ţĥúñžĥáŕŕ, ţĥé Ŵáķíñĝ Þéáķ]"
       },
+      "balgath_foreman": {
+        "name": "[Ɓáļĝáţĥ, ţĥé Ɓúŕíéð Ƒóŕéɱáñ]"
+      },
+      "balgath_cyclops": {
+        "name": "[Ɓáļĝáţĥ, ţĥé Óñé-Éýéð Ƒóŕéɱáñ]"
+      },
       "thunzharr_stormling": {
         "name": "[Ŕóúšéð Šţóŕɱļíñĝ]"
       },

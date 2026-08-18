@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "d6fabd19e708eea168126f4f6d86176292e7fd2e082cd98c3f298072d1753a8d",
+  "rendererFingerprint": "ef23af75d3ccccad84fa38c7ccf699539bd371ef1f29d6e625bbaa1bed6594b9",
   "renderer": {
     "trackedFiles": [
       {
@@ -27,8 +27,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 4228916,
-      "sha256": "668870d989696ad4cd1aeb9a2ef155b000e30fca22475868430cf4e1001f13d5",
+      "bytes": 4239402,
+      "sha256": "fae556d46763ee4c5657e86d16f7c1ef9682ff7bf3b22dd2ce03b3a63f581484",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -40,7 +40,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 230,
+  "portraitCount": 232,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -274,6 +274,74 @@
         "path": "public/ui/mobs/aurelhorn.webp",
         "bytes": 2794,
         "sha256": "29e20e1b4132172e1cf69750d68b1e61798508cda6ce53263671a0707f54cd0e"
+      }
+    },
+    {
+      "id": "balgath_cyclops",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_balgath_cyclops",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/balgath_cyclops.glb",
+          "path": "public/models/creatures/balgath_cyclops.glb",
+          "bytes": 1505480,
+          "sha256": "a8604ddd1e515ea27c163495e53d792033a708f7f066fa852cb0d1997f1476ac"
+        },
+        "idle": "Idle",
+        "height": 3.2,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.12
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#a8a496",
+        "resolved": "#a8a496",
+        "strength": 0.12
+      },
+      "sourceFingerprint": "0505291ca531cc27a871af2c4b967f94f81d8daf4c186a1255611b91b4b16d33",
+      "output": {
+        "path": "public/ui/mobs/balgath_cyclops.webp",
+        "bytes": 2366,
+        "sha256": "d69090635e96fb49e0fde896f3246a76d49e4ad2e3b21d396f843b77391770a3"
+      }
+    },
+    {
+      "id": "balgath_foreman",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_balgath_foreman",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/balgath_foreman.glb",
+          "path": "public/models/creatures/balgath_foreman.glb",
+          "bytes": 1659644,
+          "sha256": "49d88beb65203dc6563786dae849ea300b3cc9db099ea98f70f2b3b465dd2405"
+        },
+        "idle": "Idle",
+        "height": 3.2,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.15
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#9c9382",
+        "resolved": "#9c9382",
+        "strength": 0.15
+      },
+      "sourceFingerprint": "ac015ec4e58ad2ca8726ba3dec07fe143e7a51884dc06f7ec03ff5d24771b6c3",
+      "output": {
+        "path": "public/ui/mobs/balgath_foreman.webp",
+        "bytes": 2212,
+        "sha256": "64c357e457120933a09fae7d10101f2c6c98def468ab86acb58019f303147f4d"
       }
     },
     {

@@ -288,6 +288,211 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     scale: 0.55,
     color: 0x3a2740,
   },
+  // Balgath, the Mirefen boss, in TWO bodies.
+  //
+  // Mirefen is the churn choke point, so this boss exists to give the zone a reason to
+  // gather. He is level 20 in a level 6 to 13 zone deliberately: that is what pulls
+  // geared players back to Fenbridge, and the mechanics are shaped so the locals who
+  // live here are participants rather than corpses.
+  //
+  // Two templates rather than one because the whole point is to compare the
+  // silhouettes in the running game (`?boss=foreman` / `?boss=cyclops`, see
+  // src/game/boss_test_drive.ts). They are identical apart from identity: same rig,
+  // same 41 joints, same shared ClipMap, same numbers. Whichever one wins, the loser
+  // is deleted rather than kept as content.
+  //
+  // Neither is in a CAMPS list and neither is a world boss, so nothing spawns them in
+  // ordinary play yet. Structure follows thunzharr_waking_peak (content/zone3.ts) so
+  // the two read the same to a raid; the numbers are that template's shape, NOT an
+  // independently tuned encounter, and nothing here claims otherwise.
+  balgath_foreman: {
+    id: 'balgath_foreman',
+    name: 'Balgath, the Buried Foreman',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    boss: true,
+    elite: true,
+    canSwim: false,
+    // A fen is all water and reed banks; pathing a 9-unit giant around them wedges him
+    // on the first collider, so he walks the straight line as Thunzharr does.
+    phasesThroughObstacles: true,
+    quietMechanics: true,
+    ccImmune: true,
+    slowImmune: true,
+    hpBase: 4000,
+    hpPerLevel: 800,
+    dmgBase: 54,
+    dmgPerLevel: 10.3,
+    attackSpeed: 2.4,
+    armorPerLevel: 46,
+    // SLOWER than a player's base run of 7, which is the design rather than an
+    // oversight: his damage lives in telegraphed circles you walk out of, so reading
+    // the ground beats out-gearing him. It also keeps both bodies' gait inside
+    // locomotionTimeScale's clamp at scale 2.8, so his feet plant instead of skating
+    // (refs measured by scripts/anim/measure_gait.mjs; see BALGATH_SCALE in
+    // render/characters/manifest.ts).
+    moveSpeed: 6.4,
+    aggroRadius: 18,
+    // Deliberately the literal, not an import: `src/sim/` may never import from
+    // `src/render/`, and this has a render-side twin the gait refs were measured at.
+    // A test welds the two rather than a cross-layer import.
+    scale: 2.8,
+    // The circle smash: big, slow, telegraphed. Long cadence and a wide footprint so
+    // the ground ring reads from across the fen.
+    aoePulse: {
+      min: 36,
+      max: 50,
+      radius: 12,
+      every: 14,
+      name: 'Barrow Smash',
+      school: 'physical',
+      fx: 'nova',
+    },
+    // The shockwave stomp: tighter and quicker, and the smaller radius is also how the
+    // renderer tells the two slams apart when it draws their ground rings.
+    stomp: {
+      radius: 7,
+      every: 22,
+      duration: 1.5,
+      min: 18,
+      max: 28,
+      name: 'Shockwave Stomp',
+      school: 'physical',
+    },
+    // The scry: his one channelled ability, which is why `cast` in the shared BALGATH
+    // ClipMap is the eye rather than a generic cast. The bar and the pose are one event.
+    bigCast: {
+      castId: 'balgath_scry',
+      name: 'Loomshard Scry',
+      castTime: 3.5,
+      every: 40,
+      radius: 30,
+      min: 70,
+      max: 90,
+      school: 'arcane',
+      yell: 'The shard sees you. All of you.',
+    },
+    // The heavy mitigation the concept called for: what makes him want numbers rather
+    // than gear, since a small group cannot out-damage the refresh.
+    stoneskin: {
+      amount: 500,
+      every: 27,
+      duration: 9,
+      name: 'Barrowhide',
+      school: 'physical',
+    },
+    knockback: { chance: 0.3, distance: 7, name: 'Backhand' },
+    // Copper only, ON PURPOSE, and the single most load-bearing line in this template.
+    // An item's level derives from its highest source level, so a level-20 boss
+    // dropping this zone's level-10 gear silently re-levels it; sharing the existing
+    // level-20 tier instead drags in four class-set Reliquary pages that would have to
+    // start naming a Mirefen boss. Both were tried and both were wrong. Real spoils
+    // need items of his own, which is reward design, so until that lands he drops
+    // nothing that can distort the economy. This is also why neither body carries
+    // `worldBoss: true` yet: that flag is what obliges a Reliquary page, and a page
+    // with no relics of his own is a page you complete without meeting him.
+    loot: [{ copper: 2500, chance: 1 }],
+    yells: {
+      engage: 'The Smith set me to dig. You are in the way of the digging.',
+      enrage: 'The mound breaks! Let it all come down!',
+    },
+    color: 0x9c9382,
+  },
+  balgath_cyclops: {
+    id: 'balgath_cyclops',
+    name: 'Balgath, the One-Eyed Foreman',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    boss: true,
+    elite: true,
+    canSwim: false,
+    // A fen is all water and reed banks; pathing a 9-unit giant around them wedges him
+    // on the first collider, so he walks the straight line as Thunzharr does.
+    phasesThroughObstacles: true,
+    quietMechanics: true,
+    ccImmune: true,
+    slowImmune: true,
+    hpBase: 4000,
+    hpPerLevel: 800,
+    dmgBase: 54,
+    dmgPerLevel: 10.3,
+    attackSpeed: 2.4,
+    armorPerLevel: 46,
+    // SLOWER than a player's base run of 7, which is the design rather than an
+    // oversight: his damage lives in telegraphed circles you walk out of, so reading
+    // the ground beats out-gearing him. It also keeps both bodies' gait inside
+    // locomotionTimeScale's clamp at scale 2.8, so his feet plant instead of skating
+    // (refs measured by scripts/anim/measure_gait.mjs; see BALGATH_SCALE in
+    // render/characters/manifest.ts).
+    moveSpeed: 6.4,
+    aggroRadius: 18,
+    // Deliberately the literal, not an import: `src/sim/` may never import from
+    // `src/render/`, and this has a render-side twin the gait refs were measured at.
+    // A test welds the two rather than a cross-layer import.
+    scale: 2.8,
+    // The circle smash: big, slow, telegraphed. Long cadence and a wide footprint so
+    // the ground ring reads from across the fen.
+    aoePulse: {
+      min: 36,
+      max: 50,
+      radius: 12,
+      every: 14,
+      name: 'Barrow Smash',
+      school: 'physical',
+      fx: 'nova',
+    },
+    // The shockwave stomp: tighter and quicker, and the smaller radius is also how the
+    // renderer tells the two slams apart when it draws their ground rings.
+    stomp: {
+      radius: 7,
+      every: 22,
+      duration: 1.5,
+      min: 18,
+      max: 28,
+      name: 'Shockwave Stomp',
+      school: 'physical',
+    },
+    // The scry: his one channelled ability, which is why `cast` in the shared BALGATH
+    // ClipMap is the eye rather than a generic cast. The bar and the pose are one event.
+    bigCast: {
+      castId: 'balgath_scry',
+      name: 'Loomshard Scry',
+      castTime: 3.5,
+      every: 40,
+      radius: 30,
+      min: 70,
+      max: 90,
+      school: 'arcane',
+      yell: 'The shard sees you. All of you.',
+    },
+    // The heavy mitigation the concept called for: what makes him want numbers rather
+    // than gear, since a small group cannot out-damage the refresh.
+    stoneskin: {
+      amount: 500,
+      every: 27,
+      duration: 9,
+      name: 'Barrowhide',
+      school: 'physical',
+    },
+    knockback: { chance: 0.3, distance: 7, name: 'Backhand' },
+    // Copper only, ON PURPOSE, and the single most load-bearing line in this template.
+    // An item's level derives from its highest source level, so a level-20 boss
+    // dropping this zone's level-10 gear silently re-levels it; sharing the existing
+    // level-20 tier instead drags in four class-set Reliquary pages that would have to
+    // start naming a Mirefen boss. Both were tried and both were wrong. Real spoils
+    // need items of his own, which is reward design, so until that lands he drops
+    // nothing that can distort the economy. This is also why neither body carries
+    // `worldBoss: true` yet: that flag is what obliges a Reliquary page, and a page
+    // with no relics of his own is a page you complete without meeting him.
+    loot: [{ copper: 2500, chance: 1 }],
+    yells: {
+      engage: 'One eye is enough to find you.',
+      enrage: 'The mound breaks! Let it all come down!',
+    },
+    color: 0xa8a496,
+  },
   mirefen_broodmother: {
     id: 'mirefen_broodmother',
     name: 'The Broodmother',

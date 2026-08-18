@@ -13434,6 +13434,12 @@ export const ja_JP: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "サンザール、目覚めし峰"
       },
+      "balgath_foreman": {
+        "name": "バルガス、埋もれし監督"
+      },
+      "balgath_cyclops": {
+        "name": "バルガス、単眼の監督"
+      },
       "thunzharr_stormling": {
         "name": "目覚めた嵐の精"
       },

@@ -156,20 +156,41 @@ describe('balgath world boss assets', () => {
     expect(map).toContain('Balgath_Smash');
   });
 
-  it('stays out of the boot preload sweep while nothing can spawn him', () => {
-    // No MOB_KEYS entry exists yet, so preloading 3 MB of boss buys nothing: the
-    // encounter change is what makes him spawnable, and it drops both this flag and
-    // this test together. Scope the search to the MOB_KEYS literal, since a whole-file
-    // match hits the word in these defs' own comments and reports every state as live.
+  it('is reachable through MOB_KEYS, and therefore NOT lazily preloaded', () => {
+    // These two move together or world entry crashes. Preload sets are tier-independent
+    // and read synchronously at entry, so the moment a visual is reachable its GLB has
+    // to be in the union: a reachable-but-lazy def fails with "asset not preloaded".
+    // Without the MOB_KEYS entry the boss silently renders as the generic `elemental`
+    // family fallback instead, which is the quieter half of the same bug.
     const src = readFileSync(MANIFEST, 'utf8');
     const keysStart = src.indexOf('MOB_KEYS: Record');
     expect(keysStart, 'MOB_KEYS moved or was renamed').toBeGreaterThan(-1);
-    const spawnable = src.slice(keysStart, src.indexOf('\n};', keysStart)).includes('balgath');
-    for (const key of ['mob_balgath_foreman', 'mob_balgath_cyclops']) {
-      expect(defBlock(key), `${key} must stay lazy while unspawnable`).toContain(
-        'lazyPreload: true',
+    const keys = src.slice(keysStart, src.indexOf('\n};', keysStart));
+    for (const [template, visual] of [
+      ['balgath_foreman', 'mob_balgath_foreman'],
+      ['balgath_cyclops', 'mob_balgath_cyclops'],
+    ]) {
+      expect(keys, `${template} is not wired`).toContain(`${template}: '${visual}'`);
+      expect(defBlock(visual), `${visual} must not be lazy once reachable`).not.toContain(
+        'lazyPreload',
       );
     }
-    expect(spawnable, 'balgath is spawnable now: drop lazyPreload and rewrite this').toBe(false);
+  });
+
+  it('keeps the sim scale and the measured gait references in agreement', () => {
+    // The refs are only correct AT the scale they were measured at, and the sim owns the
+    // scale while render owns the refs. `src/sim/` may never import from `src/render/`,
+    // so the two cannot share a constant; this weld replaces the import. Drift is silent
+    // and shows up only as feet that skate.
+    const manifest = readFileSync(MANIFEST, 'utf8');
+    const declared = manifest.match(/export const BALGATH_SCALE = ([\d.]+);/)?.[1];
+    expect(declared, 'BALGATH_SCALE is missing from the manifest').toBeTruthy();
+    const zone = readFileSync(resolve(ROOT, 'src/sim/content/zone2.ts'), 'utf8');
+    for (const id of ['balgath_foreman', 'balgath_cyclops']) {
+      const tpl = zone.slice(zone.indexOf(`${id}: {`));
+      const simScale = tpl.slice(0, tpl.indexOf('\n  },')).match(/scale: ([\d.]+),/)?.[1];
+      expect(simScale, `${id} has no scale`).toBeTruthy();
+      expect(Number(simScale), id).toBe(Number(declared));
+    }
   });
 });

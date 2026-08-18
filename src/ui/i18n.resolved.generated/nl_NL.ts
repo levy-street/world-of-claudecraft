@@ -13434,6 +13434,12 @@ export const nl_NL: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, de Ontwakende Piek"
       },
+      "balgath_foreman": {
+        "name": "Balgath, the Buried Foreman"
+      },
+      "balgath_cyclops": {
+        "name": "Balgath, the One-Eyed Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Gewekte Stormling"
       },
