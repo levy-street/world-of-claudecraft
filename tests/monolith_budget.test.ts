@@ -129,7 +129,10 @@ const MONOLITHS: MonolithRow[] = [
     // mechanism; the scheduler module and its suite are deleted), and the
     // branch's farm-patches wiring rides on top of the release count, so the
     // ceiling is the exact merged count per the ratchet's merge rule: any
-    // further growth reds again.
+    // further growth reds again. Relative to the release pin 13744 this is a
+    // +30 re-pin funded by discarding the branch's own scheduler extraction:
+    // a maintainer decision prepared for feature review (the hud row's raise
+    // precedent), recorded in docs/farming/state.md deviation (an).
     ceiling: 13774,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },

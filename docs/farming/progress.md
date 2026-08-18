@@ -2310,6 +2310,17 @@ The ONLINE_WORLD_LAYOUT_VERSION farming go-live question joined the state.md
 OPEN list. Count baselines HELD: 202/215, IWorld 329 = 88 + 241, facets 34,
 delta keys 87. Monolith after heals: hud 19382/19387, renderer 13774/13774,
 main 11454/11460, sim 12657/12660, server/game 10791/10900.
+QA-checklist verdict READY (0 BLOCKING); its three should-fixes taken: the
+renderer ceiling re-pin annotated as a maintainer decision prepared for
+feature review (funded by discarding the branch scheduler extraction), the
+payment-walk lock arm gained a direct locked-above-unlocked index assertion,
+and the two silently auto-merged third-shape files were eyeballed (the
+src/net/online.ts hunks are the release's own chroma-permanence rework plus
+the sm decode, coherent and cross-platform-approved; tests/architecture.test.ts
+gains the release's foliage_decimation_core RENDER_PURE_CORES row). Honest
+note from the same review: a green parity run over freshly re-recorded
+goldens is circular by construction; the evidence is the machine
+classification, not the green run.
 GATE RECORD: (appended after the close run below)
 
 ### Phase 10

@@ -3061,6 +3061,17 @@ describe('item lock (issue 3042): locked copies are invisible to every farming s
     setSlotLocked(h, SEED_ID, false);
     expect(lockedUnits(h, SEED_ID)).toBe(1);
     expect(unlockedUnits(h, SEED_ID)).toBe(1);
+    // The arm's power rests on the ORDER: the locked copy must sit at the
+    // HIGHER bag index, where the highest-first removal walk spends first.
+    // Assert it directly so a future addItem hole-fill or slot reorder turns
+    // this arm red instead of silently vacuous.
+    const lockedIdx = h.meta.inventory.findIndex(
+      (s) => s.itemId === SEED_ID && s.instance?.locked === true,
+    );
+    const unlockedIdx = h.meta.inventory.findIndex(
+      (s) => s.itemId === SEED_ID && s.instance?.locked !== true,
+    );
+    expect(lockedIdx).toBeGreaterThan(unlockedIdx);
     const from = h.sim.events.length;
     plant(h);
     expect(eventsOf(h.sim, from, 'farmPlanted')).toHaveLength(1);
