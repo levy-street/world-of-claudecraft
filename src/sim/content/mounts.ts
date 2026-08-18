@@ -13,6 +13,7 @@
 
 export type MountKey =
   | 'grag_bear'
+  | 'tavern_barrel'
   | 'stalkglider_snail'
   | 'valorsteed'
   | 'aether_hover_cycle'
@@ -75,6 +76,15 @@ export const MOUNTS: Record<MountKey, MountDef> = {
   stalkglider_snail: {
     key: 'stalkglider_snail',
     name: 'Moss-Shell Stalk-Glider',
+    rarity: 'rare',
+    moveSpeedPct: 0.75,
+  },
+  // The tavern keg, rare purely so the junk set spans the card colours the way
+  // the real catalog does. Plain rare-tier 75%, the bear and snail's number, not
+  // a bespoke one. Sourceless like its two siblings.
+  tavern_barrel: {
+    key: 'tavern_barrel',
+    name: 'Barrel of Laughs',
     rarity: 'rare',
     moveSpeedPct: 0.75,
   },

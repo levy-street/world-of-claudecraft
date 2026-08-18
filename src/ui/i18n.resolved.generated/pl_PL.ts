@@ -1053,6 +1053,7 @@ export const pl_PL: EnTranslations = {
       "rarity_epic": "Epicki",
       "spec_speed": "+{pct}% dodatkowej mobilności",
       "name_valorsteed": "Rumak Męstwa",
+      "name_tavern_barrel": "Barrel of Laughs",
       "name_grag_bear": "Goliat Niedźwiedź Grag",
       "name_stalkglider_snail": "Omszałoskorupny Ślizgacz",
       "name_aether_hover_cycle": "Eteryczny Motocykl Turniejowca",
@@ -1062,6 +1063,7 @@ export const pl_PL: EnTranslations = {
       "name_terrorspark_groundshaker": "Groziskra, Wstrząsacz Ziemi",
       "name_drakemaw_raptor": "Raptor Smoczej Paszczy",
       "desc_valorsteed": "Wytrzymały, pewny kroku rumak, który zapewnia zwiększoną prędkość podróżowania.",
+      "desc_tavern_barrel": "An emptied keg that never made it back to the cellar, and has decided its second career is carrying you.",
       "desc_grag_bear": "Wytrzymały, pewny kroku niedźwiedź, który zapewnia zwiększoną prędkość podróżowania.",
       "desc_stalkglider_snail": "Krzepki, powoli, lecz niezmordowanie pełznący ślimak, który zapewnia zwiększoną prędkość podróżowania.",
       "desc_aether_hover_cycle": "Potężny magitechniczny motocykl zaprojektowany do szybkiego, nisko unoszącego się przemieszczania w walce.",
@@ -12344,6 +12346,9 @@ export const pl_PL: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Wodze Raptora Smoczej Paszczy"
+      },
+      "reins_tavern_barrel": {
+        "name": "Reins of the Barrel of Laughs"
       },
       "rimefang": {
         "name": "Szronowy Kieł"

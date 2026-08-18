@@ -1053,6 +1053,7 @@ export const it_IT: EnTranslations = {
       "rarity_epic": "Epica",
       "spec_speed": "+{pct}% di mobilità extra",
       "name_valorsteed": "Destriero del Valore",
+      "name_tavern_barrel": "Barrel of Laughs",
       "name_grag_bear": "Orso Grag Golia",
       "name_stalkglider_snail": "Aliante dal Guscio Muschioso",
       "name_aether_hover_cycle": "Aerociclo del Giostratore d’Etere",
@@ -1062,6 +1063,7 @@ export const it_IT: EnTranslations = {
       "name_terrorspark_groundshaker": "Terrorscintilla, Scuoteterra",
       "name_drakemaw_raptor": "Raptor di Drakemaw",
       "desc_valorsteed": "Un destriero robusto e dal passo sicuro che aumenta la velocità di viaggio.",
+      "desc_tavern_barrel": "An emptied keg that never made it back to the cellar, and has decided its second career is carrying you.",
       "desc_grag_bear": "Un orso robusto e dal passo sicuro che aumenta la velocità di viaggio.",
       "desc_stalkglider_snail": "Una lumaca tenace e a combustione lenta che aumenta la velocità di viaggio.",
       "desc_aether_hover_cycle": "Una potente moto magitech pensata per spostamenti da combattimento rapidi e radenti.",
@@ -12344,6 +12346,9 @@ export const it_IT: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Redini del Raptor di Drakemaw"
+      },
+      "reins_tavern_barrel": {
+        "name": "Reins of the Barrel of Laughs"
       },
       "rimefang": {
         "name": "Zanna di Brina"

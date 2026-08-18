@@ -1053,6 +1053,7 @@ export const zh_CN: EnTranslations = {
       "rarity_epic": "史诗",
       "spec_speed": "+{pct}%额外移动力",
       "name_valorsteed": "英勇战马",
+      "name_tavern_barrel": "Barrel of Laughs",
       "name_grag_bear": "歌利亚格拉格巨熊",
       "name_stalkglider_snail": "苔壳滑行蜗牛",
       "name_aether_hover_cycle": "以太骑士悬浮机车",
@@ -1062,6 +1063,7 @@ export const zh_CN: EnTranslations = {
       "name_terrorspark_groundshaker": "惊雷撼地者",
       "name_drakemaw_raptor": "龙喉迅猛龙",
       "desc_valorsteed": "一匹坚韧稳健的骏马，可提升旅行速度。",
+      "desc_tavern_barrel": "An emptied keg that never made it back to the cellar, and has decided its second career is carrying you.",
       "desc_grag_bear": "一头坚韧稳健的巨熊，可提升旅行速度。",
       "desc_stalkglider_snail": "一只坚毅耐久的蜗牛，可提升旅行速度。",
       "desc_aether_hover_cycle": "一辆强大的魔导机车，专为快速贴地悬浮的战斗穿行而设计。",
@@ -12344,6 +12346,9 @@ export const zh_CN: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "龙喉迅猛龙的缰绳"
+      },
+      "reins_tavern_barrel": {
+        "name": "Reins of the Barrel of Laughs"
       },
       "rimefang": {
         "name": "霜牙"

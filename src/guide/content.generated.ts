@@ -6456,6 +6456,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "mount",
+        "name": "Barrel of Laughs"
+      },
+      {
+        "kind": "mount",
         "name": "Sky-Reach Stormfeather"
       },
       {

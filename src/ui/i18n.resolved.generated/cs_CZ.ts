@@ -1053,6 +1053,7 @@ export const cs_CZ: EnTranslations = {
       "rarity_epic": "Epické",
       "spec_speed": "+{pct}% pohyblivosti navíc",
       "name_valorsteed": "Udatný oř",
+      "name_tavern_barrel": "Barrel of Laughs",
       "name_grag_bear": "Goliáš, medvěd Grag",
       "name_stalkglider_snail": "Mechoulitý klouzavec",
       "name_aether_hover_cycle": "Vznášecí kolo éterického kolbáře",
@@ -1062,6 +1063,7 @@ export const cs_CZ: EnTranslations = {
       "name_terrorspark_groundshaker": "Hrůzojiskra, otřásač země",
       "name_drakemaw_raptor": "Raptor z Dračí tlamy",
       "desc_valorsteed": "Otužilý, jistonohý oř poskytující zvýšenou rychlost cestování.",
+      "desc_tavern_barrel": "An emptied keg that never made it back to the cellar, and has decided its second career is carrying you.",
       "desc_grag_bear": "Otužilý, jistonohý medvěd poskytující zvýšenou rychlost cestování.",
       "desc_stalkglider_snail": "Statný, pomalu se pohybující plž poskytující zvýšenou rychlost cestování.",
       "desc_aether_hover_cycle": "Výkonné magitechnické kolo navržené pro rychlý, nízko se vznášející pohyb v boji.",
@@ -12344,6 +12346,9 @@ export const cs_CZ: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Otěže raptora z Dračí tlamy"
+      },
+      "reins_tavern_barrel": {
+        "name": "Reins of the Barrel of Laughs"
       },
       "rimefang": {
         "name": "Jinovatkový tesák"

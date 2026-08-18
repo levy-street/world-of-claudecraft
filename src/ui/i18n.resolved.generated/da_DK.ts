@@ -1053,6 +1053,7 @@ export const da_DK: EnTranslations = {
       "rarity_epic": "Episk",
       "spec_speed": "+{pct}% ekstra mobilitet",
       "name_valorsteed": "Modganger",
+      "name_tavern_barrel": "Barrel of Laughs",
       "name_grag_bear": "Goliat Grag-Bjørn",
       "name_stalkglider_snail": "Mosskal-Snigeglider",
       "name_aether_hover_cycle": "Æter-Dystridder Svævecykel",
@@ -1062,6 +1063,7 @@ export const da_DK: EnTranslations = {
       "name_terrorspark_groundshaker": "Skrækgnist, jordrysteren",
       "name_drakemaw_raptor": "Dragegabets Raptor",
       "desc_valorsteed": "En hårdfør, sikker ganger, der giver øget rejsehastighed.",
+      "desc_tavern_barrel": "An emptied keg that never made it back to the cellar, and has decided its second career is carrying you.",
       "desc_grag_bear": "En hårdfør, sikker bjørn, der giver øget rejsehastighed.",
       "desc_stalkglider_snail": "En robust, langsomt forbrændende snegl, der giver øget rejsehastighed.",
       "desc_aether_hover_cycle": "En kraftfuld magitek-cykel designet til hurtig, lavtsvævende forflytning i kamp.",
@@ -12344,6 +12346,9 @@ export const da_DK: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Tøjler til Dragegabets Raptor"
+      },
+      "reins_tavern_barrel": {
+        "name": "Reins of the Barrel of Laughs"
       },
       "rimefang": {
         "name": "Rimhugtand"

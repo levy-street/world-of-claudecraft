@@ -2414,6 +2414,17 @@
       }
     ]
   },
+  "mount_run_tavern_barrel": {
+    "ceilingDb": 5.5,
+    "tracks": [
+      {
+        "filename": "mount_run_tavern_barrel.mp3",
+        "sha256": "3c082f2e4dac2a9141d95503806dc2bb9f2fed554705d65bc73b342796d8757b",
+        "size": 12582,
+        "peakDb": -6.5
+      }
+    ]
+  },
   "mount_run_terrorspark_groundshaker": {
     "ceilingDb": 6.2,
     "tracks": [

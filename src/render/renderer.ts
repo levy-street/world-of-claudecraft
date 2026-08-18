@@ -355,7 +355,8 @@ import { buildMailboxPillar } from './mailbox';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
-import { mountBobY, mountVisualSpec } from './mount_visuals';
+import { applyStandingRider, copyMountAnim, driveMountRide } from './mount_ride_view';
+import { mountVisualSpec } from './mount_visuals';
 import { NameplatePainter } from './nameplate_painter';
 import {
   isProjectedNameplateAnchorVisible,
@@ -1081,6 +1082,8 @@ export interface EntityView {
   /** world-unit rider saddle lift while mounted (0 dismounted); the nameplate,
    *  chat-bubble, and sloppy-pick overhead anchors add it (scaled by e.scale) */
   mountLift: number;
+  /** Accumulated roll of a rolling mount (radians about its local X axis). */
+  mountRoll: number;
   metamorphVisual: CharacterVisual | null; // Necromancy Lich Form, built lazily
   fireballTravelVisual: FireballTravelVisual | null; // Mage travel form, built lazily
   iceBlockVisual: IceBlockVisual | null; // Ice Block shell, built lazily on first stasis
@@ -8862,6 +8865,7 @@ export class Renderer {
       mountVisual: null,
       mountVisualKey: '',
       mountLift: 0,
+      mountRoll: 0,
       metamorphVisual: null,
       fireballTravelVisual: null,
       iceBlockVisual: null,
@@ -11692,6 +11696,8 @@ export class Renderer {
       // the rider holds the seated pose instead of replaying the jump clip.
       const logicallyMounted = e.mountKey !== '';
       const riderMounted = v.mountLift > 0;
+      const riderStanding = riderMounted && mountVisualSpec(e.mountKey)?.ridePose === 'standing';
+      const riderSeated = riderMounted && !riderStanding;
       st.airborne = airborne && !riderMounted;
       // Long-fall flail: displayed vertical speed past what any hop reaches
       // (the same displayed-motion discipline as swimPitch, so peers flail
@@ -11720,7 +11726,8 @@ export class Renderer {
       // and swimming animate normally.
       st.sitting =
         e.kind === 'player' &&
-        (e.sitting || e.eating !== null || e.drinking !== null || riderMounted);
+        (e.sitting || e.eating !== null || e.drinking !== null || riderSeated);
+      if (riderStanding && !visuallyDead) applyStandingRider(st, loco.speed);
       // Ice slide: the sim glides the player at speed but they should read as
       // FROZEN (gliding stiff on the ice), not sprinting. Suppress locomotion +
       // airborne so the state machine holds the static idle pose while they slide.
@@ -12023,30 +12030,16 @@ export class Renderer {
       // griffin canters, the snail glides flat). `airborne` here is the real
       // flag, not the rider's suppressed one: the mount carries the jump.
       if (v.mountVisual && mountSpec && mountShown) {
-        const mst = this.mountAnimScratch;
-        mst.speed = st.speed;
-        mst.moving = st.moving;
-        mst.running = st.running;
-        mst.airborne = airborne;
-        mst.backwards = st.backwards;
-        mst.swimming = st.swimming;
-        if (runCharacterPresentation) {
-          v.mountVisual.update(dt, mst, animate);
-          // the rider floats WITH the procedural bob (the hover cycle's idle
-          // float), not just the mount body
-          const bob = mountBobY(mountSpec, this.time, moving);
-          v.mountVisual.root.position.y = bob;
-          v.visual.root.position.y = v.mountLift + bob;
-          // ambient mount particles: the snail paints its slime path while
-          // gliding, the hover cycle streams aether exhaust off its tail
-          if (mountSpec.fx === 'slime') {
-            if (moving) this.vfx.mountSlimeTrail(v.group.position, dt);
-          } else if (mountSpec.fx === 'exhaust') {
-            this.vfx.mountExhaust(v.group.position, facing, dt, moving);
-          }
-        } else {
-          v.mountVisual.advanceOffscreen(dt);
-        }
+        const mst = copyMountAnim(this.mountAnimScratch, st, airborne);
+        v.mountRoll = driveMountRide(mountSpec, mst, v, this.vfx, {
+          dt,
+          time: this.time,
+          moving,
+          bodySpeed: loco.speed,
+          facing,
+          present: runCharacterPresentation,
+          animate,
+        });
       }
 
       const emoteId =

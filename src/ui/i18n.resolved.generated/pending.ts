@@ -9,25 +9,105 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "entities.items.reins_tavern_barrel.name",
+    "hudChrome.mounts.desc_tavern_barrel",
+    "hudChrome.mounts.name_tavern_barrel"
+  ],
+  "es_ES": [
+    "entities.items.reins_tavern_barrel.name",
+    "hudChrome.mounts.desc_tavern_barrel",
+    "hudChrome.mounts.name_tavern_barrel"
+  ],
+  "fr_FR": [
+    "entities.items.reins_tavern_barrel.name",
+    "hudChrome.mounts.desc_tavern_barrel",
+    "hudChrome.mounts.name_tavern_barrel"
+  ],
+  "fr_CA": [
+    "entities.items.reins_tavern_barrel.name",
+    "hudChrome.mounts.desc_tavern_barrel",
+    "hudChrome.mounts.name_tavern_barrel"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "entities.items.reins_tavern_barrel.name",
+    "hudChrome.mounts.desc_tavern_barrel",
+    "hudChrome.mounts.name_tavern_barrel"
+  ],
+  "de_DE": [
+    "entities.items.reins_tavern_barrel.name",
+    "hudChrome.mounts.desc_tavern_barrel",
+    "hudChrome.mounts.name_tavern_barrel"
+  ],
+  "zh_CN": [
+    "entities.items.reins_tavern_barrel.name",
+    "hudChrome.mounts.desc_tavern_barrel",
+    "hudChrome.mounts.name_tavern_barrel"
+  ],
+  "zh_TW": [
+    "entities.items.reins_tavern_barrel.name",
+    "hudChrome.mounts.desc_tavern_barrel",
+    "hudChrome.mounts.name_tavern_barrel"
+  ],
+  "ko_KR": [
+    "entities.items.reins_tavern_barrel.name",
+    "hudChrome.mounts.desc_tavern_barrel",
+    "hudChrome.mounts.name_tavern_barrel"
+  ],
+  "ja_JP": [
+    "entities.items.reins_tavern_barrel.name",
+    "hudChrome.mounts.desc_tavern_barrel",
+    "hudChrome.mounts.name_tavern_barrel"
+  ],
+  "pt_BR": [
+    "entities.items.reins_tavern_barrel.name",
+    "hudChrome.mounts.desc_tavern_barrel",
+    "hudChrome.mounts.name_tavern_barrel"
+  ],
+  "ru_RU": [
+    "entities.items.reins_tavern_barrel.name",
+    "hudChrome.mounts.desc_tavern_barrel",
+    "hudChrome.mounts.name_tavern_barrel"
+  ],
+  "cs_CZ": [
+    "entities.items.reins_tavern_barrel.name",
+    "hudChrome.mounts.desc_tavern_barrel",
+    "hudChrome.mounts.name_tavern_barrel"
+  ],
+  "nl_NL": [
+    "entities.items.reins_tavern_barrel.name",
+    "hudChrome.mounts.desc_tavern_barrel",
+    "hudChrome.mounts.name_tavern_barrel"
+  ],
+  "pl_PL": [
+    "entities.items.reins_tavern_barrel.name",
+    "hudChrome.mounts.desc_tavern_barrel",
+    "hudChrome.mounts.name_tavern_barrel"
+  ],
+  "id_ID": [
+    "entities.items.reins_tavern_barrel.name",
+    "hudChrome.mounts.desc_tavern_barrel",
+    "hudChrome.mounts.name_tavern_barrel"
+  ],
+  "tr_TR": [
+    "entities.items.reins_tavern_barrel.name",
+    "hudChrome.mounts.desc_tavern_barrel",
+    "hudChrome.mounts.name_tavern_barrel"
+  ],
+  "sv_SE": [
+    "entities.items.reins_tavern_barrel.name",
+    "hudChrome.mounts.desc_tavern_barrel",
+    "hudChrome.mounts.name_tavern_barrel"
+  ],
+  "vi_VN": [
+    "entities.items.reins_tavern_barrel.name",
+    "hudChrome.mounts.desc_tavern_barrel",
+    "hudChrome.mounts.name_tavern_barrel"
+  ],
+  "da_DK": [
+    "entities.items.reins_tavern_barrel.name",
+    "hudChrome.mounts.desc_tavern_barrel",
+    "hudChrome.mounts.name_tavern_barrel"
+  ]
 };

@@ -1053,6 +1053,7 @@ export const nl_NL: EnTranslations = {
       "rarity_epic": "Episch",
       "spec_speed": "+{pct}% extra mobiliteit",
       "name_valorsteed": "Moedros",
+      "name_tavern_barrel": "Barrel of Laughs",
       "name_grag_bear": "Goliath Grag-Beer",
       "name_stalkglider_snail": "Mosschelp-Sluipglijder",
       "name_aether_hover_cycle": "Aether-Duellist Zweefmotor",
@@ -1062,6 +1063,7 @@ export const nl_NL: EnTranslations = {
       "name_terrorspark_groundshaker": "Schrikvonk, de Grondschudder",
       "name_drakemaw_raptor": "Drakenmuil-Raptor",
       "desc_valorsteed": "Een sterk, standvastig strijdros dat extra reissnelheid geeft.",
+      "desc_tavern_barrel": "An emptied keg that never made it back to the cellar, and has decided its second career is carrying you.",
       "desc_grag_bear": "Een sterke, standvastige beer die extra reissnelheid geeft.",
       "desc_stalkglider_snail": "Een taaie, langzaam brandende slak die extra reissnelheid geeft.",
       "desc_aether_hover_cycle": "Een krachtige magitech-motor, ontworpen voor snelle, laag zwevende verplaatsing tijdens gevechten.",
@@ -12344,6 +12346,9 @@ export const nl_NL: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Teugels van de Drakenmuil-Raptor"
+      },
+      "reins_tavern_barrel": {
+        "name": "Reins of the Barrel of Laughs"
       },
       "rimefang": {
         "name": "Rijptand"

@@ -1053,6 +1053,7 @@ export const fr_CA: EnTranslations = {
       "rarity_epic": "Épique",
       "spec_speed": "+{pct}% de mobilité supplémentaire",
       "name_valorsteed": "Destrier de Bravoure",
+      "name_tavern_barrel": "Barrel of Laughs",
       "name_grag_bear": "Ours-Grag Goliath",
       "name_stalkglider_snail": "Glisseur à Coquille Moussue",
       "name_aether_hover_cycle": "Aérocycle du Jouteur d’Éther",
@@ -1062,6 +1063,7 @@ export const fr_CA: EnTranslations = {
       "name_terrorspark_groundshaker": "Terrétincelle, l’Ébranleur de sol",
       "name_drakemaw_raptor": "Raptor du Drakemaw",
       "desc_valorsteed": "Un destrier robuste au pied sûr qui accroît la vitesse de déplacement.",
+      "desc_tavern_barrel": "An emptied keg that never made it back to the cellar, and has decided its second career is carrying you.",
       "desc_grag_bear": "Un ours robuste au pied sûr qui accroît la vitesse de déplacement.",
       "desc_stalkglider_snail": "Un escargot vaillant à combustion lente qui accroît la vitesse de déplacement.",
       "desc_aether_hover_cycle": "Une puissante moto magitech conçue pour des déplacements de combat rapides en vol rasant.",
@@ -12344,6 +12346,9 @@ export const fr_CA: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Rênes du Raptor du Drakemaw"
+      },
+      "reins_tavern_barrel": {
+        "name": "Reins of the Barrel of Laughs"
       },
       "rimefang": {
         "name": "Croc de givre"

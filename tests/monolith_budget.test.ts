@@ -72,7 +72,11 @@ const MONOLITHS: MonolithRow[] = [
     // (zone_prewarm_templates_core.ts, the buildFormVisual fold), and the merged
     // file lands between the two pins, so the ceiling is the exact merged count
     // per the ratchet's rule: any further growth reds again.
-    ceiling: 13754,
+    // Lowered again by this branch: the ridden-mount per-frame drive (anim
+    // copy, bob, roll, ambient fx) moved out to src/render/mount_ride_view.ts,
+    // so the rolling barrel paid for its own new logic by extraction rather
+    // than by raising the bar. 13754 upstream, 13747 here.
+    ceiling: 13747,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

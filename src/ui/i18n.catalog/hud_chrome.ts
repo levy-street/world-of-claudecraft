@@ -890,6 +890,7 @@ export const hudChromeStrings = {
     rarity_epic: 'Epic',
     spec_speed: '+{pct}% extra mobility',
     name_valorsteed: 'Valorsteed',
+    name_tavern_barrel: 'Barrel of Laughs',
     name_grag_bear: 'Goliath Grag-Bear',
     name_stalkglider_snail: 'Moss-Shell Stalk-Glider',
     name_aether_hover_cycle: 'Aether-Jouster Hover-Cycle',
@@ -899,6 +900,8 @@ export const hudChromeStrings = {
     name_terrorspark_groundshaker: 'Terrorspark Groundshaker',
     name_drakemaw_raptor: 'Drakemaw Raptor',
     desc_valorsteed: 'A hardy, sure-footed steed that provides enhanced travel speed.',
+    desc_tavern_barrel:
+      'An emptied keg that never made it back to the cellar, and has decided its second career is carrying you.',
     desc_grag_bear: 'A hardy, sure-footed bear that provides enhanced travel speed.',
     desc_stalkglider_snail: 'A hearty, slow-burning snail that provides enhanced travel speed.',
     desc_aether_hover_cycle:

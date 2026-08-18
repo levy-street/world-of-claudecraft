@@ -103,8 +103,8 @@ function ride(sim: Sim, pid: number, key: string): void {
 }
 
 describe('mount catalog', () => {
-  it('has exactly nine mounts with the horse first and the developer tank last', () => {
-    expect(MOUNT_KEYS).toHaveLength(9);
+  it('has exactly ten mounts with the horse first and the developer tank last', () => {
+    expect(MOUNT_KEYS).toHaveLength(10);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
     expect(MOUNT_KEYS.at(-1)).toBe('terrorspark_groundshaker');
     expect(DEFAULT_MOUNT).toBe('valorsteed');
@@ -116,6 +116,9 @@ describe('mount catalog', () => {
       return [d.rarity, d.moveSpeedPct];
     };
     expect(spec('valorsteed')).toEqual(['common', 0.6]);
+    // The barrel reuses its tier's existing number exactly. A gag must never be
+    // a power choice, so it does not invent a speed.
+    expect(spec('tavern_barrel')).toEqual(['rare', 0.75]);
     expect(spec('stormfeather_griffin')).toEqual(['uncommon', 0.7]);
     expect(spec('shadowjump_toad')).toEqual(['uncommon', 0.7]);
     expect(spec('grag_bear')).toEqual(['rare', 0.75]);
@@ -243,7 +246,12 @@ describe('mount reins items (the collection: owning the item is owning the mount
     // acquisition path at all. Listed EXPLICITLY so a sourceless mount is a
     // decision and never an accident: when the world boss lands, delete the entry
     // and the rarity-derived rule below takes back over.
-    const NO_SOURCE_YET: readonly string[] = ['reins_drakemaw_raptor'];
+    // The barrel joins it for a different reason: it ships as a catalog and
+    // visual entry with no door authored yet. It is RARE, which is why the
+    // sourceless arm below is HOISTED out of the epic branch: a rarity with a
+    // drop tier must still be provably sourceless rather than fall through to
+    // the rate rules.
+    const NO_SOURCE_YET: readonly string[] = ['reins_drakemaw_raptor', 'reins_tavern_barrel'];
     const FIVE_MAN_SOURCES: Record<string, readonly string[]> = {
       reins_stormfeather_griffin: ['morthen'],
       reins_shadowjump_toad: ['vael_the_mistcaller'],
@@ -268,27 +276,29 @@ describe('mount reins items (the collection: owning the item is owning the mount
         entries.filter((l) => l.itemId === itemId).map((l) => ({ bossId, ...l })),
       );
 
-      if (rarity === 'epic') {
-        // Rift S clears are the sole source, EXCEPT a mount held sourceless on
-        // purpose. Either way it stays out of every heroic table, so the heroic
-        // tier's mount supply is unchanged.
-        expect(heroicEntries, `${itemId} (epic) must not be heroic-reachable`).toEqual([]);
-        if (NO_SOURCE_YET.includes(itemId)) {
-          // The mob-table sweep above already proved it drops off nothing. Pin
-          // the remaining three pools too, so "no path" means no path: the day
-          // its world boss lands, it gets ONE source, not a quiet second one.
-          for (const [pool, name] of [
-            [RIFT_EPIC_MOUNT_REINS, 'rift S'],
-            [RIFT_BLUE_MOUNT_REINS, 'rift blue'],
-            [RIFT_GREEN_MOUNT_REINS, 'rift green'],
-          ] as const) {
-            expect(
-              pool as readonly string[],
-              `${itemId} has no source yet: not in ${name}`,
-            ).not.toContain(itemId);
-          }
-          continue;
+      if (NO_SOURCE_YET.includes(itemId)) {
+        // Checked at EVERY rarity, ahead of the tier split: the mob-table sweep
+        // above already proved it drops off nothing, so pin the heroic tables and
+        // all three rift pools too. "No path" then means no path anywhere, and the
+        // day a route lands it gets ONE source, not a quiet second one.
+        expect(heroicEntries, `${itemId} has no source yet: not heroic-reachable`).toEqual([]);
+        for (const [pool, name] of [
+          [RIFT_EPIC_MOUNT_REINS, 'rift S'],
+          [RIFT_BLUE_MOUNT_REINS, 'rift blue'],
+          [RIFT_GREEN_MOUNT_REINS, 'rift green'],
+        ] as const) {
+          expect(
+            pool as readonly string[],
+            `${itemId} has no source yet: not in ${name}`,
+          ).not.toContain(itemId);
         }
+        continue;
+      }
+
+      if (rarity === 'epic') {
+        // Rift S clears are the sole source. It stays out of every heroic table,
+        // so the heroic tier's mount supply is unchanged.
+        expect(heroicEntries, `${itemId} (epic) must not be heroic-reachable`).toEqual([]);
         expect(RIFT_EPIC_MOUNT_REINS as readonly string[]).toContain(itemId);
         continue;
       }

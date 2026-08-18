@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "2074fac9f3d7a778014af595331a137a7c1f44acb53ebe2250d901044d89da52",
-  "catalogHash": "3955e4baa75a2d284a7a67b26d653aaed5bd61d5f8b82fd048bcbeb1b07239a1",
+  "bundleId": "2ccf3c25f4456d5de48384c120eb9d887f6bc0a8cd235528ad8d05036ee5f0e3",
+  "catalogHash": "952483d5b5854b8ce8097497fbf0f633ed475765122a5aec018211d7ca8fe179",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -2921,6 +2921,18 @@
           "url": "/audio/sfx/mount_run_stormfeather_griffin.mp3?v=9fb6a774e864",
           "bytes": 13835,
           "sha256": "9fb6a774e864979c3410e939f13943dea8bca2b61ba0c37aca490cf797ffa734"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_run_tavern_barrel": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_tavern_barrel.mp3?v=3c082f2e4dac",
+          "bytes": 12582,
+          "sha256": "3c082f2e4dac2a9141d95503806dc2bb9f2fed554705d65bc73b342796d8757b"
         }
       ],
       "gain": 1,

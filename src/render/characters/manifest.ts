@@ -1622,6 +1622,12 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 12,
     lazyPreload: true,
   },
+  mount_tavern_barrel: {
+    url: `${MOUNTS_DIR}/tavern_barrel.glb`,
+    height: 1.5,
+    clips: MOUNT_RIGGED,
+    lazyPreload: true,
+  },
   mount_grag_bear: {
     url: `${MOUNTS_DIR}/grag_bear.glb`,
     height: 4.0,

@@ -1053,6 +1053,7 @@ export const es_ES: EnTranslations = {
       "rarity_epic": "Épica",
       "spec_speed": "+{pct}% de movilidad adicional",
       "name_valorsteed": "Corcel del Valor",
+      "name_tavern_barrel": "Barrel of Laughs",
       "name_grag_bear": "Oso Grag Goliat",
       "name_stalkglider_snail": "Deslizador de Caparazón Musgoso",
       "name_aether_hover_cycle": "Aerocicleta Justadora del Éter",
@@ -1062,6 +1063,7 @@ export const es_ES: EnTranslations = {
       "name_terrorspark_groundshaker": "Aterrachispa, Sacudetierras",
       "name_drakemaw_raptor": "Raptor de Drakemaw",
       "desc_valorsteed": "Un corcel resistente y de paso firme que aumenta la velocidad de viaje.",
+      "desc_tavern_barrel": "An emptied keg that never made it back to the cellar, and has decided its second career is carrying you.",
       "desc_grag_bear": "Un oso resistente y de paso firme que aumenta la velocidad de viaje.",
       "desc_stalkglider_snail": "Un caracol recio y de combustión lenta que aumenta la velocidad de viaje.",
       "desc_aether_hover_cycle": "Una potente moto magitecnológica diseñada para desplazamientos de combate veloces a baja altura.",
@@ -12344,6 +12346,9 @@ export const es_ES: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Riendas del Raptor de Drakemaw"
+      },
+      "reins_tavern_barrel": {
+        "name": "Reins of the Barrel of Laughs"
       },
       "rimefang": {
         "name": "Colmillo de Escarcha"

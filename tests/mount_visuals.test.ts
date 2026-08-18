@@ -32,12 +32,48 @@ describe('mount visual specs cover the sim catalog', () => {
     }
   });
 
-  it('seats sit inside the mount body (above ground, below the crown)', () => {
+  it('seats sit inside a ridden mount, and exactly ON TOP of a stood-on one', () => {
+    // Two different contracts, because there are now two ways to ride. A SEATED
+    // rider is in a saddle, so their lift is strictly below the crown. A
+    // STANDING rider (the rolling log and barrel) has their feet ON the crown,
+    // so seat === height: below it would sink them into the mount, above it
+    // would float them. Measured in game at the time of writing: log crown 2.90
+    // against feet 2.90, barrel crown 2.97 against feet 3.00.
     for (const key of MOUNT_KEYS) {
       const spec = MOUNT_VISUAL_SPECS[key];
       const def = VISUALS[spec.visualKey];
       expect(spec.seat, `${key} seat`).toBeGreaterThan(0.5);
-      expect(spec.seat, `${key} seat above its own crown`).toBeLessThan(def.height);
+      if (spec.ridePose === 'standing') {
+        expect(spec.seat, `${key} stands on its crown`).toBeCloseTo(def.height, 6);
+      } else {
+        expect(spec.seat, `${key} seat above its own crown`).toBeLessThan(def.height);
+      }
+    }
+  });
+
+  it('only the rolling mounts stand their rider, and only they carry a radius', () => {
+    // The two flags must agree: a mount you stand on is one that rolls under
+    // you, and rolling is what forces the backwards walk. A mount with one and
+    // not the other is a half-built mount, not a style choice.
+    const standing = MOUNT_KEYS.filter((k) => MOUNT_VISUAL_SPECS[k].ridePose === 'standing');
+    const rolling = MOUNT_KEYS.filter((k) => MOUNT_VISUAL_SPECS[k].rollRadius > 0);
+    expect(standing).toEqual(['tavern_barrel']);
+    expect(rolling).toEqual(standing);
+    // Each radius is half its own model height: the cylinder lies on its side,
+    // so the model height IS its diameter. A radius that drifts from that makes
+    // the roll skate, because omega = v / r no longer matches the ground.
+    for (const key of rolling) {
+      const spec = MOUNT_VISUAL_SPECS[key];
+      expect(spec.rollRadius, `${key} radius is half its height`).toBeCloseTo(
+        VISUALS[spec.visualKey].height / 2,
+        6,
+      );
+    }
+    // Everything else is seated and does not roll, the mine cart included: it
+    // runs on wheels, so rolling the body would turn the tub and its rider.
+    for (const key of MOUNT_KEYS.filter((k) => !standing.includes(k))) {
+      expect(MOUNT_VISUAL_SPECS[key].ridePose, `${key} pose`).toBe('seated');
+      expect(MOUNT_VISUAL_SPECS[key].rollRadius, `${key} radius`).toBe(0);
     }
   });
 

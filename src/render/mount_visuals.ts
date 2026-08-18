@@ -31,6 +31,16 @@ export interface MountVisualSpec {
   /** Ambient particle effect the renderer emits for this mount: the snail's
    *  slime path while moving, the hover cycle's aether exhaust. */
   fx: 'slime' | 'exhaust' | null;
+  /** Radius in world units of a mount that ROLLS rather than glides (the log,
+   *  the barrel). 0 means it does not roll. The renderer turns the mount about
+   *  its local X axis, which lies ACROSS the direction of travel, at omega =
+   *  v / r so the contact patch stays still at any speed (mount_roll_core.ts). */
+  rollRadius: number;
+  /** How the RIDER is posed. 'seated' is every ordinary mount (the sit loop
+   *  reads as riding). 'standing' is the rolling junk mounts: the rider stands
+   *  on top and walks BACKWARDS against the surface, which at 2x body speed is
+   *  exactly what holds them in place on a log rolling forward. */
+  ridePose: 'seated' | 'standing';
 }
 
 const spec = (
@@ -40,6 +50,7 @@ const spec = (
   bob?: { amp: number; hz: number; idle?: boolean; shape?: 'hover' | 'hop' },
   seatFwd = 0,
   fx: 'slime' | 'exhaust' | null = null,
+  opts: { rollRadius?: number; ridePose?: 'seated' | 'standing' } = {},
 ): MountVisualSpec => ({
   visualKey,
   seat,
@@ -50,6 +61,8 @@ const spec = (
   bobIdle: bob?.idle ?? false,
   bobShape: bob?.shape ?? 'hop',
   fx,
+  rollRadius: opts.rollRadius ?? 0,
+  ridePose: opts.ridePose ?? 'seated',
 });
 
 export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
@@ -57,6 +70,19 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // origin and lower than the old Tripo build, so the rider shifts toward the
   // neck and drops a touch
   valorsteed: spec('mount_valorsteed', 2.4, true, undefined, 0.15),
+  // The barrel is a CLIPLESS Tripo prop: zero animations, so the bob below IS
+  // its locomotion, the same way the snail and the hover cycle do. No idle bob:
+  // a parked barrel sits dead still, which is what sells the gag when a player
+  // dismounts beside it.
+  tavern_barrel: spec(
+    'mount_tavern_barrel',
+    1.5,
+    false,
+    { amp: 0.05, hz: 2.4, shape: 'hop' },
+    0,
+    null,
+    { rollRadius: 0.75, ridePose: 'standing' },
+  ),
   grag_bear: spec('mount_grag_bear', 3.35, true, undefined, -0.8),
   stalkglider_snail: spec('mount_stalkglider_snail', 2.65, false, undefined, -0.3, 'slime'),
   aether_hover_cycle: spec(

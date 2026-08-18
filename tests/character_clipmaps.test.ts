@@ -215,6 +215,9 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
 const CLIPLESS_RIGS = new Set([
   'mount_stalkglider_snail',
   'mount_aether_hover_cycle',
+  // the barrel: a Tripo prop-lane GLB with no animation track, so its bob in
+  // mount_visuals.ts is the whole of its motion
+  'mount_tavern_barrel',
   'mob_glimmerwisp',
   'mob_duskwisp',
   'mob_spider_egg_sac',

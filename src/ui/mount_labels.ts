@@ -12,6 +12,7 @@ import { type TranslationKey, t } from './i18n';
 
 export const MOUNT_NAME_KEYS: Record<string, TranslationKey> = {
   valorsteed: 'hudChrome.mounts.name_valorsteed',
+  tavern_barrel: 'hudChrome.mounts.name_tavern_barrel',
   grag_bear: 'hudChrome.mounts.name_grag_bear',
   stalkglider_snail: 'hudChrome.mounts.name_stalkglider_snail',
   aether_hover_cycle: 'hudChrome.mounts.name_aether_hover_cycle',
@@ -24,6 +25,7 @@ export const MOUNT_NAME_KEYS: Record<string, TranslationKey> = {
 
 export const MOUNT_DESC_KEYS: Record<string, TranslationKey> = {
   valorsteed: 'hudChrome.mounts.desc_valorsteed',
+  tavern_barrel: 'hudChrome.mounts.desc_tavern_barrel',
   grag_bear: 'hudChrome.mounts.desc_grag_bear',
   stalkglider_snail: 'hudChrome.mounts.desc_stalkglider_snail',
   aether_hover_cycle: 'hudChrome.mounts.desc_aether_hover_cycle',

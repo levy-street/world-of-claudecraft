@@ -386,6 +386,16 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     buyValue: 100_000, // 10 gold in copper
   },
+  reins_tavern_barrel: {
+    id: 'reins_tavern_barrel',
+    name: 'Reins of the Barrel of Laughs',
+    kind: 'mount',
+    mount: 'tavern_barrel',
+    quality: 'rare',
+    noVendorSell: true,
+    noDiscard: true,
+    sellValue: 0,
+  },
   // Collectible mount (Morthen the Gravecaller, The Hollow Crypt). Owning the
   // reins item IS owning the mount (src/sim/mounts.ts mountOwned); it stays
   // valid from the bank too, and it transfers like any other unbound item.

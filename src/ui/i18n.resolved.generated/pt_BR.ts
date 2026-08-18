@@ -1053,6 +1053,7 @@ export const pt_BR: EnTranslations = {
       "rarity_epic": "Épica",
       "spec_speed": "+{pct}% de mobilidade extra",
       "name_valorsteed": "Corcel do Valor",
+      "name_tavern_barrel": "Barrel of Laughs",
       "name_grag_bear": "Urso Grag Golias",
       "name_stalkglider_snail": "Planador de Casco Musgoso",
       "name_aether_hover_cycle": "Aerociclo do Justador do Éter",
@@ -1062,6 +1063,7 @@ export const pt_BR: EnTranslations = {
       "name_terrorspark_groundshaker": "Faíscaterror, Abala-Terra",
       "name_drakemaw_raptor": "Raptor de Drakemaw",
       "desc_valorsteed": "Um corcel resistente e de passo firme que aumenta a velocidade de viagem.",
+      "desc_tavern_barrel": "An emptied keg that never made it back to the cellar, and has decided its second career is carrying you.",
       "desc_grag_bear": "Um urso resistente e de passo firme que aumenta a velocidade de viagem.",
       "desc_stalkglider_snail": "Um caracol valente e de queima lenta que aumenta a velocidade de viagem.",
       "desc_aether_hover_cycle": "Uma poderosa moto magitec projetada para travessias de combate rápidas e rente ao chão.",
@@ -12344,6 +12346,9 @@ export const pt_BR: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Rédeas do Raptor de Drakemaw"
+      },
+      "reins_tavern_barrel": {
+        "name": "Reins of the Barrel of Laughs"
       },
       "rimefang": {
         "name": "Presa de Geada"

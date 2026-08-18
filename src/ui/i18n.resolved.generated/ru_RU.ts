@@ -1053,6 +1053,7 @@ export const ru_RU: EnTranslations = {
       "rarity_epic": "Эпический",
       "spec_speed": "+{pct}% к скорости передвижения",
       "name_valorsteed": "Доблестный скакун",
+      "name_tavern_barrel": "Barrel of Laughs",
       "name_grag_bear": "Голиаф Граг-медведь",
       "name_stalkglider_snail": "Мохопанцирный скользень",
       "name_aether_hover_cycle": "Эфирный ховерцикл турнирного бойца",
@@ -1062,6 +1063,7 @@ export const ru_RU: EnTranslations = {
       "name_terrorspark_groundshaker": "Страхоискр, сотрясатель земли",
       "name_drakemaw_raptor": "Раптор Дрейкмо",
       "desc_valorsteed": "Выносливый и твердо стоящий на ногах скакун, повышающий скорость передвижения.",
+      "desc_tavern_barrel": "An emptied keg that never made it back to the cellar, and has decided its second career is carrying you.",
       "desc_grag_bear": "Выносливый и твердо стоящий на лапах медведь, повышающий скорость передвижения.",
       "desc_stalkglider_snail": "Стойкая неторопливая улитка, повышающая скорость передвижения.",
       "desc_aether_hover_cycle": "Мощный магитех-байк для быстрых боевых рейдов на бреющем ходу.",
@@ -12344,6 +12346,9 @@ export const ru_RU: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Поводья раптора Дрейкмо"
+      },
+      "reins_tavern_barrel": {
+        "name": "Reins of the Barrel of Laughs"
       },
       "rimefang": {
         "name": "Инеевый клык"
