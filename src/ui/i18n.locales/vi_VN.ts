@@ -3681,7 +3681,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitDays': 'ng',
   'hudChrome.unitFrame.durationUnitHours': 'g',
   'hudChrome.unitFrame.durationUnitMinutes': 'ph',
-  'hudChrome.worldBoss.spawn': '{name} trỗi dậy trên Cao Nguyên Đỉnh Gai!',
+  'hudChrome.worldBoss.spawn': '{name} trỗi dậy trên {zone}!',
   'itemUi.kind.bag': 'Túi',
   'itemUi.tooltip.bagSlots': 'Túi {slots} Ô',
   'questUi.tracker.hideFromMap': 'Ẩn {name} khỏi bản đồ',

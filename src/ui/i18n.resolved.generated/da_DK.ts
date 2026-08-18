@@ -2449,7 +2449,7 @@ export const da_DK: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} rejser sig over Tornetop Højder!"
+      "spawn": "{name} rejser sig over {zone}!"
     },
     "auth": {
       "appleLoginCta": "Fortsæt med Apple",

@@ -1096,18 +1096,27 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     name: 'Thunzharr, the Waking Peak',
     desc: 'Personal epic spoils from the Waking Peak world boss.',
     clearSource: { kind: 'deed_stat', stat: 'thunzharrKills' },
-    // The world boss drops every relic on the page.
-    sourceDefault: fromBoss('thunzharr_waking_peak'),
+    // The world boss drops every relic on the page, with one exception that says so:
+    // the grove vestments are also Balgath's single tier-20 drop in Mirefen, and a relic
+    // listed on two pages must answer with the SAME source list on both (a pin enforces
+    // it), so that row names both bosses and inherits nothing.
+    // No `sourceDefault`: a page may not mix an inherited default with authored rows
+    // (an inheriting relic and an authoring one would answer differently for no reason
+    // a reader could see), so the eight Thunzharr-only pieces now say explicitly what
+    // the default used to say for them. Same hints, stated rather than implied.
     relics: items(
-      'crownforged_gauntlets',
-      'nighttalon_grips',
-      'soulflame_gloves',
-      'stormcallers_handguards',
-      'crownforged_girdle',
-      'nighttalon_waistband',
-      'soulflame_cord',
-      'stormcallers_waistguard',
-      'vestments_of_the_waking_grove',
+      ['crownforged_gauntlets', fromBoss('thunzharr_waking_peak')],
+      ['nighttalon_grips', fromBoss('thunzharr_waking_peak')],
+      ['soulflame_gloves', fromBoss('thunzharr_waking_peak')],
+      ['stormcallers_handguards', fromBoss('thunzharr_waking_peak')],
+      ['crownforged_girdle', fromBoss('thunzharr_waking_peak')],
+      ['nighttalon_waistband', fromBoss('thunzharr_waking_peak')],
+      ['soulflame_cord', fromBoss('thunzharr_waking_peak')],
+      ['stormcallers_waistguard', fromBoss('thunzharr_waking_peak')],
+      [
+        'vestments_of_the_waking_grove',
+        [fromBoss('balgath_foreman'), fromBoss('thunzharr_waking_peak')],
+      ],
     ),
   },
   {
@@ -1122,23 +1131,21 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     // yet, so a counter here would be a meter for a deed nobody can earn. The
     // encounter's reward design is what promotes this to a counter.
     clearSource: { kind: 'none' },
-    // Unlike Thunzharr, this page's relics are NOT boss-exclusive: Balgath is a second
-    // door onto gear Mirefen already drops, because a world boss with its own unique
-    // table owes new item ids, committed art and their own shelf entries, and that is
-    // the encounter's reward design rather than this change's. So every relic names
-    // BOTH doors. Hinting only the boss would send a player to a 3-hour respawn for a
-    // helm the local rare drops on a 10-minute one, which is worse than no hint.
-    // No `sourceDefault` precisely because every relic here authors its own pair; a
-    // default that nothing inherits is dead config, and a test says so.
-    relics: items(
-      [
-        'fenshadow_maul',
-        [fromBoss('balgath_foreman'), fromBoss('deacon_voss'), fromQuest('q_deacon')],
-      ],
-      ['marshlight_hauberk', [fromBoss('balgath_foreman'), fromBoss('fen_troll')]],
-      ['mirejaw_scale_vest', [fromBoss('balgath_foreman'), fromBoss('mirejaw_the_ravenous')]],
-      ['duskthorn_mantle', [fromBoss('balgath_foreman'), fromBoss('gravecaller_mender')]],
-    ),
+    // Balgath shares Thunzharr's level-20 tier rather than dropping Mirefen's own gear:
+    // item level derives from source level (item_level_req.ts), so a level-20 boss
+    // dropping a level-10 zone's pieces silently re-levels them until their stat budgets
+    // stop matching, which tests/item_level.test.ts catches.
+    //
+    // ONE shared piece, deliberately, and specifically the one that sits on no class-set
+    // page. The gloves and belts are each also catalogued on a `conquerors_set_*` page,
+    // and a relic's hint list has to agree across every page carrying it, so adding
+    // Balgath to those would mean rewriting four more pages to say something none of
+    // them is about. A second door onto one piece is the honest minimum; widening it is
+    // the encounter's reward design, with its own items.
+    relics: items([
+      'vestments_of_the_waking_grove',
+      [fromBoss('balgath_foreman'), fromBoss('thunzharr_waking_peak')],
+    ]),
   },
   // ---- Delves (rare+ uniques; mark-shop signature pieces included) ----
   {

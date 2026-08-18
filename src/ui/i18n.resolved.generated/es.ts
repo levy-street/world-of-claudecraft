@@ -2449,7 +2449,7 @@ export const es: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "¡{name} se alza sobre las Alturas de Thornpeak!"
+      "spawn": "¡{name} se alza sobre {zone}!"
     },
     "auth": {
       "appleLoginCta": "Continuar con Apple",

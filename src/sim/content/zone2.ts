@@ -383,21 +383,20 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       engage: 'The Smith set me to dig. You are in the way of the digging.',
       enrage: 'The mound breaks! Let it all come down!',
     },
-    // Existing Mirefen gear only, and deliberately none of it another mob's SIGNATURE
-    // relic: fen_reaver_glaive was the obvious fourth pick and is dropped here for
-    // exactly that reason, because it is Mirejaw the Ravenous's paged relic and a second
-    // award route for it would need every source hint reworded. A world boss wants its
-    // own unique table, but each NEW item id owes committed art and its own Reliquary
-    // entry, which belongs with the encounter's reward design rather than here.
+    // Level-20 loot, not Mirefen's own gear: an item's level derives from its highest
+    // source level (item_level_req.ts), so a level-20 boss dropping the zone's level-10
+    // pieces silently re-levels them and their stat budgets stop matching their new
+    // item level. tests/item_level.test.ts caught exactly that on the first attempt.
+    //
+    // Deliberately ONE tier-20 piece rather than a share of Thunzharr's whole table.
+    // The rest of that table is catalogued on the class-set Reliquary pages too, and a
+    // relic's source hints must agree across every page listing it, so a wider share
+    // would mean rewriting four set pages to mention a Mirefen boss. Balgath giving up
+    // his own table is the encounter's reward design; this is the honest placeholder,
+    // and the fen's bog iron is the guaranteed trophy in place of Thunzharr's shard.
     loot: [
-      { copper: 2500, chance: 1 },
-      { itemId: 'fenshadow_maul', chance: 0.18, rollGroup: 'balgath_gear' },
-      { itemId: 'marshlight_hauberk', chance: 0.18, rollGroup: 'balgath_gear' },
-      { itemId: 'mirejaw_scale_vest', chance: 0.18, rollGroup: 'balgath_gear' },
-      { itemId: 'duskthorn_mantle', chance: 0.18, rollGroup: 'balgath_gear' },
-      { itemId: 'mirebloom_treads', chance: 0.28 },
-      { itemId: 'fenwarden_sabatons', chance: 0.28 },
       { itemId: 'bogiron_nugget', chance: 1 },
+      { itemId: 'vestments_of_the_waking_grove', chance: 0.1 },
     ],
     color: 0x9c9382,
   },

@@ -2449,7 +2449,7 @@ export const sv_SE: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} reser sig över Törntoppshöjderna!"
+      "spawn": "{name} reser sig över {zone}!"
     },
     "auth": {
       "appleLoginCta": "Fortsätt med Apple",

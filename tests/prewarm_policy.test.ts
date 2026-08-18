@@ -631,7 +631,15 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     // in the program cache key, so omitting it links a dead variant (the
     // pre-existing defect the residue probe exposed: every skinned-shadow
     // compile linked BasicDepthPacking, and the frame relinked all of them).
-    expect(renderer).toContain('depthPacking: THREE.RGBADepthPacking');
+    // The material itself now lives in its own module (it needed a cache Map, not
+    // the coordinator's state), so the pin follows it there rather than being
+    // dropped: what matters is that SOME shipped code still sets the packing.
+    const depthMaterial = readFileSync(
+      new URL('../src/render/prewarm_depth_material.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    expect(depthMaterial).toContain('depthPacking: THREE.RGBADepthPacking');
+    expect(renderer).toContain('prewarmDepthMaterialFor(');
     // The shadow arm covers every caster, not just skinned rigs: static and
     // instanced casters' depth programs were 12 of the frame's 64 residual
     // links.

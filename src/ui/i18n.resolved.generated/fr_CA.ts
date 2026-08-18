@@ -2449,7 +2449,7 @@ export const fr_CA: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} se dresse sur les Hauteurs de Thornpeak !"
+      "spawn": "{name} se dresse au-dessus de {zone} !"
     },
     "auth": {
       "appleLoginCta": "Continuer avec Apple",

@@ -3603,7 +3603,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitDays': 'd',
   'hudChrome.unitFrame.durationUnitHours': 't',
   'hudChrome.unitFrame.durationUnitMinutes': 'm',
-  'hudChrome.worldBoss.spawn': '{name} rejser sig over Tornetop Højder!',
+  'hudChrome.worldBoss.spawn': '{name} rejser sig over {zone}!',
   'itemUi.kind.bag': 'Taske',
   'itemUi.tooltip.bagSlots': 'Taske med {slots} pladser',
   'questUi.tracker.hideFromMap': 'Skjul {name} på kortet',

@@ -3847,7 +3847,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitDays': 'd',
   'hudChrome.unitFrame.durationUnitHours': 'u',
   'hudChrome.unitFrame.durationUnitMinutes': 'm',
-  'hudChrome.worldBoss.spawn': '{name} verrijst boven Doorntop-Hoogten!',
+  'hudChrome.worldBoss.spawn': '{name} verrijst boven {zone}!',
   'itemUi.kind.bag': 'Tas',
   'itemUi.tooltip.bagSlots': 'Tas met {slots} vakken',
   'questUi.tracker.hideFromMap': 'Verberg {name} op de kaart',

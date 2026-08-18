@@ -2449,7 +2449,7 @@ export const ru_RU: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} поднимается над Терновыми высотами!"
+      "spawn": "{name} восстаёт над {zone}!"
     },
     "auth": {
       "appleLoginCta": "Продолжить с Apple",
@@ -13435,7 +13435,7 @@ export const ru_RU: EnTranslations = {
         "name": "Тунзарр, Пробуждающийся пик"
       },
       "balgath_foreman": {
-        "name": "Balgath, the Buried Foreman"
+        "name": "Балгат, Погребённый Десятник"
       },
       "thunzharr_stormling": {
         "name": "Пробуждённый элементаль бури"

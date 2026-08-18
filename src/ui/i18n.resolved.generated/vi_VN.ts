@@ -2449,7 +2449,7 @@ export const vi_VN: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} trỗi dậy trên Cao Nguyên Đỉnh Gai!"
+      "spawn": "{name} trỗi dậy trên {zone}!"
     },
     "auth": {
       "appleLoginCta": "Tiếp Tục với Apple",

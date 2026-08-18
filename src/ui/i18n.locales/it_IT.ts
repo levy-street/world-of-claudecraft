@@ -7471,7 +7471,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, il Picco Risvegliato',
   'entities.mobs.thunzharr_stormling.name': 'Elementale di tempesta ridestato',
   'entities.mobs.stable_horse.name': 'Cavallo da stalla',
-  'hudChrome.worldBoss.spawn': '{name} si erge sulle Alture di Thornpeak!',
+  'hudChrome.worldBoss.spawn': '{name} si erge su {zone}!',
   'entities.items.stormcallers_spaulders.name': 'Spallacci Galecall',
   'entities.items.bonewrought_greatsword.name': 'Spadone Bonewrought',
   'entities.items.direfang_greatblade.name': 'Gran lama Direfang',

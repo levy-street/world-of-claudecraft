@@ -101,22 +101,18 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.title"
   ],
   "zh_CN": [
-    "entities.mobs.balgath_foreman.name",
     "hudChrome.dawnholdMap.title",
     "hudChrome.lastkeepMap.title"
   ],
   "zh_TW": [
-    "entities.mobs.balgath_foreman.name",
     "hudChrome.dawnholdMap.title",
     "hudChrome.lastkeepMap.title"
   ],
   "ko_KR": [
-    "entities.mobs.balgath_foreman.name",
     "hudChrome.dawnholdMap.title",
     "hudChrome.lastkeepMap.title"
   ],
   "ja_JP": [
-    "entities.mobs.balgath_foreman.name",
     "hudChrome.dawnholdMap.title",
     "hudChrome.lastkeepMap.title"
   ],
@@ -136,7 +132,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.lastkeepMap.title"
   ],
   "ru_RU": [
-    "entities.mobs.balgath_foreman.name",
     "hudChrome.dawnholdMap.title",
     "hudChrome.lastkeepMap.title"
   ],

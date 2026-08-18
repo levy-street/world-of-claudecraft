@@ -2449,7 +2449,7 @@ export const pl_PL: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} powstaje nad Wyżynami Ciernistego Szczytu!"
+      "spawn": "{name} wznosi się nad {zone}!"
     },
     "auth": {
       "appleLoginCta": "Kontynuuj przez Apple",

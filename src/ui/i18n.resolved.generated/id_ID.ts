@@ -2449,7 +2449,7 @@ export const id_ID: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} bangkit di atas Dataran Tinggi Thornpeak!"
+      "spawn": "{name} bangkit di atas {zone}!"
     },
     "auth": {
       "appleLoginCta": "Lanjutkan dengan Apple",

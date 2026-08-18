@@ -2449,7 +2449,7 @@ export const nl_NL: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} verrijst boven Doorntop-Hoogten!"
+      "spawn": "{name} verrijst boven {zone}!"
     },
     "auth": {
       "appleLoginCta": "Ga verder met Apple",

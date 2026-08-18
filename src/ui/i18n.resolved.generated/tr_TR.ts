@@ -2449,7 +2449,7 @@ export const tr_TR: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name}, Dikenzirve Tepeleri'nin üzerinde yükseliyor!"
+      "spawn": "{name}, {zone} üzerinde yükseliyor!"
     },
     "auth": {
       "appleLoginCta": "Apple ile Devam Et",

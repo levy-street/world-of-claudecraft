@@ -3775,7 +3775,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitDays': 'd',
   'hudChrome.unitFrame.durationUnitHours': 'h',
   'hudChrome.unitFrame.durationUnitMinutes': 'm',
-  'hudChrome.worldBoss.spawn': '{name} powstaje nad Wyżynami Ciernistego Szczytu!',
+  'hudChrome.worldBoss.spawn': '{name} wznosi się nad {zone}!',
   'itemUi.kind.bag': 'Torba',
   'itemUi.tooltip.bagSlots': 'Torba z {slots} miejscami',
   'questUi.tracker.hideFromMap': 'Ukryj {name} na mapie',

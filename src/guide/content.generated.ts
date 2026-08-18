@@ -6146,19 +6146,7 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
     "relics": [
       {
         "kind": "item",
-        "name": "Fenshadow Maul"
-      },
-      {
-        "kind": "item",
-        "name": "Marshlight Hauberk"
-      },
-      {
-        "kind": "item",
-        "name": "Mirejaw Scale Vest"
-      },
-      {
-        "kind": "item",
-        "name": "Duskthorn Mantle"
+        "name": "Vestments of the Waking Grove"
       }
     ]
   },

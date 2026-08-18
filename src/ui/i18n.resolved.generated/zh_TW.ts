@@ -2449,7 +2449,7 @@ export const zh_TW: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name}在荊峰高地崛起！"
+      "spawn": "{name}在{zone}上空崛起！"
     },
     "auth": {
       "appleLoginCta": "透過 Apple 繼續",
@@ -13435,7 +13435,7 @@ export const zh_TW: EnTranslations = {
         "name": "桑扎爾，覺醒之峰"
       },
       "balgath_foreman": {
-        "name": "Balgath, the Buried Foreman"
+        "name": "巴爾加斯，被埋葬的工頭"
       },
       "thunzharr_stormling": {
         "name": "被驚醒的風暴元素"

@@ -362,7 +362,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // and the flag keeps each whole page out of owned AND total (the dedicated
     // vault and riftbound pins in this file and tests/reliquary_state.test.ts
     // hold both sides), so neither page moves these two literals.
-    expect(full).toEqual({ owned: 344, total: 344 });
+    expect(full).toEqual({ owned: 340, total: 340 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -373,7 +373,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // pair above, including the three release-merged daggers; marks are
     // character-scoped, so this trails the overview by the 29 account-scoped
     // weapon skins).
-    expect(character).toEqual({ owned: 315, total: 315 });
+    expect(character).toEqual({ owned: 311, total: 311 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -394,7 +394,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(379);
+    ).toBe(376);
     // Distinct mark ids: the 10 shipped before Phase 21 plus the 19
     // rare-slain proofs of conquerors_rares_of_the_realm.
     expect(
@@ -609,7 +609,7 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // ids, plus the three daggers the v0.36.0 release merge added: 240 (the
     // sixth figure of the ledger row's "all pinned" claim; the other five are
     // the page/overview/character/slot/mark literals nearby).
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(244);
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(240);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -2457,9 +2457,11 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   conquerors_wildheart_basin_heroic: 1,
   conquerors_nythraxis: 1,
   conquerors_nythraxis_heroic: 1,
-  conquerors_thunzharr: 1,
-  // Six distinct doors: Balgath plus the four local rares, plus q_deacon on the maul.
-  conquerors_balgath: 6,
+  // Two now: Balgath drops the grove vestments in Mirefen, so that one row names
+  // both bosses while the other eight stay Thunzharr's alone.
+  conquerors_thunzharr: 2,
+  // Two doors onto the one shared tier-20 piece: Balgath and Thunzharr.
+  conquerors_balgath: 2,
   conquerors_collapsed_reliquary: 2,
   conquerors_drowned_litany: 2,
   conquerors_set_deathlord: 4,
@@ -3835,7 +3837,8 @@ describe('Reliquary source hint coverage', () => {
     expect(offenders).toEqual([]);
     // All ten defaults are live today (nine boss pages plus the storefront on
     // the skins page); update deliberately with the authoring.
-    expect(defaults).toBe(10);
+    // 9 now: the Thunzharr page dropped its default when every row became explicit.
+    expect(defaults).toBe(9);
   });
 });
 

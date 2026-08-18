@@ -7546,7 +7546,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.thunzharr_waking_peak.name': 'Thunzharr, el Pico Despierto',
   'entities.mobs.thunzharr_stormling.name': 'Elemental de tormenta despierto',
   'entities.mobs.stable_horse.name': 'Caballo de establo',
-  'hudChrome.worldBoss.spawn': '¡{name} se alza sobre las Alturas de Thornpeak!',
+  'hudChrome.worldBoss.spawn': '¡{name} se alza sobre {zone}!',
   'entities.items.stormcallers_spaulders.name': 'Bufas de Galecall',
   'entities.items.bonewrought_greatsword.name': 'Espadón Bonewrought',
   'entities.items.direfang_greatblade.name': 'Gran hoja Direfang',

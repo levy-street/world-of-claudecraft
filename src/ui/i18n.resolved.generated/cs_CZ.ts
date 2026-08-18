@@ -2449,7 +2449,7 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} povstává nad Thornpeak Heights!"
+      "spawn": "{name} povstává nad {zone}!"
     },
     "auth": {
       "appleLoginCta": "Pokračovat přes Apple",

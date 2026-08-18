@@ -2449,7 +2449,7 @@ export const ja_JP: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name}がソーンピーク高地に立ち上がった！"
+      "spawn": "{name}が{zone}にそびえ立つ！"
     },
     "auth": {
       "appleLoginCta": "Appleで続ける",
@@ -13435,7 +13435,7 @@ export const ja_JP: EnTranslations = {
         "name": "サンザール、目覚めし峰"
       },
       "balgath_foreman": {
-        "name": "Balgath, the Buried Foreman"
+        "name": "バルガス、埋もれし監督"
       },
       "thunzharr_stormling": {
         "name": "目覚めた嵐の精"
