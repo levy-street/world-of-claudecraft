@@ -13434,6 +13434,9 @@ export const ko_KR: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "천자르, 깨어나는 봉우리"
       },
+      "balgath_foreman": {
+        "name": "Balgath, the Buried Foreman"
+      },
       "thunzharr_stormling": {
         "name": "깨어난 폭풍 정령"
       },

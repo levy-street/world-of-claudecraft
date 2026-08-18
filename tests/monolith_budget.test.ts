@@ -80,7 +80,11 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again by the castle branch's interior_light_rig.ts extraction;
     // after merging main the merged file lands below both prior pins, so the
     // ceiling is the exact merged count.
-    ceiling: 13689,
+    // Lowered again by the Balgath branch: prewarmDepthMaterial moved out to
+    // src/render/prewarm_depth_material.ts (it needed one cache Map, not the
+    // coordinator's state), which paid for that boss's seven lines of thin FX
+    // wiring and still left the file smaller than it was.
+    ceiling: 13653,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

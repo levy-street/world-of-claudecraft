@@ -61,3 +61,25 @@ function clamp01(v: number): number {
 function easeOutCubic(t: number): number {
   return 1 - (1 - t) ** 3;
 }
+
+/**
+ * Footprint that separates Balgath's two slams when only the blast radius is known.
+ *
+ * The mob-mechanic emitters carry no mechanic name, so the renderer tells the smash
+ * from the stomp by size. 9 sits between the two authored footprints with room on
+ * either side; it is a PRESENTATION split only, and picking it wrong costs a ring of
+ * the wrong tint, never a missing or mis-sized telegraph (the shared rune circle is
+ * what a player actually dodges, and it is drawn from the sim's own radius).
+ */
+export const BALGATH_SMASH_MIN_RADIUS = 9;
+
+/**
+ * How Balgath is recognised as the source of a shared mob-mechanic effect.
+ *
+ * The template prefix covers both silhouettes (`balgath_foreman`, `balgath_cyclops`),
+ * which is deliberate: they are two bodies for ONE encounter and must throw the same
+ * ground effects. The match radius is one yard squared, because the mechanic emitters
+ * fire at `mob.pos` exactly and anything looser starts claiming other bosses' blasts.
+ */
+export const BALGATH_TEMPLATE_PREFIX = 'balgath_';
+export const BALGATH_MECHANIC_MATCH_SQ = 1;

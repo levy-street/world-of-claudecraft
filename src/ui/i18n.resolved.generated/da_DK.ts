@@ -13434,6 +13434,9 @@ export const da_DK: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, den Vågnende Tinde"
       },
+      "balgath_foreman": {
+        "name": "Balgath, the Buried Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Vækket Stormling"
       },

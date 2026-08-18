@@ -241,6 +241,76 @@ const MOUNT_RIGGED: ClipMap = {
 // (breathCone shows a real bar), Cleave/Stun ride attackByAbility off the
 // 'windup' spellfx ability ids, and Shout is the flourish one-shot the
 // 'shout'/'flourish' spellfx cues play.
+/**
+ * The entity scale both Balgath silhouettes spawn at, named here because the gait
+ * references below are only correct AT this scale and would otherwise be four loose
+ * numbers nobody could re-derive.
+ *
+ * 2.8 puts a 3.2-unit rig at roughly 9 world units, between the dragonkin broodlord
+ * (2.25) and the matriarch (2.85): a boss that towers over a raid without losing its
+ * feet off the bottom of the screen at melee range.
+ */
+export const BALGATH_SCALE = 2.8;
+
+// Gait references: the world speed each clip NATURALLY travels at, which
+// `locomotionTimeScale` divides the body's real speed by to pick a playback rate.
+// MEASURED, never guessed, per rig and at BALGATH_SCALE:
+//
+//   node scripts/anim/measure_gait.mjs public/models/creatures/<rig>.glb \
+//        --height 3.2 --scale 2.8
+//
+// They differ between the two bodies even though the clips are identical, because the
+// cyclops is the leggier sculpt: its stride is ~8% longer and it normalizes at 3.93
+// against the foreman's 3.84. Handing it the foreman's numbers would over-drive its
+// cycle by about that much, which is the same mistake the dragonkin matriarch's own
+// def exists to avoid. Re-run the command above if BALGATH_SCALE or a Walk/Run clip
+// changes; `tests/balgath_boss_assets.test.ts` pins these against a live measurement.
+//
+// What these imply for the encounter, since the matcher CLAMPS rather than
+// extrapolating (walk to [0.6, 1.8], run to [0.6, 1.6]): the foreman plants his feet
+// for body speeds of 1.6 to 4.7 walking and 3.0 to 8.1 running, the cyclops for 1.7 to
+// 5.0 and 3.4 to 8.9. A chase speed at or under 8 keeps BOTH inside the clamp, which
+// suits the design anyway: a giant you outrun and dodge, not one that runs you down.
+const BALGATH_FOREMAN_WALK_REF = 2.61;
+const BALGATH_FOREMAN_RUN_REF = 5.04;
+const BALGATH_CYCLOPS_WALK_REF = 2.76;
+const BALGATH_CYCLOPS_RUN_REF = 5.58;
+
+// Balgath, the Mirefen world boss. ONE ClipMap for BOTH silhouettes (the buried
+// foreman and the cyclops), because they are two bodies for one encounter and their
+// animation contract must not be able to drift: a mechanic that reads one way on the
+// model a raid learned on and another way on the model it fights is worse than either
+// model being slightly wrong.
+//
+// Sharing it is possible at all because the two Tripo auto-rigs came back with the
+// SAME 41 joints under the same names in the same order, so the mesh-free donor
+// baked off the foreman's poses (scripts/build_balgath_anims.mjs) binds to the
+// cyclops by name with every one of its 756 channels matched and none unmatched.
+// That is verified two ways: tests/balgath_boss_assets.test.ts pins the joint-name
+// equality, and the poses were rendered on the cyclops body before this was wired.
+//
+// `cast` is the scry channel rather than a generic cast: the boss's only channelled
+// ability IS the eye, so the bar and the pose are the same event. `flourish` is the
+// enrage roar. Neither `Balgath_Blinded` nor `Balgath_Wake` gets a generic slot,
+// deliberately: one has to hold for as long as a debuff lasts and one fires once at
+// spawn, so both are encounter one-shots rather than states the animation machine may
+// pick on its own.
+//
+// NOTE for the cyclops: its own retargeted `Attack` clip is FOLDED (the slash preset
+// collapsed that body) and is named nowhere here, which is exactly why `attack` is
+// the authored pair rather than the retarget. A test pins that it stays unnamed.
+const BALGATH: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Balgath_Smash', 'Balgath_Stomp'],
+  death: 'Death',
+  hit: ['Hit'],
+  cast: 'Balgath_EyeFlare',
+  jump: 'Jump',
+  flourish: 'Balgath_Roar',
+};
+
 const DRAGONKIN_BROODLORD: ClipMap = {
   idle: 'Idle',
   walk: 'Walk',
@@ -2774,107 +2844,48 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: kaykit(['2H_Melee_Attack_Chop']),
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
   },
-  // Balgath as a CYCLOPS: the second silhouette for the same Mirefen world boss,
-  // built so the concept can be judged in-engine against the foreman below rather
-  // than off concept art. Same 41-joint biped rig and the same seven usable
-  // retargeted clips; only two bespoke clips, from
-  // scripts/build_balgath_cyclops_anims.mjs, whose header explains at length why
-  // this rig earns two where the foreman earns six (its donor library has no
-  // overhead reach and no real crouch, so the other four came back mediocre and
-  // mutually indistinguishable and were cut after review rather than shipped).
+  // Balgath as a CYCLOPS: the second silhouette for the same Mirefen world boss, so
+  // the concept can be judged in engine against the foreman below rather than off
+  // concept art. Quarried granite rather than a barrow-buried body, one Loom-shard
+  // eye, iron shackle bands.
   //
-  // His own `Attack` clip is FOLDED (the slash retarget preset collapsed this
-  // body) and is deliberately named NOWHERE in this ClipMap: `attack` uses the
-  // authored Stomp instead. His retargeted `Cast` is clean and already reads as a
-  // raised channel, so `cast` and `flourish` both point at it rather than at a
-  // bespoke clip that would have looked the same.
-  //
-  // Same lazyPreload reasoning as the foreman: nothing spawns him yet.
+  // It carries the FOREMAN's ability donor, not one of its own. Its own donor library
+  // has no overhead reach and no real crouch, so clips authored against it came back
+  // mediocre and mutually indistinguishable; the two rigs share 41 identically named
+  // joints, so the foreman's authored poses bind here directly and are strictly
+  // better. See the BALGATH ClipMap comment for the binding proof.
   mob_balgath_cyclops: {
     url: `${CREATURES}/balgath_cyclops.glb`,
-    animUrls: [`${CREATURES}/balgath_cyclops_ability_anims.glb`],
+    animUrls: [`${CREATURES}/balgath_ability_anims.glb`],
     height: 3.2,
-    lazyPreload: true,
-    clips: {
-      idle: 'Idle',
-      walk: 'Walk',
-      run: 'Run',
-      attack: ['Balgath_Stomp'],
-      death: 'Death',
-      hit: ['Hit'],
-      cast: 'Cast',
-      jump: 'Jump',
-      flourish: 'Cast',
-    },
-    // Paler and cooler than the foreman: this one reads as bare quarried granite
-    // rather than a barrow-buried body, so the moss does the colour work.
+    clips: BALGATH,
+    // Gait refs MEASURED, not guessed, at the scale this boss actually spawns at
+    // (`node scripts/anim/measure_gait.mjs public/models/creatures/balgath_cyclops.glb
+    // --height 3.2 --scale 2.8`). Re-run it if BALGATH_SCALE moves.
+    walkRef: BALGATH_CYCLOPS_WALK_REF,
+    runRef: BALGATH_CYCLOPS_RUN_REF,
+    // Paler and cooler than the foreman: this one reads as bare quarried granite, so
+    // the moss does the colour work.
     tint: 0xa8a496,
     tintStrength: 0.12,
-    // Gait refs owed by the encounter change, exactly as on the foreman below.
-    // Measured at scale 1 by `node scripts/anim/measure_gait.mjs
-    // public/models/creatures/balgath_cyclops.glb --height 3.2`.
   },
-  // Balgath, the Buried Foreman: the Mirefen world boss (concept: the Smith's
-  // foreman the trolls dug out of the barrow-mounds, one Loom-shard eye).
-  // Tripo creature lane on the biped rig (41 joints), so the eight retargeted
-  // clips carry locomotion and the generic swing; the six BESPOKE ability clips
-  // ride the mesh-free donor baked by scripts/build_balgath_anims.mjs off this
-  // same rig's own poses.
-  //
-  // `cast` is the scry channel rather than a generic cast: his only channelled
-  // ability IS the eye, so the bar and the pose are the same event, and
-  // `flourish` is the enrage roar. The two slams sit in the `attack` array so
-  // they read on any swing today; turning them into an `attackByAbility` map is
-  // the ENCOUNTER change's job, because those keys must be real ability ids from
-  // `src/sim/content/` and the ability records do not exist yet. Balgath_Blinded
-  // and Balgath_Wake get no generic slot at all, deliberately: one has to hold
-  // for as long as a debuff lasts and one fires once at spawn, so both are
-  // encounter one-shots rather than states the animation machine may pick on its
-  // own. They ship in the donor GLB now so that change stays data-only.
-  //
-  // `lazyPreload` for the same reason: with no MOB_KEYS entry nothing can spawn
-  // him, and 1.8 MB of boss in every client's boot sweep buys nothing until
-  // something does. The encounter change drops this line along with the
-  // MOB_KEYS wire, which is what puts him back in the tier-independent set.
+  // Balgath, the Buried Foreman: the Mirefen world boss (concept: the Smith's foreman
+  // the trolls dug out of the barrow-mounds, one Loom-shard eye). Tripo creature lane
+  // on the biped rig (41 joints), so the eight retargeted clips carry locomotion and
+  // the generic swing; the six BESPOKE ability clips ride the mesh-free donor baked by
+  // scripts/build_balgath_anims.mjs off this same rig's own poses.
   mob_balgath_foreman: {
     url: `${CREATURES}/balgath_foreman.glb`,
     animUrls: [`${CREATURES}/balgath_ability_anims.glb`],
     height: 3.2,
-    lazyPreload: true,
-    clips: {
-      idle: 'Idle',
-      walk: 'Walk',
-      run: 'Run',
-      attack: ['Balgath_Smash', 'Balgath_Stomp'],
-      death: 'Death',
-      hit: ['Hit'],
-      cast: 'Balgath_EyeFlare',
-      jump: 'Jump',
-      flourish: 'Balgath_Roar',
-    },
-    // Silt-grey stone, lightly applied: he is already a pale sculpt, and a heavy
-    // wash flattens the barrow-moss and the shard-eye socket into one mass.
+    clips: BALGATH,
+    walkRef: BALGATH_FOREMAN_WALK_REF,
+    runRef: BALGATH_FOREMAN_RUN_REF,
+    // Silt-grey stone, lightly applied: he is already a pale sculpt, and a heavy wash
+    // flattens the barrow-moss and the shard-eye socket into one mass.
     tint: 0x9c9382,
     tintStrength: 0.15,
-    // No walkRef/runRef ON PURPOSE, and the encounter change owes them.
-    //
-    // They are per-def and SCALE-dependent (the dragonkin matriarch needed her own
-    // def rather than the broodlord's refs, which over-strode her by 25%), and this
-    // boss has no mob template yet, so his entity scale is not decided. Measured at
-    // scale 1 by `node scripts/anim/measure_gait.mjs
-    // public/models/creatures/balgath_foreman.glb --height 3.2`: normScale 3.84,
-    // walkRef 0.93, runRef 1.80. Both refs scale LINEARLY with entity scale, so the
-    // encounter re-runs that command with `--scale <template scale>` and pastes the
-    // result here. Shipping the scale-1 pair now would be worse than shipping
-    // nothing: against ordinary wander and chase speeds both land past
-    // `locomotionTimeScale`'s clamp ceiling, which is exactly the skating gait the
-    // refs exist to prevent, while LOOKING like a measured value nobody rechecks.
   },
-  // The three zone Chroniclers (Saul, Osric Fenn, Zenzie): one shared
-  // scholarly-mage silhouette (hat, staff, open ledger in the off hand,
-  // the warlock spellbook grip) with the per-NPC entity tint carrying each
-  // identity. When the bespoke chronicler .glb files arrive, split this into
-  // one def per chronicler with its own url.
   npc_chronicler: {
     url: `${PLAYERS}/mage.glb`,
     animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
@@ -2986,6 +2997,9 @@ const MOB_KEYS: Record<string, string> = {
   // included, re-tinted gold by her template color) while the dragonkin
   // family fallback (the floating dragonevolved wyrm) stays for the sanctum,
   // temple, rift, and Galecrest dragonkin.
+  // The Mirefen world boss. The FOREMAN is the live silhouette; the cyclops def is
+  // built and tested beside it so the two can be swapped by editing this one line.
+  balgath_foreman: 'mob_balgath_foreman',
   drakemaw_broodlord: 'mob_dragonkin_broodlord',
   cindraleth_maw_matriarch: 'mob_dragonkin_matriarch',
   dragonkin_broodguard: 'mob_dragonkin_broodguard',

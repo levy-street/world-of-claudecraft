@@ -6140,6 +6140,29 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
     ]
   },
   {
+    "id": "conquerors_balgath",
+    "shelf": "conquerors",
+    "name": "The Buried Foreman (World Boss)",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Fenshadow Maul"
+      },
+      {
+        "kind": "item",
+        "name": "Marshlight Hauberk"
+      },
+      {
+        "kind": "item",
+        "name": "Mirejaw Scale Vest"
+      },
+      {
+        "kind": "item",
+        "name": "Duskthorn Mantle"
+      }
+    ]
+  },
+  {
     "id": "conquerors_collapsed_reliquary",
     "shelf": "conquerors",
     "name": "The Collapsed Reliquary",

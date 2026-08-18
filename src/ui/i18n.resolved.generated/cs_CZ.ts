@@ -13434,6 +13434,9 @@ export const cs_CZ: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, probouzející se štít"
       },
+      "balgath_foreman": {
+        "name": "Balgath, the Buried Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Probuzený bouřník"
       },

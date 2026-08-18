@@ -311,11 +311,11 @@ const CHEST_FN_BY_DELVE: Record<string, { chest: ChestFn; floor: number }> = {
 
 describe('Reliquary Conqueror catalog structure', () => {
   it('ships Conquerors + Professions + Horizons (full three-shelf product)', () => {
-    expect(CONQUEROR_PAGES.length).toBe(27);
+    expect(CONQUEROR_PAGES.length).toBe(28);
     expect(PROFESSION_PAGES.length).toBe(3);
     expect(HORIZON_PAGES.length).toBe(5);
     // Literal: update when product adds a page.
-    expect(RELIQUARY_PAGES.length).toBe(35);
+    expect(RELIQUARY_PAGES.length).toBe(36);
     expect(
       RELIQUARY_PAGES.every(
         (p) => p.shelf === 'conquerors' || p.shelf === 'professions' || p.shelf === 'horizons',
@@ -362,7 +362,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // and the flag keeps each whole page out of owned AND total (the dedicated
     // vault and riftbound pins in this file and tests/reliquary_state.test.ts
     // hold both sides), so neither page moves these two literals.
-    expect(full).toEqual({ owned: 340, total: 340 });
+    expect(full).toEqual({ owned: 344, total: 344 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -373,7 +373,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // pair above, including the three release-merged daggers; marks are
     // character-scoped, so this trails the overview by the 29 account-scoped
     // weapon skins).
-    expect(character).toEqual({ owned: 311, total: 311 });
+    expect(character).toEqual({ owned: 315, total: 315 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -394,7 +394,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(375);
+    ).toBe(379);
     // Distinct mark ids: the 10 shipped before Phase 21 plus the 19
     // rare-slain proofs of conquerors_rares_of_the_realm.
     expect(
@@ -609,7 +609,7 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // ids, plus the three daggers the v0.36.0 release merge added: 240 (the
     // sixth figure of the ledger row's "all pinned" claim; the other five are
     // the page/overview/character/slot/mark literals nearby).
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(240);
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(244);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -1657,6 +1657,7 @@ describe('Reliquary growth sweeps (new content must page or opt out)', () => {
     // pages; a NEW worldBoss: true mob reds here until it is paged and mapped.
     const WORLD_BOSS_PAGES: Record<string, string> = {
       thunzharr_waking_peak: 'conquerors_thunzharr',
+      balgath_foreman: 'conquerors_balgath',
     };
     const bossIds = Object.values(MOBS)
       .filter((m) => m.worldBoss === true)
@@ -2457,6 +2458,8 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   conquerors_nythraxis: 1,
   conquerors_nythraxis_heroic: 1,
   conquerors_thunzharr: 1,
+  // Six distinct doors: Balgath plus the four local rares, plus q_deacon on the maul.
+  conquerors_balgath: 6,
   conquerors_collapsed_reliquary: 2,
   conquerors_drowned_litany: 2,
   conquerors_set_deathlord: 4,

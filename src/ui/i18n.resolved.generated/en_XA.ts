@@ -2449,7 +2449,7 @@ export const en_XA: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "[{name} ŕíšéš óʋéŕ Ţĥóŕñþéáķ Ĥéíĝĥţš!]"
+      "spawn": "[{name} ŕíšéš óʋéŕ {zone}!]"
     },
     "auth": {
       "appleLoginCta": "[Çóñţíñúé ŵíţĥ Áþþļé]",
@@ -13433,6 +13433,9 @@ export const en_XA: EnTranslations = {
       },
       "thunzharr_waking_peak": {
         "name": "[Ţĥúñžĥáŕŕ, ţĥé Ŵáķíñĝ Þéáķ]"
+      },
+      "balgath_foreman": {
+        "name": "[Ɓáļĝáţĥ, ţĥé Ɓúŕíéð Ƒóŕéɱáñ]"
       },
       "thunzharr_stormling": {
         "name": "[Ŕóúšéð Šţóŕɱļíñĝ]"

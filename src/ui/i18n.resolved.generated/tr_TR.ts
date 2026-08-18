@@ -13434,6 +13434,9 @@ export const tr_TR: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, Uyanan Zirve"
       },
+      "balgath_foreman": {
+        "name": "Balgath, the Buried Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Uyanmış Fırtına Dölü"
       },

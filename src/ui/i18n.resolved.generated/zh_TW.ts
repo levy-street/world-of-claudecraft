@@ -13434,6 +13434,9 @@ export const zh_TW: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "桑扎爾，覺醒之峰"
       },
+      "balgath_foreman": {
+        "name": "Balgath, the Buried Foreman"
+      },
       "thunzharr_stormling": {
         "name": "被驚醒的風暴元素"
       },

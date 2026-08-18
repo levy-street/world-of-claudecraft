@@ -2814,9 +2814,12 @@ export class Sim {
     // Anchorless log (no pid, no entityId) => routeEvents broadcasts to every
     // connected player as a system notice. Localized by sim_i18n's worldBossSpawn
     // RULE (matched on this exact literal shape).
+    // Name the boss's OWN zone. This literal used to hardcode Thornpeak Heights,
+    // which was harmless while Thunzharr was the only world boss and actively wrong
+    // the moment a second one rose anywhere else.
     this.emit({
       type: 'log',
-      text: `${template.name} rises over Thornpeak Heights!`,
+      text: `${template.name} rises over ${zoneAt(mob.pos.x, mob.pos.z).name}!`,
       color: '#ffd100',
     });
     return mob.id;

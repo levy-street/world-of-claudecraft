@@ -62,6 +62,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Thunzharr, Uyanan Zirve',
     desc: "Uyanan Zirve'nin dünya patronundan çıkan kişisel epik ganimetler.",
   },
+  conquerors_balgath: {
+    name: 'Balgath, Gömülü Ustabaşı',
+    desc: 'Mirefen höyüklerinden çıkarılan ganimet.',
+  },
   conquerors_collapsed_reliquary: {
     name: 'Çökmüş Emanetlik',
     desc: "Çökmüş Emanetlik'teki kilitli sandıktan çıkan simge nadir parçalar.",

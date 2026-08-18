@@ -2449,7 +2449,7 @@ export const en_CA: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} rises over Thornpeak Heights!"
+      "spawn": "{name} rises over {zone}!"
     },
     "auth": {
       "appleLoginCta": "Continue with Apple",
@@ -13433,6 +13433,9 @@ export const en_CA: EnTranslations = {
       },
       "thunzharr_waking_peak": {
         "name": "Thunzharr, the Waking Peak"
+      },
+      "balgath_foreman": {
+        "name": "Balgath, the Buried Foreman"
       },
       "thunzharr_stormling": {
         "name": "Roused Stormling"

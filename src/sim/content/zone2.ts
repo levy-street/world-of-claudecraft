@@ -288,6 +288,119 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     scale: 0.55,
     color: 0x3a2740,
   },
+  // Balgath, the Buried Foreman: the Mirefen world boss.
+  //
+  // Mirefen is the churn choke point, so this boss exists to give the zone a reason to
+  // gather. He is level 20 in a level 6 to 13 zone ON PURPOSE: that is what pulls
+  // geared players back down to Fenbridge, and the mechanics below are shaped so the
+  // locals who live here are participants rather than corpses.
+  //
+  // Structure follows thunzharr_waking_peak (content/zone3.ts), the game's other world
+  // boss, so the two read the same to a raid. The numbers here are that template's
+  // shape, NOT an independently tuned encounter: the fight's balance pass belongs with
+  // the ability and loot design, and nothing in this change claims to have done it.
+  balgath_foreman: {
+    id: 'balgath_foreman',
+    name: 'Balgath, the Buried Foreman',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    worldBoss: true,
+    boss: true,
+    elite: true,
+    canSwim: false,
+    // A fen is all water and reed banks; pathing him around them would wedge a
+    // 9-unit giant on the first collider. He walks the straight line, as Thunzharr does.
+    phasesThroughObstacles: true,
+    quietMechanics: true,
+    ccImmune: true,
+    slowImmune: true,
+    hpBase: 4000,
+    hpPerLevel: 800,
+    dmgBase: 54,
+    dmgPerLevel: 10.3,
+    attackSpeed: 2.4,
+    armorPerLevel: 46,
+    // SLOWER than a player's base run of 7, which is the whole design: Thunzharr cannot
+    // be outrun and Balgath deliberately can. His damage is in telegraphed circles you
+    // walk out of, so a level 10 who reads the ground survives what a level 20 standing
+    // still does not. It also keeps both silhouettes' gait inside locomotionTimeScale's
+    // clamp, so his feet plant rather than skate.
+    moveSpeed: 6.4,
+    aggroRadius: 18,
+    // Deliberately the literal and not an import: `src/sim/` may never import from
+    // `src/render/`, and this number has a render-side twin (BALGATH_SCALE in
+    // render/characters/manifest.ts) that the measured gait references are derived AT.
+    // The two are welded by a test rather than by a cross-layer import, because the
+    // dependency direction is the harder invariant and drift here is silent otherwise.
+    scale: 2.8,
+    // The circle smash: the big, slow, telegraphed one. Long cadence and a wide
+    // footprint, so the ground ring is readable from across the fen.
+    aoePulse: {
+      min: 36,
+      max: 50,
+      radius: 12,
+      every: 14,
+      name: 'Barrow Smash',
+      school: 'physical',
+      fx: 'nova',
+    },
+    // The shockwave stomp: tighter and quicker, and the one that pins. Its smaller
+    // radius is also what the renderer tells the two slams apart by.
+    stomp: {
+      radius: 7,
+      every: 22,
+      duration: 1.5,
+      min: 18,
+      max: 28,
+      name: 'Shockwave Stomp',
+      school: 'physical',
+    },
+    // The scry: his one channelled ability, and the reason `cast` in the shared BALGATH
+    // ClipMap is the eye rather than a generic cast. The bar and the pose are one event.
+    bigCast: {
+      castId: 'balgath_scry',
+      name: 'Loomshard Scry',
+      castTime: 3.5,
+      every: 40,
+      radius: 30,
+      min: 70,
+      max: 90,
+      school: 'arcane',
+      yell: 'The shard sees you. All of you.',
+    },
+    // The huge mitigation the concept called for: what makes him need numbers rather
+    // than gear, since a small group simply cannot out-damage the refresh.
+    stoneskin: {
+      amount: 500,
+      every: 27,
+      duration: 9,
+      name: 'Barrowhide',
+      school: 'physical',
+    },
+    knockback: { chance: 0.3, distance: 7, name: 'Backhand' },
+    yells: {
+      engage: 'The Smith set me to dig. You are in the way of the digging.',
+      enrage: 'The mound breaks! Let it all come down!',
+    },
+    // Existing Mirefen gear only, and deliberately none of it another mob's SIGNATURE
+    // relic: fen_reaver_glaive was the obvious fourth pick and is dropped here for
+    // exactly that reason, because it is Mirejaw the Ravenous's paged relic and a second
+    // award route for it would need every source hint reworded. A world boss wants its
+    // own unique table, but each NEW item id owes committed art and its own Reliquary
+    // entry, which belongs with the encounter's reward design rather than here.
+    loot: [
+      { copper: 2500, chance: 1 },
+      { itemId: 'fenshadow_maul', chance: 0.18, rollGroup: 'balgath_gear' },
+      { itemId: 'marshlight_hauberk', chance: 0.18, rollGroup: 'balgath_gear' },
+      { itemId: 'mirejaw_scale_vest', chance: 0.18, rollGroup: 'balgath_gear' },
+      { itemId: 'duskthorn_mantle', chance: 0.18, rollGroup: 'balgath_gear' },
+      { itemId: 'mirebloom_treads', chance: 0.28 },
+      { itemId: 'fenwarden_sabatons', chance: 0.28 },
+      { itemId: 'bogiron_nugget', chance: 1 },
+    ],
+    color: 0x9c9382,
+  },
   mirefen_broodmother: {
     id: 'mirefen_broodmother',
     name: 'The Broodmother',

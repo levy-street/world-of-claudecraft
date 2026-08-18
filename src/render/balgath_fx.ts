@@ -25,7 +25,10 @@ import * as THREE from 'three';
 import {
   BALGATH_CRATER_SECONDS,
   BALGATH_EYE_POOL_RADIUS,
+  BALGATH_MECHANIC_MATCH_SQ,
   BALGATH_RING_SECONDS,
+  BALGATH_SMASH_MIN_RADIUS,
+  BALGATH_TEMPLATE_PREFIX,
   type BalgathRingPlan,
   balgathRingAlpha,
   balgathRingRadius,
@@ -104,6 +107,48 @@ interface ActiveCrater {
   mat: THREE.MeshBasicMaterial;
   age: number;
   life: number;
+}
+
+/**
+ * Route one `spellfxAt` event to Balgath's ground layer, or ignore it.
+ *
+ * The boss's mechanics ride the SHARED mob-mechanic emitters (`fx: 'runeCircle'` is
+ * the telegraph, `fx: 'nova'` the detonation), which every boss in the game uses and
+ * which carry no source id. So identity is resolved by POSITION: those emitters fire
+ * at `mob.pos` exactly, so a Balgath standing on the event's own coordinates is the
+ * caster. The match runs over the renderer's live entity list here rather than behind a
+ * callback, so the whole rule (who counts as Balgath, how close is close enough) reads in
+ * one place instead of being split across the coordinator. A tight radius keeps it honest:
+ * if some other boss ever detonates on top of Balgath the worst case is one extra silt
+ * ring, never a missing telegraph.
+ *
+ * Returns true when the event was consumed, so the caller can skip the generic path.
+ * The telegraph deliberately is NOT consumed: the shared rune-circle ring is the
+ * actionable information a player dodges, and replacing it with a cosmetic silt ring
+ * would be a gameplay regression. Balgath's ring is drawn ON TOP of it, at impact.
+ */
+export function routeBalgathSpellfxAt(
+  ev: { x: number; z: number; fx: string; radius?: number },
+  fx: BalgathFx,
+  entities: Iterable<{ templateId?: string; pos: { x: number; z: number } }>,
+): boolean {
+  if (ev.fx !== 'nova' || !ev.radius) return false;
+  let found = false;
+  for (const e of entities) {
+    if (!e.templateId?.startsWith(BALGATH_TEMPLATE_PREFIX)) continue;
+    const dx = e.pos.x - ev.x;
+    const dz = e.pos.z - ev.z;
+    if (dx * dx + dz * dz <= BALGATH_MECHANIC_MATCH_SQ) {
+      found = true;
+      break;
+    }
+  }
+  if (!found) return false;
+  // The two slams differ by footprint, which is also how a raid tells them apart:
+  // the smash is the big telegraphed circle, the stomp the tighter shockwave.
+  if (ev.radius >= BALGATH_SMASH_MIN_RADIUS) fx.smashImpact(ev.x, ev.z, ev.radius);
+  else fx.stompRing(ev.x, ev.z, ev.radius);
+  return true;
 }
 
 /** Balgath's ground-effect layer. The renderer owns one instance and ticks it. */

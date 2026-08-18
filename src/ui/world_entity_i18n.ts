@@ -116,6 +116,7 @@ const MOB_IDS = [
   'vale_cup_ball',
   // Thornpeak Heights world boss + its summoned adds
   'thunzharr_waking_peak',
+  'balgath_foreman',
   'thunzharr_stormling',
   // Ambient Highwatch Stables horse (zone 3)
   'stable_horse',

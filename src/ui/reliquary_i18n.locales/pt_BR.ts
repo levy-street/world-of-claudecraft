@@ -62,6 +62,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Thunzharr, o Pico Desperto',
     desc: 'Espólios épicos pessoais do chefe mundial do Pico Desperto.',
   },
+  conquerors_balgath: {
+    name: 'Balgath, o Capataz Enterrado',
+    desc: 'Espólios arrastados de volta dos túmulos de Mirefen.',
+  },
   conquerors_collapsed_reliquary: {
     name: 'O Relicário Desmoronado',
     desc: 'Raros marcantes do baú com fechadura do Relicário Desmoronado.',

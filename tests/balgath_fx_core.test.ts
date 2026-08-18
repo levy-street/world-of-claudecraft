@@ -6,6 +6,11 @@
 // popping out. Each of those is asserted here rather than eyeballed in a render.
 
 import { describe, expect, it } from 'vitest';
+// The router lives in the painter module (it touches a BalgathFx), but its DECISION is
+// what this suite is about, so it is tested here beside the constants it keys on. The
+// module reaches for `document` only lazily inside the soft-disc texture, which none of
+// these paths hit, so a plain Node import is safe.
+import { type BalgathFx, routeBalgathSpellfxAt } from '../src/render/balgath_fx';
 import {
   BALGATH_CRATER_SECONDS,
   BALGATH_EYE_POOL_RADIUS,
@@ -81,5 +86,81 @@ describe('balgath timing constants', () => {
 
   it('lights a ground pool big enough to read under a boss-scale body', () => {
     expect(BALGATH_EYE_POOL_RADIUS).toBeGreaterThan(3);
+  });
+});
+
+// --- the spellfxAt router ----------------------------------------------------
+// This is the whole reason Balgath's ground layer ever fires. It resolves the boss
+// by POSITION off shared mob-mechanic events that carry no source id, so the two
+// failure modes are opposite and both bad: claim another boss's blast, or silently
+// claim none and leave the effect layer dead. Both are pinned.
+describe('routeBalgathSpellfxAt', () => {
+  const at = (x: number, z: number, templateId = 'balgath_foreman') => ({
+    templateId,
+    pos: { x, z },
+  });
+  function spy() {
+    const calls: Array<[string, number]> = [];
+    return {
+      calls,
+      fx: {
+        smashImpact: (_x: number, _z: number, r: number) => calls.push(['smash', r]),
+        stompRing: (_x: number, _z: number, r: number) => calls.push(['stomp', r]),
+      } as unknown as BalgathFx,
+    };
+  }
+
+  it('claims a nova standing on Balgath and picks the slam by footprint', () => {
+    const big = spy();
+    expect(
+      routeBalgathSpellfxAt({ x: 10, z: 20, fx: 'nova', radius: 12 }, big.fx, [at(10, 20)]),
+    ).toBe(true);
+    expect(big.calls).toEqual([['smash', 12]]);
+
+    const small = spy();
+    expect(
+      routeBalgathSpellfxAt({ x: 10, z: 20, fx: 'nova', radius: 6 }, small.fx, [at(10, 20)]),
+    ).toBe(true);
+    expect(small.calls).toEqual([['stomp', 6]]);
+  });
+
+  it('leaves the telegraph alone so the dodgeable ring is never replaced', () => {
+    // runeCircle IS the actionable information. Consuming it here would swap a
+    // gameplay ring for a cosmetic one, which the graphics-neutrality invariant forbids.
+    const s = spy();
+    expect(
+      routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'runeCircle', radius: 12 }, s.fx, [at(0, 0)]),
+    ).toBe(false);
+    expect(s.calls).toEqual([]);
+  });
+
+  it('ignores another boss detonating away from Balgath', () => {
+    const s = spy();
+    expect(routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'nova', radius: 12 }, s.fx, [at(40, 40)])).toBe(
+      false,
+    );
+    expect(routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'nova', radius: 12 }, s.fx, [])).toBe(false);
+    expect(s.calls).toEqual([]);
+  });
+
+  it('claims for BOTH silhouettes, which are one encounter', () => {
+    for (const id of ['balgath_foreman', 'balgath_cyclops']) {
+      const s = spy();
+      expect(
+        routeBalgathSpellfxAt({ x: 5, z: 5, fx: 'nova', radius: 12 }, s.fx, [at(5, 5, id)]),
+      ).toBe(true);
+    }
+    const other = spy();
+    expect(
+      routeBalgathSpellfxAt({ x: 5, z: 5, fx: 'nova', radius: 12 }, other.fx, [
+        at(5, 5, 'thunzharr_waking_peak'),
+      ]),
+    ).toBe(false);
+  });
+
+  it('needs a radius, because the ring is drawn at the blast size', () => {
+    const s = spy();
+    expect(routeBalgathSpellfxAt({ x: 0, z: 0, fx: 'nova' }, s.fx, [at(0, 0)])).toBe(false);
+    expect(s.calls).toEqual([]);
   });
 });

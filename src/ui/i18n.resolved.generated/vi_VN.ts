@@ -13434,6 +13434,9 @@ export const vi_VN: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, Đỉnh Núi Thức Giấc"
       },
+      "balgath_foreman": {
+        "name": "Balgath, the Buried Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Tinh Linh Bão Trỗi Dậy"
       },

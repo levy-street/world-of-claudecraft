@@ -13434,6 +13434,9 @@ export const pt_BR: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, o Pico Desperto"
       },
+      "balgath_foreman": {
+        "name": "Balgath, the Buried Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Elemental de tormenta desperto"
       },

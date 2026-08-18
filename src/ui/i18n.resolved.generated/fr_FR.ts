@@ -13434,6 +13434,9 @@ export const fr_FR: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, le Pic Éveillé"
       },
+      "balgath_foreman": {
+        "name": "Balgath, the Buried Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Élémentaire de tempête éveillé"
       },

@@ -1110,6 +1110,33 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       'vestments_of_the_waking_grove',
     ),
   },
+  {
+    id: 'conquerors_balgath',
+    shelf: 'conquerors',
+    name: 'Balgath, the Buried Foreman',
+    desc: 'Spoils dragged back out of the Mirefen barrow-mounds.',
+    // `none`, not a deed_stat counter like Thunzharr's. A counter would be the richer
+    // page, but it only exists to drive a completion meter and it drags in the whole
+    // deed chain (a DeedStatKey, a deed that reads it, a producer site that bumps it,
+    // and the five pinned catalog totals those move). Balgath has no authored deeds
+    // yet, so a counter here would be a meter for a deed nobody can earn. The
+    // encounter's reward design is what promotes this to a counter.
+    clearSource: { kind: 'none' },
+    // Unlike Thunzharr, this page's relics are NOT boss-exclusive: Balgath is a second
+    // door onto gear Mirefen already drops, because a world boss with its own unique
+    // table owes new item ids, committed art and their own shelf entries, and that is
+    // the encounter's reward design rather than this change's. So every relic names
+    // BOTH doors. Hinting only the boss would send a player to a 3-hour respawn for a
+    // helm the local rare drops on a 10-minute one, which is worse than no hint.
+    // No `sourceDefault` precisely because every relic here authors its own pair; a
+    // default that nothing inherits is dead config, and a test says so.
+    relics: items(
+      ['fenshadow_maul', [fromBoss('balgath_foreman'), fromBoss('deacon_voss'), fromQuest('q_deacon')]],
+      ['marshlight_hauberk', [fromBoss('balgath_foreman'), fromBoss('fen_troll')]],
+      ['mirejaw_scale_vest', [fromBoss('balgath_foreman'), fromBoss('mirejaw_the_ravenous')]],
+      ['duskthorn_mantle', [fromBoss('balgath_foreman'), fromBoss('gravecaller_mender')]],
+    ),
+  },
   // ---- Delves (rare+ uniques; mark-shop signature pieces included) ----
   {
     id: 'conquerors_collapsed_reliquary',

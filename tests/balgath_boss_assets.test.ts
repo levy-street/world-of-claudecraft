@@ -14,10 +14,6 @@ const ROOT = resolve(__dirname, '..');
 const HERO = resolve(ROOT, 'public/models/creatures/balgath_foreman.glb');
 const ABILITIES = resolve(ROOT, 'public/models/creatures/balgath_ability_anims.glb');
 const CYCLOPS = resolve(ROOT, 'public/models/creatures/balgath_cyclops.glb');
-const CYCLOPS_ABILITIES = resolve(
-  ROOT,
-  'public/models/creatures/balgath_cyclops_ability_anims.glb',
-);
 const MANIFEST = resolve(ROOT, 'src/render/characters/manifest.ts');
 
 /** Clip names out of a GLB's JSON chunk, without pulling three.js into a node test. */
@@ -28,6 +24,23 @@ function clipNames(path: string): string[] {
   const jsonLength = buf.readUInt32LE(12);
   const json = JSON.parse(buf.subarray(20, 20 + jsonLength).toString('utf8'));
   return (json.animations ?? []).map((a: { name?: string }) => a.name ?? '');
+}
+
+/** Skin joint names, in order, straight out of the GLB JSON chunk. */
+function jointNames(path: string): string[] {
+  const buf = readFileSync(path);
+  const jsonLength = buf.readUInt32LE(12);
+  const json = JSON.parse(buf.subarray(20, 20 + jsonLength).toString('utf8'));
+  const skin = (json.skins ?? [])[0];
+  return (skin?.joints ?? []).map((i: number) => json.nodes[i].name as string);
+}
+
+/** The shared BALGATH ClipMap literal, as source text. */
+function clipMapSource(): string {
+  const src = readFileSync(MANIFEST, 'utf8');
+  const start = src.indexOf('const BALGATH: ClipMap = {');
+  expect(start, 'the shared BALGATH ClipMap is missing').toBeGreaterThan(-1);
+  return src.slice(start, src.indexOf('\n};', start));
 }
 
 /** A named VisualDef object literal, as source text. */
@@ -85,71 +98,94 @@ describe('balgath world boss assets', () => {
     expect(block).toContain('animUrls');
   });
 
-  it('names only clips the shipped GLBs actually carry', () => {
-    const available = new Set([...clipNames(HERO), ...clipNames(ABILITIES)]);
-    const block = balgathBlock();
-    // Every quoted clip-ish string in the ClipMap has to resolve. This is the
-    // check that catches a typo'd rename, which is otherwise invisible until the
-    // mixer silently finds no action and leaves the rig at bind pose.
-    const clipsStart = block.indexOf('clips: {');
-    const named = [...block.slice(clipsStart).matchAll(/'([A-Z][A-Za-z_]+)'/g)].map((m) => m[1]);
+  it('names only clips BOTH shipped rigs actually carry', () => {
+    // One ClipMap drives two bodies, so a name has to resolve on each of them
+    // independently. Intersecting rather than unioning is the point: a clip present
+    // on only one rig would leave the other at bind pose, and a union would pass.
+    const foreman = new Set([...clipNames(HERO), ...clipNames(ABILITIES)]);
+    const cyclops = new Set([...clipNames(CYCLOPS), ...clipNames(ABILITIES)]);
+    const named = [...clipMapSource().matchAll(/'([A-Z][A-Za-z_]+)'/g)].map((m) => m[1]);
     expect(named.length).toBeGreaterThan(0);
-    for (const clip of named)
-      expect(available, `clip '${clip}' is not in a shipped GLB`).toContain(clip);
+    for (const clip of named) {
+      expect(foreman, `clip '${clip}' is not on the foreman`).toContain(clip);
+      expect(cyclops, `clip '${clip}' is not on the cyclops`).toContain(clip);
+    }
   });
 
   it('holds the encounter-only clips out of the generic ClipMap slots', () => {
     // Blinded must hold for a debuff's duration and Wake fires once at spawn.
     // If either ever lands in `attack`/`hit`/`flourish` the state machine will
     // pick it at random mid-fight, which reads as the boss bugging out.
-    const block = balgathBlock();
-    const clips = block.slice(block.indexOf('clips: {'));
-    expect(clips).not.toContain('Balgath_Blinded');
-    expect(clips).not.toContain('Balgath_Wake');
+    const map = clipMapSource();
+    expect(map).not.toContain('Balgath_Blinded');
+    expect(map).not.toContain('Balgath_Wake');
+  });
+
+  it('gives both bodies the same ClipMap object, so they cannot drift', () => {
+    for (const key of ['mob_balgath_foreman', 'mob_balgath_cyclops']) {
+      expect(defBlock(key), `${key} should share the BALGATH ClipMap`).toContain(
+        'clips: BALGATH,',
+      );
+    }
   });
 
   // --- the cyclops silhouette -----------------------------------------------
-  // Second model for the same boss concept, kept so the two can be compared in
-  // engine. It earns its own assertions because its constraints are different:
-  // its slash retarget FOLDED, so the one clip it must never name is its own.
-  it('ships the cyclops rig with its two authored clips', () => {
-    const rig = clipNames(CYCLOPS);
-    for (const clip of RETARGETED_CLIPS) expect(rig).toContain(clip);
-    expect(clipNames(CYCLOPS_ABILITIES).sort()).toEqual(['Balgath_Blinded', 'Balgath_Stomp']);
+  // Second body for the same encounter. It carries the FOREMAN's ability donor, which
+  // is only sound because the two Tripo auto-rigs came back with the same joints under
+  // the same names. That is not a safe assumption to leave implicit: a re-generated
+  // cyclops could come back with a renamed or reordered skeleton, the clips would bind
+  // to nothing, and the rig would sit in BIND POSE the first time a mechanic fired,
+  // silently, in a raid. So the equality itself is the pin.
+  it('shares the foreman skeleton exactly, which is what lets the clips bind', () => {
+    const a = jointNames(HERO);
+    const b = jointNames(CYCLOPS);
+    expect(a.length).toBe(41);
+    expect(b).toEqual(a);
+  });
+
+  it('points the cyclops at the foreman donor, not one of its own', () => {
+    const block = defBlock('mob_balgath_cyclops');
+    expect(block).toContain('balgath_ability_anims.glb');
+    expect(block).not.toContain('balgath_cyclops_ability_anims');
   });
 
   it('never names the cyclops folded Attack clip', () => {
-    // The slash preset collapsed this body. The clip is still IN the GLB (it came
-    // with the retarget and removing it would desync the file from the job), so
-    // the only thing standing between it and a raid seeing it is this: the
-    // ClipMap must not mention it. `attack` uses the authored Stomp instead.
-    const clips = defBlock('mob_balgath_cyclops');
-    const map = clips.slice(clips.indexOf('clips: {'), clips.indexOf('tint:'));
+    // Its slash preset collapsed that body. The clip is still IN the rig GLB (it came
+    // with the retarget), so the only thing between it and a raid seeing it is that
+    // the shared ClipMap uses the authored slams for `attack` instead.
+    const map = clipMapSource();
     expect(map).not.toContain("'Attack'");
-    expect(map).toContain('Balgath_Stomp');
+    expect(map).toContain('Balgath_Smash');
   });
 
-  it('names only clips the cyclops GLBs actually carry', () => {
-    const available = new Set([...clipNames(CYCLOPS), ...clipNames(CYCLOPS_ABILITIES)]);
-    const block = defBlock('mob_balgath_cyclops');
-    const map = block.slice(block.indexOf('clips: {'), block.indexOf('tint:'));
-    const named = [...map.matchAll(/'([A-Z][A-Za-z_]+)'/g)].map((m) => m[1]);
-    expect(named.length).toBeGreaterThan(0);
-    for (const clip of named)
-      expect(available, `clip '${clip}' is not in a shipped GLB`).toContain(clip);
-  });
-
-  it('stays out of the boot preload sweep while nothing can spawn him', () => {
-    // No MOB_KEYS entry exists yet, so preloading 1.8 MB of boss buys nothing.
-    // When the encounter lands, both this flag and this assertion go away together.
+  it('is spawnable, and therefore in the boot preload sweep', () => {
+    // The inverse of what this test asserted while the encounter was missing. Both
+    // halves matter now: a MOB_KEYS entry is what stops him rendering as the generic
+    // `elemental` family fallback, and `lazyPreload` would keep his GLB out of the
+    // tier-independent preload union that world entry reads synchronously.
     const src = readFileSync(MANIFEST, 'utf8');
-    // Scope to the MOB_KEYS literal itself. A whole-file search matches the word
-    // in this def's own comment and reports every state as spawnable.
     const keysStart = src.indexOf('MOB_KEYS: Record');
     expect(keysStart, 'MOB_KEYS moved or was renamed').toBeGreaterThan(-1);
-    const spawnable = src.slice(keysStart, src.indexOf('\n};', keysStart)).includes('balgath');
-    expect(balgathBlock()).toContain('lazyPreload: true');
-    expect(defBlock('mob_balgath_cyclops')).toContain('lazyPreload: true');
-    expect(spawnable, 'balgath is spawnable now: drop lazyPreload and this test').toBe(false);
+    const keys = src.slice(keysStart, src.indexOf('\n};', keysStart));
+    expect(keys).toContain("balgath_foreman: 'mob_balgath_foreman'");
+    for (const key of ['mob_balgath_foreman', 'mob_balgath_cyclops']) {
+      expect(defBlock(key), `${key} must not be lazy once spawnable`).not.toContain('lazyPreload');
+    }
   });
+
+  it('keeps the sim scale and the measured gait references in agreement', () => {
+    // The refs are only correct AT the scale they were measured at, and the sim owns
+    // that scale while render owns the refs. `src/sim/` may never import from
+    // `src/render/`, so the two numbers cannot share a constant; this is the weld that
+    // replaces the import. Drift here is silent and shows up only as skating feet.
+    const manifest = readFileSync(MANIFEST, 'utf8');
+    const declared = manifest.match(/export const BALGATH_SCALE = ([\d.]+);/);
+    expect(declared, 'BALGATH_SCALE is missing from the manifest').toBeTruthy();
+    const zone = readFileSync(resolve(ROOT, 'src/sim/content/zone2.ts'), 'utf8');
+    const tpl = zone.slice(zone.indexOf('balgath_foreman: {'));
+    const simScale = tpl.slice(0, tpl.indexOf('\n  },')).match(/scale: ([\d.]+),/);
+    expect(simScale, "the mob template's scale is missing").toBeTruthy();
+    expect(Number(simScale![1])).toBe(Number(declared![1]));
+  });
+
 });

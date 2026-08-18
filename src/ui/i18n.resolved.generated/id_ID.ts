@@ -13434,6 +13434,9 @@ export const id_ID: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, Puncak yang Terjaga"
       },
+      "balgath_foreman": {
+        "name": "Balgath, the Buried Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Anak Badai Terjaga"
       },
