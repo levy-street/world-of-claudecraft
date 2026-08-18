@@ -4,11 +4,30 @@ Read this file first in every phase session. It is the single authority for lock
 decisions. If a phase file contradicts this file, this file wins and the phase file
 gets swept in the same pass (amend the QA twin too, always).
 
-Current phase: Phase 9 (world presence, GO-LIVE) done 2026-08-17 on
-fix/farming-phase-09-world-presence off feature/farming-plan at 26f330cea2
-(merged --no-ff back into feature/farming-plan; hash in progress.md; next is
-Phase 9 QA, docs/farming/phase-09-qa.md starter). FARMING IS LIVE on the
-merged branch: four static farmer NPCs (Farmer Jessica 'Allotment Keeper' at
+Current phase: Phase 9 QA done 2026-08-17 (verdict FAIL ON THE GO-LIVE
+ACCEPTANCE, SCOPE STOP: branch fix/farming-phase-09-qa off feature/farming-plan
+at 2f0f2547de, merged --no-ff back; hash in progress.md). Everything Phase 9
+built verifies (the live-client journey walked 39 checkpoints green at all four
+hubs, every vendor row purchase-tested, 16 of 16 new mutants killed, six
+reviewers 0 BLOCKING on the phase's own diff), but the QA established that NO
+CLIENT-SIDE PLAYER VERB PLANTS OR HARVESTS A BED (deviation (bn): plantCrop and
+harvestCrop have no caller under src/ui, src/game, src/render, or src/main.ts,
+and no /dev plant exists), so an ordinary player accepts q_farm_intro and can
+never complete it, and the Live-surface note's "reachable by ordinary players"
+is UNMET while the quest and its teaching copy are live: the half-reachable
+state the packet forbids. Owner: a new Phase 9b (the bed verbs; PROPOSED in
+docs/farming/phase-09b-bed-verbs.md, maintainer adopts or strikes) BEFORE
+Phase 10; the maintainer may instead re-dormant the intro quest and copy.
+Second packet-level hole the QA found: (bo) tier 3 and 4 seeds have NO first
+faucet (seed-back returns the SAME crop's seed and only from tier 3+ crops;
+golden_harvest is a yield multiplier), so the Highwatch and Evergarden beds can
+never be sown: D11 needs a bootstrap ruling. The eighteenth absorb (release
+tip f42a67f341, the druid feral enablement, 5 commits, no conflicts, no
+lockfile or golden move) opened the QA. Prior: Phase 9 (world presence,
+GO-LIVE) done 2026-08-17 on fix/farming-phase-09-world-presence off
+feature/farming-plan at 26f330cea2 (merged --no-ff back into
+feature/farming-plan; hash in progress.md). FARMING IS LIVE ON THE SIM AND
+THE WIRE on the merged branch: four static farmer NPCs (Farmer Jessica 'Allotment Keeper' at
 Eastbrook (24.5, 32.5), Farmer Teasel 'Fen Paddy Farmer' at Fenbridge (-21,
 333.5) with a fenbridge_layout row, Farmer Hollis 'Highwatch Terrace Farmer'
 at Highwatch (-18, 695.5), Farmer Verbena 'Parterre Gardener' at the Evergarden
@@ -381,7 +400,7 @@ visit or a punishment for lateness is violating the design, not tuning it.
   done. No pushes, no PRs, for anything farming. The integration branch is the LOCAL
   `feature/farming-plan` in this worktree (it carries docs/farming/; originally based
   on release/v0.36.0, it has absorbed every newer release tip since, release/v0.39.0
-  f48c7a3a9b as of the seventeenth absorb). Every phase: fetch, then branch `fix/farming-phase-NN-<slug>` off
+  f42a67f341 as of the eighteenth absorb). Every phase: fetch, then branch `fix/farming-phase-NN-<slug>` off
   LOCAL `feature/farming-plan` (never off a bare release tip, which lacks the packet);
   if a newer `release/**` tip exists than the branch has absorbed, merge it INTO the
   phase branch first (release-merge-audit for a nontrivial merge, PLUS the
@@ -2020,10 +2039,14 @@ question does not arise (farming has no station).
   three seeds) is otherwise identical: no pre-existing NPC, camp, or mob was
   nudged. Re-minted deliberately with the goldens: the atlas fixture, the
   Eastbrook chunk vertex digest, and the four farming-zone map plates plus
-  the world strip (the other eleven plates came out byte-identical). QA:
-  eyeball the Highwatch shelf on the live client; if the mound reads badly,
-  re-seat Hollis where the natural relief matches the legacy field. Future
-  NPC placements should probe the pad delta, not just slope.
+  the world strip (the other eleven plates came out byte-identical). QA
+  READ (Phase 9 QA, 2026-08-17): the Highwatch shelf was eyeballed on the
+  live client from three angles at the LOW preset (docs/screenshots/
+  farming-phase-09/qa-highwatch-shelf-low.png and -overview.png): the pad
+  reads as a natural terrace, Hollis stands a step uphill of the beds with
+  no visible mound, crater, or seam, so NO re-seat; the maintainer read on
+  the pad rule itself still stands. Future NPC placements should probe the
+  pad delta, not just slope.
   (bi) THE OFFERED-BUT-REFUSED BAND: the husk-trade row is offered on the
   NpcDef flag, the sim demands FARMER_TRADE_RANGE 7, and the NPC dialog
   closes at NPC_WINDOW_CLOSE_RANGE 8, so a 1-yd band exists where the row
@@ -2068,6 +2091,100 @@ question does not arise (farming has no station).
   at >= 5 with six such quests (derived, so q_farm_intro IS covered);
   "Shift+K" appears in three shipped strings while the bind is rebindable
   (the guide controls row is the one tie).
+  Phase 9 QA (2026-08-17, PASS-on-the-diff, FAIL on the go-live acceptance;
+  scope stop per the QA file): (bn) NO PLAYER VERB PLANTS OR HARVESTS.
+  plantCrop and harvestCrop exist on IWorldFarming, in Sim, in ClientWorld,
+  and in server/farming_commands.ts, and every suite drives them, but no
+  file under src/ui, src/game, src/render, or src/main.ts calls either (the
+  husk trade is the ONE farming verb with a client control, the
+  [data-husk-trade] gossip row), no bed is an interact target
+  (src/game/nearby_interaction.ts walks GATHER_NODES only, the renderer
+  picks gather nodes and entities, never bed seats), no window offers a
+  seed picker, and no /dev plant command exists (farmgrow only advances a
+  planted plot). Proven live: on the dev client a fresh character standing
+  on bed_eastbrook_1 with the granted hoe and seed pressed the interact key
+  and clicked the ground and planted nothing (no farmPlanted, no farmDenied,
+  no toast: a SILENT dead end); the whole journey then walked green only by
+  calling window.__game.sim.plantCrop / harvestCrop from the debug surface.
+  Consequences: q_farm_intro is offered (quest glyph, greeting, teaching
+  copy "sow it in one of those beds") and accepted, and can never be
+  completed by an ordinary player; the Live-surface note ("the full
+  plant-grow-harvest-cook loop is reachable by ordinary players") is UNMET
+  and the packet's own dormancy rule (dormant is fine, half-reachable never)
+  is broken; the husk trade, the watch fee, and the produce work orders are
+  stranded behind it; the (bg) per-talk seed re-grant never closes because
+  the quest never turns ready (a permanent free-hoe and free-seed dispenser
+  through the face-to-face trade pipe, the security lane's note); and the
+  phase's recorded qa-checklist READY line is superseded by this QA's NOT
+  READY. Not Phase 9's fault: no phase file in the packet ever planned the
+  client verb (Phase 8's journal is "informational by design, both verbs
+  stay at the garden beds", and nothing at the beds sends a command); it is
+  a packet planning hole surfaced by the first QA that played the loop as a
+  player. Fix owner: PROPOSED Phase 9b, docs/farming/phase-09b-bed-verbs.md
+  (a bed interaction through the gather-node family in
+  src/game/nearby_interaction.ts: harvest is choice-free so it is an
+  InteractionOutcome; plant needs a seed and knob choice so it is a window,
+  pure core src/ui/farming_plant_sheet_view.ts + thin painter on the
+  PainterHost seam, opened through a NearbyInteractionHud dep; a bed pick
+  or ripe marker as a src/render/<thing>.ts sibling; hud.ts (5 lines of
+  headroom), main.ts (1) and renderer.ts (0) must extract BEFORE the wiring;
+  mobile interact button; a jsdom test that presses the interact key beside
+  a planted bed and asserts world.plantCrop / harvestCrop, plus a browser
+  journey with NO window.__game). Maintainer decision owed: adopt 9b before
+  Phase 10, or re-dormant the intro quest, Jessica's teaching sentence, and
+  the guide's "Sow with a hoe" prose in one change until the verb ships.
+  Until one of those lands the go-live is NOT player-complete.
+  (bo) TIER 3 AND 4 SEEDS HAVE NO FIRST FAUCET: D11 says they "come from
+  harvest seed-back rolls and the rare event", but the seed-back roll
+  (professions/farming.ts, FARM_SEED_BACK_MIN_TIER 3) returns crop.seedItemId,
+  the SAME crop's seed, and only from a tier 3+ crop, so the first tier-3
+  seed can never exist; golden_harvest (D12) is a five-fold yield, not a
+  seed; no loot table, quest reward, or counter carries
+  highland_barley_seed, frost_gourd_seed, gilded_sunmelon_seed, or
+  evergarden_greens_seed (grep of src/sim and server). So the Highwatch and
+  Evergarden beds can never be sown by anyone, and Hollis and Verbena sell
+  compost beside beds nothing reaches. Phase 9 followed the plan exactly
+  (tiers 3/4 stocked NOWHERE is pinned as NEVER_STOCKED); the hole is D11's.
+  Maintainer ruling owed, options in the OPEN list; the QA changed nothing.
+  QA fixes landed (branch fix/farming-phase-09-qa): the husk-trade row now
+  closes WITH focus restore (it was the first bindRoute consumer with no
+  successor window, so the click dropped keyboard focus to <body>; pinned
+  release(true)); the stale pre-go-live comments in the IWorldFarming facet
+  and the farm recipes suite swept; and the pins the coverage lanes named:
+  compost and husk item ids by literal, the four farmer seats and the
+  spawned stock by literal (the placement suite compared the ctor's copy
+  against its own source), the vendor walk's width per farmer, the two
+  produce orders' count and payout (8 for 16, 5 for 20), the intro seed's
+  fence through sellItem and marketList with the bought seeds as the
+  negative, the online no_farmer refusal over the wire with a same-session
+  positive control, the busy-farmer no-farmPlanted arm, and the journey
+  suite's layer-honesty header. Mutation checks after committing: 16 of 16
+  new mutants killed with named reds (boundary polarity, flag-not-
+  discriminator, unnamed-crop arm, wrong action tag at plant, marker
+  ignores the named patch, husk route dead, aria key swap, wheat payout off
+  by one, Teasel's rice row dropped, Verbena's compost dropped, hoe dropped
+  from requiredItems, harvest credited on plant, patch filter inverted,
+  tier-1 fee three produce, Jessica's stock reordered, journal pointer
+  dropped from the completion text). Residuals recorded, not fixed: the
+  requiredItems grant on accept and re-talk bypasses bag capacity (a full
+  16/16 bag still receives the hoe and seed as overflow slots, 18/16; the
+  q_prof_intro template's pre-existing behavior, not farming's; the bag
+  header paints "17/16" so it is visible, maintainer read owed on the
+  template); the map_doc farmer-flag drop stays a ledgered residual, not
+  fixed (the sanitizer drops cardMaster and warfareVendor the same way, and
+  map docs carry no farm rows of their own; the static beds do stand under
+  a custom map, so an editor-authored farmer is one whitelist line plus a
+  round-trip pin the day the editor is meant to author farmers); the docs' day-one shopping list arithmetic
+  said 28 copper and the truth is 44 (seed 4 + compost 8 + two brook_carrot
+  at 16; the intro quest's 50 still covers it, with 6 to spare), corrected;
+  the guide's "(Shift+K, or the Farming row...)" prose lacks the sibling
+  pages' "by default" qualifier (a reword of a translated key, the
+  i18n-semantic-regressions trap: left for the release fill); the WCAG
+  label-in-name mismatch on the husk row aria (family-wide, ledgered); the
+  src/ui/icons.ts ITEM_ART_PENDING rationale comment still says "no faucet
+  until go-live" for compost (a comment inside the art-audit fingerprint
+  family, swept at the Phase 13 art batch when the set moves anyway);
+  nearFarmerNpc walks the whole radius after the answer (cosmetic).
 
 ## OPEN items (maintainer decisions or later-phase calls, never guess)
 
@@ -2075,9 +2192,23 @@ question does not arise (farming has no station).
   lore pass in the content phase PR.
 - Phase 9 reads owed: (bg) the intro grant fence (accept the trade-pipe leak or
   extend the trade guard to honor noVendorSell/noMarketList), (bh) the Highwatch
-  farmer's terrain pad (re-seat if the mound reads badly), and the four farmer
-  titles/greetings as authored (Allotment Keeper, Fen Paddy Farmer, Highwatch
-  Terrace Farmer, Parterre Gardener).
+  farmer's terrain pad (the QA eyeballed it: no re-seat; the pad rule itself is
+  the read), and the four farmer titles/greetings as authored (Allotment Keeper,
+  Fen Paddy Farmer, Highwatch Terrace Farmer, Parterre Gardener).
+- Phase 9 QA DECISIONS OWED (blocking the player-complete go-live): (bn) adopt the
+  PROPOSED Phase 9b (docs/farming/phase-09b-bed-verbs.md: the bed interaction
+  that plants and harvests through IWorldFarming, before Phase 10) or re-dormant
+  q_farm_intro, Jessica's teaching sentence, and the guide's "Sow with a hoe"
+  prose until the verb ships; (bo) the tier 3/4 seed bootstrap: (1) a seed-back
+  roll on a tier-N harvest that can return the NEXT tier's seed at low odds
+  (upward drift, keeps "no counter sells them"), (2) the tier-3 and tier-4
+  farmers stock their own seeds at a premium (amends D11's counter rule), (3) a
+  once-per-character grant (a Hollis or Verbena intro quest, or the golden
+  harvest paying a next-tier seed), or (4) accept that tiers 3/4 open only when
+  Phase 10 or a later phase adds a faucet, stated in the Live-surface notes.
+  Also owed from the QA lanes: the q_prof_intro-template overflow grant on a
+  full bag (pre-existing, visible as 17/16), and the (bg) faucet's lack of a
+  terminator while (bn) stands.
 - Exact tuning constants: growth durations per tier inside the D5 bands, the gain
   schedule, harvest-lives save-chance endpoints, well-fed magnitudes and durations,
   feast charge count and expiry. Phases propose concrete values in the PR body and

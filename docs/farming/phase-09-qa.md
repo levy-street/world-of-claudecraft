@@ -28,6 +28,21 @@ and 2, compost, brook_carrot, garden_hoe, the intro quest, husk conversion at ev
 farmer, the ready notices, the cook loop; still unreachable: farming deeds,
 golden_harvest, well-fed dishes, the feast.
 
+PHASE 9 QA EXECUTED 2026-08-17: verdict FAIL ON THE GO-LIVE ACCEPTANCE (scope stop),
+PASS on the phase's own diff. Branch fix/farming-phase-09-qa off feature/farming-plan at
+2f0f2547de (the eighteenth absorb f4ca0f7000 first, zero conflicts), merged --no-ff back
+(hash in progress.md). The live-client journey walked 39 checkpoints green at all four
+hubs through the real UI wherever a UI exists; the plant and the harvest had to go
+through window.__game.sim because NO PLAYER VERB EXISTS for either (state.md (bn): the
+scope BLOCKING; the qa-checklist verdict NOT READY). Also found: (bo) tier 3/4 seeds
+have no first faucet (D11 ruling owed). Fixed in the QA: the husk-trade focus restore,
+the stale pre-go-live comments, and the coverage pins the lanes named; 16 of 16 new
+mutants killed. (bh) eyeball: no re-seat. Every deviation and residual is in state.md;
+the would-be PR body is the progress.md Phase 9 QA notes. The Phase 10 session must
+read state.md's OPEN list first: the maintainer decides (bn) and (bo) before the
+feature is player-complete; the proposed Phase 9b starter is
+docs/farming/phase-09b-bed-verbs.md.
+
 ### QA Starter Prompt
 
 ```

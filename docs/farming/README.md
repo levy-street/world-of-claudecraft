@@ -30,6 +30,7 @@ Phase files, in order (each implementation phase has a QA twin):
 7. `phase-07-render-and-juice.md` / `phase-07-qa.md`
 8. `phase-08-harvest-journal.md` / `phase-08-qa.md`
 9. `phase-09-world-presence.md` / `phase-09-qa.md` (go-live)
+   9b. `phase-09b-bed-verbs.md` (PROPOSED by the Phase 9 QA: the client plant and harvest verbs; maintainer adopts or strikes)
 10. `phase-10-celebrations.md` / `phase-10-qa.md`
 11. `phase-11-well-fed-food.md` / `phase-11-qa.md`
 12. `phase-12-shared-feast.md` / `phase-12-qa.md`
