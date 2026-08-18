@@ -2774,6 +2774,46 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: kaykit(['2H_Melee_Attack_Chop']),
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
   },
+  // Balgath as a CYCLOPS: the second silhouette for the same Mirefen world boss,
+  // built so the concept can be judged in-engine against the foreman below rather
+  // than off concept art. Same 41-joint biped rig and the same seven usable
+  // retargeted clips; only two bespoke clips, from
+  // scripts/build_balgath_cyclops_anims.mjs, whose header explains at length why
+  // this rig earns two where the foreman earns six (its donor library has no
+  // overhead reach and no real crouch, so the other four came back mediocre and
+  // mutually indistinguishable and were cut after review rather than shipped).
+  //
+  // His own `Attack` clip is FOLDED (the slash retarget preset collapsed this
+  // body) and is deliberately named NOWHERE in this ClipMap: `attack` uses the
+  // authored Stomp instead. His retargeted `Cast` is clean and already reads as a
+  // raised channel, so `cast` and `flourish` both point at it rather than at a
+  // bespoke clip that would have looked the same.
+  //
+  // Same lazyPreload reasoning as the foreman: nothing spawns him yet.
+  mob_balgath_cyclops: {
+    url: `${CREATURES}/balgath_cyclops.glb`,
+    animUrls: [`${CREATURES}/balgath_cyclops_ability_anims.glb`],
+    height: 3.2,
+    lazyPreload: true,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Balgath_Stomp'],
+      death: 'Death',
+      hit: ['Hit'],
+      cast: 'Cast',
+      jump: 'Jump',
+      flourish: 'Cast',
+    },
+    // Paler and cooler than the foreman: this one reads as bare quarried granite
+    // rather than a barrow-buried body, so the moss does the colour work.
+    tint: 0xa8a496,
+    tintStrength: 0.12,
+    // Gait refs owed by the encounter change, exactly as on the foreman below.
+    // Measured at scale 1 by `node scripts/anim/measure_gait.mjs
+    // public/models/creatures/balgath_cyclops.glb --height 3.2`.
+  },
   // Balgath, the Buried Foreman: the Mirefen world boss (concept: the Smith's
   // foreman the trolls dug out of the barrow-mounds, one Loom-shard eye).
   // Tripo creature lane on the biped rig (41 joints), so the eight retargeted

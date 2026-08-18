@@ -13,6 +13,11 @@ import { describe, expect, it } from 'vitest';
 const ROOT = resolve(__dirname, '..');
 const HERO = resolve(ROOT, 'public/models/creatures/balgath_foreman.glb');
 const ABILITIES = resolve(ROOT, 'public/models/creatures/balgath_ability_anims.glb');
+const CYCLOPS = resolve(ROOT, 'public/models/creatures/balgath_cyclops.glb');
+const CYCLOPS_ABILITIES = resolve(
+  ROOT,
+  'public/models/creatures/balgath_cyclops_ability_anims.glb',
+);
 const MANIFEST = resolve(ROOT, 'src/render/characters/manifest.ts');
 
 /** Clip names out of a GLB's JSON chunk, without pulling three.js into a node test. */
@@ -25,14 +30,15 @@ function clipNames(path: string): string[] {
   return (json.animations ?? []).map((a: { name?: string }) => a.name ?? '');
 }
 
-/** The `mob_balgath_foreman` object literal, as source text. */
-function balgathBlock(): string {
+/** A named VisualDef object literal, as source text. */
+function defBlock(key: string): string {
   const src = readFileSync(MANIFEST, 'utf8');
-  const start = src.indexOf('mob_balgath_foreman: {');
-  expect(start, 'mob_balgath_foreman is missing from VISUALS').toBeGreaterThan(-1);
+  const start = src.indexOf(`${key}: {`);
+  expect(start, `${key} is missing from VISUALS`).toBeGreaterThan(-1);
   const end = src.indexOf('\n  },', start);
   return src.slice(start, end);
 }
+const balgathBlock = () => defBlock('mob_balgath_foreman');
 
 // The bespoke set, and what each one is FOR. A clip dropped from this list is a
 // mechanic with no animation, so the list is exhaustive on purpose.
@@ -102,6 +108,37 @@ describe('balgath world boss assets', () => {
     expect(clips).not.toContain('Balgath_Wake');
   });
 
+  // --- the cyclops silhouette -----------------------------------------------
+  // Second model for the same boss concept, kept so the two can be compared in
+  // engine. It earns its own assertions because its constraints are different:
+  // its slash retarget FOLDED, so the one clip it must never name is its own.
+  it('ships the cyclops rig with its two authored clips', () => {
+    const rig = clipNames(CYCLOPS);
+    for (const clip of RETARGETED_CLIPS) expect(rig).toContain(clip);
+    expect(clipNames(CYCLOPS_ABILITIES).sort()).toEqual(['Balgath_Blinded', 'Balgath_Stomp']);
+  });
+
+  it('never names the cyclops folded Attack clip', () => {
+    // The slash preset collapsed this body. The clip is still IN the GLB (it came
+    // with the retarget and removing it would desync the file from the job), so
+    // the only thing standing between it and a raid seeing it is this: the
+    // ClipMap must not mention it. `attack` uses the authored Stomp instead.
+    const clips = defBlock('mob_balgath_cyclops');
+    const map = clips.slice(clips.indexOf('clips: {'), clips.indexOf('tint:'));
+    expect(map).not.toContain("'Attack'");
+    expect(map).toContain('Balgath_Stomp');
+  });
+
+  it('names only clips the cyclops GLBs actually carry', () => {
+    const available = new Set([...clipNames(CYCLOPS), ...clipNames(CYCLOPS_ABILITIES)]);
+    const block = defBlock('mob_balgath_cyclops');
+    const map = block.slice(block.indexOf('clips: {'), block.indexOf('tint:'));
+    const named = [...map.matchAll(/'([A-Z][A-Za-z_]+)'/g)].map((m) => m[1]);
+    expect(named.length).toBeGreaterThan(0);
+    for (const clip of named)
+      expect(available, `clip '${clip}' is not in a shipped GLB`).toContain(clip);
+  });
+
   it('stays out of the boot preload sweep while nothing can spawn him', () => {
     // No MOB_KEYS entry exists yet, so preloading 1.8 MB of boss buys nothing.
     // When the encounter lands, both this flag and this assertion go away together.
@@ -112,6 +149,7 @@ describe('balgath world boss assets', () => {
     expect(keysStart, 'MOB_KEYS moved or was renamed').toBeGreaterThan(-1);
     const spawnable = src.slice(keysStart, src.indexOf('\n};', keysStart)).includes('balgath');
     expect(balgathBlock()).toContain('lazyPreload: true');
+    expect(defBlock('mob_balgath_cyclops')).toContain('lazyPreload: true');
     expect(spawnable, 'balgath is spawnable now: drop lazyPreload and this test').toBe(false);
   });
 });
