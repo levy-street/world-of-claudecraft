@@ -2774,6 +2774,49 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: kaykit(['2H_Melee_Attack_Chop']),
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
   },
+  // Balgath, the Buried Foreman: the Mirefen world boss (concept: the Smith's
+  // foreman the trolls dug out of the barrow-mounds, one Loom-shard eye).
+  // Tripo creature lane on the biped rig (41 joints), so the eight retargeted
+  // clips carry locomotion and the generic swing; the six BESPOKE ability clips
+  // ride the mesh-free donor baked by scripts/build_balgath_anims.mjs off this
+  // same rig's own poses.
+  //
+  // `cast` is the scry channel rather than a generic cast: his only channelled
+  // ability IS the eye, so the bar and the pose are the same event, and
+  // `flourish` is the enrage roar. The two slams sit in the `attack` array so
+  // they read on any swing today; turning them into an `attackByAbility` map is
+  // the ENCOUNTER change's job, because those keys must be real ability ids from
+  // `src/sim/content/` and the ability records do not exist yet. Balgath_Blinded
+  // and Balgath_Wake get no generic slot at all, deliberately: one has to hold
+  // for as long as a debuff lasts and one fires once at spawn, so both are
+  // encounter one-shots rather than states the animation machine may pick on its
+  // own. They ship in the donor GLB now so that change stays data-only.
+  //
+  // `lazyPreload` for the same reason: with no MOB_KEYS entry nothing can spawn
+  // him, and 1.8 MB of boss in every client's boot sweep buys nothing until
+  // something does. The encounter change drops this line along with the
+  // MOB_KEYS wire, which is what puts him back in the tier-independent set.
+  mob_balgath_foreman: {
+    url: `${CREATURES}/balgath_foreman.glb`,
+    animUrls: [`${CREATURES}/balgath_ability_anims.glb`],
+    height: 3.2,
+    lazyPreload: true,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Balgath_Smash', 'Balgath_Stomp'],
+      death: 'Death',
+      hit: ['Hit'],
+      cast: 'Balgath_EyeFlare',
+      jump: 'Jump',
+      flourish: 'Balgath_Roar',
+    },
+    // Silt-grey stone, lightly applied: he is already a pale sculpt, and a heavy
+    // wash flattens the barrow-moss and the shard-eye socket into one mass.
+    tint: 0x9c9382,
+    tintStrength: 0.15,
+  },
   // The three zone Chroniclers (Saul, Osric Fenn, Zenzie): one shared
   // scholarly-mage silhouette (hat, staff, open ledger in the off hand,
   // the warlock spellbook grip) with the per-NPC entity tint carrying each
