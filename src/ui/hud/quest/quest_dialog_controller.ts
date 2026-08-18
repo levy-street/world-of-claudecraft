@@ -381,7 +381,11 @@ export class QuestDialogController {
     const hasCardMaster = !!definition?.cardMaster;
     // A farmer NPC (the farming go-live) offers the husk-to-compost trade,
     // the one UI affordance that sends convert_husks; gated on the NpcDef
-    // flag like the card master, never on an id.
+    // flag like the card master, never on an id. STATIC BY CONTRACT: the row
+    // sits outside the gossip-row write-elision signature (gossipRowSig reads
+    // the quest rows only), which is sound only while its predicate is this
+    // content flag. Gate it on live state (a husk count, the farmer range)
+    // and it must join the signature or the row goes stale between refreshes.
     const hasFarmer = definition?.farmer === true;
     if (
       closeIfEmpty &&
@@ -530,7 +534,16 @@ export class QuestDialogController {
     // The husk trade goes straight to the world (IWorldFarming.convertHusks,
     // both worlds; online it is the convert_husks command): no new dep, no
     // window. The live world is read at click time, never captured at render.
-    this.bindRoute('[data-husk-trade]', () => this.deps.world().convertHusks());
+    // The husk trade opens NO successor window (the sim's own event lines are
+    // the feedback), so it is deliberately NOT a bindRoute consumer: that
+    // family closes with release(false) because it hands the trap opener to a
+    // successor window that restores focus when IT closes; with no successor
+    // that chain would drop keyboard focus to <body>. Send, then close WITH
+    // the trap's own focus restore.
+    this.deps.element.querySelector('[data-husk-trade]')?.addEventListener('click', () => {
+      this.deps.world().convertHusks();
+      this.close(true);
+    });
     this.bindClose();
     this.showAndFocus();
   }
