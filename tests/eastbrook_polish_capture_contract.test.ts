@@ -226,8 +226,11 @@ interface AttributionTargetFixture {
 // Re-minted after syncing current release/v0.39.0 into the v0.39 wrapper: the
 // resolved renderer bytes retain the queued self-spirit prewarm and delve
 // rebuild repair. No capture was retaken.
+// Re-minted for the nineteenth farming absorb (release/v0.39.0 tip 7b45fdb9a9
+// merged into the sync branch): both parents move renderer.ts again, so the
+// merged tree mints a value matching neither parent. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '2772a342485f6158c9c05d7b2915e2535388775df9722d7a06fe68a4b412c5e4';
+  '07eaec92f648b8029379debc78e780f3fb7521dd0f70d62828cf94586a58ad3f';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
