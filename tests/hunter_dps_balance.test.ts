@@ -78,7 +78,16 @@ describe('Hunter v0.29 deterministic DPS alignment', () => {
       // Lane-diet re-measure at two seeds: 0.8768, so the
       // measurement-anchored floor re-pins to 0.83 at the same relative
       // margin; the 1.15 ceiling is the design bound in both configs.
-      expect(dps.beast_mastery / nextBest).toBeGreaterThanOrEqual(band(0.8, 0.83));
+      // Re-derived for the restored camp spawn stream (camp tail spawns draw
+      // from createCampSpawnRngSelector again, moving every later
+      // shared-stream draw; no tuning changed): full actual 0.8507, which
+      // keeps the 0.8 floor unchanged at the same relative margin; diet
+      // actual 0.8241, so the diet floor re-pins to 0.78 at that margin.
+      // FLAGGED FOR CLASS-OWNER REVIEW: the diet reading now sits further
+      // under the 1.10 to 1.15 design lead than the round the floor was
+      // recorded on; the acknowledged BM debt (the kit-item lift from below)
+      // still stands.
+      expect(dps.beast_mastery / nextBest).toBeGreaterThanOrEqual(band(0.8, 0.78));
       expect(dps.beast_mastery / nextBest).toBeLessThanOrEqual(1.15);
     },
     TEST_TIMEOUT_MS,
