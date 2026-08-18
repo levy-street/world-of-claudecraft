@@ -40,7 +40,7 @@ const CORRECTED_PORTRAITS = {
   breach_wretch: [
     'mob_breach_wretch',
     'models/chars/npcs/breach_wretch.glb',
-    '6710448af53bf5a3f44645f73ee17bd6004b3edbad6fc5091c818934b45231bc',
+    '8b428d19801ec20c9613fb2fa36aedb44be7d9b6404ec456da61ba6066e570c3',
   ],
   fen_sprite: [
     'mob_kobold',

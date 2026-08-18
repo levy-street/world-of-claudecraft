@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "c86ec09489f3913f59ec719d0d52de9c36ff5dc521eb071b2ec36ad5b7a3a2ff",
+  "rendererFingerprint": "e698ab65cb54e0b836d7e2e1666233f77a9b4da4c3a21e3d5550d44ec76e1d22",
   "renderer": {
     "trackedFiles": [
       {
@@ -28,7 +28,7 @@
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
       "bytes": 4364841,
-      "sha256": "a7976cfa2ce583f648f124cba4a18188285d6d0cb565c96b2205345e4372d943",
+      "sha256": "be32e707c04aa753b401e2a25d844b7f1edbd335d71870e71f00d6a3ff54cb9f",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -591,8 +591,8 @@
         "model": {
           "url": "models/chars/npcs/breach_wretch.glb",
           "path": "public/models/chars/npcs/breach_wretch.glb",
-          "bytes": 541124,
-          "sha256": "bb8f4dede796334e1967966af1bb58de197c5ddaf1b59675c7d3379eac37cef0"
+          "bytes": 460216,
+          "sha256": "e58e38b80ff915d5534998a414465904c5ed5a6a5000f8e24cbeb13668848111"
         },
         "idle": "Idle_Combat",
         "height": 2.1,
@@ -609,11 +609,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "9287081c3417877076247e65d521ae842e1b02b6c8e178a71ebc6a07894dd6f1",
+      "sourceFingerprint": "e9e1be424d7a00bdcf7fd754b8b53935f192f457bf36ae3cc54ad1b9732bb515",
       "output": {
         "path": "public/ui/mobs/breach_wretch.webp",
-        "bytes": 2534,
-        "sha256": "6710448af53bf5a3f44645f73ee17bd6004b3edbad6fc5091c818934b45231bc"
+        "bytes": 2498,
+        "sha256": "8b428d19801ec20c9613fb2fa36aedb44be7d9b6404ec456da61ba6066e570c3"
       }
     },
     {
@@ -6289,8 +6289,8 @@
         "model": {
           "url": "models/chars/npcs/riftspawn_antler.glb",
           "path": "public/models/chars/npcs/riftspawn_antler.glb",
-          "bytes": 1137376,
-          "sha256": "6e8e2dae3e78315beaca4335c9d1d69b877e19576b7c42d71227deb94149af0b"
+          "bytes": 1532652,
+          "sha256": "d3210f71ba6ec8941e80ed4c5907cd6eb367e751305aafade132137a0e6ce2b0"
         },
         "idle": "Idle",
         "height": 2.1,
@@ -6307,11 +6307,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "4ed53430d299f2a06528bb3d6771393cc7ad7a9007daea6ab87fa58731098eb6",
+      "sourceFingerprint": "1695e8cdb9906f25c02592ea90676efd5bb70ab43c51e6380e8c8e2c0235fb7c",
       "output": {
         "path": "public/ui/mobs/riftspawn.webp",
-        "bytes": 2344,
-        "sha256": "fca20a6a479554d1e61b5d94bb84fdbe91c859d5ee0a00a39b9fd525be24cbfd"
+        "bytes": 2370,
+        "sha256": "a83ec6498edb7177cc3440ba96ab377ac2c2a0eb83b6359dfc0b0c7367d41fb1"
       }
     },
     {
@@ -6944,8 +6944,8 @@
         "model": {
           "url": "models/chars/npcs/sundered_horror_thicket.glb",
           "path": "public/models/chars/npcs/sundered_horror_thicket.glb",
-          "bytes": 1006744,
-          "sha256": "243528855312dd61d4c9aa22bda132af4f4930c5693f704a6f6e1f7251237b36"
+          "bytes": 1382896,
+          "sha256": "c9c53c4933c29de87936e383a1a2fa7a4c1118a39ae1fedaf02ded38f776f9b6"
         },
         "idle": "Idle",
         "height": 2.8,
@@ -6962,11 +6962,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "3f2bfb2d7d85091014ff3a8b504c40eef7125bf43c8af65e20dfc51e778e449c",
+      "sourceFingerprint": "21909594c7ff5da26f5ef81545ffabdf06dc6ef275ec1f1e0fc90ec785049253",
       "output": {
         "path": "public/ui/mobs/sundered_horror.webp",
-        "bytes": 2070,
-        "sha256": "a6e224307ca17ff19edb42143afe2e6dbcf6e560b101f3fe53bebb178cba45b1"
+        "bytes": 2038,
+        "sha256": "7782f49437ca6c75cd51456bbbb5eafc10c745aee1f9eec84e66d8d2b3656ec2"
       }
     },
     {
