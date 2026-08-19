@@ -622,12 +622,15 @@ describe('shared feast: charges, expiry, and the 1 Hz sweep', () => {
   });
 
   it('a feast really expires after its full 180s with no state poking', () => {
+    // 3620 real ticks: a declared budget so full-suite worker contention
+    // cannot kill it at the 20s repo default (the Phase 6 QA lesson; the
+    // suite_duration_budget ratchet accepts this row-free under 300s).
     const { sim, placer } = world(0);
     const feastId = placeOk(sim, placer);
-    tickSeconds(sim, 181); // 3620 ticks: past the 3600-tick deadline plus a sweep
+    tickSeconds(sim, 181); // past the 3600-tick deadline plus a sweep
     expect(sim.entities.has(feastId)).toBe(false);
     expect(sim.ctx.feasts.has(feastId)).toBe(false);
-  });
+  }, 60_000);
 
   it('the sweep never fires off-boundary: a mid-second drain survives to the exact boundary', () => {
     const { sim, placer } = world(0);
