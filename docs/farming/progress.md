@@ -2793,8 +2793,16 @@ DEFERRALS AND DECLINED, with reasons:
   flag 3 of the phase); the future golden field-note cell must land WITH
   its server RELIQUARY_MARK_ENGLISH row (appended to the (bv) ledger).
 
-GATE RECORD: recorded in the gate-record commit on this branch after the
-close run.
+GATE RECORD: one run on the frozen QA tip 0848acbc00
+(BROWSER_PATH=<playwright chromium> GATE_MAX_WORKERS=8
+node scripts/gate_select.mjs): mode=full (the terrain-fixture +
+bare_client broad arm), "[gate:select] PASS: all 12 steps green (vitest
+workers: 8)", 2888 test files passed / 12 skipped, 40416 tests passed /
+2 expected fail / 115 skipped, browser regression 20 files 133 green,
+ZERO FAIL markers, shell exit 0, no druid_engines timeout. An earlier
+gate run was deliberately stopped mid-flight when the qa-checklist's
+round-two findings landed (never gate a tree about to change); no
+verdict was taken from it.
 
 ### Phase 11
 (not started)
