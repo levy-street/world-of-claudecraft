@@ -11,7 +11,8 @@
 // coexistence and last-eaten-wins pins, and the zero-draw determinism twin.
 
 import { describe, expect, it } from 'vitest';
-import { ITEMS } from '../src/sim/data';
+import { DELVES, ITEMS } from '../src/sim/data';
+import { delveRunForPlayer, freeDelveRun } from '../src/sim/delves/runs';
 import { enterDungeon, instanceAt, leaveDungeon } from '../src/sim/instances/dungeons';
 import { setItemLocked } from '../src/sim/item_lock';
 import { FARM_FEAST_ITEM_ID, FARM_FEAST_TEMPLATE_ID } from '../src/sim/professions/feast';
@@ -1023,6 +1024,34 @@ describe('shared feast: instance lifecycle', () => {
     expect(sim.ctx.feasts.has(feastId), 'the sweep reclaimed the state').toBe(false);
 
     // And the placer's one-active slot freed with it.
+    giveFeast(sim, placer);
+    const from = sim.events.length;
+    sim.placeFeast(placer.pid);
+    expect(denyReason(sim, from), 'the one-active slot freed with the run').toBeNull();
+    expect(eventsOf(sim, from, 'farmFeastPlaced')).toHaveLength(1);
+  });
+
+  it('a feast placed inside a delve run falls with the run, freeing the slot', () => {
+    // Delves are their OWN spatial system with their own roster (the
+    // qa-checklist symmetry find): freeDelveRun and the module advance drop
+    // run.objectIds, and without registration the table outlived the run at
+    // the slot origin for the next claiming party, exactly the dungeon leak.
+    const { sim, placer } = world(0);
+    sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel, placer.pid);
+    sim.enterDelve('collapsed_reliquary', 'normal', placer.pid);
+    sim.tick(); // settle the entry teleport
+    const run = delveRunForPlayer(sim.ctx, placer.pid);
+    expect(run, 'the placer stands inside the claimed run').not.toBeNull();
+    if (!run) return;
+    const feastId = placeOk(sim, placer);
+
+    // The run ends (the direct teardown; the empty reaper's wait is minutes).
+    freeDelveRun(sim.ctx, run);
+    tickSeconds(sim, 2.05); // a farming sweep boundary for the state reclaim
+
+    expect(sim.entities.has(feastId), 'the entity fell with the run').toBe(false);
+    expect(sim.ctx.feasts.has(feastId), 'the sweep reclaimed the state').toBe(false);
+
     giveFeast(sim, placer);
     const from = sim.events.length;
     sim.placeFeast(placer.pid);

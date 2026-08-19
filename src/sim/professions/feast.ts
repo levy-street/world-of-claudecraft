@@ -38,6 +38,7 @@
 // persistence machinery the credited-objects ledger needs.
 
 import { ITEMS } from '../data';
+import { delveRunForPlayer } from '../delves/runs';
 import { createGroundObject } from '../entity';
 import { instanceAt } from '../instances/dungeons';
 import { countUnlockedInSlots, removeUnlockedFromSlots } from '../item_lock';
@@ -162,6 +163,14 @@ export function placeFeastAction(ctx: SimContext, p: Entity, meta: PlayerMeta): 
   // stood at the slot origin, still edible, for the next claiming party.
   const inst = instanceAt(ctx, e.pos);
   if (inst && inst.partyKey !== null) inst.objectIds.push(e.id);
+  // The SAME rule for a delve run (its own spatial system with its own
+  // roster): freeDelveRun AND the module advance both drop run.objectIds,
+  // so the table dies with the room it was set out in, and the abandoned
+  // -module drop is deliberate (that room despawns wholesale). Located by
+  // the PLACER (delveRunForPlayer), never the entity: the run lookup binds
+  // players and mobs only, and the placer stands in the run when placing.
+  const run = delveRunForPlayer(ctx, meta.entityId);
+  if (run) run.objectIds.push(e.id);
   ctx.feasts.set(e.id, {
     entityId: e.id,
     ownerKey,
