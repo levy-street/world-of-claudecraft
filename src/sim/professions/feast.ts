@@ -93,6 +93,16 @@ export function placeFeastAction(ctx: SimContext, p: Entity, meta: PlayerMeta): 
     ctx.error(meta.entityId, 'You are busy.');
     return;
   }
+  // Water refuses PLACEMENT too (the QA gate's find): without this, the
+  // spend destroys the item and spawns a feast nobody can ever eat (the
+  // bite's own swimming gate), holding the one-active slot for the full
+  // 180s. Combat placement stays deliberately LEGAL, asymmetric with the
+  // bite: combat ends and the feast remains fully usable after it (the
+  // raid-table flavor), where a water placement never becomes usable.
+  if (ctx.isSwimming(p)) {
+    ctx.error(meta.entityId, "You can't do that while swimming.");
+    return;
+  }
   const ownerKey = feastOwnerKey(meta);
   for (const feast of ctx.feasts.values()) {
     if (feast.ownerKey === ownerKey) {

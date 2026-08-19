@@ -17,6 +17,7 @@ import { FARM_FEAST_ITEM_ID, FARM_FEAST_TEMPLATE_ID } from '../src/sim/professio
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import { type Aura, type Entity, FARMING_CAST_ID, type SimEvent } from '../src/sim/types';
+import { groundHeight, isInWaterBody, waterLevelAt } from '../src/sim/world';
 
 // The capstone dish the bite serves (ITEMS[FARM_FEAST_ITEM_ID].feast.dishItemId,
 // pinned as a literal in the content arm below).
@@ -771,6 +772,45 @@ describe('shared feast: zero-draw determinism', () => {
 });
 
 describe('shared feast: entry-point convergence and the sweep inverse cleanup', () => {
+  it('water refuses PLACEMENT: the spend never destroys the item into an uneatable feast', () => {
+    // The QA gate's find: the bite refuses while swimming, so a water
+    // placement would burn the tier-4 item on a feast nobody can ever eat
+    // and hold the one-active slot for the full 180s. Combat placement
+    // stays legal by the stated header decision (combat ends; water does
+    // not), so only the swim gate is pinned here.
+    const { sim, placer } = world(0);
+    giveFeast(sim, placer);
+    const dry = { ...placer.p.pos };
+    // Deep water is positional (ground below the local water level), so the
+    // rig scans for a declared water body and treads its surface (the
+    // mount_transition findDeepLake idiom, shore-walk trimmed away).
+    const water = (() => {
+      for (let z = -300; z <= 300; z += 4) {
+        for (let x = -300; x <= 300; x += 4) {
+          const wl = waterLevelAt(x, z, 42);
+          if (isInWaterBody(x, z) && Number.isFinite(wl) && groundHeight(x, z, 42) < wl - 2) {
+            return { x, z, y: wl - 0.75 };
+          }
+        }
+      }
+      throw new Error('no deep water found on seed 42');
+    })();
+    placer.p.pos = { ...water };
+    placer.p.prevPos = { ...water };
+    expect(sim.isSwimming(placer.p), 'the rig really swims').toBe(true);
+    const from = sim.events.length;
+    sim.placeFeast(placer.pid);
+    expect(errorTexts(sim, from)).toEqual(["You can't do that while swimming."]);
+    expect(eventsOf(sim, from, 'farmFeastPlaced')).toHaveLength(0);
+    expect(feastEntities(sim)).toHaveLength(0);
+    expect(sim.countItem(FARM_FEAST_ITEM_ID, placer.pid), 'the item was NOT spent').toBe(1);
+    placer.p.pos = { ...dry }; // the positive control: the same press lands on dry ground
+    placer.p.prevPos = { ...dry };
+    const from2 = sim.events.length;
+    sim.placeFeast(placer.pid);
+    expect(eventsOf(sim, from2, 'farmFeastPlaced')).toHaveLength(1);
+  });
+
   it('useItem on the feast item PLACES it: both entry points share the one action body', () => {
     // The items.ts def.feast arm (the architecture review's silent-no-op
     // finding): a use_item frame naming the feast must place it exactly like
