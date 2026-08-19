@@ -2877,9 +2877,8 @@ Acceptance checklist (phase file STEP 5):
 - [x] tier 3/4 dishes reagent-dormant honestly under (bo); the honesty arm
       green
 - [x] every STEP 3 validation row green; mutations 9/9 killed named
-- [ ] gate_select PASS by its log markers (the run happens on this frozen
-      tip; the marker lands in the gate record appended by the post-merge
-      record commit, the Phase 7 precedent)
+- [x] gate_select PASS by its log markers (the gate record below; appended
+      by the post-merge record commit, the Phase 7 precedent)
 
 One-line answer to the QA sweep's uncertain note: rare-quality cooking
 outputs are NOT new in this phase (the Phase 6 rung-50 dishes already ship
@@ -3014,6 +3013,26 @@ professions_farming arms), M9 the food-kind guard removed (the
 synthetic-drink arm). M5b's first anchor missed (the items.ts emit line
 sits elsewhere); re-anchored on the slot-assignment block and landed
 with count proof.
+
+GATE RECORD: one run on the frozen phase tip e6746bfe79
+(BROWSER_PATH=<playwright chromium> GATE_MAX_WORKERS=8
+node scripts/gate_select.mjs): mode=full (the terrain-fixture +
+bare_client broad arm, as expected), "[gate:select] PASS: all 12 steps
+green (vitest workers: 8)", 2888 test files passed / 12 skipped, 40442
+tests passed / 2 expected fail / 115 skipped, browser regression 20
+files 133 green, ZERO FAIL markers, shell exit 0, no druid_engines
+timeout, about 15 minutes of vitest.
+
+MERGE: fix/farming-phase-11-well-fed-food merged --no-ff into
+feature/farming-plan as 9fc11d5452537834d0eb70f1ed14dbf23ecba0cc (phase
+tip e6746bfe79; the branch and the three agent worktrees
+~/Documents/woc-farm-p11-{a,b,c} deleted). The twenty-first absorb
+(release/v0.40.0, merge f0d329db02) opened the phase as its own sync
+mid-phase; its record sits above.
+
+No screenshots: the tooltip line and the buff bar ride existing visual
+families; the Phase 11 QA captures them on the LOW preset if it wants
+eyes on them (the phase doc hands that over explicitly).
 
 ### Phase 12
 (not started)
