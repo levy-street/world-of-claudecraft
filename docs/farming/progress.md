@@ -2418,7 +2418,9 @@ files passed / 12 skipped, 40334 tests passed / 2 expected fail / 115
 skipped, browser regression 20 files 132 green, zero FAIL lines, shell rc 0,
 no druid_engines timeout. The journey (scripts/farming_journey_e2e.mjs) also
 passed 17/17 standalone on the final merged tree before the gate.
-MERGE: (hash recorded in the follow-up commit on feature/farming-plan)
+MERGE: fix/farming-phase-09b-bed-verbs merged --no-ff into
+feature/farming-plan as 1f92aaa5c555c3997a0de14af19329f8b9837add (phase tip 632ee5090e; the branch and the
+three agent worktrees deleted).
 
 ### Phase 10
 (not started)
