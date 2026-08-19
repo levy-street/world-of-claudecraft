@@ -37,7 +37,7 @@ describe('feastTooltipLines', () => {
 
   it('the harvest feast states placement, servings, duration, buff, and the meal trigger', () => {
     expect(feastTooltipLines(ITEMS.harvest_feast)).toBe(
-      '<div class="tt-desc">Use: Sets out a feast others can eat from ' +
+      '<div class="tt-desc">Use: Sets out a feast others can eat from, one serving each ' +
         '(10 servings, lasts 3 min).</div>' +
         '<div class="tt-desc">Each serving grants Well Fed: +12 Stamina for 15 min ' +
         'when you finish the 18 sec meal.</div>',
@@ -78,7 +78,7 @@ describe('feastTooltipLines', () => {
       { probe_dish: dishDef(undefined) },
     );
     expect(html).toBe(
-      '<div class="tt-desc">Use: Sets out a feast others can eat from ' +
+      '<div class="tt-desc">Use: Sets out a feast others can eat from, one serving each ' +
         '(10 servings, lasts 3 min).</div>',
     );
     expect(html).not.toContain('Each serving grants');
@@ -146,28 +146,28 @@ describe('the five non-Latin fills render end to end (frozen literals, the M16 s
   const MAPPED: [SupportedLanguage, string][] = [
     [
       'zh_CN',
-      '<div class="tt-desc">使用：摆出一桌他人也能享用的盛宴（10 份，持续 3 分钟）。</div>' +
+      '<div class="tt-desc">使用：摆出一桌他人也能享用的盛宴，每人限享一份（10 份，持续 3 分钟）。</div>' +
         '<div class="tt-desc">每份：吃完 18 秒的一餐后获得饱足效果，使你的耐力提高 12 点，持续 15 分钟。</div>',
     ],
     [
       'zh_TW',
-      '<div class="tt-desc">使用：擺出一桌他人也能享用的盛宴（10 份，持續 3 分鐘）。</div>' +
+      '<div class="tt-desc">使用：擺出一桌他人也能享用的盛宴，每人限享一份（10 份，持續 3 分鐘）。</div>' +
         '<div class="tt-desc">每份：吃完 18 秒的一餐後獲得飽足效果，使你的耐力提高 12 點，持續 15 分鐘。</div>',
     ],
     [
       'ja_JP',
-      '<div class="tt-desc">使用: 他のプレイヤーも食べられる宴を広げる（10人前、3分間持続）。</div>' +
+      '<div class="tt-desc">使用: 他のプレイヤーも食べられる宴を広げる。1人1食まで（10人前、3分間持続）。</div>' +
         '<div class="tt-desc">1人前につき、18秒の食事を終えると満腹の効果を得て、スタミナが12上昇し、15分間持続します。</div>',
     ],
     [
       'ko_KR',
-      '<div class="tt-desc">사용: 다른 플레이어도 먹을 수 있는 잔치를 차립니다(10인분, 3분간 지속).</div>' +
+      '<div class="tt-desc">사용: 다른 플레이어도 먹을 수 있는 잔치를 차립니다. 1인당 1인분입니다(10인분, 3분간 지속).</div>' +
         '<div class="tt-desc">한 접시를 18초 동안 다 먹으면 포만감 효과를 얻어 체력이(가) 12 증가하며 15분 동안 지속됩니다.</div>',
     ],
     [
       'ru_RU',
-      '<div class="tt-desc">Использование: накрывает пир, с которого могут поесть и другие ' +
-        '(10 порций, действует 3 мин).</div>' +
+      '<div class="tt-desc">Использование: накрывает пир, с которого могут поесть и другие, ' +
+        'по одной порции каждому (10 порций, действует 3 мин).</div>' +
         '<div class="tt-desc">Каждая порция дает эффект &quot;Сытость&quot;: Выносливость +12 ' +
         'на 15 мин после 18 сек еды.</div>',
     ],

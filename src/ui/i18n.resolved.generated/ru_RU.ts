@@ -9059,7 +9059,7 @@ export const ru_RU: EnTranslations = {
       "useElixirAura": "Использование: дает эффект \"{aura}\" на {minutes} мин. Можно использовать в бою.",
       "useWellfed": "Эффект \"{aura}\": {stat} +{value} на {minutes} мин. Дается, когда вы доедаете.",
       "useWellfedAura": "Дает эффект \"{aura}\" на {minutes} мин, когда вы доедаете.",
-      "useFeast": "Использование: накрывает пир, с которого могут поесть и другие ({servings} порций, действует {minutes} мин).",
+      "useFeast": "Использование: накрывает пир, с которого могут поесть и другие, по одной порции каждому ({servings} порций, действует {minutes} мин).",
       "useFeastBuff": "Каждая порция дает эффект \"{aura}\": {stat} +{value} на {minutes} мин после {seconds} сек еды.",
       "useFeastBuffAura": "Каждая порция дает эффект \"{aura}\" на {minutes} мин после {seconds} сек еды.",
       "questItem": "Предмет задания",

@@ -769,3 +769,37 @@ describe('shared feast: zero-draw determinism', () => {
     expect(b.sim.tickCount).toBe(a.sim.tickCount);
   });
 });
+
+describe('shared feast: entry-point convergence and the sweep inverse cleanup', () => {
+  it('useItem on the feast item PLACES it: both entry points share the one action body', () => {
+    // The items.ts def.feast arm (the architecture review's silent-no-op
+    // finding): a use_item frame naming the feast must place it exactly like
+    // world.placeFeast, never fall through the kind ladder as a dead click.
+    const { sim, placer } = world(0);
+    giveFeast(sim, placer);
+    const from = sim.events.length;
+    sim.useItem(FARM_FEAST_ITEM_ID, placer.pid);
+    expect(eventsOf(sim, from, 'farmFeastPlaced'), 'the use placed the feast').toHaveLength(1);
+    const spread = feastEntities(sim);
+    expect(spread).toHaveLength(1);
+    expect(sim.ctx.feasts.has(spread[0].id)).toBe(true);
+    expect(sim.countItem(FARM_FEAST_ITEM_ID, placer.pid), 'the item was spent once').toBe(0);
+  });
+
+  it('a FeastState whose entity vanished out from under it is reclaimed by the sweep', () => {
+    // No other despawn path exists today (the sweep is the one despawn
+    // site); this simulates a hypothetical external entity drop so the
+    // inverse-cleanup leg is EXECUTED, not just read: the state and the
+    // placer's one-active slot must both come back at the next boundary.
+    const { sim, placer } = world(0);
+    const feastId = placeOk(sim, placer);
+    sim.entities.delete(feastId);
+    tickSeconds(sim, 1.05);
+    expect(sim.ctx.feasts.has(feastId), 'the orphaned state was reclaimed').toBe(false);
+    giveFeast(sim, placer);
+    const from = sim.events.length;
+    sim.placeFeast(placer.pid);
+    expect(denyReason(sim, from), 'the one-active slot freed with it').toBeNull();
+    expect(eventsOf(sim, from, 'farmFeastPlaced')).toHaveLength(1);
+  });
+});

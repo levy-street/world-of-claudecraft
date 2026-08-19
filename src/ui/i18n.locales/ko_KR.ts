@@ -2717,7 +2717,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '다 먹으면 {aura} 효과를 얻어 {stat}이(가) {value} 증가하며 {minutes}분 동안 지속됩니다.',
   'itemUi.tooltip.useWellfedAura': '다 먹으면 {aura} 효과를 얻어 {minutes}분 동안 지속됩니다.',
   'itemUi.tooltip.useFeast':
-    '사용: 다른 플레이어도 먹을 수 있는 잔치를 차립니다({servings}인분, {minutes}분간 지속).',
+    '사용: 다른 플레이어도 먹을 수 있는 잔치를 차립니다. 1인당 1인분입니다({servings}인분, {minutes}분간 지속).',
   'itemUi.tooltip.useFeastBuff':
     '한 접시를 {seconds}초 동안 다 먹으면 {aura} 효과를 얻어 {stat}이(가) {value} 증가하며 {minutes}분 동안 지속됩니다.',
   'itemUi.tooltip.useFeastBuffAura':

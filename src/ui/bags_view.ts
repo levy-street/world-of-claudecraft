@@ -36,8 +36,8 @@ export interface BagItemInfo {
   soulbound?: boolean;
   /** The catalog mount a kind:'mount' reins item owns (see MountItemDef). */
   mount?: string;
-  /** Truthy for a placeable shared feast (ItemDef.feast, Farming Phase 12). */
-  feast?: unknown;
+  /** The placeable shared feast payload (ItemDef.feast, Farming Phase 12). */
+  feast?: { charges: number; durationTicks: number; dishItemId: string };
 }
 
 /** The open-window modes that change what a bag click does. At most one is the
@@ -396,6 +396,10 @@ export function bagTooltipHintKey(
   if (isToolEffectBagUse(item.use)) {
     return 'hudChrome.professions.toolEffectTooltip.openProfessions';
   }
+  // The placeable feast: the hover previews the click the action ladder
+  // raises (placeFeast), through the generic use hint; the Use: tooltip line
+  // right above it says what using does.
+  if (item.feast) return 'itemUi.tooltip.clickUse';
   if (item.use) return 'itemUi.tooltip.clickUse';
   return '';
 }

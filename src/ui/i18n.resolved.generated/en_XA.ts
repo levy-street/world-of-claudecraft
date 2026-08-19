@@ -9059,7 +9059,7 @@ export const en_XA: EnTranslations = {
       "useElixirAura": "[Úšé: Ĝŕáñţš {aura} ƒóŕ {minutes} ɱíñ. Úšáƀļé íñ çóɱƀáţ.]",
       "useWellfed": "[{aura}: +{value} {stat} ƒóŕ {minutes} ɱíñ, ĝŕáñţéð ŵĥéñ ýóú ƒíñíšĥ éáţíñĝ.]",
       "useWellfedAura": "[Ĝŕáñţš {aura} ƒóŕ {minutes} ɱíñ ŵĥéñ ýóú ƒíñíšĥ éáţíñĝ.]",
-      "useFeast": "[Úšé: Šéţš óúţ á ƒéášţ óţĥéŕš çáñ éáţ ƒŕóɱ ({servings} šéŕʋíñĝš, ļášţš {minutes} ɱíñ).]",
+      "useFeast": "[Úšé: Šéţš óúţ á ƒéášţ óţĥéŕš çáñ éáţ ƒŕóɱ, óñé šéŕʋíñĝ éáçĥ ({servings} šéŕʋíñĝš, ļášţš {minutes} ɱíñ).]",
       "useFeastBuff": "[Éáçĥ šéŕʋíñĝ ĝŕáñţš {aura}: +{value} {stat} ƒóŕ {minutes} ɱíñ ŵĥéñ ýóú ƒíñíšĥ ţĥé {seconds} šéç ɱéáļ.]",
       "useFeastBuffAura": "[Éáçĥ šéŕʋíñĝ ĝŕáñţš {aura} ƒóŕ {minutes} ɱíñ ŵĥéñ ýóú ƒíñíšĥ ţĥé {seconds} šéç ɱéáļ.]",
       "questItem": "[Ɋúéšţ Íţéɱ]",

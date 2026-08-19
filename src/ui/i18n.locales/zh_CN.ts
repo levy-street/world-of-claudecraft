@@ -2624,7 +2624,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useWellfed':
     '吃完后获得{aura}效果，使你的{stat}提高 {value} 点，持续 {minutes} 分钟。',
   'itemUi.tooltip.useWellfedAura': '吃完后获得{aura}效果，持续 {minutes} 分钟。',
-  'itemUi.tooltip.useFeast': '使用：摆出一桌他人也能享用的盛宴（{servings} 份，持续 {minutes} 分钟）。',
+  'itemUi.tooltip.useFeast': '使用：摆出一桌他人也能享用的盛宴，每人限享一份（{servings} 份，持续 {minutes} 分钟）。',
   'itemUi.tooltip.useFeastBuff':
     '每份：吃完 {seconds} 秒的一餐后获得{aura}效果，使你的{stat}提高 {value} 点，持续 {minutes} 分钟。',
   'itemUi.tooltip.useFeastBuffAura': '每份：吃完 {seconds} 秒的一餐后获得{aura}效果，持续 {minutes} 分钟。',

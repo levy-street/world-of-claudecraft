@@ -88,12 +88,12 @@ export function dispatchFarmingCommand(sim: Sim, msg: Record<string, unknown>, p
       break;
     case 'consume_feast':
       // The shared feast's eat verb: the feast ENTITY id and nothing else.
-      // TYPE boundary only (a finite number; the sim validates liveness,
+      // TYPE boundary only (an integer; the sim validates liveness,
       // expiry, charges, range, and the once-per-player ledger, and answers
       // every refusal with the pid-scoped text-free farmDenied event).
       // Nothing here normalizes or defaults the id, for the dispatch
       // switch's own stated laundering reason.
-      if (typeof msg.id === 'number' && Number.isFinite(msg.id)) {
+      if (typeof msg.id === 'number' && Number.isInteger(msg.id)) {
         sim.consumeFeast(msg.id, pid);
       }
       break;

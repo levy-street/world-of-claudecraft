@@ -9059,7 +9059,7 @@ export const ja_JP: EnTranslations = {
       "useElixirAura": "使用: {aura}の効果を得て、{minutes}分間持続します。戦闘中に使用可能。",
       "useWellfed": "食べ終えると{aura}の効果を得て、{stat}が{value}上昇し、{minutes}分間持続します。",
       "useWellfedAura": "食べ終えると{aura}の効果を得て、{minutes}分間持続します。",
-      "useFeast": "使用: 他のプレイヤーも食べられる宴を広げる（{servings}人前、{minutes}分間持続）。",
+      "useFeast": "使用: 他のプレイヤーも食べられる宴を広げる。1人1食まで（{servings}人前、{minutes}分間持続）。",
       "useFeastBuff": "1人前につき、{seconds}秒の食事を終えると{aura}の効果を得て、{stat}が{value}上昇し、{minutes}分間持続します。",
       "useFeastBuffAura": "1人前につき、{seconds}秒の食事を終えると{aura}の効果を得て、{minutes}分間持続します。",
       "questItem": "クエストアイテム",

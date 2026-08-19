@@ -9059,7 +9059,7 @@ export const zh_TW: EnTranslations = {
       "useElixirAura": "使用：獲得{aura}效果，持續 {minutes} 分鐘。戰鬥中可用。",
       "useWellfed": "吃完後獲得{aura}效果，使你的{stat}提高 {value} 點，持續 {minutes} 分鐘。",
       "useWellfedAura": "吃完後獲得{aura}效果，持續 {minutes} 分鐘。",
-      "useFeast": "使用：擺出一桌他人也能享用的盛宴（{servings} 份，持續 {minutes} 分鐘）。",
+      "useFeast": "使用：擺出一桌他人也能享用的盛宴，每人限享一份（{servings} 份，持續 {minutes} 分鐘）。",
       "useFeastBuff": "每份：吃完 {seconds} 秒的一餐後獲得{aura}效果，使你的{stat}提高 {value} 點，持續 {minutes} 分鐘。",
       "useFeastBuffAura": "每份：吃完 {seconds} 秒的一餐後獲得{aura}效果，持續 {minutes} 分鐘。",
       "questItem": "任務物品",

@@ -275,5 +275,12 @@ export function handleFarmEvent(ev: FarmEvent, host: FarmFeedbackHost): void {
       if (witheredText) host.log(witheredText, '#a8a8a8');
       break;
     }
+    default: {
+      // Exhaustiveness tripwire: a farm SimEvent added to the FarmEvent
+      // union with no arm here stops compiling, instead of shipping as a
+      // silently unhandled event (the cross-platform review's ask).
+      const unhandled: never = ev;
+      void unhandled;
+    }
   }
 }

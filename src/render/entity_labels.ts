@@ -4,6 +4,7 @@
 // both the renderer and the NameplatePainter can share objectDisplayName without
 // a renderer <-> painter import cycle.
 
+import { FARM_FEAST_TEMPLATE_ID } from '../sim/professions/feast';
 import type { Entity } from '../sim/types';
 import { dungeonDisplayName, tEntity } from '../ui/entity_i18n';
 import { t } from '../ui/i18n';
@@ -84,7 +85,7 @@ export function objectDisplayName(entity: Entity): string {
   // into the localized "{name}'s Harvest Feast" here on the painter side
   // (sim and server stay language-agnostic; the key lands with the Phase 12
   // catalog fold).
-  if (entity.templateId === 'farm_feast') {
+  if (entity.templateId === FARM_FEAST_TEMPLATE_ID) {
     return t('hudChrome.farming.feastTitle', { name: entity.name });
   }
   // Collectible/quest ground objects carry the item id they grant; localize the

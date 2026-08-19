@@ -2739,7 +2739,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '食べ終えると{aura}の効果を得て、{stat}が{value}上昇し、{minutes}分間持続します。',
   'itemUi.tooltip.useWellfedAura': '食べ終えると{aura}の効果を得て、{minutes}分間持続します。',
   'itemUi.tooltip.useFeast':
-    '使用: 他のプレイヤーも食べられる宴を広げる（{servings}人前、{minutes}分間持続）。',
+    '使用: 他のプレイヤーも食べられる宴を広げる。1人1食まで（{servings}人前、{minutes}分間持続）。',
   'itemUi.tooltip.useFeastBuff':
     '1人前につき、{seconds}秒の食事を終えると{aura}の効果を得て、{stat}が{value}上昇し、{minutes}分間持続します。',
   'itemUi.tooltip.useFeastBuffAura':

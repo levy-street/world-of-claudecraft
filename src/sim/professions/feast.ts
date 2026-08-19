@@ -144,7 +144,9 @@ export function placeFeastAction(ctx: SimContext, p: Entity, meta: PlayerMeta): 
  *  feast. The bite spends a serving at START and sets the SAME eating slot
  *  a bagged tier-4 dish sets (Consuming pointed at the dish item), so the
  *  18s sit-restore, the interruption-forfeit rules, and the Well Fed mint
- *  at completion are the Phase 11 machinery verbatim, zero draws
+ *  at completion are the Phase 11 machinery (the gate SET mirrors the
+ *  items.ts food arm; the ORDER follows plantCrop's family order, so a
+ *  dead mid-cast player hears the dead line first here), zero draws
  *  (consume-slot chosen over instant-mint: it keeps one mint site and the
  *  classic eat ritual; the decision record lives in state.md). */
 export function consumeFeastAction(
@@ -213,7 +215,7 @@ export function consumeFeastAction(
     itemId: dish.id,
     kind: 'food',
     hpPer2s: dish.foodHp ? Math.round(dish.foodHp / CONSUME_TICKS) : 0,
-    manaPer2s: 0,
+    manaPer2s: dish.drinkMana ? Math.round(dish.drinkMana / CONSUME_TICKS) : 0,
     remaining: CONSUME_DURATION,
     ticksElapsed: 0,
   };
@@ -224,11 +226,14 @@ export function consumeFeastAction(
 /** The despawn check: zero charges or expiry. Rides INSIDE updateFarming's
  *  existing 1 Hz sweep (never a second appended sim.ts sweep), decides from
  *  stored state alone, draws zero rng, and allocates nothing while no feast
- *  stands (the overwhelmingly common tick). */
+ *  stands (the overwhelmingly common tick). The entities.has leg is the
+ *  inverse cleanup: no other despawn path exists today, but if anything ever
+ *  drops the entity out from under the state, the sweep reclaims the state
+ *  (and the placer's one-active slot) instead of stranding both for 180s. */
 export function updateFarmFeasts(ctx: SimContext): void {
   if (ctx.feasts.size === 0) return;
   for (const [id, feast] of ctx.feasts) {
-    if (feast.charges > 0 && ctx.tickCount < feast.expiresAtTick) continue;
+    if (feast.charges > 0 && ctx.tickCount < feast.expiresAtTick && ctx.entities.has(id)) continue;
     ctx.feasts.delete(id);
     if (ctx.entities.has(id)) ctx.dropEntity(id);
   }

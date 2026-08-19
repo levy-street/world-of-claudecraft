@@ -15,6 +15,7 @@
 //    a value; sim and server stay language-agnostic);
 //  - every other entity (players, plain objects) shows its wire name as is.
 import { isNecromancyUndead } from '../sim/combat/necromancy';
+import { FARM_FEAST_TEMPLATE_ID } from '../sim/professions/feast';
 import type { Entity } from '../sim/types';
 import { tEntity } from './entity_i18n';
 import { t } from './i18n';
@@ -27,7 +28,7 @@ export function entityDisplayName(entity: Entity): string {
       : tEntity({ kind: 'mob', id: entity.templateId, field: 'name' });
   }
   if (entity.kind === 'npc') return tEntity({ kind: 'npc', id: entity.templateId, field: 'name' });
-  if (entity.kind === 'object' && entity.templateId === 'farm_feast') {
+  if (entity.kind === 'object' && entity.templateId === FARM_FEAST_TEMPLATE_ID) {
     return t('hudChrome.farming.feastTitle', { name: entity.name });
   }
   return entity.name;

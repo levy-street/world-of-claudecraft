@@ -9059,7 +9059,7 @@ export const vi_VN: EnTranslations = {
       "useElixirAura": "Dùng: Ban {aura} trong {minutes} phút. Dùng được trong chiến đấu.",
       "useWellfed": "{aura}: +{value} {stat} for {minutes} min, granted when you finish eating.",
       "useWellfedAura": "Grants {aura} for {minutes} min when you finish eating.",
-      "useFeast": "Use: Sets out a feast others can eat from ({servings} servings, lasts {minutes} min).",
+      "useFeast": "Use: Sets out a feast others can eat from, one serving each ({servings} servings, lasts {minutes} min).",
       "useFeastBuff": "Each serving grants {aura}: +{value} {stat} for {minutes} min when you finish the {seconds} sec meal.",
       "useFeastBuffAura": "Each serving grants {aura} for {minutes} min when you finish the {seconds} sec meal.",
       "questItem": "Vật Phẩm Nhiệm Vụ",

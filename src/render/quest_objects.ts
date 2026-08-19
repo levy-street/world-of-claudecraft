@@ -610,9 +610,11 @@ function prepareItem(itemId: string): THREE.Group | null {
 }
 
 /** The farm_feast contract bounds (scripts/assets/farm_props/model.js), which
- *  size the no-item pick proxy below. */
-const NO_ITEM_PICK_HEIGHT = 0.9;
-const NO_ITEM_PICK_FOOTPRINT = 1.6;
+ *  size the no-item pick proxy below. Exported ONLY for the drift pin in
+ *  tests/farm_props_asset.test.ts: an authored prop resize must move this
+ *  pair or the click box silently desyncs from the visible table. */
+export const NO_ITEM_PICK_HEIGHT = 0.9;
+export const NO_ITEM_PICK_FOOTPRINT = 1.6;
 
 export function buildGroundQuestObject(
   itemId: string,

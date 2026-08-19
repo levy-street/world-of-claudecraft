@@ -29,6 +29,7 @@ import {
   FARM_ACCENT_MESH_NAME,
   FARM_SOIL_SOCKET_NAME,
 } from '../src/render/farm_patches_core';
+import { NO_ITEM_PICK_FOOTPRINT, NO_ITEM_PICK_HEIGHT } from '../src/render/quest_objects';
 
 const REPO_ROOT = path.join(__dirname, '..');
 // Re-minted at the fifteenth absorb: pnpm-lock.yaml is a fingerprint input
@@ -496,5 +497,16 @@ describe.each(EXPECTED_IDS)('farm prop GLB %s', (id) => {
         purpose: 'stage mesh mount point at the center of the soil surface',
       },
     });
+  });
+});
+
+describe('farm_feast pick proxy stays in step with the GLB contract', () => {
+  // The invisible click box in src/render/quest_objects.ts is hand-sized to
+  // the authored prop contract; an authored resize that forgets the proxy
+  // would silently desync the click target from the visible table.
+  it('the proxy pair equals the farm_feast contract bounds', () => {
+    const contract = FARM_PROP_CONTRACTS.farm_feast;
+    expect([NO_ITEM_PICK_FOOTPRINT, NO_ITEM_PICK_FOOTPRINT]).toEqual(contract.footprintYd);
+    expect(NO_ITEM_PICK_HEIGHT).toBe(contract.heightYd);
   });
 });

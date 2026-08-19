@@ -18,6 +18,7 @@
 // garbage on the hot path), mirroring the speedStreaksInto / cameraSpace out-param
 // idiom elsewhere in src/render.
 
+import { FARM_FEAST_TEMPLATE_ID } from '../sim/professions/feast';
 import type { Entity } from '../sim/types';
 import { INTERACT_RANGE } from '../sim/types';
 import { comboPipsFor } from './nameplate_combo';
@@ -132,7 +133,7 @@ export function nameplatePlanInto(
   // eat, hides at range), and like every object plate it carries no hp bar
   // (the flag-family object treatment).
   const feastNear =
-    e.templateId === 'farm_feast' && d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
+    e.templateId === FARM_FEAST_TEMPLATE_ID && d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
 
   out.hidden =
     (isSelf && !hasOverheadEmote && !showOwnNameplate) ||

@@ -107,7 +107,7 @@ const itemStringsEn = {
       // locale. useFeast keeps the Use: prefix: the feast has no foodHp, so
       // no useFood sentence owns that slot on its tooltip.
       useFeast:
-        'Use: Sets out a feast others can eat from ({servings} servings, lasts {minutes} min).',
+        'Use: Sets out a feast others can eat from, one serving each ({servings} servings, lasts {minutes} min).',
       useFeastBuff:
         'Each serving grants {aura}: +{value} {stat} for {minutes} min when you finish the {seconds} sec meal.',
       useFeastBuffAura:

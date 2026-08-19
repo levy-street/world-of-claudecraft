@@ -2769,7 +2769,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Эффект "{aura}": {stat} +{value} на {minutes} мин. Дается, когда вы доедаете.',
   'itemUi.tooltip.useWellfedAura': 'Дает эффект "{aura}" на {minutes} мин, когда вы доедаете.',
   'itemUi.tooltip.useFeast':
-    'Использование: накрывает пир, с которого могут поесть и другие ({servings} порций, действует {minutes} мин).',
+    'Использование: накрывает пир, с которого могут поесть и другие, по одной порции каждому ({servings} порций, действует {minutes} мин).',
   'itemUi.tooltip.useFeastBuff':
     'Каждая порция дает эффект "{aura}": {stat} +{value} на {minutes} мин после {seconds} сек еды.',
   'itemUi.tooltip.useFeastBuffAura':

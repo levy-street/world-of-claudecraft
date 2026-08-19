@@ -184,6 +184,13 @@ describe('the placeable feast classification (Farming Phase 12)', () => {
     expect(bagItemAction(ITEMS.feastItem, NO_MODE)).toBe('placeFeast');
   });
 
+  it('the hover previews the click the feast arm raises (never the empty hint)', () => {
+    // The frontend-seam review's ask: the feast was the only bag item with a
+    // click action and no hint sub-line, breaking the hover-previews-click
+    // doctrine stated at the hint ladder.
+    expect(bagTooltipHintKey(ITEMS.feastItem, NO_MODE)).toBe('itemUi.tooltip.clickUse');
+  });
+
   it('keeps a plain junk def (no feast field) on the use ladder', () => {
     // The twin that keeps the arm honest: without it, classifying EVERY junk
     // item as placeFeast would pass the positive arm above.
