@@ -1,4 +1,4 @@
-# Phase 9b: The bed verbs (PROPOSED by the Phase 9 QA, 2026-08-17)
+# Phase 9b: The bed verbs
 
 STATUS: ADOPTED as Phase 9b, 2026-08-18, via the maintainer-authored starter prompt
 (authored 2026-08-17; using it adopts the phase per its own terms). Background: the
@@ -75,27 +75,55 @@ met and q_farm_intro completes through the client.
   command-schema baselines (329 = 88 + 241, 34 facets, 202/215, delta keys 87,
   farming_session 9a8fefa5, the nineteenth-absorb re-mint) must not move.
 
-## Acceptance (if adopted)
+## EXECUTED (2026-08-18/19, branch fix/farming-phase-09b-bed-verbs off 6981105f27)
 
-- [ ] A fresh character completes q_farm_intro on the dev client through the real UI:
+Commit map: 2e6fcb42b9 adoption; 7ba29ede2c the hud.ts headroom extraction
+(openReportWindow moved whole to src/ui/report_window_open.ts, ceiling 19387 to
+19352); 5575f50260 the seam widening (REQUIRED members, IWorld and Hud satisfy
+structurally, main.ts untouched); 252138c1db the plantSheet i18n rows with the
+five non-Latin fills; lanes A/B/C in three worktrees (6dd657a148 + 4486a8fb17
+the bed arm and reachability pins, a2c07b2b12 + 8ea2432772 the plant sheet and
+its Hud composition, 6580d32ddc + bcd2132b8b the journey E2E, six LOW-preset
+captures, the CI cone rows, and the pr_shot_targets target), merged f0bbefd61a
+/ 7196e5f2e0 / 93a3998771; b2963c1d91 the convertHusks reachability describe
+(cross-platform review); 7c97ca51d1 the consolidated review-round fixes (the
+panel keydown guard, the relocalize arm and registry row, same-bed re-press
+preserves picks, any-farmPlanted clears the send arm, the plantSheet.close key,
+the live reportHooks getter, and eleven new decisive test arms including the
+comment-stripped Hud glue pin and the both-entries root pin). Reviews:
+cross-platform APPROVE, frontend pass (all seven should-fixes taken), coverage
+(B1 closed by the journey on the final tree, B2/B3 pinned, S1-S7 landed),
+gate-integrity and qa-checklist recorded in progress.md. Mutations 10/10
+KILLED with named reds through the dirty-refusing runner. The journey passed
+17/17 on the final merged tree (desktop; lane C also proved the 844x390
+landscape touch route through the real #mobile-interact button).
+DESIGN REFINEMENT (deviation (bp) in state.md): unaffordable knobs and
+non-sowable seeds are OFFER gates (disabled controls with the family's own
+denied.* line), not outcome predictions; the sim remains the refusing
+authority for everything sent, and the acceptance line below reads through
+that refinement.
+
+## Acceptance
+
+- [x] A fresh character completes q_farm_intro on the dev client through the real UI:
       accept at Jessica, buy nothing beyond the granted seed, plant at a bed through the
       interact key or a click/tap, `/dev farmgrow`, harvest through the interact key,
       turn in; no `window.__game` call anywhere in the drive.
-- [ ] The plant sheet offers only sowable seeds (bag, hoe tier, skill), shows the three
+- [x] The plant sheet offers only sowable seeds (bag, hoe tier, skill), shows the three
       knobs with honest affordability, and sends exactly one `plantCrop` with the chosen
       knobs; a knob the bags cannot pay is refused by the SIM (never pre-empted client
       side) and the sheet stays open on the deny.
-- [ ] The harvest verb works on ready AND withered plots and refuses (via the sim's
+- [x] The harvest verb works on ready AND withered plots and refuses (via the sim's
       `not_ready`) on a growing one; another player's plot in the same bed is never
       offered.
-- [ ] Desktop, touch (844x390 landscape), and gamepad all reach both verbs; screenshots
+- [x] Desktop, touch (844x390 landscape), and gamepad all reach both verbs; screenshots
       committed under docs/screenshots/farming-phase-09b (new subtree: CI cone rows in
       all five ci.yml blocks plus the `tests/ci_workflow.test.ts` literal, per the
       screenshot-dirs rule).
-- [ ] hud.ts, main.ts, renderer.ts do not grow (extraction first, ceilings lowered).
-- [ ] The Phase 9 Live-surface note is met; the (bn) deviation is closed in state.md;
+- [x] hud.ts, main.ts, renderer.ts do not grow (extraction first, ceilings lowered).
+- [x] The Phase 9 Live-surface note is met; the (bn) deviation is closed in state.md;
       the journey suite's layer-honesty header is retired.
-- [ ] tsc, the named suites, ci:changed, and gate_select green; no golden moves.
+- [x] tsc, the named suites, ci:changed, and gate_select green; no golden moves.
 
 ## Starter Prompt (the session form; using it adopts the phase)
 

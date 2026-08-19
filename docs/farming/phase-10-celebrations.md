@@ -19,14 +19,12 @@ catalog sha; this phase re-pins FROM those totals, not the ones the phase file w
 authored against, and the two castle deeds sit in DEED_ART_PENDING (src/ui/icons.ts),
 the release's own procedural-fallback ledger beside ITEM_ART_PENDING.
 
-PHASE 9 QA NOTE (2026-08-17, read state.md's OPEN list before starting): "Farming has been
-live since Phase 9" is true at the sim and wire level only. The Phase 9 QA established
-that no client-side player verb plants or harvests a bed (state.md (bn)) and that tier
-3/4 seeds have no first faucet ((bo)), so the loop this phase celebrates is not yet
-walkable by an ordinary player. The maintainer decides whether the proposed Phase 9b
-(docs/farming/phase-09b-bed-verbs.md) runs BEFORE this phase; if it does not, this
-phase's Live-surface note must say the celebrations are reachable at the sim level
-until the verb ships, and its browser evidence must not pretend otherwise.
+PHASE 9 QA NOTE (retired 2026-08-19): Phase 9b ran BEFORE this phase and closed
+state.md (bn): the client bed verbs shipped and the plant-grow-harvest loop is
+walkable by an ordinary player, so this phase's celebrations sit on a
+player-reachable loop. STILL OPEN from that QA: (bo), the tier 3/4 seed
+faucet (state.md OPEN list); nothing this phase celebrates may assume
+Highwatch or Evergarden beds are sowable until D11's bootstrap ruling lands.
 
 ### Starter Prompt
 
