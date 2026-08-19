@@ -9049,6 +9049,8 @@ export const vi_VN: EnTranslations = {
       "useDrink": "Dùng: Hồi {amount} mana trong {seconds} giây. Phải ngồi yên khi uống.",
       "useElixir": "Dùng: Tăng {stat} của bạn thêm {value} trong {minutes} phút. Dùng được trong chiến đấu.",
       "useElixirAura": "Dùng: Ban {aura} trong {minutes} phút. Dùng được trong chiến đấu.",
+      "useWellfed": "Use: Well Fed, +{value} {stat} for {minutes} min, granted when you finish eating.",
+      "useWellfedAura": "Use: Grants {aura} for {minutes} min when you finish eating.",
       "questItem": "Vật Phẩm Nhiệm Vụ",
       "questRelated": "Nhiệm vụ: {quest}",
       "questRules": "Không thể bán, gửi ngân hàng, hoặc trao đổi.",
@@ -12608,6 +12610,18 @@ export const vi_VN: EnTranslations = {
       },
       "evergarden_harvest_platter": {
         "name": "Evergarden Harvest Platter"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "Eastbrook Glazed Carrots"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "Fenbridge Rice Pudding"
+      },
+      "highwatch_barley_porridge": {
+        "name": "Highwatch Barley Porridge"
+      },
+      "evergarden_braised_greens": {
+        "name": "Evergarden Braised Greens"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"

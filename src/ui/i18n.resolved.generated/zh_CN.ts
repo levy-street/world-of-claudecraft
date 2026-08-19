@@ -9049,6 +9049,8 @@ export const zh_CN: EnTranslations = {
       "useDrink": "使用：在 {seconds} 秒内恢复 {amount} 点法力值。饮水时必须保持坐下。",
       "useElixir": "使用：使你的{stat}提高 {value} 点，持续 {minutes} 分钟。战斗中可用。",
       "useElixirAura": "使用：获得{aura}效果，持续 {minutes} 分钟。战斗中可用。",
+      "useWellfed": "使用：吃完后获得饱足效果，使你的{stat}提高 {value} 点，持续 {minutes} 分钟。",
+      "useWellfedAura": "使用：吃完后获得{aura}效果，持续 {minutes} 分钟。",
       "questItem": "任务物品",
       "questRelated": "任务：{quest}",
       "questRules": "无法出售、存入银行或交易。",
@@ -12608,6 +12610,18 @@ export const zh_CN: EnTranslations = {
       },
       "evergarden_harvest_platter": {
         "name": "常青园丰收拼盘"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "东溪蜜汁胡萝卜"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "芬桥大米布丁"
+      },
+      "highwatch_barley_porridge": {
+        "name": "高望大麦粥"
+      },
+      "evergarden_braised_greens": {
+        "name": "常青园焖青菜"
       },
       "conjured_water4": {
         "name": "魔法泉水"

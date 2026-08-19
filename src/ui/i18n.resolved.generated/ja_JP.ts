@@ -9049,6 +9049,8 @@ export const ja_JP: EnTranslations = {
       "useDrink": "使用: {seconds}秒かけてマナを{amount}回復します。飲んでいる間は座ったままでいる必要があります。",
       "useElixir": "使用: {stat}が{value}上昇し、{minutes}分間持続します。戦闘中に使用可能。",
       "useElixirAura": "使用: {aura}の効果を得て、{minutes}分間持続します。戦闘中に使用可能。",
+      "useWellfed": "使用: 食べ終えると満腹になり、{stat}が{value}上昇し、{minutes}分間持続します。",
+      "useWellfedAura": "使用: 食べ終えると{aura}の効果を得て、{minutes}分間持続します。",
       "questItem": "クエストアイテム",
       "questRelated": "クエスト：{quest}",
       "questRules": "売却、銀行預け入れ、取引はできません。",
@@ -12608,6 +12610,18 @@ export const ja_JP: EnTranslations = {
       },
       "evergarden_harvest_platter": {
         "name": "エバーガーデンの収穫プレート"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "イーストブルックの人参グラッセ"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "フェンブリッジのライスプディング"
+      },
+      "highwatch_barley_porridge": {
+        "name": "ハイウォッチの大麦粥"
+      },
+      "evergarden_braised_greens": {
+        "name": "エバーガーデンの青菜煮込み"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

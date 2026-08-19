@@ -450,6 +450,9 @@ const baseEnTable = {
   'aura.elixirBoar': 'Might of the Boar',
   'aura.elixirVenomfire': 'Vipersear Vigor',
   'aura.elixirSerpent': 'Might of the Serpent',
+  // The farming well-fed food aura (content/profession_items.ts): all four
+  // buff dishes share it, localized the same way as the elixir names above.
+  'aura.wellFed': 'Well Fed',
   // Shared Bloodlust / Temporal Acceleration exhaustion debuff (combat/haste_burst.ts).
   'aura.temporalExhaustion': 'Temporal Exhaustion',
   // Cauterize's 5 min lockout debuff (combat/fire_mage.ts); survives death.
@@ -4313,6 +4316,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirBoar': '野猪之力',
     'aura.elixirVenomfire': '蝰灼之力',
     'aura.elixirSerpent': '巨蛇之力',
+    'aura.wellFed': '饱足',
     'error.townFocusNotInTown': '你必须在城镇中才能设置专注。',
     'error.townFocusOverBudget': '该分配超出了你的专注点上限。',
     'error.townFocusInvalid': '无效的专注分配。',
@@ -4754,6 +4758,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirBoar': '野豬之力',
     'aura.elixirVenomfire': '蝰灼之力',
     'aura.elixirSerpent': '巨蛇之力',
+    'aura.wellFed': '飽足',
     'error.townFocusNotInTown': '你必須在城鎮中才能設定專注。',
     'error.townFocusOverBudget': '此分配超出了你的專注點數上限。',
     'error.townFocusInvalid': '無效的專注分配。',
@@ -5203,6 +5208,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirBoar': '멧돼지의 힘',
     'aura.elixirVenomfire': '살무사 작열의 활력',
     'aura.elixirSerpent': '뱀의 힘',
+    'aura.wellFed': '포만감',
     'error.townFocusNotInTown': '집중을 설정하려면 마을에 있어야 합니다.',
     'error.townFocusOverBudget': '해당 배분이 집중 포인트 한도를 초과합니다.',
     'error.townFocusInvalid': '잘못된 집중 배분입니다.',
@@ -5663,6 +5669,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirBoar': '猪の力',
     'aura.elixirVenomfire': '蝮灼の活力',
     'aura.elixirSerpent': '蛇の力',
+    'aura.wellFed': '満腹',
     'error.townFocusNotInTown': 'フォーカスを設定するには町にいる必要があります。',
     'error.townFocusOverBudget': 'その割り振りはフォーカスポイントの上限を超えています。',
     'error.townFocusInvalid': '無効なフォーカスの割り振りです。',
@@ -6575,6 +6582,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.elixirBoar': 'Мощь Вепря',
     'aura.elixirVenomfire': 'Мощь Гадючьего Жара',
     'aura.elixirSerpent': 'Мощь Змея',
+    'aura.wellFed': 'Сытость',
     'error.townFocusNotInTown': 'Чтобы задать фокус, нужно находиться в городе.',
     'error.townFocusOverBudget': 'Такое распределение превышает ваш запас очков фокуса.',
     'error.townFocusInvalid': 'Недопустимое распределение фокуса.',
@@ -8499,6 +8507,10 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   // still emits the pre-rename aura string. Drop after v0.29.0 ships.
   'Venomfire Vigor': 'aura.elixirVenomfire',
   'Might of the Serpent': 'aura.elixirSerpent',
+  // The farming well-fed food aura (content/profession_items.ts): all four
+  // buff dishes share this one name, so the buff bar, combat log, and the
+  // dish tooltip's fallback all localize it through the same row.
+  'Well Fed': 'aura.wellFed',
   Summoned: 'aura.summoned',
   Fed: 'aura.fed',
   'Caustic Spores': 'aura.causticSpores',

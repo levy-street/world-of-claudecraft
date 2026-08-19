@@ -2735,6 +2735,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '使用: {stat}が{value}上昇し、{minutes}分間持続します。戦闘中に使用可能。',
   'itemUi.tooltip.useElixirAura':
     '使用: {aura}の効果を得て、{minutes}分間持続します。戦闘中に使用可能。',
+  'itemUi.tooltip.useWellfed':
+    '使用: 食べ終えると満腹になり、{stat}が{value}上昇し、{minutes}分間持続します。',
+  'itemUi.tooltip.useWellfedAura': '使用: 食べ終えると{aura}の効果を得て、{minutes}分間持続します。',
   'itemUi.tooltip.clickUseInstant': 'クリックして戦闘中に即使用',
   'itemUi.tooltip.clickUse': 'クリックして使用',
   'itemUi.tooltip.clickBuyback': 'クリックして買い戻す',
@@ -8944,6 +8947,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.highwatch_gourd_soup.name': 'ハイウォッチの霜瓜スープ',
   'entities.items.evergarden_sunmelon_tart.name': 'エバーガーデンの太陽メロンタルト',
   'entities.items.evergarden_harvest_platter.name': 'エバーガーデンの収穫プレート',
+  'entities.items.eastbrook_glazed_carrots.name': 'イーストブルックの人参グラッセ',
+  'entities.items.fenbridge_rice_pudding.name': 'フェンブリッジのライスプディング',
+  'entities.items.highwatch_barley_porridge.name': 'ハイウォッチの大麦粥',
+  'entities.items.evergarden_braised_greens.name': 'エバーガーデンの青菜煮込み',
   'hudChrome.archetypeTitle.label': '称号',
   'hudChrome.archetypeTitle.none': 'なし',
   'hudChrome.archetypeTitle.hobbyLabel': '趣味',

@@ -9049,6 +9049,8 @@ export const ko_KR: EnTranslations = {
       "useDrink": "사용 효과: {seconds}초에 걸쳐 마나 {amount} 회복. 마시는 동안 앉아 있어야 합니다.",
       "useElixir": "사용: {stat}이(가) {value} 증가하며 {minutes}분 동안 지속됩니다. 전투 중 사용 가능.",
       "useElixirAura": "사용: {aura} 효과를 얻어 {minutes}분 동안 지속됩니다. 전투 중 사용 가능.",
+      "useWellfed": "사용: 다 먹으면 포만감을 얻어 {stat}이(가) {value} 증가하며 {minutes}분 동안 지속됩니다.",
+      "useWellfedAura": "사용: 다 먹으면 {aura} 효과를 얻어 {minutes}분 동안 지속됩니다.",
       "questItem": "퀘스트 아이템",
       "questRelated": "퀘스트: {quest}",
       "questRules": "판매, 은행에 보관, 거래할 수 없습니다.",
@@ -12608,6 +12610,18 @@ export const ko_KR: EnTranslations = {
       },
       "evergarden_harvest_platter": {
         "name": "상록 정원 수확 접시"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "이스트브룩 당근 글레이즈"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "펜브리지 쌀 푸딩"
+      },
+      "highwatch_barley_porridge": {
+        "name": "하이워치 보리죽"
+      },
+      "evergarden_braised_greens": {
+        "name": "상록 정원 잎채소 조림"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

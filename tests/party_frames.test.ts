@@ -56,7 +56,8 @@ describe('party frame aura relevance', () => {
       false,
     );
     expect(partyFrameAuraIsRelevant({ id: 'temporal_exhaustion', kind: 'sated' })).toBe(false);
-    expect(partyFrameAuraIsRelevant({ id: 'well_fed', kind: 'buff_sta' })).toBe(false);
+    // the live Phase 11 food-buff id: all four farming buff dishes mint it
+    expect(partyFrameAuraIsRelevant({ id: 'wellfed_buff_sta', kind: 'buff_sta' })).toBe(false);
     expect(partyFrameAuraIsRelevant({ id: 'rend', kind: 'dot' })).toBe(true);
     expect(partyFrameAuraIsRelevant({ id: 'wither', kind: 'buff_ap', neg: 1 })).toBe(true);
   });

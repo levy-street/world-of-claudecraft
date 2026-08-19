@@ -9049,6 +9049,8 @@ export const en: EnTranslations = {
       "useDrink": "Use: Restores {amount} mana over {seconds} sec. Must remain seated while drinking.",
       "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Usable in combat.",
       "useElixirAura": "Use: Grants {aura} for {minutes} min. Usable in combat.",
+      "useWellfed": "Use: Well Fed, +{value} {stat} for {minutes} min, granted when you finish eating.",
+      "useWellfedAura": "Use: Grants {aura} for {minutes} min when you finish eating.",
       "questItem": "Quest Item",
       "questRelated": "Quest: {quest}",
       "questRules": "Cannot be sold, banked, or traded.",
@@ -12608,6 +12610,18 @@ export const en: EnTranslations = {
       },
       "evergarden_harvest_platter": {
         "name": "Evergarden Harvest Platter"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "Eastbrook Glazed Carrots"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "Fenbridge Rice Pudding"
+      },
+      "highwatch_barley_porridge": {
+        "name": "Highwatch Barley Porridge"
+      },
+      "evergarden_braised_greens": {
+        "name": "Evergarden Braised Greens"
       },
       "conjured_water4": {
         "name": "Conjured Springwater"

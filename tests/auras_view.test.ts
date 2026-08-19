@@ -22,6 +22,8 @@ import {
   isAuraDebuff,
   isAuraExpiring,
 } from '../src/ui/auras_view';
+import { setLanguage } from '../src/ui/i18n';
+import { localizeSimAuraName } from '../src/ui/sim_i18n';
 import { assertAllocationStable } from './util/alloc_probe';
 
 // The "local player" id the isOwn dep compares against (the real host compares
@@ -803,6 +805,44 @@ describe('auras_view: the carried-flag buff', () => {
     expect(auraCancelNeedsConfirm(CARRIED_FLAG_AURA_ID)).toBe(true);
     expect(auraCancelNeedsConfirm('battle_shout')).toBe(false);
     expect(auraCancelNeedsConfirm('ghost_wolf')).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The farming well-fed food buff. All four buff dishes mint the ONE aura id
+// wellfed_buff_sta (last eaten wins; the namespace is distinct from
+// elixir_<kind>, so food and elixir stack by design). On the buff bar it is
+// an ordinary timed buff: its display name rides the AURA_NAME_KEY matcher
+// exactly like the elixir auras, and it is NOT a toggle, so
+// compactAuraDuration applies and the remaining time shows.
+// ---------------------------------------------------------------------------
+describe('auras_view: the well-fed food buff', () => {
+  const wellFed = (): AuraInput => ({
+    id: 'wellfed_buff_sta',
+    name: 'Well Fed',
+    kind: 'buff_sta',
+    value: 3,
+    remaining: 600,
+    duration: 600,
+  });
+
+  it('resolves its display name through the AURA_NAME_KEY row, like the elixirs', () => {
+    // Non-null proves the matcher ROW exists (a missing row returns null and
+    // the buff bar would fall back to the raw sim string in every locale);
+    // the en identity round-trip proves the row's EN value matches the aura
+    // string the dishes actually mint.
+    setLanguage('en');
+    expect(localizeSimAuraName('Well Fed')).not.toBeNull();
+    expect(localizeSimAuraName('Well Fed')).toBe('Well Fed');
+  });
+
+  it('shows its remaining time: a real timed buff, never a toggle', () => {
+    const slot = createAurasView('buffs', deps()).tick(entity([wellFed()])).slots[0];
+    expect(slot.key).toBe('wellfed_buff_sta');
+    expect(slot.toggle).toBe(false);
+    expect(slot.durationText).toBe('10m'); // compactAuraDuration: 600s reads 10m
+    expect(slot.isDebuff).toBe(false);
+    expect(slot.expiring).toBe(false);
   });
 });
 

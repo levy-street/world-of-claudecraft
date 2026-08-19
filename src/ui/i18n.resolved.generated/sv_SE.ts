@@ -9049,6 +9049,8 @@ export const sv_SE: EnTranslations = {
       "useDrink": "Använd: Återställer {amount} mana under {seconds} sek. Du måste förbli sittande medan du dricker.",
       "useElixir": "Använd: Ökar din {stat} med {value} i {minutes} min. Kan användas i strid.",
       "useElixirAura": "Använd: Ger {aura} i {minutes} min. Kan användas i strid.",
+      "useWellfed": "Use: Well Fed, +{value} {stat} for {minutes} min, granted when you finish eating.",
+      "useWellfedAura": "Use: Grants {aura} for {minutes} min when you finish eating.",
       "questItem": "Uppdragsföremål",
       "questRelated": "Uppdrag: {quest}",
       "questRules": "Kan inte säljas, bankas eller bytas bort.",
@@ -12608,6 +12610,18 @@ export const sv_SE: EnTranslations = {
       },
       "evergarden_harvest_platter": {
         "name": "Evergarden Harvest Platter"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "Eastbrook Glazed Carrots"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "Fenbridge Rice Pudding"
+      },
+      "highwatch_barley_porridge": {
+        "name": "Highwatch Barley Porridge"
+      },
+      "evergarden_braised_greens": {
+        "name": "Evergarden Braised Greens"
       },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"

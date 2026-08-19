@@ -9049,6 +9049,8 @@ export const ru_RU: EnTranslations = {
       "useDrink": "Использование: восстанавливает {amount} маны за {seconds} сек. Нужно оставаться сидя во время питья.",
       "useElixir": "Использование: повышает {stat} на {value} в течение {minutes} мин. Можно использовать в бою.",
       "useElixirAura": "Использование: дает эффект \"{aura}\" на {minutes} мин. Можно использовать в бою.",
+      "useWellfed": "Использование: Сытость, {stat} +{value} на {minutes} мин. Эффект дается, когда вы доедаете.",
+      "useWellfedAura": "Использование: дает эффект \"{aura}\" на {minutes} мин, когда вы доедаете.",
       "questItem": "Предмет задания",
       "questRelated": "Задание: {quest}",
       "questRules": "Нельзя продать, положить в банк или обменять.",
@@ -12608,6 +12610,18 @@ export const ru_RU: EnTranslations = {
       },
       "evergarden_harvest_platter": {
         "name": "Блюдо урожая Вечного Сада"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "Истврукская глазированная морковь"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "Фенбриджский рисовый пудинг"
+      },
+      "highwatch_barley_porridge": {
+        "name": "Хайвотчская ячменная каша"
+      },
+      "evergarden_braised_greens": {
+        "name": "Тушёная зелень Вечного Сада"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"

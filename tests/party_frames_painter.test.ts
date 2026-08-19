@@ -438,7 +438,8 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
           pid: 2,
           auras: [
             { id: 'weapon_imbue', kind: 'imbue' },
-            { id: 'well_fed', kind: 'buff_sta' },
+            // the live Phase 11 food-buff id: all four farming buff dishes mint it
+            { id: 'wellfed_buff_sta', kind: 'buff_sta' },
             { id: 'arcane_intellect', kind: 'buff_int_pct' },
             { id: 'temporal_exhaustion', kind: 'sated' },
             { id: 'power_word_shield', kind: 'absorb' },
