@@ -1182,6 +1182,7 @@ export const fr_CA: EnTranslations = {
       "endedForfeitLog": "Le match a été abandonné.",
       "firstWinBonusLine": "Première victoire du jour : +{honor} points d'honneur",
       "firstWinBonusLog": "Première victoire du jour : vous gagnez {honor} points d'honneur bonus.",
+      "doubleHonorLine": "Double Honor Day: all Honor awards pay {mult}x today",
       "timeWarningMinutes": "Il reste {minutes} minutes",
       "timeWarningOneMinute": "Il reste une minute",
       "timeWarningMinutesLog": "Il reste {minutes} minutes dans la bataille.",
@@ -2965,6 +2966,10 @@ export const fr_CA: EnTranslations = {
         "arenaClash": {
           "title": "Choc des arènes",
           "note": "Les duellistes affluent au Colisée cendré. Entrez en file et grimpez au classement."
+        },
+        "doubleHonor": {
+          "title": "Double Honor Day",
+          "note": "The war camps sound the muster: every Honor award pays double until the daily reset."
         },
         "fishingDerby": {
           "title": "Concours de pêche",

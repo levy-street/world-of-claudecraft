@@ -4,6 +4,7 @@
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { ArenaFormat, HonorArenaDailyState, HonorReason } from '../types';
+import { honorEventMultiplier } from './honor_event';
 
 export const RANKED_ARENA_WIN_HONOR = {
   '1v1': 25,
@@ -154,7 +155,13 @@ export function grantHonor(
   amount: number,
   reason: HonorReason,
 ): number {
-  const requested = safeHonorAmount(amount);
+  // The weekly Double Honor event multiplies here, in the one funnel every
+  // grant routes through, so no award path (result, kill drip, first-win
+  // bonus, arena, Fiesta) can be added later that silently misses the event.
+  // Applied BEFORE the single floor below: a decayed kill drip of 2.5 doubles
+  // to a credited 5, not floor(2)*2 = 4, which is the generous reading of
+  // "doubled" and keeps the floor happening exactly once.
+  const requested = safeHonorAmount(amount * honorEventMultiplier(ctx.resetDay));
   if (requested === 0) return 0;
   const honorBefore = meta.honor;
   const lifetimeBefore = meta.lifetimeHonor;

@@ -1182,6 +1182,7 @@ export const ru_RU: EnTranslations = {
       "endedForfeitLog": "Бой завершён отказом.",
       "firstWinBonusLine": "Первая победа за день: +{honor} чести",
       "firstWinBonusLog": "Первая победа за день: вы получаете {honor} очк. чести дополнительно.",
+      "doubleHonorLine": "День двойной чести: сегодня все награды чести умножаются на {mult}",
       "timeWarningMinutes": "Осталось {minutes} мин.",
       "timeWarningOneMinute": "Осталась одна минута",
       "timeWarningMinutesLog": "До конца боя осталось {minutes} мин.",
@@ -2965,6 +2966,10 @@ export const ru_RU: EnTranslations = {
         "arenaClash": {
           "title": "Битва на арене",
           "note": "Дуэлянты стекаются в Пепельный Колизей. Вставайте в очередь и поднимайтесь по лестнице."
+        },
+        "doubleHonor": {
+          "title": "День двойной чести",
+          "note": "Военные лагеря трубят сбор: до ежедневного сброса все награды чести удваиваются."
         },
         "fishingDerby": {
           "title": "Рыбацкое дерби",

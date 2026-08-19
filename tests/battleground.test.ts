@@ -3106,6 +3106,18 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
     ).toBe(true);
   });
 
+  it('reports the weekly Double Honor window on the bg readout', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Chip');
+    sim.resetDay = '2026-08-08'; // a Saturday
+    expect(must(sim.bgInfoFor(pid), 'bg info').doubleHonorActive).toBe(true);
+    sim.resetDay = '2026-08-09'; // Sunday: the chip drops on the rollover
+    expect(must(sim.bgInfoFor(pid), 'bg info').doubleHonorActive).toBe(false);
+    // No host calendar, no event (headless and parity runs stay untouched).
+    sim.resetDay = '';
+    expect(must(sim.bgInfoFor(pid), 'bg info').doubleHonorActive).toBe(false);
+  });
+
   it('an UNRATED dev match never claims it', () => {
     const sim = makeWorld();
     sim.resetDay = '2026-07-26';

@@ -43,6 +43,17 @@ describe('systemEventIdsOn', () => {
     expect(systemEventIdsOn('2026-07-03')).toEqual([]);
   });
 
+  it('advertises Double Honor Day on Saturdays, beside the Arena Clash', () => {
+    // Two Saturday rows on purpose: the clash names the ladder, this names the
+    // payout (src/sim/pvp/honor_event.ts doubles every honor grant that day),
+    // so the row points at a real activity per this file's own contract.
+    expect(systemEventIdsOn('2026-07-04')).toEqual(
+      expect.arrayContaining(['arena_clash', 'double_honor']),
+    );
+    // 2026-07-05 is a Sunday: the event does not bleed past its window.
+    expect(systemEventIdsOn('2026-07-05')).not.toContain('double_honor');
+  });
+
   it('every system event recurs within the next two months', () => {
     for (const def of SYSTEM_EVENTS) {
       const next = nextOccurrence(def, '2026-07-03');

@@ -1087,6 +1087,10 @@ export const hudChromeStrings = {
     // its own key because it is past tense.
     firstWinBonusLine: 'First win of the day: +{honor} Honor',
     firstWinBonusLog: 'First win of the day: you gain {honor} bonus Honor.',
+    // The weekly Double Honor event chip ({mult} is the event multiplier,
+    // formatted). One key for the one surface; the calendar row below carries
+    // its own longer copy.
+    doubleHonorLine: 'Double Honor Day: all Honor awards pay {mult}x today',
     // Remaining-time calls, announced to the whole field (BG_TIME_WARNINGS).
     timeWarningMinutes: '{minutes} minutes remain',
     timeWarningOneMinute: 'One minute remains',
@@ -3582,6 +3586,10 @@ export const hudChromeStrings = {
       arenaClash: {
         title: 'Arena Clash',
         note: 'Duelists flock to the Ashen Coliseum. Queue up and climb the ladder.',
+      },
+      doubleHonor: {
+        title: 'Double Honor Day',
+        note: 'The war camps sound the muster: every Honor award pays double until the daily reset.',
       },
       fishingDerby: {
         title: 'Fishing Derby',

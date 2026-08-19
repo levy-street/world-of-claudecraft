@@ -1182,6 +1182,7 @@ export const id_ID: EnTranslations = {
       "endedForfeitLog": "Pertandingan diserahkan.",
       "firstWinBonusLine": "Kemenangan pertama hari ini: +{honor} Kehormatan",
       "firstWinBonusLog": "Kemenangan pertama hari ini: kamu mendapatkan {honor} bonus Kehormatan.",
+      "doubleHonorLine": "Double Honor Day: all Honor awards pay {mult}x today",
       "timeWarningMinutes": "{minutes} menit tersisa",
       "timeWarningOneMinute": "Satu menit tersisa",
       "timeWarningMinutesLog": "{minutes} menit tersisa dalam pertempuran.",
@@ -2965,6 +2966,10 @@ export const id_ID: EnTranslations = {
         "arenaClash": {
           "title": "Bentrokan Arena",
           "note": "Para duelis berbondong-bondong ke Koloseum Abu. Masuklah antrean dan panjat tangga peringkat."
+        },
+        "doubleHonor": {
+          "title": "Double Honor Day",
+          "note": "The war camps sound the muster: every Honor award pays double until the daily reset."
         },
         "fishingDerby": {
           "title": "Lomba Memancing",

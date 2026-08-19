@@ -288,6 +288,20 @@ Phase 1 starts with these owner-selected values:
   award (`BATTLEGROUND_FIRST_WIN_BONUS_HONOR`), so the day's first win pays 80
   against a routine 60, a ratio of 1.33x.
 
+Every Saturday is Double Honor Day: every Honor grant, all modes and all award
+types (results, the kill and assist drip, the first-win bonus, arena, Fiesta),
+pays `DOUBLE_HONOR_MULTIPLIER` (2x) times its normal amount for the whole reset
+window (`src/sim/pvp/honor_event.ts`, applied inside `grantHonor` before its
+single floor). The day is the realm's own reset-day window, read from the
+host-provided `resetDay` key, so the event opens and closes at the realm's
+3 AM reset like every other daily boundary; a host that sets no calendar never
+runs the event. The weekly cadence exists to concentrate the PvP population
+into one predictable day so the 5v5 queue pops, in the spirit of the
+classic-era battleground holiday weekends; 2x is owner tuning to revisit
+against live Saturday queue data. The diminishing-returns curves below apply
+first, then the doubling: the event raises the whole day's income without
+weakening any anti-farm rule.
+
 Only the first ranked Arena win against the same opponent or team pays Honor
 each UTC day. Repeated Fiesta rewards against the same opposition pay 100, 50,
 25, then 0 percent (`HONOR_REPEAT_DR`, shared with battleground kill and assist

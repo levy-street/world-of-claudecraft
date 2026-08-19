@@ -1182,6 +1182,7 @@ export const ja_JP: EnTranslations = {
       "endedForfeitLog": "この試合は棄権で終了しました。",
       "firstWinBonusLine": "本日の初勝利:名誉+{honor}",
       "firstWinBonusLog": "本日の初勝利:追加で名誉を{honor}獲得しました。",
+      "doubleHonorLine": "名誉2倍デー:本日の名誉獲得はすべて{mult}倍",
       "timeWarningMinutes": "残り{minutes}分",
       "timeWarningOneMinute": "残り1分",
       "timeWarningMinutesLog": "戦闘は残り{minutes}分です。",
@@ -2965,6 +2966,10 @@ export const ja_JP: EnTranslations = {
         "arenaClash": {
           "title": "アリーナ激突",
           "note": "決闘者たちが灰燼の闘技場へ。キューに並んでラダーを駆け上がろう。"
+        },
+        "doubleHonor": {
+          "title": "名誉2倍デー",
+          "note": "戦陣が召集の号令を上げる。デイリーリセットまで、すべての名誉報酬が2倍になる。"
         },
         "fishingDerby": {
           "title": "フィッシングダービー",

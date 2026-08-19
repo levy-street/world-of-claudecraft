@@ -39,6 +39,7 @@ import {
   awardBattlegroundHonor,
   awardBattlegroundKillHonor,
   bgFirstWinBonusAvailable,
+  doubleHonorActive,
   honorTeamIdentity,
 } from '../pvp';
 import type { ArenaReturnPools } from '../sim';
@@ -2171,6 +2172,10 @@ export function bgInfoFor(
     // date that is not today as re-armed without writing anything, because a
     // per-viewer wire builder must not mutate the daily window it reports on.
     firstWinBonusReady: bgFirstWinBonusAvailable(ctx.resetDay, meta),
+    // The weekly Double Honor window, read off the same host-provided reset
+    // day the first-win flag above rolls on. Realm-wide fact, not per-viewer
+    // state, so the read is trivially mutation-free.
+    doubleHonorActive: doubleHonorActive(ctx.resetDay),
     match: matchInfo,
     ladder: ladder ?? bgLadder(ctx),
   };

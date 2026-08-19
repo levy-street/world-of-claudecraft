@@ -1182,6 +1182,7 @@ export const en: EnTranslations = {
       "endedForfeitLog": "The match was forfeited.",
       "firstWinBonusLine": "First win of the day: +{honor} Honor",
       "firstWinBonusLog": "First win of the day: you gain {honor} bonus Honor.",
+      "doubleHonorLine": "Double Honor Day: all Honor awards pay {mult}x today",
       "timeWarningMinutes": "{minutes} minutes remain",
       "timeWarningOneMinute": "One minute remains",
       "timeWarningMinutesLog": "{minutes} minutes remain in the battle.",
@@ -2965,6 +2966,10 @@ export const en: EnTranslations = {
         "arenaClash": {
           "title": "Arena Clash",
           "note": "Duelists flock to the Ashen Coliseum. Queue up and climb the ladder."
+        },
+        "doubleHonor": {
+          "title": "Double Honor Day",
+          "note": "The war camps sound the muster: every Honor award pays double until the daily reset."
         },
         "fishingDerby": {
           "title": "Fishing Derby",

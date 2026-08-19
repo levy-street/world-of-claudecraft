@@ -1182,6 +1182,7 @@ export const nl_NL: EnTranslations = {
       "endedForfeitLog": "De wedstrijd werd opgegeven.",
       "firstWinBonusLine": "Eerste overwinning van de dag: +{honor} Eer",
       "firstWinBonusLog": "Eerste overwinning van de dag: je krijgt {honor} bonus Eer.",
+      "doubleHonorLine": "Double Honor Day: all Honor awards pay {mult}x today",
       "timeWarningMinutes": "Nog {minutes} minuten te gaan",
       "timeWarningOneMinute": "Nog een minuut te gaan",
       "timeWarningMinutesLog": "Nog {minutes} minuten te gaan in het gevecht.",
@@ -2965,6 +2966,10 @@ export const nl_NL: EnTranslations = {
         "arenaClash": {
           "title": "Arenatreffen",
           "note": "Duellisten stromen naar het Asgrauwe Colosseum. Sluit aan in de wachtrij en klim de ladder op."
+        },
+        "doubleHonor": {
+          "title": "Double Honor Day",
+          "note": "The war camps sound the muster: every Honor award pays double until the daily reset."
         },
         "fishingDerby": {
           "title": "Visderby",
