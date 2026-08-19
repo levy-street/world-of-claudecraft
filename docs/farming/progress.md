@@ -3112,8 +3112,28 @@ whenever nonzero and the client assigns rather than skips, both
 branches. Ledgered residuals with owners: the state.md Phase 11 QA
 block. Verdict PASS-WITH-FOLLOWUPS.
 
-GATE AND MERGE: recorded in the gate-record commit at the tail of this
-QA (the notes block).
+QA-CHECKLIST VERDICT (ran LAST over the QA diff): READY, 0 BLOCKING. Its
+one SHOULD-FIX was the joint-coverage rule striking again: the death arm
+proved the OR of the two consuming-clear sites (the shared interrupt
+clear fires before the death-reset block's own clear; a diagnostic
+mutant deleting the death-block clear SURVIVED the suite). Resolved per
+its own recommendation: the arm's claim now states the joint outcome it
+actually proves (the killing blow clears the meal, nothing mints through
+30s of dead-state ticks) with the diagnostic recorded in the comment.
+Its hygiene notes taken in the same commit: the locale describe restores
+English, the locale ids are compile-checked, the ragged wrap mended.
+The remaining state.md validation matrix rows the diff demands were run
+green (professions_work_orders, snapshots, env_protocol, bandwidth: the
+wire negative proof, 280 tests).
+
+GATE RECORD: one run on the frozen QA tip a9b4c3f818
+(BROWSER_PATH=<playwright chromium> GATE_MAX_WORKERS=8
+node scripts/gate_select.mjs): "[gate:select] PASS: all 12 steps green
+(vitest workers: 8)", zero FAIL markers, shell exit 0, no druid_engines
+timeout. Golden md5 25bd6b8774f913279c96dddb25f93403 held through the
+whole QA; hud.ts 19219/19220 and renderer.ts 13774/13774 untouched.
+
+MERGE: recorded in the merge-hash record commit on the feature branch.
 
 ### Phase 12
 (not started)
