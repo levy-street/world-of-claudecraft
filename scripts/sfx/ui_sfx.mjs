@@ -37,6 +37,8 @@ const MASTER_GAINS_DB = {
   ui_farm_harvest: 0,
   // The ready-notice PLACEHOLDER, unity gain with its two siblings.
   ui_farm_ready: 0,
+  // The golden-harvest sting PLACEHOLDER, unity gain with its three siblings.
+  ui_farm_golden: 0,
 };
 
 function tone(frequency, start, duration, gain, options = {}) {
@@ -193,6 +195,20 @@ export const UI_SFX_SPECS = [
   cue('ui_farm_ready', 0.5, 'Soft two-note wooden chime announcing that crops have finished.', [
     tone(587, 0, 0.18, 0.08, { wave: 'triangle' }),
     tone(784, 0.12, 0.26, 0.07, { wave: 'triangle' }),
+  ]),
+  // Farming PLACEHOLDER (the celebrations phase), for the sound engineer: the
+  // golden-harvest sting the finder hears layered over the shared rare-event
+  // achievement cue. A short ascending golden shimmer: a bright triangle
+  // arpeggio climbing a major arc (the ui_level_up flourish vocabulary,
+  // shortened) with a soft high sparkle on top so it reads as sunlight on
+  // grain rather than a fanfare. Swap for a real recording when one lands,
+  // exactly as its three farming siblings above.
+  cue('ui_farm_golden', 0.7, 'Bright golden shimmer sting celebrating a rare five-fold harvest.', [
+    tone(659, 0, 0.22, 0.12, { wave: 'triangle' }),
+    tone(831, 0.08, 0.24, 0.12, { wave: 'triangle' }),
+    tone(1046, 0.16, 0.3, 0.13, { wave: 'triangle' }),
+    tone(1318, 0.24, 0.36, 0.11, { wave: 'triangle', endFrequency: 1568 }),
+    noise('white', 0.1, 0.5, 0.02, { highpass: 3400 }),
   ]),
 ].map((spec) => ({ ...spec, masterGainDb: MASTER_GAINS_DB[spec.key] }));
 

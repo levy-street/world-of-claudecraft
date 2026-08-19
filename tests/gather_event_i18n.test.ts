@@ -2,8 +2,14 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { GATHERING_PROFESSION_IDS } from '../src/sim/content/professions';
+import type { GatherRareEventFlavor } from '../src/sim/types';
 import { GATHERING_PROFESSION_NAME_KEYS } from '../src/ui/gathering_profession_name';
 import { hasTranslation, t } from '../src/ui/i18n';
+import { ja_JP } from '../src/ui/i18n.locales/ja_JP';
+import { ko_KR } from '../src/ui/i18n.locales/ko_KR';
+import { ru_RU } from '../src/ui/i18n.locales/ru_RU';
+import { zh_CN } from '../src/ui/i18n.locales/zh_CN';
+import { zh_TW } from '../src/ui/i18n.locales/zh_TW';
 
 // Gather-event localization: the sim emits ids plus values only
 // (gatherResult / gatherRareEvent are text-free, the craftResult/skinEvent
@@ -13,10 +19,11 @@ import { hasTranslation, t } from '../src/ui/i18n';
 // their placeholders, and stay wired into the hud event switch.
 
 describe('gatherEvent broadcast lines (client-localized ids)', () => {
-  it('all three flavor keys exist', () => {
+  it('all four flavor keys exist', () => {
     expect(hasTranslation('gatherEvent.pristineVein')).toBe(true);
     expect(hasTranslation('gatherEvent.ancientHeartwood')).toBe(true);
     expect(hasTranslation('gatherEvent.moonlitBloom')).toBe(true);
+    expect(hasTranslation('gatherEvent.goldenHarvest')).toBe(true);
   });
 
   it('renders the exact contract English with the {finder} splice', () => {
@@ -27,6 +34,31 @@ describe('gatherEvent broadcast lines (client-localized ids)', () => {
     expect(t('gatherEvent.moonlitBloom', { finder: 'Alba' })).toBe(
       'Alba discovered a moonlit bloom!',
     );
+    expect(t('gatherEvent.goldenHarvest', { finder: 'Alba' })).toBe(
+      'Alba reaped a golden harvest!',
+    );
+  });
+
+  it('the goldenHarvest fill in each M16 overlay is real (non-empty, non-English, {finder} intact)', () => {
+    // The wordy new English value needs its five non-Latin fills in the SAME
+    // change (M16). The whole-catalog English-leak guard in
+    // tests/i18n_completeness.test.ts covers byte-identical leaks; this arm
+    // additionally binds the {finder} token surviving each fill verbatim,
+    // which that guard does not check.
+    const english = t('gatherEvent.goldenHarvest', { finder: '{finder}' });
+    const overlays: Array<[string, Partial<Record<'gatherEvent.goldenHarvest', string>>]> = [
+      ['zh_CN', zh_CN],
+      ['zh_TW', zh_TW],
+      ['ja_JP', ja_JP],
+      ['ko_KR', ko_KR],
+      ['ru_RU', ru_RU],
+    ];
+    for (const [locale, overlay] of overlays) {
+      const fill = overlay['gatherEvent.goldenHarvest'];
+      expect(fill, `${locale} fill present`).toBeTruthy();
+      expect(fill, `${locale} fill is not the English source`).not.toBe(english);
+      expect(fill, `${locale} fill keeps the verbatim splice token`).toContain('{finder}');
+    }
   });
 });
 
@@ -191,6 +223,7 @@ describe('hud event switch stays wired to the ids', () => {
       'gatherEvent.pristineVein',
       'gatherEvent.ancientHeartwood',
       'gatherEvent.moonlitBloom',
+      'gatherEvent.goldenHarvest',
       'hudChrome.gathering.gatherLine',
       'hudChrome.gathering.gatherLineQty',
     ]) {
@@ -216,8 +249,9 @@ describe('hud event switch stays wired to the ids', () => {
   it('each flavor maps to its own broadcast key in the hud switch', () => {
     // A swapped flavor-to-key mapping would pass the mere-existence pin above;
     // bind each slug to its key through the conditional chain in the
-    // gatherRareEvent case (order: pristine_vein then ancient_heartwood, with
-    // moonlitBloom as the remaining arm).
+    // gatherRareEvent case (order: pristine_vein then ancient_heartwood then
+    // an explicit moonlit_bloom comparison, with goldenHarvest as the
+    // remaining arm).
     const source = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
     const caseStart = source.indexOf("case 'gatherRareEvent'");
     expect(caseStart).toBeGreaterThan(-1);
@@ -226,12 +260,16 @@ describe('hud event switch stays wired to the ids', () => {
     const pvKey = block.indexOf("'gatherEvent.pristineVein'");
     const ah = block.indexOf("'ancient_heartwood'");
     const ahKey = block.indexOf("'gatherEvent.ancientHeartwood'");
+    const mb = block.indexOf("'moonlit_bloom'");
     const mbKey = block.indexOf("'gatherEvent.moonlitBloom'");
+    const ghKey = block.indexOf("'gatherEvent.goldenHarvest'");
     expect(pv).toBeGreaterThan(-1);
     expect(pvKey).toBeGreaterThan(pv);
     expect(ah).toBeGreaterThan(pvKey);
     expect(ahKey).toBeGreaterThan(ah);
-    expect(mbKey).toBeGreaterThan(ahKey);
+    expect(mb).toBeGreaterThan(ahKey);
+    expect(mbKey).toBeGreaterThan(mb);
+    expect(ghKey).toBeGreaterThan(mbKey);
   });
 
   it('the gatherResult case adds no second loot cue (the loot event owns the cue)', () => {
@@ -257,6 +295,56 @@ describe('hud event switch stays wired to the ids', () => {
     const cue = block.indexOf('audio.achievement()');
     expect(guard).toBeGreaterThan(-1);
     expect(cue).toBeGreaterThan(guard);
+  });
+
+  it('the golden sting is flavor-guarded, finder-only, and layered after the shared cue', () => {
+    // Phase 10 (celebrations): golden_harvest LAYERS its sting on top of the
+    // achievement cue the whole flavor family shares; the sting must never
+    // fire for another flavor or another recipient. Same first-occurrence
+    // index-order technique as the achievement pin above: the flavor-and-
+    // finder guard must appear in the case block BEFORE the sting call, and
+    // the sting AFTER the shared achievement cue (layered, not replacing).
+    const source = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+    const caseStart = source.indexOf("case 'gatherRareEvent'");
+    expect(caseStart).toBeGreaterThan(-1);
+    const block = source.slice(caseStart, source.indexOf('break;', caseStart));
+    const guard = block.indexOf("ev.flavor === 'golden_harvest' && ev.finderPid === sim.playerId");
+    const sting = block.indexOf('audio.farmGolden()');
+    const sharedCue = block.indexOf('audio.achievement()');
+    expect(guard).toBeGreaterThan(-1);
+    expect(sting).toBeGreaterThan(guard);
+    expect(sting).toBeGreaterThan(sharedCue);
+    // Occurrence counts: the first-occurrence indexOf arms above stay green
+    // if an UNGUARDED second call is appended after the guarded first, so
+    // pin each cue to exactly one call site inside the case block.
+    expect(block.split('audio.farmGolden()').length - 1).toBe(1);
+    expect(block.split('audio.achievement()').length - 1).toBe(1);
+    // ONE case, ONE break: the golden arm lives inside the same case block as
+    // its three siblings, so the slice above already contains its key.
+    expect(block.includes("'gatherEvent.goldenHarvest'")).toBe(true);
+  });
+
+  it('the flavor-to-key chain is exhaustive under tsc and every key sits in the case', () => {
+    // Compile-time exhaustiveness for the hud case's catch-all chain: a
+    // fifth flavor added to GatherRareEventFlavor reds THIS table under
+    // `npx tsc --noEmit` before the terminal arm can silently render it as
+    // the golden line. The containment arm then demands every mapped key
+    // appear inside the single case slice, so the table cannot drift from
+    // the chain it describes (each PAIRING is proven by the ordering pin
+    // and the exact-English arms above).
+    const FLAVOR_KEYS = {
+      pristine_vein: 'gatherEvent.pristineVein',
+      ancient_heartwood: 'gatherEvent.ancientHeartwood',
+      moonlit_bloom: 'gatherEvent.moonlitBloom',
+      golden_harvest: 'gatherEvent.goldenHarvest',
+    } satisfies Record<GatherRareEventFlavor, string>;
+    const source = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+    const caseStart = source.indexOf("case 'gatherRareEvent'");
+    expect(caseStart).toBeGreaterThan(-1);
+    const block = source.slice(caseStart, source.indexOf('break;', caseStart));
+    for (const key of Object.values(FLAVOR_KEYS)) {
+      expect(block.includes(`'${key}'`), key).toBe(true);
+    }
   });
 
   it('both lines color through the existing quality token family only', () => {

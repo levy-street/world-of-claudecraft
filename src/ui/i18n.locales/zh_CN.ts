@@ -8508,6 +8508,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'gatherEvent.pristineVein': '{finder}挖到了一条纯净的矿脉！',
   'gatherEvent.ancientHeartwood': '{finder}砍倒了一棵远古心木！',
   'gatherEvent.moonlitBloom': '{finder}发现了一朵月光之花！',
+  'gatherEvent.goldenHarvest': '{finder}收获了一场金色丰收！',
   'entities.items.copper_ore.name': '铜矿石',
   'entities.items.iron_ore.name': '铁矿石',
   'entities.items.ironbark_log.name': '铁皮木原木',

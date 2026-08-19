@@ -8884,6 +8884,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'gatherEvent.pristineVein': '{finder}님이 순수한 광맥을 발견했습니다!',
   'gatherEvent.ancientHeartwood': '{finder}님이 고대 심목을 베어냈습니다!',
   'gatherEvent.moonlitBloom': '{finder}님이 달빛 꽃을 발견했습니다!',
+  'gatherEvent.goldenHarvest': '{finder}님이 황금빛 수확을 거두었습니다!',
   'entities.items.copper_ore.name': '구리 광석',
   'entities.items.iron_ore.name': '철 광석',
   'entities.items.ironbark_log.name': '무쇠껍질나무 통나무',

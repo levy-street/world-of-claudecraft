@@ -8900,6 +8900,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'gatherEvent.pristineVein': '{finder}が純粋な鉱脈を掘り当てた！',
   'gatherEvent.ancientHeartwood': '{finder}が太古の心木を切り倒した！',
   'gatherEvent.moonlitBloom': '{finder}が月光の花を発見した！',
+  'gatherEvent.goldenHarvest': '{finder}が黄金の実りを刈り取った！',
   'entities.items.copper_ore.name': '銅鉱石',
   'entities.items.iron_ore.name': '鉄鉱石',
   'entities.items.ironbark_log.name': 'アイアンバークの丸太',

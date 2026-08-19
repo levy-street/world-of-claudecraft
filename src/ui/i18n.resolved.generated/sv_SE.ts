@@ -3914,7 +3914,8 @@ export const sv_SE: EnTranslations = {
   "gatherEvent": {
     "pristineVein": "{finder} träffade en orörd ådra!",
     "ancientHeartwood": "{finder} fällde en gammal kärnved!",
-    "moonlitBloom": "{finder} upptäckte en månbelyst blomning!"
+    "moonlitBloom": "{finder} upptäckte en månbelyst blomning!",
+    "goldenHarvest": "{finder} reaped a golden harvest!"
   },
   "apiError": {
     "validation": {

@@ -3914,7 +3914,8 @@ export const ja_JP: EnTranslations = {
   "gatherEvent": {
     "pristineVein": "{finder}が純粋な鉱脈を掘り当てた！",
     "ancientHeartwood": "{finder}が太古の心木を切り倒した！",
-    "moonlitBloom": "{finder}が月光の花を発見した！"
+    "moonlitBloom": "{finder}が月光の花を発見した！",
+    "goldenHarvest": "{finder}が黄金の実りを刈り取った！"
   },
   "apiError": {
     "validation": {

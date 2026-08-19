@@ -3914,7 +3914,8 @@ export const vi_VN: EnTranslations = {
   "gatherEvent": {
     "pristineVein": "{finder} đánh vào mạch máu nguyên sơ!",
     "ancientHeartwood": "{finder} đã đốn hạ một tâm gỗ cổ xưa!",
-    "moonlitBloom": "{finder} phát hiện ra hoa nở dưới ánh trăng!"
+    "moonlitBloom": "{finder} phát hiện ra hoa nở dưới ánh trăng!",
+    "goldenHarvest": "{finder} reaped a golden harvest!"
   },
   "apiError": {
     "validation": {

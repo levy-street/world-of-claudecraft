@@ -3914,7 +3914,8 @@ export const cs_CZ: EnTranslations = {
   "gatherEvent": {
     "pristineVein": "{finder} narazil na nedotčenou rudnou žílu!",
     "ancientHeartwood": "{finder} pokácel prastaré jádrové dřevo!",
-    "moonlitBloom": "{finder} objevil měsíční květ!"
+    "moonlitBloom": "{finder} objevil měsíční květ!",
+    "goldenHarvest": "{finder} reaped a golden harvest!"
   },
   "apiError": {
     "validation": {

@@ -12536,12 +12536,17 @@ export class Hud {
                 ? 'gatherEvent.pristineVein'
                 : ev.flavor === 'ancient_heartwood'
                   ? 'gatherEvent.ancientHeartwood'
-                  : 'gatherEvent.moonlitBloom',
+                  : ev.flavor === 'moonlit_bloom'
+                    ? 'gatherEvent.moonlitBloom'
+                    : 'gatherEvent.goldenHarvest',
               { finder: ev.finderName },
             ),
             QUALITY_COLOR.epic,
           );
           if (ev.finderPid === sim.playerId) audio.achievement();
+          // The golden harvest (Phase 10) layers its own sting on top of the
+          // shared celebratory cue above, finder-only the same way.
+          if (ev.flavor === 'golden_harvest' && ev.finderPid === sim.playerId) audio.farmGolden();
           break;
         }
         case 'lootRoll': {

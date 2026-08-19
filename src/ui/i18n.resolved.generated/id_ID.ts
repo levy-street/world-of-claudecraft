@@ -3914,7 +3914,8 @@ export const id_ID: EnTranslations = {
   "gatherEvent": {
     "pristineVein": "{finder} memberikan kesan yang murni!",
     "ancientHeartwood": "{finder} menebang inti kayu kuno!",
-    "moonlitBloom": "{finder} menemukan mekarnya cahaya bulan!"
+    "moonlitBloom": "{finder} menemukan mekarnya cahaya bulan!",
+    "goldenHarvest": "{finder} reaped a golden harvest!"
   },
   "apiError": {
     "validation": {

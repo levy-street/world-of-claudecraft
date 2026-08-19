@@ -3914,7 +3914,8 @@ export const ko_KR: EnTranslations = {
   "gatherEvent": {
     "pristineVein": "{finder}님이 순수한 광맥을 발견했습니다!",
     "ancientHeartwood": "{finder}님이 고대 심목을 베어냈습니다!",
-    "moonlitBloom": "{finder}님이 달빛 꽃을 발견했습니다!"
+    "moonlitBloom": "{finder}님이 달빛 꽃을 발견했습니다!",
+    "goldenHarvest": "{finder}님이 황금빛 수확을 거두었습니다!"
   },
   "apiError": {
     "validation": {
