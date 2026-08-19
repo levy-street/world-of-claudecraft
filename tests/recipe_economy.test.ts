@@ -301,10 +301,11 @@ describe('REFERENTIAL INTEGRITY', () => {
     expect(TOOL_EFFECT_RECIPES).toHaveLength(2);
     expect(HOE_RECIPES).toHaveLength(3);
     // The economy-hooks phase's eight farm dishes, the four Phase 11 well-fed
-    // buff dishes, and the growth tonic's alchemy row. Deliberately re-pinned
-    // here (9 -> 13), beside its siblings, so the trainer sum above can never
-    // absorb a silent addition to the farm set.
-    expect(FARM_RECIPES).toHaveLength(13);
+    // buff dishes, the growth tonic's alchemy row, and the Phase 12 shared
+    // feast (a trainer cooking row with a placeable junk output). Deliberately
+    // re-pinned here (9 -> 13 -> 14), beside its siblings, so the trainer sum
+    // above can never absorb a silent addition to the farm set.
+    expect(FARM_RECIPES).toHaveLength(14);
   });
 
   it('the three station-free combo recipes resolve a home via professionId, not stationType', () => {

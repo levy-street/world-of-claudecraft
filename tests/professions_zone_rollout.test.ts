@@ -1110,11 +1110,12 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
       'osmium_hoe',
       ...FARM_RECIPES.map((recipe) => recipe.resultItemId),
     ]);
-    // Non-vacuity of the needle set: thirteen recipe outputs plus the eight
+    // Non-vacuity of the needle set: fourteen recipe outputs plus the eight
     // literals above, growth_tonic counted once (it is both). Re-pinned
-    // 9/16 -> 13/20 by Phase 11 (the four well-fed buff dishes).
-    expect(FARM_RECIPES).toHaveLength(13);
-    expect(NEVER_STOCKED.size).toBe(20);
+    // 9/16 -> 13/20 by Phase 11 (the four well-fed buff dishes), then
+    // 13/20 -> 14/21 by Phase 12 (the shared feast, never stocked either).
+    expect(FARM_RECIPES).toHaveLength(14);
+    expect(NEVER_STOCKED.size).toBe(21);
     for (const [npcId, npc] of Object.entries(NPCS)) {
       for (const itemId of npc.vendorItems ?? []) {
         expect(NEVER_STOCKED.has(itemId), `${npcId} stocks never-stocked ${itemId}`).toBe(false);
@@ -1177,9 +1178,10 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
     // Same non-vacuity as the arm above: the world really has counters, so an
     // "unstocked" verdict below is a real absence rather than an empty walk.
     expect(stockedItemIds.size).toBeGreaterThan(0);
-    // The whole farm set really swept: twelve dishes plus the tonic
-    // (re-pinned 9 -> 13 by Phase 11, the four well-fed buff dishes).
-    expect(FARM_RECIPES).toHaveLength(13);
+    // The whole farm set really swept: twelve dishes plus the tonic and the
+    // Phase 12 shared feast (re-pinned 9 -> 13 by Phase 11, the four
+    // well-fed buff dishes, then 13 -> 14 by Phase 12).
+    expect(FARM_RECIPES).toHaveLength(14);
     for (const recipe of FARM_RECIPES) {
       expect(recipe.reagents.length, `${recipe.id} needs reagents to sweep`).toBeGreaterThan(0);
       const unstocked = recipe.reagents
