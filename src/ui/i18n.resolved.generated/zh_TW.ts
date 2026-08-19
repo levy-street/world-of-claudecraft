@@ -8942,7 +8942,15 @@ export const zh_TW: EnTranslations = {
       "dps": "每秒傷害",
       "critChance": "暴擊機率",
       "dodge": "閃躲",
-      "parry": "招架"
+      "parry": "招架",
+      "short": {
+        "armor": "護甲",
+        "str": "Str",
+        "agi": "Agi",
+        "sta": "Sta",
+        "int": "Int",
+        "spi": "Spi"
+      }
     },
     "tooltip": {
       "qualityKind": "{quality}{kind}",

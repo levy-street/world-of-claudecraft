@@ -1473,7 +1473,7 @@ describe('World Market: collapse to lowest price per item (issue #3103)', () => 
     expect(collapsed.listings.find((l) => l.itemId === 'worn_sword')?.price).toBe(100);
   });
 
-  it('keeps enchanted, rolled, masterwork, and signed copies as distinct goods', () => {
+  it('keeps enchanted and masterwork copies distinct, but folds a signer-only copy into the plain item (issue #3383)', () => {
     const sim = makeWorld();
     const viewer = sim.addPlayer('warrior', 'Viewer');
     standAtMerchant(sim, viewer);
@@ -1531,14 +1531,71 @@ describe('World Market: collapse to lowest price per item (issue #3103)', () => 
         price: 500,
         expiresAt: sim.time + 1000,
         house: false,
+        // A maker's mark alone does not change what a buyer receives, so a signer-only
+        // copy is the same goods as the plain item and folds with ids 1/2 (the cheapest,
+        // id 1, wins). Only the enchanted (id 3) and masterwork (id 4) copies, whose
+        // payloads change the goods, survive as their own rows.
         instance: { signer: 'Artisan' },
       },
     );
 
     sim.marketSearch(q('', { collapseLowest: true }), viewer);
     const collapsed = marketInfo(sim, viewer);
-    expect(collapsed.listings.map((listing) => listing.id)).toEqual([1, 3, 4, 5]);
-    expect(collapsed.totalCount).toBe(4);
+    expect(collapsed.listings.map((listing) => listing.id)).toEqual([1, 3, 4]);
+    expect(collapsed.totalCount).toBe(3);
+  });
+
+  it('folds same-item same-enchant copies from different sellers to the cheapest (issue #3383)', () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+    const book = sim.market.marketListings;
+    book.length = 0;
+    // The live bug: several identically-enchanted copies of one weapon, each a distinct
+    // crafted listing, showed as many rows because the old key was the listing id. They
+    // are the same purchase; collapse should keep only the cheapest.
+    book.push(
+      {
+        id: 1,
+        sellerKey: 'Ada',
+        sellerName: 'Ada',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 900,
+        expiresAt: sim.time + 1000,
+        house: false,
+        instance: { enchant: 'fiery', signer: 'Ada' },
+      },
+      {
+        id: 2,
+        sellerKey: 'Ben',
+        sellerName: 'Ben',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 700,
+        expiresAt: sim.time + 1000,
+        house: false,
+        instance: { enchant: 'fiery', signer: 'Ben' },
+      },
+      {
+        id: 3,
+        sellerKey: 'Cyd',
+        sellerName: 'Cyd',
+        itemId: 'worn_sword',
+        count: 1,
+        price: 800,
+        expiresAt: sim.time + 1000,
+        house: false,
+        instance: { enchant: 'frost' },
+      },
+    );
+
+    sim.marketSearch(q('', { collapseLowest: true }), viewer);
+    const collapsed = marketInfo(sim, viewer);
+    // Two fiery copies fold to the cheapest (id 2, price 700); the frost copy is a
+    // different enchant, so it stays as its own row.
+    expect(collapsed.listings.map((listing) => listing.id).sort()).toEqual([2, 3]);
+    expect(collapsed.totalCount).toBe(2);
   });
 
   it('breaks an exact price tie by the older listing id, matching the pure core', () => {

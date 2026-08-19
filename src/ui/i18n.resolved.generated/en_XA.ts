@@ -8942,7 +8942,15 @@ export const en_XA: EnTranslations = {
       "dps": "[Ðáɱáĝé/šéç]",
       "critChance": "[Çŕíţ Çĥáñçé]",
       "dodge": "[Ðóðĝé]",
-      "parry": "[Þáŕŕý]"
+      "parry": "[Þáŕŕý]",
+      "short": {
+        "armor": "[Áŕɱóŕ]",
+        "str": "[Šţŕ]",
+        "agi": "[Áĝí]",
+        "sta": "[Šţá]",
+        "int": "[Íñţ]",
+        "spi": "[Šþí]"
+      }
     },
     "tooltip": {
       "qualityKind": "[{quality} {kind}]",

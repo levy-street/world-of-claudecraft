@@ -12805,6 +12805,21 @@
   .mkt-row .mkt-name .stack {
     color: var(--color-text-light);
   }
+  /* Enchant tag ("+2 Int"): a compact chip after the item name that distinguishes
+     copies differing only by enchant type. It never shrinks or truncates (flex 0 0
+     auto): the disambiguator must stay readable even when a long item name eats its
+     own width, so the name ellipsizes first and the tag holds. Quiet gold, small, in
+     the numeric UI face so the "+2" reads as a stat value, not part of the name. */
+  .mkt-row .mkt-name .mkt-ench {
+    flex: 0 0 auto;
+    font-family: var(--font-ui, inherit);
+    font-size: 10.5px;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+    color: var(--gold-dim);
+    font-variant-numeric: tabular-nums;
+  }
   /* The seller sits inline after the name, quiet, prefixed with a dot separator.
      It yields FIRST when the row is tight: flex-shrink 100 vs the name's 1, so a
      long name eats the seller before the name itself ever truncates. */
@@ -12893,6 +12908,22 @@
       0 1px 2px #000,
       0 0 3px #000;
     pointer-events: none;
+  }
+  /* Masterwork seal: the same authored seal the bag grid paints, on the icon's
+     BOTTOM-LEFT corner, its own slot so it never collides with the heroic star
+     (top-left) or the armor pips (bottom-right). A masterwork copy stays its own
+     row under Lowest-price collapse, so this is what tells it apart from a plain
+     copy of the same item. The localized "Masterwork" word rides the buy-button
+     aria-label; the seal itself is aria-hidden. */
+  .mkt-masterwork-seal {
+    position: absolute;
+    left: -3px;
+    bottom: -3px;
+    width: 14px;
+    height: 14px;
+    object-fit: contain;
+    pointer-events: none;
+    filter: drop-shadow(0 1px 2px #000);
   }
   /* Price is the number a shopper is actually comparing, so give it real weight.
      The market paints a gold-dominant, coinless, copper-trimmed block

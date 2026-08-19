@@ -8942,7 +8942,15 @@ export const de_DE: EnTranslations = {
       "dps": "Schaden/Sek.",
       "critChance": "Krit. Chance",
       "dodge": "Ausweichen",
-      "parry": "Parieren"
+      "parry": "Parieren",
+      "short": {
+        "armor": "Armor",
+        "str": "Str",
+        "agi": "Agi",
+        "sta": "Sta",
+        "int": "Int",
+        "spi": "Spi"
+      }
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",

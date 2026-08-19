@@ -8942,7 +8942,15 @@ export const ru_RU: EnTranslations = {
       "dps": "Урон/сек",
       "critChance": "Шанс крита",
       "dodge": "Уклонение",
-      "parry": "Парирование"
+      "parry": "Парирование",
+      "short": {
+        "armor": "Броня",
+        "str": "Str",
+        "agi": "Agi",
+        "sta": "Sta",
+        "int": "Int",
+        "spi": "Spi"
+      }
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",

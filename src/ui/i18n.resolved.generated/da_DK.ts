@@ -8942,7 +8942,15 @@ export const da_DK: EnTranslations = {
       "dps": "Skade/sek",
       "critChance": "Kritisk chance",
       "dodge": "Undvigelse",
-      "parry": "Parering"
+      "parry": "Parering",
+      "short": {
+        "armor": "Armor",
+        "str": "Str",
+        "agi": "Agi",
+        "sta": "Sta",
+        "int": "Int",
+        "spi": "Spi"
+      }
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",

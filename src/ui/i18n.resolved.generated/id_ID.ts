@@ -8942,7 +8942,15 @@ export const id_ID: EnTranslations = {
       "dps": "Kerusakan/detik",
       "critChance": "Peluang Kritis",
       "dodge": "Mengelak",
-      "parry": "Tangkis"
+      "parry": "Tangkis",
+      "short": {
+        "armor": "Armor",
+        "str": "Str",
+        "agi": "Agi",
+        "sta": "Sta",
+        "int": "Int",
+        "spi": "Spi"
+      }
     },
     "tooltip": {
       "qualityKind": "{quality} {kind}",

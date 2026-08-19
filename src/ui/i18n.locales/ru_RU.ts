@@ -2717,6 +2717,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.kind.elixir': 'Эликсир',
   'itemUi.kind.mount': 'Транспорт',
   'itemUi.stats.armor': 'Броня',
+  'itemUi.stats.short.armor': 'Броня',
   'itemUi.stats.str': 'Сила',
   'itemUi.stats.agi': 'Ловкость',
   'itemUi.stats.sta': 'Выносливость',
