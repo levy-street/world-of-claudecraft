@@ -2851,6 +2851,40 @@ merge commit.
 
 ### Phase 11 (2026-08-19, well-fed food, local-only per D22)
 
+Acceptance checklist (phase file STEP 5):
+- [x] ItemDef.wellfed exists beside elixir (aura, kind, value, duration),
+      applied via ctx.applyAura with wellfed_<kind> ids, never
+      effect_dispatch (the completion end of the food path, deviation (bx):
+      consume starts in items.ts, the mint fires at the updateRegen
+      completion site through src/sim/wellfed.ts)
+- [x] the application-timing decision made, stated, and documented
+      (completion of the sit-restore; hook and rationale in (bx))
+- [x] the namespace-isolation pin green: wellfed_buff_sta and
+      elixir_buff_sta coexist in BOTH orders, neither overwrites the other
+- [x] last-eaten-wins stated and pinned; no food buff stacks with itself
+      (one shared id, exactly-one-aura arms)
+- [x] every new aura name has an AURA_NAME_KEY row ('Well Fed', one row,
+      deviation (by))
+- [x] tooltip lines render beside the elixir view; the buff bar shows the
+      aura with its remaining time through the existing chain
+- [x] four buff dishes, one per crop tier, consume produce; magnitudes at
+      or below the documented elixir ceiling, maintainer-flagged in the
+      Notes below (the D22 stand-in for the PR body)
+- [x] tests green: application and timing, isolation, duration ticking,
+      the transient-across-save pin, recipe economy, S3 and i18n coverage
+- [x] (bw) discharged: the golden-WIN and paying-band beats, one isolated
+      classified re-record, nothing else moved
+- [x] tier 3/4 dishes reagent-dormant honestly under (bo); the honesty arm
+      green
+- [x] every STEP 3 validation row green; mutations 9/9 killed named
+- [ ] gate_select PASS by its log markers (the run happens on this frozen
+      tip; the marker lands in the gate record appended by the post-merge
+      record commit, the Phase 7 precedent)
+
+One-line answer to the QA sweep's uncertain note: rare-quality cooking
+outputs are NOT new in this phase (the Phase 6 rung-50 dishes already ship
+quality 'rare'), so no deed newly opens through cooking here.
+
 THE WOULD-BE PR BODY. Farm produce becomes buff food. ItemDef.wellfed lands
 beside elixir as the D15 mirror, field for field ({ aura, kind, value,
 duration }); the mint lives in src/sim/wellfed.ts and fires at COMPLETION
