@@ -27,6 +27,7 @@
 | Phase 9 QA | done (FAIL on the go-live acceptance, scope stop; PASS on the phase's own diff) | 2026-08-17 | 2026-08-17; branch fix/farming-phase-09-qa (eighteenth absorb f4ca0f7000 first), merged --no-ff as 59584a800a; 1 BLOCKING scope finding (no player verb plants or harvests, state.md (bn)) plus the tier 3/4 seed bootstrap hole ((bo)); 0 BLOCKING on the diff across nine lanes; the live-client journey walked 39 checkpoints green at all four hubs; 16 of 16 new mutants killed; the QA fixes are the husk-trade focus restore, the stale-comment sweep, and the coverage pins |
 | Nineteenth absorb (v0.39.0 round-2 sync mid-phase) | DONE 2026-08-18 | fix/farming-sync-v0.39.0-r2, merge b9a025b2ee of tip 7b45fdb9a9 (285 commits, 833 files, 168-file intersection: the D22 triple-digit rule) | Heals: sim.ts and main.ts extraction (mech_chroma_ownership, turnstile_gate), renderer merge-rule re-pin 13774, classified golden re-record (+4 farmers vs the release recordings, +3 practice dummies in farming_session, zero unexplained leaves), terrain fixture re-record (29 pad-local points), Eastbrook and portrait re-mints per (al), lock-rig rebuild for the whole-slot rework; 4-lane release-merge audit + cross-platform APPROVE + architecture clean move + qa-checklist; details in the notes block |
 | Phase 9b (the bed verbs) | DONE 2026-08-19 | fix/farming-phase-09b-bed-verbs off 6981105f27 (the nineteenth-absorb merge); merge hash in the notes tail | The go-live is PLAYER-COMPLETE: the interact-key bed arm harvests and the plant sheet plants on desktop, touch, and gamepad; q_farm_intro completes through the client (journey 17/17 on the final tree, desktop and 844x390 landscape touch); (bn) CLOSED, (bp) offer-gate refinement; reviews: cross-platform APPROVE, frontend pass with all seven fixes taken, coverage B1-B3 closed and S1-S7 landed, gate-integrity PASS, qa-checklist in the notes; mutations 10/10 killed named |
+| Phase 9b QA (the bed verbs audit) | DONE 2026-08-19 (PASS-WITH-FOLLOWUPS) | fix/farming-phase-09b-qa off c9075785ef (twentieth absorb ea9377db8e first: one release commit, i18n fills, pending.ts regen-resolved); merge hash in the notes tail | The fresh pass re-proved the go-live independently: journey 17/17 desktop AND mobile through the real controls, 18 desktop manual probes (focus trap, keydown guard with a jump positive control, Esc focus restore, the locked-seed deny with the sim's own toast, the ja_JP locale switch, the relocalize arm) plus the mobile sizing (all knobs 44px) and the contrast eyeball (8.95:1); negative space proven by RUNNING the pins (zero golden movement, every baseline held); one real behavior fix (the ctx.error dead/busy denies stranded the Plant control: the error-toast re-arm, deviation (bq)) plus the report_window rename under the cold-painter sweep with its first suite, safe-area caps, and eleven hardened pins; mutations 11/11 killed named (two shipped survivors diagnosed as real gaps, fixed, re-proven); reviews: 4 Workflow lanes + cross-platform APPROVE + test-coverage approve-with-followups + qa-checklist in the notes |
 | Phase 10 (celebrations) | not started | | |
 | Phase 10 QA | not started | | |
 | Phase 11 (well-fed food) | not started | | |
@@ -2421,6 +2422,141 @@ passed 17/17 standalone on the final merged tree before the gate.
 MERGE: fix/farming-phase-09b-bed-verbs merged --no-ff into
 feature/farming-plan as 1f92aaa5c555c3997a0de14af19329f8b9837add (phase tip 632ee5090e; the branch and the
 three agent worktrees deleted).
+
+### Phase 9b QA (2026-08-19, the bed verbs audit, local-only per D22)
+Branch fix/farming-phase-09b-qa off feature/farming-plan at c9075785ef (the
+Phase 9b merge-hash record). The TWENTIETH absorb opened it:
+origin/release/v0.39.0 had moved 7b45fdb9a9 to ea9377db8e (ONE commit: the
+release fills thirteen Latin bases for guide.classPage.formsAutoUnshift,
+regenerates the resolved bundles, and gives the legacy druid and hunter
+skill-art suite a 60s budget). Merge 919787518a; the only conflict was the
+generated pending.ts, regen-resolved through npm run i18n:gen, and the
+regenerated file differs from the branch side by EXACTLY the fifteen
+formsAutoUnshift rows the release filled (diffed and counted). No lockfile,
+patches, sim, server, golden, art-evidence, or monolith movement; the
+release-merge-audit lanes are all empty for a delta this shape;
+item_art_audit --verify-only green; the four count suites plus the full
+tests/parity re-run green on the merged tree; farming_session md5
+9a8fefa5e48c7e456db7ef2695bfb284 HELD.
+
+THE PLAYER JOURNEY, RE-PROVEN INDEPENDENTLY: the committed
+scripts/farming_journey_e2e.mjs passed 17/17 on this tree, desktop AND
+844x390 landscape touch (the mobile run drove the real #mobile-interact
+button; the touch interface was active headless). The manual re-walk over
+the dev client covered what the script cannot see, 18 numbered probes all
+green: focus lands inside the sheet on open (the close button) and six Tab
+presses stay trapped; Space and Enter on a focused seed row neither jump nor
+open chat while the sheet stays open (with a POSITIVE control proving the
+probe can detect a jump, dy 0.98 with world focus); Escape closes with focus
+returned to the world; the bags open beside the sheet (transient-overlay
+model) and locking the only seed through the bag context menu leaves the
+cold sheet's stale offer up, Plant then draws the sim's own locked deny
+toast ("An item that would pay for that is locked."), the sheet STAYS OPEN
+and repaints the seed into the locked list (the (bp) offer-gate refinement
+observed live end to end); the ja_JP locale switch through the real options
+dropdown reopens the sheet titled the ja fill, and dispatching the
+woc:languagechange event over an OPEN sheet rebuilds it in place (the
+relocalize arm; instrumented dispatch of the same event the language switch
+emits, recorded as such since opening the options menu itself closes the
+sheet). Mobile: all three knob toggles measure 44px tall (Plant 72x44, seed
+row 410x44, close 40x40) and the disabled-knob shortfall line measures
+8.95:1 contrast (rgb(255,143,133) on rgb(10,10,15)); the eyeball capture
+pair is committed as qa-plant-sheet-disabled-knobs-mobile.png and
+qa-plant-sheet-844x390.png beside the phase's six evidence PNGs
+(plant-sheet-open/-knobs/harvest-toast, each -desktop and -mobile). Gamepad:
+verified-by-pin (tests/pad_reel.test.ts pins interactKey() inside the pad
+interact case; no physical pad on the headless box). perf:tour ran clean
+(exit 0, zero threshold failures, FCT cap-bounded; the single-digit fps is
+swiftshader-environmental). The farmer-shadow geometry was probed live:
+standing ON bed_eastbrook_2 (4.3 yd from Jessica) the press opens her
+dialog, the pinned NPC-over-bed precedence, and the far side of the same
+bed opens the plant sheet, so the bed stays plantable; recorded as a UX
+nuance, not a defect.
+
+NEGATIVE SPACE, EACH PROVED BY RUNNING THE PIN: the phase-range diff over
+src/sim, server/, src/world_api, src/net, and tests/parity is EMPTY; the
+count suites pin 329 = 88 + 241, facets 34, commands 202/215, delta keys 87
+(all literals verified in-suite and green); farming_session 9a8fefa5
+unchanged and the full parity directory green; the terrain height fixture,
+Eastbrook digests, and map plates carry zero bytes of phase movement and
+their suites pass; the phase LOWERED the hud.ts ceiling (19387 to 19352)
+and touched no other ceiling.
+
+REVIEWS (all fresh, trusting none of the phase's own): a 4-lane Workflow
+(correctness, coverage, dead-code, frontend-seam) delivered 4/4 first try;
+cross-platform-sync and test-coverage-auditor on the Agent tool with the
+SendMessage-first line delivered first try; qa-checklist last. Verdicts:
+cross-platform APPROVE (the no-parity-change claim verified empirically;
+the accepted one-snapshot staleness reasoning re-proven STRONGER than the
+phase claimed: plantCrop's bed_taken gate precedes every payment, so a
+stale send can only buy a deny with nothing consumed); frontend-seam 0
+BLOCKING; coverage and dead-code lanes 0 BLOCKING; test-coverage
+approve-with-followups (no vacuity in the phase's own arms; the hunt list
+came back decisive). THE ONE BLOCKING (correctness lane, confirmed by
+probe): plantCrop's dead and busy gates answer via ctx.error, never
+farmDenied, so a Plant clicked while eating or casting stranded pendingSend
+and left the control dead until a close; FIXED as deviation (bq), the
+error-toast re-arm (PlantSheetWindow.notifyErrorToast, forwarded from the
+Hud's one error case; re-arms without repainting; the re-click stays safe
+under the sim's own gates).
+
+QA FIXES (commits 208d2d048d, e97bab4e00): the (bq) re-arm; the
+report_window_open.ts to report_window.ts rename so the hud_perf_budget
+cold-painter sweep governs it like every sibling window, plus its first
+direct suite (tests/report_window.test.ts: hooks-gated open, the LIVE hooks
+read at submit, pid-vs-name routing, failure re-enable with the localized
+line, both close paths); safe-area-inset subtraction on the mobile sheet's
+width/height caps (the centered-card form of the journal's four-edge pin);
+the close button's title attribute (the report-window twin's shape); the
+journey script's mobile arm now FAILS on an inactive touch interface
+instead of silently degrading to KeyF. Pins hardened: the reachability
+scan reads through the shared stripComments helper (a trailing comment can
+no longer satisfy a verb pin); the Hud glue pins assert containment inside
+uniquely-anchored once-counted blocks and grew the close-route,
+error-forward, and keydown-guard rows; a journey layer-honesty pin (the
+script may never call sim.plantCrop / harvestCrop / convertHusks /
+acceptQuest / turnInQuest, with positive arms so a gutted script also
+reds); closeOthers called once on fresh open and never on a same-bed
+re-press; the markDialogRoot contract; the locked-only body state; the
+rowless professionsState default (the ?? 0 skill read); the root div
+exactly once per entry; lockedRows length pins; and a real-painter
+plant-sheet arm in the target-size browser suite (five controls on the
+40px touch floor).
+
+MUTATIONS 11/11 KILLED with named reds through the dirty-refusing runner:
+NPC-vs-bed precedence inverted, the dead-player gate dropped from the bed
+arm, canOpenPlantSheet inverted, the relocalize arm gutted, the sowAria
+key swapped, the fee-plan legs dropped, the scanner filter widened (the
+fail-toward-missing proof: four describes red), all killed as shipped;
+the keydown-guard row removal and the journey-script __game-verb cheat
+SURVIVED as shipped (both diagnosed real coverage gaps, both fixed, both
+re-proven killed by the new pins); plus two fresh mutants over the QA's
+own fix (the Hud error-forward gutted, the notifyErrorToast body gutted),
+both killed.
+
+DEFERRALS AND RESIDUALS, LEDGERED WITH OWNERS: the online pendingSend
+stranding on a silently-dropped command (spectate, reconnect) is narrowed
+by (bq) but not closed (no event ever answers a dropped send); it
+self-heals on close/reopen and is family-consistent with every window
+under spectate (maintainer read, optional). A bedId-free deny racing an
+in-flight plant send can re-arm early; harmless to state under the sim's
+gates, at worst a second deny toast (accepted). The mobile-window-open
+body-class gap is FAMILY-WIDE (the harvest journal shares it; opening
+never sets the class, close clears it): Phase 13 polish or maintainer.
+The seed rows render single-select through the aria-pressed toggle family
+(a radiogroup would be bespoke here): a11y polish batch, Phase 13. The
+countRawInSlots raw-count loop is now the fifth private copy in src/ui
+and the bed-distance mirror re-derives the sim's private distToBed by
+comment contract; both extractions need src/sim edits (forbidden this
+QA): a later farming phase. The journey script runs at phase closes and
+by hand, not in the gate (D22 keeps farming off CI; the layer-honesty pin
+plus the component pins stand in): maintainer call at go-public. The
+focus-key selector interpolation without CSS.escape is the family idiom
+(the journal shares it): note only. The .ps-seed raw rgba and the moved
+report window's #ffd100 literal: the Phase 13 style batch.
+GATE RECORD AND MERGE: appended by the post-gate docs commit (the gate
+runs on the frozen docs tree; its markers and the merge hash land there,
+the phase-close precedent).
 
 ### Phase 10
 (not started)
