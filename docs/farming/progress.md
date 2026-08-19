@@ -3140,8 +3140,58 @@ docs/farming/phase-12-shared-feast.md); the wellfed parity beat rides
 its feast scenario by the recorded, tick-phase-enriched deferral.
 
 ### Phase 12
-Status: IN REVIEW (build complete on fix/farming-phase-12-shared-feast; reviews,
-mutations, and the gate pending; this row is finalized at merge).
+Status: DONE (2026-08-19, local-only per D22; merge hash recorded below after
+the --no-ff merge into feature/farming-plan).
+
+ACCEPTANCE (the phase file's STEP 5 list, with check states):
+- [x] The (bo)/Live-surface reconciliation decided, documented as deviation
+      (ca), and swept into the phase file and phase-12-qa.md.
+- [x] The feast item exists: an expensive produce-heavy tier-4 cooking recipe
+      honoring the (bz) whole-list invariant; recipe economy green; no
+      buyValue; the tooltip states placement, the buff, and the
+      once-per-player limit.
+- [x] placeFeast on IWorldFarming, implemented in BOTH Sim and ClientWorld,
+      parity pin updated in the same change (plus consumeFeast, the
+      delveInteract-precedent second member; 331 = 88 + 243).
+- [x] The feast is a REAL entity riding the normal entity snapshot; no new
+      wire mechanism anywhere in the diff.
+- [x] src/sim/professions/feast.ts owns FeastState (owner key, charges,
+      tick-domain expiry, the eatenBy ledger); zero rng stated and pinned.
+- [x] Consuming grants the tier-4 wellfed buff through the one Phase 11
+      completion site (the consume-slot decision recorded); a charge spends
+      at bite START, once per player; despawn rides inside updateFarming's
+      1 Hz sweep, never a second sim.ts sweep.
+- [x] Feast state transient, never serialized; rationale in the module.
+- [x] The anti-abuse rule decided and documented: one active feast per placer.
+- [x] BOTH verbs player-reachable through the real client and PROVEN BY
+      PLAYING (the live-client probe: KeyB + a genuine bag left-click places,
+      a genuine KeyF eats; the probe also caught and fixed the respawn-sweep
+      re-arm bug).
+- [x] The prop in the exporter (swap-ready, 16-GLB set), the render surface
+      inside farm_patches.ts (renderer.ts untouched at 13774), placement VFX
+      fire once per appearance, the ui_farm_feast cue chain complete.
+- [x] The feast title is the "{name}'s Harvest Feast" t() key; every wordy
+      new value carries its five non-Latin fills.
+- [x] Tests green: place, consume, once-per-player, charges, expiry, every
+      deny arm both directions, the multi-session routing test, the
+      determinism pin, and the wellfed-vs-elixir isolation.
+- [x] Parity: beat P landed as ONE isolated classified golden commit
+      (frames 0-93 byte-identical, draws 110 with an identical drawDigest,
+      md5 25bd6b87 to 9dfd1c6e); nothing else moved.
+- [x] Screenshots (desktop + landscape mobile, LOW preset) committed under
+      docs/screenshots/farming-phase-12 with the cone rows, referenced above.
+- [x] Every STEP 3 validation row green; mutations killed or
+      diagnosed-and-fixed; gate_select PASS by its log markers.
+
+GATE RECORD: run 1 (frozen tree at 32ec9bc442+docs) FAILED at the full-suite
+fallback with exactly five reds, all the recorded fallback-only census class
+plus one contention timeout (the All-only chip set, the crafted-junk
+provenance exception family, the allowed-oddments list, the farm-patch
+preload count, and the 180s expiry arm at the 20s default under 8 workers);
+each healed as a deliberate re-pin or a declared budget, each green
+standalone before and after. Run 2 on the healed frozen tree:
+"[gate:select] PASS: all 12 steps green (vitest workers: 8)", zero FAIL
+markers, no druid_engines timeout.
 
 The shared feast (D16): a placeable feast other players eat from, the communal
 payoff at the top of the farming ladder, plus the beat-P discharge of the
