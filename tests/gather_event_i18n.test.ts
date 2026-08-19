@@ -3,6 +3,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { GATHERING_PROFESSION_IDS } from '../src/sim/content/professions';
 import type { GatherRareEventFlavor } from '../src/sim/types';
+import { GATHER_RARE_EVENT_LINE_KEYS } from '../src/ui/gather_rare_event_feedback';
 import { GATHERING_PROFESSION_NAME_KEYS } from '../src/ui/gathering_profession_name';
 import { hasTranslation, t } from '../src/ui/i18n';
 import { ja_JP } from '../src/ui/i18n.locales/ja_JP';
@@ -10,6 +11,7 @@ import { ko_KR } from '../src/ui/i18n.locales/ko_KR';
 import { ru_RU } from '../src/ui/i18n.locales/ru_RU';
 import { zh_CN } from '../src/ui/i18n.locales/zh_CN';
 import { zh_TW } from '../src/ui/i18n.locales/zh_TW';
+import { stripComments } from './helpers/strip_comments';
 
 // Gather-event localization: the sim emits ids plus values only
 // (gatherResult / gatherRareEvent are text-free, the craftResult/skinEvent
@@ -213,11 +215,13 @@ describe('hud event switch stays wired to the ids', () => {
   it('the client references every gather-event key the sim ids resolve to', () => {
     // Source liveness pin (the S3-scan spirit): losing one of these mappings
     // silently would strand the id-based event without player-visible text.
-    // The flavor-to-key mapping still lives in the hud.ts event switch; the
-    // two gather-line keys moved to the grant_line_view.ts pure core when the
-    // qty-variant choice was extracted there (#2430), so scan both files.
+    // The flavor-to-key mapping moved to the gather_rare_event_feedback.ts
+    // pure core at the Phase 10 QA (hud.ts consumes it through fb.lineKey);
+    // the two gather-line keys moved to the grant_line_view.ts pure core when
+    // the qty-variant choice was extracted there (#2430), so scan all three.
     const source =
       readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8') +
+      readFileSync(path.resolve(process.cwd(), 'src/ui/gather_rare_event_feedback.ts'), 'utf8') +
       readFileSync(path.resolve(process.cwd(), 'src/ui/grant_line_view.ts'), 'utf8');
     for (const key of [
       'gatherEvent.pristineVein',
@@ -246,30 +250,24 @@ describe('hud event switch stays wired to the ids', () => {
     expect(arm).toContain('itemStackDisplayName(match[1], match[2])');
   });
 
-  it('each flavor maps to its own broadcast key in the hud switch', () => {
-    // A swapped flavor-to-key mapping would pass the mere-existence pin above;
-    // bind each slug to its key through the conditional chain in the
-    // gatherRareEvent case (order: pristine_vein then ancient_heartwood then
-    // an explicit moonlit_bloom comparison, with goldenHarvest as the
-    // remaining arm).
-    const source = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+  it('the hud case consumes the feedback core: one case, one decision, one line sink', () => {
+    // The flavor-to-key mapping and the finder-only cue rules moved to the
+    // pure core src/ui/gather_rare_event_feedback.ts at the Phase 10 QA,
+    // where tests/gather_rare_event_feedback.test.ts drives every quadrant
+    // BEHAVIORALLY. What is left to pin here is the GLUE: hud.ts has exactly
+    // one gatherRareEvent case, that case makes exactly one core call with
+    // the recipient-correct arguments, and the rendered line reads the
+    // core's key. Comment-stripped (the recorded source-pin trap: a
+    // commented-out call satisfies a raw indexOf).
+    const source = stripComments(
+      readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8'),
+    );
+    expect(source.split("case 'gatherRareEvent'").length - 1).toBe(1);
     const caseStart = source.indexOf("case 'gatherRareEvent'");
-    expect(caseStart).toBeGreaterThan(-1);
     const block = source.slice(caseStart, source.indexOf('break;', caseStart));
-    const pv = block.indexOf("'pristine_vein'");
-    const pvKey = block.indexOf("'gatherEvent.pristineVein'");
-    const ah = block.indexOf("'ancient_heartwood'");
-    const ahKey = block.indexOf("'gatherEvent.ancientHeartwood'");
-    const mb = block.indexOf("'moonlit_bloom'");
-    const mbKey = block.indexOf("'gatherEvent.moonlitBloom'");
-    const ghKey = block.indexOf("'gatherEvent.goldenHarvest'");
-    expect(pv).toBeGreaterThan(-1);
-    expect(pvKey).toBeGreaterThan(pv);
-    expect(ah).toBeGreaterThan(pvKey);
-    expect(ahKey).toBeGreaterThan(ah);
-    expect(mb).toBeGreaterThan(ahKey);
-    expect(mbKey).toBeGreaterThan(mb);
-    expect(ghKey).toBeGreaterThan(mbKey);
+    const call = 'gatherRareEventFeedback(ev.flavor, ev.finderPid, sim.playerId)';
+    expect(block.split(call).length - 1).toBe(1);
+    expect(block.split('t(fb.lineKey, { finder: ev.finderName })').length - 1).toBe(1);
   });
 
   it('the gatherResult case adds no second loot cue (the loot event owns the cue)', () => {
@@ -281,70 +279,56 @@ describe('hud event switch stays wired to the ids', () => {
   });
 
   it('the achievement cue on gatherRareEvent is finder-only (the other D1 half)', () => {
-    // The zone fanout delivers one copy per in-zone recipient; only the
-    // finder may hear the celebratory cue. A regression that cues every
-    // recipient (or drops the cue) would pass the wording pins above, so
-    // bind the cue call to the finder guard: the conditional must appear in
-    // the case block BEFORE the cue call (same index-order technique as the
-    // flavor-to-key pin).
-    const source = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+    // The finder-only SEMANTICS are behavioral now (the feedback core's
+    // suite drives every flavor x recipient quadrant); this glue pin holds
+    // the hud side to the shape those semantics assume: the cue call sits
+    // INSIDE its fb guard as one statement (so a hoist or a polarity flip
+    // changes this exact line), exactly once, over comment-stripped source.
+    const source = stripComments(
+      readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8'),
+    );
     const caseStart = source.indexOf("case 'gatherRareEvent'");
     expect(caseStart).toBeGreaterThan(-1);
     const block = source.slice(caseStart, source.indexOf('break;', caseStart));
-    const guard = block.indexOf('ev.finderPid === sim.playerId');
-    const cue = block.indexOf('audio.achievement()');
-    expect(guard).toBeGreaterThan(-1);
-    expect(cue).toBeGreaterThan(guard);
+    expect(block.split('if (fb.achievementCue) audio.achievement();').length - 1).toBe(1);
+    expect(block.split('audio.achievement()').length - 1).toBe(1);
   });
 
   it('the golden sting is flavor-guarded, finder-only, and layered after the shared cue', () => {
     // Phase 10 (celebrations): golden_harvest LAYERS its sting on top of the
     // achievement cue the whole flavor family shares; the sting must never
-    // fire for another flavor or another recipient. Same first-occurrence
-    // index-order technique as the achievement pin above: the flavor-and-
-    // finder guard must appear in the case block BEFORE the sting call, and
-    // the sting AFTER the shared achievement cue (layered, not replacing).
-    const source = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+    // fire for another flavor or another recipient. The guard semantics are
+    // behavioral (the feedback core's suite: farmGoldenSting true only for
+    // golden AND finder); the glue pin holds the sting call INSIDE its fb
+    // guard as one statement, exactly once, AFTER the shared cue (layered,
+    // not replacing), over comment-stripped source.
+    const source = stripComments(
+      readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8'),
+    );
     const caseStart = source.indexOf("case 'gatherRareEvent'");
     expect(caseStart).toBeGreaterThan(-1);
     const block = source.slice(caseStart, source.indexOf('break;', caseStart));
-    const guard = block.indexOf("ev.flavor === 'golden_harvest' && ev.finderPid === sim.playerId");
-    const sting = block.indexOf('audio.farmGolden()');
-    const sharedCue = block.indexOf('audio.achievement()');
-    expect(guard).toBeGreaterThan(-1);
-    expect(sting).toBeGreaterThan(guard);
-    expect(sting).toBeGreaterThan(sharedCue);
-    // Occurrence counts: the first-occurrence indexOf arms above stay green
-    // if an UNGUARDED second call is appended after the guarded first, so
-    // pin each cue to exactly one call site inside the case block.
+    expect(block.split('if (fb.farmGoldenSting) audio.farmGolden();').length - 1).toBe(1);
     expect(block.split('audio.farmGolden()').length - 1).toBe(1);
-    expect(block.split('audio.achievement()').length - 1).toBe(1);
-    // ONE case, ONE break: the golden arm lives inside the same case block as
-    // its three siblings, so the slice above already contains its key.
-    expect(block.includes("'gatherEvent.goldenHarvest'")).toBe(true);
+    expect(block.indexOf('audio.farmGolden()')).toBeGreaterThan(
+      block.indexOf('audio.achievement()'),
+    );
   });
 
-  it('the flavor-to-key chain is exhaustive under tsc and every key sits in the case', () => {
-    // Compile-time exhaustiveness for the hud case's catch-all chain: a
-    // fifth flavor added to GatherRareEventFlavor reds THIS table under
-    // `npx tsc --noEmit` before the terminal arm can silently render it as
-    // the golden line. The containment arm then demands every mapped key
-    // appear inside the single case slice, so the table cannot drift from
-    // the chain it describes (each PAIRING is proven by the ordering pin
-    // and the exact-English arms above).
-    const FLAVOR_KEYS = {
+  it('the flavor-to-key table is exhaustive under tsc IN PRODUCTION and pinned to literals', () => {
+    // The Phase 10 QA moved the exhaustiveness guard into the shipping
+    // module: GATHER_RARE_EVENT_LINE_KEYS carries `satisfies
+    // Record<GatherRareEventFlavor, TranslationKey>`, so a fifth flavor reds
+    // `npx tsc --noEmit` on src/ui/gather_rare_event_feedback.ts itself,
+    // not just on a test-side mirror. This arm pins the table to its
+    // literals (the wire-name rule: never assert through the constant the
+    // production code reads without restating the values).
+    expect(GATHER_RARE_EVENT_LINE_KEYS).toEqual({
       pristine_vein: 'gatherEvent.pristineVein',
       ancient_heartwood: 'gatherEvent.ancientHeartwood',
       moonlit_bloom: 'gatherEvent.moonlitBloom',
       golden_harvest: 'gatherEvent.goldenHarvest',
-    } satisfies Record<GatherRareEventFlavor, string>;
-    const source = readFileSync(path.resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
-    const caseStart = source.indexOf("case 'gatherRareEvent'");
-    expect(caseStart).toBeGreaterThan(-1);
-    const block = source.slice(caseStart, source.indexOf('break;', caseStart));
-    for (const key of Object.values(FLAVOR_KEYS)) {
-      expect(block.includes(`'${key}'`), key).toBe(true);
-    }
+    } satisfies Record<GatherRareEventFlavor, string>);
   });
 
   it('both lines color through the existing quality token family only', () => {

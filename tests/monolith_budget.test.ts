@@ -73,7 +73,11 @@ const MONOLITHS: MonolithRow[] = [
     // with their two label-key tables) whole to
     // src/ui/ability_tooltip_lines.ts. New size plus a small margin: the
     // room the celebrations case consumes next commit.
-    ceiling: 19230,
+    // Lowered again at the Phase 10 QA: the gatherRareEvent case's
+    // flavor-to-key chain and finder-only cue guards moved to the pure core
+    // src/ui/gather_rare_event_feedback.ts (the case is now a thin consumer),
+    // shrinking the file 19227 to 19217. Same small margin as above.
+    ceiling: 19220,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

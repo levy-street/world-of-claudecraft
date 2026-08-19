@@ -317,6 +317,7 @@ import {
   resetFramePositionsOnce,
   TARGET_FRAME_POS_KEY,
 } from './frame_pos_reset';
+import { gatherRareEventFeedback } from './gather_rare_event_feedback';
 import { gatherToolTooltipLines } from './gather_tool_tooltip';
 import { gatheringProfessionNameKey } from './gathering_profession_name';
 import {
@@ -12527,26 +12528,15 @@ export class Hud {
           this.plantSheetWindow.notifyFarmEvent(ev);
           break;
         case 'gatherRareEvent': {
-          // Soft zone broadcast (Professions 2.0): every recipient in
-          // the zone logs the localized flavor line; only the finder also gets
-          // the celebratory cue. The finder name splices verbatim.
-          this.log(
-            t(
-              ev.flavor === 'pristine_vein'
-                ? 'gatherEvent.pristineVein'
-                : ev.flavor === 'ancient_heartwood'
-                  ? 'gatherEvent.ancientHeartwood'
-                  : ev.flavor === 'moonlit_bloom'
-                    ? 'gatherEvent.moonlitBloom'
-                    : 'gatherEvent.goldenHarvest',
-              { finder: ev.finderName },
-            ),
-            QUALITY_COLOR.epic,
-          );
-          if (ev.finderPid === sim.playerId) audio.achievement();
-          // The golden harvest (Phase 10) layers its own sting on top of the
-          // shared celebratory cue above, finder-only the same way.
-          if (ev.flavor === 'golden_harvest' && ev.finderPid === sim.playerId) audio.farmGolden();
+          // Soft zone broadcast (Professions 2.0): every recipient in the
+          // zone logs the localized flavor line; the finder-only cue rules
+          // (shared achievement, layered golden sting) live in the pure core
+          // gather_rare_event_feedback.ts, where a Vitest drives every
+          // flavor x recipient quadrant. The finder name splices verbatim.
+          const fb = gatherRareEventFeedback(ev.flavor, ev.finderPid, sim.playerId);
+          this.log(t(fb.lineKey, { finder: ev.finderName }), QUALITY_COLOR.epic);
+          if (fb.achievementCue) audio.achievement();
+          if (fb.farmGoldenSting) audio.farmGolden();
           break;
         }
         case 'lootRoll': {
