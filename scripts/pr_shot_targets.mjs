@@ -379,6 +379,33 @@ const fakePadSeed = async (page) => {
   );
 };
 
+// Pin the page's clock to a LOCAL Saturday noon before the app boots, so the
+// weekly Double Honor surfaces render their active state through the real code
+// path (currentResetDay reads the local clock; src/sim/pvp/honor_event.ts turns
+// Saturday reset days into the event). A Date subclass shim rather than a sim
+// poke: main.ts re-supplies resetDay every frame, so a staged write would be
+// overwritten one frame later. String form for the usual tsx keepNames reason.
+const saturdayClockSeed = async (page) => {
+  await page.evaluateOnNewDocument(
+    `(() => {
+      const RealDate = Date;
+      const offset = new RealDate(2026, 7, 22, 12, 0, 0).getTime() - RealDate.now();
+      class SaturdayDate extends RealDate {
+        constructor(...args) {
+          if (args.length === 0) super(RealDate.now() + offset);
+          else super(...args);
+        }
+        static now() {
+          return RealDate.now() + offset;
+        }
+      }
+      SaturdayDate.UTC = RealDate.UTC;
+      SaturdayDate.parse = RealDate.parse;
+      window.Date = SaturdayDate;
+    })();`,
+  );
+};
+
 export const TARGETS = [
   {
     key: 'ravenrift',
@@ -395,6 +422,9 @@ export const TARGETS = [
     ],
     variants: [
       { key: 'queue-window', scene: 'queue' },
+      // The same queue window under a Saturday clock: the weekly Double Honor
+      // chip is only honest evidence when the event decision itself ran.
+      { key: 'queue-window-double-honor', scene: 'queue', beforeLoad: saturdayClockSeed },
       // First staged scene on purpose: the match seating just placed the
       // player on their real spawn point, and the DEFAULT chase camera is the
       // honest witness for the spawn-clearance contract (no camDist override).
@@ -605,6 +635,26 @@ export const TARGETS = [
       }
       await wait(2600); // let the field build + banners settle
       return {};
+    },
+  },
+  {
+    key: 'event-calendar',
+    label: 'Event Calendar window: recurring system-event rows',
+    when: ['ui/calendar_view.ts', 'ui/calendar_window.ts'],
+    // Saturday clock on purpose: the month grid rings "today" on a Saturday,
+    // the day both weekly PvP rows (Arena Clash, Double Honor Day) land on.
+    variants: [{ key: 'calendar-window', beforeLoad: saturdayClockSeed }],
+    async capture(page) {
+      const opened = await page.evaluate(() => {
+        const game = window.__game;
+        if (!game?.hud) return { ok: false, reason: 'offline world is unavailable' };
+        game.hud.toggleCalendar();
+        return { ok: true };
+      });
+      if (!opened.ok) return { skip: opened.reason };
+      const ready = await pollForSize(page, '#calendar-window');
+      if (!ready) return { skip: 'the calendar window never became visible' };
+      return { clip: '#calendar-window' };
     },
   },
   {
