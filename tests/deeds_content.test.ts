@@ -11,6 +11,7 @@ import { DEED_ORDER, DEEDS, DEEDS_ERA } from '../src/sim/content/deeds';
 import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
 import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
+import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
@@ -934,12 +935,21 @@ describe('count-form gathering deeds stay earnable', () => {
     // tests/professions_zone_rollout.test.ts remains the authoritative
     // acquisition-surface sweep, and the D11 phase that lands any faucet
     // owns re-earnability-auditing this deed either way.
-    const tier34Seeds = [
-      'highland_barley_seed',
-      'frost_gourd_seed',
-      'gilded_sunmelon_seed',
-      'evergarden_greens_seed',
-    ];
+    // DERIVED from the crop catalog (the QA hardening: a hand literal would
+    // let a future fifth tier-3 crop's seed gain a faucet with this arm still
+    // green), with the shipped four pinned as the non-vacuity floor.
+    const tier34Seeds = Object.values(FARM_CROPS)
+      .filter((crop) => crop.tier >= 3)
+      .map((crop) => crop.seedItemId);
+    expect(tier34Seeds.length).toBeGreaterThanOrEqual(4);
+    expect(new Set(tier34Seeds)).toEqual(
+      new Set([
+        'highland_barley_seed',
+        'frost_gourd_seed',
+        'gilded_sunmelon_seed',
+        'evergarden_greens_seed',
+      ]),
+    );
     const stocked = new Set<string>();
     for (const npc of Object.values(NPCS)) {
       for (const itemId of npc.vendorItems ?? []) stocked.add(itemId);
