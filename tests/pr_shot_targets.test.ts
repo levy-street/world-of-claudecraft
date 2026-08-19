@@ -427,6 +427,31 @@ describe('classifyDiff', () => {
     );
     expect(target?.variants).toEqual([{ key: 'desktop' }, { key: 'mobile', mobile: true }]);
   });
+
+  it('maps the plant sheet halves and the bed-interact resolver to the bed-press target (phase 9b)', () => {
+    // Both sheet halves share the 'ui/farming_plant_sheet' substring; the
+    // proximity resolver is the third road to the same surface, so a change
+    // to any of the three reshoots the bed press.
+    for (const path of [
+      'src/ui/farming_plant_sheet_view.ts',
+      'src/ui/farming_plant_sheet_window.ts',
+      'src/game/farm_bed_interact.ts',
+    ]) {
+      const plan = classifyDiff([path]);
+      expect(plan.isVisual, path).toBe(true);
+      expect(
+        plan.specific.map((t: { key: string }) => t.key),
+        path,
+      ).toContain('farm-plant-sheet');
+    }
+    const target = resolveTargets(['src/ui/farming_plant_sheet_view.ts']).find(
+      (candidate: { key: string }) => candidate.key === 'farm-plant-sheet',
+    );
+    // Desktop and mobile landscape both, each on the LOW graphics seed (the
+    // standing capture rules).
+    expect(target?.variants.map((v: { key: string }) => v.key)).toEqual(['desktop', 'mobile']);
+    expect(target?.variants.every((v: { beforeLoad?: unknown }) => !!v.beforeLoad)).toBe(true);
+  });
 });
 
 describe('diffChangedPaths', () => {
