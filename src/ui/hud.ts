@@ -298,6 +298,7 @@ import {
 import { ERROR_LOG_CHAN, ERROR_LOG_COLOR, shouldMirrorErrorToast } from './error_toast_log';
 import { esc } from './esc';
 import { handleFarmEvent } from './farm_event_feedback';
+import { PlantSheetWindow } from './farming_plant_sheet_window';
 import { blockFctAmountText } from './fct_core';
 import { fctSpawnShape } from './fct_event';
 import { FctPainter } from './fct_painter';
@@ -3451,6 +3452,10 @@ export class Hud {
         // Route through the painter: focus returns (WCAG 2.2 AA), clock disposed.
         this.harvestJournalWindow.close();
         break;
+      case 'plant-sheet-window':
+        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
+        this.plantSheetWindow.close();
+        break;
       case 'arena-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA),
         // consistent with the toggle / X close path.
@@ -4820,6 +4825,14 @@ export class Hud {
     world: () => this.sim,
     closeOthers: () => this.closeOtherWindows('#harvest-journal-window'),
     ...this.windowFocus('#harvest-journal-window'),
+  });
+  // The plant sheet painter (farming_plant_sheet_view.ts core + its painter):
+  // the bed-verbs plant window. Cold, paint-on-open; farm events feed it.
+  private readonly plantSheetWindow = new PlantSheetWindow({
+    root: () => $('#plant-sheet-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#plant-sheet-window'),
+    ...this.windowFocus('#plant-sheet-window'),
   });
   // The Reliquary window painter (reliquary_view.ts core + reliquary_window.ts
   // painter): Overview + shelf chrome over IWorldReliquary. A standalone
@@ -12516,6 +12529,7 @@ export class Hud {
           // src/ui/farm_event_feedback.ts at the v0.38.0 sync (the monolith
           // ratchet heal); the Hud itself is the host seam.
           handleFarmEvent(ev, this);
+          this.plantSheetWindow.notifyFarmEvent(ev);
           break;
         case 'gatherRareEvent': {
           // Soft zone broadcast (Professions 2.0): every recipient in
@@ -16475,9 +16489,10 @@ export class Hud {
     this.harvestJournalWindow.toggle();
   }
 
-  // Phase 9b seam stub: the bed arm's free-bed route (NearbyInteractionHud).
-  // The plant-sheet composition replaces this body in the same phase.
-  openPlantSheet(_bedId: string): void {}
+  // The bed arm's free-bed route (NearbyInteractionHud): opens the plant sheet.
+  openPlantSheet(bedId: string): void {
+    this.plantSheetWindow.open(bedId);
+  }
 
   // Repaint the deed tracker from the live facet: the slow band, a watch
   // toggle, the collapse toggle, and language switches all funnel here; the
