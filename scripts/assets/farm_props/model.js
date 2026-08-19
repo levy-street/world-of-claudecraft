@@ -1,8 +1,9 @@
 // Deterministic procedural factory for the farming prop set: one garden bed, one
 // shared sprout, three crop families across three growth stages plus a withered
-// husk, and a compost bin. Every asset is vertex colored and texture free; the
-// renderer supplies the biome tint on the bed and the per-crop identity tint on
-// the crop_accent material, so the meshes ship in a neutral palette.
+// husk, a compost bin, and the placed harvest feast table. Every asset is vertex
+// colored and texture free; the renderer supplies the biome tint on the bed and
+// the per-crop identity tint on the crop_accent material, so the meshes ship in
+// a neutral palette.
 //
 // The factory is pure: the same asset id always yields the same geometry, so the
 // exporter can prove a byte-identical rebuild.
@@ -195,6 +196,27 @@ export const FARM_PROP_CONTRACTS = deepFreeze({
       farm_body: 'per-hub biome multiply over the whole mesh',
     },
   },
+  // The placed harvest feast (Phase 12, the shared feast): a low rustic
+  // trestle table under a laden spread. Player-placed anywhere (never seated
+  // in a patch), so it is untinted at draw time: the authored food and timber
+  // colors are the whole read.
+  farm_feast: {
+    id: 'farm_feast',
+    out: 'models/props/farm_feast.glb',
+    rootNode: 'FarmFeast',
+    family: 'utility',
+    stage: 'utility',
+    footprintYd: [1.6, 1.6],
+    pivot: 'floor-center',
+    heightYd: 0.9,
+    meshes: [FARM_BODY_MESH_NODE],
+    materials: [FARM_BODY_MATERIAL],
+    sockets: {},
+    mountsOn: null,
+    tintChannels: {
+      farm_body: 'left untinted at draw time; the feast ships its authored colors',
+    },
+  },
 });
 
 export const FARM_PROP_IDS = Object.freeze(Object.keys(FARM_PROP_CONTRACTS));
@@ -222,6 +244,17 @@ const PALETTE = Object.freeze({
   witherLight: 0xb0a897,
   compostDeep: 0x5a4a38,
   compost: 0x6b5a45,
+  // The feast spread. Every swatch stays at or below 0xc4 per channel so the
+  // shipped linear COLOR_0 bytes hold under the farm_body ceiling the asset
+  // suite pins (the crop_accent band must stay the brightest thing in the set).
+  bread: 0xb0803f,
+  breadLight: 0xbf9455,
+  cheese: 0xc4a038,
+  roast: 0x9a5a35,
+  roastDeep: 0x7c452a,
+  cloth: 0xb8b09e,
+  clothDeep: 0xa89f8c,
+  fruit: 0xa93c2e,
 });
 
 function createRandom(seed) {
@@ -654,6 +687,84 @@ function buildCompostBin(context) {
   }
 }
 
+// The harvest feast: four tabletop planks across two splayed trestles, a cloth
+// runner, and a spread of food shapes (a roast centerpiece on its platter, a
+// bread board, a cheese wheel with its cut wedge, a greens bowl, loose fruit,
+// and two mugs). Authored close to the 1.6 x 0.9 x 1.6 contract so
+// fitToContract only trues it up.
+function buildFeastTable(context) {
+  const { body, random } = context;
+  const topY = 0.6;
+  const plankThickness = 0.055;
+
+  // Tabletop: four planks spanning x, laid along z.
+  for (const z of [-0.585, -0.195, 0.195, 0.585]) {
+    addBox(
+      body,
+      [1.58, plankThickness, 0.36],
+      [0, topY - plankThickness / 2, z],
+      jitterColor(random, PALETTE.plank, 0.12),
+    );
+  }
+  // Two trestles: a beam under the top and a pair of splayed legs each.
+  for (const sz of [-1, 1]) {
+    const z = sz * 0.45;
+    addBox(body, [1.3, 0.07, 0.09], [0, topY - plankThickness - 0.035, z], PALETTE.plankDark);
+    for (const sx of [-1, 1]) {
+      addBox(
+        body,
+        [0.09, 0.56, 0.08],
+        [sx * 0.52, 0.27, z],
+        jitterColor(random, PALETTE.plankLight, 0.1),
+        [0, 0, -sx * 0.3],
+      );
+    }
+  }
+  // The cloth runner down the middle, draped over both ends.
+  addBox(body, [0.55, 0.012, 1.56], [0, topY + 0.006, 0], PALETTE.cloth);
+  for (const sz of [-1, 1]) {
+    addBox(body, [0.55, 0.18, 0.02], [0, topY - 0.09, sz * 0.79], PALETTE.clothDeep);
+  }
+
+  // The centerpiece: a roast on a wide platter.
+  addDisc(body, 0.26, 0.03, [0, topY + 0.015, 0], PALETTE.plankLight);
+  addBlob(body, [0.19, 0.145, 0.19], [0, topY + 0.03 + 0.13, 0], PALETTE.roast, [0, 0.4, 0], 8);
+  // The bread board: a small platter and two loaves.
+  addDisc(body, 0.14, 0.025, [-0.5, topY + 0.013, -0.35], PALETTE.plankDark);
+  addBlob(body, [0.1, 0.055, 0.06], [-0.54, topY + 0.08, -0.38], PALETTE.bread, [0, 0.5, 0]);
+  addBlob(body, [0.09, 0.05, 0.055], [-0.44, topY + 0.075, -0.3], PALETTE.breadLight, [0, 1.7, 0]);
+  // The cheese wheel and its cut wedge.
+  addDisc(body, 0.11, 0.07, [0.45, topY + 0.06, -0.4], PALETTE.cheese);
+  addBox(body, [0.09, 0.05, 0.07], [0.32, topY + 0.05, -0.28], PALETTE.cheese, [0, 0.6, 0]);
+  // The greens bowl: a shallow disc with a few leafy shoots standing in it.
+  addDisc(body, 0.1, 0.05, [-0.45, topY + 0.05, 0.4], PALETTE.roastDeep);
+  for (let leaf = 0; leaf < 3; leaf++) {
+    const yaw = (leaf / 3) * Math.PI * 2 + random() * 0.4;
+    addShoot(body, {
+      base: [-0.45, topY + 0.07, 0.4],
+      height: 0.09,
+      bottom: [0.05, 0.03],
+      top: [0.06, 0.02],
+      rotation: [0.55, yaw, 0],
+      color: jitterColor(random, PALETTE.leaf, 0.12),
+    });
+  }
+  // Loose fruit scattered around the spread, kept off the centerpiece platter.
+  for (const [x, z] of scatterPositions(random, 7, 0.62, 0.6)) {
+    if (Math.hypot(x, z) < 0.32) continue;
+    addBlob(
+      body,
+      [0.045, 0.04, 0.045],
+      [x, topY + 0.04, z],
+      jitterColor(random, PALETTE.fruit, 0.12),
+      [0, random() * Math.PI, 0],
+    );
+  }
+  // Two mugs.
+  addBox(body, [0.07, 0.09, 0.07], [0.55, topY + 0.045, 0.3], PALETTE.plankDark);
+  addBox(body, [0.07, 0.09, 0.07], [-0.5, topY + 0.045, 0.42], PALETTE.roastDeep, [0, 0.5, 0]);
+}
+
 const BUILDERS = Object.freeze({
   farm_bed: buildBed,
   farm_sprout: buildSprout,
@@ -830,6 +941,7 @@ const BUILDERS = Object.freeze({
       fruitSegments: 6,
     }),
   farm_compost_bin: buildCompostBin,
+  farm_feast: buildFeastTable,
 });
 
 function mergeBucket(bucket, label) {
