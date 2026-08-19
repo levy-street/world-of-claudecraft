@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const de_DE: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formsAutoUnshift': 'Ein Heilzauber oder ein Schadenszauber, den du in einer Gestalt wirkst, holt dich selbst daraus hervor. Eine Gestalt auf diese Weise zu verlassen ist gratis und verbraucht keine globale Abklingzeit, ein Sofortzauber geht also in dem Moment los, in dem du ihn drückst. Zurückzuwechseln ist eine gewöhnliche Fähigkeit und kostet weiterhin Mana und deine globale Abklingzeit.',
   'entities.mobs.heroic_boss_dummy.name': 'Heroische Bosspuppe',
   'entities.mobs.normal_boss_dummy.name': 'Normale Bosspuppe',
   'entities.mobs.friendly_player_dummy.name': 'Freundliche Spielerpuppe',

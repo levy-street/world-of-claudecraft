@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const fr_FR: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formsAutoUnshift': "Un soin ou un sort de dégâts lancé sous forme vous en fait sortir tout seul. Quitter une forme ainsi est gratuit et ne consomme pas votre temps de recharge global, un sort instantané part donc à l'instant où vous appuyez. Reprendre la forme est une capacité ordinaire, qui coûte toujours du mana et votre temps de recharge global.",
   'entities.mobs.heroic_boss_dummy.name': 'Mannequin de boss héroïque',
   'entities.mobs.normal_boss_dummy.name': 'Mannequin de boss normal',
   'entities.mobs.friendly_player_dummy.name': 'Mannequin de joueur allié',

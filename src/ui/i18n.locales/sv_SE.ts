@@ -2,6 +2,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const sv_SE: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formsAutoUnshift': 'En läkning eller en skadetrollformel som kastas i skepnad tar dig ur den åt dig. Att lämna en skepnad på det sättet är gratis och förbrukar inte den globala nedkylningen, så en omedelbar trollformel går av i samma stund du trycker. Att skifta tillbaka är en vanlig förmåga och kostar fortfarande mana och din globala nedkylning.',
   'entities.mobs.heroic_boss_dummy.name': 'Heroisk bossdocka',
   'entities.mobs.normal_boss_dummy.name': 'Normal bossdocka',
   'entities.mobs.friendly_player_dummy.name': 'Vänlig spelardocka',

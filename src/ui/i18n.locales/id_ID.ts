@@ -2,6 +2,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const id_ID: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formsAutoUnshift': 'Penyembuhan atau sihir serangan yang dirapal saat berwujud akan mengeluarkanmu dari wujud itu secara otomatis. Keluar dari wujud dengan cara ini gratis dan tidak memakai jeda global, jadi sihir instan langsung meluncur begitu kau menekannya. Kembali ke wujud adalah kemampuan biasa dan tetap memakan mana serta jeda global.',
   'entities.mobs.heroic_boss_dummy.name': 'Boneka Bos Heroik',
   'entities.mobs.normal_boss_dummy.name': 'Boneka Bos Normal',
   'entities.mobs.friendly_player_dummy.name': 'Boneka Pemain Sekutu',

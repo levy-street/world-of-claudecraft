@@ -2,6 +2,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const vi_VN: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formsAutoUnshift': 'Một phép hồi máu hoặc phép gây sát thương thi triển khi đang ở dạng thú sẽ tự đưa bạn ra khỏi dạng đó. Rời dạng theo cách này miễn phí và không tốn hồi chiêu toàn cục, nên phép tức thời phát ra ngay khi bạn bấm. Vào lại dạng là một kỹ năng bình thường, vẫn tốn mana và hồi chiêu toàn cục.',
   'entities.mobs.heroic_boss_dummy.name': 'Hình Nộm Trùm Anh Hùng',
   'entities.mobs.normal_boss_dummy.name': 'Hình Nộm Trùm Thường',
   'entities.mobs.friendly_player_dummy.name': 'Hình Nộm Người Chơi Đồng Minh',

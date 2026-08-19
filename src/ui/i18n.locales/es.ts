@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formsAutoUnshift': 'Una sanación o un hechizo de daño lanzado en forma te saca de ella por ti. Salir de una forma así es gratis y no gasta tu tiempo de reutilización global, de modo que un hechizo instantáneo sale en el momento en que lo pulsas. Volver a la forma es una habilidad normal y sigue costando maná y tu tiempo de reutilización global.',
   'entities.mobs.heroic_boss_dummy.name': 'Muñeco de jefe heroico',
   'entities.mobs.normal_boss_dummy.name': 'Muñeco de jefe normal',
   'entities.mobs.friendly_player_dummy.name': 'Muñeco de jugador aliado',

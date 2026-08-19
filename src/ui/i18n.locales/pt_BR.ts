@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const pt_BR: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formsAutoUnshift': 'Uma cura ou um feitiço de dano conjurado em forma tira você dela sozinho. Sair de uma forma assim é de graça e não gasta sua recarga global, então um feitiço instantâneo dispara no momento em que você aperta. Voltar para a forma é uma habilidade comum e ainda custa mana e sua recarga global.',
   'entities.mobs.heroic_boss_dummy.name': 'Boneco de Chefe Heroico',
   'entities.mobs.normal_boss_dummy.name': 'Boneco de Chefe Normal',
   'entities.mobs.friendly_player_dummy.name': 'Boneco de Jogador Aliado',

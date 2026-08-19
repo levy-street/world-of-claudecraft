@@ -2,6 +2,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const nl_NL: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formsAutoUnshift': 'Een heling of een schadespreuk die je in gedaante uitspreekt, haalt je er vanzelf uit. Een gedaante zo verlaten is gratis en verbruikt je globale afkoeltijd niet, dus een instantspreuk gaat af op het moment dat je drukt. Terugschakelen is een gewone vaardigheid en kost nog steeds mana en je globale afkoeltijd.',
   'entities.mobs.heroic_boss_dummy.name': 'Heroïsche bosspop',
   'entities.mobs.normal_boss_dummy.name': 'Normale bosspop',
   'entities.mobs.friendly_player_dummy.name': 'Bevriende spelerpop',
