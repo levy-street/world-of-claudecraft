@@ -20,6 +20,7 @@ export type MountKey =
   | 'stormfeather_griffin'
   | 'thunderstrut_gobbler'
   | 'drakemaw_raptor'
+  | 'weirdo_cream_truck'
   | 'terrorspark_groundshaker';
 
 export type MountRarity = 'common' | 'uncommon' | 'rare' | 'epic';
@@ -100,6 +101,16 @@ export const MOUNTS: Record<MountKey, MountDef> = {
   drakemaw_raptor: {
     key: 'drakemaw_raptor',
     name: 'Drakemaw Raptor',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
+  // The Weirdo Cream truck: a rideable ice cream van with an open cab, so the
+  // driver is visible at the wheel. Developer-only like the Groundshaker below
+  // (its ignition key has no acquisition path), which is why the two sit
+  // together at the tail of the catalog.
+  weirdo_cream_truck: {
+    key: 'weirdo_cream_truck',
+    name: 'Weirdo Cream Truck',
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },

@@ -354,7 +354,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // honor pieces and the 3 fishing additions (the koi and both rods):
     // 242 + 16 + 29 + 47 + 3 = 337, plus the three daggers the v0.36.0 release
     // merge added to live content (rimefang on the Rift page, duskwhisper on
-    // Wildheart Basin, boneglass_shiv on Spoils): 340. Catalog growth reverts
+    // Wildheart Basin, boneglass_shiv on Spoils): 340, plus the Weirdo Cream Truck: 341. Catalog growth reverts
     // page completion for finished players, per docs/design/reliquary.md.
     // The two excludeFromCompletion pages add
     // slots and 0 to BOTH pairs: the Vault of Ages contributes four retired
@@ -362,7 +362,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // and the flag keeps each whole page out of owned AND total (the dedicated
     // vault and riftbound pins in this file and tests/reliquary_state.test.ts
     // hold both sides), so neither page moves these two literals.
-    expect(full).toEqual({ owned: 340, total: 340 });
+    expect(full).toEqual({ owned: 341, total: 341 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -373,7 +373,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // pair above, including the three release-merged daggers; marks are
     // character-scoped, so this trails the overview by the 29 account-scoped
     // weapon skins).
-    expect(character).toEqual({ owned: 311, total: 311 });
+    expect(character).toEqual({ owned: 312, total: 312 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -394,7 +394,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(375);
+    ).toBe(376);
     // Distinct mark ids: the 10 shipped before Phase 21 plus the 19
     // rare-slain proofs of conquerors_rares_of_the_realm.
     expect(
@@ -2373,7 +2373,9 @@ const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
   // slot stays listed and sourceless until the mount gets a route.
   // terrorspark_groundshaker: dev-grant only, deliberately absent from vendors,
   // quests, mob loot, heroic loot, and the rift reins pools.
-  horizons_mounts: ['drakemaw_raptor', 'terrorspark_groundshaker'],
+  // weirdo_cream_truck: the same ruling on the same terms, owner call, and
+  // proven by the exclusion sweep in tests/mounts.test.ts.
+  horizons_mounts: ['drakemaw_raptor', 'terrorspark_groundshaker', 'weirdo_cream_truck'],
   // masterwork:engineering: unearnable, QA ruling 2026-08-07. Every live
   // engineering recipe produces a slotless, statless tool, masterworkBonusStats
   // returns null for all of them, so the masterwork proc can never fire and
@@ -3261,8 +3263,8 @@ describe('Reliquary source hint coverage', () => {
     }
     expect([...actuallyUnhinted].sort()).toEqual([...PENDING_KEYS].sort());
     // Vacuity floor: this suite is worth nothing if almost everything is
-    // excluded. Literal: tighten as rulings land. 368 = 375 slots minus the
-    // four retired vault slots minus the two gap mounts minus the pended
+    // excluded. Literal: tighten as rulings land. 368 = 376 slots minus the
+    // four retired vault slots minus the three gap mounts minus the pended
     // masterwork:engineering. It tracks the slot total, so it moved with the
     // three daggers the v0.36.0 release merge added, keeping the original slack.
     const hinted = RELIC_SLOTS.length - retiredSlots - actuallyUnhinted.size;
@@ -3339,6 +3341,7 @@ describe('Reliquary source hint coverage', () => {
     expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual([
       'drakemaw_raptor',
       'terrorspark_groundshaker',
+      'weirdo_cream_truck',
     ]);
     // masterwork:engineering pended by the QA ruling 2026-08-07: no
     // engineering recipe can proc a masterwork (see the gear-capability pin),

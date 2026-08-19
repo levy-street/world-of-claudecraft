@@ -9,25 +9,85 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "entities.items.reins_weirdo_cream_truck.name",
+    "hudChrome.mounts.desc_weirdo_cream_truck",
+    "hudChrome.mounts.name_weirdo_cream_truck"
+  ],
+  "es_ES": [
+    "entities.items.reins_weirdo_cream_truck.name",
+    "hudChrome.mounts.desc_weirdo_cream_truck",
+    "hudChrome.mounts.name_weirdo_cream_truck"
+  ],
+  "fr_FR": [
+    "entities.items.reins_weirdo_cream_truck.name",
+    "hudChrome.mounts.desc_weirdo_cream_truck",
+    "hudChrome.mounts.name_weirdo_cream_truck"
+  ],
+  "fr_CA": [
+    "entities.items.reins_weirdo_cream_truck.name",
+    "hudChrome.mounts.desc_weirdo_cream_truck",
+    "hudChrome.mounts.name_weirdo_cream_truck"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "entities.items.reins_weirdo_cream_truck.name",
+    "hudChrome.mounts.desc_weirdo_cream_truck",
+    "hudChrome.mounts.name_weirdo_cream_truck"
+  ],
+  "de_DE": [
+    "entities.items.reins_weirdo_cream_truck.name",
+    "hudChrome.mounts.desc_weirdo_cream_truck",
+    "hudChrome.mounts.name_weirdo_cream_truck"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "entities.items.reins_weirdo_cream_truck.name",
+    "hudChrome.mounts.desc_weirdo_cream_truck",
+    "hudChrome.mounts.name_weirdo_cream_truck"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "entities.items.reins_weirdo_cream_truck.name",
+    "hudChrome.mounts.desc_weirdo_cream_truck",
+    "hudChrome.mounts.name_weirdo_cream_truck"
+  ],
+  "nl_NL": [
+    "entities.items.reins_weirdo_cream_truck.name",
+    "hudChrome.mounts.desc_weirdo_cream_truck",
+    "hudChrome.mounts.name_weirdo_cream_truck"
+  ],
+  "pl_PL": [
+    "entities.items.reins_weirdo_cream_truck.name",
+    "hudChrome.mounts.desc_weirdo_cream_truck",
+    "hudChrome.mounts.name_weirdo_cream_truck"
+  ],
+  "id_ID": [
+    "entities.items.reins_weirdo_cream_truck.name",
+    "hudChrome.mounts.desc_weirdo_cream_truck",
+    "hudChrome.mounts.name_weirdo_cream_truck"
+  ],
+  "tr_TR": [
+    "entities.items.reins_weirdo_cream_truck.name",
+    "hudChrome.mounts.desc_weirdo_cream_truck",
+    "hudChrome.mounts.name_weirdo_cream_truck"
+  ],
+  "sv_SE": [
+    "entities.items.reins_weirdo_cream_truck.name",
+    "hudChrome.mounts.desc_weirdo_cream_truck",
+    "hudChrome.mounts.name_weirdo_cream_truck"
+  ],
+  "vi_VN": [
+    "entities.items.reins_weirdo_cream_truck.name",
+    "hudChrome.mounts.desc_weirdo_cream_truck",
+    "hudChrome.mounts.name_weirdo_cream_truck"
+  ],
+  "da_DK": [
+    "entities.items.reins_weirdo_cream_truck.name",
+    "hudChrome.mounts.desc_weirdo_cream_truck",
+    "hudChrome.mounts.name_weirdo_cream_truck"
+  ]
 };

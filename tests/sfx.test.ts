@@ -2,7 +2,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FORGE_MAX_DISTANCE, MAX_DISTANCE, REF_DISTANCE, sfx } from '../src/game/sfx';
 import { SFX_CLIPS, type SfxEntry } from '../src/game/sfx_manifest.generated';
-import { MOUNT_KEYS } from '../src/sim/content/mounts';
+import { MOUNT_KEYS, type MountKey } from '../src/sim/content/mounts';
 
 // The footstep "jingling" bug: foot clips are ~0.48s but steps fire every ~0.22s
 // at a run, so flat retriggers overlap two pitch-jittered copies of one sample and
@@ -127,6 +127,14 @@ beforeEach(() => {
   buffers.set('foot_grass', { duration: 0.48 });
   for (const [index, mountKey] of MOUNT_KEYS.entries()) {
     buffers.set(`mount_run_${mountKey}`, { duration: 0.5 + index / 100 });
+  }
+  // Vehicle mounts carry an engine chug (and a chime) instead of a stride cue,
+  // so the loop above never reaches them. Primed by the same live clip table the
+  // runtime guards on, so a cue that stops shipping fails here rather than
+  // silently priming a key that no longer exists.
+  for (const key of Object.keys(SFX_CLIPS)) {
+    if (key.startsWith('mount_chug_')) buffers.set(key, { duration: 0.34 });
+    if (key.startsWith('mount_chime_')) buffers.set(key, { duration: 5 });
   }
   buffers.set('foot_wood', WOOD_BUFFER);
   buffers.set('impact_shadow', { duration: 0.7 });
@@ -256,15 +264,42 @@ describe('isBuffered/preload', () => {
   });
 });
 
+// Mounts come in two audio shapes. A GAIT mount plays one stride cue per
+// stride (mount_run_<key>); the tank mount additionally drives that cue as the
+// sustain of a windup/loop/winddown take set (src/game/mount_engine_state.ts).
+// A VEHICLE mount has no gait at all, so it plays a cylinder-firing chug at an
+// interval the renderer derives from ground speed (mount_chug_<key>, see
+// src/render/mount_chug_core.ts) and may also carry a signature chime. Every
+// mount is in exactly one of these sets, which is what the coverage tests
+// below assert.
+const CHUG_MOUNTS = ['weirdo_cream_truck'] as const;
+const CHIME_MOUNTS = ['weirdo_cream_truck'] as const;
+// The predicate is a type guard so the gait list NARROWS: without it the
+// element type still includes the vehicle mounts, and `mount_run_${key}` would
+// not resolve against the generated clip table.
+const GAIT_MOUNTS = MOUNT_KEYS.filter(
+  (key): key is Exclude<MountKey, (typeof CHUG_MOUNTS)[number]> =>
+    !(CHUG_MOUNTS as readonly string[]).includes(key),
+);
+
 describe('mount running audio', () => {
-  it('ships one generated manifest entry for every catalog mount', () => {
+  it('gives every catalog mount exactly one of the two audio shapes', () => {
+    for (const mountKey of MOUNT_KEYS) {
+      const hasStride = `mount_run_${mountKey}` in SFX_CLIPS;
+      const hasChug = `mount_chug_${mountKey}` in SFX_CLIPS;
+      expect(hasStride !== hasChug, `${mountKey} must be gait XOR vehicle`).toBe(true);
+      expect(hasChug).toBe((CHUG_MOUNTS as readonly string[]).includes(mountKey));
+    }
+  });
+
+  it('ships one generated manifest entry for every gait mount', () => {
     // terrorspark_groundshaker's mount_run_ entry is the sustain take of an
     // engine mount's windup/loop/winddown set (see the "mount engine audio"
     // suite below): it is genuinely driven through Sfx.loop() at runtime, so
     // its manifest entry correctly carries loop: true, unlike every other
     // mount's plain per-stride gait clip.
     const ENGINE_LOOP_MOUNTS = new Set(['terrorspark_groundshaker']);
-    for (const mountKey of MOUNT_KEYS) {
+    for (const mountKey of GAIT_MOUNTS) {
       const entry = SFX_CLIPS[`mount_run_${mountKey}`];
       expect(entry).toMatchObject({
         loop: ENGINE_LOOP_MOUNTS.has(mountKey),
@@ -278,21 +313,25 @@ describe('mount running audio', () => {
 
   // The tank mount (terrorspark_groundshaker) has a dedicated windup/loop/
   // winddown take set (see mount_engine_state.ts), so it ships two extra
-  // clips beyond the base loop every other mount has.
+  // clips beyond the base loop every other gait mount has.
   const ENGINE_MOUNT_EXTRA_SUFFIXES: Partial<Record<string, string[]>> = {
     terrorspark_groundshaker: ['_start', '_stop'],
   };
 
-  it('ships one non-empty MP3 asset for every catalog mount and no orphan mount clips', () => {
+  it('ships one non-empty MP3 asset per mount cue and no orphan mount clips', () => {
     const directory = new URL('../public/audio/sfx/', import.meta.url);
-    const expected = MOUNT_KEYS.flatMap((mountKey) => [
-      `mount_run_${mountKey}.mp3`,
-      ...(ENGINE_MOUNT_EXTRA_SUFFIXES[mountKey] ?? []).map(
-        (suffix) => `mount_run_${mountKey}${suffix}.mp3`,
-      ),
-    ]).sort();
+    const expected = [
+      ...GAIT_MOUNTS.flatMap((mountKey) => [
+        `mount_run_${mountKey}.mp3`,
+        ...(ENGINE_MOUNT_EXTRA_SUFFIXES[mountKey] ?? []).map(
+          (suffix) => `mount_run_${mountKey}${suffix}.mp3`,
+        ),
+      ]),
+      ...CHUG_MOUNTS.map((mountKey) => `mount_chug_${mountKey}.mp3`),
+      ...CHIME_MOUNTS.map((mountKey) => `mount_chime_${mountKey}.mp3`),
+    ].sort();
     const actual = readdirSync(directory)
-      .filter((file) => file.startsWith('mount_run_') && file.endsWith('.mp3'))
+      .filter((file) => file.startsWith('mount_') && file.endsWith('.mp3'))
       .sort();
 
     expect(actual).toEqual(expected);
@@ -304,11 +343,11 @@ describe('mount running audio', () => {
     }
   });
 
-  it('plays a distinct custom clip for every catalog mount', () => {
+  it('plays a distinct custom clip for every gait mount', () => {
     const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
     const played = new Set<unknown>();
 
-    for (const mountKey of MOUNT_KEYS) {
+    for (const mountKey of GAIT_MOUNTS) {
       nowT += 0.5;
       sfx.mountRun(0, 0, 0, mountKey, true);
       const src = sources.at(-1)!;
@@ -316,7 +355,32 @@ describe('mount running audio', () => {
       played.add(src.buffer);
     }
 
-    expect(played.size).toBe(MOUNT_KEYS.length);
+    expect(played.size).toBe(GAIT_MOUNTS.length);
+  });
+
+  it('plays the engine chug and the chime for a vehicle mount, at the asked rate', () => {
+    const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
+    for (const mountKey of CHUG_MOUNTS) {
+      nowT += 0.5;
+      sfx.mountChug(0, 0, 0, mountKey, 1.31, 0.47, true);
+      const engine = sources.at(-1)!;
+      expect(engine.buffer).toBe(buffers.get(`mount_chug_${mountKey}`));
+      // The caller owns the throttle, so the rate it asks for must survive.
+      expect(engine.playbackRate.value).toBeCloseTo(1.31, 5);
+    }
+    for (const mountKey of CHIME_MOUNTS) {
+      nowT += 0.5;
+      sfx.mountChime(0, 0, 0, mountKey, true);
+      expect(sources.at(-1)!.buffer).toBe(buffers.get(`mount_chime_${mountKey}`));
+    }
+  });
+
+  it('stays silent for a mount that has no chug or chime cue', () => {
+    const before = sources.length;
+    nowT += 0.5;
+    sfx.mountChug(0, 0, 0, 'valorsteed', 1, 0.5, true);
+    sfx.mountChime(0, 0, 0, 'valorsteed', true);
+    expect(sources.length).toBe(before);
   });
 
   it('plays independently of the optional on-foot footstep toggle', () => {

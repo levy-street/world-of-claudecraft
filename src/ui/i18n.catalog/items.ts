@@ -2433,6 +2433,7 @@ const ITEM_ENTITY_IDS = [
   'gatherers_cache',
   'artisans_eye',
   'reins_terrorspark_groundshaker',
+  'reins_weirdo_cream_truck',
   'reins_drakemaw_raptor',
   'rimefang',
   'marrowpoint',
@@ -2548,6 +2549,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   gatherers_cache: "Gatherer's Cache",
   artisans_eye: "Artisan's Eye",
   reins_terrorspark_groundshaker: 'Ignition Key: Terrorspark Groundshaker',
+  reins_weirdo_cream_truck: 'Ignition Key: Weirdo Cream Truck',
   // Quest-dedupe pass (zones 1 to 3): English-appended until the release fill
   // folds them into the per-locale arrays.
   firebottle: 'Firebottle',

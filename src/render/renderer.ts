@@ -356,6 +356,7 @@ import { buildMailboxPillar } from './mailbox';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
+import { driveMountChug, type MountChugState } from './mount_chug_driver';
 import {
   mountPrewarmKeys,
   stageMountPrewarmVisual,
@@ -1129,6 +1130,7 @@ export interface EntityView {
   // latches for jump/land/water-entry detection.
   stepAccum: number;
   lichHeartbeatAt: number;
+  mountChug: MountChugState | null; // vehicle-mount chug (mount_chug_driver.ts)
   waterContactSeen: boolean;
   waterContactActive: boolean;
   waterContactX: number;
@@ -8959,6 +8961,7 @@ export class Renderer {
       locoState: newLocoState(),
       stepAccum: 0,
       lichHeartbeatAt: 0,
+      mountChug: null,
       waterContactSeen: false,
       waterContactActive: false,
       waterContactX: e.pos.x,
@@ -11725,8 +11728,12 @@ export class Renderer {
       const sink = this.audioSink;
       if (sink && d2 < SFX_MOVE_RANGE_SQ) {
         // jump / land / water-entry edges
-        if (airborne && !v.wasAirborne && !visuallyDead) sink.movement('jump', ax, ay, az, isSelf);
-        else if (!airborne && v.wasAirborne && !visuallyDead) {
+        if (airborne && !v.wasAirborne && !visuallyDead) {
+          sink.movement('jump', ax, ay, az, isSelf);
+          // A vehicle mount with a chime sounds it on the way up. No-op for
+          // every mount without one, which is all of them but the truck.
+          if (logicallyMounted) sink.mountChime(ax, ay, az, e.mountKey, isSelf);
+        } else if (!airborne && v.wasAirborne && !visuallyDead) {
           // A flight that ends by catching a ledge is not a fall, and the
           // heavy landing thud on one reads as a bug: you hopped onto a rock
           // mid-arc and the game played a crash. Anything softer than a plain
@@ -11804,6 +11811,19 @@ export class Renderer {
           // lands promptly rather than after a full stride of travel.
           v.stepAccum = FOOT_STRIDE_WALK * 0.6;
         }
+        // A vehicle mount's engine, outside the stride ladder above by design.
+        v.mountChug = driveMountChug(sink, {
+          state: v.mountChug,
+          mountKey: e.mountKey,
+          speed: loco.speed,
+          airborne,
+          dt,
+          x: ax,
+          y: ay,
+          z: az,
+          self: isSelf,
+          active: logicallyMounted && !visuallyDead,
+        });
       } else if (sink && logicallyMounted) {
         // Every other cue in the block above is a one-shot; an engine
         // mount's loop is not, and this gate (SFX_MOVE_RANGE_SQ, 42yd) sits
@@ -11814,6 +11834,7 @@ export class Renderer {
         // removal. mountEngineReset is a safe no-op with no active engine
         // state (an ordinary mount, or the loop already stopped).
         sink.mountEngineReset(e.id);
+        v.mountChug = null;
       }
       // Capture the flight's peak fall speed before the landing reset: the
       // water-entry splash below scales with how hard the body came down.

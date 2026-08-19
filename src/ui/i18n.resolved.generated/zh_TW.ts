@@ -1077,6 +1077,7 @@ export const zh_TW: EnTranslations = {
       "name_thunderstrut_gobbler": "雷霆闊步大火雞",
       "name_terrorspark_groundshaker": "驚雷撼地者",
       "name_drakemaw_raptor": "龍喉迅猛龍",
+      "name_weirdo_cream_truck": "怪奇冰淇淋車",
       "desc_valorsteed": "一匹堅韌穩健的駿馬，可提升旅行速度。",
       "desc_grag_bear": "一頭堅韌穩健的巨熊，可提升旅行速度。",
       "desc_stalkglider_snail": "一隻堅毅耐久的蝸牛，可提升旅行速度。",
@@ -1085,7 +1086,8 @@ export const zh_TW: EnTranslations = {
       "desc_stormfeather_griffin": "一頭威嚴的風暴獅鷲，收攏雙翼，以符文利爪行走於大地。",
       "desc_thunderstrut_gobbler": "一隻風暴所生的龐然大火雞，從覺醒之峰昂首闊步而下，尾羽如雷雲般展開。",
       "desc_terrorspark_groundshaker": "一台緊湊的裝甲機械，配備重型履帶、大口徑火炮，以及為無畏駕駛員打造的鞍座。",
-      "desc_drakemaw_raptor": "來自龍喉火山口的馴服巢生迅猛龍，渾身筋肉、疾若奔雷，身上仍帶著淡淡的灰燼氣味。"
+      "desc_drakemaw_raptor": "來自龍喉火山口的馴服巢生迅猛龍，渾身筋肉、疾若奔雷，身上仍帶著淡淡的灰燼氣味。",
+      "desc_weirdo_cream_truck": "一輛破舊的冰淇淋車，駕駛室敞開，車頂焊著一支甜筒，每次騰空都會響起叮噹樂曲。"
     },
     "mountTraining": {
       "mountPrompt": "按 {key} 鍵騎上訓練用英勇戰馬。",
@@ -12359,6 +12361,9 @@ export const zh_TW: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "驚雷撼地者點火鑰匙"
+      },
+      "reins_weirdo_cream_truck": {
+        "name": "怪奇冰淇淋車點火鑰匙"
       },
       "reins_drakemaw_raptor": {
         "name": "龍喉迅猛龍的韁繩"

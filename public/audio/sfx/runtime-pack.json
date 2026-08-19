@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "2074fac9f3d7a778014af595331a137a7c1f44acb53ebe2250d901044d89da52",
-  "catalogHash": "3955e4baa75a2d284a7a67b26d653aaed5bd61d5f8b82fd048bcbeb1b07239a1",
+  "bundleId": "a08751f0c1b33bd7b527988a366e1ceed8b1c202cd104cac49f1ceb9cac3b14e",
+  "catalogHash": "cf42ab33c2c0b0620989757e0f0fe421b38bdfee6ecc47116e225db319507811",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -2849,6 +2849,30 @@
           "url": "/audio/sfx/mob_undead_skeleton_idle_2.mp3?v=832ad6e9f349",
           "bytes": 15045,
           "sha256": "832ad6e9f349dd100b92908f059cfb3971e4a653ad8405239fb35530cfb78ac8"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_chime_weirdo_cream_truck": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_chime_weirdo_cream_truck.mp3?v=33b61d09fc85",
+          "bytes": 121669,
+          "sha256": "33b61d09fc85d11af22f6a2cd7b226a347dabfa3fff46696af11f93776095708"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_chug_weirdo_cream_truck": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_chug_weirdo_cream_truck.mp3?v=9948a5430b8c",
+          "bytes": 10074,
+          "sha256": "9948a5430b8cef2bc55100fc40f5caa7ba181b4e62462717925f07a5ed0ddee9"
         }
       ],
       "gain": 1,

@@ -97,12 +97,17 @@ describe('the Low vertex-color path covers every mount GLB that ships COLOR_0', 
     ),
   ].sort();
 
-  it('carries authored COLOR_0 on exactly the Terrorspark Groundshaker and the Valorsteed', () => {
+  // The procedurally authored mounts bake their macro shading (cavity, contact,
+  // grime, bevel wear) into COLOR_0; the imported ones carry none. A new mount
+  // joining this list means it came out of scripts/assets, which is the point of
+  // pinning it rather than counting.
+  it('carries authored COLOR_0 on exactly the procedurally authored mounts', () => {
     expect(mountUrls.length).toBeGreaterThanOrEqual(8);
     const withVertexColors = mountUrls.filter((url) => glbAttributes(url).has('COLOR_0'));
     expect(withVertexColors).toEqual([
       'models/mounts/terrorspark_groundshaker.glb',
       'models/mounts/valorsteed.glb',
+      'models/mounts/weirdo_cream_truck.glb',
     ]);
     // Not vacuous: every mount GLB is really parsed, and POSITION proves it.
     for (const url of mountUrls) expect(glbAttributes(url).has('POSITION'), url).toBe(true);

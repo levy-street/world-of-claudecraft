@@ -123,7 +123,15 @@ const MONOLITHS: MonolithRow[] = [
     // resolved count.
     // PR #3468 changes the shadow-depth prewarm material contract, but this
     // wrapper's combined renderer remains at the same resolved count.
-    ceiling: 13744,
+    // Raised 13744 -> 13765 (+21) for the Weirdo Cream Truck engine chug, a
+    // maintainer decision prepared for PR review. The cadence math is a pure
+    // core (mount_chug_core.ts) and the per-body glue is its own thin module
+    // (mount_chug_driver.ts); what is left here is one call, one per-view
+    // field, its init, and its out-of-range reset, which cannot land behind a
+    // seam because a vehicle engine turns over in states the stride ladder
+    // treats as mutually exclusive. Exact merged count: any further growth
+    // reds again.
+    ceiling: 13765,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

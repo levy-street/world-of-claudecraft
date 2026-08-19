@@ -1,0 +1,11 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/weirdo_cream_truck/weirdo_cream_truck-final.glb",
+      "out": "models/mounts/weirdo_cream_truck.glb",
+      "type": "character",
+      "keepClips": ["Idle", "Walk", "Run", "Death"],
+      "keepExtras": true
+    }
+  ]
+}

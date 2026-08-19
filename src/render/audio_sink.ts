@@ -88,6 +88,25 @@ export interface SpatialAudioSink {
    *  e.g. on the mountKey transition that also calls mountEngineReset. A
    *  no-op for a mount with no engine take set. */
   preloadMountEngine(mountKey: string): void;
+  /** One cylinder firing on a VEHICLE mount, whose engine is not a gait.
+   *  Distinct from mountEngine above, which drives a windup/loop/winddown
+   *  take set off a moving flag: here the caller owns the cadence, pitch,
+   *  and level, deriving all three from ground speed
+   *  (src/render/mount_chug_core.ts), so an idling truck still putts and a
+   *  moving one revs. No-op for a mount with no chug clip. */
+  mountChug(
+    x: number,
+    y: number,
+    z: number,
+    mountKey: string,
+    rate: number,
+    gain: number,
+    self: boolean,
+  ): void;
+  /** The truck's roof chime, fired on a jump. A vehicle mount's signature
+   *  flourish, independent of the engine take set above. No-op for a mount
+   *  with no chime clip, which is every mount but the Weirdo Cream Truck. */
+  mountChime(x: number, y: number, z: number, mountKey: string, self: boolean): void;
   /** A discrete movement event (jump / land / water entry / swim stroke). */
   movement(
     kind: 'jump' | 'land' | 'splash' | 'swim',

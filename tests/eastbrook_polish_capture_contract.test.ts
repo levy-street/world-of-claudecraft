@@ -214,8 +214,10 @@ interface AttributionTargetFixture {
 // Re-minted after syncing current release/v0.39.0 into the v0.39 wrapper: the
 // resolved renderer bytes retain the queued self-spirit prewarm and delve
 // rebuild repair. No capture was retaken.
+// Re-minted for the Weirdo Cream Truck: the truck's engine-chug call site moved
+// the fingerprinted renderer bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '2772a342485f6158c9c05d7b2915e2535388775df9722d7a06fe68a4b412c5e4';
+  '9ebb8a6349920b9d5774abcef223a6cc3ecffee13323557890a3332fac52ba6a';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

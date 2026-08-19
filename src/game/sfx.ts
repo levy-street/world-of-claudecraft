@@ -1000,6 +1000,45 @@ class Sfx {
     this.preload(keys.stopKey);
   }
 
+  /**
+   * One cylinder firing on a vehicle mount's engine.
+   *
+   * Cadence, pitch, and level are all decided by the caller
+   * (src/render/mount_chug_core.ts) rather than here, because they are a
+   * function of ground speed rather than of the cue itself. A mount with no
+   * chug clip falls out at the guard, which is every gait mount.
+   */
+  mountChug(
+    x: number,
+    y: number,
+    z: number,
+    mountKey: string,
+    rate: number,
+    gain: number,
+    _self: boolean,
+  ): void {
+    const key = `mount_chug_${mountKey}`;
+    if (!(key in SFX_CLIPS)) return;
+    this.playAt(key, x, y, z, {
+      gain,
+      rate,
+      // The caller may ask for up to ~14 firings a second at full throttle,
+      // so the cooldown has to sit under that interval or the engine would
+      // thin out exactly where it should be loudest.
+      cooldown: 0.03,
+      release: 0.3,
+    });
+  }
+  /** The truck's roof chime, fired on a jump. Long and melodic, so it is
+   *  deliberately NOT cooldown-gated against itself the way a movement cue
+   *  is: a second jump mid-phrase restarts it. Independent of the engine
+   *  take set above, so a mount may have one without the other. */
+  mountChime(x: number, y: number, z: number, mountKey: string, _self: boolean): void {
+    const key = `mount_chime_${mountKey}`;
+    if (!(key in SFX_CLIPS)) return;
+    this.playAt(key, x, y, z, { gain: 0.75, rate: 1, cooldown: 0.25 });
+  }
+
   /** Jump / land / water-entry / swim-stroke. */
   movement(
     kind: 'jump' | 'land' | 'splash' | 'swim',

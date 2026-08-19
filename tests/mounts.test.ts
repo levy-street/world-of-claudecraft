@@ -103,10 +103,13 @@ function ride(sim: Sim, pid: number, key: string): void {
 }
 
 describe('mount catalog', () => {
-  it('has exactly nine mounts with the horse first and the developer tank last', () => {
-    expect(MOUNT_KEYS).toHaveLength(9);
+  it('has exactly ten mounts with the horse first and the developer tank last', () => {
+    expect(MOUNT_KEYS).toHaveLength(10);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
     expect(MOUNT_KEYS.at(-1)).toBe('terrorspark_groundshaker');
+    // The two developer-only mounts sit together at the tail, so a new
+    // player-facing mount still lands above them.
+    expect(MOUNT_KEYS.at(-2)).toBe('weirdo_cream_truck');
     expect(DEFAULT_MOUNT).toBe('valorsteed');
   });
 
@@ -123,6 +126,7 @@ describe('mount catalog', () => {
     expect(spec('aether_hover_cycle')).toEqual(['epic', 0.8]);
     expect(spec('thunderstrut_gobbler')).toEqual(['epic', 0.8]);
     expect(spec('terrorspark_groundshaker')).toEqual(['epic', 0.8]);
+    expect(spec('weirdo_cream_truck')).toEqual(['epic', 0.8]);
     // The level field is GONE, not merely unused: it never fired (reins carry no
     // requiredLevel and every source is level-20 content) and leaving it would
     // invite a second gate to grow back beside ridingTrained.
@@ -176,9 +180,10 @@ describe('mount reins items (the collection: owning the item is owning the mount
       expect(items).toHaveLength(1);
       const item = items[0];
       expect(mountItemId(key)).toBe(item.id);
-      if (key === 'terrorspark_groundshaker') {
-        // The developer-only tank stays soulbound: it has no player acquisition
-        // path, and tradability would turn a dev grant into a leak vector.
+      if (key === 'terrorspark_groundshaker' || key === 'weirdo_cream_truck') {
+        // The developer-only mounts stay soulbound: they have no player
+        // acquisition path, and tradability would turn a dev grant into a leak
+        // vector.
         expect(item.soulbound).toBe(true);
       } else {
         // Player reins are NOT soulbound: they trade, mail, list, and store in
@@ -254,6 +259,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
     for (const key of MOUNT_KEYS) {
       if (key === 'valorsteed') continue; // the purchase, not a drop
       if (key === 'terrorspark_groundshaker') continue; // developer-only, pinned separately below
+      if (key === 'weirdo_cream_truck') continue; // developer-only, same terms as the tank
       const itemId = mountItemId(key)!;
       const rarity = MOUNTS[key].rarity;
       // No mount is ever on a NORMAL mob table, at any rarity.

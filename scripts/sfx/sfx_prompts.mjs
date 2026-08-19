@@ -143,6 +143,23 @@ export const SFX = [
     custom: true,
   },
   {
+    // The Weirdo Cream truck deliberately has NO mount_run stride cue. A
+    // vehicle has no gait, so instead of one clip per footfall it fires this
+    // single cylinder chug on an interval the renderer derives from ground
+    // speed (src/render/mount_chug_core.ts): it lopes at idle and gallops
+    // under throttle, which a fixed-cadence stride cue cannot do.
+    key: 'mount_chug_weirdo_cream_truck',
+    custom: true,
+    duration: 0.34,
+  },
+  {
+    // The roof chime, fired on a jump. Five seconds by request, and long
+    // enough that the phrase resolves after the player has landed.
+    key: 'mount_chime_weirdo_cream_truck',
+    custom: true,
+    duration: 5,
+  },
+  {
     key: 'move_jump',
     custom: true,
     duration: 0.5,

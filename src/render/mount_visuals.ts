@@ -81,6 +81,14 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // The Drakemaw Raptor: authored saddle sits over the hips behind the neck
   // spines (hence the slight rear shift), gait-rigged Walk/Run cycles.
   drakemaw_raptor: spec('mount_drakemaw_raptor', 2.35, true, undefined, -0.1),
+  // The Weirdo Cream truck. seat/seatFwd are MEASURED off the model's own
+  // Socket_Rider (TRUCK_RIDER_SEAT in scripts/assets/weirdo_cream_truck/model.js)
+  // rather than eyeballed, and the manifest declares the truck's native height
+  // so it renders at scale 1 and those yards carry over unchanged. The large
+  // forward shift is the point: the cab is at the FRONT of the van, and standing
+  // the driver there in an open-topped tub is what keeps the body clear of the
+  // shell. tests/mount_visuals.test.ts pins the pair against the asset.
+  weirdo_cream_truck: spec('mount_weirdo_cream_truck', 0.863, true, undefined, 1.28),
 };
 
 /** Spec for an entity's active mountKey, or null when dismounted/unknown. */

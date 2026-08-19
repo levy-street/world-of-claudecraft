@@ -1687,6 +1687,19 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   // Compact fantasy tank. One wheel revolution per locomotion clip matches
   // its authored tread cadence at the reference ground speeds below.
+  // The Weirdo Cream truck. `height` is the model's OWN measured height
+  // (TRUCK_NATIVE_BOUNDS in scripts/assets/weirdo_cream_truck/model.js), so the
+  // normalization scale lands on 1 and the seat yards in mount_visuals.ts are
+  // the model's own numbers rather than a rescaled guess. One wheel revolution
+  // per locomotion clip, matched to the reference ground speeds below.
+  mount_weirdo_cream_truck: {
+    url: `${MOUNTS_DIR}/weirdo_cream_truck.glb`,
+    height: 3.65,
+    clips: MOUNT_RIGGED,
+    walkRef: 3.2,
+    runRef: 5.4,
+    lazyPreload: true,
+  },
   mount_terrorspark_groundshaker: {
     url: `${MOUNTS_DIR}/terrorspark_groundshaker.glb`,
     height: 2.8,

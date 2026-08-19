@@ -2348,6 +2348,28 @@
       }
     ]
   },
+  "mount_chime_weirdo_cream_truck": {
+    "ceilingDb": 6.2,
+    "tracks": [
+      {
+        "filename": "mount_chime_weirdo_cream_truck.mp3",
+        "sha256": "33b61d09fc85d11af22f6a2cd7b226a347dabfa3fff46696af11f93776095708",
+        "size": 121669,
+        "peakDb": -7.2
+      }
+    ]
+  },
+  "mount_chug_weirdo_cream_truck": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mount_chug_weirdo_cream_truck.mp3",
+        "sha256": "9948a5430b8cef2bc55100fc40f5caa7ba181b4e62462717925f07a5ed0ddee9",
+        "size": 10074,
+        "peakDb": -6.3
+      }
+    ]
+  },
   "mount_run_aether_hover_cycle": {
     "ceilingDb": 5.2,
     "tracks": [

@@ -1,0 +1,15 @@
+{
+  "asset": "weirdo_cream_truck",
+  "files": [
+    {
+      "path": "docs/design/weirdo-cream-truck/reference/luffy-face.jpg",
+      "sha256": "61d014c141ff745e05ed7e4804e2b979d86dab9bf557a77d7800d6feb5839ed5",
+      "bytes": 442949,
+      "dimensions": [903, 762],
+      "subject": "The player character Luffy, front portrait",
+      "provenance": "Supplied by the repository owner: a photograph of their own World of ClaudeCraft character on screen. Owner-supplied first-party content, contributed for use as this mount's decal.",
+      "usage": "Cropped, black-keyed, and composited into the portrait region of the truck's signage atlas (scripts/assets/weirdo_cream_truck/decal_atlas.mjs). Stamped on the rear shutter of the mount.",
+      "notes": "Photographed off a display, so it carries panel moire and a warm cast. The atlas builder applies a light blur to suppress the moire before downscaling; nothing else about the image is altered."
+    }
+  ]
+}

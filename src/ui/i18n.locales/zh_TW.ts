@@ -9207,6 +9207,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '來自龍喉火山口的馴服巢生迅猛龍，渾身筋肉、疾若奔雷，身上仍帶著淡淡的灰燼氣味。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆闊步大火雞',
   'hudChrome.mounts.name_terrorspark_groundshaker': '驚雷撼地者',
+  'hudChrome.mounts.name_weirdo_cream_truck': '怪奇冰淇淋車',
   'hudChrome.mounts.desc_valorsteed': '一匹堅韌穩健的駿馬，可提升旅行速度。',
   'hudChrome.mounts.desc_grag_bear': '一頭堅韌穩健的巨熊，可提升旅行速度。',
   'hudChrome.mounts.desc_stalkglider_snail': '一隻堅毅耐久的蝸牛，可提升旅行速度。',
@@ -9220,6 +9221,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '一隻風暴所生的龐然大火雞，從覺醒之峰昂首闊步而下，尾羽如雷雲般展開。',
   'hudChrome.mounts.desc_terrorspark_groundshaker':
     '一台緊湊的裝甲機械，配備重型履帶、大口徑火炮，以及為無畏駕駛員打造的鞍座。',
+  'hudChrome.mounts.desc_weirdo_cream_truck':
+    '一輛破舊的冰淇淋車，駕駛室敞開，車頂焊著一支甜筒，每次騰空都會響起叮噹樂曲。',
   'hudChrome.mounts.emptyTitle': '尚未收集坐騎',
   'hudChrome.mounts.emptyStableHint': '升到 20 級，前往高望以西的馬廄，向馬廄總管瑪拉學習騎術。',
   'hudChrome.mounts.emptyDropHint': '較稀有的坐騎由英雄地城首領掉落或完成裂隙獲得。',
@@ -9946,6 +9949,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.last_keep_signet.name': '最後的堡壘印戒',
   'entities.dungeons.the_last_keep.enterText': '你踏入最後的堡壘那冰冷而寂靜的大廳。',
   'entities.items.reins_terrorspark_groundshaker.name': '驚雷撼地者點火鑰匙',
+  'entities.items.reins_weirdo_cream_truck.name': '怪奇冰淇淋車點火鑰匙',
   'entities.dungeons.the_last_keep.leaveText': '你帶上堡門，重新走進龍裔荒原的寒風中。',
   'entities.dungeons.dawnhold_castle.name': '晨曦堡',
   'entities.items.dawnhold_posy.name': '晨曦堡花園小花束',
