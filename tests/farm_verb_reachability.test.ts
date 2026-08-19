@@ -65,3 +65,16 @@ describe('plantCrop client reachability', () => {
     ).toBeGreaterThanOrEqual(1);
   });
 });
+
+describe('convertHusks client reachability', () => {
+  // The fourth player-facing IWorldFarming verb: the husk-trade gossip row
+  // (quest_dialog_controller) is its one client control today. Pinned so the
+  // (bn) gap class cannot silently reopen on the husk trade either.
+  it('has at least one call site under src/game or src/ui', () => {
+    const sites = clientCallSites('convertHusks');
+    expect(
+      sites.length,
+      `expected a client call site of .convertHusks( under ${SCAN_ROOTS.join(' or ')}; found: [${sites.join(', ')}]`,
+    ).toBeGreaterThanOrEqual(1);
+  });
+});
