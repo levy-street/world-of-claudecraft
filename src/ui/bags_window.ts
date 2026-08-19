@@ -1509,6 +1509,17 @@ export class BagsWindow {
         this.deps.hideTooltip();
         this.render();
         break;
+      case 'placeFeast':
+        // The shared feast (Farming Phase 12): the click is the PLACE verb,
+        // never plain useItem. The command carries no payload; the server
+        // spends the bag item and spawns the feast entity (or answers with a
+        // text-free farmDenied), so nothing is predicted here. The tooltip is
+        // hidden like the other spend arms: a successful place removes the
+        // hovered stack.
+        this.deps.world().placeFeast();
+        this.deps.hideTooltip();
+        this.render();
+        break;
       case 'use': {
         // Gathering tools (#2343) route through the interact-style handler
         // (nearest matching node + autorun stop) when main.ts has wired it;

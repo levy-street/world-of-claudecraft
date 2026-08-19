@@ -293,6 +293,11 @@ describe('the Interact action reaches the escort run (tryNearbyInteraction)', ()
       harvestCrop: (bedId: string) => {
         calls.push(`harvestCrop:${bedId}`);
       },
+      // Phase 12 feast-arm seam member: inert here (the feast ordering arms
+      // live in tests/nearby_interaction.test.ts).
+      consumeFeast: (feastId: number) => {
+        calls.push(`consumeFeast:${feastId}`);
+      },
       harvestNode: (id: string) => {
         calls.push(`harvest:${id}`);
         return true;
@@ -337,6 +342,21 @@ describe('the Interact action reaches the escort run (tryNearbyInteraction)', ()
     ]);
     expect(r.press()).toBe(true);
     expect(r.calls).toEqual(['plantSheet:bed_order_1']);
+  });
+
+  it('a feast underfoot outranks the escort-away last resort (the Phase 12 arm ordering)', () => {
+    // Empty post (quest active, escortee absent) PLUS a placed feast in
+    // reach: the feast arm sits above the away line like the bed arm does,
+    // so the press eats instead of toasting.
+    const feast = entity({
+      id: 6,
+      kind: 'object',
+      templateId: 'farm_feast',
+      pos: { x: WREN.start.x, y: 0, z: WREN.start.z },
+    });
+    const r = rig([feast], playerAt(WREN.start.x, WREN.start.z));
+    expect(r.press()).toBe(true);
+    expect(r.calls).toEqual(['consumeFeast:6']);
   });
 
   it('an escortee in reach outranks a bed underfoot (escort start stays above the bed arm)', () => {

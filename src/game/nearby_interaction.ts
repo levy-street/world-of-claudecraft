@@ -10,6 +10,7 @@ import type { FarmPatchDef, FarmPlotView } from '../world_api/farming';
 import { corpseLootAvailability, localPartyMemberIds } from './corpse_loot_availability';
 import { decideEscortPress, handleEscortPress } from './escort_interact';
 import { decideFarmBedAction, nearestInteractableBed } from './farm_bed_interact';
+import { nearestInteractableFeast } from './feast_interact';
 import {
   type GatherEffectConfirmGate,
   type GatherNodeToolGate,
@@ -50,6 +51,11 @@ export interface NearbyInteractionWorld {
   // The client sends and the sim answers: a growing plot refuses not_ready
   // through the sim's own farmDenied line, never a client-side prediction.
   harvestCrop(bedId: string): void;
+  // The shared-feast arm (Phase 12). Required, not optional, the questLog
+  // precedent: IWorld satisfies it structurally (main.ts passes the world
+  // whole), and a placed feast has NO other client entry point, so a silently
+  // unwired arm would strand the eat verb entirely (the (bn) gap class).
+  consumeFeast(feastId: number): void;
 }
 
 export interface NearbyInteractionHud {
@@ -235,6 +241,20 @@ export function tryNearbyInteraction(
       } else {
         hud.openPlantSheet(bedId);
       }
+      return true;
+    }
+  }
+  // The feast arm (Phase 12) sits below the garden-bed arm (a bed press keeps
+  // winning: farming your own plot is the deliberate act, the feast the
+  // opportunistic one) and above the escort-away last resort. The press just
+  // sends the entity id: an already-fed player's press near a feast answers
+  // through the sim's own farmDenied feast_eaten line (the (bp) doctrine: the
+  // sim is the refusing authority, the client never reads the ledger, which
+  // never crosses the wire anyway).
+  if (!player.dead) {
+    const feastId = nearestInteractableFeast(world.entities, player.pos);
+    if (feastId !== null) {
+      world.consumeFeast(feastId);
       return true;
     }
   }

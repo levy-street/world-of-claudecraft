@@ -69,6 +69,16 @@ const ITEMS: Record<string, ItemDef> = {
     soulbound: true,
     noDiscard: true,
   } as ItemDef,
+  // The placeable shared feast (Farming Phase 12): the feast FIELD is the
+  // classifier, mirrored by the plain-junk twin below that must stay on the
+  // use ladder.
+  feastItem: {
+    kind: 'junk',
+    name: 'Harvest Feast',
+    quality: 'rare',
+    feast: { charges: 10, durationTicks: 3600, dishItemId: 'evergarden_braised_greens' },
+  } as ItemDef,
+  plainJunk: { kind: 'junk', name: 'Cracked Fang', quality: 'common' } as ItemDef,
 };
 const lookup: ItemLookup = (id) => ITEMS[id];
 
@@ -166,6 +176,34 @@ describe('bagItemAction priority order', () => {
     expect(bagItemAction(ITEMS.sword, { ...NO_MODE, petFeed: true })).toBe('petFeedBlocked');
     expect(bagItemAction(ITEMS.questItem, NO_MODE)).toBe('discardQuest');
     expect(bagItemAction(ITEMS.potion, NO_MODE)).toBe('use');
+  });
+});
+
+describe('the placeable feast classification (Farming Phase 12)', () => {
+  it('classifies a def carrying the feast field as placeFeast, never plain use', () => {
+    expect(bagItemAction(ITEMS.feastItem, NO_MODE)).toBe('placeFeast');
+  });
+
+  it('keeps a plain junk def (no feast field) on the use ladder', () => {
+    // The twin that keeps the arm honest: without it, classifying EVERY junk
+    // item as placeFeast would pass the positive arm above.
+    expect(bagItemAction(ITEMS.plainJunk, NO_MODE)).toBe('use');
+  });
+
+  it('every window mode still outranks the feast arm (a vendor click sells it)', () => {
+    expect(bagItemAction(ITEMS.feastItem, { ...NO_MODE, tradeOpen: true })).toBe('trade');
+    expect(bagItemAction(ITEMS.feastItem, { ...NO_MODE, marketSell: true })).toBe('marketSell');
+    expect(bagItemAction(ITEMS.feastItem, { ...NO_MODE, vendorOpen: true })).toBe('vendorSell');
+    expect(bagItemAction(ITEMS.feastItem, { ...NO_MODE, bankDeposit: true })).toBe('bankDeposit');
+    expect(bagItemAction(ITEMS.feastItem, { ...NO_MODE, petFeed: true })).toBe('petFeedBlocked');
+  });
+
+  it('the REAL shipped harvest_feast def classifies as placeFeast (the wiring is live)', () => {
+    // Off the real catalog, so the classification cannot silently detach from
+    // the item the sim actually places (a renamed field would red here while
+    // every fixture arm above stayed green).
+    expect(CATALOG_ITEMS.harvest_feast).toBeDefined();
+    expect(bagItemAction(CATALOG_ITEMS.harvest_feast, NO_MODE)).toBe('placeFeast');
   });
 });
 

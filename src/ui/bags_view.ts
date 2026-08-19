@@ -36,6 +36,8 @@ export interface BagItemInfo {
   soulbound?: boolean;
   /** The catalog mount a kind:'mount' reins item owns (see MountItemDef). */
   mount?: string;
+  /** Truthy for a placeable shared feast (ItemDef.feast, Farming Phase 12). */
+  feast?: unknown;
 }
 
 /** The open-window modes that change what a bag click does. At most one is the
@@ -93,6 +95,7 @@ export type BagAction =
   | 'petFeedBlocked'
   | 'discardQuest'
   | 'equipBag'
+  | 'placeFeast'
   | 'use';
 
 /** The tooltip hint sub-line i18n key for a bag item (or '' for no hint). */
@@ -185,6 +188,13 @@ export function bagItemAction(
   // not discarded; only inert quest items fall through to the discard prompt.
   if (item.kind === 'quest') return item.use ? 'use' : 'discardQuest';
   if (item.kind === 'bag') return 'equipBag';
+  // A placeable feast (ItemDef.feast, Farming Phase 12) routes to the
+  // dedicated place verb instead of plain useItem, the mount-classification
+  // pattern: this pure core decides off the def, bags_window dispatches
+  // world.placeFeast(). Sits below every window mode above (a vendor click
+  // still sells it) and cannot overlap the quest/bag arms (the feast item is
+  // kind 'junk'); the sim owns every outcome, refusals included.
+  if (item.feast) return 'placeFeast';
   // A collected reins item falls through to 'use' like any other usable item:
   // clicking it summons that mount (sim useItem -> summonMountItem). There is no
   // picker to open any more.

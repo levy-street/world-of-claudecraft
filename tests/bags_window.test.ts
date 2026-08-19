@@ -379,6 +379,28 @@ describe('bags_window: touch peek + bank-cluster close', () => {
       /case 'use': \{[\s\S]{0,400}?if \(!item \|\| !this\.deps\.useGatherTool\(item\)\) \{[\s\S]{0,200}?this\.deps\.world\(\)\.useItem\(s\.itemId/,
     );
   });
+
+  it('routes the placeFeast case to world.placeFeast() exactly once, never useItem (Farming Phase 12)', () => {
+    // The classification half lives in bags_view.test.ts; this pins that the
+    // dispatch actually reaches the IWorldFarming verb. Comment-stripped
+    // (line comments first, then blocks) so prose naming useItem cannot
+    // trip the negative arm, sliced to the case's own break so the claim
+    // cannot ride the neighboring 'use' case.
+    const code = painter.replace(/\/\/[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
+    const start = code.indexOf('private runBagAction(');
+    expect(start).toBeGreaterThan(-1);
+    const body = code.slice(start, code.indexOf('\n  }\n', start));
+    const caseAt = body.indexOf("case 'placeFeast':");
+    expect(caseAt).toBeGreaterThan(-1);
+    const caseEnd = body.indexOf('break;', caseAt);
+    expect(caseEnd).toBeGreaterThan(caseAt);
+    const caseBody = body.slice(caseAt, caseEnd);
+    expect(caseBody).toContain('this.deps.world().placeFeast()');
+    expect(caseBody).not.toContain('useItem');
+    // Exactly one placeFeast call in the whole dispatch: the case is the one
+    // client entry point for the verb (the reachability suite pins the file).
+    expect(body.split('.placeFeast(').length - 1).toBe(1);
+  });
 });
 
 describe('bags_window: right-click uses, dragging destroys/equips', () => {

@@ -81,6 +81,30 @@ describe('convertHusks client reachability', () => {
   });
 });
 
+describe('placeFeast client reachability', () => {
+  // The Phase 12 place verb: the bag-row classification (bags_view
+  // 'placeFeast') dispatched from bags_window is its one client control.
+  it('has at least one call site under src/game or src/ui', () => {
+    const sites = clientCallSites('placeFeast');
+    expect(
+      sites.length,
+      `expected a client call site of .placeFeast( under ${SCAN_ROOTS.join(' or ')}; found: [${sites.join(', ')}]`,
+    ).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe('consumeFeast client reachability', () => {
+  // The Phase 12 eat verb: the interact funnel's feast arm
+  // (src/game/nearby_interaction.ts) is its one client control.
+  it('has at least one call site under src/game or src/ui', () => {
+    const sites = clientCallSites('consumeFeast');
+    expect(
+      sites.length,
+      `expected a client call site of .consumeFeast( under ${SCAN_ROOTS.join(' or ')}; found: [${sites.join(', ')}]`,
+    ).toBeGreaterThanOrEqual(1);
+  });
+});
+
 // Slice one uniquely-anchored block out of a comment-stripped source. Every
 // anchor is asserted to occur EXACTLY once (a duplicated anchor would make
 // the slice ambiguous and the containment claim silently weaker), and the
@@ -149,6 +173,8 @@ describe('the journey script stays layer-honest', () => {
       'sim.plantCrop',
       'sim.harvestCrop',
       'sim.convertHusks',
+      'sim.placeFeast',
+      'sim.consumeFeast',
       'sim.acceptQuest',
       'sim.turnInQuest',
     ]) {
