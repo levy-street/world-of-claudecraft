@@ -16,6 +16,7 @@ import {
   type FarmBedSeat,
   FarmPatchVisuals,
   type FarmPlotSource,
+  FEAST_SHADOW_CAP,
   farmPatchesPreloadInternalsForTest,
 } from '../src/render/farm_patches';
 import {
@@ -263,7 +264,7 @@ describe('the placed feast surface (Phase 12)', () => {
     ).toBeUndefined();
   });
 
-  it('fires the placement flourish exactly once per feast appearance', () => {
+  it('fires the placement flourish exactly once per feast appearing after the first pass', () => {
     const scene = new THREE.Scene();
     const { seats } = buildFarmPatchProps(SEED, FARM_PATCHES);
     const vfx = recordingVfx();
@@ -288,6 +289,83 @@ describe('the placed feast surface (Phase 12)', () => {
     state.entities.set(502, feastEntity(502, { pos: { x: -4, y: 0, z: 20 } } as Partial<Entity>));
     visuals.sync(source, READ_DT);
     expect(vfx.calls).toEqual(['puff', 'burst', 'puff', 'burst']);
+  });
+
+  it('a rebuild registers standing feasts silently: no flourish replay, tables still drawn', () => {
+    // A graphics-settings rebuild constructs a fresh FarmPatchVisuals, and a
+    // login does too: every feast already standing would replay its "just
+    // placed" burst at once. The FIRST pass registers silently; a feast
+    // appearing on any LATER pass keeps its flourish.
+    const scene = new THREE.Scene();
+    const { seats } = buildFarmPatchProps(SEED, FARM_PATCHES);
+    const { state, source } = fakeWorld([]);
+    state.entities.set(501, feastEntity(501));
+
+    const first = recordingVfx();
+    const visuals = new FarmPatchVisuals(scene, seats, first.sink);
+    visuals.sync(source, READ_DT);
+    expect(
+      scene.children.find((c) => c.name === 'farmFeast:501'),
+      'the standing table still draws',
+    ).toBeDefined();
+    expect(first.calls, 'no flourish for a table that predates this mirror').toEqual([]);
+    visuals.dispose();
+
+    // The rebuild: a fresh instance over the same standing world.
+    const second = recordingVfx();
+    const rebuilt = new FarmPatchVisuals(scene, seats, second.sink);
+    rebuilt.sync(source, READ_DT);
+    expect(
+      scene.children.find((c) => c.name === 'farmFeast:501'),
+      'the rebuild re-draws the table',
+    ).toBeDefined();
+    expect(second.calls, 'and replays no flourish').toEqual([]);
+
+    // The positive control: a genuinely new feast on a later pass flourishes.
+    state.entities.set(502, feastEntity(502, { pos: { x: -4, y: 0, z: 20 } } as Partial<Entity>));
+    rebuilt.sync(source, READ_DT);
+    expect(second.calls).toEqual(['puff', 'burst']);
+  });
+
+  it('presence is never culled and only FEAST_SHADOW_CAP tables cast shadows', () => {
+    // The shadow budget: casting is the expensive cosmetic half (one shadow
+    // -map draw per caster) and sheds in a packed hub; PRESENCE is actionable
+    // (you can eat a feast) and never sheds. The literal pin: a cap drift is
+    // a deliberate re-pin, never an accident.
+    expect(FEAST_SHADOW_CAP).toBe(8);
+    const scene = new THREE.Scene();
+    const { seats } = buildFarmPatchProps(SEED, FARM_PATCHES);
+    const visuals = new FarmPatchVisuals(scene, seats, recordingVfx().sink);
+    const { state, source } = fakeWorld([]);
+
+    const N = FEAST_SHADOW_CAP + 4;
+    for (let i = 0; i < N; i++) {
+      state.entities.set(
+        700 + i,
+        feastEntity(700 + i, {
+          pos: { x: i * 6, y: 0, z: 30 },
+        } as Partial<Entity>),
+      );
+    }
+    visuals.sync(source, READ_DT);
+
+    const groups = scene.children.filter((c) => c.name.startsWith('farmFeast:'));
+    expect(groups, 'every feast in scope draws').toHaveLength(N);
+    const casts = (g: THREE.Object3D): boolean => {
+      let found = false;
+      g.traverse((o) => {
+        if ((o as THREE.Mesh).isMesh && (o as THREE.Mesh).castShadow) found = true;
+      });
+      return found;
+    };
+    expect(groups.filter(casts), 'exactly the budget casts shadows').toHaveLength(FEAST_SHADOW_CAP);
+
+    // A despawned caster refills the budget: the next table in line gains it.
+    state.entities.delete(700);
+    visuals.sync(source, READ_DT);
+    const after = scene.children.filter((c) => c.name.startsWith('farmFeast:'));
+    expect(after).toHaveLength(N - 1);
+    expect(after.filter(casts)).toHaveLength(FEAST_SHADOW_CAP);
   });
 
   it('ignores non-feast entities and disposes feasts with the module', () => {

@@ -309,8 +309,9 @@ describe('item webp icons', () => {
     // added its two supplies (compost and the growth tonic), the crop-ladder
     // phase added its seven crop families (21 ids: seed, produce, fine twin
     // per crop), the hoe phase added its four ladder rungs, the Phase 6
-    // economy-hooks phase added its eight farm dishes, and the Phase 11
-    // well-fed phase added its four buff dishes, all under the same
+    // economy-hooks phase added its eight farm dishes, the Phase 11
+    // well-fed phase added its four buff dishes, and the Phase 12 shared
+    // feast added the harvest_feast placeable, all under the same
     // reasoning: all are dormant online (no faucet for any exists yet)
     // and their art is scheduled as its own later phase. It must fall back to
     // 0 as that art lands.
