@@ -30,6 +30,13 @@ fallback art for title deeds (bt); Harvestmaster joined RELIQUARY_HORIZON_TITLES
 (catalog pins 341/376/41). The farming_session golden moved once, isolated
 (11 to 16 draws, md5 83c3478142deabbffbf23912575873e9).
 
+QA SWEEP (2026-08-19, the Phase 10 QA close): the finder-only cue rules moved to
+the src/ui/gather_rare_event_feedback.ts pure core (hud.ts ceiling lowered again,
+19230 to 19220), the golden belief reads != null, and the golden-WIN parity beat
+plus the tier-3 seed-back paying-band beat are DEFERRED to Phase 11 as state.md
+(bw) (a QA moves no golden, the deviation (z) precedent). Details in
+docs/farming/phase-10-qa.md's QA EXECUTED block and progress.md.
+
 V0.39.0 SYNC NOTE (2026-08-17, the seventeenth absorb, recorded during Phase 9): the
 release's castles feature re-pinned tests/deeds_content.test.ts to 273 deeds / 3155
 total renown / 11 exploration titles (two new walk-in castle visit deeds,

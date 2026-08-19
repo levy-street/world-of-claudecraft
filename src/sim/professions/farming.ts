@@ -18,11 +18,13 @@
 //                               IDENTICAL UNDER EVERY KNOB COMBINATION
 //   plant, every deny arm ..... 0 (the knob-payment denies included)
 //   harvest, tier 1/2 crop .... EXACTLY 1 draw, the golden-harvest roll, on
-//                               BOTH outcomes (survived and withered, toniced
+//                               EVERY resolving arm (survived, withered, AND
+//                               the defensive retired-crop arm; toniced
 //                               included)
 //   harvest, tier 3/4 crop .... EXACTLY 2 contiguous draws, the seed-back
-//                               roll then the golden-harvest roll, on BOTH
-//                               outcomes
+//                               roll then the golden-harvest roll, on EVERY
+//                               resolving arm (a retired id reads tier 1, so
+//                               that arm spends the golden draw alone)
 //   harvest, every deny arm ... 0
 //   convert_husks ............. 0 (both outcomes)
 //   the farm objective credit . 0 (quests/quest_credit.ts, pure state and
@@ -705,9 +707,11 @@ function insertPlotSorted(plots: Map<string, PlotState>, bedId: string, plot: Pl
 /** Take a finished plot out of a bed. Draws ZERO rng on every deny path: the
  *  outcome was rolled at plant time and the yield expands deterministically
  *  from the stored seed. A resolving harvest spends its action-time rolls in
- *  the one draw block below, on BOTH outcomes: a tier 1/2 harvest draws
- *  EXACTLY ONE (the golden-harvest roll), a tier 3/4 harvest EXACTLY TWO
- *  contiguous (the seed-back roll, then the golden-harvest roll).
+ *  the one draw block below, on EVERY resolving arm (survived, withered, and
+ *  the defensive retired-crop arm): a tier 1/2 harvest draws EXACTLY ONE
+ *  (the golden-harvest roll), a tier 3/4 harvest EXACTLY TWO contiguous (the
+ *  seed-back roll, then the golden-harvest roll; a retired id reads tier 1,
+ *  so that arm spends only the golden draw).
  *
  *  NO BUSY GATE, unlike plantCrop. Harvesting is instant (there is no cast to
  *  conflict with) and it is the SECOND of the two visits a crop cycle ever
@@ -918,10 +922,17 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
   // an authored patch (impossible today) could never pay a silent windfall
   // (the single-guard rule from the phase review). The finder receives their
   // own zone line because the fanout filters recipients by zoneAt(player)
-  // while this id is authored: the two agree for every shipped bed, pinned
-  // by the zone-containment arm in tests/farm_patch_placement.test.ts.
+  // while this id is authored: the two agree for every shipped bed AND for
+  // every spot a harvester can stand, pinned by the zone-containment arm and
+  // the harvest-range halo arm (every point within INTERACT_RANGE of a bed
+  // still resolves the bed's authored zone) in
+  // tests/farm_patch_placement.test.ts.
   const zoneId = farmBedZoneId(bedId);
-  const golden = goldenFlavor !== null && zoneId !== undefined;
+  // `!= null` on purpose (not `!== null`): gatherRareEventFlavor's exhaustive
+  // switch returns undefined for an out-of-union runtime value, and a strict
+  // null check would read that as a WIN. Unreachable with the shipped
+  // literals; belt for the type lie.
+  const golden = goldenFlavor != null && zoneId !== undefined;
   const count = golden ? armed.count * GATHER_RARE_EVENT_YIELD_MULT : armed.count;
   const fine = golden ? armed.fine * GATHER_RARE_EVENT_YIELD_MULT : armed.fine;
   // Whether every pick upgraded (THE ALL-FINE COLLAPSE, documented above the

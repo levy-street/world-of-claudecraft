@@ -35,6 +35,18 @@ supersede this file's older wording below):
   at 16 draws; hud.ts 19227/19230 (ceiling LOWERED via the ability-tooltip
   extraction); DEED_IMAGE_IDS 272, DEED_ART_PENDING 8.
 
+QA EXECUTED (2026-08-19, PASS-WITH-FOLLOWUPS; full record in progress.md, ledger in
+state.md): the audit found no live defect; two BLOCKING coverage gaps closed
+test-first (the golden signed-grant bag paths; the finder-only sting pins rebuilt as
+the src/ui/gather_rare_event_feedback.ts pure core with a behavioral quadrant suite,
+hud.ts ceiling LOWERED again 19230 to 19220, file 19217); the golden belief hardened
+to != null; fresh mutations 14/14 killed named; the two VERIFY items closed
+(test:browser 133 green standalone, perf:tour exit 0 in the 9b swiftshader shape).
+Baselines after the QA: unchanged except hud.ts 19217/19220. Deferred as state.md
+(bw) by the deviation (z) precedent: the golden-WIN parity beat and the tier-3
+seed-back paying-band beat both move a golden, so Phase 11 extends the scenario
+deliberately.
+
 ### QA Starter Prompt
 
 ```

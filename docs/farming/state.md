@@ -2413,7 +2413,49 @@ question does not arise (farming has no station).
   the ability-tooltip extraction fixed a latent NaN (an absent spellHaste
   on a mirrored entity now reads 0, tests/ability_tooltip_lines.test.ts
   pins it), and the extraction module registered in UI_PURE_CORES via the
-  BARE_NAMED escape hatch.
+  BARE_NAMED escape hatch. QA ADDENDUM (2026-08-19): whenever the deferred
+  golden field-note cell lands, server/character_sheet.ts's
+  RELIQUARY_MARK_ENGLISH must gain its row in the SAME change
+  (sheetRelicRecentText returns null for an unknown id and the /c/ SSR
+  page silently drops the entry), and the reliquary field-note literal in
+  tests/reliquary_content.test.ts now documents the deliberate absence at
+  the allowlist itself.
+  Phase 10 QA (2026-08-19, verify celebrations; merge hash in
+  progress.md): PASS-WITH-FOLLOWUPS, no live defect. The audit re-proved
+  the five emphases by running (totals arithmetic from content, zero
+  golden movement, a live multi-observer fanout probe, a live-client HUD
+  replay of the probed winner stream, the waiver/art coherence) and
+  closed two BLOCKING coverage gaps test-first: the golden signed-grant
+  bag paths (full-bags and last-free-slot winner arms: totals conserved,
+  only the signature truncates, the fine grade reads the bags the base
+  grade mutated) and the finder-only sting pins, rebuilt as the
+  src/ui/gather_rare_event_feedback.ts pure core (behavioral quadrant
+  suite; the satisfies-Record fifth-flavor tsc tripwire moved into the
+  shipping module; comment-stripped count-anchored glue pins over
+  hud.ts; ceiling LOWERED 19230 to 19220). Hardenings: the golden belief
+  reads != null (the exhaustive switch returns undefined off-union and
+  the strict check would have paid a windfall on it); the draw-contract
+  comments name all three resolving arms (the retired-crop arm spends
+  the golden draw too); the announce-after-grants order, the
+  armed-expansion five-fold crossing, the thornpeak announce zone, the
+  farm:planted deny sweep, the harvest-range halo, and the
+  farmBedZoneId authorship sweep are pinned; the (bo) honesty-arm seed
+  list derives from the crop catalog. Fresh mutations 14/14 killed
+  named. perf:tour exit 0 and test:browser 133 green closed the phase's
+  two VERIFY items. DECLINED: the types.ts gatherRareEvent comment
+  reflow (cosmetic; a sim-content comment edit stales the
+  portrait-manifest evidence family for zero behavioral value).
+  (bw) GOLDEN-WIN PARITY COVERAGE DEFERRED TO PHASE 11 (the deviation (z)
+  precedent: a QA moves no golden): the farming_session re-record left
+  every golden roll a recorded LOSS, so the WIN path (five-fold signed
+  grants, the crop-source fanout, the mark) reaches no golden digest,
+  and the tier-3 seed-back beat landed in the zero band (the
+  scenario-level grant proof degraded to 0 === 0). Phase 11 extends the
+  scenario deliberately: a seed-searched golden-WIN beat plus a
+  paying-band seed-back beat, re-recorded isolated with the (am)
+  classification discipline. Unit-level coverage carries both paths
+  meanwhile (the winner arms and band arms in
+  tests/professions_farming.test.ts).
 
 ## OPEN items (maintainer decisions or later-phase calls, never guess)
 

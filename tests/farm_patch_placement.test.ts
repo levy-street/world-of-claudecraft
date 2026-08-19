@@ -26,7 +26,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
-import { FARM_PATCHES } from '../src/sim/content/farm_patches';
+import { FARM_PATCHES, farmBedZoneId } from '../src/sim/content/farm_patches';
 import {
   CAMPS,
   GATHER_NODES,
@@ -665,6 +665,52 @@ describe('farm patch placement: every bed sits on ground a player can work', () 
         WORLD_MAX_X,
       );
     }
+  });
+
+  it('the harvest-range halo: every spot a harvester can stand shares the bed zone', () => {
+    // The golden-announce belief in professions/farming.ts: the finder
+    // receives their own zone line because the fanout filters recipients by
+    // zoneAt(player) while the announce carries the bed's AUTHORED zone. The
+    // containment arm above proves the bed itself agrees; a harvester can
+    // stand up to INTERACT_RANGE away, so this arm proves the whole standing
+    // halo agrees too. Eight compass points at exactly INTERACT_RANGE; a bed
+    // authored within one reach of a zone boundary reds here instead of
+    // silently costing its finder the celebration line.
+    const d = INTERACT_RANGE;
+    const diag = d / Math.SQRT2;
+    const offsets: [number, number][] = [
+      [d, 0],
+      [-d, 0],
+      [0, d],
+      [0, -d],
+      [diag, diag],
+      [diag, -diag],
+      [-diag, diag],
+      [-diag, -diag],
+    ];
+    for (const bed of BEDS) {
+      for (const [dx, dz] of offsets) {
+        expect(
+          zoneAt(bed.x + dx, bed.z + dz).id,
+          `${bed.id}'s halo point (${bed.x + dx},${bed.z + dz}) crosses out of ${bed.zoneId}`,
+        ).toBe(bed.zoneId);
+      }
+    }
+  });
+
+  it('farmBedZoneId answers by AUTHORSHIP: every bed to its patch zone, non-beds to undefined', () => {
+    // The harvest-side celebration hooks resolve a bed's zone through this
+    // lookup, never through geometry (the farm_patches.ts contract). Sweep
+    // every authored bed against its patch row, and pin the undefined arm so
+    // a geometry-flavored reimplementation cannot quietly return a zone for
+    // an id that is not a bed.
+    for (const patch of FARM_PATCHES) {
+      for (const bed of patch.beds) {
+        expect(farmBedZoneId(bed.id), bed.id).toBe(patch.zoneId);
+      }
+    }
+    expect(farmBedZoneId('not_a_real_bed')).toBeUndefined();
+    expect(farmBedZoneId('')).toBeUndefined();
   });
 
   it('the zone arm rejects a boundary z the inclusive band check would allow', () => {

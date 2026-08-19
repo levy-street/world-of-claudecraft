@@ -307,6 +307,9 @@ describe('announceGatherRareEvent: soft zone fanout + dormant deed mark', () => 
     const finder = addPlayer(1, 'Alba', 0);
     addPlayer(2, 'Bystander', 0); // eastbrook_vale, receives the fanout
     addPlayer(3, 'FarAway', 340); // mirefen_marsh: must not receive
+    // Instance space: the crop path proves the exclusion itself rather than
+    // inheriting it from the node arm above (same predicate, own proof).
+    addPlayer(4, 'Delver', 0, DUNGEON_X_THRESHOLD + 100);
 
     announceGatherRareEvent(
       ctx,

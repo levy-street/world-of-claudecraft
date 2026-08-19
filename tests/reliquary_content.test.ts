@@ -1747,6 +1747,12 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
   it('field notes reuse visited gather_event:* namespaces', () => {
     const page = RELIQUARY_PAGES_BY_ID.professions_field_notes;
     // Literal pin matches deed visit marks (col_pristine_vein etc.).
+    // DELIBERATELY ABSENT: gather_event:golden_harvest (the farming rare
+    // event) has NO field-note cell, a ledgered deferral (state.md (bv));
+    // noteReliquaryMark no-ops it by this very allowlist, negative-arm
+    // pinned in tests/gather_rare_events.test.ts and
+    // tests/professions_farming.test.ts. A curator adding a crop-shaped
+    // flavor decides its cell consciously here.
     expect(markRelicIds(page)).toEqual([
       'gather_event:pristine_vein',
       'gather_event:ancient_heartwood',

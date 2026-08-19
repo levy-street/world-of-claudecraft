@@ -47,6 +47,14 @@ describe('describeAbilitySummary', () => {
     const line = describeAbilitySummary(resolved(ABILITIES.fireball, { cost: 0 }), 'mana');
     expect(line).toBe('1.5 sec cast');
   });
+
+  it('renders the Wrack cost line for a ruin-spending ability (Rain of Fire)', () => {
+    // rain_of_fire: 45 mana, ruinCost 3, instant, no cooldown
+    // (src/sim/content/classes.ts). The QA closed this branch: deleting the
+    // ruinCost push shipped green before this arm existed.
+    const line = describeAbilitySummary(resolved(ABILITIES.rain_of_fire), 'mana');
+    expect(line).toBe('45 Mana · 3 Wrack · Instant');
+  });
 });
 
 describe('abilityCastLine', () => {
@@ -60,6 +68,16 @@ describe('abilityCastLine', () => {
     expect(abilityCastLine(resolved(ABILITIES.fireball), 0.5)).toBe('1 sec cast');
     // A net-negative haste floors at 0 exactly like the sim's spellHasteMult.
     expect(abilityCastLine(resolved(ABILITIES.fireball), -0.5)).toBe('1.5 sec cast');
+  });
+
+  it('renders the channel line, hasted by the same divisor (Aether Darts)', () => {
+    // arcane_missiles: channel { duration: 3 } (src/sim/content/classes.ts).
+    // The QA closed this branch: deleting the channel arm (every channel
+    // tooltip degrading to Instant) and dropping the /h haste division both
+    // shipped green before these two pins.
+    expect(abilityCastLine(resolved(ABILITIES.arcane_missiles))).toBe('Channeled (3 sec)');
+    // 3 / (1 + 0.5) = 2: a hasted channel shortens exactly like a cast.
+    expect(abilityCastLine(resolved(ABILITIES.arcane_missiles), 0.5)).toBe('Channeled (2 sec)');
   });
 });
 
@@ -86,8 +104,57 @@ describe('abilityRequirementLines', () => {
     expect(lines).not.toContain('Requires stealth');
   });
 
-  it('renders no lines for a plain unconditional ability', () => {
-    expect(abilityRequirementLines(ABILITIES.fireball)).not.toContain('Requires stealth');
+  it('renders the Skulduggery stealth-bypass wording for a subtlety rogue', () => {
+    expect(abilityRequirementLines(ABILITIES.ambush, 'subtlety')).toContain(
+      'Requires stealth (not needed at 3 Gloam or during the Shadow Veil)',
+    );
+  });
+
+  it('renders exactly the enemy-target line for a plain hostile nuke', () => {
+    // The exact array, not a not-contains (the QA hardening: the old arm
+    // only denied the stealth line, which fireball could never produce).
+    expect(abilityRequirementLines(ABILITIES.fireball)).toEqual(['Enemy target']);
+  });
+
+  it('maps every requirement key to its own distinct English row', () => {
+    // Table-driven over synthesized flags on a real def, one flag per row,
+    // so collapsing any switch case into the selfOnly default (or swapping
+    // two cases) reds on its exact English. Flags come from the resolver's
+    // truth table (ability_requirement_keys.ts).
+    const base = ABILITIES.fireball;
+    const rows: { def: AbilityDef; line: string }[] = [
+      {
+        def: { ...base, requiresForm: 'bear' } as AbilityDef,
+        line: 'Requires Bear Form',
+      },
+      { def: { ...base, spendsCombo: true } as AbilityDef, line: 'Consumes combo points' },
+      {
+        def: { ...base, requiresDodgeProc: true } as AbilityDef,
+        line: 'Only usable after the target dodges',
+      },
+      {
+        def: { ...base, requiresOutOfCombat: true } as AbilityDef,
+        line: 'Requires being out of combat',
+      },
+      {
+        def: { ...base, executeThreshold: 0.2 } as AbilityDef,
+        line: 'Requires target below 20% health',
+      },
+      {
+        def: { ...base, onNextSwing: true } as AbilityDef,
+        line: 'Activates on your next swing',
+      },
+      { def: { ...base, offGcd: true } as AbilityDef, line: 'Off the global cooldown' },
+      {
+        def: { ...base, targetType: 'friendly' } as unknown as AbilityDef,
+        line: 'Friendly target',
+      },
+    ];
+    for (const row of rows) {
+      expect(abilityRequirementLines(row.def), row.line).toContain(row.line);
+    }
+    // Distinctness: no two rows collapsed onto one string.
+    expect(new Set(rows.map((r) => r.line)).size).toBe(rows.length);
   });
 });
 
