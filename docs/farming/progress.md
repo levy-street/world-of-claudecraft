@@ -3140,8 +3140,9 @@ docs/farming/phase-12-shared-feast.md); the wellfed parity beat rides
 its feast scenario by the recorded, tick-phase-enriched deferral.
 
 ### Phase 12
-Status: DONE (2026-08-19, local-only per D22; merge hash recorded below after
-the --no-ff merge into feature/farming-plan).
+Status: DONE (2026-08-19, local-only per D22; merged --no-ff into
+feature/farming-plan as 71010cf82a, phase tip 1b33789ba4; the phase branch
+and the four agent worktrees deleted).
 
 ACCEPTANCE (the phase file's STEP 5 list, with check states):
 - [x] The (bo)/Live-surface reconciliation decided, documented as deviation
