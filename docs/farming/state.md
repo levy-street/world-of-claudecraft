@@ -5,7 +5,7 @@ decisions. If a phase file contradicts this file, this file wins and the phase f
 gets swept in the same pass (amend the QA twin too, always).
 
 Current phase: Phase 11 (well-fed food) DONE 2026-08-19, local-only per D22
-(branch fix/farming-phase-11-well-fed-food, eight commits, merge hash in
+(branch fix/farming-phase-11-well-fed-food, nine commits, merge hash in
 progress.md). ItemDef.wellfed ships beside elixir as the D15 mirror, minted
 by src/sim/wellfed.ts at COMPLETION of the 18s sit-restore (deviation (bx):
 the timing decision; an interrupted meal forfeits; food-only kind guard),
