@@ -3408,10 +3408,23 @@ export interface GroundObjectDef {
 // issue is content plus visibility only, no harvest logic (see G3).
 export type GatherNodeType = 'ore' | 'wood' | 'herb';
 
-// Rare gather event flavors (Professions 2.0), one per node family:
+// Rare gather event flavors (Professions 2.0), one per gather family:
 // ore rolls pristine_vein, wood rolls ancient_heartwood, herb rolls
-// moonlit_bloom (professions/gather_events.ts gatherRareEventFlavor).
-export type GatherRareEventFlavor = 'pristine_vein' | 'ancient_heartwood' | 'moonlit_bloom';
+// moonlit_bloom, and a farm-bed harvest rolls golden_harvest (the farming
+// celebrations phase, state.md D12), all mapped by
+// professions/gather_events.ts gatherRareEventFlavor.
+export type GatherRareEventFlavor =
+  | 'pristine_vein'
+  | 'ancient_heartwood'
+  | 'moonlit_bloom'
+  | 'golden_harvest';
+
+// What rolled a rare event: a gather-node family, or a farm bed ('crop').
+// Widens the gatherRareEvent payload's nodeType leaf WITHOUT conscripting
+// 'crop' into GatherNodeType itself: farm beds are deliberately not gather
+// nodes (no GATHER_NODES row, no placement suite, no node tooltip family;
+// the fishing precedent).
+export type GatherRareEventSource = GatherNodeType | 'crop';
 
 export interface GatherNodeDef {
   id: string;
@@ -6517,8 +6530,11 @@ export type SimEvent = { pid?: number } & (
   // the null row resolves, draw-free.
   | { type: 'fishingEmptyHook'; pid: number; zoneId: string; band: 0 | 1 | 2 }
   // Rare gather event (Professions 2.0): a harvest struck a pristine
-  // vein / ancient heartwood / moonlit bloom. Soft zone broadcast: one copy is
-  // emitted per player currently in the node's zone, `pid` being the RECIPIENT
+  // vein / ancient heartwood / moonlit bloom, or a farm bed paid a golden
+  // harvest (nodeType 'crop', the farming celebrations phase). Soft zone
+  // broadcast: one copy is
+  // emitted per player currently in the source's zone, `pid` being the
+  // RECIPIENT
   // (the chat fanout idiom); finderPid/finderName identify the harvester. Ids
   // plus values only, text-free on purpose: the client renders its own
   // localized line off `flavor` (the gatherEvent.* keys). The HUD reads only
@@ -6532,7 +6548,7 @@ export type SimEvent = { pid?: number } & (
       finderName: string;
       finderPid: number;
       zoneId: string;
-      nodeType: GatherNodeType;
+      nodeType: GatherRareEventSource;
       itemId: string;
     }
   // Rift boss lethal death zone placed (deathZoneCast / deathZoneStrike mechanic).

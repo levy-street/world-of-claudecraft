@@ -27,6 +27,7 @@
 | Phase 9 QA | done (FAIL on the go-live acceptance, scope stop; PASS on the phase's own diff) | 2026-08-17 | 2026-08-17; branch fix/farming-phase-09-qa (eighteenth absorb f4ca0f7000 first), merged --no-ff as 59584a800a; 1 BLOCKING scope finding (no player verb plants or harvests, state.md (bn)) plus the tier 3/4 seed bootstrap hole ((bo)); 0 BLOCKING on the diff across nine lanes; the live-client journey walked 39 checkpoints green at all four hubs; 16 of 16 new mutants killed; the QA fixes are the husk-trade focus restore, the stale-comment sweep, and the coverage pins |
 | Nineteenth absorb (v0.39.0 round-2 sync mid-phase) | DONE 2026-08-18 | fix/farming-sync-v0.39.0-r2, merge b9a025b2ee of tip 7b45fdb9a9 (285 commits, 833 files, 168-file intersection: the D22 triple-digit rule) | Heals: sim.ts and main.ts extraction (mech_chroma_ownership, turnstile_gate), renderer merge-rule re-pin 13774, classified golden re-record (+4 farmers vs the release recordings, +3 practice dummies in farming_session, zero unexplained leaves), terrain fixture re-record (29 pad-local points), Eastbrook and portrait re-mints per (al), lock-rig rebuild for the whole-slot rework; 4-lane release-merge audit + cross-platform APPROVE + architecture clean move + qa-checklist; details in the notes block |
 | Phase 9b (the bed verbs) | DONE 2026-08-19 | fix/farming-phase-09b-bed-verbs off 6981105f27 (the nineteenth-absorb merge); merge hash in the notes tail | The go-live is PLAYER-COMPLETE: the interact-key bed arm harvests and the plant sheet plants on desktop, touch, and gamepad; q_farm_intro completes through the client (journey 17/17 on the final tree, desktop and 844x390 landscape touch); (bn) CLOSED, (bp) offer-gate refinement; reviews: cross-platform APPROVE, frontend pass with all seven fixes taken, coverage B1-B3 closed and S1-S7 landed, gate-integrity PASS, qa-checklist in the notes; mutations 10/10 killed named |
+| Phase 10 (celebrations) | DONE 2026-08-19 | fix/farming-phase-10-celebrations off 0afde346ab (release tip ea9377db8e already absorbed, no new absorb); merge hash in the notes tail | golden_harvest as the fourth gatherRareEvent flavor (1/90 shared constant, five-fold signed yield, one announce path, single HUD case); seven D13 deeds + the Harvestmaster title (280/3190/43); the ui_farm_golden sting end to end; hud.ts ceiling LOWERED 19352 to 19230 via the ability-tooltip extraction; farming_session re-recorded once isolated (16 draws, md5 83c34781); deviations (br)-(bv): the bed-tier premise probed false (all four chronicles earnable), prog_farming_100 dormant under a recorded waiver, the title-shelf committed-crest rule; reviews 0 BLOCKING with the content lane resolved via the waiver, qa-checklist READY; mutations 13/13 killed named |
 | Phase 9b QA (the bed verbs audit) | DONE 2026-08-19 (PASS-WITH-FOLLOWUPS) | fix/farming-phase-09b-qa off c9075785ef (twentieth absorb ea9377db8e first: one release commit, i18n fills, pending.ts regen-resolved); merge hash in the notes tail | The fresh pass re-proved the go-live independently: journey 17/17 desktop AND mobile through the real controls, 18 desktop manual probes (focus trap, keydown guard with a jump positive control, Esc focus restore, the locked-seed deny with the sim's own toast, the ja_JP locale switch, the relocalize arm) plus the mobile sizing (all knobs 44px) and the contrast eyeball (8.95:1); negative space proven by RUNNING the pins (zero golden movement, every baseline held); one real behavior fix (the ctx.error dead/busy denies stranded the Plant control: the error-toast re-arm, deviation (bq)) plus the report_window rename under the cold-painter sweep with its first suite, safe-area caps, and eleven hardened pins; mutations 11/11 killed named (two shipped survivors diagnosed as real gaps, fixed, re-proven); reviews: 4 Workflow lanes + cross-platform APPROVE + test-coverage approve-with-followups + qa-checklist in the notes |
 | Phase 10 (celebrations) | not started | | |
 | Phase 10 QA | not started | | |
@@ -2582,8 +2583,98 @@ MERGE: fix/farming-phase-09b-qa merged --no-ff into feature/farming-plan
 as 710c03106424b68c49902421ab6c21ff4d37d5d1 (QA tip e456ac368c; the
 branch deleted).
 
-### Phase 10
-(not started)
+### Phase 10 (2026-08-19, celebrations, local-only per D22)
+
+THE WOULD-BE PR BODY. Farming gets its lottery moment and its permanent
+records. golden_harvest joins the gatherRareEvent union as the fourth
+flavor: rolled unconditionally inside harvestCrop's one contiguous draw
+block, AFTER the seed-back roll (every probed band held), via the SHARED
+GATHER_RARE_EVENT_CHANCE (1 in 90) and GATHER_RARE_EVENT_YIELD_MULT (5),
+never a farming copy. The new draw contract: plant 2 (unchanged), harvest
+tier 1/2 EXACTLY 1, tier 3/4 EXACTLY 2 contiguous, every deny 0; the win
+applies only on the survived branch (five-fold count AND fine after the
+stored-seed expansion, signed instances up to fit with the plain
+overflow-tolerant remainder, zone-announced through the one
+announceGatherRareEvent path with structural source {zoneId, type:'crop'}).
+One belief gates win, announce, and deed mark; the announce names the
+all-fine collapsed item id. The payload's nodeType leaf widened to
+GatherRareEventSource (GatherNodeType | 'crop') so farm beds never join
+GatherNodeType; no new SimEvent, IWorld member, command, or wire field.
+Celebration marks: farm:planted at plant success, farm:<zone> on a
+survived harvest (onCropHarvestedForDeeds over FARM_CHRONICLE_ZONES, the
+ZONE_FISH template; 'farm' registered in VISITED_MARK_NAMESPACES with a
+save/load round-trip arm). Seven D13 deeds: prog_first_planting ("Sow It
+Begins", 5), chr_vale/marsh/peaks/evergarden_first_harvest (5 each),
+col_golden_harvest ("Golden Harvest", 0, visible, the col_pristine_vein
+family), prog_farming_100 ("Harvestmaster", 10, gathering farming 100,
+title 'Harvestmaster'). Totals re-pinned 280 deeds / 3190 renown / 43
+titles + the frozen sha; the amount-aware farming guard arm the repo's own
+caveat demanded; the (bo) honesty arm (self-clearing over NPC vendorItems +
+HEROIC_VENDOR_STOCK + DELVE_SHOPS). Harvestmaster joined
+RELIQUARY_HORIZON_TITLES (shape pins 341/376/horizons_titles 41) and its
+crest shipped COMMITTED (the title shelf forbids fallback art, deviation
+(bt)); the six untitled deeds ride DEED_ART_PENDING with icon briefs. The
+HUD case stays single (all four flavors, epic color, finder-only
+achievement plus the layered finder-only ui_farm_golden sting on the
+feedback gate; manifest family committed together, sfx:check green). i18n:
+gatherEvent.goldenHarvest English + the five M16 non-Latin fills; deed
+text stays English-only per the release-refill protocol. hud.ts SHRANK:
+the ability-tooltip line builders extracted to
+src/ui/ability_tooltip_lines.ts (registered bare-named pure core, direct
+suite, a latent NaN spellHaste read fixed), ceiling LOWERED 19352 to
+19230, final 19227. farming_session re-recorded ONCE in an isolated commit
+(11 to 16 draws, five harvests times one roll, no golden win on seed 1;
+md5 9a8fefa5 to 83c3478142deabbffbf23912575873e9); zero other goldens
+moved.
+
+MAINTAINER FLAGS: (1) the (bs) dormancy waiver in docs/design/deeds.md
+(prog_farming_100 + feat_book_complete parked until D11); (2) the D12
+cadence read: 1/90 per HARVEST is far rarer in wall-clock terms than 1/90
+per node swing, and withered harvests burn rolls, so the realized
+celebration rate is 1/90 times survival; retune is one shared-constant
+decision away, deliberately not taken; (3) the second v0.39.0 deed-locale
+fill pass: these 7 deeds add 15 manifest rows (7 names, 7 descs, 1 title)
+unfilled in 20 locales, and the v0.39.0 fill chore predates them; (4) the
+Steam/Epic achievement mapping deferral (no ACH_ row; hard cap 100 names);
+(5) the silent signature truncation on full-bag golden wins (the
+gatherDowngrade surface union stays 'node' | 'corpse'; follow-up: 'crop').
+
+REVIEWS: architecture 0 BLOCKING (its all-fine announce SHOULD-FIX taken
+with a probed-seed arm, yieldSeed 404006; its aliasing comment and
+exhaustive-switch notes taken); cross-platform PASS (0 BLOCKING; the
+single-belief gate taken; the release-tier i18n caveat ledgered as flags 3
+above); frontend-seam 0 BLOCKING (the pure-core registration, the
+tsc-exhaustive flavor table, and the cue occurrence-count pins taken; the
+ja_JP fill reworded to the idiomatic harvest noun); content-obligations
+REQUEST CHANGES on ONE point, resolved via the recorded waiver its own
+report proposed as option (c) (D13, a locked state.md decision, mandates
+the deed this phase; deferral would contradict the packet); qa-checklist
+READY, 0 BLOCKING (its feat_book_complete waiver sentence and the two
+cross-reference comments taken; its client-exhaustiveness SHOULD-FIX was
+already delivered as the satisfies-table in tests/gather_event_i18n.test.ts,
+which reds tsc on a fifth flavor).
+
+MUTATIONS 13/13 KILLED with named reds through the dirty-refusing
+scratchpad runner, after committing: tier-gated roll (M1), forked
+always-wins local chance (M2), multiplier dropped (M3), signature dropped
+(M4), rng in the deed hook (M5, 19 reds), FARM_CHRONICLE_ZONES widened
+(M6, both bijection arms), cue key unwired (M7), HUD golden key collapsed
+(M8), sting guard definder-ed (M9), announce unguarded (M10, later re-run
+as M10b against the single-belief text, 12 reds), luck deed gaining renown
+(M11), roll removed (M12, 27 reds). PROCESS LESSON: the mutation battery
+ran while a reviewer was reading the same worktree and the reviewer caught
+mutants in flight; future batteries run only while no reviewer reads the
+tree (or in a clone).
+
+VALIDATION: npx tsc --noEmit clean; the STEP 3 battery + count suites (18
+files, 1294 tests) green; full tests/parity green after the isolated
+re-record (216); guide/sfx/portrait freshness + the v039 icon-art seal
+green; ci:changed rc 0. Baselines held: IWorld 329 = 88 + 241, facets 34,
+commands 202/215, delta keys 87; renderer.ts untouched. GATE RECORD and
+MERGE HASH: the notes tail below (recorded at the phase close).
+
+No screenshots: the visible change is a chat-log line (existing epic-color
+family) and an audio cue; no window, layout, or style surface moved.
 
 ### Phase 11
 (not started)

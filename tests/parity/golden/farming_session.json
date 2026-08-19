@@ -10,19 +10,19 @@
     "plant consumes the seed and starts the flavor cast (FARMING_CAST_ID)",
     "busy gate: the second plant waits out the first plant cast",
     "growth window: readyAtMs reached with ZERO rng draws and zero events",
-    "harvestCrop survived path: zero draws (tier 1), produce granted from the stored yield seed",
-    "harvestCrop withered path: zero draws (tier 1), withered husks paid instead of produce",
+    "harvestCrop survived path: ONE draw at tier 1 (the golden roll, a recorded loss), produce granted from the stored yield seed",
+    "harvestCrop withered path: ONE draw at tier 1 (the golden roll, spent and ignored), withered husks paid instead of produce",
     "both harvests free their bed (farmPlots empty at the end)",
     "gathering grant drain: the queued farming proficiency lands on the next tick",
     "knobbed plant (compost + watch + tonic): payments consumed, still exactly two draws",
-    "toniced harvest on a probed WINNING yieldSeed: zero draws, bonus picks at base grade",
+    "toniced harvest on a probed WINNING yieldSeed: one draw (the golden roll; the tonic itself stays draw-free seed expansion), bonus picks at base grade",
     "convertHusks: the withered payout batch trades into compost, zero draws",
-    "tier-3 harvest (highland_barley at Thornpeak): EXACTLY one draw, the seed-back roll",
+    "tier-3 harvest (highland_barley at Thornpeak): EXACTLY two contiguous draws, the seed-back roll then the golden roll",
     "ready-notice sweep (Phase 8): a plot left ready across the 1 Hz boundary emits ONE farmReady, zero draws",
     "notified flag: the noticed plot samples notified true in fplot before its closing harvest"
   ],
-  "draws": 11,
-  "drawDigest": "4839f53d",
+  "draws": 16,
+  "drawDigest": "e718f3a3",
   "frames": [
     {
       "tick": 0,
@@ -164,7 +164,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 972,
-      "state": "dd8e707c",
+      "state": "4258c2c8",
       "events": "bb3ea9b0",
       "rng": {
         "draws": 2,
@@ -200,6 +200,9 @@
               "recruit_tunic",
               "vale_wheat_seed",
               "worn_sword"
+            ],
+            "visited": [
+              "farm:planted"
             ]
           },
           "delveClears": {},
@@ -325,8 +328,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 972,
-      "state": "a90dedd2",
-      "events": "76026051",
+      "state": "facb253f",
+      "events": "b55b2487",
       "rng": {
         "draws": 2,
         "digest": "00a2a78c"
@@ -336,7 +339,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 972,
-      "state": "dae52a5a",
+      "state": "755110c7",
       "events": "bdab63e5",
       "rng": {
         "draws": 2,
@@ -347,7 +350,7 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 972,
-      "state": "e5d4df1f",
+      "state": "8922c4ec",
       "events": "d613fcc8",
       "rng": {
         "draws": 4,
@@ -383,8 +386,17 @@
               "recruit_tunic",
               "vale_wheat_seed",
               "worn_sword"
+            ],
+            "visited": [
+              "farm:planted"
             ]
           },
+          "deedsEarned": [
+            [
+              "prog_first_planting",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
           "entityId": 967,
@@ -435,6 +447,7 @@
             "counts": {},
             "firstFind": {}
           },
+          "renown": 5,
           "talents": {
             "rows": {}
           },
@@ -514,7 +527,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 972,
-      "state": "3741eebf",
+      "state": "1f5e404c",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -525,7 +538,7 @@
       "tick": 61,
       "time": 3.05,
       "nextId": 972,
-      "state": "7744bbee",
+      "state": "3a32d4a1",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -561,8 +574,17 @@
               "recruit_tunic",
               "vale_wheat_seed",
               "worn_sword"
+            ],
+            "visited": [
+              "farm:planted"
             ]
           },
+          "deedsEarned": [
+            [
+              "prog_first_planting",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
           "entityId": 967,
@@ -613,6 +635,7 @@
             "counts": {},
             "firstFind": {}
           },
+          "renown": 5,
           "talents": {
             "rows": {}
           },
@@ -692,11 +715,11 @@
       "tick": 61,
       "time": 3.05,
       "nextId": 972,
-      "state": "ba120194",
+      "state": "0e9135b2",
       "events": "08316203",
       "rng": {
-        "draws": 4,
-        "digest": "49d036fe"
+        "draws": 6,
+        "digest": "1272a77a"
       },
       "label": "harvested",
       "players": [
@@ -730,8 +753,18 @@
               "vale_wheat_seed",
               "withered_husks",
               "worn_sword"
+            ],
+            "visited": [
+              "farm:eastbrook_vale",
+              "farm:planted"
             ]
           },
+          "deedsEarned": [
+            [
+              "prog_first_planting",
+              ""
+            ]
+          ],
           "delveClears": {},
           "delveDaily": {},
           "entityId": 967,
@@ -774,6 +807,7 @@
             "counts": {},
             "firstFind": {}
           },
+          "renown": 5,
           "talents": {
             "rows": {}
           },
@@ -853,33 +887,33 @@
       "tick": 80,
       "time": 4,
       "nextId": 972,
-      "state": "8efbd27f",
-      "events": "4c752b6b",
+      "state": "785bdcb9",
+      "events": "a1150cf1",
       "rng": {
-        "draws": 4,
-        "digest": "49d036fe"
+        "draws": 6,
+        "digest": "1272a77a"
       }
     },
     {
       "tick": 100,
       "time": 5,
       "nextId": 972,
-      "state": "56afd7a3",
+      "state": "055a58c5",
       "events": "bdab63e5",
       "rng": {
-        "draws": 4,
-        "digest": "49d036fe"
+        "draws": 6,
+        "digest": "1272a77a"
       }
     },
     {
       "tick": 110,
       "time": 5.5,
       "nextId": 972,
-      "state": "dbae27c7",
+      "state": "5b8d0fcc",
       "events": "e1884589",
       "rng": {
-        "draws": 6,
-        "digest": "1272a77a"
+        "draws": 8,
+        "digest": "3c3c49a7"
       },
       "label": "planted-knobbed",
       "players": [
@@ -915,11 +949,23 @@
               "vale_wheat_seed",
               "withered_husks",
               "worn_sword"
+            ],
+            "visited": [
+              "farm:eastbrook_vale",
+              "farm:planted"
             ]
           },
           "deedsEarned": [
             [
+              "chr_vale_first_harvest",
+              ""
+            ],
+            [
               "prog_first_harvest",
+              ""
+            ],
+            [
+              "prog_first_planting",
               ""
             ]
           ],
@@ -940,10 +986,10 @@
                 "cropId": "vale_wheat",
                 "plantedAtMs": 5499,
                 "readyAtMs": 2705499,
-                "survivalRoll": 0.938211,
+                "survivalRoll": 0.85704,
                 "tonic": true,
                 "watch": true,
-                "yieldSeed": 1634866458
+                "yieldSeed": 1027816175
               }
             ]
           ],
@@ -976,7 +1022,7 @@
             "counts": {},
             "firstFind": {}
           },
-          "renown": 5,
+          "renown": 15,
           "talents": {
             "rows": {}
           },
@@ -1056,11 +1102,11 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 972,
-      "state": "39da13e5",
+      "state": "c28cfcbb",
       "events": "742e9e54",
       "rng": {
-        "draws": 6,
-        "digest": "1272a77a"
+        "draws": 9,
+        "digest": "9526117b"
       },
       "label": "harvested-toniced",
       "players": [
@@ -1096,11 +1142,23 @@
               "vale_wheat_seed",
               "withered_husks",
               "worn_sword"
+            ],
+            "visited": [
+              "farm:eastbrook_vale",
+              "farm:planted"
             ]
           },
           "deedsEarned": [
             [
+              "chr_vale_first_harvest",
+              ""
+            ],
+            [
               "prog_first_harvest",
+              ""
+            ],
+            [
+              "prog_first_planting",
               ""
             ]
           ],
@@ -1148,7 +1206,7 @@
             "counts": {},
             "firstFind": {}
           },
-          "renown": 5,
+          "renown": 15,
           "talents": {
             "rows": {}
           },
@@ -1228,11 +1286,11 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 972,
-      "state": "da2e2870",
+      "state": "669953a2",
       "events": "013df3f4",
       "rng": {
-        "draws": 6,
-        "digest": "1272a77a"
+        "draws": 9,
+        "digest": "9526117b"
       },
       "label": "husks-converted",
       "players": [
@@ -1268,11 +1326,23 @@
               "vale_wheat_seed",
               "withered_husks",
               "worn_sword"
+            ],
+            "visited": [
+              "farm:eastbrook_vale",
+              "farm:planted"
             ]
           },
           "deedsEarned": [
             [
+              "chr_vale_first_harvest",
+              ""
+            ],
+            [
               "prog_first_harvest",
+              ""
+            ],
+            [
+              "prog_first_planting",
               ""
             ]
           ],
@@ -1320,7 +1390,7 @@
             "counts": {},
             "firstFind": {}
           },
-          "renown": 5,
+          "renown": 15,
           "talents": {
             "rows": {}
           },
@@ -1400,33 +1470,33 @@
       "tick": 120,
       "time": 6,
       "nextId": 972,
-      "state": "cd2c461d",
+      "state": "74faa201",
       "events": "741638a5",
       "rng": {
-        "draws": 6,
-        "digest": "1272a77a"
+        "draws": 9,
+        "digest": "9526117b"
       }
     },
     {
       "tick": 140,
       "time": 7,
       "nextId": 972,
-      "state": "83d459c3",
+      "state": "4e1436a3",
       "events": "741638a5",
       "rng": {
-        "draws": 6,
-        "digest": "1272a77a"
+        "draws": 9,
+        "digest": "9526117b"
       }
     },
     {
       "tick": 151,
       "time": 7.55,
       "nextId": 972,
-      "state": "bd7486f8",
+      "state": "f52e6688",
       "events": "7f52c039",
       "rng": {
-        "draws": 8,
-        "digest": "3c3c49a7"
+        "draws": 11,
+        "digest": "4839f53d"
       },
       "label": "planted-t3",
       "players": [
@@ -1464,11 +1534,23 @@
               "vale_wheat_seed",
               "withered_husks",
               "worn_sword"
+            ],
+            "visited": [
+              "farm:eastbrook_vale",
+              "farm:planted"
             ]
           },
           "deedsEarned": [
             [
+              "chr_vale_first_harvest",
+              ""
+            ],
+            [
               "prog_first_harvest",
+              ""
+            ],
+            [
+              "prog_first_planting",
               ""
             ]
           ],
@@ -1488,8 +1570,8 @@
                 "cropId": "highland_barley",
                 "plantedAtMs": 7549,
                 "readyAtMs": 14407549,
-                "survivalRoll": 0.85704,
-                "yieldSeed": 1027816175
+                "survivalRoll": 0.625133,
+                "yieldSeed": 2220356497
               }
             ]
           ],
@@ -1526,7 +1608,7 @@
             "counts": {},
             "firstFind": {}
           },
-          "renown": 5,
+          "renown": 15,
           "talents": {
             "rows": {}
           },
@@ -1606,11 +1688,11 @@
       "tick": 151,
       "time": 7.55,
       "nextId": 972,
-      "state": "f942543f",
-      "events": "31e2229b",
+      "state": "11319924",
+      "events": "2023a137",
       "rng": {
-        "draws": 9,
-        "digest": "9526117b"
+        "draws": 13,
+        "digest": "298d2180"
       },
       "label": "harvested-t3",
       "players": [
@@ -1649,11 +1731,24 @@
               "vale_wheat_seed",
               "withered_husks",
               "worn_sword"
+            ],
+            "visited": [
+              "farm:eastbrook_vale",
+              "farm:planted",
+              "farm:thornpeak_heights"
             ]
           },
           "deedsEarned": [
             [
+              "chr_vale_first_harvest",
+              ""
+            ],
+            [
               "prog_first_harvest",
+              ""
+            ],
+            [
+              "prog_first_planting",
               ""
             ]
           ],
@@ -1692,11 +1787,7 @@
               "itemId": "skysilver_hoe"
             },
             {
-              "count": 1,
-              "itemId": "highland_barley_seed"
-            },
-            {
-              "count": 4,
+              "count": 7,
               "itemId": "highland_barley"
             }
           ],
@@ -1713,7 +1804,7 @@
             "counts": {},
             "firstFind": {}
           },
-          "renown": 5,
+          "renown": 15,
           "talents": {
             "rows": {}
           },
@@ -1793,88 +1884,88 @@
       "tick": 160,
       "time": 8,
       "nextId": 972,
-      "state": "2c78a849",
-      "events": "3ef536a5",
+      "state": "86175455",
+      "events": "f55d981d",
       "rng": {
-        "draws": 9,
-        "digest": "9526117b"
+        "draws": 13,
+        "digest": "298d2180"
       }
     },
     {
       "tick": 180,
       "time": 9,
       "nextId": 972,
-      "state": "03b368b7",
+      "state": "2e0d1c03",
       "events": "741638a5",
       "rng": {
-        "draws": 9,
-        "digest": "9526117b"
+        "draws": 13,
+        "digest": "298d2180"
       }
     },
     {
       "tick": 200,
       "time": 10,
       "nextId": 972,
-      "state": "52519368",
+      "state": "33bbc896",
       "events": "bdab63e5",
       "rng": {
-        "draws": 9,
-        "digest": "9526117b"
+        "draws": 13,
+        "digest": "298d2180"
       }
     },
     {
       "tick": 220,
       "time": 11,
       "nextId": 972,
-      "state": "9e415e65",
+      "state": "2d7a7aef",
       "events": "e1884589",
       "rng": {
-        "draws": 11,
-        "digest": "4839f53d"
+        "draws": 15,
+        "digest": "a8d0e3aa"
       }
     },
     {
       "tick": 240,
       "time": 12,
       "nextId": 972,
-      "state": "d0cbef27",
+      "state": "67112539",
       "events": "bdab63e5",
       "rng": {
-        "draws": 11,
-        "digest": "4839f53d"
+        "draws": 15,
+        "digest": "a8d0e3aa"
       }
     },
     {
       "tick": 260,
       "time": 13,
       "nextId": 972,
-      "state": "efc8bea7",
+      "state": "0a7b68ed",
       "events": "a4182909",
       "rng": {
-        "draws": 11,
-        "digest": "4839f53d"
+        "draws": 15,
+        "digest": "a8d0e3aa"
       }
     },
     {
       "tick": 280,
       "time": 14,
       "nextId": 972,
-      "state": "d896d972",
+      "state": "721781e4",
       "events": "741638a5",
       "rng": {
-        "draws": 11,
-        "digest": "4839f53d"
+        "draws": 15,
+        "digest": "a8d0e3aa"
       }
     },
     {
       "tick": 282,
       "time": 14.1,
       "nextId": 972,
-      "state": "cd836cb8",
+      "state": "e0b14196",
       "events": "741638a5",
       "rng": {
-        "draws": 11,
-        "digest": "4839f53d"
+        "draws": 15,
+        "digest": "a8d0e3aa"
       },
       "label": "ready-noticed",
       "players": [
@@ -1913,11 +2004,28 @@
               "vale_wheat_seed",
               "withered_husks",
               "worn_sword"
+            ],
+            "visited": [
+              "farm:eastbrook_vale",
+              "farm:planted",
+              "farm:thornpeak_heights"
             ]
           },
           "deedsEarned": [
             [
+              "chr_peaks_first_harvest",
+              ""
+            ],
+            [
+              "chr_vale_first_harvest",
+              ""
+            ],
+            [
               "prog_first_harvest",
+              ""
+            ],
+            [
+              "prog_first_planting",
               ""
             ]
           ],
@@ -1939,7 +2047,7 @@
                 "plantedAtMs": 10000,
                 "readyAtMs": 12050,
                 "survivalRoll": 0.01,
-                "yieldSeed": 2220356497
+                "yieldSeed": 320531178
               }
             ]
           ],
@@ -1969,11 +2077,7 @@
               "itemId": "skysilver_hoe"
             },
             {
-              "count": 1,
-              "itemId": "highland_barley_seed"
-            },
-            {
-              "count": 4,
+              "count": 7,
               "itemId": "highland_barley"
             }
           ],
@@ -1984,7 +2088,7 @@
             "counts": {},
             "firstFind": {}
           },
-          "renown": 5,
+          "renown": 20,
           "talents": {
             "rows": {}
           },
@@ -2062,11 +2166,11 @@
       "tick": 282,
       "time": 14.1,
       "nextId": 972,
-      "state": "826eb1eb",
-      "events": "fd4008a4",
+      "state": "b5931a93",
+      "events": "86e12c14",
       "rng": {
-        "draws": 11,
-        "digest": "4839f53d"
+        "draws": 16,
+        "digest": "e718f3a3"
       },
       "label": "harvested-noticed",
       "players": [
@@ -2105,11 +2209,28 @@
               "vale_wheat_seed",
               "withered_husks",
               "worn_sword"
+            ],
+            "visited": [
+              "farm:eastbrook_vale",
+              "farm:planted",
+              "farm:thornpeak_heights"
             ]
           },
           "deedsEarned": [
             [
+              "chr_peaks_first_harvest",
+              ""
+            ],
+            [
+              "chr_vale_first_harvest",
+              ""
+            ],
+            [
               "prog_first_harvest",
+              ""
+            ],
+            [
+              "prog_first_planting",
               ""
             ]
           ],
@@ -2136,7 +2257,7 @@
               "itemId": "garden_hoe"
             },
             {
-              "count": 15,
+              "count": 11,
               "itemId": "vale_wheat"
             },
             {
@@ -2148,11 +2269,7 @@
               "itemId": "skysilver_hoe"
             },
             {
-              "count": 1,
-              "itemId": "highland_barley_seed"
-            },
-            {
-              "count": 4,
+              "count": 7,
               "itemId": "highland_barley"
             }
           ],
@@ -2163,7 +2280,7 @@
             "counts": {},
             "firstFind": {}
           },
-          "renown": 5,
+          "renown": 20,
           "talents": {
             "rows": {}
           },
@@ -2241,11 +2358,11 @@
       "tick": 290,
       "time": 14.5,
       "nextId": 972,
-      "state": "a08d32b7",
+      "state": "b44a250f",
       "events": "741638a5",
       "rng": {
-        "draws": 11,
-        "digest": "4839f53d"
+        "draws": 16,
+        "digest": "e718f3a3"
       },
       "label": "final",
       "players": [
@@ -2284,11 +2401,28 @@
               "vale_wheat_seed",
               "withered_husks",
               "worn_sword"
+            ],
+            "visited": [
+              "farm:eastbrook_vale",
+              "farm:planted",
+              "farm:thornpeak_heights"
             ]
           },
           "deedsEarned": [
             [
+              "chr_peaks_first_harvest",
+              ""
+            ],
+            [
+              "chr_vale_first_harvest",
+              ""
+            ],
+            [
               "prog_first_harvest",
+              ""
+            ],
+            [
+              "prog_first_planting",
               ""
             ]
           ],
@@ -2315,7 +2449,7 @@
               "itemId": "garden_hoe"
             },
             {
-              "count": 15,
+              "count": 11,
               "itemId": "vale_wheat"
             },
             {
@@ -2327,11 +2461,7 @@
               "itemId": "skysilver_hoe"
             },
             {
-              "count": 1,
-              "itemId": "highland_barley_seed"
-            },
-            {
-              "count": 4,
+              "count": 7,
               "itemId": "highland_barley"
             }
           ],
@@ -2342,7 +2472,7 @@
             "counts": {},
             "firstFind": {}
           },
-          "renown": 5,
+          "renown": 20,
           "talents": {
             "rows": {}
           },

@@ -133,6 +133,10 @@ export const UI_CUES = {
   // just ask for by pressing something, and it must not read as a harvest
   // that happened without them.
   farmReady: 'ui_farm_ready',
+  // The golden-harvest sting (the celebrations phase): layers alongside the
+  // shared rare-event achievement cue, never a replacement for it, the same
+  // additive design masterwork and gatherRareTier follow.
+  farmGolden: 'ui_farm_golden',
 } as const;
 
 type UiCue =
@@ -458,6 +462,13 @@ export class GameAudio {
   // goes silent for a player who turned interface sounds off.
   farmReady(): void {
     this.playFeedback(UI_CUES.farmReady);
+  }
+
+  // Golden-harvest sting: the finder's reward notification, feedback-gated
+  // like the other result cues (masterwork, gatherRareTier) and layered on
+  // top of the shared achievement cue, never a replacement for it.
+  farmGolden(): void {
+    this.playFeedback(UI_CUES.farmGolden);
   }
 }
 

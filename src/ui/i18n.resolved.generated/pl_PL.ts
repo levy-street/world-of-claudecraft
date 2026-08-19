@@ -3914,7 +3914,8 @@ export const pl_PL: EnTranslations = {
   "gatherEvent": {
     "pristineVein": "{finder} trafił w nieskazitelną żyłę!",
     "ancientHeartwood": "{finder} ściął starożytną twardziel!",
-    "moonlitBloom": "{finder} odkrył rozkwit w świetle księżyca!"
+    "moonlitBloom": "{finder} odkrył rozkwit w świetle księżyca!",
+    "goldenHarvest": "{finder} reaped a golden harvest!"
   },
   "apiError": {
     "validation": {

@@ -5542,6 +5542,20 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   // (docs/achievements/icon-brief.md).
   'exp_the_last_keep',
   'exp_dawnhold_castle',
+  // The farming celebration deeds (D13): the chronicles and prog_ rows fall
+  // back to their category crests (deed_cat_chronicle / deed_cat_progression)
+  // and col_golden_harvest to deed_cat_collection until their commissioned
+  // art lands (docs/achievements/icon-brief.md). prog_farming_100 is NOT
+  // here: the Reliquary title shelf forbids fallback art for title deeds
+  // (tests/reliquary_cell_art.test.ts), so its wheat-sheaf medallion crest
+  // shipped committed with the phase; the brief flags it for a commissioned
+  // replacement.
+  'prog_first_planting',
+  'chr_vale_first_harvest',
+  'chr_marsh_first_harvest',
+  'chr_peaks_first_harvest',
+  'chr_evergarden_first_harvest',
+  'col_golden_harvest',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

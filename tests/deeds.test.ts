@@ -2667,6 +2667,101 @@ describe('profession deed families (threshold-exact, live sites)', () => {
     expect(meta.renown).toBe(renownBefore);
   });
 
+  it('farming celebration marks: each mark grants exactly its own deed', () => {
+    // Catalog-side grant proof for the D13 farming deeds: the sim-side mark
+    // PRODUCERS (plant success and surviving harvest in
+    // professions/farming.ts) land in a parallel slice, so these arms drive
+    // the marks directly through the same markVisited path the producers
+    // call, the rare-find idiom above.
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    const renownBefore = meta.renown;
+    const marks: [string, string][] = [
+      ['farm:planted', 'prog_first_planting'],
+      ['farm:eastbrook_vale', 'chr_vale_first_harvest'],
+      ['farm:mirefen_marsh', 'chr_marsh_first_harvest'],
+      ['farm:thornpeak_heights', 'chr_peaks_first_harvest'],
+      ['farm:evergarden', 'chr_evergarden_first_harvest'],
+      ['gather_event:golden_harvest', 'col_golden_harvest'],
+    ];
+    for (const [mark, deedId] of marks) {
+      const others = marks.filter(([, d]) => d !== deedId).map(([, d]) => d);
+      const earnedOthersBefore = others.filter((d) => meta.deedsEarned.has(d));
+      sim.ctx.markVisited(meta, mark);
+      sim.tick();
+      expect(meta.deedsEarned.has(deedId), deedId).toBe(true);
+      // Cross-mark fidelity: this mark granted ONLY its own deed.
+      const earnedOthersAfter = others.filter((d) => meta.deedsEarned.has(d));
+      expect(earnedOthersAfter).toEqual(earnedOthersBefore);
+    }
+    // Five renown-5 grants plus the renown-0 golden harvest.
+    expect(meta.renown - renownBefore).toBe(25);
+  });
+
+  it('farming ladder: 99/100 binds exactly, through the live grant drain', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    meta.gatheringProficiency.farming = 99;
+    sim.ctx.markDeedsDirty(meta.entityId);
+    sim.tick();
+    expect(meta.deedsEarned.has('prog_farming_100')).toBe(false);
+    // The +1 crossing rides the REAL queued-grant drain (drainGatheringGrants
+    // marks the deed sweep itself; no explicit dirty call here).
+    queueGatheringGrant(meta, 'farming', 1);
+    sim.tick();
+    expect(meta.gatheringProficiency.farming).toBe(100);
+    expect(meta.deedsEarned.has('prog_farming_100')).toBe(true);
+    // A farming climb never credits another profession's milestone.
+    expect(meta.deedsEarned.has('prog_mining_100')).toBe(false);
+    // The earned Harvestmaster title is selectable through the one validator
+    // both worlds use.
+    sim.setActiveTitle('prog_farming_100', meta.entityId);
+    expect(meta.activeTitle).toBe('prog_farming_100');
+  });
+
+  it('the seven farming deeds sit in the Book completion set and pay exactly 35 Renown', () => {
+    const NEW_IDS = [
+      'prog_first_planting',
+      'chr_vale_first_harvest',
+      'chr_marsh_first_harvest',
+      'chr_peaks_first_harvest',
+      'chr_evergarden_first_harvest',
+      'col_golden_harvest',
+      'prog_farming_100',
+    ];
+    // All seven are non-feat, non-hidden, so feat_book_complete's meta list
+    // (BOOK_COMPLETE_REQUIREMENTS, derived from the table) must carry them.
+    const bookIds = (DEEDS.feat_book_complete.trigger as { deedIds: string[] }).deedIds;
+    for (const id of NEW_IDS) expect(bookIds, id).toContain(id);
+    // Earning the whole block moves Renown by exactly 35 (5 for the planting
+    // proof, 5 per chronicle, 0 for the luck find, 10 for the milestone).
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    // Warm up the collateral any-profession milestone first: a nonzero
+    // farming proficiency satisfies prog_first_harvest (any trade, amount 1),
+    // which is rig collateral, not part of the D13 block's 35.
+    meta.gatheringProficiency.farming = 1;
+    sim.ctx.markDeedsDirty(meta.entityId);
+    sim.tick();
+    expect(meta.deedsEarned.has('prog_first_harvest')).toBe(true);
+    const renownBefore = meta.renown;
+    for (const mark of [
+      'farm:planted',
+      'farm:eastbrook_vale',
+      'farm:mirefen_marsh',
+      'farm:thornpeak_heights',
+      'farm:evergarden',
+      'gather_event:golden_harvest',
+    ]) {
+      markVisited(sim.ctx, meta, mark);
+    }
+    meta.gatheringProficiency.farming = 100;
+    sim.ctx.markDeedsDirty(meta.entityId);
+    sim.tick();
+    for (const id of NEW_IDS) expect(meta.deedsEarned.has(id), id).toBe(true);
+    expect(meta.renown - renownBefore).toBe(35);
+  });
+
   it('a bag-truncated specimen jackpot grants NO mark and no deed (the find got away)', () => {
     // The interaction.ts hook fires on the LANDED addItemInstance arm only;
     // with every bag slot full the signed jackpot cannot land, the harvest

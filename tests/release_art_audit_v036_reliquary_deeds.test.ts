@@ -193,12 +193,24 @@ describe('v0.36 release-audit Reliquary deed art', () => {
   it('closes the exhaustive live deed debt ledger at 271 painted deeds', () => {
     // The audit's own claim is historical: the 271 deeds live at the v0.36
     // audit are ALL painted. Deeds appended after it (the walk-in castle
-    // visit pair) ride the DEED_ART_PENDING ledger until their art lands;
-    // the audit holds exactly when the pending set and the artless set are
-    // the same post-audit appends and every other deed is painted.
-    expect([...DEED_ART_PENDING]).toEqual(['exp_the_last_keep', 'exp_dawnhold_castle']);
-    expect(DEED_ORDER).toHaveLength(273);
-    expect(DEED_IMAGE_IDS.size).toBe(271);
+    // visit pair, then the seven farming celebration deeds) ride the
+    // DEED_ART_PENDING ledger until their art lands; the audit holds exactly
+    // when the pending set and the artless set are the same post-audit
+    // appends and every other deed is painted.
+    expect([...DEED_ART_PENDING]).toEqual([
+      'exp_the_last_keep',
+      'exp_dawnhold_castle',
+      'prog_first_planting',
+      'chr_vale_first_harvest',
+      'chr_marsh_first_harvest',
+      'chr_peaks_first_harvest',
+      'chr_evergarden_first_harvest',
+      'col_golden_harvest',
+    ]);
+    expect(DEED_ORDER).toHaveLength(280);
+    // 272: the farming phase committed the prog_farming_100 crest (the
+    // Reliquary title shelf forbids fallback art for title deeds).
+    expect(DEED_IMAGE_IDS.size).toBe(272);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(
       sorted(DEED_ORDER.filter((id) => !DEED_ART_PENDING.has(id))),

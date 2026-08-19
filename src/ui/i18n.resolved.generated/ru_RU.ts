@@ -3914,7 +3914,8 @@ export const ru_RU: EnTranslations = {
   "gatherEvent": {
     "pristineVein": "{finder} находит нетронутую жилу!",
     "ancientHeartwood": "{finder} добывает древнюю сердцевину!",
-    "moonlitBloom": "{finder} находит лунный цветок!"
+    "moonlitBloom": "{finder} находит лунный цветок!",
+    "goldenHarvest": "{finder} собирает золотой урожай!"
   },
   "apiError": {
     "validation": {

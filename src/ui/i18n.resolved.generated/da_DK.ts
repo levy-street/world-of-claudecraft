@@ -3914,7 +3914,8 @@ export const da_DK: EnTranslations = {
   "gatherEvent": {
     "pristineVein": "{finder} ramte en uberørt åre!",
     "ancientHeartwood": "{finder} fældet et gammelt kernetræ!",
-    "moonlitBloom": "{finder} opdagede en måneskin opblomstring!"
+    "moonlitBloom": "{finder} opdagede en måneskin opblomstring!",
+    "goldenHarvest": "{finder} reaped a golden harvest!"
   },
   "apiError": {
     "validation": {

@@ -3914,7 +3914,8 @@ export const zh_CN: EnTranslations = {
   "gatherEvent": {
     "pristineVein": "{finder}挖到了一条纯净的矿脉！",
     "ancientHeartwood": "{finder}砍倒了一棵远古心木！",
-    "moonlitBloom": "{finder}发现了一朵月光之花！"
+    "moonlitBloom": "{finder}发现了一朵月光之花！",
+    "goldenHarvest": "{finder}收获了一场金色丰收！"
   },
   "apiError": {
     "validation": {

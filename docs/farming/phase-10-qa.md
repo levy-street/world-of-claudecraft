@@ -6,6 +6,35 @@ farming_session golden). The special hazards here are pin drift dressed up as
 deliberateness and a rare-event roll that silently forked another profession's draw
 order.
 
+EXECUTED-PHASE RULINGS (2026-08-19, the phase close; read BEFORE auditing, they
+supersede this file's older wording below):
+- (br) The packet's "Highwatch/Evergarden beds cannot be sown" premise was PROBED
+  FALSE (plantCrop has no bed-tier gate; the plant sheet offers any bagged seed at
+  any bed), so ALL FOUR first-harvest chronicles are earnable today with vendor
+  tier 1/2 seeds. FARM_CHRONICLE_ZONES (src/sim/deeds.ts) is the earnability
+  declaration, guarded both directions.
+- (bs) prog_farming_100 and its Harvestmaster title ship DORMANT (farming teaching
+  grays at 75 until a tier 3 seed exists, (bo)/D11): a recorded waiver in
+  docs/design/deeds.md, a self-clearing honesty arm over the three purchase
+  surfaces in tests/deeds_content.test.ts, and feat_book_complete transitively
+  parked for the window. Do not re-report the dormancy as a finding; audit that the
+  waiver, the arm, and the row comments stay coherent.
+- (bt) The Reliquary title shelf forbids fallback art for title deeds, so
+  prog_farming_100's crest shipped COMMITTED (an interim wheat-sheaf medallion via
+  the sanctioned converter; the brief flags the commissioned replacement). The six
+  untitled deeds ride DEED_ART_PENDING.
+- (bu) One belief gates the golden win (flavor AND resolved zone); the signature
+  truncation on full bags is silent by design (gatherDowngrade's surface union was
+  not widened; the follow-up is 'crop' in a later phase).
+- (bv) gather_event:golden_harvest has NO reliquary field-note cell (noteReliquaryMark
+  no-ops by allowlist, negative-arm pinned) and correctly NO
+  server/character_sheet.ts RELIQUARY_MARK_ENGLISH row (the reverse guard forbids
+  non-reliquary marks).
+- Baselines after the phase: 280 deeds / 3190 renown / 43 titles; harvest draws are
+  1 (tier 1/2) and 2 (tier 3/4); farming_session md5 83c3478142deabbffbf23912575873e9
+  at 16 draws; hud.ts 19227/19230 (ceiling LOWERED via the ability-tooltip
+  extraction); DEED_IMAGE_IDS 272, DEED_ART_PENDING 8.
+
 ### QA Starter Prompt
 
 ```
@@ -52,13 +81,15 @@ full report now based on what you have already seen. No more tool calls. Format:
 BLOCKING / SHOULD-FIX / NICE-TO-HAVE / VERDICT."
 - Correctness agent: every deliverable and acceptance criterion actually met; the
   offline Sim and the online ClientWorld paths behave identically; edge cases (denial
-  still draws zero, golden on the final pick, a chronicle mark in every FARMING_ZONE_TIERS
-  zone). Where sim behavior changed, run live headless-Sim probes via a throwaway vitest
+  still draws zero, golden on the final pick, a chronicle mark in every
+  FARM_CHRONICLE_ZONES zone). Where sim behavior changed, run live headless-Sim probes via a throwaway vitest
   file driving real ticks with an injected ADVANCEABLE clock (the clock must advance
   now() or waits hang), then delete the file and verify the tree is clean. Verify
   the Live-surface note: LIVE, additive: any harvesting player can roll
-  golden_harvest and every farming deed and the farming-100 title are earnable the
-  moment this merges, with no reachability change to anything that already shipped.
+  golden_harvest, and every farming deed EXCEPT prog_farming_100 is earnable the
+  moment this merges (the (bs) dormancy waiver covers that one and
+  feat_book_complete transitively), with no reachability change to anything that
+  already shipped.
   Phase 10 emphases, all three mandatory: verify the tests/deeds_content.test.ts
   totals re-pin is EXACT and deliberate (new pinned totals equal the old totals
   plus exactly the new records, cross-checked against src/sim/content/deeds.ts, not

@@ -4813,6 +4813,7 @@ export type TranslationKeyFlat =
   | 'game.xp.toNext'
   | 'game.xp.totalXp'
   | 'gatherEvent.ancientHeartwood'
+  | 'gatherEvent.goldenHarvest'
   | 'gatherEvent.moonlitBloom'
   | 'gatherEvent.pristineVein'
   | 'gpuNotice.bodyDesktop'

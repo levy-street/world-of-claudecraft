@@ -17,9 +17,12 @@
 //   plant, success ............ EXACTLY 2 ctx.rng draws, one contiguous block,
 //                               IDENTICAL UNDER EVERY KNOB COMBINATION
 //   plant, every deny arm ..... 0 (the knob-payment denies included)
-//   harvest, tier 1/2 crop .... 0 on every outcome (toniced included)
-//   harvest, tier 3/4 crop .... EXACTLY 1 contiguous draw, the seed-back roll,
-//                               on BOTH outcomes (survived and withered)
+//   harvest, tier 1/2 crop .... EXACTLY 1 draw, the golden-harvest roll, on
+//                               BOTH outcomes (survived and withered, toniced
+//                               included)
+//   harvest, tier 3/4 crop .... EXACTLY 2 contiguous draws, the seed-back
+//                               roll then the golden-harvest roll, on BOTH
+//                               outcomes
 //   harvest, every deny arm ... 0
 //   convert_husks ............. 0 (both outcomes)
 //   the farm objective credit . 0 (quests/quest_credit.ts, pure state and
@@ -32,14 +35,18 @@
 // consumed at harvest. Harvest yield expands DETERMINISTICALLY from the
 // pre-rolled yieldSeed through a local pure generator (mulberry32 below),
 // NEVER through ctx.rng and never through Math.random: seed expansion of an
-// already-drawn value is not a new draw, which is what keeps a tier 1/2
-// harvest draw-free no matter when, or on which host, it happens. The ONE
-// draw a tier 3/4 harvest adds is the seed-back roll (harvestCrop below): a
-// REAL ctx.rng draw at harvest ACTION time, deliberately NOT an expansion of
-// the stored script, and D4-legal for the same reason the plant pre-roll is,
-// because a harvest is a player action. The crop tier deciding whether that
-// draw happens is an INPUT read from content, never an outcome, so
-// conditioning on it can never fork the stream.
+// already-drawn value is not a new draw, which is what keeps the yield itself
+// draw-free no matter when, or on which host, the harvest happens. The draws
+// a harvest DOES spend are its two action-time rolls (harvestCrop below): the
+// seed-back roll (tier 3/4 only) and then the golden-harvest rare-event roll
+// (EVERY tier, the shared gather_events roll). Both are REAL ctx.rng draws at
+// harvest ACTION time, deliberately NOT expansions of the stored script, and
+// D4-legal for the same reason the plant pre-roll is, because a harvest is a
+// player action. The crop tier deciding whether the seed-back draw happens is
+// an INPUT read from content, never an outcome, so conditioning on it can
+// never fork the stream; the golden roll is unconditional, and a WITHERED
+// harvest spends it too and ignores the result (constant draw count per
+// action: husks, never a celebration).
 //
 // THE KNOBS RULE, the phase's one hard law: KNOB EFFECTS NEVER CHANGE THE
 // NUMBER OF RNG DRAWS. THEY CHANGE THRESHOLDS APPLIED TO ALREADY-DRAWN VALUES
@@ -57,6 +64,7 @@
 // carries plantedAtMs and readyAtMs, which is everything a client needs to
 // compute the stage itself.
 
+import { bagCapacity, countFit } from '../bags';
 import {
   FARM_COMPOST_ITEM_ID,
   FARM_GROWTH_TONIC_ITEM_ID,
@@ -66,8 +74,9 @@ import {
   farmCropSkillThreshold,
   farmCropTier,
 } from '../content/farm_crops';
-import { FARM_BED_IDS, farmBedById } from '../content/farm_patches';
+import { FARM_BED_IDS, farmBedById, farmBedZoneId } from '../content/farm_patches';
 import { ITEMS } from '../data';
+import { onCropHarvestedForDeeds } from '../deeds';
 import { countUnlockedInSlots, removeUnlockedFromSlots } from '../item_lock';
 import { forceDismount } from '../mounts';
 import { onCropFarmedForQuests } from '../quests/quest_credit';
@@ -78,6 +87,11 @@ import { type FarmPlantKnobs, farmPlotSurvived, type PlotState } from './farm_pr
 import { notifyFarmReady } from './farm_ready';
 import { planWatchFee, type WatchFeeLeg } from './farm_watch_fee';
 import { nearFarmerNpc } from './farmer_npcs';
+import {
+  announceGatherRareEvent,
+  GATHER_RARE_EVENT_YIELD_MULT,
+  rollGatherRareEvent,
+} from './gather_events';
 import { queueGatheringGrant } from './gathering';
 import {
   applyToolEffectUse,
@@ -650,6 +664,11 @@ export function plantCrop(
   // Text-free on purpose (the gatherResult idiom): the client logs its own
   // localized line.
   ctx.emit({ type: 'farmPlanted', pid: meta.entityId, bedId, cropId: crop.id });
+  // The first-planting proof (the celebrations phase): one idempotent visited
+  // mark at plant SUCCESS, the inline zone-mark idiom gathering.ts uses at
+  // its grant site. Never reached from a deny arm; zero rng, so the two-draw
+  // contract above is untouched.
+  ctx.markVisited(meta, 'farm:planted');
   // The farm ACTION objective credit (quests/quest_credit.ts), LAST: after
   // the plot write and the farmPlanted event, so a credited plant is always
   // a committed one, and after ctx.onInventoryChangedForQuests above (the
@@ -683,11 +702,12 @@ function insertPlotSorted(plots: Map<string, PlotState>, bedId: string, plot: Pl
 // harvestCrop
 // ---------------------------------------------------------------------------
 
-/** Take a finished plot out of a bed. Draws ZERO rng on every deny path and
- *  on every tier 1/2 harvest: the outcome was rolled at plant time and the
- *  yield expands deterministically from the stored seed. A tier 3/4 harvest
- *  draws EXACTLY ONE, the seed-back roll (the one draw block below), on both
- *  outcomes.
+/** Take a finished plot out of a bed. Draws ZERO rng on every deny path: the
+ *  outcome was rolled at plant time and the yield expands deterministically
+ *  from the stored seed. A resolving harvest spends its action-time rolls in
+ *  the one draw block below, on BOTH outcomes: a tier 1/2 harvest draws
+ *  EXACTLY ONE (the golden-harvest roll), a tier 3/4 harvest EXACTLY TWO
+ *  contiguous (the seed-back roll, then the golden-harvest roll).
  *
  *  NO BUSY GATE, unlike plantCrop. Harvesting is instant (there is no cast to
  *  conflict with) and it is the SECOND of the two visits a crop cycle ever
@@ -732,26 +752,31 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
   // takes the plot out, whatever it turned into.
   meta.farmPlots.delete(bedId);
 
-  // ---- THE ONE HARVEST DRAW BLOCK: the seed-back roll, tier 3 and 4 only ----
-  // A REAL ctx.rng draw at harvest ACTION time, deliberately NOT a seed
-  // expansion: the tonic is seed-anchored because its outcome must be fixed at
-  // plant time, while seed-back is a fresh reward decided by the harvest
-  // itself, D4-legal because a harvest is a player action (the same legality
-  // the plant pre-roll rides). Never conflate the two, and never anchor an
-  // expansion read to a skill-varying loop position (the tonic lesson). ONE
-  // contiguous draw at this FIXED position: immediately after the
-  // plot-outcome resolution gates above, BEFORE the survived/withered branch
-  // and before every loop, so its stream position can never depend on the
-  // outcome, the yield expansion's length, or any knob. It rolls on BOTH
-  // outcomes: the withered consolation roll is DELIBERATE (a failed high-tier
-  // crop can still hand a seed back beside its husks, the same
-  // failure-is-a-smaller-reward thesis), and an outcome-scoped draw would
-  // fork the stream by outcome besides. Multi-threshold single draw: under
-  // the two-chance it pays 2 seeds, else under the one-chance 1, else 0.
-  // Tier 1/2 crops reach this block and draw NOTHING: the tier is an INPUT
-  // read from content, never an outcome, so conditioning on it cannot fork
-  // the stream, and a retired crop id reads tier 1 (farmCropTier's fallback),
-  // so neither withered arm below can ever strand an ungrantable seed-back.
+  // ---- THE ONE HARVEST DRAW BLOCK: the seed-back roll (tier 3/4 only), ----
+  // ---- then the golden-harvest roll (EVERY tier)                       ----
+  // REAL ctx.rng draws at harvest ACTION time, deliberately NOT seed
+  // expansions: the tonic is seed-anchored because its outcome must be fixed
+  // at plant time, while seed-back and the golden event are fresh rewards
+  // decided by the harvest itself, D4-legal because a harvest is a player
+  // action (the same legality the plant pre-roll rides). Never conflate the
+  // two, and never anchor an expansion read to a skill-varying loop position
+  // (the tonic lesson). One CONTIGUOUS block at this FIXED position:
+  // immediately after the plot-outcome resolution gates above, BEFORE the
+  // survived/withered branch and before every loop, so no draw's stream
+  // position can ever depend on the outcome, the yield expansion's length, or
+  // any knob. Both rolls happen on BOTH outcomes: the withered seed-back
+  // consolation is DELIBERATE (a failed high-tier crop can still hand a seed
+  // back beside its husks, the same failure-is-a-smaller-reward thesis),
+  // while the withered path IGNORES its golden result below (husks, never a
+  // celebration; the roll still spends its draw for the constant per-action
+  // count), and an outcome-scoped draw would fork the stream by outcome
+  // besides. The seed-back roll is multi-threshold single draw: under the
+  // two-chance it pays 2 seeds, else under the one-chance 1, else 0. Tier
+  // 1/2 crops reach the seed-back arm and draw NOTHING there: the tier is an
+  // INPUT read from content, never an outcome, so conditioning on it cannot
+  // fork the stream, and a retired crop id reads tier 1 (farmCropTier's
+  // fallback), so neither withered arm below can ever strand an ungrantable
+  // seed-back.
   let seedBackCount = 0;
   if (cropTier >= FARM_SEED_BACK_MIN_TIER) {
     const seedBackRoll = ctx.rng.next();
@@ -759,6 +784,13 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
     const oneChance = FARM_SEED_BACK_ONE_CHANCE[cropTier] ?? 0;
     seedBackCount = seedBackRoll < twoChance ? 2 : seedBackRoll < oneChance ? 1 : 0;
   }
+  // The golden-harvest roll (the celebrations phase): ONE draw on EVERY
+  // harvest of EVERY tier through the SHARED gather-events roll (D12: the
+  // same GATHER_RARE_EVENT_CHANCE cadence as the node flavors, never a
+  // farming copy of the constant). It sits AFTER the seed-back roll so every
+  // probed seed-back band keeps its stream position, and inside this block
+  // for every reason stated above.
+  const goldenFlavor = rollGatherRareEvent(ctx.rng, 'crop');
   // ------------------------- END OF THE DRAW BLOCK -------------------------
 
   // The seed-back grant, ONE call site shared by both outcomes (the branch
@@ -871,22 +903,80 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
         fineChanceBonus: effectUse.outcome.gradeToolTier * FARM_FINE_CHANCE_EFFECT_BONUS,
       })
     : base;
-  const { count, fine } = armed;
+  // The golden-harvest win (the celebrations phase), applied ONLY on this
+  // survived branch: the roll spent its draw in the block above on every
+  // outcome, and a withered plot pays husks, never a celebration. A win
+  // five-folds BOTH grades AFTER the stored-seed expansion resolved them: a
+  // pure multiply on already-expanded values positions no new read relative
+  // to the skill-varying lives loop (the tonic lesson), and the R42 settle
+  // below still compares the UN-multiplied expansions, which a shared factor
+  // could not reorder anyway.
+  // The bed's zone is the AUTHORED patch zone (farmBedZoneId, never
+  // geometry), always defined for a bed that passed the bad_bed gate above.
+  // Folded into `golden` so ONE belief gates the whole win: the windfall,
+  // the zone announce, and the deed mark travel together, and a bed outside
+  // an authored patch (impossible today) could never pay a silent windfall
+  // (the single-guard rule from the phase review). The finder receives their
+  // own zone line because the fanout filters recipients by zoneAt(player)
+  // while this id is authored: the two agree for every shipped bed, pinned
+  // by the zone-containment arm in tests/farm_patch_placement.test.ts.
+  const zoneId = farmBedZoneId(bedId);
+  const golden = goldenFlavor !== null && zoneId !== undefined;
+  const count = golden ? armed.count * GATHER_RARE_EVENT_YIELD_MULT : armed.count;
+  const fine = golden ? armed.fine * GATHER_RARE_EVENT_YIELD_MULT : armed.fine;
+  // Whether every pick upgraded (THE ALL-FINE COLLAPSE, documented above the
+  // farmHarvested emit below): computed here because the golden zone
+  // announce must name the same collapsed item id the event names.
+  const allFine = count === 0 && fine > 0;
   // Deliberately NOT capacity-gated. A crop the player already grew must not
   // be destroyed by full bags (nothing rots, and a refusal here would BE a
   // rot), so the grant force-adds over capacity exactly like the quest-catch
   // arm in completeFishing.
   //
-  // silent + callerLogs on BOTH grants: the farmHarvested event below owns
-  // both halves of the feedback for the whole harvest (the gatherResult
+  // silent + callerLogs on EVERY grant leg: the farmHarvested event below
+  // owns both halves of the feedback for the whole harvest (the gatherResult
   // idiom, #2430), and it carries the base and fine counts together. Without
   // these flags a two-grade harvest would print THREE lines for one action,
   // two hub "You receive:" lines plus the event's own, and stack two loot
   // dings on the event's cue.
-  if (count > 0)
-    ctx.addItem(crop.produceItemId, count, meta.entityId, { silent: true, callerLogs: true });
-  if (fine > 0)
-    ctx.addItem(crop.fineProduceItemId, fine, meta.entityId, { silent: true, callerLogs: true });
+  if (golden) {
+    // A golden windfall lands SIGNED, the node rare-event idiom (gathering.ts
+    // resolveHarvest's signed arm): signed { signer } instances up to what
+    // the bags genuinely fit (countFit models same-signer merge room plus
+    // free slots, identical-payload stacking), then the plain
+    // overflow-tolerant grant for the remainder. Farming's nothing-rots rule
+    // outranks the signature: the TOTAL granted quantity is always the full
+    // five-fold yield, and only the SIGNATURE truncates on full bags. That
+    // truncation is silent by design here: gatherDowngrade's surface union
+    // is 'node' | 'corpse' and widening the wire is out of this phase's
+    // scope, a ledgered acceptance rather than an oversight.
+    // `capacity` is hoisted (slot capacity cannot change from a grant), but
+    // grantGolden runs TWICE and the second countFit deliberately reads the
+    // meta.inventory the first grant already mutated: the fine grade must
+    // see the slots the base grade consumed. Do not "clean this up" by
+    // snapshotting the inventory.
+    const capacity = bagCapacity(meta.bags);
+    const grantGolden = (itemId: string, qty: number): void => {
+      if (qty <= 0) return;
+      const fit = countFit(meta.inventory, capacity, itemId, qty, { signer: meta.name });
+      if (fit > 0) {
+        ctx.addItemInstance(itemId, { signer: meta.name }, meta.entityId, fit, {
+          silent: true,
+          callerLogs: true,
+        });
+      }
+      if (fit < qty) {
+        ctx.addItem(itemId, qty - fit, meta.entityId, { silent: true, callerLogs: true });
+      }
+    };
+    grantGolden(crop.produceItemId, count);
+    grantGolden(crop.fineProduceItemId, fine);
+  } else {
+    if (count > 0)
+      ctx.addItem(crop.produceItemId, count, meta.entityId, { silent: true, callerLogs: true });
+    if (fine > 0)
+      ctx.addItem(crop.fineProduceItemId, fine, meta.entityId, { silent: true, callerLogs: true });
+  }
   // The R42 charge settle plus the R47 use-time ratchet, the
   // completeGatherCast pattern. The ratchet's rarity read is the UNFILTERED
   // ownership scan on purpose, matching the node settle in gathering.ts and
@@ -913,6 +1003,24 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
       effectDepleted = spent && slot.durability <= 0;
     }
   }
+  // The zone celebration on a golden win, AFTER the grants (the gathering
+  // order: announce once the windfall is really in the bags). The announce
+  // writes the gather_event:golden_harvest visit mark for the finder
+  // (announceGatherRareEvent; its reliquary note no-ops for this flavor by
+  // design, the ledgered field-note deferral). Draw-free: the fanout and the
+  // marks touch no rng, so the draw block's contract holds. The line names
+  // the collapsed item id: on an all-fine harvest the primary grant IS the
+  // fine item (the same rule the farmHarvested emit applies below, and the
+  // node announce passes its actually-granted itemId the same way).
+  if (golden) {
+    announceGatherRareEvent(
+      ctx,
+      meta,
+      { zoneId, type: 'crop' },
+      goldenFlavor,
+      allFine ? crop.fineProduceItemId : crop.produceItemId,
+    );
+  }
   // THE ALL-FINE COLLAPSE. The base fields describe the harvest's PRIMARY
   // grant, and when every pick upgrades there is no base-grade grant at all,
   // so the primary grant IS the fine item. Emitting the natural
@@ -928,7 +1036,6 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
   // know that this event has an impossible shape. Consumers get one rule
   // instead, and it holds on every path: `count` is always positive and
   // `itemId` is always something the player actually received.
-  const allFine = count === 0 && fine > 0;
   ctx.emit({
     type: 'farmHarvested',
     pid: meta.entityId,
@@ -950,6 +1057,14 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
     // precedent): present exactly when the settle above emptied the slot.
     ...(effectDepleted ? { effectDepleted: true as const } : {}),
   });
+  // The first-harvest chronicle mark (the celebrations phase), the SURVIVED
+  // branch only: a withered plot never chronicles (the fish rule that weeds
+  // and boots do not count), and no deny reaches here. The hook filters to
+  // FARM_CHRONICLE_ZONES itself and writes the farm:<zone> mark. Marks only,
+  // zero rng, draw-order neutral. The guard is defense-in-depth like the
+  // golden one above: a bed that passed the bad_bed gate always resolves a
+  // zone (impossible-today, same belief).
+  if (zoneId !== undefined) onCropHarvestedForDeeds(ctx, meta, zoneId);
   // Proficiency through the shared gathering-grant queue, draining on the tick
   // path exactly like a node harvest. The gain is PURE STATE computed after
   // everything above (zero draws, zero draw reordering), and a 0 gain queues

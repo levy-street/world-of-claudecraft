@@ -124,6 +124,9 @@ describe('the real catalog', () => {
       'col_first_legendary',
       'col_first_rare',
       'col_glimmerfin',
+      // Deliberate growth (D13 farming celebrations): the golden-harvest
+      // rare find joins its gather_event siblings per the same rule 2.
+      'col_golden_harvest',
       'col_moonlit_bloom',
       'col_perfect_specimen',
       'col_pristine_vein',

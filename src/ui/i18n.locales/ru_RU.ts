@@ -9078,6 +9078,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'gatherEvent.pristineVein': '{finder} находит нетронутую жилу!',
   'gatherEvent.ancientHeartwood': '{finder} добывает древнюю сердцевину!',
   'gatherEvent.moonlitBloom': '{finder} находит лунный цветок!',
+  'gatherEvent.goldenHarvest': '{finder} собирает золотой урожай!',
   'hudChrome.archetypeTitle.label': 'Титул',
   'hudChrome.archetypeTitle.none': 'Нет',
   'hudChrome.archetypeTitle.hobbyLabel': 'Хобби',

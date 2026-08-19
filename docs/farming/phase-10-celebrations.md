@@ -6,10 +6,29 @@ Everything here is celebration: zero power, one new roll at harvest, append-only
 docs/farming/state.md is the authority; if this file contradicts it, state.md wins and this
 file plus phase-10-qa.md get swept in the same pass.
 
-Live-surface note (binding): LIVE, additive. The rare event and the deeds join the already-open
-farming loop the moment this merges: any harvesting player can roll golden_harvest, and
-every farming deed and the farming-100 title become earnable immediately. No dormant
-surface, no reachability change to anything that already shipped.
+Live-surface note (binding; AMENDED at the phase close, 2026-08-19): LIVE, additive. The
+rare event and the deeds join the already-open farming loop the moment this merges: any
+harvesting player can roll golden_harvest, and every farming deed EXCEPT
+prog_farming_100 becomes earnable immediately (all four zone chronicles included, per
+the (br) probe: plantCrop has no bed-tier gate, so vendor tier 1/2 seeds reach every
+hub's beds). prog_farming_100 and its Harvestmaster title ship DORMANT until the D11
+seed-faucet ruling (the (bs) recorded waiver in docs/design/deeds.md;
+feat_book_complete is transitively parked for the window). No reachability change to
+anything that already shipped.
+
+EXECUTED (2026-08-19): the phase closed as five commits on
+fix/farming-phase-10-celebrations merged --no-ff into feature/farming-plan (the merge
+hash and full notes in progress.md; deviations (br) through (bv) in state.md). What
+shipped matches the goal with these deviations from this file's letter: the chronicles
+are ALL EARNABLE (the (bo) unearnability premise was probed false, (br)); the
+stranded-heal doctrine does NOT fire for prog_farming_100 (globally-not-yet-earnable
+is not per-character-stranded; the (bs) waiver + self-clearing honesty arm carry it);
+the golden roll sits AFTER the seed-back roll (both outcomes, win applied on the
+survived branch only; harvest draws are now 1 for tier 1/2 and 2 for tier 3/4);
+prog_farming_100's crest shipped COMMITTED because the Reliquary title shelf forbids
+fallback art for title deeds (bt); Harvestmaster joined RELIQUARY_HORIZON_TITLES
+(catalog pins 341/376/41). The farming_session golden moved once, isolated
+(11 to 16 draws, md5 83c3478142deabbffbf23912575873e9).
 
 V0.39.0 SYNC NOTE (2026-08-17, the seventeenth absorb, recorded during Phase 9): the
 release's castles feature re-pinned tests/deeds_content.test.ts to 273 deeds / 3155

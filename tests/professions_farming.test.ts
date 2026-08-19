@@ -3,11 +3,12 @@
 // THE DRAW CONTRACT stated in src/sim/professions/farming.ts.
 //
 // The draw contract is the reason most of this file exists. Farming's whole
-// determinism story is that a plant costs exactly two rng draws, a tier 3/4
-// harvest costs exactly one (the seed-back roll, both outcomes), and literally
-// nothing else costs any, so growth can be wall-clock and offline-friendly
-// without the three hosts ever diverging. Every clause of that contract gets
-// its own counted arm below.
+// determinism story is that a plant costs exactly two rng draws, a tier 1/2
+// harvest costs exactly one (the golden-harvest roll, both outcomes), a tier
+// 3/4 harvest exactly two contiguous (the seed-back roll then the golden
+// roll, both outcomes), and literally nothing else costs any, so growth can
+// be wall-clock and offline-friendly without the three hosts ever diverging.
+// Every clause of that contract gets its own counted arm below.
 //
 // THE CLOCK IS ADVANCEABLE, ALWAYS. `lockoutNowMs` is injected as a `let` the
 // tests move forward; a frozen injected clock is how a self-re-arming wait
@@ -67,6 +68,10 @@ import {
   updateFarming,
 } from '../src/sim/professions/farming';
 import {
+  GATHER_RARE_EVENT_CHANCE,
+  GATHER_RARE_EVENT_YIELD_MULT,
+} from '../src/sim/professions/gather_events';
+import {
   resolveSlotToolEffect,
   slotEffect,
   startingDurabilityFor,
@@ -104,6 +109,19 @@ const START_MS = 1_700_000_000_000;
 // own non-vacuity, so a draw-block shift that changes the minted yieldSeed
 // reds loudly instead of going quietly vacuous again.
 const TONIC_WIN_SEED = 2;
+// A harness seed that WINS the golden-harvest roll at a tier-1 harvest: the
+// golden roll is the THIRD post-construction draw there (two plant draws,
+// then the harvest's one), and seed 280's third draw is 0.001978, under the
+// 1/90 chance (probed against the real modules, the seed-back describe's
+// probe shape). Its plant-time yieldSeed is 3704758211 (the second draw,
+// 0.862581, times 2^32 floored), whose skill-0 expansion pays
+// { count: 3, fine: 1 }: BOTH grades nonzero, so the five-fold arms below
+// can pin base and fine multiplication on one seed without any skill
+// fiddling. Every other harness seed used in this file (2, 3, 4, 5, 7, 8, 9,
+// 41, 99, 555, 777, 778, 1234, 2024, 4242) LOSES the golden roll at both
+// the tier-1 position (third draw) and the tier-3/4 position (fourth), so
+// no pre-existing payout arm multiplies (probed the same way).
+const GOLDEN_WIN_SEED = 280;
 
 // The shipped crop's own numbers, read from the catalog rather than restated,
 // so a tuning pass moves the fixture with the content instead of reddening
@@ -1339,7 +1357,10 @@ describe('the knob payload (the knobs phase): payments, denies, thresholds', () 
     // Delta, not an absolute: the reloaded bags still carry the produce the
     // watch fee did not consume at plant time.
     const produceBefore = fresh.countItem(PRODUCE_ID, meta.entityId);
-    expect(countDraws(fresh, () => harvestCrop(fresh.ctx, farmer, meta, BED))).toBe(0);
+    // The one draw is the golden-harvest roll (every harvest spends it); on
+    // this reloaded Sim it is the FIRST post-construction draw, probed to
+    // LOSE (seed 41 noPlayer: 0.826341), so the payout stays unmultiplied.
+    expect(countDraws(fresh, () => harvestCrop(fresh.ctx, farmer, meta, BED))).toBe(1);
     expect(eventsOf(fresh, from, 'farmHarvested')).toHaveLength(1);
     expect(eventsOf(fresh, from, 'farmWithered')).toEqual([]);
     // And the reloaded tonic flag really armed the toniced expansion.
@@ -1406,7 +1427,7 @@ describe('the tonic yield arm: seed expansion, never a draw', () => {
     }
   });
 
-  it('harvests a toniced plot with ZERO ctx.rng draws and pays the expanded yield', () => {
+  it('harvests a toniced plot with only the golden roll drawn and pays the expanded yield', () => {
     const h = makeHarness(TONIC_WIN_SEED);
     h.sim.addItem(SEED_ID, 1, h.pid);
     h.sim.addItem(FARM_GROWTH_TONIC_ITEM_ID, 1, h.pid);
@@ -1422,7 +1443,10 @@ describe('the tonic yield arm: seed expansion, never a draw', () => {
     expect(expected.count).toBeGreaterThan(
       resolveFarmHarvest(plot.yieldSeed as number, 0, false).count,
     );
-    expect(countDraws(h.sim, () => harvestCrop(h.sim.ctx, h.sim.player, h.meta, BED))).toBe(0);
+    // The tonic itself stays a seed expansion (zero draws); the one counted
+    // draw is the unconditional golden-harvest roll, a probed LOSER on this
+    // seed (TONIC_WIN_SEED's third post-construction draw is 0.902205).
+    expect(countDraws(h.sim, () => harvestCrop(h.sim.ctx, h.sim.player, h.meta, BED))).toBe(1);
     expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(expected.count);
     expect(h.sim.countItem(FINE_ID, h.pid)).toBe(expected.fine);
   });
@@ -1475,10 +1499,12 @@ describe('the slotted farming tool effect at harvest (the hoe phase C3 wiring)',
   // Every arm here holds to the vacuity rule: the armed expectation is FIRST
   // shown to differ from the unarmed one on the plot's own seed (probed, or
   // swept in-arm), so an equality below can never pass because both sides
-  // collapsed to the unarmed harvest. And every arm counts ZERO ctx.rng
-  // draws at harvest: the effect halves are seed expansions, never draws
-  // (tier-1 plots here; the one draw a tier 3/4 harvest spends is the
-  // seed-back roll, owned by its own describe below).
+  // collapsed to the unarmed harvest. And every arm counts EXACTLY ONE
+  // ctx.rng draw at harvest, the unconditional golden-harvest roll (a probed
+  // LOSER on the default harness seed, so no payout multiplies): the effect
+  // halves themselves are seed expansions, never draws (tier-1 plots here;
+  // the second draw a tier 3/4 harvest spends is the seed-back roll, owned
+  // by its own describe below).
   let h: Harness;
   beforeEach(() => {
     h = makeHarness();
@@ -1509,7 +1535,7 @@ describe('the slotted farming tool effect at harvest (the hoe phase C3 wiring)',
     expect(armed.count).toBeGreaterThan(unarmed.count);
     expect(armed.picks).toBe(unarmed.picks + TOOL_EFFECTS.gatherers_cache.bonus);
     const before = slot.durability;
-    expect(countDraws(h.sim, () => harvest(h))).toBe(0);
+    expect(countDraws(h.sim, () => harvest(h))).toBe(1);
     expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(armed.count);
     expect(h.sim.countItem(FINE_ID, h.pid)).toBe(armed.fine);
     // Exactly one charge: the R42 settle spends only when the bonus changed
@@ -1543,7 +1569,7 @@ describe('the slotted farming tool effect at harvest (the hoe phase C3 wiring)',
     // In-arm non-vacuity guard (the probed winner, restated where it counts).
     expect(armed.fine).toBeGreaterThan(unarmed.fine);
     const before = slot.durability;
-    expect(countDraws(h.sim, () => harvest(h))).toBe(0);
+    expect(countDraws(h.sim, () => harvest(h))).toBe(1);
     expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(armed.count);
     expect(h.sim.countItem(FINE_ID, h.pid)).toBe(armed.fine);
     expect(slot.durability).toBe(before - 1);
@@ -1639,7 +1665,7 @@ describe('the slotted farming tool effect at harvest (the hoe phase C3 wiring)',
     const before = slot.durability;
     const rareCeil = startingDurabilityFor('artisans_eye', 'rare');
     expect(slot.maxDurability).toBeLessThan(rareCeil);
-    expect(countDraws(h.sim, () => harvest(h))).toBe(0);
+    expect(countDraws(h.sim, () => harvest(h))).toBe(1);
     // The charge survives a use that paid nothing extra (the R42 predicate's
     // false branch: spend only when the bonus changed what was received)...
     expect(slot.durability).toBe(before);
@@ -1662,7 +1688,7 @@ describe('the slotted farming tool effect at harvest (the hoe phase C3 wiring)',
     // the byte-equal assertion below really distinguishes skip from fire.
     expect(armed.count).not.toBe(unarmed.count);
     const before = slot.durability;
-    expect(countDraws(h.sim, () => harvest(h))).toBe(0);
+    expect(countDraws(h.sim, () => harvest(h))).toBe(1);
     expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(unarmed.count);
     expect(h.sim.countItem(FINE_ID, h.pid)).toBe(unarmed.fine);
     expect(slot.durability).toBe(before);
@@ -1740,12 +1766,15 @@ describe('the mint refuses a prompt-mode FARMING slot (no confirm channel exists
   });
 });
 
-describe('harvestCrop: draw-free on every TIER 1/2 path', () => {
-  // Every arm here plants the tier-1 vale_wheat, so the zero-draw pins are
-  // tier-scoped claims: since the crop ladder, a TIER 3/4 harvest draws
-  // exactly one (the seed-back roll), pinned band by band in its own
-  // describe below. Tier is an input, not an outcome, so the tier-1 arms
-  // here and the tier 3/4 arms there can never fork one stream.
+describe('harvestCrop TIER 1/2: one draw (the golden roll) on every outcome, zero on every deny', () => {
+  // Every arm here plants the tier-1 vale_wheat, so the one-draw pins are
+  // tier-scoped claims: the one draw is the unconditional golden-harvest
+  // roll (a probed LOSER on the default harness seed, so no payout here
+  // multiplies; the winner arms live in the golden describe below), and a
+  // TIER 3/4 harvest draws exactly two (the seed-back roll then the golden
+  // roll), pinned band by band in its own describe below. Tier is an input,
+  // not an outcome, so the tier-1 arms here and the tier 3/4 arms there can
+  // never fork one stream.
   let h: Harness;
   beforeEach(() => {
     h = makeHarness();
@@ -1765,7 +1794,7 @@ describe('harvestCrop: draw-free on every TIER 1/2 path', () => {
     const expected = resolveFarmHarvest(plot.yieldSeed as number, 0);
     const from = h.sim.events.length;
     const draws = countDraws(h.sim, () => harvest(h));
-    expect(draws).toBe(0);
+    expect(draws).toBe(1);
     expect(h.meta.farmPlots.has(BED)).toBe(false);
     expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(expected.count);
     expect(h.sim.countItem(FINE_ID, h.pid)).toBe(expected.fine);
@@ -1919,9 +1948,11 @@ describe('harvestCrop: draw-free on every TIER 1/2 path', () => {
     // 0.85, so a 0.99 roll loses.
     const plot = h.meta.farmPlots.get(BED) as PlotState;
     plot.survivalRoll = 0.99;
+    // The withered path spends the golden draw too (constant count) and
+    // IGNORES its result: husks, never a celebration.
     const from = h.sim.events.length;
     const draws = countDraws(h.sim, () => harvest(h));
-    expect(draws).toBe(0);
+    expect(draws).toBe(1);
     expect(h.meta.farmPlots.has(BED)).toBe(false);
     expect(h.sim.countItem(FARM_WITHERED_HUSK_ITEM_ID, h.pid)).toBe(FARM_WITHERED_HUSK_COUNT);
     expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(0);
@@ -1953,7 +1984,7 @@ describe('harvestCrop: draw-free on every TIER 1/2 path', () => {
     plot.survivalRoll = 0;
     plot.cropId = 'retired_crop';
     const from = h.sim.events.length;
-    expect(countDraws(h.sim, () => harvest(h))).toBe(0);
+    expect(countDraws(h.sim, () => harvest(h))).toBe(1);
     expect(h.meta.farmPlots.has(BED)).toBe(false);
     expect(h.sim.countItem(FARM_WITHERED_HUSK_ITEM_ID, h.pid)).toBe(FARM_WITHERED_HUSK_COUNT);
     expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(0);
@@ -2085,28 +2116,34 @@ describe('harvestCrop: draw-free on every TIER 1/2 path', () => {
   });
 });
 
-describe('the seed-back roll (tier 3/4): ONE draw at harvest, banded payouts', () => {
-  // The one deliberate exception to "harvest draws nothing": a tier 3/4
-  // harvest spends EXACTLY one ctx.rng draw at a FIXED position (after the
-  // outcome-resolution gates, before the survived/withered branch and every
-  // loop), on BOTH outcomes. It is a REAL draw at player-action time, NOT a
-  // seed expansion: the tonic is seed-anchored because its outcome is fixed
-  // at plant time; seed-back is decided by the harvest itself, which is
-  // D4-legal because a harvest is a player action.
+describe('the seed-back roll (tier 3/4): the FIRST of the two harvest draws, banded payouts', () => {
+  // A tier 3/4 harvest spends EXACTLY two contiguous ctx.rng draws at a
+  // FIXED position (after the outcome-resolution gates, before the
+  // survived/withered branch and every loop), on BOTH outcomes: the
+  // seed-back roll, then the golden-harvest roll (whose own describe sits
+  // below; here every recorded second draw is a probed LOSER, so the
+  // payouts stay unmultiplied). They are REAL draws at player-action time,
+  // NOT seed expansions: the tonic is seed-anchored because its outcome is
+  // fixed at plant time; seed-back is decided by the harvest itself, which
+  // is D4-legal because a harvest is a player action.
   //
-  // PROBED SEEDS, the vacuity rule: the roll is the THIRD post-construction
-  // draw on these harnesses (two plant draws, then the harvest's one), so
-  // each band arm names the harness seed whose third draw was probed into
-  // its band, and asserts the captured value IN-ARM against the shipped
-  // thresholds. Probed against the real modules (third draw after
+  // PROBED SEEDS, the vacuity rule: the seed-back roll is the THIRD
+  // post-construction draw on these harnesses (two plant draws, then the
+  // harvest's first) and the golden roll the FOURTH, so each band arm names
+  // the harness seed whose third draw was probed into its band, and asserts
+  // the captured values IN-ARM against the shipped thresholds. Probed
+  // against the real modules (third and fourth draws after
   // new Sim({ seed, playerClass: 'warrior', autoEquip: false })):
-  //   seed 4  -> 0.026266 (tier-3 two-seed band, under 0.08)
-  //   seed 3  -> 0.180549 (tier-3 one-seed band, in [0.08, 0.40))
-  //   seed 5  -> 0.712293 (tier-3 zero band, at or above 0.40)
+  //   seed 4  -> 0.026266 (tier-3 two-seed band, under 0.08); d4 0.677277
+  //   seed 3  -> 0.180549 (tier-3 one-seed band, in [0.08, 0.40)); d4
+  //              0.367070
+  //   seed 5  -> 0.712293 (tier-3 zero band, at or above 0.40); d4 0.666813
   //   seed 41 -> 0.067811 (tier-4 ONE-seed band, in [0.06, 0.35); the same
   //              roll sits under tier 3's 0.08, which is what makes it the
-  //              per-tier-thresholds proof)
-  //   seed 8  -> 0.202110 (a withered-arm WINNER: pays 1 seed)
+  //              per-tier-thresholds proof); d4 0.403966
+  //   seed 8  -> 0.202110 (a withered-arm WINNER: pays 1 seed); d4 0.306523
+  // Every d4 above sits at or above the 1/90 golden chance: all five arms
+  // record a golden LOSS in values[1], asserted in-arm.
   const T3_CROP = 'highland_barley';
   const T3_SEED = 'highland_barley_seed';
   const T3_HOE = 'skysilver_hoe';
@@ -2159,7 +2196,7 @@ describe('the seed-back roll (tier 3/4): ONE draw at harvest, banded payouts', (
     }
   });
 
-  it('a survived tier-3 harvest draws EXACTLY one, and the two-seed band pays 2 (probed seed 4)', () => {
+  it('a survived tier-3 harvest draws EXACTLY two, and the two-seed band pays 2 (probed seed 4)', () => {
     const h = makeHarness(4);
     const plot = plantTier(h, T3_CROP, T3_HOE, 75);
     plot.survivalRoll = 0; // survival forced: this arm is about the roll
@@ -2167,10 +2204,14 @@ describe('the seed-back roll (tier 3/4): ONE draw at harvest, banded payouts', (
     const expected = resolveFarmHarvest(plot.yieldSeed as number, 75);
     const from = h.sim.events.length;
     const values = recordDraws(h.sim, () => harvest(h));
-    expect(values).toHaveLength(1);
+    expect(values).toHaveLength(2);
     // The in-arm band claim (the probe, re-proven where it counts): a draw
     // block shift that re-seats the stream reds HERE, loudly.
     expect(values[0]).toBeLessThan(FARM_SEED_BACK_TWO_CHANCE[3] as number);
+    // The golden roll rides second on every tier 3/4 harvest, a probed
+    // LOSER here (the describe banner's d4 list), so the payout above is
+    // exactly the seed-back band's own.
+    expect(values[1]).toBeGreaterThanOrEqual(GATHER_RARE_EVENT_CHANCE);
     expect(h.sim.countItem(T3_SEED, h.pid)).toBe(2);
     const ev = eventsOf(h.sim, from, 'farmHarvested')[0];
     expect(ev.seedBackCount).toBe(2);
@@ -2187,32 +2228,40 @@ describe('the seed-back roll (tier 3/4): ONE draw at harvest, banded payouts', (
     plot.survivalRoll = 0;
     const from = h.sim.events.length;
     const values = recordDraws(h.sim, () => harvest(h));
-    expect(values).toHaveLength(1);
+    expect(values).toHaveLength(2);
     expect(values[0]).toBeGreaterThanOrEqual(FARM_SEED_BACK_TWO_CHANCE[3] as number);
     expect(values[0]).toBeLessThan(FARM_SEED_BACK_ONE_CHANCE[3] as number);
+    // The golden roll rides second on every tier 3/4 harvest, a probed
+    // LOSER here (the describe banner's d4 list), so the payout above is
+    // exactly the seed-back band's own.
+    expect(values[1]).toBeGreaterThanOrEqual(GATHER_RARE_EVENT_CHANCE);
     expect(h.sim.countItem(T3_SEED, h.pid)).toBe(1);
     expect(eventsOf(h.sim, from, 'farmHarvested')[0].seedBackCount).toBe(1);
     assertAllLootFlagged(h, from);
   });
 
-  it('the zero band still draws its one, pays nothing, and OMITS the field (probed seed 5)', () => {
+  it('the zero band still draws, pays nothing, and OMITS the field (probed seed 5)', () => {
     // The omit-zero pin: a zero roll leaves the event byte-identical to the
     // pre-field wire (the only-when-true doctrine), and the bag agrees. The
     // draw still happens, which is the whole fixed-position contract: the
-    // stream moves by exactly one per tier 3/4 harvest, win or lose.
+    // stream moves by exactly two per tier 3/4 harvest, win or lose.
     const h = makeHarness(5);
     const plot = plantTier(h, T3_CROP, T3_HOE, 75);
     plot.survivalRoll = 0;
     const from = h.sim.events.length;
     const values = recordDraws(h.sim, () => harvest(h));
-    expect(values).toHaveLength(1);
+    expect(values).toHaveLength(2);
     expect(values[0]).toBeGreaterThanOrEqual(FARM_SEED_BACK_ONE_CHANCE[3] as number);
+    // The golden roll rides second on every tier 3/4 harvest, a probed
+    // LOSER here (the describe banner's d4 list), so the payout above is
+    // exactly the seed-back band's own.
+    expect(values[1]).toBeGreaterThanOrEqual(GATHER_RARE_EVENT_CHANCE);
     expect(h.sim.countItem(T3_SEED, h.pid)).toBe(0);
     const ev = eventsOf(h.sim, from, 'farmHarvested')[0];
     expect('seedBackCount' in ev).toBe(false);
   });
 
-  it('a tier-4 harvest draws its one and pays by ITS OWN thresholds (probed seed 41)', () => {
+  it('a tier-4 harvest draws its two and pays by ITS OWN thresholds (probed seed 41)', () => {
     // The per-tier proof: this roll (0.067811) sits UNDER tier 3's two-seed
     // threshold but inside tier 4's one-seed band, so a flat-rate regression
     // that ignored the crop tier would pay 2 here and red on the bag.
@@ -2221,19 +2270,24 @@ describe('the seed-back roll (tier 3/4): ONE draw at harvest, banded payouts', (
     plot.survivalRoll = 0;
     const from = h.sim.events.length;
     const values = recordDraws(h.sim, () => harvest(h));
-    expect(values).toHaveLength(1);
+    expect(values).toHaveLength(2);
     expect(values[0]).toBeLessThan(FARM_SEED_BACK_TWO_CHANCE[3] as number);
     expect(values[0]).toBeGreaterThanOrEqual(FARM_SEED_BACK_TWO_CHANCE[4] as number);
     expect(values[0]).toBeLessThan(FARM_SEED_BACK_ONE_CHANCE[4] as number);
+    // The golden roll rides second on every tier 3/4 harvest, a probed
+    // LOSER here (the describe banner's d4 list), so the payout above is
+    // exactly the seed-back band's own.
+    expect(values[1]).toBeGreaterThanOrEqual(GATHER_RARE_EVENT_CHANCE);
     expect(h.sim.countItem(T4_SEED, h.pid)).toBe(1);
     expect(eventsOf(h.sim, from, 'farmHarvested')[0].seedBackCount).toBe(1);
     assertAllLootFlagged(h, from);
   });
 
-  it('a WITHERED tier-3 harvest draws its one and can pay seed-back beside the husks (probed seed 8)', () => {
+  it('a WITHERED tier-3 harvest draws its two and can pay seed-back beside the husks (probed seed 8)', () => {
     // The withered consolation roll is deliberate (both outcomes share the
-    // one pre-branch draw), so a failed high-tier crop can hand a seed back
-    // WITH its husks. Proficiency 70: the skysilver hoe wields exactly at
+    // pre-branch draw block), so a failed high-tier crop can hand a seed
+    // back WITH its husks; the golden roll rides second and is IGNORED on
+    // this branch (husks, never a celebration). Proficiency 70: the skysilver hoe wields exactly at
     // its R22 requirement, and the tier-3 survival ramp reads 0.97 there, so
     // the 0.99 roll below genuinely withers without any skill fiddling.
     const h = makeHarness(8);
@@ -2241,10 +2295,15 @@ describe('the seed-back roll (tier 3/4): ONE draw at harvest, banded payouts', (
     plot.survivalRoll = 0.99;
     const from = h.sim.events.length;
     const values = recordDraws(h.sim, () => harvest(h));
-    expect(values).toHaveLength(1);
+    expect(values).toHaveLength(2);
     // The probed winner claim, in-arm: this roll pays exactly one seed.
     expect(values[0]).toBeGreaterThanOrEqual(FARM_SEED_BACK_TWO_CHANCE[3] as number);
     expect(values[0]).toBeLessThan(FARM_SEED_BACK_ONE_CHANCE[3] as number);
+    // The golden roll rides second on every tier 3/4 harvest, a probed
+    // LOSER here (the describe banner's d4 list), so the payout above is
+    // exactly the seed-back band's own.
+    expect(values[1]).toBeGreaterThanOrEqual(GATHER_RARE_EVENT_CHANCE);
+
     // Husks still paid, produce still absent, and the seed beside them.
     expect(h.sim.countItem(FARM_WITHERED_HUSK_ITEM_ID, h.pid)).toBe(FARM_WITHERED_HUSK_COUNT);
     expect(h.sim.countItem('highland_barley', h.pid)).toBe(0);
@@ -2259,7 +2318,7 @@ describe('the seed-back roll (tier 3/4): ONE draw at harvest, banded payouts', (
     assertAllLootFlagged(h, from);
   });
 
-  it('the crossed contract, survived: cache armed AND tonic stored, the tier-3 harvest still draws EXACTLY one', () => {
+  it('the crossed contract, survived: cache armed AND tonic stored, the tier-3 harvest still draws EXACTLY two', () => {
     // The banner's crossing claim pinned where the axes meet: the tool-effect
     // arms above run tier 1 only, and the band arms above run effect-free, so
     // until this arm no test ever executed a tier 3/4 harvest with an armed
@@ -2290,8 +2349,13 @@ describe('the seed-back roll (tier 3/4): ONE draw at harvest, banded payouts', (
     expect(armed.count).toBeGreaterThan(unarmed.count); // in-arm non-vacuity
     const before = slot.durability;
     const values = recordDraws(h.sim, () => harvest(h));
-    expect(values).toHaveLength(1); // the seed-back roll alone
+    expect(values).toHaveLength(2); // the seed-back roll, then the golden roll
     expect(values[0]).toBeLessThan(FARM_SEED_BACK_TWO_CHANCE[3] as number);
+    // The golden roll rides second on every tier 3/4 harvest, a probed
+    // LOSER here (the describe banner's d4 list), so the payout above is
+    // exactly the seed-back band's own.
+    expect(values[1]).toBeGreaterThanOrEqual(GATHER_RARE_EVENT_CHANCE);
+
     expect(h.sim.countItem(T3_SEED, h.pid)).toBe(2);
     // The armed-and-toniced expansion is what the bags received, and the
     // charge settle still spent its one: the crossing changed the payout,
@@ -2300,7 +2364,7 @@ describe('the seed-back roll (tier 3/4): ONE draw at harvest, banded payouts', (
     expect(slot.durability).toBe(before - 1);
   });
 
-  it('the crossed contract, withered: the one draw stands and the charge is KEPT (effects act on survived only)', () => {
+  it('the crossed contract, withered: the two draws stand and the charge is KEPT (effects act on survived only)', () => {
     const h = makeHarness(8); // the probed withered one-seed winner above
     const plot = plantTier(h, T3_CROP, T3_HOE, 70);
     plot.survivalRoll = 0.99;
@@ -2311,7 +2375,7 @@ describe('the seed-back roll (tier 3/4): ONE draw at harvest, banded payouts', (
     const before = slot.durability;
     const beforeCeil = slot.maxDurability;
     const values = recordDraws(h.sim, () => harvest(h));
-    expect(values).toHaveLength(1);
+    expect(values).toHaveLength(2);
     expect(h.sim.countItem(T3_SEED, h.pid)).toBe(1);
     expect(h.sim.countItem(FARM_WITHERED_HUSK_ITEM_ID, h.pid)).toBe(FARM_WITHERED_HUSK_COUNT);
     // The withered return sits ABOVE the effect block, so an armed slot on a
@@ -2385,27 +2449,399 @@ describe('the seed-back roll (tier 3/4): ONE draw at harvest, banded payouts', (
     expect(denyReason(h.sim, from)).toBe('no_plot');
 
     // Anti-vacuous close: the plot survived all five refusals, and the REAL
-    // harvest then spends exactly its one draw.
+    // harvest then spends exactly its two draws.
     (h.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0;
-    expect(countDraws(h.sim, () => harvest(h))).toBe(1);
+    expect(countDraws(h.sim, () => harvest(h))).toBe(2);
   });
 
-  it('a tier-2 harvest draws ZERO: the negative arm of the tier condition', () => {
+  it('a tier-2 harvest draws only the golden roll: the negative arm of the tier condition', () => {
     // Same harness shape as the banded arms above, one tier down, so the
-    // zero here is about the TIER and nothing else (the non-vacuous negative
-    // arm the tier-1 describe cannot supply on its own).
+    // single draw here (the unconditional golden roll, no seed-back) is
+    // about the TIER and nothing else (the non-vacuous negative arm the
+    // tier-1 describe cannot supply on its own).
     const h = makeHarness(4);
     const plot = plantTier(h, 'marsh_rice', 'bronze_hoe', 40);
     plot.survivalRoll = 0;
     const expected = resolveFarmHarvest(plot.yieldSeed as number, 40);
     const from = h.sim.events.length;
-    expect(countDraws(h.sim, () => harvest(h))).toBe(0);
+    expect(countDraws(h.sim, () => harvest(h))).toBe(1);
     expect(h.sim.countItem('marsh_rice_seed', h.pid)).toBe(0);
     const ev = eventsOf(h.sim, from, 'farmHarvested')[0];
     expect('seedBackCount' in ev).toBe(false);
     // The harvest itself still paid normally.
     expect(h.sim.countItem('marsh_rice', h.pid)).toBe(expected.count);
     expect(h.sim.countItem('fine_marsh_rice', h.pid)).toBe(expected.fine);
+  });
+});
+
+describe('the golden_harvest roll: the shared rare event at the farm bed', () => {
+  // Farming's arm of the shared gather rare event (gather_events.ts): the
+  // golden roll spends its draw on EVERY resolving harvest (the clause block
+  // at the bottom of this file pins the counts) and PAYS only on the
+  // survived branch: a five-fold SIGNED yield, the zone fanout event, and
+  // the gather_event:golden_harvest visit mark. Probed-seed rule throughout:
+  // the GOLDEN_WIN_SEED banner at the top of the file records the probe, and
+  // each arm re-asserts its band IN-ARM so a draw-block shift reds loudly.
+
+  it('pins the shared tuning to its literals (the wire-name-constant rule)', () => {
+    // The roll reaches BOTH constants through the shared gather_events
+    // import, never a farming copy (D12); pinned as literals so a retune is
+    // a deliberate edit here too.
+    expect(GATHER_RARE_EVENT_CHANCE).toBe(1 / 90);
+    expect(GATHER_RARE_EVENT_YIELD_MULT).toBe(5);
+  });
+
+  it('a losing roll leaves the harvest as before: unmultiplied, unsigned, no event, no mark', () => {
+    // The default harness seed LOSES (third post-construction draw
+    // 0.067811, the GOLDEN_WIN_SEED banner), so this arm is the negative
+    // control every win arm below is read against.
+    const h = makeHarness();
+    giveSeeds(h);
+    plant(h);
+    clearCast(h.sim);
+    h.advance(CROP.durationMs);
+    const plot = h.meta.farmPlots.get(BED) as PlotState;
+    plot.survivalRoll = 0;
+    const expected = resolveFarmHarvest(plot.yieldSeed as number, 0);
+    const from = h.sim.events.length;
+    const values = recordDraws(h.sim, () => harvest(h));
+    expect(values).toHaveLength(1);
+    // The in-arm band claim: the recorded roll really lost.
+    expect(values[0]).toBeGreaterThanOrEqual(GATHER_RARE_EVENT_CHANCE);
+    expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(expected.count);
+    expect(eventsOf(h.sim, from, 'gatherRareEvent')).toEqual([]);
+    expect(h.meta.deedStats.visited.has('gather_event:golden_harvest')).toBe(false);
+    // Unsigned: plain fungible stacks, no instance payload anywhere.
+    expect(h.meta.inventory.some((s) => s.itemId === PRODUCE_ID && s.instance)).toBe(false);
+  });
+
+  it('the probed winner: five-fold yield in BOTH grades, signed, announced, marked (seed 280)', () => {
+    const h = makeHarness(GOLDEN_WIN_SEED);
+    giveSeeds(h);
+    plant(h);
+    clearCast(h.sim);
+    h.advance(CROP.durationMs);
+    const plot = h.meta.farmPlots.get(BED) as PlotState;
+    plot.survivalRoll = 0;
+    // The unarmed same-seed expectation, computed from the REAL minted
+    // yieldSeed (the banner's probed 3704758211: { count: 3, fine: 1 }).
+    const expected = resolveFarmHarvest(plot.yieldSeed as number, 0);
+    // In-arm non-vacuity (the Phase 4 QA vacuity class): both grades are
+    // nonzero, so BOTH multiplications below are real, and the armed payout
+    // genuinely DIFFERS from the unarmed one, so a draw-block shift that
+    // stops this seed winning reds here instead of re-vacuating.
+    expect(expected.count).toBeGreaterThan(0);
+    expect(expected.fine).toBeGreaterThan(0);
+    const from = h.sim.events.length;
+    const values = recordDraws(h.sim, () => harvest(h));
+    expect(values).toHaveLength(1);
+    expect(values[0]).toBeLessThan(GATHER_RARE_EVENT_CHANCE); // the probed win, in-arm
+    // Five-fold, EXACTLY, in both grades, and MORE than the unarmed base
+    // (the non-vacuity direction stated as the bags see it: a golden payout
+    // must differ from the base payout).
+    expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(expected.count * GATHER_RARE_EVENT_YIELD_MULT);
+    expect(h.sim.countItem(FINE_ID, h.pid)).toBe(expected.fine * GATHER_RARE_EVENT_YIELD_MULT);
+    expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBeGreaterThan(expected.count);
+    // Signed: the windfall lands as { signer } instances in both grades
+    // (identical-payload stacking merges them into one signed stack each).
+    expect(h.meta.name.length).toBeGreaterThan(0);
+    for (const itemId of [PRODUCE_ID, FINE_ID]) {
+      const slots = h.meta.inventory.filter((s) => s.itemId === itemId);
+      expect(slots.length, itemId).toBeGreaterThan(0);
+      for (const slot of slots) expect(slot.instance?.signer, itemId).toBe(h.meta.name);
+    }
+    // The zone fanout event, whole payload shape: the crop source, the
+    // AUTHORED bed zone (bed_eastbrook_1's patch), the base produce id, and
+    // the finder identity; the finder is part of their own fanout.
+    const rare = eventsOf(h.sim, from, 'gatherRareEvent');
+    expect(rare.length).toBeGreaterThan(0);
+    for (const ev of rare) {
+      expect(ev.flavor).toBe('golden_harvest');
+      expect(ev.nodeType).toBe('crop');
+      expect(ev.zoneId).toBe('eastbrook_vale');
+      expect(ev.itemId).toBe(PRODUCE_ID);
+      expect(ev.finderPid).toBe(h.pid);
+      expect(ev.finderName).toBe(h.meta.name);
+    }
+    expect(rare.some((ev) => ev.pid === h.pid)).toBe(true);
+    // The farmHarvested event carries the multiplied counts (a mixed
+    // harvest: both grades present, so the fine pair rides).
+    const harvested = eventsOf(h.sim, from, 'farmHarvested')[0];
+    expect(harvested.count).toBe(expected.count * GATHER_RARE_EVENT_YIELD_MULT);
+    expect(harvested.fineCount).toBe(expected.fine * GATHER_RARE_EVENT_YIELD_MULT);
+    // The visit mark lands; the Reliquary deliberately has NO golden cell
+    // (noteReliquaryMark no-ops unknown ids: the ledgered field-note
+    // deferral, asserted as the negative so it retires consciously).
+    expect(h.meta.deedStats.visited.has('gather_event:golden_harvest')).toBe(true);
+    expect(h.meta.reliquary.marks.has('gather_event:golden_harvest')).toBe(false);
+    // Every hub grant kept both #2430 flags (the signed grant sites too).
+    const loots = eventsOf(h.sim, from, 'loot');
+    expect(loots.length).toBeGreaterThan(0);
+    for (const lev of loots) {
+      expect(lev.silent, lev.text).toBe(true);
+      expect(lev.callerLogs, lev.text).toBe(true);
+    }
+  });
+
+  it('a golden ALL-FINE harvest announces the fine item, the collapse rule (probed seed)', () => {
+    // The zone line must name something the finder actually received: on the
+    // all-fine collapse the primary grant IS the fine item, the same rule
+    // the farmHarvested emit applies. yieldSeed 404006 was PROBED at skill 0
+    // (count 0, fine 3, all three picks upgrade); the overwrite below rides
+    // the scenario's tonic-winner precedent (a stored seed is state, not a
+    // draw). The golden win still comes from the LIVE stream (seed 280's
+    // probed third draw), which the yieldSeed overwrite cannot move.
+    const ALL_FINE_YIELD_SEED = 404006;
+    const probe = resolveFarmHarvest(ALL_FINE_YIELD_SEED, 0);
+    expect(probe.count).toBe(0);
+    expect(probe.fine).toBeGreaterThan(0);
+    const h = makeHarness(GOLDEN_WIN_SEED);
+    giveSeeds(h);
+    plant(h);
+    clearCast(h.sim);
+    h.advance(CROP.durationMs);
+    const plot = h.meta.farmPlots.get(BED) as PlotState;
+    plot.survivalRoll = 0;
+    plot.yieldSeed = ALL_FINE_YIELD_SEED;
+    const from = h.sim.events.length;
+    const values = recordDraws(h.sim, () => harvest(h));
+    expect(values).toHaveLength(1);
+    expect(values[0]).toBeLessThan(GATHER_RARE_EVENT_CHANCE); // still the probed win
+    // The bags saw ONLY fine produce, five-folded.
+    expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(0);
+    expect(h.sim.countItem(FINE_ID, h.pid)).toBe(probe.fine * GATHER_RARE_EVENT_YIELD_MULT);
+    // Both events name the fine item: the zone line and the harvest event
+    // agree on the one rule (itemId is always something the player received).
+    const rare = eventsOf(h.sim, from, 'gatherRareEvent');
+    expect(rare.length).toBeGreaterThan(0);
+    for (const ev of rare) expect(ev.itemId).toBe(FINE_ID);
+    const harvested = eventsOf(h.sim, from, 'farmHarvested')[0];
+    expect(harvested.itemId).toBe(FINE_ID);
+    expect(harvested.count).toBe(probe.fine * GATHER_RARE_EVENT_YIELD_MULT);
+    expect('fineItemId' in harvested).toBe(false);
+  });
+
+  it('a WITHERED winner is IGNORED: the draw happens, no announce, no multiplier (seed 280)', () => {
+    // The same probed winner seed with the survival roll forced to lose: the
+    // golden draw still spends (the constant per-action count) and the win
+    // is discarded on the withered branch (husks, never a celebration).
+    const h = makeHarness(GOLDEN_WIN_SEED);
+    giveSeeds(h);
+    plant(h);
+    clearCast(h.sim);
+    h.advance(CROP.durationMs);
+    (h.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0.99;
+    const from = h.sim.events.length;
+    const values = recordDraws(h.sim, () => harvest(h));
+    expect(values).toHaveLength(1);
+    expect(values[0]).toBeLessThan(GATHER_RARE_EVENT_CHANCE); // it really WON
+    expect(eventsOf(h.sim, from, 'gatherRareEvent')).toEqual([]);
+    expect(h.sim.countItem(FARM_WITHERED_HUSK_ITEM_ID, h.pid)).toBe(FARM_WITHERED_HUSK_COUNT);
+    expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(0);
+    expect(h.meta.deedStats.visited.has('gather_event:golden_harvest')).toBe(false);
+  });
+
+  it('every harvest deny path draws ZERO even on a winner stream', () => {
+    // The golden roll sits after the outcome-resolution gates, so a refusal
+    // can never spend (or leak) the pending win.
+    const h = makeHarness(GOLDEN_WIN_SEED);
+    giveSeeds(h);
+    plant(h);
+    clearCast(h.sim);
+    h.advance(CROP.durationMs - 1);
+    let from = h.sim.events.length;
+    expect(countDraws(h.sim, () => harvest(h))).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('not_ready');
+    h.advance(1);
+
+    h.sim.player.dead = true;
+    expect(countDraws(h.sim, () => harvest(h))).toBe(0);
+    h.sim.player.dead = false;
+
+    from = h.sim.events.length;
+    expect(countDraws(h.sim, () => harvest(h, 'bed_not_a_real_bed'))).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('bad_bed');
+
+    h.sim.player.pos.x += 50;
+    from = h.sim.events.length;
+    expect(countDraws(h.sim, () => harvest(h))).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('range');
+    standAtBed(h.sim, BED);
+
+    from = h.sim.events.length;
+    expect(countDraws(h.sim, () => harvest(h, BED2))).toBe(0);
+    expect(denyReason(h.sim, from)).toBe('no_plot');
+
+    // Anti-vacuous close: the refusals spent nothing, so the roll the real
+    // harvest now spends is STILL the probed winner.
+    (h.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0;
+    from = h.sim.events.length;
+    const values = recordDraws(h.sim, () => harvest(h));
+    expect(values).toHaveLength(1);
+    expect(values[0]).toBeLessThan(GATHER_RARE_EVENT_CHANCE);
+    expect(eventsOf(h.sim, from, 'gatherRareEvent').length).toBeGreaterThan(0);
+  });
+
+  it('run-twice determinism: two same-seed worlds agree on the whole golden harvest', () => {
+    const run = () => {
+      const h = makeHarness(GOLDEN_WIN_SEED);
+      giveSeeds(h);
+      plant(h);
+      clearCast(h.sim);
+      h.advance(CROP.durationMs);
+      (h.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0;
+      const from = h.sim.events.length;
+      harvest(h);
+      return {
+        produce: h.sim.countItem(PRODUCE_ID, h.pid),
+        fine: h.sim.countItem(FINE_ID, h.pid),
+        signed: h.meta.inventory
+          .filter((s) => s.itemId === PRODUCE_ID || s.itemId === FINE_ID)
+          .map((s) => ({ itemId: s.itemId, count: s.count, signer: s.instance?.signer })),
+        events: JSON.parse(
+          JSON.stringify(
+            h.sim.events
+              .slice(from)
+              .filter((e) => e.type.startsWith('farm') || e.type === 'gatherRareEvent'),
+          ),
+        ),
+      };
+    };
+    const a = run();
+    const b = run();
+    expect(a).toEqual(b);
+    // Non-vacuity: the compared session really was a golden one.
+    expect(a.events.some((e: { type: string }) => e.type === 'gatherRareEvent')).toBe(true);
+    expect(a.produce).toBeGreaterThan(0);
+  });
+});
+
+describe('the celebration marks: farm:planted and the farm:<zone> chronicle', () => {
+  // Zero-rng, draw-order-neutral marks (the celebrations phase): the
+  // first-planting proof at plant success and the per-zone first-harvest
+  // chronicle on the survived branch (deeds.ts onCropHarvestedForDeeds).
+
+  it('writes farm:planted at plant SUCCESS and never on a deny', () => {
+    const h = makeHarness();
+    // The deny first (no seed in bags): no mark.
+    const from = h.sim.events.length;
+    plant(h);
+    expect(denyReason(h.sim, from)).toBe('no_seed');
+    expect(h.meta.deedStats.visited.has('farm:planted')).toBe(false);
+    // The success writes it.
+    giveSeeds(h);
+    plant(h);
+    expect(h.meta.deedStats.visited.has('farm:planted')).toBe(true);
+    // Idempotent: a second successful plant re-marks without issue (visited
+    // is a set; no duplicate entry, no error).
+    clearCast(h.sim);
+    giveSeeds(h);
+    plant(h, BED2);
+    expect(h.meta.deedStats.visited.has('farm:planted')).toBe(true);
+  });
+
+  it('writes farm:<zone> on a survived harvest at each hub (eastbrook and thornpeak)', () => {
+    // Two REAL bed ids in two different chronicle zones, so the zone
+    // resolution is proven per bed rather than once by coincidence.
+    for (const { bedId, zone } of [
+      { bedId: BED, zone: 'eastbrook_vale' },
+      { bedId: 'bed_thornpeak_1', zone: 'thornpeak_heights' },
+    ]) {
+      const h = makeHarness();
+      standAtBed(h.sim, bedId);
+      giveSeeds(h);
+      plantCrop(h.sim.ctx, h.sim.player, h.meta, bedId, CROP_ID);
+      clearCast(h.sim);
+      h.advance(CROP.durationMs);
+      (h.meta.farmPlots.get(bedId) as PlotState).survivalRoll = 0;
+      harvestCrop(h.sim.ctx, h.sim.player, h.meta, bedId);
+      expect(h.meta.deedStats.visited.has(`farm:${zone}`), zone).toBe(true);
+    }
+  });
+
+  it('never chronicles a WITHERED harvest (weeds and boots do not count)', () => {
+    const h = makeHarness();
+    giveSeeds(h);
+    plant(h);
+    clearCast(h.sim);
+    h.advance(CROP.durationMs);
+    (h.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0.99;
+    harvest(h);
+    expect(h.sim.countItem(FARM_WITHERED_HUSK_ITEM_ID, h.pid)).toBe(FARM_WITHERED_HUSK_COUNT);
+    expect(h.meta.deedStats.visited.has('farm:eastbrook_vale')).toBe(false);
+    // The plant itself still marked: farm:planted is about the planting.
+    expect(h.meta.deedStats.visited.has('farm:planted')).toBe(true);
+  });
+
+  it('both farm marks survive a save and a load (the registered-namespace proof)', () => {
+    // restoreDeedStats DROPS visited marks in unregistered namespaces (the
+    // gather_event lesson recorded at VISITED_MARK_NAMESPACES), so this
+    // round trip is what proves the 'farm' registration actually landed: an
+    // unregistered namespace would serialize fine here and come back empty.
+    const h = makeHarness();
+    giveSeeds(h);
+    plant(h);
+    clearCast(h.sim);
+    h.advance(CROP.durationMs);
+    (h.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0;
+    harvest(h);
+    expect(h.meta.deedStats.visited.has('farm:planted')).toBe(true);
+    expect(h.meta.deedStats.visited.has('farm:eastbrook_vale')).toBe(true);
+    const saved = h.sim.serializeCharacter(h.pid) as CharacterState;
+    const fresh = new Sim({ seed: 41, playerClass: 'warrior', noPlayer: true });
+    fresh.addPlayer('warrior', 'Farmer', { state: saved });
+    const loaded = [...fresh.players.values()][0] as PlayerMeta;
+    expect(loaded.deedStats.visited.has('farm:planted')).toBe(true);
+    expect(loaded.deedStats.visited.has('farm:eastbrook_vale')).toBe(true);
+  });
+});
+
+describe('the celebration deeds end to end (the merged catalog over the live producer)', () => {
+  // The cross-slice integration proof: the sim slice writes the marks and
+  // the catalog slice reads them, and neither branch alone could exercise
+  // the chain plant to harvest to tick tail to deedsEarned. Grants land at
+  // the tick tail over dirty players (src/sim/deeds.ts), so each assert
+  // follows one tick.
+
+  it('grants prog_first_planting and the vale chronicle from one real cycle', () => {
+    const h = makeHarness();
+    giveSeeds(h);
+    plant(h);
+    clearCast(h.sim);
+    h.sim.tick();
+    expect(h.meta.deedsEarned.has('prog_first_planting')).toBe(true);
+    expect(h.meta.deedsEarned.has('chr_vale_first_harvest')).toBe(false);
+    h.advance(CROP.durationMs);
+    (h.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0;
+    harvest(h);
+    h.sim.tick();
+    expect(h.meta.deedsEarned.has('chr_vale_first_harvest')).toBe(true);
+  });
+
+  it('grants col_golden_harvest on the probed winner stream and not on a loss', () => {
+    // The winner stream reproduces the GOLDEN_WIN_SEED probe exactly (plant
+    // draws 1 and 2, the golden roll is draw 3; no ticks in between so the
+    // stream position holds). The loss arm is the default seed's recorded
+    // losing stream, the non-vacuity twin.
+    const win = makeHarness(GOLDEN_WIN_SEED);
+    giveSeeds(win);
+    plant(win);
+    clearCast(win.sim);
+    win.advance(CROP.durationMs);
+    (win.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0;
+    harvest(win);
+    win.sim.tick();
+    expect(win.meta.deedsEarned.has('col_golden_harvest')).toBe(true);
+
+    const loss = makeHarness();
+    giveSeeds(loss);
+    plant(loss);
+    clearCast(loss.sim);
+    loss.advance(CROP.durationMs);
+    (loss.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0;
+    harvest(loss);
+    loss.sim.tick();
+    expect(loss.meta.deedsEarned.has('col_golden_harvest')).toBe(false);
   });
 });
 
@@ -2817,11 +3253,13 @@ describe('the draw contract, clause by clause', () => {
     }
   });
 
-  it('draws EXACTLY one at a tier 3/4 harvest and ZERO at tier 1/2: the seed-back clause', () => {
-    // The contract's newest clause, proven in one session so the two counts
-    // share a stream: the same farmer harvests a tier-3 plot (one draw, the
-    // seed-back roll) and a tier-1 plot (zero), back to back. The banded
-    // payout arms live in the seed-back describe; this is the clause count.
+  it('draws EXACTLY two at a tier 3/4 harvest and ONE at tier 1/2: the harvest clauses', () => {
+    // The seed-back and golden clauses proven in one session so the two
+    // counts share a stream: the same farmer harvests a tier-3 plot (two
+    // contiguous draws, the seed-back roll then the golden roll) and a
+    // tier-1 plot (one draw, the golden roll alone), back to back. The
+    // banded payout arms live in the seed-back describe and the golden win
+    // arms in the golden describe; this is the clause count.
     const h = makeHarness(4);
     h.meta.gatheringProficiency.farming = 75;
     h.sim.addItem('skysilver_hoe', 1, h.pid);
@@ -2835,11 +3273,34 @@ describe('the draw contract, clause by clause', () => {
     for (const bedId of [BED, BED2]) {
       (h.meta.farmPlots.get(bedId) as PlotState).survivalRoll = 0;
     }
-    expect(countDraws(h.sim, () => harvest(h, BED))).toBe(1);
-    expect(countDraws(h.sim, () => harvest(h, BED2))).toBe(0);
+    expect(countDraws(h.sim, () => harvest(h, BED))).toBe(2);
+    expect(countDraws(h.sim, () => harvest(h, BED2))).toBe(1);
     // Both really paid, so neither count came from a refused command.
     expect(h.sim.countItem('highland_barley', h.pid)).toBeGreaterThan(0);
     expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBeGreaterThan(0);
+  });
+
+  it('the golden clause: the roll is UNCONDITIONAL, so every harvest of every tier spends it', () => {
+    // The clause the golden describe's band arms interpret: the golden roll
+    // rides EVERY resolving harvest (both outcomes; the withered count is
+    // pinned in the tier-1 describe), so the per-action draw count is a
+    // constant of the crop TIER alone, never of the outcome or any knob.
+    // Proven as a difference across outcomes on one stream: a survived and
+    // a withered tier-1 harvest cost the same one draw.
+    const h = makeHarness(2024);
+    giveSeeds(h, 2);
+    plant(h, BED);
+    clearCast(h.sim);
+    plant(h, BED2);
+    clearCast(h.sim);
+    h.advance(CROP.durationMs);
+    (h.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0;
+    (h.meta.farmPlots.get(BED2) as PlotState).survivalRoll = 0.99;
+    expect(countDraws(h.sim, () => harvest(h, BED))).toBe(1);
+    expect(countDraws(h.sim, () => harvest(h, BED2))).toBe(1);
+    // One outcome each way, so the equal counts really span both branches.
+    expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBeGreaterThan(0);
+    expect(h.sim.countItem(FARM_WITHERED_HUSK_ITEM_ID, h.pid)).toBe(FARM_WITHERED_HUSK_COUNT);
   });
 });
 

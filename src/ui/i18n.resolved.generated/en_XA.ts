@@ -3914,7 +3914,8 @@ export const en_XA: EnTranslations = {
   "gatherEvent": {
     "pristineVein": "[{finder} šţŕúçķ á þŕíšţíñé ʋéíñ!]",
     "ancientHeartwood": "[{finder} ƒéļļéð áñ áñçíéñţ ĥéáŕţŵóóð!]",
-    "moonlitBloom": "[{finder} ðíšçóʋéŕéð á ɱóóñļíţ ƀļóóɱ!]"
+    "moonlitBloom": "[{finder} ðíšçóʋéŕéð á ɱóóñļíţ ƀļóóɱ!]",
+    "goldenHarvest": "[{finder} ŕéáþéð á ĝóļðéñ ĥáŕʋéšţ!]"
   },
   "apiError": {
     "validation": {

@@ -3914,7 +3914,8 @@ export const fr_CA: EnTranslations = {
   "gatherEvent": {
     "pristineVein": "{finder} a touché une veine vierge !",
     "ancientHeartwood": "{finder} a abattu un bois de cœur ancien !",
-    "moonlitBloom": "{finder} a découvert une floraison au clair de lune !"
+    "moonlitBloom": "{finder} a découvert une floraison au clair de lune !",
+    "goldenHarvest": "{finder} reaped a golden harvest!"
   },
   "apiError": {
     "validation": {

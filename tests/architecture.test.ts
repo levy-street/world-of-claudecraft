@@ -202,6 +202,7 @@ describe('live graphics profile architecture', () => {
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  'src/ui/ability_tooltip_lines.ts',
   'src/ui/map_entity_disclosure_core.ts',
   'src/ui/map_navigation_landmarks_core.ts',
   'src/ui/map_marker_profile_core.ts',
@@ -598,6 +599,7 @@ const RENDER_PURE_CORES = [
 // updating this list) fails the cross-check instead of silently escaping the
 // reverse-completeness guard.
 const BARE_NAMED = [
+  'src/ui/ability_tooltip_lines.ts',
   'src/ui/banner_queue.ts',
   'src/ui/item_instance_glyph_mark.ts',
   'src/ui/item_kind_label.ts',
@@ -1414,6 +1416,7 @@ const EXPECTED_BARE_NAMED = [
   'src/render/prewarm_pass.ts',
   'src/render/prewarm_policy.ts',
   'src/render/prewarm_resume.ts',
+  'src/ui/ability_tooltip_lines.ts',
   'src/ui/absorb_bar.ts',
   'src/ui/bag_filter.ts',
   'src/ui/bag_item_context_menu.ts',

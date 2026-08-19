@@ -3914,7 +3914,8 @@ export const tr_TR: EnTranslations = {
   "gatherEvent": {
     "pristineVein": "{finder} bozulmamış bir damara çarptı!",
     "ancientHeartwood": "{finder} eski bir öz odunu kesti!",
-    "moonlitBloom": "{finder} ay ışığının aydınlattığı bir çiçek keşfetti!"
+    "moonlitBloom": "{finder} ay ışığının aydınlattığı bir çiçek keşfetti!",
+    "goldenHarvest": "{finder} reaped a golden harvest!"
   },
   "apiError": {
     "validation": {
