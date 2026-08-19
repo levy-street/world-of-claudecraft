@@ -85,6 +85,7 @@ function armUnstuck(server: GameServer, session: ClientSession): void {
     damageTaken: meta.counters.damageTaken,
     lastAnnouncedSecond: UNSTUCK_COUNTDOWN_SECONDS,
     startedDead: player.dead || player.ghost,
+    startedInBattlegroundWallTrap: false,
   };
   player.cooldowns.set(UNSTUCK_COOLDOWN_ID, UNSTUCK_RETRY_SECONDS);
 }

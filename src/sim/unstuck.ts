@@ -13,7 +13,7 @@
 // to 5 minutes), and neither outcome can be reached by an attempt that started on
 // the other side of the life/death line (see cancelReason).
 
-import { resolvePosition } from './colliders';
+import { moverHeight, resolvePosition } from './colliders';
 import { isRooted, isStunned } from './combat/cc';
 import {
   bgOriginAt,
@@ -74,6 +74,7 @@ export interface PendingUnstuck {
    * which would make a pre-started /unstuck a cheaper alternative to the death loop.
    */
   startedDead: boolean;
+  startedInBattlegroundWallTrap: boolean;
 }
 
 export type CancelledUnstuckEvent = Extract<UnstuckEvent, { phase: 'cancelled' }> & {
@@ -220,7 +221,15 @@ function isFrozenCorpse(p: Entity): boolean {
 
 function battlegroundWallTrap(ctx: SimContext, p: Entity): boolean {
   if (!ctx.bgMatches.has(p.id) || !isBgPos(p.pos.x)) return false;
-  const resolved = resolvePosition(ctx.cfg.seed, p.pos.x, p.pos.z, PLAYER_BODY_RADIUS);
+  const resolved = resolvePosition(
+    ctx.cfg.seed,
+    p.pos.x,
+    p.pos.z,
+    PLAYER_BODY_RADIUS,
+    false,
+    undefined,
+    moverHeight(p),
+  );
   return Math.hypot(resolved.x - p.pos.x, resolved.z - p.pos.z) > POSITION_EPS;
 }
 
@@ -282,6 +291,7 @@ export function requestUnstuck(ctx: SimContext, pid?: number): boolean {
     emitBlocked(ctx, p.id, 'invalid_area');
     return false;
   }
+  const startedInBattlegroundWallTrap = battlegroundWallTrap(ctx, p);
   meta.pendingUnstuck = {
     startedAt: ctx.time,
     endsAt: ctx.time + UNSTUCK_COUNTDOWN_SECONDS,
@@ -290,6 +300,7 @@ export function requestUnstuck(ctx: SimContext, pid?: number): boolean {
     damageTaken: meta.counters.damageTaken,
     lastAnnouncedSecond: UNSTUCK_COUNTDOWN_SECONDS,
     startedDead: p.dead || p.ghost,
+    startedInBattlegroundWallTrap,
   };
   p.cooldowns.set(UNSTUCK_COOLDOWN_ID, UNSTUCK_RETRY_SECONDS);
   ctx.emit({
@@ -313,7 +324,7 @@ function cancelReason(
   if (pending.area.kind === 'battleground' && bgCarryingFlag(ctx, p.id)) return 'state_changed';
   if (
     (hasMoveInput(meta) && !battlegroundWallTrap(ctx, p)) ||
-    (pending.area.kind !== 'battleground' &&
+    (!pending.startedInBattlegroundWallTrap &&
       (Math.hypot(p.pos.x - pending.origin.x, p.pos.z - pending.origin.z) > CANCEL_MOVE_DISTANCE ||
         Math.abs(p.pos.y - pending.origin.y) > CANCEL_VERTICAL_DISTANCE))
   )
