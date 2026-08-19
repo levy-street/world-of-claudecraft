@@ -3140,6 +3140,72 @@ docs/farming/phase-12-shared-feast.md); the wellfed parity beat rides
 its feast scenario by the recorded, tick-phase-enriched deferral.
 
 ### Phase 12
+Status: IN REVIEW (build complete on fix/farming-phase-12-shared-feast; reviews,
+mutations, and the gate pending; this row is finalized at merge).
+
+The shared feast (D16): a placeable feast other players eat from, the communal
+payoff at the top of the farming ladder, plus the beat-P discharge of the
+deferred wellfed parity beat.
+
+DECISIONS RECORDED (maintainer-flagged where noted):
+- Deviation (ca), the (bo)/Live-surface reconciliation (state.md): the recipe
+  ships REAGENT-DORMANT-HONEST like the tier 3/4 dishes; the Live-surface note
+  is amended in-file and phase-12-qa.md audits the amended surface.
+- ANTI-ABUSE RULE: one active feast per placer (farmDenied 'feast_active').
+  Chosen over a placement cooldown: no per-player timestamp outliving the
+  feast, entity count bounded at one per player, no clock involvement.
+- PROPOSED TUNING, maintainer-flagged at the ItemDef.feast row: charges 10,
+  durationTicks 3600 (180 s), recipe reagents evergarden_greens x4 +
+  gilded_sunmelon x4 + cooking_salt x2 (input 336 vs output 250,
+  gold-negative), sellValue 250, trainer fee 10000 at rung 50.
+- THE BITE IS A CONSUME SLOT, not an instant mint: eating from the feast sets
+  the standard 18 s Consuming slot pointed at the CAPSTONE DISH
+  (ItemDef.feast.dishItemId = evergarden_braised_greens), so the Well Fed
+  mint stays the one Phase 11 completion site (wellfed.ts via updateRegen),
+  interruption-forfeit rules apply verbatim, and re-tuning the dish re-tunes
+  the feast. The charge spends at bite START (the dish precedent: the spend
+  lands at use; interruption forfeits the buff, never refunds the serving).
+- TRANSIENT BY DESIGN: FeastState lives only in SimContext.feasts, dies with
+  the Sim, and never serializes (the module header owns the rationale); the
+  despawn check (zero charges or expiry) rides INSIDE updateFarming's 1 Hz
+  sweep, never a second appended sim.ts sweep.
+- The consume verb rides a dedicated seam member consumeFeast(feastId) (the
+  delveInteract precedent), NOT the bare interact command: the client funnel
+  and the sim would otherwise need matching priority ladders. Both verbs are
+  player-reachable: place via the bags LEFT-click classification (the mount
+  precedent), consume via the interact funnel's feast arm below the bed arm.
+
+SCREENSHOTS (LOW preset, the standing rule; desktop and 844x390 landscape
+mobile; captured via the farm-feast target added to scripts/pr_shot_targets.mjs,
+the BEFORE from a scratch worktree at the phase base with the same framing):
+- docs/screenshots/farming-phase-12/before-feast-desktop.png
+- docs/screenshots/farming-phase-12/after-feast-desktop.png
+- docs/screenshots/farming-phase-12/before-feast-mobile.png
+- docs/screenshots/farming-phase-12/after-feast-mobile.png
+The after shots show the placed feast prop among the Eastbrook beds, the
+composed "{name}'s Harvest Feast" title, and the placer mid-bite (the EATING
+bar and the sit); the before shots are the identical framing without any of it.
+
+NOTES (residuals and findings, ledgered):
+- The renderer-owned loot sparkle floats above the placed feast (the generic
+  object branch in renderer.ts adds it; removing it needs a renderer.ts edit,
+  forbidden this phase under the evidence-seal constraint). It reads as an
+  interact affordance; Phase 13 art batch or a budgeted renderer round owns it.
+- A farm_feast entity would have drawn the generic supply-crate body through
+  renderer.ts's object arm; buildGroundQuestObject's empty-itemId arm now
+  returns an invisible pick proxy at the feast contract bounds, keeping the
+  feast clickable under the farm_patches prop with zero renderer.ts edits.
+- place_feast sits in HEAVY_SELF_CMDS belt-and-braces; dropping it stays green
+  because the bag spend independently bumps wireRev (the pin's comment states
+  the real mechanism; the deliberate mutation survivor is recorded).
+- Beat P's coverage sweep caught the tier-3 flavor cast still running at beat
+  start (the dish useItem silently refused busy); fixed with the drive's own
+  cast-wait idiom before recording.
+- hud.ts funded by extracting entityDisplayName to src/ui/entity_display_name.ts
+  (ceiling lowered 19220 to 19214, file at 19214); sim.ts funded inside its
+  12660 ceiling by compressing farming delegate comments toward the facet docs.
+
+### Phase 13
 (not started)
 
 ### Phase 13

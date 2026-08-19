@@ -2615,6 +2615,44 @@ question does not arise (farming has no station).
   feast); the D11 ruling must cover all three before the branch merges
   to a release. Swept into phase-12-shared-feast.md and phase-12-qa.md
   in the same pass.
+  PHASE 12 LEDGERS (the shipped surface; progress.md carries the notes):
+  - IWorld: placeFeast() and consumeFeast(feastId) on IWorldFarming
+    (331 = 88 + 243); commands place_feast (payload-free, HEAVY_SELF)
+    and consume_feast ({id} only), 204/217. The consume verb is a
+    dedicated member (the delveInteract precedent), never bare interact.
+  - Sim: src/sim/professions/feast.ts owns FeastState (ownerKey =
+    characterId ?? entityId, charges, expiresAtTick, eatenBy ledger) in
+    SimContext.feasts, transient, never serialized; the despawn sweep
+    rides INSIDE updateFarming's 1 Hz guard; every feast path draws
+    zero rng. The bite sets the standard Consuming slot pointed at
+    ItemDef.feast.dishItemId (evergarden_braised_greens), so the mint
+    stays the Phase 11 updateRegen completion site and the (by)
+    namespace rules hold (pinned both directions).
+  - SimEvents: farmDenied reasons appended no_feast, feast_active,
+    feast_expired, feast_finished, feast_range, feast_eaten ('locked'
+    and the (bq) dead/busy error family reused); new event
+    farmFeastPlaced {pid, feastId} (the placer's confirmation).
+  - Content: harvest_feast (kind junk, quality rare, sellValue 250, no
+    buyValue, ItemDef.feast {charges 10, durationTicks 3600,
+    dishItemId}); recipe_harvest_feast (FARM_RECIPES 14, greens x4 +
+    sunmelon x4 + salt x2, rung 50, kitchens, trainer fee 10000,
+    reagent-dormant under (ca)); ITEM_ART_PENDING 44; entity
+    templateId 'farm_feast' (kind object, lootable false, name = the
+    placer's raw name as a value).
+  - i18n: hudChrome.farming.denied.{six reasons},
+    hudChrome.farming.feastTitle ("{name}'s Harvest Feast"),
+    hudChrome.farming.feastPlacedLine, entities.items.harvest_feast
+    .name, and the items.ts useFeast/useFeastBuff/useFeastBuffAura
+    tooltip keys, each with the five non-Latin fills (M16).
+  - Render/audio: farm_feast prop in the farm-props set (16 GLBs, new
+    source fingerprint); the feast arm in farm_patches.ts (0.5 s
+    cadence, VFX-once on appearance); labels via entity_display_name
+    .ts (the hud.ts extraction, ceiling 19220 to 19214) and the
+    nameplate near-interact row; cue ui_farm_feast end to end.
+  - Parity: beat P appended to farming_session (the wellfed tick-phase
+    mint ridden for real, the feast place-bite-mint-expire loop),
+    frames 0-93 byte-identical, draws 110 unchanged with an identical
+    drawDigest, md5 25bd6b87 to 9dfd1c6e, zero other goldens moved.
 
 ## OPEN items (maintainer decisions or later-phase calls, never guess)
 

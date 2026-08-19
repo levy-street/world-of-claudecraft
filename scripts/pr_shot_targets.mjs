@@ -9411,6 +9411,47 @@ export const TARGETS = [
     },
   },
   {
+    key: 'farm-feast',
+    label: 'Placed harvest feast beside the Eastbrook garden beds (the shared feast)',
+    when: ['sim/professions/feast', 'game/feast_interact', 'ui/feast_tooltip_view'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      // The beds give the shot its farming context; the staging helper owns
+      // the game-active wait, the framing stand point, and the hostile shove.
+      await stageEastbrookBeds(page);
+      // Grant and place the feast, then take the placer's own bite so the
+      // shot shows the sit-and-eat beside the spread. Optional-chained on
+      // purpose: on the BASE build neither verb exists, so the staging
+      // degrades to the plain beds at identical framing, the honest BEFORE
+      // (the Phase 8 base-shot precedent).
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        sim?.addItem?.('harvest_feast', 1);
+        sim?.placeFeast?.();
+      });
+      await wait(600);
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const feastId = sim?.feasts ? [...sim.feasts.keys()][0] : undefined;
+        if (feastId !== undefined) sim?.consumeFeast?.(feastId);
+      });
+      // Give the adapter's 0.5s read cadence and the deferred feast GLB time
+      // to land; keep dismissing overlays right up to the shot.
+      for (let i = 0; i < 12; i++) {
+        await page.evaluate(() => {
+          document.querySelector('.camera-prompt-confirm')?.click();
+          document.querySelector('.tut-skip')?.click();
+          document.querySelector('.gpu-notice-dismiss')?.click();
+        });
+        await wait(500);
+      }
+      return { clip: '#ui' };
+    },
+  },
+  {
     key: 'harvest-journal',
     label: 'Harvest Journal window with staged growth ladder (Eastbrook beds)',
     when: ['ui/harvest_journal'],
