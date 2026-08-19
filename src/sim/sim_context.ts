@@ -604,6 +604,12 @@ export interface SimContextCallbacks {
   removeEnchantableItem(itemId: string, count: number, pid?: number): InventoryUnit[];
   completeQuestForDev(questId: string, pid?: number): boolean;
   completeCurrentQuestsForDev(pid?: number): number;
+  // DEV ONLY (/dev market): flood the World Market with realistic player-style
+  // listings (duplicates, enchanted copies, varied prices) so market features
+  // have real data to test against. Draws from its OWN fresh fixed-seed Rng, never
+  // the shared ctx.rng, so it cannot perturb the deterministic world. Returns the
+  // count added. Gated by ctx.devCommands at the call site (never production).
+  seedDevMarket(): number;
 
   // T1 player target selection consumes isHostileTo/isFriendlyTo/pvpController/stopFollow;
   // all already on the seam (C4a added the first two + stopFollow, C1 added pvpController)
@@ -1488,6 +1494,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     countFungibleItem: host.countFungibleItem,
     completeQuestForDev: host.completeQuestForDev,
     completeCurrentQuestsForDev: host.completeCurrentQuestsForDev,
+    seedDevMarket: host.seedDevMarket,
     addEntity: host.addEntity,
     dropEntity: host.dropEntity,
     rebucket: host.rebucket,
