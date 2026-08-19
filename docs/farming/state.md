@@ -4,6 +4,12 @@ Read this file first in every phase session. It is the single authority for lock
 decisions. If a phase file contradicts this file, this file wins and the phase file
 gets swept in the same pass (amend the QA twin too, always).
 
+Twenty-first absorb DONE 2026-08-19 (release/v0.40.0 tip e56707a675; the
+D22 minor-version rule fired the 06b shape as its own sync mid-phase
+before Phase 11; 7 commits / 86 files: the v0.39 spell-icon revert plus
+the CI browser-deps fix; three-file farming intersection auto-merged
+lossless; zero baseline, golden, or evidence-seal movement; audit lane
+CLEAN; full record in progress.md). Prior:
 Current phase: Phase 10 (celebrations) DONE 2026-08-19, local-only per D22
 (branch fix/farming-phase-10-celebrations, five commits, merge hash in
 progress.md). golden_harvest is the FOURTH flavor on the gatherRareEvent
@@ -487,8 +493,8 @@ visit or a punishment for lateness is violating the design, not tuning it.
   contradiction): ALL farming work stays local until the user declares the feature
   done. No pushes, no PRs, for anything farming. The integration branch is the LOCAL
   `feature/farming-plan` in this worktree (it carries docs/farming/; originally based
-  on release/v0.36.0, it has absorbed every newer release tip since, release/v0.39.0
-  7b45fdb9a9 as of the nineteenth absorb). Every phase: fetch, then branch `fix/farming-phase-NN-<slug>` off
+  on release/v0.36.0, it has absorbed every newer release tip since, release/v0.40.0
+  e56707a675 as of the twenty-first absorb, 2026-08-19). Every phase: fetch, then branch `fix/farming-phase-NN-<slug>` off
   LOCAL `feature/farming-plan` (never off a bare release tip, which lacks the packet);
   if a newer `release/**` tip exists than the branch has absorbed, merge it INTO the
   phase branch first (release-merge-audit for a nontrivial merge, PLUS the

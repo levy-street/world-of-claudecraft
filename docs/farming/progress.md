@@ -2808,6 +2808,47 @@ gate run was deliberately stopped mid-flight when the qa-checklist's
 round-two findings landed (never gate a tree about to change); no
 verdict was taken from it.
 
+### Twenty-first absorb (2026-08-19, the v0.40.0 sync mid-phase, local-only per D22)
+
+A NEW release branch existed at Phase 11 pre-flight (release/v0.40.0, tip
+e56707a675; the moved release/v0.39.0 tip 45d4148c21 is fully contained in
+it), so the D22 minor-version rule fired the phase-06b shape: branch
+fix/farming-sync-v0.40.0 off feature/farming-plan at 7e5bdcf000, merge
+origin/release/v0.40.0 (zero textual conflicts), merged --no-ff back (hash
+below). The delta over the twentieth absorb point ea9377db8e is 7 commits /
+86 files: the v0.39 spell-icon revert (58 class ability icons under
+public/ui/skills/ restored byte for byte, the three legacy_* suites
+deleted, the new tests/spell_icon_freeze.test.ts byte-freeze + fixture, PR
+3509), the CI browser-deps stall fix (ci.yml + nightly.yml install-deps
+bounding with the image fallback, tests/helpers/playwright_install_block.ts,
+PRs 3512), and docs. NO src/, server/, lockfile, patches/, golden, or i18n
+movement. Three-file intersection with the farming footprint, ALL
+auto-merged lossless and verified by hunk-level diff comparison plus suite
+runs: .github/workflows/ci.yml (the six farming screenshot cone rows held),
+tests/ci_workflow.test.ts (the cone-row literals held beside the new
+PLAYWRIGHT_INSTALL_BLOCK pins), tests/missing_painted_icons_wave.test.ts
+(the farming DEED_ORDER 280 arm held; the release edits sat in the
+spell-icon region). Validation on the merged tree: npx tsc clean; the
+checklist suites (world_api_parity, snapshots, command_schema,
+monolith_budget) plus every touched icon/CI suite plus
+professions_farming, deeds_content, and full tests/parity: 27 files, 1101
+tests green; farming_session golden md5 83c3478142deabbffbf23912575873e9
+UNCHANGED (zero golden movement, the expected no-sim-content shape);
+scripts/item_art_audit.mjs --verify-only machineChecksPassed; the (al)
+portrait manifest + art-audit builder pins green with NO re-mint needed
+(the delta reaches none of the evidence inputs). Release-merge-audit lane:
+CLEAN, 0 BLOCKING, 0 SHOULD-FIX (all 83 non-overlap release files landed
+byte-identical; the branch never touched the three deleted legacy suites;
+the spell-icon freeze scopes to public/ui/skills/<class>/ only and cannot
+collide with farming item art or the Phase 11 dish ids). One planning note
+carried forward: any future farming file under public/ui/skills/ must
+join the freeze lists + sha fixture in the same change (none planned).
+No separate sync gate run, deliberately: the delta is icons + CI plumbing
+with zero behavioral surface, every touched suite ran green standalone,
+and the Phase 11 close gate runs on a tree containing this absorb; the
+06b intent (no shared diff with feature work) is honored by the separate
+merge commit.
+
 ### Phase 11
 (not started)
 
