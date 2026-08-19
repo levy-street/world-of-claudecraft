@@ -56,6 +56,7 @@ export const UI_CUES = {
   cardReveal: 'ui_card_reveal',
   cardRoundPush: 'ui_card_round_push',
   cardShuffle: 'ui_card_shuffle',
+  pokerCheck: 'foot_wood',
   // Gathering rhythm (Professions 2.0 Phase 12b, issue #2208): fishCast/
   // fishBite/fishReel are real, shipped fishing cues. gatherCast branches by
   // node type (gatherCastByNodeType below); this flat cue is only the
@@ -364,6 +365,10 @@ export class GameAudio {
 
   cardShuffle(): void {
     this.play(UI_CUES.cardShuffle);
+  }
+
+  pokerCheck(): void {
+    this.play(UI_CUES.pokerCheck, { rate: 1.35, gain: 0.55 });
   }
 
   // Gathering rhythm (Professions 2.0 Phase 12b). All of these are personal

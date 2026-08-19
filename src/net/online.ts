@@ -44,6 +44,17 @@ import type { MarketQuery } from '../sim/market_query';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import { isPersistentEngineAura } from '../sim/persistent_aura';
 import { isPrimaryOwnedPetEntity } from '../sim/pet/pet_selection';
+import type { PokerAction } from '../sim/poker/engine';
+import {
+  isPokerClientSnapshot,
+  isPokerErrorCode,
+  isPokerTableSummary,
+  type PokerClientPort,
+  type PokerClientSnapshot,
+  type PokerClientState,
+  type PokerErrorCode,
+  type PokerTableSummary,
+} from '../sim/poker/protocol';
 import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
 import type { RespecPaymentTier } from '../sim/professions/focus';
 import type { MaterialRarity } from '../sim/professions/gathering';
@@ -1514,7 +1525,7 @@ function blankEntity(id: number): Entity {
   };
 }
 
-export class ClientWorld implements IWorld {
+export class ClientWorld implements IWorld, PokerClientPort {
   // --- IWorldEntityRoster: roster + player reads, mirrored from snapshots. The
   // `player` getter lives below the ctor (it reads `entities`/`playerId`). `known`
   // is IWorldCombat-owned but rides here as a self-wire mirror field with the rest
@@ -1893,6 +1904,12 @@ export class ClientWorld implements IWorld {
   // camera follow for keyboard turns applied by the main loop
   pendingFacingDelta = 0;
   connected = false;
+  private pokerTables: PokerTableSummary[] = [];
+  private pokerEnabled = false;
+  private pokerSnapshot: PokerClientSnapshot | null = null;
+  private pokerNames: Record<number, string> = {};
+  private pokerError: PokerErrorCode | null = null;
+  private pokerListeners: Set<() => void> | undefined;
   onDisconnect: ((reason: string) => void) | null = null;
   // fired on each unexpected socket drop while auto-reconnect is pending, and
   // once the world is live again; main.ts shows/hides the reconnect overlay.
@@ -2126,6 +2143,7 @@ export class ClientWorld implements IWorld {
     // A reconnect may land on an older binary. Drop optional behavior before
     // any new transport can accept input; the next capable snapshot re-arms it.
     this.petSpecialCommandsSupported = false;
+    this.notifyPoker();
     this.failPendingCommandOutcomes();
     if (this.sessionEnded) return;
     // A pending reconnect timer means this close is a duplicate signal of the
@@ -2389,6 +2407,79 @@ export class ClientWorld implements IWorld {
     this.ws.send(JSON.stringify({ t: 'cmd', ...payload }));
   }
 
+  pokerState(): PokerClientState {
+    return {
+      connected: this.connected,
+      enabled: this.pokerEnabled ?? false,
+      tables: [...(this.pokerTables ?? [])],
+      snapshot: this.pokerSnapshot ?? null,
+      names: { ...(this.pokerNames ?? {}) },
+      error: this.pokerError ?? null,
+    };
+  }
+
+  subscribe(listener: () => void): () => void {
+    if (!this.pokerListeners) this.pokerListeners = new Set();
+    this.pokerListeners.add(listener);
+    return () => this.pokerListeners?.delete(listener);
+  }
+
+  private notifyPoker(): void {
+    for (const listener of this.pokerListeners ?? []) listener();
+  }
+
+  private sendPoker(payload: Record<string, unknown>): void {
+    if (!this.canSendCommand()) return;
+    this.pokerError = null;
+    this.ws.send(JSON.stringify(payload));
+  }
+
+  requestTables(): void {
+    this.sendPoker({ t: 'poker_list' });
+  }
+
+  join(tableId: string, seatIndex: number): void {
+    this.sendPoker({ t: 'poker_join', tableId, seatIndex });
+  }
+
+  watch(tableId: string): void {
+    this.sendPoker({ t: 'poker_watch', tableId });
+  }
+
+  stopWatching(tableId: string): void {
+    this.sendPoker({ t: 'poker_stop_watch', tableId });
+    this.pokerSnapshot = null;
+    this.pokerNames = {};
+    this.notifyPoker();
+  }
+
+  rebuy(tableId: string): void {
+    this.sendPoker({ t: 'poker_rebuy', tableId });
+  }
+
+  leave(tableId: string): void {
+    this.sendPoker({ t: 'poker_leave', tableId });
+    this.pokerSnapshot = null;
+    this.pokerNames = {};
+    this.notifyPoker();
+  }
+
+  sitIn(tableId: string): void {
+    this.sendPoker({ t: 'poker_action', tableId, action: { type: 'sit-in' } });
+  }
+
+  act(action: PokerAction): void {
+    const snapshot = this.pokerSnapshot;
+    if (!snapshot) return;
+    this.sendPoker({
+      t: 'poker_action',
+      tableId: snapshot.tableId,
+      handNumber: snapshot.handNumber,
+      actionSequence: snapshot.actionSequence,
+      action,
+    });
+  }
+
   // Typed IWorld command send (W0b): `cmd` must be a ClientCommand, i.e. a token
   // from the shared COMMAND_NAMES table that is NOT dispatch-only. This is what
   // makes "every ClientWorld send is in the server's dispatch-set" a compile-time
@@ -2472,6 +2563,37 @@ export class ClientWorld implements IWorld {
       this.resolveCommandOutcome(msg.rid, msg.ok);
       return;
     }
+    if (
+      msg.t === 'poker_tables' &&
+      Array.isArray(msg.tables) &&
+      msg.tables.every(isPokerTableSummary)
+    ) {
+      this.pokerEnabled = msg.enabled === true;
+      this.pokerTables = msg.tables;
+      this.notifyPoker();
+      return;
+    }
+    if (msg.t === 'poker_snapshot' && isPokerClientSnapshot(msg.snapshot)) {
+      const detached = msg.snapshot.viewerSeat === null && !msg.snapshot.watching;
+      this.pokerSnapshot = detached ? null : msg.snapshot;
+      this.pokerNames = detached
+        ? {}
+        : msg.names && typeof msg.names === 'object' && !Array.isArray(msg.names)
+          ? (msg.names as Record<number, string>)
+          : {};
+      this.pokerError = null;
+      this.notifyPoker();
+      return;
+    }
+    if (msg.t === 'poker_result') {
+      this.notifyPoker();
+      return;
+    }
+    if (msg.t === 'poker_error' && isPokerErrorCode(msg.code)) {
+      this.pokerError = msg.code;
+      this.notifyPoker();
+      return;
+    }
     if (msg.t === 'hello') {
       this.playerId = msg.pid;
       this.ownPlayerId = msg.pid;
@@ -2529,6 +2651,8 @@ export class ClientWorld implements IWorld {
       // value of every such preference here, now that sends genuinely reach
       // the socket, rather than relying on callers to race this flag.
       this.resendSessionPreferences();
+      this.requestTables();
+      this.notifyPoker();
       return;
     }
     if (msg.t === 'spectate') {

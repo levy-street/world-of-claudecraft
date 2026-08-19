@@ -299,6 +299,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/vendor/unbind_view.ts',
   'src/ui/card_duel_view.ts',
   'src/ui/claudium_launcher_balance_core.ts',
+  'src/ui/poker_playtest_view.ts',
   'src/ui/claudium_view.ts',
   'src/ui/woc_store_view.ts',
   'src/ui/wallet_connection_view.ts',

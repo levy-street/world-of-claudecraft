@@ -86,6 +86,7 @@ import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
 import { requiredLevelFor } from '../sim/item_level_req';
 import type { Ante, PickAction } from '../sim/lockpick';
 import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
+import type { PokerClientPort } from '../sim/poker/protocol';
 import {
   computeRespecCost,
   FOCUS_POINT_BUDGET,
@@ -599,6 +600,7 @@ import {
   type PlayerTooltipModel,
   playerTooltipHtml,
 } from './player_tooltip_view';
+import { PokerPlaytestWindow } from './poker_playtest_window';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import {
   buildPostEntryPreviewPrewarmUnits,
@@ -859,6 +861,7 @@ export interface HudFeatures {
   dailyRewardsEnabled: boolean;
   devCommandsEnabled?: boolean;
   constrainedMemory?: boolean;
+  pokerPlaytest?: PokerClientPort;
 }
 
 export interface BugReportPayload {
@@ -2089,6 +2092,28 @@ export class Hud {
       ownAuraLabel: () => t('hudChrome.targetAuras.ownAura'),
       opacityLabel: (percent) => t('hudChrome.targetAuras.opacity', { percent }),
     });
+    this.pokerPlaytestWindow = features.pokerPlaytest
+      ? new PokerPlaytestWindow({
+          root: () => $('#poker-playtest-window'),
+          launcher: () => $('#mm-poker'),
+          client: features.pokerPlaytest,
+          now: () => Date.now(),
+          closeOthers: () => this.closeOtherWindows('#poker-playtest-window'),
+          sound: {
+            deal: () => audio.cardShuffle(),
+            turn: () => audio.cardReveal(),
+            check: () => {
+              audio.pokerCheck();
+              window.setTimeout(() => audio.pokerCheck(), 85);
+            },
+            showdown: () => audio.cardRoundPush(),
+          },
+          schedule: (callback, delayMs) => window.setTimeout(callback, delayMs),
+          cancelSchedule: (id) => window.clearTimeout(id),
+          ...this.windowFocus('#poker-playtest-window'),
+        })
+      : null;
+    if (!this.pokerPlaytestWindow) $('#mm-poker').hidden = true;
     this.actionBarController = new ActionBarController({
       storage: localStorage,
       playerClass: this.sim.cfg.playerClass,
@@ -2982,6 +3007,7 @@ export class Hud {
     $('#mm-dfinder').addEventListener('click', () => this.toggleDungeonFinder());
     $('#mm-valecup').addEventListener('click', () => this.toggleValeCup());
     $('#mm-cardduel').addEventListener('click', () => this.toggleCardDuel());
+    $('#mm-poker')?.addEventListener('click', () => this.togglePokerPlaytest());
     $('#mm-leaderboard').addEventListener('click', () => this.toggleLeaderboard());
     $('#mm-discord')?.addEventListener('click', () => this.discordHook?.());
     const emoteBtn = $('#mm-emote');
@@ -3493,6 +3519,9 @@ export class Hud {
       case 'card-duel-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.cardDuelWindow.close();
+        break;
+      case 'poker-playtest-window':
+        this.pokerPlaytestWindow?.close();
         break;
       case 'vendor-window':
         this.closeVendor();
@@ -4944,6 +4973,7 @@ export class Hud {
     closeOthers: () => this.closeOtherWindows('#card-duel-window'),
     ...this.windowFocus('#card-duel-window'),
   });
+  private readonly pokerPlaytestWindow: PokerPlaytestWindow | null;
   // Persistent Vale Cup indicator button (queued / live-at-the-Sowfield states;
   // hidden inside my own match). Never tier-shed: queue position and the live
   // score are information, not cosmetics (gameplay-neutral graphics invariant).
@@ -6382,6 +6412,7 @@ export class Hud {
     this.lastPlayerFrameMaxHp = Number.NaN;
     this.lastPlayerFrameResource = Number.NaN;
     this.lastPlayerFrameMaxResource = Number.NaN;
+    this.pokerPlaytestWindow?.render();
     this.syncDailyRewardsSurfaceLabels();
     this.storePromoCard?.relocalize({
       open: t('hudChrome.wocStore.title'),
@@ -10747,6 +10778,10 @@ export class Hud {
 
   toggleCardDuel(): void {
     this.cardDuelWindow.toggle();
+  }
+
+  togglePokerPlaytest(): void {
+    this.pokerPlaytestWindow?.toggle();
   }
 
   /** Offline builds enable the Vale Cup practice-vs-bots button (main.ts). */

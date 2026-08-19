@@ -1,0 +1,298 @@
+// @vitest-environment jsdom
+
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { PokerAction } from '../src/sim/poker/engine';
+import { parseCards } from '../src/sim/poker/engine/cards';
+import type { PokerClientPort, PokerClientState } from '../src/sim/poker/protocol';
+import { PokerPlaytestWindow } from '../src/ui/poker_playtest_window';
+
+function state(): PokerClientState {
+  return {
+    connected: true,
+    enabled: true,
+    tables: [],
+    names: { 1: 'Alice', 2: 'Bob' },
+    error: null,
+    snapshot: {
+      tableId: 'low-stakes-1',
+      revision: 3,
+      viewerSeat: 0,
+      watching: false,
+      turnDeadlineMs: null,
+      config: {
+        id: 'low-stakes-1',
+        numSeats: 2,
+        smallBlind: 10,
+        bigBlind: 20,
+        minBuyIn: 2_000,
+        maxBuyIn: 2_000,
+      },
+      handNumber: 1,
+      actionSequence: 2,
+      button: 0,
+      street: 'preflop',
+      actorSeat: 0,
+      communityCards: [],
+      pots: [{ amount: 30, eligibleSeats: [0, 1] }],
+      seats: [
+        {
+          seat: 0,
+          playerId: 1,
+          stack: 1_990,
+          bet: 10,
+          committed: 10,
+          inHand: true,
+          folded: false,
+          allIn: false,
+          holeCards: [],
+        },
+        {
+          seat: 1,
+          playerId: 2,
+          stack: 1_980,
+          bet: 20,
+          committed: 20,
+          inHand: true,
+          folded: false,
+          allIn: false,
+          holeCards: null,
+        },
+      ],
+      legalActions: {
+        actions: ['fold', 'call', 'raise'],
+        toCall: 10,
+        minTo: 40,
+        maxTo: 2_000,
+      },
+      lastResult: null,
+    },
+  };
+}
+
+describe('poker playtest window interaction', () => {
+  beforeEach(() => {
+    vi.stubGlobal('CSS', { escape: (value: string) => value });
+  });
+
+  it('shows two card backs for an opponent who remains in the hand', () => {
+    document.body.innerHTML = '<button id=launcher></button><section id=poker></section>';
+    const current = state();
+    const snapshot = current.snapshot;
+    if (!snapshot?.seats[0]) throw new Error('Poker test snapshot is missing');
+    snapshot.street = 'flop';
+    snapshot.communityCards = parseCards('Kd 9h 7c');
+    snapshot.seats[0].holeCards = parseCards('As Ad');
+    const client: PokerClientPort = {
+      pokerState: () => current,
+      subscribe: () => () => {},
+      requestTables: vi.fn(),
+      join: vi.fn(),
+      watch: vi.fn(),
+      stopWatching: vi.fn(),
+      rebuy: vi.fn(),
+      leave: vi.fn(),
+      act: vi.fn(),
+    };
+    const root = document.querySelector<HTMLElement>('#poker');
+    const launcher = document.querySelector<HTMLElement>('#launcher');
+    if (!root || !launcher) throw new Error('Poker test DOM is missing');
+    const pokerWindow = new PokerPlaytestWindow({
+      root: () => root,
+      launcher: () => launcher,
+      client,
+      closeOthers: () => {},
+      captureFocus: () => null,
+      restoreFocus: () => {},
+      sound: { deal: () => {}, turn: () => {} },
+      now: () => 0,
+      schedule: () => 1,
+      cancelSchedule: () => {},
+    });
+
+    pokerWindow.toggle();
+
+    expect(root.querySelectorAll('.seat-1 .poker-card.back')).toHaveLength(2);
+    expect(root.querySelector('.seat-1 .poker-seat-cards')?.textContent).not.toContain('??');
+    expect(root.querySelector('.poker-hand-name')?.textContent).toBe('Pair');
+    expect(root.querySelectorAll('.poker-card.highlighted')).toHaveLength(5);
+  });
+
+  it('forwards Call and a 1 BB stepped Raise through the live DOM binding', () => {
+    document.body.innerHTML = '<button id=launcher></button><section id=poker></section>';
+    const current = state();
+    const act = vi.fn<(action: PokerAction) => void>();
+    const client: PokerClientPort = {
+      pokerState: () => current,
+      subscribe: () => () => {},
+      requestTables: vi.fn(),
+      join: vi.fn(),
+      watch: vi.fn(),
+      stopWatching: vi.fn(),
+      rebuy: vi.fn(),
+      leave: vi.fn(),
+      act,
+    };
+    const root = document.querySelector<HTMLElement>('#poker');
+    const launcher = document.querySelector<HTMLElement>('#launcher');
+    if (!root || !launcher) throw new Error('Poker test DOM is missing');
+    const pokerWindow = new PokerPlaytestWindow({
+      root: () => root,
+      launcher: () => launcher,
+      client,
+      closeOthers: () => {},
+      captureFocus: () => null,
+      restoreFocus: () => {},
+      sound: { deal: () => {}, turn: () => {} },
+      now: () => 0,
+      schedule: () => 1,
+      cancelSchedule: () => {},
+    });
+
+    pokerWindow.toggle();
+    root.querySelector<HTMLButtonElement>('[data-focus-key=action-call]')?.click();
+    root.querySelector<HTMLButtonElement>(`[data-wager-step='increase'][data-wager='2']`)?.click();
+    root.querySelector<HTMLButtonElement>(`[data-wager-step='increase'][data-wager='2']`)?.click();
+    root.querySelector<HTMLButtonElement>('[data-focus-key=action-raise]')?.click();
+
+    expect(root.querySelector(`input[data-wager='2']`)).toBeNull();
+    expect(act).toHaveBeenNthCalledWith(1, { type: 'call' });
+    expect(act).toHaveBeenNthCalledWith(2, { type: 'raise', to: 80 });
+  });
+
+  it('preserves an in-progress Raise amount across the turn timer repaint', () => {
+    document.body.innerHTML = '<button id=launcher></button><section id=poker></section>';
+    const current = state();
+    if (!current.snapshot) throw new Error('Poker test snapshot is missing');
+    current.snapshot.turnDeadlineMs = 10_000;
+    let scheduled: (() => void) | null = null;
+    const client: PokerClientPort = {
+      pokerState: () => current,
+      subscribe: () => () => {},
+      requestTables: vi.fn(),
+      join: vi.fn(),
+      watch: vi.fn(),
+      stopWatching: vi.fn(),
+      rebuy: vi.fn(),
+      leave: vi.fn(),
+      act: vi.fn(),
+    };
+    const root = document.querySelector<HTMLElement>('#poker');
+    const launcher = document.querySelector<HTMLElement>('#launcher');
+    if (!root || !launcher) throw new Error('Poker test DOM is missing');
+    const pokerWindow = new PokerPlaytestWindow({
+      root: () => root,
+      launcher: () => launcher,
+      client,
+      closeOthers: () => {},
+      captureFocus: () => null,
+      restoreFocus: () => {},
+      sound: { deal: () => {}, turn: () => {} },
+      now: () => 0,
+      schedule: (callback) => {
+        scheduled = callback;
+        return 1;
+      },
+      cancelSchedule: () => {},
+    });
+
+    pokerWindow.toggle();
+    const increase = root.querySelector<HTMLButtonElement>(
+      `[data-focus-key='wager-raise-increase']`,
+    );
+    if (!increase) throw new Error('Raise increase button is missing');
+    increase.focus();
+    increase.click();
+    increase.click();
+    const timerCallback = scheduled as (() => void) | null;
+    if (!timerCallback) throw new Error('Turn timer was not scheduled');
+    timerCallback();
+
+    const repainted = root.querySelector<HTMLOutputElement>(`output[data-wager-kind='raise']`);
+    expect(repainted?.dataset.wagerValue).toBe('80');
+    expect(repainted?.textContent).toBe('80');
+    const focused = root.querySelector<HTMLButtonElement>(
+      `[data-focus-key='wager-raise-increase']`,
+    );
+    expect(document.activeElement).toBe(focused);
+  });
+
+  it('shows the winning hand while keeping all board cards visible and highlighting five', () => {
+    document.body.innerHTML = '<button id=launcher></button><section id=poker></section>';
+    const current = state();
+    const snapshot = current.snapshot;
+    if (!snapshot) throw new Error('Poker test snapshot is missing');
+    snapshot.street = null;
+    snapshot.actorSeat = null;
+    snapshot.communityCards = parseCards('Kd 9h 7c 2s Kc');
+    const alice = snapshot.seats[0];
+    const bob = snapshot.seats[1];
+    if (!alice || !bob) throw new Error('Poker test seats are missing');
+    alice.holeCards = parseCards('As Ad');
+    bob.holeCards = parseCards('Qs Jd');
+    snapshot.lastResult = {
+      handNumber: 1,
+      communityCards: snapshot.communityCards,
+      pots: [{ amount: 400, eligibleSeats: [0, 1] }],
+      payouts: [{ seat: 0, playerId: 1, amount: 400 }],
+      winners: [0],
+      revealedHoleCards: [
+        { seat: 0, cards: parseCards('As Ad') },
+        { seat: 1, cards: parseCards('Qs Jd') },
+      ],
+      rake: 0,
+      rakeByPot: [0],
+    };
+    let now = 0;
+    let scheduled: (() => void) | null = null;
+    const client: PokerClientPort = {
+      pokerState: () => current,
+      subscribe: () => () => {},
+      requestTables: vi.fn(),
+      join: vi.fn(),
+      watch: vi.fn(),
+      stopWatching: vi.fn(),
+      rebuy: vi.fn(),
+      leave: vi.fn(),
+      act: vi.fn(),
+    };
+    const root = document.querySelector<HTMLElement>('#poker');
+    const launcher = document.querySelector<HTMLElement>('#launcher');
+    if (!root || !launcher) throw new Error('Poker test DOM is missing');
+    const pokerWindow = new PokerPlaytestWindow({
+      root: () => root,
+      launcher: () => launcher,
+      client,
+      closeOthers: () => {},
+      captureFocus: () => null,
+      restoreFocus: () => {},
+      sound: { deal: () => {}, turn: () => {}, showdown: () => {} },
+      now: () => now,
+      schedule: (callback) => {
+        scheduled = callback;
+        return 1;
+      },
+      cancelSchedule: () => {},
+    });
+
+    pokerWindow.toggle();
+    expect(root.querySelectorAll('.poker-board > .poker-cards .poker-card')).toHaveLength(5);
+    now = 1_000;
+    const revealResult = scheduled as (() => void) | null;
+    if (!revealResult) throw new Error('Showdown reveal was not scheduled');
+    revealResult();
+
+    expect(root.querySelector('.poker-result-banner')?.textContent).toContain(
+      'Alice Won +400 with Two Pair',
+    );
+    expect(root.querySelectorAll('.poker-card.highlighted')).toHaveLength(5);
+    expect(root.querySelectorAll('.poker-card.highlighted .visually-hidden')).toHaveLength(5);
+    expect(root.querySelector('.poker-hand-name')?.textContent).toBe('Alice: Two Pair');
+    expect(
+      root
+        .querySelector('.poker-result-banner')
+        ?.previousElementSibling?.classList.contains('poker-table-wrap'),
+    ).toBe(true);
+    expect(root.querySelector('.poker-result-banner')?.getAttribute('role')).toBe('status');
+    expect(root.querySelector('.poker-result-banner')?.getAttribute('aria-live')).toBe('polite');
+  });
+});
