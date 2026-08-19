@@ -1,7 +1,9 @@
 # Phase 13 QA: Verify Integration polish and the handoff
 
-The final audit of the packet. It verifies the Phase 13 PR (wiki page, manifest,
-screenshots, deferral sweep, audit evidence), re-runs the whole-feature rows any late
+The final audit of the packet. It verifies the Phase 13 merge (wiki page, manifest,
+screenshots, deferral sweep, audit evidence; per D22 no PR exists, so every "PR body"
+mention below reads as the progress.md Phase 13 Notes block and the state.md handoff
+table), re-runs the whole-feature rows any late
 fix touched, and then, uniquely, offers the packet teardown to the user. Note:
 docs/design/farming-asset-manifest.json is deliberately outside the packet and stays
 after teardown; only docs/farming/ is ever offered for deletion.
@@ -56,10 +58,13 @@ full report now based on what you have already seen. No more tool calls. Format:
 BLOCKING / SHOULD-FIX / NICE-TO-HAVE / VERDICT."
 - Correctness agent: every deliverable and acceptance criterion actually met; the wiki
   prose is accurate against the shipped mechanics and spoiler-safe; the manifest is
-  complete (cross-check every exporter output in scripts/assets/build_farm_props.mjs
+  complete (cross-check every exporter output in
+  scripts/assets/farm_props/export_farm_props.mjs [path corrected in the Phase 13
+  amendment sweep; the file was renamed from the draft's build_farm_props.mjs]
   and every adapter consumer against the manifest rows; verify footprints, pivots,
   tints, and stage lists match the authored values) and references no docs/farming/
-  path; the screenshots exist under docs/screenshots and the PR body references them;
+  path; the screenshots exist under docs/screenshots and the progress.md Phase 13
+  Notes block references them;
   each qa-checklist evidence row is actually supported by its evidence (re-run a
   sample, the anti-chore rows in particular). Verify the Live-surface note: LIVE,
   complete: no new mechanic shipped; the merge is the wiki page, the screenshots,
@@ -98,8 +103,10 @@ Only after every prior step is green:
 - FIRST surface every deferred follow-up recorded anywhere in the packet (every
   progress.md Notes block, the state.md ledgers and OPEN items, any phase-file
   deferral) so nothing tracked only in docs/farming/ is lost. Restate them in your
-  final response and confirm each one lives in the PR body or a filed issue before any
-  deletion.
+  final response and confirm each one lives in a home that SURVIVES teardown (the
+  state.md table itself dies with the packet: the progress.md copy dies too, so each
+  row must be restated in the final response and accepted by the user, or filed as an
+  issue, before any deletion) [AMENDED per D22: the PR body does not exist].
 - Then ask the user explicitly: "All phases are complete and green. OK to delete
   docs/farming/ (the planning scaffolding) before the PR?"
 - On explicit confirmation, delete ONLY that directory with explicit paths:
@@ -113,7 +120,8 @@ Only after every prior step is green:
 
 STEP 6 - FINAL RESPONSE FORMAT
 Verdict PASS / PASS-WITH-FOLLOWUPS / FAIL; counts of issues found and fixed per
-severity; deferrals, each with where it now lives (PR body or issue); whether the
+severity; deferrals, each with where it now lives (a teardown-surviving home per the
+STEP 5 amendment, or an issue); whether the
 packet was removed (yes on confirmation, no with the user's answer otherwise); and the
 closing line: either a one-line handoff for remaining follow-ups or "packet complete".
 

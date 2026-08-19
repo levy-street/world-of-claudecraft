@@ -8,6 +8,14 @@ docs/farming/qa-checklist.md. docs/farming/state.md is the authority; if this fi
 contradicts it, state.md wins and this file plus phase-13-qa.md get swept in the same
 pass.
 
+[AMENDED 2026-08-19 per D22 (standing): no push, no PR. The phase lands as commits on
+fix/farming-phase-13-integration-polish cut off LOCAL feature/farming-plan, merges back
+--no-ff, and the branch is deleted; the gate log is the arbiter. Every "PR body"
+reference below (the screenshot references, the staged deferral list) lands in the
+progress.md Phase 13 Notes block instead, and the deferral sweep's canonical home is
+the state.md handoff table. The Close block's push-and-open-a-PR wording is superseded
+by the same rule.]
+
 Live-surface note (binding): LIVE, complete. No new mechanic ships. This phase merges the wiki
 page, the screenshots, the asset handoff manifest, and the recorded whole-feature audit
 evidence. After it, the feature is done and the packet is ready for the teardown offer
@@ -100,9 +108,13 @@ bullets (never a planning doc to read); never run a teammate in plan mode.
   (git add -f by EXPLICIT path per the memory entry: docs/screenshots is gitignored,
   so the force-add by explicit path is the sanctioned exception per the repo
   screenshot workflow; never a bare -A or a tree-wide force) and referenced from the
-  PR body.
+  progress.md Phase 13 Notes block (the D22 amendment above). A NEW referenced
+  docs/screenshots subtree also joins ci.yml's sparse-checkout cone rows AND the
+  ci_workflow test literal in the same change (the screenshot-dirs-need-ci-cone-rows
+  memory; full-suite-fallback-only red otherwise).
 - Agent C, the sweep and the audit (docs): the deferral sweep: every progress.md Notes
-  deferral collected into docs/farming/state.md and staged for the PR body, none lost.
+  deferral collected into the docs/farming/state.md handoff table and recorded in the
+  progress.md Phase 13 Notes block (the D22 amendment above), none lost.
   Then the full execution of docs/farming/qa-checklist.md, including the anti-chore
   audit, with evidence recorded per row (a test run, a probe transcript, or a
   screenshot; never "looks done"); record the evidence in the progress.md Phase 13
@@ -164,8 +176,9 @@ STEP 5 - ACCEPTANCE CRITERIA
       notes, cross-checked against the exporter and adapters.
 - [ ] The manifest references no docs/farming/ path (it must survive teardown intact).
 - [ ] The full-journey screenshot set (desktop and mobile) is committed under
-      docs/screenshots and referenced from the PR body.
-- [ ] Every progress.md Notes deferral is swept into state.md and the PR body.
+      docs/screenshots and referenced from the progress.md Phase 13 Notes block.
+- [ ] Every progress.md Notes deferral is swept into the state.md handoff table and
+      the progress.md Phase 13 Notes block.
 - [ ] docs/farming/qa-checklist.md is executed in full, anti-chore audit included, with
       evidence recorded per row.
 - [ ] The final IP-safe audit covered every player-visible farming string.
@@ -196,10 +209,11 @@ STOPPING RULES
 - Stop while any review BLOCKING stands.
 
 Close: gate via node scripts/gate_select.mjs (the armory browser red is the standing
-environmental exception; grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL") plus the GATE EXIT marker, never trust a piped exit code;
-PR CI is the arbiter). Push and open the PR against the release branch this phase was
-based on, following .github/PULL_REQUEST_TEMPLATE.md. Screenshots via the pr-screenshots
-skill apply to the visual phases (12 and 13); this phase IS one, so the PR body
-references the committed full-journey set. No Claude attribution or session links in
-commits or PR text.
+environmental exception; grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL") plus the GATE EXIT marker, never trust a piped exit code).
+[AMENDED per D22: no push, no PR. Merge --no-ff into LOCAL feature/farming-plan, delete
+the branch and any agent worktrees, and record the merge hash in progress.md and the
+farming-skill-program memory topic.] Screenshots via the pr-screenshots
+skill apply to the visual phases (12 and 13); this phase IS one, so the progress.md
+Phase 13 Notes block references the committed full-journey set. No Claude attribution
+or session links in commits.
 ```
