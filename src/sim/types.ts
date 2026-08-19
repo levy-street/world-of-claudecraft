@@ -653,13 +653,16 @@ export interface Aura {
   // mob purge still takes a flagged buff: the rule scopes to player-driven
   // counters. Only its own timer (or a rule that bypasses player counters
   // entirely) takes it off. Set today
-  // at three sites: applySickness in ./spirit.ts (both recovery sicknesses,
+  // at four sites: applySickness in ./spirit.ts (both recovery sicknesses,
   // matching the fact that they already survive death and relogging; without
   // it a single dispel erased the entire Pale Keeper / unstuck penalty), the
-  // cheater mark (./moderation/cheater_mark.ts), and the flask mint in
+  // cheater mark (./moderation/cheater_mark.ts), the flask mint in
   // ./items.ts useItem (the phase 10 QA STK-2 ruling: classic consumable
   // buffs carried no dispel type, so a flask is neither offensively
-  // dispellable nor stealable). The rule itself is isPlayerRemovableAura in
+  // dispellable nor stealable), and the warlock Fate Threads self-aura
+  // (./combat/affliction.ts, the v0.40.0 rework: a resource carrier a
+  // dispel could strip would zero the class kit). The rule itself is
+  // isPlayerRemovableAura in
   // ./aura_classify.ts.
   undispellable?: true;
   // Marks a FLASK consumable aura (kind 'flask', src/sim/items.ts useItem).

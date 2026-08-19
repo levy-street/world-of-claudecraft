@@ -37,8 +37,13 @@ const recordPath = path.join(
 const ACCEPTED_ART_SHA256 = '3d8cb36726050e3a708720b650744005f4ce23d3ac49c0323761441beb50eb51';
 const SECOND_PASS_RECORD =
   'docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-art.json';
+// Advanced at the feature/masterwrought release/v0.40.0 sync: the branch's
+// three role foods (stonepot_stew, warspice_skewers, sageleaf_chowder) join
+// the live isHotbarItemId census, so the sealed runtimeClosure.hotbarItems
+// moves 72 to 75 (each food ships committed painted art, so painted moves
+// with live and the no-gap assertions below still bind).
 const SECOND_PASS_RECORD_SHA256 =
-  '88a9e7c35e79eb6620843734493e9b7e29f04b6bc986b1e81b3f36b4572d429f';
+  '2d8ece746cf703da9dd8f16679209a7aeb337e9b18c0f9f8a7de73a7bb17c16b';
 const EVIDENCE = {
   'icon-art-before-after-desktop.png': {
     sha256: '61d19fb321f2b30eb3749e0966f26efea0fa4df53edae4b253cfd70edb82cd7a',
@@ -329,7 +334,9 @@ describe('release v0.39 icon-art second-pass lineage', () => {
       },
       runtimeClosure: {
         abilities: { live: 410, painted: 410 },
-        hotbarItems: { live: 72, painted: 72 },
+        // 75 on the masterwrought branch: the three phase 10 role foods
+        // joined the census (see the record-sha comment above).
+        hotbarItems: { live: 75, painted: 75 },
         fixedActions: { painted: 11 },
         mobAuraRouting: { paintedFamilies: 44, exactRuntimeIds: 89 },
         fiesta: { augments: 20, powerups: 4, painted: 24 },
@@ -425,7 +432,9 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     expect(new Set(liveHotbarItemIds).size, 'live hotbar item ids remain unique').toBe(
       liveHotbarItemIds.length,
     );
-    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(72);
+    // 72 at the v0.39 pass; 75 on the masterwrought branch (the three phase
+    // 10 role foods classify as hotbar items and ship painted art).
+    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(75);
     expect(
       liveHotbarItemIds.filter((id) => !paintedHotbarItemIds.has(id)),
       'every production-eligible hotbar item resolves to committed painted art',
