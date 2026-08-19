@@ -29,8 +29,7 @@
 | Phase 9b (the bed verbs) | DONE 2026-08-19 | fix/farming-phase-09b-bed-verbs off 6981105f27 (the nineteenth-absorb merge); merge hash in the notes tail | The go-live is PLAYER-COMPLETE: the interact-key bed arm harvests and the plant sheet plants on desktop, touch, and gamepad; q_farm_intro completes through the client (journey 17/17 on the final tree, desktop and 844x390 landscape touch); (bn) CLOSED, (bp) offer-gate refinement; reviews: cross-platform APPROVE, frontend pass with all seven fixes taken, coverage B1-B3 closed and S1-S7 landed, gate-integrity PASS, qa-checklist in the notes; mutations 10/10 killed named |
 | Phase 10 (celebrations) | DONE 2026-08-19 | fix/farming-phase-10-celebrations off 0afde346ab (release tip ea9377db8e already absorbed, no new absorb); merge hash in the notes tail | golden_harvest as the fourth gatherRareEvent flavor (1/90 shared constant, five-fold signed yield, one announce path, single HUD case); seven D13 deeds + the Harvestmaster title (280/3190/43); the ui_farm_golden sting end to end; hud.ts ceiling LOWERED 19352 to 19230 via the ability-tooltip extraction; farming_session re-recorded once isolated (16 draws, md5 83c34781); deviations (br)-(bv): the bed-tier premise probed false (all four chronicles earnable), prog_farming_100 dormant under a recorded waiver, the title-shelf committed-crest rule; reviews 0 BLOCKING with the content lane resolved via the waiver, qa-checklist READY; mutations 13/13 killed named |
 | Phase 9b QA (the bed verbs audit) | DONE 2026-08-19 (PASS-WITH-FOLLOWUPS) | fix/farming-phase-09b-qa off c9075785ef (twentieth absorb ea9377db8e first: one release commit, i18n fills, pending.ts regen-resolved); merge hash in the notes tail | The fresh pass re-proved the go-live independently: journey 17/17 desktop AND mobile through the real controls, 18 desktop manual probes (focus trap, keydown guard with a jump positive control, Esc focus restore, the locked-seed deny with the sim's own toast, the ja_JP locale switch, the relocalize arm) plus the mobile sizing (all knobs 44px) and the contrast eyeball (8.95:1); negative space proven by RUNNING the pins (zero golden movement, every baseline held); one real behavior fix (the ctx.error dead/busy denies stranded the Plant control: the error-toast re-arm, deviation (bq)) plus the report_window rename under the cold-painter sweep with its first suite, safe-area caps, and eleven hardened pins; mutations 11/11 killed named (two shipped survivors diagnosed as real gaps, fixed, re-proven); reviews: 4 Workflow lanes + cross-platform APPROVE + test-coverage approve-with-followups + qa-checklist in the notes |
-| Phase 10 (celebrations) | not started | | |
-| Phase 10 QA | not started | | |
+| Phase 10 QA (verify celebrations) | DONE 2026-08-19 (PASS-WITH-FOLLOWUPS) | fix/farming-phase-10-qa off 8a466e898f (release tip ea9377db8e still newest, no absorb); merge hash in the notes tail | All five mandatory emphases verified first-hand (totals re-pin exact 273+7/3155+35/42+1; zero golden movement outside farming_session with the golden dir byte-identical merge-to-HEAD; the instance exclusion proven with a LIVE multi-observer Sim probe; a real golden win replayed through the LIVE client HUD, epic line + finder-only cues behaviorally observed; the (bs)/(bt) stories coherent); two BLOCKING coverage gaps closed (the golden signed-grant bag paths, the finder-only sting pins rebuilt as the gather_rare_event_feedback pure core + behavioral suite); hud.ts SHRANK again (ceiling 19230 to 19220); fresh mutations 14/14 killed named; browser suite 133 green standalone and perf:tour exit 0 (the two VERIFY items); (bw) parity-win coverage deferred to Phase 11 by the (z) precedent |
 | Phase 11 (well-fed food) | not started | | |
 | Phase 11 QA | not started | | |
 | Phase 12 (shared feast) | not started | | |
@@ -2692,6 +2691,102 @@ tip dd9d3bd7d4; the branch and the three agent worktrees deleted).
 
 No screenshots: the visible change is a chat-log line (existing epic-color
 family) and an audio cue; no window, layout, or style surface moved.
+
+### Phase 10 QA (2026-08-19, verify celebrations, local-only per D22)
+
+VERDICT: PASS-WITH-FOLLOWUPS. The phase's claims all held under independent
+re-verification; every finding was a coverage or hygiene gap, none a live
+defect. Branch fix/farming-phase-10-qa off 8a466e898f; no absorb needed
+(origin/release/v0.39.0 still ea9377db8e). The stale not-started Phase 10
+placeholder row above was removed as table drift in the same pass.
+
+INDEPENDENT VERIFICATION (the five mandatory emphases plus the two VERIFY
+items, each proven by running, never by prose):
+- Totals re-pin EXACT: old suite pins 273/3155/42 (git show 0afde346ab),
+  new rows sum to +7 deeds / +35 renown / +1 title from
+  src/sim/content/deeds.ts itself; new pins 280/3190/43 match.
+- No forked draw order: the phase diff moved ONLY
+  tests/parity/golden/farming_session.json; the golden directory is
+  byte-identical between merge 40988c8b3b and HEAD; full tests/parity green
+  (216) before and after the QA fixes; farming_session md5 83c34781 held
+  throughout.
+- Instance exclusion proven LIVE: a throwaway multi-observer Sim probe
+  (real plant + harvest on the probed winner stream, seed 280) fanned the
+  golden announce to the finder and a same-zone bystander ONLY; an
+  out-of-zone player and an instanced player (x past DUNGEON_X_THRESHOLD)
+  received nothing; marks and all three deed grants landed on the tick.
+- PLAYED AS A PLAYER: the captured winner payloads replayed through the
+  LIVE client (dev server, puppeteer, the module-singleton audio facade
+  wrapped in-page): the epic line rendered in rgb(163,53,238) for finder
+  AND bystander, achievement + sting fired for the finder only, a
+  pristine_vein control fired achievement without the sting.
+- (bs)/(bt) coherence: docs/design/deeds.md waiver, the deed row comment,
+  and the honesty arm tell one story (TWO dormant deeds incl.
+  feat_book_complete transitively); crest committed at 128x128 WebP,
+  DEED_ART_PENDING exactly 8, DEED_IMAGE_IDS 272, all art suites green.
+- The VERIFY items: npm run test:browser standalone 20 files / 133 green;
+  perf:tour exit 0, zero threshold failures, FCT cap-bounded (the
+  single-digit fps is the recorded swiftshader environment, the 9b shape).
+
+REVIEWS: 8 lanes delivered (3 Workflow audit lanes + architecture,
+cross-platform, content-obligations, frontend-seam, test-coverage on the
+Agent tool, ALL first try; the Explore context loader idled and was
+stopped, its ground covered first-hand). 0 BLOCKING on correctness
+anywhere; the test-coverage auditor raised TWO BLOCKING coverage gaps,
+both closed test-first this QA:
+- The golden signed-grant bag paths were exercised only on empty bags
+  (countFit's signer, the fit cap, the plain overflow remainder, and the
+  deliberate second-read were all invisible). Closed with the full-bags
+  and last-free-slot winner arms.
+- The finder-only sting rested on raw index-order source pins
+  (comment-blind, polarity-blind, containment-blind). Closed by extracting
+  the decision into src/ui/gather_rare_event_feedback.ts (pure core,
+  behavioral suite over every flavor x recipient quadrant, the
+  satisfies-Record fifth-flavor tsc tripwire now in the SHIPPING module)
+  with comment-stripped count-anchored glue pins left over hud.ts; the
+  hud.ts ceiling LOWERED 19230 to 19220 (file 19217).
+SHOULD-FIXES taken: the draw-contract comments now name all three
+resolving arms (the retired-crop arm spends the golden draw too); the
+golden belief reads != null (the exhaustive switch returns undefined off
+the union and strict !== null would have read that as a WIN); the
+announce-after-grants event order pinned; the five-fold pinned against
+the ARMED expansion (tool-effect crossing); a winner at bed_thornpeak_1
+pins the announce zone following the bed; the farm:planted deny SWEEP
+(range, bad_bed, no_seed, knob-payment); the harvest-range halo arm (no
+bed within INTERACT_RANGE of a zone boundary) plus the farmBedZoneId
+authorship sweep; the (bo) honesty-arm seed list DERIVED from the crop
+catalog; the crop fanout arm gained its own instanced player; the
+ability-tooltip module reads the action_bar barrel, its header names the
+one behavior delta, and its deletable-green branches (Wrack cost,
+channel with the hasted divisor, eight requirement rows, the exact
+enemy-target array) are pinned; the icon-brief preamble counts six of
+seven pending.
+
+MUTATIONS: 14/14 fresh mutants KILLED with rc nonzero AND named failing
+tests, through the dirty-refusing scratchpad runner on the committed
+tree, no reviewer reading: countfit-signer-drop, instance-qty-not-fit,
+remainder-zeroed, snapshot-hoist, early-announce, deny-arm-mark,
+zone-hardcode, cue-polarity, sting-widened, sting-hoist, sting-commented
+(the last two are exactly the classes the old pins passed),
+vendor-faucet (certifying the honesty arm reds toward honesty),
+channel-haste-drop, ruin-block-drop.
+
+DEFERRALS AND DECLINED, with reasons:
+- (bw) ledgered in state.md: the golden-WIN path has no parity-golden
+  coverage and the re-record left the tier-3 seed-back beat in the zero
+  band; both fixes move or add a golden, which this QA's stopping rule
+  forbids; deferred to Phase 11 by the deviation (z) precedent.
+- DECLINED: the ragged gatherRareEvent comment reflow in src/sim/types.ts
+  (cosmetic; a sim-content comment edit stales the portrait-manifest
+  evidence family for zero behavioral value).
+- Recorded, no action: grantGolden is copy two of the node signed-grant
+  shape (rule of three); the signed-windfall slot-pressure UX note; the
+  deed locale rows ride the recorded release-refill protocol (maintainer
+  flag 3 of the phase); the future golden field-note cell must land WITH
+  its server RELIQUARY_MARK_ENGLISH row (appended to the (bv) ledger).
+
+GATE RECORD: recorded in the gate-record commit on this branch after the
+close run.
 
 ### Phase 11
 (not started)
