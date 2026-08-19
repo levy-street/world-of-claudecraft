@@ -68,7 +68,12 @@ const MONOLITHS: MonolithRow[] = [
     // stays); the freed margin was then spent by the phase's own plant-sheet
     // composition, so this is once again a near-exact pin with no free
     // headroom to borrow against.
-    ceiling: 19352,
+    // Lowered after Phase 10's headroom extraction moved the six pure
+    // ability-tooltip line builders (describeAbilitySummary and friends,
+    // with their two label-key tables) whole to
+    // src/ui/ability_tooltip_lines.ts. New size plus a small margin: the
+    // room the celebrations case consumes next commit.
+    ceiling: 19230,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

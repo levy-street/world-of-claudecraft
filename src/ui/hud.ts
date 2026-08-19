@@ -97,7 +97,6 @@ import { TIER_SKILL_STEP, tierForSkill } from '../sim/professions/wheel';
 import { questObjectivesForMob } from '../sim/quest_targets';
 import type { ResolvedAbility } from '../sim/sim';
 import type {
-  AbilityDef,
   CalendarResultCode,
   EquipSlot,
   HonorReason,
@@ -154,6 +153,14 @@ import {
   formatAbilityNumber,
 } from './ability_description';
 import { abilityDisplayName, abilityDisplayNameFromSource } from './ability_display_name';
+import {
+  abilityCastLine,
+  abilityRangeLine,
+  abilityRequirementLines,
+  describeAbilitySummary,
+  playerSpellHasteFrac,
+  resourceDisplayName,
+} from './ability_tooltip_lines';
 import { ArenaWindow } from './arena_window';
 import { auraDisplayNameForHud, auraDisplayNameFromSource } from './aura_display_name';
 import {
@@ -336,10 +343,6 @@ import {
   shouldShowHealLanding,
 } from './heal_landing_feedback_core';
 import { honorFloatText } from './honor_float_view';
-import {
-  type AbilityRequirementResolve,
-  abilityRequirementKeys,
-} from './hud/action_bar/ability_requirement_keys';
 import {
   type ActionBarBindState,
   actionBarBindEnter,
@@ -975,12 +978,6 @@ const PLAYER_TOOLTIP_VIEW_DEPS: PlayerTooltipI18n = {
   fmt: (value, opts) => formatNumber(value, opts),
 };
 
-const RESOURCE_LABEL_KEYS: Record<ResourceType, TranslationKey> = {
-  mana: 'abilityUi.resources.mana',
-  rage: 'abilityUi.resources.rage',
-  energy: 'abilityUi.resources.energy',
-  focus: 'abilityUi.resources.focus',
-};
 // Ravenpost mailResult refusal codes to their toast lines. `sent`/`collected`
 // are successes rendered as chat-log lines in handleEvents, but they map here
 // too; codes outside THIS bundle's union take the fallback below.
@@ -1060,10 +1057,6 @@ const RAID_MARKER_LABEL_KEYS = [
   'hud.markers.names.cross',
   'hud.markers.names.skull',
 ] as const satisfies readonly TranslationKey[];
-const FORM_LABEL_KEYS: Record<'bear' | 'cat', TranslationKey> = {
-  bear: 'abilityUi.forms.bear',
-  cat: 'abilityUi.forms.cat',
-};
 const PET_MODE_LABEL_KEYS: Record<PetMode, TranslationKey> = {
   passive: 'hud.pet.passive',
   defensive: 'hud.pet.defensive',
@@ -19098,39 +19091,6 @@ export class Hud {
   }
 }
 
-function describeAbilitySummary(
-  known: ResolvedAbility,
-  resourceType: ResourceType | null,
-  spellHaste = 0,
-): string {
-  const parts: string[] = [];
-  if (known.cost > 0) {
-    parts.push(
-      t('abilityUi.tooltip.cost', {
-        cost: formatAbilityNumber(known.cost),
-        resource: resourceDisplayName(resourceType),
-      }),
-    );
-  }
-  if ((known.def.ruinCost ?? 0) > 0) {
-    parts.push(
-      t('abilityUi.tooltip.ruinCost', {
-        cost: formatAbilityNumber(known.def.ruinCost ?? 0),
-      }),
-    );
-  }
-  parts.push(abilityCastLine(known, spellHaste));
-  // Resolved cooldown (after talent cooldown modifiers), not the base def cooldown.
-  if (known.cooldown > 0) {
-    parts.push(
-      t('abilityUi.tooltip.cooldownSeconds', {
-        seconds: formatAbilityNumber(known.cooldown),
-      }),
-    );
-  }
-  return parts.join(' · ');
-}
-
 function itemDisplayNameFromSource(name: string): string {
   const item = Object.values(ITEMS).find((candidate) => candidate.name === name);
   return item ? itemDisplayName(item) : name;
@@ -19225,10 +19185,6 @@ function combatAbilityName(name: string | null): string {
   return name ? abilityDisplayNameFromSource(name) : t('hud.combat.attack');
 }
 
-function resourceDisplayName(resourceType: ResourceType | null): string {
-  return t(RESOURCE_LABEL_KEYS[resourceType ?? 'mana']);
-}
-
 // itemSlotName moved to ./item_slot_labels as itemSlotLabel (imported above under
 // its old name here), so the pure view cores can read the same shared-label facts
 // the HUD does (#2466).
@@ -19247,96 +19203,10 @@ function parseSimMoney(text: string): number | null {
   return matched ? copper : null;
 }
 
-function abilityRangeLine(def: AbilityDef): string | null {
-  if (def.range <= 0) return null;
-  if (def.minRange !== undefined) {
-    return t('abilityUi.tooltip.rangeWithMin', {
-      min: formatAbilityNumber(def.minRange),
-      max: formatAbilityNumber(def.range),
-    });
-  }
-  return t('abilityUi.tooltip.range', {
-    range: formatAbilityNumber(def.range),
-  });
-}
-
-// The live caster's TOTAL spell-haste fraction: the resolved stat (set bonuses + spec
-// mastery) PLUS active buff_spellhaste auras (Arcane Power, Icy Veins, Metamorphosis).
-// Mirrors the sim's spellHasteMult (spell_combat.ts) EXACTLY, including its
-// `Math.max(0, ...)` floor, so a shown cast time never disagrees with the real one (a
-// net-negative haste, e.g. a cast-slow debuff, floors at 0 for both). ui/ cannot import
-// the sim-combat helper across the seam, so the formula is kept identical here by hand.
-function playerSpellHasteFrac(p: Entity | null | undefined): number {
-  if (!p) return 0;
-  let frac = p.spellHaste;
-  for (const a of p.auras) if (a.kind === 'buff_spellhaste') frac += a.value;
-  return Math.max(0, frac);
-}
-
-// `spellHaste` (the live character's total spell haste, a fraction) shortens the shown
-// cast / channel time exactly as the sim does, so a hasted caster's tooltips reflect the
-// real, faster cast.
-function abilityCastLine(known: ResolvedAbility, spellHaste = 0): string {
-  const h = 1 + Math.max(0, spellHaste);
-  if (known.def.channel) {
-    return t('abilityUi.tooltip.channeledSeconds', {
-      seconds: formatAbilityNumber(known.def.channel.duration / h),
-    });
-  }
-  if (known.castTime > 0) {
-    return t('abilityUi.tooltip.castSeconds', {
-      seconds: formatAbilityNumber(known.castTime / h),
-    });
-  }
-  return t('abilityUi.tooltip.instant');
-}
-
-// Thin i18n mapper over the pure resolver (ability_requirement_keys.ts), which
-// owns the truth table incl. the Skulduggery-only stealth-bypass line.
-export function abilityRequirementLines(
-  def: AbilityDef,
-  spec?: string | null,
-  resolved?: AbilityRequirementResolve,
-): string[] {
-  return abilityRequirementKeys(def, spec, resolved).map((req) => {
-    switch (req.key) {
-      case 'requiresForm':
-        if (req.form) {
-          return t('abilityUi.tooltip.requiresForm', { form: t(FORM_LABEL_KEYS[req.form]) });
-        }
-        return t('abilityUi.tooltip.selfOnly');
-      case 'requiresStealth':
-        return t('abilityUi.tooltip.requiresStealth');
-      case 'requiresStealthSkulduggery':
-        return t('abilityUi.tooltip.requiresStealthSkulduggery');
-      case 'requiresCombo':
-        return t('abilityUi.tooltip.requiresCombo');
-      case 'requiresDodge':
-        return t('abilityUi.tooltip.requiresDodge');
-      case 'requiresOutOfCombat':
-        return t('abilityUi.tooltip.requiresOutOfCombat');
-      case 'requiresTargetHealthBelow':
-        if (req.percent !== undefined) {
-          return t('abilityUi.tooltip.requiresTargetHealthBelow', {
-            percent: formatAbilityNumber(req.percent),
-          });
-        }
-        return t('abilityUi.tooltip.selfOnly');
-      case 'onNextSwing':
-        return t('abilityUi.tooltip.onNextSwing');
-      case 'offGlobalCooldown':
-        return t('abilityUi.tooltip.offGlobalCooldown');
-      case 'friendlyTarget':
-        return t('abilityUi.tooltip.friendlyTarget');
-      case 'enemyTarget':
-        return t('abilityUi.tooltip.enemyTarget');
-      case 'selfOnly':
-        return t('abilityUi.tooltip.selfOnly');
-      default:
-        return t('abilityUi.tooltip.selfOnly');
-    }
-  });
-}
+// abilityRangeLine, playerSpellHasteFrac, abilityCastLine,
+// abilityRequirementLines, describeAbilitySummary and resourceDisplayName
+// moved WHOLE to ./ability_tooltip_lines (imported above) at the Phase 10
+// headroom extraction, so a Vitest can pin the tooltip lines directly.
 
 // A 2D canvas context is non-null for any attached canvas in this app; centralize
 // the assertion so the call sites do not each carry a non-null bang. Throws (a
