@@ -12523,6 +12523,7 @@ export class Hud {
         case 'farmDenied':
         case 'farmHusksConverted':
         case 'farmReady':
+        case 'farmFeastPlaced':
           // Farming's six feedback arms, extracted whole to
           // src/ui/farm_event_feedback.ts at the v0.38.0 sync (the monolith
           // ratchet heal); the Hud itself is the host seam.

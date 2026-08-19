@@ -39,6 +39,8 @@ const MASTER_GAINS_DB = {
   ui_farm_ready: 0,
   // The golden-harvest sting PLACEHOLDER, unity gain with its three siblings.
   ui_farm_golden: 0,
+  // The shared-feast placement PLACEHOLDER, unity gain with its four siblings.
+  ui_farm_feast: 0,
 };
 
 function tone(frequency, start, duration, gain, options = {}) {
@@ -209,6 +211,19 @@ export const UI_SFX_SPECS = [
     tone(1046, 0.16, 0.3, 0.13, { wave: 'triangle' }),
     tone(1318, 0.24, 0.36, 0.11, { wave: 'triangle', endFrequency: 1568 }),
     noise('white', 0.1, 0.5, 0.02, { highpass: 3400 }),
+  ]),
+  // Farming PLACEHOLDER (Phase 12, the shared feast), for the sound engineer:
+  // setting the feast table out. A woody double thud (boards landing on the
+  // trestles) under a short convivial rattle of plates and mugs, closed by a
+  // small warm lift so it reads as an invitation rather than furniture being
+  // dropped. Swap for a real recording when one lands, exactly as its four
+  // farming siblings above.
+  cue('ui_farm_feast', 0.7, 'Woody table thud with a warm rattle of plates being set out.', [
+    tone(140, 0, 0.18, 0.16, { wave: 'triangle', endFrequency: 100 }),
+    tone(170, 0.12, 0.18, 0.13, { wave: 'triangle', endFrequency: 120 }),
+    noise('brown', 0, 0.2, 0.07, { lowpass: 600 }),
+    noise('white', 0.18, 0.26, 0.035, { highpass: 2400, lowpass: 8000 }),
+    tone(523, 0.3, 0.3, 0.09, { wave: 'triangle', endFrequency: 659 }),
   ]),
 ].map((spec) => ({ ...spec, masterGainDb: MASTER_GAINS_DB[spec.key] }));
 
