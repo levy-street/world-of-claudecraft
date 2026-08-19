@@ -26,222 +26,285 @@ player-reachable loop. STILL OPEN from that QA: (bo), the tier 3/4 seed
 faucet (state.md OPEN list); nothing this phase celebrates may assume
 Highwatch or Evergarden beds are sowable until D11's bootstrap ruling lands.
 
-### Starter Prompt
+### Starter Prompt (the session form; refreshed by the Phase 9b QA close, 2026-08-19)
 
 ```
-This is Phase 10 of the Farming feature: Celebrations.
-Model: Opus 4.8, xhigh effort (1m context variant where the file load demands it).
-Harness: Claude Code.
+This is Phase 10 of the Farming feature: Celebrations (the golden_harvest rare
+event, the farming deeds, and the farming-100 title). Model: Opus 4.8 or newer,
+xhigh effort (1m context variant where the file load demands it). Harness:
+Claude Code. DELIVERY per D22 (standing): LOCAL-ONLY. No pushes, no PRs. The
+phase lands as commits on fix/farming-phase-10-celebrations cut off LOCAL
+feature/farming-plan, merges back --no-ff, and deletes its branch. The gate log
+is the arbiter.
 
-Goal: farming gets its lottery moment and its permanent records: the golden_harvest rare
-event rolled at harvest, the farming deeds, and the farming-100 title.
+Goal: farming gets its lottery moment and its permanent records: golden_harvest
+rolled at harvest as a fourth flavor on the existing gatherRareEvent union
+(1 in 90, five-fold yield, signed produce, zone-announced through the one
+announceGatherRareEvent path), the D13 deeds (first planting, a first-harvest
+chronicle per farming zone, a golden-harvest deed, prog_farming_100 with the
+farming title; append-only, cosmetic, ZERO rng), and the golden sting cue.
+Everything is celebration: no power, no new SimEvent type, one new roll.
 
 STEP 0 - PRE-FLIGHT
-- Work ONLY in the persistent worktree ~/Documents/woc-farming-plan. Use
-  git -C ~/Documents/woc-farming-plan for every git command (the Bash cwd resets between
-  calls; never rely on cd).
-- git status must be clean. If it is not, stop and surface; never stash or discard WIP
-  that is not yours.
+- Work ONLY in the persistent worktree ~/Documents/woc-farming-plan. Other
+  sessions share the main checkout; never work there. Prefix EVERY shell command
+  with cd ~/Documents/woc-farming-plan && export PATH=$HOME/.nvm/versions/node/v26.5.0/bin:$PATH
+  (the Bash cwd resets between calls; the inherited shell has Node 24 and no pnpm).
+- git -C ~/Documents/woc-farming-plan status must be clean, on feature/farming-plan
+  at or after 881052cab0 (the Phase 9b QA merge-hash record; the QA merged
+  --no-ff as 710c031064 on 2026-08-19; verify HEAD descends from it). Stop if
+  it is not.
+- Branch fix/farming-phase-10-celebrations off LOCAL feature/farming-plan (D22:
+  never off a bare release tip, which lacks the packet).
 - Re-resolve the NEWEST release/** branch: git fetch origin --prune, then
-  git branch -r --list 'origin/release/*' | sort -V and take the last row. Create branch
-  fix/farming-phase-10-celebrations off LOCAL feature/farming-plan (D22: never off
-  the release tip, which lacks the packet and all farming work), then MERGE the
-  newest release tip INTO the phase branch FIRST: run the release-merge-audit skill
-  plus the state.md deviation (al) absorb checklist, re-run the parity and count-pin
-  suites, and verify the farming_session golden md5 unchanged. A jump of a minor
-  version or more (or a triple-digit intersection) runs
-  docs/farming/phase-06b-release-sync.md's shape as its own mid-phase BEFORE this
-  phase instead. Record the phase-start commit sha.
-- If release moves mid-phase and this branch turns long-lived, merge release in and run
-  the release-merge-audit skill.
-- Scan Claude Code memory: the MEMORY.md index, the farming-skill-program entry, plus
-  these phase-relevant topics: worktree-cwd-drift-misroutes-git,
-  i18n-semantic-regressions-gate-trap, mutation-checks-commit-first,
-  big-diff-reviewer-turn-budgets, fanout-agent-delivery-traps, no-claude-session-links.
+  git branch -r --list 'origin/release/*' | sort -V, take the last row. The
+  branch has absorbed release/v0.39.0 through ea9377db8e (the TWENTIETH absorb,
+  2026-08-19, inside the Phase 9b QA). If a newer tip exists, merge it INTO the
+  phase branch FIRST: release-merge-audit skill plus the state.md deviation (al)
+  absorb checklist (portrait manifest fingerprint-only re-mint via
+  scripts/build_mob_portrait_source_manifest.mjs --write plus the accepted-art
+  registry row; scripts/item_art_audit.mjs --verify-only; the ART-SUBJECT rule
+  for any release seal over a live inventory pending-art items can join), re-run
+  tests/world_api_parity.test.ts, tests/snapshots.test.ts,
+  tests/command_schema.test.ts, tests/monolith_budget.test.ts, and tests/parity,
+  and classify any farming_session golden movement before re-minting (expect the
+  (am) shape on any absorb adding static world content). A minor-version jump or
+  a triple-digit intersection runs the phase-06b-release-sync shape as its OWN
+  mid-phase first. ABSORB TRAPS proven live: a pnpm-lock.yaml move fires the
+  farm-props seal family; a patches/ move needs pnpm install; a both-sides
+  Eastbrook seal conflict resolves ONLY by remint_polish_provenance.mjs on the
+  merged tree; `git checkout --theirs <conflicted pin suite>` DISCARDS
+  non-conflicting arms; release monolith ceilings can land BELOW your working
+  count (heal by extraction, never a raise); the npc-looks roster demands an
+  AUTHORED look for every NpcDef; the shard-weight floor heals by re-harvesting
+  from a green FULL-MODE upstream run.
+- Baselines as of the Phase 9b QA merge: IWorld 329 members (88 data, 241
+  method), facet count 34, command_schema 202/215, delta keys 87,
+  farming_session golden md5 9a8fefa5e48c7e456db7ef2695bfb284. This phase moves
+  the farming_session golden EXACTLY ONCE, deliberately (the harvest draw-count
+  change), in an ISOLATED UPDATE_PARITY=1 commit; every other golden stays
+  byte-identical. Deeds totals re-pin FROM the live suite (273 deeds / 3155
+  renown as of the seventeenth absorb; VERIFY by running
+  tests/deeds_content.test.ts, never trust this file's numbers over the suite).
+  MONOLITH: hud.ts 19352/19352 (EXACT, ZERO headroom: the Phase 9b QA's (bq)
+  error-forward spent the last line), renderer.ts 13774/13774 (exact, zero),
+  main.ts 11454/11460, sim.ts 12657/12660, server/game.ts 10791/10900. Agent
+  B's HUD-case work CANNOT add a net line to hud.ts as it stands: an extraction
+  lands FIRST as its own commit (move a self-contained block behind the file's
+  seam, then LOWER the ceiling; pin-check candidates first: the S3 guard
+  source-scans hud.ts for the three localize* matchers,
+  reliquary_window.test.ts regex-slices handleReliquaryUnlocks, and
+  tests/farm_verb_reachability.test.ts containment-slices openPlantSheet, the
+  farmReady/error event cases, the plant-sheet close case, and the panel
+  keydown guard list: none of those blocks may move). A ceiling raise is a
+  maintainer decision: stop before one. Touch renderer.ts NOT AT ALL (the
+  three evidence-seal re-mints).
+- Record the phase-start commit (git rev-parse HEAD).
+- Scan Claude Code memory: MEMORY.md; farming-skill-program (the PHASE 9B and
+  PHASE 9B QA paragraphs are the freshest record: the (bq) re-arm, the hud.ts
+  zero-headroom warning, the source-pin slicing idiom, the delivery recipes);
+  golden-files-store-digests + parity-omit-defaults-zero-fields (the golden
+  re-record discipline); deeds-stranded-heal-pr2077 (join-time heals for
+  unearnable deeds: load it before designing the chronicle earnability);
+  profession-icon-art-backed-pin (DEED_ART_PENDING is the same self-clearing
+  pattern); npcs-are-terrain-calm-pads (touch NO NPC seat);
+  i18n-semantic-regressions-gate-trap (new keys English-only + M16 fills for
+  wordy values; never reword an existing translated key);
+  fanout-agent-delivery-traps (Workflow for plain implementer/audit lanes;
+  custom-agentType reviewers on the Agent tool with the
+  report-via-SendMessage-to-main line FIRST and a 25-call budget; check the
+  journal for LEN 0; a background Explore loader can idle: nudge once, then
+  load it yourself); mutation-checks-commit-first (the dirty-refusing runner);
+  mutation-verdicts-need-exit-code-plus-names; one-probe-outranks-agreeing-
+  agents; worktree-cwd-drift-misroutes-git; pkill-pattern-matches-own-shell
+  (kill dev servers by port: fuser -k 5188/tcp); lockfile-moves-asset-seals;
+  big-diff-reviewer-turn-budgets.
+- READ docs/farming/state.md's head block, D12 / D13 / D17 / D22, deviation
+  (bq) (the error-toast re-arm: the Hud's error case now forwards to the plant
+  sheet; do not disturb that case), (bo) READ ONLY AND BINDING: tier 3/4 seeds
+  have NO faucet until D11 rules, so the Highwatch and Evergarden first-harvest
+  chronicle deeds are UNEARNABLE at ship time; the earnability table (the
+  ZONE_FISH template) plus the join-time stranded-heal doctrine must carry
+  them honestly, and nothing this phase ships may assume those beds are
+  sowable; the OPEN list; docs/design/deeds.md;
+  docs/farming/phase-10-celebrations.md whole (this file: the sync note above
+  re-pins deeds FROM the castle totals); progress.md's Phase 9b and 9b QA
+  notes (hud.ts headroom history, the gate recipe).
 
 STEP 1 - LOAD CONTEXT
-Spawn one Explore agent (thorough) to read and summarize: docs/farming/state.md,
-docs/farming/progress.md, docs/farming/phase-10-celebrations.md, and these sources:
-src/sim/professions/farming.ts (the harvest action-time draw block, the draw-count
-contract), src/sim/content/deeds.ts (the catalog, the ZONE_FISH earnability template,
-the visit-mark idiom), the module exporting the gatherRareEvent SimEvent flavor union and
-announceGatherRareEvent (locate by symbol), src/ui/hud.ts (the single gatherRareEvent HUD
-case, read by the agent only, never by you), src/game/audio.ts (UI_CUES, the UiCue
-union), scripts/sfx/sfx_prompts.mjs, the deeds i18n module under src/ui/i18n.catalog/,
-tests/deeds_content.test.ts, tests/professions_farming.test.ts (and any sibling matching
-tests/professions_farming*.test.ts), tests/game_audio.test.ts,
-tests/localization_fixes.test.ts, the farming_session scenario under tests/parity, and
-the CLAUDE.md files: root, src/sim/CLAUDE.md, src/sim/professions/CLAUDE.md,
-src/ui/CLAUDE.md, plus docs/design/deeds.md. The orchestrator never reads planning docs
-or coordinator monoliths directly; the summary is your only context.
-The summary must return, explicitly:
-- The file and exported union carrying the gatherRareEvent flavors, the exact flavor
-  shape, and the announceGatherRareEvent signature and fanout semantics (including how
-  instance space is excluded).
-- The harvest action-time draw block's shape in src/sim/professions/farming.ts, the
-  current draw-count contract (draws per plant, draws per harvest, zero on denial) and
-  the test that pins it, and the exported name of the shared rare-event chance constant.
-- The single gatherRareEvent HUD case shape: how the existing flavors localize, the epic
-  color class, and the finder-only achievement cue path.
-- The full SFX cue recipe as implemented: UI_CUES key, facade method, hud case, prompt
-  row, npm run sfx:ui, sfx:manifest, sfx:check, and the completeness guard in
-  tests/game_audio.test.ts.
-- The deeds catalog structure: the ZONE_FISH earnability template, the visit-mark
-  producer idiom, the prog_ deed naming pattern, the title shape, and exactly which
-  totals tests/deeds_content.test.ts pins (deed order length, total renown, title
-  counts).
-- The deeds i18n module and the localization-coverage arms that count deeds.
-- The farming_session parity scenario file and the deliberate regen recipe
-  (UPDATE_PARITY=1, isolated commit).
-- Any progress.md Notes from Phases 1 to 9 that touch harvest, deeds, or the HUD
-  celebration path.
+Spawn ONE very-thorough Explore agent (plain-text return; if it idles, one
+nudge, then load it yourself): src/sim/professions/farming.ts (the harvest
+action-time draw block, the draw-count contract and its pin), the module
+exporting the gatherRareEvent flavor union + announceGatherRareEvent (locate by
+symbol; how instance space is excluded), src/sim/content/deeds.ts (the catalog,
+the ZONE_FISH earnability template, the visit-mark idiom, the prog_ naming, the
+title shape), src/ui/hud.ts's single gatherRareEvent case (the epic color, the
+finder-only achievement cue) READ BY THE AGENT ONLY, src/game/audio.ts
+(UI_CUES, the facade), scripts/sfx/sfx_prompts.mjs and the manifest chain, the
+deeds i18n module under src/ui/i18n.catalog/, src/ui/icons.ts DEED_ART_PENDING,
+tests/deeds_content.test.ts (exactly which totals pin),
+tests/professions_farming.test.ts, tests/game_audio.test.ts, the
+farming_session scenario under tests/parity and the UPDATE_PARITY=1 recipe, and
+the CLAUDE.md files (root, src/sim, src/sim/professions if present, src/ui).
+The summary must return: the flavor union file and shape, the
+announceGatherRareEvent signature and fanout, the draw block and count
+contract, the HUD case shape and its hud.ts line placement (to size the
+extraction Agent B needs), the full SFX cue recipe (UI_CUES key, facade, hud
+case, prompt row, npm run sfx:ui with
+--ffmpeg node_modules/ffmpeg-static/ffmpeg on this box, sfx:manifest,
+sfx:check, the completeness guard; the gate's manifest-freshness step diffs
+the SFX manifest, runtime pack, and gain-ceiling cache against a fresh regen:
+commit all three together), the deeds catalog totals and earnability
+machinery, the deed i18n coverage arms, and any hud.ts block that could
+extract to fund Agent B's lines.
 
-STEP 2 - CHOOSE ORCHESTRATION + EXECUTE
-Spawn three implementation agents by vertical slice, each owning its slice plus its
-tests. Fan-out reminders: request the fan-out explicitly and spawn all three in one
-message so they run in parallel; give each agent ONLY the Explore summary plus its own
-bullets (never a planning doc to read); never run a teammate in plan mode.
-- Agent A, the rare event (sim): add golden_harvest as a fourth flavor on the existing
-  gatherRareEvent SimEvent union (no new SimEvent type); roll it at harvest inside the
-  action-time draw block in src/sim/professions/farming.ts using the shared rare-event
-  chance constant (1 in 90 per D12); five-fold yield; the produce signed; zone-announced
-  through the announceGatherRareEvent path so the HUD case stays single. Agent A owns ALL
-  edits to src/sim/professions/farming.ts, including the farm:<zone> visit-mark producer
-  Agent C's chronicle deeds consume. Restate and re-pin the draw-count contract (harvest
-  gains the rare-event draw; plant unchanged; denial still zero). Tests in
-  tests/professions_farming.test.ts: the roll fires only at harvest, the yield
-  multiplier, the signature, the announcement, the re-stated contract, a same-seed
-  determinism pin.
-- Agent B, the HUD arm and the cue (ui plus game): the localized golden_harvest line in
-  the epic color inside the one gatherRareEvent HUD case; the finder-only achievement cue
-  on the existing path; a NEW golden sting cue: UI_CUES key, facade method in
-  src/game/audio.ts (widen the UiCue union if the family nests), the hud case, a prompt
-  row in scripts/sfx/sfx_prompts.mjs, placeholder clip via npm run sfx:ui, then
-  npm run sfx:manifest and npm run sfx:check (since the fourteenth absorb the
-  gate's manifest-freshness step diffs the SFX manifest, the runtime pack, and
-  the gain-ceiling cache against a fresh regen: commit all of them in the same
-  change, see the state.md validation matrix); the English t() rows in the matching
-  src/ui/i18n.catalog/ module. Tests: the tests/game_audio.test.ts completeness arm.
-- Agent C, the deeds (content plus i18n): per D13 and docs/design/deeds.md, all
-  append-only, cosmetic, ZERO rng: a first-planting deed; a first-harvest chronicle per
-  farming zone using farm:<zone> visit marks with an earnability table on the ZONE_FISH
-  template (the mark producer itself lands in Agent A's file; coordinate on the mark
-  ids); a golden-harvest deed; prog_farming_100 with the farming title. Re-pin the
-  tests/deeds_content.test.ts totals (deed order length, total renown, title counts)
-  deliberately in the same change. Deed English i18n rows in the matching
-  src/ui/i18n.catalog/ module with the release-tier note for the PR body (English-only
-  passes the PR tier; any M16-wordy string gets its non-Latin fills in the same change).
-  Verify the localization-coverage arms that count deeds.
-After the slices merge, YOU (the orchestrator) re-record the farming_session golden:
-run npx vitest run tests/parity first to see exactly which scenario moved, then
-UPDATE_PARITY=1 regen in an ISOLATED commit containing nothing else, then re-run to
-green and confirm no golden outside the farming scenarios changed.
+STEP 2 - BUILD
+Three implementer agents by vertical slice via Workflow (the shapes that
+delivered: Workflow implementer lanes have gone first-try in every recorded
+session). If two slices must touch one file, the orchestrator lands the shared
+shape first as its own commit (the Phase 9 recipe), or gives each agent its
+own git worktree off the phase branch; generated artifacts (i18n regen, SFX
+manifest, the golden) are ORCHESTRATOR-only re-mints after the slices merge.
+- Agent A, the rare event (sim): golden_harvest as a FOURTH flavor on the
+  existing gatherRareEvent union (no new SimEvent type); rolled at harvest
+  inside the action-time draw block via the shared rare-event chance constant
+  (1 in 90 per D12); five-fold yield; signed produce; zone-announced through
+  announceGatherRareEvent so the HUD case stays single. Agent A owns ALL edits
+  to src/sim/professions/farming.ts, including the farm:<zone> visit-mark
+  producer Agent C's chronicles consume (coordinate mark ids through the
+  orchestrator). Restate and re-pin the draw-count contract (harvest gains the
+  rare-event draw; plant unchanged at 2; denial still zero; the pre-roll
+  expansion stays position-independent of skill-varying loops, the Phase 4
+  monotonicity rule). Tests: roll only at harvest, the multiplier, the
+  signature, the announcement, the contract, a same-seed determinism pin, and
+  an armed-vs-unarmed non-vacuity guard on any new expansion (the Phase 4 QA
+  vacuity class: prove the armed expectation DIFFERS before pinning it).
+- Agent B, the HUD line and the cue (ui + game): the localized golden_harvest
+  line in the epic color inside the ONE gatherRareEvent case; the finder-only
+  achievement cue on the existing path; the NEW golden sting cue end to end
+  (UI_CUES key, facade method, hud case, prompt row, placeholder clip via
+  npm run sfx:ui --ffmpeg node_modules/ffmpeg-static/ffmpeg, then
+  sfx:manifest + sfx:check, all committed together); English t() rows in the
+  matching src/ui/i18n.catalog/ module (M16 fills for wordy values). hud.ts is
+  at ZERO headroom: if the case needs ANY net line, extract first (own commit,
+  lower the ceiling, respect the pinned blocks listed in STEP 0). Tests: the
+  game_audio completeness arm; a decisive line/color/cue arm.
+- Agent C, the deeds (content + i18n): per D13 and docs/design/deeds.md, all
+  append-only, cosmetic, zero rng: first planting; a first-harvest chronicle
+  per farming zone on farm:<zone> marks with the ZONE_FISH earnability
+  template, where the HIGHWATCH and EVERGARDEN chronicles ship
+  earnability-honest under (bo) (no faucet reaches their beds until D11; the
+  join-time stranded-heal doctrine applies; state the handling in the notes);
+  a golden-harvest deed; prog_farming_100 with the farming title (D17
+  IP-safe). Re-pin the tests/deeds_content.test.ts totals deliberately in the
+  same change (verify the live numbers first). New deed ids join
+  DEED_ART_PENDING (the self-clearing procedural-fallback ledger) unless art
+  ships. Deed English i18n rows + the coverage arms that count deeds; the
+  release-tier fill note goes in the progress notes.
+After the slices merge, YOU re-record farming_session: npx vitest run
+tests/parity first to see exactly what moved, classify it (the draw-count
+change and nothing else), then UPDATE_PARITY=1 in an ISOLATED commit, re-run
+green, and confirm no golden outside the farming scenario moved.
 
 INVARIANTS THIS PHASE MUST KEEP
-- Every deed draws zero rng, ever; all deeds are append-only and cosmetic (titles and
-  Renown, never power).
-- All randomness in src/sim/ goes through ctx.rng; the new roll happens only inside the
-  harvest action-time draw block, never at expiry, login, or tick.
-- The draw-count contract change is deliberate, stated in the PR body, and isolated: the
-  farming_session re-record is its own UPDATE_PARITY=1 commit, and every golden outside
-  the farming scenarios stays byte-identical.
-- The gatherRareEvent HUD case stays single: all four flavors flow through the one case
-  and the one announceGatherRareEvent path.
-- No English in any sim or server path: every player-visible string added this phase is
-  an English t() key in the matching src/ui/i18n.catalog/ module; every sim emit stays
-  text-free and id-carrying (the S3 guard binds).
-- Every new cue key has a clip, a manifest row, and a green sfx:check.
-- No em dashes, en dashes, or emojis anywhere; every new name is IP-safe per D17.
+- Every deed draws zero rng; all deeds append-only and cosmetic (never power).
+- All sim randomness through ctx.rng; the new roll only inside the harvest
+  action-time draw block, never at expiry, login, or tick.
+- The golden move is deliberate, classified, isolated, and singular.
+- The gatherRareEvent HUD case stays single (all four flavors, one case, one
+  announce path).
+- No English in any sim or server path: sim emits stay text-free and
+  id-carrying (the S3 guard binds); every player string is a t() key.
+- Every new cue key has a clip, a manifest row, and a green sfx:check, with
+  the manifest family committed together (the gate regen-diffs it).
+- (bo) binds: nothing ships that assumes Highwatch or Evergarden beds are
+  sowable; the chronicles carry their unearnability honestly.
+- No em dashes, en dashes, or emojis anywhere; D17 IP-safe names.
 
-Out of scope (do NOT do in this phase)
-- Buff food (Phase 11).
-- The shared feast (Phase 12).
-- Wiki prose and the asset manifest (Phase 13).
-- Tuning the shared rare-event chance constant or any yield number outside D12.
-- Any new SimEvent type, any power-granting reward on any deed.
+Out of scope: buff food (Phase 11), the shared feast (Phase 12), wiki prose
+and the asset manifest (Phase 13), tuning the rare-event constant or yields
+beyond D12, any new SimEvent type, any seed faucet or D11 decision, any
+power on any deed.
 
-STEP 3 - VALIDATION + MULTI-AGENT REVIEW
-Run, in order, and record each result:
-- npx tsc --noEmit
-- npx vitest run tests/deeds_content.test.ts tests/professions_farming.test.ts
-  tests/architecture.test.ts tests/localization_fixes.test.ts tests/game_audio.test.ts
-- npx vitest run tests/parity (green after the isolated re-record; nothing outside the
-  farming scenarios moved)
-- npm run ci:changed
-- node scripts/gate_select.mjs
-Then check git diff --name-only against the phase-start commit and dispatch ONLY the
-matching rows of the Review Dispatch Matrix in docs/farming/implementation-plan.md
-(expected for this diff: architecture-reviewer, cross-platform-sync,
-frontend-seam-reviewer (the hud case, the src/game/audio.ts cue, and the i18n rows
-match its matrix row), and qa-checklist at phase completion; add none beyond what the
-matrix matches). Every review agent gets a
-hard 30-tool-call budget, the coverage instruction ("report every issue including
-low-severity and uncertain ones; ranking happens later"), and, if truncated, the resume
-line: "Stop reading more files. Output the full report now based on what you have
-already seen. No more tool calls. Format: BLOCKING / SHOULD-FIX / NICE-TO-HAVE /
-VERDICT." No commit while a BLOCKING stands.
+STEP 3 - VALIDATION + REVIEW
+Run and record: npx tsc --noEmit; npx vitest run tests/deeds_content.test.ts
+tests/professions_farming.test.ts tests/architecture.test.ts
+tests/localization_fixes.test.ts tests/game_audio.test.ts
+tests/i18n_completeness.test.ts (the Phase 4 lesson: item/deed names red here
+on missing non-Latin fills); npx vitest run tests/parity (green after the
+isolated re-record, nothing else moved); npm run ci:changed. Reviews:
+architecture-reviewer (src/sim moved: mandatory), content-obligations-reviewer
+(deeds are content: mandatory), cross-platform-sync, frontend-seam-reviewer,
+then qa-checklist LAST. Dispatch custom-agentType reviewers on the Agent tool
+with the report-via-SendMessage-to-main line FIRST, a hard 25-tool-call
+budget, the coverage instruction ("report every issue including low-severity
+and uncertain ones; ranking happens later"), and the resume line ("Stop
+reading more files. Output the full report now. Format: BLOCKING / SHOULD-FIX
+/ NICE-TO-HAVE / VERDICT"); plain audit lanes may ride a Workflow. Take every
+BLOCKING and SHOULD-FIX or ledger it with a reason. Then mutation checks
+(after committing, through a scratchpad runner that refuses a dirty target):
+at least eight fresh mutants, including the roll moved off the harvest block,
+the chance constant unshared, the yield multiplier dropped, the sign dropped,
+a deed gaining rng or power, the earnability table widened to the unearnable
+chronicles, the cue key unwired, and the HUD case forked. Every verdict needs
+rc nonzero AND named failing tests AND the summary line; a survivor is a rig
+defect, dead code, or a real gap: diagnose before adding a test.
 
-STEP 4 - COMMIT CADENCE
-2 to 5 Conventional Commits, each with a scope and a BODY (what changed and why),
-explicit paths only, never git add -A, no session links or Claude attribution:
-- feat(sim): golden_harvest flavor and the harvest roll (union arm, action-time draw,
-  five-fold yield, signed produce, zone announce, re-stated draw-count pin)
-- feat(ui): the epic HUD line, finder-only achievement cue, and the golden sting cue
-  chain (facade, prompt row, placeholder clip, manifest)
-- feat(deeds): the farming deeds, chronicle marks and earnability table,
-  prog_farming_100 and title, totals re-pin, deed i18n rows
-- test(parity): re-record farming_session for the harvest rare-event draw (isolated,
-  UPDATE_PARITY=1, nothing else in the commit)
-- docs(farming): progress and state ledgers for Phase 10
+STEP 4 - COMMITS
+2 to 6 Conventional Commits, each with a scope and a BODY, explicit paths
+only, never git add -A, no session links or Claude attribution: the sim roll,
+the HUD/cue chain (extraction commit first if hud.ts needs a line), the
+deeds + i18n, the isolated parity re-record, docs.
 
-STEP 5 - ACCEPTANCE CRITERIA
-- [ ] golden_harvest is a fourth flavor on the existing gatherRareEvent union; no new
-      SimEvent type; the HUD case remains single.
-- [ ] The roll happens at harvest inside the action-time draw block via the shared
-      rare-event chance constant; five-fold yield; produce signed; zone-announced
-      through announceGatherRareEvent.
-- [ ] The draw-count contract is restated (harvest gains the rare-event draw) and
-      re-pinned so the pin fails if the count drifts.
-- [ ] farming_session re-recorded in an isolated UPDATE_PARITY=1 commit; no golden
-      outside the farming scenarios moved.
-- [ ] Deeds landed per D13: first planting, a first-harvest chronicle per farming zone
-      via farm:<zone> marks with an earnability table, a golden-harvest deed,
-      prog_farming_100 with the farming title; all append-only, cosmetic, zero rng.
-- [ ] tests/deeds_content.test.ts totals re-pinned deliberately in the same change.
-- [ ] Deed English i18n rows landed with the release-tier note in the PR body; the
-      localization-coverage arms that count deeds verified; S3 green.
-- [ ] Golden sting cue complete: UI_CUES key, facade method, hud case, prompt row,
-      placeholder clip, manifest, sfx:check green; tests/game_audio.test.ts green.
-- [ ] The epic-colored line and the achievement cue fire for the finder only; the zone
-      announcement reaches the zone.
-- [ ] Every STEP 3 validation row green; gate_select green modulo the armory exception.
+STEP 5 - ACCEPTANCE
+- [ ] golden_harvest is a fourth flavor on the existing union; no new
+      SimEvent; the HUD case remains single.
+- [ ] The roll happens at harvest via the shared constant; five-fold yield;
+      signed; zone-announced.
+- [ ] The draw-count contract restated and re-pinned; the same-seed
+      determinism arm and the armed-vs-unarmed non-vacuity guard hold.
+- [ ] farming_session re-recorded once, isolated, classified; nothing else
+      moved.
+- [ ] The D13 deeds landed, totals re-pinned from live numbers, the (bo)
+      chronicles earnability-honest, ids in DEED_ART_PENDING, i18n rows +
+      coverage arms green.
+- [ ] The golden sting cue complete end to end with the manifest family
+      committed together.
+- [ ] hud.ts and renderer.ts did not grow (extraction first, ceilings
+      lowered or held).
+- [ ] tsc, the STEP 3 rows, ci:changed, and gate_select green; mutations all
+      killed or diagnosed-and-fixed.
 
-STEP 6 - DOC UPDATES + MEMORY
-Update docs/farming/progress.md (the Phase 10 status row, the acceptance list above
-copied with its check states, a Notes block for surprises, deviations, and deferrals)
-and the docs/farming/state.md ledgers (new SimEvent flavor, new i18n keys, new deeds,
-new cue). Any deviation decided in-phase gets swept into
-docs/farming/phase-10-celebrations.md AND docs/farming/phase-10-qa.md in the same pass.
-Record genuine surprises in Claude Code memory.
+STEP 6 - DOCS
+progress.md (a Phase 10 row + notes: the would-be PR body, review verdicts,
+the mutation record, the gate record, the merge hash), state.md (head block;
+new deviation letters continue at (br); ledger the flavor, keys, deeds, cue),
+this file's EXECUTED block, and docs/farming/phase-10-qa.md swept in the same
+pass. Record genuine surprises in Claude Code memory.
 
-STEP 7 - FINAL RESPONSE FORMAT
-Report: phase status (complete or partial with reasons); files touched, grouped by
-surface; validation results per command; review verdicts per agent; deferrals with
-reasons; one line handing off to the Phase 10 QA session.
+STEP 7 - FINAL RESPONSE
+The phase report: what shipped, any extraction commits and new ceilings,
+validation results, review verdicts, the mutation record, deviations and
+deferrals with reasons, the gate record, the merge hash, and a one-line
+handoff to the Phase 10 QA session.
 
-STOPPING RULES
-- Stop if the fourth flavor cannot land without breaking the single-HUD-case shape (a
-  second case or a forked switch): surface the design instead of forking it.
-- Stop if tests/parity reds outside the farming scenarios after the re-record: the
-  shared draw order forked for another profession; never regen other goldens to silence
-  it.
-- Stop if git status is dirty at STEP 0 or the newest release branch cannot be resolved.
-- Stop while any review BLOCKING stands.
+STOPPING RULES: stop and surface before any monolith ceiling raise; before
+any new SimEvent type, IWorld member, command, or wire field; if the fourth
+flavor cannot land without forking the single HUD case; if tests/parity reds
+outside the farming scenario after the re-record (the shared draw order
+forked: never regen other goldens to silence it); before anything that
+grants power on a deed; on an unresolvable release tip.
 
-Close: gate via node scripts/gate_select.mjs (the armory browser red is the standing
-environmental exception; grep the log for "FAIL" (the selective gate prints "[gate:select] FAIL", the full gate "[gate] FAIL") plus the GATE EXIT marker, never trust a piped exit code;
-PR CI is the arbiter). Push and open the PR against the release branch this phase was
-based on, following .github/PULL_REQUEST_TEMPLATE.md. Screenshots via the pr-screenshots
-skill apply to the visual phases (12 and 13); this phase needs none. No Claude
-attribution or session links in commits or PR text.
+Close: gate via BROWSER_PATH=$HOME/.cache/ms-playwright/chromium-1228/
+chrome-linux64/chrome GATE_MAX_WORKERS=8 node scripts/gate_select.mjs on the
+committed tree; judge ONLY the log markers ("[gate:select] FAIL at" /
+"[gate] FAIL" / "[gate:select] PASS: all N steps green"; the exit code has
+lied). EXPECT the full-suite fallback (the terrain fixture plus
+tests/helpers/bare_client.ts keep the planner's broad arm live), about 15
+minutes of vitest at 8 workers, and budget the druid_engines 20 s contention
+timeout as the recorded environmental flake (prove it standalone if it fires,
+do not chase it). Per D22: no push, no PR; merge --no-ff into LOCAL
+feature/farming-plan, delete the branch and any agent worktrees, record the
+merge hash in progress.md and the farming-skill-program memory topic, and
+hand off to the Phase 10 QA (docs/farming/phase-10-qa.md).
 ```
