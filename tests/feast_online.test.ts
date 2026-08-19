@@ -239,9 +239,14 @@ describe('the multi-session feast routing over the real broadcast path', () => {
     broadcast(server);
 
     // The spend is real on the authoritative bags AND already on this first
-    // post-command snapshot (place_feast is a HEAVY_SELF_CMDS member; a drop
-    // from that table strands this inv on the staggered backstop and reds
-    // the assertion below).
+    // post-command snapshot. WHAT THIS DOES NOT PIN, deliberately (the
+    // farming chain suite's precedent): WHICH mechanism supplies the heavy
+    // freshness. Two independently do: place_feast is a HEAVY_SELF_CMDS
+    // member, AND the successful place spends a bag item, which bumps
+    // meta.wireRev (itself a heavyDue input). Dropping the table entry alone
+    // leaves this green (probed by mutation, not assumed); the contract worth
+    // pinning is the OBSERVABLE one: the placer's mirror sees the spend at
+    // once, never on the staggered backstop.
     expect(server.sim.countItem('harvest_feast', pid)).toBe(0);
     expect(invItemIds(lastSnap(fc.sent))).not.toContain('harvest_feast');
     // And the entity really spawned server-side.
