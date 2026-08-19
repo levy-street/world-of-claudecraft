@@ -1,16 +1,15 @@
 // Pure ability-tooltip line builders: the cost/cast/cooldown summary, the
 // range and cast lines, the live spell-haste fraction they fold in, and the
 // requirement rows. Moved WHOLE from hud.ts at the Phase 10 headroom
-// extraction (the monolith ratchet heal); behavior unchanged. These close
-// over no Hud state, so a Vitest imports them directly.
+// extraction (the monolith ratchet heal) with ONE deliberate behavior delta:
+// playerSpellHasteFrac gained the `?? 0` mirror guard (an absent spellHaste
+// on a ClientWorld-mirrored entity used to read NaN). These close over no
+// Hud state, so a Vitest imports them directly.
 
 import type { ResolvedAbility } from '../sim/sim';
 import type { AbilityDef, Entity, ResourceType } from '../sim/types';
 import { formatAbilityNumber } from './ability_description';
-import {
-  type AbilityRequirementResolve,
-  abilityRequirementKeys,
-} from './hud/action_bar/ability_requirement_keys';
+import { type AbilityRequirementResolve, abilityRequirementKeys } from './hud/action_bar';
 import { type TranslationKey, t } from './i18n';
 
 const RESOURCE_LABEL_KEYS: Record<ResourceType, TranslationKey> = {
