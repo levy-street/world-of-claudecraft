@@ -46,7 +46,6 @@ import type { SimContext } from '../sim_context';
 import {
   CONSUME_DURATION,
   CONSUME_TICKS,
-  DT,
   dist2d,
   type Entity,
   INTERACT_RANGE,
@@ -145,10 +144,15 @@ export function placeFeastAction(ctx: SimContext, p: Entity, meta: PlayerMeta): 
   // lootable-false object as a cooling pickup (respawnTimer -= DT, re-arm
   // at zero), which re-armed the feast one second after placement and
   // handed the interact press to the generic object arm (found by the
-  // player-path probe). A spawn timer longer than the feast's own life
-  // keeps the sweep from ever re-arming it; the 1 Hz despawn below ends
-  // the entity long before the timer runs out.
-  e.respawnTimer = (info.durationTicks + 20) * DT;
+  // player-path probe). Infinity is the precedented never-re-arm sentinel
+  // (handleDeath's run-scoped mobs, dismissed pets): Infinity - DT stays
+  // Infinity, so the sweep can never flip lootable back on, and no timer
+  // arithmetic stays silently coupled to the 1 Hz sweep period (the prior
+  // finite dodge, durationTicks + 20 ticks, had a worst-case margin of
+  // exactly ONE tick over the despawn below, measured by the QA round).
+  // respawnTimer never rides the wire; `loot` is the only lootability
+  // wire field, and it stays false for the feast's whole life (pinned).
+  e.respawnTimer = Infinity;
   ctx.addEntity(e);
   // Inside a claimed dungeon instance the feast joins the run's teardown
   // roster: freeInstance drops every registered objectId when the reaper

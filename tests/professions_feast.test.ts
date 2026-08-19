@@ -633,9 +633,31 @@ describe('shared feast: charges, expiry, and the 1 Hz sweep', () => {
     // cannot kill it at the 20s repo default (the Phase 6 QA lesson; the
     // suite_duration_budget ratchet accepts this row-free under 300s).
     const { sim, placer } = world(0);
+    // Pin the WORST-CASE sweep phase (the re-arm class's tightest alignment):
+    // place so expiresAtTick lands one tick past a 1 Hz boundary, making the
+    // despawn wait the full 19 ticks after expiry. The QA round measured the
+    // old finite spawn timer's margin at exactly ONE tick here, so this ride
+    // is the arm that reds any regression of the never-re-arm rule at END of
+    // life (the dedicated re-arm arm below covers only the start of life).
+    while (sim.tickCount % 20 !== 1) sim.tick();
     const feastId = placeOk(sim, placer);
-    tickSeconds(sim, 181); // past the 3600-tick deadline plus a sweep
-    expect(sim.entities.has(feastId)).toBe(false);
+    const placeTick = sim.tickCount;
+    const ent = sim.entities.get(feastId);
+    if (!ent) throw new Error('no feast entity');
+    let despawnTick = -1;
+    for (let i = 0; i < 3700 && despawnTick < 0; i++) {
+      sim.tick();
+      if (!sim.entities.has(feastId)) {
+        despawnTick = sim.tickCount;
+      } else if (ent.lootable) {
+        throw new Error(`re-armed lootable at life tick ${sim.tickCount - placeTick}`);
+      }
+    }
+    expect(despawnTick, 'the feast despawned').toBeGreaterThan(0);
+    expect(
+      despawnTick - placeTick,
+      'despawn landed on the first sweep boundary at or after expiry',
+    ).toBeLessThanOrEqual(3600 + 19);
     expect(sim.ctx.feasts.has(feastId)).toBe(false);
   }, 60_000);
 
