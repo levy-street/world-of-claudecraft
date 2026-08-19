@@ -5579,6 +5579,57 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "exploration",
     "renown": 5,
     "feat": false
+  },
+  {
+    "id": "prog_first_planting",
+    "name": "Sow It Begins",
+    "category": "progression",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_vale_first_harvest",
+    "name": "First Fruits of the Vale",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_marsh_first_harvest",
+    "name": "Sprouts in the Peat",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_peaks_first_harvest",
+    "name": "A Crop Among the Crags",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_evergarden_first_harvest",
+    "name": "A Plot in Paradise",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "col_golden_harvest",
+    "name": "Golden Harvest",
+    "category": "collection",
+    "renown": 0,
+    "feat": false
+  },
+  {
+    "id": "prog_farming_100",
+    "name": "Harvestmaster",
+    "category": "progression",
+    "renown": 10,
+    "feat": false,
+    "rewardTitle": "Harvestmaster",
+    "crest": "/ui/deeds/prog_farming_100.webp"
   }
 ];
 
@@ -6788,6 +6839,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "title",
         "name": "Light of the Sanctum"
+      },
+      {
+        "kind": "title",
+        "name": "Harvestmaster"
       }
     ]
   },

@@ -2842,6 +2842,97 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 5,
     trigger: { kind: 'visit', markId: 'dungeon:dawnhold_castle' },
   },
+
+  // The farming celebration deeds (D13), appended per the append-only
+  // DEED_ORDER contract. All cosmetic, zero rng, no power. The farm:planted
+  // mark is written at plant success and the farm:<zone> marks at surviving
+  // harvest (src/sim/deeds.ts onCropHarvestedForDeeds), both from
+  // professions/farming.ts.
+  prog_first_planting: {
+    id: 'prog_first_planting',
+    name: 'Sow It Begins',
+    desc: 'Plant your first crop in a garden bed.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'farm:planted' },
+  },
+  // The four first-harvest chronicles, one per farming hub
+  // (FARM_CHRONICLE_ZONES, src/sim/deeds.ts). ALL FOUR are earnable today:
+  // plantCrop carries no bed-tier gate (probed live in the celebrations
+  // phase), so vendor-stocked tier 1/2 seeds can be planted and harvested at
+  // every hub, Highwatch and the Evergarden included, even while tier 3/4
+  // seeds have no faucet (state.md (bo) gates the high-tier CROPS, never
+  // these marks).
+  chr_vale_first_harvest: {
+    id: 'chr_vale_first_harvest',
+    name: 'First Fruits of the Vale',
+    desc: 'Harvest your first thriving crop from a garden bed in Eastbrook Vale.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'farm:eastbrook_vale' },
+  },
+  chr_marsh_first_harvest: {
+    id: 'chr_marsh_first_harvest',
+    name: 'Sprouts in the Peat',
+    desc: 'Harvest your first thriving crop from a garden bed in Mirefen Marsh.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'farm:mirefen_marsh' },
+  },
+  chr_peaks_first_harvest: {
+    id: 'chr_peaks_first_harvest',
+    name: 'A Crop Among the Crags',
+    desc: 'Harvest your first thriving crop from a garden bed in Thornpeak Heights.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'farm:thornpeak_heights' },
+  },
+  chr_evergarden_first_harvest: {
+    id: 'chr_evergarden_first_harvest',
+    name: 'A Plot in Paradise',
+    desc: 'Harvest your first thriving crop from a garden bed in the Evergarden.',
+    category: 'chronicle',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'farm:evergarden' },
+  },
+  // Rare-find deed: luck-based, so renown 0 and no title (docs/design/deeds.md
+  // rule 2), and VISIBLE like col_pristine_vein (the hid_ shelf is for spoiler
+  // delights, not public zone-wide celebrations). Keys on the finder-only
+  // gather_event mark its announce site writes; golden_harvest joins the
+  // family from the farming rare-event seam (professions/gather_events.ts),
+  // where noteReliquaryMark no-ops for it by design (no reliquary cell, a
+  // ledgered deferral).
+  col_golden_harvest: {
+    id: 'col_golden_harvest',
+    name: 'Golden Harvest',
+    desc: 'Reap a golden harvest and let the whole zone hear about it.',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'visit', markId: 'gather_event:golden_harvest' },
+  },
+  // Renown 10, the prog_mining_100 / prog_fishing_100 family value; the title
+  // placement is the D13 mandate, and it is DELIBERATELY the catalog's first
+  // profession-100 title: farming caps at 100 with no 200 tier, so its
+  // capstone carries the program's one title the way fishing's 200-cap
+  // Master Angler does at its own cap. Whether the other gathering caps gain
+  // titles is a catalog-wide maintainer call, not taken here. Reaching 100
+  // requires tier 3+ crops (the
+  // tier-2 teaching ceiling grays at 75, farmingTeachingCeilingFor in
+  // professions/farming.ts) whose seeds have no faucet until the D11
+  // bootstrap ruling (state.md (bo)), so this deed and its title become
+  // earnable the day that faucet lands; the honesty arm in
+  // tests/deeds_content.test.ts pins the dependency and the recorded waiver
+  // of the visible-but-unearnable rule lives in docs/design/deeds.md
+  // (the dormancy window note).
+  prog_farming_100: {
+    id: 'prog_farming_100',
+    name: 'Harvestmaster',
+    desc: 'Reach 100 Farming proficiency.',
+    category: 'progression',
+    renown: 10,
+    trigger: { kind: 'gathering', professionId: 'farming', amount: 100 },
+    reward: { kind: 'title', text: 'Harvestmaster' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {
