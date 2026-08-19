@@ -13,7 +13,12 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import type { AuraKind, ItemDef } from '../src/sim/types';
 import { elixirTooltipLines } from '../src/ui/elixir_tooltip_view';
-import { ensureLocaleLoaded, formatNumber, setLanguage } from '../src/ui/i18n';
+import {
+  ensureLocaleLoaded,
+  formatNumber,
+  type SupportedLanguage,
+  setLanguage,
+} from '../src/ui/i18n';
 import { wellfedTooltipLines } from '../src/ui/wellfed_tooltip_view';
 import { stripComments } from './helpers/strip_comments';
 
@@ -183,13 +188,15 @@ describe('the wellfed and elixir stat maps stay in step', () => {
 });
 
 describe('the five non-Latin fills render end to end (frozen literals, the M16 staleness pin)', () => {
+  afterEach(() => setLanguage('en'));
+
   // Frozen renders of the two new catalog keys through the REAL sink
   // (locale chunk awaited first, the app's own order, then t() + the
   // AURA_NAME_KEY matcher): a stale or clobbered fill, a broken {aura}
   // interpolation, or a lost matcher row reds the exact literal. A reviewed
   // reword of a fill re-points its row here deliberately, the
   // localization_fixes idiom.
-  const MAPPED: [string, string][] = [
+  const MAPPED: [SupportedLanguage, string][] = [
     ['zh_CN', '<div class="tt-desc">吃完后获得饱足效果，使你的耐力提高 3 点，持续 10 分钟。</div>'],
     ['zh_TW', '<div class="tt-desc">吃完後獲得飽足效果，使你的耐力提高 3 點，持續 10 分鐘。</div>'],
     [
@@ -205,7 +212,7 @@ describe('the five non-Latin fills render end to end (frozen literals, the M16 s
       '<div class="tt-desc">Эффект &quot;Сытость&quot;: Выносливость +3 на 10 мин. Дается, когда вы доедаете.</div>',
     ],
   ];
-  const FALLBACK: [string, string][] = [
+  const FALLBACK: [SupportedLanguage, string][] = [
     ['zh_CN', '<div class="tt-desc">吃完后获得饱足效果，持续 5 分钟。</div>'],
     ['zh_TW', '<div class="tt-desc">吃完後獲得飽足效果，持續 5 分鐘。</div>'],
     ['ko_KR', '<div class="tt-desc">다 먹으면 포만감 효과를 얻어 5분 동안 지속됩니다.</div>'],
@@ -217,14 +224,14 @@ describe('the five non-Latin fills render end to end (frozen literals, the M16 s
   ];
 
   it.each(MAPPED)('%s: the useWellfed sentence and interpolated aura name', async (loc, want) => {
-    await ensureLocaleLoaded(loc as never);
-    setLanguage(loc as never);
+    await ensureLocaleLoaded(loc);
+    setLanguage(loc);
     expect(wellfedTooltipLines(ITEMS.eastbrook_glazed_carrots)).toBe(want);
   });
 
   it.each(FALLBACK)('%s: the useWellfedAura sentence', async (loc, want) => {
-    await ensureLocaleLoaded(loc as never);
-    setLanguage(loc as never);
+    await ensureLocaleLoaded(loc);
+    setLanguage(loc);
     expect(
       wellfedTooltipLines(
         wellfedDef({

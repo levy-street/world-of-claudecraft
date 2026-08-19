@@ -136,7 +136,17 @@ describe('well fed: interruption forfeits the buff', () => {
     expect(wellfedAuras(p), 'the forfeited meal never pays out').toEqual([]);
   });
 
-  it('death mid-meal clears the slot and the buff is forfeited for good', () => {
+  it('the killing blow clears the meal and the buff is forfeited for good', () => {
+    // SCOPE, stated honestly (the joint-coverage rule): lethal damage
+    // routes through the shared consuming-interrupt clear in
+    // src/sim/combat/damage.ts BEFORE the death-reset block's own
+    // belt-and-braces clear, so this arm pins the joint OUTCOME (no meal
+    // survives the killing blow, and nothing mints through 30s of
+    // dead-state ticks), not the death-reset site specifically: a
+    // diagnostic mutant deleting the death block's eating clear survives
+    // this suite because the interrupt site already covers it. The
+    // posthumous-quiet window below is the coverage the alive-interrupt
+    // arm above cannot give.
     const { sim, pid, p } = playerWorld();
     consume(sim, pid, 'eastbrook_glazed_carrots');
     tickSeconds(sim, 5);
@@ -144,7 +154,7 @@ describe('well fed: interruption forfeits the buff', () => {
 
     sim.ctx.dealDamage(null, p, 1_000_000, false, 'physical', null, 'hit');
     expect(p.dead, 'the hit was lethal').toBe(true);
-    expect(p.eating, 'death cleared the meal').toBeNull();
+    expect(p.eating, 'the killing blow cleared the meal').toBeNull();
 
     // Far past every boundary the meal could have reached, through death
     // and any respawn handling: the mint must never land posthumously.
