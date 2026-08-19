@@ -667,7 +667,7 @@ import {
   reliquaryRelicPageIndex,
 } from './reliquary_view';
 import { curatorRankNameKey, ReliquaryWindow } from './reliquary_window';
-import { openReportWindow } from './report_window_open';
+import { openReportWindow } from './report_window';
 import { restView } from './rest_indicator';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
@@ -18582,7 +18582,7 @@ export class Hud {
     return null;
   }
 
-  // Body in report_window_open.ts (the Phase 9b headroom extraction); this
+  // Body in report_window.ts (the Phase 9b headroom extraction); this
   // wrapper only binds the coordinator's private pieces into the deps bag.
   private openReportWindow(target: { pid?: number; name: string }): void {
     openReportWindow(
