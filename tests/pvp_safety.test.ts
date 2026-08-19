@@ -316,7 +316,7 @@ describe('PvP control abilities in active duels', () => {
     expect(castFear()).toBe(5);
   }, 90_000);
 
-  it('duel stuns land at full duration on every repeat (stun DR exemption)', () => {
+  it('duel stuns walk the 100/50/25/immune ladder (PvP stun DR)', () => {
     const { sim, aPid, b } = startDuel('paladin', 'warrior', 20);
 
     // Sundering Gavel is a 3s instant stun. As with Fear, a
@@ -337,13 +337,24 @@ describe('PvP control abilities in active duels', () => {
       return dur;
     };
 
-    // Balance pass (maintainer): player stuns are EXEMPT from PvP diminishing
-    // returns (they are short flat durations behind real cooldowns); every
-    // repeat lands at full duration. Fear/polymorph/root keep their ladders.
+    // Player stuns diminish within their category like roots and lockouts:
+    // full, half, quarter, then immune.
     expect(castStun()).toBe(3);
-    expect(castStun()).toBe(3);
-    expect(castStun()).toBe(3);
-    expect(castStun()).toBe(3);
+    expect(castStun()).toBe(1.5);
+    expect(castStun()).toBe(0.75);
+
+    // Fourth application: DR-immune. A single real cast applies no stun aura,
+    // and the decisive pin is the DR state itself: the chain sits at stage 3
+    // (immune), which is what bounds a repeated same-category chain in PvP.
+    b.auras = b.auras.filter((aura) => aura.id !== 'hammer_of_justice_stun');
+    const pala = sim.entities.get(aPid)!;
+    pala.gcdRemaining = 0;
+    pala.resource = pala.maxResource;
+    pala.cooldowns.delete('hammer_of_justice');
+    sim.castAbility('hammer_of_justice', aPid);
+    finishCast(sim, aPid);
+    expect(b.auras.some((aura) => aura.id === 'hammer_of_justice_stun')).toBe(false);
+    expect(b.ccDr.get('controlledStun')?.stage).toBe(3);
   });
 
   it('keeps opener and controlled stuns on independent DR chains (#1004)', () => {
@@ -372,11 +383,11 @@ describe('PvP control abilities in active duels', () => {
       return dur;
     };
 
-    // The controlled stun is unaffected by the spent opener chain, and with
-    // the stun-DR exemption every repeat stays full length.
+    // The controlled stun is unaffected by the spent opener chain: it lands at
+    // full duration, then diminishes only within its own controlled bucket.
     expect(castStun()).toBe(3);
-    expect(castStun()).toBe(3);
-    expect(castStun()).toBe(3);
+    expect(castStun()).toBe(1.5);
+    expect(castStun()).toBe(0.75);
   });
 
   it('does not diminish PvE stuns: a stun on a mob keeps full duration on repeat', () => {

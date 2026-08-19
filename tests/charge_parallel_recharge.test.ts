@@ -9,8 +9,8 @@ import { EMPTY_TEST_WORLD } from './sim_shared';
 // waited a WHOLE extra cooldown behind the first. Charge-limited abilities now
 // run one recharge timer PER SPENT CHARGE in parallel: each charge comes back
 // its own cooldown after the moment IT was spent, not queued behind its twin.
-// Also pinned here: player stuns are exempt from PvP diminishing returns
-// (fear/polymorph/root keep theirs).
+// Also pinned here: player stuns walk the PvP diminishing-returns ladder
+// through the Sim delegate (so a banked second charge lands diminished).
 
 function setup(): { sim: Sim; p: Entity; mob: Entity } {
   const sim = new Sim({
@@ -68,7 +68,7 @@ describe('parallel per-charge recharge (Double Sentence)', () => {
     expect(p.abilityCharges?.hammer_of_justice?.charges).toBe(2);
   });
 
-  it('player stuns are exempt from PvP diminishing returns', () => {
+  it('player stuns walk the PvP diminishing-returns ladder through the Sim delegate', () => {
     const sim = new Sim({
       seed: 7,
       playerClass: 'paladin',
@@ -89,10 +89,12 @@ describe('parallel per-charge recharge (Double Sentence)', () => {
     const hostile = anySim.isHostileTo.bind(sim);
     (sim as unknown as { isHostileTo(a: Entity, b: Entity): boolean }).isHostileTo = (a, b) =>
       (a.id === source.id && b.id === 999) || hostile(a, b);
-    // Repeated stuns keep FULL duration (no 1/2, 1/4, immune ladder).
-    for (let i = 0; i < 4; i++) {
-      expect(anySim.diminishedCrowdControlDuration(source, target, 'controlledStun', 3)).toBe(3);
-    }
+    // Repeated same-bucket stuns diminish (full, 1/2, 1/4, then immune), so a
+    // banked second Sundering Gavel charge lands at half length, not full.
+    expect(anySim.diminishedCrowdControlDuration(source, target, 'controlledStun', 3)).toBe(3);
+    expect(anySim.diminishedCrowdControlDuration(source, target, 'controlledStun', 3)).toBe(1.5);
+    expect(anySim.diminishedCrowdControlDuration(source, target, 'controlledStun', 3)).toBe(0.75);
+    expect(anySim.diminishedCrowdControlDuration(source, target, 'controlledStun', 3)).toBeNull();
     // Fear keeps its ladder: the second application is shorter than the first.
     const first = anySim.diminishedCrowdControlDuration(source, target, 'fear', 8);
     const second = anySim.diminishedCrowdControlDuration(source, target, 'fear', 8);
