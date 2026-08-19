@@ -39,10 +39,18 @@
 
 import { ITEMS } from '../data';
 import { createGroundObject } from '../entity';
-import { countUnlockedInSlots } from '../item_lock';
+import { countUnlockedInSlots, removeUnlockedFromSlots } from '../item_lock';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { CONSUME_DURATION, CONSUME_TICKS, dist2d, type Entity, INTERACT_RANGE } from '../types';
+import {
+  CONSUME_DURATION,
+  CONSUME_TICKS,
+  dist2d,
+  type Entity,
+  INTERACT_RANGE,
+  isConsuming,
+  isNonSpellCast,
+} from '../types';
 
 /** The one placeable feast item (content/profession_items.ts) and the
  *  templateId its placed entity carries. A second placeable is explicitly
@@ -81,7 +89,7 @@ export function placeFeastAction(ctx: SimContext, p: Entity, meta: PlayerMeta): 
     ctx.error(meta.entityId, "You can't do that while dead.");
     return;
   }
-  if (p.castingAbility || p.eating !== null || p.drinking !== null) {
+  if (p.castingAbility || isConsuming(p)) {
     ctx.error(meta.entityId, 'You are busy.');
     return;
   }
@@ -103,7 +111,15 @@ export function placeFeastAction(ctx: SimContext, p: Entity, meta: PlayerMeta): 
     ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason });
     return;
   }
-  ctx.removeItem(FARM_FEAST_ITEM_ID, 1, meta.entityId);
+  // Lock-aware SPEND to match the lock-aware gate above: ctx.removeItem is
+  // the inventory hub's lock-blind walk (highest bag index first, any slot a
+  // victim), so a locked end-slot copy would be spent first while the gate
+  // had counted only the unlocked one. Same walk the seed spend uses
+  // (plantCrop): locked slots are never victims. removeUnlockedFromSlots
+  // mutates the slot array only, so the quest hook fires once here
+  // (place_feast stays a HEAVY_SELF_CMDS member for the self snapshot).
+  removeUnlockedFromSlots(meta.inventory, FARM_FEAST_ITEM_ID, 1);
+  ctx.onInventoryChangedForQuests?.(meta);
   // The entity, the battleground-flag shape: a ground object with a custom
   // templateId, no pickup item, not lootable. `name` carries the PLACER'S
   // raw name as a VALUE; the client composes the localized
@@ -164,7 +180,15 @@ export function consumeFeastAction(
     return;
   }
   // The eating family's own gates, mirrored from the items.ts food arm so a
-  // feast bite refuses exactly where a bagged dish does.
+  // feast bite refuses exactly where a bagged dish does: a running non-spell
+  // cast (fishing/gather/farming) blocks the bite with the family's one busy
+  // sentence, while a SPELL cast deliberately does not (the items.ts rule:
+  // the Demon Heal channel keeps items usable, and item use carries no GCD
+  // gate to mirror), then combat, water, and the occupied eating slot.
+  if (isNonSpellCast(p.castingAbility)) {
+    ctx.error(meta.entityId, 'You are busy.');
+    return;
+  }
   if (p.inCombat) {
     ctx.error(meta.entityId, "You can't do that while in combat.");
     return;
