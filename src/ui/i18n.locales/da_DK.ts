@@ -2,6 +2,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const da_DK: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formsAutoUnshift': 'Et heal eller en skadetrylleformular kastet i skikkelse trækker dig selv ud af den. At forlade en skikkelse på den måde er gratis og bruger ikke den globale nedkøling, så en øjeblikkelig trylleformular affyres i samme sekund, du trykker. At skifte tilbage er en almindelig evne og koster stadig mana og din globale nedkøling.',
   'entities.mobs.heroic_boss_dummy.name': 'Heroisk bossdukke',
   'entities.mobs.normal_boss_dummy.name': 'Normal bossdukke',
   'entities.mobs.friendly_player_dummy.name': 'Venlig spillerdukke',

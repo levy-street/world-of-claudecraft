@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const it_IT: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formsAutoUnshift': "Una cura o un incantesimo di danno lanciato in forma ti fa uscire da solo. Lasciare una forma in questo modo è gratuito e non consuma il recupero globale, quindi un incantesimo istantaneo parte nel momento in cui lo premi. Rientrare in forma è un'abilità normale e costa comunque mana e il tuo recupero globale.",
   'entities.mobs.heroic_boss_dummy.name': 'Manichino di boss eroico',
   'entities.mobs.normal_boss_dummy.name': 'Manichino di boss normale',
   'entities.mobs.friendly_player_dummy.name': 'Manichino di giocatore alleato',

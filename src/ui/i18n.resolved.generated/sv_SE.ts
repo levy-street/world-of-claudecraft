@@ -4854,7 +4854,7 @@ export const sv_SE: EnTranslations = {
       "mageEleJet": "Vattenstråle har en egen knapp på djurraden: klicka på den för att låsa en kylande stråle på en fiende, eller högerklicka på den (håll intryckt på mobil) för att låta elementaren avfyra den på egen hand så snart den är redo.",
       "formsHeading": "Formskiftning",
       "formsNote": "En druid slåss genom att byta form. De flesta av druidens förmågor hör till en enda form, så formen du befinner dig i avgör vad du kan kasta, och att skifta kostar lite mana. Du kan skifta in eller ut ur strid, så ofta du vill.",
-      "formsAutoUnshift": "A heal or a damaging spell cast while shifted shifts you out for you. Leaving a shape that way is free and does not spend your global cooldown, so an instant spell goes off the moment you press it. Shifting back in is an ordinary ability, and still costs mana and your global cooldown.",
+      "formsAutoUnshift": "En läkning eller en skadetrollformel som kastas i skepnad tar dig ur den åt dig. Att lämna en skepnad på det sättet är gratis och förbrukar inte den globala nedkylningen, så en omedelbar trollformel går av i samma stund du trycker. Att skifta tillbaka är en vanlig förmåga och kostar fortfarande mana och din globala nedkylning.",
       "formsMoonwing": "En Månlund-druid får en form till, Månugglaform, besvärjarformen en Balans-druid strider i. Det är den enda djurformen som behåller dina besvärjelser, och din trollstav fungerar bara i den eller i din vanliga besvärjarform.",
       "formLine": {
         "form_bear": "Tankformen: en tjock hud, Raseri i stället för mana, och extra hot så att fiender fortsätter slå på dig.",

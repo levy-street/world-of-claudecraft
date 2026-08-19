@@ -4525,8 +4525,28 @@
      controls carry the 44px touch floor, the class-scoped twin of the
      coarse-pointer rules (the map-zoom-btn idiom). */
   body.mobile-touch #plant-sheet-window {
-    width: min(440px, calc(100vw - 20px));
-    max-height: calc(var(--app-vh, 100vh) - 20px);
+    /* The card stays CENTERED (unlike the journal's four-edge pin), so a
+       symmetric shrink only clears an asymmetric inset when it is TWICE the
+       larger side: a landscape notch is 44px on one edge and 0 on the other,
+       and subtracting the sum would leave the card 12px inside the cutout.
+       Both caps clamp against the JS-synced app viewport (the layout.css
+       .window contract: never raw viewport units); an inset-less phone
+       resolves the env() terms to 0 and keeps the exact prior box. */
+    width: min(
+      440px,
+      calc(
+        var(--app-vw, 100vw) -
+        20px -
+        2 *
+        max(env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px))
+      )
+    );
+    max-height: calc(
+      var(--app-vh, 100vh) -
+      20px -
+      2 *
+      max(env(safe-area-inset-top, 0px), env(safe-area-inset-bottom, 0px))
+    );
   }
   body.mobile-touch .ps-seed,
   body.mobile-touch .ps-knob,

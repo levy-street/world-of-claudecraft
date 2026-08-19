@@ -2,6 +2,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const cs_CZ: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formsAutoUnshift': 'Léčení nebo útočné kouzlo seslané v podobě tě z ní samo vyvede. Opuštění podoby tímto způsobem je zdarma a nespotřebuje globální dobu obnovy, takže okamžité kouzlo vyletí hned, jak ho stiskneš. Návrat do podoby je běžná schopnost a stále stojí manu i globální dobu obnovy.',
   'entities.mobs.heroic_boss_dummy.name': 'Panák hrdinského bosse',
   'entities.mobs.normal_boss_dummy.name': 'Panák normálního bosse',
   'entities.mobs.friendly_player_dummy.name': 'Panák přátelského hráče',

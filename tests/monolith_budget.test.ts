@@ -64,7 +64,7 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the moved-base v0.39 wrapper merge output. The combined tree
     // lands below both branch ceilings, so keep the exact merged count.
     // Lowered after Phase 9b's headroom extraction moved the report window
-    // body whole to src/ui/report_window_open.ts (a thin deps-bag wrapper
+    // body whole to src/ui/report_window.ts (a thin deps-bag wrapper
     // stays); the freed margin was then spent by the phase's own plant-sheet
     // composition, so this is once again a near-exact pin with no free
     // headroom to borrow against.

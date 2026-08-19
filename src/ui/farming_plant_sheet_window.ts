@@ -7,9 +7,12 @@
 // THE SIM'S EVENTS ARE THE FEEDBACK (the husk-trade contract): the Plant
 // control sends IWorldFarming.plantCrop exactly once per activation and the
 // sheet STAYS OPEN. A farmPlanted for THIS bed closes it with the trap's own
-// focus restore (no successor window, the close(true) semantics); a
-// farmDenied leaves it open, re-arms the control, and repaints affordability
-// from the live bags. Nothing here predicts an outcome.
+// focus restore (no successor window); a farmDenied leaves it open, re-arms
+// the control, and repaints affordability from the live bags. The sim's
+// dead/busy gates answer through ctx.error rather than farmDenied (its
+// one-busy-sentence design), so the Hud also forwards every error toast via
+// notifyErrorToast, which re-arms without repainting: an answer arrived, the
+// in-flight belief is spent. Nothing here predicts an outcome.
 
 import { FARM_COMPOST_ITEM_ID, FARM_GROWTH_TONIC_ITEM_ID } from '../sim/content/farm_crops';
 import { ITEMS } from '../sim/data';
@@ -112,6 +115,17 @@ export class PlantSheetWindow {
     if (this.isOpen) this.paint();
   }
 
+  /** The Hud's error-toast forward. The sim's dead and busy plantCrop gates
+   *  answer through ctx.error, never farmDenied (one busy state, one
+   *  sentence), so without this arm a Plant clicked while eating or casting
+   *  left pendingSend armed forever and the control dead until a close.
+   *  Any error toast spends the in-flight belief; the sim's own gates keep a
+   *  re-click safe (bed_taken and friends), so re-arming early costs at most
+   *  one more deny toast. No repaint: an error changes no bag state. */
+  notifyErrorToast(): void {
+    if (this.isOpen) this.pendingSend = false;
+  }
+
   close(): void {
     const root = this.deps.root();
     if (root.style.display !== 'block') {
@@ -173,7 +187,7 @@ export class PlantSheetWindow {
     const focusKey = captureFocusKey(root);
     root.innerHTML =
       `<div class="panel-title"><span id="plant-sheet-title">${esc(t('hudChrome.farming.plantSheet.title'))}</span>` +
-      `<button type="button" class="x-btn" data-close data-focus-key="plantSheetClose" aria-label="${esc(t('hudChrome.farming.plantSheet.close'))}">${svgIcon('close')}</button></div>` +
+      `<button type="button" class="x-btn" data-close data-focus-key="plantSheetClose" aria-label="${esc(t('hudChrome.farming.plantSheet.close'))}" title="${esc(t('hudChrome.farming.plantSheet.close'))}">${svgIcon('close')}</button></div>` +
       `<div class="ps-body">${this.bodyHtml(view)}</div>`;
     this.wire(root);
     if (focusKey !== null) {

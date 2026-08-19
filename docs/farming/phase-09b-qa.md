@@ -15,6 +15,41 @@ review-round fixes, plus the two lane merges and the docs/gate-record
 commits. farming_session md5 9a8fefa5e48c7e456db7ef2695bfb284 (unmoved by the
 phase). The knob-affordability doc reconcile is state.md (bp).
 
+## EXECUTED (2026-08-19, branch fix/farming-phase-09b-qa off c9075785ef)
+
+VERDICT: PASS-WITH-FOLLOWUPS. The twentieth absorb opened it (merge
+919787518a of origin/release/v0.39.0 ea9377db8e, one i18n commit; the
+pending.ts conflict regen-resolved and the regen explained to the row;
+baselines held, art audit green). STEP 1 re-proved the journey 17/17 on
+desktop AND the real mobile-interact route, plus 18 manual probes (focus
+trap, panel keydown guard with a jump positive control, Esc focus restore,
+the locked-seed deny leaving the sheet open with the sim's locked line and
+the repaint to the locked list, the ja_JP options-dropdown locale switch,
+the woc:languagechange relocalize arm over an OPEN sheet, knob toggles
+44px on 844x390, shortfall contrast 8.95:1 with the committed eyeball
+captures, gamepad verified-by-pin, perf:tour exit 0, the farmer-shadow
+far-side probe). STEP 3 proved the negative space by running every pin.
+STEP 2 lanes: 4-lane Workflow 4/4 first try; cross-platform APPROVE;
+test-coverage approve-with-followups; qa-checklist recorded in
+progress.md. The one BLOCKING (correctness lane, probe-confirmed): the
+ctx.error dead/busy denies stranded the Plant control; fixed as state.md
+deviation (bq) (the error-toast re-arm). Other fixes: report_window.ts
+renamed under the cold-painter sweep with its first direct suite, the
+mobile sheet's safe-area caps, the close-button title, the journey's
+mobile arm failing hard, and eleven hardened pins (reachability via the
+shared stripComments, containment-sliced Hud glue rows incl. close-route /
+error-forward / keydown-guard, the journey layer-honesty pin, closeOthers
+counts, the markDialogRoot contract, the locked-only body, the rowless
+professionsState default, exact root-div counts, lockedRows length pins,
+the real-painter target-size browser arm). MUTATIONS 11/11 killed named:
+seven killed as shipped, two shipped survivors (the keydown-guard row and
+the journey __game-verb cheat) diagnosed as real gaps, fixed, re-proven
+killed, plus two fresh mutants over the (bq) fix, killed. Commit map:
+919787518a the absorb merge, 208d2d048d the rename + suite, e97bab4e00
+the consolidated QA fixes, then the docs and gate-record commits.
+Deferrals with owners are ledgered in state.md's Phase 9b QA block; the
+gate record and merge hash are in progress.md's Phase 9b QA notes tail.
+
 ## Starter Prompt (the session form)
 
 ```

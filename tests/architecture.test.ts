@@ -1878,8 +1878,10 @@ const UI_DOM_MODULES = [
   'src/ui/profession_tutorial_window.ts',
   'src/ui/prompt_dialog.ts',
   // The report window body moved whole out of hud.ts (the Phase 9b headroom
-  // extraction); it paints #report-window and owns its listeners.
-  'src/ui/report_window_open.ts',
+  // extraction); it paints #report-window and owns its listeners. Renamed to
+  // the _window suffix by the 9b QA so the cold-painter sweep in
+  // tests/hud_perf_budget.test.ts governs it like every sibling window.
+  'src/ui/report_window.ts',
   // professions_window.ts is BACK on the ledger: the focus_restore move left
   // it host-free for a while, but armSentGuard's one-shot re-arm timer is a
   // real host reach, now spelled window.setTimeout so this sweep can see it

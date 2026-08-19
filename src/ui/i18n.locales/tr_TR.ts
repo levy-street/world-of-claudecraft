@@ -2,6 +2,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const tr_TR: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formsAutoUnshift': 'Formdayken yapılan bir iyileştirme ya da hasar büyüsü seni formdan kendiliğinden çıkarır. Formu bu yolla bırakmak bedavadır ve genel bekleme süreni harcamaz, yani anlık bir büyü tuşa bastığın anda çıkar. Forma geri dönmek sıradan bir yetenektir ve yine mana ile genel bekleme süreni tüketir.',
   'entities.mobs.heroic_boss_dummy.name': 'Kahramanca Boss Kuklası',
   'entities.mobs.normal_boss_dummy.name': 'Normal Boss Kuklası',
   'entities.mobs.friendly_player_dummy.name': 'Dost Oyuncu Kuklası',

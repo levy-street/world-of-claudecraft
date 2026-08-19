@@ -597,7 +597,11 @@ describe('release v0.39 legacy Druid and Hunter skill repaints', () => {
     }
 
     expect(acceptedHashes.size).toBe(22);
-  });
+    // 22 sharp decodes plus the retired-blob reads sit right at the 20s default
+    // on a loaded CI shard (20.3s observed once shard 5 rebalanced); the
+    // i18n_status_registry precedent gives slow-by-construction suites a
+    // generous explicit budget instead of riding the default.
+  }, 60_000);
 
   it('records the rejected scenic Release Companion attempt and corrective repaint', () => {
     const cohort = readJson<CohortRecord>(recordRelativePath);

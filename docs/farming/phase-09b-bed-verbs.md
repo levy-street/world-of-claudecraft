@@ -78,7 +78,9 @@ met and q_farm_intro completes through the client.
 ## EXECUTED (2026-08-18/19, branch fix/farming-phase-09b-bed-verbs off 6981105f27)
 
 Commit map: 2e6fcb42b9 adoption; 7ba29ede2c the hud.ts headroom extraction
-(openReportWindow moved whole to src/ui/report_window_open.ts, ceiling 19387 to
+(openReportWindow moved whole to src/ui/report_window_open.ts, since renamed
+to src/ui/report_window.ts by the 9b QA so the cold-painter sweep governs it,
+ceiling 19387 to
 19352); 5575f50260 the seam widening (REQUIRED members, IWorld and Hud satisfy
 structurally, main.ts untouched); 252138c1db the plantSheet i18n rows with the
 five non-Latin fills; lanes A/B/C in three worktrees (6dd657a148 + 4486a8fb17

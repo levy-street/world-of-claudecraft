@@ -4,7 +4,26 @@ Read this file first in every phase session. It is the single authority for lock
 decisions. If a phase file contradicts this file, this file wins and the phase file
 gets swept in the same pass (amend the QA twin too, always).
 
-Current phase: Phase 9b (the bed verbs) DONE 2026-08-18/19: the go-live is
+Current phase: Phase 9b QA DONE 2026-08-19, PASS-WITH-FOLLOWUPS (branch
+fix/farming-phase-09b-qa; merge hash in progress.md). The fresh pass
+re-proved the go-live independently: the committed journey 17/17 on
+desktop AND the real mobile-interact button, 18 manual probes (focus trap,
+keydown guard with a jump positive control, the locked-seed deny leaving
+the sheet open under the sim's own toast, the ja_JP locale switch and the
+relocalize arm live, knob sizing 44px and the 8.95:1 shortfall contrast
+eyeball), the negative space proven by running every pin (zero golden
+movement, no sim/server/wire/IWorld change, the phase LOWERED hud.ts's
+ceiling), and 11/11 mutants killed named. One real behavior fix landed as
+deviation (bq): the sim's dead/busy plantCrop denies ride ctx.error, not
+farmDenied, and stranded the Plant control; the Hud now forwards every
+error toast to the sheet's notifyErrorToast re-arm. Also: report_window.ts
+(renamed under the cold-painter sweep, first direct suite), safe-area caps
+on the mobile sheet, eleven hardened pins (reachability via the shared
+stripComments, containment-sliced Hud glue, the journey layer-honesty
+pin), and the twentieth absorb (ea9377db8e, one release i18n commit,
+pending.ts regen-resolved, baselines held; hud.ts now 19352/19352 EXACT
+after the (bq) forward spent the last line). Prior: Phase 9b (the bed
+verbs) DONE 2026-08-18/19: the go-live is
 PLAYER-COMPLETE. An ordinary player plants through the interact-key plant
 sheet and harvests through the same press on desktop, touch, and gamepad;
 q_farm_intro completes through the client (the committed journey
@@ -15,8 +34,10 @@ ready, so the per-talk re-grant window closes normally). Baselines held
 (IWorld 329 = 88 + 241, facets 34, commands 202/215, delta keys 87,
 farming_session 9a8fefa5, zero golden moves, no src/sim or server change);
 hud.ts 19351/19352 after the report-window extraction funded the sheet.
-Merge hash in progress.md. NEXT: the Phase 9b QA
-(docs/farming/phase-09b-qa.md), then Phase 10. Prior: the NINETEENTH ABSORB done 2026-08-18 as its own sync mid-phase
+Merge hash in progress.md. NEXT: Phase 10
+(docs/farming/phase-10-celebrations.md; (bo) still bounds it: nothing may
+assume Highwatch or Evergarden beds are sowable until D11's bootstrap
+ruling lands). Prior: the NINETEENTH ABSORB done 2026-08-18 as its own sync mid-phase
 per the D22 triple-digit rule (release/v0.39.0 moved f42a67f341 to 7b45fdb9a9:
 285 commits, 833 files, 168-file farming intersection; branch
 fix/farming-sync-v0.39.0-r2, merge b9a025b2ee, opening Phase 9b which the
@@ -2285,6 +2306,37 @@ question does not arise (farming has no station).
   until go-live" for compost (a comment inside the art-audit fingerprint
   family, swept at the Phase 13 art batch when the set moves anyway);
   nearFarmerNpc walks the whole radius after the answer (cosmetic).
+  Phase 9b QA (2026-08-19, PASS-WITH-FOLLOWUPS; branch
+  fix/farming-phase-09b-qa, merge hash in progress.md):
+  (bq) THE ERROR-TOAST RE-ARM (a refinement of the husk-trade feedback
+  contract): the sim's plantCrop gates 1 and 2 (dead, busy) answer through
+  ctx.error with the family's shared sentences, DELIBERATELY never a
+  farmDenied (no new wire enum arm for a state every command family refuses
+  the same way), so the plant sheet's send-once arm, which cleared only on
+  farmPlanted / farmDenied, stayed armed forever after a busy deny (eat or
+  cast, click Plant, control dead until a close; the any-farmPlanted clear
+  already healed the back-to-back-planting case). The heal keeps both
+  designs: the Hud's one error case forwards every error toast to
+  PlantSheetWindow.notifyErrorToast, which spends the in-flight belief
+  WITHOUT repainting (an error changes no bag state); re-arming on an
+  unrelated error is safe because the sim's own gates answer any re-click
+  (at worst one more deny toast). Pinned behaviorally (the window suite's
+  re-arm-without-repaint arm) and structurally (the glue pin's error-case
+  containment slice); both mutants killed named. RESIDUAL, ledgered: a
+  command the online pipe silently drops (spectate, a reconnect window)
+  still strands the arm until close/reopen, family-consistent with every
+  window under spectate; and a bedId-free deny racing an in-flight plant
+  send can re-arm early, harmless to state under the sim's gates.
+  Other QA residuals with owners: the mobile-window-open body-class gap is
+  family-wide (the harvest journal shares it), Phase 13 polish; the seed
+  rows stay on the aria-pressed toggle family rather than a bespoke
+  radiogroup, the a11y polish batch; countRawInSlots (fifth src/ui copy)
+  and the distToBed comment-contract mirror both want src/sim-adjacent
+  extractions, a later farming phase; the journey script stays outside the
+  gate under D22 (the layer-honesty pin stands in), maintainer call at
+  go-public; the farmer-shadow nuance (a press ON bed_eastbrook_2/4 within
+  Jessica's NPC-arm range opens her dialog, the pinned precedence; the far
+  side plants, probed live) is recorded as UX, not a defect.
 
 ## OPEN items (maintainer decisions or later-phase calls, never guess)
 

@@ -4854,7 +4854,7 @@ export const tr_TR: EnTranslations = {
       "mageEleJet": "Su Jeti, evcil çubuğunda kendi düğmesiyle durur: bir düşmana dondurucu bir ışın kilitlemek için tıkla, ya da elementalin onu hazır olduğunda kendiliğinden ateşlemesine izin vermek için sağ tıkla (mobilde dokunup basılı tut).",
       "formsHeading": "Şekil Değiştirme",
       "formsNote": "Bir druid, şekil değiştirerek dövüşür. Çoğu druid yeteneği tek bir şekle aittir, bu yüzden içinde bulunduğun form neyi büyüleyebileceğine karar verir, ve şekil değiştirmek biraz mana harcar. İstediğin kadar sık, dövüş içinde ya da dışında şekil değiştirebilirsin.",
-      "formsAutoUnshift": "A heal or a damaging spell cast while shifted shifts you out for you. Leaving a shape that way is free and does not spend your global cooldown, so an instant spell goes off the moment you press it. Shifting back in is an ordinary ability, and still costs mana and your global cooldown.",
+      "formsAutoUnshift": "Formdayken yapılan bir iyileştirme ya da hasar büyüsü seni formdan kendiliğinden çıkarır. Formu bu yolla bırakmak bedavadır ve genel bekleme süreni harcamaz, yani anlık bir büyü tuşa bastığın anda çıkar. Forma geri dönmek sıradan bir yetenektir ve yine mana ile genel bekleme süreni tüketir.",
       "formsMoonwing": "Bir Denge druidi bir şekil daha kazanır: Aykuşu Formu, bu uzmanlığın dövüştüğü büyücü şeklidir. Büyülerini koruyan tek hayvan şeklidir ve değneğin yalnızca bu şekilde ya da normal büyücü şeklinde çalışır.",
       "formLine": {
         "form_bear": "Tank şekli: ağır bir post, mana yerine öfke ve düşmanların sana vurmaya devam etmesini sağlayan ekstra tehdit.",

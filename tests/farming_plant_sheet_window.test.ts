@@ -52,12 +52,13 @@ class StubWorld {
 let root: HTMLElement;
 let world: StubWorld;
 let restoredTo: HTMLElement | null | undefined;
+let closeOthersSpy: ReturnType<typeof vi.fn<() => void>>;
 
 const makeWindow = (captureFocus: () => HTMLElement | null = () => null): PlantSheetWindow =>
   new PlantSheetWindow({
     root: () => root,
     world: () => world as unknown as IWorld,
-    closeOthers: () => {},
+    closeOthers: closeOthersSpy,
     captureFocus,
     restoreFocus: (target) => {
       restoredTo = target;
@@ -75,6 +76,7 @@ beforeEach(() => {
   root = document.getElementById('plant-sheet-window') as HTMLElement;
   world = new StubWorld();
   restoredTo = undefined;
+  closeOthersSpy = vi.fn<() => void>();
 });
 
 describe('plant sheet window: paint', () => {
@@ -121,6 +123,63 @@ describe('plant sheet window: paint', () => {
     expect(tonic?.querySelector('.ps-knob-short')?.textContent).toBe('You have no growth tonic.');
     const compost = root.querySelector<HTMLButtonElement>('[data-knob="compost"]');
     expect(compost?.disabled).toBe(false);
+  });
+
+  it('clears the transient overlays once on a fresh open, never on a same-bed re-press', () => {
+    const win = makeWindow();
+    win.open(BED);
+    expect(closeOthersSpy).toHaveBeenCalledTimes(1);
+    win.open(BED);
+    expect(closeOthersSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('marks the root as a labelled dialog on open (the markDialogRoot contract)', () => {
+    makeWindow().open(BED);
+    expect(root.getAttribute('role')).toBe('dialog');
+    expect(root.getAttribute('aria-labelledby')).toBe('plant-sheet-title');
+    expect(root.getAttribute('tabindex')).toBe('-1');
+  });
+
+  it('paints the locked rows WITH the empty line when every held seed is gated', () => {
+    // All copies locked: no pick rows, so no Plant control, but the locked
+    // list still explains each held seed; the empty line beneath is then the
+    // honest summary (nothing sowable), not a contradiction.
+    world.inventory = [
+      { itemId: WHEAT.seedItemId, count: 2, instance: { locked: true } } as InvSlot,
+      { itemId: 'garden_hoe', count: 1 },
+    ];
+    makeWindow().open(BED);
+    expect(root.querySelectorAll('[data-seed-crop]')).toHaveLength(0);
+    expect(root.querySelectorAll('.ps-locked')).toHaveLength(1);
+    expect(root.querySelector('.ps-locked .ps-reason')?.textContent).toBe(
+      'An item that would pay for that is locked.',
+    );
+    expect(root.querySelector('[data-plant]')).toBeNull();
+    expect(root.querySelector('.ps-empty')).not.toBeNull();
+  });
+
+  it('locks every row by skill when professionsState has no farming row (the ?? 0 default)', () => {
+    // A fresh character has no farming skill row at all; the window's read
+    // must resolve to skill 0 and gate a tier-2 seed on the skill line.
+    const rowless = {
+      inventory: [{ itemId: RICE.seedItemId, count: 1 }] as readonly InvSlot[],
+      myFarmPlots: [] as readonly FarmPlotView[],
+      professionsState: { skills: [] },
+      plantCrop: vi.fn(),
+    };
+    const win = new PlantSheetWindow({
+      root: () => root,
+      world: () => rowless as unknown as IWorld,
+      closeOthers: () => {},
+      captureFocus: () => null,
+      restoreFocus: () => {},
+    });
+    win.open(BED);
+    expect(root.querySelectorAll('[data-seed-crop]')).toHaveLength(0);
+    expect(root.querySelectorAll('.ps-locked')).toHaveLength(1);
+    expect(root.querySelector('.ps-locked .ps-reason')?.textContent).toBe(
+      'Your Farming skill is too low for that crop.',
+    );
   });
 
   it('refuses to open at a bed the caller already grows in (the canOpen guard)', () => {
@@ -277,6 +336,29 @@ describe('plant sheet window: re-open, event filters, and staleness (the review 
     expect(world.plantCrop).toHaveBeenCalledTimes(2);
   });
 
+  it('an error toast re-arms the Plant control without repainting (the dead/busy heal)', () => {
+    // The sim's dead and busy plantCrop gates answer through ctx.error, not
+    // farmDenied; without the Hud's notifyErrorToast forward the control
+    // stayed dead until a close. The re-arm must NOT repaint (an error
+    // changes no bag state), which the sentinel attribute proves.
+    const win = makeWindow();
+    win.open(BED);
+    root.querySelector<HTMLElement>('[data-plant]')?.click();
+    expect(world.plantCrop).toHaveBeenCalledTimes(1);
+    root.querySelector('#plant-sheet-title')?.setAttribute('data-qa-sentinel', '1');
+    win.notifyErrorToast();
+    expect(root.querySelector('#plant-sheet-title')?.getAttribute('data-qa-sentinel')).toBe('1');
+    root.querySelector<HTMLElement>('[data-plant]')?.click();
+    expect(world.plantCrop).toHaveBeenCalledTimes(2);
+  });
+
+  it('an error toast on a closed sheet is a no-op', () => {
+    const win = makeWindow();
+    win.notifyErrorToast();
+    expect(root.innerHTML).toBe('');
+    expect(win.isOpen).toBe(false);
+  });
+
   it('a farmPlanted for ANOTHER bed clears the send arm without closing (no dead control)', () => {
     const win = makeWindow();
     win.open(BED);
@@ -341,7 +423,32 @@ describe('plant sheet window: the root div ships in BOTH entries', () => {
   // idiom: read the real entry HTML, never a fixture).
   it.each(['index.html', 'play.html'])('%s carries id="plant-sheet-window"', (entry) => {
     const html = readFileSync(join(repoRoot, entry), 'utf8');
-    expect(html).toContain('id="plant-sheet-window"');
+    // Exactly once: a duplicate id would make querySelector's pick arbitrary
+    // and a comment-only occurrence would leave the painter with no root.
+    expect(html.split('id="plant-sheet-window"').length - 1).toBe(1);
+  });
+});
+
+describe('plant sheet window: the mobile safe-area rule', () => {
+  // A CSS-text pin (css_corpus and styles_extraction pass with or without
+  // the inset terms, so nothing else reds if they are dropped): the touch
+  // card's caps must clamp against the JS-synced app viewport (the
+  // layout.css .window contract, never raw viewport units) and clear an
+  // ASYMMETRIC notch by twice the larger inset on each axis.
+  it('clamps both caps by --app-vw/--app-vh and both safe-area axes', () => {
+    const css = readFileSync(join(repoRoot, 'src/styles/hud.mobile.css'), 'utf8');
+    const anchor = 'body.mobile-touch #plant-sheet-window {';
+    const at = css.indexOf(anchor);
+    expect(at, 'the mobile plant sheet rule must exist').toBeGreaterThanOrEqual(0);
+    expect(css.indexOf(anchor, at + 1), 'the rule must be unique').toBe(-1);
+    const end = css.indexOf('\n  }', at);
+    expect(end).toBeGreaterThan(at);
+    const block = css.slice(at, end);
+    expect(block).toContain('var(--app-vw');
+    expect(block).toContain('var(--app-vh');
+    for (const side of ['left', 'right', 'top', 'bottom']) {
+      expect(block).toContain(`env(safe-area-inset-${side}`);
+    }
   });
 });
 
