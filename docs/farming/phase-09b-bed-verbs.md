@@ -96,7 +96,17 @@ cross-platform APPROVE, frontend pass (all seven should-fixes taken), coverage
 gate-integrity and qa-checklist recorded in progress.md. Mutations 10/10
 KILLED with named reds through the dirty-refusing runner. The journey passed
 17/17 on the final merged tree (desktop; lane C also proved the 844x390
-landscape touch route through the real #mobile-interact button).
+landscape touch route through the real #mobile-interact button). GAMEPAD
+REACH is verified by inspection plus a standing pin: the pad dispatch's
+case 'interact' routes through the same interactKey() funnel and
+tests/pad_reel.test.ts source-pins interactKey() inside that braced case
+(deleting it reds the pin), the same shape whose touch twin killed the
+mobile-unwired mutant. The qa-checklist round's remaining asks landed
+post-snapshot: the NPC-versus-bed precedence arm (the
+farmer-at-the-beds collision), the escort-versus-bed pair, the knob
+captures eyeballed real, and the funnel-level harvest dispatch was
+already pinned (the it.each plot arms assert harvestCrop THROUGH
+tryNearbyInteraction; mutant M5, the gutted call, died on exactly them).
 DESIGN REFINEMENT (deviation (bp) in state.md): unaffordable knobs and
 non-sowable seeds are OFFER gates (disabled controls with the family's own
 denied.* line), not outcome predictions; the sim remains the refusing

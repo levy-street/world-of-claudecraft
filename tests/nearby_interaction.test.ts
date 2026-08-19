@@ -533,6 +533,17 @@ describe('the garden-bed arm (Phase 9b)', () => {
     },
   );
 
+  it('an NPC in range keeps the press over a free bed (the farmer-at-the-beds collision)', () => {
+    // The real layout this pins: Farmer Jessica stands about 4 yd from
+    // bed_eastbrook_2, so both are routinely in reach at once. The NPC arm
+    // sits above the bed arm; a press beside both must open the dialog,
+    // never the sheet (the sheet is one more press after stepping clear).
+    const npc = entity({ id: 9, kind: 'npc', templateId: 'farmer_jessica', pos: { x: 1, y: 0, z: 0 } });
+    const r = bedRig(null, [npc]);
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['quest:9']);
+  });
+
   it('opens the plant sheet once beside a free bed and never sends harvest', () => {
     const r = bedRig(null);
     expect(interact(r)).toBe(true);
