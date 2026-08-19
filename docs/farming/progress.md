@@ -2360,7 +2360,8 @@ affordability from unlocked counts and planWatchFee, no outcome prediction)
 plus the cold painter farming_plant_sheet_window.ts (HarvestJournalWindow
 recipe: deps bag, focus trap, closeManagedWindow case, panel keydown guard,
 relocalize arm) composed by Hud inside headroom freed by moving the report
-window body whole to src/ui/report_window_open.ts (ceiling 19387 to 19352,
+window body whole to src/ui/report_window_open.ts (renamed to
+src/ui/report_window.ts by the 9b QA; ceiling 19387 to 19352,
 hud.ts final 19351). One Plant activation sends plantCrop(bedId, cropId,
 knobs) exactly once; the sheet stays open; farmPlanted for the bed closes
 with focus restore, any farmPlanted clears the send arm, a deny re-arms and

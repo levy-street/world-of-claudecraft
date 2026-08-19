@@ -429,6 +429,29 @@ describe('plant sheet window: the root div ships in BOTH entries', () => {
   });
 });
 
+describe('plant sheet window: the mobile safe-area rule', () => {
+  // A CSS-text pin (css_corpus and styles_extraction pass with or without
+  // the inset terms, so nothing else reds if they are dropped): the touch
+  // card's caps must clamp against the JS-synced app viewport (the
+  // layout.css .window contract, never raw viewport units) and clear an
+  // ASYMMETRIC notch by twice the larger inset on each axis.
+  it('clamps both caps by --app-vw/--app-vh and both safe-area axes', () => {
+    const css = readFileSync(join(repoRoot, 'src/styles/hud.mobile.css'), 'utf8');
+    const anchor = 'body.mobile-touch #plant-sheet-window {';
+    const at = css.indexOf(anchor);
+    expect(at, 'the mobile plant sheet rule must exist').toBeGreaterThanOrEqual(0);
+    expect(css.indexOf(anchor, at + 1), 'the rule must be unique').toBe(-1);
+    const end = css.indexOf('\n  }', at);
+    expect(end).toBeGreaterThan(at);
+    const block = css.slice(at, end);
+    expect(block).toContain('var(--app-vw');
+    expect(block).toContain('var(--app-vh');
+    for (const side of ['left', 'right', 'top', 'bottom']) {
+      expect(block).toContain(`env(safe-area-inset-${side}`);
+    }
+  });
+});
+
 describe('plant sheet window: the ClientWorld mirror shape', () => {
   it('paints identically over a plain decoded bag behind a stable array identity', () => {
     const mirrorWorld = {
