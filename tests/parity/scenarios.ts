@@ -5814,9 +5814,11 @@ function professionsFarmingSession(seed = 1): Scenario {
       // command bodies, never bare rng draws): each cycle is a real plant
       // (two draws) plus a real WITHERED harvest (one draw, spent and
       // ignored per the contract above), advancing the stream by exactly
-      // three while minting no produce, no gains, no golden win, and no
-      // farmReady (the plot is planted, ripened, and harvested inside one
-      // drive step, so the 1 Hz sweep never observes it). Withering NEEDS
+      // three while minting no CROP produce, no skill gains, no golden win,
+      // and no farmReady (the plot is planted, ripened, and harvested inside
+      // one drive step, so the 1 Hz sweep never observes it). The wither
+      // payout's two husks per cycle ARE minted and expected: coverage_c
+      // pins all 29 padding farmWithered events and the husk pouch total. Withering NEEDS
       // low skill: crops die only at low proficiency (the keep chance
       // saturates at 1 by 75, where a stored 0.99 roll SURVIVES), so the
       // padding rides the beat-10 proficiency-write idiom, dropping to the
