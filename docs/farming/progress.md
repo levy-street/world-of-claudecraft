@@ -2407,8 +2407,18 @@ self-heals; the stale online.ts professionsState comment (release-owned,
 pre-existing) recorded; the sheet's cold-paint bag staleness while open heals
 through the deny round-trip (frontend NICE-TO-HAVE, accepted); the disabled
 knob contrast eyeball rides the Phase 9b QA's manual pass.
-GATE RECORD: (appended after the close run)
-MERGE: (recorded after the merge)
+GATE RECORD: run 1 on the frozen tree 8bcb6e8410 (BROWSER_PATH=<playwright
+chromium> GATE_MAX_WORKERS=8 node scripts/gate_select.mjs) FAILED at the
+early "biome (changed files)" step: the late farmer-at-the-beds arm insert
+carried an overlong literal line (a format diff, error-severity); healed by
+the scoped format commit 679b0cfd77, nothing else moved. Run 2 on the frozen
+tree 679b0cfd77: mode=full (the terrain-fixture broad arm),
+"[gate:select] PASS: all 12 steps green (vitest workers: 8)", 2885 test
+files passed / 12 skipped, 40334 tests passed / 2 expected fail / 115
+skipped, browser regression 20 files 132 green, zero FAIL lines, shell rc 0,
+no druid_engines timeout. The journey (scripts/farming_journey_e2e.mjs) also
+passed 17/17 standalone on the final merged tree before the gate.
+MERGE: (hash recorded in the follow-up commit on feature/farming-plan)
 
 ### Phase 10
 (not started)
