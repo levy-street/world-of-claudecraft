@@ -992,6 +992,10 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/progression/xp.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/mob_swing.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/lifecycle.ts'), 'utf8'),
+    // M5 -> src/sim/mob/boss_mechanics.ts (the boss support kit: "calls for aid!",
+    // "becomes enraged!", the desperate-second-wind line, the channels/unleashes
+    // support-pulse lines, "<mechanic> is interrupted!").
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/boss_mechanics.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/pet/pet_commands.ts'), 'utf8'),
     // The arena-shaped-match pet round trip: its one emit is the same
     // "<name> returns to your side." line Revive Pet uses, so it is matched by
