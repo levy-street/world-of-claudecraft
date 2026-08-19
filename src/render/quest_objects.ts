@@ -609,11 +609,38 @@ function prepareItem(itemId: string): THREE.Group | null {
   return root;
 }
 
+/** The farm_feast contract bounds (scripts/assets/farm_props/model.js), which
+ *  size the no-item pick proxy below. */
+const NO_ITEM_PICK_HEIGHT = 0.9;
+const NO_ITEM_PICK_FOOTPRINT = 1.6;
+
 export function buildGroundQuestObject(
   itemId: string,
   entityId: number,
 ): { group: THREE.Group; height: number } {
   const group = new THREE.Group();
+  // A ground object that grants NO item (renderer passes objectItemId ?? '';
+  // today only the placed harvest feast, kind 'object', templateId
+  // 'farm_feast', objectItemId null). Its world prop is drawn by
+  // farm_patches.ts, so this generic view must not stack a supply-crate body
+  // on top of it. What the view still owes the renderer is a raycastable
+  // click body and an honest anchor height, so the proxy is an INVISIBLE box
+  // at the feast contract's bounds (the character clickProxy precedent:
+  // three's raycaster ignores `visible`). Fresh geometry and material per
+  // view on purpose: removeView's non-pooled path disposes them, and a
+  // shared singleton would be torn down with the first despawned feast.
+  if (!itemId) {
+    const proxy = new THREE.Mesh(
+      new THREE.BoxGeometry(NO_ITEM_PICK_FOOTPRINT, NO_ITEM_PICK_HEIGHT, NO_ITEM_PICK_FOOTPRINT),
+      new THREE.MeshBasicMaterial(),
+    );
+    proxy.position.y = NO_ITEM_PICK_HEIGHT / 2;
+    proxy.visible = false;
+    proxy.castShadow = false;
+    proxy.receiveShadow = false;
+    group.add(proxy);
+    return { group, height: NO_ITEM_PICK_HEIGHT };
+  }
   const key =
     PROCEDURAL_ITEM_IDS.has(itemId) || QUEST_OBJECT_URLS[itemId] ? itemId : 'supply_crate';
   const template = prepareItem(key);

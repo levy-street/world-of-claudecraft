@@ -127,12 +127,18 @@ export function nameplatePlanInto(
     e.templateId === 'delve_bell_rope' ||
     e.templateId === 'delve_bell_rope_pulled';
   const delveInteractNear = isDelveInteract && d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
+  // The placed harvest feast (Phase 12): labels like the delve interactables
+  // (the composed "{name}'s Harvest Feast" title shows when close enough to
+  // eat, hides at range), and like every object plate it carries no hp bar
+  // (the flag-family object treatment).
+  const feastNear =
+    e.templateId === 'farm_feast' && d2 <= (INTERACT_RANGE + 1) * (INTERACT_RANGE + 1);
 
   out.hidden =
     (isSelf && !hasOverheadEmote && !showOwnNameplate) ||
     d2 > NAMEPLATE_RANGE_SQ ||
     (e.dead && !e.lootable && e.kind === 'mob') ||
-    (e.kind === 'object' && !isDoor && !delveInteractNear) ||
+    (e.kind === 'object' && !isDoor && !delveInteractNear && !feastNear) ||
     (isDoor && e.dungeonId === UNLABELED_DOOR_DUNGEON_ID) ||
     e.templateId === UNLABELED_MOB_TEMPLATE_ID ||
     (!showNameplates && e.kind === 'mob' && !e.dead) ||

@@ -79,6 +79,14 @@ export function objectDisplayName(entity: Entity): string {
       ? t('worldContent.dungeonExitName', { name: dungeonName })
       : dungeonName;
   }
+  // The placed harvest feast (Phase 12): the entity's wire name is the
+  // PLACER'S raw player name, a VALUE, and the displayed title composes it
+  // into the localized "{name}'s Harvest Feast" here on the painter side
+  // (sim and server stay language-agnostic; the key lands with the Phase 12
+  // catalog fold).
+  if (entity.templateId === 'farm_feast') {
+    return t('hudChrome.farming.feastTitle', { name: entity.name });
+  }
   // Collectible/quest ground objects carry the item id they grant; localize the
   // nameplate through the item dictionary instead of the raw English name.
   if (entity.objectItemId) return tEntity({ kind: 'item', id: entity.objectItemId, field: 'name' });

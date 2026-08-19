@@ -58,7 +58,10 @@ describe('groundObjectPoolKey', () => {
     const exit = { kind: 'object', templateId: 'dungeon_exit', objectItemId: 'x' };
     const bare = { kind: 'object', templateId: 'mailbox', objectItemId: null };
     const mob = { kind: 'mob', templateId: 'wild_boar', objectItemId: 'supply_crate' };
-    for (const e of [door, exit, bare, mob]) {
+    // The placed harvest feast (Phase 12): lootable-false with no item, so it
+    // never enters the generic pool and needs no bespoke opt-out row.
+    const feast = { kind: 'object', templateId: 'farm_feast', objectItemId: null, lootable: false };
+    for (const e of [door, exit, bare, mob, feast]) {
       expect(groundObjectPoolKey(e as unknown as Entity)).toBeNull();
     }
   });

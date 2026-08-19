@@ -148,6 +148,18 @@ describe('nameplate_view - visibility', () => {
     ).toBe(true);
   });
 
+  it('labels a placed harvest feast near, hides it far, and never shows its hp', () => {
+    // The Phase 12 feast follows the delve-interact idiom: the composed
+    // "{name}'s Harvest Feast" title shows when close enough to eat and hides
+    // at range; as a kind-'object' plate it carries no hp bar (the painter's
+    // object arm never sets hpVisible, the flag-family treatment).
+    const near = plan(ent({ kind: 'object', templateId: 'farm_feast', pos: { x: 0, y: 0, z: 1 } }));
+    expect(near.hidden).toBe(false);
+    expect(
+      plan(ent({ kind: 'object', templateId: 'farm_feast', pos: { x: 0, y: 0, z: 30 } })).hidden,
+    ).toBe(true);
+  });
+
   it('hides the sealed royal door inside the boss arena (it reads as back wall)', () => {
     expect(
       plan(ent({ kind: 'object', templateId: 'dungeon_door', dungeonId: 'nythraxis_boss_arena' }))
