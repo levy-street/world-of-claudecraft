@@ -2849,8 +2849,137 @@ and the Phase 11 close gate runs on a tree containing this absorb; the
 06b intent (no shared diff with feature work) is honored by the separate
 merge commit.
 
-### Phase 11
-(not started)
+### Phase 11 (2026-08-19, well-fed food, local-only per D22)
+
+THE WOULD-BE PR BODY. Farm produce becomes buff food. ItemDef.wellfed lands
+beside elixir as the D15 mirror, field for field ({ aura, kind, value,
+duration }); the mint lives in src/sim/wellfed.ts and fires at COMPLETION
+of the 18s sit-restore, hooked at the one natural completion site in
+src/sim/combat/auras.ts updateRegen (the slot-null branch), via
+ctx.applyAura with the single aura id wellfed_buff_sta, never
+effect_dispatch, zero rng draws, transient across save/load. THE TIMING
+DECISION (deviation (bx), refining D15): completion over
+immediate-on-consume, the sit-through-the-meal ritual; an interrupted meal
+(damage, death, match reset) forfeits the buff; a food-only kind guard
+keeps future drink records honest. All four dishes share the aura name
+'Well Fed' and the buff_sta kind (deviation (by)): one AURA_NAME_KEY row,
+last-eaten-wins across the whole food namespace, and no dish ever clobbers
+an elixir_<kind> buff or the reverse (aura replacement keys on id +
+sourceId).
+
+CONTENT: four buff dishes, one per crop tier, in FARM_RECIPES (9 to 13
+rows; LADDER_RECIPES untouched): eastbrook_glazed_carrots (rung 0, common,
+foodHp 90 / sell 6, wellfed +3 sta 600s), fenbridge_rice_pudding (25,
+uncommon, 243/25, +6 sta 900s), highwatch_barley_porridge (50, rare,
+552/60, +9 sta 900s), evergarden_braised_greens (50, rare, 980/150, +12
+sta 900s). Reagents: tier produce x4 plus cooking_salt; the tier-1 row
+carries the pottage-precedent vale_wheat binder (deviation (bz)) because
+brook_carrot is the priced D9 vegetable, keeping every farm row
+uncraftable from counter stock and opening no rung-0 cooking skill-up
+faucet (a build-lane exemption variant was reverted at integration). The
+tier 3/4 pair ships REAGENT-DORMANT under (bo), stated at the rows; the
+honesty arm stays green and derives from the crop catalog. foodHp and
+sellValue reuse shipped curve points; art rides ITEM_ART_PENDING (39 to
+43) with four distinct procedural icon recipes on the shared food radial
+(A3/A4c re-pinned, the v039 hotbar literal 12 to 16, the audit CLI
+pendingArtCount re-pinned); wiki content regenerated (guide freshness
+green); the four names carry catalog rows byte-identical to the defs plus
+five non-Latin M16 fills each.
+
+MAINTAINER FLAGS gathered here: (1) the well-fed ladder 3/600s, 6/900s,
+9/900s, 12/900s sits at or below the documented elixir ceiling, but the
+capstone EQUALS the strongest crafted elixir (12/900) and the distinct
+namespace makes food STACK with a same-stat elixir for a combined 24
+stamina no doc budgets; cheap lever: capstone to 9 or 10. (2) Reagent
+counts (produce x4) and both top dishes at rung 50 (restating the Phase 6
+three-rungs-for-four-tiers domination flag). (3) Tier 4 ships quality
+'rare' like tier 3. (4) The aura.wellFed row carries the five non-Latin
+fills only (the sim_i18n in-file pattern); the Latin fills join the
+release-tier pass.
+
+UI: src/ui/wellfed_tooltip_view.ts beside the elixir view (registered pure
+core, leaf imports), composed in Hud.itemTooltip at 19219/19220 (ONE line
+of headroom left, flagged); no 'Use:' prefix (the foodHp line owns that
+slot) and BOTH branches interpolate the buff name through the sim_i18n
+matcher chain the buff bar reads, so the term cannot fork per locale. The
+buff bar needs no new module: name via AURA_NAME_KEY, remaining time via
+compactAuraDuration, icon via the aura_buff_sta fallback (a bespoke
+wellfed icon is a Phase 13 art-batch candidate). Party frames correctly
+ignore the buff (sim-side classifier, not a tier knob); the old synthetic
+well_fed fixtures now pin the live id.
+
+(bw) DISCHARGED (the Phase 10 QA ledger): the farming_session scenario
+gained a position-searched golden-WIN beat and a paying-band tier-3
+seed-back beat, appended after every earlier beat. Probe facts (recorded
+in the drive comment): post-drive stream index 86 is the first golden
+winner (0.003351 < 1/90) and index 92 the first one-seed band value
+(0.155753); 29 padding cycles of real plant-plus-withered-harvest walk
+the stream there (3 draws each; withering NEEDS the written skill-0
+window, because the keep chance saturates at 1 by 75 and a 0.99 roll
+SURVIVES at the pre-write skill: crops cannot wither at cap, discovered
+live by the first probe run). The WIN beat overwrites its yieldSeed with
+the probed both-grades winner (FARM_GOLDEN_WIN_YIELD_SEED = 7 at skill
+75: count 3, fine 1), so the five-fold signed grants land at BOTH grades
+(15 + 5), the crop-source announce fans out, and the
+gather_event:golden_harvest mark reaches the digest; the paying beat's
+seed-back pays exactly one highland_barley_seed. ONE deliberate isolated
+classified UPDATE_PARITY=1 re-record: frames 0-25 byte-identical, the old
+final frame replaced by the continuing cadence frame, five frames
+appended; draws 16 to 110, ticks 290 to 1577, md5
+83c3478142deabbffbf23912575873e9 to 25bd6b8774f913279c96dddb25f93403;
+zero other goldens moved (full tests/parity 216 green). The coverage_c
+farming arm extends to the new labels (drawsAt 102/103/108/110), the
+five-fold both-grades equality with in-arm non-vacuity, the announce
+fanout, the mark, and the two-beat bag consistency.
+
+REVIEWS: architecture 0 BLOCKING (its food-kind-guard SHOULD-FIX taken
+with a synthetic-drink arm plus the catalog sweep; its maxHp-mid-tick
+ordering note DECLINED with reason: hp heals ride only the eating slot,
+which is the completing slot itself, and player stat auras fold through
+the deferred statsDirty recalc, so no cross-slot read exists);
+cross-platform APPROVE (0 BLOCKING; its wellfed parity-beat SHOULD-FIX
+deferred to Phase 12 with the feast scenario, ledgered below; its
+party-frame fixture value note taken at the predicate level, the painter
+fixture stays the projected wire shape which carries no value field);
+content-obligations 0 BLOCKING (its docs-ledger SHOULD-FIX is this
+section plus the state.md entries; its capstone flag is maintainer flag 1
+above); frontend-seam 0 BLOCKING (both SHOULD-FIXes taken: the doubled
+Use: prefix reworded with the five fills re-supplied in the same change,
+and the buff name unified onto the one matcher row; its bespoke-icon and
+32px carrot-vs-pottage eyeball notes ledgered for the Phase 11 QA);
+qa-checklist LAST, verdict recorded below.
+
+DEFERRALS ledgered with owners: a wellfed parity-scenario beat rides the
+Phase 12 feast scenario (the mint is host-agnostic shared sim code with
+the zero-draw pin; unit coverage carries it meanwhile); the bespoke
+wellfed_buff_sta AURA_RECIPES icon and the glazed-carrots-vs-pottage 32px
+eyeball go to the Phase 13 art batch; the third stat-buff tooltip line
+extracts a shared core on the rule of three; hud.ts headroom is ONE line.
+
+VALIDATION: npx tsc --noEmit clean; the STEP 3 battery (27 files, 750
+tests incl. the aura suites) green; tests/parity 216 green after the
+isolated re-record; npm run ci:changed rc 0 with zero errors (the real
+rc captured unpiped).
+
+MUTATIONS 9/9 KILLED with rc nonzero AND named failing tests AND run
+summaries, through the dirty-refusing scratchpad runner on the committed
+tree, no reviewer reading: M1 namespace escape (wellfed id minted as
+elixir_<kind>: six named reds incl. both isolation orders), M2
+last-eaten-wins inverted (per-item ids: the exactly-one-aura arm), M3
+aura replacement keyed on kind instead of id (both isolation orders red:
+the elixir-clobbered-by-food reverse direction), M4 capstone magnitude
+over the ceiling (the exact-tuning arm), M5a completion hook deleted
+(six reds), M5b mint-on-consume inserted (killed by exactly the
+never-mid-meal and interruption-forfeits arms: the timing decision is
+pinned in both directions), M6 a tier-3 seed gaining a vendor faucet
+(the (bo) honesty arm reds toward honesty), M7 the golden win never
+applying (the (bw) beat asserts something: coverage_c AND the parity_g
+digest both red, the vacuity probe), M8 the five-fold dropped (the
+armed-expansion probe: coverage_c, parity_g, and four
+professions_farming arms), M9 the food-kind guard removed (the
+synthetic-drink arm). M5b's first anchor missed (the items.ts emit line
+sits elsewhere); re-anchored on the slot-assignment block and landed
+with count proof.
 
 ### Phase 12
 (not started)

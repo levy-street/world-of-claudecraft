@@ -11,6 +11,18 @@ Live-surface note (binding): LIVE, additive. The buff dishes join cooking the mo
 any player with produce can cook them, eat them, and carry a well-fed buff. The elixir
 slots and every existing elixir behavior are untouched.
 
+EXECUTED 2026-08-19 (decisions locked in-phase; state.md owns the letters):
+(bx) timing = COMPLETION of the sit-restore, minted by src/sim/wellfed.ts at the
+updateRegen slot-null site, interruption forfeits, food-only kind guard; (by) all four
+dishes share aura name 'Well Fed' and kind buff_sta, one id wellfed_buff_sta,
+last-eaten-wins namespace-wide; (bz) the tier-1 dish carries the pottage-precedent
+vale_wheat binder (brook_carrot is the priced D9 vegetable), keeping every farm row
+uncraftable from counter stock. Magnitudes proposed 3/600s 6/900s 9/900s 12/900s,
+maintainer-flagged (capstone at the elixir ceiling; 24-stamina stacking read owed).
+(bw) discharged with the position-searched golden-WIN beat and the paying-band tier-3
+beat; ONE isolated classified re-record, md5 83c34781 to 25bd6b87, draws 16 to 110.
+The full record: docs/farming/progress.md Phase 11 and the state.md ledgers.
+
 ### Starter Prompt (the session form; refreshed by the Phase 10 QA close, 2026-08-19)
 
 ```
