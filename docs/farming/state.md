@@ -2594,6 +2594,28 @@ question does not arise (farming has no station).
     (below the extraction rule of three), held in step by the new parity
     pin; the third consumable-buff view owns the extraction.
 
+  Phase 12 (2026-08-19, the shared feast; merge hash in progress.md):
+  (ca) THE (bo)/LIVE-SURFACE RECONCILIATION, decided at phase start per
+  the phase file's STEP 0 mandate (option 3 of its recorded three): the
+  feast recipe ships REAGENT-DORMANT-HONEST like the tier 3/4 buff
+  dishes, keeping its true produce-heavy tier-4 identity
+  (evergarden_greens x4 + gilded_sunmelon x4 + cooking_salt x2). The
+  phase file's binding Live-surface note is AMENDED in-file (state.md
+  wins by that file's own header): the whole loop (cook, place, eat,
+  buff) is live code-side and proven through tests and granted-item
+  probes, but no player can cook the feast until the D11/(bo)
+  seed-bootstrap ruling opens a tier-4 produce faucet. Rationale:
+  option 1 (obtain the D11 ruling first) needs the maintainer and could
+  not be decided in scope; option 2 (a reagent mix reachable today)
+  would build the tier-4 showcase from tier 1/2 produce, making the
+  feast the cheapest source of the 12-stamina buff and permanently
+  undercutting the tier-4 dishes the moment D11 opens the faucet, a
+  balance wart baked into content. The (bo) addendum above therefore
+  owns THREE advertised dormant rows (porridge, braised greens, harvest
+  feast); the D11 ruling must cover all three before the branch merges
+  to a release. Swept into phase-12-shared-feast.md and phase-12-qa.md
+  in the same pass.
+
 ## OPEN items (maintainer decisions or later-phase calls, never guess)
 
 - Crop display names: ids are locked (D11), English display names get a maintainer
