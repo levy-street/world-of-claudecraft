@@ -2555,9 +2555,32 @@ plus the component pins stand in): maintainer call at go-public. The
 focus-key selector interpolation without CSS.escape is the family idiom
 (the journal shares it): note only. The .ps-seed raw rgba and the moved
 report window's #ffd100 literal: the Phase 13 style batch.
-GATE RECORD AND MERGE: appended by the post-gate docs commit (the gate
-runs on the frozen docs tree; its markers and the merge hash land there,
-the phase-close precedent).
+QA-CHECKLIST VERDICT (the last lane, run over the QA branch's own diff):
+READY, zero BLOCKING; its two CSS SHOULD-FIXes were both taken in the
+round-two commit (the caps clamp var(--app-vw), never raw 100vw, per the
+layout.css .window contract; a CENTERED card clears an asymmetric
+landscape notch only by twice the LARGER inset, so both axes subtract
+2 * max() of their env() pair) together with its missing-pin finding (a
+CSS-text pin anchors the mobile rule once and demands the app-viewport
+tokens plus all four inset terms) and its missing-evidence finding as far
+as headless allows (a 400px-viewport probe measured the resolved width at
+exactly 380px, proving the calc parses and applies; a true notch capture
+needs a real device, recorded honestly). Its adversarial pass also named:
+hud.ts now at ZERO headroom (19352/19352, flagged to Phase 10:
+extraction-first for any new Hud line), the unconditional error forward
+(the safety argument verified against the sim's own gate order: dead and
+busy precede bed_taken and every deny consumes nothing), and the missing
+in-flight aria-busy affordance (pre-existing, the a11y polish batch).
+GATE RECORD: run 1 on the frozen tree 557e7df147
+(BROWSER_PATH=<playwright chromium> GATE_MAX_WORKERS=8
+node scripts/gate_select.mjs): mode=full (the terrain-fixture +
+bare_client broad arm), "[gate:select] PASS: all 12 steps green (vitest
+workers: 8)", 2886 test files passed / 12 skipped, 40355 tests passed / 2
+expected fail / 115 skipped, browser regression 20 files 133 green, ZERO
+FAIL markers, no druid_engines timeout.
+MERGE: fix/farming-phase-09b-qa merged --no-ff into feature/farming-plan;
+the hash is recorded in the merge-hash commit on the feature branch and
+in the farming-skill-program memory topic.
 
 ### Phase 10
 (not started)
