@@ -2768,6 +2768,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useWellfed':
     'Эффект "{aura}": {stat} +{value} на {minutes} мин. Дается, когда вы доедаете.',
   'itemUi.tooltip.useWellfedAura': 'Дает эффект "{aura}" на {minutes} мин, когда вы доедаете.',
+  'itemUi.tooltip.useFeast':
+    'Использование: накрывает пир, с которого могут поесть и другие ({servings} порций, действует {minutes} мин).',
+  'itemUi.tooltip.useFeastBuff':
+    'Каждая порция дает эффект "{aura}": {stat} +{value} на {minutes} мин после {seconds} сек еды.',
+  'itemUi.tooltip.useFeastBuffAura':
+    'Каждая порция дает эффект "{aura}" на {minutes} мин после {seconds} сек еды.',
   'itemUi.tooltip.clickUseInstant': 'Нажмите, чтобы мгновенно использовать в бою',
   'itemUi.tooltip.clickUse': 'Нажмите, чтобы использовать',
   'itemUi.tooltip.clickBuyback': 'Нажмите, чтобы выкупить',
@@ -9057,6 +9063,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.feast_finished': 'Этот пир съеден подчистую.',
   'hudChrome.farming.denied.feast_range': 'Вы слишком далеко от пира.',
   'hudChrome.farming.denied.feast_eaten': 'Вы уже поели с этого пира.',
+  'hudChrome.farming.feastTitle': 'Пир урожая {name}',
+  'hudChrome.farming.feastPlacedLine': 'Вы накрыли свой пир урожая.',
   'hudChrome.farming.husksConvertedLine': 'Вы обмениваете {husksName} x{husks} на {name}.',
   'hudChrome.farming.husksConvertedLineQty':
     'Вы обмениваете {husksName} x{husks} на {name} x{qty}.',

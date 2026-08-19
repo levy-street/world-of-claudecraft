@@ -3917,6 +3917,15 @@ export const hudChromeStrings = {
       feast_range: 'You are too far from the feast.',
       feast_eaten: 'You have already eaten from that feast.',
     },
+    // The placed feast entity's title (professions/feast.ts), composed
+    // client-side off templateId 'farm_feast': {name} is the PLACER'S raw
+    // player name, carried by the entity as a VALUE and never translated
+    // (the gatherEvent.goldenHarvest finder-param precedent).
+    feastTitle: "{name}'s Harvest Feast",
+    // The placer's own confirmation, rendered from the text-free
+    // farmFeastPlaced SimEvent (everyone else learns of the feast by seeing
+    // the entity itself, so only the placer gets a line).
+    feastPlacedLine: 'You set out your harvest feast.',
     // The farmer NPC's gossip row (the farming go-live): the one UI affordance
     // that sends convert_husks, offered in the dialog of every NpcDef carrying
     // the farmer flag (hud/quest/quest_dialog_controller.ts). The trade's own

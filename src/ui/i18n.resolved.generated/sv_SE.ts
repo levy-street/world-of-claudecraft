@@ -3121,6 +3121,8 @@ export const sv_SE: EnTranslations = {
         "feast_range": "You are too far from the feast.",
         "feast_eaten": "You have already eaten from that feast."
       },
+      "feastTitle": "{name}'s Harvest Feast",
+      "feastPlacedLine": "You set out your harvest feast.",
       "huskTrade": "Trade husks for compost",
       "huskTradeAria": "Trade withered husks for compost with {name}",
       "plantSheet": {
@@ -9057,6 +9059,9 @@ export const sv_SE: EnTranslations = {
       "useElixirAura": "Använd: Ger {aura} i {minutes} min. Kan användas i strid.",
       "useWellfed": "{aura}: +{value} {stat} for {minutes} min, granted when you finish eating.",
       "useWellfedAura": "Grants {aura} for {minutes} min when you finish eating.",
+      "useFeast": "Use: Sets out a feast others can eat from ({servings} servings, lasts {minutes} min).",
+      "useFeastBuff": "Each serving grants {aura}: +{value} {stat} for {minutes} min when you finish the {seconds} sec meal.",
+      "useFeastBuffAura": "Each serving grants {aura} for {minutes} min when you finish the {seconds} sec meal.",
       "questItem": "Uppdragsföremål",
       "questRelated": "Uppdrag: {quest}",
       "questRules": "Kan inte säljas, bankas eller bytas bort.",

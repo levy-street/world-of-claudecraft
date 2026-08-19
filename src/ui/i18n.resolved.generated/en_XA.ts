@@ -3121,6 +3121,8 @@ export const en_XA: EnTranslations = {
         "feast_range": "[Ýóú áŕé ţóó ƒáŕ ƒŕóɱ ţĥé ƒéášţ.]",
         "feast_eaten": "[Ýóú ĥáʋé áļŕéáðý éáţéñ ƒŕóɱ ţĥáţ ƒéášţ.]"
       },
+      "feastTitle": "[{name}'š Ĥáŕʋéšţ Ƒéášţ]",
+      "feastPlacedLine": "[Ýóú šéţ óúţ ýóúŕ ĥáŕʋéšţ ƒéášţ.]",
       "huskTrade": "[Ţŕáðé ĥúšķš ƒóŕ çóɱþóšţ]",
       "huskTradeAria": "[Ţŕáðé ŵíţĥéŕéð ĥúšķš ƒóŕ çóɱþóšţ ŵíţĥ {name}]",
       "plantSheet": {
@@ -9057,6 +9059,9 @@ export const en_XA: EnTranslations = {
       "useElixirAura": "[Úšé: Ĝŕáñţš {aura} ƒóŕ {minutes} ɱíñ. Úšáƀļé íñ çóɱƀáţ.]",
       "useWellfed": "[{aura}: +{value} {stat} ƒóŕ {minutes} ɱíñ, ĝŕáñţéð ŵĥéñ ýóú ƒíñíšĥ éáţíñĝ.]",
       "useWellfedAura": "[Ĝŕáñţš {aura} ƒóŕ {minutes} ɱíñ ŵĥéñ ýóú ƒíñíšĥ éáţíñĝ.]",
+      "useFeast": "[Úšé: Šéţš óúţ á ƒéášţ óţĥéŕš çáñ éáţ ƒŕóɱ ({servings} šéŕʋíñĝš, ļášţš {minutes} ɱíñ).]",
+      "useFeastBuff": "[Éáçĥ šéŕʋíñĝ ĝŕáñţš {aura}: +{value} {stat} ƒóŕ {minutes} ɱíñ ŵĥéñ ýóú ƒíñíšĥ ţĥé {seconds} šéç ɱéáļ.]",
+      "useFeastBuffAura": "[Éáçĥ šéŕʋíñĝ ĝŕáñţš {aura} ƒóŕ {minutes} ɱíñ ŵĥéñ ýóú ƒíñíšĥ ţĥé {seconds} šéç ɱéáļ.]",
       "questItem": "[Ɋúéšţ Íţéɱ]",
       "questRelated": "[Ɋúéšţ: {quest}]",
       "questRules": "[Çáññóţ ƀé šóļð, ƀáñķéð, óŕ ţŕáðéð.]",

@@ -309,6 +309,7 @@ import { PlantSheetWindow } from './farming_plant_sheet_window';
 import { blockFctAmountText } from './fct_core';
 import { fctSpawnShape } from './fct_event';
 import { FctPainter } from './fct_painter';
+import { feastTooltipLines } from './feast_tooltip_view';
 import { FocusManager, type FocusTrapHandle } from './focus_manager';
 import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
 import {
@@ -6030,9 +6031,7 @@ export class Hud {
     // restore-health line; no materialHintLine HTML growth). outerHTML bridges
     // the node into the legacy string tooltip stack.
     const cookingHintKey = cookingCatchHintKey(item.id);
-    if (cookingHintKey) {
-      html += createTooltipLine(t(cookingHintKey), 'tt-desc').outerHTML;
-    }
+    if (cookingHintKey) html += createTooltipLine(t(cookingHintKey), 'tt-desc').outerHTML;
     // Profession affinity for honest materials (material_profession_hint_view.ts):
     // "Used by Leatherworking, ..." derived from live recipe/enchant consumers.
     // Skips when a more specific purpose line above already covers a single
@@ -6053,6 +6052,7 @@ export class Hud {
     // and market all state what the elixir does.
     html += elixirTooltipLines(item);
     html += wellfedTooltipLines(item);
+    html += feastTooltipLines(item);
     // Quest story block (related quest, progress, rules, orphaned). Replaces the
     // old plain "Quest Item" desc that doubled the kind line.
     if (questModel) html += this.questItemTooltipStoryHtml(questModel);

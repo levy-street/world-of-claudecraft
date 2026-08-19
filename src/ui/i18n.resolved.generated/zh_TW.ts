@@ -3121,6 +3121,8 @@ export const zh_TW: EnTranslations = {
         "feast_range": "你離盛宴太遠了。",
         "feast_eaten": "你已經吃過那桌盛宴了。"
       },
+      "feastTitle": "{name}的豐收盛宴",
+      "feastPlacedLine": "你擺出了豐收盛宴。",
       "huskTrade": "用穀殼換堆肥",
       "huskTradeAria": "與{name}用枯萎穀殼換取堆肥",
       "plantSheet": {
@@ -9057,6 +9059,9 @@ export const zh_TW: EnTranslations = {
       "useElixirAura": "使用：獲得{aura}效果，持續 {minutes} 分鐘。戰鬥中可用。",
       "useWellfed": "吃完後獲得{aura}效果，使你的{stat}提高 {value} 點，持續 {minutes} 分鐘。",
       "useWellfedAura": "吃完後獲得{aura}效果，持續 {minutes} 分鐘。",
+      "useFeast": "使用：擺出一桌他人也能享用的盛宴（{servings} 份，持續 {minutes} 分鐘）。",
+      "useFeastBuff": "每份：吃完 {seconds} 秒的一餐後獲得{aura}效果，使你的{stat}提高 {value} 點，持續 {minutes} 分鐘。",
+      "useFeastBuffAura": "每份：吃完 {seconds} 秒的一餐後獲得{aura}效果，持續 {minutes} 分鐘。",
       "questItem": "任務物品",
       "questRelated": "任務：{quest}",
       "questRules": "無法出售、存入銀行或交易。",

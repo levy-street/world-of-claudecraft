@@ -18,6 +18,7 @@ import { ITEMS } from '../src/sim/data';
 import type { ItemDef } from '../src/sim/types';
 import { cookingCatchHintKey } from '../src/ui/cooking_catch_hint_view';
 import { elixirTooltipLines } from '../src/ui/elixir_tooltip_view';
+import { feastTooltipLines } from '../src/ui/feast_tooltip_view';
 import { gatherToolTooltipLines } from '../src/ui/gather_tool_tooltip';
 import { materialHintLine } from '../src/ui/material_hint_view';
 import { materialProfessionHintText } from '../src/ui/material_profession_hint_view';
@@ -40,6 +41,7 @@ const EFFECT_SOURCES: Array<[string, (def: ItemDef) => boolean]> = [
   ['potion use line', (def) => (def.potionHp ?? 0) > 0 || (def.potionMana ?? 0) > 0],
   ['elixir use line', (def) => elixirTooltipLines(def) !== ''],
   ['wellfed use line', (def) => wellfedTooltipLines(def) !== ''],
+  ['feast use line', (def) => feastTooltipLines(def) !== ''],
   ['gathering tool lines', (def) => gatherToolTooltipLines(def) !== ''],
   ['tool effect charm lines', (def) => toolEffectTooltipLines(def) !== ''],
   ['enchanting material hint', (def) => materialHintLine(def.id) !== ''],
@@ -114,6 +116,7 @@ describe('crafted item tooltip coverage', () => {
       'materialProfessionHintText(item.id)',
       'elixirTooltipLines(item)',
       'wellfedTooltipLines(item)',
+      'feastTooltipLines(item)',
       'stackSizeTooltipLine(item, instance)',
     ]) {
       expect(body, `itemTooltip must compose ${call}`).toContain(call);

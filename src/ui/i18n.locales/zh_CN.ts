@@ -2624,6 +2624,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useWellfed':
     '吃完后获得{aura}效果，使你的{stat}提高 {value} 点，持续 {minutes} 分钟。',
   'itemUi.tooltip.useWellfedAura': '吃完后获得{aura}效果，持续 {minutes} 分钟。',
+  'itemUi.tooltip.useFeast': '使用：摆出一桌他人也能享用的盛宴（{servings} 份，持续 {minutes} 分钟）。',
+  'itemUi.tooltip.useFeastBuff':
+    '每份：吃完 {seconds} 秒的一餐后获得{aura}效果，使你的{stat}提高 {value} 点，持续 {minutes} 分钟。',
+  'itemUi.tooltip.useFeastBuffAura': '每份：吃完 {seconds} 秒的一餐后获得{aura}效果，持续 {minutes} 分钟。',
   'itemUi.tooltip.clickUseInstant': '点击在战斗中立即使用',
   'itemUi.tooltip.clickUse': '点击使用',
   'itemUi.tooltip.clickBuyback': '点击回购',
@@ -8485,6 +8489,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.feast_finished': '那桌盛宴已被吃光。',
   'hudChrome.farming.denied.feast_range': '你离盛宴太远了。',
   'hudChrome.farming.denied.feast_eaten': '你已经吃过那桌盛宴了。',
+  'hudChrome.farming.feastTitle': '{name}的丰收盛宴',
+  'hudChrome.farming.feastPlacedLine': '你摆出了丰收盛宴。',
   'hudChrome.farming.husksConvertedLine': '你用{husksName} x{husks}换取了{name}。',
   'hudChrome.farming.husksConvertedLineQty': '你用{husksName} x{husks}换取了{name} x{qty}。',
   'hudChrome.farming.readyLine': '有一块作物可以收获了。',

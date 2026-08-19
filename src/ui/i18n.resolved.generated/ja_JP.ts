@@ -3121,6 +3121,8 @@ export const ja_JP: EnTranslations = {
         "feast_range": "その宴から離れすぎています。",
         "feast_eaten": "その宴からはすでに食べました。"
       },
+      "feastTitle": "{name}の収穫の宴",
+      "feastPlacedLine": "収穫の宴を広げた。",
       "huskTrade": "籾殻を堆肥と交換する",
       "huskTradeAria": "{name}と枯れた籾殻を堆肥に交換する",
       "plantSheet": {
@@ -9057,6 +9059,9 @@ export const ja_JP: EnTranslations = {
       "useElixirAura": "使用: {aura}の効果を得て、{minutes}分間持続します。戦闘中に使用可能。",
       "useWellfed": "食べ終えると{aura}の効果を得て、{stat}が{value}上昇し、{minutes}分間持続します。",
       "useWellfedAura": "食べ終えると{aura}の効果を得て、{minutes}分間持続します。",
+      "useFeast": "使用: 他のプレイヤーも食べられる宴を広げる（{servings}人前、{minutes}分間持続）。",
+      "useFeastBuff": "1人前につき、{seconds}秒の食事を終えると{aura}の効果を得て、{stat}が{value}上昇し、{minutes}分間持続します。",
+      "useFeastBuffAura": "1人前につき、{seconds}秒の食事を終えると{aura}の効果を得て、{minutes}分間持続します。",
       "questItem": "クエストアイテム",
       "questRelated": "クエスト：{quest}",
       "questRules": "売却、銀行預け入れ、取引はできません。",
