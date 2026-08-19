@@ -9432,6 +9432,155 @@
     color: var(--color-text-muted);
   }
 
+  /* ---------- plant sheet ---------- */
+  /* The plant sheet (#plant-sheet-window, the bed verbs): the window a press
+     on a free garden bed opens. Seed rows are aria-pressed pick buttons and
+     the three care knobs are aria-pressed toggles, all on the 40px touch
+     floor; hue is never the only signal (a short knob also says its reason).
+     Reuses the journal's inset-card idiom and the shared window chrome. */
+  #plant-sheet-window {
+    width: 440px;
+    max-height: calc(var(--app-vh, 100vh) * 0.8 / var(--window-scale) - 24px);
+    flex-direction: column;
+  }
+  #plant-sheet-window .panel-title {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #plant-sheet-window .panel-title > span {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .ps-body {
+    flex: 1 1 auto;
+    min-height: 100px;
+    overflow-y: auto;
+    padding-right: 2px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .ps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ps-seed {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 40px;
+    padding: 8px 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    background: rgba(0, 0, 0, 0.24);
+    color: var(--color-text-light);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .ps-seed[aria-pressed="true"] {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+  .ps-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-weight: 600;
+  }
+  .ps-count {
+    font-variant-numeric: tabular-nums;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .ps-locked {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 2px 8px;
+    padding: 8px 10px;
+    border: 1px dashed var(--color-border-showcase);
+    border-radius: 7px;
+    color: var(--color-text-muted);
+  }
+  .ps-locked .ps-name {
+    flex: none;
+  }
+  .ps-reason {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .ps-knobs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .ps-knob {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 6px 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    background: var(--color-bg-input);
+    color: var(--color-text-muted);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .ps-knob[aria-pressed="true"] {
+    border-color: var(--gold);
+    color: var(--color-text-light);
+  }
+  .ps-knob:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+  .ps-knob-name {
+    font-weight: 600;
+    font-size: 12px;
+  }
+  .ps-knob-leg {
+    font-size: 10px;
+    color: var(--color-text-muted);
+  }
+  .ps-leg-count {
+    font-variant-numeric: tabular-nums;
+    padding-left: 3px;
+  }
+  .ps-knob-short {
+    font-size: 10px;
+    color: var(--color-text-error);
+  }
+  .ps-plant {
+    align-self: flex-end;
+    min-height: 40px;
+    padding: 8px 18px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 7px;
+    background: var(--color-bg-input);
+    color: var(--gold);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .ps-empty {
+    margin: 0;
+    padding: 14px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+
   /* ---------- AAA window-frame adoption: master-detail windows (batch 2) ---------- */
   /* The quest log, mailbox, social panel, and spellbook adopt the shared
      window-frame grammar (src/ui/window_frame.ts; spec 6.1 + 8). Each mounts the

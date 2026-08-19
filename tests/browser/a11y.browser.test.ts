@@ -18,6 +18,7 @@ import { ALL_CLASSES } from '../../src/sim/types';
 import { ArenaWindow } from '../../src/ui/arena_window';
 import { BagsWindow } from '../../src/ui/bags_window';
 import { CharWindow } from '../../src/ui/char_window';
+import { PlantSheetWindow } from '../../src/ui/farming_plant_sheet_window';
 import { FOCUSABLE_SELECTOR } from '../../src/ui/focus_manager';
 import { resolveActionBarVisibility } from '../../src/ui/hud/action_bar/action_bar_visibility_core';
 import { QuestLogWindow } from '../../src/ui/hud/quest/questlog_window';
@@ -1181,6 +1182,52 @@ describe('axe: professions window tool-effect controls', () => {
     expect(slot?.textContent?.trim().length ?? 0).toBeGreaterThan(0);
     expect(recharge?.textContent?.trim().length ?? 0).toBeGreaterThan(0);
     await expectClean(root);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The plant sheet (#plant-sheet-window) - the bed-verbs window: aria-pressed
+// seed pick rows, the three aria-pressed care knob toggles (one disabled with
+// its reason line), and the Plant control, painted through the real window
+// with the real styles.
+// ---------------------------------------------------------------------------
+
+describe('axe: plant sheet window seed picks, knobs, and Plant control', () => {
+  it('pick rows, knob toggles, and the Plant control are clean with real names', async () => {
+    const root = host('plant-sheet-window');
+    // CAUTION: handed over through `as never`, so tsc cannot flag a missing
+    // member; the stub carries EVERY key the window's buildInput reads
+    // (inventory, myFarmPlots, professionsState) or the miss is a RUNTIME
+    // throw in this suite only.
+    const world = {
+      inventory: [
+        { itemId: 'vale_wheat_seed', count: 3 },
+        { itemId: 'garden_hoe', count: 1 },
+        { itemId: 'compost', count: 1 },
+      ],
+      myFarmPlots: [],
+      professionsState: { skills: [{ professionId: 'farming', skill: 10, maxSkill: 100 }] },
+      plantCrop: () => {},
+    };
+    const win = new PlantSheetWindow(
+      stubDeps({
+        root: () => root,
+        world: () => world as never,
+      }),
+    );
+    win.open('bed_eastbrook_1');
+    // The three control families must actually render: a seed pick row with
+    // its sow aria, a knob toggle (the tonic one disabled, saying why), and
+    // the one Plant control.
+    const seed = root.querySelector<HTMLButtonElement>('[data-seed-crop]');
+    const tonic = root.querySelector<HTMLButtonElement>('[data-knob="tonic"]');
+    const plant = root.querySelector<HTMLButtonElement>('[data-plant]');
+    expect(seed).not.toBeNull();
+    expect(seed?.getAttribute('aria-label')?.trim().length ?? 0).toBeGreaterThan(0);
+    expect(tonic?.disabled).toBe(true);
+    expect(plant?.textContent?.trim().length ?? 0).toBeGreaterThan(0);
+    await expectClean(root);
+    win.close();
   });
 });
 

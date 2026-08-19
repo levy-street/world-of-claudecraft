@@ -55,3 +55,13 @@ describe('openPlantSheet client reachability', () => {
     ).toBeGreaterThanOrEqual(1);
   });
 });
+
+describe('plantCrop client reachability', () => {
+  it('has at least one call site under src/game or src/ui', () => {
+    const sites = clientCallSites('plantCrop');
+    expect(
+      sites.length,
+      `expected a client call site of .plantCrop( under ${SCAN_ROOTS.join(' or ')}; found: [${sites.join(', ')}]`,
+    ).toBeGreaterThanOrEqual(1);
+  });
+});
