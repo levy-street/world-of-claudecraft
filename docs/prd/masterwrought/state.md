@@ -4814,3 +4814,130 @@ recorded, or refuted with the file open)
   and the (d) entry's appendix-GENERIC claim narrowed to Might (Vigor and
   Clarity are generic vocabulary without appendix rows); the pre-apex
   baseline triple gained its explicit spec order.
+
+## Phase 11 QA release sync (2026-08-19, merge 210ec2f7d1 + fix 33008fa7ac; the QA fan-out re-runs the phase-11-qa prompt in a FRESH session)
+
+- THE SYNC. Discovery found a NEW release line: origin/release/v0.40.0 (tip
+  e56707a675, 369 commits, containing the whole v0.39.0 close: its full locale
+  fill, the warlock Fate Threads rework with ONLINE_WORLD_LAYOUT_VERSION 7 and
+  the incapacitate breakThreshold budget, the druid cast-commit auto unshift,
+  the ogre body replacement with a full portrait receipt re-mint, the castle
+  walk-in dungeons the_last_keep + dawnhold_castle with the dawnhold_posy
+  keepsake and two ART-PENDING deeds, sky KTX2, the 58-icon spell-art revert
+  with a byte freeze suite, CI browser-deps hardening). Merged as 210ec2f7d1
+  with 371 conflicts: 241 portrait webps, 67 parity goldens, 23 resolved-i18n
+  slices, and 40 hand files. No stop-rule file was rewritten (loot_roll.ts,
+  rift/progression.ts, heroic_vendor.ts, market_query.ts all untouched by the
+  delta; the one rift change is authored.ts parkour ledges, zero rng).
+- UNION DECISIONS (the deliberate ones). Both-sides-appended tables keep the
+  RELEASE's entries AHEAD of the branch's so the eventual release merge stays a
+  pure tail append: deeds.ts (castle pair before the six craft milestones;
+  DEED_ORDER 279, renown 3235, FROZEN sha re-minted ea007571ae35 from suite
+  output; tail stays prog_grandmaster_inscription) and the items catalog
+  (dawnhold_posy before the masterwrought block in ITEM_ENTITY_IDS and
+  APPENDED_ITEM_NAMES; mapping.json 108 entries / 18 batches). hud.ts keeps
+  SUNDER_CAST_ID and DROPS SUNDER_ARMOR_PCT_PER_STACK (the release's
+  ability_description.ts extraction took its only consumer); the ratchet
+  re-pins at the exact merged 19337 (below BOTH parents: the two deletions
+  compose). effect_dispatch.ts takes the release's fear logic
+  (breakChanceScale gated on warlockBreakThreshold === undefined, plus
+  breakThreshold) under a union comment keeping the branch's Drakesting
+  rename; ancestor_return takes the release's reworded mechanic text with the
+  branch's (Spiritcall) tag, in classes.ts AND the abilities catalog
+  identically (S3 parity). The seven conflicted overlays keep the branch's
+  Dreadspark renders over the fill's Terrorspark transliterations and TAKE the
+  release's new the_last_keep.enterText rows plus its supersessions (it_IT
+  ossuary_mark 15 sec; tr_TR ossuary 15 sn, scale-free ferocious_bite,
+  funeral_harvest), each verified against the live English first. All three
+  naming guards GREEN over the fill (second clean fill sync; no reintroduced
+  coins).
+- COUNT PINS: verified from suite output, NO composition this sync (the
+  release touched neither surface): IWorld 324 = 86/238, commands 200/213.
+- RE-MINTS from the merged tree: 67 conflicted goldens plus the branch's own
+  rift_clear_rewards via UPDATE_PARITY (its movement is entity-id numbering
+  only, draws 0 unchanged, zero rng movement; the release added four world
+  entities); i18n:gen + wiki:content (270 guide deeds = 279 minus 9 hidden);
+  eastbrook seals via remint_polish_provenance.mjs (composite 5f52543636,
+  metadata 09b79915db27, second-order 0ed10cc2b249); the item-art verdict via
+  item_art_audit.mjs --refresh-verdict at the merged 907 art / 922 defs
+  (expected counts advanced in the script; the refresh REFUSES on a moved
+  shipping catalog until the posy's owner-reviewed admission is hand-advanced
+  into evidence.shippingCatalogSha256, the conscious-admission gate working as
+  designed; verdict sha c7fa0e80c134 at 122036 bytes propagated to
+  accepted-art.json and both test pins; summary sentence unions the release's
+  posy clause into the branch's admission chain at "All 907"); the FULL
+  233-portrait receipt rerender (bytes CONVERGED with the release's CI
+  encodes this time, no ping-pong: target_portrait_view + vale-cup evidence
+  resolved to THEIRS; grix + tunnel_rat + the three target-dummy portraits
+  minted fresh; determinism proven by a byte-identical 3-portrait sample
+  rerender; manifest re-minted via the receipt flow, sha d0614b9c96e1 at
+  268566 bytes, a merged-tree mint matching NEITHER parent since the branch
+  content moves the bundle fingerprint, hand-advanced into the placeholder
+  accepted-art trio).
+- FIRED TRIPWIRE, R12 held-offhand disenchant (the conscious re-decision):
+  the release WIDENED isDisenchantable (and isSalvageable) to kind
+  'held_offhand' ("a copy the player's class cannot wield is never stuck with
+  no way to recover value"), which redded the phase 09 pin built to force
+  exactly this re-decision. ADOPTED the upstream family rule: the pin flips to
+  true with the rationale re-cut. Faucet consequence for phases 12/15: every
+  epic held offhand (gyrelens_array, voidbound_grimoire, wraithfire_orb and
+  its heroic variants) now disenchants to the standard arcane_shard with NO
+  typed secondary (the jewelry shape), a marginal widening of the shard
+  faucet the phase 04 ledger sized 1:1 against the heroic faucet.
+  Sunderability is UNTOUCHED (isSunderable + itemFromRaid have zero delta;
+  the phase 12 heroic-raid sunderable flip premise stands as written).
+- FULL SUITE at the merge tip: 2877 files / 40099 passed, TWO reds, both
+  known merge-induced infra classes, closed in fix 33008fa7ac: (1) the
+  shard-weight union coverage fell to 94.57 percent (the phase-13
+  marketplace class exactly); 155 newly uncovered non-browser files measured
+  locally (42s run, default reporter) and merged into
+  ci_shard_weights.generated.json via parseWeightLines, every CI-harvested
+  weight untouched, provenance noting the local merge, table 2876 rows,
+  partition suite green; (2) the release's NEW sealed icon-art census
+  (release_v039_icon_art) pinned 72 hotbar items while the branch's three
+  role foods join the live isHotbarItemId inventory with painted art: the
+  sealed record and its sha pin advance to 75/75 (the nythraxis_hitch
+  literal-pin class: a release live-derivation pin no branch content can
+  survive).
+- MERGE AUDIT (release-merge-audit skill as a 7-agent workflow: six lanes +
+  completeness critic; all reports in the session transcript). Lanes 1-5
+  CLEAN with mechanical proof (25 of 28 sim-cluster files byte-identical to
+  a fresh three-way re-merge; presentation cluster verified against the
+  merge-tree recompute; injected seams all live: extract_essence dispatch,
+  item_copy_ref bindings, craftBonusStatsFor twins, resetForArena seats,
+  masterwrought cap arms, mintsSignerPayload, the carve-out; no
+  corpus-invisible route; db-mock trap EMPTY; duplicate_test_blocks green;
+  ci_workflow sparse cones still cover the masterwrought screenshot trees).
+  Lane 6 found 2 SHOULD-FIX + 1 NOTE, all applied: (a) the ruling (c)
+  amendment below (fourth undispellable stamp site), (b) THIS ledger records
+  the fired R12 tripwire, (c) phase-11-qa.md's draw-order premise scoped to
+  the sync merge (the release itself edited four finale copper rows:
+  heroicCopper on Morthen/Vael/Korzul/Nythraxis, Korzul base 50000 to 15000,
+  draw-count-neutral value swaps; release-owned, outside the append proof).
+  The critic closed four coverage gaps GREEN itself (parity replay 155/155
+  over the hybrid goldens; 17 between-lane suites 252 passed; the binary art
+  theirs-resolution consistency; the docs cluster incl. master-spec agreeing
+  with the copper retune) leaving ONE residual, the i18n resolved-bundle
+  freshness, which the gate's i18n freshness step then proved.
+- RULING (c) AMENDMENT (dated 2026-08-19): v0.40.0 added a FOURTH
+  undispellable stamp site, the warlock Fate Threads self-aura
+  (src/sim/combat/affliction.ts), so the phase 11 entry (c) claim "types.ts
+  doc comments recut (undispellable now names its THREE stamp sites)" is
+  superseded: the types.ts comment now names four (recut in 33008fa7ac).
+  Flag semantics unchanged; flask/Spellgnaw/spellsteal pins all green.
+- RELEASE-OWNED, recorded not fixed: the castle deed pair ships art-pending
+  by upstream design (DEED_ART_PENDING, category-crest fallback,
+  docs/design/deeds.md sanctions it; icon-brief flags the commission); the 13
+  Latin-overlay reins_terrorspark rows the branch stripped at phase 03 now
+  fall back to the English Dreadspark name (M16-consistent, release fill
+  channel); the ossuary_mark/possess-family reword staleness in the 13
+  non-conflicted Latin overlays is inherited fill debt, not merge damage
+  (lane 2's note).
+- VALIDATION RECORD: tsc clean at every step; naming guards 26/26; S3 +
+  channel + count-pin suites 458 green; deed/ratchet cluster 181 green;
+  item-art pair 13 green; eastbrook 29 green; portrait quartet 33 green;
+  full suite 2877 files at the merge tip (the two closed reds above);
+  gate_select PASS all 12 steps at the committed fix tip 33008fa7ac via the
+  full-suite fallback (2879 files / 40101 passed, ZERO failures, browser
+  131 green, typecheck and all builds green). Portrait manifest --check
+  fresh at the tip. Branch stays LOCAL, never pushed.

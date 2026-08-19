@@ -506,3 +506,21 @@ never future-PR items, per the delivery contract in `state.md`).
   one census red admitted with rationale; gate_select PASS all 12 steps at
   b0d77be779. Rates, prices, decisions, review record, and the residuals in
   state.md "Phase 11 BUILT ledger" and "Phase 11 ruling executions".
+- Phase 11 QA release sync (2026-08-19, Step 0 only; the QA fan-out runs in a
+  fresh session): release/v0.40.0 (369 commits, the v0.39.0 close plus the
+  warlock Fate Threads rework, castle walk-ins, ogre bodies, sky KTX2) merged
+  as 210ec2f7d1 with 371 conflicts resolved, then fix 33008fa7ac closed the
+  two merge-induced infra reds (shard-weight union coverage re-measured
+  locally; the release's sealed icon-art hotbar census advanced 72 to 75 for
+  the three role foods). Release-side entries deliberately sit AHEAD of
+  branch appends everywhere both sides grew a table, keeping the eventual
+  release merge a pure tail append. One fired tripwire adopted as the
+  upstream family rule: held offhands are now disenchantable, so the two
+  apex held items flip their conscious-decision pin (shard-faucet note for
+  phases 12/15 in the ledger). Seven-agent release-merge audit: lanes clean,
+  two doc corrections applied, critic closed its four coverage gaps green.
+  gate_select PASS all 12 steps at 33008fa7ac via the full-suite fallback
+  (2879 files / 40101 tests, zero failures; browser 131 green); portrait
+  seal fresh; count pins verified from suite output (IWorld 324, commands
+  200/213, no silent composition). Full record: state.md "Phase 11 QA
+  release sync".
