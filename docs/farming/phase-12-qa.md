@@ -104,11 +104,14 @@ STEP 0 - PRE-FLIGHT
   Infinity, the precedented never-re-arm sentinel (run-scoped mobs,
   dismissed pets); the 181s expiry arm now rides the whole life at the
   worst-case phase asserting lootable false on every tick. The QA also
-  found and fixed the INSTANCE-TEARDOWN LEAK: a feast placed inside a
-  dungeon instance now joins the claimed instance's objectIds, so
-  freeInstance drops it and the sweep's inverse-cleanup leg reclaims
-  the state and the one-active slot; placement inside instances stays
-  LEGAL (the raid-table flavor). Both in the state.md Phase 12 QA block.
+  found and fixed the INSTANCE-TEARDOWN LEAK in BOTH legs: a feast
+  placed inside a dungeon instance now joins the claimed instance's
+  objectIds (freeInstance drops it), and a feast placed inside a delve
+  run joins the placer's run.objectIds (freeDelveRun and the module
+  advance drop it); the sweep's inverse-cleanup leg reclaims the state
+  and the one-active slot either way; placement inside instances and
+  delves stays LEGAL (the raid-table flavor). All in the state.md
+  Phase 12 QA block.
   (5) The swim PLACE gate exists (a water placement would burn the item
   on a feast nobody can ever eat); COMBAT placement is deliberately
   LEGAL (combat ends; water does not), stated in the module header.

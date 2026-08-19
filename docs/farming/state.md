@@ -2668,7 +2668,13 @@ question does not arise (farming has no station).
     teardown roster; freeInstance drops it and the sweep's entities.has
     inverse-cleanup leg reclaims the state and the slot (its designed
     job). RULING RECORDED: placement inside instances stays LEGAL (the
-    raid-table flavor) and is instance-scoped.
+    raid-table flavor) and is instance-scoped. THE SAME RULE FOR DELVES
+    (the qa-checklist adversarial find: delve runs are their own spatial
+    system with their own roster): the feast joins the placer's
+    run.objectIds, so freeDelveRun AND the module advance tear it down
+    (the abandoned-module drop is deliberate, that room despawns
+    wholesale); reproduced failing-first and mutation-proven like the
+    dungeon leg.
   - THE RE-ARM DODGE AMENDED to the Infinity sentinel: the shipped
     finite spawn timer (durationTicks + 20 ticks) was silently coupled
     to the 1 Hz sweep period across two files; the QA probe measured the
@@ -2683,7 +2689,9 @@ question does not arise (farming has no station).
     graphics-settings rebuild or login (the first applyFeasts pass
     registers standing tables silently; later appearances keep it; the
     scope-re-entry ambiguity is ACCEPTED, indistinguishable client-side
-    without wire age). Shadow casting budgeted at FEAST_SHADOW_CAP = 8
+    without wire age; also accepted: the viewer's OWN placement is
+    silenced when it lands inside the first pass after a rebuild, up to
+    one 0.5 s sync interval, a different and narrower case). Shadow casting budgeted at FEAST_SHADOW_CAP = 8
     tables (insertion order, refills on despawn; a universal budget,
     never a preset knob); PRESENCE is actionable and never culled (the
     natural bound is one feast per online placer crossed with interest

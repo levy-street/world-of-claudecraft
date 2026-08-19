@@ -453,6 +453,9 @@ Phase 12 QA block and the progress.md Phase 12 QA section):
   sweep's inverse-cleanup leg reclaims the state and the one-active slot.
   Placement inside instances stays LEGAL (the raid-table flavor); before
   this, the entity outlived the run at the slot origin for the next party.
+  The SAME rule covers delve runs (their own spatial system): the feast
+  joins the placer's run.objectIds, torn down by freeDelveRun and the
+  module advance (the abandoned-module drop is deliberate).
 Render notes: the placement flourish registers standing tables silently on
 the first pass after construction (no rebuild/login replay; scope-re-entry
 ambiguity accepted), and shadow casting is budgeted at FEAST_SHADOW_CAP = 8

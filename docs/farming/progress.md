@@ -33,7 +33,7 @@
 | Phase 11 (well-fed food) | DONE 2026-08-19 | fix/farming-phase-11-well-fed-food off f0d329db02 (the twenty-first absorb, release/v0.40.0 e56707a675, opened the phase); merged --no-ff as 9fc11d5452, phase tip e6746bfe79 | ItemDef.wellfed beside elixir; the completion-time mint (src/sim/wellfed.ts at the updateRegen slot-null site, deviation (bx)); one shared aura 'Well Fed' / wellfed_buff_sta, last-eaten-wins namespace-wide (by); four buff dishes in FARM_RECIPES rows 9 to 13 with the (bz) vale_wheat binder; magnitudes 3/600s 6/900s 9/900s 12/900s proposed and flagged; (bw) discharged (the golden-WIN and paying-band beats, one isolated classified re-record, draws 16 to 110, md5 25bd6b87); reviews 0 BLOCKING; mutations 9/9 killed named; gate all 12 green on e6746bfe79 |
 | Phase 11 QA | DONE 2026-08-19 (PASS-WITH-FOLLOWUPS) | fix/farming-phase-11-qa off 35536d8ca8 (v0.40.0 e56707a675 still newest, no absorb); merge hash in the notes tail | All four mandatory emphases proven live first-hand (coexistence and last-eaten-wins through real ticks; the eat verb PLAYED as a player through the real bag UI on the LOW live client with the buff bar, remaining time, and single-Use:-prefix tooltip observed; the tier-4-then-tier-1 downgrade over the REAL wire through a stable-timer GameServer + ClientWorld rig, value 12 shipped, held through elision, re-encoded to 3); 7 lanes/reviewers 0 BLOCKING; 4 SHOULD-FIX closed test-first (18s boundary bracket, concurrent-meal refusal, death forfeit, zero-rng rig guards) plus the stat-map parity pin, the stripComments glue-pin hardening, and ten frozen non-Latin fill literals; mutations 7/7 killed named (M3 and M5b re-proven, five fresh over the new pins); rest ledgered with owners in the state.md Phase 11 QA block |
 | Phase 12 (shared feast) | DONE 2026-08-19 | fix/farming-phase-12-shared-feast off deffe3a5d4 (release/v0.40.0 e56707a675 still newest, no absorb); merged --no-ff as 71010cf82a, phase tip 1b33789ba4 | harvest_feast (kind junk, ItemDef.feast {charges 10, 3600 ticks, dishItemId evergarden_braised_greens}) + recipe_harvest_feast (FARM_RECIPES 14, reagent-dormant under (ca)); placeFeast/consumeFeast on IWorldFarming (331 = 88 + 243); the farm_feast entity on the normal snapshot; one-active-per-placer; the bite is a consume slot at the capstone dish (the one updateRegen mint site); the lootable re-arm trap found BY PLAYING and fixed; beat P appended (draws 110 unchanged, md5 9dfd1c6e); five-review round + qa-checklist 0 standing BLOCKING; gate run 2 all 12 green |
-| Phase 12 QA | DONE 2026-08-19 (PASS-WITH-FOLLOWUPS) | fix/farming-phase-12-qa off 2445de46ab (e56707a675 still newest, no absorb); merge hash in the notes tail | All four emphases proven first-hand over the real wire (three-session lifecycle incl. placer-eats-own and latecomer denies; the ledger survives leave/rejoin on the characterId key; nothing serializes, save blobs + db calls captured clean; the re-arm class online through a real ClientWorld mirror); ONE real defect found and fixed test-first (the instance-teardown leak: a feast placed in a dungeon instance outlived the run); the re-arm dodge amended to the Infinity sentinel (worst-case margin was ONE tick, four lanes converged); flourish rebuild-replay silenced + FEAST_SHADOW_CAP 8 (presence never culled); five decisive arms added (swim-bite, exact-range, keyed placer, orphan window, behavioral bags click); mutations 12/12 killed named; 3 audit lanes + 5 reviewers + qa-checklist, 0 BLOCKING anywhere |
+| Phase 12 QA | DONE 2026-08-19 (PASS-WITH-FOLLOWUPS) | fix/farming-phase-12-qa off 2445de46ab (e56707a675 still newest, no absorb); merge hash in the notes tail | All four emphases proven first-hand over the real wire (three-session lifecycle incl. placer-eats-own and latecomer denies; the ledger survives leave/rejoin on the characterId key; nothing serializes, save blobs + db calls captured clean; the re-arm class online through a real ClientWorld mirror); ONE real defect class found and fixed test-first in BOTH legs (the teardown leak: a feast placed in a dungeon instance or a delve run outlived it); the re-arm dodge amended to the Infinity sentinel (worst-case margin was ONE tick, four lanes converged); flourish rebuild-replay silenced + FEAST_SHADOW_CAP 8 (presence never culled); six decisive arms added (swim-bite, exact-range, keyed placer, orphan window, delve lifecycle, behavioral bags click); mutations 13/13 killed named; 3 audit lanes + 5 reviewers + qa-checklist READY, 0 BLOCKING anywhere |
 | Phase 13 (integration polish) | not started | | |
 | Phase 13 QA (final; teardown offer) | not started | | |
 
@@ -3323,7 +3323,7 @@ dispatch, a throwaway probe suite run green then deleted):
   candidate set (which requires entity.lootable) while
   nearestInteractableFeast resolved it.
 
-FIXES (five commits on the QA branch, each test-first):
+FIXES (six commits on the QA branch, each test-first):
 1. THE INSTANCE-TEARDOWN LEAK (the architecture reviewer's find, REPRODUCED
    with a failing arm before the fix): a feast placed inside a dungeon
    instance was never registered in inst.objectIds, so freeInstance left the
@@ -3332,6 +3332,11 @@ FIXES (five commits on the QA branch, each test-first):
    entity in the CLAIMED instance's teardown roster at placement; the sweep's
    entities.has inverse-cleanup leg reclaims the state and the slot.
    Placement inside instances stays LEGAL (the raid-table flavor).
+   THE DELVE TWIN (the qa-checklist adversarial find, its own commit): delve
+   runs are a separate spatial system with their own roster, so the same
+   leak stood there; the feast now joins the placer's run.objectIds
+   (delveRunForPlayer), torn down by freeDelveRun AND the module advance,
+   reproduced failing-first the same way.
 2. The re-arm dodge replaced with the INFINITY SENTINEL: the finite spawn
    timer (durationTicks + 20 ticks) was silently coupled to the 1 Hz sweep
    period across two files with a probe-measured worst-case margin of
@@ -3353,13 +3358,13 @@ FIXES (five commits on the QA branch, each test-first):
    shadow casting budgeted at FEAST_SHADOW_CAP = 8 tables, presence never
    culled (actionable). Both pinned by new adapter arms.
 
-MUTATIONS 12/12 KILLED named through the dirty-refusing runner (each with a
+MUTATIONS 13/13 KILLED named through the dirty-refusing runner (each with a
 nonzero exit code, named failing tests, the summary line, and a landing-proof
 grep): the swim-gate deletion, the finite no-margin respawn, one-active-by
 -entity-id, range >=, the !entity leg drop, ledger-by-entity-id, expiry
 strict >, state-never-deleted (8 named reds), the instance-registration drop,
-flourish-always, shadow-budget-unbounded, and place-case-to-useItem (both the
-source pin and the behavioral arm red). The build round's deliberate
+the delve-registration drop, flourish-always, shadow-budget-unbounded, and
+place-case-to-useItem (both the source pin and the behavioral arm red). The build round's deliberate
 HEAVY_SELF place_feast survivor stays recorded, not re-run. DOC NOTE: the
 build round's own kill list was never itemized in this file (the 9/9 list in
 the Phase 11 block is Phase 11's); the omission is recorded here, the kills
@@ -3390,6 +3395,13 @@ rule-of-three watch, the nameplate hysteresis pad, the wiki effect-prose
 generator gap, the malformed-id host asymmetry).
 
 NOTES TAIL (records):
+- qa-checklist (dispatched LAST over the QA branch's own diff): READY, zero
+  BLOCKING; its one SHOULD-FIX (the delve teardown symmetry) was fixed
+  test-first as the sixth commit and its mutant killed named; its remaining
+  notes are accepted and folded into the state.md ledger (the own-placement
+  first-pass flourish clause, the expiry arm's upper-bound-only despawn
+  assertion, the rebuild arm's shared-scene note, the bounded
+  inst.objectIds growth).
 
 ### Phase 13
 (not started)
