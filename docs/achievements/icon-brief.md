@@ -110,9 +110,11 @@ Exploration (the walk-in castles):
 
 Seven new ids from the farming celebrations pass (D13), same delivery contract
 as above: one 512x512 RGBA PNG per deed, named exactly by deed id, ingested
-with `npm run assets:deeds <source-dir>`. All seven ride their procedural
-category crests until the paintings land (enumerated in `DEED_ART_PENDING`,
-`src/ui/icons.ts`).
+with `npm run assets:deeds <source-dir>`. Six of the seven ride their
+procedural category crests until the paintings land (enumerated in
+`DEED_ART_PENDING`, `src/ui/icons.ts`); `prog_farming_100` is the exception,
+shipped with a COMMITTED interim crest because the Reliquary title shelf
+forbids fallback art for title deeds (see its row's NOTE below).
 
 Progression and chronicle (the planting and first-harvest line):
 
