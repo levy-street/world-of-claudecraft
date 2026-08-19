@@ -35,9 +35,9 @@ function world(): Sim {
 }
 
 // Fixture reset days in this file are deliberately NOT Saturdays: the weekly
-// Double Honor event (src/sim/pvp/honor_event.ts) doubles every grant on a
-// Saturday reset day, and these suites pin the BASE amounts. The event has its
-// own describe at the bottom, on a Saturday key on purpose.
+// Double Honor event (src/sim/pvp/honor_event.ts) doubles every battleground
+// award on a Saturday reset day, and these suites pin the BASE amounts. The
+// event has its own describe near the bottom, on a Saturday key on purpose.
 
 function liveArena(): { sim: Sim; a: number; b: number; match: ArenaMatch } {
   const sim = world();
@@ -599,28 +599,50 @@ describe('Thornhollow Fields honor income', () => {
 });
 
 describe('weekly Double Honor', () => {
-  it('doubles every grant on a Saturday reset day, before the single floor', () => {
+  it('doubles battleground kill and assist drips before the single floor, and only on Saturday', () => {
     const sim = world();
     sim.resetDay = '2026-08-15'; // a Saturday
     const pid = sim.addPlayer('warrior', 'Weekender');
     const meta = sim.meta(pid)!;
 
-    expect(grantHonor(sim.ctx, meta, 60, 'battleground_win')).toBe(120);
+    // Doubled BEFORE grantHonor's single floor: the third (0.25-decayed) kill
+    // pays floor(5 * 0.25 * 2) = 2, and the second pays 5, never floor-then-double.
+    const kills = new Map<string, number>();
+    expect(
+      Array.from({ length: 5 }, () => awardBattlegroundKillHonor(sim.ctx, meta, 99, kills)),
+    ).toEqual([10, 5, 2, 0, 0]);
+    const assists = new Map<string, number>();
+    expect(
+      Array.from({ length: 5 }, () => awardBattlegroundAssistHonor(sim.ctx, meta, 99, assists)),
+    ).toEqual([4, 2, 1, 0, 0]);
     expect(sim.events).toContainEqual({
       type: 'honor',
       pid,
-      amount: 120,
-      reason: 'battleground_win',
+      amount: 10,
+      reason: 'battleground_kill',
     });
-    // Doubled BEFORE the single floor: a decayed 2.5 drip credits 5, not
-    // floor(2.5) * 2 = 4.
-    expect(grantHonor(sim.ctx, meta, 2.5, 'battleground_kill')).toBe(5);
-    expect(meta.honor).toBe(125);
-    expect(meta.lifetimeHonor).toBe(125);
 
     // The rollover into Sunday closes the window.
     sim.resetDay = '2026-08-16';
-    expect(grantHonor(sim.ctx, meta, 60, 'battleground_win')).toBe(60);
+    const sunday = new Map<string, number>();
+    expect(awardBattlegroundKillHonor(sim.ctx, meta, 100, sunday)).toBe(5);
+  });
+
+  it('leaves arena and Fiesta honor at base rate on Saturday (5v5-only scope)', () => {
+    const sim = world();
+    sim.resetDay = '2026-08-15'; // a Saturday
+    const pid = sim.addPlayer('warrior', 'Purist', { characterId: 703 });
+    const meta = sim.meta(pid)!;
+
+    // The issue scopes the event to the 5v5 CTF explicitly, so a Saturday
+    // ranked arena win and a Fiesta kill both pay exactly their weekday rate.
+    expect(awardRankedArenaResultHonor(sim.ctx, meta, '1v1', '["character:foe"]', 'win')).toBe(
+      RANKED_ARENA_WIN_HONOR['1v1'],
+    );
+    const pairs = new Map<string, number>();
+    expect(awardFiestaKillHonor(sim.ctx, meta, 99, pairs)).toBe(FIESTA_KILL_HONOR);
+    // And the funnel itself never applies the event: raw grants stay raw.
+    expect(grantHonor(sim.ctx, meta, 60, 'arena_win')).toBe(60);
   });
 
   it('doubles the whole battleground result, first-win bonus included, with the DR curve intact', () => {
@@ -642,7 +664,10 @@ describe('weekly Double Honor', () => {
   it('never fires without a host calendar (the empty reset day)', () => {
     const sim = world(); // resetDay stays '': headless / replay / parity runs
     const pid = sim.addPlayer('warrior', 'Headless');
-    expect(grantHonor(sim.ctx, sim.meta(pid)!, 60, 'battleground_win')).toBe(60);
+    const kills = new Map<string, number>();
+    expect(awardBattlegroundKillHonor(sim.ctx, sim.meta(pid)!, 99, kills)).toBe(
+      BATTLEGROUND_KILL_HONOR,
+    );
   });
 });
 

@@ -1182,7 +1182,7 @@ export const sv_SE: EnTranslations = {
       "endedForfeitLog": "Matchen gavs förlorad.",
       "firstWinBonusLine": "Dagens första seger: +{honor} heder",
       "firstWinBonusLog": "Dagens första seger: du får {honor} extra heder.",
-      "doubleHonorLine": "Double Honor Day: all Honor awards pay {mult}x today",
+      "doubleHonorLine": "Double Honor Day: Thornhollow Fields Honor pays {mult}x today",
       "timeWarningMinutes": "{minutes} minuter kvar",
       "timeWarningOneMinute": "En minut kvar",
       "timeWarningMinutesLog": "{minutes} minuter återstår av striden.",
@@ -2969,7 +2969,7 @@ export const sv_SE: EnTranslations = {
         },
         "doubleHonor": {
           "title": "Double Honor Day",
-          "note": "The war camps sound the muster: every Honor award pays double until the daily reset."
+          "note": "The war camps sound the muster: Thornhollow Fields Honor pays double until the daily reset."
         },
         "fishingDerby": {
           "title": "Fisketävling",

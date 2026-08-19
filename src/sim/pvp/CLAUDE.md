@@ -10,8 +10,10 @@ ratings.
   HOST-provided UTC day, never a wall clock.
 - `honor_event.ts` owns the weekly Double Honor event: the Saturday window
   decision (pure weekday arithmetic on the host-provided `resetDay` key, no
-  `Date`) and the event multiplier `grantHonor` applies to every award. An
-  empty `resetDay` (no host calendar) never fires the event.
+  `Date`) and the event multiplier the four BATTLEGROUND award paths in
+  `honor.ts` apply (result, kill, assist, first-win bonus; arena and Fiesta
+  honor never read it, per the issue's 5v5-only scope). An empty `resetDay`
+  (no host calendar) never fires the event.
 - `power.ts` owns rating conversion, the independent offense/defense caps, and
   the hostile-player damage multiplier. It must stay pure and deterministic.
 - `warfare_quartermaster.ts` spawns Warmarshal Draven Kole, the Highwatch

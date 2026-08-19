@@ -1182,7 +1182,7 @@ export const nl_NL: EnTranslations = {
       "endedForfeitLog": "De wedstrijd werd opgegeven.",
       "firstWinBonusLine": "Eerste overwinning van de dag: +{honor} Eer",
       "firstWinBonusLog": "Eerste overwinning van de dag: je krijgt {honor} bonus Eer.",
-      "doubleHonorLine": "Double Honor Day: all Honor awards pay {mult}x today",
+      "doubleHonorLine": "Double Honor Day: Thornhollow Fields Honor pays {mult}x today",
       "timeWarningMinutes": "Nog {minutes} minuten te gaan",
       "timeWarningOneMinute": "Nog een minuut te gaan",
       "timeWarningMinutesLog": "Nog {minutes} minuten te gaan in het gevecht.",
@@ -2969,7 +2969,7 @@ export const nl_NL: EnTranslations = {
         },
         "doubleHonor": {
           "title": "Double Honor Day",
-          "note": "The war camps sound the muster: every Honor award pays double until the daily reset."
+          "note": "The war camps sound the muster: Thornhollow Fields Honor pays double until the daily reset."
         },
         "fishingDerby": {
           "title": "Visderby",

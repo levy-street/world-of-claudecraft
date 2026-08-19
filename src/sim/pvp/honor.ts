@@ -155,13 +155,7 @@ export function grantHonor(
   amount: number,
   reason: HonorReason,
 ): number {
-  // The weekly Double Honor event multiplies here, in the one funnel every
-  // grant routes through, so no award path (result, kill drip, first-win
-  // bonus, arena, Fiesta) can be added later that silently misses the event.
-  // Applied BEFORE the single floor below: a decayed kill drip of 2.5 doubles
-  // to a credited 5, not floor(2)*2 = 4, which is the generous reading of
-  // "doubled" and keeps the floor happening exactly once.
-  const requested = safeHonorAmount(amount * honorEventMultiplier(ctx.resetDay));
+  const requested = safeHonorAmount(amount);
   if (requested === 0) return 0;
   const honorBefore = meta.honor;
   const lifetimeBefore = meta.lifetimeHonor;
@@ -331,10 +325,16 @@ export function awardBattlegroundHonor(
   results[key] = repeats + 1;
   const base = outcome === 'win' ? BATTLEGROUND_WIN_HONOR : BATTLEGROUND_LOSS_HONOR;
   const reason: HonorReason = outcome === 'win' ? 'battleground_win' : 'battleground_complete';
+  // The weekly Double Honor event multiplies every BATTLEGROUND award (this
+  // result, the kill and assist drips, and the first-win bonus below) and
+  // nothing else: the issue that asked for the event scopes it to the 5v5
+  // CTF explicitly, which is also the classic-era battleground-holiday shape.
+  // The anti-farm decay applies first, then the event, inside the one floor.
+  const eventMult = honorEventMultiplier(ctx.resetDay);
   let total = grantHonor(
     ctx,
     meta,
-    Math.floor(base * battlegroundResultMultiplier(repeats)),
+    Math.floor(base * battlegroundResultMultiplier(repeats) * eventMult),
     reason,
   );
   let firstWinBonus = 0;
@@ -348,7 +348,7 @@ export function awardBattlegroundHonor(
     firstWinBonus = grantHonor(
       ctx,
       meta,
-      BATTLEGROUND_FIRST_WIN_BONUS_HONOR,
+      BATTLEGROUND_FIRST_WIN_BONUS_HONOR * eventMult,
       'battleground_first_win',
     );
     // The claim is spent only if the grant actually PAID. grantHonor credits
@@ -374,10 +374,12 @@ export function awardBattlegroundKillHonor(
   const key = `${meta.entityId}:${victimPid}`;
   const repeats = killsByPair.get(key) ?? 0;
   killsByPair.set(key, repeats + 1);
+  // Doubled by the weekly event BEFORE grantHonor's single floor, so a decayed
+  // 2.5 drip pays 5 on the event day, not floor(2.5) * 2 = 4.
   return grantHonor(
     ctx,
     meta,
-    BATTLEGROUND_KILL_HONOR * repeatHonorMultiplier(repeats),
+    BATTLEGROUND_KILL_HONOR * repeatHonorMultiplier(repeats) * honorEventMultiplier(ctx.resetDay),
     'battleground_kill',
   );
 }
@@ -395,7 +397,7 @@ export function awardBattlegroundAssistHonor(
   return grantHonor(
     ctx,
     meta,
-    BATTLEGROUND_ASSIST_HONOR * repeatHonorMultiplier(repeats),
+    BATTLEGROUND_ASSIST_HONOR * repeatHonorMultiplier(repeats) * honorEventMultiplier(ctx.resetDay),
     'battleground_assist',
   );
 }

@@ -1182,7 +1182,7 @@ export const zh_TW: EnTranslations = {
       "endedForfeitLog": "本場比賽以棄權告終。",
       "firstWinBonusLine": "每日首勝:+{honor}榮譽",
       "firstWinBonusLog": "每日首勝:你額外獲得{honor}點榮譽。",
-      "doubleHonorLine": "雙倍榮譽日:今日所有榮譽獎勵均為{mult}倍",
+      "doubleHonorLine": "雙倍榮譽日:今日荊谷原野榮譽獎勵均為{mult}倍",
       "timeWarningMinutes": "還剩{minutes}分鐘",
       "timeWarningOneMinute": "還剩一分鐘",
       "timeWarningMinutesLog": "本場戰鬥還剩{minutes}分鐘。",
@@ -2969,7 +2969,7 @@ export const zh_TW: EnTranslations = {
         },
         "doubleHonor": {
           "title": "雙倍榮譽日",
-          "note": "戰營吹響集結號：每日重置前，所有榮譽獎勵加倍。"
+          "note": "戰營吹響集結號：每日重置前，荊谷原野榮譽獎勵加倍。"
         },
         "fishingDerby": {
           "title": "釣魚大賽",

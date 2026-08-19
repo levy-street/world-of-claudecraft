@@ -1182,7 +1182,7 @@ export const en: EnTranslations = {
       "endedForfeitLog": "The match was forfeited.",
       "firstWinBonusLine": "First win of the day: +{honor} Honor",
       "firstWinBonusLog": "First win of the day: you gain {honor} bonus Honor.",
-      "doubleHonorLine": "Double Honor Day: all Honor awards pay {mult}x today",
+      "doubleHonorLine": "Double Honor Day: Thornhollow Fields Honor pays {mult}x today",
       "timeWarningMinutes": "{minutes} minutes remain",
       "timeWarningOneMinute": "One minute remains",
       "timeWarningMinutesLog": "{minutes} minutes remain in the battle.",
@@ -2969,7 +2969,7 @@ export const en: EnTranslations = {
         },
         "doubleHonor": {
           "title": "Double Honor Day",
-          "note": "The war camps sound the muster: every Honor award pays double until the daily reset."
+          "note": "The war camps sound the muster: Thornhollow Fields Honor pays double until the daily reset."
         },
         "fishingDerby": {
           "title": "Fishing Derby",

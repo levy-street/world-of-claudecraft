@@ -1182,7 +1182,7 @@ export const en_XA: EnTranslations = {
       "endedForfeitLog": "[Ţĥé ɱáţçĥ ŵáš ƒóŕƒéíţéð.]",
       "firstWinBonusLine": "[Ƒíŕšţ ŵíñ óƒ ţĥé ðáý: +{honor} Ĥóñóŕ]",
       "firstWinBonusLog": "[Ƒíŕšţ ŵíñ óƒ ţĥé ðáý: ýóú ĝáíñ {honor} ƀóñúš Ĥóñóŕ.]",
-      "doubleHonorLine": "[Ðóúƀļé Ĥóñóŕ Ðáý: áļļ Ĥóñóŕ áŵáŕðš þáý {mult}ẋ ţóðáý]",
+      "doubleHonorLine": "[Ðóúƀļé Ĥóñóŕ Ðáý: Ţĥóŕñĥóļļóŵ Ƒíéļðš Ĥóñóŕ þáýš {mult}ẋ ţóðáý]",
       "timeWarningMinutes": "[{minutes} ɱíñúţéš ŕéɱáíñ]",
       "timeWarningOneMinute": "[Óñé ɱíñúţé ŕéɱáíñš]",
       "timeWarningMinutesLog": "[{minutes} ɱíñúţéš ŕéɱáíñ íñ ţĥé ƀáţţļé.]",
@@ -2969,7 +2969,7 @@ export const en_XA: EnTranslations = {
         },
         "doubleHonor": {
           "title": "[Ðóúƀļé Ĥóñóŕ Ðáý]",
-          "note": "[Ţĥé ŵáŕ çáɱþš šóúñð ţĥé ɱúšţéŕ: éʋéŕý Ĥóñóŕ áŵáŕð þáýš ðóúƀļé úñţíļ ţĥé ðáíļý ŕéšéţ.]"
+          "note": "[Ţĥé ŵáŕ çáɱþš šóúñð ţĥé ɱúšţéŕ: Ţĥóŕñĥóļļóŵ Ƒíéļðš Ĥóñóŕ þáýš ðóúƀļé úñţíļ ţĥé ðáíļý ŕéšéţ.]"
         },
         "fishingDerby": {
           "title": "[Ƒíšĥíñĝ Ðéŕƀý]",

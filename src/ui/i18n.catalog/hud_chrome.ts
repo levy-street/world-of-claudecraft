@@ -1089,8 +1089,9 @@ export const hudChromeStrings = {
     firstWinBonusLog: 'First win of the day: you gain {honor} bonus Honor.',
     // The weekly Double Honor event chip ({mult} is the event multiplier,
     // formatted). One key for the one surface; the calendar row below carries
-    // its own longer copy.
-    doubleHonorLine: 'Double Honor Day: all Honor awards pay {mult}x today',
+    // its own longer copy. Scoped copy on purpose: the event doubles
+    // Thornhollow Fields honor only, never arena or Fiesta honor.
+    doubleHonorLine: 'Double Honor Day: Thornhollow Fields Honor pays {mult}x today',
     // Remaining-time calls, announced to the whole field (BG_TIME_WARNINGS).
     timeWarningMinutes: '{minutes} minutes remain',
     timeWarningOneMinute: 'One minute remains',
@@ -3589,7 +3590,7 @@ export const hudChromeStrings = {
       },
       doubleHonor: {
         title: 'Double Honor Day',
-        note: 'The war camps sound the muster: every Honor award pays double until the daily reset.',
+        note: 'The war camps sound the muster: Thornhollow Fields Honor pays double until the daily reset.',
       },
       fishingDerby: {
         title: 'Fishing Derby',

@@ -117,10 +117,11 @@ export interface BgInfo {
    *  the chip is an invitation, never actionable in-match information. */
   firstWinBonusReady: boolean;
   /** The weekly Double Honor event (src/sim/pvp/honor_event.ts) is running:
-   *  every honor grant pays DOUBLE_HONOR_MULTIPLIER times its normal amount
-   *  until the realm's next daily reset. Drives the event chip on the
-   *  Thornhollow Fields tab; a realm-wide fact on the same reset-day boundary
-   *  as `firstWinBonusReady` above, riding the same refresh cadence. */
+   *  every Thornhollow Fields honor award pays DOUBLE_HONOR_MULTIPLIER times
+   *  its normal amount until the realm's next daily reset (battleground only,
+   *  never arena or Fiesta honor). Drives the event chip on the Thornhollow
+   *  Fields tab; a realm-wide fact on the same reset-day boundary as
+   *  `firstWinBonusReady` above, riding the same refresh cadence. */
   doubleHonorActive: boolean;
   /** The live queue-pop offer awaiting my answer, or null. Counts only, never
    *  names: the ten have not been introduced, and a decline must not leak who

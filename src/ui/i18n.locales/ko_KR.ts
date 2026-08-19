@@ -1090,7 +1090,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.endedForfeitLog': '이 경기는 기권으로 끝났습니다.',
   'hudChrome.bg.firstWinBonusLine': '오늘의 첫 승리: 명예 +{honor}',
   'hudChrome.bg.firstWinBonusLog': '오늘의 첫 승리: 추가로 명예를 {honor} 획득했습니다.',
-  'hudChrome.bg.doubleHonorLine': '명예 2배의 날: 오늘 모든 명예 보상이 {mult}배로 지급됩니다',
+  'hudChrome.bg.doubleHonorLine': '명예 2배의 날: 오늘 쏜할로우 평원 명예 보상이 {mult}배로 지급됩니다',
   'hudChrome.bg.timeWarningMinutes': '{minutes}분 남았습니다',
   'hudChrome.bg.timeWarningOneMinute': '1분 남았습니다',
   'hudChrome.bg.timeWarningMinutesLog': '전투가 {minutes}분 남았습니다.',
@@ -8729,7 +8729,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '결투사들이 잿빛 투기장으로 몰려듭니다. 대기열에 올라 순위를 노리세요.',
   'hudChrome.calendar.events.doubleHonor.title': '명예 2배의 날',
   'hudChrome.calendar.events.doubleHonor.note':
-    '전쟁 진영이 소집 나팔을 붑니다. 일일 초기화까지 모든 명예 보상이 2배가 됩니다.',
+    '전쟁 진영이 소집 나팔을 붑니다. 일일 초기화까지 쏜할로우 평원 명예 보상이 2배가 됩니다.',
   'hudChrome.calendar.events.fishingDerby.title': '낚시 대회',
   'hudChrome.calendar.events.fishingDerby.note':
     '낚시꾼들이 호숫가에 늘어섭니다. 낚싯대를 들고 이야기꽃을 피우세요.',

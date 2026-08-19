@@ -1,9 +1,14 @@
-// Weekly Double Honor: every Saturday, every honor grant pays double. The
-// weekly cadence exists to concentrate the PvP population into one predictable
-// day so the 5v5 queue actually pops (issue: casual players cannot progress
-// toward Warfare gear when the queue is dead six days a week), which is why the
-// bonus is a flat realm-wide day rather than a per-player hook like the
-// first-win bonus.
+// Weekly Double Honor: every Saturday, every Thornhollow Fields (5v5 CTF)
+// honor award pays double. The 5v5-only scope is the issue's own ask ("Double
+// Honor Saturday, 5v5 CTF only") and the classic-era shape: battleground
+// holiday weekends boosted ONE battleground's honor faucet, never the arena's.
+// The weekly cadence exists to concentrate the PvP population into one
+// predictable day so the ten-player queue actually pops (casual players cannot
+// progress toward Warfare gear while the queue is dead six days a week), which
+// is why the bonus is a flat realm-wide day rather than a per-player hook like
+// the first-win bonus. The multiplier is applied by honor.ts inside the four
+// battleground award paths (result, kill, assist, first-win bonus); arena and
+// Fiesta honor never read it.
 //
 // "Saturday" is the realm's own reset window: the day is read from the
 // HOST-provided `resetDay` key (the same boundary the first-win bonus and the
@@ -23,12 +28,12 @@
  *  issue's ask: the community day the queue should concentrate into. */
 export const DOUBLE_HONOR_WEEKDAY = 6;
 
-/** Event multiplier applied to every honor grant while the window is open.
- *  2x is owner tuning in the same spirit as the classic-era battleground
- *  holiday weekends (which roughly doubled a battleground's honor faucet for
- *  their weekend); like the 60/20 result awards it is sized for participation,
- *  not derived from a documented classic curve. Revisit against live Saturday
- *  queue data. */
+/** Event multiplier applied to every battleground honor award while the
+ *  window is open. 2x is owner tuning in the same spirit as the classic-era
+ *  battleground holiday weekends (which roughly doubled a battleground's
+ *  honor faucet for their weekend); like the 60/20 result awards it is sized
+ *  for participation, not derived from a documented classic curve. Revisit
+ *  against live Saturday queue data. */
 export const DOUBLE_HONOR_MULTIPLIER = 2;
 
 // Sakamoto's day-of-week congruence, month offsets for January..December.
@@ -65,8 +70,8 @@ export function doubleHonorActive(resetDay: string): boolean {
   return weekdayOfDayKey(resetDay) === DOUBLE_HONOR_WEEKDAY;
 }
 
-/** The factor `grantHonor` applies to every award: DOUBLE_HONOR_MULTIPLIER
- *  while the Saturday window is open, otherwise 1. */
+/** The factor honor.ts applies to every battleground award:
+ *  DOUBLE_HONOR_MULTIPLIER while the Saturday window is open, otherwise 1. */
 export function honorEventMultiplier(resetDay: string): number {
   return doubleHonorActive(resetDay) ? DOUBLE_HONOR_MULTIPLIER : 1;
 }

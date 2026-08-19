@@ -1182,7 +1182,7 @@ export const ru_RU: EnTranslations = {
       "endedForfeitLog": "Бой завершён отказом.",
       "firstWinBonusLine": "Первая победа за день: +{honor} чести",
       "firstWinBonusLog": "Первая победа за день: вы получаете {honor} очк. чести дополнительно.",
-      "doubleHonorLine": "День двойной чести: сегодня все награды чести умножаются на {mult}",
+      "doubleHonorLine": "День двойной чести: сегодня награды чести Терновой Лощины умножаются на {mult}",
       "timeWarningMinutes": "Осталось {minutes} мин.",
       "timeWarningOneMinute": "Осталась одна минута",
       "timeWarningMinutesLog": "До конца боя осталось {minutes} мин.",
@@ -2969,7 +2969,7 @@ export const ru_RU: EnTranslations = {
         },
         "doubleHonor": {
           "title": "День двойной чести",
-          "note": "Военные лагеря трубят сбор: до ежедневного сброса все награды чести удваиваются."
+          "note": "Военные лагеря трубят сбор: до ежедневного сброса награды чести Терновой Лощины удваиваются."
         },
         "fishingDerby": {
           "title": "Рыбацкое дерби",

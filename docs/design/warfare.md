@@ -288,16 +288,18 @@ Phase 1 starts with these owner-selected values:
   award (`BATTLEGROUND_FIRST_WIN_BONUS_HONOR`), so the day's first win pays 80
   against a routine 60, a ratio of 1.33x.
 
-Every Saturday is Double Honor Day: every Honor grant, all modes and all award
-types (results, the kill and assist drip, the first-win bonus, arena, Fiesta),
-pays `DOUBLE_HONOR_MULTIPLIER` (2x) times its normal amount for the whole reset
-window (`src/sim/pvp/honor_event.ts`, applied inside `grantHonor` before its
-single floor). The day is the realm's own reset-day window, read from the
-host-provided `resetDay` key, so the event opens and closes at the realm's
+Every Saturday is Double Honor Day: every Thornhollow Fields Honor award (the
+result, the kill and assist drip, and the first-win bonus) pays
+`DOUBLE_HONOR_MULTIPLIER` (2x) times its normal amount for the whole reset
+window (`src/sim/pvp/honor_event.ts`, applied by the battleground award paths
+in `honor.ts` before their single floor). Battleground only, never arena or
+Fiesta Honor: that is the scope the feature request asked for by name, and it
+is the classic-era shape, where a battleground holiday weekend boosted one
+battleground's faucet. The day is the realm's own reset-day window, read from
+the host-provided `resetDay` key, so the event opens and closes at the realm's
 3 AM reset like every other daily boundary; a host that sets no calendar never
 runs the event. The weekly cadence exists to concentrate the PvP population
-into one predictable day so the 5v5 queue pops, in the spirit of the
-classic-era battleground holiday weekends; 2x is owner tuning to revisit
+into one predictable day so the 5v5 queue pops; 2x is owner tuning to revisit
 against live Saturday queue data. The diminishing-returns curves below apply
 first, then the doubling: the event raises the whole day's income without
 weakening any anti-farm rule.
