@@ -8464,6 +8464,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.plantSheet.plant': '種植',
   'hudChrome.farming.plantSheet.sowAria': '播種{name}',
   'hudChrome.farming.plantSheet.empty': '你沒有可以在這塊田裡播種的種子。',
+  'hudChrome.farming.plantSheet.close': '關閉種植面板',
   'hudChrome.farming.denied.bed_taken': '你已經在那裡種下了作物。',
   'hudChrome.farming.denied.skill': '你的耕作技能不足以種植該作物。',
   'hudChrome.farming.denied.no_seed': '你沒有該作物的種子。',

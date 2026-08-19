@@ -3121,7 +3121,8 @@ export const ru_RU: EnTranslations = {
         "title": "Посадить культуру",
         "plant": "Посадить",
         "sowAria": "Посеять: {name}",
-        "empty": "У вас нет семян, которые можно посеять на этой грядке."
+        "empty": "У вас нет семян, которые можно посеять на этой грядке.",
+        "close": "Закрыть окно посадки"
       },
       "husksConvertedLine": "Вы обмениваете {husksName} x{husks} на {name}.",
       "husksConvertedLineQty": "Вы обмениваете {husksName} x{husks} на {name} x{qty}.",

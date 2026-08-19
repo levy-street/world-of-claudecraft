@@ -9031,6 +9031,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.plantSheet.plant': 'Посадить',
   'hudChrome.farming.plantSheet.sowAria': 'Посеять: {name}',
   'hudChrome.farming.plantSheet.empty': 'У вас нет семян, которые можно посеять на этой грядке.',
+  'hudChrome.farming.plantSheet.close': 'Закрыть окно посадки',
   'hudChrome.farming.denied.bed_taken': 'Там у вас уже растет урожай.',
   'hudChrome.farming.denied.skill': 'Ваш навык земледелия слишком низок для этой культуры.',
   'hudChrome.farming.denied.no_seed': 'У вас нет семян этой культуры.',

@@ -3121,7 +3121,8 @@ export const zh_TW: EnTranslations = {
         "title": "種植作物",
         "plant": "種植",
         "sowAria": "播種{name}",
-        "empty": "你沒有可以在這塊田裡播種的種子。"
+        "empty": "你沒有可以在這塊田裡播種的種子。",
+        "close": "關閉種植面板"
       },
       "husksConvertedLine": "你用{husksName} x{husks}換取了{name}。",
       "husksConvertedLineQty": "你用{husksName} x{husks}換取了{name} x{qty}。",

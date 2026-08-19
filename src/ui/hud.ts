@@ -2731,6 +2731,7 @@ export class Hud {
       '#reliquary-window',
       '#professions-window',
       '#harvest-journal-window',
+      '#plant-sheet-window',
     ]) {
       $(panelId).addEventListener('keydown', (e) => {
         if ((e.target as HTMLElement).tagName !== 'BUTTON') return;
@@ -6434,6 +6435,7 @@ export class Hud {
     if (this.reliquaryWindow.isOpen) this.reliquaryWindow.render();
     if (this.professionsWindow.isOpen) this.professionsWindow.render();
     if (this.harvestJournalWindow.isOpen) this.harvestJournalWindow.render();
+    this.plantSheetWindow.relocalize();
     // The crafting window's repaint memos (station set, reagent sig, the
     // profession surface sig) are all text-independent, so a language switch
     // alone never moves them and an open window kept the previous locale
@@ -18585,7 +18587,7 @@ export class Hud {
   private openReportWindow(target: { pid?: number; name: string }): void {
     openReportWindow(
       {
-        reportHooks: this.reportHooks,
+        reportHooks: () => this.reportHooks,
         closeOtherWindows: (keep) => this.closeOtherWindows(keep),
         buildDropdown: (options, current, onChange, placeholder, a11y) =>
           this.buildDropdown(options, current, onChange, placeholder, a11y),

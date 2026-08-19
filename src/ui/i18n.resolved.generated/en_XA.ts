@@ -3121,7 +3121,8 @@ export const en_XA: EnTranslations = {
         "title": "[Þļáñţ á Çŕóþ]",
         "plant": "[Þļáñţ]",
         "sowAria": "[Šóŵ {name}]",
-        "empty": "[Ýóú ĥáʋé ñó šééð ýóú çáñ šóŵ áţ ţĥíš ƀéð.]"
+        "empty": "[Ýóú ĥáʋé ñó šééð ýóú çáñ šóŵ áţ ţĥíš ƀéð.]",
+        "close": "[Çļóšé ţĥé þļáñţ šĥééţ]"
       },
       "husksConvertedLine": "[Ýóú ţŕáðé {husksName} ẋ{husks} ƒóŕ {name}.]",
       "husksConvertedLineQty": "[Ýóú ţŕáðé {husksName} ẋ{husks} ƒóŕ {name} ẋ{qty}.]",

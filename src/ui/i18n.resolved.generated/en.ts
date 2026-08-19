@@ -3121,7 +3121,8 @@ export const en: EnTranslations = {
         "title": "Plant a Crop",
         "plant": "Plant",
         "sowAria": "Sow {name}",
-        "empty": "You have no seed you can sow at this bed."
+        "empty": "You have no seed you can sow at this bed.",
+        "close": "Close the plant sheet"
       },
       "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
       "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",

@@ -8854,6 +8854,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.plantSheet.plant': '植える',
   'hudChrome.farming.plantSheet.sowAria': '{name}を蒔く',
   'hudChrome.farming.plantSheet.empty': 'この畑に蒔ける種を持っていません。',
+  'hudChrome.farming.plantSheet.close': '植え付けシートを閉じる',
   'hudChrome.farming.denied.bed_taken': 'そこにはすでに作物が育っています。',
   'hudChrome.farming.denied.skill': 'その作物を育てるには農耕スキルが足りません。',
   'hudChrome.farming.denied.no_seed': 'その作物の種を持っていません。',

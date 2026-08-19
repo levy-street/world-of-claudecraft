@@ -252,7 +252,19 @@ describe('isEscorteeEntity', () => {
 });
 
 describe('the Interact action reaches the escort run (tryNearbyInteraction)', () => {
-  function rig(list: Entity[], player: Entity, log = activeLog()) {
+  function rig(
+    list: Entity[],
+    player: Entity,
+    log = activeLog(),
+    farmPatches: {
+      id: string;
+      zoneId: string;
+      tier: 1;
+      x: number;
+      z: number;
+      beds: { id: string; x: number; z: number }[];
+    }[] = [],
+  ) {
     const calls: string[] = [];
     const world = {
       playerId: player.id,
@@ -275,8 +287,8 @@ describe('the Interact action reaches the escort run (tryNearbyInteraction)', ()
       leaveDungeon: () => false as const,
       pickUpObject: () => false as const,
       nodeHarvestableByMe: () => true,
-      // Phase 9b bed-arm seam members: inert here (lane A's arms exercise them).
-      farmPatches: [] as const,
+      // Phase 9b bed-arm seam members (the ordering arms below exercise them).
+      farmPatches,
       myFarmPlots: [] as const,
       harvestCrop: (bedId: string) => {
         calls.push(`harvestCrop:${bedId}`);
@@ -313,6 +325,28 @@ describe('the Interact action reaches the escort run (tryNearbyInteraction)', ()
 
     expect(r.press()).toBe(false);
     expect(r.calls).toEqual([`error:${AWAY_TEXT}`]);
+  });
+
+  it('a free bed underfoot outranks the escort-away last resort', () => {
+    // Empty post (quest active, escortee absent) PLUS a bed in reach: the
+    // bed arm sits above the away line, so the press farms instead of
+    // toasting (the ordering the arm's comment claims).
+    const bed = { id: 'bed_order_1', x: WREN.start.x, z: WREN.start.z };
+    const r = rig([], playerAt(WREN.start.x, WREN.start.z), activeLog(), [
+      { id: 'patch_order', zoneId: 'eastbrook_vale', tier: 1, x: bed.x, z: bed.z, beds: [bed] },
+    ]);
+    expect(r.press()).toBe(true);
+    expect(r.calls).toEqual(['plantSheet:bed_order_1']);
+  });
+
+  it('an escortee in reach outranks a bed underfoot (escort start stays above the bed arm)', () => {
+    const wren = escorteeAt();
+    const bed = { id: 'bed_order_2', x: WREN.start.x + 1, z: WREN.start.z };
+    const r = rig([wren], playerAt(WREN.start.x + 1, WREN.start.z), activeLog(), [
+      { id: 'patch_order', zoneId: 'eastbrook_vale', tier: 1, x: bed.x, z: bed.z, beds: [bed] },
+    ]);
+    expect(r.press()).toBe(true);
+    expect(r.calls).toEqual([`target:${wren.id}`, 'interact']);
   });
 
   it('never swallows a corpse press: looting the ambush wave still wins', () => {

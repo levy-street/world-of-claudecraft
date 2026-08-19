@@ -262,6 +262,24 @@ describe('plant sheet core: the two world shapes', () => {
       slot('garden_hoe', 1),
       slot(FARM_COMPOST_ITEM_ID, 1),
     ];
-    expect(buildPlantSheetView(input(simShaped))).toEqual(buildPlantSheetView(input(clientShaped)));
+    // Anchor before comparing: two nulls or two empty models would satisfy
+    // toEqual vacuously (the review's S7).
+    const simModel = buildPlantSheetView(input(simShaped));
+    expect(simModel).not.toBeNull();
+    expect(simModel?.seedRows.map((row) => row.cropId)).toEqual([WHEAT.id]);
+    expect(simModel?.selectedCropId).toBe(WHEAT.id);
+    expect(simModel).toEqual(buildPlantSheetView(input(clientShaped)));
+  });
+
+  it("pins compost's own shortfall line (denied.no_compost, not a sibling reason)", () => {
+    // Bags with a seed and a hoe but NO compost: the compost knob's shortfall
+    // must name its own family line (the S6 mutation gap: a swapped reason
+    // key survived every other arm).
+    const view = buildPlantSheetView(
+      input([slot(WHEAT.seedItemId, 1), slot('garden_hoe', 1)] as InvSlot[]),
+    );
+    const compost = view?.knobs.find((k) => k.id === 'compost');
+    expect(compost?.affordable).toBe(false);
+    expect(compost?.shortKey).toBe('hudChrome.farming.denied.no_compost');
   });
 });

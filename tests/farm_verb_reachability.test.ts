@@ -78,3 +78,26 @@ describe('convertHusks client reachability', () => {
     ).toBeGreaterThanOrEqual(1);
   });
 });
+
+describe('the Hud glue between the funnel and the sheet', () => {
+  // The three links a stubbed-hud suite can never see: Hud.openPlantSheet must
+  // reach the window, and the farm-event forward must reach notifyFarmEvent.
+  // Emptying either body would leave every module suite green while a real
+  // press did nothing (the (bn) shape one level up). Source pin over
+  // comment-stripped hud.ts: LINE comments strip FIRST (the flattener-order
+  // rule; a line comment holding a bare block-open would otherwise void the
+  // rest of the file), then block comments.
+  it('hud.ts wires the open route and the event forward to the plant sheet window', () => {
+    const raw = readFileSync(join(repoRoot, 'src/ui/hud.ts'), 'utf8');
+    const stripped = raw
+      .split('\n')
+      .map((line) => {
+        const i = line.indexOf('//');
+        return i >= 0 ? line.slice(0, i) : line;
+      })
+      .join('\n')
+      .replace(/\/\*[\s\S]*?\*\//g, '');
+    expect(stripped).toContain('.plantSheetWindow.open(');
+    expect(stripped).toContain('.plantSheetWindow.notifyFarmEvent(');
+  });
+});

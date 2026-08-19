@@ -113,6 +113,9 @@ const FANOUT_ARMS: readonly string[] = [
   'this.deedsWindow.render|this.deedsWindow.isOpen',
   'this.professionsWindow.render|this.professionsWindow.isOpen',
   'this.harvestJournalWindow.render|this.harvestJournalWindow.isOpen',
+  // The plant sheet's relocalize gates itself (paint only while open), so the
+  // arm carries no guard of its own.
+  'this.plantSheetWindow.relocalize|',
   // The Reliquary cold window is signature-gated (lastSig); language switch
   // must force render while open so curator rank chrome and shelf labels re-t().
   'this.reliquaryWindow.render|this.reliquaryWindow.isOpen',

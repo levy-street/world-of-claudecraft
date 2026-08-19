@@ -3121,7 +3121,8 @@ export const ko_KR: EnTranslations = {
         "title": "작물 심기",
         "plant": "심기",
         "sowAria": "{name} 뿌리기",
-        "empty": "이 밭에 뿌릴 수 있는 씨앗이 없습니다."
+        "empty": "이 밭에 뿌릴 수 있는 씨앗이 없습니다.",
+        "close": "심기 창 닫기"
       },
       "husksConvertedLine": "{husksName} x{husks}을(를) {name}(으)로 교환했습니다.",
       "husksConvertedLineQty": "{husksName} x{husks}을(를) {name} x{qty}(으)로 교환했습니다.",

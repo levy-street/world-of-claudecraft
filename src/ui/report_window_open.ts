@@ -8,7 +8,10 @@ import { t } from './i18n';
 import { svgIcon } from './ui_icons';
 
 export interface ReportWindowDeps {
-  reportHooks: {
+  /** Read LIVE at open and at submit time, never captured: the online glue
+   *  reassigns the hooks on reconnect, and a submit must post through the
+   *  current object (or degrade honestly when they are gone). */
+  reportHooks(): {
     submit(targetPid: number, reason: string, details: string): Promise<void>;
     submitByName?(targetName: string, reason: string, details: string): Promise<void>;
   } | null;
@@ -30,7 +33,7 @@ export function openReportWindow(
   deps: ReportWindowDeps,
   target: { pid?: number; name: string },
 ): void {
-  if (!deps.reportHooks) return;
+  if (!deps.reportHooks()) return;
   deps.closeOtherWindows('#report-window');
   const { pid, name } = target;
   const el = $('#report-window');
@@ -77,10 +80,11 @@ export function openReportWindow(
     const reason = reasonDD.dataset.value ?? 'other';
     const details = ($('#report-details') as HTMLTextAreaElement).value;
     submit.disabled = true;
+    const hooks = deps.reportHooks();
     const request =
       pid !== undefined
-        ? deps.reportHooks?.submit(pid, reason, details)
-        : deps.reportHooks?.submitByName?.(name, reason, details);
+        ? hooks?.submit(pid, reason, details)
+        : hooks?.submitByName?.(name, reason, details);
     if (!request) {
       submit.disabled = false;
       $('#report-error').textContent = t('hud.report.failed');

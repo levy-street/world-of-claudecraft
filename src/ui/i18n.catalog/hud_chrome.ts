@@ -3922,6 +3922,7 @@ export const hudChromeStrings = {
       plant: 'Plant',
       sowAria: 'Sow {name}',
       empty: 'You have no seed you can sow at this bed.',
+      close: 'Close the plant sheet',
     },
     // The husk trade's one line (the knobs phase): names BOTH sides of the
     // trade, what left the bags and what arrived, because the compost grant's

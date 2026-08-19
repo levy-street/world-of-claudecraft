@@ -8837,6 +8837,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.plantSheet.plant': '심기',
   'hudChrome.farming.plantSheet.sowAria': '{name} 뿌리기',
   'hudChrome.farming.plantSheet.empty': '이 밭에 뿌릴 수 있는 씨앗이 없습니다.',
+  'hudChrome.farming.plantSheet.close': '심기 창 닫기',
   'hudChrome.farming.denied.bed_taken': '그곳에는 이미 작물이 자라고 있습니다.',
   'hudChrome.farming.denied.skill': '그 작물을 재배하기에는 농사 숙련도가 부족합니다.',
   'hudChrome.farming.denied.no_seed': '그 작물의 씨앗이 없습니다.',

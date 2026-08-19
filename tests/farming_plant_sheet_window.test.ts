@@ -10,6 +10,8 @@
 // one t() call against another: a self-comparison would pass with the key
 // wrong (tests/harvest_journal_window.test.ts, the same doctrine).
 
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   FARM_COMPOST_ITEM_ID,
@@ -22,6 +24,10 @@ import type { InvSlot } from '../src/sim/types';
 import type { FarmEvent } from '../src/ui/farm_event_feedback';
 import { PlantSheetWindow } from '../src/ui/farming_plant_sheet_window';
 import type { IWorld } from '../src/world_api';
+
+// happy-dom rewrites import.meta.url to an http scheme, so the repo root
+// comes from the vitest cwd (the localization_fixes idiom).
+const repoRoot = process.cwd();
 
 const WHEAT = FARM_CROPS.vale_wheat;
 const CARROT = FARM_CROPS.brook_carrot;
@@ -217,9 +223,125 @@ describe('plant sheet window: the Plant activation', () => {
     const win = makeWindow();
     win.open(BED);
     const close = root.querySelector<HTMLElement>('[data-close]');
-    expect(close?.getAttribute('aria-label')).toBe('Close');
+    expect(close?.getAttribute('aria-label')).toBe('Close the plant sheet');
     close?.click();
     expect(win.isOpen).toBe(false);
+  });
+});
+
+describe('plant sheet window: re-open, event filters, and staleness (the review arms)', () => {
+  it('a re-press at the SAME bed keeps the picks and the in-flight send', () => {
+    world.inventory.push({ itemId: CARROT.seedItemId, count: 2 });
+    const win = makeWindow();
+    win.open(BED);
+    root.querySelector<HTMLElement>('[data-knob="compost"]')?.click();
+    root.querySelector<HTMLElement>(`[data-seed-crop="${CARROT.id}"]`)?.click();
+    root.querySelector<HTMLElement>('[data-plant]')?.click();
+    expect(world.plantCrop).toHaveBeenCalledTimes(1);
+    win.open(BED);
+    // Picks survived the re-press...
+    expect(
+      root.querySelector(`[data-seed-crop="${CARROT.id}"]`)?.getAttribute('aria-pressed'),
+    ).toBe('true');
+    expect(root.querySelector('[data-knob="compost"]')?.getAttribute('aria-pressed')).toBe('true');
+    // ...and so did the send arm: the re-press is not a re-send license.
+    root.querySelector<HTMLElement>('[data-plant]')?.click();
+    expect(world.plantCrop).toHaveBeenCalledTimes(1);
+  });
+
+  it('opening a DIFFERENT bed resets the picks, so a knob never rides between beds', () => {
+    const win = makeWindow();
+    win.open(BED);
+    root.querySelector<HTMLElement>('[data-knob="compost"]')?.click();
+    win.open('bed_eastbrook_2');
+    root.querySelector<HTMLElement>('[data-plant]')?.click();
+    expect(world.plantCrop).toHaveBeenCalledTimes(1);
+    expect(world.plantCrop).toHaveBeenCalledWith('bed_eastbrook_2', WHEAT.id, {});
+  });
+
+  it("a deny for someone ELSE's bed neither re-arms nor repaints this sheet", () => {
+    const win = makeWindow();
+    win.open(BED);
+    root.querySelector<HTMLElement>('[data-plant]')?.click();
+    win.notifyFarmEvent(denied('bed_eastbrook_2'));
+    root.querySelector<HTMLElement>('[data-plant]')?.click();
+    expect(world.plantCrop).toHaveBeenCalledTimes(1);
+  });
+
+  it('a bedId-free deny (the husk-trade family) re-arms the control', () => {
+    const win = makeWindow();
+    win.open(BED);
+    root.querySelector<HTMLElement>('[data-plant]')?.click();
+    win.notifyFarmEvent({ type: 'farmDenied', pid: 1, reason: 'no_husks' } as FarmEvent);
+    root.querySelector<HTMLElement>('[data-plant]')?.click();
+    expect(world.plantCrop).toHaveBeenCalledTimes(2);
+  });
+
+  it('a farmPlanted for ANOTHER bed clears the send arm without closing (no dead control)', () => {
+    const win = makeWindow();
+    win.open(BED);
+    root.querySelector<HTMLElement>('[data-plant]')?.click();
+    win.notifyFarmEvent(planted('bed_eastbrook_2'));
+    expect(win.isOpen).toBe(true);
+    root.querySelector<HTMLElement>('[data-plant]')?.click();
+    expect(world.plantCrop).toHaveBeenCalledTimes(2);
+  });
+
+  it('a picked knob that stops being affordable un-picks itself before the next send', () => {
+    const win = makeWindow();
+    win.open(BED);
+    root.querySelector<HTMLElement>('[data-knob="compost"]')?.click();
+    root.querySelector<HTMLElement>('[data-plant]')?.click();
+    expect(world.plantCrop).toHaveBeenCalledWith(BED, WHEAT.id, { compost: true });
+    // The compost left the bags (a mail, a trade, another window)...
+    world.inventory = world.inventory.filter((slot) => slot.itemId !== FARM_COMPOST_ITEM_ID);
+    // ...and the deny-driven repaint un-picks the short knob.
+    win.notifyFarmEvent(denied(BED));
+    root.querySelector<HTMLElement>('[data-plant]')?.click();
+    expect(world.plantCrop).toHaveBeenCalledTimes(2);
+    expect(world.plantCrop).toHaveBeenLastCalledWith(BED, WHEAT.id, {});
+  });
+
+  it('a repaint over a bed that became MY plot closes the sheet (the null-model race)', () => {
+    const win = makeWindow();
+    win.open(BED);
+    world.myFarmPlots = [
+      {
+        bedId: BED,
+        cropId: WHEAT.id,
+        plantedAtMs: 0,
+        readyAtMs: 1000,
+        compost: false,
+        watch: false,
+        tonic: false,
+        notified: false,
+        status: 'growing',
+      },
+    ];
+    win.notifyFarmEvent(denied(BED));
+    expect(win.isOpen).toBe(false);
+  });
+
+  it('relocalize repaints an open sheet and is a no-op on a closed one', () => {
+    const win = makeWindow();
+    win.relocalize();
+    expect(root.innerHTML).toBe('');
+    win.open(BED);
+    root.querySelector<HTMLElement>('[data-knob="compost"]')?.click();
+    win.relocalize();
+    // The repaint rebuilt the subtree from live state; the pick survived.
+    expect(root.querySelector('#plant-sheet-title')?.textContent).toBe('Plant a Crop');
+    expect(root.querySelector('[data-knob="compost"]')?.getAttribute('aria-pressed')).toBe('true');
+  });
+});
+
+describe('plant sheet window: the root div ships in BOTH entries', () => {
+  // The painter resolves #plant-sheet-window; a dropped div in either entry
+  // is a runtime throw for every bed press there (the crafting_launcher
+  // idiom: read the real entry HTML, never a fixture).
+  it.each(['index.html', 'play.html'])('%s carries id="plant-sheet-window"', (entry) => {
+    const html = readFileSync(join(repoRoot, entry), 'utf8');
+    expect(html).toContain('id="plant-sheet-window"');
   });
 });
 

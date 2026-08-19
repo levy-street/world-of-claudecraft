@@ -65,8 +65,9 @@ const MONOLITHS: MonolithRow[] = [
     // lands below both branch ceilings, so keep the exact merged count.
     // Lowered after Phase 9b's headroom extraction moved the report window
     // body whole to src/ui/report_window_open.ts (a thin deps-bag wrapper
-    // stays); the margin above the new 19330 count is sized for the phase's
-    // planned plant-sheet composition lines, nothing more.
+    // stays); the freed margin was then spent by the phase's own plant-sheet
+    // composition, so this is once again a near-exact pin with no free
+    // headroom to borrow against.
     ceiling: 19352,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },

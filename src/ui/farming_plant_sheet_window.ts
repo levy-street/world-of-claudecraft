@@ -84,20 +84,32 @@ export class PlantSheetWindow {
     if (!canOpenPlantSheet(bedId, this.deps.world().myFarmPlots)) return;
     const root = this.deps.root();
     const wasOpen = this.isOpen;
+    if (wasOpen && this.bedId === bedId) {
+      // A re-press at the SAME bed (key repeat, habit) keeps the player's
+      // picks and any in-flight send; it only refreshes the paint.
+      this.paint();
+      return;
+    }
     if (!wasOpen) {
       this.deps.closeOthers();
       this.openerFocus = this.deps.captureFocus();
       markDialogRoot(root, { labelledBy: 'plant-sheet-title' });
       root.style.display = 'block';
     }
-    // A fresh bed is a fresh decision: selection and knob picks reset even on
-    // a re-open, so a toggle paid for one bed never silently rides to another.
+    // A fresh bed is a fresh decision: selection and knob picks reset, so a
+    // toggle paid for one bed never silently rides to another.
     this.bedId = bedId;
     this.selectedCropId = null;
     this.choices = { compost: false, watch: false, tonic: false };
     this.pendingSend = false;
     this.paint();
     if (!wasOpen) root.querySelector<HTMLElement>('[data-close]')?.focus();
+  }
+
+  /** The Hud's runtime-language-switch arm: repaint an open sheet so its
+   *  labels follow the new locale (the cold-window relocalize contract). */
+  relocalize(): void {
+    if (this.isOpen) this.paint();
   }
 
   close(): void {
@@ -114,13 +126,16 @@ export class PlantSheetWindow {
   }
 
   /** The Hud's farm-event forward. A farmPlanted for this bed is the success
-   *  answer: close with focus restore (no successor window). A deny for this
-   *  bed re-arms the Plant control and repaints affordability; every other
-   *  event is not this window's business. */
+   *  answer: close with focus restore (no successor window). ANY farmPlanted
+   *  clears the send arm (the answer arrived; a matched close clears it
+   *  anyway, and an unmatched one must not leave the Plant control dead
+   *  forever). A deny for this bed re-arms the Plant control and repaints
+   *  affordability; every other event is not this window's business. */
   notifyFarmEvent(ev: FarmEvent): void {
     if (!this.isOpen || this.bedId === null) return;
-    if (ev.type === 'farmPlanted' && ev.bedId === this.bedId) {
-      this.close();
+    if (ev.type === 'farmPlanted') {
+      this.pendingSend = false;
+      if (ev.bedId === this.bedId) this.close();
       return;
     }
     if (ev.type === 'farmDenied' && (ev.bedId === undefined || ev.bedId === this.bedId)) {
@@ -158,7 +173,7 @@ export class PlantSheetWindow {
     const focusKey = captureFocusKey(root);
     root.innerHTML =
       `<div class="panel-title"><span id="plant-sheet-title">${esc(t('hudChrome.farming.plantSheet.title'))}</span>` +
-      `<button type="button" class="x-btn" data-close data-focus-key="plantSheetClose" aria-label="${esc(t('hudChrome.harvestJournal.close'))}">${svgIcon('close')}</button></div>` +
+      `<button type="button" class="x-btn" data-close data-focus-key="plantSheetClose" aria-label="${esc(t('hudChrome.farming.plantSheet.close'))}">${svgIcon('close')}</button></div>` +
       `<div class="ps-body">${this.bodyHtml(view)}</div>`;
     this.wire(root);
     if (focusKey !== null) {
