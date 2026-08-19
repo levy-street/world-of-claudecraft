@@ -766,6 +766,9 @@ export function useItem(
     throwFirebottleAtNearestHut(ctx, p, meta);
     return;
   }
+  // Buff dishes (def.wellfed) mint their Well Fed aura at COMPLETION of the
+  // sit-restore, not here: completion-time minting lives in src/sim/wellfed.ts,
+  // hooked from updateRegen (src/sim/combat/auras.ts).
   if (def.kind === 'food' || def.kind === 'drink') {
     if (p.inCombat) {
       ctx.error(meta.entityId, "You can't do that while in combat.");
