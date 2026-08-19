@@ -308,6 +308,7 @@ const UI_PURE_CORES = [
   'src/ui/skill_level_toast_view.ts',
   'src/ui/grant_line_view.ts',
   'src/ui/farming_view.ts',
+  'src/ui/farming_plant_sheet_view.ts',
   'src/ui/harvest_journal_view.ts',
   'src/ui/crafting_view.ts',
   'src/ui/commission_order_view.ts',

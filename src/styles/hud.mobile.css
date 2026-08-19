@@ -4520,6 +4520,19 @@
       justify-content: flex-start;
     }
   }
+  /* The plant sheet on touch: the desktop 440px card clamps to the phone
+     (844x390 landscape stays fully on screen), and the pick / toggle / plant
+     controls carry the 44px touch floor, the class-scoped twin of the
+     coarse-pointer rules (the map-zoom-btn idiom). */
+  body.mobile-touch #plant-sheet-window {
+    width: min(440px, calc(100vw - 20px));
+    max-height: calc(var(--app-vh, 100vh) - 20px);
+  }
+  body.mobile-touch .ps-seed,
+  body.mobile-touch .ps-knob,
+  body.mobile-touch .ps-plant {
+    min-height: 44px;
+  }
   /* The tool-effect controls' touch floors, the body.mobile-touch twin of the
      @media (pointer: coarse) rules in components.css (the map-zoom-btn idiom):
      the coarse-pointer media rule serves real devices, and this class-scoped
