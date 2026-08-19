@@ -4,7 +4,36 @@ Read this file first in every phase session. It is the single authority for lock
 decisions. If a phase file contradicts this file, this file wins and the phase file
 gets swept in the same pass (amend the QA twin too, always).
 
-Current phase: Phase 9b QA DONE 2026-08-19, PASS-WITH-FOLLOWUPS (branch
+Current phase: Phase 10 (celebrations) DONE 2026-08-19, local-only per D22
+(branch fix/farming-phase-10-celebrations, five commits, merge hash in
+progress.md). golden_harvest is the FOURTH flavor on the gatherRareEvent
+union, rolled unconditionally in the harvest draw block AFTER the seed-back
+roll via the shared GATHER_RARE_EVENT_CHANCE (harvest draws now: tier 1/2
+EXACTLY 1, tier 3/4 EXACTLY 2, denies zero); a win five-folds both grades,
+grants signed-up-to-fit with plain overflow, and zone-announces through the
+one announceGatherRareEvent path (source type 'crop'; one belief gates win,
+announce, and mark). Seven D13 deeds landed (first planting on farm:planted,
+four zone chronicles on farm:<zone>, col_golden_harvest at renown 0,
+prog_farming_100 with the Harvestmaster title); deeds totals 280/3190/43
+titles; Harvestmaster joined RELIQUARY_HORIZON_TITLES (341/376/41). The
+ui_farm_golden sting shipped end to end; hud.ts SHRANK via the
+ability-tooltip extraction (ceiling 19352 to 19230, now 19227/19230,
+headroom 3). farming_session re-recorded ONCE, isolated: 11 to 16 draws,
+md5 83c3478142deabbffbf23912575873e9; zero other goldens moved. NEW
+deviations (br)-(bv) below; the headline correction: the (bo) "beds cannot
+be sown" premise was PROBED FALSE (no bed-tier gate), so all four
+chronicles are earnable today, while prog_farming_100 ships DORMANT under a
+recorded docs/design/deeds.md waiver until D11 (feat_book_complete
+transitively parked). Reviews: architecture/cross-platform/frontend 0
+BLOCKING, content-obligations' one BLOCKING resolved via the waiver,
+qa-checklist READY; mutations 13/13 killed named. Maintainer reads owed:
+the (bs) waiver itself, the D12 cadence (1/90 per harvest is far rarer in
+wall-clock terms than per node swing, and withered harvests burn rolls so
+the realized rate is 1/90 times survival), the second v0.39.0 deed-locale
+fill pass (15 new manifest rows), and the Steam mapping deferral. NEXT:
+Phase 10 QA (docs/farming/phase-10-qa.md, its head carries the
+executed-rulings block). Prior: Phase 9b QA DONE 2026-08-19,
+PASS-WITH-FOLLOWUPS (branch
 fix/farming-phase-09b-qa; merge hash in progress.md). The fresh pass
 re-proved the go-live independently: the committed journey 17/17 on
 desktop AND the real mobile-interact button, 18 manual probes (focus trap,
@@ -2337,6 +2366,54 @@ question does not arise (farming has no station).
   go-public; the farmer-shadow nuance (a press ON bed_eastbrook_2/4 within
   Jessica's NPC-arm range opens her dialog, the pinned precedence; the far
   side plants, probed live) is recorded as UX, not a defect.
+  Phase 10 (2026-08-19, celebrations; merge hash in progress.md):
+  (br) THE (bo) SOWABILITY PREMISE WAS FALSE: plantCrop carries NO bed-tier
+  gate (probed live in a real Sim: vale_wheat plants at bed_evergarden_1 at
+  skill 0, and the plant sheet offers any bagged seed at any bed), so the
+  Highwatch and Evergarden first-harvest chronicles are EARNABLE today with
+  vendor tier 1/2 seeds. All four chronicles ship earnable;
+  FARM_CHRONICLE_ZONES (src/sim/deeds.ts, the ZONE_FISH template) is the
+  earnability declaration, pinned against FARM_PATCHES zones both
+  directions. (bo) itself still binds the tier 3/4 CROPS: nothing shipped
+  assumes those seeds exist.
+  (bs) prog_farming_100 SHIPS DORMANT UNDER A RECORDED WAIVER: D13 mandates
+  the farming-100 title this phase while (bo) leaves farming teaching
+  grayed at 75, so the deed is visible-but-unearnable until D11, the exact
+  state docs/design/deeds.md rule 3 forbids. Resolution: the waiver is
+  RECORDED in docs/design/deeds.md (the dormancy-window note: bounded by
+  the self-clearing honesty arm in tests/deeds_content.test.ts over the
+  three purchase surfaces, closed by the D11 faucet phase;
+  feat_book_complete transitively parked, named there). The content
+  reviewer's REQUEST CHANGES resolved via this waiver; MAINTAINER READ
+  OWED on the waiver, plus the D12 cadence (per-harvest 1/90 is much rarer
+  in wall clock than per node swing, and withered harvests burn rolls so
+  the realized celebration rate is 1/90 times survival).
+  (bt) THE TITLE SHELF FORCES COMMITTED ART: tests/reliquary_cell_art.test.ts
+  forbids category-fallback crests for every RELIQUARY_HORIZON_TITLES
+  member, so prog_farming_100 could not ride DEED_ART_PENDING; an interim
+  tied-wheat-sheaf medallion crest shipped COMMITTED through the sanctioned
+  converter (public/ui/deeds/prog_farming_100.webp, 5.6 KiB;
+  DEED_IMAGE_IDS 272), and docs/achievements/icon-brief.md flags the
+  commissioned replacement. The six untitled deeds ride DEED_ART_PENDING
+  (now 8 with the castle pair). GENERAL RULE for future phases: a
+  title-reward deed can never trail its art.
+  (bu) ONE BELIEF GATES THE WIN: golden = flavor-won AND zone-resolved, so
+  the five-fold payout, the zone announce, and the gather_event mark travel
+  together (a bed outside an authored patch, impossible today, could never
+  pay a silent windfall). ACCEPTED: the signature truncation on full bags
+  is silent (gatherDowngrade's surface union is 'node' | 'corpse'; widening
+  the wire was out of scope; the named follow-up is adding 'crop' in a
+  later phase). The zone announce names the all-fine collapsed item id, the
+  farmHarvested rule.
+  (bv) NO RELIQUARY FIELD-NOTE CELL for gather_event:golden_harvest (its
+  three node siblings have one): noteReliquaryMark no-ops by allowlist,
+  pinned as a negative arm so the deferral retires consciously; and
+  correctly NO server/character_sheet.ts RELIQUARY_MARK_ENGLISH row (that
+  map's reverse guard admits only live reliquary marks). Also recorded:
+  the ability-tooltip extraction fixed a latent NaN (an absent spellHaste
+  on a mirrored entity now reads 0, tests/ability_tooltip_lines.test.ts
+  pins it), and the extraction module registered in UI_PURE_CORES via the
+  BARE_NAMED escape hatch.
 
 ## OPEN items (maintainer decisions or later-phase calls, never guess)
 
