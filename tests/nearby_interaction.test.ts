@@ -538,7 +538,12 @@ describe('the garden-bed arm (Phase 9b)', () => {
     // bed_eastbrook_2, so both are routinely in reach at once. The NPC arm
     // sits above the bed arm; a press beside both must open the dialog,
     // never the sheet (the sheet is one more press after stepping clear).
-    const npc = entity({ id: 9, kind: 'npc', templateId: 'farmer_jessica', pos: { x: 1, y: 0, z: 0 } });
+    const npc = entity({
+      id: 9,
+      kind: 'npc',
+      templateId: 'farmer_jessica',
+      pos: { x: 1, y: 0, z: 0 },
+    });
     const r = bedRig(null, [npc]);
     expect(interact(r)).toBe(true);
     expect(r.calls).toEqual(['quest:9']);
