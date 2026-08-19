@@ -504,7 +504,10 @@ export function createPokerStore(
       }
       const escrowDelta = (row.escrowCopper ?? 0) - (current.escrowCopper ?? 0);
       if (!Number.isSafeInteger(escrowDelta)) throw new Error('Poker escrow delta is invalid');
-      if (currency?.escrowDelta !== escrowDelta || (!currency && escrowDelta !== 0)) {
+      if (
+        (currency && currency.escrowDelta !== escrowDelta) ||
+        (!currency && escrowDelta !== 0)
+      ) {
         throw new Error('Poker escrow mutation is missing or inconsistent');
       }
 
