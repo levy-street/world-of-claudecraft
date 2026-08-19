@@ -92,121 +92,15 @@
     },
     {
       "abilityId": "sap",
-      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
-      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-shaman-rogue-priest/raw/sap.png",
-      "output": "sap.webp",
-      "source": "OpenAI built-in image generation",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "acceptedArtManifest": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-shaman-rogue-priest.json",
-      "intendedVisualSubject": "one short weighted black-leather blackjack or cosh descending behind the simple silhouette of an unaware helmeted head, with one compact teal-violet impact hush and three large fading daze stars; covert nonlethal incapacitation, no club with spikes, blood, fist, sleep letters, or magical halo.",
-      "references": [
-        {
-          "path": "public/ui/skills/rogue/knockout_blow.webp",
-          "role": "Dark nonlethal impact and readable daze marks.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "860870b2aa41dc7b9729903b12fbf1aa0a18633d5380cef765a185062936e35e",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/rogue/smoke_screen.webp",
-          "role": "Concealed Rogue atmosphere and black-teal values.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "c89da13aca6b1fa91efb60cf007f1179b57b1d59ab6c45271d34c472e2c68f52",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/rogue/veilstrike.webp",
-          "role": "Clear shadowed target silhouette with controlled violet energy.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "22c6aedfb9e161351b611923b6c0d1364f209a7281fc30130bce47fbfe7e5e66",
-          "usedAsGenerationInput": false
-        }
-      ],
-      "generationPrompt": "Use case: stylized-concept. Asset type: opaque borderless square game ability icon for the World of ClaudeCraft Rogue action bar. Style/medium: premium hand-painted classic dark-fantasy MMORPG ability art, tactile black leather, worn steel, smoke, grit, and restrained poison-green, crimson, or violet accents; crisp focal edges and broad energetic brushwork, never a flat vector or raw 3D render. Scene/backdrop: fully opaque blackened teal-charcoal and midnight painted vignette, no literal environment scene. Composition/framing: one dominant readable stealth action or object, visually centered, complete and uncropped with safe padding, 78 to 86 percent fill, strong silhouette and simplified internal values that stay distinct at 48, 32, and 16 pixels and survive a circular crop. Lighting/mood: narrow warm top-left glint, cold shadow, dangerous covert mood. Constraints: fresh composition, no text, letters, numbers, pseudo-writing, watermark, signature, transparency, checkerboard, baked border, UI frame, rarity chrome, modern graphic design, collage, gore, or tiny decorative clutter. Primary request: repaint Sap (sap). Canonical mechanic: from stealth and out of combat, instantly incapacitate one target for 8 seconds; any damage breaks the effect. Subject: one short weighted black-leather blackjack or cosh descending behind the simple silhouette of an unaware helmeted head, with one compact teal-violet impact hush and three large fading daze stars; covert nonlethal incapacitation, no club with spikes, blood, fist, sleep letters, or magical halo. Approved sibling references visually inspected: knockout_blow for dark nonlethal impact and readable daze marks; smoke_screen for concealed Rogue atmosphere and black-teal values; veilstrike for a clear shadowed target silhouette with controlled violet energy.",
-      "sourceSha256": "a50aff5279a51c4ba64692c23d207863ccd4cdb2df8087de2472b7ddd15b225e",
-      "sourceBytes": 1878471,
-      "acceptedSha256": "7d5088688d2e1dd6a34800fd5074bd43b40e335e75b3f411a7dad041707d10a7",
-      "acceptedBytes": 2194,
-      "supersedes": {
-        "sourceCommit": "d2d1a8ad5c1121f38c52ca2709d88b84adbe5c9e",
-        "owner": "Levy Street Account - callum@levystreet.com",
-        "license": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
-        "sourceManifest": "public/ui/skills/rogue/mapping.json",
-        "sourcePack": "generic-skill100",
-        "sourceFile": "skill icon 30.png",
-        "output": "sap.webp",
-        "sha256": "df44e87143e5f4f68f3055354fb640978f91e9b63cdb06a4452fd9d4d6b9e6b1",
-        "bytes": 3500,
-        "width": 128,
-        "height": 128,
-        "format": "webp",
-        "colorSpace": "srgb",
-        "channels": 3,
-        "hasAlpha": false
-      }
+      "sourcePack": "generic-skill100",
+      "sourceFile": "skill icon 30.png",
+      "output": "sap.webp"
     },
     {
       "abilityId": "expose_armor",
-      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
-      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-shaman-rogue-priest/raw/expose_armor.png",
-      "output": "expose_armor.webp",
-      "source": "OpenAI built-in image generation",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "acceptedArtManifest": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-shaman-rogue-priest.json",
-      "intendedVisualSubject": "one blackened steel breastplate split open by two crossing dagger cuts, with five broad progressive fracture wedges peeled away from the center and a restrained crimson-violet light burning through the breach; unmistakable sundered armor finisher, no shield, human body, floating numbers, or blood.",
-      "references": [
-        {
-          "path": "public/ui/skills/rogue/body_blow.webp",
-          "role": "Compact red-black impact energy.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "9683bb32d832ab7d3ae1defed61d0efdb2bc214da41f957c77d9bddd5f04fa44",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/rogue/flurry_of_knives.webp",
-          "role": "Premium worn blade material and radial cutting motion.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "a6f4377c005b7844058a8b365c2a841ed163edf2e67b825e3e971046b9cc9dcf",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/rogue/veilstrike.webp",
-          "role": "Deep violet shadow values and crisp steel silhouette.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "22c6aedfb9e161351b611923b6c0d1364f209a7281fc30130bce47fbfe7e5e66",
-          "usedAsGenerationInput": false
-        }
-      ],
-      "generationPrompt": "Use case: stylized-concept. Asset type: opaque borderless square game ability icon for the World of ClaudeCraft Rogue action bar. Style/medium: premium hand-painted classic dark-fantasy MMORPG ability art, tactile black leather, worn steel, smoke, grit, and restrained poison-green, crimson, or violet accents; crisp focal edges and broad energetic brushwork, never a flat vector or raw 3D render. Scene/backdrop: fully opaque blackened teal-charcoal and midnight painted vignette, no literal environment scene. Composition/framing: one dominant readable stealth action or object, visually centered, complete and uncropped with safe padding, 78 to 86 percent fill, strong silhouette and simplified internal values that stay distinct at 48, 32, and 16 pixels and survive a circular crop. Lighting/mood: narrow warm top-left glint, cold shadow, dangerous covert mood. Constraints: fresh composition, no text, letters, numbers, pseudo-writing, watermark, signature, transparency, checkerboard, baked border, UI frame, rarity chrome, modern graphic design, collage, gore, or tiny decorative clutter. Primary request: repaint Armor Breach (expose_armor). Canonical mechanic: a combo-point finishing move that exposes the target for 30 seconds, reducing armor by 2 percent per combo point up to five applications. Subject: one blackened steel breastplate split open by two crossing dagger cuts, with five broad progressive fracture wedges peeled away from the center and a restrained crimson-violet light burning through the breach; unmistakable sundered armor finisher, no shield, human body, floating numbers, or blood. Approved sibling references visually inspected: body_blow for compact red-black impact energy; flurry_of_knives for premium worn blade material and radial cutting motion; veilstrike for deep violet shadow values and crisp steel silhouette.",
-      "sourceSha256": "8b98c456fa89c9d5286011dbf99c3704eb1728d84faf18828851857a2c73910e",
-      "sourceBytes": 2315527,
-      "acceptedSha256": "98fe9fb41a69d6c3f6b1503705d728acf52ede61f9ab6f8913cab7481d225abd",
-      "acceptedBytes": 2576,
-      "supersedes": {
-        "sourceCommit": "d2d1a8ad5c1121f38c52ca2709d88b84adbe5c9e",
-        "owner": "Levy Street Account - callum@levystreet.com",
-        "license": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
-        "sourceManifest": "public/ui/skills/rogue/mapping.json",
-        "sourcePack": "generic-skill100",
-        "sourceFile": "skill icon 68.png",
-        "output": "expose_armor.webp",
-        "sha256": "b288d3c9c1f4e4cbdb7e29223da91d998925a2d4b637fbcbdfc67b0e03a74986",
-        "bytes": 5892,
-        "width": 128,
-        "height": 128,
-        "format": "webp",
-        "colorSpace": "srgb",
-        "channels": 3,
-        "hasAlpha": false
-      }
+      "sourcePack": "generic-skill100",
+      "sourceFile": "skill icon 68.png",
+      "output": "expose_armor.webp"
     },
     {
       "abilityId": "garrote",
@@ -216,62 +110,9 @@
     },
     {
       "abilityId": "blind",
-      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
-      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-shaman-rogue-priest/raw/blind.png",
-      "output": "blind.webp",
-      "source": "OpenAI built-in image generation",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "acceptedArtManifest": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-shaman-rogue-priest.json",
-      "intendedVisualSubject": "one black-leather gloved hand whipping a broad ochre crescent of coarse dirt and grit across a simple shadowed opponent face, with the single visible eye squeezed shut behind the spray and two wavering disorientation trails; physical dirty trick, not a potion, magic eye beam, or realistic eyeball close-up.",
-      "references": [
-        {
-          "path": "public/ui/skills/rogue/body_blow.webp",
-          "role": "Bold gloved-hand action and crimson-black material treatment.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "9683bb32d832ab7d3ae1defed61d0efdb2bc214da41f957c77d9bddd5f04fa44",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/rogue/smoke_screen.webp",
-          "role": "Deep teal shadow, Rogue silhouette language, and smoky periphery.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "c89da13aca6b1fa91efb60cf007f1179b57b1d59ab6c45271d34c472e2c68f52",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/rogue/knockout_blow.webp",
-          "role": "Readable disorientation motion and dark physical-control impact.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "860870b2aa41dc7b9729903b12fbf1aa0a18633d5380cef765a185062936e35e",
-          "usedAsGenerationInput": false
-        }
-      ],
-      "generationPrompt": "Use case: stylized-concept. Asset type: opaque borderless square game ability icon for the World of ClaudeCraft Rogue action bar. Style/medium: premium hand-painted classic dark-fantasy MMORPG ability art, tactile black leather, worn steel, smoke, grit, and restrained poison-green, crimson, or violet accents; crisp focal edges and broad energetic brushwork, never a flat vector or raw 3D render. Scene/backdrop: fully opaque blackened teal-charcoal and midnight painted vignette, no literal environment scene. Composition/framing: one dominant readable stealth action or object, visually centered, complete and uncropped with safe padding, 78 to 86 percent fill, strong silhouette and simplified internal values that stay distinct at 48, 32, and 16 pixels and survive a circular crop. Lighting/mood: narrow warm top-left glint, cold shadow, dangerous covert mood. Constraints: fresh composition, no text, letters, numbers, pseudo-writing, watermark, signature, transparency, checkerboard, baked border, UI frame, rarity chrome, modern graphic design, collage, gore, or tiny decorative clutter. Primary request: repaint Dirt Toss (blind). Canonical mechanic: an instant 5-yard toss that incapacitates a target for 8 seconds, making it wander disoriented until any damage breaks the effect; 120-second cooldown. Subject: one black-leather gloved hand whipping a broad ochre crescent of coarse dirt and grit across a simple shadowed opponent face, with the single visible eye squeezed shut behind the spray and two wavering disorientation trails; physical dirty trick, not a potion, magic eye beam, or realistic eyeball close-up. Approved sibling references visually inspected: body_blow for the bold gloved-hand action and crimson-black material treatment; smoke_screen for deep teal shadow, rogue silhouette language, and soft smoky periphery; knockout_blow for readable disorientation motion and a dark physical-control impact.",
-      "sourceSha256": "dcb8de87807fa21ac742e1a6cc862b5b93e7fa2c7f9923f5bd8ead5fb1de454c",
-      "sourceBytes": 1949019,
-      "acceptedSha256": "43bed549f22db4b53cc6a8b54ca810a525f4be923c43d08e5bd5212c66f55b14",
-      "acceptedBytes": 2876,
-      "supersedes": {
-        "sourceCommit": "d2d1a8ad5c1121f38c52ca2709d88b84adbe5c9e",
-        "owner": "Levy Street Account - callum@levystreet.com",
-        "license": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
-        "sourceManifest": "public/ui/skills/rogue/mapping.json",
-        "sourcePack": "_Missing_Icons_Rouge",
-        "sourceFile": "49.png",
-        "output": "blind.webp",
-        "sha256": "97d96f937fe4a451794d97879627c878728249eeb27c1b72741d0edeb985521e",
-        "bytes": 3030,
-        "width": 128,
-        "height": 128,
-        "format": "webp",
-        "colorSpace": "srgb",
-        "channels": 4,
-        "hasAlpha": true
-      }
+      "sourcePack": "_Missing_Icons_Rouge",
+      "sourceFile": "49.png",
+      "output": "blind.webp"
     },
     {
       "abilityId": "blade_flurry",
@@ -675,5 +516,5 @@
     }
   ],
   "deferredStayProcedural": {},
-  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 and woc_openai_release_v039_icon_art_second_pass_2026_08_16 entries are project-generated and explicitly override it."
+  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 entries are project-generated and explicitly override it."
 }

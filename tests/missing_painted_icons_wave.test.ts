@@ -28,7 +28,6 @@ const itemConsistencyManifestPath = path.join(
   repoRoot,
   'docs/achievements/item-art-consistency-2026-08-09/accepted-art.json',
 );
-const GENERATED_ABILITY_SOURCE_PACK = 'woc_openai_missing_painted_icons_2026_08_01';
 
 interface ReferenceRecord {
   path: string;
@@ -165,14 +164,6 @@ interface AbilityMappingEntry {
   license?: string;
   references?: ReferenceRecord[];
   generationPrompt?: string;
-  provenanceRecord?: string;
-  acceptedSha256?: string;
-  acceptedBytes?: number;
-  supersedes?: {
-    sourcePack: string;
-    shippingSha256: string;
-    shippingBytes: number;
-  };
 }
 
 function manifest(): AcceptedArtManifest {
@@ -187,28 +178,6 @@ function resolvedShippingPin(asset: RasterAsset): {
   acceptedSha256: string;
   acceptedBytes: number;
 } {
-  if (asset.kind === 'ability') {
-    const ability = ABILITIES[asset.id];
-    if (!ability) throw new Error(`manifest ability ${asset.id} is not canonical`);
-    const mapping = JSON.parse(
-      readFileSync(path.join(repoRoot, `public/ui/skills/${ability.class}/mapping.json`), 'utf8'),
-    ) as { abilities: AbilityMappingEntry[] };
-    const owner = mapping.abilities.find(({ abilityId }) => abilityId === asset.id);
-    if (!owner || owner.sourcePack === GENERATED_ABILITY_SOURCE_PACK) return asset;
-
-    expect(owner.supersedes, `${asset.id} historical generated-art lineage`).toMatchObject({
-      sourcePack: GENERATED_ABILITY_SOURCE_PACK,
-      shippingSha256: asset.acceptedSha256,
-      shippingBytes: asset.acceptedBytes,
-    });
-    expect(owner.provenanceRecord, `${asset.id} replacement provenance`).toBeTruthy();
-    expect(owner.acceptedSha256, `${asset.id} replacement SHA-256`).toMatch(/^[0-9a-f]{64}$/);
-    expect(owner.acceptedBytes, `${asset.id} replacement bytes`).toBeGreaterThan(0);
-    return {
-      acceptedSha256: owner.acceptedSha256 as string,
-      acceptedBytes: owner.acceptedBytes as number,
-    };
-  }
   if (asset.kind !== 'item') return asset;
   const replacementManifest = itemConsistencyManifest();
   const supersession = replacementManifest.supersedes.find(({ itemId }) => itemId === asset.id);
@@ -260,6 +229,7 @@ function expectedAssetLocations(asset: RasterAsset): {
   return { runtimeUrl, shippingPath: `public${runtimeUrl}` };
 }
 
+const GENERATED_ABILITY_SOURCE_PACK = 'woc_openai_missing_painted_icons_2026_08_01';
 const ALLOWED_REFERENCE_ROLES = [
   'composition reference',
   'frame reference',
@@ -267,8 +237,8 @@ const ALLOWED_REFERENCE_ROLES = [
   'subject reference',
 ] as const;
 
-// Choice-row talents, modifier art, retired summon paintings, pet signature
-// actions, and shared pet commands are image ids without live ABILITIES rows by design.
+// Choice-row talents, modifier art, retired summon paintings, and pet signature
+// actions are image ids without live ABILITIES rows by design.
 const PRESERVED_IMAGE_BACKED_MODIFIER_IDS = [
   'anger_management',
   'attack',
@@ -544,12 +514,9 @@ describe('missing painted ability integration', () => {
       };
       expect(mapping.licenseScope).toContain('explicitly override');
       allEntries.push(...mapping.abilities.map((entry) => ({ className, entry })));
-      const generated = mapping.abilities.filter((entry) => {
-        return (
-          entry.sourcePack === GENERATED_ABILITY_SOURCE_PACK ||
-          entry.supersedes?.sourcePack === GENERATED_ABILITY_SOURCE_PACK
-        );
-      });
+      const generated = mapping.abilities.filter(
+        (entry) => entry.sourcePack === GENERATED_ABILITY_SOURCE_PACK,
+      );
       for (const entry of generated) {
         mapped.push(entry.abilityId);
         const asset = assetById.get(entry.abilityId);
@@ -558,21 +525,10 @@ describe('missing painted ability integration', () => {
         expect(entry.owner).toBe('World of ClaudeCraft');
         expect(entry.license).toContain('project asset');
         expect(entry.license).not.toContain('CraftPix');
+        expect(entry.sourceFile).toBe(asset?.source.path);
         expect(entry.output).toBe(`${entry.abilityId}.webp`);
-        if (entry.sourcePack === GENERATED_ABILITY_SOURCE_PACK) {
-          expect(entry.sourceFile).toBe(asset?.source.path);
-          expect(entry.references).toEqual(asset?.generation.references);
-          expect(entry.generationPrompt).toBe(asset?.generation.prompt);
-        } else {
-          expect(entry.supersedes).toMatchObject({
-            sourcePack: GENERATED_ABILITY_SOURCE_PACK,
-            shippingSha256: asset?.acceptedSha256,
-            shippingBytes: asset?.acceptedBytes,
-          });
-          expect(entry.provenanceRecord).toBeTruthy();
-          expect(entry.acceptedSha256).toMatch(/^[0-9a-f]{64}$/);
-          expect(entry.acceptedBytes).toBeGreaterThan(0);
-        }
+        expect(entry.references).toEqual(asset?.generation.references);
+        expect(entry.generationPrompt).toBe(asset?.generation.prompt);
       }
     }
     expect(sorted(mapped)).toEqual(accepted.targetSets.abilities);
@@ -581,20 +537,14 @@ describe('missing painted ability integration', () => {
     for (const id of accepted.targetSets.abilities) {
       const owners = allEntries.filter(({ entry }) => entry.abilityId === id);
       expect(owners, `${id} must have exactly one mapping owner`).toHaveLength(1);
-      expect(
-        owners[0].entry.sourcePack === GENERATED_ABILITY_SOURCE_PACK ||
-          owners[0].entry.supersedes?.sourcePack === GENERATED_ABILITY_SOURCE_PACK,
-        `${id} mapping owner or explicit supersession`,
-      ).toBe(true);
+      expect(owners[0].entry.sourcePack, `${id} mapping owner`).toBe(GENERATED_ABILITY_SOURCE_PACK);
       expect(owners[0].className, `${id} mapping class`).toBe(ABILITIES[id].class);
     }
     expect(
       allEntries
         .filter(
           ({ entry }) =>
-            targets.has(entry.abilityId) &&
-            entry.sourcePack !== GENERATED_ABILITY_SOURCE_PACK &&
-            entry.supersedes?.sourcePack !== GENERATED_ABILITY_SOURCE_PACK,
+            targets.has(entry.abilityId) && entry.sourcePack !== GENERATED_ABILITY_SOURCE_PACK,
         )
         .map(({ entry }) => entry.abilityId),
       'generated abilities must not also appear as ordinary CraftPix entries',

@@ -1,4 +1,3 @@
-import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -9,7 +8,6 @@ import { abilityImageUrl } from '../src/ui/icons';
 const ACCEPTED_PATH = path.resolve(
   'docs/achievements/release-art-audit-v036-2026-08-10/warlock-pet-action-art.accepted.json',
 );
-const ACCEPTED_COMMIT = '24a1a1a7210bb75ac080fc45bff9afaffaa4547a';
 const EXPECTED_IDS = ['emberkin_felbolt', 'gloomshade_abyssal_chain'] as const;
 
 interface AcceptedAsset {
@@ -38,15 +36,6 @@ interface AcceptedManifest {
 
 const sha256 = (bytes: Buffer): string => createHash('sha256').update(bytes).digest('hex');
 
-function acceptedCommitIsAvailable(): boolean {
-  return (
-    spawnSync('git', ['cat-file', '-e', `${ACCEPTED_COMMIT}^{commit}`], {
-      cwd: path.resolve('.'),
-      stdio: 'ignore',
-    }).status === 0
-  );
-}
-
 describe('Warlock pet signature action art', () => {
   const accepted = JSON.parse(readFileSync(ACCEPTED_PATH, 'utf8')) as AcceptedManifest;
 
@@ -58,19 +47,9 @@ describe('Warlock pet signature action art', () => {
     );
     expect(accepted.assets.map(({ id }) => id)).toEqual(EXPECTED_IDS);
 
-    if (acceptedCommitIsAvailable()) {
-      const historicalMappingBytes = execFileSync(
-        'git',
-        ['show', `${ACCEPTED_COMMIT}:${accepted.mapping.path}`],
-        { cwd: path.resolve('.') },
-      );
-      expect(historicalMappingBytes.length).toBe(accepted.mapping.bytes);
-      expect(sha256(historicalMappingBytes)).toBe(accepted.mapping.sha256);
-    }
-
-    // The accepted manifest is immutable history. Read the current mapping separately so
-    // later, explicitly documented repaint records can coexist with these retained pet rows.
     const mappingBytes = readFileSync(path.resolve(accepted.mapping.path));
+    expect(mappingBytes.length).toBe(accepted.mapping.bytes);
+    expect(sha256(mappingBytes)).toBe(accepted.mapping.sha256);
     const mapping = JSON.parse(mappingBytes.toString('utf8')) as {
       abilities: Array<{
         abilityId: string;
