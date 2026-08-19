@@ -158,10 +158,10 @@ const MONOLITHS: MonolithRow[] = [
     file: 'src/sim/sim.ts',
     // Lowered after the M5 extraction moved the boss support kit
     // (updateBossMechanics + spawnBossAdds) whole to src/sim/mob/
-    // boss_mechanics.ts: the file sits at 12249, so this IS the
+    // boss_mechanics.ts: the file sits at 12246, so this IS the
     // post-extraction size plus a small margin (the plus-margin style the
     // ratchet uses for sim.ts).
-    ceiling: 12251,
+    ceiling: 12249,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

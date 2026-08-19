@@ -8320,9 +8320,6 @@ export class Sim {
   // ctx.despawnSummonedAdds. despawnPersistentPet + clearNonPlayerStatAuras stay
   // Sim methods, now also exposed on the seam for the moved respawnMob to consume.
 
-  // Boss threshold mechanics: add waves (summonAdds) and enrage. Checked
-  // every tick while the boss is in combat; thresholds fire once per pull
-  // and reset on evade/respawn.
   // Boss support mechanics moved to mob/boss_mechanics.ts (M5): the template-
   // driven per-tick kit (summon waves, enrage, desperate heal, Mend/Ward/Rally/
   // War Cadence, the channeled escalating heal) plus the add-wave spawner.

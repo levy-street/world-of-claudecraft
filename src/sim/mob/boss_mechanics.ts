@@ -1,7 +1,9 @@
 // Boss support mechanics (M5), extracted from the Sim monolith: the per-tick
 // template-driven boss kit (summonAdds waves, enrage, desperateHeal, the Mend/
 // Ward/Rally/War Cadence support pulses, the channeled escalating heal) plus
-// the add-wave spawner it fires. Driven by mob/locomotion.ts updateMob via
+// the add-wave spawner it fires. Checked every tick while the boss is in
+// combat; thresholds fire once per pull and reset on evade/respawn.
+// Driven by mob/locomotion.ts updateMob via
 // ctx.updateBossMechanics; the add spawner is also reached by the delve boss
 // scripts (delves/drowned_litany_boss.ts, delves/runs.ts) via ctx.spawnBossAdds.
 // Sim keeps thin same-named private delegates because several suites reach the
