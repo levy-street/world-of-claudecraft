@@ -95,6 +95,7 @@ describe('plant sheet core: the sowable filter', () => {
   it('locks a seed whose only copies are player-locked with denied.locked', () => {
     const view = build([locked(WHEAT.seedItemId, 2), slot('garden_hoe', 1)]);
     expect(view.seedRows).toEqual([]);
+    expect(view.lockedRows).toHaveLength(1);
     expect(view.lockedRows[0]).toMatchObject({
       cropId: WHEAT.id,
       reasonKey: 'hudChrome.farming.denied.locked',
@@ -103,6 +104,7 @@ describe('plant sheet core: the sowable filter', () => {
 
   it('locks on the hoe gate with the tier-named line: no hoe, and a hoe a tier short', () => {
     const noHoe = build([slot(WHEAT.seedItemId, 1)]);
+    expect(noHoe.lockedRows).toHaveLength(1);
     expect(noHoe.lockedRows[0]).toMatchObject({
       cropId: WHEAT.id,
       reasonKey: 'hudChrome.gathering.tierRequired.farming',
@@ -111,6 +113,7 @@ describe('plant sheet core: the sowable filter', () => {
     const tierShort = build([slot(RICE.seedItemId, 1), slot('garden_hoe', 1)], {
       farmingSkill: TIER2_SKILL,
     });
+    expect(tierShort.lockedRows).toHaveLength(1);
     expect(tierShort.lockedRows[0]).toMatchObject({
       cropId: RICE.id,
       reasonKey: 'hudChrome.gathering.tierRequired.farming',
@@ -123,9 +126,11 @@ describe('plant sheet core: the sowable filter', () => {
     const skillFirst = build([locked(RICE.seedItemId, 1)], {
       farmingSkill: farmCropSkillThreshold(2) - 1,
     });
+    expect(skillFirst.lockedRows).toHaveLength(1);
     expect(skillFirst.lockedRows[0]?.reasonKey).toBe('hudChrome.farming.denied.skill');
     // Skill passes, seed locked, no hoe: the locked seed names the row.
     const lockedNext = build([locked(RICE.seedItemId, 1)], { farmingSkill: TIER2_SKILL });
+    expect(lockedNext.lockedRows).toHaveLength(1);
     expect(lockedNext.lockedRows[0]?.reasonKey).toBe('hudChrome.farming.denied.locked');
   });
 });

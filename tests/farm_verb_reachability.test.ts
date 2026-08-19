@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { stripComments } from './helpers/strip_comments';
 
 // The pin that would have caught the Phase 9 (bn) gap: a farming verb the
 // worlds and the wire all carry is still unreachable by an ordinary player
@@ -10,6 +11,13 @@ import { describe, expect, it } from 'vitest';
 // reachability. It fails toward MISSING (zero call sites is red) and lists
 // what it found so a deletion names its survivors. One describe per verb;
 // a new client-reachable farming verb lands with its own describe here.
+//
+// Hardened by the 9b QA: sources go through the shared stripComments helper
+// before the needle scan, so a trailing "// TODO: restore .plantCrop(...)"
+// comment can never keep a pin green after the real call is deleted (the
+// original filter tested only the line's LEADING characters). A needle inside
+// a STRING literal still counts (no stripper here tokenizes strings); no such
+// string exists today and the deny lines never embed call syntax.
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 const SCAN_ROOTS = ['src/game', 'src/ui'] as const;
@@ -22,15 +30,9 @@ function clientCallSites(verb: string): string[] {
     for (const entry of readdirSync(dir, { recursive: true, withFileTypes: true })) {
       if (!entry.isFile() || !entry.name.endsWith('.ts')) continue;
       const file = join(entry.parentPath, entry.name);
-      const hasCall = readFileSync(file, 'utf8')
-        .split('\n')
-        .some((line) => {
-          const lead = line.trimStart();
-          // A comment mentioning the verb is not reachability.
-          if (lead.startsWith('//') || lead.startsWith('*') || lead.startsWith('/*')) return false;
-          return line.includes(needle);
-        });
-      if (hasCall) found.push(relative(repoRoot, file));
+      if (stripComments(readFileSync(file, 'utf8')).includes(needle)) {
+        found.push(relative(repoRoot, file));
+      }
     }
   }
   return found.sort();
@@ -79,25 +81,85 @@ describe('convertHusks client reachability', () => {
   });
 });
 
+// Slice one uniquely-anchored block out of a comment-stripped source. Every
+// anchor is asserted to occur EXACTLY once (a duplicated anchor would make
+// the slice ambiguous and the containment claim silently weaker), and the
+// terminator must exist after it, so a truncated slice can never pass by
+// running to end-of-file (the span-runs-into-the-next-declaration trap).
+function sliceOnce(stripped: string, anchor: string, terminator: string): string {
+  const at = stripped.indexOf(anchor);
+  expect(at, `anchor not found: ${anchor}`).toBeGreaterThanOrEqual(0);
+  expect(stripped.indexOf(anchor, at + 1), `anchor not unique: ${anchor}`).toBe(-1);
+  const end = stripped.indexOf(terminator, at);
+  expect(end, `terminator "${terminator}" not found after anchor ${anchor}`).toBeGreaterThan(at);
+  return stripped.slice(at, end + terminator.length);
+}
+
 describe('the Hud glue between the funnel and the sheet', () => {
-  // The three links a stubbed-hud suite can never see: Hud.openPlantSheet must
-  // reach the window, and the farm-event forward must reach notifyFarmEvent.
-  // Emptying either body would leave every module suite green while a real
-  // press did nothing (the (bn) shape one level up). Source pin over
-  // comment-stripped hud.ts: LINE comments strip FIRST (the flattener-order
-  // rule; a line comment holding a bare block-open would otherwise void the
-  // rest of the file), then block comments.
-  it('hud.ts wires the open route and the event forward to the plant sheet window', () => {
-    const raw = readFileSync(join(repoRoot, 'src/ui/hud.ts'), 'utf8');
-    const stripped = raw
-      .split('\n')
-      .map((line) => {
-        const i = line.indexOf('//');
-        return i >= 0 ? line.slice(0, i) : line;
-      })
-      .join('\n')
-      .replace(/\/\*[\s\S]*?\*\//g, '');
-    expect(stripped).toContain('.plantSheetWindow.open(');
-    expect(stripped).toContain('.plantSheetWindow.notifyFarmEvent(');
+  // The wirings a stubbed-hud suite can never see, each pinned INSIDE its own
+  // uniquely-anchored block (text presence anywhere in hud.ts would survive a
+  // relocation into dead code): the open route, the farm-event forward, the
+  // close-all route (Escape and closeManagedWindow), the error-toast forward
+  // (the sim's dead/busy gates answer via ctx.error, so gutting this arm
+  // re-strands the Plant control), and the panel keydown guard row (without
+  // it, Space/Enter on a focused sheet button also jumps or opens chat).
+  const stripped = stripComments(readFileSync(join(repoRoot, 'src/ui/hud.ts'), 'utf8'));
+
+  it('routes Hud.openPlantSheet to the window', () => {
+    const block = sliceOnce(stripped, 'openPlantSheet(bedId: string): void {', '\n  }');
+    expect(block).toContain('.plantSheetWindow.open(');
+  });
+
+  it('forwards the farm events to the window from the event switch', () => {
+    const block = sliceOnce(stripped, "case 'farmReady':", 'break;');
+    expect(block).toContain('.plantSheetWindow.notifyFarmEvent(');
+  });
+
+  it('routes the close-all case through the painter close', () => {
+    const block = sliceOnce(stripped, "case 'plant-sheet-window':", 'break;');
+    expect(block).toContain('.plantSheetWindow.close(');
+  });
+
+  it('forwards every error toast to the window (the dead/busy re-arm)', () => {
+    const block = sliceOnce(stripped, "case 'error': {", 'break;');
+    expect(block).toContain('.plantSheetWindow.notifyErrorToast(');
+  });
+
+  it('keeps the sheet in the panel keydown guard list', () => {
+    const block = sliceOnce(stripped, 'for (const panelId of [', '});');
+    expect(block).toContain("'#plant-sheet-window'");
+    expect(block).toContain('stopPropagation');
+  });
+});
+
+describe('the journey script stays layer-honest', () => {
+  // scripts/farming_journey_e2e.mjs is the go-live acceptance: q_farm_intro
+  // completes through CLIENT entry points only. window.__game is sanctioned
+  // for staging (position, xp/copper reads, /dev farmgrow) and for NOTHING
+  // else; a verb call through the debug surface is exactly the (bn) shortcut
+  // the Phase 9 QA proved can hide an unreachable feature. The positive arms
+  // keep this pin non-vacuous: an emptied or rewritten script that no longer
+  // drives the real controls reds here, not just one that cheats.
+  const script = stripComments(
+    readFileSync(join(repoRoot, 'scripts/farming_journey_e2e.mjs'), 'utf8'),
+  );
+
+  it('never drives a farming or quest verb through window.__game', () => {
+    for (const forbidden of [
+      'sim.plantCrop',
+      'sim.harvestCrop',
+      'sim.convertHusks',
+      'sim.acceptQuest',
+      'sim.turnInQuest',
+    ]) {
+      expect(script, `the journey script must not call ${forbidden}`).not.toContain(forbidden);
+    }
+  });
+
+  it('drives the real client controls', () => {
+    expect(script).toContain('[data-plant]');
+    expect(script).toContain('data-quest="q_farm_intro"');
+    expect(script).toContain('mobile-interact');
+    expect(script).toContain('KeyF');
   });
 });

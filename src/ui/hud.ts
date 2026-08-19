@@ -12714,6 +12714,7 @@ export class Hud {
           } else {
             this.showError(this.localizeErrorText(ev.text));
           }
+          this.plantSheetWindow.notifyErrorToast();
           break;
         }
         case 'questAccepted':

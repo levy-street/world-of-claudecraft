@@ -174,7 +174,9 @@ async function main() {
       }
     };
     if (MOBILE && !touchActive) {
-      ok('NOTE: touch interface inactive in this headless run; interacting via KeyF fallback');
+      // A KeyF fallback would let a broken #mobile-interact wiring print
+      // "JOURNEY PASS (mobile)"; the mobile run's whole point is the button.
+      fail('touch interface inactive; the mobile journey must drive #mobile-interact');
     }
 
     const waitVisible = (selector, timeoutMs) =>
