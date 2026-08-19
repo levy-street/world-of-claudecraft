@@ -5,6 +5,21 @@ the tooltip and buff bar surface. The special hazards here are namespace leakage
 buff clobbering an elixir or the reverse), a stacking rule that holds in only one
 direction, and a timing decision that was made but never pinned.
 
+PHASE EXECUTED 2026-08-19 (read before auditing; state.md owns the letters): the timing
+decision is (bx), completion of the sit-restore minted by src/sim/wellfed.ts at the
+updateRegen slot-null site with a food-only kind guard; (by) one shared aura name 'Well
+Fed', one kind buff_sta, one id wellfed_buff_sta (last-eaten-wins namespace-wide); (bz)
+the tier-1 dish carries the pottage-precedent vale_wheat binder. Magnitudes proposed
+3/600s 6/900s 9/900s 12/900s (capstone at the elixir ceiling; the 24-stamina stacking
+read is a flagged OPEN item, not an oversight). (bw) was discharged IN the phase: the
+golden-WIN and paying-band beats plus ONE isolated classified re-record (md5 83c34781
+to 25bd6b87, draws 16 to 110); this QA moves NO golden. Review-round items already
+taken: the single-Use:-prefix tooltip reword, the one-matcher buff name, the food
+guard's synthetic-drink arm, the predicate-level party-frame fixture value. Deferrals
+with owners: the wellfed parity beat rides Phase 12; the bespoke aura icon and the
+glazed-carrots-vs-pottage 32px icon eyeball ride the Phase 13 art batch; hud.ts
+headroom is ONE line (extraction-first for any new Hud line).
+
 ### QA Starter Prompt
 
 ```

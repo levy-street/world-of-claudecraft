@@ -9049,6 +9049,8 @@ export const cs_CZ: EnTranslations = {
       "useDrink": "Použití: Obnoví {amount} many během {seconds} s. Při pití musíš zůstat sedět.",
       "useElixir": "Použití: Zvyšuje {stat} o {value} po dobu {minutes} min. Použitelné v boji.",
       "useElixirAura": "Použití: Uděluje efekt {aura} po dobu {minutes} min. Použitelné v boji.",
+      "useWellfed": "{aura}: +{value} {stat} for {minutes} min, granted when you finish eating.",
+      "useWellfedAura": "Grants {aura} for {minutes} min when you finish eating.",
       "questItem": "Úkolový předmět",
       "questRelated": "Úkol: {quest}",
       "questRules": "Nelze prodat, uložit do banky ani směnit.",
@@ -12608,6 +12610,18 @@ export const cs_CZ: EnTranslations = {
       },
       "evergarden_harvest_platter": {
         "name": "Evergarden Harvest Platter"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "Eastbrook Glazed Carrots"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "Fenbridge Rice Pudding"
+      },
+      "highwatch_barley_porridge": {
+        "name": "Highwatch Barley Porridge"
+      },
+      "evergarden_braised_greens": {
+        "name": "Evergarden Braised Greens"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"

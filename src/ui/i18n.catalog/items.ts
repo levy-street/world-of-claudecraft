@@ -84,6 +84,17 @@ const itemStringsEn = {
       // what quaffing grants instead of saying nothing.
       useElixir: 'Use: Increases your {stat} by {value} for {minutes} min. Usable in combat.',
       useElixirAura: 'Use: Grants {aura} for {minutes} min. Usable in combat.',
+      // Well-fed buff dishes (wellfed_tooltip_view.ts): the buff lands only
+      // when the 18s sit-restore COMPLETES (an interrupted meal forfeits it),
+      // so the line states the finish-eating trigger; the aura-name fallback
+      // keeps an unmapped kind from shipping a silent dish.
+      // No 'Use:' prefix on either wellfed line: every buff dish also carries
+      // foodHp, so the useFood sentence above it already owns the Use: slot
+      // and a second one would double the prefix on one tooltip. The buff
+      // NAME is interpolated ({aura}) through the same sim_i18n matcher the
+      // buff bar reads, so one row owns the term in every locale.
+      useWellfed: '{aura}: +{value} {stat} for {minutes} min, granted when you finish eating.',
+      useWellfedAura: 'Grants {aura} for {minutes} min when you finish eating.',
       questItem: 'Quest Item',
       // Story tooltip lines (quest_item_tooltip_view.ts): related quest title,
       // keep-rules footer, and orphaned copy when the item is no longer needed
@@ -2485,6 +2496,10 @@ const ITEM_ENTITY_IDS = [
   'highwatch_gourd_soup',
   'evergarden_sunmelon_tart',
   'evergarden_harvest_platter',
+  'eastbrook_glazed_carrots',
+  'fenbridge_rice_pudding',
+  'highwatch_barley_porridge',
+  'evergarden_braised_greens',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2678,6 +2693,15 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   highwatch_gourd_soup: 'Highwatch Gourd Soup',
   evergarden_sunmelon_tart: 'Evergarden Sunmelon Tart',
   evergarden_harvest_platter: 'Evergarden Harvest Platter',
+  // The well-fed phase's four buff dishes (FARM_RECIPES), one per crop tier,
+  // same treatment and the same stay-in-step rule against the ItemDef `name`
+  // fields in src/sim/content/profession_items.ts. IP-safe per D17: real
+  // cooking words (glazed, pudding, porridge, braised) plus this game's own
+  // settlement flavor.
+  eastbrook_glazed_carrots: 'Eastbrook Glazed Carrots',
+  fenbridge_rice_pudding: 'Fenbridge Rice Pudding',
+  highwatch_barley_porridge: 'Highwatch Barley Porridge',
+  evergarden_braised_greens: 'Evergarden Braised Greens',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

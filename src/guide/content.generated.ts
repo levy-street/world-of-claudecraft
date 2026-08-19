@@ -8927,6 +8927,130 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 100,
           "zeroAt": 125
         }
+      },
+      {
+        "id": "recipe_eastbrook_glazed_carrots",
+        "name": "Eastbrook Glazed Carrots",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Brook Carrot",
+            "count": 4
+          },
+          {
+            "name": "Vale Wheat",
+            "count": 1
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Eastbrook Glazed Carrots",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        }
+      },
+      {
+        "id": "recipe_fenbridge_rice_pudding",
+        "name": "Fenbridge Rice Pudding",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Marsh Rice",
+            "count": 4
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Fenbridge Rice Pudding",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_highwatch_barley_porridge",
+        "name": "Highwatch Barley Porridge",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Highland Barley",
+            "count": 4
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Highwatch Barley Porridge",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_evergarden_braised_greens",
+        "name": "Evergarden Braised Greens",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Evergarden Greens",
+            "count": 4
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Evergarden Braised Greens",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
       }
     ]
   },

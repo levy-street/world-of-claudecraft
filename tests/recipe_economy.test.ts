@@ -153,7 +153,9 @@ describe('THE ECONOMY INVARIANT', () => {
     // vendor-fed must be added HERE deliberately, and it then rides the bound
     // below. recipe_bronze_hoe joined with the hoe phase: both its reagents
     // carry a copper basis (fine_vale_wheat is the farming economy-basis
-    // convention, garden_hoe is the vendor-priced tier-1 rung).
+    // convention, garden_hoe is the vendor-priced tier-1 rung). The Phase 11
+    // tier-1 buff dish stays OUT of this set deliberately: its vale_wheat
+    // binder (the pottage precedent) keeps a priceless reagent on the row.
     expect(vendorFed.map((recipe) => recipe.id).sort()).toEqual([
       'recipe_ashwood_axe',
       'recipe_bronze_hoe',
@@ -196,9 +198,10 @@ describe('THE ECONOMY INVARIANT', () => {
         );
       }),
     );
-    // Since the gathered-material delist, every one of the six loops has at
-    // least one reagent no NPC sells. This records that fact; it is NOT what
-    // the bound runs over.
+    // Since the gathered-material delist, every one of the loops has at
+    // least one reagent no NPC sells (Phase 11's tier-1 buff dish keeps the
+    // property via its vale_wheat binder). This records that fact; it is NOT
+    // what the bound runs over.
     expect(liveVendorFed.map((recipe) => recipe.id)).toEqual([]);
     // The live set is a subset of the counterfactual one by construction, and
     // the counterfactual one is what still carries the assertions. Stating the
@@ -297,10 +300,11 @@ describe('REFERENTIAL INTEGRITY', () => {
     expect(ROD_RECIPES).toHaveLength(2);
     expect(TOOL_EFFECT_RECIPES).toHaveLength(2);
     expect(HOE_RECIPES).toHaveLength(3);
-    // The economy-hooks phase's eight farm dishes plus the growth tonic's
-    // alchemy row. Deliberately re-pinned here, beside its siblings, so the
-    // trainer sum above can never absorb a silent addition to the farm set.
-    expect(FARM_RECIPES).toHaveLength(9);
+    // The economy-hooks phase's eight farm dishes, the four Phase 11 well-fed
+    // buff dishes, and the growth tonic's alchemy row. Deliberately re-pinned
+    // here (9 -> 13), beside its siblings, so the trainer sum above can never
+    // absorb a silent addition to the farm set.
+    expect(FARM_RECIPES).toHaveLength(13);
   });
 
   it('the three station-free combo recipes resolve a home via professionId, not stationType', () => {

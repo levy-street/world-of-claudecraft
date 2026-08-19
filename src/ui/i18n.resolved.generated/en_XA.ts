@@ -9049,6 +9049,8 @@ export const en_XA: EnTranslations = {
       "useDrink": "[Úšé: Ŕéšţóŕéš {amount} ɱáñá óʋéŕ {seconds} šéç. Ɱúšţ ŕéɱáíñ šéáţéð ŵĥíļé ðŕíñķíñĝ.]",
       "useElixir": "[Úšé: Íñçŕéášéš ýóúŕ {stat} ƀý {value} ƒóŕ {minutes} ɱíñ. Úšáƀļé íñ çóɱƀáţ.]",
       "useElixirAura": "[Úšé: Ĝŕáñţš {aura} ƒóŕ {minutes} ɱíñ. Úšáƀļé íñ çóɱƀáţ.]",
+      "useWellfed": "[{aura}: +{value} {stat} ƒóŕ {minutes} ɱíñ, ĝŕáñţéð ŵĥéñ ýóú ƒíñíšĥ éáţíñĝ.]",
+      "useWellfedAura": "[Ĝŕáñţš {aura} ƒóŕ {minutes} ɱíñ ŵĥéñ ýóú ƒíñíšĥ éáţíñĝ.]",
       "questItem": "[Ɋúéšţ Íţéɱ]",
       "questRelated": "[Ɋúéšţ: {quest}]",
       "questRules": "[Çáññóţ ƀé šóļð, ƀáñķéð, óŕ ţŕáðéð.]",
@@ -12608,6 +12610,18 @@ export const en_XA: EnTranslations = {
       },
       "evergarden_harvest_platter": {
         "name": "[Éʋéŕĝáŕðéñ Ĥáŕʋéšţ Þļáţţéŕ]"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "[Éášţƀŕóóķ Ĝļážéð Çáŕŕóţš]"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "[Ƒéñƀŕíðĝé Ŕíçé Þúððíñĝ]"
+      },
+      "highwatch_barley_porridge": {
+        "name": "[Ĥíĝĥŵáţçĥ Ɓáŕļéý Þóŕŕíðĝé]"
+      },
+      "evergarden_braised_greens": {
+        "name": "[Éʋéŕĝáŕðéñ Ɓŕáíšéð Ĝŕééñš]"
       },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"

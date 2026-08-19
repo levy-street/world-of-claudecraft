@@ -1621,10 +1621,11 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
   },
 ];
 
-// The farm-economy hook set (Phase 6): the recipes that turn farm output into
-// something a player wants, so growing a crop is a supply chain rather than a
-// vendor-sell loop. Eight plain cooking dishes plus one alchemy row, the
-// growth tonic's craft (D7, the cross-profession trade).
+// The farm-economy hook set (Phase 6, reopened by Phase 11): the recipes that
+// turn farm output into something a player wants, so growing a crop is a
+// supply chain rather than a vendor-sell loop. Twelve cooking rows (the eight
+// plain dishes plus the four Phase 11 well-fed buff dishes) plus one alchemy
+// row, the growth tonic's craft (D7, the cross-profession trade).
 //
 // A SEPARATE LIST FROM LADDER_RECIPES, deliberately, for the same reason
 // ROD_RECIPES and HOE_RECIPES are separate: LADDER_RECIPES is CLOSED at three
@@ -1641,9 +1642,10 @@ export const LADDER_RECIPES: ProfessionRecipeRecord[] = [
 // alchemist_verane), with no content edit either side, the post-freeze
 // authoring default: a trainer's list derives from the crafts its station
 // serves. Every row follows the ladder's cross-craft scaffolding convention
-// (skillReq 0 -> 10/10, 25 -> 16/15, 50 -> 20/20). The DISH outputs are plain
-// kind 'food' + foodHp ItemDefs in content/profession_items.ts: NO buff
-// machinery, no new effect field. The tonic's output is the kind 'junk' item
+// (skillReq 0 -> 10/10, 25 -> 16/15, 50 -> 20/20). The PLAIN dish outputs are
+// plain kind 'food' + foodHp ItemDefs in content/profession_items.ts with no
+// buff machinery; the four Phase 11 buff dishes add exactly the one `wellfed`
+// field (see their block below). The tonic's output is the kind 'junk' item
 // the plant_crop command already consumes as a knob, which is why it gets no
 // use arm here either.
 //
@@ -1815,6 +1817,101 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
       { itemId: 'evergarden_greens', count: 3 },
       { itemId: 'fine_evergarden_greens', count: 1 },
       { itemId: 'cooking_salt', count: 2 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'kitchens',
+  },
+  // --- Phase 11 buff dishes (well-fed food) --------------------------------
+  // One buff dish per crop tier, so the produce ladder has a well-fed
+  // consumer at every rung. Each takes its tier's produce x4 (one more than
+  // the plain twins), so the buff dish costs strictly more produce than its
+  // plain sibling at the same rung, plus the kitchen staple salt (the tier-1
+  // row adds the pottage-precedent vale_wheat binder, see below). NO fine
+  // twins here: the fine_marsh_rice / fine_highland_barley consumer set is an
+  // OPEN maintainer question, and the five dish twins above stay single-owner.
+  // The tier 3/4 pair ships REAGENT-DORMANT under deviation (bo): trainable
+  // and well-formed, but tier 3/4 produce has no seed faucet until the D11
+  // bootstrap ruling (stated again at the two rows). VALUES ARE PROPOSED AND
+  // FLAGGED FOR THE MAINTAINER, reagent counts and rungs alike.
+  //
+  // The tier-1 row keeps the POTTAGE PRECEDENT: brook_carrot is the D9
+  // vegetable, the one produce row that is vendor-stocked AND priced, so a
+  // carrot dish carries a vale_wheat binder exactly like
+  // recipe_eastbrook_root_pottage above. That keeps the whole-list invariant
+  // intact (every farm recipe holds at least one reagent no counter stocks
+  // and no vendor prices), so no dish, buff or plain, is craftable from
+  // counter stock alone, and no rung-0 cooking skill-up faucet opens from
+  // vendor goods (the unresolved hazard the deviation (ai) QA addendum
+  // flagged for the tonic; opening a second one is a maintainer call this
+  // phase does not make).
+  {
+    id: 'recipe_eastbrook_glazed_carrots',
+    professionId: 'cooking',
+    resultItemId: 'eastbrook_glazed_carrots',
+    resultCount: 1,
+    // The starter buff dish: the D9 carrot glazed down with salt and bound
+    // with a handful of wheat (the pottage's binder idiom), reachable the
+    // hour a first carrot bed comes in. Input 76 vs output 6.
+    reagents: [
+      { itemId: 'brook_carrot', count: 4 },
+      { itemId: 'vale_wheat', count: 1 },
+      { itemId: 'cooking_salt', count: 1 },
+    ],
+    skillReq: 0,
+    itemLevelBudget: 10,
+    level: 10,
+    acquisition: ['trainer'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_fenbridge_rice_pudding',
+    professionId: 'cooking',
+    resultItemId: 'fenbridge_rice_pudding',
+    resultCount: 1,
+    // The fen tier's buff dish: the same rice and salt as the plain bowl,
+    // slow-cooked into a pudding worth sitting through. Input 40 vs output 25.
+    reagents: [
+      { itemId: 'marsh_rice', count: 4 },
+      { itemId: 'cooking_salt', count: 1 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    level: 15,
+    acquisition: ['trainer'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_highwatch_barley_porridge',
+    professionId: 'cooking',
+    resultItemId: 'highwatch_barley_porridge',
+    resultCount: 1,
+    // The wall kitchens' buff dish. REAGENT-DORMANT under deviation (bo):
+    // trainable and well-formed today, but highland_barley has no seed
+    // faucet until the D11 bootstrap ruling. Input 68 vs output 60.
+    reagents: [
+      { itemId: 'highland_barley', count: 4 },
+      { itemId: 'cooking_salt', count: 1 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_evergarden_braised_greens',
+    professionId: 'cooking',
+    resultItemId: 'evergarden_braised_greens',
+    resultCount: 1,
+    // The capstone buff dish. REAGENT-DORMANT under deviation (bo):
+    // trainable and well-formed today, but evergarden_greens has no seed
+    // faucet until the D11 bootstrap ruling. Input 168 vs output 150.
+    reagents: [
+      { itemId: 'evergarden_greens', count: 4 },
+      { itemId: 'cooking_salt', count: 1 },
     ],
     skillReq: 50,
     itemLevelBudget: 20,

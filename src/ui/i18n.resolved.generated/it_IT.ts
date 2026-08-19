@@ -9049,6 +9049,8 @@ export const it_IT: EnTranslations = {
       "useDrink": "Usa: ripristina {amount} mana in {seconds} s. Devi restare seduto mentre bevi.",
       "useElixir": "Uso: aumenta {stat} di {value} per {minutes} min. Utilizzabile in combattimento.",
       "useElixirAura": "Uso: concede {aura} per {minutes} min. Utilizzabile in combattimento.",
+      "useWellfed": "{aura}: +{value} {stat} for {minutes} min, granted when you finish eating.",
+      "useWellfedAura": "Grants {aura} for {minutes} min when you finish eating.",
       "questItem": "Oggetto missione",
       "questRelated": "Missione: {quest}",
       "questRules": "Non può essere venduto, depositato in banca o scambiato.",
@@ -12608,6 +12610,18 @@ export const it_IT: EnTranslations = {
       },
       "evergarden_harvest_platter": {
         "name": "Evergarden Harvest Platter"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "Eastbrook Glazed Carrots"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "Fenbridge Rice Pudding"
+      },
+      "highwatch_barley_porridge": {
+        "name": "Highwatch Barley Porridge"
+      },
+      "evergarden_braised_greens": {
+        "name": "Evergarden Braised Greens"
       },
       "conjured_water4": {
         "name": "Acqua sorgiva evocata"

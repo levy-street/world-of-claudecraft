@@ -9049,6 +9049,8 @@ export const pl_PL: EnTranslations = {
       "useDrink": "Użycie: Przywraca {amount} many w ciągu {seconds} s. Podczas picia musisz pozostać w pozycji siedzącej.",
       "useElixir": "Użycie: zwiększa twoje {stat} o {value} na {minutes} min. Można użyć w walce.",
       "useElixirAura": "Użycie: nadaje {aura} na {minutes} min. Można użyć w walce.",
+      "useWellfed": "{aura}: +{value} {stat} for {minutes} min, granted when you finish eating.",
+      "useWellfedAura": "Grants {aura} for {minutes} min when you finish eating.",
       "questItem": "Przedmiot zadania",
       "questRelated": "Zadanie: {quest}",
       "questRules": "Nie można go sprzedać, zdeponować w banku ani wymienić.",
@@ -12608,6 +12610,18 @@ export const pl_PL: EnTranslations = {
       },
       "evergarden_harvest_platter": {
         "name": "Evergarden Harvest Platter"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "Eastbrook Glazed Carrots"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "Fenbridge Rice Pudding"
+      },
+      "highwatch_barley_porridge": {
+        "name": "Highwatch Barley Porridge"
+      },
+      "evergarden_braised_greens": {
+        "name": "Evergarden Braised Greens"
       },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"

@@ -9049,6 +9049,8 @@ export const nl_NL: EnTranslations = {
       "useDrink": "Gebruik: Herstelt {amount} mana over {seconds} sec. Je moet blijven zitten tijdens het drinken.",
       "useElixir": "Gebruik: Verhoogt je {stat} met {value} gedurende {minutes} min. Bruikbaar in gevecht.",
       "useElixirAura": "Gebruik: Verleent {aura} gedurende {minutes} min. Bruikbaar in gevecht.",
+      "useWellfed": "{aura}: +{value} {stat} for {minutes} min, granted when you finish eating.",
+      "useWellfedAura": "Grants {aura} for {minutes} min when you finish eating.",
       "questItem": "Questvoorwerp",
       "questRelated": "Quest: {quest}",
       "questRules": "Kan niet worden verkocht, in de bank gezet of geruild.",
@@ -12608,6 +12610,18 @@ export const nl_NL: EnTranslations = {
       },
       "evergarden_harvest_platter": {
         "name": "Evergarden Harvest Platter"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "Eastbrook Glazed Carrots"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "Fenbridge Rice Pudding"
+      },
+      "highwatch_barley_porridge": {
+        "name": "Highwatch Barley Porridge"
+      },
+      "evergarden_braised_greens": {
+        "name": "Evergarden Braised Greens"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"

@@ -9049,6 +9049,8 @@ export const id_ID: EnTranslations = {
       "useDrink": "Pakai: Memulihkan {amount} mana selama {seconds} detik. Harus tetap duduk selama minum.",
       "useElixir": "Pakai: Meningkatkan {stat} milikmu sebesar {value} selama {minutes} mnt. Bisa dipakai dalam pertempuran.",
       "useElixirAura": "Pakai: Memberikan {aura} selama {minutes} mnt. Bisa dipakai dalam pertempuran.",
+      "useWellfed": "{aura}: +{value} {stat} for {minutes} min, granted when you finish eating.",
+      "useWellfedAura": "Grants {aura} for {minutes} min when you finish eating.",
       "questItem": "Barang Misi",
       "questRelated": "Misi: {quest}",
       "questRules": "Tidak dapat dijual, disimpan di bank, atau ditukar.",
@@ -12608,6 +12610,18 @@ export const id_ID: EnTranslations = {
       },
       "evergarden_harvest_platter": {
         "name": "Evergarden Harvest Platter"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "Eastbrook Glazed Carrots"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "Fenbridge Rice Pudding"
+      },
+      "highwatch_barley_porridge": {
+        "name": "Highwatch Barley Porridge"
+      },
+      "evergarden_braised_greens": {
+        "name": "Evergarden Braised Greens"
       },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"

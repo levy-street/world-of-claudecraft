@@ -959,6 +959,13 @@ interface BaseItemDef {
   // `aura` is a flavor name shown in the buff frame; `value` is the stat amount,
   // `duration` the buff length in seconds. Folds through the normal aura/stat path.
   elixir?: { aura: string; kind: AuraKind; value: number; duration: number };
+  // well-fed buff food (farming, D15): the elixir mirror for food, field for
+  // field, but the aura is minted only when the 18s sit-restore COMPLETES
+  // (never on first bite; an interrupted meal forfeits it; src/sim/wellfed.ts
+  // owns the timing and the mint). Aura ids live in the wellfed_<kind>
+  // namespace, so a food buff and an elixir of the same stat coexist and
+  // neither ever clobbers the other.
+  wellfed?: { aura: string; kind: AuraKind; value: number; duration: number };
   quality?: 'poor' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'; // gray/white/green/blue/purple/orange name colors
   // bags (kind:'bag'): extra inventory slots granted while equipped in one of
   // the 4 bag sockets (see src/sim/bags.ts; the 16-slot backpack is implicit).

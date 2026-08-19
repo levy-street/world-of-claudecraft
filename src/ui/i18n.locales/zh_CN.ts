@@ -2621,6 +2621,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useElixir':
     '使用：使你的{stat}提高 {value} 点，持续 {minutes} 分钟。战斗中可用。',
   'itemUi.tooltip.useElixirAura': '使用：获得{aura}效果，持续 {minutes} 分钟。战斗中可用。',
+  'itemUi.tooltip.useWellfed':
+    '吃完后获得{aura}效果，使你的{stat}提高 {value} 点，持续 {minutes} 分钟。',
+  'itemUi.tooltip.useWellfedAura': '吃完后获得{aura}效果，持续 {minutes} 分钟。',
   'itemUi.tooltip.clickUseInstant': '点击在战斗中立即使用',
   'itemUi.tooltip.clickUse': '点击使用',
   'itemUi.tooltip.clickBuyback': '点击回购',
@@ -8552,6 +8555,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.highwatch_gourd_soup.name': '高望霜瓜汤',
   'entities.items.evergarden_sunmelon_tart.name': '常青园太阳瓜挞',
   'entities.items.evergarden_harvest_platter.name': '常青园丰收拼盘',
+  'entities.items.eastbrook_glazed_carrots.name': '东溪蜜汁胡萝卜',
+  'entities.items.fenbridge_rice_pudding.name': '芬桥大米布丁',
+  'entities.items.highwatch_barley_porridge.name': '高望大麦粥',
+  'entities.items.evergarden_braised_greens.name': '常青园焖青菜',
   'hudChrome.archetypeTitle.label': '称号',
   'hudChrome.archetypeTitle.none': '无',
   'hudChrome.archetypeTitle.hobbyLabel': '爱好',

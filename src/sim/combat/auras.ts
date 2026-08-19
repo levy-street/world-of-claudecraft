@@ -44,6 +44,7 @@ import { isPersistentEngineAura } from '../persistent_aura';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
+import { applyWellfedOnConsumeComplete } from '../wellfed';
 import { tickAfflictionAura, tickMaledictGaze } from './affliction';
 import { isStunned } from './cc';
 import { regenerateRuinOutOfCombat, tickPyreGuardian } from './destruction';
@@ -177,7 +178,12 @@ export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void 
       });
     }
     c.remaining -= 2;
-    if (c.remaining <= 0) p[slot] = null;
+    // Meal completed: mint the Well Fed buff (src/sim/wellfed.ts) before the
+    // slot is nulled; an interrupted meal never reaches this line. Zero draws.
+    if (c.remaining <= 0) {
+      applyWellfedOnConsumeComplete(ctx, p, c);
+      p[slot] = null;
+    }
   }
 }
 

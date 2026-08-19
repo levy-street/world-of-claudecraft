@@ -2765,6 +2765,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Использование: повышает {stat} на {value} в течение {minutes} мин. Можно использовать в бою.',
   'itemUi.tooltip.useElixirAura':
     'Использование: дает эффект "{aura}" на {minutes} мин. Можно использовать в бою.',
+  'itemUi.tooltip.useWellfed':
+    'Эффект "{aura}": {stat} +{value} на {minutes} мин. Дается, когда вы доедаете.',
+  'itemUi.tooltip.useWellfedAura': 'Дает эффект "{aura}" на {minutes} мин, когда вы доедаете.',
   'itemUi.tooltip.clickUseInstant': 'Нажмите, чтобы мгновенно использовать в бою',
   'itemUi.tooltip.clickUse': 'Нажмите, чтобы использовать',
   'itemUi.tooltip.clickBuyback': 'Нажмите, чтобы выкупить',
@@ -5596,6 +5599,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.highwatch_gourd_soup.name': 'Хайвотчский суп из морозной тыквы',
   'entities.items.evergarden_sunmelon_tart.name': 'Тарт с солнечной дыней из Вечного Сада',
   'entities.items.evergarden_harvest_platter.name': 'Блюдо урожая Вечного Сада',
+  'entities.items.eastbrook_glazed_carrots.name': 'Истврукская глазированная морковь',
+  'entities.items.fenbridge_rice_pudding.name': 'Фенбриджский рисовый пудинг',
+  'entities.items.highwatch_barley_porridge.name': 'Хайвотчская ячменная каша',
+  'entities.items.evergarden_braised_greens.name': 'Тушёная зелень Вечного Сада',
   'hud.core.chatChannels.add': 'Добавить канал чата',
   'hud.core.chatChannels.addTitle': 'Добавить канал',
   'hud.core.chatChannels.close': 'Закрыть вкладку {channel}',

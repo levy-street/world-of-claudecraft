@@ -9049,6 +9049,8 @@ export const tr_TR: EnTranslations = {
       "useDrink": "Kullanım: {seconds} saniyede {amount} mana yeniler. İçerken oturur kalmalısın.",
       "useElixir": "Kullanım: {stat} özelliğini {minutes} dakika boyunca {value} artırır. Dövüşte kullanılabilir.",
       "useElixirAura": "Kullanım: {minutes} dakika boyunca {aura} bahşeder. Dövüşte kullanılabilir.",
+      "useWellfed": "{aura}: +{value} {stat} for {minutes} min, granted when you finish eating.",
+      "useWellfedAura": "Grants {aura} for {minutes} min when you finish eating.",
       "questItem": "Görev Eşyası",
       "questRelated": "Görev: {quest}",
       "questRules": "Satılamaz, bankaya konulamaz veya takas edilemez.",
@@ -12608,6 +12610,18 @@ export const tr_TR: EnTranslations = {
       },
       "evergarden_harvest_platter": {
         "name": "Evergarden Harvest Platter"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "Eastbrook Glazed Carrots"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "Fenbridge Rice Pudding"
+      },
+      "highwatch_barley_porridge": {
+        "name": "Highwatch Barley Porridge"
+      },
+      "evergarden_braised_greens": {
+        "name": "Evergarden Braised Greens"
       },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"

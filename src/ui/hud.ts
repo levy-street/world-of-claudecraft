@@ -757,6 +757,7 @@ import {
 } from './wallet_balance';
 import { type WeaponProcEffectDesc, weaponProcLines } from './weapon_proc_view';
 import { weaponTypeLabelKey } from './weapon_type_label';
+import { wellfedTooltipLines } from './wellfed_tooltip_view';
 import { promptWikiVisit } from './wiki_link';
 import {
   installWindowDrag,
@@ -6051,6 +6052,7 @@ export class Hud {
     // useItem), from the pure sibling view so bags, bank, crafting, vendor,
     // and market all state what the elixir does.
     html += elixirTooltipLines(item);
+    html += wellfedTooltipLines(item);
     // Quest story block (related quest, progress, rules, orphaned). Replaces the
     // old plain "Quest Item" desc that doubled the kind line.
     if (questModel) html += this.questItemTooltipStoryHtml(questModel);

@@ -13,10 +13,12 @@ import {
 import {
   AURA_IMAGE_IDS,
   abilityImageUrl,
+  auraIconRecipe,
   auraImageUrl,
   hasAbilityIconIdentity,
   hasAuraImageIdentity,
   hasAuraRecipe,
+  isUnknownIconRecipe,
 } from '../src/ui/icons';
 import { observeFiestaPowerupAuras } from './helpers/fiesta_powerup_aura_observer';
 
@@ -461,6 +463,18 @@ describe('resolveAuraIconId', () => {
     expect(auraImageUrl('fear_incap')).toBe('/ui/auras/fear_incap.webp');
     expect(resolve('blind_willow_sprite', 'blind')).toBe('aura_blind');
     expect(resolve('silence_abyssal_horror', 'silence')).toBe('aura_silence');
+  });
+
+  it('resolves the well-fed food buff to a usable generic recipe, never the unknown icon', () => {
+    // wellfed_buff_sta (the one aura id all four farming buff dishes mint)
+    // ships no dedicated art: it must land on the generic aura_<kind>
+    // fallback family and that recipe must be a REAL painted fallback, not
+    // the unknown-id icon. Contrast: elixir_buff_sta keeps its own identity
+    // because it owns shipped WebP art.
+    const iconId = resolve('wellfed_buff_sta', 'buff_sta');
+    expect(iconId).toBe('aura_buff_sta');
+    expect(isUnknownIconRecipe(auraIconRecipe(iconId))).toBe(false);
+    expect(resolve('elixir_buff_sta', 'buff_sta')).toBe('elixir_buff_sta');
   });
 
   it('falls back to the generic aura-kind identity when no authored identity exists', () => {

@@ -4,6 +4,33 @@ Read this file first in every phase session. It is the single authority for lock
 decisions. If a phase file contradicts this file, this file wins and the phase file
 gets swept in the same pass (amend the QA twin too, always).
 
+Current phase: Phase 11 (well-fed food) DONE 2026-08-19, local-only per D22
+(branch fix/farming-phase-11-well-fed-food, eight commits, merge hash in
+progress.md). ItemDef.wellfed ships beside elixir as the D15 mirror, minted
+by src/sim/wellfed.ts at COMPLETION of the 18s sit-restore (deviation (bx):
+the timing decision; an interrupted meal forfeits; food-only kind guard),
+via ctx.applyAura with the one aura id wellfed_buff_sta: all four dishes
+share the aura name 'Well Fed' and the buff_sta kind (deviation (by)), so
+food never clobbers elixir_<kind> and last eaten always wins namespace-wide.
+Four buff dishes, one per crop tier, joined FARM_RECIPES (9 to 13; produce
+x4 plus salt; the tier-1 row carries the pottage-precedent vale_wheat
+binder, deviation (bz), keeping every farm row uncraftable from counter
+stock); proposed magnitudes 3/600s, 6/900s, 9/900s, 12/900s at or below the
+documented elixir ceiling, maintainer-flagged (the capstone sits AT the
+ceiling and stacks with a same-stat elixir to 24, the OPEN tuning read).
+Tier 3/4 dishes reagent-dormant under (bo). UI: aura.wellFed + the
+AURA_NAME_KEY row, src/ui/wellfed_tooltip_view.ts beside the elixir view
+(both branches interpolate the buff name through the one matcher), buff bar
+and icon ride the existing aura chain; hud.ts 19219/19220. (bw) DISCHARGED:
+the farming_session scenario gained a position-searched golden-WIN beat
+(five-fold signed grants at both grades, the crop announce, the mark, all
+in the digest) and a paying-band tier-3 seed-back beat; ONE isolated
+classified re-record, md5 83c34781 to 25bd6b8774f913279c96dddb25f93403,
+draws 16 to 110, zero other goldens moved. Reviews: architecture,
+cross-platform, content-obligations, frontend all 0 BLOCKING (every
+SHOULD-FIX taken or ledgered); baselines: deeds 280/3190/43 unchanged,
+IWorld 329 = 88 + 241, commands 202/215, delta keys 87, no new
+SimEvent/IWorld/command/wire surface, ITEM_ART_PENDING 39 to 43. Prior:
 Twenty-first absorb DONE 2026-08-19 (release/v0.40.0 tip e56707a675; the
 D22 minor-version rule fired the 06b shape as its own sync mid-phase
 before Phase 11; 7 commits / 86 files: the v0.39 spell-icon revert plus
@@ -2451,7 +2478,12 @@ question does not arise (farming has no station).
   two VERIFY items. DECLINED: the types.ts gatherRareEvent comment
   reflow (cosmetic; a sim-content comment edit stales the
   portrait-manifest evidence family for zero behavioral value).
-  (bw) GOLDEN-WIN PARITY COVERAGE DEFERRED TO PHASE 11 (the deviation (z)
+  (bw) GOLDEN-WIN PARITY COVERAGE DEFERRED TO PHASE 11, AND DISCHARGED
+  THERE 2026-08-19: the scenario gained the position-searched golden-WIN
+  beat and the paying-band tier-3 seed-back beat (probe facts, padding
+  shape, and the isolated classified re-record recorded in the progress.md
+  Phase 11 notes; md5 83c34781 to 25bd6b87, draws 16 to 110, prior frames
+  byte-identical). The original deferral record follows. (the deviation (z)
   precedent: a QA moves no golden): the farming_session re-record left
   every golden roll a recorded LOSS, so the WIN path (five-fold signed
   grants, the crop-source fanout, the mark) reaches no golden digest,
@@ -2462,6 +2494,42 @@ question does not arise (farming has no station).
   classification discipline. Unit-level coverage carries both paths
   meanwhile (the winner arms and band arms in
   tests/professions_farming.test.ts).
+
+  Phase 11: (bx) THE D15 TIMING REFINEMENT, LOCKED: the wellfed aura is
+  minted at COMPLETION of the 18s sit-restore, never on first bite. D15's
+  "applied via ctx.applyAura from the food path in src/sim/items.ts" is
+  refined, not contradicted: the food path STARTS in items.ts (consume,
+  slot, sit) and COMPLETES in src/sim/combat/auras.ts updateRegen where
+  remaining <= 0 nulls the slot; src/sim/wellfed.ts owns the mint at that
+  one natural completion site (a minimal call before the null, the PRIME
+  DIRECTIVE respected), still via ctx.applyAura, never effect_dispatch.
+  An interrupted meal (damage, death, match reset, anything that nulls the
+  slot early) forfeits the buff: the sit-through-the-meal ritual is the
+  point, and immediate-on-consume was rejected as a full buff for one
+  bite. A food-only kind guard keeps a future wellfed-carrying drink from
+  minting at gulp completion undecided (pinned behaviorally with a
+  synthetic drink slot plus a catalog sweep in tests/wellfed.test.ts).
+  Zero rng draws; the aura is transient across save/load (executed
+  round-trip pin).
+  (by) ONE AURA NAME, ONE KIND, ONE ID: all four buff dishes share the
+  aura name 'Well Fed' and the kind buff_sta, so they mint the single id
+  wellfed_buff_sta and last-eaten-wins holds across the WHOLE food
+  namespace (the classic one-food-buff idiom), not merely per kind. One
+  AURA_NAME_KEY row covers the family; re-eating is the silent same-name
+  refresh; a tier-1 dish deliberately overwrites a live tier-4 buff
+  (classic last-eaten-wins, noted by the architecture review). The
+  tooltip interpolates the SAME matcher row in both branches
+  (src/ui/wellfed_tooltip_view.ts), so the term cannot fork per locale.
+  (bz) THE TIER-1 BINDER RULING: brook_carrot is the D9 vegetable (the
+  one vendor-stocked AND priced produce row), so the tier-1 buff dish
+  carries a vale_wheat binder exactly like the Phase 6 pottage, keeping
+  the whole-list invariant (every FARM_RECIPES row holds a reagent no
+  counter stocks and no vendor prices) and opening NO rung-0 cooking
+  skill-up faucet from vendor goods (the unresolved (ai)-addendum hazard;
+  a build-round exemption variant was considered and reverted at
+  integration). Pinned uniformly in tests/farm_recipes.test.ts,
+  tests/professions_zone_rollout.test.ts, and tests/recipe_economy.test.ts
+  (counterfactual vendor-fed set stays seven, live set stays empty).
 
 ## OPEN items (maintainer decisions or later-phase calls, never guess)
 
@@ -2499,6 +2567,15 @@ question does not arise (farming has no station).
   schedule, harvest-lives save-chance endpoints, well-fed magnitudes and durations,
   feast charge count and expiry. Phases propose concrete values in the PR body and
   flag them for the maintainer; the packet deliberately does not freeze them.
+  Phase 11 proposed the well-fed ladder 3/600s, 6/900s, 9/900s, 12/900s (buff_sta,
+  each pair dominated by or equal to a shipped elixir point). TWO reads owed: the
+  capstone dish EQUALS the strongest crafted elixir (12/900, elixir_of_the_serpent)
+  rather than sitting below it, and the distinct wellfed_ namespace makes food
+  STACK with a same-stat elixir for a combined 24 stamina no design doc budgets;
+  the cheap lever is dropping the capstone to 9 or 10 (flagged at the
+  profession_items.ts rows). Also flagged there: reagent counts (produce x4), the
+  tier 3 and tier 4 buff dishes both at rung 50 (restating the Phase 6 three-rungs
+  -for-four-tiers domination flag), and tier 4 shipping quality 'rare' like tier 3.
 - Whether farming counting toward existing any-profession deeds is accepted (default
   yes; it is automatic via the data-driven arm; flag in the Phase 1 PR body).
 - Seed-back roll rates for tier 3/4 seeds (economy-sensitive; propose in the content

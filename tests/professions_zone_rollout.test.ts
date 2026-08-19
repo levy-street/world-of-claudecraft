@@ -1110,10 +1110,11 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
       'osmium_hoe',
       ...FARM_RECIPES.map((recipe) => recipe.resultItemId),
     ]);
-    // Non-vacuity of the needle set: nine recipe outputs plus the eight
-    // literals above, growth_tonic counted once (it is both).
-    expect(FARM_RECIPES).toHaveLength(9);
-    expect(NEVER_STOCKED.size).toBe(16);
+    // Non-vacuity of the needle set: thirteen recipe outputs plus the eight
+    // literals above, growth_tonic counted once (it is both). Re-pinned
+    // 9/16 -> 13/20 by Phase 11 (the four well-fed buff dishes).
+    expect(FARM_RECIPES).toHaveLength(13);
+    expect(NEVER_STOCKED.size).toBe(20);
     for (const [npcId, npc] of Object.entries(NPCS)) {
       for (const itemId of npc.vendorItems ?? []) {
         expect(NEVER_STOCKED.has(itemId), `${npcId} stocks never-stocked ${itemId}`).toBe(false);
@@ -1149,10 +1150,12 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
     // recipe whose WHOLE reagent list can be bought off a counter would mint
     // its output (and its cooking skill-ups) with no crop ever grown. So
     // every FARM_RECIPES row must keep at least one reagent no NPC stocks.
-    // For the eight dishes that reagent is farm produce (brook_carrot is the
+    // For the plain dishes that reagent is farm produce (brook_carrot is the
     // one stocked produce, D9, and its pottage keeps vale_wheat and the fine
     // twin off every counter); for the tonic it is silverleaf_herb,
-    // wild-gathered and priceless by doctrine.
+    // wild-gathered and priceless by doctrine; for the four Phase 11 buff
+    // dishes it is their tier's unstocked produce, the tier-1 row carrying
+    // the pottage-precedent vale_wheat binder for exactly this reason.
     //
     // DELIBERATE and ledgered as deviation (ai): the tonic IS craftable by a
     // player who gathers the herbs. That is exactly D7's cross-profession
@@ -1174,8 +1177,9 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
     // Same non-vacuity as the arm above: the world really has counters, so an
     // "unstocked" verdict below is a real absence rather than an empty walk.
     expect(stockedItemIds.size).toBeGreaterThan(0);
-    // The whole Phase 6 set really swept: eight dishes plus the tonic.
-    expect(FARM_RECIPES).toHaveLength(9);
+    // The whole farm set really swept: twelve dishes plus the tonic
+    // (re-pinned 9 -> 13 by Phase 11, the four well-fed buff dishes).
+    expect(FARM_RECIPES).toHaveLength(13);
     for (const recipe of FARM_RECIPES) {
       expect(recipe.reagents.length, `${recipe.id} needs reagents to sweep`).toBeGreaterThan(0);
       const unstocked = recipe.reagents

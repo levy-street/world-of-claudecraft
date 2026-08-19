@@ -439,9 +439,10 @@ describe('release v0.39 icon-art second-pass lineage', () => {
       artSubjectHotbarItemIds,
       'production isHotbarItemId art-subject inventory (live minus ITEM_ART_PENDING)',
     ).toHaveLength(72);
-    // The farming branch's declared debt on the hotbar: eight farm dishes
-    // (kind 'food') and the four-rung hoe ladder (use.type 'gatherTool').
-    expect(pendingHotbarItemIds, 'ITEM_ART_PENDING hotbar items').toHaveLength(12);
+    // The farming branch's declared debt on the hotbar: eight plain farm
+    // dishes plus the four Phase 11 buff dishes (kind 'food') and the
+    // four-rung hoe ladder (use.type 'gatherTool').
+    expect(pendingHotbarItemIds, 'ITEM_ART_PENDING hotbar items').toHaveLength(16);
     expect(
       pendingHotbarItemIds.filter((id) => shippingImageExists(`/ui/items/${id}.webp`)),
       'no pending hotbar item ships committed art (a stale ITEM_ART_PENDING entry)',

@@ -1,5 +1,6 @@
-// FARM_RECIPES (the Phase 6 farm-economy hook set): conformance pins for the
-// eight cooking dishes that turn crop produce into something a player wants,
+// FARM_RECIPES (the Phase 6 farm-economy hook set, reopened by Phase 11):
+// conformance pins for the twelve cooking dishes that turn crop produce into
+// something a player wants (eight plain, four Phase 11 well-fed buff dishes),
 // plus the one alchemy row, the growth tonic brewed from wild herbs.
 //
 // A SEPARATE LIST FROM LADDER_RECIPES, so it needs its own conformance suite:
@@ -132,15 +133,22 @@ const EXPECTED_INPUT_VALUE: Record<string, number> = {
   recipe_highwatch_gourd_soup: 173,
   recipe_evergarden_sunmelon_tart: 448,
   recipe_evergarden_harvest_platter: 456,
+  // The four Phase 11 buff dishes (produce x4 plus one salt each; the tier-1
+  // row also carries the pottage-precedent vale_wheat binder, see its row).
+  recipe_eastbrook_glazed_carrots: 76,
+  recipe_fenbridge_rice_pudding: 40,
+  recipe_highwatch_barley_porridge: 68,
+  recipe_evergarden_braised_greens: 168,
 };
 
 describe('FARM_RECIPES: the farm-economy hook set', () => {
-  it('is exactly eight cooking dishes inside a nine-row list', () => {
+  it('is exactly twelve cooking dishes inside a thirteen-row list', () => {
     // The whole-list pin and the cooking-filter pin are BOTH stated: the
-    // alchemy row moved the first and left the second at 8, and keeping them
-    // separate is what makes any further addition a visible, deliberate edit.
-    expect(FARM_RECIPES).toHaveLength(9);
-    expect(dishes, 'the cooking dishes are eight of the nine farm rows').toHaveLength(8);
+    // alchemy row moved the first and left the second behind it, and keeping
+    // them separate is what makes any further addition a visible, deliberate
+    // edit. Re-pinned 9 -> 13 by Phase 11 (the four well-fed buff dishes).
+    expect(FARM_RECIPES).toHaveLength(13);
+    expect(dishes, 'the cooking dishes are twelve of the thirteen farm rows').toHaveLength(12);
   });
 
   it('every dish is reachable through the merged ALL_RECIPES table', () => {
@@ -180,13 +188,14 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
     expect(new Set(dishes.map((d) => d.skillReq)).size).toBeGreaterThan(1);
   });
 
-  it('every dish output is plain food: kind, foodHp, no vendor price, rung quality', () => {
+  it('every dish output is food: kind, foodHp, no vendor price, rung quality', () => {
     for (const dish of dishes) {
       const def = ITEMS[dish.resultItemId];
       expect(def, `${dish.id}: output ${dish.resultItemId} has no ItemDef`).toBeDefined();
       expect(def.kind, `${dish.resultItemId} kind`).toBe('food');
       expect(def.foodHp, `${dish.resultItemId} foodHp`).toBeGreaterThan(0);
-      // No buff machinery and no new effect field: foodHp is the whole effect.
+      // foodHp is the shared floor; the wellfed field is allowed ONLY on the
+      // four Phase 11 buff dishes, which the closed-shape describe below pins.
       expect(def.buyValue, `${dish.resultItemId} must never be vendor-stocked`).toBeUndefined();
       expect(def.quality, `${dish.resultItemId} quality for rung ${dish.skillReq}`).toBe(
         QUALITY_BY_RUNG[dish.skillReq],
@@ -260,7 +269,14 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
     expect(exactlyBreakEven, 'the intended exactly-break-even row exists').toBeGreaterThan(0);
   });
 
-  it('every dish carries a reagent with NO buyValue (stays out of the vendor-fed arm)', () => {
+  it('every dish, buff dishes included, carries a reagent with NO buyValue', () => {
+    // The Phase 6 invariant held whole through Phase 11: brook_carrot is the
+    // D9 vegetable (the ONE produce row with a buyValue), so the tier-1 buff
+    // dish carries the pottage-precedent vale_wheat binder rather than an
+    // exemption, and every farm dish keeps at least one priceless reagent.
+    // A row drifting fully-priced would join the counterfactual vendor-fed
+    // set in tests/recipe_economy.test.ts (a sorted literal pin plus a
+    // discounted-input bound), so the drift breaks two suites, not one.
     for (const dish of dishes) {
       const unpriced = dish.reagents.filter((reagent) => {
         const def = ITEMS[reagent.itemId];
@@ -273,6 +289,8 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
           'pin plus a discounted-input bound). Give it a produce reagent with no buyValue.',
       ).toBeGreaterThan(0);
     }
+    // Non-vacuity: the tier-1 buff dish really is a live dish under the sweep.
+    expect(dishes.map((d) => d.id)).toContain('recipe_eastbrook_glazed_carrots');
   });
 
   it('closes the five fine twins the hoe ladder left without a consumer', () => {
@@ -463,20 +481,94 @@ describe('FARM_RECIPES: the growth tonic, the farming-alchemy trade (D7)', () =>
   });
 });
 
-describe('FARM_RECIPES: the dish ItemDef shape is closed until Phase 11 reopens it', () => {
-  it('every dish def carries EXACTLY the six plain-food keys, nothing more', () => {
-    // The acceptance criterion "foodHp only, NO buff machinery" as an
-    // absence pin, not a comment: Phase 11 is the well-fed phase, so the
-    // field these dishes must not carry is SCHEDULED to exist. This exact
-    // key-set pin makes attaching it to a shipped dish a deliberate re-pin
-    // here instead of a silent def edit.
-    const PLAIN_FOOD_KEYS = ['foodHp', 'id', 'kind', 'name', 'quality', 'sellValue'];
-    for (const dish of dishes) {
+describe('FARM_RECIPES: the dish ItemDef shape, reopened by Phase 11 and closed again', () => {
+  // Phase 11 (well-fed food) is the reopening the old pin scheduled: the four
+  // buff dishes now carry the `wellfed` field, and NOTHING else moved. The
+  // shape is closed again until the next consumable phase reopens it here.
+  //
+  // The buff-dish id set is an explicit sorted literal, so a FIFTH buff dish
+  // is a deliberate re-pin in this file, never a silent def edit; both sweeps
+  // below derive their row sets from FARM_RECIPES, so a new cooking row
+  // cannot escape one of the two arms.
+  const BUFF_DISH_IDS = [
+    'eastbrook_glazed_carrots',
+    'evergarden_braised_greens',
+    'fenbridge_rice_pudding',
+    'highwatch_barley_porridge',
+  ];
+  const PLAIN_FOOD_KEYS = ['foodHp', 'id', 'kind', 'name', 'quality', 'sellValue'];
+  const BUFF_FOOD_KEYS = ['foodHp', 'id', 'kind', 'name', 'quality', 'sellValue', 'wellfed'];
+
+  it('the eight plain dishes keep EXACTLY the six plain-food keys, nothing more', () => {
+    const plain = dishes.filter((d) => !BUFF_DISH_IDS.includes(d.resultItemId));
+    expect(plain, 'the plain sweep really covers the eight Phase 6 dishes').toHaveLength(8);
+    for (const dish of plain) {
       const def = ITEMS[dish.resultItemId];
       expect(
         Object.keys(def).sort(),
-        `${dish.resultItemId} grew beyond the plain-food shape; Phase 11 must re-pin this deliberately`,
+        `${dish.resultItemId} grew beyond the plain-food shape; the next consumable phase ` +
+          'must re-pin this deliberately',
       ).toEqual(PLAIN_FOOD_KEYS);
+    }
+  });
+
+  it('the four buff dishes carry EXACTLY the seven keys (plain plus wellfed)', () => {
+    const buff = dishes.filter((d) => BUFF_DISH_IDS.includes(d.resultItemId));
+    // Derived from FARM_RECIPES and matched against the literal, so a buff
+    // dish authored without a recipe row (or the reverse) reds here too.
+    expect(buff.map((d) => d.resultItemId).sort()).toEqual(BUFF_DISH_IDS);
+    for (const dish of buff) {
+      const def = ITEMS[dish.resultItemId];
+      expect(
+        Object.keys(def).sort(),
+        `${dish.resultItemId} drifted off the buff-dish shape; the next consumable phase ` +
+          'must re-pin this deliberately',
+      ).toEqual(BUFF_FOOD_KEYS);
+    }
+  });
+
+  it('every buff dish wellfed field is well-formed, at the exact proposed tuning', () => {
+    // The ceiling comes from the documented elixir budget (the alchemy ladder
+    // header in content/profession_items.ts): buff_sta value <= 12 for
+    // duration <= 900s. The exact pairs are pinned so a silent retune is a
+    // visible edit; VALUES ARE PROPOSED AND MAINTAINER-FLAGGED at the defs.
+    const EXPECTED_WELLFED: Record<string, [number, number]> = {
+      eastbrook_glazed_carrots: [3, 600],
+      fenbridge_rice_pudding: [6, 900],
+      highwatch_barley_porridge: [9, 900],
+      evergarden_braised_greens: [12, 900],
+    };
+    const buff = dishes.filter((d) => BUFF_DISH_IDS.includes(d.resultItemId));
+    expect(buff, 'the buff sweep really covers the four Phase 11 dishes').toHaveLength(4);
+    for (const dish of buff) {
+      const def = ITEMS[dish.resultItemId];
+      const wellfed = def.wellfed;
+      expect(wellfed, `${dish.resultItemId} lost its wellfed field`).toBeDefined();
+      if (!wellfed) continue;
+      // The shared namespace: one aura name, therefore ONE aura id
+      // (wellfed_buff_sta), so last eaten always wins within food while the
+      // distinct wellfed_ prefix keeps elixir_<kind> buffs coexisting.
+      expect(wellfed.aura, `${dish.resultItemId} aura name`).toBe('Well Fed');
+      expect(wellfed.kind, `${dish.resultItemId} aura kind`).toBe('buff_sta');
+      expect(Number.isInteger(wellfed.value), `${dish.resultItemId} value integer`).toBe(true);
+      expect(wellfed.value, `${dish.resultItemId} value floor`).toBeGreaterThan(0);
+      expect(
+        wellfed.value,
+        `${dish.resultItemId} value ceiling (elixir budget)`,
+      ).toBeLessThanOrEqual(12);
+      expect(Number.isInteger(wellfed.duration), `${dish.resultItemId} duration integer`).toBe(
+        true,
+      );
+      expect(wellfed.duration, `${dish.resultItemId} duration floor`).toBeGreaterThan(0);
+      expect(
+        wellfed.duration,
+        `${dish.resultItemId} duration ceiling (elixir budget)`,
+      ).toBeLessThanOrEqual(900);
+      const [value, duration] = EXPECTED_WELLFED[dish.resultItemId];
+      expect(wellfed.value, `${dish.resultItemId} proposed value retuned silently`).toBe(value);
+      expect(wellfed.duration, `${dish.resultItemId} proposed duration retuned silently`).toBe(
+        duration,
+      );
     }
   });
 
@@ -484,7 +576,7 @@ describe('FARM_RECIPES: the dish ItemDef shape is closed until Phase 11 reopens 
     // The def name is what sim/server text uses; the catalog row is what the
     // HUD renders. The catalog comment states the stay-in-step rule, but no
     // pin held it: an English reword on one side would drift the other
-    // silently. Scoped to the phase ids (the nine this suite owns).
+    // silently. Scoped to the phase ids (the thirteen this suite owns).
     const enNames = itemNames.en.entities.items as Record<string, { name?: string } | undefined>;
     for (const recipe of FARM_RECIPES) {
       const def = ITEMS[recipe.resultItemId];

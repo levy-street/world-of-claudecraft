@@ -3718,6 +3718,37 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
     { p: 'leaf', pal: 'leafGreen' },
     { p: 'droplet', pal: 'gold', ...TR },
   ]),
+  // The well-fed phase's four buff dishes join the same family under the same
+  // two rules: the shared 'food' radial, and a DIFFERENT primary glyph per
+  // dish (fang, coin, potion, tendrils; distinct from the eight primaries
+  // above), so no pair in the twelve-dish family is separated by palette
+  // alone. NO sparkle, same as above: a dish is not a grade.
+  eastbrook_glazed_carrots: r(
+    'food',
+    'ember',
+    [
+      { p: 'fang', pal: 'ember' },
+      { p: 'leaf', pal: 'leafGreen', ...TR },
+    ],
+    ['glow'],
+  ),
+  fenbridge_rice_pudding: r('food', 'bone', [
+    { p: 'coin', pal: 'bone' },
+    { p: 'droplet', pal: 'gold', ...TR },
+  ]),
+  highwatch_barley_porridge: r('food', 'gold', [
+    { p: 'potion', pal: 'gold' },
+    { p: 'leaf', pal: 'earthBrown', ...TR },
+  ]),
+  evergarden_braised_greens: r(
+    'food',
+    'leafGreen',
+    [
+      { p: 'tendrils', pal: 'leafGreen' },
+      { p: 'flame', pal: 'ember', ...TR },
+    ],
+    ['drips'],
+  ),
   // misc UI icons (not real items)
   coin_gold: r('treasure', 'gold', ['coin'], ['sparkle']),
   slot_empty: r('junk', 'silverWhite', []),
@@ -5512,6 +5543,14 @@ export const ITEM_ART_PENDING = new Set<string>([
   'highwatch_barley_bannock',
   'highwatch_gourd_soup',
   'vale_hearth_loaf',
+  // The well-fed phase's four buff dishes, one per crop tier. Same
+  // dormant-online reasoning as the eight plain dishes above (cooked from
+  // produce whose live faucet is the same farm) and the same scheduled art
+  // phase; each serves a distinct procedural recipe through iconDataUrl.
+  'eastbrook_glazed_carrots',
+  'evergarden_braised_greens',
+  'fenbridge_rice_pudding',
+  'highwatch_barley_porridge',
 ]);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */

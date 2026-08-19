@@ -9049,6 +9049,8 @@ export const da_DK: EnTranslations = {
       "useDrink": "Brug: Genopretter {amount} mana over {seconds} sek. Skal forblive siddende mens du drikker.",
       "useElixir": "Brug: Øger din {stat} med {value} i {minutes} min. Brugbar i kamp.",
       "useElixirAura": "Brug: Giver {aura} i {minutes} min. Brugbar i kamp.",
+      "useWellfed": "{aura}: +{value} {stat} for {minutes} min, granted when you finish eating.",
+      "useWellfedAura": "Grants {aura} for {minutes} min when you finish eating.",
       "questItem": "Questgenstand",
       "questRelated": "Opgave: {quest}",
       "questRules": "Kan ikke sælges, lægges i banken eller byttes.",
@@ -12608,6 +12610,18 @@ export const da_DK: EnTranslations = {
       },
       "evergarden_harvest_platter": {
         "name": "Evergarden Harvest Platter"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "Eastbrook Glazed Carrots"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "Fenbridge Rice Pudding"
+      },
+      "highwatch_barley_porridge": {
+        "name": "Highwatch Barley Porridge"
+      },
+      "evergarden_braised_greens": {
+        "name": "Evergarden Braised Greens"
       },
       "conjured_water4": {
         "name": "Fremmanet kildevand"
