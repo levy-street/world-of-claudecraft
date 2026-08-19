@@ -305,6 +305,13 @@ STEP 5 - ACCEPTANCE CRITERIA
 - [ ] ItemDef.wellfed exists beside elixir (aura name, kind, value, duration), applied
       from the food path in src/sim/items.ts via ctx.applyAura with wellfed_<kind> ids,
       never through effect_dispatch.
+      [AMENDED by the Phase 11 QA, 2026-08-19: the locked completion-timing
+      decision (deviation (bx)) moved the application SITE to updateRegen
+      (src/sim/combat/auras.ts) calling src/sim/wellfed.ts at the moment the
+      consume timer runs out; src/sim/items.ts carries only a signpost
+      comment. The criterion's intent (ctx.applyAura, wellfed_<kind> ids,
+      never effect_dispatch) is met at that site; this bullet's wording
+      predates the timing decision.]
 - [ ] The application-timing decision is made, stated, and documented (recommended:
       completion of the sit-restore), including the auras-module hook chosen.
 - [ ] The namespace-isolation pin is green: a wellfed buff and an elixir_<kind> buff of

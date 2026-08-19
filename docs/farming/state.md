@@ -5,7 +5,7 @@ decisions. If a phase file contradicts this file, this file wins and the phase f
 gets swept in the same pass (amend the QA twin too, always).
 
 Current phase: Phase 11 (well-fed food) DONE 2026-08-19, local-only per D22
-(branch fix/farming-phase-11-well-fed-food, eight commits, merge hash in
+(branch fix/farming-phase-11-well-fed-food, nine commits, merge hash in
 progress.md). ItemDef.wellfed ships beside elixir as the D15 mirror, minted
 by src/sim/wellfed.ts at COMPLETION of the 18s sit-restore (deviation (bx):
 the timing decision; an interrupted meal forfeits; food-only kind guard),
@@ -2531,6 +2531,69 @@ question does not arise (farming has no station).
   tests/professions_zone_rollout.test.ts, and tests/recipe_economy.test.ts
   (counterfactual vendor-fed set stays seven, live set stays empty).
 
+  Phase 11 QA (2026-08-19, verify well-fed food; merge hash in
+  progress.md): PASS-WITH-FOLLOWUPS, no live defect. All four emphases
+  proven first-hand (records in the progress.md Phase 11 QA block: the
+  played-as-a-player live-client eat, and the online downgrade over a
+  real stable-timer wire with the elision path exercised). Fixes taken
+  test-first: the 18s boundary bracket, the death forfeit, the
+  concurrent-meal refusal, the zero-rng rig guards, the shared
+  stripComments glue pin, the wellfed/elixir stat-map parity pin, ten
+  frozen non-Latin fill literals; the scenarios.ts padding comment now
+  states the husk payout. Mutations 7/7 killed named (M3 and M5b
+  re-proven; five fresh, each dying to exactly its new pin).
+  RESIDUALS LEDGERED WITH OWNERS:
+  - (bo) addendum: the wiki (src/guide regen) now ADVERTISES the two
+    reagent-dormant buff-dish recipes (porridge, braised greens) as
+    trainer-taught rows no player can complete and shows no seed source;
+    the D11 bootstrap ruling must explicitly cover these two rows before
+    the branch merges to a release, or they ship after D11. Owner: the
+    (bo) decision.
+  - Tuning addenda folded into the OPEN well-fed row below (the
+    unanchored raid-floor phrase; the tier 2 to 4 stat-identity of the
+    buff twins and the tier-1 inversion). Owner: the maintainer tuning
+    read. The QA left the profession_items.ts comment untouched
+    deliberately: a sim-content comment edit stales the portrait
+    evidence family for zero behavioral value (the Phase 10 QA
+    precedent), so the ledger carries the correction.
+  - The wellfed parity beat stays deferred to the Phase 12 feast
+    scenario, ENRICHED by the architecture review: the wellfed mint is
+    the one genuinely new TICK-PHASE path (updateRegen completion),
+    unlike the command-phase elixir beat, so the Phase 12 beat must ride
+    a consume completion through real ticks (addItem + useItem + tick
+    past 18s + snapshot), which is draw-free and appends without moving
+    prior frames. Owner: Phase 12.
+  - Icon reads for the Phase 13 art batch (extends the recorded
+    carrot-vs-pottage eyeball): highwatch_barley_porridge paints a
+    potion primary (reads as alchemy) and fenbridge_rice_pudding a coin
+    primary (reads as currency); glazed carrots and root pottage share
+    palette AND glyph set differing only in primary. The A4c pairwise
+    pin holds in-family distinctness; the cross-family read is the art
+    batch's call. The generic aura_buff_sta buff icon stays the recorded
+    bespoke-icon deferral. Owner: Phase 13 art batch.
+  - Online e.eating is a lossy shadow (itemId '' and a hardcoded kind
+    'food' in the ClientWorld rebuild): no reader today, but any future
+    "Well Fed incoming" preview keyed on eating.itemId would be blank
+    online while working offline. Owner: whoever adds an eating-preview
+    surface.
+  - The tier-4-to-tier-1 downgrade is invisible in the combat log by
+    design (same-name displacement emits a refresh, never a fade or the
+    magnitude); the buff hover is the only surface that reveals it,
+    identically in both hosts. Owner: maintainer UX read, only if the
+    drop should be legible.
+  - AURA_VISIBLE_CAP_LOW = 8 (src/game/ui_tier_knobs.ts) recycles auras
+    past the cap on the LOW tier; pre-existing and outside this diff,
+    but the well-fed buff is information a player re-eats on, and no
+    test pins that a self-buff survives the cap. Owner: maintainer
+    fairness read, not farming's.
+  - The useWellfed/useWellfedAura keys sit in the use* family without a
+    Use: prefix for a reason only a source comment states; renaming
+    would churn 21 locales for a naming nit, declined. The pending Latin
+    rows for both keys ride the release-tier fill as usual.
+  - The wellfed/elixir tooltip stat maps stay two deliberate copies
+    (below the extraction rule of three), held in step by the new parity
+    pin; the third consumable-buff view owns the extraction.
+
 ## OPEN items (maintainer decisions or later-phase calls, never guess)
 
 - Crop display names: ids are locked (D11), English display names get a maintainer
@@ -2576,6 +2639,16 @@ question does not arise (farming has no station).
   profession_items.ts rows). Also flagged there: reagent counts (produce x4), the
   tier 3 and tier 4 buff dishes both at rung 50 (restating the Phase 6 three-rungs
   -for-four-tiers domination flag), and tier 4 shipping quality 'rare' like tier 3.
+  Phase 11 QA addenda to this same read: (1) the comment's "still below the raid
+  floor" justification cites no code constant or design doc the QA could find;
+  treat the 24-stamina combined ceiling as an OPEN question on its own terms, not
+  a verified bound. (2) The buff twins are STAT-IDENTICAL supersets of their plain
+  siblings at tiers 2 to 4 (same foodHp/sellValue/quality for one extra produce),
+  so the plain dish is only ever the right craft when produce-constrained; tier 1
+  INVERTS (carrots 90/6 vs pottage 117/12), so the starter buff dish heals and
+  vendors for less than its plain sibling. The code comment's uniform
+  "costs strictly more produce" framing is true on cost and silent on the
+  stat-identity; fold both into the tuning decision.
 - Whether farming counting toward existing any-profession deeds is accepted (default
   yes; it is automatic via the data-driven arm; flag in the Phase 1 PR body).
 - Seed-back roll rates for tier 3/4 seeds (economy-sensitive; propose in the content

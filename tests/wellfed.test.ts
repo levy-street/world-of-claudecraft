@@ -62,6 +62,22 @@ describe('well fed: completion timing', () => {
     expect(wf[0].duration).toBe(600);
   });
 
+  it('the 18s boundary: still no mint at 17s in, minted by 19s', () => {
+    // playerWorld ticks once, so the consume starts at tickCount 1 and the
+    // 2s regen boundaries land at ticks 40, 80, ... 360: eight boundaries
+    // have fired by 17s (remaining 2, meal in flight, no aura) and the
+    // ninth (18s) is the completion. Pins the CONSUME_DURATION scale the
+    // 5s/22s arms cannot see: a meal that completed early would mint here.
+    const { sim, pid, p } = playerWorld();
+    consume(sim, pid, 'eastbrook_glazed_carrots');
+    tickSeconds(sim, 17);
+    expect(p.eating, 'still eating at 17s').toBeTruthy();
+    expect(wellfedAuras(p), 'no aura at 17s').toEqual([]);
+    tickSeconds(sim, 2);
+    expect(p.eating, 'meal ended at the 18s boundary').toBeNull();
+    expect(wellfedAuras(p)).toHaveLength(1);
+  });
+
   it('a plain dish (no wellfed field) completes with no aura minted', () => {
     const { sim, pid, p } = playerWorld();
     eatToCompletion(sim, pid, p, 'vale_hearth_loaf');
@@ -118,6 +134,56 @@ describe('well fed: interruption forfeits the buff', () => {
 
     tickSeconds(sim, 20); // well past where 18s would have landed
     expect(wellfedAuras(p), 'the forfeited meal never pays out').toEqual([]);
+  });
+
+  it('the killing blow clears the meal and the buff is forfeited for good', () => {
+    // SCOPE, stated honestly (the joint-coverage rule): lethal damage
+    // routes through the shared consuming-interrupt clear in
+    // src/sim/combat/damage.ts BEFORE the death-reset block's own
+    // belt-and-braces clear, so this arm pins the joint OUTCOME (no meal
+    // survives the killing blow, and nothing mints through 30s of
+    // dead-state ticks), not the death-reset site specifically: a
+    // diagnostic mutant deleting the death block's eating clear survives
+    // this suite because the interrupt site already covers it. The
+    // posthumous-quiet window below is the coverage the alive-interrupt
+    // arm above cannot give.
+    const { sim, pid, p } = playerWorld();
+    consume(sim, pid, 'eastbrook_glazed_carrots');
+    tickSeconds(sim, 5);
+    expect(p.eating, 'mid-meal before the killing blow').toBeTruthy();
+
+    sim.ctx.dealDamage(null, p, 1_000_000, false, 'physical', null, 'hit');
+    expect(p.dead, 'the hit was lethal').toBe(true);
+    expect(p.eating, 'the killing blow cleared the meal').toBeNull();
+
+    // Far past every boundary the meal could have reached, through death
+    // and any respawn handling: the mint must never land posthumously.
+    tickSeconds(sim, 30);
+    expect(wellfedAuras(p), 'no posthumous mint').toEqual([]);
+  });
+
+  it('a second dish mid-meal is refused outright, never a restart', () => {
+    const { sim, pid, p } = playerWorld();
+    consume(sim, pid, 'eastbrook_glazed_carrots'); // dish A
+    tickSeconds(sim, 5);
+    expect(p.eating?.itemId).toBe('eastbrook_glazed_carrots');
+    const remainingBefore = p.eating?.remaining;
+
+    sim.addItem('fenbridge_rice_pudding', 1, pid); // dish B
+    sim.useItem('fenbridge_rice_pudding', pid);
+    // The already-eating guard (src/sim/items.ts, #2565) refuses B before
+    // anything is spent: the slot keeps A (same item, timer untouched) and
+    // B stays in the bag.
+    expect(p.eating?.itemId).toBe('eastbrook_glazed_carrots');
+    expect(p.eating?.remaining).toBe(remainingBefore);
+    expect(sim.countItem('fenbridge_rice_pudding', pid)).toBe(1);
+
+    // A's meal completes on A's own clock and mints A's aura, exactly one.
+    tickSeconds(sim, 17);
+    expect(p.eating).toBeNull();
+    const wf = wellfedAuras(p);
+    expect(wf).toHaveLength(1);
+    expect(wf[0].value).toBe(3); // A's value, never B's 6
   });
 });
 
@@ -247,6 +313,12 @@ describe('well fed: the mint draws zero rng', () => {
     // Non-vacuity: the buffed run really minted, the plain run really did not.
     expect(wellfedAuras(buffed.p).length).toBe(1);
     expect(wellfedAuras(plain.p)).toEqual([]);
+    // Non-vacuity of the RIG: the observer really recorded a stream (an
+    // unwired observer would leave both runs empty-equal and prove nothing),
+    // and the twin premise holds: same foodHp, so the two meals differ ONLY
+    // in the wellfed field.
+    expect(buffed.draws.length).toBeGreaterThan(0);
+    expect(ITEMS.vale_hearth_loaf.foodHp).toBe(ITEMS.eastbrook_glazed_carrots.foodHp);
 
     expect(buffed.draws.length).toBe(plain.draws.length);
     expect(buffed.draws).toEqual(plain.draws);

@@ -11,9 +11,16 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
-import type { ItemDef } from '../src/sim/types';
-import { formatNumber, setLanguage } from '../src/ui/i18n';
+import type { AuraKind, ItemDef } from '../src/sim/types';
+import { elixirTooltipLines } from '../src/ui/elixir_tooltip_view';
+import {
+  ensureLocaleLoaded,
+  formatNumber,
+  type SupportedLanguage,
+  setLanguage,
+} from '../src/ui/i18n';
 import { wellfedTooltipLines } from '../src/ui/wellfed_tooltip_view';
+import { stripComments } from './helpers/strip_comments';
 
 // Synthetic wellfed variants: one def spread with a replaced record, so the
 // mapped-stat rows, the formatter options, and the escaping are each pinned
@@ -122,19 +129,118 @@ describe('wellfedTooltipLines', () => {
   });
 
   it('Hud.itemTooltip composes the well-fed line (method-scoped source pin)', () => {
-    // Whole-line // comments are stripped before scanning so the pin is not
-    // satisfied by prose (the comment-gameable trap; block comments are left
-    // alone: a /* strip would misfire on string and regex literals). Scoped
-    // to the itemTooltip method body so the call cannot drift into some
-    // other surface and still pass.
-    const hudSrc = readFileSync(path.join(__dirname, '../src/ui/hud.ts'), 'utf8').replace(
-      /^\s*\/\/.*$/gm,
-      '',
-    );
+    // Comments are stripped through the SHARED order-safe stripper (both
+    // line and block classes in one pass, tests/helpers/strip_comments.ts),
+    // so neither prose form can satisfy the pin: the original line-only
+    // strip left a block-commented `html += wellfedTooltipLines(item);`
+    // able to pass. Scoped to the itemTooltip method body so the call
+    // cannot drift into some other surface and still pass.
+    const hudSrc = stripComments(readFileSync(path.join(__dirname, '../src/ui/hud.ts'), 'utf8'));
     const start = hudSrc.indexOf('private itemTooltip(');
     const end = hudSrc.indexOf('private itemProcBlock(');
     expect(start).toBeGreaterThan(-1);
     expect(end).toBeGreaterThan(start);
     expect(hudSrc.slice(start, end)).toContain('html += wellfedTooltipLines(item);');
+  });
+});
+
+describe('the wellfed and elixir stat maps stay in step', () => {
+  // The two sibling views deliberately keep separate 5-row stat maps (two
+  // copies sits below the extraction rule of three); this pin is what makes
+  // a one-sided edit (adding a stat kind to one map only) FAIL instead of
+  // silently rendering the aura fallback in the other view. The key sets
+  // are extracted from both sources (const-name anchored, sliced to the
+  // map's closing brace, comments stripped), compared for equality, and
+  // then every extracted kind is driven through BOTH views to prove it
+  // really takes the mapped branch (the fallback sentence says 'Grants',
+  // the mapped one never does; the off-map probe below proves that
+  // discriminator is live in both views).
+  function readMapKeys(file: string, constName: string): string[] {
+    const src = stripComments(readFileSync(path.join(__dirname, file), 'utf8'));
+    const start = src.indexOf(`const ${constName}`);
+    expect(start, `${constName} found in ${file}`).toBeGreaterThan(-1);
+    const end = src.indexOf('};', start);
+    expect(end).toBeGreaterThan(start);
+    return [...src.slice(start, end).matchAll(/^\s*(\w+):/gm)].map((m) => m[1]).sort();
+  }
+
+  it('identical key sets, every key mapped in both views, off-map falls back in both', () => {
+    const wellfedKeys = readMapKeys('../src/ui/wellfed_tooltip_view.ts', 'WELLFED_STAT_KEYS');
+    const elixirKeys = readMapKeys('../src/ui/elixir_tooltip_view.ts', 'ELIXIR_STAT_KEYS');
+    expect(wellfedKeys).toEqual(elixirKeys);
+    expect(wellfedKeys.length).toBeGreaterThanOrEqual(5);
+    for (const kind of wellfedKeys) {
+      const record = { aura: 'Probe', kind: kind as AuraKind, value: 5, duration: 300 };
+      expect(wellfedTooltipLines(wellfedDef(record)), `wellfed maps ${kind}`).not.toContain(
+        'Grants',
+      );
+      expect(
+        elixirTooltipLines({ ...ITEMS.eastbrook_glazed_carrots, elixir: record }),
+        `elixir maps ${kind}`,
+      ).not.toContain('Grants');
+    }
+    const offMap = { aura: 'Probe', kind: 'buff_spellpower' as AuraKind, value: 5, duration: 300 };
+    expect(wellfedTooltipLines(wellfedDef(offMap))).toContain('Grants');
+    expect(elixirTooltipLines({ ...ITEMS.eastbrook_glazed_carrots, elixir: offMap })).toContain(
+      'Grants',
+    );
+  });
+});
+
+describe('the five non-Latin fills render end to end (frozen literals, the M16 staleness pin)', () => {
+  afterEach(() => setLanguage('en'));
+
+  // Frozen renders of the two new catalog keys through the REAL sink
+  // (locale chunk awaited first, the app's own order, then t() + the
+  // AURA_NAME_KEY matcher): a stale or clobbered fill, a broken {aura}
+  // interpolation, or a lost matcher row reds the exact literal. A reviewed
+  // reword of a fill re-points its row here deliberately, the
+  // localization_fixes idiom.
+  const MAPPED: [SupportedLanguage, string][] = [
+    ['zh_CN', '<div class="tt-desc">吃完后获得饱足效果，使你的耐力提高 3 点，持续 10 分钟。</div>'],
+    ['zh_TW', '<div class="tt-desc">吃完後獲得飽足效果，使你的耐力提高 3 點，持續 10 分鐘。</div>'],
+    [
+      'ko_KR',
+      '<div class="tt-desc">다 먹으면 포만감 효과를 얻어 체력이(가) 3 증가하며 10분 동안 지속됩니다.</div>',
+    ],
+    [
+      'ja_JP',
+      '<div class="tt-desc">食べ終えると満腹の効果を得て、スタミナが3上昇し、10分間持続します。</div>',
+    ],
+    [
+      'ru_RU',
+      '<div class="tt-desc">Эффект &quot;Сытость&quot;: Выносливость +3 на 10 мин. Дается, когда вы доедаете.</div>',
+    ],
+  ];
+  const FALLBACK: [SupportedLanguage, string][] = [
+    ['zh_CN', '<div class="tt-desc">吃完后获得饱足效果，持续 5 分钟。</div>'],
+    ['zh_TW', '<div class="tt-desc">吃完後獲得飽足效果，持續 5 分鐘。</div>'],
+    ['ko_KR', '<div class="tt-desc">다 먹으면 포만감 효과를 얻어 5분 동안 지속됩니다.</div>'],
+    ['ja_JP', '<div class="tt-desc">食べ終えると満腹の効果を得て、5分間持続します。</div>'],
+    [
+      'ru_RU',
+      '<div class="tt-desc">Дает эффект &quot;Сытость&quot; на 5 мин, когда вы доедаете.</div>',
+    ],
+  ];
+
+  it.each(MAPPED)('%s: the useWellfed sentence and interpolated aura name', async (loc, want) => {
+    await ensureLocaleLoaded(loc);
+    setLanguage(loc);
+    expect(wellfedTooltipLines(ITEMS.eastbrook_glazed_carrots)).toBe(want);
+  });
+
+  it.each(FALLBACK)('%s: the useWellfedAura sentence', async (loc, want) => {
+    await ensureLocaleLoaded(loc);
+    setLanguage(loc);
+    expect(
+      wellfedTooltipLines(
+        wellfedDef({
+          aura: 'Well Fed',
+          kind: 'buff_spellpower' as AuraKind,
+          value: 5,
+          duration: 300,
+        }),
+      ),
+    ).toBe(want);
   });
 });

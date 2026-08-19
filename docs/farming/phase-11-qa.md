@@ -20,6 +20,23 @@ with owners: the wellfed parity beat rides Phase 12; the bespoke aura icon and t
 glazed-carrots-vs-pottage 32px icon eyeball ride the Phase 13 art batch; hud.ts
 headroom is ONE line (extraction-first for any new Hud line).
 
+QA EXECUTED 2026-08-19, PASS-WITH-FOLLOWUPS (merge hash in progress.md; the full
+record is the progress.md Phase 11 QA block and the state.md Phase 11 QA
+residuals block). All four emphases proven first-hand: the two live headless
+probes, the played-as-a-player live-client eat (the LEFT-click is the classic
+bag action; right-click opens the item menu), and the online downgrade over a
+real stable-timer wire (value 12 shipped, held through elision, re-encoded to
+3; the declined pin stands, additionally covered by
+tests/snapshot_timer_wire.test.ts's value-bust arm). 0 BLOCKING across three
+audit lanes and four matrix reviewers. Fixes: the 18s boundary bracket, death
+forfeit, concurrent-meal refusal, zero-rng rig guards, the shared-stripComments
+glue pin, the wellfed/elixir stat-map parity pin, ten frozen non-Latin fill
+literals, and the padding-comment husk correction. Mutations 7/7 killed named
+(M3 and M5b re-proven, five fresh over the new pins). This QA moved NO golden
+(md5 25bd6b87 held throughout) and touched no monolith. Residual owners:
+state.md; the wellfed parity beat rides Phase 12's feast scenario, enriched
+with the tick-phase argument.
+
 ### QA Starter Prompt (the session form; refreshed by the Phase 11 close, 2026-08-19)
 
 ```

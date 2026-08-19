@@ -30,8 +30,8 @@
 | Phase 10 (celebrations) | DONE 2026-08-19 | fix/farming-phase-10-celebrations off 0afde346ab (release tip ea9377db8e already absorbed, no new absorb); merge hash in the notes tail | golden_harvest as the fourth gatherRareEvent flavor (1/90 shared constant, five-fold signed yield, one announce path, single HUD case); seven D13 deeds + the Harvestmaster title (280/3190/43); the ui_farm_golden sting end to end; hud.ts ceiling LOWERED 19352 to 19230 via the ability-tooltip extraction; farming_session re-recorded once isolated (16 draws, md5 83c34781); deviations (br)-(bv): the bed-tier premise probed false (all four chronicles earnable), prog_farming_100 dormant under a recorded waiver, the title-shelf committed-crest rule; reviews 0 BLOCKING with the content lane resolved via the waiver, qa-checklist READY; mutations 13/13 killed named |
 | Phase 9b QA (the bed verbs audit) | DONE 2026-08-19 (PASS-WITH-FOLLOWUPS) | fix/farming-phase-09b-qa off c9075785ef (twentieth absorb ea9377db8e first: one release commit, i18n fills, pending.ts regen-resolved); merge hash in the notes tail | The fresh pass re-proved the go-live independently: journey 17/17 desktop AND mobile through the real controls, 18 desktop manual probes (focus trap, keydown guard with a jump positive control, Esc focus restore, the locked-seed deny with the sim's own toast, the ja_JP locale switch, the relocalize arm) plus the mobile sizing (all knobs 44px) and the contrast eyeball (8.95:1); negative space proven by RUNNING the pins (zero golden movement, every baseline held); one real behavior fix (the ctx.error dead/busy denies stranded the Plant control: the error-toast re-arm, deviation (bq)) plus the report_window rename under the cold-painter sweep with its first suite, safe-area caps, and eleven hardened pins; mutations 11/11 killed named (two shipped survivors diagnosed as real gaps, fixed, re-proven); reviews: 4 Workflow lanes + cross-platform APPROVE + test-coverage approve-with-followups + qa-checklist in the notes |
 | Phase 10 QA (verify celebrations) | DONE 2026-08-19 (PASS-WITH-FOLLOWUPS) | fix/farming-phase-10-qa off 8a466e898f (release tip ea9377db8e still newest, no absorb); merge hash in the notes tail | All five mandatory emphases verified first-hand (totals re-pin exact 273+7/3155+35/42+1; zero golden movement outside farming_session with the golden dir byte-identical merge-to-HEAD; the instance exclusion proven with a LIVE multi-observer Sim probe; a real golden win replayed through the LIVE client HUD, epic line + finder-only cues behaviorally observed; the (bs)/(bt) stories coherent); two BLOCKING coverage gaps closed (the golden signed-grant bag paths, the finder-only sting pins rebuilt as the gather_rare_event_feedback pure core + behavioral suite); hud.ts SHRANK again (ceiling 19230 to 19220); fresh mutations 14/14 killed named; browser suite 133 green standalone and perf:tour exit 0 (the two VERIFY items); (bw) parity-win coverage deferred to Phase 11 by the (z) precedent |
-| Phase 11 (well-fed food) | not started | | |
-| Phase 11 QA | not started | | |
+| Phase 11 (well-fed food) | DONE 2026-08-19 | fix/farming-phase-11-well-fed-food off f0d329db02 (the twenty-first absorb, release/v0.40.0 e56707a675, opened the phase); merged --no-ff as 9fc11d5452, phase tip e6746bfe79 | ItemDef.wellfed beside elixir; the completion-time mint (src/sim/wellfed.ts at the updateRegen slot-null site, deviation (bx)); one shared aura 'Well Fed' / wellfed_buff_sta, last-eaten-wins namespace-wide (by); four buff dishes in FARM_RECIPES rows 9 to 13 with the (bz) vale_wheat binder; magnitudes 3/600s 6/900s 9/900s 12/900s proposed and flagged; (bw) discharged (the golden-WIN and paying-band beats, one isolated classified re-record, draws 16 to 110, md5 25bd6b87); reviews 0 BLOCKING; mutations 9/9 killed named; gate all 12 green on e6746bfe79 |
+| Phase 11 QA | DONE 2026-08-19 (PASS-WITH-FOLLOWUPS) | fix/farming-phase-11-qa off 35536d8ca8 (v0.40.0 e56707a675 still newest, no absorb); merge hash in the notes tail | All four mandatory emphases proven live first-hand (coexistence and last-eaten-wins through real ticks; the eat verb PLAYED as a player through the real bag UI on the LOW live client with the buff bar, remaining time, and single-Use:-prefix tooltip observed; the tier-4-then-tier-1 downgrade over the REAL wire through a stable-timer GameServer + ClientWorld rig, value 12 shipped, held through elision, re-encoded to 3); 7 lanes/reviewers 0 BLOCKING; 4 SHOULD-FIX closed test-first (18s boundary bracket, concurrent-meal refusal, death forfeit, zero-rng rig guards) plus the stat-map parity pin, the stripComments glue-pin hardening, and ten frozen non-Latin fill literals; mutations 7/7 killed named (M3 and M5b re-proven, five fresh over the new pins); rest ledgered with owners in the state.md Phase 11 QA block |
 | Phase 12 (shared feast) | not started | | |
 | Phase 12 QA | not started | | |
 | Phase 13 (integration polish) | not started | | |
@@ -3033,6 +3033,107 @@ mid-phase; its record sits above.
 No screenshots: the tooltip line and the buff bar ride existing visual
 families; the Phase 11 QA captures them on the LOW preset if it wants
 eyes on them (the phase doc hands that over explicitly).
+
+#### Phase 11 QA (2026-08-19, PASS-WITH-FOLLOWUPS)
+
+Branch fix/farming-phase-11-qa off 35536d8ca8; release/v0.40.0 e56707a675
+still the newest tip, no absorb needed. Baselines verified by RUNNING
+before any audit: golden md5 25bd6b87 exact, monolith counts exact
+(hud.ts 19219/19220, renderer.ts 13774/13774), the five pin suites green
+(417 tests), diff f0d329db02..e6746bfe79 resolved cleanly (64 files).
+
+THE FOUR EMPHASES, all proven first-hand:
+1. Coexistence LIVE: elixir_buff_sta and wellfed_buff_sta side by side
+   through real ticks with sane decaying remaining times (correctness
+   lane probe, plus the shipped both-orders arms re-run green).
+2. Last-eaten-wins LIVE: carrots then pudding leaves exactly one wellfed
+   aura at value 6, the elixir untouched and NOT refreshed.
+3. PLAYED AS A PLAYER on the live client (LOW preset, dev server, real
+   browser): grants staged via window.__game, the EAT VERB a real
+   desktop left-click on the real bag row (right-click opens the item
+   menu; left-click is the classic action). Meal started, 18s sit rode
+   out on the wall clock, the buff bar showed the slot with '10m'
+   remaining, the buff hover tooltip read 'Well Fed, Increases Stamina
+   by 3, 600 seconds remaining', and the dish tooltip carried exactly
+   one Use: prefix plus 'Well Fed: +3 Stamina for 10 min, granted when
+   you finish eating.' Probe screenshots were transient verification
+   evidence in the session scratchpad, deliberately not committed: the
+   two frozen-literal suites and this log pin the same content, and two
+   whole-HUD shots do not justify minting a new docs/screenshots cone
+   subtree; the standing capture offer passes to the Phase 13 art batch.
+4. THE SAME-NAME SILENT DOWNGRADE ONLINE, over the real wire: a
+   stable-timer-wire session (timerWireVersion 3) on a real GameServer
+   with the eat verb sent as a REAL ClientWorld use frame (the
+   farming_command_chain_online payload-skew rule). Tier-4 completion
+   shipped value 12 to the client mirror; an idle broadcast elided the
+   unchanged aura array and the client held 12; the tier-1 completion
+   re-encoded (auraMatches includes value, snapshot_timer_wire) and the
+   client surface reflected 3/600 with exactly one wellfed aura. The
+   declined pin's mechanism is additionally covered by the existing
+   field-matrix arm in tests/snapshot_timer_wire.test.ts (value 8 bust),
+   so the decline stands, now with an empirical end-to-end replay.
+
+FAN-OUT: one Workflow (3 free-text lanes: correctness, test-coverage,
+dead-code) 3/3 first try, plus architecture-reviewer, cross-platform-sync
+(APPROVE), frontend-seam-reviewer, and content-obligations-reviewer on
+the Agent tool, all delivered first try with the SendMessage-first
+preamble. 0 BLOCKING anywhere. qa-checklist ran LAST over the QA diff.
+
+FIXES (test-first, three commits, then the docs): the 18s boundary
+bracket (no mint at 17s, minted by 19s: pins the CONSUME_DURATION scale
+the 5s/22s arms could not see), the death-mid-meal forfeit, the
+second-dish-mid-meal refusal (slot keeps the first dish on its own
+clock, the second stays unspent), the zero-rng twin's rig guards
+(draws-nonempty floor + same-foodHp premise), the Hud glue pin routed
+through the shared order-safe stripComments (a block-commented
+composition line no longer passes), the wellfed/elixir stat-map parity
+pin (identical key sets, every key driven through both views' mapped
+branch), and ten frozen non-Latin renders of useWellfed/useWellfedAura
+through the real sink (locale chunk awaited first; a stale resolved fill
+reds an exact literal). The scenarios.ts padding comment now states the
+husk payout instead of claiming 'no produce' (comment-only, golden and
+draw positions untouched, md5 re-verified 25bd6b87).
+
+MUTATIONS 7/7 KILLED named through the dirty-refusing runner on the
+committed tree, no reviewer reading, landing proof by occurrence counts,
+restores verified clean: M3 re-proven (replacement keyed on kind: both
+isolation orders red), M5b re-proven (mint-on-consume insertion: 3 reds
+including the NEW boundary arm), plus five fresh, each dying to exactly
+its new pin (early completion, guard fall-through, one-sided map
+widening, a clobbered ja_JP resolved row, a block-commented glue line).
+
+FINDINGS RESOLVED WITHOUT CODE (verified, recorded): the loot surfaces
+DO route through Hud.itemTooltip (both loot controllers take it as a
+dep), so the well-fed line reaches loot tooltips; the localized-sentence
+English render seen in a first probe was a probe artifact (the app
+awaits ensureLocaleLoaded before setLanguage; with the chunk resident
+all ten fills render translated); the aura-value wire path ships value
+whenever nonzero and the client assigns rather than skips, both
+branches. Ledgered residuals with owners: the state.md Phase 11 QA
+block. Verdict PASS-WITH-FOLLOWUPS.
+
+QA-CHECKLIST VERDICT (ran LAST over the QA diff): READY, 0 BLOCKING. Its
+one SHOULD-FIX was the joint-coverage rule striking again: the death arm
+proved the OR of the two consuming-clear sites (the shared interrupt
+clear fires before the death-reset block's own clear; a diagnostic
+mutant deleting the death-block clear SURVIVED the suite). Resolved per
+its own recommendation: the arm's claim now states the joint outcome it
+actually proves (the killing blow clears the meal, nothing mints through
+30s of dead-state ticks) with the diagnostic recorded in the comment.
+Its hygiene notes taken in the same commit: the locale describe restores
+English, the locale ids are compile-checked, the ragged wrap mended.
+The remaining state.md validation matrix rows the diff demands were run
+green (professions_work_orders, snapshots, env_protocol, bandwidth: the
+wire negative proof, 280 tests).
+
+GATE RECORD: one run on the frozen QA tip a9b4c3f818
+(BROWSER_PATH=<playwright chromium> GATE_MAX_WORKERS=8
+node scripts/gate_select.mjs): "[gate:select] PASS: all 12 steps green
+(vitest workers: 8)", zero FAIL markers, shell exit 0, no druid_engines
+timeout. Golden md5 25bd6b8774f913279c96dddb25f93403 held through the
+whole QA; hud.ts 19219/19220 and renderer.ts 13774/13774 untouched.
+
+MERGE: recorded in the merge-hash record commit on the feature branch.
 
 ### Phase 12
 (not started)
