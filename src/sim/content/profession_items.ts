@@ -710,6 +710,66 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     sellValue: 150,
   },
 
+  // --- Farm buff dishes (cooking, Phase 11 well-fed food) -------------------
+  // Trainer-taught outputs of FARM_RECIPES, one BUFF dish per crop tier so
+  // the produce ladder has a well-fed consumer at every rung. Exactly the
+  // plain-dish shape above plus the ONE new field: `wellfed`, the elixir-arm
+  // mirror (src/sim/items.ts / src/sim/wellfed.ts), a temporary buff_sta aura
+  // minted when the 18s sit-restore completes. All four share the aura name
+  // 'Well Fed' and therefore the aura id wellfed_buff_sta: within the food
+  // namespace last eaten always wins (the classic one-food-buff idiom), and
+  // the distinct namespace means no dish ever clobbers an elixir_<kind> buff
+  // or the reverse.
+  //
+  // VALUES ARE PROPOSED AND FLAGGED FOR THE MAINTAINER. Every wellfed pair
+  // sits at or below the documented elixir budget ceiling (buff_sta <= 12
+  // for <= 900s; the alchemy ladder header below): 3/600s, 6/900s, 9/900s,
+  // 12/900s, each dominated by or equal to a shipped elixir point (boar
+  // 6/600, venomfire 9/900, bear and serpent 12/900). Tuning read to flag:
+  // a well-fed buff STACKS with a same-stat elixir by design (distinct aura
+  // id), so the combined crafted ceiling is 24 stamina, still below the raid
+  // floor. foodHp and sellValue reuse shipped curve points; quality matches
+  // the rung. The tier 3/4 pair ships REAGENT-DORMANT under (bo): trainable
+  // and well-formed, but tier 3/4 produce has no seed faucet until the D11
+  // bootstrap ruling. Names are IP-safe per D17 (real culinary words plus
+  // settlement flavor) and collide with none of the eight plain dishes.
+  eastbrook_glazed_carrots: {
+    id: 'eastbrook_glazed_carrots',
+    name: 'Eastbrook Glazed Carrots',
+    kind: 'food',
+    quality: 'common',
+    foodHp: 90,
+    sellValue: 6,
+    wellfed: { aura: 'Well Fed', kind: 'buff_sta', value: 3, duration: 600 },
+  },
+  fenbridge_rice_pudding: {
+    id: 'fenbridge_rice_pudding',
+    name: 'Fenbridge Rice Pudding',
+    kind: 'food',
+    quality: 'uncommon',
+    foodHp: 243,
+    sellValue: 25,
+    wellfed: { aura: 'Well Fed', kind: 'buff_sta', value: 6, duration: 900 },
+  },
+  highwatch_barley_porridge: {
+    id: 'highwatch_barley_porridge',
+    name: 'Highwatch Barley Porridge',
+    kind: 'food',
+    quality: 'rare',
+    foodHp: 552,
+    sellValue: 60,
+    wellfed: { aura: 'Well Fed', kind: 'buff_sta', value: 9, duration: 900 },
+  },
+  evergarden_braised_greens: {
+    id: 'evergarden_braised_greens',
+    name: 'Evergarden Braised Greens',
+    kind: 'food',
+    quality: 'rare',
+    foodHp: 980,
+    sellValue: 150,
+    wellfed: { aura: 'Well Fed', kind: 'buff_sta', value: 12, duration: 900 },
+  },
+
   // --- Crafted alchemy ladder (alchemy) ------------------------------------
   // Trainer-taught outputs of LADDER_RECIPES (content/recipes.ts), three rungs
   // at skillReq 0/25/50, apothecary-bound at alchemist_verane. Potions reuse the

@@ -308,8 +308,9 @@ describe('item webp icons', () => {
     // growth-engine phase re-opened it for its four items, the knobs phase
     // added its two supplies (compost and the growth tonic), the crop-ladder
     // phase added its seven crop families (21 ids: seed, produce, fine twin
-    // per crop), the hoe phase added its four ladder rungs, and the Phase 6
-    // economy-hooks phase added its eight farm dishes, all under the same
+    // per crop), the hoe phase added its four ladder rungs, the Phase 6
+    // economy-hooks phase added its eight farm dishes, and the Phase 11
+    // well-fed phase added its four buff dishes, all under the same
     // reasoning: all are dormant online (no faucet for any exists yet)
     // and their art is scheduled as its own later phase. It must fall back to
     // 0 as that art lands.
@@ -323,13 +324,16 @@ describe('item webp icons', () => {
       'brook_carrot',
       'brook_carrot_seed',
       'compost',
+      'eastbrook_glazed_carrots',
       'eastbrook_root_pottage',
+      'evergarden_braised_greens',
       'evergarden_greens',
       'evergarden_greens_seed',
       'evergarden_harvest_platter',
       'evergarden_sunmelon_tart',
       'fenbridge_beet_braise',
       'fenbridge_rice_bowl',
+      'fenbridge_rice_pudding',
       'fine_bog_beet',
       'fine_brook_carrot',
       'fine_evergarden_greens',
@@ -347,6 +351,7 @@ describe('item webp icons', () => {
       'highland_barley',
       'highland_barley_seed',
       'highwatch_barley_bannock',
+      'highwatch_barley_porridge',
       'highwatch_gourd_soup',
       'marsh_rice',
       'marsh_rice_seed',
@@ -401,13 +406,14 @@ describe('item webp icons', () => {
     expect(b.prims[0]?.p).toBe('sack');
   });
 
-  it('A4c) the eight farm dishes differ in their PRIM LISTS, never only the shared food radial', () => {
-    // The A4b lesson generalized to the Phase 6 dish family: all eight sit on
-    // the 'food' radial DELIBERATELY (a cooked dish must never read as raw
-    // produce), and three also share a palette, so A4's whole-recipe JSON
-    // identity could be satisfied by the background alone, a distinction a
-    // 32px bag cell does not show. Demanding pairwise-distinct prim lists
-    // (each prim WITH its palette) keeps every pair tellable at a glance.
+  it('A4c) the twelve farm dishes differ in their PRIM LISTS, never only the shared food radial', () => {
+    // The A4b lesson generalized to the dish family (the Phase 6 eight plus
+    // the Phase 11 four buff dishes): all twelve sit on the 'food' radial
+    // DELIBERATELY (a cooked dish must never read as raw produce), and
+    // several share a palette, so A4's whole-recipe JSON identity could be
+    // satisfied by the background alone, a distinction a 32px bag cell does
+    // not show. Demanding pairwise-distinct prim lists (each prim WITH its
+    // palette) keeps every pair tellable at a glance.
     const DISH_ICON_IDS = [
       'vale_hearth_loaf',
       'eastbrook_root_pottage',
@@ -417,6 +423,10 @@ describe('item webp icons', () => {
       'highwatch_gourd_soup',
       'evergarden_sunmelon_tart',
       'evergarden_harvest_platter',
+      'eastbrook_glazed_carrots',
+      'fenbridge_rice_pudding',
+      'highwatch_barley_porridge',
+      'evergarden_braised_greens',
     ];
     const seen = new Map<string, string>();
     for (const id of DISH_ICON_IDS) {
