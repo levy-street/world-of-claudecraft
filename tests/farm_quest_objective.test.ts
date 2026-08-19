@@ -457,7 +457,7 @@ describe('the farm ACTION objective: harvest credit', () => {
     expect(progressEvents(h.sim, from)).toEqual([]);
   });
 
-  it('the credit adds no rng draw: a plant stays 2 and a tier-1 harvest 0 with the quest active', () => {
+  it('the credit adds no rng draw: a plant stays 2 and a tier-1 harvest 1 with the quest active', () => {
     // The D4 draw contract pinned in tests/professions_farming.test.ts, re-read
     // WITH a crediting farm objective in the log: the crediter is pure state
     // and event work.
@@ -469,7 +469,9 @@ describe('the farm ACTION objective: harvest credit', () => {
     clearCast(h.sim);
     h.advance(CROP.durationMs);
     (h.meta.farmPlots.get(BED) as PlotState).survivalRoll = 0;
-    expect(countDraws(h.sim, () => harvest(h))).toBe(0);
+    // 1 draw since the celebrations phase: the golden roll (the crediter
+    // itself still adds none, which is what this arm pins).
+    expect(countDraws(h.sim, () => harvest(h))).toBe(1);
     expect(qp.counts).toEqual([1, 1]);
   });
 });

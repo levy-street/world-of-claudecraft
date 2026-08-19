@@ -601,7 +601,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(slot.durability).toBe(29);
   });
 
-  it('farming_session: plants draw two each, only the tier-3 harvest draws one (the seed-back roll)', () => {
+  it('farming_session: plants draw two each, every harvest one golden roll, the tier-3 one the seed-back too', () => {
     const { trace, rec } = record(SCENARIOS.find((s) => s.name === 'farming_session')!);
     const ev = rec.allEvents as Ev[];
     const pid = (rec.sim as any).playerId as number;
@@ -636,10 +636,13 @@ describe('coverage: each scenario fires its subsystem', () => {
 
     // THE DRAW LEDGER, the point of this scenario. rng.draws is cumulative
     // from drive start: two draws per plant (the contiguous survival + yield
-    // seed pre-roll), EXACTLY one at the tier-3 harvest (the seed-back roll),
-    // and NOTHING anywhere else. Growth windows, tier-1 harvests (toniced
-    // included), and the husk trade all sit at the count of the beat before
-    // them; harvested-t3 sitting at planted-t3 + 1 is the seed-back clause.
+    // seed pre-roll), EXACTLY one golden-harvest roll at EVERY harvest
+    // (both outcomes, the celebrations phase), plus the seed-back roll at
+    // the tier-3 harvest (so harvested-t3 sits at planted-t3 + 2, the
+    // contiguous pair), and NOTHING anywhere else. Growth windows and the
+    // husk trade sit at the count of the beat before them; the two tier-1
+    // opening harvests land together in the harvested frame at +2 (one
+    // golden roll each, survived and withered alike).
     const drawsAt = (label: string): number => {
       const frame = trace.frames.find((f) => f.label === label);
       expect(frame, `missing the ${label} checkpoint frame`).toBeTruthy();
@@ -648,18 +651,19 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(drawsAt('planted-first')).toBe(2);
     expect(drawsAt('planted')).toBe(4);
     expect(drawsAt('grown')).toBe(4);
-    expect(drawsAt('harvested')).toBe(4);
-    expect(drawsAt('planted-knobbed')).toBe(6);
-    expect(drawsAt('harvested-toniced')).toBe(6);
-    expect(drawsAt('husks-converted')).toBe(6);
-    expect(drawsAt('planted-t3')).toBe(8);
-    expect(drawsAt('harvested-t3')).toBe(9);
-    // The Phase 8 ready-notice beat: its plant pre-rolls two more, and then
-    // NOTHING draws through the sweep that emits the notice, the sampled
-    // notified flag, or the closing harvest (tier 1, no seed-back).
-    expect(drawsAt('ready-noticed')).toBe(11);
-    expect(drawsAt('harvested-noticed')).toBe(11);
-    expect(trace.draws).toBe(11);
+    expect(drawsAt('harvested')).toBe(6);
+    expect(drawsAt('planted-knobbed')).toBe(8);
+    expect(drawsAt('harvested-toniced')).toBe(9);
+    expect(drawsAt('husks-converted')).toBe(9);
+    expect(drawsAt('planted-t3')).toBe(11);
+    expect(drawsAt('harvested-t3')).toBe(13);
+    // The Phase 8 ready-notice beat: its plant pre-rolls two more, then
+    // NOTHING draws through the sweep that emits the notice or the sampled
+    // notified flag, and the closing tier-1 harvest spends exactly its one
+    // golden roll.
+    expect(drawsAt('ready-noticed')).toBe(15);
+    expect(drawsAt('harvested-noticed')).toBe(16);
+    expect(trace.draws).toBe(16);
 
     // The knobbed plant really stored all three paid flags (farmPlanted is
     // knob-free on the wire, so the drive stashes the stored plot's flags).
@@ -672,17 +676,19 @@ describe('coverage: each scenario fires its subsystem', () => {
     // seedBackCount either: tier 1 never rolls (the omit-zero doctrine).
     const harvested = ev.filter((e) => e.type === 'farmHarvested');
     expect(harvested).toHaveLength(4);
-    // The Phase 8 closing harvest: skill sits at 75-and-change by now, so the
-    // yield expansion pays 7 (the recorded truth of the committed golden, a
-    // literal for the drawsAt reason above) with no fine or seed-back fields
-    // on a tier-1 crop.
+    // The Phase 8 closing harvest: skill sits at 75-and-change by now, and
+    // its yieldSeed now mints two stream positions later (the golden rolls
+    // upstream re-seated every later mint), so the expansion pays 3 (the
+    // recorded truth of the re-recorded golden, a literal for the drawsAt
+    // reason above) with no fine or seed-back fields on a tier-1 crop. Its
+    // own golden roll (draw 16, 0.515190) loses, so no multiplier.
     expect(harvested[3]).toEqual({
       type: 'farmHarvested',
       pid,
       bedId: 'bed_eastbrook_1',
       cropId: 'vale_wheat',
       itemId: 'vale_wheat',
-      count: 7,
+      count: 3,
     });
     expect('fineItemId' in harvested[3]).toBe(false);
     expect('seedBackCount' in harvested[3]).toBe(false);
@@ -726,15 +732,16 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(convertedEv[0].compost).toBe(1);
 
     // The tier-3 harvest. The band is pinned as a LITERAL, the drawsAt style
-    // above: seedBackCount 1 (the one-seed band) is the recorded truth of the
-    // committed farming_session golden, so it moves only with a deliberate
-    // re-record, never silently. The tolerant toContain([0, 1, 2]) shape this
-    // replaces would have let the grant half of the beat go vacuous (a
-    // seed-back that stopped paying still satisfied it). The bag consistency
-    // arm stays: the event's count must equal the highland_barley_seed bag
-    // delta (the drive granted 1 seed and the plant spent it, so the final
-    // bag IS the seed-back), and the base/fine grants must match their bags
-    // the same way.
+    // above: seedBackCount 0 (the zero band, so the field is OMITTED) is the
+    // recorded truth of the re-recorded farming_session golden, and it moves
+    // only with a deliberate re-record, never silently. The golden rolls
+    // upstream re-seated the seed-back roll from the old draw 9 (0.297173,
+    // the one-seed band) to draw 12 (0.981881, the zero band): the
+    // celebrations phase's expected ledger shift, not a band retune. The bag
+    // consistency arm stays: the event's count must equal the
+    // highland_barley_seed bag delta (the drive granted 1 seed and the plant
+    // spent it, so the final bag IS the seed-back), and the base/fine grants
+    // must match their bags the same way.
     const countOf = (itemId: string): number =>
       meta.inventory
         .filter((s: any) => s.itemId === itemId)
@@ -743,7 +750,8 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(barleyEv.bedId).toBe('bed_thornpeak_1');
     expect(barleyEv.cropId).toBe('highland_barley');
     const seedBack = (barleyEv.seedBackCount as number | undefined) ?? 0;
-    expect(seedBack).toBe(1);
+    expect(seedBack).toBe(0);
+    expect('seedBackCount' in barleyEv).toBe(false); // omit-zero doctrine
     expect(countOf('highland_barley_seed')).toBe(seedBack);
     expect(countOf(barleyEv.itemId)).toBe(barleyEv.count);
     if (barleyEv.fineItemId !== undefined) {
@@ -798,7 +806,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     // converted), the tonic was consumed, and every seed pouch is empty
     // except the seed-back. Both eastbrook beds and the thornpeak bed are
     // free again (one visit takes the plot out on either outcome).
-    expect(countOf('vale_wheat')).toBe(3 + toniced.count + 7);
+    expect(countOf('vale_wheat')).toBe(3 + toniced.count + 3);
     expect(countOf('withered_husks')).toBe(0);
     expect(countOf('vale_wheat_seed')).toBe(0);
     expect(countOf('compost')).toBe(1);

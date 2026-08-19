@@ -9,7 +9,7 @@ import { noteReliquaryMark } from '../reliquary';
 import type { Rng } from '../rng';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import type { GatherNodeDef, GatherNodeType, GatherRareEventFlavor, SimEvent } from '../types';
+import type { GatherRareEventFlavor, GatherRareEventSource, SimEvent } from '../types';
 import type { MasterworkProc } from './masterwork';
 
 // One shared cadence knob: state.md target of roughly 1 per zone per 20
@@ -34,23 +34,32 @@ export const GATHER_RARE_EVENT_CHANCE = 1 / 90;
 // regardless of the rolled material rarity.
 export const GATHER_RARE_EVENT_YIELD_MULT = 5;
 
-export function gatherRareEventFlavor(nodeType: GatherNodeType): GatherRareEventFlavor {
-  return nodeType === 'ore'
-    ? 'pristine_vein'
-    : nodeType === 'wood'
-      ? 'ancient_heartwood'
-      : 'moonlit_bloom';
+// Exhaustive on purpose (no default arm): a fifth source added to the union
+// fails tsc here instead of silently minting a golden harvest.
+export function gatherRareEventFlavor(source: GatherRareEventSource): GatherRareEventFlavor {
+  switch (source) {
+    case 'ore':
+      return 'pristine_vein';
+    case 'wood':
+      return 'ancient_heartwood';
+    case 'herb':
+      return 'moonlit_bloom';
+    case 'crop':
+      return 'golden_harvest';
+  }
 }
 
 // Draw #2 of resolveHarvest (after rollMaterialRarity, a pinned determinism
 // contract). Draws EXACTLY ONE rng.next() on EVERY call, hit when the draw is
 // below GATHER_RARE_EVENT_CHANCE: a constant draw count per harvest keeps the
-// sim's rng stream identical across hosts regardless of the outcome.
+// sim's rng stream identical across hosts regardless of the outcome. The
+// farming harvest draw block is the second caller (source 'crop', state.md
+// D12: the SAME shared chance, never a farming copy of the constant).
 export function rollGatherRareEvent(
   rng: Rng,
-  nodeType: GatherNodeType,
+  source: GatherRareEventSource,
 ): GatherRareEventFlavor | null {
-  return rng.next() < GATHER_RARE_EVENT_CHANCE ? gatherRareEventFlavor(nodeType) : null;
+  return rng.next() < GATHER_RARE_EVENT_CHANCE ? gatherRareEventFlavor(source) : null;
 }
 
 // Soft zone broadcast: one pid-scoped copy of the event per player whose
@@ -75,27 +84,34 @@ export function emitToZonePlayers(
   }
 }
 
+// The `source` parameter is structural on purpose: a GatherNodeDef satisfies
+// it as-is (the three node flavors), and the farming harvest passes its bed's
+// zone with type 'crop' (golden_harvest) without farm beds ever becoming
+// gather nodes.
 export function announceGatherRareEvent(
   ctx: SimContext,
   finder: PlayerMeta,
-  node: GatherNodeDef,
+  source: { zoneId: string; type: GatherRareEventSource },
   flavor: GatherRareEventFlavor,
   itemId: string,
 ): void {
-  emitToZonePlayers(ctx, node.zoneId, (recipientPid) => ({
+  emitToZonePlayers(ctx, source.zoneId, (recipientPid) => ({
     type: 'gatherRareEvent',
     pid: recipientPid,
     flavor,
     finderName: finder.name,
     finderPid: finder.entityId,
-    zoneId: node.zoneId,
-    nodeType: node.type,
+    zoneId: source.zoneId,
+    nodeType: source.type,
     itemId,
   }));
-  // Deed-mark hook: each flavor mark feeds its rare-find
-  // deed (col_pristine_vein / col_ancient_heartwood / col_moonlit_bloom).
+  // Deed-mark hook: each flavor mark feeds its rare-find deed
+  // (col_pristine_vein / col_ancient_heartwood / col_moonlit_bloom, and the
+  // farming phase's golden-harvest deed on gather_event:golden_harvest).
   // Reliquary field-note trophies reuse the same stable gather_event:* ids
-  // (catalog allowlist only; noteReliquaryMark no-ops unknown ids).
+  // (catalog allowlist only; noteReliquaryMark no-ops unknown ids, which is
+  // deliberately where golden_harvest sits today: its field-note cell is a
+  // ledgered deferral, not an oversight).
   const visitMark = `gather_event:${flavor}`;
   ctx.markVisited(finder, visitMark);
   noteReliquaryMark(ctx, finder, visitMark);

@@ -183,6 +183,20 @@ export function farmBedById(bedId: string): FarmBedDef | undefined {
   return FARM_BEDS_BY_ID.get(bedId);
 }
 
+// Bed id to its patch's zone, the same build-once shape as FARM_BEDS_BY_ID:
+// the harvest-side celebration hooks (the golden-harvest zone announce and
+// the first-harvest chronicle mark) resolve a bed's zone per harvest, and
+// the patch row states it authoritatively (never zoneAt: a bed belongs to
+// its patch's zone by authorship, not by geometry).
+const FARM_BED_ZONE_BY_ID: ReadonlyMap<string, string> = new Map(
+  FARM_PATCHES.flatMap((p) => p.beds.map((b) => [b.id, p.zoneId] as const)),
+);
+
+/** The zone id of the patch this bed belongs to, or undefined for a non-bed. */
+export function farmBedZoneId(bedId: string): string | undefined {
+  return FARM_BED_ZONE_BY_ID.get(bedId);
+}
+
 // The crop registry the persistence allowlist reads, now DERIVED from the
 // real catalog (content/farm_crops.ts) rather than declared here: the growth
 // phase brought the catalog, so a second hand-maintained list would only be a

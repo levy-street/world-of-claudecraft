@@ -5610,14 +5610,14 @@ function professionsFarmingSession(seed = 1): Scenario {
       'plant consumes the seed and starts the flavor cast (FARMING_CAST_ID)',
       'busy gate: the second plant waits out the first plant cast',
       'growth window: readyAtMs reached with ZERO rng draws and zero events',
-      'harvestCrop survived path: zero draws (tier 1), produce granted from the stored yield seed',
-      'harvestCrop withered path: zero draws (tier 1), withered husks paid instead of produce',
+      'harvestCrop survived path: ONE draw at tier 1 (the golden roll, a recorded loss), produce granted from the stored yield seed',
+      'harvestCrop withered path: ONE draw at tier 1 (the golden roll, spent and ignored), withered husks paid instead of produce',
       'both harvests free their bed (farmPlots empty at the end)',
       'gathering grant drain: the queued farming proficiency lands on the next tick',
       'knobbed plant (compost + watch + tonic): payments consumed, still exactly two draws',
-      'toniced harvest on a probed WINNING yieldSeed: zero draws, bonus picks at base grade',
+      'toniced harvest on a probed WINNING yieldSeed: one draw (the golden roll; the tonic itself stays draw-free seed expansion), bonus picks at base grade',
       'convertHusks: the withered payout batch trades into compost, zero draws',
-      'tier-3 harvest (highland_barley at Thornpeak): EXACTLY one draw, the seed-back roll',
+      'tier-3 harvest (highland_barley at Thornpeak): EXACTLY two contiguous draws, the seed-back roll then the golden roll',
       'ready-notice sweep (Phase 8): a plot left ready across the 1 Hz boundary emits ONE farmReady, zero draws',
       'notified flag: the noticed plot samples notified true in fplot before its closing harvest',
     ],
@@ -5675,7 +5675,8 @@ function professionsFarmingSession(seed = 1): Scenario {
 
       // Both harvests, back to back from the one stand point: the survived
       // plot pays produce and queues proficiency, the withered plot pays
-      // husks and queues nothing. Neither draws.
+      // husks and queues nothing. Each draws exactly once (the golden roll,
+      // both outcomes; both land losses on this stream).
       harvestCrop(sim.ctx, p, meta, BED_READY);
       harvestCrop(sim.ctx, p, meta, BED_WITHERED);
       rec.snapshot('harvested');
@@ -5716,8 +5717,9 @@ function professionsFarmingSession(seed = 1): Scenario {
       // the beats above, then OVERWRITE the minted yieldSeed with the probed
       // tonic WINNER (see FARM_TONIC_WINNER_YIELD_SEED above): at a losing
       // seed the toniced and plain expansions coincide and the beat proves
-      // nothing (the M8 lesson). Zero draws: the tonic is seed expansion,
-      // and vale_wheat is tier 1, so no seed-back roll either.
+      // nothing (the M8 lesson). One draw, the golden roll (a loss on this
+      // stream): the tonic is seed expansion, and vale_wheat is tier 1, so
+      // no seed-back roll.
       knobbed.readyAtMs = sim.ctx.lockoutNowMs();
       knobbed.survivalRoll = 0.01;
       knobbed.yieldSeed = FARM_TONIC_WINNER_YIELD_SEED;
@@ -5744,10 +5746,11 @@ function professionsFarmingSession(seed = 1): Scenario {
       const barley = meta.farmPlots.get(BED_T3) as PlotState;
       barley.readyAtMs = sim.ctx.lockoutNowMs();
       barley.survivalRoll = 0.01;
-      // ...and EXACTLY one more, the seed-back roll: whatever band the
-      // shared stream yields here is the recorded truth (the coverage suite
-      // asserts the ledger arithmetic and that the event's seedBackCount
-      // matches the highland_barley_seed bag delta, never a band literal).
+      // ...and EXACTLY two more, the seed-back roll then the golden roll:
+      // whatever bands the shared stream yields here are the recorded truth
+      // (the coverage suite asserts the ledger arithmetic and that the
+      // event's seedBackCount matches the highland_barley_seed bag delta,
+      // never a band literal).
       harvestCrop(sim.ctx, p, meta, BED_T3);
       rec.snapshot('harvested-t3');
       // Drain the barley harvest's queued 0.02 gain into the final sample.
