@@ -16,6 +16,7 @@
 // asserts against a clock that never moves.
 
 import { beforeEach, describe, expect, it } from 'vitest';
+import { bagCapacity, stackSizeOf } from '../src/sim/bags';
 import {
   FARM_CROPS,
   type FarmCropDef,
@@ -2714,6 +2715,161 @@ describe('the golden_harvest roll: the shared rare event at the farm bed', () =>
     expect(a.events.some((e: { type: string }) => e.type === 'gatherRareEvent')).toBe(true);
     expect(a.produce).toBeGreaterThan(0);
   });
+
+  /** The shared probed-winner rig for the bag-path arms below: plant on the
+   *  winner stream, ripen, force survival, and return the unarmed
+   *  expectation, asserting the Phase 4 non-vacuity pair in-rig. */
+  function ripenWinner(h: Harness): { count: number; fine: number } {
+    giveSeeds(h);
+    plant(h);
+    clearCast(h.sim);
+    h.advance(CROP.durationMs);
+    const plot = h.meta.farmPlots.get(BED) as PlotState;
+    plot.survivalRoll = 0;
+    const expected = resolveFarmHarvest(plot.yieldSeed as number, 0);
+    expect(expected.count).toBeGreaterThan(0);
+    expect(expected.fine).toBeGreaterThan(0);
+    return expected;
+  }
+
+  function signedCountOf(h: Harness, itemId: string): number {
+    return h.meta.inventory
+      .filter((s) => s.itemId === itemId && s.instance?.signer === h.meta.name)
+      .reduce((sum, s) => sum + s.count, 0);
+  }
+
+  it('a golden win with FULL bags: totals conserved, only the SIGNATURE truncates ((bu))', () => {
+    // The merge-room-only split, unreachable on empty bags: a same-signer
+    // stack two under its cap and ZERO free slots. countFit must see the
+    // signer (drop it and the fit reads 0), the fit must cap the SIGNED
+    // grant (pass qty instead and the stack overshoots its room), and the
+    // remainder must ride the plain overflow-tolerant grant (zero it and
+    // grown produce is destroyed, the rot farming forbids).
+    const h = makeHarness(GOLDEN_WIN_SEED);
+    const expected = ripenWinner(h);
+    const stack = stackSizeOf(ITEMS[PRODUCE_ID]);
+    h.sim.ctx.addItemInstance(PRODUCE_ID, { signer: h.meta.name }, h.pid, stack - 2, {
+      silent: true,
+      callerLogs: true,
+    });
+    const capacity = bagCapacity(h.meta.bags);
+    while (h.meta.inventory.length < capacity) h.sim.addItem(HOE_ID, 1, h.pid);
+    expect(h.meta.inventory.length).toBe(capacity);
+    const values = recordDraws(h.sim, () => harvest(h));
+    expect(values).toHaveLength(1);
+    expect(values[0]).toBeLessThan(GATHER_RARE_EVENT_CHANCE); // the probed win, in-arm
+    const count5 = expected.count * GATHER_RARE_EVENT_YIELD_MULT;
+    const fine5 = expected.fine * GATHER_RARE_EVENT_YIELD_MULT;
+    // NOTHING ROTS: the full five-fold totals landed despite the full bags.
+    expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(stack - 2 + count5);
+    expect(h.sim.countItem(FINE_ID, h.pid)).toBe(fine5);
+    // Only the SIGNATURE truncated: exactly the merge room (2) signed on top
+    // of the pre-seeded stack, the remainder landed PLAIN.
+    expect(signedCountOf(h, PRODUCE_ID)).toBe(stack);
+    expect(
+      h.meta.inventory
+        .filter((s) => s.itemId === PRODUCE_ID && !s.instance)
+        .reduce((sum, s) => sum + s.count, 0),
+    ).toBe(count5 - 2);
+    // The fine grade found no signed room at all: fully plain.
+    expect(h.meta.inventory.some((s) => s.itemId === FINE_ID && s.instance)).toBe(false);
+    // The overflow is VISIBLE (the 17/16 rule), never silently absorbed.
+    expect(h.meta.inventory.length).toBeGreaterThan(capacity);
+  });
+
+  it('a golden win into the LAST free slot: the fine grade reads the mutated bags ((bu))', () => {
+    // The deliberate second-read the grantGolden comment forbids "cleaning
+    // up": the base grade consumes the one free slot, so the fine grade's
+    // countFit must see the NOW-FULL bags and land fully plain. A hoisted
+    // inventory snapshot would sign the fine grade into the phantom slot.
+    const h = makeHarness(GOLDEN_WIN_SEED);
+    const expected = ripenWinner(h);
+    const capacity = bagCapacity(h.meta.bags);
+    while (h.meta.inventory.length < capacity - 1) h.sim.addItem(HOE_ID, 1, h.pid);
+    expect(h.meta.inventory.length).toBe(capacity - 1);
+    const values = recordDraws(h.sim, () => harvest(h));
+    expect(values).toHaveLength(1);
+    expect(values[0]).toBeLessThan(GATHER_RARE_EVENT_CHANCE);
+    const count5 = expected.count * GATHER_RARE_EVENT_YIELD_MULT;
+    expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(count5);
+    expect(h.sim.countItem(FINE_ID, h.pid)).toBe(expected.fine * GATHER_RARE_EVENT_YIELD_MULT);
+    // The base grade took the one free slot, signed in full...
+    expect(signedCountOf(h, PRODUCE_ID)).toBe(count5);
+    // ...and the fine grade, reading the mutated bags, landed fully plain.
+    expect(h.meta.inventory.some((s) => s.itemId === FINE_ID && s.instance)).toBe(false);
+  });
+
+  it('the announce lands AFTER the grants (celebrate once the windfall is real)', () => {
+    // Pins the deliberate order the code comment states: every grant leg's
+    // loot event precedes the first gatherRareEvent copy, and the
+    // farmHarvested completion event follows the announce (the node idiom).
+    const h = makeHarness(GOLDEN_WIN_SEED);
+    ripenWinner(h);
+    const from = h.sim.events.length;
+    const values = recordDraws(h.sim, () => harvest(h));
+    expect(values[0]).toBeLessThan(GATHER_RARE_EVENT_CHANCE);
+    const types = h.sim.events.slice(from).map((e) => e.type);
+    const lastLoot = types.lastIndexOf('loot');
+    const firstRare = types.indexOf('gatherRareEvent');
+    const firstHarvested = types.indexOf('farmHarvested');
+    expect(lastLoot).toBeGreaterThan(-1);
+    expect(firstRare).toBeGreaterThan(lastLoot);
+    expect(firstHarvested).toBeGreaterThan(firstRare);
+  });
+
+  it('the five-fold multiplies the ARMED expansion, tool-effect bonus included (seed 280)', () => {
+    // The crossing arm the empty-handed winner cannot provide: with a
+    // quantity effect armed, "armed times five" and "plain times five plus
+    // the bonus" are different numbers, so a mutant that multiplies the
+    // pre-effect base and re-adds the bonus reds here.
+    const h = makeHarness(GOLDEN_WIN_SEED);
+    giveSeeds(h);
+    plant(h);
+    clearCast(h.sim);
+    h.advance(CROP.durationMs);
+    const plot = h.meta.farmPlots.get(BED) as PlotState;
+    plot.survivalRoll = 0;
+    const slot = slotEffect('gatherers_cache');
+    h.meta.toolEffectSlots = { farming: slot };
+    const plain = resolveFarmHarvest(plot.yieldSeed as number, 0);
+    const armed = resolveFarmHarvest(plot.yieldSeed as number, 0, false, {
+      bonusPicks: TOOL_EFFECTS.gatherers_cache.bonus,
+    });
+    // Non-vacuity: the effect really changes the expansion on this seed, and
+    // the two mutant-distinguishing totals really differ.
+    expect(armed.count).not.toBe(plain.count);
+    expect(armed.count * GATHER_RARE_EVENT_YIELD_MULT).not.toBe(
+      plain.count * GATHER_RARE_EVENT_YIELD_MULT + (armed.count - plain.count),
+    );
+    const values = recordDraws(h.sim, () => harvest(h));
+    expect(values).toHaveLength(1);
+    expect(values[0]).toBeLessThan(GATHER_RARE_EVENT_CHANCE);
+    expect(h.sim.countItem(PRODUCE_ID, h.pid)).toBe(armed.count * GATHER_RARE_EVENT_YIELD_MULT);
+    expect(h.sim.countItem(FINE_ID, h.pid)).toBe(armed.fine * GATHER_RARE_EVENT_YIELD_MULT);
+  });
+
+  it('the announce zone follows the BED: a win at Thornpeak announces thornpeak_heights', () => {
+    // Kills the hardcoded-zone mutant: every other golden arm harvests at
+    // the eastbrook bed, so an announce call that froze 'eastbrook_vale'
+    // would survive them all. The same probed winner stream applies at any
+    // bed (draw positions never depend on WHICH bed hosts the plot), and
+    // (br) lets a tier-1 seed plant at any hub.
+    const h = makeHarness(GOLDEN_WIN_SEED);
+    standAtBed(h.sim, 'bed_thornpeak_1');
+    giveSeeds(h);
+    plant(h, 'bed_thornpeak_1');
+    clearCast(h.sim);
+    h.advance(CROP.durationMs);
+    (h.meta.farmPlots.get('bed_thornpeak_1') as PlotState).survivalRoll = 0;
+    const from = h.sim.events.length;
+    const values = recordDraws(h.sim, () => harvest(h, 'bed_thornpeak_1'));
+    expect(values).toHaveLength(1);
+    expect(values[0]).toBeLessThan(GATHER_RARE_EVENT_CHANCE);
+    const rare = eventsOf(h.sim, from, 'gatherRareEvent');
+    expect(rare.length).toBeGreaterThan(0);
+    for (const ev of rare) expect(ev.zoneId).toBe('thornpeak_heights');
+    expect(h.meta.deedStats.visited.has('farm:thornpeak_heights')).toBe(true);
+  });
 });
 
 describe('the celebration marks: farm:planted and the farm:<zone> chronicle', () => {
@@ -2722,13 +2878,48 @@ describe('the celebration marks: farm:planted and the farm:<zone> chronicle', ()
   // chronicle on the survived branch (deeds.ts onCropHarvestedForDeeds).
 
   it('writes farm:planted at plant SUCCESS and never on a deny', () => {
+    // The deny SWEEP (the QA hardening: the old arm swept only no_seed, so
+    // the mark migrating above the range or knob gates would have gone
+    // unseen): one fresh rig per deny family, each proving the deny fired
+    // AND no mark landed. The gates run in order, so each rig trips only
+    // its own.
+    const denies: { name: string; rig: (d: Harness) => void; reason: string }[] = [
+      { name: 'no_seed', rig: () => {}, reason: 'no_seed' },
+      {
+        name: 'range',
+        rig: (d) => {
+          giveSeeds(d);
+          d.sim.player.pos.x += 50;
+        },
+        reason: 'range',
+      },
+      {
+        name: 'bad_bed',
+        rig: (d) => giveSeeds(d),
+        reason: 'bad_bed',
+      },
+      {
+        name: 'no_compost (a knob-payment deny)',
+        rig: (d) => giveSeeds(d),
+        reason: 'no_compost',
+      },
+    ];
+    for (const deny of denies) {
+      const d = makeHarness();
+      deny.rig(d);
+      const dFrom = d.sim.events.length;
+      if (deny.reason === 'bad_bed') {
+        plantCrop(d.sim.ctx, d.sim.player, d.meta, 'not_a_bed', CROP_ID);
+      } else if (deny.reason === 'no_compost') {
+        plantCrop(d.sim.ctx, d.sim.player, d.meta, BED, CROP_ID, { compost: true });
+      } else {
+        plant(d);
+      }
+      expect(denyReason(d.sim, dFrom), deny.name).toBe(deny.reason);
+      expect(d.meta.deedStats.visited.has('farm:planted'), deny.name).toBe(false);
+    }
+    // The success writes it (the positive control proving the rig CAN mark).
     const h = makeHarness();
-    // The deny first (no seed in bags): no mark.
-    const from = h.sim.events.length;
-    plant(h);
-    expect(denyReason(h.sim, from)).toBe('no_seed');
-    expect(h.meta.deedStats.visited.has('farm:planted')).toBe(false);
-    // The success writes it.
     giveSeeds(h);
     plant(h);
     expect(h.meta.deedStats.visited.has('farm:planted')).toBe(true);
