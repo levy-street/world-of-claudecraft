@@ -96,6 +96,19 @@ STEP 0 - PRE-FLIGHT
   generic object arm. tests/professions_feast.test.ts pins
   lootable-false for life. Verify the class ONLINE too (the mirrored
   entity's funnel behavior over a real wire).
+  QA AMENDMENT (2026-08-19, this round): the finite spawn timer
+  (durationTicks + 20 ticks) was silently coupled to the 1 Hz sweep
+  period across two files, with a probe-measured worst-case margin of
+  exactly ONE tick (expiry phased one tick past a boundary: despawn at
+  expiry + 19, re-arm one tick later). Replaced with respawnTimer =
+  Infinity, the precedented never-re-arm sentinel (run-scoped mobs,
+  dismissed pets); the 181s expiry arm now rides the whole life at the
+  worst-case phase asserting lootable false on every tick. The QA also
+  found and fixed the INSTANCE-TEARDOWN LEAK: a feast placed inside a
+  dungeon instance now joins the claimed instance's objectIds, so
+  freeInstance drops it and the sweep's inverse-cleanup leg reclaims
+  the state and the one-active slot; placement inside instances stays
+  LEGAL (the raid-table flavor). Both in the state.md Phase 12 QA block.
   (5) The swim PLACE gate exists (a water placement would burn the item
   on a feast nobody can ever eat); COMBAT placement is deliberately
   LEGAL (combat ends; water does not), stated in the module header.

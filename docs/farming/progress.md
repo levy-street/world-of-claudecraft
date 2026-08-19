@@ -32,8 +32,8 @@
 | Phase 10 QA (verify celebrations) | DONE 2026-08-19 (PASS-WITH-FOLLOWUPS) | fix/farming-phase-10-qa off 8a466e898f (release tip ea9377db8e still newest, no absorb); merge hash in the notes tail | All five mandatory emphases verified first-hand (totals re-pin exact 273+7/3155+35/42+1; zero golden movement outside farming_session with the golden dir byte-identical merge-to-HEAD; the instance exclusion proven with a LIVE multi-observer Sim probe; a real golden win replayed through the LIVE client HUD, epic line + finder-only cues behaviorally observed; the (bs)/(bt) stories coherent); two BLOCKING coverage gaps closed (the golden signed-grant bag paths, the finder-only sting pins rebuilt as the gather_rare_event_feedback pure core + behavioral suite); hud.ts SHRANK again (ceiling 19230 to 19220); fresh mutations 14/14 killed named; browser suite 133 green standalone and perf:tour exit 0 (the two VERIFY items); (bw) parity-win coverage deferred to Phase 11 by the (z) precedent |
 | Phase 11 (well-fed food) | DONE 2026-08-19 | fix/farming-phase-11-well-fed-food off f0d329db02 (the twenty-first absorb, release/v0.40.0 e56707a675, opened the phase); merged --no-ff as 9fc11d5452, phase tip e6746bfe79 | ItemDef.wellfed beside elixir; the completion-time mint (src/sim/wellfed.ts at the updateRegen slot-null site, deviation (bx)); one shared aura 'Well Fed' / wellfed_buff_sta, last-eaten-wins namespace-wide (by); four buff dishes in FARM_RECIPES rows 9 to 13 with the (bz) vale_wheat binder; magnitudes 3/600s 6/900s 9/900s 12/900s proposed and flagged; (bw) discharged (the golden-WIN and paying-band beats, one isolated classified re-record, draws 16 to 110, md5 25bd6b87); reviews 0 BLOCKING; mutations 9/9 killed named; gate all 12 green on e6746bfe79 |
 | Phase 11 QA | DONE 2026-08-19 (PASS-WITH-FOLLOWUPS) | fix/farming-phase-11-qa off 35536d8ca8 (v0.40.0 e56707a675 still newest, no absorb); merge hash in the notes tail | All four mandatory emphases proven live first-hand (coexistence and last-eaten-wins through real ticks; the eat verb PLAYED as a player through the real bag UI on the LOW live client with the buff bar, remaining time, and single-Use:-prefix tooltip observed; the tier-4-then-tier-1 downgrade over the REAL wire through a stable-timer GameServer + ClientWorld rig, value 12 shipped, held through elision, re-encoded to 3); 7 lanes/reviewers 0 BLOCKING; 4 SHOULD-FIX closed test-first (18s boundary bracket, concurrent-meal refusal, death forfeit, zero-rng rig guards) plus the stat-map parity pin, the stripComments glue-pin hardening, and ten frozen non-Latin fill literals; mutations 7/7 killed named (M3 and M5b re-proven, five fresh over the new pins); rest ledgered with owners in the state.md Phase 11 QA block |
-| Phase 12 (shared feast) | not started | | |
-| Phase 12 QA | not started | | |
+| Phase 12 (shared feast) | DONE 2026-08-19 | fix/farming-phase-12-shared-feast off deffe3a5d4 (release/v0.40.0 e56707a675 still newest, no absorb); merged --no-ff as 71010cf82a, phase tip 1b33789ba4 | harvest_feast (kind junk, ItemDef.feast {charges 10, 3600 ticks, dishItemId evergarden_braised_greens}) + recipe_harvest_feast (FARM_RECIPES 14, reagent-dormant under (ca)); placeFeast/consumeFeast on IWorldFarming (331 = 88 + 243); the farm_feast entity on the normal snapshot; one-active-per-placer; the bite is a consume slot at the capstone dish (the one updateRegen mint site); the lootable re-arm trap found BY PLAYING and fixed; beat P appended (draws 110 unchanged, md5 9dfd1c6e); five-review round + qa-checklist 0 standing BLOCKING; gate run 2 all 12 green |
+| Phase 12 QA | DONE 2026-08-19 (PASS-WITH-FOLLOWUPS) | fix/farming-phase-12-qa off 2445de46ab (e56707a675 still newest, no absorb); merge hash in the notes tail | All four emphases proven first-hand over the real wire (three-session lifecycle incl. placer-eats-own and latecomer denies; the ledger survives leave/rejoin on the characterId key; nothing serializes, save blobs + db calls captured clean; the re-arm class online through a real ClientWorld mirror); ONE real defect found and fixed test-first (the instance-teardown leak: a feast placed in a dungeon instance outlived the run); the re-arm dodge amended to the Infinity sentinel (worst-case margin was ONE tick, four lanes converged); flourish rebuild-replay silenced + FEAST_SHADOW_CAP 8 (presence never culled); five decisive arms added (swim-bite, exact-range, keyed placer, orphan window, behavioral bags click); mutations 12/12 killed named; 3 audit lanes + 5 reviewers + qa-checklist, 0 BLOCKING anywhere |
 | Phase 13 (integration polish) | not started | | |
 | Phase 13 QA (final; teardown offer) | not started | | |
 
@@ -3238,10 +3238,10 @@ composed "{name}'s Harvest Feast" title, and the placer mid-bite (the EATING
 bar and the sit); the before shots are the identical framing without any of it.
 
 NOTES (residuals and findings, ledgered):
-- The renderer-owned loot sparkle floats above the placed feast (the generic
-  object branch in renderer.ts adds it; removing it needs a renderer.ts edit,
-  forbidden this phase under the evidence-seal constraint). It reads as an
-  interact affordance; Phase 13 art batch or a budgeted renderer round owns it.
+- The renderer-owned loot sparkle: RESOLVED, not owed. It keyed on the wrongly
+  re-armed lootable flag, so the re-arm fix removed it as a side effect (see
+  PLAYED PROOF below); this bullet originally deferred it to the Phase 13 art
+  batch and is amended by the Phase 12 QA doc pass.
 - A farm_feast entity would have drawn the generic supply-crate body through
   renderer.ts's object arm; buildGroundQuestObject's empty-itemId arm now
   returns an invisible pick proxy at the feast contract bounds, keeping the
@@ -3292,8 +3292,107 @@ sim.ts extraction round (Phase 13 needs one regardless: the file sits at
 12660/12660 exact). (2) The tuning constants listed above. (3) The (ca)
 dormancy row joining the D11/(bo) ruling's scope.
 
+### Phase 12 QA (2026-08-19, verify the shared feast, local-only per D22)
+
+Status: DONE (PASS-WITH-FOLLOWUPS), branch fix/farming-phase-12-qa off
+2445de46ab (release/v0.40.0 e56707a675 still the newest tip, no absorb owed).
+Merge hash in the notes tail below.
+
+THE FOUR MANDATORY EMPHASES, each proven first-hand over the REAL wire (the
+feast_online harness: real ClientWorld frames into the real GameServer
+dispatch, a throwaway probe suite run green then deleted):
+- (a) Three sessions: the placer placed AND ate the own feast (charges 10 to
+  9, Well Fed value 12 minted on the placer's own snapshot at the 18s
+  completion); a guest ate once (9 to 8) and was denied the second helping
+  (feast_eaten, state untouched); a third session ate the LAST charge (staged
+  1 to 0, the last-charge edge); a latecomer joining AFTER the charges
+  emptied was denied feast_finished before the sweep and feast_expired after
+  the despawn; the sweep collected the emptied feast on its boundary.
+- (b) The once-per-player ledger survived a REAL leave (server.leave) and a
+  rejoin under the SAME characterId with a NEW session entity id: the
+  rejoined guest was denied feast_eaten over the wire, charges and ledger
+  unchanged, and the rejoin resurrected no feast state.
+- (c) Nothing serializes: the real leave-save's blobs (saveCharacterState
+  plus saveCharacterAndMarketState, captured at the mocked db seam with a
+  positive control) carried no feast content, no pool.query call did either,
+  and the static sweep of every server persistence path found zero feast
+  mentions outside the dispatch and heavy-self files.
+- (d) The lootable re-arm class ONLINE: a real ClientWorld mirror fed the
+  actual broadcast frames held lootable false on server AND mirror through
+  4 seconds of real ticks; the feast never joined the generic object arm's
+  candidate set (which requires entity.lootable) while
+  nearestInteractableFeast resolved it.
+
+FIXES (five commits on the QA branch, each test-first):
+1. THE INSTANCE-TEARDOWN LEAK (the architecture reviewer's find, REPRODUCED
+   with a failing arm before the fix): a feast placed inside a dungeon
+   instance was never registered in inst.objectIds, so freeInstance left the
+   entity standing at the slot origin for the next claiming party, still
+   edible and holding the placer's one-active slot. Fixed by registering the
+   entity in the CLAIMED instance's teardown roster at placement; the sweep's
+   entities.has inverse-cleanup leg reclaims the state and the slot.
+   Placement inside instances stays LEGAL (the raid-table flavor).
+2. The re-arm dodge replaced with the INFINITY SENTINEL: the finite spawn
+   timer (durationTicks + 20 ticks) was silently coupled to the 1 Hz sweep
+   period across two files with a probe-measured worst-case margin of
+   exactly ONE tick. respawnTimer = Infinity is the precedented never-re-arm
+   sentinel, never rides the wire, moved no golden; the 181s expiry arm now
+   rides the whole life at the worst-case sweep phase asserting lootable
+   false on every tick.
+3. Four decisive sim arms: the swim-bite refusal (the gate was deletable
+   with the whole battery green), the exact-INTERACT_RANGE allow (the client
+   twin's inclusive-boundary premise, now pinned sim-side), the keyed-placer
+   feast_active deny, and the orphan-window press (the !entity leg guards a
+   dist2d-on-undefined crash).
+4. The bags placeFeast dispatch pinned BEHAVIORALLY: a real click on the
+   feast cell in the use-routing DOM rig reaches world.placeFeast once and
+   never useItem (the old pin was source-text only).
+5. Render: the placement flourish no longer replays on a graphics-settings
+   rebuild or login (the first applyFeasts pass registers standing tables
+   silently; the scope-re-entry ambiguity is accepted and documented);
+   shadow casting budgeted at FEAST_SHADOW_CAP = 8 tables, presence never
+   culled (actionable). Both pinned by new adapter arms.
+
+MUTATIONS 12/12 KILLED named through the dirty-refusing runner (each with a
+nonzero exit code, named failing tests, the summary line, and a landing-proof
+grep): the swim-gate deletion, the finite no-margin respawn, one-active-by
+-entity-id, range >=, the !entity leg drop, ledger-by-entity-id, expiry
+strict >, state-never-deleted (8 named reds), the instance-registration drop,
+flourish-always, shadow-budget-unbounded, and place-case-to-useItem (both the
+source pin and the behavioral arm red). The build round's deliberate
+HEAVY_SELF place_feast survivor stays recorded, not re-run. DOC NOTE: the
+build round's own kill list was never itemized in this file (the 9/9 list in
+the Phase 11 block is Phase 11's); the omission is recorded here, the kills
+stand in the phase branch history.
+
+REVIEWS (this round, on the MERGED result, hunting what the build round could
+have structurally missed): three audit lanes (correctness PASS, every
+acceptance criterion re-verified as amended by (ca), all edge probes green
+including consume-at-expiry, the one-active boundary at the despawn tick, and
+the bite racing the sweep; coverage PASS-WITH-FOLLOWUPS, all taken; dead-code
+PASS, zero unused surface beyond two accepted nits) plus architecture (0
+BLOCKING; the instance leak and the Infinity amendment were its SHOULD-FIXes,
+both taken), cross-platform (PASS, zero drift; the consume_feast heavy-self
+exclusion chased to the encoders and safe: eat and sit ride light per-tick
+channels), privacy-security (ship-as-merged: authority, input validation,
+rate limiting, and privacy all held; the +20 coupling SHOULD-FIX taken via
+Infinity), content-obligations (APPROVE; deeds and Reliquary affirmatively
+NOT owed, rulings now recorded in the state.md Phase 12 QA block), and
+qa-checklist LAST (verdict in the notes tail). The browser suite ran 133
+green standalone (the bags world-read widening verified benign: buildInput
+gained no world read; the placeFeast call is click-handler only).
+
+DEFERRALS: ledgered with owners in the state.md Phase 12 QA block (the
+deny-order asymmetry, the existence oracle, the O(live feasts) scan and
+heavy-on-receipt sibling behavior, the useItem slotIndex thread, the
+dish-from-constant coupling, the bags hint copy, the title-composition
+rule-of-three watch, the nameplate hysteresis pad, the wiki effect-prose
+generator gap, the malformed-id host asymmetry).
+
+NOTES TAIL (records):
+
 ### Phase 13
 (not started)
 
-### Phase 13
+### Phase 13 QA (final; teardown offer)
 (not started)
