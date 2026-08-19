@@ -39,6 +39,7 @@
 
 import { ITEMS } from '../data';
 import { createGroundObject } from '../entity';
+import { instanceAt } from '../instances/dungeons';
 import { countUnlockedInSlots, removeUnlockedFromSlots } from '../item_lock';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -149,6 +150,14 @@ export function placeFeastAction(ctx: SimContext, p: Entity, meta: PlayerMeta): 
   // the entity long before the timer runs out.
   e.respawnTimer = (info.durationTicks + 20) * DT;
   ctx.addEntity(e);
+  // Inside a claimed dungeon instance the feast joins the run's teardown
+  // roster: freeInstance drops every registered objectId when the reaper
+  // frees the empty claim, and the 1 Hz sweep's entities.has leg below then
+  // reclaims the state and the placer's one-active slot (the inverse
+  // cleanup's designed job). Without this the entity outlived the run and
+  // stood at the slot origin, still edible, for the next claiming party.
+  const inst = instanceAt(ctx, e.pos);
+  if (inst && inst.partyKey !== null) inst.objectIds.push(e.id);
   ctx.feasts.set(e.id, {
     entityId: e.id,
     ownerKey,

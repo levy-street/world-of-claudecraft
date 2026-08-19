@@ -12,11 +12,18 @@
 
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
+import { enterDungeon, instanceAt, leaveDungeon } from '../src/sim/instances/dungeons';
 import { setItemLocked } from '../src/sim/item_lock';
 import { FARM_FEAST_ITEM_ID, FARM_FEAST_TEMPLATE_ID } from '../src/sim/professions/feast';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
-import { type Aura, type Entity, FARMING_CAST_ID, type SimEvent } from '../src/sim/types';
+import {
+  type Aura,
+  type Entity,
+  FARMING_CAST_ID,
+  INSTANCE_EMPTY_TIMEOUT,
+  type SimEvent,
+} from '../src/sim/types';
 import { groundHeight, isInWaterBody, waterLevelAt } from '../src/sim/world';
 
 // The capstone dish the bite serves (ITEMS[FARM_FEAST_ITEM_ID].feast.dishItemId,
@@ -857,6 +864,38 @@ describe('shared feast: entry-point convergence and the sweep inverse cleanup', 
     const from = sim.events.length;
     sim.placeFeast(placer.pid);
     expect(denyReason(sim, from), 'the one-active slot freed with it').toBeNull();
+    expect(eventsOf(sim, from, 'farmFeastPlaced')).toHaveLength(1);
+  });
+});
+
+describe('shared feast: instance lifecycle', () => {
+  it('a feast placed inside a dungeon instance falls with the run, freeing the slot', () => {
+    // Without the objectIds registration, freeInstance tears down the run's
+    // mobs and registered objects but leaves the feast standing at the slot
+    // origin, still edible for the NEXT party claiming the slot and still
+    // holding the placer's one-active slot for the rest of its 180s.
+    const { sim, placer } = world(0);
+    expect(enterDungeon(sim.ctx, 'dawnhold_castle', placer.pid)).toBe(true);
+    sim.tick(); // settle the door processing
+    const feastId = placeOk(sim, placer);
+    const inst = instanceAt(sim.ctx, placer.p.pos);
+    expect(inst, 'the placer stands inside a claimed instance').not.toBeNull();
+    expect(inst?.partyKey, 'the instance is claimed').not.toBeNull();
+
+    // The run ends: the placer leaves and the reaper's empty timeout elapses
+    // (poked, the suite's state-write idiom; the real wait is 5 minutes).
+    expect(leaveDungeon(sim.ctx, placer.pid)).toBe(true);
+    if (inst) inst.emptyFor = INSTANCE_EMPTY_TIMEOUT;
+    tickSeconds(sim, 2.05); // one reaper boundary plus one farming sweep boundary
+
+    expect(sim.entities.has(feastId), 'the entity fell with the instance').toBe(false);
+    expect(sim.ctx.feasts.has(feastId), 'the sweep reclaimed the state').toBe(false);
+
+    // And the placer's one-active slot freed with it.
+    giveFeast(sim, placer);
+    const from = sim.events.length;
+    sim.placeFeast(placer.pid);
+    expect(denyReason(sim, from), 'the one-active slot freed with the run').toBeNull();
     expect(eventsOf(sim, from, 'farmFeastPlaced')).toHaveLength(1);
   });
 });
