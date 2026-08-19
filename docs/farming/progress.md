@@ -2793,6 +2793,10 @@ DEFERRALS AND DECLINED, with reasons:
   flag 3 of the phase); the future golden field-note cell must land WITH
   its server RELIQUARY_MARK_ENGLISH row (appended to the (bv) ledger).
 
+MERGE: fix/farming-phase-10-qa merged --no-ff into feature/farming-plan
+as b296da117a71fbf5a72b2ee2d1b30dc4f4e7d51c (QA tip 29aab13445, nine
+commits; the branch deleted).
+
 GATE RECORD: one run on the frozen QA tip 0848acbc00
 (BROWSER_PATH=<playwright chromium> GATE_MAX_WORKERS=8
 node scripts/gate_select.mjs): mode=full (the terrain-fixture +
