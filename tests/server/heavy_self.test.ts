@@ -53,6 +53,7 @@ const EXPECTED_CMDS = [
   'mount_toggle',
   'pet_feed',
   'pickup',
+  'place_feast',
   'plant_crop',
   'prestige',
   'respec',

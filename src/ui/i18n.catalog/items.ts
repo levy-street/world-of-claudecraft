@@ -2500,6 +2500,7 @@ const ITEM_ENTITY_IDS = [
   'fenbridge_rice_pudding',
   'highwatch_barley_porridge',
   'evergarden_braised_greens',
+  'harvest_feast',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2702,6 +2703,8 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   fenbridge_rice_pudding: 'Fenbridge Rice Pudding',
   highwatch_barley_porridge: 'Highwatch Barley Porridge',
   evergarden_braised_greens: 'Evergarden Braised Greens',
+  // The shared feast (Phase 12). IP-safe per D17: two plain cooking words.
+  harvest_feast: 'Harvest Feast',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

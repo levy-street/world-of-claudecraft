@@ -348,6 +348,7 @@ describe('item webp icons', () => {
       'gilded_sunmelon',
       'gilded_sunmelon_seed',
       'growth_tonic',
+      'harvest_feast',
       'highland_barley',
       'highland_barley_seed',
       'highwatch_barley_bannock',

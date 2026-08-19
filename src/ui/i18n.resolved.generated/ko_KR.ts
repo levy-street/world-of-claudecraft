@@ -3113,7 +3113,13 @@ export const ko_KR: EnTranslations = {
         "no_tonic": "성장 토닉이 없습니다.",
         "tool": "그 작물에 맞는 농사 괭이가 없습니다.",
         "locked": "지불에 쓸 아이템이 잠겨 있습니다.",
-        "no_farmer": "껍질을 퇴비로 바꾸려면 농부 근처에 있어야 합니다."
+        "no_farmer": "껍질을 퇴비로 바꾸려면 농부 근처에 있어야 합니다.",
+        "no_feast": "차릴 잔치 음식이 없습니다.",
+        "feast_active": "이미 잔치를 차려 놓았습니다.",
+        "feast_expired": "그 잔치는 이미 사라졌습니다.",
+        "feast_finished": "그 잔치는 남김없이 비워졌습니다.",
+        "feast_range": "잔치에서 너무 멀리 있습니다.",
+        "feast_eaten": "이미 그 잔치에서 먹었습니다."
       },
       "huskTrade": "껍질을 퇴비로 교환",
       "huskTradeAria": "{name}에게 시든 껍질을 퇴비로 교환",
@@ -12622,6 +12628,9 @@ export const ko_KR: EnTranslations = {
       },
       "evergarden_braised_greens": {
         "name": "상록 정원 잎채소 조림"
+      },
+      "harvest_feast": {
+        "name": "수확의 잔치"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

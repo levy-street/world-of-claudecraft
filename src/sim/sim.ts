@@ -458,6 +458,7 @@ import {
   plantCrop as plantCropAction,
   updateFarming,
 } from './professions/farming';
+import { consumeFeastAction, type FeastState, placeFeastAction } from './professions/feast';
 import * as fishing from './professions/fishing';
 import type { RespecPaymentTier } from './professions/focus';
 import * as professionsFocus from './professions/focus';
@@ -2106,6 +2107,7 @@ export class Sim {
   tradeInvites = new Map<number, { fromPid: number; expires: number }>();
   duels = new Map<number, DuelState>(); // pid -> shared duel (both pids)
   duelInvites = new Map<number, { fromPid: number; expires: number }>();
+  feasts = new Map<number, FeastState>(); // entity id -> live shared feast (transient; professions/feast.ts)
   // Card Duel minigame (src/sim/social/card_duel.ts): its own FIFO queue and
   // live-match map, independent of the HP-based duels above.
   cardDuelQueue: number[] = [];
@@ -5167,6 +5169,9 @@ export class Sim {
       get duelInvites() {
         return sim.duelInvites;
       },
+      get feasts() {
+        return sim.feasts;
+      },
       get nextId() {
         return sim.nextId;
       },
@@ -6432,14 +6437,11 @@ export class Sim {
     lap?.('postOffice');
     drainDelayedEvents(this.ctx);
     lap?.('delayedEv');
-    // The farming sweep (the growth-engine phase): APPENDED here, never
-    // inserted, because the shared rng stream makes any reorder of the tail
-    // fork every golden. Draws ZERO rng (it emits the ready notice behind its
-    // own internal 1 Hz guard, and decides it from stored state alone), so its
-    // position cannot fork the draw order, exactly like the updateProfNudges
-    // and updateDeeds neighbours. Farming growth itself is NOT ticked: a plot
-    // is an absolute deadline the projection compares against, so there is no
-    // timer here to fire.
+    // The farming sweep: APPENDED here, never inserted (any reorder of the
+    // tail forks every golden). Draws ZERO rng behind its own 1 Hz guard:
+    // the ready notice and the shared-feast despawn check (charges/expiry,
+    // professions/feast.ts) both decide from stored state alone, so its
+    // position cannot fork the draw order, like its neighbours.
     updateFarming(this.ctx);
     lap?.('farming');
     // The Book of Deeds evaluator runs at the very end of the tail: it sees
@@ -12528,29 +12530,21 @@ export class Sim {
     return this.toolEffectSlotsFor(this.primaryId);
   }
 
-  // The static garden-bed geography (content/farm_patches.ts). Handed back by
-  // reference like the other static content reads: the table is a shared
-  // module constant typed readonly all the way down, so a defensive copy would
-  // allocate every patch and bed per call for data no consumer may mutate.
+  // Static garden-bed geography (content/farm_patches.ts), by shared readonly reference.
   get farmPatches(): readonly FarmPatchDef[] {
     return FARM_PATCHES;
   }
 
-  // The viewer's farm plots, projected for the seam. Takes an explicit pid
-  // (the toolEffectSlotsFor precedent) so the server can build one player's
-  // delta while the offline getter below reads the primary. Returns the
-  // shared frozen empty projection for an unknown pid and for a player with
-  // no planted bed, which is the default and the overwhelming majority (the
-  // EMPTY_TOOL_EFFECT_SLOT_VIEWS arm above). The projection owns the bed-id
-  // sort and the hidden-slot leak barrier (professions/farm_projection.ts).
+  // The viewer's farm plots, projected for the seam: explicit pid (the
+  // toolEffectSlotsFor precedent) so the server builds one player's delta;
+  // the shared frozen empty projection for unknown or plotless players. The
+  // projection owns the sort and the hidden-slot leak barrier.
   farmPlotsFor(pid: number): readonly FarmPlotView[] {
     const meta = this.players.get(pid);
     if (!meta) return EMPTY_FARM_PLOT_VIEWS;
-    // The farmer's CURRENT proficiency decides `withered` versus `ready`
-    // (farm_projection.ts farmSurvivalChance), which is why the skill is
-    // threaded in rather than baked into the plot: out-levelling a crop
-    // retires its risk retroactively, and proficiency never falls, so this can
-    // only ever turn a withered row into a ready one.
+    // CURRENT proficiency (farm_projection.ts farmSurvivalChance) decides
+    // `withered` versus `ready`: out-levelling a crop retires its risk
+    // retroactively, so this can only ever turn a withered row into a ready one.
     return projectFarmPlots(
       meta.farmPlots,
       this.lockoutNowMs(),
@@ -12563,18 +12557,14 @@ export class Sim {
     return this.farmPlotsFor(this.primaryId);
   }
 
-  // This world's own clock base for the farm timestamps above: the sim clock,
-  // the exact value projectFarmPlots was handed. Draws no rng and moves no
-  // tick order (a pure read of the same counter raidLockouts uses).
+  // This world's own clock base for the farm timestamps above (the exact
+  // value projectFarmPlots was handed). Draw-free pure read.
   farmNowMs(): number {
     return this.lockoutNowMs();
   }
 
-  // Plant a crop in a garden bed, with the optional plant-time knob payload
-  // (compost, farmer's watch, growth tonic). Thin delegate: the whole
-  // decision (the stated gate order, the seed and knob payments, the one
-  // two-draw pre-roll block, the plot write) lives in professions/farming.ts,
-  // which owns the draw contract.
+  // Plant a crop with the optional plant-time knob payload. Thin delegate:
+  // the whole decision lives in professions/farming.ts (the draw contract).
   plantCrop(bedId: string, cropId: string, knobs?: FarmPlantKnobs, pid?: number): void {
     const r = this.ctx.resolve(pid);
     if (!r) return;
@@ -12589,14 +12579,27 @@ export class Sim {
     harvestCropAction(this.ctx, r.e, r.meta, bedId);
   }
 
-  // Trade withered husks for compost. Thin delegate like its two siblings
-  // above; draw-free on every path (the ratio is a constant), and the
-  // farmer-NPC range gate lives at the action (professions/farmer_npcs.ts
-  // nearFarmerNpc: in reach of a farmer-flagged NPC, else farmDenied).
+  // Trade withered husks for compost. Thin delegate; draw-free, and the
+  // farmer-NPC range gate lives at the action (professions/farmer_npcs.ts).
   convertHusks(pid?: number): void {
     const r = this.ctx.resolve(pid);
     if (!r) return;
     convertHusksAction(this.ctx, r.e, r.meta);
+  }
+
+  // Set out a shared feast at the caller's feet (the D16 showcase). Thin
+  // delegate; the whole lifecycle lives in professions/feast.ts, draw-free.
+  placeFeast(pid?: number): void {
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    placeFeastAction(this.ctx, r.e, r.meta);
+  }
+
+  // Eat once from the placed feast entity `feastId`. Thin delegate; draw-free.
+  consumeFeast(feastId: number, pid?: number): void {
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    consumeFeastAction(this.ctx, r.e, r.meta, feastId);
   }
 
   // Slot an effect onto one gathering profession's tool, consuming one charm

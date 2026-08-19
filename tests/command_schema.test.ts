@@ -68,8 +68,10 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // the ratio and batch count resolve sim-side from the sender's own bags.
 // The v0.38.0 fifteenth absorb adds one release-side pair on top (199/212 on
 // the release arm over the 198/211 base), so the merged universe is 202/215.
-const EXPECTED_SEND_COUNT = 202;
-const EXPECTED_DISPATCH_COUNT = 215;
+// Farming's shared-feast phase adds the place_feast + consume_feast pair
+// (payload-free placement, entity-id-only bite), landing at 204/217.
+const EXPECTED_SEND_COUNT = 204;
+const EXPECTED_DISPATCH_COUNT = 217;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

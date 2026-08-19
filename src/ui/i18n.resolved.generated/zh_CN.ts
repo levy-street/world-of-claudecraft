@@ -3113,7 +3113,13 @@ export const zh_CN: EnTranslations = {
         "no_tonic": "你没有生长滋补剂。",
         "tool": "你没有适合该作物的耕作锄。",
         "locked": "有一件可用于支付的物品已被锁定。",
-        "no_farmer": "你必须靠近农夫才能用谷壳换堆肥。"
+        "no_farmer": "你必须靠近农夫才能用谷壳换堆肥。",
+        "no_feast": "你没有可以摆出的盛宴。",
+        "feast_active": "你的盛宴已经摆出了。",
+        "feast_expired": "那桌盛宴已经不在了。",
+        "feast_finished": "那桌盛宴已被吃光。",
+        "feast_range": "你离盛宴太远了。",
+        "feast_eaten": "你已经吃过那桌盛宴了。"
       },
       "huskTrade": "用谷壳换堆肥",
       "huskTradeAria": "与{name}用枯萎谷壳换取堆肥",
@@ -12622,6 +12628,9 @@ export const zh_CN: EnTranslations = {
       },
       "evergarden_braised_greens": {
         "name": "常青园焖青菜"
+      },
+      "harvest_feast": {
+        "name": "丰收盛宴"
       },
       "conjured_water4": {
         "name": "魔法泉水"

@@ -3749,6 +3749,18 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
     ],
     ['drips'],
   ),
+  // The shared feast (Phase 12): a laden spread, distinct from every dish
+  // above (gold ground + green tendrils + sparkle; no dish pairs gold with
+  // tendrils), pinned by the A4 distinctness sweep.
+  harvest_feast: r(
+    'food',
+    'gold',
+    [
+      { p: 'tendrils', pal: 'leafGreen' },
+      { p: 'coin', pal: 'gold', ...TR },
+    ],
+    ['sparkle'],
+  ),
   // misc UI icons (not real items)
   coin_gold: r('treasure', 'gold', ['coin'], ['sparkle']),
   slot_empty: r('junk', 'silverWhite', []),
@@ -5551,6 +5563,10 @@ export const ITEM_ART_PENDING = new Set<string>([
   'evergarden_braised_greens',
   'fenbridge_rice_pudding',
   'highwatch_barley_porridge',
+  // The shared feast (Phase 12): same dormant-online reasoning (cooked from
+  // tier-4 produce under the (bo) faucet hole) and the same scheduled art
+  // phase; serves its own distinct procedural recipe through iconDataUrl.
+  'harvest_feast',
 ]);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */

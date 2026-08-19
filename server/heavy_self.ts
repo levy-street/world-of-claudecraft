@@ -55,6 +55,13 @@ export const HEAVY_SELF_CMDS = new Set<string>([
   // commands: they ride plant_crop's payload, whose membership already marks
   // on receipt, and a paid knob spends items (wireRev again).
   'convert_husks',
+  // The shared feast's place verb spends one bag item on success (wireRev
+  // covers that path); membership keeps the guarantee local to the command,
+  // the same belt-and-braces trade as its farming siblings above.
+  // consume_feast deliberately has NO entry: a bite touches no bag state
+  // (charges and the ledger are feast state, and the buff rides the aura
+  // wire), so there is nothing heavy to refresh.
+  'place_feast',
   'loot',
   'harvestCorpse',
   'pickup',

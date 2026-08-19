@@ -3113,7 +3113,13 @@ export const ja_JP: EnTranslations = {
         "no_tonic": "成長トニックがありません。",
         "tool": "その作物に合う農耕鍬を持っていません。",
         "locked": "その支払いに使えるアイテムがロックされています。",
-        "no_farmer": "籾殻を堆肥と交換するには農夫のそばにいなければなりません。"
+        "no_farmer": "籾殻を堆肥と交換するには農夫のそばにいなければなりません。",
+        "no_feast": "広げられる宴の料理を持っていません。",
+        "feast_active": "あなたの宴はすでに広げられています。",
+        "feast_expired": "その宴はもうありません。",
+        "feast_finished": "その宴は食べ尽くされました。",
+        "feast_range": "その宴から離れすぎています。",
+        "feast_eaten": "その宴からはすでに食べました。"
       },
       "huskTrade": "籾殻を堆肥と交換する",
       "huskTradeAria": "{name}と枯れた籾殻を堆肥に交換する",
@@ -12622,6 +12628,9 @@ export const ja_JP: EnTranslations = {
       },
       "evergarden_braised_greens": {
         "name": "エバーガーデンの青菜煮込み"
+      },
+      "harvest_feast": {
+        "name": "収穫の宴"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

@@ -89,6 +89,7 @@ import { type FarmPlantKnobs, farmPlotSurvived, type PlotState } from './farm_pr
 import { notifyFarmReady } from './farm_ready';
 import { planWatchFee, type WatchFeeLeg } from './farm_watch_fee';
 import { nearFarmerNpc } from './farmer_npcs';
+import { updateFarmFeasts } from './feast';
 import {
   announceGatherRareEvent,
   GATHER_RARE_EVENT_YIELD_MULT,
@@ -1197,4 +1198,8 @@ export function convertHusks(ctx: SimContext, p: Entity, meta: PlayerMeta): void
 export function updateFarming(ctx: SimContext): void {
   if (ctx.tickCount % 20 !== 0) return;
   for (const meta of ctx.players.values()) notifyFarmReady(ctx, meta);
+  // The shared-feast despawn check (zero charges or expiry) rides INSIDE this
+  // driver behind the same 1 Hz guard, never a second appended sim.ts sweep;
+  // it decides from stored state alone and draws zero rng (feast.ts header).
+  updateFarmFeasts(ctx);
 }

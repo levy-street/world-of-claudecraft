@@ -22,6 +22,7 @@ import type { PendingLootRoll } from './loot/loot_roll';
 import type { MarketListing } from './market';
 import type { MobScanCounters } from './mob/scan_counters';
 import type { CommissionOrder } from './professions/commission_order';
+import type { FeastState } from './professions/feast';
 import type { PendingProjectile } from './projectile_travel';
 import type { NaturalRiftPortal } from './rift/portals';
 import type { RiftEvent, RiftInstance } from './rift/types';
@@ -112,6 +113,11 @@ export interface SimContextPrimitives {
   // stay on Sim (mutated in place), like E1's delayedEvents/groundAoEs.
   readonly tradeInvites: Map<number, { fromPid: number; expires: number }>;
   readonly duelInvites: Map<number, { fromPid: number; expires: number }>;
+  // Live placed shared feasts, keyed by entity id (professions/feast.ts).
+  // A LIVE view like the invite maps above: the backing field stays on Sim,
+  // mutated in place. TRANSIENT by design: never serialized anywhere (the
+  // feast module's header owns the rationale).
+  readonly feasts: Map<number, FeastState>;
   // The monotonically increasing entity-id counter (I1). Read-write so spawners (I1's
   // claimInstance) allocate ids exactly as `this.nextId++` did on Sim.
   nextId: number;
@@ -1146,6 +1152,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get duelInvites() {
       return host.duelInvites;
+    },
+    get feasts() {
+      return host.feasts;
     },
     get nextId() {
       return host.nextId;

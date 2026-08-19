@@ -3905,6 +3905,17 @@ export const hudChromeStrings = {
       // out of reach of a farmer NPC, professions/farmer_npcs.ts). Its own
       // leaf rather than `range` above, whose English names a crop bed.
       no_farmer: 'You must be near a farmer to trade husks for compost.',
+      // The shared feast (professions/feast.ts): the place arm's refusals
+      // (missing item, one active feast per placer), then the consume arm's
+      // (stale or expired, picked clean, range with its own leaf since
+      // `range` above names a crop bed, once per player). The lock-caused
+      // shortfall reuses `locked` above.
+      no_feast: 'You have no feast to set out.',
+      feast_active: 'Your feast is already set out.',
+      feast_expired: 'That feast is gone.',
+      feast_finished: 'That feast has been picked clean.',
+      feast_range: 'You are too far from the feast.',
+      feast_eaten: 'You have already eaten from that feast.',
     },
     // The farmer NPC's gossip row (the farming go-live): the one UI affordance
     // that sends convert_husks, offered in the dialog of every NpcDef carrying
