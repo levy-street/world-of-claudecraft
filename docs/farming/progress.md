@@ -2670,8 +2670,25 @@ VALIDATION: npx tsc --noEmit clean; the STEP 3 battery + count suites (18
 files, 1294 tests) green; full tests/parity green after the isolated
 re-record (216); guide/sfx/portrait freshness + the v039 icon-art seal
 green; ci:changed rc 0. Baselines held: IWorld 329 = 88 + 241, facets 34,
-commands 202/215, delta keys 87; renderer.ts untouched. GATE RECORD and
-MERGE HASH: the notes tail below (recorded at the phase close).
+commands 202/215, delta keys 87; renderer.ts untouched.
+
+GATE RECORD: run 1 on the frozen dcb6e2d88e-era tree FAILED at the
+full-suite vitest step on exactly ONE test, the recorded
+fallback-only-census class again (tests/profile_page.test.ts pins the
+profile page's interpolated Reliquary character-completion total at the
+live-catalog literal; the Harvestmaster shelf cell moved it 311 to 312);
+the shell exit was 0 while the log said FAIL, the log-marker rule
+re-confirmed. Healed and folded into the deeds commit. Run 2 on the frozen
+tip dd9d3bd7d4 (BROWSER_PATH=<playwright chromium> GATE_MAX_WORKERS=8
+node scripts/gate_select.mjs): mode=full (the terrain-fixture +
+bare_client broad arm), "[gate:select] PASS: all 12 steps green (vitest
+workers: 8)", 2886 test files passed / 12 skipped, 40393 tests passed / 2
+expected fail / 115 skipped, browser regression 20 files 133 green, ZERO
+FAIL markers, no druid_engines timeout.
+
+MERGE: fix/farming-phase-10-celebrations merged --no-ff into
+feature/farming-plan as 40988c8b3b0306b857a7ef87f750ddf761b6b4e7 (phase
+tip dd9d3bd7d4; the branch and the three agent worktrees deleted).
 
 No screenshots: the visible change is a chat-log line (existing epic-color
 family) and an audio cue; no window, layout, or style surface moved.
