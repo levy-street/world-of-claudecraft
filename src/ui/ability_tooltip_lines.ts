@@ -9,7 +9,17 @@
 import type { ResolvedAbility } from '../sim/sim';
 import type { AbilityDef, Entity, ResourceType } from '../sim/types';
 import { formatAbilityNumber } from './ability_description';
-import { type AbilityRequirementResolve, abilityRequirementKeys } from './hud/action_bar';
+// The LEAF path on purpose, never the './hud/action_bar' barrel: this module
+// is a registered UI_PURE_CORES entry, the barrel re-exports the two action
+// bar PAINTERS (painter_host reach one hop away), and the architecture
+// guard's forbiddenUiCoreImport matches import specifiers only, so a painter
+// reached through a barrel would be invisible to the purity ban. Deep-path
+// imports of ability_requirement_keys are the convention at every other
+// consumer too.
+import {
+  type AbilityRequirementResolve,
+  abilityRequirementKeys,
+} from './hud/action_bar/ability_requirement_keys';
 import { type TranslationKey, t } from './i18n';
 
 const RESOURCE_LABEL_KEYS: Record<ResourceType, TranslationKey> = {

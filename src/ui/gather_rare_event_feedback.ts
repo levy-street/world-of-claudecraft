@@ -40,8 +40,15 @@ export function gatherRareEventFeedback(
   myPid: number,
 ): GatherRareEventFeedback {
   const isFinder = finderPid === myPid;
+  // The ?? belt: an OFF-UNION runtime flavor (a version-skewed server; the
+  // event crosses the wire generically) must keep the pre-extraction
+  // catch-all behavior, the golden line, never hand hud.ts an undefined key
+  // (t() throws on unknown keys in dev builds, inside the event switch).
+  // Same off-union defense the sim side takes with its != null belief. The
+  // sting check below reads the RAW flavor, so an unknown flavor can never
+  // inherit the golden sting through this fallback.
   return {
-    lineKey: GATHER_RARE_EVENT_LINE_KEYS[flavor],
+    lineKey: GATHER_RARE_EVENT_LINE_KEYS[flavor] ?? GATHER_RARE_EVENT_LINE_KEYS.golden_harvest,
     achievementCue: isFinder,
     farmGoldenSting: isFinder && flavor === 'golden_harvest',
   };

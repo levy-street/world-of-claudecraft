@@ -63,4 +63,18 @@ describe('the finder-only cue rules, every quadrant', () => {
     expect(fb.achievementCue).toBe(true);
     expect(fb.farmGoldenSting).toBe(true);
   });
+
+  it('an OFF-UNION runtime flavor keeps the old catch-all line and gains no sting', () => {
+    // A version-skewed server can emit a flavor this client does not know
+    // (the event crosses the wire generically). The pre-extraction chain
+    // rendered such a value as the golden line; the table lookup alone would
+    // hand hud.ts an undefined key and t() THROWS on unknown keys in dev
+    // builds, inside the event switch. The core carries the belt (the same
+    // off-union defense the sim side took with != null), and the unknown
+    // flavor must NOT inherit the golden sting through the fallback.
+    const fb = gatherRareEventFeedback('mystery_bloom' as GatherRareEventFlavor, FINDER, FINDER);
+    expect(fb.lineKey).toBe('gatherEvent.goldenHarvest');
+    expect(fb.achievementCue).toBe(true);
+    expect(fb.farmGoldenSting).toBe(false);
+  });
 });

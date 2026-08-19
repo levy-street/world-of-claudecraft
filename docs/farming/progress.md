@@ -2756,11 +2756,19 @@ pins the announce zone following the bed; the farm:planted deny SWEEP
 bed within INTERACT_RANGE of a zone boundary) plus the farmBedZoneId
 authorship sweep; the (bo) honesty-arm seed list DERIVED from the crop
 catalog; the crop fanout arm gained its own instanced player; the
-ability-tooltip module reads the action_bar barrel, its header names the
-one behavior delta, and its deletable-green branches (Wrack cost,
-channel with the hasted divisor, eight requirement rows, the exact
-enemy-target array) are pinned; the icon-brief preamble counts six of
-seven pending.
+ability-tooltip module keeps the LEAF ability_requirement_keys import
+(round two: the barrel briefly adopted on the frontend lane's advice was
+reverted on the qa-checklist's catch that the barrel re-exports the two
+action bar PAINTERS and the purity guard matches specifiers only, so a
+pure core must stay leaf-scoped; the leaf path is also the convention at
+every other consumer), its header names the one behavior delta, and its
+deletable-green branches (Wrack cost, channel with the hasted divisor,
+eight requirement rows, the exact enemy-target array) are pinned; the
+icon-brief preamble counts six of seven pending. Round two also added
+the off-union flavor belt in the feedback core (the extraction had
+silently changed an unknown wire flavor from render-the-golden-line to
+throw-in-dev; the ?? fallback restores the old line, proven red-then-
+green, and the raw-flavor sting check keeps the fallback sting-free).
 
 MUTATIONS: 14/14 fresh mutants KILLED with rc nonzero AND named failing
 tests, through the dirty-refusing scratchpad runner on the committed
