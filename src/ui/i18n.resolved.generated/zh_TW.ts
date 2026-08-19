@@ -3117,6 +3117,13 @@ export const zh_TW: EnTranslations = {
       },
       "huskTrade": "用穀殼換堆肥",
       "huskTradeAria": "與{name}用枯萎穀殼換取堆肥",
+      "plantSheet": {
+        "title": "種植作物",
+        "plant": "種植",
+        "sowAria": "播種{name}",
+        "empty": "你沒有可以在這塊田裡播種的種子。",
+        "close": "關閉種植面板"
+      },
       "husksConvertedLine": "你用{husksName} x{husks}換取了{name}。",
       "husksConvertedLineQty": "你用{husksName} x{husks}換取了{name} x{qty}。",
       "readyLine": "有一塊作物可以收成了。",

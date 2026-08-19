@@ -3117,6 +3117,13 @@ export const en_XA: EnTranslations = {
       },
       "huskTrade": "[Ţŕáðé ĥúšķš ƒóŕ çóɱþóšţ]",
       "huskTradeAria": "[Ţŕáðé ŵíţĥéŕéð ĥúšķš ƒóŕ çóɱþóšţ ŵíţĥ {name}]",
+      "plantSheet": {
+        "title": "[Þļáñţ á Çŕóþ]",
+        "plant": "[Þļáñţ]",
+        "sowAria": "[Šóŵ {name}]",
+        "empty": "[Ýóú ĥáʋé ñó šééð ýóú çáñ šóŵ áţ ţĥíš ƀéð.]",
+        "close": "[Çļóšé ţĥé þļáñţ šĥééţ]"
+      },
       "husksConvertedLine": "[Ýóú ţŕáðé {husksName} ẋ{husks} ƒóŕ {name}.]",
       "husksConvertedLineQty": "[Ýóú ţŕáðé {husksName} ẋ{husks} ƒóŕ {name} ẋ{qty}.]",
       "readyLine": "[Á çŕóþ íš ŕéáðý ţó ĥáŕʋéšţ.]",

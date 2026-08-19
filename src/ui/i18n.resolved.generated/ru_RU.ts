@@ -3117,6 +3117,13 @@ export const ru_RU: EnTranslations = {
       },
       "huskTrade": "Обменять шелуху на компост",
       "huskTradeAria": "Обменять засохшую шелуху на компост у {name}",
+      "plantSheet": {
+        "title": "Посадить культуру",
+        "plant": "Посадить",
+        "sowAria": "Посеять: {name}",
+        "empty": "У вас нет семян, которые можно посеять на этой грядке.",
+        "close": "Закрыть окно посадки"
+      },
       "husksConvertedLine": "Вы обмениваете {husksName} x{husks} на {name}.",
       "husksConvertedLineQty": "Вы обмениваете {husksName} x{husks} на {name} x{qty}.",
       "readyLine": "Урожай на одной грядке готов к сбору.",

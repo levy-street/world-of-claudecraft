@@ -9604,6 +9604,40 @@ export const TARGETS = [
     },
   },
   {
+    // The Phase 9b plant surface: standing on a FREE Eastbrook bed with the
+    // tier-1 farming kit in the bags, the real interact gesture (KeyF on
+    // desktop, the mobile-interact button on touch) opens the plant sheet
+    // with the seed rows and the three knob toggles. The press goes through
+    // the real input funnel, never hud.openPlantSheet directly, so the shot
+    // proves the binding is live end to end.
+    key: 'farm-plant-sheet',
+    label: 'The plant sheet opened from a free garden bed by the interact press (Phase 9b)',
+    when: ['ui/farming_plant_sheet', 'game/farm_bed_interact'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page, shot) {
+      await stagePlantSheetBed(page);
+      await page.evaluate(() => {
+        const el = document.activeElement;
+        if (el && el !== document.body) el.blur?.();
+      });
+      const touch = await page.evaluate(() => document.body.classList.contains('mobile-touch'));
+      if (shot?.mobile && touch) {
+        await page.evaluate(() => document.getElementById('mobile-interact')?.click());
+      } else {
+        await page.keyboard.press('KeyF');
+      }
+      const open = await pollForSize(page, '#plant-sheet-window');
+      if (!open) return { skip: 'the plant sheet never opened from the bed press' };
+      await wait(400);
+      // Mobile clips the whole HUD so the shot also proves the sheet fits the
+      // 844x390 landscape viewport beside the touch cluster.
+      return { clip: shot?.mobile ? '#ui' : '#plant-sheet-window' };
+    },
+  },
+  {
     // Auto-unshift (src/sim/combat/form_auto_unshift.ts). The change is a
     // behavior, so the evidence is a MOMENT, not a window: the same press, one
     // second in. Before the change the druid is still wearing the beast and the
@@ -10071,6 +10105,59 @@ async function stageEastbrookBeds(page) {
     });
     await wait(500);
   }
+}
+
+// Stand the player ON bed_eastbrook_1 (16, 30) with the tier-1 farming kit in
+// the bags and NOTHING planted, so the interact press resolves the free bed
+// and opens the plant sheet (the farm-plant-sheet target above). Compost rides
+// along so one knob paints affordable beside the two that honestly cannot pay.
+async function stagePlantSheetBed(page) {
+  await page.waitForFunction(
+    () => {
+      const loading = document.querySelector('#loading-screen');
+      const ui = document.querySelector('#ui');
+      return (
+        document.body.classList.contains('game-active') &&
+        !!ui &&
+        getComputedStyle(ui).display !== 'none' &&
+        !!loading &&
+        !loading.classList.contains('visible')
+      );
+    },
+    { timeout: 90000, polling: 200 },
+  );
+  const staged = await page.evaluate(() => {
+    const sim = window.__game?.sim;
+    const player = sim?.player;
+    if (!sim || !player?.pos) return { ok: false, reason: 'offline world is unavailable' };
+    player.pos.x = 16;
+    player.pos.z = 30;
+    player.prevPos = { ...player.pos };
+    sim.addItem?.('garden_hoe', 1);
+    sim.addItem?.('vale_wheat_seed', 3);
+    sim.addItem?.('compost', 1);
+    for (const e of sim.entities.values()) {
+      if (!e?.hostile || !e.pos) continue;
+      const dx = e.pos.x - player.pos.x;
+      const dz = e.pos.z - player.pos.z;
+      if (dx * dx + dz * dz < 60 * 60) {
+        e.pos.x += 500;
+        e.pos.z += 500;
+      }
+    }
+    return { ok: true };
+  });
+  if (!staged.ok) throw new Error(staged.reason);
+  for (let i = 0; i < 6; i++) {
+    await page.evaluate(() => {
+      document.querySelector('.camera-prompt-confirm')?.click();
+      document.querySelector('.tut-skip')?.click();
+      document.querySelector('.gpu-notice-dismiss')?.click();
+      document.querySelector('#gpu-notice')?.remove();
+    });
+    await wait(400);
+  }
+  return staged;
 }
 
 // Grant one staged stack (a plain count, or a specific ItemInstancePayload) and

@@ -26,6 +26,7 @@
 | Phase 9 (world presence, go-live) | DONE 2026-08-17 | fix/farming-phase-09-world-presence (seventeenth absorb 89030e4e0f first; merge hash in the Phase 9 notes tail) | 0 BLOCKING across architecture, cross-platform, frontend, content-obligations, test-coverage, privacy-security, and qa-checklist; every SHOULD-FIX taken in-phase or ledgered as (bg) to (bm); 14/14 mutants killed; farming is LIVE |
 | Phase 9 QA | done (FAIL on the go-live acceptance, scope stop; PASS on the phase's own diff) | 2026-08-17 | 2026-08-17; branch fix/farming-phase-09-qa (eighteenth absorb f4ca0f7000 first), merged --no-ff as 59584a800a; 1 BLOCKING scope finding (no player verb plants or harvests, state.md (bn)) plus the tier 3/4 seed bootstrap hole ((bo)); 0 BLOCKING on the diff across nine lanes; the live-client journey walked 39 checkpoints green at all four hubs; 16 of 16 new mutants killed; the QA fixes are the husk-trade focus restore, the stale-comment sweep, and the coverage pins |
 | Nineteenth absorb (v0.39.0 round-2 sync mid-phase) | DONE 2026-08-18 | fix/farming-sync-v0.39.0-r2, merge b9a025b2ee of tip 7b45fdb9a9 (285 commits, 833 files, 168-file intersection: the D22 triple-digit rule) | Heals: sim.ts and main.ts extraction (mech_chroma_ownership, turnstile_gate), renderer merge-rule re-pin 13774, classified golden re-record (+4 farmers vs the release recordings, +3 practice dummies in farming_session, zero unexplained leaves), terrain fixture re-record (29 pad-local points), Eastbrook and portrait re-mints per (al), lock-rig rebuild for the whole-slot rework; 4-lane release-merge audit + cross-platform APPROVE + architecture clean move + qa-checklist; details in the notes block |
+| Phase 9b (the bed verbs) | DONE 2026-08-19 | fix/farming-phase-09b-bed-verbs off 6981105f27 (the nineteenth-absorb merge); merge hash in the notes tail | The go-live is PLAYER-COMPLETE: the interact-key bed arm harvests and the plant sheet plants on desktop, touch, and gamepad; q_farm_intro completes through the client (journey 17/17 on the final tree, desktop and 844x390 landscape touch); (bn) CLOSED, (bp) offer-gate refinement; reviews: cross-platform APPROVE, frontend pass with all seven fixes taken, coverage B1-B3 closed and S1-S7 landed, gate-integrity PASS, qa-checklist in the notes; mutations 10/10 killed named |
 | Phase 10 (celebrations) | not started | | |
 | Phase 10 QA | not started | | |
 | Phase 11 (well-fed food) | not started | | |
@@ -2337,6 +2338,87 @@ catch). Run 2 on the frozen tree 9c17ac093f: "[gate:select] PASS: all 12
 steps green (vitest workers: 8)", mode=full, 2881 test files passed / 12
 skipped, browser regression 20 files 131 green, zero FAIL lines, shell rc 0,
 no druid_engines timeout.
+
+### Phase 9b (2026-08-18/19, the bed verbs, local-only per D22)
+Branch fix/farming-phase-09b-bed-verbs off feature/farming-plan at 6981105f27
+(the nineteenth-absorb merge; the sync ran first as its own mid-phase, its
+record above). ADOPTED via the maintainer-authored starter prompt (2e6fcb42b9).
+
+WHAT SHIPPED (the would-be PR body): an ordinary player now plants a seed into
+a garden bed and harvests a ready or withered plot from the game client. The
+interact funnel (main.ts interactKey: desktop KeyF, the mobile-interact
+button, the gamepad edge action, one call site) gained a garden-bed arm below
+gather nodes and above the escort-away last resort: the pure resolver
+src/game/farm_bed_interact.ts picks the nearest bed within INTERACT_RANGE
+(inclusive, mirroring the sim's exclusive deny) and a bed with MY plot sends
+world.harvestCrop (the sim's own farmDenied not_ready answers a growing plot;
+the client never reads plot.status), while a free bed opens the plant sheet.
+The sheet is the pure core src/ui/farming_plant_sheet_view.ts (UI_PURE_CORES;
+sowable seeds by bag/skill/wielded-hoe with per-gate denied.* reasons, knob
+affordability from unlocked counts and planWatchFee, no outcome prediction)
+plus the cold painter farming_plant_sheet_window.ts (HarvestJournalWindow
+recipe: deps bag, focus trap, closeManagedWindow case, panel keydown guard,
+relocalize arm) composed by Hud inside headroom freed by moving the report
+window body whole to src/ui/report_window_open.ts (ceiling 19387 to 19352,
+hud.ts final 19351). One Plant activation sends plantCrop(bedId, cropId,
+knobs) exactly once; the sheet stays open; farmPlanted for the bed closes
+with focus restore, any farmPlanted clears the send arm, a deny re-arms and
+repaints; a same-bed re-press keeps the picks, a fresh bed resets them.
+The i18n mint is five plantSheet keys (title, plant, sowAria, empty, close)
+with the five non-Latin fills each (M16); knob labels ride itemDisplayName
+and the journal's careWatch key; deny lines reuse hudChrome.farming.denied.*.
+NO IWorld member, command, wire field, SimEvent, src/sim, or server change;
+zero golden movement; baselines held (329 = 88 + 241, 34, 202/215, 87,
+farming_session 9a8fefa5).
+
+JOURNEY (the go-live acceptance, scripts/farming_journey_e2e.mjs, committed;
+17 checkpoints, PASS on the final merged tree and in lane C's runs on both
+viewports): boot LOW offline -> stage beside Jessica -> interact opens her
+dialog -> accept First Furrow through the gossip row -> stage onto
+bed_eastbrook_1 -> interact opens the plant sheet (title, vale_wheat seed row,
+three knobs, Plant) -> Plant through the sheet DOM -> sheet closes on
+farmPlanted, tracker 1/1 planted -> /dev farmgrow (the one sanctioned dev
+command) -> interact harvests ("You bring in: [Vale Wheat] x3.") -> turn-in
+pays +150 xp +50 copper -> quest leaves the tracker. window.__game was used
+only for staging positions and reading xp/copper, never for a verb.
+
+REVIEWS: cross-platform-sync APPROVE 0 BLOCKING (facet untouched, fplot
+delta semantics verified both directions, the one-snapshot bed-verb staleness
+online self-heals through the sim deny and is ledgered here as accepted);
+frontend-seam 0 BLOCKING with 7 SHOULD-FIX, ALL taken (7c97ca51d1);
+test-coverage 3 BLOCKING all closed (B1 the journey landed and passed on the
+final tree, B2 the comment-stripped Hud glue pin, B3 the both-entries root
+pin) and S1-S7 all landed; gate-integrity PASS (all five cone blocks plus the
+literal verified job-anchored, no-sixth-copy, fails toward more checkout; its
+one WARNING, that the plan doc is the only counting reference to the
+screenshot subtree, is moot under D22: the branch ships WHOLE, docs included,
+and the pin fails loud not silent); qa-checklist verdict in this block's
+tail. Mutations 10/10 KILLED with named reds through the dirty-refusing
+runner (decide polarity, double-send, knob payload dropped, range off by one,
+harvest call gutted, mobile unwired via the pad_reel order pin, Hud glue
+gutted, same-bed reset regression, any-bed clear dropped, bed preempting the
+node arm).
+
+DEFERRALS AND RESIDUALS: the world-space bed affordance (highlight or ripe
+marker) is DEFERRED per the phase file's own clause (renderer.ts at zero
+headroom; a src/render sibling can land in a later phase without the seals
+churn); the online one-snapshot verb staleness (xplat NICE-TO-HAVE) accepted,
+self-heals; the stale online.ts professionsState comment (release-owned,
+pre-existing) recorded; the sheet's cold-paint bag staleness while open heals
+through the deny round-trip (frontend NICE-TO-HAVE, accepted); the disabled
+knob contrast eyeball rides the Phase 9b QA's manual pass.
+GATE RECORD: run 1 on the frozen tree 8bcb6e8410 (BROWSER_PATH=<playwright
+chromium> GATE_MAX_WORKERS=8 node scripts/gate_select.mjs) FAILED at the
+early "biome (changed files)" step: the late farmer-at-the-beds arm insert
+carried an overlong literal line (a format diff, error-severity); healed by
+the scoped format commit 679b0cfd77, nothing else moved. Run 2 on the frozen
+tree 679b0cfd77: mode=full (the terrain-fixture broad arm),
+"[gate:select] PASS: all 12 steps green (vitest workers: 8)", 2885 test
+files passed / 12 skipped, 40334 tests passed / 2 expected fail / 115
+skipped, browser regression 20 files 132 green, zero FAIL lines, shell rc 0,
+no druid_engines timeout. The journey (scripts/farming_journey_e2e.mjs) also
+passed 17/17 standalone on the final merged tree before the gate.
+MERGE: (hash recorded in the follow-up commit on feature/farming-plan)
 
 ### Phase 10
 (not started)

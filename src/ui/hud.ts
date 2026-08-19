@@ -298,6 +298,7 @@ import {
 import { ERROR_LOG_CHAN, ERROR_LOG_COLOR, shouldMirrorErrorToast } from './error_toast_log';
 import { esc } from './esc';
 import { handleFarmEvent } from './farm_event_feedback';
+import { PlantSheetWindow } from './farming_plant_sheet_window';
 import { blockFctAmountText } from './fct_core';
 import { fctSpawnShape } from './fct_event';
 import { FctPainter } from './fct_painter';
@@ -666,6 +667,7 @@ import {
   reliquaryRelicPageIndex,
 } from './reliquary_view';
 import { curatorRankNameKey, ReliquaryWindow } from './reliquary_window';
+import { openReportWindow } from './report_window_open';
 import { restView } from './rest_indicator';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
@@ -2729,6 +2731,7 @@ export class Hud {
       '#reliquary-window',
       '#professions-window',
       '#harvest-journal-window',
+      '#plant-sheet-window',
     ]) {
       $(panelId).addEventListener('keydown', (e) => {
         if ((e.target as HTMLElement).tagName !== 'BUTTON') return;
@@ -3449,6 +3452,10 @@ export class Hud {
       case 'harvest-journal-window':
         // Route through the painter: focus returns (WCAG 2.2 AA), clock disposed.
         this.harvestJournalWindow.close();
+        break;
+      case 'plant-sheet-window':
+        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
+        this.plantSheetWindow.close();
         break;
       case 'arena-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA),
@@ -4819,6 +4826,14 @@ export class Hud {
     world: () => this.sim,
     closeOthers: () => this.closeOtherWindows('#harvest-journal-window'),
     ...this.windowFocus('#harvest-journal-window'),
+  });
+  // The plant sheet painter (farming_plant_sheet_view.ts core + its painter):
+  // the bed-verbs plant window. Cold, paint-on-open; farm events feed it.
+  private readonly plantSheetWindow = new PlantSheetWindow({
+    root: () => $('#plant-sheet-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#plant-sheet-window'),
+    ...this.windowFocus('#plant-sheet-window'),
   });
   // The Reliquary window painter (reliquary_view.ts core + reliquary_window.ts
   // painter): Overview + shelf chrome over IWorldReliquary. A standalone
@@ -6420,6 +6435,7 @@ export class Hud {
     if (this.reliquaryWindow.isOpen) this.reliquaryWindow.render();
     if (this.professionsWindow.isOpen) this.professionsWindow.render();
     if (this.harvestJournalWindow.isOpen) this.harvestJournalWindow.render();
+    this.plantSheetWindow.relocalize();
     // The crafting window's repaint memos (station set, reagent sig, the
     // profession surface sig) are all text-independent, so a language switch
     // alone never moves them and an open window kept the previous locale
@@ -12515,6 +12531,7 @@ export class Hud {
           // src/ui/farm_event_feedback.ts at the v0.38.0 sync (the monolith
           // ratchet heal); the Hud itself is the host seam.
           handleFarmEvent(ev, this);
+          this.plantSheetWindow.notifyFarmEvent(ev);
           break;
         case 'gatherRareEvent': {
           // Soft zone broadcast (Professions 2.0): every recipient in
@@ -16474,6 +16491,11 @@ export class Hud {
     this.harvestJournalWindow.toggle();
   }
 
+  // The bed arm's free-bed route (NearbyInteractionHud): opens the plant sheet.
+  openPlantSheet(bedId: string): void {
+    this.plantSheetWindow.open(bedId);
+  }
+
   // Repaint the deed tracker from the live facet: the slow band, a watch
   // toggle, the collapse toggle, and language switches all funnel here; the
   // elided writers make an unchanged repaint free.
@@ -18560,73 +18582,20 @@ export class Hud {
     return null;
   }
 
+  // Body in report_window_open.ts (the Phase 9b headroom extraction); this
+  // wrapper only binds the coordinator's private pieces into the deps bag.
   private openReportWindow(target: { pid?: number; name: string }): void {
-    if (!this.reportHooks) return;
-    this.closeOtherWindows('#report-window');
-    const { pid, name } = target;
-    const el = $('#report-window');
-    el.innerHTML = `
-      <div class="panel-title"><span>${esc(t('hud.report.title', { name }))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.report.cancel'))}" title="${esc(t('hud.report.cancel'))}">${svgIcon('close')}</button></div>
-      <label class="report-label" for="report-reason">${esc(t('hud.report.reason'))}</label>
-      <div id="report-reason-slot" aria-describedby="report-error"></div>
-      <label class="report-label" for="report-details">${esc(t('hud.report.details'))}</label>
-      <textarea id="report-details" maxlength="1000" placeholder="${esc(t('hud.report.detailsPlaceholder'))}" aria-describedby="report-error"></textarea>
-      <div class="report-error" id="report-error" role="alert" aria-live="polite"></div>
-      <div class="report-actions">
-        <button class="btn" type="button" id="report-submit">${esc(t('hud.report.submit'))}</button>
-        <button class="btn" type="button" data-close>${esc(t('hud.report.cancel'))}</button>
-      </div>`;
-    el.style.display = 'block'; // centred by the shared .window rule
-    const reasonDD = this.buildDropdown(
-      [
-        { value: 'harassment', label: t('hud.report.reasons.harassment') },
-        { value: 'spam', label: t('hud.report.reasons.spam') },
-        { value: 'cheating', label: t('hud.report.reasons.cheating') },
-        {
-          value: 'offensive_name_or_chat',
-          label: t('hud.report.reasons.offensiveNameOrChat'),
-        },
-        { value: 'other', label: t('hud.report.reasons.other') },
-      ],
-      'harassment',
-      undefined,
-      undefined,
-      { ariaLabel: t('hud.report.reason') },
+    openReportWindow(
+      {
+        reportHooks: () => this.reportHooks,
+        closeOtherWindows: (keep) => this.closeOtherWindows(keep),
+        buildDropdown: (options, current, onChange, placeholder, a11y) =>
+          this.buildDropdown(options, current, onChange, placeholder, a11y),
+        log: (text, color) => this.log(text, color),
+        localizeReportError: (err) => this.localizeReportError(err),
+      },
+      target,
     );
-    // Give the trigger the id the <label for="report-reason"> points at, so the
-    // label (which lost its original target when the slot div was replaced)
-    // associates with a real focusable control again.
-    reasonDD.querySelector('.ui-dd-btn')?.setAttribute('id', 'report-reason');
-    el.querySelector('#report-reason-slot')?.replaceWith(reasonDD);
-    el.querySelectorAll('[data-close]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        el.style.display = 'none';
-      });
-    });
-    const submit = $('#report-submit') as HTMLButtonElement;
-    submit.addEventListener('click', () => {
-      const reason = reasonDD.dataset.value ?? 'other';
-      const details = ($('#report-details') as HTMLTextAreaElement).value;
-      submit.disabled = true;
-      const request =
-        pid !== undefined
-          ? this.reportHooks?.submit(pid, reason, details)
-          : this.reportHooks?.submitByName?.(name, reason, details);
-      if (!request) {
-        submit.disabled = false;
-        $('#report-error').textContent = t('hud.report.failed');
-        return;
-      }
-      request
-        .then(() => {
-          el.style.display = 'none';
-          this.log(t('hud.report.submitted', { name }), '#ffd100');
-        })
-        .catch((err: unknown) => {
-          submit.disabled = false;
-          $('#report-error').textContent = this.localizeReportError(err);
-        });
-    });
   }
 
   private localizeReportError(err: unknown): string {

@@ -4,7 +4,19 @@ Read this file first in every phase session. It is the single authority for lock
 decisions. If a phase file contradicts this file, this file wins and the phase file
 gets swept in the same pass (amend the QA twin too, always).
 
-Current phase: the NINETEENTH ABSORB done 2026-08-18 as its own sync mid-phase
+Current phase: Phase 9b (the bed verbs) DONE 2026-08-18/19: the go-live is
+PLAYER-COMPLETE. An ordinary player plants through the interact-key plant
+sheet and harvests through the same press on desktop, touch, and gamepad;
+q_farm_intro completes through the client (the committed journey
+scripts/farming_journey_e2e.mjs, 17 checkpoints, no window.__game for any
+verb); deviation (bn) is CLOSED and (bp) records the offer-gate refinement;
+the (bg) intro-grant faucet finally has its terminator (the quest can turn
+ready, so the per-talk re-grant window closes normally). Baselines held
+(IWorld 329 = 88 + 241, facets 34, commands 202/215, delta keys 87,
+farming_session 9a8fefa5, zero golden moves, no src/sim or server change);
+hud.ts 19351/19352 after the report-window extraction funded the sheet.
+Merge hash in progress.md. NEXT: the Phase 9b QA
+(docs/farming/phase-09b-qa.md), then Phase 10. Prior: the NINETEENTH ABSORB done 2026-08-18 as its own sync mid-phase
 per the D22 triple-digit rule (release/v0.39.0 moved f42a67f341 to 7b45fdb9a9:
 285 commits, 833 files, 168-file farming intersection; branch
 fix/farming-sync-v0.39.0-r2, merge b9a025b2ee, opening Phase 9b which the
@@ -2196,6 +2208,32 @@ question does not arise (farming has no station).
   Phase 10, or re-dormant the intro quest, Jessica's teaching sentence, and
   the guide's "Sow with a hoe" prose in one change until the verb ships.
   Until one of those lands the go-live is NOT player-complete.
+  ADOPTED as Phase 9b, 2026-08-18 (the maintainer-authored starter prompt,
+  authored 2026-08-17, whose use adopts the phase per its own terms).
+  CLOSED by Phase 9b (2026-08-18/19, branch fix/farming-phase-09b-bed-verbs,
+  merge hash in progress.md): the interact funnel gained the garden-bed arm
+  (proximity resolver src/game/farm_bed_interact.ts; a bed with MY plot sends
+  world.harvestCrop and the sim's own farmDenied answers a growing plot; a
+  free bed opens the plant sheet), the plant sheet shipped as the pure core
+  src/ui/farming_plant_sheet_view.ts plus the cold painter
+  farming_plant_sheet_window.ts composed by Hud, and the committed journey
+  scripts/farming_journey_e2e.mjs drives q_farm_intro to completion through
+  client gestures only on desktop AND 844x390 landscape touch (17 checkpoints,
+  no window.__game for any verb). The reachability pin
+  tests/farm_verb_reachability.test.ts guards all four IWorldFarming verbs
+  plus the Hud glue, so the (bn) class cannot silently reopen. The go-live is
+  player-complete; Phase 9's Live-surface note is met.
+  (bp) OFFER GATES ARE NOT OUTCOME PREDICTIONS (Phase 9b design refinement,
+  reconciling the phase file's "never pre-empted client side" acceptance line
+  with the shipped sheet): non-sowable seeds and unaffordable knobs render as
+  DISABLED controls carrying the family's own denied.* line (bag-derived, the
+  same order as the sim's gates), and a knob that stops being affordable
+  un-picks itself so a send can never carry a payment the sheet shows as
+  short. The sim remains the refusing authority for everything actually sent
+  (range, bed, skill, seed, and every payment re-checked server-side); the
+  sheet never predicts an OUTCOME (no survival, no yield, no fee-plan
+  preemption on the send path). Pinned in the view suite's per-dimension
+  arms and the window's un-pick arm.
   (bo) TIER 3 AND 4 SEEDS HAVE NO FIRST FAUCET: D11 says they "come from
   harvest seed-back rolls and the rare event", but the seed-back roll
   (professions/farming.ts, FARM_SEED_BACK_MIN_TIER 3) returns crop.seedItemId,
@@ -2261,7 +2299,10 @@ question does not arise (farming has no station).
   PROPOSED Phase 9b (docs/farming/phase-09b-bed-verbs.md: the bed interaction
   that plants and harvests through IWorldFarming, before Phase 10) or re-dormant
   q_farm_intro, Jessica's teaching sentence, and the guide's "Sow with a hoe"
-  prose until the verb ships; (bo) the tier 3/4 seed bootstrap: (1) a seed-back
+  prose until the verb ships (ADOPTED as Phase 9b, 2026-08-18, and CLOSED by
+  its merge: the verbs ship, the go-live is player-complete, the journey and
+  reachability pins guard the class; only (bo) below remains OPEN);
+  (bo) the tier 3/4 seed bootstrap: (1) a seed-back
   roll on a tier-N harvest that can return the NEXT tier's seed at low odds
   (upward drift, keeps "no counter sells them"), (2) the tier-3 and tier-4
   farmers stock their own seeds at a premium (amends D11's counter rule), (3) a

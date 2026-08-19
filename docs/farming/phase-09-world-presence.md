@@ -65,6 +65,12 @@ TWO produce: the day-one shopping list is seed + compost + two carrots (44 coppe
 intro quest's 50 copper covers it. The QA twin's live-client journey must play the
 Highwatch shelf too ((bh)).
 
+LIVE-SURFACE NOTE MET AS OF PHASE 9B (2026-08-18/19): the client bed verbs
+shipped (the interact-key bed arm and the plant sheet, phase-09b-bed-verbs.md),
+the committed journey drives q_farm_intro to completion through client gestures
+only on desktop and touch, and state.md deviation (bn) is CLOSED. The paragraph
+below records the QA finding that stood between Phase 9 and this note.
+
 PHASE 9 QA EXECUTED 2026-08-17 (verdict FAIL ON THE GO-LIVE ACCEPTANCE, scope stop;
 PASS on this phase's own diff; state.md (bn) and (bo), progress.md Phase 9 QA notes):
 everything above verifies on the live client and the sim, but the Live-surface note's

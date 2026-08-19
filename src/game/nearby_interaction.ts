@@ -6,8 +6,10 @@ import {
   INTERACT_RANGE,
   type QuestProgress,
 } from '../sim/types';
+import type { FarmPatchDef, FarmPlotView } from '../world_api/farming';
 import { corpseLootAvailability, localPartyMemberIds } from './corpse_loot_availability';
 import { decideEscortPress, handleEscortPress } from './escort_interact';
+import { decideFarmBedAction, nearestInteractableBed } from './farm_bed_interact';
 import {
   type GatherEffectConfirmGate,
   type GatherNodeToolGate,
@@ -40,6 +42,14 @@ export interface NearbyInteractionWorld {
   pickUpObject(id: number): InteractionOutcome;
   nodeHarvestableByMe(nodeId: string): boolean;
   harvestNode(nodeId: string, confirmEffectUse?: boolean): InteractionOutcome;
+  // The garden-bed arm (Phase 9b). Static bed content plus the caller's own
+  // plots; IWorld satisfies all three structurally, so the live call site
+  // (main.ts interactKey passing the world object whole) needs no change.
+  farmPatches: readonly FarmPatchDef[];
+  myFarmPlots: readonly FarmPlotView[];
+  // The client sends and the sim answers: a growing plot refuses not_ready
+  // through the sim's own farmDenied line, never a client-side prediction.
+  harvestCrop(bedId: string): void;
 }
 
 export interface NearbyInteractionHud {
@@ -48,6 +58,9 @@ export interface NearbyInteractionHud {
   openDelveBoard(npcId: number): void;
   showError(text: string): void;
   requestSpiritHealerResurrect(): void;
+  // A free bed opens the seed-and-knobs sheet (Phase 9b); choice-free
+  // harvest stays a direct world call above.
+  openPlantSheet(bedId: string): void;
 }
 
 type NearbyGatherNode = Pick<GatherNodeDef, 'id' | 'pos' | 'type' | 'tier'>;
@@ -208,6 +221,22 @@ export function tryNearbyInteraction(
       nodeToolGateFor?.(bestNode),
       effectConfirm,
     );
+  }
+  // The garden-bed arm (Phase 9b) sits below gather nodes (a node in reach
+  // keeps winning the press) and above the escort-away last resort. Harvest
+  // is choice-free, so a bed with MY plot goes straight to the world (the
+  // sim's own farmDenied answers a growing plot with not_ready; the client
+  // never reads plot.status here); a free bed opens the seed-and-knobs sheet.
+  if (!player.dead) {
+    const bedId = nearestInteractableBed(world.farmPatches, player.pos);
+    if (bedId !== null) {
+      if (decideFarmBedAction(world, bedId) === 'harvest') {
+        world.harvestCrop(bedId);
+      } else {
+        hud.openPlantSheet(bedId);
+      }
+      return true;
+    }
   }
   // The away line is a LAST resort that only replaces the generic
   // nothing-to-interact message: an absent escortee must never eat a press that

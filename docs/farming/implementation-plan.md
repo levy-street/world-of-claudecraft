@@ -28,7 +28,7 @@ Review Dispatch Matrix. Each phase is a self-contained session prompt in its own
 | 8 QA | `phase-08-qa.md` | Verify Phase 8 | |
 | 9 | `phase-09-world-presence.md` | The farmer NPCs (Jessica at Eastbrook), the intro quest and its objective arm, vendor stock, work orders, the deliberate NPC golden regen | GO-LIVE: the full loop opens with visuals and timers already shipped |
 | 9 QA | `phase-09-qa.md` | Verify Phase 9 | |
-| 9b (PROPOSED by the Phase 9 QA, not adopted) | `phase-09b-bed-verbs.md` | The client-side plant and harvest controls (bed interaction + plant sheet) that Phase 9's go-live turned out to lack; state.md (bn) | Would make the loop player-complete; the maintainer adopts (strike this label) or strikes the row |
+| 9b | `phase-09b-bed-verbs.md` | The client-side plant and harvest controls (bed interaction + plant sheet) that Phase 9's go-live turned out to lack; state.md (bn) | Makes the loop player-complete; ADOPTED 2026-08-18 via the starter prompt |
 | 10 | `phase-10-celebrations.md` | golden_harvest rare event, farming deeds and the farming-100 title | LIVE |
 | 10 QA | `phase-10-qa.md` | Verify Phase 10 | |
 | 11 | `phase-11-well-fed-food.md` | The wellfed ItemDef arm, buff dishes per tier, aura naming and tooltips | LIVE |

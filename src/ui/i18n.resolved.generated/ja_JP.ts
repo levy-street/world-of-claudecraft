@@ -3117,6 +3117,13 @@ export const ja_JP: EnTranslations = {
       },
       "huskTrade": "籾殻を堆肥と交換する",
       "huskTradeAria": "{name}と枯れた籾殻を堆肥に交換する",
+      "plantSheet": {
+        "title": "作物を植える",
+        "plant": "植える",
+        "sowAria": "{name}を蒔く",
+        "empty": "この畑に蒔ける種を持っていません。",
+        "close": "植え付けシートを閉じる"
+      },
       "husksConvertedLine": "{husksName} x{husks}を{name}と交換した。",
       "husksConvertedLineQty": "{husksName} x{husks}を{name} x{qty}と交換した。",
       "readyLine": "作物が1区画、収穫できるようになった。",
