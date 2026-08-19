@@ -2578,9 +2578,9 @@ bare_client broad arm), "[gate:select] PASS: all 12 steps green (vitest
 workers: 8)", 2886 test files passed / 12 skipped, 40355 tests passed / 2
 expected fail / 115 skipped, browser regression 20 files 133 green, ZERO
 FAIL markers, no druid_engines timeout.
-MERGE: fix/farming-phase-09b-qa merged --no-ff into feature/farming-plan;
-the hash is recorded in the merge-hash commit on the feature branch and
-in the farming-skill-program memory topic.
+MERGE: fix/farming-phase-09b-qa merged --no-ff into feature/farming-plan
+as 710c03106424b68c49902421ab6c21ff4d37d5d1 (QA tip e456ac368c; the
+branch deleted).
 
 ### Phase 10
 (not started)
