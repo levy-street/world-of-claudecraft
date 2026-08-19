@@ -386,6 +386,8 @@ export const nl_NL: EnTranslations = {
       "chips": "{amount} chips",
       "pot": "Pot: {amount}",
       "noCards": "No cards",
+      "bestFiveCard": "{card}, Best Five",
+      "highlightedHand": "{name}: {hand}",
       "emptySeat": "Open",
       "dealerButton": "Dealer button",
       "dealerMarker": "D",
@@ -396,6 +398,18 @@ export const nl_NL: EnTranslations = {
       "yourTurn": "Your turn",
       "showdown": "SHOWDOWN",
       "winner": "{name} Won +{amount}",
+      "winnerWithHand": "{name} Won +{amount} with {hand}",
+      "hand": {
+        "highCard": "High Card",
+        "pair": "Pair",
+        "twoPair": "Two Pair",
+        "threeOfAKind": "Three of a Kind",
+        "straight": "Straight",
+        "flush": "Flush",
+        "fullHouse": "Full House",
+        "fourOfAKind": "Four of a Kind",
+        "straightFlush": "Straight Flush"
+      },
       "actionWithAmount": "{action} {amount}",
       "action": {
         "fold": "Fold",

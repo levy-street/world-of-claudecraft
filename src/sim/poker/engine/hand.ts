@@ -179,7 +179,13 @@ function combinationsOfFive(cards: readonly PokerCard[]): PokerCard[][] {
 }
 
 export function evaluateSevenCardHand(cards: readonly PokerCard[]): EvaluatedPokerHand {
-  validateDistinctCards(cards, 7);
+  pokerInvariant(cards.length === 7, 'Expected 7 cards');
+  return evaluateBestPokerHand(cards);
+}
+
+export function evaluateBestPokerHand(cards: readonly PokerCard[]): EvaluatedPokerHand {
+  validateDistinctCards(cards);
+  pokerInvariant(cards.length >= 5 && cards.length <= 7, 'Expected 5 to 7 cards');
   const hands = combinationsOfFive(cards).map(evaluateFiveCardHand);
   pokerInvariant(hands.length > 0, 'No poker hands can be evaluated');
   return hands.reduce((best, candidate) =>

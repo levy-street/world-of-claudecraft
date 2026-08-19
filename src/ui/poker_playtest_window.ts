@@ -1,3 +1,4 @@
+import type { PokerHandCategory } from '../sim/poker/engine/hand';
 import type { PokerClientPort, PokerErrorCode } from '../sim/poker/protocol';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
@@ -12,6 +13,21 @@ import {
 import { svgIcon } from './ui_icons';
 
 const SHOWDOWN_REVEAL_MS = 900;
+const HAND_CATEGORY_KEYS = {
+  'high-card': 'hudChrome.pokerPlaytest.hand.highCard',
+  pair: 'hudChrome.pokerPlaytest.hand.pair',
+  'two-pair': 'hudChrome.pokerPlaytest.hand.twoPair',
+  'three-of-a-kind': 'hudChrome.pokerPlaytest.hand.threeOfAKind',
+  straight: 'hudChrome.pokerPlaytest.hand.straight',
+  flush: 'hudChrome.pokerPlaytest.hand.flush',
+  'full-house': 'hudChrome.pokerPlaytest.hand.fullHouse',
+  'four-of-a-kind': 'hudChrome.pokerPlaytest.hand.fourOfAKind',
+  'straight-flush': 'hudChrome.pokerPlaytest.hand.straightFlush',
+} as const satisfies Record<PokerHandCategory, Parameters<typeof t>[0]>;
+
+function handName(category: PokerHandCategory): string {
+  return t(HAND_CATEGORY_KEYS[category]);
+}
 
 export interface PokerPlaytestWindowDeps {
   root(): HTMLElement;
@@ -190,12 +206,19 @@ export class PokerPlaytestWindow {
     const winners =
       result?.payouts
         .filter((payout) => payout.amount > 0)
-        .map((payout) =>
-          t('hudChrome.pokerPlaytest.winner', {
-            name: name(payout.seat),
-            amount: formatNumber(payout.amount),
-          }),
-        ) ?? [];
+        .map((payout) => {
+          const category = view.winnerHandCategories[payout.seat];
+          return category
+            ? t('hudChrome.pokerPlaytest.winnerWithHand', {
+                name: name(payout.seat),
+                amount: formatNumber(payout.amount),
+                hand: handName(category),
+              })
+            : t('hudChrome.pokerPlaytest.winner', {
+                name: name(payout.seat),
+                amount: formatNumber(payout.amount),
+              });
+        }) ?? [];
     return this.tableFrame(state, view, name, seats, result?.rake ?? null, winners);
   }
 
@@ -216,13 +239,18 @@ export class PokerPlaytestWindow {
         ? ''
         : showingShowdown
           ? `<div class=poker-showdown-banner role=status aria-live=polite>${esc(t('hudChrome.pokerPlaytest.showdown'))}</div>`
-          : `<div class=poker-result-banner>${winners.map((line) => `<div>${esc(line)}</div>`).join('')}<div>${esc(t('hudChrome.pokerPlaytest.rake', { amount: formatNumber(rake) }))}</div></div>`;
-    return this.tableControls(state, view, name) + this.board(view, seats, result);
+          : `<div class=poker-result-banner role=status aria-live=polite>${winners.map((line) => `<div>${esc(line)}</div>`).join('')}<div>${esc(t('hudChrome.pokerPlaytest.rake', { amount: formatNumber(rake) }))}</div></div>`;
+    return this.tableControls(state, view, name) + this.board(view, seats, name) + result;
   }
 
-  private board(view: PokerPlaytestView, seats: string, result: string): string {
+  private board(view: PokerPlaytestView, seats: string, name: (seat: number) => string): string {
     const pot = esc(t('hudChrome.pokerPlaytest.pot', { amount: formatNumber(view.pot) }));
-    return `<div class=poker-table-wrap><div class=poker-table-felt><div class=poker-board><div class=poker-pot>${pot}</div><div class=poker-cards>${this.cards(view.communityCards)}</div></div></div>${seats}${result}</div>`;
+    const handOwner = view.highlightedWinnerSeat === null ? null : name(view.highlightedWinnerSeat);
+    const category = view.handCategory ? handName(view.handCategory) : null;
+    const hand = view.handCategory
+      ? `<div class=poker-hand-name>${esc(handOwner && category ? t('hudChrome.pokerPlaytest.highlightedHand', { name: handOwner, hand: category }) : category)}</div>`
+      : '';
+    return `<div class=poker-table-wrap><div class=poker-table-felt><div class=poker-board><div class=poker-pot>${pot}</div><div class=poker-cards>${this.cards(view.communityCards)}</div>${hand}</div></div>${seats}</div>`;
   }
 
   private seatMarkup(
@@ -394,13 +422,19 @@ export class PokerPlaytestWindow {
     return `<button type=button class=poker-wager-step data-wager=${index} data-wager-kind=${kind} data-wager-step=${direction} data-focus-key=wager-${kind}-${direction} aria-label='${esc(ariaLabel)}'${enabled ? '' : ' disabled'}>${symbol}</button>`;
   }
 
-  private cards(values: string[], hidden = false): string {
+  private cards(values: PokerPlaytestView['communityCards'], hidden = false): string {
     if (!values.length) {
       return hidden
         ? `<span class='poker-card back' aria-hidden=true></span><span class='poker-card back' aria-hidden=true></span>`
         : esc(t('hudChrome.pokerPlaytest.noCards'));
     }
-    return values.map((value) => `<span class=poker-card>${esc(value)}</span>`).join('');
+    return values
+      .map((value) => {
+        if (!value.highlighted) return `<span class=poker-card>${esc(value.label)}</span>`;
+        const selected = t('hudChrome.pokerPlaytest.bestFiveCard', { card: value.label });
+        return `<span class='poker-card highlighted'><span aria-hidden=true>${esc(value.label)}</span><span class=visually-hidden>${esc(selected)}</span></span>`;
+      })
+      .join('');
   }
 
   private button(

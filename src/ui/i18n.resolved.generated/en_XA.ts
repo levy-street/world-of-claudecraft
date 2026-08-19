@@ -386,6 +386,8 @@ export const en_XA: EnTranslations = {
       "chips": "[{amount} çĥíþš]",
       "pot": "[Þóţ: {amount}]",
       "noCards": "[Ñó çáŕðš]",
+      "bestFiveCard": "[{card}, Ɓéšţ Ƒíʋé]",
+      "highlightedHand": "[{name}: {hand}]",
       "emptySeat": "[Óþéñ]",
       "dealerButton": "[Ðéáļéŕ ƀúţţóñ]",
       "dealerMarker": "[Ð]",
@@ -396,6 +398,18 @@ export const en_XA: EnTranslations = {
       "yourTurn": "[Ýóúŕ ţúŕñ]",
       "showdown": "[ŠĤÓŴÐÓŴÑ]",
       "winner": "[{name} Ŵóñ +{amount}]",
+      "winnerWithHand": "[{name} Ŵóñ +{amount} ŵíţĥ {hand}]",
+      "hand": {
+        "highCard": "[Ĥíĝĥ Çáŕð]",
+        "pair": "[Þáíŕ]",
+        "twoPair": "[Ţŵó Þáíŕ]",
+        "threeOfAKind": "[Ţĥŕéé óƒ á Ķíñð]",
+        "straight": "[Šţŕáíĝĥţ]",
+        "flush": "[Ƒļúšĥ]",
+        "fullHouse": "[Ƒúļļ Ĥóúšé]",
+        "fourOfAKind": "[Ƒóúŕ óƒ á Ķíñð]",
+        "straightFlush": "[Šţŕáíĝĥţ Ƒļúšĥ]"
+      },
       "actionWithAmount": "[{action} {amount}]",
       "action": {
         "fold": "[Ƒóļð]",

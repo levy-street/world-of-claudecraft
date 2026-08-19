@@ -373,7 +373,7 @@ export const zh_TW: EnTranslations = {
       "error": {
         "busy": "牌桌正在處理。請重試。",
         "disabled": "目前無法使用撲克。",
-        "insufficient_funds": "You need more Copper to join or rebuy.",
+        "insufficient_funds": "加入或重新買入需要更多銅幣。",
         "invalid_action": "此操作不合法。",
         "participation_suspended": "此帳號的撲克參與權限已被暫停。",
         "invalidAmount": "請輸入允許範圍內的整數。",
@@ -386,6 +386,8 @@ export const zh_TW: EnTranslations = {
       "chips": "{amount}籌碼",
       "pot": "底池: {amount}",
       "noCards": "無牌",
+      "bestFiveCard": "{card}, Best Five",
+      "highlightedHand": "{name}: {hand}",
       "emptySeat": "空位",
       "dealerButton": "莊家按鈕",
       "dealerMarker": "D",
@@ -396,6 +398,18 @@ export const zh_TW: EnTranslations = {
       "yourTurn": "輪到你了",
       "showdown": "SHOWDOWN",
       "winner": "{name}贏得{amount}",
+      "winnerWithHand": "{name}以{hand}贏得{amount}",
+      "hand": {
+        "highCard": "高牌",
+        "pair": "一對",
+        "twoPair": "兩對",
+        "threeOfAKind": "三條",
+        "straight": "順子",
+        "flush": "同花",
+        "fullHouse": "葫蘆",
+        "fourOfAKind": "四條",
+        "straightFlush": "同花順"
+      },
       "actionWithAmount": "{action} {amount}",
       "action": {
         "fold": "棄牌",

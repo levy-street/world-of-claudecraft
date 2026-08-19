@@ -32,4 +32,14 @@ describe('poker playtest window contract', () => {
     expect(mobileCss).toContain('(orientation: landscape)');
     expect(mobileCss).toContain('#poker-playtest-window');
   });
+
+  it('keeps showdown messages in document flow after the table', () => {
+    expect(componentCss).toMatch(
+      /\.poker-result-banner,[^}]*\.poker-showdown-banner \{[^}]*position:\s*relative;[^}]*transform:\s*translateX\(-50%\);/,
+    );
+    expect(componentCss).toMatch(
+      /#lockpick-panel,[^}]*#delve-rite-panel \{[^}]*transform:\s*translate\(-50%, -50%\);/,
+    );
+    expect(componentCss).toContain('.poker-card.highlighted');
+  });
 });

@@ -373,7 +373,7 @@ export const ru_RU: EnTranslations = {
       "error": {
         "busy": "Стол занят обработкой. Повторите попытку.",
         "disabled": "Покер сейчас недоступен.",
-        "insufficient_funds": "You need more Copper to join or rebuy.",
+        "insufficient_funds": "Для посадки за стол или ребая нужно больше меди.",
         "invalid_action": "Это действие недопустимо.",
         "participation_suspended": "Участие этого аккаунта в покере приостановлено.",
         "invalidAmount": "Введите целое число в допустимом диапазоне.",
@@ -386,6 +386,8 @@ export const ru_RU: EnTranslations = {
       "chips": "Фишки: {amount}",
       "pot": "Банк: {amount}",
       "noCards": "Нет карт",
+      "bestFiveCard": "{card}, Best Five",
+      "highlightedHand": "{name}: {hand}",
       "emptySeat": "Свободно",
       "dealerButton": "Кнопка дилера",
       "dealerMarker": "D",
@@ -396,6 +398,18 @@ export const ru_RU: EnTranslations = {
       "yourTurn": "Ваш ход",
       "showdown": "SHOWDOWN",
       "winner": "{name} получает {amount}",
+      "winnerWithHand": "{name} выигрывает {amount} с комбинацией {hand}",
+      "hand": {
+        "highCard": "Старшая карта",
+        "pair": "Пара",
+        "twoPair": "Две пары",
+        "threeOfAKind": "Тройка",
+        "straight": "Стрит",
+        "flush": "Флеш",
+        "fullHouse": "Фул-хаус",
+        "fourOfAKind": "Каре",
+        "straightFlush": "Стрит-флеш"
+      },
       "actionWithAmount": "{action} {amount}",
       "action": {
         "fold": "Сбросить",

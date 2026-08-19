@@ -373,7 +373,7 @@ export const ja_JP: EnTranslations = {
       "error": {
         "busy": "テーブルが処理中です。もう一度お試しください。",
         "disabled": "現在ポーカーを利用できません。",
-        "insufficient_funds": "You need more Copper to join or rebuy.",
+        "insufficient_funds": "参加またはリバイするにはCopperが足りません。",
         "invalid_action": "そのアクションは選択できません。",
         "participation_suspended": "このアカウントのポーカー参加は停止されています。",
         "invalidAmount": "許可された範囲の整数を入力してください。",
@@ -386,6 +386,8 @@ export const ja_JP: EnTranslations = {
       "chips": "{amount}チップ",
       "pot": "ポット: {amount}",
       "noCards": "カードなし",
+      "bestFiveCard": "{card}, Best Five",
+      "highlightedHand": "{name}: {hand}",
       "emptySeat": "空席",
       "dealerButton": "ディーラーボタン",
       "dealerMarker": "D",
@@ -396,6 +398,18 @@ export const ja_JP: EnTranslations = {
       "yourTurn": "あなたの手番です",
       "showdown": "SHOWDOWN",
       "winner": "{name}が{amount}獲得",
+      "winnerWithHand": "{name}が{hand}で{amount}獲得",
+      "hand": {
+        "highCard": "ハイカード",
+        "pair": "ワンペア",
+        "twoPair": "ツーペア",
+        "threeOfAKind": "スリーカード",
+        "straight": "ストレート",
+        "flush": "フラッシュ",
+        "fullHouse": "フルハウス",
+        "fourOfAKind": "フォーカード",
+        "straightFlush": "ストレートフラッシュ"
+      },
       "actionWithAmount": "{action} {amount}",
       "action": {
         "fold": "フォールド",

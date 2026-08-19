@@ -373,7 +373,7 @@ export const ko_KR: EnTranslations = {
       "error": {
         "busy": "테이블이 처리 중입니다. 다시 시도하세요.",
         "disabled": "현재 포커를 이용할 수 없습니다.",
-        "insufficient_funds": "You need more Copper to join or rebuy.",
+        "insufficient_funds": "참가하거나 리바이하려면 Copper가 더 필요합니다.",
         "invalid_action": "허용되지 않는 행동입니다.",
         "participation_suspended": "이 계정의 포커 참가가 정지되었습니다.",
         "invalidAmount": "허용 범위 안의 정수를 입력하세요.",
@@ -386,6 +386,8 @@ export const ko_KR: EnTranslations = {
       "chips": "{amount}칩",
       "pot": "팟: {amount}",
       "noCards": "카드 없음",
+      "bestFiveCard": "{card}, Best Five",
+      "highlightedHand": "{name}: {hand}",
       "emptySeat": "빈 좌석",
       "dealerButton": "딜러 버튼",
       "dealerMarker": "D",
@@ -396,6 +398,18 @@ export const ko_KR: EnTranslations = {
       "yourTurn": "당신의 차례입니다",
       "showdown": "SHOWDOWN",
       "winner": "{name}님이 {amount} 획득",
+      "winnerWithHand": "{name}님이 {hand}(으)로 {amount} 획득",
+      "hand": {
+        "highCard": "하이 카드",
+        "pair": "원 페어",
+        "twoPair": "투 페어",
+        "threeOfAKind": "트리플",
+        "straight": "스트레이트",
+        "flush": "플러시",
+        "fullHouse": "풀 하우스",
+        "fourOfAKind": "포카드",
+        "straightFlush": "스트레이트 플러시"
+      },
       "actionWithAmount": "{action} {amount}",
       "action": {
         "fold": "폴드",

@@ -1,4 +1,6 @@
-import type { PokerAction, PokerViewerSnapshot } from '../sim/poker/engine';
+import type { PokerAction, PokerCard, PokerViewerSnapshot } from '../sim/poker/engine';
+import { cardKey } from '../sim/poker/engine/cards';
+import { evaluateBestPokerHand, type PokerHandCategory } from '../sim/poker/engine/hand';
 
 export interface PokerPlaytestActionView {
   kind: PokerAction['type'];
@@ -11,13 +13,21 @@ export interface PokerPlaytestView {
   active: boolean;
   street: PokerViewerSnapshot['street'];
   pot: number;
-  communityCards: string[];
+  communityCards: PokerPlaytestCardView[];
   playerCards: string[];
   seats: PokerPlaytestSeatView[];
   actorSeat: number | null;
   actions: PokerPlaytestActionView[];
   lastPayout: number;
   rake: number;
+  handCategory: PokerHandCategory | null;
+  winnerHandCategories: Record<number, PokerHandCategory>;
+  highlightedWinnerSeat: number | null;
+}
+
+export interface PokerPlaytestCardView {
+  label: string;
+  highlighted: boolean;
 }
 
 export interface PokerPlaytestSeatView {
@@ -27,7 +37,7 @@ export interface PokerPlaytestSeatView {
   bet: number;
   folded: boolean;
   acting: boolean;
-  cards: string[];
+  cards: PokerPlaytestCardView[];
   cardsVisible: boolean;
   own: boolean;
   dealer: boolean;
@@ -40,14 +50,47 @@ function cardLabel(card: { rank: string; suit: string }): string {
   return `${card.rank}${suit}`;
 }
 
+function evaluatedHand(cards: readonly PokerCard[]) {
+  return cards.length >= 5 && cards.length <= 7 ? evaluateBestPokerHand(cards) : null;
+}
+
 export function buildPokerPlaytestView(
   snapshot: PokerViewerSnapshot,
   viewerSeat: number | null,
 ): PokerPlaytestView {
   const legal = snapshot.legalActions;
   const result = snapshot.street === null ? snapshot.lastResult : null;
+  const boardCards = result?.communityCards ?? snapshot.communityCards;
+  const viewerHoleCards =
+    viewerSeat === null ? null : (snapshot.seats[viewerSeat]?.holeCards ?? null);
+  const viewerHand = viewerHoleCards ? evaluatedHand([...viewerHoleCards, ...boardCards]) : null;
+  const winnerHandCategories: Record<number, PokerHandCategory> = {};
+  const highlightedKeys = new Set(viewerHand?.cards.map(cardKey) ?? []);
+  const highlightedWinnerSeat = result?.payouts.find((payout) => payout.amount > 0)?.seat ?? null;
+  let showdownHandCategory: PokerHandCategory | null = null;
+  if (result) {
+    highlightedKeys.clear();
+    const revealedBySeat = new Map(
+      result.revealedHoleCards.map((entry) => [entry.seat, entry.cards]),
+    );
+    for (const payout of result.payouts) {
+      if (payout.amount <= 0) continue;
+      const holeCards = revealedBySeat.get(payout.seat);
+      const hand = holeCards ? evaluatedHand([...holeCards, ...result.communityCards]) : null;
+      if (!hand) continue;
+      winnerHandCategories[payout.seat] = hand.category;
+      if (payout.seat === highlightedWinnerSeat) {
+        showdownHandCategory = hand.category;
+        for (const card of hand.cards) highlightedKeys.add(cardKey(card));
+      }
+    }
+  }
+  const cardView = (card: PokerCard): PokerPlaytestCardView => ({
+    label: cardLabel(card),
+    highlighted: highlightedKeys.has(cardKey(card)),
+  });
   const revealedCardsBySeat = new Map(
-    result?.revealedHoleCards.map((entry) => [entry.seat, entry.cards.map(cardLabel)]) ?? [],
+    result?.revealedHoleCards.map((entry) => [entry.seat, entry.cards]) ?? [],
   );
   const actions: PokerPlaytestActionView[] = [];
   if (legal) {
@@ -83,7 +126,7 @@ export function buildPokerPlaytestView(
     active: snapshot.street !== null,
     street: snapshot.street,
     pot: snapshot.pots.reduce((sum, pot) => sum + pot.amount, 0),
-    communityCards: (result?.communityCards ?? snapshot.communityCards).map(cardLabel),
+    communityCards: boardCards.map(cardView),
     playerCards:
       viewerSeat === null ? [] : (snapshot.seats[viewerSeat]?.holeCards?.map(cardLabel) ?? []),
     seats: Array.from({ length: snapshot.config.numSeats }, (_, seatIndex) => {
@@ -97,7 +140,7 @@ export function buildPokerPlaytestView(
         bet: seat?.bet ?? 0,
         folded: seat?.folded ?? false,
         acting: snapshot.actorSeat === seatIndex,
-        cards: revealedCards ?? (own ? (seat?.holeCards?.map(cardLabel) ?? []) : []),
+        cards: (revealedCards ?? (own ? (seat?.holeCards ?? []) : [])).map(cardView),
         cardsVisible:
           revealedCards !== undefined ||
           Boolean(snapshot.street !== null && seat?.inHand && !seat.folded),
@@ -119,6 +162,9 @@ export function buildPokerPlaytestView(
         ? 0
         : (snapshot.lastResult?.payouts.find((payout) => payout.seat === viewerSeat)?.amount ?? 0),
     rake: snapshot.lastResult?.rake ?? 0,
+    handCategory: result ? showdownHandCategory : (viewerHand?.category ?? null),
+    winnerHandCategories,
+    highlightedWinnerSeat,
   };
 }
 

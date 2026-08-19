@@ -2,6 +2,7 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PokerAction } from '../src/sim/poker/engine';
+import { parseCards } from '../src/sim/poker/engine/cards';
 import type { PokerClientPort, PokerClientState } from '../src/sim/poker/protocol';
 import { PokerPlaytestWindow } from '../src/ui/poker_playtest_window';
 
@@ -76,6 +77,11 @@ describe('poker playtest window interaction', () => {
   it('shows two card backs for an opponent who remains in the hand', () => {
     document.body.innerHTML = '<button id=launcher></button><section id=poker></section>';
     const current = state();
+    const snapshot = current.snapshot;
+    if (!snapshot?.seats[0]) throw new Error('Poker test snapshot is missing');
+    snapshot.street = 'flop';
+    snapshot.communityCards = parseCards('Kd 9h 7c');
+    snapshot.seats[0].holeCards = parseCards('As Ad');
     const client: PokerClientPort = {
       pokerState: () => current,
       subscribe: () => () => {},
@@ -107,6 +113,8 @@ describe('poker playtest window interaction', () => {
 
     expect(root.querySelectorAll('.seat-1 .poker-card.back')).toHaveLength(2);
     expect(root.querySelector('.seat-1 .poker-seat-cards')?.textContent).not.toContain('??');
+    expect(root.querySelector('.poker-hand-name')?.textContent).toBe('Pair');
+    expect(root.querySelectorAll('.poker-card.highlighted')).toHaveLength(5);
   });
 
   it('forwards Call and a 1 BB stepped Raise through the live DOM binding', () => {
@@ -206,5 +214,85 @@ describe('poker playtest window interaction', () => {
       `[data-focus-key='wager-raise-increase']`,
     );
     expect(document.activeElement).toBe(focused);
+  });
+
+  it('shows the winning hand while keeping all board cards visible and highlighting five', () => {
+    document.body.innerHTML = '<button id=launcher></button><section id=poker></section>';
+    const current = state();
+    const snapshot = current.snapshot;
+    if (!snapshot) throw new Error('Poker test snapshot is missing');
+    snapshot.street = null;
+    snapshot.actorSeat = null;
+    snapshot.communityCards = parseCards('Kd 9h 7c 2s Kc');
+    const alice = snapshot.seats[0];
+    const bob = snapshot.seats[1];
+    if (!alice || !bob) throw new Error('Poker test seats are missing');
+    alice.holeCards = parseCards('As Ad');
+    bob.holeCards = parseCards('Qs Jd');
+    snapshot.lastResult = {
+      handNumber: 1,
+      communityCards: snapshot.communityCards,
+      pots: [{ amount: 400, eligibleSeats: [0, 1] }],
+      payouts: [{ seat: 0, playerId: 1, amount: 400 }],
+      winners: [0],
+      revealedHoleCards: [
+        { seat: 0, cards: parseCards('As Ad') },
+        { seat: 1, cards: parseCards('Qs Jd') },
+      ],
+      rake: 0,
+      rakeByPot: [0],
+    };
+    let now = 0;
+    let scheduled: (() => void) | null = null;
+    const client: PokerClientPort = {
+      pokerState: () => current,
+      subscribe: () => () => {},
+      requestTables: vi.fn(),
+      join: vi.fn(),
+      watch: vi.fn(),
+      stopWatching: vi.fn(),
+      rebuy: vi.fn(),
+      leave: vi.fn(),
+      act: vi.fn(),
+    };
+    const root = document.querySelector<HTMLElement>('#poker');
+    const launcher = document.querySelector<HTMLElement>('#launcher');
+    if (!root || !launcher) throw new Error('Poker test DOM is missing');
+    const pokerWindow = new PokerPlaytestWindow({
+      root: () => root,
+      launcher: () => launcher,
+      client,
+      closeOthers: () => {},
+      captureFocus: () => null,
+      restoreFocus: () => {},
+      sound: { deal: () => {}, turn: () => {}, showdown: () => {} },
+      now: () => now,
+      schedule: (callback) => {
+        scheduled = callback;
+        return 1;
+      },
+      cancelSchedule: () => {},
+    });
+
+    pokerWindow.toggle();
+    expect(root.querySelectorAll('.poker-board > .poker-cards .poker-card')).toHaveLength(5);
+    now = 1_000;
+    const revealResult = scheduled as (() => void) | null;
+    if (!revealResult) throw new Error('Showdown reveal was not scheduled');
+    revealResult();
+
+    expect(root.querySelector('.poker-result-banner')?.textContent).toContain(
+      'Alice Won +400 with Two Pair',
+    );
+    expect(root.querySelectorAll('.poker-card.highlighted')).toHaveLength(5);
+    expect(root.querySelectorAll('.poker-card.highlighted .visually-hidden')).toHaveLength(5);
+    expect(root.querySelector('.poker-hand-name')?.textContent).toBe('Alice: Two Pair');
+    expect(
+      root
+        .querySelector('.poker-result-banner')
+        ?.previousElementSibling?.classList.contains('poker-table-wrap'),
+    ).toBe(true);
+    expect(root.querySelector('.poker-result-banner')?.getAttribute('role')).toBe('status');
+    expect(root.querySelector('.poker-result-banner')?.getAttribute('aria-live')).toBe('polite');
   });
 });

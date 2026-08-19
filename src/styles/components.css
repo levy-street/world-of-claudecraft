@@ -5219,13 +5219,16 @@
   }
   .poker-result-banner,
   .poker-showdown-banner {
-    position: absolute;
+    position: relative;
     z-index: 10;
-    top: 50%;
     left: 50%;
+    width: max-content;
+    max-width: calc(100% - 20px);
+    box-sizing: border-box;
     min-width: 210px;
+    margin-top: 8px;
     padding: 10px 18px;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
     border: 2px solid var(--gold);
     border-radius: 8px;
     background: color-mix(in srgb, var(--color-bg-dark) 94%, transparent);
@@ -5239,6 +5242,15 @@
       0 0 16px color-mix(in srgb, var(--gold) 45%, transparent),
       var(--art-shadow-md);
     pointer-events: none;
+  }
+  .poker-hand-name {
+    min-height: 18px;
+    margin-top: 3px;
+    color: var(--gold);
+    font-family: var(--title-font);
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-shadow: 0 1px 2px var(--color-bg-dark);
   }
   .poker-showdown-banner {
     min-width: 260px;
@@ -5260,12 +5272,12 @@
   @keyframes poker-showdown-arrive {
     from {
       opacity: 0;
-      transform: translate(-50%, -50%) scale(0.82);
+      transform: translateX(-50%) scale(0.82);
       letter-spacing: 0.38em;
     }
     to {
       opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
+      transform: translateX(-50%) scale(1);
       letter-spacing: 0.18em;
     }
   }
@@ -5550,6 +5562,16 @@
   }
   .poker-card.red {
     color: var(--color-hostile);
+  }
+  .poker-card.highlighted {
+    border-color: var(--color-text-light);
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+    font-weight: 700;
+    transform: translateY(-3px);
+    box-shadow:
+      0 0 12px color-mix(in srgb, var(--gold) 72%, transparent),
+      inset 0 0 8px color-mix(in srgb, var(--gold) 18%, transparent);
   }
   .poker-card.back {
     color: var(--gold);

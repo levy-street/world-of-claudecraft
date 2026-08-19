@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { parseCards } from '../src/sim/poker/engine/cards';
 import {
   comparePokerHands,
+  evaluateBestPokerHand,
   evaluateSevenCardHand,
   type PokerHandCategory,
 } from '../src/sim/poker/engine/hand';
@@ -69,6 +70,14 @@ const STANDARD_VECTORS: Array<{
 ];
 
 describe('poker hand evaluation', () => {
+  it('selects the best five from flop through river card counts', () => {
+    expect(evaluateBestPokerHand(parseCards('As Ad Kd 9h 7c')).category).toBe('pair');
+    expect(
+      evaluateBestPokerHand(parseCards('As Ad Kd 9h 7c 2s')).cards.map((card) => card.rank),
+    ).toEqual(['A', 'A', 'K', '9', '7']);
+    expect(evaluateBestPokerHand(parseCards('As 2d 3h 4c 5s Kd Qc')).category).toBe('straight');
+  });
+
   it.each(STANDARD_VECTORS)(
     'selects the standard best five and tiebreak for $category',
     ({ cards, category, tiebreak, bestRanks }) => {
