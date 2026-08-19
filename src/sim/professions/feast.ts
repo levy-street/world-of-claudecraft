@@ -45,6 +45,7 @@ import type { SimContext } from '../sim_context';
 import {
   CONSUME_DURATION,
   CONSUME_TICKS,
+  DT,
   dist2d,
   type Entity,
   INTERACT_RANGE,
@@ -139,6 +140,14 @@ export function placeFeastAction(ctx: SimContext, p: Entity, meta: PlayerMeta): 
   e.templateId = FARM_FEAST_TEMPLATE_ID;
   e.objectItemId = null;
   e.lootable = false;
+  // The object-respawn sweep in sim.ts's entity loop treats EVERY
+  // lootable-false object as a cooling pickup (respawnTimer -= DT, re-arm
+  // at zero), which re-armed the feast one second after placement and
+  // handed the interact press to the generic object arm (found by the
+  // player-path probe). A spawn timer longer than the feast's own life
+  // keeps the sweep from ever re-arming it; the 1 Hz despawn below ends
+  // the entity long before the timer runs out.
+  e.respawnTimer = (info.durationTicks + 20) * DT;
   ctx.addEntity(e);
   ctx.feasts.set(e.id, {
     entityId: e.id,

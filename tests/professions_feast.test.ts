@@ -826,6 +826,20 @@ describe('shared feast: entry-point convergence and the sweep inverse cleanup', 
     expect(sim.countItem(FARM_FEAST_ITEM_ID, placer.pid), 'the item was spent once').toBe(0);
   });
 
+  it('the object-respawn sweep never re-arms the feast (lootable stays false for life)', () => {
+    // The player-path probe's find: sim.ts's entity loop treats every
+    // lootable-false object as a cooling pickup and re-armed the feast one
+    // second after placement, handing the interact press to the generic
+    // object arm (a silent dead press). The spawn respawnTimer outlives the
+    // feast, so the sweep can never flip it back.
+    const { sim, placer } = world(0);
+    const feastId = placeOk(sim, placer);
+    const ent = sim.entities.get(feastId);
+    expect(ent?.lootable).toBe(false);
+    tickSeconds(sim, 5); // well past the old one-second re-arm
+    expect(ent?.lootable, 'the respawn sweep must never re-arm a feast as a pickup').toBe(false);
+  });
+
   it('a FeastState whose entity vanished out from under it is reclaimed by the sweep', () => {
     // No other despawn path exists today (the sweep is the one despawn
     // site); this simulates a hypothetical external entity drop so the
