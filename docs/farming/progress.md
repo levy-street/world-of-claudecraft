@@ -3133,7 +3133,11 @@ node scripts/gate_select.mjs): "[gate:select] PASS: all 12 steps green
 timeout. Golden md5 25bd6b8774f913279c96dddb25f93403 held through the
 whole QA; hud.ts 19219/19220 and renderer.ts 13774/13774 untouched.
 
-MERGE: recorded in the merge-hash record commit on the feature branch.
+MERGE: fix/farming-phase-11-qa merged --no-ff into feature/farming-plan
+as 0bb8468cd6 (QA tip 37f773d6d2; seven commits; the branch deleted; no
+agent worktrees were created this round). NEXT: Phase 12 (shared feast,
+docs/farming/phase-12-shared-feast.md); the wellfed parity beat rides
+its feast scenario by the recorded, tick-phase-enriched deferral.
 
 ### Phase 12
 (not started)
