@@ -225,6 +225,14 @@ describe('Affliction Warlock', () => {
     );
   });
 
+  it('explains every Sentence threshold in the ability description', () => {
+    const expectedDescription =
+      'Consumes all Condemnation and Fate Threads to pass sentence on the enemy bearing your primary Evil Eye. Each Thread increases damage by 6%. At 20 Condemnation, Sentence becomes castable and deals Shadow damage that increases with Condemnation, though its level scaling weakens after level 16. At 50, it also heals you for 20% of the damage dealt. At 80, it also deals 35% damage to other enemies within 8 yd. At 100, it executes normal enemies below 20% health; against players and bosses, it instead deals 5% more damage.';
+
+    expect(ABILITIES.sentence.description).toBe(expectedDescription);
+    expect(en.entities.abilities.sentence.description).toBe(expectedDescription);
+  });
+
   it('turns Condemnation gains into bounded Litany cleave around the primary Eye', () => {
     const sim = makeAffliction();
     const primary = addTarget(sim, 10);

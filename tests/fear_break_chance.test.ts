@@ -121,7 +121,7 @@ describe('G5: damage-scaled fear break', () => {
     for (let i = 0; i < 80; i++) sim.tick();
     const aura = fearAura(mob);
     expect(aura, 'Harrow fear aura').toBeDefined();
-    expect(aura?.duration).toBe(5);
+    expect(aura?.duration).toBe(8);
     expect(aura?.breaksOnDamage).toBe(true);
     expect(aura?.breakChanceScale).toBeUndefined();
     expect(aura?.breakThreshold).toBe(8_000);
@@ -171,7 +171,7 @@ describe('G5: damage-scaled fear break', () => {
 
   it('states the 8% budget in both Warlock Fear descriptions', () => {
     expect(ABILITIES.fear.description).toBe(
-      "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect.",
+      "Strikes terror into the enemy, leaving it cowering for up to 8 sec. Damage totaling 8% of the target's maximum health breaks the effect.",
     );
     expect(ABILITIES.howl_of_terror.description).toBe(
       "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)",
@@ -266,7 +266,7 @@ describe('PvP fear diminishing returns scale the authored duration', () => {
 
   it('gives each fear its own authored duration on the first application', () => {
     const { dr, reset } = pvpRig();
-    // The generic 8 sec boundary plus Warlock Harrow and Dread Chorus 5,
+    // Warlock Harrow and the generic boundary are 8 sec, Dread Chorus is 5 sec,
     // warrior Intimidating Shout and priest Psychic Scream 4, and Death Coil 3.
     for (const authored of [8, 5, 4, 3]) {
       reset();

@@ -1516,7 +1516,7 @@ const classAbilityNamesEn = {
       [
         'sentence',
         'Sentence',
-        'Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation. Its damage scaling flattens after level 16.',
+        'Consumes all Condemnation and Fate Threads to pass sentence on the enemy bearing your primary Evil Eye. Each Thread increases damage by 6%. At 20 Condemnation, Sentence becomes castable and deals Shadow damage that increases with Condemnation, though its level scaling weakens after level 16. At 50, it also heals you for 20% of the damage dealt. At 80, it also deals 35% damage to other enemies within 8 yd. At 100, it executes normal enemies below 20% health; against players and bosses, it instead deals 5% more damage.',
       ],
       ['life_tap', 'Hard Bargain', 'Converts {damage} health into {damage} mana.'],
       [
@@ -1587,7 +1587,7 @@ const classAbilityNamesEn = {
       [
         'fear',
         'Harrow',
-        "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect.",
+        "Strikes terror into the enemy, leaving it cowering for up to 8 sec. Damage totaling 8% of the target's maximum health breaks the effect.",
       ],
       [
         'searing_pain',

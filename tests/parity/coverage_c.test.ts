@@ -117,7 +117,8 @@ describe('coverage: each scenario fires its subsystem', () => {
     // paladin consecration: a ground AoE was pushed (on-cast pulse path).
     expect((rec.sim as any).groundAoEs.length).toBeGreaterThanOrEqual(1);
     // warlock fear: the incapacitate aura landed on the warlock's mob (fear-angle draw).
-    // Harrow is now a 5s fear, so the final snapshot can arrive after expiry.
+    // Record the landing directly instead of coupling this fanout check to the
+    // final snapshot's timing relative to Harrow's authored duration.
     expect(rec.notes.warlockFearApplied).toBe(true);
     // warlock summon_imp: a pet now belongs to the warlock (summonDemon -> summonPet).
     expect(ents.some((e) => e.ownerId === rec.notes.warlockId)).toBe(true);

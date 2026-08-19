@@ -103,7 +103,7 @@ maintaining a checklist of periodic effects.
   Suffering, and Coven all provide distinct ways to generate Condemnation.
 - Sentence requires the primary Evil Eye and consumes the entire pool. Its damage and
   extra effects escalate at 20, 50, 80, and 100 Condemnation. To contain endgame burst,
-  its level scaling flattens after level 16 and reaches a 0.8 multiplier at level 20.
+  its level scaling flattens after level 16 and reaches a 0.55 multiplier at level 20.
 - Coven is the deliberate multi-target cooldown: it creates up to four temporary
   secondary Eyes, which generate at half strength and receive Sentence echoes.
 
@@ -114,7 +114,7 @@ maintaining a checklist of periodic effects.
 | 5 | Evil Eye | 15 | Instant | 1 sec | 30 | Moves the single primary Eye. Does not generate or refresh Condemnation. |
 | 5 | Maledict Gaze | Passive | -- | -- | 30 | The companion attacks the selected primary Eye for 5/9/14 Shadow damage at levels 5/12/20. Possession halves its 2.5 sec attack interval. |
 | 5 | Needle of Fate | 25/30/35 | 1.5 sec | None | 30 | Deals 18-22, 32-38, or 48-56 Shadow damage at levels 5, 12, and 20. Generates 5 on the primary Eye. |
-| 5 | Sentence | 40 | Instant | None | 30 | Requires at least 20 and the primary Eye. Consumes the full pool, uses 138/400/750/1100 base damage at 20/50/80/100, flattens its scaling after level 16, and generates 35% of normal threat. |
+| 5 | Sentence | 40 | Instant | None | 30 | Requires at least 20 and the primary Eye. Consumes the full pool, uses 138/400/620/910 base damage at 20/50/80/100, flattens its scaling after level 16, and generates 35% of normal threat. |
 | 7 | Cursed Accomplice | 40 | Instant | None | 40 | With no allied player selected, links the Maledict Eye and its Gaze generates 2. With an allied player selected, their damage to an Eye generates 3. One link; at most once every 2 sec. |
 | 9 | Consume | 40/55/70 | 5 sec channel | None | 20 | Shared Warlock spell with five ticks for 7/12/17 damage at levels 9, 14, and 20. It transfers 70% of that damage as health; Affliction transfers the full amount and generates 2 Condemnation per primary-Eye tick plus 5 on completion. |
 | 11 | Litany of Guilt | 50/65 | Instant | 20 sec | 30 | For 8 sec, Condemnation gains damage up to four other enemies within 8 yards of the primary Eye, at most once per second. |
@@ -126,11 +126,19 @@ maintaining a checklist of periodic effects.
 | 20 | Coven | 120 | Instant | 90 sec | 30 | Requires the primary Eye. Adds up to four secondary Eyes for 15 sec within 15 yards. |
 
 At 50 Condemnation, Sentence heals the Warlock for 20% of primary damage dealt. At 80,
-it also deals 35% splash damage within 8 yards. At 100, it deals 20% more damage to
+it also deals 35% splash damage within 8 yards. At 100, it deals 5% more damage to
 players and bosses, and executes non-elite normal enemies below 20% health.
 
 Secondary Eyes generate 50% of the normal amount, rounded to the nearest whole point per
 event, and receive a 35% Sentence echo. The shared resource remains capped at 100.
+
+### Localization handoff
+
+The existing keys `entities.abilities.sentence.description` and
+`entities.abilities.fear.description` were reworded to explain all four Condemnation thresholds
+and restore Harrow's 8 second duration, respectively. Their non-English overlays still contain
+the older wording and must be refreshed in the next maintainer locale pass because the pending-key
+worklist does not detect changes to an existing English value.
 
 ### Strengths
 
