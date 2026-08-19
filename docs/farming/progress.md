@@ -3402,6 +3402,14 @@ NOTES TAIL (records):
   first-pass flourish clause, the expiry arm's upper-bound-only despawn
   assertion, the rebuild arm's shared-scene note, the bounded
   inst.objectIds growth).
+- GATE (run 1, on the frozen QA tip b92918f47b): "[gate:select] PASS: all
+  12 steps green (vitest workers: 8)", mode=full fallback (562 changed
+  paths vs the release base), 2894 test files passed / 12 skipped, 40568
+  tests passed (2 expected-fail, 115 skipped), browser suite 20 files /
+  133 tests green, zero FAIL markers, no druid_engines timeout.
+- MERGED --no-ff into feature/farming-plan as caf0fdee9f (QA tip
+  b92918f47b, eight commits; branch deleted). The farming_session golden
+  md5 9dfd1c6ea073f853655e38675460e81f held through the whole round.
 
 ### Phase 13
 (not started)
