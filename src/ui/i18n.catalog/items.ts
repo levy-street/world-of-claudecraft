@@ -88,9 +88,13 @@ const itemStringsEn = {
       // when the 18s sit-restore COMPLETES (an interrupted meal forfeits it),
       // so the line states the finish-eating trigger; the aura-name fallback
       // keeps an unmapped kind from shipping a silent dish.
-      useWellfed:
-        'Use: Well Fed, +{value} {stat} for {minutes} min, granted when you finish eating.',
-      useWellfedAura: 'Use: Grants {aura} for {minutes} min when you finish eating.',
+      // No 'Use:' prefix on either wellfed line: every buff dish also carries
+      // foodHp, so the useFood sentence above it already owns the Use: slot
+      // and a second one would double the prefix on one tooltip. The buff
+      // NAME is interpolated ({aura}) through the same sim_i18n matcher the
+      // buff bar reads, so one row owns the term in every locale.
+      useWellfed: '{aura}: +{value} {stat} for {minutes} min, granted when you finish eating.',
+      useWellfedAura: 'Grants {aura} for {minutes} min when you finish eating.',
       questItem: 'Quest Item',
       // Story tooltip lines (quest_item_tooltip_view.ts): related quest title,
       // keep-rules footer, and orphaned copy when the item is no longer needed

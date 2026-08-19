@@ -2736,8 +2736,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useElixirAura':
     '使用: {aura}の効果を得て、{minutes}分間持続します。戦闘中に使用可能。',
   'itemUi.tooltip.useWellfed':
-    '使用: 食べ終えると満腹になり、{stat}が{value}上昇し、{minutes}分間持続します。',
-  'itemUi.tooltip.useWellfedAura': '使用: 食べ終えると{aura}の効果を得て、{minutes}分間持続します。',
+    '食べ終えると{aura}の効果を得て、{stat}が{value}上昇し、{minutes}分間持続します。',
+  'itemUi.tooltip.useWellfedAura': '食べ終えると{aura}の効果を得て、{minutes}分間持続します。',
   'itemUi.tooltip.clickUseInstant': 'クリックして戦闘中に即使用',
   'itemUi.tooltip.clickUse': 'クリックして使用',
   'itemUi.tooltip.clickBuyback': 'クリックして買い戻す',

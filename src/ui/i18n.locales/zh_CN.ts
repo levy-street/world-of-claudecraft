@@ -2622,8 +2622,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '使用：使你的{stat}提高 {value} 点，持续 {minutes} 分钟。战斗中可用。',
   'itemUi.tooltip.useElixirAura': '使用：获得{aura}效果，持续 {minutes} 分钟。战斗中可用。',
   'itemUi.tooltip.useWellfed':
-    '使用：吃完后获得饱足效果，使你的{stat}提高 {value} 点，持续 {minutes} 分钟。',
-  'itemUi.tooltip.useWellfedAura': '使用：吃完后获得{aura}效果，持续 {minutes} 分钟。',
+    '吃完后获得{aura}效果，使你的{stat}提高 {value} 点，持续 {minutes} 分钟。',
+  'itemUi.tooltip.useWellfedAura': '吃完后获得{aura}效果，持续 {minutes} 分钟。',
   'itemUi.tooltip.clickUseInstant': '点击在战斗中立即使用',
   'itemUi.tooltip.clickUse': '点击使用',
   'itemUi.tooltip.clickBuyback': '点击回购',

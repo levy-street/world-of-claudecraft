@@ -57,7 +57,11 @@ describe('party frame aura relevance', () => {
     );
     expect(partyFrameAuraIsRelevant({ id: 'temporal_exhaustion', kind: 'sated' })).toBe(false);
     // the live Phase 11 food-buff id: all four farming buff dishes mint it
-    expect(partyFrameAuraIsRelevant({ id: 'wellfed_buff_sta', kind: 'buff_sta' })).toBe(false);
+    // (value 12 is the capstone dish's real magnitude, so the fixture walks
+    // the predicate exactly as the live aura does)
+    expect(partyFrameAuraIsRelevant({ id: 'wellfed_buff_sta', kind: 'buff_sta', value: 12 })).toBe(
+      false,
+    );
     expect(partyFrameAuraIsRelevant({ id: 'rend', kind: 'dot' })).toBe(true);
     expect(partyFrameAuraIsRelevant({ id: 'wither', kind: 'buff_ap', neg: 1 })).toBe(true);
   });

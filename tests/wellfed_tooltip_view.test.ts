@@ -28,7 +28,7 @@ describe('wellfedTooltipLines', () => {
 
   it('glazed carrots state the buff, duration, and the finish-eating trigger', () => {
     expect(wellfedTooltipLines(ITEMS.eastbrook_glazed_carrots)).toBe(
-      '<div class="tt-desc">Use: Well Fed, +3 Stamina for 10 min, granted when you finish eating.</div>',
+      '<div class="tt-desc">Well Fed: +3 Stamina for 10 min, granted when you finish eating.</div>',
     );
   });
 
@@ -59,7 +59,7 @@ describe('wellfedTooltipLines', () => {
       wellfedDef({ aura: 'Probe', kind: 'buff_sta', value: 1234, duration: 450 }),
     );
     expect(html).toBe(
-      '<div class="tt-desc">Use: Well Fed, +1,234 Stamina for 7.5 min, granted when you finish eating.</div>',
+      '<div class="tt-desc">Probe: +1,234 Stamina for 7.5 min, granted when you finish eating.</div>',
     );
   });
 
@@ -92,7 +92,7 @@ describe('wellfedTooltipLines', () => {
       duration: 300,
     });
     expect(wellfedTooltipLines(def)).toBe(
-      '<div class="tt-desc">Use: Grants Well Fed for 5 min when you finish eating.</div>',
+      '<div class="tt-desc">Grants Well Fed for 5 min when you finish eating.</div>',
     );
   });
 

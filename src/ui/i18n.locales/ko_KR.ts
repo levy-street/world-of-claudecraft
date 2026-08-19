@@ -2714,9 +2714,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useElixirAura':
     '사용: {aura} 효과를 얻어 {minutes}분 동안 지속됩니다. 전투 중 사용 가능.',
   'itemUi.tooltip.useWellfed':
-    '사용: 다 먹으면 포만감을 얻어 {stat}이(가) {value} 증가하며 {minutes}분 동안 지속됩니다.',
-  'itemUi.tooltip.useWellfedAura':
-    '사용: 다 먹으면 {aura} 효과를 얻어 {minutes}분 동안 지속됩니다.',
+    '다 먹으면 {aura} 효과를 얻어 {stat}이(가) {value} 증가하며 {minutes}분 동안 지속됩니다.',
+  'itemUi.tooltip.useWellfedAura': '다 먹으면 {aura} 효과를 얻어 {minutes}분 동안 지속됩니다.',
   'itemUi.tooltip.clickUseInstant': '클릭하여 전투 중 즉시 사용',
   'itemUi.tooltip.clickUse': '클릭하여 사용',
   'itemUi.tooltip.clickBuyback': '클릭하여 되사기',

@@ -8,8 +8,10 @@
 // draws zero rng, and the aura is transient across save/load.
 
 import { describe, expect, it } from 'vitest';
+import { ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { Aura, Entity } from '../src/sim/types';
+import { applyWellfedOnConsumeComplete } from '../src/sim/wellfed';
 
 function playerWorld(seed = 42) {
   const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true });
@@ -64,6 +66,43 @@ describe('well fed: completion timing', () => {
     const { sim, pid, p } = playerWorld();
     eatToCompletion(sim, pid, p, 'vale_hearth_loaf');
     expect(wellfedAuras(p)).toEqual([]);
+  });
+
+  it('the food-kind guard: a drink-slot completion never mints, even for a wellfed item', () => {
+    // No shipped drink carries a wellfed field, so the guard is exercised by
+    // calling the completion hook directly with a synthetic drink-kind slot
+    // pointing at a REAL wellfed dish: the D15 food-only contract, pinned.
+    const { sim, p } = playerWorld();
+    applyWellfedOnConsumeComplete(sim.ctx, p, {
+      itemId: 'eastbrook_glazed_carrots',
+      kind: 'drink',
+      hpPer2s: 0,
+      manaPer2s: 10,
+      remaining: 0,
+      ticksElapsed: 9,
+    });
+    expect(wellfedAuras(p), 'the drink slot must not mint').toEqual([]);
+    // The same slot as food DOES mint: the guard is the only difference.
+    applyWellfedOnConsumeComplete(sim.ctx, p, {
+      itemId: 'eastbrook_glazed_carrots',
+      kind: 'food',
+      hpPer2s: 10,
+      manaPer2s: 0,
+      remaining: 0,
+      ticksElapsed: 9,
+    });
+    expect(wellfedAuras(p)).toHaveLength(1);
+  });
+
+  it('content rule: every wellfed carrier in the merged catalog is kind food', () => {
+    // The type allows wellfed on any BaseItemDef; the D15 contract keeps it
+    // on food. This sweep makes a future non-food carrier a deliberate,
+    // visible decision instead of a silent gulp-completion mint.
+    const carriers = Object.values(ITEMS).filter((def) => def.wellfed !== undefined);
+    expect(carriers.length, 'the four Phase 11 buff dishes').toBeGreaterThanOrEqual(4);
+    for (const def of carriers) {
+      expect(def.kind, `${def.id} carries wellfed but is not food`).toBe('food');
+    }
   });
 });
 

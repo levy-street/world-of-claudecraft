@@ -2766,9 +2766,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useElixirAura':
     'Использование: дает эффект "{aura}" на {minutes} мин. Можно использовать в бою.',
   'itemUi.tooltip.useWellfed':
-    'Использование: Сытость, {stat} +{value} на {minutes} мин. Эффект дается, когда вы доедаете.',
-  'itemUi.tooltip.useWellfedAura':
-    'Использование: дает эффект "{aura}" на {minutes} мин, когда вы доедаете.',
+    'Эффект "{aura}": {stat} +{value} на {minutes} мин. Дается, когда вы доедаете.',
+  'itemUi.tooltip.useWellfedAura': 'Дает эффект "{aura}" на {minutes} мин, когда вы доедаете.',
   'itemUi.tooltip.clickUseInstant': 'Нажмите, чтобы мгновенно использовать в бою',
   'itemUi.tooltip.clickUse': 'Нажмите, чтобы использовать',
   'itemUi.tooltip.clickBuyback': 'Нажмите, чтобы выкупить',

@@ -13,7 +13,7 @@
 // ever ships a silent tooltip.
 
 import type { AuraKind, ItemDef } from '../sim/types';
-import { auraDisplayNameFromSource } from './aura_display_name';
+import { auraDisplayNameForHud } from './aura_display_name';
 import { esc } from './esc';
 import { formatNumber, type TranslationKey, t } from './i18n';
 
@@ -35,19 +35,20 @@ export function wellfedTooltipLines(item: ItemDef): string {
   if (!fed) return '';
   const minutes = formatNumber(fed.duration / 60, { maximumFractionDigits: 1 });
   const statKey = WELLFED_STAT_KEYS[fed.kind];
+  // BOTH branches interpolate the buff name through the buff bar's own
+  // matcher chain (AURA_NAME_KEY first, the source prettifier as the raw
+  // fallback), so the tooltip and the buff bar can never disagree on the
+  // term in any locale; a new dish whose aura lacks its sim_i18n row ships
+  // English inside a localized sentence, which the S3 round-trip arm in
+  // tests/localization_fixes.test.ts is what prevents.
+  const aura = auraDisplayNameForHud(fed.aura, null);
   const text = statKey
     ? t('itemUi.tooltip.useWellfed', {
+        aura,
         stat: t(statKey),
         value: formatNumber(fed.value, { maximumFractionDigits: 0 }),
         minutes,
       })
-    : // The fallback localizes through the buff bar's own matcher, which
-      // returns the RAW ENGLISH aura name when no AURA_NAME_KEY row exists:
-      // a new unmapped-kind dish needs its aura's sim_i18n entry in the same
-      // change or this line ships English inside a localized sentence.
-      t('itemUi.tooltip.useWellfedAura', {
-        aura: auraDisplayNameFromSource(fed.aura),
-        minutes,
-      });
+    : t('itemUi.tooltip.useWellfedAura', { aura, minutes });
   return `<div class="tt-desc">${esc(text)}</div>`;
 }

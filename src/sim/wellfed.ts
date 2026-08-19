@@ -40,6 +40,12 @@ export function applyWellfedOnConsumeComplete(
   p: Entity,
   consumed: Consuming,
 ): void {
+  // FOOD ONLY, by contract (D15: well-fed is buff FOOD): the completion hook
+  // fires for both consume slots, so this guard is what keeps a future drink
+  // record carrying a wellfed field from silently minting at gulp completion
+  // with nothing having decided that. tests/wellfed.test.ts pins both the
+  // guard and the content-level rule (every wellfed carrier is kind 'food').
+  if (consumed.kind !== 'food') return;
   const w = ITEMS[consumed.itemId]?.wellfed;
   if (!w) return;
   // Field for field the elixir arm's applyAura call (src/sim/items.ts), with
