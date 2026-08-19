@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
+import { DUNGEONS } from '../sim/data';
 import { RIFT_TIER_COLORS, type RiftTier } from '../sim/types';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
@@ -1019,6 +1020,9 @@ export function buildDoorBody(
     ? wildheartDoorPortalMaterial(lowGfx)
     : doorPortalMaterial(entering, lowGfx);
   const portal = new THREE.Mesh(doorPortalGeometry(), portalMat);
+  // doors flagged staticDoor render a still membrane: the renderer's
+  // per-frame swirl spin and opacity pulse skip this mesh
+  if (dungeonId && DUNGEONS[dungeonId]?.staticDoor) portal.userData.staticDoor = true;
   portal.position.y = isWildheart && wildheartGate ? 4.4 : 2.15;
   portal.scale.set(
     isWildheart && wildheartGate ? 2.35 : 1,

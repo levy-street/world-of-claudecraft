@@ -376,4 +376,20 @@ describe('vale_cup hud.ts call sites', () => {
     expect(wiring).toContain('return !!match && match.team !== null;');
     expect(wiring).not.toContain('.phase');
   });
+
+  it('paints the fixed primary seat with the same sport move it casts', () => {
+    expect(hud).toContain('private firstSportAbility(): ResolvedAbility | null');
+    expect(hud).toContain('this.castSportTap(sportFirst.def.id, sportFirst.def.range);');
+    expect(hud).toContain(
+      'i === 0 && this.attackSlotIsAttack() && this.firstSportAbility() === null',
+    );
+    expect(hud).toContain('ability: () => this.firstSportAbility(),');
+    expect(hud).toContain('if (this.firstSportAbility()) {');
+    expect(hud).toContain(
+      'i === 0 && this.attackSlotIsAttack()\n                ? this.firstSportAbility()\n                : this.abilityForSlot(i)',
+    );
+    expect(hud).toContain(
+      'const sportFirst = this.firstSportAbility();\n          if (sportFirst) return this.abilityTooltip(sportFirst);',
+    );
+  });
 });

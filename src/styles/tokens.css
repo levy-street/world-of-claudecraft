@@ -283,6 +283,9 @@
     --color-map-building-chapel: #9b9080;
     --color-map-building-inn: #8a6233;
     --color-map-building-house: #7a5630;
+    --color-map-castle-wall: #9b9080;
+    --color-map-castle-tower: #b3a894;
+    --color-map-castle-court: rgba(120, 150, 96, 0.35);
     --color-map-well: #5a7fa8;
     --color-map-stall: #b07a3a;
     --color-map-tent: #9a8a5a;
@@ -505,10 +508,26 @@
      dropping the blur leaves a clean opaque panel). It is !important so it crosses
      cascade layers and wins over the opt-in frosted panels; a low-tier player then
      computes backdrop-filter:none, so the per-pixel composite over the WebGL canvas
-     never runs. Ultra/high/medium are untouched (data-fx-level only matches "low"). */
+     never runs. Ultra/high/medium are untouched (data-fx-level only matches "low").
+     The SAME removal also fires whenever the touch interface is up (body.mobile-touch),
+     independent of data-fx-level: unlike the decorative --fx-shadow glows, backdrop-filter
+     is a compositor cost, not a 3D-throughput one, so it is not something a device's chosen
+     3D quality tier predicts. The mobile-touch chrome (the always-visible button ring,
+     action ring and extra-controls modal) sits directly over the live-updating WebGL canvas,
+     so blurring it every frame is disproportionately expensive on phone-class compositors at
+     ANY graphics preset. A touch player's 3D preset only auto-floors to low on their FIRST
+     boot (src/render/gfx.ts resolveDefaultGraphicsPreset) and is never re-detected once an
+     explicit choice is recorded, so a returning player, or one who raised their preset before
+     ever seeing this glass chrome, would otherwise keep paying this cost indefinitely. This
+     touches only the glass BLUR (the chrome keeps its translucent background/border look);
+     it never lowers the 3D preset itself, so terrain/shadow/character quality stays exactly
+     what the player chose. */
   :root[data-fx-level="low"] *,
   :root[data-fx-level="low"] *::before,
-  :root[data-fx-level="low"] *::after {
+  :root[data-fx-level="low"] *::after,
+  body.mobile-touch *,
+  body.mobile-touch *::before,
+  body.mobile-touch *::after {
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
   }

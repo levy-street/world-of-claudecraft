@@ -503,6 +503,7 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'cracked_fetish',
     'cracked_ogre_tusk',
     'cracked_wyrm_scale',
+    'dawnhold_posy',
     'deepfen_pearl',
     'emberwing_cinderscale',
     'frayed_prayer_beads',

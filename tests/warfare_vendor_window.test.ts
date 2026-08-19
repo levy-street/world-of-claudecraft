@@ -167,6 +167,33 @@ describe('renderWarfareVendorWindow: focus keys are namespaced per section', () 
   });
 });
 
+describe('renderWarfareVendorWindow: painted Honor identity', () => {
+  it('renders the Honor painting in both the live balance and each purchasable price', () => {
+    const el = mount();
+    renderWarfareVendorWindow(
+      el,
+      'Draven',
+      view([section(SET_A, [offer('a_one', 'helmet')])]),
+      deps(),
+    );
+
+    const icons = [...el.querySelectorAll<HTMLImageElement>('img.currency-honor')];
+    expect(icons).toHaveLength(2);
+    expect(
+      icons.map((image) => ({
+        src: image.getAttribute('src'),
+        alt: image.getAttribute('alt'),
+        draggable: image.getAttribute('draggable'),
+      })),
+    ).toEqual([
+      { src: '/ui/currency/honor.webp', alt: '', draggable: 'false' },
+      { src: '/ui/currency/honor.webp', alt: '', draggable: 'false' },
+    ]);
+    expect(icons[0].closest('.warfare-balance')).not.toBeNull();
+    expect(icons[1].closest('.warfare-price')).not.toBeNull();
+  });
+});
+
 describe('renderWarfareVendorWindow: the focus ladder across an uninitiated repaint', () => {
   it('keeps the exact tile when it comes back enabled', () => {
     const el = mount();

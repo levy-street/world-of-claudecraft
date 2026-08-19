@@ -5,8 +5,8 @@
     "baselineCommit": "aee195551b5aef628eb7a72192117d7e3079818e",
     "branch": "feature/placeholder-art-completion-v036",
     "shippingDirectory": "public/ui/items",
-    "itemArtFilesReviewed": 906,
-    "liveItemDefinitions": 921,
+    "itemArtFilesReviewed": 907,
+    "liveItemDefinitions": 922,
     "generatedHeroicDefinitions": 64,
     "heroicDefinitionsWithOwnWebp": 48,
     "heroicWeaponArtAliases": 16,
@@ -304,7 +304,7 @@
       "flask": 3,
       "food": 24,
       "held_offhand": 14,
-      "junk": 92,
+      "junk": 93,
       "mount": 9,
       "potion": 13,
       "quest": 97,
@@ -393,7 +393,7 @@
   },
   "visualVerdict": {
     "status": "pass",
-    "passCount": 906,
+    "passCount": 907,
     "passIds": [
       "abyssal_loop",
       "abysswrought_band",
@@ -538,6 +538,7 @@
       "cultist_flayer",
       "curved_tusk",
       "cyan_magenta_armor_plate",
+      "dawnhold_posy",
       "deacon_reliquary_helm",
       "deacons_cleaver",
       "deathless_greatblade",
@@ -1306,7 +1307,7 @@
     "watch": [],
     "rejectCount": 0,
     "reject": [],
-    "summary": "All 906 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the three Masterwrought material placeholders (wyrmfall_core, sundered_essence, makers_ember) flattened onto the opaque house ground and reviewed at the feature/masterwrought v0.36.0 sync on 2026-08-10, plus the nine Masterwrought jewelcrafting placeholders (hammered_copper_band, polished_copper_loop, coiled_copper_torc, riveted_iron_signet, etched_iron_loop, iron_link_choker, weighted_thorium_band, gleaming_thorium_loop, burnished_thorium_amulet) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 05 jewelcrafting admission on 2026-08-10, plus the six Masterwrought inscription placeholders (silverleaf_primer, goldleaf_folio, sunpetal_grimoire, silverleaf_scroll, goldleaf_scroll, sunpetal_scroll) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 06 inscription admission on 2026-08-11, plus the ten Masterwrought skill-75 intermediate placeholders (duskforged_billet, forgefold_plating, wyrmhide_cording, sunspun_bolt, prismglass_setting, precision_chassis, quickening_catalyst, seasoned_stock, lucent_reagent, sablewax_vellum) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 07 intermediates admission on 2026-08-11, plus the ten Masterwrought apex armor placeholders (spiritweld_girdle, forgefold_legguards, wardspeaker_sabatons, briarstep_jerkin, fenbloom_breeches, barksong_handguards, sunspun_vestments, sunspun_leggings, sunspun_handwraps, sunspun_haversack) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 08 apex armor admission on 2026-08-12, plus the ten Masterwrought apex weapon, jewelry, and tool placeholders (duskforged_warblade, duskforged_bulwark, ridgebreaker, wyrmfall_pendant, warhewn_signet, prismglass_loop, makers_charm, gyrelens_array, masters_field_forge, voidbound_grimoire) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 09 apex weapons, jewelry, and tools admission on 2026-08-13, plus the eight Masterwrought apex consumable and station placeholders (ironhusk_flask, warboar_flask, runewater_flask, stonepot_stew, warspice_skewers, sageleaf_chowder, grand_cauldron, laden_hearth) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 10 apex consumables admission on 2026-08-14, plus the 28 Masterwrought apex recipe pattern placeholders (pattern_barksong_handguards, pattern_briarstep_jerkin, pattern_duskforged_bulwark, pattern_duskforged_warblade, pattern_fenbloom_breeches, pattern_forgefold_legguards, pattern_grand_cauldron, pattern_gyrelens_array, pattern_ironhusk_flask, pattern_laden_hearth, pattern_makers_charm, pattern_masters_field_forge, pattern_prismglass_loop, pattern_ridgebreaker, pattern_runewater_flask, pattern_sageleaf_chowder, pattern_spiritweld_girdle, pattern_stonepot_stew, pattern_sunspun_handwraps, pattern_sunspun_haversack, pattern_sunspun_leggings, pattern_sunspun_vestments, pattern_voidbound_grimoire, pattern_warboar_flask, pattern_wardspeaker_sabatons, pattern_warhewn_signet, pattern_warspice_skewers, pattern_wyrmfall_pendant) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 11 apex patterns admission on 2026-08-16."
+    "summary": "All 907 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the three Masterwrought material placeholders (wyrmfall_core, sundered_essence, makers_ember) flattened onto the opaque house ground and reviewed at the feature/masterwrought v0.36.0 sync on 2026-08-10, plus the nine Masterwrought jewelcrafting placeholders (hammered_copper_band, polished_copper_loop, coiled_copper_torc, riveted_iron_signet, etched_iron_loop, iron_link_choker, weighted_thorium_band, gleaming_thorium_loop, burnished_thorium_amulet) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 05 jewelcrafting admission on 2026-08-10, plus the six Masterwrought inscription placeholders (silverleaf_primer, goldleaf_folio, sunpetal_grimoire, silverleaf_scroll, goldleaf_scroll, sunpetal_scroll) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 06 inscription admission on 2026-08-11, plus the ten Masterwrought skill-75 intermediate placeholders (duskforged_billet, forgefold_plating, wyrmhide_cording, sunspun_bolt, prismglass_setting, precision_chassis, quickening_catalyst, seasoned_stock, lucent_reagent, sablewax_vellum) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 07 intermediates admission on 2026-08-11, plus the ten Masterwrought apex armor placeholders (spiritweld_girdle, forgefold_legguards, wardspeaker_sabatons, briarstep_jerkin, fenbloom_breeches, barksong_handguards, sunspun_vestments, sunspun_leggings, sunspun_handwraps, sunspun_haversack) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 08 apex armor admission on 2026-08-12, plus the ten Masterwrought apex weapon, jewelry, and tool placeholders (duskforged_warblade, duskforged_bulwark, ridgebreaker, wyrmfall_pendant, warhewn_signet, prismglass_loop, makers_charm, gyrelens_array, masters_field_forge, voidbound_grimoire) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 09 apex weapons, jewelry, and tools admission on 2026-08-13, plus the eight Masterwrought apex consumable and station placeholders (ironhusk_flask, warboar_flask, runewater_flask, stonepot_stew, warspice_skewers, sageleaf_chowder, grand_cauldron, laden_hearth) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 10 apex consumables admission on 2026-08-14, plus the 28 Masterwrought apex recipe pattern placeholders (pattern_barksong_handguards, pattern_briarstep_jerkin, pattern_duskforged_bulwark, pattern_duskforged_warblade, pattern_fenbloom_breeches, pattern_forgefold_legguards, pattern_grand_cauldron, pattern_gyrelens_array, pattern_ironhusk_flask, pattern_laden_hearth, pattern_makers_charm, pattern_masters_field_forge, pattern_prismglass_loop, pattern_ridgebreaker, pattern_runewater_flask, pattern_sageleaf_chowder, pattern_spiritweld_girdle, pattern_stonepot_stew, pattern_sunspun_handwraps, pattern_sunspun_haversack, pattern_sunspun_leggings, pattern_sunspun_vestments, pattern_voidbound_grimoire, pattern_warboar_flask, pattern_wardspeaker_sabatons, pattern_warhewn_signet, pattern_warspice_skewers, pattern_wyrmfall_pendant) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 11 apex patterns admission on 2026-08-16."
   },
   "nonVisualContentWatch": [
     {
@@ -1463,8 +1464,8 @@
   "evidence": {
     "catalog": {
       "path": "tmp/imagegen/item-art-consistency/final-audit/catalog.json",
-      "sha256": "82667558927c9485704392f2f336678f4fdb3b8a78c5de1a08d9805971ba1d36",
-      "bytes": 497520
+      "sha256": "1a7f563f4eac92cfbb3e81eb2ee81f0bcd4550e001a62bb7b9ea20fa57486ef4",
+      "bytes": 498026
     },
     "rendererFingerprint": "fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082",
     "sheetCount": 232,
@@ -1478,7 +1479,7 @@
       "small-multiview": 29,
       "identity": 29
     },
-    "sheetSetSha256": "42c30b18a770f46a05d2cfa17bc552fc81654ea446840a79d9af03b1dcf874ed",
+    "sheetSetSha256": "667e2e02123bd6375970f1452e1dd6e9343446ebb170975d755897d37bcaec80",
     "sheets": [
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--128-color.png",
@@ -2570,128 +2571,128 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p01--128-color.png",
-        "sha256": "196bb3ed923752c417a5af0b9875ed008e2a51ceb8ea41b3ddc9d8cc6d6bd476",
-        "bytes": 2340047,
+        "sha256": "9ce38e1d5fa3019b892f20e9f2b5449f74b8d19af5ad142ffb07137915188e42",
+        "bytes": 2329731,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p01--40-color.png",
-        "sha256": "1231551d800c9eca5f8078157b532beac18fca369792ae9e2f86b1da6dac4ea1",
-        "bytes": 437300,
+        "sha256": "a96658d2acbe4fe41417e5f1f9068efe1d4b69fdd2736ce2bc0092b23b433a17",
+        "bytes": 436166,
         "width": 1600,
         "height": 1020,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p01--28-color.png",
-        "sha256": "47f5414dab904f00fe36ae92d50190d6c603c5e9144fd1d8cc44c8c58bec5c65",
-        "bytes": 293452,
+        "sha256": "c3e7958650cc63bb57e9eedaeec02f2137ac371d87e77d7346cb83adda39ee6d",
+        "bytes": 292993,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p01--22-color.png",
-        "sha256": "41bdc8858923dd9969b033c3b329449527bb5944af4a2e7b2ef2eb299767fc27",
-        "bytes": 224401,
+        "sha256": "10f6d0d6507a033c91b433e5d3993416623efeac2739612636ce8d14909e90d2",
+        "bytes": 224402,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p01--28-grayscale.png",
-        "sha256": "7fdea07c6acbd9976da251a4f8f76a7f292b1e29a9b0fa4c6006051dedcf187b",
-        "bytes": 206388,
+        "sha256": "279d7ee87b8438f6e09c3c636890ceadedb836eefc5c8643d98bc1fa3916664f",
+        "bytes": 206369,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p01--64-circle.png",
-        "sha256": "c658aa67595600a5afac6cd725d198537d1a43943050207f1365b0b9004f2312",
-        "bytes": 754057,
+        "sha256": "922e93b8b216b36c474e8b27206d4e22889cc31c02251bca09b6d23168506924",
+        "bytes": 752201,
         "width": 1600,
         "height": 1372,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p01--small-multiview.png",
-        "sha256": "f7c9faf298918fa0777b87b3da9dd60e7f73e7fbb14e89a6083a02667560575e",
-        "bytes": 1403632,
+        "sha256": "8bfb34e426df6821cae9ef9d5c16a73495bd1c50ab55cad5780bd114275c6dd9",
+        "bytes": 1399292,
         "width": 1800,
         "height": 1788,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p01--identity.png",
-        "sha256": "0c8fdbd261d4be209fa6b413c289acf25b1293aecbfb458b95834cff8cfde6b4",
-        "bytes": 2417592,
+        "sha256": "7ddf57b7235744fca505e505911125563ac47ee4c8754ae461e88f4fb77cfc45",
+        "bytes": 2408837,
         "width": 1800,
         "height": 1676,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p02--128-color.png",
-        "sha256": "dddc7dc2ad570f9b9467b39a969adeb1d1ae20050e9afa2c9617ef4f1b9d1910",
-        "bytes": 316142,
+        "sha256": "6592d3189bea64c0f40ed96c5c0a78b2f2958fce69a4d68f027dad3b775320ac",
+        "bytes": 344971,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p02--40-color.png",
-        "sha256": "608e01e53c616fd1bf797287b2de9867aafe6e6022d4a8587e13642b098f2cb8",
-        "bytes": 67553,
+        "sha256": "5244b4c9bd1f9f18a9d421a36fc637b4a02c916e478ee0a50a23669c2903cb6e",
+        "bytes": 72776,
         "width": 1600,
         "height": 288,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p02--28-color.png",
-        "sha256": "25f66a46de29783f71565f800873a96cbe91c6ad737beb3a3914da868788a983",
-        "bytes": 48370,
+        "sha256": "6f8e42f73526c81deb2cf5d39119affd8efd121072b72b0d7be5dca6e433967f",
+        "bytes": 51909,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p02--22-color.png",
-        "sha256": "4275a5b7d0c1f2ef24d2f46b19c4fdcb339ba8ba4c5d36c150e0a862318f4e34",
-        "bytes": 38288,
+        "sha256": "fbb847e07322b61003fb982057d802b328ad36a14a8ff9ed5a884184cddbe8b4",
+        "bytes": 40902,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p02--28-grayscale.png",
-        "sha256": "7f500eba156dea6ae6370821079e0691889925fe83f6c3e2b83ceb9be94ff64a",
-        "bytes": 36337,
+        "sha256": "d00c07911ac6260de1f12ec0bd6a058e41a56470b751551127b0cbdcd679d417",
+        "bytes": 39046,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p02--64-circle.png",
-        "sha256": "51e6f905194da9a6ff8a206c51b40f752aee6b22c29682ea22a35e79182b297b",
-        "bytes": 110428,
+        "sha256": "f95ae642f8e9e157b4a7a61d2cea12b4fa03b1b214d703bafaf52e28523a83a2",
+        "bytes": 119590,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p02--small-multiview.png",
-        "sha256": "808ad384724d7399ba63a4e35bfe97f4c83ae7b4290a675164cd023c83679c52",
-        "bytes": 206743,
+        "sha256": "1b2288676cd00133dc9db64278faf559523cebd0b507568e8a31d6382390886f",
+        "bytes": 224580,
         "width": 1800,
         "height": 480,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/junk--p02--identity.png",
-        "sha256": "7aa4a28e02764f377ee79f96b28f17aa34f5af5f59e819a6874b1ca231d3fa46",
-        "bytes": 331897,
+        "sha256": "5980646ca3414d9aaca15e3e610b859a1dd9cc0086e28eca140ee404c516b266",
+        "bytes": 361191,
         "width": 1800,
         "height": 452,
         "format": "png"
@@ -3337,6 +3338,6 @@
         "format": "png"
       }
     ],
-    "shippingCatalogSha256": "1039f0a12f6ee207a0469ee276808748cd2054254afd3be02351bbf494908fab"
+    "shippingCatalogSha256": "71d66ce297b6c82b98f27bbc8b67df042136a6e00740eef488107bb90a215a30"
   }
 }

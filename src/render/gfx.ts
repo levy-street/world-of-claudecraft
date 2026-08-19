@@ -188,6 +188,13 @@ export interface GfxSettings {
   readonly aoFullRes: boolean;
   /** SMAA tail pass on the grade/composer output */
   readonly smaa: boolean;
+  /**
+   * FXAA fused into the output grade pass, the edge AA the region-safe
+   * grade-only chain can carry: a tail pass is full-frame and would cost that
+   * chain its dynamic resolution. Mutually exclusive with `smaa`, and
+   * meaningless without `gradePass`.
+   */
+  readonly fxaa: boolean;
   /** UnrealBloom pass on the composer */
   readonly bloom: boolean;
   /** terrain meshes cast into the sun shadow map */
@@ -1055,6 +1062,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
           : 0,
     aoFullRes: gfxTierAtLeast(tier, 'ultra'),
     smaa: aaPolicy.postAa === 'smaa',
+    fxaa: aaPolicy.postAa === 'fxaa-grade',
     bloom: !iosMemoryProfile && gfxTierAtLeast(tier, 'high'),
     terrainCastShadows: tier !== 'low' && !constrainedMemory,
     lowPlus,
@@ -1224,7 +1232,8 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
       settings = { ...settings, surfaceDetailTaps: 3, surfaceDetailClampK: 0.85 };
     else settings = { ...settings, surfaceDetailTaps: 4, surfaceDetailClampK: 1 };
     // Effects & Lighting: Low is the region-safe grade-only mini composer (the
-    // medium tier's post profile, without full-frame SMAA); Medium adds N8AO; High the full
+    // medium tier's post profile, with the grade-fused FXAA in place of
+    // full-frame SMAA); Medium adds N8AO; High the full
     // high-tier stack (AO + bloom + SMAA). The level-0 test keeps the shared
     // EFFECTS_QUALITY_LOW_CUTOFF constant so the HUD effect tier and the 3D
     // renderer still downgrade at the same threshold.
@@ -1239,6 +1248,12 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
         aoFullRes: false,
         bloom: false,
         smaa: false,
+        // Dropping to the grade-only chain drops the SMAA tail with it, so the
+        // fused arm is what keeps this mix anti-aliased at all. Granted on any
+        // device whose policy grants post AA, not just the medium tier's own
+        // 'fxaa-grade': a memory-tight profile whose policy is 'none' still
+        // gets nothing. The AA dial below then applies.
+        fxaa: aaPolicy.postAa !== 'none',
         maxPointLights: Math.min(settings.maxPointLights, 3),
       };
     else if (effectsValue < 0.75)
@@ -1257,8 +1272,9 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     // Per-effect switches (round 12), layered AFTER Effects & Lighting and
     // authoritative over its per-effect writes: Effects & Lighting stays the
     // post-CHAIN master (its Low arm sheds the composer, and with no composer
-    // there is no pass to run these on, so the whole block is skipped there),
-    // while these dials own the individual passes. A pre-round-12 mix stores
+    // there is no pass for AO or bloom to run on, so this block is skipped
+    // there and the else arm below takes over for the one dial that still has
+    // something to control), while these dials own the individual passes. A pre-round-12 mix stores
     // no values for them, so each dial's absent default DERIVES from the
     // stored effectsQuality and reproduces the old bundle byte for byte. The
     // AA dial can only DISABLE what the device policy grants (a memory-tight
@@ -1277,6 +1293,15 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
         bloom: bloomDial >= 0.5,
         smaa: aaPolicy.postAa === 'smaa' && aaDial >= 0.5,
       };
+    } else {
+      // The grade-fused FXAA is the only edge AA a grade-only mix can carry, so
+      // it answers to the same AA dial, which the block above cannot reach: that
+      // one is gated on a composer this mix has none of. Disable-only there,
+      // disable-only here. Its default is ON rather than deriving from
+      // effectsQuality, because this arm is new: there is no stored pre-round-12
+      // mix of it to reproduce byte for byte, and a grade-only mix that silently
+      // opted out of AA would be the surprising reading.
+      settings = { ...settings, fxaa: settings.fxaa && (hints.antiAliasing ?? 1) >= 0.5 };
     }
     // View Distance / Water Quality: whole-tier remaps for the two subsystems
     // that plan against a tier (the far-field policy still applies its own

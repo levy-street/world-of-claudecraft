@@ -28,6 +28,7 @@
 // are honest data and a future caller may want them; this painter simply renders
 // none of it.
 
+import { currencyIconHtml } from '../../currency_art';
 import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName, tEntity } from '../../entity_i18n';
 import { esc } from '../../esc';
@@ -94,7 +95,7 @@ function appendOfferTile(
   const ownedMark = owned
     ? `<span class="vi-sub">${esc(t('hudChrome.warfareShop.owned'))}</span>`
     : '';
-  tile.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}${ownedMark}</span><span class="vi-price"><span class="warfare-price${affordable ? '' : ' unaffordable'}">${esc(price)}</span></span>`;
+  tile.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}${ownedMark}</span><span class="vi-price"><span class="warfare-price${affordable ? '' : ' unaffordable'}">${currencyIconHtml('honor')}${esc(price)}</span></span>`;
   tile.addEventListener('click', () => deps.onBuy(itemId));
   deps.attachTooltip(
     tile,
@@ -132,7 +133,7 @@ export function renderWarfareVendorWindow(
 
   const balance = document.createElement('div');
   balance.className = 'warfare-balance';
-  balance.textContent = t('hudChrome.warfare.balance', { amount: count(view.balance) });
+  balance.innerHTML = `${currencyIconHtml('honor')}${esc(t('hudChrome.warfare.balance', { amount: count(view.balance) }))}`;
   el.appendChild(balance);
 
   for (const section of view.sections) {

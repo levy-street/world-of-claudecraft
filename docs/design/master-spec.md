@@ -175,7 +175,7 @@ vael_the_mistcaller (0,98)  tidebound_acolyte (-4,96)  bastion_revenant (4,96)
 | raised_bonewalker | Raised Bonewalker | undead | 18 | (summoned add) | 42/15 | 9/2.2 | 2.2 | no loot; Velkhar's summonAdds target |
 | korgath_the_bound | Korgath the Bound | ogre | 20 | elite, miniboss | 260/36 | 14/2.9 | 2.8 | **enrage** {belowHpPct 0.30, dmgMult 1.5}; copper 5000; korgaths_chainwraps 0.5 |
 | grand_necromancer_velkhar | Grand Necromancer Velkhar | humanoid | 20 | elite, miniboss | 230/33 | 13/2.8 | 2.0 | **summonAdds** {raised_bonewalker, 3, [0.66,0.33]}; copper 5000; boneguard_breastplate 0.33; shadowmeld_tunic 0.33; staff_of_velkhar 0.34 |
-| korzul_the_gravewyrm | Korzul the Gravewyrm | dragonkin | 20 | elite, boss | 420/48 | 15/3.0 | 2.6 | aoePulse {30,42,r14,every8,'Necrotic Shockwave'} + **enrage** {0.30, 1.5}; copper 50000; wyrmfang_greatblade 0.34; staff_of_the_gravewyrm 0.33; fang_of_korzul 0.33 |
+| korzul_the_gravewyrm | Korzul the Gravewyrm | dragonkin | 20 | elite, boss | 420/48 | 15/3.0 | 2.6 | aoePulse {30,42,r14,every8,'Necrotic Shockwave'} + **enrage** {0.30, 1.5}; copper 15000; wyrmfang_greatblade 0.34; staff_of_the_gravewyrm 0.33; fang_of_korzul 0.33 |
 
 ## Camps sketch
 
@@ -265,7 +265,7 @@ korzul_the_gravewyrm (0,146)  sanctum_drakonid (-5,144) (5,144)
 
 **Boss mechanics summary** (only 2 NEW sim mechanics across the whole expansion, both deterministic, both also used in the Bastion — see §7): summonAdds (Vael, Velkhar), enrage (Korgath, Korzul). aoePulse reused everywhere (Voss, Vael, Drogmar, Korzul). Frontal breath DEFERRED (facing-cone math not worth it).
 
-**Loot:** Korgath → korgaths_chainwraps (50%) + 50s coin. Velkhar → one of three blues (boneguard_breastplate / staff_of_velkhar / shadowmeld_tunic) + 50s. Korzul → one of three EPIC weapons (wyrmfang_greatblade / staff_of_the_gravewyrm / fang_of_korzul, ~1/3 each) + 5g coin. Quest blues (q_gravewyrm chest pieces) guarantee every archetype a best-in-slot chest on completion. Trash: 3–3.5s coin/elite + junk.
+**Loot:** Korgath → korgaths_chainwraps (50%) + 50s coin. Velkhar → one of three blues (boneguard_breastplate / staff_of_velkhar / shadowmeld_tunic) + 50s. Korzul → one of three EPIC weapons (wyrmfang_greatblade / staff_of_the_gravewyrm / fang_of_korzul, ~1/3 each) + 1.5g coin. Quest blues (q_gravewyrm chest pieces) guarantee every archetype a best-in-slot chest on completion. Trash: 3 to 3.5s coin/elite + junk.
 
 **XP reality (corrected per judge verdict):** full clear = 18 trash × (140×2×1.43÷5 ≈ 80) + 3 bosses ≈ **1,700 XP/member**. A loot/story event — the level-20 push comes from the lead-up chain, by design.
 

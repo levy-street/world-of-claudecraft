@@ -45,12 +45,19 @@ const COIN_FAMILIES = new Set([
   'elemental',
   'burrower',
 ]);
-/** Families that pay in harvestable components rather than coin. */
+/**
+ * Families whose trash is held to the harvest rule below (usable components)
+ * instead of the coin curve. Most of them still carry a small flavor purse
+ * (24 of the 25 tagged templates today, e.g. snowdrift_wolf at 80c beside its
+ * hide/fang/meat); that coin is simply not curve-governed, components are the
+ * payment the rule enforces.
+ */
 const HARVEST_FAMILIES = new Set(['beast', 'spider', 'reptile']);
 /**
  * Evergarden and Galecrest topiary are garden CONSTRUCTS typed as beasts: they
  * are clipped hedge, so they carry coin (the gardeners' lost pay) and have no
- * hide or meat to take. The only sanctioned exception to the harvest rule.
+ * hide or meat to take. The only sanctioned exception to the components
+ * requirement, which is why governed() below excludes them.
  */
 const HEDGE_CONSTRUCTS = new Set(['topiary_stag', 'topiary_wolf', 'the_topiary_bull']);
 
@@ -190,7 +197,7 @@ describe('coin-family trash sits on the coin curve', () => {
   });
 });
 
-describe('harvest-family trash carries usable components instead of coin', () => {
+describe('harvest-family trash carries usable components', () => {
   const governed = () =>
     campTemplates().filter(
       ({ template }) =>

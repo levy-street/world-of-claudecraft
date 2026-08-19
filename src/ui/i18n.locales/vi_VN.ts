@@ -2,6 +2,22 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const vi_VN: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formsAutoUnshift': 'Một phép hồi máu hoặc phép gây sát thương thi triển khi đang ở dạng thú sẽ tự đưa bạn ra khỏi dạng đó. Rời dạng theo cách này miễn phí và không tốn hồi chiêu toàn cục, nên phép tức thời phát ra ngay khi bạn bấm. Vào lại dạng là một kỹ năng bình thường, vẫn tốn mana và hồi chiêu toàn cục.',
+  'entities.mobs.heroic_boss_dummy.name': 'Hình Nộm Trùm Anh Hùng',
+  'entities.mobs.normal_boss_dummy.name': 'Hình Nộm Trùm Thường',
+  'entities.mobs.friendly_player_dummy.name': 'Hình Nộm Người Chơi Đồng Minh',
+  'entities.items.dawnhold_posy.name': 'Bó Hoa Vườn Dawnhold',
+  'entities.dungeons.dawnhold_castle.leaveText': 'Bạn lách ra ngoài, trở lại bãi cỏ vườn ngập nắng.',
+  'entities.dungeons.dawnhold_castle.enterText': 'Bạn bước vào những sảnh đường ấm áp, thơm ngát hương hoa của Lâu Đài Dawnhold.',
+  'entities.dungeons.dawnhold_castle.name': 'Lâu Đài Dawnhold',
+  'hudChrome.lastkeepMap.story.tower': 'Tháp Canh',
+  'hudChrome.lastkeepMap.story.residence': 'Tầng Sinh Hoạt',
+  'hudChrome.lastkeepMap.story.state': 'Tầng Nghi Lễ',
+  'hudChrome.lastkeepMap.story.undercroft': 'Tầng Hầm',
+  'hudChrome.lastkeepMap.title': '{keep}: {story}',
+  'hudChrome.dawnholdMap.story.solar': 'Phòng Nắng',
+  'hudChrome.dawnholdMap.story.ground': 'Tầng Vườn',
+  'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.social.chanBattleground': 'Chiến Trường.',
   'guide.social.chanBattlegroundBody': 'Trò chuyện với mọi người tham chiến trong chiến trường của bạn, cả hai phe. Chỉ trong khi trận đấu đang diễn ra.',
   'hud.chat.templates.battleground': '[Chiến Trường] {name}: {message}',
@@ -4240,7 +4256,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Xuyên Phá Giáp',
   'entities.abilities.faerie_fire.name': 'Ánh Ma Trơi',
   'entities.abilities.fear.description':
-    'Gieo nỗi kinh hoàng vào kẻ địch, khiến nó co rúm sợ hãi trong tối đa 8 giây. Mọi sát thương sẽ phá vỡ hiệu ứng.',
+    'Gieo nỗi kinh hoàng vào kẻ địch, khiến nó co rúm sợ hãi trong tối đa 5 giây. Tổng sát thương bằng 8% máu tối đa của mục tiêu sẽ phá vỡ hiệu ứng.',
   'entities.abilities.fear.name': 'Giày Vò',
   'entities.abilities.ferocious_bite.name': 'Cắn Xé Máu',
   'entities.abilities.fire_blast.description':
@@ -4366,7 +4382,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.power_word_shield.description': 'Khiên chắn cho một mục tiêu đồng minh, hấp thụ {damage} sát thương trong 30 giây. Kỷ Luật còn liên kết mục tiêu ấy với sát thương Thần Thánh của bạn trong 30 giây.',
   'entities.abilities.power_word_shield.name': 'Thánh Thi Hộ Mệnh',
   'entities.abilities.prowl.description':
-    'Vào trạng thái ẩn thân khi ở Hình Sói, di chuyển chậm hơn 50%. Không thể dùng trong chiến đấu.',
+    'Vào trạng thái ẩn thân khi ở Hình Sói, di chuyển chậm hơn 5%. Không thể dùng trong chiến đấu.',
   'entities.abilities.prowl.name': 'Rình Rập',
   'entities.abilities.pyroblast.description':
     'Ném ra một tảng lửa khổng lồ gây {damage} sát thương Hỏa cùng sát thương cộng dồn theo thời gian.',
@@ -4463,7 +4479,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Giáng đòn lên các kẻ địch lân cận gây {damage} sát thương và làm chậm 10% đòn tấn công của chúng trong 10 giây.',
   'entities.abilities.thunder_clap.name': 'Đòn Chấn Rung',
   'entities.abilities.tigers_fury.description':
-    'Tăng {buff} sức mạnh tấn công trong {duration} giây. Chỉ dùng được ở Hình Sói.',
+    'Trào dâng {rage} năng lượng và tăng {buff} sức mạnh tấn công trong {duration} giây. Chỉ dùng được ở Hình Sói.',
   'entities.abilities.tigers_fury.name': 'Huyết Sói',
   'entities.abilities.travel_form.description':
     'Tức thì biến thành Fleet Form nhanh nhẹn, tăng 40% tốc độ di chuyển. Bạn không thể dùng các kỹ năng khác khi đã biến hình, nhưng có thể biến hình trong hoặc ngoài chiến đấu, lý tưởng để chạy trốn.',
@@ -4515,9 +4531,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.name': 'Dạng Cú Mặt Trăng',
   'entities.abilities.moonkin_form.description':
     'Nhận dạng cú mặt trăng, cường hóa thi triển phép cho đến khi bạn đổi lại. Thi triển lần nữa để trở về dạng thường. (dấu ấn Cân Bằng)',
-  'entities.abilities.feral_charge.name': 'Xung Phong Hoang Dã',
+  'entities.abilities.feral_charge.name': 'Dâng Trào Nguyên Thủy',
   'entities.abilities.feral_charge.description':
-    'Xung phong vào kẻ địch và trói chân chúng trong 1 giây. Tầm 8-25 m. (dấu ấn Hoang Dã)',
+    'Giải phóng một đợt dâng trào nguyên thủy. Trong Hình Sói, tốc độ hồi Năng Lượng tăng 100% trong 10 giây. Trong Hình Bruin, lập tức tạo 50 Nộ Khí. (dấu ấn Hoang Dã)',
   'entities.abilities.swiftmend.name': 'Hồi Phục Nhanh',
   'entities.abilities.crusader_strike.description':
     'Đánh mục tiêu bằng sát thương vũ khí cộng {damage} sát thương Thánh. (tài năng Paladin)',
@@ -9228,6 +9244,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'sim.delve.unknownTier': 'Cấp bậc hầm thám hiểm không xác định.',
   'sim.delve.wayOutNotOpen': 'Lối ra vẫn chưa mở.',
   'sim.delve.whileTrading': 'Bạn không thể vào hầm thám hiểm khi đang giao dịch.',
+  'sim.delve.enemiesRemain': 'Hãy đánh bại những kẻ địch còn lại trước.',
   'sim.lockpick.alreadyInProgress': 'Đã có người đang cạy ổ khóa.',
   'sim.lockpick.cannotPickThat': 'Bạn không thể cạy thứ đó.',
   'sim.lockpick.chooseAnte': 'Chọn 1, 2 hoặc 3 cây cạy.',
@@ -10712,18 +10729,19 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deterrence.description':
     'Tăng 50 điểm phần trăm khả năng né tránh của bạn trong 10 giây. (thiên phú Thợ săn)',
   'entities.abilities.earthbind.description': 'Trói chân kẻ địch trong 4 m quanh điểm mục tiêu suốt 2 giây, rồi làm chậm chúng 40% trong 6 giây. (Thiên phú pháp sư tự nhiên)',
-  'entities.abilities.evocation.description': 'Restaura mana rápidamente. (thiên phú pháp sư)',
+  'entities.abilities.evocation.description':
+    'Vận sức trong 6 giây: mỗi giây hồi 100 mana và cộng dồn 8 sức mạnh phép thuật. Hiệu ứng cộng dồn trong khi vận sức và kéo dài 15 giây. (thiên phú pháp sư)',
   'entities.abilities.frenzied_regeneration.description':
-    'Hồi 180 máu trong 10 giây. Chỉ dùng được ở Dạng Gấu. (thiên phú Druid)',
+    'Hồi 40% máu tối đa trong 10 giây. Chỉ dùng được ở Dạng Gấu. (thiên phú Druid)',
   'entities.abilities.frost_trap.description':
     'Đóng băng kẻ địch trong khu vực mục tiêu trong 3 giây, khiến chúng không thể di chuyển hoặc hành động. (thiên phú Thợ săn)',
   'entities.abilities.hammer_of_wrath.description': 'Phóng một chiếc búa thần thánh gây {damage} sát thương và tạo ra 1 Sùng Tín. Dùng được khi mục tiêu dưới 20% máu, hoặc trong lúc Thăng Thiên Thần Thánh hay Cuồng Nộ Báo Thù. Cuồng Nộ Bình Minh ban thêm một lần niệm lên bất cứ mục tiêu nào, bỏ qua thời gian hồi đang chạy và gây thêm 20% sát thương. Thăng Thiên tăng sát thương của nó thêm 30%.',
   'entities.abilities.healing_stream.description':
     'Hồi 120 máu cho một mục tiêu đồng minh trong 12 giây. (thiên phú Shaman)',
   'entities.abilities.howl_of_terror.description':
-    'Khiến kẻ địch ở gần sợ hãi trong tối đa 3 giây. Sát thương có thể phá hiệu ứng. (thiên phú Warlock)',
+    'Khiến kẻ địch ở gần sợ hãi trong tối đa 5 giây. Tổng sát thương bằng 8% máu tối đa của mục tiêu sẽ phá vỡ nỗi sợ của nó. (thiên phú Warlock)',
   'entities.abilities.ice_block.description':
-    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 giây. (thiên phú pháp sư)',
+    'Bao bọc bạn trong băng cứng suốt 8 giây, khiến bạn miễn nhiễm mọi sát thương. Xóa các hiệu ứng có hại thông thường đang tồn tại và ngăn các hiệu ứng khống chế thông thường mới được áp dụng. Có thể dùng khi bị choáng hoặc biến hình. Bạn không thể hành động khi bị bao bọc. Dùng lại để hủy. (pháp sư)',
   'entities.abilities.inner_focus.description': 'Khiến phép tu sĩ kế tiếp của bạn miễn phí và không thể bị ngắt. Kéo dài 60 giây.',
   'entities.abilities.innervate.description':
     'Nhựa sống trào dâng trong bạn trong 10 giây và hồi 20 tài nguyên hiện tại theo từng đợt: mana, nộ khí hoặc năng lượng. Biến hình không làm gián đoạn. Ngủ, choáng hoặc đình trệ sẽ làm dòng nhựa ngừng lại. (thiên phú Druid)',
@@ -10739,7 +10757,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.preparation.description':
     'Kết thúc thời gian hồi của Chạy nước rút, Né tránh và Biến mất. (thiên phú Đạo tặc)',
   'entities.abilities.presence_of_mind.description':
-    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 giây. (thiên phú pháp sư)',
+    'Khiến phép tiếp theo có thời gian niệm của bạn được thi triển tức thì. Kéo dài 60 giây. (thiên phú pháp sư)',
   'entities.abilities.psychic_scream.description': 'Làm kẻ địch trong 8 m khiếp sợ tối đa 4 giây. Sát thương có thể phá vỡ hiệu ứng.',
   'entities.abilities.shadowstep.description':
     'Bước xuyên bóng tối về phía mục tiêu. (thiên phú Đạo tặc)',
@@ -12194,7 +12212,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Tiêu 5 Sắc Xanh. Thu hoạch mọi hồi máu theo thời gian của bạn trên tất cả đồng minh với 60% lượng hồi còn lại, gỡ bỏ các hiệu ứng đó và trồng một Hoa Nở Hoang Dã mới lên mục tiêu.',
   'entities.abilities.redharvest.name': 'Thu Hoạch Đỏ',
   'entities.abilities.redharvest.description':
-    'Tiêu 3 Huyết Cổ của bạn: đánh gây {damage}, lập tức gây toàn bộ sát thương mà Lóc Xé và Xé Rách của bạn còn sẽ gây ra, xóa cả hai hiệu ứng chảy máu và hồi 30 năng lượng. Dùng được cả khi không có điểm liên hoàn.',
+    'Tiêu 3 Huyết Cổ của bạn: đánh gây {damage}, lập tức gây toàn bộ sát thương mà Lóc Xé và Xé Rách của bạn còn sẽ gây ra, xóa cả hai hiệu ứng chảy máu và hồi {rage} năng lượng. Dùng được cả khi không có điểm liên hoàn.',
   'entities.abilities.sunlance.name': 'Vệt Dương',
   'entities.abilities.sunlance.description':
     'Tiêu 3 Triều Nguyệt của bạn cho một đòn gây {damage} sát thương Tự Nhiên cộng thêm {overTime} thiêu đốt trong 9 giây, và hồi 35 mana: lựa chọn mana. Nguyệt Trào cũng tiêu đúng 3 Triều Nguyệt đó, nên hãy chọn một.',
@@ -12478,7 +12496,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.description': 'Chiêu kết liễu phơi bày mục tiêu trong 30 giây: mỗi điểm liên hoàn tiêu hao giảm giáp của nó 2% (5 điểm liên hoàn: {damage}%).',
   'entities.abilities.faerie_fire.description': 'Giảm giáp của mục tiêu {damage}% trong 40 giây.',
   'entities.abilities.ferocious_bite.description': 'Chiêu kết liễu gây {damage} sát thương. Chỉ dùng được ở Hình Sói.',
-  'entities.abilities.ferocious_bite.specNote_feral': 'Mỗi đòn đánh trúng thêm 1 Huyết Cổ; ở 3 Huyết Cổ, nút này trở thành Thu Hoạch Đỏ: một cú cắn gây 70 cộng 43 mỗi điểm liên hoàn, đồng thời lập tức gây toàn bộ sát thương còn lại của Lóc Xé và Xé Rách, và hồi 30 năng lượng.',
+  'entities.abilities.ferocious_bite.specNote_feral': 'Mỗi đòn đánh trúng thêm 1 Huyết Cổ; ở 3 Huyết Cổ, nút này trở thành Thu Hoạch Đỏ, tiêu Huyết Cổ cho một cú cắn mạnh hơn, đồng thời lập tức gây toàn bộ sát thương còn lại của Lóc Xé và Xé Rách, và hồi năng lượng.',
   'entities.abilities.funeral_harvest.description': 'Khi một kẻ địch vừa bị bạn hoặc thuộc hạ Bất Tử của bạn gây sát thương chết đi, bạn nhận 1 Mảnh Linh Hồn. Điều này có thể xảy ra một lần mỗi 3 giây.',
   'entities.abilities.funeral_harvest.name': 'Thu Hoạch Tang Lễ',
   'entities.abilities.garrote.description': 'Siết dây quanh cổ kẻ địch, gây ngay {damage} sát thương và khiến nó chảy máu {overTime} sát thương trong 18 giây. Phải đang ẩn thân. Nhận 1 điểm liên hoàn.',
@@ -12500,7 +12518,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonfire.specNote_balance': 'Giữ nó tiếp tục cháy: Nguyệt Chủng kéo dài thêm 6 giây.',
   'entities.abilities.needle_of_fate.description': 'Xuyên qua kẻ địch gây {damage} sát thương Bóng Tối và tạo ra 5 Kết Án nếu nó mang Ác Nhãn của bạn. Mỗi đòn trúng vào Ác Nhãn chính của bạn thêm 1 Sợi Định Mệnh trong 12 giây, tối đa 3. Nếu không có Ác Nhãn nào tồn tại, Kim sẽ đánh dấu mục tiêu của nó trước.',
   'entities.abilities.needle_of_fate.name': 'Kim Định Mệnh',
-  'entities.abilities.ossuary_mark.description': 'Đánh dấu một kẻ địch trong 12 giây, lưu trữ 20% sát thương gây ra bởi bạn và thuộc hạ Bất Tử của bạn. Thi triển lại để kích nổ nó. Nếu kẻ địch bị đánh dấu chết, nó sẽ nổ trong bán kính 6 thước và tạo 1 Mảnh Linh Hồn.',
+  'entities.abilities.ossuary_mark.description': 'Đánh dấu một kẻ địch trong 15 giây, lưu trữ 20% sát thương gây ra bởi bạn và thuộc hạ Bất Tử của bạn. Thi triển lại để kích nổ nó. Nếu kẻ địch bị đánh dấu chết, nó sẽ nổ trong bán kính 6 thước và tạo 1 Mảnh Linh Hồn.',
   'entities.abilities.ossuary_mark.name': 'Dấu Ấn Cốt Táng',
   'entities.abilities.possess_evil_eye.description': 'Kẻ Nguyền Rủa chiếm hữu Ác Nhãn chính của bạn trong 15 giây và tạo ra 35 Kết Án. Kim Định Mệnh thi triển trong 1 giây và tạo thêm 2 Kết Án, Nuốt Chửng có thể được dẫn phép khi đang di chuyển, và Phán Quyết gây thêm 25% sát thương và giải phóng một tiếng vọng trễ với 60% sát thương, giảm dần xuống 30% qua các cấp 17-20.',
   'entities.abilities.possess_evil_eye.name': 'Chiếm Hữu Ác Nhãn',

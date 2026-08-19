@@ -82,6 +82,7 @@ const MANIFEST_IDS = [
   'vfx.atlas',
   'vfx.weapon-skins',
   'vfx.ability-primitives',
+  'vfx.mount-programs',
   'sky.nearby-biomes',
   'world.initial-frame',
   'programs.compile',
@@ -227,6 +228,7 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     // per-family criterion in the debt set's doc.
     expect(prewarmResumeIsDebt('props.ghost-fade-variants')).toBe(false);
     expect(prewarmResumeIsDebt('vfx.weapon-skins')).toBe(false);
+    expect(prewarmResumeIsDebt('vfx.mount-programs')).toBe(false);
     expect(prewarmResumeIsDebt('vfx.ability-primitives')).toBe(false);
   });
 
@@ -284,6 +286,7 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
       'vfx.atlas',
       'vfx.weapon-skins',
       'vfx.ability-primitives',
+      'vfx.mount-programs',
       'sky.current-zone',
       'render.settle-passes',
     ];
@@ -617,31 +620,51 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
   });
 
   it('wires the compile dedupe and the widened shadow arm to the measured residue', () => {
-    const renderer = readFileSync(
-      new URL('../src/render/renderer.ts', import.meta.url),
-      'utf8',
-    ).replace(/\r\n/g, '\n');
+    // Line comments stripped: a commented-out call site must not keep a
+    // positive pin green.
+    const renderer = codeWithoutLineComments(
+      readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8').replace(
+        /\r\n/g,
+        '\n',
+      ),
+    );
     // The dedupe key comes from the shared pure helper, never a hand-rolled
     // string that can drift from three's cache key again.
     expect(renderer).toContain('prewarmProgramContentKeys(');
     expect(renderer).toContain('hasInstanceColor: ');
     expect(renderer).toContain('morphTargetCount: ');
-    // The prewarm depth material must match the REAL shadow pass variant:
-    // three's shadow depth material uses RGBADepthPacking and depthPacking is
-    // in the program cache key, so omitting it links a dead variant (the
-    // pre-existing defect the residue probe exposed: every skinned-shadow
-    // compile linked BasicDepthPacking, and the frame relinked all of them).
-    expect(renderer).toContain('depthPacking: THREE.RGBADepthPacking');
+    // The prewarm depth material must match the REAL shadow pass variant, and
+    // that derivation lives in the shared factory (src/render/prewarm_depth_material.ts),
+    // pinned against three's WebGLShadowMap source by its own test. The renderer
+    // never sets depthPacking itself: the RGBADepthPacking override that matched
+    // three 0.165 became a dead variant under 0.185 (its shadow pass draws the
+    // default packing), and every character shadow program relinked cold at its
+    // first draw (production: 1196 / 662 / 211 / 129 ms frames).
+    expect(renderer).toContain("import { prewarmDepthMaterial } from './prewarm_depth_material';");
     // The shadow arm covers every caster, not just skinned rigs: static and
     // instanced casters' depth programs were 12 of the frame's 64 residual
     // links.
     const shadowStart = renderer.indexOf('private async compileShadowPrograms(');
-    const shadowEnd = renderer.indexOf('\n  // A tiny throwaway target', shadowStart);
+    // Comments are stripped above, so the slice ends on the next declaration.
+    const shadowEnd = renderer.indexOf('private prewarmRenderTarget', shadowStart);
     expect(shadowStart).toBeGreaterThan(-1);
     expect(shadowEnd).toBeGreaterThan(shadowStart);
     const shadowMethod = renderer.slice(shadowStart, shadowEnd);
     expect(shadowMethod).toContain('if (!mesh.isMesh || !mesh.castShadow) return;');
     expect(shadowMethod).not.toContain('if (!mesh.isSkinnedMesh || !mesh.castShadow) return;');
+    // Scoped to the shadow arm: the renderer must not hand-build a depth
+    // material there (a `new THREE.MeshDepthMaterial(` or a `depthPacking` write
+    // in that block would be the override coming back by another door). The
+    // factory is fed the caster mesh too: one awaited depth material per
+    // (skinning x morph count x instancing) shape, not one shared instance whose
+    // single currentProgram slot leaves the sibling programs unpolled.
+    // (tests/renderer_shadow_prewarm.test.ts proves the same behaviorally.)
+    expect(shadowMethod).not.toContain('depthPacking');
+    expect(shadowMethod).not.toContain('new THREE.MeshDepthMaterial(');
+    expect(shadowMethod).toContain('prewarmDepthMaterial(this.prewarmDepthMaterials, item, mesh)');
+    expect(shadowMethod).toContain(
+      'prewarmDepthMaterial(this.prewarmDepthMaterials, material, mesh)',
+    );
   });
 
   it('keeps the required desktop compiler behind the loading cover after a slow first frame', () => {
@@ -1175,6 +1198,28 @@ describe('mandatory interaction-landmark prewarm', () => {
       'return this.sharedQueue.run(work, options.priority, options.label, { releaseTail: true })',
     );
     expect(core).toContain('this.tail.then(work)');
+  });
+});
+
+describe('self-spirit prewarm queue wiring', () => {
+  it('preserves the idle delay and runs the compile through the shared GPU queue', () => {
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    const start = renderer.indexOf('private selfSpirit = new SelfSpiritPrewarmer({');
+    const end = renderer.indexOf('\n  // Static terrain/water/features', start);
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const wiring = renderer.slice(start, end);
+    const idleAt = wiring.indexOf('idle: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS)');
+    const queueAt = wiring.indexOf('this.backgroundGpuWork.run(');
+    expect(idleAt).toBeGreaterThan(-1);
+    expect(queueAt).toBeGreaterThan(-1);
+    expect(wiring).toContain('() => this.warmSelfSpirit()');
+    expect(wiring).toContain('GPU_WORK_PRIORITY.VISIBLE_PREWARM');
+    expect(wiring).toContain("'self-spirit'");
+    expect(wiring).toContain('{ releaseTail: true }');
   });
 });
 

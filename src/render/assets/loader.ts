@@ -1,12 +1,15 @@
-// Runtime asset loading: glTF models (meshopt-compressed) + HDR environment
-// maps, with a promise cache so every consumer shares one parse per URL.
+// Runtime asset loading: glTF models (meshopt-compressed) + plain and KTX2
+// textures, with a promise cache so every consumer shares one parse per URL.
 // Render-layer only — the sim must never import this (it runs headless).
+//
+// There is deliberately no Radiance (.hdr) arm: the biome sky domes and their
+// PMREM sources ship as KTX2 UASTC HDR and come through loadKtx2Texture, which
+// uploads GPU-compressed blocks instead of the half-float RGBA DataTexture an
+// RGBE decode produced (see src/render/sky.ts).
 import * as THREE from 'three';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import { GFX } from '../gfx';
-import { resampleHdrRgba } from '../hdr_resample';
 import { classifyGltfKtx2Textures, dismissKtx2Source } from './ktx2_mip_release';
 import { ktx2Loader } from './ktx2_support';
 import { MAX_LOAD_ATTEMPTS, retryDelayMs } from './load_retry';
@@ -15,7 +18,6 @@ import { assetLoadStarted, recordAssetLoad } from './stats';
 
 let gltfLoader: GLTFLoader | null = null;
 const gltfCache = new Map<string, Promise<GLTF>>();
-const hdrCache = new Map<string, Promise<THREE.DataTexture>>();
 const texCache = new Map<string, Promise<THREE.Texture>>();
 const ktx2TexCache = new Map<string, Promise<THREE.CompressedTexture>>();
 
@@ -36,7 +38,12 @@ function constrainedBrowser(): boolean {
 const constrained = constrainedBrowser();
 const gltfQueue: AssetQueue = { active: 0, limit: constrained ? 2 : 4, pending: [] };
 const textureQueue: AssetQueue = { active: 0, limit: constrained ? 3 : 6, pending: [] };
-const hdrQueue: AssetQueue = { active: 0, limit: 1, pending: [] };
+// Single-slot lane for the few very large textures (the biome sky domes, about
+// 1.6 MB compressed at 2k), inherited from the Radiance path this replaced.
+// Their fetch lands on the hitch-sensitive biome-crossing path, and letting two
+// of them race the model and atlas traffic on the shared texture queue is what
+// that serialization was there to prevent.
+const largeTextureQueue: AssetQueue = { active: 0, limit: 1, pending: [] };
 
 function pumpQueue(q: AssetQueue): void {
   while (q.active < q.limit && q.pending.length > 0) {
@@ -225,205 +232,6 @@ export function releaseTexture(url: string, opts: { srgb?: boolean; repeat?: boo
   texCache.delete(`${resolved}|${opts.srgb ? 's' : 'l'}|${opts.repeat ? 'r' : 'c'}`);
 }
 
-// One shared decode worker (created lazily): fetch + RGBE parse of an 8MB 2k
-// HDRI is over a second of pure CPU, a measured full-frame stall every time
-// zone streaming brought in a new biome's sky. Requests are matched by id;
-// the pixel buffer transfers back zero-copy.
-let hdrWorker: Worker | null = null;
-let hdrWorkerSeq = 0;
-const hdrWorkerPending = new Map<
-  number,
-  (r: import('./hdr_decode_worker').HdrDecodeResponse) => void
->();
-function hdrDecodeInWorker(
-  url: string,
-  maxWidth?: number,
-): Promise<import('./hdr_decode_worker').HdrDecodeResponse> {
-  if (!hdrWorker) {
-    try {
-      hdrWorker = new Worker(new URL('./hdr_decode_worker.ts', import.meta.url), {
-        type: 'module',
-      });
-    } catch {
-      return Promise.resolve({ id: 0, ok: false, error: 'worker unavailable' });
-    }
-    hdrWorker.onmessage = (e: MessageEvent<import('./hdr_decode_worker').HdrDecodeResponse>) => {
-      const pending = hdrWorkerPending.get(e.data.id);
-      if (pending) {
-        hdrWorkerPending.delete(e.data.id);
-        pending(e.data);
-      }
-    };
-    // A worker-level failure (script load, uncaught throw) must never strand
-    // the callers: fail every pending decode so loadHdr's fallback path runs.
-    hdrWorker.onerror = () => {
-      for (const [id, resolve] of hdrWorkerPending) {
-        hdrWorkerPending.delete(id);
-        resolve({ id, ok: false, error: 'hdr decode worker error' });
-      }
-    };
-  }
-  const id = ++hdrWorkerSeq;
-  return new Promise((resolve) => {
-    hdrWorkerPending.set(id, resolve);
-    hdrWorker?.postMessage({
-      id,
-      url,
-      maxWidth,
-    } satisfies import('./hdr_decode_worker').HdrDecodeRequest);
-  });
-}
-
-// The exact texture configuration RGBELoader.load applies for the HalfFloat/
-// Float types it produces (three/examples RGBELoader onLoadCallback), plus the
-// equirect mapping loadHdr always set. Keep in lockstep with the fallback path
-// below, which still routes through RGBELoader.load itself.
-function finishHdrTexture(tex: THREE.DataTexture): THREE.DataTexture {
-  tex.colorSpace = THREE.LinearSRGBColorSpace;
-  tex.minFilter = THREE.LinearFilter;
-  tex.magFilter = THREE.LinearFilter;
-  tex.generateMipmaps = false;
-  tex.flipY = true;
-  tex.mapping = THREE.EquirectangularReflectionMapping;
-  tex.needsUpdate = true;
-  return tex;
-}
-
-interface HdrTextureImage {
-  data: Uint16Array<ArrayBuffer> | Float32Array<ArrayBuffer>;
-  width: number;
-  height: number;
-}
-
-function decodedHdrImage(image: unknown): HdrTextureImage | null {
-  if (typeof image !== 'object' || image === null) return null;
-  const data = Reflect.get(image, 'data');
-  const width = Reflect.get(image, 'width');
-  const height = Reflect.get(image, 'height');
-  if (
-    (!(data instanceof Uint16Array) && !(data instanceof Float32Array)) ||
-    typeof width !== 'number' ||
-    !Number.isInteger(width) ||
-    width <= 0 ||
-    typeof height !== 'number' ||
-    !Number.isInteger(height) ||
-    height <= 0
-  ) {
-    return null;
-  }
-  if (!(data.buffer instanceof ArrayBuffer)) return null;
-  const pixels =
-    data instanceof Uint16Array
-      ? new Uint16Array(data.buffer, data.byteOffset, data.length)
-      : new Float32Array(data.buffer, data.byteOffset, data.length);
-  return { data: pixels, width, height };
-}
-
-export interface HdrLoadOptions {
-  /** Resize decoded pixels in the worker before transfer (used by PMREM). */
-  maxWidth?: number;
-}
-
-/** The resolved cache key for one (url, options) pair. loadHdr and releaseHdr
- *  share it so a release can never miss the entry a load created. */
-interface HdrRequest {
-  resolved: string;
-  maxWidth: number | undefined;
-  cacheKey: string;
-}
-
-/** One normalization for url + maxWidth, shared by loadHdr and releaseHdr so
- *  the pair can never disagree on a cache key (review round 1). */
-function hdrRequest(url: string, options: HdrLoadOptions): HdrRequest {
-  const resolved = assetUrl(url);
-  const maxWidth = options.maxWidth ? Math.max(1, Math.floor(options.maxWidth)) : undefined;
-  return {
-    resolved,
-    maxWidth,
-    cacheKey: maxWidth ? `${resolved}#max-width=${maxWidth}` : resolved,
-  };
-}
-
-function hdrCacheKey(url: string, options: HdrLoadOptions): string {
-  return hdrRequest(url, options).cacheKey;
-}
-
-/** Equirectangular Radiance .hdr for IBL / sky sampling (HalfFloat). */
-export function loadHdr(url: string, options: HdrLoadOptions = {}): Promise<THREE.DataTexture> {
-  const { resolved, maxWidth, cacheKey } = hdrRequest(url, options);
-  let p = hdrCache.get(cacheKey);
-  if (!p) {
-    const startedAt = assetLoadStarted();
-    p = scheduleLoad(hdrQueue, () =>
-      withRetry(async () => {
-        if (typeof Worker !== 'undefined') {
-          const decoded = await hdrDecodeInWorker(resolved, maxWidth);
-          if (decoded.ok && decoded.data && decoded.width && decoded.height) {
-            const pixels = decoded.data as unknown as Uint16Array<ArrayBuffer>;
-            const tex = new THREE.DataTexture(pixels, decoded.width, decoded.height);
-            tex.type = decoded.type as THREE.TextureDataType;
-            return finishHdrTexture(tex);
-          }
-        }
-        return new Promise<THREE.DataTexture>((resolve, reject) => {
-          new RGBELoader().load(
-            resolved,
-            (loaded) => {
-              let tex = loaded;
-              const image = decodedHdrImage(loaded.image);
-              if (maxWidth && !image) {
-                reject(new Error(`hdr load failed: ${url} (invalid decoded pixels)`));
-                return;
-              }
-              if (maxWidth && image && image.width > maxWidth) {
-                const resized = resampleHdrRgba(image.data, image.width, image.height, maxWidth);
-                tex = new THREE.DataTexture(resized.data, resized.width, resized.height);
-                tex.type = loaded.type;
-                finishHdrTexture(tex);
-                loaded.dispose();
-              } else {
-                tex.mapping = THREE.EquirectangularReflectionMapping;
-              }
-              resolve(tex);
-            },
-            undefined,
-            () => reject(new Error(`hdr load failed: ${url}`)),
-          );
-        });
-      }),
-    ).then(
-      (tex) => {
-        recordAssetLoad('hdr', resolved, startedAt);
-        return tex;
-      },
-      (err: unknown) => {
-        recordAssetLoad('hdr', resolved, startedAt, true);
-        // Same failure eviction as loadGltf (the black-void precedent): a
-        // rejected promise left in the cache poisons every later ensure for
-        // the session, which would defeat the sky evict-and-refetch lane
-        // after an outage outlives the bounded retry. Identity-guarded so a
-        // newer in-flight load is never evicted by an old failure settling.
-        if (hdrCache.get(cacheKey) === p) hdrCache.delete(cacheKey);
-        throw err;
-      },
-    );
-    hdrCache.set(cacheKey, p);
-  }
-  return p;
-}
-
-/** The HDR twin of releaseGltf/releaseTexture: drop a loadHdr entry once its
- *  decoded texture has been disposed by its owner, so a later loadHdr for the
- *  same url re-fetches instead of handing out a disposed DataTexture. Pass the
- *  SAME options the load used - maxWidth discriminates the cache key. The
- *  sky-residency lane pairs this with the dispose (src/render/sky.ts
- *  releaseSkyBiomeAssets): releasing the cache entry WITHOUT disposing merely
- *  costs a re-decode, but disposing without releasing hands the next consumer a
- *  dead texture. */
-export function releaseHdr(url: string, options: HdrLoadOptions = {}): void {
-  hdrCache.delete(hdrCacheKey(url, options));
-}
-
 /** Plain image texture (terrain splats, water normals, VFX sprites). */
 export function loadTexture(
   url: string,
@@ -467,7 +275,7 @@ export function loadTexture(
       },
       (err: unknown) => {
         recordAssetLoad('texture', resolved, startedAt, true);
-        // Same terminal-failure eviction as loadHdr, loadGltf and
+        // Same terminal-failure eviction as loadGltf and
         // loadKtx2Texture: a rejected promise left in the cache poisons every
         // later load of this url for the session. Identity-guarded so a newer
         // in-flight load is never evicted by an old failure settling.
@@ -480,26 +288,36 @@ export function loadTexture(
   return p;
 }
 
+/** One normalization for a KTX2 request's cache key, shared by
+ *  loadKtx2Texture and releaseKtx2Texture so the pair can never disagree on
+ *  which entry a release drops. */
+function ktx2CacheKey(resolved: string, opts: { repeat?: boolean }): string {
+  return `${resolved}|${opts.repeat ? 'r' : 'c'}`;
+}
+
 /** Standalone KTX2/Basis image (KHR_texture_basisu-style compressed atlas):
  *  stays GPU-compressed in memory instead of decoding to a full RGBA bitmap,
  *  the same win GLB-embedded textures already get. Shares the one ktx2Loader()
  *  transcoder singleton the GLB parse path attaches to GLTFLoader, so this pays
  *  no extra transcoder init. Colorspace, mip levels and the vertical flip are
  *  baked into the KTX2 container at compress time
- *  (scripts/assets/compress_standalone_textures.mjs), so unlike loadTexture
+ *  (scripts/assets/compress_standalone_textures.mjs for the LDR sets,
+ *  compress_sky_hdr.mjs for the UASTC HDR sky domes), so unlike loadTexture
  *  there is no `srgb` option to pass and `flipY` is never honored here; only
  *  `repeat` remains a runtime choice, and it discriminates the cache key
- *  exactly as it does in loadTexture. */
+ *  exactly as it does in loadTexture. `large` picks the single-slot fetch lane
+ *  and is NOT part of the cache key: it is a scheduling choice about one
+ *  request, not a property of the texture two callers would disagree on. */
 export function loadKtx2Texture(
   url: string,
-  opts: { repeat?: boolean } = {},
+  opts: { repeat?: boolean; large?: boolean } = {},
 ): Promise<THREE.CompressedTexture> {
   const resolved = assetUrl(url);
-  const cacheKey = `${resolved}|${opts.repeat ? 'r' : 'c'}`;
+  const cacheKey = ktx2CacheKey(resolved, opts);
   let p = ktx2TexCache.get(cacheKey);
   if (!p) {
     const startedAt = assetLoadStarted();
-    p = scheduleLoad(textureQueue, () => {
+    p = scheduleLoad(opts.large ? largeTextureQueue : textureQueue, () => {
       const seq = diagStart('ktx2tex', resolved);
       return withRetry(
         () =>
@@ -533,12 +351,14 @@ export function loadKtx2Texture(
       },
       (err: unknown) => {
         recordAssetLoad('texture', resolved, startedAt, true);
-        // Same failure eviction as loadHdr (the loadGltf black-void precedent):
-        // a rejected promise left in the cache poisons every later load for the
+        // Same failure eviction as loadGltf (the black-void precedent): a
+        // rejected promise left in the cache poisons every later load for the
         // session, so the second graphics-profile Apply that the terrain,
         // surface-detail and stone-normal owners retry through would replay the
-        // old rejection instead of issuing a request. Identity-guarded so a
-        // newer in-flight load is never evicted by an old failure settling.
+        // old rejection instead of issuing a request, and the sky evict-and-
+        // refetch lane could never recover from an outage that outlives the
+        // bounded retry. Identity-guarded so a newer in-flight load is never
+        // evicted by an old failure settling.
         if (ktx2TexCache.get(cacheKey) === p) ktx2TexCache.delete(cacheKey);
         throw err;
       },
@@ -546,4 +366,16 @@ export function loadKtx2Texture(
     ktx2TexCache.set(cacheKey, p);
   }
   return p;
+}
+
+/** The KTX2 twin of releaseGltf/releaseTexture: drop a loadKtx2Texture entry
+ *  once its transcoded texture has been disposed by its owner, so a later
+ *  loadKtx2Texture for the same url re-fetches instead of handing out a
+ *  disposed texture. Pass the SAME `repeat` the load used, since it
+ *  discriminates the cache key. The sky-residency lane pairs this with the
+ *  dispose (src/render/sky.ts releaseSkyBiomeAssets): releasing the cache entry
+ *  WITHOUT disposing merely costs a re-fetch, but disposing without releasing
+ *  hands the next consumer a dead texture. */
+export function releaseKtx2Texture(url: string, opts: { repeat?: boolean } = {}): void {
+  ktx2TexCache.delete(ktx2CacheKey(assetUrl(url), opts));
 }

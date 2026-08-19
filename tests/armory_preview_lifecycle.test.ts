@@ -123,9 +123,12 @@ describe('Armory preview lifecycle', () => {
     expect(startAt).toBeGreaterThan(revealAt);
   });
 
-  it('warms both portrait framings so Inspect never pays the first PNG capture', () => {
+  it('warms the requested portrait framings; login trims to headshot (body is Inspect-only, built lazily on open)', () => {
     // The plan lives in the pure core; the hud composes it with the real
-    // portrait thunk.
+    // portrait thunk. Which framings warm is now a dep, not a hardcoded pair:
+    // headshots ride the party/raid/target frames unprompted, so login keeps
+    // them; the full-body Inspect portrait is menu-gated and built lazily on
+    // open, so warming it at every entry is deferred cost dropped from login.
     const core = readFileSync(
       new URL('../src/ui/preview_prewarm_core.ts', import.meta.url),
       'utf8',
@@ -133,7 +136,7 @@ describe('Armory preview lifecycle', () => {
     const start = core.indexOf('export function buildPostEntryPreviewPrewarmUnits');
     expect(start).toBeGreaterThan(-1);
     const plan = core.slice(start);
-    expect(plan).toContain("['headshot', 'body'] as const");
+    expect(plan).toContain('for (const framing of deps.portraitFramings)');
     expect(plan).toContain('deps.renderPortrait(portraitClass, skin, framing)');
     const hudStart = hud.indexOf(
       'private postEntryPreviewPrewarmUnits(includeCharFamily: boolean)',
@@ -141,6 +144,8 @@ describe('Armory preview lifecycle', () => {
     expect(hudStart).toBeGreaterThan(-1);
     const compose = hud.slice(hudStart, hud.indexOf('startPostEntryPreviewPrewarm(', hudStart));
     expect(compose).toContain('buildPostEntryPreviewPrewarmUnits');
+    // Login warms headshots only; the body framing is deferred to Inspect open.
+    expect(compose).toContain("portraitFramings: ['headshot']");
     // The prewarm variant, not the sync playerPortraitDataUrl: uploads prepaid
     // in bounded slices and the PNG encode off-thread (the sync capture books
     // 43 to 201 ms per cold portrait); a later sync call is a cache hit.

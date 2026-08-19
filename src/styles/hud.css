@@ -533,6 +533,10 @@
     will-change: transform;
     animation: tut-pulse 1100ms ease-in-out infinite;
   }
+  .tut-arrow .ui-icon {
+    width: 30px;
+    height: 30px;
+  }
   @keyframes tut-in {
     from {
       transform: translateX(-50%) translateY(-14px);
@@ -3839,10 +3843,14 @@
   }
   #delve-tracker .dt-affix-icon {
     display: inline-block;
-    width: 14px;
-    height: 14px;
-    border-radius: 2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 3px;
     border: 1px solid #0008;
+    object-fit: cover;
+    box-shadow:
+      inset 0 0 0 1px #ffffff18,
+      0 1px 3px #0009;
     cursor: help;
   }
 
@@ -6062,17 +6070,15 @@
     flex: 1;
   }
   .fa-card .fa-icon {
-    width: 34px;
-    height: 34px;
-    display: grid;
-    place-items: center;
+    width: 42px;
+    height: 42px;
+    display: block;
     border-radius: 9px;
     background: #0008;
-    box-shadow: inset 0 0 0 1px #ffffff22;
-  }
-  .fa-card .fa-icon svg {
-    width: 22px;
-    height: 22px;
+    object-fit: cover;
+    box-shadow:
+      inset 0 0 0 1px #ffffff22,
+      0 2px 7px #000b;
   }
   .fa-card .fa-cat {
     font-size: 10px;
@@ -6129,9 +6135,14 @@
     display: grid;
     place-items: center;
   }
-  #fiesta-pending .fpend-gem svg {
-    width: 18px;
-    height: 18px;
+  #fiesta-pending .fpend-gem::before {
+    width: 10px;
+    height: 10px;
+    content: "";
+    border: 1px solid #fff0a8;
+    background: linear-gradient(135deg, #fff5bd, #f0a614 55%, #8e4b09);
+    box-shadow: 0 0 7px #ffd24aaa;
+    transform: rotate(45deg);
   }
   @keyframes fpend-pulse {
     0%,
@@ -6877,6 +6888,10 @@
     line-height: 1;
     filter: drop-shadow(0 0 2px #000);
   }
+  .party-frame :is(.pf-badge, .lead-star) .ui-icon {
+    width: 1em;
+    height: 1em;
+  }
   .party-frame .pf-badge.combat {
     animation: pf-combat-pulse 1s ease-in-out infinite;
     /* Ambient: paused + duration-calmed by the effect-tier tokens. */
@@ -7112,6 +7127,14 @@
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
+  }
+  #ctx-menu .ctx-selected {
+    display: inline-flex;
+    width: 14px;
+    height: 14px;
+    margin-left: 6px;
+    vertical-align: middle;
+    color: var(--gold);
   }
   /* Bag-item action menu (Professions 2.0): the Apply Enchant picker
      rows carry a dim meta sub-line (target slot + reagent affordability), and an

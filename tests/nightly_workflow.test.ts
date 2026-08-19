@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { NIGHTLY_LANES_PER_REF } from '../scripts/lib/nightly_plan.mjs';
+import { PLAYWRIGHT_INSTALL_BLOCK } from './helpers/playwright_install_block';
 
 const workflow = readFileSync(new URL('../.github/workflows/nightly.yml', import.meta.url), 'utf8');
 const ciWorkflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
@@ -179,7 +180,11 @@ describe('nightly gate workflow', () => {
     expect(runLines(checks)).toEqual(runLines(releaseChecks));
     expect(checks).not.toContain('run: npm test');
     const browser = jobSource('browser');
-    expect(browser).toMatch(stepLine('run: npx playwright install --with-deps chromium'));
+    // Same split shape as ci.yml's browser-gate step, pinned to the identical
+    // whole block scalar (shared helper) so the two jobs cannot drift apart
+    // and neither can grow a fallback on the hard-failing browser install.
+    expect(browser).toContain(PLAYWRIGHT_INSTALL_BLOCK);
+    expect(browser).not.toContain('--with-deps');
     expect(browser).toMatch(stepLine('run: npm run test:browser'));
     expect(browser).toContain('path: ~/.cache/ms-playwright');
     expect(browser).toContain("require('playwright/package.json').version");

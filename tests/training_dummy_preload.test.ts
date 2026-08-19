@@ -11,7 +11,6 @@ import { describe, expect, it, vi } from 'vitest';
 function mockGltfLoad(): void {
   vi.doMock('../src/render/assets/loader', () => ({
     loadGltf: vi.fn(() => Promise.resolve({ scene: {}, animations: [] })),
-    loadHdr: vi.fn(() => new Promise(() => undefined)),
     loadTexture: vi.fn(() => new Promise(() => undefined)),
     loadKtx2Texture: vi.fn(() => new Promise(() => undefined)),
     releaseGltf: vi.fn(),

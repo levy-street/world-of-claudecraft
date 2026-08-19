@@ -40,6 +40,7 @@ import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
 import {
   auraIconRecipe,
   hasAbilityIconIdentity,
+  hasAuraImageIdentity,
   hasAuraRecipe,
   isUnknownIconRecipe,
 } from '../src/ui/icons';
@@ -161,10 +162,15 @@ describe('the Cheater mark aura reaches the client as a named, iconned debuff', 
   });
 
   it('carries a dedicated icon rather than the generic utility fallback', () => {
-    const resolve = createAuraIconResolver(hasAbilityIconIdentity, hasAuraRecipe);
-    // A recipe keyed by the AURA ID makes the resolver pass the id straight
-    // through; without one it degraded to `aura_cheater_mark`, which no recipe
-    // matched, so a SANCTION wore the parchment/gold "utility buff" art.
+    const resolve = createAuraIconResolver(
+      hasAbilityIconIdentity,
+      () => false,
+      hasAuraImageIdentity,
+    );
+    // The exact image registry makes the resolver pass the AURA ID straight
+    // through even without an exact procedural recipe. The recipe remains the
+    // painted image's synchronous fallback layer.
+    expect(hasAuraImageIdentity(CHEATER_MARK_AURA_ID)).toBe(true);
     expect(hasAuraRecipe(CHEATER_MARK_AURA_ID)).toBe(true);
     expect(resolve({ id: aura.id, kind: aura.kind })).toBe(CHEATER_MARK_AURA_ID);
     expect(resolve({ id: aura.id, kind: aura.kind })).not.toBe(`aura_${aura.kind}`);

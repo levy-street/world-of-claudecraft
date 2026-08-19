@@ -1,3 +1,5 @@
+import { svgIcon } from './ui_icons';
+
 export interface StorePromoCardLabels {
   open: string;
   close: string;
@@ -76,7 +78,7 @@ export function mountStorePromoCard(
   const close = doc.createElement('button');
   close.type = 'button';
   close.className = 'x-btn store-promo-card-close';
-  close.textContent = '×';
+  close.innerHTML = svgIcon('close');
 
   card.append(open, close);
   host.appendChild(card);

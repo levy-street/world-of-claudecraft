@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  exp_dawnhold_castle: {
+    name: 'Otevřené dveře v zahradě',
+    desc: 'Navštiv zámek Dawnhold a projdi se jeho prosluněnými zahradními síněmi.',
+  },
+  exp_the_last_keep: {
+    name: 'Tiché síně',
+    desc: 'Vstup do Poslední tvrze a projdi se jejími tichými síněmi.',
+  },
   pvp_bg_first_capture: {
     name: 'Vlajka v ruce',
     desc: 'Zajmi vlajku v Thornhollowských polích.',

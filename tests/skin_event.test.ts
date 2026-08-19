@@ -6,6 +6,7 @@ import {
   EVENT_SKIN_TOKEN_ID,
   MECH_CHROMAS,
   mechChromaItemId,
+  mechChromaSkinIndex,
   rankAllowsSkin,
   rollSkinRank,
   SKIN_COUNTS,
@@ -151,27 +152,33 @@ describe('cosmetic skin-select event', () => {
     expect(sim.countItem('amber_crimson_armor_plate')).toBe(0);
   });
 
-  it('unequips a mech cosmetic account-wide and returns the specific item', () => {
+  it('unequipping a mech cosmetic keeps the account-wide unlock permanent, like a store appearance', () => {
+    // Regression: unequipping used to REVOKE accountCosmetics.mechChromaIds
+    // outright, so a chroma still showing on another character (one that was
+    // not online at the time) could never be taken off or re-applied again.
+    // The unlock must behave like a purchased Season 1 Armory weapon skin:
+    // account-wide and permanent.
     const sim = new Sim({ seed: 1, playerClass: 'shaman', playerName: 'Mechwearer' });
     sim.addItem('amber_crimson_armor_plate', 1);
     sim.useItem('amber_crimson_armor_plate');
 
     expect(sim.unequipMechChroma('amber_crimson')).toBe(true);
 
-    expect(sim.accountCosmetics.mechChromaIds).toEqual([]);
-    expect(sim.player.skin).toBe(0);
-    expect(sim.player.skinCatalog).toBe('class');
-    expect(sim.countItem('amber_crimson_armor_plate')).toBe(1);
-
-    sim.useItem('amber_crimson_armor_plate');
-
+    // The unlock never expires: unequipping only changes the CURRENT display.
     expect(sim.accountCosmetics.mechChromaIds).toEqual(['amber_crimson']);
     expect(sim.player.skin).toBe(0);
-    expect(sim.player.skinCatalog).toBe('mech');
+    expect(sim.player.skinCatalog).toBe('class');
+    // Nothing is minted back: the look was never itemized to begin with, and
+    // re-equipping should never require a fresh copy of the plate.
     expect(sim.countItem('amber_crimson_armor_plate')).toBe(0);
+
+    // Re-equipping needs no item at all: the account already owns the look.
+    sim.changeSkin(0, 'mech');
+    expect(sim.player.skin).toBe(0);
+    expect(sim.player.skinCatalog).toBe('mech');
   });
 
-  it('returns a non-vendorable, non-discardable, non-marketable mech cosmetic item when unequipped', () => {
+  it('the mech cosmetic plate is non-vendorable, non-discardable, non-marketable', () => {
     const sim = new Sim({ seed: 1, playerClass: 'shaman', playerName: 'Seller' });
     const merchant = [...sim.entities.values()].find(
       (e) => e.kind === 'npc' && e.templateId === 'the_merchant',
@@ -182,8 +189,6 @@ describe('cosmetic skin-select event', () => {
     sim.player.prevPos = { ...pos };
 
     sim.addItem('amber_crimson_armor_plate', 1);
-    sim.useItem('amber_crimson_armor_plate');
-    expect(sim.unequipMechChroma('amber_crimson')).toBe(true);
 
     sim.sellItem('amber_crimson_armor_plate');
     sim.discardItem('amber_crimson_armor_plate');
@@ -197,10 +202,11 @@ describe('cosmetic skin-select event', () => {
     ).toBe(false);
   });
 
-  it('returns and reuses a specific item for every mech chroma', () => {
+  it('keeps every mech chroma unlocked account-wide after unequipping, freely reselectable', () => {
     for (const chroma of MECH_CHROMAS) {
       const itemId = mechChromaItemId(chroma.id);
       expect(itemId, chroma.id).toBeTruthy();
+      const skin = mechChromaSkinIndex(chroma.id);
 
       const sim = new Sim({ seed: 1, playerClass: 'shaman', playerName: `Mech-${chroma.id}` });
       sim.accountCosmetics = {
@@ -209,14 +215,19 @@ describe('cosmetic skin-select event', () => {
         weaponSkinIds: [],
         weaponSkinLoadout: {},
       };
+      sim.setPlayerSkin(sim.playerId, skin, 'mech');
+
       expect(sim.unequipMechChroma(chroma.id)).toBe(true);
-      expect(sim.accountCosmetics.mechChromaIds).not.toContain(chroma.id);
-      expect(sim.countItem(expectDefined(itemId))).toBe(1);
-
-      sim.useItem(expectDefined(itemId));
-
+      // The unlock survives the unequip, for every chroma in the catalog.
       expect(sim.accountCosmetics.mechChromaIds).toContain(chroma.id);
+      expect(sim.player.skinCatalog).toBe('class');
+      // No item is minted for any chroma: the look is never itemized.
       expect(sim.countItem(expectDefined(itemId))).toBe(0);
+
+      // Free re-equip: the unlock alone gates it, no item spent.
+      sim.changeSkin(skin, 'mech');
+      expect(sim.player.skinCatalog).toBe('mech');
+      expect(sim.player.skin).toBe(skin);
     }
   });
 

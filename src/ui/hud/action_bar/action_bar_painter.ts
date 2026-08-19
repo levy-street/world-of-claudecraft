@@ -35,6 +35,7 @@ const HEIGHT_PROP = 'height';
 // old bottom-up `height` fill so remaining cooldown reads as a classic clock wipe.
 const COOLDOWN_FILL_PROP = '--cd-fill';
 const CLASS_EMPTY = 'empty';
+const CLASS_ABILITY = 'ability';
 const CLASS_UNUSABLE = 'unusable';
 const CLASS_OUT_OF_RANGE = 'oor';
 const CLASS_QUEUED = 'queued';
@@ -107,6 +108,7 @@ export class ActionBarPainter {
       this.writers.setText(el.cdText, s.cdText);
 
       this.writers.toggleClass(el.btn, CLASS_EMPTY, s.kind === 'empty');
+      this.writers.toggleClass(el.btn, CLASS_ABILITY, s.kind === 'ability');
       this.writers.toggleClass(el.btn, CLASS_UNUSABLE, !s.usable);
       this.writers.toggleClass(el.btn, CLASS_OUT_OF_RANGE, s.outOfRange);
       this.writers.toggleClass(el.btn, CLASS_QUEUED, s.queued);

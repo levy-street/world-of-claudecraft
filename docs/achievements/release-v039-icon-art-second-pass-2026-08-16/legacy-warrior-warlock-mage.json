@@ -1,0 +1,1486 @@
+{
+  "schemaVersion": 1,
+  "batch": "release-v039-second-pass-legacy-warrior-warlock-mage-2026-08-16",
+  "generatedAt": "2026-08-16",
+  "owner": "World of ClaudeCraft",
+  "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+  "generationPolicy": "one built-in imagegen call per asset; retry only on a rejected semantic, crop, style, grayscale, circular-crop, or runtime-size review",
+  "result": {
+    "requested": 21,
+    "generated": 21,
+    "accepted": 21,
+    "rejected": 0,
+    "retried": 0
+  },
+  "reviewArtifacts": {
+    "color128": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/review/final-128-contact.png",
+    "color48": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/review/final-48-contact.png",
+    "color32": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/review/final-32-contact.png",
+    "color16": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/review/final-16-contact.png",
+    "grayscale128": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/review/final-grayscale-contact.png",
+    "circular128": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/review/final-circular-contact.png"
+  },
+  "assets": [
+    {
+      "class": "warrior",
+      "abilityId": "defensive_stance",
+      "liveName": "Guarded Stance",
+      "mechanic": "Stance: generates 30% more threat while dealing and taking 10% less damage.",
+      "mechanicSource": "src/sim/content/classes.ts",
+      "oldShipping": {
+        "preservedFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/old/warrior_defensive_stance.webp",
+        "sha256": "bbd61b9715851b9d392802cc4fcf153eb4d2ed97132667fbefd5a0733e5618cf",
+        "bytes": 6122,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "oldMapping": {
+        "path": "public/ui/skills/warrior/mapping.json",
+        "sourcePack": "custom-user",
+        "sourceFile": "desktop/Actitud defensiva wow.png",
+        "ownerOrLicense": "custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com"
+      },
+      "generation": {
+        "mode": "OpenAI built-in image generation",
+        "builtInCallCount": 1,
+        "prompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior action-bar stance icon, brand-new replacement painting\nPrimary request: Paint Guarded Stance, the Warrior stance that increases threat by 30% while reducing damage dealt and taken by 10%.\nInput images: Image 1 (Raised Guard): approved sibling reference for steel shield material, blue impact light, and tight action-bar silhouette. Image 2 (Iron Resolve): approved sibling reference for premium plated Warrior rendering and amber protective energy. Image 3 (Battle Stance): approved sibling reference for full-body stance readability and warm class palette.\nSubject: one heavily armored Warrior planted low behind a broad battered shield, shoulders squared, sword held close rather than attacking; a compact amber ring braces around the shield while hostile red sparks bend toward the Warrior, communicating guarded threat and mitigation.\nScene/backdrop: fully painted charcoal battlefield smoke to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG ability art; blackened steel, worn bronze, muscular silhouette, dramatic light, original design.\nComposition/framing: square, centered defensive silhouette filling about 78%; face mostly hidden; thick forms and protected center remain clear at 16, 32, and 48 px and inside a circular crop.\nLighting/mood: cold steel-blue front light, amber rim, restrained crimson sparks; immovable, disciplined, dangerous.\nConstraints: opaque, borderless; no text, letters, numbers, UI frame, badge, bevel, watermark, modern iconography, flat glyph, cartoon anatomy, or copied sibling composition.\nAvoid: passive shield floating alone, heroic portrait bust, ornate thin details, empty margins, low contrast.",
+        "references": [
+          {
+            "path": "public/ui/skills/warrior/raised_guard.webp",
+            "role": "approved sibling: steel shield material, blue impact light, tight silhouette"
+          },
+          {
+            "path": "public/ui/skills/warrior/iron_resolve.webp",
+            "role": "approved sibling: premium plated Warrior rendering and amber protective energy"
+          },
+          {
+            "path": "public/ui/skills/warrior/battle_stance.webp",
+            "role": "approved sibling: full-body stance readability and warm class palette"
+          }
+        ],
+        "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_defensive_stance.png",
+        "sourceSha256": "7ea64401c638c1527ce5dad1bbf6ce5c8407c7d1ee3c85a8b8d22b69539156dc",
+        "sourceBytes": 2574935,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "accepted": {
+        "output": "public/ui/skills/warrior/defensive_stance.webp",
+        "sha256": "82d494e2eaec84d574b763fb47ba1186f016e47cd366567ca56e0d2e9c8f24a0",
+        "bytes": 5068,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "decision": "accepted replacement: high-confidence legacy flat/cartoon outlier superseded by mechanic-accurate premium painted art",
+        "review": {
+          "semantic": "accepted",
+          "crop": "accepted",
+          "style": "accepted",
+          "sizesPx": [128, 48, 32, 16],
+          "grayscale": "accepted",
+          "circularCrop": "accepted"
+        }
+      },
+      "rejects": [],
+      "retries": 0
+    },
+    {
+      "class": "warrior",
+      "abilityId": "battle_shout",
+      "liveName": "Iron Bellow",
+      "mechanic": "Party buff: increases all party members' attack power by 10% for 30 minutes.",
+      "mechanicSource": "src/sim/content/classes.ts",
+      "oldShipping": {
+        "preservedFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/old/warrior_battle_shout.webp",
+        "sha256": "bfe117c3e7381130d6109f91fdea22da7ed49035d61a124b590b70035eb6fb3b",
+        "bytes": 5076,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false
+      },
+      "oldMapping": {
+        "path": "public/ui/skills/warrior/mapping.json",
+        "sourcePack": "custom-user",
+        "sourceFile": "desktop/grito de guerra.png",
+        "ownerOrLicense": "custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com"
+      },
+      "generation": {
+        "mode": "OpenAI built-in image generation",
+        "builtInCallCount": 1,
+        "prompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior party-buff action-bar icon, brand-new replacement painting\nPrimary request: Paint Iron Bellow, a shout that raises every party member's attack power by 10% for 30 minutes.\nInput images: Image 1 (Defiant Bellow): approved sibling reference for armored Warrior, circular force wave, and premium red-gold finish. Image 2 (Emboldening Roar): approved sibling reference for shout posture and expanding amber sound rings. Image 3 (Rallying Cry): approved sibling reference for triumphant class lighting and rallying silhouette.\nSubject: a scarred iron-helmed Warrior roaring upward, one fist raised, while two broad molten-gold sound waves expand behind the head and three dark weapon silhouettes rise in response along the lower edge; communicate martial rally and shared attack power.\nScene/backdrop: fully painted dark red battlefield smoke to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG ability art; textured armor, forceful brushwork, rich red/amber class palette, original design.\nComposition/framing: square, centered head-and-fist cluster filling 75-80%, broad rings and strong mouth silhouette, readable at 16/32/48 px and in a circular crop.\nLighting/mood: furnace gold from the throat and rings, blood-red rim, black steel; commanding, energizing, victorious.\nConstraints: opaque, borderless; no text, letters, numbers, line-art face, UI frame, badge, bevel, watermark, speech bubble, microphone, flat glyph, or copied sibling composition.\nAvoid: comic-book burst, friendly smile, tiny party characters, white background, low contrast.",
+        "references": [
+          {
+            "path": "public/ui/skills/warrior/defiant_bellow.webp",
+            "role": "approved sibling: armored shout posture, circular force, premium red-gold finish"
+          },
+          {
+            "path": "public/ui/skills/warrior/emboldening_roar.webp",
+            "role": "approved sibling: shout posture and expanding amber sound rings"
+          },
+          {
+            "path": "public/ui/skills/warrior/rallying_cry.webp",
+            "role": "approved sibling: triumphant class lighting and rallying silhouette"
+          }
+        ],
+        "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_battle_shout.png",
+        "sourceSha256": "0a1b4ec528b9476a0ba592f9ca9b3e77a6ec90f552e2100e0c933d4529f22c4c",
+        "sourceBytes": 2291223,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "accepted": {
+        "output": "public/ui/skills/warrior/battle_shout.webp",
+        "sha256": "21d24805132c6034cab8b7957a507565e87f1d12cf7e02e36d2a9e3f9efc20fe",
+        "bytes": 6694,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "decision": "accepted replacement: high-confidence legacy flat/cartoon outlier superseded by mechanic-accurate premium painted art",
+        "review": {
+          "semantic": "accepted",
+          "crop": "accepted",
+          "style": "accepted",
+          "sizesPx": [128, 48, 32, 16],
+          "grayscale": "accepted",
+          "circularCrop": "accepted"
+        }
+      },
+      "rejects": [],
+      "retries": 0
+    },
+    {
+      "class": "warrior",
+      "abilityId": "charge",
+      "liveName": "Onrush",
+      "mechanic": "Rushes an enemy from 8-25 yards, generates 9 rage, and stuns for 1 second.",
+      "mechanicSource": "src/sim/content/classes.ts",
+      "oldShipping": {
+        "preservedFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/old/warrior_charge.webp",
+        "sha256": "05c5e019eb9c04730d26f76258a4cb3dcb89c3893e2ce1f16b279256968932ea",
+        "bytes": 4036,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "oldMapping": {
+        "path": "public/ui/skills/warrior/mapping.json",
+        "sourcePack": "berserker",
+        "sourceFile": "27.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account unless sourcePack is custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com"
+      },
+      "generation": {
+        "mode": "OpenAI built-in image generation",
+        "builtInCallCount": 1,
+        "prompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior mobility action-bar icon, brand-new replacement painting\nPrimary request: Paint Onrush, the Warrior's 8-25 yard charge that generates rage and stuns the enemy for one second.\nInput images: Image 1 (Heroic Leap): approved sibling reference for a readable airborne armored silhouette and gold impact light. Image 2 (Pursuit): approved sibling reference for explosive forward motion and small-size contrast. Image 3 (Raised Guard): approved sibling reference for worn shield/steel material and blue impact sparks.\nSubject: one armored Warrior driving shoulder-first diagonally forward behind a lowered shield, boots trailing a broad red-orange wake; the shield meets a dark enemy silhouette in a compact white-gold stun burst.\nScene/backdrop: fully painted black battlefield haze streaking backward to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG action art; heavy steel and leather, kinetic foreshortening, decisive impact, original design.\nComposition/framing: square, dynamic diagonal centered on shield impact, subject fills roughly 80%, broad silhouette readable at 16/32/48 px and inside a circular crop.\nLighting/mood: hot amber wake, steel-blue impact, deep crimson shadow; sudden, unstoppable, brutal.\nConstraints: opaque, borderless; no text, letters, numbers, UI frame, badge, bevel, watermark, horse, sports runner, flat glyph, or copied sibling composition.\nAvoid: static standing pose, multiple warriors, thin speed lines, excessive background scenery, low contrast.",
+        "references": [
+          {
+            "path": "public/ui/skills/warrior/heroic_leap.webp",
+            "role": "approved sibling: airborne armored silhouette and gold impact light"
+          },
+          {
+            "path": "public/ui/skills/warrior/pursuit.webp",
+            "role": "approved sibling: explosive forward motion and small-size contrast"
+          },
+          {
+            "path": "public/ui/skills/warrior/raised_guard.webp",
+            "role": "approved sibling: worn shield/steel material and blue impact sparks"
+          }
+        ],
+        "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_charge.png",
+        "sourceSha256": "e4fc7138db67159ad06292adcb1c7f9c9c64c98c058854862d274ada642249ed",
+        "sourceBytes": 2414279,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "accepted": {
+        "output": "public/ui/skills/warrior/charge.webp",
+        "sha256": "eeee184519b791d97fd376942b18bb697ee2a898531bd786d9aacb989cfecf6f",
+        "bytes": 6366,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "decision": "accepted replacement: high-confidence legacy flat/cartoon outlier superseded by mechanic-accurate premium painted art",
+        "review": {
+          "semantic": "accepted",
+          "crop": "accepted",
+          "style": "accepted",
+          "sizesPx": [128, 48, 32, 16],
+          "grayscale": "accepted",
+          "circularCrop": "accepted"
+        }
+      },
+      "rejects": [],
+      "retries": 0
+    },
+    {
+      "class": "warrior",
+      "abilityId": "demoralizing_shout",
+      "liveName": "Direhowl",
+      "mechanic": "Area debuff: nearby enemies deal 20% less damage for 20 seconds.",
+      "mechanicSource": "src/sim/content/classes.ts",
+      "oldShipping": {
+        "preservedFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/old/warrior_demoralizing_shout.webp",
+        "sha256": "fd821f47ad86bc8c1c59a7996cd5b0aef6bce5e641bdb16505bf4e0a6728907c",
+        "bytes": 4962,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false
+      },
+      "oldMapping": {
+        "path": "public/ui/skills/warrior/mapping.json",
+        "sourcePack": "warrior",
+        "sourceFile": "36.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account unless sourcePack is custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com"
+      },
+      "generation": {
+        "mode": "OpenAI built-in image generation",
+        "builtInCallCount": 1,
+        "prompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior enemy-debuff action-bar icon, brand-new replacement painting\nPrimary request: Paint Direhowl, a fearsome shout that makes all nearby enemies deal 20% less damage for 20 seconds.\nInput images: Image 1 (Defiant Bellow): approved sibling reference for armored shout posture and circular force. Image 2 (Lingering Dread): approved sibling reference for violet terror, spectral faces, and debuff darkness. Image 3 (Iron Resolve): approved sibling reference for premium blackened armor rendering and amber edge light.\nSubject: a black-iron Warrior helm roaring at the center of a wide dark-red shockwave; two enemy weapon silhouettes at the sides visibly dim, crack, and bow away under violet dread pressure.\nScene/backdrop: fully painted soot-black and bruised crimson smoke to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG debuff art; heavy armor, supernatural pressure, bold value grouping, original design.\nComposition/framing: square, centered helm and broad shockwave filling 75-80%, simple side weapons, readable at 16/32/48 px and in a circular crop.\nLighting/mood: ember-red throat light, violet-black wave, muted steel; oppressive, terrifying, weakening.\nConstraints: opaque, borderless; no text, letters, numbers, comic speech burst, UI frame, badge, bevel, watermark, flat glyph, or copied sibling composition.\nAvoid: cheerful rally, fleeing full characters, tiny details, bright gold-dominant buff look, low contrast.",
+        "references": [
+          {
+            "path": "public/ui/skills/warrior/defiant_bellow.webp",
+            "role": "approved sibling: armored shout posture and circular force"
+          },
+          {
+            "path": "public/ui/skills/warrior/lingering_dread.webp",
+            "role": "approved sibling: violet terror, spectral faces, debuff darkness"
+          },
+          {
+            "path": "public/ui/skills/warrior/iron_resolve.webp",
+            "role": "approved sibling: premium blackened armor and amber edge light"
+          }
+        ],
+        "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_demoralizing_shout.png",
+        "sourceSha256": "2f7c1086c882dcf55dbebf4959c06df583890501bf4e5c143c7e1f872762f163",
+        "sourceBytes": 2476963,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "accepted": {
+        "output": "public/ui/skills/warrior/demoralizing_shout.webp",
+        "sha256": "3a27eb70b3f9f539748b8c9c7b7cc019a104bb9bd1013c8cd5e9aeac3943b1ed",
+        "bytes": 4752,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "decision": "accepted replacement: high-confidence legacy flat/cartoon outlier superseded by mechanic-accurate premium painted art",
+        "review": {
+          "semantic": "accepted",
+          "crop": "accepted",
+          "style": "accepted",
+          "sizesPx": [128, 48, 32, 16],
+          "grayscale": "accepted",
+          "circularCrop": "accepted"
+        }
+      },
+      "rejects": [],
+      "retries": 0
+    },
+    {
+      "class": "warrior",
+      "abilityId": "hamstring",
+      "liveName": "Hobbling Cut",
+      "mechanic": "Maims for damage and slows movement by 50% for 15 seconds.",
+      "mechanicSource": "src/sim/content/classes.ts",
+      "oldShipping": {
+        "preservedFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/old/warrior_hamstring.webp",
+        "sha256": "c9ab9d54402ee936d4eb9c794b6464a6eaff4e8520a411ec8d284c84ce01e571",
+        "bytes": 2950,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false
+      },
+      "oldMapping": {
+        "path": "public/ui/skills/warrior/mapping.json",
+        "sourcePack": "warrior",
+        "sourceFile": "33.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account unless sourcePack is custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com"
+      },
+      "generation": {
+        "mode": "OpenAI built-in image generation",
+        "builtInCallCount": 1,
+        "prompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior melee slow action-bar icon, brand-new replacement painting\nPrimary request: Paint Hobbling Cut, a maiming weapon strike that deals damage and slows the enemy's movement by 50% for 15 seconds.\nInput images: Image 1 (Execute): approved sibling reference for sharp steel, hot orange impact, and readable weapon motion. Image 2 (Revenge): approved sibling reference for plated enemy material and close-range Warrior impact. Image 3 (Deep Wounds): approved sibling reference for a concentrated crimson wound with premium dark rendering.\nSubject: one broad notched sword sweeping low through the back of an armored greave at the ankle, opening a vivid red cut; a thick cold-blue drag trail coils around the boot to communicate crippled movement.\nScene/backdrop: fully painted near-black battlefield ground and smoke to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG ability art; tactile steel and leather, brutal macro action, bold original silhouette.\nComposition/framing: square close-up, diagonal blade and boot fill roughly 80%, wound centered, readable at 16/32/48 px and in a circular crop.\nLighting/mood: hot red-orange wound light against cold steel-blue drag energy; ruthless, heavy, disabling.\nConstraints: opaque, borderless; no text, letters, numbers, UI frame, badge, bevel, watermark, full character, medical diagram, flat glyph, or copied sibling composition.\nAvoid: detached leg, gore overload, three scratch marks, tiny chains, bright background, low contrast.",
+        "references": [
+          {
+            "path": "public/ui/skills/warrior/execute.webp",
+            "role": "approved sibling: sharp steel, hot-orange impact, readable weapon motion"
+          },
+          {
+            "path": "public/ui/skills/warrior/revenge.webp",
+            "role": "approved sibling: plated enemy material and close-range impact"
+          },
+          {
+            "path": "public/ui/skills/warrior/deep_wounds.webp",
+            "role": "approved sibling: concentrated crimson wound and premium dark rendering"
+          }
+        ],
+        "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_hamstring.png",
+        "sourceSha256": "a94d9a5d50b76cbd79498126d128855359f7b70ab63ce1436aed4bf1838161a8",
+        "sourceBytes": 2591606,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "accepted": {
+        "output": "public/ui/skills/warrior/hamstring.webp",
+        "sha256": "683b4ddb07c2e2544e834d3a19e66fbc8dd1fcca151d919988cfb46f369743e1",
+        "bytes": 4500,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "decision": "accepted replacement: high-confidence legacy flat/cartoon outlier superseded by mechanic-accurate premium painted art",
+        "review": {
+          "semantic": "accepted",
+          "crop": "accepted",
+          "style": "accepted",
+          "sizesPx": [128, 48, 32, 16],
+          "grayscale": "accepted",
+          "circularCrop": "accepted"
+        }
+      },
+      "rejects": [],
+      "retries": 0
+    },
+    {
+      "class": "warrior",
+      "abilityId": "heroic_strike",
+      "liveName": "Reaver Strike",
+      "mechanic": "Queues a strong bonus-damage attack onto the next melee swing.",
+      "mechanicSource": "src/sim/content/classes.ts",
+      "oldShipping": {
+        "preservedFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/old/warrior_heroic_strike.webp",
+        "sha256": "5e9778fe29ad437dd0bbe67611f53603fcdf884097dbdfec8a3aaa84ba21133c",
+        "bytes": 4442,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false
+      },
+      "oldMapping": {
+        "path": "public/ui/skills/warrior/mapping.json",
+        "sourcePack": "warrior",
+        "sourceFile": "3.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account unless sourcePack is custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com"
+      },
+      "generation": {
+        "mode": "OpenAI built-in image generation",
+        "builtInCallCount": 1,
+        "prompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior on-next-swing action-bar icon, brand-new replacement painting\nPrimary request: Paint Reaver Strike, a strong attack queued onto the Warrior's next melee swing for bonus damage.\nInput images: Image 1 (Revenge): approved sibling reference for close steel-on-armor impact and premium bronze finish. Image 2 (Execute): approved sibling reference for forceful blade foreshortening and orange impact. Image 3 (Cleave): approved sibling reference for broad sweeping weapon arc and small-size clarity.\nSubject: a single heavy battle sword pulled back then surging forward in one decisive diagonal swing, represented by a dark steel blade with one broad molten-gold afterimage; its tip bursts against black plate in a compact star of sparks.\nScene/backdrop: fully painted charcoal and deep burgundy combat haze to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG attack art; worn steel, muscular momentum, simple high-impact value grouping, original design.\nComposition/framing: square, blade and one afterimage form a strong diagonal filling 78%, impact near center, readable at 16/32/48 px and in a circular crop.\nLighting/mood: burnished gold, hot orange sparks, cool steel; committed, martial, forceful.\nConstraints: opaque, borderless; no text, letters, numbers, UI frame, badge, bevel, watermark, hand-only photo, multiple weapons, flat glyph, or copied sibling composition.\nAvoid: thrown sword, magic projectile, three-hit frenzy, thin blade, empty background, low contrast.",
+        "references": [
+          {
+            "path": "public/ui/skills/warrior/revenge.webp",
+            "role": "approved sibling: steel-on-armor impact and bronze finish"
+          },
+          {
+            "path": "public/ui/skills/warrior/execute.webp",
+            "role": "approved sibling: blade foreshortening and orange impact"
+          },
+          {
+            "path": "public/ui/skills/warrior/cleave.webp",
+            "role": "approved sibling: broad sweeping weapon arc and small-size clarity"
+          }
+        ],
+        "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_heroic_strike.png",
+        "sourceSha256": "f33042f58c1fe40b99f3747f0d9f69511a9cb4570106a42327feb50968e1ba7f",
+        "sourceBytes": 2439583,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "accepted": {
+        "output": "public/ui/skills/warrior/heroic_strike.webp",
+        "sha256": "b883a9c133778d87fea466bc8081d11f8b82038ac378d62778357e322140d57e",
+        "bytes": 5018,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "decision": "accepted replacement: high-confidence legacy flat/cartoon outlier superseded by mechanic-accurate premium painted art",
+        "review": {
+          "semantic": "accepted",
+          "crop": "accepted",
+          "style": "accepted",
+          "sizesPx": [128, 48, 32, 16],
+          "grayscale": "accepted",
+          "circularCrop": "accepted"
+        }
+      },
+      "rejects": [],
+      "retries": 0
+    },
+    {
+      "class": "warrior",
+      "abilityId": "intimidating_shout",
+      "liveName": "Intimidating Shout",
+      "mechanic": "Area fear: sends up to five enemies within 8 yards fleeing for 4 seconds; damage may break it.",
+      "mechanicSource": "src/sim/content/classes.ts",
+      "oldShipping": {
+        "preservedFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/old/warrior_intimidating_shout.webp",
+        "sha256": "5965bdaa1c377d7723c232e256e8cd855acf6010ddd7505d1ddf1751bf85d2f3",
+        "bytes": 16168,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false
+      },
+      "oldMapping": {
+        "path": "public/ui/skills/warrior/mapping.json",
+        "sourcePack": "custom-user",
+        "sourceFile": "desktop/Fear en area wow.png",
+        "ownerOrLicense": "custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com"
+      },
+      "generation": {
+        "mode": "OpenAI built-in image generation",
+        "builtInCallCount": 1,
+        "prompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior area-fear action-bar icon, brand-new replacement painting\nPrimary request: Paint Intimidating Shout, a terrifying roar that sends up to five nearby enemies fleeing for four seconds.\nInput images: Image 1 (Defiant Bellow): approved sibling reference for plated Warrior shout posture and radial force. Image 2 (Lingering Dread): approved sibling reference for spectral terror faces and violet-black atmosphere. Image 3 (Emboldening Roar): approved sibling reference for powerful concentric sound waves and close-up face readability.\nSubject: one horned black-steel Warrior helm roaring from the center of a bone-white and red shockwave; three large shadow faces recoil outward at the perimeter, eyes wide in violet terror, suggesting a crowd without tiny figures.\nScene/backdrop: fully painted black-purple battlefield smoke to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG crowd-control art; textured plate, spectral fear, dramatic high contrast, original design.\nComposition/framing: square, central roaring helm fills half the canvas, broad circular wave and three perimeter faces stay inside safe crop; readable at 16/32/48 px and circular crop.\nLighting/mood: white-hot throat, blood-red ring, violet shadows; primal, shocking, panic-inducing.\nConstraints: opaque, borderless; no text, letters, numbers, comic burst, UI frame, badge, bevel, watermark, flat silhouette, or copied sibling composition.\nAvoid: smiling rally, five tiny bodies, skull-only icon, white checkerboard, low contrast.",
+        "references": [
+          {
+            "path": "public/ui/skills/warrior/defiant_bellow.webp",
+            "role": "approved sibling: plated Warrior shout posture and radial force"
+          },
+          {
+            "path": "public/ui/skills/warrior/lingering_dread.webp",
+            "role": "approved sibling: spectral terror faces and violet-black atmosphere"
+          },
+          {
+            "path": "public/ui/skills/warrior/emboldening_roar.webp",
+            "role": "approved sibling: concentric sound waves and face readability"
+          }
+        ],
+        "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_intimidating_shout.png",
+        "sourceSha256": "8c870750bfc29464b6b7ae8d34e85b972705484fb6bbe8fd00ca7a116da3e1b9",
+        "sourceBytes": 2585867,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "accepted": {
+        "output": "public/ui/skills/warrior/intimidating_shout.webp",
+        "sha256": "2bf22332aa09f46882736c6e6aa8980af077c3e3e9daa7b0fe77162fe30a5bf9",
+        "bytes": 6364,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "decision": "accepted replacement: high-confidence legacy flat/cartoon outlier superseded by mechanic-accurate premium painted art",
+        "review": {
+          "semantic": "accepted",
+          "crop": "accepted",
+          "style": "accepted",
+          "sizesPx": [128, 48, 32, 16],
+          "grayscale": "accepted",
+          "circularCrop": "accepted"
+        }
+      },
+      "rejects": [],
+      "retries": 0
+    },
+    {
+      "class": "warrior",
+      "abilityId": "mortal_strike",
+      "liveName": "Maiming Strike",
+      "mechanic": "Heavy Arms strike that halves healing received for 10 seconds and applies a bleed.",
+      "mechanicSource": "src/sim/content/classes.ts",
+      "oldShipping": {
+        "preservedFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/old/warrior_mortal_strike.webp",
+        "sha256": "17e1fb6fae3144fd4ca101729d3d9fefc54f623ca00e5ed734ed7dc41b4ae83a",
+        "bytes": 2298,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false
+      },
+      "oldMapping": {
+        "path": "public/ui/skills/warrior/mapping.json",
+        "sourcePack": "warrior",
+        "sourceFile": "21.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account unless sourcePack is custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com"
+      },
+      "generation": {
+        "mode": "OpenAI built-in image generation",
+        "builtInCallCount": 1,
+        "prompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior signature attack action-bar icon, brand-new replacement painting\nPrimary request: Paint Maiming Strike, a vicious Arms attack that deals heavy weapon damage, halves healing received for ten seconds, and leaves a bleeding wound.\nInput images: Image 1 (Bloodletting): approved sibling reference for brutal red-black melee energy and premium rendering. Image 2 (Deep Wounds): approved sibling reference for a focused bleeding cut. Image 3 (Execute): approved sibling reference for heavy steel weapon impact and amber sparks.\nSubject: one massive dark-steel axe cleaving through a glowing green life-vine wrapped around black armor; the vine snaps and withers at the red wound, making blocked healing and lasting bleed readable without using a medical symbol.\nScene/backdrop: fully painted soot-black and deep crimson haze to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG signature art; tactile steel, torn vine and armor, bold value grouping, original design.\nComposition/framing: square macro impact, axe diagonal fills 75-80%, red wound and broken green vine at center, readable at 16/32/48 px and in a circular crop.\nLighting/mood: saturated blood red, dying emerald, hot gold edge light; vicious, final, anti-healing.\nConstraints: opaque, borderless; no text, letters, numbers, red cross, UI frame, badge, bevel, watermark, full character, flat glyph, or copied sibling composition.\nAvoid: generic sword slash, ordinary plant-cutting scene, gore overload, tiny leaves, low contrast.",
+        "references": [
+          {
+            "path": "public/ui/skills/warrior/bloodthirst.webp",
+            "role": "approved sibling: brutal red-black melee energy and premium rendering"
+          },
+          {
+            "path": "public/ui/skills/warrior/deep_wounds.webp",
+            "role": "approved sibling: focused bleeding cut"
+          },
+          {
+            "path": "public/ui/skills/warrior/execute.webp",
+            "role": "approved sibling: heavy steel weapon impact and amber sparks"
+          }
+        ],
+        "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_mortal_strike.png",
+        "sourceSha256": "fb17def38a5c3ca99163944a6841f4c529653c2826c5f86d474c960f9b2bff2b",
+        "sourceBytes": 2234124,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "accepted": {
+        "output": "public/ui/skills/warrior/mortal_strike.webp",
+        "sha256": "60a951bfe1bb836372a4d40e79252d63f130adfd8118ac4925302f1cb7ee9957",
+        "bytes": 4810,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "decision": "accepted replacement: high-confidence legacy flat/cartoon outlier superseded by mechanic-accurate premium painted art",
+        "review": {
+          "semantic": "accepted",
+          "crop": "accepted",
+          "style": "accepted",
+          "sizesPx": [128, 48, 32, 16],
+          "grayscale": "accepted",
+          "circularCrop": "accepted"
+        }
+      },
+      "rejects": [],
+      "retries": 0
+    },
+    {
+      "class": "warrior",
+      "abilityId": "overpower",
+      "liveName": "Redhand",
+      "mechanic": "Two-charge unavoidable attack that empowers the next Maiming Strike by 20%, stacking twice.",
+      "mechanicSource": "src/sim/content/classes.ts",
+      "oldShipping": {
+        "preservedFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/old/warrior_overpower.webp",
+        "sha256": "ea303e376830e2cc015cc8d80fec59e3f0c5b7caa8406f9cbe24e43a1db7b7a3",
+        "bytes": 4044,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "oldMapping": {
+        "path": "public/ui/skills/warrior/mapping.json",
+        "sourcePack": "berserker",
+        "sourceFile": "12.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account unless sourcePack is custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com"
+      },
+      "generation": {
+        "mode": "OpenAI built-in image generation",
+        "builtInCallCount": 1,
+        "prompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior two-charge attack action-bar icon, brand-new replacement painting\nPrimary request: Paint Redhand, an unavoidable instant attack with two charges that empowers the next Maiming Strike, stacking twice.\nInput images: Image 1 (Revenge): approved sibling reference for a close armored counter-impact. Image 2 (Twinstrike): approved sibling reference for paired weapon motion and saturated red energy. Image 3 (Iron Resolve): approved sibling reference for a powerful plated Warrior body and premium amber finish.\nSubject: one enormous crimson-lit armored gauntlet seizing and forcing aside an enemy sword while the Warrior's own dark blade crashes through behind it; two broad red echo crescents flank the gauntlet to indicate stored paired charges and stacking power.\nScene/backdrop: fully painted black and furnace-red combat haze to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG attack art; tactile gauntlet steel, decisive counterforce, bold original silhouette.\nComposition/framing: square macro action, gauntlet dominates center and blades form a clean X, fills roughly 80%, readable at 16/32/48 px and circular crop.\nLighting/mood: molten red, hard gold sparks, black steel; overwhelming, inevitable, controlled.\nConstraints: opaque, borderless; no text, letters, numbers, UI frame, badge, bevel, watermark, disembodied cartoon hand, flat glyph, or copied sibling composition.\nAvoid: open palm spell, two full characters, tiny weapons, shield, low contrast.",
+        "references": [
+          {
+            "path": "public/ui/skills/warrior/revenge.webp",
+            "role": "approved sibling: close armored counter-impact"
+          },
+          {
+            "path": "public/ui/skills/warrior/raging_gale.webp",
+            "role": "approved sibling: paired weapon motion and saturated red energy"
+          },
+          {
+            "path": "public/ui/skills/warrior/iron_resolve.webp",
+            "role": "approved sibling: plated Warrior body and amber finish"
+          }
+        ],
+        "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_overpower.png",
+        "sourceSha256": "4183702848f8318260374e00f83d9bb2ff9f96d2bcc2285fe7e7fc9c03e38bbe",
+        "sourceBytes": 2311893,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "accepted": {
+        "output": "public/ui/skills/warrior/overpower.webp",
+        "sha256": "10bbba52b08521dfde0881c7fd38668eca9f3ea075fef35df53d3994fe657e0b",
+        "bytes": 5026,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "decision": "accepted replacement: high-confidence legacy flat/cartoon outlier superseded by mechanic-accurate premium painted art",
+        "review": {
+          "semantic": "accepted",
+          "crop": "accepted",
+          "style": "accepted",
+          "sizesPx": [128, 48, 32, 16],
+          "grayscale": "accepted",
+          "circularCrop": "accepted"
+        }
+      },
+      "rejects": [],
+      "retries": 0
+    },
+    {
+      "class": "warrior",
+      "abilityId": "red_harvest",
+      "liveName": "Red Harvest",
+      "mechanic": "Spends the entire 80-rage bar for three 65%-weapon strikes and always grants Enrage.",
+      "mechanicSource": "src/sim/content/classes.ts",
+      "oldShipping": {
+        "preservedFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/old/warrior_red_harvest.webp",
+        "sha256": "a2a3a22163452b654f4e15a7a043a921b5a9158b655bf3c02a9a7f10d28095ca",
+        "bytes": 15074,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false
+      },
+      "oldMapping": {
+        "path": "public/ui/skills/warrior/mapping.json",
+        "sourcePack": "custom-user",
+        "sourceFile": "desktop/Desenfreno wow.png",
+        "ownerOrLicense": "custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com"
+      },
+      "generation": {
+        "mode": "OpenAI built-in image generation",
+        "builtInCallCount": 1,
+        "prompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior Fury spender action-bar icon, brand-new replacement painting\nPrimary request: Paint Red Harvest, the all-rage Fury attack that strikes three times in a frenzy and always Enrages the Warrior.\nInput images: Image 1 (Bloodletting): approved sibling reference for blood-red melee ferocity and premium armor rendering. Image 2 (Twinstrike): approved sibling reference for multi-hit weapon rhythm. Image 3 (Mayhem): approved sibling reference for the flaming Enrage silhouette. Image 4 (Bladestorm): approved sibling reference for compact circular blade motion.\nSubject: a berserk black-armored Warrior at center executing three unmistakable crimson weapon arcs - one high, one crossing, one low - around a single two-handed axe; the three arcs converge into a white-hot blood-red impact while an ember mane flares behind the helm.\nScene/backdrop: fully painted near-black battlefield smoke to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG signature art; savage motion, rich steel and blood-light, strong original silhouette.\nComposition/framing: square, central berserker and exactly three broad arcs fill 80%, safe circular crop, readable at 16/32/48 px.\nLighting/mood: saturated crimson, white-hot center, ember orange; frenzied, costly, explosive.\nConstraints: opaque, borderless; no text, letters, numbers, UI frame, badge, bevel, watermark, gore, more than three major arcs, flat glyph, or copied sibling composition.\nAvoid: calm single swing, generic whirlwind circle, tiny character, rainbow trails, low contrast.",
+        "references": [
+          {
+            "path": "public/ui/skills/warrior/bloodthirst.webp",
+            "role": "approved sibling: blood-red melee ferocity and armor rendering"
+          },
+          {
+            "path": "public/ui/skills/warrior/raging_gale.webp",
+            "role": "approved sibling: multi-hit weapon rhythm"
+          },
+          {
+            "path": "public/ui/skills/warrior/enrage_passive.webp",
+            "role": "approved sibling: flaming Enrage silhouette"
+          },
+          {
+            "path": "public/ui/skills/warrior/bladestorm.webp",
+            "role": "approved sibling: compact circular blade motion"
+          }
+        ],
+        "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_red_harvest.png",
+        "sourceSha256": "41536a3156fa7730c2b2ec676e2e796f03ab89140799e24afe29a879260db0ab",
+        "sourceBytes": 2316948,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "accepted": {
+        "output": "public/ui/skills/warrior/red_harvest.webp",
+        "sha256": "76674a34a222f69e4256f57434862a717746c38cfcb4458e9ddb8344d9b12a72",
+        "bytes": 4986,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "decision": "accepted replacement: high-confidence legacy flat/cartoon outlier superseded by mechanic-accurate premium painted art",
+        "review": {
+          "semantic": "accepted",
+          "crop": "accepted",
+          "style": "accepted",
+          "sizesPx": [128, 48, 32, 16],
+          "grayscale": "accepted",
+          "circularCrop": "accepted"
+        }
+      },
+      "rejects": [],
+      "retries": 0
+    },
+    {
+      "class": "warrior",
+      "abilityId": "shield_slam",
+      "liveName": "Shieldcrack",
+      "mechanic": "Shield-required signature slam: heavy damage and threat, generating 15 rage.",
+      "mechanicSource": "src/sim/content/classes.ts",
+      "oldShipping": {
+        "preservedFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/old/warrior_shield_slam.webp",
+        "sha256": "3619e8acc39ef49af683f0aab434f08492bb4f66fa409b040045a9bce7d1ac07",
+        "bytes": 4706,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "oldMapping": {
+        "path": "public/ui/skills/warrior/mapping.json",
+        "sourcePack": "berserker",
+        "sourceFile": "25.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account unless sourcePack is custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com"
+      },
+      "generation": {
+        "mode": "OpenAI built-in image generation",
+        "builtInCallCount": 1,
+        "prompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior Protection signature action-bar icon, brand-new replacement painting\nPrimary request: Paint Shieldcrack, a shield-required slam that deals weapon damage, creates massive threat, and generates 15 rage.\nInput images: Image 1 (Raised Guard): approved sibling reference for battered shield materials and blue-white shield impact. Image 2 (Revenge): approved sibling reference for close armored collision and hot sparks. Image 3 (Iron Resolve): approved sibling reference for premium plated Warrior lighting.\nSubject: a broad iron shield exploding forward into a horned enemy helm, bending the helm backward in one compact white-gold impact; the Warrior's braced shoulder is visible behind the shield and a red rage flare erupts from its rim.\nScene/backdrop: fully painted charcoal battlefield smoke to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG melee art; dented steel, physical weight, bold collision, original design.\nComposition/framing: square macro impact, shield fills the left-center and helm the right-center, overall cluster fills 82%, readable at 16/32/48 px and circular crop.\nLighting/mood: steel blue, white-gold impact, deep red rim; concussive, commanding, high-threat.\nConstraints: opaque, borderless; no text, letters, numbers, UI frame, badge, bevel, watermark, floating shield, full scene, flat glyph, or copied sibling composition.\nAvoid: defensive static pose, sword as main subject, broken shield, tiny face, low contrast.",
+        "references": [
+          {
+            "path": "public/ui/skills/warrior/raised_guard.webp",
+            "role": "approved sibling: battered shield material and blue-white impact"
+          },
+          {
+            "path": "public/ui/skills/warrior/revenge.webp",
+            "role": "approved sibling: close armored collision and hot sparks"
+          },
+          {
+            "path": "public/ui/skills/warrior/iron_resolve.webp",
+            "role": "approved sibling: premium plated Warrior lighting"
+          }
+        ],
+        "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_shield_slam.png",
+        "sourceSha256": "04c1539a7dc2309aa6619841776b8d0f7c862b0797709f42ab45618390f1b211",
+        "sourceBytes": 2622838,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "accepted": {
+        "output": "public/ui/skills/warrior/shield_slam.webp",
+        "sha256": "8b419980157fff97eb73274b148adf68ab879763620dae5ab67cf35a4eeaf924",
+        "bytes": 6008,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "decision": "accepted replacement: high-confidence legacy flat/cartoon outlier superseded by mechanic-accurate premium painted art",
+        "review": {
+          "semantic": "accepted",
+          "crop": "accepted",
+          "style": "accepted",
+          "sizesPx": [128, 48, 32, 16],
+          "grayscale": "accepted",
+          "circularCrop": "accepted"
+        }
+      },
+      "rejects": [],
+      "retries": 0
+    },
+    {
+      "class": "warrior",
+      "abilityId": "slam",
+      "liveName": "Brute Swing",
+      "mechanic": "Brutal 50%-weapon-damage strike that generates 8 rage.",
+      "mechanicSource": "src/sim/content/classes.ts",
+      "oldShipping": {
+        "preservedFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/old/warrior_slam.webp",
+        "sha256": "bbc02cc07fcdf91ee09741eb356378126da47fdf360a25350dfcce7f36787b8b",
+        "bytes": 3210,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false
+      },
+      "oldMapping": {
+        "path": "public/ui/skills/warrior/mapping.json",
+        "sourcePack": "warrior",
+        "sourceFile": "4.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account unless sourcePack is custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com"
+      },
+      "generation": {
+        "mode": "OpenAI built-in image generation",
+        "builtInCallCount": 1,
+        "prompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior Arms builder action-bar icon, brand-new replacement painting\nPrimary request: Paint Brute Swing, a brutal half-weapon-damage blow that generates eight rage.\nInput images: Image 1 (Heroic Leap): approved sibling reference for airborne armored force and gold landing light. Image 2 (Execute): approved sibling reference for heavy blade foreshortening. Image 3 (Faultline): approved sibling reference for seismic ground impact and premium orange-black rendering.\nSubject: one two-handed war hammer descending vertically from an armored grip into a cracked stone plate, producing one broad V-shaped amber shock burst; the heavy head and downward momentum dominate, with no magic lightning.\nScene/backdrop: fully painted soot-black battlefield ground and dust to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG attack art; battered steel, raw physical force, thick brushwork, original design.\nComposition/framing: square, hammer head and impact fill roughly 80%, strong vertical silhouette, safe circular crop, readable at 16/32/48 px.\nLighting/mood: hot amber fracture light, dark steel, red dust; brutal, grounded, rage-building.\nConstraints: opaque, borderless; no text, letters, numbers, UI frame, badge, bevel, watermark, floating weapon, lightning, shield, flat glyph, or copied sibling composition.\nAvoid: heroic leap body pose, multiple hammers, thin cracks, bright scenic background, low contrast.",
+        "references": [
+          {
+            "path": "public/ui/skills/warrior/heroic_leap.webp",
+            "role": "approved sibling: airborne armored force and gold landing light"
+          },
+          {
+            "path": "public/ui/skills/warrior/execute.webp",
+            "role": "approved sibling: heavy blade foreshortening"
+          },
+          {
+            "path": "public/ui/skills/warrior/faultline.webp",
+            "role": "approved sibling: seismic impact and orange-black rendering"
+          }
+        ],
+        "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_slam.png",
+        "sourceSha256": "5ec4a05567a404321f5b5d5fa6ec2c1fb7879bce241819226f8b0246045f1493",
+        "sourceBytes": 2688463,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "accepted": {
+        "output": "public/ui/skills/warrior/slam.webp",
+        "sha256": "23adcdc76ef4b840d3017103a357b8afb15d3f7a244cb7af86cbcdd5e1ab4211",
+        "bytes": 5454,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "decision": "accepted replacement: high-confidence legacy flat/cartoon outlier superseded by mechanic-accurate premium painted art",
+        "review": {
+          "semantic": "accepted",
+          "crop": "accepted",
+          "style": "accepted",
+          "sizesPx": [128, 48, 32, 16],
+          "grayscale": "accepted",
+          "circularCrop": "accepted"
+        }
+      },
+      "rejects": [],
+      "retries": 0
+    },
+    {
+      "class": "warrior",
+      "abilityId": "sunder_armor",
+      "liveName": "Armor Shear",
+      "mechanic": "High-threat armor debuff that reduces armor per application and stacks up to five times.",
+      "mechanicSource": "src/sim/content/classes.ts",
+      "oldShipping": {
+        "preservedFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/old/warrior_sunder_armor.webp",
+        "sha256": "1cf71e3e80f4e58806e848d5950a1c592ca53a1a42758a14c77609c1d08e7125",
+        "bytes": 4928,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "oldMapping": {
+        "path": "public/ui/skills/warrior/mapping.json",
+        "sourcePack": "berserker",
+        "sourceFile": "8.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account unless sourcePack is custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com"
+      },
+      "generation": {
+        "mode": "OpenAI built-in image generation",
+        "builtInCallCount": 1,
+        "prompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior armor-debuff action-bar icon, brand-new replacement painting\nPrimary request: Paint Armor Shear, a high-threat strike that reduces armor per application and stacks up to five times.\nInput images: Image 1 (Faultline): approved sibling reference for dramatic fracturing and amber impact light. Image 2 (Revenge): approved sibling reference for close steel-on-plate collision. Image 3 (Raised Guard): approved sibling reference for battered shield-grade metal texture.\nSubject: one wedge-shaped war axe biting through a blackened breastplate, splitting it into five large readable plate fragments around a deep glowing orange fissure; the armor is clearly being peeled and broken away layer by layer.\nScene/backdrop: fully painted charcoal battlefield smoke to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG debuff art; tactile dented steel, heavy fracture, bold original silhouette.\nComposition/framing: square macro impact, axe and breastplate fill roughly 82%, five broad fragments stay within circular safe crop, readable at 16/32/48 px.\nLighting/mood: furnace orange fracture light, cool steel, deep red dust; destructive, deliberate, threatening.\nConstraints: opaque, borderless; no text, letters, numbers, UI frame, badge, bevel, watermark, full character, floating armor icon, flat glyph, or copied sibling composition.\nAvoid: shield block, stone-only crack, many tiny shards, gore, low contrast.",
+        "references": [
+          {
+            "path": "public/ui/skills/warrior/faultline.webp",
+            "role": "approved sibling: fracturing and amber impact light"
+          },
+          {
+            "path": "public/ui/skills/warrior/revenge.webp",
+            "role": "approved sibling: steel-on-plate collision"
+          },
+          {
+            "path": "public/ui/skills/warrior/raised_guard.webp",
+            "role": "approved sibling: battered shield-grade metal texture"
+          }
+        ],
+        "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_sunder_armor.png",
+        "sourceSha256": "d4aad04f5a510c01044669c90fcd09395a951061e331d8daa7e2f4af65e22172",
+        "sourceBytes": 2364801,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "accepted": {
+        "output": "public/ui/skills/warrior/sunder_armor.webp",
+        "sha256": "884a8ebb9e8a67db9bf329923b1cd77d3adf4193790833332f4f741e731a9531",
+        "bytes": 5838,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "decision": "accepted replacement: high-confidence legacy flat/cartoon outlier superseded by mechanic-accurate premium painted art",
+        "review": {
+          "semantic": "accepted",
+          "crop": "accepted",
+          "style": "accepted",
+          "sizesPx": [128, 48, 32, 16],
+          "grayscale": "accepted",
+          "circularCrop": "accepted"
+        }
+      },
+      "rejects": [],
+      "retries": 0
+    },
+    {
+      "class": "warrior",
+      "abilityId": "taunt",
+      "liveName": "Goad",
+      "mechanic": "Matches the target's highest threat and compels it to attack the Warrior for 3 seconds.",
+      "mechanicSource": "src/sim/content/classes.ts",
+      "oldShipping": {
+        "preservedFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/old/warrior_taunt.webp",
+        "sha256": "ba8b656e5a4bbb0974b63689760b5753a6aa904085c6e68135d0d36694f7a4a9",
+        "bytes": 2168,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "oldMapping": {
+        "path": "public/ui/skills/warrior/mapping.json",
+        "sourcePack": "generic-skill100",
+        "sourceFile": "skill icon 37.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account unless sourcePack is custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com"
+      },
+      "generation": {
+        "mode": "OpenAI built-in image generation",
+        "builtInCallCount": 1,
+        "prompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior threat-control action-bar icon, brand-new replacement painting\nPrimary request: Paint Goad, the off-global taunt that matches the target's highest threat and compels it to attack the Warrior for three seconds.\nInput images: Image 1 (Defiant Bellow): approved sibling reference for commanding red radial force. Image 2 (Iron Resolve): approved sibling reference for dominant plated Warrior presence. Image 3 (Revenge): approved sibling reference for close hostile helmet and Warrior impact materials.\nSubject: a massive armored Warrior fist clenched in the foreground, connected by one thick molten-red threat tether to a snarling horned enemy helm being yanked to face it; a compact red target glare locks between their eyes.\nScene/backdrop: fully painted black and dark-red battlefield haze to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG control art; heavy steel, supernatural threat force, simple original silhouette.\nComposition/framing: square close-up, fist and enemy helm occupy opposing halves joined through center, fills 78%, readable at 16/32/48 px and circular crop.\nLighting/mood: molten red tether, amber eye glare, black steel; provocative, commanding, unavoidable.\nConstraints: opaque, borderless; no text, letters, numbers, bullseye symbol, pointing finger, UI frame, badge, bevel, watermark, full bodies, flat glyph, or copied sibling composition.\nAvoid: comic insult, speech bubble, fishing hook, tiny chain, friendly handshake, low contrast.",
+        "references": [
+          {
+            "path": "public/ui/skills/warrior/defiant_bellow.webp",
+            "role": "approved sibling: commanding red radial force"
+          },
+          {
+            "path": "public/ui/skills/warrior/iron_resolve.webp",
+            "role": "approved sibling: dominant plated Warrior presence"
+          },
+          {
+            "path": "public/ui/skills/warrior/revenge.webp",
+            "role": "approved sibling: hostile helmet and impact materials"
+          }
+        ],
+        "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_taunt.png",
+        "sourceSha256": "5c536592065786e6077dcc682dc81b419c3edc33d6ac94ea008b5a91f6de9330",
+        "sourceBytes": 1917815,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "accepted": {
+        "output": "public/ui/skills/warrior/taunt.webp",
+        "sha256": "3d854a88d08457bc6fa075380a18b86137e6a49a7787eef61e081101f103d583",
+        "bytes": 4040,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "decision": "accepted replacement: high-confidence legacy flat/cartoon outlier superseded by mechanic-accurate premium painted art",
+        "review": {
+          "semantic": "accepted",
+          "crop": "accepted",
+          "style": "accepted",
+          "sizesPx": [128, 48, 32, 16],
+          "grayscale": "accepted",
+          "circularCrop": "accepted"
+        }
+      },
+      "rejects": [],
+      "retries": 0
+    },
+    {
+      "class": "warrior",
+      "abilityId": "thunder_clap",
+      "liveName": "Quaking Blow",
+      "mechanic": "Area damage and high threat, slowing affected enemies' attacks by 10% for 10 seconds.",
+      "mechanicSource": "src/sim/content/classes.ts",
+      "oldShipping": {
+        "preservedFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/old/warrior_thunder_clap.webp",
+        "sha256": "5c9dffbc6f02a4b7fc7803a4b89aa97fecc84e588257394c29d20ed4e206283b",
+        "bytes": 8126,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false
+      },
+      "oldMapping": {
+        "path": "public/ui/skills/warrior/mapping.json",
+        "sourcePack": "warrior",
+        "sourceFile": "7.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account unless sourcePack is custom-user",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com"
+      },
+      "generation": {
+        "mode": "OpenAI built-in image generation",
+        "builtInCallCount": 1,
+        "prompt": "Use case: stylized-concept\nAsset type: 128x128 Warrior area-damage and attack-slow action-bar icon, brand-new replacement painting\nPrimary request: Paint Quaking Blow, a Protection ground blast that damages nearby enemies, creates high threat, and slows their attacks by 10% for ten seconds.\nInput images: Image 1 (Faultline): approved sibling reference for seismic radial impact and premium black-orange finish. Image 2 (Heroic Leap): approved sibling reference for grounded Warrior force. Image 3 (Raised Guard): approved sibling reference for cold steel-blue impact energy.\nSubject: one plated Warrior fist smashing a stone plate dead center, releasing a broad circular shockwave of blue-white thunder and amber rock; three enemy weapon heads around the perimeter are driven backward and trapped in the slowed wave.\nScene/backdrop: fully painted storm-black battlefield dust to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG area attack art; heavy gauntlet, electric fracture, bold radial value grouping, original design.\nComposition/framing: square top-down impact cluster filling 82%, fist central and three broad perimeter weapons inside circular safe crop, readable at 16/32/48 px.\nLighting/mood: cobalt-white thunder core, amber fractures, soot black; seismic, controlling, high-threat.\nConstraints: opaque, borderless; no text, letters, numbers, clock, UI frame, badge, bevel, watermark, full character, hammer, flat glyph, or copied sibling composition.\nAvoid: weather landscape, thin lightning web, magical caster hand, tiny debris, low contrast.",
+        "references": [
+          {
+            "path": "public/ui/skills/warrior/faultline.webp",
+            "role": "approved sibling: seismic radial impact and black-orange finish"
+          },
+          {
+            "path": "public/ui/skills/warrior/heroic_leap.webp",
+            "role": "approved sibling: grounded Warrior force"
+          },
+          {
+            "path": "public/ui/skills/warrior/raised_guard.webp",
+            "role": "approved sibling: cold steel-blue impact energy"
+          }
+        ],
+        "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warrior_thunder_clap.png",
+        "sourceSha256": "4c400c6be926cfe595b025ec19856dd4e2e608282f683f2f9ff86a5210d37b55",
+        "sourceBytes": 2718416,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "accepted": {
+        "output": "public/ui/skills/warrior/thunder_clap.webp",
+        "sha256": "a300fdced475f2ca0a37870c6ba68d2634463e45722fd73b32914981ba49a44c",
+        "bytes": 7282,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "decision": "accepted replacement: high-confidence legacy flat/cartoon outlier superseded by mechanic-accurate premium painted art",
+        "review": {
+          "semantic": "accepted",
+          "crop": "accepted",
+          "style": "accepted",
+          "sizesPx": [128, 48, 32, 16],
+          "grayscale": "accepted",
+          "circularCrop": "accepted"
+        }
+      },
+      "rejects": [],
+      "retries": 0
+    },
+    {
+      "class": "warlock",
+      "abilityId": "summon_felguard",
+      "liveName": "Summon Warfiend",
+      "mechanic": "Summons a durable melee demon that wades into battle and holds its own.",
+      "mechanicSource": "src/ui/i18n.catalog/abilities.ts",
+      "oldShipping": {
+        "preservedFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/old/warlock_summon_felguard.webp",
+        "sha256": "86792cac6a199da2a82183481ac80e92d46ee9944d6367a884a8f45eaa3b16f4",
+        "bytes": 4856,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false
+      },
+      "oldMapping": {
+        "path": "public/ui/skills/warlock/mapping.json",
+        "sourcePack": "demon",
+        "sourceFile": "25.png",
+        "ownerOrLicense": "CraftPix premium legacy entry",
+        "inheritedClassLicense": "Mixed: CraftPix premium for legacy entries; project-owned OpenAI-generated art for generatedBatches"
+      },
+      "generation": {
+        "mode": "OpenAI built-in image generation",
+        "builtInCallCount": 1,
+        "prompt": "Use case: stylized-concept\nAsset type: 128x128 Warlock demon-summon action-bar icon, brand-new replacement painting\nPrimary request: Paint Summon Warfiend, calling a durable melee demon that wades into battle and holds its own.\nInput images: Image 1 (Cinderhide): approved sibling reference for infernal plated-hide texture and acid-green fissure light. Image 2 (Summon Wraithborn): approved sibling reference for a demon emerging beneath violet summoning rings. Image 3 (Hour of Judgment): approved sibling reference for premium Warlock violet-black radial energy and crisp small-size silhouette.\nSubject: one massive horned Warfiend rising chest-first through a violet summoning rift, shoulders encased in jagged black iron, one broad cleaver held close; thick acid-green cracks glow through its plated hide and its eyes burn white-violet.\nScene/backdrop: fully painted abyss-black and smoky violet atmosphere to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG summon art; intimidating demon anatomy, heavy armor, dimensional portal light, original non-franchise design.\nComposition/framing: square, centered head/shoulders/cleaver cluster fills 78%, broad horns within circular safe crop, readable at 16/32/48 px.\nLighting/mood: violet portal, sickly green fissures, black iron; durable, brutal, obedient.\nConstraints: opaque, borderless; no text, letters, numbers, UI frame, badge, bevel, watermark, cute creature, full-body scene, flat glyph, or copied sibling composition.\nAvoid: red human warrior, skull-only face, oversized wings, tiny weapon, low contrast.",
+        "references": [
+          {
+            "path": "public/ui/skills/warlock/cinderhide.webp",
+            "role": "approved sibling: infernal plated hide and acid-green fissure light"
+          },
+          {
+            "path": "public/ui/skills/warlock/summon_doomguard.webp",
+            "role": "approved sibling: demon emerging beneath violet summoning rings"
+          },
+          {
+            "path": "public/ui/skills/warlock/hour_of_judgment.webp",
+            "role": "approved sibling: violet-black radial energy and small-size silhouette"
+          }
+        ],
+        "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warlock_summon_felguard.png",
+        "sourceSha256": "fab75d6b233b718a5105c09b0e16ebc668b8b0e120aebd8826ed4fac6ff336dc",
+        "sourceBytes": 2754672,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "accepted": {
+        "output": "public/ui/skills/warlock/summon_felguard.webp",
+        "sha256": "d5c7aea76d3f051e72b0dcbbdaf67a024eb683d2a0c530ba6bd2bcb148c268ba",
+        "bytes": 6046,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "decision": "accepted replacement: high-confidence legacy flat/cartoon outlier superseded by mechanic-accurate premium painted art",
+        "review": {
+          "semantic": "accepted",
+          "crop": "accepted",
+          "style": "accepted",
+          "sizesPx": [128, 48, 32, 16],
+          "grayscale": "accepted",
+          "circularCrop": "accepted"
+        }
+      },
+      "rejects": [],
+      "retries": 0
+    },
+    {
+      "class": "warlock",
+      "abilityId": "summon_felhunter",
+      "liveName": "Summon Spellhound",
+      "mechanic": "Summons a ranged demon that harries enemies with Gloombite and hunts spellcasters.",
+      "mechanicSource": "src/ui/i18n.catalog/abilities.ts",
+      "oldShipping": {
+        "preservedFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/old/warlock_summon_felhunter.webp",
+        "sha256": "f73df7c8031455fa49fd7f77fba5d3fb6865f567bec684cc6b7650f67695948f",
+        "bytes": 4144,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false
+      },
+      "oldMapping": {
+        "path": "public/ui/skills/warlock/mapping.json",
+        "sourcePack": "demon",
+        "sourceFile": "19.png",
+        "ownerOrLicense": "CraftPix premium legacy entry",
+        "inheritedClassLicense": "Mixed: CraftPix premium for legacy entries; project-owned OpenAI-generated art for generatedBatches"
+      },
+      "generation": {
+        "mode": "OpenAI built-in image generation",
+        "builtInCallCount": 1,
+        "prompt": "Use case: stylized-concept\nAsset type: 128x128 Warlock demon-summon action-bar icon, brand-new replacement painting\nPrimary request: Paint Summon Spellhound, calling a ranged demon that attacks with Gloombite and excels at hunting enemy spellcasters.\nInput images: Image 1 (Evil Eye): approved sibling reference for focused violet occult sight and clean Warlock contrast. Image 2 (Soul Lance): approved sibling reference for blue-violet piercing spell energy. Image 3 (Cinderhide): approved sibling reference for infernal plated skin and acid-green fissures.\nSubject: one eyeless armored Spellhound lunging head-first through a violet summoning tear, with a long wedge-shaped jaw, four heavy fangs, swept-back sensory horns, and a bright blue-violet Gloombite building in its mouth; green runic veins hunt toward a small spell-glow at the edge.\nScene/backdrop: fully painted abyss-black and indigo smoke to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG summon art; original quadrupedal demon anatomy, plated hide, luminous shadow magic, strong silhouette.\nComposition/framing: square, three-quarter hound head and fore-shoulders fill 78%, jaws centered, horns within circular safe crop, readable at 16/32/48 px.\nLighting/mood: blue-violet mouth core, acid-green veins, black armor; predatory, arcane-hunting, alien.\nConstraints: opaque, borderless; no text, letters, numbers, UI frame, badge, bevel, watermark, ordinary wolf, floating face, cute pet, flat glyph, or copied sibling composition.\nAvoid: cartoon grin, human demon, multiple heads, tiny teeth, red-only palette, low contrast.",
+        "references": [
+          {
+            "path": "public/ui/skills/warlock/evil_eye.webp",
+            "role": "approved sibling: focused violet occult sight and clean contrast"
+          },
+          {
+            "path": "public/ui/skills/warlock/soul_lance.webp",
+            "role": "approved sibling: blue-violet piercing spell energy"
+          },
+          {
+            "path": "public/ui/skills/warlock/cinderhide.webp",
+            "role": "approved sibling: infernal plated skin and acid-green fissures"
+          }
+        ],
+        "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warlock_summon_felhunter.png",
+        "sourceSha256": "7cdff051f68d8c9572c1979c1c078657a40fd61ee9b841af7e2f75ad57164c62",
+        "sourceBytes": 2367791,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "accepted": {
+        "output": "public/ui/skills/warlock/summon_felhunter.webp",
+        "sha256": "fe9f76981a4c8613c2482ee6e1fb91bfc375f5378d0cd7db162cacf189ceaff5",
+        "bytes": 4800,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "decision": "accepted replacement: high-confidence legacy flat/cartoon outlier superseded by mechanic-accurate premium painted art",
+        "review": {
+          "semantic": "accepted",
+          "crop": "accepted",
+          "style": "accepted",
+          "sizesPx": [128, 48, 32, 16],
+          "grayscale": "accepted",
+          "circularCrop": "accepted"
+        }
+      },
+      "rejects": [],
+      "retries": 0
+    },
+    {
+      "class": "warlock",
+      "abilityId": "summon_succubus",
+      "liveName": "Summon Duskborn",
+      "mechanic": "Summons a fragile demon that strikes quickly and hard in melee.",
+      "mechanicSource": "src/ui/i18n.catalog/abilities.ts",
+      "oldShipping": {
+        "preservedFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/old/warlock_summon_succubus.webp",
+        "sha256": "43ddc3c529fa4db48044ef5ccf6e7244f9735cf92c652736b078482242845ec7",
+        "bytes": 4372,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "oldMapping": {
+        "path": "public/ui/skills/warlock/mapping.json",
+        "sourcePack": "warlock",
+        "sourceFile": "48.png",
+        "ownerOrLicense": "CraftPix premium legacy entry",
+        "inheritedClassLicense": "Mixed: CraftPix premium for legacy entries; project-owned OpenAI-generated art for generatedBatches"
+      },
+      "generation": {
+        "mode": "OpenAI built-in image generation",
+        "builtInCallCount": 1,
+        "prompt": "Use case: stylized-concept\nAsset type: 128x128 Warlock demon-summon action-bar icon, brand-new replacement painting\nPrimary request: Paint Summon Duskborn, calling a fragile but extremely fast and hard-hitting melee demon.\nInput images: Image 1 (Raise Gravewing): approved sibling reference for premium wing silhouette and violet summoning energy. Image 2 (Summon Emberkin): approved sibling reference for a small agile demon's horns and class palette. Image 3 (Hour of Judgment): approved sibling reference for violet-black radial portal finish. Image 4 (Needle of Fate): approved sibling reference for sharp magenta weapon-light and speed lines.\nSubject: one sleek Duskborn demon springing through a crescent violet portal, with narrow swept horns, two folded batlike wings, black-magenta plated skin, and a single long crescent foreclaw cutting a bright pink afterimage; athletic and predatory, not sexualized.\nScene/backdrop: fully painted dusk-purple void smoke to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG summon art; agile original demon anatomy, sharp materials, luminous motion, strong silhouette.\nComposition/framing: square, dynamic upper-body lunge fills 75-80%, face and one claw centered, wings inside circular safe crop, readable at 16/32/48 px.\nLighting/mood: hot magenta claw light, violet portal, midnight black; swift, dangerous, ephemeral.\nConstraints: opaque, borderless; no text, letters, numbers, UI frame, badge, bevel, watermark, sexualized costume, human pin-up, whip, heart symbol, cute creature, flat glyph, or copied sibling composition.\nAvoid: stationary portrait, giant bulky tank, many limbs, pale skin, low contrast.",
+        "references": [
+          {
+            "path": "public/ui/skills/warlock/raise_gravewing.webp",
+            "role": "approved sibling: premium wing silhouette and violet summoning energy"
+          },
+          {
+            "path": "public/ui/skills/warlock/summon_imp.webp",
+            "role": "approved sibling: agile demon horns and class palette"
+          },
+          {
+            "path": "public/ui/skills/warlock/hour_of_judgment.webp",
+            "role": "approved sibling: violet-black radial portal finish"
+          },
+          {
+            "path": "public/ui/skills/warlock/needle_of_fate.webp",
+            "role": "approved sibling: magenta weapon-light and speed lines"
+          }
+        ],
+        "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/warlock_summon_succubus.png",
+        "sourceSha256": "80916dcb9aba0a7e9adf5496d079317361fcb7a5ddd32c345459b1ceaa4c68a5",
+        "sourceBytes": 2243692,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "accepted": {
+        "output": "public/ui/skills/warlock/summon_succubus.webp",
+        "sha256": "51a750f99334c4208be49bee256fa43331ef2849a966a97897c0976ba6d57ffc",
+        "bytes": 5134,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "decision": "accepted replacement: high-confidence legacy flat/cartoon outlier superseded by mechanic-accurate premium painted art",
+        "review": {
+          "semantic": "accepted",
+          "crop": "accepted",
+          "style": "accepted",
+          "sizesPx": [128, 48, 32, 16],
+          "grayscale": "accepted",
+          "circularCrop": "accepted"
+        }
+      },
+      "rejects": [],
+      "retries": 0
+    },
+    {
+      "class": "mage",
+      "abilityId": "conjure_food",
+      "liveName": "Breadbind",
+      "mechanic": "Three-second Arcane cast that conjures two servings of health-restoring bread; higher ranks create heartier fare.",
+      "mechanicSource": "src/sim/content/classes.ts",
+      "oldShipping": {
+        "preservedFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/old/mage_conjure_food.webp",
+        "sha256": "7cae820108954f9fb1b765365a06943e6ba6f2c5d9e6118044aef34be50b45af",
+        "bytes": 3172,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "oldMapping": {
+        "path": "public/ui/skills/mage/mapping.json",
+        "sourcePack": "_Missing_Mage",
+        "sourceFile": "11.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com"
+      },
+      "generation": {
+        "mode": "OpenAI built-in image generation",
+        "builtInCallCount": 1,
+        "prompt": "Use case: stylized-concept\nAsset type: 128x128 Mage conjuration action-bar icon, brand-new replacement painting\nPrimary request: Paint Breadbind, a three-second Arcane cast that conjures two servings of bread; higher ranks create heartier fare.\nInput images: Image 1 (Conjured Bread rank 4): approved associated-item reference for the live golden loaf's crust, score marks, and warm food identity. Image 2 (Arcane Power): approved sibling reference for concentrated violet spell circles and Mage-class glow. Image 3 (Spellsteal): approved sibling reference for a dark-gloved casting hand and blue-violet magic finish.\nSubject: one hearty golden round loaf materializing above an open dark-gloved hand, with two thick bread slices separating from it inside a broad violet-blue arcane spiral; sparkling flour motes become solid crust near the center.\nScene/backdrop: fully painted midnight-blue magical haze to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG utility art; appetizing bread texture, dimensional Arcane energy, crisp original silhouette.\nComposition/framing: square, loaf and two slices fill 72-78%, hand secondary, safe circular crop, readable at 16/32/48 px.\nLighting/mood: warm bakery gold against cool violet and cobalt; wondrous, sustaining, arcane.\nConstraints: opaque, borderless; no text, letters, numbers, runic writing, UI frame, badge, bevel, watermark, plate, picnic, cartoon food, flat glyph, or copied sibling composition.\nAvoid: croissant, meat, many tiny loaves, white background, low contrast.",
+        "references": [
+          {
+            "path": "public/ui/items/conjured_bread4.webp",
+            "role": "approved associated item: live golden loaf crust, score marks, food identity"
+          },
+          {
+            "path": "public/ui/skills/mage/arcane_power.webp",
+            "role": "approved sibling: violet spell circles and Mage-class glow"
+          },
+          {
+            "path": "public/ui/skills/mage/spellsteal.webp",
+            "role": "approved sibling: dark-gloved casting hand and blue-violet finish"
+          }
+        ],
+        "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/mage_conjure_food.png",
+        "sourceSha256": "1174feaeb8850134f3e07015a5bd2014ce360e5e0d2dd5359aec629ff77db169",
+        "sourceBytes": 2429317,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "accepted": {
+        "output": "public/ui/skills/mage/conjure_food.webp",
+        "sha256": "5105ef160bc559e729deb41efa7586c068cc2bf4740f12e1f2412e4d50233bbd",
+        "bytes": 4422,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "decision": "accepted replacement: high-confidence legacy flat/cartoon outlier superseded by mechanic-accurate premium painted art",
+        "review": {
+          "semantic": "accepted",
+          "crop": "accepted",
+          "style": "accepted",
+          "sizesPx": [128, 48, 32, 16],
+          "grayscale": "accepted",
+          "circularCrop": "accepted"
+        }
+      },
+      "rejects": [],
+      "retries": 0
+    },
+    {
+      "class": "mage",
+      "abilityId": "conjure_water",
+      "liveName": "Waterbind",
+      "mechanic": "Three-second Arcane cast that conjures two bottles of mana-restoring water; higher ranks create purer water.",
+      "mechanicSource": "src/sim/content/classes.ts",
+      "oldShipping": {
+        "preservedFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/old/mage_conjure_water.webp",
+        "sha256": "b84ea5c567c043472467f88b7a4f0dcaba36ee9a687ba37caf752ab87c1c8ffd",
+        "bytes": 4074,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false
+      },
+      "oldMapping": {
+        "path": "public/ui/skills/mage/mapping.json",
+        "sourcePack": "cryomancer",
+        "sourceFile": "34.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com"
+      },
+      "generation": {
+        "mode": "OpenAI built-in image generation",
+        "builtInCallCount": 1,
+        "prompt": "Use case: stylized-concept\nAsset type: 128x128 Mage conjuration action-bar icon, brand-new replacement painting\nPrimary request: Paint Waterbind, a three-second Arcane cast that conjures two bottles of mana-restoring water; higher ranks create purer water.\nInput images: Image 1 (Conjured Water rank 4): approved associated-item reference for the live stoppered bottle, brilliant blue water, and glass shape. Image 2 (Warded): approved sibling reference for luminous blue Arcane geometry and premium magical texture. Image 3 (Arcane Power): approved sibling reference for violet spell-circle energy and class consistency.\nSubject: one ornate stoppered glass bottle condensing from a broad violet spell ring, filled with radiant pure cobalt water; two thick water ribbons spiral into the neck and a second smaller bottle silhouette is suggested in the glow behind it.\nScene/backdrop: fully painted midnight-blue Arcane mist to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG utility art; luminous glass and liquid, dimensional magic, strong original silhouette.\nComposition/framing: square, main bottle fills 70-75%, ring and ribbons inside circular safe crop, readable at 16/32/48 px.\nLighting/mood: crystalline cyan, cobalt, rich violet; pure, refreshing, magical.\nConstraints: opaque, borderless; no text, letters, numbers, readable runes, UI frame, badge, bevel, watermark, laboratory test tube, potion label, flat glyph, or copied sibling composition.\nAvoid: ice block, wine bottle, many tiny containers, transparent checkerboard, pale background, low contrast.",
+        "references": [
+          {
+            "path": "public/ui/items/conjured_water4.webp",
+            "role": "approved associated item: live stoppered bottle, brilliant water, glass shape"
+          },
+          {
+            "path": "public/ui/skills/mage/warded.webp",
+            "role": "approved sibling: luminous blue Arcane geometry and premium texture"
+          },
+          {
+            "path": "public/ui/skills/mage/arcane_power.webp",
+            "role": "approved sibling: violet spell-circle energy and class consistency"
+          }
+        ],
+        "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/mage_conjure_water.png",
+        "sourceSha256": "850e28dfee95abc877ff542c95dc99d278c7edaa5eb5547f0fb6b4ec659d9746",
+        "sourceBytes": 2521225,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "accepted": {
+        "output": "public/ui/skills/mage/conjure_water.webp",
+        "sha256": "9df97093e7bcfe40040dbc0433b1332820be839fe46e078395ef065e8df4b824",
+        "bytes": 5964,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "decision": "accepted replacement: high-confidence legacy flat/cartoon outlier superseded by mechanic-accurate premium painted art",
+        "review": {
+          "semantic": "accepted",
+          "crop": "accepted",
+          "style": "accepted",
+          "sizesPx": [128, 48, 32, 16],
+          "grayscale": "accepted",
+          "circularCrop": "accepted"
+        }
+      },
+      "rejects": [],
+      "retries": 0
+    },
+    {
+      "class": "mage",
+      "abilityId": "polymorph",
+      "liveName": "Bewitch",
+      "mechanic": "Transforms a beast or humanoid enemy into a toad for up to 15-20 seconds; the toad wanders and heals rapidly, and damage breaks the effect.",
+      "mechanicSource": "src/sim/content/classes.ts",
+      "oldShipping": {
+        "preservedFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/old/mage_polymorph.webp",
+        "sha256": "771745943629981de79e85f8d48d6aeecd6829df2aee7f685525c98a05f78685",
+        "bytes": 4326,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": false
+      },
+      "oldMapping": {
+        "path": "public/ui/skills/mage/mapping.json",
+        "sourcePack": "_Missing_Mage",
+        "sourceFile": "32.png",
+        "ownerOrLicense": "CraftPix premium / Levy Street account",
+        "inheritedClassLicense": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com"
+      },
+      "generation": {
+        "mode": "OpenAI built-in image generation",
+        "builtInCallCount": 1,
+        "prompt": "Use case: stylized-concept\nAsset type: 128x128 Mage crowd-control action-bar icon, brand-new replacement painting\nPrimary request: Paint Bewitch, the live Polymorph spell that transforms a beast or humanoid enemy into a TOAD for up to 15-20 seconds; the toad wanders, heals rapidly, and any damage breaks the effect.\nInput images: Image 1 (Bogtoad portrait): approved repository anatomy reference for the live squat green toad head and broad mouth. Image 2 (Shadow-Jump Toad reins): approved repository anatomy/material reference for a full seated fantasy toad; ignore its saddle and hat. Image 3 (Snap Polymorph): approved sibling reference for violet transformation burst and Mage finish. Image 4 (Arcane Power): approved sibling reference for concentrated arcane ring energy.\nSubject: one unmistakable squat green TOAD seated front-facing, broad mouth and amber eyes, caught mid-transformation inside a violet-white Arcane spiral; a few fading black-iron armor fragments dissolve into sparkles around it, showing an enemy changed into the toad.\nScene/backdrop: fully painted midnight-violet magical haze to every edge.\nStyle/medium: premium hand-painted dark-fantasy MMORPG crowd-control art; tactile warty toad skin, dimensional spell light, charming but not childish, original design.\nComposition/framing: square, toad head and body fill about 72%, face centered, magic spiral and armor fragments within circular safe crop, readable at 16/32/48 px.\nLighting/mood: luminous violet and blue-white magic around moss-green skin and amber eyes; uncanny, mischievous, controlled.\nConstraints: opaque, borderless; depict a TOAD, not a monkey, sheep, alpaca, cat, or generic frog mascot; no text, letters, numbers, UI frame, badge, bevel, watermark, saddle, hat, flat glyph, or copied sibling composition.\nAvoid: monkey, sheep, baby animal, cartoon sticker, long-legged tree frog, photoreal nature photo, low contrast.",
+        "references": [
+          {
+            "path": "public/ui/mobs/bogtoad.webp",
+            "role": "approved repository anatomy: squat green toad head and broad mouth"
+          },
+          {
+            "path": "public/ui/items/reins_shadowjump_toad.webp",
+            "role": "approved repository anatomy/material: full seated fantasy toad; ignore saddle and hat"
+          },
+          {
+            "path": "public/ui/skills/mage/snap_polymorph.webp",
+            "role": "approved sibling: violet transformation burst and Mage finish"
+          },
+          {
+            "path": "public/ui/skills/mage/arcane_power.webp",
+            "role": "approved sibling: concentrated arcane ring energy"
+          }
+        ],
+        "sourceFile": "tmp/imagegen/v039-second-pass/legacy-warrior-warlock-mage/raw/mage_polymorph.png",
+        "sourceSha256": "742aa8ec6a15ad927b26961228a5fc6dce4e06ab917387da0eb8c53f87f55833",
+        "sourceBytes": 2755487,
+        "width": 1254,
+        "height": 1254,
+        "colorSpace": "sRGB",
+        "opaque": true
+      },
+      "accepted": {
+        "output": "public/ui/skills/mage/polymorph.webp",
+        "sha256": "a409ba425954a0a36f190f2722d4a07d157c2cbd673e9f4627591fb7955565af",
+        "bytes": 6504,
+        "width": 128,
+        "height": 128,
+        "colorSpace": "sRGB",
+        "opaque": true,
+        "decision": "accepted replacement: high-confidence legacy flat/cartoon outlier superseded by mechanic-accurate premium painted art",
+        "review": {
+          "semantic": "accepted",
+          "crop": "accepted",
+          "style": "accepted",
+          "sizesPx": [128, 48, 32, 16],
+          "grayscale": "accepted",
+          "circularCrop": "accepted"
+        }
+      },
+      "rejects": [],
+      "retries": 0
+    }
+  ]
+}

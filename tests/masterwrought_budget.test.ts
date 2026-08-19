@@ -1001,11 +1001,14 @@ describe('masterwrought apex budget sweep', () => {
       expect(ALLOWED_HELD_KEYS.has(key), `${id} carries unexpected field ${key}`).toBe(true);
     }
 
-    // Held offhands sit OUTSIDE the disenchant kind gate (weapon/armor
-    // only), the shipped wraithfire_orb behavior, so R12 has no yield arm
-    // here; this pin reds if enchanting.ts ever widens the gate, forcing a
-    // conscious re-decision for the family.
-    expect(isDisenchantable(def)).toBe(false);
+    // Held offhands sat OUTSIDE the disenchant kind gate until the release
+    // v0.40.0 widened isDisenchantable to admit kind 'held_offhand' (a copy a
+    // class cannot wield is never stuck valueless): the tripwire this pin
+    // carried fired at that sync and the re-decision ADOPTS the upstream
+    // family rule. The R12 routing below already covers the yield (epic ->
+    // arcane_shard primary; a held offhand has no typed secondary, the
+    // jewelry shape), so no new faucet class opens here.
+    expect(isDisenchantable(def)).toBe(true);
 
     expectGearRecipe(id, row.craft);
   });

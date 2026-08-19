@@ -249,6 +249,7 @@ import {
 } from './render/assets/preload';
 import {
   CharacterPreview,
+  npcLookFor,
   type PreviewAppearance,
   setModularLookProvider,
 } from './render/characters';
@@ -469,7 +470,7 @@ import {
   isCompleteTotpCode,
 } from './ui/two_factor_setup';
 import { UiEffectsApplier } from './ui/ui_effects_applier';
-import { hydrateIcons } from './ui/ui_icons';
+import { hydrateIcons, svgIcon } from './ui/ui_icons';
 import {
   resolveWocBalanceUpdate,
   setWalletConnectionAddresses,
@@ -1490,7 +1491,13 @@ async function startGame(
     // paperdoll eye toggle), so peers see the owner's choice. Per-entity
     // wire JSON is normalized at compose time (visual build, not per frame):
     // hostile or stale payloads clamp to a valid body.
-    setModularLookProvider((e) => inWorldLookFor(e, armorSetForEntity(e.id === world.playerId)));
+    // Non-players compose too: NPCs resolve authored looks by templateId
+    // (static data on every host; the why lives in characters/npc_looks.ts).
+    setModularLookProvider((e) =>
+      e.kind === 'player'
+        ? inWorldLookFor(e, armorSetForEntity(e.id === world.playerId))
+        : npcLookFor(e.templateId, e.kind),
+    );
     // No helmet re-assert here on purpose. The preference is per CHARACTER
     // now: set from the creator's toggle at creation, changed by the paperdoll
     // eye afterwards, and serialized into that character's own saved state.
@@ -4635,8 +4642,8 @@ async function startGame(
     }
     perfNetworkStats.connected = net.connected;
     perfNetworkStats.snapInterval = Math.round(net.snapInterval);
-    perfNetworkStats.lastSnapAge =
-      net.lastSnapAt > 0 ? Math.round(performance.now() - net.lastSnapAt) : -1;
+    const cameraLastSnapAge = net.lastSnapAt > 0 ? performance.now() - net.lastSnapAt : -1;
+    perfNetworkStats.lastSnapAge = Math.round(cameraLastSnapAge);
     perfNetworkStats.alpha = Math.round(alpha * 100) / 100;
     perf.setNetwork(perfNetworkStats);
     // Always-on net-pipeline counters (net_pipeline_stats.ts): fold the
@@ -4674,8 +4681,9 @@ async function startGame(
           onlineJitterMs,
           alpha,
           frameDt,
+          Math.max(0, cameraLastSnapAge),
+          net.snapInterval,
         );
-    const cameraLastSnapAge = net.lastSnapAt > 0 ? performance.now() - net.lastSnapAt : -1;
     traceStart = perf.startTrace();
     try {
       updateCamera(frameDt, kbFacing ?? interpServerFacing);
@@ -7344,7 +7352,7 @@ function renderClassDetails(
             // A combo-point bleed finisher (rupture, rip): `total` alone is the
             // damage at zero combo points, a state the caster can never reach.
             // Render base plus per-combo-point, the same composition the
-            // finisherDamage arm above and abilityEffectText in the HUD use.
+            // finisherDamage arm above and the shared abilityEffectText formatter use.
             dmgText = t('abilityUi.tooltip.finisherDamage', {
               base: formatClassDetailNumber(secondaryEffect.total),
               perCombo: formatClassDetailNumber(secondaryEffect.perCombo),
@@ -8070,7 +8078,7 @@ function showWalletPicker(
     closeBtn.type = 'button';
     closeBtn.className = 'x-btn wallet-picker-close';
     closeBtn.setAttribute('aria-label', t('skinEvent.close'));
-    closeBtn.textContent = '×';
+    closeBtn.innerHTML = svgIcon('close');
     titleRow.append(title, closeBtn);
 
     const help = document.createElement('p');

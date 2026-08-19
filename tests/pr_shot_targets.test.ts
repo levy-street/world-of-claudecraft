@@ -551,3 +551,43 @@ describe('diffChangedPaths', () => {
     }
   });
 });
+
+describe('the druid auto-unshift target', () => {
+  it('fires on the sim rule and on the bar gate that has to agree with it', () => {
+    // The behavior lives in the sim and its visible consequence lives on the
+    // bar, so BOTH paths must select the target: a change to either one alone
+    // still needs the evidence.
+    for (const path of [
+      'src/sim/combat/form_auto_unshift.ts',
+      'src/ui/hud/action_bar/action_bar_view.ts',
+    ]) {
+      const plan = classifyDiff([path]);
+      expect(plan.isVisual).toBe(true);
+      expect(plan.specific.map((t: { key: string }) => t.key)).toContain('druid-auto-unshift');
+      expect(plan.generic).toHaveLength(0);
+    }
+  });
+
+  it('covers both bar-swapping and travel forms, on desktop and mobile', () => {
+    // Bruin parks the mana pool and Fleet does not, which is the split the rule
+    // turns on, so a variant list that lost either one would stop proving it.
+    const target = classifyDiff(['src/sim/combat/form_auto_unshift.ts']).specific.find(
+      (t: { key: string }) => t.key === 'druid-auto-unshift',
+    );
+    expect(target.variants.map((v: { key: string }) => v.key)).toEqual([
+      'bruin-form-desktop',
+      'fleet-form-desktop',
+      'bruin-form-mobile',
+    ]);
+    expect(target.variants.map((v: { formAbility: string }) => v.formAbility)).toEqual([
+      'bear_form',
+      'travel_form',
+      'bear_form',
+    ]);
+    expect(target.variants.filter((v: { mobile?: boolean }) => v.mobile)).toHaveLength(1);
+    // Every variant drives the real druid kit, not a stand-in class.
+    for (const v of target.variants) expect(v.charClass).toBe('druid');
+    expect(ABILITIES.healing_touch.class).toBe('druid');
+    expect(ABILITIES.healing_touch.castTime).toBeGreaterThan(1);
+  });
+});

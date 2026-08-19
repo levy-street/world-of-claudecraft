@@ -2,6 +2,22 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const pl_PL: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formsAutoUnshift': 'Leczenie lub zaklęcie zadające obrażenia rzucone w formie samo cię z niej wyprowadza. Opuszczenie formy w ten sposób jest darmowe i nie zużywa globalnego czasu odnowienia, więc błyskawiczne zaklęcie odpala się w chwili naciśnięcia. Powrót do formy to zwykła zdolność i nadal kosztuje manę oraz globalny czas odnowienia.',
+  'entities.mobs.heroic_boss_dummy.name': 'Manekin heroicznego bossa',
+  'entities.mobs.normal_boss_dummy.name': 'Manekin normalnego bossa',
+  'entities.mobs.friendly_player_dummy.name': 'Manekin przyjaznego gracza',
+  'entities.items.dawnhold_posy.name': 'Bukiecik z ogrodu zamku Dawnhold',
+  'entities.dungeons.dawnhold_castle.leaveText': 'Wymykasz się z powrotem na skąpany w słońcu ogrodowy trawnik.',
+  'entities.dungeons.dawnhold_castle.enterText': 'Wchodzisz do ciepłych, pachnących kwiatami sal zamku Dawnhold.',
+  'entities.dungeons.dawnhold_castle.name': 'Zamek Dawnhold',
+  'hudChrome.lastkeepMap.story.tower': 'Wieża strażnicza',
+  'hudChrome.lastkeepMap.story.residence': 'Piętro mieszkalne',
+  'hudChrome.lastkeepMap.story.state': 'Piętro reprezentacyjne',
+  'hudChrome.lastkeepMap.story.undercroft': 'Podziemia',
+  'hudChrome.lastkeepMap.title': '{keep}: {story}',
+  'hudChrome.dawnholdMap.story.solar': 'Komnata słoneczna',
+  'hudChrome.dawnholdMap.story.ground': 'Parter ogrodowy',
+  'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.social.chanBattleground': 'Pole bitwy.',
   'guide.social.chanBattlegroundBody': 'Rozmawiaj z każdym walczącym na polu bitwy, po obu stronach. Tylko podczas trwania meczu.',
   'hud.chat.templates.battleground': '[Pole bitwy] {name}: {message}',
@@ -4309,7 +4325,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Wyłom w pancerzu',
   'entities.abilities.faerie_fire.name': 'Wiedźmie światło',
   'entities.abilities.fear.description':
-    'Wzbudza w przeciwniku przerażenie, zmuszając go do kulenia się przez nawet 8 sek. Każde obrażenie przerywa efekt.',
+    'Wzbudza w przeciwniku przerażenie, zmuszając go do kulenia się przez maksymalnie 5 sek. Obrażenia równe łącznie 8% maksymalnego zdrowia celu przerywają efekt.',
   'entities.abilities.fear.name': 'Trwoga',
   'entities.abilities.ferocious_bite.name': 'Krwawe ukąszenie',
   'entities.abilities.fire_blast.description':
@@ -4435,7 +4451,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.power_word_shield.description': 'Osłania sprzymierzony cel, pochłaniając {damage} obrażeń przez 30 s. Dyscyplina dodatkowo wiąże cel z twoimi obrażeniami świętymi na 30 s.',
   'entities.abilities.power_word_shield.name': 'Psalm ochrony',
   'entities.abilities.prowl.description':
-    'Wchodzi w skradanie w postaci wilka, poruszając się o 50% wolniej. Nie można użyć w walce.',
+    'Wchodzi w skradanie w postaci wilka, poruszając się o 5% wolniej. Nie można użyć w walce.',
   'entities.abilities.prowl.name': 'Podchody',
   'entities.abilities.pyroblast.description':
     'Ciska ogromnym ognistym głazem, który zadaje {damage} obrażeń od ognia oraz dodatkowe obrażenia w czasie.',
@@ -4532,7 +4548,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Razi pobliskich wrogów za {damage} obrażeń i spowalnia ich ataki o 10% na 10 sek.',
   'entities.abilities.thunder_clap.name': 'Trzęsący cios',
   'entities.abilities.tigers_fury.description':
-    'Zwiększa moc ataku o {buff} na {duration} sek. Tylko w Postaci wilka.',
+    'Natychmiast przywraca {rage} energii i zwiększa moc ataku o {buff} na {duration} sek. Tylko w Postaci wilka.',
   'entities.abilities.tigers_fury.name': 'Wilcza krew',
   'entities.abilities.travel_form.description':
     'Natychmiast przemienia cię w szybką, rączą postać, zwiększając szybkość poruszania się o 40%. Po przemianie nie możesz używać innych zdolności, ale możesz się przemieniać w walce i poza nią, co czyni ją idealną do ucieczki.',
@@ -4584,9 +4600,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.name': 'Postać księżycowej sowy',
   'entities.abilities.moonkin_form.description':
     'Przyjmujesz postać księżycowej sowy, wzmacniając rzucanie zaklęć do czasu powrotu. Rzuć ponownie, aby wrócić do zwykłej postaci. (specjalizacja Równowaga)',
-  'entities.abilities.feral_charge.name': 'Dzika szarża',
+  'entities.abilities.feral_charge.name': 'Pierwotny przypływ',
   'entities.abilities.feral_charge.description':
-    'Szarżujesz na wroga i unieruchamiasz go na 1 sek. Zasięg 8-25 m. (specjalizacja Dzikość)',
+    'Wyzwalasz pierwotny przypływ. W Postaci wilka regeneracja energii wzrasta o 100% na 10 sek. W Postaci Bruina natychmiast zyskujesz 50 pkt. wściekłości. (specjalizacja Dzikość)',
   'entities.abilities.swiftmend.name': 'Szybkie uzdrowienie',
   'entities.abilities.crusader_strike.description':
     'Uderza cel za obrażenia broni plus {damage} obrażeń od Świętości. (talent paladyna)',
@@ -8726,6 +8742,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'sim.delve.unknownTier': 'Nieznany poziom trudności eskapady.',
   'sim.delve.wayOutNotOpen': 'Droga wyjścia jeszcze się nie otworzyła.',
   'sim.delve.whileTrading': 'Nie możesz wejść do eskapady podczas handlu.',
+  'sim.delve.enemiesRemain': 'Najpierw pokonaj pozostałych wrogów.',
   'sim.lockpick.alreadyInProgress': 'Ktoś już majstruje przy zamku.',
   'sim.lockpick.cannotPickThat': 'Tego nie da się otworzyć wytrychem.',
   'sim.lockpick.chooseAnte': 'Wybierz 1, 2 lub 3 wytrychy.',
@@ -10972,18 +10989,19 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deterrence.description':
     'Zwiększa twoją szansę na unik o 50 punktów procentowych na 10 sek. (talent Łowcy)',
   'entities.abilities.earthbind.description': 'Unieruchamia wrogów w promieniu 4 m od punktu celu na 2 s, a następnie spowalnia ich o 40% na 6 s. (Talent szamana)',
-  'entities.abilities.evocation.description': 'Restaura manę rápidamente. (talent maga)',
+  'entities.abilities.evocation.description':
+    'Kanalizujesz przez 6 sek.: co sekundę przywracasz 100 many i zyskujesz 8 mocy zaklęć. Premia kumuluje się podczas kanalizowania i trwa 15 sek. (talent maga)',
   'entities.abilities.frenzied_regeneration.description':
-    'Przywraca 180 zdrowia przez 10 sek. Tylko w Formie Niedźwiedzia. (talent Druida)',
+    'Przywraca 40% maksymalnego zdrowia przez 10 sek. Tylko w Formie Niedźwiedzia. (talent Druida)',
   'entities.abilities.frost_trap.description':
     'Zamraża wrogów w wybranym obszarze na 3 sek., uniemożliwiając im ruch i działanie. (talent Łowcy)',
   'entities.abilities.hammer_of_wrath.description': 'Ciska świętym młotem za {damage} obrażeń i generuje 1 Oddanie. Użyteczny poniżej 20% zdrowia albo podczas Boskiego Wzniesienia lub Mściwego gniewu. Gniew Świtu daje dodatkowe rzucenie przeciw dowolnemu celowi, które ignoruje trwający czas odnowienia i zadaje o 20% więcej obrażeń. Wzniesienie zwiększa jego obrażenia o 30%.',
   'entities.abilities.healing_stream.description':
     'Przywraca sojuszniczemu celowi 120 zdrowia przez 12 sek. (talent Szamana)',
   'entities.abilities.howl_of_terror.description':
-    'Przeraża pobliskich wrogów na maksymalnie 3 sek. Obrażenia mogą przerwać efekt. (talent Czarnoksiężnika)',
+    'Przeraża pobliskich wrogów na maksymalnie 5 sek. Obrażenia równe łącznie 8% maksymalnego zdrowia celu przerywają jego strach. (talent Czarnoksiężnika)',
   'entities.abilities.ice_block.description':
-    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talent maga)',
+    'Zamyka cię w litym lodzie na 8 sek., zapewniając odporność na wszystkie obrażenia. Usuwa istniejące zwykłe szkodliwe efekty i zapobiega nakładaniu nowych zwykłych efektów kontroli. Można użyć podczas ogłuszenia lub przemiany. W zamknięciu nie możesz działać. Użyj ponownie, aby anulować. (mag)',
   'entities.abilities.inner_focus.description': 'Sprawia, że twoje następne zaklęcie kapłana jest darmowe i nieprzerywalne. Trwa 60 s.',
   'entities.abilities.innervate.description':
     'Żywe soki wzbierają w tobie przez 10 sek. i falami przywracają 20 twojego bieżącego zasobu: many, szału lub energii. Zmiana postaci ich nie przerywa. Sen, ogłuszenie lub zastój zatrzymują przepływ soków. (talent Druida)',
@@ -10999,7 +11017,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.preparation.description':
     'Kończy czas odnowienia Sprintu, Uniku i Zniknięcia. (talent Łotrzyka)',
   'entities.abilities.presence_of_mind.description':
-    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (talent maga)',
+    'Sprawia, że twoje następne zaklęcie z czasem rzucania jest natychmiastowe. Trwa 60 sek. (talent maga)',
   'entities.abilities.psychic_scream.description': 'Przeraża wrogów w promieniu 8 m na maksymalnie 4 s. Obrażenia mogą przerwać efekt.',
   'entities.abilities.shadowstep.description':
     'Przechodzisz przez cienie w kierunku celu. (talent Łotrzyka)',
@@ -12382,7 +12400,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Zużywa 5 Zieleni. Zbiera każde twoje leczenie w czasie na wszystkich sojusznikach za 60% pozostałego leczenia, usuwa te efekty i sadzi świeży Dziki rozkwit na celu.',
   'entities.abilities.redharvest.name': 'Czerwone Żniwa',
   'entities.abilities.redharvest.description':
-    'Zużywa twoje 3 Starej Krwi: cios za {damage}, natychmiast zadaje wszystkie obrażenia, które twoje Zdzieranie i Rozszarpanie by jeszcze zadały, usuwa oba krwawienia i przywraca 30 energii. Działa bez punktów combo.',
+    'Zużywa twoje 3 Starej Krwi: cios za {damage}, natychmiast zadaje wszystkie obrażenia, które twoje Zdzieranie i Rozszarpanie by jeszcze zadały, usuwa oba krwawienia i przywraca {rage} energii. Działa bez punktów combo.',
   'entities.abilities.sunlance.name': 'Słoneczny ślad',
   'entities.abilities.sunlance.description':
     'Zużywa twoje 3 Księżycowego przypływu na cios zadający {damage} obrażeń natury oraz podpalenie zadające {overTime} w ciągu 9 s i przywraca 35 many: wybór many. Księżycowy przybór zużywa te same 3 Księżycowego przypływu, więc wybierz jeden.',
@@ -12638,7 +12656,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Umiejętność kończąca, która zadaje {damage}. Tylko w Postaci wilka.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Każdy trafiony cios dodaje 1 Starą Krew; przy 3 Starej Krwi ten przycisk zmienia się w Czerwone Żniwa: ukąszenie za 70 plus 43 za punkt combo, które dodatkowo natychmiast zadaje wszystkie obrażenia, jakie zadałyby jeszcze twoje Zdzieranie i Rozszarpanie, i przywraca 30 energii.',
+    'Każdy trafiony cios dodaje 1 Starą Krew; przy 3 Starej Krwi ten przycisk zmienia się w Czerwone Żniwa, które zużywają Starą Krew na silniejszy cios, dodatkowo natychmiast zadają wszystkie obrażenia, jakie zadałyby jeszcze twoje Zdzieranie i Rozszarpanie, i przywracają energię.',
   'entities.abilities.funeral_harvest.description':
     'Gdy umiera wróg, któremu niedawno zadałeś obrażenia ty lub twoi nieumarli, zyskujesz 1 Odłamek Duszy. Może się to zdarzyć najwyżej raz na 3 sekundy.',
   'entities.abilities.funeral_harvest.name': 'Funeral Harvest',
@@ -12676,7 +12694,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Przebija wroga za {damage} obrażeń od Cienia i generuje 5 Potępienia, jeśli nosi on twoje Evil Eye. Każde trafienie w twoje główne Evil Eye dodaje Nić Przeznaczenia na 12 sekund, maksymalnie do 3. Jeśli nie istnieje żadne Evil Eye, Needle najpierw oznacza swój cel.',
   'entities.abilities.needle_of_fate.name': 'Needle of Fate',
   'entities.abilities.ossuary_mark.description':
-    'Oznacza wroga na 12 sekund, gromadząc 20% obrażeń zadanych przez ciebie i twoich nieumarłych. Rzuć ponownie, aby zdetonować znak. Jeśli oznaczony wróg umrze, znak eksploduje w promieniu 6 m i tworzy 1 Odłamek Duszy.',
+    'Oznacza wroga na 15 sekund, gromadząc 20% obrażeń zadanych przez ciebie i twoich nieumarłych. Rzuć ponownie, aby zdetonować znak. Jeśli oznaczony wróg umrze, znak eksploduje w promieniu 6 jardów i tworzy 1 Odłamek Duszy.',
   'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
   'entities.abilities.possess_evil_eye.description':
     'Maledyktor opętuje twoje główne Evil Eye na 15 sekund i generuje 35 Potępienia. Needle of Fate rzuca się w 1 sekundę i generuje 2 dodatkowe Potępienia, Pochłonięcie można kanalizować podczas ruchu, a Sentence zadaje o 25% więcej obrażeń i uwalnia opóźnione echo za 60% obrażeń, malejące do 30% między poziomem 17 a 20.',

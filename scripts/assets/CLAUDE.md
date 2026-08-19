@@ -85,6 +85,21 @@ For reference-image reconstruction and procedural GLB authoring, read the living
   correction, and a re-run that drops the flag passes every byte-level check while
   sampling upside down (`tests/surface_texture_ktx2.test.ts` greps this exact
   command).
+- **`compress_sky_hdr.mjs`** (+ `lib/sky_hdr_compression_core.mjs`) is the HDR twin of the
+  step above, for the biome sky domes under `public/env/`. Each committed `.hdr` master
+  produces three KTX2 UASTC HDR files (`_2k` and `_1k` for the two dome tiers, `_512` for
+  the PMREM prefilter source); `src/render/sky.ts` requests them through `loadKtx2Texture`
+  and there is NO Radiance arm at runtime, so a missing or stale `.ktx2` is a black sky, not
+  a slow path. The `.hdr` masters are never deleted: `skies_in/` holds only LDR PNGs and the
+  PNG-to-Radiance step is a maintainer-local tool, so they are the repo's only HDR source.
+  Unlike the LDR sets this needs `basisu` (BinomialLLC/basis_universal v1.50+), NOT `ktx`:
+  through KTX-Software 4.4 `ktx create --encode` takes only the two LDR codecs and rejects
+  `--format ASTC_4x4_SFLOAT_BLOCK`, so it cannot write UASTC HDR at all. The distinction is
+  load-bearing rather than cosmetic: only a Basis UASTC HDR payload (DFD colorModel `0xA7`)
+  makes three's `KTX2Loader` transcode to BC6H or RGBA half where the ASTC HDR profile is
+  missing; a plain ASTC HDR encode uploads raw on every device and black-skies the rest.
+  `tests/sky_ktx2_assets.test.ts` pins that byte, the dimensions and the manifest rows.
+  Re-run after repainting a sky, then regenerate the media manifest.
 - **One-shot and maintenance tools**, each with its recipe in its own header: the zone prop
   bakes (`build_willowfen_props.mjs` and its `*_props.mjs` siblings: one-shot weld + bounded
   simplify recipes over maintainer-local source packs; copy the willowfen recipe for a new

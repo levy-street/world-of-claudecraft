@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  exp_dawnhold_castle: {
+    name: 'Открытая дверь в саду',
+    desc: 'Загляните в Замок Рассвета и прогуляйтесь по его залитым солнцем садовым залам.',
+  },
+  exp_the_last_keep: {
+    name: 'Тихие залы',
+    desc: 'Войдите в двери Последнего оплота и пройдитесь по его безмолвным залам.',
+  },
   pvp_bg_first_capture: {
     name: 'Знамя в руках',
     desc: 'Захватите флаг в Терновой Лощине.',

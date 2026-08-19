@@ -5,8 +5,9 @@
 // (rejuvenation, defensive_stance, rapid_fire, growl, prowl, drain_life) made the pet
 // buttons borrow other classes' spell art, so a hunter's "aggressive" stance rendered
 // the SAME icon as their own Rapid Fire, and "Heal Pet" showed the druid's green magic
-// heal. These ids are deliberately NOT ability ids; each has its own recipe in
-// `icons.ts` (`ABILITY_RECIPES`). Guarded by `tests/pet_action_icons.test.ts`.
+// heal. These ids are deliberately NOT ability ids; each has dedicated painted art under
+// public/ui/skills/pet plus a procedural resilience recipe in `icons.ts`
+// (`ABILITY_RECIPES`). Guarded by `tests/pet_action_icons.test.ts`.
 export const PET_ACTION_ICONS = {
   attack: 'pet_attack',
   taunt: 'pet_growl',
@@ -17,6 +18,9 @@ export const PET_ACTION_ICONS = {
   defensive: 'pet_defensive',
   aggressive: 'pet_aggressive',
 } as const;
+
+/** Closed painted-art inventory for synthetic pet action-bar commands. */
+export const PET_ACTION_IMAGE_IDS: ReadonlySet<string> = new Set(Object.values(PET_ACTION_ICONS));
 
 // Pure decision for the hunter Feed Pet button's disabled state. Previously
 // the button always looked identically clickable, but clicking it with no

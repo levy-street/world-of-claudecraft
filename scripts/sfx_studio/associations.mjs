@@ -14,7 +14,7 @@ const MOB_MODELS = {
   humanoid: 'public/models/chars/enemies/skeleton_warrior.glb',
   undead: 'public/models/chars/enemies/skeleton_warrior.glb',
   troll: 'public/models/creatures/tribal.glb',
-  ogre: 'public/models/creatures/giant.glb',
+  ogre: 'public/models/creatures/ogre.glb',
   elemental: 'public/models/creatures/golelingevolved.glb',
   dragonkin: 'public/models/creatures/dragonevolved.glb',
   demon: 'public/models/creatures/demon.glb',

@@ -65,7 +65,7 @@ consume them now before an ally dies.
 | Unleash Weapon | Consumes one owned Mending Current for an instant 125% burst. For 8 seconds, the next hit is reduced by 50% of the effective healing. |
 | Cascading Mend (`chain_heal`) | Retained Chain Heal signature with its canonical initial heal and two bounces. Consumes every Mending Current reached for a proposed 125% of its remaining amount. |
 | Lifespring Weapon | Spiritmend-only enhancement that increases Mending Current deposits. |
-| Ancestors' Return | Seven-second, out-of-combat cast that offers every dead group or raid member a return with 30% health and mana. |
+| Ancestors' Return | Seven-second, out-of-combat cast that offers every dead group or raid member within 40 yards and line of sight of the caster a return with 30% health and mana. |
 
 Tidecall is the player-facing action name. Mending Current is the pool it creates or enlarges.
 
@@ -204,8 +204,10 @@ against `release/v0.29.0`.
 - One Shaman cannot consume another Shaman's pools.
 - Invalid casts, death, respec, disconnect, and reconnect cannot duplicate or strand healing.
 - The loop remains effective with one injured ally and without offensive spellcasting.
-- Ancestors' Return offers every dead group or raid member a resurrection after seven seconds, cannot
-  start in combat, and never affects players outside the group.
+- Ancestors' Return offers every dead group or raid member within 40 yards and line of sight of the
+  caster a resurrection after seven seconds, cannot start in combat, and never affects players
+  outside the group (the reach rule is `src/sim/combat/resurrection_reach.ts`: it closes the
+  raid and heroic lockout bypass, so an unbounded roster sweep must never return).
 - Mobile and reduced-motion players can read pool size, Mending Current readiness, and consumption.
 - PBE validates Mana efficiency, preloading caps, burst healing, overhealing risk, host parity, and
   PvP survivability.

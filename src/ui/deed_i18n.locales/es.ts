@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  exp_dawnhold_castle: {
+    name: 'Una puerta abierta en el jardín',
+    desc: 'Visita el Castillo Dawnhold y pasea por sus soleados salones del jardín.',
+  },
+  exp_the_last_keep: {
+    name: 'Los salones silenciosos',
+    desc: 'Cruza las puertas de La Última Fortaleza y recorre sus salones silenciosos.',
+  },
   pvp_bg_first_capture: {
     name: 'Bandera en Mano',
     desc: 'Captura una bandera en Campos Espinosos.',

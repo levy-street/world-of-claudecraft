@@ -33,10 +33,10 @@ function manifestBlock(startAnchor: string, endAnchor: string): string {
   return MANIFEST_SRC.slice(start, end);
 }
 
-const DONOR_GLBS = [
-  'public/models/creatures/goblin_hit_variety_anims.glb',
-  'public/models/creatures/giant_hit_variety_anims.glb',
-];
+// giant_hit_variety_anims.glb was retired with the authored ogre body:
+// mob_ogre (the giant donor's only consumer) now ships its own authored Hit
+// clip inside ogre.glb and reads the OGRE ClipMap, not ENEMY7.
+const DONOR_GLBS = ['public/models/creatures/goblin_hit_variety_anims.glb'];
 
 describe('ENEMY7 hit-reaction stagger (issue #2889 round 2)', () => {
   it.each(DONOR_GLBS)('%s ships exactly HitRecieve_Heavy in a mesh-free donor GLB', (glbPath) => {
@@ -56,8 +56,12 @@ describe('ENEMY7 hit-reaction stagger (issue #2889 round 2)', () => {
 
   it('wires a matching animUrls entry onto every ENEMY7 consumer', () => {
     const consumers: [string, string, string][] = [
+      // mob_kobold is the only consumer left, from BOTH sides of the v0.39.0
+      // merge. mob_ogre took its own authored body and Hit clip (so the giant
+      // donor retired with it), and upstream cut mob_grix's animUrls outright
+      // because the goblin donor's tracks bind nothing on his mixamorig rig
+      // (see the GRIX ClipMap comment, and note his hit slot is now empty).
       ['mob_kobold', 'goblin_hit_variety_anims.glb', 'clips: KOBOLD_ENEMY7'],
-      ['mob_ogre', 'giant_hit_variety_anims.glb', 'clips: ENEMY7'],
     ];
     for (const [key, file, clipsLine] of consumers) {
       const idx = MANIFEST_SRC.indexOf(`  ${key}: {`);
@@ -98,7 +102,7 @@ describe('ENEMY7 hit-reaction stagger (issue #2889 round 2)', () => {
     // carry comments that NAME the goblin donor while explaining their wiring,
     // and a bare-basename count would tally those sentences as consumers.
     const occurrences = [
-      ...MANIFEST_SRC.matchAll(/\$\{CREATURES\}\/(?:goblin|giant)_hit_variety_anims\.glb/g),
+      ...MANIFEST_SRC.matchAll(/\$\{CREATURES\}\/goblin_hit_variety_anims\.glb/g),
     ].length;
     expect(occurrences).toBe(consumers.length);
   });

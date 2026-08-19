@@ -1144,7 +1144,7 @@ const classAbilityNamesEn = {
       [
         'recall_the_fallen',
         'Recall the Fallen',
-        'Returns a dead group member to life with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group.',
+        'Returns a dead group member to life at your side with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group within 30 yards and in your line of sight.',
       ],
       [
         'beacon_of_light',
@@ -1483,7 +1483,11 @@ const classAbilityNamesEn = {
         'Gloom Bolt',
         'Sends a shadowy bolt at the enemy for {damage} Shadow damage.',
       ],
-      ['demon_skin', 'Fiendhide', 'Demonic skin increases your armor by {buff} for 30 min.'],
+      [
+        'demon_skin',
+        'Fiendhide',
+        'Demonic skin increases your armor by {buff} for 30 min. Pact Deepened can double this armor and reduce magic damage taken while Fiendhide is active.',
+      ],
       [
         'immolate',
         'Burning Pact',
@@ -1507,7 +1511,7 @@ const classAbilityNamesEn = {
       [
         'needle_of_fate',
         'Needle of Fate',
-        'Pierces the enemy for {damage} Shadow damage and generates 5 Condemnation if it bears your Evil Eye. Each hit on your primary Evil Eye adds a Fate Thread for 12 sec, up to 3. If no Evil Eye exists, the Needle first marks its target.',
+        'Pierces the enemy for {damage} Shadow damage and generates 7 Condemnation on impact if it still bears your Evil Eye. Completing a cast moves your primary Evil Eye to the target and adds a Fate Thread for 12 sec, up to 3. Fate Threads stay with you when the Eye moves or its target dies. Targeting a secondary Coven Eye swaps it with the primary Eye.',
       ],
       [
         'sentence',
@@ -1583,7 +1587,7 @@ const classAbilityNamesEn = {
       [
         'fear',
         'Harrow',
-        'Strikes terror into the enemy, leaving it cowering for up to 8 sec. Any damage breaks the effect.',
+        "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect.",
       ],
       [
         'searing_pain',
@@ -1682,7 +1686,7 @@ const classAbilityNamesEn = {
         'Finishing move that causes {damage}. Wolf Form only.',
         {
           feral:
-            'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: a bite for 70 plus 43 per combo point that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores 30 energy.',
+            'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest, which spends the Old Blood for a stronger strike that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores energy.',
         },
       ],
       [
@@ -1749,7 +1753,7 @@ const classAbilityNamesEn = {
       [
         'tigers_fury',
         'Wolfsblood',
-        'Increases attack power by {buff} for {duration} sec. Wolf Form only.',
+        'Surges {rage} energy and increases attack power by {buff} for {duration} sec. Wolf Form only.',
       ],
       [
         'rip',
@@ -1870,7 +1874,7 @@ const classAbilityNamesEn = {
       [
         'corpse_explosion',
         'Corpse Explosion',
-        'Sacrifices a Bone Mage first, then a Skeletal Warrior, and a Gravewing only as a last resort. Among duplicates it chooses the one with the least remaining duration, then the weakest, to deal {damage} Shadow damage at the chosen location.',
+        'Sacrifices a Skeletal Warrior first, then a Bone Mage, and a Gravewing only as a last resort. Among duplicates it chooses the one with the least remaining duration, then the weakest, to deal {damage} Shadow damage at the chosen location.',
       ],
       [
         'funeral_harvest',
@@ -1880,7 +1884,7 @@ const classAbilityNamesEn = {
       [
         'ossuary_mark',
         'Ossuary Mark',
-        'Marks an enemy for 12 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment.',
+        'Marks an enemy for 15 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment.',
       ],
       [
         'unholy_command',
@@ -1890,7 +1894,7 @@ const classAbilityNamesEn = {
       [
         'reaping_command',
         'Reaping Command',
-        'Spends 2 Soul Fragments to command every undead servant to strike in unison. Graveguards taunt and brace, Warriors pin, Bone Mages expose magic defenses, and Gravewing rends all enemies hit.',
+        "Spends 2 Soul Fragments to command every undead servant to strike in unison. Graveguards taunt and brace, Warriors pin, Bone Mages expose magic defenses, and Gravewing rends all enemies hit. Reaping Command ignores and does not reset each servant's own ability cooldown.",
       ],
       [
         'sacrifice_undead',
@@ -2025,7 +2029,7 @@ const classAbilityNamesEn = {
       [
         'redharvest',
         'Redharvest',
-        'Spends your 3 Old Blood: strike for {damage}, instantly deal all the damage your Flense and Bloodrift would still have dealt, remove both bleeds, and restore 30 energy. Works with zero combo points.',
+        'Spends your 3 Old Blood: strike for {damage}, instantly deal all the damage your Flense and Bloodrift would still have dealt, remove both bleeds, and restore {rage} energy. Works with zero combo points.',
       ],
       [
         'marrowbreak',
@@ -2313,7 +2317,7 @@ const classAbilityNamesEn = {
       [
         'evocation',
         'Aetherwell',
-        'Channel for 6 sec: each second restores 100 mana and builds 8 spell power, stacking while you channel. (Mage talent)',
+        'Channel for 6 sec: each second restores 100 mana and builds 8 spell power, stacking while you channel and lasting 15 sec. (Mage talent)',
       ],
       [
         'flurry_of_knives',
@@ -2323,7 +2327,7 @@ const classAbilityNamesEn = {
       [
         'frenzied_regeneration',
         'Savage Mending',
-        'Restores 180 health over 10 sec. Bruin Form only.',
+        'Restores 40% of your maximum health over 10 sec. Bruin Form only.',
       ],
       [
         'frost_trap',
@@ -2348,12 +2352,12 @@ const classAbilityNamesEn = {
       [
         'howl_of_terror',
         'Dread Chorus',
-        'Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)',
+        "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)",
       ],
       [
         'ice_block',
         'Cold Coffin',
-        'Encases you in ice, absorbing a massive amount of damage for 8 sec. (Mage talent)',
+        'Encases you in solid ice for 8 sec, making you immune to all damage. Removes existing ordinary harmful effects and prevents new ordinary control effects. Usable while stunned or polymorphed. You cannot act while encased. Recast to cancel. (Mage)',
       ],
       [
         'inner_focus',
@@ -2405,17 +2409,17 @@ const classAbilityNamesEn = {
       [
         'temporal_reversal',
         'Temporal Reversal',
-        "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)",
+        "Rewinds a fallen ally's timeline, returning them to life at your side with 35% of their health and mana, even in the thick of combat. (Chronomancy)",
       ],
       [
         'collective_reversal',
         'Collective Reversal',
-        'Rewinds every fallen member of your group or raid, returning them to life at their body with 30% health and mana. Cannot be cast in combat. (Chronomancy)',
+        'Rewinds every fallen member of your group or raid within 40 yards and in your line of sight, returning them to life at your side with 30% health and mana. Cannot be cast in combat. (Chronomancy)',
       ],
       [
         'ancestor_return',
         "Ancestors' Return",
-        'Call every fallen member of your group or raid back to life at their body with 30% health and mana. Cannot be cast in combat. (Spiritcall)',
+        'Call every fallen member of your group or raid within 40 yards and in your line of sight back to your side with 30% health and mana. Cannot be cast in combat. (Spiritcall)',
       ],
       [
         'temporal_rewind',

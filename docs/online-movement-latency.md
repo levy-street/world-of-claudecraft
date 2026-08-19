@@ -32,14 +32,19 @@ here so the survey is not read as the as-built spec:
   simple blend the survey sketched: the authoritative pose is compared against
   the display's own pose one measured echo ago (history ring), with the gain
   bounded by the delay so the loop cannot ring, and the leash clamping the pose
-  only. See the header of `src/render/self_motion.ts`.
+  only. See the header of `src/render/self_motion.ts`. A long render frame is
+  the one sanctioned exception to both halves: it freezes the anchor and then
+  delivers a burst, so the leash lends the block's own ground (bounded by
+  `BLOCK_EPISODE_MAX_MS`) and the servo sits out the resume sweep, pinned by
+  `describe('long render frames')` in `tests/self_motion.test.ts`.
 - **The extrapolation cap landed at 350 ms**, not the surveyed 150 to 200:
   below the real RTT the display rides the leash and steering feels gluey.
 - **The rule amendment has three parts**, not two (`src/net/CLAUDE.md`):
   outcome prediction still banned; display-layer pose extrapolation sanctioned
   under four constraints (applies to `src/render/self_motion.ts`); the heading
   reclassified as client-authoritative input, to which the "never sent"
-  constraint deliberately does not apply.
+  constraint deliberately does not apply. Constraints (a) and (b) carry the
+  long-frame exception recorded above and in `src/net/CLAUDE.md`.
 - Also shipped: the adaptive render lead (`src/game/self_alpha_lead.ts`), the
   shared kernel (`src/sim/player_motion.ts`, bit-for-bit parity-tested), and
   hysteresis fixes for pre-existing animation flicker the smoother display made

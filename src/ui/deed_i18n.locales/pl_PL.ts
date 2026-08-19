@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  exp_dawnhold_castle: {
+    name: 'Otwarte drzwi w ogrodzie',
+    desc: 'Odwiedź zamek Dawnhold i przespaceruj się po jego słonecznych ogrodowych komnatach.',
+  },
+  exp_the_last_keep: {
+    name: 'Ciche komnaty',
+    desc: 'Przekrocz progi Ostatniej Twierdzy i przejdź się jej cichymi komnatami.',
+  },
   pvp_bg_first_capture: {
     name: 'Sztandar w dłoni',
     desc: 'Przechwyć flagę na Polach Ciernistej Kotliny.',

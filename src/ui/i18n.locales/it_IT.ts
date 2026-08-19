@@ -13,6 +13,22 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const it_IT: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formsAutoUnshift': "Una cura o un incantesimo di danno lanciato in forma ti fa uscire da solo. Lasciare una forma in questo modo è gratuito e non consuma il recupero globale, quindi un incantesimo istantaneo parte nel momento in cui lo premi. Rientrare in forma è un'abilità normale e costa comunque mana e il tuo recupero globale.",
+  'entities.mobs.heroic_boss_dummy.name': 'Manichino di boss eroico',
+  'entities.mobs.normal_boss_dummy.name': 'Manichino di boss normale',
+  'entities.mobs.friendly_player_dummy.name': 'Manichino di giocatore alleato',
+  'entities.items.dawnhold_posy.name': 'Mazzolino del giardino di Dawnhold',
+  'entities.dungeons.dawnhold_castle.leaveText': 'Esci di nuovo sul prato soleggiato del giardino.',
+  'entities.dungeons.dawnhold_castle.enterText': 'Metti piede nelle sale calde e profumate di fiori del Castello Dawnhold.',
+  'entities.dungeons.dawnhold_castle.name': 'Castello Dawnhold',
+  'hudChrome.lastkeepMap.story.tower': 'La torre di guardia',
+  'hudChrome.lastkeepMap.story.residence': 'La residenza',
+  'hudChrome.lastkeepMap.story.state': 'Il piano nobile',
+  'hudChrome.lastkeepMap.story.undercroft': 'I sotterranei',
+  'hudChrome.lastkeepMap.title': '{keep}: {story}',
+  'hudChrome.dawnholdMap.story.solar': 'La sala del sole',
+  'hudChrome.dawnholdMap.story.ground': 'Il piano del giardino',
+  'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.social.chanBattleground': 'Campo di battaglia.',
   'guide.social.chanBattlegroundBody': 'Parla con tutti i combattenti nel tuo campo di battaglia, di entrambe le squadre. Solo mentre una partita è in corso.',
   'hud.chat.templates.battleground': '[Campo di battaglia] {name}: {message}',
@@ -5786,7 +5802,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.drain_life.description': "Consuma la vitalità del bersaglio, infliggendo {damage} danni da Ombra ogni secondo e trasferendovene il 70% come salute. Afflizione ne trasferisce invece la totalità. Quando è incanalato sul vostro Evil Eye primario, consuma all'inizio tutti i Filamenti del Fato, e ogni Filamento genera 1 Condanna in più per impulso.",
   'entities.abilities.fear.name': 'Tormento',
   'entities.abilities.fear.description':
-    "Terrorizza il nemico, lasciandolo tremante per un massimo di 8 s. Qualsiasi danno interrompe l'effetto.",
+    "Terrorizza il nemico, lasciandolo tremante per un massimo di 5 s. I danni pari in totale all'8% della salute massima del bersaglio interrompono l'effetto.",
   'entities.abilities.searing_pain.name': 'Bruciatura',
   'entities.abilities.searing_pain.description':
     'Brucia il nemico con fuoco agonizzante per {damage} danni da Fuoco. Lancio rapido.',
@@ -5847,7 +5863,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Il nemico è assalito da uno sciame di insetti, subendo {damage} danni da Natura in 12 sec.',
   'entities.abilities.tigers_fury.name': 'Sangue di Lupo',
   'entities.abilities.tigers_fury.description':
-    "Aumenta la potenza d'attacco di {buff} per {duration} sec. Solo Forma del Lupo.",
+    "Sprigiona {rage} energia e aumenta la potenza d'attacco di {buff} per {duration} sec. Solo Forma del Lupo.",
   'entities.abilities.rip.name': 'Faglia Sanguigna',
   'entities.abilities.mortal_strike.name': 'Colpo Mutilante',
   'entities.abilities.mortal_strike.description':
@@ -5891,7 +5907,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Demoralizza i nemici vicini, riducendone la potenza d'attacco di 20 per 20 sec. Solo in Forma di Bruin.",
   'entities.abilities.prowl.name': 'Appostamento',
   'entities.abilities.prowl.description':
-    'Entra in furtività mentre sei in Forma del Lupo, muovendoti il 50% più lentamente. Non utilizzabile in combattimento.',
+    'Entra in furtività mentre sei in Forma del Lupo, muovendoti il 5% più lentamente. Non utilizzabile in combattimento.',
   'entities.abilities.rake.name': 'Scarnificare',
   'entities.abilities.revive_pet.name': 'Rattoppare',
   'entities.abilities.revive_pet.description':
@@ -5935,9 +5951,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.name': 'Forma di Lunagufo',
   'entities.abilities.moonkin_form.description':
     'Assume Forma di Lunagufo, potenziando il lancio di incantesimi finché non cambi di nuovo. Lancia ancora per tornare alla forma normale. (firma Equilibrio)',
-  'entities.abilities.feral_charge.name': 'Carica Ferina',
+  'entities.abilities.feral_charge.name': 'Impeto Primordiale',
   'entities.abilities.feral_charge.description':
-    'Carica un nemico e lo immobilizza per 1 s. Portata 8-25 m. (firma Aggressore Ferino)',
+    'Scatena un impeto primordiale. In Forma del Lupo, la rigenerazione dell’energia aumenta del 100% per 10 s. In Forma di Bruin, genera istantaneamente 50 rabbia. (firma Aggressore Ferino)',
   'entities.abilities.swiftmend.name': 'Rapidità di Guarigione',
   'entities.abilities.crusader_strike.description':
     'Colpisce il bersaglio infliggendo danni dell’arma più {damage} danni sacri. (talento da paladino)',
@@ -8922,6 +8938,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'worldContent.delveSurfaceExitInteract': 'Premi F per risalire',
   'sim.delve.objectiveClearRoom': 'Ripulisci la stanza.',
   'sim.delve.objectiveDefeatBoss': 'Sconfiggi il boss.',
+  'sim.delve.enemiesRemain': 'Elimina prima i nemici rimasti.',
   'sim.rift.allUnstable': 'Tutti gli squarci sono instabili in questo momento. Riprova a breve.',
   'sim.rift.alreadyCleared': 'Questo squarcio è già stato completato da {names}.',
   'sim.rift.deadEntry': 'Non puoi entrare in uno squarcio mentre sei morto.',
@@ -11197,18 +11214,19 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deterrence.description':
     'Aumenta la tua probabilità di schivata di 50 punti percentuali per 10 sec. (talento del Cacciatore)',
   'entities.abilities.earthbind.description': 'Radica i nemici entro 4 m dal punto bersaglio per 2 sec, poi li rallenta del 40% per 6 sec. (Talento da sciamano)',
-  'entities.abilities.evocation.description': 'Restaura mana rápidamente. (talento da mago)',
+  'entities.abilities.evocation.description':
+    'Canalizza per 6 s: ogni secondo ripristina 100 mana e accumula 8 potere magico. Il bonus si accumula durante la canalizzazione e dura 15 s. (talento da mago)',
   'entities.abilities.frenzied_regeneration.description':
-    'Ripristina 180 salute in 10 sec. Utilizzabile solo in Forma d’Orso. (talento del Druido)',
+    'Ripristina il 40% della salute massima in 10 sec. Utilizzabile solo in Forma d’Orso. (talento del Druido)',
   'entities.abilities.frost_trap.description':
     'Congela i nemici nell’area bersaglio per 3 sec., impedendo loro di muoversi e agire. (talento del Cacciatore)',
   'entities.abilities.hammer_of_wrath.description': "Scaglia un martello sacro per {damage} danni e genera 1 Devozione. Utilizzabile sotto il 20% di salute, oppure durante Ascensione Divina o Ira Vendicatrice. Ira dell'Alba concede un lancio aggiuntivo contro qualsiasi bersaglio che ignora il tempo di recupero in corso e infligge il 20% di danno in più. Ascensione ne aumenta il danno del 30%.",
   'entities.abilities.healing_stream.description':
     'Ripristina 120 salute a un bersaglio alleato in 12 sec. (talento dello Sciamano)',
   'entities.abilities.howl_of_terror.description':
-    'Terrorizza i nemici vicini per un massimo di 3 sec. I danni possono interrompere l’effetto. (talento dello Stregone)',
+    "Terrorizza i nemici vicini per un massimo di 5 sec. I danni pari in totale all'8% della salute massima del bersaglio interrompono la sua paura. (talento dello Stregone)",
   'entities.abilities.ice_block.description':
-    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talento da mago)',
+    'Ti racchiude nel ghiaccio solido per 8 s, rendendoti immune a tutti i danni. Rimuove gli effetti dannosi comuni già attivi e impedisce l’applicazione di nuovi effetti di controllo comuni. Utilizzabile mentre sei stordito o trasformato. Non puoi agire mentre sei racchiuso. Lancia di nuovo per annullare. (mago)',
   'entities.abilities.inner_focus.description': 'Rende il vostro prossimo incantesimo da sacerdote gratuito e non interrompibile. Dura 60 sec.',
   'entities.abilities.innervate.description':
     'La linfa vivente scorre in te per 10 sec. e ripristina a ondate 20 della tua risorsa attuale: mana, rabbia o energia. Cambiare forma non la interrompe. Sonno, stordimento o stasi arrestano la linfa. (talento del Druido)',
@@ -11224,7 +11242,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.preparation.description':
     'Azzera il tempo di recupero di Scatto, Evasione e Sparizione. (talento del Ladro)',
   'entities.abilities.presence_of_mind.description':
-    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (talento da mago)',
+    'Rende istantaneo il prossimo incantesimo con tempo di lancio. Dura 60 s. (talento da mago)',
   'entities.abilities.psychic_scream.description': "Atterrisce i nemici entro 8 m per un massimo di 4 sec. Il danno può spezzare l'effetto.",
   'entities.abilities.shadowstep.description':
     'Avanzi attraverso le ombre verso il tuo bersaglio. (talento del Ladro)',
@@ -12550,7 +12568,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Consuma 5 Verzura. Raccoglie ogni tua cura nel tempo su tutti gli alleati per il 60% della cura restante, rimuove quegli effetti e pianta una Fioritura Selvaggia fresca sul bersaglio.',
   'entities.abilities.redharvest.name': 'Mietitura Rossa',
   'entities.abilities.redharvest.description':
-    "Consuma 3 Sangue Antico: colpisce per {damage}, infligge all'istante tutto il danno che i tuoi Scarnificare e Squartare avrebbero ancora inflitto, rimuove entrambe le emorragie e ripristina 30 energia. Funziona anche senza punti combo.",
+    "Consuma 3 Sangue Antico: colpisce per {damage}, infligge all'istante tutto il danno che i tuoi Scarnificare e Squartare avrebbero ancora inflitto, rimuove entrambe le emorragie e ripristina {rage} energia. Funziona anche senza punti combo.",
   'entities.abilities.sunlance.name': 'Scia Solare',
   'entities.abilities.sunlance.description':
     'Consuma 3 Marea Lunare per un colpo da {damage} danni di Natura più una bruciatura di {overTime} in 9 sec, e ripristina 35 mana: la scelta del mana. Ondata Lunare consuma le stesse 3 Marea Lunare, quindi scegline una.',
@@ -12768,7 +12786,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.description':
     'Mossa finale che infligge {damage}. Solo Forma del Lupo.',
   'entities.abilities.ferocious_bite.specNote_feral':
-    'Ogni colpo a segno aggiunge 1 Sangue Antico; a 3 Sangue Antico questo pulsante diventa Mietitura Rossa: un morso per 70 più 43 per punto combo che infligge anche istantaneamente tutti i danni che Scarnificare e Squartare avrebbero ancora inflitto, e ripristina 30 energia.',
+    'Ogni colpo a segno aggiunge 1 Sangue Antico; a 3 Sangue Antico questo pulsante diventa Mietitura Rossa, che consuma il Sangue Antico per un colpo più forte che infligge anche istantaneamente tutti i danni che Scarnificare e Squartare avrebbero ancora inflitto, e ripristina energia.',
   'entities.abilities.funeral_harvest.description':
     "Quando un nemico danneggiato di recente da te o dai tuoi non morti muore, guadagni 1 Frammento d'Anima. Questo può verificarsi una volta ogni 3 sec.",
   'entities.abilities.funeral_harvest.name': 'Funeral Harvest',
@@ -12806,7 +12824,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Trafigge il nemico per {damage} danni da Ombra e genera 5 Condanna se porta il tuo Evil Eye. Ogni colpo sul tuo Evil Eye primario aggiunge un Filamento del Fato per 12 sec, fino a 3. Se non esiste alcun Evil Eye, Needle of Fate marchia per prima il suo bersaglio.',
   'entities.abilities.needle_of_fate.name': 'Needle of Fate',
   'entities.abilities.ossuary_mark.description':
-    "Marchia un nemico per 12 sec, accumulando il 20% dei danni inflitti da te e dai tuoi non morti. Rilancia per farlo detonare. Se il nemico marchiato muore, esplode entro 6 metri e crea 1 Frammento d'Anima.",
+    "Marchia un nemico per 15 sec, accumulando il 20% dei danni inflitti da te e dai tuoi non morti. Rilancia per farlo detonare. Se il nemico marchiato muore, esplode entro 6 metri e crea 1 Frammento d'Anima.",
   'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
   'entities.abilities.possess_evil_eye.description':
     "Il Maledictor possiede il tuo Evil Eye primario per 15 sec e genera 35 Condanna. Needle of Fate si lancia in 1 sec e genera 2 Condanna extra, Divorare può essere incanalato in movimento, e Sentence infligge il 25% di danni in più e rilascia un'eco ritardata per il 60% dei danni, che scende al 30% tra i livelli 17 e 20.",

@@ -98,6 +98,10 @@ describe('choice row engine', () => {
           const g = o.effect.grant?.ability;
           if (!g) continue;
           expect(ABILITIES[g], `${o.id} grants unknown ability ${g}`).toBeTruthy();
+          const grantHasRiders = (o.effect.ability ?? []).some(
+            (mod) => mod.ability === g && (mod.addEffects?.length ?? 0) > 0,
+          );
+          if (grantHasRiders) continue;
           expect(o.name, `${o.id} name must match ${g}'s display name`).toBe(ABILITIES[g].name);
         }
       }

@@ -67,18 +67,20 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 277 deeds worth 3225 total Renown', () => {
+  it('ships exactly 279 deeds worth 3235 total Renown', () => {
     // Release base (262 / 3145 after the WARFARE lifetime-honor ladder) plus
     // four Reliquary Curator rank bridges and the five Phase 18 completion
     // ladder deeds (all nine renown 0: catalog prestige never scores the
-    // board), plus prog_jewelcrafting_rare (renown 10, the Masterwrought
-    // phase 05 jewelcrafting base catalog), plus the phase 05 QA ruling pair
-    // prog_jewelcrafting_50 (renown 5) and prog_grandmaster_jewelcrafting
-    // (renown 25) joining their cross-craft families, plus the phase 06
-    // inscription base catalog's three (prog_inscription_rare 10,
-    // prog_inscription_50 5, prog_grandmaster_inscription 25).
-    expect(DEED_ORDER.length).toBe(277);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3225);
+    // board), plus the release's walk-in castle visit pair (exp_the_last_keep,
+    // exp_dawnhold_castle, renown 5 each), plus prog_jewelcrafting_rare
+    // (renown 10, the Masterwrought phase 05 jewelcrafting base catalog), plus
+    // the phase 05 QA ruling pair prog_jewelcrafting_50 (renown 5) and
+    // prog_grandmaster_jewelcrafting (renown 25) joining their cross-craft
+    // families, plus the phase 06 inscription base catalog's three
+    // (prog_inscription_rare 10, prog_inscription_50 5,
+    // prog_grandmaster_inscription 25).
+    expect(DEED_ORDER.length).toBe(279);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3235);
   });
 
   it('ships the audited per-category counts', () => {
@@ -102,7 +104,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // Release's Thornhollow battlegrounds plus the WARFARE honor ladder.
       pvp: 35,
       social: 18,
-      exploration: 9,
+      exploration: 11,
       feat: 3,
       hidden: 9,
     });
@@ -228,6 +230,13 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'col_reliquary_illum_nythraxis_heroic',
       'col_reliquary_illum_thunzharr',
       'col_reliquary_illum_gravewyrm_heroic',
+      // The release's walk-in castle visit pair sits ahead of the branch's
+      // craft milestones so the eventual release merge stays a pure tail
+      // append: the Last Keep's deed retro-fixes its shipped-without-deeds
+      // gap, Dawnhold's lands with its castle (both keyed on the enterDungeon
+      // markVisited emit).
+      'exp_the_last_keep',
+      'exp_dawnhold_castle',
       // Jewelcrafting joins the per-craft rare-tier family with the
       // Masterwrought phase 05 base catalog (appended at the tail:
       // DEED_ORDER is append-only, so it cannot sit beside its siblings),
@@ -335,6 +344,22 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     });
     expect(DEEDS.dgn_rift_s_rank.hidden ?? false).toBe(false);
     expect(DEEDS.dgn_rift_s_rank.feat ?? false).toBe(false);
+  });
+
+  it('pins the walk-in castle visits: renown and trigger literals', () => {
+    // The castle visit pair: routine renown-5 walk-ins, no reward beyond it.
+    expect(DEEDS.exp_the_last_keep.renown).toBe(5);
+    expect(DEEDS.exp_the_last_keep.trigger).toEqual({
+      kind: 'visit',
+      markId: 'dungeon:the_last_keep',
+    });
+    expect(DEEDS.exp_the_last_keep.reward).toBeUndefined();
+    expect(DEEDS.exp_dawnhold_castle.renown).toBe(5);
+    expect(DEEDS.exp_dawnhold_castle.trigger).toEqual({
+      kind: 'visit',
+      markId: 'dungeon:dawnhold_castle',
+    });
+    expect(DEEDS.exp_dawnhold_castle.reward).toBeUndefined();
   });
 
   it('pins the professions additions: renown and trigger literals', () => {
@@ -666,7 +691,13 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // three appended deeds (prog_inscription_rare 10, prog_inscription_50 5,
   // prog_grandmaster_inscription 25, Grandmaster title), the jewelcrafting
   // family shapes exactly. No shipped trigger or renown changed.
-  const FROZEN_CATALOG_SHA256 = '812ee9fcc6b91ff23958583dd3e3d97d34a8a82b2bc122e74ab413b38b261d0d';
+  // Re-baselined for the merge of release/v0.40.0: the release's walk-in
+  // castle visit pair (exp_the_last_keep, exp_dawnhold_castle, renown 5
+  // each) lands AHEAD of the six craft milestones in the merged order, so
+  // the merged canonical string matches neither parent literal. No shipped
+  // trigger or renown changed (both parents reproduce their own priors
+  // exactly; the merged hash is re-minted from the suite output).
+  const FROZEN_CATALOG_SHA256 = 'ea007571ae354f38849ac913aaed470dccca3c52eb44199995b9370f0b4a8bf8';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -859,15 +890,15 @@ describe('table shape', () => {
   it('DEED_ORDER holds the append-only authored order (first and last pinned)', () => {
     // DEED_ORDER derives from the table keys, so covering DEEDS is inherent;
     // what CAN drift is the authored order itself. Pin the endpoints as
-    // literals: prog_first_steps opens the catalog and the evergarden
-    // first-cast closes the tail, and either moving would signal a reorder
+    // literals: prog_first_steps opens the catalog and exp_dawnhold_castle
+    // closes the tail, and either moving would signal a reorder
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    // The Masterwrought phase 05 jewelcrafting milestones append after the
-    // Phase 18 Reliquary completion ladder, then the phase 06 inscription
-    // milestones append behind them; the inscription Grandmaster deed closes
-    // the tail.
+    // The release's walk-in castle visit pair sits after the Phase 18
+    // Reliquary completion ladder, then the Masterwrought phase 05
+    // jewelcrafting milestones and the phase 06 inscription milestones
+    // append behind it; the inscription Grandmaster deed closes the tail.
     expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('prog_grandmaster_inscription');
   });
 

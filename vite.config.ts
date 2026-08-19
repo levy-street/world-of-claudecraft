@@ -423,6 +423,14 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    // Dev-only: never let the browser reuse cached asset bytes. GLBs and other
+    // public/ files are fetched LAZILY by the asset loader, after page load, so
+    // even a hard refresh (which bypasses cache only for the document's own
+    // requests) can leave a replaced model serving day-old bytes from disk
+    // cache; a swapped weapon or creature GLB then "looks exactly the same"
+    // through any number of reloads. Prod is unaffected (this is the dev
+    // server block); prod busts via content-hashed /media/ URLs instead.
+    headers: { 'Cache-Control': 'no-store' },
     // Vite's default watch ignore list is only .git, node_modules, test-results,
     // cacheDir and outDir, so the dev watcher otherwise descends into every agent
     // runtime directory at the repo root. A linked worktree parked under one of them

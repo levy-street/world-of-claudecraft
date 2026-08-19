@@ -2489,6 +2489,7 @@ const ITEM_ENTITY_IDS = [
   'sharp_claw',
   'curved_tusk',
   'pristine_claw',
+  'dawnhold_posy',
   'hammered_copper_band',
   'polished_copper_loop',
   'coiled_copper_torc',
@@ -2698,6 +2699,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   thornhide_leggings: 'Thornhide Leggings',
   thornhide_gloves: 'Thornhide Gloves',
   thornhide_boots: 'Thornhide Boots',
+  dawnhold_posy: 'Dawnhold Garden Posy',
   // Jewelcrafting base catalog (Masterwrought phase 05): the thorium_* ids
   // display "Osmium" (the Osmium register in content/profession_items.ts).
   // English-appended like the quivers above until the release fill folds them

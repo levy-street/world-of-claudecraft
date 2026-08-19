@@ -1,0 +1,547 @@
+{
+  "schemaVersion": 1,
+  "batch": "release-v0.39.0-second-pass-delve-affixes",
+  "createdOn": "2026-08-16",
+  "owner": "World of ClaudeCraft",
+  "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+  "generator": {
+    "tool": "OpenAI built-in image generation",
+    "invocation": "image_gen__imagegen",
+    "workflow": "imagegen",
+    "useCase": "stylized-concept",
+    "callsPerAsset": 1,
+    "variantsPerCall": 1,
+    "referenceImagesPassedToGenerator": false,
+    "note": "Repository references were inspected for mechanics and visual continuity before prompting. Brand-new generations intentionally omitted referenced_image_paths and num_last_images_to_include."
+  },
+  "result": {
+    "requested": 6,
+    "generated": 6,
+    "accepted": 6,
+    "rejected": 0,
+    "retried": 0,
+    "builtInCalls": 6
+  },
+  "semanticSources": [
+    {
+      "path": "src/sim/content/delves/affixes.ts",
+      "role": "Canonical affix identities, mechanics, descriptions, and Drowned Litany selection rules."
+    },
+    {
+      "path": "src/sim/delves/runs.ts",
+      "role": "Implemented-affix roster and live Delve run behavior."
+    },
+    {
+      "path": "src/sim/delves/drowned_litany_boss.ts",
+      "role": "High Water and Lively Choir encounter semantics for the Drowned Litany family."
+    },
+    {
+      "path": "src/sim/delves/drowned_litany_rooms.ts",
+      "role": "Belligerent Dead encounter semantics and drowned-revenant context."
+    }
+  ],
+  "visualReferences": [
+    {
+      "path": "public/ui/items/corpse_candle_focus.webp",
+      "role": "Tactile corpse-candle wax, dark relic material, and cyan-gold focal-light benchmark.",
+      "usedAsGenerationInput": false,
+      "sha256": "3ddc66d021556bc3f1eb9574b9f1518c7ecb1af7e71ef19e6a11e7ac3e2a543f"
+    },
+    {
+      "path": "public/ui/items/pristine_venom_gland.webp",
+      "role": "Toxic chartreuse against bruised-violet shadow benchmark for hazardous-affix readability.",
+      "usedAsGenerationInput": false,
+      "sha256": "7bd75ae4de7fe2b5ad483bd87e7bbeb6e8a57fd7ca1dda4fcc20d4b009d632f7"
+    },
+    {
+      "path": "public/ui/skills/warlock/raise_graveguard.webp",
+      "role": "Necromantic skeletal-emergence silhouette, cyan underlight, and grave-darkness benchmark.",
+      "usedAsGenerationInput": false,
+      "sha256": "d560f09fd76ea40e83015e5a8007fdc0f82dd4481c227053dbc8d27d945ee840"
+    },
+    {
+      "path": "public/ui/skills/druid/faerie_fire.webp",
+      "role": "Existing spell-family painterly density, high-contrast magical rim light, and small-size legibility benchmark.",
+      "usedAsGenerationInput": false,
+      "sha256": "a51f42df4da301d53012d85e49a36fabf9d05b1ed32c9764ba86e272aac850a8"
+    },
+    {
+      "path": "public/ui/skills/shaman/tidecall.webp",
+      "role": "Turbulent blackwater motion, cyan-teal wave light, and deep-navy aquatic palette benchmark.",
+      "usedAsGenerationInput": false,
+      "sha256": "c48612f1d32af9a8537125edeef92b683f0d9c0ccc700a32e2252701b3d4a6d5"
+    },
+    {
+      "path": "public/ui/skills/priest/choir_of_deliverance.webp",
+      "role": "Spectral cantor-face hierarchy, supernatural voice ribbons, and choral readability benchmark.",
+      "usedAsGenerationInput": false,
+      "sha256": "a70ee005bdb91685da8d3834ba51228fb67d25cf3a710dbca445783ae76b4aa9"
+    },
+    {
+      "path": "public/ui/items/nhalias_bell_maul.webp",
+      "role": "Aged brass bell and drowned-relic material benchmark for the Lively Choir family identity.",
+      "usedAsGenerationInput": false,
+      "sha256": "4af05893f1223d135fbea01102fde7d1ce105c5fcc193ad4590817c66c32d387"
+    },
+    {
+      "path": "public/ui/deeds/dgn_drowned_temple_heroic.webp",
+      "role": "Drowned Temple architecture, corroded stone-and-metal language, and blackwater cyan-gold palette benchmark.",
+      "usedAsGenerationInput": false,
+      "sha256": "eb40338b218dbcc80e3e469fafddd60687c421794d1fa00db9263f32bd116eef"
+    }
+  ],
+  "processing": {
+    "tool": "cwebp",
+    "command": "cwebp -q 80 -m 6 -sharp_yuv -resize 128 128 INPUT.png -o OUTPUT.webp",
+    "operations": [
+      "Resize the opaque source to 128x128",
+      "Encode WebP at quality=80, method=6, sharp YUV"
+    ],
+    "shippingRequirements": {
+      "width": 128,
+      "height": 128,
+      "format": "webp",
+      "colorSpace": "sRGB",
+      "fullyOpaque": true,
+      "maximumBytes": 15360
+    }
+  },
+  "review": {
+    "assetOrder": [
+      "bad_air",
+      "belligerent_dead",
+      "candleblind",
+      "high_water",
+      "lively_choir",
+      "restless_graves"
+    ],
+    "sourceContactSheet": {
+      "path": "tmp/imagegen/v039-second-pass/delve-encounters/previews/generated-final-six.png",
+      "sha256": "bfe8782718a81eaa64e57ac08dcefe286a43d71554d632119ce020047b6b4cd0",
+      "width": 1656,
+      "height": 276,
+      "role": "Side-by-side source review for the six accepted affix paintings in assetOrder."
+    },
+    "runtimeContactSheets": [
+      {
+        "path": "tmp/imagegen/v039-second-pass/delve-encounters/previews/runtime-48.png",
+        "sha256": "e137a5d91bdbc935396569e7d21157c8e39e8f77fa5b38765118a673c29c8a1c",
+        "width": 280,
+        "height": 224,
+        "size": 48
+      },
+      {
+        "path": "tmp/imagegen/v039-second-pass/delve-encounters/previews/runtime-32.png",
+        "sha256": "d62cab3609f72889dc99bf154388b321e78c20e288769196f5c5c7fe3003631d",
+        "width": 200,
+        "height": 160,
+        "size": 32
+      },
+      {
+        "path": "tmp/imagegen/v039-second-pass/delve-encounters/previews/runtime-16.png",
+        "sha256": "2f4006638db0c6a06d62ad7387c79d5b788c9119671165b2f8f7aed09b6eccec",
+        "width": 120,
+        "height": 96,
+        "size": 16
+      }
+    ],
+    "method": "Manual visual inspection of every generated source and the shipping WebPs at native 128px plus 48px, 32px, and 16px contact sheets, followed by automated hash, metadata, opacity, uniqueness, and byte-limit checks."
+  },
+  "assets": [
+    {
+      "id": "bad_air",
+      "family": "collapsed_reliquary_affixes",
+      "semanticBrief": "A cracked plague censer exhaling poisonous vapor shaped like a choking spectral claw.",
+      "mechanicSources": ["src/sim/content/delves/affixes.ts", "src/sim/delves/runs.ts"],
+      "prompt": "Use case: stylized-concept\nAsset type: 128x128 MMORPG HUD delve-affix icon\nPrimary request: Bad Air, a cracked blackened plague censer forcefully exhaling thick poisonous vapor that curls into a choking spectral claw\nScene/backdrop: fully opaque subterranean crypt darkness with murky olive haze\nStyle/medium: premium hand-painted dark-fantasy game UI icon, richly modeled tarnished metal and luminous toxic smoke, polished World of ClaudeCraft spell-icon language\nComposition/framing: censer low-center with one bold rising plume, subject fills about 82 percent, clear silhouette and strong value separation for instant readability at 48px, 32px, and 16px\nLighting/mood: sickly chartreuse inner glow with bruised violet shadows, oppressive and hazardous\nConstraints: square; opaque edge-to-edge painted background; borderless; no circular frame; no UI chrome; no text; no letters; no numbers; no watermark; no rarity gem; no transparent corners\nAvoid: flat vector glyphs, comedy, generic green cloud alone, tiny particles, muddy contrast, photorealism, decorative border",
+      "references": [
+        {
+          "path": "public/ui/items/corpse_candle_focus.webp",
+          "role": "Tactile corpse-candle wax, dark relic material, and cyan-gold focal-light benchmark."
+        },
+        {
+          "path": "public/ui/items/pristine_venom_gland.webp",
+          "role": "Toxic chartreuse against bruised-violet shadow benchmark for hazardous-affix readability."
+        },
+        {
+          "path": "public/ui/skills/warlock/raise_graveguard.webp",
+          "role": "Necromantic skeletal-emergence silhouette, cyan underlight, and grave-darkness benchmark."
+        },
+        {
+          "path": "public/ui/skills/druid/faerie_fire.webp",
+          "role": "Existing spell-family painterly density, high-contrast magical rim light, and small-size legibility benchmark."
+        }
+      ],
+      "generation": {
+        "mode": "OpenAI built-in image generation",
+        "builtInCallCount": 1,
+        "variantsReturned": 1,
+        "generatorOutputFilename": "exec-e2dc6f64-3c05-4f97-a551-1cf5d777e8b5.png",
+        "source": {
+          "path": "tmp/imagegen/v039-second-pass/delve-encounters/raw/bad_air.png",
+          "sha256": "b5d8aa01c0f074bf6efb8565230de7d60531c179ab20c03af3e74c6afaf47637",
+          "bytes": 2135203,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorSpace": "sRGB",
+          "channels": 3,
+          "hasAlpha": false
+        }
+      },
+      "accepted": {
+        "output": "public/ui/delve-affixes/bad_air.webp",
+        "sha256": "ae221adbcd98dade908b1139636b155eb173379786049e744d6efaa03161458c",
+        "bytes": 4146,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "sRGB",
+        "channels": 3,
+        "hasAlpha": false,
+        "decision": "accepted: the cracked censer and single choking spectral claw remain unmistakable at 48, 32, and 16 pixels",
+        "review": {
+          "semantic": "accepted",
+          "crop": "accepted",
+          "style": "accepted",
+          "sizesPx": [128, 48, 32, 16],
+          "opacity": "accepted",
+          "byteLimit": "accepted"
+        }
+      },
+      "rejects": [],
+      "retries": 0
+    },
+    {
+      "id": "belligerent_dead",
+      "family": "drowned_litany",
+      "semanticBrief": "An armored drowned revenant surging behind a battered grave-silt bulwark.",
+      "mechanicSources": [
+        "src/sim/content/delves/affixes.ts",
+        "src/sim/delves/runs.ts",
+        "src/sim/delves/drowned_litany_rooms.ts"
+      ],
+      "prompt": "Use case: stylized-concept\nAsset type: 128x128 MMORPG HUD delve-affix icon\nPrimary request: Belligerent Dead, a heavily armored drowned revenant surging forward behind a battered grave-silt bulwark shield, jaw set in a silent war cry\nScene/backdrop: fully opaque ruined blackwater crypt, subdued and atmospheric\nStyle/medium: premium hand-painted dark-fantasy game UI icon, weighty corroded plate, wet grave silt, old bone and spectral energy, polished World of ClaudeCraft spell-icon language\nComposition/framing: shield and undead torso form one aggressive forward wedge, subject fills about 84 percent, strong silhouette with broad shapes readable at 48px, 32px, and 16px\nLighting/mood: cold teal rim light with rusty ember-orange eye glow, relentless and hostile\nConstraints: square; fully opaque edge-to-edge painted background; borderless; no circular frame; no UI chrome; no text; no letters; no numbers; no watermark; no rarity gem\nAvoid: flat shield glyph, generic zombie portrait, modern armor, comedy, tiny details, decorative border",
+      "references": [
+        {
+          "path": "public/ui/skills/shaman/tidecall.webp",
+          "role": "Turbulent blackwater motion, cyan-teal wave light, and deep-navy aquatic palette benchmark."
+        },
+        {
+          "path": "public/ui/skills/priest/choir_of_deliverance.webp",
+          "role": "Spectral cantor-face hierarchy, supernatural voice ribbons, and choral readability benchmark."
+        },
+        {
+          "path": "public/ui/items/nhalias_bell_maul.webp",
+          "role": "Aged brass bell and drowned-relic material benchmark for the Lively Choir family identity."
+        },
+        {
+          "path": "public/ui/deeds/dgn_drowned_temple_heroic.webp",
+          "role": "Drowned Temple architecture, corroded stone-and-metal language, and blackwater cyan-gold palette benchmark."
+        }
+      ],
+      "generation": {
+        "mode": "OpenAI built-in image generation",
+        "builtInCallCount": 1,
+        "variantsReturned": 1,
+        "generatorOutputFilename": "exec-2027e8e2-9c08-44fd-8582-bd3f047bb240.png",
+        "source": {
+          "path": "tmp/imagegen/v039-second-pass/delve-encounters/raw/belligerent_dead.png",
+          "sha256": "bc1b5db000a1435946318849dbd7f5e8f74ab06dcc211f515a06bdb386b97983",
+          "bytes": 3041316,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorSpace": "sRGB",
+          "channels": 3,
+          "hasAlpha": false
+        }
+      },
+      "accepted": {
+        "output": "public/ui/delve-affixes/belligerent_dead.webp",
+        "sha256": "67a419ed2dc3aa12500faf79848ce3928ec7f7a48ab02973ebb4456dcc5ff66b",
+        "bytes": 5134,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "sRGB",
+        "channels": 3,
+        "hasAlpha": false,
+        "decision": "accepted: the drowned revenant and grave-silt bulwark retain one aggressive readable wedge at 48, 32, and 16 pixels",
+        "review": {
+          "semantic": "accepted",
+          "crop": "accepted",
+          "style": "accepted",
+          "sizesPx": [128, 48, 32, 16],
+          "opacity": "accepted",
+          "byteLimit": "accepted"
+        }
+      },
+      "rejects": [],
+      "retries": 0
+    },
+    {
+      "id": "candleblind",
+      "family": "collapsed_reliquary_affixes",
+      "semanticBrief": "A guttering corpse candle flaring across a watchful eye until its pupil disappears.",
+      "mechanicSources": ["src/sim/content/delves/affixes.ts", "src/sim/delves/runs.ts"],
+      "prompt": "Use case: stylized-concept\nAsset type: 128x128 MMORPG HUD delve-affix icon\nPrimary request: Candleblind, a guttering corpse candle flaring directly across a watchful eye whose pupil disappears behind a harsh fan of white-gold glare, with dripping wax and faint grave smoke\nScene/backdrop: fully opaque midnight crypt blue\nStyle/medium: premium hand-painted dark-fantasy MMORPG icon, tactile wax and iris detail, dramatic painterly light, polished World of ClaudeCraft visual language\nComposition/framing: one large eye behind one candle flame, bold crossed silhouette, subject fills about 84 percent, simplified major shapes and high local contrast readable at 48px, 32px, and 16px\nLighting/mood: blinding ivory-gold flame against deep indigo and violet, uncanny rather than holy\nConstraints: square; fully opaque edge-to-edge background; borderless; no circular frame; no UI chrome; no text; no letters; no numbers; no watermark; no rarity gem\nAvoid: flat vector eye symbol, realistic human portrait, extra candles, tiny details, soft low contrast, decorative borders",
+      "references": [
+        {
+          "path": "public/ui/items/corpse_candle_focus.webp",
+          "role": "Tactile corpse-candle wax, dark relic material, and cyan-gold focal-light benchmark."
+        },
+        {
+          "path": "public/ui/items/pristine_venom_gland.webp",
+          "role": "Toxic chartreuse against bruised-violet shadow benchmark for hazardous-affix readability."
+        },
+        {
+          "path": "public/ui/skills/warlock/raise_graveguard.webp",
+          "role": "Necromantic skeletal-emergence silhouette, cyan underlight, and grave-darkness benchmark."
+        },
+        {
+          "path": "public/ui/skills/druid/faerie_fire.webp",
+          "role": "Existing spell-family painterly density, high-contrast magical rim light, and small-size legibility benchmark."
+        }
+      ],
+      "generation": {
+        "mode": "OpenAI built-in image generation",
+        "builtInCallCount": 1,
+        "variantsReturned": 1,
+        "generatorOutputFilename": "exec-36bd4586-9492-4f4b-ba7b-f3cb2db3c83b.png",
+        "source": {
+          "path": "tmp/imagegen/v039-second-pass/delve-encounters/raw/candleblind.png",
+          "sha256": "b6e78f5304fcaebb683217c922eb052b641aa121819c6777e4ab7ae59ad6c7eb",
+          "bytes": 2207999,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorSpace": "sRGB",
+          "channels": 3,
+          "hasAlpha": false
+        }
+      },
+      "accepted": {
+        "output": "public/ui/delve-affixes/candleblind.webp",
+        "sha256": "91502e2624e037b82c7d528e379c8cb3497eedbb4a8402b7af520d72e86be65a",
+        "bytes": 3766,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "sRGB",
+        "channels": 3,
+        "hasAlpha": false,
+        "decision": "accepted: the candle flare crossing the disappearing pupil stays legible and source-accurate at 48, 32, and 16 pixels",
+        "review": {
+          "semantic": "accepted",
+          "crop": "accepted",
+          "style": "accepted",
+          "sizesPx": [128, 48, 32, 16],
+          "opacity": "accepted",
+          "byteLimit": "accepted"
+        }
+      },
+      "rejects": [],
+      "retries": 0
+    },
+    {
+      "id": "high_water",
+      "family": "drowned_litany",
+      "semanticBrief": "A blackwater crest surging over reliquary steps and a sinking iron lantern.",
+      "mechanicSources": [
+        "src/sim/content/delves/affixes.ts",
+        "src/sim/delves/runs.ts",
+        "src/sim/delves/drowned_litany_boss.ts"
+      ],
+      "prompt": "Use case: stylized-concept\nAsset type: 128x128 MMORPG HUD delve-affix icon\nPrimary request: High Water, a violent crest of blackwater surging upward over half-submerged reliquary steps and a sinking iron lantern\nScene/backdrop: fully opaque drowned-ruin darkness\nStyle/medium: premium hand-painted dark-fantasy game UI icon, sculpted turbulent water, old stone and corroded iron, polished World of ClaudeCraft spell-icon language\nComposition/framing: one towering diagonal wave dominates the square, lantern and steps are supporting scale cues, subject fills about 85 percent, broad readable shapes at 48px, 32px, and 16px\nLighting/mood: eerie cyan-teal bioluminescence inside nearly black water, cold moon-silver highlights, escalating danger\nConstraints: square; opaque edge-to-edge painted background; borderless; no circular frame; no UI chrome; no text; no letters; no numbers; no watermark; no rarity gem\nAvoid: cheerful ocean, blue water-drop glyph, beach scene, tiny foam noise, photorealism, decorative border",
+      "references": [
+        {
+          "path": "public/ui/skills/shaman/tidecall.webp",
+          "role": "Turbulent blackwater motion, cyan-teal wave light, and deep-navy aquatic palette benchmark."
+        },
+        {
+          "path": "public/ui/skills/priest/choir_of_deliverance.webp",
+          "role": "Spectral cantor-face hierarchy, supernatural voice ribbons, and choral readability benchmark."
+        },
+        {
+          "path": "public/ui/items/nhalias_bell_maul.webp",
+          "role": "Aged brass bell and drowned-relic material benchmark for the Lively Choir family identity."
+        },
+        {
+          "path": "public/ui/deeds/dgn_drowned_temple_heroic.webp",
+          "role": "Drowned Temple architecture, corroded stone-and-metal language, and blackwater cyan-gold palette benchmark."
+        }
+      ],
+      "generation": {
+        "mode": "OpenAI built-in image generation",
+        "builtInCallCount": 1,
+        "variantsReturned": 1,
+        "generatorOutputFilename": "exec-261bfcc6-2d27-4987-82e3-b252d3e592d2.png",
+        "source": {
+          "path": "tmp/imagegen/v039-second-pass/delve-encounters/raw/high_water.png",
+          "sha256": "21fc7d388981c0cb2fa41db87049557c8509076cccd7128ead555a1710efaae7",
+          "bytes": 2459221,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorSpace": "sRGB",
+          "channels": 3,
+          "hasAlpha": false
+        }
+      },
+      "accepted": {
+        "output": "public/ui/delve-affixes/high_water.webp",
+        "sha256": "5738154620d18fbe2ddd57afccf6e18be472cb17a1329bf29ad80508e51640ee",
+        "bytes": 4544,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "sRGB",
+        "channels": 3,
+        "hasAlpha": false,
+        "decision": "accepted: the blackwater crest dominates while the sinking lantern remains a readable danger cue at 48, 32, and 16 pixels",
+        "review": {
+          "semantic": "accepted",
+          "crop": "accepted",
+          "style": "accepted",
+          "sizesPx": [128, 48, 32, 16],
+          "opacity": "accepted",
+          "byteLimit": "accepted"
+        }
+      },
+      "rejects": [],
+      "retries": 0
+    },
+    {
+      "id": "lively_choir",
+      "family": "drowned_litany",
+      "semanticBrief": "Three drowned cantor masks singing luminous sound ribbons around a tolling bell.",
+      "mechanicSources": [
+        "src/sim/content/delves/affixes.ts",
+        "src/sim/delves/drowned_litany_boss.ts"
+      ],
+      "prompt": "Use case: stylized-concept\nAsset type: 128x128 MMORPG HUD delve-affix icon\nPrimary request: Lively Choir, one drowned cantor mask singing a supernatural note while two dimmer drowned faces answer behind it, their voices forming luminous concentric sound ribbons around a small tolling bell\nScene/backdrop: fully opaque blackwater chapel darkness\nStyle/medium: premium hand-painted dark-fantasy MMORPG icon, expressive spectral faces, aged brass and fluid blue-green magic, polished World of ClaudeCraft spell-icon language\nComposition/framing: large central singing face with two supporting silhouettes and one simple bell, triangular hierarchy, subject fills about 84 percent, clear at 48px, 32px, and 16px\nLighting/mood: ghostly cyan and tarnished gold against deep navy, energetic, uncanny, ritualistic\nConstraints: square; opaque edge-to-edge painted background; borderless; no circular frame; no UI chrome; no text; no letters; no musical notation; no numbers; no watermark; no rarity gem\nAvoid: happy choir, modern singers, comedy, flat sound-wave glyph, cluttered crowd, decorative frame",
+      "references": [
+        {
+          "path": "public/ui/skills/shaman/tidecall.webp",
+          "role": "Turbulent blackwater motion, cyan-teal wave light, and deep-navy aquatic palette benchmark."
+        },
+        {
+          "path": "public/ui/skills/priest/choir_of_deliverance.webp",
+          "role": "Spectral cantor-face hierarchy, supernatural voice ribbons, and choral readability benchmark."
+        },
+        {
+          "path": "public/ui/items/nhalias_bell_maul.webp",
+          "role": "Aged brass bell and drowned-relic material benchmark for the Lively Choir family identity."
+        },
+        {
+          "path": "public/ui/deeds/dgn_drowned_temple_heroic.webp",
+          "role": "Drowned Temple architecture, corroded stone-and-metal language, and blackwater cyan-gold palette benchmark."
+        }
+      ],
+      "generation": {
+        "mode": "OpenAI built-in image generation",
+        "builtInCallCount": 1,
+        "variantsReturned": 1,
+        "generatorOutputFilename": "exec-d6293934-dd33-41ee-b3aa-86a1c3392b6f.png",
+        "source": {
+          "path": "tmp/imagegen/v039-second-pass/delve-encounters/raw/lively_choir.png",
+          "sha256": "4acaca68c9c14cd7ad9f077f0c210ca716a28d4690394b28694cf3869e802720",
+          "bytes": 2692780,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorSpace": "sRGB",
+          "channels": 3,
+          "hasAlpha": false
+        }
+      },
+      "accepted": {
+        "output": "public/ui/delve-affixes/lively_choir.webp",
+        "sha256": "8550459f71168e229bb324ba25ed9c31b88e0618f169f27283874d46a5bae13b",
+        "bytes": 4848,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "sRGB",
+        "channels": 3,
+        "hasAlpha": false,
+        "decision": "accepted: the cantor-mask hierarchy, luminous voice ribbons, and bell remain coherent at 48, 32, and 16 pixels",
+        "review": {
+          "semantic": "accepted",
+          "crop": "accepted",
+          "style": "accepted",
+          "sizesPx": [128, 48, 32, 16],
+          "opacity": "accepted",
+          "byteLimit": "accepted"
+        }
+      },
+      "rejects": [],
+      "retries": 0
+    },
+    {
+      "id": "restless_graves",
+      "family": "collapsed_reliquary_affixes",
+      "semanticBrief": "A skeletal hand erupting through a cracked ancient grave slab.",
+      "mechanicSources": ["src/sim/content/delves/affixes.ts", "src/sim/delves/runs.ts"],
+      "prompt": "Use case: stylized-concept\nAsset type: 128x128 MMORPG HUD delve-affix icon\nPrimary request: Restless Graves, a cracked ancient grave slab erupting as a skeletal hand claws upward through loose earth, with a newly raised bonewalker silhouette beginning to emerge\nScene/backdrop: deep charcoal-brown crypt darkness with a subtle pool of grave mist, fully opaque\nStyle/medium: premium hand-painted dark-fantasy game UI icon, dense painterly brushwork and convincing bone, stone, soil, and spectral-light texture; match World of ClaudeCraft's polished existing spell-icon language\nComposition/framing: single centered emblematic subject, bold diagonal gesture, subject fills about 82 percent of the square, strong silhouette and generous internal contrast, designed to remain instantly legible at 48px, 32px, and 16px\nLighting/mood: cold cyan-blue necromantic underlight against warm umber stone, eerie and urgent\nConstraints: square image; fully opaque edge-to-edge painted background; one coherent focal subject; borderless; no circular frame; no UI chrome; no text; no letters; no numbers; no watermark; no rarity gem; no transparent corners\nAvoid: flat vector glyphs, clip art, generic skull-only icon, tiny scattered details, muddy low contrast, photorealism, decorative gold borders",
+      "references": [
+        {
+          "path": "public/ui/items/corpse_candle_focus.webp",
+          "role": "Tactile corpse-candle wax, dark relic material, and cyan-gold focal-light benchmark."
+        },
+        {
+          "path": "public/ui/items/pristine_venom_gland.webp",
+          "role": "Toxic chartreuse against bruised-violet shadow benchmark for hazardous-affix readability."
+        },
+        {
+          "path": "public/ui/skills/warlock/raise_graveguard.webp",
+          "role": "Necromantic skeletal-emergence silhouette, cyan underlight, and grave-darkness benchmark."
+        },
+        {
+          "path": "public/ui/skills/druid/faerie_fire.webp",
+          "role": "Existing spell-family painterly density, high-contrast magical rim light, and small-size legibility benchmark."
+        }
+      ],
+      "generation": {
+        "mode": "OpenAI built-in image generation",
+        "builtInCallCount": 1,
+        "variantsReturned": 1,
+        "generatorOutputFilename": "exec-9c985ffb-5dc0-4598-af66-7f0d9472199e.png",
+        "source": {
+          "path": "tmp/imagegen/v039-second-pass/delve-encounters/raw/restless_graves.png",
+          "sha256": "2b2bb706a10f49adfd253edf735ddfe9bc938e929aba439bac354d9f6791888d",
+          "bytes": 2438041,
+          "width": 1254,
+          "height": 1254,
+          "format": "png",
+          "colorSpace": "sRGB",
+          "channels": 3,
+          "hasAlpha": false
+        }
+      },
+      "accepted": {
+        "output": "public/ui/delve-affixes/restless_graves.webp",
+        "sha256": "ad3bc775ea21fd1024d9cff5f373f13d0c5b6efc20fe1e7838795876b970d5c3",
+        "bytes": 4350,
+        "width": 128,
+        "height": 128,
+        "format": "webp",
+        "colorSpace": "sRGB",
+        "channels": 3,
+        "hasAlpha": false,
+        "decision": "accepted: the skeletal hand erupting through the grave slab keeps a strong necromantic silhouette at 48, 32, and 16 pixels",
+        "review": {
+          "semantic": "accepted",
+          "crop": "accepted",
+          "style": "accepted",
+          "sizesPx": [128, 48, 32, 16],
+          "opacity": "accepted",
+          "byteLimit": "accepted"
+        }
+      },
+      "rejects": [],
+      "retries": 0
+    }
+  ]
+}

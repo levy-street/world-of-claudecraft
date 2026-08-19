@@ -6,7 +6,8 @@
 // pass (southPassX). Terrain shape: the EMBER_* tables in world.ts (coast
 // lobes, the desert gradient, volcano cones).
 
-import { CASTLE_BUILDINGS } from '../castle_layout';
+import { BULWARK_BUILDINGS } from '../bulwark_layout';
+import { castleBuildingProps } from '../castle_layout';
 import type {
   CampDef,
   GroundObjectDef,
@@ -90,11 +91,21 @@ export const DRAKELANDS_ROADS: { x: number; z: number }[][] = [
     { x: 404, z: 1900 },
   ], // the Pale Causeway -> the Wyrmgate pass -> Wyrmwatch
   [
+    // Skirts the Last Keep instead of slicing through its north wall and
+    // barbican (the pre-castle line): around the northwest corner, down the
+    // west flank outside the outer work, and on south to the dunes.
     { x: 404, z: 1900 },
-    { x: 370, z: 1970 },
-    { x: 350, z: 2040 },
+    { x: 372, z: 1958 },
+    { x: 352, z: 1974 },
+    { x: 334, z: 1998 },
+    { x: 330, z: 2030 },
+    { x: 332, z: 2064 },
     { x: 330, z: 2100 },
-  ], // Wyrmwatch -> Cinder Dunes
+  ], // Wyrmwatch -> past the Last Keep's gate -> Cinder Dunes
+  [
+    { x: 330, z: 2030 },
+    { x: 342, z: 2029.9 },
+  ], // the keep spur: the road's fork straight into the barbican's outer gate
   [
     { x: 330, z: 2100 },
     { x: 380, z: 2180 },
@@ -998,13 +1009,17 @@ export const DRAKELANDS_PROPS: ZonePropsDef = {
   stalls: [
     { x: 398, z: 1896, rot: 0.5, r: 1.6 },
     { x: 410, z: 1910, rot: -1.2, r: 1.6 },
-    // the keep's market row inside the main gate
-    { x: 391, z: 2033, rot: 0.7, r: 1.6 },
-    { x: 402, z: 2044.5, rot: -2.1, r: 1.6 },
+    // The keep's market row inside the main gate. A stall's collider is its
+    // rotated box PLUS its dressing, so it needs the same standable lane
+    // around it the bailey buildings get: pitched against the market hall's
+    // circle it left a tapering alley a body could walk into and not turn
+    // around in.
+    { x: 394, z: 2032, rot: 0.7, r: 1.6 },
+    { x: 403, z: 2045.5, rot: -2.4, r: 1.6 },
   ],
   // the Last Keep's bailey: every building comes from the castle plan (one
   // source of truth with the walls, walks, and colliders)
-  decorProps: [...CASTLE_BUILDINGS],
+  decorProps: [...castleBuildingProps(), ...BULWARK_BUILDINGS],
   crates: [
     [406, 1892],
     [396, 1912],

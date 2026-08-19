@@ -201,8 +201,8 @@ power window instead of playing as another direct-damage caster.
 - Ossuary Mark enters at level 12. It stores 20% of landed damage from the
   Necromancer and their undead for 12 sec, can be detonated early, and turns a
   marked death into a 6 yard burst plus one Soul Fragment.
-- Corpse Explosion is an 8 sec ground-targeted conversion. It sacrifices Bone Mage
-  first, Skeletal Warrior second, and Gravewing only as a last resort. Duplicates of the
+- Corpse Explosion is an 8 sec ground-targeted conversion. It sacrifices Skeletal Warrior
+  first, Bone Mage second, and Gravewing only as a last resort. Duplicates of the
   same archetype are ordered by remaining duration, health percentage, and entity ID.
   Graveguard is never eligible. The open Dominion slot can be filled by any archetype.
 - Let minion choice or talent choices alter the damage profile.

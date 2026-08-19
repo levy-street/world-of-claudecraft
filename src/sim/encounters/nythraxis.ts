@@ -26,6 +26,8 @@
 // through the seam.
 
 import { isStunned, isUnbreakableControlAura } from '../combat/cc';
+import { resetLongCooldownsForRaidWipe } from '../combat/raid_wipe_cooldowns';
+import { resurrectionArrivalAnchor } from '../combat/resurrection_offer';
 import { ITEMS, MOBS, NPCS, QUESTS } from '../data';
 import * as deedsMod from '../deeds';
 import { createMob, createNpc } from '../entity';
@@ -263,6 +265,7 @@ export function initNythraxisEncounter(boss: Entity): NonNullable<Entity['nythra
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      attemptParticipantIds: [],
     };
   }
   return boss.nythraxis;
@@ -296,6 +299,11 @@ export function resetNythraxisEncounter(ctx: SimContext, boss: Entity): void {
 // health, clear his adds/Aldric/wards/auras, and drop combat so the sealed
 // doors reopen and the raid can run back in for another attempt.
 export function wipeNythraxisEncounter(ctx: SimContext, boss: Entity): void {
+  for (const playerId of boss.nythraxis?.attemptParticipantIds ?? []) {
+    const player = ctx.entities.get(playerId);
+    const meta = ctx.players.get(playerId);
+    if (player?.kind === 'player' && meta) resetLongCooldownsForRaidWipe(player, meta.known);
+  }
   boss.pos = { ...boss.spawnPos };
   boss.prevPos = { ...boss.spawnPos };
   ctx.rebucket(boss);
@@ -304,6 +312,11 @@ export function wipeNythraxisEncounter(ctx: SimContext, boss: Entity): void {
 
 export function updateNythraxisEncounter(ctx: SimContext, boss: Entity): void {
   const st = initNythraxisEncounter(boss);
+  const room = playersInNythraxisRoom(ctx, boss);
+  for (const player of room) {
+    if (!st.attemptParticipantIds?.includes(player.id)) st.attemptParticipantIds?.push(player.id);
+  }
+  st.attemptParticipantIds?.sort((a, b) => a - b);
   if (!st.introSpoken) {
     st.introSpoken = true;
     nythraxisDialogueSet(ctx, boss, [
@@ -319,7 +332,6 @@ export function updateNythraxisEncounter(ctx: SimContext, boss: Entity): void {
   // Wipe-or-kill is the only reset: if every player in the arena is dead the
   // encounter resets for a retry; otherwise keep the boss locked onto a live
   // target so kiting him out of melee never sends him home.
-  const room = playersInNythraxisRoom(ctx, boss);
   if (room.length === 0) {
     wipeNythraxisEncounter(ctx, boss);
     return;
@@ -561,9 +573,12 @@ function willBeInNythraxisRoomAfterResurrection(
   if (entity.kind !== 'player' || !entity.dead) return false;
   const offer = ctx.pendingResurrections.get(entity.id);
   if (!offer || ctx.time >= offer.expiresAt) return false;
-  const caster = ctx.entities.get(offer.casterId);
+  // The one arrival-destination rule lives in resurrection_offer.ts: the live
+  // caster anchors only while within the offer's reach of the body, else the
+  // cast-time fallback. Deriving it here keeps this prediction in lockstep with
+  // where the accept will actually place the player.
   const destination =
-    caster?.kind === 'player' && !caster.dead ? caster.pos : offer.fallbackDestination;
+    resurrectionArrivalAnchor(ctx, offer, entity)?.pos ?? offer.fallbackDestination;
   return dist2d(destination, boss.spawnPos) <= NYTHRAXIS_ROOM_RADIUS;
 }
 

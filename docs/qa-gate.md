@@ -431,6 +431,17 @@ even start): `.github/workflows/ci-stall-rerun.yml` drives `scripts/ci_stall_rer
 to rerun runs killed by that narrow signature, and the driver can be invoked by hand
 for a stalled run. Triage recipes for both classes: the `ci-triage` skill.
 
+One more bounded retry lives inside a SETUP step, not a test leg: the browser jobs'
+Install Chromium step gives `playwright install-deps` one time-bounded try, then
+verifies the capability the suite demonstrably needs (CJK font coverage) directly,
+retries a targeted font install off the primary archive mirror, and fails loudly,
+still setup-class, only when no route produced the fonts (three merge-queue rejections
+on 2026-08-19 were that package-manager half dead at zero mirror throughput, and the
+first split run proved fonts were its one load-bearing effect). It can never touch a
+test result, every try is visible in the job log, and the exact block is pinned by
+`tests/helpers/playwright_install_block.ts` via `tests/ci_workflow.test.ts` and
+`tests/nightly_workflow.test.ts`.
+
 **Evidence it works.** Fault injection, 5/5 caught: a `Math.random()` in `src/sim`, a combat
 constant, a content record, a sim-emitted player string, and a deleted weapon `.glb`. In two
 of those (`Math.random` and the asset deletion) `vitest related` selected **nothing** and

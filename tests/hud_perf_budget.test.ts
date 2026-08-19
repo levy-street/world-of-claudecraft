@@ -649,9 +649,10 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
 // are intentionally outside this HUD-painter file.)
 //
 // The counted reads are the token resolves this file's prose used to merely assert: each of
-// the three map-family painters holds ONE getComputedStyle pass over the document element,
+// the map-family painters holds ONE getComputedStyle pass over the document element,
 // reading its whole --color-* group in one go. Their cadences differ and the old flat "once
-// per redraw" hid it: minimap caches the resolve for the session, while map and delve
+// per redraw" hid it: minimap and lastkeep (the walk-in castle floor plan, which caches by
+// the MinimapPainter rule) resolve once for the session, while map and delve
 // re-resolve on every redraw. unit_portrait keys its decode-race guard off
 // canvas.dataset.portrait, 4 accesses around one async image decode, two of them writes at
 // the start of a decode and two of them reads that abandon a decode whose unit changed;
@@ -671,6 +672,7 @@ const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: {},
     reflowAllow: { getComputedStyle: 1 },
   },
+  { file: 'lastkeep_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'map_window_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'minimap_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'perf_graph_painter.ts', allow: {}, reflowAllow: {} },
@@ -2652,6 +2654,8 @@ function idleWorld(): ActionBarWorldInput {
       cooldowns: new Map(),
       gcdRemaining: 0,
       potionCdRemaining: 0,
+      resourceType: 'mana' as const,
+      savedMana: 0,
       queuedOnSwing: null,
       auras: [],
       pos: { x: 0, y: 0, z: 0 },

@@ -172,7 +172,7 @@ describe('the Last Keep is drawn on the ground the sim stands players on', () =>
     vi.resetModules();
     vi.doMock('../src/render/assets/loader', () => ({
       loadGltf: vi.fn(() => new Promise(() => {})),
-      loadHdr: vi.fn(() => new Promise(() => {})),
+      loadKtx2Texture: vi.fn(() => new Promise(() => {})),
       loadTexture: vi.fn(() => new Promise(() => {})),
       releaseGltf: vi.fn(),
     }));
@@ -204,14 +204,23 @@ describe('the Last Keep is drawn on the ground the sim stands players on', () =>
     expect(plinth.max.x).toBeLessThanOrEqual(w.x1 + 1e-6);
     expect(plinth.min.z).toBeGreaterThanOrEqual(w.z0 - 1e-6);
     expect(plinth.max.z).toBeLessThanOrEqual(w.z1 + 1e-6);
-    // and the two stair cuts get their own wedges reaching the terrace top
+    // and the two stair cuts get their own wedges reaching the terrace top.
+    //
+    // The wedge is hand-built into a Float32Array, so its vertices carry float32
+    // rounding while the plan values here are float64. Compare at a float32
+    // epsilon, not an exact one: near 2000 a single float32 step is about 1.2e-4,
+    // so the old 1e-6 was a hundred times finer than the geometry can express. It
+    // passed only while the ward's edges happened to be whole numbers, which are
+    // float32-exact, and went red the moment one moved off the steepness lattice
+    // (2018.6 stores as 2018.5999755859).
+    const F32 = 2e-3;
     for (const cut of WARD_STEPS) {
       const wedge = boxes.find(
         (b) =>
-          b.min.x >= cut.x0 - 1e-6 &&
-          b.max.x <= cut.x1 + 1e-6 &&
-          b.min.z >= w.z1 - 1e-6 &&
-          Math.abs(b.max.y - CASTLE.ward.h) < 1e-4,
+          b.min.x >= cut.x0 - F32 &&
+          b.max.x <= cut.x1 + F32 &&
+          b.min.z >= w.z1 - F32 &&
+          Math.abs(b.max.y - CASTLE.ward.h) < F32,
       );
       expect(wedge, `a stair wedge for the cut at x ${cut.x0}..${cut.x1}`).toBeTruthy();
       expect(wedge?.max.z, 'running out to the bailey').toBeCloseTo(w.z1 + WARD_STEP_RUN, 4);

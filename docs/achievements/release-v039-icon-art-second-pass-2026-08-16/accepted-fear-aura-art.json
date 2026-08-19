@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "release-v039-icon-art-second-pass-fear-aura-2026-08-16",
+    "acceptedDate": "2026-08-16",
+    "baseRelease": "release/v0.39.0",
+    "baseCommit": "d2d1a8ad5c11",
+    "rasterGenerator": "OpenAI built-in image generation",
+    "owner": "World of ClaudeCraft",
+    "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
+  },
+  "scope": {
+    "exactRuntimeAuras": 1,
+    "runtimeIdentity": "fear_incap",
+    "liveProducerFamilies": [
+      "Warlock Harrow",
+      "Howl of Terror",
+      "Psychic Scream",
+      "Intimidating Shout",
+      "mob Dread",
+      "mob Terrify"
+    ],
+    "semanticConstraint": "The wire identity erases its source, so the painting depicts the afflicted victim and does not claim a caster class, faction, or creature family."
+  },
+  "generationContract": {
+    "oneCallPerDistinctAsset": true,
+    "builtInImagegenCalls": 1,
+    "acceptedFirstOutputs": 1,
+    "rejectedOutputs": 0,
+    "sourceRetention": "The accepted 1254px master remains under tmp/imagegen/v039-second-pass/fear-incap in this worktree.",
+    "processing": "A center-weighted 850px crop with a 25px vertical offset was downsampled to exact 128px sRGB and encoded as opaque WebP at quality 82 within the 15 KiB aura-art gate.",
+    "review": "The source and shipping icon were inspected at 128px, 40px, 28px, 16px, 13px, and 13px grayscale."
+  },
+  "assets": [
+    {
+      "auraId": "fear_incap",
+      "displayName": "Shared Incapacitating Fear",
+      "sourceProvenance": "tmp/imagegen/v039-second-pass/fear-incap/provenance.json",
+      "sourceFile": "tmp/imagegen/v039-second-pass/fear-incap/raw/fear_incap.png",
+      "sourceBytes": 2149800,
+      "mechanic": "A shared incapacitating-fear aura emitted by player and mob effects after the wire summary has discarded the original source.",
+      "intendedVisualSubject": "One terrified victim face compressed by inward-curling cyan-violet shadow pressure, with frightened eyes and a restrained crimson mouth accent.",
+      "references": [
+        {
+          "path": "public/ui/skills/warlock/fear.webp",
+          "role": "Spectral fear palette and victim expression only, without copying class identity."
+        },
+        {
+          "path": "public/ui/skills/priest/psychic_scream.webp",
+          "role": "Small-scale screaming-face readability and violet energy finish only."
+        },
+        {
+          "path": "public/ui/auras/mob_soulrot.webp",
+          "role": "Current aura-family paint density and cyan-violet separation."
+        },
+        {
+          "path": "public/ui/auras/nythraxis_dread_curse.webp",
+          "role": "Current hostile-aura darkness, pressure, and restrained crimson accent."
+        }
+      ],
+      "prompt": "Use case: stylized-concept\nAsset type: 1:1 dark-fantasy MMORPG aura/debuff UI icon, ultimately displayed at 13, 16, 28, and 40 pixels.\nPaint the shared incapacitating-fear aura used truthfully across Warlock Harrow, area fear spells, monster Dread, and monster Terrify.\nOne large centered gender-neutral terrified victim face, eyes and mouth open in panic, engulfed and compressed by inward-curling shadow pressure and spectral fear waves; the face itself is the unmistakable focal silhouette.\nPremium hand-painted dark-fantasy MMORPG spell icon with rich painterly brushwork, convincing facial anatomy, dramatic readable silhouette, and polished shipping-game quality.\nSquare close-up; face fills about 70 percent of the canvas; strongest facial features stay bold and simple; shadow arcs curl inward from all sides; no tiny peripheral storytelling elements; preserve instant legibility when heavily downscaled.\nCold cyan-violet rim light against deep black-purple shadow with a restrained ember-red accent around the mouth or eyes.\nFully opaque edge-to-edge painted background; source-neutral; no caster, recognizable player class, monster species, faction, armor, weapon, or class-bound spell sigil; no text, runes, logos, watermark, border, frame, rounded chrome, UI bevel, or transparent corner.",
+      "decision": "Accepted after source and 128/40/28/16/13 plus 13px grayscale review.",
+      "sourceSha256": "309deb698dc5a647caa9adc0ac8048009391c805e1f741bf3a8c4da63a845cc6",
+      "acceptedSha256": "3bd21485ee0ce2db9d12d1a621fc38961e33a56a29b925aaaebd92761b37a5cf",
+      "acceptedBytes": 4094,
+      "output": "fear_incap.webp",
+      "runtimeUrl": "/ui/auras/fear_incap.webp"
+    }
+  ]
+}

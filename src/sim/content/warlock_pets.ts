@@ -13,13 +13,14 @@ export const WARLOCK_PET_MOBS: Record<string, MobTemplate> = {
     minLevel: 1,
     maxLevel: 60,
     family: 'demon',
-    // squishy ranged caster: low health and armor, steady Felbolt damage
-    hpBase: 30,
-    hpPerLevel: 12,
-    dmgBase: 5,
-    dmgPerLevel: 1.1,
+    // Ranged caster: still less durable than Gloomshade, but sturdy enough to
+    // survive ordinary solo pulls and contribute meaningful Felbolt damage.
+    hpBase: 40,
+    hpPerLevel: 17,
+    dmgBase: 6,
+    dmgPerLevel: 1.25,
     attackSpeed: 2.0,
-    armorPerLevel: 8,
+    armorPerLevel: 12,
     moveSpeed: 5.2,
     aggroRadius: 8,
     loot: [],

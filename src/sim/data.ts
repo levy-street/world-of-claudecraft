@@ -65,7 +65,7 @@ import {
   DRAKELANDS_ROADS,
   DRAKELANDS_ZONE,
 } from './content/drakelands';
-import { DUNGEON_DEFS, DUNGEON_MOBS } from './content/dungeons';
+import { DUNGEON_DEFS, DUNGEON_KEEPSAKE_ITEMS, DUNGEON_MOBS } from './content/dungeons';
 import {
   EVERGARDEN_CAMPS,
   EVERGARDEN_ITEMS,
@@ -163,6 +163,7 @@ import {
   PALMREACH_ROADS,
   PALMREACH_ZONE,
 } from './content/palmreach';
+import { PRACTICE_DUMMY_CAMPS, PRACTICE_DUMMY_MOBS } from './content/practice_dummies';
 import { STATIONS } from './content/professions';
 import {
   REALM_CAMPS,
@@ -351,6 +352,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   GALECREST_ITEMS,
   FARSHORE_ITEMS,
   WILDHEART_ITEMS,
+  DUNGEON_KEEPSAKE_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -360,6 +362,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...ZONE1_MOBS,
   ...ZONE2_MOBS,
   ...ZONE3_MOBS,
+  ...PRACTICE_DUMMY_MOBS,
   ...DUNGEON_MOBS,
   ...WARLOCK_PET_MOBS,
   ...NECROMANCY_MOBS,
@@ -505,6 +508,12 @@ export const CAMPS: CampDef[] = [
   // The Drakelands dragonkin brood belt (v0.35 rework) arrived after the
   // knights: same append-last rule, so every camp above keeps its draws.
   ...DRAKELANDS_BROOD_CAMPS,
+  // The Highwatch practice row (content/practice_dummies.ts) is last of all,
+  // same append-last rule. These three draw no world-gen rng at all (the spawn
+  // loop's dummy branch is rng-free), so they cannot move an earlier camp even
+  // in principle; they sit here so the array's one ordering rule has no
+  // exceptions to remember.
+  ...PRACTICE_DUMMY_CAMPS,
 ];
 
 // Escort quest runs (src/sim/escort.ts): defs authored per realm, merged here

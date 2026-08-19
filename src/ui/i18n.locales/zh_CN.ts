@@ -13,6 +13,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.lastkeepMap.title': '{keep}：{story}',
+  'hudChrome.dawnholdMap.title': '{keep}：{story}',
   'guide.classPage.formName.form_cat': '狼形态',
   'guide.gear.slotOffhand': '副手',
   'guide.glossary.claudiumTerm': 'Claudium',
@@ -786,6 +788,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorial.nextTipQuestLog': '打开任务日志（{key}）查找附近的下一个任务。',
   'hudChrome.tutorial.nextTipMap': '查看世界地图（{key}）了解任务所在位置。',
   'hudChrome.tutorial.nextTipSocial': '打开社交面板（{key}）寻找队伍应对更强的战斗。',
+  'hudChrome.lastkeepMap.story.undercroft': '地下穹室',
+  'hudChrome.lastkeepMap.story.state': '正殿层',
+  'hudChrome.lastkeepMap.story.residence': '起居层',
+  'hudChrome.lastkeepMap.story.tower': '瞭望塔',
+  'hudChrome.dawnholdMap.story.ground': '庭园层',
+  'hudChrome.dawnholdMap.story.solar': '日光厅',
   'hudChrome.raidLockout.title': '团队副本锁定',
   'hudChrome.raidLockout.allReady': '所有团队副本就绪',
   'hudChrome.raidLockout.daysHours': '{d}天{h}小时',
@@ -3060,7 +3068,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.drain_life.description': '吞噬目标的生命力，每秒造成 {damage} 点暗影伤害，并将其中的 70% 转化为生命传给你。痛苦则改为全部转化。当引导在你的主邪眼之上时，它会在开始时消耗全部命运丝线，而每一根丝线都会让每一跳额外产生 1 点谴罪。',
   'entities.abilities.fear.name': '惊惧',
   'entities.abilities.fear.description':
-    '使敌人陷入恐惧并畏缩，最多持续 8 秒。任何伤害都会打破效果。',
+    '使敌人陷入恐惧并畏缩，最多持续 5 秒。累计达到目标最大生命值 8% 的伤害会打破效果。',
   'entities.abilities.searing_pain.name': '焦灼',
   'entities.abilities.searing_pain.description':
     '以痛苦烈焰灼烧敌人，造成 {damage} 点火焰伤害。施法迅速。',
@@ -3139,7 +3147,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '敌人被虫群侵袭，在 12 秒内受到 {damage} 点自然伤害。',
   'entities.abilities.tigers_fury.name': '狼血',
   'entities.abilities.tigers_fury.description':
-    '使攻击强度提高 {buff}，持续 {duration} 秒。仅限狼形态。',
+    '涌起{rage}点能量，并使攻击强度提高 {buff}，持续 {duration} 秒。仅限狼形态。',
   'entities.abilities.rip.name': '血隙',
   'entities.abilities.rip.description': '终结技，使目标每 2 秒流血一次，持续 24 秒：36 点伤害外加每消耗 1 点连击点 24 点（5 点连击点：共 {damage} 点）。仅限狼形态。',
   'entities.abilities.mortal_strike.name': '致残打击',
@@ -3182,7 +3190,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '震慑附近的敌人，使其攻击强度降低 20 点，持续 20 秒。仅限巨熊形态使用。',
   'entities.abilities.prowl.name': '潜行',
   'entities.abilities.prowl.description':
-    '在狼形态下进入潜行状态，移动速度降低 50%。无法在战斗中使用。',
+    '在狼形态下进入潜行状态，移动速度降低 5%。无法在战斗中使用。',
   'entities.abilities.rake.name': '剐削',
   'entities.abilities.rake.description': '撕裂敌人，造成武器伤害外加 {damage} 点，并造成持续 18 秒的流血伤害。给予 1 点连击点。仅限狼形态。',
   'entities.abilities.revive_pet.name': '修补',
@@ -3231,9 +3239,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.name': '枭兽形态',
   'entities.abilities.moonkin_form.description':
     '进入枭兽形态，强化施法直到你切换回来。再次施放可返回普通形态。（平衡专精招牌）',
-  'entities.abilities.feral_charge.name': '野性冲锋',
+  'entities.abilities.feral_charge.name': '原始涌动',
   'entities.abilities.feral_charge.description':
-    '冲向敌人并使其定身1秒。8-25码距离。（野性专精招牌）',
+    '释放一股原始涌动。狼形态下，能量恢复速度提高100%，持续10秒。巨熊形态下，立即产生50点怒气。（野性专精招牌）',
   'entities.abilities.swiftmend.name': '迅捷治愈',
   'entities.abilities.swiftmend.description': '消耗友方目标身上的一个持续治疗效果，治疗其 {damage} 点生命。野性绽放与二度绽放的播撒会累加青翠；在 5 层青翠时，此按钮会变为盛放，立即为每一位带有你持续治疗效果的盟友治疗这些效果所剩余量的 60%。（恢复标志技能）',
   'entities.abilities.crusader_strike.name': '十字军打击',
@@ -3560,6 +3568,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gravecaller_summoner.name': '唤墓者召唤师',
   'entities.mobs.deacon_voss.name': '执事沃斯',
   'entities.mobs.training_dummy.name': '训练假人',
+  'entities.mobs.friendly_player_dummy.name': '友方玩家假人',
+  'entities.mobs.normal_boss_dummy.name': '普通首领假人',
+  'entities.mobs.heroic_boss_dummy.name': '英雄首领假人',
   'entities.mobs.ridge_stalker.name': '山脊潜猎者',
   'entities.mobs.deeprock_kobold.name': '深岩掘地者',
   'entities.mobs.thornpeak_ogre.name': '荆峰食人魔',
@@ -7089,6 +7100,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'sim.delve.moveCloserStairs': '靠近楼梯一些。',
   'sim.delve.notInDelve': '你不在探秘之中。',
   'sim.delve.nothingHappens': '什么也没有发生。',
+  'sim.delve.enemiesRemain': '先清除剩余的敌人。',
   'sim.delve.passageSealed': '通道被封住了。',
   'sim.delve.raiseDead': '{name}开始施放亡者复生。',
   'sim.delve.runFailed': '{name}探秘失败。',
@@ -9401,9 +9413,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deterrence.description':
     '使你的躲闪几率提高50个百分点，持续10秒。（猎人天赋）',
   'entities.abilities.earthbind.description': '将目标点 4 米内的敌人定身 2 秒，随后使其减速 40%，持续 6 秒。（萨满天赋）',
-  'entities.abilities.evocation.description': '快速恢复法力。（法师天赋）',
+  'entities.abilities.evocation.description':
+    '引导6秒：每秒恢复100点法力并获得8点法术强度，效果在引导期间叠加并持续15秒。（法师天赋）',
   'entities.abilities.frenzied_regeneration.description':
-    '在10秒内恢复180点生命值。只能在熊形态下使用。（德鲁伊天赋）',
+    '在10秒内恢复相当于最大生命值40%的生命。只能在熊形态下使用。（德鲁伊天赋）',
   'entities.abilities.frost_trap.description':
     '冻结目标区域内的敌人3秒，使其无法移动或行动。（猎人天赋）',
   'entities.abilities.ghostly_strike.description': '以武器伤害外加 {damage} 点击打敌人，并将你的躲闪几率提高 15%，持续 7 秒。给予 1 点连击点。（潜行者天赋）',
@@ -9411,9 +9424,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     '在12秒内为一个友方目标恢复120点生命值。（萨满天赋）',
   'entities.abilities.howl_of_terror.description':
-    '使附近的敌人恐惧，最多持续3秒。受到伤害可能打破该效果。（术士天赋）',
+    '使附近的敌人恐惧，最多持续 5 秒。累计达到目标最大生命值 8% 的伤害会打破其恐惧。（术士天赋）',
   'entities.abilities.ice_block.description':
-    '将你封入寒冰之中，吸收大量伤害，持续 8 秒。（法师天赋）',
+    '将你封入坚冰8秒，使你免疫所有伤害。移除已存在的普通有害效果，并阻止新的普通控制效果施加于你。可在昏迷或变形状态下使用。被封冻期间无法行动。再次施放可取消。（法师）',
   'entities.abilities.inner_focus.description': '使你的下一个牧师法术免费且无法被打断。持续 60 秒。',
   'entities.abilities.innervate.description':
     '生命树液在你体内涌动10秒，分波恢复20点当前资源，可恢复法力、怒气或能量。变形不会中断效果。睡眠、昏迷或停滞会使树液停止涌动。（德鲁伊天赋）',
@@ -10032,10 +10045,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '温热的雨水在古老石面上嘶嘶作响。荒野之心盆地在你眼前展开。',
   'entities.dungeons.wildheart_basin.leaveText': '你从石牙之下穿回棕榈之境的阳光中。',
   'entities.dungeons.the_last_keep.name': '最后的堡垒',
-  'entities.dungeons.the_last_keep.enterText': '你踏入最后的堡垒那冰冷而寂静的大厅。',
   'entities.items.last_keep_signet.name': '最后的堡垒印戒',
+  'entities.dungeons.the_last_keep.enterText': '你踏入最后的堡垒那冰冷而寂静的大厅。',
   'entities.items.reins_terrorspark_groundshaker.name': '骇雷撼地者点火钥匙',
   'entities.dungeons.the_last_keep.leaveText': '你带上堡门，重新走进龙裔荒原的寒风中。',
+  'entities.dungeons.dawnhold_castle.name': '晨曦堡',
+  'entities.items.dawnhold_posy.name': '晨曦堡花园小花束',
+  'entities.dungeons.dawnhold_castle.enterText': '你走进晨曦堡温暖而花香四溢的厅堂。',
+  'entities.dungeons.dawnhold_castle.leaveText': '你回到阳光洒落的花园草坪上。',
   'entities.items.wildheart_tuskblade.name': '荒野之心獠牙巨刃',
   'entities.items.wildheart_hexwood_staff.name': '盆地巫木法杖',
   'entities.items.wildheart_fangknife.name': '祖尔加的獠牙匕首',
@@ -11547,7 +11564,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '在 8 秒内，你受到的下一次敌人攻击将被回敬：至多抵消 {buff} 点伤害，并以等量神圣伤害返还给攻击者，同时你获得 1 点虔诚。只回敬一次攻击。升华使可回敬的数值提高 50%。',
   'entities.abilities.faithforged_guard.name': '圣光之债',
   'entities.abilities.ferocious_bite.specNote_feral':
-    '每次命中累积1层古血；古血达到3层时，此按钮变为血收：一次撕咬，造成91点伤害，每个连击点额外造成55点，并立即引爆你的剐削与血裂的全部剩余伤害，同时恢复30点能量。',
+    '每次命中累积1层古血；古血达到3层时，此按钮变为血收：消耗古血发动一次更强的撕咬，立即引爆你的剐削与血裂的全部剩余伤害，同时恢复能量。',
   'entities.abilities.fieldcraft_reentry.description':
     '被动：断迹会刷新狩猎势能，并使你在12秒内的下一次剖膛一击或血钩获得返场强化。剖膛一击每层造成15%额外伤害。血钩造成18至24点额外物理伤害，每层再提高15%，并随远程攻击强度提高。达到3层时，任一攻击都会消耗狩猎势能。（野战技艺）',
   'entities.abilities.fieldcraft_reentry.name': '蓄势返场',
@@ -11630,7 +11647,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '立即用神圣锁链束缚一名远处敌人。敌人以每秒 18 米的速度向你移动，直至距离 3 米，随后移动速度降低 50%，持续 4 秒。升华期间还会束缚附近的第二名敌人。',
   'entities.abilities.oath_chain.name': '誓约锁链',
   'entities.abilities.ossuary_mark.description':
-    '为敌人标记12秒，储存你与你的亡灵所造成伤害的20%。再次施放可将其引爆。若被标记的敌人死亡，印记会在6码内爆炸，并生成1枚灵魂碎片。',
+    '为敌人标记15秒，储存你与你的亡灵所造成伤害的20%。再次施放可将其引爆。若被标记的敌人死亡，印记会在6码内爆炸，并生成1枚灵魂碎片。',
   'entities.abilities.ossuary_mark.name': '骸骨印记',
   'entities.abilities.overbloom.description':
     '消耗你的5层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的60%，这些效果随之移除，并为目标种下一个新的野性绽放。',
@@ -11673,7 +11690,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '使一名死亡的小队成员复活，并恢复 35% 的生命值和法力值。',
   'entities.abilities.recall_the_fallen.name': '唤回逝者',
   'entities.abilities.redharvest.description':
-    '消耗你的3层古血：造成{damage}点伤害，立即引爆你的剐削与血裂的全部剩余伤害，移除这两个流血效果，并恢复30点能量。无需连击点也可使用。',
+    '消耗你的3层古血：造成{damage}点伤害，立即引爆你的剐削与血裂的全部剩余伤害，移除这两个流血效果，并恢复{rage}点能量。无需连击点也可使用。',
   'entities.abilities.redharvest.name': '血收',
   'entities.abilities.regrowth.specNote_restoration': '种下新的绽放会累积1层繁茂（最多5层）。',
   'entities.abilities.rejuvenation.specNote_restoration':
@@ -11880,6 +11897,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formsHeading': '变形',
   'guide.classPage.formsMoonwing':
     '平衡系德鲁伊还会多得到一种形态：枭兽形态，也就是平衡德鲁伊作战时所用的施法形态。它是唯一保留法术的野兽形态，而你的魔杖也只在这个形态或你普通的施法形态下才能使用。',
+  'guide.classPage.formsAutoUnshift':
+    '变身时施放治疗或伤害法术会自动为你解除变身。以这种方式离开形态不消耗法力，也不占用公共冷却时间，因此瞬发法术会在你按下的那一刻释放。重新变身是普通技能，依然消耗法力并占用公共冷却时间。',
   'guide.classPage.formsNote':
     '德鲁伊靠变形作战。大多数德鲁伊技能都归属于某一种形态，因此你当前所处的形态决定了你能施放什么，而变形本身会消耗少量法力。无论是否身处战斗，你都可以随时变形，次数不限。',
   'guide.classPage.mageEleHeading': '水元素',

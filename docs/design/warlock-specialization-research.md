@@ -287,7 +287,7 @@ generators, and boss usability depended on maintaining an extra spatial resource
 The implemented direction converts the army itself while preserving ground targeting:
 
 - The player selects any valid point within range.
-- Corpse Explosion chooses Bone Mage first, Skeletal Warrior second, and Gravewing only
+- Corpse Explosion chooses Skeletal Warrior first, Bone Mage second, and Gravewing only
   as a last resort.
 - Duplicates of one archetype are ordered by remaining duration, health percentage, and
   entity ID so temporary servants and deterministic ties remain predictable.

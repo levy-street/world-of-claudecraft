@@ -193,8 +193,41 @@ interface AttributionTargetFixture {
 // Re-minted again for the merge of release/v0.38.2 (the composer NaN
 // hotfix's lockfile bump re-stamped every fingerprinted GLB upstream); the
 // merged tree mints values matching neither parent. No capture was retaken.
+// Re-minted after extracting the delve interior build-cache scheduling into
+// src/render/delve_interior_tracker.ts (renderer.ts moved again, no capture retaken).
+// Re-minted again for the login preview/self-spirit prewarm merge with the
+// delve interior tracker extraction. Renderer/prewarm bytes moved; captures
+// were adopted verbatim.
+// Re-minted for the sky KTX2 UASTC HDR conversion: the renderer publishes the
+// sky module's held textures into the residency table and its idle sky upload
+// comment follows the compressed path, so renderer.ts moves and the composite
+// follows its bytes. No capture was retaken.
+// Re-minted for the corrected PR #3446 merge: the v0.39 wrapper renderer and
+// prewarm repairs combine with the sky KTX2 renderer bytes, so the merged tree
+// mints a value matching neither parent. No capture was retaken.
+// Re-minted for the vfx.mount-programs prewarm entry (#2571): renderer.ts and
+// prewarm_policy.ts both move, so the composite follows their bytes. No
+// capture was retaken.
+// Re-minted for the vfx.mount-programs review fixes (scene-reparent bug,
+// honest desktop-path progress, depth compile, timeout-bounded fetch,
+// constrained-device removal): renderer.ts and prewarm_policy.ts both move
+// again, so the composite follows their bytes. No capture was retaken.
+// Re-minted for the PR #3447 merge: the v0.39 wrapper, corrected PR #3446 sky
+// KTX2 renderer bytes, and mount-program prewarm bytes combine in one tree. No
+// capture was retaken.
+// Re-minted for the moved-base v0.39 wrapper refresh: the castle renderer bytes
+// and v0.39 wrapper bytes combine in one tree. No capture was retaken.
+// Re-minted for the approved PR #3425 merge into the v0.39 wrapper: the
+// resolved renderer bytes combine the delve tracker extraction with later
+// wrapper fixes. No capture was retaken.
+// Re-minted after syncing current release/v0.39.0 into the v0.39 wrapper: the
+// resolved renderer bytes retain the queued self-spirit prewarm and delve
+// rebuild repair. No capture was retaken.
+// Re-minted for the merge of release/v0.40.0 into feature/masterwrought:
+// both sides re-minted since the common base, so the merged tree mints
+// values matching neither parent. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '8ef6988b58ffc15aa623e12d1250a7632ea07d9fe54fa797ae7e170198fe4b9c';
+  '5f5254363617ed85f902045745499d41bb1ac018b372691bbd5e9e24a259eae3';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

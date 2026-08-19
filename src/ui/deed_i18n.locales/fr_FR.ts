@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  exp_dawnhold_castle: {
+    name: 'Une porte ouverte sur le jardin',
+    desc: 'Rendez visite au Château Dawnhold et flânez dans ses salles baignées de soleil.',
+  },
+  exp_the_last_keep: {
+    name: 'Les salles silencieuses',
+    desc: 'Franchissez les portes du Dernier Donjon et parcourez ses salles silencieuses.',
+  },
   pvp_bg_first_capture: {
     name: 'Bannière en main',
     desc: 'Capturez un drapeau dans les Champs de Thornhollow.',

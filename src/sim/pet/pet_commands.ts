@@ -41,6 +41,7 @@ import { isTemporaryNecromancyUndead } from '../combat/necromancy';
 import { ABILITIES, DUNGEON_X_THRESHOLD, ITEMS, isDelvePos, MOBS } from '../data';
 import { createMob } from '../entity';
 import { consumeSelectedInventorySlot } from '../item_copy_ref';
+import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import type { PetState, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { addThreat, clearThreat } from '../threat';
@@ -639,7 +640,11 @@ export function petAttack(ctx: SimContext, pid?: number): void {
     ctx.error(r.e.id, 'Your pet needs a hostile target.');
     return;
   }
+  if (questGateBlocksAggro(ctx.players, target, pets[0])) return;
   for (const pet of pets) {
+    if (target.kind === 'mob' && target.hostile && questGateBlocksAggro(ctx.players, target, pet)) {
+      continue;
+    }
     pet.aggroTargetId = target.id;
     pet.inCombat = true;
     if (target.kind === 'mob' && target.hostile) addThreat(target, pet.id, 1);
@@ -675,6 +680,7 @@ export function petTaunt(ctx: SimContext, pid?: number): void {
     ctx.error(r.e.id, 'Your pet needs a hostile target.');
     return;
   }
+  if (questGateBlocksAggro(ctx.players, target, pet)) return;
   pet.aggroTargetId = target.id;
   pet.inCombat = true;
   addThreat(target, pet.id, 1);
@@ -682,7 +688,7 @@ export function petTaunt(ctx: SimContext, pid?: number): void {
     pet.petManualTauntPending = true;
     return;
   }
-  ctx.applyTaunt(pet, target);
+  if (!ctx.applyTaunt(pet, target)) return;
   pet.petManualTauntPending = false;
   pet.petTauntTimer = PET_GROWL_INTERVAL;
 }
@@ -696,6 +702,7 @@ export function petWaterJet(ctx: SimContext, pid?: number): void {
   if (!pet || !jet || pet.dead || pet.castingAbility || pet.petTauntTimer > 0) return;
   const target = r.e.targetId !== null ? ctx.entities.get(r.e.targetId) : null;
   if (!target || target.dead || !ctx.isHostileTo(pet, target)) return;
+  if (questGateBlocksAggro(ctx.players, target, pet)) return;
   const range = MOBS[pet.templateId]?.petRanged?.range ?? 0;
   if (dist2d(pet.pos, target.pos) > range) return;
   pet.aggroTargetId = target.id;
@@ -728,6 +735,7 @@ export function petSpecial(ctx: SimContext, pid?: number): void {
     ctx.error(r.e.id, 'Your pet needs a hostile target.');
     return;
   }
+  if (questGateBlocksAggro(ctx.players, target, pet)) return;
   if (!useWarlockPetSkill(ctx, pet, target, petRangedAttack)) return;
   pet.aggroTargetId = target.id;
   pet.inCombat = true;

@@ -8,19 +8,20 @@
 import * as THREE from 'three';
 import { CASTLE_CRYSTALS } from '../sim/castle_layout';
 import { EMBER_FLAT_POOLS, EMBER_LAVA_LINKS, emberLinkPolyline } from '../sim/ember_lava_layout';
-import { emberLilySpots, emberScatterClear } from '../sim/ember_lilies';
+import { EMBER_DENS, emberLilySpots, emberScatterClear } from '../sim/ember_lilies';
 import { hash2 } from '../sim/rng';
 import { EMBER_LAVA_POOLS, terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { GFX } from './gfx';
+import { lavaChainPlacements } from './lava_chain_core';
 
 // the Drakelands prop models (built by build_drakelands_props.mjs)
 const EMBER_PROP_URLS = {
+  // the lava vocabulary is exactly three pieces: a pool, the river middle
+  // that connects, and the river end that terminates a spill
   pool: '/models/props/lava_pool.glb',
-  riverA: '/models/props/lava_river_a.glb',
-  riverB: '/models/props/lava_river_b.glb',
-  riverC: '/models/props/lava_river_c.glb',
+  riverMid: '/models/props/lava_river_mid.glb',
   riverEnd: '/models/props/lava_river_end.glb',
   hoard: '/models/props/dragon_hoard.glb',
   eggs: '/models/props/dragon_eggs.glb',
@@ -97,8 +98,14 @@ export interface EmberFeaturesView {
 }
 
 // The Bloodglass Fields: shard clusters seeded around the POI.
-const BLOODGLASS = { x: -90, z: 1890, r: 42 };
+// The Bloodglass Fields POI (content/drakelands.ts). This used to read
+// (-90, 1890), which is 270 units west of the realm's own xMin, so the
+// shard field drew on empty ground nobody visits and the actual POI was
+// bare. Same class of bug as the bone fields below.
+const BLOODGLASS = { x: 270, z: 2270, r: 42 };
 const BLOODGLASS_TINTS = [0xd83a2c, 0xb82838, 0xe85838];
+/** a shard stands this far off a dragon den (the shared scatter ring is 13) */
+const BLOODGLASS_DEN_CLEAR = 24;
 
 function shardGeo(): THREE.BufferGeometry {
   // a stretched octahedron reads as a glassy spur in the flat-shaded style
@@ -174,72 +181,25 @@ export function buildEmberFeatures(seed: number): EmberFeaturesView {
       });
     }
     instanceProp('pool', poolSpots);
-    const seg = (x: number, z: number, rot: number, fp: number): PropPlacement => ({
-      x,
-      z,
-      y: T(x, z) - 0.1,
-      fp,
-      rot,
-    });
-    // each link renders as alternating river variants laid nose to tail
-    // along the SHARED meander polyline (the same curve the terrain bed
-    // follows). Each model's channel runs along its own axis (variant A
-    // along +z, B/C and the end piece along +x, measured from the shipped
-    // GLBs), so every piece takes a per-variant yaw offset that lands its
-    // channel ON the local tangent; every other piece also flips
-    // end-for-end so the mouths meet flush instead of repeating the same
-    // closed end down the run.
-    const AXIS_OFFSET = [0, -Math.PI / 2, -Math.PI / 2]; // riverA, riverB, riverC
-    const riverSegs: PropPlacement[][] = [[], [], []];
+    // Each link renders as ONE model tiled along the SHARED meander
+    // polyline the terrain bed follows, plus an end cap wherever the run
+    // spends itself on open ground. lava_chain_core owns the arithmetic:
+    // pieces are scaled by their CROSS extent so the channel holds one
+    // width, and seated by their MELT surface so it holds one height.
+    const midSegs: PropPlacement[] = [];
     const endSegs: PropPlacement[] = [];
     for (const link of EMBER_LAVA_LINKS) {
-      const pts = emberLinkPolyline(link);
-      // cumulative arc length along the polyline
-      const arc: number[] = [0];
-      for (let i = 1; i < pts.length; i++) {
-        arc.push(arc[i - 1] + Math.hypot(pts[i].x - pts[i - 1].x, pts[i].z - pts[i - 1].z));
+      for (const pc of lavaChainPlacements(link, { m0: link.m0, m1: link.m1 }, T)) {
+        (pc.kind === 'mid' ? midSegs : endSegs).push({
+          x: pc.x,
+          z: pc.z,
+          y: pc.y,
+          fp: pc.fp,
+          rot: pc.rot,
+        });
       }
-      const len = arc[arc.length - 1];
-      const at = (d: number): { x: number; z: number } => {
-        let i = 1;
-        while (i < arc.length - 1 && arc[i] < d) i++;
-        const t = (d - arc[i - 1]) / Math.max(1e-6, arc[i] - arc[i - 1]);
-        return {
-          x: pts[i - 1].x + (pts[i].x - pts[i - 1].x) * t,
-          z: pts[i - 1].z + (pts[i].z - pts[i - 1].z) * t,
-        };
-      };
-      // dense overlap (pieces are ~1.7x the step) so the short bendy
-      // variants read as ONE continuous channel; variant A is the strongly
-      // curved piece, so it appears only every 4th slot between the two
-      // gentler variants, and never right at a mouth (a hard curl against
-      // a pool rim reads as a loop, not a confluence)
-      const step = link.w * 0.58;
-      let k = 0;
-      for (let d = link.trim0; d < len - link.trim1; d += step) {
-        const here = at(d);
-        const ahead = at(Math.min(len, d + 1.5));
-        const yaw = Math.atan2(ahead.x - here.x, ahead.z - here.z);
-        const nearMouth = d < link.trim0 + step * 1.5 || d > len - link.trim1 - step * 1.5;
-        const variant = !nearMouth && k % 4 === 3 ? 0 : k % 2 === 1 ? 2 : 1;
-        const flip = k % 2 === 1 ? Math.PI : 0;
-        riverSegs[variant].push(seg(here.x, here.z, yaw + AXIS_OFFSET[variant] + flip, link.w));
-        k++;
-      }
-      // a mouth cap at EACH pool, laid on the local tangent so the channel
-      // visually plugs into the pool ring instead of stopping short
-      const head = at(Math.min(len, link.trim0 - step * 0.25 < 0 ? 0 : link.trim0 - step * 0.25));
-      const headNext = at(Math.min(len, link.trim0 + 1.5));
-      const headYaw = Math.atan2(headNext.x - head.x, headNext.z - head.z);
-      endSegs.push(seg(head.x, head.z, headYaw + Math.PI / 2, link.w));
-      const tail = at(Math.max(0, len - link.trim1 + step * 0.25));
-      const tailPrev = at(Math.max(0, len - link.trim1 + step * 0.25 - 1.5));
-      const tailYaw = Math.atan2(tail.x - tailPrev.x, tail.z - tailPrev.z);
-      endSegs.push(seg(tail.x, tail.z, tailYaw - Math.PI / 2, link.w));
     }
-    instanceProp('riverA', riverSegs[0]);
-    instanceProp('riverB', riverSegs[1]);
-    instanceProp('riverC', riverSegs[2]);
+    instanceProp('riverMid', midSegs);
     instanceProp('riverEnd', endSegs);
     for (const pool of EMBER_LAVA_POOLS) {
       const light = new THREE.PointLight(0xff5a18, 8, pool.r * 3.4, 2);
@@ -257,15 +217,55 @@ export function buildEmberFeatures(seed: number): EmberFeaturesView {
     }
   }
 
-  // --- the dragon dens: a treasure hoard and egg clutches where the
-  // emberwing drakes roost, each piece on its probed LEVEL shelf ---
-  instanceProp('hoard', [
-    { x: 417, z: 2262, y: terrainHeight(417, 2262, seed) - 0.1, fp: 7, rot: 1.2 },
-  ]);
+  // --- the dragon dens: the drakes' treasure and their clutches. Each
+  // piece sits on the LOWEST of five terrain probes across its own
+  // footprint (the ember_lilies flat-bed rule) so no rim of a big mound
+  // hangs in air on the den's gentle slope. ---
+  const denSeatY = (x: number, z: number, fp: number): number => {
+    const pr = fp * 0.32;
+    let lo = terrainHeight(x, z, seed);
+    for (const [ox, oz] of [
+      [pr, 0],
+      [-pr, 0],
+      [0, pr],
+      [0, -pr],
+    ] as const) {
+      lo = Math.min(lo, terrainHeight(x + ox, z + oz, seed));
+    }
+    return lo;
+  };
+  // The hoard is DOUBLE its old size: footprint area goes as fp squared, so
+  // fp 7 to 9.9 is exactly 2x the ground the gold covers (49 to 98.01), and
+  // the mound grows 7.0 by 6.6 by 2.5 to 9.9 by 9.3 by 3.5. Den B roosted
+  // over an empty patch with only a clutch to its name, so it gets a hoard
+  // of its own on the flattest shelf inside its ring.
+  const HOARDS = [
+    { x: 417, z: 2262, fp: 9.9, rot: 1.2 },
+    { x: 307, z: 2259, fp: 5.5, rot: -0.7 },
+  ];
+  instanceProp(
+    'hoard',
+    HOARDS.map((h) => ({
+      x: h.x,
+      z: h.z,
+      y: denSeatY(h.x, h.z, h.fp) - 0.1,
+      fp: h.fp,
+      rot: h.rot,
+    })),
+  );
   instanceProp('eggs', [
-    { x: 423, z: 2268, y: terrainHeight(423, 2268, seed) - 0.05, fp: 4.5, rot: 0.4 },
-    { x: 299, z: 2256, y: terrainHeight(299, 2256, seed) - 0.05, fp: 4.5, rot: 2.6 },
+    { x: 423, z: 2268, y: denSeatY(423, 2268, 4.5) - 0.05, fp: 4.5, rot: 0.4 },
+    { x: 299, z: 2256, y: denSeatY(299, 2256, 4.5) - 0.05, fp: 4.5, rot: 2.6 },
   ]);
+  // gold catches the light: a warm point over each hoard so a den reads as
+  // occupied from the approach and stays legible at night
+  for (const h of HOARDS) {
+    const light = new THREE.PointLight(0xffb038, h.fp > 7 ? 5 : 4, h.fp * 2.6, 2);
+    light.position.set(h.x, denSeatY(h.x, h.z, h.fp) + 2.2, h.z);
+    light.userData.baseIntensity = h.fp > 7 ? 5 : 4;
+    glowLights.push(light);
+    group.add(light);
+  }
 
   // --- the ember lilies (giant crystal-flower trees) and small ember
   // crystal clusters. Lily grove placements come from the SHARED sim leaf
@@ -341,6 +341,16 @@ export function buildEmberFeatures(seed: number): EmberFeaturesView {
     const z = BLOODGLASS.z + Math.cos(ang) * dist;
     const y = terrainHeight(x, z, seed);
     if (y < 0) continue;
+    // The shard scatter never consulted the wild-scatter clearance, which
+    // did not show while the field sat outside the realm. On its real POI
+    // the 42yd radius reaches a dragon den, and red glass spurs growing
+    // through a drake's hoard is not the read: honour the same exclusion
+    // rings (pools, vents, roads, the keep) every other Drakelands scatter
+    // respects, and stand further off a den than the shared 13yd ring,
+    // because a shard is a tall spur and the Bloodglass POI happens to sit
+    // only 34yd from the west den.
+    if (!emberScatterClear(x, z)) continue;
+    if (EMBER_DENS.some((d) => Math.hypot(x - d.x, z - d.z) < BLOODGLASS_DEN_CLEAR)) continue;
     spots.push({
       x,
       z,
@@ -402,11 +412,17 @@ export function buildEmberFeatures(seed: number): EmberFeaturesView {
       { g: boneGeo.toNonIndexed(), skull: true },
       { g: ribGeo.toNonIndexed(), skull: false },
     ];
+    // The realm's own graveyards (content/drakelands.ts DRAKELANDS_PROPS)
+    // plus a field of picked-clean bones at each dragon den. These read
+    // (-6,1712) / (-60,1796) / (92,1732) / (10,1860) before, every one of
+    // them west of the realm's xMin 180, so the whole bone scatter drew
+    // outside the Drakelands and the graveyards themselves had none.
     const FIELDS = [
-      { x: -6, z: 1712, r: 22 },
-      { x: -60, z: 1796, r: 24 },
-      { x: 92, z: 1732, r: 20 },
-      { x: 10, z: 1860, r: 34 },
+      { x: 354, z: 2092, r: 22 },
+      { x: 300, z: 2176, r: 24 },
+      { x: 452, z: 2112, r: 20 },
+      { x: 419, z: 2266, r: 9 },
+      { x: 302, z: 2258, r: 9 },
     ];
     for (const part of merged) {
       const spots2: { x: number; z: number; y: number; s: number; rot: number }[] = [];

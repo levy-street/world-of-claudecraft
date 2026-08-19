@@ -13,6 +13,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.lastkeepMap.title': '{keep}：{story}',
+  'hudChrome.dawnholdMap.title': '{keep}：{story}',
   'guide.classPage.formName.form_cat': 'ウルフフォーム',
   'guide.gear.slotOffhand': 'オフハンド',
   'guide.glossary.claudiumTerm': 'Claudium',
@@ -807,6 +809,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.tutorial.nextTipMap': 'ワールドマップ（{key}）でクエストの場所を確認しましょう。',
   'hudChrome.tutorial.nextTipSocial':
     'ソーシャル（{key}）を開いて、手強い戦いに備えるパーティーを探しましょう。',
+  'hudChrome.lastkeepMap.story.undercroft': '地下蔵',
+  'hudChrome.lastkeepMap.story.state': '公務の階',
+  'hudChrome.lastkeepMap.story.residence': '居住の階',
+  'hudChrome.lastkeepMap.story.tower': '見張り塔',
+  'hudChrome.dawnholdMap.story.ground': '庭園の階',
+  'hudChrome.dawnholdMap.story.solar': '日だまりの間',
   'hudChrome.raidLockout.title': 'レイドロックアウト',
   'hudChrome.raidLockout.allReady': 'すべてのレイドが利用可能',
   'hudChrome.raidLockout.daysHours': '{d}日{h}時間',
@@ -3186,7 +3194,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.drain_life.description': '対象の生命力を貪り、毎秒{damage}の影ダメージを与え、その70%を体力としてあなたへ移します。苦痛はその全てを移します。主たる邪眼へ詠唱を維持すると、開始時に運命の糸をすべて消費し、糸1本ごとに刻みあたり追加で断罪が1得られます。',
   'entities.abilities.fear.name': '責め苦',
   'entities.abilities.fear.description':
-    '敵に恐怖を刻み、最大8秒間おびえさせます。ダメージを受けると効果が切れます。',
+    '敵に恐怖を刻み、最大5秒間おびえさせます。対象の最大体力の8%に相当する合計ダメージを受けると効果が切れます。',
   'entities.abilities.searing_pain.name': '灼熱',
   'entities.abilities.searing_pain.description':
     '苦痛の炎で敵を焼き、{damage} の火炎ダメージを与えます。詠唱が速い呪文です。',
@@ -3271,7 +3279,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '敵が虫の群れに襲われ、12秒かけて{damage}の自然ダメージを受けます。',
   'entities.abilities.tigers_fury.name': '狼の血',
   'entities.abilities.tigers_fury.description':
-    '攻撃力を{duration}秒間{buff}上昇させます。ウルフフォーム専用。',
+    'エネルギーを{rage}回復し、攻撃力を{duration}秒間{buff}上昇させます。ウルフフォーム専用。',
   'entities.abilities.rip.name': '血裂',
   'entities.abilities.rip.description': '対象を24秒間、2秒ごとに出血させるフィニッシュ技。36ダメージに加え、消費したコンボポイント1つにつき24（コンボポイント5：合計{damage}）。狼の姿専用。',
   'entities.abilities.mortal_strike.name': '重傷の一撃',
@@ -3315,7 +3323,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '周囲の敵を萎縮させ、20秒間その攻撃力を20低下させる。ブルーインフォーム時のみ使用可能。',
   'entities.abilities.prowl.name': 'つけ狙い',
   'entities.abilities.prowl.description':
-    'ウルフフォーム中にステルス状態に入り、移動速度が50%低下する。戦闘中は使用できない。',
+    'ウルフフォーム中にステルス状態に入り、移動速度が5%低下する。戦闘中は使用できない。',
   'entities.abilities.rake.name': '皮剥ぎ',
   'entities.abilities.rake.description': '敵を切り裂いて武器ダメージに{damage}を加え、18秒間の出血ダメージを与えます。コンボポイントを1与えます。狼の姿専用。',
   'entities.abilities.revive_pet.name': '応急処置',
@@ -3364,9 +3372,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.name': 'ムーンキンフォーム',
   'entities.abilities.moonkin_form.description':
     'ムーンキンフォームになり、戻るまで呪文詠唱を強化します。再び唱えると通常形態に戻ります。（バランス特性のシグネチャ）',
-  'entities.abilities.feral_charge.name': 'フェラルチャージ',
+  'entities.abilities.feral_charge.name': '原初の奔流',
   'entities.abilities.feral_charge.description':
-    '敵に突撃し、1秒間足止めします。射程8-25ヤード。（フェラル特性のシグネチャ）',
+    '原初の力を解き放ちます。ウルフフォームでは、10秒間エネルギーの再生速度が100%上昇します。ブルーインフォームでは、即座に怒りを50生成します。（フェラル特性のシグネチャ）',
   'entities.abilities.swiftmend.name': 'スウィフトメンド',
   'entities.abilities.swiftmend.description': '味方の対象にかかった継続回復効果を消費し、{damage}回復します。野生の芽吹きと二度目の開花の植え付けは青翠を貯め、青翠5でこのボタンは満開となり、あなたの継続回復効果を帯びた味方全員を、それらの効果の残量の60%だけ即座に回復します。（回復の象徴）',
   'entities.abilities.crusader_strike.name': 'クルセイダー ストライク',
@@ -3693,6 +3701,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gravecaller_summoner.name': 'グレイブコーラーの召喚師',
   'entities.mobs.deacon_voss.name': '助祭ヴォス',
   'entities.mobs.training_dummy.name': '訓練用ダミー',
+  'entities.mobs.friendly_player_dummy.name': '味方プレイヤーダミー',
+  'entities.mobs.normal_boss_dummy.name': 'ノーマルボスダミー',
+  'entities.mobs.heroic_boss_dummy.name': 'ヒロイックボスダミー',
   'entities.mobs.ridge_stalker.name': '尾根の追跡者',
   'entities.mobs.deeprock_kobold.name': 'ディープロックの坑夫',
   'entities.mobs.thornpeak_ogre.name': 'ソーンピーク・オーガ',
@@ -7378,6 +7389,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'sim.delve.moveCloserStairs': '階段にもっと近づけ。',
   'sim.delve.notInDelve': 'あなたはデルヴの中にいない。',
   'sim.delve.nothingHappens': '何も起こらない。',
+  'sim.delve.enemiesRemain': '残りの敵を先に倒せ。',
   'sim.delve.passageSealed': '通路は封じられている。',
   'sim.delve.raiseDead': '{name}が死者蘇生を唱え始める。',
   'sim.delve.runFailed': '{name}の攻略に失敗した。',
@@ -9827,9 +9839,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deterrence.description':
     '回避率を50パーセントポイント上昇させる。効果時間10秒。（ハンターのタレント）',
   'entities.abilities.earthbind.description': '対象地点から4ヤード以内の敵を2秒間その場に縛り、続けて6秒間40%減速させます。（シャーマンのタレント）',
-  'entities.abilities.evocation.description': 'マナを急速に回復する。（メイジタレント）',
+  'entities.abilities.evocation.description':
+    '6秒間チャネルします。毎秒100マナを回復し、呪文威力が8上昇します。この効果はチャネル中に累積し、15秒間持続します。（メイジタレント）',
   'entities.abilities.frenzied_regeneration.description':
-    '10秒かけて体力を180回復する。熊形態でのみ使用可能。（ドルイドのタレント）',
+    '10秒かけて最大体力の40%を回復する。熊形態でのみ使用可能。（ドルイドのタレント）',
   'entities.abilities.frost_trap.description':
     '対象地点の敵を3秒間凍結させ、移動と行動を封じる。（ハンターのタレント）',
   'entities.abilities.ghostly_strike.description': '武器ダメージに{damage}を加えて敵を打ち、回避率を7秒間15%高めます。コンボポイントを1与えます。（ローグのタレント）',
@@ -9837,9 +9850,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     '味方1体の体力を12秒かけて120回復する。（シャーマンのタレント）',
   'entities.abilities.howl_of_terror.description':
-    '周囲の敵を最大3秒間恐怖状態にする。ダメージを受けると解除されることがある。（ウォーロックのタレント）',
+    '周囲の敵を最大5秒間恐怖状態にする。対象の最大体力の8%に相当する合計ダメージを受けると、その恐怖は解除される。（ウォーロックのタレント）',
   'entities.abilities.ice_block.description':
-    '自身を氷に封じ、大量のダメージを吸収する。効果時間 8 秒。（メイジタレント）',
+    '8秒間自身を堅い氷に封じ、あらゆるダメージを無効化します。すでにかかっている通常の有害な効果を取り除き、新たな通常の行動阻害効果の付与を防ぎます。スタンまたは変身中でも使用できます。氷の中では行動できません。再使用すると解除します。（メイジ）',
   'entities.abilities.inner_focus.description': '次のプリーストの呪文を無償かつ中断されないものにします。60秒続きます。',
   'entities.abilities.innervate.description':
     '生命の樹液が10秒間あふれ、現在のリソースを波状に20回復する。マナ、怒り、エナジーに対応し、変身しても中断されない。睡眠、スタン、ステイシス中は樹液が止まる。（ドルイドのタレント）',
@@ -10493,10 +10506,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '温かな雨が古い石の上で音を立てる。ワイルドハート盆地が目の前に開けた。',
   'entities.dungeons.wildheart_basin.leaveText': '石の牙の下をくぐり、パームリーチの陽光へ戻った。',
   'entities.dungeons.the_last_keep.name': '最後の砦',
-  'entities.dungeons.the_last_keep.enterText': '最後の砦の冷たく静まり返った広間へ足を踏み入れた。',
   'entities.items.last_keep_signet.name': '最後の砦の印章',
+  'entities.dungeons.the_last_keep.enterText': '最後の砦の冷たく静まり返った広間へ足を踏み入れた。',
   'entities.items.reins_terrorspark_groundshaker.name': 'ドレッドスパークの始動キー',
   'entities.dungeons.the_last_keep.leaveText': '砦の扉を閉め、ドレイクランドの風の中へ戻った。',
+  'entities.dungeons.dawnhold_castle.name': 'ドーンホールド城',
+  'entities.items.dawnhold_posy.name': 'ドーンホールド庭園の小さな花束',
+  'entities.dungeons.dawnhold_castle.enterText':
+    '花の香り漂うドーンホールド城の暖かな広間へ足を踏み入れた。',
+  'entities.dungeons.dawnhold_castle.leaveText': '日差しあふれる庭園の芝生へと戻った。',
   'entities.items.wildheart_tuskblade.name': 'ワイルドハートの牙大剣',
   'entities.items.wildheart_hexwood_staff.name': '盆地の呪木杖',
   'entities.items.wildheart_fangknife.name': 'ズルガーの牙小刀',
@@ -12048,7 +12066,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '8秒間、次に受ける敵の攻撃に報いる。最大{buff}のダメージを打ち消し、同量を神聖ダメージとして攻撃者に返し、信仰を1得る。報いるのは1撃のみ。昇天は報いられる量を50%増加させる。',
   'entities.abilities.faithforged_guard.name': '聖光の負債',
   'entities.abilities.ferocious_bite.specNote_feral':
-    '命中した攻撃ごとに古き血を1蓄える。古き血が3のとき、このボタンは血の収穫に変化する：91にコンボポイントごとに55を加えたダメージの噛みつきで、皮剥ぎと血の亀裂が与えるはずだった残りダメージも即座にすべて与え、エネルギーを30回復する。',
+    '命中した攻撃ごとに古き血を1蓄える。古き血が3のとき、このボタンは血の収穫に変化する：古き血を消費した強力な噛みつきで、皮剥ぎと血の亀裂が与えるはずだった残りダメージも即座にすべて与え、エネルギーを回復する。',
   'entities.abilities.fieldcraft_reentry.description':
     'パッシブ：離脱跳躍は狩猟の勢いを更新し、12秒以内の次の腹裂きの一撃または血鉤を強化します。腹裂きの一撃は1スタックごとに15%の追加ダメージを与えます。血鉤は18から24の追加物理ダメージを与え、1スタックごとに15%増加し、遠隔攻撃力でも増加します。3スタック時はいずれの攻撃も狩猟の勢いを消費します。（野戦術）',
   'entities.abilities.fieldcraft_reentry.name': '再突入準備',
@@ -12132,7 +12150,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '遠くの敵を聖なる鎖で即座に縛る。敵は秒速18メートルで自身へ引き寄せられ、3メートルまで近づくと4秒間、移動速度が50%低下する。昇天中は周囲の敵をもう1体縛る。',
   'entities.abilities.oath_chain.name': '誓いの鎖',
   'entities.abilities.ossuary_mark.description':
-    '敵に12秒間の印を刻み、自分と自分のアンデッドが与えたダメージの20%を蓄積する。もう一度使用すると起爆する。印のついた敵が死亡すると6ヤード以内で爆発し、魂の欠片を1個生成する。',
+    '敵に15秒間の印を刻み、自分と自分のアンデッドが与えたダメージの20%を蓄積する。もう一度使用すると起爆する。印のついた敵が死亡すると6ヤード以内で爆発し、魂の欠片を1個生成する。',
   'entities.abilities.ossuary_mark.name': '納骨の印',
   'entities.abilities.overbloom.description':
     '翠成を5消費する：自身の継続回復効果を持つすべての味方が、その効果の残り回復量の60%分を即座に回復し、効果は除去され、対象には新しい野生の芽吹きが植えられる。',
@@ -12175,7 +12193,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '死亡したグループメンバーを、体力とマナが35%の状態で蘇生する。',
   'entities.abilities.recall_the_fallen.name': '倒れし者の呼び戻し',
   'entities.abilities.redharvest.description':
-    '古き血を3消費する：{damage}のダメージを与え、皮剥ぎと血の亀裂が与えるはずだった残りダメージを即座にすべて与え、両方の出血を除去し、エネルギーを30回復する。コンボポイントが0でも使用できる。',
+    '古き血を3消費する：{damage}のダメージを与え、皮剥ぎと血の亀裂が与えるはずだった残りダメージを即座にすべて与え、両方の出血を除去し、エネルギーを{rage}回復する。コンボポイントが0でも使用できる。',
   'entities.abilities.redharvest.name': '血の収穫',
   'entities.abilities.regrowth.specNote_restoration':
     '新しい花を植えると翠成が1段階進む（最大5）。',
@@ -12384,6 +12402,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formName.form_travel': 'フリートフォーム',
   'guide.classPage.formsHeading': '変身',
   'guide.classPage.formsMoonwing': '均衡（ムーングローブ）のドルイドは、もう一つの姿、ムーンウィングフォームを得ます。均衡型のドルイドが戦うための術者の姿です。獣の姿でありながら呪文を保てる唯一の形であり、ワンドもこの姿か、通常の術者の姿でしか使えません。',
+  'guide.classPage.formsAutoUnshift':
+    '変身中に回復や攻撃の呪文を唱えると、姿はひとりでに解けます。こうして姿を解くのはマナもかからず、グローバルクールダウンも使いません。ですから即時発動の呪文は押した瞬間に飛びます。もう一度変身するのは普通のアビリティなので、マナもグローバルクールダウンもかかります。',
   'guide.classPage.formsNote': 'ドルイドは姿を変えて戦います。ドルイドのアビリティはほとんどがいずれか一つの姿に属しているので、今どの姿でいるかが何を使えるかを決めます。変身にはわずかなマナがかかります。戦闘中でも戦闘外でも、好きなだけ変身し、また解くことができます。',
   'guide.classPage.mageEleHeading': 'ウォーターエレメンタル',
   'guide.classPage.mageEleJet': 'ウォータージェットはペットバーに独立したボタンとして並びます。クリックすれば凍てつく光線を敵一体に固定し、右クリック（モバイルでは長押し）すれば、準備が整うたびにエレメンタルが自分の判断で放つようになります。',

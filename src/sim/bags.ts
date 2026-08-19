@@ -60,20 +60,20 @@ export function stackSizeOf(def: ItemDef | undefined): number {
 }
 
 /** The tamper ceiling for a PERSISTED slot's count: a counted instanced slot
- *  loads capped at the stack cap identical-payload merges could legitimately
- *  have built; a charge-bearing payload stays one-per-slot regardless (a
- *  counted stack shares ONE payload object, so a hand-edited count would mint
- *  shared-charge copies); an unknown item def stays dormant recoverable data,
- *  uncapped like the plain arm (items are never destroyed by a load); plain
- *  slots are uncapped. Consumed by bank.ts sanitizeBankState AND the
- *  carried-inventory hydration in Sim.addPlayer so the rule cannot drift
- *  between the two load arms. */
+ *  loads capped at the stack cap identical-payload merges or an in-place
+ *  whole-stack lock could legitimately have built; a charge-bearing payload
+ *  stays one-per-slot regardless (a counted stack shares ONE payload object,
+ *  so a hand-edited count would mint shared-charge copies); an unknown item
+ *  def stays dormant recoverable data, uncapped like the plain arm (items are
+ *  never destroyed by a load); plain slots are uncapped. Consumed by bank.ts
+ *  sanitizeBankState AND the carried-inventory hydration in Sim.addPlayer so
+ *  the rule cannot drift between the two load arms. */
 export function instancedCountCap(
   def: ItemDef | undefined,
   instance: ItemInstancePayload | undefined,
 ): number {
   if (!instance) return Number.POSITIVE_INFINITY;
-  if (!isMergeableInstancePayload(instance)) return 1;
+  if (instance.charges !== undefined) return 1;
   return def ? stackSizeOf(def) : Number.POSITIVE_INFINITY;
 }
 

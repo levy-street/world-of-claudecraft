@@ -34,7 +34,6 @@ import {
   openPlaySession,
   reclaimDeactivatedName,
   renameCharacter,
-  revokeAccountMechChroma,
   SCHEMA,
   setAccountWeaponSkinLoadout,
   touchLogin,
@@ -578,31 +577,6 @@ describe('account cosmetics', () => {
     const [sql, params] = dbMock.query.mock.calls[0];
     expect(sql).toMatch(/jsonb_set/);
     expect(params).toEqual([7, 'mechChromaIds', 'amber_crimson']);
-  });
-
-  it('persists mech chroma removal without replacing account quest lockouts', async () => {
-    dbMock.query.mockResolvedValueOnce({
-      rows: [
-        {
-          cosmetics: {
-            completedQuestIds: ['q_aldrics_fallen_star'],
-            mechChromaIds: ['onyx_gold'],
-          },
-        },
-      ],
-    } as any);
-
-    await expect(revokeAccountMechChroma(7, 'amber_crimson')).resolves.toEqual({
-      completedQuestIds: ['q_aldrics_fallen_star'],
-      mechChromaIds: ['onyx_gold'],
-      weaponSkinIds: [],
-      weaponSkinLoadout: {},
-    });
-
-    const [sql, params] = dbMock.query.mock.calls[0];
-    expect(sql).toMatch(/UPDATE accounts/);
-    expect(sql).toMatch(/jsonb_set/);
-    expect(params).toEqual([7, 'amber_crimson']);
   });
 });
 

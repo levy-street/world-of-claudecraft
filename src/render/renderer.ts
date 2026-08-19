@@ -19,7 +19,6 @@ import {
   defaultDelveModules,
   delveAt,
   delveModuleStackEndRelZ,
-  delveModuleZOffset,
   delveOrigin,
   delveSlotAt,
   dungeonAt,
@@ -86,6 +85,7 @@ import {
   createBlobShadowSlot,
 } from './blob_shadow_core';
 import { BlobShadows } from './blob_shadows';
+import { type BulwarkFeaturesView, buildBulwarkFeatures } from './bulwark_features';
 import { BurningPactMarkers } from './burning_pact_markers';
 import { createCameraBoom, stepCameraBoom } from './camera_boom_core';
 import {
@@ -193,6 +193,7 @@ import {
   showsStaticFarMesh,
 } from './crowd_lod';
 import { daisVisualLift } from './dais_lift';
+import { buildDawnholdFeatures, type DawnholdFeaturesView } from './dawnhold_features';
 import { currentDayNightPhase, currentLunarPhase, dayNightPhaseOverride } from './day_night_clock';
 import {
   aboveHorizon,
@@ -218,7 +219,7 @@ import {
   warmDuskGrade,
 } from './day_night_core';
 import { shouldPlayDeedFirework } from './deed_fx_gate';
-import { buildDelveModule } from './delve_interiors';
+import { DelveInteriorTracker } from './delve_interior_tracker';
 import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
 import { detailHorizonStarved } from './detail_horizon_core';
 import { buildDoorBody, buildRiftGateBody, buildRiftPuzzleProp } from './door_portal';
@@ -330,7 +331,7 @@ import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
 import { buildImpactSite, type ImpactSiteView, MIREFEN_IMPACT_SITE } from './impact_site';
 import * as encounterPrewarm from './interior_encounter_prewarm_pass';
-import { ensureDelveInteriorKit } from './interior_kit';
+import { applyInteriorLightRig, applyRiftLightRig, type FogSceneState } from './interior_light_rig';
 import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
 import { stepLichHeartbeat } from './lich_audio_state_core';
@@ -355,6 +356,11 @@ import { buildMailboxPillar } from './mailbox';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
+import {
+  mountPrewarmKeys,
+  stageMountPrewarmVisual,
+  stageResidentMountPrewarmVisual,
+} from './mount_prewarm';
 import { mountBobY, mountVisualSpec } from './mount_visuals';
 import { NameplatePainter } from './nameplate_painter';
 import {
@@ -443,6 +449,7 @@ import {
   summarizePrewarmManifest,
 } from './prewarm_compile_lifecycle';
 import { submitPrewarmCompileUnit } from './prewarm_compile_submission_core';
+import { prewarmDepthMaterial } from './prewarm_depth_material';
 import {
   boundedPrewarmVisibility,
   runBackgroundPrewarm,
@@ -532,6 +539,7 @@ import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
 import { type SelfMotionFrame, SelfMotionPredictor, updateSelfRenderFallback } from './self_motion';
+import { SelfSpiritPrewarmer } from './self_spirit_prewarm';
 import { SentenceVfx } from './sentence_vfx';
 import { sentenceImpactPlan } from './sentence_vfx_core';
 import {
@@ -553,6 +561,7 @@ import {
   type SkyKey,
   type SkyView,
   skyBiomesAt,
+  skyResidencyTextures,
 } from './sky';
 import { zoneArrivalReady } from './sky_residency_core';
 import { SkyResidencyDriver } from './sky_residency_driver';
@@ -888,21 +897,9 @@ const hemiOutdoorIntensity = (): number =>
 
 const SUN_INTENSITY = 3.5;
 const ENV_INTENSITY = 0.37;
-// dungeon interiors: kill the daylight so torchlight carries the scene
-// (env at 0.15 still lit rigs sky-blue against the pitch-dark crypt)
-const DUNGEON_SUN_INTENSITY = 0.34;
-const DUNGEON_ENV_INTENSITY = 0.05;
-// The authored Infernal Citadel is larger than a procedural floor and carries
-// real budgeted brazier lights. A stronger ambient floor preserves the black-red
-// infernal grade while keeping its loops, bosses, and doors readable between pools.
-const INFERNAL_SUN_INTENSITY = 0.54;
-const INFERNAL_HEMI_INTENSITY = 0.32;
-const INFERNAL_ENV_INTENSITY = 0.1;
-const INFERNAL_RIM_BOOST = 2.15;
 // raw HDRI PMREMs integrate the real sun the dome shader clamps away,
 // rescale so ambient matches the dome-capture look (see lookdev-hookup.md)
 const IBL_RAW_SCALE = 0.55;
-const DUNGEON_HEMI_INTENSITY = 0.22; // floor of readability — bosses crushed to black at 0.14
 // day/night: at night the key sun and sky bounce cool toward moonlight. These
 // are the fully-night blend weights (scaled each frame by the grade's nightAmt).
 const MOON_SUN_COLOR = 0x9fb2e0; // pale cool moonlight the warm sun eases toward
@@ -927,31 +924,6 @@ const DAY_HEMI_SKY_WARMTH = 0.3;
 const DAY_HEMI_GROUND_WARMTH = 0.22;
 // the moving sun/moon key light rides at the same distance the fixed anchor did
 const SUN_TRAVEL_DISTANCE = SUN_ANCHOR.length();
-// character rim glow scales up underground so silhouettes split from the murk
-const DUNGEON_RIM_BOOST = 2.4;
-// The Protect Yumi maze is a torch-lit NIGHT ARENA, not a crypt: a moon-key
-// plus a healthy hemisphere keep the whole competitive space readable, with
-// the braziers/torches adding warmth rather than carrying the scene alone.
-const YUMI_MAZE_SUN_INTENSITY = 1.32;
-const YUMI_MAZE_HEMI_INTENSITY = 0.38;
-const YUMI_MAZE_ENV_INTENSITY = 0.25;
-const YUMI_MAZE_RIM_BOOST = 1.7;
-const WILDHEART_SUN_INTENSITY = 1.75;
-const WILDHEART_HEMI_INTENSITY = 0.59;
-const WILDHEART_ENV_INTENSITY = 0.28;
-const WILDHEART_RIM_BOOST = 1.5;
-// The Last Keep is a LIVED-IN castle interior, not a crypt: a higher, warmed
-// ambient floor (over the candle-orange torch lights the interior itself
-// carries) so its halls read golden and inhabited while staying indoors-dim.
-// Scoped to interior 'lastkeep' only; every other underground interior keeps
-// the DUNGEON_* rig.
-const LASTKEEP_SUN_INTENSITY = 0.66;
-const LASTKEEP_HEMI_INTENSITY = 0.46;
-const LASTKEEP_ENV_INTENSITY = 0.14;
-const LASTKEEP_RIM_BOOST = 1.9;
-const LASTKEEP_SUN_COLOR = 0xffd9a8;
-const LASTKEEP_HEMI_SKY_COLOR = 0xffe4c4;
-const LASTKEEP_HEMI_GROUND_COLOR = 0x4a3826;
 const RENDERER_PHASE_SAMPLE_LIMIT = 720;
 const RENDER_STALL_ATTRIBUTION_MS = 80;
 const PREWARM_MOB_TEMPLATE_IDS = [
@@ -1680,7 +1652,9 @@ export class Renderer {
   private impactSite: ImpactSiteView;
   private realmFlora: RealmFloraView | null = null;
   private emberFeatures: EmberFeaturesView | null = null;
+  private bulwarkFeatures: BulwarkFeaturesView | null = null;
   private castleFeatures: CastleFeaturesView | null = null;
+  private dawnholdFeatures: DawnholdFeaturesView | null = null;
   private frostSky: FrostSkyView | null = null;
   private fenFeatures: FenFeaturesView | null = null;
   private amberFeatures: AmberFeaturesView | null = null;
@@ -1816,10 +1790,17 @@ export class Renderer {
   // One shared lane for background work that touches WebGL. Idle callbacks from
   // independent zone/sky/archetype tasks can otherwise all start in one frame.
   private backgroundGpuWork = createBackgroundGpuQueue();
-  // Serial tail for spirit-puppet construction: several models resolve at once
-  // when a class is first sighted, so the builds queue behind one another and
-  // each spends its own idle slot instead of stacking into one combat frame.
   private spiritBuildLane: Promise<unknown> = Promise.resolve();
+  private selfSpirit = new SelfSpiritPrewarmer({
+    warm: () =>
+      this.backgroundGpuWork.run(
+        () => this.warmSelfSpirit(),
+        GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+        'self-spirit',
+        { releaseTail: true },
+      ),
+    idle: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS),
+  });
   // Static terrain/water/features just beyond the current zone are built in a
   // single background lane when their rectangles enter the relaxed fog
   // horizon, so a walked boundary crossing lands on already-resident ground.
@@ -2786,6 +2767,7 @@ export class Renderer {
               label: 'foliage parse cache',
               objects: foliageResidencySources().parsedScenes,
             },
+            { label: 'sky', textures: skyResidencyTextures() },
             {
               // The cost side of the KTX2 mip release: source bytes retained
               // for the context-loss re-transcode (the released mip chains
@@ -3660,11 +3642,9 @@ export class Renderer {
         for (const key of skyKeys) this.prewarmTexture(this.skyView.domeTexture(key));
         return;
       }
-      // A DataTexture upload is synchronous even from requestIdleCallback. The
-      // installed 0.185 ships native update ranges, so the idle arm row-batches
-      // the HDRI instead of paying one full upload. Either way each atomic
-      // WebGL call enters the shared queue so it cannot overlap a live shader
-      // compile.
+      // A texture upload is synchronous even from requestIdleCallback, and a
+      // CompressedTexture has no row-addressable buffer to range over, so the
+      // sky is ONE queued call rather than a DataTexture's row batches.
       await this.prewarmTextureInIdle(this.skyView.envTexture(zone.biome));
       // PMREM generation is indivisible in three (0.185 included). Defer two
       // timed-out callbacks before deliberately paying that single unit under
@@ -4231,6 +4211,10 @@ export class Renderer {
           this.castleFeatures = buildCastleFeatures();
           this.attachZoneFeature(this.castleFeatures);
         }
+        if (!this.bulwarkFeatures) {
+          this.bulwarkFeatures = buildBulwarkFeatures();
+          this.attachZoneFeature(this.bulwarkFeatures);
+        }
         break;
       case 'frost':
         if (!this.frostSky) {
@@ -4272,6 +4256,10 @@ export class Renderer {
         if (!this.gardenFeatures) {
           this.gardenFeatures = buildGardenFeatures(this.sim.cfg.seed);
           this.attachZoneFeature(this.gardenFeatures);
+        }
+        if (!this.dawnholdFeatures) {
+          this.dawnholdFeatures = buildDawnholdFeatures();
+          this.attachZoneFeature(this.dawnholdFeatures);
         }
         break;
       case 'gale':
@@ -5602,50 +5590,6 @@ export class Renderer {
     return count;
   }
 
-  private prewarmDepthMaterial(source: THREE.Material): THREE.MeshDepthMaterial {
-    const textured = source as TextureBackedMaterial & {
-      displacementScale?: number;
-      displacementBias?: number;
-      wireframe?: boolean;
-    };
-    const shadowSide =
-      source.shadowSide ??
-      (source.side === THREE.FrontSide
-        ? THREE.BackSide
-        : source.side === THREE.BackSide
-          ? THREE.FrontSide
-          : THREE.DoubleSide);
-    const key = [
-      shadowSide,
-      textured.map ? 1 : 0,
-      textured.alphaMap ? 1 : 0,
-      source.alphaToCoverage || source.alphaTest > 0 ? 1 : 0,
-      textured.displacementMap ? 1 : 0,
-      textured.wireframe ? 1 : 0,
-    ].join('|');
-    let depth = this.prewarmDepthMaterials.get(key);
-    if (depth) return depth;
-    depth = new THREE.MeshDepthMaterial({
-      side: shadowSide,
-      map: textured.map ?? null,
-      alphaMap: textured.alphaMap ?? null,
-      alphaTest: source.alphaToCoverage ? 0.5 : source.alphaTest,
-      displacementMap: textured.displacementMap ?? null,
-      displacementScale: textured.displacementScale ?? 1,
-      displacementBias: textured.displacementBias ?? 0,
-      wireframe: textured.wireframe ?? false,
-      // Match the REAL shadow pass: three's shared shadow depth material uses
-      // RGBADepthPacking and depthPacking sits in the program cache key, so
-      // the default BasicDepthPacking linked a variant the shadow pass never
-      // draws, and every "prewarmed" caster relinked at its first shadow
-      // draw anyway (the residue probe measured all of them).
-      depthPacking: THREE.RGBADepthPacking,
-    });
-    depth.name = `prewarm-depth:${key}`;
-    this.prewarmDepthMaterials.set(key, depth);
-    return depth;
-  }
-
   /**
    * Link a root's exact live colour-program variant before a bounded upload.
    * Three chooses output colour space from the current render target in
@@ -5698,8 +5642,8 @@ export class Renderer {
       const material = mesh.material;
       swaps.push({ mesh, material });
       mesh.material = Array.isArray(material)
-        ? material.map((item) => this.prewarmDepthMaterial(item))
-        : this.prewarmDepthMaterial(material);
+        ? material.map((item) => prewarmDepthMaterial(this.prewarmDepthMaterials, item, mesh))
+        : prewarmDepthMaterial(this.prewarmDepthMaterials, material, mesh);
     });
     if (swaps.length === 0) return;
     // Match the real shadow pass's program key exactly. A bare
@@ -5734,6 +5678,33 @@ export class Renderer {
     await compilePromise;
   }
 
+  // Link the local player's own body spirit (ghost) transparent variants
+  // off-thread so a later spirit release reuses cached programs instead of
+  // linking ~20 inline on the ungated self view (the ~2.2 s death stall).
+  // Applies the ghost materials to the REAL skinned meshes (so the variant
+  // matches the flip's skinning/morph), runs compileAsync's synchronous
+  // prologue, then restores the opaque originals BEFORE awaiting the linker
+  // (the compileShadowPrograms restore-early pattern): no frame draws the ghost,
+  // and the clones the flip reuses stay cached on the visual.
+  private async warmSelfSpirit(): Promise<boolean> {
+    if (!this.asyncCompileSupported || this.sim.player.ghost) return false;
+    const visual = this.views.get(this.sim.player.id)?.visual;
+    if (!visual) return false;
+    const previousTarget = this.webgl.getRenderTarget();
+    // Composer tiers link the ghost variant against their offscreen colour space.
+    if (this.post) this.prewarmRenderTarget ??= new THREE.WebGLRenderTarget(8, 8);
+    let compilePromise: Promise<THREE.Object3D>;
+    visual.setGhost(true);
+    try {
+      this.webgl.setRenderTarget(this.post ? this.prewarmRenderTarget : null);
+      compilePromise = this.webgl.compileAsync(visual.root, this.camera, this.scene);
+    } finally {
+      this.webgl.setRenderTarget(previousTarget);
+      visual.setGhost(false);
+    }
+    await compilePromise;
+    return true;
+  }
   // A tiny throwaway target for background child uploads, so a prewarm root
   // that is briefly visible during its bounded call is never presented on
   // the canvas. Lazily built once and kept: 8x8 RGBA plus depth is negligible.
@@ -6054,6 +6025,10 @@ export class Renderer {
     let foliagePrewarmGroup: THREE.Group | null = null;
     let greatTreePrewarmGroup: THREE.Group | null = null;
     let weaponVfxPrewarmGroup: THREE.Group | null = null;
+    let mountPrewarmGroup: THREE.Group | null = null;
+    const mountPrewarmPlannedKeys = mountPrewarmKeys();
+    const mountPrewarmPendingKeys = new Set(mountPrewarmPlannedKeys);
+    let mountPrewarmWarmed = 0;
     let landmarkPrewarmGroup: THREE.Group | null = null;
     let weatherPrewarmActive = false;
     let surfaceDetailTexturesWarmed = 0;
@@ -6115,6 +6090,8 @@ export class Renderer {
       /** Explicit small units that may resume after world entry. The absence of
        * this hook is intentional: a whole manifest entry is never rerun live. */
       resumeUnits?: () => readonly PrewarmResumeUnit[];
+      /** Optional remainder for a started entry that reports partial progress. */
+      resumePartialUnits?: () => readonly PrewarmResumeUnit[];
       run: () => void | Promise<void>;
       /** Read after run(): how much of the planned work actually happened. A
        * trimmed report downgrades the entry to 'partial' (prewarm_policy.ts),
@@ -6154,6 +6131,7 @@ export class Renderer {
       ['foliage', foliagePrewarmGroup],
       ['great-tree', greatTreePrewarmGroup],
       ['weapon-vfx', weaponVfxPrewarmGroup],
+      ['mounts', mountPrewarmGroup],
       ['landmark', landmarkPrewarmGroup],
     ];
 
@@ -6426,6 +6404,10 @@ export class Renderer {
       // its counts, never 'completed'.
       const progress = entry.progress?.() ?? null;
       if (status === 'completed') status = resolvePrewarmEntryStatus(progress);
+      if (status === 'partial') {
+        const partialUnits = entry.resumePartialUnits?.() ?? [];
+        if (partialUnits.length > 0) droppedEntries.push({ id: entry.id, units: partialUnits });
+      }
       const after = this.prewarmCounts();
       const entryEnded = performance.now();
       target.push({
@@ -6467,6 +6449,7 @@ export class Renderer {
         ghostVariantPrewarmGroup,
         foliagePrewarmGroup,
         weaponVfxPrewarmGroup,
+        mountPrewarmGroup,
         landmarkPrewarmGroup,
       ]) {
         if (group) group.visible = false;
@@ -6516,6 +6499,9 @@ export class Renderer {
       // Removed, never disposed: disposing a material releases its linked
       // program, which is exactly what this group exists to warm.
       if (weaponVfxPrewarmGroup) this.scene.remove(weaponVfxPrewarmGroup);
+      // Same reason: a mount rig removed here keeps its program cached, it
+      // just stops taking a scene-graph traversal slot every frame.
+      if (mountPrewarmGroup) this.scene.remove(mountPrewarmGroup);
       if (landmarkPrewarmGroup) this.scene.remove(landmarkPrewarmGroup);
       if (weatherPrewarmActive) this.weather.endPrewarm();
       doorPrewarmGroup = null;
@@ -6533,11 +6519,26 @@ export class Renderer {
       foliagePrewarmGroup = null;
       greatTreePrewarmGroup = null;
       weaponVfxPrewarmGroup = null;
+      mountPrewarmGroup = null;
       landmarkPrewarmGroup = null;
       weatherPrewarmActive = false;
     };
 
     const settleMinPasses = this.lowGfx ? 8 : 10;
+
+    const mountPrewarmResumeUnits = (): PrewarmResumeUnit[] =>
+      [...mountPrewarmPendingKeys].map((key) => ({
+        id: `mount:${key}`,
+        run: async () => {
+          const staged = await stageMountPrewarmVisual(this.scene, mountPrewarmGroup, key);
+          if (!staged) return;
+          mountPrewarmGroup = staged.group;
+          await this.compilePrewarmColorPrograms(staged.visual.root, false);
+          await this.compileShadowPrograms(staged.visual.root);
+          mountPrewarmPendingKeys.delete(key);
+          mountPrewarmWarmed++;
+        },
+      }));
 
     const textureResumeUnits = (
       idPrefix: string,
@@ -7066,6 +7067,48 @@ export class Renderer {
             this.prewarmMaterialTextures(renderable.material);
           });
         },
+      },
+      {
+        // Rideable mounts: worn by whoever is riding one, so the FIRST
+        // sighting of any given mount links its programs the moment it
+        // appears, exactly like vfx.weapon-skins above. The runtime fallback
+        // (gateSwapFlagOnCompile at the mount-swap site, see updateEntity) is
+        // a no-op without KHR_parallel_shader_compile, so on that hardware
+        // this entry is the only mitigation there ever was (#2571). Mount
+        // GLBs are lazyPreload (characters/assets.ts): a fetch failure or a
+        // timed-out one (mount_prewarm.ts's MOUNT_PREWARM_FETCH_TIMEOUT_MS)
+        // drops only that one mount, never the whole entry.
+        //
+        // The loading-cover path stages only already-resident mount assets,
+        // then the shared programs.compile entry links both program halves
+        // for that staged group. Missing keys hand off to one explicit
+        // background resume unit per mount, where each lazy fetch has its own
+        // timeout and then self-compiles because programs.compile has already
+        // finished. progress() reports only keys actually staged or resumed,
+        // so a deadline-limited pass reports 'partial', never a false
+        // 'completed' (the failure mode resolvePrewarmEntryStatus documents).
+        id: 'vfx.mount-programs',
+        category: 'vfx',
+        priority: 63,
+        required: false,
+        resumeUnits: mountPrewarmResumeUnits,
+        resumePartialUnits: mountPrewarmResumeUnits,
+        run: async () => {
+          for (const key of mountPrewarmPlannedKeys) {
+            if (performance.now() >= buildDeadline) break;
+            const staged = stageResidentMountPrewarmVisual(this.scene, mountPrewarmGroup, key);
+            if (!staged) continue;
+            mountPrewarmGroup = staged.group;
+            mountPrewarmPendingKeys.delete(key);
+            mountPrewarmWarmed++;
+          }
+        },
+        progress: () => ({
+          done: mountPrewarmWarmed,
+          planned: mountPrewarmPlannedKeys.length,
+          trimmed: mountPrewarmPendingKeys.size > 0,
+        }),
+        detail: () => `mounts=${mountPrewarmGroup?.children.length ?? 0}`,
       },
       {
         // A 2k RGBA16F dome upload blocked a live Mirefen frame for 183ms.
@@ -9353,28 +9396,21 @@ export class Renderer {
   private readonly umbralAnchorMarker = new UmbralAnchorMarker(this.groundSample);
   // The approved Maledict Eye is cosmetic: one local, non-targetable Affliction familiar.
   private readonly afflictionFamiliar = new AfflictionFamiliar();
-  // Delve module interiors build asynchronously; track in-flight keys so a
-  // per-frame ensureDelveInteriorsNear does not re-schedule a build mid-load.
-  private pendingInteriors = new Set<string>();
+  // Delve module interiors build asynchronously; the tracker also retires a
+  // position's stale geometry when a new run puts a different module there
+  // (see delve_interior_tracker.ts).
+  private delveInteriors = new DelveInteriorTracker(
+    () => this.ensureDungeons(),
+    (group) => this.retireInteriorGroup(group),
+    this.builtInteriors,
+  );
   // Re-applied rift fog is keyed by the floor descriptor (seed:floorIndex) so a
   // descent (same 'rift' fogState, different palette) still refreshes the fog.
   private riftFogKey: string | null = null;
   // Cached with riftFogKey: whether the current rift floor is an authored set
   // piece, so the per-frame lighting read avoids regenerating the floor.
   private riftFogAuthored = false;
-  private fogState:
-    | 'outdoor'
-    | 'dungeon'
-    | 'temple'
-    | 'nythraxis'
-    | 'delve'
-    | 'yumiMaze'
-    | 'battleground'
-    | 'underwater'
-    | 'rift'
-    | 'practice'
-    | 'wildheartField'
-    | 'lastkeep' = 'outdoor';
+  private fogState: FogSceneState = 'outdoor';
 
   /** Drop a retired interior's scene nodes and prune its lights/flames out of
    * the per-frame registries. See riftInteriorGroups for why nothing here
@@ -9573,6 +9609,27 @@ export class Renderer {
     return Renderer.BIOME_FOG[zoneBiomeAt(this.sim.player.pos.x, this.sim.player.pos.z)];
   }
 
+  /** Settle the light rig for a fog state (interior_light_rig.ts owns the
+   * per-state numbers; the outdoor legs carry this frame's day/night grade,
+   * so leaving an interior at night stays night). */
+  private applyStateLightRig(state: FogSceneState): void {
+    const targets = {
+      sun: this.sun,
+      hemi: this.hemi,
+      scene: this.scene,
+      rim: sharedUniforms.uRimBoost,
+    };
+    if (state === 'rift') {
+      applyRiftLightRig(this.riftFogAuthored, targets);
+      return;
+    }
+    applyInteriorLightRig(state, targets, {
+      sunIntensity: SUN_INTENSITY * this.dnGrade.lightScale,
+      hemiIntensity: hemiOutdoorIntensity() * this.dnGrade.ambientScale,
+      envIntensity: this.envOutdoorIntensity * this.dnGrade.ambientScale,
+    });
+  }
+
   /**
    * The vista arms may only engage once the far layer can actually stand in
    * for the fog: until EVERY planned tile is attached, an unbuilt direction
@@ -9628,27 +9685,6 @@ export class Renderer {
       : (this.scene.fog as THREE.Fog).far;
   }
 
-  private scheduleDelveModuleBuild(
-    key: string,
-    moduleId: DelveModuleId,
-    ox: number,
-    oz: number,
-  ): void {
-    if (this.builtInteriors.has(key) || this.pendingInteriors.has(key)) return;
-    this.pendingInteriors.add(key);
-    void buildDelveModule(this.ensureDungeons(), moduleId, ox, oz)
-      .then(() => {
-        this.builtInteriors.add(key);
-        this.pendingInteriors.delete(key);
-      })
-      .catch((err) => {
-        this.pendingInteriors.delete(key);
-        if (import.meta.env?.DEV) {
-          console.warn('Failed to build delve interior:', moduleId, 'at', ox, oz, err);
-        }
-      });
-  }
-
   /** Build every module in a delve run at its stacked z offset (parallel async). */
   private buildAllDelveModules(
     delveId: string,
@@ -9656,14 +9692,7 @@ export class Renderer {
     origin: { x: number; z: number },
     modules: readonly DelveModuleId[],
   ): void {
-    void ensureDelveInteriorKit().catch(() => undefined);
-    for (let mi = 0; mi < modules.length; mi++) {
-      const moduleId = modules[mi];
-      const key = `delve:${delveId}:${slot}:${moduleId}`;
-      if (this.builtInteriors.has(key) || this.pendingInteriors.has(key)) continue;
-      const zOff = delveModuleZOffset(modules, mi);
-      this.scheduleDelveModuleBuild(key, moduleId, origin.x, origin.z + zOff);
-    }
+    this.delveInteriors.buildAll(delveId, slot, origin, modules);
   }
 
   /** Prebuild the full module stack when a delve run starts (offline + online). */
@@ -9913,6 +9942,7 @@ export class Renderer {
     // sky dome and the daylight rig and only swaps in its own field haze.
     const inWildheartField = interior === 'wildheart';
     const inLastKeep = interior === 'lastkeep';
+    const inDawnhold = interior === 'dawnhold';
     const desired = inPractice
       ? 'practice'
       : inDelve
@@ -9929,17 +9959,19 @@ export class Renderer {
                   ? 'wildheartField'
                   : inLastKeep
                     ? 'lastkeep'
-                    : inside
-                      ? 'dungeon'
-                      : camY <
-                          waterLevelAt(
-                            this.camera.position.x,
-                            this.camera.position.z,
-                            this.sim.cfg.seed,
-                          ) -
-                            0.05
-                        ? 'underwater'
-                        : 'outdoor';
+                    : inDawnhold
+                      ? 'dawnhold'
+                      : inside
+                        ? 'dungeon'
+                        : camY <
+                            waterLevelAt(
+                              this.camera.position.x,
+                              this.camera.position.z,
+                              this.sim.cfg.seed,
+                            ) -
+                              0.05
+                          ? 'underwater'
+                          : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
     // Procedural rift: dynamic fog from the generated floor style, re-applied when
     // the floor changes (descent keeps fogState='rift' but swaps the palette).
@@ -9962,11 +9994,7 @@ export class Renderer {
       }
       this.fogState = 'rift';
       if (!this.lowGfx) {
-        const authored = this.riftFogAuthored;
-        this.sun.intensity = authored ? INFERNAL_SUN_INTENSITY : DUNGEON_SUN_INTENSITY;
-        this.hemi.intensity = authored ? INFERNAL_HEMI_INTENSITY : DUNGEON_HEMI_INTENSITY;
-        this.scene.environmentIntensity = authored ? INFERNAL_ENV_INTENSITY : DUNGEON_ENV_INTENSITY;
-        sharedUniforms.uRimBoost.value = authored ? INFERNAL_RIM_BOOST : DUNGEON_RIM_BOOST;
+        this.applyStateLightRig('rift');
       }
       return;
     }
@@ -10000,6 +10028,13 @@ export class Renderer {
         fog.color.setHex(0x241610);
         fog.near = 30;
         fog.far = 150;
+      } else if (desired === 'dawnhold') {
+        // Dawnhold Castle: brighter and greener-warm than the keep's hearth
+        // murk: a pale sage-gold air pushed even further back, so the garden
+        // palace reads sunlit end to end.
+        fog.color.setHex(0x3d422a);
+        fog.near = 40;
+        fog.far = 190;
       } else if (desired === 'delve') {
         // the collapsed reliquary breathes a warm ember murk, dried-blood
         // charcoal, tighter than the overworld crypt's cold near-black, so the
@@ -10047,65 +10082,9 @@ export class Renderer {
       // interiors must not leak daylight: drop sun + sky ambient + IBL
       // underground so the torch point lights own the scene; restore outside.
       // The rim glow cranks up instead, silhouettes must split from the murk.
+      // Which numbers each state means is interior_light_rig.ts's to own.
       if (!this.lowGfx) {
-        const mazeNight = desired === 'yumiMaze';
-        const wildheartSun = desired === 'wildheartField';
-        const keepHearth = desired === 'lastkeep';
-        const underground =
-          desired === 'dungeon' ||
-          desired === 'temple' ||
-          desired === 'nythraxis' ||
-          desired === 'delve';
-        // The maze runs its own night rig; otherwise returning outdoors restores the
-        // full daylight rig scaled by the current day/night grade, so stepping out
-        // of a cave at night stays night.
-        this.sun.intensity = mazeNight
-          ? YUMI_MAZE_SUN_INTENSITY
-          : wildheartSun
-            ? WILDHEART_SUN_INTENSITY
-            : keepHearth
-              ? LASTKEEP_SUN_INTENSITY
-              : underground
-                ? DUNGEON_SUN_INTENSITY
-                : SUN_INTENSITY * this.dnGrade.lightScale;
-        this.hemi.intensity = mazeNight
-          ? YUMI_MAZE_HEMI_INTENSITY
-          : wildheartSun
-            ? WILDHEART_HEMI_INTENSITY
-            : keepHearth
-              ? LASTKEEP_HEMI_INTENSITY
-              : underground
-                ? DUNGEON_HEMI_INTENSITY
-                : hemiOutdoorIntensity() * this.dnGrade.ambientScale;
-        this.scene.environmentIntensity = mazeNight
-          ? YUMI_MAZE_ENV_INTENSITY
-          : wildheartSun
-            ? WILDHEART_ENV_INTENSITY
-            : keepHearth
-              ? LASTKEEP_ENV_INTENSITY
-              : underground
-                ? DUNGEON_ENV_INTENSITY
-                : this.envOutdoorIntensity * this.dnGrade.ambientScale;
-        sharedUniforms.uRimBoost.value = mazeNight
-          ? YUMI_MAZE_RIM_BOOST
-          : wildheartSun
-            ? WILDHEART_RIM_BOOST
-            : keepHearth
-              ? LASTKEEP_RIM_BOOST
-              : underground
-                ? DUNGEON_RIM_BOOST
-                : 1;
-        if (wildheartSun) {
-          this.sun.color.setHex(0xffd48c);
-          this.hemi.color.setHex(0xd8ebca);
-          this.hemi.groundColor.setHex(0x5b4a2d);
-        } else if (keepHearth) {
-          // hearth-gold key and bounce; the outdoor path re-grades these
-          // colors every frame once the player steps back outside
-          this.sun.color.setHex(LASTKEEP_SUN_COLOR);
-          this.hemi.color.setHex(LASTKEEP_HEMI_SKY_COLOR);
-          this.hemi.groundColor.setHex(LASTKEEP_HEMI_GROUND_COLOR);
-        }
+        this.applyStateLightRig(desired);
       }
       return;
     }
@@ -11044,7 +11023,7 @@ export class Renderer {
         if (wardstoneLit) {
           this.vfx.castSparkle(e.id, 'arcane', dt * 2.6);
         }
-        if (v.portal && vis) {
+        if (v.portal && vis && !v.portal.userData.staticDoor) {
           v.portal.rotation.z = this.time * 1.4;
           (v.portal.material as THREE.MeshBasicMaterial).opacity =
             0.45 + Math.sin(this.time * 2.2 + e.id) * 0.15;
@@ -11258,6 +11237,17 @@ export class Renderer {
       }
       this.updateBaseVisual(e, v);
       if (!v.visual) continue;
+      // Warm the local player's own spirit variants once per distinct look, so
+      // a death spirit-release never links them inline on the ungated self view.
+      if (e.id === this.sim.player.id) {
+        this.selfSpirit.observe(
+          v.visual,
+          e.skin,
+          e.mainhandItemId,
+          e.offhandItemId,
+          e.weaponSkinId,
+        );
+      }
       if (iceBlockActivated) this.activeVisual(v)?.playEmote('wave', 1);
 
       // live skin swap: appearance changed (in-game changer or a multiplayer peer).

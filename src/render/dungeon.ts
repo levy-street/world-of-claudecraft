@@ -21,6 +21,7 @@ import {
   arenaMapForSlot,
   CRYPT_LAYOUT,
   DAIS_HEIGHT,
+  DAWNHOLD_LAYOUT,
   DUNGEON_END_WALL_HW,
   DUNGEON_WALL_HEIGHT,
   DUNGEON_WALL_HW,
@@ -48,6 +49,7 @@ import { loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { fitAuthoredWallSegment } from './authored_walls_core';
 import { DAIS_PLATFORM_HEIGHT } from './dais_lift';
+import { buildDawnholdDressing, ensureDawnholdDressing } from './dawnhold_dressing';
 import {
   placeLitanyMarshDressing,
   placeMarshBlackwaterPools,
@@ -94,6 +96,11 @@ export type DungeonInteriorVariant =
   // warm candle torchlight, and the kcas furniture dressing on stories 1-2;
   // only its undercroft rooms keep the crypt's cracked stone and cold flame.
   | 'lastkeep'
+  // Dawnhold Castle: the Evergarden garden palace. The lastkeep grammar but
+  // BRIGHTER and greener-warm (daylight through a garden palace, no cold
+  // undercroft anywhere), furnished by the dawnhold dressing pass with
+  // planters and flowers.
+  | 'dawnhold'
   | 'nythraxis'
   // Collapsed Reliquary delve sub-themes (share the ember crypt-stone base, see
   // isDelveVariant; differ only in wall-side props, clutter, and the dais).
@@ -158,6 +165,9 @@ const TORCH_COLORS: Record<Variant, TorchColors> = {
   // and paler than the arena's hard ember (its undercroft alone burns the
   // crypt's cold blue, split per story in the authored build path).
   lastkeep: { flame: 0xffc27a, emissive: 0xcc6a1e, light: 0xffa14e },
+  // Dawnhold Castle is a garden palace in DAYLIGHT: paler, golder candle
+  // flames than the keep's torchlit halls, closer to sun through blossom.
+  dawnhold: { flame: 0xffd98f, emissive: 0xd08428, light: 0xffc061 },
   nythraxis: { flame: 0x8f5cff, emissive: 0x4b1c9a, light: 0x7b4dff },
   // delve reliquaries burn with grave-ember red: warm coals over cold stone
   delve_ossuary: { flame: 0xff7a3c, emissive: 0xcc3a14, light: 0xff6a3c },
@@ -201,6 +211,13 @@ const DROWNED_FLOOR_TINT = 0x93a2b4;
 // rift style uses, so no other interior is touched.
 const KEEP_WALL_TINT = 0xe4d6bd;
 const KEEP_FLOOR_TINT = 0xdccdb2;
+
+// Dawnhold Castle grades the same crypt-stone pack BRIGHTER and greener-warm
+// than the Last Keep: cream sandstone walls and pale honey-sage flags, so the
+// garden palace reads sunlit even before its warm light rig lands. Same
+// tintedMaterial path; no other interior is touched.
+const DAWNHOLD_WALL_TINT = 0xf0e7ca;
+const DAWNHOLD_FLOOR_TINT = 0xe2ddb8;
 
 // The Drowned Temple is flooded — a translucent, self-animating water sheet
 // (driven by the shared uTime so it needs no per-frame plumbing) with cheap
@@ -792,7 +809,11 @@ export class DungeonInteriors {
                   // rooms/doors/decor route the build through the authored path
                   // below, exactly like the citadel's set-piece floors.
                   LASTKEEP_LAYOUT
-                : CRYPT_LAYOUT);
+                : interior === 'dawnhold'
+                  ? // Dawnhold Castle: the Evergarden garden palace, same
+                    // authored room-graph path at a smaller, warmer scale.
+                    DAWNHOLD_LAYOUT
+                  : CRYPT_LAYOUT);
     const variant = opts?.style?.kit ?? opts?.variant ?? this.variantFor(interior, ox, oz);
     const torch = opts?.style?.torch ?? TORCH_COLORS[variant];
     const daisRaised = opts?.style?.daisRaised;
@@ -811,6 +832,7 @@ export class DungeonInteriors {
       this.placeAuthoredFloor(p, layout, variant);
       this.placeAuthoredWalls(p, layout, variant);
       this.placeAuthoredRelief(group, layout);
+      this.placeAuthoredLedges(group, layout);
       const liftAt = (x: number, z: number): number =>
         authoredLiftAt(layout.rooms ?? [], layout.doors ?? [], x, z);
       const light = (x: number, z: number, color: number, y?: number, scale?: number): void =>
@@ -839,6 +861,13 @@ export class DungeonInteriors {
         // banners, and mounted torches instanced along the authored room walls.
         await ensureLastKeepDressing();
         buildLastKeepDressing(group, light, this.lowGfx);
+      } else if (variant === 'dawnhold') {
+        // Dawnhold Castle has NO cold story: every room burns the same warm
+        // garden-gold flame, and the dressing pass fills it with kcas
+        // furniture, planters, and flowers.
+        buildInfernalDecor(group, layout.decor ?? [], torch, light, liftAt);
+        await ensureDawnholdDressing();
+        buildDawnholdDressing(group, light, this.lowGfx);
       } else {
         buildInfernalDecor(group, layout.decor ?? [], torch, light, liftAt);
       }
@@ -853,8 +882,20 @@ export class DungeonInteriors {
       // reads as grey crypt otherwise). Scoped to this path: the procedural rift
       // floors keep the look they shipped with; the keep grades its stone warm.
       this.emit(group, p, variant, {
-        wall: opts?.style?.wallTint ?? (variant === 'lastkeep' ? KEEP_WALL_TINT : undefined),
-        floor: opts?.style?.floorTint ?? (variant === 'lastkeep' ? KEEP_FLOOR_TINT : undefined),
+        wall:
+          opts?.style?.wallTint ??
+          (variant === 'lastkeep'
+            ? KEEP_WALL_TINT
+            : variant === 'dawnhold'
+              ? DAWNHOLD_WALL_TINT
+              : undefined),
+        floor:
+          opts?.style?.floorTint ??
+          (variant === 'lastkeep'
+            ? KEEP_FLOOR_TINT
+            : variant === 'dawnhold'
+              ? DAWNHOLD_FLOOR_TINT
+              : undefined),
       });
       group.position.set(ox, 0, oz);
       group.userData.renderCategory = 'dungeon';
@@ -1139,6 +1180,36 @@ export class DungeonInteriors {
    * door that joins rooms of different lift. Box tops follow the same linear
    * ramp authoredLiftAt gives the sim, so what you climb is what the sim
    * stands you on (the sub-step mismatch is the platform stairs' own). */
+  /**
+   * The parkour shelves. A ledge is a real standable collider in the sim, so
+   * it MUST be drawn: an invisible surface a player vaults onto is worse
+   * than no surface at all. Each is a plain stone slab whose TOP sits
+   * exactly on the collider's moveTopY, so what the eye reads and what the
+   * body stands on are the same plane.
+   */
+  private placeAuthoredLedges(group: THREE.Group, layout: DungeonLayout): void {
+    const ledges = layout.ledges ?? [];
+    if (ledges.length === 0) return;
+    const rooms = layout.rooms ?? [];
+    const doors = layout.doors ?? [];
+    const mat = new THREE.MeshLambertMaterial({ color: 0x6a6270, emissive: 0x0c0a10 });
+    const THICK = 0.5;
+    for (const l of ledges) {
+      const top = authoredLiftAt(rooms, doors, l.x, l.z) + l.top;
+      const slab = new THREE.Mesh(new THREE.BoxGeometry(l.hw * 2, THICK, l.hd * 2), mat);
+      slab.position.set(l.x, top - THICK / 2, l.z);
+      slab.castShadow = true;
+      slab.receiveShadow = true;
+      group.add(slab);
+      // the bracket under it, so the shelf reads as corbelled off the wall
+      // rather than floating in the room
+      const post = new THREE.Mesh(new THREE.BoxGeometry(l.hw * 0.7, top - THICK, l.hd * 0.7), mat);
+      post.position.set(l.x, (top - THICK) / 2, l.z);
+      post.receiveShadow = true;
+      group.add(post);
+    }
+  }
+
   private placeAuthoredRelief(group: THREE.Group, layout: DungeonLayout): void {
     const rooms = layout.rooms ?? [];
     const doors = layout.doors ?? [];
@@ -1322,6 +1393,8 @@ export class DungeonInteriors {
     // kcas furniture). Explicit so the overflow band's origin x can never
     // accidentally trip the bastion-band check below.
     if (interior === 'lastkeep') return 'lastkeep';
+    // Dawnhold Castle, same reasoning in the overflow band.
+    if (interior === 'dawnhold') return 'dawnhold';
     const bastionX = instanceOrigin(1, 0).x;
     if (Math.abs(ox - bastionX) < 250) return 'bastion';
     return 'crypt';
@@ -1577,6 +1650,19 @@ export class DungeonInteriors {
         t,
       );
     }
+    if (variant === 'dawnhold') {
+      // the garden palace floor: whole pale flags, even fewer breaks than the
+      // keep and a richer decorated share (sun-catching insets), no dirt, no
+      // weeds, no grates anywhere
+      return pickKind(
+        [
+          ['floor_tile_large', 70],
+          ['floor_tile_large_rocks', 2],
+          ['quad', 28],
+        ],
+        t,
+      );
+    }
     if (isDelveVariant(variant)) {
       // collapsed reliquary: grave-dust over cracked flags, more dirt and rubble
       return pickKind(
@@ -1654,6 +1740,21 @@ export class DungeonInteriors {
           ['floor_tile_small_decorated', 12],
           ['floor_tile_small_broken_A', 9],
           ['floor_tile_small_broken_B', 9],
+        ],
+        t,
+      );
+    }
+    if (variant === 'dawnhold') {
+      // garden-palace flags: swept whole slabs with soft weed tufts breaking
+      // through between them (green growing INTO the palace is the identity;
+      // the decorated votive tile stays a rare accent, same vigil rule)
+      return pickKind(
+        [
+          ['floor_tile_small', 62],
+          ['floor_tile_small_weeds_A', 13],
+          ['floor_tile_small_weeds_B', 13],
+          ['floor_tile_small_decorated', 8],
+          ['floor_tile_small_broken_A', 4],
         ],
         t,
       );
@@ -1770,7 +1871,9 @@ export class DungeonInteriors {
     const rooms = layout.rooms ?? [];
     const doors = layout.doors ?? [];
     const bannerEvery = variant === 'crypt' ? 4 : 3;
-    const isKeep = variant === 'lastkeep';
+    // Both walk-in castles suppress the kit's crypt hangings (their dressing
+    // passes hang the kcas banners) and stack a second wall storey below.
+    const isKeep = variant === 'lastkeep' || variant === 'dawnhold';
     const openAt = (x: number, z: number): boolean =>
       rooms.some((r) => x > r.x0 && x < r.x1 && z > r.z0 && z < r.z1);
     // Highest lift among the rooms a wall segment borders: says which story the
@@ -1797,7 +1900,10 @@ export class DungeonInteriors {
       const cells = fitAuthoredWallSegment(seg.a, seg.b, 8);
       // Face the wall detail into an adjacent room (either one, when it is shared).
       const ry = segRy(seg);
-      const segVariant: Variant = isKeep && segMaxLift(seg) < 1.6 ? 'crypt' : variant;
+      // Only the Last Keep has a dungeon-flavored undercroft to re-key to the
+      // crypt mix; Dawnhold's ground floor stays warm palace stone.
+      const segVariant: Variant =
+        variant === 'lastkeep' && segMaxLift(seg) < 1.6 ? 'crypt' : variant;
       for (const cell of cells) {
         const t = cell.center;
         const x = seg.axis === 'x' ? t : seg.fixed;
@@ -1815,11 +1921,12 @@ export class DungeonInteriors {
       }
     }
     if (!isKeep) return;
-    // ---- The Last Keep's SECOND wall storey ----
-    // One 8u module row is only wall-top 8, which the residence floor (lift 6)
-    // and tower would poke straight through. Stack a second row at y=8 so the
-    // state floor soars (13u of wall over its 3.0 floor) and the residence
-    // keeps 10u. The row is cut by the SAME door openings as the base row:
+    // ---- The walk-in castles' SECOND wall storey ----
+    // One 8u module row is only wall-top 8, which the keep's residence floor
+    // (lift 6) and tower would poke straight through. Stack a second row at
+    // y=8 so the state floor soars (13u of wall over its 3.0 floor) and the
+    // residence keeps 10u; Dawnhold's solar story (lift 3.0) gets the same
+    // tall, airy read. The row is cut by the SAME door openings as the base row:
     // capping a low doorway looks like a lintel but puts the chase camera
     // inside the solid cap whenever it trails the player through a door (the
     // cap carries no collider, so the boom happily enters it and the frame
@@ -1829,7 +1936,7 @@ export class DungeonInteriors {
     for (const seg of authoredWallSegments(rooms, doors)) {
       const maxLift = segMaxLift(seg);
       const ry = segRy(seg);
-      const upperVariant: Variant = maxLift < 1.6 ? 'crypt' : 'lastkeep';
+      const upperVariant: Variant = variant === 'lastkeep' && maxLift < 1.6 ? 'crypt' : variant;
       const sy = maxLift >= 8 ? 0.75 : MODULE_SCALE; // lookout parapet: 3u, not 8u
       for (const cell of fitAuthoredWallSegment(seg.a, seg.b, 8)) {
         const t = cell.center;
@@ -1891,6 +1998,20 @@ export class DungeonInteriors {
           ['wall_pillar', 24],
           ['wall_arched', 13],
           ['wall_archedwindow_gated', 7],
+        ],
+        t,
+      );
+    }
+    if (variant === 'dawnhold') {
+      // the garden palace: clean masonry thrown OPEN to the light: nearly a
+      // third of every run is arched bays and windows so the halls read
+      // daylit, and no cracked stone anywhere
+      return pickKind(
+        [
+          ['wall', 42],
+          ['wall_pillar', 26],
+          ['wall_arched', 20],
+          ['wall_archedwindow_gated', 12],
         ],
         t,
       );

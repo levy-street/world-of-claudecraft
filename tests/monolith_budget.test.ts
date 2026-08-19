@@ -46,14 +46,15 @@ const MONOLITHS: MonolithRow[] = [
     // Upstream meanwhile extracted the ability description prose (the
     // placeholder values, the over-time string and the talent-conditional
     // field choice) into src/ui/ability_description.ts and re-pinned its own
-    // row at the exact count twice (19420 -> 19432 -> 19433, a zero-slack
-    // maintainer decision for the desktop-client-update packet).
-    // Re-pinned for the merge of release/v0.39.0 into this branch: both
-    // parents' extractions (entity_display_core here, ability_description
-    // upstream) land together, so the merged file shrinks below both prior
-    // pins. Exact merged count per this row's zero-slack rule: any further
-    // growth reds again.
-    ceiling: 19388,
+    // row at the exact count through the desktop-client-update, castle, and
+    // moved-base v0.39 wrapper merges (ending at its own zero-slack 19387).
+    // Re-pinned for the merge of release/v0.40.0 into this branch: both
+    // parents' deletions land together (the release's extractions plus the
+    // branch SUNDER_ARMOR_PCT_PER_STACK import the release's extraction
+    // orphaned), so the merged file shrinks below both prior pins. Exact
+    // merged count per this row's zero-slack rule: any further growth reds
+    // again.
+    ceiling: 19337,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -74,7 +75,46 @@ const MONOLITHS: MonolithRow[] = [
     // (zone_prewarm_templates_core.ts, the buildFormVisual fold), and the merged
     // file lands between the two pins, so the ceiling is the exact merged count
     // per the ratchet's rule: any further growth reds again.
-    ceiling: 13754,
+    // Lowered again after extracting the delve interior build-cache scheduling
+    // (the position-keyed rebuild/retire decision plus the async build loop)
+    // into src/render/delve_interior_tracker.ts.
+    // Extracted the shadow-depth material factory into
+    // src/render/prewarm_depth_material.ts so the self-spirit prewarm could add
+    // Renderer.warmSelfSpirit + the per-frame observe without growing the file.
+    // Merging the delve tracker and prewarm work plus the release-owned
+    // weapon-skin identity repair leaves renderer.ts at the exact count below;
+    // any further growth reds again.
+    // Raised +38 for the vfx.mount-programs manifest entry (#2571: mounts had
+    // ZERO prewarm coverage, so the first sighting of any mount could freeze a
+    // live frame, worse on hardware without KHR_parallel_shader_compile where
+    // the runtime fallback gate is a no-op). The rig-building logic itself was
+    // extracted to src/render/mount_prewarm.ts; this was the coordinator's
+    // unavoidable thin-wiring cost (the manifest entry, its group bookkeeping,
+    // and cleanup/hide registration).
+    // Raised a further +34 (13792 -> 13826) in review response: the group-
+    // staging/scene-bookkeeping logic that first cut left inline here (and
+    // that inline copy is what hid the bug, an `Object3D.add` reparent that
+    // silently detached every staged rig from its group) moved into
+    // mount_prewarm.ts's stageMountPrewarmVisual too, but run() also grew
+    // real synchronous-desktop-path work plus an honest progress() (the
+    // entry's run() was previously a no-op that still reported 'completed'),
+    // and resumeUnits now links the shadow-depth program half it was missing.
+    // What remains is the manifest entry itself, the shared
+    // mountPrewarmGroup/mountPrewarmWarmed variables, and cleanup/hide
+    // registration: exactly the seam this ratchet exists to bound, not grow
+    // unchecked.
+    // Merging PR #3447 onto the corrected PR #3446 v0.39 wrapper leaves the
+    // renderer below this bound; any further growth reds again.
+    // Lowered again by the castle branch's interior_light_rig.ts extraction;
+    // after merging main the merged file lands below both prior pins, so the
+    // ceiling is the exact merged count.
+    // Merging approved PRs #3425 and #3447 into the moved-base v0.39 wrapper
+    // keeps the delve tracker and mount prewarm extractions while preserving
+    // the wrapper's later renderer wiring, so the ceiling is the exact
+    // resolved count.
+    // PR #3468 changes the shadow-depth prewarm material contract, but this
+    // wrapper's combined renderer remains at the same resolved count.
+    ceiling: 13744,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -114,7 +154,7 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/render/foliage.ts',
-    ceiling: 4150,
+    ceiling: 4147,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

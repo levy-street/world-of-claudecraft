@@ -109,6 +109,8 @@ function idleWorld(): ActionBarWorldInput {
       cooldowns: new Map(),
       gcdRemaining: 0,
       potionCdRemaining: 0,
+      resourceType: 'mana' as const,
+      savedMana: 0,
       queuedOnSwing: null,
       auras: [],
       pos: { x: 0, y: 0, z: 0 },
@@ -285,6 +287,7 @@ describe('MobileActionRingPainter: cooldown/empty rendering parity with the desk
       args: [els[1].label, 'background-image', 'URL(ability:fireball)'],
     });
     expect(calls).toContainEqual({ m: 'toggleClass', args: [els[1].btn, 'empty', false] });
+    expect(calls).toContainEqual({ m: 'toggleClass', args: [els[1].btn, 'ability', true] });
     expect(calls).toContainEqual({ m: 'toggleClass', args: [els[0].btn, 'empty', false] });
   });
 });

@@ -81,7 +81,7 @@ describe('char_window: profession art placements', () => {
     expect(painter).toContain('alt=""');
   });
 
-  it('paints the exact four gathering assets and replaces the inline pair crest', () => {
+  it('paints the exact gathering, Honor, and archetype identities', () => {
     let canvasContext: unknown;
     canvasContext = new Proxy(
       {},
@@ -99,7 +99,7 @@ describe('char_window: profession art placements', () => {
       cfg: { playerClass: 'warrior' },
       player: { name: 'Aurelia', level: 60, skin: 0 },
       equipment: {},
-      honor: 0,
+      honor: 187,
       archetypeTitle: 'weaponcrafting+armorcrafting' as string | null,
       hobbyCraft: 'jewelcrafting',
       selectedMount: () => null,
@@ -150,6 +150,23 @@ describe('char_window: profession art placements', () => {
     });
 
     win.render();
+    const honorBalance = root.querySelector<HTMLElement>('.char-honor-balance');
+    expect(honorBalance?.textContent).toContain('187');
+    expect(
+      [...(honorBalance?.querySelectorAll<HTMLImageElement>('img') ?? [])].map((img) => ({
+        className: img.className,
+        src: img.getAttribute('src'),
+        alt: img.getAttribute('alt'),
+        draggable: img.getAttribute('draggable'),
+      })),
+    ).toEqual([
+      {
+        className: 'currency-inline currency-honor',
+        src: '/ui/currency/honor.webp',
+        alt: '',
+        draggable: 'false',
+      },
+    ]);
     expect(
       [...root.querySelectorAll<HTMLImageElement>('.char-gather-icon')].map((img) =>
         img.getAttribute('src'),

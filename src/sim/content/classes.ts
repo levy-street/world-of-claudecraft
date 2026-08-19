@@ -2609,7 +2609,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetsDead: true,
     effects: [{ type: 'resurrectAlly', hpFrac: 0.35 }],
     description:
-      "Rewinds a fallen ally's timeline, returning them to life at their body with a portion of their health and mana, even in the thick of combat. (Chronomancy)",
+      "Rewinds a fallen ally's timeline, returning them to life at your side with 35% of their health and mana, even in the thick of combat. (Chronomancy)",
   },
   // ---- Chronomancy out-of-combat mass resurrection. The base seven-second cast
   // and mana cost are provisional playtest values. It has no target and rewinds all
@@ -2634,7 +2634,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     projectile: false,
     effects: [{ type: 'massResurrectGroup', hpFrac: 0.3 }],
     description:
-      'Rewinds every fallen member of your group or raid, returning them to life at their body with 30% health and mana. Cannot be cast in combat. (Chronomancy)',
+      'Rewinds every fallen member of your group or raid within 40 yards and in your line of sight, returning them to life at your side with 30% health and mana. Cannot be cast in combat. (Chronomancy)',
   },
   // ---- Chronomancy (healer) "Correct" pillar: Rewind (Rebobinar), the raid
   // cooldown. docs/prd/mage-chronomancy.md. Instant, no target, self-centered 40 yd
@@ -4718,7 +4718,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     projectile: false,
     effects: [{ type: 'massResurrectGroup', hpFrac: 0.3 }],
     description:
-      'Call every fallen member of your group or raid back to life at their body with 30% health and mana. Cannot be cast in combat. (Spiritcall)',
+      'Call every fallen member of your group or raid within 40 yards and in your line of sight back to your side with 30% health and mana. Cannot be cast in combat. (Spiritcall)',
   },
   healing_wave: {
     id: 'healing_wave',
@@ -5051,7 +5051,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Pierces the enemy for $d Shadow damage and generates 7 Condemnation if it bears your Evil Eye. Each hit on your primary Evil Eye adds a Fate Thread for 12 sec, up to 3. If no Evil Eye exists, the Needle first marks its target.',
+      'Pierces the enemy for $d Shadow damage and generates 7 Condemnation on impact if it still bears your Evil Eye. Completing a cast moves your primary Evil Eye to the target and adds a Fate Thread for 12 sec, up to 3. Fate Threads stay with you when the Eye moves or its target dies. Targeting a secondary Coven Eye swaps it with the primary Eye.',
   },
   sentence: {
     id: 'sentence',
@@ -5270,7 +5270,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 80, duration: 1800 }],
       },
     ],
-    description: 'Demonic skin increases your armor by $b for 30 min.',
+    description:
+      'Demonic skin increases your armor by $b for 30 min. Pact Deepened can double this armor and reduce magic damage taken while Fiendhide is active.',
   },
   immolate: {
     id: 'immolate',
@@ -5561,9 +5562,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'shadow',
     requiresTarget: true,
     fearDr: true,
-    effects: [{ type: 'incapacitate', duration: 8 }],
+    effects: [{ type: 'incapacitate', duration: 5 }],
     description:
-      'Strikes terror into the enemy, leaving it cowering for up to 8 sec. Any damage breaks the effect.',
+      "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect.",
   },
   searing_pain: {
     id: 'searing_pain',
@@ -5853,7 +5854,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     targetMode: 'position',
     effects: [{ type: 'aoeDamage', min: 48, max: 60, radius: 8, canCrit: true }],
     description:
-      'Sacrifices a Bone Mage first, then a Skeletal Warrior, and a Gravewing only as a last resort. Among duplicates it chooses the one with the least remaining duration, then the weakest, to deal $d Shadow damage at the chosen location.',
+      'Sacrifices a Skeletal Warrior first, then a Bone Mage, and a Gravewing only as a last resort. Among duplicates it chooses the one with the least remaining duration, then the weakest, to deal $d Shadow damage at the chosen location.',
   },
   funeral_harvest: {
     id: 'funeral_harvest',
@@ -5888,14 +5889,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [
       {
         type: 'necromancyOssuaryMark',
-        duration: 12,
+        duration: 15,
         storedDamagePct: 0.2,
         soulLanceBonusPct: 0.5,
         deathRadius: 6,
       },
     ],
     description:
-      'Marks an enemy for 12 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment.',
+      'Marks an enemy for 15 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment.',
   },
   unholy_command: {
     id: 'unholy_command',
@@ -5930,7 +5931,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     projectile: false,
     effects: [{ type: 'reapingCommand' }],
     description:
-      'Spends 2 Soul Fragments to command every undead servant to strike in unison. Graveguards taunt and brace, Warriors pin, Bone Mages expose magic defenses, and Gravewing rends all enemies hit.',
+      "Spends 2 Soul Fragments to command every undead servant to strike in unison. Graveguards taunt and brace, Warriors pin, Bone Mages expose magic defenses, and Gravewing rends all enemies hit. Reaping Command ignores and does not reset each servant's own ability cooldown.",
   },
   sacrifice_undead: {
     id: 'sacrifice_undead',
@@ -6407,8 +6408,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     requiresForm: 'cat',
     requiresOutOfCombat: true,
-    effects: [{ type: 'selfBuff', kind: 'stealth', value: 0.5, duration: 3600 }],
-    description: 'Enter stealth while in Wolf Form, moving 50% slower. Cannot be used in combat.',
+    // 0.95: stealth at near-full speed is the feral scouting identity; the
+    // rogue Duskveil family deliberately keeps its slower 0.5 crawl.
+    effects: [{ type: 'selfBuff', kind: 'stealth', value: 0.95, duration: 3600 }],
+    description: 'Enter stealth while in Wolf Form, moving 5% slower. Cannot be used in combat.',
   },
   rake: {
     id: 'rake',
@@ -6468,7 +6471,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'ferocious_bite',
     name: 'Gorebite',
     class: 'druid',
-    learnLevel: 14,
+    // Learned at 8 (was 14) so the combo points Rendclaw and Flense build from
+    // level 5 have a spender for every druid, not only ferals with Redharvest.
+    learnLevel: 8,
     cost: 35,
     castTime: 0,
     cooldown: 0,
@@ -6482,7 +6487,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description: 'Finishing move that causes $d. Wolf Form only.',
     specNotes: {
       feral:
-        'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: a bite for 70 plus 43 per combo point that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores 30 energy.',
+        'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest, which spends the Old Blood for a stronger strike that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores energy.',
     },
   },
   swipe: {
@@ -6696,7 +6701,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     id: 'pounce',
     name: 'Slinkstrike',
     class: 'druid',
-    learnLevel: 18,
+    // Learned at 8 (was 18) so Stalk has its payoff soon after it is learned
+    // instead of thirteen levels later.
+    learnLevel: 8,
     cost: 50,
     castTime: 0,
     cooldown: 0,
@@ -6730,15 +6737,23 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Wolfsblood',
     class: 'druid',
     learnLevel: 20,
-    cost: 30,
+    // Free with a 30 energy surge: the classic-era fix for a cooldown top
+    // parses never pressed. As a 30 energy spend the buff returned less than
+    // the same energy pushed through the Flense/Redharvest cycle, so it was a
+    // DPS loss whenever it displaced cycle energy; as a surge it is feral's
+    // burst-window button and rewards timing a Flense inside the AP window.
+    cost: 0,
     castTime: 0,
     cooldown: 30, // balance pass: was 0 (spammable permanent +40 AP)
     range: 0,
     school: 'physical',
     requiresTarget: false,
     requiresForm: 'cat',
-    effects: [{ type: 'selfBuff', kind: 'buff_ap', value: 40, duration: 6 }],
-    description: 'Increases attack power by $b for $t sec. Wolf Form only.',
+    effects: [
+      { type: 'selfBuff', kind: 'buff_ap', value: 40, duration: 6 },
+      { type: 'gainResource', amount: 30 },
+    ],
+    description: 'Surges 30 energy and increases attack power by $b for $t sec. Wolf Form only.',
   },
   rip: {
     id: 'rip',
@@ -6998,7 +7013,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // the 1-20 band: cost and cooldown tuned down. The DURATION now diverges too
     // (owner 2026-08-07, 8 -> 4): classic's 8 sec left the melee class with a
     // longer fear than either caster whose identity is fear (Psychic Scream 4,
-    // Howl of Terror 3), and PVP_FEAR_DR_RESET (60s) is half this cooldown, so DR
+    // then-current Howl of Terror 3), and PVP_FEAR_DR_RESET (60s) is half this cooldown, so DR
     // never engages and every cast landed the full 8. 4 anchors on Psychic Scream
     // rather than on an invented number.
     effects: [{ type: 'aoeFear', duration: 4, radius: 8, maxTargets: 5 }],
@@ -7707,7 +7722,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Redharvest',
     class: 'druid',
     specs: ['feral'],
-    learnLevel: 10,
+    // The rank ladder starts at 5 where spec commitment does, but the
+    // finisher is REACHED through the transforming Gorebite button, which
+    // learns at 8: that is the first level the ladder is castable (combo
+    // points used to accrue unspendable until 14). Rank 3 restores the
+    // pre-rank live values, so level-20 balance and existing parses are
+    // untouched.
+    learnLevel: 5,
     cost: 35,
     castTime: 0,
     cooldown: 0,
@@ -7720,13 +7741,37 @@ export const ABILITIES: Record<string, AbilityDef> = {
     spendsCombo: true,
     comboOptional: true,
     effects: [
-      { type: 'finisherDamage', base: 70, perCombo: 43, variance: 10 },
+      { type: 'finisherDamage', base: 35, perCombo: 20, variance: 6 },
       { type: 'consumeDot', dot: 'rake' },
       { type: 'consumeDot', dot: 'rip' },
-      { type: 'gainResource', amount: 30 },
+      { type: 'gainResource', amount: 15 },
+    ],
+    ranks: [
+      {
+        rank: 2,
+        level: 10,
+        cost: 35,
+        effects: [
+          { type: 'finisherDamage', base: 52, perCombo: 32, variance: 8 },
+          { type: 'consumeDot', dot: 'rake' },
+          { type: 'consumeDot', dot: 'rip' },
+          { type: 'gainResource', amount: 22 },
+        ],
+      },
+      {
+        rank: 3,
+        level: 16,
+        cost: 35,
+        effects: [
+          { type: 'finisherDamage', base: 70, perCombo: 43, variance: 10 },
+          { type: 'consumeDot', dot: 'rake' },
+          { type: 'consumeDot', dot: 'rip' },
+          { type: 'gainResource', amount: 30 },
+        ],
+      },
     ],
     description:
-      'Spends your 3 Old Blood: strike for $d, instantly deal all the damage your Flense and Bloodrift would still have dealt, remove both bleeds, and restore 30 energy. Works with zero combo points.',
+      'Spends your 3 Old Blood: strike for $d, instantly deal all the damage your Flense and Bloodrift would still have dealt, remove both bleeds, and restore energy. Works with zero combo points.',
   },
   marrowbreak: {
     id: 'marrowbreak',

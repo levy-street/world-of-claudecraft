@@ -142,7 +142,8 @@ export class EvilEyeMarkers {
   }
 
   update(world: IWorld, views: ReadonlyMap<number, EvilEyeHostView>, reducedMotion = false): void {
-    const possessed = hasPossessedEvilEye(world.entities.get(world.playerId));
+    const owner = world.entities.get(world.playerId);
+    const possessed = hasPossessedEvilEye(owner);
     for (const [id, entry] of this.markers) {
       const entity = world.entities.get(id);
       const view = views.get(id);
@@ -200,7 +201,7 @@ export class EvilEyeMarkers {
       const scale = (kindScale * pulse) / hostScale;
       entry.sprite.scale.set(scale, scale, 1);
       const threadState =
-        entry.kind === 'primary' ? fateThreadMarkerState(entity, world.playerId) : null;
+        entry.kind === 'primary' && owner ? fateThreadMarkerState(owner, world.playerId) : null;
       const expiry =
         threadState === null
           ? 0

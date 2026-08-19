@@ -5,6 +5,8 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, PlayerClass } from '../src/sim/types';
+import { setLanguage } from '../src/ui/i18n';
+import { tTalent } from '../src/ui/talent_i18n';
 
 function rig(
   cls: PlayerClass,
@@ -121,11 +123,37 @@ describe('druid wave 2 choice rows', () => {
 
 describe('warlock wave 2 choice rows', () => {
   it('names Grand Malediction targets and describes class talents without internal shared jargon', () => {
+    const improvedAbyssalGag = WARLOCK_CHOICE_ROWS.rows
+      .find((row) => row.level === 8)
+      ?.options.find((option) => option.id === 'wlk_r8_voidfeast');
+    expect(improvedAbyssalGag).toMatchObject({
+      name: 'Improved Abyssal Gag',
+      description:
+        'Improves Abyssal Gag and grants it two levels early. It interrupts the enemy and silences all of its spells for 4 sec.',
+    });
+    const leadenHex = WARLOCK_CHOICE_ROWS.rows
+      .find((row) => row.level === 8)
+      ?.options.find((option) => option.id === 'wlk_r8_curse_of_exhaustion');
+    expect(leadenHex).toMatchObject({
+      effect: { tuning: { rootDuration: 3.5 } },
+      description:
+        'Damaging spells apply a 5% slow for 5 sec, stacking 3 times. At 3 stacks, the next spell roots for 3.5 sec and consumes them. A target can be rooted once every 15 sec.',
+    });
+    if (!improvedAbyssalGag) throw new Error('Missing Improved Abyssal Gag talent');
+    setLanguage('zh_CN');
+    try {
+      expect(tTalent({ kind: 'talentChoice', choice: improvedAbyssalGag, field: 'name' })).toBe(
+        '强化深渊禁言',
+      );
+    } finally {
+      setLanguage('en');
+    }
+
     const dreadChorus = WARLOCK_CHOICE_ROWS.rows
       .find((row) => row.level === 8)
       ?.options.find((option) => option.id === 'wlk_r8_howl_of_terror');
     expect(dreadChorus?.description).toBe(
-      'Grants Dread Chorus: frighten enemies within 8 yards for up to 3 sec. Damage may break the effect. 40 sec cooldown.',
+      "Grants Dread Chorus: frighten enemies within 8 yards for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. 40 sec cooldown.",
     );
     const shadowCredit = WARLOCK_CHOICE_ROWS.rows
       .find((row) => row.level === 14)
@@ -180,7 +208,7 @@ describe('warlock wave 2 choice rows', () => {
 
     const { sim } = rig('warlock', 20, { 20: 'wlk_r20_curse_mastery' });
     expect(sim.resolvedAbility('abyssal_rift')).toMatchObject({
-      cooldown: 90,
+      cooldown: 45,
       effects: [
         expect.objectContaining({
           type: 'aoeDamage',

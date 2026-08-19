@@ -357,6 +357,7 @@ describe('batched canvas nameplate state', () => {
     });
     const object = entity({ id: 3, kind: 'object', templateId: 'delve_locked_chest' });
     const boss = entity({ id: 4, kind: 'mob', templateId: 'gorrak', hostile: true });
+    const elite = entity({ id: 6, kind: 'mob', templateId: 'mogger', hostile: true });
     const corpse = entity({
       id: 5,
       kind: 'mob',
@@ -365,7 +366,7 @@ describe('batched canvas nameplate state', () => {
       dead: true,
       lootable: true,
     });
-    const { painter } = harness([questNpc, object, boss, corpse]);
+    const { painter } = harness([questNpc, object, boss, elite, corpse]);
 
     painter.update(true);
 
@@ -373,9 +374,15 @@ describe('batched canvas nameplate state', () => {
     expect(stateOf(painter, object.id)).toMatchObject({ nameColor: '#c084ff', badges: [] });
     expect(stateOf(painter, object.id).name).not.toBe('');
     expect(stateOf(painter, boss.id)).toMatchObject({ frame: 'boss', hpVisible: true });
+    expect(stateOf(painter, elite.id)).toMatchObject({
+      frame: 'elite',
+      marker: '◆',
+      markerTone: 'none',
+      hpVisible: true,
+    });
     expect(stateOf(painter, corpse.id)).toMatchObject({
       frame: '',
-      marker: '$',
+      marker: 'loot',
       markerTone: 'loot',
       hpVisible: false,
     });

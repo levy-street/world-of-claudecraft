@@ -26,6 +26,7 @@ import {
   tutorialNeedsRerender,
   tutorialSlayHintPlan,
 } from './tutorial_copy';
+import { svgIcon } from './ui_icons';
 
 // Starter content the onboarding guides the player toward — all derived from the
 // shipped sim sources so a content rename or a moved spawn can't silently desync
@@ -267,7 +268,7 @@ export class TutorialOverlay {
     const arrow = document.createElement('div');
     arrow.className = 'tut-arrow';
     arrow.setAttribute('aria-hidden', 'true');
-    arrow.textContent = '➤'; // ➤
+    arrow.innerHTML = svgIcon('next');
     ui.appendChild(arrow);
     this.arrow = arrow;
   }

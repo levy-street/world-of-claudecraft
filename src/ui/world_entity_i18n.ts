@@ -40,6 +40,10 @@ const MOB_IDS = [
   'gravecaller_mender',
   'deacon_voss',
   'training_dummy',
+  // The rest of the Highwatch practice row (sim/content/practice_dummies.ts).
+  'friendly_player_dummy',
+  'normal_boss_dummy',
+  'heroic_boss_dummy',
   'ridge_stalker',
   'deeprock_kobold',
   'thornpeak_ogre',
@@ -563,6 +567,7 @@ const DUNGEON_IDS = [
   'nythraxis_boss_arena',
   'wildheart_basin',
   'the_last_keep',
+  'dawnhold_castle',
 ] as const;
 const DELVE_IDS = ['collapsed_reliquary', 'drowned_litany'] as const;
 // Ravenpost authored letters (src/sim/content/letters.ts): the welcome letter

@@ -1,0 +1,1944 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "release-v039-icon-art-second-pass-mob-auras-2026-08-16",
+    "acceptedDate": "2026-08-16",
+    "baseRelease": "release/v0.39.0",
+    "baseCommit": "d2d1a8ad5c11",
+    "rasterGenerator": "OpenAI built-in image generation",
+    "owner": "World of ClaudeCraft",
+    "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
+  },
+  "scope": {
+    "paintedMobAuraFamilies": 44,
+    "exactRuntimeAuraIds": 89,
+    "liveCarrierRows": 108,
+    "runtimeMapping": "tmp/imagegen/v039-second-pass/mob-aura-families/runtime_mapping.json",
+    "executableCensus": "tmp/imagegen/v039-second-pass/mob-aura-families/census.ts"
+  },
+  "generationContract": {
+    "oneAcceptedSourcePerFamily": true,
+    "acceptedSources": 44,
+    "sourceRetention": "Accepted 1254px masters remain under tmp/imagegen/v039-second-pass/mob-aura-families in this worktree.",
+    "processing": "lossy WebP via cwebp -q 80 -m 6 -sharp_yuv -resize 128 128",
+    "review": "Every source and shipping icon was reviewed at 128px, 48px, 32px, 16px, and in grayscale."
+  },
+  "assets": [
+    {
+      "auraId": "mob_aoe_slow",
+      "trait": "aoeSlow",
+      "mechanic": "A boss periodically pulses a shared fixed movement-slow aura onto every player within its radius, including while chasing.",
+      "kind": "slow",
+      "polarity": "harmful_area_movement_control_on_players",
+      "producer": {
+        "path": "src/sim/mob/locomotion.ts",
+        "symbol": "pulseAntiKiteSnare",
+        "runtime_id_formula": "aoe_slow"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["aoe_slow"],
+      "carrierCount": 6,
+      "intendedVisualSubject": "several dark armored boots caught inside one broad inward-collapsing spectral pressure ring, their outward motion trails cut short. Use a neutral hostile palette blending muted teal, violet, and iron gray so the identity works for gale, silk, temporal, static, undertow, and earth-themed carriers. It must read as an area movement slow, not frostbite, a root, or a single-target chill.",
+      "references": [
+        {
+          "path": "public/ui/skills/shaman/earthbind.webp",
+          "role": "shared area-control readability, inward pressure, and non-school-specific hostile slow language"
+        },
+        {
+          "path": "public/ui/auras/thronebane_arc_slow.webp",
+          "role": "shared area-control readability, inward pressure, and non-school-specific hostile slow language"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show several dark armored boots caught inside one broad inward-collapsing spectral pressure ring, their outward motion trails cut short. Use a neutral hostile palette blending muted teal, violet, and iron gray so the identity works for gale, silk, temporal, static, undertow, and earth-themed carriers. It must read as an area movement slow, not frostbite, a root, or a single-target chill.",
+      "decision": "Accepted: multiple boots trapped in one neutral teal-violet inward pressure ring read as an area slow across all six elemental/thematic carriers.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_aoe_slow.png",
+      "sourceBytes": 2360902,
+      "sourceSha256": "77b6025529cba448d24894e18ff04bd854b53cd033ab9912614cac6127f61fe8",
+      "acceptedBytes": 4188,
+      "acceptedSha256": "67f191a9a84254f5f0e510eb515da1ea9d9b7f6d59eca4022251f19464ebaa36",
+      "output": "mob_aoe_slow.webp",
+      "runtimeUrl": "/ui/auras/mob_aoe_slow.webp"
+    },
+    {
+      "auraId": "mob_arcane_rot",
+      "trait": "arcaneRot",
+      "mechanic": "A landed hostile swing may brand the target with a refreshing arcane damage-over-time rune.",
+      "kind": "dot",
+      "polarity": "harmful_to_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "arcaneRot_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["arcaneRot_deacon_voss", "arcaneRot_rift_void_acolyte"],
+      "carrierCount": 2,
+      "intendedVisualSubject": "a cracked magenta-violet arcane sigil burned into stone-like skin, leaking luminous blue-purple energy and dissolving at the edges. It must read as magical corruption festering over time, not a beneficial intellect buff.",
+      "references": [
+        {
+          "path": "public/ui/skills/mage/frostbolt.webp",
+          "role": "frost/fire/arcane material rendering and high-contrast magical focal light"
+        },
+        {
+          "path": "public/ui/skills/mage/scorch.webp",
+          "role": "frost/fire/arcane material rendering and high-contrast magical focal light"
+        },
+        {
+          "path": "public/ui/skills/mage/arcane_power.webp",
+          "role": "frost/fire/arcane material rendering and high-contrast magical focal light"
+        },
+        {
+          "path": "public/ui/auras/brood_burn_hatchling_burn.webp",
+          "role": "frost/fire/arcane material rendering and high-contrast magical focal light"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a cracked magenta-violet arcane sigil burned into stone-like skin, leaking luminous blue-purple energy and dissolving at the edges. It must read as magical corruption festering over time, not a beneficial intellect buff.",
+      "decision": "Accepted: cracked magenta rune and afflicted torso read as harmful arcane decay.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_arcane_rot.png",
+      "sourceBytes": 2443910,
+      "sourceSha256": "d686afd03aedaab726cf5510ad8660fafbfbddf586bf58a20425b003060e4198",
+      "acceptedBytes": 5360,
+      "acceptedSha256": "d7ad2e8d57b42d812e7e308eb77e082aa6215cf95b5fa32f9d1b4b0429dc6268",
+      "output": "mob_arcane_rot.webp",
+      "runtimeUrl": "/ui/auras/mob_arcane_rot.webp"
+    },
+    {
+      "auraId": "mob_bleed",
+      "trait": "bleed",
+      "mechanic": "A landed hostile swing may open a refreshing physical bleeding wound.",
+      "kind": "dot",
+      "polarity": "harmful_to_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "bleed_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["bleed_ridge_stalker", "bleed_rift_thornback", "bleed_wildheart_ravager"],
+      "carrierCount": 3,
+      "intendedVisualSubject": "three deep diagonal claw gashes torn through dark leather and flesh, with a restrained vivid crimson flow and sharp steel-gray edges. Brutal physical wound, readable and tasteful, no gore pile.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/mortal_strike.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        },
+        {
+          "path": "public/ui/skills/rogue/expose_armor.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        },
+        {
+          "path": "public/ui/skills/warrior/thunder_clap.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        },
+        {
+          "path": "public/ui/auras/set_bonesplinter.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show three deep diagonal claw gashes torn through dark leather and flesh, with a restrained vivid crimson flow and sharp steel-gray edges. Brutal physical wound, readable and tasteful, no gore pile.",
+      "decision": "Accepted: restrained crimson claw gashes are a strong physical DoT silhouette.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_bleed.png",
+      "sourceBytes": 2518385,
+      "sourceSha256": "89f4d05e76efd3fee312c5774921aec76d0ee8c842594476a256355683b853fc",
+      "acceptedBytes": 3888,
+      "acceptedSha256": "04966ec23654ee732d5b5473f8153a8a5f9b59d551dc5ce17bb52ae053c5cd9f",
+      "output": "mob_bleed.webp",
+      "runtimeUrl": "/ui/auras/mob_bleed.webp"
+    },
+    {
+      "auraId": "mob_blind",
+      "trait": "blind",
+      "mechanic": "A landed hostile hit may add a miss chance to the victim's weapon attacks.",
+      "kind": "blind",
+      "polarity": "harmful_to_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "blind_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["blind_vale_bandit"],
+      "carrierCount": 1,
+      "intendedVisualSubject": "an armored eye struck by a burst of pale dust and torn black cloth, the pupil disappearing behind a harsh white flare. Hostile impaired aim and weapon misses; grounded dark-fantasy, not medical realism.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/blind.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        },
+        {
+          "path": "public/ui/skills/mage/polymorph.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        },
+        {
+          "path": "public/ui/skills/priest/silence.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        },
+        {
+          "path": "public/ui/skills/warrior/thunder_clap.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show an armored eye struck by a burst of pale dust and torn black cloth, the pupil disappearing behind a harsh white flare. Hostile impaired aim and weapon misses; grounded dark-fantasy, not medical realism.",
+      "decision": "Accepted: eye/visor overwhelmed by a white dust flare reads as impaired aim.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_blind.png",
+      "sourceBytes": 2382012,
+      "sourceSha256": "5a30c0ead5fc24250562d88a8fc90e336ab0da0252d99c59f96e8bee1f9cf431",
+      "acceptedBytes": 3162,
+      "acceptedSha256": "a3b387667bdb766f137a4a28ae4f6e81a4baacb35cf145d10e1cad245160f36c",
+      "output": "mob_blind.webp",
+      "runtimeUrl": "/ui/auras/mob_blind.webp"
+    },
+    {
+      "auraId": "mob_charge_stun",
+      "trait": "charge",
+      "mechanic": "A Heroic-stamped melee mob opens an anti-kite charge with an immediate fixed stun before dashing to the player.",
+      "kind": "stun",
+      "polarity": "harmful_heroic_anti_kite_control_on_player",
+      "producer": {
+        "path": "src/sim/mob/charge.ts",
+        "symbol": "tryStartMobCharge",
+        "runtime_id_formula": "mob_charge_stun"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["mob_charge_stun"],
+      "carrierCount": 9,
+      "intendedVisualSubject": "a neutral faceless armored charger driving one heavy shoulder and shield into a stunned helm, with a single white-gold impact star and long iron-red forward motion streaks. Communicate gap-closing charge plus immediate stun in one bold diagonal silhouette. No faction insignia, dungeon motif, mount, gore, or player-ability identity.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/charge.webp",
+          "role": "fast forward physical motion and immediate stun-impact readability without faction or dungeon specificity"
+        },
+        {
+          "path": "public/ui/auras/stomp_stun.webp",
+          "role": "fast forward physical motion and immediate stun-impact readability without faction or dungeon specificity"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a neutral faceless armored charger driving one heavy shoulder and shield into a stunned helm, with a single white-gold impact star and long iron-red forward motion streaks. Communicate gap-closing charge plus immediate stun in one bold diagonal silhouette. No faction insignia, dungeon motif, mount, gore, or player-ability identity.",
+      "decision": "Accepted: neutral armored shoulder-and-shield impact with long forward streaks reads as gap-closing charge plus immediate stun.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_charge_stun.png",
+      "sourceBytes": 2333976,
+      "sourceSha256": "44a7cdc952f8e91e5e68139d9362e074ca876358b5b5a216f6987bf285dfff6b",
+      "acceptedBytes": 4936,
+      "acceptedSha256": "499d1c4676e052936dba51bbbce239221bf851586e8ebabb5bc16fd820779ab5",
+      "output": "mob_charge_stun.webp",
+      "runtimeUrl": "/ui/auras/mob_charge_stun.webp"
+    },
+    {
+      "auraId": "mob_chill_on_hit",
+      "trait": "chillOnHit",
+      "mechanic": "A landed hit may slow the target's movement with frost.",
+      "kind": "slow",
+      "polarity": "harmful_movement_control_on_target",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "<templateId>_chill"
+      },
+      "additionalProducers": [],
+      "runtimeIds": [
+        "mirefen_widowling_chill",
+        "rift_frost_revenant_chill",
+        "stormcrag_elemental_chill"
+      ],
+      "carrierCount": 3,
+      "intendedVisualSubject": "a running boot abruptly encased at the heel by angular cyan ice, its blue motion trail snapping short. Clear frost movement slow, distinct from frostbite damage and attack-speed slowing.",
+      "references": [
+        {
+          "path": "public/ui/skills/mage/frostbolt.webp",
+          "role": "frost/fire/arcane material rendering and high-contrast magical focal light"
+        },
+        {
+          "path": "public/ui/skills/mage/scorch.webp",
+          "role": "frost/fire/arcane material rendering and high-contrast magical focal light"
+        },
+        {
+          "path": "public/ui/skills/mage/arcane_power.webp",
+          "role": "frost/fire/arcane material rendering and high-contrast magical focal light"
+        },
+        {
+          "path": "public/ui/auras/brood_burn_hatchling_burn.webp",
+          "role": "frost/fire/arcane material rendering and high-contrast magical focal light"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a running boot abruptly encased at the heel by angular cyan ice, its blue motion trail snapping short. Clear frost movement slow, distinct from frostbite damage and attack-speed slowing.",
+      "decision": "Accepted: boot frozen at the heel reads as movement slow, distinct from frostbite.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_chill_on_hit.png",
+      "sourceBytes": 2139040,
+      "sourceSha256": "716f665a40c143a60611749ca492fa70204d9a546e639885670337ced9ac26c9",
+      "acceptedBytes": 3974,
+      "acceptedSha256": "fa7ef4557e5dc30750d5e5c531054f0cbdb1a72f70e44b382047d5f432a133b1",
+      "output": "mob_chill_on_hit.webp",
+      "runtimeUrl": "/ui/auras/mob_chill_on_hit.webp"
+    },
+    {
+      "auraId": "mob_cinder",
+      "trait": "cinder",
+      "mechanic": "A landed hostile swing may apply a refreshing cinder fire damage-over-time effect.",
+      "kind": "dot",
+      "polarity": "harmful_to_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "cinder_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["cinder_ironvein_sapper", "cinder_rift_boss_ember", "cinder_rift_ember_fiend"],
+      "carrierCount": 3,
+      "intendedVisualSubject": "a razor-edged ember shard embedded in dark armor, shedding bright orange sparks and a compact lick of fire. More explosive and shard-like than smolder, but still clearly a persistent harmful burn.",
+      "references": [
+        {
+          "path": "public/ui/skills/mage/frostbolt.webp",
+          "role": "frost/fire/arcane material rendering and high-contrast magical focal light"
+        },
+        {
+          "path": "public/ui/skills/mage/scorch.webp",
+          "role": "frost/fire/arcane material rendering and high-contrast magical focal light"
+        },
+        {
+          "path": "public/ui/skills/mage/arcane_power.webp",
+          "role": "frost/fire/arcane material rendering and high-contrast magical focal light"
+        },
+        {
+          "path": "public/ui/auras/brood_burn_hatchling_burn.webp",
+          "role": "frost/fire/arcane material rendering and high-contrast magical focal light"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a razor-edged ember shard embedded in dark armor, shedding bright orange sparks and a compact lick of fire. More explosive and shard-like than smolder, but still clearly a persistent harmful burn.",
+      "decision": "Accepted: embedded orange shard in armor is distinct from the smolder seam.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_cinder.png",
+      "sourceBytes": 2070677,
+      "sourceSha256": "5933769f8415a1382cbe4b0af2644fa06761dfca8d2684b15954069d88ed9c4c",
+      "acceptedBytes": 4782,
+      "acceptedSha256": "2a4a52e32dcdbfbd93f590f5d5cf232357a83d1643194b2ebc54e4aa220faade",
+      "output": "mob_cinder.webp",
+      "runtimeUrl": "/ui/auras/mob_cinder.webp"
+    },
+    {
+      "auraId": "mob_concuss",
+      "trait": "concuss",
+      "mechanic": "A landed hostile hit may briefly stun the player with a concussive blow.",
+      "kind": "stun",
+      "polarity": "harmful_control_on_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "concuss_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": [
+        "concuss_brakka_wallbreaker",
+        "concuss_rift_boss_storm",
+        "concuss_rift_storm_caller",
+        "concuss_thornpeak_ogre"
+      ],
+      "carrierCount": 4,
+      "intendedVisualSubject": "a heavy stone maul impact exploding beside a dented helm, with a compact gold-white shock ring and scattered blue sparks. Immediate single-target concussion and stun; forceful but uncluttered.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/blind.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        },
+        {
+          "path": "public/ui/skills/mage/polymorph.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        },
+        {
+          "path": "public/ui/skills/priest/silence.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        },
+        {
+          "path": "public/ui/skills/warrior/thunder_clap.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a heavy stone maul impact exploding beside a dented helm, with a compact gold-white shock ring and scattered blue sparks. Immediate single-target concussion and stun; forceful but uncluttered.",
+      "decision": "Accepted: hammer-to-helm shock remains distinct from fist-based stun-on-hit.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_concuss.png",
+      "sourceBytes": 2356139,
+      "sourceSha256": "16a8c764688a55be94c3d583050cc22987a1897a00806d664b8a131edc8777f0",
+      "acceptedBytes": 4662,
+      "acceptedSha256": "4057ea2d4f26653df5f00e35446d22b8245f78070e2531b9fb3d2f8a6b04881a",
+      "output": "mob_concuss.webp",
+      "runtimeUrl": "/ui/auras/mob_concuss.webp"
+    },
+    {
+      "auraId": "mob_corrode",
+      "trait": "corrode",
+      "mechanic": "Repeated hostile hits stack a flat armor shred through corrosive damage.",
+      "kind": "corrode",
+      "polarity": "harmful_to_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes/applyCorrosion",
+        "runtime_id_formula": "corrode_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": [
+        "corrode_deepfen_murloc",
+        "corrode_reliquary_ledger_wraith",
+        "corrode_rift_deep_lurker"
+      ],
+      "carrierCount": 3,
+      "intendedVisualSubject": "an iron shield dissolving from the lower edge under acid-green venom, with three layered pitted corrosion marks. Communicate stacking flat armor destruction, toxic and hostile, distinct from the cracked-guard physical exposure icon.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/deadly_poison.webp",
+          "role": "venom, poison, decay, organic green-violet hostile palette"
+        },
+        {
+          "path": "public/ui/skills/hunter/serpent_sting.webp",
+          "role": "venom, poison, decay, organic green-violet hostile palette"
+        },
+        {
+          "path": "public/ui/skills/warlock/corruption.webp",
+          "role": "venom, poison, decay, organic green-violet hostile palette"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show an iron shield dissolving from the lower edge under acid-green venom, with three layered pitted corrosion marks. Communicate stacking flat armor destruction, toxic and hostile, distinct from the cracked-guard physical exposure icon.",
+      "decision": "Accepted: acid-pitted shield communicates stacking flat armor loss, distinct from expose.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_corrode.png",
+      "sourceBytes": 2449650,
+      "sourceSha256": "42851a2225dc00f2f3890636a2faaa7180bc752acfea157abe4cc30ccc17af76",
+      "acceptedBytes": 4892,
+      "acceptedSha256": "179373dc5908ffe0e0a1c017d3df4f6d1ce4c34da454a83012c556509a1fcc66",
+      "output": "mob_corrode.webp",
+      "runtimeUrl": "/ui/auras/mob_corrode.webp"
+    },
+    {
+      "auraId": "mob_cost_tax",
+      "trait": "costTax",
+      "mechanic": "A landed hostile hit may increase the resource costs of the victim's abilities.",
+      "kind": "cost_tax",
+      "polarity": "harmful_to_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "cost_tax_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["cost_tax_gravecaller_mender"],
+      "carrierCount": 1,
+      "intendedVisualSubject": "a bright mana gem being weighed down by a jagged black chain and a hungry violet claw, with energy draining away before use. Communicate abilities costing more resource; no coins, numbers, or text.",
+      "references": [
+        {
+          "path": "public/ui/skills/warlock/corruption.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        },
+        {
+          "path": "public/ui/skills/warlock/curse_of_agony.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        },
+        {
+          "path": "public/ui/skills/priest/mind_flay.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        },
+        {
+          "path": "public/ui/auras/nythraxis_soul_rend.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a bright mana gem being weighed down by a jagged black chain and a hungry violet claw, with energy draining away before use. Communicate abilities costing more resource; no coins, numbers, or text.",
+      "decision": "Accepted: chained mana gem losing energy reads as increased resource cost, not currency.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_cost_tax.png",
+      "sourceBytes": 2396668,
+      "sourceSha256": "1ea9983ad513e1b39103523cc22f83b7bfa5150fa215afde30401a0a70bccfcd",
+      "acceptedBytes": 4770,
+      "acceptedSha256": "1f4c0afa8d1794a69433d25963c08241f6c586bb9e09fd75c2835b9ff82a8089",
+      "output": "mob_cost_tax.webp",
+      "runtimeUrl": "/ui/auras/mob_cost_tax.webp"
+    },
+    {
+      "auraId": "mob_crit_vuln",
+      "trait": "critVuln",
+      "mechanic": "A landed hostile hit may make subsequent critical hits against the player deal more damage.",
+      "kind": "critvuln",
+      "polarity": "harmful_to_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "critvuln_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["critvuln_mire_widow"],
+      "carrierCount": 1,
+      "intendedVisualSubject": "a small red fracture-mark on an armored chest struck by a second brilliant needle-point critical impact, causing the crack to burst wider. Convey vulnerability specifically to critical strikes, distinct from general and physical-only vulnerability.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/mortal_strike.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        },
+        {
+          "path": "public/ui/skills/rogue/expose_armor.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        },
+        {
+          "path": "public/ui/skills/warrior/thunder_clap.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        },
+        {
+          "path": "public/ui/auras/set_bonesplinter.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a small red fracture-mark on an armored chest struck by a second brilliant needle-point critical impact, causing the crack to burst wider. Convey vulnerability specifically to critical strikes, distinct from general and physical-only vulnerability.",
+      "decision": "Accepted: focused second impact bursting an existing chest fracture reads as critical-hit vulnerability.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_crit_vuln.png",
+      "sourceBytes": 2455526,
+      "sourceSha256": "13d24e340b779ec1194bd39e02c9c6f678e7f2603668605bb6a86250472e2da4",
+      "acceptedBytes": 4694,
+      "acceptedSha256": "594b004707fe043c018934a80adbac5c79fcd80fb038accbcab8b2bb0b17e4c8",
+      "output": "mob_crit_vuln.webp",
+      "runtimeUrl": "/ui/auras/mob_crit_vuln.webp"
+    },
+    {
+      "auraId": "mob_demoralize",
+      "trait": "demoralize",
+      "mechanic": "A successful hostile hit applies a negative attack-power modifier to the player.",
+      "kind": "buff_ap",
+      "polarity": "harmful_negative_attack_power_on_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "mob_demoralize"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["mob_demoralize"],
+      "carrierCount": 1,
+      "intendedVisualSubject": "a raised weapon drooping and losing its red-gold battle flame beneath a looming skull-shaped shadow. Communicate broken morale and reduced attack power; desaturated steel and hostile violet-red, explicitly not a positive battle shout.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/mortal_strike.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        },
+        {
+          "path": "public/ui/skills/rogue/expose_armor.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        },
+        {
+          "path": "public/ui/skills/warrior/thunder_clap.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        },
+        {
+          "path": "public/ui/auras/set_bonesplinter.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a raised weapon drooping and losing its red-gold battle flame beneath a looming skull-shaped shadow. Communicate broken morale and reduced attack power; desaturated steel and hostile violet-red, explicitly not a positive battle shout.",
+      "decision": "Accepted: bowed warrior and extinguished weapon under a looming skull read as negative AP.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_demoralize.png",
+      "sourceBytes": 2180590,
+      "sourceSha256": "6d139df4e18bfc598eca9507da755e2263b8c2a4ab096eb0b635c15073bf277e",
+      "acceptedBytes": 2822,
+      "acceptedSha256": "087bb732630fec660c16a479c0b8cec017cc1fa9d4893c1609425b32f83bc560",
+      "output": "mob_demoralize.webp",
+      "runtimeUrl": "/ui/auras/mob_demoralize.webp"
+    },
+    {
+      "auraId": "mob_disarm",
+      "trait": "disarm",
+      "mechanic": "A landed hostile hit may suppress the player's auto-attack by knocking away their weapon.",
+      "kind": "disarm",
+      "polarity": "harmful_control_on_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "disarm_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["disarm_ogre_crusher"],
+      "carrierCount": 1,
+      "intendedVisualSubject": "a sword flying from an opened gauntlet after a red-orange impact, with the weapon and hand forming one bold diagonal silhouette. Clear forced weapon loss, physical control, no detached body parts.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/mortal_strike.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        },
+        {
+          "path": "public/ui/skills/rogue/expose_armor.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        },
+        {
+          "path": "public/ui/skills/warrior/thunder_clap.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        },
+        {
+          "path": "public/ui/auras/set_bonesplinter.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a sword flying from an opened gauntlet after a red-orange impact, with the weapon and hand forming one bold diagonal silhouette. Clear forced weapon loss, physical control, no detached body parts.",
+      "decision": "Accepted: released sword flying from an open gauntlet reads instantly.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_disarm.png",
+      "sourceBytes": 2359816,
+      "sourceSha256": "9b5e1ee2f26b3a53ab6a459b75292bdf9e7a83f5f31836ea34c54837ac631ab0",
+      "acceptedBytes": 4162,
+      "acceptedSha256": "fd8dc81ca64c191feaa77feda0a9c8c967a89877922d52d2552d0fe2fef51a92",
+      "output": "mob_disarm.webp",
+      "runtimeUrl": "/ui/auras/mob_disarm.webp"
+    },
+    {
+      "auraId": "mob_enervate",
+      "trait": "enervate",
+      "mechanic": "A landed hostile hit may apply a negative Stamina modifier, shrinking maximum health.",
+      "kind": "buff_sta",
+      "polarity": "harmful_negative_stamina_on_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "enervate_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["enervate_boneclad_revenant"],
+      "carrierCount": 1,
+      "intendedVisualSubject": "a red life-heart withering and collapsing under a cold violet siphon, with its outer armor-like shell going gray. Communicate drained vitality and reduced maximum health, hostile and weakening.",
+      "references": [
+        {
+          "path": "public/ui/skills/warlock/corruption.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        },
+        {
+          "path": "public/ui/skills/warlock/curse_of_agony.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        },
+        {
+          "path": "public/ui/skills/priest/mind_flay.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        },
+        {
+          "path": "public/ui/auras/nythraxis_soul_rend.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a red life-heart withering and collapsing under a cold violet siphon, with its outer armor-like shell going gray. Communicate drained vitality and reduced maximum health, hostile and weakening.",
+      "decision": "Accepted: collapsing red heart under violet siphon reads as negative Stamina.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_enervate.png",
+      "sourceBytes": 2328460,
+      "sourceSha256": "fb309118bae063cd19dcfbaaf2b1efcf8a63beb9ba34bd29d98f27783adc584b",
+      "acceptedBytes": 3624,
+      "acceptedSha256": "1afdafb1666e5d21e71ac794d2aa227e17ec2696f239f216ea091143c46c1b39",
+      "output": "mob_enervate.webp",
+      "runtimeUrl": "/ui/auras/mob_enervate.webp"
+    },
+    {
+      "auraId": "mob_enfeeble",
+      "trait": "enfeeble",
+      "mechanic": "A landed hostile hit may apply a negative Intellect modifier to a mana user, shrinking maximum mana.",
+      "kind": "buff_int",
+      "polarity": "harmful_negative_intellect_on_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "enfeeble_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["enfeeble_threnos_first_voice", "enfeeble_wyrmcult_zealot"],
+      "carrierCount": 2,
+      "intendedVisualSubject": "a luminous blue eye and crystalline mind-flame being crushed inward by black-violet claws, its light dimming and leaking downward. Explicitly hostile loss of intellect and mana potential, never positive arcane wisdom art.",
+      "references": [
+        {
+          "path": "public/ui/skills/warlock/corruption.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        },
+        {
+          "path": "public/ui/skills/warlock/curse_of_agony.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        },
+        {
+          "path": "public/ui/skills/priest/mind_flay.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        },
+        {
+          "path": "public/ui/auras/nythraxis_soul_rend.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a luminous blue eye and crystalline mind-flame being crushed inward by black-violet claws, its light dimming and leaking downward. Explicitly hostile loss of intellect and mana potential, never positive arcane wisdom art.",
+      "decision": "Accepted: blue eye/mind flame crushed by violet claws reads as negative Intellect.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_enfeeble.png",
+      "sourceBytes": 2364665,
+      "sourceSha256": "95b55080e58350e3fb0c5d9c256e49ec449becf43fc5137cd44ce8cafb03444e",
+      "acceptedBytes": 4208,
+      "acceptedSha256": "d6f4c06b2f97376293ba02a77199eacd12249762828a56fe9fe0507af23411c7",
+      "output": "mob_enfeeble.webp",
+      "runtimeUrl": "/ui/auras/mob_enfeeble.webp"
+    },
+    {
+      "auraId": "mob_ensnare",
+      "trait": "ensnare",
+      "mechanic": "A landed hostile hit may root the player in place with crowd-control duration rules.",
+      "kind": "root",
+      "polarity": "harmful_control_on_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "ensnare_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": [
+        "ensnare_rift_boss_venom",
+        "ensnare_rift_venom_weaver",
+        "ensnare_webwood_spider"
+      ],
+      "carrierCount": 3,
+      "intendedVisualSubject": "a boot and ankle bound tightly by thick thorny web-strands anchored into dark earth, with sickly green highlights. Clear immobility/root silhouette, threatening and organic, not a movement-speed buff.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/blind.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        },
+        {
+          "path": "public/ui/skills/mage/polymorph.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        },
+        {
+          "path": "public/ui/skills/priest/silence.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        },
+        {
+          "path": "public/ui/skills/warrior/thunder_clap.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a boot and ankle bound tightly by thick thorny web-strands anchored into dark earth, with sickly green highlights. Clear immobility/root silhouette, threatening and organic, not a movement-speed buff.",
+      "decision": "Accepted: dense thorn/web binding remains readable as a root at 16px.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_ensnare.png",
+      "sourceBytes": 2445539,
+      "sourceSha256": "5eaf233c3260d752910603f18a7d757c6b6b6190d147839abf6ff250a18667ac",
+      "acceptedBytes": 4938,
+      "acceptedSha256": "60f7db5307b3b80b973e5eaf75514beb4c6e545d8d6396d11cfe4e36b82309d8",
+      "output": "mob_ensnare.webp",
+      "runtimeUrl": "/ui/auras/mob_ensnare.webp"
+    },
+    {
+      "auraId": "mob_expose",
+      "trait": "expose",
+      "mechanic": "A landed hostile hit may crack the victim's guard, increasing physical damage taken.",
+      "kind": "expose",
+      "polarity": "harmful_to_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "expose_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["expose_varkas_boneguard"],
+      "carrierCount": 1,
+      "intendedVisualSubject": "a once-solid steel breastplate split open by a bright red-orange wedge, exposing a vulnerable glowing seam beneath. Harmful physical exposure, distinctly not a beneficial armor buff or flat armor corrosion.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/mortal_strike.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        },
+        {
+          "path": "public/ui/skills/rogue/expose_armor.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        },
+        {
+          "path": "public/ui/skills/warrior/thunder_clap.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        },
+        {
+          "path": "public/ui/auras/set_bonesplinter.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a once-solid steel breastplate split open by a bright red-orange wedge, exposing a vulnerable glowing seam beneath. Harmful physical exposure, distinctly not a beneficial armor buff or flat armor corrosion.",
+      "decision": "Accepted: bright red split through steel chest reads as increased physical damage taken.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_expose.png",
+      "sourceBytes": 2387746,
+      "sourceSha256": "2f22ca2454806bb52414811c3467f78e6d8caf87759713752282199fb4340282",
+      "acceptedBytes": 4806,
+      "acceptedSha256": "c2324d987bd625066e87d24b4e55c6055d36c6b0589ef76b00c5c840f0204d32",
+      "output": "mob_expose.webp",
+      "runtimeUrl": "/ui/auras/mob_expose.webp"
+    },
+    {
+      "auraId": "mob_frenzy_on_hit",
+      "trait": "frenzyOnHit",
+      "mechanic": "When struck, the hostile mob may gain a brief self attack-speed frenzy.",
+      "kind": "buff_haste",
+      "polarity": "beneficial_to_wounded_hostile_mob",
+      "producer": {
+        "path": "src/sim/combat/damage.ts",
+        "symbol": "maybeFrenzyOnHit",
+        "runtime_id_formula": "blood_frenzy"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["blood_frenzy"],
+      "carrierCount": 4,
+      "intendedVisualSubject": "a wounded beast skull snapping forward, fresh red slash across its brow igniting into spiraling orange speed streaks. Read as reactive blood frenzy and faster attacks after being hurt, not as bleeding damage on the wearer.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/battle_shout.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        },
+        {
+          "path": "public/ui/skills/hunter/pack_rally.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        },
+        {
+          "path": "public/ui/skills/priest/power_word_shield.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        },
+        {
+          "path": "public/ui/auras/set_bonesplinter.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a wounded beast skull snapping forward, fresh red slash across its brow igniting into spiraling orange speed streaks. Read as reactive blood frenzy and faster attacks after being hurt, not as bleeding damage on the wearer.",
+      "decision": "Accepted: wounded beast face igniting into speed trails communicates reactive haste.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_frenzy_on_hit.png",
+      "sourceBytes": 2297508,
+      "sourceSha256": "70da6df416b778e3ac818642af71a96c7c998da615b7709aa9f68f313565c8ff",
+      "acceptedBytes": 5550,
+      "acceptedSha256": "721aea3dcb1ba5bd629f8a8055670236a377d062053aec43ce61cbaf63e00580",
+      "output": "mob_frenzy_on_hit.webp",
+      "runtimeUrl": "/ui/auras/mob_frenzy_on_hit.webp"
+    },
+    {
+      "auraId": "mob_frostbite",
+      "trait": "frostbite",
+      "mechanic": "A landed hostile swing may inflict a refreshing frost damage-over-time burn.",
+      "kind": "dot",
+      "polarity": "harmful_to_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "frostbite_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["frostbite_rift_rime_elemental", "frostbite_shardlord_kazzix"],
+      "carrierCount": 2,
+      "intendedVisualSubject": "a frost-blackened armored hand trapped in jagged blue-white ice crystals, rimmed by pale cyan cold mist. Convey painful freezing damage continuing over time, distinct from a simple movement slow.",
+      "references": [
+        {
+          "path": "public/ui/skills/mage/frostbolt.webp",
+          "role": "frost/fire/arcane material rendering and high-contrast magical focal light"
+        },
+        {
+          "path": "public/ui/skills/mage/scorch.webp",
+          "role": "frost/fire/arcane material rendering and high-contrast magical focal light"
+        },
+        {
+          "path": "public/ui/skills/mage/arcane_power.webp",
+          "role": "frost/fire/arcane material rendering and high-contrast magical focal light"
+        },
+        {
+          "path": "public/ui/auras/brood_burn_hatchling_burn.webp",
+          "role": "frost/fire/arcane material rendering and high-contrast magical focal light"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a frost-blackened armored hand trapped in jagged blue-white ice crystals, rimmed by pale cyan cold mist. Convey painful freezing damage continuing over time, distinct from a simple movement slow.",
+      "decision": "Accepted: frozen blackened gauntlet is distinct from movement-slow boot art.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_frostbite.png",
+      "sourceBytes": 2596490,
+      "sourceSha256": "6c472b5ca9efd00959e5d223124bfe8321d008cce3eec098261f1991352db9f7",
+      "acceptedBytes": 6382,
+      "acceptedSha256": "fe18757e621e98869023e8c6094985f476b82bb47e46da2547692665b70e889b",
+      "output": "mob_frostbite.webp",
+      "runtimeUrl": "/ui/auras/mob_frostbite.webp"
+    },
+    {
+      "auraId": "mob_heal_absorb",
+      "trait": "healAbsorb",
+      "mechanic": "A landed hostile hit may create a necrotic pool that consumes a fixed amount of future healing.",
+      "kind": "heal_absorb",
+      "polarity": "harmful_to_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "heal_absorb_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["heal_absorb_gravecaller_summoner", "heal_absorb_rift_boss_necro"],
+      "carrierCount": 2,
+      "intendedVisualSubject": "a black-violet maw or skeletal hand swallowing a bright green-gold healing droplet before it reaches a dim heart. The visual must distinguish absorption of future healing from percentage healing reduction.",
+      "references": [
+        {
+          "path": "public/ui/skills/warlock/corruption.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        },
+        {
+          "path": "public/ui/skills/warlock/curse_of_agony.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        },
+        {
+          "path": "public/ui/skills/priest/mind_flay.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        },
+        {
+          "path": "public/ui/auras/nythraxis_soul_rend.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a black-violet maw or skeletal hand swallowing a bright green-gold healing droplet before it reaches a dim heart. The visual must distinguish absorption of future healing from percentage healing reduction.",
+      "decision": "Accepted: black-violet maw consuming a green healing droplet reads as a finite absorb pool.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_heal_absorb.png",
+      "sourceBytes": 2020200,
+      "sourceSha256": "e3a1b344298042ecd66b4f6964fb558bf148525d9b27514f89a7a9f1caaf8cc5",
+      "acceptedBytes": 3368,
+      "acceptedSha256": "578ab6036bbf5edf52bda001214c5005c7cae1314485accf89a1b1dbeb661669",
+      "output": "mob_heal_absorb.webp",
+      "runtimeUrl": "/ui/auras/mob_heal_absorb.webp"
+    },
+    {
+      "auraId": "mob_hex",
+      "trait": "hex",
+      "mechanic": "A landed hostile hit may reduce both damage and healing dealt by the player.",
+      "kind": "hex",
+      "polarity": "harmful_to_player_output",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "hex_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["hex_gravecaller_cultist"],
+      "carrierCount": 1,
+      "intendedVisualSubject": "crossed sword and healing chalice silhouettes both bound inside the same thorned violet curse ring, their red and gold light fading. Read as a weakening hex on all output, not polymorph and not a stat buff.",
+      "references": [
+        {
+          "path": "public/ui/skills/warlock/corruption.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        },
+        {
+          "path": "public/ui/skills/warlock/curse_of_agony.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        },
+        {
+          "path": "public/ui/skills/priest/mind_flay.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        },
+        {
+          "path": "public/ui/auras/nythraxis_soul_rend.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show crossed sword and healing chalice silhouettes both bound inside the same thorned violet curse ring, their red and gold light fading. Read as a weakening hex on all output, not polymorph and not a stat buff.",
+      "decision": "Accepted: sword and healing vessel bound in one curse ring reads as reduced damage and healing.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_hex.png",
+      "sourceBytes": 2368697,
+      "sourceSha256": "74c414115fb2de1aa347b4ecda348cef4bf14eb7505dfd83622814894ee30140",
+      "acceptedBytes": 4536,
+      "acceptedSha256": "be9971660aa6b9b881fa024faafabb22cccad5b3f75122fe3ddd26f3b1aca6c8",
+      "output": "mob_hex.webp",
+      "runtimeUrl": "/ui/auras/mob_hex.webp"
+    },
+    {
+      "auraId": "mob_lockout",
+      "trait": "lockout",
+      "mechanic": "A landed hostile hit may seal one spell school for a duration.",
+      "kind": "lockout",
+      "polarity": "harmful_control_on_player_caster",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "lockout_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["lockout_threnos_first_voice", "lockout_wyrmcult_zealot"],
+      "carrierCount": 2,
+      "intendedVisualSubject": "a vivid elemental spell orb trapped behind a heavy black iron keyhole seal and crossed arcane chains. It must read as a school-specific magic lockout, distinct from total silence.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/blind.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        },
+        {
+          "path": "public/ui/skills/mage/polymorph.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        },
+        {
+          "path": "public/ui/skills/priest/silence.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        },
+        {
+          "path": "public/ui/skills/warrior/thunder_clap.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a vivid elemental spell orb trapped behind a heavy black iron keyhole seal and crossed arcane chains. It must read as a school-specific magic lockout, distinct from total silence.",
+      "decision": "Accepted: chained elemental seal and keyhole distinguish school lockout from silence.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_lockout.png",
+      "sourceBytes": 2427853,
+      "sourceSha256": "46d69d6aaf90c97b098dcf27a50fe669e6ba79f27e8131a68825a49cb6e269ee",
+      "acceptedBytes": 5254,
+      "acceptedSha256": "0e22983520bc6472e7d39d2114ec6dc572696b517c938b0c0a16e7cb080d2f0d",
+      "output": "mob_lockout.webp",
+      "runtimeUrl": "/ui/auras/mob_lockout.webp"
+    },
+    {
+      "auraId": "mob_mortal_strike",
+      "trait": "mortalStrike",
+      "mechanic": "A landed hostile hit may reduce all healing received for a duration.",
+      "kind": "mortal_wound",
+      "polarity": "harmful_to_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "mortal_wound_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": [
+        "mortal_wound_bastion_revenant",
+        "mortal_wound_deathstalker_voss",
+        "mortal_wound_reliquary_gravecall_acolyte",
+        "mortal_wound_voskar_emberwing"
+      ],
+      "carrierCount": 4,
+      "intendedVisualSubject": "a blood-dark spearhead piercing a luminous healing heart and splitting its golden restorative glow. Strong crimson versus muted holy gold; read as a mortal wound that suppresses incoming healing, not generic weapon damage.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/mortal_strike.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        },
+        {
+          "path": "public/ui/skills/rogue/expose_armor.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        },
+        {
+          "path": "public/ui/skills/warrior/thunder_clap.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        },
+        {
+          "path": "public/ui/auras/set_bonesplinter.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a blood-dark spearhead piercing a luminous healing heart and splitting its golden restorative glow. Strong crimson versus muted holy gold; read as a mortal wound that suppresses incoming healing, not generic weapon damage.",
+      "decision": "Accepted: spear splitting a golden healing heart reads as healing reduction.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_mortal_strike.png",
+      "sourceBytes": 2494670,
+      "sourceSha256": "09760877072a97cfd4c8c0012262d8b05976042f33649dd440f6d8b615d412fc",
+      "acceptedBytes": 4592,
+      "acceptedSha256": "6c3e7ae6f0235456736ba76a5592e81e948580bfb41ebbbb9b8d220d2187dec2",
+      "output": "mob_mortal_strike.webp",
+      "runtimeUrl": "/ui/auras/mob_mortal_strike.webp"
+    },
+    {
+      "auraId": "mob_pack_frenzy",
+      "trait": "packFrenzy",
+      "mechanic": "When one pack creature dies, nearby surviving same-family mobs gain a refreshing attack-speed frenzy.",
+      "kind": "buff_haste",
+      "polarity": "beneficial_to_surviving_hostile_packmates",
+      "producer": {
+        "path": "src/sim/mob/lifecycle.ts",
+        "symbol": "frenzyPackmates",
+        "runtime_id_formula": "pack_frenzy"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["pack_frenzy"],
+      "carrierCount": 4,
+      "intendedVisualSubject": "three predatory wolf-like eyes and fangs sweeping together in a circular rush, one fading into shadow while the survivors flare with orange-red speed trails. Communicate pack loss converting into shared ferocity and haste.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/battle_shout.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        },
+        {
+          "path": "public/ui/skills/hunter/pack_rally.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        },
+        {
+          "path": "public/ui/skills/priest/power_word_shield.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        },
+        {
+          "path": "public/ui/auras/set_bonesplinter.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show three predatory wolf-like eyes and fangs sweeping together in a circular rush, one fading into shadow while the survivors flare with orange-red speed trails. Communicate pack loss converting into shared ferocity and haste.",
+      "decision": "Accepted: multiple predators in a shared circular rush communicate pack-wide haste.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_pack_frenzy.png",
+      "sourceBytes": 2417193,
+      "sourceSha256": "47c75a9f1e28aca6ed05f24adde5e4fa9a30b50a8dfec9a1f8a5976dc2a0f11c",
+      "acceptedBytes": 4810,
+      "acceptedSha256": "0b0b99a1ca655a5bcdbe95c9a7aa77c5b78dc68fa9a47fc0e4acef5f796f572d",
+      "output": "mob_pack_frenzy.webp",
+      "runtimeUrl": "/ui/auras/mob_pack_frenzy.webp"
+    },
+    {
+      "auraId": "mob_plague",
+      "trait": "plague",
+      "mechanic": "A landed hostile hit may rot Stamina through disease, shrinking maximum health.",
+      "kind": "buff_sta",
+      "polarity": "harmful_negative_stamina_disease_on_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "plague_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["plague_drowned_dead", "plague_drowned_warlord"],
+      "carrierCount": 2,
+      "intendedVisualSubject": "a sickly green-black plague heart mottled with luminous pustule-like spores and curling decay vapor. This is disease-driven vitality loss, distinct from the shadow siphon of enervate; macabre but not graphic.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/deadly_poison.webp",
+          "role": "venom, poison, decay, organic green-violet hostile palette"
+        },
+        {
+          "path": "public/ui/skills/hunter/serpent_sting.webp",
+          "role": "venom, poison, decay, organic green-violet hostile palette"
+        },
+        {
+          "path": "public/ui/skills/warlock/corruption.webp",
+          "role": "venom, poison, decay, organic green-violet hostile palette"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a sickly green-black plague heart mottled with luminous pustule-like spores and curling decay vapor. This is disease-driven vitality loss, distinct from the shadow siphon of enervate; macabre but not graphic.",
+      "decision": "Accepted: diseased green heart differentiates nature-disease Stamina loss from enervate.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_plague.png",
+      "sourceBytes": 2424525,
+      "sourceSha256": "b5354e3ece704bf6f9acca31352089c74513acb67a75f9b162b6eb7eb2da4c23",
+      "acceptedBytes": 5202,
+      "acceptedSha256": "52f6e5eef120d235b5e71601d346d23b280186da3f3cfdd9d0c595d81ccfaa9b",
+      "output": "mob_plague.webp",
+      "runtimeUrl": "/ui/auras/mob_plague.webp"
+    },
+    {
+      "auraId": "mob_polymorph_hex",
+      "trait": "polymorphHex",
+      "mechanic": "A landed hostile hit may briefly polymorph the player into a critter; the effect breaks on damage.",
+      "kind": "polymorph",
+      "polarity": "harmful_control_on_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "hex_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["hex_mudfin_murloc"],
+      "carrierCount": 1,
+      "intendedVisualSubject": "a frightened small horned toad silhouette emerging from a burst of green-violet witch smoke while a warrior helm falls away behind it. Dark-fantasy transformation hex, readable and slightly uncanny, not cute cartoon art.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/blind.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        },
+        {
+          "path": "public/ui/skills/mage/polymorph.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        },
+        {
+          "path": "public/ui/skills/priest/silence.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        },
+        {
+          "path": "public/ui/skills/warrior/thunder_clap.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a frightened small horned toad silhouette emerging from a burst of green-violet witch smoke while a warrior helm falls away behind it. Dark-fantasy transformation hex, readable and slightly uncanny, not cute cartoon art.",
+      "decision": "Accepted: uncanny toad emerging beneath a falling helm reads as transformation control.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_polymorph_hex.png",
+      "sourceBytes": 2594667,
+      "sourceSha256": "8496402fbdcac0642b33cf6ed84cbdb8f078db97de75a9da6213548971407701",
+      "acceptedBytes": 5216,
+      "acceptedSha256": "6116700fe7cbdf06f6890e226e05df4180470d89f35c43107b2ed87c73023bbf",
+      "output": "mob_polymorph_hex.webp",
+      "runtimeUrl": "/ui/auras/mob_polymorph_hex.webp"
+    },
+    {
+      "auraId": "mob_rally",
+      "trait": "rally",
+      "mechanic": "A commander periodically grants nearby friendly mobs a refreshing attack-power buff.",
+      "kind": "buff_ap",
+      "polarity": "beneficial_to_hostile_mob_allies",
+      "producer": {
+        "path": "src/sim/sim.ts",
+        "symbol": "Sim.updateBossMechanics",
+        "runtime_id_formula": "rally_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["rally_ironvein_foreman"],
+      "carrierCount": 1,
+      "intendedVisualSubject": "a ragged war banner planted amid upward-surging crimson-gold force, with two shadowed weapons rising behind it. It must read as an offensive commander rally that strengthens allied attackers, not as a player achievement.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/battle_shout.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        },
+        {
+          "path": "public/ui/skills/hunter/pack_rally.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        },
+        {
+          "path": "public/ui/skills/priest/power_word_shield.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        },
+        {
+          "path": "public/ui/auras/set_bonesplinter.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a ragged war banner planted amid upward-surging crimson-gold force, with two shadowed weapons rising behind it. It must read as an offensive commander rally that strengthens allied attackers, not as a player achievement.",
+      "decision": "Accepted: central war banner and outward red-gold surge distinguish AP rally from haste.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_rally.png",
+      "sourceBytes": 2694511,
+      "sourceSha256": "9ba1638f75fd6a7f78f0f27fce439ea38e0d23dc8066c6c42e61523332fb1269",
+      "acceptedBytes": 5890,
+      "acceptedSha256": "e07924a3da778acc1e42eafbf47352df815eb8b6154558c8b14ffcc10816caf9",
+      "output": "mob_rally.webp",
+      "runtimeUrl": "/ui/auras/mob_rally.webp"
+    },
+    {
+      "auraId": "mob_rampage",
+      "trait": "rampage",
+      "mechanic": "A landed swing stacks and refreshes escalating attack power on the hostile mob.",
+      "kind": "buff_ap",
+      "polarity": "beneficial_to_hostile_mob",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "rampage_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["rampage_rift_boss_brute", "rampage_warlord_drogmar"],
+      "carrierCount": 2,
+      "intendedVisualSubject": "a feral iron war-mask or horned beast face surging upward through three ascending crimson-gold claw-like energy slashes, communicating mounting attack power and dangerous escalation. Aggressive red, ember-orange, and tarnished gold; no literal meter.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/battle_shout.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        },
+        {
+          "path": "public/ui/skills/hunter/pack_rally.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        },
+        {
+          "path": "public/ui/skills/priest/power_word_shield.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        },
+        {
+          "path": "public/ui/auras/set_bonesplinter.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a feral iron war-mask or horned beast face surging upward through three ascending crimson-gold claw-like energy slashes, communicating mounting attack power and dangerous escalation. Aggressive red, ember-orange, and tarnished gold; no literal meter.",
+      "decision": "Accepted: ascending slash stack and hostile face remain clear at 16px.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_rampage.png",
+      "sourceBytes": 2369154,
+      "sourceSha256": "31a4b83053a0d98f81cafb0af2963ea3a3e03b91b3318d088df91c288f8e14de",
+      "acceptedBytes": 5730,
+      "acceptedSha256": "6aefd1ea53316582d0ab4c1d77e18a4ea65ad5a87b164d1c758af4329d965455",
+      "output": "mob_rampage.webp",
+      "runtimeUrl": "/ui/auras/mob_rampage.webp"
+    },
+    {
+      "auraId": "mob_silence",
+      "trait": "silence",
+      "mechanic": "A landed hostile hit may interrupt ongoing casting and prevent spell use for a duration.",
+      "kind": "silence",
+      "polarity": "harmful_control_on_player_caster",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "silence_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["silence_gravecaller_summoner"],
+      "carrierCount": 1,
+      "intendedVisualSubject": "a luminous blue-violet spell flame pinched out between two black iron bands across a spectral mouth. Communicate total magical silence and extinguished casting, with strong dark-on-light contrast.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/blind.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        },
+        {
+          "path": "public/ui/skills/mage/polymorph.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        },
+        {
+          "path": "public/ui/skills/priest/silence.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        },
+        {
+          "path": "public/ui/skills/warrior/thunder_clap.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a luminous blue-violet spell flame pinched out between two black iron bands across a spectral mouth. Communicate total magical silence and extinguished casting, with strong dark-on-light contrast.",
+      "decision": "Accepted: mouth sealed by a bright horizontal band reads as total spell silence.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_silence.png",
+      "sourceBytes": 2237587,
+      "sourceSha256": "a5d3c9f88d0301b072ad1e0272095476a46dd7546f4db1402da11fbacdf48fcd",
+      "acceptedBytes": 4338,
+      "acceptedSha256": "0e10437c77caed1637ab7b1996258811ac3657e88d71380ec15a4298714c4941",
+      "output": "mob_silence.webp",
+      "runtimeUrl": "/ui/auras/mob_silence.webp"
+    },
+    {
+      "auraId": "mob_siphon_spirit",
+      "trait": "siphonSpirit",
+      "mechanic": "A landed hostile hit may drain Spirit from a mana user, weakening out-of-combat regeneration.",
+      "kind": "buff_spi",
+      "polarity": "harmful_negative_spirit_on_player_caster",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "siphon_spirit_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["siphon_spirit_sister_nhalia"],
+      "carrierCount": 1,
+      "intendedVisualSubject": "a pale blue-white spirit flame being pulled from a hollow chest into a black-violet skeletal hand, leaving the body dim and empty. Clearly hostile Spirit drain and regeneration loss, never a positive spiritual blessing.",
+      "references": [
+        {
+          "path": "public/ui/skills/warlock/corruption.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        },
+        {
+          "path": "public/ui/skills/warlock/curse_of_agony.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        },
+        {
+          "path": "public/ui/skills/priest/mind_flay.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        },
+        {
+          "path": "public/ui/auras/nythraxis_soul_rend.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a pale blue-white spirit flame being pulled from a hollow chest into a black-violet skeletal hand, leaving the body dim and empty. Clearly hostile Spirit drain and regeneration loss, never a positive spiritual blessing.",
+      "decision": "Accepted: pale soul flame pulled into a dark hand reads as hostile Spirit drain.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_siphon_spirit.png",
+      "sourceBytes": 2264163,
+      "sourceSha256": "09258675c8de044d867ba4e28e5f455ba1a0aa6ac61dd3667fcac34ad7b7d5a4",
+      "acceptedBytes": 3972,
+      "acceptedSha256": "5a875cc2299982651b365e29c70b69c86cd47e60c372cd98920dff1b84b354a6",
+      "output": "mob_siphon_spirit.webp",
+      "runtimeUrl": "/ui/auras/mob_siphon_spirit.webp"
+    },
+    {
+      "auraId": "mob_slow_strike",
+      "trait": "slowStrike",
+      "mechanic": "A landed hostile hit may slow the victim's weapon attack speed.",
+      "kind": "attackspeed",
+      "polarity": "harmful_to_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "slowstrike_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["slowstrike_mire_prowler"],
+      "carrierCount": 1,
+      "intendedVisualSubject": "a sword arm dragged through thick black-blue tar, its once-bright swing arc breaking into slow heavy fragments. Convey slowed melee cadence and weighted attacks, not reduced movement speed.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/mortal_strike.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        },
+        {
+          "path": "public/ui/skills/rogue/expose_armor.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        },
+        {
+          "path": "public/ui/skills/warrior/thunder_clap.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        },
+        {
+          "path": "public/ui/auras/set_bonesplinter.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a sword arm dragged through thick black-blue tar, its once-bright swing arc breaking into slow heavy fragments. Convey slowed melee cadence and weighted attacks, not reduced movement speed.",
+      "decision": "Accepted: sword arm dragged through black-blue tar reads as attack cadence loss.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_slow_strike.png",
+      "sourceBytes": 2775303,
+      "sourceSha256": "92ba800904ebf5e98cfa06dad464f24edc468b1ba306ac544afc489bf9bf089a",
+      "acceptedBytes": 4140,
+      "acceptedSha256": "bbcf6b8d4dade8174ea1886d7cb2bd7b4802772b8d762eeb5a7029e492c80401",
+      "output": "mob_slow_strike.webp",
+      "runtimeUrl": "/ui/auras/mob_slow_strike.webp"
+    },
+    {
+      "auraId": "mob_smolder",
+      "trait": "smolder",
+      "mechanic": "A landed hostile swing may ignite a refreshing fire damage-over-time smolder.",
+      "kind": "dot",
+      "polarity": "harmful_to_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "smolder_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": [
+        "smolder_ironvein_sapper",
+        "smolder_rift_hellguard",
+        "smolder_rift_magma_brute"
+      ],
+      "carrierCount": 3,
+      "intendedVisualSubject": "a charred fuse-like wound glowing from within under blackened ash, with low orange embers and thin smoke rather than a large flame. Communicate slow persistent burning and imminent heat.",
+      "references": [
+        {
+          "path": "public/ui/skills/mage/frostbolt.webp",
+          "role": "frost/fire/arcane material rendering and high-contrast magical focal light"
+        },
+        {
+          "path": "public/ui/skills/mage/scorch.webp",
+          "role": "frost/fire/arcane material rendering and high-contrast magical focal light"
+        },
+        {
+          "path": "public/ui/skills/mage/arcane_power.webp",
+          "role": "frost/fire/arcane material rendering and high-contrast magical focal light"
+        },
+        {
+          "path": "public/ui/auras/brood_burn_hatchling_burn.webp",
+          "role": "frost/fire/arcane material rendering and high-contrast magical focal light"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a charred fuse-like wound glowing from within under blackened ash, with low orange embers and thin smoke rather than a large flame. Communicate slow persistent burning and imminent heat.",
+      "decision": "Accepted: low internal ember seam and smoke read as persistent heat rather than burst fire.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_smolder.png",
+      "sourceBytes": 2146368,
+      "sourceSha256": "7d9990ca5b628814a1a8cf1384b41d5bb9372b9098ab5fa191d8ed8cbeea2628",
+      "acceptedBytes": 3260,
+      "acceptedSha256": "40f624ba1f03d1d289a61d0229c7fc0bd3d259bc692236da518109fea7013cc1",
+      "output": "mob_smolder.webp",
+      "runtimeUrl": "/ui/auras/mob_smolder.webp"
+    },
+    {
+      "auraId": "mob_soulrot",
+      "trait": "soulrot",
+      "mechanic": "A landed hostile swing may inflict a refreshing shadow damage-over-time rot.",
+      "kind": "dot",
+      "polarity": "harmful_to_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "soulrot_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": [
+        "soulrot_restless_bones",
+        "soulrot_rift_boss_necro",
+        "soulrot_rift_boss_ritualist",
+        "soulrot_rift_pact_acolyte"
+      ],
+      "carrierCount": 4,
+      "intendedVisualSubject": "a pale ghostly soul silhouette decomposing into violet-black motes inside a cracked ribcage-like shadow. Sickly teal highlights against deep purple; clearly necrotic spiritual decay over time.",
+      "references": [
+        {
+          "path": "public/ui/skills/warlock/corruption.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        },
+        {
+          "path": "public/ui/skills/warlock/curse_of_agony.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        },
+        {
+          "path": "public/ui/skills/priest/mind_flay.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        },
+        {
+          "path": "public/ui/auras/nythraxis_soul_rend.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a pale ghostly soul silhouette decomposing into violet-black motes inside a cracked ribcage-like shadow. Sickly teal highlights against deep purple; clearly necrotic spiritual decay over time.",
+      "decision": "Accepted: dissolving teal spirit in violet ribs reads as shadow decay.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_soulrot.png",
+      "sourceBytes": 2381366,
+      "sourceSha256": "e7107dbdb4de06ddc1e85150961bd91ad337a6f68e3440baa9b9a0673e432489",
+      "acceptedBytes": 5338,
+      "acceptedSha256": "f6d721785ea31a48c8da33c08b0d5de80529f1ccb2fb6964ae79699a2cc50604",
+      "output": "mob_soulrot.webp",
+      "runtimeUrl": "/ui/auras/mob_soulrot.webp"
+    },
+    {
+      "auraId": "mob_spell_vuln",
+      "trait": "spellVuln",
+      "mechanic": "The wearer takes increased magic damage from all attackers; produced by hostile mob hits and the Bone Mage pet's shadow bolt rider.",
+      "kind": "spellvuln",
+      "polarity": "harmful_to_aura_wearer",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "spellvuln_<templateId>"
+      },
+      "additionalProducers": [
+        {
+          "trait_path": "petRanged.spellVuln",
+          "template_id": "necromancy_bone_mage",
+          "path": "src/sim/pet/pet_ai.ts",
+          "symbol": "petRangedAttack"
+        }
+      ],
+      "runtimeIds": [
+        "raise_bone_mage",
+        "spellvuln_rift_boss_arcane",
+        "spellvuln_stormcrag_elemental"
+      ],
+      "carrierCount": 3,
+      "intendedVisualSubject": "a dark shield cracked into four elemental-colored fissures - violet arcane, blue frost, orange fire, green nature - while a pale spell beam penetrates its center. Explicitly harmful magic vulnerability, never a protective ward or positive spell-power buff.",
+      "references": [
+        {
+          "path": "public/ui/skills/mage/frostbolt.webp",
+          "role": "frost/fire/arcane material rendering and high-contrast magical focal light"
+        },
+        {
+          "path": "public/ui/skills/mage/scorch.webp",
+          "role": "frost/fire/arcane material rendering and high-contrast magical focal light"
+        },
+        {
+          "path": "public/ui/skills/mage/arcane_power.webp",
+          "role": "frost/fire/arcane material rendering and high-contrast magical focal light"
+        },
+        {
+          "path": "public/ui/auras/brood_burn_hatchling_burn.webp",
+          "role": "frost/fire/arcane material rendering and high-contrast magical focal light"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a dark shield cracked into four elemental-colored fissures - violet arcane, blue frost, orange fire, green nature - while a pale spell beam penetrates its center. Explicitly harmful magic vulnerability, never a protective ward or positive spell-power buff.",
+      "decision": "Accepted: multi-school beam cracking a dark shield is explicitly hostile magic exposure.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_spell_vuln.png",
+      "sourceBytes": 2736342,
+      "sourceSha256": "8a17a70c193bf8a0592642abc18ae175b1e2b510bd6a71eb697aa332a232991c",
+      "acceptedBytes": 4974,
+      "acceptedSha256": "087a210094d9456e91c5935b6e2ebf6ca93c29eb59034a4d30e6d36f1c2857d6",
+      "output": "mob_spell_vuln.webp",
+      "runtimeUrl": "/ui/auras/mob_spell_vuln.webp"
+    },
+    {
+      "auraId": "mob_stack_poison",
+      "trait": "stackPoison",
+      "mechanic": "Repeated hostile hits stack a nature poison DoT, increasing its tick damage up to a cap.",
+      "kind": "dot",
+      "polarity": "harmful_to_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes/applyStackPoison",
+        "runtime_id_formula": "stackpoison_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["stackpoison_mirefen_broodmother", "stackpoison_rift_boss_venom"],
+      "carrierCount": 2,
+      "intendedVisualSubject": "three overlapping luminous venom drops climbing up a hooked fang, each drop larger and darker than the last, surrounded by layered emerald poison rings. Clearly communicate stacking and escalating toxicity without numerals.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/deadly_poison.webp",
+          "role": "venom, poison, decay, organic green-violet hostile palette"
+        },
+        {
+          "path": "public/ui/skills/hunter/serpent_sting.webp",
+          "role": "venom, poison, decay, organic green-violet hostile palette"
+        },
+        {
+          "path": "public/ui/skills/warlock/corruption.webp",
+          "role": "venom, poison, decay, organic green-violet hostile palette"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show three overlapping luminous venom drops climbing up a hooked fang, each drop larger and darker than the last, surrounded by layered emerald poison rings. Clearly communicate stacking and escalating toxicity without numerals.",
+      "decision": "Accepted: three escalating venom drops clearly communicate stacks without numerals.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_stack_poison.png",
+      "sourceBytes": 2574652,
+      "sourceSha256": "f57b5b93c21408beb23a6302e812ee7883325af72e8baf1e455287db7ffcacb3",
+      "acceptedBytes": 5832,
+      "acceptedSha256": "db1130dac0269197566e90376a5ca8024af8092cb2722f501a7b37a1f1c9ce5b",
+      "output": "mob_stack_poison.webp",
+      "runtimeUrl": "/ui/auras/mob_stack_poison.webp"
+    },
+    {
+      "auraId": "mob_stagger_hit",
+      "trait": "staggerHit",
+      "mechanic": "A landed hostile hit applies a negative dodge modifier, making the player easier to hit.",
+      "kind": "buff_dodge",
+      "polarity": "harmful_negative_dodge_on_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "stagger_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["stagger_deeprock_kobold"],
+      "carrierCount": 1,
+      "intendedVisualSubject": "an off-balance boot slipping beside a tilted broken buckler as a red impact arc shoves both sideways. Convey lost footing and reduced evasion; hostile crimson and bruised steel, explicitly not graceful positive dodge art.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/mortal_strike.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        },
+        {
+          "path": "public/ui/skills/rogue/expose_armor.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        },
+        {
+          "path": "public/ui/skills/warrior/thunder_clap.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        },
+        {
+          "path": "public/ui/auras/set_bonesplinter.webp",
+          "role": "weapon impact, wounds, broken guard, readable steel-and-crimson silhouettes"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show an off-balance boot slipping beside a tilted broken buckler as a red impact arc shoves both sideways. Convey lost footing and reduced evasion; hostile crimson and bruised steel, explicitly not graceful positive dodge art.",
+      "decision": "Accepted: displaced boot and buckler with red lateral arc communicate reduced dodge.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_stagger_hit.png",
+      "sourceBytes": 2463039,
+      "sourceSha256": "46e3adf526fa8eca91d4c263c812e5dc12db7214308a5a6c2869c981dd57e89f",
+      "acceptedBytes": 4766,
+      "acceptedSha256": "202f8b12813a4609c4a0e9923923ac5bd6cf1c08037fdf9ab0df0219206fd968",
+      "output": "mob_stagger_hit.webp",
+      "runtimeUrl": "/ui/auras/mob_stagger_hit.webp"
+    },
+    {
+      "auraId": "mob_stoneskin",
+      "trait": "stoneskin",
+      "mechanic": "A mob periodically wraps itself in a temporary absorb barrier.",
+      "kind": "absorb",
+      "polarity": "beneficial_to_hostile_mob",
+      "producer": {
+        "path": "src/sim/mob/locomotion.ts",
+        "symbol": "runMobAttackMechanics",
+        "runtime_id_formula": "stoneskin_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": [
+        "stoneskin_ancient_guardian",
+        "stoneskin_marrowlord_varkas",
+        "stoneskin_old_marrowshell",
+        "stoneskin_rift_boss_arcane",
+        "stoneskin_rift_boss_frost",
+        "stoneskin_sump_troll_devourer",
+        "stoneskin_thunzharr_waking_peak"
+      ],
+      "carrierCount": 7,
+      "intendedVisualSubject": "a hulking fist and shoulder turning into cracked basalt plates while a translucent blue-gray barrier seals around them. The barrier is protective and temporary; emphasize stone weight, hard highlights, and a clear shielded silhouette.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/battle_shout.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        },
+        {
+          "path": "public/ui/skills/hunter/pack_rally.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        },
+        {
+          "path": "public/ui/skills/priest/power_word_shield.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        },
+        {
+          "path": "public/ui/auras/set_bonesplinter.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a hulking fist and shoulder turning into cracked basalt plates while a translucent blue-gray barrier seals around them. The barrier is protective and temporary; emphasize stone weight, hard highlights, and a clear shielded silhouette.",
+      "decision": "Accepted: rock fist inside a blue barrier reads as temporary absorb, not armor stat.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_stoneskin.png",
+      "sourceBytes": 2897515,
+      "sourceSha256": "8109cdc86cbcc781927255a90a9e51dbc2bc75d1bf7a4f738ce085cdd4c3ccff",
+      "acceptedBytes": 5982,
+      "acceptedSha256": "35731d97859e328d3c201882c67d933e8237f2d9f1eed255f3baa03bedadbc62",
+      "output": "mob_stoneskin.webp",
+      "runtimeUrl": "/ui/auras/mob_stoneskin.webp"
+    },
+    {
+      "auraId": "mob_stun_on_hit",
+      "trait": "stunOnHit",
+      "mechanic": "A landed hostile crushing blow may briefly stun the player.",
+      "kind": "stun",
+      "polarity": "harmful_control_on_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "stun_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["stun_mogger_lackey", "stun_rift_stone_ogre"],
+      "carrierCount": 2,
+      "intendedVisualSubject": "a brutal iron fist striking a helm dead-center, producing a tight ring of amber stars rendered as sparks and a red shockwave. Distinct from the stone-maul concussive icon: this is a reactive melee on-hit stun.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/blind.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        },
+        {
+          "path": "public/ui/skills/mage/polymorph.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        },
+        {
+          "path": "public/ui/skills/priest/silence.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        },
+        {
+          "path": "public/ui/skills/warrior/thunder_clap.webp",
+          "role": "instant crowd-control readability without text or generic flat glyphs"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a brutal iron fist striking a helm dead-center, producing a tight ring of amber stars rendered as sparks and a red shockwave. Distinct from the stone-maul concussive icon: this is a reactive melee on-hit stun.",
+      "decision": "Accepted: iron fist and compact red shock ring distinguish it from concuss.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_stun_on_hit.png",
+      "sourceBytes": 2191883,
+      "sourceSha256": "8c30182fa81a63c5acb13cf315ca430cde954d38480a1a599565bfffebe97e4c",
+      "acceptedBytes": 5208,
+      "acceptedSha256": "03e8e3b716dc80878fb212d65e8d23f542f9a65f7362d1902e6a528c3fc0cc72",
+      "output": "mob_stun_on_hit.webp",
+      "runtimeUrl": "/ui/auras/mob_stun_on_hit.webp"
+    },
+    {
+      "auraId": "mob_tongues",
+      "trait": "tongues",
+      "mechanic": "A landed hostile hit may lengthen the player's spell cast times.",
+      "kind": "tongues",
+      "polarity": "harmful_to_player_caster",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "tongues_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["tongues_nhalia_mourner"],
+      "carrierCount": 1,
+      "intendedVisualSubject": "a spectral mouth wrapped by twisting violet runic bands, with a spell spark trapped behind the lips. Communicate garbled incantations and slower casting; sinister purple-black, no written runes or letters.",
+      "references": [
+        {
+          "path": "public/ui/skills/warlock/corruption.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        },
+        {
+          "path": "public/ui/skills/warlock/curse_of_agony.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        },
+        {
+          "path": "public/ui/skills/priest/mind_flay.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        },
+        {
+          "path": "public/ui/auras/nythraxis_soul_rend.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a spectral mouth wrapped by twisting violet runic bands, with a spell spark trapped behind the lips. Communicate garbled incantations and slower casting; sinister purple-black, no written runes or letters.",
+      "decision": "Accepted: bound spectral mouth reads as slowed incantation without letters or runes.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_tongues.png",
+      "sourceBytes": 2145084,
+      "sourceSha256": "03c675db2f62210287e660411a374337e874dbe9f41a99cd6e2d181f36133f04",
+      "acceptedBytes": 4426,
+      "acceptedSha256": "dd01fe2e3afce8de157e45fb07797740184c7772f648ba918839209745018757",
+      "output": "mob_tongues.webp",
+      "runtimeUrl": "/ui/auras/mob_tongues.webp"
+    },
+    {
+      "auraId": "mob_venom",
+      "trait": "venom",
+      "mechanic": "A landed hostile swing may inflict a refreshing nature-poison damage-over-time effect.",
+      "kind": "dot",
+      "polarity": "harmful_to_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "venom_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": [
+        "venom_duskwisp",
+        "venom_old_marrowshell",
+        "venom_rift_venom_weaver",
+        "venom_webwood_spider"
+      ],
+      "carrierCount": 4,
+      "intendedVisualSubject": "curved venomous fangs closing around a luminous emerald droplet, with caustic green vapor and tiny dark-purple poison veins. Harmful nature DoT polarity, vivid toxic focal point, no potion bottle.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/deadly_poison.webp",
+          "role": "venom, poison, decay, organic green-violet hostile palette"
+        },
+        {
+          "path": "public/ui/skills/hunter/serpent_sting.webp",
+          "role": "venom, poison, decay, organic green-violet hostile palette"
+        },
+        {
+          "path": "public/ui/skills/warlock/corruption.webp",
+          "role": "venom, poison, decay, organic green-violet hostile palette"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show curved venomous fangs closing around a luminous emerald droplet, with caustic green vapor and tiny dark-purple poison veins. Harmful nature DoT polarity, vivid toxic focal point, no potion bottle.",
+      "decision": "Accepted: emerald venom droplet between fangs survives the 16px reduction.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_venom.png",
+      "sourceBytes": 2267316,
+      "sourceSha256": "a8efa31f258f3b3d2a2a1ba0f70dcdfb74412d0f38d81f549b25b7b330f0c2a8",
+      "acceptedBytes": 5242,
+      "acceptedSha256": "45cb754bc8fe8b1d095f245e7424f0a7b14ce25c32494933e156cb3e3e176e36",
+      "output": "mob_venom.webp",
+      "runtimeUrl": "/ui/auras/mob_venom.webp"
+    },
+    {
+      "auraId": "mob_vulnerability",
+      "trait": "vulnerability",
+      "mechanic": "A landed hostile hit may make the player take increased damage from every source.",
+      "kind": "vulnerability",
+      "polarity": "harmful_to_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "vulnerability_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["vulnerability_gravecaller_cultist"],
+      "carrierCount": 1,
+      "intendedVisualSubject": "a humanoid silhouette marked by a bright crimson target-like fracture in the chest while multiple shadowy weapon and spell streaks converge on it. General all-damage vulnerability, broad and hostile without resembling spell-only exposure.",
+      "references": [
+        {
+          "path": "public/ui/skills/warlock/corruption.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        },
+        {
+          "path": "public/ui/skills/warlock/curse_of_agony.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        },
+        {
+          "path": "public/ui/skills/priest/mind_flay.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        },
+        {
+          "path": "public/ui/auras/nythraxis_soul_rend.webp",
+          "role": "necrotic curses, spiritual drain, violet-black threat language"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a humanoid silhouette marked by a bright crimson target-like fracture in the chest while multiple shadowy weapon and spell streaks converge on it. General all-damage vulnerability, broad and hostile without resembling spell-only exposure.",
+      "decision": "Accepted: marked figure receiving converging strikes reads as all-damage vulnerability.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_vulnerability.png",
+      "sourceBytes": 2572797,
+      "sourceSha256": "e9f43999a45b5d6e83b3e0c91b5ca13ab63aa16048e72f729f693be48be52d5c",
+      "acceptedBytes": 4772,
+      "acceptedSha256": "15e106239d7776d71c66b621f67926fbea543619f1385b6cd5bedb1f509e8049",
+      "output": "mob_vulnerability.webp",
+      "runtimeUrl": "/ui/auras/mob_vulnerability.webp"
+    },
+    {
+      "auraId": "mob_warcry",
+      "trait": "warcry",
+      "mechanic": "A support mob periodically quickens nearby friendly mobs' melee swings.",
+      "kind": "buff_haste",
+      "polarity": "beneficial_to_hostile_mob_allies",
+      "producer": {
+        "path": "src/sim/sim.ts",
+        "symbol": "Sim.updateBossMechanics",
+        "runtime_id_formula": "warcry_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["warcry_deepfen_murloc", "warcry_wildheart_beastmaster"],
+      "carrierCount": 2,
+      "intendedVisualSubject": "a snarling monster profile unleashing a visible cone of golden-orange sonic force that drives three blurred weapon arcs forward. Convey allied attack-speed acceleration, martial cadence, and urgency; avoid music notes or text.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/battle_shout.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        },
+        {
+          "path": "public/ui/skills/hunter/pack_rally.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        },
+        {
+          "path": "public/ui/skills/priest/power_word_shield.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        },
+        {
+          "path": "public/ui/auras/set_bonesplinter.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a snarling monster profile unleashing a visible cone of golden-orange sonic force that drives three blurred weapon arcs forward. Convey allied attack-speed acceleration, martial cadence, and urgency; avoid music notes or text.",
+      "decision": "Accepted: roaring profile and accelerated golden arcs read as offensive cadence.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_warcry.png",
+      "sourceBytes": 2363003,
+      "sourceSha256": "c84c1e73b08e9493f78b721938e73303de3b7041559d6f3f658f74d0a017e0d6",
+      "acceptedBytes": 5262,
+      "acceptedSha256": "8a532c155a0110bd02e639c833b7fe1a07d5d724f857b813d3f5a01a9a672398",
+      "output": "mob_warcry.webp",
+      "runtimeUrl": "/ui/auras/mob_warcry.webp"
+    },
+    {
+      "auraId": "mob_ward_allies",
+      "trait": "wardAllies",
+      "mechanic": "A support mob periodically grants a refreshing absorb barrier to nearby friendly mobs.",
+      "kind": "absorb",
+      "polarity": "beneficial_to_hostile_mob_allies",
+      "producer": {
+        "path": "src/sim/sim.ts",
+        "symbol": "Sim.updateBossMechanics",
+        "runtime_id_formula": "ward_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": [
+        "ward_grave_silt_bulwark",
+        "ward_mogger",
+        "ward_treant_elder",
+        "ward_wildheart_beastmaster"
+      ],
+      "carrierCount": 4,
+      "intendedVisualSubject": "several dark creature silhouettes sheltered behind one luminous spectral ward shield, with pale holy-blue energy curving protectively around the group. Defensive support polarity must read instantly; steel-blue, moon-white, and restrained gold.",
+      "references": [
+        {
+          "path": "public/ui/skills/warrior/battle_shout.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        },
+        {
+          "path": "public/ui/skills/hunter/pack_rally.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        },
+        {
+          "path": "public/ui/skills/priest/power_word_shield.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        },
+        {
+          "path": "public/ui/auras/set_bonesplinter.webp",
+          "role": "paint density, luminous beneficial polarity, shield/banner/haste vocabulary"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show several dark creature silhouettes sheltered behind one luminous spectral ward shield, with pale holy-blue energy curving protectively around the group. Defensive support polarity must read instantly; steel-blue, moon-white, and restrained gold.",
+      "decision": "Accepted: protected group behind a single luminous shield reads as ally support.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_ward_allies.png",
+      "sourceBytes": 2294323,
+      "sourceSha256": "725932af0db8c651f07528ba3fda186a5dddba8185319e2e163611aaa18d0479",
+      "acceptedBytes": 5618,
+      "acceptedSha256": "ba1bc304cb222d4f8d4875073b8daa1fce5904e0ff7dc8e9e2cdf5360926b4aa",
+      "output": "mob_ward_allies.webp",
+      "runtimeUrl": "/ui/auras/mob_ward_allies.webp"
+    },
+    {
+      "auraId": "mob_wither",
+      "trait": "wither",
+      "mechanic": "A landed hostile hit may drain Agility, reducing armor and dodge together.",
+      "kind": "buff_agi",
+      "polarity": "harmful_negative_agility_on_player",
+      "producer": {
+        "path": "src/sim/mob/mob_swing.ts",
+        "symbol": "runMobSwingAffixes",
+        "runtime_id_formula": "wither_<templateId>"
+      },
+      "additionalProducers": [],
+      "runtimeIds": ["wither_fen_troll"],
+      "carrierCount": 1,
+      "intendedVisualSubject": "a once-supple green tendon or leaf-shaped limb shriveling into brittle brown fibers while a boot silhouette loses its motion trail. Hostile withering curse, conveying lost agility, armor, and dodge - not a positive nature buff.",
+      "references": [
+        {
+          "path": "public/ui/skills/rogue/deadly_poison.webp",
+          "role": "venom, poison, decay, organic green-violet hostile palette"
+        },
+        {
+          "path": "public/ui/skills/hunter/serpent_sting.webp",
+          "role": "venom, poison, decay, organic green-violet hostile palette"
+        },
+        {
+          "path": "public/ui/skills/warlock/corruption.webp",
+          "role": "venom, poison, decay, organic green-violet hostile palette"
+        }
+      ],
+      "prompt": "Create one square 1:1 game UI aura icon for World of ClaudeCraft, a premium hand-painted dark-fantasy MMORPG. Stylized-concept art with a bold centered silhouette, tight crop, layered painterly texture, dramatic directional light, deep atmospheric shadows, rich jewel-toned color, and an edge-to-edge opaque composition. The subject must fill roughly 75% of the canvas and remain immediately readable at 16, 32, and 48 pixels. Dark vignette is allowed only as painted atmosphere, never as a frame. No text, letters, numbers, border, frame, UI chrome, rarity treatment, watermark, logo, flat vector glyph, emoji, or photorealism. Show a once-supple green tendon or leaf-shaped limb shriveling into brittle brown fibers while a boot silhouette loses its motion trail. Hostile withering curse, conveying lost agility, armor, and dodge - not a positive nature buff.",
+      "decision": "Accepted: flexible green form turning brittle brown reads as negative Agility.",
+      "sourceFile": "tmp/imagegen/v039-second-pass/mob-aura-families/raw/mob_wither.png",
+      "sourceBytes": 2241406,
+      "sourceSha256": "3aea16f40590ef4ff434188c986e7deaf351ddeae721ff8c93bfbfe9edee38b7",
+      "acceptedBytes": 4252,
+      "acceptedSha256": "c23ec6ea00b3d61a15715f1c97bc09571830f180c86900b8ee2a55d4db9f5329",
+      "output": "mob_wither.webp",
+      "runtimeUrl": "/ui/auras/mob_wither.webp"
+    }
+  ]
+}

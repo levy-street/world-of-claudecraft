@@ -1,8 +1,12 @@
-// Physical dimensions of scatter decorations, in world yards. THE single
-// source of truth: `src/render/foliage.ts` scales each rock GLB to exactly the
-// height this returns, and `src/sim/colliders.ts` uses the same number as the
-// collider's movement top, so a stone's silhouette and the surface you stand
-// on (or stride over) can never drift apart again.
+// Physical dimensions of scatter decorations, in world yards, and whether a
+// decoration is solid at all. THE single source of truth: `src/render/foliage.ts`
+// scales each rock GLB to exactly the height this returns, and `src/sim/colliders.ts`
+// uses the same number as the collider's movement top, so a stone's silhouette and the
+// surface you stand on (or stride over) can never drift apart again. The same sharing
+// applies to solidity: `decorationHasCollider` is what `colliders.ts` gates a rock's
+// collider on, and what the render side's low-tier triangle-count trim
+// (`src/render/foliage_decimation_core.ts`) reads before ever dropping one, so a
+// graphics preset can never hide something a player can be blocked by.
 //
 // Why this module exists: the rock collider top used to be a hand-guessed
 // `1.25 * scale`, while the rendered stone stood about `0.84 * scale` tall.
@@ -63,4 +67,16 @@ export function rockHeightOf(d: Decoration, seed: number): number {
 /** Collider radius for this rock (yards). */
 export function rockRadius(scale: number): number {
   return ROCK_RADIUS_PER_SCALE * scale;
+}
+
+/**
+ * Whether `colliders.ts` gives this decoration a real physical collider.
+ * A rock only clears the bar at or above `ROCK_COLLIDER_MIN_SCALE`; every
+ * tree/tree2 gets an unconditional trunk collider. The single home for this
+ * check so `colliders.ts` (which builds the collider) and any render-side
+ * candidate selection (which must never hide one, root CLAUDE.md's
+ * graphics-fairness invariant) can't drift apart on what counts as solid.
+ */
+export function decorationHasCollider(d: Decoration): boolean {
+  return d.kind !== 'rock' || d.scale >= ROCK_COLLIDER_MIN_SCALE;
 }

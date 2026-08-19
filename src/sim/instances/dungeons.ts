@@ -442,6 +442,10 @@ export function enterDungeon(
   ctx.emit({ type: 'log', text: dungeon.enterText, color: '#b9f', pid: r.meta.entityId });
   // Stepping through the moongate is a Chronicle task.
   if (dungeonId === 'drowned_temple') ctx.markVisited(r.meta, 'dungeon:drowned_temple');
+  // The walk-in castles record their visit deeds on entry (markVisited draws
+  // no rng and only marks the deeds pass dirty).
+  if (dungeonId === 'the_last_keep') ctx.markVisited(r.meta, 'dungeon:the_last_keep');
+  if (dungeonId === 'dawnhold_castle') ctx.markVisited(r.meta, 'dungeon:dawnhold_castle');
   return true;
 }
 
@@ -575,7 +579,8 @@ export function detachFromDungeon(ctx: SimContext, p: Entity): { x: number; z: n
   const inst = ctx.instances.find((i) => i.partyKey !== null && instanceClaimContains(i, p.pos));
   if (inst) scrubInstanceThreat(ctx, inst, p.id);
   cancelProfessionSessionOnDisplacement(ctx, p);
-  return { x: dungeon.doorPos.x, z: dungeon.doorPos.z - DUNGEON_DOOR_RETURN_INSET };
+  const drop = dungeon.leaveOffset ?? { x: 0, z: -DUNGEON_DOOR_RETURN_INSET };
+  return { x: dungeon.doorPos.x + drop.x, z: dungeon.doorPos.z + drop.z };
 }
 
 // Drop one departing player (and every entity they own) from the hate tables of

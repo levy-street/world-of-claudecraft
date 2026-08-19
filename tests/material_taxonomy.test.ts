@@ -131,8 +131,9 @@ const HONEST_MATERIALS = [
 ] as const;
 
 // The ONLY non-poor junk allowed outside the material set: four rare-mob
-// trophies plus the placed keep keepsake (Q4 ruled them out of the sweep),
-// the phase 04 making-catalyst, and the Masterwrought phase 07 intermediates
+// trophies plus the two placed castle keepsakes (Q4 ruled them out of the
+// sweep; the Dawnhold garden posy follows the keep signet's ruling), the
+// phase 04 making-catalyst, and the Masterwrought phase 07 intermediates
 // still awaiting their consuming apex rows (the wyrmfall_core precedent; the
 // Quickening Catalyst is deliberately NOT here, it derives IN via its nine
 // in-phase consumers). A new junk item landing in this assertion's diff must
@@ -141,6 +142,7 @@ const HONEST_MATERIALS = [
 // IN, or add it here as a deliberate non-material with the maintainer's
 // sign-off.
 const ALLOWED_UNCLASSIFIED_JUNK = [
+  'dawnhold_posy',
   'emberwing_cinderscale',
   'gleamstag_charm',
   'guardian_core',

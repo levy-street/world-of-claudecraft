@@ -255,6 +255,14 @@ const PRESERVED_IMAGE_BACKED_MODIFIER_IDS = [
   'gloomshade_abyssal_chain',
   'lingering_dread',
   'overflowing_power',
+  'pet_aggressive',
+  'pet_attack',
+  'pet_defensive',
+  'pet_feed',
+  'pet_growl',
+  'pet_mend',
+  'pet_passive',
+  'pet_water_jet',
   'pursuit',
   'second_wind',
   'snap_polymorph',
@@ -624,14 +632,17 @@ describe('missing painted deed and Heroic weapon integration', () => {
       'pvp_card_duel_first_win',
     ]);
     // Later releases appended more deeds after this historical wave. The
-    // release art audit painted those additions too, and the three
-    // Masterwrought jewelcrafting deeds (the rare milestone with the base
-    // catalog, the 50-skill and Grandmaster pair with the phase 05 QA
-    // ruling) each shipped their crest in the change that added them, as did
-    // the three Masterwrought inscription milestone deeds at phase 06, so the
-    // one exhaustive DEED_ART_PENDING ledger is empty and no live deed uses
-    // fallback art.
-    expect(DEED_ORDER).toHaveLength(277);
+    // release art audit painted those additions, and the six Masterwrought
+    // jewelcrafting and inscription milestone deeds (phases 05 and 06) each
+    // shipped their crest in the change that added them. The only artless ids
+    // are the release's walk-in castle visit pair appended after the audit,
+    // riding the category-crest fallback the Icons authoring rule in
+    // docs/design/deeds.md sanctions until their 512px sources are
+    // commissioned (flagged in docs/achievements/icon-brief.md). Read from
+    // DEED_ART_PENDING, the one enumeration of that debt (src/ui/icons.ts),
+    // so this file cannot end up naming a different pending set than the
+    // other two art suites. Exhaustive: a third artless deed still reds here.
+    expect(DEED_ORDER).toHaveLength(279);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(

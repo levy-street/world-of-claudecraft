@@ -8,8 +8,9 @@
 //     piece grants exactly 1, a sub-rare piece grants baseDisenchantYield to
 //     maxDisenchantYield (the single +0/+1 rng bonus arm),
 //   - the typed secondary is disenchant_reagents.ts typedSecondaryFor: absent
-//     below rare and on a piece with no typed material (jewelry), exactly 1 on a
-//     rare piece, 1 to 2 (one rng draw) on an epic/legendary piece.
+//     below rare and on a piece with no typed material (jewelry or a held
+//     offhand), exactly 1 on a rare piece, 1 to 2 (one rng draw) on an
+//     epic/legendary piece.
 // It is a PREVIEW, never a promise the client enforces: the server stays
 // authoritative and the confirm's own OK path still just sends the command.
 //

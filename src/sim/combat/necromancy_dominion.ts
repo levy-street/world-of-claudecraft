@@ -46,8 +46,8 @@ export function selectCorpseExplosionServant<T extends CorpseExplosionServant>(
   );
   eligible.sort((a, b) => {
     const priority = (servant: CorpseExplosionServant): number => {
-      if (servant.templateId === 'necromancy_bone_mage') return 0;
-      if (servant.templateId === 'necromancy_skeletal_warrior') return 1;
+      if (servant.templateId === 'necromancy_skeletal_warrior') return 0;
+      if (servant.templateId === 'necromancy_bone_mage') return 1;
       return 2;
     };
     const priorityDifference = priority(a) - priority(b);

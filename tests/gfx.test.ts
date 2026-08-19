@@ -427,6 +427,11 @@ describe('graphics tier resolution', () => {
     expect(effectsLow.ao).toBe(false);
     expect(effectsLow.msaaSamples).toBe(0);
     expect(effectsLow.smaa).toBe(false);
+    // Losing the composer loses the SMAA tail, so the grade-fused arm is what
+    // keeps this mix anti-aliased, and the AA dial still turns it off.
+    expect(effectsLow.fxaa).toBe(true);
+    expect(adv({ effectsQuality: 0, antiAliasing: 0 }).fxaa).toBe(false);
+    expect(adv({ effectsQuality: 1 }).fxaa).toBe(false);
     const effectsMedium = adv({ effectsQuality: 0.5 });
     expect(effectsMedium.ao).toBe(true);
     expect(effectsMedium.bloom).toBe(false);
@@ -708,6 +713,31 @@ describe('graphics tier resolution', () => {
       effectsQuality: 0,
     });
     expect(advanced.maxPointLights).toBe(2);
+  });
+
+  it('gives the grade-only tier its fused edge AA and nothing else a second AA arm', () => {
+    // Medium is the tier the fused arm exists for: it keeps the region-safe
+    // grade-only chain, which a full-frame SMAA tail cannot ride.
+    expect(gfxInternalsForTest.settingsFor('medium').fxaa).toBe(true);
+    expect(gfxInternalsForTest.settingsFor('medium').smaa).toBe(false);
+    // Low has no grade pass to fuse into, and the composer tiers already have
+    // SMAA. Never both arms on one profile.
+    expect(gfxInternalsForTest.settingsFor('low').fxaa).toBe(false);
+    for (const tier of ['high', 'ultra', 'insane'] as const) {
+      const settings = gfxInternalsForTest.settingsFor(tier);
+      expect(settings.smaa, tier).toBe(true);
+      expect(settings.fxaa, tier).toBe(false);
+    }
+    // The iOS WebKit profile drops the grade pass with the composer, so it
+    // stays on no post AA at all rather than gaining an arm with no host.
+    const webkit = gfxInternalsForTest.settingsFor('medium', {
+      maxTouchPoints: 5,
+      coarsePointer: true,
+      narrowViewport: true,
+      platform: 'ios',
+    });
+    expect(webkit.gradePass).toBe(false);
+    expect(webkit.fxaa).toBe(false);
   });
 
   it('routes Advanced low effects through the low static effects tier', () => {

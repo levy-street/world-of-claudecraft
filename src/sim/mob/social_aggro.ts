@@ -13,6 +13,7 @@ import { MOBS } from '../data';
 import type { SimContext } from '../sim_context';
 import { addThreat } from '../threat';
 import type { Entity } from '../types';
+import { questGateBlocksAggro } from './quest_gated_aggro';
 
 // A fleeing mob rallies same-family allies within this (small, local) radius. Kept tight
 // so the first cluster it reaches is local, not the whole camp down the escape lane.
@@ -34,7 +35,10 @@ export function rallyFleeingAllies(ctx: SimContext, mob: Entity, target: Entity)
       m.aiState === 'idle' &&
       m.ownerId === null &&
       MOBS[m.templateId]?.family === family &&
-      d2 < FLEE_HELP_RADIUS * FLEE_HELP_RADIUS
+      d2 < FLEE_HELP_RADIUS * FLEE_HELP_RADIUS &&
+      // A quest-gated same-family idle mob (e.g. a Broodmother egg beside a fleeing
+      // Mirefen Widow) never joins a rally against a player it cannot legally fight.
+      !questGateBlocksAggro(ctx.players, m, target)
     ) {
       m.aiState = 'chase';
       m.aggroTargetId = target.id;

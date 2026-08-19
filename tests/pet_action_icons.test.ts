@@ -1,10 +1,13 @@
-import { existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { ABILITIES, MOBS } from '../src/sim/data';
 import { abilityImageUrl, hasExplicitAbilityIcon } from '../src/ui/icons';
 import {
   PET_ACTION_ICONS,
+  PET_ACTION_IMAGE_IDS,
   petFeedButtonState,
   petSpecialButtonState,
 } from '../src/ui/pet_action_icons';
@@ -15,6 +18,7 @@ import {
 // magic heal). Each pet action must have its OWN dedicated icon recipe instead.
 describe('pet action bar icons', () => {
   const iconIds = Object.values(PET_ACTION_ICONS);
+  const petArtDir = path.join(process.cwd(), 'public/ui/skills/pet');
 
   it('defines an icon for every pet action', () => {
     expect(iconIds.length).toBeGreaterThan(0);
@@ -33,6 +37,72 @@ describe('pet action bar icons', () => {
 
   it('uses a distinct icon id per pet action', () => {
     expect(new Set(iconIds).size).toBe(iconIds.length);
+  });
+
+  it('ships one mapped, unique, opaque painted WebP for every synthetic command', async () => {
+    const mapping = JSON.parse(readFileSync(path.join(petArtDir, 'mapping.json'), 'utf8')) as {
+      iconSize: number;
+      runtimeDir: string;
+      acceptedArtManifest: string;
+      abilities: Array<{
+        abilityId: string;
+        output: string;
+        source: string;
+        owner: string;
+        license: string;
+        sourceSha256: string;
+        acceptedSha256: string;
+        acceptedBytes: number;
+      }>;
+    };
+    const committedIds = readdirSync(petArtDir)
+      .filter((name) => name.endsWith('.webp'))
+      .map((name) => path.basename(name, '.webp'))
+      .sort();
+    const mappedIds = mapping.abilities.map(({ abilityId }) => abilityId).sort();
+    const expectedIds = [...PET_ACTION_IMAGE_IDS].sort();
+
+    expect(iconIds.slice().sort()).toEqual(expectedIds);
+    expect(committedIds).toEqual(expectedIds);
+    expect(mappedIds).toEqual(expectedIds);
+    expect(mapping).toMatchObject({
+      iconSize: 128,
+      runtimeDir: 'public/ui/skills/pet',
+      acceptedArtManifest:
+        'docs/achievements/release-v039-icon-art-first-pass-2026-08-16/accepted-art.json',
+    });
+
+    const hashes = new Set<string>();
+    for (const entry of mapping.abilities) {
+      expect(entry.output, entry.abilityId).toBe(`${entry.abilityId}.webp`);
+      expect(entry.source, entry.abilityId).toBe('OpenAI built-in image generation');
+      expect(entry.owner, entry.abilityId).toBe('World of ClaudeCraft');
+      expect(entry.license, entry.abilityId).toContain('project asset');
+      expect(entry.sourceSha256, entry.abilityId).toMatch(/^[0-9a-f]{64}$/);
+
+      const url = abilityImageUrl(entry.abilityId);
+      expect(url, entry.abilityId).toBe(`/ui/skills/pet/${entry.abilityId}.webp`);
+      const file = path.join(process.cwd(), 'public', (url as string).slice(1));
+      const bytes = readFileSync(file);
+      const hash = createHash('sha256').update(bytes).digest('hex');
+      const metadata = await sharp(bytes).metadata();
+
+      expect(bytes.length, entry.abilityId).toBe(entry.acceptedBytes);
+      expect(bytes.length, entry.abilityId).toBeLessThanOrEqual(15 * 1024);
+      expect(hash, entry.abilityId).toBe(entry.acceptedSha256);
+      expect(metadata, entry.abilityId).toMatchObject({
+        format: 'webp',
+        width: 128,
+        height: 128,
+        space: 'srgb',
+        hasAlpha: false,
+      });
+      hashes.add(hash);
+    }
+    expect(hashes.size).toBe(expectedIds.length);
+    expect(readFileSync(path.join(process.cwd(), 'CREDITS.md'), 'utf8')).toContain(
+      'Shared pet action-bar command icons',
+    );
   });
 
   it('gives each Warlock pet signature button dedicated painted art', () => {

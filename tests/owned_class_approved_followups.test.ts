@@ -12,7 +12,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, PlayerClass, SimEvent } from '../src/sim/types';
-import { abilityEffectText } from '../src/ui/hud';
+import { abilityEffectText } from '../src/ui/ability_description';
 
 type TestSim = Sim & {
   addEntity(entity: Entity): void;

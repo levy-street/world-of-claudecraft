@@ -87,7 +87,7 @@ export function buildComposer(webgl: THREE.WebGLRenderer, scene: THREE.Scene, ca
 }
 ```
 
-**AA tradeoff (decided):** MSAA `samples: 4` on the composer's HalfFloat target. It resolves geometry edges before post, costs ~1ms on integrated GPUs at 1080p×1.75, and unlike FXAA doesn't smear the crisp low-poly silhouettes. FXAA (`ShaderPass(FXAAShader)` appended after grade) only as fallback if `!webgl.capabilities.isWebGL2` (rare). SMAA rejected: 3 extra passes for marginal gain here. lowgfx keeps the current direct `webgl.render()` with built-in `antialias:true` — zero new cost.
+**AA tradeoff (decided):** MSAA `samples: 4` on the composer's HalfFloat target. It resolves geometry edges before post, costs ~1ms on integrated GPUs at 1080p×1.75, and unlike FXAA doesn't smear the crisp low-poly silhouettes. FXAA (`ShaderPass(FXAAShader)` appended after grade) only as fallback if `!webgl.capabilities.isWebGL2` (rare). SMAA rejected: 3 extra passes for marginal gain here. lowgfx keeps the current direct `webgl.render()` with built-in `antialias:true`: zero new cost. (Superseded: SMAA is the tail on high and above, and medium runs an FXAA arm fused INTO the grade pass rather than appended after it, so the grade-only chain keeps its dynamic-resolution region; see `src/render/gfx_aa_policy_core.ts`.)
 
 **GradeShader** (inline in post.ts) — lift/gamma/gain + saturation + vignette + faint filmic grain:
 

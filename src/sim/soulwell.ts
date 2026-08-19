@@ -36,6 +36,23 @@ function isOwnedSoulwell(entity: Entity, ownerId: number): boolean {
   );
 }
 
+function rememberEligiblePlayer(state: NonNullable<Entity['soulwell']>, playerId: number): void {
+  if (!state.eligiblePlayerIds.includes(playerId)) state.eligiblePlayerIds.push(playerId);
+}
+
+export function rememberSoulwellPartyEligibility(
+  ctx: SimContext,
+  party: { members: readonly number[] },
+): void {
+  const entities = ctx.entities;
+  if (!entities || typeof entities.values !== 'function') return;
+  for (const entity of entities.values()) {
+    const state = entity.soulwell;
+    if (!state || !party.members.includes(state.ownerId)) continue;
+    for (const memberId of party.members) rememberEligiblePlayer(state, memberId);
+  }
+}
+
 function overlapsGroundObject(ctx: SimContext, casterId: number, x: number, z: number): boolean {
   for (const entity of ctx.entities.values()) {
     if (entity.id === casterId || entity.kind !== 'object') continue;
@@ -87,10 +104,12 @@ export function summonSoulwell(
   const well = createGroundObject(ctx.nextId++, SOULWELL_OBJECT_ITEM_ID, 'Soulwell', spawnPosition);
   well.templateId = SOULWELL_ABILITY_ID;
   well.despawnTimer = duration;
-  const partyMembers = ctx.partyOf(caster.id)?.members ?? [];
+  const party = ctx.partyOf(caster.id);
+  const partyMembers = party?.members ?? [];
   const ownerMeta = ctx.players.get(caster.id);
   well.soulwell = {
     ownerId: caster.id,
+    partyId: party?.id ?? null,
     eligiblePlayerIds: [...new Set([caster.id, ...partyMembers])],
     wardAbsorbPctMax: ownerMeta ? ctx.playerMods(ownerMeta).global.warlockSoulwellWardPct : 0,
     wardedPlayerIds: [],
@@ -113,10 +132,16 @@ export function interactSoulwell(ctx: SimContext, object: Entity, actorId: numbe
   }
 
   const state = object.soulwell;
-  if (!state.eligiblePlayerIds.includes(actorId)) {
+  const ownerParty = ctx.partyOf(state.ownerId);
+  const isOriginalPartyMember =
+    state.partyId !== null &&
+    ownerParty?.id === state.partyId &&
+    ownerParty.members.includes(actorId);
+  if (!state.eligiblePlayerIds.includes(actorId) && !isOriginalPartyMember) {
     ctx.error(actorId, 'That ally is not in your group.');
     return true;
   }
+  if (ownerParty) rememberSoulwellPartyEligibility(ctx, ownerParty);
 
   const actor = ctx.entities.get(actorId);
   if (actor?.inCombat) {

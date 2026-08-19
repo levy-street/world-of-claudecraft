@@ -755,11 +755,11 @@ describe('item-art audit builder', () => {
     ) as Record<string, unknown>;
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: '82667558927c9485704392f2f336678f4fdb3b8a78c5de1a08d9805971ba1d36',
-      catalogBytes: 497520,
+      catalogSha256: '1a7f563f4eac92cfbb3e81eb2ee81f0bcd4550e001a62bb7b9ea20fa57486ef4',
+      catalogBytes: 498026,
       rendererFingerprint: 'fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082',
-      catalogCount: 906,
-      liveItemCount: 921,
+      catalogCount: 907,
+      liveItemCount: 922,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
@@ -768,7 +768,7 @@ describe('item-art audit builder', () => {
       sheetCount: 232,
       sheetModeCounts: Object.fromEntries(ITEM_ART_AUDIT_MODES.map((mode) => [mode, 29])),
       sheetSetSha256: null,
-      shippingCatalogSha256: '1039f0a12f6ee207a0469ee276808748cd2054254afd3be02351bbf494908fab',
+      shippingCatalogSha256: '71d66ce297b6c82b98f27bbc8b67df042136a6e00740eef488107bb90a215a30',
       machineChecksPassed: true,
       verdict: null,
     });

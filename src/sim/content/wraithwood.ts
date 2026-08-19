@@ -153,7 +153,10 @@ export const WRAITHWOOD_MOBS: Record<string, MobTemplate> = {
     name: 'Gravenbark Shambler',
     minLevel: 20,
     maxLevel: 20,
-    family: 'ogre',
+    // Animated wood, not a brute (see orchard_treant in amberfall.ts). Elemental
+    // is also the safe tag here specifically: this one is NOT elite, and beast
+    // would put a walking tree inside a hunter's tame gate.
+    family: 'elemental',
     hpBase: 90,
     hpPerLevel: 26,
     dmgBase: 14,

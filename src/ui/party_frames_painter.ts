@@ -32,7 +32,6 @@ import {
   createPartyRowsWrapper,
   PARTY_BAR_SCALE_PRECISION,
   PARTY_CREST_KEY_PREFIX,
-  PARTY_LEADER_GLYPH,
   type PartyRow,
   type PartyRowAuraDeps,
   type PartyRowDeps,
@@ -415,10 +414,9 @@ export class PartyFramesPainter {
     );
     this.writers.setStyleProp(row.incoming, '--incoming-start', `${(hpFrac * 100).toFixed(1)}%`);
     this.writers.setWidth(row.incoming, `${(incomingFrac * 100).toFixed(1)}%`);
-    // The leader star (aria-hidden, decorative) and the visually-hidden raid-group label,
-    // both per-frame text routed through the elided writer (no raw write on the hot path);
-    // each is cached, so a steady-state tick re-writes neither.
-    this.writers.setText(row.leadStar, leader === m.pid ? PARTY_LEADER_GLYPH : '');
+    // The leader crown is built once as an aria-hidden SVG; only its display
+    // state changes here. The visually-hidden raid-group label remains text.
+    this.writers.setDisplay(row.leadStar, leader === m.pid ? BADGE_SHOWN : BADGE_HIDDEN);
     this.writers.setText(row.group, this.groupLabel(m, raid));
     // The dead / combat / out-of-range badge icons: persistent, only display toggles
     // (the non-color cue that stays distinguishable under forced-colors).

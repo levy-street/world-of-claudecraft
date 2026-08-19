@@ -1614,34 +1614,6 @@ export async function grantAccountMechChroma(
   return addAccountCosmeticId(accountId, 'mechChromaIds', chromaId);
 }
 
-export async function revokeAccountMechChroma(
-  accountId: number,
-  chromaId: string,
-): Promise<AccountCosmetics> {
-  const res = await pool.query(
-    `WITH updated AS (
-       UPDATE accounts
-          SET cosmetics = jsonb_set(
-            COALESCE(cosmetics, '{}'::jsonb), '{mechChromaIds}',
-            (SELECT COALESCE(jsonb_agg(to_jsonb(v) ORDER BY ord), '[]'::jsonb)
-               FROM jsonb_array_elements_text(
-                 CASE WHEN jsonb_typeof(cosmetics -> 'mechChromaIds') = 'array'
-                   THEN cosmetics -> 'mechChromaIds' ELSE '[]'::jsonb END)
-                 WITH ORDINALITY AS entries(v, ord)
-              WHERE v <> $2))
-        WHERE id = $1
-        RETURNING id, cosmetics
-     )
-     SELECT updated.cosmetics,
-            awc.skin_ids AS weapon_skin_ids,
-            awc.loadout AS weapon_skin_loadout
-       FROM updated
-       LEFT JOIN account_weapon_cosmetics awc ON awc.account_id = updated.id`,
-    [accountId, chromaId],
-  );
-  return normalizeAccountCosmeticsRow(res.rows[0]);
-}
-
 /** Additive union in the rollback-safe paid-entitlement row. */
 export async function grantAccountWeaponSkins(
   accountId: number,

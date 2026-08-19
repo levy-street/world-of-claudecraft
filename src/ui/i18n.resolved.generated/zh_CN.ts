@@ -953,6 +953,22 @@ export const zh_CN: EnTranslations = {
       "clockMs": "{minutes}:{seconds}",
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
+    "lastkeepMap": {
+      "title": "{keep}：{story}",
+      "story": {
+        "undercroft": "地下穹室",
+        "state": "正殿层",
+        "residence": "起居层",
+        "tower": "瞭望塔"
+      }
+    },
+    "dawnholdMap": {
+      "title": "{keep}：{story}",
+      "story": {
+        "ground": "庭园层",
+        "solar": "日光厅"
+      }
+    },
     "compass": {
       "N": "北",
       "NE": "东北",
@@ -4786,6 +4802,7 @@ export const zh_CN: EnTranslations = {
       "mageEleJet": "水流喷射在宠物栏上有属于自己的按钮：点击它，就能把一道寒流锁定在某个敌人身上；右键点击它（在移动端为长按），则让水元素在冷却结束后自行施放。",
       "formsHeading": "变形",
       "formsNote": "德鲁伊靠变形作战。大多数德鲁伊技能都归属于某一种形态，因此你当前所处的形态决定了你能施放什么，而变形本身会消耗少量法力。无论是否身处战斗，你都可以随时变形，次数不限。",
+      "formsAutoUnshift": "变身时施放治疗或伤害法术会自动为你解除变身。以这种方式离开形态不消耗法力，也不占用公共冷却时间，因此瞬发法术会在你按下的那一刻释放。重新变身是普通技能，依然消耗法力并占用公共冷却时间。",
       "formsMoonwing": "平衡系德鲁伊还会多得到一种形态：枭兽形态，也就是平衡德鲁伊作战时所用的施法形态。它是唯一保留法术的野兽形态，而你的魔杖也只在这个形态或你普通的施法形态下才能使用。",
       "formLine": {
         "form_bear": "坦克形态：厚实的兽皮，以怒气取代法力，还有额外的威胁值，让敌人始终朝你挥拳。",
@@ -7231,6 +7248,7 @@ export const zh_CN: EnTranslations = {
       "shopMarksRequired": "购买{name}需要 {marks} 枚探秘印记。",
       "shopSealPremiumOnly": "此封印只向大师之手屈服，唯有上乘投入方能开启。",
       "passageSealed": "通道被封住了。",
+      "enemiesRemain": "先清除剩余的敌人。",
       "moveCloserPassage": "靠近通道一些。",
       "moveCloserChest": "靠近宝箱一些。",
       "moveCloserReliquary": "靠近圣物匣一些。",
@@ -10051,7 +10069,7 @@ export const zh_CN: EnTranslations = {
       },
       "fear": {
         "name": "惊惧",
-        "description": "使敌人陷入恐惧并畏缩，最多持续 8 秒。任何伤害都会打破效果。"
+        "description": "使敌人陷入恐惧并畏缩，最多持续 5 秒。累计达到目标最大生命值 8% 的伤害会打破效果。"
       },
       "searing_pain": {
         "name": "焦灼",
@@ -10129,7 +10147,7 @@ export const zh_CN: EnTranslations = {
       "ferocious_bite": {
         "name": "血噬",
         "description": "终结技，造成 {damage}。仅限狼形态。",
-        "specNote_feral": "每次命中累积1层古血；古血达到3层时，此按钮变为血收：一次撕咬，造成91点伤害，每个连击点额外造成55点，并立即引爆你的剐削与血裂的全部剩余伤害，同时恢复30点能量。"
+        "specNote_feral": "每次命中累积1层古血；古血达到3层时，此按钮变为血收：消耗古血发动一次更强的撕咬，立即引爆你的剐削与血裂的全部剩余伤害，同时恢复能量。"
       },
       "swipe": {
         "name": "横扫利爪",
@@ -10192,7 +10210,7 @@ export const zh_CN: EnTranslations = {
       },
       "tigers_fury": {
         "name": "狼血",
-        "description": "使攻击强度提高 {buff}，持续 {duration} 秒。仅限狼形态。"
+        "description": "涌起{rage}点能量，并使攻击强度提高 {buff}，持续 {duration} 秒。仅限狼形态。"
       },
       "rip": {
         "name": "血隙",
@@ -10297,7 +10315,7 @@ export const zh_CN: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "骸骨印记",
-        "description": "为敌人标记12秒，储存你与你的亡灵所造成伤害的20%。再次施放可将其引爆。若被标记的敌人死亡，印记会在6码内爆炸，并生成1枚灵魂碎片。"
+        "description": "为敌人标记15秒，储存你与你的亡灵所造成伤害的20%。再次施放可将其引爆。若被标记的敌人死亡，印记会在6码内爆炸，并生成1枚灵魂碎片。"
       },
       "unholy_command": {
         "name": "邪秽号令",
@@ -10396,8 +10414,8 @@ export const zh_CN: EnTranslations = {
         "description": "进入枭兽形态，强化施法直到你切换回来。再次施放可返回普通形态。（平衡专精招牌）"
       },
       "feral_charge": {
-        "name": "野性冲锋",
-        "description": "冲向敌人并使其定身1秒。8-25码距离。（野性专精招牌）"
+        "name": "原始涌动",
+        "description": "释放一股原始涌动。狼形态下，能量恢复速度提高100%，持续10秒。巨熊形态下，立即产生50点怒气。（野性专精招牌）"
       },
       "swiftmend": {
         "name": "迅捷治愈",
@@ -10413,7 +10431,7 @@ export const zh_CN: EnTranslations = {
       },
       "redharvest": {
         "name": "血收",
-        "description": "消耗你的3层古血：造成{damage}点伤害，立即引爆你的剐削与血裂的全部剩余伤害，移除这两个流血效果，并恢复30点能量。无需连击点也可使用。"
+        "description": "消耗你的3层古血：造成{damage}点伤害，立即引爆你的剐削与血裂的全部剩余伤害，移除这两个流血效果，并恢复{rage}点能量。无需连击点也可使用。"
       },
       "marrowbreak": {
         "name": "碎髓",
@@ -10653,7 +10671,7 @@ export const zh_CN: EnTranslations = {
       },
       "evocation": {
         "name": "以太之井",
-        "description": "快速恢复法力。（法师天赋）"
+        "description": "引导6秒：每秒恢复100点法力并获得8点法术强度，效果在引导期间叠加并持续15秒。（法师天赋）"
       },
       "flurry_of_knives": {
         "name": "刀刃乱舞",
@@ -10661,7 +10679,7 @@ export const zh_CN: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "野性愈合",
-        "description": "在10秒内恢复180点生命值。只能在熊形态下使用。（德鲁伊天赋）"
+        "description": "在10秒内恢复相当于最大生命值40%的生命。只能在熊形态下使用。（德鲁伊天赋）"
       },
       "frost_trap": {
         "name": "霜纹陷阱",
@@ -10681,11 +10699,11 @@ export const zh_CN: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "恐惧嚎叫",
-        "description": "使附近的敌人恐惧，最多持续3秒。受到伤害可能打破该效果。（术士天赋）"
+        "description": "使附近的敌人恐惧，最多持续 5 秒。累计达到目标最大生命值 8% 的伤害会打破其恐惧。（术士天赋）"
       },
       "ice_block": {
         "name": "寒冰棺",
-        "description": "将你封入寒冰之中，吸收大量伤害，持续 8 秒。（法师天赋）"
+        "description": "将你封入坚冰8秒，使你免疫所有伤害。移除已存在的普通有害效果，并阻止新的普通控制效果施加于你。可在昏迷或变形状态下使用。被封冻期间无法行动。再次施放可取消。（法师）"
       },
       "inner_focus": {
         "name": "静心",
@@ -10894,7 +10912,7 @@ export const zh_CN: EnTranslations = {
       },
       "prowl": {
         "name": "潜行",
-        "description": "在狼形态下进入潜行状态，移动速度降低 50%。无法在战斗中使用。"
+        "description": "在狼形态下进入潜行状态，移动速度降低 5%。无法在战斗中使用。"
       },
       "rake": {
         "name": "剐削",
@@ -12449,6 +12467,9 @@ export const zh_CN: EnTranslations = {
       "pristine_claw": {
         "name": "完美的爪"
       },
+      "dawnhold_posy": {
+        "name": "晨曦堡花园小花束"
+      },
       "hammered_copper_band": {
         "name": "锤锻铜指环"
       },
@@ -13545,6 +13566,15 @@ export const zh_CN: EnTranslations = {
       },
       "training_dummy": {
         "name": "训练假人"
+      },
+      "friendly_player_dummy": {
+        "name": "友方玩家假人"
+      },
+      "normal_boss_dummy": {
+        "name": "普通首领假人"
+      },
+      "heroic_boss_dummy": {
+        "name": "英雄首领假人"
       },
       "ridge_stalker": {
         "name": "山脊潜猎者"
@@ -17184,6 +17214,11 @@ export const zh_CN: EnTranslations = {
         "name": "最后的堡垒",
         "enterText": "你踏入最后的堡垒那冰冷而寂静的大厅。",
         "leaveText": "你带上堡门，重新走进龙裔荒原的寒风中。"
+      },
+      "dawnhold_castle": {
+        "name": "晨曦堡",
+        "enterText": "你走进晨曦堡温暖而花香四溢的厅堂。",
+        "leaveText": "你回到阳光洒落的花园草坪上。"
       },
       "drowned_temple": {
         "name": "溺亡神殿",

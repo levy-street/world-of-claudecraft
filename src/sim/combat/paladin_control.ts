@@ -1,3 +1,4 @@
+import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import type { SimContext } from '../sim_context';
 import { addThreat } from '../threat';
 import { DT, type Entity } from '../types';
@@ -154,6 +155,7 @@ export function pulsePaladinThreat(
   const modified = amount * ctx.threatMod(source, 'holy');
   for (const target of ctx.hostilesInRadius(source, source.pos, radius)) {
     if (!ctx.hasLineOfSight(source, target)) continue;
+    if (questGateBlocksAggro(ctx.players, target, source)) continue;
     addThreat(target, source.id, modified);
     ctx.enterCombat(source, target);
   }
