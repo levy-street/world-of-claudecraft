@@ -438,3 +438,25 @@ feature/farming-plan, delete the branch and any agent worktrees, record
 the merge hash in progress.md and the farming-skill-program memory
 topic, and hand off to Phase 12 QA (docs/farming/phase-12-qa.md).
 ```
+
+## Phase 12 QA amendments (2026-08-19, swept per the deviation rule)
+
+Two mechanism amendments landed in the QA round (full records: the state.md
+Phase 12 QA block and the progress.md Phase 12 QA section):
+- The lootable re-arm dodge is now respawnTimer = Infinity (the precedented
+  never-re-arm sentinel), replacing the finite durationTicks + 20 spawn
+  timer whose worst-case margin over the 1 Hz despawn was exactly one tick
+  and whose "+ 20" was silently the sweep period. The 181s expiry arm rides
+  the whole life at the worst-case sweep phase pinning lootable false.
+- A feast placed inside a CLAIMED dungeon instance registers in the
+  instance's objectIds, so freeInstance tears it down with the run and the
+  sweep's inverse-cleanup leg reclaims the state and the one-active slot.
+  Placement inside instances stays LEGAL (the raid-table flavor); before
+  this, the entity outlived the run at the slot origin for the next party.
+  The SAME rule covers delve runs (their own spatial system): the feast
+  joins the placer's run.objectIds, torn down by freeDelveRun and the
+  module advance (the abandoned-module drop is deliberate).
+Render notes: the placement flourish registers standing tables silently on
+the first pass after construction (no rebuild/login replay; scope-re-entry
+ambiguity accepted), and shadow casting is budgeted at FEAST_SHADOW_CAP = 8
+with presence never culled.

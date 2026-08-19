@@ -11,12 +11,21 @@
 // coexistence and last-eaten-wins pins, and the zero-draw determinism twin.
 
 import { describe, expect, it } from 'vitest';
-import { ITEMS } from '../src/sim/data';
+import { DELVES, ITEMS } from '../src/sim/data';
+import { delveRunForPlayer, freeDelveRun } from '../src/sim/delves/runs';
+import { enterDungeon, instanceAt, leaveDungeon } from '../src/sim/instances/dungeons';
 import { setItemLocked } from '../src/sim/item_lock';
 import { FARM_FEAST_ITEM_ID, FARM_FEAST_TEMPLATE_ID } from '../src/sim/professions/feast';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
-import { type Aura, type Entity, FARMING_CAST_ID, type SimEvent } from '../src/sim/types';
+import {
+  type Aura,
+  type Entity,
+  FARMING_CAST_ID,
+  INSTANCE_EMPTY_TIMEOUT,
+  INTERACT_RANGE,
+  type SimEvent,
+} from '../src/sim/types';
 import { groundHeight, isInWaterBody, waterLevelAt } from '../src/sim/world';
 
 // The capstone dish the bite serves (ITEMS[FARM_FEAST_ITEM_ID].feast.dishItemId,
@@ -311,6 +320,30 @@ describe('shared feast: placing', () => {
     expect(sim.ctx.feasts.size).toBe(2);
   });
 
+  it('feast_active binds the rename-proof key: a characterId-keyed placer is denied too', () => {
+    // Every other feast_active arm uses non-keyed players, where ownerKey
+    // equals the session entity id, so a one-active scan comparing entity
+    // ids instead of the rename-proof key would pass them all. This arm is
+    // the online shape: a keyed placer whose characterId differs from the
+    // session pid must still be denied a second helping of placement.
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const placer = join(sim, 'Keyed', 501);
+    sim.tick();
+    expect(placer.meta.characterId).toBe(501);
+    expect(placer.pid, 'the key really differs from the session id').not.toBe(501);
+    giveFeast(sim, placer, 2);
+    const from0 = sim.events.length;
+    sim.placeFeast(placer.pid);
+    expect(eventsOf(sim, from0, 'farmFeastPlaced')).toHaveLength(1);
+    const st = [...sim.ctx.feasts.values()][0];
+    expect(st.ownerKey, 'the stored owner key is the characterId').toBe(501);
+    const from = sim.events.length;
+    sim.placeFeast(placer.pid);
+    expect(denyReason(sim, from)).toBe('feast_active');
+    expect(feastEntities(sim)).toHaveLength(1);
+    expect(sim.countItem(FARM_FEAST_ITEM_ID, placer.pid), 'the second item kept').toBe(1);
+  });
+
   it('dead answers via the shared error sentence, never farmDenied, nothing changes', () => {
     const { sim, placer } = world(0);
     giveFeast(sim, placer);
@@ -517,6 +550,90 @@ describe('shared feast: the bite and the Well Fed mint', () => {
     expect(st.charges).toBe(9);
   });
 
+  it('a bite at exactly INTERACT_RANGE lands: the deny is strictly beyond the boundary', () => {
+    // The client twin (tests/feast_interact.test.ts) pins its INCLUSIVE
+    // boundary on the premise the sim accepts at equality; this arm is the
+    // sim half of that contract, so a sim-side >= drift reds here instead
+    // of silently breaking the client's never-refuse-what-the-sim-accepts
+    // promise. Integer coordinates keep the distance exactly 5.0.
+    const { sim, placer, eaters } = world(1);
+    const eater = eaters[0];
+    const feastId = placeOk(sim, placer);
+    const ent = sim.entities.get(feastId);
+    if (!ent) throw new Error('no feast entity');
+    ent.pos.x = Math.round(ent.pos.x);
+    ent.pos.z = Math.round(ent.pos.z);
+    eater.p.pos.x = ent.pos.x + INTERACT_RANGE;
+    eater.p.pos.z = ent.pos.z;
+    eater.p.prevPos = { ...eater.p.pos };
+    const from = sim.events.length;
+    sim.consumeFeast(feastId, eater.pid);
+    expect(eventsOf(sim, from, 'farmDenied')).toHaveLength(0);
+    expect(eater.p.eating, 'the bite landed at the exact boundary').not.toBeNull();
+  });
+
+  it('the bite refuses while swimming with the family sentence, nothing spent', () => {
+    // The place gate's own comment cites this refusal as its premise; this
+    // arm executes it. The range gate sits BEFORE the swim gate, so the
+    // feast is poked within reach of the swimmer (no shore-placed geometry
+    // reaches deep water inside INTERACT_RANGE).
+    const { sim, placer, eaters } = world(1);
+    const eater = eaters[0];
+    const feastId = placeOk(sim, placer);
+    const st = sim.ctx.feasts.get(feastId)!;
+    const water = (() => {
+      for (let z = -300; z <= 300; z += 4) {
+        for (let x = -300; x <= 300; x += 4) {
+          const wl = waterLevelAt(x, z, 42);
+          if (isInWaterBody(x, z) && Number.isFinite(wl) && groundHeight(x, z, 42) < wl - 2) {
+            return { x, z, y: wl - 0.75 };
+          }
+        }
+      }
+      throw new Error('no deep water found on seed 42');
+    })();
+    eater.p.pos = { ...water };
+    eater.p.prevPos = { ...water };
+    expect(sim.isSwimming(eater.p), 'the rig really swims').toBe(true);
+    const ent = sim.entities.get(feastId);
+    if (!ent) throw new Error('no feast entity');
+    const shorePos = { ...ent.pos };
+    ent.pos = { x: water.x + 1, y: water.y, z: water.z };
+    const from = sim.events.length;
+    sim.consumeFeast(feastId, eater.pid);
+    expect(errorTexts(sim, from)).toEqual(["You can't do that while swimming."]);
+    expect(eventsOf(sim, from, 'farmDenied')).toHaveLength(0);
+    expect(st.charges, 'nothing spent').toBe(10);
+    expect(st.eatenBy.size, 'the ledger untouched').toBe(0);
+    expect(eater.p.eating).toBeNull();
+    // The positive control: the same press lands ashore.
+    ent.pos = shorePos;
+    standBeside(eater, placer, 1, 0);
+    const from2 = sim.events.length;
+    sim.consumeFeast(feastId, eater.pid);
+    expect(eventsOf(sim, from2, 'farmDenied')).toHaveLength(0);
+    expect(eater.p.eating, 'the shore press lands').not.toBeNull();
+    expect(st.charges).toBe(9);
+  });
+
+  it('a press in the orphan window (entity gone, state standing) denies without crashing', () => {
+    // The !entity leg of the existence gate: between an external entity
+    // drop and the next sweep boundary the state still stands; the press
+    // must answer feast_expired and never reach the range check, where
+    // dist2d on an undefined entity would throw (the crash vector the leg
+    // guards).
+    const { sim, placer, eaters } = world(1);
+    const eater = eaters[0];
+    const feastId = placeOk(sim, placer);
+    sim.entities.delete(feastId);
+    expect(sim.ctx.feasts.has(feastId), 'the state still stands pre-sweep').toBe(true);
+    const from = sim.events.length;
+    sim.consumeFeast(feastId, eater.pid);
+    expect(denyReason(sim, from)).toBe('feast_expired');
+    expect(sim.ctx.feasts.get(feastId)?.charges, 'nothing spent').toBe(10);
+    expect(eater.p.eating).toBeNull();
+  });
+
   it('interruption forfeits the buff, never refunds the serving, and the ledger keeps the eater', () => {
     const { sim, placer, eaters } = world(1);
     const eater = eaters[0];
@@ -626,9 +743,31 @@ describe('shared feast: charges, expiry, and the 1 Hz sweep', () => {
     // cannot kill it at the 20s repo default (the Phase 6 QA lesson; the
     // suite_duration_budget ratchet accepts this row-free under 300s).
     const { sim, placer } = world(0);
+    // Pin the WORST-CASE sweep phase (the re-arm class's tightest alignment):
+    // place so expiresAtTick lands one tick past a 1 Hz boundary, making the
+    // despawn wait the full 19 ticks after expiry. The QA round measured the
+    // old finite spawn timer's margin at exactly ONE tick here, so this ride
+    // is the arm that reds any regression of the never-re-arm rule at END of
+    // life (the dedicated re-arm arm below covers only the start of life).
+    while (sim.tickCount % 20 !== 1) sim.tick();
     const feastId = placeOk(sim, placer);
-    tickSeconds(sim, 181); // past the 3600-tick deadline plus a sweep
-    expect(sim.entities.has(feastId)).toBe(false);
+    const placeTick = sim.tickCount;
+    const ent = sim.entities.get(feastId);
+    if (!ent) throw new Error('no feast entity');
+    let despawnTick = -1;
+    for (let i = 0; i < 3700 && despawnTick < 0; i++) {
+      sim.tick();
+      if (!sim.entities.has(feastId)) {
+        despawnTick = sim.tickCount;
+      } else if (ent.lootable) {
+        throw new Error(`re-armed lootable at life tick ${sim.tickCount - placeTick}`);
+      }
+    }
+    expect(despawnTick, 'the feast despawned').toBeGreaterThan(0);
+    expect(
+      despawnTick - placeTick,
+      'despawn landed on the first sweep boundary at or after expiry',
+    ).toBeLessThanOrEqual(3600 + 19);
     expect(sim.ctx.feasts.has(feastId)).toBe(false);
   }, 60_000);
 
@@ -857,6 +996,66 @@ describe('shared feast: entry-point convergence and the sweep inverse cleanup', 
     const from = sim.events.length;
     sim.placeFeast(placer.pid);
     expect(denyReason(sim, from), 'the one-active slot freed with it').toBeNull();
+    expect(eventsOf(sim, from, 'farmFeastPlaced')).toHaveLength(1);
+  });
+});
+
+describe('shared feast: instance lifecycle', () => {
+  it('a feast placed inside a dungeon instance falls with the run, freeing the slot', () => {
+    // Without the objectIds registration, freeInstance tears down the run's
+    // mobs and registered objects but leaves the feast standing at the slot
+    // origin, still edible for the NEXT party claiming the slot and still
+    // holding the placer's one-active slot for the rest of its 180s.
+    const { sim, placer } = world(0);
+    expect(enterDungeon(sim.ctx, 'dawnhold_castle', placer.pid)).toBe(true);
+    sim.tick(); // settle the door processing
+    const feastId = placeOk(sim, placer);
+    const inst = instanceAt(sim.ctx, placer.p.pos);
+    expect(inst, 'the placer stands inside a claimed instance').not.toBeNull();
+    expect(inst?.partyKey, 'the instance is claimed').not.toBeNull();
+
+    // The run ends: the placer leaves and the reaper's empty timeout elapses
+    // (poked, the suite's state-write idiom; the real wait is 5 minutes).
+    expect(leaveDungeon(sim.ctx, placer.pid)).toBe(true);
+    if (inst) inst.emptyFor = INSTANCE_EMPTY_TIMEOUT;
+    tickSeconds(sim, 2.05); // one reaper boundary plus one farming sweep boundary
+
+    expect(sim.entities.has(feastId), 'the entity fell with the instance').toBe(false);
+    expect(sim.ctx.feasts.has(feastId), 'the sweep reclaimed the state').toBe(false);
+
+    // And the placer's one-active slot freed with it.
+    giveFeast(sim, placer);
+    const from = sim.events.length;
+    sim.placeFeast(placer.pid);
+    expect(denyReason(sim, from), 'the one-active slot freed with the run').toBeNull();
+    expect(eventsOf(sim, from, 'farmFeastPlaced')).toHaveLength(1);
+  });
+
+  it('a feast placed inside a delve run falls with the run, freeing the slot', () => {
+    // Delves are their OWN spatial system with their own roster (the
+    // qa-checklist symmetry find): freeDelveRun and the module advance drop
+    // run.objectIds, and without registration the table outlived the run at
+    // the slot origin for the next claiming party, exactly the dungeon leak.
+    const { sim, placer } = world(0);
+    sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel, placer.pid);
+    sim.enterDelve('collapsed_reliquary', 'normal', placer.pid);
+    sim.tick(); // settle the entry teleport
+    const run = delveRunForPlayer(sim.ctx, placer.pid);
+    expect(run, 'the placer stands inside the claimed run').not.toBeNull();
+    if (!run) return;
+    const feastId = placeOk(sim, placer);
+
+    // The run ends (the direct teardown; the empty reaper's wait is minutes).
+    freeDelveRun(sim.ctx, run);
+    tickSeconds(sim, 2.05); // a farming sweep boundary for the state reclaim
+
+    expect(sim.entities.has(feastId), 'the entity fell with the run').toBe(false);
+    expect(sim.ctx.feasts.has(feastId), 'the sweep reclaimed the state').toBe(false);
+
+    giveFeast(sim, placer);
+    const from = sim.events.length;
+    sim.placeFeast(placer.pid);
+    expect(denyReason(sim, from), 'the one-active slot freed with the run').toBeNull();
     expect(eventsOf(sim, from, 'farmFeastPlaced')).toHaveLength(1);
   });
 });

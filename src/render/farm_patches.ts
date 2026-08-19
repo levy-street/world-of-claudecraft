@@ -272,7 +272,22 @@ interface FeastVisual {
   group: THREE.Group;
   ownedMaterials: THREE.Material[];
   ownedGeometries: THREE.BufferGeometry[];
+  /** The table's meshes, kept for the shadow-budget pass below. */
+  shadowMeshes: THREE.Mesh[];
+  /** Whether this table currently casts shadows (the budget's memo, so the
+   *  steady-state pass writes nothing when membership has not changed). */
+  castsShadow: boolean;
 }
+
+/** How many feast tables may CAST shadows at once (insertion order, oldest
+ *  first; the budget refills as feasts despawn). Presence is deliberately
+ *  never capped: a feast is actionable (you can eat it), so every table in
+ *  interest scope draws, and the natural bound is one feast per online
+ *  placer crossed with the ~120 yd interest scope. Shadow casting is the
+ *  expensive cosmetic half (a shadow-map draw per caster), so it is the
+ *  half that sheds in a packed hub. Applied identically at every graphics
+ *  tier: this is a universal budget, never a preset knob. */
+export const FEAST_SHADOW_CAP = 8;
 
 /** One live plot's crop meshes. Satisfies FarmPlotVisualKey structurally, so
  *  the steady-state sync check compares fields in place and allocates nothing. */
@@ -336,6 +351,9 @@ export class FarmPatchVisuals {
   // frame forever.
   private dirty = false;
   private dirtyForS = 0;
+  // False until the first applyFeasts pass has run: standing feasts register
+  // WITHOUT the placement flourish on that pass (see applyFeasts).
+  private feastFlourishArmed = false;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -414,18 +432,43 @@ export class FarmPatchVisuals {
    *  'farm_feast') into the scene: create on first appearance, remove on
    *  despawn. Steady state is one entity-map walk plus set membership, no
    *  allocation (the reused seen-set idiom of applyPlots). The placement
-   *  flourish fires exactly once per feast, when it FIRST appears to this
-   *  renderer, which also covers feasts other players set out (their entity
-   *  arrives by snapshot with no event on this viewer's channel). */
+   *  flourish fires once per feast appearing on any pass AFTER the first:
+   *  the first pass after construction registers standing tables silently,
+   *  because a graphics-settings rebuild (a fresh visuals instance) and a
+   *  login both replay it for every feast in view at once, and the burst
+   *  would read as "someone just placed this" for a table set out minutes
+   *  ago. A feast appearing on a later pass is genuinely new to this mirror
+   *  (which also covers feasts other players set out: their entity arrives
+   *  by snapshot with no event on this viewer's channel). The one residual
+   *  ambiguity, an old feast re-entering interest scope after the viewer
+   *  walked far away, is indistinguishable client-side without wire age and
+   *  is accepted (Phase 12 QA ledger). */
   private applyFeasts(entities: ReadonlyMap<number, Entity>, seed: number): void {
     this.feastsSeen.clear();
+    const flourish = this.feastFlourishArmed;
     for (const e of entities.values()) {
       if (e.kind !== 'object' || e.templateId !== FARM_FEAST_TEMPLATE_ID) continue;
       this.feastsSeen.add(e.id);
-      if (!this.feasts.has(e.id)) this.createFeast(e, seed);
+      if (!this.feasts.has(e.id)) this.createFeast(e, seed, flourish);
     }
     for (const [id, visual] of this.feasts) {
       if (!this.feastsSeen.has(id)) this.disposeFeast(id, visual);
+    }
+    this.feastFlourishArmed = true;
+    this.applyFeastShadowBudget();
+  }
+
+  /** Re-derives which tables cast shadows (the first FEAST_SHADOW_CAP in
+   *  insertion order). Runs on the throttled read only; writes nothing when
+   *  membership has not changed (the castsShadow memo). */
+  private applyFeastShadowBudget(): void {
+    let budget = FEAST_SHADOW_CAP;
+    for (const visual of this.feasts.values()) {
+      const cast = budget > 0;
+      if (cast) budget--;
+      if (visual.castsShadow === cast) continue;
+      visual.castsShadow = cast;
+      for (const mesh of visual.shadowMeshes) mesh.castShadow = cast;
     }
   }
 
@@ -488,9 +531,10 @@ export class FarmPatchVisuals {
 
   /** Builds one feast table at the entity's ground seat (the bed idiom:
    *  terrainHeight for y, tilted to the local ground normal), plus the
-   *  placement flourish. Cosmetic only, so both emitters go through vfx.ts,
-   *  whose scaledCount path is the graphics-tier shed. */
-  private createFeast(e: Entity, seed: number): void {
+   *  placement flourish when `flourish` is armed (every pass after the
+   *  first; see applyFeasts). Cosmetic only, so both emitters go through
+   *  vfx.ts, whose scaledCount path is the graphics-tier shed. */
+  private createFeast(e: Entity, seed: number, flourish: boolean): void {
     const group = new THREE.Group();
     group.name = `farmFeast:${e.id}`;
     const y = terrainHeight(e.pos.x, e.pos.z, seed);
@@ -505,6 +549,7 @@ export class FarmPatchVisuals {
 
     const ownedMaterials: THREE.Material[] = [];
     const ownedGeometries: THREE.BufferGeometry[] = [];
+    const shadowMeshes: THREE.Mesh[] = [];
     const parts = templateParts(FARM_FEAST_MODEL_URL, FEAST_HEIGHT, 0x8a6a4a);
     for (const part of parts) {
       // Owned hook-preserving clones, untinted: the feast ships its authored
@@ -514,20 +559,31 @@ export class FarmPatchVisuals {
         : this.cloneOwned(part.mat, ownedMaterials);
       const mesh = new THREE.Mesh(part.geo, mat);
       mesh.applyMatrix4(part.local);
-      mesh.castShadow = true;
+      // Casting starts OFF; the shadow-budget pass right after this create
+      // (applyFeasts tail) turns on the first FEAST_SHADOW_CAP tables.
+      mesh.castShadow = false;
       mesh.receiveShadow = true;
+      shadowMeshes.push(mesh);
       if (!loadedFarmGltf.has(FARM_FEAST_MODEL_URL)) ownedGeometries.push(part.geo);
       group.add(mesh);
     }
     setRenderCategory(group, 'props');
     this.scene.add(group);
-    this.feasts.set(e.id, { group, ownedMaterials, ownedGeometries });
+    this.feasts.set(e.id, {
+      group,
+      ownedMaterials,
+      ownedGeometries,
+      shadowMeshes,
+      castsShadow: false,
+    });
 
-    // The placement flourish: turned earth under the table, then a warm
-    // nature burst over the spread. Fires once per feast per appearance.
-    const at = new THREE.Vector3(e.pos.x, y + FEAST_VFX_LIFT, e.pos.z);
-    this.vfx.groundPuff(at, 0.7, 0x6b4f34);
-    this.vfx.burst(at, 'nature', 12, 0.8);
+    if (flourish) {
+      // The placement flourish: turned earth under the table, then a warm
+      // nature burst over the spread. Armed passes only (see applyFeasts).
+      const at = new THREE.Vector3(e.pos.x, y + FEAST_VFX_LIFT, e.pos.z);
+      this.vfx.groundPuff(at, 0.7, 0x6b4f34);
+      this.vfx.burst(at, 'nature', 12, 0.8);
+    }
   }
 
   private cloneOwned(src: THREE.Material, owned: THREE.Material[]): THREE.Material {

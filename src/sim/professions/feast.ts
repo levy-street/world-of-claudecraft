@@ -38,14 +38,15 @@
 // persistence machinery the credited-objects ledger needs.
 
 import { ITEMS } from '../data';
+import { delveRunForPlayer } from '../delves/runs';
 import { createGroundObject } from '../entity';
+import { instanceAt } from '../instances/dungeons';
 import { countUnlockedInSlots, removeUnlockedFromSlots } from '../item_lock';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
   CONSUME_DURATION,
   CONSUME_TICKS,
-  DT,
   dist2d,
   type Entity,
   INTERACT_RANGE,
@@ -144,11 +145,32 @@ export function placeFeastAction(ctx: SimContext, p: Entity, meta: PlayerMeta): 
   // lootable-false object as a cooling pickup (respawnTimer -= DT, re-arm
   // at zero), which re-armed the feast one second after placement and
   // handed the interact press to the generic object arm (found by the
-  // player-path probe). A spawn timer longer than the feast's own life
-  // keeps the sweep from ever re-arming it; the 1 Hz despawn below ends
-  // the entity long before the timer runs out.
-  e.respawnTimer = (info.durationTicks + 20) * DT;
+  // player-path probe). Infinity is the precedented never-re-arm sentinel
+  // (handleDeath's run-scoped mobs, dismissed pets): Infinity - DT stays
+  // Infinity, so the sweep can never flip lootable back on, and no timer
+  // arithmetic stays silently coupled to the 1 Hz sweep period (the prior
+  // finite dodge, durationTicks + 20 ticks, had a worst-case margin of
+  // exactly ONE tick over the despawn below, measured by the QA round).
+  // respawnTimer never rides the wire; `loot` is the only lootability
+  // wire field, and it stays false for the feast's whole life (pinned).
+  e.respawnTimer = Infinity;
   ctx.addEntity(e);
+  // Inside a claimed dungeon instance the feast joins the run's teardown
+  // roster: freeInstance drops every registered objectId when the reaper
+  // frees the empty claim, and the 1 Hz sweep's entities.has leg below then
+  // reclaims the state and the placer's one-active slot (the inverse
+  // cleanup's designed job). Without this the entity outlived the run and
+  // stood at the slot origin, still edible, for the next claiming party.
+  const inst = instanceAt(ctx, e.pos);
+  if (inst && inst.partyKey !== null) inst.objectIds.push(e.id);
+  // The SAME rule for a delve run (its own spatial system with its own
+  // roster): freeDelveRun AND the module advance both drop run.objectIds,
+  // so the table dies with the room it was set out in, and the abandoned
+  // -module drop is deliberate (that room despawns wholesale). Located by
+  // the PLACER (delveRunForPlayer), never the entity: the run lookup binds
+  // players and mobs only, and the placer stands in the run when placing.
+  const run = delveRunForPlayer(ctx, meta.entityId);
+  if (run) run.objectIds.push(e.id);
   ctx.feasts.set(e.id, {
     entityId: e.id,
     ownerKey,

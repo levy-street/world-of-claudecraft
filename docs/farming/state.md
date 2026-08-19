@@ -2646,13 +2646,108 @@ question does not arise (farming has no station).
     tooltip keys, each with the five non-Latin fills (M16).
   - Render/audio: farm_feast prop in the farm-props set (16 GLBs, new
     source fingerprint); the feast arm in farm_patches.ts (0.5 s
-    cadence, VFX-once on appearance); labels via entity_display_name
+    cadence, VFX on post-first-pass appearances, QA amendment below);
+    labels via entity_display_name
     .ts (the hud.ts extraction, ceiling 19220 to 19214) and the
     nameplate near-interact row; cue ui_farm_feast end to end.
   - Parity: beat P appended to farming_session (the wellfed tick-phase
     mint ridden for real, the feast place-bite-mint-expire loop),
     frames 0-93 byte-identical, draws 110 unchanged with an identical
     drawDigest, md5 25bd6b87 to 9dfd1c6e, zero other goldens moved.
+
+  Phase 12 QA (2026-08-19, verify the shared feast; merge hash in
+  progress.md): PASS-WITH-FOLLOWUPS, one real lifecycle defect found and
+  fixed. All four emphases proven first-hand over the REAL wire (records
+  in the progress.md Phase 12 QA block). FIXES, each test-first:
+  - INSTANCE TEARDOWN (the real defect, reproduced with a failing arm):
+    a feast placed inside a dungeon instance was never registered in
+    inst.objectIds, so freeInstance left the entity standing at the slot
+    origin for the NEXT claiming party, still edible, holding the
+    placer's one-active slot for the rest of its 180s. Fixed: placement
+    inside a CLAIMED instance registers the entity in the instance's
+    teardown roster; freeInstance drops it and the sweep's entities.has
+    inverse-cleanup leg reclaims the state and the slot (its designed
+    job). RULING RECORDED: placement inside instances stays LEGAL (the
+    raid-table flavor) and is instance-scoped. THE SAME RULE FOR DELVES
+    (the qa-checklist adversarial find: delve runs are their own spatial
+    system with their own roster): the feast joins the placer's
+    run.objectIds, so freeDelveRun AND the module advance tear it down
+    (the abandoned-module drop is deliberate, that room despawns
+    wholesale); reproduced failing-first and mutation-proven like the
+    dungeon leg.
+  - THE RE-ARM DODGE AMENDED to the Infinity sentinel: the shipped
+    finite spawn timer (durationTicks + 20 ticks) was silently coupled
+    to the 1 Hz sweep period across two files; the QA probe measured the
+    worst-case margin at exactly ONE tick (expiry phased one tick past a
+    boundary: despawn at expiry + 19, re-arm one tick later). Four
+    independent lanes converged on the coupling. respawnTimer = Infinity
+    is the precedented never-re-arm sentinel (run-scoped mobs, dismissed
+    pets), never rides the wire, moved no golden; the 181s expiry arm
+    now rides the whole life at the worst-case phase asserting lootable
+    false per tick. Swept into phase-12-qa.md ruling (4).
+  - RENDER AMENDMENTS: the placement flourish no longer replays on a
+    graphics-settings rebuild or login (the first applyFeasts pass
+    registers standing tables silently; later appearances keep it; the
+    scope-re-entry ambiguity is ACCEPTED, indistinguishable client-side
+    without wire age; also accepted: the viewer's OWN placement is
+    silenced when it lands inside the first pass after a rebuild, up to
+    one 0.5 s sync interval, a different and narrower case). Shadow casting budgeted at FEAST_SHADOW_CAP = 8
+    tables (insertion order, refills on despawn; a universal budget,
+    never a preset knob); PRESENCE is actionable and never culled (the
+    natural bound is one feast per online placer crossed with interest
+    scope).
+  - COVERAGE: four decisive sim arms (swim-bite refusal, exact
+    INTERACT_RANGE allow, keyed-placer feast_active, orphan-window
+    press) plus the behavioral bags click arm (a real DOM click reaches
+    placeFeast once, never useItem; the old pin was source-text only).
+    Mutations 12/12 killed named through the dirty-refusing runner; the
+    build round's deliberate HEAVY_SELF survivor stays recorded.
+  RULINGS RECORDED (the content reviewer's, so the docs now state them):
+  the feast owes NO Book of Deeds record (deeds.md scopes the obligation
+  to dungeon/delve/raid/world boss/zone/rare; no per-recipe deed exists
+  anywhere; a feast deed would also be unearnable while (ca) stands,
+  the prog_ringwright reasoning) and NO Reliquary page (crafted
+  consumable, not conquerable unique loot; cooking is outside the
+  masterwork gallery by the isCataloguedRelicMark('masterwork:cooking')
+  false pin).
+  RESIDUALS LEDGERED WITH OWNERS:
+  - The consume deny-order asymmetry (feast-specific reasons answer
+    before the eating-family gates, so an in-combat already-fed player
+    hears feast_eaten where a bagged dish says combat): deliberate,
+    zero state effect, documented. Owner: none (accepted).
+  - The entity-id existence oracle in the consume denies (feast_expired
+    vs feast_finished distinguishes live feasts outside interest scope):
+    existence-only leak, bounded by the command lane, matches the
+    sibling idiom. Owner: none (accepted).
+  - The one-active scan is O(live feasts) per placement and place_feast
+    marks heavy on receipt even when refused: exactly the pre-existing
+    sibling behavior, lane-bucket bounded. Owner: a server perf round if
+    packed-hub numbers ever flag it (an ownerKey index makes it O(1)).
+  - useItem's feast arm ignores the validated slotIndex (the spend walks
+    its own lock-aware path): unobservable today (no per-instance feast
+    provenance). Owner: Phase 13 polish (thread the slot like
+    consumeOneUnit if a provenance ever lands).
+  - The bite derives the dish from FARM_FEAST_ITEM_ID, not FeastState
+    (a second placeable would serve the first one's dish): scope
+    -consistent (the header rules a second placeable out). Owner: whoever
+    adds a second placeable carries dishItemId on FeastState.
+  - The bags hint says "Click to use" for a placement; a "set out" key
+    needs M16 fills. Owner: Phase 13 polish.
+  - The feast title composition exists at two sites (entity_display_name
+    and entity_labels, one shared key): at the rule-of-three watch
+    point. Owner: the third composer extracts.
+  - The nameplate feast row shows within INTERACT_RANGE + 1 (a 1 yd
+    hysteresis pad where a bite still denies feast_range) and its
+    comment overstates "close enough to eat". Owner: Phase 13 polish.
+  - feastOwnerKey's export keyword has no external importer;
+    FeastState.entityId duplicates the map key: harmless self-describing
+    surface. Owner: none (accepted).
+  - The wiki shows no consumable-effect prose for ANY dish (GuideProfCraft
+    has no effect field): a catalog-wide generator gap, not a Phase 12
+    omission. Owner: a guide-generator follow-up.
+  - The malformed consume_feast id is a silent no-op online but a
+    feast_expired toast offline: matches the plant/harvest sibling
+    idiom. Owner: none (accepted).
 
 ## OPEN items (maintainer decisions or later-phase calls, never guess)
 
