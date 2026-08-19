@@ -3205,6 +3205,42 @@ NOTES (residuals and findings, ledgered):
   (ceiling lowered 19220 to 19214, file at 19214); sim.ts funded inside its
   12660 ceiling by compressing farming delegate comments toward the facet docs.
 
+REVIEWS (all delivered; every BLOCKING and actionable SHOULD-FIX fixed in
+committed rounds): architecture 0 BLOCKING (2 SHOULD-FIX taken: the useItem
+silent no-op converged into the one action body, the sweep's entities.has
+inverse cleanup), cross-platform PASS (the assertNever farm-event guard
+taken; the place-gate asymmetry kept deliberately, header-stated),
+privacy-security ship-it (the header honesty line taken; the deny-reason
+liveness oracle, the falsy-characterId idiom, presence-after-logout, and the
+jail-list consistency recorded as considered-and-accepted),
+frontend-seam 0 BLOCKING (bag hint arm, three FARM_FEAST_TEMPLATE_ID
+imports, entity_display_name registration, twin title-literal suites, the
+narrowed feast field all taken), content-obligations REQUEST CHANGES
+resolved (the servings fixture red fixed; the tooltip one-serving limit
+folded into useFeast with all five fills), qa-checklist READY (the water
+place-gate and the art-debt ledger row taken).
+
+PLAYED PROOF (the (bn) rule, beyond the reachability pins): a live-client
+probe drove BOTH verbs through the REAL gestures on the LOW preset: KeyB
+plus a genuine bag-row left-click placed the feast (item spent, entity up,
+composed title on), and a genuine KeyF bite started the 18s meal. THE PROBE
+CAUGHT A REAL BUG the whole test pyramid missed: sim.ts's object-respawn
+sweep re-armed the feast as a lootable pickup one second after placement,
+so the funnel's generic object arm swallowed the press silently; fixed with
+a lifetime-derived spawn respawnTimer plus a lootable-stays-false life pin
+(commit 32ec9bc442). Side effect: the renderer's generic loot sparkle no
+longer decorates the feast (it keyed on the wrongly re-armed lootable), so
+the ledgered sparkle residual above is RESOLVED, not just accepted.
+
+MAINTAINER READS OWED FROM THIS PHASE: (1) the qa-checklist flags the
+sim.ts headroom funding (comment compression toward the owning module and
+facet docs, the Phase 8 in-place precedent) as ratchet-spirit inversion;
+the feast delegates are IWorld interface members that cannot leave the Sim
+class, so the options are blessing the compression or budgeting the next
+sim.ts extraction round (Phase 13 needs one regardless: the file sits at
+12660/12660 exact). (2) The tuning constants listed above. (3) The (ca)
+dormancy row joining the D11/(bo) ruling's scope.
+
 ### Phase 13
 (not started)
 
