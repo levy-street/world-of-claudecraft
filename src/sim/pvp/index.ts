@@ -33,7 +33,7 @@ export {
 } from './honor';
 export {
   DOUBLE_HONOR_MULTIPLIER,
-  DOUBLE_HONOR_WEEKDAY,
+  DOUBLE_HONOR_WEEKDAYS,
   doubleHonorActive,
   honorEventMultiplier,
   weekdayOfDayKey,

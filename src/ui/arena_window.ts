@@ -397,9 +397,9 @@ export class ArenaWindow {
     );
   }
 
-  /** The weekly Double Honor event chip: same accessibility posture (and the
+  /** The Double Honor Weekend event chip: same accessibility posture (and the
    *  same chip styling) as the first-win chip above, absent outside the
-   *  Saturday window (the pure view decides, never this painter). */
+   *  weekend window (the pure view decides, never this painter). */
   private bgDoubleHonorChipHtml(event: { multiplier: number } | null): string {
     if (!event) return '';
     const label = t('hudChrome.bg.doubleHonorLine', { mult: num(event.multiplier) });

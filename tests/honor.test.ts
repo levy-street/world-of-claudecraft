@@ -34,10 +34,11 @@ function world(): Sim {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: RL_TEST_WORLD });
 }
 
-// Fixture reset days in this file are deliberately NOT Saturdays: the weekly
-// Double Honor event (src/sim/pvp/honor_event.ts) doubles every battleground
-// award on a Saturday reset day, and these suites pin the BASE amounts. The
-// event has its own describe near the bottom, on a Saturday key on purpose.
+// Fixture reset days in this file are deliberately WEEKDAYS: the Double Honor
+// Weekend (src/sim/pvp/honor_event.ts) doubles every battleground award on
+// Saturday and Sunday reset days and boosts played-out losses, and these
+// suites pin the BASE amounts. The event has its own describe near the
+// bottom, on weekend keys on purpose.
 
 function liveArena(): { sim: Sim; a: number; b: number; match: ArenaMatch } {
   const sim = world();
@@ -599,7 +600,7 @@ describe('Thornhollow Fields honor income', () => {
 });
 
 describe('weekly Double Honor', () => {
-  it('doubles battleground kill and assist drips before the single floor, and only on Saturday', () => {
+  it('doubles battleground kill and assist drips before the single floor, all weekend', () => {
     const sim = world();
     sim.resetDay = '2026-08-15'; // a Saturday
     const pid = sim.addPlayer('warrior', 'Weekender');
@@ -622,13 +623,40 @@ describe('weekly Double Honor', () => {
       reason: 'battleground_kill',
     });
 
-    // The rollover into Sunday closes the window.
+    // Sunday is still inside the window; the Monday rollover closes it.
     sim.resetDay = '2026-08-16';
     const sunday = new Map<string, number>();
-    expect(awardBattlegroundKillHonor(sim.ctx, meta, 100, sunday)).toBe(5);
+    expect(awardBattlegroundKillHonor(sim.ctx, meta, 100, sunday)).toBe(10);
+    sim.resetDay = '2026-08-17';
+    const monday = new Map<string, number>();
+    expect(awardBattlegroundKillHonor(sim.ctx, meta, 101, monday)).toBe(5);
   });
 
-  it('leaves arena and Fiesta honor at base rate on Saturday (5v5-only scope)', () => {
+  it('pays a played-out loss and draw the WIN base during the weekend, and the loss base outside it', () => {
+    const sim = world();
+    sim.resetDay = '2026-08-16'; // a Sunday, inside the window
+    const pid = sim.addPlayer('warrior', 'Stalwart', { characterId: 704 });
+    const meta = sim.meta(pid)!;
+
+    // The weekend loss boost: a played-out loss pays the WIN base, doubled,
+    // and a draw the same; the DR curve still applies on the shared counter.
+    const loss = awardBattlegroundHonor(sim.ctx, meta, '["character:sun"]', 'loss');
+    expect(loss.total).toBe(BATTLEGROUND_WIN_HONOR * 2);
+    expect(loss.firstWinBonus, 'a loss never claims the daily bonus').toBe(0);
+    const draw = awardBattlegroundHonor(sim.ctx, meta, '["character:sun"]', 'draw');
+    expect(draw.total).toBe(Math.floor(BATTLEGROUND_WIN_HONOR * 0.5) * 2);
+    // The first WIN still arms the daily bonus on top: losing first, then
+    // winning, keeps the day's headline reward intact.
+    const win = awardBattlegroundHonor(sim.ctx, meta, '["character:sun"]', 'win');
+    expect(win.firstWinBonus).toBe(BATTLEGROUND_FIRST_WIN_BONUS_HONOR * 2);
+
+    // Monday: weekday loss economics are untouched.
+    sim.resetDay = '2026-08-17';
+    const weekday = awardBattlegroundHonor(sim.ctx, meta, '["character:mon"]', 'loss');
+    expect(weekday.total).toBe(BATTLEGROUND_LOSS_HONOR);
+  });
+
+  it('leaves arena and Fiesta honor at base rate on the weekend (5v5-only scope)', () => {
     const sim = world();
     sim.resetDay = '2026-08-15'; // a Saturday
     const pid = sim.addPlayer('warrior', 'Purist', { characterId: 703 });

@@ -1182,7 +1182,7 @@ export const nl_NL: EnTranslations = {
       "endedForfeitLog": "De wedstrijd werd opgegeven.",
       "firstWinBonusLine": "Eerste overwinning van de dag: +{honor} Eer",
       "firstWinBonusLog": "Eerste overwinning van de dag: je krijgt {honor} bonus Eer.",
-      "doubleHonorLine": "Double Honor Day: Thornhollow Fields Honor pays {mult}x today",
+      "doubleHonorLine": "Double Honor Weekend: Thornhollow Fields Honor pays {mult}x today, and a played-out loss pays like a win",
       "timeWarningMinutes": "Nog {minutes} minuten te gaan",
       "timeWarningOneMinute": "Nog een minuut te gaan",
       "timeWarningMinutesLog": "Nog {minutes} minuten te gaan in het gevecht.",
@@ -2968,8 +2968,8 @@ export const nl_NL: EnTranslations = {
           "note": "Duellisten stromen naar het Asgrauwe Colosseum. Sluit aan in de wachtrij en klim de ladder op."
         },
         "doubleHonor": {
-          "title": "Double Honor Day",
-          "note": "The war camps sound the muster: Thornhollow Fields Honor pays double until the daily reset."
+          "title": "Double Honor Weekend",
+          "note": "The war camps sound the muster: all weekend, Thornhollow Fields Honor pays double and a played-out loss pays like a win."
         },
         "fishingDerby": {
           "title": "Visderby",

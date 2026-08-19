@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   DOUBLE_HONOR_MULTIPLIER,
-  DOUBLE_HONOR_WEEKDAY,
+  DOUBLE_HONOR_WEEKDAYS,
   doubleHonorActive,
   honorEventMultiplier,
   weekdayOfDayKey,
@@ -49,18 +49,14 @@ describe('weekdayOfDayKey', () => {
 });
 
 describe('weekly Double Honor window', () => {
-  it('opens on Saturday reset days and only there', () => {
-    expect(DOUBLE_HONOR_WEEKDAY).toBe(6);
+  it('opens on Saturday and Sunday reset days and only there', () => {
+    // The two weekend RESET WINDOWS: in realm time the event runs Saturday
+    // 3 AM through Monday 3 AM.
+    expect(DOUBLE_HONOR_WEEKDAYS).toEqual([6, 0]);
     expect(doubleHonorActive('2026-08-15')).toBe(true); // a Saturday
-    const week = [
-      '2026-08-16',
-      '2026-08-17',
-      '2026-08-18',
-      '2026-08-19',
-      '2026-08-20',
-      '2026-08-21',
-    ];
-    for (const day of week) {
+    expect(doubleHonorActive('2026-08-16')).toBe(true); // its Sunday
+    const weekdays = ['2026-08-17', '2026-08-18', '2026-08-19', '2026-08-20', '2026-08-21'];
+    for (const day of weekdays) {
       expect(doubleHonorActive(day), day).toBe(false);
     }
     expect(doubleHonorActive('2026-08-22')).toBe(true); // the next Saturday
@@ -72,7 +68,9 @@ describe('weekly Double Honor window', () => {
   it('multiplies by the event constant inside the window and by 1 outside it', () => {
     expect(DOUBLE_HONOR_MULTIPLIER).toBe(2);
     expect(honorEventMultiplier('2026-08-15')).toBe(DOUBLE_HONOR_MULTIPLIER);
-    expect(honorEventMultiplier('2026-08-14')).toBe(1);
+    expect(honorEventMultiplier('2026-08-16')).toBe(DOUBLE_HONOR_MULTIPLIER);
+    expect(honorEventMultiplier('2026-08-14')).toBe(1); // the Friday before
+    expect(honorEventMultiplier('2026-08-17')).toBe(1); // the Monday after
     expect(honorEventMultiplier('')).toBe(1);
   });
 

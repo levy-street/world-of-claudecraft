@@ -1,14 +1,16 @@
-// Weekly Double Honor: every Saturday, every Thornhollow Fields (5v5 CTF)
-// honor award pays double. The 5v5-only scope is the issue's own ask ("Double
-// Honor Saturday, 5v5 CTF only") and the classic-era shape: battleground
-// holiday weekends boosted ONE battleground's honor faucet, never the arena's.
-// The weekly cadence exists to concentrate the PvP population into one
-// predictable day so the ten-player queue actually pops (casual players cannot
-// progress toward Warfare gear while the queue is dead six days a week), which
-// is why the bonus is a flat realm-wide day rather than a per-player hook like
-// the first-win bonus. The multiplier is applied by honor.ts inside the four
-// battleground award paths (result, kill, assist, first-win bonus); arena and
-// Fiesta honor never read it.
+// Weekly Double Honor: every weekend, every Thornhollow Fields (5v5 CTF)
+// honor award pays double, and a played-out loss or draw pays the WIN base
+// (see honor.ts awardBattlegroundHonor). The 5v5-only scope follows the
+// feature request ("Double Honor Saturday, 5v5 CTF only", later widened by
+// the owner to the whole weekend) and the classic-era shape: battleground
+// holiday weekends boosted ONE battleground's honor faucet, never the
+// arena's. The weekly cadence exists to concentrate the PvP population into
+// one predictable window so the ten-player queue actually pops (casual
+// players cannot progress toward Warfare gear while the queue is dead five
+// days a week), which is why the bonus is a flat realm-wide window rather
+// than a per-player hook like the first-win bonus. The multiplier is applied
+// by honor.ts inside the four battleground award paths (result, kill,
+// assist, first-win bonus); arena and Fiesta honor never read it.
 //
 // "Saturday" is the realm's own reset window: the day is read from the
 // HOST-provided `resetDay` key (the same boundary the first-win bonus and the
@@ -23,10 +25,11 @@
 // pure fact about the Gregorian calendar, and keeping `Date` out of the sim
 // keeps the no-wall-clock rule easy to audit.
 
-/** Day of the week the event runs, 0=Sunday..6=Saturday (matching
- *  `getUTCDay` and the calendar view's weekday convention). Saturday is the
- *  issue's ask: the community day the queue should concentrate into. */
-export const DOUBLE_HONOR_WEEKDAY = 6;
+/** Days of the week the event runs, 0=Sunday..6=Saturday (matching
+ *  `getUTCDay` and the calendar view's weekday convention). The Saturday and
+ *  Sunday RESET WINDOWS, so in realm time the event opens Saturday 3 AM and
+ *  closes Monday 3 AM: the whole weekend, never mid-evening. */
+export const DOUBLE_HONOR_WEEKDAYS: readonly number[] = [6, 0];
 
 /** Event multiplier applied to every battleground honor award while the
  *  window is open. 2x is owner tuning in the same spirit as the classic-era
@@ -67,7 +70,7 @@ export function weekdayOfDayKey(dayKey: string): number {
 
 /** Is the weekly Double Honor window open for this host-provided reset day? */
 export function doubleHonorActive(resetDay: string): boolean {
-  return weekdayOfDayKey(resetDay) === DOUBLE_HONOR_WEEKDAY;
+  return DOUBLE_HONOR_WEEKDAYS.includes(weekdayOfDayKey(resetDay));
 }
 
 /** The factor honor.ts applies to every battleground award:

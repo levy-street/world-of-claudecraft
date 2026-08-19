@@ -1182,7 +1182,7 @@ export const ja_JP: EnTranslations = {
       "endedForfeitLog": "この試合は棄権で終了しました。",
       "firstWinBonusLine": "本日の初勝利:名誉+{honor}",
       "firstWinBonusLog": "本日の初勝利:追加で名誉を{honor}獲得しました。",
-      "doubleHonorLine": "名誉2倍デー:本日のソーンホロウ平原の名誉獲得は{mult}倍",
+      "doubleHonorLine": "名誉2倍ウィークエンド:本日のソーンホロウ平原の名誉獲得は{mult}倍、最後まで戦えば敗北でも勝利と同額",
       "timeWarningMinutes": "残り{minutes}分",
       "timeWarningOneMinute": "残り1分",
       "timeWarningMinutesLog": "戦闘は残り{minutes}分です。",
@@ -2968,8 +2968,8 @@ export const ja_JP: EnTranslations = {
           "note": "決闘者たちが灰燼の闘技場へ。キューに並んでラダーを駆け上がろう。"
         },
         "doubleHonor": {
-          "title": "名誉2倍デー",
-          "note": "戦陣が召集の号令を上げる。デイリーリセットまで、ソーンホロウ平原の名誉報酬が2倍になる。"
+          "title": "名誉2倍ウィークエンド",
+          "note": "戦陣が召集の号令を上げる。週末の間、ソーンホロウ平原の名誉報酬が2倍になり、最後まで戦えば敗北でも勝利と同額を得られる。"
         },
         "fishingDerby": {
           "title": "フィッシングダービー",

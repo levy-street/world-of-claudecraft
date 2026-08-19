@@ -1182,7 +1182,7 @@ export const id_ID: EnTranslations = {
       "endedForfeitLog": "Pertandingan diserahkan.",
       "firstWinBonusLine": "Kemenangan pertama hari ini: +{honor} Kehormatan",
       "firstWinBonusLog": "Kemenangan pertama hari ini: kamu mendapatkan {honor} bonus Kehormatan.",
-      "doubleHonorLine": "Double Honor Day: Thornhollow Fields Honor pays {mult}x today",
+      "doubleHonorLine": "Double Honor Weekend: Thornhollow Fields Honor pays {mult}x today, and a played-out loss pays like a win",
       "timeWarningMinutes": "{minutes} menit tersisa",
       "timeWarningOneMinute": "Satu menit tersisa",
       "timeWarningMinutesLog": "{minutes} menit tersisa dalam pertempuran.",
@@ -2968,8 +2968,8 @@ export const id_ID: EnTranslations = {
           "note": "Para duelis berbondong-bondong ke Koloseum Abu. Masuklah antrean dan panjat tangga peringkat."
         },
         "doubleHonor": {
-          "title": "Double Honor Day",
-          "note": "The war camps sound the muster: Thornhollow Fields Honor pays double until the daily reset."
+          "title": "Double Honor Weekend",
+          "note": "The war camps sound the muster: all weekend, Thornhollow Fields Honor pays double and a played-out loss pays like a win."
         },
         "fishingDerby": {
           "title": "Lomba Memancing",

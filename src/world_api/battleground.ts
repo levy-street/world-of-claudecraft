@@ -118,8 +118,9 @@ export interface BgInfo {
   firstWinBonusReady: boolean;
   /** The weekly Double Honor event (src/sim/pvp/honor_event.ts) is running:
    *  every Thornhollow Fields honor award pays DOUBLE_HONOR_MULTIPLIER times
-   *  its normal amount until the realm's next daily reset (battleground only,
-   *  never arena or Fiesta honor). Drives the event chip on the Thornhollow
+   *  its normal amount through the weekend's reset windows, and a played-out
+   *  loss pays the win base (battleground only, never arena or Fiesta
+   *  honor). Drives the event chip on the Thornhollow
    *  Fields tab; a realm-wide fact on the same reset-day boundary as
    *  `firstWinBonusReady` above, riding the same refresh cadence. */
   doubleHonorActive: boolean;

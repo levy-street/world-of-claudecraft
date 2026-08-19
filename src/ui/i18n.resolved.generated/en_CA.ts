@@ -1182,7 +1182,7 @@ export const en_CA: EnTranslations = {
       "endedForfeitLog": "The match was forfeited.",
       "firstWinBonusLine": "First win of the day: +{honor} Honor",
       "firstWinBonusLog": "First win of the day: you gain {honor} bonus Honor.",
-      "doubleHonorLine": "Double Honor Day: Thornhollow Fields Honor pays {mult}x today",
+      "doubleHonorLine": "Double Honor Weekend: Thornhollow Fields Honor pays {mult}x today, and a played-out loss pays like a win",
       "timeWarningMinutes": "{minutes} minutes remain",
       "timeWarningOneMinute": "One minute remains",
       "timeWarningMinutesLog": "{minutes} minutes remain in the battle.",
@@ -2968,8 +2968,8 @@ export const en_CA: EnTranslations = {
           "note": "Duelists flock to the Ashen Coliseum. Queue up and climb the ladder."
         },
         "doubleHonor": {
-          "title": "Double Honor Day",
-          "note": "The war camps sound the muster: Thornhollow Fields Honor pays double until the daily reset."
+          "title": "Double Honor Weekend",
+          "note": "The war camps sound the muster: all weekend, Thornhollow Fields Honor pays double and a played-out loss pays like a win."
         },
         "fishingDerby": {
           "title": "Fishing Derby",

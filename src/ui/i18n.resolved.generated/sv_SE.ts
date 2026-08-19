@@ -1182,7 +1182,7 @@ export const sv_SE: EnTranslations = {
       "endedForfeitLog": "Matchen gavs förlorad.",
       "firstWinBonusLine": "Dagens första seger: +{honor} heder",
       "firstWinBonusLog": "Dagens första seger: du får {honor} extra heder.",
-      "doubleHonorLine": "Double Honor Day: Thornhollow Fields Honor pays {mult}x today",
+      "doubleHonorLine": "Double Honor Weekend: Thornhollow Fields Honor pays {mult}x today, and a played-out loss pays like a win",
       "timeWarningMinutes": "{minutes} minuter kvar",
       "timeWarningOneMinute": "En minut kvar",
       "timeWarningMinutesLog": "{minutes} minuter återstår av striden.",
@@ -2968,8 +2968,8 @@ export const sv_SE: EnTranslations = {
           "note": "Duellanter flockas till Askgrå kolosseum. Ställ dig i kö och klättra på stegen."
         },
         "doubleHonor": {
-          "title": "Double Honor Day",
-          "note": "The war camps sound the muster: Thornhollow Fields Honor pays double until the daily reset."
+          "title": "Double Honor Weekend",
+          "note": "The war camps sound the muster: all weekend, Thornhollow Fields Honor pays double and a played-out loss pays like a win."
         },
         "fishingDerby": {
           "title": "Fisketävling",

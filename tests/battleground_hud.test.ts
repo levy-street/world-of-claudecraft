@@ -1029,7 +1029,7 @@ describe('the weekly Double Honor event chip', () => {
     expect(DOUBLE_HONOR_MULTIPLIER).toBeGreaterThan(1);
   });
 
-  it('drops the chip outside the Saturday window', () => {
+  it('drops the chip outside the weekend window', () => {
     expect(liveView({ doubleHonorActive: false }).doubleHonor).toBeNull();
   });
 

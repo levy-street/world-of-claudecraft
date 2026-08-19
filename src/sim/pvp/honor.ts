@@ -323,14 +323,22 @@ export function awardBattlegroundHonor(
   const results = daily.bgResultsByOpponent;
   const repeats = results[key] ?? 0;
   results[key] = repeats + 1;
-  const base = outcome === 'win' ? BATTLEGROUND_WIN_HONOR : BATTLEGROUND_LOSS_HONOR;
-  const reason: HonorReason = outcome === 'win' ? 'battleground_win' : 'battleground_complete';
   // The weekly Double Honor event multiplies every BATTLEGROUND award (this
   // result, the kill and assist drips, and the first-win bonus below) and
   // nothing else: the issue that asked for the event scopes it to the 5v5
   // CTF explicitly, which is also the classic-era battleground-holiday shape.
   // The anti-farm decay applies first, then the event, inside the one floor.
   const eventMult = honorEventMultiplier(ctx.resetDay);
+  // Weekend loss boost (owner tuning for the early, gearless realm): while
+  // the event window is open, a played-out loss or draw pays the WIN base,
+  // still decayed and still doubled, so queueing on an event day is never a
+  // wasted evening for the side that stayed and played it out. Forfeits never
+  // reach this function, so deserting still pays nothing, and winning stays
+  // ahead through the first-win bonus and the natural kill-drip edge.
+  // Weekday loss economics are untouched.
+  const base =
+    outcome === 'win' || eventMult > 1 ? BATTLEGROUND_WIN_HONOR : BATTLEGROUND_LOSS_HONOR;
+  const reason: HonorReason = outcome === 'win' ? 'battleground_win' : 'battleground_complete';
   let total = grantHonor(
     ctx,
     meta,

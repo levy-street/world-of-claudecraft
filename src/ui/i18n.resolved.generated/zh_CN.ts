@@ -1182,7 +1182,7 @@ export const zh_CN: EnTranslations = {
       "endedForfeitLog": "本场比赛以弃权告终。",
       "firstWinBonusLine": "每日首胜:+{honor}荣誉",
       "firstWinBonusLog": "每日首胜:你额外获得{honor}点荣誉。",
-      "doubleHonorLine": "双倍荣誉日:今日荆谷原野荣誉奖励均为{mult}倍",
+      "doubleHonorLine": "双倍荣誉周末:今日荆谷原野荣誉奖励均为{mult}倍,打满全场的败方也按胜方奖励结算",
       "timeWarningMinutes": "还剩{minutes}分钟",
       "timeWarningOneMinute": "还剩一分钟",
       "timeWarningMinutesLog": "本场战斗还剩{minutes}分钟。",
@@ -2968,8 +2968,8 @@ export const zh_CN: EnTranslations = {
           "note": "决斗者涌向灰烬斗兽场。排队开打，向天梯进发。"
         },
         "doubleHonor": {
-          "title": "双倍荣誉日",
-          "note": "战营吹响集结号：每日重置前，荆谷原野荣誉奖励翻倍。"
+          "title": "双倍荣誉周末",
+          "note": "战营吹响集结号：整个周末，荆谷原野荣誉奖励翻倍，打满全场的败方也按胜方奖励结算。"
         },
         "fishingDerby": {
           "title": "钓鱼大赛",

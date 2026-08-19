@@ -86,7 +86,7 @@ export type BgWindowView =
        *  claimed it. `honor` is the sim's own constant, imported here the same
        *  way BG_MIN_LEVEL is, rather than shipped as a second wire field. */
       firstWinBonus: { honor: number } | null;
-      /** The weekly Double Honor event chip, or null outside the Saturday
+      /** The Double Honor Weekend event chip, or null outside the weekend
        *  window. `multiplier` is the sim's own constant, imported the same way
        *  the first-win chip's honor amount is. */
       doubleHonor: { multiplier: number } | null;
