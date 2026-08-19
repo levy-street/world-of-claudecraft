@@ -20,8 +20,11 @@ import { formatNumber, type TranslationKey, t } from './i18n';
 // The stat-buff kinds a well-fed dish plausibly carries, each mapped to the
 // item tooltip's own stat label so "Stamina" reads identically here, on the
 // elixir line, and on a gear stat line. Kinds outside this map take the
-// aura-name fallback below.
-const WELLFED_STAT_KEYS: Partial<Record<AuraKind, TranslationKey>> = {
+// aura-name fallback below. Exported for feast_tooltip_view.ts, whose buff
+// line states the SAME well-fed grant (the feast bite resolves to a dish's
+// wellfed record), so a third copy of this map can never drift from the
+// dish tooltip's.
+export const WELLFED_STAT_KEYS: Partial<Record<AuraKind, TranslationKey>> = {
   buff_sta: 'itemUi.stats.sta',
   buff_int: 'itemUi.stats.int',
   buff_agi: 'itemUi.stats.agi',

@@ -4748,6 +4748,16 @@ export class ClientWorld implements IWorld {
   convertHusks(): void {
     this.cmd({ cmd: 'convert_husks' });
   }
+  // The shared feast pair: payload-free place (the item id, charges, expiry
+  // and anti-abuse rule all resolve server-side) and an entity-id-only
+  // consume. Never predicted: the placed feast arrives on the normal entity
+  // snapshot and every refusal answers as a text-free farmDenied SimEvent.
+  placeFeast(): void {
+    this.cmd({ cmd: 'place_feast' });
+  }
+  consumeFeast(feastId: number): void {
+    this.cmd({ cmd: 'consume_feast', id: feastId });
+  }
   chat(text: string): void {
     this.cmd({ cmd: 'chat', text });
   }

@@ -77,6 +77,26 @@ export function dispatchFarmingCommand(sim: Sim, msg: Record<string, unknown>, p
       // the sim body) answer with the pid-scoped text-free farmDenied event.
       sim.convertHusks(pid);
       break;
+    case 'place_feast':
+      // The shared feast's place verb. NO payload to guard: the one feast
+      // item id, its charge count, its expiry, and the one-active-feast-per
+      // -placer rule all resolve sim-side (src/sim/professions/feast.ts)
+      // from the sender's own bags and the live feast table, so there is
+      // nothing on this frame to forge. Every refusal answers with the
+      // pid-scoped text-free farmDenied event.
+      sim.placeFeast(pid);
+      break;
+    case 'consume_feast':
+      // The shared feast's eat verb: the feast ENTITY id and nothing else.
+      // TYPE boundary only (an integer; the sim validates liveness,
+      // expiry, charges, range, and the once-per-player ledger, and answers
+      // every refusal with the pid-scoped text-free farmDenied event).
+      // Nothing here normalizes or defaults the id, for the dispatch
+      // switch's own stated laundering reason.
+      if (typeof msg.id === 'number' && Number.isInteger(msg.id)) {
+        sim.consumeFeast(msg.id, pid);
+      }
+      break;
   }
 }
 

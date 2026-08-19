@@ -3905,7 +3905,27 @@ export const hudChromeStrings = {
       // out of reach of a farmer NPC, professions/farmer_npcs.ts). Its own
       // leaf rather than `range` above, whose English names a crop bed.
       no_farmer: 'You must be near a farmer to trade husks for compost.',
+      // The shared feast (professions/feast.ts): the place arm's refusals
+      // (missing item, one active feast per placer), then the consume arm's
+      // (stale or expired, picked clean, range with its own leaf since
+      // `range` above names a crop bed, once per player). The lock-caused
+      // shortfall reuses `locked` above.
+      no_feast: 'You have no feast to set out.',
+      feast_active: 'Your feast is already set out.',
+      feast_expired: 'That feast is gone.',
+      feast_finished: 'That feast has been picked clean.',
+      feast_range: 'You are too far from the feast.',
+      feast_eaten: 'You have already eaten from that feast.',
     },
+    // The placed feast entity's title (professions/feast.ts), composed
+    // client-side off templateId 'farm_feast': {name} is the PLACER'S raw
+    // player name, carried by the entity as a VALUE and never translated
+    // (the gatherEvent.goldenHarvest finder-param precedent).
+    feastTitle: "{name}'s Harvest Feast",
+    // The placer's own confirmation, rendered from the text-free
+    // farmFeastPlaced SimEvent (everyone else learns of the feast by seeing
+    // the entity itself, so only the placer gets a line).
+    feastPlacedLine: 'You set out your harvest feast.',
     // The farmer NPC's gossip row (the farming go-live): the one UI affordance
     // that sends convert_husks, offered in the dialog of every NpcDef carrying
     // the farmer flag (hud/quest/quest_dialog_controller.ts). The trade's own

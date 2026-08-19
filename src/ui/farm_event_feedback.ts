@@ -1,7 +1,8 @@
-// Farming's six SimEvent feedback arms (plant, harvest, wither, deny, husk
-// trade, and the ready notice), the first five extracted whole from the HUD's
-// event switch at the v0.38.0 release sync (the monolith-ratchet heal) and the
-// sixth landed here directly: the event-to-line doctrine lives here and
+// Farming's seven SimEvent feedback arms (plant, harvest, wither, deny, husk
+// trade, the ready notice, and the feast placement), the first five extracted
+// whole from the HUD's event switch at the v0.38.0 release sync (the
+// monolith-ratchet heal) and the rest landed here directly: the
+// event-to-line doctrine lives here and
 // the HUD's switch keeps a one-call thin arm. The split of duties is
 // unchanged: the PURE resolution (which line key, which item token id, the
 // deny toast plan) stays in farming_view.ts, the pure core a Vitest drives
@@ -25,7 +26,7 @@ import {
 import { grantItemToken, grantQtyText } from './grant_line_view';
 import { formatNumber, t } from './i18n';
 
-/** The six farming events, narrowed from the shared SimEvent union. */
+/** The seven farming events, narrowed from the shared SimEvent union. */
 export type FarmEvent = Extract<
   SimEvent,
   {
@@ -35,7 +36,8 @@ export type FarmEvent = Extract<
       | 'farmWithered'
       | 'farmDenied'
       | 'farmHusksConverted'
-      | 'farmReady';
+      | 'farmReady'
+      | 'farmFeastPlaced';
   }
 >;
 
@@ -162,6 +164,18 @@ export function handleFarmEvent(ev: FarmEvent, host: FarmFeedbackHost): void {
       }
       break;
     }
+    case 'farmFeastPlaced': {
+      // The shared feast went out (Phase 12). The placer's confirmation: the
+      // placement cue (ungated, the farmPlant direct-affordance register)
+      // plus ONE transient self-note toast. Deliberately no log line and no
+      // banner: the standing table, its flourish, and its composed title are
+      // the durable record, so a second written surface would be the
+      // double-feedback trap. The event carries only ids (pid, feastId); the
+      // sentence is entirely client-side.
+      audio.farmFeast();
+      host.showSelfNote(t('hudChrome.farming.feastPlacedLine'));
+      break;
+    }
     case 'farmDenied': {
       // A refused plant, harvest or husk trade: an error toast ONLY, no
       // line, no cue, no other state (the gatherDenied pattern). The sim
@@ -260,6 +274,13 @@ export function handleFarmEvent(ev: FarmEvent, host: FarmFeedbackHost): void {
       if (readyText) host.log(readyText, '#c8f7c5');
       if (witheredText) host.log(witheredText, '#a8a8a8');
       break;
+    }
+    default: {
+      // Exhaustiveness tripwire: a farm SimEvent added to the FarmEvent
+      // union with no arm here stops compiling, instead of shipping as a
+      // silently unhandled event (the cross-platform review's ask).
+      const unhandled: never = ev;
+      void unhandled;
     }
   }
 }

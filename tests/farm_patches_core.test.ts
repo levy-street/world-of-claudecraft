@@ -14,6 +14,7 @@ import {
   FARM_FALLBACK_ACCENT,
   FARM_FALLBACK_FAMILY,
   FARM_FALLBACK_PALETTE,
+  FARM_FEAST_MODEL_URL,
   FARM_SOIL_SOCKET_NAME,
   FARM_SPROUT_MODEL_URL,
   FARM_WET_BAND_1_MS,
@@ -240,14 +241,18 @@ describe('plot rebuild key', () => {
 });
 
 describe('model urls', () => {
-  it('names the 15 authored GLBs, all distinct and all under props/', () => {
+  it('names the 16 authored GLBs, all distinct and all under props/', () => {
     const urls = farmModelUrls();
-    expect(urls.length).toBe(15);
-    expect(new Set(urls).size).toBe(15);
+    expect(urls.length).toBe(16);
+    expect(new Set(urls).size).toBe(16);
     for (const url of urls) expect(url.startsWith('/models/props/farm_')).toBe(true);
     expect(urls).toContain(FARM_BED_MODEL_URL);
     expect(urls).toContain(FARM_SPROUT_MODEL_URL);
     expect(urls).toContain(FARM_COMPOST_BIN_MODEL_URL);
+    // The placed feast preloads with the set, and its url is the literal the
+    // shipped farm_feast.glb actually lives at.
+    expect(urls).toContain(FARM_FEAST_MODEL_URL);
+    expect(FARM_FEAST_MODEL_URL).toBe('/models/props/farm_feast.glb');
   });
 
   it('maps each family and stage to its own file, with sprout shared', () => {

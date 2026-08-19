@@ -680,6 +680,16 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(drawsAt('harvested-golden-win')).toBe(103);
     expect(drawsAt('planted-t3-paying')).toBe(108);
     expect(drawsAt('harvested-t3-paying')).toBe(110);
+    // THE PHASE 12 BEAT-P FRAMES: the dish's tick-phase mint and the whole
+    // feast loop (place, bite, mint, expire) draw NOTHING: the ledger closes
+    // at 110 with every appended frame flat (the recorded truth of the
+    // re-recorded golden).
+    expect(drawsAt('wellfed-eating')).toBe(110);
+    expect(drawsAt('wellfed-dish-minted')).toBe(110);
+    expect(drawsAt('feast-placed')).toBe(110);
+    expect(drawsAt('feast-bitten')).toBe(110);
+    expect(drawsAt('feast-wellfed-minted')).toBe(110);
+    expect(drawsAt('feast-expired')).toBe(110);
     expect(trace.draws).toBe(110);
 
     // The knobbed plant really stored all three paid flags (farmPlanted is
@@ -873,6 +883,10 @@ describe('coverage: each scenario fires its subsystem', () => {
       // padding cycle's seed, then the paying tier-3 beat's barley seed.
       ...Array.from({ length: 30 }, () => receiveLine('vale_wheat_seed')),
       receiveLine('highland_barley_seed'),
+      // The Phase 12 beat-P scaffolding, in drive order: the dish the
+      // tick-phase mint eats, then the feast item the place verb spends.
+      receiveLine('evergarden_braised_greens'),
+      receiveLine('harvest_feast'),
     ]);
     const expectedFlagged =
       harvested.reduce(
@@ -903,6 +917,25 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(countOf('vale_wheat_seed')).toBe(0);
     expect(countOf('compost')).toBe(1);
     expect(countOf('growth_tonic')).toBe(0);
+
+    // THE PHASE 12 BEAT P, event and state truth. Exactly one
+    // farmFeastPlaced (the placer's own confirmation; everyone else learns
+    // by seeing the entity), and the post-drive world holds NO feast: the
+    // draw-free expiry write plus ONE 1 Hz updateFarming sweep dropped the
+    // entity and the FeastState together.
+    const placedEv = ev.filter((e) => e.type === 'farmFeastPlaced');
+    expect(placedEv).toHaveLength(1);
+    expect(placedEv[0].pid).toBe(pid);
+    const simAny = rec.sim as any;
+    expect(simAny.feasts.size).toBe(0);
+    expect(simAny.entities.get(placedEv[0].feastId)).toBeUndefined();
+    // The bite refreshed the dish mint (last-eaten-wins on the shared id):
+    // the drive ends Well Fed at the tier-4 value, and both beat-P items
+    // left the bags (the dish eaten, the feast spent at placement).
+    const wellfedAura = (simAny.player.auras as any[]).find((a) => a.id === 'wellfed_buff_sta');
+    expect(wellfedAura?.value).toBe(12);
+    expect(countOf('evergarden_braised_greens')).toBe(0);
+    expect(countOf('harvest_feast')).toBe(0);
     expect(meta.farmPlots.size).toBe(0);
 
     // The gathering-grant drain across the whole session: +1 at proficiency

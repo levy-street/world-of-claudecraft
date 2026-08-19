@@ -1919,6 +1919,42 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
     acquisition: ['trainer'],
     stationType: 'kitchens',
   },
+  {
+    id: 'recipe_harvest_feast',
+    professionId: 'cooking',
+    resultItemId: 'harvest_feast',
+    resultCount: 1,
+    // The shared feast (Phase 12, D16): the tier-4 communal showcase, cooked
+    // from BOTH tier-4 produce lines at once so one feast asks a whole
+    // evergarden harvest, not a single bed. Input vs output: unit value =
+    // buyValue when finite and > 0 else sellValue, so greens 40x4 + sunmelon
+    // 40x4 + salt 8x2 = 336 in against an output sellValue of 250:
+    // gold-negative, like every farm row.
+    //
+    // The (bz) whole-list invariant holds here too: both produce reagents
+    // (evergarden_greens, gilded_sunmelon) carry no buyValue and no counter
+    // stocks them, so the feast can never be cooked from vendor stock alone
+    // and stays out of the counterfactual vendor-fed set in
+    // tests/recipe_economy.test.ts.
+    //
+    // REAGENT-DORMANT under deviation (bo), with the (ca) reconciliation:
+    // the D11 seed-bootstrap ruling owns the tier 3/4 seed faucet, so this
+    // row ships trainable and well-formed but honest-dormant, exactly like
+    // the tier 3/4 dishes above it.
+    //
+    // FLAGGED FOR THE MAINTAINER: the reagent counts (4 + 4 + 2) and the
+    // 250 output sellValue are proposed tuning, like every farming constant.
+    reagents: [
+      { itemId: 'evergarden_greens', count: 4 },
+      { itemId: 'gilded_sunmelon', count: 4 },
+      { itemId: 'cooking_salt', count: 2 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'kitchens',
+  },
   // --- alchemy -------------------------------------------------------------
   {
     id: 'recipe_growth_tonic',

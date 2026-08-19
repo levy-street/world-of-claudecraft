@@ -1,0 +1,29 @@
+import { FARM_FEAST_TEMPLATE_ID } from '../sim/professions/feast';
+import { dist2d, type Entity, INTERACT_RANGE, type Vec3 } from '../sim/types';
+
+/** Nearest placed feast entity within reach of the player, by 2D distance, or
+ *  null. A feast is the kind:'object' entity carrying the farm_feast
+ *  templateId (src/sim/professions/feast.ts): it is not lootable and owns no
+ *  pickup item, so no other funnel arm ever competes for it. The boundary is
+ *  INCLUSIVE (`<= INTERACT_RANGE`) to mirror the sim's own deny,
+ *  `dist2d(p.pos, entity.pos) > INTERACT_RANGE` (farmDenied 'feast_range'),
+ *  so the client never refuses a press the sim would accept. Ties go to the
+ *  first entity in iteration order (the strict `<` on best keeps the earlier
+ *  one), the farm_bed_interact comparator exactly. Pure module: no DOM, no
+ *  Three, no HUD. */
+export function nearestInteractableFeast(
+  entities: ReadonlyMap<number, Entity>,
+  playerPos: Vec3,
+): number | null {
+  let bestId: number | null = null;
+  let bestDistance = Number.POSITIVE_INFINITY;
+  for (const entity of entities.values()) {
+    if (entity.kind !== 'object' || entity.templateId !== FARM_FEAST_TEMPLATE_ID) continue;
+    const distance = dist2d(playerPos, entity.pos);
+    if (distance <= INTERACT_RANGE && distance < bestDistance) {
+      bestId = entity.id;
+      bestDistance = distance;
+    }
+  }
+  return bestId;
+}

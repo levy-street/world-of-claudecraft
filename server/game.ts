@@ -7045,6 +7045,8 @@ export class GameServer {
       case 'plant_crop':
       case 'harvest_crop':
       case 'convert_husks':
+      case 'place_feast':
+      case 'consume_feast':
         // Farming's command bodies live whole in server/farming_commands.ts
         // (the v0.38.0 sync monolith heal). The labels stay HERE: the
         // command-schema suite scans this switch for the dispatch universe.

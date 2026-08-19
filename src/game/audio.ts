@@ -137,6 +137,10 @@ export const UI_CUES = {
   // shared rare-event achievement cue, never a replacement for it, the same
   // additive design masterwork and gatherRareTier follow.
   farmGolden: 'ui_farm_golden',
+  // Setting out the shared feast (Phase 12): the placement's own cue, a
+  // procedural placeholder like its farming siblings until a real recording
+  // lands.
+  farmFeast: 'ui_farm_feast',
 } as const;
 
 type UiCue =
@@ -469,6 +473,13 @@ export class GameAudio {
   // top of the shared achievement cue, never a replacement for it.
   farmGolden(): void {
     this.playFeedback(UI_CUES.farmGolden);
+  }
+
+  // Setting out the shared feast: the direct-affordance half (you pressed
+  // the verb and the table answers), so it rides the ungated arm exactly
+  // like its farmPlant sibling.
+  farmFeast(): void {
+    this.play(UI_CUES.farmFeast);
   }
 }
 

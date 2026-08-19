@@ -3113,8 +3113,16 @@ export const ru_RU: EnTranslations = {
         "no_tonic": "У вас нет тоника роста.",
         "tool": "У вас нет мотыги земледельца, подходящей для этой культуры.",
         "locked": "Предмет, которым можно за это заплатить, заблокирован.",
-        "no_farmer": "Чтобы обменять шелуху на компост, нужно стоять рядом с фермером."
+        "no_farmer": "Чтобы обменять шелуху на компост, нужно стоять рядом с фермером.",
+        "no_feast": "У вас нет пира, который можно накрыть.",
+        "feast_active": "Ваш пир уже накрыт.",
+        "feast_expired": "Этого пира больше нет.",
+        "feast_finished": "Этот пир съеден подчистую.",
+        "feast_range": "Вы слишком далеко от пира.",
+        "feast_eaten": "Вы уже поели с этого пира."
       },
+      "feastTitle": "Пир урожая {name}",
+      "feastPlacedLine": "Вы накрыли свой пир урожая.",
       "huskTrade": "Обменять шелуху на компост",
       "huskTradeAria": "Обменять засохшую шелуху на компост у {name}",
       "plantSheet": {
@@ -9051,6 +9059,9 @@ export const ru_RU: EnTranslations = {
       "useElixirAura": "Использование: дает эффект \"{aura}\" на {minutes} мин. Можно использовать в бою.",
       "useWellfed": "Эффект \"{aura}\": {stat} +{value} на {minutes} мин. Дается, когда вы доедаете.",
       "useWellfedAura": "Дает эффект \"{aura}\" на {minutes} мин, когда вы доедаете.",
+      "useFeast": "Использование: накрывает пир, с которого могут поесть и другие, по одной порции каждому ({servings} порций, действует {minutes} мин).",
+      "useFeastBuff": "Каждая порция дает эффект \"{aura}\": {stat} +{value} на {minutes} мин после {seconds} сек еды.",
+      "useFeastBuffAura": "Каждая порция дает эффект \"{aura}\" на {minutes} мин после {seconds} сек еды.",
       "questItem": "Предмет задания",
       "questRelated": "Задание: {quest}",
       "questRules": "Нельзя продать, положить в банк или обменять.",
@@ -12622,6 +12633,9 @@ export const ru_RU: EnTranslations = {
       },
       "evergarden_braised_greens": {
         "name": "Тушёная зелень Вечного Сада"
+      },
+      "harvest_feast": {
+        "name": "Пир урожая"
       },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"

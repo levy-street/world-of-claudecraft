@@ -5632,6 +5632,9 @@ function professionsFarmingSession(seed = 1): Scenario {
       'padding cycles (Phase 11): real plant-plus-withered-harvest cycles walk the shared stream to the probed positions, exactly three draws each, no produce, no gains, no notices',
       'golden-WIN harvest (Phase 11, (bw)): the tier-1 golden roll WINS at the searched position; the five-fold signed grants at both grades, the crop-source announce fanout, and the gather_event:golden_harvest mark reach the golden digest',
       'tier-3 seed-back PAYING band (Phase 11, (bw)): the re-seated Thornpeak harvest pays exactly one highland_barley_seed (the one-seed band), upgrading the Phase 10 zero-band grant proof',
+      'wellfed tick-phase mint (Phase 12, beat P): a REAL consume completion through ticks (addItem + useItem + the full 18s sit-restore) mints wellfed_buff_sta at the updateRegen completion arm, zero draws',
+      'shared feast loop (Phase 12): placeFeast spends the bag item and spawns the farm_feast entity on the normal roster; the placer bites the own feast (a charge spent at START) and rides the same completion to a last-eaten-wins refresh of the buff, zero draws',
+      'feast expiry despawn (Phase 12): the draw-free expiresAtTick write plus the 1 Hz updateFarming sweep drop the entity and the FeastState together (the one despawn site)',
     ],
     build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: true }),
     drive(rec: Recorder) {
@@ -5885,6 +5888,47 @@ function professionsFarmingSession(seed = 1): Scenario {
       rec.snapshot('harvested-t3-paying');
       // Drain the paying harvest's queued 0.02 gain into the final sample.
       rec.tick(8);
+
+      // ---- The Phase 12 extension (beat P, the (bw) residual discharged):
+      // the wellfed TICK-PHASE mint, ridden for real. The mint is the one
+      // genuinely new tick-phase path of the well-fed phase (updateRegen
+      // completion, not a command), so the beat rides a REAL consume
+      // completion through ticks: addItem, useItem, the full 18s
+      // sit-restore, then the sampled buff. Zero draws on every step (the
+      // eat is a pure slot write and the ride is mob-dead quiet), so every
+      // prior frame and the whole 110-draw ledger stay byte-identical: a
+      // pure append. ----
+      // Wait out the tier-3 beat's still-running plant flavor cast first
+      // (the drive's own busy-gate idiom): useItem refuses during a
+      // non-spell cast, and rec.tick(8) above is shorter than the cast.
+      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      sim.addItem('evergarden_braised_greens', 1, pid);
+      sim.useItem('evergarden_braised_greens', pid);
+      rec.snapshot('wellfed-eating');
+      rec.tick(400); // past the 18s sit-restore (360 ticks) with regen-tick slack
+      rec.snapshot('wellfed-dish-minted');
+
+      // ---- The shared feast loop (Phase 12): place, bite, mint, expire.
+      // placeFeast spends the bag item and spawns the farm_feast entity on
+      // the normal roster; the placer bites the own feast (a charge spent
+      // at bite START, the ledger marked) and rides the SAME completion to
+      // a last-eaten-wins REFRESH of the buff minted above (the (by)
+      // namespace rule, sampled in the digest). Expiry rides the readyAtMs
+      // idiom: a draw-free expiresAtTick write plus the 1 Hz updateFarming
+      // sweep drops the entity and the FeastState together (the one
+      // despawn site). Zero draws end to end. ----
+      sim.addItem('harvest_feast', 1, pid);
+      sim.placeFeast(pid);
+      rec.snapshot('feast-placed');
+      const feastId = [...sim.feasts.keys()][0] as number;
+      sim.consumeFeast(feastId, pid);
+      rec.snapshot('feast-bitten');
+      rec.tick(400); // the bite's own 18s sit-restore, same slack as above
+      rec.snapshot('feast-wellfed-minted');
+      const feast = sim.feasts.get(feastId);
+      if (feast) feast.expiresAtTick = sim.ctx.tickCount;
+      rec.tick(21); // across the next 1 Hz boundary: the sweep despawns
+      rec.snapshot('feast-expired');
     },
   };
 }

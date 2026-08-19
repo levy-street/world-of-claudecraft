@@ -25,7 +25,7 @@ import {
   resolveFarmPlotVisual,
 } from '../src/render/farm_patches_core';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
-import type { SimEvent } from '../src/sim/types';
+import type { Entity, SimEvent } from '../src/sim/types';
 import type { FarmPlotView } from '../src/world_api/farming';
 
 const HOUR = 60 * 60 * 1000;
@@ -56,15 +56,29 @@ function plot(over: Partial<FarmPlotView> = {}): FarmPlotView {
  * itself is the cost being avoided).
  */
 function fakeWorld(rows: readonly FarmPlotView[], nowMs = 0) {
-  const state = { rows, nowMs, reads: 0 };
+  const state = { rows, nowMs, reads: 0, entities: new Map<number, Entity>() };
   const source: FarmPlotSource = {
     get myFarmPlots() {
       state.reads++;
       return state.rows;
     },
     farmNowMs: () => state.nowMs,
+    entities: state.entities,
+    cfg: { seed: SEED },
   };
   return { state, source };
+}
+
+/** A placed harvest feast entity, narrowed to the fields the adapter reads. */
+function feastEntity(id: number, over: Partial<Entity> = {}): Entity {
+  return {
+    id,
+    kind: 'object',
+    templateId: 'farm_feast',
+    name: 'Mira',
+    pos: { x: 12, y: 0, z: -8 },
+    ...over,
+  } as Entity;
 }
 
 /** Records which emitter each event reached, so the arms are distinguishable. */
@@ -221,6 +235,77 @@ describe('farm patch per-viewer visuals', () => {
     expect(scene.children.length).toBe(2);
     visuals.dispose();
     expect(scene.children.length).toBe(0);
+  });
+});
+
+describe('the placed feast surface (Phase 12)', () => {
+  it('draws a feast entity on the throttled read and removes it on despawn', () => {
+    const scene = new THREE.Scene();
+    const { seats } = buildFarmPatchProps(SEED, FARM_PATCHES);
+    const visuals = new FarmPatchVisuals(scene, seats, recordingVfx().sink);
+    const { state, source } = fakeWorld([]);
+
+    state.entities.set(501, feastEntity(501));
+    visuals.sync(source, READ_DT);
+    const group = scene.children.find((c) => c.name === 'farmFeast:501');
+    expect(group, 'the feast table must enter the scene').toBeDefined();
+    if (!group) return;
+    // Seated at the entity's own (x, z) on finite terrain ground.
+    expect(group.position.x).toBe(12);
+    expect(group.position.z).toBe(-8);
+    expect(Number.isFinite(group.position.y)).toBe(true);
+
+    state.entities.delete(501);
+    visuals.sync(source, READ_DT);
+    expect(
+      scene.children.find((c) => c.name === 'farmFeast:501'),
+      'a despawned feast must leave the scene',
+    ).toBeUndefined();
+  });
+
+  it('fires the placement flourish exactly once per feast appearance', () => {
+    const scene = new THREE.Scene();
+    const { seats } = buildFarmPatchProps(SEED, FARM_PATCHES);
+    const vfx = recordingVfx();
+    const visuals = new FarmPatchVisuals(scene, seats, vfx.sink);
+    const { state, source } = fakeWorld([]);
+
+    // The unarmed baseline: no feast, no flourish (so the armed expectation
+    // below demonstrably differs).
+    visuals.sync(source, READ_DT);
+    expect(vfx.calls).toEqual([]);
+
+    state.entities.set(501, feastEntity(501));
+    visuals.sync(source, READ_DT);
+    expect(vfx.calls, 'turned earth, then the warm burst').toEqual(['puff', 'burst']);
+
+    // While the same feast stands, later reads must NOT refire the flourish.
+    visuals.sync(source, READ_DT);
+    visuals.sync(source, READ_DT);
+    expect(vfx.calls).toEqual(['puff', 'burst']);
+
+    // A SECOND feast is its own appearance and earns its own flourish.
+    state.entities.set(502, feastEntity(502, { pos: { x: -4, y: 0, z: 20 } } as Partial<Entity>));
+    visuals.sync(source, READ_DT);
+    expect(vfx.calls).toEqual(['puff', 'burst', 'puff', 'burst']);
+  });
+
+  it('ignores non-feast entities and disposes feasts with the module', () => {
+    const scene = new THREE.Scene();
+    const { seats } = buildFarmPatchProps(SEED, FARM_PATCHES);
+    const visuals = new FarmPatchVisuals(scene, seats, recordingVfx().sink);
+    const { state, source } = fakeWorld([]);
+
+    state.entities.set(600, feastEntity(600, { templateId: 'mailbox' } as Partial<Entity>));
+    state.entities.set(601, feastEntity(601, { kind: 'npc' } as Partial<Entity>));
+    state.entities.set(602, feastEntity(602));
+    visuals.sync(source, READ_DT);
+    expect(
+      scene.children.filter((c) => c.name.startsWith('farmFeast:')).map((c) => c.name),
+    ).toEqual(['farmFeast:602']);
+
+    visuals.dispose();
+    expect(scene.children.filter((c) => c.name.startsWith('farmFeast:'))).toEqual([]);
   });
 });
 

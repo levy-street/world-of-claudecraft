@@ -3113,8 +3113,16 @@ export const it_IT: EnTranslations = {
         "no_tonic": "You have no growth tonic.",
         "tool": "You have no farming hoe fit for that crop.",
         "locked": "An item that would pay for that is locked.",
-        "no_farmer": "You must be near a farmer to trade husks for compost."
+        "no_farmer": "You must be near a farmer to trade husks for compost.",
+        "no_feast": "You have no feast to set out.",
+        "feast_active": "Your feast is already set out.",
+        "feast_expired": "That feast is gone.",
+        "feast_finished": "That feast has been picked clean.",
+        "feast_range": "You are too far from the feast.",
+        "feast_eaten": "You have already eaten from that feast."
       },
+      "feastTitle": "{name}'s Harvest Feast",
+      "feastPlacedLine": "You set out your harvest feast.",
       "huskTrade": "Trade husks for compost",
       "huskTradeAria": "Trade withered husks for compost with {name}",
       "plantSheet": {
@@ -9051,6 +9059,9 @@ export const it_IT: EnTranslations = {
       "useElixirAura": "Uso: concede {aura} per {minutes} min. Utilizzabile in combattimento.",
       "useWellfed": "{aura}: +{value} {stat} for {minutes} min, granted when you finish eating.",
       "useWellfedAura": "Grants {aura} for {minutes} min when you finish eating.",
+      "useFeast": "Use: Sets out a feast others can eat from, one serving each ({servings} servings, lasts {minutes} min).",
+      "useFeastBuff": "Each serving grants {aura}: +{value} {stat} for {minutes} min when you finish the {seconds} sec meal.",
+      "useFeastBuffAura": "Each serving grants {aura} for {minutes} min when you finish the {seconds} sec meal.",
       "questItem": "Oggetto missione",
       "questRelated": "Missione: {quest}",
       "questRules": "Non può essere venduto, depositato in banca o scambiato.",
@@ -12622,6 +12633,9 @@ export const it_IT: EnTranslations = {
       },
       "evergarden_braised_greens": {
         "name": "Evergarden Braised Greens"
+      },
+      "harvest_feast": {
+        "name": "Harvest Feast"
       },
       "conjured_water4": {
         "name": "Acqua sorgiva evocata"

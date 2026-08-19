@@ -2716,6 +2716,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useWellfed':
     '다 먹으면 {aura} 효과를 얻어 {stat}이(가) {value} 증가하며 {minutes}분 동안 지속됩니다.',
   'itemUi.tooltip.useWellfedAura': '다 먹으면 {aura} 효과를 얻어 {minutes}분 동안 지속됩니다.',
+  'itemUi.tooltip.useFeast':
+    '사용: 다른 플레이어도 먹을 수 있는 잔치를 차립니다. 1인당 1인분입니다({servings}인분, {minutes}분간 지속).',
+  'itemUi.tooltip.useFeastBuff':
+    '한 접시를 {seconds}초 동안 다 먹으면 {aura} 효과를 얻어 {stat}이(가) {value} 증가하며 {minutes}분 동안 지속됩니다.',
+  'itemUi.tooltip.useFeastBuffAura':
+    '한 접시를 {seconds}초 동안 다 먹으면 {aura} 효과를 얻어 {minutes}분 동안 지속됩니다.',
   'itemUi.tooltip.clickUseInstant': '클릭하여 전투 중 즉시 사용',
   'itemUi.tooltip.clickUse': '클릭하여 사용',
   'itemUi.tooltip.clickBuyback': '클릭하여 되사기',
@@ -8852,6 +8858,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.no_tonic': '성장 토닉이 없습니다.',
   'hudChrome.farming.denied.tool': '그 작물에 맞는 농사 괭이가 없습니다.',
   'hudChrome.farming.denied.locked': '지불에 쓸 아이템이 잠겨 있습니다.',
+  'hudChrome.farming.denied.no_feast': '차릴 잔치 음식이 없습니다.',
+  'hudChrome.farming.denied.feast_active': '이미 잔치를 차려 놓았습니다.',
+  'hudChrome.farming.denied.feast_expired': '그 잔치는 이미 사라졌습니다.',
+  'hudChrome.farming.denied.feast_finished': '그 잔치는 남김없이 비워졌습니다.',
+  'hudChrome.farming.denied.feast_range': '잔치에서 너무 멀리 있습니다.',
+  'hudChrome.farming.denied.feast_eaten': '이미 그 잔치에서 먹었습니다.',
+  'hudChrome.farming.feastTitle': '{name}의 수확의 잔치',
+  'hudChrome.farming.feastPlacedLine': '수확의 잔치를 차렸습니다.',
   'hudChrome.farming.husksConvertedLine': '{husksName} x{husks}을(를) {name}(으)로 교환했습니다.',
   'hudChrome.farming.husksConvertedLineQty':
     '{husksName} x{husks}을(를) {name} x{qty}(으)로 교환했습니다.',
@@ -8935,6 +8949,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.fenbridge_rice_pudding.name': '펜브리지 쌀 푸딩',
   'entities.items.highwatch_barley_porridge.name': '하이워치 보리죽',
   'entities.items.evergarden_braised_greens.name': '상록 정원 잎채소 조림',
+  'entities.items.harvest_feast.name': '수확의 잔치',
   'hudChrome.archetypeTitle.label': '칭호',
   'hudChrome.archetypeTitle.none': '없음',
   'hudChrome.archetypeTitle.hobbyLabel': '취미',

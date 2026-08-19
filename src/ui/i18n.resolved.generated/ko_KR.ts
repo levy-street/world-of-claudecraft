@@ -3113,8 +3113,16 @@ export const ko_KR: EnTranslations = {
         "no_tonic": "성장 토닉이 없습니다.",
         "tool": "그 작물에 맞는 농사 괭이가 없습니다.",
         "locked": "지불에 쓸 아이템이 잠겨 있습니다.",
-        "no_farmer": "껍질을 퇴비로 바꾸려면 농부 근처에 있어야 합니다."
+        "no_farmer": "껍질을 퇴비로 바꾸려면 농부 근처에 있어야 합니다.",
+        "no_feast": "차릴 잔치 음식이 없습니다.",
+        "feast_active": "이미 잔치를 차려 놓았습니다.",
+        "feast_expired": "그 잔치는 이미 사라졌습니다.",
+        "feast_finished": "그 잔치는 남김없이 비워졌습니다.",
+        "feast_range": "잔치에서 너무 멀리 있습니다.",
+        "feast_eaten": "이미 그 잔치에서 먹었습니다."
       },
+      "feastTitle": "{name}의 수확의 잔치",
+      "feastPlacedLine": "수확의 잔치를 차렸습니다.",
       "huskTrade": "껍질을 퇴비로 교환",
       "huskTradeAria": "{name}에게 시든 껍질을 퇴비로 교환",
       "plantSheet": {
@@ -9051,6 +9059,9 @@ export const ko_KR: EnTranslations = {
       "useElixirAura": "사용: {aura} 효과를 얻어 {minutes}분 동안 지속됩니다. 전투 중 사용 가능.",
       "useWellfed": "다 먹으면 {aura} 효과를 얻어 {stat}이(가) {value} 증가하며 {minutes}분 동안 지속됩니다.",
       "useWellfedAura": "다 먹으면 {aura} 효과를 얻어 {minutes}분 동안 지속됩니다.",
+      "useFeast": "사용: 다른 플레이어도 먹을 수 있는 잔치를 차립니다. 1인당 1인분입니다({servings}인분, {minutes}분간 지속).",
+      "useFeastBuff": "한 접시를 {seconds}초 동안 다 먹으면 {aura} 효과를 얻어 {stat}이(가) {value} 증가하며 {minutes}분 동안 지속됩니다.",
+      "useFeastBuffAura": "한 접시를 {seconds}초 동안 다 먹으면 {aura} 효과를 얻어 {minutes}분 동안 지속됩니다.",
       "questItem": "퀘스트 아이템",
       "questRelated": "퀘스트: {quest}",
       "questRules": "판매, 은행에 보관, 거래할 수 없습니다.",
@@ -12622,6 +12633,9 @@ export const ko_KR: EnTranslations = {
       },
       "evergarden_braised_greens": {
         "name": "상록 정원 잎채소 조림"
+      },
+      "harvest_feast": {
+        "name": "수확의 잔치"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

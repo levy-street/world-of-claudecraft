@@ -212,10 +212,12 @@ export function farmPlotKeyMatches(
   );
 }
 
-// The 15 authored GLBs, all under public/models/props/.
+// The 16 authored GLBs, all under public/models/props/.
 export const FARM_BED_MODEL_URL = '/models/props/farm_bed.glb';
 export const FARM_SPROUT_MODEL_URL = '/models/props/farm_sprout.glb';
 export const FARM_COMPOST_BIN_MODEL_URL = '/models/props/farm_compost_bin.glb';
+/** The placed harvest feast table (Phase 12, the shared feast). */
+export const FARM_FEAST_MODEL_URL = '/models/props/farm_feast.glb';
 
 /** The node in farm_bed.glb the stage meshes mount at. */
 export const FARM_SOIL_SOCKET_NAME = 'Socket_Soil';
@@ -236,7 +238,12 @@ export function farmStageModelUrl(family: FarmCropFamily, stage: FarmStageMesh):
 export function farmModelUrls(): string[] {
   const families: FarmCropFamily[] = ['grain', 'rootleaf', 'gourd'];
   const stages: FarmStageMesh[] = ['stage2', 'stage3', 'stage4', 'withered'];
-  const urls = [FARM_BED_MODEL_URL, FARM_SPROUT_MODEL_URL, FARM_COMPOST_BIN_MODEL_URL];
+  const urls = [
+    FARM_BED_MODEL_URL,
+    FARM_SPROUT_MODEL_URL,
+    FARM_COMPOST_BIN_MODEL_URL,
+    FARM_FEAST_MODEL_URL,
+  ];
   for (const family of families) {
     for (const stage of stages) urls.push(farmStageModelUrl(family, stage));
   }

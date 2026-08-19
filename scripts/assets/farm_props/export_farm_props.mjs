@@ -1,5 +1,5 @@
 // Deterministic farm prop authoring, export, optimization, contract validation,
-// and visual evidence capture for the fifteen farming GLBs.
+// and visual evidence capture for the sixteen farming GLBs.
 //
 // Usage:
 //   BROWSER_PATH=... node scripts/assets/farm_props/export_farm_props.mjs

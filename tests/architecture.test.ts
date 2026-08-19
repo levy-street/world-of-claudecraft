@@ -275,6 +275,8 @@ const UI_PURE_CORES = [
   'src/ui/material_profession_hint_view.ts',
   'src/ui/elixir_tooltip_view.ts',
   'src/ui/wellfed_tooltip_view.ts',
+  'src/ui/feast_tooltip_view.ts',
+  'src/ui/entity_display_name.ts',
   'src/ui/stack_size_tooltip_view.ts',
   'src/ui/craft_name_view.ts',
   'src/ui/cooking_catch_hint_view.ts',
@@ -602,6 +604,7 @@ const RENDER_PURE_CORES = [
 // reverse-completeness guard.
 const BARE_NAMED = [
   'src/ui/ability_tooltip_lines.ts',
+  'src/ui/entity_display_name.ts',
   'src/ui/banner_queue.ts',
   'src/ui/item_instance_glyph_mark.ts',
   'src/ui/item_kind_label.ts',
@@ -1429,6 +1432,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/clock.ts',
   'src/ui/compass.ts',
   'src/ui/coords.ts',
+  'src/ui/entity_display_name.ts',
   'src/ui/fct_event.ts',
   'src/ui/focus_order.ts',
   'src/ui/gather_rare_event_feedback.ts',

@@ -15,6 +15,7 @@ const audioMock = vi.hoisted(() => ({
   farmPlant: vi.fn(),
   farmHarvest: vi.fn(),
   farmReady: vi.fn(),
+  farmFeast: vi.fn(),
 }));
 vi.mock('../src/game/audio', () => ({ audio: audioMock }));
 
@@ -271,6 +272,14 @@ describe('farm_event_feedback: the cue arms', () => {
       tool: true,
       locked: true,
       no_farmer: true,
+      // The shared-feast phase's six refusal reasons (professions/feast.ts):
+      // error-toast only, like every row above.
+      no_feast: true,
+      feast_active: true,
+      feast_expired: true,
+      feast_finished: true,
+      feast_range: true,
+      feast_eaten: true,
     };
     const reasons = Object.keys(REASON_ROWS) as FarmDeniedReason[];
     for (const reason of reasons) {
@@ -282,6 +291,32 @@ describe('farm_event_feedback: the cue arms', () => {
     expect(audioMock.farmPlant).not.toHaveBeenCalled();
     expect(audioMock.farmHarvest).not.toHaveBeenCalled();
     expect(audioMock.farmReady).not.toHaveBeenCalled();
+    expect(audioMock.farmFeast).not.toHaveBeenCalled();
+  });
+});
+
+// The shared feast placement (Phase 12): the placer's one-surface confirm.
+describe('farm_event_feedback: the feast placement', () => {
+  it('shows ONE self-note toast in real localized copy and touches no other surface', () => {
+    const calls = drive({ type: 'farmFeastPlaced', pid: 1, feastId: 501 });
+    expect(calls).toHaveLength(1);
+    expect(calls[0].fn).toBe('showSelfNote');
+    // Real copy, never a leaked key: the sentence is entirely client-side
+    // (the event carries only ids).
+    expect(calls[0].text).not.toContain('hudChrome.');
+    expect(calls[0].text.length).toBeGreaterThan(0);
+  });
+
+  it('fires the feast cue EXACTLY once and never a sibling cue', () => {
+    drive({ type: 'farmFeastPlaced', pid: 1, feastId: 501 });
+    expect(audioMock.farmFeast).toHaveBeenCalledTimes(1);
+    expect(audioMock.farmPlant).not.toHaveBeenCalled();
+    expect(audioMock.farmHarvest).not.toHaveBeenCalled();
+    expect(audioMock.farmReady).not.toHaveBeenCalled();
+    // ...and the sibling arms never borrow the feast cue back (the unarmed
+    // baseline for the cue assertions above).
+    drive({ type: 'farmPlanted', pid: 1, bedId: 'eastbrook_1', cropId: 'vale_wheat' });
+    expect(audioMock.farmFeast).toHaveBeenCalledTimes(1);
   });
 });
 

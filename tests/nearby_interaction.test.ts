@@ -70,6 +70,10 @@ function rig(targets: Entity[] = [], nodes: GatherNodeDef[] = []) {
     harvestCrop: (bedId: string) => {
       calls.push(`harvestCrop:${bedId}`);
     },
+    // Phase 12 feast-arm seam member (the feast describe below exercises it).
+    consumeFeast: (feastId: number) => {
+      calls.push(`consumeFeast:${feastId}`);
+    },
     harvestNode: (id: string) => {
       calls.push(`harvest:${id}`);
       return true;
@@ -593,6 +597,72 @@ describe('the garden-bed arm (Phase 9b)', () => {
 
   it('never fires for a dead player standing on a free bed', () => {
     const r = bedRig(null);
+    r.player.dead = true;
+    expect(interact(r)).toBe(false);
+    expect(r.calls).toEqual(['error:nothing']);
+  });
+});
+
+describe('the feast arm (Phase 12)', () => {
+  // The templateId stays the LITERAL here (never the sim constant): the wire
+  // rows carry this exact string, so a constant-value drift must red.
+  const feast = (id: number, x = 2) =>
+    entity({ id, kind: 'object', templateId: 'farm_feast', pos: { x, y: 0, z: 0 } });
+
+  it('presses consume exactly once beside a placed feast', () => {
+    const r = rig([feast(12)]);
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['consumeFeast:12']);
+  });
+
+  it('sends the press even when this player already ate: the sim answers feast_eaten', () => {
+    // The (bp) doctrine: the ledger never crosses the wire, so the client has
+    // nothing to read and must not invent a prediction. The press always
+    // sends; the sim is the refusing authority.
+    const r = rig([feast(12)]);
+    expect(interact(r)).toBe(true);
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['consumeFeast:12', 'consumeFeast:12']);
+  });
+
+  it('a garden bed in reach keeps winning the press over a feast (the arm sits below the bed arm)', () => {
+    const r = rig([feast(12)]);
+    r.world.farmPatches = [
+      {
+        id: 'patch_test',
+        zoneId: 'eastbrook_vale',
+        tier: 1,
+        x: 2,
+        z: 0,
+        beds: [{ id: 'bed_test_1', x: 2, z: 0 }],
+      },
+    ];
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['plantSheet:bed_test_1']);
+  });
+
+  it('a gather node in reach keeps winning the press over a feast', () => {
+    const node = {
+      id: 'ore_1',
+      zoneId: 'zone',
+      type: 'ore',
+      pos: { x: 1, z: 0 },
+      level: 1,
+      tier: 1,
+    } as const;
+    const r = rig([feast(12)], [node as unknown as GatherNodeDef]);
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['harvest:ore_1']);
+  });
+
+  it('falls through to the nothing-to-interact line when the feast is out of range', () => {
+    const r = rig([feast(12, 10)]);
+    expect(interact(r)).toBe(false);
+    expect(r.calls).toEqual(['error:nothing']);
+  });
+
+  it('never fires for a dead player beside a feast', () => {
+    const r = rig([feast(12)]);
     r.player.dead = true;
     expect(interact(r)).toBe(false);
     expect(r.calls).toEqual(['error:nothing']);

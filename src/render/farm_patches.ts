@@ -10,7 +10,10 @@
 //    the caller's own plot rows and nobody else's, so a bed a stranger planted
 //    stays bare to us. The rift_death_zone.ts idiom: sync() keyed by a content
 //    signature creates, updates and disposes; update(dt) does per-frame writes
-//    only and allocates nothing.
+//    only and allocates nothing. Phase 12 adds the placed harvest feast to the
+//    same sync: a REAL snapshot entity everyone sees, drawn here because its
+//    GLB, ground idiom and flourish all live in this module already (a
+//    dedicated feast module would need renderer.ts wiring).
 //
 // NO COLLIDER AND NO GROUND PAD, deliberately: beds are decorative, walkable
 // and non-blocking, the same ruling gather_nodes.ts and stations.ts already
@@ -23,7 +26,8 @@
 // flourishes are COSMETIC and go out through vfx.ts, whose scaledCount path IS
 // the tier shed; there is no bespoke knob here.
 import * as THREE from 'three';
-import type { SimEvent } from '../sim/types';
+import { FARM_FEAST_TEMPLATE_ID } from '../sim/professions/feast';
+import type { Entity, SimEvent } from '../sim/types';
 import { terrainHeight } from '../sim/world';
 import type { FarmPatchDef, FarmPlotView } from '../world_api/farming';
 import { loadGltf } from './assets/loader';
@@ -33,6 +37,7 @@ import {
   FARM_ACCENT_MESH_NAME,
   FARM_BED_MODEL_URL,
   FARM_COMPOST_BIN_MODEL_URL,
+  FARM_FEAST_MODEL_URL,
   FARM_SOIL_SOCKET_NAME,
   type FarmCropFamily,
   type FarmPlotVisual,
@@ -84,13 +89,17 @@ const WET_SOIL_DARKEN: Readonly<Record<FarmWetBand, number>> = Object.freeze({
 });
 // Where a stage mesh sits when the bed GLB carries no Socket_Soil node.
 const SOIL_SOCKET_FALLBACK_Y = 0.3;
+// The placed feast table's normalized height (the farm_feast contract).
+const FEAST_HEIGHT = 0.9;
+// Where the feast's placement flourish centers, above its ground seat.
+const FEAST_VFX_LIFT = 0.45;
 
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 
-// RESIDENCY, stated on purpose (the Phase 7 QA deferral): these 15 scenes are
+// RESIDENCY, stated on purpose (the Phase 7 QA deferral): these 16 scenes are
 // retained for the whole session, never released. The templates serve every
 // later plot create and the soil-socket resolve, so releasing them buys
-// nothing back; the loader's own gltfCache redundantly retains the 15 gltf
+// nothing back; the loader's own gltfCache redundantly retains the 16 gltf
 // wrappers on top, bounded and accepted (calling releaseGltf in the .then
 // would drop only the wrapper refs and must first prove no other consumer
 // shares these URLs).
@@ -256,6 +265,15 @@ export function buildFarmPatchProps(
   return { group, seats };
 }
 
+/** One placed harvest feast's table meshes (Phase 12, the shared feast). A
+ *  feast never changes appearance while it stands, so its whole rebuild key is
+ *  the entity id it is stored under. */
+interface FeastVisual {
+  group: THREE.Group;
+  ownedMaterials: THREE.Material[];
+  ownedGeometries: THREE.BufferGeometry[];
+}
+
 /** One live plot's crop meshes. Satisfies FarmPlotVisualKey structurally, so
  *  the steady-state sync check compares fields in place and allocates nothing. */
 interface PlotVisual extends FarmPlotVisualKey {
@@ -297,6 +315,11 @@ const SWAY_AMPLITUDE: Readonly<Record<FarmStageMesh, number>> = Object.freeze({
 export class FarmPatchVisuals {
   private readonly plots = new Map<string, PlotVisual>();
   private readonly seen = new Set<string>();
+  // The placed feasts (Phase 12): keyed by feast ENTITY id, mirrored from the
+  // world's entity map on the same throttled read as the plots. Everyone sees
+  // every feast (it is a real snapshot entity), unlike the per-viewer plots.
+  private readonly feasts = new Map<number, FeastVisual>();
+  private readonly feastsSeen = new Set<number>();
   private socketY = SOIL_SOCKET_FALLBACK_Y;
   // True once socketY came from a real loaded bed GLB: from then on the Box3
   // walk in soilSocketOffset() need not repeat on every plot create.
@@ -348,6 +371,10 @@ export class FarmPatchVisuals {
     if (!this.dirty && this.sinceReadS < FARM_SYNC_INTERVAL_S) return;
     this.sinceReadS = 0;
     const changed = this.applyPlots(world.myFarmPlots, world.farmNowMs());
+    // The feast scan rides the same throttled read. It never touches the
+    // dirty flag: the arming exists for the viewer's own plot rows, and a
+    // feast appearing within the normal half-second cadence is fine.
+    this.applyFeasts(world.entities, world.cfg.seed);
     // The event-forced read stays armed until it actually observes a change
     // (see the field comment: online the changed rows ride a LATER message
     // than the event), bounded at one interval so the normal cadence is the
@@ -381,6 +408,25 @@ export class FarmPatchVisuals {
       }
     }
     return changed;
+  }
+
+  /** Mirrors the placed feast entities (kind 'object', templateId
+   *  'farm_feast') into the scene: create on first appearance, remove on
+   *  despawn. Steady state is one entity-map walk plus set membership, no
+   *  allocation (the reused seen-set idiom of applyPlots). The placement
+   *  flourish fires exactly once per feast, when it FIRST appears to this
+   *  renderer, which also covers feasts other players set out (their entity
+   *  arrives by snapshot with no event on this viewer's channel). */
+  private applyFeasts(entities: ReadonlyMap<number, Entity>, seed: number): void {
+    this.feastsSeen.clear();
+    for (const e of entities.values()) {
+      if (e.kind !== 'object' || e.templateId !== FARM_FEAST_TEMPLATE_ID) continue;
+      this.feastsSeen.add(e.id);
+      if (!this.feasts.has(e.id)) this.createFeast(e, seed);
+    }
+    for (const [id, visual] of this.feasts) {
+      if (!this.feastsSeen.has(id)) this.disposeFeast(id, visual);
+    }
   }
 
   /** Per-frame writes only: the idle sway. No per-plot allocation (the one
@@ -437,6 +483,64 @@ export class FarmPatchVisuals {
 
   dispose(): void {
     for (const [bedId, visual] of this.plots) this.disposePlot(bedId, visual);
+    for (const [id, visual] of this.feasts) this.disposeFeast(id, visual);
+  }
+
+  /** Builds one feast table at the entity's ground seat (the bed idiom:
+   *  terrainHeight for y, tilted to the local ground normal), plus the
+   *  placement flourish. Cosmetic only, so both emitters go through vfx.ts,
+   *  whose scaledCount path is the graphics-tier shed. */
+  private createFeast(e: Entity, seed: number): void {
+    const group = new THREE.Group();
+    group.name = `farmFeast:${e.id}`;
+    const y = terrainHeight(e.pos.x, e.pos.z, seed);
+    group.position.set(e.pos.x, y, e.pos.z);
+    // Seat tilt plus a stable per-entity yaw (the ground-object (id % 7)
+    // idiom), composed in that order so the table still stands normal to the
+    // slope it was set out on.
+    const yawQuat = new THREE.Quaternion().setFromAxisAngle(WORLD_UP, (e.id % 7) * 0.45);
+    group.quaternion
+      .setFromUnitVectors(WORLD_UP, groundNormal(e.pos.x, e.pos.z, seed))
+      .multiply(yawQuat);
+
+    const ownedMaterials: THREE.Material[] = [];
+    const ownedGeometries: THREE.BufferGeometry[] = [];
+    const parts = templateParts(FARM_FEAST_MODEL_URL, FEAST_HEIGHT, 0x8a6a4a);
+    for (const part of parts) {
+      // Owned hook-preserving clones, untinted: the feast ships its authored
+      // colors, and per-feast clones keep disposal symmetric with the plots.
+      const mat = Array.isArray(part.mat)
+        ? part.mat.map((m) => this.cloneOwned(m, ownedMaterials))
+        : this.cloneOwned(part.mat, ownedMaterials);
+      const mesh = new THREE.Mesh(part.geo, mat);
+      mesh.applyMatrix4(part.local);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      if (!loadedFarmGltf.has(FARM_FEAST_MODEL_URL)) ownedGeometries.push(part.geo);
+      group.add(mesh);
+    }
+    setRenderCategory(group, 'props');
+    this.scene.add(group);
+    this.feasts.set(e.id, { group, ownedMaterials, ownedGeometries });
+
+    // The placement flourish: turned earth under the table, then a warm
+    // nature burst over the spread. Fires once per feast per appearance.
+    const at = new THREE.Vector3(e.pos.x, y + FEAST_VFX_LIFT, e.pos.z);
+    this.vfx.groundPuff(at, 0.7, 0x6b4f34);
+    this.vfx.burst(at, 'nature', 12, 0.8);
+  }
+
+  private cloneOwned(src: THREE.Material, owned: THREE.Material[]): THREE.Material {
+    const clone = cloneMaterialWithHooks(src);
+    owned.push(clone);
+    return clone;
+  }
+
+  private disposeFeast(id: number, visual: FeastVisual): void {
+    this.scene.remove(visual.group);
+    for (const mat of visual.ownedMaterials) mat.dispose();
+    for (const geo of visual.ownedGeometries) geo.dispose();
+    this.feasts.delete(id);
   }
 
   private create(
@@ -539,12 +643,17 @@ export class FarmPatchVisuals {
   }
 }
 
-/** The slice of IWorld this module reads, narrowed to the two farming members
- *  it needs. Taken as a WORLD rather than an array so the throttle can decide
- *  before touching myFarmPlots, which projects and sorts on every access. */
+/** The slice of IWorld this module reads. Taken as a WORLD rather than an
+ *  array so the throttle can decide before touching myFarmPlots, which
+ *  projects and sorts on every access. The entity map and the world seed
+ *  joined at Phase 12 for the placed-feast scan; both worlds already expose
+ *  them, so the renderer's `sync(this.sim, dt)` call sites stand unchanged
+ *  (the widening is structural, never a renderer edit). */
 export interface FarmPlotSource {
   readonly myFarmPlots: readonly FarmPlotView[];
   farmNowMs(): number;
+  readonly entities: ReadonlyMap<number, Entity>;
+  readonly cfg: { readonly seed: number };
 }
 
 /** The Vfx surface this module uses, narrowed to the two emitters it calls so

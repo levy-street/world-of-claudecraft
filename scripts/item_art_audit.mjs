@@ -112,9 +112,9 @@ const build = await buildItemArtAudit({
     // when it runs standalone (the vitest exact-set pin in
     // tests/item_icons.test.ts names the ids; this counts them). Total live
     // defs = liveItemCount + pendingArtCount, so both growth directions are
-    // visible, deliberate edits. 43 is the Phase 6 39 plus the Phase 11
-    // well-fed phase's four buff dishes.
-    pendingArtCount: 43,
+    // visible, deliberate edits. 44 is the Phase 6 39 plus the Phase 11
+    // well-fed phase's four buff dishes plus the Phase 12 shared feast.
+    pendingArtCount: 44,
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,
     heroicWeaponArtAliases: 16,

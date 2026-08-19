@@ -95,6 +95,23 @@ const itemStringsEn = {
       // buff bar reads, so one row owns the term in every locale.
       useWellfed: '{aura}: +{value} {stat} for {minutes} min, granted when you finish eating.',
       useWellfedAura: 'Grants {aura} for {minutes} min when you finish eating.',
+      // The shared feast (feast_tooltip_view.ts): what USING the item does
+      // (places a feast entity others eat from; {servings} and {minutes} come
+      // from the def's own feast record), then what each serving pays,
+      // matching the capstone dish's resolved well-fed form above. {seconds}
+      // is CONSUME_DURATION, the same sit-restore a bagged dish runs, and the
+      // finish-the-meal trigger is load-bearing copy like the wellfed lines
+      // (the buff lands only when the meal COMPLETES). The buff NAME rides
+      // the shared sim_i18n matcher row ({aura}), the (by) rule, so the
+      // tooltip, the dish tooltip, and the buff bar can never disagree per
+      // locale. useFeast keeps the Use: prefix: the feast has no foodHp, so
+      // no useFood sentence owns that slot on its tooltip.
+      useFeast:
+        'Use: Sets out a feast others can eat from, one serving each ({servings} servings, lasts {minutes} min).',
+      useFeastBuff:
+        'Each serving grants {aura}: +{value} {stat} for {minutes} min when you finish the {seconds} sec meal.',
+      useFeastBuffAura:
+        'Each serving grants {aura} for {minutes} min when you finish the {seconds} sec meal.',
       questItem: 'Quest Item',
       // Story tooltip lines (quest_item_tooltip_view.ts): related quest title,
       // keep-rules footer, and orphaned copy when the item is no longer needed
@@ -2500,6 +2517,7 @@ const ITEM_ENTITY_IDS = [
   'fenbridge_rice_pudding',
   'highwatch_barley_porridge',
   'evergarden_braised_greens',
+  'harvest_feast',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2702,6 +2720,8 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   fenbridge_rice_pudding: 'Fenbridge Rice Pudding',
   highwatch_barley_porridge: 'Highwatch Barley Porridge',
   evergarden_braised_greens: 'Evergarden Braised Greens',
+  // The shared feast (Phase 12). IP-safe per D17: two plain cooking words.
+  harvest_feast: 'Harvest Feast',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

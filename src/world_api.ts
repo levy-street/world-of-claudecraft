@@ -638,6 +638,14 @@ export const COMMAND_NAMES = [
   // sim-side from the sender's own bags, so there is nothing on this wire to
   // forge. Appended because wire tokens are never reordered.
   'convert_husks',
+  // The shared feast (Sim.placeFeast / Sim.consumeFeast via
+  // src/sim/professions/feast.ts). place_feast carries NO payload (the one
+  // feast item id, charges, expiry and the anti-abuse rule resolve
+  // sim-side); consume_feast carries the feast ENTITY id only, and every
+  // outcome (ledger, charges, range, the Well Fed mint) is server state.
+  // Appended because wire tokens are never reordered.
+  'place_feast',
+  'consume_feast',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -967,4 +975,6 @@ export const COMMAND_FACETS = {
   plant_crop: 'IWorldFarming',
   harvest_crop: 'IWorldFarming',
   convert_husks: 'IWorldFarming',
+  place_feast: 'IWorldFarming',
+  consume_feast: 'IWorldFarming',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

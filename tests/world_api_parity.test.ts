@@ -459,6 +459,11 @@ export const IWORLD_MEMBERS = [
   // The render phase's clock read: each world returns its OWN lockoutNowMs
   // base, so a growth-stage fraction never mixes clock bases.
   { name: 'farmNowMs', kind: 'method' },
+  // The shared-feast phase's pair: payload-free placement and the
+  // entity-id-keyed bite (both methods; the feast entity itself rides the
+  // normal entity snapshot, so no data member exists for it).
+  { name: 'placeFeast', kind: 'method' },
+  { name: 'consumeFeast', kind: 'method' },
 ] as const satisfies readonly IWorldMember[];
 
 const DATA_MEMBERS = IWORLD_MEMBERS.filter((m) => m.kind === 'data');
@@ -617,7 +622,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // leaving 327. Farming's knobs phase adds the husk conversion,
     // convertHusks (IWorldFarming, a method), leaving 328. Farming's render
     // phase adds the clock read farmNowMs (IWorldFarming, a method), leaving
-    // 329.
+    // 329. Farming's shared-feast phase adds the placement and bite pair,
+    // placeFeast and consumeFeast (IWorldFarming, methods), leaving 331.
     //
     // NOTE for the next merge, four syncs run now: BOTH sides of this pin move
     // it independently every cycle. Twice git merged identical numbers with no
@@ -627,9 +633,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // even when the total agrees. Only running the suite says what these
     // numbers really are; never reconcile them by arithmetic in the diff (the
     // numbers below were set from a suite run, not from this narrative).
-    expect(IWORLD_MEMBERS.length).toBe(329);
+    expect(IWORLD_MEMBERS.length).toBe(331);
     expect(DATA_MEMBERS.length).toBe(88);
-    expect(METHOD_MEMBERS.length).toBe(241);
+    expect(METHOD_MEMBERS.length).toBe(243);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -702,6 +708,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'companionState',
       'companionUpgrade',
       'companionUpgrades',
+      'consumeFeast',
       'convertHusks',
       'convertPartyToRaid',
       'convertRaidToParty',
@@ -857,6 +864,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'petTaunt',
       'petWaterJet',
       'pickUpObject',
+      'placeFeast',
       'placeMobileStation',
       'plantCrop',
       'playCardInDuel',
@@ -1108,6 +1116,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'clearMarker',
       'collectDelveChestLoot',
       'companionUpgrade',
+      'consumeFeast',
       'convertHusks',
       'convertPartyToRaid',
       'convertRaidToParty',
@@ -1224,6 +1233,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'petTaunt',
       'petWaterJet',
       'pickUpObject',
+      'placeFeast',
       'placeMobileStation',
       'plantCrop',
       'playCardInDuel',
@@ -1856,6 +1866,8 @@ const FACET_FARMING = [
   'harvestCrop',
   'convertHusks',
   'farmNowMs',
+  'placeFeast',
+  'consumeFeast',
 ] as const satisfies readonly (keyof IWorldFarming)[];
 type _ExhaustFarming = AssertNever<Exclude<keyof IWorldFarming, (typeof FACET_FARMING)[number]>>;
 
@@ -1931,8 +1943,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(329);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(329);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(331);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(331);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

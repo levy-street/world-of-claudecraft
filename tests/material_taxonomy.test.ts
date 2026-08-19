@@ -131,8 +131,10 @@ const HONEST_MATERIALS = [
 ] as const;
 
 // The ONLY non-poor junk allowed outside the material set: four rare-mob
-// trophies plus the two placed castle keepsakes (Q4 ruled them out of the
-// sweep; the Dawnhold garden posy follows the keep signet's ruling).
+// trophies, the two placed castle keepsakes (Q4 ruled them out of the
+// sweep; the Dawnhold garden posy follows the keep signet's ruling), and
+// the Phase 12 harvest feast (a crafted PLACEABLE, not a material: nothing
+// crafts FROM it, and its one consumer is the place_feast command).
 // A new junk item landing in this assertion's diff must be classified: either
 // author it into a source table (a node yield, grade, component, specimen,
 // salvage return, or junk-kind reagent) so it derives IN, or add it here as a
@@ -142,6 +144,7 @@ const ALLOWED_UNCLASSIFIED_JUNK = [
   'emberwing_cinderscale',
   'gleamstag_charm',
   'guardian_core',
+  'harvest_feast',
   'last_keep_signet',
   'old_cragmaws_pelt',
 ] as const;

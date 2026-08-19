@@ -3113,8 +3113,16 @@ export const zh_CN: EnTranslations = {
         "no_tonic": "你没有生长滋补剂。",
         "tool": "你没有适合该作物的耕作锄。",
         "locked": "有一件可用于支付的物品已被锁定。",
-        "no_farmer": "你必须靠近农夫才能用谷壳换堆肥。"
+        "no_farmer": "你必须靠近农夫才能用谷壳换堆肥。",
+        "no_feast": "你没有可以摆出的盛宴。",
+        "feast_active": "你的盛宴已经摆出了。",
+        "feast_expired": "那桌盛宴已经不在了。",
+        "feast_finished": "那桌盛宴已被吃光。",
+        "feast_range": "你离盛宴太远了。",
+        "feast_eaten": "你已经吃过那桌盛宴了。"
       },
+      "feastTitle": "{name}的丰收盛宴",
+      "feastPlacedLine": "你摆出了丰收盛宴。",
       "huskTrade": "用谷壳换堆肥",
       "huskTradeAria": "与{name}用枯萎谷壳换取堆肥",
       "plantSheet": {
@@ -9051,6 +9059,9 @@ export const zh_CN: EnTranslations = {
       "useElixirAura": "使用：获得{aura}效果，持续 {minutes} 分钟。战斗中可用。",
       "useWellfed": "吃完后获得{aura}效果，使你的{stat}提高 {value} 点，持续 {minutes} 分钟。",
       "useWellfedAura": "吃完后获得{aura}效果，持续 {minutes} 分钟。",
+      "useFeast": "使用：摆出一桌他人也能享用的盛宴，每人限享一份（{servings} 份，持续 {minutes} 分钟）。",
+      "useFeastBuff": "每份：吃完 {seconds} 秒的一餐后获得{aura}效果，使你的{stat}提高 {value} 点，持续 {minutes} 分钟。",
+      "useFeastBuffAura": "每份：吃完 {seconds} 秒的一餐后获得{aura}效果，持续 {minutes} 分钟。",
       "questItem": "任务物品",
       "questRelated": "任务：{quest}",
       "questRules": "无法出售、存入银行或交易。",
@@ -12622,6 +12633,9 @@ export const zh_CN: EnTranslations = {
       },
       "evergarden_braised_greens": {
         "name": "常青园焖青菜"
+      },
+      "harvest_feast": {
+        "name": "丰收盛宴"
       },
       "conjured_water4": {
         "name": "魔法泉水"

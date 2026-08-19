@@ -148,6 +148,18 @@ describe('nameplate_view - visibility', () => {
     ).toBe(true);
   });
 
+  it('labels a placed harvest feast near, hides it far, and never shows its hp', () => {
+    // The Phase 12 feast follows the delve-interact idiom: the composed
+    // "{name}'s Harvest Feast" title shows when close enough to eat and hides
+    // at range; as a kind-'object' plate it carries no hp bar (the painter's
+    // object arm never sets hpVisible, the flag-family treatment).
+    const near = plan(ent({ kind: 'object', templateId: 'farm_feast', pos: { x: 0, y: 0, z: 1 } }));
+    expect(near.hidden).toBe(false);
+    expect(
+      plan(ent({ kind: 'object', templateId: 'farm_feast', pos: { x: 0, y: 0, z: 30 } })).hidden,
+    ).toBe(true);
+  });
+
   it('hides the sealed royal door inside the boss arena (it reads as back wall)', () => {
     expect(
       plan(ent({ kind: 'object', templateId: 'dungeon_door', dungeonId: 'nythraxis_boss_arena' }))
@@ -343,6 +355,10 @@ describe('nameplate_view - import absence (two-controller + purity, source scan)
     const froms = [...code.matchAll(/\bimport\b[^;]*\bfrom\s*['"]([^'"]+)['"]/g)].map((m) => m[1]);
     // unique modules, robust to biome merging/splitting the type vs value sim import
     expect([...new Set(froms)].sort()).toEqual([
+      // The feast template-id constant (Phase 12): a sim CONTENT leaf, not
+      // three/painter/gfx; imported so the discriminator cannot drift from
+      // the sim's own id (the frontend-seam review's ask).
+      '../sim/professions/feast',
       '../sim/types',
       './nameplate_combo',
       './nameplate_threat',

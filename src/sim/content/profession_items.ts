@@ -769,6 +769,29 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     sellValue: 150,
     wellfed: { aura: 'Well Fed', kind: 'buff_sta', value: 12, duration: 900 },
   },
+  // The shared feast (Phase 12, D16): the tier-4 communal showcase. NOT
+  // kind 'food': using it PLACES a farm_feast world entity instead of
+  // eating (src/sim/professions/feast.ts owns the whole lifecycle), and
+  // each of `charges` players eats once, receiving one serving OF THE
+  // CAPSTONE DISH above (`dishItemId`: the bite's eating slot points at
+  // that def, so its foodHp restore and its Well Fed mint apply verbatim
+  // and can never drift from the bagged dish; re-tuning the dish re-tunes
+  // the feast). kind 'junk' is the tonic precedent for a crafted
+  // non-equippable usable; quality 'rare' matches the tier-4 dish set, and
+  // the junk-sale sweep keys on quality 'poor' so a feast can never ride
+  // the bulk junk sale. No buyValue: never vendor-stocked, and
+  // REAGENT-DORMANT under deviation (bo) like the tier 3/4 dishes (the
+  // (ca) reconciliation: the D11 seed-bootstrap ruling owns the faucet).
+  // charges 10 and durationTicks 3600 (180s at 20 Hz) are
+  // maintainer-flagged tuning, like every farming constant.
+  harvest_feast: {
+    id: 'harvest_feast',
+    name: 'Harvest Feast',
+    kind: 'junk',
+    quality: 'rare',
+    sellValue: 250,
+    feast: { charges: 10, durationTicks: 3600, dishItemId: 'evergarden_braised_greens' },
+  },
 
   // --- Crafted alchemy ladder (alchemy) ------------------------------------
   // Trainer-taught outputs of LADDER_RECIPES (content/recipes.ts), three rungs

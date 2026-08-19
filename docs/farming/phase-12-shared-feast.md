@@ -7,16 +7,17 @@ consumed ledger, and tick-domain expiry, transient and never serialized.
 docs/farming/state.md is the authority; if this file contradicts it, state.md wins and
 this file plus phase-12-qa.md get swept in the same pass.
 
-Live-surface note (binding): LIVE. The moment this merges, a player can cook the feast, place it in
-the world, and every nearby player can eat from it once for the tier-4 well-fed buff.
-This is the first farming surface other players consume; it is fully reachable on merge,
-nothing dormant.
-
-[REFRESH NOTE, Phase 11 QA close, 2026-08-19: this note COLLIDES with state.md's OPEN
-(bo): tier-4 produce has no seed faucet until the D11 ruling, so a produce-heavy tier-4
-recipe is uncraftable today, and the Phase 11 QA ledgered that the wiki already
-advertises two reagent-dormant recipes. state.md wins by this file's own header; the
-starter prompt's STEP 0 carries the reconciliation and the stopping rule.]
+Live-surface note (binding; AMENDED at phase start, 2026-08-19, deviation (ca)):
+REAGENT-DORMANT-HONEST, the tier 3/4 dish pattern. The whole loop is live code-side
+the moment this merges: placing a feast, eating from it once per player for the tier-4
+well-fed buff, the charges, the expiry, and every deny arm are all reachable through the
+real client and proven through tests and granted-item probes. But the recipe's tier-4
+produce reagents have no faucet until the D11/(bo) seed-bootstrap ruling, so no player
+can COOK the feast yet; the wiki-visibility ledger's (bo) addendum owns the third
+advertised dormant row. This supersedes the original "LIVE, nothing dormant" wording:
+state.md (ca) records the decision and the option-3 rationale (a reachable reagent mix
+would have built the tier-4 showcase from tier 1/2 produce and permanently undercut the
+tier-4 dishes once D11 opens the faucet).
 
 ### Starter Prompt (the session form; refreshed by the Phase 11 QA close, 2026-08-19)
 

@@ -3113,8 +3113,16 @@ export const en_XA: EnTranslations = {
         "no_tonic": "[Ýóú ĥáʋé ñó ĝŕóŵţĥ ţóñíç.]",
         "tool": "[Ýóú ĥáʋé ñó ƒáŕɱíñĝ ĥóé ƒíţ ƒóŕ ţĥáţ çŕóþ.]",
         "locked": "[Áñ íţéɱ ţĥáţ ŵóúļð þáý ƒóŕ ţĥáţ íš ļóçķéð.]",
-        "no_farmer": "[Ýóú ɱúšţ ƀé ñéáŕ á ƒáŕɱéŕ ţó ţŕáðé ĥúšķš ƒóŕ çóɱþóšţ.]"
+        "no_farmer": "[Ýóú ɱúšţ ƀé ñéáŕ á ƒáŕɱéŕ ţó ţŕáðé ĥúšķš ƒóŕ çóɱþóšţ.]",
+        "no_feast": "[Ýóú ĥáʋé ñó ƒéášţ ţó šéţ óúţ.]",
+        "feast_active": "[Ýóúŕ ƒéášţ íš áļŕéáðý šéţ óúţ.]",
+        "feast_expired": "[Ţĥáţ ƒéášţ íš ĝóñé.]",
+        "feast_finished": "[Ţĥáţ ƒéášţ ĥáš ƀééñ þíçķéð çļéáñ.]",
+        "feast_range": "[Ýóú áŕé ţóó ƒáŕ ƒŕóɱ ţĥé ƒéášţ.]",
+        "feast_eaten": "[Ýóú ĥáʋé áļŕéáðý éáţéñ ƒŕóɱ ţĥáţ ƒéášţ.]"
       },
+      "feastTitle": "[{name}'š Ĥáŕʋéšţ Ƒéášţ]",
+      "feastPlacedLine": "[Ýóú šéţ óúţ ýóúŕ ĥáŕʋéšţ ƒéášţ.]",
       "huskTrade": "[Ţŕáðé ĥúšķš ƒóŕ çóɱþóšţ]",
       "huskTradeAria": "[Ţŕáðé ŵíţĥéŕéð ĥúšķš ƒóŕ çóɱþóšţ ŵíţĥ {name}]",
       "plantSheet": {
@@ -9051,6 +9059,9 @@ export const en_XA: EnTranslations = {
       "useElixirAura": "[Úšé: Ĝŕáñţš {aura} ƒóŕ {minutes} ɱíñ. Úšáƀļé íñ çóɱƀáţ.]",
       "useWellfed": "[{aura}: +{value} {stat} ƒóŕ {minutes} ɱíñ, ĝŕáñţéð ŵĥéñ ýóú ƒíñíšĥ éáţíñĝ.]",
       "useWellfedAura": "[Ĝŕáñţš {aura} ƒóŕ {minutes} ɱíñ ŵĥéñ ýóú ƒíñíšĥ éáţíñĝ.]",
+      "useFeast": "[Úšé: Šéţš óúţ á ƒéášţ óţĥéŕš çáñ éáţ ƒŕóɱ, óñé šéŕʋíñĝ éáçĥ ({servings} šéŕʋíñĝš, ļášţš {minutes} ɱíñ).]",
+      "useFeastBuff": "[Éáçĥ šéŕʋíñĝ ĝŕáñţš {aura}: +{value} {stat} ƒóŕ {minutes} ɱíñ ŵĥéñ ýóú ƒíñíšĥ ţĥé {seconds} šéç ɱéáļ.]",
+      "useFeastBuffAura": "[Éáçĥ šéŕʋíñĝ ĝŕáñţš {aura} ƒóŕ {minutes} ɱíñ ŵĥéñ ýóú ƒíñíšĥ ţĥé {seconds} šéç ɱéáļ.]",
       "questItem": "[Ɋúéšţ Íţéɱ]",
       "questRelated": "[Ɋúéšţ: {quest}]",
       "questRules": "[Çáññóţ ƀé šóļð, ƀáñķéð, óŕ ţŕáðéð.]",
@@ -12622,6 +12633,9 @@ export const en_XA: EnTranslations = {
       },
       "evergarden_braised_greens": {
         "name": "[Éʋéŕĝáŕðéñ Ɓŕáíšéð Ĝŕééñš]"
+      },
+      "harvest_feast": {
+        "name": "[Ĥáŕʋéšţ Ƒéášţ]"
       },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"

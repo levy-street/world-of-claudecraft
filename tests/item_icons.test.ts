@@ -348,6 +348,10 @@ describe('item webp icons', () => {
       'gilded_sunmelon',
       'gilded_sunmelon_seed',
       'growth_tonic',
+      // The Phase 12 shared feast: the placeable tier-4 showcase, same
+      // scheduled art phase as the dish set (the deliberate re-pin this
+      // list's contract demands; 43 to 44).
+      'harvest_feast',
       'highland_barley',
       'highland_barley_seed',
       'highwatch_barley_bannock',

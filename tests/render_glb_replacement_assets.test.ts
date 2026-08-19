@@ -510,9 +510,10 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
   it('farm patch assets', () => {
     const urls = farmPatchesPreloadInternalsForTest.modelUrls;
     // The full committed set: bed + bin + shared sprout + 3 families x
-    // (stage2, stage3, stage4, withered). A new family or stage moves this
-    // count deliberately, in the same change that commits its GLB.
-    expect(urls.length).toBe(15);
+    // (stage2, stage3, stage4, withered), plus the Phase 12 harvest feast
+    // table. A new family or stage moves this count deliberately, in the
+    // same change that commits its GLB.
+    expect(urls.length).toBe(16);
     for (const url of urls) expectAssetExistsAndManifested(url);
   });
 

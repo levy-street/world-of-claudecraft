@@ -44,7 +44,6 @@ import {
 import { resolveActionReplacement } from '../sim/combat/action_replacement';
 import { resolveColdsightAbilityForSpec } from '../sim/combat/hunter_coldsight';
 import { resolveHunterSharedAbilityForTalents } from '../sim/combat/hunter_shared';
-import { isNecromancyUndead } from '../sim/combat/necromancy';
 import { warriorParryChance } from '../sim/combat/warrior_hit_table';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
@@ -291,6 +290,7 @@ import {
   disenchantSecondaryLineKey,
   salvageResultToast,
 } from './enchanting_view';
+import { entityDisplayName } from './entity_display_name';
 import {
   classDisplayName,
   dungeonDisplayName,
@@ -309,6 +309,7 @@ import { PlantSheetWindow } from './farming_plant_sheet_window';
 import { blockFctAmountText } from './fct_core';
 import { fctSpawnShape } from './fct_event';
 import { FctPainter } from './fct_painter';
+import { feastTooltipLines } from './feast_tooltip_view';
 import { FocusManager, type FocusTrapHandle } from './focus_manager';
 import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
 import {
@@ -675,7 +676,7 @@ import { openReportWindow } from './report_window';
 import { restView } from './rest_indicator';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
-import { localizeSimAuraName, localizeSimText } from './sim_i18n';
+import { localizeSimText } from './sim_i18n';
 import { openSimpleMenu } from './simple_context_menu';
 import {
   advanceSkillLevelObservation,
@@ -6030,9 +6031,7 @@ export class Hud {
     // restore-health line; no materialHintLine HTML growth). outerHTML bridges
     // the node into the legacy string tooltip stack.
     const cookingHintKey = cookingCatchHintKey(item.id);
-    if (cookingHintKey) {
-      html += createTooltipLine(t(cookingHintKey), 'tt-desc').outerHTML;
-    }
+    if (cookingHintKey) html += createTooltipLine(t(cookingHintKey), 'tt-desc').outerHTML;
     // Profession affinity for honest materials (material_profession_hint_view.ts):
     // "Used by Leatherworking, ..." derived from live recipe/enchant consumers.
     // Skips when a more specific purpose line above already covers a single
@@ -6053,6 +6052,7 @@ export class Hud {
     // and market all state what the elixir does.
     html += elixirTooltipLines(item);
     html += wellfedTooltipLines(item);
+    html += feastTooltipLines(item);
     // Quest story block (related quest, progress, rules, orphaned). Replaces the
     // old plain "Quest Item" desc that doubled the kind line.
     if (questModel) html += this.questItemTooltipStoryHtml(questModel);
@@ -12523,7 +12523,8 @@ export class Hud {
         case 'farmDenied':
         case 'farmHusksConverted':
         case 'farmReady':
-          // Farming's six feedback arms, extracted whole to
+        case 'farmFeastPlaced':
+          // Farming's seven feedback arms, extracted whole to
           // src/ui/farm_event_feedback.ts at the v0.38.0 sync (the monolith
           // ratchet heal); the Hud itself is the host seam.
           handleFarmEvent(ev, this);
@@ -19165,14 +19166,8 @@ function dungeonDisplayNameFromSource(name: string): string {
   return dungeon ? dungeonDisplayName(dungeon.id) : name;
 }
 
-function entityDisplayName(entity: Entity): string {
-  if (entity.kind === 'mob')
-    return entity.ownerId !== null && !isNecromancyUndead(entity)
-      ? (localizeSimAuraName(entity.name) ?? entity.name)
-      : mobDisplayName(entity.templateId);
-  if (entity.kind === 'npc') return npcDisplayName(entity.templateId);
-  return entity.name;
-}
+// entityDisplayName moved WHOLE to ./entity_display_name (imported above) at
+// the Phase 12 headroom extraction, gaining the feast-title arm there.
 
 function delveDisplayName(delveId: string): string {
   return tEntity({ kind: 'delve', id: delveId, field: 'name' });

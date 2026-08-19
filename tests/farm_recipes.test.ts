@@ -1,7 +1,9 @@
-// FARM_RECIPES (the Phase 6 farm-economy hook set, reopened by Phase 11):
-// conformance pins for the twelve cooking dishes that turn crop produce into
-// something a player wants (eight plain, four Phase 11 well-fed buff dishes),
-// plus the one alchemy row, the growth tonic brewed from wild herbs.
+// FARM_RECIPES (the Phase 6 farm-economy hook set, reopened by Phase 11 and
+// again by Phase 12): conformance pins for the twelve cooking dishes that turn
+// crop produce into something a player wants (eight plain, four Phase 11
+// well-fed buff dishes), plus the one alchemy row (the growth tonic brewed
+// from wild herbs) and the one placeable cooking row (the Phase 12 shared
+// feast, whose kind-'junk' output is NOT a dish; its own describe below).
 //
 // A SEPARATE LIST FROM LADDER_RECIPES, so it needs its own conformance suite:
 // the ladder is closed at three rungs x three recipes per craft (pinned in
@@ -41,7 +43,13 @@ import { resolveTrain } from '../src/sim/professions/training';
 import { Sim } from '../src/sim/sim';
 import { itemNames } from '../src/ui/i18n.catalog/items';
 
-const dishes = FARM_RECIPES.filter((r) => r.professionId === 'cooking');
+// The Phase 12 shared feast is a COOKING row whose output is NOT a dish (kind
+// 'junk', no foodHp: using it places a world entity instead of eating), so the
+// dish contract below excludes it by id; its own describe re-states everything
+// it shares with the dishes and pins the feast-specific shape. The exclusion
+// is honest only while the output stays non-food, which that describe pins.
+const FEAST_ID = 'recipe_harvest_feast';
+const dishes = FARM_RECIPES.filter((r) => r.professionId === 'cooking' && r.id !== FEAST_ID);
 
 // The rung scaffolding convention, shared with every other ladder in
 // content/recipes.ts: skillReq -> [itemLevelBudget, level].
@@ -142,13 +150,16 @@ const EXPECTED_INPUT_VALUE: Record<string, number> = {
 };
 
 describe('FARM_RECIPES: the farm-economy hook set', () => {
-  it('is exactly twelve cooking dishes inside a thirteen-row list', () => {
-    // The whole-list pin and the cooking-filter pin are BOTH stated: the
-    // alchemy row moved the first and left the second behind it, and keeping
-    // them separate is what makes any further addition a visible, deliberate
-    // edit. Re-pinned 9 -> 13 by Phase 11 (the four well-fed buff dishes).
-    expect(FARM_RECIPES).toHaveLength(13);
-    expect(dishes, 'the cooking dishes are twelve of the thirteen farm rows').toHaveLength(12);
+  it('is exactly twelve cooking dishes inside a fourteen-row list', () => {
+    // The whole-list pin and the dish-filter pin are BOTH stated: the alchemy
+    // row moved the first and left the second behind it, and keeping them
+    // separate is what makes any further addition a visible, deliberate edit.
+    // Re-pinned 9 -> 13 by Phase 11 (the four well-fed buff dishes), then
+    // 13 -> 14 by Phase 12 (the shared feast). The dish filter counts the
+    // cooking rows MINUS the feast (its junk output fails every dish arm and
+    // is pinned separately), so it stays at twelve.
+    expect(FARM_RECIPES).toHaveLength(14);
+    expect(dishes, 'the cooking dishes are twelve of the fourteen farm rows').toHaveLength(12);
   });
 
   it('every dish is reachable through the merged ALL_RECIPES table', () => {
@@ -481,6 +492,147 @@ describe('FARM_RECIPES: the growth tonic, the farming-alchemy trade (D7)', () =>
   });
 });
 
+const FEAST_ITEM_ID = 'harvest_feast';
+
+// The feast's input value spelled out as a literal, the dishes' anti-drift
+// arm: greens 40x4 (sell floor, no buyValue) + sunmelon 40x4 (same) + salt at
+// its 8-copper buyValue x2 = 336. A re-price of any reagent reds HERE, not
+// only if it happens to cross the strict bound.
+const FEAST_EXPECTED_INPUT_VALUE = 336;
+
+describe('FARM_RECIPES: the shared feast, the Phase 12 placeable cooking row', () => {
+  function requireFeast() {
+    const row = FARM_RECIPES.find((r) => r.id === FEAST_ID);
+    if (!row) throw new Error(`${FEAST_ID} is missing from FARM_RECIPES`);
+    return row;
+  }
+
+  it('is one cooking row on the farm list, merged into ALL_RECIPES, and NOT a dish', () => {
+    expect(
+      FARM_RECIPES.filter((r) => r.id === FEAST_ID),
+      'exactly one shared-feast recipe on FARM_RECIPES',
+    ).toHaveLength(1);
+    expect(
+      ALL_RECIPES.filter((r) => r.id === FEAST_ID),
+      `${FEAST_ID} is authored in content but not joined into the merged ALL_RECIPES ` +
+        'table, so it would be unreachable in play',
+    ).toHaveLength(1);
+    // The dish-filter exclusion at the top of this file is honest only while
+    // the output is genuinely non-food (using it PLACES a world entity
+    // instead of eating): if the feast ever became a kind-'food' item it
+    // would belong under the dish contract, and these pins are what force
+    // that re-classification to be a deliberate edit here.
+    expect(ITEMS[FEAST_ITEM_ID].kind, 'the feast output must stay non-food').toBe('junk');
+    expect(ITEMS[FEAST_ITEM_ID].foodHp, 'a foodHp would make it a dish').toBeUndefined();
+    expect(
+      dishes.map((r) => r.id),
+      'the feast never counts as a dish',
+    ).not.toContain(FEAST_ID);
+  });
+
+  it('shares the dish scaffolding: kitchens, trainer, rung 50, one feast per craft', () => {
+    const feast = requireFeast();
+    expect(feast.professionId, `${FEAST_ID} professionId`).toBe('cooking');
+    expect(feast.stationType, `${FEAST_ID} stationType`).toBe('kitchens');
+    expect(feast.acquisition, `${FEAST_ID} acquisition`).toEqual(['trainer']);
+    expect(feast.resultItemId, `${FEAST_ID} resultItemId`).toBe(FEAST_ITEM_ID);
+    expect(feast.resultCount, `${FEAST_ID} resultCount`).toBe(1);
+    expect(feast.skillReq, 'the feast is capstone content on the rung-50 band').toBe(50);
+    const [budget, level] = SCAFFOLDING_BY_RUNG[feast.skillReq];
+    expect(feast.itemLevelBudget, `${FEAST_ID} itemLevelBudget for rung 50`).toBe(budget);
+    expect(feast.level, `${FEAST_ID} level for rung 50`).toBe(level);
+  });
+
+  it('asks BOTH tier-4 produce lines plus salt, at the exact proposed counts', () => {
+    // The reagent counts (4 + 4 + 2) are maintainer-flagged tuning (the row
+    // comment); pinned as literals so a silent retune is a visible edit.
+    const feast = requireFeast();
+    const byId = new Map(feast.reagents.map((reagent) => [reagent.itemId, reagent.count]));
+    expect(byId.get('evergarden_greens'), 'the greens line').toBe(4);
+    expect(byId.get('gilded_sunmelon'), 'the sunmelon line').toBe(4);
+    expect(byId.get('cooking_salt'), 'the staple binder').toBe(2);
+    expect(feast.reagents, `${FEAST_ID} reagent count`).toHaveLength(3);
+    for (const reagent of feast.reagents) {
+      expect(ITEMS[reagent.itemId], `reagent ${reagent.itemId} in ${FEAST_ID}`).toBeDefined();
+    }
+  });
+
+  it('vendors strictly below its input value, at the exact input pinned', () => {
+    const feast = requireFeast();
+    let input = 0;
+    for (const reagent of feast.reagents) input += reagent.count * reagentUnitValue(reagent.itemId);
+    expect(input, `${FEAST_ID} input value`).toBe(FEAST_EXPECTED_INPUT_VALUE);
+    const output = ITEMS[feast.resultItemId].sellValue * feast.resultCount;
+    // The 250 is maintainer-flagged tuning (the ItemDef comment); the literal
+    // keeps the row comment's "336 in vs 250 out" arithmetic executable.
+    expect(output, `${FEAST_ID} output value`).toBe(250);
+    expect(output, `${FEAST_ID}: output ${output} must be below input ${input}`).toBeLessThan(
+      input,
+    );
+  });
+
+  it('keeps BOTH produce reagents free of a buyValue, the (bz) whole-list invariant', () => {
+    // No counter stocks either tier-4 produce line and neither carries a
+    // copper price, so the feast can never be cooked from vendor stock alone
+    // and stays out of the counterfactual vendor-fed set in
+    // tests/recipe_economy.test.ts.
+    const feast = requireFeast();
+    const unpriced = feast.reagents.filter((reagent) => {
+      const def = ITEMS[reagent.itemId];
+      return !def || typeof def.buyValue !== 'number' || def.buyValue <= 0;
+    });
+    expect(
+      unpriced.map((reagent) => reagent.itemId).sort(),
+      `${FEAST_ID} unpriced reagents`,
+    ).toEqual(['evergarden_greens', 'gilded_sunmelon']);
+  });
+
+  it('outputs the placeable feast itself: rung quality, never vendor-stocked, a live feast record', () => {
+    const def = ITEMS[FEAST_ITEM_ID];
+    expect(def, `${FEAST_ITEM_ID} has no ItemDef`).toBeDefined();
+    expect(def.quality, 'rung-50 output quality, like every rung-50 row').toBe('rare');
+    expect(
+      def.buyValue,
+      'the feast is never vendor-stocked (REAGENT-DORMANT rows must not gain a copper faucet)',
+    ).toBeUndefined();
+    // charges 10 and durationTicks 3600 are maintainer-flagged tuning (the
+    // ItemDef comment); the dishItemId is load-bearing: the bite pays one
+    // serving of the CAPSTONE DISH, so the Well Fed mint stays the Phase 11
+    // completion path.
+    expect(def.feast, `${FEAST_ITEM_ID} feast record`).toEqual({
+      charges: 10,
+      durationTicks: 3600,
+      dishItemId: 'evergarden_braised_greens',
+    });
+    const dishDef = ITEMS[def.feast?.dishItemId ?? ''];
+    expect(dishDef?.wellfed, 'the feast dish must be a live buff dish').toBeDefined();
+    // Closed key shape, the dish-shape doctrine below applied to the feast:
+    // the feast field beside the five junk keys, nothing more.
+    expect(Object.keys(def).sort()).toEqual([
+      'feast',
+      'id',
+      'kind',
+      'name',
+      'quality',
+      'sellValue',
+    ]);
+  });
+
+  it('does NOT join LADDER_RECIPES, whose consumable convention it would fail', () => {
+    // The tonic's negative arm re-stated for the feast: a junk output is
+    // fine on the farm list and would break the ladder's "cooking has a
+    // consumable output at every rung" pin.
+    expect(
+      LADDER_RECIPES.map((r) => r.id),
+      `${FEAST_ID} must live on FARM_RECIPES, never on the closed ladder`,
+    ).not.toContain(FEAST_ID);
+    expect(
+      LADDER_RECIPES.some((r) => r.resultItemId === FEAST_ITEM_ID),
+      'no ladder row may produce the feast either',
+    ).toBe(false);
+  });
+});
+
 describe('FARM_RECIPES: the dish ItemDef shape, reopened by Phase 11 and closed again', () => {
   // Phase 11 (well-fed food) is the reopening the old pin scheduled: the four
   // buff dishes now carry the `wellfed` field, and NOTHING else moved. The
@@ -736,6 +888,9 @@ describe('FARM_RECIPES: trainable at the stations on the settled R8 fee curve', 
       ['recipe_growth_tonic', 'apothecary', 0],
       ['recipe_fenbridge_rice_bowl', 'kitchens', 2500],
       ['recipe_evergarden_harvest_platter', 'kitchens', 10000],
+      // The Phase 12 shared feast joins the rung-50 fee shape: a premium
+      // trainer row like the platter, charging the tier-2 fee.
+      ['recipe_harvest_feast', 'kitchens', 10000],
     ] as const) {
       const station = stationsOfType(STATIONS, stationType)[0];
       expect(station, `no placed ${stationType} station to train at`).toBeDefined();

@@ -56,6 +56,7 @@ import { isItemLocked } from './item_lock';
 import { mountOwned, summonMountItem } from './mounts';
 import { learnRiding } from './mounts_training';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
+import { placeFeastAction } from './professions/feast';
 import { useGatherToolItem } from './professions/gathering';
 import type { ItemUseResult, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -745,6 +746,16 @@ export function useItem(
   }
   if (def.use?.type === 'skinSelect') {
     ctx.openSkinSelect(meta, def.use.catalog ?? 'class', itemId);
+    return;
+  }
+  // The placeable shared feast (ItemDef.feast, Farming Phase 12): using the
+  // item IS placing it, so this arm and the bags placeFeast classification
+  // converge on the ONE action body (professions/feast.ts owns every gate
+  // and the lock-aware spend; nothing here consumes a unit). Without it a
+  // use_item frame naming the feast would be exactly the silent no-op the
+  // raw-catch arm below exists to refuse.
+  if (def.feast) {
+    placeFeastAction(ctx, p, meta);
     return;
   }
   // Raw fishing catches are cooking reagents only (kind junk, no foodHp).

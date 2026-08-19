@@ -2738,6 +2738,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useWellfed':
     '食べ終えると{aura}の効果を得て、{stat}が{value}上昇し、{minutes}分間持続します。',
   'itemUi.tooltip.useWellfedAura': '食べ終えると{aura}の効果を得て、{minutes}分間持続します。',
+  'itemUi.tooltip.useFeast':
+    '使用: 他のプレイヤーも食べられる宴を広げる。1人1食まで（{servings}人前、{minutes}分間持続）。',
+  'itemUi.tooltip.useFeastBuff':
+    '1人前につき、{seconds}秒の食事を終えると{aura}の効果を得て、{stat}が{value}上昇し、{minutes}分間持続します。',
+  'itemUi.tooltip.useFeastBuffAura':
+    '1人前につき、{seconds}秒の食事を終えると{aura}の効果を得て、{minutes}分間持続します。',
   'itemUi.tooltip.clickUseInstant': 'クリックして戦闘中に即使用',
   'itemUi.tooltip.clickUse': 'クリックして使用',
   'itemUi.tooltip.clickBuyback': 'クリックして買い戻す',
@@ -8869,6 +8875,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.no_tonic': '成長トニックがありません。',
   'hudChrome.farming.denied.tool': 'その作物に合う農耕鍬を持っていません。',
   'hudChrome.farming.denied.locked': 'その支払いに使えるアイテムがロックされています。',
+  'hudChrome.farming.denied.no_feast': '広げられる宴の料理を持っていません。',
+  'hudChrome.farming.denied.feast_active': 'あなたの宴はすでに広げられています。',
+  'hudChrome.farming.denied.feast_expired': 'その宴はもうありません。',
+  'hudChrome.farming.denied.feast_finished': 'その宴は食べ尽くされました。',
+  'hudChrome.farming.denied.feast_range': 'その宴から離れすぎています。',
+  'hudChrome.farming.denied.feast_eaten': 'その宴からはすでに食べました。',
+  'hudChrome.farming.feastTitle': '{name}の収穫の宴',
+  'hudChrome.farming.feastPlacedLine': '収穫の宴を広げた。',
   'hudChrome.farming.husksConvertedLine': '{husksName} x{husks}を{name}と交換した。',
   'hudChrome.farming.husksConvertedLineQty': '{husksName} x{husks}を{name} x{qty}と交換した。',
   'hudChrome.farming.readyLine': '作物が1区画、収穫できるようになった。',
@@ -8951,6 +8965,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.fenbridge_rice_pudding.name': 'フェンブリッジのライスプディング',
   'entities.items.highwatch_barley_porridge.name': 'ハイウォッチの大麦粥',
   'entities.items.evergarden_braised_greens.name': 'エバーガーデンの青菜煮込み',
+  'entities.items.harvest_feast.name': '収穫の宴',
   'hudChrome.archetypeTitle.label': '称号',
   'hudChrome.archetypeTitle.none': 'なし',
   'hudChrome.archetypeTitle.hobbyLabel': '趣味',

@@ -459,6 +459,10 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'gleamstag_charm',
     'gravewoven_bag',
     'guardian_core',
+    // The Phase 12 shared feast: a placeable crafted junk-kind item whose
+    // click PLACES (never uses or equips), so no chip predicate claims it;
+    // All-only is the honest home (the tonic settlement's shape).
+    'harvest_feast',
     'inert_storm_shard',
     'last_keep_signet',
     'linen_pouch',
@@ -479,7 +483,7 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'wolfhide_satchel',
   ] as const;
 
-  it('exactly the ruled 26 junk items plus the 6 bag-kind items match no chip', () => {
+  it('exactly the ruled 27 junk items plus the 6 bag-kind items match no chip', () => {
     const allOnly = Object.values(REAL_ITEMS)
       .filter((def) => !BAG_CATEGORIES.some((c) => c !== 'all' && matchesCategory(def, c)))
       .map((d) => d.id)

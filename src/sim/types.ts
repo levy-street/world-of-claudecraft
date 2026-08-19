@@ -966,6 +966,14 @@ interface BaseItemDef {
   // namespace, so a food buff and an elixir of the same stat coexist and
   // neither ever clobbers the other.
   wellfed?: { aura: string; kind: AuraKind; value: number; duration: number };
+  // The shared feast (farming, D16): a placeable item whose use spawns a
+  // farm_feast world entity instead of consuming food. `charges` is how many
+  // players may eat once each, `durationTicks` the tick-domain lifetime, and
+  // `dishItemId` names the dish whose serving each bite IS: the eating slot
+  // points at that dish, so its foodHp and wellfed fields drive the restore
+  // and the completion mint unchanged (src/sim/professions/feast.ts owns the
+  // whole lifecycle; both numbers are maintainer-flagged tuning).
+  feast?: { charges: number; durationTicks: number; dishItemId: string };
   quality?: 'poor' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'; // gray/white/green/blue/purple/orange name colors
   // bags (kind:'bag'): extra inventory slots granted while equipped in one of
   // the 4 bag sockets (see src/sim/bags.ts; the 16-slot backpack is implicit).
@@ -6704,7 +6712,18 @@ export type SimEvent = { pid?: number } & (
         // farmer NPC stands within FARMER_TRADE_RANGE of the sender
         // (professions/farmer_npcs.ts). Its own reason rather than 'range',
         // whose HUD line names a crop bed; the trade has no bed.
-        | 'no_farmer';
+        | 'no_farmer'
+        // The shared feast, appended (professions/feast.ts): the place arm's
+        // missing-item and one-active-feast-per-placer refusals, then the
+        // consume arm's stale-or-expired, picked-clean, own-range (its own
+        // reason: 'range' names a crop bed), and once-per-player refusals.
+        // The lock-caused shortfall reuses 'locked' above.
+        | 'no_feast'
+        | 'feast_active'
+        | 'feast_expired'
+        | 'feast_finished'
+        | 'feast_range'
+        | 'feast_eaten';
       bedId?: string;
       cropId?: string;
     }
@@ -6728,6 +6747,12 @@ export type SimEvent = { pid?: number } & (
   // growth cycle, gated by the plot's persisted `notified` flag
   // (professions/farm_ready.ts), so relogging never repeats a notice.
   | { type: 'farmReady'; pid: number; ready: number; withered?: number }
+  // The shared feast: the placer's own confirmation that the feast entity
+  // spawned (professions/feast.ts). Personal and text-free like every farm
+  // event; the entity itself is everyone else's signal (it rides the normal
+  // snapshot), so this exists only to drive the placer's cue and toast.
+  // `feastId` is the spawned entity id.
+  | { type: 'farmFeastPlaced'; pid: number; feastId: number }
 );
 
 export interface MoveInput {

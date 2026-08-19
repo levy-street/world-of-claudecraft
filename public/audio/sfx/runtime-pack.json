@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "e2f6903341cd9181672f71267188524e79982cf4ec72c66c374feb442f41a595",
-  "catalogHash": "648329de33a7225f9b1e60f33358bee74073baf978dc98a817f173cd79cb4ddc",
+  "bundleId": "348bfddb7bc1e1acec0976d5e04b3ea1caf264232e308462b415ca88491e61fb",
+  "catalogHash": "bb6dac29f98926ad39c1ce2b0fa063cd56c3779bfa3c70e8aa4264ab5e6bc559",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -3941,6 +3941,18 @@
           "url": "/audio/sfx/ui_error.mp3?v=2c47db40ec45",
           "bytes": 20732,
           "sha256": "2c47db40ec452b957e716ec6f5f08cb534b1576db9ccdbd5ccce2f85da6da545"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_farm_feast": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_farm_feast.mp3?v=37cc1b3013cb",
+          "bytes": 18224,
+          "sha256": "37cc1b3013cb77d253fe4a94b960299164dae772c69f97cae9379121421b5064"
         }
       ],
       "gain": 1,

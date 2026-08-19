@@ -77,7 +77,11 @@ const MONOLITHS: MonolithRow[] = [
     // flavor-to-key chain and finder-only cue guards moved to the pure core
     // src/ui/gather_rare_event_feedback.ts (the case is now a thin consumer),
     // shrinking the file 19227 to 19217. Same small margin as above.
-    ceiling: 19220,
+    // Lowered at the Phase 12 headroom extraction: entityDisplayName moved
+    // whole to src/ui/entity_display_name.ts (gaining the feast-title arm and
+    // its own suite there), shrinking the file 19219 to 19213; the one line
+    // of margin is the farmFeastPlaced case label the same phase adds.
+    ceiling: 19214,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

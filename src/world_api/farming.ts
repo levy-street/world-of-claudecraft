@@ -98,4 +98,23 @@ export interface IWorldFarming {
   // fiction is the farmer working the husks back into soil, and the range is
   // the same INTERACT_RANGE + 2 the counter purchase uses.
   convertHusks(): void;
+  // Set out a shared feast (the D16 tier-4 showcase) at the caller's feet,
+  // spending one harvest_feast item from the sender's own bags. Carries NO
+  // payload: the one feast item id, its charge count, its expiry, and the
+  // anti-abuse rule (one active feast per placer) all resolve server-side
+  // (src/sim/professions/feast.ts), so there is nothing to forge. The placed
+  // feast is a REAL entity (kind 'object', templateId 'farm_feast') riding
+  // the normal interest-scoped entity snapshot: no new wire mechanism, and
+  // clients learn despawn by snapshot absence. Every refusal is a text-free
+  // id-carrying farmDenied SimEvent; placement draws zero rng.
+  placeFeast(): void;
+  // Eat once from the placed feast entity `feastId` (the id a client reads
+  // off the entity snapshot; the interact funnel's feast arm supplies it).
+  // Server-authoritative: the sim re-checks liveness, expiry, charges,
+  // range, and the once-per-player consumed ledger, then spends a serving
+  // and starts the SAME 18s sit-restore a bagged tier-4 dish starts, so the
+  // Well Fed buff mints at completion through the one Phase 11 site
+  // (src/sim/wellfed.ts) and an interrupted meal forfeits it. The client
+  // never decides or predicts any feast outcome; consumption draws zero rng.
+  consumeFeast(feastId: number): void;
 }

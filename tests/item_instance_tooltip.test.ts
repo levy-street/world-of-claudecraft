@@ -351,7 +351,14 @@ describe('isGatheredProvenanceKind partition over the live content', () => {
     // the signing floor and the masterwork arm needs slot+stats the def
     // lacks. Both facts are pinned below, so the exception self-invalidates
     // the day either one moves.
-    const CRAFTED_JUNK_EXCEPTIONS = new Set(['growth_tonic']);
+    // The SECOND member of the same family (Phase 12): the harvest feast is
+    // a crafted output deliberately kind 'junk' (using it PLACES the
+    // farm_feast entity; it is never eaten or equipped). Its rare quality
+    // sits ABOVE the signing floor, so its never-signable proof rests on the
+    // masterwork arm alone: a stat-less, slot-less def can never proc a
+    // signed masterwork instance. Pinned below with the rarity arm stated
+    // honestly, so a slot or stats gain on the def reds there first.
+    const CRAFTED_JUNK_EXCEPTIONS = new Set(['growth_tonic', 'harvest_feast']);
     expect(ALL_RECIPES.length).toBeGreaterThan(0);
     for (const recipe of ALL_RECIPES) {
       const def = ITEMS[recipe.resultItemId];
@@ -377,6 +384,21 @@ describe('isGatheredProvenanceKind partition over the live content', () => {
         stats: (tonic as { stats?: Record<string, number> }).stats as never,
       }),
       'a stat-less, slot-less def can never proc a signed masterwork instance',
+    ).toBeNull();
+    const feastDef = ITEMS.harvest_feast;
+    expect(feastDef, 'the feast exception names a live item').toBeDefined();
+    expect(feastDef.kind, 'the feast exception exists only for the junk kind').toBe('junk');
+    // The rarity arm does NOT block (rare is signable), so the masterwork
+    // arm below is the load-bearing half of the feast's proof.
+    expect(isSignableMaterialRarity(feastDef.quality as never)).toBe(true);
+    expect(
+      masterworkBonusStats({
+        level: 20,
+        quality: feastDef.quality,
+        slot: (feastDef as { slot?: string }).slot as never,
+        stats: (feastDef as { stats?: Record<string, number> }).stats as never,
+      }),
+      'a stat-less, slot-less feast def can never proc a signed masterwork instance',
     ).toBeNull();
   });
 });

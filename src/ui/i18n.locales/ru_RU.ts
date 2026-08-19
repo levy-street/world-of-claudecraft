@@ -2768,6 +2768,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useWellfed':
     'Эффект "{aura}": {stat} +{value} на {minutes} мин. Дается, когда вы доедаете.',
   'itemUi.tooltip.useWellfedAura': 'Дает эффект "{aura}" на {minutes} мин, когда вы доедаете.',
+  'itemUi.tooltip.useFeast':
+    'Использование: накрывает пир, с которого могут поесть и другие, по одной порции каждому ({servings} порций, действует {minutes} мин).',
+  'itemUi.tooltip.useFeastBuff':
+    'Каждая порция дает эффект "{aura}": {stat} +{value} на {minutes} мин после {seconds} сек еды.',
+  'itemUi.tooltip.useFeastBuffAura':
+    'Каждая порция дает эффект "{aura}" на {minutes} мин после {seconds} сек еды.',
   'itemUi.tooltip.clickUseInstant': 'Нажмите, чтобы мгновенно использовать в бою',
   'itemUi.tooltip.clickUse': 'Нажмите, чтобы использовать',
   'itemUi.tooltip.clickBuyback': 'Нажмите, чтобы выкупить',
@@ -5603,6 +5609,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.fenbridge_rice_pudding.name': 'Фенбриджский рисовый пудинг',
   'entities.items.highwatch_barley_porridge.name': 'Хайвотчская ячменная каша',
   'entities.items.evergarden_braised_greens.name': 'Тушёная зелень Вечного Сада',
+  'entities.items.harvest_feast.name': 'Пир урожая',
   'hud.core.chatChannels.add': 'Добавить канал чата',
   'hud.core.chatChannels.addTitle': 'Добавить канал',
   'hud.core.chatChannels.close': 'Закрыть вкладку {channel}',
@@ -9050,6 +9057,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.no_tonic': 'У вас нет тоника роста.',
   'hudChrome.farming.denied.tool': 'У вас нет мотыги земледельца, подходящей для этой культуры.',
   'hudChrome.farming.denied.locked': 'Предмет, которым можно за это заплатить, заблокирован.',
+  'hudChrome.farming.denied.no_feast': 'У вас нет пира, который можно накрыть.',
+  'hudChrome.farming.denied.feast_active': 'Ваш пир уже накрыт.',
+  'hudChrome.farming.denied.feast_expired': 'Этого пира больше нет.',
+  'hudChrome.farming.denied.feast_finished': 'Этот пир съеден подчистую.',
+  'hudChrome.farming.denied.feast_range': 'Вы слишком далеко от пира.',
+  'hudChrome.farming.denied.feast_eaten': 'Вы уже поели с этого пира.',
+  'hudChrome.farming.feastTitle': 'Пир урожая {name}',
+  'hudChrome.farming.feastPlacedLine': 'Вы накрыли свой пир урожая.',
   'hudChrome.farming.husksConvertedLine': 'Вы обмениваете {husksName} x{husks} на {name}.',
   'hudChrome.farming.husksConvertedLineQty':
     'Вы обмениваете {husksName} x{husks} на {name} x{qty}.',

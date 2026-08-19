@@ -61,9 +61,15 @@ BLOCKING / SHOULD-FIX / NICE-TO-HAVE / VERDICT."
   advance now() or waits hang), then delete the file and verify the tree is clean.
   Verify the despawn and expiry check rides INSIDE the already-anchored
   updateFarming driver (the state.md tick anchor), not a second appended sweep.
-  Verify the Live-surface note: LIVE: a player can cook the feast, place it in the
-  world, and every nearby player can eat from it once for the tier-4 well-fed buff
-  the moment this merges, nothing dormant.
+  Verify the Live-surface note AS AMENDED by deviation (ca) (state.md; the
+  phase file's note was reconciled at phase start): REAGENT-DORMANT-HONEST.
+  The whole loop (place, eat once per player, the tier-4 well-fed buff,
+  charges, expiry, every deny arm) must be live and player-reachable with a
+  GRANTED feast item; the recipe itself is advertised but uncookable until
+  the D11/(bo) ruling (the third row of the (bo) addendum). A QA finding
+  that the loop needs window.__game for any verb is a defect; a finding
+  that the recipe cannot be cooked from live faucets is NOT (it is the
+  recorded (ca) state).
   Phase 12 emphases, all three mandatory: run a three-session probe (the placer places
   and eats; a guest eats once and is denied a second helping; a latecomer arriving
   after charges empty is denied); verify the once-per-player ledger survives the guest
