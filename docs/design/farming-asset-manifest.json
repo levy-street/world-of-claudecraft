@@ -7,6 +7,7 @@
     "src/render/farm_patches_core.ts (render identity tables)"
   ],
   "assetCount": 16,
+  "journeyEvidence": "docs/screenshots/farming-phase-13 holds the Phase 13 full-journey capture set (desktop 1600x900 and landscape mobile 844x390, LOW preset)",
   "heightNote": "authoredHeightYd is the exporter fit target (the shipped GLB bounds); drawHeightYd is the height the adapter renormalizes the whole model to at draw time. The three crop families share one drawHeightYd per stage even though their authored heights differ, which is what keeps a stage silhouette readable across families.",
   "assets": [
     {
