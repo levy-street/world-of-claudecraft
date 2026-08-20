@@ -20,6 +20,7 @@ import {
   vfxWeaponSkinIds,
 } from './interior_encounter_prewarm';
 import type { InteriorEncounterPrewarmHost } from './interior_encounter_prewarm_host';
+import { collectObjectTextures } from './material_texture_slots';
 import { runBackgroundPrewarm } from './prewarm_pass';
 import { setRenderCategory } from './renderer_diagnostics';
 import { WEAPON_VFX } from './weapon_vfx';
@@ -57,18 +58,21 @@ export function startInteriorEncounterPrewarm(interior: string, host: object): v
   if (!spec || typed.shutdownStarted) return;
   // The attach is the earliest honest answer to "which interior is live".
   setEncounterPrewarmInterior(host, interior);
-  let started = startedByHost.get(host);
-  if (!started) {
-    started = new Set();
-    startedByHost.set(host, started);
-  }
+  // Held as a const so the failure arm below can close over it.
+  const started = startedByHost.get(host) ?? new Set<string>();
+  startedByHost.set(host, started);
   if (!started.has(interior)) {
     started.add(interior);
     // Handled the moment it exists: the background GPU queue REJECTS every
     // pending unit when the renderer shuts down (logout, graphics rebuild), and
     // a rejection sitting un-awaited across that window is reported as an
     // unhandledrejection, which is the client's fatal overlay.
-    void runInteriorEncounterPrewarm(spec, typed).catch(() => {});
+    // Forget the interior again on failure: the key is claimed BEFORE the work,
+    // so a rejected pass (a shutdown mid-flight, a compile that threw) would
+    // otherwise leave the catalog cold for the session and link it at first draw.
+    void runInteriorEncounterPrewarm(spec, typed).catch(() => {
+      started.delete(interior);
+    });
   }
   for (const [id, view] of typed.views) {
     if (!view.visual) continue;
@@ -102,11 +106,9 @@ export function queueLiveSoulRendPrewarm(
   // spec at all.
   if (!spec) return;
   const identity = liveSoulRendPrewarmIdentity(look);
-  let warmed = liveWarmedByVisual.get(visual);
-  if (!warmed) {
-    warmed = new Set();
-    liveWarmedByVisual.set(visual, warmed);
-  }
+  // Held as a const so the failure arm below can close over it.
+  const warmed = liveWarmedByVisual.get(visual) ?? new Set<string>();
+  liveWarmedByVisual.set(visual, warmed);
   if (
     !shouldQueueLiveSoulRendPrewarm({
       disabled: encounterPrewarmDisabled(typeof location === 'undefined' ? '' : location.search),
@@ -121,7 +123,10 @@ export function queueLiveSoulRendPrewarm(
   warmed.add(identity);
   const chain = (liveChainByHost.get(host) ?? Promise.resolve()).then(() =>
     compileLiveSoulRendClones(typed, visual).catch(() => {
-      /* one body failing to warm never stalls the bodies behind it */
+      // One body failing to warm never stalls the bodies behind it, and its
+      // look is un-claimed so the next queue for the same look retries instead
+      // of leaving that body's clones cold.
+      warmed.delete(identity);
     }),
   );
   liveChainByHost.set(host, chain);
@@ -292,14 +297,14 @@ async function compileEncounterPrewarmGroup(
         );
       },
       prepareChildAssets: (child) => {
-        for (const texture of host.collectObjectTextures(child as THREE.Object3D, false)) {
+        for (const texture of collectObjectTextures(child as THREE.Object3D, false)) {
           host.webgl.initTexture(texture);
         }
       },
       warmChildUnits: (groupLike, child) => {
         const childRoot = child as THREE.Object3D;
         const units: { label: string; run: () => void }[] = [];
-        const textures = [...host.collectObjectTextures(childRoot, false)];
+        const textures = [...collectObjectTextures(childRoot, false)];
         for (let i = 0; i < textures.length; i += TEXTURE_BATCH) {
           const batch = textures.slice(i, i + TEXTURE_BATCH);
           units.push({

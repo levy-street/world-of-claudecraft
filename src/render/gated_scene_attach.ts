@@ -8,10 +8,12 @@
 // A gate that never settles is the one failure the promise chain cannot see,
 // and here the blast radius is a whole interior or town staying invisible
 // with no diagnostic. The watchdog below reveals anyway after a bounded wait
-// and says so on the dev channel: a one-off link stall at reveal beats an
-// invisible world.
+// and says so on the dev channel, plus a machine-readable gpu-prep event a
+// capture can read back: a one-off link stall at reveal beats an invisible
+// world.
 
 import type * as THREE from 'three';
+import { gpuPrepNow, recordGpuPrepEvent } from './gpu_prep_events';
 
 export const GATED_ATTACH_WATCHDOG_MS = 10_000;
 
@@ -26,6 +28,7 @@ export async function attachSceneGroupGated(
   }
   group.visible = false;
   scene.add(group);
+  const attachedAtMs = gpuPrepNow();
   const watchdog = setTimeout(() => {
     if (group.visible) return;
     group.visible = true;
@@ -33,6 +36,11 @@ export async function attachSceneGroupGated(
       `Gated scene attach never settled after ${GATED_ATTACH_WATCHDOG_MS}ms, revealed anyway`,
       group.name || group.type,
     );
+    recordGpuPrepEvent({
+      kind: 'attach-watchdog',
+      key: group.name || group.type,
+      ageMs: gpuPrepNow() - attachedAtMs,
+    });
   }, GATED_ATTACH_WATCHDOG_MS);
   try {
     await compileGate(group);

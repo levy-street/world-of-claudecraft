@@ -158,6 +158,13 @@ export function delveOccupancyRadius(run: DelveRun): number {
   return delveModuleZOffsetLayout(run.modules, mi) + span + 40;
 }
 
+/** South edge of the occupancy band, in units south of a run's origin. Module 0
+ *  starts at DELVE_MODULE_Z_START + layout.zMin (about -11, the walkable south
+ *  lip), so 40 leaves ~29u of slack while staying ~100u clear of the neighbor
+ *  slot's rooms (they end 143u south). Pinned from both sides by the two
+ *  south-margin tests in tests/delves.test.ts. */
+export const DELVE_OCCUPANCY_SOUTH_MARGIN = 40;
+
 export function delveRunForEntity(ctx: SimContext, e: Entity): DelveRun | null {
   const byPlayer = delveRunForPlayer(ctx, e.id);
   if (byPlayer) return byPlayer;
@@ -283,6 +290,10 @@ export function delveRunForPlayer(ctx: SimContext, pid: number): DelveRun | null
   for (const run of ctx.delveRuns) {
     if (run.partyKey !== key) continue;
     const dx = Math.abs(e.pos.x - run.origin.x);
+    // Symmetric band ON PURPOSE, unlike the updateDelveRuns empty sweep's
+    // asymmetric one: this lookup is key-gated (one run per delveId+key, and
+    // delves sit 600u apart in x), so it can never bind a player to a NEIGHBOR
+    // slot's run; the generous band only ever re-finds the caller's own run.
     const dz = Math.abs(e.pos.z - run.origin.z);
     if (dx <= 120 && dz <= delveOccupancyRadius(run)) return run;
   }
@@ -497,6 +508,10 @@ export function spawnDelveModule(ctx: SimContext, run: DelveRun): void {
   run.objectIds = [];
   run.objectState = {};
   run.raiseDeadChannel = null;
+  // Pending Restless Graves spawns are room state: a spawn queued in the old
+  // room must die with it, or it rises there after the advance and joins the
+  // NEW room's mob list, sealing that room's portal forever.
+  run.restlessPending = [];
   run.exitPortalOpen = false;
   run.rewardChestId = null;
   run.surfaceExitId = null;
@@ -614,10 +629,18 @@ export function updateDelveRuns(ctx: SimContext): void {
     let occupied = false;
     for (const meta of ctx.players.values()) {
       const e = ctx.entities.get(meta.entityId);
+      if (!e) continue;
+      // Asymmetric band: rooms extend north up to ~536u but only ~11u south
+      // of the origin (see DELVE_OCCUPANCY_SOUTH_MARGIN for the geometry). The
+      // old symmetric +-radius check reached [-536, -143] into the SOUTH
+      // neighbor's rooms (slots sit 620u apart), letting busy neighbors pin an
+      // abandoned run claimed forever. delveRunForPlayer keeps its symmetric
+      // band on purpose: it is key-gated, so cross-slot binding is unreachable.
+      const dz = e.pos.z - origin.z;
       if (
-        e &&
         Math.abs(e.pos.x - origin.x) < 120 &&
-        Math.abs(e.pos.z - origin.z) < delveOccupancyRadius(run)
+        dz > -DELVE_OCCUPANCY_SOUTH_MARGIN &&
+        dz < delveOccupancyRadius(run)
       ) {
         occupied = true;
         break;
@@ -1007,13 +1030,27 @@ export function findDelveExitPortal(ctx: SimContext, run: DelveRun): Entity | nu
   return null;
 }
 
-export function tryOpenDelveExitPortal(ctx: SimContext, run: DelveRun): void {
-  if (run.exitPortalOpen || run.moduleIndex >= run.modules.length - 1) return;
-  const liveMobs = run.mobIds.some((id) => {
+/** True while any mob tracked on this run's active module (spawn-set trash, waves,
+ * or a boss's own summoned adds, e.g. Raise Dead bonewalkers / Sister Nhalia's
+ * cantors) is still alive. Shared by every delve gate that must not open while a
+ * fight is still live: the mid-run module exit portal and the finale-room reward
+ * flows below. */
+export function delveHasLiveMobs(ctx: SimContext, run: DelveRun): boolean {
+  return run.mobIds.some((id) => {
     const e = ctx.entities.get(id);
     return e && !e.dead;
   });
-  if (liveMobs) return;
+}
+
+export function tryOpenDelveExitPortal(ctx: SimContext, run: DelveRun): void {
+  if (run.exitPortalOpen || run.moduleIndex >= run.modules.length - 1) return;
+  if (delveHasLiveMobs(ctx, run)) return;
+  // Queued Restless Graves spawns count as live: killing the LAST trash in a
+  // room must not open (and latch) the portal inside the 3s grave delay, or the
+  // risen Bonewalkers appear behind an open portal and seal the NEXT room's
+  // gate instead. The tick driver re-checks, so the portal opens normally once
+  // the risen are down.
+  if (run.restlessPending.length > 0) return;
   // Room puzzle gate: every pressure plate in the module must be triggered before
   // the exit opens (Drowned Litany "activate N valves/tablets/candles/ropes"; the
   // Reliquary's plated rooms already require all plates to raise the portcullis, so
@@ -1445,11 +1482,22 @@ export function delveInteract(ctx: SimContext, objectId: number, pid?: number): 
     advanceDelveModule(ctx, run);
     return true;
   }
+  if (state.kind === 'drowned_reliquary' && !state.looted && delveHasLiveMobs(ctx, run)) {
+    ctx.error(r.meta.entityId, 'Clear the remaining enemies first.');
+    return false;
+  }
   const riteOutcome = interactDrownedLitanyRite(ctx, run, objectId, r.meta.entityId);
   if (riteOutcome.handled) return riteOutcome.succeeded;
   if (state.kind === 'locked_chest') {
     if (dist2d(r.e.pos, obj.pos) > DELVE_PLATE_RADIUS + 2) {
       ctx.error(r.meta.entityId, 'Move closer to the chest.');
+      return false;
+    }
+    // Boss-summoned adds (Raise Dead bonewalkers) can still be up when the boss
+    // itself dies; the chest must wait for them the same way the mid-run module
+    // exit waits for trash, or the surface exit opens while a fight is still live.
+    if (!state.looted && delveHasLiveMobs(ctx, run)) {
+      ctx.error(r.meta.entityId, 'Clear the remaining enemies first.');
       return false;
     }
     if (state.looted) {
@@ -1492,6 +1540,10 @@ export function delveInteract(ctx: SimContext, objectId: number, pid?: number): 
         color: '#aaa',
         pid: r.meta.entityId,
       });
+      return false;
+    }
+    if (delveHasLiveMobs(ctx, run)) {
+      ctx.error(r.meta.entityId, 'Clear the remaining enemies first.');
       return false;
     }
     grantDelveRewards(ctx, run);
@@ -1582,6 +1634,13 @@ export function delveRiteChoose(ctx: SimContext, intensity: RiteIntensity, pid?:
   const reliquary = st ? ctx.entities.get(st.reliquaryId) : undefined;
   if (!reliquary || dist2d(r.e.pos, reliquary.pos) > DELVE_INTERACT_RANGE) {
     ctx.error(r.meta.entityId, 'Move closer to the reliquary.');
+    return;
+  }
+  // Sister Nhalia's own summoned cantors/choir thralls can still be up when she
+  // dies; the rite must wait for them, the same way the mid-run module exit waits
+  // for trash, or the surface exit opens while a fight is still live.
+  if (delveHasLiveMobs(ctx, run)) {
+    ctx.error(r.meta.entityId, 'Clear the remaining enemies first.');
     return;
   }
   chooseDrownedLitanyRiteIntensity(ctx, run, intensity);

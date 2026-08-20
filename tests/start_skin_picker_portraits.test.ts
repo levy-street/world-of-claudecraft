@@ -33,4 +33,16 @@ describe('start skin picker portrait readiness', () => {
     expect(document.querySelector('#online-skin-row img')).toBeNull();
     expect(document.querySelector('#online-skin-row .skin-swatch')?.textContent).toBe('2');
   });
+
+  it('ignores a composed update, whose subject no swatch shows', () => {
+    const portraitUrl = vi.fn(() => 'data:image/png;base64,ready');
+
+    // COMPOSED_PORTRAIT_SKIN: a player's own body, reported on the same
+    // listener. Asking the getter for it would kick a capture of a visual that
+    // does not exist and cache it under a class the picker never asked about.
+    refreshStartSkinPickerPortraits(document, 'player_warrior_modular', -1, portraitUrl);
+
+    expect(portraitUrl).not.toHaveBeenCalled();
+    expect(document.querySelector('#offline-skin-row img')).toBeNull();
+  });
 });

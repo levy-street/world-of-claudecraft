@@ -25,6 +25,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
+import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import type { SimContext } from '../sim_context';
 import { addThreat, HEAL_THREAT_FACTOR } from '../threat';
 import type { Entity } from '../types';
@@ -211,6 +212,7 @@ export function healingThreat(
   const aware: Entity[] = [];
   for (const m of ctx.entities.values()) {
     if (m.kind !== 'mob' || m.dead || !m.hostile || !m.inCombat || m.threat.size === 0) continue;
+    if (questGateBlocksAggro(ctx.players, m, source)) continue;
     if (threatEntryMatchesEntity(ctx, m, target)) aware.push(m);
   }
   if (aware.length === 0) return;

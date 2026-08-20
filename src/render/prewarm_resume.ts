@@ -3,9 +3,35 @@
 // no whole-entry callback: requestIdleCallback cannot preempt synchronous work
 // once it starts, including Three r165's compileAsync traversal prologue.
 
+/** One root's share of a batch unit, runnable as its own queue unit. */
+export interface PrewarmResumeUnitPiece {
+  /** `${unit.id}:${index}`: the same kind prefix as the unit, so the budget
+   *  prices it under the unit's family. */
+  id: string;
+  run: () => Promise<void>;
+}
+
 export interface PrewarmResumeUnit {
   id: string;
   run: () => void | Promise<void>;
+  /** The same work cut ONE ROOT PER PIECE, for a lane that runs while the
+   *  world is live. A batch unit's `run` launches its roots together (the
+   *  boot shape: their driver links overlap under the curtain), but live that
+   *  shape cost twice: every root's SECOND arm (the shadow compile after its
+   *  colour compile settles) ran as a continuation, and the roots' colour
+   *  links settled in the same poll pass, so 16 to 32 shadow prologues fired
+   *  in one microtask burst (one 3 to 3.8 s main-thread task, bench H14); and
+   *  the unit held the queue for its WHOLE settle, which serial made 4 to 6 s
+   *  on the Intel iGPU, so the reveal gates of the decor the camera stands in
+   *  waited behind it past their watchdog (bench batch 17: 116 keys, 365
+   *  roots revealed cold). One root per queue unit keeps the held-tail debt
+   *  shape (hitch-hunt P1: one settled link at a time, the driver queue
+   *  shallow) and lets the queue re-arbitrate between roots, so a gate waits
+   *  at most one root's settle. Absent on a unit with no batch. */
+  pieces?: readonly PrewarmResumeUnitPiece[];
+  /** The roots behind the unit, for a consumer that needs to know WHICH
+   *  scene objects a deferred unit left unlinked (the reveal-time hold). */
+  roots?: readonly object[];
 }
 
 export interface PrewarmResumeEntry {
@@ -117,13 +143,17 @@ export function orderRootsByDistanceSq<T>(
 }
 
 /** Structural shape of a compile root's placement (a three mesh satisfies it
- *  without this module importing three). */
+ *  without this module importing three). An InstancedMesh also exposes its
+ *  instance matrices (count x 16 floats, local to the mesh). */
 export interface CompileRootPlacement {
   matrixWorld: { elements: ArrayLike<number> };
   boundingSphere?: { center: { x: number; y: number; z: number } } | null;
   geometry?: {
     boundingSphere?: { center: { x: number; y: number; z: number } } | null;
   } | null;
+  isInstancedMesh?: boolean;
+  count?: number;
+  instanceMatrix?: { array: ArrayLike<number> } | null;
 }
 
 /**
@@ -136,6 +166,18 @@ export interface CompileRootPlacement {
  * instance-aware sphere on the object, so that bound takes precedence over
  * the primitive-local geometry sphere. The translation is the fallback for
  * spheres not yet computed.
+ *
+ * A world-spanning InstancedMesh (every alchemy cauldron of the world in one
+ * mesh) has its aggregate centre far from ANY instance, so the centre alone
+ * sorted it last and the resume lane reached it after the instance next to
+ * the player had already drawn cold (bench batches 17 to 19: the station
+ * cauldron, 0.4 to 0.7 s never-compiled in the first two seconds after the
+ * curtain, every run). For an InstancedMesh with several instances the proxy
+ * is therefore the NEAREST instance translation and nothing else (the
+ * aggregate centre is wrong in both directions: far from every instance, or
+ * near the camera with no instance there); a single-instance mesh keeps the
+ * sphere, which is what keeps the identity-instance bakes honest (their
+ * instance sits at the origin and the geometry carries the placement).
  */
 export function compileRootDistanceSq(
   root: CompileRootPlacement,
@@ -152,7 +194,23 @@ export function compileRootDistanceSq(
   }
   const dx = x - camX;
   const dz = z - camZ;
-  return dx * dx + dz * dz;
+  let best = dx * dx + dz * dz;
+  const instances = root.isInstancedMesh === true ? root.instanceMatrix?.array : undefined;
+  const count = root.count ?? 0;
+  if (instances && count > 1 && instances.length >= count * 16) {
+    best = Number.POSITIVE_INFINITY;
+    for (let i = 0; i < count; i++) {
+      const base = i * 16;
+      const lx = instances[base + 12];
+      const ly = instances[base + 13];
+      const lz = instances[base + 14];
+      const ix = world[0] * lx + world[4] * ly + world[8] * lz + world[12] - camX;
+      const iz = world[2] * lx + world[6] * ly + world[10] * lz + world[14] - camZ;
+      const d = ix * ix + iz * iz;
+      if (d < best) best = d;
+    }
+  }
+  return best;
 }
 
 export interface PrewarmCompileUnitOptions<T> {
@@ -177,6 +235,15 @@ export interface PrewarmCompileUnitOptions<T> {
   batchSize?: number;
 }
 
+// Per-shared-store unit indices. Two calls that share a dedupe store are two
+// passes of ONE logical compile pass ('programs.compile-submit' early, then
+// 'programs.compile' re-collecting the live scene), and the submit lane
+// accounts every unit BY ID: an index restarting at 0 mints an id still in
+// flight from the earlier pass, whose in-flight cost the namesake's sync
+// prologue then rewrites and whose settle is scored against the wrong unit.
+// Keyed off the caller's store, so a call with no store keeps its own space.
+const sharedUnitIndices = new WeakMap<object, Map<string, number>>();
+
 /**
  * Turns materialized archetype roots into explicit resume units. Reference
  * deduplication prevents one shared root from being compiled twice when it is
@@ -190,17 +257,26 @@ export function buildPrewarmCompileUnits<T extends object>(
 ): PrewarmResumeUnit[] {
   const seen = options?.sharedDedupe?.seen ?? new Set<T>();
   const seenKeys = options?.sharedDedupe?.seenKeys ?? new Set<unknown>();
+  const store = options?.sharedDedupe;
+  let unitIndices = store ? sharedUnitIndices.get(store) : undefined;
+  if (store && !unitIndices) {
+    unitIndices = new Map<string, number>();
+    sharedUnitIndices.set(store, unitIndices);
+  }
+  const indices = unitIndices ?? new Map<string, number>();
   const batchSize = Math.max(1, options?.batchSize ?? 1);
   const units: PrewarmResumeUnit[] = [];
   for (const group of groups) {
-    let unitIndex = 0;
+    let unitIndex = indices.get(group.id) ?? 0;
     let batch: T[] = [];
     const flush = (): void => {
       if (batch.length === 0) return;
       const roots = batch;
       batch = [];
+      const id = `${group.id}:${unitIndex++}`;
+      indices.set(group.id, unitIndex);
       units.push({
-        id: `${group.id}:${unitIndex++}`,
+        id,
         run: async () => {
           // allSettled, then rethrow the first failure: Promise.all would
           // short-circuit the unit on one rejection and blur which of its
@@ -214,6 +290,13 @@ export function buildPrewarmCompileUnits<T extends object>(
           );
           if (failed) throw failed.reason;
         },
+        pieces: roots.map((root, index) => ({
+          id: `${id}:${index}`,
+          run: async () => {
+            await compile(root);
+          },
+        })),
+        roots,
       });
     };
     for (const root of group.roots) {
@@ -231,6 +314,26 @@ export function buildPrewarmCompileUnits<T extends object>(
     flush();
   }
   return units;
+}
+
+/**
+ * Run a unit's pieces one after the other through `runPiece` (the caller's
+ * queue submission), every piece attempted, the first failure rethrown at the
+ * end: the contract `run` has for the batch, kept for the per-root shape.
+ */
+export async function runPrewarmPiecesSerially(
+  pieces: readonly PrewarmResumeUnitPiece[],
+  runPiece: (piece: PrewarmResumeUnitPiece) => Promise<unknown>,
+): Promise<void> {
+  let failure: { reason: unknown } | null = null;
+  for (const piece of pieces) {
+    try {
+      await runPiece(piece);
+    } catch (reason) {
+      failure ??= { reason };
+    }
+  }
+  if (failure) throw failure.reason;
 }
 
 /**

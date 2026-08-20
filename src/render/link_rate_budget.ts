@@ -4,6 +4,14 @@ import {
   type AdaptiveLinkBudgetSnapshot,
   createAdaptiveLinkBudget,
 } from './adaptive_link_budget_core';
+import { recordGpuPrepEvent } from './gpu_prep_events';
+import {
+  createPrewarmSubmitStop,
+  PREWARM_SUBMIT_STOP_CONFIG,
+  type PrewarmSubmitStopConfig,
+  type PrewarmSubmitStopSnapshot,
+  type PrewarmSubmitStopVerdict,
+} from './prewarm_submit_stop_core';
 
 export interface LinkRateBudgetClock {
   now: () => number;
@@ -173,6 +181,10 @@ export interface PrewarmPacingReceipt {
   hardMaxMs: number;
   chargedLinks: number;
   scope: 'compile-unit-sync-prologue' | 'compile-unit-lifecycle';
+  /** The lane's hard-stop state, including the rule that fired. Without it a
+   *  capture reads a short manifest and cannot say whether the lane was
+   *  truncated or simply had nothing left to submit. */
+  submitStop: PrewarmSubmitStopSnapshot;
   adaptive?: AdaptiveLinkBudgetSnapshot;
 }
 
@@ -185,7 +197,36 @@ export interface PrewarmPacing {
   markSettled(id: string): void;
   markFailed(id: string): void;
   markReveal(): void;
+  /** The lane's hard-stop verdict at this reading (default: the lane clock).
+   *  Latching, and it records the one `submit-stop` gpu-prep event on the
+   *  transition, so the caller consults it as often as it likes. */
+  shouldStop(nowMs?: number): PrewarmSubmitStopVerdict;
   receipt(compileBatchRoots: number, hardMaxMs: number): PrewarmPacingReceipt;
+}
+
+/** The renderer's handle on the boot pacing lane: the controller plus the two
+ *  knobs its receipt is stamped with. */
+export interface PrewarmPacingHandle {
+  controller: PrewarmPacing;
+  compileBatchRoots: number;
+  hardMaxMs: number;
+}
+
+/** Curtain-fade boundary: mark the reveal on the lane and re-stamp the boot
+ *  receipt already published on the prewarm stats, so the post-reveal state
+ *  (window, backoffs, last settlement) reaches the capture. */
+export function markPrewarmPacingReveal(
+  pacing: PrewarmPacingHandle | null,
+  receiptSink: { prewarmPacing?: PrewarmPacingReceipt } | null | undefined,
+): void {
+  if (!pacing) return;
+  pacing.controller.markReveal();
+  if (receiptSink?.prewarmPacing) {
+    Object.assign(
+      receiptSink.prewarmPacing,
+      pacing.controller.receipt(pacing.compileBatchRoots, pacing.hardMaxMs),
+    );
+  }
 }
 
 export const ADAPTIVE_PREWARM_LINK_CONFIG: AdaptiveLinkBudgetConfig = {
@@ -200,7 +241,11 @@ export const ADAPTIVE_PREWARM_LINK_CONFIG: AdaptiveLinkBudgetConfig = {
   maxSleepMs: MAX_INTERRUPTIBLE_WAIT_MS,
 };
 
-export function createPrewarmPacing(search: string, clock: LinkRateBudgetClock): PrewarmPacing {
+export function createPrewarmPacing(
+  search: string,
+  clock: LinkRateBudgetClock,
+  stopOverride?: Partial<PrewarmSubmitStopConfig>,
+): PrewarmPacing {
   const knobs = parseSubmissionPacingKnobs(search);
   const budget = createLinkRateBudget(knobs, clock);
   const adaptive: AdaptiveLinkBudget | null =
@@ -208,21 +253,60 @@ export function createPrewarmPacing(search: string, clock: LinkRateBudgetClock):
       ? createAdaptiveLinkBudget(ADAPTIVE_PREWARM_LINK_CONFIG, clock)
       : null;
   let chargedLinks = 0;
+  // The hard stop runs on EVERY mode: a static ?linkrate lane needs the same
+  // bound the adaptive one does, and neither is exempted by the manifest's
+  // finish-full-manifest arm.
+  const submitStop = createPrewarmSubmitStop({ ...PREWARM_SUBMIT_STOP_CONFIG, ...stopOverride });
+  // Each in-flight unit's own program delta, so the settle can report what the
+  // unit actually linked; markSyncEnd is the only place that number exists.
+  const unitLinks = new Map<string, number>();
+  let stopRecorded = false;
   return {
     knobs,
     budget,
     awaitSlot: (outOfTime) =>
       adaptive ? adaptive.awaitSlot(outOfTime) : awaitSubmissionBudget(budget, outOfTime),
-    markSubmitted: (id) => adaptive?.markSubmitted(id),
+    markSubmitted: (id) => {
+      submitStop.noteSubmitted(clock.now());
+      adaptive?.markSubmitted(id);
+    },
     markSyncEnd: (id, links) => {
       const normalizedLinks = Number.isFinite(links) ? Math.max(0, links) : 0;
       chargedLinks += normalizedLinks;
+      unitLinks.set(id, normalizedLinks);
+      submitStop.noteSyncEnd(normalizedLinks);
       if (adaptive) adaptive.markSyncEnd(id, normalizedLinks);
       else budget.charge(normalizedLinks);
     },
-    markSettled: (id) => adaptive?.markSettled(id),
-    markFailed: (id) => adaptive?.markFailed(id),
+    markSettled: (id) => {
+      // An id with no recorded delta (its markSyncEnd never landed) settles as
+      // UNMEASURED, never as zero: reading an accounting hole as a unit that
+      // linked nothing fed the stop rules evidence nobody observed.
+      submitStop.noteSettled(clock.now(), unitLinks.get(id));
+      unitLinks.delete(id);
+      adaptive?.markSettled(id);
+    },
+    markFailed: (id) => {
+      // A failed unit is not a zero-delta settle: it never reported an
+      // outcome the lane can read as cheap, and the adaptive budget already
+      // backs off on it.
+      unitLinks.delete(id);
+      adaptive?.markFailed(id);
+    },
     markReveal: () => adaptive?.markReveal(),
+    shouldStop: (nowMs = clock.now()) => {
+      const verdict = submitStop.shouldStop(nowMs);
+      if (verdict.stop && !stopRecorded) {
+        stopRecorded = true;
+        recordGpuPrepEvent({
+          kind: 'submit-stop',
+          key: verdict.reason ?? 'unknown',
+          ageMs: verdict.elapsedMs,
+          units: verdict.submissions,
+        });
+      }
+      return verdict;
+    },
     receipt: (compileBatchRoots, hardMaxMs) => {
       if (adaptive) {
         return {
@@ -235,6 +319,7 @@ export function createPrewarmPacing(search: string, clock: LinkRateBudgetClock):
           hardMaxMs,
           chargedLinks,
           scope: 'compile-unit-lifecycle',
+          submitStop: submitStop.snapshot(),
           adaptive: adaptive.snapshot(),
         };
       }
@@ -250,6 +335,7 @@ export function createPrewarmPacing(search: string, clock: LinkRateBudgetClock):
         // Later continuations inside a compile root are observed separately by
         // the probe. Naming the controlled scope keeps a negative A/B honest.
         scope: 'compile-unit-sync-prologue',
+        submitStop: submitStop.snapshot(),
       };
     },
   };

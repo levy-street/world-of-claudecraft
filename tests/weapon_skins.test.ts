@@ -691,7 +691,6 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
           ].map(clip),
         }),
       ),
-      loadHdr: vi.fn(() => new Promise(() => undefined)),
       loadTexture: vi.fn(() => Promise.resolve(new THREE.Texture())),
       loadKtx2Texture: vi.fn(() => Promise.resolve(new THREE.Texture())),
       releaseGltf: vi.fn(),

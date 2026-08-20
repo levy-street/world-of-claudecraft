@@ -83,6 +83,7 @@ import { archetypeCeilingFor, craftSkillGainMultiplier } from './archetype';
 import { comboEligibility } from './combo_eligibility';
 import { isCommissionEligible } from './commission';
 import { craftCastDurationSec } from './craft_cast_duration';
+import { isDisenchantable } from './enchanting';
 import { announceMasterworkZone } from './gather_events';
 import { isSignableMaterialRarity, type MaterialRarity } from './gathering';
 import {
@@ -138,13 +139,18 @@ export { CRAFT_BATCH_MAX } from '../content/professions';
 // deliberately broad-and-shallow rather than ever truly specialized.
 const JACK_MATERIAL_DISCOUNT_PCT = 0.1;
 
+// Whether a craft OUTPUT is worth provenance-stamping for the disenchant
+// anti-farm gate (isCraftedDisenchantVictim, enchanting.ts): the SAME
+// eligibility as disenchant itself, so a kind that cannot be disenchanted
+// never carries a craftedRecipeId nobody will ever read, and a kind that CAN
+// be disenchanted (weapon, armor, or held offhand) can never silently escape
+// the gate the way a hand-duplicated copy of isDisenchantable once could. A
+// wrapper, not a `const X = isDisenchantable` alias: a bare alias would
+// resolve to undefined if a future runtime import cycle with enchanting.ts
+// ever landed (an ordinary hazard of CJS interop on the server bundle); a
+// function body always sees the fully-initialized import by call time.
 function isCraftedDisenchantTrackedOutput(def: ItemDef | undefined): boolean {
-  return (
-    !!def &&
-    (def.kind === 'weapon' || def.kind === 'armor') &&
-    !!def.quality &&
-    def.quality !== 'poor'
-  );
+  return isDisenchantable(def);
 }
 
 export interface CraftResult {

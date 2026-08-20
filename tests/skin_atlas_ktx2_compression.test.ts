@@ -197,7 +197,6 @@ describe('loadSkinTexInto routes textures/skins/ atlases through the KTX2 loader
     const textureCalls: string[] = [];
     vi.doMock('../src/render/assets/loader', () => ({
       loadGltf: vi.fn(() => new Promise(() => undefined)),
-      loadHdr: vi.fn(() => new Promise(() => undefined)),
       loadTexture: vi.fn((url: string) => {
         textureCalls.push(url);
         return Promise.resolve(new THREE.Texture());

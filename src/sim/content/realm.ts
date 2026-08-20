@@ -324,7 +324,9 @@ export const REALM_MOBS: Record<string, MobTemplate> = {
     name: 'Treant Elder',
     minLevel: 18,
     maxLevel: 18,
-    family: 'ogre',
+    // Animated wood, not a brute (see orchard_treant in amberfall.ts for the
+    // full reasoning): elemental rather than the ogre family it was tagged into.
+    family: 'elemental',
     elite: true,
     hpBase: 150,
     hpPerLevel: 27,

@@ -126,6 +126,9 @@ function streakTexture(): THREE.CanvasTexture {
   return tex;
 }
 
+/** Eased intensity above which the precipitation cloud is drawn at all. */
+const LIVE_INTENSITY = 0.01;
+
 export class Weather {
   private points: THREE.Points;
   private material: THREE.PointsMaterial;
@@ -144,6 +147,9 @@ export class Weather {
 
   private mode: Precip = 'snow';
   private intensity = 0; // current eased opacity 0..1
+  /** update() has driven this system at least once, so the intensity below is
+   *  LIVE weather rather than the constructed staging state. */
+  private liveUpdatesRun = false;
   private enabled = true;
   private time = 0;
   // Remote-weather state: the cached box plan, its refresh clock, and whether
@@ -215,8 +221,34 @@ export class Weather {
     return [this.textures.flake, this.textures.streak];
   }
 
-  endPrewarm(): void {
+  /**
+   * Take the staged precipitation draw back out of the frame without ending
+   * the prewarm. This is what "hidden" means for the weather prewarm slot,
+   * which owns no group: the boot pass wants the draw, but a resume after
+   * world entry stages this material while live frames are presenting, and
+   * the loading screen that justified a visible cloud is long gone. The
+   * intensity is deliberately left alone, so a zone that really is raining
+   * keeps its fade (update() re-derives `points.visible` from it every frame).
+   */
+  hidePrewarm(): void {
     this.points.visible = false;
+  }
+
+  /**
+   * Release the slot. Zeroing the eased intensity is only correct while the
+   * material is purely STAGED: 'weather.materials' is deadline-droppable, so a
+   * resumed slot cleans up tens of seconds into the session, and by then the
+   * intensity belongs to the live update loop. Zeroing it there snapped a
+   * player's rain off and eased it back in. Once update() has run this only
+   * hands the draw back to update()'s own visibility rule; idempotent either
+   * way.
+   */
+  endPrewarm(): void {
+    if (this.liveUpdatesRun) {
+      this.points.visible = this.intensity > LIVE_INTENSITY;
+      return;
+    }
+    this.hidePrewarm();
     this.intensity = 0;
     this.material.opacity = 0;
   }
@@ -280,6 +312,7 @@ export class Weather {
     // nothing could read. The cached plan is dropped with it so a resume
     // re-scans against wherever the camera has since ended up instead of
     // opening on a stale mode.
+    this.liveUpdatesRun = true;
     const suppressed = !this.enabled || biome === null;
     if (suppressed) {
       this.planTimer = 0;
@@ -317,7 +350,7 @@ export class Weather {
     this.intensity += (target - this.intensity) * k;
     this.material.opacity = this.intensity;
 
-    const live = this.intensity > 0.01;
+    const live = this.intensity > LIVE_INTENSITY;
     this.points.visible = live;
     // A masked activation or live style swap reseeds the whole pool into the
     // weathered zone's cells. A type swap happens while the outgoing cloud is

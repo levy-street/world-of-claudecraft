@@ -7,6 +7,7 @@
 import { describe, expect, it } from 'vitest';
 import { CRAFT_GOLD_SINK_COPPER_PER_BUDGET } from '../src/sim/content/professions';
 import { COMMON_RECIPES } from '../src/sim/content/recipes';
+import { ITEMS } from '../src/sim/data';
 import {
   acquireRecipeForRecipe,
   isRecipeKnown,
@@ -15,6 +16,7 @@ import {
 import { isSalvageable, resolveSalvage, salvageYield } from '../src/sim/professions/salvage';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import { Sim } from '../src/sim/sim';
+import { runSalvage } from './helpers/enchant_family_cast';
 
 function makeSim(seed = 7) {
   return new Sim({ seed, playerClass: 'warrior', autoEquip: false });
@@ -142,6 +144,38 @@ describe('#1300 salvage/disenchant', () => {
     const result = resolveSalvage(sim.ctx, pid, 'eastbrook_arming_sword');
     expect(result.ok).toBe(false);
     expect(result.reason).toBe('not_held');
+  });
+
+  // A held offhand is equipment (quality, requiredClass) exactly like a
+  // weapon or armor piece, so it must be salvageable the same way: this
+  // warrior can never equip valefire_lantern (CASTER_ALL only), which is
+  // exactly the case where salvage is the only way to get value from it.
+  it('a held offhand salvages like any other equipment piece', () => {
+    expect(isSalvageable(ITEMS.valefire_lantern)).toBe(true);
+    const sim = makeSim();
+    const pid = sim.playerId;
+    grantItem(sim, 'valefire_lantern', 1, pid);
+    const result = resolveSalvage(sim.ctx, pid, 'valefire_lantern');
+    expect(result.ok).toBe(true);
+    expect(result.materialItemId).toBe('linen_scrap');
+    expect(result.count).toBeGreaterThan(0);
+    expect(sim.countItem('valefire_lantern', pid)).toBe(0);
+  });
+
+  // resolveSalvage above proves the resolver arm; the player actually hits
+  // the salvageItem COMMAND, which calls the very same isSalvageable through
+  // evaluateSalvageAdmission at cast start (and again at complete). This is
+  // not a second predicate to fix, but it IS a separately hand-copied deny
+  // chain around that shared call (see tests/professions_admission_drift.test.ts),
+  // so it closes the loop end to end rather than assuming the resolver's
+  // behavior carries through.
+  it('the salvageItem command entry point admits a held offhand', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    grantItem(sim, 'valefire_lantern', 1, pid);
+    runSalvage(sim, 'valefire_lantern', pid);
+    expect(sim.lastSalvageResultFor(pid)?.ok).toBe(true);
+    expect(sim.countItem('valefire_lantern', pid)).toBe(0);
   });
 
   it('salvaging an eligible item consumes it and yields a scripted material via Rng', () => {

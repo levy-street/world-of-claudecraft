@@ -21,8 +21,10 @@ import {
   abilityBuffValue,
   abilityDamageBonus,
   abilityTemporalHourglassValues,
+  auraBuffDisplayValue,
 } from '../src/ui/ability_damage';
-import { abilityEffectText } from '../src/ui/hud';
+import { abilityEffectAuraInput, abilityEffectText } from '../src/ui/ability_description';
+import { auraEffectDescriptor } from '../src/ui/aura_effect';
 
 function known(cls: Parameters<typeof abilitiesKnownAt>[0], id: string, mods?: TalentModifiers) {
   const ability = abilitiesKnownAt(cls, MAX_LEVEL, mods).find((k) => k.def.id === id);
@@ -50,12 +52,55 @@ const DESTRUCTION_MODS = computeTalentModifiers('warlock', {
   ...emptyAllocation(),
   spec: 'destruction',
 } as never);
+const AFFLICTION_MODS = computeTalentModifiers('warlock', {
+  ...emptyAllocation(),
+  spec: 'affliction',
+} as never);
 const PROT_MODS = computeTalentModifiers('warrior', {
   ...emptyAllocation(),
   spec: 'prot',
 } as never);
 
 describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
+  it('shows Hexcraft-resolved Litany of Guilt damage at every rank', () => {
+    for (const [level, expectedDamage] of [
+      [8, 6],
+      [11, 10],
+      [20, 15],
+    ] as const) {
+      const litany = abilitiesKnownAt('warlock', level, AFFLICTION_MODS).find(
+        (ability) => ability.def.id === 'litany_of_guilt',
+      );
+      expect(litany, `missing Litany of Guilt at level ${level}`).toBeDefined();
+      if (!litany) continue;
+      const effect = litany.effects.find((candidate) => candidate.type === 'afflictionLitany');
+      if (effect?.type !== 'afflictionLitany') throw new Error('missing Litany damage effect');
+
+      expect(effect.damage).toBe(expectedDamage);
+      const damageText = abilityEffectText(litany, {
+        spellPower: 500,
+        rangedPower: 700,
+        attackPower: 900,
+      });
+      expect(damageText).toBe(String(expectedDamage));
+      const auraInput = abilityEffectAuraInput(effect);
+      expect(auraInput).toEqual({
+        kind: 'affliction_litany',
+        value: expectedDamage,
+        value2: effect.radius,
+        value3: effect.maxTargets,
+      });
+      expect(auraInput && auraEffectDescriptor(auraInput)).toEqual({
+        key: 'hudChrome.auraEffect.afflictionLitany',
+        nums: {
+          damage: expectedDamage,
+          targets: effect.maxTargets,
+          radius: effect.radius,
+        },
+      });
+    }
+  });
+
   it('renders Direhowl from its percentage damage reduction, not the retired AP amount', () => {
     expect(abilityBuffValue(known('warrior', 'demoralizing_shout', PROT_MODS))).toBe(20);
   });
@@ -216,5 +261,15 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
     expect(abilityDamageBonus(rof, eff, SC)).toBe(
       directHitBonus(SC.spellPower, rof.def, rof.castTime, true),
     );
+  });
+});
+
+describe("auraBuffDisplayValue (an APPLIED aura, not the viewer's resolved ability)", () => {
+  it('reads a flat buff straight off the aura value', () => {
+    expect(auraBuffDisplayValue({ kind: 'buff_armor', value: 160 })).toBe(160);
+  });
+
+  it('converts a form_fireball speed multiplier to a whole percent, like abilityBuffValue', () => {
+    expect(auraBuffDisplayValue({ kind: 'form_fireball', value: 1.4 })).toBeCloseTo(40);
   });
 });

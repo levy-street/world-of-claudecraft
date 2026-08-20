@@ -2,6 +2,7 @@ import { isTemporaryNecromancyUndeadTemplateId } from '../content/necromancy';
 import { MOBS } from '../data';
 import { createMob } from '../entity';
 import { petDamageMult } from '../pet/pet_ai';
+import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { clearThreat } from '../threat';
 import { type AbilityDef, armorReduction, type Entity } from '../types';
@@ -13,6 +14,7 @@ import {
 } from './necromancy_dominion';
 
 export const SOUL_FRAGMENT_CAP = 5;
+export const SOUL_FRAGMENT_OUT_OF_COMBAT_CAP = 3;
 export const TEMPORARY_UNDEAD_CAP = NECROMANCY_DOMINION_CAP;
 export const DEATH_ECHO_CAP = 3;
 export const DEATH_ECHO_DURATION = 15;
@@ -72,6 +74,17 @@ export function addSoulFragments(ctx: SimContext, owner: Entity, amount: number)
     sourceId: owner.id,
     school: 'shadow',
   });
+}
+
+export function regenerateSoulFragmentsOutOfCombat(
+  ctx: SimContext,
+  owner: Entity,
+  meta: PlayerMeta,
+): void {
+  if (owner.inCombat || meta.cls !== 'warlock' || ctx.playerMods(meta).spec !== 'demonology')
+    return;
+  if (soulFragmentCount(owner) >= SOUL_FRAGMENT_OUT_OF_COMBAT_CAP) return;
+  addSoulFragments(ctx, owner, 1);
 }
 
 export function spendSoulFragments(owner: Entity, amount: number): boolean {

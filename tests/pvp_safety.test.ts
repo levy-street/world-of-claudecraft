@@ -276,7 +276,7 @@ describe('PvP control abilities in active duels', () => {
     }
 
     const fear = b.auras.find((aura) => aura.id === 'fear_incap' && aura.kind === 'incapacitate');
-    expect(fear?.duration).toBe(8);
+    expect(fear?.duration).toBe(5);
 
     for (let i = 0; i < 20; i++) sim.tick();
 
@@ -284,13 +284,13 @@ describe('PvP control abilities in active duels', () => {
     expect(b.auras.some((aura) => aura.id === 'fear_incap')).toBe(true);
   });
 
-  it('diminishes repeated duel Fears to 8s, 4s, 2s, 1s and resets after 60s', () => {
+  it('diminishes repeated duel Fears from their authored duration and resets after 60s', () => {
     const { sim, aPid, b } = startDuel('warlock', 'warrior', 20);
 
     const castFear = () => {
       // A resisted Fear applies nothing and does NOT advance diminishing returns
       // (the spell-hit roll precedes the DR bookkeeping in applyAbility), so retry
-      // until it lands. This keeps the 8/4/2/1 sequence stable regardless of where
+      // until it lands. This keeps the multiplier sequence stable regardless of where
       // the shared world RNG stream happens to sit (new content shifts it).
       let dur = 0;
       for (let attempt = 0; attempt < 50 && dur === 0; attempt++) {
@@ -305,15 +305,15 @@ describe('PvP control abilities in active duels', () => {
       return dur;
     };
 
-    expect(castFear()).toBe(8);
-    expect(castFear()).toBe(4);
-    expect(castFear()).toBe(2);
-    expect(castFear()).toBe(1);
+    expect(castFear()).toBe(5);
+    expect(castFear()).toBe(2.5);
+    expect(castFear()).toBe(1.25);
+    expect(castFear()).toBe(0.625);
 
     b.auras = b.auras.filter((aura) => aura.id !== 'fear_incap');
     for (let i = 0; i < 20 * 61; i++) sim.tick();
 
-    expect(castFear()).toBe(8);
+    expect(castFear()).toBe(5);
   }, 90_000);
 
   it('duel stuns land at full duration on every repeat (stun DR exemption)', () => {

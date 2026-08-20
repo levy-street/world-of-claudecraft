@@ -14,8 +14,9 @@ import type { Entity, SimEvent } from '../src/sim/types';
 type Invite = { fromPid: number; expires: number };
 
 // A minimal SimContext that supplies only what PartyMachine reads: resolve/players/
-// error/emit/time + the trade/duel invite maps + readyChecks + dropPartyMarkers. The
-// rest of the seam is irrelevant to the party machine and left unimplemented.
+// error/emit/time + the trade/duel invite maps + readyChecks + dropPartyMarkers +
+// aura cleanup. The rest of the seam is irrelevant to the party machine and left
+// unimplemented.
 function makeCtx() {
   const players = new Map<number, PlayerMeta>();
   const tradeInvites = new Map<number, Invite>();
@@ -59,6 +60,7 @@ function makeCtx() {
     emit(ev: SimEvent) {
       events.push(ev);
     },
+    clearAurasFromSource() {},
     dropPartyMarkers(partyId: number) {
       droppedMarkers.push(partyId);
     },

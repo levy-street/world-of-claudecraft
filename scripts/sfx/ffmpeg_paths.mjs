@@ -8,9 +8,12 @@
 // existence check: callers probe by execution, and silently falling back would
 // mask an operator's explicit choice. The overrides are NOT universal: the
 // conformance-measuring call sites (scripts/sfx_conform.mjs, and the Studio
-// export validation in scripts/sfx_studio/export_bundle.mjs, PR #1930) bind
-// directly to the static packages so the published-conformance verdict is always
-// measured with the exact toolchain that gates the checked-in assets.
+// export validation in scripts/sfx_studio/export_bundle.mjs, PR #1930) prefer
+// the static packages without operator overrides so the published-conformance
+// verdict is measured with the exact toolchain that gates the checked-in assets
+// when that static binary exists. ffprobe-static@3.1.0 does not ship a Linux
+// arm64 ffprobe, so those conformance paths fall back to PATH ffprobe on that
+// platform instead of importing a known-missing package path.
 import { existsSync } from 'node:fs';
 import ffmpegStatic from 'ffmpeg-static';
 import ffprobeStatic from 'ffprobe-static';
@@ -29,6 +32,16 @@ export const FFMPEG_PATH = resolveSfxTool({
 
 export const FFPROBE_PATH = resolveSfxTool({
   overridePath: process.env.WOC_FFPROBE_PATH,
+  staticPath: ffprobeStatic.path,
+  fallback: 'ffprobe',
+});
+
+export const SFX_CONFORMANCE_FFMPEG_PATH = resolveSfxTool({
+  staticPath: ffmpegStatic,
+  fallback: 'ffmpeg',
+});
+
+export const SFX_CONFORMANCE_FFPROBE_PATH = resolveSfxTool({
   staticPath: ffprobeStatic.path,
   fallback: 'ffprobe',
 });

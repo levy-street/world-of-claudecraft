@@ -58,3 +58,21 @@ export function entityViewShouldDrop(
     entityViewDistanceSq(entity, player) > destroyRangeSq
   );
 }
+
+/** Ledger class of one entity view build (build_ledger_core `view:<class>`):
+ *  what createView constructed, named from what it knows once the visual
+ *  exists. `composed` is a modular character body (its own decal geometry and
+ *  tinted clones), `rig` a fixed GLB rig; the mount visual is built by its own
+ *  lazy path and records `mount` itself. */
+export type ViewBuildClass = 'self' | 'composed' | 'rig' | 'mount' | 'object' | 'other';
+
+export function viewBuildClass(
+  entity: Pick<Entity, 'id' | 'kind'>,
+  selfId: number,
+  visual: { modularLook: unknown } | null,
+): ViewBuildClass {
+  if (entity.id === selfId) return 'self';
+  if (visual) return visual.modularLook ? 'composed' : 'rig';
+  if (entity.kind === 'object') return 'object';
+  return 'other';
+}

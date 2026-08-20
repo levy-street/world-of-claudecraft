@@ -46,6 +46,7 @@ import {
 } from './water_coverage_core';
 import { WaterSimulation, type WaterWaveUniforms } from './water_simulation';
 import { WATER_TIME_PERIOD, WATER_WAVE_GLSL } from './water_wave_core';
+import { zoneBuildPool } from './zone_build_pool';
 
 // Water for the whole zone strip.
 //
@@ -956,6 +957,38 @@ export function createWaterSurfaceMaterial(
   });
 }
 
+/**
+ * Bakes a sheet's shore attributes on the shared zone-build workers, in place.
+ * Returns false when the caller must bake them on this thread instead (no
+ * module workers, or the job failed): off-thread is a latency optimisation,
+ * never a requirement.
+ *
+ * The vertex COORDINATES travel with the job rather than the rect: sampling the
+ * positions the geometry actually carries is what makes the two paths agree bit
+ * for bit (tests/terrain_chunk_worker.test.ts pins the equivalence).
+ */
+async function fillShoreOffThread(
+  pos: THREE.BufferAttribute,
+  shoreDepth: Float32Array,
+  shoreSlope: Float32Array,
+  seed: number,
+  urgent: boolean,
+): Promise<boolean> {
+  const pool = zoneBuildPool();
+  if (!pool) return false;
+  const x = new Float32Array(pos.count);
+  const z = new Float32Array(pos.count);
+  for (let i = 0; i < pos.count; i++) {
+    x[i] = pos.getX(i);
+    z[i] = pos.getZ(i);
+  }
+  const filled = await pool.fillWater({ x, z, seed }, { urgent });
+  if (!filled) return false;
+  shoreDepth.set(filled.shoreDepth);
+  shoreSlope.set(filled.shoreSlope);
+  return true;
+}
+
 function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterView {
   // legacy procedural maps still get generated (unused) to preserve the
   // shared-LCG call order in textures.ts for everything generated after
@@ -1350,13 +1383,20 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     const fill = (): void => {
       for (const row of WATER_VERTEX_ROWS) fillRow(row);
     };
-    if (idlePace) {
-      await runIdleQueue(WATER_VERTEX_ROWS, fillRow, {
-        batchSize: WATER_ROWS_PER_IDLE_SLICE,
-        timeoutMs: WATER_IDLE_TIMEOUT_MS,
-      });
-    } else {
-      fill();
+    // Off-thread first on BOTH paces: this is the single biggest term in a zone
+    // prepare (32k vertices x shoreDepthAt + shoreSlopeAt, measured at 1.3 to
+    // 1.7 s), and it is pure arithmetic, so it belongs on the shared zone-build
+    // workers. The row slicing below stays for the fallback, which is what runs
+    // wherever module workers are unavailable or the job failed.
+    if (!(await fillShoreOffThread(pos, shoreDepth, shoreSlope, seed, !idlePace))) {
+      if (idlePace) {
+        await runIdleQueue(WATER_VERTEX_ROWS, fillRow, {
+          batchSize: WATER_ROWS_PER_IDLE_SLICE,
+          timeoutMs: WATER_IDLE_TIMEOUT_MS,
+        });
+      } else {
+        fill();
+      }
     }
     geo.setAttribute('aShoreDepth', new THREE.BufferAttribute(shoreDepth, 1));
     geo.setAttribute('aShoreSlope', new THREE.BufferAttribute(shoreSlope, 1));

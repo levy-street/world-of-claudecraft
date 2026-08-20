@@ -175,6 +175,83 @@ describe('three compileAsync disposal race patch', () => {
   });
 });
 
+describe('three released program retention patch', () => {
+  // Fourth patch hunk (WebGLPrograms): upstream destroys a program the moment
+  // its last material releases it, so a material disposed and re-minted under
+  // the same cache key (a streamed prop cell unloading and reloading, one
+  // player of a class leaving and another arriving) links the same program
+  // again, cold, on the main thread; production 2026-08-19 showed 13 of the 18
+  // worst live link stalls with a byte-identical cache key to a program that
+  // had existed. Released programs stay linked in a bounded FIFO and
+  // acquireProgram hands one back as if it had never left.
+  const source = readFileSync(
+    new URL('../node_modules/three/build/three.module.js', import.meta.url),
+    'utf8',
+  );
+
+  it('keeps the retention applied: a released program is parked, not destroyed', () => {
+    expect(
+      source.includes('const RETAINED_PROGRAM_LIMIT = 64;'),
+      'the retention bound is missing; re-run pnpm install',
+    ).toBe(true);
+    // The release arm parks and evicts the OLDEST past the bound (a count,
+    // never a timer); the destroy body is the upstream one, moved.
+    expect(
+      source.includes(
+        'if ( -- program.usedTimes === 0 ) {\n\n\t\t\tretainedPrograms.push( program );\n\n\t\t\tif ( retainedPrograms.length > RETAINED_PROGRAM_LIMIT ) destroyProgram( retainedPrograms.shift() );',
+      ),
+      'the release arm no longer parks the program under the bound; re-run pnpm install',
+    ).toBe(true);
+    // The acquire arm un-parks: without the splice a re-acquired program
+    // would still sit in the FIFO and be destroyed under a live material at
+    // eviction, which is worse than the upstream behavior.
+    expect(
+      source.includes(
+        'if ( program.usedTimes === 0 ) {\n\n\t\t\t\tconst r = retainedPrograms.indexOf( program );\n\t\t\t\tif ( r !== - 1 ) retainedPrograms.splice( r, 1 );',
+      ),
+      'the acquire arm no longer un-parks a retained program; re-run pnpm install',
+    ).toBe(true);
+    // The upstream immediate-destroy spelling must be GONE from the release
+    // arm. Positive control: the unpatched three.cjs still carries it once.
+    const immediate = 'if ( -- program.usedTimes === 0 ) {\n\n\t\t\t// Remove from unordered set';
+    expect(
+      source.includes(immediate),
+      'the upstream immediate destroy is back beside the retention; re-run pnpm install',
+    ).toBe(false);
+    const unpatchedSibling = readFileSync(
+      new URL('../node_modules/three/build/three.cjs', import.meta.url),
+      'utf8',
+    );
+    expect(
+      unpatchedSibling.split(immediate).length - 1,
+      'the three.cjs control no longer matches the immediate-destroy needle; the GONE pin may be vacuous',
+    ).toBe(1);
+  });
+
+  it('destroys an evicted program out of BOTH the list and the key map', () => {
+    // The worst failure mode of the hunk: a re-rolled patch that dropped the
+    // map delete would let acquireProgram hand back a DESTROYED program under
+    // a known key. The destroy body is upstream's, moved whole.
+    expect(
+      source.includes(
+        'function destroyProgram( program ) {\n\n\t\t// Remove from unordered set\n\t\tconst i = programs.indexOf( program );\n\t\tprograms[ i ] = programs[ programs.length - 1 ];\n\t\tprograms.pop();\n\n\t\t// Remove from map\n\t\tprogramsMap.delete( program.cacheKey );\n\n\t\t// Free WebGL resources\n\t\tprogram.destroy();',
+      ),
+      'destroyProgram no longer removes from the list, the map and the GL context together; re-run pnpm install',
+    ).toBe(true);
+  });
+
+  it('exposes the retained list for monitoring beside info.programs', () => {
+    expect(
+      source.includes('retainedPrograms: retainedPrograms,'),
+      'WebGLPrograms no longer returns its retained list; re-run pnpm install',
+    ).toBe(true);
+    expect(
+      source.includes('info.retainedPrograms = programCache.retainedPrograms;'),
+      'renderer.info.retainedPrograms is missing; re-run pnpm install',
+    ).toBe(true);
+  });
+});
+
 describe('three degenerate normal guard patch', () => {
   // The one SHADER hunk of the same patch file, pinned here beside the
   // compileAsync hunks because they share one .patch and one scope note: the
@@ -250,6 +327,84 @@ describe('three degenerate normal guard patch', () => {
       unpatchedSibling.split(stockFlat).length - 1,
       'the unpatched three.cjs control no longer matches the FLAT_SHADED needle; the GONE pin above may be vacuous',
     ).toBe(1);
+  });
+});
+
+describe('three empty instanced draw skip patch', () => {
+  // Fifth patch hunk (WebGLRenderer.projectObject): an InstancedMesh whose
+  // count is 0 draws nothing, yet upstream still pushes it into the render
+  // list, and renderBufferDirect reaches setProgram (acquiring and, when cold,
+  // LINKING the material's program) before renderInstances returns on
+  // primcount 0. Measured in this repo: the props far bakes sit at count 0 in
+  // near mode (shadow-only casters, restored to count 1 by the app's
+  // onBeforeShadow hook) and paid 2.3 s of cold color-program links for zero
+  // pixels in the first seconds after the loading curtain on an Intel iGPU
+  // (bench batch 17). The SHADOW pass is unaffected by design: WebGLShadowMap
+  // traverses the scene itself rather than the render list, and onBeforeShadow
+  // has restored count 1 by the time it draws. Known limit: a count 0
+  // InstancedMesh no longer receives onBeforeRender or onAfterRender from the
+  // color pass.
+  const source = readFileSync(
+    new URL('../node_modules/three/build/three.module.js', import.meta.url),
+    'utf8',
+  );
+  const stock =
+    '\n\t\t\t\t\tif ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {';
+
+  it('keeps the count 0 skip applied inside projectObject', () => {
+    expect(
+      source.includes(
+        'const drawsNothing = object.isInstancedMesh === true && object.count === 0;',
+      ),
+      'the empty-instanced skip is not applied; re-run pnpm install',
+    ).toBe(true);
+    // The flag alone proves nothing: the assertion is that it GATES the push,
+    // as the first condition of the mesh branch's frustum test, so a count 0
+    // instanced mesh never reaches the render list even while on screen.
+    expect(
+      source.includes(
+        'if ( drawsNothing === false && ( ! object.frustumCulled || ' +
+          '_frustum.intersectsObject( object ) ) ) {',
+      ),
+      'the count 0 flag no longer gates the render-list push; re-run pnpm install',
+    ).toBe(true);
+  });
+
+  it('leaves no ungated mesh-branch frustum test behind', () => {
+    // The patch REPLACES the mesh-branch test, it does not add a second one:
+    // the ungated spelling must be gone, or a build still pushes count 0
+    // instanced meshes. Positive control: the deliberately unpatched sibling
+    // bundle carries the spelling exactly once and carries no skip of its own,
+    // so the GONE pin is proven matchable rather than vacuously absent.
+    expect(
+      source.includes(stock),
+      'the ungated mesh-branch frustum test is back; the count 0 skip no longer replaces it',
+    ).toBe(false);
+    const unpatchedSibling = readFileSync(
+      new URL('../node_modules/three/build/three.cjs', import.meta.url),
+      'utf8',
+    );
+    expect(
+      unpatchedSibling.split(stock).length - 1,
+      'the unpatched three.cjs control no longer matches the ungated needle; the GONE pin may be vacuous',
+    ).toBe(1);
+    expect(
+      unpatchedSibling.includes('object.isInstancedMesh === true && object.count === 0'),
+      'the unpatched three.cjs control already carries the skip; the pins above prove nothing',
+    ).toBe(false);
+  });
+
+  it('records the hunk in the checked-in patch file', () => {
+    // node_modules is reinstalled from patches/three@0.185.1.patch, so the
+    // shipped artifact carries the hunk too, as an ADDED line rather than
+    // anywhere in its context.
+    const patch = readFileSync(new URL('../patches/three@0.185.1.patch', import.meta.url), 'utf8');
+    expect(
+      patch.includes(
+        '+\t\t\t\t\tconst drawsNothing = object.isInstancedMesh === true && object.count === 0;',
+      ),
+      'the empty-instanced skip is missing from patches/three@0.185.1.patch',
+    ).toBe(true);
   });
 });
 

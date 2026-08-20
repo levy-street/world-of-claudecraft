@@ -9,6 +9,7 @@
 // textures make initTexture a cheap no-op, so sweeping a whole scene per step
 // stays affordable.
 import type * as THREE from 'three';
+import { materialSlotTextures } from './material_texture_slots';
 
 /** Per-slice main-thread budget for texture uploads. Small enough that a slice
  *  landing inside a busy frame cannot by itself push it past the hitch
@@ -107,4 +108,46 @@ export async function uploadTexturesInSlices(
     }
   }
   return uploaded;
+}
+
+/** What the boot and zone texture sweeps need from the renderer: one upload,
+ *  and the live texture count the per-object arm diffs to report how many NEW
+ *  textures a subtree actually created. */
+export interface TextureSweepHost {
+  upload(texture: THREE.Texture | null | undefined): void;
+  textureCount(): number;
+}
+
+/** Upload every texture a material reaches: the named map slots, plus the
+ *  ShaderMaterial uniforms (ability-vfx pools, custom fx) that are invisible
+ *  to the standard-key walk. */
+export function sweepMaterialTextures(
+  host: TextureSweepHost,
+  material: THREE.Material | THREE.Material[] | undefined,
+): void {
+  const mats = Array.isArray(material) ? material : material ? [material] : [];
+  for (const mat of mats) {
+    for (const texture of materialSlotTextures(mat)) host.upload(texture);
+    const shaderMat = mat as THREE.ShaderMaterial;
+    if (shaderMat.isShaderMaterial) {
+      for (const uniform of Object.values(shaderMat.uniforms)) {
+        const value = uniform?.value as { isTexture?: boolean } | null | undefined;
+        if (value?.isTexture) host.upload(value as THREE.Texture);
+      }
+    }
+  }
+}
+
+/** Upload every texture under `obj`, and report how many the renderer newly
+ *  created, measured as the texture-count delta per child. */
+export function sweepObjectTextures(host: TextureSweepHost, obj: THREE.Object3D): number {
+  let count = 0;
+  obj.traverse((child) => {
+    const material = (child as { material?: THREE.Material | THREE.Material[] }).material;
+    if (!material) return;
+    const before = host.textureCount();
+    sweepMaterialTextures(host, material);
+    count += Math.max(0, host.textureCount() - before);
+  });
+  return count;
 }

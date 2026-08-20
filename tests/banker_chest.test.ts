@@ -312,7 +312,9 @@ describe('banker chest renderer integration', () => {
     );
     const attachAt = rendererSource.indexOf('const bankerChest = attachBankerChestToNpcView(');
     const clickTargetAt = rendererSource.indexOf('let clickTarget: THREE.Object3D;', attachAt);
-    expect(attachAt).toBeGreaterThan(rendererSource.indexOf('private createView(e: Entity): void'));
+    expect(attachAt).toBeGreaterThan(
+      rendererSource.indexOf('private createView(e: Entity, opts?: AssembleOptions): void'),
+    );
     expect(clickTargetAt).toBeGreaterThan(attachAt);
     expect(rendererSource.slice(attachAt, clickTargetAt)).toContain('this.sim.cfg.seed');
     expect(rendererSource.slice(attachAt, clickTargetAt)).toContain('this.sim.cfg.world?.npcs');

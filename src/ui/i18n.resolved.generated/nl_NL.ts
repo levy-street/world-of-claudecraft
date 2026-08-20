@@ -956,17 +956,17 @@ export const nl_NL: EnTranslations = {
     "lastkeepMap": {
       "title": "{keep}: {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "De keldergewelven",
+        "state": "De staatsieverdieping",
+        "residence": "De woonverdieping",
+        "tower": "De wachttoren"
       }
     },
     "dawnholdMap": {
       "title": "{keep}: {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "De tuinverdieping",
+        "solar": "De zonnekamer"
       }
     },
     "compass": {
@@ -1449,9 +1449,29 @@ export const nl_NL: EnTranslations = {
       "buttons": "Knopindeling",
       "resetButtons": "Knopindeling resetten",
       "menuAction": "Spelmenu",
+      "confirmAction": "Confirm / Select",
       "zoomIn": "Inzoomen",
       "zoomOut": "Uitzoomen",
-      "help": "Linkerstick beweegt, rechterstick kijkt rond. Open een venster om de aanwijzer op het scherm te gebruiken."
+      "help": "Linkerstick beweegt, rechterstick kijkt rond. Open een venster om de aanwijzer op het scherm te gebruiken.",
+      "crossHotbar": "Cross Hotbar",
+      "crossHotbarEnable": "Enable Cross Hotbar",
+      "crossHotbarExpand": "Double Cross Hotbar",
+      "crossHotbarHelp": "Hold a trigger to light eight action-bar slots on the d-pad and face buttons. Tap the other trigger to swap to the second set.",
+      "crossHotbarResetLayout": "Reset Cross Hotbar",
+      "crossHotbarPosition": "{trigger} + {button}",
+      "crossHotbarOwnsButtons": "The triggers and the d-pad belong to the cross hotbar while it is on, so they are set up below rather than here.",
+      "cancelAction": "Cancel / Back",
+      "subcommandsAction": "Subcommands / Map",
+      "cycleHudAction": "Cycle Interface",
+      "cycleSetAction": "Change Hotbar Set",
+      "crossHotbarDisplay": "Bar Display",
+      "crossHotbarDisplayFull": "Full",
+      "crossHotbarDisplayCompact": "Compact",
+      "crossHotbarDisplayMinimal": "Only While Held",
+      "crossHotbarArrangeChord": "{bumper} + {button}",
+      "crossHotbarCarrying": "Carrying {action}: confirm on a cell to place it, cancel to put it back.",
+      "crossHotbarEditHint": "Arranging: confirm picks up from a cell or the spellbook and drops on a cell, cancel clears one.",
+      "crossHotbarEditHelp": "Hold the left bumper and press the top face button to arrange the bar with the controller."
     },
     "perf": {
       "title": "Prestatie-overlay",
@@ -1570,6 +1590,7 @@ export const nl_NL: EnTranslations = {
           "render": "render  submit {submit} ms | wereld {world} ms | entiteiten {entities} ms",
           "scene": "scène   {calls} calls | {triangles} tris | {views} weergaven",
           "hitches": "haperingen {hitches} | shaders {shaders} | uploads {uploads} | weergaven {views}",
+          "hitchesBuild": "zone builds {zoneBuilds} | off-frame {offFrame} | gc {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "wachtend"
         },
@@ -1621,7 +1642,10 @@ export const nl_NL: EnTranslations = {
             "eventCpu": "Gebeurtenisverwerking verbruikt het frame",
             "shaderCompile": "Shaders worden gecompileerd tijdens het spelen",
             "textureUpload": "Textuur-uploads veroorzaken haperingen tijdens het spelen",
+            "zoneBuild": "Zone streaming builds are causing hitches",
             "viewCreate": "Het aanmaken van entiteitweergaven veroorzaakt haperingen",
+            "gcHitch": "Garbage collections are running inside long frames",
+            "offFrameHitch": "Long frames come from work outside the render callback",
             "otherHitch": "Er blijven niet-toegewezen lange frames over",
             "assetStartup": "Het opstarten van het spel wordt vertraagd door assetwerk",
             "longTasks": "Lange browsertaken blokkeren frames",
@@ -4772,6 +4796,7 @@ export const nl_NL: EnTranslations = {
       "mageEleJet": "Waterstraal staat als eigen knop op de huisdierbalk: klik erop om een vertragende straal op één vijand vast te zetten, of klik met rechts (op mobiel aanraken en vasthouden) om de elementaal hem zelf te laten afvuren zodra hij klaar is.",
       "formsHeading": "Gedaanteverwisseling",
       "formsNote": "Een druïde vecht door van gedaante te veranderen. De meeste druïdenvaardigheden horen bij één gedaante, dus de vorm waarin je verkeert bepaalt wat je kunt gebruiken, en van gedaante wisselen kost een beetje mana. Je kunt in of buiten gevecht van gedaante wisselen, zo vaak je wilt.",
+      "formsAutoUnshift": "Een heling of een schadespreuk die je in gedaante uitspreekt, haalt je er vanzelf uit. Een gedaante zo verlaten is gratis en verbruikt je globale afkoeltijd niet, dus een instantspreuk gaat af op het moment dat je drukt. Terugschakelen is een gewone vaardigheid en kost nog steeds mana en je globale afkoeltijd.",
       "formsMoonwing": "Een Balans-druïde krijgt er nog één gedaante bij: de Maanuilvorm, de spreukgedaante waarin hij vecht. Het is de enige diergedaante die je spreuken behoudt, en je toverstaf werkt alleen in deze vorm of in je normale spreukgedaante.",
       "formLine": {
         "form_bear": "De tankgedaante: een zware huid, Woede in plaats van mana, en extra dreiging zodat vijanden jou blijven aanvallen.",
@@ -7189,6 +7214,7 @@ export const nl_NL: EnTranslations = {
       "shopMarksRequired": "Je hebt {marks} Delve-Merken nodig om {name} te kopen.",
       "shopSealPremiumOnly": "Dit zegel wijkt alleen voor een meesterhand. Alleen de Premium-inzet kan het openen.",
       "passageSealed": "De doorgang is verzegeld.",
+      "enemiesRemain": "Versla eerst de overgebleven vijanden.",
       "moveCloserPassage": "Kom dichter bij de doorgang.",
       "moveCloserChest": "Kom dichter bij de kist.",
       "moveCloserReliquary": "Kom dichter bij het reliekschrijn.",
@@ -9998,7 +10024,7 @@ export const nl_NL: EnTranslations = {
       },
       "fear": {
         "name": "Teisteren",
-        "description": "Jaagt de vijand de stuipen op het lijf, waardoor het maximaal 8 sec ineenkrimpt. Elke schade verbreekt het effect."
+        "description": "Jaagt de vijand de stuipen op het lijf, waardoor die maximaal 5 sec ineenkrimpt. Schade ter waarde van in totaal 8% van de maximale gezondheid van het doelwit verbreekt het effect."
       },
       "searing_pain": {
         "name": "Schroeien",
@@ -10244,7 +10270,7 @@ export const nl_NL: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Markeert een vijand gedurende 12 sec, en slaat 20% van de schade op die jij en je ondoden toebrengen. Werp opnieuw om het te laten ontploffen. Als de gemarkeerde vijand sterft, ontploft het binnen 6 m en creëert 1 Zielfragment."
+        "description": "Markeert een vijand gedurende 15 sec, en slaat 20% van de schade op die jij en je ondoden toebrengen. Werp opnieuw om het te laten ontploffen. Als de gemarkeerde vijand sterft, ontploft het binnen 6 yards en creëert 1 Zielfragment."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10343,8 +10369,8 @@ export const nl_NL: EnTranslations = {
         "description": "Neem maanuilvorm aan en versterk spreuken totdat je terugschakelt. Spreek opnieuw uit om terug te keren naar normale vorm. (Balans signatuur)"
       },
       "feral_charge": {
-        "name": "Wilde stormloop",
-        "description": "Storm op een vijand af en wortel hem 1 sec. Bereik 8-25 m. (Wildernis signatuur)"
+        "name": "Oerkrachtgolf",
+        "description": "Ontketent een golf van oerkracht. In Wolfsgedaante wordt uw energieregeneratie 10 sec. lang met 100% verhoogd. In Bruingedaante krijgt u onmiddellijk 50 woede. (Wildernis-signatuur)"
       },
       "swiftmend": {
         "name": "Snelle genezing",
@@ -10600,7 +10626,7 @@ export const nl_NL: EnTranslations = {
       },
       "evocation": {
         "name": "Etherbron",
-        "description": "Restaura mana rápidamente. (magiertalent)"
+        "description": "Kanaliseert 6 sec.: elke seconde herstelt u 100 mana en bouwt u 8 spreukkracht op. De bonus stapelt zich tijdens het kanaliseren en blijft 15 sec. actief. (magiertalent)"
       },
       "flurry_of_knives": {
         "name": "Messenregen",
@@ -10628,11 +10654,11 @@ export const nl_NL: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Huiveringwekkende huil",
-        "description": "Jaagt nabije vijanden tot 3 sec. angst aan. Schade kan het effect verbreken. (tovenaarstalent)"
+        "description": "Jaagt nabije vijanden tot 5 sec. angst aan. Schade ter waarde van in totaal 8% van de maximale gezondheid van een doelwit verbreekt de angst. (tovenaarstalent)"
       },
       "ice_block": {
         "name": "Koude kist",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sec. (magiertalent)"
+        "description": "Sluit u 8 sec. lang op in massief ijs en maakt u immuun voor alle schade. Verwijdert bestaande gewone schadelijke effecten en voorkomt dat nieuwe gewone controle-effecten worden toegepast. Kan worden gebruikt terwijl u verdoofd of veranderd bent. U kunt niet handelen zolang u opgesloten bent. Werp opnieuw om te annuleren. (magiër)"
       },
       "inner_focus": {
         "name": "Gestilde geest",
@@ -10724,7 +10750,7 @@ export const nl_NL: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Razende geest",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sec. (magiertalent)"
+        "description": "Maakt uw volgende spreuk met een werptijd onmiddellijk. Blijft 60 sec. actief. (magiertalent)"
       },
       "psychic_scream": {
         "name": "Psychische schreeuw",
@@ -12400,7 +12426,7 @@ export const nl_NL: EnTranslations = {
         "name": "Ongerepte Klauw"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Boeketje uit de tuin van Dawnhold"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"
@@ -13246,6 +13272,15 @@ export const nl_NL: EnTranslations = {
       },
       "training_dummy": {
         "name": "Oefenpop"
+      },
+      "friendly_player_dummy": {
+        "name": "Bevriende spelerpop"
+      },
+      "normal_boss_dummy": {
+        "name": "Normale bosspop"
+      },
+      "heroic_boss_dummy": {
+        "name": "Heroïsche bosspop"
       },
       "ridge_stalker": {
         "name": "Bergkam-Sluiper"
@@ -16887,9 +16922,9 @@ export const nl_NL: EnTranslations = {
         "leaveText": "Je trekt de burchtdeur dicht en stapt terug de wind van de Drakenlanden in."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Kasteel Dawnhold",
+        "enterText": "Je stapt de warme, naar bloemen geurende zalen van Kasteel Dawnhold binnen.",
+        "leaveText": "Je glipt weer naar buiten, het zonnige gazon van de tuin op."
       },
       "drowned_temple": {
         "name": "De Verdronken Tempel",

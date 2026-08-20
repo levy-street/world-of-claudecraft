@@ -20,6 +20,30 @@ function mockWaterShaderAssets(): void {
   }));
 }
 
+/** The zone sheet's shore attributes as the MAIN-THREAD bake produces them,
+ *  the reference every pooled arm below has to reproduce exactly. */
+async function mainThreadShoreBake(): Promise<{ depth: number[]; slope: number[] }> {
+  vi.resetModules();
+  mockWaterShaderAssets();
+  const { buildWater } = await import('../src/render/water');
+  const { zoneAt } = await import('../src/sim/data');
+  await Promise.resolve();
+
+  const plain = buildWater(20061);
+  const plainTask = plain.ensureZone(zoneAt(0, 0));
+  await vi.runAllTimersAsync();
+  const [mesh] = await plainTask;
+  return {
+    depth: Array.from((mesh.geometry.attributes.aShoreDepth as THREE.BufferAttribute).array),
+    slope: Array.from((mesh.geometry.attributes.aShoreSlope as THREE.BufferAttribute).array),
+  };
+}
+
+const shoreAttributes = (mesh: THREE.Mesh): { depth: number[]; slope: number[] } => ({
+  depth: Array.from((mesh.geometry.attributes.aShoreDepth as THREE.BufferAttribute).array),
+  slope: Array.from((mesh.geometry.attributes.aShoreSlope as THREE.BufferAttribute).array),
+});
+
 describe('progressive water build', () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -28,6 +52,9 @@ describe('progressive water build', () => {
   afterEach(() => {
     vi.useRealTimers();
     vi.restoreAllMocks();
+    // vi.resetModules() drops the module cache but NOT the mock registry, so
+    // the pool stub below has to be lifted or it leaks into later tests.
+    vi.doUnmock('../src/render/zone_build_pool');
   });
 
   it('coalesces an idle zone build and stages its mesh hidden for renderer prewarm', async () => {
@@ -53,6 +80,93 @@ describe('progressive water build', () => {
     expect(mesh.visible).toBe(false);
     expect(water.group.children).toContain(mesh);
     expect(await water.ensureZone(zone, { pace: 'idle' })).toEqual([]);
+  });
+
+  // The shore-attribute bake (32k vertices of shoreDepthAt + shoreSlopeAt) is
+  // the single biggest term in a zone's water prepare, and it now rides the
+  // shared zone-build workers on BOTH paces. The pins: the sheet really is
+  // baked off-thread when a pool exists, and the attributes it lands are the
+  // ones the main-thread bake produces.
+  // Both paces take the pool: a background idle prepare pays the same 32k
+  // vertex bake as a gating one, so an idle arm left on the main thread would
+  // keep the very cost this moved off it.
+  for (const pace of ['gating', 'idle'] as const) {
+    it(`bakes the shore attributes on the worker pool at ${pace} pace and matches the main-thread bake`, async () => {
+      const expected = await mainThreadShoreBake();
+      expect(new Set(expected.depth).size).toBeGreaterThan(1);
+
+      vi.resetModules();
+      mockWaterShaderAssets();
+      const fills: number[] = [];
+      vi.doMock('../src/render/zone_build_pool', async () => {
+        const { buildWaterFillArrays } = await import('../src/render/zone_build_worker');
+        return {
+          zoneBuildPool: () => ({
+            size: 3,
+            async buildChunk() {
+              return null;
+            },
+            async fillWater(job: { x: Float32Array; z: Float32Array; seed: number }) {
+              fills.push(job.x.length);
+              await new Promise((resolve) => setTimeout(resolve, 0));
+              return buildWaterFillArrays({ ...job, kind: 'water-fill', id: fills.length });
+            },
+            dispose() {},
+          }),
+          disposeZoneBuildPool: () => {},
+        };
+      });
+      const { buildWater } = await import('../src/render/water');
+      const { zoneAt } = await import('../src/sim/data');
+      const pooled = buildWater(20061);
+      await Promise.resolve();
+      const pooledTask = pooled.ensureZone(
+        zoneAt(0, 0),
+        pace === 'idle' ? { pace: 'idle' } : undefined,
+      );
+      await vi.runAllTimersAsync();
+      const [pooledMesh] = await pooledTask;
+
+      // The fill really went through the pool, over the whole sheet.
+      expect(fills.length).toBeGreaterThan(0);
+      expect(fills[0]).toBe(expected.depth.length);
+      expect(shoreAttributes(pooledMesh)).toEqual(expected);
+    });
+  }
+
+  // The pool is FALLIBLE by contract: a failed job returns null and the sheet
+  // must be baked here instead, through the row-sliced fallback. Same numbers
+  // either way, or shorelines would foam differently depending on a worker.
+  it('bakes on the main thread when the pool declines the fill, with the same attributes', async () => {
+    const expected = await mainThreadShoreBake();
+
+    vi.resetModules();
+    mockWaterShaderAssets();
+    let declined = 0;
+    vi.doMock('../src/render/zone_build_pool', () => ({
+      zoneBuildPool: () => ({
+        size: 3,
+        async buildChunk() {
+          return null;
+        },
+        async fillWater() {
+          declined++;
+          return null;
+        },
+        dispose() {},
+      }),
+      disposeZoneBuildPool: () => {},
+    }));
+    const { buildWater } = await import('../src/render/water');
+    const { zoneAt } = await import('../src/sim/data');
+    const fallback = buildWater(20061);
+    await Promise.resolve();
+    const task = fallback.ensureZone(zoneAt(0, 0));
+    await vi.runAllTimersAsync();
+    const [mesh] = await task;
+
+    expect(declined).toBeGreaterThan(0);
+    expect(shoreAttributes(mesh)).toEqual(expected);
   });
 
   it('unloadZone releases a streamed zone sheet (and its underside twin) and a later ensureZone rebuilds it', async () => {

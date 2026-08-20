@@ -104,3 +104,12 @@ WebGL context, which is a different seam from the one this document is about.
 
 The world's own weapon-skin program warming is a separate entry in the
 renderer's entry manifest (`vfx.weapon-skins`) and is unaffected.
+
+One cost the second context no longer carries: three's default
+`debug.checkShaderErrors` issues a synchronous `getProgramInfoLog` round trip on
+every program's first use, and the Armory preview, the character preview, and
+the portrait rig all kept it on long after `renderer.ts` turned it off for the
+world context. All three now read the same `?shaderdebug` switch through
+`shaderDebugRequested()` (`src/render/shader_debug_flag.ts`), so the first
+inspect no longer blocks on the driver once per linked program. The saving is
+not separately measured; the numbers above predate the change.

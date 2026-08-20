@@ -19,6 +19,7 @@ const EXPECTED_LOW_OVERRIDES = {
   msaaSamples: 'msaaSamples:0',
   bloom: 'bloom:0',
   smaa: 'smaa:0',
+  fxaa: 'fxaa:0',
   dynamicShadows: 'dynamicShadows:0',
   terrainCastShadows: 'terrainCastShadows:0',
   shadowMap: 'shadowMap:2048',

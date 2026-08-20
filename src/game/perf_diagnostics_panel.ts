@@ -467,6 +467,11 @@ export class PerfDiagnosticsPanel {
         uploads: formatNumber(hitches?.byCause['texture-upload'] ?? 0, INTEGER_NUMBER_FORMAT),
         views: formatNumber(hitches?.byCause['view-create'] ?? 0, INTEGER_NUMBER_FORMAT),
       }),
+      t('hudChrome.perf.diagnostics.metrics.hitchesBuild', {
+        zoneBuilds: formatNumber(hitches?.byCause['zone-build'] ?? 0, INTEGER_NUMBER_FORMAT),
+        offFrame: formatNumber(hitches?.byCause['off-frame'] ?? 0, INTEGER_NUMBER_FORMAT),
+        gc: formatNumber(hitches?.byCause.gc ?? 0, INTEGER_NUMBER_FORMAT),
+      }),
       t('hudChrome.perf.diagnostics.metrics.gpu', {
         renderer:
           renderer?.glRenderer?.slice(0, 74) ??

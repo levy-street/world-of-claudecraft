@@ -1396,6 +1396,23 @@
     width: 100% !important;
     height: 100% !important;
   }
+  /* Cold-open stand-in: the class crest (or a cached portrait) covers the still
+     empty canvas while the preview's programs link, so the panel is never a
+     blank box. Built and removed by src/ui/preview_stand_in.ts, never per
+     frame. */
+  .char-model-preview .preview-stand-in {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .char-model-preview .preview-stand-in img {
+    width: 44%;
+    max-width: 112px;
+    opacity: 0.5;
+  }
   .char-skin-row {
     justify-content: center;
     align-items: center;

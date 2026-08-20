@@ -192,7 +192,7 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
       expect(rendered.get('wlk_r20_chaos_bolt')).toContain('talentos finales');
       expect(rendered.get('wlk_r20_grimoire_of_haste')).toContain('esa misma habilidad');
       expect(rendered.get('wlk_r20_grimoire_of_haste')).toContain('una vez cada 60 s');
-      expect(rendered.get('wlk_r20_curse_mastery')).toContain('90');
+      expect(rendered.get('wlk_r20_curse_mastery')).toContain('45');
     } finally {
       setLanguage('en');
     }

@@ -2284,7 +2284,6 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "welcome": "The canopy closes over the road like a lid. Keep to the lanterns of Gallowmere, and do not answer if the wood calls your name.",
     "families": [
       "spider",
-      "ogre",
       "elemental"
     ]
   },
@@ -3079,19 +3078,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "thornpeak_ogre",
         "model": "mob_ogre",
         "tint": "#9e7b53",
-        "tintStrength": 0.2,
-        "still": "/guide-stills/mob_ogre__9e7b53__s20.webp"
-      },
-      {
-        "name": "Gravenbark Shambler",
-        "min": 20,
-        "max": 20,
-        "rare": false,
-        "templateId": "gravenbark_shambler",
-        "model": "mob_treant",
-        "tint": "#4e4a3a",
-        "tintStrength": 0.72,
-        "still": "/guide-stills/mob_treant__4e4a3a__s72.webp"
+        "tintStrength": 0.12,
+        "still": "/guide-stills/mob_ogre__9e7b53__s12.webp"
       }
     ]
   },
@@ -3274,6 +3262,17 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "tint": "#bfe0e8",
         "tintStrength": 0.4,
         "still": "/guide-stills/mob_elemental__bfe0e8.webp"
+      },
+      {
+        "name": "Gravenbark Shambler",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "gravenbark_shambler",
+        "model": "mob_treant",
+        "tint": "#4e4a3a",
+        "tintStrength": 0.72,
+        "still": "/guide-stills/mob_treant__4e4a3a__s72.webp"
       },
       {
         "name": "Nightkin Stargazer",
@@ -12802,10 +12801,10 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "tintStrength": 0.2
   },
   "mob_ogre": {
-    "url": "models/creatures/giant.glb",
+    "url": "models/creatures/ogre.glb",
     "idle": "Idle",
     "height": 2.8,
-    "tintStrength": 0.2
+    "tintStrength": 0.12
   },
   "mob_elemental": {
     "url": "models/creatures/golelingevolved.glb",

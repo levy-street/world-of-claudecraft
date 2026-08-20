@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { DEVICE_MEMORY_GB_KEY, ENTRY_TIGHT_MODE_KEY } from '../src/device_memory_hint';
@@ -19,8 +20,10 @@ import {
   isWeakIntegratedGpu,
   resolveDefaultGraphicsPreset,
   shouldUseAutoGovernor,
+  surfaceMat,
   tierFromHints,
 } from '../src/render/gfx';
+import { tsFilesUnder } from './helpers/ts_files_under';
 
 const desktop: GfxRuntimeHints = {
   search: '',
@@ -427,6 +430,11 @@ describe('graphics tier resolution', () => {
     expect(effectsLow.ao).toBe(false);
     expect(effectsLow.msaaSamples).toBe(0);
     expect(effectsLow.smaa).toBe(false);
+    // Losing the composer loses the SMAA tail, so the grade-fused arm is what
+    // keeps this mix anti-aliased, and the AA dial still turns it off.
+    expect(effectsLow.fxaa).toBe(true);
+    expect(adv({ effectsQuality: 0, antiAliasing: 0 }).fxaa).toBe(false);
+    expect(adv({ effectsQuality: 1 }).fxaa).toBe(false);
     const effectsMedium = adv({ effectsQuality: 0.5 });
     expect(effectsMedium.ao).toBe(true);
     expect(effectsMedium.bloom).toBe(false);
@@ -708,6 +716,31 @@ describe('graphics tier resolution', () => {
       effectsQuality: 0,
     });
     expect(advanced.maxPointLights).toBe(2);
+  });
+
+  it('gives the grade-only tier its fused edge AA and nothing else a second AA arm', () => {
+    // Medium is the tier the fused arm exists for: it keeps the region-safe
+    // grade-only chain, which a full-frame SMAA tail cannot ride.
+    expect(gfxInternalsForTest.settingsFor('medium').fxaa).toBe(true);
+    expect(gfxInternalsForTest.settingsFor('medium').smaa).toBe(false);
+    // Low has no grade pass to fuse into, and the composer tiers already have
+    // SMAA. Never both arms on one profile.
+    expect(gfxInternalsForTest.settingsFor('low').fxaa).toBe(false);
+    for (const tier of ['high', 'ultra', 'insane'] as const) {
+      const settings = gfxInternalsForTest.settingsFor(tier);
+      expect(settings.smaa, tier).toBe(true);
+      expect(settings.fxaa, tier).toBe(false);
+    }
+    // The iOS WebKit profile drops the grade pass with the composer, so it
+    // stays on no post AA at all rather than gaining an arm with no host.
+    const webkit = gfxInternalsForTest.settingsFor('medium', {
+      maxTouchPoints: 5,
+      coarsePointer: true,
+      narrowViewport: true,
+      platform: 'ios',
+    });
+    expect(webkit.gradePass).toBe(false);
+    expect(webkit.fxaa).toBe(false);
   });
 
   it('routes Advanced low effects through the low static effects tier', () => {
@@ -1257,6 +1290,56 @@ describe('animated far character band: per-tier ceiling', () => {
     for (const tier of ['medium', 'high', 'ultra'] as const) {
       expect(gfxInternalsForTest.settingsFor(tier, nativeIos).farCharacterAnimScale).toBe(1);
       expect(gfxInternalsForTest.settingsFor(tier, constrained).farCharacterAnimScale).toBe(1);
+    }
+  });
+});
+
+describe('surfaceMat dedupe key', () => {
+  it('splits two option sets that differ only in metalnessMap', () => {
+    // The key folded map / normalMap / roughnessMap / aoMap but not
+    // metalnessMap, so a caller that wanted the metallic arm got the SAME
+    // cached material as one that did not, and wrote the slot on afterwards.
+    // Slot presence is a program-cache-key input, so that write relinked every
+    // material already drawing with the shared entry, live.
+    const response = new THREE.Texture();
+    const base = { color: 0x808080, roughnessMap: response };
+    const plain = surfaceMat(base);
+    expect(surfaceMat({ ...base })).toBe(plain);
+
+    const metallic = surfaceMat({ ...base, metalnessMap: response });
+
+    expect(metallic).not.toBe(plain);
+    if (metallic instanceof THREE.MeshStandardMaterial) {
+      expect(metallic.metalnessMap).toBe(response);
+      expect((plain as THREE.MeshStandardMaterial).metalnessMap).toBeNull();
+    }
+  });
+
+  it('splits two option sets whose metalnessMap is a DIFFERENT texture', () => {
+    const base = { color: 0x707070, roughnessMap: new THREE.Texture() };
+    const first = surfaceMat({ ...base, metalnessMap: new THREE.Texture() });
+    const second = surfaceMat({ ...base, metalnessMap: new THREE.Texture() });
+
+    // The uuid is what the key folds, so two metallic callers with their own
+    // texture must not share the entry either.
+    expect(second).not.toBe(first);
+    if (first instanceof THREE.MeshStandardMaterial && second instanceof THREE.MeshStandardMaterial)
+      expect(second.metalnessMap).not.toBe(first.metalnessMap);
+  });
+
+  it('leaves no surfaceMat consumer writing the slot onto a shared material', () => {
+    // Every caller in the tree, not the two that once did it: the write is
+    // legal on a material a caller owns and a live relink on a shared one, and
+    // nothing tells the two apart at the call site.
+    const callers = tsFilesUnder(fileURLToPath(new URL('../src/render/', import.meta.url)))
+      .map(({ file, full }) => ({ file, source: readFileSync(full, 'utf8') }))
+      .filter(({ source }) => source.includes('surfaceMat('));
+
+    expect(callers.length).toBeGreaterThanOrEqual(24);
+    for (const { file, source } of callers) {
+      expect(source, `${file} writes metalnessMap after surfaceMat`).not.toMatch(
+        /\.metalnessMap = /,
+      );
     }
   });
 });

@@ -954,7 +954,7 @@ export const ja_JP: EnTranslations = {
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
     "lastkeepMap": {
-      "title": "{keep}: {story}",
+      "title": "{keep}：{story}",
       "story": {
         "undercroft": "地下蔵",
         "state": "公務の階",
@@ -963,7 +963,7 @@ export const ja_JP: EnTranslations = {
       }
     },
     "dawnholdMap": {
-      "title": "{keep}: {story}",
+      "title": "{keep}：{story}",
       "story": {
         "ground": "庭園の階",
         "solar": "日だまりの間"
@@ -1449,9 +1449,29 @@ export const ja_JP: EnTranslations = {
       "buttons": "ボタン配置",
       "resetButtons": "ボタン配置をリセット",
       "menuAction": "ゲームメニュー",
+      "confirmAction": "決定 / 選択",
       "zoomIn": "ズームイン",
       "zoomOut": "ズームアウト",
-      "help": "左スティックで移動、右スティックで視点。ウィンドウを開くと画面ポインターが使えます。"
+      "help": "左スティックで移動、右スティックで視点。ウィンドウを開くと画面ポインターが使えます。",
+      "crossHotbar": "クロスホットバー",
+      "crossHotbarEnable": "クロスホットバーを有効化",
+      "crossHotbarExpand": "ダブルクロスホットバー",
+      "crossHotbarHelp": "トリガーを押している間、方向キーとフェイスボタンに8つのアクションバースロットが表示されます。もう一方のトリガーを軽く押すと、2つ目のセットに切り替わります。",
+      "crossHotbarResetLayout": "クロスホットバーをリセット",
+      "crossHotbarPosition": "{trigger} + {button}",
+      "crossHotbarOwnsButtons": "クロスホットバーが有効な間、トリガーと方向キーはクロスホットバーが使用します。ここではなく下の項目で設定してください。",
+      "cancelAction": "キャンセル / 戻る",
+      "subcommandsAction": "サブコマンド / マップ",
+      "cycleHudAction": "インターフェース切替",
+      "cycleSetAction": "ホットバーセット切替",
+      "crossHotbarDisplay": "バー表示",
+      "crossHotbarDisplayFull": "通常",
+      "crossHotbarDisplayCompact": "コンパクト",
+      "crossHotbarDisplayMinimal": "押している間のみ",
+      "crossHotbarArrangeChord": "{bumper} + {button}",
+      "crossHotbarCarrying": "{action}を持っています。マスで決定を押すと置き、キャンセルで戻します。",
+      "crossHotbarEditHint": "配置変更中：決定でマスまたはスペルブックからアクションを持ち上げてマスに置き、キャンセルでマスを空にします。",
+      "crossHotbarEditHelp": "左バンパーを押しながら上の面ボタンを押すと、コントローラーでバーを配置変更できます。"
     },
     "perf": {
       "title": "パフォーマンスオーバーレイ",
@@ -1570,6 +1590,7 @@ export const ja_JP: EnTranslations = {
           "render": "描画  送信 {submit} ミリ秒 | ワールド {world} ミリ秒 | エンティティ {entities} ミリ秒",
           "scene": "シーン   {calls} 呼び出し | {triangles} 三角形 | {views} ビュー",
           "hitches": "カクつき {hitches} | シェーダー {shaders} | アップロード {uploads} | ビュー {views}",
+          "hitchesBuild": "ゾーン構築 {zoneBuilds} | フレーム外 {offFrame} | GC {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "待機中"
         },
@@ -1621,7 +1642,10 @@ export const ja_JP: EnTranslations = {
             "eventCpu": "イベント処理がフレーム時間を消費しています",
             "shaderCompile": "ゲーム中にシェーダーがコンパイルされています",
             "textureUpload": "テクスチャのアップロードでカクつきが発生しています",
+            "zoneBuild": "ゾーンのストリーミング構築でカクつきが発生しています",
             "viewCreate": "エンティティ表示の作成でカクつきが発生しています",
+            "gcHitch": "長いフレーム内でガベージコレクションが実行されています",
+            "offFrameHitch": "長いフレームはレンダーコールバック外の処理に起因しています",
             "otherHitch": "原因不明の長いフレームが残っています",
             "assetStartup": "アセット処理でゲーム開始が遅れています",
             "longTasks": "ブラウザーの長いタスクがフレームを妨げています",
@@ -4772,6 +4796,7 @@ export const ja_JP: EnTranslations = {
       "mageEleJet": "ウォータージェットはペットバーに独立したボタンとして並びます。クリックすれば凍てつく光線を敵一体に固定し、右クリック（モバイルでは長押し）すれば、準備が整うたびにエレメンタルが自分の判断で放つようになります。",
       "formsHeading": "変身",
       "formsNote": "ドルイドは姿を変えて戦います。ドルイドのアビリティはほとんどがいずれか一つの姿に属しているので、今どの姿でいるかが何を使えるかを決めます。変身にはわずかなマナがかかります。戦闘中でも戦闘外でも、好きなだけ変身し、また解くことができます。",
+      "formsAutoUnshift": "変身中に回復や攻撃の呪文を唱えると、姿はひとりでに解けます。こうして姿を解くのはマナもかからず、グローバルクールダウンも使いません。ですから即時発動の呪文は押した瞬間に飛びます。もう一度変身するのは普通のアビリティなので、マナもグローバルクールダウンもかかります。",
       "formsMoonwing": "均衡（ムーングローブ）のドルイドは、もう一つの姿、ムーンウィングフォームを得ます。均衡型のドルイドが戦うための術者の姿です。獣の姿でありながら呪文を保てる唯一の形であり、ワンドもこの姿か、通常の術者の姿でしか使えません。",
       "formLine": {
         "form_bear": "タンクの姿です。分厚い毛皮をまとい、マナの代わりにレイジを使い、追加の脅威で敵の矛先を自分に引きつけ続けます。",
@@ -7189,6 +7214,7 @@ export const ja_JP: EnTranslations = {
       "shopMarksRequired": "{name}を購入するにはデルヴの刻印が{marks}個必要だ。",
       "shopSealPremiumOnly": "この封印は達人の手にのみ応じる。極上の賭けだけが開くことができる。",
       "passageSealed": "通路は封じられている。",
+      "enemiesRemain": "残りの敵を先に倒せ。",
       "moveCloserPassage": "通路にもっと近づけ。",
       "moveCloserChest": "宝箱にもっと近づけ。",
       "moveCloserReliquary": "聖遺物匣にもっと近づけ。",
@@ -9998,7 +10024,7 @@ export const ja_JP: EnTranslations = {
       },
       "fear": {
         "name": "責め苦",
-        "description": "敵に恐怖を刻み、最大8秒間おびえさせます。ダメージを受けると効果が切れます。"
+        "description": "敵に恐怖を刻み、最大5秒間おびえさせます。対象の最大体力の8%に相当する合計ダメージを受けると効果が切れます。"
       },
       "searing_pain": {
         "name": "灼熱",
@@ -10244,7 +10270,7 @@ export const ja_JP: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "納骨の印",
-        "description": "敵に12秒間の印を刻み、自分と自分のアンデッドが与えたダメージの20%を蓄積する。もう一度使用すると起爆する。印のついた敵が死亡すると6ヤード以内で爆発し、魂の欠片を1個生成する。"
+        "description": "敵に15秒間の印を刻み、自分と自分のアンデッドが与えたダメージの20%を蓄積する。もう一度使用すると起爆する。印のついた敵が死亡すると6ヤード以内で爆発し、魂の欠片を1個生成する。"
       },
       "unholy_command": {
         "name": "不浄の号令",
@@ -10343,8 +10369,8 @@ export const ja_JP: EnTranslations = {
         "description": "ムーンキンフォームになり、戻るまで呪文詠唱を強化します。再び唱えると通常形態に戻ります。（バランス特性のシグネチャ）"
       },
       "feral_charge": {
-        "name": "フェラルチャージ",
-        "description": "敵に突撃し、1秒間足止めします。射程8-25ヤード。（フェラル特性のシグネチャ）"
+        "name": "原初の奔流",
+        "description": "原初の力を解き放ちます。ウルフフォームでは、10秒間エネルギーの再生速度が100%上昇します。ブルーインフォームでは、即座に怒りを50生成します。（フェラル特性のシグネチャ）"
       },
       "swiftmend": {
         "name": "スウィフトメンド",
@@ -10600,7 +10626,7 @@ export const ja_JP: EnTranslations = {
       },
       "evocation": {
         "name": "エーテルの井戸",
-        "description": "マナを急速に回復する。（メイジタレント）"
+        "description": "6秒間チャネルします。毎秒100マナを回復し、呪文威力が8上昇します。この効果はチャネル中に累積し、15秒間持続します。（メイジタレント）"
       },
       "flurry_of_knives": {
         "name": "短剣乱舞",
@@ -10628,11 +10654,11 @@ export const ja_JP: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "恐怖の遠吠え",
-        "description": "周囲の敵を最大3秒間恐怖状態にする。ダメージを受けると解除されることがある。（ウォーロックのタレント）"
+        "description": "周囲の敵を最大5秒間恐怖状態にする。対象の最大体力の8%に相当する合計ダメージを受けると、その恐怖は解除される。（ウォーロックのタレント）"
       },
       "ice_block": {
         "name": "冷たき棺",
-        "description": "自身を氷に封じ、大量のダメージを吸収する。効果時間 8 秒。（メイジタレント）"
+        "description": "8秒間自身を堅い氷に封じ、あらゆるダメージを無効化します。すでにかかっている通常の有害な効果を取り除き、新たな通常の行動阻害効果の付与を防ぎます。スタンまたは変身中でも使用できます。氷の中では行動できません。再使用すると解除します。（メイジ）"
       },
       "inner_focus": {
         "name": "静まる心",
@@ -13246,6 +13272,15 @@ export const ja_JP: EnTranslations = {
       },
       "training_dummy": {
         "name": "訓練用ダミー"
+      },
+      "friendly_player_dummy": {
+        "name": "味方プレイヤーダミー"
+      },
+      "normal_boss_dummy": {
+        "name": "ノーマルボスダミー"
+      },
+      "heroic_boss_dummy": {
+        "name": "ヒロイックボスダミー"
       },
       "ridge_stalker": {
         "name": "尾根の追跡者"

@@ -109,7 +109,10 @@ const ADVANCED_DIAL_SEEDS: Readonly<Record<number, Readonly<Record<GraphicsDialK
     surfaceDetail: 0,
     effectsQuality: 0,
     shadowQuality: 0.5,
-    antiAliasing: 0,
+    // On at Medium, off at Low: the medium tier's own AA is the FXAA fused
+    // into the grade pass, which the grade-only effects level above keeps and
+    // the low tier (no grade pass, and a policy of no post AA) never had.
+    antiAliasing: 1,
     bloomQuality: 0,
     ambientOcclusion: 0,
     viewDistance: 0.5,

@@ -1371,7 +1371,7 @@ export const en: EnTranslations = {
       "gfxParticleEffects": "Particle Effects",
       "gfxHalf": "Half",
       "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
-      "gfxEffectsNote": "Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.",
+      "gfxEffectsNote": "Ambient Occlusion and Bloom ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect. Anti-Aliasing keeps working there, on a cheaper edge filter built into the final image pass.",
       "interfaceMode": "Interface Mode",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Desktop",
@@ -1449,9 +1449,29 @@ export const en: EnTranslations = {
       "buttons": "Button Layout",
       "resetButtons": "Reset Button Layout",
       "menuAction": "Game Menu",
+      "confirmAction": "Confirm / Select",
       "zoomIn": "Zoom In",
       "zoomOut": "Zoom Out",
-      "help": "Left stick moves, right stick looks. Open a window to use the on-screen pointer."
+      "help": "Left stick moves, right stick looks. Open a window to use the on-screen pointer.",
+      "crossHotbar": "Cross Hotbar",
+      "crossHotbarEnable": "Enable Cross Hotbar",
+      "crossHotbarExpand": "Double Cross Hotbar",
+      "crossHotbarHelp": "Hold a trigger to light eight action-bar slots on the d-pad and face buttons. Tap the other trigger to swap to the second set.",
+      "crossHotbarResetLayout": "Reset Cross Hotbar",
+      "crossHotbarPosition": "{trigger} + {button}",
+      "crossHotbarOwnsButtons": "The triggers and the d-pad belong to the cross hotbar while it is on, so they are set up below rather than here.",
+      "cancelAction": "Cancel / Back",
+      "subcommandsAction": "Subcommands / Map",
+      "cycleHudAction": "Cycle Interface",
+      "cycleSetAction": "Change Hotbar Set",
+      "crossHotbarDisplay": "Bar Display",
+      "crossHotbarDisplayFull": "Full",
+      "crossHotbarDisplayCompact": "Compact",
+      "crossHotbarDisplayMinimal": "Only While Held",
+      "crossHotbarArrangeChord": "{bumper} + {button}",
+      "crossHotbarCarrying": "Carrying {action}: confirm on a cell to place it, cancel to put it back.",
+      "crossHotbarEditHint": "Arranging: confirm picks up from a cell or the spellbook and drops on a cell, cancel clears one.",
+      "crossHotbarEditHelp": "Hold the left bumper and press the top face button to arrange the bar with the controller."
     },
     "perf": {
       "title": "Performance Overlay",
@@ -1570,6 +1590,7 @@ export const en: EnTranslations = {
           "render": "render  submit {submit} ms | world {world} ms | entities {entities} ms",
           "scene": "scene   {calls} calls | {triangles} tris | {views} views",
           "hitches": "hitches {hitches} | shaders {shaders} | uploads {uploads} | views {views}",
+          "hitchesBuild": "zone builds {zoneBuilds} | off-frame {offFrame} | gc {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "waiting"
         },
@@ -1621,7 +1642,10 @@ export const en: EnTranslations = {
             "eventCpu": "Event processing is consuming the frame",
             "shaderCompile": "Shaders are compiling during gameplay",
             "textureUpload": "Texture uploads are causing gameplay hitches",
+            "zoneBuild": "Zone streaming builds are causing hitches",
             "viewCreate": "Entity view creation is causing hitches",
+            "gcHitch": "Garbage collections are running inside long frames",
+            "offFrameHitch": "Long frames come from work outside the render callback",
             "otherHitch": "Unattributed long frames remain",
             "assetStartup": "Game startup is delayed by asset work",
             "longTasks": "Long browser tasks are blocking frames",
@@ -4280,7 +4304,7 @@ export const en: EnTranslations = {
       "factSearchBody": "There is no search box, so it helps to know the shape of the menu. Graphics is laid out as cards: Quality, World Detail, Lighting & Effects, Camera, Display, and System, plus Touch Controls on a touchscreen. Interface is split into four tabs: General, Frames, Chat, and Combat. If a setting changes how the world is drawn it is in Graphics, and if it changes what the interface shows you it is in Interface.",
       "advancedHeading": "The detail dials and the Advanced mix",
       "advancedBody": "You do not have to pick Advanced to see the detail dials. The Graphics panel always shows them, in two cards: World Detail holds Terrain Detail, Foliage Density, Surface Detail, View Distance, Water Quality, and Character Detail, and Lighting & Effects holds Effects & Lighting, Shadow Quality, Ambient Occlusion, Bloom, Anti-Aliasing, Dynamic Lights, and Particle Effects. Under a fixed preset each dial shows roughly where that preset sits.",
-      "advancedMixes": "Two favorite mixes: keep Shadow Quality high and set Effects & Lighting to Low for a crisp, glow-free look that runs light, or do the reverse to keep the bloom and soften the shadows. One thing to know before you mix: Ambient Occlusion, Bloom, and Anti-Aliasing ride the same chain as Effects & Lighting, so with that dial on Low they have nothing to run on.",
+      "advancedMixes": "Two favorite mixes: keep Shadow Quality high and set Effects & Lighting to Low for a crisp, glow-free look that runs light, or do the reverse to keep the bloom and soften the shadows. One thing to know before you mix: Ambient Occlusion and Bloom ride the same chain as Effects & Lighting, so with that dial on Low they have nothing to run on. Anti-Aliasing survives that mix, on a cheaper edge filter built into the final image pass.",
       "tableHeading": "Every graphics option, explained",
       "colSetting": "Setting",
       "colDoes": "What it does",
@@ -4772,6 +4796,7 @@ export const en: EnTranslations = {
       "mageEleJet": "Water Jet sits on the pet bar as a button of its own: click it to lock a chilling beam onto one enemy, or right-click it (touch and hold on mobile) to let the elemental fire it on its own whenever it is ready.",
       "formsHeading": "Shapeshifting",
       "formsNote": "A druid fights by changing shape. Most druid abilities belong to one shape, so the form you are in decides what you can cast, and shifting costs a little mana. You can shift in or out of combat, as often as you like.",
+      "formsAutoUnshift": "A heal or a damaging spell cast while shifted shifts you out for you. Leaving a shape that way is free and does not spend your global cooldown, so an instant spell goes off the moment you press it. Shifting back in is an ordinary ability, and still costs mana and your global cooldown.",
       "formsMoonwing": "A Moongrove druid gains one more shape, Moonwing Form, the caster shape a Balance druid fights in. It is the one animal shape that keeps your spells, and your wand only works in it or in your normal caster form.",
       "formLine": {
         "form_bear": "The tanking shape: a heavy hide, rage instead of mana, and extra threat so enemies keep swinging at you.",
@@ -5694,9 +5719,9 @@ export const en: EnTranslations = {
       "specializationBody": "At skill {at} this craft specializes you, no quest needed: recipes cost {pct}% fewer materials from then on, and specialization adds its own bump to the masterwork chance.\n\nSpecialists also learn to take the workshop with them: a specialized crafter can set up a mobile station in the field for ten minutes at a time, so station-bound recipes can be worked at the mine mouth instead of back in town. Its limits are deliberate: it never counts for training with a master or for unbinding a commissioned piece, and it expires on its timer whether or not you used it.",
       "ench": {
         "disenchantHeading": "Disenchanting",
-        "disenchantNote": "Disenchanting takes any weapon or armor piece of common quality or better and consumes one copy, taking a plain copy before an enchanted one; when only enchanted copies remain, one of those is destroyed, enchant and all. Common and uncommon pieces mill down into a rolled handful of Chime Dust, a little richer for rarer and higher-level pieces; from rare up the yield changes shape, exactly one Chime Essence from a rare piece or one Chime Shard from an epic or legendary one, plus a typed secondary keyed to what the piece was made of.",
+        "disenchantNote": "Disenchanting takes any weapon, armor, or held off-hand piece (an orb, quiver, or the like) of common quality or better and consumes one copy, taking a plain copy before an enchanted one; when only enchanted copies remain, one of those is destroyed, enchant and all. Common and uncommon pieces mill down into a rolled handful of Chime Dust, a little richer for rarer and higher-level pieces; from rare up the yield changes shape, exactly one Chime Essence from a rare piece or one Chime Shard from an epic or legendary one, plus a typed secondary keyed to what the piece was made of.",
         "typedHeading": "Typed secondaries",
-        "typedNote": "The typed secondaries follow the material: cloth armor yields Resonant Thread, leather Resonant Hide, mail Resonant Links, melee weapons Resonant Steel, and staves, wands, bows, and crossbows Resonant Timber. A rare piece gives exactly {rare}; an epic or legendary piece gives {epicMin} or {epicMax}. Rings and necklaces have no armor class, so they yield only the primary material.\n\nMind the fine print: the Resonant secondaries bind on trade, so each can change hands exactly once, straight from the breaker to the enchanter who will burn it. Dust, Essence, and Shards carry no such string and move like any other trade good.",
+        "typedNote": "The typed secondaries follow the material: cloth armor yields Resonant Thread, leather Resonant Hide, mail Resonant Links, melee weapons Resonant Steel, and staves, wands, bows, and crossbows Resonant Timber. A rare piece gives exactly {rare}; an epic or legendary piece gives {epicMin} or {epicMax}. Rings, necklaces, and held off-hands have no armor class or weapon family, so they yield only the primary material.\n\nMind the fine print: the Resonant secondaries bind on trade, so each can change hands exactly once, straight from the breaker to the enchanter who will burn it. Dust, Essence, and Shards carry no such string and move like any other trade good.",
         "colSource": "Broken from",
         "meleeWeapons": "Melee weapons",
         "timberWeapons": "Staves, wands, bows, and crossbows",
@@ -5712,7 +5737,7 @@ export const en: EnTranslations = {
           "greater": "Greater"
         },
         "salvageHeading": "Salvage",
-        "salvageNote": "Salvage is the everyman cousin of disenchanting: the same weapons and armor, no skill required and none gained, returning plain crafting scrap by quality instead of anything arcane. Anyone can do it, enchanter or not. When you hold a piece worth breaking, the choice is simple: from rare up, disenchanting is strictly the better deal, while at common the two yields vendor for about the same, so break toward whichever material you actually need.",
+        "salvageNote": "Salvage is the everyman cousin of disenchanting: the same weapons, armor, and held off-hands, no skill required and none gained, returning plain crafting scrap by quality instead of anything arcane. Anyone can do it, enchanter or not. When you hold a piece worth breaking, the choice is simple: from rare up, disenchanting is strictly the better deal, while at common the two yields vendor for about the same, so break toward whichever material you actually need.",
         "bonusFmt": "+{value} {stat}",
         "enchantsNoteOffhand": "Enchants come in three tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed two more sinks besides, the two charm recipes at five apiece and the top rung of tool-effect recharges, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.",
         "charmsHeading": "Charms for a gatherer's tools",
@@ -7189,6 +7214,7 @@ export const en: EnTranslations = {
       "shopMarksRequired": "You need {marks} Delve Marks to buy {name}.",
       "shopSealPremiumOnly": "This seal yields only to a master's hand. Only the Premium ante can open it.",
       "passageSealed": "The passage is sealed.",
+      "enemiesRemain": "Clear the remaining enemies first.",
       "moveCloserPassage": "Move closer to the passage.",
       "moveCloserChest": "Move closer to the chest.",
       "moveCloserReliquary": "Move closer to the reliquary.",
@@ -9914,7 +9940,7 @@ export const en: EnTranslations = {
       },
       "demon_skin": {
         "name": "Fiendhide",
-        "description": "Demonic skin increases your armor by {buff} for 30 min."
+        "description": "Demonic skin increases your armor by {buff} for 30 min. Pact Deepened can double this armor and reduce magic damage taken while Fiendhide is active."
       },
       "immolate": {
         "name": "Burning Pact",
@@ -9934,7 +9960,7 @@ export const en: EnTranslations = {
       },
       "needle_of_fate": {
         "name": "Needle of Fate",
-        "description": "Pierces the enemy for {damage} Shadow damage and generates 5 Condemnation if it bears your Evil Eye. Each hit on your primary Evil Eye adds a Fate Thread for 12 sec, up to 3. If no Evil Eye exists, the Needle first marks its target."
+        "description": "Pierces the enemy for {damage} Shadow damage and generates 7 Condemnation on impact if it still bears your Evil Eye. Completing a cast moves your primary Evil Eye to the target and adds a Fate Thread for 12 sec, up to 3. Fate Threads stay with you when the Eye moves or its target dies. Targeting a secondary Coven Eye swaps it with the primary Eye."
       },
       "sentence": {
         "name": "Sentence",
@@ -9998,7 +10024,7 @@ export const en: EnTranslations = {
       },
       "fear": {
         "name": "Harrow",
-        "description": "Strikes terror into the enemy, leaving it cowering for up to 8 sec. Any damage breaks the effect."
+        "description": "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect."
       },
       "searing_pain": {
         "name": "Sear",
@@ -10236,7 +10262,7 @@ export const en: EnTranslations = {
       },
       "corpse_explosion": {
         "name": "Corpse Explosion",
-        "description": "Sacrifices a Bone Mage first, then a Skeletal Warrior, and a Gravewing only as a last resort. Among duplicates it chooses the one with the least remaining duration, then the weakest, to deal {damage} Shadow damage at the chosen location."
+        "description": "Sacrifices a Skeletal Warrior first, then a Bone Mage, and a Gravewing only as a last resort. Among duplicates it chooses the one with the least remaining duration, then the weakest, to deal {damage} Shadow damage at the chosen location."
       },
       "funeral_harvest": {
         "name": "Funeral Harvest",
@@ -10244,7 +10270,7 @@ export const en: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Ossuary Mark",
-        "description": "Marks an enemy for 12 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+        "description": "Marks an enemy for 15 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
       },
       "unholy_command": {
         "name": "Unholy Command",
@@ -10252,7 +10278,7 @@ export const en: EnTranslations = {
       },
       "reaping_command": {
         "name": "Reaping Command",
-        "description": "Spends 2 Soul Fragments to command every undead servant to strike in unison. Graveguards taunt and brace, Warriors pin, Bone Mages expose magic defenses, and Gravewing rends all enemies hit."
+        "description": "Spends 2 Soul Fragments to command every undead servant to strike in unison. Graveguards taunt and brace, Warriors pin, Bone Mages expose magic defenses, and Gravewing rends all enemies hit. Reaping Command ignores and does not reset each servant's own ability cooldown."
       },
       "sacrifice_undead": {
         "name": "Sacrifice Undead",
@@ -10600,7 +10626,7 @@ export const en: EnTranslations = {
       },
       "evocation": {
         "name": "Aetherwell",
-        "description": "Channel for 6 sec: each second restores 100 mana and builds 8 spell power, stacking while you channel. (Mage talent)"
+        "description": "Channel for 6 sec: each second restores 100 mana and builds 8 spell power, stacking while you channel and lasting 15 sec. (Mage talent)"
       },
       "flurry_of_knives": {
         "name": "Flurry of Knives",
@@ -10628,11 +10654,11 @@ export const en: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Dread Chorus",
-        "description": "Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)"
+        "description": "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)"
       },
       "ice_block": {
         "name": "Cold Coffin",
-        "description": "Encases you in ice, absorbing a massive amount of damage for 8 sec. (Mage talent)"
+        "description": "Encases you in solid ice for 8 sec, making you immune to all damage. Removes existing ordinary harmful effects and prevents new ordinary control effects. Usable while stunned or polymorphed. You cannot act while encased. Recast to cancel. (Mage)"
       },
       "inner_focus": {
         "name": "Stilled Mind",
@@ -13246,6 +13272,15 @@ export const en: EnTranslations = {
       },
       "training_dummy": {
         "name": "Training Dummy"
+      },
+      "friendly_player_dummy": {
+        "name": "Friendly Player Dummy"
+      },
+      "normal_boss_dummy": {
+        "name": "Normal Boss Dummy"
+      },
+      "heroic_boss_dummy": {
+        "name": "Heroic Boss Dummy"
       },
       "ridge_stalker": {
         "name": "Ridge Stalker"

@@ -7,7 +7,7 @@ const REFERENCE_CHARACTER_HEIGHT = 1.8;
 const BASE_GEOMETRY = new THREE.CylinderGeometry(0.7, 0.76, 0.2, 8);
 const SHARD_GEOMETRY = new THREE.ConeGeometry(0.13, 0.5, 5);
 
-interface FrostRootMaterials {
+export interface FrostRootMaterials {
   base: THREE.Material;
   shards: THREE.Material;
 }
@@ -25,7 +25,7 @@ export function isFrostNovaRootAura(aura: { id: string; kind: string }): boolean
 }
 
 /** Created after initGfxTier(), retaining a readable Lambert fallback on low graphics. */
-function frostRootMaterials(): FrostRootMaterials {
+export function frostRootMaterials(): FrostRootMaterials {
   if (materials) return materials;
 
   const base = surfaceMat({

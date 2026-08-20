@@ -1,6 +1,6 @@
 {
   "name": "world-of-claudecraft",
-  "version": "0.38.3",
+  "version": "0.39.0",
   "private": true,
   "license": "MIT",
   "author": {
@@ -72,8 +72,6 @@
     "feel:smoke": "node scripts/feel_smoke.mjs",
     "asset:budget": "node scripts/asset_budget.mjs",
     "assets:mapbg": "node scripts/build_map_backgrounds.mjs",
-    "assets:lastkeepmap": "node scripts/build_lastkeep_map.mjs",
-    "assets:dawnholdmap": "node scripts/build_dawnhold_map.mjs",
     "assets:items": "node scripts/convert_item_icons_webp.mjs",
     "assets:skills": "node scripts/convert_skill_icons_webp.mjs",
     "assets:chrome": "node scripts/convert_chrome_icons_webp.mjs",

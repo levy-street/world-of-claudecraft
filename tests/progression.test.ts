@@ -156,6 +156,11 @@ describe('content referential integrity', () => {
     // like the other fixtures, not a v0.32.0-style empty-loot regression.
     const LOOTLESS_FIXTURES = new Set([
       'training_dummy',
+      // The rest of the Highwatch practice row: practice targets you can never
+      // really fell, so a drop would be a bug, not an omission.
+      'friendly_player_dummy',
+      'normal_boss_dummy',
+      'heroic_boss_dummy',
       'stable_horse',
       'gilded_stag',
       'spider_egg',

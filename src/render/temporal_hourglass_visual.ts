@@ -36,7 +36,7 @@ function buildClockTexture(): THREE.DataTexture {
 
 const CLOCK_TEXTURE = buildClockTexture();
 
-interface TemporalHourglassMaterials {
+export interface TemporalHourglassMaterials {
   gold: THREE.Material;
   glass: THREE.Material;
   protectiveEnergy: THREE.Material;
@@ -45,7 +45,7 @@ interface TemporalHourglassMaterials {
 
 let profileMaterials: TemporalHourglassMaterials | null = null;
 
-function temporalHourglassMaterials(): TemporalHourglassMaterials {
+export function temporalHourglassMaterials(): TemporalHourglassMaterials {
   if (profileMaterials) return profileMaterials;
   const glass = surfaceMat({
     color: 0x9befff,

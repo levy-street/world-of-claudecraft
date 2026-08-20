@@ -14,7 +14,9 @@ import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { attachBiomeHaze } from '../src/render/biome_haze_field';
-import { gfxInternalsForTest } from '../src/render/gfx';
+import { fenbridgeTownInternalsForTest } from '../src/render/fenbridge_town';
+import { gfxInternalsForTest, surfaceMat } from '../src/render/gfx';
+import { cloneMaterialWithHooks } from '../src/render/material_clone_hooks';
 import {
   applyOccluderFade,
   isOccluderGhostMaterial,
@@ -26,6 +28,10 @@ import {
   collectOccluderGhostTargets,
   occluderGhostVariantKey,
 } from '../src/render/occluder_ghost_prewarm';
+import {
+  modulateEmissiveByVertexColor,
+  vertexColorEmissiveInternalsForTest,
+} from '../src/render/vertex_color_emissive';
 import { applySurfaceDetail } from '../src/render/worn_stone';
 
 // The hook layers a kit material really carries (surfaceMat attaches the zone
@@ -350,35 +356,91 @@ describe('one twin per program identity, not per ghost material', () => {
   });
 });
 
+describe('the town emissive fade twin', () => {
+  // townMaterial(true, textures, true) reassembled from fenbridge_town's own
+  // exported materialOptions: surfaceMat (which attaches the zone haze), the
+  // independent building's hook-preserving clone, then the vertex-colour
+  // emissive layer. Its twin used to drop that last layer, so the twin keyed a
+  // program the live fade never asks for and the first building fade in town
+  // still linked cold (measured: fenbridgeTownEmissive:fenbridge_hesk_tannery
+  // 126 ms, the Eastbrook inn's equivalent 120.5 ms, both inside a live frame).
+  function townEmissiveBuildingMaterial(name: string): THREE.Material {
+    const shared = surfaceMat({
+      ...fenbridgeTownInternalsForTest.materialOptions(true, {
+        atlas: undefined,
+        normal: undefined,
+        roughness: undefined,
+      }),
+      side: THREE.FrontSide,
+    });
+    const material = modulateEmissiveByVertexColor(cloneMaterialWithHooks(shared));
+    material.name = name;
+    return material;
+  }
+
+  it('starts from a material that really carries the emissive layer', () => {
+    const material = townEmissiveBuildingMaterial('fenbridgeTownEmissive:fenbridge_hesk_tannery');
+    expect(material.customProgramCacheKey()).toContain(
+      vertexColorEmissiveInternalsForTest.programCacheKey,
+    );
+  });
+
+  it('links the key the live fade of that material asks for', () => {
+    const material = townEmissiveBuildingMaterial('fenbridgeTownEmissive:fenbridge_hesk_tannery');
+    const { group, mats } = ghostedStructure([material]);
+    const prewarm = buildGhostVariantPrewarmGroup(group);
+    const twin = (prewarm.children[0] as THREE.Mesh).material as THREE.Material;
+
+    applyOccluderFade(mats, OCCLUDER_FADE_ALPHA);
+    expect(programKeyInputs(twin)).toEqual(programKeyInputs(material));
+    // depthWrite is not one of three's key inputs, but the twin still stages
+    // exactly the state applyOccluderFade writes below alpha 1.
+    expect(twin.depthWrite).toBe(true);
+    expect(material.depthWrite).toBe(true);
+  });
+
+  it('resolves to the same variant identity, so one twin covers the town', () => {
+    const material = townEmissiveBuildingMaterial('fenbridgeTownEmissive:fenbridge_hesk_tannery');
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const { group } = ghostedStructure([material]);
+    const twin = (buildGhostVariantPrewarmGroup(group).children[0] as THREE.Mesh)
+      .material as THREE.Material;
+    const context = { geometry, instanced: false, instanceColor: false };
+    expect(occluderGhostVariantKey({ material: twin, ...context })).toBe(
+      occluderGhostVariantKey({ material, ...context }),
+    );
+  });
+});
+
 describe('renderer wiring for the ghost transparent variants', () => {
   const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
 
   it('stages the twins as a resumable prewarm entry ahead of programs.compile', () => {
+    // The stage / compile / hide / cleanup plumbing is the shared variant slot
+    // (variant_prewarm_slot.ts, its own Vitest); the manifest entry binds it.
+    expect(source).toContain(
+      "createVariantPrewarmSlot(\n      variantSlotHost,\n      'ghost-fade-variants',\n      buildGhostVariantPrewarmGroup,\n    )",
+    );
     const start = source.indexOf("id: 'props.ghost-fade-variants'");
     expect(start).toBeGreaterThan(-1);
     const end = source.indexOf('      {\n        id:', start + 1);
     const entry = source.slice(start, end);
     expect(entry).toContain("category: 'props'");
     expect(entry).toContain('required: false');
-    expect(entry).toContain("id: 'ghost-fade-variants:group'");
-    expect(entry).toContain("id: 'ghost-fade-variants:compile'");
-    expect(entry).toContain(
-      'await this.compilePrewarmColorPrograms(ghostVariantPrewarmGroup, false)',
-    );
-    expect(entry.match(/buildGhostVariantPrewarmGroup\(this\.scene\)/g)).toHaveLength(2);
+    expect(entry).toContain('resumeUnits: ghostVariantSlot.resumeUnits,');
+    expect(entry).toContain('run: ghostVariantSlot.run,');
     // Ordered before the monolithic compile, or the entry warms nothing.
     expect(start).toBeLessThan(source.indexOf("id: 'programs.compile'"));
   });
 
   it('tears the staged group out without ever disposing its materials', () => {
-    expect(source).toContain(
-      'if (ghostVariantPrewarmGroup) this.scene.remove(ghostVariantPrewarmGroup)',
-    );
-    expect(source).toContain('ghostVariantPrewarmGroup = null;');
     const hideStart = source.indexOf('const hidePrewarmArtifacts = ');
     const hideEnd = source.indexOf('const cleanupPrewarmArtifacts = ', hideStart);
-    expect(source.slice(hideStart, hideEnd)).toContain('ghostVariantPrewarmGroup,');
+    expect(source.slice(hideStart, hideEnd)).toContain('ghostVariantSlot.hide();');
+    const cleanupEnd = source.indexOf('doorPrewarmGroup = null;', hideEnd);
+    expect(source.slice(hideEnd, cleanupEnd)).toContain('ghostVariantSlot.cleanup();');
     // A dropped programs.compile still links it from its own bounded unit.
-    expect(source).toContain("['ghost-fade-variants', ghostVariantPrewarmGroup],");
+    expect(source).toContain('ghostVariantSlot.staged(),');
+    expect(source).not.toContain('ghostVariantPrewarmGroup');
   });
 });

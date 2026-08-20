@@ -25,6 +25,7 @@ import { localizeSimAuraName } from '../ui/sim_i18n';
 import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
 
 import { castBarState } from './cast_bar';
+import { anyCharacterRigDrawing, entityHasNoBody } from './entity_gate_stand_in_core';
 import { mobDisplayName, npcDisplayName, objectDisplayName } from './entity_labels';
 import {
   createNameplateCanvasState,
@@ -187,6 +188,17 @@ export class NameplatePainter {
       // The canvas pass draws only what it reaches, so skipping the entity is the
       // whole hide (the removed DOM-era hideNameplate had to clear styles instead).
       if (isQuestGatedEntityHidden(entity, world.questLog)) continue;
+      // A compile gate can leave this entity with no body at all (the arrival
+      // gate hides the whole group). Its plate is then the only thing that says
+      // an enemy is there, so it is forced on over the nameplate toggles for
+      // that window: the stand-in invariant in entity_gate_stand_in_core.ts.
+      // Deliberately AFTER the quest gate above: a quest-gated clutch is meant
+      // to read as inert scenery, and a stand-in would leak it.
+      const standIn = entityHasNoBody(
+        view.compilePending,
+        !!view.visual,
+        anyCharacterRigDrawing(view),
+      );
       // the saddle lift rides the anchor so a mounted player's plate clears the head
       const plan = nameplatePlanInto(
         this.plan,
@@ -196,6 +208,7 @@ export class NameplatePainter {
         showNameplates,
         showOwnNameplate,
         showPlayerNameplates,
+        standIn,
       );
       if (plan.hidden) continue;
 

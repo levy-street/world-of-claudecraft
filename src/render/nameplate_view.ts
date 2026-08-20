@@ -90,8 +90,20 @@ export function newNameplatePlan(): NameplatePlan {
  * player's. `showPlayerNameplates` is the other-players toggle (defaults on):
  * when off, other players' plates hide, except the current target so a clicked
  * player stays readable; the self plate stays governed by showOwnNameplate
- * alone, and mob/object plates are unaffected. Pure: same inputs give the same
- * plan, no DOM/Three/i18n, no Math.random/Date.now/performance.now.
+ * alone, and mob/object plates are unaffected. `standIn` says this entity has
+ * no in-world body at all right now (a compile gate hides it, see
+ * entity_gate_stand_in_core.ts): its plate is then the only thing telling the
+ * player the entity is there, so it overrides BOTH nameplate toggles, the
+ * nameplate range and the plateless-object rule. The arrival gate hides the
+ * whole group of ANY non-self view, objects included, so a gated ground-loot
+ * pile, chest or quest object would otherwise have no representation at all;
+ * and a view only exists inside the streaming radius (about 80 yd), so showing
+ * its plate out to that distance for the gate window is the honest stand-in.
+ * It still overrides nothing that is not about a hidden body: a looted corpse,
+ * the deliberately label-less sealed crypt door and the Vale Cup ball stay
+ * hidden, and the self plate stays the player's own choice (the local player's
+ * view is never gated). Pure: same inputs give the same plan, no DOM/Three/i18n,
+ * no Math.random/Date.now/performance.now.
  */
 export function nameplatePlanInto(
   out: NameplatePlan,
@@ -101,6 +113,7 @@ export function nameplatePlanInto(
   showNameplates: boolean,
   showOwnNameplate: boolean,
   showPlayerNameplates: boolean,
+  standIn: boolean,
 ): NameplatePlan {
   const dx = e.pos.x - player.pos.x;
   const dz = e.pos.z - player.pos.z;
@@ -130,13 +143,14 @@ export function nameplatePlanInto(
 
   out.hidden =
     (isSelf && !hasOverheadEmote && !showOwnNameplate) ||
-    d2 > NAMEPLATE_RANGE_SQ ||
     (e.dead && !e.lootable && e.kind === 'mob') ||
-    (e.kind === 'object' && !isDoor && !delveInteractNear) ||
     (isDoor && e.dungeonId === UNLABELED_DOOR_DUNGEON_ID) ||
     e.templateId === UNLABELED_MOB_TEMPLATE_ID ||
-    (!showNameplates && e.kind === 'mob' && !e.dead) ||
-    (!showPlayerNameplates && e.kind === 'player' && !isSelf && e.id !== player.targetId);
+    (!standIn &&
+      (d2 > NAMEPLATE_RANGE_SQ ||
+        (e.kind === 'object' && !isDoor && !delveInteractNear) ||
+        (!showNameplates && e.kind === 'mob' && !e.dead) ||
+        (!showPlayerNameplates && e.kind === 'player' && !isSelf && e.id !== player.targetId)));
   out.anchorYOffset =
     viewHeight * e.scale +
     (isSelf && hasOverheadEmote && !showOwnNameplate

@@ -2,6 +2,22 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const tr_TR: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formsAutoUnshift': 'Formdayken yapılan bir iyileştirme ya da hasar büyüsü seni formdan kendiliğinden çıkarır. Formu bu yolla bırakmak bedavadır ve genel bekleme süreni harcamaz, yani anlık bir büyü tuşa bastığın anda çıkar. Forma geri dönmek sıradan bir yetenektir ve yine mana ile genel bekleme süreni tüketir.',
+  'entities.mobs.heroic_boss_dummy.name': 'Kahramanca Boss Kuklası',
+  'entities.mobs.normal_boss_dummy.name': 'Normal Boss Kuklası',
+  'entities.mobs.friendly_player_dummy.name': 'Dost Oyuncu Kuklası',
+  'entities.items.dawnhold_posy.name': 'Dawnhold Bahçesi Çiçek Demeti',
+  'entities.dungeons.dawnhold_castle.leaveText': 'Güneşli bahçe çimenliğine geri süzülüyorsun.',
+  'entities.dungeons.dawnhold_castle.enterText': "Dawnhold Şatosu'nun sıcak, çiçek kokulu salonlarına adım atıyorsun.",
+  'entities.dungeons.dawnhold_castle.name': 'Dawnhold Şatosu',
+  'hudChrome.lastkeepMap.story.tower': 'Gözetleme Kulesi',
+  'hudChrome.lastkeepMap.story.residence': 'Yaşam Katı',
+  'hudChrome.lastkeepMap.story.state': 'Tören Katı',
+  'hudChrome.lastkeepMap.story.undercroft': 'Mahzen',
+  'hudChrome.lastkeepMap.title': '{keep}: {story}',
+  'hudChrome.dawnholdMap.story.solar': 'Güneş Odası',
+  'hudChrome.dawnholdMap.story.ground': 'Bahçe Katı',
+  'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.social.chanBattleground': 'Savaş Alanı.',
   'guide.social.chanBattlegroundBody': 'Savaş alanındaki iki taraftan da tüm dövüşçülerle konuş. Yalnızca bir maç sürerken işler.',
   'hud.chat.templates.battleground': '[Savaş Alanı] {name}: {message}',
@@ -4337,7 +4353,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Zırh Gediği',
   'entities.abilities.faerie_fire.name': 'Cadı Işığı',
   'entities.abilities.fear.description':
-    'Düşmanın yüreğine korku salar ve onu 8 saniyeye kadar sinmiş bırakır. Herhangi bir hasar etkiyi bozar.',
+    'Düşmanın yüreğine korku salar ve onu 5 saniyeye kadar sinmiş bırakır. Hedefin azami sağlığının toplam %8\'i kadar hasar etkiyi bozar.',
   'entities.abilities.fear.name': 'Dehşet',
   'entities.abilities.ferocious_bite.name': 'Kanlı Isırık',
   'entities.abilities.fire_blast.description': 'Düşmanı {damage} Ateş hasarıyla patlatır. Anında.',
@@ -4614,9 +4630,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.name': 'Aykuşu Formu',
   'entities.abilities.moonkin_form.description':
     'Aykuşu formuna girer, geri dönene kadar büyü yapmayı güçlendirirsin. Normal forma dönmek için tekrar kullan. (Denge imzası)',
-  'entities.abilities.feral_charge.name': 'Yabani Hücum',
+  'entities.abilities.feral_charge.name': 'İlkel Dalga',
   'entities.abilities.feral_charge.description':
-    'Bir düşmana hücum eder ve onu 1 sn köklersin. 8-25 m menzil. (Yabanilik imzası)',
+    'İlkel bir dalga salar. Kurt Formunda Enerji yenilenmesi 10 sn boyunca %100 artar. Bruin Formunda anında 50 Öfke üretir. (Yabanilik imzası)',
   'entities.abilities.swiftmend.name': 'Hızlı İyileştirme',
   'entities.abilities.crusader_strike.name': 'Haçlı Darbesi',
   'entities.abilities.crusader_strike.description':
@@ -9321,6 +9337,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'sim.delve.unknownTier': 'Bilinmeyen delve kademesi.',
   'sim.delve.wayOutNotOpen': 'Çıkış yolu henüz açık değil.',
   'sim.delve.whileTrading': 'Takas yaparken delveye giremezsin.',
+  'sim.delve.enemiesRemain': 'Önce kalan düşmanları temizle.',
   'sim.lockpick.alreadyInProgress': 'Birisi kilidi zaten kurcalıyor.',
   'sim.lockpick.cannotPickThat': 'Onun kilidini açamazsın.',
   'sim.lockpick.chooseAnte': '1, 2 veya 3 maymuncuk seç.',
@@ -10869,7 +10886,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deterrence.description':
     'Kaçınma şansını 10 sn. boyunca 50 yüzde puan artırır. (Avcı yeteneği)',
   'entities.abilities.earthbind.description': 'Hedef noktanın 4 m çevresindeki düşmanları 2 sn kökler, ardından 6 sn boyunca %40 yavaşlatır. (Şaman yeteneği)',
-  'entities.abilities.evocation.description': 'Restaura manayı rápidamente. (büyücü yeteneği)',
+  'entities.abilities.evocation.description':
+    '6 sn kanalize eder: her saniye 100 mana yeniler ve 8 Büyü Gücü biriktirir. Bonus kanalize ederken birikir ve 15 sn sürer. (büyücü yeteneği)',
   'entities.abilities.frenzied_regeneration.description':
     '10 sn. boyunca azami sağlığının %40 kadarını yeniler. Yalnızca Ayı Formunda kullanılabilir. (Druid yeteneği)',
   'entities.abilities.frost_trap.description':
@@ -10878,9 +10896,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Bir müttefik hedefe 12 sn. boyunca 120 sağlık yeniler. (Şaman yeteneği)',
   'entities.abilities.howl_of_terror.description':
-    'Yakındaki düşmanları 3 sn. kadar korkutur. Hasar etkiyi bozabilir. (Karabüyücü yeteneği)',
+    'Yakındaki düşmanları 5 sn. kadar korkutur. Hedefin azami sağlığının toplam %8\'i kadar hasar korkusunu bozar. (Karabüyücü yeteneği)',
   'entities.abilities.ice_block.description':
-    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sn. (büyücü yeteneği)',
+    'Seni 8 sn boyunca katı buzun içine hapseder ve tüm hasara karşı bağışıklık kazandırır. Mevcut sıradan zararlı etkileri kaldırır ve yeni sıradan kontrol etkilerinin uygulanmasını engeller. Sersemlemiş veya polimorfa uğramışken kullanılabilir. Hapsedilmişken eylemde bulunamazsın. İptal etmek için tekrar kullan. (büyücü)',
   'entities.abilities.inner_focus.description': 'Bir sonraki rahip büyünü bedava ve kesintiye uğratılamaz kılar. 60 sn sürer.',
   'entities.abilities.innervate.description':
     'Canlı özsu 10 sn. boyunca içinde kabarır ve mevcut kaynağından dalgalar halinde 20 yeniler: mana, öfke veya enerji. Form değiştirmek bunu bozmaz. Uyku, sersemletme veya durağanlık özsuyu durdurur. (Druid yeteneği)',
@@ -10896,7 +10914,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.preparation.description':
     'Sprint, Kaçınma ve Kaybolmanın bekleme süresini bitirir. (Haydut yeteneği)',
   'entities.abilities.presence_of_mind.description':
-    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sn. (büyücü yeteneği)',
+    'Büyü yapma süresi olan bir sonraki büyünü anında kullanılır hâle getirir. 60 sn sürer. (büyücü yeteneği)',
   'entities.abilities.psychic_scream.description': '8 m içindeki düşmanları en fazla 4 sn korkutur. Hasar etkiyi bozabilir.',
   'entities.abilities.shadowstep.description':
     'Gölgelerin içinden hedefine doğru adım atarsın. (Haydut yeteneği)',
@@ -12703,7 +12721,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonfire.specNote_balance': 'Yanmaya devam ettir: Ay Tohumu süresini 6 sn uzatır.',
   'entities.abilities.needle_of_fate.description': 'Düşmanı {damage} Gölge hasarıyla deler ve üzerinde Kem Gözün varsa 5 Mahkûmiyet üretir. Birincil Kem Gözüne isabet eden her vuruş 12 sn süren bir Kader İpliği ekler, en fazla 3. Hiç Kem Göz yoksa, İğne önce hedefini işaretler.',
   'entities.abilities.needle_of_fate.name': 'Kader İğnesi',
-  'entities.abilities.ossuary_mark.description': 'Bir düşmanı 12 sn süreyle işaretler, senin ve ölülerinin verdiği hasarın %20\'sini depolar. Patlatmak için yeniden oku. İşaretli düşman ölürse, 6 yarda içinde patlar ve 1 Ruh Parçası oluşturur.',
+  'entities.abilities.ossuary_mark.description': 'Bir düşmanı 15 sn süreyle işaretler, senin ve ölülerinin verdiği hasarın %20\'sini depolar. Patlatmak için yeniden oku. İşaretli düşman ölürse, 6 yarda içinde patlar ve 1 Ruh Parçası oluşturur.',
   'entities.abilities.ossuary_mark.name': 'Kemik Damgası',
   'entities.abilities.possess_evil_eye.description': 'Lanetkâr, birincil Kem Gözünü 15 sn boyunca ele geçirir ve 35 Mahkûmiyet üretir. Kader İğnesi 1 sn\'de okunur ve 2 ekstra Mahkûmiyet üretir, Tüketme hareket halindeyken kanalize edilebilir, Hüküm ise %25 daha fazla hasar verir ve %60 hasarla gecikmeli bir yankı salar, bu oran seviye 17-20 arasında %30\'a geriler.',
   'entities.abilities.possess_evil_eye.name': 'Kem Gözü Ele Geçir',

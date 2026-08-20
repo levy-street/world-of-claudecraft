@@ -11737,6 +11737,7 @@ const RULES: Rule[] = [
     build: () => t('sim.delve.cannotAffordCompanionUpgrade'),
   },
   { re: /^The passage is sealed\.$/, build: () => t('sim.delve.passageSealed') },
+  { re: /^Clear the remaining enemies first\.$/, build: () => t('sim.delve.enemiesRemain') },
   { re: /^Move closer to the passage\.$/, build: () => t('sim.delve.moveCloserPassage') },
   { re: /^Move closer to the chest\.$/, build: () => t('sim.delve.moveCloserChest') },
   { re: /^Move closer to the reliquary\.$/, build: () => t('sim.delve.moveCloserReliquary') },

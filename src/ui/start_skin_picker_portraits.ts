@@ -22,6 +22,10 @@ export function refreshStartSkinPickerPortraits(
   skin: number,
   portraitUrl: StartSkinPortraitUrl,
 ): void {
+  // A composed update reports COMPOSED_PORTRAIT_SKIN (-1) for a body no skin
+  // swatch shows, and its visual key still starts with `player_`. Asking the
+  // getter for it would kick a capture of a visual that does not exist.
+  if (skin < 0) return;
   if (!visualKey.startsWith('player_')) return;
   const cls = visualKey.slice('player_'.length) as PlayerClass;
   const url = portraitUrl(cls, skin);

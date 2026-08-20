@@ -18,8 +18,8 @@ const ASSET_PATH = path.join(REPO_ROOT, 'public/models/mounts/terrorspark_ground
 // shipped KTX2 GLB so the pin stays honest about size as well as content.
 const SHIPPING_BUDGET = 1200 * 1024;
 const EXPECTED_SOURCE_FINGERPRINT =
-  '965c3709cd306fc5d7e6b4e9e78f9f72755f4ed1f37128b5984b51c531bc0a7b';
-const EXPECTED_ASSET_SHA256 = '2f42879b885debe52bf72bfeb77a3469eb29f5b546ec979e91a6938db0bd603b';
+  'dd1c362c29122eabee73cf5980aa8b21ead71609831fd13c7e9b253b29215b49';
+const EXPECTED_ASSET_SHA256 = 'da13686b8f8b72f2a8afb988c08c48ffd9afef41dc0756eeb8fa16b5afad1f66';
 /** Midtone the ORM map's roughness and metalness channels encode; the material
  *  factors divide the authored target by it. */
 const ORM_CENTER = 230 / 255;

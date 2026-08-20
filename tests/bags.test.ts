@@ -12,6 +12,7 @@ import {
   consumeOneScratch,
   countFit,
   fitsAll,
+  instancedCountCap,
   migrationBagsFor,
   stackSizeOf,
 } from '../src/sim/bags';
@@ -149,6 +150,13 @@ describe('stack sizes and stacking math', () => {
     addStacked(inv, 'baked_bread', 2, charged);
     expect(inv).toHaveLength(3);
     for (const s of inv) expect(s.count).toBe(1);
+  });
+
+  it('load cap allows locked counted stacks while charges remain one-per-slot', () => {
+    expect(instancedCountCap(ITEMS.wolf_fang, { locked: true })).toBe(20);
+    expect(instancedCountCap(ITEMS.wolf_fang, { signer: 'Ana', locked: true })).toBe(20);
+    expect(instancedCountCap(ITEMS.wolf_fang, { locked: true, charges: { zap: 2 } })).toBe(1);
+    expect(instancedCountCap(undefined, { locked: true })).toBe(Number.POSITIVE_INFINITY);
   });
 
   it('fresh instanced slots each carry their own deep clone of the payload', () => {

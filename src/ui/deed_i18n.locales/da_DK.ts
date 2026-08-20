@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  exp_dawnhold_castle: {
+    name: 'En Åben Dør i Haven',
+    desc: 'Besøg Dawnhold Slot og vandr gennem dets solbeskinnede havesale.',
+  },
+  exp_the_last_keep: {
+    name: 'De Stille Sale',
+    desc: 'Træd ind ad Den Sidste Borgs døre og gå gennem dens tavse sale.',
+  },
   pvp_bg_first_capture: {
     name: 'Banner i Hånden',
     desc: 'Erobr et flag i Tornehulemarkerne.',

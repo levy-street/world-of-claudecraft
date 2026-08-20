@@ -248,7 +248,23 @@ jobs:
           key: playwright-chromium-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
 
       - name: Install Chromium
-        run: npx playwright install --with-deps chromium
+        # Same split as ci.yml's browser-gate step: the browser install fails
+        # hard, the package-manager OS-dep half is bounded and best-effort
+        # because the runner image already ships Chromium's system libraries
+        # and a stalled mirror was killing whole runs (2026-08-19 queue
+        # rejections). A genuinely missing library still fails at browser
+        # launch below.
+        run: |
+          npx playwright install chromium
+          if ! timeout -k 15 100 npx playwright install-deps chromium; then
+            echo "install-deps unavailable (exit $?); verifying CJK font coverage directly"
+            if ! fc-list :lang=ja | grep -q .; then
+              sudo sed -i 's|azure.archive.ubuntu.com|archive.ubuntu.com|g' /etc/apt/sources.list.d/ubuntu.sources /etc/apt/sources.list 2>/dev/null || true
+              timeout -k 15 60 sudo apt-get update || true
+              timeout -k 15 90 sudo apt-get install -y --no-install-recommends fonts-noto-cjk || true
+            fi
+            fc-list :lang=ja | grep -q . || { echo "no CJK font coverage by any route; the browser suite cannot pass without it"; exit 1; }
+          fi
 
       - name: Run browser regressions
         run: npm run test:browser

@@ -39,6 +39,19 @@ function devicePixels(value: number): number {
   return Number.isFinite(value) ? Math.max(1, Math.floor(value)) : 1;
 }
 
+/** The scale a fresh render-scale setting opens at: a mobile runtime starts
+ *  below full scale unless the URL forces one of the desktop tiers. */
+export function initialEffectiveRenderScale(
+  scale: number,
+  mobileRuntime: boolean,
+  forcedTier: string | null,
+): number {
+  if (mobileRuntime && forcedTier !== 'high' && forcedTier !== 'ultra' && forcedTier !== 'insane') {
+    return Math.min(scale, 0.85);
+  }
+  return scale;
+}
+
 export function dynamicResolutionAllocationScale(
   supported: boolean,
   manualRenderScale: number,

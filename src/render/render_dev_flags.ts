@@ -12,6 +12,10 @@
 //   bladegrass  - the near-field blade-grass carpet
 //   canopy      - the canopy clump-detail layer
 //   n8ao        - the N8AO ambient-occlusion pass
+//   smaa        - the tail SMAA pass (high and above)
+//   fxaa        - the FXAA arm fused into the output grade pass (the
+//                 grade-only chain's edge AA); off leaves the grade otherwise
+//                 untouched, so it prices the extra taps on their own
 //   tmicroshadow - the terrain micro sun-shadow taps (ultra+)
 //   zonehaze    - the per-zone aerial haze field (biome_haze_field)
 //   nightlights - the night light field (night_light_field); off falls back
@@ -21,6 +25,18 @@
 //   farvista    - the whole coarse far-vista terrain layer (far_terrain); off
 //                 is the A/B that says whether a suspect distant surface is
 //                 this layer or the real splat terrain underneath it
+
+// Beside the ?<name>=off layer switches, one MODE flag with its own accessor:
+//   ?prep=legacy - restores the pre-scheduler queue ADMISSION only: every unit
+//                  is admitted as its turn comes and the ledger keeps learning.
+//                  It does NOT revert the reveal-gate policy (piecewise reveal,
+//                  soft deadline), which has no legacy arm. It is the rollout
+//                  kill switch for pacing: if the budget regresses on a machine,
+//                  ?prep=legacy is the A/B that says so without a rebuild, and
+//                  the same flag is what a rollback ships as the default.
+
+/** Which GPU-preparation behaviour this session runs. */
+export type GpuPrepMode = 'adaptive' | 'legacy';
 
 const disabled = ((): ReadonlySet<string> => {
   const set = new Set<string>();
@@ -35,4 +51,14 @@ const disabled = ((): ReadonlySet<string> => {
 /** True when the named render layer is disabled via `?<name>=off` (dev only). */
 export function renderLayerDisabled(name: string): boolean {
   return disabled.has(name);
+}
+
+const gpuPrep = ((): GpuPrepMode => {
+  if (typeof location === 'undefined') return 'adaptive';
+  return new URLSearchParams(location.search).get('prep') === 'legacy' ? 'legacy' : 'adaptive';
+})();
+
+/** The session's GPU-preparation mode: 'legacy' only under `?prep=legacy`. */
+export function gpuPrepMode(): GpuPrepMode {
+  return gpuPrep;
 }

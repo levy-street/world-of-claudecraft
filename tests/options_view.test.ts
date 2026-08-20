@@ -441,10 +441,12 @@ describe('options_view: audio dispatch matrix (cluster 4)', () => {
 // Cluster 5: controller + the remaining interface toggles
 // ---------------------------------------------------------------------------
 describe('options_view: controller dispatch matrix (cluster 5)', () => {
-  it('lists the enable/invert toggles then the three controller sliders', () => {
+  it('lists the enable, cross hotbar and invert toggles then the three sliders', () => {
     const controls = buildControllerControls(makeSource());
     expect(keysOf(controls)).toEqual([
       'gamepadEnabled',
+      'gamepadCrossHotbar',
+      'gamepadCrossHotbarExpand',
       'gamepadInvertY',
       'gamepadStickDeadzone',
       'gamepadCameraSpeed',
@@ -469,6 +471,8 @@ describe('options_view: optionsControlKeys (issue 2341 scoped reset)', () => {
     const controls = buildControllerControls(makeSource());
     expect(optionsControlKeys(controls)).toEqual([
       'gamepadEnabled',
+      'gamepadCrossHotbar',
+      'gamepadCrossHotbarExpand',
       'gamepadInvertY',
       'gamepadStickDeadzone',
       'gamepadCameraSpeed',

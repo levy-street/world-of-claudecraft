@@ -13,6 +13,22 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formsAutoUnshift': 'Una sanación o un hechizo de daño lanzado en forma te saca de ella por ti. Salir de una forma así es gratis y no gasta tu tiempo de reutilización global, de modo que un hechizo instantáneo sale en el momento en que lo pulsas. Volver a la forma es una habilidad normal y sigue costando maná y tu tiempo de reutilización global.',
+  'entities.mobs.heroic_boss_dummy.name': 'Muñeco de jefe heroico',
+  'entities.mobs.normal_boss_dummy.name': 'Muñeco de jefe normal',
+  'entities.mobs.friendly_player_dummy.name': 'Muñeco de jugador aliado',
+  'entities.items.dawnhold_posy.name': 'Ramillete del jardín de Dawnhold',
+  'entities.dungeons.dawnhold_castle.leaveText': 'Vuelves a salir al soleado césped del jardín.',
+  'entities.dungeons.dawnhold_castle.enterText': 'Entras en los cálidos salones del Castillo Dawnhold, perfumados de flores.',
+  'entities.dungeons.dawnhold_castle.name': 'Castillo Dawnhold',
+  'hudChrome.lastkeepMap.story.tower': 'La atalaya',
+  'hudChrome.lastkeepMap.story.residence': 'La residencia',
+  'hudChrome.lastkeepMap.story.state': 'La planta noble',
+  'hudChrome.lastkeepMap.story.undercroft': 'Los sótanos',
+  'hudChrome.lastkeepMap.title': '{keep}: {story}',
+  'hudChrome.dawnholdMap.story.solar': 'La solana',
+  'hudChrome.dawnholdMap.story.ground': 'La planta del jardín',
+  'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.social.chanBattleground': 'Campo de batalla.',
   'guide.social.chanBattlegroundBody': 'Habla con todos los combatientes de tu campo de batalla, de ambos bandos. Solo mientras hay una partida en curso.',
   'hud.chat.templates.battleground': '[Campo de batalla] {name}: {message}',
@@ -5927,7 +5943,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.drain_life.description': 'Consume la vitalidad del objetivo, infligiendo {damage} de daño de Sombra cada segundo y transfiriéndote un 70% como salud. Aflicción transfiere en cambio la totalidad. Cuando se canaliza sobre tu Mal de ojo principal, consume todos los Hilos del destino al comenzar, y cada Hilo genera 1 de Condena adicional por pulso.',
   'entities.abilities.fear.name': 'Espanto',
   'entities.abilities.fear.description':
-    'Siembra terror en el enemigo y lo deja encogido durante hasta 8 s. Cualquier daño rompe el efecto.',
+    'Siembra terror en el enemigo y lo deja encogido durante hasta 5 s. El daño acumulado equivalente al 8% de la salud máxima del objetivo rompe el efecto.',
   'entities.abilities.searing_pain.name': 'Abrasar',
   'entities.abilities.searing_pain.description':
     'Abrasa al enemigo con fuego agonizante por {damage} de daño de Fuego. Lanzamiento rápido.',
@@ -6077,9 +6093,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.name': 'Forma de lechúcico lunar',
   'entities.abilities.moonkin_form.description':
     'Adopta Forma de lechúcico lunar, potenciando el lanzamiento de hechizos hasta que vuelvas a cambiar. Lánzalo otra vez para volver a la forma normal. (habilidad distintiva de Equilibrio)',
-  'entities.abilities.feral_charge.name': 'Carga feral',
+  'entities.abilities.feral_charge.name': 'Oleada primigenia',
   'entities.abilities.feral_charge.description':
-    'Carga contra un enemigo y lo enraíza durante 1 s. Alcance de 8-25 m. (habilidad distintiva de Feral)',
+    'Desata una oleada primigenia. En Forma de lobo, aumenta la regeneración de energía un 100% durante 10 s. En Forma de Bruin, genera 50 p. de ira al instante. (habilidad distintiva de Feral)',
   'entities.abilities.swiftmend.name': 'Alivio presto',
   'entities.abilities.crusader_strike.name': 'Golpe de cruzado',
   'entities.abilities.crusader_strike.description':
@@ -9084,6 +9100,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'worldContent.delveSurfaceExitInteract': 'Pulsa F para trepar',
   'sim.delve.objectiveClearRoom': 'Despeja la sala.',
   'sim.delve.objectiveDefeatBoss': 'Derrota al jefe.',
+  'sim.delve.enemiesRemain': 'Elimina primero a los enemigos restantes.',
   'sim.rift.allUnstable':
     'Todas las brechas están inestables en este momento. Vuelve a intentarlo pronto.',
   'sim.rift.alreadyCleared': 'Esta brecha ya ha sido despejada por {names}.',
@@ -11427,7 +11444,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Aumenta tu probabilidad de esquivar en 50 puntos porcentuales durante 10 s. (talento de Cazador)',
   'entities.abilities.earthbind.description': 'Inmoviliza a los enemigos en 4 m alrededor del punto objetivo durante 2 s, y luego los ralentiza un 40% durante 6 s. (Talento de chamán)',
   'entities.abilities.evocation.description':
-    'Canaliza durante 6 s: cada segundo restaura 40 de maná y acumula 8 de poder con hechizos mientras canalizas. (talento de mago)',
+    'Canaliza durante 6 s: cada segundo restaura 100 de maná y acumula 8 de poder con hechizos. La bonificación se acumula mientras canalizas y dura 15 s. (talento de mago)',
   'entities.abilities.frenzied_regeneration.description':
     'Restaura un 40% de tu salud máxima durante 10 s. Solo en Forma de Oso. (talento de Druida)',
   'entities.abilities.frost_trap.description':
@@ -11436,9 +11453,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Restaura 120 de salud a un objetivo aliado durante 12 s. (talento de Chamán)',
   'entities.abilities.howl_of_terror.description':
-    'Aterroriza a los enemigos cercanos hasta 3 s. El daño puede romper el efecto. (talento de Brujo)',
+    'Aterroriza a los enemigos cercanos hasta 5 s. El daño acumulado equivalente al 8% de la salud máxima de un objetivo rompe su miedo. (talento de Brujo)',
   'entities.abilities.ice_block.description':
-    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talento de mago)',
+    'Te encierra en hielo sólido durante 8 s, haciéndote inmune a todo el daño. Elimina los efectos perjudiciales comunes ya activos e impide que se apliquen nuevos efectos de control comunes. Se puede usar mientras estás aturdido o transformado. No puedes actuar mientras estás encerrado. Vuelve a lanzarlo para cancelar. (mago)',
   'entities.abilities.inner_focus.description': 'Hace que tu próximo hechizo de sacerdote sea gratuito e ininterrumpible. Dura 60 s.',
   'entities.abilities.innervate.description':
     'La savia viva brota en ti durante 10 s y restaura en oleadas 20 de tu recurso actual: maná, ira o energía. Cambiar de forma no la interrumpe. El sueño, el aturdimiento o la estasis detienen la savia. (talento de Druida)',
@@ -13075,7 +13092,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Quema al enemigo con fuego lunar, infligiendo {damage} de daño Arcano más daño con el tiempo.',
   'entities.abilities.moonfire.specNote_balance': 'Mantenlo ardiendo: Semilla Lunar lo extiende 6 s.',
   'entities.abilities.ossuary_mark.description':
-    'Marca a un enemigo durante 12 s y almacena un 20% del daño infligido por ti y tus no-muertos. Vuelve a lanzarla para detonarla. Si el enemigo marcado muere, explota en un radio de 6 m y crea 1 fragmento de alma.',
+    'Marca a un enemigo durante 15 s y almacena un 20% del daño infligido por ti y tus no-muertos. Vuelve a lanzarla para detonarla. Si el enemigo marcado muere, explota en un radio de 6 yardas y crea 1 fragmento de alma.',
   'entities.abilities.ossuary_mark.name': 'Marca del Osario',
   'entities.abilities.rake.description':
     'Desuella al enemigo por daño de arma más {damage} y causa daño de sangrado durante 18 s. Otorga 1 punto de combo. Solo en Forma de lobo.',

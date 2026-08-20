@@ -49,6 +49,11 @@ export interface ChunkedTextureUploadOptions {
  * single-upload arm remains for hosts or stubs without it, where beforeChunk
  * still paces the start and uploadChunk lets the renderer serialize that
  * indivisible call with other WebGL work.
+ *
+ * A CompressedTexture (the biome sky domes) takes that same single-upload arm:
+ * there is no row-addressable pixel buffer to range over. It needs one far
+ * less, since the block payload it uploads is an eighth of the half-float RGBA
+ * the same image cost as a DataTexture.
  */
 export async function uploadDataTextureInChunks(
   target: TextureUploadTarget,

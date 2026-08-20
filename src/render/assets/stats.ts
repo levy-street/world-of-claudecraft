@@ -15,7 +15,9 @@ export interface AssetTimingSnapshot {
     complete: boolean;
   };
   byType: Record<string, AssetTimingSummary>;
-  files: { type: string; url: string; ms: number; bytes: number }[];
+  /** `at` is the load's start on the page clock, so a capture can line a
+   *  parse up against the long task it may own. */
+  files: { type: string; url: string; ms: number; bytes: number; at: number }[];
 }
 
 interface AssetSample {
@@ -24,6 +26,7 @@ interface AssetSample {
   ms: number;
   bytes: number;
   failed: boolean;
+  at: number;
 }
 
 const samples: AssetSample[] = [];
@@ -49,7 +52,8 @@ function shortUrl(url: string): string {
 }
 
 function resourceBytes(url: string): number {
-  if (typeof performance === 'undefined' || typeof performance.getEntriesByName !== 'function') return 0;
+  if (typeof performance === 'undefined' || typeof performance.getEntriesByName !== 'function')
+    return 0;
   const entries = performance.getEntriesByName(url) as PerformanceResourceTiming[];
   const r = entries[entries.length - 1];
   return Math.max(0, Number(r?.transferSize || r?.encodedBodySize || 0));
@@ -59,9 +63,21 @@ export function assetLoadStarted(): number {
   return now();
 }
 
-export function recordAssetLoad(type: string, url: string, startedAt: number, failed = false): void {
+export function recordAssetLoad(
+  type: string,
+  url: string,
+  startedAt: number,
+  failed = false,
+): void {
   const ms = Math.max(0, now() - startedAt);
-  samples.push({ type, url: shortUrl(url), ms, bytes: failed ? 0 : resourceBytes(url), failed });
+  samples.push({
+    type,
+    url: shortUrl(url),
+    ms,
+    bytes: failed ? 0 : resourceBytes(url),
+    failed,
+    at: startedAt,
+  });
 }
 
 export function recordPreloadWait(tasks: number, startedAt: number, complete: boolean): void {
@@ -107,7 +123,7 @@ export function assetTimingSnapshot(): AssetTimingSnapshot {
     byType,
     files: samples
       .filter((s) => !s.failed)
-      .map((s) => ({ type: s.type, url: s.url, ms: round(s.ms), bytes: s.bytes })),
+      .map((s) => ({ type: s.type, url: s.url, ms: round(s.ms), bytes: s.bytes, at: round(s.at) })),
   };
 }
 

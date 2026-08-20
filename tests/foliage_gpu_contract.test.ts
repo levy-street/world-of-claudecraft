@@ -21,9 +21,18 @@ describe('foliage GPU optimization production wiring', () => {
   it('packs cap flags and keeps cap and no-cap shader programs distinct', () => {
     expect(foliage).toContain('new Uint8Array(g.getAttribute');
     expect(foliage).toContain("g.setAttribute('aCap', new THREE.Uint8BufferAttribute(arr, 1));");
+    // The key is composed by the core the boot prewarm enumerates its arms
+    // from (grass_cap_collapse_core.ts), so the twin set and the live material
+    // cannot drift apart.
     expect(foliage).toContain(
-      'mat.customProgramCacheKey = () => `grass-card|cap:${capProgramKey}|${baseProgramKey}`;',
+      'const cacheKey = grassCardProgramCacheKey(capBand, baseProgramKey);',
     );
+    expect(foliage).toContain('mat.customProgramCacheKey = () => cacheKey;');
+    const core = readFileSync(
+      new URL('../src/render/grass_cap_collapse_core.ts', import.meta.url),
+      'utf8',
+    );
+    expect(core).toContain('return `grass-card|cap:${grassCardCapKey(band)}|${baseProgramKey}`;');
     expect(foliage).toContain(
       'const capCollapseBand = grassCapCollapseBand(GFX.bladeCarpetRadius);',
     );

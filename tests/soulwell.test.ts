@@ -93,6 +93,7 @@ describe('Warlock Soulwell', () => {
     expect(first).toHaveLength(1);
     expect(first[0].soulwell).toEqual({
       ownerId,
+      partyId: 1,
       eligiblePlayerIds: [ownerId, allyId],
       wardAbsorbPctMax: 0,
       wardedPlayerIds: [],
@@ -130,6 +131,35 @@ describe('Warlock Soulwell', () => {
     // A nearby player outside the owner's group cannot take any.
     expect(sim.pickUpObject(well.id, strangerId)).toBe(true);
     expect(sim.countItem(SOUL_STONE_ITEM_ID, strangerId)).toBe(0);
+  });
+
+  it('lets a player who joins the group after summoning use the active well', () => {
+    const { sim, owner, ownerId, strangerId } = world();
+    const well = summon(sim, owner);
+
+    sim.partyInvite(strangerId, ownerId);
+    sim.partyAccept(strangerId);
+
+    expect(well.soulwell?.eligiblePlayerIds).toContain(strangerId);
+    expect(sim.pickUpObject(well.id, strangerId)).toBe(true);
+    expect(sim.countItem(SOUL_STONE_ITEM_ID, strangerId)).toBe(3);
+  });
+
+  it('keeps a late joiner eligible after the owner disconnects', () => {
+    const { sim, owner, ownerId, strangerId } = world();
+    const outsiderId = sim.addPlayer('mage', 'Outsider');
+    const well = summon(sim, owner);
+
+    sim.partyInvite(strangerId, ownerId);
+    sim.partyAccept(strangerId);
+    sim.removePlayer(ownerId);
+
+    expect(sim.entities.has(well.id)).toBe(true);
+    expect(sim.pickUpObject(well.id, strangerId)).toBe(true);
+    expect(sim.countItem(SOUL_STONE_ITEM_ID, strangerId)).toBe(3);
+
+    expect(sim.pickUpObject(well.id, outsiderId)).toBe(true);
+    expect(sim.countItem(SOUL_STONE_ITEM_ID, outsiderId)).toBe(0);
   });
 
   it('keeps the summoned group roster eligible after the owner disconnects', () => {

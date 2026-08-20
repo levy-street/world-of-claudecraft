@@ -58,14 +58,17 @@ export const SALVAGE_MATERIAL_BY_QUALITY: Readonly<Record<string, string>> = {
   legendary: 'spider_leg',
 };
 
-/** Eligible for salvage: an equippable weapon or armor piece, at least
- *  `common` quality (a `poor`/undefined-quality piece has nothing worth
- *  reclaiming). Ineligible items (consumables, quest items, poor-quality
- *  junk, unknown ids) are never salvageable. */
+/** Eligible for salvage: an equippable weapon, armor, or held-offhand piece,
+ *  at least `common` quality (a `poor`/undefined-quality piece has nothing
+ *  worth reclaiming). A held offhand is equipment exactly like a weapon or
+ *  armor piece (it carries quality and requiredClass), so a copy the
+ *  player's class cannot wield is never stuck with no way to recover value
+ *  from it. Ineligible items (consumables, quest items, poor-quality junk,
+ *  unknown ids) are never salvageable. */
 export function isSalvageable(def: ItemDef | undefined): boolean {
   return (
     !!def &&
-    (def.kind === 'weapon' || def.kind === 'armor') &&
+    (def.kind === 'weapon' || def.kind === 'armor' || def.kind === 'held_offhand') &&
     !!def.quality &&
     def.quality !== 'poor'
   );

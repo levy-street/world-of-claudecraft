@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import type { PlayerClass } from '../../sim/types';
 import { assetsReady } from '../assets/preload';
 import { trackWebGLContext } from '../context_release';
+import { gpuPrepNow } from '../gpu_prep_events';
+import { shaderDebugRequested } from '../shader_debug_flag';
 import {
   collectPrewarmTextures,
   uploadTexturesInSlices,
@@ -10,6 +12,7 @@ import {
 import { ensureSkinTexture } from './assets';
 import { VISUALS } from './manifest';
 import { type ModularLook, modularSignature } from './modular';
+import { createPortraitCaptureLane } from './portrait_capture_lane_core';
 import { type PortraitFraming, portraitFrameParams } from './portrait_framing';
 import { runPortraitPrewarm } from './portrait_prewarm_core';
 import { CharacterVisual } from './visual';
@@ -67,8 +70,10 @@ let rig: PortraitRig | null = null;
 let unregisterContext: (() => void) | null = null;
 
 const cache = new Map<string, string>();
+// One capture per (visual, skin, framing) at a time; see requestLiveCapture.
+const liveCaptures = createPortraitCaptureLane();
 const readyListeners = new Set<() => void>();
-const updateListeners = new Set<(visualKey: string, skin: number) => void>();
+const updateListeners = new Set<(visualKey: string, skin: number, key?: string) => void>();
 const pendingAtlases = new Map<string, Promise<void>>();
 let assetsAreReady = false;
 void assetsReady()
@@ -109,6 +114,7 @@ function ensureRig(): PortraitRig {
     antialias: true,
     preserveDrawingBuffer: true,
   });
+  newRenderer.debug.checkShaderErrors = shaderDebugRequested();
   newRenderer.setPixelRatio(1);
   newRenderer.setSize(PORTRAIT_SIZE, PORTRAIT_SIZE, false);
   newRenderer.shadowMap.enabled = false;
@@ -138,9 +144,11 @@ function ensureRig(): PortraitRig {
 }
 
 /**
- * A transparent-PNG headshot for a (class, skin), or null if the character
- * GLBs are not preloaded yet. Cached after the first render. Callers should
- * fall back to a class crest while null and upgrade via {@link onPortraitsReady}.
+ * A transparent-PNG headshot for a (class, skin), or null while one is not
+ * cached yet (assets still preloading, atlas still streaming, or the capture
+ * still running). Never blocks the calling frame: a miss kicks the async
+ * capture. Callers fall back to a class crest while null and upgrade via
+ * {@link onPortraitsReady} / {@link onPortraitUpdate}.
  */
 export function playerPortraitDataUrl(
   cls: PlayerClass,
@@ -167,7 +175,53 @@ export function visualPortraitDataUrl(
 
   if (trackSkinAtlasPending(visualKey, skin)) return null;
 
-  return capture(key, visualKey, () => new CharacterVisual(visualKey, 0xffffff, skin), framing);
+  requestLiveCapture(key, visualKey, skin, framing);
+  return null;
+}
+
+/** Fill a live cache miss OFF the calling frame. Captured on the asking frame,
+ *  a portrait ends in a canvas readback plus PNG encode on top of the first-use
+ *  atlas uploads: 43 to 201 ms measured per cold portrait, paid by the very
+ *  frame that acquires a player target and writes its HP bar, level and
+ *  resource. Every live consumer already draws the class crest while this
+ *  returns null (portrait_chip's crest, UnitPortraitPainter's procedural
+ *  crest) and upgrades on the update listeners fired here, so the answer is
+ *  null now and the real headshot a few frames later. Deduped by cache key:
+ *  twenty same-class players in a crowd trigger ONE capture. */
+function requestLiveCapture(
+  key: string,
+  visualKey: string,
+  skin: number,
+  framing: PortraitFraming,
+): void {
+  liveCaptures.request(key, gpuPrepNow(), async () => {
+    await prewarmVisualPortrait(visualKey, skin, framing);
+    // A capture that linked nothing (encode failure, graphics rebuild) commits
+    // nothing: leave the consumers on their crest rather than repaint them,
+    // and report the miss so the lane backs this key off. Without that, a key
+    // that can never cache is re-kicked by the next frame's ask and loops its
+    // whole capture forever.
+    if (!cache.has(key)) return false;
+    for (const cb of updateListeners) cb(visualKey, skin);
+    return true;
+  });
+}
+
+/**
+ * The cached headshot for a (visual, skin, framing), or null. A PEEK: unlike
+ * the getters above it never kicks a capture on a miss, because its caller is
+ * the preview's cold-open stand-in (src/ui/preview_stand_in.ts), which resolves
+ * it at the exact moment the sheet's own context is linking. Starting a
+ * second-context capture there would put a 43 to 201 ms build, upload and
+ * encode on the frame that carries the click, which is the block the gate
+ * exists to remove.
+ */
+export function cachedPortraitDataUrl(
+  visualKey: string,
+  skin = 0,
+  framing: PortraitFraming = 'headshot',
+): string | null {
+  return cache.get(`${visualKey}:${skin}:${framing}`) ?? null;
 }
 
 /** Tight-memory iOS hosts defer the boot skin-atlas sweep (assets.ts), so a
@@ -196,10 +250,11 @@ function trackSkinAtlasPending(visualKey: string, skin: number): boolean {
 
 /** Snapshot-encode the portrait canvas to a PNG data URL off the main thread.
  *  toBlob captures the bitmap AT CALL TIME, so a later render into the shared
- *  rig cannot bleed into this capture; the encode itself runs async (the sync
- *  toDataURL path blocks on GPU readback plus PNG encode). Resolves null on an
- *  encode failure (including a synchronous toBlob throw, which must not become
- *  an unhandled rejection); the caller falls back to the lazy sync path. */
+ *  rig cannot bleed into this capture; the encode itself runs async (a
+ *  toDataURL here would block on GPU readback plus PNG encode instead).
+ *  Resolves null on an encode failure (including a synchronous toBlob throw,
+ *  which must not become an unhandled rejection); the capture then commits
+ *  nothing and its key backs off in the lane. */
 function encodePortraitPng(canvas: HTMLCanvasElement): Promise<string | null> {
   return new Promise((resolve) => {
     try {
@@ -222,33 +277,88 @@ function encodePortraitPng(canvas: HTMLCanvasElement): Promise<string | null> {
 /**
  * Warm one (class, skin, framing) portrait cache entry with every heavy step
  * bounded or off-thread: texture uploads prepaid in budgeted slices, then one
- * render, then an async PNG encode. The post-entry paced lane calls this so a
- * later synchronous {@link playerPortraitDataUrl} is a cache hit; live callers
- * keep the sync path (43 to 201 ms measured per cold portrait in production,
- * dominated by first-use atlas uploads plus the toDataURL readback/encode).
+ * render, then an async PNG encode. The post-entry paced lane calls this ahead
+ * of time so {@link playerPortraitDataUrl} is a cache hit; a live miss kicks
+ * the SAME path through the capture lane rather than blocking its frame (43 to
+ * 201 ms measured per cold portrait in production, dominated by first-use
+ * atlas uploads plus the readback and encode).
  */
-export async function prewarmPlayerPortrait(
+export function prewarmPlayerPortrait(
   cls: PlayerClass,
   skin = 0,
   framing: PortraitFraming = 'headshot',
 ): Promise<void> {
-  const visualKey = `player_${cls}`;
+  return prewarmVisualPortrait(`player_${cls}`, skin, framing);
+}
+
+/** {@link prewarmPlayerPortrait} for any visual key (`player_mech`, a cosmetic
+ *  body), and the capture the live getters kick on a miss. */
+function prewarmVisualPortrait(
+  visualKey: string,
+  skin: number,
+  framing: PortraitFraming,
+): Promise<void> {
   const key = `${visualKey}:${skin}:${framing}`;
+  return capturePortrait({
+    key,
+    visualKey,
+    framing,
+    atlasPending: () => trackSkinAtlasPending(visualKey, skin),
+    buildVisual: () => new CharacterVisual(visualKey, 0xffffff, skin),
+    commit: (url) => cache.set(key, url),
+  });
+}
+
+/** The composed twin of {@link prewarmVisualPortrait}: the same off-thread
+ *  steps (sliced uploads, async link, one render, async encode) around a body
+ *  built from `look` rather than from a (class, skin) pair. The composed body
+ *  wears what the player is already wearing in the live world, so its parts and
+ *  armour atlases are resident and there is no streaming gate to wait on. */
+export function prewarmModularPortrait(
+  visualKey: string,
+  look: ModularLook,
+  framing: PortraitFraming = 'headshot',
+): Promise<void> {
+  const key = modularPortraitKey(visualKey, look, framing);
+  return capturePortrait({
+    key,
+    visualKey,
+    framing,
+    atlasPending: () => false,
+    buildVisual: () => new CharacterVisual(visualKey, 0xffffff, 0, null, null, null, look),
+    commit: (url) => rememberModularPortrait(key, url),
+  });
+}
+
+/** What a capture varies: which entry it fills, which body it renders, and how
+ *  it commits (the composed half of the cache is bounded, the class half is
+ *  not). Everything else, the rig, the step order and the mount contract
+ *  below, is one shared path. */
+interface PortraitCaptureRequest {
+  key: string;
+  visualKey: string;
+  framing: PortraitFraming;
+  atlasPending(): boolean;
+  buildVisual(): CharacterVisual;
+  commit(url: string): void;
+}
+
+async function capturePortrait(request: PortraitCaptureRequest): Promise<void> {
+  const { key, visualKey, framing } = request;
   let prewarmRig: PortraitRig | null = null;
   await runPortraitPrewarm<CharacterVisual>({
     cached: () => cache.has(key),
     ready: () => assetsAreReady,
-    atlasPending: () => trackSkinAtlasPending(visualKey, skin),
+    atlasPending: () => request.atlasPending(),
     build: () => {
       prewarmRig = ensureRig();
-      return new CharacterVisual(visualKey, 0xffffff, skin);
+      return request.buildVisual();
     },
     // This offscreen context is separate from the world renderer, so atlases
     // resident there still upload here on first draw; prepay them in slices.
     // The visual stays UNMOUNTED for this: initTexture needs no scene, and
-    // the mount is shared with the synchronous capture() path, so a visual
-    // left mounted across an await would bleed into any concurrent live
-    // portrait capture (and that capture's visual into ours).
+    // the mount is shared by every capture, so a visual left mounted across
+    // an await would bleed into any concurrent one (and its visual into ours).
     uploadTextures: async (visual) => {
       const textures = new Set<THREE.Texture>();
       collectPrewarmTextures(visual.root, textures);
@@ -267,12 +377,16 @@ export async function prewarmPlayerPortrait(
     // measured 248 and 150 ms on the first two portrait units). compileAsync
     // walks the scene SYNCHRONOUSLY at call time, so the visual is mounted
     // only around that call and unmounted before the link is awaited: no
-    // concurrent sync capture can render it (see the mount-sharing note
-    // above), and the captured material list keeps polling regardless.
+    // concurrent capture can render it (see the mount-sharing note above),
+    // and the captured material list keeps polling regardless.
     compile: (visual) => {
       if (!prewarmRig) return Promise.resolve();
       const activeRig = prewarmRig;
       activeRig.mount.add(visual.root);
+      // Settle the pose FIRST, exactly as renderPortraitFrame will before it
+      // draws: a swap or a lazily built child that update() introduces must be
+      // in the scene compileAsync walks, or the render links it instead.
+      visual.update(0.4, PORTRAIT_ANIM_STATE, true);
       const compiled = activeRig.renderer.compileAsync(activeRig.scene, activeRig.camera);
       activeRig.mount.remove(visual.root);
       return compiled.then(() => undefined);
@@ -289,7 +403,7 @@ export async function prewarmPlayerPortrait(
       prewarmRig?.mount.remove(visual.root);
       visual.dispose();
     },
-    commit: (url) => cache.set(key, url),
+    commit: (url) => request.commit(url),
     onError: (err) => {
       if (import.meta.env?.DEV) console.warn(`[portrait] prewarm failed for ${key}`, err);
     },
@@ -305,8 +419,14 @@ export async function prewarmPlayerPortrait(
  * colour wheel has a lot of values in it), so unlike the class portraits these
  * entries are capped and evicted oldest-first: a creation session that drags a
  * slider around would otherwise hold a PNG per position.
+ *
+ * Never blocks the calling frame either: a miss answers null, kicks the async
+ * capture, and both consumers (the chip's crest, the unit frame's class
+ * portrait) already draw their fallback until {@link onPortraitUpdate} says the
+ * composed headshot landed.
  */
-const MODULAR_PORTRAIT_CACHE_MAX = 24;
+export const MODULAR_PORTRAIT_CACHE_MAX = 24;
+const MODULAR_KEY_SEGMENT = ':mod:';
 const modularKeys: string[] = [];
 
 export function modularPortraitDataUrl(
@@ -314,30 +434,71 @@ export function modularPortraitDataUrl(
   look: ModularLook,
   framing: PortraitFraming = 'headshot',
 ): string | null {
-  const key = `${visualKey}:mod:${modularSignature(look.app, look.worn)}:${framing}`;
+  const key = modularPortraitKey(visualKey, look, framing);
   const cached = cache.get(key);
   if (cached) return cached;
   if (!assetsAreReady) return null;
-  const url = capture(
-    key,
-    visualKey,
-    () => new CharacterVisual(visualKey, 0xffffff, 0, null, null, null, look),
-    framing,
-  );
-  if (url) {
-    modularKeys.push(key);
-    while (modularKeys.length > MODULAR_PORTRAIT_CACHE_MAX) {
-      const oldest = modularKeys.shift();
-      if (oldest) cache.delete(oldest);
-    }
+  requestLiveModularCapture(key, visualKey, look, framing);
+  return null;
+}
+
+function modularPortraitKey(
+  visualKey: string,
+  look: ModularLook,
+  framing: PortraitFraming,
+): string {
+  return `${visualKey}${MODULAR_KEY_SEGMENT}${modularSignature(look.app, look.worn)}:${framing}`;
+}
+
+/**
+ * True for a cache key minted by {@link modularPortraitDataUrl}, the third
+ * argument {@link onPortraitUpdate} hands its listeners.
+ *
+ * A composed capture carries the look SIGNATURE where a class capture carries
+ * (class, skin), and its visual key is `player_<cls>_modular`, so a consumer
+ * that framed a composed subject cannot recognize its own update from the first
+ * two arguments at all.
+ */
+export function isComposedPortraitKey(key: string | undefined): boolean {
+  return key?.includes(MODULAR_KEY_SEGMENT) === true;
+}
+
+/** The composed twin of {@link requestLiveCapture}, deliberately on the SAME
+ *  lane instance: composed keys already disambiguate through their `:mod:`
+ *  segment, so one lane covers both halves with one in-flight dedupe and one
+ *  failure backoff. Deduped by look signature: the char sheet and the player
+ *  frame asking for the same body in the same frame capture it once. */
+function requestLiveModularCapture(
+  key: string,
+  visualKey: string,
+  look: ModularLook,
+  framing: PortraitFraming,
+): void {
+  liveCaptures.request(key, gpuPrepNow(), async () => {
+    await prewarmModularPortrait(visualKey, look, framing);
+    if (!cache.has(key)) return false;
+    // No skin index names a composed body (it wears its own colours), so the
+    // KEY is what a listener matches on: see isComposedPortraitKey.
+    for (const cb of updateListeners) cb(visualKey, COMPOSED_PORTRAIT_SKIN, key);
+    return true;
+  });
+}
+
+/** Commit a composed portrait and keep the composed half of the cache bounded
+ *  (see the cap's why above). Every path that fills a composed entry commits
+ *  through here, so the FIFO can never miss one. */
+function rememberModularPortrait(key: string, url: string): void {
+  cache.set(key, url);
+  modularKeys.push(key);
+  while (modularKeys.length > MODULAR_PORTRAIT_CACHE_MAX) {
+    const oldest = modularKeys.shift();
+    if (oldest) cache.delete(oldest);
   }
-  return url;
 }
 
 /** Mount `visual` in the offscreen rig, settle its pose, aim the camera for
- *  `framing`, and render one frame. The caller owns the readback (synchronous
- *  toDataURL for the live path, async toBlob for the prewarm path) and the
- *  visual's unmount/dispose. */
+ *  `framing`, and render one frame. The caller owns the readback (the async
+ *  toBlob snapshot) and the visual's unmount/dispose. */
 function renderPortraitFrame(
   rig: PortraitRig,
   visual: CharacterVisual,
@@ -397,37 +558,6 @@ function renderPortraitFrame(
   rig.renderer.render(rig.scene, rig.camera);
 }
 
-/** Render one visual into the offscreen rig and return it as a PNG data URL.
- *  Shared by the class portraits and the composed ones, the only difference
- *  between them is which CharacterVisual gets built. */
-function capture(
-  key: string,
-  visualKey: string,
-  build: () => CharacterVisual,
-  framing: PortraitFraming,
-): string | null {
-  // Paired so cleanup below can prove the rig is available whenever there is
-  // a visual to dispose, with no non-null assertions on either side.
-  let active: { rig: PortraitRig; visual: CharacterVisual } | null = null;
-  try {
-    const rig = ensureRig();
-    const visual = build();
-    active = { rig, visual };
-    renderPortraitFrame(rig, visual, visualKey, framing);
-    const url = rig.renderer.domElement.toDataURL('image/png');
-    cache.set(key, url);
-    return url;
-  } catch (err) {
-    if (import.meta.env?.DEV) console.warn(`[portrait] failed for ${key}`, err);
-    return null;
-  } finally {
-    if (active) {
-      active.rig.mount.remove(active.visual.root);
-      active.visual.dispose();
-    }
-  }
-}
-
 /** Run `cb` once character assets finish preloading (immediately if already
  *  ready), so a fallback crest can be swapped for the real portrait. */
 export function onPortraitsReady(cb: () => void): void {
@@ -435,11 +565,26 @@ export function onPortraitsReady(cb: () => void): void {
   else readyListeners.add(cb);
 }
 
-/** Subscribe to newly available deferred atlases so mounted portrait consumers
- * can replace their fallback without waiting for an unrelated repaint. */
-export function onPortraitUpdate(cb: (visualKey: string, skin: number) => void): void {
+/** Subscribe to portraits that land after their consumer already painted a
+ * fallback (a deferred atlas arriving, a live capture settling), so it can
+ * replace that fallback without waiting for an unrelated repaint.
+ *
+ * A COMPOSED capture is addressed by its cache `key` (third argument), because
+ * no (visualKey, skin) pair names one; the skin it reports is
+ * {@link COMPOSED_PORTRAIT_SKIN}, an index no catalog holds. Listeners that
+ * take the first two arguments still RECEIVE a composed update and cannot
+ * recognize it as theirs, so any listener that acts on (visualKey, skin) must
+ * reject that skin itself (start_skin_picker_portraits.ts does). */
+export function onPortraitUpdate(
+  cb: (visualKey: string, skin: number, key?: string) => void,
+): void {
   updateListeners.add(cb);
 }
+
+/** The skin argument a composed update reports: a composed body wears its own
+ *  colours, so no class-atlas or chroma index describes it, and no listener
+ *  filtering on a real index can mistake one for its own subject. */
+export const COMPOSED_PORTRAIT_SKIN = -1;
 
 /** True once portraits can be generated synchronously. */
 export function portraitsReady(): boolean {
@@ -453,6 +598,14 @@ export function portraitsReady(): boolean {
  */
 export function resetPortraitRendererForGraphicsRebuild(): void {
   cache.clear();
+  // The FIFO must forget what the cache just did: a key left here is evicted
+  // again later against an entry that is no longer the one it named, and a look
+  // recaptured after the rebuild would be dropped by its own stale entry.
+  modularKeys.length = 0;
+  // The captures still running are pinned to the OLD rig and commit nothing
+  // (runPortraitPrewarm's current() check); dropping their keys lets the first
+  // ask after the rebuild start a fresh capture instead of waiting on them.
+  liveCaptures.clear();
   if (rig) {
     rig.scene.remove(rig.mount);
     try {

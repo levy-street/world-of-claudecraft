@@ -104,20 +104,35 @@ export function resolvedCharacterForm(
   return readyMask & readyFlagFor(requested) ? requested : 'base';
 }
 
+/** A form rig counts as ready only once it can actually DRAW: built AND past
+ *  its compile gate. `compilePending` is the shared pending-root token (null
+ *  when nothing is linking); a rig whose root is that token is treated as
+ *  absent, so `resolvedCharacterForm` keeps the entity on its base body until
+ *  the rig links. Without that, the instant the rig was constructed the
+ *  resolved form flipped to the form while the gate still hid it, and a
+ *  polymorphed target had no silhouette at all for the whole gate window.
+ *  Reads only `.root` identity, so it stays Three-free. */
 export function characterFormReadyMask(
   sheep: unknown,
   bear: unknown,
   cat: unknown,
   travel: unknown,
   metamorph: unknown,
+  compilePending: unknown,
 ): number {
   let mask = 0;
-  if (sheep) mask |= CHARACTER_FORM_READY.sheep;
-  if (bear) mask |= CHARACTER_FORM_READY.bear;
-  if (cat) mask |= CHARACTER_FORM_READY.cat;
-  if (travel) mask |= CHARACTER_FORM_READY.travel;
-  if (metamorph) mask |= CHARACTER_FORM_READY.metamorph;
+  if (formRigReady(sheep, compilePending)) mask |= CHARACTER_FORM_READY.sheep;
+  if (formRigReady(bear, compilePending)) mask |= CHARACTER_FORM_READY.bear;
+  if (formRigReady(cat, compilePending)) mask |= CHARACTER_FORM_READY.cat;
+  if (formRigReady(travel, compilePending)) mask |= CHARACTER_FORM_READY.travel;
+  if (formRigReady(metamorph, compilePending)) mask |= CHARACTER_FORM_READY.metamorph;
   return mask;
+}
+
+function formRigReady(visual: unknown, compilePending: unknown): boolean {
+  if (!visual) return false;
+  if (compilePending === null || compilePending === undefined) return true;
+  return (visual as { root?: unknown }).root !== compilePending;
 }
 
 export function activeCharacterFormVisual<T>(

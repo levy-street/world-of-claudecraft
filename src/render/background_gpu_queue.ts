@@ -14,9 +14,13 @@
 // higher-priority actionable gates waiting behind it). The cap is what keeps
 // the original guarantee (#2753): driver link work stays bounded, never one
 // per streamed view during an online snapshot burst. Priority applies when a
-// unit STARTS: a higher-priority arrival can still wait on a full cap, but
-// that wait is bounded by the shortest in-flight tail instead of the whole
-// serial hold, so it is never longer than the pre-release policy's.
+// unit STARTS: a higher-priority arrival that would add a tail can still wait
+// on a full cap, but that wait is bounded by the shortest in-flight tail
+// instead of the whole serial hold, so it is never longer than the
+// pre-release policy's. A unit that holds NO tail (a per-program touch piece,
+// a synchronous upload) starts under a full cap: it adds nothing to the
+// driver's link queue and the bound (tailLimit tails plus the one running
+// unit) holds unchanged.
 //
 // The OTHER half of the policy (hitch-hunt P1): boot-debt resume batches keep
 // their tail HELD on purpose. Released tails let every debt batch's links
@@ -59,6 +63,38 @@
 // ambiguous. `sharedFrameGap === 1` therefore means "no other queue unit was in
 // flight", NOT "this unit did it". Proving cause needs an exclusive run, which
 // is what a probe driving one unit at a time is for.
+//
+// ADMISSION (the amount half). This file arbitrates ORDER; an optional
+// `admission` hook arbitrates AMOUNT: before a unit starts, the host's policy
+// (src/render/gpu_prep_budget_core.ts through gpu_prep_admission.ts) is asked
+// whether the frame about to be drawn has room for it. It is consulted in the
+// same order the queue would have started units in, and the first candidate it
+// admits runs, so a cheap lower-priority unit can go while an expensive
+// higher-priority one waits. That inversion is deliberate and bounded: the
+// refused candidate ages one deferral per noteFrame and the policy's starvation
+// rule admits it regardless once it has waited long enough, so pacing delays a
+// piece, never drops it. The policy may decline that ageing per candidate
+// (agesDeferral), for the one refusal that is not a wait for headroom: under
+// the arrival cover, boot debt is refused because it is not this arrival's
+// work, and ageing it through the whole curtain would make every one of those
+// units starvation-admissible on the first live frame after the drop.
+// When every candidate is refused the loop PARKS until
+// the next frame or the next arrival, and it is ARMED BY THE FRAME CLOCK: until
+// the host feeds its first noteFrame the admission is not consulted at all.
+// Boot is why. World entry pushes dozens of units through before
+// requestAnimationFrame is ever armed, so a queue that admitted against a
+// budget with no frames to protect would park under the curtain with nothing
+// able to wake it. There is no live frame to protect before the first one.
+//
+// Strict priority order stays strict; there is no per-frame "piece slot". One
+// was tried (a starving tail-free piece offered ahead of the order every frame,
+// then every fourth frame) and the iGPU crowd bench rejected it both ways: it
+// forced touch pieces into the driver's link storm, where a single
+// ACTIVE_UNIFORMS query waited 0.5 to 1.9 s, and it took frames from the props
+// bands' own compile submissions. A tail-free piece behind a storm is not
+// starved outright: the boot-debt drain spaces its batches with idle slots and
+// a reveal storm has gaps between arrivals, and the piece is admitted in the
+// first such gap; its wait is bounded by the storm, which is the honest bound.
 import { createGpuQueueWindow, type GpuQueueWindowStats } from './gpu_queue_window_core';
 
 export const GPU_WORK_PRIORITY = {
@@ -69,11 +105,64 @@ export const GPU_WORK_PRIORITY = {
   // frames, so it outranks the cosmetic BACKGROUND warmers (production
   // measured the preview lane starving it for minutes) but stays under the
   // streamed-zone prepare and every live gate.
+  // The tail PIECES of a gate (one uniform-table touch per linked program):
+  // below every link SUBMISSION, the boot-debt resume included, so a cheap
+  // prologue that starts async driver work always goes ahead of a piece that
+  // only finishes one. Measured on the iGPU crowd bench: hundreds of touch
+  // pieces above the debt lane sat ahead of the dropped props twins' resume
+  // for 2.5 s, and the spawn zone's bands drew them cold at their escape.
+  // Actionable gates keep their pieces at ACTIONABLE_VIEW (the actionable
+  // floor). The budget still classes these pieces as approaching, not
+  // cosmetic (gpu_prep_budget_core gpuPrepClassForPriority).
+  TAIL_PIECE: 12,
   BOOT_DEBT: 15,
   VISIBLE_PREWARM: 20,
   LIVE_VIEW: 30,
   ACTIONABLE_VIEW: 40,
 } as const;
+
+/** What the admission is told about a candidate. Kept as a queue-local shape
+ *  rather than an import of the budget core: that core imports
+ *  GPU_WORK_PRIORITY from here, so the dependency runs one way only. */
+export interface GpuWorkAdmissionCandidate {
+  label: string;
+  priority: number;
+  /** Frames counted since this candidate was FIRST REFUSED, not since it was
+   *  enqueued: the starvation bound must measure time the policy actually held
+   *  the unit back, never time it merely spent behind another unit. */
+  deferredFrames: number;
+}
+
+/** The per-frame budget seam (see the header's admission paragraph). */
+export interface GpuWorkAdmission {
+  admit(candidate: GpuWorkAdmissionCandidate): boolean;
+  /** Whether a refused candidate's deferral should AGE this frame. Absent, or
+   *  true, means it does, which is the ordinary pacing case: a unit refused
+   *  for lack of headroom is waiting for headroom, and the starvation bound
+   *  measures that wait. A policy that refuses a candidate on a rule which has
+   *  nothing to do with waiting (the arrival cover, which refuses boot debt
+   *  because it is not this arrival's work) answers false, so the unit does
+   *  not spend the curtain accumulating deferrals it never earned and then
+   *  admit as `starvation` on the first live frame after the drop. */
+  agesDeferral?(candidate: GpuWorkAdmissionCandidate): boolean;
+  /** The main-thread cost the admitted unit's synchronous prologue really had,
+   *  reported the moment it returns so a second admission in the same frame
+   *  prices the smaller headroom it actually has. Called for the released-tail
+   *  case too: the prologue is main-thread work whatever the tail does. */
+  spend(syncMs: number, label: string): void;
+}
+
+export interface GpuWorkAdmissionStats {
+  /** Whether an admission is installed. It only GATES once the frame clock is
+   *  running (see the header), so `deferred`/`parks` are what say it is live. */
+  enabled: boolean;
+  /** admit() refusals, counted per refusal and not per unit: one candidate
+   *  refused across ten frames counts ten. */
+  deferred: number;
+  /** Times the drain loop parked with work pending because EVERY candidate was
+   *  refused. */
+  parks: number;
+}
 
 /** Per-unit scheduling options; see the tail policy in the header. */
 export interface GpuWorkRunOptions {
@@ -104,6 +193,14 @@ interface PendingGpuWork<T> {
    *  counter advance and reports no cap wait, despite having waited on exactly
    *  that. The counter alone can confirm a cap wait but never rule one out. */
   parkedOnTailCapAtEnqueue: boolean;
+  /** Frames counted since the first admission refusal; 0 until one happens. */
+  deferredFrames: number;
+  /** Whether the admission has refused this candidate at least once, i.e.
+   *  whether its deferral counter is running. */
+  refusedAdmission: boolean;
+  /** Selection pass that last refused this candidate, so one pass considers
+   *  every pending unit exactly once without allocating an ordered copy. */
+  refusedPass: number;
   work: () => T | Promise<T>;
   resolve: (value: T | PromiseLike<T>) => void;
   reject: (reason?: unknown) => void;
@@ -139,6 +236,9 @@ export interface GpuWorkUnitStat {
    *  gets counted at all). Read the trio (frameGapMs, syncMs, sharedFrameGap)
    *  together, never frameGapMs alone. */
   sharedFrameGap: number;
+  /** Frames this unit spent refused by the admission before it was granted.
+   *  Zero without an admission, and zero for a unit admitted on sight. */
+  deferredFrames: number;
 }
 
 /** The unit the drain loop is awaiting right now. Every pending unit waits
@@ -261,6 +361,8 @@ export interface BackgroundGpuQueueStats {
    *  while costing nothing itself, and that is precisely the priority-inversion
    *  shape, so it can never surface in a cost-ordered list. */
   longestWaits: GpuWorkWaitStat[];
+  /** What the per-frame admission decided, cumulatively. */
+  admission: GpuWorkAdmissionStats;
   /** The RECENT interval, per priority lane. Every other field on this object is
    *  cumulative or a lifetime maximum; this one is the only arm two runs of a
    *  pacing experiment can be compared on. See gpu_queue_window_core.ts. */
@@ -340,6 +442,9 @@ export function createBackgroundGpuQueue(opts?: {
   frameGapIgnoreMs?: number;
   recentWindowMs?: number;
   recentSampleLimit?: number;
+  /** Per-frame budget. Absent, the queue starts every unit as soon as its turn
+   *  comes, which is the behaviour every host had before this seam. */
+  admission?: GpuWorkAdmission;
 }): BackgroundGpuQueue {
   const now = opts?.now ?? ((): number => performance.now());
   const slowestLimit = Math.max(1, opts?.slowestLimit ?? DEFAULT_SLOWEST_LIMIT);
@@ -347,6 +452,7 @@ export function createBackgroundGpuQueue(opts?: {
   const stallLimit = Math.max(1, opts?.stallLimit ?? DEFAULT_STALL_LIMIT);
   const tailLimit = Math.max(1, opts?.tailLimit ?? DEFAULT_TAIL_LIMIT);
   const frameGapIgnoreMs = Math.max(1, opts?.frameGapIgnoreMs ?? DEFAULT_FRAME_GAP_IGNORE_MS);
+  const admission = opts?.admission;
   const pending: PendingGpuWork<unknown>[] = [];
   const slowest: GpuWorkUnitStat[] = [];
   const blockiest: GpuWorkUnitStat[] = [];
@@ -362,6 +468,10 @@ export function createBackgroundGpuQueue(opts?: {
   let worstSyncMs = 0;
   let worstWaitMs = 0;
   let tailCapParks = 0;
+  let admissionDeferred = 0;
+  let admissionParks = 0;
+  let selectionPass = 0;
+  let admissionNotify: (() => void) | null = null;
   // True while the drain loop is parked waiting for a cap slot. Read at enqueue
   // so a unit arriving mid-park is attributed the wait it really had.
   let parkedOnTailCap = false;
@@ -476,6 +586,7 @@ export function createBackgroundGpuQueue(opts?: {
       waitMs: unit.waitMs,
       frameGapMs: unit.worstFrameGapMs,
       sharedFrameGap: unit.worstFrameGapShared,
+      deferredFrames: unit.entry.deferredFrames,
     };
     if (stat.waitMs > worstWaitMs) worstWaitMs = stat.waitMs;
     // Keyed on SETTLE time, not stat.atMs (the start): released tails settle out
@@ -551,43 +662,141 @@ export function createBackgroundGpuQueue(opts?: {
     }
   };
 
+  /** Wake a loop parked on the admission. Idempotent: a park that already
+   *  ended has no notifier left to call. */
+  const wakeAdmission = (): void => {
+    const notify = admissionNotify;
+    admissionNotify = null;
+    notify?.();
+  };
+
+  const outranks = (a: PendingGpuWork<unknown>, b: PendingGpuWork<unknown>): boolean =>
+    a.priority > b.priority || (a.priority === b.priority && a.order < b.order);
+
+  /** Index of the LOWEST-priority pending unit that holds no tail, FIFO among
+   *  equals, or -1: the cap-park attribution asks whether any such candidate
+   *  is pending (a full cap with a tail-free candidate is a budget park, not a
+   *  cap park). */
+  const lowestTailFree = (): number => {
+    let found = -1;
+    for (let index = 0; index < pending.length; index++) {
+      const candidate = pending[index];
+      if (candidate.releaseTail) continue;
+      const held = found < 0 ? null : pending[found];
+      if (
+        held === null ||
+        candidate.priority < held.priority ||
+        (candidate.priority === held.priority && candidate.order < held.order)
+      ) {
+        found = index;
+      }
+    }
+    return found;
+  };
+
+  /**
+   * Index of the unit to start next: highest priority, FIFO within a priority,
+   * and with an armed admission the first such candidate it admits. Returns -1
+   * only when every pending candidate was refused.
+   *
+   * Allocation-free by design (this runs per unit start, and the pending array
+   * is the one thing a burst makes long): candidates are marked with the pass
+   * that refused them instead of being copied into a sorted list.
+   */
+  const selectNext = (tailFreeOnly: boolean): number => {
+    if (!admission || lastFrameAt === null) {
+      let selectedIndex = -1;
+      for (let index = 0; index < pending.length; index++) {
+        const candidate = pending[index];
+        if (tailFreeOnly && candidate.releaseTail) continue;
+        if (selectedIndex < 0 || outranks(candidate, pending[selectedIndex])) selectedIndex = index;
+      }
+      return selectedIndex;
+    }
+    selectionPass++;
+    for (;;) {
+      let selectedIndex = -1;
+      for (let index = 0; index < pending.length; index++) {
+        const candidate = pending[index];
+        if (candidate.refusedPass === selectionPass) continue;
+        if (tailFreeOnly && candidate.releaseTail) continue;
+        if (selectedIndex < 0 || outranks(candidate, pending[selectedIndex])) selectedIndex = index;
+      }
+      if (selectedIndex < 0) return -1;
+      const candidate = pending[selectedIndex];
+      if (
+        admission.admit({
+          label: candidate.label,
+          priority: candidate.priority,
+          deferredFrames: candidate.deferredFrames,
+        })
+      ) {
+        return selectedIndex;
+      }
+      candidate.refusedPass = selectionPass;
+      candidate.refusedAdmission = true;
+      admissionDeferred++;
+    }
+  };
+
   const drain = async (): Promise<void> => {
     while (pending.length > 0) {
-      // The released-tail cap gates STARTING units, so the bound covers the
-      // running unit's own driver work too: at most tailLimit + 1 units'
-      // driver work can be in flight at any instant.
-      while (waitingTails.size >= tailLimit) {
-        // Counted, not just awaited: this park is the one way a RELEASED tail
-        // still delays a higher-priority arrival, and without the count a long
-        // wait cannot be told apart from waiting behind an ordinary holder.
-        tailCapParks++;
-        lastCapOccupants = [...waitingTails].map((tail) => tail.entry.label);
-        parkedOnTailCap = true;
-        try {
-          await new Promise<void>((resolve) => {
-            tailNotify = resolve;
-          });
-        } finally {
-          // Backstop only: the settle path above clears this the moment a slot
-          // frees. This covers the paths that leave the park without one
-          // (shutdown), and re-clearing is idempotent.
-          parkedOnTailCap = false;
+      // The released-tail cap gates STARTING units that would add a tail, so
+      // the bound covers the running unit's own driver work too: at most
+      // tailLimit + 1 units' driver work can be in flight at any instant. A
+      // unit that holds NO tail (a per-program touch piece, a synchronous
+      // upload) still starts under a full cap: it adds nothing to the driver's
+      // link queue, and it is what settles the gates whose tails hold the cap
+      // (a touch piece parked behind two slow crowd links kept every reveal
+      // gate compiling past its soft deadline, measured on the iGPU crowd
+      // bench, where the same tail ran inside the gate before it was a piece).
+      const capFull = waitingTails.size >= tailLimit;
+      const selectedIndex = selectNext(capFull);
+      if (selectedIndex < 0) {
+        if (capFull) {
+          // Counted, not just awaited: this park is the one way a RELEASED
+          // tail still delays a higher-priority arrival, and without the count
+          // a long wait cannot be told apart from waiting behind an ordinary
+          // holder. A tail settling wakes it; so does the frame clock or an
+          // arrival, in case a tail-free candidate was only budget-refused.
+          //
+          // Only a PURE cap wait is that park, though: with a tail-free
+          // candidate pending, the cap is full but it is not what held this
+          // loop, the budget is, and counting it here would inflate the cap
+          // counters every frame (the wake re-parks) and mark a purely
+          // budget-driven wait waitedOnTailCap.
+          if (lowestTailFree() < 0) {
+            tailCapParks++;
+            lastCapOccupants = [...waitingTails].map((tail) => tail.entry.label);
+            parkedOnTailCap = true;
+          } else {
+            admissionParks++;
+          }
+          try {
+            await new Promise<void>((resolve) => {
+              tailNotify = resolve;
+              admissionNotify = resolve;
+            });
+          } finally {
+            // Backstop only: the settle path above clears this the moment a
+            // slot frees. This covers the paths that leave the park without
+            // one (shutdown), and re-clearing is idempotent. The tail notifier
+            // is stale once the park ends on the admission side, and the
+            // settle path clears its own.
+            parkedOnTailCap = false;
+            admissionNotify = null;
+            tailNotify = null;
+          }
+          continue;
         }
-      }
-      // shutdown() splices pending while the loop is parked on the cap wait
-      // above: re-check emptiness before selecting, or the resumed iteration
-      // dereferences a unit that no longer exists.
-      if (pending.length === 0) break;
-      let selectedIndex = 0;
-      for (let index = 1; index < pending.length; index++) {
-        const candidate = pending[index];
-        const selected = pending[selectedIndex];
-        if (
-          candidate.priority > selected.priority ||
-          (candidate.priority === selected.priority && candidate.order < selected.order)
-        ) {
-          selectedIndex = index;
-        }
+        // Every candidate refused: nothing this loop can do until the frame
+        // clock advances their deferral (noteFrame) or a new arrival brings a
+        // candidate the budget has room for (run). Both wake this park.
+        admissionParks++;
+        await new Promise<void>((resolve) => {
+          admissionNotify = resolve;
+        });
+        continue;
       }
       const [next] = pending.splice(selectedIndex, 1);
       const startedAt = now();
@@ -607,9 +816,14 @@ export function createBackgroundGpuQueue(opts?: {
       lastHolderPriority = next.priority;
       let syncMs = 0;
       let released = false;
+      let charged = false;
       try {
         const returned = next.work();
         syncMs = now() - unit.startedAt;
+        // Charged whether or not the tail is released, and whether or not the
+        // admission is armed yet: the ledger learns from boot units too.
+        charged = true;
+        admission?.spend(syncMs, next.label);
         if (
           next.releaseTail &&
           returned !== null &&
@@ -622,7 +836,14 @@ export function createBackgroundGpuQueue(opts?: {
           next.resolve(await returned);
         }
       } catch (error) {
-        if (syncMs === 0) syncMs = now() - unit.startedAt;
+        if (!charged) {
+          // A unit that threw synchronously still cost the main thread what it
+          // ran before throwing: leaving it uncharged hands the rest of the
+          // frame budget away on the strength of work that did happen.
+          syncMs = now() - unit.startedAt;
+          charged = true;
+          admission?.spend(syncMs, next.label);
+        }
         next.reject(error);
       } finally {
         running = null;
@@ -669,15 +890,43 @@ export function createBackgroundGpuQueue(opts?: {
           enqueuedAt: now(),
           tailCapParksAtEnqueue: tailCapParks,
           parkedOnTailCapAtEnqueue: parkedOnTailCap,
+          deferredFrames: 0,
+          refusedAdmission: false,
+          refusedPass: 0,
           work,
           resolve,
           reject,
         } as PendingGpuWork<unknown>);
       });
       scheduleDrain();
+      // A parked loop is already active, so scheduleDrain returns without
+      // reconsidering: this arrival may be the admissible one.
+      wakeAdmission();
       return result;
     },
     noteFrame(atMs: number): void {
+      if (admission) {
+        // A refused candidate ages in FRAMES, which is the unit the starvation
+        // bound counts in, and the new frame re-opens the budget: wake the loop
+        // so it reconsiders everything it parked on. The policy may decline
+        // the ageing for a candidate whose refusal is not a wait for headroom
+        // (GpuWorkAdmission.agesDeferral).
+        for (const entry of pending) {
+          if (!entry.refusedAdmission) continue;
+          if (
+            admission.agesDeferral !== undefined &&
+            !admission.agesDeferral({
+              label: entry.label,
+              priority: entry.priority,
+              deferredFrames: entry.deferredFrames,
+            })
+          ) {
+            continue;
+          }
+          entry.deferredFrames++;
+        }
+        wakeAdmission();
+      }
       const previous = lastFrameAt;
       lastFrameAt = atMs;
       const inFlight = (running ? 1 : 0) + waitingTails.size;
@@ -754,6 +1003,11 @@ export function createBackgroundGpuQueue(opts?: {
           waitMs: round1(wait.waitMs),
           tails: [...wait.tails],
         })),
+        admission: {
+          enabled: admission !== undefined,
+          deferred: admissionDeferred,
+          parks: admissionParks,
+        },
         recent: recent.stats(now()),
       };
     },
@@ -762,6 +1016,9 @@ export function createBackgroundGpuQueue(opts?: {
       accepting = false;
       shutdownReason = reason;
       for (const entry of pending.splice(0)) entry.reject(reason);
+      // A loop parked on the admission has no other way out: nothing will feed
+      // it a frame after shutdown, and its pending set just emptied.
+      wakeAdmission();
       shutdownPromise = new Promise<void>((resolve) => {
         resolveShutdown = resolve;
       });

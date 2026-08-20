@@ -954,19 +954,19 @@ export const fr_FR: EnTranslations = {
       "clockHms": "{hours}:{minutes}:{seconds}"
     },
     "lastkeepMap": {
-      "title": "{keep}: {story}",
+      "title": "{keep} : {story}",
       "story": {
-        "undercroft": "The Undercroft",
-        "state": "The State Floor",
-        "residence": "The Residence",
-        "tower": "The Watch Tower"
+        "undercroft": "La salle basse",
+        "state": "L'étage d'apparat",
+        "residence": "Le logis",
+        "tower": "La tour de guet"
       }
     },
     "dawnholdMap": {
-      "title": "{keep}: {story}",
+      "title": "{keep} : {story}",
       "story": {
-        "ground": "The Garden Floor",
-        "solar": "The Solar"
+        "ground": "Le rez-de-jardin",
+        "solar": "La chambre du soleil"
       }
     },
     "compass": {
@@ -1449,9 +1449,29 @@ export const fr_FR: EnTranslations = {
       "buttons": "Disposition des boutons",
       "resetButtons": "Réinitialiser la disposition des boutons",
       "menuAction": "Menu du jeu",
+      "confirmAction": "Confirm / Select",
       "zoomIn": "Zoom avant",
       "zoomOut": "Zoom arrière",
-      "help": "Le stick gauche déplace, le droit oriente la caméra. Ouvrez une fenêtre pour utiliser le pointeur à l'écran."
+      "help": "Le stick gauche déplace, le droit oriente la caméra. Ouvrez une fenêtre pour utiliser le pointeur à l'écran.",
+      "crossHotbar": "Cross Hotbar",
+      "crossHotbarEnable": "Enable Cross Hotbar",
+      "crossHotbarExpand": "Double Cross Hotbar",
+      "crossHotbarHelp": "Hold a trigger to light eight action-bar slots on the d-pad and face buttons. Tap the other trigger to swap to the second set.",
+      "crossHotbarResetLayout": "Reset Cross Hotbar",
+      "crossHotbarPosition": "{trigger} + {button}",
+      "crossHotbarOwnsButtons": "The triggers and the d-pad belong to the cross hotbar while it is on, so they are set up below rather than here.",
+      "cancelAction": "Cancel / Back",
+      "subcommandsAction": "Subcommands / Map",
+      "cycleHudAction": "Cycle Interface",
+      "cycleSetAction": "Change Hotbar Set",
+      "crossHotbarDisplay": "Bar Display",
+      "crossHotbarDisplayFull": "Full",
+      "crossHotbarDisplayCompact": "Compact",
+      "crossHotbarDisplayMinimal": "Only While Held",
+      "crossHotbarArrangeChord": "{bumper} + {button}",
+      "crossHotbarCarrying": "Carrying {action}: confirm on a cell to place it, cancel to put it back.",
+      "crossHotbarEditHint": "Arranging: confirm picks up from a cell or the spellbook and drops on a cell, cancel clears one.",
+      "crossHotbarEditHelp": "Hold the left bumper and press the top face button to arrange the bar with the controller."
     },
     "perf": {
       "title": "Surcouche de performance",
@@ -1570,6 +1590,7 @@ export const fr_FR: EnTranslations = {
           "render": "rendu   soumission {submit} ms | monde {world} ms | entités {entities} ms",
           "scene": "scène   {calls} appels | {triangles} tris | {views} vues",
           "hitches": "saccades {hitches} | shaders {shaders} | transferts {uploads} | vues {views}",
+          "hitchesBuild": "zone builds {zoneBuilds} | off-frame {offFrame} | gc {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "en attente"
         },
@@ -1621,7 +1642,10 @@ export const fr_FR: EnTranslations = {
             "eventCpu": "Le traitement des événements consomme le temps d'image",
             "shaderCompile": "Des shaders se compilent en cours de jeu",
             "textureUpload": "Les transferts de textures causent des saccades en jeu",
+            "zoneBuild": "Zone streaming builds are causing hitches",
             "viewCreate": "La création de vues d'entités cause des saccades",
+            "gcHitch": "Garbage collections are running inside long frames",
+            "offFrameHitch": "Long frames come from work outside the render callback",
             "otherHitch": "Des images longues non attribuées subsistent",
             "assetStartup": "Le démarrage du jeu est retardé par le chargement des ressources",
             "longTasks": "De longues tâches du navigateur bloquent les images",
@@ -4772,6 +4796,7 @@ export const fr_FR: EnTranslations = {
       "mageEleJet": "Jet d'eau se trouve sur la barre du familier comme un bouton à part entière : cliquez dessus pour verrouiller un rayon glacial sur un ennemi, ou faites un clic droit (appui long sur tactile) pour laisser l'élémentaire le déclencher de lui-même dès qu'il est prêt.",
       "formsHeading": "Changement de forme",
       "formsNote": "Un druide combat en changeant de forme. La plupart des capacités de druide appartiennent à une forme précise, si bien que la forme que vous portez détermine ce que vous pouvez lancer, et changer de forme coûte un peu de mana. Vous pouvez changer de forme en combat ou hors combat, aussi souvent que vous le souhaitez.",
+      "formsAutoUnshift": "Un soin ou un sort de dégâts lancé sous forme vous en fait sortir tout seul. Quitter une forme ainsi est gratuit et ne consomme pas votre temps de recharge global, un sort instantané part donc à l'instant où vous appuyez. Reprendre la forme est une capacité ordinaire, qui coûte toujours du mana et votre temps de recharge global.",
       "formsMoonwing": "Un druide Équilibre gagne une forme supplémentaire, la Forme de sélénien, la forme de lanceur de sorts dans laquelle il combat. C'est la seule forme animale qui conserve vos sorts, et votre baguette ne fonctionne que dans cette forme ou dans votre forme de lanceur de sorts normale.",
       "formLine": {
         "form_bear": "La forme de tank : une peau épaisse, de la rage à la place du mana, et davantage de menace pour que les ennemis continuent de vous frapper.",
@@ -7189,6 +7214,7 @@ export const fr_FR: EnTranslations = {
       "shopMarksRequired": "Il vous faut {marks} Marques de plongée pour acheter {name}.",
       "shopSealPremiumOnly": "Ce sceau ne cède qu'à la main d'un maître : seule la mise Supérieure peut l'ouvrir.",
       "passageSealed": "Le passage est scellé.",
+      "enemiesRemain": "Éliminez d'abord les ennemis restants.",
       "moveCloserPassage": "Rapprochez-vous du passage.",
       "moveCloserChest": "Rapprochez-vous du coffre.",
       "moveCloserReliquary": "Rapprochez-vous du reliquaire.",
@@ -9998,7 +10024,7 @@ export const fr_FR: EnTranslations = {
       },
       "fear": {
         "name": "Tourment",
-        "description": "Terrifie l'ennemi et le laisse tremblant pendant un maximum de 8 s. Tout dégât interrompt l'effet."
+        "description": "Terrifie l'ennemi et le laisse tremblant pendant un maximum de 5 s. Les dégâts cumulés équivalant à 8% du maximum de points de vie de la cible interrompent l'effet."
       },
       "searing_pain": {
         "name": "Cautérisation",
@@ -10223,12 +10249,12 @@ export const fr_FR: EnTranslations = {
         "description": "Relève un compagnon défensif permanent. Le Graveguard provoque automatiquement, intercepte 20% de vos dégâts subis via la Domination des tombes, et Commandement de la moisson le fait provoquer et subir 30% de dégâts en moins pendant 4 s."
       },
       "raise_skeletal_warrior": {
-        "name": "Relever un Skeletal Warrior",
-        "description": "Dépense 1 Fragment d'âme pour ajouter un Skeletal Warrior permanent à votre Domination à 2 emplacements. Un seul peut vous servir à la fois. Il frappe en zone les ennemis proches pour 45% de dégâts toutes les 6 s, et Commandement de la moisson cloue sa cible avec un ralentissement de 40% pendant 4 s."
+        "name": "Relever un Guerrier squelette",
+        "description": "Dépense 1 Fragment d'âme pour ajouter un Guerrier squelette permanent à votre Domination à 2 emplacements. Un seul peut vous servir à la fois. Il frappe en zone les ennemis proches pour 45% de dégâts toutes les 6 s, et Commandement de la moisson cloue sa cible avec un ralentissement de 40% pendant 4 s."
       },
       "raise_bone_mage": {
-        "name": "Relever un Bone Mage",
-        "description": "Dépense 2 Fragments d'âme pour ajouter un Bone Mage à distance permanent à votre Domination à 2 emplacements. Un seul peut vous servir à la fois. Ses attaques exposent la cible à 5% de dégâts magiques en plus pendant 6 s, et Commandement de la moisson porte cette faiblesse à 8%."
+        "name": "Relever un Mage d’os",
+        "description": "Dépense 2 Fragments d'âme pour ajouter un Mage d’os à distance permanent à votre Domination à 2 emplacements. Un seul peut vous servir à la fois. Ses attaques exposent la cible à 5% de dégâts magiques en plus pendant 6 s, et Commandement de la moisson porte cette faiblesse à 8%."
       },
       "bone_armor": {
         "name": "Armure d'os",
@@ -10236,7 +10262,7 @@ export const fr_FR: EnTranslations = {
       },
       "corpse_explosion": {
         "name": "Explosion de cadavre",
-        "description": "Sacrifie d'abord un Bone Mage, puis un Skeletal Warrior, et un Gravewing seulement en dernier recours. Parmi les doublons, choisit celui dont la durée restante est la plus faible, puis le plus faible, pour infliger {damage} points de dégâts d'Ombre à l'endroit choisi."
+        "description": "Sacrifie d'abord un Mage d’os, puis un Guerrier squelette, et une Aile funéraire seulement en dernier recours. Parmi les doublons, choisit celui dont la durée restante est la plus faible, puis le plus faible, pour infliger {damage} points de dégâts d'Ombre à l'endroit choisi."
       },
       "funeral_harvest": {
         "name": "Moisson funéraire",
@@ -10244,7 +10270,7 @@ export const fr_FR: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "Marque de l'ossuaire",
-        "description": "Marque un ennemi pendant 12 s, stockant 20% des dégâts infligés par vous et vos morts-vivants. Relancez pour la faire détoner. Si l'ennemi marqué meurt, elle explose dans un rayon de 6 m et crée 1 Fragment d'âme."
+        "description": "Marque un ennemi pendant 15 s, stockant 20% des dégâts infligés par vous et vos morts-vivants. Relancez pour la faire détoner. Si l'ennemi marqué meurt, elle explose dans un rayon de 6 mètres et crée 1 Fragment d'âme."
       },
       "unholy_command": {
         "name": "Commandement impie",
@@ -10252,19 +10278,19 @@ export const fr_FR: EnTranslations = {
       },
       "reaping_command": {
         "name": "Commandement de la moisson",
-        "description": "Dépense 2 Fragments d'âme pour ordonner à tous vos serviteurs morts-vivants de frapper à l'unisson. Les Graveguards provoquent et s'arc-boutent, les Skeletal Warriors clouent leur cible, les Bone Mages exposent les défenses magiques, et le Gravewing déchire tous les ennemis touchés."
+        "description": "Dépense 2 Fragments d'âme pour ordonner à tous vos serviteurs morts-vivants de frapper à l'unisson. Les Graveguards provoquent et s'arc-boutent, les Guerriers squelettes clouent leur cible, les Mages d’os exposent les défenses magiques, et l’Aile funéraire déchire tous les ennemis touchés."
       },
       "sacrifice_undead": {
         "name": "Sacrifier un mort-vivant",
         "description": "Détruit un serviteur de Domination pour restaurer 25% de vos points de vie maximum."
       },
       "raise_gravewing": {
-        "name": "Relever un Gravewing",
-        "description": "Dépense 2 Fragments d'âme pour ajouter un Gravewing permanent à votre Domination à 2 emplacements. Un seul peut vous servir à la fois. Il frappe en zone les ennemis proches pour 65% de dégâts toutes les 5 s, et Commandement de la moisson fait que chaque ennemi touché subit 8% de dégâts en plus pendant 5 s."
+        "name": "Relever une Aile funéraire",
+        "description": "Dépense 2 Fragments d'âme pour ajouter une Aile funéraire permanente à votre Domination à 2 emplacements. Une seule peut vous servir à la fois. Elle frappe en zone les ennemis proches pour 65% de dégâts toutes les 5 s, et Commandement de la moisson fait que chaque ennemi touché subit 8% de dégâts en plus pendant 5 s."
       },
       "army_of_the_dead": {
         "name": "Armée des morts",
-        "description": "Ouvre un portail funéraire pour relever temporairement un Skeletal Warrior, un Bone Mage et un Gravewing pendant 20 s, comblant les rangs que vos serviteurs de Domination habituels laissent vides."
+        "description": "Ouvre un portail funéraire pour relever temporairement un Guerrier squelette, un Mage d’os et une Aile funéraire pendant 20 s, comblant les rangs que vos serviteurs de Domination habituels laissent vides."
       },
       "metamorphosis": {
         "name": "Forme de liche",
@@ -10304,7 +10330,7 @@ export const fr_FR: EnTranslations = {
       },
       "cold_blood": {
         "name": "Sang froid",
-        "description": "Concentre votre instinct meurtrier pour que votre prochaine attaque soit un coup critique. (signature Knifework)"
+        "description": "Concentre votre instinct meurtrier pour que votre prochaine attaque soit un coup critique. (signature Art des lames)"
       },
       "blade_flurry": {
         "name": "Déluge de lames",
@@ -10312,7 +10338,7 @@ export const fr_FR: EnTranslations = {
       },
       "hemorrhage": {
         "name": "Hémorragie",
-        "description": "Frappe l'ennemi pour les dégâts de l'arme plus {damage}, cause des dégâts de saignement sur 12 s, et augmente les dégâts de saignement subis de 40%. Confère 1 point de combo. Une utilisation sur deux ajoute 1 Pénombre (maximum 3). (signature Skulduggery)"
+        "description": "Frappe l'ennemi pour les dégâts de l'arme plus {damage}, cause des dégâts de saignement sur 12 s, et augmente les dégâts de saignement subis de 40%. Confère 1 point de combo. Une utilisation sur deux ajoute 1 Pénombre (maximum 3). (signature Fourberie)"
       },
       "power_infusion": {
         "name": "Infusion de puissance",
@@ -10343,12 +10369,12 @@ export const fr_FR: EnTranslations = {
         "description": "Adopte la forme de sélénien, renforçant l’incantation jusqu’à ce que vous changiez de nouveau. Lancez à nouveau pour revenir à la forme normale. (signature Équilibre)"
       },
       "feral_charge": {
-        "name": "Charge farouche",
-        "description": "Charge un ennemi et l’enracine pendant 1 s. Portée de 8-25 m. (signature Farouche)"
+        "name": "Déferlante primordiale",
+        "description": "Libère une déferlante primordiale. En Forme de loup, augmente la régénération d'énergie de 100% pendant 10 s. En Forme de Bruin, génère instantanément 50 points de rage. (signature Farouche)"
       },
       "swiftmend": {
         "name": "Prompte guérison",
-        "description": "Consomme un effet de soin sur la durée présent sur une cible alliée pour la soigner de {damage}. Les plantations de Floraison sauvage et de Seconde floraison ajoutent de la Verdoyance ; à 5 Verdoyance, ce bouton devient Surfloraison, qui soigne instantanément chaque allié portant vos effets de soin sur la durée pour 60% de ce qu'il leur restait. (signature Groveheart)"
+        "description": "Consomme un effet de soin sur la durée présent sur une cible alliée pour la soigner de {damage}. Les plantations de Floraison sauvage et de Seconde floraison ajoutent de la Verdoyance ; à 5 Verdoyance, ce bouton devient Surfloraison, qui soigne instantanément chaque allié portant vos effets de soin sur la durée pour 60% de ce qu'il leur restait. (signature Cœur sylvestre)"
       },
       "moonlash": {
         "name": "Déferlante lunaire",
@@ -10391,8 +10417,8 @@ export const fr_FR: EnTranslations = {
         "description": "Invoque un Warfiend sous le commandement du démoniste. Le Warfiend est un démon de mêlée résistant qui se jette dans la bataille et tient bon. Invoquer un nouveau démon renvoie celui que vous avez. Vous ne pouvez avoir qu'un démon à la fois."
       },
       "summon_infernal": {
-        "name": "Invoquer un Pyre Colossus",
-        "description": "Fait s'abattre un Pyre Colossus sur la zone ciblée et inflige 58-72 points de dégâts de Feu à l'impact. Il combat pendant 30 s sans remplacer votre démon, brûle les ennemis proches toutes les 2 s et génère 1 point de Ruine par seconde."
+        "name": "Invoquer un Colosse du bûcher",
+        "description": "Fait s'abattre un Colosse du bûcher sur la zone ciblée et inflige 58-72 points de dégâts de Feu à l'impact. Il combat pendant 30 s sans remplacer votre démon, brûle les ennemis proches toutes les 2 s et génère 1 point de Ruine par seconde."
       },
       "summon_doomguard": {
         "name": "Invoquer un Wraithborn",
@@ -10600,7 +10626,7 @@ export const fr_FR: EnTranslations = {
       },
       "evocation": {
         "name": "Puits d’éther",
-        "description": "Restaura mana rápidamente. (talent de mage)"
+        "description": "Canalisez pendant 6 s : chaque seconde, vous récupérez 100 points de mana et gagnez 8 points de puissance des sorts. Le bonus se cumule pendant la canalisation et dure 15 s. (talent de Mage)"
       },
       "flurry_of_knives": {
         "name": "Rafale de couteaux",
@@ -10628,11 +10654,11 @@ export const fr_FR: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "Hurlement d’effroi",
-        "description": "Effraie les ennemis proches pendant un maximum de 3 s. Les dégâts peuvent interrompre l'effet. (talent de Démoniste)"
+        "description": "Effraie les ennemis proches pendant un maximum de 5 s. Les dégâts cumulés équivalant à 8% du maximum de points de vie d'une cible interrompent sa peur. (talent de Démoniste)"
       },
       "ice_block": {
         "name": "Cercueil froid",
-        "description": "Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talent de mage)"
+        "description": "Vous enferme dans la glace pendant 8 s, vous immunisant contre tous les dégâts. Supprime les effets néfastes ordinaires déjà actifs et empêche les nouveaux effets de contrôle ordinaires. Utilisable lorsque vous êtes étourdi ou métamorphosé. Vous ne pouvez pas agir pendant cet effet. Relancez la capacité pour l’annuler. (Mage)"
       },
       "inner_focus": {
         "name": "Esprit apaisé",
@@ -10724,7 +10750,7 @@ export const fr_FR: EnTranslations = {
       },
       "presence_of_mind": {
         "name": "Esprit fulgurant",
-        "description": "Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (talent de mage)"
+        "description": "Votre prochain sort ayant un temps d’incantation devient instantané. Dure 60 s. (talent de Mage)"
       },
       "psychic_scream": {
         "name": "Cri psychique",
@@ -10780,7 +10806,7 @@ export const fr_FR: EnTranslations = {
       },
       "venom_dart": {
         "name": "Dard venimeux",
-        "description": "Projette un dard empoisonné infligeant {damage} points de dégâts de Nature. Confère 1 point de combo. Knifework : prolonge votre plaie de Déchirure venimeuse de 6 sec, jusqu’à 20 sec.",
+        "description": "Projette un dard empoisonné infligeant {damage} points de dégâts de Nature. Confère 1 point de combo. Art des lames : prolonge votre plaie de Déchirure venimeuse de 6 sec, jusqu’à 20 sec.",
         "specNote_assassination": "Ajoute 1 Rituel du venin et prolonge votre plaie de venin de 6 s (la plaie ne dépasse jamais 20 s)."
       },
       "body_blow": {
@@ -10793,11 +10819,11 @@ export const fr_FR: EnTranslations = {
       },
       "veilstrike": {
         "name": "Frappe du voile",
-        "description": "Consume la réserve de Pénombre pour vous envelopper d’ombre pendant 6 s : vos ouvertures furtives fonctionnent à découvert et vous infligez 25% de dégâts supplémentaires. (moteur Skulduggery)"
+        "description": "Consume la réserve de Pénombre pour vous envelopper d’ombre pendant 6 s : vos ouvertures furtives fonctionnent à découvert et vous infligez 25% de dégâts supplémentaires. (moteur Fourberie)"
       },
       "venomrend": {
         "name": "Déchirure venimeuse",
-        "description": "Consume le Rituel du venin : frappe pour 22 plus 26 par point de combo, fait détoner les dégâts restants de vos saignements et rend 25 points d’énergie. (moteur Knifework)"
+        "description": "Consume le Rituel du venin : frappe pour 22 plus 26 par point de combo, fait détoner les dégâts restants de vos saignements et rend 25 points d’énergie. (moteur Art des lames)"
       },
       "typhoon": {
         "name": "Typhon",
@@ -12400,7 +12426,7 @@ export const fr_FR: EnTranslations = {
         "name": "Griffe immaculée"
       },
       "dawnhold_posy": {
-        "name": "Dawnhold Garden Posy"
+        "name": "Bouquet du jardin de Dawnhold"
       },
       "conjured_water4": {
         "name": "Eau de source invoquée"
@@ -13247,6 +13273,15 @@ export const fr_FR: EnTranslations = {
       "training_dummy": {
         "name": "Mannequin d'entraînement"
       },
+      "friendly_player_dummy": {
+        "name": "Mannequin de joueur allié"
+      },
+      "normal_boss_dummy": {
+        "name": "Mannequin de boss normal"
+      },
+      "heroic_boss_dummy": {
+        "name": "Mannequin de boss héroïque"
+      },
       "ridge_stalker": {
         "name": "Traqueur de crête"
       },
@@ -13818,7 +13853,7 @@ export const fr_FR: EnTranslations = {
         "name": "Maldrec le Lie-spectres"
       },
       "pyre_colossus": {
-        "name": "Pyre Colossus"
+        "name": "Colosse du bûcher"
       },
       "choirmother_selthe": {
         "name": "Selthe, mère de chœur"
@@ -13863,13 +13898,13 @@ export const fr_FR: EnTranslations = {
         "name": "Graveguard"
       },
       "necromancy_skeletal_warrior": {
-        "name": "Skeletal Warrior"
+        "name": "Guerrier squelette"
       },
       "necromancy_bone_mage": {
-        "name": "Bone Mage"
+        "name": "Mage d’os"
       },
       "necromancy_gravewing": {
-        "name": "Gravewing"
+        "name": "Aile funéraire"
       }
     },
     "npcs": {
@@ -16887,9 +16922,9 @@ export const fr_FR: EnTranslations = {
         "leaveText": "Vous refermez la porte du donjon et retrouvez le vent des Drakelands."
       },
       "dawnhold_castle": {
-        "name": "Dawnhold Castle",
-        "enterText": "You step into the warm, flower-scented halls of Dawnhold Castle.",
-        "leaveText": "You slip back out onto the sunlit garden lawn."
+        "name": "Château Dawnhold",
+        "enterText": "Vous pénétrez dans les salles chaudes et parfumées de fleurs du Château Dawnhold.",
+        "leaveText": "Vous ressortez sur la pelouse ensoleillée du jardin."
       },
       "drowned_temple": {
         "name": "Le Temple noyé",

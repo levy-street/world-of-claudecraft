@@ -120,9 +120,9 @@ export type {
 // discriminator. Changing the authoritative town layout requires a new epoch:
 // the strict discriminator makes both rolling-deploy directions fail closed
 // before either binary loads a character into a differently shaped world.
-// 6 = the class-overhauls integration layout on top of the v0.35.0 base layout
-// (both sides of the 2026-08 base merge bumped independently: 4 and 5).
-export const ONLINE_WORLD_LAYOUT_VERSION = 6 as const;
+// 7 = Fate Threads moved from the marked target to the Warlock. Mixed binaries
+// disagree about the authoritative resource carrier, so they must fail closed.
+export const ONLINE_WORLD_LAYOUT_VERSION = 7 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI

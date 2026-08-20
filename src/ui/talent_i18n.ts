@@ -202,7 +202,9 @@ const grantAbilityIdByTitle = new Map(
     rows.flatMap((row) =>
       row.options.flatMap((option) => {
         const abilityId = option.effect.grant?.ability;
-        return abilityId ? ([[option.name, abilityId]] as const) : [];
+        return abilityId && ABILITIES[abilityId]?.name === option.name
+          ? ([[option.name, abilityId]] as const)
+          : [];
       }),
     ),
   ),

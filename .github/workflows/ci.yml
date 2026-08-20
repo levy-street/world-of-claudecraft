@@ -407,7 +407,37 @@ jobs:
           key: playwright-chromium-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
 
       - name: Install Chromium
-        run: npx playwright install --with-deps chromium
+        # The old single-step form folded a package-manager run (playwright
+        # install-deps) into the browser install, and in practice that half
+        # was the step's only failure mode: three consecutive merge-queue
+        # rejections on 2026-08-19 died at zero mirror throughput with the
+        # browser itself cache-hit. The halves are split so the browser
+        # install keeps its hard failure while the OS-dep half is bounded
+        # (-k so a TERM-ignoring hang cannot defeat the bound) and verified
+        # by CAPABILITY instead of by tool success: the runner image already
+        # ships Chromium's shared libraries (a genuinely missing one fails
+        # loudly at browser launch in the next step), and the one thing
+        # install-deps alone was providing is font coverage, proven when the
+        # first PR run of this split shipped without it and only the CJK
+        # sprite tests went red (run 32233898992, "黒石の城" measured zero
+        # ink). So when install-deps fails, the step checks for CJK fonts
+        # directly, retries a targeted font install off the primary archive
+        # mirror (the stall class lives on the azure mirror), and fails
+        # LOUDLY, still inside this setup step's auto-rerunnable class,
+        # only when no route produced the fonts the suite demonstrably
+        # needs. Worst-case degraded wall is about 3.7 minutes on top of
+        # the 3.73-minute healthy wall, inside this job's 10-minute bound.
+        run: |
+          npx playwright install chromium
+          if ! timeout -k 15 100 npx playwright install-deps chromium; then
+            echo "install-deps unavailable (exit $?); verifying CJK font coverage directly"
+            if ! fc-list :lang=ja | grep -q .; then
+              sudo sed -i 's|azure.archive.ubuntu.com|archive.ubuntu.com|g' /etc/apt/sources.list.d/ubuntu.sources /etc/apt/sources.list 2>/dev/null || true
+              timeout -k 15 60 sudo apt-get update || true
+              timeout -k 15 90 sudo apt-get install -y --no-install-recommends fonts-noto-cjk || true
+            fi
+            fc-list :lang=ja | grep -q . || { echo "no CJK font coverage by any route; the browser suite cannot pass without it"; exit 1; }
+          fi
 
       - name: Run browser regressions
         run: npm run test:browser

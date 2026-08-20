@@ -118,9 +118,11 @@ function eyeGeneration(eye: Aura, amount: number, warlock: Entity): number {
   return Math.round(amount * eyeMult * judgmentMult);
 }
 
-function fateThreadAura(target: Entity, warlockId: number): Aura | undefined {
-  return target.auras.find(
-    (aura) => aura.kind === 'affliction_fate_threads' && aura.sourceId === warlockId,
+// Fate Threads are a caster-owned combo resource. Keeping them on the warlock
+// lets the rotation survive an Eye move or the marked enemy's death.
+function fateThreadAura(warlock: Entity): Aura | undefined {
+  return warlock.auras.find(
+    (aura) => aura.kind === 'affliction_fate_threads' && aura.sourceId === warlock.id,
   );
 }
 
@@ -222,10 +224,10 @@ export function applyEvilEyePossession(
   });
 }
 
-function grantFateThreads(ctx: SimContext, target: Entity, warlock: Entity, stacks: number): void {
+function grantFateThreads(ctx: SimContext, warlock: Entity, stacks: number): void {
   const bounded = Math.min(FATE_THREAD_MAX, Math.max(0, Math.floor(stacks)));
   if (bounded === 0) return;
-  const existing = fateThreadAura(target, warlock.id);
+  const existing = fateThreadAura(warlock);
   if (existing) {
     existing.stacks = bounded;
     existing.value = bounded;
@@ -233,7 +235,7 @@ function grantFateThreads(ctx: SimContext, target: Entity, warlock: Entity, stac
     existing.duration = FATE_THREAD_DURATION;
     return;
   }
-  ctx.applyAura(target, {
+  ctx.applyAura(warlock, {
     id: 'needle_of_fate',
     name: 'Fate Threads',
     kind: 'affliction_fate_threads',
@@ -243,6 +245,7 @@ function grantFateThreads(ctx: SimContext, target: Entity, warlock: Entity, stac
     stacks: bounded,
     sourceId: warlock.id,
     school: 'shadow',
+    undispellable: true,
   });
 }
 
@@ -255,7 +258,7 @@ export function applyHourOfJudgment(
   refund: number,
 ): void {
   gainDoom(ctx, warlock, doom);
-  grantFateThreads(ctx, target, warlock, FATE_THREAD_MAX);
+  grantFateThreads(ctx, warlock, FATE_THREAD_MAX);
   applyEvilEyePossession(ctx, warlock, duration);
   ctx.applyAura(warlock, {
     id: 'hour_of_judgment',
@@ -364,15 +367,20 @@ function triggerLitanyOfGuilt(ctx: SimContext, warlock: Entity): void {
 }
 
 export function moveEvilEye(ctx: SimContext, warlock: Entity, target: Entity): void {
+  const current = primaryEye(ctx, warlock.id);
+  const currentAura = current?.auras.find(
+    (aura) => aura.kind === 'affliction_eye' && aura.sourceId === warlock.id,
+  );
+  const secondary = target.auras.find(
+    (aura) => aura.kind === 'affliction_eye_secondary' && aura.sourceId === warlock.id,
+  );
   for (const entity of ctx.entities.values()) {
     const existing = entity.auras.find(
       (aura) => aura.kind === 'affliction_eye' && aura.sourceId === warlock.id,
     );
-    if (!existing) continue;
-    removeOwnedAura(ctx, entity, existing);
-    const threads = fateThreadAura(entity, warlock.id);
-    if (threads) removeOwnedAura(ctx, entity, threads);
+    if (existing) removeOwnedAura(ctx, entity, existing);
   }
+  if (secondary) removeOwnedAura(ctx, target, secondary);
   ctx.applyAura(target, {
     id: 'evil_eye',
     name: 'Evil Eye',
@@ -384,7 +392,14 @@ export function moveEvilEye(ctx: SimContext, warlock: Entity, target: Entity): v
     tickTimer: MALEDICT_GAZE_INTERVAL,
     sourceId: warlock.id,
     school: 'shadow',
+    actionGainLockout: secondary?.actionGainLockout,
   });
+  // Selecting an existing Coven Eye swaps the two roles. The old primary
+  // inherits the secondary Eye's remaining lifetime, so target switching does
+  // not create an extra Coven mark or extend the talent's temporary coverage.
+  if (current && current.id !== target.id && secondary) {
+    ctx.applyAura(current, { ...secondary, actionGainLockout: currentAura?.actionGainLockout });
+  }
 }
 
 export function maledictGazeDamage(level: number): number {
@@ -458,10 +473,20 @@ export function tickMaledictGaze(ctx: SimContext, target: Entity, aura: Aura): v
   accomplice.icd = accomplice.icdMax ?? ACCOMPLICE_INTERVAL;
 }
 
+export function completeNeedleOfFateCast(ctx: SimContext, warlock: Entity, target: Entity): void {
+  if (!afflictionMeta(ctx, warlock)) return;
+  // Commit the resource when the cast finishes, before the visual projectile
+  // lands, so a queued Sentence can release without an unnecessary fourth Needle.
+  const current = primaryEye(ctx, warlock.id);
+  if (current?.id !== target.id) moveEvilEye(ctx, warlock, target);
+  const eye = eyeAura(target, warlock.id);
+  if (eye?.kind !== 'affliction_eye') return;
+  const threads = fateThreadAura(warlock);
+  grantFateThreads(ctx, warlock, Math.min(FATE_THREAD_MAX, (threads?.stacks ?? 0) + 1));
+}
+
 export function resolveNeedleOfFate(ctx: SimContext, warlock: Entity, target: Entity): void {
   if (!afflictionMeta(ctx, warlock)) return;
-  const current = primaryEye(ctx, warlock.id);
-  if (!current) moveEvilEye(ctx, warlock, target);
   const eye = eyeAura(target, warlock.id);
   if (!eye) return;
   gainDoom(
@@ -473,26 +498,6 @@ export function resolveNeedleOfFate(ctx: SimContext, warlock: Entity, target: En
       warlock,
     ),
   );
-  if (eye.kind !== 'affliction_eye') return;
-  const threads = fateThreadAura(target, warlock.id);
-  if (threads) {
-    threads.stacks = Math.min(FATE_THREAD_MAX, (threads.stacks ?? 0) + 1);
-    threads.value = threads.stacks;
-    threads.remaining = FATE_THREAD_DURATION;
-    threads.duration = FATE_THREAD_DURATION;
-    return;
-  }
-  ctx.applyAura(target, {
-    id: 'needle_of_fate',
-    name: 'Needle of Fate',
-    kind: 'affliction_fate_threads',
-    remaining: FATE_THREAD_DURATION,
-    duration: FATE_THREAD_DURATION,
-    value: 1,
-    stacks: 1,
-    sourceId: warlock.id,
-    school: 'shadow',
-  });
 }
 
 export function applyCursedAccomplice(ctx: SimContext, warlock: Entity, target: Entity): void {
@@ -707,11 +712,11 @@ export function resolveSentence(
   flat = 0,
 ): void {
   const possessed = hasAfflictionPossession(warlock);
-  const threads = fateThreadAura(target, warlock.id);
+  const threads = fateThreadAura(warlock);
   const threadCount = Math.min(FATE_THREAD_MAX, Math.max(0, threads?.stacks ?? 0));
   const doom = consumeDoom(ctx, warlock);
   if (doom < 20) return;
-  if (threads) removeOwnedAura(ctx, target, threads);
+  if (threads) removeOwnedAura(ctx, warlock, threads);
   const judgment = warlock.auras.find(
     (aura) => aura.kind === 'affliction_judgment' && aura.remaining > 0,
   );
@@ -859,10 +864,10 @@ export function consumeFateThreadsForDrain(
   ) {
     return 0;
   }
-  const threads = fateThreadAura(target, warlock.id);
+  const threads = fateThreadAura(warlock);
   if (!threads) return 0;
   const count = Math.min(FATE_THREAD_MAX, Math.max(0, threads.stacks ?? 0));
-  removeOwnedAura(ctx, target, threads);
+  removeOwnedAura(ctx, warlock, threads);
   if (count === 0) return 0;
   ctx.applyAura(warlock, {
     id: 'drain_life_fate_threads',

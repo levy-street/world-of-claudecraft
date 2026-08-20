@@ -26,6 +26,12 @@ type FindingFamily =
   | 'snapshot'
   | 'generic';
 
+/** True when a finding id renders a title of its own rather than the generic
+ *  fallback: the completeness pin every new finding id must satisfy. */
+export function perfFindingHasTitle(id: string): boolean {
+  return Object.hasOwn(TITLE_KEYS, id);
+}
+
 const TITLE_KEYS: Readonly<Record<string, TranslationKey>> = {
   'system-hardware-acceleration': `${PREFIX}.titles.hardwareAcceleration`,
   'system-integrated-gpu': `${PREFIX}.titles.integratedGpu`,
@@ -46,7 +52,10 @@ const TITLE_KEYS: Readonly<Record<string, TranslationKey>> = {
   'event-cpu': `${PREFIX}.titles.eventCpu`,
   'hitch-shader-compile': `${PREFIX}.titles.shaderCompile`,
   'hitch-texture-upload': `${PREFIX}.titles.textureUpload`,
+  'hitch-zone-build': `${PREFIX}.titles.zoneBuild`,
   'hitch-view-create': `${PREFIX}.titles.viewCreate`,
+  'hitch-gc': `${PREFIX}.titles.gcHitch`,
+  'hitch-off-frame': `${PREFIX}.titles.offFrameHitch`,
   'hitch-other': `${PREFIX}.titles.otherHitch`,
   'asset-startup': `${PREFIX}.titles.assetStartup`,
   'main-thread-long-tasks': `${PREFIX}.titles.longTasks`,

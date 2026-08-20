@@ -4,10 +4,6 @@ const DOOM_MAX = 100;
 const FATE_THREAD_MAX = 3;
 const WARNING_SECONDS = 5;
 
-export interface AfflictionAuraCarrier {
-  auras: readonly Aura[];
-}
-
 export interface DoomMeterState {
   visible: boolean;
   value: number;
@@ -27,23 +23,11 @@ export interface DoomMeterInput {
   fateThreads?: number;
 }
 
-export function afflictionFateThreadCount(
-  entities: Iterable<AfflictionAuraCarrier>,
-  sourceId: number,
-): number {
-  for (const entity of entities) {
-    let primaryEye = false;
-    let threads = 0;
-    for (const aura of entity.auras) {
-      if (aura.sourceId !== sourceId) continue;
-      if (aura.kind === 'affliction_eye') primaryEye = true;
-      if (aura.kind === 'affliction_fate_threads') {
-        threads = aura.stacks ?? Math.round(aura.value);
-      }
-    }
-    if (primaryEye) return Math.max(0, Math.min(FATE_THREAD_MAX, Math.round(threads)));
-  }
-  return 0;
+export function afflictionFateThreadCount(auras: readonly Aura[], sourceId: number): number {
+  const threads = auras.find(
+    (aura) => aura.sourceId === sourceId && aura.kind === 'affliction_fate_threads',
+  );
+  return Math.max(0, Math.min(FATE_THREAD_MAX, Math.round(threads?.stacks ?? threads?.value ?? 0)));
 }
 
 export function doomMeterState(

@@ -112,9 +112,18 @@ describe('prewarm resume ledger', () => {
     expect(renderer).not.toMatch(/structuredClone\(\s*this\.lastPrewarmStats/);
     // Copying the stats INTO a fresh object is the dangerous shape. Mutating a
     // sub-object in place is not, and markGpuHitchReveal legitimately does that
-    // to prewarmPacing, so the pin has to tell the two apart.
+    // to prewarmPacing (through markPrewarmPacingReveal in link_rate_budget.ts,
+    // which receives the stats object itself), so the pin has to tell the two
+    // apart.
     expect(renderer).not.toMatch(/Object\.assign\(\s*\{[^)]*this\.lastPrewarmStats/);
-    expect(renderer).toContain('Object.assign(\n        this.lastPrewarmStats.prewarmPacing,');
+    expect(renderer).toContain(
+      'markPrewarmPacingReveal(this.gpuHitchPacing, this.lastPrewarmStats);',
+    );
+    const pacing = readFileSync(
+      new URL('../src/render/link_rate_budget.ts', import.meta.url),
+      'utf8',
+    );
+    expect(pacing).toContain('Object.assign(\n      receiptSink.prewarmPacing,');
   });
 
   it('reads LIVE through a getter, so a spread cannot freeze it at scheduled', () => {

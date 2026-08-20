@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  exp_dawnhold_castle: {
+    name: '정원의 열린 문',
+    desc: '던홀드 성을 찾아 햇살 가득한 정원 회랑을 거닐어 보세요.',
+  },
+  exp_the_last_keep: {
+    name: '고요한 회랑',
+    desc: '마지막 요새의 문을 지나 고요한 회랑을 걸어 보세요.',
+  },
   pvp_bg_first_capture: {
     name: '손에 쥔 깃발',
     desc: '쏜할로우 평원에서 깃발을 탈취하십시오.',

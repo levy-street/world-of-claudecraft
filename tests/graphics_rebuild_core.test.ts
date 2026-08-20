@@ -120,7 +120,7 @@ describe('per-system dial staging (round 12)', () => {
       surfaceDetail: 0,
       effectsQuality: 0,
       shadowQuality: 0.5,
-      antiAliasing: 0,
+      antiAliasing: 1,
       bloomQuality: 0,
       ambientOcclusion: 0,
       viewDistance: 0.5,
@@ -339,6 +339,22 @@ describe('dial seeds versus the real gfx.ts tier ladder', () => {
     expect(advancedFor(2).gradePass).toBe(medium.gradePass);
     expect(advancedFor(2).ao).toBe(medium.ao);
     expect(advancedFor(2).bloom).toBe(medium.bloom);
+    // Medium's edge AA is fused into the grade pass, so the AA dial has to
+    // carry it across the switch to Advanced or the mix silently loses it.
+    expect(advancedFor(2).fxaa).toBe(medium.fxaa);
+    expect(advancedFor(1).fxaa).toBe(low.fxaa);
+    // The same dial move has a second consequence worth recording: raise the
+    // Medium-seeded mix into the composer range and the AA it now carries
+    // becomes the SMAA tail, where the old seed left that mix with no AA at all.
+    const mediumSeedOnComposer = settingsFor('high', {
+      ...desktopHints,
+      graphicsPreset: 5,
+      ...advancedDialSeed(2),
+      effectsQuality: 1,
+    });
+    expect(mediumSeedOnComposer.composer).toBe(true);
+    expect(mediumSeedOnComposer.smaa).toBe(true);
+    expect(mediumSeedOnComposer.fxaa).toBe(false);
 
     const high = settingsFor('high', desktopHints);
     const highKnobs = [

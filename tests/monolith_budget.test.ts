@@ -51,12 +51,37 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned 19432 -> 19433: the release/v0.38.0 merge into this branch
     // grew hud.ts by one line at HEAD without updating the row, so the gate
     // arrived red. Same exact-count, zero-slack intent as above.
+    // Raised 19433 -> 19442 (+9) for the login preview-prewarm trim: thin-consumer
+    // wiring (a `looksModular` read plus three flag args to the pure
+    // buildPostEntryPreviewPrewarmUnits) that has no clean branch-owned
+    // extraction, landing on upstream's zero-slack re-pin. Maintainer decision,
+    // exact merged count: any further growth reds again.
     // Re-pinned 19433 -> 19488 when the castle branch merged main: the castle
     // additions are thin-consumer wiring to extracted modules (the two
     // LastKeepMapPainter declarations and the two walk-in map branches on the
     // clearMapHitState pattern), riding on main's zero-slack pin. Exact merged
     // count: any further growth reds again.
-    ceiling: 19488,
+    // Raised for the controller cross hotbar, on top of the moved-base v0.39
+    // re-pin. The additions are thin-consumer wiring to an extracted domain
+    // (src/ui/hud/cross_hotbar/): the overlay's construction, its per-frame paint,
+    // and the one public seam the pad drives it through. Everything with substance
+    // (the view, painter, resolvers, panel-hooks shape) lives in that domain, and
+    // the earlier attempt to buy these lines by extracting UNRELATED pre-existing
+    // helpers out of hud.ts was reverted: refactoring code a change does not own to
+    // fit a budget inflates the diff and risks regressions elsewhere. A maintainer
+    // decision, taken rather than paid for with someone else's code. The last
+    // line is openSpellbook, which the pad needs so a confirm on an empty cell can
+    // reach the ability list; the toggle beside it would have closed it instead.
+    // castCrossHotbarAction is the other: it routes a pad press back through
+    // castSlot so a cross-hotbar cast keeps the SAME semantics a key press has
+    // (reticle, empower, sport, mouseover) instead of growing a second cast path,
+    // with the Attack branch beside it: Attack is the fixed slot-0 toggle rather
+    // than an ability, so it is the one action the seed cannot copy off the bar.
+    // Raised for the cross-hotbar cast-fallback fix: the fallback grows an item
+    // arm and a spoken refusal beside the ability one, and the shared item-use
+    // seam castSlot and the pad now both call. Exact merged count, zero slack:
+    // any further growth reds again.
+    ceiling: 19490,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -70,14 +95,12 @@ const MONOLITHS: MonolithRow[] = [
     // per-status manifest rollup to summarizePrewarmManifest
     // (prewarm_compile_lifecycle.ts, beside the interface it fills) and the
     // resume-lane bookkeeping to prewarm_resume_ledger_core.ts.
-    // Merging release/v0.39.0 into the sled: this side stood at 13731 (its own
-    // exact size, after the ground_puff.ts extraction paid for the summon call)
-    // and upstream at 13689, and the merge lands at 13665, below both. Pinned to
-    // that exact merged count, which is the rule both parents already followed:
-    // a merge takes the merged count and any further growth reds. Upstream also
-    // carries the r185 frozen-camera aim fix now, so this branch's cherry-pick
-    // of it converges here rather than diverging.
-    ceiling: 13665,
+    // Merging release/v0.40.0 into the sled: this side pinned 13665 and
+    // upstream 13546, and the merge lands at 13565. Pinned to that exact merged
+    // count, the rule both parents already follow. Upstream's prewarm depth
+    // material refactor and texture-sweep extraction were taken wholesale here,
+    // which is most of the drop.
+    ceiling: 13568,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -87,7 +110,12 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/main.ts',
-    ceiling: 11490,
+    // Pinned at the exact merged count. This branch's extractions (the blocking
+    // arrival chain into src/game/arrival_warmup.ts, the world-entry settle
+    // cover joining it) net against the base's pad-selection extraction plus
+    // controller-config growth (src/game/pad_target_pick.ts, ceiling 11552),
+    // landing below both parents' pins. Any further growth reds again.
+    ceiling: 11516,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -117,7 +145,7 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/render/foliage.ts',
-    ceiling: 4150,
+    ceiling: 4147,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

@@ -2214,6 +2214,7 @@ export function disposeWeaponEmissiveCache(): void {
 export function clearWeaponVfxTextureCacheForTest(): void {
   for (const texture of texCache.values()) texture.dispose();
   texCache.clear();
+  prewarmHostMap = null;
 }
 
 /** Cold-build the emissive + de-baked albedo pair for one source map: the
@@ -3148,6 +3149,36 @@ export function weaponVfxPrewarmTextures(): THREE.Texture[] {
  * compile entry link it, then removes it (never disposes: disposing a
  * material releases its linked program, which is the thing being warmed).
  */
+let prewarmHostMap: THREE.Texture | null = null;
+
+/**
+ * A one-pixel base-colour map for the prewarm hosts, shared by every spec.
+ * deriveEmissive BRANCHES on the host material's `map`: a mapless host takes
+ * the flat-tint fallback, so the boot twin carried map-absent and
+ * emissiveMap-absent while the live path carries both present (and
+ * metalnessMap / roughnessMap nulled), which is a different program-cache key
+ * for the whole variant set. One pixel keeps the derivation memo cost that the
+ * mapless host was protecting against (weapon_vfx_emissive_cache_core.ts) down
+ * to two 1x1 canvases per catalog spec, pinned for the session by the prewarm
+ * rigs, which are deliberately never disposed.
+ */
+function weaponVfxPrewarmHostMap(): THREE.Texture {
+  if (prewarmHostMap) return prewarmHostMap;
+  const canvas = document.createElement('canvas');
+  canvas.width = 1;
+  canvas.height = 1;
+  const cx = canvas.getContext('2d');
+  if (cx) {
+    cx.fillStyle = '#ffffff';
+    cx.fillRect(0, 0, 1, 1);
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.flipY = false; // match GLTF UV orientation, as the real skin maps do
+  texture.colorSpace = THREE.SRGBColorSpace;
+  prewarmHostMap = markSharedTexture(texture);
+  return prewarmHostMap;
+}
+
 export function buildWeaponVfxPrewarmGroup(): THREE.Group {
   const group = new THREE.Group();
   group.name = 'weapon-vfx-program-prewarm';
@@ -3155,7 +3186,7 @@ export function buildWeaponVfxPrewarmGroup(): THREE.Group {
   for (const [key, spec] of Object.entries(WEAPON_VFX)) {
     const host = new THREE.Mesh(
       new THREE.BoxGeometry(0.1, 1, 0.1),
-      new THREE.MeshStandardMaterial({ color: 0xffffff }),
+      new THREE.MeshStandardMaterial({ color: 0xffffff, map: weaponVfxPrewarmHostMap() }),
     );
     host.name = `prewarm-skin-host:${key}`;
     host.frustumCulled = false;

@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  exp_dawnhold_castle: {
+    name: 'Een Open Deur in de Tuin',
+    desc: 'Breng een bezoek aan Kasteel Dawnhold en dwaal door zijn zonnige tuinzalen.',
+  },
+  exp_the_last_keep: {
+    name: 'De Stille Zalen',
+    desc: 'Stap door de deuren van De Laatste Burcht en loop door haar stille zalen.',
+  },
   pvp_bg_first_capture: {
     name: 'Vaandel in de Hand',
     desc: 'Verover een vlag in Doornholte-Velden.',

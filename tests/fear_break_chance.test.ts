@@ -1,12 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { MOBS } from '../src/sim/data';
+import { runEffects } from '../src/sim/combat/effect_dispatch';
+import { ABILITIES, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
-import { Sim } from '../src/sim/sim';
+import { type PlayerMeta, type ResolvedAbility, Sim } from '../src/sim/sim';
 import type { Aura, Entity } from '../src/sim/types';
 
 // G5 (fix/talents2-balance-pass): fears no longer insta-break on any damage.
-// The fear family (Harrow, Dread Chorus, Morrowlash, Terror Canticle) carries
-// breakChanceScale: each damage event breaks the fear with probability
+// The generic fear family (Morrowlash, Terror Canticle) carries breakChanceScale:
+// each damage event breaks the fear with probability
 // min(1, amount / (scale * maxHp)), so big hits reliably break it and dot
 // ticks usually do not (the classic behavior that makes dot-then-fear a
 // warlock rotation instead of an anti-combo). Plain incapacitates (Eye Jab,
@@ -14,6 +15,8 @@ import type { Aura, Entity } from '../src/sim/types';
 // left the warrior Lingering Dread soak threshold alone. (That soak has since
 // moved 20% -> 10% of max health, anchored on FEAR_BREAK_CHANCE_SCALE so it now
 // absorbs exactly one guaranteed-break hit; see src/sim/content/warrior_rows.ts.)
+// Harrow and Dread Chorus instead carry a deterministic 8% cumulative budget,
+// so automatic pet and DoT damage cannot roll an immediate break.
 
 function addTarget(sim: Sim, distance: number, level = 20): Entity {
   const player = sim.player;
@@ -98,7 +101,7 @@ describe('G5: damage-scaled fear break', () => {
     expect(fearAura(mob)).toBeDefined();
   });
 
-  it('Harrow applies a chance-scaled fear', () => {
+  it('Harrow absorbs 8% max-health damage before breaking', () => {
     // Seed hunted (post-merge camp order) so the level-14-vs-20 Harrow cast
     // is not resisted: the fear must actually land for the aura assertions.
     // Re-hunted (1 -> 3) after the Eastbrook camp respacing thinned the zone-1
@@ -118,8 +121,61 @@ describe('G5: damage-scaled fear break', () => {
     for (let i = 0; i < 80; i++) sim.tick();
     const aura = fearAura(mob);
     expect(aura, 'Harrow fear aura').toBeDefined();
+    expect(aura?.duration).toBe(5);
     expect(aura?.breaksOnDamage).toBe(true);
-    expect(aura?.breakChanceScale).toBeCloseTo(0.1);
+    expect(aura?.breakChanceScale).toBeUndefined();
+    expect(aura?.breakThreshold).toBe(8_000);
+
+    let draws = 0;
+    sim.rng.setObserver(() => {
+      draws++;
+    });
+    dealHit(sim, mob, 7_999);
+    sim.rng.setObserver(null);
+    expect(draws).toBe(0);
+    expect(fearAura(mob)?.breakThreshold).toBe(1);
+    dealHit(sim, mob, 1);
+    expect(fearAura(mob)).toBeUndefined();
+  });
+
+  it('Dread Chorus gives every feared target the same 8% damage budget', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warlock', autoEquip: true });
+    sim.setPlayerLevel(20);
+    expect(sim.applyTalents({ spec: null, rows: { 8: 'wlk_r8_howl_of_terror' } })).toBe(true);
+    const first = addTarget(sim, 3);
+    const second = createMob(30_000, MOBS.forest_wolf, 20, {
+      x: sim.player.pos.x - 3,
+      y: sim.player.pos.y,
+      z: sim.player.pos.z,
+    });
+    second.hostile = true;
+    second.aiState = 'idle';
+    second.maxHp = 50_000;
+    second.hp = second.maxHp;
+    (sim as unknown as { addEntity(entity: Entity): void }).addEntity(second);
+    sim.player.resource = sim.player.maxResource;
+
+    sim.castAbility('howl_of_terror');
+
+    expect(fearAura(first)?.duration).toBe(5);
+    expect(fearAura(second)?.duration).toBe(5);
+    expect(fearAura(first)?.breakThreshold).toBe(8_000);
+    expect(fearAura(second)?.breakThreshold).toBe(4_000);
+    expect(fearAura(first)?.breakChanceScale).toBeUndefined();
+    expect(fearAura(second)?.breakChanceScale).toBeUndefined();
+
+    dealHit(sim, first, 8_000);
+    expect(fearAura(first)).toBeUndefined();
+    expect(fearAura(second)?.breakThreshold).toBe(4_000);
+  });
+
+  it('states the 8% budget in both Warlock Fear descriptions', () => {
+    expect(ABILITIES.fear.description).toBe(
+      "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect.",
+    );
+    expect(ABILITIES.howl_of_terror.description).toBe(
+      "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)",
+    );
   });
 
   it('Terror Canticle (aoeFear) applies chance-scaled fears', () => {
@@ -133,6 +189,35 @@ describe('G5: damage-scaled fear break', () => {
     const aura = fearAura(mob);
     expect(aura, 'Terror Canticle fear aura').toBeDefined();
     expect(aura?.breakChanceScale).toBeCloseTo(0.1);
+    expect(aura?.breakThreshold).toBeUndefined();
+  });
+
+  it('Morrowlash keeps the generic chance-scaled fear behavior', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warlock', autoEquip: true });
+    sim.setPlayerLevel(20);
+    const mob = addTarget(sim, 3);
+    const meta = (sim as unknown as { players: Map<number, PlayerMeta> }).players.get(
+      sim.player.id,
+    );
+    const def = ABILITIES.death_coil;
+    const ability: ResolvedAbility = {
+      def,
+      rank: 1,
+      cost: def.cost,
+      castTime: def.castTime,
+      cooldown: def.cooldown,
+      effects: def.effects,
+      threatFlat: 0,
+      threatMult: 1,
+    };
+    if (!meta) throw new Error('Morrowlash test setup failed');
+
+    runEffects(sim.ctx, sim.player, meta, mob, ability);
+
+    const aura = fearAura(mob);
+    expect(aura, 'Morrowlash fear aura').toBeDefined();
+    expect(aura?.breakChanceScale).toBeCloseTo(0.1);
+    expect(aura?.breakThreshold).toBeUndefined();
   });
 
   it('Eye Jab stays a classic incapacitate: any damage breaks it', () => {
@@ -153,7 +238,7 @@ describe('G5: damage-scaled fear break', () => {
 // The PvP fear ladder scales the ability's OWN duration. It used to be a table of
 // absolute seconds returned WITHOUT reading the authored duration, so every fear
 // lasted 8s on its first PvP application whatever its tooltip said: Psychic Scream
-// (4s) doubled, Howl of Terror and Death Coil (3s) more than doubled. Five
+// (4s) doubled, and the then-authored Howl of Terror and Death Coil (3s) more than doubled. Five
 // abilities across three classes ride this ladder, so an absolute table can only
 // ever be correct for one of them.
 describe('PvP fear diminishing returns scale the authored duration', () => {
@@ -181,9 +266,9 @@ describe('PvP fear diminishing returns scale the authored duration', () => {
 
   it('gives each fear its own authored duration on the first application', () => {
     const { dr, reset } = pvpRig();
-    // warlock fear 8, warrior Intimidating Shout 4, priest Psychic Scream 4,
-    // Howl of Terror 3, Death Coil 3. Every one of these read 8 before the fix.
-    for (const authored of [8, 4, 3]) {
+    // The generic 8 sec boundary plus Warlock Harrow and Dread Chorus 5,
+    // warrior Intimidating Shout and priest Psychic Scream 4, and Death Coil 3.
+    for (const authored of [8, 5, 4, 3]) {
       reset();
       expect(dr(authored), `authored ${authored}s`).toBe(authored);
     }
@@ -215,7 +300,7 @@ describe('PvP fear diminishing returns scale the authored duration', () => {
     const inner = sim as unknown as {
       diminishedCrowdControlDuration: (a: Entity, b: Entity, c: string, d: number) => number | null;
     };
-    for (const authored of [8, 4, 3]) {
+    for (const authored of [8, 5, 4, 3]) {
       expect(inner.diminishedCrowdControlDuration(sim.player, mob, 'fear', authored)).toBe(
         authored,
       );

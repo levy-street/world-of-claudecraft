@@ -22,6 +22,14 @@ import { GFX } from './gfx';
 // The fish body is a small Tripo-generated GLB (see public/models/creatures/
 // CLAUDE.md); a merged-primitive body is kept as a fallback for the brief
 // window before the GLB preload resolves.
+//
+// The GLB body is a CLIENT of the renderer's live compile gate. Its material
+// arrives on the deferred preload lane, so no prewarm manifest entry ever sees
+// it, and the pooled bodies stay hidden between leaps: its program therefore
+// linked synchronously on the first leap after the world reveal (a measured
+// 23-146 ms frame). `setCompileGate` routes ONE hidden prewarm instance
+// through the gate first and the pool keeps the merged-primitive body until
+// the programs are linked, exactly as it does before the preload resolves.
 
 const FISH_ASSET_URL = '/models/creatures/leaping_fish.glb';
 let loadedFishGltf: THREE.Group | null = null;
@@ -34,8 +42,14 @@ if (typeof window !== 'undefined') {
   );
 }
 
-/** Test-only window into the preload asset (mirrors props.ts). */
-export const fishPreloadInternalsForTest = { fishAssetUrl: FISH_ASSET_URL };
+/** Test-only window into the preload asset (mirrors props.ts). The setter lets
+ *  a test drive the post-preload body swap without a loader or a GPU. */
+export const fishPreloadInternalsForTest = {
+  fishAssetUrl: FISH_ASSET_URL,
+  setLoadedGltfForTest(scene: THREE.Group | null): void {
+    loadedFishGltf = scene;
+  },
+};
 
 const SPAWN_RADIUS = 72; // fish surface within this distance of the player
 const MIN_RADIUS = 9; // ...but never right on top of the camera
@@ -48,10 +62,19 @@ const REST_MAX = 7.0;
 const RETRY_REST = 0.6; // shorter wait when no water was found nearby
 const PLACE_TRIES = 6; // attempts to find deep water per leap
 
+/** The renderer's live compile gate: compile the colour + shadow programs of a
+ *  HIDDEN root off-thread and resolve once they are linked. Same shape as the
+ *  gate `DungeonInteriors` takes and as `renderer.compileGate`. */
+export type FishCompileGate = (root: THREE.Object3D) => Promise<unknown>;
+
 export interface FishView {
   group: THREE.Group;
   /** per-frame: advance leaps and recycle idle fish near the player */
   update(px: number, pz: number, dt: number): void;
+  /** Install (or clear) the renderer's live compile gate. Install it before the
+   *  first `update()`; without one the GLB body swaps in as soon as the preload
+   *  has resolved (previous behaviour, and what headless hosts and tests get). */
+  setCompileGate(gate: FishCompileGate | null): void;
 }
 
 function mulberry32(seed: number): () => number {
@@ -100,6 +123,8 @@ type Phase = 'rest' | 'leap';
 
 interface Fish {
   body: THREE.Object3D;
+  /** false while this fish still wears the merged-primitive fallback body */
+  glbBody: boolean;
   phase: Phase;
   timer: number; // rest countdown / leap elapsed depending on phase
   ox: number; // leap origin (where it breaks the surface)
@@ -142,28 +167,34 @@ export function buildFish(
   const depthAt = (x: number, z: number): number =>
     waterLevelAt(x, z, seed) - terrainHeight(x, z, seed);
 
-  const buildBody = (): THREE.Object3D => {
-    if (loadedFishGltf) {
-      // Not Box3-normalized: assumes the fish GLB is authored at world scale
-      // with its body centered at the origin.
-      // A re-export at a different scale or origin will silently sink or
-      // oversize the fish.
-      const inst = loadedFishGltf.clone(true);
-      inst.traverse((child) => {
-        if (child instanceof THREE.Mesh) child.castShadow = GFX.standardMaterials;
-      });
-      return inst;
-    }
-    return new THREE.Mesh(bodyGeo, bodyMat);
+  // The ONE builder for a GLB body: the hidden prewarm instance and every live
+  // fish must come out of it, so the flags three keys a program on (castShadow
+  // decides whether the depth variant is needed) cannot drift between the
+  // instance the gate compiles and the one that draws.
+  const buildGlbBody = (source: THREE.Group): THREE.Object3D => {
+    // Not Box3-normalized: assumes the fish GLB is authored at world scale
+    // with its body centered at the origin.
+    // A re-export at a different scale or origin will silently sink or
+    // oversize the fish.
+    const inst = source.clone(true);
+    inst.traverse((child) => {
+      if (child instanceof THREE.Mesh) child.castShadow = GFX.standardMaterials;
+    });
+    inst.visible = false;
+    return inst;
   };
 
   const fish: Fish[] = [];
   for (let i = 0; i < count; i++) {
-    const body = buildBody();
+    // The pool always starts on the fallback body: whether a compile gate is
+    // installed is not known until after buildFish returns, and no fish is
+    // drawn before the first update(), which is where the GLB body lands.
+    const body = new THREE.Mesh(bodyGeo, bodyMat);
     body.visible = false;
     group.add(body);
     fish.push({
       body,
+      glbBody: false,
       phase: 'rest',
       timer: REST_MIN + (rng() * (REST_MAX - REST_MIN) * (i + 1)) / count, // stagger the first wave
       ox: 0,
@@ -188,9 +219,61 @@ export function buildFish(
     return false;
   };
 
+  // 'waiting' until the preload resolves, then 'linking' while the gate holds
+  // the hidden prewarm instance, then 'ready' (swap the pool over) or 'failed'
+  // (a rejected gate leaves the whole pool on the fallback body).
+  let glbState: 'waiting' | 'linking' | 'ready' | 'failed' = 'waiting';
+  let compileGate: FishCompileGate | null = null;
+  let prewarm: THREE.Object3D | null = null;
+
+  const beginGlbSwap = (source: THREE.Group): void => {
+    if (!compileGate) {
+      glbState = 'ready';
+      return;
+    }
+    glbState = 'linking';
+    const instance = buildGlbBody(source);
+    prewarm = instance;
+    group.add(instance);
+    try {
+      void compileGate(instance).then(
+        () => {
+          // Flag only. Swapping a body here would flip nodes between frames,
+          // and numPointLights is part of three's program cache key: a
+          // hide/show off a promise can move the counted light set and link a
+          // second program.
+          glbState = 'ready';
+        },
+        () => {
+          glbState = 'failed';
+        },
+      );
+    } catch {
+      glbState = 'failed';
+    }
+  };
+
+  const swapInGlbBody = (f: Fish, source: THREE.Group): void => {
+    const body = buildGlbBody(source);
+    group.remove(f.body);
+    group.add(body);
+    f.body = body;
+    f.glbBody = true;
+  };
+
   return {
     group,
+    setCompileGate(gate: FishCompileGate | null): void {
+      compileGate = gate;
+    },
     update(px: number, pz: number, dt: number): void {
+      const gltf = loadedFishGltf;
+      if (gltf && glbState === 'waiting') beginGlbSwap(gltf);
+      if (prewarm && glbState !== 'linking') {
+        prewarm.removeFromParent();
+        prewarm = null;
+      }
+
       // no fish indoors — dungeon instances live far past the strip
       if (px > DUNGEON_X_THRESHOLD) {
         if (group.visible) group.visible = false;
@@ -200,6 +283,9 @@ export function buildFish(
 
       for (const f of fish) {
         if (f.phase === 'rest') {
+          // Under water and invisible: the only safe moment to change a body.
+          // Mid-leap the fish is on screen, and swapping there would pop.
+          if (gltf && glbState === 'ready' && !f.glbBody) swapInGlbBody(f, gltf);
           f.timer -= dt;
           if (f.timer <= 0) {
             if (seekWater(f, px, pz)) {

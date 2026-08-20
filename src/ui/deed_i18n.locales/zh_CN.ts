@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  exp_dawnhold_castle: {
+    name: '花园中敞开的门',
+    desc: '造访晨曦堡，漫步于它洒满阳光的花园厅堂。',
+  },
+  exp_the_last_keep: {
+    name: '寂静厅堂',
+    desc: '步入最后的堡垒，走过它寂静的厅堂。',
+  },
   pvp_bg_first_capture: {
     name: '旗帜在手',
     desc: '在荆谷原野夺取一面旗帜。',

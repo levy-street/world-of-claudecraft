@@ -1449,9 +1449,29 @@ export const ko_KR: EnTranslations = {
       "buttons": "버튼 배치",
       "resetButtons": "버튼 배치 초기화",
       "menuAction": "게임 메뉴",
+      "confirmAction": "확인 / 선택",
       "zoomIn": "확대",
       "zoomOut": "축소",
-      "help": "왼쪽 스틱으로 이동, 오른쪽 스틱으로 시점 조작. 창을 열면 화면 포인터를 사용할 수 있습니다."
+      "help": "왼쪽 스틱으로 이동, 오른쪽 스틱으로 시점 조작. 창을 열면 화면 포인터를 사용할 수 있습니다.",
+      "crossHotbar": "크로스 핫바",
+      "crossHotbarEnable": "크로스 핫바 사용",
+      "crossHotbarExpand": "더블 크로스 핫바",
+      "crossHotbarHelp": "트리거를 누르고 있으면 방향키와 페이스 버튼에 여덟 개의 액션 바 슬롯이 표시됩니다. 다른 트리거를 짧게 누르면 두 번째 세트로 전환됩니다.",
+      "crossHotbarResetLayout": "크로스 핫바 초기화",
+      "crossHotbarPosition": "{trigger} + {button}",
+      "crossHotbarOwnsButtons": "크로스 핫바가 켜져 있는 동안에는 트리거와 방향키를 크로스 핫바가 사용합니다. 여기가 아니라 아래에서 설정하세요.",
+      "cancelAction": "취소 / 뒤로",
+      "subcommandsAction": "하위 명령 / 지도",
+      "cycleHudAction": "인터페이스 전환",
+      "cycleSetAction": "단축바 세트 전환",
+      "crossHotbarDisplay": "바 표시",
+      "crossHotbarDisplayFull": "전체",
+      "crossHotbarDisplayCompact": "간소",
+      "crossHotbarDisplayMinimal": "누르고 있을 때만",
+      "crossHotbarArrangeChord": "{bumper} + {button}",
+      "crossHotbarCarrying": "{action} 을(를) 들고 있습니다. 칸에서 확인을 누르면 놓고, 취소하면 되돌립니다.",
+      "crossHotbarEditHint": "정렬 중: 확인으로 칸이나 마법서에서 액션을 집어 칸에 놓고, 취소로 칸을 비웁니다.",
+      "crossHotbarEditHelp": "왼쪽 범퍼를 누른 채 위쪽 페이스 버튼을 누르면 컨트롤러로 바를 정렬할 수 있습니다."
     },
     "perf": {
       "title": "성능 오버레이",
@@ -1570,6 +1590,7 @@ export const ko_KR: EnTranslations = {
           "render": "렌더  제출 {submit}밀리초 | 월드 {world}밀리초 | 엔티티 {entities}밀리초",
           "scene": "장면   호출 {calls}회 | 삼각형 {triangles}개 | 뷰 {views}개",
           "hitches": "끊김 {hitches} | 셰이더 {shaders} | 업로드 {uploads} | 뷰 {views}",
+          "hitchesBuild": "구역 빌드 {zoneBuilds} | 프레임 외부 {offFrame} | GC {gc}",
           "gpu": "GPU     {renderer}",
           "waitingValue": "대기 중"
         },
@@ -1621,7 +1642,10 @@ export const ko_KR: EnTranslations = {
             "eventCpu": "이벤트 처리가 프레임 시간을 사용합니다",
             "shaderCompile": "게임 중 셰이더가 컴파일되고 있습니다",
             "textureUpload": "텍스처 업로드가 게임 끊김을 일으킵니다",
+            "zoneBuild": "구역 스트리밍 빌드가 끊김을 일으킵니다",
             "viewCreate": "엔티티 뷰 생성이 끊김을 일으킵니다",
+            "gcHitch": "긴 프레임 안에서 가비지 컬렉션이 실행되고 있습니다",
+            "offFrameHitch": "긴 프레임은 렌더 콜백 외부의 작업에서 발생합니다",
             "otherHitch": "원인을 알 수 없는 긴 프레임이 남아 있습니다",
             "assetStartup": "에셋 작업이 게임 시작을 지연시킵니다",
             "longTasks": "브라우저의 긴 작업이 프레임을 막습니다",
@@ -4772,6 +4796,7 @@ export const ko_KR: EnTranslations = {
       "mageEleJet": "물 분사는 소환수 바에 자기 버튼으로 따로 자리합니다. 클릭하면 적 하나에게 얼어붙는 물줄기를 집중시키고, 우클릭하면(모바일에서는 길게 누르면) 준비될 때마다 정령이 알아서 쏘게 합니다.",
       "formsHeading": "변신",
       "formsNote": "드루이드는 형태를 바꾸며 싸웁니다. 드루이드의 능력은 대부분 특정 형태에 속하므로, 지금 어떤 형태인지가 무엇을 쓸 수 있는지를 결정하며, 변신에는 약간의 마나가 듭니다. 전투 중이든 아니든 원하는 만큼 자주 변신할 수 있습니다.",
+      "formsAutoUnshift": "변신한 채로 치유 주문이나 공격 주문을 시전하면 형태가 알아서 풀립니다. 이렇게 형태를 벗는 데에는 마나가 들지 않고 공용 재사용 대기시간도 쓰지 않으므로, 즉시 시전 주문은 누른 그 순간에 나갑니다. 다시 변신하는 것은 평범한 능력이라 여전히 마나와 공용 재사용 대기시간이 듭니다.",
       "formsMoonwing": "조화 전문화 드루이드는 형태를 하나 더 얻습니다. 조화 드루이드가 싸울 때 쓰는 시전자 형태인 달빛야수 변신입니다. 주문을 그대로 쓸 수 있는 유일한 동물 형태이며, 마법봉은 이 형태나 평범한 시전자 모습에서만 쓸 수 있습니다.",
       "formLine": {
         "form_bear": "방어를 맡는 형태입니다. 두꺼운 가죽을 두르고, 마나 대신 분노를 쓰며, 위협 수준을 더 쌓아 적이 계속 당신을 때리게 합니다.",
@@ -7189,6 +7214,7 @@ export const ko_KR: EnTranslations = {
       "shopMarksRequired": "{name}을(를) 구매하려면 탐굴 증표 {marks}개가 필요합니다.",
       "shopSealPremiumOnly": "이 봉인은 대가의 손에만 응합니다. 최상급 베팅만이 열 수 있습니다.",
       "passageSealed": "통로가 봉인되어 있습니다.",
+      "enemiesRemain": "남은 적을 먼저 처치하세요.",
       "moveCloserPassage": "통로에 더 가까이 다가가세요.",
       "moveCloserChest": "상자에 더 가까이 다가가세요.",
       "moveCloserReliquary": "성물함에 더 가까이 다가가세요.",
@@ -9998,7 +10024,7 @@ export const ko_KR: EnTranslations = {
       },
       "fear": {
         "name": "번민",
-        "description": "적에게 공포를 심어 최대 8초 동안 떨게 만듭니다. 피해를 받으면 효과가 해제됩니다."
+        "description": "적에게 공포를 심어 최대 5초 동안 떨게 만듭니다. 대상 최대 생명력의 8%에 해당하는 누적 피해를 받으면 효과가 해제됩니다."
       },
       "searing_pain": {
         "name": "지지기",
@@ -10244,7 +10270,7 @@ export const ko_KR: EnTranslations = {
       },
       "ossuary_mark": {
         "name": "납골 표식",
-        "description": "적에게 12초 동안 표식을 남겨 당신과 당신의 언데드가 입힌 피해의 20%를 저장합니다. 다시 시전하면 표식을 터뜨립니다. 표식이 남은 적이 죽으면 6미터 안에서 폭발하고 영혼 조각 1개를 생성합니다."
+        "description": "적에게 15초 동안 표식을 남겨 당신과 당신의 언데드가 입힌 피해의 20%를 저장합니다. 다시 시전하면 표식을 터뜨립니다. 표식이 남은 적이 죽으면 6야드 안에서 폭발하고 영혼 조각 1개를 생성합니다."
       },
       "unholy_command": {
         "name": "부정한 명령",
@@ -10343,8 +10369,8 @@ export const ko_KR: EnTranslations = {
         "description": "달빛야수 형상을 취해 돌아올 때까지 주문 시전을 강화합니다. 다시 시전하면 일반 형상으로 돌아옵니다. (조화 전문화 상징)"
       },
       "feral_charge": {
-        "name": "야성의 돌진",
-        "description": "적에게 돌진하고 1초 동안 묶습니다. 8-25미터 거리. (야성 전문화 상징)"
+        "name": "원시 쇄도",
+        "description": "원시의 힘을 폭발시킵니다. 늑대 변신 상태에서는 10초 동안 기력 회복 속도가 100% 증가합니다. 큰곰 변신 상태에서는 즉시 분노를 50 생성합니다. (야성 전문화 상징)"
       },
       "swiftmend": {
         "name": "신속한 치유",
@@ -10600,7 +10626,7 @@ export const ko_KR: EnTranslations = {
       },
       "evocation": {
         "name": "에테르샘",
-        "description": "마나를 빠르게 회복합니다. (마법사 특성)"
+        "description": "6초 동안 정신을 집중합니다. 매초 마나를 100 회복하고 주문력이 8 증가합니다. 이 효과는 정신 집중 중 중첩되며 15초 동안 지속됩니다. (마법사 특성)"
       },
       "flurry_of_knives": {
         "name": "칼날 난무",
@@ -10628,11 +10654,11 @@ export const ko_KR: EnTranslations = {
       },
       "howl_of_terror": {
         "name": "공포의 울부짖음",
-        "description": "주위 적을 최대 3초 동안 공포에 빠뜨립니다. 피해를 받으면 효과가 해제될 수 있습니다. (흑마법사 특성)"
+        "description": "주위 적을 최대 5초 동안 공포에 빠뜨립니다. 대상 최대 생명력의 8%에 해당하는 누적 피해를 받으면 공포가 해제됩니다. (흑마법사 특성)"
       },
       "ice_block": {
         "name": "차가운 관",
-        "description": "자신을 얼음 속에 가두어 엄청난 피해를 흡수합니다. 8초 동안 지속됩니다. (마법사 특성)"
+        "description": "8초 동안 단단한 얼음 속에 자신을 가두어 모든 피해에 면역이 됩니다. 이미 활성화된 일반적인 해로운 효과를 제거하고 새로운 일반 제어 효과가 적용되는 것을 방지합니다. 기절 또는 변이 상태에서도 사용할 수 있습니다. 갇힌 동안에는 행동할 수 없습니다. 다시 사용하면 취소됩니다. (마법사)"
       },
       "inner_focus": {
         "name": "고요한 마음",
@@ -13246,6 +13272,15 @@ export const ko_KR: EnTranslations = {
       },
       "training_dummy": {
         "name": "훈련용 허수아비"
+      },
+      "friendly_player_dummy": {
+        "name": "아군 플레이어 허수아비"
+      },
+      "normal_boss_dummy": {
+        "name": "일반 보스 허수아비"
+      },
+      "heroic_boss_dummy": {
+        "name": "영웅 보스 허수아비"
       },
       "ridge_stalker": {
         "name": "산등성이 추적자"

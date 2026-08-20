@@ -196,7 +196,7 @@ describe('client wiring source pins (the tests/client_shell.test.ts idiom)', () 
 
   it('the hud hotbar press tries the hook first and falls back to plain useItem', () => {
     const src = stripComments(readFileSync(path.join(__dirname, '../src/ui/hud.ts'), 'utf8'));
-    expect(src).toContain('if (!this.tryGatherToolUse(action.id)) this.sim.useItem(action.id);');
+    expect(src).toContain('if (!this.tryGatherToolUse(itemId)) this.sim.useItem(itemId);');
   });
 });
 

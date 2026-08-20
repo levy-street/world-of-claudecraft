@@ -2,6 +2,22 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const id_ID: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formsAutoUnshift': 'Penyembuhan atau sihir serangan yang dirapal saat berwujud akan mengeluarkanmu dari wujud itu secara otomatis. Keluar dari wujud dengan cara ini gratis dan tidak memakai jeda global, jadi sihir instan langsung meluncur begitu kau menekannya. Kembali ke wujud adalah kemampuan biasa dan tetap memakan mana serta jeda global.',
+  'entities.mobs.heroic_boss_dummy.name': 'Boneka Bos Heroik',
+  'entities.mobs.normal_boss_dummy.name': 'Boneka Bos Normal',
+  'entities.mobs.friendly_player_dummy.name': 'Boneka Pemain Sekutu',
+  'entities.items.dawnhold_posy.name': 'Buket Taman Dawnhold',
+  'entities.dungeons.dawnhold_castle.leaveText': 'Kau menyelinap keluar lagi ke halaman rumput taman yang bermandikan cahaya matahari.',
+  'entities.dungeons.dawnhold_castle.enterText': 'Kau melangkah masuk ke aula Kastil Dawnhold yang hangat dan harum bunga.',
+  'entities.dungeons.dawnhold_castle.name': 'Kastil Dawnhold',
+  'hudChrome.lastkeepMap.story.tower': 'Menara Pengawas',
+  'hudChrome.lastkeepMap.story.residence': 'Lantai Hunian',
+  'hudChrome.lastkeepMap.story.state': 'Lantai Kebesaran',
+  'hudChrome.lastkeepMap.story.undercroft': 'Ruang Bawah Tanah',
+  'hudChrome.lastkeepMap.title': '{keep}: {story}',
+  'hudChrome.dawnholdMap.story.solar': 'Ruang Matahari',
+  'hudChrome.dawnholdMap.story.ground': 'Lantai Taman',
+  'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.social.chanBattleground': 'Medan Thornhollow.',
   'guide.social.chanBattlegroundBody': 'Bicaralah dengan setiap petarung di Medan Thornhollow-mu, dari kedua pihak. Hanya berlaku selama pertandingan sedang berlangsung.',
   'hud.chat.templates.battleground': '[Medan Thornhollow] {name}: {message}',
@@ -4368,7 +4384,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Tembus Zirah',
   'entities.abilities.faerie_fire.name': 'Cahaya Sihir',
   'entities.abilities.fear.description':
-    'Menanamkan teror ke dalam musuh, membuatnya gemetar ketakutan hingga 8 detik. Kerusakan apa pun mematahkan efeknya.',
+    'Menanamkan teror ke dalam musuh, membuatnya gemetar ketakutan hingga 5 detik. Kerusakan total sebesar 8% dari kesehatan maksimum target mematahkan efeknya.',
   'entities.abilities.fear.name': 'Cekaman',
   'entities.abilities.ferocious_bite.name': 'Gigitan Berdarah',
   'entities.abilities.fire_blast.description':
@@ -4648,9 +4664,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.name': 'Wujud Burung Bulan',
   'entities.abilities.moonkin_form.description':
     'Mengambil wujud burung bulan, memperkuat perapalan mantra sampai kamu berubah kembali. Gunakan lagi untuk kembali ke wujud normal. (ciri khas Keseimbangan)',
-  'entities.abilities.feral_charge.name': 'Terjangan Liar',
+  'entities.abilities.feral_charge.name': 'Gelora Purba',
   'entities.abilities.feral_charge.description':
-    'Menerjang musuh dan mengakarkannya selama 1 dtk. Jarak 8-25 m. (ciri khas Keganasan)',
+    'Lepaskan gelora purba. Dalam Wujud Serigala, regenerasi energi meningkat 100% selama 10 detik. Dalam Wujud Bruin, langsung menghasilkan 50 Amukan. (ciri khas Keganasan)',
   'entities.abilities.swiftmend.name': 'Pemulihan Cepat',
   'entities.abilities.crusader_strike.name': 'Serangan Tentara Salib',
   'entities.abilities.crusader_strike.description':
@@ -9414,6 +9430,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'sim.delve.unknownTier': 'Tingkat delve tak dikenal.',
   'sim.delve.wayOutNotOpen': 'Jalan keluar belum terbuka.',
   'sim.delve.whileTrading': 'Kamu tidak dapat memasuki delve saat berdagang.',
+  'sim.delve.enemiesRemain': 'Kalahkan musuh yang tersisa terlebih dahulu.',
   'sim.lockpick.alreadyInProgress': 'Seseorang sudah sedang membobol kunci.',
   'sim.lockpick.cannotPickThat': 'Kamu tidak dapat membobol itu.',
   'sim.lockpick.chooseAnte': 'Pilih 1, 2, atau 3 cungkil.',
@@ -10979,7 +10996,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deterrence.description':
     'Meningkatkan peluang menghindarmu sebesar 50 poin persentase selama 10 detik. (talenta Hunter)',
   'entities.abilities.earthbind.description': 'Mengakarkan musuh dalam 4 m dari titik sasaran selama 2 dtk, lalu memperlambat mereka 40% selama 6 dtk. (Talenta shaman)',
-  'entities.abilities.evocation.description': 'Restaura mana rápidamente. (talenta mage)',
+  'entities.abilities.evocation.description':
+    'Menyalurkan selama 6 detik: setiap detik memulihkan 100 mana dan menambah 8 spell power. Bonus menumpuk selama penyaluran dan bertahan 15 detik. (talenta mage)',
   'entities.abilities.frenzied_regeneration.description':
     'Memulihkan 40% nyawa maksimummu selama 10 detik. Hanya dalam Bentuk Beruang. (talenta Druid)',
   'entities.abilities.frost_trap.description':
@@ -10988,9 +11006,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Memulihkan 120 nyawa target sekutu selama 12 detik. (talenta Shaman)',
   'entities.abilities.howl_of_terror.description':
-    'Membuat musuh di dekatnya ketakutan hingga 3 detik. Kerusakan dapat membatalkan efek ini. (talenta Warlock)',
+    'Membuat musuh di dekatnya ketakutan hingga 5 detik. Kerusakan total sebesar 8% dari kesehatan maksimum target mematahkan ketakutannya. (talenta Warlock)',
   'entities.abilities.ice_block.description':
-    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 detik. (talenta mage)',
+    'Membungkusmu dalam es padat selama 8 detik, membuatmu kebal terhadap semua kerusakan. Menghapus efek berbahaya biasa yang sudah aktif dan mencegah penerapan efek pengendalian biasa yang baru. Dapat digunakan saat terkena stun atau polymorph. Kamu tidak dapat bertindak selama terbungkus. Rapal lagi untuk membatalkan. (mage)',
   'entities.abilities.inner_focus.description': 'Membuat mantra pendeta berikutnya gratis dan tak bisa diinterupsi. Bertahan 60 dtk.',
   'entities.abilities.innervate.description':
     'Getah hidup mengalir dalam dirimu selama 10 detik dan memulihkan 20 sumber dayamu saat ini dalam gelombang: mana, amarah, atau energi. Berganti wujud tidak memutusnya. Tidur, pingsan, atau stasis menghentikan aliran getah. (talenta Druid)',
@@ -11006,7 +11024,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.preparation.description':
     'Mengakhiri waktu isi ulang Lari Cepat, Mengelak, dan Lenyap. (talenta Rogue)',
   'entities.abilities.presence_of_mind.description':
-    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 detik. (talenta mage)',
+    'Membuat mantra berikutnya yang memiliki waktu perapalan menjadi instan. Bertahan 60 detik. (talenta mage)',
   'entities.abilities.psychic_scream.description': 'Menakuti musuh dalam 8 m sampai 4 dtk. Kerusakan bisa mematahkan efeknya.',
   'entities.abilities.shadowstep.description':
     'Melangkah menembus bayangan menuju targetmu. (talenta Rogue)',
@@ -12852,7 +12870,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menusuk musuh sebesar {damage} kerusakan Bayangan dan menghasilkan 5 Kecaman jika musuh itu menyandang Evil Eye-mu. Setiap pukulan pada Evil Eye utamamu menambah 1 Benang Takdir selama 12 detik, hingga 3. Jika tidak ada Evil Eye, Needle terlebih dahulu menandai targetnya.',
   'entities.abilities.needle_of_fate.name': 'Needle of Fate',
   'entities.abilities.ossuary_mark.description':
-    'Menandai musuh selama 12 detik, menyimpan 20% dari kerusakan yang diberikan olehmu dan mayat hidupmu. Rapal ulang untuk meledakkannya. Jika musuh yang ditandai mati, ia meledak dalam radius 6 m dan menciptakan 1 Serpihan Jiwa.',
+    'Menandai musuh selama 15 detik, menyimpan 20% dari kerusakan yang diberikan olehmu dan mayat hidupmu. Rapal ulang untuk meledakkannya. Jika musuh yang ditandai mati, ia meledak dalam radius 6 yard dan menciptakan 1 Serpihan Jiwa.',
   'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
   'entities.abilities.possess_evil_eye.description':
     'Maledictor merasuki Evil Eye utamamu selama 15 detik dan menghasilkan 35 Kecaman. Needle of Fate dirapal dalam 1 detik dan menghasilkan 2 Kecaman tambahan, Melahap dapat disalurkan sambil bergerak, dan Sentence memberikan 25% kerusakan lebih besar dan melepaskan gema tertunda sebesar 60% kerusakan, menurun menjadi 30% sepanjang level 17-20.',

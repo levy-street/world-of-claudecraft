@@ -3,8 +3,22 @@ import {
   dynamicResolutionAllocationScale,
   dynamicResolutionGovernorRange,
   dynamicResolutionRect,
+  initialEffectiveRenderScale,
   MIN_DYNAMIC_RENDER_SCALE,
 } from '../src/render/dynamic_resolution_core';
+
+describe('initial effective render scale', () => {
+  it('opens a mobile runtime below full scale unless a desktop tier is forced', () => {
+    expect(initialEffectiveRenderScale(1, false, null)).toBe(1);
+    expect(initialEffectiveRenderScale(1, true, null)).toBe(0.85);
+    expect(initialEffectiveRenderScale(0.7, true, null)).toBe(0.7);
+    expect(initialEffectiveRenderScale(1, true, 'low')).toBe(0.85);
+    expect(initialEffectiveRenderScale(1, true, 'medium')).toBe(0.85);
+    for (const tier of ['high', 'ultra', 'insane']) {
+      expect(initialEffectiveRenderScale(1, true, tier)).toBe(1);
+    }
+  });
+});
 
 describe('dynamic resolution rectangle', () => {
   it('keeps the live rectangle on whole device pixels within the fixed target', () => {

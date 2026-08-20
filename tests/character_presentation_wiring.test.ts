@@ -124,17 +124,22 @@ describe('char-select roster wiring (source pins)', () => {
   });
 
   it('re-arms crest fallbacks after the composed-chip outerHTML swap', () => {
-    const start = main.indexOf(
+    // The swap lives in the roster's repaint module now (main.ts hands it the
+    // row's hydrate); the order swap-then-hydrate is what keeps a blocked crest
+    // asset on the fresh img falling back.
+    const refresh = readFileSync(
+      new URL('../src/ui/charselect_composed_refresh.ts', import.meta.url),
+      'utf8',
+    );
+    const start = refresh.indexOf(
       "const chip = row.querySelector('.portrait-chip[data-portrait-composed]');",
     );
-    const end = main.indexOf('hydratePortraits(row);', start);
     expect(start).toBeGreaterThan(-1);
-    expect(end).toBeGreaterThan(start);
-    const block = main.slice(start, end + 'hydratePortraits(row);'.length);
-
+    const block = refresh.slice(start, refresh.indexOf('\n  };', start));
     const swapAt = block.indexOf('chip.outerHTML = chipHtml();');
-    const hydrateAt = block.indexOf('hydratePortraits(row);');
+    const hydrateAt = block.indexOf('hydrate();');
     expect(swapAt).toBeGreaterThan(-1);
     expect(hydrateAt).toBeGreaterThan(swapAt);
+    expect(main).toContain('trackComposedChipRow(row, chipHtml, () => hydratePortraits(row));');
   });
 });

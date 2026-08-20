@@ -1614,7 +1614,7 @@ describe('druid forms', () => {
     expect(sim.player.comboPoints).toBe(0);
   });
 
-  it('caster spells are locked while shapeshifted', () => {
+  it('utility spells are locked while shapeshifted', () => {
     const sim = makeSim('druid');
     sim.setPlayerLevel(10);
     sim.castAbility('bear_form');
@@ -1624,7 +1624,10 @@ describe('druid forms', () => {
     sim.targetEntity(wolf.id);
     sim.player.facing = Math.atan2(wolf.pos.x - sim.player.pos.x, wolf.pos.z - sim.player.pos.z);
     sim.player.resource = 100;
-    sim.castAbility('wrath');
+    // Wildward, not Wildbolt: a healing or damaging spell now auto-unshifts and
+    // casts (src/sim/combat/form_auto_unshift.ts), so the spell that pins the
+    // form lock must be one outside that set. A buff still refuses in form.
+    sim.castAbility('mark_of_the_wild');
     const events = sim.tick();
     expect(events.some((e) => e.type === 'error' && /shapeshifted/.test(e.text))).toBe(true);
   });
@@ -1641,7 +1644,10 @@ describe('druid forms', () => {
     sim.castAbility('cat_form');
     for (let i = 0; i < 32; i++) sim.tick();
     sim.player.resource = 100;
-    sim.castAbility('wrath');
+    // Wildward, not Wildbolt: a nuke would auto-unshift and start casting here
+    // (src/sim/combat/form_auto_unshift.ts), which both drops the cat form the
+    // Maul check below depends on and turns its refusal into "You are busy."
+    sim.castAbility('mark_of_the_wild');
     let events = sim.tick();
     expect(events.some((e) => e.type === 'error' && /shapeshifted/.test(e.text))).toBe(true);
     sim.castAbility('maul');

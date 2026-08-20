@@ -13,6 +13,22 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const de_DE: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formsAutoUnshift': 'Ein Heilzauber oder ein Schadenszauber, den du in einer Gestalt wirkst, holt dich selbst daraus hervor. Eine Gestalt auf diese Weise zu verlassen ist gratis und verbraucht keine globale Abklingzeit, ein Sofortzauber geht also in dem Moment los, in dem du ihn drückst. Zurückzuwechseln ist eine gewöhnliche Fähigkeit und kostet weiterhin Mana und deine globale Abklingzeit.',
+  'entities.mobs.heroic_boss_dummy.name': 'Heroische Bosspuppe',
+  'entities.mobs.normal_boss_dummy.name': 'Normale Bosspuppe',
+  'entities.mobs.friendly_player_dummy.name': 'Freundliche Spielerpuppe',
+  'entities.items.dawnhold_posy.name': 'Gartensträußchen von Dawnhold',
+  'entities.dungeons.dawnhold_castle.leaveText': 'Du schlüpfst wieder hinaus auf den sonnenbeschienenen Gartenrasen.',
+  'entities.dungeons.dawnhold_castle.enterText': 'Du trittst in die warmen, blumenduftenden Hallen von Schloss Dawnhold ein.',
+  'entities.dungeons.dawnhold_castle.name': 'Schloss Dawnhold',
+  'hudChrome.lastkeepMap.story.tower': 'Der Wachturm',
+  'hudChrome.lastkeepMap.story.residence': 'Das Wohngeschoss',
+  'hudChrome.lastkeepMap.story.state': 'Die Beletage',
+  'hudChrome.lastkeepMap.story.undercroft': 'Das Untergewölbe',
+  'hudChrome.lastkeepMap.title': '{keep}: {story}',
+  'hudChrome.dawnholdMap.story.solar': 'Das Sonnengemach',
+  'hudChrome.dawnholdMap.story.ground': 'Das Gartengeschoss',
+  'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.social.chanBattleground': 'Schlachtfeld.',
   'guide.social.chanBattlegroundBody': 'Sprich mit jedem Kämpfer in deinem Schlachtfeld, auf beiden Seiten. Nur während ein Match läuft.',
   'hud.chat.templates.battleground': '[Schlachtfeld] {name}: {message}',
@@ -5885,7 +5901,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.drain_life.description': 'Zehrt die Lebenskraft des Ziels aus, verursacht jede Sekunde {damage} Schattenschaden und überträgt euch 70% davon als Gesundheit. Gebrechen überträgt stattdessen alles. Auf euer vorrangiges Evil Eye kanalisiert, verbraucht der Zauber zu Beginn alle Schicksalsfäden, und jeder Faden erzeugt 1 zusätzliche Verdammnis je Tick.',
   'entities.abilities.fear.name': 'Heimsuchung',
   'entities.abilities.fear.description':
-    'Versetzt den Gegner in Schrecken und lässt ihn bis zu 8 Sek. lang kauern. Jeder Schaden bricht den Effekt.',
+    'Versetzt den Gegner in Schrecken und lässt ihn bis zu 5 Sek. lang kauern. Schaden in Höhe von insgesamt 8% der maximalen Gesundheit des Ziels bricht den Effekt.',
   'entities.abilities.searing_pain.name': 'Versengen',
   'entities.abilities.searing_pain.description':
     'Versengt den Gegner mit qualvollem Feuer für {damage} Feuerschaden. Schnell zu wirken.',
@@ -6034,9 +6050,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.name': 'Mondkingestalt',
   'entities.abilities.moonkin_form.description':
     'Nehmt Mondkingestalt an und verstärkt Eure Zauber, bis Ihr zurückwechselt. Erneut wirken, um zur normalen Gestalt zurückzukehren. (Gleichgewichts-Signatur)',
-  'entities.abilities.feral_charge.name': 'Wilde Attacke',
+  'entities.abilities.feral_charge.name': 'Urwoge',
   'entities.abilities.feral_charge.description':
-    'Stürmt einen Gegner an und wurzelt ihn 1 Sek. lang. 8-25 m Reichweite. (Wildheits-Signatur)',
+    'Entfesselt eine Urwoge. In Wolfsgestalt wird Eure Energieregeneration 10 Sek. lang um 100% erhöht. In Bruin-Gestalt erhaltet Ihr sofort 50 Wut. (Wildheits-Signatur)',
   'entities.abilities.swiftmend.name': 'Rasche Heilung',
   'entities.abilities.crusader_strike.name': 'Kreuzfahrerstoß',
   'entities.abilities.crusader_strike.description':
@@ -8843,6 +8859,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'worldContent.delveSurfaceExitInteract': 'Drücke F, um hinaufzuklettern',
   'sim.delve.objectiveClearRoom': 'Den Raum räumen.',
   'sim.delve.objectiveDefeatBoss': 'Den Boss erschlagen.',
+  'sim.delve.enemiesRemain': 'Erledige zuerst die verbleibenden Gegner.',
   'hudChrome.auraEffect.dot': 'Verursacht alle {interval} s {value} {school}schaden',
   'hudChrome.auraEffect.hot': 'Stellt alle {interval} s {value} Gesundheit wieder her',
   'hudChrome.auraEffect.absorb': 'Absorbiert {value} Schaden',
@@ -10217,7 +10234,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deterrence.description':
     'Erhöht Eure Ausweichchance 10 Sek. lang um 50 Prozentpunkte. (Jägertalent)',
   'entities.abilities.earthbind.description': 'Macht Gegner im Umkreis von 4 m um den Zielpunkt 2 Sek. lang bewegungsunfähig und verlangsamt sie danach 6 Sek. lang um 40%. (Schamanentalent)',
-  'entities.abilities.evocation.description': 'Restaura Mana rápidamente. (Magier-Talent)',
+  'entities.abilities.evocation.description':
+    'Kanalisiert 6 Sek. lang: Jede Sekunde werden 100 Mana wiederhergestellt und 8 Zaubermacht aufgebaut. Der Bonus ist während des Kanalisierens stapelbar und hält 15 Sek. lang an. (Magier-Talent)',
   'entities.abilities.frenzied_regeneration.description':
     'Stellt im Verlauf von 10 Sek. 40% Eurer maximalen Gesundheit wieder her. Nur in Bärengestalt. (Druidentalent)',
   'entities.abilities.frost_trap.description':
@@ -10226,9 +10244,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Stellt bei einem verbündeten Ziel im Verlauf von 12 Sek. 120 Gesundheit wieder her. (Schamanentalent)',
   'entities.abilities.howl_of_terror.description':
-    'Versetzt Gegner in der Nähe bis zu 3 Sek. lang in Furcht. Schaden kann den Effekt aufheben. (Hexenmeistertalent)',
+    'Versetzt Gegner in der Nähe bis zu 5 Sek. lang in Furcht. Schaden in Höhe von insgesamt 8% der maximalen Gesundheit eines Ziels bricht seine Furcht. (Hexenmeistertalent)',
   'entities.abilities.ice_block.description':
-    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 Sek.. (Magier-Talent)',
+    'Schließt Euch 8 Sek. lang in festes Eis ein und macht Euch gegen jeglichen Schaden immun. Entfernt bestehende gewöhnliche schädliche Effekte und verhindert neue gewöhnliche Kontroll-Effekte. Kann während Betäubung oder Verwandlung eingesetzt werden. Ihr könnt währenddessen nicht handeln. Erneut wirken, um den Effekt abzubrechen. (Magier)',
   'entities.abilities.inner_focus.description': 'Euer nächster Priesterzauber kostet nichts und ist nicht unterbrechbar. Hält 60 Sek. lang an.',
   'entities.abilities.innervate.description':
     'Lebendiger Pflanzensaft quillt 10 Sek. lang in Euch auf und stellt in Wellen 20 Eurer aktuellen Ressource wieder her: Mana, Wut oder Energie. Gestaltwandel unterbricht ihn nicht. Schlaf, Betäubung oder Stasis bringen den Saft zum Stillstand. (Druidentalent)',
@@ -10244,7 +10262,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.preparation.description':
     'Schließt die Abklingzeiten von Sprint, Entrinnen und Verschwinden ab. (Schurkentalent)',
   'entities.abilities.presence_of_mind.description':
-    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 Sek.. (Magier-Talent)',
+    'Macht Euren nächsten Zauber mit Zauberzeit zu einem Spontanzauber. Hält 60 Sek. lang an. (Magier-Talent)',
   'entities.abilities.psychic_scream.description': 'Versetzt Gegner im Umkreis von 8 m bis zu 4 Sek. lang in Furcht. Schaden kann den Effekt aufheben.',
   'entities.abilities.shadowstep.description':
     'Tretet durch die Schatten auf Euer Ziel zu. (Schurkentalent)',
@@ -12963,7 +12981,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Durchbohrt den Gegner für {damage} Schattenschaden und erzeugt 5 Verdammnis, wenn er Euer Evil Eye trägt. Jeder Treffer auf Euer primäres Evil Eye fügt für 12 Sek. einen Schicksalsfaden hinzu, bis zu 3. Existiert kein Evil Eye, markiert die Needle zuerst ihr Ziel.',
   'entities.abilities.needle_of_fate.name': 'Needle of Fate',
   'entities.abilities.ossuary_mark.description':
-    'Markiert einen Gegner 12 Sek. lang und speichert 20% des von Euch und Euren Untoten verursachten Schadens. Erneutes Wirken lässt es detonieren. Stirbt der markierte Gegner, explodiert es im Umkreis von 6 m und erschafft 1 Seelenfragment.',
+    'Markiert einen Gegner 15 Sek. lang und speichert 20% des von Euch und Euren Untoten verursachten Schadens. Erneutes Wirken lässt es detonieren. Stirbt der markierte Gegner, explodiert es im Umkreis von 6 Metern und erschafft 1 Seelenfragment.',
   'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
   'entities.abilities.possess_evil_eye.description':
     'Der Maledictor besetzt Euer primäres Evil Eye 15 Sek. lang und erzeugt 35 Verdammnis. Needle of Fate wirkt in 1 Sek. und erzeugt 2 zusätzliche Verdammnis, Verzehren kann während der Bewegung kanalisiert werden, und Sentence verursacht 25% mehr Schaden und löst ein verzögertes Echo für 60% Schaden aus, das über die Stufen 17-20 auf 30% abnimmt.',

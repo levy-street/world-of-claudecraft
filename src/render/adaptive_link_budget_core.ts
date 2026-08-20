@@ -48,6 +48,9 @@ export interface AdaptiveLinkBudget {
 interface InFlightUnit {
   submittedAtMs: number;
   links: number;
+  /** Its synchronous prologue reported a program delta of zero: the unit
+   *  linked NOTHING, so how fast it settles says nothing about the driver. */
+  cheap: boolean;
 }
 
 const defaultSleep = (ms: number): Promise<void> =>
@@ -148,6 +151,13 @@ export function createAdaptiveLinkBudget(
     lastSettlementMs = settlementMs;
     if (admissionClosed) return;
     if (settlementMs <= config.fastSettlementMs) {
+      // The cheap-unit discount. A unit that linked no program settles
+      // instantly whatever the driver is doing, so its speed is not headroom:
+      // growing the window on it is how a lane of already-linked units (the
+      // boot sweep's hidden entity views, tests/reveal_gate_wiring.test.ts)
+      // ramps to the cap and submits to the wall. It still counts as
+      // progress, it just buys no admission.
+      if (unit.cheap) return;
       windowLinks = Math.min(config.maxWindowLinks, windowLinks + config.increaseLinks);
       maxWindowObserved = Math.max(maxWindowObserved, windowLinks);
       state = windowLinks >= config.maxWindowLinks ? 'steady' : 'ramp';
@@ -179,6 +189,7 @@ export function createAdaptiveLinkBudget(
       inFlight.set(id, {
         submittedAtMs: clock.now(),
         links: estimatedLinksPerUnit,
+        cheap: false,
       });
       submittedUnits++;
     },
@@ -186,6 +197,7 @@ export function createAdaptiveLinkBudget(
       const unit = inFlight.get(id);
       if (!unit) return;
       const actualLinks = positiveInteger(chargedLinks, 1);
+      unit.cheap = Number.isFinite(chargedLinks) && chargedLinks <= 0;
       unit.links = actualLinks;
       observedCharges++;
       estimatedLinksPerUnit =

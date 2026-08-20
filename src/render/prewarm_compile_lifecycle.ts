@@ -41,6 +41,34 @@ export interface RendererPrewarmCompileUnitStats {
   failedAtMs: number | null;
   /** State observed when the loading curtain starts to reveal. */
   statusAtReveal: 'settled' | 'pending' | 'deferred' | 'failed' | 'post-reveal' | null;
+  /** The unit's roots as labels (name or type, plus the material name), so a
+   *  capture can say WHICH scene objects a deferred unit left unlinked.
+   *  Bounded per unit (COMPILE_UNIT_ROOT_LABELS); absent when the host
+   *  installs no labeler. */
+  roots?: string[];
+}
+
+/** Labels kept per unit; a batch is at most 32 roots. */
+export const COMPILE_UNIT_ROOT_LABELS = 32;
+
+/** The structural slice of a compile root the label reads (a three mesh). */
+export interface CompileRootLike {
+  name?: string;
+  type?: string;
+  material?: { name?: string } | { name?: string }[] | null;
+}
+
+/** `name|material` (or the type when unnamed): enough to find the object in
+ *  a capture, never a free-form string beyond what the scene already names. */
+export function compileRootLabel(root: CompileRootLike): string {
+  const materials = Array.isArray(root.material)
+    ? root.material
+    : root.material
+      ? [root.material]
+      : [];
+  const material = materials.map((entry) => entry?.name ?? '').find((name) => name !== '') ?? '';
+  const self = root.name || root.type || 'object';
+  return material ? `${self}|${material}` : self;
 }
 
 export interface RendererPrewarmDiagnosticsBaselineStats {
@@ -126,6 +154,7 @@ export function summarizePrewarmManifest(
 
 interface CompileUnitIdentity {
   id: string;
+  roots?: readonly object[];
 }
 
 export interface PrewarmCompileLifecycle {
@@ -140,8 +169,12 @@ export interface PrewarmCompileLifecycle {
 
 const roundedMs = (value: number): number => Math.round(value * 100) / 100;
 
-/** Pure lifecycle bookkeeping. The renderer injects its monotonic clock. */
-export function createPrewarmCompileLifecycle(now: () => number): PrewarmCompileLifecycle {
+/** Pure lifecycle bookkeeping. The renderer injects its monotonic clock and,
+ *  optionally, the root labeler (compileRootLabel) for the capture's unit rows. */
+export function createPrewarmCompileLifecycle(
+  now: () => number,
+  labelRoot?: (root: object) => string,
+): PrewarmCompileLifecycle {
   const records: RendererPrewarmCompileUnitStats[] = [];
   const byUnit = new WeakMap<object, RendererPrewarmCompileUnitStats>();
   let revealed = false;
@@ -160,6 +193,9 @@ export function createPrewarmCompileLifecycle(now: () => number): PrewarmCompile
           failedAtMs: null,
           statusAtReveal: revealed ? 'post-reveal' : null,
         };
+        if (labelRoot && unit.roots) {
+          record.roots = unit.roots.slice(0, COMPILE_UNIT_ROOT_LABELS).map(labelRoot);
+        }
         byUnit.set(unit, record);
         records.push(record);
       } else if (record.lane !== lane && record.submittedAtMs === null) {
