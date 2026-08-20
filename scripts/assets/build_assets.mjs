@@ -11,7 +11,8 @@
 //   "attachMeshes": [{ "from": "weapon.glb",      // optional: bake a prop/weapon mesh
 //                      "bone": "handslot.r" }],    //   parented under a named bone
 //   "maxTex": 512,                                 // optional: clamp texture dimension
-//   "keepExtras": true                             // optional: retain extras-bearing leaf nodes
+//   "keepExtras": true,                            // optional: retain extras-bearing leaf nodes
+//   "losslessMeshopt": true                        // optional: compress without quantizing attributes
 // } ] }
 //
 // Bulk mode: instead of `src`/`out`, an item may use `srcDir`/`outDir` to convert
@@ -30,7 +31,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { NodeIO } from '@gltf-transform/core';
-import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
+import { ALL_EXTENSIONS, EXTMeshoptCompression } from '@gltf-transform/extensions';
 import {
   dedup,
   mergeDocuments,
@@ -293,8 +294,14 @@ async function processModel(io, item, outputRoot) {
       }),
     );
   }
-  transforms.push(meshopt({ encoder: MeshoptEncoder, level: 'high' }));
+  if (!item.losslessMeshopt) transforms.push(meshopt({ encoder: MeshoptEncoder, level: 'high' }));
   await doc.transform(...transforms);
+  if (item.losslessMeshopt) {
+    doc
+      .createExtension(EXTMeshoptCompression)
+      .setRequired(true)
+      .setEncoderOptions({ method: EXTMeshoptCompression.EncoderMethod.FILTER });
+  }
 
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
   await io.write(outPath, doc);

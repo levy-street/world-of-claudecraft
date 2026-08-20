@@ -635,11 +635,19 @@ export interface Aura {
   value3?: number; // imbue: judgement max; Greater Invisibility: aftereffect duration
   tickInterval?: number;
   tickTimer?: number;
+  // Sim-only periodic ramp: after each resolved DoT tick, increase `stacks`
+  // and recompute `value` as per-stack damage times stacks, up to this cap.
+  // The wire already mirrors the resulting value/stacks, so clients do not
+  // need this authoring field.
+  maxTickStacks?: number;
   sourceId: number;
   school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
   // Encounter-authored control that must land through immunity and cannot be
   // removed by player counters. Natural expiry and encounter cleanup still own it.
   unbreakableControl?: true;
+  // Encounter-authored mechanic that ordinary dispels and broad self-cleanses
+  // cannot remove. Death, natural expiry, and the encounter script still clear it.
+  encounterOwned?: true;
   // A penalty no player counter may shed: dispel, purge, and cleanse all skip it, and
   // it is never right-click cancelable. Only its own timer takes it off. Set today at
   // exactly one site, applySickness in ./spirit.ts, which serves both recovery
@@ -3421,12 +3429,24 @@ export interface DungeonSpawn {
   z: number;
 }
 
+export interface DungeonNpcSpawn {
+  npcId: string;
+  x: number; // relative to instance origin
+  z: number;
+}
+
 export interface DungeonObjectSpawn {
   itemId: string;
   name: string;
   x: number; // relative to instance origin
   z: number;
-  templateId?: 'dungeon_door' | 'dungeon_exit';
+  templateId?:
+    | 'dungeon_door'
+    | 'dungeon_exit'
+    | 'ignivar_raid_gate_locked'
+    | 'ignivar_water_conduit_ready'
+    | 'ignivar_water_conduit_active'
+    | 'ignivar_water_conduit_cooldown';
   dungeonId?: string;
   /**
    * This object is an encounter mechanic players INTERACT with, never a pickup, even
@@ -3435,6 +3455,8 @@ export interface DungeonObjectSpawn {
    * display gate (quest_gated_entity.ts) never hides a flagged object.
    */
   interactOnly?: boolean;
+  /** False for encounter scenery that is targeted by mechanics, not by interact. */
+  lootable?: boolean;
 }
 
 export interface DungeonDef {
@@ -3449,6 +3471,8 @@ export interface DungeonDef {
    *  read as a building's own doorway rather than a magic portal */
   staticDoor?: boolean;
   overworldDoor?: boolean; // false for rooms only reached by internal instance doors
+  /** False for development-only rooms that must stay out of the public Guide. */
+  guideVisible?: boolean;
   entry: { x: number; z: number }; // player arrival point (instance-local)
   exitOffset: { x: number; z: number }; // exit portal (instance-local)
   // Where a second exit portal opens when the final boss dies (instance-local).
@@ -3456,9 +3480,20 @@ export interface DungeonDef {
   // corridor back; absent = no boss portal (every corridor dungeon).
   bossExitPortal?: { x: number; z: number };
   spawns: DungeonSpawn[];
+  npcs?: DungeonNpcSpawn[];
   objects?: DungeonObjectSpawn[];
   // renderer + collider interior builder key
-  interior: 'crypt' | 'sanctum' | 'temple' | 'nythraxis' | 'wildheart' | 'lastkeep' | 'dawnhold';
+  interior:
+    | 'crypt'
+    | 'sanctum'
+    | 'temple'
+    | 'nythraxis'
+    | 'ignivar'
+    | 'ignivar_approach'
+    | 'ignivar_depths'
+    | 'wildheart'
+    | 'lastkeep'
+    | 'dawnhold';
   /**
    * What dresses this dungeon's wall-side obstacle slots (matches the render
    * variant): coffins get one standable lid, cargo splits into the crate
@@ -4588,6 +4623,8 @@ export interface Entity extends ClientMirroredEntityFields {
   mobChargeTargetId?: number | null; // dash victim; null/undefined = not dashing
   healedThisPull: boolean; // desperation self-heal already used this pull
   nythraxis?: NythraxisEncounterState; // sim-only state for the Nythraxis raid encounter
+  ignivar?: IgnivarEncounterState; // sim-only state for the Ignivar raid encounter
+  varkhul?: VarkhulEncounterState; // sim-only state for the Varkhul raid encounter
   spawnPos: Vec3;
   leashAnchor: Vec3 | null; // refreshed by hostile player/pet actions; spawnPos remains the true home
   evadeStall: number; // seconds an evading mob has failed to get closer to home; snaps it home if it can't path back (e.g. across water)
@@ -4610,9 +4647,9 @@ export interface Entity extends ClientMirroredEntityFields {
   // [dev] /dev god cheat state, kept OFF the production gm flag so it never touches a
   // real game master (who could otherwise deal 100x or have their invuln toggled).
   devGod?: boolean;
-  /** Profiler-only invulnerability. The dev-gated server command sets this
-   *  idempotently so combat presentation remains active without /dev god's
-   *  outgoing damage multiplier. Server-private and never persisted. */
+  /** Dev-only invulnerability used by /dev immortal and profiler tooling so
+   *  combat presentation remains active without /dev god's outgoing damage
+   *  multiplier. Server-private and never persisted. */
   profilerInvulnerable?: boolean;
   /** Owner of a mob created by /dev spawn. Server-private and never persisted. */
   devSpawnOwnerId?: number;
@@ -4924,6 +4961,86 @@ export interface NythraxisEncounterState {
   // roster used for raid-wipe recovery, so a remote group member cannot farm
   // cooldown resets without participating.
   attemptParticipantIds?: number[];
+}
+
+export interface IgnivarEncounterState {
+  brandTimer: number;
+  forgeStrikeTimer: number;
+  frontalTimer: number;
+  frontalCastRemaining: number;
+  frontalFacing: number;
+  skyfireTimer: number;
+  skyfireCastRemaining: number;
+  skyfireFacing: number;
+  meteorTimer: number;
+  meteorCastKey: number;
+  meteorImpactRemaining: number;
+  meteorPoints: Array<{ x: number; z: number }>;
+  forgeChainsTimer: number;
+  forgeChainsRemaining: number;
+  forgeChainsAttachGraceRemaining: number;
+  forgeChainsStrainSeconds: number[];
+  forgeChainsPlayerIds: [number, number][] | null;
+  forgeChainsLastPositions: Array<{ playerId: number; x: number; z: number }>;
+  rotatingRaysTimer: number;
+  rotatingRaysWindupRemaining: number;
+  rotatingRaysActiveRemaining: number;
+  rotatingRaysFacing: number;
+  rotatingRaysBossFacing: number;
+  rotatingRaysDirection: -1 | 1;
+  rotatingRaysNextDirection: -1 | 1;
+  rotatingRaysPulseTimer: number;
+  forgeWaveTimer: number;
+  forgeWaveWindupRemaining: number;
+  forgeWaveActiveRemaining: number;
+  forgeWaveFacing: number;
+  forgeWaveRadius: number;
+  forgeWaveHitPlayerIds: number[];
+  soakTimer: number;
+  soakTargetId: number | null;
+  soakRemaining: number;
+  overlapTimer: number;
+  conduitTimers: Partial<Record<'north_west' | 'north_east' | 'south_east' | 'south_west', number>>;
+  apocalypseTriggered: boolean;
+  apocalypseAddId: number | null;
+  apocalypseCastRemaining: number;
+  apocalypseResolved: boolean;
+  forgeJudgmentPhase: 'idle' | 'warning' | 'active' | 'done';
+  forgeJudgmentRemaining: number;
+  forgeJudgmentPulseTimer: number;
+  forgeJudgmentRotation: number;
+  forgeJudgmentSafeIndex: 0 | 1 | 2;
+  lastInfernoTriggered: boolean;
+  lastInfernoRemaining: number;
+  lastInfernoResolved: boolean;
+  finalFrontalTimer: number;
+  finalNextFrontal: 'searing' | 'skyfire';
+}
+
+export interface VarkhulEncounterState {
+  makersBrandTimer: number;
+  blueprintTimer: number;
+  blueprintCastKey: number;
+  blueprintRemaining: number;
+  blueprintTargetIds: number[];
+  forgestormTimer: number;
+  forgestormCastKey: number;
+  forgestormWaveIndex: number;
+  forgestormWarningRemaining: number;
+  forgestormPoints: Vec3[];
+  anvilTimer: number;
+  anvilStrikeIndex: number;
+  anvilStrikeRemaining: number;
+  anvilFacing: number;
+  majorAbility: 'none' | 'blueprint' | 'forgestorm' | 'anvil';
+  assemblyTriggered: boolean;
+  assemblyAddIds: number[];
+  assemblyRemaining: number;
+  assemblyWipeResolved: boolean;
+  masterpieceTriggered: boolean;
+  masterpieceRemaining: number;
+  masterpiecePulseTimer: number;
+  masterpieceWipeResolved: boolean;
 }
 
 export type ErrorReason = 'target_dead';
@@ -5834,7 +5951,9 @@ export type SimEvent = { pid?: number } & (
         | 'tick'
         // Soul released by Sacrifice Undead. It starts at this world point and
         // travels to targetId as a cosmetic homing projectile.
-        | 'soulTravel';
+        | 'soulTravel'
+        | 'meteorImpact'
+        | 'ambientMeteorFall';
       // The casting ability's id, so the renderer can pick that ground cast's
       // authored visual instead of a generic per-school one.
       ability?: string;
@@ -5847,6 +5966,12 @@ export type SimEvent = { pid?: number } & (
       dirZ?: number;
       speed?: number;
       duration?: number;
+      // 'meteorFall' only: seconds where the ground warning is visible before
+      // the falling body appears. Included inside duration, so impact timing stays shared.
+      warningLead?: number;
+      // Stable id for a persistent warning also carried by the snapshot. A
+      // renderer deduplicates the live event against reconnect reconstruction.
+      persistentId?: string;
       // 'orb' only: which flight moment this is. 'release' starts the local
       // animation; 'halt'/'resume' freeze and restart it at the server's real
       // coordinates when the orb latches onto (and outlives) an enemy.
@@ -6946,6 +7071,7 @@ export const PARTY_XP_RANGE = 80; // yards: members this close share kill xp/cre
 // boss death) and the still-on-Sim encounter logic; N1 may re-home it when it owns
 // the encounter. Kept here as the neutral shared seam in the meantime.
 export const NYTHRAXIS_BOSS_ID = 'nythraxis_scourge_of_thornpeak';
+export const IGNIVAR_BOSS_ID = 'ignivar_herald_of_the_last_flame';
 // The Nythraxis arena room radius (yards from the boss spawn). Shared here so
 // deeds.ts can read it without importing encounters/nythraxis.ts (which itself
 // imports deeds.ts). Membership consumers (the lockout roster and the deed

@@ -375,6 +375,15 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
             }
           }
           if (e.dead) return;
+          if (a.maxTickStacks !== undefined) {
+            const oldStacks = Math.max(1, a.stacks ?? 1);
+            const nextStacks = Math.min(a.maxTickStacks, oldStacks + 1);
+            if (nextStacks !== oldStacks) {
+              const valuePerStack = a.value / oldStacks;
+              a.stacks = nextStacks;
+              a.value = Math.max(1, Math.round(valuePerStack * nextStacks));
+            }
+          }
         } else if (a.kind === 'hot' && !tickMendingCurrent(ctx, e, a)) {
           const intended = Math.round(a.value * ctx.healingTakenMult(e));
           const healed = Math.min(intended, e.maxHp - e.hp);

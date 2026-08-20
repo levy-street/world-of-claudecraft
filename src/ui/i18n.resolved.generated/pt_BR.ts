@@ -2265,6 +2265,8 @@ export const pt_BR: EnTranslations = {
       "mail": "Malha"
     },
     "auraEffect": {
+      "sharedPyre": "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
+      "makersBrand": "For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.",
       "dot": "Causa {value} de dano de {school} a cada {interval} s",
       "hot": "Restaura {value} de vida a cada {interval} s",
       "mendingCurrent": "Armazena {value} de cura, liberada com o tempo ou consumida por Remendo em Cascata",
@@ -13370,6 +13372,24 @@ export const pt_BR: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Flagelo de Thornpeak"
       },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "Ignivar, Herald of the Last Flame"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "Heart of the End"
+      },
+      "ignivar_ember_sentinel": {
+        "name": "Ember Sentinel"
+      },
+      "ignivar_crucible_warden": {
+        "name": "Crucible Warden"
+      },
+      "ignivar_cinder_artificer": {
+        "name": "Cinder Artificer"
+      },
+      "varkhul_forgefather_of_the_last_flame": {
+        "name": "Varkhul, Forgefather of the Last Flame"
+      },
       "reliquary_ledger_wraith": {
         "name": "Espectro do Registro"
       },
@@ -14023,6 +14043,11 @@ export const pt_BR: EnTranslations = {
         "name": "Irmão Aldric",
         "title": "Sacerdote do Vale",
         "greeting": "Do cemitério da capela ao teto do mundo... a trilha termina aqui. Sinto a montanha ouvindo."
+      },
+      "archivist_maelin_emberward": {
+        "name": "Archivist Maelin Emberward",
+        "title": "Crucible Archivist",
+        "greeting": "Every hammer mark in this place is a sentence. Help me read what Varkhul tried to hide."
       },
       "brother_halven": {
         "name": "Irmão Halven",
@@ -15129,6 +15154,54 @@ export const pt_BR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Nythraxis derrotado"
+          }
+        }
+      },
+      "q_ignivar_echoes_in_iron": {
+        "title": "Echoes in Iron",
+        "text": "These automata are not soldiers. They are drafts. Varkhul tempered shell after shell while the Last Spring failed around him. Read the three records and destroy the constructs guarding them. Each failed body may carry part of the answer.",
+        "completion": "The records agree. Varkhul bound water from the dying Last Spring into living metal. These automatons were his failed temperings. Only one design endured.",
+        "objectives": {
+          "0": {
+            "label": "Read the First Tempering record"
+          },
+          "1": {
+            "label": "Read the Living Metal record"
+          },
+          "2": {
+            "label": "Read the Herald-Key record"
+          },
+          "3": {
+            "label": "Ember Sentinel defeated"
+          },
+          "4": {
+            "label": "Crucible Warden defeated"
+          },
+          "5": {
+            "label": "Cinder Artificer defeated"
+          }
+        }
+      },
+      "q_ignivar_heralds_heart": {
+        "title": "The Herald's Heart",
+        "text": "The survivor named in every record is Ignivar. Varkhul called him herald, seal, and key. Defeat Ignivar, then examine the core that remains. It should tell us what the herald was made to guard.",
+        "completion": "Ignivar was never merely a guardian. His heart is a key, and its final plates point toward the sealed crucible below.",
+        "objectives": {
+          "0": {
+            "label": "Ignivar defeated"
+          },
+          "1": {
+            "label": "Ignivar's core inspected"
+          }
+        }
+      },
+      "q_ignivar_the_forgefather": {
+        "title": "The Forgefather",
+        "text": "The path below leads to Varkhul, Forgefather of the Last Flame. He imprisoned the Last Spring to make metal live, then forged Ignivar to keep the crime sealed. Enter the Inner Crucible and end his work.",
+        "completion": "The forge is silent at last. The spring may never recover, but Varkhul will shape no more lives into chains.",
+        "objectives": {
+          "0": {
+            "label": "Varkhul defeated"
           }
         }
       },
@@ -16881,6 +16954,21 @@ export const pt_BR: EnTranslations = {
         "name": "Arena de raide de Nythraxis",
         "enterText": "Você atravessa a porta real selada.",
         "leaveText": "Você retorna ao ar frio de Thornpeak."
+      },
+      "ignivar_forge_approach": {
+        "name": "Halls of the First Tempering",
+        "enterText": "Hammerfall echoes through the Halls of the First Tempering.",
+        "leaveText": "You step away from the first forge and breathe freely again."
+      },
+      "ignivar_raid_arena": {
+        "name": "Crucible of the Last Spring",
+        "enterText": "Heat shimmers above the sealed waters of the Crucible.",
+        "leaveText": "You step away from the Crucible and breathe freely again."
+      },
+      "ignivar_inner_crucible": {
+        "name": "The Inner Crucible",
+        "enterText": "The opened gate leads deeper into the Crucible.",
+        "leaveText": "You leave the silent depths of the Crucible."
       },
       "wildheart_basin": {
         "name": "A Bacia de Wildheart",

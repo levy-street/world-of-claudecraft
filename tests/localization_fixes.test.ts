@@ -42,7 +42,13 @@ import {
   zh_TW,
 } from '../src/ui/i18n';
 import { localizeServerText, DICT as serverDICT, tServer } from '../src/ui/server_i18n';
-import { localizeSimAuraName, localizeSimText, DICT as simDICT } from '../src/ui/sim_i18n';
+import {
+  localizeAuthoredYellSpeakerName,
+  localizeAuthoredYellText,
+  localizeSimAuraName,
+  localizeSimText,
+  DICT as simDICT,
+} from '../src/ui/sim_i18n';
 import {
   hasTalentTitleOverride,
   renderTalentManifestEntry,
@@ -566,6 +572,35 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
     setLanguage('de_DE');
     expect(localizeSimText('Equipped Pitted Shortsword.')).not.toContain('Pitted Shortsword');
     expect(localizeSimText('Forest Wolf dies.')).not.toContain('Forest Wolf');
+    setLanguage('en');
+  });
+
+  it('localizes authored encounter yells but preserves player-authored yells', () => {
+    setLanguage('es_ES');
+    const authored = 'The Heart of the End awakens. Let the world burn!';
+    expect(localizeAuthoredYellText(authored, 'mob')).toBe(
+      'El Corazón del Fin despierta. ¡Que arda el mundo!',
+    );
+    expect(localizeAuthoredYellText(authored, 'npc')).toBe(
+      'El Corazón del Fin despierta. ¡Que arda el mundo!',
+    );
+    expect(localizeAuthoredYellText(authored, 'player')).toBe(authored);
+    expect(localizeAuthoredYellText(authored, undefined)).toBe(
+      'El Corazón del Fin despierta. ¡Que arda el mundo!',
+    );
+    expect(localizeAuthoredYellText(authored, undefined, 'mage')).toBe(authored);
+    expect(localizeAuthoredYellText('Player message', 'mob')).toBe('Player message');
+    expect(
+      localizeAuthoredYellSpeakerName(
+        'Ignivar, Herald of the Last Flame',
+        'mob',
+        'ignivar_herald_of_the_last_flame',
+      ),
+    ).not.toBe('Ignivar, Herald of the Last Flame');
+    expect(
+      localizeAuthoredYellSpeakerName('Ignivar, Herald of the Last Flame', undefined, undefined),
+    ).not.toBe('Ignivar, Herald of the Last Flame');
+    expect(localizeAuthoredYellSpeakerName('Player', undefined, undefined, 'mage')).toBe('Player');
     setLanguage('en');
   });
 

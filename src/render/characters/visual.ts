@@ -68,6 +68,7 @@ import {
   PALADIN_TEMPLARS_VERDICT_DURATION,
 } from './paladin_templars_verdict_clip';
 import { PaladinTemplarsVerdictFx } from './paladin_templars_verdict_fx';
+import { characterMeshCastsShadow } from './shadow_policy';
 import { SkeletonUpdateCache, type SkeletonUpdateStats } from './skeleton_update_cache';
 import {
   type OneShotKind,
@@ -700,11 +701,11 @@ export class CharacterVisual {
 
       this.model.traverse((o) => {
         const mesh = o as THREE.Mesh;
-        // the halo is an unlit additive FX quad: keep it out of the caster list
-        // or this sweep overwrites buildHalo's castShadow = false
-        if (!mesh.isMesh || mesh.name === 'class_halo') return;
-        mesh.castShadow = true;
+        if (!mesh.isMesh) return;
+        const castsShadow = characterMeshCastsShadow(mesh);
+        mesh.castShadow = castsShadow;
         mesh.receiveShadow = false;
+        if (!castsShadow) return;
         // skinned bounds drift outside bind-pose spheres; entity-level culling
         // (80u draw range) already bounds the cost
         if ((mesh as unknown as THREE.SkinnedMesh).isSkinnedMesh) mesh.frustumCulled = false;
@@ -732,6 +733,7 @@ export class CharacterVisual {
             skinEmissiveTexture(key, skinIndex),
             this.tintedFarClaims,
           ),
+          prep.shadowGeo,
         );
       }
 
@@ -1547,14 +1549,18 @@ export class CharacterVisual {
   /** Hang a baked far mesh (and, off the low tier, its shadow proxy) on the
    *  pose wrapper. Shared by the fixed-rig path in the constructor and the
    *  composed path below so the two cannot drift. */
-  private buildFarMeshes(geo: THREE.BufferGeometry, mats: THREE.Material[]): void {
+  private buildFarMeshes(
+    geo: THREE.BufferGeometry,
+    mats: THREE.Material[],
+    shadowGeo: THREE.BufferGeometry | null = geo,
+  ): void {
     this.farMesh = new THREE.Mesh(geo, mats);
     this.farMaterials = this.farMesh.material;
     this.farMesh.name = 'character_far_mesh';
     this.farMesh.visible = false;
     this.poseWrap.add(this.farMesh);
-    if (GFX.tier !== 'low') {
-      this.shadowProxy = new THREE.Mesh(geo, shadowOnlyMat());
+    if (GFX.tier !== 'low' && shadowGeo) {
+      this.shadowProxy = new THREE.Mesh(shadowGeo, shadowOnlyMat());
       this.shadowProxy.name = 'character_shadow_proxy';
       this.shadowProxy.castShadow = true;
       this.shadowProxy.visible = false;
@@ -2445,12 +2451,17 @@ export class CharacterVisual {
     this.model.traverse((o) => {
       const mesh = o as THREE.Mesh;
       if (!mesh.isMesh || mesh.userData.weaponVfxMesh) return;
-      if (mesh.name === 'class_halo') {
+      const castsShadow = characterMeshCastsShadow(mesh);
+      if (!castsShadow) {
         // unlit additive FX quad: never a shadow caster, but its material must
         // stay in the snapshot so ghost/stealth swaps restore it; snapshot the
         // build-time handle, since the live one may be an overlay clone when
         // the swap happens mid-ghost/shadowform
-        this.originalMaterials.set(mesh, this.haloBaseMaterial ?? mesh.material);
+        this.originalMaterials.set(
+          mesh,
+          mesh.name === 'class_halo' ? (this.haloBaseMaterial ?? mesh.material) : mesh.material,
+        );
+        mesh.castShadow = false;
         return;
       }
       mesh.castShadow = this.shadowOn;

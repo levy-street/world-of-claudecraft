@@ -9,6 +9,7 @@
 // arrive here as the outdoor fallbacks); this module owns WHAT each state
 // means in light.
 import type * as THREE from 'three';
+import { applyIgnivarRaidLighting, type IgnivarRaidFogState } from './ignivar_raid_environment';
 
 /** Every fog scene state the renderer resolves to (single source of truth). */
 export type FogSceneState =
@@ -16,6 +17,9 @@ export type FogSceneState =
   | 'dungeon'
   | 'temple'
   | 'nythraxis'
+  | 'ignivarApproach'
+  | 'ignivar'
+  | 'varkhul'
   | 'delve'
   | 'yumiMaze'
   | 'battleground'
@@ -109,8 +113,13 @@ export function applyInteriorLightRig(
   const wildheartSun = state === 'wildheartField';
   const keepHearth = state === 'lastkeep';
   const dawnholdDay = state === 'dawnhold';
+  const ignivarForge = state === 'ignivarApproach' || state === 'ignivar' || state === 'varkhul';
   const underground =
-    state === 'dungeon' || state === 'temple' || state === 'nythraxis' || state === 'delve';
+    state === 'dungeon' ||
+    state === 'temple' ||
+    state === 'nythraxis' ||
+    ignivarForge ||
+    state === 'delve';
   targets.sun.intensity = mazeNight
     ? YUMI_MAZE_SUN_INTENSITY
     : wildheartSun
@@ -171,6 +180,8 @@ export function applyInteriorLightRig(
     targets.sun.color.setHex(DAWNHOLD_SUN_COLOR);
     targets.hemi.color.setHex(DAWNHOLD_HEMI_SKY_COLOR);
     targets.hemi.groundColor.setHex(DAWNHOLD_HEMI_GROUND_COLOR);
+  } else if (ignivarForge) {
+    applyIgnivarRaidLighting(state as IgnivarRaidFogState, targets);
   }
 }
 

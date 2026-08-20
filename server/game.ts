@@ -8326,14 +8326,15 @@ export class GameServer {
           break;
         }
         const e = sim.entities.get(pid);
-        const door = [...sim.entities.values()].find(
-          (x) => x.templateId === 'dungeon_door' && x.dungeonId === dungeonId,
-        );
-        const succeeded =
-          !!e &&
-          !!door &&
-          Math.hypot(e.pos.x - door.pos.x, e.pos.z - door.pos.z) < 8 &&
-          sim.enterDungeon(dungeonId, pid);
+        const door = e
+          ? [...sim.entities.values()].find(
+              (x) =>
+                x.templateId === 'dungeon_door' &&
+                x.dungeonId === dungeonId &&
+                Math.hypot(e.pos.x - x.pos.x, e.pos.z - x.pos.z) < 8,
+            )
+          : undefined;
+        const succeeded = !!door && sim.enterDungeon(dungeonId, pid);
         this.sendCommandOutcome(session, msg, succeeded);
         break;
       }
@@ -8495,6 +8496,8 @@ export class GameServer {
     }
     const head = `{"t":"snap","tick":${tick},"time":${round2(this.sim.time)}${tickHzJson}`;
     const activeFrostRings = this.sim.activeFrostRings;
+    const activeIgnivarMeteors = this.sim.activeIgnivarMeteors;
+    const activeVarkhulForgestormWarnings = this.sim.activeVarkhulForgestormWarnings;
     const activeTemporalHourglasses = this.sim.activeTemporalHourglasses;
     const activeConsecrations = this.sim.activeConsecrations;
     // Resolve every live session's interest anchor up front, each inside its own
@@ -8690,6 +8693,35 @@ export class GameServer {
               `{"id":${JSON.stringify(ring.id)},"x":${round2(ring.x)},"z":${round2(ring.z)},"r":${round2(ring.radius)},"i":${round2(ring.innerRadius)},"dur":${round2(ring.duration)},"rem":${round2(ring.remaining)}}`,
           );
         const frostRingsJson = frostRings.length > 0 ? `,"rings":[${frostRings.join(',')}]` : '';
+        const ignivarMeteors = activeIgnivarMeteors
+          .filter((meteor) => {
+            const dx = meteor.x - anchorEntity.pos.x;
+            const dz = meteor.z - anchorEntity.pos.z;
+            // Keep the persistent warning on the same delivery horizon as
+            // its world-point meteorImpact event, so a visible warning never
+            // disappears silently outside the event router's radius.
+            return dx * dx + dz * dz <= EVENT_RADIUS * EVENT_RADIUS;
+          })
+          .map(
+            (meteor) =>
+              `{"id":${JSON.stringify(meteor.id)},"x":${round2(meteor.x)},"z":${round2(meteor.z)},"r":${round2(meteor.radius)},"dur":${round2(meteor.duration)},"rem":${round2(meteor.remaining)},"lead":${round2(meteor.warningLead)}}`,
+          );
+        const ignivarMeteorsJson =
+          ignivarMeteors.length > 0 ? `,"ignivarMeteors":[${ignivarMeteors.join(',')}]` : '';
+        const varkhulForgestorm = activeVarkhulForgestormWarnings
+          .filter((warning) => {
+            const dx = warning.x - anchorEntity.pos.x;
+            const dz = warning.z - anchorEntity.pos.z;
+            return dx * dx + dz * dz <= EVENT_RADIUS * EVENT_RADIUS;
+          })
+          .map(
+            (warning) =>
+              `{"id":${warning.id},"sourceId":${warning.sourceId},"x":${round2(warning.x)},"z":${round2(warning.z)},"r":${round2(warning.radius)},"dur":${round2(warning.duration)},"rem":${round2(warning.remaining)}}`,
+          );
+        const varkhulForgestormJson =
+          varkhulForgestorm.length > 0
+            ? `,"varkhulForgestorm":[${varkhulForgestorm.join(',')}]`
+            : '';
         const temporalHourglasses = activeTemporalHourglasses
           .filter((hourglass) => {
             const dx = hourglass.x - anchorEntity.pos.x;
@@ -8723,7 +8755,7 @@ export class GameServer {
             : '';
         this.sendRaw(
           session,
-          `${head}${timerWireJson}${petSpecialWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${frostRingsJson}${temporalHourglassesJson}${consecrationsJson}${keepJson}}`,
+          `${head}${timerWireJson}${petSpecialWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${frostRingsJson}${ignivarMeteorsJson}${varkhulForgestormJson}${temporalHourglassesJson}${consecrationsJson}${keepJson}}`,
         );
       },
       (err, resolved) =>

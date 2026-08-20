@@ -80,6 +80,7 @@ import {
   PALADIN_TEMPLARS_VERDICT_CLIP,
 } from './paladin_templars_verdict_clip';
 import { animatedNodeNames, mergeSkinnedParts } from './rig_merge';
+import { characterMeshCastsShadow } from './shadow_policy';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { optimizeSkinGpuLayout } from './skin_gpu_layout';
 import { primeSkinnedSortSpheres } from './skinned_sort_spheres';
@@ -546,6 +547,13 @@ const streamableUrls = allPreloadUrls.filter(
 );
 let streamedUrls = GFX.iosMemoryProfile ? streamableUrls : [];
 let streamedUrlSet = new Set(streamedUrls);
+const lazyOnDemandUrls = new Set(
+  Object.values(VISUALS).flatMap((def) =>
+    def.lazyPreload
+      ? [def.url, ...(def.animUrls ?? []), ...(def.attach ?? []).map((a) => a.url)]
+      : [],
+  ),
+);
 const preloadUrls = allPreloadUrls.filter((url) => !streamedUrlSet.has(url));
 const characterLoadTasks = new Map<string, Promise<void>>();
 
@@ -889,7 +897,7 @@ function resolvedGltf(url: string): GLTF {
     // attempt re-kicks the fetch (the mount lazy-load pattern; loadGltf
     // evicts rejected promises so the re-call really re-fetches). A
     // non-streamed miss stays a loud preload-set bug: no masking fetch.
-    if (streamedUrlSet.has(url)) ensureCharacterUrl(url);
+    if (streamedUrlSet.has(url) || lazyOnDemandUrls.has(url)) ensureCharacterUrl(url);
     throw new Error(`character asset not preloaded: ${resolvedUrl}`);
   }
   return g;
@@ -1778,6 +1786,8 @@ export function tintedMaterial(
   emisTex: THREE.Texture | null = null,
   role: MaterialRole = 'body',
   claims: TintedMaterialClaims | null = null,
+  selfIllumination = 0,
+  envMapIntensity?: number,
 ): THREE.Material {
   // A source with no color property (the weapon-skin fresnel shell's
   // ShaderMaterial) has nothing this factory can tint, lift, or polish.
@@ -1785,9 +1795,18 @@ export function tintedMaterial(
   // (its per-frame uTime/uStr writes would land on a material nothing
   // renders), and caching that clone would strand it forever.
   if (!(src as THREE.MeshStandardMaterial).color) return src;
-  const key = `${src.uuid}|${tint ?? 'n'}|${tint === null ? 0 : strength}|${GFX.standardMaterials ? 's' : 'l'}|${skinTex ? skinTex.uuid : 'n'}|${emisTex ? emisTex.uuid : 'n'}|${role}`;
+  const key = `${src.uuid}|${tint ?? 'n'}|${tint === null ? 0 : strength}|${GFX.standardMaterials ? 's' : 'l'}|${skinTex ? skinTex.uuid : 'n'}|${emisTex ? emisTex.uuid : 'n'}|${role}|${selfIllumination}|${envMapIntensity ?? 'n'}`;
   const build = () =>
-    buildTintedClone(src as THREE.MeshStandardMaterial, tint, strength, skinTex, emisTex, role);
+    buildTintedClone(
+      src as THREE.MeshStandardMaterial,
+      tint,
+      strength,
+      skinTex,
+      emisTex,
+      role,
+      selfIllumination,
+      envMapIntensity,
+    );
   if (claims) {
     if (claims.has(key)) {
       // This lease already claimed the key (the same source material on an
@@ -1817,6 +1836,8 @@ function buildTintedClone(
   skinTex: THREE.Texture | null,
   emisTex: THREE.Texture | null,
   role: MaterialRole,
+  selfIllumination: number,
+  envMapIntensity?: number,
 ): THREE.Material {
   const src: THREE.Material = s;
   let mat: THREE.MeshStandardMaterial | THREE.MeshLambertMaterial | THREE.MeshBasicMaterial;
@@ -1890,6 +1911,13 @@ function buildTintedClone(
     // in one coherent painted-surface response without touching metalness.
     const std = mat as THREE.MeshStandardMaterial;
     std.roughness = Math.min(Math.max(std.roughness, 0.55), 0.9);
+    if (selfIllumination > 0 && std.map && !std.emissiveMap) {
+      std.emissiveMap = std.map;
+      std.emissive.set(0xffffff);
+      std.emissiveIntensity = selfIllumination;
+      std.needsUpdate = true;
+    }
+    if (envMapIntensity !== undefined) std.envMapIntensity = envMapIntensity;
   }
   if (!GFX.standardMaterials) applyLowReadabilityLift(mat, role);
   return mat;
@@ -1940,10 +1968,30 @@ export function applyMaterials(
     const em = emisTex && mesh.userData.bodyMesh ? emisTex : null;
     if (Array.isArray(source)) {
       mesh.material = source.map((m) =>
-        tintedMaterial(m, materialTint, strength, sk, em, role, claims),
+        tintedMaterial(
+          m,
+          materialTint,
+          strength,
+          sk,
+          em,
+          role,
+          claims,
+          role === 'body' ? (def.selfIllumination ?? 0) : 0,
+          role === 'body' ? def.envMapIntensity : undefined,
+        ),
       );
     } else {
-      mesh.material = tintedMaterial(source, materialTint, strength, sk, em, role, claims);
+      mesh.material = tintedMaterial(
+        source,
+        materialTint,
+        strength,
+        sk,
+        em,
+        role,
+        claims,
+        role === 'body' ? (def.selfIllumination ?? 0) : 0,
+        role === 'body' ? def.envMapIntensity : undefined,
+      );
     }
   });
 }
@@ -1974,6 +2022,8 @@ export function tintedFarMaterials(
       isBody[i] ? emisTex : null,
       'body',
       claims,
+      isBody[i] ? (def.selfIllumination ?? 0) : 0,
+      isBody[i] ? def.envMapIntensity : undefined,
     ),
   );
 }
@@ -1993,6 +2043,8 @@ export interface PreparedVisual {
   clips: Map<string, THREE.AnimationClip>;
   /** static idle-pose geometry in normalized space (far LOD + shadow proxy) */
   idleGeo: THREE.BufferGeometry | null;
+  /** caster-only idle-pose geometry for the mid-distance shadow proxy */
+  shadowGeo: THREE.BufferGeometry | null;
   /** source materials aligned with idleGeo groups */
   idleSrcMats: THREE.Material[];
   /** parallel to idleSrcMats: whether that material belongs to the
@@ -2133,7 +2185,11 @@ export function prepareVisual(key: string): PreparedVisual {
     .multiply(new THREE.Matrix4().makeRotationY(def.yaw ?? 0))
     .multiply(new THREE.Matrix4().makeScale(normScale, normScale, normScale));
 
-  const { geo, mats, isBody } = bakeStaticPose(norm, farBakeMeshes(temp));
+  const farMeshes = farBakeMeshes(temp);
+  const { geo, mats, isBody } = bakeStaticPose(norm, farMeshes);
+  const shadowMeshes = farMeshes.filter(characterMeshCastsShadow);
+  const shadowGeo =
+    shadowMeshes.length === farMeshes.length ? geo : bakeStaticPose(norm, shadowMeshes).geo;
   // The throwaway retained a variant when the def is modular (assembleModular
   // retains every clone it makes). It exists only to be measured and flattened,
   // so give it back rather than pinning one part set per modular key forever
@@ -2147,6 +2203,7 @@ export function prepareVisual(key: string): PreparedVisual {
     yOffset,
     clips,
     idleGeo: geo,
+    shadowGeo,
     idleSrcMats: mats,
     idleSrcIsBody: isBody,
     clickRadius,

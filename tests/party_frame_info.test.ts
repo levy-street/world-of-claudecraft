@@ -58,6 +58,20 @@ describe('partyFrameAuras', () => {
     ]);
   });
 
+  it("surfaces Varkhul's stacking tank-swap mark on compact party frames", () => {
+    const rows = partyFrameAuras([
+      aura({
+        id: 'varkhul_makers_brand',
+        kind: 'vuln_source',
+        value: 0.7,
+        remaining: 29.2,
+        sourceId: 77,
+      }),
+    ]);
+
+    expect(rows).toEqual([{ id: 'varkhul_makers_brand', kind: 'vuln_source', remaining: 30 }]);
+  });
+
   it('marks negative-value auras and ceils the remaining seconds', () => {
     const rows = partyFrameAuras([
       aura({ id: 'wither', kind: 'buff_ap', value: -12, remaining: 11.2 }),

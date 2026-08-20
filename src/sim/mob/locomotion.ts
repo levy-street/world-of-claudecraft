@@ -38,7 +38,22 @@ import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { resetDrownedLitanyBossEncounter } from '../delves/drowned_litany_boss';
 import { clearDelveRaiseDeadChannel } from '../delves/runs';
+import {
+  IGNIVAR_APOCALYPSE_ADD_ID,
+  resetIgnivarEncounter,
+  updateIgnivarApocalypseAdd,
+  updateIgnivarEncounter,
+} from '../encounters/ignivar';
+import {
+  resetVarkhulEncounter,
+  updateVarkhulAssemblyArtificer,
+  updateVarkhulEncounter,
+  VARKHUL_BOSS_ID,
+  VARKHUL_CINDER_ARTIFICER_ID,
+  VARKHUL_MASTERS_ASSEMBLY_CAST_ID,
+} from '../encounters/varkhul';
 import { isEscortNpcTemplate } from '../escort';
+import { unlockIgnivarRaidGate } from '../ignivar_raid_progression';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import { noteMatchPetUnravelled } from '../pet/pet_match_return';
 import { notePetUnravelledOnOwnerDeath } from '../pet/pet_owner_revive';
@@ -62,6 +77,7 @@ import {
   DUNGEON_LEASH_DISTANCE,
   dist2d,
   type Entity,
+  IGNIVAR_BOSS_ID,
   LEASH_DISTANCE,
   MELEE_RANGE,
   type MobTemplate,
@@ -138,6 +154,11 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     mob.despawnTimer = undefined;
   }
   if (mob.dead) {
+    if (mob.templateId === IGNIVAR_BOSS_ID) {
+      if (mob.ignivar) resetIgnivarEncounter(ctx, mob);
+      unlockIgnivarRaidGate(ctx, mob);
+    }
+    if (mob.templateId === VARKHUL_BOSS_ID && mob.varkhul) resetVarkhulEncounter(ctx, mob);
     ctx.onBossDeath(mob);
     if (
       mob.ownerId !== null &&
@@ -247,6 +268,19 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     return;
   }
 
+  if (mob.templateId === IGNIVAR_APOCALYPSE_ADD_ID) {
+    updateIgnivarApocalypseAdd(mob);
+    return;
+  }
+
+  if (
+    mob.templateId === VARKHUL_CINDER_ARTIFICER_ID &&
+    mob.castingAbility === VARKHUL_MASTERS_ASSEMBLY_CAST_ID
+  ) {
+    updateVarkhulAssemblyArtificer(mob);
+    return;
+  }
+
   // Tolling Bell projectiles (The Drowned Litany finale) are moved exclusively
   // by the boss driver: no aggro, no wander, no evade-home, and the hostility
   // safety net below must not re-hostile them.
@@ -338,6 +372,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   if (!mob.hostile) mob.hostile = true;
 
   const isNythraxis = mob.templateId === NYTHRAXIS_BOSS_ID;
+  const isIgnivar = mob.templateId === IGNIVAR_BOSS_ID;
+  const isVarkhul = mob.templateId === VARKHUL_BOSS_ID;
   if (mob.inCombat || (isNythraxis && mob.nythraxis && mob.nythraxis.phase !== 'dead')) {
     const nythraxisScriptLocked =
       isNythraxis &&
@@ -357,6 +393,12 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
             (mob.nythraxis.heroicSummonChannelRemaining ?? 0) > 0))
       )
         return;
+    } else if (isIgnivar) {
+      updateIgnivarEncounter(ctx, mob, true);
+      return;
+    } else if (isVarkhul) {
+      updateVarkhulEncounter(ctx, mob, true);
+      return;
     } else {
       ctx.updateBossMechanics(mob);
     }
@@ -388,7 +430,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
 
   switch (mob.aiState) {
     case 'idle': {
-      if (mob.templateId === NYTHRAXIS_BOSS_ID && !mob.inCombat) {
+      if ((isNythraxis || isIgnivar || isVarkhul) && !mob.inCombat) {
         mob.wanderTarget = null;
         mob.wanderTimer = 3;
         mob.pos = { ...mob.spawnPos };
@@ -1475,6 +1517,8 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   // every mob here privately and intentionally has a different shared RNG digest.
   mob.wanderTimer = wanderPause(idleRng(ctx, mob), mob, 2, 8);
   if (mob.templateId === NYTHRAXIS_BOSS_ID) ctx.resetNythraxisEncounter(mob);
+  if (mob.templateId === IGNIVAR_BOSS_ID) resetIgnivarEncounter(ctx, mob);
+  if (mob.templateId === VARKHUL_BOSS_ID) resetVarkhulEncounter(ctx, mob);
   if (mob.templateId === SISTER_NHALIA_BOSS_ID) resetDrownedLitanyBossEncounter(ctx, mob);
   // No bossId check needed here: clearDelveRaiseDeadChannel is a no-op for every
   // mob other than the one that actually started the channel, so it is safe to

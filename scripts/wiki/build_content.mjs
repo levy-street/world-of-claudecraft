@@ -320,7 +320,9 @@ const dungeonBand = (def) => {
   return min === Infinity ? { min: null, max: null } : { min, max };
 };
 const dungeons = Object.values(DUNGEONS)
-  .filter((d) => (d.suggestedPlayers ?? 0) >= 5)
+  // Development-only encounter rooms remain hidden until their progression,
+  // rewards, and public entrance are authored.
+  .filter((d) => (d.suggestedPlayers ?? 0) >= 5 && d.guideVisible !== false)
   .map((d) => {
     const isRaid = (d.suggestedPlayers ?? 0) >= 10;
     const band = dungeonBand(d);

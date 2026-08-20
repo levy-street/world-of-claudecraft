@@ -344,4 +344,23 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     finalBossId: 'nythraxis_scourge_of_thornpeak',
     marksPerParticipant: 3,
   },
+  // Ignivar's development raid tier. This record makes an explicit Heroic
+  // claim possible while Normal continues to use the untouched base template.
+  // The multipliers remain provisional while full-raid telemetry is gathered.
+  // A parse-calibrated full-BiS raid simulation reduced the initial 3.2x health
+  // and 3x damage values, which prevented every tested composition from killing.
+  // Damage tuning applies to spawn-time weapon values. Encounter-owned max-HP
+  // mechanics keep their authored percentages. The Heart has no attacks, so its
+  // add multiplier is currently an inert mirror of the dungeon-wide value.
+  ignivar_raid_arena: {
+    id: 'ignivar_raid_arena',
+    difficulty: 'heroic',
+    level: 22,
+    healthMultiplier: 2.5,
+    damageMultiplier: 2,
+    addDamageMultiplier: 2,
+    armorMultiplier: 1.2,
+    finalBossId: 'ignivar_herald_of_the_last_flame',
+    marksPerParticipant: 3,
+  },
 };

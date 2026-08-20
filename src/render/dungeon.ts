@@ -11,6 +11,7 @@
 //   Gravewyrm Sanctum (interior 'sanctum')                 - green ritual fire, necromantic
 //   Drowned Temple (interior 'temple')                     - pale moon-violet, drowned reliquaries
 //   Abandoned Crypt raid (interior 'nythraxis')            - dark violet soul wards
+//   Crucible of the Last Spring (interior 'ignivar')       - hot amber forge light
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
@@ -28,6 +29,9 @@ import {
   DUNGEON_WALL_X,
   type DungeonLayout,
   type GridPoint,
+  IGNIVAR_FORGE_APPROACH_LAYOUT,
+  IGNIVAR_LAYOUT,
+  IGNIVAR_SECOND_WING_LAYOUT,
   type InteriorStyle,
   LASTKEEP_LAYOUT,
   NYTHRAXIS_LAYOUT,
@@ -60,7 +64,9 @@ import {
 } from './delve_marsh_dressing';
 import { rectShellWallSegments, stubFaceSegments } from './dungeon_wall_segments';
 import { attachSceneGroupGated } from './gated_scene_attach';
-import { EMISSIVE_LIGHT, GFX, sharedUniforms } from './gfx';
+import { EMISSIVE_LIGHT, sharedUniforms } from './gfx';
+import { buildIgnivarArenaAtmosphere } from './ignivar_arena_atmosphere';
+import { buildIgnivarRaidDressing, ensureIgnivarRaidDressingAssets } from './ignivar_raid_dressing';
 import { buildLastKeepDressing, ensureLastKeepDressing } from './lastkeep_dressing';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
@@ -102,6 +108,7 @@ export type DungeonInteriorVariant =
   // planters and flowers.
   | 'dawnhold'
   | 'nythraxis'
+  | 'ignivar'
   // Collapsed Reliquary delve sub-themes (share the ember crypt-stone base, see
   // isDelveVariant; differ only in wall-side props, clutter, and the dais).
   | 'delve_ossuary'
@@ -136,13 +143,18 @@ export function dungeonDaisHasRaisedPlatform(variant: DungeonInteriorVariant): b
   // Flat fighting floors: the arena pits, the Nythraxis raid, and the delve
   // trash rooms (their "dais" marker is only the exit threshold). The delve
   // finale keeps a raised boss stage for Deacon Varric.
-  if (isArenaVariant(variant) || variant === 'nythraxis') return false;
+  if (isArenaVariant(variant) || variant === 'nythraxis' || variant === 'ignivar') return false;
   if (variant === 'delve_ossuary' || variant === 'delve_bell' || variant === 'delve_hall')
     return false;
   // marsh trash rooms are flat fighting floors like the other delve trash; the
   // marsh apse keeps a raised boss stage like delve_finale.
   if (variant === 'delve_marsh') return false;
   return true;
+}
+
+/** Encounter floors where uncollided legacy aisle props must never be emitted. */
+export function dungeonVariantKeepsFightingFloorClear(variant: DungeonInteriorVariant): boolean {
+  return isArenaVariant(variant) || variant === 'ignivar';
 }
 
 interface TorchColors {
@@ -169,6 +181,7 @@ const TORCH_COLORS: Record<Variant, TorchColors> = {
   // flames than the keep's torchlit halls, closer to sun through blossom.
   dawnhold: { flame: 0xffd98f, emissive: 0xd08428, light: 0xffc061 },
   nythraxis: { flame: 0x8f5cff, emissive: 0x4b1c9a, light: 0x7b4dff },
+  ignivar: { flame: 0xffd06a, emissive: 0xe05a16, light: 0xff7a2e },
   // delve reliquaries burn with grave-ember red: warm coals over cold stone
   delve_ossuary: { flame: 0xff7a3c, emissive: 0xcc3a14, light: 0xff6a3c },
   delve_bell: { flame: 0xff7a3c, emissive: 0xcc3a14, light: 0xff6a3c },
@@ -487,12 +500,13 @@ class Placements {
   }
 }
 
-interface ArenaWallFootprint {
+export interface ArenaWallFootprint {
   x: number;
   z: number;
   hw: number;
   hd: number;
   topY: number;
+  ry?: number;
 }
 
 interface PendingArenaWall {
@@ -601,7 +615,12 @@ export function scaleUv(geo: THREE.BufferGeometry, su: number, sv: number): THRE
 }
 
 function pointInsideArenaWall(f: ArenaWallFootprint, x: number, z: number): boolean {
-  return Math.abs(x - f.x) < f.hw && Math.abs(z - f.z) < f.hd;
+  const ry = f.ry ?? 0;
+  const dx = x - f.x;
+  const dz = z - f.z;
+  const lx = Math.cos(ry) * dx - Math.sin(ry) * dz;
+  const lz = Math.sin(ry) * dx + Math.cos(ry) * dz;
+  return Math.abs(lx) < f.hw && Math.abs(lz) < f.hd;
 }
 
 function segmentArenaWallEntry(
@@ -612,10 +631,17 @@ function segmentArenaWallEntry(
   bz: number,
 ): number {
   if (pointInsideArenaWall(f, ax, az)) return 0;
-  const lax = ax - f.x;
-  const laz = az - f.z;
-  const lbx = bx - f.x;
-  const lbz = bz - f.z;
+  const ry = f.ry ?? 0;
+  const c = Math.cos(ry);
+  const s = Math.sin(ry);
+  const adx = ax - f.x;
+  const adz = az - f.z;
+  const bdx = bx - f.x;
+  const bdz = bz - f.z;
+  const lax = c * adx - s * adz;
+  const laz = s * adx + c * adz;
+  const lbx = c * bdx - s * bdz;
+  const lbz = s * bdx + c * bdz;
   const dx = lbx - lax;
   const dz = lbz - laz;
   let tmin = -Infinity;
@@ -650,7 +676,7 @@ function segmentArenaWallEntry(
   return tmin;
 }
 
-function arenaWallSegmentHits(
+export function arenaWallSegmentHits(
   f: ArenaWallFootprint,
   eyeX: number,
   eyeY: number,
@@ -777,6 +803,7 @@ export class DungeonInteriors {
     },
   ): Promise<THREE.Group> {
     await ensureDungeonAssets();
+    await ensureIgnivarRaidDressingAssets(interior);
     if (interior === 'wildheart') {
       const group = buildWildheartFieldInterior({
         lowGfx: this.lowGfx,
@@ -813,7 +840,13 @@ export class DungeonInteriors {
                   ? // Dawnhold Castle: the Evergarden garden palace, same
                     // authored room-graph path at a smaller, warmer scale.
                     DAWNHOLD_LAYOUT
-                  : CRYPT_LAYOUT);
+                  : interior === 'ignivar_approach'
+                    ? IGNIVAR_FORGE_APPROACH_LAYOUT
+                    : interior === 'ignivar'
+                      ? IGNIVAR_LAYOUT
+                      : interior === 'ignivar_depths'
+                        ? IGNIVAR_SECOND_WING_LAYOUT
+                        : CRYPT_LAYOUT);
     const variant = opts?.style?.kit ?? opts?.variant ?? this.variantFor(interior, ox, oz);
     const torch = opts?.style?.torch ?? TORCH_COLORS[variant];
     const daisRaised = opts?.style?.daisRaised;
@@ -945,6 +978,11 @@ export class DungeonInteriors {
     }
 
     this.emit(group, p, variant);
+    if (interior === 'ignivar') {
+      group.add(buildIgnivarArenaAtmosphere({ lowGfx: this.lowGfx }));
+    }
+    const raidDressing = buildIgnivarRaidDressing(interior, layout, this.lowGfx);
+    if (raidDressing) group.add(raidDressing);
     if (arenaWalls) {
       for (const wall of arenaWalls.all) this.emitArenaHideable(group, wall, variant);
     }
@@ -1387,6 +1425,8 @@ export class DungeonInteriors {
         : 'arena';
     }
     if (interior === 'nythraxis') return 'nythraxis';
+    if (interior === 'ignivar_approach' || interior === 'ignivar' || interior === 'ignivar_depths')
+      return 'ignivar';
     if (interior === 'sanctum') return 'sanctum';
     if (interior === 'temple') return 'temple';
     // The Last Keep gets its own warm castle grade (clean stone, candle light,
@@ -1524,6 +1564,19 @@ export class DungeonInteriors {
     });
     const front = wall({ x: ox, z: oz + layout.zMin, hw: endWallHw, hd: DUNGEON_WALL_HW, topY });
     const back = wall({ x: ox, z: oz + layout.zMax, hw: endWallHw, hd: DUNGEON_WALL_HW, topY });
+    if (layout.shellPolygon) {
+      const polygon = polygonWallSegments(layout.shellPolygon).map((segment) =>
+        wall({
+          x: ox + segment.x,
+          z: oz + segment.z,
+          hw: segment.halfLength,
+          hd: DUNGEON_WALL_HW,
+          topY,
+          ry: segment.rot,
+        }),
+      );
+      return { left, right, front, back, all: polygon };
+    }
     return {
       left,
       right,
@@ -2102,7 +2155,7 @@ export class DungeonInteriors {
     arenaWalls?: PendingArenaWalls,
   ): void {
     if (layout.shellPolygon) {
-      this.placePolygonWalls(p, layout.shellPolygon, variant);
+      this.placePolygonWalls(p, layout.shellPolygon, variant, arenaWalls?.all);
       return;
     }
     const bannerEvery = variant === 'crypt' ? 4 : 3;
@@ -2180,6 +2233,7 @@ export class DungeonInteriors {
     p: Placements,
     points: ReadonlyArray<{ x: number; z: number }>,
     variant: Variant,
+    hideableWalls?: readonly PendingArenaWall[],
   ): void {
     const bannerEvery = variant === 'crypt' ? 4 : 3;
     let i = 0;
@@ -2189,9 +2243,10 @@ export class DungeonInteriors {
       // KayKit wall modules are 4u long on local X. Scale each one to the exact
       // shared segment span instead of drawing an 8u module past a short edge.
       const scale: [number, number, number] = [halfLength / 2, MODULE_SCALE, MODULE_SCALE];
-      p.add(kind, x, 0, z, rot, scale);
+      const target = hideableWalls?.[i]?.placements ?? p;
+      target.add(kind, x, 0, z, rot, scale);
       if (i % bannerEvery === 2 && kind !== 'wall_archedwindow_gated') {
-        p.add(this.bannerKind(variant, hash2(z, x * 7.3)), x, 0, z, rot, MODULE_SCALE);
+        target.add(this.bannerKind(variant, hash2(z, x * 7.3)), x, 0, z, rot, MODULE_SCALE);
       }
       i++;
     }
@@ -2555,7 +2610,7 @@ export class DungeonInteriors {
 
   // Bone piles / debris strewn along the aisle (legacy deterministic spots)
   private placeAisleClutter(p: Placements, layout: DungeonLayout, variant: Variant): void {
-    if (isArenaVariant(variant)) return; // the fighting floors stay clear of obstacles
+    if (dungeonVariantKeepsFightingFloorClear(variant)) return;
     // Delve modules drive clutter straight from their layout's authored scatter
     // points so the visible bone piles sit exactly on the collision circles
     // (the Drowned Litany marsh shapes use bespoke scatter, not the sine aisle
@@ -2609,6 +2664,10 @@ export class DungeonInteriors {
     variant: Variant,
     arenaWalls?: PendingArenaWalls,
   ): void {
+    // Ignivar's four authored conduits are the room's gameplay landmarks. Keep
+    // its compact octagonal floor free of legacy crypt/sanctum scenery that has
+    // no matching sim collider and could hide encounter telegraphs.
+    if (variant === 'ignivar') return;
     // The Drowned Court keeps bare moonlit walls: banners already come from
     // placeWalls, and the water bands + reliquary altars carry the theme.
     if (variant === 'arena_drowned') return;

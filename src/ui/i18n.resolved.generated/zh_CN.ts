@@ -2265,6 +2265,8 @@ export const zh_CN: EnTranslations = {
       "mail": "锁甲"
     },
     "auraEffect": {
+      "sharedPyre": "圈内至少需要 {players} 名玩家",
+      "makersBrand": "For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.",
       "dot": "每 {interval} 秒造成 {value} 点{school}伤害",
       "hot": "每 {interval} 秒恢复 {value} 点生命值",
       "mendingCurrent": "储存 {value} 点治疗量，随时间释放或由湍流愈合消耗",
@@ -13370,6 +13372,24 @@ export const zh_CN: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "尼思拉克西斯，荆峰之灾"
       },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "伊格尼瓦，末焰使者"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "终焉之心"
+      },
+      "ignivar_ember_sentinel": {
+        "name": "Ember Sentinel"
+      },
+      "ignivar_crucible_warden": {
+        "name": "Crucible Warden"
+      },
+      "ignivar_cinder_artificer": {
+        "name": "Cinder Artificer"
+      },
+      "varkhul_forgefather_of_the_last_flame": {
+        "name": "Varkhul, Forgefather of the Last Flame"
+      },
       "reliquary_ledger_wraith": {
         "name": "名册幽魂"
       },
@@ -14023,6 +14043,11 @@ export const zh_CN: EnTranslations = {
         "name": "奥德里克修士",
         "title": "山谷牧师",
         "greeting": "从礼拜堂墓地到世界屋脊... 线索到这里结束。我感觉山正在聆听。"
+      },
+      "archivist_maelin_emberward": {
+        "name": "Archivist Maelin Emberward",
+        "title": "Crucible Archivist",
+        "greeting": "Every hammer mark in this place is a sentence. Help me read what Varkhul tried to hide."
       },
       "brother_halven": {
         "name": "哈尔文修士",
@@ -15129,6 +15154,54 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "击败尼思拉克西斯"
+          }
+        }
+      },
+      "q_ignivar_echoes_in_iron": {
+        "title": "Echoes in Iron",
+        "text": "These automata are not soldiers. They are drafts. Varkhul tempered shell after shell while the Last Spring failed around him. Read the three records and destroy the constructs guarding them. Each failed body may carry part of the answer.",
+        "completion": "The records agree. Varkhul bound water from the dying Last Spring into living metal. These automatons were his failed temperings. Only one design endured.",
+        "objectives": {
+          "0": {
+            "label": "Read the First Tempering record"
+          },
+          "1": {
+            "label": "Read the Living Metal record"
+          },
+          "2": {
+            "label": "Read the Herald-Key record"
+          },
+          "3": {
+            "label": "Ember Sentinel defeated"
+          },
+          "4": {
+            "label": "Crucible Warden defeated"
+          },
+          "5": {
+            "label": "Cinder Artificer defeated"
+          }
+        }
+      },
+      "q_ignivar_heralds_heart": {
+        "title": "The Herald's Heart",
+        "text": "The survivor named in every record is Ignivar. Varkhul called him herald, seal, and key. Defeat Ignivar, then examine the core that remains. It should tell us what the herald was made to guard.",
+        "completion": "Ignivar was never merely a guardian. His heart is a key, and its final plates point toward the sealed crucible below.",
+        "objectives": {
+          "0": {
+            "label": "Ignivar defeated"
+          },
+          "1": {
+            "label": "Ignivar's core inspected"
+          }
+        }
+      },
+      "q_ignivar_the_forgefather": {
+        "title": "The Forgefather",
+        "text": "The path below leads to Varkhul, Forgefather of the Last Flame. He imprisoned the Last Spring to make metal live, then forged Ignivar to keep the crime sealed. Enter the Inner Crucible and end his work.",
+        "completion": "The forge is silent at last. The spring may never recover, but Varkhul will shape no more lives into chains.",
+        "objectives": {
+          "0": {
+            "label": "Varkhul defeated"
           }
         }
       },
@@ -16881,6 +16954,21 @@ export const zh_CN: EnTranslations = {
         "name": "尼思拉克西斯团队竞技场",
         "enterText": "你穿过封印的王室之门。",
         "leaveText": "你回到荆峰的寒冷空气中。"
+      },
+      "ignivar_forge_approach": {
+        "name": "Halls of the First Tempering",
+        "enterText": "Hammerfall echoes through the Halls of the First Tempering.",
+        "leaveText": "You step away from the first forge and breathe freely again."
+      },
+      "ignivar_raid_arena": {
+        "name": "最后泉源熔炉",
+        "enterText": "热浪在熔炉封印的水源上方翻涌。",
+        "leaveText": "你离开熔炉，终于再次畅快呼吸。"
+      },
+      "ignivar_inner_crucible": {
+        "name": "The Inner Crucible",
+        "enterText": "The opened gate leads deeper into the Crucible.",
+        "leaveText": "You leave the silent depths of the Crucible."
       },
       "wildheart_basin": {
         "name": "荒野之心盆地",

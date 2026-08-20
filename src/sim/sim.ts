@@ -264,6 +264,8 @@ import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
 import type { GuildBankState, GuildMembership } from './guild_bank';
 import * as guildBankMod from './guild_bank';
+import { type ActiveIgnivarMeteorWarning, activeIgnivarMeteorWarnings } from './ignivar_meteors';
+import { VARKHUL_BOSS_ID } from './ignivar_raid_ids';
 import * as interaction from './interaction';
 import {
   boundCraftedRecipeIdOnLoad,
@@ -562,6 +564,10 @@ import {
 } from './talent_save_migration';
 import * as unstuckMod from './unstuck';
 import {
+  type ActiveVarkhulForgestormWarning,
+  activeVarkhulForgestormWarnings,
+} from './varkhul_forgestorm';
+import {
   rollWorldBossLoot as rollWorldBossLootImpl,
   scaleWorldBossHp,
   WORLD_BOSSES,
@@ -734,6 +740,7 @@ import {
   FAERIE_FIRE_ARMOR_PCT,
   GCD,
   type HonorArenaDailyState,
+  IGNIVAR_BOSS_ID,
   type InventoryUnit,
   type InvSlot,
   type ItemInstancePayload,
@@ -1146,6 +1153,7 @@ export interface InstanceSlot {
   slot: number;
   partyKey: string | null; // party id or 'solo:<pid>'
   mobIds: number[];
+  npcIds: number[];
   objectIds: number[];
   exitId: number | null;
   // The exit portal a DungeonDef.bossExitPortal dungeon spawns at the final
@@ -1257,6 +1265,9 @@ export interface PlayerMeta {
   // devCommands): a stationary player you can target and whisper to exercise social
   // features offline; a whisper to it auto-replies. Runtime-only, never serialized.
   isDevBot?: boolean;
+  // Dev-only stationary encounter participant. Unlike the derived equipment stat,
+  // this survives aura-driven stat recalculation. Runtime-only, never serialized.
+  devAnchored?: boolean;
   // Offline Fiesta practice opponent. Session-only and never serialized.
   isFiestaBot?: boolean;
   // Firebottle throw cooldown (q_deepfen_purge): sim time the player's next hut
@@ -2209,6 +2220,22 @@ export class Sim {
     }
     return rings;
   }
+  get activeIgnivarMeteors(): ActiveIgnivarMeteorWarning[] {
+    const warnings: ActiveIgnivarMeteorWarning[] = [];
+    for (const entity of this.entities.values()) {
+      if (entity.templateId !== IGNIVAR_BOSS_ID || !entity.ignivar) continue;
+      warnings.push(...activeIgnivarMeteorWarnings(entity.id, entity.ignivar));
+    }
+    return warnings;
+  }
+  get activeVarkhulForgestormWarnings(): ActiveVarkhulForgestormWarning[] {
+    const warnings: ActiveVarkhulForgestormWarning[] = [];
+    for (const entity of this.entities.values()) {
+      if (entity.templateId !== VARKHUL_BOSS_ID || !entity.varkhul) continue;
+      warnings.push(...activeVarkhulForgestormWarnings(entity.id, entity.varkhul));
+    }
+    return warnings;
+  }
   get activeTemporalHourglasses(): ActiveTemporalHourglass[] {
     const hourglasses: ActiveTemporalHourglass[] = [];
     for (const effect of this.groundAoEs) {
@@ -2499,6 +2526,7 @@ export class Sim {
             slot: i,
             partyKey: null,
             mobIds: [],
+            npcIds: [],
             objectIds: [],
             exitId: null,
             bossExitId: null,
@@ -2530,6 +2558,7 @@ export class Sim {
           slot: i,
           partyKey: null,
           mobIds: [],
+          npcIds: [],
           objectIds: [],
           exitId: null,
           bossExitId: null,
@@ -7294,6 +7323,7 @@ export class Sim {
   private applyKnockback(source: Entity, target: Entity, distance: number): number {
     if (source.id !== target.id && this.isIceBlocked(target)) return 0;
     if (source.id !== target.id && isVeilboundMarchActive(target)) return 0;
+    if (this.cfg.devCommands && this.players.get(target.id)?.devAnchored) return 0;
     // Knockback resistance (the caster tier-set 2-piece grants 100%) is applied
     // centrally here so no caller can bypass it: a fully-resisted shove moves 0 yards
     // and never displaces the victim, so a caster keeps casting through it.

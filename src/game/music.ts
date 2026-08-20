@@ -15,6 +15,7 @@ import type { MusicMixState } from './music_mix_policy';
 import { isMusicMixAudible, musicMixMasterTarget } from './music_mix_policy';
 import { MUSIC_OVERRIDES } from './music_overrides.generated';
 import { COMBAT_STREAM_URLS, pickCombatTrackIndex, ZONE_STREAM_URLS } from './music_tracks';
+import { buildIgnivarRaidThemes } from './raid_music_themes';
 
 export type MusicZone =
   | 'town_eastbrook'
@@ -39,6 +40,9 @@ export type MusicZone =
   | 'dungeon_hollow_crypt'
   | 'dungeon_sunken_bastion'
   | 'dungeon_gravewyrm_sanctum'
+  | 'ignivar_forge_approach'
+  | 'ignivar_raid_arena'
+  | 'ignivar_inner_crucible'
   | 'rift_frost'
   | 'rift_ember'
   | 'rift_venom'
@@ -111,6 +115,9 @@ const DUNGEON_MUSIC: Record<string, MusicZone> = {
   hollow_crypt: 'dungeon_hollow_crypt',
   sunken_bastion: 'dungeon_sunken_bastion',
   gravewyrm_sanctum: 'dungeon_gravewyrm_sanctum',
+  ignivar_forge_approach: 'ignivar_forge_approach',
+  ignivar_raid_arena: 'ignivar_raid_arena',
+  ignivar_inner_crucible: 'ignivar_inner_crucible',
 };
 
 export function dungeonMusicZoneForDungeon(dungeonId: string): MusicZone {
@@ -3974,6 +3981,7 @@ export function buildMusicThemes(withOverrides = true): Record<string, Theme> {
     dungeon_hollow_crypt: composeDungeonHollowCrypt(),
     dungeon_sunken_bastion: composeDungeonSunkenBastion(),
     dungeon_gravewyrm_sanctum: composeDungeonGravewyrmSanctum(),
+    ...buildIgnivarRaidThemes(),
     rift_frost: composeRiftFrost(),
     rift_ember: composeRiftEmber(),
     rift_venom: composeRiftVenom(),
@@ -4013,6 +4021,10 @@ export const THEME_TRIM: Record<string, number> = {
   dungeon_hollow_crypt: 2.95,
   dungeon_sunken_bastion: 2.95,
   dungeon_gravewyrm_sanctum: 1.8,
+  // Measured against town_eastbrook with scripts/music_gated_rms.mjs.
+  ignivar_forge_approach: 2.34,
+  ignivar_raid_arena: 1.59,
+  ignivar_inner_crucible: 1.39,
   combat: 1.35,
   // The nineteen new-environment cues, MEASURED by the same gated-RMS pass:
   // rendered at trim 1 via scripts/render_music.mjs, then

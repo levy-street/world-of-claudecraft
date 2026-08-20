@@ -6148,6 +6148,160 @@ describe('Consecration snapshot parity', () => {
   });
 });
 
+describe('Ignivar meteor snapshot parity', () => {
+  it('rebuilds active warnings after reconnect and clears them after impact', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [],
+      ignivarMeteors: [{ id: '77:912:0', x: 3, z: 5, r: 2.4, dur: 2.5, rem: 1.4, lead: 0.75 }],
+    });
+    expect(client.activeIgnivarMeteors).toEqual([
+      {
+        id: '77:912:0',
+        x: 3,
+        z: 5,
+        radius: 2.4,
+        duration: 2.5,
+        remaining: 1.4,
+        warningLead: 0.75,
+      },
+    ]);
+
+    (client as any).applySnapshot({ t: 'snap', ents: [] });
+    expect(client.activeIgnivarMeteors).toEqual([]);
+  });
+
+  it('rejects malformed warning rows and clamps remaining time to duration', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [],
+      ignivarMeteors: [
+        null,
+        'primitive-row',
+        { id: 'valid', x: 3, z: 5, r: 2.4, dur: 2.5, rem: 9, lead: 0 },
+        { id: 'expired', x: 3, z: 5, r: 2.4, dur: 2.5, rem: 0, lead: 0.75 },
+        { id: 'bad-lead', x: 3, z: 5, r: 2.4, dur: 2.5, rem: 1, lead: 2.5 },
+        { id: 77, x: 3, z: 5, r: 2.4, dur: 2.5, rem: 1, lead: 0.75 },
+        { id: 'bad-coordinate', x: Number.NaN, z: 5, r: 2.4, dur: 2.5, rem: 1, lead: 0.75 },
+        { id: 'bad-radius', x: 3, z: 5, r: 0, dur: 2.5, rem: 1, lead: 0.75 },
+        { id: 'bad-duration', x: 3, z: 5, r: 2.4, dur: 0, rem: 1, lead: 0.75 },
+      ],
+    });
+
+    expect(client.activeIgnivarMeteors).toEqual([
+      {
+        id: 'valid',
+        x: 3,
+        z: 5,
+        radius: 2.4,
+        duration: 2.5,
+        remaining: 2.5,
+        warningLead: 0,
+      },
+    ]);
+  });
+
+  it('interest-scopes active warnings with their authoritative remaining lifetime', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Cinderwire', 'mage');
+    const player = server.sim.entities.get(session.pid)!;
+    const boss = createMob(
+      9901,
+      MOBS.ignivar_herald_of_the_last_flame,
+      MOBS.ignivar_herald_of_the_last_flame.maxLevel,
+      { x: player.pos.x + 4, y: player.pos.y, z: player.pos.z },
+    );
+    boss.ignivar = {
+      meteorCastKey: 912,
+      meteorImpactRemaining: 1.4,
+      meteorPoints: [
+        { x: player.pos.x + 5, z: player.pos.z },
+        { x: player.pos.x + 100, z: player.pos.z },
+      ],
+    } as NonNullable<typeof boss.ignivar>;
+    server.sim.entities.set(boss.id, boss);
+
+    broadcast(server);
+
+    expect(lastSnap(fc.sent).ignivarMeteors).toEqual([
+      expect.objectContaining({ id: `${boss.id}:912:0`, r: 2.4, dur: 2.5, rem: 1.4, lead: 0.75 }),
+    ]);
+  });
+});
+
+describe('Varkhul Forgestorm snapshot parity', () => {
+  it('rebuilds active warnings after reconnect, clamps lifetime, and rejects malformed rows', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [],
+      varkhulForgestorm: [
+        { id: 9901000100, sourceId: 9901, x: 3, z: 5, r: 4, dur: 2.5, rem: 9 },
+        { id: 'bad', sourceId: 9901, x: 3, z: 5, r: 4, dur: 2.5, rem: 1 },
+        { id: 1, sourceId: 'bad', x: 3, z: 5, r: 4, dur: 2.5, rem: 1 },
+        { id: 2, sourceId: 9901, x: Number.NaN, z: 5, r: 4, dur: 2.5, rem: 1 },
+        { id: 20, sourceId: 9901, x: 3, z: Number.NaN, r: 4, dur: 2.5, rem: 1 },
+        { id: 3, sourceId: 9901, x: 3, z: 5, r: 0, dur: 2.5, rem: 1 },
+        { id: 30, sourceId: 9901, x: 3, z: 5, r: 4, dur: 0, rem: 1 },
+        { id: 4, sourceId: 9901, x: 3, z: 5, r: 4, dur: 2.5, rem: 0 },
+      ],
+    });
+
+    expect(client.activeVarkhulForgestormWarnings).toEqual([
+      {
+        id: 9901000100,
+        sourceId: 9901,
+        x: 3,
+        z: 5,
+        radius: 4,
+        duration: 2.5,
+        remaining: 2.5,
+      },
+    ]);
+
+    (client as any).applySnapshot({ t: 'snap', ents: [] });
+    expect(client.activeVarkhulForgestormWarnings).toEqual([]);
+  });
+
+  it('interest-scopes active warnings with stable numeric ids and authoritative time', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Forgewire', 'warrior');
+    const player = server.sim.entities.get(session.pid)!;
+    const boss = createMob(
+      9902,
+      MOBS.varkhul_forgefather_of_the_last_flame,
+      MOBS.varkhul_forgefather_of_the_last_flame.maxLevel,
+      { x: player.pos.x + 4, y: player.pos.y, z: player.pos.z },
+    );
+    boss.varkhul = {
+      forgestormCastKey: 7,
+      forgestormWaveIndex: 1,
+      forgestormWarningRemaining: 1.4,
+      forgestormPoints: [
+        { x: player.pos.x + 5, y: player.pos.y, z: player.pos.z },
+        { x: player.pos.x + 100, y: player.pos.y, z: player.pos.z },
+      ],
+    } as NonNullable<typeof boss.varkhul>;
+    server.sim.entities.set(boss.id, boss);
+
+    broadcast(server);
+
+    expect(lastSnap(fc.sent).varkhulForgestorm).toEqual([
+      expect.objectContaining({
+        id: boss.id * 1_000_000 + 710,
+        sourceId: boss.id,
+        r: 4,
+        dur: 2.5,
+        rem: 1.4,
+      }),
+    ]);
+  });
+});
+
 describe('authoritative interaction command outcomes', () => {
   it.each([
     ['loot', { id: -1 }],

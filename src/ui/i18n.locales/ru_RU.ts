@@ -4821,6 +4821,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Вы проходите через запечатанную королевскую дверь.',
   'entities.dungeons.nythraxis_boss_arena.leaveText':
     'Вы возвращаетесь в холодный воздух Терновых высот.',
+  'entities.mobs.ignivar_herald_of_the_last_flame.name': 'Игнивар, Вестник Последнего Пламени',
+  'entities.mobs.ignivar_heart_of_the_end.name': 'Сердце Конца',
+  'entities.dungeons.ignivar_raid_arena.name': 'Горнило Последнего Источника',
+  'entities.dungeons.ignivar_raid_arena.enterText':
+    'Жар дрожит над запечатанными водами Горнила.',
+  'entities.dungeons.ignivar_raid_arena.leaveText':
+    'Вы покидаете Горнило и снова дышите свободно.',
   'entities.quests.q_nythraxis_restless_dead.title': 'Беспокойство на костяных полях',
   'entities.quests.q_nythraxis_restless_dead.text':
     'Что-то изменилось в Терновых высотах, {playerName}. Мертвые больше не бродят бесцельно. Они собираются и маршируют по северным костяным полям за Хайвотчем, где старое поле битвы выходит к дороге у утеса. Идите туда, расследуйте беспокойство среди костяных ревенантов и принесите любое доказательство того, что ими движет.',
@@ -7579,6 +7586,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemArmorType.mail': 'Кольчуга',
   'hudChrome.auraEffect.dot': 'Наносит {value} единиц урона ({school}) каждые {interval} сек',
   'hudChrome.auraEffect.hot': 'Восстанавливает {value} здоровья каждые {interval} сек',
+  'hudChrome.auraEffect.sharedPyre': 'В круге должно находиться не менее {players} игроков',
   'hudChrome.auraEffect.absorb': 'Поглощает {value} единиц урона',
   'hudChrome.auraEffect.healAbsorb': 'Поглощает {value} единиц входящего исцеления',
   'hudChrome.auraEffect.thorns': 'Наносит {value} единиц урона ({school}) атакующим',

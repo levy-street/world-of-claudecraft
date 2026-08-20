@@ -1212,6 +1212,11 @@ describe('Guide module-graph spoiler containment', () => {
 // the game's real default bind (src/game/keybinds.ts), so a changed shipped default reds this
 // test instead of silently drifting the public reference.
 describe('Guide deeds cross-page surfaces', () => {
+  it('withholds development raids until their public progression is ready', () => {
+    expect(GUIDE_DUNGEONS.filter((d) => d.isRaid)).toHaveLength(1);
+    expect(GUIDE_DUNGEONS.every((d) => d.min !== null && d.max !== null)).toBe(true);
+  });
+
   it('lists the Book of Deeds bind on the controls page, matching the in-game default', () => {
     setLanguage('en');
     const deedsBind = BIND_ACTIONS.find((a) => a.id === 'deeds');

@@ -4,9 +4,11 @@
 // both the renderer and the NameplatePainter can share objectDisplayName without
 // a renderer <-> painter import cycle.
 
+import { IGNIVAR_LORE_OBJECTS } from '../sim/content/ignivar_raid_lore';
 import type { Entity } from '../sim/types';
 import { dungeonDisplayName, tEntity } from '../ui/entity_i18n';
 import { t } from '../ui/i18n';
+import { localizeSimText } from '../ui/sim_i18n';
 
 export function mobDisplayName(mobId: string): string {
   return tEntity({ kind: 'mob', id: mobId, field: 'name' });
@@ -78,6 +80,13 @@ export function objectDisplayName(entity: Entity): string {
     return entity.templateId === 'dungeon_exit'
       ? t('worldContent.dungeonExitName', { name: dungeonName })
       : dungeonName;
+  }
+  // These four development-raid records are interactOnly narrative props, not
+  // inventory items. Their lore handler returns before generic pickup, so keep
+  // them out of ITEMS (and its mandatory icon-art contract) while still giving
+  // their authored entity names an exact localization source.
+  if (entity.objectItemId && Object.hasOwn(IGNIVAR_LORE_OBJECTS, entity.objectItemId)) {
+    return localizeSimText(entity.name) ?? entity.name;
   }
   // Collectible/quest ground objects carry the item id they grant; localize the
   // nameplate through the item dictionary instead of the raw English name.

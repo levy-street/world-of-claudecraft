@@ -5,7 +5,7 @@ import {
   type InstanceMusicInput,
   instanceMusicDecision,
 } from '../src/game/instance_music';
-import { DELVE_X_MIN, ZONES } from '../src/sim/data';
+import { DELVE_X_MIN, DUNGEONS, instanceOrigin, ZONES } from '../src/sim/data';
 import { SOWFIELD_CENTER } from '../src/sim/vale_cup_layout';
 
 const eastbrookFixture = ZONES.find((zone) => zone.id === 'eastbrook_vale');
@@ -116,5 +116,48 @@ describe('instance music policy', () => {
       }),
     );
     expect(waiting.sowfieldTrack).toBeNull();
+  });
+
+  it('selects a distinct ambient cue for each Ignivar raid room', () => {
+    const rooms = [
+      'ignivar_forge_approach',
+      'ignivar_raid_arena',
+      'ignivar_inner_crucible',
+    ] as const;
+
+    for (const room of rooms) {
+      const origin = instanceOrigin(DUNGEONS[room].index, 0);
+      const decision = instanceMusicDecision(
+        input({
+          playerPos: origin,
+          inDungeon: true,
+        }),
+      );
+      expect(decision.instanceId, room).toBe(room);
+      expect(decision.zone, room).toBe(room);
+      expect(decision.musicCombat, room).toBe(false);
+    }
+  });
+
+  it('keeps the room cue selected while ordinary raid combat uses the global combat layer', () => {
+    const room = 'ignivar_inner_crucible';
+    const origin = instanceOrigin(DUNGEONS[room].index, 0);
+    const decision = instanceMusicDecision(
+      input({
+        playerPos: origin,
+        inDungeon: true,
+        entities: [
+          {
+            kind: 'mob',
+            dead: false,
+            templateId: 'varkhul_forgefather',
+            aggroTargetId: 7,
+          },
+        ],
+      }),
+    );
+
+    expect(decision.zone).toBe(room);
+    expect(decision.musicCombat).toBe(true);
   });
 });

@@ -116,14 +116,16 @@ describe('Ice Block: immunity + cleanse + control', () => {
     }
   });
 
-  it('cannot cleanse unbreakable encounter control but still cleanses ordinary debuffs', () => {
+  it('cannot cleanse encounter-owned mechanics but still cleanses ordinary debuffs', () => {
     const { sim, p } = rigMage();
     p.auras.push(unbreakableControl('scripted_stun', 'stun'));
+    p.auras.push({ ...debuff('encounter_dot', 'dot', 50), encounterOwned: true });
     p.auras.push(debuff('ordinary_dot', 'dot', 50));
 
     sim.castAbility('ice_block');
 
     expect(p.auras.some((a) => a.id === 'scripted_stun')).toBe(true);
+    expect(p.auras.some((a) => a.id === 'encounter_dot')).toBe(true);
     expect(p.auras.some((a) => a.id === 'ordinary_dot')).toBe(false);
     expect(p.auras.some((a) => a.id === 'ice_block' && a.kind === 'stasis')).toBe(true);
   });

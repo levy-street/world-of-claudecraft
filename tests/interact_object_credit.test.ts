@@ -207,29 +207,36 @@ describe('every multi-count interact objective has enough distinct objects to fi
     }
   });
 
-  it('spawns every interact target at a FIXED world position, never instance-relative', () => {
+  it('spawns every multi-count interact target at a FIXED world position', () => {
     // The ledger key is the object's world position, which is only stable
-    // because every interact target is a world GROUND_OBJECTS placement.
+    // because every multi-count interact target is a world GROUND_OBJECTS placement.
     // A dungeon object spawns at `origin + offset` with a per-instance-slot
     // origin (instances/dungeons.ts), so an interact target placed there would
     // key differently in every instance copy and could be credited again after
-    // an instance reset. No dungeon places one today: keep it that way.
+    // an instance reset. A count-1 narrative inspection is safe there because
+    // the objective is already capped after its first credit; multi-count
+    // objectives must retain stable authored world positions.
     const dungeonObjectItemIds = new Set(
       Object.values(DUNGEONS).flatMap((d) => (d.objects ?? []).map((o) => o.itemId)),
     );
-    for (const { itemId, questId } of interactObjectives) {
+    for (const { itemId, questId } of interactObjectives.filter(
+      (objective) => objective.count > 1,
+    )) {
       expect(dungeonObjectItemIds.has(itemId), `${questId} target ${itemId}`).toBe(false);
     }
   });
 
-  it('places every interact target in the world table, bar the riding-lesson sentinel', () => {
+  it('places every interact target in the world, a dungeon, or the riding-lesson sentinel', () => {
     // train_valorsteed is a sentinel targetObjectItemId with no object at all
     // (mounts_training.ts credits it off the trainer NPC), so it never reaches
-    // the ledger. Anything ELSE missing from the world table would mean an
-    // objective whose object spawns somewhere this reasoning has not checked.
-    const worldItemIds = new Set(GROUND_OBJECTS.map((d) => d.itemId));
+    // the ledger. Anything ELSE missing from both placement registries would
+    // mean an objective whose object spawns somewhere this reasoning has not checked.
+    const placedItemIds = new Set([
+      ...GROUND_OBJECTS.map((d) => d.itemId),
+      ...Object.values(DUNGEONS).flatMap((d) => (d.objects ?? []).map((o) => o.itemId)),
+    ]);
     const unplaced = [...new Set(interactObjectives.map((o) => o.itemId))].filter(
-      (id) => !worldItemIds.has(id),
+      (id) => !placedItemIds.has(id),
     );
     expect(unplaced).toEqual(['train_valorsteed']);
   });

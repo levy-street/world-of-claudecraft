@@ -2631,6 +2631,10 @@ export const hudChromeStrings = {
   // localized damage-school name (see schools below). Keys are produced by the pure
   // aura_effect.ts descriptor; render via t('hudChrome.auraEffect.<key>', values).
   auraEffect: {
+    sharedPyre:
+      "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
+    makersBrand:
+      'For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.',
     dot: 'Deals {value} {school} damage every {interval} sec',
     hot: 'Restores {value} health every {interval} sec',
     mendingCurrent: 'Stores {value} healing, released over time or consumed by Cascading Mend',

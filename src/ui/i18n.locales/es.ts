@@ -9794,6 +9794,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.hedge_knight.name': 'Caballero de Dawnhold',
   'entities.mobs.ice_wisp.name': 'Fuego Fatuo del Hielo',
   'entities.mobs.idol_guardian.name': 'El Guardián del Ídolo',
+  'entities.mobs.ignivar_heart_of_the_end.name': 'Corazón del Fin',
+  'entities.mobs.ignivar_herald_of_the_last_flame.name': 'Ignivar, Heraldo de la Última Llama',
   'entities.mobs.lily_wisp.name': 'Fuego Fatuo del Lirio',
   'entities.mobs.mere_lurker.name': 'Acechador del Mere',
   'entities.mobs.moonfleece_grazer.name': 'Ramoneador Moonfleece',

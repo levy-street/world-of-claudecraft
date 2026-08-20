@@ -12,6 +12,9 @@ import {
   CRYPT_LAYOUT,
   type DungeonLayout,
   daisLiftAt,
+  IGNIVAR_FORGE_APPROACH_LAYOUT,
+  IGNIVAR_LAYOUT,
+  IGNIVAR_SECOND_WING_LAYOUT,
   NYTHRAXIS_LAYOUT,
   SANCTUM_LAYOUT,
   TEMPLE_LAYOUT,
@@ -24,6 +27,9 @@ export const INTERIOR_LAYOUTS: Record<string, DungeonLayout> = {
   sanctum: SANCTUM_LAYOUT,
   temple: TEMPLE_LAYOUT,
   nythraxis: NYTHRAXIS_LAYOUT,
+  ignivar_approach: IGNIVAR_FORGE_APPROACH_LAYOUT,
+  ignivar: IGNIVAR_LAYOUT,
+  ignivar_depths: IGNIVAR_SECOND_WING_LAYOUT,
 };
 
 export interface DungeonInstanceFrame {

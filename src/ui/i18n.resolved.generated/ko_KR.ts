@@ -2265,6 +2265,8 @@ export const ko_KR: EnTranslations = {
       "mail": "사슬"
     },
     "auraEffect": {
+      "sharedPyre": "원 안에 최소 {players}명의 플레이어가 있어야 합니다",
+      "makersBrand": "For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.",
       "dot": "{interval}초마다 {value}의 {school} 피해를 입힙니다",
       "hot": "{interval}초마다 생명력을 {value} 회복합니다",
       "mendingCurrent": "치유량 {value}를 저장하여 시간에 따라 방출하거나 쇄도하는 치유로 소모합니다",
@@ -13370,6 +13372,24 @@ export const ko_KR: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "나이트락시스, 손피크의 재앙"
       },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "이그니바르, 마지막 불꽃의 전령"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "종말의 심장"
+      },
+      "ignivar_ember_sentinel": {
+        "name": "Ember Sentinel"
+      },
+      "ignivar_crucible_warden": {
+        "name": "Crucible Warden"
+      },
+      "ignivar_cinder_artificer": {
+        "name": "Cinder Artificer"
+      },
+      "varkhul_forgefather_of_the_last_flame": {
+        "name": "Varkhul, Forgefather of the Last Flame"
+      },
       "reliquary_ledger_wraith": {
         "name": "명부의 망령"
       },
@@ -14023,6 +14043,11 @@ export const ko_KR: EnTranslations = {
         "name": "알드릭 수사",
         "title": "계곡의 사제",
         "greeting": "예배당 묘지에서 세상의 지붕까지... 흔적은 여기서 끝납니다. 산이 듣고 있음을 느낍니다."
+      },
+      "archivist_maelin_emberward": {
+        "name": "Archivist Maelin Emberward",
+        "title": "Crucible Archivist",
+        "greeting": "Every hammer mark in this place is a sentence. Help me read what Varkhul tried to hide."
       },
       "brother_halven": {
         "name": "브라더 할벤",
@@ -15129,6 +15154,54 @@ export const ko_KR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "니트락시스 처치"
+          }
+        }
+      },
+      "q_ignivar_echoes_in_iron": {
+        "title": "Echoes in Iron",
+        "text": "These automata are not soldiers. They are drafts. Varkhul tempered shell after shell while the Last Spring failed around him. Read the three records and destroy the constructs guarding them. Each failed body may carry part of the answer.",
+        "completion": "The records agree. Varkhul bound water from the dying Last Spring into living metal. These automatons were his failed temperings. Only one design endured.",
+        "objectives": {
+          "0": {
+            "label": "Read the First Tempering record"
+          },
+          "1": {
+            "label": "Read the Living Metal record"
+          },
+          "2": {
+            "label": "Read the Herald-Key record"
+          },
+          "3": {
+            "label": "Ember Sentinel defeated"
+          },
+          "4": {
+            "label": "Crucible Warden defeated"
+          },
+          "5": {
+            "label": "Cinder Artificer defeated"
+          }
+        }
+      },
+      "q_ignivar_heralds_heart": {
+        "title": "The Herald's Heart",
+        "text": "The survivor named in every record is Ignivar. Varkhul called him herald, seal, and key. Defeat Ignivar, then examine the core that remains. It should tell us what the herald was made to guard.",
+        "completion": "Ignivar was never merely a guardian. His heart is a key, and its final plates point toward the sealed crucible below.",
+        "objectives": {
+          "0": {
+            "label": "Ignivar defeated"
+          },
+          "1": {
+            "label": "Ignivar's core inspected"
+          }
+        }
+      },
+      "q_ignivar_the_forgefather": {
+        "title": "The Forgefather",
+        "text": "The path below leads to Varkhul, Forgefather of the Last Flame. He imprisoned the Last Spring to make metal live, then forged Ignivar to keep the crime sealed. Enter the Inner Crucible and end his work.",
+        "completion": "The forge is silent at last. The spring may never recover, but Varkhul will shape no more lives into chains.",
+        "objectives": {
+          "0": {
+            "label": "Varkhul defeated"
           }
         }
       },
@@ -16881,6 +16954,21 @@ export const ko_KR: EnTranslations = {
         "name": "니트락시스 공격대 투기장",
         "enterText": "봉인된 왕실 문을 지나갑니다.",
         "leaveText": "쏜피크의 차가운 공기 속으로 돌아옵니다."
+      },
+      "ignivar_forge_approach": {
+        "name": "Halls of the First Tempering",
+        "enterText": "Hammerfall echoes through the Halls of the First Tempering.",
+        "leaveText": "You step away from the first forge and breathe freely again."
+      },
+      "ignivar_raid_arena": {
+        "name": "마지막 샘의 도가니",
+        "enterText": "도가니의 봉인된 물 위로 열기가 아른거립니다.",
+        "leaveText": "도가니를 벗어나 다시 편히 숨을 쉽니다."
+      },
+      "ignivar_inner_crucible": {
+        "name": "The Inner Crucible",
+        "enterText": "The opened gate leads deeper into the Crucible.",
+        "leaveText": "You leave the silent depths of the Crucible."
       },
       "wildheart_basin": {
         "name": "야생심장 분지",

@@ -1,5 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import {
+  IGNIVAR_SOAK_REQUIRED_PLAYERS,
+  IGNIVAR_SOAK_SHARED_MAX_HP,
+} from '../src/sim/encounters/ignivar';
+import {
+  VARKHUL_MAKERS_BRAND_AURA_ID,
+  VARKHUL_MAKERS_BRAND_DURATION,
+  VARKHUL_MAKERS_BRAND_MAX_STACKS,
+  VARKHUL_MAKERS_BRAND_PER_STACK,
+  VARKHUL_MAKERS_BRAND_TANK_SWAP_STACKS,
+} from '../src/sim/encounters/varkhul';
+import {
   type AuraEffectInput,
   auraEffectDescriptor,
   auraEffectMaximumFractionDigits,
@@ -9,6 +20,44 @@ import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
 const desc = (a: AuraEffectInput) => auraEffectDescriptor(a);
 
 describe('auraEffectDescriptor', () => {
+  it('explains that Ignivar Shared Pyre splits damage inside its circle', () => {
+    expect(desc({ id: 'ignivar_shared_pyre', kind: 'vulnerability', value: 0 })).toEqual({
+      key: 'hudChrome.auraEffect.sharedPyre',
+      nums: {
+        total: Math.round(IGNIVAR_SOAK_SHARED_MAX_HP * 100),
+        players: IGNIVAR_SOAK_REQUIRED_PLAYERS,
+        perPlayer: Math.round((IGNIVAR_SOAK_SHARED_MAX_HP * 100) / IGNIVAR_SOAK_REQUIRED_PLAYERS),
+      },
+    });
+    expect(IGNIVAR_SOAK_SHARED_MAX_HP).toBe(1.2);
+    expect(IGNIVAR_SOAK_REQUIRED_PLAYERS).toBe(4);
+    expect(hudChromeStrings.auraEffect.sharedPyre).toBe(
+      "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
+    );
+  });
+
+  it("teaches Maker's Brand from the encounter's live stack constants", () => {
+    expect(
+      desc({
+        id: VARKHUL_MAKERS_BRAND_AURA_ID,
+        kind: 'vulnerability',
+        value: VARKHUL_MAKERS_BRAND_PER_STACK,
+        stacks: VARKHUL_MAKERS_BRAND_TANK_SWAP_STACKS,
+      }),
+    ).toEqual({
+      key: 'hudChrome.auraEffect.makersBrand',
+      nums: {
+        duration: VARKHUL_MAKERS_BRAND_DURATION,
+        max: VARKHUL_MAKERS_BRAND_MAX_STACKS,
+        pct: Math.round(VARKHUL_MAKERS_BRAND_PER_STACK * 100),
+        swap: VARKHUL_MAKERS_BRAND_TANK_SWAP_STACKS,
+      },
+    });
+    expect(hudChromeStrings.auraEffect.makersBrand).toBe(
+      'For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.',
+    );
+  });
+
   it('describes the cancelable protective Hourglass aura', () => {
     expect(desc({ id: 'temporal_hourglass', kind: 'stasis', value: 1.5 })).toEqual({
       key: 'hudChrome.auraEffect.temporalHourglass',

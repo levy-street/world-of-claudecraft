@@ -19,6 +19,7 @@ export const DEBUFF_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'polymorph',
   'attackspeed',
   'bleed_vuln',
+  'vuln_source',
   'debuff_ap',
   'sunder',
   'corrode',
@@ -57,17 +58,19 @@ export function isDebuffAura(kind: AuraKind, value: number): boolean {
 }
 
 // The one rule for "may a player counter take this aura off at all", ahead of any
-// question of school or polarity. Two aura classes answer no: encounter-authored
-// unbreakable control (the script owns its release) and `undispellable` penalties
+// question of school or polarity. Three aura classes answer no: encounter-owned
+// mechanics, unbreakable control (the script owns its release), and `undispellable` penalties
 // (the recovery sicknesses, which only their own timer clears). Every removal path a
 // player can drive routes through here so the answer cannot drift between them: the
 // dispel executor and its requiresDispellable cast gate (isDispellableAura below),
 // the cleanseSelf executor (combat/effect_dispatch.ts), and the right-click buff
 // cancel (combat/aura_cancel.ts).
 export function isPlayerRemovableAura(
-  aura: Pick<Aura, 'kind' | 'unbreakableControl' | 'undispellable'>,
+  aura: Pick<Aura, 'kind' | 'unbreakableControl' | 'encounterOwned' | 'undispellable'>,
 ): boolean {
-  return !isUnbreakableControlAura(aura) && aura.undispellable !== true;
+  return (
+    aura.encounterOwned !== true && !isUnbreakableControlAura(aura) && aura.undispellable !== true
+  );
 }
 
 // The dispel eligibility rule, shared by the dispel executor and the
@@ -76,7 +79,9 @@ export function isPlayerRemovableAura(
 // strips a benefit off an enemy; a friendly one strips a harmful effect off an ally).
 export function isDispellableAura(
   aura: Pick<Aura, 'kind' | 'value' | 'school'> &
-    Partial<Pick<Aura, 'id' | 'unbreakableControl' | 'undispellable' | 'permanent'>>,
+    Partial<
+      Pick<Aura, 'id' | 'unbreakableControl' | 'encounterOwned' | 'undispellable' | 'permanent'>
+    >,
   offensive: boolean,
 ): boolean {
   // Ascension is a player-owned resource state surfaced as an aura for HUD clarity,

@@ -271,6 +271,106 @@ export const NYTHRAXIS_LAYOUT: DungeonLayout = (() => {
 // the moon-sanctum with Ysolei's great altar dais. Side walls at |x|=23 like
 // the crypt so the KayKit wall modules fit unchanged; wall-side slots carry
 // drowned reliquary altars instead of sarcophagi.
+// The Halls of the First Tempering: a long, clipped forge nave broken into
+// three readable workshops by pillar pairs. The open centre aisle keeps each
+// guardian pull and the final gate visible from the preceding chamber.
+export const IGNIVAR_FORGE_APPROACH_LAYOUT: DungeonLayout = {
+  zMin: -58,
+  zMax: 58,
+  sideWallZ: 0,
+  sideWallHd: 58,
+  wallX: 28,
+  endWallHw: 28,
+  floorHalfX: 28,
+  doorZ: -58,
+  pillars: [
+    { x: -18, z: -31 },
+    { x: 18, z: -31 },
+    { x: -18, z: -4 },
+    { x: 18, z: -4 },
+    { x: -18, z: 23 },
+    { x: 18, z: 23 },
+  ],
+  tombs: [],
+  stubs: [],
+  dais: { x: 0, z: 49, r: 7 },
+  shellPolygon: [
+    { x: -16, z: -58 },
+    { x: 16, z: -58 },
+    { x: 28, z: -46 },
+    { x: 28, z: 46 },
+    { x: 16, z: 58 },
+    { x: -16, z: 58 },
+    { x: -28, z: 46 },
+    { x: -28, z: -46 },
+  ],
+  shellPole: { x: 0, z: 0 },
+};
+
+// Ignivar's Crucible: a flat octagonal raid room centered on the sealed heart.
+// The clipped corners give the four diagonal water conduits their own readable
+// stations while the entire fighting floor stays free of line-of-sight blockers.
+// The polygon is the one source for both rendered walls and collision.
+export const IGNIVAR_LAYOUT: DungeonLayout = {
+  zMin: -33,
+  zMax: 33,
+  sideWallZ: 0,
+  sideWallHd: 33,
+  wallX: 33,
+  endWallHw: 33,
+  floorHalfX: 33,
+  doorZ: -33,
+  pillars: [],
+  tombs: [],
+  stubs: [],
+  dais: { x: 0, z: 0, r: 8 },
+  shellPolygon: [
+    { x: -14, z: -33 },
+    { x: 14, z: -33 },
+    { x: 33, z: -14 },
+    { x: 33, z: 14 },
+    { x: 14, z: 33 },
+    { x: -14, z: 33 },
+    { x: -33, z: 14 },
+    { x: -33, z: -14 },
+  ],
+  shellPole: { x: 0, z: 0 },
+};
+
+// The raid's second encounter room. It stays mechanically neutral until its boss
+// is authored: a larger twelve-sided floor, no pillars, and no line-of-sight
+// blockers. The extra space leaves room for a future encounter without changing
+// Ignivar's carefully tuned arena geometry.
+export const IGNIVAR_SECOND_WING_LAYOUT: DungeonLayout = {
+  zMin: -40,
+  zMax: 40,
+  sideWallZ: 0,
+  sideWallHd: 40,
+  wallX: 40,
+  endWallHw: 40,
+  floorHalfX: 40,
+  doorZ: -40,
+  pillars: [],
+  tombs: [],
+  stubs: [],
+  dais: { x: 0, z: 0, r: 10 },
+  shellPolygon: [
+    { x: -16, z: -40 },
+    { x: 16, z: -40 },
+    { x: 32, z: -32 },
+    { x: 40, z: -16 },
+    { x: 40, z: 16 },
+    { x: 32, z: 32 },
+    { x: 16, z: 40 },
+    { x: -16, z: 40 },
+    { x: -32, z: 32 },
+    { x: -40, z: 16 },
+    { x: -40, z: -16 },
+    { x: -32, z: -32 },
+  ],
+  shellPole: { x: 0, z: 0 },
+};
+
 export const TEMPLE_LAYOUT: DungeonLayout = (() => {
   const pillars: GridPoint[] = [];
   for (const z of [10, 25, 40, 55, 80, 95, 110]) {

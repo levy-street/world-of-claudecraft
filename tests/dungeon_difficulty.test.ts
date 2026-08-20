@@ -44,6 +44,7 @@ describe('heroic tuning data contract', () => {
       'drowned_temple',
       'gravewyrm_sanctum',
       'hollow_crypt',
+      'ignivar_raid_arena',
       'nythraxis_boss_arena',
       'sunken_bastion',
       'wildheart_basin',
@@ -57,6 +58,7 @@ describe('heroic tuning data contract', () => {
       gravewyrm_sanctum: 'korzul_the_gravewyrm',
       wildheart_basin: 'wildheart_high_priest',
       nythraxis_boss_arena: 'nythraxis_scourge_of_thornpeak',
+      ignivar_raid_arena: 'ignivar_herald_of_the_last_flame',
     });
     for (const tuning of Object.values(HEROIC_DUNGEON_TUNING)) {
       expect(tuning.level).toBe(22);
@@ -75,6 +77,7 @@ describe('heroic tuning data contract', () => {
       gravewyrm_sanctum: 1,
       wildheart_basin: 1,
       nythraxis_boss_arena: 3,
+      ignivar_raid_arena: 3,
     });
   });
 
@@ -111,6 +114,7 @@ describe('heroic tuning data contract', () => {
       // summoned 250 floor through damageMultiplierByMob, so the raid's
       // addDamageMultiplier stays an inert mirror of damageMultiplier.
       nythraxis_boss_arena: [3.2, 7.25, 7.25, 1.2],
+      ignivar_raid_arena: [2.5, 2, 2, 1.2],
     });
   });
 });
@@ -120,6 +124,7 @@ describe('claimDifficultyForDungeon', () => {
     expect(claimDifficultyForDungeon('hollow_crypt', 'heroic')).toBe('heroic');
     expect(claimDifficultyForDungeon('gravewyrm_sanctum', 'heroic')).toBe('heroic');
     expect(claimDifficultyForDungeon('nythraxis_boss_arena', 'heroic')).toBe('heroic');
+    expect(claimDifficultyForDungeon('ignivar_raid_arena', 'heroic')).toBe('heroic');
     // The attunement dungeon is story content: normal even when heroic is selected.
     expect(claimDifficultyForDungeon('nythraxis_crypt', 'heroic')).toBe('normal');
     expect(claimDifficultyForDungeon('no_such_dungeon', 'heroic')).toBe('normal');
@@ -229,15 +234,17 @@ describe('applyDungeonMobTuning', () => {
 });
 
 describe('boss templates are CC and snare immune on BOTH difficulties', () => {
-  it('every boss-flagged template of the five endgame instances carries both flags', () => {
-    // The complete boss enumeration of the four five-mans plus the raid: these
-    // are the ONLY boss: true templates in dungeons.ts + temple.ts (Korgath,
-    // Velkhar, Sexton Marrow, Olen, Selthe, and the Nythraxis adds are
-    // deliberately NOT boss-flagged). Template-level flags cover normal spawns
-    // too: the applyAura gates read MOBS[templateId] at fire time, so a normal
-    // Korzul can no longer be stunned or kited on a snare (the economy retune
-    // assumes boss swings actually land).
+  it('every boss-flagged dungeon template carries both flags', () => {
+    // The complete boss enumeration of the four five-mans, the public raid,
+    // and both Ignivar development-raid encounters. These are the ONLY boss: true templates
+    // in dungeons.ts + temple.ts (Korgath, Velkhar, Sexton Marrow, Olen, Selthe,
+    // and the Nythraxis adds are deliberately NOT boss-flagged). Template-level
+    // flags cover normal spawns too: the applyAura gates read MOBS[templateId]
+    // at fire time, so a normal Korzul can no longer be stunned or kited on a
+    // snare (the economy retune assumes boss swings actually land).
     const bossIds = [
+      'ignivar_herald_of_the_last_flame',
+      'varkhul_forgefather_of_the_last_flame',
       'morthen',
       'vael_the_mistcaller',
       'ysolei',

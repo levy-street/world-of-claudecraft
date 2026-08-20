@@ -666,7 +666,12 @@ import { curatorRankNameKey, ReliquaryWindow } from './reliquary_window';
 import { restView } from './rest_indicator';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
-import { localizeSimAuraName, localizeSimText } from './sim_i18n';
+import {
+  localizeAuthoredYellSpeakerName,
+  localizeAuthoredYellText,
+  localizeSimAuraName,
+  localizeSimText,
+} from './sim_i18n';
 import { openSimpleMenu } from './simple_context_menu';
 import {
   advanceSkillLevelObservation,
@@ -4257,12 +4262,9 @@ export class Hud {
     },
   });
   // The two cast bars are ONE instance-parameterized painter, over the
-  // castBarState core. The PLAYER instance localizes the cast id (castDisplayName),
-  // layers the eat/drink overlay (consumeBarState, player-only), and clears the bar
-  // on hide (its inline block did). The TARGET instance shows the raw cast id
-  // (byte-faithful: the target block set the raw `label`), has no eat/drink (the
-  // target never eats/drinks, so its paint omits `consume`), and hides with only
-  // display:none (its inline block did not clear).
+  // castBarState core. Both instances localize cast ids; the PLAYER instance also
+  // layers the eat/drink overlay (consumeBarState, player-only) and clears the bar
+  // on hide. The TARGET instance has no eat/drink and hides with only display:none.
   private readonly playerCastBarPainter = new CastBarPainter(
     this.writerFacet,
     {
@@ -4281,7 +4283,7 @@ export class Hud {
       label: this.targetCastbarLabelEl,
       timer: this.targetCastbarTimerEl,
     },
-    { resolveCastLabel: (s) => s.label },
+    { resolveCastLabel: (s) => abilityDisplayNameFromSource(s.label) },
   );
   // The target frame is the SECOND instance of the unit_frame family: the same
   // painter + core as the player, over the target's element set. It supplies the
@@ -12748,6 +12750,11 @@ export class Hud {
           // consulting the local list here as well would resurrect stale ignores
           // the player has since cleared from their account.
           if (this.sim.socialInfo === null && this.localIgnoredNames.has(ignoreKey(ev.from))) break;
+          const bubbleSpeakerId = ev.entityId ?? ev.fromPid;
+          const bubbleSpeaker =
+            typeof bubbleSpeakerId === 'number'
+              ? this.sim.entities.get(bubbleSpeakerId)
+              : undefined;
           switch (ev.channel) {
             case 'party':
               this.chatLogFrom(
@@ -12775,8 +12782,13 @@ export class Hud {
               break;
             case 'yell':
               this.chatLogFrom(
-                ev.from,
-                ev.text,
+                localizeAuthoredYellSpeakerName(
+                  ev.from,
+                  bubbleSpeaker?.kind,
+                  bubbleSpeaker?.templateId,
+                  ev.classId,
+                ),
+                localizeAuthoredYellText(ev.text, bubbleSpeaker?.kind, ev.classId),
                 CHAT_TEMPLATE_KEYS.yell,
                 'yell',
                 ev.fromPid,
@@ -12910,9 +12922,12 @@ export class Hud {
           // guild/officer (server social broadcasts that carry no speaker id, so
           // the client has no entity to anchor to; a server/wire follow-up).
           const bubbleStyle = ev.channel === undefined ? null : chatBubbleStyle(ev.channel);
-          const bubbleSpeakerId = ev.entityId ?? ev.fromPid;
           if (bubbleStyle && typeof bubbleSpeakerId === 'number') {
-            const masked = this.maskChat(this.chatLinkPlainText(ev.text));
+            const visibleText =
+              ev.channel === 'yell'
+                ? localizeAuthoredYellText(ev.text, bubbleSpeaker?.kind, ev.classId)
+                : ev.text;
+            const masked = this.maskChat(this.chatLinkPlainText(visibleText));
             const bubble = ev.channel === 'emote' ? `${ev.from} ${masked}` : masked;
             this.renderer.showChatBubble(bubbleSpeakerId, bubble, bubbleStyle);
           }

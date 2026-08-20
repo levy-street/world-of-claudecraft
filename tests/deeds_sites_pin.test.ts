@@ -84,6 +84,7 @@ function encounterInstance(
     slot: 0,
     partyKey: 'party:deeds-test',
     mobIds: [boss.id],
+    npcIds: [],
     objectIds: [],
     exitId: null,
     bossExitId: null,

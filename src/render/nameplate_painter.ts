@@ -12,6 +12,7 @@ import {
   strongerQuestMarker,
 } from '../sim/quests/quest_marker_kind';
 import { type Entity, GATHER_CAST_ID } from '../sim/types';
+import { abilityDisplayNameFromSource } from '../ui/ability_display_name';
 import { cheaterTagLabel } from '../ui/cheater_tag';
 import { deedBorderSlug } from '../ui/deed_border_view';
 import { deedTitleText } from '../ui/deed_i18n';
@@ -284,7 +285,7 @@ export class NameplatePainter {
           ? t('abilityUi.cast.gathering')
           : ABILITIES[cast.label]
             ? tEntity({ kind: 'ability', id: cast.label, field: 'name' })
-            : cast.label;
+            : abilityDisplayNameFromSource(cast.label);
     } else if (!cast.visible) {
       state.castSource = '';
       state.castLabel = '';

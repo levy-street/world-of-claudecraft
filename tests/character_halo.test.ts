@@ -56,6 +56,13 @@ describe('class halo geometry', () => {
       const mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshStandardMaterial());
       mesh.name = 'body';
       scene.add(mesh);
+      const emissive = new THREE.Mesh(
+        new THREE.BoxGeometry(0.2, 0.2, 0.2),
+        new THREE.MeshStandardMaterial(),
+      );
+      emissive.name = 'authored_emissive_fx';
+      emissive.userData.shadowCaster = false;
+      scene.add(emissive);
       const head = new THREE.Group();
       head.name = 'head';
       scene.add(head);
@@ -72,12 +79,15 @@ describe('class halo geometry', () => {
     const { CharacterVisual } = await import('../src/render/characters/visual');
     const visual = new CharacterVisual('player_priest', 0xffffff, 0);
     const halo = visual.root.getObjectByName('class_halo') as THREE.Mesh;
+    const emissive = visual.root.getObjectByName('authored_emissive_fx') as THREE.Mesh;
     expect(halo).toBeDefined();
+    expect(emissive).toBeDefined();
     expect(halo.position.y).toBe(1.45);
     // no radius override: the priest rides the shared default-size geometry
     expect((halo.geometry as THREE.PlaneGeometry).parameters.width).toBeCloseTo(1.0);
     // the caster sweeps must not overwrite buildHalo's castShadow = false
     expect(halo.castShadow).toBe(false);
+    expect(emissive.castShadow).toBe(false);
 
     // the rebuildCasters arm has the same two obligations: after a model-graph
     // change re-lists the casters with shadows on, the halo stays out of the
@@ -98,11 +108,14 @@ describe('class halo geometry', () => {
 
     visual.setShadow(true);
     expect(halo.castShadow).toBe(false);
+    expect(emissive.castShadow).toBe(false);
     visual.setWeapon('bogoak_staff');
     expect(halo.castShadow).toBe(false);
+    expect(emissive.castShadow).toBe(false);
     visual.setShadow(false);
     visual.setShadow(true);
     expect(halo.castShadow).toBe(false);
+    expect(emissive.castShadow).toBe(false);
     visual.setGhost(true);
     expect(halo.material).not.toBe(originalMat);
     visual.setGhost(false);
