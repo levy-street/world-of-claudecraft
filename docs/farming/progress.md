@@ -3509,7 +3509,10 @@ Integration record (the orchestrator, 2026-08-19):
   dormancy arithmetic of the new prose, and the farm_patches_core comment
   claims; its two informational notes (the unconsumed trim field, already a
   handoff row; the honest [dev] farmgrow line visible in the feast capture's
-  chat log) need no action.
+  chat log) need no action. [CORRECTED by Phase 13 QA: the [dev] farmgrow
+  chat line is visible in THREE desktop captures (03-harvest,
+  04-harvest-journal, 05-harvest-feast), not the feast capture alone; the
+  shots themselves are honest staging evidence and stay as shipped.]
 - GATE RECORD (the close gate, run on the frozen tip 5787094ee8):
   BROWSER_PATH + GATE_MAX_WORKERS=8 node scripts/gate_select.mjs, mode=full
   (the planner fell back on the broad change set as expected),
