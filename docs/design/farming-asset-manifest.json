@@ -1,561 +1,433 @@
 {
- "title": "Farming prop asset handoff manifest (Phase 13)",
- "generatedFrom": "scripts/assets/farm_props/model.js (FARM_PROP_CONTRACTS). Rows are generated, never hand-edited; regenerate from that table when it changes.",
- "verifiedAgainst": [
-  "scripts/assets/farm_props/export_farm_props.mjs (verifyContract)",
-  "src/render/farm_patches.ts (adapter constants)",
-  "src/render/farm_patches_core.ts (render identity tables)"
- ],
- "assetCount": 16,
- "journeyEvidence": "docs/screenshots/farming-phase-13 holds the Phase 13 full-journey capture set (desktop 1600x900 and landscape mobile 844x390, LOW preset)",
- "heightNote": "authoredHeightYd is the exporter fit target (the shipped GLB bounds); drawHeightYd is the height the adapter renormalizes the whole model to at draw time. The three crop families share one drawHeightYd per stage even though their authored heights differ, which is what keeps a stage silhouette readable across families.",
- "assets": [
-  {
-   "id": "farm_bed",
-   "out": "models/props/farm_bed.glb",
-   "rootNode": "FarmBed",
-   "family": "bed",
-   "stage": "base",
-   "footprintYd": [
-    3,
-    2
-   ],
-   "pivot": "floor-center",
-   "authoredHeightYd": 0.34,
-   "drawHeightYd": 0.35,
-   "meshes": [
-    "FarmBody"
-   ],
-   "materials": [
-    "farm_body"
-   ],
-   "tintChannels": {
-    "farm_body": "per-hub biome multiply (the palette soil channel) over the whole mesh"
-   },
-   "sockets": {
-    "Socket_Soil": {
-     "purpose": "stage mesh mount point at the center of the soil surface",
-     "authoredPositionYd": [
-      0,
-      0.22,
-      0
-     ],
-     "note": "BED_SOIL_TOP in scripts/assets/farm_props/model.js; the exporter requires 0 < y <= heightYd and an empty node (no mesh, no children)"
+  "title": "Farming prop asset handoff manifest (Phase 13)",
+  "generatedFrom": "scripts/assets/farm_props/model.js (FARM_PROP_CONTRACTS). Rows are generated, never hand-edited; regenerate from that table when it changes.",
+  "verifiedAgainst": [
+    "scripts/assets/farm_props/export_farm_props.mjs (verifyContract)",
+    "src/render/farm_patches.ts (adapter constants)",
+    "src/render/farm_patches_core.ts (render identity tables)"
+  ],
+  "assetCount": 16,
+  "journeyEvidence": "docs/screenshots/farming-phase-13 holds the Phase 13 full-journey capture set (desktop 1600x900 and landscape mobile 844x390, LOW preset)",
+  "heightNote": "authoredHeightYd is the exporter fit target (the shipped GLB bounds); drawHeightYd is the height the adapter renormalizes the whole model to at draw time. The three crop families share one drawHeightYd per stage even though their authored heights differ, which is what keeps a stage silhouette readable across families.",
+  "assets": [
+    {
+      "id": "farm_bed",
+      "out": "models/props/farm_bed.glb",
+      "rootNode": "FarmBed",
+      "family": "bed",
+      "stage": "base",
+      "footprintYd": [3, 2],
+      "pivot": "floor-center",
+      "authoredHeightYd": 0.34,
+      "drawHeightYd": 0.35,
+      "meshes": ["FarmBody"],
+      "materials": ["farm_body"],
+      "tintChannels": {
+        "farm_body": "per-hub biome multiply (the palette soil channel) over the whole mesh"
+      },
+      "sockets": {
+        "Socket_Soil": {
+          "purpose": "stage mesh mount point at the center of the soil surface",
+          "authoredPositionYd": [0, 0.22, 0],
+          "note": "BED_SOIL_TOP in scripts/assets/farm_props/model.js; the exporter requires 0 < y <= heightYd and an empty node (no mesh, no children)"
+        }
+      },
+      "mountsOn": null,
+      "replacementIntent": "A sourced farm_bed.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmBed at identity; shipped bounds exactly 3 x 0.34 x 2 yd (min [-1.5, 0, -1], max [1.5, 0.34, 1]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody] and material set [farm_body], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). It must keep the Socket_Soil empty seated on the soil surface: every stage mesh mounts there. Height is renormalized to 0.35 yd at draw time, so the authored 0.34 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
+    },
+    {
+      "id": "farm_sprout",
+      "out": "models/props/farm_sprout.glb",
+      "rootNode": "FarmSprout",
+      "family": "shared",
+      "stage": "sprout",
+      "footprintYd": [1.67, 0.97],
+      "pivot": "floor-center",
+      "authoredHeightYd": 0.25,
+      "drawHeightYd": 0.18,
+      "meshes": ["FarmBody"],
+      "materials": ["farm_body"],
+      "tintChannels": {
+        "farm_body": "shared foliage, left untinted or biome tinted at draw time"
+      },
+      "sockets": {},
+      "mountsOn": "Socket_Soil",
+      "replacementIntent": "A sourced farm_sprout.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmSprout at identity; shipped bounds exactly 1.67 x 0.25 x 0.97 yd (min [-0.835, 0, -0.485], max [0.835, 0.25, 0.485]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody] and material set [farm_body], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). Height is renormalized to 0.18 yd at draw time, so the authored 0.25 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
+    },
+    {
+      "id": "farm_grain_stage2",
+      "out": "models/props/farm_grain_stage2.glb",
+      "rootNode": "FarmGrainStage2",
+      "family": "grain",
+      "stage": "stage2",
+      "footprintYd": [1.81, 1.04],
+      "pivot": "floor-center",
+      "authoredHeightYd": 0.42,
+      "drawHeightYd": 0.42,
+      "meshes": ["FarmBody"],
+      "materials": ["farm_body"],
+      "tintChannels": {
+        "farm_body": "shared foliage, left untinted or biome tinted at draw time"
+      },
+      "sockets": {},
+      "mountsOn": "Socket_Soil",
+      "replacementIntent": "A sourced farm_grain_stage2.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmGrainStage2 at identity; shipped bounds exactly 1.81 x 0.42 x 1.04 yd (min [-0.905, 0, -0.52], max [0.905, 0.42, 0.52]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody] and material set [farm_body], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). Height is renormalized to 0.42 yd at draw time, so the authored 0.42 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
+    },
+    {
+      "id": "farm_rootleaf_stage2",
+      "out": "models/props/farm_rootleaf_stage2.glb",
+      "rootNode": "FarmRootleafStage2",
+      "family": "rootleaf",
+      "stage": "stage2",
+      "footprintYd": [1.61, 1.31],
+      "pivot": "floor-center",
+      "authoredHeightYd": 0.22,
+      "drawHeightYd": 0.42,
+      "meshes": ["FarmBody"],
+      "materials": ["farm_body"],
+      "tintChannels": {
+        "farm_body": "shared foliage, left untinted or biome tinted at draw time"
+      },
+      "sockets": {},
+      "mountsOn": "Socket_Soil",
+      "replacementIntent": "A sourced farm_rootleaf_stage2.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmRootleafStage2 at identity; shipped bounds exactly 1.61 x 0.22 x 1.31 yd (min [-0.805, 0, -0.655], max [0.805, 0.22, 0.655]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody] and material set [farm_body], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). Height is renormalized to 0.42 yd at draw time, so the authored 0.22 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
+    },
+    {
+      "id": "farm_gourd_stage2",
+      "out": "models/props/farm_gourd_stage2.glb",
+      "rootNode": "FarmGourdStage2",
+      "family": "gourd",
+      "stage": "stage2",
+      "footprintYd": [1.8, 1.16],
+      "pivot": "floor-center",
+      "authoredHeightYd": 0.09,
+      "drawHeightYd": 0.42,
+      "meshes": ["FarmBody"],
+      "materials": ["farm_body"],
+      "tintChannels": {
+        "farm_body": "shared foliage, left untinted or biome tinted at draw time"
+      },
+      "sockets": {},
+      "mountsOn": "Socket_Soil",
+      "replacementIntent": "A sourced farm_gourd_stage2.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmGourdStage2 at identity; shipped bounds exactly 1.8 x 0.09 x 1.16 yd (min [-0.9, 0, -0.58], max [0.9, 0.09, 0.58]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody] and material set [farm_body], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). Height is renormalized to 0.42 yd at draw time, so the authored 0.09 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
+    },
+    {
+      "id": "farm_grain_stage3",
+      "out": "models/props/farm_grain_stage3.glb",
+      "rootNode": "FarmGrainStage3",
+      "family": "grain",
+      "stage": "stage3",
+      "footprintYd": [1.91, 1.31],
+      "pivot": "floor-center",
+      "authoredHeightYd": 0.82,
+      "drawHeightYd": 0.75,
+      "meshes": ["FarmBody", "CropAccent"],
+      "materials": ["farm_body", "crop_accent"],
+      "tintChannels": {
+        "farm_body": "shared foliage, left untinted or biome tinted at draw time",
+        "crop_accent": "per-crop identity multiply over a light neutral base"
+      },
+      "sockets": {},
+      "mountsOn": "Socket_Soil",
+      "replacementIntent": "A sourced farm_grain_stage3.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmGrainStage3 at identity; shipped bounds exactly 1.91 x 0.82 x 1.31 yd (min [-0.955, 0, -0.655], max [0.955, 0.82, 0.655]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody, CropAccent] and material set [farm_body, crop_accent], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). The crop_accent material must stay bound to the CropAccent mesh and nothing else: it takes the per-crop identity multiply, so its authored color must stay a light neutral. Height is renormalized to 0.75 yd at draw time, so the authored 0.82 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
+    },
+    {
+      "id": "farm_rootleaf_stage3",
+      "out": "models/props/farm_rootleaf_stage3.glb",
+      "rootNode": "FarmRootleafStage3",
+      "family": "rootleaf",
+      "stage": "stage3",
+      "footprintYd": [2.16, 1.49],
+      "pivot": "floor-center",
+      "authoredHeightYd": 0.37,
+      "drawHeightYd": 0.75,
+      "meshes": ["FarmBody", "CropAccent"],
+      "materials": ["farm_body", "crop_accent"],
+      "tintChannels": {
+        "farm_body": "shared foliage, left untinted or biome tinted at draw time",
+        "crop_accent": "per-crop identity multiply over a light neutral base"
+      },
+      "sockets": {},
+      "mountsOn": "Socket_Soil",
+      "replacementIntent": "A sourced farm_rootleaf_stage3.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmRootleafStage3 at identity; shipped bounds exactly 2.16 x 0.37 x 1.49 yd (min [-1.08, 0, -0.745], max [1.08, 0.37, 0.745]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody, CropAccent] and material set [farm_body, crop_accent], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). The crop_accent material must stay bound to the CropAccent mesh and nothing else: it takes the per-crop identity multiply, so its authored color must stay a light neutral. Height is renormalized to 0.75 yd at draw time, so the authored 0.37 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
+    },
+    {
+      "id": "farm_gourd_stage3",
+      "out": "models/props/farm_gourd_stage3.glb",
+      "rootNode": "FarmGourdStage3",
+      "family": "gourd",
+      "stage": "stage3",
+      "footprintYd": [2.46, 1.5],
+      "pivot": "floor-center",
+      "authoredHeightYd": 0.18,
+      "drawHeightYd": 0.75,
+      "meshes": ["FarmBody", "CropAccent"],
+      "materials": ["farm_body", "crop_accent"],
+      "tintChannels": {
+        "farm_body": "shared foliage, left untinted or biome tinted at draw time",
+        "crop_accent": "per-crop identity multiply over a light neutral base"
+      },
+      "sockets": {},
+      "mountsOn": "Socket_Soil",
+      "replacementIntent": "A sourced farm_gourd_stage3.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmGourdStage3 at identity; shipped bounds exactly 2.46 x 0.18 x 1.5 yd (min [-1.23, 0, -0.75], max [1.23, 0.18, 0.75]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody, CropAccent] and material set [farm_body, crop_accent], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). The crop_accent material must stay bound to the CropAccent mesh and nothing else: it takes the per-crop identity multiply, so its authored color must stay a light neutral. Height is renormalized to 0.75 yd at draw time, so the authored 0.18 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
+    },
+    {
+      "id": "farm_grain_stage4",
+      "out": "models/props/farm_grain_stage4.glb",
+      "rootNode": "FarmGrainStage4",
+      "family": "grain",
+      "stage": "stage4",
+      "footprintYd": [2.54, 1.38],
+      "pivot": "floor-center",
+      "authoredHeightYd": 1.07,
+      "drawHeightYd": 1,
+      "meshes": ["FarmBody", "CropAccent"],
+      "materials": ["farm_body", "crop_accent"],
+      "tintChannels": {
+        "farm_body": "shared foliage, left untinted or biome tinted at draw time",
+        "crop_accent": "per-crop identity multiply over a light neutral base"
+      },
+      "sockets": {},
+      "mountsOn": "Socket_Soil",
+      "replacementIntent": "A sourced farm_grain_stage4.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmGrainStage4 at identity; shipped bounds exactly 2.54 x 1.07 x 1.38 yd (min [-1.27, 0, -0.69], max [1.27, 1.07, 0.69]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody, CropAccent] and material set [farm_body, crop_accent], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). The crop_accent material must stay bound to the CropAccent mesh and nothing else: it takes the per-crop identity multiply, so its authored color must stay a light neutral. Height is renormalized to 1 yd at draw time, so the authored 1.07 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
+    },
+    {
+      "id": "farm_rootleaf_stage4",
+      "out": "models/props/farm_rootleaf_stage4.glb",
+      "rootNode": "FarmRootleafStage4",
+      "family": "rootleaf",
+      "stage": "stage4",
+      "footprintYd": [2.72, 1.71],
+      "pivot": "floor-center",
+      "authoredHeightYd": 0.58,
+      "drawHeightYd": 1,
+      "meshes": ["FarmBody", "CropAccent"],
+      "materials": ["farm_body", "crop_accent"],
+      "tintChannels": {
+        "farm_body": "shared foliage, left untinted or biome tinted at draw time",
+        "crop_accent": "per-crop identity multiply over a light neutral base"
+      },
+      "sockets": {},
+      "mountsOn": "Socket_Soil",
+      "replacementIntent": "A sourced farm_rootleaf_stage4.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmRootleafStage4 at identity; shipped bounds exactly 2.72 x 0.58 x 1.71 yd (min [-1.36, 0, -0.855], max [1.36, 0.58, 0.855]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody, CropAccent] and material set [farm_body, crop_accent], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). The crop_accent material must stay bound to the CropAccent mesh and nothing else: it takes the per-crop identity multiply, so its authored color must stay a light neutral. Height is renormalized to 1 yd at draw time, so the authored 0.58 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
+    },
+    {
+      "id": "farm_gourd_stage4",
+      "out": "models/props/farm_gourd_stage4.glb",
+      "rootNode": "FarmGourdStage4",
+      "family": "gourd",
+      "stage": "stage4",
+      "footprintYd": [2.63, 1.61],
+      "pivot": "floor-center",
+      "authoredHeightYd": 0.4,
+      "drawHeightYd": 1,
+      "meshes": ["FarmBody", "CropAccent"],
+      "materials": ["farm_body", "crop_accent"],
+      "tintChannels": {
+        "farm_body": "shared foliage, left untinted or biome tinted at draw time",
+        "crop_accent": "per-crop identity multiply over a light neutral base"
+      },
+      "sockets": {},
+      "mountsOn": "Socket_Soil",
+      "replacementIntent": "A sourced farm_gourd_stage4.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmGourdStage4 at identity; shipped bounds exactly 2.63 x 0.4 x 1.61 yd (min [-1.315, 0, -0.805], max [1.315, 0.4, 0.805]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody, CropAccent] and material set [farm_body, crop_accent], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). The crop_accent material must stay bound to the CropAccent mesh and nothing else: it takes the per-crop identity multiply, so its authored color must stay a light neutral. Height is renormalized to 1 yd at draw time, so the authored 0.4 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
+    },
+    {
+      "id": "farm_grain_withered",
+      "out": "models/props/farm_grain_withered.glb",
+      "rootNode": "FarmGrainWithered",
+      "family": "grain",
+      "stage": "withered",
+      "footprintYd": [2.17, 1.36],
+      "pivot": "floor-center",
+      "authoredHeightYd": 0.66,
+      "drawHeightYd": 0.55,
+      "meshes": ["FarmBody"],
+      "materials": ["farm_body"],
+      "tintChannels": {
+        "farm_body": "shared foliage, left untinted or biome tinted at draw time"
+      },
+      "sockets": {},
+      "mountsOn": "Socket_Soil",
+      "replacementIntent": "A sourced farm_grain_withered.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmGrainWithered at identity; shipped bounds exactly 2.17 x 0.66 x 1.36 yd (min [-1.085, 0, -0.68], max [1.085, 0.66, 0.68]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody] and material set [farm_body], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). Height is renormalized to 0.55 yd at draw time, so the authored 0.66 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
+    },
+    {
+      "id": "farm_rootleaf_withered",
+      "out": "models/props/farm_rootleaf_withered.glb",
+      "rootNode": "FarmRootleafWithered",
+      "family": "rootleaf",
+      "stage": "withered",
+      "footprintYd": [2.12, 1.47],
+      "pivot": "floor-center",
+      "authoredHeightYd": 0.24,
+      "drawHeightYd": 0.55,
+      "meshes": ["FarmBody"],
+      "materials": ["farm_body"],
+      "tintChannels": {
+        "farm_body": "shared foliage, left untinted or biome tinted at draw time"
+      },
+      "sockets": {},
+      "mountsOn": "Socket_Soil",
+      "replacementIntent": "A sourced farm_rootleaf_withered.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmRootleafWithered at identity; shipped bounds exactly 2.12 x 0.24 x 1.47 yd (min [-1.06, 0, -0.735], max [1.06, 0.24, 0.735]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody] and material set [farm_body], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). Height is renormalized to 0.55 yd at draw time, so the authored 0.24 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
+    },
+    {
+      "id": "farm_gourd_withered",
+      "out": "models/props/farm_gourd_withered.glb",
+      "rootNode": "FarmGourdWithered",
+      "family": "gourd",
+      "stage": "withered",
+      "footprintYd": [2.43, 1.42],
+      "pivot": "floor-center",
+      "authoredHeightYd": 0.14,
+      "drawHeightYd": 0.55,
+      "meshes": ["FarmBody"],
+      "materials": ["farm_body"],
+      "tintChannels": {
+        "farm_body": "shared foliage, left untinted or biome tinted at draw time"
+      },
+      "sockets": {},
+      "mountsOn": "Socket_Soil",
+      "replacementIntent": "A sourced farm_gourd_withered.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmGourdWithered at identity; shipped bounds exactly 2.43 x 0.14 x 1.42 yd (min [-1.215, 0, -0.71], max [1.215, 0.14, 0.71]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody] and material set [farm_body], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). Height is renormalized to 0.55 yd at draw time, so the authored 0.14 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
+    },
+    {
+      "id": "farm_compost_bin",
+      "out": "models/props/farm_compost_bin.glb",
+      "rootNode": "FarmCompostBin",
+      "family": "utility",
+      "stage": "utility",
+      "footprintYd": [1, 1],
+      "pivot": "floor-center",
+      "authoredHeightYd": 0.8,
+      "drawHeightYd": 1.1,
+      "meshes": ["FarmBody"],
+      "materials": ["farm_body"],
+      "tintChannels": {
+        "farm_body": "per-hub biome multiply (the palette wood channel) over the whole mesh"
+      },
+      "sockets": {},
+      "mountsOn": null,
+      "replacementIntent": "A sourced farm_compost_bin.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmCompostBin at identity; shipped bounds exactly 1 x 0.8 x 1 yd (min [-0.5, 0, -0.5], max [0.5, 0.8, 0.5]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody] and material set [farm_body], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). Height is renormalized to 1.1 yd at draw time, so the authored 0.8 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
+    },
+    {
+      "id": "farm_feast",
+      "out": "models/props/farm_feast.glb",
+      "rootNode": "FarmFeast",
+      "family": "utility",
+      "stage": "utility",
+      "footprintYd": [1.6, 1.6],
+      "pivot": "floor-center",
+      "authoredHeightYd": 0.9,
+      "drawHeightYd": 0.9,
+      "meshes": ["FarmBody"],
+      "materials": ["farm_body"],
+      "tintChannels": {
+        "farm_body": "left untinted at draw time; the feast ships its authored colors"
+      },
+      "sockets": {},
+      "mountsOn": null,
+      "replacementIntent": "A sourced farm_feast.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmFeast at identity; shipped bounds exactly 1.6 x 0.9 x 1.6 yd (min [-0.8, 0, -0.8], max [0.8, 0.9, 0.8]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody] and material set [farm_body], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). Height is renormalized to 0.9 yd at draw time, so the authored 0.9 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
     }
-   },
-   "mountsOn": null,
-   "replacementIntent": "A sourced farm_bed.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmBed at identity; shipped bounds exactly 3 x 0.34 x 2 yd (min [-1.5, 0, -1], max [1.5, 0.34, 1]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody] and material set [farm_body], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). It must keep the Socket_Soil empty seated on the soil surface: every stage mesh mounts there. Height is renormalized to 0.35 yd at draw time, so the authored 0.34 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
+  ],
+  "replacementContract": {
+    "source": "scripts/assets/farm_props/export_farm_props.mjs (verifyContract); every rule below is enforced there, per asset, on raw and optimized GLBs",
+    "scene": "exactly one scene; its only child is the contract rootNode at identity (translation [0,0,0], rotation [0,0,0,1], scale [1,1,1], tolerance 1e-8)",
+    "boundsYd": "min [-footprintX/2, 0, -footprintZ/2], max [footprintX/2, heightYd, footprintZ/2]; tolerance 1e-5 raw, 3e-3 optimized",
+    "meshes": "mesh node names exactly equal the contract mesh set; each mesh carries exactly one primitive, mode TRIANGLES, attributes exactly COLOR_0 + NORMAL + POSITION; the crop_accent material binds to the CropAccent mesh and to nothing else",
+    "materials": "material names exactly equal the contract material set",
+    "forbidden": "no textures, no animations, no skins, no cameras",
+    "extensions": "optimized GLBs use and require exactly EXT_meshopt_compression + KHR_mesh_quantization; Draco is forbidden; raw exports carry no extensions",
+    "budgets": {
+      "trianglesPerAsset": 1200,
+      "bytesPerShippedGlb": 35840,
+      "bytesPerShippedSet": 409600
+    },
+    "sockets": "every Socket_* node is an empty mount point (no mesh, no children) carrying extras.farmPropSocket.purpose equal to the contract purpose string, seated at 0 < y <= heightYd",
+    "stampedExtras": "the root node carries extras.farmPropContract equal to its FARM_PROP_CONTRACTS row and extras.sculptRuntime with the asset id and swapReady true; extras.sourceFingerprint is stamped at BOTH sites (document root extras and asset extras) and must match scripts/assets/farm_props/source_fingerprint.mjs",
+    "determinism": "the optimizer must rebuild byte-identically (the exporter compares a candidate and a repeat run per asset, then the shipped file against the candidate)"
   },
-  {
-   "id": "farm_sprout",
-   "out": "models/props/farm_sprout.glb",
-   "rootNode": "FarmSprout",
-   "family": "shared",
-   "stage": "sprout",
-   "footprintYd": [
-    1.67,
-    0.97
-   ],
-   "pivot": "floor-center",
-   "authoredHeightYd": 0.25,
-   "drawHeightYd": 0.18,
-   "meshes": [
-    "FarmBody"
-   ],
-   "materials": [
-    "farm_body"
-   ],
-   "tintChannels": {
-    "farm_body": "shared foliage, left untinted or biome tinted at draw time"
-   },
-   "sockets": {},
-   "mountsOn": "Socket_Soil",
-   "replacementIntent": "A sourced farm_sprout.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmSprout at identity; shipped bounds exactly 1.67 x 0.25 x 0.97 yd (min [-0.835, 0, -0.485], max [0.835, 0.25, 0.485]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody] and material set [farm_body], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). Height is renormalized to 0.18 yd at draw time, so the authored 0.25 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
+  "renderIdentity": {
+    "source": "src/render/farm_patches_core.ts",
+    "note": "hex values are written as 0x-prefixed sRGB strings for readability; the renderer multiplies them into the shared materials at draw time",
+    "cropFamilies": {
+      "vale_wheat": "grain",
+      "marsh_rice": "grain",
+      "highland_barley": "grain",
+      "brook_carrot": "rootleaf",
+      "bog_beet": "rootleaf",
+      "evergarden_greens": "rootleaf",
+      "frost_gourd": "gourd",
+      "gilded_sunmelon": "gourd"
+    },
+    "cropAccents": {
+      "vale_wheat": "0xe8c66a",
+      "brook_carrot": "0xe07a2a",
+      "marsh_rice": "0xbcd6a8",
+      "bog_beet": "0xa42440",
+      "highland_barley": "0xd9a441",
+      "frost_gourd": "0x9ec8e4",
+      "gilded_sunmelon": "0xf0a83c",
+      "evergarden_greens": "0x2f6b34"
+    },
+    "fallbackFamily": "grain",
+    "fallbackAccent": "0xcfcfcf",
+    "biomePalettes": {
+      "eastbrook_vale": {
+        "soil": "0xa87a52",
+        "wood": "0xc4a274",
+        "trim": "0xd8c69a"
+      },
+      "mirefen_marsh": {
+        "soil": "0x5c5140",
+        "wood": "0x7c8460",
+        "trim": "0x93a074"
+      },
+      "thornpeak_heights": {
+        "soil": "0x8a8578",
+        "wood": "0x9aa0a4",
+        "trim": "0xb4bcc0"
+      },
+      "evergarden": {
+        "soil": "0x8c7a5e",
+        "wood": "0xd6c9ae",
+        "trim": "0xf2ece0"
+      }
+    },
+    "fallbackPalette": {
+      "soil": "0x8a7a62",
+      "wood": "0xb0a084",
+      "trim": "0xc8bca4"
+    },
+    "channelUse": "As consumed by src/render/farm_patches.ts: soil is the bed whole-mesh multiply, wood is the compost bin whole-mesh multiply; trim is authored for a future higher-tier trim pass and has no draw-time consumer today."
   },
-  {
-   "id": "farm_grain_stage2",
-   "out": "models/props/farm_grain_stage2.glb",
-   "rootNode": "FarmGrainStage2",
-   "family": "grain",
-   "stage": "stage2",
-   "footprintYd": [
-    1.81,
-    1.04
-   ],
-   "pivot": "floor-center",
-   "authoredHeightYd": 0.42,
-   "drawHeightYd": 0.42,
-   "meshes": [
-    "FarmBody"
-   ],
-   "materials": [
-    "farm_body"
-   ],
-   "tintChannels": {
-    "farm_body": "shared foliage, left untinted or biome tinted at draw time"
-   },
-   "sockets": {},
-   "mountsOn": "Socket_Soil",
-   "replacementIntent": "A sourced farm_grain_stage2.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmGrainStage2 at identity; shipped bounds exactly 1.81 x 0.42 x 1.04 yd (min [-0.905, 0, -0.52], max [0.905, 0.42, 0.52]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody] and material set [farm_body], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). Height is renormalized to 0.42 yd at draw time, so the authored 0.42 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
+  "adapterParameters": {
+    "source": "src/render/farm_patches.ts and src/render/farm_patches_core.ts",
+    "FARM_SYNC_INTERVAL_S": 0.5,
+    "PITCH_SAMPLE_STEP": 0.4,
+    "SOIL_SOCKET_FALLBACK_Y": 0.3,
+    "normalizedDrawHeightsYd": {
+      "BED_HEIGHT": 0.35,
+      "BIN_HEIGHT": 1.1,
+      "FEAST_HEIGHT": 0.9,
+      "STAGE_HEIGHT": {
+        "sprout": 0.18,
+        "stage2": 0.42,
+        "stage3": 0.75,
+        "stage4": 1,
+        "withered": 0.55
+      }
+    },
+    "WET_SOIL_DARKEN": {
+      "band0Dry": 1,
+      "band1Damp": 0.86,
+      "band2Fresh": 0.72,
+      "note": "multiplied into the bed biome soil tint on the non-accent stage parts"
+    },
+    "FARM_WET_BAND_2_MS": 600000,
+    "FARM_WET_BAND_1_MS": 3600000,
+    "FEAST_VFX_LIFT": 0.45,
+    "FEAST_SHADOW_CAP": 8,
+    "feastShadowNote": "shadow casting sheds at the cap (the first 8 tables in insertion order cast; the budget refills as feasts despawn) but feast PRESENCE is never culled: every table in interest scope draws at every graphics tier",
+    "FARM_COMPOST_BIN_OFFSET": 3,
+    "compostBinNote": "yd west of the bed grid west edge, on the first row line, short of the 5 yd bed pitch so the bin never lands where a future bed row would"
   },
-  {
-   "id": "farm_rootleaf_stage2",
-   "out": "models/props/farm_rootleaf_stage2.glb",
-   "rootNode": "FarmRootleafStage2",
-   "family": "rootleaf",
-   "stage": "stage2",
-   "footprintYd": [
-    1.61,
-    1.31
-   ],
-   "pivot": "floor-center",
-   "authoredHeightYd": 0.22,
-   "drawHeightYd": 0.42,
-   "meshes": [
-    "FarmBody"
-   ],
-   "materials": [
-    "farm_body"
-   ],
-   "tintChannels": {
-    "farm_body": "shared foliage, left untinted or biome tinted at draw time"
-   },
-   "sockets": {},
-   "mountsOn": "Socket_Soil",
-   "replacementIntent": "A sourced farm_rootleaf_stage2.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmRootleafStage2 at identity; shipped bounds exactly 1.61 x 0.22 x 1.31 yd (min [-0.805, 0, -0.655], max [0.805, 0.22, 0.655]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody] and material set [farm_body], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). Height is renormalized to 0.42 yd at draw time, so the authored 0.22 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
-  },
-  {
-   "id": "farm_gourd_stage2",
-   "out": "models/props/farm_gourd_stage2.glb",
-   "rootNode": "FarmGourdStage2",
-   "family": "gourd",
-   "stage": "stage2",
-   "footprintYd": [
-    1.8,
-    1.16
-   ],
-   "pivot": "floor-center",
-   "authoredHeightYd": 0.09,
-   "drawHeightYd": 0.42,
-   "meshes": [
-    "FarmBody"
-   ],
-   "materials": [
-    "farm_body"
-   ],
-   "tintChannels": {
-    "farm_body": "shared foliage, left untinted or biome tinted at draw time"
-   },
-   "sockets": {},
-   "mountsOn": "Socket_Soil",
-   "replacementIntent": "A sourced farm_gourd_stage2.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmGourdStage2 at identity; shipped bounds exactly 1.8 x 0.09 x 1.16 yd (min [-0.9, 0, -0.58], max [0.9, 0.09, 0.58]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody] and material set [farm_body], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). Height is renormalized to 0.42 yd at draw time, so the authored 0.09 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
-  },
-  {
-   "id": "farm_grain_stage3",
-   "out": "models/props/farm_grain_stage3.glb",
-   "rootNode": "FarmGrainStage3",
-   "family": "grain",
-   "stage": "stage3",
-   "footprintYd": [
-    1.91,
-    1.31
-   ],
-   "pivot": "floor-center",
-   "authoredHeightYd": 0.82,
-   "drawHeightYd": 0.75,
-   "meshes": [
-    "FarmBody",
-    "CropAccent"
-   ],
-   "materials": [
-    "farm_body",
-    "crop_accent"
-   ],
-   "tintChannels": {
-    "farm_body": "shared foliage, left untinted or biome tinted at draw time",
-    "crop_accent": "per-crop identity multiply over a light neutral base"
-   },
-   "sockets": {},
-   "mountsOn": "Socket_Soil",
-   "replacementIntent": "A sourced farm_grain_stage3.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmGrainStage3 at identity; shipped bounds exactly 1.91 x 0.82 x 1.31 yd (min [-0.955, 0, -0.655], max [0.955, 0.82, 0.655]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody, CropAccent] and material set [farm_body, crop_accent], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). The crop_accent material must stay bound to the CropAccent mesh and nothing else: it takes the per-crop identity multiply, so its authored color must stay a light neutral. Height is renormalized to 0.75 yd at draw time, so the authored 0.82 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
-  },
-  {
-   "id": "farm_rootleaf_stage3",
-   "out": "models/props/farm_rootleaf_stage3.glb",
-   "rootNode": "FarmRootleafStage3",
-   "family": "rootleaf",
-   "stage": "stage3",
-   "footprintYd": [
-    2.16,
-    1.49
-   ],
-   "pivot": "floor-center",
-   "authoredHeightYd": 0.37,
-   "drawHeightYd": 0.75,
-   "meshes": [
-    "FarmBody",
-    "CropAccent"
-   ],
-   "materials": [
-    "farm_body",
-    "crop_accent"
-   ],
-   "tintChannels": {
-    "farm_body": "shared foliage, left untinted or biome tinted at draw time",
-    "crop_accent": "per-crop identity multiply over a light neutral base"
-   },
-   "sockets": {},
-   "mountsOn": "Socket_Soil",
-   "replacementIntent": "A sourced farm_rootleaf_stage3.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmRootleafStage3 at identity; shipped bounds exactly 2.16 x 0.37 x 1.49 yd (min [-1.08, 0, -0.745], max [1.08, 0.37, 0.745]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody, CropAccent] and material set [farm_body, crop_accent], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). The crop_accent material must stay bound to the CropAccent mesh and nothing else: it takes the per-crop identity multiply, so its authored color must stay a light neutral. Height is renormalized to 0.75 yd at draw time, so the authored 0.37 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
-  },
-  {
-   "id": "farm_gourd_stage3",
-   "out": "models/props/farm_gourd_stage3.glb",
-   "rootNode": "FarmGourdStage3",
-   "family": "gourd",
-   "stage": "stage3",
-   "footprintYd": [
-    2.46,
-    1.5
-   ],
-   "pivot": "floor-center",
-   "authoredHeightYd": 0.18,
-   "drawHeightYd": 0.75,
-   "meshes": [
-    "FarmBody",
-    "CropAccent"
-   ],
-   "materials": [
-    "farm_body",
-    "crop_accent"
-   ],
-   "tintChannels": {
-    "farm_body": "shared foliage, left untinted or biome tinted at draw time",
-    "crop_accent": "per-crop identity multiply over a light neutral base"
-   },
-   "sockets": {},
-   "mountsOn": "Socket_Soil",
-   "replacementIntent": "A sourced farm_gourd_stage3.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmGourdStage3 at identity; shipped bounds exactly 2.46 x 0.18 x 1.5 yd (min [-1.23, 0, -0.75], max [1.23, 0.18, 0.75]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody, CropAccent] and material set [farm_body, crop_accent], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). The crop_accent material must stay bound to the CropAccent mesh and nothing else: it takes the per-crop identity multiply, so its authored color must stay a light neutral. Height is renormalized to 0.75 yd at draw time, so the authored 0.18 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
-  },
-  {
-   "id": "farm_grain_stage4",
-   "out": "models/props/farm_grain_stage4.glb",
-   "rootNode": "FarmGrainStage4",
-   "family": "grain",
-   "stage": "stage4",
-   "footprintYd": [
-    2.54,
-    1.38
-   ],
-   "pivot": "floor-center",
-   "authoredHeightYd": 1.07,
-   "drawHeightYd": 1,
-   "meshes": [
-    "FarmBody",
-    "CropAccent"
-   ],
-   "materials": [
-    "farm_body",
-    "crop_accent"
-   ],
-   "tintChannels": {
-    "farm_body": "shared foliage, left untinted or biome tinted at draw time",
-    "crop_accent": "per-crop identity multiply over a light neutral base"
-   },
-   "sockets": {},
-   "mountsOn": "Socket_Soil",
-   "replacementIntent": "A sourced farm_grain_stage4.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmGrainStage4 at identity; shipped bounds exactly 2.54 x 1.07 x 1.38 yd (min [-1.27, 0, -0.69], max [1.27, 1.07, 0.69]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody, CropAccent] and material set [farm_body, crop_accent], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). The crop_accent material must stay bound to the CropAccent mesh and nothing else: it takes the per-crop identity multiply, so its authored color must stay a light neutral. Height is renormalized to 1 yd at draw time, so the authored 1.07 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
-  },
-  {
-   "id": "farm_rootleaf_stage4",
-   "out": "models/props/farm_rootleaf_stage4.glb",
-   "rootNode": "FarmRootleafStage4",
-   "family": "rootleaf",
-   "stage": "stage4",
-   "footprintYd": [
-    2.72,
-    1.71
-   ],
-   "pivot": "floor-center",
-   "authoredHeightYd": 0.58,
-   "drawHeightYd": 1,
-   "meshes": [
-    "FarmBody",
-    "CropAccent"
-   ],
-   "materials": [
-    "farm_body",
-    "crop_accent"
-   ],
-   "tintChannels": {
-    "farm_body": "shared foliage, left untinted or biome tinted at draw time",
-    "crop_accent": "per-crop identity multiply over a light neutral base"
-   },
-   "sockets": {},
-   "mountsOn": "Socket_Soil",
-   "replacementIntent": "A sourced farm_rootleaf_stage4.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmRootleafStage4 at identity; shipped bounds exactly 2.72 x 0.58 x 1.71 yd (min [-1.36, 0, -0.855], max [1.36, 0.58, 0.855]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody, CropAccent] and material set [farm_body, crop_accent], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). The crop_accent material must stay bound to the CropAccent mesh and nothing else: it takes the per-crop identity multiply, so its authored color must stay a light neutral. Height is renormalized to 1 yd at draw time, so the authored 0.58 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
-  },
-  {
-   "id": "farm_gourd_stage4",
-   "out": "models/props/farm_gourd_stage4.glb",
-   "rootNode": "FarmGourdStage4",
-   "family": "gourd",
-   "stage": "stage4",
-   "footprintYd": [
-    2.63,
-    1.61
-   ],
-   "pivot": "floor-center",
-   "authoredHeightYd": 0.4,
-   "drawHeightYd": 1,
-   "meshes": [
-    "FarmBody",
-    "CropAccent"
-   ],
-   "materials": [
-    "farm_body",
-    "crop_accent"
-   ],
-   "tintChannels": {
-    "farm_body": "shared foliage, left untinted or biome tinted at draw time",
-    "crop_accent": "per-crop identity multiply over a light neutral base"
-   },
-   "sockets": {},
-   "mountsOn": "Socket_Soil",
-   "replacementIntent": "A sourced farm_gourd_stage4.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmGourdStage4 at identity; shipped bounds exactly 2.63 x 0.4 x 1.61 yd (min [-1.315, 0, -0.805], max [1.315, 0.4, 0.805]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody, CropAccent] and material set [farm_body, crop_accent], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). The crop_accent material must stay bound to the CropAccent mesh and nothing else: it takes the per-crop identity multiply, so its authored color must stay a light neutral. Height is renormalized to 1 yd at draw time, so the authored 0.4 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
-  },
-  {
-   "id": "farm_grain_withered",
-   "out": "models/props/farm_grain_withered.glb",
-   "rootNode": "FarmGrainWithered",
-   "family": "grain",
-   "stage": "withered",
-   "footprintYd": [
-    2.17,
-    1.36
-   ],
-   "pivot": "floor-center",
-   "authoredHeightYd": 0.66,
-   "drawHeightYd": 0.55,
-   "meshes": [
-    "FarmBody"
-   ],
-   "materials": [
-    "farm_body"
-   ],
-   "tintChannels": {
-    "farm_body": "shared foliage, left untinted or biome tinted at draw time"
-   },
-   "sockets": {},
-   "mountsOn": "Socket_Soil",
-   "replacementIntent": "A sourced farm_grain_withered.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmGrainWithered at identity; shipped bounds exactly 2.17 x 0.66 x 1.36 yd (min [-1.085, 0, -0.68], max [1.085, 0.66, 0.68]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody] and material set [farm_body], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). Height is renormalized to 0.55 yd at draw time, so the authored 0.66 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
-  },
-  {
-   "id": "farm_rootleaf_withered",
-   "out": "models/props/farm_rootleaf_withered.glb",
-   "rootNode": "FarmRootleafWithered",
-   "family": "rootleaf",
-   "stage": "withered",
-   "footprintYd": [
-    2.12,
-    1.47
-   ],
-   "pivot": "floor-center",
-   "authoredHeightYd": 0.24,
-   "drawHeightYd": 0.55,
-   "meshes": [
-    "FarmBody"
-   ],
-   "materials": [
-    "farm_body"
-   ],
-   "tintChannels": {
-    "farm_body": "shared foliage, left untinted or biome tinted at draw time"
-   },
-   "sockets": {},
-   "mountsOn": "Socket_Soil",
-   "replacementIntent": "A sourced farm_rootleaf_withered.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmRootleafWithered at identity; shipped bounds exactly 2.12 x 0.24 x 1.47 yd (min [-1.06, 0, -0.735], max [1.06, 0.24, 0.735]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody] and material set [farm_body], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). Height is renormalized to 0.55 yd at draw time, so the authored 0.24 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
-  },
-  {
-   "id": "farm_gourd_withered",
-   "out": "models/props/farm_gourd_withered.glb",
-   "rootNode": "FarmGourdWithered",
-   "family": "gourd",
-   "stage": "withered",
-   "footprintYd": [
-    2.43,
-    1.42
-   ],
-   "pivot": "floor-center",
-   "authoredHeightYd": 0.14,
-   "drawHeightYd": 0.55,
-   "meshes": [
-    "FarmBody"
-   ],
-   "materials": [
-    "farm_body"
-   ],
-   "tintChannels": {
-    "farm_body": "shared foliage, left untinted or biome tinted at draw time"
-   },
-   "sockets": {},
-   "mountsOn": "Socket_Soil",
-   "replacementIntent": "A sourced farm_gourd_withered.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmGourdWithered at identity; shipped bounds exactly 2.43 x 0.14 x 1.42 yd (min [-1.215, 0, -0.71], max [1.215, 0.14, 0.71]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody] and material set [farm_body], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). Height is renormalized to 0.55 yd at draw time, so the authored 0.14 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
-  },
-  {
-   "id": "farm_compost_bin",
-   "out": "models/props/farm_compost_bin.glb",
-   "rootNode": "FarmCompostBin",
-   "family": "utility",
-   "stage": "utility",
-   "footprintYd": [
-    1,
-    1
-   ],
-   "pivot": "floor-center",
-   "authoredHeightYd": 0.8,
-   "drawHeightYd": 1.1,
-   "meshes": [
-    "FarmBody"
-   ],
-   "materials": [
-    "farm_body"
-   ],
-   "tintChannels": {
-    "farm_body": "per-hub biome multiply (the palette wood channel) over the whole mesh"
-   },
-   "sockets": {},
-   "mountsOn": null,
-   "replacementIntent": "A sourced farm_compost_bin.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmCompostBin at identity; shipped bounds exactly 1 x 0.8 x 1 yd (min [-0.5, 0, -0.5], max [0.5, 0.8, 0.5]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody] and material set [farm_body], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). Height is renormalized to 1.1 yd at draw time, so the authored 0.8 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
-  },
-  {
-   "id": "farm_feast",
-   "out": "models/props/farm_feast.glb",
-   "rootNode": "FarmFeast",
-   "family": "utility",
-   "stage": "utility",
-   "footprintYd": [
-    1.6,
-    1.6
-   ],
-   "pivot": "floor-center",
-   "authoredHeightYd": 0.9,
-   "drawHeightYd": 0.9,
-   "meshes": [
-    "FarmBody"
-   ],
-   "materials": [
-    "farm_body"
-   ],
-   "tintChannels": {
-    "farm_body": "left untinted at draw time; the feast ships its authored colors"
-   },
-   "sockets": {},
-   "mountsOn": null,
-   "replacementIntent": "A sourced farm_feast.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmFeast at identity; shipped bounds exactly 1.6 x 0.9 x 1.6 yd (min [-0.8, 0, -0.8], max [0.8, 0.9, 0.8]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody] and material set [farm_body], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). Height is renormalized to 0.9 yd at draw time, so the authored 0.9 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
-  }
- ],
- "replacementContract": {
-  "source": "scripts/assets/farm_props/export_farm_props.mjs (verifyContract); every rule below is enforced there, per asset, on raw and optimized GLBs",
-  "scene": "exactly one scene; its only child is the contract rootNode at identity (translation [0,0,0], rotation [0,0,0,1], scale [1,1,1], tolerance 1e-8)",
-  "boundsYd": "min [-footprintX/2, 0, -footprintZ/2], max [footprintX/2, heightYd, footprintZ/2]; tolerance 1e-5 raw, 3e-3 optimized",
-  "meshes": "mesh node names exactly equal the contract mesh set; each mesh carries exactly one primitive, mode TRIANGLES, attributes exactly COLOR_0 + NORMAL + POSITION; the crop_accent material binds to the CropAccent mesh and to nothing else",
-  "materials": "material names exactly equal the contract material set",
-  "forbidden": "no textures, no animations, no skins, no cameras",
-  "extensions": "optimized GLBs use and require exactly EXT_meshopt_compression + KHR_mesh_quantization; Draco is forbidden; raw exports carry no extensions",
-  "budgets": {
-   "trianglesPerAsset": 1200,
-   "bytesPerShippedGlb": 35840,
-   "bytesPerShippedSet": 409600
-  },
-  "sockets": "every Socket_* node is an empty mount point (no mesh, no children) carrying extras.farmPropSocket.purpose equal to the contract purpose string, seated at 0 < y <= heightYd",
-  "stampedExtras": "the root node carries extras.farmPropContract equal to its FARM_PROP_CONTRACTS row and extras.sculptRuntime with the asset id and swapReady true; extras.sourceFingerprint is stamped at BOTH sites (document root extras and asset extras) and must match scripts/assets/farm_props/source_fingerprint.mjs",
-  "determinism": "the optimizer must rebuild byte-identically (the exporter compares a candidate and a repeat run per asset, then the shipped file against the candidate)"
- },
- "renderIdentity": {
-  "source": "src/render/farm_patches_core.ts",
-  "note": "hex values are written as 0x-prefixed sRGB strings for readability; the renderer multiplies them into the shared materials at draw time",
-  "cropFamilies": {
-   "vale_wheat": "grain",
-   "marsh_rice": "grain",
-   "highland_barley": "grain",
-   "brook_carrot": "rootleaf",
-   "bog_beet": "rootleaf",
-   "evergarden_greens": "rootleaf",
-   "frost_gourd": "gourd",
-   "gilded_sunmelon": "gourd"
-  },
-  "cropAccents": {
-   "vale_wheat": "0xe8c66a",
-   "brook_carrot": "0xe07a2a",
-   "marsh_rice": "0xbcd6a8",
-   "bog_beet": "0xa42440",
-   "highland_barley": "0xd9a441",
-   "frost_gourd": "0x9ec8e4",
-   "gilded_sunmelon": "0xf0a83c",
-   "evergarden_greens": "0x2f6b34"
-  },
-  "fallbackFamily": "grain",
-  "fallbackAccent": "0xcfcfcf",
-  "biomePalettes": {
-   "eastbrook_vale": {
-    "soil": "0xa87a52",
-    "wood": "0xc4a274",
-    "trim": "0xd8c69a"
-   },
-   "mirefen_marsh": {
-    "soil": "0x5c5140",
-    "wood": "0x7c8460",
-    "trim": "0x93a074"
-   },
-   "thornpeak_heights": {
-    "soil": "0x8a8578",
-    "wood": "0x9aa0a4",
-    "trim": "0xb4bcc0"
-   },
-   "evergarden": {
-    "soil": "0x8c7a5e",
-    "wood": "0xd6c9ae",
-    "trim": "0xf2ece0"
-   }
-  },
-  "fallbackPalette": {
-   "soil": "0x8a7a62",
-   "wood": "0xb0a084",
-   "trim": "0xc8bca4"
-  },
-  "channelUse": "As consumed by src/render/farm_patches.ts: soil is the bed whole-mesh multiply, wood is the compost bin whole-mesh multiply; trim is authored for a future higher-tier trim pass and has no draw-time consumer today."
- },
- "adapterParameters": {
-  "source": "src/render/farm_patches.ts and src/render/farm_patches_core.ts",
-  "FARM_SYNC_INTERVAL_S": 0.5,
-  "PITCH_SAMPLE_STEP": 0.4,
-  "SOIL_SOCKET_FALLBACK_Y": 0.3,
-  "normalizedDrawHeightsYd": {
-   "BED_HEIGHT": 0.35,
-   "BIN_HEIGHT": 1.1,
-   "FEAST_HEIGHT": 0.9,
-   "STAGE_HEIGHT": {
-    "sprout": 0.18,
-    "stage2": 0.42,
-    "stage3": 0.75,
-    "stage4": 1,
-    "withered": 0.55
-   }
-  },
-  "WET_SOIL_DARKEN": {
-   "band0Dry": 1,
-   "band1Damp": 0.86,
-   "band2Fresh": 0.72,
-   "note": "multiplied into the bed biome soil tint on the non-accent stage parts"
-  },
-  "FARM_WET_BAND_2_MS": 600000,
-  "FARM_WET_BAND_1_MS": 3600000,
-  "FEAST_VFX_LIFT": 0.45,
-  "FEAST_SHADOW_CAP": 8,
-  "feastShadowNote": "shadow casting sheds at the cap (the first 8 tables in insertion order cast; the budget refills as feasts despawn) but feast PRESENCE is never culled: every table in interest scope draws at every graphics tier",
-  "FARM_COMPOST_BIN_OFFSET": 3,
-  "compostBinNote": "yd west of the bed grid west edge, on the first row line, short of the 5 yd bed pitch so the bin never lands where a future bed row would"
- },
- "regenerationNote": "assets, replacementContract, and renderIdentity regenerate from FARM_PROP_CONTRACTS in scripts/assets/farm_props/model.js; journeyEvidence, heightNote, this note, and the channelUse note under renderIdentity are hand-added and MUST be preserved on regeneration (the journeyEvidence reference keeps tests/ci_workflow.test.ts green: the screenshot cone entry needs a tracked reference outside docs/screenshots)."
+  "regenerationNote": "assets, replacementContract, and renderIdentity regenerate from FARM_PROP_CONTRACTS in scripts/assets/farm_props/model.js; journeyEvidence, heightNote, this note, and the channelUse note under renderIdentity are hand-added and MUST be preserved on regeneration (the journeyEvidence reference keeps tests/ci_workflow.test.ts green: the screenshot cone entry needs a tracked reference outside docs/screenshots)."
 }
