@@ -1,6 +1,6 @@
 {
   "title": "Farming prop asset handoff manifest (Phase 13)",
-  "generatedFrom": "scripts/assets/farm_props/model.js (FARM_PROP_CONTRACTS). Rows are generated, never hand-edited; regenerate from that table when it changes.",
+  "generatedFrom": "scripts/assets/farm_props/model.js (FARM_PROP_CONTRACTS). Rows are derived from that table (no generator script exists; a re-derivation is a hand edit) and bound to it by tests/farming_asset_manifest.test.ts, which reds on drift.",
   "verifiedAgainst": [
     "scripts/assets/farm_props/export_farm_props.mjs (verifyContract)",
     "src/render/farm_patches.ts (adapter constants)",
@@ -429,5 +429,5 @@
     "FARM_COMPOST_BIN_OFFSET": 3,
     "compostBinNote": "yd west of the bed grid west edge, on the first row line, short of the 5 yd bed pitch so the bin never lands where a future bed row would"
   },
-  "regenerationNote": "assets, replacementContract, and renderIdentity regenerate from FARM_PROP_CONTRACTS in scripts/assets/farm_props/model.js; journeyEvidence, heightNote, this note, and the channelUse note under renderIdentity are hand-added and MUST be preserved on regeneration (the journeyEvidence reference keeps tests/ci_workflow.test.ts green: the screenshot cone entry needs a tracked reference outside docs/screenshots)."
+  "regenerationNote": "assets and replacementContract derive from FARM_PROP_CONTRACTS in scripts/assets/farm_props/model.js; renderIdentity derives from the src/render/farm_patches_core.ts tables and adapterParameters from src/render/farm_patches.ts constants. No generator script exists: a re-derivation is a hand edit against those pinned sources, and tests/farming_asset_manifest.test.ts binds the derivable halves so drift reds instead of rotting. journeyEvidence, heightNote, this note, the replacementIntent prose, and the channelUse note under renderIdentity are hand-added and MUST be preserved on any re-derivation (the journeyEvidence reference keeps tests/ci_workflow.test.ts green: the screenshot cone entry needs a tracked reference outside docs/screenshots)."
 }
