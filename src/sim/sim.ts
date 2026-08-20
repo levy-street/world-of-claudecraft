@@ -275,7 +275,7 @@ import {
 } from './item_instance_load';
 import { canStackInstancePayloads, isMergeableInstancePayload } from './item_instance_merge';
 import { meetsLevelRequirement } from './item_level_req';
-import { setItemLocked as setItemLockedCmd } from './item_lock';
+import { countRawInSlots, setItemLocked as setItemLockedCmd } from './item_lock';
 import * as items from './items';
 import type { JailState } from './jail';
 import {
@@ -8378,10 +8378,7 @@ export class Sim {
 
   countItem(itemId: string, pid?: number): number {
     const r = this.resolve(pid);
-    if (!r) return 0;
-    let n = 0;
-    for (const s of r.meta.inventory) if (s.itemId === itemId) n += s.count;
-    return n;
+    return r ? countRawInSlots(r.meta.inventory, itemId) : 0;
   }
 
   // Fungible-only count for `itemId` (excludes per-instance slots, #1165). The

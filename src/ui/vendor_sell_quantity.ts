@@ -1,3 +1,4 @@
+import { countRawInSlots } from '../sim/item_lock';
 import type { InvSlot } from '../sim/types';
 
 /** Total copies of `itemId` held across every bag slot, not just the ONE slot the
@@ -8,11 +9,8 @@ import type { InvSlot } from '../sim/types';
  *  size (e.g. 100 when the player owns five stacks of 20) silently clamps down to
  *  whatever the clicked slot alone holds, never reaching what was actually typed.
  *  `Sim.sellItem` already walks every unbound stack (`removePreferFungible`) once
- *  asked for more than one slot's worth; only the UI-side cap was wrong. */
+ *  asked for more than one slot's worth; only the UI-side cap was wrong. A thin
+ *  domain alias over the shared sim walk (item_lock.ts countRawInSlots). */
 export function totalHeldCount(inventory: readonly InvSlot[], itemId: string): number {
-  let total = 0;
-  for (const slot of inventory) {
-    if (slot.itemId === itemId) total += slot.count;
-  }
-  return total;
+  return countRawInSlots(inventory, itemId);
 }

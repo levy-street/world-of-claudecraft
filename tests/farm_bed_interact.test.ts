@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { decideFarmBedAction, nearestInteractableBed } from '../src/game/farm_bed_interact';
 import { INTERACT_RANGE } from '../src/sim/types';
@@ -54,6 +56,18 @@ describe('nearestInteractableBed', () => {
       ]),
     ];
     expect(nearestInteractableBed(patches, ORIGIN)).toBe('bed_first');
+  });
+
+  it('measures reach with the sim`s own distToBed, not a re-derived walk', () => {
+    // Phase 14 replaced the comment-contract mirror with the shared export:
+    // the module must import distToBed from the sim's farming module and use
+    // it as the one distance read, so the reach math can never drift from the
+    // deny it mirrors. Behavior is pinned by the boundary arms above; this pin
+    // exists so a future re-derivation (dropping the import) reds loudly.
+    const source = readFileSync(path.join(process.cwd(), 'src/game/farm_bed_interact.ts'), 'utf8');
+    const importLine = "import { distToBed } from '../sim/professions/farming';";
+    expect(source.split(importLine).length - 1).toBe(1);
+    expect(source.split('distToBed(playerPos, bed)').length - 1).toBe(1);
   });
 });
 

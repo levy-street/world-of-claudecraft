@@ -487,7 +487,7 @@ closed-by-X.
 | gatherDowngrade surface union gains 'crop' (silent signature truncation on full-bag golden wins) | P10 | later phase | handed-to-maintainer |
 | Mobile-window-open body-class gap (harvest journal and plant sheet, family-wide) | P9b QA | Phase 13 polish | handed-to-maintainer |
 | A11y polish batch: seed rows aria-pressed vs radiogroup, in-flight aria-busy, journal ready aria-live, WCAG label-in-name husk aria | P8 to P9b QA | a11y batch | handed-to-maintainer |
-| countRawInSlots fifth src/ui copy plus the distToBed comment-contract mirror (need src/sim edits) | P9b QA | later farming phase | handed-to-maintainer |
+| countRawInSlots fifth src/ui copy plus the distToBed comment-contract mirror (need src/sim edits) | P9b QA | later farming phase | closed-by-Phase-14 (item B7: countRawInSlots exported from src/sim/item_lock.ts beside its unlocked twin, Sim.countItem delegates to it, the five src/ui copies collapsed onto it, the two domain-named wrappers tradeOfferCeiling and totalHeldCount are thin aliases; distToBed exported from farming.ts and consumed by the farm_bed_interact mirror, import pinned) |
 | Style batch: .ps-seed raw rgba, the report window #ffd100 literal | P9b QA | Phase 13 style batch | handed-to-maintainer |
 | useItem feast arm ignores the validated slotIndex (thread like consumeOneUnit if provenance lands) | P12 QA | Phase 13 polish | handed-to-maintainer |
 | Bags feast hint says "Click to use" for a placement; a "set out" key needs M16 fills | P12 QA | Phase 13 polish | handed-to-maintainer |

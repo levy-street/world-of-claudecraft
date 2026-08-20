@@ -61,6 +61,27 @@ export function countUnlockedInSlots(inventory: readonly InvSlot[], itemId: stri
   return n;
 }
 
+/** Raw copies of `itemId` across every slot, locked INCLUDED: the walk
+ *  `Sim.countItem` runs, shared so every mirror counts exactly what the sim
+ *  counts. The raw-vs-unlocked pair is what splits a locked-copy shortfall
+ *  (denied 'locked') from a plain shortage in every deny site, so the raw
+ *  twin lives beside `countUnlockedInSlots` rather than as another private
+ *  copy (Phase 14 collapsed five src/ui copies onto this one export). The
+ *  parameter is structurally narrow on purpose: hot-path callers (the action
+ *  bar) hold `{ itemId, count }` slices, not full `InvSlot`s, and the walk
+ *  reads nothing else. A for-loop, not reduce: no per-frame closure
+ *  allocation on the hot path. */
+export function countRawInSlots(
+  inventory: readonly Pick<InvSlot, 'itemId' | 'count'>[],
+  itemId: string,
+): number {
+  let total = 0;
+  for (const slot of inventory) {
+    if (slot.itemId === itemId) total += slot.count;
+  }
+  return total;
+}
+
 /** Lock-aware removal mirroring the Sim inventory hub's removeItem walk
  *  (highest bag index first) but SKIPPING any locked slot entirely: a locked
  *  copy is never a valid removal victim, so unlike removePreferFungible's

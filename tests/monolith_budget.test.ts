@@ -160,10 +160,11 @@ const MONOLITHS: MonolithRow[] = [
     // (updateBossMechanics + spawnBossAdds) whole to src/sim/mob/
     // boss_mechanics.ts, then again when Phase 14 retired the orphaned
     // mobMeleeRange / mobCombatProfile delegates (their last production
-    // caller left with M5): the file sits at 12232, so this IS the
-    // post-retirement size plus a small margin (the plus-margin style the
-    // ratchet uses for sim.ts).
-    ceiling: 12235,
+    // caller left with M5), and once more when countItem became a thin
+    // delegate over the shared item_lock.ts countRawInSlots walk: the file
+    // sits at 12229, so this IS the post-extraction size plus a small margin
+    // (the plus-margin style the ratchet uses for sim.ts).
+    ceiling: 12232,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

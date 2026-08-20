@@ -402,8 +402,12 @@ export function canPlantCrop(crop: FarmCropDef, farmingSkill: number): boolean {
 }
 
 /** Flat-ground distance to a bed. Beds carry no y (FarmBedDef), so this is a
- *  plain 2D distance, the distToNode precedent in gathering.ts. */
-function distToBed(pos: { x: number; z: number }, bed: { x: number; z: number }): number {
+ *  plain 2D distance, the distToNode precedent in gathering.ts. EXPORTED for
+ *  the client-side reach mirror (src/game/farm_bed_interact.ts), which used to
+ *  re-derive this walk by comment contract; sharing the one function is what
+ *  keeps the client's inclusive `<=` offer boundary the exact complement of
+ *  the `>` deny below. */
+export function distToBed(pos: { x: number; z: number }, bed: { x: number; z: number }): number {
   const dx = pos.x - bed.x;
   const dz = pos.z - bed.z;
   return Math.sqrt(dx * dx + dz * dz);

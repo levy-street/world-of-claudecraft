@@ -10,6 +10,7 @@ import { describe, expect, it } from 'vitest';
 import { BACKPACK_SLOTS } from '../src/sim/bags';
 import { recipeById } from '../src/sim/content/recipes';
 import {
+  countRawInSlots,
   countUnlockedInSlots,
   countUnlockedItem,
   isItemLocked,
@@ -110,6 +111,39 @@ describe('countUnlockedItem / countUnlockedInSlots / removeUnlockedFromSlots', (
       { itemId: 'bone_fragments', count: 4 },
     );
     expect(countUnlockedItem(meta, 'bone_fragments')).toBe(4);
+  });
+
+  // The raw twin (Phase 14): the shared walk Sim.countItem runs and the five
+  // former src/ui copies consume. Locked copies COUNT here; the raw-vs-unlocked
+  // difference is exactly what splits a locked-copy shortfall from a plain
+  // shortage in the deny sites.
+  it('countRawInSlots counts every stack, locked included, and 0 for an absent id', () => {
+    const inv: InvSlot[] = [
+      { itemId: 'bone_fragments', count: 5, instance: { locked: true } },
+      { itemId: 'bone_fragments', count: 3 },
+      { itemId: 'wolf_fang', count: 7 },
+    ];
+    expect(countRawInSlots(inv, 'bone_fragments')).toBe(8);
+    expect(countRawInSlots(inv, 'wolf_fang')).toBe(7);
+    expect(countRawInSlots(inv, 'no_such_item')).toBe(0);
+    // The deny-split property on ONE fixture: raw exceeds unlocked exactly by
+    // the locked units, so a raw >= 1 with unlocked < 1 reads as 'locked'.
+    expect(countRawInSlots(inv, 'bone_fragments')).toBe(
+      countUnlockedInSlots(inv, 'bone_fragments') + 5,
+    );
+  });
+
+  it('countRawInSlots matches Sim.countItem over the live inventory (the shared-walk pin)', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = sim.players.get(pid)!;
+    meta.inventory.length = 0;
+    meta.inventory.push(
+      { itemId: 'bone_fragments', count: 2, instance: { locked: true } },
+      { itemId: 'bone_fragments', count: 4 },
+    );
+    expect(sim.countItem('bone_fragments', pid)).toBe(6);
+    expect(countRawInSlots(meta.inventory, 'bone_fragments')).toBe(6);
   });
 });
 
