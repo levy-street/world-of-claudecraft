@@ -34,7 +34,7 @@
 | Phase 11 QA | DONE 2026-08-19 (PASS-WITH-FOLLOWUPS) | fix/farming-phase-11-qa off 35536d8ca8 (v0.40.0 e56707a675 still newest, no absorb); merge hash in the notes tail | All four mandatory emphases proven live first-hand (coexistence and last-eaten-wins through real ticks; the eat verb PLAYED as a player through the real bag UI on the LOW live client with the buff bar, remaining time, and single-Use:-prefix tooltip observed; the tier-4-then-tier-1 downgrade over the REAL wire through a stable-timer GameServer + ClientWorld rig, value 12 shipped, held through elision, re-encoded to 3); 7 lanes/reviewers 0 BLOCKING; 4 SHOULD-FIX closed test-first (18s boundary bracket, concurrent-meal refusal, death forfeit, zero-rng rig guards) plus the stat-map parity pin, the stripComments glue-pin hardening, and ten frozen non-Latin fill literals; mutations 7/7 killed named (M3 and M5b re-proven, five fresh over the new pins); rest ledgered with owners in the state.md Phase 11 QA block |
 | Phase 12 (shared feast) | DONE 2026-08-19 | fix/farming-phase-12-shared-feast off deffe3a5d4 (release/v0.40.0 e56707a675 still newest, no absorb); merged --no-ff as 71010cf82a, phase tip 1b33789ba4 | harvest_feast (kind junk, ItemDef.feast {charges 10, 3600 ticks, dishItemId evergarden_braised_greens}) + recipe_harvest_feast (FARM_RECIPES 14, reagent-dormant under (ca)); placeFeast/consumeFeast on IWorldFarming (331 = 88 + 243); the farm_feast entity on the normal snapshot; one-active-per-placer; the bite is a consume slot at the capstone dish (the one updateRegen mint site); the lootable re-arm trap found BY PLAYING and fixed; beat P appended (draws 110 unchanged, md5 9dfd1c6e); five-review round + qa-checklist 0 standing BLOCKING; gate run 2 all 12 green |
 | Phase 12 QA | DONE 2026-08-19 (PASS-WITH-FOLLOWUPS) | fix/farming-phase-12-qa off 2445de46ab (e56707a675 still newest, no absorb); merge hash in the notes tail | All four emphases proven first-hand over the real wire (three-session lifecycle incl. placer-eats-own and latecomer denies; the ledger survives leave/rejoin on the characterId key; nothing serializes, save blobs + db calls captured clean; the re-arm class online through a real ClientWorld mirror); ONE real defect class found and fixed test-first in BOTH legs (the teardown leak: a feast placed in a dungeon instance or a delve run outlived it); the re-arm dodge amended to the Infinity sentinel (worst-case margin was ONE tick, four lanes converged); flourish rebuild-replay silenced + FEAST_SHADOW_CAP 8 (presence never culled); six decisive arms added (swim-bite, exact-range, keyed placer, orphan window, delve lifecycle, behavioral bags click); mutations 13/13 killed named; 3 audit lanes + 5 reviewers + qa-checklist READY, 0 BLOCKING anywhere |
-| Phase 13 (integration polish) | complete 2026-08-19 (gate + merge record in the Phase 13 Notes block) | | |
+| Phase 13 (integration polish) | complete 2026-08-19, merged --no-ff as 1f1a74a8ad (phase tip 5c371c2fba) | | |
 | Phase 13 QA (final; teardown offer) | not started | | |
 
 ## Per-phase deliverable checklists
@@ -3516,6 +3516,16 @@ Integration record (the orchestrator, 2026-08-19):
   "[gate:select] PASS: all 12 steps green (vitest workers: 8)", vitest
   40572 passed / 2 expected fail / 115 skipped, browser suite 133 passed,
   zero FAIL markers in the log, no druid_engines timeout, exit 0.
+- MERGE RECORD: merged --no-ff into feature/farming-plan as 1f1a74a8ad
+  (phase tip 5c371c2fba; the phase branch and the three lane worktrees
+  woc-farm-p13-{a,b,c} with their lane branches deleted). Commit map on the
+  phase side: 8caa0c669c M5 extraction, 14ede759cb D22 amendment sweep,
+  f68928ddf7 extraction unit test + review fixes, 2e14d0bbc8 guide prose,
+  e877a9de08 manifest, cbd04d03ea screenshots + cone rows, 72b7923dbf lane C
+  sweep + checklist, 09b86e63d0 integration reconcile, 6b074f9168 manifest
+  format, 2f890caa84 toast-free recapture, 59566a2837 Phase 13 record +
+  teardown precondition, 8e7ba5a9cb lane A fix round, 5787094ee8 frontend
+  record + palette comment, 5c371c2fba qa verdict + gate record.
 
 Notes (Lane C, the deferral sweep and the checklist execution, 2026-08-19):
 - TASK 1 delivered in state.md: the head block healed (Phase 12 merged
