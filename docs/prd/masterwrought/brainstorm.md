@@ -72,6 +72,10 @@ recipes today). v1 is pure stats and bounded utility: no new proc effects anywhe
 - A deterministic late-cycle recipe valve beyond the marks vendor (add if a recipe
   fossilizes: vendor, reputation, or quest channel).
 - maxSkill 150 with the next map/level-cap expansion.
+- A gain-curve revisit for the gray-grind shape (qr-GRAY, state.md row 128): below-band
+  crafts gaining at half and quarter rate make the cheapest path to any skill number a
+  bulk spam of low recipes; Phase 15 records the measurement, and any change to
+  tierProgressMultiplier is a future-tier pacing redesign, never an in-packet tune.
 
 ## OPEN items (resolved inside phases, tracked in state.md)
 - Jewelcrafting/inscription station model (phase 05/06 decision).

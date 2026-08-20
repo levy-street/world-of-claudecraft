@@ -23,7 +23,35 @@
 | 10 | Apex consumables and enchants | complete | 2026-08-14 | 2026-08-14 |
 | 10 QA | verify | complete | 2026-08-14 | 2026-08-16 |
 | 11 | Pattern drops and vendors | complete | 2026-08-16 | 2026-08-16 |
-| 11 QA | verify | pending | | |
+| 11 QA | verify | complete | 2026-08-19 | 2026-08-20 |
+| 11b | Farming absorb | pending | | |
+| 11b QA | verify | pending | | |
+| 11c | Food and feast reconciliation | pending | | |
+| 11c QA | verify | pending | | |
+| 11d | Derived artifacts, pins, and the merge audit | pending | | |
+| 11d QA | verify | pending | | |
+| 11e | A true skill, farming's mastery curve and crop roster | pending | | |
+| 11e QA | verify | pending | | |
+| 11f | Farming joins the drop economy | pending | | |
+| 11f QA | verify | pending | | |
+| 11g | The provisioning supply line, leveling tier | pending | | |
+| 11g QA | verify | pending | | |
+| 11h | The provisioning supply line, apex tier | pending | | |
+| 11h QA | verify | pending | | |
+| 11i | The angler's endgame | pending | | |
+| 11i QA | verify | pending | | |
+| 11j | The gathering completion pass | pending | | |
+| 11j QA | verify | pending | | |
+| 11k | The provisioning capstone and prestige | pending | | |
+| 11k QA | verify | pending | | |
+| 11l | The trophy economy | pending | | |
+| 11l QA | verify | pending | | |
+| 11m | Harvest geography and material sinks | pending | | |
+| 11m QA | verify | pending | | |
+| 11n | The vendor floor | pending | | |
+| 11n QA | verify | pending | | |
+| 11o | The leveling crafter | pending | | |
+| 11o QA | verify | pending | | |
 | 12 | The Perfecting stage | pending | | |
 | 12 QA | verify | pending | | |
 | 13 | Orange promotion | pending | | |
@@ -39,6 +67,60 @@
 Deliverable checklists live in each phase's section of `implementation-plan.md`; mark them
 here per phase as they complete, with a Notes line per phase (deferrals become CUT items,
 never future-PR items, per the delivery contract in `state.md`).
+
+THE PLAYER-PAIN BLOCK (11l, 11m, 11n) was ADMITTED by the maintainer on 2026-08-20 and its
+six rows are in the table above. Ten of the fourteen inserted phases exist because of the
+absorb; these three exist because of reported player pain, and they share a method: every
+reported item is re-measured before it becomes a deliverable, because perception is reliable
+about THAT something is wrong and unreliable about WHY. The admission record and the CUT
+procedure are in `implementation-plan.md` under "GATE (CLOSED 2026-08-20, ADMITTED)".
+
+THE QUALITY-REVIEW PHASE (11o) was ADMITTED by the maintainer on 2026-08-20, the same day,
+from the first run of the packet's standing quality review (professions-quality-review.md,
+run against the plan; adoption rows 117 to 133 in state.md). Its two rows are in the table
+above; it runs after 11n and must land before Phase 15. The same adoption pass amended
+files in place across the packet (11i and its twin, 11l, 11m and its twin, 11n, 12, 15,
+16, and smaller corrections in 11d, 11e, 11f, 11g-qa, 11h, 11j, decisions-index.md and
+brainstorm.md); the amendments are recorded at their rows and the full list is in
+professions-quality-review.md's first-run record, not here.
+
+## Absorbed: the farming program (F axis)
+
+The fifth gathering profession shipped as its own packet on `feature/farming-plan` and was
+pulled into this one (see the absorb entry in Notes). Its phases are recorded here on a
+parallel `F` axis so this table is the packet's single status surface; the per-phase record
+itself is not re-typed, it stays whole in the farming packet's own `progress.md`. The file
+bodies under `docs/prd/masterwrought/farming/` keep their original bare "Phase NN"
+numbering and are never renumbered; `F<nn>` exists for cross-packet reference only.
+
+| Phase | Title | Status | Completed | Record |
+|---|---|---|---|---|
+| F01 | Foundation: farming as the fifth gathering profession | complete (absorbed) | 2026-08-08 | docs/prd/masterwrought/farming/progress.md |
+| F02 | Patches and plots | complete (absorbed) | 2026-08-08 | docs/prd/masterwrought/farming/progress.md |
+| F03 | Growth engine | complete (absorbed) | 2026-08-08 | docs/prd/masterwrought/farming/progress.md |
+| F04 | Knobs: compost, farmer's watch, growth tonic, withered husks | complete (absorbed) | 2026-08-08 | docs/prd/masterwrought/farming/progress.md |
+| F05 | Crops and tools | complete (absorbed) | 2026-08-09 | docs/prd/masterwrought/farming/progress.md |
+| F06 | Economy hooks | complete (absorbed) | 2026-08-09 | docs/prd/masterwrought/farming/progress.md |
+| F06b | Release sync (the D22 mid-phase absorb, v0.38.0 at authoring) | complete (absorbed) | 2026-08-13 | docs/prd/masterwrought/farming/progress.md |
+| F07 | Render and juice | complete (absorbed) | 2026-08-14 | docs/prd/masterwrought/farming/progress.md |
+| F08 | Harvest Journal | complete (absorbed) | 2026-08-14 | docs/prd/masterwrought/farming/progress.md |
+| F09 | World presence (go-live) | complete (absorbed) | 2026-08-17 | docs/prd/masterwrought/farming/progress.md |
+| F09b | Bed verbs (the client plant and harvest verbs) | complete (absorbed) | 2026-08-19 | docs/prd/masterwrought/farming/progress.md |
+| F10 | Celebrations | complete (absorbed) | 2026-08-19 | docs/prd/masterwrought/farming/progress.md |
+| F11 | Well-fed food | complete (absorbed) | 2026-08-19 | docs/prd/masterwrought/farming/progress.md |
+| F12 | Shared feast | complete (absorbed) | 2026-08-19 | docs/prd/masterwrought/farming/progress.md |
+| F13 | Integration polish | complete (absorbed) | 2026-08-19 | docs/prd/masterwrought/farming/progress.md |
+| F14 | Final polish (the perfection-sweep actionables) | complete (absorbed) | 2026-08-20 | docs/prd/masterwrought/farming/progress.md |
+
+Every F phase carries a completed QA twin (`farming/phase-NN-qa.md`) except F14, which has
+no twin FILE. SETTLED 2026-08-20 (11b-qa-GATE-9): the F14 QA round was neither waived nor
+skipped, it was FOLDED INTO THE PHASE RECORD, and `farming/progress.md` carries the dated
+QA-CHECKLIST ROUND block with reviewer verdicts, LOW dispositions, N/A verdicts and a full
+gate record on frozen tip 354cff6e77. Only the file is missing, not the round, so Phase 11b's
+QA covers F14's thirteen actionables inside Auditor 7's lane and authors NO retrospective
+twin. Nothing about this is confirmed at 11b STEP 0.
+Farming's own status rows carry dense per-phase verdict text in the date columns; that text
+is deliberately not copied here, it lives in the farming record.
 
 ## Notes
 (append per completed phase)
@@ -560,3 +642,70 @@ never future-PR items, per the delivery contract in `state.md`).
   the overturn feasibility recorded. Full suite 41270 green zero
   failures; gate_select PASS all 12 steps at the tip. Full record:
   state.md "Phase 11 QA ledger".
+- Farming absorb (2026-08-20, the decision record; the merge itself is Phase 11b):
+  the maintainer pulled the completed farming packet INTO this one, so the fifth
+  gathering profession and the ten crafts ship as ONE branch and ONE PR from
+  `feature/masterwrought`. Absorbed tip: `origin/feature/farming-plan` at
+  8cd964d599, 14 phases plus their QA twins (F01 to F14 with F06b and F09b, live
+  in the world since the F09 go-live), recorded on the parallel F axis in the
+  status table above. The merge lands as a true merge commit, never a squash, so
+  farming's history stays reachable and the release-merge convention keeps working.
+  Trial merge against merge-base e56707a675: 160 conflicted paths in six classes
+  (GOLDEN 67, REGEN 27, ART_CENSUS 17, TAIL_APPEND 14, COUNT_PIN 13, SEMANTIC 22),
+  60 of which carry hand-readable source hunks across 5306 conflict lines; the two
+  doc trees conflict on NOTHING (zero `docs/prd/masterwrought/**` and zero
+  `docs/farming/**` entries), so the document side is a layout and authority
+  decision, not a resolution problem. Four phases inserted between 11 QA and 12
+  with no existing number touched and every forward carry left literally correct:
+  11b the absorb, 11c the food and feast reconciliation (the one genuine design
+  collision, one Well Fed system and two distinct feasts), 11d the derived
+  artifacts, pins, and the merge audit (67 goldens, 27 generated artifacts, 13
+  count pins, four monolith ceilings, plus the export and symbol census that is
+  the only thing able to detect a dropped hunk), 11e the farming apex arm and the
+  tier 3 and 4 seed bootstrap. Phases 12 to 17 keep their numbers, titles, and
+  carries, and each grows an explicit farming arm. Contracts superseded, marked in
+  place and never deleted: farming's D22 (local-only: no push, no PR, delivery is a
+  push of `feature/farming-plan`) and its D22 addendum (B) (no PR is ever opened
+  for the farming program). Both remain the correct record of how F01 to F14 were
+  executed, and where a farming phase file and this packet's delivery contract
+  disagree, this contract wins. Adopted upstream from D22 because it is better than
+  what this packet had: the newest `release/**` re-resolved by version sort, the
+  sync-mid-phase rule (an absorb of this size runs as its OWN phase and never
+  shares a diff with feature work), and `--no-ff` phase-boundary merges. The
+  farming record is not re-typed anywhere: `docs/farming/` moves whole to
+  `docs/prd/masterwrought/farming/` in 11b (36 files, 303 in-packet path strings
+  rewritten, five out-of-packet comment citations re-pointed in
+  `tests/monolith_budget.test.ts`, `tests/item_art_consistency.test.ts` twice,
+  `tests/mob_portrait_source_manifest.test.ts`, and `docs/design/deeds.md`, plus
+  the needle in `tests/farming_asset_manifest.test.ts` that would otherwise pass
+  vacuously after the move), `farming/state.md` becomes the farming design
+  authority and this packet's ONE open-item collection point (the MAINTAINER GATES
+  block plus the handoff table, with masterwrought's own open decisions appended at
+  the end and never interleaved), and the new `decisions-index.md` states which
+  namespace lives where. GATE 1 (farming's D11 tier 3 and 4 seed bootstrap: three
+  trainer-visible recipes uncompletable and two deeds unearnable today) stops being
+  a farming-local ruling and becomes a blocker on THIS PR; it is discharged in 11e.
+- The gathering half (2026-08-20, the scope record; supersedes the "Four phases
+  inserted" line in the absorb note above, which stays as the record of what the
+  absorb alone needed): the maintainer widened the goal after the absorb decision.
+  Professions must be INCREDIBLE, every gathering skill must feed the craft economy,
+  and every skill must have real content at ALL levels, so the packet now covers the
+  endgame gear for ten crafts AND the completion of the gathering tier. The insert
+  grows from four phases to TEN, still between 11 QA and 12, still with no existing
+  number touched and every forward carry left correct: 11b, 11c, and 11d are the
+  absorb exactly as recorded above, and 11e through 11k are the gathering half
+  (11e farming's measured mastery curve and crop roster, which also discharges GATE
+  1; 11f farming joins the drop economy; 11g and 11h the provisioning supply line at
+  the leveling and apex tiers; 11i the angler's endgame; 11j the gathering completion
+  pass; 11k the provisioning capstone and prestige). 11f through 11i run ultracode.
+  Four new rulings govern the half and live in `state.md` beside R1 to R16: R17 the
+  provisioner rule, R18 the anti-compulsion guardrail, R19 farming is a long-haul
+  skill, R20 every gathering profession reaches the endgame. The measured facts the
+  scope rests on are recorded in `state.md` and cited by the phase files rather than
+  re-derived: the cooking tree's 17 reagents include no vegetable and no grain, all
+  14 farming recipes are trainer-taught with the ladder ending at skillReq 50,
+  endgame bills per gathering profession run mining 21, herbalism 15, skinning 11,
+  logging 6, and fishing 1 (a fishing rod), and farming is the only gap in the apex
+  gathering-tool family. The stale `phase-11e-farming-apex-arm.md` is replaced by
+  `phase-11e-mastery-curve.md` and deleted; its apex-feast design moves into 11h and
+  11k and its GATE 1 material into 11e, so no table references the old file.

@@ -109,3 +109,122 @@ STOPPING RULES: stop and ask if the Perfecting flow cannot be expressed without 
 repeating driver of its own (a cold-window contract breach), or if the commission fee
 floor demands an economy rule state.md does not record.
 ```
+
+### Farming arm (amended 2026-08-20)
+
+Phase 11b absorbed `feature/farming-plan` into this packet: one branch, one PR, five
+gathering professions and ten crafts shipping as one system. The prompt above is not
+retracted and not rewritten. This section is part of it, and it is the largest amendment
+in the packet. Read it after STEP 0 and fold every item into the matching step.
+
+**The phase's goal grows.** It stops being "dress the Perfecting flow" and becomes: make
+ONE professions interface out of two independently designed families. The reason is hard
+and checkable, not a matter of taste. Farming's entire doc set contains ZERO references
+to `DESIGN.md`, so the Harvest Journal, the plant sheet, the bed verbs, the feast
+tooltip, and `farm_event_feedback` were built and QA'd without the standard ever being
+cited. Phase 14 is the only phase in either packet that can hold them to it, and after
+Phase 14 nothing else will.
+
+**STEP 0 additions.**
+- DECISION 4 (monolith ceiling policy) IS SETTLED (2026-08-20; rows 11b-D-4, 11d-D-4 and
+  11d-U6-PAYBACK). Nothing is confirmed here. 11d took four recorded raises at the exact
+  merged counts, and Phase 14 PAYS BACK the `hud.ts` raise by extraction, because it is the
+  phase that already owns HUD work and the repo rule is that after extracting you LOWER the
+  ceiling. 11d-U6-PAYBACK fixes the target and the acceptance: this phase does not pass until
+  the `hud.ts` ceiling in `tests/monolith_budget.test.ts` reads 19445 or lower AND is LOWERED
+  in the same change, and the `ip-14-UI` professions-module migration does NOT count toward
+  it (a file move relocates zero lines out of `hud.ts`).
+  The measured facts behind that: masterwrought's pin was 19445 at zero slack, farming's
+  pin 19186 with its file at 19183, the merged clean region 19235, the take-theirs floor
+  19324, and the realistic merged resolution about 19460. There is no resolution of
+  `hud.ts` at or under farming's pin, because masterwrought added roughly 141 lines
+  outside every conflict region, so the payback is roughly 274 lines of extraction owed
+  here rather than a number anyone can argue down.
+- Read the packet's open-item collection point (`docs/prd/masterwrought/farming/state.md`)
+  for farming's (be) row, the simplified-mode gathering rows classified as a Professions
+  2.0 surface change. It is an open maintainer ruling touching the same panel family the
+  Masterwrought slot indicators go into. Do not resolve it here; do not contradict it.
+- Memory scan gains: the farming HUD window traps and the mobile window-open body-class
+  family.
+
+**STEP 1 additions (Explore agent).**
+- The merged professions UI family, whole. Masterwrought's roughly 20 modules sit at
+  `src/ui/` root (`crafting_view.ts` / `crafting_window.ts`, `commission_order_view.ts` /
+  `_window.ts`, `enchanting_view.ts`, `craft_denial_line_view.ts`,
+  `craft_celebration_view.ts`, `profession_identity_*`, and the rest). Farming's five sit
+  beside them: `src/ui/farming_plant_sheet_view.ts` / `_window.ts`,
+  `src/ui/harvest_journal_view.ts` / `_window.ts`, `src/ui/farming_view.ts`,
+  `src/ui/farm_event_feedback.ts`, `src/ui/feast_tooltip_view.ts`. There is NO
+  `src/ui/hud/professions/` barrel today (`src/ui/hud/` holds action_bar, battleground,
+  chat, cosmetics, cross_hotbar, delve, fiesta, loot, map, player_card, quest, rift,
+  vendor, warlock).
+- Farming's a11y patterns as shipped, and the axe browser suite rows that bind them.
+- The merged `tests/hud_perf_budget.test.ts` bucket table.
+Return additionally: which farming surface solves each shared visual problem, the exact
+a11y attribute patterns, and the merged bucket assignments.
+
+**STEP 2 additions.**
+- THE MODULE PLACEMENT CALL IS SETTLED (2026-08-20, row ip-14-UI): MINT AND MIGRATE. The
+  prompt above says to land the Perfecting panel in "the matching `src/ui/hud/<domain>/`
+  directory behind its barrel", which as written would split the family: about 25 professions
+  modules at root and one new panel in a barrel. There is no choice left to make and no
+  keep-at-root branch. Create `src/ui/hud/professions/` with an `index.ts` barrel and a local
+  `CLAUDE.md`, and move the WHOLE family behind it as its OWN commit: pure moves plus import
+  re-points, ZERO logic change, so the migration stays reviewable beside the beauty work.
+  Write the `DESIGN.md` compliance statement for the farming windows in this same phase. The
+  migration does NOT count toward the `hud.ts` payback target of 19445 (11d-U6-PAYBACK: a file
+  move relocates zero lines out of `hud.ts`). WHY: the repo rule says HUD-domain components
+  live in `src/ui/hud/<domain>/` behind a barrel, and about 25 root-level professions modules
+  is the shape that rule exists to prevent.
+- ONE of each, across BOTH families:
+  - One token set. Farming's F14 already tokenized the plant sheet's raw rgba and the
+    report window's hard-coded accent; the new masterwrought surfaces use the same tokens.
+  - One window chrome and one empty-state pattern.
+  - One denial-line pattern: `src/ui/farm_event_feedback.ts` versus
+    `src/ui/craft_denial_line_view.ts`. Two shapes for one player moment.
+  - One timer presentation. Farming's growth countdown and the Perfecting rank track are
+    the SAME visual problem solved twice by two teams.
+  - One placement-verb copy pattern. Farming minted a "set out" bags hint for the feast
+    because "Click to use" was wrong; masterwrought's residual is the station log line
+    with the article dropped. Two verbs, two copy patterns, one player action.
+- REUSE farming's a11y patterns rather than reinventing them: single-select rows as a
+  radiogroup (never `aria-pressed` toggles), `aria-busy` on in-flight sends, `aria-live`
+  on flip-to-ready. The Perfecting panel has all three shapes (single-select target rows,
+  an in-flight attempt, a flip to Perfected), and the axe browser suite already binds them
+  for the farming windows.
+- JOIN the mobile body-class family. Farming fixed the mobile window-open body-class gap
+  family-wide for its two windows and wrote the jsdom pin; the Perfecting panel
+  participates identically and uses that pin as its template.
+- THE CONSUMABLE TRAY IS A FIX, not an eyeball. Phase 11 recorded the tray truncating at
+  6 with 6 kinds already competing; farming adds four buff dishes, a feast, and the growth
+  tonic. Design the overflow, do not defer it. The packet has no defer.
+- Perf contract on a MERGED budget file: masterwrought adds the Perfecting painter to a
+  `tests/hud_perf_budget.test.ts` that already carries farming's journal painter. Buckets
+  are re-sorted on the merged tree, never on either branch's.
+- Screenshots: a new subtree needs its sparse-checkout cone row AND its `ci_workflow`
+  literal in the SAME commit (farming's `docs/screenshots/farming-phase-13/` is the
+  worked example). The PR body now references both packets' capture sets.
+
+**STEP 5 additions (acceptance).**
+- [ ] Module placement call made and recorded; the professions family is not split
+- [ ] One token set, one chrome and empty state, one denial-line pattern, one timer
+      presentation, one placement verb, stated with the file that now owns each
+- [ ] Farming's radiogroup, `aria-busy`, and `aria-live` patterns reused, not reinvented
+- [ ] Perfecting panel in the mobile body-class family with the jsdom pin extended
+- [ ] Consumable tray overflow FIXED against the merged kind count, not truncated
+- [ ] `hud.ts` ceiling payback landed by extraction and the ceiling LOWERED, with the
+      merged numbers quoted in the ledger row
+- [ ] Merged `hud_perf_budget` buckets green and re-sorted on the merged tree
+- [ ] DESIGN.md compliance stated with evidence for the FARMING windows as well as the
+      new ones
+
+**What the QA twin additionally owes.** Its correctness-and-design agent states DESIGN.md
+rollout compliance for the farming windows with evidence, because they have no prior
+statement of any kind; its frontend-contract agent audits a merged bucket table and a
+`hud.ts` whose slack was consumed by the union; its i18n-and-mobile agent covers both
+screenshot subtrees and both placement-copy patterns.
+
+**Stopping rule, added.** The module placement call is settled (ip-14-UI) and is never a
+stop. Stop and ask if the migration cannot be done without moving a farming window that an
+open farming ruling still governs, or if the `hud.ts` payback cannot reach 19445 without
+touching sim or server behavior.

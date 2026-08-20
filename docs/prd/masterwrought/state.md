@@ -75,6 +75,127 @@ Branch: `feature/masterwrought` (worktree `~/Documents/wocc-masterwrought`), bas
     dedicated naming phase (ids are frozen and never change).
 16. R16 Duplicate apex pieces: wearing two copies of the same apex item is allowed inside
     the cap (v1 pieces are pure stats, so copies are harmless). Revisit if v2 adds effects.
+17. R17 THE PROVISIONER RULE (R17 to R20 were added 2026-08-20 with the professions
+    completion program, phases 11b to 11k; same standing as R1 to R16, do not
+    re-litigate). Farm produce feeds the CONSUMABLE professions (cooking and alchemy) at
+    every rung, and NEVER the gear chain, the Perfecting materials, or
+    recipe_quickening_catalyst (the packet's one pacing gate). Grain and vegetables are
+    the third gathering input family, beside meat and fish and beside herbs. The reason
+    is measured: the whole cooking tree uses 17 distinct reagents and NOT ONE is a
+    vegetable or a grain, so a fifth gathering profession whose entire output is produce
+    ships with no buyer at all. The rule fills that hole where it belongs (food and
+    flasks) rather than routing produce into gear, where it would push against R5's power
+    envelope and put a wall-clock-gated input in front of the one gate that paces the
+    whole packet.
+18. R18 NEED THE OUTPUT, NEVER THE SLOT (the demand engine; stated positively because it
+    is one, and amended 2026-08-20 from its original defensive framing as "the
+    anti-compulsion guardrail", which undersold it). Professions are needed through
+    their OUTPUT and never through a character slot. Everyone needs what professions
+    make: flasks, feasts, food, enchants, near-raid gear. Nobody needs to have TAKEN a
+    given profession to equip, enter, or complete anything. Those two sound similar and
+    behave in opposite directions. Needing the slot is a tax every player resents and
+    every game eventually refunds (TBC's bind-on-pickup gear requiring the profession to
+    equip; Wrath's equal mandatory perk per profession). Needing the output is the
+    largest possible market, because the buyers are the entire playerbase rather than
+    only the people who took the craft. The market is the bridge, and it is what makes
+    every profession's output continuously valuable to the whole realm. Mechanically:
+    every farm produce item stays market-listable
+    `kind: 'junk'`, with tiers 1 and 2 vendor-stocked, so a raider buys grain the way a
+    raider already buys sunpetal_herb. Farming rows are ADDED to bills alongside the herb
+    and meat rows, never substituted for them, which is also how this packet honors
+    farming's D24 displacement guardrail: herbalism loses nothing. No profession is ever
+    required to equip, raid, or craft gear. This guardrail is load bearing rather than
+    cautious: compulsion (the gathering profession that quietly becomes homework) is the
+    recurring REAL failure the packet's own research identified across every game
+    surveyed, and it is the single condition under which produce may be a first-class
+    reagent at all.
+19. R19 FARMING IS A LONG-HAUL SKILL. Its gain curve is deliberately slower than the
+    other four gathering professions because harvests are wall-clock gated, not
+    swing-gated. FARMING_GAIN_SCHEDULE (1 / 0.5 / 0.1 / 0.02 by band, carrying the source
+    marker "TUNING, PROVISIONAL, FLAGGED FOR THE MAINTAINER") is tuned against a MEASURED
+    calendar-days-to-100 model built from real bed counts and real cycle times, never
+    from feel. Slower pacing never becomes punishment: no daily reset, no decay, and a
+    late harvest still costs only opportunity. Farming's anti-chore contract holds
+    absolutely, and the day it would have to bend is the day the curve is wrong, not the
+    day the contract is.
+20. R20 EVERY GATHERING PROFESSION REACHES THE ENDGAME. No gathering profession may be
+    absent from recipes at skillReq 100 or above, nor from any 25-point band below it,
+    and this is enforced by a TEST, not by intention. The census that forced the ruling:
+    endgame bills (skillReq >= 75) run mining 21, herbalism 15, skinning 11, logging 6,
+    and FISHING 1, where that one row is recipe_tidewrought_fishing_rod, so fishing feeds
+    only itself; farming's own ladder tops out at skillReq 50 with all 14 recipes
+    acquisition ['trainer'] against masterwrought's 28 acquisition ['drop']; and the apex
+    gathering-tool family (arcanite_mining_pick 150, elderwood_axe 150, sunpetal_sickle
+    150, tidewrought_fishing_rod 125) has exactly one hole, farming, whose ladder ends at
+    osmium_hoe at engineering 75. Intention is what produced that spread; a pinned test is
+    what keeps the next profession from repeating it.
+21. R21 DEMAND-SIDE DESIGN (added 2026-08-20 with the player-pain block, phases 11l to
+    11n; same standing as R1 to R20). Every profession's output must be CONSUMED by the
+    endgame at a rate that sustains a real market. Content is tuned so the prepared
+    player is meaningfully stronger, consumables are spent per raid night rather than
+    hoarded, and no profession produces something nobody repeatedly needs. R20 is the
+    supply half of one invariant and R21 is the demand half: R20 proves every gathering
+    profession feeds the crafts, R21 proves the world eats what the crafts make. A
+    profession that feeds a recipe nobody buys is still dead content, and ONLY the demand
+    half catches it. The worked example, which is exactly the fault R20 cannot see: the
+    enchanting reagent ladder runs arcane_dust (9 recipes, 27 units), arcane_essence (19
+    recipes, 40 units), arcane_shard (2 recipes, 10 units, and BOTH consumers are
+    skill-25 tool charms), lucent_reagent (apex). arcane_shard is what disenchanting a
+    rare yields, at roughly 6 to 7 per disenchant, so the third rung of a four-rung
+    ladder is the one a mid-to-high player produces most and has almost nowhere to send.
+    R20's census passes this happily, because enchanting appears in plenty of recipes at
+    every band. THE LINE R21 DOES NOT CROSS: pushing demand is right and it inverts past
+    a point. If content is tuned so hard around the full kit that arriving without it
+    means you cannot clear, professions stop being desirable and become a checklist, and
+    the players who love professions feel it first. R5's 5 percent envelope is that line:
+    prepared is meaningfully stronger, unprepared is behind and never locked out.
+22. R22 NO MATERIAL IS GEOGRAPHICALLY TRAPPED. Every mapped corpse-harvest component
+    family must reach a floor of templates, zones, and at least two level bands, and no
+    mob template may carry a component tag absent from HARVEST_COMPONENT_ITEMS. Enforced
+    by a test. The census that forced it: tag membership decides a material's whole
+    geography, and the spread ran tusk 2 templates, silk 3, venomSac 4, claw 6, cloth 7,
+    meat 15, fang 16, hide 33, a 16x range. Silk at three templates is why a leveled
+    player farms starter-zone spiders and competes with new players for them, and why
+    tailoring reads as trivial and miserable at once: it consumes both ends of the
+    spread. Two tags, `horn` and `gills`, sat on templates while mapping to nothing, so
+    those corpses yielded nothing AND inflated the concentration bonus on every mixed
+    template carrying them. THE FLOOR IS MEASURED IN REACHABILITY, NOT MEMBERSHIP: a
+    floor met by tagging a raid boss and a dungeon rare is the same bug with a passing
+    test, so the count only admits templates a player at the relevant level meets in
+    ordinary play.
+23. R23 A VENDOR IS A FLOOR, NEVER A COMPETITOR. No vendor-sold item may sit within the
+    decided margin of a crafted equivalent on the axis that matters, and the margin
+    WIDENS as the rungs climb. Enforced by a test. The measured fault: crafted potions
+    beat vendor potions by 9.1 percent at the bottom rung and under 3.7 percent at the
+    top, so the advantage shrinks exactly where professions are supposed to matter most,
+    while the vendor sells an unlimited substitute at a fixed price. No player pays a
+    crafter for 3.7 percent, which is why the reported experience is that leveling
+    alchemy to sell potions is pointless. The floor is created by lowering the VENDOR
+    line and never by raising the crafted line: that direction leaves R5's ceiling
+    exactly where it was measured, so the power verification inherits no new work. A
+    floor is also not a cliff: a player with no crafter, no gold, and no market access
+    must still be able to buy something that works, so the nerf weights toward the top
+    rungs where the crafted economy lives and the player has options.
+
+THE RULING-NUMBER COLLISION, standing rule for R17 to R23 (recorded 2026-08-20; the
+Phase 11e Decision F default, applied packet-wide). These numbers ALREADY MEAN something
+else in shipped source and docs: the Professions 2.0 / professions-tuning R series, which
+`src/sim/` cites at R1, R4, R8, R9, R14, R19, R22, R30, R35, R37, R39, R40, R42, R45 to
+R50. Two are live landmines. Shipped R19 is the fishing teaching-ceiling ruling, cited from
+`src/sim/professions/fishing.ts`, `src/sim/professions/CLAUDE.md`,
+`docs/design/professions.md`, and a farming test titled "the R19 composition"; masterwrought
+R19 is farming's gain curve, and Phase 11e writes it into a comment one screen from that
+test. Shipped R22 is the wield-gate ruling, cited as "R22/R50" in
+`src/sim/content/professions.ts`; masterwrought R22 is the harvest-geography floor, and
+Phase 11m edits that very file.
+THE RULE: packet doc numbers STAND and are never renumbered (they are cited from every
+phase file and every ledger). But every R-number written into `src/`, `server/`, `tests/`,
+any `CLAUDE.md`, or `docs/design/` by these phases is spelled "masterwrought R<n>" IN FULL,
+never bare. A bare R-number in those files means the Professions 2.0 series, permanently.
+`docs/design/professions.md` is the sharpest case and the reason `docs/design/` is in scope:
+it is the OTHER series' own authority file, it already cites R19, R20 and R22 by bare number,
+and Phase 11j writes masterwrought R17 to R20 into it. Reviewers: a bare packet R-number in a
+source, test, or `docs/design/` comment is a finding, not a nit.
 
 ## Power placement (the numbers every content phase authors against)
 - Budget formula: `src/sim/item_budget.ts` `primaryStatBudget`; crafted source level =
@@ -111,7 +232,12 @@ Lucent Crystal (same enchanting-material role class) recorded against the Lucent
 Phase 11 head, per ruling (9): the four aura DISPLAY names (Ironhusk Vigor, Warboar
 Might, Runewater Clarity, Well Fed) registered GENERIC-with-caveat in naming-audit.md
 (Well Fed's caveat: WoW's verbatim same-role food-buff name, kept as a plain-English
-state description).
+state description). AMENDED 2026-08-20 (state-OPEN-WELLFED, in "Decisions closed
+2026-08-20" below): the Well Fed caveat's SECOND clause, the one that said the registry
+row must say so or one of the two mechanics is renamed, is RETIRED by the 11c
+unification. After 11c there is ONE Well Fed (one aura id `well_fed`, one mechanic, one
+ladder), so neither mechanic is renamed and the condition that created the caveat is
+gone. Phase 16 writes the amendment into naming-audit.md with this date and reason.
 Phase 03 amendments: Prismstone Setting RENAMED to Prismglass Setting (FFXIV ships a real
 'Prismstone' crafting material in the same component role, plus WoW's Prismstone Ring;
 Prismglass verified zero-hit). Phase 03 QA amendment (v0.36.0 merge supersession): the
@@ -535,8 +661,18 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   ru_RU chr_nightbloom_first_cast DESC row is pre-existing romanized junk ("Poymay
   rybu..."), name row fixed here, desc left for the fill; (6) sv_SE split-vintage rows
   and the register-clash trio (de/pl/tr) remain from earlier ledgers.
-- Maintainer borderlines recorded in naming-audit.md (stopping rule, no unilateral
-  rename): the zones The Amberfall / The Frostveil Reach / The Nightbloom, the Galecrest
+- Maintainer borderlines recorded in naming-audit.md. CLOSED 2026-08-20 by the maintainer,
+  NARROWLY: rename the profession-related name, leave the world alone ("if these are zones
+  like map zones, let's not mess with that. Let's just stick to profession related stuff").
+  RENAME IN THIS PACKET, Phase 16: the 'Enchant <Slot> - <Stat>' scheme, the only
+  profession-related entry (verbatim WoW formula trade dress on ENCHANTING content).
+  DO NOT RENAME, no phase may touch them: the zone families and the timing-parallel coins.
+  Those are world identity, not professions; all were BORDERLINE not infringing, several
+  plausibly predate the other property, and a shipped-zone rename cascades through zone
+  identity, POIs, quest text, the map, the wiki, the guide and every locale. Highwatch and
+  Moonrest were REFUTED and stay. No follow-up rename packet exists or should be scheduled.
+  Full record: the "Recorded for the maintainer" section of naming-audit.md, and row 114.
+  The original borderline list, for reference: the zones The Amberfall / The Frostveil Reach / The Nightbloom, the Galecrest
   zone family (verifiers confirmed Stonemaier's Libertalia: Winds of Galecrest coined
   the word), the Highwatch town family (refuted as TERA-distinctive), the Voidscar zone
   family (WoW Midnight's Voidscar Arena is contemporaneous; ours shipped 2026-07-07),
@@ -3511,7 +3647,7 @@ applied in the fix round or recorded below.
   enchantsNoteOffhand) ride the release fill, as recorded by the
   enchanting arm.
 
-### OPEN maintainer decisions (the standing three, one WIDENED)
+### Maintainer decisions (the standing three, one WIDENED); ALL CLOSED 2026-08-20
 - Reliquary curation now covers FOUR crafted-primary epic tools:
   masters_field_forge, makers_charm, grand_cauldron, laden_hearth (the
   professions_specimens fishing-rod counter-precedent applies to all four
@@ -3519,6 +3655,17 @@ applied in the fix round or recorded below.
   invisible placeable stations. The masterwork:engineering revisit
   trigger stands. Plus, new this phase: the flask logout-persistence
   schema call above.
+- CLOSED 2026-08-20 (the full delegation). All of these are now answered;
+  the record is "Decisions closed 2026-08-20 (the full delegation)" at the
+  end of this file. Reliquary curation for the crafted epic tools and forge
+  world-visibility stay as ruled at Phase 10 QA (out, and party-visible).
+  The fired masterwork:engineering revisit trigger is
+  state-OPEN-MASTERWORK: Phase 12 re-judges and amends
+  docs/design/reliquary.md in the SAME change that moves R1 suppression to
+  the effect gate, because craftIsGearCapable('engineering') flips and
+  falsifies the cited reason. The flask logout-persistence call stays
+  session-bound at 1200s as ruled in-session; the flask owner-cancel
+  deviation is state-OPEN-FLASK, CLOSED-keep.
 
 ## Phase 10 QA release sync (2026-08-14, merge 33d641773f; the QA audit itself runs in a follow-up session)
 
@@ -5121,6 +5268,17 @@ recorded, or refuted with the file open)
   heroic-claim golden, roughly half a day, feasibility recorded above;
   (b) the standing flask owner-cancel classic deviation remains posted
   for review with phase 14's wire marker (unchanged from the build).
+  BOTH ANSWERED 2026-08-20 under the full delegation; the record is
+  "Decisions closed 2026-08-20 (the full delegation)" at the end of this
+  file. (a) is OVERTURNED (state-OPEN-RIFT): take the overturn and close
+  the residual BEFORE 11f, or as 11f's own first commit, because 11f
+  appends a draw after draw 6 in the rift reward stream and a rollGroup at
+  the nythraxis_boss_arena tail, which is exactly the rank-local insertion
+  the missing C/B/S goldens would cover; the sibling heroic-claim
+  Nythraxis residual closes with it. (b) is KEEP AS SHIPPED
+  (state-OPEN-FLASK), recorded CLOSED-keep so it stops sitting in the open
+  list; phase 14's flask_<kind> shared-glyph note proceeds on its own
+  merits and does not reopen the cancel semantics.
 - PHASE 12 CARRIES: unchanged from the Phase 11 BUILT ledger (the
   rolled.quality successor ruling, promotion re-validation, the
   heroic-raid sunderable flip premise, the reliquary pin trio, the
@@ -5128,3 +5286,1377 @@ recorded, or refuted with the file open)
   movement:true on the re-mint arm, the Infusion slot/stat, the
   masterwork guide prose apex clause). This QA adds NOTHING new owed to
   phase 12.
+
+## The professions completion program (phases 11b to 11k, recorded 2026-08-20)
+- WHY THE PROGRAM EXISTS: the maintainer pulled the COMPLETED farming
+  packet (origin/feature/farming-plan, 14 phases, decisions D1 to D24,
+  docs now at docs/prd/masterwrought/farming/) into this one, and then
+  widened the goal past the absorb itself: professions must be
+  INCREDIBLE, every gathering skill must feed the craft economy, and
+  every skill must have real content at ALL levels. The four absorb
+  phases as first planned (11b to 11e) only merged the two trees and gave
+  farming an endgame arm. The census below finds the same gap in
+  fishing, in logging, and across the 75-plus band of the whole catalog,
+  so 11e is re-cut and the program runs to 11k. 11b, 11c and 11d stand as authored;
+  phases 12 to 17 keep their numbers, their titles, and every forward
+  carry; the delivery contract is unchanged, ONE branch and ONE PR, and
+  an item is in the packet or explicitly CUT.
+- THE MEASURED GAPS (the maintainer's own investigation, 2026-08-20;
+  these numbers are the authoring basis for every phase below, and are
+  not to be re-derived or contradicted):
+  - The whole cooking tree uses 17 distinct reagents and NOT ONE is a
+    vegetable or a grain. Farming's entire output is produce, so the
+    fifth gathering profession ships with no buyer at all.
+  - All 14 farming recipes are acquisition ['trainer'] and zero are
+    drop; masterwrought alone adds 28 acquisition ['drop'] recipes.
+    Farming's ladder tops out at skillReq 50 (4 rows at 0, 3 at 25, 7 at
+    50) with nothing at 75, 100 or 125.
+  - Recipes by skillReq across the whole game: 32 at 0, 28 at 25, 23 at
+    50, 17 at 75, 26 at 100, 3 at 125, 3 at 150. The top of the catalog
+    is thin everywhere, not only in farming.
+  - Endgame bills (skillReq >= 75) per gathering profession: mining 21,
+    herbalism 15, skinning 11, logging 6, FISHING 1, and that single
+    fishing row is recipe_tidewrought_fishing_rod, so fishing feeds only
+    itself. (AMENDED 2026-08-20, quality-review adoption row 130: the
+    fishing count measures 2 on this tree, recipe_stormreel_fishing_rod
+    at engineering 75 also consumes glimmerfin_koi; BOTH rows are fishing
+    rods, so the conclusion stands unchanged. Mining measures 20 under
+    the node-family derivation; the census family definitions are pinned
+    by 11j Agent 1's derivation, which is the authority at test time.)
+  - recipe_sageleaf_chowder is a CHOWDER whose reagents are
+    seasoned_stock, prime_cut, game_meat, sunpetal_herb and cooking_salt.
+    There is no fish in it.
+  - The apex gathering-tool family is engineering-crafted:
+    arcanite_mining_pick 150, elderwood_axe 150, sunpetal_sickle 150,
+    tidewrought_fishing_rod 125. Farming's ladder ends at osmium_hoe at
+    engineering skillReq 75, the family's only hole.
+  - Fishing: maxSkill 200 with FISHING_GAIN_SCHEDULE bands at
+    50/100/150/200; six raw fish exist (raw_mirror_trout,
+    raw_river_perch, raw_marsh_pike, raw_bog_eel, raw_frostgill_trout,
+    raw_stonescale_carp) across THREE catch bands, and rod tier 3 already
+    reaches the last band. Fishing 200 grants prog_master_angler (the
+    Master Angler title and 25 renown), and that is the entire reward for
+    150 points of grind.
+  - FARMING_GAIN_SCHEDULE is 1 / 0.5 / 0.1 / 0.02 by band and is marked
+    in source as "TUNING, PROVISIONAL, FLAGGED FOR THE MAINTAINER".
+  - Farm crop skill gates are DERIVED from tier through the shared
+    25-point band math, under an explicit invariant that a crop can never
+    disagree with the profession's ladder. A crop gated at an arbitrary
+    skill such as 90 is NOT available; re-tiering is a ladder decision,
+    never a per-crop one.
+  - Farming's 8 crops: T1 vale_wheat, brook_carrot; T2 marsh_rice,
+    bog_beet; T3 highland_barley, frost_gourd; T4 gilded_sunmelon,
+    evergarden_greens, each with a fine_ twin. The two tier-4 fine twins
+    currently have NO consumer.
+  - The three role plates (stonepot_stew buff_sta, warspice_skewers
+    buff_ap, sageleaf_chowder buff_int) carry byte-identical bills today
+    and NO test pins them identical, so they may be differentiated.
+- THE PHASES (titles as minted at authoring; if a later re-cut moves a
+  title the phase file is the authority and the goal here is what the row
+  promises):
+  - 11b THE FARMING ABSORB: merge feature/farming-plan in whole (160
+    conflicted files, the docs move, farming's item rows ported onto
+    masterwrought's ItemDef discriminated union).
+  - 11c FOOD AND FEAST RECONCILIATION: settle the one genuine design
+    collision, Well Fed and the two feast objects, so the merged tree
+    carries one ladder and two non-substitutable feasts.
+  - 11d DERIVED ARTIFACTS, PINS, AND THE MERGE AUDIT: re-derive every
+    self-minting artifact (goldens, generated files, count pins, monolith
+    ceilings) predicted-then-observed, plus the export and symbol census
+    that can actually detect a bad resolution.
+  - 11e A TRUE SKILL, FARMING'S MASTERY CURVE AND CROP ROSTER: settle
+    FARMING_GAIN_SCHEDULE against the measured calendar-days-to-100 model
+    that R19 requires; grow the roster from two crops per tier to
+    2 / 2 / 4 / 4; reconcile the tool effects; and discharge GATE 1 (the
+    D11/(bo) tier 3 and 4 seed faucet). GATE 1's answer is SETTLED
+    (11b-D-1, state-GATE-7): vendor-stock the seeds at farmer_hollis in
+    Highwatch and farmer_verbena in Evergarden, at buyValue 32 for tier 3
+    and 64 for tier 4 (11e-D-D), which un-dorms highwatch_barley_porridge,
+    evergarden_braised_greens and recipe_harvest_feast plus both parked
+    deeds at once. It is EIGHT rows once 11e-D-B grows the roster, not
+    four. GATE 1 is discharged HERE and nowhere else: exactly one
+    bootstrap, and every downstream phase proves it by reading the merged
+    vendorItems arrays in code.
+  - 11f FARMING JOINS THE DROP ECONOMY: pattern items on the shipped
+    Phase 02 machinery, the channel flip that moves the top rungs from
+    acquisition ['trainer'] to ['drop'] while the low rungs stay
+    trainer-taught, append-only loot placement across raid, dungeon and
+    rift, the Heroic Quartermaster valve so nothing fossilizes, and the
+    rung climb that adds the missing 75 / 100 / 125 rows.
+  - 11g THE PROVISIONING SUPPLY LINE, LEVELING TIER: put grain and
+    vegetables into cooking and alchemy bills at rungs 0 to 50, closing
+    the bottom of the 17-reagent hole, with R17's scope as the fence and
+    R18's add-never-substitute rule pinned.
+  - 11h THE PROVISIONING SUPPLY LINE, APEX TIER: the same supply line at
+    rungs 75 to 150, the first consumers for the two tier-4 fine twins,
+    and the differentiation of the three byte-identical role plates.
+    recipe_quickening_catalyst stays untouched on purpose and the ledger
+    says why. AMENDED 2026-08-20 (11h-GATE-E): the apex feasts are NOT
+    minted here. 11h mints ZERO new item ids; it authors the apex feast
+    bills' reagent lines and 11k mints the feasts themselves at cooking
+    125, because 11k owns every keyed site a placeable feast touches.
+  - 11i THE ANGLER'S ENDGAME: make fishing feed something other than its
+    own rod (the catch bands, the six raw fish, the rod ladder, and a
+    reward at 200 that is more than a title).
+  - 11j THE GATHERING COMPLETION PASS: land the R20 guard test, run the
+    band audit and fill what it finds, raise the two thin gathering arms
+    (logging and skinning) into the endgame band, and close the apex tool
+    family's one hole with farming's apex hoe.
+  - 11k THE PROVISIONING CAPSTONE AND PRESTIGE: the three apex Harvest
+    Feasts serving the shipped role plates through feast.dishItemId, the
+    craft-signing prestige that needs no new machinery, the one
+    cross-packet deed, the wiki page, and the program's closing
+    whole-catalog obligation sweep.
+- THE FOUR NEW RULINGS, and what each one FORBIDS (full text in the
+  locked-rulings section above; cite them by number):
+  - R17 THE PROVISIONER RULE forbids farm produce in the gear chain, in
+    the Perfecting materials, and in recipe_quickening_catalyst, the
+    packet's one pacing gate. Produce feeds cooking and alchemy, at every
+    rung, and nothing else.
+  - R18 THE ANTI-COMPULSION GUARDRAIL forbids unlistable or soulbound
+    produce, forbids substituting a farming row for the herb or meat row
+    it sits beside (farming's D24 displacement guardrail, so herbalism
+    loses nothing), and forbids any profession being required to equip,
+    raid, or craft gear.
+  - R19 FARMING IS A LONG-HAUL SKILL forbids tuning the gain curve from
+    feel instead of from the measured calendar-days-to-100 model, and
+    forbids every punishment lever: no daily reset, no decay, and a late
+    harvest costs only opportunity.
+  - R20 EVERY GATHERING PROFESSION REACHES THE ENDGAME forbids any
+    gathering profession being absent from skillReq 100 and above or from
+    any 25-point band below it, and forbids leaving that to intention:
+    the guarantee is a test or it does not exist.
+- MAINTAINER GATES this program INTRODUCED, ALL CLOSED 2026-08-20 under
+  the full delegation. None is a STEP 0 question any more: every phase
+  file now carries its answer as an instruction the session executes. The
+  one collection point is the section "Decisions closed 2026-08-20 (the
+  full delegation)" at the END of this file, and the ids below point into
+  it. A phase file and that record disagreeing is doc drift to fix, never
+  a licence to pick.
+  - CLOSED, see 11e-D-A and state-GATE-1. The farming gain-curve target
+    span (R19) is about 10 weeks, 70 to 75 days, for the reference farmer,
+    with a floor of about 5 weeks at maximum dedication. The four gain
+    VALUES are DERIVED by 11e from the measured model and recorded; the
+    four belowProficiency BOUNDARIES (25/50/75/100) are FROZEN, because
+    farmingTeachingCeilingFor derives each crop tier's teaching ceiling
+    from them.
+  - CLOSED, see 11e-D-B and state-GATE-2. The crop roster grows by +4
+    crops, 12 new item ids, ITEM_ART_PENDING 44 to 56. Composition is
+    ruled with it: exactly one of the two new tier-3 crops is a LEAF, and
+    no tier repeats a plant class.
+  - CLOSED, see 11f-GATE-A and state-GATE-3. The farming ladder re-tiers
+    band-complete to 0/25/50/75/100 and STOPS there: recipe_harvest_feast
+    climbs to cooking 100 rather than 125, and
+    recipe_highwatch_barley_bannock holds at 50 as the band-50 anchor.
+    Moving rows the ladder advertises is authoring rather than a retune,
+    because farming lives on an unmerged branch and reaches players only
+    through this packet's single PR.
+  - CLOSED, see 11i-GATE-A and state-GATE-4. The fishing ladder grows
+    THREE new catch bands (3, 4, 5) plus a tier-6 apex rod, not one band;
+    the nine shipped cells stay byte identical. REJECTED: the existing
+    three bands taking new fish behind the shipped tier-3 rod.
+  - CLOSED, see state-GATE-5 and ip-16-ICON. PARK. Every new id from 11e
+    to 11k parks on the merged ITEM_ART_PENDING with exactly ONE
+    mapping.json owner; committed WebP art is not attempted in-change, and
+    the art wave runs on the maintainer's own schedule after the packet.
+    The growth is ACCEPTED, and each phase re-derives the pending size
+    from the previous phase's observed value.
+  - CLOSED, see 11j-D-F and state-GATE-6. THE R17 GATHERING-TOOL CARVE-OUT
+    STANDS, scoped by TEXT to the hoe ladder alone and recorded as a
+    CLARIFICATION beside R17, never as a change to R17. R17's text above is
+    untouched, and every other exclusion (the gear intermediates, the apex
+    gear bills, the Perfecting materials, and recipe_quickening_catalyst)
+    stays asserted by sweep. The merits: a gathering tool has no equip
+    slot, contests no item-level budget, and has no R5 interaction, so it
+    is not gear in R17's sense, and the shipped recipe_osmium_hoe already
+    consumes fine_highland_barley under farming's deviation (ad).
+  - CLOSED, see 11b-D-1 and state-GATE-7, and still tracked as the
+    packet's hardest blocker until a phase VERIFIES it in code: GATE 1,
+    the D11/(bo) tier 3 and 4 seed bootstrap. FIX the faucet by
+    vendor-stocking every tier 3 and tier 4 seed at farmer_hollis and
+    farmer_verbena on the D11 tier 1/2 pattern, executed ONCE in 11e,
+    priced per 11e-D-D, at EIGHT rows after 11e-D-B. No downstream phase
+    may treat reagent dormancy as settled: 11f STEP 0, 11g DECISION B, 11h
+    and 11k all prove the faucet by reading the merged vendorItems arrays
+    in code, never a ledger row.
+- SAME-CHANGE OBLIGATIONS, restated because this program mints more
+  content ids than any phase before it: every new id carries committed
+  WebP art (which needs the maintainer's master SHA, so new ids park in
+  ITEM_ART_PENDING with exactly one mapping.json owner), non-Latin name
+  fills for wordy English names (M16), wiki regen through
+  npm run wiki:content, Book of Deeds records where the content is
+  conquerable, src/ui/world_entity_i18n.ts rows for named entities, and
+  an economy-invariant recheck. tests/recipe_economy.test.ts is edited by
+  BOTH packets and its sorted literal pins are RECOMPUTED from the tree,
+  never hand-merged. Every new proper noun is web-verified against the
+  major game wikis at authoring time and recorded in the naming registry
+  (R15, and farming's D17).
+- WHERE THE OPEN ITEMS LIVE (amended 2026-08-20 by state-COLLECT).
+  farming's own state.md (docs/prd/masterwrought/farming/state.md) remains
+  the packet's ONE open-item collection point once it exists, GATE 1
+  included. Until 11b's doc move creates it, delegated answers live in
+  THIS file, in the dated append-only block "Decisions closed 2026-08-20
+  (the full delegation)" at the end, never interleaved. 11b STEP 6
+  MIGRATES that block into farming/state.md's handoff table in the SAME
+  commit as the doc move, converting each row to that file's status
+  vocabulary (open ruling-owed, closed-by-X) and leaving a one-line
+  pointer behind here; 11b STEP 6 also states the append convention. The
+  rulings themselves stay in the R namespace in this file, and
+  decisions-index.md is the key to the five namespaces and the
+  never-renumber rule.
+- THE PLAYER-PAIN BLOCK (11l, 11m, 11n), admitted 2026-08-20 and recorded
+  at the gate section in implementation-plan.md, extends this program by
+  three more inserted phases on the same axis, carrying R21, R22 and R23.
+  All three are data work over shipped content: 11l gives the 21 orphaned
+  junk drops profession consumers with zero new item ids, 11m spreads
+  harvest geography and maps the two orphan tags, and 11n makes the vendor
+  line a floor rather than a competitor. Their decisions (11, 12 and 13)
+  are settled in "Decisions closed 2026-08-20 (the full delegation)"
+  below. The inserted block is therefore THIRTEEN phases, 11b through 11n,
+  not ten. (AMENDED 2026-08-20, quality-review adoption row 117: the block
+  is FOURTEEN phases, 11b through 11o. Phase 11o, the leveling crafter,
+  was admitted from the standing quality review's first run and runs after
+  11n and before Phase 12.)
+
+## Decisions closed 2026-08-20 (the full delegation)
+
+THE DELEGATION, in the maintainer's own words: "For anything open, just do what is best for
+the feature and the game. I want it fantastic and truly remarkable of a feature." Every gate
+in this packet that read "confirm at STEP 0" or "maintainer gate" is ANSWERED below, and the
+phase files now carry each answer as an instruction rather than a question. ONE item is
+handed back, and only one, because it needs an input that does not exist yet: ip-17-PUSH
+needs the maintainer's consent to push. (AMENDED 2026-08-20 by the quality-review adoption
+pass, row 132: this header formerly said TWO items and "CLOSED to RENAME ALL", both stale
+against its own row 114. ip-NAME-BORDERLINE was the second hand-back and was CLOSED
+2026-08-20 NARROWLY: one rename, the 'Enchant <Slot> - <Stat>' scheme, owned by Phase 16;
+the zones and coins never rename. Row 114 is the authority.) It formerly needed a brand and
+IP-risk judgment on names that are already live in players' hands; that judgment is made.
+
+WHAT THIS BLOCK IS. It is the dated DELEGATED RULINGS block state-COLLECT names: APPEND-ONLY,
+at the END of this file, never interleaved. It lives here until 11b's doc move runs. 11b
+STEP 6 MIGRATES it into docs/prd/masterwrought/farming/state.md's handoff table in the SAME
+commit as the doc move, converting each row to that file's status vocabulary (open
+ruling-owed, closed-by-X) and leaving a one-line pointer behind here.
+
+HOW TO READ IT. Every ruling is consistent with R1 to R23 and with the delivery contract: an
+item is in the packet or explicitly CUT, never deferred. Packet R-numbers are never
+renumbered, and any R-number a phase writes into src/, server/, tests/, a CLAUDE.md or
+docs/design/ reads "masterwrought R<n>" IN FULL. Where a ruling says a phase DERIVES a value, the value is not
+in this record: the acceptance criterion is, and a phase that pastes a number from here
+instead of deriving it has failed the ruling. Rejected options are recorded so they are not
+re-proposed, not so they can be reconsidered.
+
+### THE SPINE (eight acts; every row below is consistent with them)
+- S1 The apex feasts are minted ONCE, by 11k, at cooking 125. 11h GATE E is CUT, and 11h
+  becomes a pure bill-editing phase that mints zero new item ids.
+- S2 recipe_seasoned_stock belongs to 11g, with grain and root. 11h drops GATE F.
+- S3 The farm ladder re-tiers to 0/25/50/75/100 and stops there. recipe_harvest_feast climbs
+  to cooking 100, not 125, so no second-capstone exception is needed.
+- S4 Well Fed unifies on masterwrought's single `well_fed` aura id with farming's module and
+  view, and the ladder re-tunes so the apex plates strictly dominate.
+- S5 The R17 hoe carve-out stands, scoped by text to the hoe ladder alone.
+- S6 The apex hoe is `evergarden_hoe`, engineering 125, trainer, and both hoe rungs join the
+  Heroic Marks counter.
+- S7 Fishing grows three bands and a tier-6 apex rod, which retroactively gives the shipped
+  tier-4 and tier-5 rods a reason to exist.
+- S8 Vendor consumables nerf on a 10/15/20 percent margin ladder, with exactly three
+  both-sourced ids exempt.
+
+### THE RULINGS, in inventory order (ID, ruling, one-line why)
+
+Rows 1 to 111 are the delegation pass. Rows 112 onward were appended the SAME DAY by the
+reconcile pass that swept every phase file against these rows; they answer gates the
+delegation pass missed and record what it fixed. Append-only, never renumbered, and an
+existing row that was wrong is AMENDED IN PLACE with a dated line rather than rewritten.
+
+1. 11b-D-1. FIX the tier 3 and 4 seed faucet as a real deliverable: vendor-stock every tier 3
+   and tier 4 seed at farmer_hollis and farmer_verbena on the D11 tier 1/2 pattern, executed
+   ONCE in 11e, priced per 11e-D-D, EIGHT rows after 11e-D-B; every downstream phase proves
+   the faucet by reading merged vendorItems in code, never a ledger row. WHY: a reagent with
+   no faucet is not an output (R18), and four later phases write bills against it.
+2. 11b-D-2. Take all six Well Fed axes: one aura id `well_fed`; masterwrought's
+   FoodItemDef.wellFed carrying TimedStatBuffPayload, kind-scoped; masterwrought's
+   clear-then-grant order; farming's src/sim/wellfed.ts module and tooltip view; the ladder
+   re-tuned to farming 2/3/4/5 at 600s with the three apex role foods at 6/900. 11b moves no
+   number; 11c executes. WHY: as merged, a cooking-50 trainer dish (evergarden_braised_greens,
+   sta 12 for 900s) beats the cooking-100 drop-taught stonepot_stew (sta 6 for 600s), which
+   breaks R5 before Phase 15 can measure anything.
+3. 11b-D-3. Adopt the absorb amendment, both halves: farming is absorbed, D22 and its
+   addendum (B) are superseded IN PLACE with a dated banner and never deleted, D22's absorb
+   discipline is adopted upstream; AND an "accepted-by-design" handoff row already constitutes
+   an explicit record satisfying the delivery contract's CUT requirement. WHY: never-renumber
+   requires supersession in place, and refusing the second half nearly doubles Phase 17's
+   closing matrix (51 rows to 95) to re-record decisions already recorded.
+4. 11b-D-4. Four recorded monolith ceiling raises at the exact merged line counts, each with a
+   ledger row naming this merge, both parent pins and the reason; no extraction funded inside
+   the merge phase; hud.ts is paid back by extraction in Phase 14. WHY: no resolution of
+   hud.ts lands at or under farming's 19186 pin, and mixing conflict resolution with
+   behavior-bearing refactor in one commit is what makes a merge unreviewable.
+5. 11b-R3c-1. With a farm bed and a mobile crafting station both in range, the PLACED STATION
+   wins and the farm bed sits immediately below it; pin both directions in
+   tests/nearby_interaction.test.ts. If the two sides' RULE 3c cases contradict, this ruling
+   supersedes RULE 3c for that one function and goes on the 11c carry list. WHY: a placed
+   station despawns on a timer and is what the player just walked to, while a farm bed is
+   permanent world furniture, so the transient entity wins on the shipped corpses-over-nodes
+   logic.
+6. 11b-R3c-2. 11c writes the merged guide sentence ("five gathering trades ... and a ring of
+   ten crafts", plus "all four gathering professions" to five) in src/ui/i18n.catalog/guide.ts
+   with its five non-Latin overlays; 11b takes ours and records it owed-to-11c;
+   implementation-plan.md's Phase 16 arm changes from "author" to "verify: no shipped string
+   says four gathering". WHY: 11c already owns a guide.ts reword plus five-overlay obligation
+   in the same fill batch, so folding one more reword in costs nothing.
+7. 11b-PARK-1. Neither deleted nor moved: farming REFACTORED the icon-art assertion and the
+   merged tree takes farming's refactored form (artSubjectHotbarItemIds plus
+   pendingHotbarItemIds plus a both-directions debt check), with both literals re-derived on
+   the merged tree (art-subject rises to 75; pending is 16 plus every id 11e to 11k parks).
+   WHY: read from the branch, farming's form polices the debt in both directions and matches
+   scripts/item_art_audit.mjs, so the single-literal form would discard a real guard.
+8. 11b-CNT-1. Derive both counts on the merged tree (farming item rows split by kind, and the
+   docs/farming tracked file count from git ls-tree) and record the found numbers; a
+   disagreement with the plan literal is reported explicitly, never adopted silently. WHY: a
+   row vanishing between two counts is the merge's characteristic failure, and an
+   un-re-derived number is the predicted-then-observed pin trap.
+9. 11b-qa-GATE-9. The F14 QA twin was FOLDED INTO THE PHASE RECORD, not waived:
+   docs/farming/progress.md carries a dated QA-CHECKLIST ROUND block with reviewer verdicts,
+   LOW dispositions, N/A verdicts and a full gate record on frozen tip 354cff6e77. The 11b
+   audit covers F14's thirteen actionable items inside Auditor 7's lane and authors NO
+   retrospective twin. WHY: verified by reading the branch, only the FILE is missing, not the
+   round.
+10. 11b-qa-B8. Record sim.ts as a known 11d ceiling INPUT, never a regression: masterwrought
+    measures 12650, the merged file 12340, so sim.ts FALLS. If 12340 is at or under F14's
+    lowered pin, that pin HOLDS and only a confirmation line is owed. WHY: F14's extraction
+    survives in the merged tree, so the pin moved by merge arithmetic.
+11. 11b-qa-SURF-1. Write the REST-surface verdict CLEAN with its four citations (farming's 20
+    route modules are a strict subset of masterwrought's 27; server/farming_commands.ts is a
+    WebSocket handler with no RouteDef; farming's server/main.ts diff is the lockoutNowMs
+    injection and no URL literal; no farming path in any /api/ string), and delete the word
+    UNAUDITED from the drift record. WHY: a record that says UNAUDITED is indistinguishable at
+    Phase 17 from a record that says nothing.
+12. 11c-D-2. Take the unification with the re-tuned ladder (farming 2/3/4/5 at 600s, the three
+    apex role plates at 6/900). REJECTED: cutting farming's four wellFed payloads. REJECTED
+    and closed: lifting the apex to 8 or above. WHY: the fallback pays four real costs to
+    avoid re-tuning four numbers already marked provisional in source, and an apex of 8 breaks
+    the R5 kit arithmetic (flask 15 plus food 6 equals 21 stamina) Phase 15 measures.
+13. 11c-A2-BUILDER. Extract a host-agnostic src/sim/consuming.ts builder and route BOTH real
+    writers through it (src/sim/items.ts useItem's food and drink arm, and
+    src/sim/professions/feast.ts's bite); the two dev-scenario zero-rate meals stay out and are
+    named in the ledger with that reason. WHY: consumeFeastAction builds p.eating as a literal
+    with no wellFed field, so the carried payload silently dies; two hand-built copies of one
+    shape is a defect class, and the pure function is a sibling module by the deciding question.
+14. 11c-A4-KEYPAIR. Masterwrought's itemUi.tooltip.wellFed plus itemUi.tooltip.wellFedAura
+    survive; farming's useWellfed and useWellfedAura plus their ten overlay rows are deleted in
+    the same change; the surviving value states BOTH the completion trigger and the
+    one-at-a-time rule, and the surviving view supplies exactly that key's placeholder set.
+    WHY: locale coverage is a tie so copy decides, one aura id makes the one-at-a-time rule
+    true of the whole food family, and a half-swap would ship an {aura} hole.
+15. 11c-VOCAB. Take the file's own sentence verbatim, "a mobile field kitchen so dinner gets
+    cooked at the dungeon door", and flag it on the Phase 17 release-tier fill worklist as a
+    reword-staleness obligation by key. WHY: a one-word substitution frees the word "feast" for
+    the real placed-entity mechanic, and a reworded English value leaves every locale silently
+    stale.
+16. 11d-D-4. Confirmed: four recorded raises at the exact merged counts, and unit 6 proceeds.
+    Record the direction honestly: hud.ts and renderer.ts rise, sim.ts and main.ts fall. WHY:
+    same ruling as 11b-D-4 restated at the executing phase, and a ratchet that only ever shows
+    raises has stopped being read.
+17. 11d-U3-ICON. Execute 11b-PARK-1 here: take farming's art-subject split form, re-derive
+    art-subject to 75 and pending to the merged count, and add the file to
+    merge-deletion-list.md ONLY for the two farming literals it replaces, noting that nothing
+    was deleted from it. WHY: writing "deleted" for a refactor would corrupt the one artifact
+    Phase 17 re-runs as a delivery gate.
+18. 11d-U6-FIFTH. A fifth monolith over its pin is a recorded raise on the same terms as the
+    four, taken inside 11d, scoped to growth attributable to the MERGE and never to growth a
+    phase authored; every extra row lists both parent pins and a NAMED payback phase; no
+    extraction runs inside 11d. WHY: the merge is one event, and splitting its ceiling record
+    across two decisions makes the ledger lie about the cause.
+19. 11d-U6-PAYBACK. Phase 14's extraction target is masterwrought's 19445 at minimum, recorded
+    as a Phase 14 carry, and Phase 14's acceptance does not pass until the hud.ts ceiling reads
+    19445 or lower and is LOWERED in the same change; the ip-14-UI migration does NOT count
+    toward it. WHY: a raise with no payback number is a permanent raise, and a file move
+    relocates zero lines out of hud.ts.
+20. 11d-U4-MATTAX. tests/material_taxonomy_bootstrap.test.ts IS a count pin
+    (MATERIAL_ITEM_IDS.size 66) and takes predicted-then-observed; tests/material_taxonomy.test.ts
+    is NOT (exact-set equality plus membership and class-exclusion arms) and resolves by
+    re-deriving its literal; correct the 13-file COUNT_PIN class to the corrected count. WHY:
+    MATERIAL_ITEM_IDS is DERIVED from every recipe and enchant reagent filtered to kind 'junk',
+    so 11l and 11m both move it.
+21. 11d-U1-SHARD. Fresh CI harvest run for the shard-weight table; hand-written weights are
+    refused; take the NEWER __provenance block and re-derive `files` from the merged key count;
+    a union under 95 percent of test files means the harvest runs before the phase closes. WHY:
+    a union under 95 percent is a named way a non-trivial merge reds the gate, and invented
+    weights make the LPT balancer distribute against fiction.
+22. 11e-D-A. The calendar target is about 10 weeks (70 to 75 days) for the reference farmer,
+    with a floor of about 5 weeks at maximum dedication; the four gain VALUES are DERIVED and
+    recorded, and the four belowProficiency BOUNDARIES (25/50/75/100) are FROZEN; acceptance is
+    a derivation test plus a recorded model printing harvests-per-band and days-to-100, and a
+    span materially under a month re-opens the gate rather than shipping. WHY: R19 forbids
+    tuning from feel, and the boundaries drive farmingTeachingCeilingFor, so moving one
+    silently moves which crop tier grays out at which skill.
+23. 11e-D-B. +4 crops, 12 new item ids, ITEM_ART_PENDING 44 to 56: two new tier-3 and two new
+    tier-4, with exactly one new tier-3 crop a LEAF and no tier repeating a plant class. WHY:
+    +2 leaves the upper tiers at two crops each, which is what forced 11h GATE B into its
+    awkward branch; a tier-3 leaf makes the cost-equal branch available for free.
+24. 11e-D-C. Step farming's Maker's Charm contribution to +1 in farming's OWN
+    quantity-to-bonusPicks mapping in src/sim/professions/farming.ts, never in
+    TOOL_EFFECTS.makers_charm.bonus; move the "+2 yield per harvest while charged" tooltip line
+    in the same change; add a test arm proving the cap bites. WHY: it is a SUPPLY control under
+    R21 (charm +2 plus FARM_TONIC_BONUS_PICKS +2 on a base of 3 more than doubles yield), and
+    capping in farming's mapping leaves mining, logging and herbalism untouched.
+25. 11e-D-D. Tier 3 seeds buyValue 32 and tier 4 seeds buyValue 64 (the shipped four-times-sell
+    convention plus a two-times bootstrap premium), applied to all EIGHT tier 3 and 4 seed rows
+    across zone3.ts and evergarden.ts, with NEVER_STOCKED and the per-farmer walk pins updated
+    in the same change. WHY: a tier-3 harvest expects 0.48 seeds back and tier 4 expects 0.41,
+    so an at-convention price would make the counter the cheaper permanent source and kill the
+    seed loop.
+26. 11e-D-E. ONE cosmetic deed for growing the whole roster, category 'collection', renown 5,
+    NO title, on the shipped visit-mark family with a per-crop mark namespace REGISTERED in
+    VISITED_MARK_NAMESPACES and a pinned save/load round trip; migration-safety becomes a
+    required reviewer; move DEED_ORDER's tail pin off prog_farming_100. WHY: a roster is a
+    collection and 5 is the shipped first-rung gathering point, and an unregistered namespace
+    serializes fine and is dropped on load, a trap that has already bitten this program twice.
+27. 11e-D-F. Packet numbers stand and are never renumbered; every R-number a phase writes into
+    src/, server/, tests/, a CLAUDE.md or docs/design/ reads "masterwrought R<n>" IN FULL, and
+    a bare packet R-number in source is a finding rather than a nit (docs/design/ is in scope
+    because docs/design/professions.md is the Professions 2.0 series' OWN authority file and
+    11j writes masterwrought R17 to R20 into it; AMENDED 2026-08-20 by the reconcile pass); 11d writes the owed decisions-index.md
+    namespace row for the professions-tuning R series. WHY: shipped source cites a different R
+    series at R1, R4, R8, R9, R14, R19, R22, R30, R35, R37 and R39 to R50, and shipped R19 and
+    R22 are live landmines in the very files these phases edit.
+28. 11e-DUR. Worked duration defaults, re-derived at authoring: tier 3 at 250 and 260 minutes,
+    tier 4 at 615 and 645, each banner-flagged provisional; verify three constraints against
+    the shipped table first (no duplicate durationMs inside a tier, inside the D5 band, and
+    never under the tier's current minimum of 240 and 600). WHY: the floor is the load-bearing
+    constraint, because a shorter upper-tier crop raises harvests per day and undoes 11e-D-A
+    through the back door.
+29. 11e-BILL. The four new crops land ALONGSIDE existing reagents in
+    recipe_highwatch_barley_bannock, recipe_highwatch_gourd_soup, recipe_evergarden_sunmelon_tart
+    and recipe_evergarden_harvest_platter, each as a base-plus-fine pair on farming's idiom;
+    FORBIDDEN and unchanged: barley porridge, braised greens, harvest feast, seasoned stock and
+    every masterwrought apex bill. WHY: D11 requires a consumer in the minting phase and R18
+    forbids substitution; the four forbidden dishes belong to 11f, 11g, 11h and 11k.
+30. 11e-NAME. The phase derives the four crop names and none is typed before its verdict exists
+    in naming-audit.md; each id pairs a REGISTERED zone-flavored word with a common plant noun,
+    so the whole R15 risk sits on the plant noun; check the rejected-for-collisions row FIRST
+    and web-verify at authoring. WHY: the verdicts need web verification that does not exist
+    yet, and FARM_CROP_IDS members are persisted save keys, authored once, correctly, forever.
+31. 11e-VERDICTS. Four verdicts recorded and each sweep RUNS: no Reliquary page, no further
+    deed beyond 11e-D-E, no new work-order rows, no new market filter chip, nothing owed in
+    src/ui/world_entity_i18n.ts. WHY: the content-obligations reviewer treats an unwritten
+    verdict as a gap, and the work-order verdict has real teeth, since a flat 0.5-of-sellValue
+    payout pointed at top-of-curve produce mints copper.
+32. 11e-qa-PRE. All six 11e decisions are written into the packet's open-item record BEFORE the
+    QA session starts; a code-versus-ruling mismatch is blocking on its own, and the audit
+    judges code against the RECORDED answers, never the file defaults. Binds 11f-QA, 11h-QA,
+    11i-QA, 11j-QA and 11k-QA too. WHY: every gate shipped with a recommended default, and an
+    auditor reading defaults would silently bless a session that took an alternative.
+33. 11f-GATE-A. Band-complete re-tier: gourd soup and barley porridge to 75 [20,20]; the three
+    tier-4 rows to 100 [25,25]; recipe_harvest_feast to 100, NOT 125; barley bannock HELD at 50
+    as the band-50 anchor. Band table 0:4, 25:3, 50:1, 75:2, 100:4, 125:0, still 14 rows and no
+    new id, and no second cooking-125 capstone exception is taken. WHY: all 14 rows are cooking
+    rungs and R17 says produce feeds cooking at every rung; at 125 the feast would collide with
+    11k's apex feasts and falsify 11k deliverable 2's "the party-tier rung below".
+34. 11f-GATE-B. One rule derived from the rung: every row at 75 or above flips to ['drop'],
+    tradable, bind on learn; every row at 50 and below stays ['trainer']. Six flip, eight stay,
+    and the acquisition assertions become rule-derived rather than row-listed; the alchemy
+    sub-arm is N/A on the merged tree. WHY: a rule derived from the rung cannot drift row by
+    row, and the growth tonic staying trainer at rung 0 keeps the tonic reachable before any
+    drop channel exists.
+35. 11f-GATE-C. ONE unconditional contiguous ctx.rng draw at harvest, immediately after the
+    golden-harvest roll, spent on every resolving arm and READ only when the golden roll won;
+    the draw contract becomes tier 1/2 harvest 2 draws, tier 3/4 3, deny arms 0, plant 2, tick
+    sweep 0; restate the DRAW CONTRACT header WHOLE; re-record the farming session golden in its
+    own isolated last commit; determinism review is required. WHY: stacking growth, yield,
+    tonic, golden and a golden bonus on one 32-bit plant-time seed asks it to carry more
+    independent structure than it was sized for, and the unconditional draw keeps stream
+    position stable whichever arm resolves.
+36. 11f-GATE-D. A golden harvest's bonus draw pays exactly ONE extra item: a SEED (the next
+    tier's at tiers 1 to 3, the same tier's at 4, so golden is an upward-drift faucet) or, at a
+    lower weight, ONE farming pattern. Zero new item ids. WEIGHTS are DERIVED from the shipped
+    rare-event rate, with expected seeds-per-day and patterns-per-day recorded. BINDING: the
+    pattern arm's expected rate must be strictly slower than the quartermaster marks route.
+    WHY: D13 forbids a luck gate being the only faucet for a pattern, and the upward-drift seed
+    makes a lucky farmer's first tier-3 seed a moment rather than a purchase.
+37. 11f-GATE-E. Channels mirror Phase 11's recorded shape with the rungs corrected: RAID one
+    new rollGroup at the nythraxis_boss_arena tail (pattern_harvest_feast plus the two tier-4
+    seeds); RIFT one appended draw AFTER draw 6 over a sorted exported id list on winning B/A/S
+    clears; DUNGEON the two rung-75 patterns as a tail group; QUARTERMASTER all six farming
+    patterns and all four tier-3/4 seeds at 12 marks. No 16-mark farming row exists. THE COPPER
+    FLOOR IS NOT IN THIS PHASE. WHY: the shipped mark family has exactly two points, 12 for
+    skill-100 patterns and 16 for 125 capstones, and every farming pattern now teaches a 75 or
+    100 row.
+38. 11f-PAT. Pattern QUALITY derives from the taught row's OUTPUT quality, computed per
+    pattern; pattern sellValue stays UNIFORM across the whole farming set at the shipped point
+    of 100. WHY: sellValue on a kind 'recipe' item is a vendor floor and the shipped catalog
+    has exactly one point for that class, while recipe rarity is pinned monotone to the power
+    of what it teaches, so quality must diverge and price must not.
+39. 11f-DUNG. Read tests/dungeons.test.ts's ungrouped-set pin FIRST and append the rung-75
+    patterns as a TAIL ROLLGROUP if that pin would move; on the evidence available it will, so
+    plan for the tail group. WHY: the ungrouped set is pinned exactly so a new ungrouped entry
+    is a visible decision, and a tail group keeps loot draw order stable for the parity goldens.
+40. 11f-VERDICTS. Four recorded: NAMING no new coinage (every pattern is "Recipe: " plus an
+    already-shipped display name); DEEDS none; RELIQUARY no page, with the sweep run anyway;
+    ART parks all six pattern ids with exactly one mapping.json owner and M16 fills in-change.
+    WHY: the naming verdict is the cheap one worth writing down because it explains why six new
+    ids need no audit, and the item-art ownership trap is batch form or entries form, never
+    both.
+41. 11g-D-A. Reading 1, THE SEEDS: this phase adds ZERO vendor rows and ZERO buyValues; R18's
+    obtainability half is already satisfied; the membership literal in
+    tests/recipe_economy.test.ts is PREDICTED UNCHANGED at six ids, and any movement is a STOP.
+    WHY: sunpetal_herb carries buyValue 160 with no NpcDef stocking it, so a buyValue is an
+    economy basis and not a stock row, and Reading 2's three costs all land in the same change.
+42. 11g-D-B. Rung-50 rows may consume tier-3 crops CONDITIONAL on reading farmer_hollis's
+    vendorItems in code; on a failed read, fall back to tier-2 produce and record the
+    substitution at the row (grand roast takes vale_wheat 2 plus bog_beet 2; serpent elixir
+    takes marsh_rice 2). WHY: a crop with no seed source is not a reagent, and reading the array
+    is the only proof that survives a phase running out of order.
+43. 11g-D-C. recipe_seasoned_stock lands in 11g with marsh_rice 2 plus bog_beet 2; 11h DROPS
+    its GATE F and takes the merged bill as given; the ruling goes in the packet record AND the
+    11g report; pre-check, if the row already carries produce when 11g opens it, 11h landed
+    first, so STOP and reconcile. WHY: 11g runs first and the row is a choke point feeding the
+    whole cooking apex, so coupling it to TWO tier-2 crops spreads the choke across two supply
+    lines instead of one paddy.
+44. 11g-BAND. Leave LOW_BAND, MID_BAND and RARE_BAND alone; produce joins none of them; record
+    that the LADDER SHAPE arm now passes more easily on the two rung-50 rows this phase touches
+    and confirm it still has teeth on the rows it was written for. WHY: adding produce would
+    change a pin's meaning without changing what it catches.
+45. 11g-VERDICTS. Record the NIL list as PROVEN, not skipped: zero new ids, so no art, no M16,
+    no mapping arbitration, no deed, no Reliquary page, nothing in world_entity_i18n.ts, and no
+    proper noun to verify. The ONE obligation is the REWORD set, on the release-tier fill
+    worklist by key. WHY: a phase that mints nothing still owes the sweep, and an edited English
+    value with filled locales is stale in every locale unless a worklist entry catches it.
+46. 11h-GATE-A. Differentiate the FOOD family only, holding the added crop row at equal or
+    near-equal summed value across the three plates, and amend the APEX_CONSUMABLE_RECIPES
+    header in the SAME change with this exact scope: the food family's bills differ by exactly
+    one crop row and are identical in every other reagent, and the flask family stays
+    byte-identical. Pin the resulting cost spread. Deliverable 2 is NOT cut. WHY: no test pins
+    the plates identical so the change is available, but the header states the rule and amending
+    a written rule is deliberate; the precise scope keeps 11i's identical fish row legal and
+    stops a future contributor reading the amendment as open season.
+47. 11h-GATE-B. Gourd to recipe_stonepot_stew, grain to recipe_warspice_skewers, the new tier-3
+    leaf to recipe_sageleaf_chowder, all three at count 2; the tier-4 fallback branch is
+    recorded as superseded; every crop's obtainability at the tier its recipe unlocks is
+    ASSERTED by test. WHY: 11e-D-B was composed for exactly this, so all three plates ask
+    farming 50 and nothing else, and a role choice is never also an economy or skill-gate choice.
+48. 11h-GATE-C. ONE tier-3 grain at count 2, added IDENTICALLY to all three apex flask bills,
+    standing beside sunpetal_herb at that reagent's own count and replacing none of it; the
+    flask family stays byte-identical; assert the sunpetal_herb counts before and after. WHY:
+    the flask chain is the daily-gated one through recipe_quickening_catalyst, so a bill
+    difference there is a real gate rather than flavor, and standing beside the herb honors R18
+    and farming's D24 displacement guardrail.
+49. 11h-GATE-D. recipe_laden_hearth takes evergarden_greens 3 plus fine_evergarden_greens 1;
+    recipe_grand_cauldron takes gilded_sunmelon 3 plus fine_gilded_sunmelon 1; re-read both
+    shipped bills off the merged tree and carry the IDIOM, not these literals; correct the stale
+    items.ts tier-4-fine-twin comment in the same change if 11h runs first. WHY: 3 base plus 1
+    fine is farming's own shipped showcase idiom used twice, and the split gives each 125
+    capstone one showcase crop rather than making both read off one line.
+50. 11h-GATE-E. CUT from 11h: 11h mints no apex feasts, no feast patterns and no new item ids at
+    all; the three apex feasts are 11k's at cooking 125; delete GATE E from the phase file and
+    11h Agent 5's feast slice, and change implementation-plan.md's 11h summary. WHY: 11k owns
+    every piece of machinery the feasts need, so minting them in 11h would ship three placeable
+    entities no code can place; and at 125 the bill can take both tier-4 fine twins plus 11i's
+    new high-band catch, the strongest R20 statement in the packet.
+51. 11h-GATE-F. DROPPED from 11h: 11g DECISION C owns recipe_seasoned_stock, and 11h takes the
+    merged bill as given, re-derives the gold-negative arithmetic from it, and edits the row for
+    nothing. WHY: exactly one phase may edit a choke point, 11g runs first, and 11g's bill is
+    the better one.
+52. 11h-PRICE. MOOT for 11h under GATE E; the question survives once as 11k-D-K2 and is answered
+    there. WHY: pricing an item this phase no longer creates would be pricing nothing, and
+    recording it as moot keeps the 11h-to-11k trail visible.
+53. 11h-NAME. MOOT for 11h under GATE E; the three apex feast names are 11k's, and 11h's naming
+    verdict is "no coinage, nothing to verify", written down. WHY: 11h and 11k both claimed the
+    same three naming slots, which would have produced two verdict sets for one set of items.
+54. 11h-150. The 150 rung is NOT touched in 11h and is not assumable; the R17 gathering-tool
+    carve-out is settled at 11j-D-F, and the shipped recipe_osmium_hoe precedent is evidence for
+    11j, not a licence for 11h. WHY: 11h's bills are consumables under R17's plain reading, and
+    letting a phase that does not own a carve-out assume it is how a carve-out becomes an
+    accident.
+55. 11h-VERDICTS. With zero new ids the obligation stack collapses to a written NIL (Reliquary
+    sweep run and recorded, no deed, no art, no M16, nothing in world_entity_i18n.ts); the ONE
+    live obligation is the reword set from the header amendment, on the release-tier worklist.
+    WHY: 11h becomes the cheapest remarkable phase in the block, changing what the game's four
+    best consumable families are MADE of while adding not one id.
+56. 11i-GATE-A. Grow the catch ladder by THREE new bands (3, 4, 5) on the shipped gate, so band
+    3 takes stormreel_fishing_rod, band 4 takes tidewrought_fishing_rod and band 5 a NEW tier-6
+    apex rod; the nine shipped cells stay byte identical; FISHING_TABLES_BY_BAND grows 3 to 6;
+    widen the fishing SimEvent band union and server/fishing_telemetry.ts's label set with their
+    cardinality comments. REJECTED outright: new fish behind the shipped tier-3 rod. WHY: rod
+    tier 3 already reaches the last band, so two shipped crafted rods buy an angler nothing, and
+    this retroactively gives both a reason to exist.
+57. 11i-GATE-B. New FISHING_CATCH_BAND_THRESHOLDS = [0, 100, 150, 200, 200, 200] in a new leaf
+    src/sim/professions/fishing_bands.ts; the shared PROFICIENCY_BAND_THRESHOLDS stays literally
+    [0, 100, 200] and is NOT touched; prove no regression with an exhaustive walk over
+    proficiency 0 to 200 crossed with rod tier 1 to 6, predicting the moved-pair set first; move
+    the [0, 100, 200] literal and toHaveLength(3) onto the new leaf and re-record the fishing
+    session golden. WHY: the shared array also drives proficiency_display_heal and the land
+    gather-cast duration, so gating catches on it would silently retune land gathering.
+58. 11i-GATE-C. The apex rod's recipe sits at engineering skillReq 125, acquisition ['drop'],
+    pattern-taught, quality EPIC, use tier 6, stationType 'toolworks'; re-verify at STEP 1 and
+    hand it to 11j; rewrite the ROD_RECIPES header to cover three rungs. WHY: the header already
+    states that skillReq 150 resolves to tier 6 while engineering caps at 125, so a taught
+    recipe at 150 is permanently unlearnable; epic and not legendary because rod rarity feeds
+    FISH_REEL_WINDOW_RARITY_BONUS_SEC and the session-cap budget arm.
+59. 11i-GATE-D. The SAME fish row goes into all three apex role plates AND recipe_laden_hearth;
+    this gate governs the FISH row only, and 11h's per-plate crop rows stay exactly as
+    11h-GATE-B leaves them; re-derive the gold-negative arithmetic from the merged rows. WHY:
+    fixing only the chowder would leave an int-role player needing fish while an ap-role player
+    does not, and that compulsion asymmetry is exactly what R18 exists to prevent.
+60. 11i-GATE-E. All four new patterns (three cooking rows plus the apex rod schematic) ride the
+    Heroic Quartermaster as deterministic marks stock, priced in the shipped two-point family by
+    taught rung. REJECTED: the master angler fishing up their own rod. WHY: R18 forbids a
+    gathering TOOL behind a luck gate and the rod gates band 5; the flavor option also costs the
+    attached deed its Renown, since luck-gated deeds are zero.
+61. 11i-CATCH. DERIVE the three sellValues from the shipped raw-catch curve and record the
+    derivation; carry NO buyValue, so no row joins the counterfactually-vendor-fed set; all
+    three JOIN ZONE_FISH; the Reliquary verdict is no page, written down; add all three to
+    RAW_COOKING_CATCH_IDS and confirm isRawCookingCatch covers them. WHY: excluding them from
+    ZONE_FISH would make the first-cast deed marks silently incomplete for the only zones the
+    new bands are authored against, which is the harder bug to find later.
+62. 11i-DEED. Do NOT add fishing deed rungs at 50 and 150; mint exactly ONE new deed, the apex
+    rod CRAFT, on the shipped craft trigger, renown 10, no title (prog_master_angler already
+    owns fishing's title). A band-5 first-catch deed, if wanted, is luck-gated and therefore
+    zero Renown and cosmetic. WHY: the shipped gathering ladder spacing is 5 / 10 / 25 with no
+    50 or 150 rung anywhere, so adding them to fishing alone would make it the only five-rung
+    gathering ladder in the game.
+63. 11i-NAME. The phase derives the names and none is typed before its verdict exists; under
+    11i-DEED the count drops to about nine ids and five real coinages; consult the
+    rejected-for-collisions row FIRST, never carry a working label into an id, and give fish,
+    rod and dish names the adversarial second pass phases 08 and 09 used. WHY: the verdicts need
+    web verification that does not exist yet, real-world fish names are shared vocabulary, and
+    "Master Angler" is already taken by our own shipped deed.
+64. 11j-D-A. The fifth apex gathering tool sits at engineering skillReq 125, acquisition
+    ['trainer'], stationType 'toolworks', on the recipe_tidewrought_fishing_rod precedent;
+    PRE_TRAINING_RECIPE_IDS stays frozen at 21; record the family reading in the packet record
+    and in docs/design/professions.md (three grandfathered rows at 150 that are HISTORY, two
+    authored rows at 125 that are REACHABLE, and 150 is not a target). WHY: engineering's cap of
+    125 resolves to tier 5, so a trainer-taught row at 150 would ship a recipe no player can
+    ever learn. (FORWARD CARRY 2026-08-20, row 120: Phase 11o re-tiers the three 150 rows to
+    125 after 11j; this row's reading is correct at 11j's own runtime.)
+65. 11j-D-B. BOTH hoe rungs join DELVE_SHOPS.drowned_litany, osmium_hoe at 24 marks / clears:3
+    and the apex hoe at 56 marks / heroicClear, matching the shipped land and rod tools exactly;
+    the craft-only pin NARROWS to hoe rungs 1 to 3 with its reason written out loud; the
+    deliberate self-clearing tripwire in tests/delve_shop.test.ts is discharged, not widened.
+    WHY: R18 says nobody must have TAKEN a profession to get a thing and this counter is the
+    gathering family's one non-crafter route, so leaving farming half-in makes it the only
+    gathering profession without one; five and five is also a more drift-resistant pin than four
+    and five, and a hoe carries no combat power.
+66. 11j-D-C. SIX families bind the R20 guard: the five profession ids plus corpse harvesting,
+    with the subject list DERIVED from GATHERING_PROFESSION_IDS so a sixth gathering profession
+    joins automatically and is never hand-listed. WHY: R20 says the guarantee is a test or it
+    does not exist, and a hand-listed subject set is the "leave it to intention" shape R20's
+    second clause forbids.
+67. 11j-D-D. The skillReq >= 100 arm refuses to count a recipe whose result is a gathering tool
+    of that same profession, derived through the item's own `use` record and never a hand-written
+    exclusion list; on this tree it should bite NOTHING, and confirming that is part of the
+    audit. WHY: on the pre-11i tree it bit exactly one family, fishing, whose entire endgame
+    contribution was a fishing rod, and that single measured hit is what proves the arm is
+    calibrated rather than decorative.
+68. 11j-D-E. Presence only: NO numeric floor in tests/gathering_supply_coverage.test.ts.
+    Per-family per-band bill counts are RECORDED as a judgment surface, and thin-ladder top-ups
+    are listed with their reasons; for logging, add timber rows ALONGSIDE existing reagents,
+    never substituted. This and 11m-FLOOR are one ruling. WHY: a numeric floor is a balance
+    number nobody measured and turns an invariant guard into a content quota that passes on
+    padding, while presence is a structural fact that cannot be gamed.
+69. 11j-D-F. The R17 gathering-tool carve-out STANDS, scoped by TEXT to the hoe ladder alone,
+    recorded as an R17 CLARIFICATION and never as a change to R17; every other exclusion stays
+    asserted by sweep, and the sweep's carve-out text names the hoe ladder and nothing else.
+    WHY: a gathering tool has no equip slot, contests no item-level budget and has no R5
+    interaction, so it is not gear in R17's sense, and recipe_osmium_hoe already consumes
+    fine_highland_barley under farming's deviation (ad).
+70. 11j-TWIN. The apex hoe consumes fine_evergarden_greens count 2 plus osmium_hoe count 1, with
+    the reason in the row comment; retire the stale items.ts tier-4-twin comment in the same
+    change unless 11h already did. WHY: every tier-4 land tool takes its fine grade at 4 and
+    every tier-5 land tool halves it to 2, so a tier-5 hoe at 4 would be the only apex tool that
+    did not halve.
+71. 11j-NAME. Candidate evergarden_hoe, "Evergarden Hoe", web-verified at authoring and checked
+    against the rejected-for-collisions row first; the next candidate in order is the crop-word
+    form from gilded_sunmelon, which would flip 11j-TWIN's twin. WHY: "Evergarden" is already a
+    registered proper noun so the phase mints no new coin, and it follows the land tier-5
+    convention exactly (Elderwood Axe from fine_elderwood_log, Sunpetal Sickle from
+    fine_sunpetal_herb).
+72. 11j-COUNT. Correct the acceptance and stopping-rule counts to SIX decisions; Decision F stays
+    in the phase's gate set, because it is both a phase gate and a state.md gate and the phase
+    that EXECUTES it counts it. WHY: the QA twin's "were all decisions recorded" check reads the
+    acceptance list, so a stale five would let the one gate that amends a locked ruling pass
+    unrecorded.
+73. 11j-VERDICTS. The four sibling apex tools carry no deed, so the apex hoe carries none, and
+    that symmetry IS the recorded answer; the Reliquary sweep runs and records no page; run the
+    M16 guard rather than judging by eye; nothing owed in world_entity_i18n.ts; re-mint
+    shipped_item_ids.golden.json (additions only) and run tests/item_icons.test.ts arm H. WHY: a
+    precedent-derived verdict is stronger than a judged one, and the M16 guard's measure of
+    wordy is not a human's.
+74. 11k-D-K1. THREE new templateIds, one per role, all drawn with the SHIPPED farm_feast prop,
+    all reached through ONE exported membership helper in src/sim/professions/feast.ts;
+    re-point all four keyed sites (src/ui/entity_display_name.ts, src/render/farm_patches.ts's
+    applyFeasts filter AND its shadow-cap sweep, src/game/feast_interact.ts, and the contract
+    comment in src/render/quest_objects.ts); three new title keys in hud_chrome.ts with M16
+    fills; nothing keys on a bare string literal after this change. WHY: the placed title is
+    composed client-side off templateId, so one shared id would label an apex feast as the rung
+    below it, and one helper makes a fifth feast impossible to half-wire.
+75. 11k-D-K2. Quality 'epic'; sellValue DERIVED with a binding acceptance criterion rather than a
+    chosen number: strictly above 250 (harvest_feast) and strictly below 380 (laden_hearth), a
+    multiple of 10, gold-negative against the MERGED bill with the arithmetic printed at the
+    row; quality stays rare-or-better whatever else moves, because deliverable 3's craft-signing
+    prestige rides that threshold. WHY: the two bounds are shipped points and the reasoning
+    between them is structural, while the bill is not authored yet, so the gold-negative half
+    genuinely cannot be computed now.
+76. 11k-D-K3. NO storefront entry, recorded ONCE at packet level and covering every deed this
+    packet adds (the 13 absorbed farming deeds plus 11e-D-E's, 11i-DEED's and
+    prog_field_to_feast): no ACHIEVEMENT_MAP row, the pins stay at 84 against
+    MAX_EPIC_ACHIEVEMENTS 100, privacy-security-review is not triggered, and Phase 16 writes the
+    record. WHY: the launch set is curated rather than a catalog mirror, and the exhaustive
+    coverage arm is scoped to col_reliquary_*, so an unmapped deed goes green silently and only
+    a written record catches it.
+77. 11k-D-K4. Keep the feast placement refusal exactly as shipped and TIER-AGNOSTIC, and PIN the
+    reading in BOTH directions (a cook holding an apex feast and a harvest_feast can place only
+    one, in either order). REJECTED: one-per-tier. WHY: feast.ts sweeps ctx.feasts by ownerKey,
+    so tier-agnostic is what the code does today and pinning it turns an accident into a
+    decision; one-per-tier doubles the live entity bound and drags FEAST_SHADOW_CAP and the 1 Hz
+    despawn sweep into a content phase.
+78. 11k-D-K5. The shipped harvest_feast values: charges 10, durationTicks 3600. Raid-scale
+    charges are refused, not deferred. WHY: the per-player ledger, the 1 Hz despawn sweep and
+    FEAST_SHADOW_CAP were built for these numbers, and feast uptime is an R5 input Phase 15 owns.
+79. 11k-NAME. The phase derives the names, web-verifies at authoring, records verdicts and checks
+    the rejected-for-collisions row first ("Grand Banquet" is already there); RULED DIRECTION:
+    compound the SHIPPED apex plate name it serves (Stonepot, Warspice, Sageleaf) with one table
+    or gathering word, so the role is legible from the placed title and no new proper noun is
+    coined at all; only the shared table word needs verification, once. WHY: under K1 the name
+    appears in the placed entity's title, so role legibility is functional rather than flavor,
+    and this reduces three R15 verifications to one.
+80. 11k-CUT. CUT: the crafter's signature is NOT carried onto a feast placed by someone else, and
+    deliverable 3's prestige claim narrows in the same change to what is true (the signature is
+    on the item instance, the placer's name is on the entity, and they coincide when a cook
+    places their own feast). WHY: it needs a new FeastState field and a new wire field, a
+    cross-platform change, for a case that arises only when a cook sells a feast and a stranger
+    places it; shipping the broad claim while cutting the mechanism would leave a false sentence
+    in the record.
+81. 11k-VERDICT. No Reliquary page for the apex feasts; the sweep RUNS and the verdict is written
+    into the phase record and checked against tests/reliquary_content.test.ts. WHY: a consumable
+    feast is not conquerable unique loot, and the packet already ruled at Phase 10 QA that
+    crafted epic tools stay out on the same ground.
+82. 11l-D-11. ADOPT the flavor mapping and promote every adopted reagent out of quality 'poor':
+    the rule is "no adopted reagent stays poor", and the COUNT is DERIVED at the phase, never
+    pasted. AMENDED 2026-08-20 by the reconcile pass, which measured it: nineteen ids are
+    adopted (21 minus the two 11l-HOLDOUT keeps) and FOUR already sit outside 'poor', so
+    FIFTEEN rows move, not eighteen. The four are gleamstag_charm ('rare'),
+    emberwing_cinderscale and old_cragmaws_pelt ('common'), and guardian_core, which carries NO
+    `quality` field at all and which the original row missed. WHY: the promotion is mechanically
+    FORCED, because MATERIAL_ITEM_IDS is derived from every recipe and enchant reagent of kind
+    'junk' and the taxonomy test forbids a poor member; and junkSellableSlot gates purely on
+    'poor', so an unpromoted reagent is one-click destroyed at the first vendor. The same
+    measurement named three tests/material_taxonomy.test.ts arms no blast list carried, all
+    three now written into phase-11l: ALLOWED_UNCLASSIFIED_JUNK holds exactly those four ids and
+    must lose every one this phase adopts; the quality-poor sweep's non-vacuity floor reads
+    toBeGreaterThan(15) against a catalog of exactly 21 poor items, so promoting fifteen leaves
+    six and the floor must be re-derived DOWNWARD; and isMaterialItem's negative control is
+    guardian_core itself, which flips to true. (AMENDED AGAIN 2026-08-20 by the quality-review
+    adoption pass, row 123, which supersedes this row's counts and taxonomy predictions
+    wholesale: FOURTEEN adopted, all poor, FOURTEEN move; the four non-poor ids plus
+    deepfen_pearl are arithmetic EXCLUSIONS, so the allowlist loses nothing and stays at its
+    measured SIX members, the poor-survivor set is SEVEN, and the guardian_core negative
+    control stays valid. Row 123 is the live reading; this row stands as the record of the
+    reconcile-pass measurement it corrected.)
+83. 11l-HOLDOUT. BOTH tangled_weed AND soggy_moccasin stay trash: never reagents, never promoted,
+    both named in the junk-sweep pin's TRUE arm. REJECTED: adopting the moccasin as a scrap.
+    WHY: the shipped fishing comment makes weeds and boots a PAIR, so keeping only the weed
+    leaves half a gag and one stray boot, and two members keep the TRUE arm non-vacuous.
+84. 11l-SELL. Every sellValue is FROZEN, gleamstag_charm (2500) and deepfen_pearl (600) included.
+    WHY: tests/recipe_economy.test.ts uses sellValue as the value basis for every new bill, so
+    moving one while adding a bill makes the gold-negative arithmetic unverifiable, and freezing
+    the vendor side keeps the vendor-versus-craft choice a real one.
+85. 11l-RUNG. Each new row's rung matches its input's DROP LEVEL, the two high-value bills must
+    out-value their vendored input with the arithmetic in the row comment, and the arithmetic
+    decides MEMBERSHIP: an input no rung in the mapped profession can out-value is NOT adopted
+    and is recorded as an explicit exclusion with that arithmetic. WHY: a bill worth less than
+    its input is a trap that punishes engagement, which is the exact pain the phase removes, and
+    letting arithmetic decide membership costs nothing because sixteen adoptions carry the phase.
+    (AMENDED 2026-08-20 by the quality-review adoption pass, rows 122 and 123: the rule
+    GENERALIZES to every adopted trophy, not only the two high-value bills; the predicted
+    exclusion set is FIVE and fourteen adoptions carry the phase; and every row's output obeys
+    the new 11l-OUT doctrine. Rows 122 and 123 are the live reading.)
+86. 11m-D-12. SPREAD never add; TARGET (6 templates, 4 zones, 2 level bands) counted over the
+    REACHABLE subset only, defined as an open-world spawn a solo player of that template's own
+    level range can reach; MAP the orphans per 11m-ORPHAN; do NOT thin cloth; the arcane_shard
+    dead-end premise is FALSIFIED and re-derived before any row is written (enchants.ts carries
+    10 more consumer rows, so live demand is 12 consumers and 21 units, not 2 and 10); NO affix
+    rerolls. WHY: R22's floor is reachability in its own words, so a membership count would pass
+    on exactly the shape R22 names as still broken, and the shard census scanned one file.
+87. 11m-ORPHAN. horn maps to curved_tusk, gills maps to mudfin_scale, MONSTER_MATERIAL_TIERS rows
+    at 1 for both, NO specimen for either decided explicitly, and the phase's authorized
+    one-new-id exception is NOT used and that non-use is recorded. WHY: horn is the same keratin
+    structure as tusk and curved_tusk is the thinnest mapped family, so one line fixes two
+    faults; gills to mudfin_scale ties 11l and 11m into one act; and a pristine jackpot on a
+    bare-hands-floor component would invert the premium ladder.
+88. 11m-FLOOR. R21's enforceable floor is PRESENCE (consumer count at or above 1), the only
+    numeric assertion anywhere; consumers and unit demand are RECORDED as a ratio table with
+    outliers reported against each family's own median; phase-11m gains the floor definition and
+    phase-11j deliverable 1b's wording is corrected to match. WHY: zero is a structural fact and
+    everything above it is an unmeasured balance number, and this is the same ruling as 11j-D-E
+    stated once so the two files stop disagreeing.
+89. 11m-ADMIT. The closed admission gate STANDS and the two stale lines are drift to fix: correct
+    phase-11m's "NOT YET ADMITTED" text and decisions-index.md line 18 (its NNb/NNc namespace
+    row, plus "ten inserted phases" to thirteen). WHY: three records disagree and two are stale,
+    so a session loading either one first would conclude the phases are optional under a contract
+    that has no deferral state.
+90. 11n-D-13. The margin ladder is FIXED at 10 / 15 / 20 percent by rung, bottom to top; nerf the
+    VENDOR line only; magnitudes are arithmetic the phase computes (crafted divided by 1 plus the
+    margin, floored) and records; scope is every vendor-sold consumable and the FOOD line takes
+    the same ladder; two recorded exclusions (no crafted counterpart, and the three both-sourced
+    ids); re-derive the combat-potion header fractions and tests/consumables.test.ts in the same
+    change. WHY: the measured shape is inverted, 9.1 percent at the bottom shrinking to 3.7 at
+    the top, and the food line is worse still, with roasted_boar equal to crafted and
+    brightwood_venison ahead of it.
+91. 11n-BOTH. The both-sourced set is exactly THREE (minor_healing_potion, elixir_of_the_bear,
+    tough_jerky), none split and none changed on magnitude, with the allowlist pinned in
+    tests/vendor_floor.test.ts; AND remove elixir_of_the_bear from alchemist_verane's vendorItems
+    row in src/sim/content/zone3.ts, keeping the item, its 7 percent Mirefen drop, its recipe and
+    its buyValue. WHY: elixir_of_the_bear is buff_sta 12 for 900s sold by the alchemy master for
+    100 copper and exactly equals elixir_of_the_serpent, the alchemy-50 crafted top elixir; that
+    zero-percent margin is R23's competitor in its purest form, and it is the one vendor-sold
+    BUFF in the catalog, which the floor never had to protect. (AMENDED 2026-08-20 by the
+    quality-review adoption pass, row 127: the stock-row carve-out WIDENS to FIVE rows, this
+    one plus smith_haldren's four byte-identical crafted gear ids, the same purest-competitor
+    shape at the gear axis. Row 127 is the live reading.)
+92. state-GATE-1. Answered at 11e-D-A: about 10 weeks (70 to 75 days) for the reference farmer,
+    floor about 5 weeks at maximum dedication, values DERIVED and recorded, band boundaries
+    25/50/75/100 FROZEN. Closed-by-11e. WHY: one question, one answer, recorded where sessions
+    read it; the boundary freeze is the half the old row never mentioned and the half that would
+    break farmingTeachingCeilingFor.
+93. state-GATE-2. Answered at 11e-D-B: +4 crops, 12 new ids, ITEM_ART_PENDING 44 to 56, with the
+    composition constraint (one new tier-3 crop is a LEAF, no tier repeats a plant class).
+    Closed-by-11e, and it prices state-GATE-5 below it. WHY: same ruling, one home, and the
+    composition constraint makes the gate pay for itself twice by unlocking 11h-GATE-B's
+    cost-equal branch.
+94. state-GATE-3. Answered at 11f-GATE-A: the band-complete re-tier to 0:4, 25:3, 50:1, 75:2,
+    100:4, 125:0, bannock held at 50 and harvest feast at cooking 100. YES it is acceptable to
+    move rows a shipped ladder advertises. WHY: farming lives on the unmerged
+    feature/farming-plan and reaches players only through this packet's single PR, so no live
+    player holds expectations about these rungs and the re-tier is authoring rather than a
+    retune.
+95. state-GATE-4. Answered at 11i-GATE-A: THREE new bands (3, 4, 5) plus a tier-6 apex rod, not
+    one; the row is rewritten because as written it understated its own default by two bands and
+    named only the rejected alternative as the other half. WHY: a gate row that misstates the
+    option being taken is worse than no row, because a session reading state.md first would build
+    a four-band ladder and then find 11i specifying six.
+96. state-GATE-5. PARK: every new id from 11e to 11k parks on the merged ITEM_ART_PENDING with
+    exactly ONE mapping.json owner, committed WebP art is not attempted in-change, the growth is
+    ACCEPTED and recorded phase by phase, and the art wave runs on the maintainer's own schedule
+    after the packet. WHY: the master SHA is a maintainer artifact a phase session cannot produce,
+    so "ship art" would block every content phase on something outside the branch and break the
+    one-branch-one-PR contract.
+97. state-GATE-6. Answered at 11j-D-F: the carve-out STANDS, scoped by text to the hoe ladder
+    alone, recorded here as an R17 CLARIFICATION and never as a change to R17, with every other
+    exclusion still asserted by sweep. WHY: recorded at packet level here and executed at 11j, so
+    the only work is writing it in one place and pointing the other two homes at it.
+98. state-GATE-7. Answered at 11b-D-1: FIX the faucet, vendor-stocked at the two farmers,
+    executed once in 11e, priced per 11e-D-D, EIGHT rows after 11e-D-B. Closed-by-11e, and kept
+    flagged as the single-PR blocker until 11f's STEP 0 discovery verifies the rows in code. WHY:
+    four later phases write bills against reagents it makes reachable, and the whole verification
+    chain reads code rather than a ledger, which is what makes closing it safe.
+99. state-OPEN-RIFT. OVERTURN the record-and-accept and CLOSE the residual, scheduled BEFORE 11f
+    or as 11f's own first commit: the rank parameter on the riftClearRewards factory, three
+    SCENARIOS appends at baseLevel 20/22/28, one coverage arm and an UPDATE_PARITY mint each,
+    with seed hunting only for the B/S in-window picks; the sibling heroic-claim Nythraxis
+    residual closes with it. WHY: 11f appends a draw after draw 6 in the rift reward stream and a
+    rollGroup at the nythraxis_boss_arena tail, which is precisely the rank-local insertion the
+    missing goldens would cover, so half a day of plain addition buys coverage for the exact
+    change the packet is about to make.
+100. state-OPEN-FLASK. KEEP as shipped; record the standing flask owner-cancel deviation
+     CLOSED-keep so it stops sitting in the open list; Phase 14's flask_<kind> shared-glyph note
+     proceeds on its own merits and does not reopen the cancel semantics. WHY: nothing in this
+     packet depends on it, it carries no power under R14, and it has been posted for review
+     through a full phase without an objection.
+101. state-OPEN-MASTERWORK. Re-judge and amend docs/design/reliquary.md in Phase 12, in the SAME
+     change that moves R1 suppression to the effect gate; Phase 12 either records the reason that
+     survives the flip or fills the feat under tests/reliquary_content.test.ts's own admission
+     rules, and the three reliquary pins move with it. The other two of the standing three stay as
+     ruled at Phase 10 QA. WHY: the feat justification cites engineering's gear-capability, and
+     craftIsGearCapable('engineering') flips, so holding the slot unfillable on an unstated ground
+     is the drift the anchor rule exists to stop.
+102. state-OPEN-WELLFED. DISSOLVED by 11c: after the unification there is ONE Well Fed (one aura
+     id, one mechanic, one ladder), so neither mechanic is renamed and Phase 16 amends the naming
+     registry row to say the GENERIC-with-caveat caveat is RETIRED by the 11c unification, with
+     the date and the reason. WHY: the item was written when the merge held two Well Fed systems
+     side by side, and the condition that created the caveat is gone.
+103. state-COLLECT. Until 11b's doc move runs, delegated answers live in THIS file as a dated
+     append-only block at the END, never interleaved; 11b STEP 6 MIGRATES the block into
+     farming/state.md's handoff table in the SAME commit as the doc move, converts each row to
+     that file's status vocabulary, leaves a one-line pointer behind, and states the append
+     convention. WHY: every phase from 11e onward reads farming's OPEN list, and that file does
+     not exist yet, so answers recorded now would otherwise be homeless for the interval.
+104. ip-GATE-17. YES: farming's "accepted-by-design" handoff rows already constitute an explicit
+     record and satisfy the delivery contract's CUT requirement, so Phase 17 closes the 51
+     maintainer-gated rows and NOT the 44 accepted ones; record it in decisions-index.md and in
+     the packet record before the closing matrix runs. Same ruling as 11b-D-3's second half. WHY:
+     the contract requires that nothing be implicit, and a dated row saying "accepted by design,
+     here is why" is the most explicit form a record takes.
+105. ip-GATE-PAIN. ADMITTED, gate closed 2026-08-20, as implementation-plan.md already records;
+     11l, 11m and 11n are in the packet and the residual work is doc drift only, fixed at
+     11m-ADMIT; no CUT is taken, so neither dependent amendment is needed. WHY: three phases that
+     fix measured player pain are the cheapest remarkable content in the program, and 11l adds
+     zero new ids.
+106. ip-14-UI. MINT and MIGRATE: Phase 14 creates src/ui/hud/professions/ with an index.ts barrel
+     and a local CLAUDE.md and moves the whole family behind it, as its OWN commit (pure moves plus
+     import re-points, zero logic change); it does NOT count toward the hud.ts payback target of
+     19445; write the DESIGN.md compliance statement for the farming windows in the same phase.
+     WHY: the repo rule says HUD-domain components live in src/ui/hud/<domain>/ behind a barrel,
+     and about 25 root-level professions modules is the shape that rule exists to prevent.
+107. ip-16-ICON. PARK: masterwrought's items park against the merged table and the merged pending
+     allowlist exactly like farming's 44, said explicitly in the Phase 16 record; this packet ships
+     no committed WebP art, every new id carries a pending row with one mapping.json owner, and the
+     merged icon test keeps farming's art-subject split shape with re-derived literals. WHY: it is
+     state-GATE-5's question at a second altitude and the answers must match, and masterwrought's
+     asserted-empty pending set was true only in an era with maintainer art turnaround inside the
+     phase.
+108. ip-16-SURFACES. Four verdicts, all recorded in the Phase 16 record. (a) STOREFRONT
+     ACHIEVEMENTS: CUT, one packet-level record covering every deed the packet adds; pins do not
+     move; privacy-security-review is not triggered (same ruling as 11k-D-K3). (b) DISCORD ACTIVITY
+     FEED: ADD, capped at two cards, the farming member on bot/logic.ts's closed kind union with
+     cards for the Harvestmaster title and golden_harvest, no third card and no per-placement noise.
+     (c) THE RL HOST: CUT, explicitly, with the reason recorded in headless/CLAUDE.md, because
+     farming growth resolves against ctx.lockoutNowMs() so any episode that plants is non-replayable;
+     the five wire commands and the eight-member facet stay out with it, and re-admission needs a
+     virtual clock. (d) ADMIN MARKET METRICS: WIDEN to cover produce, seeds and compost, with
+     every string through t(). AMENDED 2026-08-20 by the reconcile pass at row ip-16-METRICS,
+     which closed the half this row left open: the state-the-scope-in-the-copy alternative is
+     REJECTED, because the market metrics are the only instrument that shows whether the world
+     eats what the crafts make, so scoping the copy would leave masterwrought R21's claim
+     unmeasurable on the surface built to measure it. WHY: the contract is in-or-CUT, so silence
+     is unavailable on all four, and (c) is the one genuine structural incompatibility and
+     deserves a written reason rather than an omission.
+109. ip-15-KIT. UN-DROP the feast from the R5 full-kit premise BEFORE Phase 15 runs: re-author the
+     premise to "the best available food, always on, delivered by feast", re-record deviation (e)
+     with its new outcome, revert both live edits the drop justified, and add the aura-exclusivity
+     pin spanning well_fed and elixir_<kind> that also asserts wellfed_<kind> exists NOWHERE after
+     11c. Conditional unchanged: anything other than the 11c-D-2 ladder trips Phase 15's own
+     stopping rule. WHY: harvest_feast and 11k's three apex feasts make the feast a real buff
+     source, so the premise is falsified by the merge and Phase 15 would otherwise measure less
+     than the game ships, on the packet's defining gate.
+110. ip-17-TEARDOWN. Teardown is CUT from this PR and recorded as a post-merge chore with its shape
+     fixed now: when taken, both doc trees go as ONE decision, the eleven screenshot cone rows are
+     re-homed in the same change, and docs/design/farming-asset-manifest.json is deliberately
+     preserved. What DOES land in the packet, because live tests cite them by path: promote
+     naming-audit.md and power-verification.md to docs/design/ and re-point every citation
+     (tests/originality_renames.test.ts, tests/ip_scrub.test.ts), and re-home the cone rows
+     tests/ci_workflow.test.ts guards. WHY: the packet docs are the review evidence for a
+     seventeen-phase PR, and deleting them in the same PR removes the reviewer's map at the exact
+     moment it is needed.
+111. ip-17-PUSH. The branch stays LOCAL. The packet is complete when Phase 17 closes and
+     `node scripts/gate_select.mjs` passes on the committed tree; the push and the single PR happen
+     only on the maintainer's own word, at the time. This is the ONE item in the inventory a session
+     cannot answer. WHY: not because the design is unresolved, but because it needs an input that
+     does not exist yet: the standing rule is that new branches stay local until okayed and no merge
+     happens without approval, and no delegation of design decisions can supply a consent that has
+     not been given.
+
+### CROSS-CHECKS (pairs that would otherwise contradict; reconciled, not weakened)
+- C1. 11h-GATE-A (differentiate the food family) versus 11i-GATE-D (the fish row is identical on
+  all three plates): reconciled by making the header amendment PRECISE, "the food family's bills
+  differ by exactly one crop row and are identical in every other reagent; the flask family stays
+  byte-identical", so both hold literally and no contributor reads it as open season.
+- C2. 11f-GATE-A versus 11k's apex feasts at 125 and 11k deliverable 2's "the rung below":
+  reconciled by moving the harvest feast to cooking 100. At 100 and 125 the feast ladder is a real
+  climb and cooking 125 holds four rows rather than five.
+- C3. 11j-D-E (no numeric demand floor) versus 11m's two agents referencing a floor DECISION 12
+  never set: reconciled at 11m-FLOOR by ruling ONE floor for both, presence, with a recorded ratio
+  table. Both files change to that wording.
+- C4. R22's reachability floor versus 11m DECISION 12's membership counts: reconciled at 11m-D-12
+  by keeping the numbers as the shape and running every count over a defined REACHABLE subset.
+- C5. R17 versus the hoe ladder's shipped fine-twin invariant: reconciled at 11j-D-F as a narrow
+  written carve-out beside R17, scoped by text, judged on the merits. The apex hoe's bill does NOT
+  change.
+- C6. R23's "the vendor stays useful" versus pulling elixir_of_the_bear from Verane's counter:
+  reconciled by distinguishing the ITEM from the STOCK ROW. The item keeps its drop, its recipe and
+  its buyValue, every heal, mana and food row stays, and only the one vendor-sold BUFF goes.
+- C7. R23's nerf direction versus 11n-BOTH's exemption at the bottom hp rung: reconciled by ruling
+  the exemption superior. minor_healing_potion does not move and the bottom hp rung is recorded as
+  EXEMPT rather than as a miss; the ladder binds at the lesser and standard rungs and on the food
+  line.
+- C8. 11e-D-C's charm cap versus R19's calendar model: no conflict, and worth writing down. Capping
+  bonus picks changes UNITS per harvest, not harvests per day, so the calendar model is unaffected
+  and does not need re-running.
+- C9. 11e-D-B's roster composition versus 11h-GATE-B's crop assignment: one decision taken twice.
+  The tier-3 leaf is what makes 11h's cost-equal branch available; two grains would have forced the
+  tier-4 halving branch and a lopsided value spread.
+- C10. 11f-GATE-D's golden pattern arm versus 11f-GATE-E's marks channel: reconciled by the binding
+  rate constraint, since D13 says a luck-gated source is never the only faucet and without the
+  constraint the two channels could invert.
+- C11. 11b-PARK-1 versus state-GATE-5 and ip-16-ICON: all three settle to farming's art-subject
+  split with a positive pinned pending count and both literals re-derived per phase.
+  Masterwrought's asserted-empty pending set is retired, and its retirement is recorded.
+- C12. state-OPEN-RIFT's overturn versus 11f-GATE-E's rift append: not independent. The overturn is
+  scheduled BEFORE 11f precisely because 11f's append is a rank-local insertion into the stream the
+  missing goldens cover. Reconciled by sequencing, not by weakening either.
+- C13. 11c-VOCAB's reword versus 11h-NAME, 11k-NAME and the word "feast": reconciled by order. 11c
+  frees the word first; if 11c's reword slips, 11k's names wait, and that dependency is recorded at
+  11c-VOCAB.
+- C14. 11h mints zero ids versus 11h-VERDICTS' obligation list: consistent, and the strongest
+  evidence the set is coherent. Cutting GATE E turns 11h into a phase that changes what the game's
+  four best consumable families are made of and adds not one item id.
+- C15 (added by the 2026-08-20 reconcile pass). 11c-D-2's apex plate duration, 600 to 900,
+  versus R23's "never by raising the crafted line" and versus R5: no collision, and the
+  reasoning is now written into phase-11c so it reads as decided rather than missed. The
+  MAGNITUDE stays 6, and ip-15-KIT fixes Phase 15's premise at "the best available food, ALWAYS
+  ON, delivered by feast", so an always-on measurement is indifferent to 600 versus 900 and R5's
+  ceiling does not move. R23 governs the vendor-versus-crafted MARGIN, and after 11n-BOTH pulls
+  elixir_of_the_bear from Alchemist Verane's counter no vendor item grants Well Fed at all (the
+  vendor food line carries foodHp only), so no margin is being created here. 11c is ladder
+  ORDERING inside the crafted line, and it is explicitly not a licence for a later phase to
+  raise a crafted magnitude.
+- C16 (added by the 2026-08-20 reconcile pass). 11i-GATE-C's apex rod versus R18: the rod GATES
+  band 5, so it is R18's hardest case in the packet, harder than any catch. Reconciled by
+  asserting the rod ITEM stays market-listable, never soulbound and never noMarketList, on the
+  shipped tidewrought_fishing_rod def's precedent, so a fisher who never took engineering
+  reaches band 5 by buying the rod. 11i's R18 arm covered only the CATCHES and now covers the
+  rod too, with its own acceptance row.
+
+### NEW WORK these rulings imply, with its owner
+- N1. The decisions-index.md professions-tuning namespace row (11e-D-F). ASSIGNED TO 11d, in the
+  derived-artifacts commit, since 11d is the doc-truing phase and runs before any phase that would
+  cite an R-number in source. DISCHARGED 2026-08-20 by the reconcile pass: the row is authored in
+  decisions-index.md, and the same pass WIDENED its scope to include docs/design/ (see 11e-D-F as
+  amended). 11d unit 7 becomes a VERIFICATION of both rows against the merged tree, with authoring
+  as the fallback if the merge loses one.
+- N2. The decisions-index.md admission-row correction (11m-ADMIT): line 18's NNb/NNc row said
+  11l, 11m and 11n were NOT ADMITTED and said "ten inserted phases". ASSIGNED TO 11d, same commit
+  as N1, so the file is opened once. DISCHARGED 2026-08-20 by the reconcile pass, which fixed it
+  where it stood rather than leaving a session to load a stale "NOT ADMITTED" first; the
+  open-once reason was already spent, because N1 had opened the file. 11d verifies it.
+- N3. This block and its migration (state-COLLECT). The block is appended here now; 11b STEP 6 must
+  migrate it into farming/state.md's handoff table in the doc-move commit and leave a pointer. The
+  migration step is not in 11b's current STEP 6 and must be added there.
+- N4. The src/sim/consuming.ts module's ceiling story (11c-A2-BUILDER): a new sim module needs its
+  tests/monolith_budget.test.ts position considered and a Vitest that imports it directly. 11c owns
+  the extraction; the budget entry is new work inside 11c.
+- N5. src/sim/professions/fishing_bands.ts, a new leaf (11i-GATE-B), plus moving
+  tests/professions_fishing.test.ts's [0, 100, 200] literal and toHaveLength(3) off the shared
+  proficiency_bands module onto it. 11i owns the content; the module and the test relocation are new
+  work inside 11i.
+- N6. Correcting the three "NEVER arcane_shard" reservations in src/sim/content/recipes.ts (the
+  jewelcrafting hub header, the inscription header, the INTERMEDIATE_RECIPES header), or proving
+  they need no correction (11m-D-12). Owned by 11m, and both branches must be stated.
+- N7. Re-deriving the combat-potion header's target fractions in src/sim/content/items.ts and the
+  matching assertions in tests/consumables.test.ts (11n-D-13). Owned by 11n, not on its original
+  blast list.
+- N8. tests/vendor_floor.test.ts's no-crafted-counterpart exclusion arm (11n-D-13), a second arm with
+  its own literal set beside the both-sourced allowlist. Owned by 11n.
+- N9. Delve-shop symmetry work (11j-D-B): the shop file's "these eight" comment becomes ten, both
+  exact per-tier arms move four to five, the literal stock pin grows by two rows, the
+  craftedTools.length floor moves, and the farming craft-only pin narrows to rungs 1 to 3 with its
+  reason written. Owned by 11j.
+- N10. bot/logic.ts's farming kind-union member and its two cards (ip-16-SURFACES b): the union
+  member, two card renderers, the bot's own tests, and an entry in bot/CLAUDE.md. Owned by Phase 16;
+  no phase touches bot/ today.
+- N11. The headless/CLAUDE.md CUT record (ip-16-SURFACES c), naming ctx.lockoutNowMs() as the
+  structural reason and the virtual clock as the re-admission condition. Owned by Phase 16; no phase
+  touches headless/ or python/ today.
+- N12. Admin market-metrics widening plus its i18n (ip-16-SURFACES d), every string through t()
+  because operators are users. Owned by Phase 16, which names the question but budgets no work.
+- N13. Promoting naming-audit.md and power-verification.md to docs/design/ and re-pointing their
+  citations in tests/originality_renames.test.ts and tests/ip_scrub.test.ts (ip-17-TEARDOWN). Owed
+  in-packet regardless of the teardown decision; owned by Phase 17.
+- N14. The aura-exclusivity pin spanning well_fed and elixir_<kind> that also asserts wellfed_<kind>
+  exists nowhere after the unification (ip-15-KIT). Phase 15 names it; 11c is the natural home,
+  since 11c is what makes the assertion true.
+- N15. The stale items.ts tier-4-fine-twin comment (11h GATE D, 11j Agent 3 and 11k Agent 2 all
+  instruct their session to correct it). 11h OWNS it, because it runs first under this ruling set;
+  11j and 11k must find it already corrected and not re-correct it, and their files need that
+  sentence.
+
+### THE RECONCILE PASS, 2026-08-20 (rows 112 to 116, appended the same day)
+
+The delegation pass wrote 111 rulings and rewrote the 11-block phase files against them. The
+reconcile pass then swept EVERY packet file, including phases 12 to 17, the README, the
+implementation plan and the decisions index, against those rows. It found six gates the
+delegation pass had not reached, seven cross-file contradictions, and one arithmetic error in
+a landed ruling. Everything it found is either fixed in place or recorded below.
+
+112. ip-15-ACCESS. R5 measures the GEARED INDIVIDUAL at full food uptime, never the raid
+     aggregate, and Phase 15 states the model explicitly in power-verification.md and in its
+     ledger. A feast moves DELIVERY, not the ceiling: it takes a raid from partial uptime to
+     the uptime the individual measurement already assumed. That is access, and under
+     masterwrought R18 and masterwrought R21 it is the intended reward for preparation, so it
+     does not enter the R5 arithmetic. WHY: every knob R5 names is a per-character stat (flask
+     15, food 6, apex enchants, 2 Perfected pieces), and ip-15-KIT already re-authored the
+     premise to "the best available food, ALWAYS ON, delivered by feast", which bakes 100
+     percent uptime into the measurement; phase-15 was still carrying this as a take-it-to-the-
+     maintainer question after that ruling landed.
+113. ip-16-METRICS. Resolves the open half of ip-16-SURFACES (d): WIDEN the admin market
+     metrics to cover produce, seeds and compost. Scoping the dashboard copy instead is
+     REJECTED. Every string goes through t() either way, because operators are users, and the
+     record names which surfaces moved. WHY: masterwrought R21 is demand-side design, and the
+     market metrics are the only instrument that shows whether the world eats what the crafts
+     make; a dashboard that measures the crafting half and not the gathering half leaves the
+     packet's central claim unmeasurable on the surface built to measure it.
+114. ip-NAME-BORDERLINE. CLOSED 2026-08-20 BY THE MAINTAINER, narrowly. Supersedes the
+     earlier hand-back AND the wider reading taken minutes before it.
+     THE RULING: rename the PROFESSION-RELATED name; leave the world alone. The maintainer
+     first said to change them all to avoid the risk, then scoped it on seeing what the list
+     contained: "if these are zones like map zones, let's not mess with that. Let's just stick
+     to profession related stuff please."
+     RENAME, IN THIS PACKET, owned by Phase 16 inside its merged naming-registry pass: the
+     'Enchant <Slot> - <Stat>' scheme, the ONLY profession-related entry on the list. Verbatim
+     WoW formula trade dress on ENCHANTING content this packet already rewrites, so it is in
+     scope by subject as well as by risk; the distinctive suffixes were already originalized
+     (Runed Sigil, Runed Weave), leaving only the scheme to re-cut.
+     DO NOT RENAME, and no phase in this packet may touch them: the zone families The
+     Amberfall, The Frostveil Reach, The Nightbloom, Galecrest and Voidscar, and the
+     timing-parallel coins (Brutok, Brother Halven, Aetherwell, Gravelight, Summon Emberkin),
+     which are mobs, NPCs and abilities. These are WORLD IDENTITY, not professions. Every one
+     was judged BORDERLINE rather than infringing under R15's bar for NEW coinage, several
+     plausibly PREDATE the other property, and a shipped-zone rename cascades through zone
+     identity, POIs, quest text, derived deed and item names, the map, the wiki, the guide and
+     every locale. Measured once so nobody re-derives it: Amberfall 61 files / 124 source hits,
+     Frostveil 102 / 156, Nightbloom 72 / 149, Galecrest 71 / 174, Voidscar 18 / 21.
+     REFUTED AND KEPT: Highwatch (item 2) and Moonrest (item 4).
+     There is no follow-up rename packet and none should be scheduled from this row.
+     Only ip-17-PUSH remains handed back.
+115. ip-16-STOREFRONT-DRIFT. phase-16-polish.md carried a STEP 0 gate and a STEP 2 instruction
+     telling its session to MAP the three title-bearing deeds into ACHIEVEMENT_MAP, in direct
+     contradiction of 11k-D-K3 and ip-16-SURFACES (a), which CUT every storefront row this
+     packet would add. The rulings stand unchanged and phase-16 is corrected: map NOTHING, the
+     84 pin does not move, server/steam/ and server/epic/ stay untouched, and the deliverable
+     is ONE packet-level non-mapping record. WHY it is recorded rather than silently fixed: a
+     phase file that instructs the opposite of its own ruling is the exact failure 11e-qa-PRE
+     names, and this one would have shipped an ACHIEVEMENT_MAP row nobody ruled for.
+116. reconcile-DRIFT. The doc drift this pass fixed, listed so Phase 17 can verify it rather
+     than rediscover it. (a) decisions-index.md's NNb/NNc row said 11l, 11m and 11n were NOT
+     ADMITTED pending a maintainer gate; corrected to thirteen inserted phases, all admitted
+     (11m-ADMIT, N2 discharged). (b) README.md said "the ten inserted phases 11b to 11k" twice
+     and named only R17 to R20; corrected to thirteen, 11b to 11n, and R17 to R23. (c)
+     implementation-plan.md's 11f summary said the phase gives farming rows at 125, against
+     11f-GATE-A's band table 0:4, 25:3, 50:1, 75:2, 100:4, 125:0. (d) Its 11h summary claimed
+     the 150 rung (against 11h-150) and claimed recipe_seasoned_stock (against 11h-GATE-F and
+     11g-D-C); the phase-summary table row said "bills 75 to 150". (e) Its Phase 15 arm credited
+     apex feasts to 11h, which 11h-GATE-E cut. (f) progress.md still told 11b STEP 0 to confirm
+     the F14 twin was "deliberately waived", against 11b-qa-GATE-9's finding that the round was
+     folded into the phase record and only the FILE is missing. (g) Phases 12, 13, 14, 15, 16
+     and 17 each still opened with "Confirm maintainer decision N ... Default per the
+     integration plan", the recommended-default shape 11e-qa-PRE forbids; all six now read as
+     instructions. (h) phase-13 said FOUR tier 3 and 4 seed rows where 11b-D-1 says EIGHT. (i)
+     phase-14's module placement call still said "choose ONE", already settled at ip-14-UI. (j)
+     phase-16's icon park, its Well Fed registry row, its Discord card and its admin metrics all
+     still read as either/or. (k) The R-number rule's scope named src/, server/, tests/ and
+     CLAUDE.md but not docs/design/, even though docs/design/professions.md is the OTHER
+     series' own authority file and 11j writes masterwrought R17 to R20 into it; the scope is
+     widened everywhere the rule is stated (11e-D-F amended). (l) Ruling 82's promotion count
+     was wrong and is amended in place: FIFTEEN rows move, not eighteen, because guardian_core
+     carries no quality field and the original row missed it. The same measurement found three
+     tests/material_taxonomy.test.ts arms on no blast list, now written into phase-11l.
+
+### THE QUALITY-REVIEW ADOPTION PASS, 2026-08-20 (rows 117 to 133, appended the same day)
+
+The packet's standing quality review (professions-quality-review.md) ran its FIRST pass
+against the plan, as that file instructs, with the built tree measured by script and the
+plan phases audited against the maintainer's four complaints. The maintainer adopted EVERY
+finding, in their own words: "I love this! I want to do EVERYTHING you mentioned." The rows
+below record the adoptions. The review's full report is recorded in
+professions-quality-review.md's first-run record; the measured facts cited here (the req-20
+cliff, the fishing tail, the engineering on-ramp, the 11l arithmetic) are that report's,
+each verified against code before it became a row. One standing guardrail rides the pass
+without a row of its own, recorded here so it binds every remaining phase: the Quickening
+Catalyst remains the packet's ONLY daily-visit mechanic. The review judged it acceptable
+precisely because it is alone and costs only opportunity; a phase that would add a second
+daily gate anywhere in professions is out of ruling and STOPS.
+
+117. qr-11o-ADMIT. Phase 11o (the leveling crafter) and its QA twin are ADMITTED, growing
+     the inserted block to FOURTEEN phases, 11b through 11o. It runs after 11n and before
+     Phase 12, and it MUST land before Phase 15, which measures a settled world. It owns
+     three deliverables no other phase owned: the mid-band wearability re-level (row 118),
+     the engineering on-ramp (row 119), and the 150-rung re-tier (row 120). WHY: the review
+     measured that the crafted rare tier is administratively locked out of levels 14 to 19,
+     the longest leveling band, and that no phase 11b to 17 touches recipe.level; a defect
+     with a one-line-per-recipe fix and no owner is exactly what an inserted phase is for.
+118. qr-11o-WEAR. THE REQUIRED-LEVEL CLIFF. Every rung-50 trainer gear recipe across the six
+     gear crafts moves recipe.level 20 to 15, and the three rung-75 grandfathered rares
+     (wardweave_cowl, duskhide_wraps, sootscale_mantle) move 20 to 17, so the crafted rare
+     tier is wearable in the band where its stats are actually competitive. The measured
+     basis: rare-and-above quality derives requiredLevel from item source level, crafted
+     source level IS recipe.level (src/sim/item_level.ts), every rung-50/75 recipe ships
+     level 20, so thoriumscale_cuirass (score 23.2, best-in-band against a measured 18.3)
+     is unwearable until 20 where the epic shelf (26 and up) obsoletes it on arrival.
+     ACCEPTANCE, derived not pasted: each re-leveled output's requiredLevel lands at or
+     below the character level its craft band naturally pairs with (rung 50 wearable by 16,
+     rung 75 by 18); the level-20 shelf is untouched (no apex or heroic number moves, so R5
+     inherits no re-measurement); masterwork instances keep gating on the def. WHY nerf
+     nothing: the fix moves WHEN crafted rares can be worn, never how strong anything is.
+119. qr-11o-ENG. THE ENGINEERING ON-RAMP. Three edits: (a) recipe_bronze_hoe re-tiers
+     skillReq 25 to 0 (trainer acquisition kept), so engineering has a learnable row at
+     skill 0; (b) ONE new trainer-taught PART at skillReq 0, a junk-kind engineering
+     component that joins the shipped recipe_precision_chassis bill as an ADDED reagent row
+     (R18's add-never-substitute shape), so the part has a real consumer inside
+     engineering's own chain; (c) ONE new trainer-taught GADGET at skillReq 25 with a
+     cosmetic-only use or formula-exact band stats (R14 forbids procs; R23 forbids a vendor
+     twin), the session's derivation under the naming and obligation rules. Two new item
+     ids, art PARKS per ip-16-ICON. ACCEPTANCE: an UNATTUNED character can gain engineering
+     0 to 25 through a learnable row, and an attuned major reaches 75 without ever crafting
+     the grandfathered tier-3 tool ladder; pinned by test. WHY: measured, engineering has
+     nothing craftable below skillReq 75, its cheapest recipe sits above the unattuned
+     ceiling, so an unattuned character can never gain a single point; the review named it
+     the worst first-hour experience in professions and the one permanently empty cell.
+120. qr-11o-150. THE 150 RUNG RETIRES. The three grandfathered land-tool recipes
+     (recipe_arcanite_mining_pick, recipe_elderwood_axe, recipe_sunpetal_sickle) re-tier
+     skillReq 150 to 125, the reachable cap tier. No admission behavior changes (all three
+     are acquisition-less, known to everyone); what changes is the fiction: a tier no
+     player can attain stops being printed on three live recipes. The unlearnable-at-150
+     LESSON in the ROD_RECIPES and TOOL_RECIPES headers is KEPT as the standing rule for
+     new rows, amended in place to record that the three historical rows were re-tiered by
+     11o. 11j's Decision A family reading ("three grandfathered rows at 150 that are
+     HISTORY") stays correct at 11j's own runtime and gains a forward-carry line naming
+     11o. WHY: the review's cut list; a dangling tier above the cap is pure confusion and
+     teaches zero to non-majors.
+121. qr-11i-PACE. FISHING GETS A PACING ARM (11i DECISION F, new). FISHING_GAIN_SCHEDULE's
+     VALUES are re-derived from a measured casts-to-200 model, exactly the R19 discipline
+     11e applies to farming's curve: casts per active hour from the shipped cast-cycle
+     timing (bite delay, reel window, recast), teaching-catch share per band from the D9
+     cell tables, recorded in state.md so the tune is reproducible from the doc. TARGET
+     SPAN, settled: the reference angler reaches 200 in about 10 to 12 ACTIVE hours total,
+     and no single band costs more than about a third of the total. The four band
+     BOUNDARIES (50/100/150/200) are FROZEN, because fishingTeachingCeilingFor derives the
+     water teaching ceilings from them. The parity golden professions_fishing_session may
+     move and is predicted before observed. 11i's rejection-list entry "Editing
+     FISHING_GAIN_SCHEDULE" is OVERTURNED in place with a dated line: it was right to
+     protect the ceilings and wrong to leave the rate, because the measured shipped tail
+     (0.02 per catch, roughly 2500 teaching catches, on the order of 5000 casts and 11
+     hours for the last 50 points, zero character XP) is the program's one outright chore
+     and 11i was fixing fishing's reward while shipping its pacing debt untouched.
+122. qr-11l-OUT. THE 11l OUTPUT DOCTRINE (the review's highest-risk underspecification
+     closed). Every 11l consumer row is a NEW recipe whose resultItemId is an EXISTING,
+     currently-uncrafted shipped item, the COMMON_RECIPES and COMBO_RECIPES precedent
+     (outputs reuse existing item ids rather than minting). Selection checklist, executed
+     per row: the output has no existing recipe (recipeForResultItem documents that no two
+     recipes share a resultItemId, and battlefield-XP attribution rides that uniqueness);
+     the output's quality is at or below the rung's ladder quality; the output's flavor
+     matches the profession; the row's value arithmetic (output strictly between the
+     trophy's sellValue and the bill's total input value) is printed in the row comment. A
+     mapping for which no defensible existing output exists is EXCLUDED and recorded,
+     exactly like a value exclusion. NO bill edit to a shipped recipe is permitted in 11l:
+     new rows only, so no shipped craft gets more expensive.
+123. qr-11l-VALUE. 11l-RUNG GENERALIZES to every adopted trophy, and the counts are
+     corrected. The worth-more-than-the-vendored-input test applies to ALL adopted ids, not
+     only the two high-value ones, because tests/recipe_economy.test.ts bounds every output
+     below its bill's input value, so a trophy can only be adopted if some rung's output
+     value clears its sellValue. Measured ceiling on this tree: the highest crafted output
+     sellValue is 460, jewelcrafting's is 320. PREDICTED exclusions, re-derived at
+     execution: gleamstag_charm 2500, deepfen_pearl 600, emberwing_cinderscale 320,
+     old_cragmaws_pelt 300, guardian_core 180. PREDICTED adoption: FOURTEEN ids (21 minus
+     the two 11l-HOLDOUT keeps minus the five exclusions), ALL fourteen ship quality
+     'poor', so FOURTEEN rows move to 'common'; ALLOWED_UNCLASSIFIED_JUNK is UNCHANGED
+     (its four adopted-and-non-poor leavers are now all excluded, and the review measured
+     the live set at SIX members, dawnhold_posy and last_keep_signet included, correcting
+     11l's "currently carries four"); the poor-survivor set is SEVEN (the six plus
+     deepfen_pearl); the isMaterialItem guardian_core negative control STAYS VALID.
+     11l-D-11's "NINETEEN adopted, FIFTEEN move" line and 11l-RUNG's "the other sixteen
+     adoptions" line are SUPERSEDED by this row; the delegation-pass literal "18 of the 21
+     are poor" reads 17. Engineering's trophy lane goes empty under these exclusions, and
+     that is accepted: its on-ramp is row 119, not a token trophy row. WHY: the review
+     proved the two headline adoptions arithmetically impossible under 11l's own rules and
+     the sub-300 trio vendor-losing through any realistic bill; fewer, real consumers beat
+     nineteen paper ones.
+124. qr-11m-SPREAD. 11m's spread covers ALL SIX thin families and names the mid-band silk
+     source. mire_widow (zone2, levels 8 to 10, open world) GAINS the silk tag by name:
+     it is the one open-world mid-band spider in the game, and without it the silk floor is
+     satisfiable while the reported 5-to-19 hole stays open, because silk's shipped spread
+     (bands 2 to 4 plus 20) already meets the two-band clause. horn and gills, once mapped
+     by 11m-ORPHAN, are MAPPED tags and must meet the same reachable floor as everything
+     else: the phase spreads them too, with the review's measured open-world candidates as
+     the starting set (horn: moor_ram, veiled_stag, gilded_stag, frostmane_yeti; gills:
+     tide_scuttler, shoal_scuttler beside the four shipped carriers), each tag placed only
+     where the flavor reads true. The floor still counts templates; the phase RECORDS spawn
+     density per family in the ledger (count-1 named mobs are legal floor members and the
+     QA twin's reachability agent judges density), so the metric's blind spot is at least
+     written down. WHY: the review proved 11m as written breaks its own test the moment it
+     maps the orphans, and cannot force a single mid-band silk source; both defects are
+     cheap to fix in the plan and expensive to discover in a session.
+125. qr-11m-SUPPLY. FAULT C's SUPPLY premise is corrected in place: rare disenchants yield
+     arcane_essence, NOT arcane_shard; shards come only from epic and legendary disenchants
+     (DISENCHANT_MATERIAL_BY_QUALITY in src/sim/professions/disenchant_reagents.ts,
+     unchanged since the original enchanting commit). A level-20 rare yields roughly 6 to 7
+     ESSENCE per disenchant; essence is the best-fed rung of the family (40 consumers, 84
+     units over both files). 11m's line claiming "6 to 7 shards per rare disenchant" and
+     its stale one-file comparators ("arcane_essence's 19 and arcane_dust's 9"; the
+     two-file truth is essence 40 and dust 41) are amended in the phase file by this pass.
+     WHY: an executing session aiming shard consumers "at the rung that produces the
+     material" would have targeted the wrong rung on a premise its own FAULT C paragraph
+     lectures against.
+126. qr-11m-QA. Two 11m-qa corrections: the shard mutation in its invariant-decisiveness
+     agent becomes "drop the LAST consumer of a material" (dropping one of twelve cannot
+     red a presence-only arm, so the written mutation yields a false not-decisive verdict);
+     and its scope agent treats ANY new item id as BLOCKING, because decision 12 as settled
+     REJECTED minting (the "authorized orphan material" tolerance was stale).
+127. qr-11n-WIDE. 11n WIDENS in four recorded ways. (a) The stock-row carve-out grows from
+     one row to FIVE: smith_haldren's four byte-identical crafted gear rows
+     (eastbrook_arming_sword, eastbrook_chain_vest, eastbrook_wool_trousers,
+     tanned_leather_jerkin) are PULLED from his vendorItems alongside the Verane
+     bear-elixir pull. The four recipes, items, and prices stay; only the vendor stock
+     goes. They are R23's purest competitor shape (identical id, zero margin, unlimited
+     restock) and the review found no recorded reasoning for leaving them; the smith keeps
+     selling his non-crafted staples. (b) The measured-fault table gains the four food
+     rungs the review found broken beyond the two named: fenbridge_rye 243 equals two
+     crafted foods, smoked_eel 432 equals frostgill_chowder, trail_hardtack 552 equals two
+     crafted foods (all zero margin), and roast_mountain_goat 874 versus
+     marlows_grand_roast 980 is 12.1 percent against a 20 percent top-rung target. (c) The
+     margin ladder maps onto the six-tier food line EXPLICITLY: the phase assigns each
+     vendor food a rung on the 10/15/20 ladder by its magnitude tercile and records the
+     mapping, so "by rung" is never a judgment call at a definition. (d) The
+     no-crafted-counterpart exclusion set is the FIVE vendor drinks (spring_water,
+     marsh_mint_tea, silvermist_cordial, meltwater_flask, glacier_melt), not spring_water
+     alone; zero crafted drinkMana items exist, so the whole mana-drink economy has no
+     crafted arm, RECORDED as an R21-shaped gap for the record (a crafted drink line is
+     future content, not an 11n nerf). Conjured mage food equalling the top crafted food
+     at zero cost is recorded as out of R23's vendor-sold scope, with that wording, so
+     nobody rediscovers it as a miss.
+128. qr-GRAY. THE GRAY-GRIND OBSERVATION, measured and DECIDED: no gain-curve change in
+     this packet. The review measured that below-band crafts still gain at half and
+     quarter rate, so the cheapest path to any craft skill number is always bulk-spamming
+     low recipes rather than crafting the band's real content. Changing
+     tierProgressMultiplier mid-packet would invalidate the 11e, 11f and 11i pacing models
+     and re-open settled curves, so the packet records the measurement (Phase 15 prints
+     crafts-to-cap for the cheap path beside the intended path per craft) and the revisit
+     lands in brainstorm.md's future-tier block. WHY recorded rather than fixed: the fix
+     is a pacing redesign, not a tune, and every pacing model in this packet was derived
+     against the shipped multiplier.
+129. qr-12-CADENCE. THE PERFECTING CADENCE GETS AN ACCEPTANCE CRITERION, closing the one
+     unbounded design number the review found. Phase 12's rank and attempt counts are
+     DERIVED (never pasted) against this target: the reference endgame character (one
+     Maker's Ember per week, no banked backlog, R4's accrual untouched) reaches Perfected
+     on a FIRST piece in 4 to 6 weeks, and fills both cap slots in 10 to 12 weeks; a
+     masterwork head start (R1) is worth about one week. The derivation, its inputs (the
+     ember faucet, banked-ember behavior, the head-start size), and the resulting counts
+     are recorded in state.md by the phase 12 session. WHY: attempts-per-rank against a
+     weekly keystone IS the endgame's whole cadence; seed prices got a delegation row and
+     the packet's largest pacing lever had none.
+130. qr-CENSUS. CENSUS ERRATA, amended in place where each number lives: fishing's endgame
+     bill count measures 2, not 1 (recipe_stormreel_fishing_rod at 75 also consumes
+     glimmerfin_koi; both rows are rods, so "fishing feeds only itself" stands); mining
+     measures 20 under the node-family derivation; the corpse-harvest family list was
+     never pinned (11 claimed, up to 21 under the widest reading). The family definitions
+     behind the BEFORE column are pinned by 11j Agent 1's derivation, and 11j's BEFORE
+     column carries this row's note so a prediction mismatch at 11j is read as this
+     erratum, not as a lost row.
+131. qr-R17-SWEEP. ONE R17 SWEEP, not two. 11f Agent 6 CREATES the R17 firewall test file;
+     11h Agent 5's FARM_CROPS-derived sweep EXTENDS that same file rather than authoring a
+     sibling, and both phase files name it. WHY: the review found the two phases authoring
+     independent guards for one invariant with different carve-out shapes and no
+     cross-reference, the exact two-guards-disagree failure the packet's own rules name.
+132. qr-DOC-DRIFT. THE DRIFT SET THE REVIEW FOUND, all fixed by this pass in the files
+     where each lives: implementation-plan.md's settled-gates paragraph (two open items
+     and "no phase may act on ip-NAME-BORDERLINE", contradicting row 114 and phase-16's
+     instructed rename; a Phase 16 session obeying it would have silently dropped the
+     maintainer's ruling); decisions-index.md's matching two-open-items claim; THIS FILE's
+     own block header (see the amendment in the delegation preamble above); phase-11e's
+     rejection list still re-arming the fifth-hoe-rung rejection 11j records as overturned
+     (amended with a dated pointer); phase-11g-qa's handoff still describing 11h's deleted
+     GATE F; phase-11m's stale census lines (rows 124 and 125). Two farming decisions
+     silently narrowed without amendment lines now get them: 11j STEP 6 adds the dated
+     AMENDED line to D10 (the hoe ladder is five rungs, overturn recorded), and 11e STEP 6
+     adds the dated AMENDED line to D21 (the work-order rotation stays at the original
+     eight crops, with 11e's no-new-rows verdict as the reason), both in farming/state.md
+     once 11b's move creates it.
+133. qr-GATE-DOC. THE GATE MODEL GETS DOCUMENTED. Phase 16's content-surface sweep adds a
+     short "how crafting gates" paragraph to docs/design/professions.md citing
+     crafting.ts: there is deliberately NO skillReq admission gate at craft time; bands
+     gate TEACHING (teachTierMet over both channels) and SKILL GAIN (the archetype
+     ceilings and tier-distance multipliers) and the masterwork ceiling, so a low-skill
+     crafter with materials can always craft a known recipe for a friend. Any packet
+     R-number in that paragraph reads "masterwrought R<n>" in full per the namespace rule.
+     WHY: the review judged the design good and undocumented, reading like a bug until
+     traced; writing it down is what stops a future contributor from "fixing" it.

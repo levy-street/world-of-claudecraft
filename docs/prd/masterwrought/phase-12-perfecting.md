@@ -52,8 +52,13 @@ Agent 1 (sim module + tests):
   locked constants stay untouched (R1). Eligibility: an apex (masterwrought-flagged)
   piece, crafter skill 125 in the craft that made it (R13), the wearer supplies the
   materials. Per-attempt consume: 1 Maker's Ember + Sundered Essence + 1 Prismglass
-  Setting. A rank track up to Perfected: decide the rank/attempt counts and record them
-  in state.md. Fail-forward ONLY: failure consumes materials and never harms or
+  Setting. A rank track up to Perfected: DERIVE the rank/attempt counts against the
+  qr-12-CADENCE criterion (state.md row 129, added 2026-08-20 by the quality-review
+  adoption pass): the reference endgame character (one Maker's Ember per week, no banked
+  backlog, R4's accrual untouched) reaches Perfected on a FIRST piece in 4 to 6 weeks and
+  fills both cap slots in 10 to 12 weeks, with a masterwork head start (R1) worth about
+  one week. Record the derivation, its inputs, and the resulting counts
+  in state.md; a session that pastes counts without the derivation has failed the ruling. Fail-forward ONLY: failure consumes materials and never harms or
   downgrades the piece (R1). The piece binds on the FIRST attempt via the Maker's Bond
   boundTo reuse (R2; base pieces stay freely tradable until then).
 - Bonus stats land via rolled.stats worth exactly the delta to source 28 at epic quality
@@ -184,3 +189,87 @@ masterwork.ts or moving the proc site's rng draw; if the R5 delta cannot be deri
 item_budget.ts formulas (a magic number is a stop, not a workaround); or if the release
 merge conflicts inside src/sim/professions/ or the item wire path.
 ```
+
+### Farming arm (amended 2026-08-20)
+
+Phase 11b absorbed `feature/farming-plan` into this packet: one branch, one PR, five
+gathering professions and ten crafts shipping as one system. The prompt above is not
+retracted and not rewritten. This section is part of it. Read it after STEP 0 and fold
+every item into the matching step.
+
+**STEP 0 additions.**
+- DECISION 4 (monolith ceiling policy) IS SETTLED (2026-08-20, the full delegation; rows
+  11b-D-4, 11d-D-4 and 11d-U6-FIFTH in state.md's "Decisions closed 2026-08-20"). Nothing is
+  confirmed here. READ its landed outcome from the 11d ledger and execute against it: 11d
+  took four recorded raises at the exact merged counts, each with a ledger row naming this
+  merge, both parent pins, and the reason. A disagreement between the ledger and this file is
+  doc drift to fix before any edit, never a licence to pick. Merged
+  `src/sim/sim.ts` measures 12340 against parent pins of 12650 (masterwrought) and 12232
+  (farming). Phase 12 is the FIRST phase to add sim lines post-merge, so it inherits
+  11d's discipline verbatim: extraction first, and the merged literal in
+  `tests/monolith_budget.test.ts` is never raised to make room for this phase's code.
+- Memory scan gains: the JSONB blob-size and TOAST notes, and farming's draw-count
+  contract (draws at plant, draws at harvest, ZERO on denial, expiry, login, and tick).
+
+**STEP 1 additions (Explore agent).**
+- `docs/prd/masterwrought/farming/state.md`, the farming design authority and this
+  packet's open-item collection point, for the `characters.state` measurement and the
+  farming parity contract.
+- `src/sim/item_lock.ts`: read the MERGED export surface. Farming's F14 made
+  `countRawInSlots` a shared export out of that file and turned `Sim.countItem` into a
+  thin delegate over it, and lowered `sim.ts`'s ceiling on that basis.
+- `src/sim/professions/farming.ts` and `src/world_api/farming.ts` for the second writer
+  into the same persisted blob, and `tests/parity/golden/farming_session.json` for how
+  the farming parity scenario is registered.
+Return additionally: the merged `item_lock.ts` helper shapes, where `farmPlots` is
+written to and read from `characters.state`, and the merged `tests/parity` scenario list.
+
+**STEP 2 additions.**
+- Agent 1, item lock: the AMENDED v0.38.0 note above names `countUnlockedItem` /
+  `countUnlockedInSlots`. On the merged tree, count sufficiency through the merged helper
+  family built on farming's shared `countRawInSlots` export, not the shapes that note
+  names. Same doctrine, same dedicated locked-reason denial line, merged helper.
+- Agent 2, persistence: Perfecting writes its new `ItemInstancePayload` fields into the
+  SAME `characters.state` JSONB blob farming already writes `farmPlots` into. Farming
+  measured that blob first hand (PG16 on :5433, 2026-08-19): empty character 1499 B
+  compressed / 2059 B raw, 23 beds planted 3261 B / 7831 B, about 251 B raw per plot,
+  rows past 2 KB TOAST, WAL plus 1.5 to 3 KB per 30 s autosave cycle per fully planted
+  character. Phase 12 owes a MERGED size bound: state the worst case (a fully planted
+  character carrying a full set of Perfecting instance fields) derived from those
+  baselines and this phase's per-field cost, never asserted and never eyeballed.
+- Agent 2, reverse compatibility (new, and covered by no research lane): state what an
+  OLDER server does with a blob carrying BOTH writers. That is exactly the shape a revert
+  of this PR produces on a live realm, and farming's zero-default omission only protects
+  characters that never planted. The forward direction (pre-phase saves load clean) is
+  already in the acceptance list above; the backward direction joins it.
+
+**STEP 3 additions.**
+- The `database-performance-reviewer` trigger CHANGES. It is no longer "only if a SQL
+  call site changed": the merged blob grows on both packets with no SQL call site change,
+  and farming's measured TOAST crossing is the baseline the Perfecting fields ride on top
+  of. Dispatch it on the BLOB. `migration-safety` now covers two writers into one JSONB
+  document, in both directions.
+- Suites gain the merged parity set: run the farming parity scenario alongside the new
+  Perfecting one. Re-derive the `tests/world_api_parity.test.ts` pins against the values
+  11d predicted and then observed on the merged tree (332 total / 88 data / 244 method;
+  11e is content-only and moves none of the three), and predict this phase's facet delta
+  before running it, never after.
+
+**STEP 5 additions (acceptance).**
+- [ ] Merged `characters.state` size bound stated WITH its arithmetic against farming's
+      measured baseline
+- [ ] Revert direction recorded: an older server's behavior on a both-writers blob
+- [ ] Item-lock sufficiency counted through the merged `countRawInSlots` family
+- [ ] `farming_session` golden unmoved from the merged value 11d recorded, and farming's
+      draw-count contract intact
+- [ ] `sim.ts` ceiling re-derived extraction-first, never raised for this phase
+
+**What the QA twin additionally owes.** One determinism arm: the farming draw-count
+contract still holds and `farming_session` did not move. Its authority-and-wire agent
+covers the merged `fplot` delta key and the merged command-schema counts; its persistence
+arm reads the blob size and the TOAST crossing; `migration-safety` covers two writers
+into one blob in both directions.
+
+**Stopping rule, added.** Stop and ask if the merged blob bound cannot be derived from
+farming's recorded measurement without a fresh Postgres measurement run this phase has no
+rig for.

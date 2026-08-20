@@ -373,6 +373,34 @@ Vellum.
 
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
+STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.
+
+THE RULING: rename the PROFESSION-RELATED name and leave the world alone. The maintainer
+first said to change them all to avoid the risk, then scoped it on seeing what the list
+actually contained: "if these are zones like map zones, let's not mess with that. Let's just
+stick to profession related stuff please." That is the ruling.
+
+RENAME, IN THIS PACKET (Phase 16 owns it, inside its merged naming-registry pass):
+- ITEM 5, the `Enchant <Slot> - <Stat>` scheme. This is the only profession-related entry on
+  the list. It is verbatim WoW formula trade dress sitting on ENCHANTING content that this
+  packet is already rewriting, so it is in scope by subject as well as by risk, and the
+  distinctive suffixes were already originalized (Runed Sigil, Runed Weave), which leaves
+  only the scheme itself to re-cut.
+
+DO NOT RENAME, and do not re-raise:
+- ITEM 1, the zone families The Amberfall / The Frostveil Reach / The Nightbloom / Galecrest.
+- ITEM 3, the Voidscar zone family.
+- ITEM 6, the timing-parallel coins (Brutok, Brother Halven, Aetherwell, Gravelight, Summon
+  Emberkin), which are mobs, NPCs and abilities rather than profession content.
+These are WORLD IDENTITY, not professions. They stay exactly as shipped. Every one was judged
+BORDERLINE rather than infringing under masterwrought R15's bar (which governs NEW coinage),
+several plausibly PREDATE the other property, and a shipped-zone rename cascades through zone
+identity, POIs, quest text, derived deed and item names, the map, the wiki, the guide and
+every locale. Measured, for the record, so nobody re-derives it: Amberfall 61 files / 124
+source hits, Frostveil 102 / 156, Nightbloom 72 / 149, Galecrest 71 / 174, Voidscar 18 / 21.
+No phase in this packet may touch any of them.
+- ITEMS 2 (Highwatch) and 4 (Moonrest) were REFUTED outright and stay.
+
 1. **Zones and their families.** 'The Amberfall' (RS3 2026 music track, itself a
    typo of 'Amberfell'), 'The Frostveil Reach' (GW2 minor NPC surname), 'The
    Nightbloom' (FFXIV boss theme; WoW also uses Nightbloom), and **Galecrest**

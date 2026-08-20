@@ -63,5 +63,6 @@ unreviewed code: have a fresh reviewer pass over the fix diff.
 STEP 4 - DOCS: progress.md (Phase 11 QA row), state.md drift, memory notes.
 
 STEP 5 - REPORT: PASS / PASS-WITH-FOLLOWUPS / FAIL, counts found and fixed, handoff to
-Phase 12. Follow-ups are CUT-or-fix decisions, never future-PR items.
+Phase 11b (the farming absorb, inserted after this round completed; Phase 12 now follows
+11e). Follow-ups are CUT-or-fix decisions, never future-PR items.
 ```

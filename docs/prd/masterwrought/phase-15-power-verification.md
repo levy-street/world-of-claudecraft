@@ -97,3 +97,109 @@ STOPPING RULES: stop and ask if the envelope cannot be met by tuning down withou
 breaking a locked ruling (R13 skill placement, R14 stat shapes), or if the framework
 cannot measure a kit (a tooling gap is a maintainer call, not a guess).
 ```
+
+### Farming arm (amended 2026-08-20)
+
+Phase 11b absorbed `feature/farming-plan` into this packet: one branch, one PR, five
+gathering professions and ten crafts shipping as one system. The prompt above is not
+retracted and not rewritten, but TWO of its premises are falsified by the absorb and must
+be re-authored BEFORE this phase runs. Read this section first.
+
+**Premise 1, falsified: the "food" term in R5's kit doubles.** The kit above reads
+"2 Perfected pieces + apex enchants + flask + food". After the merge, "food" names two
+systems: masterwrought's three apex role foods and farming's four-rung dish ladder. The
+kit definition must name the SPECIFIC aura and magnitude it measures, not the word
+"food". Rewrite it before Arm 1 builds anything.
+
+**Premise 2, falsified: the feast is un-dropped.** Deviation (e) recorded, with outcome
+dated 2026-08-16, that the feast was dropped from the R5 full-kit premise per ruling (4)
+of the Phase 10 QA, on the finding that there was no feast buff source to measure, and
+that correction was applied to BOTH live copies: this file's Goal line and Arm 1, and
+`implementation-plan.md`'s Phase 15 deliverable. Farming's `harvest_feast` and 11e's apex
+Harvest Feasts falsify that finding. Revert both edits and re-record deviation (e) with
+its new outcome in the state.md ledger, in the same change, before the measured pass
+starts. R5's correct kit definition becomes "the best available food, always on,
+delivered by feast", which is strictly stronger than what this phase was written to
+measure.
+
+**Premise 3, added 2026-08-20 (qr-11o-WEAR, state.md row 118): the crafted rare tier was
+re-leveled before this phase runs.** Phase 11o moved recipe.level on the rung-50 gear
+recipes (20 to 15) and the three rung-75 grandfathered rares (20 to 17), so the crafted
+rares are wearable mid-leveling. That change was ruled R5-safe by construction (it moves
+WHEN gear can be worn, never any magnitude), and this phase VERIFIES the construction: the
+level-20 shelf this phase measures against (raid, heroic, apex) must be shown UNMOVED by
+11o (re-derive the shelf, do not assume it), and any 11o-side drift into the shelf is a
+STOP, not a tuning input.
+
+**The gray-grind record (qr-GRAY, state.md row 128), a new recorded measurement, not a
+tune:** print, per craft, the crafts-to-cap count for the cheapest below-band spam path
+beside the intended band-matched path. No gain-curve change lands in this packet (the 11e,
+11f and 11i pacing models were all derived against the shipped multiplier); the record is
+the judgment surface for the future-tier revisit brainstorm.md carries.
+
+**STEP 0 additions.**
+- DECISION 2 (the well-fed unification and power ladder) IS SETTLED (2026-08-20, row
+  11c-D-2). Nothing is confirmed here: READ its landed outcome from the 11c ledger and
+  measure against it. The settled ladder: one aura id `'well_fed'`, masterwrought's
+  `FoodItemDef.wellFed` field
+  and `TimedStatBuffPayload`, masterwrought's clear-then-grant order, farming's
+  `src/sim/wellfed.ts` module and tooltip view, and the ladder re-tuned to farming 2/3/4/5
+  at 600 s with the apex role foods at 6/900. IF 11c landed exactly that, THIS PHASE'S
+  ARITHMETIC IS UNCHANGED from what it was authored against: consumables stay at flask 15
+  plus food 6 equals 21 stamina, roughly 3 percent of physical white DPS from consumables
+  and 4.2 to 4.7 percent for the full physical kit against the 5 percent cap. That is the
+  entire reason to prefer that ladder over any other.
+- IF 11c landed anything else, that is a code-versus-ruling mismatch and it is blocking on
+  its own. This phase then requires a fresh run of
+  `docs/design/spell-balance-framework.md` from the top, and it trips its own stopping rule:
+  the named tune-down knobs are flask 15 and well-fed 6, and the well-fed magnitudes are
+  SETTLED at 11c-D-2. A breach closable only by moving them RE-OPENS 11c-D-2 in the packet
+  record and is reported as such; it is never an in-phase re-tune of a settled magnitude.
+- Confirm 11e landed before measuring: decision 1 (the tier 3 and 4 seed faucet at
+  `farmer_hollis` and `farmer_verbena`) changes real-world tier 3 and 4 produce
+  availability, which changes food uptime, which is an R5 INPUT; and decision 6
+  (`marsh_rice` count 2 into `recipe_seasoned_stock`) must be in the tree before this
+  phase seals numbers, never after.
+- ACCESS VERSUS POWER IS SETTLED (2026-08-20, row ip-15-ACCESS). R5 measures the GEARED
+  INDIVIDUAL at full food uptime, never the raid aggregate. Every knob R5 names is a
+  per-character stat (flask 15, well-fed 6, apex enchants, 2 Perfected pieces), and
+  ip-15-KIT already re-authored the premise to "the best available food, ALWAYS ON, delivered
+  by feast", which bakes 100 percent uptime into the individual measurement. A feast therefore
+  moves DELIVERY, not the ceiling: it takes a raid from partial uptime to the uptime the
+  measurement already assumed. That is access, and under masterwrought R21 and R18 it is the
+  intended reward for preparation (prepared is meaningfully stronger, unprepared is behind and
+  never locked out), so it does not enter the R5 arithmetic. STATE THE MODEL EXPLICITLY in
+  `power-verification.md` and in the ledger, in those terms, so the number is reproducible
+  from the doc alone and nobody re-litigates it by re-measuring a raid.
+
+**STEP 1 additions (Explore agent).**
+- The merged consumable set as shipped after 11c and 11e: the apex role foods, farming's
+  four dishes, `harvest_feast`, the three apex Harvest Feasts, `ironhusk_flask`, and the
+  elixir family.
+- `src/sim/wellfed.ts` and `src/sim/combat/auras.ts` as merged, for the single mint site
+  and the exclusivity rules 11c settled.
+- The merged exclusivity pins from phases 06 and 10, which do not know the farming
+  namespace existed.
+
+**STEP 2 additions.**
+- Arm 1 measures the merged kit: the named food aura at its named magnitude, delivered by
+  feast at full uptime, plus the flask, plus apex enchants, plus 2 Perfected pieces.
+  `power-verification.md` states the aura id and value it measured, so the number is
+  reproducible from the doc alone.
+- Arm 3 gains a NEW aura-exclusivity pin spanning `well_fed` and `elixir_<kind>`, and
+  asserting that `wellfed_<kind>` no longer exists ANYWHERE in the tree. That last clause
+  is the one that catches a bad 11c resolution, and it is a source scan, not a behavior
+  test.
+- Arm 3's budget-sweep enumeration is otherwise unaffected: no farming item is
+  apex-flagged.
+- Arm 4 tunes DOWN as before, with one added constraint: farming's ladder magnitudes are
+  SETTLED at 11c-D-2, so a breach that can only be closed by moving them is a STOP that
+  re-opens 11c-D-2 in the record, not an in-phase tune.
+
+**STEP 5 additions (acceptance).**
+- [ ] Deviation (e) re-recorded with its new outcome; both live copies reverted
+- [ ] The kit definition names the specific food aura, its magnitude, and its delivery
+- [ ] Aura-exclusivity pin spans `well_fed` and `elixir_<kind>` and asserts
+      `wellfed_<kind>` is absent from the tree
+- [ ] The access-versus-power model (individual or raid) stated and answered in the doc
+- [ ] 11c's ladder and 11e's content confirmed in the tree before any number was sealed
