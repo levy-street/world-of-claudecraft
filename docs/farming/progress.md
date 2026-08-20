@@ -34,7 +34,7 @@
 | Phase 11 QA | DONE 2026-08-19 (PASS-WITH-FOLLOWUPS) | fix/farming-phase-11-qa off 35536d8ca8 (v0.40.0 e56707a675 still newest, no absorb); merge hash in the notes tail | All four mandatory emphases proven live first-hand (coexistence and last-eaten-wins through real ticks; the eat verb PLAYED as a player through the real bag UI on the LOW live client with the buff bar, remaining time, and single-Use:-prefix tooltip observed; the tier-4-then-tier-1 downgrade over the REAL wire through a stable-timer GameServer + ClientWorld rig, value 12 shipped, held through elision, re-encoded to 3); 7 lanes/reviewers 0 BLOCKING; 4 SHOULD-FIX closed test-first (18s boundary bracket, concurrent-meal refusal, death forfeit, zero-rng rig guards) plus the stat-map parity pin, the stripComments glue-pin hardening, and ten frozen non-Latin fill literals; mutations 7/7 killed named (M3 and M5b re-proven, five fresh over the new pins); rest ledgered with owners in the state.md Phase 11 QA block |
 | Phase 12 (shared feast) | DONE 2026-08-19 | fix/farming-phase-12-shared-feast off deffe3a5d4 (release/v0.40.0 e56707a675 still newest, no absorb); merged --no-ff as 71010cf82a, phase tip 1b33789ba4 | harvest_feast (kind junk, ItemDef.feast {charges 10, 3600 ticks, dishItemId evergarden_braised_greens}) + recipe_harvest_feast (FARM_RECIPES 14, reagent-dormant under (ca)); placeFeast/consumeFeast on IWorldFarming (331 = 88 + 243); the farm_feast entity on the normal snapshot; one-active-per-placer; the bite is a consume slot at the capstone dish (the one updateRegen mint site); the lootable re-arm trap found BY PLAYING and fixed; beat P appended (draws 110 unchanged, md5 9dfd1c6e); five-review round + qa-checklist 0 standing BLOCKING; gate run 2 all 12 green |
 | Phase 12 QA | DONE 2026-08-19 (PASS-WITH-FOLLOWUPS) | fix/farming-phase-12-qa off 2445de46ab (e56707a675 still newest, no absorb); merge hash in the notes tail | All four emphases proven first-hand over the real wire (three-session lifecycle incl. placer-eats-own and latecomer denies; the ledger survives leave/rejoin on the characterId key; nothing serializes, save blobs + db calls captured clean; the re-arm class online through a real ClientWorld mirror); ONE real defect class found and fixed test-first in BOTH legs (the teardown leak: a feast placed in a dungeon instance or a delve run outlived it); the re-arm dodge amended to the Infinity sentinel (worst-case margin was ONE tick, four lanes converged); flourish rebuild-replay silenced + FEAST_SHADOW_CAP 8 (presence never culled); six decisive arms added (swim-bite, exact-range, keyed placer, orphan window, delve lifecycle, behavioral bags click); mutations 13/13 killed named; 3 audit lanes + 5 reviewers + qa-checklist READY, 0 BLOCKING anywhere |
-| Phase 13 (integration polish) | not started | | |
+| Phase 13 (integration polish) | complete 2026-08-19 (gate + merge record in the Phase 13 Notes block) | | |
 | Phase 13 QA (final; teardown offer) | not started | | |
 
 ## Per-phase deliverable checklists
@@ -3412,10 +3412,87 @@ NOTES TAIL (records):
   md5 9dfd1c6ea073f853655e38675460e81f held through the whole round.
 
 ### Phase 13
-Status: IN FLIGHT (2026-08-19, integration polish, local-only per D22;
-branch fix/farming-phase-13-integration-polish, opened with the M5 sim.ts
-extraction, monolith ceiling 12660 lowered to 12249). The orchestrator
-appends the status row and the gate record after integration.
+Completed 2026-08-19 on fix/farming-phase-13-integration-polish, local-only per
+D22 (no push, no PR; merged --no-ff into feature/farming-plan, merge hash in the
+gate record below). Opened with the MANDATED sim.ts extraction: M5, the boss
+support kit (updateBossMechanics + spawnBossAdds, ~430 lines) moved whole to
+src/sim/mob/boss_mechanics.ts behind SimContext, thin facade delegates kept for
+the seven suites that reach the methods by cast, the S3 scan list gained the
+module path, the monolith ceiling LOWERED 12660 to 12249, the farming_session
+golden byte-identical (md5 9dfd1c6ea073f853655e38675460e81f) and the parity
+suite green throughout. Architecture review: 0 BLOCKING; both SHOULD-FIXes
+taken (tests/mob_boss_mechanics.test.ts direct unit test; the src/sim/CLAUDE.md
+map row) plus the ownership annotations and the once-per-pull comment fold.
+Extraction mutation checks through the dirty-refusing runner, 4/4 KILLED with
+named failing tests: M1 drop-mend-applyHeal (the hp-bounds arm), M2
+pulse-ignores-telegraph (the never-pulses arm), M3 adds-not-flagged-summoned
+(the summonedAdd arm), M4 unknown-template-guard-dropped (the silent arm).
+
+Acceptance (phase file STEP 5, as amended by the D22 sweep):
+- [x] The sim.ts extraction landed with a LOWERED ceiling (12660 to 12249) and a
+      byte-identical golden.
+- [x] The wiki farming page regenerated via npm run wiki:content (byte-identical
+      regen), tests/guide.test.ts green, prose spoiler-safe: lane A added the
+      "From the beds to the table" section (new keys only, no rewords) and
+      replaced the false no-deeds-yet claim via the new gatherDeeds.farmingSown
+      key with its five M16 fills.
+- [x] docs/design/farming-asset-manifest.json exists: 16 rows generated from
+      FARM_PROP_CONTRACTS, cross-checked BOTH directions (every exporter output
+      has a row, every adapter consumer parameter has an entry), authored and
+      draw heights as separate labeled fields, replacement contract verified
+      against the exporter, render identity + adapter parameters recorded.
+- [x] The manifest references no docs/farming/ path (grep-verified; it survives
+      teardown).
+- [x] The full-journey screenshot set is committed under
+      docs/screenshots/farming-phase-13 (this reference is load-bearing for the
+      ci_workflow referenced-corpus pin): 01-planting, 02-stage-ladder,
+      03-harvest, 04-harvest-journal, 05-harvest-feast, each -desktop (1600x900)
+      and -mobile (844x390 landscape touch), LOW preset seeded pre-boot,
+      recaptured toast-free with a per-shot GPU-notice assertion; the cone row
+      joined all five ci.yml sparse-checkout blocks AND the ci_workflow test
+      literal in the same commit.
+- [x] Every progress.md Notes deferral and state.md residual swept into the
+      state.md handoff table (105 rows + the integration additions), the
+      MAINTAINER GATES block at the top, none lost; closures recorded, never
+      silently dropped.
+- [x] docs/farming/qa-checklist.md executed in full with per-row evidence (the
+      matrix below), anti-chore audit as its own subsection; the one
+      BLOCKED-ON-RULING row is the known (ca)/D11 gate this phase ledgers by
+      design; the five DEFERRED-TO-INTEGRATION rows are completed in the
+      integration record below.
+- [x] The final IP-safe audit (D17) covered every player-visible farming string
+      (per-module counts in the integration record; zero violations; one
+      shared-key staleness follow-up and one awareness note ledgered).
+- [x] No em dashes, en dashes, or emojis in the new prose (hook-enforced plus
+      a diff scan).
+- [x] Gate green by log markers and ci:changed rc 0 (the gate record below).
+
+Integration record (the orchestrator, 2026-08-19):
+- Lane commits cherry-picked in order: 2e14d0bbc8 (guide), e877a9de08
+  (manifest), cbd04d03ea (screenshots + cone rows), 72b7923dbf (sweep +
+  checklist), then 09b86e63d0 (integration reconcile), 6b074f9168 (manifest
+  biome format), 2f890caa84 (toast-free recapture).
+- The checklist rows lane C deferred to integration, completed here: the
+  manifest EXISTS and is cross-checked (see the acceptance box above); the
+  screenshots are committed and referenced from THIS block; ci:changed rc 0
+  after the manifest format fix; wiki accuracy re-verified on the integrated
+  tree (guide battery 587 passed); the packet-close gate is the record below.
+- D17 audit per-module counts (lane A): hud_chrome 78 checked / 0 flagged;
+  items 49 / 0; guide 7 shipped + 3 added / 0; hud 1 / 0 (other hits
+  incidental); abilities 28 hits all excluded as non-farming; world_entity +
+  NpcDefs 12 / 0; sim_i18n 3 / 0 with the Well Fed awareness note;
+  talent_i18n all hits excluded. Zero D17 violations.
+- Reviews: architecture (the extraction) 0 BLOCKING, fixes taken;
+  gate-integrity (the cone rows) APPROVE 0 BLOCKING, its durability
+  SHOULD-FIX satisfied by this block's screenshot reference plus the
+  manifest's regenerationNote, and its teardown finding ledgered as the
+  Phase 13 QA teardown precondition (seven earlier subtrees are referenced
+  only from docs/farming/); frontend-seam and qa-checklist verdicts recorded
+  below when delivered.
+- Validation on the integrated tree: tsc rc 0; wiki:content rc 0 and
+  byte-identical; guide/ci_workflow/i18n_completeness/localization_fixes/
+  monolith/architecture/world_api_parity 587 passed; tests/parity 216 passed
+  with the golden md5 exact; ci:changed rc 0.
 
 Notes (Lane C, the deferral sweep and the checklist execution, 2026-08-19):
 - TASK 1 delivered in state.md: the head block healed (Phase 12 merged

@@ -119,6 +119,15 @@ Only after every prior step is green:
 - On explicit confirmation, delete ONLY that directory with explicit paths:
   git rm -r docs/farming/ and a "docs: remove farming planning scaffolding" commit
   (with a body) if the docs were committed.
+- [ADDED by the Phase 13 sweep, a HARD teardown precondition: seven screenshot cone
+  subtrees (farming-phase-01/05/07/08/09/09b/12) are referenced ONLY from docs/farming/
+  files, so the deletion reds tests/ci_workflow.test.ts's referenced-vs-cone
+  set-equality and the in-test comment then suggests deleting the cone rows, which
+  would silently drop the evidence from five CI checkouts. The teardown change must,
+  in the SAME commit, either re-home one reference per subtree to a surviving file or
+  deliberately retire each subtree WITH its cone rows and PNGs (a maintainer call).
+  The plain farming/ subtree and farming-phase-13 already survive via
+  docs/design/farming-asset-manifest.json and the exporter.]
 - If the user declines, leave the packet in place and say so in the final response.
 - Never delete anything else, never fold the deletion into an unrelated commit, never
   git add -A.
