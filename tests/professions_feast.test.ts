@@ -15,7 +15,11 @@ import { DELVES, ITEMS } from '../src/sim/data';
 import { delveRunForPlayer, freeDelveRun } from '../src/sim/delves/runs';
 import { enterDungeon, instanceAt, leaveDungeon } from '../src/sim/instances/dungeons';
 import { setItemLocked } from '../src/sim/item_lock';
-import { FARM_FEAST_ITEM_ID, FARM_FEAST_TEMPLATE_ID } from '../src/sim/professions/feast';
+import {
+  FARM_FEAST_ITEM_ID,
+  FARM_FEAST_TEMPLATE_ID,
+  placeFeastAction,
+} from '../src/sim/professions/feast';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import {
@@ -296,6 +300,82 @@ describe('shared feast: placing', () => {
     // The locked end-slot copy was never a victim: A (unlocked) was spent.
     expect(lockedUnits(placer)).toBe(1);
     expect(unlockedUnits(placer)).toBe(0);
+  });
+
+  it('a use_item press spends the CLICKED slot, never the id-walk guess (two stacks)', () => {
+    const { sim, placer } = world(0);
+    // Two distinguishable copies: distinct instance payloads never merge, so
+    // CopyA sits at the LOWER bag index and CopyB at the END slot, exactly
+    // where the id-only removal walk (highest index first) would strike.
+    sim.addItemInstance(FARM_FEAST_ITEM_ID, { signer: 'CopyA' }, placer.pid, 1, { silent: true });
+    sim.addItemInstance(FARM_FEAST_ITEM_ID, { signer: 'CopyB' }, placer.pid, 1, { silent: true });
+    const idxA = placer.meta.inventory.findIndex(
+      (s) => s.itemId === FARM_FEAST_ITEM_ID && s.instance?.signer === 'CopyA',
+    );
+    const idxB = placer.meta.inventory.findIndex(
+      (s) => s.itemId === FARM_FEAST_ITEM_ID && s.instance?.signer === 'CopyB',
+    );
+    expect(idxA).toBeGreaterThanOrEqual(0);
+    expect(idxB).toBeGreaterThan(idxA);
+
+    const from = sim.events.length;
+    sim.useItem(FARM_FEAST_ITEM_ID, placer.pid, idxA);
+    expect(eventsOf(sim, from, 'farmFeastPlaced')).toHaveLength(1);
+    // The clicked copy (A) is gone and the end-slot copy (B) survives: the
+    // named selection was honored, not the highest-index guess.
+    const left = placer.meta.inventory.filter((s) => s.itemId === FARM_FEAST_ITEM_ID);
+    expect(left).toHaveLength(1);
+    expect(left[0].instance?.signer).toBe('CopyB');
+  });
+
+  it('a use_item press naming a LOCKED copy denies as locked even with an unlocked spare', () => {
+    const { sim, placer } = world(0);
+    // A locked at the lower index, B unlocked at the end slot (a locked slot
+    // never merges, so the second grant starts fresh).
+    giveFeast(sim, placer);
+    setSlotLocked(sim, placer, true);
+    giveFeast(sim, placer);
+    const idxLocked = placer.meta.inventory.findIndex(
+      (s) => s.itemId === FARM_FEAST_ITEM_ID && s.instance?.locked === true,
+    );
+    expect(idxLocked).toBeGreaterThanOrEqual(0);
+
+    const from = sim.events.length;
+    sim.useItem(FARM_FEAST_ITEM_ID, placer.pid, idxLocked);
+    // Spending a different copy than the one the player clicked is the
+    // id-only guess per-copy addressing exists to remove: the named locked
+    // copy refuses as locked, nothing is spent, nothing spawns.
+    expect(denyReason(sim, from)).toBe('locked');
+    expect(lockedUnits(placer)).toBe(1);
+    expect(unlockedUnits(placer)).toBe(1);
+    expect(sim.ctx.feasts.size).toBe(0);
+    expect(feastEntities(sim)).toHaveLength(0);
+
+    // Positive control: the same press naming the UNLOCKED copy lands and
+    // spends exactly it; the locked copy survives.
+    const idxUnlocked = placer.meta.inventory.findIndex(
+      (s) => s.itemId === FARM_FEAST_ITEM_ID && s.instance?.locked !== true,
+    );
+    const from2 = sim.events.length;
+    sim.useItem(FARM_FEAST_ITEM_ID, placer.pid, idxUnlocked);
+    expect(eventsOf(sim, from2, 'farmFeastPlaced')).toHaveLength(1);
+    expect(lockedUnits(placer)).toBe(1);
+    expect(unlockedUnits(placer)).toBe(0);
+  });
+
+  it('a stale named selection refuses without spending (the direct defensive arm)', () => {
+    // The tri-state's null branch is unreachable through useItem (which
+    // pre-validates the selection), so this drives placeFeastAction directly
+    // with an out-of-range index: the refusal must consume nothing and spawn
+    // nothing (the free-feast duplication a silent fall-through would risk).
+    const { sim, placer } = world(0);
+    giveFeast(sim, placer);
+    const from = sim.events.length;
+    placeFeastAction(sim.ctx, placer.p, placer.meta, 999);
+    expect(denyReason(sim, from)).toBe('no_feast');
+    expect(sim.countItem(FARM_FEAST_ITEM_ID, placer.pid)).toBe(1);
+    expect(sim.ctx.feasts.size).toBe(0);
+    expect(feastEntities(sim)).toHaveLength(0);
   });
 
   it('feast_active: one active feast per placer, while another player still can place', () => {

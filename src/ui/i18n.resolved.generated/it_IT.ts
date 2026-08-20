@@ -3080,6 +3080,7 @@ export const it_IT: EnTranslations = {
         "rodBand": "Sblocca tabelle di catture più ricche con abilità di Pesca {skill} o superiore."
       },
       "downgradeMark": "Borse piene: il ritrovamento e stato conservato senza il marchio del raccoglitore.",
+      "downgradeMarkCrop": "Bags full: the harvest was stored without its grower's mark.",
       "downgradeFind": "Borse piene: un ritrovamento pregiato e scivolato via.",
       "emptyHookNote": "Niente all'amo",
       "stateReady": "Pronto",
@@ -3124,7 +3125,7 @@ export const it_IT: EnTranslations = {
       "feastTitle": "{name}'s Harvest Feast",
       "feastPlacedLine": "You set out your harvest feast.",
       "huskTrade": "Trade husks for compost",
-      "huskTradeAria": "Trade withered husks for compost with {name}",
+      "huskTradeAria": "Trade husks for compost with {name}",
       "plantSheet": {
         "title": "Plant a Crop",
         "plant": "Plant",
@@ -3147,6 +3148,7 @@ export const it_IT: EnTranslations = {
       "ready": "Ready to harvest",
       "finishing": "Finishing up",
       "withered": "Withered",
+      "readyAnnounce": "Ready to harvest: {name}",
       "remainingDaysHours": "{days}d {hours}h",
       "remainingHoursMinutes": "{hours}h {minutes}m",
       "remainingMinutesSeconds": "{minutes}m {seconds}s",
@@ -5663,6 +5665,9 @@ export const it_IT: EnTranslations = {
       "matFmt": "{name} x{count}",
       "outputFmt": "{name} x{count}",
       "comboReq": "Richiede {a} e {b}",
+      "effectFood": "Restores {amount} health over {seconds} sec when eaten.",
+      "effectWellFed": "Well fed when you finish eating: +{value} {stat} for {minutes} min.",
+      "effectWellFedAura": "Grants {aura} for {minutes} min when you finish eating.",
       "sourceTrainerFee": "Istruttore, {fee}",
       "sourceTrainerFree": "Istruttore, gratuito",
       "sourceKnown": "Conosciuta dall'inizio",
@@ -9087,6 +9092,7 @@ export const it_IT: EnTranslations = {
       "useManaPotion": "Uso: ripristina istantaneamente {amount} mana. Usabile in combattimento. Recupero 1 min.",
       "clickUseInstant": "Clicca per usare subito in combattimento",
       "clickUse": "Clicca per usare",
+      "clickSetOut": "Click to set out",
       "clickBuyback": "Clicca per ricomprare",
       "bagSlots": "Borsa da {slots} spazi"
     },

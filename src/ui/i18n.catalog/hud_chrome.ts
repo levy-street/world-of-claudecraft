@@ -3811,6 +3811,11 @@ export const hudChromeStrings = {
     // text-free personal gatherDowngrade SimEvent, one key per lost arm:
     // 'mark' (the yield arrived unsigned) and 'find' (the jackpot dropped).
     downgradeMark: "Bags full: the find was stored without its gatherer's mark.",
+    // The crop surface's own mark line (Phase 14): "the find" is prospecting
+    // vocabulary and reads wrong for a harvest you grew; a crop can only
+    // ever lose the mark (nothing-rots always lands the units), so no crop
+    // find line exists.
+    downgradeMarkCrop: "Bags full: the harvest was stored without its grower's mark.",
     downgradeFind: 'Bags full: a pristine find slipped away.',
     // The empty-hook FCT self-note (the UX pass), fired off the
     // fishingEmptyHook event beside the sim's grey log line: the reel was
@@ -3931,7 +3936,11 @@ export const hudChromeStrings = {
     // the farmer flag (hud/quest/quest_dialog_controller.ts). The trade's own
     // feedback is the husksConverted line below and the denied toasts above.
     huskTrade: 'Trade husks for compost',
-    huskTradeAria: 'Trade withered husks for compost with {name}',
+    // WCAG 2.5.3 label-in-name: the accessible name CONTAINS the visible
+    // huskTrade label verbatim (speech-input users say what they see), so
+    // the aria adds only the counterparty, never rewords the action. The
+    // same containment rule binds every locale fill of this pair.
+    huskTradeAria: 'Trade husks for compost with {name}',
     // The plant sheet (the bed-verbs phase): the window a press on a free
     // garden bed opens. Seed and supply names come from itemDisplayName and
     // the watch knob reuses the journal's careWatch label, so the copy here
@@ -3989,6 +3998,12 @@ export const hudChromeStrings = {
     ready: 'Ready to harvest',
     finishing: 'Finishing up',
     withered: 'Withered',
+    // The in-dialog status line (role=status, the a11y batch): announced when
+    // a row flips to ready UNDER an open journal, naming the crop(s); the
+    // chat line reaches the log live region, but a reader standing in the
+    // journal hears nothing there. {name} is the produce display name (a
+    // comma-joined list when several flip on one repaint).
+    readyAnnounce: 'Ready to harvest: {name}',
     // The clock arms, selected by scale in harvest_journal_view.ts. Token-only
     // on purpose: no colon string is ever hand-built, and a locale is free to
     // reorder the units or change the unit letters. The seconds value arrives

@@ -117,6 +117,9 @@ export type BagTooltipHintKey =
   | 'itemUi.tooltip.clickConsume'
   | 'itemUi.tooltip.clickUseInstant'
   | 'itemUi.tooltip.clickUse'
+  // The placeable feast: the click SETS IT OUT at your feet (placeFeast),
+  // it never eats it, so the generic "Click to use" undersold the action.
+  | 'itemUi.tooltip.clickSetOut'
   // Tool-effect charms are not bag-usable: the sim refuses useItem with the
   // "Open Professions to slot that" line, so the hover must not advertise
   // "Click to use" for a click that only errors.
@@ -397,9 +400,10 @@ export function bagTooltipHintKey(
     return 'hudChrome.professions.toolEffectTooltip.openProfessions';
   }
   // The placeable feast: the hover previews the click the action ladder
-  // raises (placeFeast), through the generic use hint; the Use: tooltip line
-  // right above it says what using does.
-  if (item.feast) return 'itemUi.tooltip.clickUse';
+  // raises (placeFeast), in the feast's own words: the click sets the table
+  // out at your feet, it never eats it, so the generic use hint undersold
+  // the action (the P12 QA deferral this key discharges).
+  if (item.feast) return 'itemUi.tooltip.clickSetOut';
   if (item.use) return 'itemUi.tooltip.clickUse';
   return '';
 }

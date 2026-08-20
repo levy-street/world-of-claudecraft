@@ -3080,6 +3080,7 @@ export const zh_TW: EnTranslations = {
         "rodBand": "釣魚技能達到{skill}後可解鎖更豐富的漁獲。"
       },
       "downgradeMark": "背包已滿：這份收穫未能留下採集者的印記。",
+      "downgradeMarkCrop": "背包已滿：這份收成未能留下種植者的印記。",
       "downgradeFind": "背包已滿：一件完美的收穫溜走了。",
       "emptyHookNote": "空鉤",
       "stateReady": "可採集",
@@ -3124,7 +3125,7 @@ export const zh_TW: EnTranslations = {
       "feastTitle": "{name}的豐收盛宴",
       "feastPlacedLine": "你擺出了豐收盛宴。",
       "huskTrade": "用穀殼換堆肥",
-      "huskTradeAria": "與{name}用枯萎穀殼換取堆肥",
+      "huskTradeAria": "與{name}用穀殼換堆肥",
       "plantSheet": {
         "title": "種植作物",
         "plant": "種植",
@@ -3147,6 +3148,7 @@ export const zh_TW: EnTranslations = {
       "ready": "可以收成",
       "finishing": "即將成熟",
       "withered": "已枯萎",
+      "readyAnnounce": "可以收成：{name}",
       "remainingDaysHours": "{days}天{hours}小時",
       "remainingHoursMinutes": "{hours}小時{minutes}分",
       "remainingMinutesSeconds": "{minutes}分{seconds}秒",
@@ -5663,6 +5665,9 @@ export const zh_TW: EnTranslations = {
       "matFmt": "{name}×{count}",
       "outputFmt": "{name}×{count}",
       "comboReq": "需要{a}與{b}",
+      "effectFood": "食用後在{seconds}秒內恢復{amount}點生命值。",
+      "effectWellFed": "吃完後進入飽足狀態：{stat}+{value}，持續{minutes}分鐘。",
+      "effectWellFedAura": "吃完後獲得{aura}，持續{minutes}分鐘。",
       "sourceTrainerFee": "訓練師，{fee}",
       "sourceTrainerFree": "訓練師，免費",
       "sourceKnown": "初始即會",
@@ -9087,6 +9092,7 @@ export const zh_TW: EnTranslations = {
       "useManaPotion": "使用：立即恢復 {amount} 點法力值。戰鬥中可用。1 分鐘冷卻。",
       "clickUseInstant": "點擊在戰鬥中立即使用",
       "clickUse": "點擊使用",
+      "clickSetOut": "點擊擺放",
       "clickBuyback": "點擊買回",
       "bagSlots": "{slots}格背包"
     },

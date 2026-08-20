@@ -3080,6 +3080,7 @@ export const fr_CA: EnTranslations = {
         "rodBand": "Débloque des tables de prises plus riches à partir de {skill} en compétence de pêche."
       },
       "downgradeMark": "Sacs pleins : la trouvaille a été rangée sans la marque du collecteur.",
+      "downgradeMarkCrop": "Bags full: the harvest was stored without its grower's mark.",
       "downgradeFind": "Sacs pleins : une trouvaille de qualité supérieure vous a échappé.",
       "emptyHookNote": "Rien sur l'hameçon",
       "stateReady": "Disponible",
@@ -3124,7 +3125,7 @@ export const fr_CA: EnTranslations = {
       "feastTitle": "{name}'s Harvest Feast",
       "feastPlacedLine": "You set out your harvest feast.",
       "huskTrade": "Trade husks for compost",
-      "huskTradeAria": "Trade withered husks for compost with {name}",
+      "huskTradeAria": "Trade husks for compost with {name}",
       "plantSheet": {
         "title": "Plant a Crop",
         "plant": "Plant",
@@ -3147,6 +3148,7 @@ export const fr_CA: EnTranslations = {
       "ready": "Ready to harvest",
       "finishing": "Finishing up",
       "withered": "Withered",
+      "readyAnnounce": "Ready to harvest: {name}",
       "remainingDaysHours": "{days}d {hours}h",
       "remainingHoursMinutes": "{hours}h {minutes}m",
       "remainingMinutesSeconds": "{minutes}m {seconds}s",
@@ -5663,6 +5665,9 @@ export const fr_CA: EnTranslations = {
       "matFmt": "{name} x{count}",
       "outputFmt": "{name} x{count}",
       "comboReq": "Requiert {a} et {b}",
+      "effectFood": "Restores {amount} health over {seconds} sec when eaten.",
+      "effectWellFed": "Well fed when you finish eating: +{value} {stat} for {minutes} min.",
+      "effectWellFedAura": "Grants {aura} for {minutes} min when you finish eating.",
       "sourceTrainerFee": "Formateur, {fee}",
       "sourceTrainerFree": "Formateur, gratuit",
       "sourceKnown": "Connu dès le départ",
@@ -9087,6 +9092,7 @@ export const fr_CA: EnTranslations = {
       "useManaPotion": "Utiliser : rend instantanément {amount} mana. Utilisable en combat. Recharge de 1 min.",
       "clickUseInstant": "Cliquer pour utiliser instantanément en combat",
       "clickUse": "Cliquer pour utiliser",
+      "clickSetOut": "Click to set out",
       "clickBuyback": "Cliquer pour racheter",
       "bagSlots": "Sac de {slots} emplacements"
     },

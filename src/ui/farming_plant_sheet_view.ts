@@ -19,7 +19,7 @@ import {
   FARM_GROWTH_TONIC_ITEM_ID,
 } from '../sim/content/farm_crops';
 import { ITEMS } from '../sim/data';
-import { countUnlockedInSlots } from '../sim/item_lock';
+import { countRawInSlots, countUnlockedInSlots } from '../sim/item_lock';
 import type { FarmPlotView } from '../sim/professions/farm_projection';
 import { planWatchFee } from '../sim/professions/farm_watch_fee';
 import { canPlantCrop } from '../sim/professions/farming';
@@ -106,18 +106,10 @@ export function canOpenPlantSheet(bedId: string, myFarmPlots: readonly FarmPlotV
   return !myFarmPlots.some((plot) => plot.bedId === bedId);
 }
 
-/** Raw copies in bags, locked included: the count that splits a locked-copy
- *  shortfall (denied.locked) from a plain shortage, mirroring the sim's own
- *  countUnlockedInSlots-then-ctx.countItem deny split. */
-function countRawInSlots(inventory: readonly InvSlot[], itemId: string): number {
-  let total = 0;
-  for (const slot of inventory) {
-    if (slot.itemId === itemId) total += slot.count;
-  }
-  return total;
-}
-
-/** The compost / tonic knob: one unlocked unit of the supply item affords it. */
+/** The compost / tonic knob: one unlocked unit of the supply item affords it.
+ *  The raw count (locked included, the shared sim walk) is what splits a
+ *  locked-copy shortfall (denied.locked) from a plain shortage, mirroring the
+ *  sim's own countUnlockedInSlots-then-ctx.countItem deny split. */
 function supplyKnob(
   id: PlantSheetKnobId,
   itemId: string,

@@ -274,6 +274,7 @@ const UI_PURE_CORES = [
   'src/ui/material_hint_view.ts',
   'src/ui/material_profession_hint_view.ts',
   'src/ui/elixir_tooltip_view.ts',
+  'src/ui/wellfed_stat_keys.ts',
   'src/ui/wellfed_tooltip_view.ts',
   'src/ui/feast_tooltip_view.ts',
   'src/ui/entity_display_name.ts',
@@ -624,6 +625,7 @@ const BARE_NAMED = [
   'src/render/preview_prewarm_lane.ts',
   'src/ui/mob_idle_sfx.ts',
   'src/ui/gather_rare_event_feedback.ts',
+  'src/ui/wellfed_stat_keys.ts',
   'src/ui/gather_tool_tooltip.ts',
   'src/ui/tool_effect_tooltip.ts',
   'src/ui/known_item.ts',
@@ -1470,6 +1472,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/tool_effect_tooltip.ts',
   'src/ui/unit_frame.ts',
   'src/ui/unit_portrait.ts',
+  'src/ui/wellfed_stat_keys.ts',
   'src/ui/xp_bar.ts',
 ];
 
@@ -1927,6 +1930,7 @@ const UI_DOM_MODULES = [
   'src/ui/vale_cup_hud.ts',
   'src/ui/wiki_link.ts',
   'src/ui/window_drag.ts',
+  'src/ui/window_open_state.ts',
   'src/ui/window_resize.ts',
 ].map((rel) => join(repoRoot, rel));
 

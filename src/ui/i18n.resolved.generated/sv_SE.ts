@@ -3080,6 +3080,7 @@ export const sv_SE: EnTranslations = {
         "rodBand": "Låser upp rikare fångster vid fiskeskicklighet {skill} och uppåt."
       },
       "downgradeMark": "Väskorna fulla: fyndet förvarades utan samlarmärke.",
+      "downgradeMarkCrop": "Bags full: the harvest was stored without its grower's mark.",
       "downgradeFind": "Väskorna fulla: ett orört fynd gled undan.",
       "emptyHookNote": "Inget på kroken",
       "stateReady": "Redo",
@@ -3124,7 +3125,7 @@ export const sv_SE: EnTranslations = {
       "feastTitle": "{name}'s Harvest Feast",
       "feastPlacedLine": "You set out your harvest feast.",
       "huskTrade": "Trade husks for compost",
-      "huskTradeAria": "Trade withered husks for compost with {name}",
+      "huskTradeAria": "Trade husks for compost with {name}",
       "plantSheet": {
         "title": "Plant a Crop",
         "plant": "Plant",
@@ -3147,6 +3148,7 @@ export const sv_SE: EnTranslations = {
       "ready": "Ready to harvest",
       "finishing": "Finishing up",
       "withered": "Withered",
+      "readyAnnounce": "Ready to harvest: {name}",
       "remainingDaysHours": "{days}d {hours}h",
       "remainingHoursMinutes": "{hours}h {minutes}m",
       "remainingMinutesSeconds": "{minutes}m {seconds}s",
@@ -5663,6 +5665,9 @@ export const sv_SE: EnTranslations = {
       "matFmt": "{name} x{count}",
       "outputFmt": "{name} x{count}",
       "comboReq": "Kräver {a} och {b}",
+      "effectFood": "Restores {amount} health over {seconds} sec when eaten.",
+      "effectWellFed": "Well fed when you finish eating: +{value} {stat} for {minutes} min.",
+      "effectWellFedAura": "Grants {aura} for {minutes} min when you finish eating.",
       "sourceTrainerFee": "Tränare, {fee}",
       "sourceTrainerFree": "Tränare, gratis",
       "sourceKnown": "Känd från start",
@@ -9087,6 +9092,7 @@ export const sv_SE: EnTranslations = {
       "useManaPotion": "Använd: Återställer omedelbart {amount} mana. Användbar i strid. 1 min nedkylning.",
       "clickUseInstant": "Klicka för att använda omedelbart i strid",
       "clickUse": "Klicka för att använda",
+      "clickSetOut": "Click to set out",
       "clickBuyback": "Klicka för att köpa tillbaka",
       "bagSlots": "Väska med {slots} platser"
     },

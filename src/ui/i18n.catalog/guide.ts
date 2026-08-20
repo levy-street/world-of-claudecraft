@@ -2642,6 +2642,14 @@ export const guideStrings = {
     matFmt: '{name} x{count}',
     outputFmt: '{name} x{count}',
     comboReq: 'Needs {a} and {b}',
+    // The dish effect sub-lines (C10): composed from the generated effect
+    // VALUES, mirroring the in-game itemUi.tooltip.useFood / useWellfed
+    // family (resolved numbers, the finish-the-meal trigger stated). The
+    // aura variant is the unmapped-buff-kind fallback, the
+    // wellfed_tooltip_view rule: no dish ever ships a silent effect cell.
+    effectFood: 'Restores {amount} health over {seconds} sec when eaten.',
+    effectWellFed: 'Well fed when you finish eating: +{value} {stat} for {minutes} min.',
+    effectWellFedAura: 'Grants {aura} for {minutes} min when you finish eating.',
     sourceTrainerFee: 'Trainer, {fee}',
     sourceTrainerFree: 'Trainer, free',
     sourceKnown: 'Known from the start',

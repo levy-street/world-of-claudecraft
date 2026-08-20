@@ -3080,6 +3080,7 @@ export const pl_PL: EnTranslations = {
         "rodBand": "Odblokowuje bogatsze połowy przy umiejętności rybołówstwa {skill} i wyższej."
       },
       "downgradeMark": "Torby pełne: znalezisko zostało schowane bez znaku zbieracza.",
+      "downgradeMarkCrop": "Bags full: the harvest was stored without its grower's mark.",
       "downgradeFind": "Torby pełne: wyjątkowe znalezisko przeszło ci koło nosa.",
       "emptyHookNote": "Nic na haczyku",
       "stateReady": "Gotowy",
@@ -3124,7 +3125,7 @@ export const pl_PL: EnTranslations = {
       "feastTitle": "{name}'s Harvest Feast",
       "feastPlacedLine": "You set out your harvest feast.",
       "huskTrade": "Trade husks for compost",
-      "huskTradeAria": "Trade withered husks for compost with {name}",
+      "huskTradeAria": "Trade husks for compost with {name}",
       "plantSheet": {
         "title": "Plant a Crop",
         "plant": "Plant",
@@ -3147,6 +3148,7 @@ export const pl_PL: EnTranslations = {
       "ready": "Ready to harvest",
       "finishing": "Finishing up",
       "withered": "Withered",
+      "readyAnnounce": "Ready to harvest: {name}",
       "remainingDaysHours": "{days}d {hours}h",
       "remainingHoursMinutes": "{hours}h {minutes}m",
       "remainingMinutesSeconds": "{minutes}m {seconds}s",
@@ -5663,6 +5665,9 @@ export const pl_PL: EnTranslations = {
       "matFmt": "{name} x{count}",
       "outputFmt": "{name} x{count}",
       "comboReq": "Wymaga {a} i {b}",
+      "effectFood": "Restores {amount} health over {seconds} sec when eaten.",
+      "effectWellFed": "Well fed when you finish eating: +{value} {stat} for {minutes} min.",
+      "effectWellFedAura": "Grants {aura} for {minutes} min when you finish eating.",
       "sourceTrainerFee": "Trener, {fee}",
       "sourceTrainerFree": "Trener, bezpłatnie",
       "sourceKnown": "Znany od początku",
@@ -9087,6 +9092,7 @@ export const pl_PL: EnTranslations = {
       "useManaPotion": "Użycie: Natychmiast przywraca {amount} many. Można użyć w walce. Czas odnowienia 1 min.",
       "clickUseInstant": "Kliknij, aby użyć natychmiast w walce",
       "clickUse": "Kliknij, aby użyć",
+      "clickSetOut": "Click to set out",
       "clickBuyback": "Kliknij, aby odkupić",
       "bagSlots": "Torba z {slots} miejscami"
     },

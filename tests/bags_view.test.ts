@@ -184,11 +184,16 @@ describe('the placeable feast classification (Farming Phase 12)', () => {
     expect(bagItemAction(ITEMS.feastItem, NO_MODE)).toBe('placeFeast');
   });
 
-  it('the hover previews the click the feast arm raises (never the empty hint)', () => {
-    // The frontend-seam review's ask: the feast was the only bag item with a
-    // click action and no hint sub-line, breaking the hover-previews-click
-    // doctrine stated at the hint ladder.
-    expect(bagTooltipHintKey(ITEMS.feastItem, NO_MODE)).toBe('itemUi.tooltip.clickUse');
+  it('the hover previews the click the feast arm raises, in the feast`s own words', () => {
+    // The frontend-seam review's ask plus the P12 QA copy deferral: the feast
+    // needs a hint sub-line (hover-previews-click doctrine), and the click
+    // SETS OUT the table (placeFeast), it never eats it, so the hint is the
+    // dedicated set-out key, never the generic use line.
+    expect(bagTooltipHintKey(ITEMS.feastItem, NO_MODE)).toBe('itemUi.tooltip.clickSetOut');
+    // The real shipped def rides the same key (the fixture cannot detach).
+    expect(bagTooltipHintKey(CATALOG_ITEMS.harvest_feast, NO_MODE)).toBe(
+      'itemUi.tooltip.clickSetOut',
+    );
   });
 
   it('keeps a plain junk def (no feast field) on the use ladder', () => {

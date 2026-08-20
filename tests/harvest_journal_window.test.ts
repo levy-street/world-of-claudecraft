@@ -241,6 +241,93 @@ describe('harvest journal window: the countdown clock', () => {
     expect(countdownCell()).toBeNull();
   });
 
+  it('announces a ready flip through the in-dialog status line (a11y batch)', () => {
+    world.nowMs = 5 * MINUTE;
+    makeWindow().open();
+    const status = () => root.querySelector<HTMLElement>('.hj-live-status');
+    // The line exists from the first paint (a live region must be PRESENT
+    // before its content changes) and starts empty: rows already ready at
+    // open are shown, never announced.
+    expect(status()).not.toBeNull();
+    expect(status()?.getAttribute('role')).toBe('status');
+    expect(status()?.textContent).toBe('');
+    const node = status();
+    // The repaint wrapper's identity is the decisive never-detached proof: a
+    // regression that rebuilds the wrapper each paint would re-append the
+    // SAME cached status element (identity alone stays green) while still
+    // detaching it from the tree every repaint.
+    const wrapper = root.querySelector<HTMLElement>('.hj-content');
+    expect(wrapper).not.toBeNull();
+    world.plots = [plot({ status: 'ready' })];
+    vi.advanceTimersByTime(HARVEST_JOURNAL_TICK_MS);
+    expect(root.querySelector<HTMLElement>('.hj-content')).toBe(wrapper);
+    // The SAME node carries the announcement across the whole repaint AND it
+    // was never detached: the repaint targets the inner content element, so
+    // the region's parent stays the root (a region that leaves and re-enters
+    // the tree announces unreliably; assistive tech drops or repeats it).
+    expect(status()).toBe(node);
+    expect(status()?.parentNode).toBe(root);
+    expect(status()?.textContent).toBe('Ready to harvest: Vale Wheat');
+  });
+
+  it('a repeat flip of the same crop still mutates the region (fresh child span)', () => {
+    world.nowMs = 5 * MINUTE;
+    makeWindow().open();
+    const status = root.querySelector<HTMLElement>('.hj-live-status');
+    world.plots = [plot({ status: 'ready' })];
+    vi.advanceTimersByTime(HARVEST_JOURNAL_TICK_MS);
+    const firstSpan = status?.firstChild;
+    expect(firstSpan?.textContent).toBe('Ready to harvest: Vale Wheat');
+    // Harvested (row gone) then replanted and ready again: byte-identical
+    // announcement text. Writing the same string into textContent would
+    // mutate nothing, so AT would announce nothing; the fresh child span is
+    // what makes the repeat a real mutation.
+    world.plots = [];
+    vi.advanceTimersByTime(HARVEST_JOURNAL_TICK_MS);
+    world.plots = [plot({ status: 'ready' })];
+    vi.advanceTimersByTime(HARVEST_JOURNAL_TICK_MS);
+    const secondSpan = status?.firstChild;
+    expect(secondSpan?.textContent).toBe('Ready to harvest: Vale Wheat');
+    expect(root.querySelector('.hj-live-status')).toBe(status);
+    expect(secondSpan).not.toBe(firstSpan);
+    // The mechanism pin: the announcement is an ELEMENT child, the explicit
+    // engine-optimization-proof form. A bare textContent write would also
+    // land a fresh Text node per the DOM's string-replace-all, but that
+    // leaves the mutation property to engine behavior; the span makes it
+    // deliberate (and killable in the mutation battery).
+    expect((secondSpan as HTMLElement)?.nodeName).toBe('SPAN');
+  });
+
+  it('a language switch clears the standing announcement (no stale locale)', () => {
+    world.nowMs = 5 * MINUTE;
+    const win = makeWindow();
+    win.open();
+    world.plots = [plot({ status: 'ready' })];
+    vi.advanceTimersByTime(HARVEST_JOURNAL_TICK_MS);
+    expect(root.querySelector('.hj-live-status')?.textContent).toBe('Ready to harvest: Vale Wheat');
+    // The Hud's language-switch arm: the standing announcement was minted in
+    // the OLD locale and no flip re-mints it, so relocalize clears it and
+    // re-renders the window (which stays painted).
+    win.relocalize();
+    expect(root.querySelector('.hj-live-status')?.textContent).toBe('');
+    expect(root.querySelector('#harvest-journal-title')).not.toBeNull();
+  });
+
+  it('a journal opened onto an already-ready plot stays quiet; a close clears the line', () => {
+    world.plots = [plot({ status: 'ready' })];
+    const win = makeWindow();
+    win.open();
+    expect(root.querySelector('.hj-live-status')?.textContent).toBe('');
+    // A second bed flips under the open window: announced. Then a close and
+    // reopen must start quiet again (no stale announcement to re-read).
+    world.plots = [plot({ status: 'ready' }), plot({ bedId: 'bed_eastbrook_2', status: 'ready' })];
+    vi.advanceTimersByTime(HARVEST_JOURNAL_TICK_MS);
+    expect(root.querySelector('.hj-live-status')?.textContent).toBe('Ready to harvest: Vale Wheat');
+    win.close();
+    win.open();
+    expect(root.querySelector('.hj-live-status')?.textContent).toBe('');
+  });
+
   it('repaints whole the tick a countdown crosses its own deadline', () => {
     world.nowMs = 10 * MINUTE - 2 * SECOND;
     makeWindow().open();

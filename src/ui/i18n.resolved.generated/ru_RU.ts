@@ -3080,6 +3080,7 @@ export const ru_RU: EnTranslations = {
         "rodBand": "Открывает более богатый улов при навыке рыбалки от {skill}."
       },
       "downgradeMark": "Сумки полны: добыча сохранена без метки сборщика.",
+      "downgradeMarkCrop": "Сумки полны: урожай сохранен без метки садовода.",
       "downgradeFind": "Сумки полны: превосходная находка ускользнула.",
       "emptyHookNote": "Пустой крючок",
       "stateReady": "Готово",
@@ -3124,7 +3125,7 @@ export const ru_RU: EnTranslations = {
       "feastTitle": "Пир урожая {name}",
       "feastPlacedLine": "Вы накрыли свой пир урожая.",
       "huskTrade": "Обменять шелуху на компост",
-      "huskTradeAria": "Обменять засохшую шелуху на компост у {name}",
+      "huskTradeAria": "Обменять шелуху на компост у {name}",
       "plantSheet": {
         "title": "Посадить культуру",
         "plant": "Посадить",
@@ -3147,6 +3148,7 @@ export const ru_RU: EnTranslations = {
       "ready": "Готово к сбору",
       "finishing": "Почти созрел",
       "withered": "Засох",
+      "readyAnnounce": "Готово к сбору: {name}",
       "remainingDaysHours": "{days} д {hours} ч",
       "remainingHoursMinutes": "{hours} ч {minutes} мин",
       "remainingMinutesSeconds": "{minutes} мин {seconds} с",
@@ -5663,6 +5665,9 @@ export const ru_RU: EnTranslations = {
       "matFmt": "{name} x{count}",
       "outputFmt": "{name} x{count}",
       "comboReq": "Нужны {a} и {b}",
+      "effectFood": "Восстанавливает {amount} здоровья за {seconds} сек. при еде.",
+      "effectWellFed": "Сытость после еды: +{value} к характеристике {stat} на {minutes} мин.",
+      "effectWellFedAura": "Дает {aura} на {minutes} мин., когда вы доедаете.",
       "sourceTrainerFee": "Учитель, {fee}",
       "sourceTrainerFree": "Учитель, бесплатно",
       "sourceKnown": "Известен с самого начала",
@@ -9087,6 +9092,7 @@ export const ru_RU: EnTranslations = {
       "useManaPotion": "Использование: мгновенно восстанавливает {amount} маны. Можно использовать в бою. Восстановление 1 мин.",
       "clickUseInstant": "Нажмите, чтобы мгновенно использовать в бою",
       "clickUse": "Нажмите, чтобы использовать",
+      "clickSetOut": "Нажмите, чтобы накрыть стол",
       "clickBuyback": "Нажмите, чтобы выкупить",
       "bagSlots": "Сумка на {slots} ячеек"
     },

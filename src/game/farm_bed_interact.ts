@@ -1,4 +1,5 @@
-import { dist2d, INTERACT_RANGE, type Vec3 } from '../sim/types';
+import { distToBed } from '../sim/professions/farming';
+import { INTERACT_RANGE, type Vec3 } from '../sim/types';
 import type { FarmPatchDef, FarmPlotView } from '../world_api/farming';
 
 /** The world slice the bed press needs (Phase 9b): static bed content plus
@@ -9,12 +10,14 @@ export interface FarmBedInteractWorld {
   myFarmPlots: readonly FarmPlotView[];
 }
 
-/** Nearest garden bed within reach of the player, by 2D distance, or null.
- *  The boundary is INCLUSIVE (`<= INTERACT_RANGE`) to mirror the sim's own
- *  deny, `distToBed(p.pos, bed) > INTERACT_RANGE`, so the client never
- *  refuses a press the sim would accept. Ties go to the first bed in
- *  content order (the strict `<` on best keeps the earlier bed); beds sit
- *  on a 5 yard pitch, so reach never covers two in practice. */
+/** Nearest garden bed within reach of the player, or null. Measured with the
+ *  sim's OWN `distToBed` (farming.ts), not a re-derived walk, so the reach
+ *  math can never drift from the deny it mirrors. The boundary is INCLUSIVE
+ *  (`<= INTERACT_RANGE`) to mirror the sim's own deny,
+ *  `distToBed(p.pos, bed) > INTERACT_RANGE`, so the client never refuses a
+ *  press the sim would accept. Ties go to the first bed in content order (the
+ *  strict `<` on best keeps the earlier bed); beds sit on a 5 yard pitch, so
+ *  reach never covers two in practice. */
 export function nearestInteractableBed(
   farmPatches: readonly FarmPatchDef[],
   playerPos: Vec3,
@@ -23,7 +26,7 @@ export function nearestInteractableBed(
   let bestDistance = Number.POSITIVE_INFINITY;
   for (const patch of farmPatches) {
     for (const bed of patch.beds) {
-      const distance = dist2d(playerPos, { x: bed.x, y: playerPos.y, z: bed.z });
+      const distance = distToBed(playerPos, bed);
       if (distance <= INTERACT_RANGE && distance < bestDistance) {
         bestId = bed.id;
         bestDistance = distance;

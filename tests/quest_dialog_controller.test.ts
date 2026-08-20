@@ -1,13 +1,13 @@
 // @vitest-environment happy-dom
 
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DELVES, NPCS, QUESTS, STATIONS } from '../src/sim/data';
 import { CHRONICLER_TEMPLATE_IDS } from '../src/sim/deeds';
 import type { Entity } from '../src/sim/types';
 import { craftNameText } from '../src/ui/char_window';
 import type { FocusTrapHandle } from '../src/ui/focus_manager';
 import { QuestDialogController } from '../src/ui/hud/quest/quest_dialog_controller';
-import { t } from '../src/ui/i18n';
+import { ensureLocaleLoaded, setLanguage, supportedLanguages, t } from '../src/ui/i18n';
 import type { IWorld } from '../src/world_api';
 
 function npc(id: number, templateId: string, x = 0): Entity {
@@ -183,6 +183,10 @@ describe('QuestDialogController', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
   });
+  // The per-locale label-in-name arm switches the module-global language; a
+  // failure mid-loop must not cascade a non-English locale into every later
+  // test in this file.
+  afterEach(() => setLanguage('en'));
 
   it('owns the normal gossip lifecycle and fades the greeting from NPC distance', () => {
     const test = harness();
@@ -641,9 +645,12 @@ describe('QuestDialogController', () => {
     // The English literals once, beside the t() form: a key swap to any other
     // existing key would keep the t() comparisons green on their own.
     expect(button?.textContent).toContain('Trade husks for compost');
-    expect(button?.getAttribute('aria-label')).toBe(
-      `Trade withered husks for compost with npc:${farmerId}`,
-    );
+    expect(button?.getAttribute('aria-label')).toBe(`Trade husks for compost with npc:${farmerId}`);
+    // WCAG 2.5.3 label-in-name (the Phase 14 a11y batch): the accessible
+    // name CONTAINS the visible label verbatim, so speech-input users can
+    // say what they see. Pinned as the containment PROPERTY, not just the
+    // literal above, so a future reword of either key must keep it.
+    expect(button?.getAttribute('aria-label')).toContain(button?.textContent?.trim() ?? 'MISSING');
     // No shop row for an empty stock, so the trade row is the only action.
     expect(farmer.element.querySelector('[data-vendor]')).toBeNull();
     expect(farmer.convertHusks).not.toHaveBeenCalled();
@@ -658,6 +665,29 @@ describe('QuestDialogController', () => {
     expect(farmer.release).toHaveBeenCalledWith(true);
     expect(farmer.release).not.toHaveBeenCalledWith(false);
     expect(farmer.controller.isOpen).toBe(false);
+  });
+
+  it('label-in-name holds in EVERY locale for the husk pair (WCAG 2.5.3)', async () => {
+    // The Phase 14 a11y batch reworded the aria pair so the accessible name
+    // contains the visible label verbatim in every locale (speech-input
+    // users say what they see in their language). The property is asserted
+    // across the WHOLE supported set: the five filled non-Latin locales
+    // render their fills, the rest English-fall-back BOTH keys together, so
+    // containment must hold everywhere; a future one-sided fill (aria
+    // translated, visible pending, or vice versa) reds here. Rendered
+    // through the real sink in the app's own order (await, then switch).
+    const FILLED = new Set(['ja_JP', 'ko_KR', 'ru_RU', 'zh_CN', 'zh_TW']);
+    for (const locale of supportedLanguages) {
+      if (locale === 'en') continue;
+      await ensureLocaleLoaded(locale);
+      setLanguage(locale);
+      const visible = t('hudChrome.farming.huskTrade');
+      const aria = t('hudChrome.farming.huskTradeAria', { name: 'X' });
+      expect(aria, locale).toContain(visible);
+      // Non-vacuity where a real fill exists: not English-falling-back.
+      if (FILLED.has(locale)) expect(visible, locale).not.toBe('Trade husks for compost');
+    }
+    setLanguage('en');
   });
 
   it('a farmer with stock renders the trade row BESIDE the goods row', () => {

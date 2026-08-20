@@ -243,7 +243,7 @@ describe('hud gatherDowngrade case mirrors the gatherDenied toast-only pattern (
   it('maps the lost arm through the pure key mapper into showError', () => {
     expect(caseStart).toBeGreaterThan(-1);
     expect(block).toContain('this.showError(');
-    expect(block).toContain('gatherDowngradeLineKey(ev.lost)');
+    expect(block).toContain('gatherDowngradeLineKey(ev.lost, ev.surface)');
   });
 
   it('adds no log line and no audio cue (toast only, the double-feedback trap)', () => {

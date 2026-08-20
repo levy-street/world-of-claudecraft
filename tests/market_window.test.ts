@@ -229,8 +229,13 @@ describe('market_window: mobile pairing (hud.mobile.css)', () => {
     // The paired-geometry rule reserves the 72px band FOR the player frame;
     // without the market-open disqualifier the docked bags flips
     // mobile-fullscreen-window-open and hides own HP/resource while the world
-    // keeps running. The core pins the flag list; this pins the hud wiring.
-    expect(hud).toMatch(
+    // keeps running. The core pins the flag list; this pins the body-class
+    // writer's wiring (window_open_state.ts since the Phase 14 extraction).
+    const windowOpenState = readFileSync(
+      new URL('../src/ui/window_open_state.ts', import.meta.url),
+      'utf8',
+    );
+    expect(windowOpenState).toMatch(
       /isMobileFullscreenWindowOpen\([\s\S]{0,400}?contains\('market-open'\),\s*document\.body\.classList\.contains\('char-bags-paired'\)/,
     );
   });

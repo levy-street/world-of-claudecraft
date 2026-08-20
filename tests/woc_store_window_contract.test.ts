@@ -8,6 +8,10 @@ function readSource(path: string): string {
 const storeWindow = readSource('../src/ui/daily_rewards_window.ts');
 const claudiumWindow = readSource('../src/ui/claudium_window.ts');
 const hud = readSource('../src/ui/hud.ts');
+// The body-class scan moved whole to window_open_state.ts (Phase 14); the
+// stack-sync pins below read it there, while the per-window dep pins stay
+// over hud.ts (the composition sites did not move).
+const windowOpenState = readSource('../src/ui/window_open_state.ts');
 const main = readSource('../src/main.ts');
 const inspect = readSource('../src/ui/armory_inspect.ts');
 const componentsCss = readSource('../src/styles/components.css');
@@ -160,13 +164,20 @@ describe('WOC Store window contract', () => {
     expect(containment).not.toBeNull();
     expect(containment?.[1]).toContain('contain: paint;');
     expect(containment?.[1]).toContain('isolation: isolate;');
-    const stackSync = hud.slice(
-      hud.indexOf("const storeWindow = document.getElementById('daily-rewards-window')"),
-      hud.indexOf("document.body.classList.toggle(\n      'mobile-map-quest-open'"),
+    const stackStart = windowOpenState.indexOf(
+      "const storeWindow = document.getElementById('daily-rewards-window')",
     );
+    const stackEnd = windowOpenState.indexOf(
+      "document.body.classList.toggle(\n    'mobile-map-quest-open'",
+    );
+    // Guarded anchors: an unfound end anchor would widen the slice to the
+    // rest of the module and let the pins go vacuously green.
+    expect(stackStart, 'stack-sync start anchor found').toBeGreaterThan(-1);
+    expect(stackEnd, 'stack-sync end anchor past start').toBeGreaterThan(stackStart);
+    const stackSync = windowOpenState.slice(stackStart, stackEnd);
     expect(stackSync).toContain('stackedWindowsVisible(');
-    expect(stackSync).toContain('!!storeWindow && this.isWindowVisible(storeWindow)');
-    expect(stackSync).toContain('!!claudiumWindow && this.isWindowVisible(claudiumWindow)');
+    expect(stackSync).toContain('!!storeWindow && isWindowVisible(storeWindow)');
+    expect(stackSync).toContain('!!claudiumWindow && isWindowVisible(claudiumWindow)');
     expect(stackSync).toContain("document.body.classList.toggle('store-stack-open'");
     expect(stackSync).toContain('recordStoreStackSample(');
     expect(hud).toContain('isWindowDragPreviewMutation(m.attributeName, m.target)');

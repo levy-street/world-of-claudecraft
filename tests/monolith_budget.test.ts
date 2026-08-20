@@ -81,7 +81,11 @@ const MONOLITHS: MonolithRow[] = [
     // whole to src/ui/entity_display_name.ts (gaining the feast-title arm and
     // its own suite there), shrinking the file 19219 to 19213; the one line
     // of margin is the farmFeastPlaced case label the same phase adds.
-    ceiling: 19214,
+    // Lowered at the Phase 14 body-class fix: the syncAnyWindowOpenState body
+    // moved whole to src/ui/window_open_state.ts (Hud keeps the pinned
+    // delegate), funding the two farming windows' onVisibilityChange dep
+    // lines; the file sits at 19183, small margin as above.
+    ceiling: 19186,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -158,10 +162,13 @@ const MONOLITHS: MonolithRow[] = [
     file: 'src/sim/sim.ts',
     // Lowered after the M5 extraction moved the boss support kit
     // (updateBossMechanics + spawnBossAdds) whole to src/sim/mob/
-    // boss_mechanics.ts: the file sits at 12246, so this IS the
-    // post-extraction size plus a small margin (the plus-margin style the
-    // ratchet uses for sim.ts).
-    ceiling: 12249,
+    // boss_mechanics.ts, then again when Phase 14 retired the orphaned
+    // mobMeleeRange / mobCombatProfile delegates (their last production
+    // caller left with M5), and once more when countItem became a thin
+    // delegate over the shared item_lock.ts countRawInSlots walk: the file
+    // sits at 12229, so this IS the post-extraction size plus a small margin
+    // (the plus-margin style the ratchet uses for sim.ts).
+    ceiling: 12232,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

@@ -129,12 +129,23 @@ export interface HarvestJournalWindowDeps {
   closeOthers(): void;
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
+  /** Fired after the root's display flips either way (the leaderboard /
+   *  daily-rewards family shape): Hud wires it to syncAnyWindowOpenState so
+   *  the mobile chrome's body classes track this window like every sibling
+   *  (the P9b QA body-class gap this dep closes). */
+  onVisibilityChange?(): void;
 }
 
 export class HarvestJournalWindow {
   private openerFocus: HTMLElement | null = null;
   private countdown: number | null = null;
   private paintedSignature: string | null = null;
+  /** The persistent in-dialog status line (see liveStatusNode). */
+  private liveStatus: HTMLElement | null = null;
+  /** Bed ids observed ready by the LAST paint of an open journal, or null
+   *  before the first paint after an open: the flip detector's baseline, so
+   *  rows already ready at open are shown but never announced. */
+  private readyBedIds: Set<string> | null = null;
 
   constructor(private readonly deps: HarvestJournalWindowDeps) {}
 
@@ -156,6 +167,7 @@ export class HarvestJournalWindow {
     const root = this.deps.root();
     markDialogRoot(root, { labelledBy: 'harvest-journal-title' });
     root.style.display = 'block';
+    this.deps.onVisibilityChange?.();
     this.render();
     root.querySelector<HTMLElement>('[data-close]')?.focus();
     this.countdown = window.setInterval(() => this.tick(), HARVEST_JOURNAL_TICK_MS);
@@ -169,7 +181,12 @@ export class HarvestJournalWindow {
     }
     this.clearCountdown();
     root.style.display = 'none';
+    this.deps.onVisibilityChange?.();
     this.paintedSignature = null;
+    // The flip baseline and any standing announcement die with the session:
+    // a reopen observes fresh and must not re-announce (or announce stale).
+    this.readyBedIds = null;
+    this.liveStatus?.replaceChildren();
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
   }
@@ -250,10 +267,26 @@ export class HarvestJournalWindow {
     // flipping to ready under an open window) strands focus on <body> while
     // the dialog is still up (the focus_restore contract).
     const focusKey = captureFocusKey(root);
-    root.innerHTML =
+    // The repaint targets an INNER content element, never the root: the
+    // status line beside it must be a PERSISTENT live region, and writing
+    // root.innerHTML would destroy and re-insert it every repaint, which
+    // assistive tech treats as a region leaving and re-entering the tree
+    // (announcements drop or repeat). The wrapper is display: contents in
+    // CSS, so the title and body still lay out as the root's own flex
+    // children.
+    let content = root.querySelector<HTMLElement>('.hj-content');
+    if (content === null) {
+      root.textContent = '';
+      content = document.createElement('div');
+      content.className = 'hj-content';
+      root.appendChild(content);
+      root.appendChild(this.liveStatusNode());
+    }
+    content.innerHTML =
       `<div class="panel-title"><span id="harvest-journal-title">${esc(t('hudChrome.harvestJournal.title'))}</span>` +
       `<button type="button" class="x-btn" data-close data-focus-key="harvestJournalClose" aria-label="${esc(t('hudChrome.harvestJournal.close'))}">${svgIcon('close')}</button></div>` +
       `<div class="hj-body">${this.bodyHtml(view, nowMs)}</div>`;
+    this.announceReadyFlips(view);
     root.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     if (focusKey !== null) {
       restoreFirstEnabled([
@@ -262,6 +295,56 @@ export class HarvestJournalWindow {
       ]);
     }
     this.paintedSignature = harvestJournalViewSignature(view);
+  }
+
+  /** The persistent in-dialog status line (role=status, implicit polite
+   *  aria-live). Appended beside the content element ONCE per open and never
+   *  removed while the window lives (the repaint targets the content element
+   *  only), so AT tracks one stable live region; #chatlog and #combat-live
+   *  are the shipped persistent-region exemplars this follows. */
+  private liveStatusNode(): HTMLElement {
+    if (this.liveStatus === null) {
+      this.liveStatus = document.createElement('div');
+      this.liveStatus.className = 'hj-live-status';
+      this.liveStatus.setAttribute('role', 'status');
+    }
+    return this.liveStatus;
+  }
+
+  /** The a11y batch's recorded follow-up: a row flipping to ready UNDER an
+   *  open journal announces through the in-dialog status line. The chat line
+   *  already reaches the LOG live region, but a reader standing in the
+   *  journal dialog hears nothing there; this line is both visible and the
+   *  announcement. The first paint after an open only observes (rows already
+   *  ready at open are visible, not news), and the baseline tracks bed ids
+   *  so a repaint that changes nothing announces nothing. Each announcement
+   *  lands as a FRESH child span: a repeat of the same crop (harvest,
+   *  replant, ready again) is byte-identical text, and writing the same
+   *  string into textContent mutates nothing, so AT would announce nothing;
+   *  replacing the child node is a real mutation every time. */
+  private announceReadyFlips(view: HarvestJournalView): void {
+    const ready = new Set<string>();
+    if (view.kind === 'rows') {
+      for (const row of view.rows) if (row.status === 'ready') ready.add(row.bedId);
+    }
+    const prior = this.readyBedIds;
+    this.readyBedIds = ready;
+    if (prior === null || view.kind !== 'rows') return;
+    const flipped = view.rows.filter((row) => row.status === 'ready' && !prior.has(row.bedId));
+    if (flipped.length === 0) return;
+    const name = flipped.map((row) => itemName(row.produceItemId)).join(', ');
+    const line = document.createElement('span');
+    line.textContent = t('hudChrome.harvestJournal.readyAnnounce', { name });
+    this.liveStatusNode().replaceChildren(line);
+  }
+
+  /** The Hud's runtime-language-switch arm: clear any standing announcement
+   *  (its text was minted in the OLD locale and no flip re-mints it until a
+   *  plot changes) and re-render the whole window in the new locale. */
+  relocalize(): void {
+    if (!this.isOpen) return;
+    this.liveStatusNode().replaceChildren();
+    this.render();
   }
 
   private bodyHtml(view: HarvestJournalView, nowMs: number): string {

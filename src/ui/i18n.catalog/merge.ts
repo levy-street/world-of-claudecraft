@@ -569,6 +569,9 @@ const mergeStringsEn = {
       useManaPotion: 'Use: Instantly restores {amount} mana. Usable in combat. 2 min cooldown.',
       clickUseInstant: 'Click to use instantly in combat',
       clickUse: 'Click to use',
+      // The placeable feast's hint (bags_view.ts): the click PLACES the feast
+      // at your feet, it never eats it, so "use" undersold what happens.
+      clickSetOut: 'Click to set out',
       clickBuyback: 'Click to buy back',
       // Rendered by the item tooltip (hud.ts), the bag sockets (bags_window.ts) AND the
       // World Market's bag-capacity dropdown (market_window.ts), which reuses it so a new

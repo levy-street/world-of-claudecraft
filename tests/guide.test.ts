@@ -36,6 +36,7 @@ import { controls as controlsPage } from '../src/guide/pages/controls';
 import { catalogSections, deeds as deedsPage } from '../src/guide/pages/deeds';
 import { dungeons as dungeonsPage } from '../src/guide/pages/dungeons';
 import { professions as professionsPage } from '../src/guide/pages/professions';
+import { effectLines } from '../src/guide/pages/professions_craft';
 import { gatheringDetailHtml } from '../src/guide/pages/professions_gathering';
 import { reliquaryCatalogSections, reliquary as reliquaryPage } from '../src/guide/pages/reliquary';
 import { world as worldPage } from '../src/guide/pages/world';
@@ -112,10 +113,11 @@ import {
   TIER5_TOOL_WIELD_PROFICIENCY,
   WIELD_REQUIREMENT_BY_TIER,
 } from '../src/sim/professions/wield_gate';
-import type { DeedDef } from '../src/sim/types';
+import { CONSUME_DURATION, type DeedDef } from '../src/sim/types';
 import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
 import { ensureLocaleLoaded, type SupportedLanguage, setLanguage, t } from '../src/ui/i18n';
 import { guideStrings } from '../src/ui/i18n.catalog/guide';
+import { WELLFED_STAT_KEYS } from '../src/ui/wellfed_stat_keys';
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 const publicPath = (url: string): string => resolve(repoRoot, 'public', url.replace(/^\//, ''));
@@ -1685,6 +1687,10 @@ describe('Guide professions generated content accuracy', () => {
       'output',
       'combo',
       'gain',
+      // The consumable effect facts (C10): the foodHp restore and well-fed
+      // boon values the craft page's effect sub-lines compose. Shape-pinned
+      // in its own accuracy arm below.
+      'effect',
     ]);
     for (const c of GUIDE_PROF_CRAFTS) {
       for (const k of Object.keys(c)) {
@@ -1743,6 +1749,70 @@ describe('Guide professions generated content accuracy', () => {
         expect(tierProgressMultiplier(tierForSkill(row.gain.zeroAt), rTier)).toBe(0);
       }
     }
+  });
+
+  it('mirrors every consumable effect row against the live item def (C10)', () => {
+    // The dish effect prose is composed from these VALUES, so the accuracy
+    // guard binds them to the sim source both ways: every foodHp/wellfed
+    // output carries the row with the def's own numbers, and a row never
+    // appears on a non-consumable. Non-vacuity: the four buff dishes and at
+    // least a dozen foodHp dishes exist, counted below.
+    let foodRows = 0;
+    let wellfedRows = 0;
+    for (const c of GUIDE_PROF_CRAFTS) {
+      for (const row of c.recipes) {
+        const def = ALL_RECIPES.find((r) => r.id === row.id);
+        if (!def) continue;
+        const item = ITEMS[def.resultItemId];
+        if (item.foodHp) {
+          foodRows++;
+          expect(row.effect?.food, `${row.id} foodHp row missing`).toEqual({
+            amount: item.foodHp,
+            seconds: CONSUME_DURATION,
+          });
+        } else {
+          expect(row.effect?.food, `${row.id} phantom food effect`).toBeUndefined();
+        }
+        if (item.wellfed) {
+          wellfedRows++;
+          expect(row.effect?.wellfed, `${row.id} wellfed row missing`).toEqual({
+            aura: item.wellfed.aura,
+            kind: item.wellfed.kind,
+            value: item.wellfed.value,
+            minutes: item.wellfed.duration / 60,
+          });
+          // The LIVE_OFF_SWEEP exemption for effectWellFedAura rests on this
+          // precondition: every SHIPPED wellfed kind is mapped, so the
+          // aura-name fallback stays a degradation path and never renders.
+          // The first dish with an unmapped kind reds here instead of
+          // silently selecting the fallback prose on the wiki.
+          expect(
+            Object.keys(WELLFED_STAT_KEYS),
+            `${row.id} ships an unmapped wellfed kind`,
+          ).toContain(item.wellfed.kind);
+        } else {
+          expect(row.effect?.wellfed, `${row.id} phantom wellfed effect`).toBeUndefined();
+        }
+        if (!item.foodHp && !item.wellfed) {
+          expect(row.effect, `${row.id} effect on a non-consumable`).toBeUndefined();
+        }
+      }
+    }
+    expect(foodRows).toBeGreaterThanOrEqual(12);
+    expect(wellfedRows).toBe(4);
+  });
+
+  it('the unmapped-kind fallback line renders (never a silent effect cell)', () => {
+    // Synthetic row: no shipped dish carries an unmapped kind (asserted
+    // above), so the fallback branch is driven directly. Its aura value is
+    // the def's baked English proper noun, the page's GUIDE_DEEDS policy.
+    const row = {
+      effect: { wellfed: { aura: 'Test Boon', kind: 'buff_spellpower', value: 3, minutes: 10 } },
+    } as unknown as Parameters<typeof effectLines>[0];
+    const html = effectLines(row);
+    expect(html).toContain('guide-prof-effect');
+    expect(html).toContain('Test Boon');
+    expect(html).toContain('10');
   });
 
   it('pins the spot literals a consistently-wrong regeneration would keep wrong', () => {

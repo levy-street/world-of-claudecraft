@@ -61,6 +61,11 @@ export interface PlantSheetWindowDeps {
   closeOthers(): void;
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
+  /** Fired after the root's display flips either way (the leaderboard /
+   *  daily-rewards family shape): Hud wires it to syncAnyWindowOpenState so
+   *  the mobile chrome's body classes track this window like every sibling
+   *  (the P9b QA body-class gap this dep closes). */
+  onVisibilityChange?(): void;
 }
 
 export class PlantSheetWindow {
@@ -74,10 +79,18 @@ export class PlantSheetWindow {
   };
   /** Armed by a Plant activation, cleared by the deny that answers it (or a
    *  close): the send-once-per-activation guard, so a double click before the
-   *  sim answers cannot double-plant. */
+   *  sim answers cannot double-plant. Write it ONLY through setPendingSend,
+   *  which mirrors the flag onto the root's aria-busy (the a11y batch's
+   *  in-flight affordance: the send has no synchronous outcome, the sim's
+   *  events answer, so AT hears the wait the sighted eye infers). */
   private pendingSend = false;
 
   constructor(private readonly deps: PlantSheetWindowDeps) {}
+
+  private setPendingSend(value: boolean): void {
+    this.pendingSend = value;
+    this.deps.root().setAttribute('aria-busy', value ? 'true' : 'false');
+  }
 
   get isOpen(): boolean {
     return this.deps.root().style.display === 'block';
@@ -98,13 +111,14 @@ export class PlantSheetWindow {
       this.openerFocus = this.deps.captureFocus();
       markDialogRoot(root, { labelledBy: 'plant-sheet-title' });
       root.style.display = 'block';
+      this.deps.onVisibilityChange?.();
     }
     // A fresh bed is a fresh decision: selection and knob picks reset, so a
     // toggle paid for one bed never silently rides to another.
     this.bedId = bedId;
     this.selectedCropId = null;
     this.choices = { compost: false, watch: false, tonic: false };
-    this.pendingSend = false;
+    this.setPendingSend(false);
     this.paint();
     if (!wasOpen) root.querySelector<HTMLElement>('[data-close]')?.focus();
   }
@@ -123,7 +137,7 @@ export class PlantSheetWindow {
    *  re-click safe (bed_taken and friends), so re-arming early costs at most
    *  one more deny toast. No repaint: an error changes no bag state. */
   notifyErrorToast(): void {
-    if (this.isOpen) this.pendingSend = false;
+    if (this.isOpen) this.setPendingSend(false);
   }
 
   close(): void {
@@ -133,8 +147,9 @@ export class PlantSheetWindow {
       return;
     }
     root.style.display = 'none';
+    this.deps.onVisibilityChange?.();
     this.bedId = null;
-    this.pendingSend = false;
+    this.setPendingSend(false);
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
   }
@@ -148,12 +163,12 @@ export class PlantSheetWindow {
   notifyFarmEvent(ev: FarmEvent): void {
     if (!this.isOpen || this.bedId === null) return;
     if (ev.type === 'farmPlanted') {
-      this.pendingSend = false;
+      this.setPendingSend(false);
       if (ev.bedId === this.bedId) this.close();
       return;
     }
     if (ev.type === 'farmDenied' && (ev.bedId === undefined || ev.bedId === this.bedId)) {
-      this.pendingSend = false;
+      this.setPendingSend(false);
       this.paint();
     }
   }
@@ -222,7 +237,7 @@ export class PlantSheetWindow {
       if (this.choices.compost) knobs.compost = true;
       if (this.choices.watch) knobs.watch = true;
       if (this.choices.tonic) knobs.tonic = true;
-      this.pendingSend = true;
+      this.setPendingSend(true);
       // The live world at click time, never captured at render (the
       // husk-trade precedent), and the sheet stays open: the sim's own
       // farmPlanted / farmDenied events are the feedback.
@@ -234,8 +249,23 @@ export class PlantSheetWindow {
     if (view.seedRows.length === 0 && view.lockedRows.length === 0) {
       return `<p class="ps-empty">${esc(t('hudChrome.farming.plantSheet.empty'))}</p>`;
     }
-    const seeds = view.seedRows.map((row) => this.seedRowHtml(row)).join('');
-    const locked = view.lockedRows.map((row) => this.lockedRowHtml(row)).join('');
+    // The seed rows are SINGLE-SELECT (picking one un-picks the rest), so
+    // they expose radiogroup semantics, not a row of independent aria-pressed
+    // toggles (the P8/P9b a11y batch). The group borrows the dialog title as
+    // its name, the li wrappers are presentational so the radios are the
+    // group's owned children, and the LOCKED rows live in their own plain
+    // list: they are not options, so they never dilute the radio count AT
+    // reports. Every radio stays a natively tabbable button (Tab reaches
+    // each, Enter/Space picks); the roving-tabindex refinement is deliberate
+    // future polish, not a gap the axe suite flags.
+    const seeds =
+      view.seedRows.length > 0
+        ? `<ul class="ps-list" role="radiogroup" aria-labelledby="plant-sheet-title">${view.seedRows.map((row) => this.seedRowHtml(row)).join('')}</ul>`
+        : '';
+    const locked =
+      view.lockedRows.length > 0
+        ? `<ul class="ps-list" role="list">${view.lockedRows.map((row) => this.lockedRowHtml(row)).join('')}</ul>`
+        : '';
     const knobs =
       view.knobs.length > 0
         ? `<div class="ps-knobs">${view.knobs.map((knob) => this.knobHtml(knob)).join('')}</div>`
@@ -244,13 +274,13 @@ export class PlantSheetWindow {
       view.seedRows.length > 0
         ? `<button type="button" class="ps-plant" data-plant data-focus-key="plantSheetPlant">${esc(t('hudChrome.farming.plantSheet.plant'))}</button>`
         : `<p class="ps-empty">${esc(t('hudChrome.farming.plantSheet.empty'))}</p>`;
-    return `<ul class="ps-list" role="list">${seeds}${locked}</ul>${knobs}${plant}`;
+    return `${seeds}${locked}${knobs}${plant}`;
   }
 
   private seedRowHtml(row: PlantSheetSeedRow): string {
     const name = itemName(row.seedItemId);
     return (
-      `<li><button type="button" class="ps-seed" data-seed-crop="${esc(row.cropId)}" data-focus-key="seed:${esc(row.cropId)}" aria-pressed="${row.selected ? 'true' : 'false'}" aria-label="${esc(t('hudChrome.farming.plantSheet.sowAria', { name }))}">` +
+      `<li role="none"><button type="button" role="radio" class="ps-seed" data-seed-crop="${esc(row.cropId)}" data-focus-key="seed:${esc(row.cropId)}" aria-checked="${row.selected ? 'true' : 'false'}" aria-label="${esc(t('hudChrome.farming.plantSheet.sowAria', { name }))}">` +
       `<span class="ps-name">${esc(name)}</span>` +
       `<span class="ps-count">${esc(wholeNumber(row.seedCount))}</span>` +
       `</button></li>`

@@ -9431,10 +9431,32 @@
     font-size: 11px;
     color: var(--color-text-muted);
   }
+  /* The journal's repaint wrapper: the whole title + body re-renders inside
+     it while the status line beside it persists (a live region must never be
+     destroyed and re-inserted). display: contents keeps the title and body
+     laying out as the root's own flex children, exactly as before. */
+  .hj-content {
+    display: contents;
+  }
+  /* The in-dialog ready announcement (role=status, the a11y batch): a
+     visible status line that doubles as the polite live region, appended
+     once per open and never removed while the window lives (the #chatlog
+     persistent-region exemplar). Collapses while empty so the quiet journal
+     pays no layout for it; each announcement lands as a fresh child span so
+     a repeat of the same text still mutates the region. */
+  .hj-live-status {
+    margin: 6px 14px 10px;
+    font-size: 11px;
+    color: var(--gold);
+  }
+  .hj-live-status:empty {
+    display: none;
+  }
 
   /* ---------- plant sheet ---------- */
   /* The plant sheet (#plant-sheet-window, the bed verbs): the window a press
-     on a free garden bed opens. Seed rows are aria-pressed pick buttons and
+     on a free garden bed opens. Seed rows are single-select RADIOS in a
+     radiogroup (aria-checked carries the pick, the Phase 14 a11y batch) and
      the three care knobs are aria-pressed toggles, all on the 40px touch
      floor; hue is never the only signal (a short knob also says its reason).
      Reuses the journal's inset-card idiom and the shared window chrome. */
@@ -9479,13 +9501,18 @@
     padding: 8px 10px;
     border: 1px solid var(--color-border-showcase);
     border-radius: 7px;
-    background: rgba(0, 0, 0, 0.24);
+    /* The input-surface token its sibling .ps-knob already rides (Phase 14
+       style batch): the raw 24%-black scrim read a shade apart from the knobs
+       in the same sheet and drifted from the tokens the theme presets drive. */
+    background: var(--color-bg-input);
     color: var(--color-text-light);
     font: inherit;
     text-align: left;
     cursor: pointer;
   }
-  .ps-seed[aria-pressed="true"] {
+  /* The seed rows are radios since the Phase 14 a11y batch (single-select),
+     so the picked state rides aria-checked, never aria-pressed. */
+  .ps-seed[aria-checked="true"] {
     border-color: var(--gold);
     color: var(--gold);
   }

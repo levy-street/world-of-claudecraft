@@ -54,3 +54,13 @@ export const castDisplayName = (id: string): string => {
   const ability = ABILITIES[id];
   return ability ? abilityDisplayName(ability) : id;
 };
+
+/** The TARGET cast bar's label resolver (#tf-castbar). The target bar has
+ *  historically shown the raw cast id, byte-faithful to its old inline block,
+ *  so a targeted player mid-trade-cast reads "farming" / "crafting" instead
+ *  of a localized name. Phase 14 fixes exactly the FARMING cast (the handoff
+ *  row it discharges); the other trades' raw ids are the same pre-existing
+ *  class and stay deliberately untouched here (a class-wide fix localizes
+ *  every id and is a maintainer call, not polish). */
+export const targetCastDisplayLabel = (id: string): string =>
+  id === FARMING_CAST_ID ? castDisplayName(id) : id;

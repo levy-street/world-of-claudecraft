@@ -50,6 +50,7 @@ import * as esbuild from 'esbuild';
 import { COPIED_ALLOW_IDS, V07_SLASH } from './i18n_blocked_seed.mjs';
 import { flatten } from './i18n_flatten.mjs';
 import { contentHash, PLACEHOLDER_RE, placeholdersOf } from './i18n_hash.mjs';
+import { RETIRED_KEY_SET, RETIRED_REASON } from './i18n_retired_keys.mjs';
 
 const root = process.cwd();
 // I18N_OUT_DIR overrides the destination DIRECTORY for both emitted files (used by
@@ -226,7 +227,11 @@ async function main() {
 
   const keyEntries = [];
 
-  // main scope: en leaves. No blocked seed here (cognates live in server/admin).
+  // main scope: en leaves. The only blocked rows here are the RETIRED keys
+  // (scripts/i18n_retired_keys.mjs): a key no page renders is never a fill
+  // work item, so its unprovided locale rows carry the retired reason instead
+  // of `pending` (a provided row stays `translated`: the reviewed prose is
+  // real and kept). Cognate blocked rows still live in server/admin only.
   for (const key of Object.keys(enFlat)) {
     const enVal = enFlat[key];
     const ph = placeholdersOf(enVal);
@@ -235,7 +240,9 @@ async function main() {
     for (const lang of NON_EN) {
       locales[lang] = providedByLang[lang].has(key)
         ? { state: 'translated', srcHash: enHash, by: 'human' }
-        : { state: 'pending' };
+        : RETIRED_KEY_SET.has(key)
+          ? { state: 'blocked', reason: RETIRED_REASON }
+          : { state: 'pending' };
     }
     keyEntries.push({
       composite: `main:${key}`,

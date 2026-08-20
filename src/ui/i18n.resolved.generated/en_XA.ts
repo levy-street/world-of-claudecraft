@@ -3080,6 +3080,7 @@ export const en_XA: EnTranslations = {
         "rodBand": "[Úñļóçķš ŕíçĥéŕ çáţçĥ ţáƀļéš áţ ƒíšĥíñĝ šķíļļ {skill} áñð áƀóʋé.]"
       },
       "downgradeMark": "[Ɓáĝš ƒúļļ: ţĥé ƒíñð ŵáš šţóŕéð ŵíţĥóúţ íţš ĝáţĥéŕéŕ'š ɱáŕķ.]",
+      "downgradeMarkCrop": "[Ɓáĝš ƒúļļ: ţĥé ĥáŕʋéšţ ŵáš šţóŕéð ŵíţĥóúţ íţš ĝŕóŵéŕ'š ɱáŕķ.]",
       "downgradeFind": "[Ɓáĝš ƒúļļ: á þŕíšţíñé ƒíñð šļíþþéð áŵáý.]",
       "emptyHookNote": "[Ñóţĥíñĝ óñ ţĥé ĥóóķ]",
       "stateReady": "[Ŕéáðý]",
@@ -3124,7 +3125,7 @@ export const en_XA: EnTranslations = {
       "feastTitle": "[{name}'š Ĥáŕʋéšţ Ƒéášţ]",
       "feastPlacedLine": "[Ýóú šéţ óúţ ýóúŕ ĥáŕʋéšţ ƒéášţ.]",
       "huskTrade": "[Ţŕáðé ĥúšķš ƒóŕ çóɱþóšţ]",
-      "huskTradeAria": "[Ţŕáðé ŵíţĥéŕéð ĥúšķš ƒóŕ çóɱþóšţ ŵíţĥ {name}]",
+      "huskTradeAria": "[Ţŕáðé ĥúšķš ƒóŕ çóɱþóšţ ŵíţĥ {name}]",
       "plantSheet": {
         "title": "[Þļáñţ á Çŕóþ]",
         "plant": "[Þļáñţ]",
@@ -3147,6 +3148,7 @@ export const en_XA: EnTranslations = {
       "ready": "[Ŕéáðý ţó ĥáŕʋéšţ]",
       "finishing": "[Ƒíñíšĥíñĝ úþ]",
       "withered": "[Ŵíţĥéŕéð]",
+      "readyAnnounce": "[Ŕéáðý ţó ĥáŕʋéšţ: {name}]",
       "remainingDaysHours": "[{days}ð {hours}ĥ]",
       "remainingHoursMinutes": "[{hours}ĥ {minutes}ɱ]",
       "remainingMinutesSeconds": "[{minutes}ɱ {seconds}š]",
@@ -5663,6 +5665,9 @@ export const en_XA: EnTranslations = {
       "matFmt": "[{name} ẋ{count}]",
       "outputFmt": "[{name} ẋ{count}]",
       "comboReq": "[Ñééðš {a} áñð {b}]",
+      "effectFood": "[Ŕéšţóŕéš {amount} ĥéáļţĥ óʋéŕ {seconds} šéç ŵĥéñ éáţéñ.]",
+      "effectWellFed": "[Ŵéļļ ƒéð ŵĥéñ ýóú ƒíñíšĥ éáţíñĝ: +{value} {stat} ƒóŕ {minutes} ɱíñ.]",
+      "effectWellFedAura": "[Ĝŕáñţš {aura} ƒóŕ {minutes} ɱíñ ŵĥéñ ýóú ƒíñíšĥ éáţíñĝ.]",
       "sourceTrainerFee": "[Ţŕáíñéŕ, {fee}]",
       "sourceTrainerFree": "[Ţŕáíñéŕ, ƒŕéé]",
       "sourceKnown": "[Ķñóŵñ ƒŕóɱ ţĥé šţáŕţ]",
@@ -9087,6 +9092,7 @@ export const en_XA: EnTranslations = {
       "useManaPotion": "[Úšé: Íñšţáñţļý ŕéšţóŕéš {amount} ɱáñá. Úšáƀļé íñ çóɱƀáţ. 2 ɱíñ çóóļðóŵñ.]",
       "clickUseInstant": "[Çļíçķ ţó úšé íñšţáñţļý íñ çóɱƀáţ]",
       "clickUse": "[Çļíçķ ţó úšé]",
+      "clickSetOut": "[Çļíçķ ţó šéţ óúţ]",
       "clickBuyback": "[Çļíçķ ţó ƀúý ƀáçķ]",
       "bagSlots": "[{slots} Šļóţ Ɓáĝ]"
     },

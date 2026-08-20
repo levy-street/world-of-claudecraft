@@ -37,6 +37,7 @@ import path from 'node:path';
 import * as esbuild from 'esbuild';
 import { flatten, unflatten } from './i18n_flatten.mjs';
 import { pseudoLocalize } from './i18n_pseudo.mjs';
+import { RETIRED_KEY_SET } from './i18n_retired_keys.mjs';
 import { writeModuleDir } from './lib/write_module_dir.mjs';
 
 const root = process.cwd();
@@ -320,7 +321,10 @@ function computePending(en, locales) {
       const baseOverlay = locales[base] || {};
       for (const k of Object.keys(baseOverlay)) if (isPresent(baseOverlay[k])) provided.add(k);
     }
-    pending[lang] = enFlatKeys.filter((k) => !provided.has(k)).sort();
+    // A RETIRED key (scripts/i18n_retired_keys.mjs) is never pending: no page
+    // renders it, so an unprovided overlay row is not a fill work item (the
+    // registry marks the same rows `blocked`; the two stay in lockstep).
+    pending[lang] = enFlatKeys.filter((k) => !provided.has(k) && !RETIRED_KEY_SET.has(k)).sort();
   }
   return pending;
 }

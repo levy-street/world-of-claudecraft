@@ -3080,6 +3080,7 @@ export const ja_JP: EnTranslations = {
         "rodBand": "釣りスキル{skill}以上でより豊かな釣果が解放されます。"
       },
       "downgradeMark": "バッグが満杯です：収穫は採集者の印なしで収納されました。",
+      "downgradeMarkCrop": "バッグが満杯です：収穫物は栽培者の銘なしで収納されました。",
       "downgradeFind": "バッグが満杯です：極上の獲物を逃してしまいました。",
       "emptyHookNote": "針には何もなし",
       "stateReady": "採集可能",
@@ -3124,7 +3125,7 @@ export const ja_JP: EnTranslations = {
       "feastTitle": "{name}の収穫の宴",
       "feastPlacedLine": "収穫の宴を広げた。",
       "huskTrade": "籾殻を堆肥と交換する",
-      "huskTradeAria": "{name}と枯れた籾殻を堆肥に交換する",
+      "huskTradeAria": "{name}と籾殻を堆肥と交換する",
       "plantSheet": {
         "title": "作物を植える",
         "plant": "植える",
@@ -3147,6 +3148,7 @@ export const ja_JP: EnTranslations = {
       "ready": "収穫可能",
       "finishing": "まもなく完了",
       "withered": "枯れた",
+      "readyAnnounce": "収穫可能: {name}",
       "remainingDaysHours": "{days}日{hours}時間",
       "remainingHoursMinutes": "{hours}時間{minutes}分",
       "remainingMinutesSeconds": "{minutes}分{seconds}秒",
@@ -5663,6 +5665,9 @@ export const ja_JP: EnTranslations = {
       "matFmt": "{name}×{count}",
       "outputFmt": "{name}×{count}",
       "comboReq": "{a}と{b}が必要",
+      "effectFood": "食べると{seconds}秒かけて体力を{amount}回復する。",
+      "effectWellFed": "食べ終えると満腹: {stat}+{value}({minutes}分)。",
+      "effectWellFedAura": "食べ終えると{minutes}分間{aura}を得る。",
       "sourceTrainerFee": "訓練師、{fee}",
       "sourceTrainerFree": "訓練師、無料",
       "sourceKnown": "最初から習得済み",
@@ -9087,6 +9092,7 @@ export const ja_JP: EnTranslations = {
       "useManaPotion": "使用: 即座にマナを{amount}回復します。戦闘中に使用可能。クールダウン1分。",
       "clickUseInstant": "クリックして戦闘中に即使用",
       "clickUse": "クリックして使用",
+      "clickSetOut": "クリックして設置",
       "clickBuyback": "クリックして買い戻す",
       "bagSlots": "{slots}スロットのバッグ"
     },

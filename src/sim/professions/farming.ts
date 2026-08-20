@@ -402,8 +402,12 @@ export function canPlantCrop(crop: FarmCropDef, farmingSkill: number): boolean {
 }
 
 /** Flat-ground distance to a bed. Beds carry no y (FarmBedDef), so this is a
- *  plain 2D distance, the distToNode precedent in gathering.ts. */
-function distToBed(pos: { x: number; z: number }, bed: { x: number; z: number }): number {
+ *  plain 2D distance, the distToNode precedent in gathering.ts. EXPORTED for
+ *  the client-side reach mirror (src/game/farm_bed_interact.ts), which used to
+ *  re-derive this walk by comment contract; sharing the one function is what
+ *  keeps the client's inclusive `<=` offer boundary the exact complement of
+ *  the `>` deny below. */
+export function distToBed(pos: { x: number; z: number }, bed: { x: number; z: number }): number {
   const dx = pos.x - bed.x;
   const dz = pos.z - bed.z;
   return Math.sqrt(dx * dx + dz * dz);
@@ -958,16 +962,18 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
     // free slots, identical-payload stacking), then the plain
     // overflow-tolerant grant for the remainder. Farming's nothing-rots rule
     // outranks the signature: the TOTAL granted quantity is always the full
-    // five-fold yield, and only the SIGNATURE truncates on full bags. That
-    // truncation is silent by design here: gatherDowngrade's surface union
-    // is 'node' | 'corpse' and widening the wire is out of this phase's
-    // scope, a ledgered acceptance rather than an oversight.
+    // five-fold yield, and only the SIGNATURE truncates on full bags. The
+    // truncation NAMES itself (the (bu) follow-up): one gatherDowngrade
+    // { surface: 'crop', lost: 'mark' } per harvest command (the dedupe
+    // idiom, even when both grades truncate), always 'mark' and never
+    // 'find' because the units themselves always land here.
     // `capacity` is hoisted (slot capacity cannot change from a grant), but
     // grantGolden runs TWICE and the second countFit deliberately reads the
     // meta.inventory the first grant already mutated: the fine grade must
     // see the slots the base grade consumed. Do not "clean this up" by
     // snapshotting the inventory.
     const capacity = bagCapacity(meta.bags);
+    let signatureTruncated = false;
     const grantGolden = (itemId: string, qty: number): void => {
       if (qty <= 0) return;
       const fit = countFit(meta.inventory, capacity, itemId, qty, { signer: meta.name });
@@ -978,11 +984,15 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
         });
       }
       if (fit < qty) {
+        signatureTruncated = true;
         ctx.addItem(itemId, qty - fit, meta.entityId, { silent: true, callerLogs: true });
       }
     };
     grantGolden(crop.produceItemId, count);
     grantGolden(crop.fineProduceItemId, fine);
+    if (signatureTruncated) {
+      ctx.emit({ type: 'gatherDowngrade', pid: meta.entityId, surface: 'crop', lost: 'mark' });
+    }
   } else {
     if (count > 0)
       ctx.addItem(crop.produceItemId, count, meta.entityId, { silent: true, callerLogs: true });

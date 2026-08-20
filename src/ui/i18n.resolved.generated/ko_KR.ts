@@ -3080,6 +3080,7 @@ export const ko_KR: EnTranslations = {
         "rodBand": "낚시 기술 {skill} 이상에서 더 풍성한 어획 목록이 해금됩니다."
       },
       "downgradeMark": "가방이 가득 찼습니다: 수확물이 채집자의 표식 없이 보관되었습니다.",
+      "downgradeMarkCrop": "가방이 가득 찼습니다: 수확물이 재배자의 표식 없이 보관되었습니다.",
       "downgradeFind": "가방이 가득 찼습니다: 최상급 수확물을 놓쳐 버렸습니다.",
       "emptyHookNote": "빈 낚싯바늘",
       "stateReady": "채집 가능",
@@ -3124,7 +3125,7 @@ export const ko_KR: EnTranslations = {
       "feastTitle": "{name}의 수확의 잔치",
       "feastPlacedLine": "수확의 잔치를 차렸습니다.",
       "huskTrade": "껍질을 퇴비로 교환",
-      "huskTradeAria": "{name}에게 시든 껍질을 퇴비로 교환",
+      "huskTradeAria": "{name}에게 껍질을 퇴비로 교환",
       "plantSheet": {
         "title": "작물 심기",
         "plant": "심기",
@@ -3147,6 +3148,7 @@ export const ko_KR: EnTranslations = {
       "ready": "수확 가능",
       "finishing": "마무리 중",
       "withered": "시들었음",
+      "readyAnnounce": "수확 가능: {name}",
       "remainingDaysHours": "{days}일 {hours}시간",
       "remainingHoursMinutes": "{hours}시간 {minutes}분",
       "remainingMinutesSeconds": "{minutes}분 {seconds}초",
@@ -5663,6 +5665,9 @@ export const ko_KR: EnTranslations = {
       "matFmt": "{name} x{count}",
       "outputFmt": "{name} x{count}",
       "comboReq": "{a}와 {b} 필요",
+      "effectFood": "먹으면 {seconds}초에 걸쳐 생명력을 {amount} 회복합니다.",
+      "effectWellFed": "식사를 마치면 배부름: {minutes}분간 {stat} +{value}.",
+      "effectWellFedAura": "식사를 마치면 {minutes}분간 {aura} 효과를 얻습니다.",
       "sourceTrainerFee": "훈련사, {fee}",
       "sourceTrainerFree": "훈련사, 무료",
       "sourceKnown": "처음부터 습득",
@@ -9087,6 +9092,7 @@ export const ko_KR: EnTranslations = {
       "useManaPotion": "사용: 즉시 마나를 {amount} 회복합니다. 전투 중 사용 가능. 재사용 대기시간 1분.",
       "clickUseInstant": "클릭하여 전투 중 즉시 사용",
       "clickUse": "클릭하여 사용",
+      "clickSetOut": "클릭하여 차리기",
       "clickBuyback": "클릭하여 되사기",
       "bagSlots": "{slots}칸 가방"
     },
