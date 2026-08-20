@@ -259,6 +259,12 @@ describe('i18n status registry: blocked rows are load-bearing (no over-allow)', 
       }
     }
     expect(retiredBlocked).toBeGreaterThan(0);
+    // The marker string the ledger reads, pinned to its literal ONCE here so
+    // the reason comparison above is never a self-comparison against the
+    // same constant the generator writes (the wire-name pin rule).
+    expect(RETIRED_REASON).toBe(
+      'Retired key: kept only for its reviewed overlay rows and the release-fill ledger; no page renders it (tests/guide_key_coverage.test.ts RETIRED_KEYS), so it is never a fill work item.',
+    );
   });
 
   it('the runtime pending set excludes retired keys too (build/registry lockstep)', async () => {
@@ -266,6 +272,16 @@ describe('i18n status registry: blocked rows are load-bearing (no over-allow)', 
     // in lockstep; the retired exclusion must hold in BOTH or the runtime
     // English-fill accounting and the release ledger disagree.
     const { pending } = await import('../src/ui/i18n.resolved.generated/pending');
+    const langs = Object.keys(pending);
+    // Non-vacuity: an empty or shrunken pending table would make the loop
+    // below constant-true. The set is populated, and the retired leaf's LIVE
+    // successor is still pending in at least one locale, proving the
+    // exclusion filtered the retired key rather than emptying the set.
+    expect(langs.length).toBeGreaterThan(0);
+    expect(langs.reduce((n, l) => n + pending[l].length, 0)).toBeGreaterThan(0);
+    expect(langs.some((l) => pending[l].includes('guide.profPages.gatherDeeds.farmingSown'))).toBe(
+      true,
+    );
     for (const [lang, keys] of Object.entries(pending)) {
       for (const key of keys) {
         expect(RETIRED_KEY_SET.has(key), `${lang} runtime-pending retired key ${key}`).toBe(false);

@@ -6399,7 +6399,7 @@ export class Hud {
     if (this.deedsWindow.isOpen) this.deedsWindow.render();
     if (this.reliquaryWindow.isOpen) this.reliquaryWindow.render();
     if (this.professionsWindow.isOpen) this.professionsWindow.render();
-    if (this.harvestJournalWindow.isOpen) this.harvestJournalWindow.render();
+    this.harvestJournalWindow.relocalize();
     this.plantSheetWindow.relocalize();
     // The crafting window's repaint memos (station set, reagent sig, the
     // profession surface sig) are all text-independent, so a language switch

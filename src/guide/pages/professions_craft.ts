@@ -71,8 +71,13 @@ function sourceCell(r: GuideProfRecipe): string {
  *  label rides the SAME exported map the in-game dish and feast tooltips use
  *  (WELLFED_STAT_KEYS), so the wiki can never name a stat the tooltip does
  *  not. An unmapped buff kind degrades to the aura-name line rather than
- *  shipping a silent dish (the wellfed_tooltip_view fallback rule). */
-function effectLines(r: GuideProfRecipe): string {
+ *  shipping a silent dish (the wellfed_tooltip_view fallback rule); the
+ *  interpolated aura value is the def's own baked English proper noun, the
+ *  SAME policy every name on this page follows (see the module header's
+ *  GUIDE_DEEDS precedent), and tests/guide.test.ts asserts every SHIPPED
+ *  wellfed kind is mapped, so the fallback stays a degradation path, never
+ *  the live rendering. Exported for the direct fallback-render test. */
+export function effectLines(r: GuideProfRecipe): string {
   const effect = r.effect;
   if (!effect) return '';
   const lines: string[] = [];

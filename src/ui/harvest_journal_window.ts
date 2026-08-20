@@ -186,7 +186,7 @@ export class HarvestJournalWindow {
     // The flip baseline and any standing announcement die with the session:
     // a reopen observes fresh and must not re-announce (or announce stale).
     this.readyBedIds = null;
-    if (this.liveStatus) this.liveStatus.textContent = '';
+    this.liveStatus?.replaceChildren();
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
   }
@@ -267,11 +267,25 @@ export class HarvestJournalWindow {
     // flipping to ready under an open window) strands focus on <body> while
     // the dialog is still up (the focus_restore contract).
     const focusKey = captureFocusKey(root);
-    root.innerHTML =
+    // The repaint targets an INNER content element, never the root: the
+    // status line beside it must be a PERSISTENT live region, and writing
+    // root.innerHTML would destroy and re-insert it every repaint, which
+    // assistive tech treats as a region leaving and re-entering the tree
+    // (announcements drop or repeat). The wrapper is display: contents in
+    // CSS, so the title and body still lay out as the root's own flex
+    // children.
+    let content = root.querySelector<HTMLElement>('.hj-content');
+    if (content === null) {
+      root.textContent = '';
+      content = document.createElement('div');
+      content.className = 'hj-content';
+      root.appendChild(content);
+      root.appendChild(this.liveStatusNode());
+    }
+    content.innerHTML =
       `<div class="panel-title"><span id="harvest-journal-title">${esc(t('hudChrome.harvestJournal.title'))}</span>` +
       `<button type="button" class="x-btn" data-close data-focus-key="harvestJournalClose" aria-label="${esc(t('hudChrome.harvestJournal.close'))}">${svgIcon('close')}</button></div>` +
       `<div class="hj-body">${this.bodyHtml(view, nowMs)}</div>`;
-    root.appendChild(this.liveStatusNode());
     this.announceReadyFlips(view);
     root.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     if (focusKey !== null) {
@@ -284,10 +298,10 @@ export class HarvestJournalWindow {
   }
 
   /** The persistent in-dialog status line (role=status, implicit polite
-   *  aria-live). The SAME element instance survives every whole repaint: it
-   *  is re-appended after each innerHTML write rather than re-created, so AT
-   *  keeps tracking one live region instead of meeting a fresh node per
-   *  paint (a re-created live region announces unreliably). */
+   *  aria-live). Appended beside the content element ONCE per open and never
+   *  removed while the window lives (the repaint targets the content element
+   *  only), so AT tracks one stable live region; #chatlog and #combat-live
+   *  are the shipped persistent-region exemplars this follows. */
   private liveStatusNode(): HTMLElement {
     if (this.liveStatus === null) {
       this.liveStatus = document.createElement('div');
@@ -303,7 +317,11 @@ export class HarvestJournalWindow {
    *  journal dialog hears nothing there; this line is both visible and the
    *  announcement. The first paint after an open only observes (rows already
    *  ready at open are visible, not news), and the baseline tracks bed ids
-   *  so a repaint that changes nothing announces nothing. */
+   *  so a repaint that changes nothing announces nothing. Each announcement
+   *  lands as a FRESH child span: a repeat of the same crop (harvest,
+   *  replant, ready again) is byte-identical text, and writing the same
+   *  string into textContent mutates nothing, so AT would announce nothing;
+   *  replacing the child node is a real mutation every time. */
   private announceReadyFlips(view: HarvestJournalView): void {
     const ready = new Set<string>();
     if (view.kind === 'rows') {
@@ -315,7 +333,18 @@ export class HarvestJournalWindow {
     const flipped = view.rows.filter((row) => row.status === 'ready' && !prior.has(row.bedId));
     if (flipped.length === 0) return;
     const name = flipped.map((row) => itemName(row.produceItemId)).join(', ');
-    this.liveStatusNode().textContent = t('hudChrome.harvestJournal.readyAnnounce', { name });
+    const line = document.createElement('span');
+    line.textContent = t('hudChrome.harvestJournal.readyAnnounce', { name });
+    this.liveStatusNode().replaceChildren(line);
+  }
+
+  /** The Hud's runtime-language-switch arm: clear any standing announcement
+   *  (its text was minted in the OLD locale and no flip re-mints it until a
+   *  plot changes) and re-render the whole window in the new locale. */
+  relocalize(): void {
+    if (!this.isOpen) return;
+    this.liveStatusNode().replaceChildren();
+    this.render();
   }
 
   private bodyHtml(view: HarvestJournalView, nowMs: number): string {

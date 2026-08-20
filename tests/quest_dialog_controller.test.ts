@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DELVES, NPCS, QUESTS, STATIONS } from '../src/sim/data';
 import { CHRONICLER_TEMPLATE_IDS } from '../src/sim/deeds';
 import type { Entity } from '../src/sim/types';
@@ -183,6 +183,10 @@ describe('QuestDialogController', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
   });
+  // The per-locale label-in-name arm switches the module-global language; a
+  // failure mid-loop must not cascade a non-English locale into every later
+  // test in this file.
+  afterEach(() => setLanguage('en'));
 
   it('owns the normal gossip lifecycle and fades the greeting from NPC distance', () => {
     const test = harness();

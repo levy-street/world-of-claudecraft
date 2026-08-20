@@ -159,10 +159,17 @@ describe('boss_mechanics module: the summon-threshold loop', () => {
     expect(boss.firedSummons).toBe(1);
 
     // The REAL evade reset (locomotion.ts), not a hand-rolled field poke: it
-    // clears the ledger and despawns the wave with the dying pull.
+    // clears the ledger and despawns the wave with the dying pull. The wave
+    // entities must really LEAVE the world (a clear-the-array-without-
+    // despawning mutant passes a length check alone).
+    const waveIds = [...boss.summonedIds];
+    expect(waveIds.length).toBeGreaterThan(0);
     resetEvadingMob(ctxOf(sim), boss);
     expect(boss.firedSummons).toBe(0);
     expect(boss.summonedIds.length).toBe(0);
+    for (const id of waveIds) {
+      expect((sim as any).entities.has(id), `add ${id} still in the world`).toBe(false);
+    }
 
     boss.hp = Math.floor(boss.maxHp * (thresholds()[0] - 0.05));
     updateBossMechanics(ctxOf(sim), boss);
@@ -195,6 +202,9 @@ describe('boss_mechanics module: spawnBossAdds', () => {
         (e) => e.type === 'log' && typeof e.text === 'string' && e.text.includes('calls for aid'),
       ),
     ).toBe(true);
+    // The positive control the silent-arm negative below leans on: a
+    // successful wave really does emit the boss-sourced spellfx nova.
+    expect(evs.some((e) => e.type === 'spellfx' && e.sourceId === boss.id)).toBe(true);
   });
 
   it('an unknown add template spawns nothing and stays silent', () => {

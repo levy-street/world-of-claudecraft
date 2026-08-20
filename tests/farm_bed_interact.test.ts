@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { decideFarmBedAction, nearestInteractableBed } from '../src/game/farm_bed_interact';
 import { INTERACT_RANGE } from '../src/sim/types';
 import type { FarmPatchDef, FarmPlotStatus, FarmPlotView } from '../src/world_api/farming';
+import { stripComments } from './helpers/strip_comments';
 
 function patch(id: string, beds: readonly { id: string; x: number; z: number }[]): FarmPatchDef {
   return { id, zoneId: 'eastbrook_vale', tier: 1, x: 0, z: 0, beds };
@@ -64,7 +65,11 @@ describe('nearestInteractableBed', () => {
     // it as the one distance read, so the reach math can never drift from the
     // deny it mirrors. Behavior is pinned by the boundary arms above; this pin
     // exists so a future re-derivation (dropping the import) reds loudly.
-    const source = readFileSync(path.join(process.cwd(), 'src/game/farm_bed_interact.ts'), 'utf8');
+    // Comments stripped first: a deleted call surviving as a commented-out
+    // copy must not keep the count green.
+    const source = stripComments(
+      readFileSync(path.join(process.cwd(), 'src/game/farm_bed_interact.ts'), 'utf8'),
+    );
     const importLine = "import { distToBed } from '../sim/professions/farming';";
     expect(source.split(importLine).length - 1).toBe(1);
     expect(source.split('distToBed(playerPos, bed)').length - 1).toBe(1);

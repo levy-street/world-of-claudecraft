@@ -164,12 +164,17 @@ describe('WOC Store window contract', () => {
     expect(containment).not.toBeNull();
     expect(containment?.[1]).toContain('contain: paint;');
     expect(containment?.[1]).toContain('isolation: isolate;');
-    const stackSync = windowOpenState.slice(
-      windowOpenState.indexOf(
-        "const storeWindow = document.getElementById('daily-rewards-window')",
-      ),
-      windowOpenState.indexOf("document.body.classList.toggle(\n    'mobile-map-quest-open'"),
+    const stackStart = windowOpenState.indexOf(
+      "const storeWindow = document.getElementById('daily-rewards-window')",
     );
+    const stackEnd = windowOpenState.indexOf(
+      "document.body.classList.toggle(\n    'mobile-map-quest-open'",
+    );
+    // Guarded anchors: an unfound end anchor would widen the slice to the
+    // rest of the module and let the pins go vacuously green.
+    expect(stackStart, 'stack-sync start anchor found').toBeGreaterThan(-1);
+    expect(stackEnd, 'stack-sync end anchor past start').toBeGreaterThan(stackStart);
+    const stackSync = windowOpenState.slice(stackStart, stackEnd);
     expect(stackSync).toContain('stackedWindowsVisible(');
     expect(stackSync).toContain('!!storeWindow && isWindowVisible(storeWindow)');
     expect(stackSync).toContain('!!claudiumWindow && isWindowVisible(claudiumWindow)');

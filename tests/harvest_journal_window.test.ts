@@ -254,10 +254,50 @@ describe('harvest journal window: the countdown clock', () => {
     const node = status();
     world.plots = [plot({ status: 'ready' })];
     vi.advanceTimersByTime(HARVEST_JOURNAL_TICK_MS);
-    // The SAME node carries the announcement across the whole repaint (a
-    // re-created live region announces unreliably), naming the crop.
+    // The SAME node carries the announcement across the whole repaint AND it
+    // was never detached: the repaint targets the inner content element, so
+    // the region's parent stays the root (a region that leaves and re-enters
+    // the tree announces unreliably; assistive tech drops or repeats it).
     expect(status()).toBe(node);
+    expect(status()?.parentNode).toBe(root);
     expect(status()?.textContent).toBe('Ready to harvest: Vale Wheat');
+  });
+
+  it('a repeat flip of the same crop still mutates the region (fresh child span)', () => {
+    world.nowMs = 5 * MINUTE;
+    makeWindow().open();
+    const status = root.querySelector<HTMLElement>('.hj-live-status');
+    world.plots = [plot({ status: 'ready' })];
+    vi.advanceTimersByTime(HARVEST_JOURNAL_TICK_MS);
+    const firstSpan = status?.firstChild;
+    expect(firstSpan?.textContent).toBe('Ready to harvest: Vale Wheat');
+    // Harvested (row gone) then replanted and ready again: byte-identical
+    // announcement text. Writing the same string into textContent would
+    // mutate nothing, so AT would announce nothing; the fresh child span is
+    // what makes the repeat a real mutation.
+    world.plots = [];
+    vi.advanceTimersByTime(HARVEST_JOURNAL_TICK_MS);
+    world.plots = [plot({ status: 'ready' })];
+    vi.advanceTimersByTime(HARVEST_JOURNAL_TICK_MS);
+    const secondSpan = status?.firstChild;
+    expect(secondSpan?.textContent).toBe('Ready to harvest: Vale Wheat');
+    expect(root.querySelector('.hj-live-status')).toBe(status);
+    expect(secondSpan).not.toBe(firstSpan);
+  });
+
+  it('a language switch clears the standing announcement (no stale locale)', () => {
+    world.nowMs = 5 * MINUTE;
+    const win = makeWindow();
+    win.open();
+    world.plots = [plot({ status: 'ready' })];
+    vi.advanceTimersByTime(HARVEST_JOURNAL_TICK_MS);
+    expect(root.querySelector('.hj-live-status')?.textContent).toBe('Ready to harvest: Vale Wheat');
+    // The Hud's language-switch arm: the standing announcement was minted in
+    // the OLD locale and no flip re-mints it, so relocalize clears it and
+    // re-renders the window (which stays painted).
+    win.relocalize();
+    expect(root.querySelector('.hj-live-status')?.textContent).toBe('');
+    expect(root.querySelector('#harvest-journal-title')).not.toBeNull();
   });
 
   it('a journal opened onto an already-ready plot stays quiet; a close clears the line', () => {

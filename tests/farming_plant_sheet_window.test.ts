@@ -138,6 +138,27 @@ describe('plant sheet window: paint', () => {
     expect(root.getAttribute('aria-busy')).toBe('false');
   });
 
+  it('farmPlanted answers clear the busy state: foreign bed re-arms, same bed closes', () => {
+    // Production deliberately clears the send arm on ANY farmPlanted (the
+    // answer arrived; an unmatched one must not leave the Plant control dead
+    // forever). The busy affordance follows the same rule: a foreign bed's
+    // plant clears aria-busy and leaves the sheet open; the same bed's plant
+    // closes the window, whose close path also resets the attribute.
+    const win = makeWindow();
+    win.open(BED);
+    root.querySelector<HTMLElement>('[data-plant]')?.click();
+    expect(world.plantCrop).toHaveBeenCalledTimes(1);
+    expect(root.getAttribute('aria-busy')).toBe('true');
+    win.notifyFarmEvent(planted('bed_eastbrook_2'));
+    expect(root.getAttribute('aria-busy')).toBe('false');
+    expect(root.style.display).toBe('block');
+    root.querySelector<HTMLElement>('[data-plant]')?.click();
+    expect(root.getAttribute('aria-busy')).toBe('true');
+    win.notifyFarmEvent(planted(BED));
+    expect(root.style.display).toBe('none');
+    expect(root.getAttribute('aria-busy')).toBe('false');
+  });
+
   it('renders ONLY sowable seeds as pick rows; a gated one is a reasoned locked row', () => {
     world.inventory.push({ itemId: RICE.seedItemId, count: 1 });
     makeWindow().open(BED);

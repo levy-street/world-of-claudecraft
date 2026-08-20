@@ -15,7 +15,11 @@ import { DELVES, ITEMS } from '../src/sim/data';
 import { delveRunForPlayer, freeDelveRun } from '../src/sim/delves/runs';
 import { enterDungeon, instanceAt, leaveDungeon } from '../src/sim/instances/dungeons';
 import { setItemLocked } from '../src/sim/item_lock';
-import { FARM_FEAST_ITEM_ID, FARM_FEAST_TEMPLATE_ID } from '../src/sim/professions/feast';
+import {
+  FARM_FEAST_ITEM_ID,
+  FARM_FEAST_TEMPLATE_ID,
+  placeFeastAction,
+} from '../src/sim/professions/feast';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import {
@@ -357,6 +361,21 @@ describe('shared feast: placing', () => {
     expect(eventsOf(sim, from2, 'farmFeastPlaced')).toHaveLength(1);
     expect(lockedUnits(placer)).toBe(1);
     expect(unlockedUnits(placer)).toBe(0);
+  });
+
+  it('a stale named selection refuses without spending (the direct defensive arm)', () => {
+    // The tri-state's null branch is unreachable through useItem (which
+    // pre-validates the selection), so this drives placeFeastAction directly
+    // with an out-of-range index: the refusal must consume nothing and spawn
+    // nothing (the free-feast duplication a silent fall-through would risk).
+    const { sim, placer } = world(0);
+    giveFeast(sim, placer);
+    const from = sim.events.length;
+    placeFeastAction(sim.ctx, placer.p, placer.meta, 999);
+    expect(denyReason(sim, from)).toBe('no_feast');
+    expect(sim.countItem(FARM_FEAST_ITEM_ID, placer.pid)).toBe(1);
+    expect(sim.ctx.feasts.size).toBe(0);
+    expect(feastEntities(sim)).toHaveLength(0);
   });
 
   it('feast_active: one active feast per placer, while another player still can place', () => {

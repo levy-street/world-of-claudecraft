@@ -45,6 +45,12 @@ describe('targetCastDisplayLabel (the #tf-castbar resolver)', () => {
     // boundary so a silent widening or narrowing is a deliberate edit here.
     expect(targetCastDisplayLabel(FISHING_CAST_ID)).toBe(FISHING_CAST_ID);
     expect(targetCastDisplayLabel(CRAFT_CAST_ID)).toBe(CRAFT_CAST_ID);
+    // A REAL ability id stays raw too: the boundary is farming-only, not
+    // "trades raw, abilities localized" (the widening a later reviewer would
+    // actually reach for passes the two trade arms untouched).
+    const abilityId = Object.keys(ABILITIES)[0];
+    expect(abilityId).toBeTruthy();
+    expect(targetCastDisplayLabel(abilityId)).toBe(abilityId);
     expect(targetCastDisplayLabel('no_such_cast_id_ever')).toBe('no_such_cast_id_ever');
   });
 });

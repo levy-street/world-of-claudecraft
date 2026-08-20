@@ -29,6 +29,7 @@ import { PlantSheetWindow } from '../src/ui/farming_plant_sheet_window';
 import { HarvestJournalWindow } from '../src/ui/harvest_journal_window';
 import { syncWindowOpenBodyClasses } from '../src/ui/window_open_state';
 import type { IWorld } from '../src/world_api';
+import { stripComments } from './helpers/strip_comments';
 
 // happy-dom rewrites import.meta.url to an http scheme, so the repo root
 // comes from the vitest cwd (the localization_fixes idiom).
@@ -146,15 +147,26 @@ describe('the mobile-window-open body class follows the farming windows', () => 
   });
 
   it('hud wires both windows to syncAnyWindowOpenState (the pinned sibling shape)', () => {
-    const hud = readFileSync(join(repoRoot, 'src/ui/hud.ts'), 'utf8');
-    const journalDeps = hud.slice(
-      hud.indexOf('private readonly harvestJournalWindow = new HarvestJournalWindow({'),
-      hud.indexOf('private readonly plantSheetWindow = new PlantSheetWindow({'),
+    // Comments stripped (a commented-out dep line must not satisfy the pin)
+    // and every anchor GUARDED: an unfound end anchor would widen the slice
+    // to the rest of the file, where any OTHER window's dep line goes
+    // vacuously green (the unguarded-indexOf trap).
+    const hud = stripComments(readFileSync(join(repoRoot, 'src/ui/hud.ts'), 'utf8'));
+    const depsSlice = (startAnchor: string, endAnchor: string): string => {
+      const start = hud.indexOf(startAnchor);
+      const end = hud.indexOf(endAnchor);
+      expect(start, `anchor found: ${startAnchor}`).toBeGreaterThan(-1);
+      expect(end, `end anchor past start: ${endAnchor}`).toBeGreaterThan(start);
+      return hud.slice(start, end);
+    };
+    const journalDeps = depsSlice(
+      'private readonly harvestJournalWindow = new HarvestJournalWindow({',
+      'private readonly plantSheetWindow = new PlantSheetWindow({',
     );
     expect(journalDeps).toContain('onVisibilityChange: () => this.syncAnyWindowOpenState()');
-    const sheetDeps = hud.slice(
-      hud.indexOf('private readonly plantSheetWindow = new PlantSheetWindow({'),
-      hud.indexOf('private readonly reliquaryWindow = new ReliquaryWindow({'),
+    const sheetDeps = depsSlice(
+      'private readonly plantSheetWindow = new PlantSheetWindow({',
+      'private readonly reliquaryWindow = new ReliquaryWindow({',
     );
     expect(sheetDeps).toContain('onVisibilityChange: () => this.syncAnyWindowOpenState()');
   });

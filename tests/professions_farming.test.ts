@@ -2822,6 +2822,11 @@ describe('the golden_harvest roll: the shared rare event at the farm bed', () =>
     expect(downgrades).toEqual([
       { type: 'gatherDowngrade', pid: h.pid, surface: 'crop', lost: 'mark' },
     ]);
+    // BOTH grades really truncated in this construction, so the single event
+    // above proves the DEDUPE, not a one-grade emitter: the fine grade found
+    // no signed room at all, and the base grade signed only its merge room.
+    expect(h.meta.inventory.some((s) => s.itemId === FINE_ID && s.instance)).toBe(false);
+    expect(signedCountOf(h, PRODUCE_ID)).toBe(stack);
   });
 
   it('a golden win with bag room emits NO downgrade (the signature landed in full)', () => {

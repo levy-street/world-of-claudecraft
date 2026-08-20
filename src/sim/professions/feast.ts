@@ -162,8 +162,18 @@ export function placeFeastAction(
   // plantCrop, locked slots are never victims). Both mutate the slot array
   // only, so the quest hook fires once here (place_feast stays a
   // HEAVY_SELF_CMDS member for the self snapshot).
-  if (selected) consumeSelectedInventorySlot(meta.inventory, FARM_FEAST_ITEM_ID, slotIndex);
-  else removeUnlockedFromSlots(meta.inventory, FARM_FEAST_ITEM_ID, 1);
+  if (selected) {
+    // Branch on the tri-state as item_copy_ref.ts demands. Nothing mutates
+    // the inventory between the resolve above and this consume today, so a
+    // failed take is defensive only: refuse rather than spawn a FREE feast
+    // (item duplication) if a future gate insertion breaks that invariant.
+    if (!consumeSelectedInventorySlot(meta.inventory, FARM_FEAST_ITEM_ID, slotIndex)) {
+      ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'no_feast' });
+      return;
+    }
+  } else {
+    removeUnlockedFromSlots(meta.inventory, FARM_FEAST_ITEM_ID, 1);
+  }
   ctx.onInventoryChangedForQuests?.(meta);
   // The entity, the battleground-flag shape: a ground object with a custom
   // templateId, no pickup item, not lootable. `name` carries the PLACER'S
