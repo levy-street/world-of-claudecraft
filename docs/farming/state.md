@@ -4,6 +4,22 @@ Read this file first in every phase session. It is the single authority for lock
 decisions. If a phase file contradicts this file, this file wins and the phase file
 gets swept in the same pass (amend the QA twin too, always).
 
+Current phase: Phase 13 (integration polish) IN FLIGHT on
+fix/farming-phase-13-integration-polish, opened with the M5 sim.ts
+extraction (monolith ceiling 12660 lowered to 12249, which DISCHARGES the
+Phase 12 comment-compression ratchet read). Prior: Phase 12 QA (verify the
+shared feast) DONE 2026-08-19, PASS-WITH-FOLLOWUPS, merged caf0fdee9f
+(one real lifecycle defect found and fixed: the instance/delve feast
+teardown registration; the finite re-arm dodge amended to the Infinity
+sentinel; residual ledger in the Phase 12 QA block below). Prior: Phase 12
+(the shared feast) DONE 2026-08-19, merged 71010cf82a (placeFeast and
+consumeFeast on IWorldFarming, 331 = 88 + 243, commands 204/217; beat P
+discharged the wellfed parity beat; farming_session golden md5
+9dfd1c6ea073f853655e38675460e81f; deviation (ca): the feast recipe ships
+reagent-dormant-honest, so the D11/(bo) ruling must cover THREE advertised
+dormant rows before any release merge). The "Phase 13 handoff" section
+below collects EVERY open gate, maintainer read, and deferral in one
+table. Prior:
 Current phase: Phase 11 (well-fed food) DONE 2026-08-19, local-only per D22
 (branch fix/farming-phase-11-well-fed-food, nine commits, merge hash in
 progress.md). ItemDef.wellfed ships beside elixir as the D15 mirror, minted
@@ -350,6 +366,204 @@ lockfile and both fired the branch-only farm-props re-mint (the release can
 never re-mint a branch-only seal).
 Working tree: ALL farming work happens in the persistent worktree
 `~/Documents/woc-farming-plan`. Other sessions share the main checkout; never work there.
+
+## Phase 13 handoff: MAINTAINER GATES and the full deferral ledger (2026-08-19)
+
+Compiled by the Phase 13 integration sweep (Lane C) from every progress.md
+Notes block, the deviation ledger (a) through (ca), the Phase 12 QA residual
+block, and the OPEN list. This table is the ONE collection point; the source
+entries stay authoritative for detail. Statuses: open ruling-owed,
+deferred-to-release-fill, accepted-no-action, handed-to-maintainer,
+closed-by-X.
+
+### MAINTAINER GATES (read these first)
+
+1. THE (ca)/D11 RULING GATE, blocking any release merge: THREE advertised
+   reagent-dormant recipes (the tier-3 buff dish highwatch_barley_porridge,
+   the tier-4 buff dish evergarden_braised_greens, and the harvest feast
+   recipe_harvest_feast) are trainer-visible rows no player can complete,
+   because tier 3/4 produce has no first faucet (deviation (bo): the
+   seed-back roll returns the SAME crop's seed and only from tier 3+ crops;
+   golden_harvest is a yield multiplier, not a seed). The D11/(bo)
+   seed-bootstrap ruling (four options in the OPEN list below) MUST
+   explicitly cover all three rows BEFORE this branch ever merges to a
+   release, or they ship after D11. prog_farming_100 and (transitively)
+   feat_book_complete stay parked on the same ruling under the (bs) waiver.
+
+2. THE MAINTAINER READS OWED (detail at each ledger letter): (a) the
+   PENDING_ART allowlist sign-off; (w) the structural affinity exemption
+   (standing since Phase 4, now 27 materials); (al) the art-suite guard
+   extensions plus the sharpened bundle-hash renderer/content split; (ap)
+   the farmNowMs facet member; (bb) the linkdead notice loss; (be) the
+   simplified-mode gathering rows; (bg) the intro grant fence, its
+   trade-pipe leak, and the garden_hoe reagent knock-on; (bh) the
+   NPCs-are-terrain calm-pad rule; (bs) the dormant-deed waiver plus the
+   D12 golden-harvest cadence read (1/90 per harvest times survival). The
+   tuning reads: feast charges 10 / durationTicks 3600 (180 s) / trainer
+   fee 10000 / sellValue 250; the Phase 11 well-fed magnitudes 3/600s,
+   6/900s, 9/900s, 12/900s with the capstone-at-elixir-ceiling and the
+   24-stamina food-plus-elixir stacking read (cheap lever: capstone to 9 or
+   10) plus the tier 2 to 4 stat-identity and tier-1 inversion addendum;
+   seed-back rates 0.08/0.40 tier 3 and 0.06/0.35 tier 4; compost 2 sell /
+   8 buy with FARM_HUSKS_PER_COMPOST 2; growth tonic 6 sell-only; watch
+   fees 2/3/4/6; the tier-3 rung-50 domination and tier 4 shipping quality
+   rare; (ai) the tonic as the cheapest rung-0 alchemy skill-up; (aj) the
+   2500/10000 trainer fees on reagent-dormant rungs; the crop and hoe
+   display-name lore passes; the fine-twin buyValue doctrine intersection;
+   the fine_marsh_rice / fine_highland_barley dish-consumer question; the
+   farming-counts-toward-any-profession-deeds default; the
+   ONLINE_WORLD_LAYOUT_VERSION epoch call at go-live; the renderer.ts
+   exact-count ceiling re-pin prepared at the nineteenth absorb; the
+   q_prof_intro overflow-grant template (17/16 bags); the second v0.39.0
+   deed-locale fill pass (15 manifest rows); the Steam/Epic achievement
+   mapping. The sim.ts comment-compression ratchet read from Phase 12 is
+   DISCHARGED by the Phase 13 M5 extraction (ceiling 12660 lowered to
+   12249); recorded here as such, no read owed anymore.
+
+3. THE ART BATCH HANDOFF. The deliverable here is THIS LEDGER, never
+   generated art: committed item art demands the maintainer's master SHA
+   (the profession_icons E2 rule). The batch: ITEM_ART_PENDING at 44 ids
+   including harvest_feast; the gather_farming profession icon behind (a);
+   a bespoke wellfed aura icon (the aura_buff_sta fallback serves today);
+   the icon cross-family reads (highwatch_barley_porridge paints a potion
+   primary and reads as alchemy, fenbridge_rice_pudding a coin primary and
+   reads as currency); the four hoe icons alike-at-32px eyeball; the
+   glazed-carrots-vs-pottage 32px eyeball (shared palette and glyph set);
+   the painted map-pin MapMarkerArtId with the (bd) per-surface pin-color
+   unification (oak on the zone map, station orange on the minimap); the
+   growth_tonic sparkle-overlay glyph-semantics note; the farmer NPC voice
+   lines (VOICE_ALIAS rows only; scripts/gen_npc_lines.mjs is the
+   follow-up; the LOOK rows were CLOSED by the nineteenth-absorb npc_looks
+   heal); the src/ui/icons.ts ITEM_ART_PENDING rationale comment sweep (it
+   still says "no faucet until go-live" for compost); DEED_ART_PENDING at
+   8 untitled deeds plus the commissioned prog_farming_100 crest
+   replacement (docs/achievements/icon-brief.md); the Phase 11 buff-bar
+   and tooltip capture offer; the A4 pairwise-distinctness pin extension
+   across every procedurally-resolving id when the first debt id leaves
+   the pending set; the 10 to 11 px mobile chip legibility revisit
+   ((bf)(4)).
+
+### The handoff table
+
+| Item | Phase | Owner | Status |
+|---|---|---|---|
+| D11/(bo) tier 3/4 seed bootstrap; must cover the three (ca) dormant recipes (porridge, braised greens, harvest feast) | P9 QA / P11 / P12 | maintainer | open ruling-owed (GATE 1) |
+| (bs) dormant-deed waiver (prog_farming_100, feat_book_complete) plus the D12 cadence read | P10 | maintainer | open ruling-owed |
+| (a) PENDING_ART allowlist sign-off (gather_farming, self-clearing) | P1 | maintainer | open ruling-owed |
+| (w) structural affinity exemption, 27 materials (standing since Phase 4) | P4 / P5 | maintainer | open ruling-owed |
+| (al) art-suite guard extensions plus the bundle-hash renderer/content split | P6 / P6 QA | maintainer | open ruling-owed |
+| (ap) farmNowMs facet member (re-argued KEEP at P7 QA) | P7 | maintainer | open ruling-owed |
+| (bb) linkdead transient-notice loss acceptance | P8 | maintainer | open ruling-owed |
+| (be) simplified-mode gathering rows (a Professions 2.0 surface change) | P8 QA | maintainer | open ruling-owed |
+| (bg) intro grant fence, trade-pipe leak, garden_hoe reagent knock-on | P9 | maintainer | open ruling-owed |
+| (bh) NPCs-are-terrain pad rule (Highwatch eyeballed, no re-seat) | P9 | maintainer | open ruling-owed |
+| Well-fed ladder magnitudes: capstone at the elixir ceiling, 24-stam stacking, twins stat-identity, tier-1 inversion, unanchored raid-floor phrase | P11 / P11 QA | maintainer | open ruling-owed |
+| Feast tuning: charges 10, 180 s, trainer fee 10000, sellValue 250, reagents x4/x4/x2 | P12 | maintainer | open ruling-owed |
+| Seed-back rates 0.08/0.40 tier 3, 0.06/0.35 tier 4 (economy-sensitive) | P5 | maintainer | open ruling-owed |
+| Watch fees 2/3/4/6, compost 2/8, FARM_HUSKS_PER_COMPOST 2, tonic bonus 0.5/2 | P4 | maintainer | open ruling-owed |
+| Growth tonic 6 sell-only plus (ai) cheapest rung-0 alchemy skill-up ruling | P4 / P6 QA | maintainer | open ruling-owed |
+| (aj) 2500/10000 trainer fees on reagent-dormant rungs | P6 QA | maintainer | open ruling-owed |
+| Tier-3 rung-50 domination (three rungs for four tiers); tier 4 quality rare | P6 / P11 | maintainer | open ruling-owed |
+| Dish foodHp/sellValue assignments and reagent counts (all curve-point reuses) | P6 | maintainer | open ruling-owed |
+| Crop durations (5-minute sibling gap advisory), gain schedule, survival endpoints, pick floor/cap | P3 / P5 | maintainer | open ruling-owed |
+| Crop display names lore pass (D11 ids locked) | packet | maintainer | open ruling-owed |
+| Hoe display names (Skysilver/Osmium compressed coinages) and prices | P5 | maintainer | open ruling-owed |
+| Fine-twin buyValue doctrine intersection (priced tier-4 twin above unpriced tier-4 seed) | P5 QA | maintainer | open ruling-owed |
+| fine_marsh_rice / fine_highland_barley dish consumers (hoe-reagent-only today) | P6 | maintainer | open ruling-owed |
+| Farming counting toward any-profession deeds (default yes, automatic) | P1 | maintainer | open ruling-owed |
+| ONLINE_WORLD_LAYOUT_VERSION epoch bump at farming go-live | 19th absorb | maintainer | open ruling-owed |
+| renderer.ts exact-count ceiling re-pin (13774) prepared for feature review | 19th absorb | maintainer | open ruling-owed |
+| q_prof_intro requiredItems overflow grant on a full bag (17/16 visible) | P9 QA | maintainer | open ruling-owed |
+| Journey script joins the gate at go-public (D22 keeps farming off CI today) | P9b QA | maintainer | open ruling-owed |
+| Tier-4-to-tier-1 wellfed downgrade legibility (buff hover is the one surface) | P11 QA | maintainer | open ruling-owed (optional) |
+| (bq) residual: online pendingSend stranding on a silently dropped command (spectate/reconnect), family-consistent | P9b QA | maintainer | open ruling-owed (optional) |
+| CRITICAL preload lane for the 12 crop-stage GLBs (background-lane split invited) | P7 QA | maintainer | open ruling-owed (glance) |
+| Idle sway ignores reducedMotion (foliage precedent) | P7 QA | maintainer | open ruling-owed (glance) |
+| Phase 9 farmer titles and greetings as authored | P9 | maintainer | open ruling-owed |
+| p99 blob-size gauge in the perf heartbeat | P3 | maintainer | handed-to-maintainer |
+| AURA_VISIBLE_CAP_LOW = 8 self-buff cap fairness (pre-existing, not farming's) | P11 QA | maintainer | handed-to-maintainer |
+| The art batch ledger (gates block item 3: ITEM_ART_PENDING 44, wellfed aura icon, cross-family icon reads, hoe 32px, carrots-vs-pottage, pin art plus (bd), tonic sparkle, voice lines, icons.ts comment, DEED_ART_PENDING 8 plus crest replacement, chip legibility) | P4 to P12 | maintainer art pass | handed-to-maintainer |
+| CI shard-weights harvest re-run at go-public (scripts/ci_shard_weights_harvest.mjs) | 16th absorb | go-public session | handed-to-maintainer |
+| gatherDowngrade surface union gains 'crop' (silent signature truncation on full-bag golden wins) | P10 | later phase | handed-to-maintainer |
+| Mobile-window-open body-class gap (harvest journal and plant sheet, family-wide) | P9b QA | Phase 13 polish | handed-to-maintainer |
+| A11y polish batch: seed rows aria-pressed vs radiogroup, in-flight aria-busy, journal ready aria-live, WCAG label-in-name husk aria | P8 to P9b QA | a11y batch | handed-to-maintainer |
+| countRawInSlots fifth src/ui copy plus the distToBed comment-contract mirror (need src/sim edits) | P9b QA | later farming phase | handed-to-maintainer |
+| Style batch: .ps-seed raw rgba, the report window #ffd100 literal | P9b QA | Phase 13 style batch | handed-to-maintainer |
+| useItem feast arm ignores the validated slotIndex (thread like consumeOneUnit if provenance lands) | P12 QA | Phase 13 polish | handed-to-maintainer |
+| Bags feast hint says "Click to use" for a placement; a "set out" key needs M16 fills | P12 QA | Phase 13 polish | handed-to-maintainer |
+| Nameplate feast row INTERACT_RANGE + 1 hysteresis pad; comment overstates "close enough to eat" | P12 QA | Phase 13 polish | handed-to-maintainer |
+| Nameplate raw-id cast label for non-player farming casts (cross-profession class gap) | P3 / P7 | Phase 13 polish | handed-to-maintainer |
+| Wiki shows no consumable-effect prose for ANY dish (GuideProfCraft lacks an effect field) | P12 QA | guide-generator follow-up | handed-to-maintainer |
+| map_doc NPC sanitizer drops the farmer flag (one whitelist line plus a round-trip pin when the editor authors farmers) | P9 | editor curation | handed-to-maintainer |
+| Steam/Epic achievement mapping (no ACH_ rows; hard cap 100 names) | P10 | maintainer | handed-to-maintainer |
+| STALE PLAYER PROSE FOUND BY THIS SWEEP: guide.profPages.gatherDeeds.farming said farming "keeps no deeds of its own yet", FALSE since Phase 10 shipped seven deeds | P7 / P10 | Phase 13 lane A | closed-by-Phase-13 (new key gatherDeeds.farmingSown with its five M16 fills, deedsSection farming arm re-pointed, retired leaf kept with a RETIRED comment; its stale Latin fills join the release-fill row above) |
+| Disposable-PG TOAST/WAL measurement (P3 QA made it a Phase 9 HARD gate; NO execution is recorded in any Phase 9 / 9b / QA block; the user-space PG16 recipe exists) | P3 QA | Phase 13 QA (execute) or maintainer (waive) | open, handed-to-Phase-13-QA |
+| Online resumed mid-growth live render check (P7 QA moved it to Phase 9 QA, which owns the online rig; no execution recorded) | P7 QA | Phase 13 QA (execute) or maintainer (waive) | open, handed-to-Phase-13-QA |
+| guide.profPages.rareBody (shared across the four gathering pages, filled translated key) names only the three node-trade windfall flavors; farming's golden-harvest flavor is absent (the farming page's new tableBody covers it, so no falsehood renders); the reword needs the new-key treatment plus fills | P13 lane A | release fill / maintainer | open, deferred (reword landmine) |
+| FarmBiomePalette.trim has no draw-time consumer (soil tints the bed, wood tints the bin; the core comment claimed trim covered the bin and is now corrected); wire trim in the higher-tier pass or drop the channel | P13 integration | maintainer / art batch | open, handed-to-maintainer |
+| "Well Fed" (aura.wellFed) is verbatim the classic-era MMO food-buff term; plain descriptive English, shipped Phase 11 with fills, past ip_scrub; awareness note only | P13 lane A | maintainer | accepted-no-action (awareness) |
+| TEARDOWN PRECONDITION (gate-integrity finding): seven screenshot cone subtrees (farming-phase-01/05/07/08/09/09b/12) are referenced ONLY from docs/farming/ files, so deleting the packet reds tests/ci_workflow.test.ts's set-equality (in-cone-but-unreferenced), and the in-test comment then points at deleting the cone rows, which silently drops the evidence from five CI checkouts; the teardown change must re-home those references (or deliberately retire the subtrees WITH their cone rows and PNGs) in the SAME change; the plain farming/ subtree and farming-phase-13 survive via the asset manifest and the exporter | P13 integration | Phase 13 QA (the teardown step) | open, handed-to-Phase-13-QA (blocks teardown, not the merge) |
+| Second v0.39.0 deed-locale fill pass (15 manifest rows unfilled in 20 locales) | P10 | release fill | deferred-to-release-fill |
+| All pending Latin locale rows (about 660 as of the nineteenth absorb) | P1 to P12 | release fill | deferred-to-release-fill |
+| Stale Latin count prose (whatBody, gatherHubBody, gatherDeeds bodies) plus the 18 dropped Master Gatherer desc fills | P1 | release fill | deferred-to-release-fill |
+| Anti-roster guide pin extended across locales at the fill | P1 QA | release fill | deferred-to-release-fill |
+| BASE_DICT locale fill for error.castingPlanting | P3 | release fill | deferred-to-release-fill |
+| ja_JP guide fill names the hoe in English (check zh/ko/ru for the pattern) | P5 QA | release fill | deferred-to-release-fill |
+| Five-locale "frost gourd" qualifier plus the ru Eastbrook stem split | P6 | release fill | deferred-to-release-fill |
+| Guide "(Shift+K ...)" prose lacks the "by default" qualifier (translated-key reword) | P9 QA | release fill | deferred-to-release-fill |
+| useWellfed/useWellfedAura pending Latin rows; aura.wellFed Latin fills | P11 | release fill | deferred-to-release-fill |
+| farmDenied raw-string echo bound and heavy-self mark-on-receipt refusal amplification (rate limiter bounds it; an ownerKey index is the future O(1)) | P3 QA / P12 QA | none | accepted-no-action |
+| Offline forged knob flags (offline-only, the survivalRoll-analysis class) | P4 | none | accepted-no-action |
+| Rule-of-three watch points: hud.ts seed-back block, sprout ratio constants, feast title composition, grantGolden signed-grant shape, wellfed/elixir stat maps | P5 to P12 | the third copy extracts | accepted-no-action |
+| Two raw grant-green hex literals ride the eventual log-color tokenization sweep | P5 QA | none | accepted-no-action |
+| Closure arm derives recipe consumers from merged ALL_RECIPES (bounded by the twin-to-dish literal) | P6 | none | accepted-no-action |
+| FarmPatchVisuals.dispose never called; fallback template material never disposed (family precedent, bounded) | P7 QA | none | accepted-no-action |
+| Two-tier built fairness arm structurally impossible (no preset input; revisit only if gfx grows preset-keyed geometry) | P7 QA | none | accepted-no-action |
+| releaseGltf residency no-leak verdict (policy at the preload block) | P7 QA | none | accepted-no-action |
+| (aq) asset-budget honest bar (repo-wide budget pre-existing RED; farm props moved models/props by exactly +174,844 bytes) | P7 | any future asset phase | accepted-no-action |
+| Cosmetic clock-skew acceptances: fast client renders stage4 early; withered surfaces on the staggered backstop | P7 / P8 | none | accepted-no-action |
+| (bc) unsharded 1 Hz sweep on the crowded residue (sub-millisecond measured; revisit with tick-cost evidence) | P8 | none | accepted-no-action |
+| (bf) residuals: mis-stated offline-notice concern, twin production-dead marker exports, sprout ratios, 10px chip type | P8 QA | none | accepted-no-action (chip revisit at the art pass) |
+| Withered-then-ready monotone re-projection with no correcting notice (the bed shows the truth) | P8 | none | accepted-no-action |
+| Login-notice replay on an unsaved flip; ev.ready numeric trust; focusKey splice without CSS.escape (family idiom, journal and sheet) | P8 QA / P9b QA | none | accepted-no-action |
+| Spectators receive the watched farmer's farmReady and its heavy-self mark (generic spectator semantics) | P8 QA | none | accepted-no-action |
+| Four em dashes in keybinds.ts (pre-existing, release commit e9c54bc7d2) | P8 QA | none | accepted-no-action |
+| (bi) offered-but-refused 1 yd band (vendor-family-consistent) | P9 | none | accepted-no-action |
+| (bj) module-import credit arm (fold into the SimContext seam when an extraction frees sim.ts headroom; the M5 extraction is a candidate opening) | P9 | none | accepted-no-action (watch) |
+| (bk) patchId is marker-only (any patch credits) | P9 | none | accepted-no-action |
+| (bm) two work orders per master (cadence is per quest id) | P9 | none | accepted-no-action |
+| requiredItems sweep floor stays >= 5 (derived, q_farm_intro covered) | P9 | none | accepted-no-action |
+| nearFarmerNpc walks the whole radius after the answer (cosmetic) | P9 | none | accepted-no-action |
+| questObjectiveAreas if/else fall-through and patchless farm objectives circling every patch (latent, none shipped) | P9 QA | none | accepted-no-action |
+| Farmer-shadow NPC-over-bed precedence (press ON bed_eastbrook_2/4 in Jessica's arm range opens her dialog; the far side plants) | P9b QA | none | accepted-no-action (UX note) |
+| A bedId-free deny racing an in-flight plant send can re-arm early (at worst one extra deny toast) | P9b QA | none | accepted-no-action |
+| Online e.eating is a lossy shadow (itemId '', hardcoded kind 'food') | P11 QA | future eating-preview author | accepted-no-action |
+| useWellfed keys keep no Use: prefix (rename declined, 21-locale churn) | P11 QA | none | accepted-no-action |
+| Phase 12 QA accepted set: consume deny-order asymmetry, entity-id existence oracle, O(live feasts) scan and heavy-on-receipt, dish-from-constant coupling, feastOwnerKey export surface, malformed-id host asymmetry, flourish scope-re-entry ambiguity | P12 QA | none (perf trigger recorded) | accepted-no-action |
+| place_feast HEAVY_SELF belt-and-braces deliberate mutation survivor | P12 | none | accepted-no-action |
+| Release-hygiene flags: unequipAccountMechChroma hand-roll, the unpinned sm self field, three db-mock lease-export omissions | 19th absorb | release-owned | accepted-no-action (recorded) |
+| Admin farm section must field-pick like the wire projection (standing rule; no farm section exists) | P2 QA | future admin author | accepted-no-action (rule recorded) |
+| Renderer's three-case farm event route has no direct pin (the adapter guard is pinned) | P7 QA | none | accepted-no-action |
+| Offline-taster semantics: session-local clock, a reload re-anchors remaining growth | P3 | none | accepted-no-action (documented) |
+| PROFESSIONS_BLOB_FIELDS both-suites same-change rule; the blob band upper margin note (about 1142 bytes) | P2 / P5 | any future blob phase | accepted-no-action (rule recorded) |
+| Snapshots delta-key scrape source list is a hand-maintained two-file constant (game.ts plus farming_commands.ts); any moved maybe() emitter joins it in the same change | P6b | any future extraction | accepted-no-action (rule recorded) |
+| Any future farming file under public/ui/skills/ joins the freeze lists plus the sha fixture in the same change | 21st absorb | any future phase | accepted-no-action (rule recorded) |
+| hud.ts sits at an exact-zero-headroom ceiling (19214/19214 after the P12 extraction); extraction-first is mandatory for any Hud line | P12 | every future phase | accepted-no-action (standing constraint) |
+| Stale dev-facing comments (types.ts roster, online.ts gprof pair, guide professions.ts header, load_professions.mjs GATHER_PROFS, build_content.mjs beds prose) | P1 / P3 | inherited debt | accepted-no-action |
+| Harvest confirm channel for prompt-mode tool effects ((af)/(ah)/(ba): mints refused, toggle suppressed, journal informational) | P5 to P8 | whoever lands a confirm channel | accepted-no-action (re-deferred with the paired-edit rule) |
+| Deploy-order and rollback bullet | P2 / P3 | ops | closed-by-Phase-3 (DEPLOY.md carries it) |
+| (bn) no client-side player verb planted or harvested | P9 QA | Phase 9b | closed-by-Phase-9b (verbs ship; journey 17/17; reachability pin guards the class) |
+| (z) parity-scenario knob coverage | P4 QA | Phase 5 | closed-by-Phase-5 (isolated golden re-record with the knob beats) |
+| (bw) golden-WIN and paying-band parity coverage | P10 QA | Phase 11 | closed-by-Phase-11 (position-searched beats, one isolated classified re-record) |
+| Wellfed parity beat (tick-phase mint through real ticks) | P11 | Phase 12 | closed-by-Phase-12 (beat P) |
+| sim.ts comment-compression ratchet read | P12 | Phase 13 | closed-by-Phase-13-M5 (extraction; ceiling 12660 lowered to 12249) |
+| Instanced-prop helper extraction (rule of three met) | P7 | Phase 7 QA | closed-by-Phase-7-QA (src/render/glb_instanced_props.ts) |
+| Farmer NPC look rows (villager fallback) | P9 | 19th absorb | closed-by-nineteenth-absorb (four authored rows in the release npc_looks mechanism; voice LINES stay open, see the art batch) |
+| Amount-aware arm for the deeds gainability guard | P3 | Phase 10 | closed-by-Phase-10 (the farming guard arm) |
+| /dev GUI farmgrow row | P3 / P7 | Phase 8 | closed-by-Phase-8 (DEV_COMMAND_ACTIONS row behind the gate) |
+| Feast loot sparkle residual | P12 | Phase 12 | closed-by-Phase-12 (the lootable re-arm fix removed it) |
+| Wiki farming page rendered the node-arm layout with empty tables | P1 | Phase 5 / Phase 9 | closed-by-Phase-9 (live beds prose; the length guards flipped to demand the sections) |
+| No real-browser E2E for the professions window rows | P1 QA | Phase 8 QA | closed-by-Phase-8-QA (the browser a11y professions arm runs the real window) |
 
 ## Locked design decisions
 

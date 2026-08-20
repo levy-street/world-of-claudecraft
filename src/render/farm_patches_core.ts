@@ -81,15 +81,18 @@ export function farmCropAccent(cropId: string): number {
   return FARM_CROP_ACCENT[cropId] ?? FARM_FALLBACK_ACCENT;
 }
 
-/** A patch's local colour grade: the bed soil, the frame timber, and the trim
- *  the higher tiers show. Multiplied into the shared bed material, so one
- *  model reads as four different gardens. */
+/** A patch's local colour grade, multiplied into the props' farm_body
+ *  materials (each GLB carries its own material of that name) so one model
+ *  set reads as four different gardens. As consumed by farm_patches.ts
+ *  today: soil is the bed's whole-mesh multiply and wood is the compost
+ *  bin's; trim is authored for a future higher-tier trim pass and has no
+ *  draw-time consumer yet (ledgered in the Phase 13 handoff). */
 export interface FarmBiomePalette {
-  /** Multiplied into the bed's soil surface. */
+  /** Multiplied into the bed (the whole-mesh instance tint). */
   readonly soil: number;
-  /** Multiplied into the bed's timber frame. */
+  /** Multiplied into the compost bin (the whole-mesh instance tint). */
   readonly wood: number;
-  /** Multiplied into the bed's trim and the patch's compost bin. */
+  /** Authored for the higher-tier trim pass; unconsumed at draw time today. */
   readonly trim: number;
 }
 

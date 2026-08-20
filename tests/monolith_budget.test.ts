@@ -156,11 +156,12 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/sim/sim.ts',
-    // Held at the release pin after the nineteenth-absorb heal moved the mech
-    // chroma unlock/unequip pair to src/sim/mech_chroma_ownership.ts: the file
-    // sits at 12657, so this IS the post-extraction size plus a small margin
-    // (the plus-margin style the ratchet uses for sim.ts).
-    ceiling: 12660,
+    // Lowered after the M5 extraction moved the boss support kit
+    // (updateBossMechanics + spawnBossAdds) whole to src/sim/mob/
+    // boss_mechanics.ts: the file sits at 12246, so this IS the
+    // post-extraction size plus a small margin (the plus-margin style the
+    // ratchet uses for sim.ts).
+    ceiling: 12249,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

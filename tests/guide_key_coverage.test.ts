@@ -95,6 +95,8 @@ const RETIRED_KEYS: string[] = [
   'guide.profPages.specimenBody', // -> guide.profPages.specimenBodyFamilies
   'guide.professions.focusBody', // -> guide.professions.focusBodyTiers
   'guide.professions.harvestBodyChoice', // folded into the harvest section's body copy
+  // -> guide.profPages.gatherDeeds.farmingSown (farming gained its own deeds at D13)
+  'guide.profPages.gatherDeeds.farming',
 
   // -- Content the game no longer has, so the wiki must not define it.
   // The glossary defined Augment as a draft pick in a two-on-two Fiesta match.

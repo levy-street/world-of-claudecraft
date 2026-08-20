@@ -1889,6 +1889,15 @@ describe('Guide professions gathering accuracy', () => {
     expect(html, 'the farming page must carry its planting-loop section').toContain(
       'id="prof-farm-beds"',
     );
+    // The Phase 13 beds-to-table section (the well-fed dishes, the shared
+    // feast, the golden harvest): farming-only, like the beds section above.
+    expect(html, 'the farming page must carry its beds-to-table section').toContain(
+      'id="prof-farm-table"',
+    );
+    // The deeds ternary's farming branch renders the live farmingSown prose,
+    // never the retired no-deeds-yet leaf.
+    expect(html).toContain('its own shelf in the Book of Deeds');
+    expect(html).not.toContain('keeps no deeds of its own yet');
     expect(html).toContain('Farmer Jessica');
     // Tied to the live NPC name so a rename cannot leave the page lying.
     expect(html).toContain(NPCS.farmer_jessica.name);
@@ -1919,6 +1928,12 @@ describe('Guide professions gathering accuracy', () => {
     expect(miningHtml, 'the planting loop is farming-only prose').not.toContain(
       'id="prof-farm-beds"',
     );
+    expect(miningHtml, 'the beds-to-table section is farming-only prose').not.toContain(
+      'id="prof-farm-table"',
+    );
+    // The deeds ternary's other branch: a non-farming trade still renders its
+    // own gatherDeeds leaf.
+    expect(miningHtml).toContain('Ore in the Blood');
   });
 
   // Master Gatherer's trigger counts every registered trade (src/sim/deeds.ts

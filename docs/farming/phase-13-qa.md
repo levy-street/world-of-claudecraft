@@ -1,7 +1,9 @@
 # Phase 13 QA: Verify Integration polish and the handoff
 
-The final audit of the packet. It verifies the Phase 13 PR (wiki page, manifest,
-screenshots, deferral sweep, audit evidence), re-runs the whole-feature rows any late
+The final audit of the packet. It verifies the Phase 13 merge (wiki page, manifest,
+screenshots, deferral sweep, audit evidence; per D22 no PR exists, so every "PR body"
+mention below reads as the progress.md Phase 13 Notes block and the state.md handoff
+table), re-runs the whole-feature rows any late
 fix touched, and then, uniquely, offers the packet teardown to the user. Note:
 docs/design/farming-asset-manifest.json is deliberately outside the packet and stays
 after teardown; only docs/farming/ is ever offered for deletion.
@@ -56,10 +58,13 @@ full report now based on what you have already seen. No more tool calls. Format:
 BLOCKING / SHOULD-FIX / NICE-TO-HAVE / VERDICT."
 - Correctness agent: every deliverable and acceptance criterion actually met; the wiki
   prose is accurate against the shipped mechanics and spoiler-safe; the manifest is
-  complete (cross-check every exporter output in scripts/assets/build_farm_props.mjs
+  complete (cross-check every exporter output in
+  scripts/assets/farm_props/export_farm_props.mjs [path corrected in the Phase 13
+  amendment sweep; the file was renamed from the draft's build_farm_props.mjs]
   and every adapter consumer against the manifest rows; verify footprints, pivots,
   tints, and stage lists match the authored values) and references no docs/farming/
-  path; the screenshots exist under docs/screenshots and the PR body references them;
+  path; the screenshots exist under docs/screenshots and the progress.md Phase 13
+  Notes block references them;
   each qa-checklist evidence row is actually supported by its evidence (re-run a
   sample, the anti-chore rows in particular). Verify the Live-surface note: LIVE,
   complete: no new mechanic shipped; the merge is the wiki page, the screenshots,
@@ -67,7 +72,14 @@ BLOCKING / SHOULD-FIX / NICE-TO-HAVE / VERDICT."
   change in this diff is
   itself a finding (Phase 13 ships no mechanics); if one exists anyway, probe it with
   the throwaway-vitest ADVANCEABLE-clock rig (the clock must advance now() or waits
-  hang), then delete the rig and verify the tree is clean.
+  hang), then delete the rig and verify the tree is clean. [ADDED by the Phase 13
+  sweep: two never-executed re-pointed checks are handed to THIS lane, execute or
+  get a maintainer waive: (1) the disposable-PG TOAST/WAL measurement (a P3 QA hard
+  gate aimed at Phase 9 that no block records executing; the user-space PG16 recipe
+  is in the no-docker-userspace-postgres memory), and (2) the online resumed
+  mid-growth live render check (P7 QA re-pointed it at the online rig). One sim
+  relocation IS expected in this diff and is not a finding: the M5 boss-mechanics
+  extraction, reviewed 0-BLOCKING with the golden byte-identical.]
 - Test-coverage agent: decisive assertions that fail on regression; no
   constant-self-comparison pins; both arms of every either/all claim; orphaned tests
   removed; the guide freshness gate really binds the new content; mutation checks only
@@ -98,13 +110,24 @@ Only after every prior step is green:
 - FIRST surface every deferred follow-up recorded anywhere in the packet (every
   progress.md Notes block, the state.md ledgers and OPEN items, any phase-file
   deferral) so nothing tracked only in docs/farming/ is lost. Restate them in your
-  final response and confirm each one lives in the PR body or a filed issue before any
-  deletion.
+  final response and confirm each one lives in a home that SURVIVES teardown (the
+  state.md table itself dies with the packet: the progress.md copy dies too, so each
+  row must be restated in the final response and accepted by the user, or filed as an
+  issue, before any deletion) [AMENDED per D22: the PR body does not exist].
 - Then ask the user explicitly: "All phases are complete and green. OK to delete
   docs/farming/ (the planning scaffolding) before the PR?"
 - On explicit confirmation, delete ONLY that directory with explicit paths:
   git rm -r docs/farming/ and a "docs: remove farming planning scaffolding" commit
   (with a body) if the docs were committed.
+- [ADDED by the Phase 13 sweep, a HARD teardown precondition: seven screenshot cone
+  subtrees (farming-phase-01/05/07/08/09/09b/12) are referenced ONLY from docs/farming/
+  files, so the deletion reds tests/ci_workflow.test.ts's referenced-vs-cone
+  set-equality and the in-test comment then suggests deleting the cone rows, which
+  would silently drop the evidence from five CI checkouts. The teardown change must,
+  in the SAME commit, either re-home one reference per subtree to a surviving file or
+  deliberately retire each subtree WITH its cone rows and PNGs (a maintainer call).
+  The plain farming/ subtree and farming-phase-13 already survive via
+  docs/design/farming-asset-manifest.json and the exporter.]
 - If the user declines, leave the packet in place and say so in the final response.
 - Never delete anything else, never fold the deletion into an unrelated commit, never
   git add -A.
@@ -113,7 +136,8 @@ Only after every prior step is green:
 
 STEP 6 - FINAL RESPONSE FORMAT
 Verdict PASS / PASS-WITH-FOLLOWUPS / FAIL; counts of issues found and fixed per
-severity; deferrals, each with where it now lives (PR body or issue); whether the
+severity; deferrals, each with where it now lives (a teardown-surviving home per the
+STEP 5 amendment, or an issue); whether the
 packet was removed (yes on confirmation, no with the user's answer otherwise); and the
 closing line: either a one-line handoff for remaining follow-ups or "packet complete".
 

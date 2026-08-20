@@ -214,9 +214,17 @@ function toolEffectsSection(): string {
 }
 
 function deedsSection(g: GuideProfGathering): string {
+  // Farming's arm re-points at a NEW leaf (the harvestBodyChoice
+  // precedent): the retired gatherDeeds.farming prose promised the trade
+  // kept no deeds yet, which the celebrations phase (D13) made false, and
+  // a reword would strand any filled locale copy.
+  const key =
+    g.id === 'farming'
+      ? ('guide.profPages.gatherDeeds.farmingSown' as TranslationKey)
+      : (`guide.profPages.gatherDeeds.${g.id}` as TranslationKey);
   return `<section class="guide-block" id="prof-gather-deeds">
       <h2>${esc(t('guide.profPages.gatherDeedsHeading'))}</h2>
-      ${paras(`guide.profPages.gatherDeeds.${g.id}` as TranslationKey)}
+      ${paras(key)}
     </section>`;
 }
 
@@ -323,6 +331,10 @@ function farmingSection(): string {
   return `<section class="guide-block" id="prof-farm-beds">
       <h2>${esc(t('guide.profPages.farm.bedsHeading'))}</h2>
       ${paras('guide.profPages.farm.bedsBody')}
+    </section>
+    <section class="guide-block" id="prof-farm-table">
+      <h2>${esc(t('guide.profPages.farm.tableHeading'))}</h2>
+      ${paras('guide.profPages.farm.tableBody')}
     </section>`;
 }
 
