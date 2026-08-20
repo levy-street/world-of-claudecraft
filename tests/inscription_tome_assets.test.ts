@@ -25,7 +25,7 @@ const REPO_ROOT = path.join(__dirname, '..');
 // (bytes, triangles, and bounds pins never move): first for the v0.37.0
 // three@0.165.0 patch-hash bump, then v0.38.0, and most recently for the
 // v0.39.0 merge's Three.js r165 to r185 bump (patches/three@0.185.1.patch).
-const SOURCE_FINGERPRINT = 'dd9365467ea15c17ad34a5e6cf2e600320bdc817263376c1adbb4bcea459f5ae';
+const SOURCE_FINGERPRINT = '7c631c34abed8b41b17aa457a49c5b9d2ccffc58f56eda3387839939075de020';
 
 interface TomePin {
   itemId: string;
@@ -41,7 +41,7 @@ const TOME_PINS: Record<string, TomePin> = {
     itemId: 'silverleaf_primer',
     rootName: 'InscriptionTomeSilverleaf',
     bytes: 11_136,
-    sha256: '26f90e5eaa3a74ad621566c9d5c0d71dbd0bf0819e9b8069a69607c7bf442c14',
+    sha256: '7c94d9169063bc3b5b4d3f53b0bd7a1965015d63e58be28a1643b47f5edb7a33',
     triangles: 404,
     bounds: { min: [-0.1763, -0.1, -0.0555], max: [0.163, 0.3, 0.0622] },
   },
@@ -49,7 +49,7 @@ const TOME_PINS: Record<string, TomePin> = {
     itemId: 'goldleaf_folio',
     rootName: 'InscriptionTomeGoldleaf',
     bytes: 12_948,
-    sha256: '2f673d814b1f1b45e21fe71e7a69a3881ee62520d74ec113856a005d2b799ff5',
+    sha256: '21fbe077c99d4822952a7baa872c047ffd26e8eebbb3dcb4a9403cf232ea2d3c',
     triangles: 512,
     bounds: { min: [-0.1866, -0.1668, -0.0605], max: [0.1705, 0.33, 0.0672] },
   },
@@ -57,7 +57,7 @@ const TOME_PINS: Record<string, TomePin> = {
     itemId: 'sunpetal_grimoire',
     rootName: 'InscriptionTomeSunpetal',
     bytes: 13_956,
-    sha256: 'c0c68db95f75af201073d2188562cbc35988f3c96bc9bec1efc620d9eedc7a05',
+    sha256: '71d7977e1cadbef0ee673294f09c58e2946d8c72fcd4e36aa8bb271b8403a46d',
     triangles: 584,
     bounds: { min: [-0.2007, -0.1668, -0.068], max: [0.1805, 0.36, 0.0863] },
   },

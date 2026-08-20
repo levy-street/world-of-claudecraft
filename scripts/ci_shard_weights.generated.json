@@ -2,8 +2,8 @@
   "__provenance": {
     "run": "32103940330",
     "harvested": "2026-08-18",
-    "files": 2830,
-    "localMerge": "2026-08-20 v0.40.0 sync: 49 branch-only rows carried from the 2026-08-19 local measurement, CI-harvested weights untouched"
+    "files": 2879,
+    "localMerge": "2026-08-20 v0.40.0 sync: 49 branch-only rows carried from the 2026-08-19 local measurement, CI-harvested weights untouched; files counts the merged table (2830 CI-harvested + 49 carried)"
   },
   "tests/abilities_command.test.ts": 2516,
   "tests/ability_audio_defers_to_recordings.test.ts": 140,
