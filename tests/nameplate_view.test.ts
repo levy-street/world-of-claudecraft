@@ -10,6 +10,7 @@ import {
   nameplatePlanInto,
   newNameplatePlan,
 } from '../src/render/nameplate_view';
+import { INTERACT_RANGE } from '../src/sim/types';
 
 // The nameplate_view core: the pure DOM/Three/i18n-free decision model the
 // NameplatePainter consumes. These pin the exact visibility / anchor / urgent /
@@ -150,11 +151,33 @@ describe('nameplate_view - visibility', () => {
 
   it('labels a placed harvest feast near, hides it far, and never shows its hp', () => {
     // The Phase 12 feast follows the delve-interact idiom: the composed
-    // "{name}'s Harvest Feast" title shows when close enough to eat and hides
-    // at range; as a kind-'object' plate it carries no hp bar (the painter's
-    // object arm never sets hpVisible, the flag-family treatment).
+    // "{name}'s Harvest Feast" title shows within the INTERACT_RANGE + 1
+    // hysteresis pad (one yard PAST the bite's own INTERACT_RANGE gate, so
+    // the plate is already up walking in and never flickers at the exact
+    // boundary) and hides beyond it; as a kind-'object' plate it carries no
+    // hp bar (the painter's object arm never sets hpVisible, the flag-family
+    // treatment).
     const near = plan(ent({ kind: 'object', templateId: 'farm_feast', pos: { x: 0, y: 0, z: 1 } }));
     expect(near.hidden).toBe(false);
+    // The exact pad, both sides of the boundary.
+    expect(
+      plan(
+        ent({
+          kind: 'object',
+          templateId: 'farm_feast',
+          pos: { x: 0, y: 0, z: INTERACT_RANGE + 1 },
+        }),
+      ).hidden,
+    ).toBe(false);
+    expect(
+      plan(
+        ent({
+          kind: 'object',
+          templateId: 'farm_feast',
+          pos: { x: 0, y: 0, z: INTERACT_RANGE + 1.01 },
+        }),
+      ).hidden,
+    ).toBe(true);
     expect(
       plan(ent({ kind: 'object', templateId: 'farm_feast', pos: { x: 0, y: 0, z: 30 } })).hidden,
     ).toBe(true);

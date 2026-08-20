@@ -188,7 +188,7 @@ import { blockLandingLogKey } from './block_landing_feedback_core';
 import { CalendarWindow } from './calendar_window';
 import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter, type CastBarPaintInput } from './cast_bar_painter';
-import { castDisplayName } from './cast_display_name';
+import { castDisplayName, targetCastDisplayLabel } from './cast_display_name';
 import { charBagsPaired } from './char_bags_pairing_core';
 import { charSheetRefreshSig } from './char_sheet_sig_core';
 import { type CharSkinPainterHost, paintCharSkinPicker } from './char_skin_window';
@@ -4235,10 +4235,10 @@ export class Hud {
   // The two cast bars are ONE instance-parameterized painter, over the
   // castBarState core. The PLAYER instance localizes the cast id (castDisplayName),
   // layers the eat/drink overlay (consumeBarState, player-only), and clears the bar
-  // on hide (its inline block did). The TARGET instance shows the raw cast id
-  // (byte-faithful: the target block set the raw `label`), has no eat/drink (the
-  // target never eats/drinks, so its paint omits `consume`), and hides with only
-  // display:none (its inline block did not clear).
+  // on hide (its inline block did). The TARGET instance resolves through
+  // targetCastDisplayLabel (farming localized, every other id raw as its inline
+  // block was), has no eat/drink (the target never eats/drinks, so its paint
+  // omits `consume`), and hides with only display:none (no inline-block clear).
   private readonly playerCastBarPainter = new CastBarPainter(
     this.writerFacet,
     {
@@ -4257,7 +4257,7 @@ export class Hud {
       label: this.targetCastbarLabelEl,
       timer: this.targetCastbarTimerEl,
     },
-    { resolveCastLabel: (s) => s.label },
+    { resolveCastLabel: (s) => targetCastDisplayLabel(s.label) },
   );
   // The target frame is the SECOND instance of the unit_frame family: the same
   // painter + core as the player, over the target's element set. It supplies the
