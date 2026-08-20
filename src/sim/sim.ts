@@ -317,7 +317,6 @@ import {
 } from './mech_chroma_ownership';
 import * as bossMechanics from './mob/boss_mechanics';
 import {
-  mobCombatProfile as mobCombatProfileFn,
   mobEffectiveMeleeRange as mobEffectiveMeleeRangeImpl,
   tryMobMeleeSwingInRange as tryMobMeleeSwingInRangeImpl,
 } from './mob/combat_profile';
@@ -338,7 +337,6 @@ import {
   updateMobTarget as updateMobTargetFn,
 } from './mob/targeting';
 import { emitMobYell } from './mob/yells';
-import type { MobCombatProfile } from './mob_combat';
 import * as moderationMod from './moderation';
 import {
   cancelMountRace as cancelMountRaceImpl,
@@ -7886,18 +7884,6 @@ export class Sim {
 
   updateMobTarget(mob: Entity): void {
     updateMobTargetFn(this.ctx, mob);
-  }
-
-  // Effective melee reach. Large creatures measure range from their centre, which
-  // sits deep inside an oversized body — so a giant (e.g. Nythraxis at scale 3.1)
-  // can never close to the flat MELEE_RANGE and barely swings. Scale reach with
-  // size so big mobs connect from where the player actually stands (their feet).
-  private mobMeleeRange(mob: Entity): number {
-    return this.mobCombatProfile(mob).meleeRange;
-  }
-
-  private mobCombatProfile(mob: Entity): MobCombatProfile {
-    return mobCombatProfileFn(mob);
   }
 
   aggroMob(mob: Entity, target: Entity, social: boolean): boolean {
