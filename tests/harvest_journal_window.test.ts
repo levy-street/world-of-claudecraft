@@ -290,6 +290,12 @@ describe('harvest journal window: the countdown clock', () => {
     expect(secondSpan?.textContent).toBe('Ready to harvest: Vale Wheat');
     expect(root.querySelector('.hj-live-status')).toBe(status);
     expect(secondSpan).not.toBe(firstSpan);
+    // The mechanism pin: the announcement is an ELEMENT child, the explicit
+    // engine-optimization-proof form. A bare textContent write would also
+    // land a fresh Text node per the DOM's string-replace-all, but that
+    // leaves the mutation property to engine behavior; the span makes it
+    // deliberate (and killable in the mutation battery).
+    expect((secondSpan as HTMLElement)?.nodeName).toBe('SPAN');
   });
 
   it('a language switch clears the standing announcement (no stale locale)', () => {
