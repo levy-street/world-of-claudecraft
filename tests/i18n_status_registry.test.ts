@@ -8,6 +8,7 @@ import { describe, expect, it } from 'vitest';
 // SAME module, so re-deriving hashes here is an independent check of the registry
 // rather than a copy of the scanner's own arithmetic.
 import { contentHash, placeholdersOf } from '../scripts/i18n_hash.mjs';
+import { RETIRED_KEY_SET, RETIRED_REASON } from '../scripts/i18n_retired_keys.mjs';
 import { DICT as adminDICT } from '../src/admin/i18n';
 import { en, supportedLanguages } from '../src/ui/i18n';
 import { DICT as serverDICT } from '../src/ui/server_i18n';
@@ -218,17 +219,58 @@ describe('i18n status registry: blocked rows are load-bearing (no over-allow)', 
     }
   });
 
-  it('only server/admin scopes carry blocked rows (main/sim carry none)', () => {
+  it('main/sim blocked rows exist ONLY for retired main keys, with the retired reason', () => {
+    // Phase 14 widened the main scope's blocked rows to exactly the RETIRED
+    // keys (scripts/i18n_retired_keys.mjs): a key no page renders is never a
+    // fill work item, so its unprovided rows are blocked-with-reason instead
+    // of pending. Everything else in main, and ALL of sim, still carries
+    // none: the over-allow hazard this pin exists for is unchanged.
     // Same accumulate-then-assert-once shape as the freshness walk above.
     const violations: string[] = [];
     for (const [ck, entry] of keyEntries()) {
-      const scope = ck.slice(0, ck.indexOf(':'));
+      const ci = ck.indexOf(':');
+      const scope = ck.slice(0, ci);
+      const key = ck.slice(ci + 1);
       if (scope === 'server' || scope === 'admin') continue;
-      for (const row of Object.values<any>(entry.locales))
-        if (row.state === 'blocked')
+      for (const row of Object.values<any>(entry.locales)) {
+        if (row.state !== 'blocked') continue;
+        if (scope !== 'main' || !RETIRED_KEY_SET.has(key))
           violations.push(`${ck} unexpected blocked row in scope ${scope}`);
+        else if (row.reason !== RETIRED_REASON)
+          violations.push(`${ck} retired blocked row without the retired reason`);
+      }
     }
     expect(violations).toEqual([]);
+  });
+
+  it('no retired key carries a pending row anywhere (the Phase 14 exclusion), non-vacuously', () => {
+    // The exclusion's decisive arm: the release fill pass walks pending, so a
+    // retired key with a pending row would put never-rendered prose on the
+    // fill worklist. Non-vacuity: at least one retired key really has
+    // unprovided rows (the gatherDeeds.farming outlier the exclusion was cut
+    // for), so this cannot pass by every retired key being fully filled.
+    let retiredBlocked = 0;
+    for (const [ck, entry] of keyEntries()) {
+      const ci = ck.indexOf(':');
+      if (ck.slice(0, ci) !== 'main' || !RETIRED_KEY_SET.has(ck.slice(ci + 1))) continue;
+      for (const row of Object.values<any>(entry.locales)) {
+        expect(row.state, `${ck} retired key must never be pending`).not.toBe('pending');
+        if (row.state === 'blocked') retiredBlocked++;
+      }
+    }
+    expect(retiredBlocked).toBeGreaterThan(0);
+  });
+
+  it('the runtime pending set excludes retired keys too (build/registry lockstep)', async () => {
+    // The build's pending.ts and the registry are computed by two scripts kept
+    // in lockstep; the retired exclusion must hold in BOTH or the runtime
+    // English-fill accounting and the release ledger disagree.
+    const { pending } = await import('../src/ui/i18n.resolved.generated/pending');
+    for (const [lang, keys] of Object.entries(pending)) {
+      for (const key of keys) {
+        expect(RETIRED_KEY_SET.has(key), `${lang} runtime-pending retired key ${key}`).toBe(false);
+      }
+    }
   });
 
   it('every blockedSource entry is a unique sim-channel string with a reason', () => {
