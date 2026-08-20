@@ -4025,3 +4025,9 @@ the whole log, 2897 test files / 40606 tests passed (2 expected fail, 115
 skipped), browser regression 20 files 134 green, no druid_engines timeout.
 The commits after the run (this gate record and the merge-hash record) are
 records only.
+MERGE-HASH RECORD: Phase 14 merged --no-ff into feature/farming-plan as
+673036bb95 (phase tip 06575d2d02, nineteen commits; the phase branch
+fix/farming-phase-14-final-polish deleted; no agent worktrees existed this
+phase). Smoke on the merged tip: tsc clean, world_api_parity +
+monolith_budget + parity coverage_c + architecture all green (422 tests),
+farming_session md5 9dfd1c6ea073f853655e38675460e81f held.
