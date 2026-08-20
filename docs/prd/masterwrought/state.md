@@ -5518,6 +5518,117 @@ recorded, or refuted with the file open)
   was admitted from the standing quality review's first run and runs after
   11n and before Phase 12.)
 
+## Phase 11b pre-flight ledger (2026-08-20, recorded BEFORE the farming merge runs)
+
+### STEP 0 record
+- Worktree guard passed (session switched into ~/Documents/wocc-masterwrought,
+  branch feature/masterwrought). STEP -1 committed the 11b to 11o planning
+  insert as 2c1191fbbc (44 files, docs/prd/masterwrought/ only); tree clean.
+- Release sync (0b): VERIFIED ALREADY COMPLETE, no new merge. After
+  `git fetch origin --prune`, the newest release branch by version sort is
+  origin/release/v0.40.0 (tip 65b91fa190) and
+  `git rev-list --count HEAD..origin/release/v0.40.0` is 0 (the tip is an
+  ancestor of HEAD via the Phase 11 QA second-pass sync fba8f47ee9). No merge
+  commit exists for this session, so no release-merge-audit is owed. The merge
+  base for the farming merge is therefore UNMOVED and the phase file's conflict
+  prediction applies as written.
+- Farming merge base re-derived: e56707a675013fc1a86bb19d31a0a8d79a02a197,
+  exactly the trial-merge base the prediction was made at. Farming tip
+  re-resolved: origin/feature/farming-plan = 8cd964d599, matching the
+  planning-time hash.
+- Memory scan (0d) done: test-pin trap index (read whole), release-merge gate
+  surprises (all six classes; reinstall on lockfile/patches movement,
+  shard-weight union floor, ci:changed scope widening, sparse-cone union,
+  lockfile-fingerprint remints, provenance file count), gate-needs-committed-tree
+  and shared-stash notes, shared-worktree commit care (explicit paths, diff
+  --cached sweep, never git add -A), the workflow/subagent cluster (agents edit
+  the real worktree; slices must be file-disjoint), pin-source-must-carry-identity,
+  vitest-transform-cache-stale-after-merge.
+- Harness note: the operator's session prompt set ULTRACODE: no for 11b (a
+  careful merge, not a batch), overriding the phase file's ULTRACODE: yes
+  header. Resolution is done serially in the main loop under the three
+  mechanical rules; subagents are used read-only (context loading, reviewers).
+
+### The four decisions, ANSWERED (copied verbatim in substance from "Decisions
+closed 2026-08-20 (the full delegation)" rows 1 to 4; that block is the
+authority, this ledger records them as answered so no gate reads
+confirm-at-STEP-0)
+- Decision 1 = 11b-D-1, the tier 3 and 4 seed bootstrap: FIXED. Vendor-stock
+  every tier 3 and tier 4 seed at farmer_hollis and farmer_verbena on the D11
+  tier 1/2 pattern, executed ONCE, in Phase 11e, at the prices 11e derives
+  (EIGHT rows after 11e-D-B). 11b's obligation is the negative half: no
+  resolver here treats reagent dormancy as settled, and every downstream phase
+  proves the faucet by READING the merged vendorItems arrays in code, never a
+  ledger row. WHY: R18 needs a profession through its OUTPUT, and a reagent
+  with no faucet is not an output. REJECTED: leaving the faucet to a later pass.
+- Decision 2 = 11b-D-2, the well-fed unification and the power ladder: SETTLED,
+  all six axes as drafted (one aura id 'well_fed'; masterwrought's
+  FoodItemDef.wellFed carrying TimedStatBuffPayload, kind-scoped;
+  masterwrought's clear-then-grant mint order; farming's src/sim/wellfed.ts
+  module and its tooltip view; the ladder re-tuned to farming 2/3/4/5 at 600s
+  with the three apex role foods at 6/900). Phase 11c executes; 11b parks
+  toward that target and changes NO number. WHY: as merged the ladder INVERTS
+  (cooking-50 evergarden_braised_greens sta 12/900s beats cooking-100
+  stonepot_stew sta 6/600s), breaking R5 before Phase 15 can measure. REJECTED:
+  cutting farming's four wellFed payloads; lifting the apex to 8 or above.
+- Decision 3 = 11b-D-3, the delivery-contract amendment: ADOPTED as drafted,
+  BOTH halves. Farming is absorbed; D22 and its addendum (B) are superseded IN
+  PLACE with a dated banner and never deleted; D22's absorb discipline is
+  adopted upstream. AND an accepted-by-design handoff row already constitutes
+  an explicit record satisfying the delivery contract's CUT requirement. 11b
+  writes the amendment text. WHY: never-renumber requires supersession in
+  place, and a dated "accepted, here is why" row is the most explicit record
+  form. REJECTED: re-closing the 44 accepted-by-design rows at Phase 17.
+- Decision 4 = 11b-D-4, monolith ceiling policy: FOUR RECORDED RAISES at the
+  exact merged line counts, taken in Phase 11d, each with a ledger row naming
+  this merge, both parent pins, and the reason; src/ui/hud.ts paid back by
+  extraction in Phase 14. 11b touches no ceiling. There is NO resolution of
+  hud.ts at or under farming's pin of 19186. WHY: funding 431 lines of
+  behavior-bearing extraction inside a 160-file merge makes the merge
+  unreviewable; the ratchet's credibility comes from the raise being recorded
+  and paid back. REJECTED: funding that extraction inside the merge phase.
+- Also in force for this phase, from the same block: 11b-R3c-1 (placed station
+  wins, farm bed immediately below; pin both directions), 11b-R3c-2 (guide
+  sentence owed to 11c; 11b takes ours), 11b-PARK-1 (icon-art test parks on
+  farming's refactored art-subject split form, verdict REFACTORED NOT DELETED),
+  11b-CNT-1 (derive both counts on the merged tree, report any disagreement
+  with a plan literal explicitly), 11b-qa-GATE-9, 11b-qa-B8, 11b-qa-SURF-1.
+
+### Baseline capture (STEP 0c, the three literals per file; base = e56707a675,
+ours = 2c1191fbbc, theirs = 8cd964d599)
+Monolith line counts (newline count, as countLines() measures), base/ours/theirs:
+- src/ui/hud.ts 19382 / 19445 / 19183
+- src/render/renderer.ts 13744 / 13546 / 13774
+- src/sim/sim.ts 12518 / 12629 / 12229
+- src/main.ts 11490 / 11516 / 11454
+- server/game.ts 10894 / 10862 / 10793
+- src/net/online.ts 5855 / 5902 / 5920
+- src/game/music.ts 5270 / 5270 / 5270
+- src/sim/world.ts 5301 / 5301 / 5301
+- server/db.ts 4835 / 4835 / 4865
+- src/render/foliage.ts 3961 / 4131 / 3961
+- src/sim/colliders.ts 2590 / 2590 / 2590
+Monolith ceilings in tests/monolith_budget.test.ts, base/ours/theirs:
+- src/ui/hud.ts 19387 / 19445 / 19186
+- src/render/renderer.ts 13744 / 13546 / 13774
+- src/sim/sim.ts 12660 / 12650 / 12232
+- src/main.ts 11490 / 11516 / 11460
+- server/game.ts 10900 / 10890 / 10900
+- src/net/online.ts 5950 / 5950 / 5950
+- src/game/music.ts 5470 / 5470 / 5470
+- src/sim/world.ts 5450 / 5450 / 5450
+- server/db.ts 4980 / 4980 / 4980
+- src/render/foliage.ts 4147 / 4147 / 4147
+- src/sim/colliders.ts 2660 / 2660 / 2660
+COUNT_PIN headline literals, base/ours/theirs (fuller grep capture in the 11b
+session scratch; each 11d resolution re-derives on the merged tree and checks
+observed == base + oursDelta + theirsDelta):
+- tests/world_api_parity.test.ts IWORLD_MEMBERS 323 / 324 / 331 (DATA 86/86/88,
+  METHOD 237/238/243, FACET_MEMBER_ARRAYS keys 33 at base and ours; theirs
+  gains src/world_api/farming.ts)
+- (world_api predicted merged: members 324 + (331 - 323) = 332, data 88,
+  method 244, facets 34; 11d verifies)
+
 ## Decisions closed 2026-08-20 (the full delegation)
 
 THE DELEGATION, in the maintainer's own words: "For anything open, just do what is best for
