@@ -4017,3 +4017,11 @@ farm_bed_interact.ts now pulls farming.ts's dependency cone into its chunk
 a literal anywhere (the pad arms track it relatively, as intended);
 tests/wellfed_tooltip_view.test.ts still regex-parses the stat map it could
 now import from the pure leaf.
+GATE RECORD: one run on the frozen tip 354cff6e77 (BROWSER_PATH=<playwright
+chromium> GATE_MAX_WORKERS=8 node scripts/gate_select.mjs): mode=full (the
+planner fell back, the standing broad-arm behavior), "[gate:select] PASS:
+all 12 steps green (vitest workers: 8)", exit code 0, ZERO FAIL markers in
+the whole log, 2897 test files / 40606 tests passed (2 expected fail, 115
+skipped), browser regression 20 files 134 green, no druid_engines timeout.
+The commits after the run (this gate record and the merge-hash record) are
+records only.
