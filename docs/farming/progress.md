@@ -3815,3 +3815,182 @@ is pushing feature/farming-plan to origin on the user's go, nothing more),
   all 12 steps green (vitest workers: 8)", exit code 0, ZERO FAIL markers,
   no druid_engines timeout. The two commits after the run (this gate record
   and the merge-hash record) are records only.
+
+## Phase 14: Final polish (the perfection-sweep actionables), 2026-08-20
+
+Branch fix/farming-phase-14-final-polish off feature/farming-plan at 4793879e09.
+No absorb needed: origin/release/v0.40.0 tip e56707a675 unchanged at pre-flight
+(zero commits past the twenty-first absorb). Baselines verified by RUNNING the
+suites before any change: farming_session md5 9dfd1c6ea073f853655e38675460e81f
+at 110 draws / 2439 ticks / 144 frames; IWorld 331 = 88 + 243 (34 facets);
+commands 204/217; delta keys 87; NEVER_STOCKED 21; ITEM_ART_PENDING 44;
+FEAST_SHADOW_CAP 8; monoliths hud.ts 19214/19214 EXACT, renderer.ts
+13774/13774 (untouched the whole phase), sim.ts 12246/12249, main.ts 11454,
+online.ts 5920, server/game.ts 10793.
+
+ACCEPTANCE MATRIX (item, landing commit, discharge; every touched handoff row
+in state.md moved to closed-by-Phase-14 in the SAME commit as its item):
+- A1 body-class family fix: c205462f16 (evidence 4329bd3102; the missed
+  UI_DOM_MODULES registration landed in 2d6cb12531, caught by the
+  architecture suite). Both windows gained the family onVisibilityChange dep;
+  funded extraction-first at the EXACT-ZERO hud ceiling by moving the whole
+  body-class scan verbatim to src/ui/window_open_state.ts, ceiling LOWERED
+  19214 to 19186 (file 19183); the three source-pin suites re-pointed
+  (woc_store_window_contract, client_shell, market_window). Live mobile probe
+  proved set AND clear with both windows; mobile 844x390 LOW shots committed
+  under docs/screenshots/farming-phase-13/phase14-*.png (existing coned
+  subtree, no cone churn).
+- A2 style tokens: 51e6382b19. .ps-seed rides var(--color-bg-input), the
+  token its sibling .ps-knob already used; deliberately NO new scrim token
+  (the #1788 no-piecemeal-re-land rule). The report submitted line logs in
+  'var(--gold)', suite pin re-pointed. Before/after pair captured on LOW:
+  visually indistinguishable (scratchpad probe evidence, the Phase 11 QA
+  precedent).
+- A3 feast hint: 090a2b3002. itemUi.tooltip.clickSetOut plus five M16
+  non-Latin fills; the bags_view feast branch returns it, pinned by literal
+  on the fixture AND the real harvest_feast def.
+- A4 a11y batch: 3d024dc658. Seed rows are a radiogroup named by the dialog
+  title (role=radio, aria-checked, presentational li wrappers; locked rows in
+  their own plain list); pendingSend mirrors onto root aria-busy through one
+  setter; the journal gained a persistent in-dialog role=status ready
+  announcement (readyAnnounce plus five fills); huskTradeAria reworded for
+  WCAG 2.5.3 label-in-name containment in English AND all five non-Latin
+  fills, containment pinned per locale through the real sink. Axe green over
+  the live radiogroup, busy, and announcing trees; target-size suite green;
+  keydown-guard pins untouched.
+- A5 pending generators: 482fa2c386. RETIRED_KEYS moved whole to
+  scripts/i18n_retired_keys.mjs (one shared source; .d.mts for the TS test);
+  the registry scan marks a retired key's unprovided rows blocked-with-reason
+  (the sanctioned documented-exception state; the main-scope over-allow pin
+  re-pointed to say exactly that), runtime pending.ts lockstep; the
+  gatherDeeds.farming outlier's fifteen pending Latin rows became blocked,
+  its five non-Latin fills stay translated.
+- B6 feast slotIndex: 69c83d4982. Test-first (both arms red as shipped); the
+  arm consumes the CLICKED slot via consumeSelectedInventorySlot, a NAMED
+  locked copy denies as locked, the dedicated place_feast command keeps the
+  byte-identical id-only lock-aware walk. REACHABILITY recorded honestly
+  (reviews): no shipped UI gesture passes a slot for the feast today, so the
+  named-copy semantics are protocol hardening on the use-frame path,
+  identical in both hosts; the bags-click divergence is a new open ledger row.
+- B7 shared walks: 8a7fd2a349. countRawInSlots exported from
+  src/sim/item_lock.ts beside its unlocked twin (structural param so the
+  action bar's slice fits); Sim.countItem delegates (ceiling 12235 to 12232);
+  the five src/ui copies collapsed (plant sheet, enchant rows, action bar
+  direct; tradeOfferCeiling and totalHeldCount stay as thin domain aliases so
+  their callers and source pins hold). distToBed exported from farming.ts and
+  consumed by the farm_bed_interact reach mirror, import pinned
+  (comment-stripped, count-exact).
+- B8 delegate retirement: 570fd2c026. mobMeleeRange plus the private
+  mobCombatProfile retired from sim.ts (last production caller left with M5);
+  tests/threat.test.ts re-points at the module import; ceiling 12249 to 12235.
+- B9 gatherDowngrade 'crop': d4a54536a5. Union member, the farming emit at
+  the golden grant site (once per harvest command across both grades, always
+  lost 'mark' under nothing-rots), the existing surface-independent
+  downgradeMark toast is the client line. ZERO golden movement: the whole
+  tests/parity directory re-run green, no golden file in the diff.
+- C10 dish effect prose: 2d6cb12531. GuideProfRecipe gains an effect field
+  (VALUES from the live def, never baked prose); the craft page composes the
+  new guide.profPages.effect* templates (fifteen M16 fills); the stat label
+  rides WELLFED_STAT_KEYS extracted to the pure leaf src/ui/wellfed_stat_keys.ts
+  so the guide bundle cannot reach the deeds catalog (the spoiler pin
+  re-proved the containment); accuracy mirrored BOTH ways against ITEMS with
+  non-vacuity counts (foodRows >= 12, wellfedRows == 4) plus the
+  every-shipped-kind-is-mapped precondition; the later-patch dormancy pins
+  untouched; wiki regen committed fresh.
+- C11 nameplate pair: c1af9a648e. targetCastDisplayLabel in
+  cast_display_name.ts (farming localized on the target bar; every other id
+  deliberately raw, pinned as the scope boundary incl. a real ability id);
+  the feast plate comment states the real INTERACT_RANGE + 1 hysteresis pad,
+  the exact boundary pinned both sides.
+- C12 boss-mechanics depth: 2052d7e419. Direct-import summon-threshold cases
+  (once per pull, both-thresholds-one-call, the REAL resetEvadingMob
+  re-arming with the wave-really-despawns proof), the no-hand-set-timer
+  countdown bracket, the de-fragilized stays-silent arms with their positive
+  controls.
+- C13: this block, the per-row landing hashes above, and the state.md sweep.
+
+REVIEWS (all FRESH, 30-call budgets, report-first; 4/4 delivered, zero
+report-less deaths): cross-platform 0 BLOCKING / 0 SHOULD-FIX (every
+gatherDowngrade consumer enumerated: server routing is type-generic, no pin
+enumerates the surface union outside types.ts; the B6 use-frame path carries
+slot on both hosts); architecture 0 BLOCKING / 3 SHOULD-FIX (all resolved:
+the feast consume tri-state branch + the direct stale-selection arm landed;
+the bags copy-ref divergence LEDGERED as a new open row, a wire widening
+beyond polish); frontend seam 0 BLOCKING / 4 SHOULD-FIX (all resolved: the
+journal live region made genuinely persistent, see below; wellfed_stat_keys
+registered in UI_PURE_CORES + both BARE_NAMED lists; dead imports swept; the
+guide fallback DISPOSITIONED as the page's own baked-proper-noun policy with
+a comment + a direct fallback-render test); test coverage 0 BLOCKING / 8
+SHOULD-FIX (all taken: slice-anchor guards + comment stripping, the
+both-grades dedupe proof, the real-ability-id boundary arm, the
+RETIRED_REASON literal pin, runtime-pending non-vacuity via the pending
+successor, the farmPlanted busy arms, the spellfx positive control, the
+afterEach locale restore). Review round landed as 49a35b9e97 + 806f8f068e +
+da89a1d72d.
+
+THE REVIEW ROUND'S HEADLINE FIX: the journal's ready status line is now a
+genuinely PERSISTENT live region. The first cut re-appended the same cached
+node after each whole-root innerHTML write, which still detaches and
+re-inserts it (AT drops or repeats announcements across a region that leaves
+the tree). The repaint now targets an inner .hj-content wrapper
+(display: contents, so the title and body still lay out as the root's flex
+children), the status node is appended ONCE per open beside it, each
+announcement lands as a FRESH child span (a repeat of the same crop is
+byte-identical text; the new element is what makes it a real mutation), the
+new relocalize() arm clears the region on a language switch (fanout registry
+rows re-pointed, BOTH halves), and the wrapper's identity is the pinned
+never-detached proof (the same-cached-node trap would pass an identity pin
+alone).
+
+MUTATION KILL TABLE (21/21 KILLED through the dirty-refusing scratchpad
+runner, always AFTER committing; verdict = rc nonzero AND named failing tests
+AND the summary line; two structural first drafts rebuilt as semantic
+mutants, the P9b file-level-FAIL rule):
+- M1 B6 slotIndex thread dropped -> 2 named reds (two-stack, locked-named)
+- M2 B6 named-locked deny disabled -> 1 named red
+- M3 B7 raw walk gains a lock filter -> 6 named reds
+- M4 B7 distToBed zeroed -> 4 named reds
+- M5 B9 truncation flag never set -> 1 named red (crop/mark arm)
+- M6 C11 target label to identity -> 1 named red
+- M7 C12 countdown deletion -> 1 named red (bracket arm)
+- M8 C12 single-wave loop (rebuilt: while->if is a parse error via the
+  loop's continue) -> 1 named red (both-thresholds arm)
+- M9 C12 evade re-arm dropped -> 1 named red
+- M10 A1 sync blind-false -> 3 named reds
+- M11 A3 hint reverted to clickUse -> 1 named red
+- M12 A4 announce suppressed -> 2 named reds
+- M13 A4 radio role dropped -> 1 named red
+- M14 A5 scan retired arm dropped (regen inside the run, regen after
+  restore) -> 1 named red (the non-vacuous no-retired-pending arm)
+- M15 C10 wellfed effect line dropped (rebuilt: the inverted guard crashed
+  the sweep) -> 1 named red (coverage sweep)
+- M16 C10 artifact amount 980 -> 981, anchor-scoped at braised greens with
+  landing proof -> 1 named red (the accuracy mirror)
+- M17 A2 token reverted to hex -> 1 named red
+- MR1 feast null-selection branch gutted -> 1 named red (the direct arm)
+- MR2 journal wrapper recreated per paint -> 1 named red (wrapper identity)
+- MR3 relocalize clear dropped -> 1 named red (stale-locale arm)
+- MR4 fresh-span mechanism replaced by textContent -> SURVIVED first as a
+  near-equivalent (the DOM's string-replace-all also lands a fresh Text
+  node), then the nodeName mechanism pin landed (da89a1d72d) and the same
+  mutant re-run -> 1 named red
+
+EVIDENCE: the committed journey rig PASSED all 17 checkpoints on the final
+tree (mobile 844x390 LOW, the rig's seed-row read updated to aria-checked);
+the phase probe proved live: body class set/clear with both windows in both
+directions, radiogroup + aria-checked live, aria-busy false at rest; the A2
+pair indistinguishable; probe trap re-confirmed: beds[1] sits in the Jessica
+farmer-shadow band, beds[2] is clear. Browser suites standalone: a11y 35
+green (including the busy tree and the announcing tree under axe),
+target-size 19 green.
+
+NOTES FOR THE MAINTAINER (recorded, not decided): src/ui/CLAUDE.md's
+catalog-domain gotcha list omits merge.ts as an en-only domain (A3 landed
+there cleanly); the C12 stays-silent arms could return to the strong
+zero-events form now that they drain pre-act noise; the radiogroup borrows
+the dialog title as its group name (a dedicated label key would be nicer);
+farm_bed_interact.ts now pulls farming.ts's dependency cone into its chunk
+(deliberate, the shared-math win); INTERACT_RANGE itself remains unpinned to
+a literal anywhere (the pad arms track it relatively, as intended);
+tests/wellfed_tooltip_view.test.ts still regex-parses the stat map it could
+now import from the pure leaf.
