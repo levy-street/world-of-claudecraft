@@ -3487,8 +3487,17 @@ Integration record (the orchestrator, 2026-08-19):
   SHOULD-FIX satisfied by this block's screenshot reference plus the
   manifest's regenerationNote, and its teardown finding ledgered as the
   Phase 13 QA teardown precondition (seven earlier subtrees are referenced
-  only from docs/farming/); frontend-seam and qa-checklist verdicts recorded
-  below when delivered.
+  only from docs/farming/); frontend-seam 2 BLOCKING + 3 SHOULD-FIX, ALL
+  fixed in the lane A fix round (commit 7d64d20d12, cherry-picked): the
+  retired gatherDeeds.farming key joined RETIRED_KEYS (the
+  harvestBodyChoice precedent) healing the red guide_key_coverage gate,
+  the Harvestmaster and top-dishes prose moved to the later-patch
+  disclosure idiom with all five fills re-supplied per key in the same
+  commit, the (bo) dormancy sweep comment gained the guide prose as a
+  fourth site, and the prof-farm-table + deeds-ternary accuracy pins
+  landed with four ISOLATED red-then-green mutation cycles (the first two
+  broad proofs were discarded as shadowed by the beds pins, an honesty
+  call worth keeping); qa-checklist verdict recorded below when delivered.
 - Validation on the integrated tree: tsc rc 0; wiki:content rc 0 and
   byte-identical; guide/ci_workflow/i18n_completeness/localization_fixes/
   monolith/architecture/world_api_parity 587 passed; tests/parity 216 passed
