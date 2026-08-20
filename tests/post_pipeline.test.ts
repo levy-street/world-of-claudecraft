@@ -10,6 +10,7 @@ const gfxSettings = vi.hoisted(() => ({
   composer: true,
   msaaSamples: 0,
   smaa: true,
+  fxaa: false,
 }));
 
 vi.mock('../src/render/gfx', () => ({
@@ -58,6 +59,7 @@ describe('live post pipeline', () => {
     gfxSettings.aoFullRes = true;
     gfxSettings.bloom = true;
     gfxSettings.smaa = true;
+    gfxSettings.fxaa = false;
     gfxSettings.msaaSamples = 0;
   });
 
@@ -85,6 +87,7 @@ describe('live post pipeline', () => {
       'ShaderPass',
       'SMAAPass',
     ]);
+    expect(post.grade.fxaa).toBe(false);
     expect(post.composer.renderTarget1).not.toBe(post.composer.renderTarget2);
     expect(post.composer.renderTarget1.samples).toBe(0);
     expect(post.composer.renderTarget1.depthBuffer).toBe(false);
@@ -186,6 +189,71 @@ describe('live post pipeline', () => {
       rect.uvMaxX,
       rect.uvMaxY,
     ]);
+  });
+
+  it('anti-aliases the medium chain from inside the grade pass, region intact', async () => {
+    gfxSettings.smaa = true;
+    gfxSettings.fxaa = true;
+    vi.stubGlobal('Image', class {});
+    const { buildComposer } = await import('../src/render/post');
+    const post = buildComposer(
+      rendererStub(),
+      new THREE.Scene(),
+      new THREE.PerspectiveCamera(),
+      1280,
+      720,
+      { gradeOnly: true },
+    );
+
+    // No new pass and no new buffer: the AA is a define on the pass that was
+    // already the tail, which is exactly why the region survives it.
+    expect(post.composer.passes.map((pass) => pass.constructor.name)).toEqual([
+      'RenderPass',
+      'OutputGradePass',
+    ]);
+    expect(post.composer.renderTarget1).toBe(post.composer.renderTarget2);
+    expect(post.grade.fxaa).toBe(true);
+    expect(post.supportsDynamicResolution).toBe(true);
+
+    const rect = dynamicResolutionRect({
+      logicalWidth: 1280,
+      logicalHeight: 720,
+      pixelRatio: 1,
+      renderScale: 0.75,
+      maxRenderScale: 1,
+      minRenderScale: 0.68,
+    });
+    post.setRenderRegion(rect);
+    expect(post.composer.renderTarget1.viewport.toArray()).toEqual([0, 0, 960, 540]);
+    // The taps clamp to uvMax, and under a reduced region uvMax stops half a
+    // texel short of the region edge, so a bilinear tap cannot reach the stale
+    // pixels outside it.
+    expect(post.grade.uniforms.uInputUvRect.value.toArray()).toEqual([
+      rect.uvScaleX,
+      rect.uvScaleY,
+      rect.uvMaxX,
+      rect.uvMaxY,
+    ]);
+    expect(rect.uvMaxX).toBeLessThan(rect.uvScaleX);
+    expect(rect.uvMaxY).toBeLessThan(rect.uvScaleY);
+  });
+
+  it('drops the fused FXAA for the perf-attribution kill switch', async () => {
+    gfxSettings.fxaa = true;
+    disabledLayers.add('fxaa');
+    vi.stubGlobal('Image', class {});
+    const { buildComposer } = await import('../src/render/post');
+    const post = buildComposer(
+      rendererStub(),
+      new THREE.Scene(),
+      new THREE.PerspectiveCamera(),
+      1280,
+      720,
+      { gradeOnly: true },
+    );
+
+    expect(post.grade.fxaa).toBe(false);
+    expect(post.supportsDynamicResolution).toBe(true);
   });
 
   it('keeps high half-resolution AO depth available to every AO stage', async () => {

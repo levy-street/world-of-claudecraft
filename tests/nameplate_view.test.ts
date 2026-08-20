@@ -60,6 +60,7 @@ function plan(
   showNameplates = true,
   showOwnNameplate = false,
   showPlayerNameplates = true,
+  standIn = false,
 ) {
   return nameplatePlanInto(
     newNameplatePlan(),
@@ -69,6 +70,7 @@ function plan(
     showNameplates,
     showOwnNameplate,
     showPlayerNameplates,
+    standIn,
   );
 }
 
@@ -261,19 +263,78 @@ describe('nameplate_view - threat + combo (delegated to the narrow helpers)', ()
   });
 });
 
+describe('nameplate_view - compile-gate stand-in', () => {
+  // The inverse of the compile gates' charter: a gate hides a body only while
+  // SOMETHING still represents the entity. When nothing does, the plate is that
+  // stand-in and it must beat the player's own nameplate toggles, or an
+  // arriving enemy is completely invisible for an unbounded window.
+  const gatedMob = () => ent({ kind: 'mob', pos: { x: 0, y: 0, z: 6 } });
+  const otherPlayer = () => ent({ id: 7, kind: 'player', pos: { x: 0, y: 0, z: 6 } });
+
+  it('leaves a mob plate hidden when plates are off and the mob has a body', () => {
+    expect(plan(gatedMob(), viewer(), 2, false, false, true, false).hidden).toBe(true);
+  });
+
+  it('forces the mob plate on when plates are off and the mob has no body', () => {
+    expect(plan(gatedMob(), viewer(), 2, false, false, true, true).hidden).toBe(false);
+  });
+
+  it('leaves a plate shown when plates are on, with or without a stand-in', () => {
+    expect(plan(gatedMob(), viewer(), 2, true, false, true, false).hidden).toBe(false);
+    expect(plan(gatedMob(), viewer(), 2, true, false, true, true).hidden).toBe(false);
+  });
+
+  it('forces an other-player plate on only when its own toggle is off and it is bodiless', () => {
+    expect(plan(otherPlayer(), viewer(), 2, true, false, false, false).hidden).toBe(true);
+    expect(plan(otherPlayer(), viewer(), 2, true, false, false, true).hidden).toBe(false);
+  });
+
+  it('also beats the range and the plateless-object rule: a gated view has no other representation', () => {
+    // Both rules assume something is drawn in the world. Under a gate nothing
+    // is, and a view only exists inside the streaming radius (about 80 yd), so
+    // the plate stands in out to there, object views included.
+    const far = ent({ kind: 'mob', pos: { x: 0, y: 0, z: NAMEPLATE_RANGE + 5 } });
+    expect(plan(far, viewer(), 2, true, false, true, false).hidden).toBe(true);
+    expect(plan(far, viewer(), 2, true, false, true, true).hidden).toBe(false);
+    const crate = ent({ kind: 'object', templateId: 'crate' });
+    expect(plan(crate, viewer(), 2, true, false, true, false).hidden).toBe(true);
+    expect(plan(crate, viewer(), 2, true, false, true, true).hidden).toBe(false);
+  });
+
+  it('still hides what no gate is hiding: a looted corpse and the label-less carve-outs', () => {
+    const corpse = ent({ kind: 'mob', dead: true, lootable: false });
+    expect(plan(corpse, viewer(), 2, true, false, true, true).hidden).toBe(true);
+    // The sealed crypt door reads as back wall and the Vale Cup ball is a toy:
+    // both are deliberately label-less, gate or no gate.
+    const sealed = ent({
+      kind: 'object',
+      templateId: 'dungeon_door',
+      dungeonId: 'nythraxis_boss_arena',
+    });
+    expect(plan(sealed, viewer(), 2, true, false, true, true).hidden).toBe(true);
+    const ball = ent({ kind: 'mob', templateId: 'vale_cup_ball' });
+    expect(plan(ball, viewer(), 2, true, false, true, true).hidden).toBe(true);
+  });
+
+  it('never overrides the self plate (the local player view is never gated)', () => {
+    const me = ent({ id: PLAYER_ID, kind: 'player' });
+    expect(plan(me, viewer({ id: PLAYER_ID }), 2, true, false, true, true).hidden).toBe(true);
+  });
+});
+
 describe('nameplate_view - allocation-light + determinism', () => {
   it('writes into the caller-owned plan and returns that same instance (no per-call alloc)', () => {
     const out = newNameplatePlan();
     const e = ent({ pos: { x: 0, y: 0, z: 5 } });
-    const returned = nameplatePlanInto(out, e, viewer(), 2, true, false, true);
+    const returned = nameplatePlanInto(out, e, viewer(), 2, true, false, true, false);
     expect(returned).toBe(out); // same reference, reused
   });
 
   it('same input gives the same plan (pure)', () => {
     const e = ent({ pos: { x: 0, y: 0, z: 5 }, aggroTargetId: PLAYER_ID });
     const p = viewer({ comboPoints: 2, targetId: e.id });
-    const a = nameplatePlanInto(newNameplatePlan(), e, p, 2, true, false, true);
-    const b = nameplatePlanInto(newNameplatePlan(), e, p, 2, true, false, true);
+    const a = nameplatePlanInto(newNameplatePlan(), e, p, 2, true, false, true, false);
+    const b = nameplatePlanInto(newNameplatePlan(), e, p, 2, true, false, true, false);
     expect(a).toEqual(b);
   });
 });
@@ -312,8 +373,26 @@ describe('nameplate_view - Sim-vs-ClientWorld parity', () => {
       // ClientWorld-mirror-shaped: ONLY the fields the core reads, sim-only absent.
       const mirE = ent({ ...eo });
       const mirP = viewer({ ...po });
-      const simPlan = nameplatePlanInto(newNameplatePlan(), simE, simP, 2, true, false, true);
-      const mirPlan = nameplatePlanInto(newNameplatePlan(), mirE, mirP, 2, true, false, true);
+      const simPlan = nameplatePlanInto(
+        newNameplatePlan(),
+        simE,
+        simP,
+        2,
+        true,
+        false,
+        true,
+        false,
+      );
+      const mirPlan = nameplatePlanInto(
+        newNameplatePlan(),
+        mirE,
+        mirP,
+        2,
+        true,
+        false,
+        true,
+        false,
+      );
       expect(simPlan).toEqual(mirPlan);
     });
   }

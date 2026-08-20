@@ -7,6 +7,7 @@ import {
   type PreviewAppearance,
   previewAppearanceVisual,
 } from '../src/render/characters/preview_appearance';
+import { createPreviewOpenGate } from '../src/render/characters/preview_open_gate_core';
 
 const mechAssets = vi.hoisted(() => ({
   ready: false,
@@ -245,6 +246,9 @@ describe('CharacterPreview visual reuse', () => {
       currentSkin: 0,
       closeupCache: new Map(),
       characterGroup: { add: vi.fn(), remove: vi.fn(), rotation: { y: 1 } },
+      // A rebuild forgets the gate's linked signature (three releases a
+      // program with the last material holding it).
+      openGate: createPreviewOpenGate(),
     });
     return preview;
   }
@@ -288,6 +292,7 @@ describe('CharacterPreview visual lifecycle', () => {
     state.closeupCache = new Map();
     state.currentVisual = { root: {}, dispose };
     state.characterGroup = { remove, add, rotation: { y: 1 } };
+    state.openGate = createPreviewOpenGate();
 
     preview.setVisualKey('player_warrior');
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_GAMEPAD_BINDINGS } from '../src/game/gamepad_map';
+import { CROSS_HOTBAR_SLOTS_PER_SET, seedCrossHotbarLayout } from '../src/game/cross_hotbar';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { computeTalentModifiers } from '../src/sim/content/talents';
 import type { PlayerClass } from '../src/sim/types';
@@ -417,9 +417,22 @@ describe('owned class level 20 default action bars', () => {
   });
 
   it('keeps core actions visible and controller-bound, with every action reachable on mobile', () => {
-    const controllerActions = new Set(Object.values(DEFAULT_GAMEPAD_BINDINGS));
     for (const { key, expected } of ownedSpecEntries()) {
       const actions = buildDefaultFormBar(expected, ACTION_BAR_ABILITY_SLOTS);
+      // Controller reachability is the CROSS HOTBAR's now, not a flat slotN button
+      // binding: a pad reaches abilities by holding a trigger, and the bar is seeded
+      // from this same default loadout. Pinned as the exact per-set slices, in order:
+      // an empty-extras seed copies the bar, so merely asserting the bar's actions are
+      // somewhere in the layout cannot fail for any class content, while this catches a
+      // reordered seed, a narrower set, and a kit whose later actions stop landing on
+      // the second set (the only two sets a pad can reach).
+      const layout = seedCrossHotbarLayout(actions, []);
+      expect(layout[0], `${key} cross hotbar first set`).toEqual(
+        actions.slice(0, CROSS_HOTBAR_SLOTS_PER_SET),
+      );
+      expect(layout[1], `${key} cross hotbar second set`).toEqual(
+        actions.slice(CROSS_HOTBAR_SLOTS_PER_SET, CROSS_HOTBAR_SLOTS_PER_SET * 2),
+      );
       for (let index = 0; index < actions.length; index++) {
         if (!actions[index]) continue;
         const sourceSlot = index + 1;
@@ -427,11 +440,6 @@ describe('owned class level 20 default action bars', () => {
         expect(desktopRow, `${key} desktop slot ${sourceSlot}`).toBeLessThanOrEqual(3);
         if (index < 11) {
           expect(desktopRow, `${key} visible desktop slot ${sourceSlot}`).toBe(1);
-        }
-        if (index < 8) {
-          expect(controllerActions, `${key} default controller slot ${sourceSlot}`).toContain(
-            `slot${sourceSlot}`,
-          );
         }
         const page = Math.floor(index / MOBILE_ACTIONS_PER_PAGE);
         const button = index % MOBILE_ACTIONS_PER_PAGE;

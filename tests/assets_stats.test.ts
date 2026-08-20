@@ -46,8 +46,8 @@ describe('asset timing stats', () => {
     expect(snap.byType.gltf.maxMs).toBe(25);
     expect(snap.byType.gltf.slowest[0]).toEqual({ url: '/media/big.glb', ms: 25, bytes: 2000 });
     expect(snap.files).toEqual([
-      { type: 'gltf', url: '/media/big.glb', ms: 25, bytes: 2000 },
-      { type: 'gltf', url: '/media/small.glb', ms: 5, bytes: 500 },
+      { type: 'gltf', url: '/media/big.glb', ms: 25, bytes: 2000, at: 1000 },
+      { type: 'gltf', url: '/media/small.glb', ms: 5, bytes: 500, at: 1025 },
     ]);
     expect(snap.byType.texture.failed).toBe(1);
   });

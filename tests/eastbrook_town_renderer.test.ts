@@ -26,6 +26,8 @@ import {
   newEastbrookRoofVisibilityPlan,
 } from '../src/render/eastbrook_town_visibility_core';
 import { gfxInternalsForTest } from '../src/render/gfx';
+import { setGpuPrepClockForTest } from '../src/render/gpu_prep_events';
+import { createRevealGateCore } from '../src/render/reveal_gate_core';
 import { vertexColorEmissiveInternalsForTest } from '../src/render/vertex_color_emissive';
 import { BUILDING_TERRAIN_SAMPLE_STEP } from '../src/sim/building_layout';
 import { BUILTIN_WORLD } from '../src/sim/data';
@@ -75,6 +77,7 @@ function meshesOf(root: THREE.Object3D): THREE.Mesh[] {
 afterEach(() => {
   restoreGfx?.();
   restoreGfx = null;
+  setGpuPrepClockForTest(null);
 });
 
 const ROTATED_ROOF: EastbrookRoofVisibilityTarget = {
@@ -267,6 +270,138 @@ describe('Eastbrook town renderer', () => {
       }
       expect(foundationBottom, `${building.id} deepest terrain seat`).toBeCloseTo(minimumY, 10);
     }
+  });
+
+  it('holds the buildings with the static batches on a walking approach until the gate settles', () => {
+    const view = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
+    const requested: string[] = [];
+    const gate = createRevealGateCore((key) => requested.push(key));
+    view.setRevealGate(gate);
+    const buildingGroups = EASTBROOK_LAYOUT.buildings.map((building) => {
+      const group = view.group.getObjectByName(`eastbrookBuilding:${building.id}`);
+      if (!group) throw new Error(`renderer fixture lost ${building.id}`);
+      return group;
+    });
+    const micro = view.group.getObjectByName('eastbrookTownMicroOpaqueBatch');
+    if (!micro) throw new Error('renderer fixture lost the micro batch');
+    // The gate compiles the buildings WITH the batches: every building group
+    // is a reveal root, so its unshared materials link before first draw.
+    for (const group of buildingGroups) expect(view.staticRevealRoots()).toContain(group);
+    expect(view.staticRevealRoots()).toContain(micro);
+
+    // Camera outside the town cull radius, town and buildings inside the fog.
+    const cullRadius = EASTBROOK_LAYOUT.wall.radius + EASTBROOK_LAYOUT.wall.maximumSegmentSpan / 2;
+    const approachX = cullRadius + 20;
+    view.update(approachX, 2, 0, approachX - 5, 2, 0, 400, 0.05);
+    expect(requested).toEqual(['eastbrook-town-static']);
+    expect(micro.visible).toBe(false);
+    for (const group of buildingGroups) expect(group.visible).toBe(false);
+
+    // Held frames never re-request; the settle reveals batches and buildings
+    // together, and the latch never consults the gate again.
+    view.update(approachX, 2, 0, approachX - 5, 2, 0, 400, 0.05);
+    expect(requested).toEqual(['eastbrook-town-static']);
+    for (const group of buildingGroups) expect(group.visible).toBe(false);
+    gate.settle('eastbrook-town-static');
+    view.update(approachX, 2, 0, approachX - 5, 2, 0, 400, 0.05);
+    expect(micro.visible).toBe(true);
+    for (const group of buildingGroups) expect(group.visible).toBe(true);
+    view.setRevealGate(createRevealGateCore((key) => requested.push(`again:${key}`)));
+    view.update(approachX, 2, 0, approachX - 5, 2, 0, 400, 0.05);
+    expect(requested).toEqual(['eastbrook-town-static']);
+    for (const group of buildingGroups) expect(group.visible).toBe(true);
+  });
+
+  it('reveals each root as its own compile lands, without waiting for the whole town', () => {
+    // The town key covers every batch plus every building group. Holding all
+    // of them until the slowest link settles turns the settle frame into the
+    // one-frame first-draw burst the gate exists to prevent, so a root whose
+    // own compile has landed draws while the rest keep waiting.
+    const view = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
+    const gate = createRevealGateCore((key) => gate.noteRoots(key, view.staticRevealRoots()));
+    view.setRevealGate(gate);
+    const bank = EASTBROOK_LAYOUT.buildings[0];
+    const bankGroup = view.group.getObjectByName(`eastbrookBuilding:${bank.id}`);
+    const other = EASTBROOK_LAYOUT.buildings[1];
+    const otherGroup = view.group.getObjectByName(`eastbrookBuilding:${other.id}`);
+    const micro = view.group.getObjectByName('eastbrookTownMicroOpaqueBatch');
+    if (!bankGroup || !otherGroup || !micro) throw new Error('renderer fixture lost a town node');
+
+    const cullRadius = EASTBROOK_LAYOUT.wall.radius + EASTBROOK_LAYOUT.wall.maximumSegmentSpan / 2;
+    const approachX = cullRadius + 20;
+    view.update(approachX, 2, 0, approachX - 5, 2, 0, 400, 0.05);
+    expect(bankGroup.visible).toBe(false);
+
+    gate.settleRoot('eastbrook-town-static', bankGroup);
+    view.update(approachX, 2, 0, approachX - 5, 2, 0, 400, 0.05);
+    expect(gate.state('eastbrook-town-static')).toBe('compiling');
+    expect(bankGroup.visible).toBe(true);
+    // Nothing else moved: the batches and the other buildings are still cold.
+    expect(micro.visible).toBe(false);
+    expect(otherGroup.visible).toBe(false);
+
+    // A revealed root is never taken back while the key is still held.
+    view.update(approachX, 2, 0, approachX - 5, 2, 0, 400, 0.05);
+    expect(bankGroup.visible).toBe(true);
+  });
+
+  it('holds the buildings as an IMMINENT key when the camera is already inside', () => {
+    // The arrival shape: it used to reveal on the spot without consulting,
+    // which linked the whole town kit in the live frames after the jump on a
+    // host whose boot manifest never carried it. It consults now, holds, and
+    // what standing inside buys is that the compiles go out first.
+    const view = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
+    const requested: { key: string; imminent: boolean }[] = [];
+    view.setRevealGate(createRevealGateCore((key, imminent) => requested.push({ key, imminent })));
+    const far = EASTBROOK_LAYOUT.buildings[EASTBROOK_LAYOUT.buildings.length - 1];
+    const farGroup = view.group.getObjectByName(`eastbrookBuilding:${far.id}`);
+    if (!farGroup) throw new Error('renderer fixture lost the last building');
+    // The camera stands at the town centre, far from that building.
+    view.update(0, 2, 0, 0, 2, 0, 200, 0.05);
+    expect(requested).toEqual([{ key: 'eastbrook-town-static', imminent: true }]);
+    expect(farGroup.visible).toBe(false);
+    // No clock is threaded anywhere: the hold outlasts any number of frames.
+    for (let frame = 0; frame < 200; frame++) {
+      view.update(0, 2, 0, 0, 2, 0, 200, 0.05);
+    }
+    expect(farGroup.visible).toBe(false);
+    expect(requested).toHaveLength(1);
+  });
+
+  it("shows a building at arm's length on the first held frame, linked or not", () => {
+    // The reach floor: the sim colliders of a building the camera is standing
+    // in must not sit under something invisible, whatever the driver is doing.
+    const view = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
+    view.setRevealGate(createRevealGateCore(() => undefined));
+    const bank = EASTBROOK_LAYOUT.buildings[0];
+    const bankGroup = view.group.getObjectByName(`eastbrookBuilding:${bank.id}`);
+    if (!bankGroup) throw new Error('renderer fixture lost the bank');
+    const { x, z } = bankGroup.position;
+    view.update(x, 2, z, x, 2, z + 5, 200, 0.05);
+    expect(bankGroup.visible).toBe(true);
+    // The town key itself never warmed: this is the floor, not a reveal.
+    const micro = view.group.getObjectByName('eastbrookTownMicroOpaqueBatch');
+    if (!micro) throw new Error('renderer fixture lost the micro batch');
+    expect(micro.visible).toBe(false);
+  });
+
+  it('hands the gate its roots nearest to the camera first', () => {
+    // The compiles are submitted in the order the roots come back, so an
+    // arrival links what it landed among before the far side of the town.
+    const view = eastbrookTownInternalsForTest.buildFromSources(fixtureSources(), () => 0, true);
+    let submitted: readonly THREE.Object3D[] = [];
+    view.setRevealGate(
+      createRevealGateCore(() => {
+        submitted = [...view.staticRevealRoots()];
+      }),
+    );
+    const last = EASTBROOK_LAYOUT.buildings[EASTBROOK_LAYOUT.buildings.length - 1];
+    const lastGroup = view.group.getObjectByName(`eastbrookBuilding:${last.id}`);
+    if (!lastGroup) throw new Error('renderer fixture lost the last building');
+    const { x, z } = lastGroup.position;
+    view.update(x, 2, z, x, 2, z + 5, 200, 0.05);
+    expect(submitted).toHaveLength(view.staticRevealRoots().length);
+    expect(submitted[0]).toBe(lastGroup);
   });
 
   it('roof-fades only building volumes to 20% and restores them without touching microgeometry', () => {

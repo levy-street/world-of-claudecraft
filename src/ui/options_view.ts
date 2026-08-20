@@ -471,8 +471,10 @@ export function buildGraphicsSections(
       highCapLadderOptions,
       true,
     ),
-    // The per-effect switches ride the post chain: Effects & Lighting on Low
-    // sheds that whole chain, so they have nothing to run on there.
+    // Ambient Occlusion and Bloom ride the post chain, so Effects & Lighting on
+    // Low leaves them nothing to run on. Anti-Aliasing is the exception: the
+    // grade-only chain carries its own fused FXAA arm (gfx_aa_policy_core.ts),
+    // and this dial is the only control over it there.
     note('hudChrome.options.gfxEffectsNote'),
   ];
 
@@ -611,6 +613,8 @@ export function buildAudioControls(s: OptionsSettingsSource): OptionsControl[] {
 export function buildControllerControls(s: OptionsSettingsSource): OptionsControl[] {
   return [
     boolToggle(s, 'gamepadEnabled', 'hudChrome.controller.enable'),
+    boolToggle(s, 'gamepadCrossHotbar', 'hudChrome.controller.crossHotbarEnable'),
+    boolToggle(s, 'gamepadCrossHotbarExpand', 'hudChrome.controller.crossHotbarExpand'),
     boolToggle(s, 'gamepadInvertY', 'hudChrome.controller.invertY'),
     slider(s, 'gamepadStickDeadzone', 'hudChrome.controller.deadzone'),
     slider(s, 'gamepadCameraSpeed', 'hudChrome.controller.cameraSpeed', 'oneDecimal'),

@@ -6,9 +6,13 @@
 // Why bounded: the derivation memo used to retain every (source albedo map,
 // emissive spec) pair ever SEEN for the renderer's whole lifetime, about two
 // full-resolution canvases plus two GPU textures per weapon cosmetic that
-// ever walked past (the C2 memory ratchet). The boot prewarm deliberately
-// does not populate it (its host material carries no albedo map), so the set
-// grew with cosmetic traffic, never with the catalog.
+// ever walked past (the C2 memory ratchet). The boot prewarm now populates it
+// with one entry per catalog spec, because a mapless host material took
+// deriveEmissive's flat-tint fallback and linked the WRONG program twin; its
+// host map is one pixel (weapon_vfx.ts weaponVfxPrewarmHostMap), so those
+// entries are two 1x1 canvases each, pinned for the session by rigs that are
+// deliberately never disposed. Everything above that floor still grows with
+// cosmetic traffic, not with the catalog.
 //
 // The policy: a live rig holds a reference, and a referenced entry is NEVER
 // evicted, so eviction can never change what is on screen. An entry whose

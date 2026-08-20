@@ -125,4 +125,25 @@ describe('Warspirit engine', () => {
     expect(wolf.forcedTargetId).toBeNull();
     expect(wolf.forcedTargetTimer).toBe(0);
   });
+
+  it('never force-targets a quest-gated mob for a non-questing shaman, but does once questing', () => {
+    const { sim, shaman } = setup();
+    applyWarspiritPosture(sim.ctx, shaman, 'stonebound', 14);
+    const egg = createMob(91_023, MOBS.spider_egg, 10, sim.groundPos(0, 3));
+    egg.hostile = true;
+    sim.entities.set(egg.id, egg);
+
+    applyStoneboundJolt(sim.ctx, shaman, egg);
+    expect(egg.forcedTargetId).toBeNull();
+    expect(egg.threat.size).toBe(0);
+
+    sim.questLog.set('q_broodmother', {
+      questId: 'q_broodmother',
+      counts: [0, 0],
+      state: 'active',
+    });
+    applyStoneboundJolt(sim.ctx, shaman, egg);
+    expect(egg.forcedTargetId).toBe(shaman.id);
+    expect(egg.threat.get(shaman.id)).toBeGreaterThan(0);
+  });
 });

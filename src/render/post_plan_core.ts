@@ -24,8 +24,11 @@ export interface PostPlanInput {
   readonly aoFullRes: boolean;
   readonly bloom: boolean;
   readonly smaa: boolean;
+  /** Fuse edge AA into the output grade pass (the region-safe chain's post AA). */
+  readonly fxaa: boolean;
   readonly n8aoDisabled: boolean;
   readonly smaaDisabled: boolean;
+  readonly fxaaDisabled: boolean;
   readonly isWebGL2: boolean;
   readonly msaaSamples: number;
 }
@@ -37,6 +40,12 @@ export interface PostPipelinePlan {
     readonly aoScale: 0.5 | 1 | null;
   };
   readonly composerPasses: readonly PostComposerPass[];
+  /**
+   * The output-grade pass carries the fused FXAA arm. NOT a composer pass and
+   * NOT a render target: it is a define on a pass the chain already runs, which
+   * is exactly why it leaves `supportsDynamicResolution` alone.
+   */
+  readonly gradeFxaa: boolean;
   readonly singleComposerBuffer: boolean;
   readonly supportsDynamicResolution: boolean;
   readonly composerSamples: number;
@@ -86,6 +95,12 @@ export function postPipelinePlan(input: PostPlanInput): PostPipelinePlan {
   const useBloom = input.bloom && !input.gradeOnly;
   const useScreenFx = !input.gradeOnly;
   const useSmaa = input.smaa && !input.gradeOnly && !input.smaaDisabled;
+  // The fused arm belongs to the GRADE-ONLY chain, and saying so here makes it
+  // structural rather than a property of today's AA policy. On a composer chain
+  // it would be wrong twice over: the SMAA tail already resolves the same image,
+  // and the grade there writes an intermediate that ScreenFx re-aliases after
+  // it, so an AA arm inside the grade would land before the pass that undoes it.
+  const useFxaa = input.fxaa && input.gradeOnly && !input.fxaaDisabled;
   // Preserve the shipped dev-override behavior: configured AO owns scene rasterization
   // storage even when ?n8ao=off temporarily selects the RenderPass attribution branch.
   const aoOwnsSceneStorage = input.ao && !input.gradeOnly;
@@ -210,6 +225,7 @@ export function postPipelinePlan(input: PostPlanInput): PostPipelinePlan {
       aoScale,
     },
     composerPasses,
+    gradeFxaa: useFxaa,
     singleComposerBuffer,
     supportsDynamicResolution,
     composerSamples,

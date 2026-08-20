@@ -234,6 +234,10 @@ Use the seams this repo already has, do not invent new ones:
   contracts: `src/ui/CLAUDE.md`, `src/ui/hud/CLAUDE.md`, and `src/styles/CLAUDE.md`.
 - New visual system: a new `src/render/<thing>.ts` the renderer calls, not a method bank on
   `renderer.ts` (pure logic goes in a `RENDER_PURE_CORES` core; see `src/render/CLAUDE.md`).
+- New GPU producer (a material, a light, a GL context, a group added to the scene after
+  boot): it is a client of the preparation scheduler, never a free draw. Give it a prewarm
+  home or a gate, and see `src/render/CLAUDE.md` "GPU work: every new producer is a client
+  of the scheduler"; dispatch `render-performance-reviewer` on any such diff.
 - New world GLB prop or building from a reference image: the `image-to-glb` skill owns the
   whole pipeline (exporter, optimizer, fingerprint pins, adapter); do not improvise one.
 - New sim SYSTEM behavior (a combat/mob/social/economy mechanic, not just a data record):
@@ -326,8 +330,9 @@ unsure, or on a smaller or unfamiliar model, use the baseline.
   live in `.claude/agents/` and dispatch via `/qa`; the canonical concern-to-reviewer
   table is in `docs/qa-gate.md`. Highlights: `qa-checklist` (the end-of-contribution
   gate), `content-obligations-reviewer` (any game-content diff), `gate-integrity-reviewer`
-  (any change to the gate/CI selection pipeline), plus the domain reviewers for sim,
-  parity, database, security, frontend, and tests. Skills cover the repeated workflows:
+  (any change to the gate/CI selection pipeline), `render-performance-reviewer` (any diff
+  that produces GPU work: a material, a light, a GL context, a scene attach), plus the
+  domain reviewers for sim, parity, database, security, frontend, and tests. Skills cover the repeated workflows:
   `extract-and-test`, `feature-plan`, `review-pr`, `release-merge-audit`,
   `i18n-locale-fill`, `pr-screenshots`, `ci-triage`, `image-to-glb`, `asset-pipeline`.
 - **State rule scope literally.** Models follow instructions literally and will not

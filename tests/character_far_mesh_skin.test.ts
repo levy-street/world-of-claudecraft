@@ -67,7 +67,6 @@ describe('far-LOD mesh follows the selected body skin', () => {
     vi.resetModules();
     vi.doMock('../src/render/assets/loader', () => ({
       loadGltf: vi.fn(() => Promise.resolve(stubGltf())),
-      loadHdr: vi.fn(() => new Promise(() => undefined)),
       // Tag each loaded texture with the URL it came from so the test can
       // tell the alternate-skin atlas apart from the embedded default.
       loadTexture: vi.fn((url: string) =>

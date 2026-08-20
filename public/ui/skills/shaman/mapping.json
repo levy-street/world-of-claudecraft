@@ -12,652 +12,69 @@
   "abilities": [
     {
       "abilityId": "lightning_bolt",
-      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
-      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-shaman-rogue-priest/raw/lightning_bolt.png",
-      "output": "lightning_bolt.webp",
-      "source": "OpenAI built-in image generation",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "acceptedArtManifest": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-shaman-rogue-priest.json",
-      "intendedVisualSubject": "one thick forked blue-white lightning spear traveling diagonally from upper-left into a single dark basalt target shard at lower-right, with one compact star-shaped impact and one small captured thunder spark behind the bolt; unmistakably one projectile, not a branching chain or shield.",
-      "references": [
-        {
-          "path": "public/ui/skills/shaman/chain_lightning.webp",
-          "role": "Premium blue-white lightning material while avoiding multi-target branching.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "2d0493cec121b257867eb5cc3f03f519cca162e46ad74824eb9545cc8f2efe18",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/shaman/thunder_reservoir.webp",
-          "role": "Captured Thunder spark, carved stone, and bronze accents.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "cf12bf073035e9fc24fc2170391387ecf03a7cb6e05d48491fbb297808d0c952",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/shaman/stormsurge.webp",
-          "role": "Focused electric impact and deep violet-blue storm halo.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "60ee0f411a9648749abce95f18457b341532a143c3458f7cd2c8391c58ec07b1",
-          "usedAsGenerationInput": false
-        }
-      ],
-      "generationPrompt": "Use case: stylized-concept. Asset type: opaque borderless square game ability icon for the World of ClaudeCraft Shaman action bar. Style/medium: premium hand-painted classic dark-fantasy MMORPG ability art, tactile stone, bronze, leather, spirit light, and elemental brushwork; crisp focal edges, softer atmospheric periphery, never a flat vector or raw 3D render. Scene/backdrop: fully opaque deep storm-navy and charcoal painted vignette, no literal environment scene. Composition/framing: one dominant readable action or object, visually centered, complete and uncropped with safe padding, 78 to 86 percent fill, strong silhouette and simplified internal values that stay distinct at 48, 32, and 16 pixels and survive a circular crop. Lighting/mood: warm top-left material light against cool bottom-right shadow, controlled saturated elemental glow, ancient primal ritual mood. Constraints: fresh composition, no text, letters, numbers, pseudo-writing, watermark, signature, transparency, checkerboard, baked border, UI frame, rarity chrome, modern graphic design, collage, spellbook page, or tiny decorative clutter. Primary request: repaint Arc Bolt (lightning_bolt). Canonical mechanic: a cast-time 30-yard Nature projectile that deals direct damage and grants one Thunder on hit. Subject: one thick forked blue-white lightning spear traveling diagonally from upper-left into a single dark basalt target shard at lower-right, with one compact star-shaped impact and one small captured thunder spark behind the bolt; unmistakably one projectile, not a branching chain or shield. Approved sibling references visually inspected: chain_lightning for premium blue-white lightning material while avoiding its multi-target branching; thunder_reservoir for a captured Thunder spark, carved stone, and bronze accents; stormsurge for a focused electric impact and deep violet-blue storm halo.",
-      "sourceSha256": "d9eb987b25e90bae918d4640055a84a128c1ae101701e5ff752d3ffb0909c170",
-      "sourceBytes": 2400748,
-      "acceptedSha256": "e25134c7a294ea5e9ca14ef24e682e8262288a3484fd08327299fe1aa02ce876",
-      "acceptedBytes": 4032,
-      "supersedes": {
-        "sourceCommit": "d2d1a8ad5c1121f38c52ca2709d88b84adbe5c9e",
-        "owner": "Levy Street Account - callum@levystreet.com",
-        "license": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
-        "sourceManifest": "public/ui/skills/shaman/mapping.json",
-        "sourcePack": "skill100",
-        "sourceFile": "skill icon 70.png",
-        "output": "lightning_bolt.webp",
-        "sha256": "1b530a0a70850ac59d0e341df5e4972432ddca31ad5e6b35daefcf2d3cacce38",
-        "bytes": 4780,
-        "width": 128,
-        "height": 128,
-        "format": "webp",
-        "colorSpace": "srgb",
-        "channels": 4,
-        "hasAlpha": true
-      }
+      "sourcePack": "skill100",
+      "sourceFile": "skill icon 70.png",
+      "output": "lightning_bolt.webp"
     },
     {
       "abilityId": "rockbiter_weapon",
-      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
-      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-shaman-rogue-priest/raw/rockbiter_weapon.png",
-      "output": "rockbiter_weapon.webp",
-      "source": "OpenAI built-in image generation",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "acceptedArtManifest": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-shaman-rogue-priest.json",
-      "intendedVisualSubject": "one complete blunt basalt warhammer on a strong lower-left to upper-right diagonal, its massive head bound by worn bronze bands and dark roots, with three large orbiting stone chips and thick amber-green seams glowing through the rock; enduring fortified earth enchant, no fist, shield, or strike target.",
-      "references": [
-        {
-          "path": "public/ui/skills/shaman/galeheart_weapon.webp",
-          "role": "Centered enchanted-weapon composition.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "39859854df31a97adbc6893fc7e0e8f9136f45404c1aa210e99db24c52a80adf",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/shaman/stoneward.webp",
-          "role": "Protective basalt, bronze, and green-gold earth light.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "2ca95e9a2f44407f7594eb18fa4e478843cf9c89aa6361465e0df3e413423a11",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/shaman/earthquake.webp",
-          "role": "Cracked stone material and restrained ochre energy.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "b5d170be172af477c8e3f2ee9306237c6ea4a4dbda401c1605af3e1a7d040770",
-          "usedAsGenerationInput": false
-        }
-      ],
-      "generationPrompt": "Use case: stylized-concept. Asset type: opaque borderless square game ability icon for the World of ClaudeCraft Shaman action bar. Style/medium: premium hand-painted classic dark-fantasy MMORPG ability art, tactile stone, bronze, leather, spirit light, and elemental brushwork; crisp focal edges, softer atmospheric periphery, never a flat vector or raw 3D render. Scene/backdrop: fully opaque deep storm-navy and charcoal painted vignette, no literal environment scene. Composition/framing: one dominant readable action or object, visually centered, complete and uncropped with safe padding, 78 to 86 percent fill, strong silhouette and simplified internal values that stay distinct at 48, 32, and 16 pixels and survive a circular crop. Lighting/mood: warm top-left material light against cool bottom-right shadow, controlled saturated elemental glow, ancient primal ritual mood. Constraints: fresh composition, no text, letters, numbers, pseudo-writing, watermark, signature, transparency, checkerboard, baked border, UI frame, rarity chrome, modern graphic design, collage, spellbook page, or tiny decorative clutter. Primary request: repaint Stonebound Weapon (rockbiter_weapon). Canonical mechanic: a 30-minute weapon imbue adding damage; for Warspirit it also grants heavy armor, stamina, damage reduction, critical immunity, threat, a forcing Earthen Jolt, and a brief Thunder Ward guard. Subject: one complete blunt basalt warhammer on a strong lower-left to upper-right diagonal, its massive head bound by worn bronze bands and dark roots, with three large orbiting stone chips and thick amber-green seams glowing through the rock; enduring fortified earth enchant, no fist, shield, or strike target. Approved sibling references visually inspected: galeheart_weapon for the centered enchanted-weapon composition; stoneward for protective basalt, bronze, and green-gold earth light; earthquake for cracked stone material and restrained ochre energy.",
-      "sourceSha256": "becd375b9519eed79c09b441279433338078112bc7f33d8eea8f35dd425b135b",
-      "sourceBytes": 2452717,
-      "acceptedSha256": "a89dff7e0b4366100ab679d787d7cb0bf69ce3803a332c193e67ee4430d6d5c4",
-      "acceptedBytes": 3938,
-      "supersedes": {
-        "sourceCommit": "d2d1a8ad5c1121f38c52ca2709d88b84adbe5c9e",
-        "owner": "Levy Street Account - callum@levystreet.com",
-        "license": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
-        "sourceManifest": "public/ui/skills/shaman/mapping.json",
-        "sourcePack": "earth-magician",
-        "sourceFile": "23.png",
-        "output": "rockbiter_weapon.webp",
-        "sha256": "2bbfa1f796b76b5255ee815e6e02f8360e7dc72d530cfc2f716c8a6492c2b951",
-        "bytes": 3056,
-        "width": 128,
-        "height": 128,
-        "format": "webp",
-        "colorSpace": "srgb",
-        "channels": 4,
-        "hasAlpha": true
-      }
+      "sourcePack": "earth-magician",
+      "sourceFile": "23.png",
+      "output": "rockbiter_weapon.webp"
     },
     {
       "abilityId": "healing_wave",
-      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
-      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-shaman-rogue-priest/raw/healing_wave.png",
-      "output": "healing_wave.webp",
-      "source": "OpenAI built-in image generation",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "acceptedArtManifest": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-shaman-rogue-priest.json",
-      "intendedVisualSubject": "two weathered Shaman hands cradle one bold turquoise wave curling upward around a luminous green-gold life pearl, with a smaller inner current visibly held inside the larger wave to suggest stored healing; calm but potent, one coherent water symbol, no text, medical cross, cup, or extra characters.",
-      "references": [
-        {
-          "path": "public/ui/skills/shaman/tidecall.webp",
-          "role": "Hand, droplet, and luminous blue healing language.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "c48612f1d32af9a8537125edeef92b683f0d9c0ccc700a32e2252701b3d4a6d5",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/shaman/lifespring_weapon.webp",
-          "role": "Teal-green life energy with warm gold containment.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "e532c68ca70f37865b0afdcb5a3a345a3138a110c270fc404dbc23889517911b",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/shaman/chain_heal.webp",
-          "role": "Flowing restorative arcs and soft spirit highlights.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "43c100ab08ee4f08f1af21b9b62673b070612d5952156b76a7fa5d6704629a80",
-          "usedAsGenerationInput": false
-        }
-      ],
-      "generationPrompt": "Use case: stylized-concept. Asset type: opaque borderless square game ability icon for the World of ClaudeCraft Shaman action bar. Style/medium: premium hand-painted classic dark-fantasy MMORPG ability art, tactile stone, bronze, leather, spirit light, and elemental brushwork; crisp focal edges, softer atmospheric periphery, never a flat vector or raw 3D render. Scene/backdrop: fully opaque deep storm-navy and charcoal painted vignette, no literal environment scene. Composition/framing: one dominant readable action or object, visually centered, complete and uncropped with safe padding, 78 to 86 percent fill, strong silhouette and simplified internal values that stay distinct at 48, 32, and 16 pixels and survive a circular crop. Lighting/mood: warm top-left material light against cool bottom-right shadow, controlled saturated elemental glow, ancient primal ritual mood. Constraints: fresh composition, no text, letters, numbers, pseudo-writing, watermark, signature, transparency, checkerboard, baked border, UI frame, rarity chrome, modern graphic design, collage, spellbook page, or tiny decorative clutter. Primary request: repaint Mending Waters (healing_wave). Canonical mechanic: a cast-time single-target Nature heal; Spiritmend stores half of the full pre-overheal amount as Mending Current for 12 seconds. Subject: two weathered Shaman hands cradle one bold turquoise wave curling upward around a luminous green-gold life pearl, with a smaller inner current visibly held inside the larger wave to suggest stored healing; calm but potent, one coherent water symbol, no text, medical cross, cup, or extra characters. Approved sibling references visually inspected: tidecall for the hand, droplet, and luminous blue healing language; lifespring_weapon for teal-green life energy with warm gold containment; chain_heal for flowing restorative arcs and soft spirit highlights.",
-      "sourceSha256": "7d9067bcaa4b9876b12c902e819f78e3808cbca67a007dafea4254d5203e5f1c",
-      "sourceBytes": 2486293,
-      "acceptedSha256": "ab152e941bd443d514bfb726df83145f62f6260a3be6ddf4e10296660b78fd85",
-      "acceptedBytes": 4930,
-      "supersedes": {
-        "sourceCommit": "d2d1a8ad5c1121f38c52ca2709d88b84adbe5c9e",
-        "owner": "Levy Street Account - callum@levystreet.com",
-        "license": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
-        "sourceManifest": "public/ui/skills/shaman/mapping.json",
-        "sourcePack": "skill100",
-        "sourceFile": "skill icon 73.png",
-        "output": "healing_wave.webp",
-        "sha256": "1ca329023dc89e198dfd32c32b3f3ed1d8747f85567df8d4b62fb4a52374f5f2",
-        "bytes": 4088,
-        "width": 128,
-        "height": 128,
-        "format": "webp",
-        "colorSpace": "srgb",
-        "channels": 3,
-        "hasAlpha": false
-      }
+      "sourcePack": "skill100",
+      "sourceFile": "skill icon 73.png",
+      "output": "healing_wave.webp"
     },
     {
       "abilityId": "earth_shock",
-      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
-      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-shaman-rogue-priest/raw/earth_shock.png",
-      "output": "earth_shock.webp",
-      "source": "OpenAI built-in image generation",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "acceptedArtManifest": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-shaman-rogue-priest.json",
-      "intendedVisualSubject": "one jagged basalt fist punching upward from a compact cracked-earth impact, pierced by one thick blue-white thunderbolt and one ochre-gold shock ring; directional violent jolt, not a lingering ground zone, no humanoid.",
-      "references": [
-        {
-          "path": "public/ui/skills/shaman/earthquake.webp",
-          "role": "Cracked earthen material and restrained ochre shock geometry.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "b5d170be172af477c8e3f2ee9306237c6ea4a4dbda401c1605af3e1a7d040770",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/shaman/chain_lightning.webp",
-          "role": "Blue-white electric brushwork and deep storm values.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "2d0493cec121b257867eb5cc3f03f519cca162e46ad74824eb9545cc8f2efe18",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/shaman/stoneward.webp",
-          "role": "Tactile basalt, bronze, and shamanic green-gold accents.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "2ca95e9a2f44407f7594eb18fa4e478843cf9c89aa6361465e0df3e413423a11",
-          "usedAsGenerationInput": false
-        }
-      ],
-      "generationPrompt": "Use case: stylized-concept. Asset type: opaque borderless square game ability icon for the World of ClaudeCraft Shaman action bar. Style/medium: premium hand-painted classic dark-fantasy MMORPG ability art, tactile stone, bronze, leather, spirit light, and elemental brushwork; crisp focal edges, softer atmospheric periphery, never a flat vector or raw 3D render. Scene/backdrop: fully opaque deep storm-navy and charcoal painted vignette, no literal environment scene. Composition/framing: one dominant readable action or object, visually centered, complete and uncropped with safe padding, 78 to 86 percent fill, strong silhouette and simplified internal values that stay distinct at 48, 32, and 16 pixels and survive a circular crop. Lighting/mood: warm top-left material light against cool bottom-right shadow, controlled saturated elemental glow, ancient primal ritual mood. Constraints: fresh composition, no text, letters, numbers, pseudo-writing, watermark, signature, transparency, checkerboard, baked border, UI frame, rarity chrome, modern graphic design, collage, spellbook page, or tiny decorative clutter. Primary request: repaint Earthen Jolt (earth_shock). Canonical mechanic: an instant 20-yard Nature jolt that deals direct damage; at five Thunder it detonates for 125 percent more damage and consumes the Thunder, while Stonebound makes the target attack the Shaman for 3 seconds. Subject: one jagged basalt fist punching upward from a compact cracked-earth impact, pierced by one thick blue-white thunderbolt and one ochre-gold shock ring; directional violent jolt, not a lingering ground zone, no humanoid. Approved sibling references visually inspected: earthquake for cracked earthen material and restrained ochre geometry; chain_lightning for blue-white electric brushwork and dark values; stoneward for tactile basalt, bronze, and shamanic green-gold accents.",
-      "sourceSha256": "bdbb680a94fa441945772c396cc5c210cd3a5784124bb582a870365a88415acb",
-      "sourceBytes": 2683027,
-      "acceptedSha256": "714e9e95ccbe5e7b02a9809df2ca599203334aa8a10b44878c35fe93c9a46eec",
-      "acceptedBytes": 5986,
-      "supersedes": {
-        "sourceCommit": "d2d1a8ad5c1121f38c52ca2709d88b84adbe5c9e",
-        "owner": "Levy Street Account - callum@levystreet.com",
-        "license": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
-        "sourceManifest": "public/ui/skills/shaman/mapping.json",
-        "sourcePack": "earth-magician",
-        "sourceFile": "12.png",
-        "output": "earth_shock.webp",
-        "sha256": "905b6a8c195cf648630c67f5dacd9abe271d5a18255b9771f87643131a25e5f3",
-        "bytes": 3806,
-        "width": 128,
-        "height": 128,
-        "format": "webp",
-        "colorSpace": "srgb",
-        "channels": 4,
-        "hasAlpha": true
-      }
+      "sourcePack": "earth-magician",
+      "sourceFile": "12.png",
+      "output": "earth_shock.webp"
     },
     {
       "abilityId": "lightning_shield",
-      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
-      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-shaman-rogue-priest/raw/lightning_shield.png",
-      "output": "lightning_shield.webp",
-      "source": "OpenAI built-in image generation",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "acceptedArtManifest": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-shaman-rogue-priest.json",
-      "intendedVisualSubject": "one rugged dark-basalt round ward plate with a small bronze center boss, protected by exactly three large blue-white lightning fangs orbiting in a triangular rhythm and pointing outward at attackers; visibly defensive and charged, not a generic glowing orb or full UI ring.",
-      "references": [
-        {
-          "path": "public/ui/skills/shaman/stoneward.webp",
-          "role": "Centered defensive stone-and-bronze composition.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "2ca95e9a2f44407f7594eb18fa4e478843cf9c89aa6361465e0df3e413423a11",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/shaman/thunder_reservoir.webp",
-          "role": "Contained lightning, carved basalt, and electric contrast.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "cf12bf073035e9fc24fc2170391387ecf03a7cb6e05d48491fbb297808d0c952",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/shaman/chain_lightning.webp",
-          "role": "Crisp blue-white energy against deep storm values.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "2d0493cec121b257867eb5cc3f03f519cca162e46ad74824eb9545cc8f2efe18",
-          "usedAsGenerationInput": false
-        }
-      ],
-      "generationPrompt": "Use case: stylized-concept. Asset type: opaque borderless square game ability icon for the World of ClaudeCraft Shaman action bar. Style/medium: premium hand-painted classic dark-fantasy MMORPG ability art, tactile stone, bronze, leather, spirit light, and elemental brushwork; crisp focal edges, softer atmospheric periphery, never a flat vector or raw 3D render. Scene/backdrop: fully opaque deep storm-navy and charcoal painted vignette, no literal environment scene. Composition/framing: one dominant readable action or object, visually centered, complete and uncropped with safe padding, 78 to 86 percent fill, strong silhouette and simplified internal values that stay distinct at 48, 32, and 16 pixels and survive a circular crop. Lighting/mood: warm top-left material light against cool bottom-right shadow, controlled saturated elemental glow, ancient primal ritual mood. Constraints: fresh composition, no text, letters, numbers, pseudo-writing, watermark, signature, transparency, checkerboard, baked border, UI frame, rarity chrome, modern graphic design, collage, spellbook page, or tiny decorative clutter. Primary request: repaint Thunder Ward (lightning_shield). Canonical mechanic: surround yourself with lightning for 10 minutes; the next three melee attacks against you trigger retaliatory Nature damage, at most once every 5 seconds. Subject: one rugged dark-basalt round ward plate with a small bronze center boss, protected by exactly three large blue-white lightning fangs orbiting in a triangular rhythm and pointing outward at attackers; visibly defensive and charged, not a generic glowing orb or full UI ring. Approved sibling references visually inspected: stoneward for the centered defensive stone-and-bronze composition; thunder_reservoir for contained lightning, carved basalt, and electric contrast; chain_lightning for crisp blue-white energy against deep storm values.",
-      "sourceSha256": "3659e480d2703ce62207632489e722f96b451a080ba60b220fb680ff4f0b9dba",
-      "sourceBytes": 2398108,
-      "acceptedSha256": "e11e8094d5cc452ded0de3565a37eaafe682cbd617a0a2218713935e006955f9",
-      "acceptedBytes": 4684,
-      "supersedes": {
-        "sourceCommit": "d2d1a8ad5c1121f38c52ca2709d88b84adbe5c9e",
-        "owner": "Levy Street Account - callum@levystreet.com",
-        "license": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
-        "sourceManifest": "public/ui/skills/shaman/mapping.json",
-        "sourcePack": "rpg100",
-        "sourceFile": "skill 12.png",
-        "output": "lightning_shield.webp",
-        "sha256": "4305ba21084abd1815b24b920544a97cf29dda6798db0894332a9dff021345f2",
-        "bytes": 3866,
-        "width": 128,
-        "height": 128,
-        "format": "webp",
-        "colorSpace": "srgb",
-        "channels": 3,
-        "hasAlpha": false
-      }
+      "sourcePack": "rpg100",
+      "sourceFile": "skill 12.png",
+      "output": "lightning_shield.webp"
     },
     {
       "abilityId": "flame_shock",
-      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
-      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-shaman-rogue-priest/raw/flame_shock.png",
-      "output": "flame_shock.webp",
-      "source": "OpenAI built-in image generation",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "acceptedArtManifest": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-shaman-rogue-priest.json",
-      "intendedVisualSubject": "one compact obsidian impact shard bursting forward through a crescent of bright orange-red fire, with four large fading ember beads trailing behind to communicate the lingering burn; bold hot core, charred dark recesses, no weapon and no full fireball.",
-      "references": [
-        {
-          "path": "public/ui/skills/shaman/primal_exaltation.webp",
-          "role": "Class fire palette beside deep earth and storm values.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "397c794639d0121902885607ca38b5dc79675c9dcfda7dd9e3eb4eabb34d343c",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/shaman/unleash_weapon.webp",
-          "role": "Forceful elemental burst and tactile dark material.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "b1c616abc35fe59596f11fc901b6006682ca808a3b832925404a2fe1bf75a8d7",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/shaman/elemental_trance.webp",
-          "role": "Controlled orbiting elemental motes and soft peripheral atmosphere.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "5cf7eeaf1052e9d3993fb2780b9009c33c9fd329f9801cb63ae7568d32dc98a2",
-          "usedAsGenerationInput": false
-        }
-      ],
-      "generationPrompt": "Use case: stylized-concept. Asset type: opaque borderless square game ability icon for the World of ClaudeCraft Shaman action bar. Style/medium: premium hand-painted classic dark-fantasy MMORPG ability art, tactile stone, bronze, leather, spirit light, and elemental brushwork; crisp focal edges, softer atmospheric periphery, never a flat vector or raw 3D render. Scene/backdrop: fully opaque deep storm-navy and charcoal painted vignette, no literal environment scene. Composition/framing: one dominant readable action or object, visually centered, complete and uncropped with safe padding, 78 to 86 percent fill, strong silhouette and simplified internal values that stay distinct at 48, 32, and 16 pixels and survive a circular crop. Lighting/mood: warm top-left material light against cool bottom-right shadow, controlled saturated elemental glow, ancient primal ritual mood. Constraints: fresh composition, no text, letters, numbers, pseudo-writing, watermark, signature, transparency, checkerboard, baked border, UI frame, rarity chrome, modern graphic design, collage, spellbook page, or tiny decorative clutter. Primary request: repaint Cinder Jolt (flame_shock). Canonical mechanic: an instant 20-yard Fire jolt with one direct hit followed by four periodic burns across 12 seconds. Subject: one compact obsidian impact shard bursting forward through a crescent of bright orange-red fire, with four large fading ember beads trailing behind to communicate the lingering burn; bold hot core, charred dark recesses, no weapon and no full fireball. Approved sibling references visually inspected: primal_exaltation for the Shaman fire palette beside deep earth and storm values; unleash_weapon for a forceful elemental burst and tactile dark metal; elemental_trance for controlled orbiting elemental motes and soft peripheral atmosphere.",
-      "sourceSha256": "06586e6a188b35ba1f2865eeba57f11cf6c70ede1fec3beb04a146ddd8c86139",
-      "sourceBytes": 1993474,
-      "acceptedSha256": "91aa49a73a7888357661b7b477f872ac4a827fcab39c5b168007f412f331f9e8",
-      "acceptedBytes": 4346,
-      "supersedes": {
-        "sourceCommit": "d2d1a8ad5c1121f38c52ca2709d88b84adbe5c9e",
-        "owner": "Levy Street Account - callum@levystreet.com",
-        "license": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
-        "sourceManifest": "public/ui/skills/shaman/mapping.json",
-        "sourcePack": "skill100",
-        "sourceFile": "skill icon 31.png",
-        "output": "flame_shock.webp",
-        "sha256": "8ed8e6022acce62930c3a0809f7043c95507528ae3c6a823a8bd4a260ee6bc87",
-        "bytes": 4028,
-        "width": 128,
-        "height": 128,
-        "format": "webp",
-        "colorSpace": "srgb",
-        "channels": 3,
-        "hasAlpha": false
-      }
+      "sourcePack": "skill100",
+      "sourceFile": "skill icon 31.png",
+      "output": "flame_shock.webp"
     },
     {
       "abilityId": "flametongue_weapon",
-      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
-      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-shaman-rogue-priest/raw/flametongue_weapon.png",
-      "output": "flametongue_weapon.webp",
-      "source": "OpenAI built-in image generation",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "acceptedArtManifest": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-shaman-rogue-priest.json",
-      "intendedVisualSubject": "one complete black-iron ritual hand axe on a strong lower-left to upper-right diagonal, its broad blade branded by a non-alphabetic spiral of molten orange and transforming into a single clean tongue of flame along the cutting edge; clearly an enduring weapon enchant, not a strike impact.",
-      "references": [
-        {
-          "path": "public/ui/skills/shaman/galeheart_weapon.webp",
-          "role": "Centered enchanted-weapon composition and storm swirl.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "39859854df31a97adbc6893fc7e0e8f9136f45404c1aa210e99db24c52a80adf",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/shaman/lifespring_weapon.webp",
-          "role": "Premium bronze-black weapon material and luminous elemental inlay.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "e532c68ca70f37865b0afdcb5a3a345a3138a110c270fc404dbc23889517911b",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/shaman/unleash_weapon.webp",
-          "role": "Balanced fire, storm, earth, and water intensity on a dark Shaman vignette.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "b1c616abc35fe59596f11fc901b6006682ca808a3b832925404a2fe1bf75a8d7",
-          "usedAsGenerationInput": false
-        }
-      ],
-      "generationPrompt": "Use case: stylized-concept. Asset type: opaque borderless square game ability icon for the World of ClaudeCraft Shaman action bar. Style/medium: premium hand-painted classic dark-fantasy MMORPG ability art, tactile stone, bronze, leather, spirit light, and elemental brushwork; crisp focal edges, softer atmospheric periphery, never a flat vector or raw 3D render. Scene/backdrop: fully opaque deep storm-navy and charcoal painted vignette, no literal environment scene. Composition/framing: one dominant readable action or object, visually centered, complete and uncropped with safe padding, 78 to 86 percent fill, strong silhouette and simplified internal values that stay distinct at 48, 32, and 16 pixels and survive a circular crop. Lighting/mood: warm top-left material light against cool bottom-right shadow, controlled saturated elemental glow, ancient primal ritual mood. Constraints: fresh composition, no text, letters, numbers, pseudo-writing, watermark, signature, transparency, checkerboard, baked border, UI frame, rarity chrome, modern graphic design, collage, spellbook page, or tiny decorative clutter. Primary request: repaint Pyrebrand Weapon (flametongue_weapon). Canonical mechanic: a 30-minute Elemental Shaman weapon imbue that makes every swing deal additional Fire damage. Subject: one complete black-iron ritual hand axe on a strong lower-left to upper-right diagonal, its broad blade branded by a non-alphabetic spiral of molten orange and transforming into a single clean tongue of flame along the cutting edge; clearly an enduring weapon enchant, not a strike impact. Approved sibling references visually inspected: galeheart_weapon for the centered enchanted-weapon composition and storm swirl; lifespring_weapon for premium bronze-black weapon material and luminous elemental inlay; unleash_weapon for balanced fire, storm, earth, and water intensity on a dark Shaman vignette.",
-      "sourceSha256": "9c55fa48f254e513b903308303714989d4965c87ffa5ab1588d7314b37b12ee9",
-      "sourceBytes": 2286785,
-      "acceptedSha256": "17b322c11692a53a41935ac79bfe9ebaa3b355c2e33b9a7d6654314cef93c9be",
-      "acceptedBytes": 4428,
-      "supersedes": {
-        "sourceCommit": "d2d1a8ad5c1121f38c52ca2709d88b84adbe5c9e",
-        "owner": "Levy Street Account - callum@levystreet.com",
-        "license": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
-        "sourceManifest": "public/ui/skills/shaman/mapping.json",
-        "sourcePack": "rpg100",
-        "sourceFile": "skill 64.png",
-        "output": "flametongue_weapon.webp",
-        "sha256": "30685a6f97729e07271824fce1c3eb82b2ce0fec6941b943e86d116bc5e54310",
-        "bytes": 2886,
-        "width": 128,
-        "height": 128,
-        "format": "webp",
-        "colorSpace": "srgb",
-        "channels": 3,
-        "hasAlpha": false
-      }
+      "sourcePack": "rpg100",
+      "sourceFile": "skill 64.png",
+      "output": "flametongue_weapon.webp"
     },
     {
       "abilityId": "frost_shock",
-      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
-      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-shaman-rogue-priest/raw/frost_shock.png",
-      "output": "frost_shock.webp",
-      "source": "OpenAI built-in image generation",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "acceptedArtManifest": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-shaman-rogue-priest.json",
-      "intendedVisualSubject": "one heavy spectral ice fist striking downward into a compact cobalt frost burst, with a broken ring of thick frozen chain links snapping shut around the impact; sharp cyan-white core, deep blue ice, immediate force and binding slow, no snowflake emblem and no weapon.",
-      "references": [
-        {
-          "path": "public/ui/skills/shaman/chain_lightning.webp",
-          "role": "Focused instant-jolt energy and crisp edge treatment.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "2d0493cec121b257867eb5cc3f03f519cca162e46ad74824eb9545cc8f2efe18",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/shaman/tidecall.webp",
-          "role": "Luminous blue-cyan elemental depth.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "c48612f1d32af9a8537125edeef92b683f0d9c0ccc700a32e2252701b3d4a6d5",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/shaman/primal_exaltation.webp",
-          "role": "Readable frost-water energy beside a dark earthen anchor.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "397c794639d0121902885607ca38b5dc79675c9dcfda7dd9e3eb4eabb34d343c",
-          "usedAsGenerationInput": false
-        }
-      ],
-      "generationPrompt": "Use case: stylized-concept. Asset type: opaque borderless square game ability icon for the World of ClaudeCraft Shaman action bar. Style/medium: premium hand-painted classic dark-fantasy MMORPG ability art, tactile stone, bronze, leather, spirit light, and elemental brushwork; crisp focal edges, softer atmospheric periphery, never a flat vector or raw 3D render. Scene/backdrop: fully opaque deep storm-navy and charcoal painted vignette, no literal environment scene. Composition/framing: one dominant readable action or object, visually centered, complete and uncropped with safe padding, 78 to 86 percent fill, strong silhouette and simplified internal values that stay distinct at 48, 32, and 16 pixels and survive a circular crop. Lighting/mood: warm top-left material light against cool bottom-right shadow, controlled saturated elemental glow, ancient primal ritual mood. Constraints: fresh composition, no text, letters, numbers, pseudo-writing, watermark, signature, transparency, checkerboard, baked border, UI frame, rarity chrome, modern graphic design, collage, spellbook page, or tiny decorative clutter. Primary request: repaint Rime Jolt (frost_shock). Canonical mechanic: an instant 20-yard Frost jolt that deals direct damage and slows the target by 50 percent for 8 seconds. Subject: one heavy spectral ice fist striking downward into a compact cobalt frost burst, with a broken ring of thick frozen chain links snapping shut around the impact; sharp cyan-white core, deep blue ice, immediate force and binding slow, no snowflake emblem and no weapon. Approved sibling references visually inspected: chain_lightning for a focused instant jolt and electric edge treatment; tidecall for luminous blue-cyan elemental depth; primal_exaltation for readable frost-water energy beside a dark earthen anchor.",
-      "sourceSha256": "5fbb8183c99825d3c4ee9bec9c33a154abaa5bd5d7bcee6afcbd225169345f89",
-      "sourceBytes": 2326352,
-      "acceptedSha256": "91f6ad858dfb97c2deb53145830d9bb170a66179c1e9f0e62cc6f07f3c0539c5",
-      "acceptedBytes": 4946,
-      "supersedes": {
-        "sourceCommit": "d2d1a8ad5c1121f38c52ca2709d88b84adbe5c9e",
-        "owner": "Levy Street Account - callum@levystreet.com",
-        "license": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
-        "sourceManifest": "public/ui/skills/shaman/mapping.json",
-        "sourcePack": "rpg100",
-        "sourceFile": "skill 83.png",
-        "output": "frost_shock.webp",
-        "sha256": "a22e3a1f7151ba402d8f969adb8c78b4e83a86adcb8667a3d4ad90899474fc74",
-        "bytes": 4504,
-        "width": 128,
-        "height": 128,
-        "format": "webp",
-        "colorSpace": "srgb",
-        "channels": 3,
-        "hasAlpha": false
-      }
+      "sourcePack": "rpg100",
+      "sourceFile": "skill 83.png",
+      "output": "frost_shock.webp"
     },
     {
       "abilityId": "frostbrand_weapon",
-      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
-      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-shaman-rogue-priest/raw/frostbrand_weapon.png",
-      "output": "frostbrand_weapon.webp",
-      "source": "OpenAI built-in image generation",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "acceptedArtManifest": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-shaman-rogue-priest.json",
-      "intendedVisualSubject": "one complete dark-steel crescent hand axe on a strong upper-left to lower-right diagonal, its broad cutting edge sealed inside thick translucent blue rime with three large icicle teeth and cold mist; clearly an enduring weapon enchant, not a shock impact, and visually distinct from the fiery Pyrebrand axe.",
-      "references": [
-        {
-          "path": "public/ui/skills/shaman/galeheart_weapon.webp",
-          "role": "Centered enchanted-weapon composition and premium dark metal.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "39859854df31a97adbc6893fc7e0e8f9136f45404c1aa210e99db24c52a80adf",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/shaman/tidecall.webp",
-          "role": "Cyan-blue translucency and soft water light.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "c48612f1d32af9a8537125edeef92b683f0d9c0ccc700a32e2252701b3d4a6d5",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/shaman/primal_exaltation.webp",
-          "role": "Elemental contrast and grounded dark values.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "397c794639d0121902885607ca38b5dc79675c9dcfda7dd9e3eb4eabb34d343c",
-          "usedAsGenerationInput": false
-        }
-      ],
-      "generationPrompt": "Use case: stylized-concept. Asset type: opaque borderless square game ability icon for the World of ClaudeCraft Shaman action bar. Style/medium: premium hand-painted classic dark-fantasy MMORPG ability art, tactile stone, bronze, leather, spirit light, and elemental brushwork; crisp focal edges, softer atmospheric periphery, never a flat vector or raw 3D render. Scene/backdrop: fully opaque deep storm-navy and charcoal painted vignette, no literal environment scene. Composition/framing: one dominant readable action or object, visually centered, complete and uncropped with safe padding, 78 to 86 percent fill, strong silhouette and simplified internal values that stay distinct at 48, 32, and 16 pixels and survive a circular crop. Lighting/mood: warm top-left material light against cool bottom-right shadow, controlled saturated elemental glow, ancient primal ritual mood. Constraints: fresh composition, no text, letters, numbers, pseudo-writing, watermark, signature, transparency, checkerboard, baked border, UI frame, rarity chrome, modern graphic design, collage, spellbook page, or tiny decorative clutter. Primary request: repaint Rimebound Weapon (frostbrand_weapon). Canonical mechanic: a 5-minute weapon imbue that makes every swing deal additional biting Frost damage. Subject: one complete dark-steel crescent hand axe on a strong upper-left to lower-right diagonal, its broad cutting edge sealed inside thick translucent blue rime with three large icicle teeth and cold mist; clearly an enduring weapon enchant, not a shock impact, and visually distinct from the fiery Pyrebrand axe. Approved sibling references visually inspected: galeheart_weapon for the centered enchanted-weapon composition and premium dark metal; tidecall for cyan-blue translucency and soft restorative water light; primal_exaltation for the class's elemental contrast and grounded dark values.",
-      "sourceSha256": "ebc8ee0ca1668d9345f4c2bbbd38a4007e4e8fb5b889e67b2d031088eb4d7bc4",
-      "sourceBytes": 2612734,
-      "acceptedSha256": "c5f4e978648e815ab50cb53f4c11b8af82728b74ca7481744d18c563ee9f2b48",
-      "acceptedBytes": 3616,
-      "supersedes": {
-        "sourceCommit": "d2d1a8ad5c1121f38c52ca2709d88b84adbe5c9e",
-        "owner": "Levy Street Account - callum@levystreet.com",
-        "license": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
-        "sourceManifest": "public/ui/skills/shaman/mapping.json",
-        "sourcePack": "rpg100",
-        "sourceFile": "skill 20.png",
-        "output": "frostbrand_weapon.webp",
-        "sha256": "96bc6bd822feec06309654c82e45d4cc2c4ef2e19ce71600bcc33de7913c1924",
-        "bytes": 3382,
-        "width": 128,
-        "height": 128,
-        "format": "webp",
-        "colorSpace": "srgb",
-        "channels": 4,
-        "hasAlpha": true
-      }
+      "sourcePack": "rpg100",
+      "sourceFile": "skill 20.png",
+      "output": "frostbrand_weapon.webp"
     },
     {
       "abilityId": "ghost_wolf",
-      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
-      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-shaman-rogue-priest/raw/ghost_wolf.png",
-      "output": "ghost_wolf.webp",
-      "source": "OpenAI built-in image generation",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "acceptedArtManifest": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-shaman-rogue-priest.json",
-      "intendedVisualSubject": "one powerful running wolf in clean three-quarter profile, formed from charcoal-gray spirit fur with a luminous cyan-violet outline and a long wind-swept spectral mane; forequarters and head dominate, paws dissolve into two broad speed wisps, intelligent pale eyes, primal guardian rather than demonic beast, no red eyes, blood, collar, moon, or scenery.",
-      "references": [
-        {
-          "path": "public/ui/skills/shaman/ancestor_return.webp",
-          "role": "Translucent ancestral spirit anatomy and blue-violet glow.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "9e2680448d8f35b49415deb37a71c96308354bad813e3645aaa4a9cb75bd4d6b",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/shaman/elemental_trance.webp",
-          "role": "Centered spiritual silhouette wrapped in elemental atmosphere.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "5cf7eeaf1052e9d3993fb2780b9009c33c9fd329f9801cb63ae7568d32dc98a2",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/shaman/chain_lightning.webp",
-          "role": "Crisp cyan energy against deep navy shadow.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "2d0493cec121b257867eb5cc3f03f519cca162e46ad74824eb9545cc8f2efe18",
-          "usedAsGenerationInput": false
-        }
-      ],
-      "generationPrompt": "Use case: stylized-concept. Asset type: opaque borderless square game ability icon for the World of ClaudeCraft Shaman action bar. Style/medium: premium hand-painted classic dark-fantasy MMORPG ability art, tactile stone, bronze, leather, spirit light, and elemental brushwork; crisp focal edges, softer atmospheric periphery, never a flat vector or raw 3D render. Scene/backdrop: fully opaque deep storm-navy and charcoal painted vignette, no literal environment scene. Composition/framing: one dominant readable action or object, visually centered, complete and uncropped with safe padding, 78 to 86 percent fill, strong silhouette and simplified internal values that stay distinct at 48, 32, and 16 pixels and survive a circular crop. Lighting/mood: warm top-left material light against cool bottom-right shadow, controlled saturated elemental glow, ancient primal ritual mood. Constraints: fresh composition, no text, letters, numbers, pseudo-writing, watermark, signature, transparency, checkerboard, baked border, UI frame, rarity chrome, modern graphic design, collage, spellbook page, or tiny decorative clutter. Primary request: repaint Shadewolf (ghost_wolf). Canonical mechanic: the Shaman becomes a Shadewolf and moves 40 percent faster until shifting back. Subject: one powerful running wolf in clean three-quarter profile, formed from charcoal-gray spirit fur with a luminous cyan-violet outline and a long wind-swept spectral mane; forequarters and head dominate, paws dissolve into two broad speed wisps, intelligent pale eyes, primal guardian rather than demonic beast, no red eyes, blood, collar, moon, or scenery. Approved sibling references visually inspected: ancestor_return for translucent ancestral spirit anatomy and blue-violet glow; elemental_trance for a centered spiritual silhouette wrapped in elemental atmosphere; chain_lightning for crisp cyan energy against deep navy shadow.",
-      "sourceSha256": "cbda79b17dbd1067d4156059f93e0c59ccf577a813653af5e3b4585ec1f9c775",
-      "sourceBytes": 2737367,
-      "acceptedSha256": "cfd779a8108c6d57d8ce07820375316dd4ab0863c154c71d8778be501922e5ae",
-      "acceptedBytes": 4138,
-      "supersedes": {
-        "sourceCommit": "d2d1a8ad5c1121f38c52ca2709d88b84adbe5c9e",
-        "owner": "Levy Street Account - callum@levystreet.com",
-        "license": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
-        "sourceManifest": "public/ui/skills/shaman/mapping.json",
-        "sourcePack": "rpg100",
-        "sourceFile": "skill 32.png",
-        "output": "ghost_wolf.webp",
-        "sha256": "dbb787612e78de186347c9610030e4e520e90b541318230ce0581ca1ca1c6301",
-        "bytes": 3628,
-        "width": 128,
-        "height": 128,
-        "format": "webp",
-        "colorSpace": "srgb",
-        "channels": 4,
-        "hasAlpha": true
-      }
+      "sourcePack": "rpg100",
+      "sourceFile": "skill 32.png",
+      "output": "ghost_wolf.webp"
     },
     {
       "abilityId": "stormstrike",
-      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
-      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-shaman-rogue-priest/raw/stormstrike.png",
-      "output": "stormstrike.webp",
-      "source": "OpenAI built-in image generation",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "acceptedArtManifest": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-shaman-rogue-priest.json",
-      "intendedVisualSubject": "one physical dark-steel shamanic war axe driving downward into a compact blue-white impact while one translucent ancestral echo of the same axe follows just behind it, creating two broad lightning crescents that converge on one point; unmistakably an active doubled melee strike, not a static weapon enchant.",
-      "references": [
-        {
-          "path": "public/ui/skills/shaman/galeheart_weapon.webp",
-          "role": "Shaman weapon material and storm motion.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "39859854df31a97adbc6893fc7e0e8f9136f45404c1aa210e99db24c52a80adf",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/shaman/warspirit_cadence.webp",
-          "role": "Dual-step weapon rhythm and coiling lightning.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "24d451f4ea5eec24e26ee113b62442310b13d4d1facfcf835ad3043ef91f40ee",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/shaman/stormsurge.webp",
-          "role": "Focused electric melee impact and violet-blue halo.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "60ee0f411a9648749abce95f18457b341532a143c3458f7cd2c8391c58ec07b1",
-          "usedAsGenerationInput": false
-        }
-      ],
-      "generationPrompt": "Use case: stylized-concept. Asset type: opaque borderless square game ability icon for the World of ClaudeCraft Shaman action bar. Style/medium: premium hand-painted classic dark-fantasy MMORPG ability art, tactile stone, bronze, leather, spirit light, and elemental brushwork; crisp focal edges, softer atmospheric periphery, never a flat vector or raw 3D render. Scene/backdrop: fully opaque deep storm-navy and charcoal painted vignette, no literal environment scene. Composition/framing: one dominant readable action or object, visually centered, complete and uncropped with safe padding, 78 to 86 percent fill, strong silhouette and simplified internal values that stay distinct at 48, 32, and 16 pixels and survive a circular crop. Lighting/mood: warm top-left material light against cool bottom-right shadow, controlled saturated elemental glow, ancient primal ritual mood. Constraints: fresh composition, no text, letters, numbers, pseudo-writing, watermark, signature, transparency, checkerboard, baked border, UI frame, rarity chrome, modern graphic design, collage, spellbook page, or tiny decorative clutter. Primary request: repaint Ancestral Strike (stormstrike). Canonical mechanic: an instant melee weapon strike for weapon damage plus bonus damage that advances Warspirit Cadence by two steps. Subject: one physical dark-steel shamanic war axe driving downward into a compact blue-white impact while one translucent ancestral echo of the same axe follows just behind it, creating two broad lightning crescents that converge on one point; unmistakably an active doubled melee strike, not a static weapon enchant. Approved sibling references visually inspected: galeheart_weapon for Shaman weapon material and storm motion; warspirit_cadence for dual-step weapon rhythm and coiling lightning; stormsurge for a focused electric melee impact and violet-blue halo.",
-      "sourceSha256": "a64299c31ccfea907d422009d272f457ee07f3969036985c54c882136ffb1068",
-      "sourceBytes": 2523954,
-      "acceptedSha256": "89daaddc5be6f509d431bc0868b3df2d3b45d0855dde12a28cbe3b37f807b9d8",
-      "acceptedBytes": 5666,
-      "supersedes": {
-        "sourceCommit": "d2d1a8ad5c1121f38c52ca2709d88b84adbe5c9e",
-        "owner": "Levy Street Account - callum@levystreet.com",
-        "license": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
-        "sourceManifest": "public/ui/skills/shaman/mapping.json",
-        "sourcePack": "skill100",
-        "sourceFile": "skill icon 65.png",
-        "output": "stormstrike.webp",
-        "sha256": "a0793840dd1438a1db5879c27728ffcfa55616b7ce4a05debc1c4d64fb131088",
-        "bytes": 6094,
-        "width": 128,
-        "height": 128,
-        "format": "webp",
-        "colorSpace": "srgb",
-        "channels": 3,
-        "hasAlpha": false
-      }
+      "sourcePack": "skill100",
+      "sourceFile": "skill icon 65.png",
+      "output": "stormstrike.webp"
     },
     {
       "abilityId": "galeheart_weapon",
@@ -921,7 +338,7 @@
     }
   ],
   "deferredStayProcedural": {},
-  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 and woc_openai_release_v039_icon_art_second_pass_2026_08_16 entries are project-generated and explicitly override it.",
+  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 entries are project-generated and explicitly override it.",
   "generatedArt": {
     "source": "OpenAI image generation through Codex",
     "generatedOn": "2026-07-25",

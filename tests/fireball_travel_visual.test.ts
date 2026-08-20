@@ -81,8 +81,11 @@ describe('Fireball travel visual', () => {
     expect(renderer).toContain("const fireballForm = requestedForm === 'fireball'");
     expect(renderer).toContain('v.fireballTravelVisual = syncFireballTravelVisual(');
     expect(renderer).toContain('v.fireballTravelVisual?.dispose()');
+    // The base rig's setActive lives in the shared fan-out core
+    // (entity_gate_stand_in_core.ts applyCharacterFormVisibility), fed the
+    // base-visual pending flag by the renderer.
     expect(renderer).toContain(
-      'v.visual.setActive(formVisibility.base && !v.visualCompilePending)',
+      'applyCharacterFormVisibility(v, formVisibility, v.visualCompilePending)',
     );
   });
 });

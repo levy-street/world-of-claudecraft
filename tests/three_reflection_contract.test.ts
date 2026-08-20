@@ -123,6 +123,26 @@ describe('three r185 program reflection contract', () => {
     ).toBe(true);
   });
 
+  it('turns the same gate off on every SECONDARY context, not just the world one', () => {
+    // The gated queries above are per RENDERER, not global: the world context
+    // being clean says nothing about the three other WebGLRenderers this client
+    // mints, which kept three's default true and paid the blocking round trip on
+    // every preview's first draw. Behaviour of the shared helper is covered in
+    // tests/shader_debug_flag.test.ts; this pins that each context still routes
+    // through it, beside the world-renderer pin it mirrors.
+    for (const [path, line] of [
+      ['../src/render/characters/preview.ts', 'this.renderer.debug.checkShaderErrors'],
+      ['../src/render/characters/portrait.ts', 'newRenderer.debug.checkShaderErrors'],
+      ['../src/render/armory_preview.ts', 'renderer.debug.checkShaderErrors'],
+    ] as const) {
+      const source = readFileSync(new URL(path, import.meta.url), 'utf8');
+      expect(
+        source.includes(`${line} = shaderDebugRequested();`),
+        `${path} no longer disables checkShaderErrors through shaderDebugRequested()`,
+      ).toBe(true);
+    }
+  });
+
   it('keeps the cache-key parameter order the analyzer names positions from', () => {
     // variantDiffParameter counts BACKWARDS from the end of the parameter block,
     // because the defines section before it is variable length. Both the order

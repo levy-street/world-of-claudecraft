@@ -492,3 +492,23 @@ export function buildImpactSite(seed: number): ImpactSiteView {
     },
   };
 }
+
+/**
+ * A boot-prewarm twin of the live impact site. The real site exists from boot
+ * but sits hundreds of yards outside the spawn frustum, so its custom scorch
+ * and ember programs would link on the first live draw that reaches it. The
+ * clone shares the real geometry and materials and is translated in front of
+ * the player, whose position it takes as a plain reading (the caller owns the
+ * vector). Visible on purpose: the boot pass draws it behind the loading
+ * screen. The prewarm slot hides it before world entry and before any resume.
+ */
+export function buildImpactSitePrewarmGroup(
+  source: THREE.Group,
+  at: { x: number; y: number; z: number },
+): THREE.Group {
+  const group = source.clone(true);
+  group.name = 'prewarm-mirefen-impact-site';
+  group.visible = true;
+  group.position.set(at.x - MIREFEN_IMPACT_SITE.x, at.y, at.z - 18 - MIREFEN_IMPACT_SITE.z);
+  return group;
+}

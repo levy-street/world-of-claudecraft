@@ -5,7 +5,10 @@ import { dungeonDaisHasRaisedPlatform } from '../src/render/dungeon';
 import { isBlocked } from '../src/sim/colliders';
 import { BUILTIN_WORLD, DUNGEONS, ITEMS, instanceOrigin, MOBS } from '../src/sim/data';
 import { NYTHRAXIS_LAYOUT } from '../src/sim/dungeon_layout';
-import { nythraxisGravebreakerOnMobSwing } from '../src/sim/encounters/nythraxis';
+import {
+  nythraxisGravebreakerOnMobSwing,
+  resetNythraxisEncounter,
+} from '../src/sim/encounters/nythraxis';
 import { isShieldItem } from '../src/sim/equipment_rules';
 import { expectedStatBudget, itemLevel, primaryStatSum } from '../src/sim/item_level';
 import { Sim } from '../src/sim/sim';
@@ -2541,9 +2544,21 @@ describe('Nythraxis raid encounter', () => {
 
   it('resets only on a full wipe (every player in the arena dead)', () => {
     const sim = makeWorld();
-    const tankPid = sim.addPlayer('warrior', 'Tank');
+    const tankPid = sim.addPlayer('warlock', 'Tank');
+    sim.setPlayerLevel(20, tankPid);
+    sim.setSpec('demonology', tankPid);
+    const remotePid = sim.addPlayer('warlock', 'Remote');
+    sim.setPlayerLevel(20, remotePid);
+    sim.setSpec('demonology', remotePid);
+    sim.partyInvite(remotePid, tankPid);
+    sim.partyAccept(remotePid);
     enterRaid(sim, tankPid);
     const tank = sim.entities.get(tankPid)!;
+    const remote = sim.entities.get(remotePid)!;
+    tank.cooldowns.set('army_of_the_dead', 91);
+    tank.cooldowns.set('metamorphosis', 151);
+    tank.cooldowns.set('reaping_command', 7);
+    remote.cooldowns.set('army_of_the_dead', 91);
     const boss = mob(sim, 'nythraxis_scourge_of_thornpeak');
     engage(boss, tank);
     sim.tick();
@@ -2556,6 +2571,29 @@ describe('Nythraxis raid encounter', () => {
     expect(boss.hp).toBe(boss.maxHp); // back to full
     expect(dist2d(boss.pos, boss.spawnPos)).toBeLessThan(1); // sent home
     expect(boss.inCombat).toBe(false);
+    expect(tank.cooldowns.has('army_of_the_dead')).toBe(false);
+    expect(tank.cooldowns.has('metamorphosis')).toBe(false);
+    expect(tank.cooldowns.get('reaping_command')).toBeGreaterThan(0);
+    expect(remote.cooldowns.get('army_of_the_dead')).toBeGreaterThan(0);
+  });
+
+  it('does not recover raid cooldowns during a non-wipe encounter reset', () => {
+    const sim = makeWorld();
+    const tankPid = sim.addPlayer('warlock', 'Tank');
+    sim.setPlayerLevel(20, tankPid);
+    sim.setSpec('demonology', tankPid);
+    enterRaid(sim, tankPid);
+    const tank = sim.entities.get(tankPid)!;
+    const boss = mob(sim, 'nythraxis_scourge_of_thornpeak');
+    tank.cooldowns.set('metamorphosis', 151);
+    engage(boss, tank);
+    sim.tick();
+    expect(boss.nythraxis?.attemptParticipantIds).toContain(tankPid);
+    const cooldownBeforeReset = tank.cooldowns.get('metamorphosis');
+
+    resetNythraxisEncounter(sim.ctx, boss);
+
+    expect(tank.cooldowns.get('metamorphosis')).toBe(cooldownBeforeReset);
   });
 
   it('seals the royal door while engaged and reopens it when Nythraxis dies', () => {

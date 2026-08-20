@@ -114,12 +114,12 @@ describe('character form visual selection', () => {
     const requested = requestedCharacterForm(maskFor([{ kind: 'form_lich' }]));
     let metamorph: typeof lich | null = null;
 
-    let ready = characterFormReadyMask(null, null, null, null, metamorph);
+    let ready = characterFormReadyMask(null, null, null, null, metamorph, null);
     let resolved = resolvedCharacterForm(requested, ready);
     expect(activeCharacterFormVisual(resolved, base, null, null, null, null, metamorph)).toBe(base);
 
     metamorph = lich;
-    ready = characterFormReadyMask(null, null, null, null, metamorph);
+    ready = characterFormReadyMask(null, null, null, null, metamorph, null);
     resolved = resolvedCharacterForm(requested, ready);
     expect(resolved).toBe('metamorph');
     expect(activeCharacterFormVisual(resolved, base, null, null, null, null, metamorph)).toBe(lich);
@@ -255,5 +255,50 @@ describe('character form visual selection', () => {
       expect(Object.values(step.visibility).filter(Boolean)).toHaveLength(1);
     }
     expect(metamorphAura).toEqual({ kind: 'form_metamorph' });
+  });
+});
+
+describe('character form readiness vs the compile gate (the stand-in invariant)', () => {
+  // A form rig is READY only once it can draw. Before this, the mask flipped
+  // ready the instant the rig OBJECT existed, so the resolved form left 'base',
+  // the base body went dark, and the still-linking form was hidden by its own
+  // gate: a polymorphed target with no silhouette at all for the gate window.
+  const sheep = { root: { id: 'sheep-root' } };
+  const bear = { root: { id: 'bear-root' } };
+  const requested = (kind: string) => requestedCharacterForm(maskFor([{ kind }]));
+
+  it('holds a built-but-pending form at base, so the body stands in', () => {
+    const ready = characterFormReadyMask(sheep, null, null, null, null, sheep.root);
+    expect(ready & CHARACTER_FORM_READY.sheep).toBe(0);
+    expect(resolvedCharacterForm(requested('polymorph'), ready)).toBe('base');
+    expect(characterFormVisibility('base').base).toBe(true);
+  });
+
+  it('swaps to the form once its gate settles', () => {
+    const ready = characterFormReadyMask(sheep, null, null, null, null, null);
+    expect(ready & CHARACTER_FORM_READY.sheep).toBe(CHARACTER_FORM_READY.sheep);
+    expect(resolvedCharacterForm(requested('polymorph'), ready)).toBe('sheep');
+  });
+
+  it('keys the pending token per root: another form linking never un-readies a settled one', () => {
+    const ready = characterFormReadyMask(sheep, bear, null, null, null, bear.root);
+    expect(ready & CHARACTER_FORM_READY.sheep).toBe(CHARACTER_FORM_READY.sheep);
+    expect(ready & CHARACTER_FORM_READY.bear).toBe(0);
+    expect(resolvedCharacterForm(requested('polymorph'), ready)).toBe('sheep');
+    expect(resolvedCharacterForm(requested('form_bear'), ready)).toBe('base');
+  });
+
+  it('leaves the ungated Metamorphosis rig ready (it is built without a gate)', () => {
+    const metamorph = { root: { id: 'metamorph-root' } };
+    const ready = characterFormReadyMask(null, null, null, null, metamorph, null);
+    expect(resolvedCharacterForm(requested('form_metamorph'), ready)).toBe('metamorph');
+    // ...and a sibling form's pending token cannot reach it either.
+    const withSibling = characterFormReadyMask(sheep, null, null, null, metamorph, sheep.root);
+    expect(resolvedCharacterForm(requested('form_metamorph'), withSibling)).toBe('metamorph');
+  });
+
+  it('reports an unbuilt form as not ready whatever the pending token is', () => {
+    expect(characterFormReadyMask(null, null, null, null, null, null)).toBe(0);
+    expect(characterFormReadyMask(null, null, null, null, null, sheep.root)).toBe(0);
   });
 });

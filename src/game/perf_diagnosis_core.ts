@@ -43,6 +43,36 @@ const SEVERITY_WEIGHT: Record<PerfSuggestionSeverity, number> = {
 
 const MATERIAL_VIEW_CREATE_HITCH_MS = 50;
 
+/** The hitch families the renderer could NOT name a resource for. They were one
+ *  bucket ('other') until the tracker learned to separate a collection and an
+ *  off-frame task out of it, and the split is a diagnostic refinement, not
+ *  three independent problems: one capture can trip all three off the same long
+ *  frames. */
+const UNATTRIBUTED_HITCH_FINDING_IDS: readonly string[] = [
+  'hitch-gc',
+  'hitch-off-frame',
+  'hitch-other',
+];
+
+/**
+ * The score deduction, with the unattributed hitch families sharing ONE cap.
+ *
+ * Every finding still appears in the report; only the arithmetic is grouped, so
+ * splitting the single bucket into three cannot cost a capture 105 points where
+ * the bucket cost it 35. The cap is the critical weight, which is exactly what
+ * the single bucket deducted at its worst.
+ */
+function scoreDeduction(findings: readonly PerfDiagnosisFinding[]): number {
+  let named = 0;
+  let unattributed = 0;
+  for (const finding of findings) {
+    const weight = SEVERITY_WEIGHT[finding.severity];
+    if (UNATTRIBUTED_HITCH_FINDING_IDS.includes(finding.id)) unattributed += weight;
+    else named += weight;
+  }
+  return named + Math.min(unattributed, SEVERITY_WEIGHT.critical);
+}
+
 const CATEGORY_SOURCE: Record<string, { files: string[]; fix: string; label: string }> = {
   foliage: {
     files: ['src/render/foliage.ts', 'src/render/render_budget.ts'],
@@ -434,34 +464,55 @@ export function diagnosePerfSnapshot(
 
   const hitches = snapshot.hitches;
   if (hitches && hitches.hitches > 0) {
+    // No prose here on purpose: localizePerfDiagnosis rewrites every finding's
+    // cause, immediateFixes and codeFixes from the per-family catalog rows in
+    // src/game/perf_diagnosis_i18n.ts, so an English sentence written at this
+    // site renders nowhere. Edit the catalog. What the localizer keeps from a
+    // finding is the machine-readable part: the id, the severity, the
+    // confidence and the source files.
     const hitchRules = [
       {
         key: 'shader-compile' as const,
         title: 'Shaders are compiling during gameplay',
-        fix: 'Add the exact late material or variant to the existing renderer prewarm manifest. Keep customProgramCacheKey stable and clone patched materials through material_clone_hooks.ts.',
         files: ['src/render/renderer.ts', 'src/render/material_clone_hooks.ts'],
       },
       {
         key: 'texture-upload' as const,
         title: 'Texture uploads are causing gameplay hitches',
-        fix: 'Move the asset into the deferred boot preload lane, compress large textures, and avoid first-use uploads inside a visible frame.',
         files: ['src/render/assets/preload.ts', 'src/render/assets/loader.ts'],
+      },
+      {
+        key: 'zone-build' as const,
+        title: 'Zone streaming builds are causing hitches',
+        files: ['src/render/renderer.ts', 'src/render/zone_streaming.ts'],
       },
       {
         key: 'view-create' as const,
         title: 'Entity view creation is causing hitches',
-        fix: 'Pool or prewarm the recurring visual, and spread unavoidable construction over the existing world-streaming budget.',
         files: ['src/render/renderer.ts', 'src/render/view_create_retry.ts'],
+      },
+      {
+        key: 'gc' as const,
+        title: 'Garbage collections are running inside long frames',
+        files: ['src/render/renderer.ts', 'src/render/characters/visual.ts'],
+      },
+      {
+        key: 'off-frame' as const,
+        title: 'Long frames come from work outside the render callback',
+        files: ['src/game/perf.ts', 'src/main.ts'],
       },
       {
         key: 'other' as const,
         title: 'Unattributed long frames remain',
-        fix: 'Rerun locally with ?perfTrace=1 and inspect devTrace.frames, spans, and longTasks for the nearest named scope.',
         files: ['src/game/perf.ts', 'src/main.ts'],
       },
     ];
     for (const rule of hitchRules) {
-      if (rule.key === 'other' && !slowFrames) continue;
+      // The renderer could not name a resource for these, so they only count
+      // while the recent window is actually slow (a collection coinciding
+      // with a long frame is a lead, not a named resource).
+      const unattributed = rule.key === 'other' || rule.key === 'off-frame' || rule.key === 'gc';
+      if (unattributed && !slowFrames) continue;
       const count = hitches.byCause[rule.key];
       if (count <= 0) continue;
       // A single lazily streamed view on a 33 ms sample is expected open-world
@@ -481,22 +532,17 @@ export function diagnosePerfSnapshot(
       addFinding(findings, {
         id: `hitch-${rule.key}`,
         severity: count >= 3 ? 'critical' : 'warning',
-        confidence: rule.key === 'other' ? 'medium' : 'high',
+        confidence: unattributed ? 'medium' : 'high',
         title: rule.title,
-        cause:
-          rule.key === 'other'
-            ? 'Some sampled frames exceeded the renderer hitch threshold without a matching program, texture, or view-count change.'
-            : 'The renderer recorded a frame over the hitch threshold at the same time this resource count changed.',
+        cause: '',
         evidence: [
           `${count} of ${hitches.hitches} recorded hitches were attributed to ${rule.key}.`,
           ...(rule.key === 'shader-compile'
             ? [`${hitches.programsAdded} shader programs were added after tracking began.`]
             : []),
         ],
-        immediateFixes: [
-          'Repeat the same movement path to confirm the hitch occurs at the same location or first-use action.',
-        ],
-        codeFixes: [rule.fix],
+        immediateFixes: [],
+        codeFixes: [],
         sourceFiles: rule.files,
       });
     }
@@ -614,10 +660,7 @@ export function diagnosePerfSnapshot(
       severityRank[a.severity] - severityRank[b.severity] ||
       (a.confidence === b.confidence ? 0 : a.confidence === 'high' ? -1 : 1),
   );
-  const score = Math.max(
-    0,
-    100 - findings.reduce((sum, finding) => sum + SEVERITY_WEIGHT[finding.severity], 0),
-  );
+  const score = Math.max(0, 100 - scoreDeduction(findings));
   const status = findings.some((finding) => finding.severity === 'critical')
     ? 'critical'
     : findings.some((finding) => finding.severity === 'warning')

@@ -8,6 +8,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { computeTalentModifiers } from '../src/sim/content/talents';
+import { ABILITIES } from '../src/sim/data';
 import { type AbilityDef, type AuraKind, type ItemDef, MELEE_RANGE } from '../src/sim/types';
 import {
   ABILITY_ICON_PREFIX,
@@ -108,6 +109,9 @@ interface WorldOpts {
   stealthed?: boolean;
   fateThreads?: number;
   auras?: ActionBarAuraInput[];
+  /** Druid form bars: the live pool kind, plus the mana parked behind it. */
+  resourceType?: 'mana' | 'rage' | 'energy' | 'focus';
+  savedMana?: number;
   paladinDevotion?: {
     value: number;
     ascensionCharges: number;
@@ -127,6 +131,8 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
       cooldowns: opts.cooldowns ?? new Map(),
       gcdRemaining: opts.gcdRemaining ?? 0,
       potionCdRemaining: opts.potionCdRemaining ?? 0,
+      resourceType: opts.resourceType ?? 'mana',
+      savedMana: opts.savedMana ?? 0,
       queuedOnSwing: opts.queuedOnSwing ?? null,
       pos: opts.playerPos ?? { x: 0, y: 0, z: 0 },
       abilityCharges: opts.abilityCharges,
@@ -1591,5 +1597,56 @@ describe('actionBarView: instance-parameterized + parity', () => {
     const simState = structuredClone(createActionBarView(desc, fakeDeps()).tick(simWorld));
     const clientState = structuredClone(createActionBarView(desc, fakeDeps()).tick(clientWorld));
     expect(clientState).toEqual(simState);
+  });
+});
+
+// A druid pressing a heal or a nuke from a shapeshift leaves the form and casts
+// it, billed against the PARKED mana pool rather than the rage or energy bar the
+// button sits over (src/sim/combat/form_auto_unshift.ts). The bar has to weigh
+// the same pool the cast gate weighs, or a slot paints dead while the press
+// behind it works.
+describe('actionBarView: an auto-unshifting cast is affordable against parked mana', () => {
+  const bear: ActionBarAuraInput[] = [{ kind: 'form_bear' as AuraKind }];
+  const wildmend = (): ActionBarAbility => ({ def: ABILITIES.healing_touch, cost: 110 });
+
+  function usableInBear(opts: { resource: number; savedMana: number }): boolean {
+    return createActionBarView(descriptor(slot(0, { ability: wildmend() })), fakeDeps()).tick(
+      world({ auras: bear, resourceType: 'rage', ...opts }),
+    ).slots[0].usable;
+  }
+
+  it('reads the parked pool, not the rage bar, for a spell that unshifts', () => {
+    // Empty rage bar, full parked pool: the cast goes through, so the slot lives.
+    expect(usableInBear({ resource: 0, savedMana: 500 })).toBe(true);
+    // Full rage bar, empty parked pool: rage cannot pay for a mana spell.
+    expect(usableInBear({ resource: 100, savedMana: 5 })).toBe(false);
+  });
+
+  it('leaves a form ability reading the live form bar', () => {
+    // Maul is bear-locked: it never unshifts, so it spends rage as it always did
+    // and the parked pool must not rescue it.
+    const maulSlot = () =>
+      createActionBarView(
+        descriptor(slot(0, { ability: { def: ABILITIES.maul, cost: 15 } })),
+        fakeDeps(),
+      );
+    expect(
+      maulSlot().tick(world({ auras: bear, resourceType: 'rage', resource: 30, savedMana: 0 }))
+        .slots[0].usable,
+    ).toBe(true);
+    expect(
+      maulSlot().tick(world({ auras: bear, resourceType: 'rage', resource: 5, savedMana: 500 }))
+        .slots[0].usable,
+    ).toBe(false);
+  });
+
+  it('ignores the parked pool entirely once out of form', () => {
+    // The unshifted caster is the common path: a stale savedMana on the mirror
+    // must never pay for a spell the live mana bar cannot afford.
+    expect(
+      createActionBarView(descriptor(slot(0, { ability: wildmend() })), fakeDeps()).tick(
+        world({ auras: [], resourceType: 'mana', resource: 5, savedMana: 500 }),
+      ).slots[0].usable,
+    ).toBe(false);
   });
 });

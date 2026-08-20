@@ -18,6 +18,33 @@ export interface InstancedGhostHandle {
   baseOpacity: number;
 }
 
+/** The material a source mesh's ghosts clone from (foliage buckets and the
+ *  maze walls never use a material array, but three's type allows one). */
+export function ghostSourceMaterial(source: THREE.InstancedMesh): THREE.Material {
+  return (Array.isArray(source.material) ? source.material[0] : source.material) as THREE.Material;
+}
+
+/**
+ * The ghost material recipe, in ONE place so a prewarm twin can be built from
+ * the same call and land on the same program.
+ *
+ * The bare `clone()` is deliberate and load-bearing: it DROPS `onBeforeCompile`
+ * and `customProgramCacheKey` (see material_clone_hooks.ts), so the ghost is a
+ * hookless material whose key differs from the source bucket's by more than the
+ * `transparent` flip. That is why nothing that prewarms the source program
+ * covers the ghost, and why a twin must come through this same function rather
+ * than reproduce the recipe: reproducing it is how the twin and the live ghost
+ * drifted onto two programs in the first place.
+ */
+export function createInstancedGhostMaterial(src: THREE.Material): THREE.Material {
+  const mat = src.clone();
+  mat.transparent = true;
+  mat.depthWrite = false;
+  const color = (mat as THREE.Material & { color?: THREE.Color }).color;
+  if (color) mat.userData.ghostBaseColor = color.clone();
+  return mat;
+}
+
 export class InstancedOccluderGhosts {
   private pools = new Map<THREE.InstancedMesh, InstancedGhostHandle[]>();
   private tint = new THREE.Color();
@@ -57,14 +84,8 @@ export class InstancedOccluderGhosts {
   }
 
   private create(source: THREE.InstancedMesh): InstancedGhostHandle {
-    const src = (
-      Array.isArray(source.material) ? source.material[0] : source.material
-    ) as THREE.Material;
-    const mat = src.clone();
-    mat.transparent = true;
-    mat.depthWrite = false;
-    const color = (mat as THREE.Material & { color?: THREE.Color }).color;
-    if (color) mat.userData.ghostBaseColor = color.clone();
+    const src = ghostSourceMaterial(source);
+    const mat = createInstancedGhostMaterial(src);
     const mesh = new THREE.Mesh(source.geometry, mat);
     mesh.matrixAutoUpdate = false;
     mesh.castShadow = false;

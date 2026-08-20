@@ -245,6 +245,40 @@ arrived). The guard test pins the r185 form. Any future three upgrade must again
 re-verify upstream `compileAsync` behavior and deliberately retain, replace, or remove
 the patch and its installed-source guard test.
 
+The same patch file carries one hunk outside `compileAsync`, in `WebGLPrograms`, pinned
+by the same guard test: released program retention. Upstream destroys a shader program
+the moment its last material releases it, so a material disposed and re-minted under the
+same cache key (a streamed prop cell unloading and reloading, one player of a class
+leaving and another arriving) links the same program again, cold, on the main thread; a
+production capture showed most of the worst live link stalls carrying a byte-identical
+cache key to a program that had existed. Released programs now stay linked in a bounded
+FIFO (a count, `RETAINED_PROGRAM_LIMIT`, never a timer) and `acquireProgram` hands one
+back as if it had never left; `renderer.info.retainedPrograms` exposes the list for
+monitoring next to `info.programs` (which keeps counting them: they are live GL programs).
+Known limits, by construction: a `ShaderMaterial` / `RawShaderMaterial` whose last instance
+was disposed cannot hit the retention (three's shader cache drops the stage at zero use and
+the re-minted stage's id leads the cache key), so custom-shader content only occupies a slot
+until eviction, while every built-in material type (the class bodies and props the capture
+named) hits; the bound is a fixed count inside the patched bundle, up to 64 linked programs
+held that upstream freed promptly; and every readout of `info.programs.length` (the `?perf`
+program count, the prewarm unit "links" delta, the bench scripts' "programs +N per wave") now
+counts parked programs too, so it no longer falls when content unloads and a unit that
+re-acquires a parked program reports zero links (the link-exact cross-check is the capture
+kit's `linkProgram` intercept).
+
+The same file carries one more hunk outside `compileAsync`, in
+`WebGLRenderer.projectObject`, pinned by the same guard test: an `InstancedMesh` whose
+`count` is 0 is not pushed into the render list. There is nothing to draw, but upstream
+still reaches `renderBufferDirect`, which calls `setProgram` (acquiring and, when cold,
+linking the material's program) before `renderInstances` returns on `primcount === 0`.
+The props far bakes spend near mode at count 0 (shadow-only casters, restored to count 1
+by their `onBeforeShadow` hook) and paid 2.3 s of cold color-pass program links for zero
+pixels in the first seconds after the loading curtain on an Intel iGPU. The shadow pass
+is unaffected by design: `WebGLShadowMap` traverses the scene itself rather than the
+render list, and `onBeforeShadow` has restored count 1 by the time it draws. Known limit,
+by construction: a count 0 `InstancedMesh` no longer receives `onBeforeRender` or
+`onAfterRender` from the color pass.
+
 ## Freeze rule
 
 After engineering signoff, `scripts/perf_hitch.mjs`, its files under `scripts/lib/`,

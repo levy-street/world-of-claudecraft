@@ -1,11 +1,22 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
+  gpuPrepEventsSnapshot,
+  resetGpuPrepEventsForTest,
+  setGpuPrepClockForTest,
+} from '../src/render/gpu_prep_events';
+import {
+  ADAPTIVE_PREWARM_LINK_CONFIG,
   awaitSubmissionBudget,
   createLinkRateBudget,
   createPrewarmPacing,
   type LinkRateBudgetClock,
   parseSubmissionPacingKnobs,
 } from '../src/render/link_rate_budget';
+import {
+  PREWARM_SUBMIT_LANE_MAX_MS,
+  PREWARM_SUBMIT_NO_USEFUL_LINK_MS,
+  PREWARM_SUBMIT_ZERO_DELTA_STREAK_LIMIT,
+} from '../src/render/prewarm_submit_stop_core';
 
 function virtualClock(): LinkRateBudgetClock & {
   sleep: (ms: number) => Promise<void>;
@@ -24,6 +35,16 @@ function virtualClock(): LinkRateBudgetClock & {
     sleeps,
   };
 }
+
+beforeEach(() => {
+  resetGpuPrepEventsForTest();
+  setGpuPrepClockForTest(() => 0);
+});
+
+afterEach(() => {
+  setGpuPrepClockForTest(null);
+  resetGpuPrepEventsForTest();
+});
 
 describe('link rate budget', () => {
   it('preserves release behavior when unlimited', async () => {
@@ -184,7 +205,132 @@ describe('submission pacing knobs', () => {
       hardMaxMs: 15_000,
       chargedLinks: 17,
       scope: 'compile-unit-sync-prologue',
+      // The hard stop runs on the static-rate arm too: nothing about a
+      // ?linkrate lane makes it safe to submit to the wall.
+      submitStop: {
+        submissions: 1,
+        usefulSettles: 0,
+        zeroDeltaSettles: 0,
+        zeroDeltaStreak: 0,
+        syncEnds: 1,
+        zeroDeltaSyncEnds: 0,
+        elapsedMs: 0,
+        sinceUsefulMs: 0,
+        stopped: false,
+        reason: null,
+      },
     });
+  });
+
+  it('stops the lane on its own wall clock and stamps the receipt with the reason', async () => {
+    const clock = virtualClock();
+    // The wall clock ships disarmed; arm it explicitly for this case.
+    const pacing = createPrewarmPacing('?perf&linkmode=adaptive', clock, {
+      laneMaxMs: PREWARM_SUBMIT_LANE_MAX_MS,
+    });
+    // 20 s of manifest before the lane's first unit: the lane owns none of it.
+    await clock.sleep(20_000);
+    pacing.markSubmitted('scene:0');
+    pacing.markSyncEnd('scene:0', 12);
+    await clock.sleep(PREWARM_SUBMIT_LANE_MAX_MS - 1);
+    expect(pacing.shouldStop().stop).toBe(false);
+    await clock.sleep(1);
+    expect(pacing.shouldStop()).toMatchObject({
+      stop: true,
+      reason: 'lane-max',
+      elapsedMs: PREWARM_SUBMIT_LANE_MAX_MS,
+      submissions: 1,
+    });
+    expect(pacing.receipt(16, 15_000).submitStop).toMatchObject({
+      stopped: true,
+      reason: 'lane-max',
+      elapsedMs: PREWARM_SUBMIT_LANE_MAX_MS,
+    });
+  });
+
+  it('feeds the stop from its own marks and records ONE submit-stop event', () => {
+    const clock = virtualClock();
+    const pacing = createPrewarmPacing('?perf&linkmode=adaptive', clock);
+    // The instant-settle runaway: every unit links nothing and comes straight
+    // back, so the lane stops on the zero-delta streak, not on the clock.
+    for (let index = 0; index < 40; index++) {
+      if (pacing.shouldStop().stop) break;
+      const id = `hidden:${index}`;
+      pacing.markSubmitted(id);
+      pacing.markSyncEnd(id, 0);
+      pacing.markSettled(id);
+    }
+    const verdict = pacing.shouldStop();
+    expect(verdict).toMatchObject({
+      stop: true,
+      reason: 'no-useful-link',
+      submissions: PREWARM_SUBMIT_ZERO_DELTA_STREAK_LIMIT,
+    });
+    const receipt = pacing.receipt(16, 15_000);
+    expect(receipt.submitStop).toMatchObject({
+      submissions: PREWARM_SUBMIT_ZERO_DELTA_STREAK_LIMIT,
+      usefulSettles: 0,
+      zeroDeltaSettles: PREWARM_SUBMIT_ZERO_DELTA_STREAK_LIMIT,
+      zeroDeltaSyncEnds: PREWARM_SUBMIT_ZERO_DELTA_STREAK_LIMIT,
+      stopped: true,
+      reason: 'no-useful-link',
+    });
+    // The AIMD blind spot the same run closes: instant settles that linked
+    // nothing bought no window at all.
+    expect(receipt.adaptive?.windowLinks).toBe(ADAPTIVE_PREWARM_LINK_CONFIG.initialWindowLinks);
+    // Exactly one event, however often the loop consults the verdict.
+    const events = gpuPrepEventsSnapshot();
+    expect(events.counts['submit-stop']).toBe(1);
+    expect(events.events[0]).toMatchObject({
+      kind: 'submit-stop',
+      key: 'no-useful-link',
+      ageMs: 0,
+      units: PREWARM_SUBMIT_ZERO_DELTA_STREAK_LIMIT,
+    });
+  });
+
+  it('never scores a settle whose sync prologue never reported a delta', async () => {
+    // The accounting hole: markSyncEnd never landed for that id (a duplicate
+    // id, a unit whose prologue threw), so the lane has no measurement for it.
+    // Scoring it as a zero-delta settle fed BOTH stop rules evidence nobody
+    // observed, and the lane latched dead on it.
+    const clock = virtualClock();
+    const pacing = createPrewarmPacing('?perf&linkmode=adaptive', clock);
+    for (let index = 0; index < 40; index++) {
+      const id = `unmeasured:${index}`;
+      pacing.markSubmitted(id);
+      pacing.markSettled(id);
+      expect(pacing.shouldStop().stop).toBe(false);
+    }
+    await clock.sleep(PREWARM_SUBMIT_NO_USEFUL_LINK_MS * 2);
+    expect(pacing.shouldStop().stop).toBe(false);
+    expect(pacing.receipt(16, 15_000).submitStop).toMatchObject({
+      usefulSettles: 0,
+      zeroDeltaSettles: 0,
+      zeroDeltaStreak: 0,
+      stopped: false,
+      reason: null,
+    });
+    expect(gpuPrepEventsSnapshot().counts['submit-stop']).toBe(0);
+  });
+
+  it('keeps a lane that links real programs running', () => {
+    const clock = virtualClock();
+    const pacing = createPrewarmPacing('?perf&linkmode=adaptive', clock);
+    for (let index = 0; index < 40; index++) {
+      const id = `scene:${index}`;
+      pacing.markSubmitted(id);
+      pacing.markSyncEnd(id, 6);
+      pacing.markSettled(id);
+      expect(pacing.shouldStop().stop).toBe(false);
+    }
+    expect(pacing.receipt(16, 15_000).submitStop).toMatchObject({
+      usefulSettles: 40,
+      zeroDeltaSettles: 0,
+      stopped: false,
+      reason: null,
+    });
+    expect(gpuPrepEventsSnapshot().counts['submit-stop']).toBe(0);
   });
 
   it('publishes adaptive configuration and lifecycle feedback without a fake rate', () => {

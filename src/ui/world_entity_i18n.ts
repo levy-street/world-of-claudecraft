@@ -48,6 +48,10 @@ const MOB_IDS = [
   'gravecaller_mender',
   'deacon_voss',
   'training_dummy',
+  // The rest of the Highwatch practice row (sim/content/practice_dummies.ts).
+  'friendly_player_dummy',
+  'normal_boss_dummy',
+  'heroic_boss_dummy',
   'ridge_stalker',
   'deeprock_kobold',
   'thornpeak_ogre',

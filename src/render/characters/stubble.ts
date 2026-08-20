@@ -468,25 +468,43 @@ export function decalTextureData(
   size = DECAL_TEX_SIZE,
 ): Uint8Array<ArrayBuffer> {
   const out = new Uint8Array(new ArrayBuffer(size * size * 4));
+  decalTextureRows(sel, out, 0, size, size);
+  return out;
+}
+
+/**
+ * Paint the rows [rowStart, rowEnd) of a decal map into `out`, a buffer laid
+ * out as `decalTextureData` allocates it. Bands painted separately concatenate
+ * to the byte-identical full map: every texel depends on its own coordinates
+ * only, so a look's map can be built a slice at a time (look_pieces.ts) as
+ * well as in one call.
+ */
+export function decalTextureRows(
+  sel: StubbleSelection,
+  out: Uint8Array,
+  rowStart: number,
+  rowEnd: number,
+  size = DECAL_TEX_SIZE,
+): void {
   // RGB is filled EVERYWHERE, alpha only where there is growth. three multiplies
   // the whole texel into the fragment, so a transparent texel left at black
   // bleeds through bilinear filtering and rings every dot with a dark halo, the
   // colour channel of an alpha map has to stay valid outside the shape.
   const BASE = 232;
-  for (let i = 0; i < size * size; i++) {
+  for (let i = rowStart * size; i < rowEnd * size; i++) {
     out[i * 4] = BASE;
     out[i * 4 + 1] = BASE;
     out[i * 4 + 2] = BASE;
   }
   const scalp = sel.scalp;
   const beard = sel.beard;
-  if (!scalp && !beard) return out;
+  if (!scalp && !beard) return;
   const beardAlpha = beard ? BEARD_SPECS[beard].alpha : 0;
   const beardFloor = beard ? BEARD_SPECS[beard].floor : 0;
   // The scalp reads a touch heavier than a jaw shadow at the same density.
   const scalpAlpha = scalp ? SCALP_SPECS[scalp].alpha : 0;
   const scalpFloor = scalp ? SCALP_SPECS[scalp].floor : 0;
-  for (let row = 0; row < size; row++) {
+  for (let row = rowStart; row < rowEnd; row++) {
     const v = (row + 0.5) / size - 0.5;
     for (let colIdx = 0; colIdx < size; colIdx++) {
       const u = (colIdx + 0.5) / size - 0.5;
@@ -527,17 +545,31 @@ export function decalTextureData(
       out[i + 3] = Math.min(255, Math.round(a * 255));
     }
   }
-  return out;
 }
 
 const textureCache = new Map<string, THREE.DataTexture>();
 
+/** Whether a selection's decal map is already resident (built and cached). */
+export function hasDecalTexture(sel: StubbleSelection): boolean {
+  return textureCache.has(decalKey(sel));
+}
+
 export function decalTexture(sel: StubbleSelection): THREE.DataTexture {
+  return textureCache.get(decalKey(sel)) ?? decalTextureFromData(sel, decalTextureData(sel));
+}
+
+/** Wrap already-painted bytes (a full `decalTextureData` map, whichever way
+ *  its rows were produced) as the selection's cached decal texture. A
+ *  selection that already has one keeps it: the first publish wins. */
+export function decalTextureFromData(
+  sel: StubbleSelection,
+  data: Uint8Array<ArrayBuffer>,
+): THREE.DataTexture {
   const key = decalKey(sel);
   const hit = textureCache.get(key);
   if (hit) return hit;
   const tex = new THREE.DataTexture(
-    decalTextureData(sel),
+    data,
     DECAL_TEX_SIZE,
     DECAL_TEX_SIZE,
     THREE.RGBAFormat,
@@ -899,23 +931,46 @@ export function buildRegionDecalGeometry(
 
 const geometryCache = new Map<string, THREE.BufferGeometry | null>();
 
+// SkeletonUtils clones share geometry with the parsed asset, so one head mesh
+// serves every composed variant and this key is stable per (head, styles).
+//
+// The STYLES have to be in it, not just which slots are filled: the trim is
+// sized to the footprint, and a buzz cut's hairline is 11 degrees lower than a
+// crew's. Keying on "has a scalp decal" hands buzz the geometry cut for crew
+// and slices the bottom off its hairline.
+function decalGeometryKey(head: THREE.BufferGeometry, sel: StubbleSelection): string {
+  return `${head.uuid}|${decalKey(sel)}`;
+}
+
 function decalGeometry(
   head: THREE.BufferGeometry,
   frame: HeadFrame,
   sel: StubbleSelection,
 ): THREE.BufferGeometry | null {
-  // SkeletonUtils clones share geometry with the parsed asset, so one head mesh
-  // serves every composed variant and this key is stable per (head, styles).
-  //
-  // The STYLES have to be in it, not just which slots are filled: the trim is
-  // sized to the footprint, and a buzz cut's hairline is 11 degrees lower than a
-  // crew's. Keying on "has a scalp decal" hands buzz the geometry cut for crew
-  // and slices the bottom off its hairline.
-  const key = `${head.uuid}|${decalKey(sel)}`;
+  const key = decalGeometryKey(head, sel);
   if (geometryCache.has(key)) return geometryCache.get(key) ?? null;
   const geo = buildDecalGeometry(head, frame, sel);
   geometryCache.set(key, geo);
   return geo;
+}
+
+/** Whether the decal cut for (head, styles) is already resident. A head with
+ *  no usable frame is resident as `null` once ensured, so a caller never waits
+ *  on a cut that can never exist. */
+export function hasDecalGeometry(head: THREE.BufferGeometry, sel: StubbleSelection): boolean {
+  return geometryCache.has(decalGeometryKey(head, sel));
+}
+
+/** Build (and cache) the decal cut `buildStubbleDecal` will read for this
+ *  head and selection, without building the mesh. */
+export function ensureDecalGeometry(head: THREE.SkinnedMesh, sel: StubbleSelection): void {
+  if (!sel.scalp && !sel.beard) return;
+  const frame = cachedFrame(head.geometry);
+  if (!frame) {
+    geometryCache.set(decalGeometryKey(head.geometry, sel), null);
+    return;
+  }
+  decalGeometry(head.geometry, frame, sel);
 }
 
 const frameCache = new WeakMap<THREE.BufferGeometry, HeadFrame>();

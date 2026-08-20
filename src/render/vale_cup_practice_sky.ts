@@ -36,6 +36,14 @@ const VARIANTS: SkyVariant[] = [
 
 const SKY_RADIUS = 520; // just inside the overworld dome (560); camera-centred
 
+/** The one-texel white stand-in the sphere wears until the panorama decodes. */
+function placeholderSky(): THREE.DataTexture {
+  const texture = new THREE.DataTexture(new Uint8Array([255, 255, 255, 255]), 1, 1);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.needsUpdate = true;
+  return texture;
+}
+
 export class ValeCupPracticeSky {
   readonly mesh: THREE.Mesh;
   private readonly material: THREE.MeshBasicMaterial;
@@ -48,6 +56,13 @@ export class ValeCupPracticeSky {
       depthWrite: false,
       fog: false, // the pitch fog must not wash out the deep-space backdrop
       color: 0xffffff,
+      // A one-texel white stand-in, so the slot is POPULATED from the start.
+      // Map presence is a program-cache-key input and this mesh is visible
+      // mid-bout, so a null-to-texture swap when the panorama decoded linked a
+      // new program inside a live practice frame. Swapping one texture for
+      // another in a populated slot changes no key. White multiplies the
+      // variant tint to exactly the colour the empty slot used to show.
+      map: placeholderSky(),
     });
     this.mesh = new THREE.Mesh(new THREE.SphereGeometry(SKY_RADIUS, 40, 24), this.material);
     this.mesh.renderOrder = -10; // behind everything, like the overworld dome
@@ -66,13 +81,16 @@ export class ValeCupPracticeSky {
     if (!this.requested) {
       // Lazy load (only once a player actually practices) through the shared
       // manifest-aware loader (content-hashed URL + the texture load queue);
-      // the sphere shows the deep-space colour until the panorama decodes,
-      // then pops in.
+      // the sphere shows the deep-space colour (the white stand-in under the
+      // variant tint) until the panorama decodes, then pops in.
       this.requested = true;
       loadTexture('/env/space_galaxy.jpg', { srgb: true })
         .then((t) => {
+          const placeholder = this.material.map;
           this.material.map = t;
-          this.material.needsUpdate = true;
+          // No needsUpdate: the slot was already populated, so the program is
+          // unchanged and three re-binds the new texture on its own.
+          if (placeholder !== t) placeholder?.dispose();
         })
         .catch(() => undefined);
     }

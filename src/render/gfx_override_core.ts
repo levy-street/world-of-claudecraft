@@ -6,6 +6,7 @@ export const GFX_OVERRIDE_VALUE_KINDS = {
   msaaSamples: 'number',
   bloom: 'boolean',
   smaa: 'boolean',
+  fxaa: 'boolean',
   dynamicShadows: 'boolean',
   terrainCastShadows: 'boolean',
   shadowMap: 'number',

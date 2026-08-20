@@ -1,5 +1,5 @@
 diff --git a/build/three.module.js b/build/three.module.js
-index ad13abf7d128bee607a7672646ca543327e258d3..d217ed88d8e46845010536a5baf7209d034fb4ae 100644
+index ad13abf7d128bee607a7672646ca543327e258d3..207a0071e346263aaf28113a1316d5f9e6e3a1f7 100644
 --- a/build/three.module.js
 +++ b/build/three.module.js
 @@ -438,7 +438,7 @@ var morphtarget_pars_vertex = "#ifdef USE_MORPHTARGETS\n\t#ifndef USE_INSTANCING
@@ -11,7 +11,93 @@ index ad13abf7d128bee607a7672646ca543327e258d3..d217ed88d8e46845010536a5baf7209d
  
  var normal_fragment_maps = "#ifdef USE_NORMALMAP_OBJECTSPACE\n\tnormal = texture2D( normalMap, vNormalMapUv ).xyz * 2.0 - 1.0;\n\t#ifdef FLIP_SIDED\n\t\tnormal = - normal;\n\t#endif\n\t#ifdef DOUBLE_SIDED\n\t\tnormal = normal * faceDirection;\n\t#endif\n\tnormal = normalize( normalMatrix * normal );\n#elif defined( USE_NORMALMAP_TANGENTSPACE )\n\tvec3 mapN = texture2D( normalMap, vNormalMapUv ).xyz * 2.0 - 1.0;\n\t#if defined( USE_PACKED_NORMALMAP )\n\t\tmapN = vec3( mapN.xy, sqrt( saturate( 1.0 - dot( mapN.xy, mapN.xy ) ) ) );\n\t#endif\n\tmapN.xy *= normalScale;\n\tnormal = normalize( tbn * mapN );\n#elif defined( USE_BUMPMAP )\n\tnormal = perturbNormalArb( - vViewPosition, normal, dHdxy_fwd(), faceDirection );\n#endif";
  
-@@ -17487,21 +17487,81 @@ class WebGLRenderer {
+@@ -7990,12 +7990,30 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
+ 
+ 	}
+ 
++	// World of ClaudeCraft: released program retention. Upstream destroys a
++	// program the moment its last material lets go, so a material disposed and
++	// re-minted under the same cache key (a streamed prop cell unloading and
++	// reloading, one player of a class leaving and another arriving) links the
++	// same program again, cold, on the main thread. Released programs are kept
++	// LINKED in a bounded FIFO instead, and acquireProgram hands one back as if
++	// it had never left; the oldest is destroyed once the bound is reached. The
++	// bound is a count (a memory bound), never a timer.
++	const RETAINED_PROGRAM_LIMIT = 64;
++	const retainedPrograms = [];
++
+ 	function acquireProgram( parameters, cacheKey ) {
+ 
+ 		let program = programsMap.get( cacheKey );
+ 
+ 		if ( program !== undefined ) {
+ 
++			if ( program.usedTimes === 0 ) {
++
++				const r = retainedPrograms.indexOf( program );
++				if ( r !== - 1 ) retainedPrograms.splice( r, 1 );
++
++			}
++
+ 			++ program.usedTimes;
+ 
+ 		} else {
+@@ -8011,20 +8029,28 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
+ 
+ 	}
+ 
++	function destroyProgram( program ) {
++
++		// Remove from unordered set
++		const i = programs.indexOf( program );
++		programs[ i ] = programs[ programs.length - 1 ];
++		programs.pop();
++
++		// Remove from map
++		programsMap.delete( program.cacheKey );
++
++		// Free WebGL resources
++		program.destroy();
++
++	}
++
+ 	function releaseProgram( program ) {
+ 
+ 		if ( -- program.usedTimes === 0 ) {
+ 
+-			// Remove from unordered set
+-			const i = programs.indexOf( program );
+-			programs[ i ] = programs[ programs.length - 1 ];
+-			programs.pop();
+-
+-			// Remove from map
+-			programsMap.delete( program.cacheKey );
++			retainedPrograms.push( program );
+ 
+-			// Free WebGL resources
+-			program.destroy();
++			if ( retainedPrograms.length > RETAINED_PROGRAM_LIMIT ) destroyProgram( retainedPrograms.shift() );
+ 
+ 		}
+ 
+@@ -8051,6 +8077,8 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
+ 		releaseShaderCache: releaseShaderCache,
+ 		// Exposed for resource monitoring & error feedback via renderer.info:
+ 		programs: programs,
++		// Exposed for resource monitoring (World of ClaudeCraft retention):
++		retainedPrograms: retainedPrograms,
+ 		dispose: dispose
+ 	};
+ 
+@@ -16462,6 +16490,7 @@ class WebGLRenderer {
+ 			indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, info );
+ 
+ 			info.programs = programCache.programs;
++			info.retainedPrograms = programCache.retainedPrograms;
+ 
+ 			/**
+ 			 * Holds details about the capabilities of the current rendering context.
+@@ -17487,21 +17516,81 @@ class WebGLRenderer {
  
  			return new Promise( ( resolve ) => {
  
@@ -52,9 +138,9 @@ index ad13abf7d128bee607a7672646ca543327e258d3..d217ed88d8e46845010536a5baf7209d
 +					// isReady()'s own positive cache), so a budgeted pass spends its
 +					// 2 ms on DISTINCT pending programs instead of repeat queries.
 +					const notReadyThisPass = new Set();
-+
-+					for ( let i = 0; i < pending.length; i ++ ) {
  
++					for ( let i = 0; i < pending.length; i ++ ) {
++
 +						const material = pending[ ( pollCursor + i ) % pending.length ];
  						const materialProperties = properties.get( material );
  						const program = materialProperties.currentProgram;
@@ -97,20 +183,19 @@ index ad13abf7d128bee607a7672646ca543327e258d3..d217ed88d8e46845010536a5baf7209d
  
  					// once the list of compiling materials is empty, call the callback
  
-@@ -17512,9 +17572,19 @@ class WebGLRenderer {
+@@ -17512,9 +17601,19 @@ class WebGLRenderer {
  
  					}
  
 -					// if some materials are still not ready, wait a bit and check again
--
--					setTimeout( checkMaterialsReady, 10 );
 +					// if some materials are still not ready, wait a bit and check again.
 +					// The reset keys on CHEAP QUERIES ONLY, deliberately not on progress:
 +					// with ~30 ms queries a poller that finds one ready material per pass
 +					// would reset to 10 ms every time and still own ~75 percent of the
 +					// main thread while draining. Expensive queries back off whether or
 +					// not they progressed; readiness latency is bounded by the cap.
-+
+ 
+-					setTimeout( checkMaterialsReady, 10 );
 +					const passMs = performance.now() - passStart;
 +					pollIntervalMs =
 +						passMs < POLL_PASS_BUDGET_MS
@@ -120,3 +205,16 @@ index ad13abf7d128bee607a7672646ca543327e258d3..d217ed88d8e46845010536a5baf7209d
  
  				}
  
+@@ -17876,7 +17975,11 @@ class WebGLRenderer {
+ 
+ 				} else if ( object.isMesh || object.isLine || object.isPoints ) {
+ 
+-					if ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {
++					// World of ClaudeCraft: a count 0 InstancedMesh draws nothing, yet the render
++					// list still reaches setProgram, which LINKS its program for zero pixels.
++					const drawsNothing = object.isInstancedMesh === true && object.count === 0;
++
++					if ( drawsNothing === false && ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) ) {
+ 
+ 						const geometry = objects.update( object );
+ 						const material = object.material;

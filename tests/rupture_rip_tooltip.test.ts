@@ -16,7 +16,7 @@
 import { describe, expect, it } from 'vitest';
 import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
 import { emptyModifiers } from '../src/sim/content/talents';
-import { abilityEffectText } from '../src/ui/hud';
+import { abilityEffectText } from '../src/ui/ability_description';
 
 const NO_SCALING = { spellPower: 0, rangedPower: 0, attackPower: 0 };
 

@@ -29,7 +29,7 @@ export function buildDelveModule(
   moduleId: DelveModuleId,
   ox: number,
   oz: number,
-): Promise<void> {
+) {
   const mod = DELVE_MODULES[moduleId];
   const interior = mod?.interior ?? 'crypt';
   // Pass the module's own layout so visible geometry matches the collision set
@@ -41,13 +41,13 @@ export function buildDelveModule(
   const variant = DELVE_MODULE_VARIANT[moduleId] ?? 'delve_ossuary';
   // Static Blackwater hazard pools (The Drowned Litany) are authored on the module
   // def; the renderer draws a visible pool at each so the sim's damage zone reads.
-  // The built group is only tracked for rift interiors; delves discard it.
-  return dungeons
-    .buildInterior(interior, ox, oz, {
-      layout,
-      variant,
-      hazards: mod?.hazards,
-      moduleId,
-    })
-    .then(() => undefined);
+  // The built group IS returned (the renderer tracks it per z-stacked position: a
+  // slot's position is reused run to run with a DIFFERENT randomized module, so a
+  // stale group there must be retirable, not just discarded).
+  return dungeons.buildInterior(interior, ox, oz, {
+    layout,
+    variant,
+    hazards: mod?.hazards,
+    moduleId,
+  });
 }

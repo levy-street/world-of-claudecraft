@@ -11,12 +11,13 @@ import {
   stableHutKey,
   throwFirebottleAtNearestHut,
 } from '../src/sim/interactions/firebottle_hut';
+import { questGateBlocksAggro } from '../src/sim/mob/quest_gated_aggro';
 import { isQuestGatedEntityHidden } from '../src/sim/quest_gated_entity';
 import { regrantMissingQuestItems } from '../src/sim/quests/quest_commands';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
-import type { Entity, QuestProgress } from '../src/sim/types';
+import { dist2d, type Entity, type QuestProgress } from '../src/sim/types';
 
 // Mirefen duplicate-objective rework: each duplicate quest keeps its id (no DB
 // breakage) but gets a distinct objective so two quests are no longer literal
@@ -117,6 +118,40 @@ describe('Mirefen quest de-duplication', () => {
     it('blocks a wild mob (non-pet) from harming a gated egg', () => {
       const wildMob = { kind: 'mob', id: 50, ownerId: null } as unknown as Entity;
       expect(questGateBlocksDamage(players('active'), wildMob, egg)).toBe(true);
+    });
+  });
+
+  describe('quest-gated egg aggro (questGateBlocksAggro)', () => {
+    const egg = { kind: 'mob', templateId: 'spider_egg' } as unknown as Entity;
+    const widow = { kind: 'mob', templateId: 'mire_widow' } as unknown as Entity;
+    const player = { kind: 'player', id: 1 } as unknown as Entity;
+    const pet = { kind: 'mob', id: 9, ownerId: 1 } as unknown as Entity;
+    const players = (state?: QuestProgress['state']): Map<number, PlayerMeta> => {
+      const log = new Map<string, QuestProgress>();
+      if (state) log.set('q_broodmother', { questId: 'q_broodmother', counts: [0, 0], state });
+      return new Map([[1, { entityId: 1, questLog: log } as unknown as PlayerMeta]]);
+    };
+
+    it('blocks an egg from aggroing a player with no Broodmother quest', () => {
+      expect(questGateBlocksAggro(players(), egg, player)).toBe(true);
+    });
+    it('allows an egg to aggro a player with the quest active or ready', () => {
+      expect(questGateBlocksAggro(players('active'), egg, player)).toBe(false);
+      expect(questGateBlocksAggro(players('ready'), egg, player)).toBe(false);
+    });
+    it('blocks an egg from aggroing a player who has already turned the quest in', () => {
+      expect(questGateBlocksAggro(players('done'), egg, player)).toBe(true);
+    });
+    it('resolves a pet target through its owner', () => {
+      expect(questGateBlocksAggro(players(), egg, pet)).toBe(true);
+      expect(questGateBlocksAggro(players('active'), egg, pet)).toBe(false);
+    });
+    it('never gates an ordinary mob', () => {
+      expect(questGateBlocksAggro(players(), widow, player)).toBe(false);
+    });
+    it('blocks a wild mob (non-pet) from being resolved as a valid puller', () => {
+      const wildMob = { kind: 'mob', id: 50, ownerId: null } as unknown as Entity;
+      expect(questGateBlocksAggro(players('active'), egg, wildMob)).toBe(true);
     });
   });
 
@@ -427,5 +462,142 @@ describe('firebottle lifecycle: giver re-grant and removal on finish (q_deepfen_
     sim.useItem('firebottle');
     expect(sim.questLog.get(HUT_QUEST)?.counts[0]).toBe(0);
     expect(sim.player.firebottleCdRemaining).toBe(0);
+  });
+});
+
+// Regression for the reported bug: a Broodmother egg (spider_egg, requiresQuestId
+// q_broodmother) is inert scenery for a non-quester (isQuestGatedEntityHidden /
+// questGateBlocksDamage above), but before questGateBlocksAggro the mob AI's idle
+// detection scan (mob/locomotion.ts) still pulled a nearby non-quester into combat:
+// the egg's aggroRadius: 0 only stops it from HUNTING, the scan's own effective-radius
+// floor still detects anyone within a few yards. That left a non-quester attacked and
+// held in combat by an egg they could never legally damage back.
+describe('Broodmother egg aggro gate over a live tick loop (issue: eggs attack non-questers)', () => {
+  const makeSim = () =>
+    new Sim({ seed: 4242, playerClass: 'warrior', playerName: 'Fenn', autoEquip: false });
+  const findLiveEgg = (sim: Sim): Entity => {
+    const egg = [...sim.entities.values()].find(
+      (e) => e.kind === 'mob' && e.templateId === 'spider_egg' && !e.dead,
+    );
+    if (!egg) throw new Error('no live spider_egg in the world');
+    return egg;
+  };
+  // Widow Thicket also hosts real, un-gated hostile mobs (Mirefen Widows, the
+  // Broodmother boss) beside the egg clutch; clearing everything but the target egg
+  // out of the local camp isolates the egg's OWN aggro behavior under test, so this
+  // stays a test of questGateBlocksAggro rather than of the whole zone's difficulty.
+  const standBesideIsolatedEgg = (sim: Sim, egg: Entity) => {
+    const pos = sim.groundPos(egg.pos.x + 1, egg.pos.z);
+    sim.player.pos = { ...pos };
+    sim.player.prevPos = { ...pos };
+    for (const [id, e] of sim.entities) {
+      if (e.kind === 'mob' && e.id !== egg.id && e.ownerId === null && dist2d(e.pos, egg.pos) < 60)
+        sim.entities.delete(id);
+    }
+    sim.grid.refresh(sim.entities.values());
+  };
+
+  it('never aggroes or attacks a player standing beside it without the quest active', () => {
+    const sim = makeSim();
+    const egg = findLiveEgg(sim);
+    standBesideIsolatedEgg(sim, egg);
+    // 5s of ticks: comfortably past the one-tick grid-rebucket lag noted in
+    // mob/locomotion.ts, so the egg's idle scan has every chance to (wrongly) detect.
+    for (let i = 0; i < 20 * 5; i++) sim.tick();
+    expect(egg.aiState).toBe('idle');
+    expect(egg.inCombat).toBe(false);
+    expect(sim.player.inCombat).toBe(false);
+  });
+
+  it('still aggroes normally once the player is on The Broodmother', () => {
+    const sim = makeSim();
+    const egg = findLiveEgg(sim);
+    sim.questLog.set('q_broodmother', {
+      questId: 'q_broodmother',
+      counts: [0, 0],
+      state: 'active',
+    });
+    standBesideIsolatedEgg(sim, egg);
+    for (let i = 0; i < 20 * 5; i++) sim.tick();
+    expect(egg.aiState).toBe('attack'); // stationary (moveSpeed 0): chases straight to attack
+    expect(egg.inCombat).toBe(true);
+    expect(egg.aggroTargetId).toBe(sim.playerId);
+  });
+
+  it('gates only the egg: a real, un-gated Mirefen Widow beside it still aggroes normally', () => {
+    // Proves the fix is selective (questGateBlocksAggro), not a blanket "nothing near
+    // the player aggroes" regression: the egg and a genuine hostile share the same
+    // local camp, and only the egg stays inert.
+    const sim = makeSim();
+    const egg = findLiveEgg(sim);
+    const pos = sim.groundPos(egg.pos.x + 1, egg.pos.z);
+    sim.player.pos = { ...pos };
+    sim.player.prevPos = { ...pos };
+    let widow: Entity | undefined;
+    for (const [id, e] of sim.entities) {
+      if (e.kind === 'mob' && e.id !== egg.id && e.ownerId === null) {
+        if (e.templateId === 'mire_widow' && !widow && dist2d(e.pos, egg.pos) < 60) {
+          widow = e;
+          widow.pos = { x: egg.pos.x - 1, z: egg.pos.z, y: egg.pos.y };
+          widow.prevPos = { ...widow.pos };
+          continue;
+        }
+        if (dist2d(e.pos, egg.pos) < 60) sim.entities.delete(id);
+      }
+    }
+    if (!widow) throw new Error('no mire_widow found near a spider_egg camp');
+    sim.grid.refresh(sim.entities.values());
+    for (let i = 0; i < 20 * 5; i++) sim.tick();
+    expect(egg.aiState).toBe('idle');
+    expect(egg.aggroTargetId).toBeNull();
+    expect(widow.aggroTargetId).toBe(sim.playerId);
+  });
+});
+
+// A non-quester's own action (a single-target taunt, an area taunt swept over the
+// clutch, or a hunter/warlock pet's auto-growl) all funnel through the ONE shared
+// Sim.applyTaunt entry (src/sim/sim_context.ts: "applyTaunt"). Before this fix that
+// entry seeded threat/forcedTargetId and set both sides inCombat BEFORE ever reaching
+// the (now-gated) aggroMob call, so an area taunt that merely swept over a hidden egg
+// still forced it into combat with a non-quester who could never fight back.
+describe('Broodmother egg taunt gate (issue: area/pet taunt bypassing the aggro gate)', () => {
+  const makeSim = () =>
+    new Sim({ seed: 4242, playerClass: 'warrior', playerName: 'Fenn', autoEquip: false });
+  const findLiveEgg = (sim: Sim): Entity => {
+    const egg = [...sim.entities.values()].find(
+      (e) => e.kind === 'mob' && e.templateId === 'spider_egg' && !e.dead,
+    );
+    if (!egg) throw new Error('no live spider_egg in the world');
+    return egg;
+  };
+
+  it('a non-quester taunting a gated egg seeds no threat and forces no target', () => {
+    const sim = makeSim();
+    const egg = findLiveEgg(sim);
+    (sim as unknown as { applyTaunt: (p: Entity, mob: Entity) => void }).applyTaunt(
+      sim.player,
+      egg,
+    );
+    expect(egg.threat.size).toBe(0);
+    expect(egg.forcedTargetId).toBeNull();
+    expect(egg.aiState).toBe('idle');
+    expect(sim.player.inCombat).toBe(false);
+  });
+
+  it('still taunts normally once the player is on The Broodmother', () => {
+    const sim = makeSim();
+    const egg = findLiveEgg(sim);
+    sim.questLog.set('q_broodmother', {
+      questId: 'q_broodmother',
+      counts: [0, 0],
+      state: 'active',
+    });
+    (sim as unknown as { applyTaunt: (p: Entity, mob: Entity) => void }).applyTaunt(
+      sim.player,
+      egg,
+    );
+    expect(egg.threat.get(sim.playerId)).toBeGreaterThan(0);
+    expect(egg.forcedTargetId).toBe(sim.playerId);
+    expect(sim.player.inCombat).toBe(true);
   });
 });

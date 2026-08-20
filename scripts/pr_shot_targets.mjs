@@ -335,6 +335,50 @@ async function pinReliquaryTrackerPages(page) {
   return picks;
 }
 
+// Standard-mapping button indices the cross-hotbar shots press (mirrors GP in
+// src/game/gamepad_map.ts; duplicated as literals because this script cannot import
+// from src/).
+const GP_Y = 3;
+const GP_LB = 4;
+const GP_LT = 6;
+const GP_RT = 7;
+
+// Install a fake standard-mapping pad before the document loads. The cross hotbar
+// only appears while one is connected, and headless Chrome exposes no Gamepad API,
+// so without this every cross-hotbar shot is just the keyboard HUD. `window.__fakePad`
+// is the handle the capture drives: the manager re-reads getGamepads every frame, so
+// writing `pressed` is enough to hold a trigger. String form because this script runs
+// under tsx (keepNames breaks nested functions inside evaluate callbacks).
+const fakePadSeed = async (page) => {
+  await page.evaluateOnNewDocument(
+    `window.__fakePad = { pressed: [] };
+     var fakeGetGamepads = function () {
+       var down = window.__fakePad.pressed;
+       var buttons = [];
+       for (var i = 0; i < 17; i++) {
+         var on = down.indexOf(i) >= 0;
+         buttons.push({ pressed: on, touched: on, value: on ? 1 : 0 });
+       }
+       return [{
+         index: 0,
+         id: 'Xbox Wireless Controller (STANDARD GAMEPAD Vendor: 045e Product: 02fd)',
+         connected: true,
+         mapping: 'standard',
+         buttons: buttons,
+         axes: [0, 0, 0, 0],
+         timestamp: performance.now(),
+       }];
+     };
+     // getGamepads lives on Navigator.prototype and is not writable through a
+     // plain assignment on the instance, so define it on both.
+     try { Object.defineProperty(Navigator.prototype, 'getGamepads', { value: fakeGetGamepads, configurable: true, writable: true }); } catch (e) {}
+     try { Object.defineProperty(navigator, 'getGamepads', { value: fakeGetGamepads, configurable: true, writable: true }); } catch (e) {}
+     // Headless pages can report themselves unfocused, and the pad manager takes
+     // no input from an unfocused window. Say focused so the poll runs.
+     try { Object.defineProperty(document, 'hasFocus', { value: function () { return true; }, configurable: true, writable: true }); } catch (e) {}`,
+  );
+};
+
 export const TARGETS = [
   {
     key: 'ravenrift',
@@ -9281,6 +9325,113 @@ export const TARGETS = [
     },
   },
   {
+    // Auto-unshift (src/sim/combat/form_auto_unshift.ts). The change is a
+    // behavior, so the evidence is a MOMENT, not a window: the same press, one
+    // second in. Before the change the druid is still wearing the beast and the
+    // refusal is on screen; after it, the beast is gone and the heal is casting.
+    // Both variants press through sim.castAbility rather than a bar slot,
+    // because the bear bar is a separate page a player has to populate and the
+    // shot must not depend on that.
+    key: 'druid-auto-unshift',
+    label: 'Wildmend pressed while shapeshifted: the form falls away and the cast runs',
+    when: ['sim/combat/form_auto_unshift', 'ui/hud/action_bar/action_bar_view.ts'],
+    variants: [
+      {
+        key: 'bruin-form-desktop',
+        charClass: 'druid',
+        charName: 'Thornmane',
+        formAbility: 'bear_form',
+        beforeLoad: lowGraphicsSeed,
+      },
+      {
+        key: 'fleet-form-desktop',
+        charClass: 'druid',
+        charName: 'Thornmane',
+        formAbility: 'travel_form',
+        beforeLoad: lowGraphicsSeed,
+      },
+      {
+        key: 'bruin-form-mobile',
+        charClass: 'druid',
+        charName: 'Thornmane',
+        formAbility: 'bear_form',
+        mobile: true,
+        beforeLoad: lowGraphicsSeed,
+      },
+    ],
+    async capture(page, variant) {
+      await page.waitForFunction(
+        () => {
+          const loading = document.querySelector('#loading-screen');
+          const ui = document.querySelector('#ui');
+          return (
+            document.body.classList.contains('game-active') &&
+            !!ui &&
+            getComputedStyle(ui).display !== 'none' &&
+            !!loading &&
+            !loading.classList.contains('visible')
+          );
+        },
+        { timeout: 90000, polling: 200 },
+      );
+      // Stage: high enough to know every rank of the kit, full mana, self-targeted
+      // so the friendly heal has somewhere to land, then shift through the REAL
+      // cast so the form aura, the parked mana, and the beast model are all live.
+      const staged = await page.evaluate((formAbility) => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const sim = window.__game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        sim.setPlayerLevel?.(20, player.id);
+        player.resource = player.maxResource;
+        sim.targetEntity?.(player.id, player.id);
+        sim.castAbility?.(formAbility, player.id);
+        return { ok: true };
+      }, variant.formAbility);
+      if (!staged.ok) throw new Error(staged.reason);
+      // Wait for the shift to resolve AND its global cooldown to lapse. Polled,
+      // not slept: the offline sim advances on animation frames, so the seconds
+      // just after game-active run at whatever rate the loading tail leaves, and
+      // a press inside the GCD returns silently (classic spams that button), which
+      // would shoot a frame where nothing happened at all.
+      await page.waitForFunction(
+        () => {
+          const player = window.__game?.sim?.player;
+          return (
+            !!player &&
+            player.auras.some((a) => a.kind.startsWith('form_')) &&
+            player.gcdRemaining <= 0 &&
+            player.castingAbility === null
+          );
+        },
+        { timeout: 30000, polling: 100 },
+      );
+      // The press, with an explicit pid (an omitted one is a silent no-op here,
+      // which shoots a frame where nothing happened at all). Read the event
+      // buffer's LENGTH around the call rather than draining it: draining would
+      // eat the very refusal the before-arm frame is supposed to show, and both
+      // arms must run this same recipe.
+      const pressed = await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        const before = sim.events?.length ?? 0;
+        sim.castAbility?.('healing_touch', player.id);
+        return {
+          ok: (sim.events?.length ?? 0) > before || player.castingAbility !== null,
+          reason: 'the press reached no gate: no cast started and the sim said nothing',
+        };
+      });
+      if (!pressed.ok) throw new Error(pressed.reason);
+      // One second in: long enough for the refusal to be painted on the old
+      // behavior, and short enough that the 2.5s heal is still visibly casting
+      // on the new one.
+      await wait(1000);
+      return { clip: '#ui' };
+    },
+  },
+  {
     key: 'swing-timer',
     label: 'Swing-timer bar sweep for a Wolf Form druid on a slow staff',
     when: ['src/ui/swing_timer', 'src/sim/combat/form_swing'],
@@ -9410,6 +9561,157 @@ export const TARGETS = [
           },
         });
       }
+      return {};
+    },
+  },
+  {
+    key: 'cross-hotbar',
+    label: 'Cross hotbar: resting, a held trigger, the expanded set, arrange mode',
+    when: [
+      'game/cross_hotbar',
+      'game/pad_focus_action',
+      'game/gamepad.ts',
+      'game/gamepad_map.ts',
+      'ui/hud/cross_hotbar/',
+    ],
+    // The bar only exists while a pad is connected, and headless Chrome has no
+    // Gamepad API surface at all, so every variant except `no-pad` installs a
+    // fake pad before the document loads. `no-pad` is the honest BEFORE frame:
+    // it is what a keyboard player still sees, in the same run.
+    variants: [
+      { key: 'no-pad' },
+      { key: 'resting', beforeLoad: fakePadSeed, pad: [] },
+      { key: 'left-trigger', beforeLoad: fakePadSeed, pad: [GP_LT] },
+      { key: 'expanded', beforeLoad: fakePadSeed, expand: true },
+      { key: 'arranging', beforeLoad: fakePadSeed, pad: [], arrange: true },
+    ],
+    async capture(page, variant) {
+      for (let i = 0; i < 12; i++) {
+        await page.evaluate(() => {
+          document.querySelector('.camera-prompt-confirm')?.click();
+          document.querySelector('.tut-skip')?.click();
+          document.querySelector('.gpu-notice-dismiss')?.click();
+        });
+        await wait(500);
+      }
+      if (!variant?.beforeLoad) return {};
+      // Arrange mode is a CHORD, so it has to be pressed and released like one
+      // rather than set as a steady state; the poll runs on the render loop, so
+      // each step needs frames either side of it.
+      // The expanded set is reached by HOLDING one trigger and TAPPING the other,
+      // not by pressing both: pressed in the same poll they tie and resolve to the
+      // left half, which is why setting both at once photographed the plain bar.
+      if (variant.expand) {
+        await page.evaluate(`window.__fakePad.pressed = [${GP_LT}]`);
+        await wait(300);
+        await page.evaluate(`window.__fakePad.pressed = [${GP_LT}, ${GP_RT}]`);
+        await wait(300);
+        await page.evaluate(`window.__fakePad.pressed = [${GP_LT}]`);
+        await wait(500);
+      } else if (variant.arrange) {
+        await page.evaluate(`window.__fakePad.pressed = [${GP_LB}]`);
+        await wait(200);
+        await page.evaluate(`window.__fakePad.pressed = [${GP_LB}, ${GP_Y}]`);
+        await wait(200);
+        await page.evaluate('window.__fakePad.pressed = []');
+        await wait(400);
+      } else {
+        await page.evaluate(`window.__fakePad.pressed = ${JSON.stringify(variant.pad ?? [])}`);
+        await wait(600);
+      }
+      // A fake pad that never reached the manager produces a frame identical to
+      // the no-pad one, which reads as "no change" rather than as a broken rig.
+      const seen = await page.evaluate(() => {
+        const el = document.querySelector('#cross-hotbar');
+        return {
+          pads: navigator.getGamepads?.().filter(Boolean).length ?? 0,
+          focused: document.hasFocus(),
+          padMode: document.body.classList.contains('xhb-mode'),
+          barShown: !!el && getComputedStyle(el).display !== 'none',
+        };
+      });
+      if (!seen.barShown) {
+        console.log(`SHOT cross-hotbar: bar not shown (${JSON.stringify(seen)})`);
+      }
+      return {};
+    },
+  },
+  {
+    key: 'practice-row',
+    label: 'The Highwatch practice row seen from the approach',
+    when: ['practice_dummies'],
+    // Deliberately branch-agnostic: the camera is staged from FIXED world
+    // coordinates and the target frame locks onto whichever dummy stands
+    // furthest west (the heroic end of the row; engine east is minus x), so the
+    // same recipe runs unchanged on the base commit (one training dummy) and on
+    // the branch (four). That is what makes the before and after frames
+    // comparable instead of two differently-composed shots.
+    variants: [
+      { key: 'desktop', charClass: 'priest', charName: 'Wardmara', beforeLoad: lowGraphicsSeed },
+      {
+        key: 'mobile',
+        charClass: 'priest',
+        charName: 'Wardmara',
+        mobile: true,
+        beforeLoad: lowGraphicsSeed,
+      },
+    ],
+    async capture(page) {
+      await page.waitForFunction(
+        () => {
+          const loading = document.querySelector('#loading-screen');
+          const ui = document.querySelector('#ui');
+          return (
+            document.body.classList.contains('game-active') &&
+            !!ui &&
+            getComputedStyle(ui).display !== 'none' &&
+            !!loading &&
+            !loading.classList.contains('visible')
+          );
+        },
+        { timeout: 90000, polling: 200 },
+      );
+      const staged = await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        sim.setPlayerLevel?.(20, player.id);
+        // The anchor is the shipped training dummy, which exists on both sides
+        // of this comparison; its ground height is what the viewpoint stands on.
+        const anchor = [...sim.entities.values()].find(
+          (e) => e.templateId === 'training_dummy' && !e.dead && e.name !== 'Healing Dummy',
+        );
+        if (!anchor) return { ok: false, reason: 'the training dummy is unavailable' };
+        // Ten yards south of the row, looking north up the hill, so all of it is
+        // in frame with room for the nameplates.
+        player.pos.x = anchor.pos.x + 1;
+        player.pos.y = anchor.pos.y;
+        player.pos.z = anchor.pos.z - 10;
+        player.prevPos = { ...player.pos };
+        player.facing = 0;
+        player.prevFacing = 0;
+        sim.rebucket?.(player);
+        const westmost = [...sim.entities.values()]
+          .filter((e) => e.kind === 'mob' && !e.dead && e.name.toLowerCase().includes('dummy'))
+          .sort((a, b) => b.pos.x - a.pos.x)[0];
+        if (westmost) sim.targetEntity(westmost.id, player.id);
+        return { ok: true, targetName: westmost?.name ?? '', dummies: westmost ? 1 : 0 };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      // Moving across zones can start the streaming overlay on the next frame.
+      await wait(1500);
+      await page.waitForFunction(
+        () => !document.querySelector('#loading-screen')?.classList.contains('visible'),
+        { timeout: 90000, polling: 200 },
+      );
+      // The dummy body is lazy-preloaded (manifest.ts mob_training_dummy): the
+      // fetch only starts once one is in view, so a short settle races it and
+      // the mobile frame shot an empty hillside. This settle is sized for that
+      // round trip under SwiftShader, not for the HUD.
+      await wait(15000);
       return {};
     },
   },

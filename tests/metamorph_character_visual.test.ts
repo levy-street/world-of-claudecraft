@@ -134,10 +134,15 @@ describe('Metamorphosis character integration', () => {
     expect(source).toContain('v.metamorphVisual?.setFar(v.isFar && active === v.metamorphVisual);');
     expect(source).toContain("createCharacterVisual(metamorphEntity, 'form_metamorph')");
     expect(source).toContain('for (const visual of playerPrewarmInstances) visual.dispose();');
-    expect(source).toContain('v.metamorphVisual?.setActive(');
-    expect(source).toContain(
-      'formVisibility.metamorph && v.formCompilePending !== v.metamorphVisual.root',
+    // The per-rig setActive fan-out lives in entity_gate_stand_in_core.ts
+    // (applyCharacterFormVisibility), where a pending form's token keeps the
+    // body drawing; the renderer feeds it the resolved visibility.
+    expect(source).toContain('applyCharacterFormVisibility(v, formVisibility,');
+    const core = readFileSync(
+      new URL('../src/render/entity_gate_stand_in_core.ts', import.meta.url),
+      'utf8',
     );
+    expect(core).toContain('rigs.metamorphVisual?.setActive(visibility.metamorph);');
     expect(source).toContain('characterFormShadowPlan(');
     expect(source).toContain(
       'v.metamorphVisual?.setProxyShadow(shadowPlan.formProxy && active === v.metamorphVisual)',
@@ -151,7 +156,6 @@ describe('Metamorphosis character integration', () => {
     vi.resetModules();
     vi.doMock('../src/render/assets/loader', () => ({
       loadGltf: vi.fn(() => Promise.resolve(stubMetamorphRig())),
-      loadHdr: vi.fn(() => new Promise(() => undefined)),
       loadTexture: vi.fn(() => Promise.resolve(new THREE.Texture())),
       // assets.ts resolves skin atlases through the KTX2 path since the
       // fleet conversion; the mock must provide it (review 3050).

@@ -155,7 +155,7 @@ describe('suite duration budget (declared-timeout ratchet)', () => {
     expect(declaredTimeouts(`it('h', { timeout: IMPORTED_MS }, fn);`).unparsed).toHaveLength(1);
     expect(declaredTimeouts(`it('i', () => { run(); }, importedBudget);`).unparsed).toHaveLength(1);
     // The mask keeps template interpolations bracket-balanced.
-    expect(maskCommentsAndStrings('`a ${b(1)} c`').includes('b(1)')).toBe(true);
+    expect(maskCommentsAndStrings(`\`a \${b(1)} c\``).includes('b(1)')).toBe(true);
   });
 
   it('caps every single declared test timeout at the worker-chain bound', () => {

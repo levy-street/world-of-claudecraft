@@ -61,15 +61,37 @@ describe('Evil Eye overhead markers', () => {
         1,
       ),
     ).toEqual({ stacks: 3, remaining: 4, duration: 12 });
+    const threads: Aura = {
+      ...eye('affliction_eye'),
+      kind: 'affliction_fate_threads',
+      stacks: 2,
+      remaining: 4,
+      duration: 12,
+    };
+    expect(
+      fateThreadMarkerState({ dead: false, auras: [{ ...threads, sourceId: 2 }] }, 1),
+    ).toBeNull();
+    expect(
+      fateThreadMarkerState({ dead: false, auras: [{ ...threads, kind: 'affliction_doom' }] }, 1),
+    ).toBeNull();
+    expect(fateThreadMarkerState({ dead: true, auras: [threads] }, 1)).toBeNull();
+    expect(
+      fateThreadMarkerState({ dead: false, auras: [{ ...threads, remaining: 0 }] }, 1),
+    ).toBeNull();
+    expect(
+      fateThreadMarkerState(
+        { dead: false, auras: [{ ...threads, stacks: undefined, value: 1 }] },
+        1,
+      ),
+    ).toEqual({ stacks: 1, remaining: 4, duration: 12 });
   });
 
   it('wraps the primary victim in one visible tether per Fate Thread', () => {
     vi.spyOn(performance, 'now').mockReturnValue(1000);
-    const target = {
-      id: 9,
+    const player = {
+      id: 1,
       dead: false,
       auras: [
-        eye('affliction_eye'),
         {
           ...eye('affliction_eye'),
           id: 'fate_threads',
@@ -81,11 +103,19 @@ describe('Evil Eye overhead markers', () => {
           duration: 12,
         },
       ],
+    } as Entity;
+    const target = {
+      id: 9,
+      dead: false,
+      auras: [eye('affliction_eye')],
       scale: 2,
     } as Entity;
     const world = {
       playerId: 1,
-      entities: new Map([[target.id, target]]),
+      entities: new Map([
+        [player.id, player],
+        [target.id, target],
+      ]),
     } as unknown as IWorld;
     const group = new THREE.Group();
     const markers = new EvilEyeMarkers();
@@ -101,7 +131,7 @@ describe('Evil Eye overhead markers', () => {
     expect(first.scale.x).toBeCloseTo(0.5, 4);
     expect((first.material as THREE.LineBasicMaterial).opacity).toBeGreaterThan(0.3);
 
-    target.auras = [eye('affliction_eye')];
+    player.auras = [];
     markers.update(world, new Map([[target.id, { group, height: 3 }]]));
     expect(first.visible).toBe(false);
     expect(second.visible).toBe(false);

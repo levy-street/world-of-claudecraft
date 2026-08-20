@@ -2,6 +2,22 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const sv_SE: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formsAutoUnshift': 'En läkning eller en skadetrollformel som kastas i skepnad tar dig ur den åt dig. Att lämna en skepnad på det sättet är gratis och förbrukar inte den globala nedkylningen, så en omedelbar trollformel går av i samma stund du trycker. Att skifta tillbaka är en vanlig förmåga och kostar fortfarande mana och din globala nedkylning.',
+  'entities.mobs.heroic_boss_dummy.name': 'Heroisk bossdocka',
+  'entities.mobs.normal_boss_dummy.name': 'Normal bossdocka',
+  'entities.mobs.friendly_player_dummy.name': 'Vänlig spelardocka',
+  'entities.items.dawnhold_posy.name': 'Bukett från Dawnholds trädgård',
+  'entities.dungeons.dawnhold_castle.leaveText': 'Du kliver ut igen på trädgårdens solbelysta gräsmatta.',
+  'entities.dungeons.dawnhold_castle.enterText': 'Du kliver in i de varma, blomsterdoftande salarna i Dawnholds slott.',
+  'entities.dungeons.dawnhold_castle.name': 'Dawnholds slott',
+  'hudChrome.lastkeepMap.story.tower': 'Vakttornet',
+  'hudChrome.lastkeepMap.story.residence': 'Bostadsvåningen',
+  'hudChrome.lastkeepMap.story.state': 'Paradvåningen',
+  'hudChrome.lastkeepMap.story.undercroft': 'Källarvalven',
+  'hudChrome.lastkeepMap.title': '{keep}: {story}',
+  'hudChrome.dawnholdMap.story.solar': 'Solkammaren',
+  'hudChrome.dawnholdMap.story.ground': 'Trädgårdsvåningen',
+  'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.social.chanBattleground': 'Slagfält.',
   'guide.social.chanBattlegroundBody': 'Prata med alla stridande i ditt slagfält, båda sidorna. Bara medan en match pågår.',
   'hud.chat.templates.battleground': '[Slagfält] {name}: {message}',
@@ -4207,7 +4223,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Rustningsbräsch',
   'entities.abilities.faerie_fire.name': 'Häxljus',
   'entities.abilities.fear.description':
-    'Slår skräck i fienden och får den att huka sig i upp till 8 sek. All skada bryter effekten.',
+    'Slår skräck i fienden och får den att huka sig i upp till 5 sek. Skada som sammanlagt motsvarar 8% av målets maximala hälsa bryter effekten.',
   'entities.abilities.fear.name': 'Plåga',
   'entities.abilities.ferocious_bite.name': 'Blodsbett',
   'entities.abilities.fire_blast.description': 'Spränger fienden för {damage} eldskada. Omedelbar.',
@@ -4483,9 +4499,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.name': 'Månugglaform',
   'entities.abilities.moonkin_form.description':
     'Anta månugglaform och stärk besvärjelser tills du skiftar tillbaka. Kasta igen för att återgå till normal form. (Balanssignatur)',
-  'entities.abilities.feral_charge.name': 'Vild rusning',
+  'entities.abilities.feral_charge.name': 'Urvåg',
   'entities.abilities.feral_charge.description':
-    'Rusa mot en fiende och rota den i 1 sek. 8-25 m räckvidd. (Vildhetssignatur)',
+    'Släpp lös en urvåg. I Vargform ökar er energiregenerering med 100% i 10 sek. I Bruinform får ni omedelbart 50 raseri. (Vildhetssignatur)',
   'entities.abilities.swiftmend.name': 'Snabb läkning',
   'entities.abilities.crusader_strike.name': 'Korsfararslag',
   'entities.abilities.crusader_strike.description':
@@ -8587,6 +8603,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'sim.delve.unknownTier': 'Okänd fördjupningsnivå.',
   'sim.delve.wayOutNotOpen': 'Vägen ut är inte öppen ännu.',
   'sim.delve.whileTrading': 'Du kan inte gå in i en fördjupning medan du handlar.',
+  'sim.delve.enemiesRemain': 'Besegra de återstående fienderna först.',
   'sim.lockpick.alreadyInProgress': 'Någon arbetar redan med låset.',
   'sim.lockpick.cannotPickThat': 'Du kan inte dyrka upp det.',
   'sim.lockpick.chooseAnte': 'Välj 1, 2 eller 3 dyrkar.',
@@ -10889,7 +10906,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deterrence.description':
     'Ökar din chans att undvika med 50 procentenheter i 10 sek. (jägartalang)',
   'entities.abilities.earthbind.description': 'Rotar fiender inom 4 m från målpunkten i 2 sek och saktar sedan ner dem med 40% i 6 sek. (Shamantalang)',
-  'entities.abilities.evocation.description': 'Restaura mana rápidamente. (magikertalang)',
+  'entities.abilities.evocation.description':
+    'Kanalisera i 6 sek.: varje sekund återställer ni 100 mana och bygger upp 8 besvärjelsekraft. Bonusen staplas under kanaliseringen och varar i 15 sek. (magikertalang)',
   'entities.abilities.frenzied_regeneration.description':
     'Återställer 40% av din maximala hälsa under 10 sek. Endast i Björngestalt. (druidtalang)',
   'entities.abilities.frost_trap.description':
@@ -10898,9 +10916,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Återställer 120 hälsa hos ett allierat mål under 12 sek. (schamantalang)',
   'entities.abilities.howl_of_terror.description':
-    'Skrämmer fiender i närheten i upp till 3 sek. Skada kan bryta effekten. (häxmästartalang)',
+    'Skrämmer fiender i närheten i upp till 5 sek. Skada som sammanlagt motsvarar 8% av målets maximala hälsa bryter deras rädsla. (häxmästartalang)',
   'entities.abilities.ice_block.description':
-    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sek. (magikertalang)',
+    'Innesluter er i fast is i 8 sek. och gör er immuna mot all skada. Tar bort befintliga vanliga skadliga effekter och förhindrar att nya vanliga kontrolleffekter tillämpas. Kan användas medan ni är bedövade eller förvandlade. Ni kan inte agera medan ni är inneslutna. Kasta igen för att avbryta. (magiker)',
   'entities.abilities.inner_focus.description': 'Gör er nästa prästbesvärjelse gratis och omöjlig att avbryta. Varar 60 sek.',
   'entities.abilities.innervate.description':
     'Levande sav väller upp i dig i 10 sek. och återställer 20 av din aktuella resurs i vågor: mana, raseri eller energi. Formbyte avbryter den inte. Sömn, bedövning eller stasis stoppar saven. (druidtalang)',
@@ -10916,7 +10934,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.preparation.description':
     'Avslutar nedkylningen för Spurt, Undvikande och Försvinnande. (skurktalang)',
   'entities.abilities.presence_of_mind.description':
-    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sek. (magikertalang)',
+    'Gör er nästa besvärjelse med kasttid omedelbar. Varar i 60 sek. (magikertalang)',
   'entities.abilities.psychic_scream.description': 'Skrämmer fiender inom 8 m i upp till 4 sek. Skada kan bryta effekten.',
   'entities.abilities.shadowstep.description': 'Kliver genom skuggorna mot ditt mål. (skurktalang)',
   'entities.abilities.silence.description': 'Tystar målet i 4 sek. (prästtalang)',
@@ -12729,7 +12747,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Genomborrar fienden för {damage} skuggskada och genererar 5 Fördömelse om den bär ditt Evil Eye. Varje träff på ditt primära Evil Eye lägger till en Ödestråd i 12 sek, upp till 3. Om inget Evil Eye finns märker Needle först sitt mål.',
   'entities.abilities.needle_of_fate.name': 'Needle of Fate',
   'entities.abilities.ossuary_mark.description':
-    'Märker en fiende i 12 sek, vilket lagrar 20% av skadan du och dina odöda vållar. Kasta igen för att detonera märket. Om det märkta målet dör exploderar det inom 6 meter och skapar 1 Själfragment.',
+    'Märker en fiende i 15 sek, vilket lagrar 20% av skadan du och dina odöda vållar. Kasta igen för att detonera märket. Om det märkta målet dör exploderar det inom 6 yards och skapar 1 Själfragment.',
   'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
   'entities.abilities.possess_evil_eye.description':
     'Maledictorn tar över ditt primära Evil Eye i 15 sek och genererar 35 Fördömelse. Needle of Fate kastas på 1 sek och genererar 2 extra Fördömelse, Förtär kan kanaliseras i rörelse, och Sentence gör 25% mer skada och släpper ett fördröjt eko för 60% skada, avtagande till 30% mellan nivåerna 17 och 20.',

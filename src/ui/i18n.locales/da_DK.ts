@@ -2,6 +2,22 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const da_DK: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formsAutoUnshift': 'Et heal eller en skadetrylleformular kastet i skikkelse trækker dig selv ud af den. At forlade en skikkelse på den måde er gratis og bruger ikke den globale nedkøling, så en øjeblikkelig trylleformular affyres i samme sekund, du trykker. At skifte tilbage er en almindelig evne og koster stadig mana og din globale nedkøling.',
+  'entities.mobs.heroic_boss_dummy.name': 'Heroisk bossdukke',
+  'entities.mobs.normal_boss_dummy.name': 'Normal bossdukke',
+  'entities.mobs.friendly_player_dummy.name': 'Venlig spillerdukke',
+  'entities.items.dawnhold_posy.name': 'Buket fra Dawnholds have',
+  'entities.dungeons.dawnhold_castle.leaveText': 'Du smutter ud igen på havens solbeskinnede græsplæne.',
+  'entities.dungeons.dawnhold_castle.enterText': 'Du træder ind i Dawnhold Slots varme, blomsterduftende sale.',
+  'entities.dungeons.dawnhold_castle.name': 'Dawnhold Slot',
+  'hudChrome.lastkeepMap.story.tower': 'Vagttårnet',
+  'hudChrome.lastkeepMap.story.residence': 'Boligetagen',
+  'hudChrome.lastkeepMap.story.state': 'Repræsentationsetagen',
+  'hudChrome.lastkeepMap.story.undercroft': 'Kælderhvælvingen',
+  'hudChrome.lastkeepMap.title': '{keep}: {story}',
+  'hudChrome.dawnholdMap.story.solar': 'Solgemakket',
+  'hudChrome.dawnholdMap.story.ground': 'Haveetagen',
+  'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.social.chanBattleground': 'Slagmark.',
   'guide.social.chanBattlegroundBody': 'Tal med alle stridende i din slagmark, begge sider. Kun mens en kamp er i gang.',
   'hud.chat.templates.battleground': '[Slagmark] {name}: {message}',
@@ -4212,7 +4228,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.expose_armor.name': 'Rustningsbrud',
   'entities.abilities.faerie_fire.name': 'Hekselys',
   'entities.abilities.fear.description':
-    'Slår rædsel i fjenden, så den kryber sammen i op til 8 sek. Enhver skade bryder effekten.',
+    'Slår rædsel i fjenden, så den kryber sammen i op til 5 sek. Skade svarende til 8% af målets maksimale helbred bryder effekten.',
   'entities.abilities.fear.name': 'Hjemsøg',
   'entities.abilities.ferocious_bite.name': 'Blodbid',
   'entities.abilities.fire_blast.description':
@@ -4489,9 +4505,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.name': 'Månekinform',
   'entities.abilities.moonkin_form.description':
     'Antag månekinform, som styrker besværgelser, indtil du skifter tilbage. Kast igen for at vende tilbage til normal form. (Balancesignatur)',
-  'entities.abilities.feral_charge.name': 'Vild ladning',
+  'entities.abilities.feral_charge.name': 'Urkraftsbølge',
   'entities.abilities.feral_charge.description':
-    'Storm mod en fjende og rodfæst den i 1 sek. 8-25 m rækkevidde. (Vildskabssignatur)',
+    'Udløs en urkraftsbølge. I Ulveform øges jeres energiregenerering med 100% i 10 sek. I Bruin-form får I øjeblikkeligt 50 raseri. (Vildskabssignatur)',
   'entities.abilities.swiftmend.name': 'Hurtig heling',
   'entities.abilities.crusader_strike.name': 'Korsfarerslag',
   'entities.abilities.crusader_strike.description':
@@ -8633,6 +8649,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'sim.delve.unknownTier': 'Ukendt delve-niveau.',
   'sim.delve.wayOutNotOpen': 'Vejen ud er endnu ikke åben.',
   'sim.delve.whileTrading': 'Du kan ikke gå ind i et delve, mens du handler.',
+  'sim.delve.enemiesRemain': 'Besejr først de resterende fjender.',
   'sim.lockpick.alreadyInProgress': 'Nogen arbejder allerede på låsen.',
   'sim.lockpick.cannotPickThat': 'Du kan ikke dirke den op.',
   'sim.lockpick.chooseAnte': 'Vælg 1, 2 eller 3 dirke.',
@@ -10872,7 +10889,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deterrence.description':
     'Øger din undvigelseschance med 50 procentpoint i 10 sek. (jægertalent)',
   'entities.abilities.earthbind.description': 'Rodfæster fjender inden for 4 m fra målpunktet i 2 sek. og sinker dem derefter med 40% i 6 sek. (Shamantalent)',
-  'entities.abilities.evocation.description': 'Restaura mana rápidamente. (magikertalent)',
+  'entities.abilities.evocation.description':
+    'Kanaliser i 6 sek.: Hvert sekund genopretter I 100 mana og opbygger 8 besværgelseskraft. Bonussen stables under kanaliseringen og varer 15 sek. (magikertalent)',
   'entities.abilities.frenzied_regeneration.description':
     'Genopretter 40% af dit maksimale helbred over 10 sek. Kun i Bjørneform. (druidentalent)',
   'entities.abilities.frost_trap.description':
@@ -10881,9 +10899,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Genopretter 120 helbred hos et allieret mål over 12 sek. (shamantalent)',
   'entities.abilities.howl_of_terror.description':
-    'Skræmmer fjender i nærheden i op til 3 sek. Skade kan bryde effekten. (troldmandstalent)',
+    'Skræmmer fjender i nærheden i op til 5 sek. Skade svarende til 8% af målets maksimale helbred bryder deres frygt. (troldmandstalent)',
   'entities.abilities.ice_block.description':
-    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 sek. (magikertalent)',
+    'Indkapsler jer i fast is i 8 sek. og gør jer immune over for al skade. Fjerner eksisterende almindelige skadelige effekter og forhindrer, at nye almindelige kontroleffekter bliver påført. Kan bruges, mens I er bedøvede eller forvandlede. I kan ikke handle, mens I er indkapslet. Kast igen for at annullere. (magiker)',
   'entities.abilities.inner_focus.description': 'Gør jeres næste præstebesværgelse gratis og umulig at afbryde. Varer 60 sek.',
   'entities.abilities.innervate.description':
     'Levende saft vælder op i dig i 10 sek. og genopretter 20 af din aktuelle ressource i bølger: mana, raseri eller energi. Formskifte afbryder den ikke. Søvn, bedøvelse eller stase standser saften. (druidentalent)',
@@ -10899,7 +10917,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.preparation.description':
     'Afslutter nedkølingen på Sprint, Undvigelse og Forsvinden. (slyngeltalent)',
   'entities.abilities.presence_of_mind.description':
-    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 sek. (magikertalent)',
+    'Gør jeres næste besværgelse med kastetid øjeblikkelig. Varer 60 sek. (magikertalent)',
   'entities.abilities.psychic_scream.description': 'Skræmmer fjender inden for 8 m i op til 4 sek. Skade kan bryde effekten.',
   'entities.abilities.shadowstep.description':
     'Træder gennem skyggerne mod dit mål. (slyngeltalent)',
@@ -12707,7 +12725,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Gennemborer fjenden for {damage} Skyggeskade og genererer 5 Fordømmelse, hvis den bærer dit Evil Eye. Hvert træf på dit primære Evil Eye tilføjer en Skæbnetråd i 12 sek., op til 3. Findes intet Evil Eye, mærker Needle of Fate først sit mål.',
   'entities.abilities.needle_of_fate.name': 'Needle of Fate',
   'entities.abilities.ossuary_mark.description':
-    'Mærker en fjende i 12 sek. og opbevarer 20% af skaden, du og dine udøde gør. Kast igen for at detonere det. Hvis det mærkede mål dør, eksploderer det inden for 6 m og skaber 1 Sjælesplint.',
+    'Mærker en fjende i 15 sek. og opbevarer 20% af skaden, du og dine udøde gør. Kast igen for at detonere det. Hvis det mærkede mål dør, eksploderer det inden for 6 yards og skaber 1 Sjælesplint.',
   'entities.abilities.ossuary_mark.name': 'Ossuary Mark',
   'entities.abilities.possess_evil_eye.description':
     'Maledictor besætter dit primære Evil Eye i 15 sek. og genererer 35 Fordømmelse. Needle of Fate kastes på 1 sek. og genererer 2 ekstra Fordømmelse, Fortær kan kanaliseres, mens du bevæger dig, og Sentence gør 25% mere skade og udløser et forsinket ekko for 60% skade, aftagende til 30% hen over niveau 17 til 20.',

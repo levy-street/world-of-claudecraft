@@ -156,7 +156,7 @@ cadence logic of its own. Narrow helpers:
   parsed-GLB contract test, and its own thin `src/render/<asset>.ts` adapter
   (exemplars: `banker_chest.ts`, `eastbrook_grand_armoury.ts`, `noticeboard.ts`).
 ## Asset loading (`assets/`)
-`loader.ts` (`loadGltf`/`loadHdr`/`loadTexture`, one parse per URL) plus these
+`loader.ts` (`loadGltf`/`loadTexture`/`loadKtx2Texture`, one parse per URL) plus these
 rules, all CI-enforced:
 - **Cache results are IMMUTABLE: clone before mutating.** `releaseGltf(url)` drops
   the cache entry after geometry is extracted.
@@ -211,10 +211,209 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   their programs because compile traverses via `scene.traverse`, not
   `traverseVisible`).
 - Shared machinery: `compile_gate.ts` (fail-soft async shader-compile gating
-  that also BOUNDS in-flight driver links during snapshot bursts),
+  that also BOUNDS in-flight driver links during snapshot bursts, plus the
+  `SerialGateLane` for gates that arrive in a burst), `linked_program_touch.ts`
+  (the gate's tail: fetch every linked variant's uniform tables so the reveal
+  draw issues no synchronous first-use query),
   `background_gpu_queue.ts` (the one priority arbiter for idle-time work that
-  reaches WebGL), `idle_queue.ts` (idle-slot queue draining). Use these, never
-  a bespoke idle loop.
+  reaches WebGL). That queue decides ORDER; it also admits under the per-frame
+  BUDGET of `gpu_prep_budget_core.ts` (wired by `gpu_prep_admission.ts`), which
+  learns a syncMs per label kind and spends the headroom left by the tier's
+  drop-frame threshold, defers a refused unit frame by frame under a starvation
+  bound, and arms only once the frame clock runs, with `?prep=legacy` restoring
+  the old ADMISSION only (every unit admitted at once, the ledger still
+  learning); the reveal-gate policy has no legacy arm and keeps revealing
+  piecewise under its soft deadline whatever that flag says. The touch tail runs as one budgeted queue
+  unit PER PROGRAM (`linked_program_touch_lane.ts`) on the live gates AND on the
+  reveal host, which previously ended at the shadow arm and left streamed decor
+  paying the uniform-table round trip on its reveal draw. Its readiness comes
+  from the SETTLE and never from a driver query: a settled gate records its
+  target's current programs in `linked_program_readiness.ts` and the walk reads
+  that record, because three latches `programReady` false after one missed poll,
+  so `isReady()` on a program that has been linked and drawing for a minute
+  re-issues COMPLETION_STATUS synchronously (5558 ms on the main thread in the
+  2026-08-18 production capture, with eighteen reveal units parked behind it).
+  A settle means EVERY VARIANT, not the one slot three polled: `compileAsync`
+  polls `materialProperties.currentProgram` per material, while a material
+  can carry several program variants in `materialProperties.programs` (skinned
+  and rigid, morph counts, the depth twin's own map) and a material SHARED by
+  concurrent gates (the composed bodies' skin detail, jewels, class tints) has
+  that slot repointed by another gate's prologue mid-poll, so the sibling
+  variants linked unpolled, were never marked, and paid their link at first
+  draw or first uniform query in a live frame (28 raced pending links, 39 to
+  125 ms each, in the same capture). Every gate piece therefore runs a THIRD
+  arm after its colour and shadow compiles, the variant settle
+  (`program_variant_settle.ts`, enumeration and pass in the pure
+  `program_variant_settle_core.ts`, the depth twins found through
+  `prewarmDepthMaterialsOf`): an asynchronous poll of every program of the
+  piece's materials at three's own compileAsync cadence and backoff, bounded
+  by the piece's deadline (`PieceDeadline`, handed to each piece by
+  `runPieces`), recording each program as it answers ready. That poll is the
+  ONE place this code asks `isReady()`; a piece is settled only when every
+  variant answered, timed out otherwise. A settled gate links
+  programs but uploads NOTHING (three's `compileAsync` never reaches
+  `WebGLTextures`), so the same gates also run an upload lane: one budgeted
+  queue unit per non-resident texture under the root (`texture_prep_lane.ts`,
+  enumeration and the residency predicate in the pure `texture_prep_core.ts`,
+  label kind `upload:texture` with the size class appended, `upload-mid` from
+  512x512 texels and `upload-big` from 1024x1024, so a large upload is priced by
+  its own class; a second context that moves onto the lane passes its own label,
+  `upload-preview:texture`, though the paperdoll and portrait contexts still run
+  their sliced upload today). A texture whose image has not arrived or not
+  finished decoding is not a candidate (three uploads nothing for it and would
+  leave it non-resident, so it would be re-queued at every gate). **The order
+  inside a gate is LINK, then UPLOADS, then the TOUCH tail, then settle**,
+  because the touch's driver round trip flushes behind everything already
+  queued, so uploads paid after it are simply measured by it. The lane never
+  releases its tail (an upload is main-thread driver work with no off-thread
+  arm), never re-arms `needsUpdate` on a texture it does not own (a KTX2 texture
+  whose CPU mips were released comes back black; the DataTexture chunk path
+  re-arms it per update range by design, that is how three consumes ranges),
+  and never wraps its uploads in `compilePrewarmColorPrograms`' render-target
+  dance (`initTexture` dispatches on the texture's own flags and unbinds
+  itself, so there is nothing to restore). `idle_queue.ts`
+  (idle-slot queue draining),
+  `prewarm_depth_material.ts` (the shadow arm's depth material: it must link
+  the SAME program three's `WebGLShadowMap` draws, so it never sets
+  `depthPacking` and keys one instance per caster shape; a three bump is
+  re-read from three's source, pinned by `tests/prewarm_depth_material.test.ts`,
+  never guessed). The shadow arm (`renderer.ts` `compileShadowPrograms`)
+  swaps a twin onto EVERY mesh under the gated root, casting at gate time or
+  not: `castShadow` is a runtime distance toggle (entity shadow band, zone
+  shadow volume, gather nodes) that flips frames after the gate ran, and a
+  rig gated beyond the band otherwise links its depth program cold at its
+  first shadow draw. Use these, never a bespoke idle loop.
+- **Streamed decor reveals PIECEWISE, per root, nearest first.** The reveal
+  gates (`reveal_gate_core.ts` policy, `reveal_gate.ts` host adapter over the
+  one `reveal_compile_host.ts`) hold a cull's FIRST hidden-to-visible flip
+  until the subtree's programs are linked. A key still warms only once every
+  root behind it is ready, but the core also tracks each root (`rootReady`),
+  so a consumer whose roots draw independently shows each one as its own
+  compile lands: the towns do exactly that (`town_reveal_core.ts`
+  `townPiecewiseRevealInto`, closest root to the camera first, at most
+  `TOWN_PIECEWISE_REVEALS_PER_FRAME` per frame), because a town key is every
+  static batch plus every building group and flipping all of them on the frame
+  the slowest link settles IS the burst the gate exists to prevent. A root
+  once shown is never hidden again (`numPointLights` is in three's program
+  cache key, so a hide and re-show links fresh programs). The props bands and
+  the foliage buckets are one root per key, and a far cell's bake meshes swap
+  as one representation (its first near flip back after a proven bake holds
+  ON the bake under `<key>:near`, `prop_cell_core.ts` `propCellNearKey`, until
+  the members' own programs link), so those consults stay all-or-nothing. The
+  props HIDEABLES (each camera-ghost building, tent or campfire group) carry
+  NO first-sight gate of their own, by measurement: gating them put 116 keys
+  into the reveal pipeline at once on the Eastbrook ride and the iGPU could
+  not settle them inside the watchdog, so they hid 10 s and drew cold anyway;
+  the near-flip hold is what covers a building's unique kit materials.
+  The two consults that used to SKIP the gate (a prop band already inside half
+  the fog, a camera already inside a town's cull radius: the teleport-arrival
+  shape) are IMMINENT HOLDS now, because the premise that such an arrival rides
+  a cover whose zone prepare compiled the scene is false wherever the boot
+  manifest dropped that content, and revealing on the jump frame linked the
+  whole town kit in live frames. They consult and hold like any other reveal;
+  what imminence buys is ORDER, never an early draw. There is NO wall-clock
+  reveal bound anywhere: the cores take no clock, a held root shows when its own
+  compile lands, and the only other ends of a hold are the
+  `REVEAL_GATE_WATCHDOG_MS` watchdog and the two reach floors below.
+  IMMINENT KEYS GO FIRST, AND NEAREST FIRST. The consult carries the flag into
+  the gate's request (`reveal_gate_core.ts` `allow(key, imminent)`), which
+  carries it into `reveal_compile_host.ts`: that key's link, upload and touch
+  pieces ride at `LIVE_VIEW` instead of `VISIBLE_PREWARM`, still under the
+  actionable gates. Within a key the roots are submitted nearest to the camera
+  first (`town_reveal_core.ts` `orderTownRootsNearestFirst`, called by each town
+  view at request time off that frame's camera), and across keys a frame's
+  escaping bands are consulted in distance order (`prop_cull_core.ts`
+  `updatePropCullables` over a reused `PropCullPass`; the sort runs only on a
+  frame with two or more of them). `gpu_prep_events.ts` counts the marked keys
+  as `imminentHolds`.
+  TWO REACH FLOORS, and they are the only reveals that may draw a root
+  unlinked: colliders are never invisible at arm's length. Bands keep
+  `PROP_CULL_REVEAL_REACH` (40 yd, instant, gate or not). Towns get
+  `TOWN_REVEAL_REACH_YD` (12 yd, applied in the piecewise pass on the first held
+  frame, budget-free, counted as `rootsReach`), and it is DELIBERATELY the
+  smaller one: a town kit's programs are shared across its buildings, so
+  revealing one unlinked building links the whole kit cold in that live frame.
+  It is the fairness floor, not a comfort radius. It also applies ONLY to
+  FOOTPRINT-anchored roots (`TownPiecewiseReveal.footprint`, set by each town
+  view): every town-spanning static batch anchors at the town centre, so a
+  camera standing there is at arm's length of all of them at once, and reach is
+  a collider argument a batch cannot make.
+  The ARRIVAL COVER (`arrival_cover.ts`, raised by `src/game/arrival_warmup.ts`
+  for the whole blocking teleport chain, and at world entry) does two things and
+  neither of them reveals anything. It makes the curtain WAIT on the gates
+  (`awaitArrivalReveals`, at most `ARRIVAL_REVEAL_SETTLE_MAX_MS`, zero online)
+  so an arrival lifts with its decor linked the way boot does. Its first check
+  happens after ONE poll interval, never synchronously: the wait starts before
+  any cull has consulted a gate at the new position, so a synchronous check read
+  "nothing held" because nothing had been asked yet. At world entry that wait
+  sits behind `afterActiveAnimationMs`, which is driven by
+  `requestAnimationFrame`, so a HIDDEN TAB keeps the cover raised until frames
+  resume; nothing renders meanwhile, so nothing is being hidden from anyone. It
+  also switches
+  `gpu_prep_admission.ts` onto the cover rule (`gpu_prep_budget_core.ts`
+  `gpuPrepCoverAdmits`): under a curtain there is no frame to protect, so
+  everything from `TAIL_PIECE` up is admitted on the `cover` reason, and
+  `BOOT_DEBT` / `BACKGROUND` / `BOOT_RESUME` are refused on
+  `cover-not-arrival`. Admitting those too is what starved the arrival
+  (measured: after a second of hold, 0 of 1 roots ready per band key and 0 of 12
+  on the town, because the debt lane drained ahead of them). A
+  `cover-not-arrival` refusal does NOT age: the adapter answers `agesDeferral`
+  false for it (`background_gpu_queue.ts` consults the hook in `noteFrame`),
+  because ticking `deferredFrames` through a whole curtain left every one of
+  those units past `maxDeferFrames` and admitted the entire debt lane as
+  `starvation` on the first live frame after the drop. The cover is DEPTH-counted
+  (`setArrivalCover(true|false)` increments and decrements, floored at zero): the
+  blocking arrival and the world-entry settle are independent owners that can
+  overlap, and the curtain stands until the last of them drops it. Beside the
+  cover, the blocking arrival also HOLDS THE WORLD DRAW for the same span
+  (`src/game/presentation_gate.ts` `worldDrawHeld`); see `src/game/CLAUDE.md`,
+  the `arrival_warmup.ts` row.
+  Two deadlines beside it, and only one of them reveals: a SOFT deadline per key, from
+  the budget's learned reveal cost (one gate PIECE, since a reveal compile is one
+  queue unit per material group) times the piece count of the key's roots clamped into
+  [`REVEAL_SOFT_DEADLINE_MIN_MS`, `REVEAL_GATE_WATCHDOG_MS`], records a
+  `reveal-soft-deadline` gpu-prep event with the key's ready/total roots and
+  changes nothing. That learned cost is the compileAsync PROLOGUE (1 to 3 ms),
+  not the driver's link wall time, so the deadline sits at its floor in
+  practice: a learned wall time is future work, and it is telemetry either
+  way; the `REVEAL_GATE_WATCHDOG_MS` hard watchdog still reveals ungated and now
+  carries the same counts, plus the `reveal` aggregate in
+  `gpu_prep_events.ts` (keys held, roots held, roots revealed piecewise, roots
+  revealed on a reach floor, roots still compiling at a watchdog), so a capture
+  can attribute a first-draw stall to the roots that never linked in time.
+- **Every gate names its stand-in: NEVER LEAVE AN ENTITY WITH NO REPRESENTATION.**
+  A gate hides a still-linking object so its reveal draw cannot stall the frame;
+  the link is not cancellable and the gate timeout is diagnostic only, so the
+  hidden window is UNBOUNDED. That is fair only while something else still tells
+  the player the entity is there. The reference is the far-bake gate
+  (`characters/far_lod_reveal_core.ts` `farMeshShown`: the articulated rig keeps
+  drawing until the baked mesh links). `entity_gate_stand_in_core.ts` holds the
+  rule: `ENTITY_GATE_STAND_INS` (one row per gate call site, naming what it hides
+  and what still draws), `applyCharacterFormVisibility` (the base body is the
+  stand-in for a linking FORM rig, held there by `characterFormReadyMask`, which
+  treats a rig behind its gate as absent), and `entityHasNoBody`, which the
+  nameplate painter uses to force a plate on OVER the player's nameplate toggles
+  for the one gate with no in-world stand-in (the arrival gate hides the whole
+  group). A new gate adds a row AND a case to `tests/entity_gate_stand_in.test.ts`;
+  its coverage pin reds on any unregistered call site, over the gate shapes its
+  `GATE_CALL_SITES` table names (the three renderer wrappers plus
+  `spiritCompileGate`, the puppet pool's own consult of the host gate it takes
+  through `setSpiritCompileGate`). That one REFUSES the spawn instead of
+  holding it, because an apparition that pops in late is worse than one that
+  never came: the rest of the impact sequence is the stand-in, and the refusals
+  are counted as `gpuPrep.gates.spiritSpawnsRefused`.
+  The rule has a SECOND-CONTEXT arm: the paperdoll / Inspect preview holds its
+  own draws on a cold open (`characters/preview_open_gate_core.ts`, armed from
+  `Hud.mountSharedPreview`) while that context links, uploads and touches, and
+  its stand-in is a 2D layer, a cached portrait or the class crest, painted
+  over the empty canvas by `src/ui/preview_stand_in.ts` with `aria-busy`, on
+  EVERY arm including a rebuild in the same container (the mount resizes the
+  renderer first, and `setSize` reassigns `canvas.width`, which clears the
+  drawing buffer: there is no retained frame left to stand in). It
+  needs no `ENTITY_GATE_STAND_INS` row: that table is world ENTITIES the
+  renderer hides in the live scene, and this gate hides nothing in the world.
+  Its escape is the reveal gates' rule, a soft deadline that records a
+  `gate-timeout` gpu-prep event under the `preview-open` key and draws anyway.
 - **A program only ONE encounter can reach warms at that interior's attach,
   never in the boot manifest** (`interior_encounter_prewarm.ts` spec +
   `_pass.ts` + `_host.ts`, kill switch `?encounterPrewarm=0`). The Nythraxis
@@ -234,6 +433,94 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   spec until an A/B from a start zone that had never compiled his model showed
   his spawn linking ZERO programs (the player bodies on screen already carry
   them).
+
+## GPU work: every new producer is a client of the scheduler
+The sections above are the machinery; this is the contract EVERY new producer of
+GPU work signs. Each rule names its seam and its guard.
+- **Every material a live frame can draw for the first time after the curtain has
+  a prewarm home:** a twin in an existing prewarm manifest entry, or a compile
+  gate at its first appearance (`compileGate`, `attachSceneGroupGated` in
+  `gated_scene_attach.ts`, a reveal gate). Never a bare `scene.add` of a group
+  carrying new materials after boot; never a module-scope material cache filled on
+  first cast without being registered. Guards:
+  `tests/ability_material_prewarm_sweep.test.ts`, the `buildInterior` gating pin in
+  `tests/renderer_compile_gate.test.ts`, and the `live-program` events in
+  `perfStats().gpuPrep`, whose count on an offline tour of the touched content is
+  the acceptance bar of a render PR.
+- **Every program-key change on a VISIBLE material rides a gated swap with a
+  stand-in.** The key inputs: texture-slot presence, `transparent` / `blending` /
+  `alphaToCoverage` / `alphaHash`, `defines`, `onBeforeCompile` /
+  `customProgramCacheKey` (three's default key IS the hook source), skinning and
+  instancing, and any `needsUpdate` on a drawn material.
+  `materialProgramSignature` (`prewarm_policy.ts`) is the enumeration, with its
+  dimension-by-dimension contract test in `tests/prewarm_policy.test.ts`; `live-program`
+  catches what it misses.
+- **Never add, remove, or hide a directional, hemisphere, spot, or rect-area light
+  after boot:** those counts are program-cache-key inputs, so one change relinks
+  every lit material in view. Re-GRADE the constructor's one sun/hemi pair through
+  `interior_light_rig.ts` instead. Point lights ride the pad budget
+  (`point_light_budget.ts`). Guards: `tests/render_light_census_pin.test.ts` (the
+  allowlist of every non-point light constructed under `src/render`) and
+  `tests/point_light_budget.test.ts`. The Wildheart caldera rig
+  (`wildheart_props.ts`) is the ONE named exception, pinned as such in
+  `tests/renderer_compile_gate.test.ts`; pre-linking a scene-wide light census is
+  a backlog item, not a precedent.
+- **Every new secondary GL context links (`compileAsync`) and uploads
+  (`uploadTexturesInSlices`, `texture_prewarm.ts`) before its first draw, and sets
+  `debug.checkShaderErrors = shaderDebugRequested()` on the renderer it just built,
+  ahead of that renderer's first `render()`.** Guard: the secondary-context pins in
+  `tests/shader_debug_flag.test.ts`.
+- **No new queue, no new lane, no fourth gate.** New work rides
+  `background_gpu_queue.ts` at an existing `GPU_WORK_PRIORITY`, carries a
+  `kind:instance` label whose kind the budget can learn (`gpuPrepKindOfLabel`),
+  and, if it holds a representation back, names its stand-in in
+  `ENTITY_GATE_STAND_INS` plus a case in `tests/entity_gate_stand_in.test.ts`. A
+  compile gate submits one unit per material group and variant of its root
+  (the material tuple plus what three's program cache key reads off the node:
+  skinning, instancing, morph targets, the geometry attributes), one
+  representative compile per group plus its variant settle
+  (`CompileGateQueue.runPieces` over `linkPieceWork`, `compile_gate_pieces.ts`,
+  the settle arm bound by `pieceProgramSettle`), never a whole root in one unit:
+  the queue paces between units, and a driver that compiles shader source at
+  submission charged every program of a root to the one unit. Each piece arms
+  the gate timeout for its OWN work (the driver latency of one unit), so queue
+  pacing between pieces never counts against it. No
+  wall-clock constant calibrated on one machine inside a gate: the arrival lesson
+  is that a hold ends on evidence (its own compile settling), on the
+  `REVEAL_GATE_WATCHDOG_MS` watchdog, or on a reach floor, never on a tuned timer.
+- **CPU construction pieces ride the same queue and budget.** Main-thread work a
+  view build would otherwise pay inside its frame (a composed look's procedural
+  decal maps and head cuts, measured at 94 percent of a composed build) is cut into
+  pieces the budget can price (a map as a chain of row bands, `LOOK_BAND_ROWS` rows
+  per unit, a structural fraction of the map so the budget decides how many units
+  fit a frame; a cut as one unit), deduped by style key, and enqueued at the view's
+  priority. The live candidate whose pieces are not resident builds its body NOW
+  without its face decals (the body IS the stand-in: nameplate, click target and
+  silhouette on the frame it enters range, never an invisible player, per the
+  fairness rule) and the decals attach later, one budgeted queue unit per body
+  (`LookPieces.attachWhenReady`, so a crowd sharing a look never attaches in one
+  burst), through the visual's compile gate (`CharacterVisual.attachDeferredDecals`,
+  hidden until their programs link).
+  Under a cover and for the local target the build stays synchronous, decals
+  included. Seam: `characters/look_pieces.ts` (`composedLookPiecesFor`,
+  `perfStats().lookPieces`) and `AssembleOptions.deferDecals`, guarded by
+  `tests/look_pieces.test.ts`, `tests/deferred_face_decals.test.ts` and
+  `tests/renderer_look_pieces_hold.test.ts`.
+- **Verify, do not assert.** `?perf`, then `__game.renderer.perfStats().gpuPrep`: the
+  budget snapshot, the event ring (`live-program`, `gate-timeout`, `reveal-watchdog`,
+  `reveal-soft-deadline`, `submit-stop`, `attach-watchdog`, `touch-unproven` (programs a
+  world gate's touch tail found unproven by any settle, the ones a walk mark used to
+  bless and block on), plus the `arrival` mark one per teleport-class landing), and the
+  reveal counters. The CPU side of the same picture is `perfStats().buildLedger`
+  (`build_ledger_core.ts`: main-thread ms per view build class and per zone feature
+  builder, each kind's worst sample and when it happened (`maxAtMs`, the one frame
+  anchor a nested `view-part:` kind keeps), the worst frame, the slowest builds) and `perfStats().zoneStreaming` (the last prepare's stage wall-times);
+  the hitch tracker's `zone-build`, `view-create` and `off-frame` causes read from
+  them, on a sample ALIGNED with the span its dt measures (`hitch_frame_align_core.ts`:
+  the previous callback plus the gap before this one), so a cause inside a callback
+  is filed on the frame that paid it.
+  External capture: `node scripts/gpu_hitch_capture.mjs`. Dispatch
+  `render-performance-reviewer` on any diff that lands a producer under these rules.
 
 ## i18n: overhead labels are the only string surface here
 One deliberate exception: `scene_census_core.ts`'s table/format helpers feed the
@@ -308,13 +595,17 @@ collision/movement.
   VFX) stops being drawn without any of its own flags changing; a per-frame
   driver over such a subtree should skip. Check the swap ACTUALLY happened
   (`CharacterVisual.setFar` keeps the rig visible when no baked mesh exists,
-  while `isFar` reads true either way), never just the intent flag.
+  or while a fresh bake's materials are still linking behind the far-bake
+  compile gate, while `isFar` reads true either way), never just the intent
+  flag: `farMeshShown` in `characters/far_lod_reveal_core.ts` is that
+  predicate.
 - **Cloning a material? Use `material_clone_hooks.ts`.** `Material.clone()` copies
   userData but silently DROPS `onBeforeCompile`, and three keys its program cache
   on `customProgramCacheKey()`, whose default return value IS
   `onBeforeCompile.toString()`. So a bare clone of a patched material (rim glow,
   the worn surface-detail layer, the armour dye that carries a player's outfit
-  colorway, `characters/armor_dye.ts`) both renders un-patched AND links a whole new
+  colorway `characters/armor_dye.ts`, the vertex-colour emissive layer both towns'
+  lit building materials carry, `vertex_color_emissive.ts`) both renders un-patched AND links a whole new
   program on its first draw, wherever that draw lands. `cloneMaterialWithHooks`
   re-attaches exactly the layers the source carried, in the source's order, so
   the composed key comes out identical and the clone reuses the linked program.

@@ -13,7 +13,7 @@ import {
 import { bagCapacity } from '../sim/bags';
 import { signChallenge } from '../sim/client_challenge';
 import { MOUNT_RACE_COURSE, type MountKey, normalizeMountKey } from '../sim/content/mounts';
-import { mechChromaItemId, mechChromaSkinIndex } from '../sim/content/skins';
+import { mechChromaSkinIndex } from '../sim/content/skins';
 import {
   computeTalentModifiers,
   emptyAllocation,
@@ -3344,6 +3344,10 @@ export class ClientWorld implements IWorld {
       e.resource = s.res;
       e.maxResource = s.mres;
       e.resourceType = s.rtype;
+      // Parked mana while shapeshifted (server/game.ts self snapshot). Absent
+      // means zero, decoded unconditionally so leaving the form clears it
+      // rather than stranding the last parked pool on the mirror.
+      e.savedMana = typeof s.sm === 'number' ? s.sm : 0;
       // delta fields: the server omits them while unchanged, so only the
       // snapshots that carry them rebuild the local structures
       // corpse position while a ghost (null once resurrected). Delta-guarded: kept
@@ -4592,14 +4596,16 @@ export class ClientWorld implements IWorld {
     this.cmd({ cmd: 'set_helm', hidden });
   }
   unequipMechChroma(chromaId: string): void {
-    const itemId = mechChromaItemId(chromaId);
+    // The account-wide unlock (accountCosmetics.mechChromaIds) is permanent,
+    // like a purchased Armory weapon skin: this only reverts the local
+    // player's OWN display, it never revokes ownership.
     const skin = mechChromaSkinIndex(chromaId);
-    if (itemId && skin >= 0 && this.accountCosmetics.mechChromaIds.includes(chromaId)) {
-      this.accountCosmetics = {
-        ...this.accountCosmetics,
-        mechChromaIds: this.accountCosmetics.mechChromaIds.filter((id) => id !== chromaId),
-      };
-      const current = this.entities.get(this.playerId);
+    const current = this.entities.get(this.playerId);
+    if (
+      skin >= 0 &&
+      (this.accountCosmetics.mechChromaIds.includes(chromaId) ||
+        (current?.skinCatalog === 'mech' && current.skin === skin))
+    ) {
       if (current?.skinCatalog === 'mech' && current.skin === skin) {
         current.skin = 0;
         current.skinCatalog = 'class';
@@ -4613,15 +4619,8 @@ export class ClientWorld implements IWorld {
           current.weaponSkinLoadout,
           current.skinCatalog,
         );
+        this.cosmeticsChanged = true;
       }
-      const existing = this.inventory.find((slot) => slot.itemId === itemId);
-      this.inventory = existing
-        ? this.inventory.map((slot) =>
-            slot.itemId === itemId ? { ...slot, count: slot.count + 1 } : slot,
-          )
-        : [...this.inventory, { itemId, count: 1 }];
-      this.invChanged = true;
-      this.cosmeticsChanged = true;
     }
     this.cmd({ cmd: 'unequip_mech_chroma', chroma: chromaId });
   }

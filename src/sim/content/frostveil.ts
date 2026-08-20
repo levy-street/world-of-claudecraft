@@ -231,7 +231,12 @@ export const FROSTVEIL_MOBS: Record<string, MobTemplate> = {
     name: 'Frostmane Yeti',
     minLevel: 19,
     maxLevel: 20,
-    family: 'ogre',
+    // A beast, not a brute: it renders on the yeti body and was only in the ogre
+    // family from the era when that family's fallback was a generic giant. Beast
+    // is tameable, but this one is elite, which the tame gate refuses anyway.
+    // The den also stops tending a night brazier with the move (ogre is a
+    // FIRE_BUILDING_FAMILIES member, beast is not), which reads right for a yeti.
+    family: 'beast',
     hpBase: 120,
     hpPerLevel: 30,
     dmgBase: 15,
@@ -244,6 +249,11 @@ export const FROSTVEIL_MOBS: Record<string, MobTemplate> = {
     loot: [{ copper: 100, chance: 1 }],
     scale: 1.5,
     color: 0xf2f6fa,
+    // Carried in with the family move: a beast owes the corpse-harvest system
+    // something to take (tests/economy_yield.test.ts holds every camp-spawned
+    // beast to a mapped tag), and the Reach's other furred beasts skin exactly
+    // this way.
+    componentTags: ['hide', 'fang', 'meat'],
   },
 };
 // The folk of the Reach: the warden and hearthkeeper hold Icemantle, a scout

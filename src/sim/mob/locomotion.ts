@@ -92,6 +92,7 @@ import {
   resetMechanicSpacing,
   tickMechanicSpacing,
 } from './mechanic_spacing';
+import { playerDummyShedHp } from './practice_dummies';
 import {
   impairedZoneFuseMult,
   openRiftEscapeWindow,
@@ -201,11 +202,28 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
 
   mob.combatTimer += DT;
 
-  if (MOBS[mob.templateId]?.dummy) {
+  const dummyTemplate = MOBS[mob.templateId];
+  if (dummyTemplate?.dummy) {
     // Training dummy: stays hostile/attackable so it counts for damage and shows on
     // the meters, but is otherwise inert (never aggros, moves, or fights back). It
     // drops combat and heals to full a few seconds after the last hit, so the player
     // leaves combat while the meter retains the finished encounter's DPS.
+    //
+    // A FRIENDLY dummy is the same target from the other side: nothing ever damages
+    // it, so instead of healing to full it SHEDS healing back toward its resting
+    // mark. That is what keeps it healable, both for the healer working on it (a
+    // full-health target returns nothing but overheal) and for whoever walks up
+    // next. It is never put in combat, so healing it costs the healer no regen.
+    if (dummyTemplate.friendlyPracticeTarget) {
+      mob.inCombat = false;
+      mob.hp = playerDummyShedHp(mob.hp, mob.maxHp, DT);
+      mob.aiState = 'idle';
+      mob.aggroTargetId = null;
+      mob.forcedTargetId = null;
+      mob.forcedTargetTimer = 0;
+      clearThreat(mob);
+      return;
+    }
     if (mob.combatTimer >= DUMMY_RESET_SECONDS) {
       mob.inCombat = false;
       mob.hp = mob.maxHp;

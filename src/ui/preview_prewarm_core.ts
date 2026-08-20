@@ -85,47 +85,74 @@ export interface PreviewPrewarmPlanDeps<Pose> {
    *  exists to avoid. Portrait units stay in every plan (canvas-2D only, no
    *  dependence on the shell). */
   includeCharFamily: boolean;
+  /** Warm the paperdoll skin (chroma) swatch variants. FALSE for a composed
+   *  ("modular") local look: the char-sheet skin picker retired its numbered
+   *  class chromas (Troy, 2026-08-06), and the per-skin `setSkin` warms the
+   *  FIXED `player_<class>` atlas that a `player_<class>_modular` body never
+   *  reads (no SKINS entry for the modular key), so the units are pure cost
+   *  for no visible effect. TRUE for a legacy no-look / mech-catalog body,
+   *  which still mounts the fixed rig those swatches drive. */
+  warmCharSkins: boolean;
+  /** Warm the shareable Player Card closeup poses. FALSE at login: the card is
+   *  a rare, explicit share action (the char-sheet Share button, local player
+   *  only) and `PlayerCardController` builds the closeup lazily on open via
+   *  `captureCloseup`, so paying the biggest preview stall (a ~950 ms frame gap
+   *  measured) on every entry for a window most players never open is waste. */
+  includeCardPoses: boolean;
+  /** Which portrait framings to warm at login. Login warms `['headshot']` only:
+   *  headshots ride the unit/party/target frames unprompted (a healer clicks
+   *  raid frames mid-combat), so they stay warm; the full-body `'body'` framing
+   *  is only ever shown in the menu-gated Inspect window and is built lazily on
+   *  open, so warming it at every entry is deferred cost for a rare surface. */
+  portraitFramings: readonly ('headshot' | 'body')[];
   renderCharShell: () => void;
   prewarmCharSkin: (skin: number) => void | Promise<void>;
   prewarmCardPose: (pose: Pose) => void | Promise<void>;
   renderPortrait: (cls: string, skin: number, framing: 'headshot' | 'body') => void | Promise<void>;
 }
 
-/** Build the ordered post-entry preview prewarm plan: the shared paperdoll
- *  preview per skin, the player-card poses, both portrait framings for every
- *  class (chips use headshots while Inspect uses a full-body portrait, so
- *  warming only the former still leaves a synchronous WebGL readback + PNG
- *  encode on the first inspected player). NO Armory units: that catalog is not
- *  warmed ahead of time at all, it is built per inspected card (see the header).
- *  Each entry is one bounded GPU unit the renderer's background lane paces.
- *  `deps.includeCharFamily` gates the shell/skin/pose units only; see its doc
- *  on `PreviewPrewarmPlanDeps`. */
+/** Build the ordered post-entry preview prewarm plan: the paperdoll shell, the
+ *  paperdoll skin swatches (only when `warmCharSkins`), the player-card poses
+ *  (only when `includeCardPoses`), and the requested `portraitFramings` for
+ *  every class. Login trims the set to what a player actually hits unprompted
+ *  or cheaply: skins only for a fixed-rig look, no card poses, headshots only.
+ *  The dropped surfaces (card closeup, full-body Inspect portrait) stay warmed
+ *  by their own lazy on-open paths; see each flag's doc on
+ *  `PreviewPrewarmPlanDeps`. NO Armory units: that catalog is not warmed ahead
+ *  of time at all, it is built per inspected card (see the header). Each entry
+ *  is one bounded GPU unit the renderer's background lane paces.
+ *  `deps.includeCharFamily` gates the shell/skin/pose units together; the
+ *  per-surface flags trim within it. */
 export function buildPostEntryPreviewPrewarmUnits<Pose>(
   deps: PreviewPrewarmPlanDeps<Pose>,
 ): PreviewPrewarmUnit[] {
   const units: PreviewPrewarmUnit[] = [];
   if (deps.includeCharFamily) {
     units.push({ family: 'char', label: 'preview:char-window', run: deps.renderCharShell });
-    const skins = deps.skinCount(`player_${deps.playerClass}`);
-    for (let skin = 0; skin < skins; skin++) {
-      units.push({
-        family: 'char',
-        label: `preview:char-skin:${skin}`,
-        run: () => deps.prewarmCharSkin(skin),
-      });
+    if (deps.warmCharSkins) {
+      const skins = deps.skinCount(`player_${deps.playerClass}`);
+      for (let skin = 0; skin < skins; skin++) {
+        units.push({
+          family: 'char',
+          label: `preview:char-skin:${skin}`,
+          run: () => deps.prewarmCharSkin(skin),
+        });
+      }
     }
-    for (const [index, pose] of deps.cardPoses.entries()) {
-      units.push({
-        family: 'char',
-        label: `preview:card-pose:${index}`,
-        run: () => deps.prewarmCardPose(pose),
-      });
+    if (deps.includeCardPoses) {
+      for (const [index, pose] of deps.cardPoses.entries()) {
+        units.push({
+          family: 'char',
+          label: `preview:card-pose:${index}`,
+          run: () => deps.prewarmCardPose(pose),
+        });
+      }
     }
   }
   for (const portraitClass of deps.allClasses) {
     const portraitSkins = deps.skinCount(`player_${portraitClass}`);
     for (let skin = 0; skin < portraitSkins; skin++) {
-      for (const framing of ['headshot', 'body'] as const) {
+      for (const framing of deps.portraitFramings) {
         units.push({
           family: 'char',
           label: `preview:portrait:${portraitClass}:${skin}:${framing}`,

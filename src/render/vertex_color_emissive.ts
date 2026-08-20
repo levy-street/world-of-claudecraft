@@ -33,6 +33,31 @@ export function modulateEmissiveByVertexColor<T extends THREE.Material>(material
   return material;
 }
 
+/**
+ * True for a material `modulateEmissiveByVertexColor` decorated. Reads the
+ * userData stamp rather than the WeakSet, so it also answers for a `clone()`
+ * (which copies userData but drops the hook functions themselves).
+ */
+export function hasVertexColorEmissive(material: THREE.Material): boolean {
+  return (
+    (material.userData as { vertexColorEmissive?: string }).vertexColorEmissive ===
+    PROGRAM_CACHE_KEY
+  );
+}
+
+/**
+ * Re-attach the layer to a clone whose userData records it. Without this a
+ * clone of a town emissive material composes a DIFFERENT
+ * `customProgramCacheKey` from its source, so its first draw links a fresh
+ * program (measured: the occluder-fade twin of the Eastbrook inn's emissive
+ * material linked cold, 120.5 ms, inside a gameplay frame). No-op on a clone
+ * of an undecorated source, which would split the cache the other way.
+ */
+export function reapplyVertexColorEmissiveToClone<T extends THREE.Material>(clone: T): T {
+  if (!hasVertexColorEmissive(clone)) return clone;
+  return modulateEmissiveByVertexColor(clone);
+}
+
 export const vertexColorEmissiveInternalsForTest = {
   programCacheKey: PROGRAM_CACHE_KEY,
 };

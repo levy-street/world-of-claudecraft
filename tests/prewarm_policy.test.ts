@@ -29,6 +29,7 @@ import {
   skyAssetInlineWaitMs,
   withRestoredPrewarmState,
 } from '../src/render/prewarm_policy';
+import { PREWARM_SUBMIT_LANE_MAX_MS } from '../src/render/prewarm_submit_stop_core';
 import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
 // The real desktop constants (renderer.ts), injected so the test pins the actual
@@ -71,6 +72,7 @@ const MANIFEST_IDS = [
   'objects.quest-archetypes',
   'props.material-variants',
   'props.ghost-fade-variants',
+  'entities.character-effect-variants',
   'foliage.materials',
   'foliage.great-tree-materials',
   'programs.compile-submit',
@@ -82,6 +84,7 @@ const MANIFEST_IDS = [
   'vfx.atlas',
   'vfx.weapon-skins',
   'vfx.ability-primitives',
+  'vfx.mount-programs',
   'sky.nearby-biomes',
   'world.initial-frame',
   'programs.compile',
@@ -212,25 +215,63 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     // finishFullManifestBeforeReveal (desktop Insane) submits without bound:
     // its contract is a complete manifest behind the cover.
     expect(prewarmSubmitShouldStop(20_000, 14_000, true)).toBe(false);
+    // An absent or not-yet-stopped lane verdict changes none of the above.
+    expect(prewarmSubmitShouldStop(13_999, 14_000, false, null)).toBe(false);
+    expect(
+      prewarmSubmitShouldStop(20_000, 14_000, true, {
+        stop: false,
+        reason: null,
+        elapsedMs: 5_999,
+        submissions: 40,
+      }),
+    ).toBe(false);
+  });
+
+  it('stops on the lane hard stop even where the deadline is exempted', () => {
+    // The deadline clause is the only exemptible one: the lane's own stop
+    // (prewarm_submit_stop_core) binds every arm, which is what the Insane
+    // arm was missing when one compile-submit entry ate 11.8 s of a 12 s
+    // budget and the twelve entries behind it timed out.
+    const laneMax = {
+      stop: true,
+      reason: 'lane-max',
+      elapsedMs: PREWARM_SUBMIT_LANE_MAX_MS,
+      submissions: 812,
+    } as const;
+    expect(prewarmSubmitShouldStop(0, 14_000, true, laneMax)).toBe(true);
+    expect(prewarmSubmitShouldStop(0, 14_000, false, laneMax)).toBe(true);
+    const noUsefulLink = {
+      stop: true,
+      reason: 'no-useful-link',
+      elapsedMs: 12,
+      submissions: 8,
+    } as const;
+    // Both rules stop the lane long before either deadline reading.
+    expect(prewarmSubmitShouldStop(0, 14_000, true, noUsefulLink)).toBe(true);
+    expect(prewarmSubmitShouldStop(0, Number.POSITIVE_INFINITY, true, noUsefulLink)).toBe(true);
   });
 
   it('classifies exactly the link/upload debt entries for BOOT_DEBT resume', () => {
-    // Positive arm: the four debt payers whose unpaid remainder surfaces as
+    // Positive arm: the debt payers whose unpaid remainder surfaces as
     // first-draw stalls in live frames.
     expect(prewarmResumeIsDebt('programs.compile')).toBe(true);
     expect(prewarmResumeIsDebt('programs.compile-submit')).toBe(true);
     expect(prewarmResumeIsDebt('textures.scene')).toBe(true);
     expect(prewarmResumeIsDebt('surface-detail.textures')).toBe(true);
+    // The foliage species stream in with travel (ambient scene, not an
+    // event), so their dropped material units are debt too.
+    expect(prewarmResumeIsDebt('foliage.materials')).toBe(true);
     // Negative arm over REACHABLE inputs: these three entries declare real
     // resumeUnits, so they are the ids a misclassification would actually
     // route to BOOT_DEBT. They stay cosmetic (below the preview lane) by the
     // per-family criterion in the debt set's doc.
     expect(prewarmResumeIsDebt('props.ghost-fade-variants')).toBe(false);
     expect(prewarmResumeIsDebt('vfx.weapon-skins')).toBe(false);
+    expect(prewarmResumeIsDebt('vfx.mount-programs')).toBe(false);
     expect(prewarmResumeIsDebt('vfx.ability-primitives')).toBe(false);
   });
 
-  it('orders resume entries debt first, stable within each class', () => {
+  it('orders resume entries program debt, upload debt, then cosmetic, stable within each class', () => {
     // The resume lane is strictly serial in array order, so this ordering is
     // the ONLY thing that can put the link/upload debt ahead of the cosmetic
     // entries (BOOT_DEBT priority arbitrates against other lanes, never
@@ -242,10 +283,12 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
       { id: 'programs.compile' },
       { id: 'programs.compile-submit' },
     ]);
+    // Program links lead the debt class (a met unlinked program blocks the
+    // frame; a texture upload is paced), then the upload debt, then cosmetic.
     expect(ordered.map((entry) => entry.id)).toEqual([
-      'textures.scene',
       'programs.compile',
       'programs.compile-submit',
+      'textures.scene',
       'props.ghost-fade-variants',
       'vfx.weapon-skins',
     ]);
@@ -281,29 +324,102 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     // must be added to one of the two, never land unclassified.
     const COSMETIC_RESUME_IDS = [
       'props.ghost-fade-variants',
+      'entities.character-effect-variants',
       'vfx.atlas',
       'vfx.weapon-skins',
       'vfx.ability-primitives',
+      'vfx.mount-programs',
       'sky.current-zone',
       'render.settle-passes',
+      // Converted to prewarm slots (variant_prewarm_slot.ts): a landmark
+      // clone and two precipitation maps, both first-use-on-a-specific-event
+      // warm-ups rather than ambient scene debt.
+      'weather.materials',
+      'landmarks.impact-site',
     ];
     // Same per-entry block split as parsedManifestEntries, so an entry's
-    // resumeUnits can never be attributed to its neighbour.
+    // resumeUnits can never be attributed to its neighbour. Comments are
+    // stripped and the match is anchored to the PROPERTY syntax first: the
+    // manifest explains itself in prose beside the code, and lines like
+    // `// No resumeUnits: this spawns real particles` are a substring match.
+    // Counting those padded the floor to 10 over 7 real declarations, so the
+    // count could have halved and the pin stayed green. Raised to 10 real
+    // declarations when weather.materials and landmarks.impact-site became
+    // prewarm slots.
     const start = renderer.indexOf('const manifest: PrewarmManifestEntry[] = [');
     const end = renderer.indexOf('const byId = new Map(', start);
-    const resumable = renderer
-      .slice(start, end)
+    const manifestCode = codeWithoutLineComments(renderer.slice(start, end)).replace(
+      /\/\*[\s\S]*?\*\//g,
+      '',
+    );
+    const resumable = manifestCode
       .split(/\n {6}\{\n/)
       .slice(1)
-      .filter((block) => block.includes('resumeUnits:'))
+      .filter((block) => /^\s*resumeUnits:/m.test(block))
       .map((block) => /id: '([^']+)'/.exec(block)?.[1])
       .filter((id): id is string => Boolean(id) && manifestIds.has(id as string));
-    expect(resumable.length).toBeGreaterThanOrEqual(5);
+    // The real declaration count, measured against the source above. A drop
+    // here means a resume lane was deleted, not that a comment was reworded.
+    expect(resumable.length).toBeGreaterThanOrEqual(10);
+    // Every id counted must own a real property declaration, so a block that
+    // only TALKS about resumeUnits can never be one of them.
+    for (const id of resumable) {
+      const block = manifestCode
+        .split(/\n {6}\{\n/)
+        .find((candidate) => candidate.includes(`id: '${id}'`));
+      expect(block && /^\s*resumeUnits:/m.test(block), `${id} has no resumeUnits property`).toBe(
+        true,
+      );
+    }
     for (const id of resumable) {
       expect(
         prewarmResumeIsDebt(id) || COSMETIC_RESUME_IDS.includes(id),
         `manifest entry ${id} declares resumeUnits but is classified neither debt nor cosmetic`,
       ).toBe(true);
+    }
+  });
+
+  it('binds the landmark and weather entries to the shared prewarm slot', () => {
+    // Both entries used to hold their artifact in a manifest-local `let` that
+    // the cleanup nulled, which is why neither could resume: the slot keeps it
+    // in its own closure instead (variant_prewarm_slot.ts, its own Vitest).
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    expect(renderer).toContain(
+      "createVariantPrewarmSlot(variantSlotHost, 'landmarks.impact-site', () =>",
+    );
+    expect(renderer).toContain('buildImpactSitePrewarmGroup(this.impactSite.group, p.pos)');
+    expect(renderer).toContain("createPrewarmGroupSlot(variantSlotHost, 'weather.materials', {");
+    // The weather artifact is no group, so the slot's hide arm is the only
+    // thing that can take the staged precipitation draw back out of a live
+    // frame before its uploads run.
+    expect(renderer).toContain('hide: () => this.weather.hidePrewarm(),');
+    expect(renderer).toContain(
+      "units: (textures) => textureResumeUnits('weather-materials', textures),",
+    );
+    expect(renderer).toContain('cleanup: () => this.weather.endPrewarm(),');
+    // The manifest-local mutable state is gone with them.
+    expect(renderer).not.toContain('landmarkPrewarmGroup');
+    expect(renderer).not.toContain('weatherPrewarmActive');
+    // Both entries bind the slot rather than re-implementing the staging.
+    for (const [id, slot] of [
+      ['weather.materials', 'weatherSlot'],
+      ['landmarks.impact-site', 'landmarkSlot'],
+    ]) {
+      const start = renderer.indexOf(`id: '${id}'`);
+      const entry = renderer.slice(start, renderer.indexOf('      {\n        id:', start + 1));
+      expect(entry, id).toContain(`resumeUnits: ${slot}.resumeUnits,`);
+      expect(entry, id).toContain(`run: ${slot}.run,`);
+    }
+    // Hidden at world entry and torn down with every other staged artifact.
+    for (const slot of ['landmarkSlot', 'weatherSlot']) {
+      const hideStart = renderer.indexOf('const hidePrewarmArtifacts = ');
+      const hideEnd = renderer.indexOf('const cleanupPrewarmArtifacts = ', hideStart);
+      expect(renderer.slice(hideStart, hideEnd), slot).toContain(`${slot}.hide();`);
+      const cleanupEnd = renderer.indexOf('doorPrewarmGroup = null;', hideEnd);
+      expect(renderer.slice(hideEnd, cleanupEnd), slot).toContain(`${slot}.cleanup();`);
     }
   });
 
@@ -381,11 +497,13 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     // lane, never a drop (the pins below).
     expect(compileEntry).not.toContain('performance.now() >= gpuSubmitDeadline');
     // The submit loop consults the pure decision BETWEEN units, with the
-    // caller-chosen deadline and the Insane exemption flag: without this
-    // wiring the 22 s production overrun comes back with every unit test
-    // green (QA finding B2).
+    // caller-chosen deadline, the Insane exemption flag, and the pacing
+    // lane's own hard-stop verdict: without this wiring the 22 s production
+    // overrun comes back with every unit test green (QA finding B2), and
+    // without the fourth argument the Insane arm has no stop at all (the
+    // 11.8 s compile-submit entry of the 17/08 production login).
     expect(renderer).toContain(
-      'prewarmSubmitShouldStop(\n          performance.now(),\n          deadlineMs,\n          policy.finishFullManifestBeforeReveal,\n        )',
+      'prewarmSubmitShouldStop(\n          performance.now(),\n          deadlineMs,\n          policy.finishFullManifestBeforeReveal,\n          pacing.shouldStop(performance.now()),\n        )',
     );
     expect(renderer).toContain('if (!(await pacing.awaitSlot(outOfTime))) {');
     expect(renderer).toContain(
@@ -616,39 +734,85 @@ describe('resolvePrewarmPolicy: unconstrained desktop', () => {
     );
   });
 
+  it('splits every input of the opaque bit three keys on, and the flags beside it', () => {
+    // three's key carries `opaque` (transparent === false && blending ===
+    // NormalBlending && alphaToCoverage === false) plus alphaHash, dithering
+    // and premultipliedAlpha. Each is its own class of variant the compile
+    // lane would otherwise skip and the first live draw would link.
+    const stone = { type: 'MeshStandardMaterial', map: {}, transparent: false };
+    const base = materialProgramSignature(stone);
+    // AdditiveBlending: opaque with a non-normal blend mode is a second program.
+    expect(materialProgramSignature({ ...stone, blending: 2 })).not.toBe(base);
+    expect(materialProgramSignature({ ...stone, alphaToCoverage: true })).not.toBe(base);
+    expect(materialProgramSignature({ ...stone, alphaHash: true })).not.toBe(base);
+    expect(materialProgramSignature({ ...stone, dithering: true })).not.toBe(base);
+    expect(materialProgramSignature({ ...stone, premultipliedAlpha: true })).not.toBe(base);
+    // NormalBlending spelled out is the default, so it must not split.
+    expect(materialProgramSignature({ ...stone, blending: 1 })).toBe(base);
+    // ... and each of the four is independent of the others.
+    const signatures = new Set([
+      base,
+      materialProgramSignature({ ...stone, blending: 2 }),
+      materialProgramSignature({ ...stone, alphaToCoverage: true }),
+      materialProgramSignature({ ...stone, alphaHash: true }),
+      materialProgramSignature({ ...stone, dithering: true }),
+      materialProgramSignature({ ...stone, premultipliedAlpha: true }),
+    ]);
+    expect(signatures.size).toBe(6);
+  });
+
   it('wires the compile dedupe and the widened shadow arm to the measured residue', () => {
-    const renderer = readFileSync(
-      new URL('../src/render/renderer.ts', import.meta.url),
-      'utf8',
-    ).replace(/\r\n/g, '\n');
+    // Line comments stripped: a commented-out call site must not keep a
+    // positive pin green.
+    const renderer = codeWithoutLineComments(
+      readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8').replace(
+        /\r\n/g,
+        '\n',
+      ),
+    );
     // The dedupe key comes from the shared pure helper, never a hand-rolled
     // string that can drift from three's cache key again.
     expect(renderer).toContain('prewarmProgramContentKeys(');
     expect(renderer).toContain('hasInstanceColor: ');
     expect(renderer).toContain('morphTargetCount: ');
-    // The prewarm depth material must match the REAL shadow pass variant:
-    // three's shadow depth material uses RGBADepthPacking and depthPacking is
-    // in the program cache key, so omitting it links a dead variant (the
-    // pre-existing defect the residue probe exposed: every skinned-shadow
-    // compile linked BasicDepthPacking, and the frame relinked all of them).
-    // Read from prewarm_depth_material.ts, not renderer.ts: the depth-material
-    // cache was extracted there under the monolith ratchet. The assertion is
-    // unchanged, only the file it scans.
-    const depthModule = readFileSync(
-      new URL('../src/render/prewarm_depth_material.ts', import.meta.url),
-      'utf8',
-    ).replace(/\r\n/g, '\n');
-    expect(depthModule).toContain('depthPacking: THREE.RGBADepthPacking');
-    // The shadow arm covers every caster, not just skinned rigs: static and
-    // instanced casters' depth programs were 12 of the frame's 64 residual
-    // links.
+    // The prewarm depth material must match the REAL shadow pass variant, and
+    // that derivation lives in the shared factory (src/render/prewarm_depth_material.ts),
+    // pinned against three's WebGLShadowMap source by its own test. The renderer
+    // never sets depthPacking itself: the RGBADepthPacking override that matched
+    // three 0.165 became a dead variant under 0.185 (its shadow pass draws the
+    // default packing), and every character shadow program relinked cold at its
+    // first draw (production: 1196 / 662 / 211 / 129 ms frames).
+    expect(renderer).toContain("import { prewarmDepthMaterial } from './prewarm_depth_material';");
+    // The shadow arm covers EVERY mesh with a material, not just skinned rigs
+    // (static and instanced casters' depth programs were 12 of the frame's 64
+    // residual links) and not just the casters of the moment: castShadow is a
+    // runtime distance toggle, so a rig gated beyond the shadow band must
+    // still get its depth twin or it links cold at its first shadow draw.
+    // Neither a `castShadow` branch nor a null-material swap belongs here.
     const shadowStart = renderer.indexOf('private async compileShadowPrograms(');
-    const shadowEnd = renderer.indexOf('\n  // A tiny throwaway target', shadowStart);
+    // Comments are stripped above, so the slice ends on the next declaration.
+    const shadowEnd = renderer.indexOf('private prewarmRenderTarget', shadowStart);
     expect(shadowStart).toBeGreaterThan(-1);
     expect(shadowEnd).toBeGreaterThan(shadowStart);
     const shadowMethod = renderer.slice(shadowStart, shadowEnd);
-    expect(shadowMethod).toContain('if (!mesh.isMesh || !mesh.castShadow) return;');
-    expect(shadowMethod).not.toContain('if (!mesh.isSkinnedMesh || !mesh.castShadow) return;');
+    expect(shadowMethod).toContain('if (!mesh.isMesh || !mesh.material) return;');
+    expect(shadowMethod).not.toContain('castShadow');
+    expect(shadowMethod).not.toContain('isSkinnedMesh');
+    expect(shadowMethod).not.toContain('mesh.material = null');
+    expect(shadowMethod).toContain('for (const swap of swaps) swap.mesh.material = swap.material;');
+    // Scoped to the shadow arm: the renderer must not hand-build a depth
+    // material there (a `new THREE.MeshDepthMaterial(` or a `depthPacking` write
+    // in that block would be the override coming back by another door). The
+    // factory is fed the caster mesh too: one awaited depth material per
+    // (skinning x morph count x instancing) shape, not one shared instance whose
+    // single currentProgram slot leaves the sibling programs unpolled.
+    // (tests/renderer_shadow_prewarm.test.ts proves the same behaviorally.)
+    expect(shadowMethod).not.toContain('depthPacking');
+    expect(shadowMethod).not.toContain('new THREE.MeshDepthMaterial(');
+    expect(shadowMethod).toContain('prewarmDepthMaterial(this.prewarmDepthMaterials, item, mesh)');
+    expect(shadowMethod).toContain(
+      'prewarmDepthMaterial(this.prewarmDepthMaterials, material, mesh)',
+    );
   });
 
   it('keeps the required desktop compiler behind the loading cover after a slow first frame', () => {
@@ -1161,10 +1325,24 @@ describe('mandatory interaction-landmark prewarm', () => {
     const compileGate = renderer.slice(compileGateStart, compileGateEnd);
     expect(compileGateStart).toBeGreaterThan(-1);
     expect(compileGateEnd).toBeGreaterThan(compileGateStart);
-    expect(compileGate).toContain('this.liveCompileGates.run(');
+    // One gate, one queue unit per material group of the target: the split
+    // is compile_gate_pieces.ts, and each piece arms the one constant for its
+    // own work.
+    expect(compileGate).toContain('this.liveCompileGates.runPieces(');
+    // ...each piece the colour arm, the shadow arm, then the settle over every
+    // program variant its materials carry (program_variant_settle.ts), bound to
+    // this renderer's material properties and depth-twin cache.
+    expect(compileGate).toContain('linkPieceWork(target, color, shadow, settle)');
+    expect(compileGate).toContain(
+      'const settle = pieceProgramSettle(this.webgl.properties, this.prewarmDepthMaterials);',
+    );
     expect(compileGate).toContain('VIEW_COMPILE_GATE_MAX_MS');
     expect(compileGate).not.toContain('onTimeout');
-    expect(renderer).toContain('return GPU_WORK_PRIORITY.ACTIONABLE_VIEW;');
+    // The target-ancestry walk lives in compile_priority_core.ts (its own
+    // Vitest); the renderer stays a thin caller.
+    expect(renderer).toContain(
+      'const priority = compilePriorityForTarget(target, this.sim.player.targetId, isCasting);',
+    );
     expect(renderer).toContain(
       'private readonly liveCompileGates = new CompileGateQueue(this.backgroundGpuWork)',
     );
@@ -1182,6 +1360,28 @@ describe('mandatory interaction-landmark prewarm', () => {
       'return this.sharedQueue.run(work, options.priority, options.label, { releaseTail: true })',
     );
     expect(core).toContain('this.tail.then(work)');
+  });
+});
+
+describe('self-spirit prewarm queue wiring', () => {
+  it('preserves the idle delay and runs the compile through the shared GPU queue', () => {
+    const renderer = readFileSync(
+      new URL('../src/render/renderer.ts', import.meta.url),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    const start = renderer.indexOf('private selfSpirit = new SelfSpiritPrewarmer({');
+    const end = renderer.indexOf('\n  // Static terrain/water/features', start);
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const wiring = renderer.slice(start, end);
+    const idleAt = wiring.indexOf('idle: () => idleSlot(IDLE_PREWARM_TIMEOUT_MS)');
+    const queueAt = wiring.indexOf('this.backgroundGpuWork.run(');
+    expect(idleAt).toBeGreaterThan(-1);
+    expect(queueAt).toBeGreaterThan(-1);
+    expect(wiring).toContain('() => this.warmSelfSpirit()');
+    expect(wiring).toContain('GPU_WORK_PRIORITY.VISIBLE_PREWARM');
+    expect(wiring).toContain("'self-spirit'");
+    expect(wiring).toContain('{ releaseTail: true }');
   });
 });
 
@@ -1213,9 +1413,18 @@ describe('constrained entry view creation ramp', () => {
       budgetMethodStart,
     );
     const budgetMethod = renderer.slice(budgetMethodStart, budgetMethodEnd);
-    const budgetAt = budgetMethod.indexOf('const base = constrainedEntryViewCreateBudget(');
-    const zeroGuardAt = budgetMethod.indexOf('if (base === 0) return 0;');
-    const backoffAt = budgetMethod.indexOf('if (this.viewCreateBackoff > 0)');
+    // The decision itself lives in view_create_budget_core.ts (its own Vitest);
+    // the renderer feeds it and consumes the count before creating candidates.
+    expect(budgetMethod).toContain(
+      'return runtimeViewCreateBudget(input, this.viewCreateBudgetState);',
+    );
+    const core = readFileSync(
+      new URL('../src/render/view_create_budget_core.ts', import.meta.url),
+      'utf8',
+    );
+    const budgetAt = core.indexOf('const base = constrainedEntryViewCreateBudget(');
+    const zeroGuardAt = core.indexOf('if (base === 0) return 0;');
+    const backoffAt = core.indexOf('if (state.backoffSeconds > 0)');
     const createAt = renderer.indexOf('this.createCandidateViews(', budgetMethodEnd);
     const elapsedIncrementAt = renderer.indexOf(
       'this.runtimeEntryElapsedMs += Math.min(250, Math.max(0, dt * 1000))',
@@ -1246,9 +1455,9 @@ describe('constrained entry view creation ramp', () => {
       collectionStart,
     );
     const collectionMethod = renderer.slice(collectionStart, collectionEnd);
-    expect(collectionMethod).toContain('this.collectObjectTextures(this.scene, true)');
+    expect(collectionMethod).toContain('collectObjectTextures(this.scene, true)');
     expect(collectionMethod).toContain('for (const view of this.views.values())');
-    expect(collectionMethod).toContain('this.collectObjectTextures(view.group, false, textures)');
+    expect(collectionMethod).toContain('collectObjectTextures(view.group, false, textures)');
 
     const methodStart = renderer.indexOf('private async prewarmInitialSceneTexturesBatched(');
     const methodEnd = renderer.indexOf('\n  private renderPrewarmPass(', methodStart);

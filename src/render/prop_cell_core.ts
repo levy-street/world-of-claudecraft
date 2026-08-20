@@ -32,6 +32,27 @@ export function propCellKey(x: number, z: number, size = PROP_FAR_CELL_SIZE): st
   return `${Math.floor(x / size)}:${Math.floor(z / size)}`;
 }
 
+const NEAR_KEY_SUFFIX = ':near';
+
+/** The reveal-gate key of a cell's first NEAR flip after its bake was proven
+ *  (see updatePropCell): the members' own groups behind it, the bake in
+ *  front of them meanwhile. */
+export function propCellNearKey(cellKey: string): string {
+  return `${cellKey}${NEAR_KEY_SUFFIX}`;
+}
+
+/** The cell key behind a near key, or null for any other key. */
+export function propCellNearBaseKey(key: string): string | null {
+  return key.endsWith(NEAR_KEY_SUFFIX) ? key.slice(0, -NEAR_KEY_SUFFIX.length) : null;
+}
+
+/** Bands closer than this fraction of the fog far plane make their FIRST
+ *  consult IMMINENT (prop_cull_core.ts PROP_CULL_REVEAL_NEAR_FRACTION); a
+ *  cell's near flip mirrors it on the cell box distance. Restated rather
+ *  than imported because prop_cull_core imports this module for the near
+ *  key; tests/prop_cell_core.test.ts pins the two equal. */
+export const PROP_CELL_NEAR_FLIP_IMMINENT_FOG_FRACTION = 0.5;
+
 export interface PropCellBounds {
   minX: number;
   maxX: number;
@@ -104,6 +125,10 @@ export interface PropCellRuntime {
   /** Latched once the first far flip was allowed (reveal_gate_core): the
    *  gate is consulted only until the bake's programs are known linked. */
   farReady?: boolean;
+  /** Latched once the first near flip was allowed (or never held): the
+   *  members' own programs are known linked, or the cell never had a bake
+   *  to stand in for them. */
+  nearReady?: boolean;
   meshes: PropCellBakeMesh[];
   hideables: PropCellHideable[];
 }
@@ -111,7 +136,7 @@ export interface PropCellRuntime {
 /** Structural subset of reveal_gate_core's RevealGateCore, so this core
  *  stays decoupled from the gate module. */
 export interface PropCellRevealGate {
-  allow(key: string): boolean;
+  allow(key: string, imminent?: boolean): boolean;
 }
 
 /**
@@ -140,6 +165,23 @@ export function updatePropCell(
     // see. No gate (or no key) keeps the historical immediate flip.
     if (gate && cell.key !== undefined && !gate.allow(cell.key)) farMode = false;
     else cell.farReady = true;
+  } else if (!farMode && cell.nearReady !== true) {
+    // The symmetric hold, first NEAR flip: the members' own materials (a
+    // building's unique kit) are programs the bake never linked, and riding
+    // in from a shown bake flipped them cold at first draw (the Eastbrook
+    // Grand Armoury's five, 781 + 300 + 290 + 190 + 183 ms on the iGPU ride).
+    // Held only once the bake was PROVEN (farReady): it is a pixel-identical
+    // stand-in already on screen, so staying on it costs nothing visible. A
+    // cell that starts near never had a bake to stand in and draws at once,
+    // as it always did. The consult is imminent inside half the fog, the
+    // bands' near line, since a near cell is what the player stands in.
+    const nearKey = cell.key !== undefined ? propCellNearKey(cell.key) : undefined;
+    const imminent = dist <= fogFar * PROP_CELL_NEAR_FLIP_IMMINENT_FOG_FRACTION;
+    if (gate && nearKey !== undefined && cell.farReady === true && !gate.allow(nearKey, imminent)) {
+      farMode = true;
+    } else {
+      cell.nearReady = true;
+    }
   }
   applyPropCellModeFlags(cell, farMode, farMode && dist < fogFar);
 }

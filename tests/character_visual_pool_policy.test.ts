@@ -21,20 +21,23 @@ describe('character visual pool residency policy', () => {
 
   it('is enforced by the renderer pool take, store, and teardown paths', () => {
     const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
-    const takeStart = renderer.indexOf('private takePooledVisual(');
-    const storeStart = renderer.indexOf('private storePooledVisual(', takeStart);
-    const storeEnd = renderer.indexOf('\n  private ', storeStart + 1);
-    const take = renderer.slice(takeStart, storeStart);
-    const store = renderer.slice(storeStart, storeEnd);
-
-    expect(takeStart).toBeGreaterThan(-1);
-    expect(storeStart).toBeGreaterThan(takeStart);
+    const lifecycle = readFileSync(
+      new URL('../src/render/characters/pooled_visual_lifecycle.ts', import.meta.url),
+      'utf8',
+    );
     // The character pool routes every release through the bounded LRU store
     // (which evicts + disposes least-recently-released overflow under the
     // live GFX cap; see tests/character_visual_pool.test.ts for its unit
-    // behavior), and every acquire through the pool take.
-    expect(store).toContain('this.visualPool.store(key, visual, GFX.maxPooledCharacterVisuals)');
-    expect(take).toContain('this.visualPool.take(key)');
+    // behavior), and every acquire through the pool take: both halves live in
+    // PooledVisualLifecycle, which the renderer binds ONCE to its pool and to
+    // the live cap, and every renderer take/store goes through that binding.
+    expect(lifecycle).toContain('this.pool.store(key, visual, this.host.maxPooled())');
+    expect(lifecycle).toContain('this.pool.take(key)');
+    expect(renderer).toContain('new PooledVisualLifecycle(this.visualPool, {');
+    expect(renderer).toContain('maxPooled: () => GFX.maxPooledCharacterVisuals,');
+    expect(renderer).toContain('this.pooledVisuals.take(visualPoolKey, e.color)');
+    expect(renderer).toContain('this.pooledVisuals.store(v.visualPoolKey, v.visual)');
+    expect(renderer).not.toMatch(/this\.visualPool\.(take|store)\(/);
     // Terminal teardown drains the pool and really disposes every visual.
     expect(renderer).toContain(
       'for (const visual of this.visualPool.drain()) bestEffort(() => visual.dispose());',

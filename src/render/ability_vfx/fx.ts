@@ -27,6 +27,7 @@ import {
   SpiritApparitions,
   type SpiritAtKind,
   type SpiritBuildScheduler,
+  type SpiritCompileGate,
 } from './spirits';
 
 export type { DecalStyle } from './decals';
@@ -461,6 +462,13 @@ export class AbilityVfxFx implements SequencerHost {
   // slots instead of the GLB resolve's own (live, in-combat) frame.
   setSpiritBuildScheduler(schedule: SpiritBuildScheduler | null): void {
     this.spirits.setBuildScheduler(schedule);
+  }
+
+  // Hand the spirit puppets the host's live compile gate, so a freshly built
+  // puppet links its ghost program off-thread on a hidden root instead of
+  // riding one VISIBLE frame (a synchronous link in a live frame).
+  setSpiritCompileGate(gate: SpiritCompileGate | null): void {
+    this.spirits.setCompileGate(gate);
   }
 
   // Wired once by the painter: particle bursts ride the pooled Vfx cloud,

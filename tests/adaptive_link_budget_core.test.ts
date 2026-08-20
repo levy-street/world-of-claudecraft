@@ -78,6 +78,58 @@ describe('adaptive link budget core', () => {
     });
   });
 
+  it('gives a zero-delta settle no window credit (the cheap-unit discount)', () => {
+    // Measured (iGPU, far login, 2026-08-17): a boot sweep that also collects
+    // views hidden behind their live compile gates submits units whose
+    // programs are ALREADY linked. They settle instantly having created no
+    // program, the window read that as headroom, ramped to the cap, and the
+    // lane kept submitting until the hard deadline while the whole manifest
+    // behind it timed out (tests/reveal_gate_wiring.test.ts).
+    const clock = virtualClock();
+    const budget = createAdaptiveLinkBudget(CONFIG, clock);
+
+    for (let index = 0; index < 200; index++) {
+      const id = `hidden:${index}`;
+      budget.markSubmitted(id);
+      budget.markSyncEnd(id, 0);
+      budget.markSettled(id);
+    }
+
+    expect(budget.snapshot()).toMatchObject({
+      windowLinks: CONFIG.initialWindowLinks,
+      maxWindowObserved: CONFIG.initialWindowLinks,
+      settledUnits: 200,
+      backoffCount: 0,
+    });
+    // A unit that DID link programs still grows the window on the same clock:
+    // the discount is about the delta, never about the speed.
+    budget.markSubmitted('real:0');
+    budget.markSyncEnd('real:0', 8);
+    budget.markSettled('real:0');
+    expect(budget.snapshot()).toMatchObject({
+      windowLinks: CONFIG.initialWindowLinks + CONFIG.increaseLinks,
+      maxWindowObserved: CONFIG.initialWindowLinks + CONFIG.increaseLinks,
+    });
+  });
+
+  it('still backs off on a SLOW settle that linked nothing', () => {
+    // The discount withholds credit; it never withholds congestion evidence.
+    // A cheap unit that took two seconds to come back says the driver is
+    // busy, whatever this unit itself linked.
+    const clock = virtualClock();
+    const budget = createAdaptiveLinkBudget({ ...CONFIG, initialWindowLinks: 24 }, clock);
+    budget.markSubmitted('hidden:0');
+    budget.markSyncEnd('hidden:0', 0);
+    clock.advance(2_500);
+    budget.markSettled('hidden:0');
+
+    expect(budget.snapshot()).toMatchObject({
+      state: 'backoff',
+      windowLinks: 12,
+      backoffCount: 1,
+    });
+  });
+
   it('backs off multiplicatively after a slow settlement without cancelling other work', () => {
     const clock = virtualClock();
     const budget = createAdaptiveLinkBudget({ ...CONFIG, initialWindowLinks: 24 }, clock);

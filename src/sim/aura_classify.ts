@@ -43,7 +43,6 @@ export const DEBUFF_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'sun_verdict',
   'affliction_eye',
   'affliction_eye_secondary',
-  'affliction_fate_threads',
   'affliction_violence',
   'necromancy_harvest_mark',
   // Cosmetic and mechanically inert (value 0, no stat fold): listed here only so

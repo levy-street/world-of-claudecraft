@@ -92,6 +92,20 @@ describe('StableAuraWireCache', () => {
     expect(JSON.parse(ordinaryWire.json)[0]).not.toHaveProperty('ub');
   });
 
+  it('serializes undispellable auras and rebuilds when their protection changes', () => {
+    const cache = new StableAuraWireCache();
+    const active = aura('fate_threads', 12);
+    active.undispellable = true;
+
+    const protectedWire = cache.encode([active], 0, false);
+    expect(JSON.parse(protectedWire.json)[0]).toMatchObject({ und: 1 });
+
+    active.undispellable = undefined;
+    const ordinaryWire = cache.encode([active], 0, false);
+    expect(ordinaryWire.revision).toBe(protectedWire.revision + 1);
+    expect(JSON.parse(ordinaryWire.json)[0]).not.toHaveProperty('und');
+  });
+
   it('rebuilds for every wire-visible mutation and explicit empty removal', () => {
     const cache = new StableAuraWireCache();
     const first = aura('first', 10);

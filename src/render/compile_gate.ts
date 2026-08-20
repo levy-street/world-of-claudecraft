@@ -9,6 +9,8 @@
 // queue's released-tail cap, or strict serialization on the local fallback.
 
 import type { GpuWorkRunOptions } from './background_gpu_queue';
+import { recordGpuPrepEvent } from './gpu_prep_events';
+import { linkPieceLabel } from './link_piece_core';
 
 export interface CompileGateScheduler {
   setTimeout: (cb: () => void, ms: number) => number;
@@ -22,11 +24,27 @@ export interface CompileGateResult {
 
 export interface CompileGateOptions {
   onTimeout?: () => void;
+  /** Off switches the default `gate-timeout` telemetry for this gate; the
+   *  caller's own onTimeout still runs. */
+  recordTimeoutEvent?: boolean;
   priority?: number;
   /** Names this gate's unit in the shared queue's per-unit timing stats. */
   label?: string;
   scheduler?: CompileGateScheduler;
 }
+
+/** What a gate piece may read of its OWN deadline: whether it has fired. A
+ *  piece that keeps polling the driver after its compile resolves (the
+ *  variant settle, program_variant_settle.ts) ends that poll here, so the one
+ *  timeout constant still bounds the whole piece; a closed gate (its queue
+ *  rejected) reads as fired, so nothing polls a context that is going away. */
+export interface PieceDeadline {
+  readonly fired: boolean;
+}
+
+/** One queue unit of a pieced gate: the compile of one material group, handed
+ *  its own deadline. */
+export type CompileGatePiece = (deadline: PieceDeadline) => Promise<unknown>;
 
 export interface CompileGateWorkQueue {
   run<T>(
@@ -47,7 +65,38 @@ const defaultScheduler: CompileGateScheduler = {
  * driver and may notify diagnostics, but never resolves the gate early. A
  * rejection or synchronous throw is fail-soft because no compile remains
  * active and the caller can safely fall back to first-draw compilation.
+ *
+ * The timeout also lands in the GPU-preparation ring by default, so a capture
+ * can count slow links instead of the timeout being inert whenever no caller
+ * passes onTimeout. That record is write-only telemetry: the gate's own
+ * decisions never read it back, which is what keeps this module deterministic
+ * (its ageMs is the deadline that elapsed, not a clock reading).
  */
+function reportGateTimeout(timeoutMs: number, options: CompileGateOptions): void {
+  if (options.recordTimeoutEvent !== false) {
+    recordGpuPrepEvent({
+      kind: 'gate-timeout',
+      key: options.label ?? 'compile-gate',
+      ageMs: timeoutMs,
+    });
+  }
+  options.onTimeout?.();
+}
+
+/** A piece's settle, fail-soft like the whole gate's: a rejection or a
+ *  synchronous throw leaves no compile active, so it only marks the piece
+ *  failed. */
+function settleCompilePiece(piece: () => Promise<unknown>): Promise<boolean> {
+  try {
+    return piece().then(
+      () => false,
+      () => true,
+    );
+  } catch {
+    return Promise.resolve(true);
+  }
+}
+
 export function awaitCompileGate(
   compile: () => Promise<unknown>,
   timeoutMs: number,
@@ -60,7 +109,7 @@ export function awaitCompileGate(
     const guard = scheduler.setTimeout(() => {
       if (settled) return;
       timedOut = true;
-      options.onTimeout?.();
+      reportGateTimeout(timeoutMs, options);
     }, timeoutMs);
     const finish = (failed: boolean): void => {
       if (settled) return;
@@ -98,13 +147,135 @@ export class CompileGateQueue {
     timeoutMs: number,
     options: CompileGateOptions = {},
   ): Promise<CompileGateResult> {
-    const work = () => awaitCompileGate(compile, timeoutMs, options);
+    return this.submit(() => awaitCompileGate(compile, timeoutMs, options), options);
+  }
+
+  /**
+   * One gate cut into pieces (compile_gate_pieces.ts: one per material group
+   * of the root), each its own queue unit labelled `${label}:${index}`, so
+   * the queue paces the driver's per-program work between them and its
+   * released-tail cap bounds how many of the gate's links pile on the driver
+   * at once. The deadline is PER PIECE: each piece arms `timeoutMs` when its
+   * own work starts and disarms it when it settles, so the constant keeps
+   * the meaning it had for a whole root (the driver latency of one unit) and
+   * the queue's pacing between pieces never burns it. The gate times out
+   * when any piece does (recorded once per gate, under the gate label, by
+   * the first piece to fire). The result aggregates the pieces (any failure
+   * fails it) and resolves only when every piece settled, so readiness
+   * marking and the reveal happen exactly as for a whole-root gate. Serial
+   * on the local fallback. Each piece receives its own deadline, so work it
+   * runs after its compile resolves (the variant settle) ends when that
+   * deadline fires: such a piece resolves with the gate already timed out.
+   */
+  runPieces(
+    pieces: CompileGatePiece[],
+    timeoutMs: number,
+    options: CompileGateOptions = {},
+  ): Promise<CompileGateResult> {
+    if (pieces.length === 0) return Promise.resolve({ failed: false, timedOut: false });
+    const scheduler = options.scheduler ?? defaultScheduler;
+    let timedOut = false;
+    // The queue rejected the gate (shutdown): live timers are cleared and a
+    // piece released after that arms none, so a closed gate records nothing.
+    let closed = false;
+    const armed = new Set<number>();
+    const disarmAll = (): void => {
+      closed = true;
+      for (const guard of armed) scheduler.clearTimeout(guard);
+      armed.clear();
+    };
+    const closedDeadline: PieceDeadline = { fired: true };
+    const settled = pieces.map((piece, index) =>
+      this.submit(
+        () => {
+          if (closed) return settleCompilePiece(() => piece(closedDeadline));
+          let pieceSettled = false;
+          let fired = false;
+          // Reads the closed flag too: a disarmed timer never fires, and a
+          // piece still polling past that must stop as if it had.
+          const deadline: PieceDeadline = {
+            get fired() {
+              return fired || closed;
+            },
+          };
+          const guard = scheduler.setTimeout(() => {
+            armed.delete(guard);
+            if (pieceSettled) return;
+            fired = true;
+            const first = !timedOut;
+            timedOut = true;
+            if (first) reportGateTimeout(timeoutMs, options);
+          }, timeoutMs);
+          armed.add(guard);
+          return settleCompilePiece(() => piece(deadline)).then((failed) => {
+            pieceSettled = true;
+            if (armed.delete(guard)) scheduler.clearTimeout(guard);
+            return failed;
+          });
+        },
+        options.label === undefined
+          ? options
+          : { ...options, label: linkPieceLabel(options.label, index) },
+      ),
+    );
+    return Promise.all(settled).then(
+      (failures) => ({ failed: failures.some(Boolean), timedOut }),
+      (error) => {
+        disarmAll();
+        throw error;
+      },
+    );
+  }
+
+  private submit<T>(work: () => Promise<T>, options: CompileGateOptions): Promise<T> {
     if (this.sharedQueue) {
       return this.sharedQueue.run(work, options.priority, options.label, { releaseTail: true });
     }
     const result = this.tail.then(work);
     this.tail = result;
     return result;
+  }
+}
+
+/**
+ * Strictly serial lane for gates whose targets arrive in a BURST and whose
+ * first draw pays for every link still in flight on the driver: the composed
+ * far bakes of a crowd crossing the far band (twenty wraps minted inside a
+ * second). Released tails let all of their links pile onto the driver's compile
+ * threads at once, and on drivers that finish a program lazily at its first
+ * use (measured on the Intel iGPU: 360 to 380 ms for one settled program
+ * behind a dozen queued links) the settled bake still stalled. One gate's link
+ * at a time, in arrival order, keeps that queue one wrap deep. `start` runs the
+ * gate and must call the settle callback exactly once (also on failure), or the
+ * lane stalls; the renderer's gates always do (recovery calls it too).
+ */
+export class SerialGateLane {
+  private tail: Promise<void> = Promise.resolve();
+  private depth = 0;
+
+  /** Gates enqueued and not yet settled (diagnostics and tests). */
+  get pending(): number {
+    return this.depth;
+  }
+
+  /** Queue one gate: `start` runs when the lane is free and gets the settle
+   *  callback to hand to the gate; `onSettled` (the caller's own reaction)
+   *  runs on that settle, before the next gate starts. */
+  enqueue(start: (settled: () => void) => void, onSettled: () => void = () => {}): void {
+    this.depth++;
+    this.tail = this.tail.then(
+      () =>
+        new Promise<void>((resolve) => {
+          let done = false;
+          start(() => {
+            if (done) return;
+            done = true;
+            this.depth--;
+            onSettled();
+            resolve();
+          });
+        }),
+    );
   }
 }
 

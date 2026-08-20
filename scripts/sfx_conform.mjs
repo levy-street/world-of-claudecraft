@@ -21,13 +21,12 @@
 
 import { existsSync, readdirSync, unlinkSync } from 'node:fs';
 import path from 'node:path';
-import ffmpegPath from 'ffmpeg-static';
-import ffprobeStatic from 'ffprobe-static';
 import {
   conformSfxAudio,
   inspectSfxConformance,
   SFX_AUDIO_EXTENSIONS,
 } from './sfx/conform_audio.mjs';
+import { SFX_CONFORMANCE_FFMPEG_PATH, SFX_CONFORMANCE_FFPROBE_PATH } from './sfx/ffmpeg_paths.mjs';
 import { buildSfxConformPolicy } from './sfx/sfx_conform_inventory.mjs';
 import {
   channelProblem,
@@ -42,7 +41,8 @@ import { SFX } from './sfx/sfx_prompts.mjs';
 const fix = process.argv.includes('--fix');
 const strict = process.argv.includes('--strict');
 const sfxDirectory = path.join(process.cwd(), 'public/audio/sfx');
-const ffprobePath = ffprobeStatic.path;
+const ffmpegPath = SFX_CONFORMANCE_FFMPEG_PATH;
+const ffprobePath = SFX_CONFORMANCE_FFPROBE_PATH;
 
 const allFiles = existsSync(sfxDirectory)
   ? readdirSync(sfxDirectory)

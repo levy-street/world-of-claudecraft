@@ -87,6 +87,15 @@ const mainTs = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8').
   /\r\n/g,
   '\n',
 );
+const padTargetPickTs = readFileSync(
+  new URL('../src/game/pad_target_pick.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
+// A raw source pin is satisfied by a commented-out occurrence, so the pad pins
+// below read a comment-stripped view (the tests/pad_reel.test.ts idiom).
+const stripLineComments = (source: string) => source.replace(/^\s*\/\/.*$/gm, '');
+const mainTsCode = stripLineComments(mainTs);
+const padTargetPickCode = stripLineComments(padTargetPickTs);
 const newsFeedTs = readFileSync(new URL('../src/ui/news_feed.ts', import.meta.url), 'utf8').replace(
   /\r\n/g,
   '\n',
@@ -2180,8 +2189,10 @@ describe('client HTML shell', () => {
     // corpse-claim mirror online). The R40 confirm gate now trails the
     // nothing-to-interact string, with harvestStateReliable still an
     // explicit `undefined` (the default), never a live override.
+    // preferNpcId trails the confirm gate: the pad names the npc the player
+    // SELECTED, so a talk press cannot answer whoever happens to stand closer.
     expect(mainTs).toContain(
-      "t('errors.nothingInteract'),\n        undefined,\n        gatherEffectConfirm,\n      ),",
+      "t('errors.nothingInteract'),\n        undefined,\n        gatherEffectConfirm,\n        preferNpcId,\n      ),",
     );
     // The escort away line sits immediately before it (escort_interact.ts): an
     // escort run has no other client entry point, so an unwired argument here
@@ -2190,6 +2201,29 @@ describe('client HTML shell', () => {
       "t('questUi.errors.escortAway'),\n        t('errors.nothingInteract'),",
     );
     expect(mainTs).not.toContain('online === null');
+    // Attack is the fixed slot-0 toggle, not a spell, so ABILITIES has no record
+    // for it and it would be the ONE press that skipped auto-targeting: the very
+    // press a new controller player reaches for first, on a wolf they have not
+    // targeted. The descriptor is substituted here rather than in the pure core,
+    // which never learns about pseudo-actions.
+    expect(padTargetPickCode).toMatch(
+      /action\.id === CROSS_HOTBAR_ATTACK_ID\s*\?\s*\{ requiresTarget: true \}\s*:\s*resolvedAbility\(world, action\.id\)/,
+    );
+    // Every other press is judged on the definition the button would actually cast:
+    // a cell stores the learned BASE id, which an aura transform can move away from.
+    expect(padTargetPickCode).toContain('resolveActionReplacement(known, world.player).def');
+    expect(mainTsCode).toContain(
+      'const padTargetPick = createPadTargetPick({ world, interactKey });',
+    );
+    // Pad mode is a body class only syncPadMode writes, and gamepad.stop() releases
+    // the pad without an onConnectionChange, so the Controller settings arm has to
+    // re-read it: otherwise turning the setting off leaves the desktop rows hidden
+    // behind a cross hotbar no longer driven by anything.
+    expect(mainTsCode).toMatch(
+      /else gamepad\.stop\(\);[\s\S]{0,400}?crossHotbar\.syncPadMode\(gamepad\);/,
+    );
+    // The pad layout is per character, like the keybinds it is scoped alongside.
+    expect(mainTsCode).toContain('createCrossHotbar(() => hud, keybindScope)');
     expect(mainTs).toContain('const interactionOutcome = handlePickedEntity(');
     expect(mainTs).toContain(
       'isClickMoveButton &&\n        shouldApproachPickedEntity(\n          world.player,\n          e,\n          didInteractImmediately,\n          true,\n          localPartyMemberIds(world.partyInfo),\n        )',

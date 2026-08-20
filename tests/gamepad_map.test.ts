@@ -137,26 +137,44 @@ describe('risingEdges', () => {
 
 describe('default layout', () => {
   it('binds every console-MMO button to a known action and stays within the bindable set', () => {
-    expect(DEFAULT_GAMEPAD_BINDINGS[GP.A]).toBe('jump');
+    // Console-MMO face layout: bottom confirms, top jumps.
+    expect(DEFAULT_GAMEPAD_BINDINGS[GP.A]).toBe('confirm');
+    expect(DEFAULT_GAMEPAD_BINDINGS[GP.Y]).toBe('jump');
+    // The left face button opens the target's subcommands (falling back to the
+    // map). Targeting does not need a button of its own: confirm selects, and the
+    // bare d-pad cycles.
+    expect(DEFAULT_GAMEPAD_BINDINGS[GP.X]).toBe('subcommands');
+    expect(DEFAULT_GAMEPAD_BINDINGS[GP.B]).toBe('cancel');
+    expect(DEFAULT_GAMEPAD_BINDINGS[GP.BACK]).toBe('cycleHud');
     expect(DEFAULT_GAMEPAD_BINDINGS[GP.START]).toBe('escape');
     for (const idx of Object.keys(DEFAULT_GAMEPAD_BINDINGS).map(Number)) {
       expect(BINDABLE_BUTTONS).toContain(idx);
     }
   });
 
-  it('assigns a default to every bindable button (catches a dropped binding)', () => {
+  it('leaves the modifiers and the ability-free cross-hotbar buttons unbound', () => {
     const bound = Object.keys(DEFAULT_GAMEPAD_BINDINGS)
       .map(Number)
       .sort((a, b) => a - b);
-    expect(bound).toEqual(BINDABLE_BUTTONS);
+    // The triggers are the cross hotbar's modifiers. A modifier that also fires an
+    // ability reads as a random cast every time the player reaches for the bar, so
+    // they ship unbound and stay free for anyone who turns the cross hotbar off.
+    const unbound: number[] = [GP.LT, GP.RT, GP.DPAD_UP, GP.DPAD_DOWN, GP.DPAD_LEFT, GP.DPAD_RIGHT];
+    expect(bound).toEqual(BINDABLE_BUTTONS.filter((b) => !unbound.includes(b)));
+    for (const b of unbound) expect(DEFAULT_GAMEPAD_BINDINGS[b]).toBeUndefined();
   });
 
-  it('covers action-bar slots 0..8 exactly once (catches a dropped or duplicated slotN)', () => {
+  it('covers its action-bar slots exactly once (catches a dropped or duplicated slotN)', () => {
     const values = Object.values(DEFAULT_GAMEPAD_BINDINGS);
-    for (let slot = 0; slot <= 8; slot++) {
-      // Exactly once: count 0 = a dropped slot, count >= 2 = a duplicated slot
-      // (additive or displacing). The default layout binds each slot to one button.
-      expect(values.filter((v) => v === `slot${slot}`).length, `slot${slot}`).toBe(1);
+    // Only the LEFT bumper still carries a bare slot; the right one took the set
+    // switch a console pad puts there. Every cross-hotbar button (the d-pad and
+    // the face four) is reserved for system verbs and its sixteen trigger-held
+    // slots, and the triggers themselves are the modifiers, so the flat layout
+    // deliberately reaches no other slot.
+    // Exactly once: count 0 = a dropped slot, count >= 2 = a duplicated slot.
+    expect(values.filter((v) => v === 'slot2').length, 'slot2').toBe(1);
+    for (const slot of [0, 1, 3, 4, 5, 6, 7, 8]) {
+      expect(values.filter((v) => v === `slot${slot}`).length, `slot${slot}`).toBe(0);
     }
   });
 

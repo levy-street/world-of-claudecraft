@@ -23,16 +23,17 @@ import type * as THREE from 'three';
 import { reattachBiomeHazeToClone } from './biome_haze_field';
 import { reapplyArmorDyeToClone } from './characters/armor_dye';
 import { addRimGlow, hasRimGlow } from './gfx';
+import { reapplyVertexColorEmissiveToClone } from './vertex_color_emissive';
 import { reapplySurfaceDetailToClone } from './worn_stone';
 
 /**
  * Re-attach to `clone` the onBeforeCompile layers `source` carried, in the
  * order the material factories apply them (armour dye first, then rim glow,
- * then zone haze as surfaceMat attaches it at creation, then surface detail:
- * each later layer chains the previous hook into its own cache key). Only
- * layers the source actually had are re-attached, so a clone never gains a
- * patch its source never carried, which would break program identity just as
- * badly.
+ * then zone haze as surfaceMat attaches it at creation, then surface detail,
+ * then the vertex-colour emissive layer: each later layer chains the previous
+ * hook into its own cache key). Only layers the source actually had are
+ * re-attached, so a clone never gains a patch its source never carried, which
+ * would break program identity just as badly.
  *
  * The dye goes FIRST because that is the order the rig factory composes them:
  * characters/assets.ts buildTintedClone re-attaches the outfit dye, then calls
@@ -52,6 +53,11 @@ export function reattachClonedMaterialHooks(source: THREE.Material, clone: THREE
   // Reads the JSON spec applySurfaceDetail records in userData, which clone()
   // did copy; a no-op for clones of undetailed materials.
   reapplySurfaceDetailToClone(clone);
+  // Last, because townMaterial applies it last (after its own hook-preserving
+  // clone, and on the arm that never takes surface detail): the two town
+  // factories decorate their emissive building materials here, and those
+  // materials are exactly the ones the occluder fade re-clones.
+  reapplyVertexColorEmissiveToClone(clone);
 }
 
 /** clone() plus reattachClonedMaterialHooks: the program-preserving clone. */

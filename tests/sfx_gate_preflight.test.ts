@@ -36,9 +36,11 @@ describe('SFX gate toolchain preflight', () => {
 
   it('names only the broken tool when the other one resolves and runs', () => {
     // Per-dimension red path: only ffmpeg is forced onto a nonexistent override
-    // while ffprobe resolves normally (the static package binary, PATH-independent),
-    // so the failure message's per-tool selection is exercised, not just the
-    // both-tools arm above.
+    // while ffprobe is forced onto a tiny runnable fixture. Do not rely on the
+    // static package here: ffprobe-static@3.1.0 publishes no Linux arm64 binary.
+    const dir = mkdtempSync(join(tmpdir(), 'woc-preflight-'));
+    const okTool = join(dir, 'ok-ffprobe');
+    writeFileSync(okTool, '#!/bin/sh\nexit 0\n', { mode: 0o755 });
     const result = spawnSync(process.execPath, ['scripts/gate.mjs'], {
       cwd: process.cwd(),
       encoding: 'utf8',
@@ -47,14 +49,18 @@ describe('SFX gate toolchain preflight', () => {
         PATH: '',
         WOC_SKIP_DEP_SYNC: '1',
         WOC_FFMPEG_PATH: '/nonexistent/woc-preflight/ffmpeg',
-        WOC_FFPROBE_PATH: undefined,
+        WOC_FFPROBE_PATH: okTool,
       },
     });
 
-    expect(result.status).toBe(1);
-    expect(result.stderr).toContain('missing required SFX audio tooling: ffmpeg');
-    expect(result.stderr).not.toMatch(/missing required SFX audio tooling: [^\n]*ffprobe/);
-    expect(result.stdout).not.toContain('[gate] i18n artifacts');
+    try {
+      expect(result.status).toBe(1);
+      expect(result.stderr).toContain('missing required SFX audio tooling: ffmpeg');
+      expect(result.stderr).not.toMatch(/missing required SFX audio tooling: [^\n]*ffprobe/);
+      expect(result.stdout).not.toContain('[gate] i18n artifacts');
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 
   it('probes by execution, not existence: a present but broken binary still fails', () => {

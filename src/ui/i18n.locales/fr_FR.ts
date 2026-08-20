@@ -13,6 +13,22 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const fr_FR: Partial<Record<TranslationKey, string>> = {
+  'guide.classPage.formsAutoUnshift': "Un soin ou un sort de dégâts lancé sous forme vous en fait sortir tout seul. Quitter une forme ainsi est gratuit et ne consomme pas votre temps de recharge global, un sort instantané part donc à l'instant où vous appuyez. Reprendre la forme est une capacité ordinaire, qui coûte toujours du mana et votre temps de recharge global.",
+  'entities.mobs.heroic_boss_dummy.name': 'Mannequin de boss héroïque',
+  'entities.mobs.normal_boss_dummy.name': 'Mannequin de boss normal',
+  'entities.mobs.friendly_player_dummy.name': 'Mannequin de joueur allié',
+  'entities.items.dawnhold_posy.name': 'Bouquet du jardin de Dawnhold',
+  'entities.dungeons.dawnhold_castle.leaveText': 'Vous ressortez sur la pelouse ensoleillée du jardin.',
+  'entities.dungeons.dawnhold_castle.enterText': 'Vous pénétrez dans les salles chaudes et parfumées de fleurs du Château Dawnhold.',
+  'entities.dungeons.dawnhold_castle.name': 'Château Dawnhold',
+  'hudChrome.lastkeepMap.story.tower': 'La tour de guet',
+  'hudChrome.lastkeepMap.story.residence': 'Le logis',
+  'hudChrome.lastkeepMap.story.state': "L'étage d'apparat",
+  'hudChrome.lastkeepMap.story.undercroft': 'La salle basse',
+  'hudChrome.lastkeepMap.title': '{keep} : {story}',
+  'hudChrome.dawnholdMap.story.solar': 'La chambre du soleil',
+  'hudChrome.dawnholdMap.story.ground': 'Le rez-de-jardin',
+  'hudChrome.dawnholdMap.title': '{keep} : {story}',
   'guide.social.chanBattleground': 'Champs de Thornhollow.',
   'guide.social.chanBattlegroundBody': "Parlez à chaque combattant de votre champ de bataille, des deux côtés. Uniquement pendant qu'un match est en cours.",
   'hud.chat.templates.battleground': '[Champs de Thornhollow] {name} : {message}',
@@ -2707,10 +2723,10 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Un signal sifflé galvanise votre groupe : vitesse d’attaque, d’incantation et de canalisation augmentée de 10% pendant 10 s. Les alliés récemment touchés par une accélération de groupe sont trop épuisés pour en profiter. (talent de Voleur)',
   'entities.abilities.venomrend.name': 'Déchirure venimeuse',
   'entities.abilities.venomrend.description':
-    'Consume le Rituel du venin : frappe pour 22 plus 26 par point de combo, fait détoner les dégâts restants de vos saignements et rend 25 points d’énergie. (moteur Knifework)',
+    'Consume le Rituel du venin : frappe pour 22 plus 26 par point de combo, fait détoner les dégâts restants de vos saignements et rend 25 points d’énergie. (moteur Art des lames)',
   'entities.abilities.veilstrike.name': 'Frappe du voile',
   'entities.abilities.veilstrike.description':
-    'Consume la réserve de Pénombre pour vous envelopper d’ombre pendant 6 s : vos ouvertures furtives fonctionnent à découvert et vous infligez 25% de dégâts supplémentaires. (moteur Skulduggery)',
+    'Consume la réserve de Pénombre pour vous envelopper d’ombre pendant 6 s : vos ouvertures furtives fonctionnent à découvert et vous infligez 25% de dégâts supplémentaires. (moteur Fourberie)',
   'entities.abilities.body_blow.name': 'Coup au corps',
   'entities.abilities.body_blow.description':
     'Un coup puissant infligeant 130% des dégâts de l’arme plus 10, qui confère 2 points de combo et approfondit la Redline d’un cran. (moteur Thuggery)',
@@ -2719,7 +2735,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Termine la Redline par un K.-O. : frappe pour 45 plus 35 par point de combo, 25% plus fort par cran de Redline, et rend 25 points d’énergie. (moteur Thuggery)',
   'entities.abilities.venom_dart.name': 'Dard venimeux',
   'entities.abilities.venom_dart.description':
-    'Projette un dard empoisonné infligeant {damage} points de dégâts de Nature. Confère 1 point de combo. Knifework : prolonge votre plaie de Déchirure venimeuse de 6 sec, jusqu’à 20 sec.',
+    'Projette un dard empoisonné infligeant {damage} points de dégâts de Nature. Confère 1 point de combo. Art des lames : prolonge votre plaie de Déchirure venimeuse de 6 sec, jusqu’à 20 sec.',
   'entities.abilities.smoke_screen.name': 'Écran de fumée',
   'entities.abilities.smoke_screen.description':
     'Vous disparaissez dans un nuage de fumée, ce qui augmente vos chances d’esquiver de 30 % pendant 8 s.',
@@ -6328,7 +6344,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.drain_life.description': "Consume la vitalité de la cible, infligeant {damage} points de dégâts d'Ombre chaque seconde et vous en transférant 70% sous forme de vie. Affliction en transfère la totalité à la place. Canalisé sur votre Mauvais œil principal, il consomme tous les Fils du destin au départ, et chaque Fil génère 1 Condamnation supplémentaire par tic.",
   'entities.abilities.fear.name': 'Tourment',
   'entities.abilities.fear.description':
-    "Terrifie l'ennemi et le laisse tremblant pendant un maximum de 8 s. Tout dégât interrompt l'effet.",
+    "Terrifie l'ennemi et le laisse tremblant pendant un maximum de 5 s. Les dégâts cumulés équivalant à 8% du maximum de points de vie de la cible interrompent l'effet.",
   'entities.abilities.searing_pain.name': 'Cautérisation',
   'entities.abilities.searing_pain.description':
     "Brûle l'ennemi d'un feu atroce pour {damage} points de dégâts de Feu. Incantation rapide.",
@@ -6419,9 +6435,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_felguard.name': 'Invoquer un Warfiend',
   'entities.abilities.summon_felguard.description':
     "Invoque un Warfiend sous le commandement du démoniste. Le Warfiend est un démon de mêlée résistant qui se jette dans la bataille et tient bon. Invoquer un nouveau démon renvoie celui que vous avez. Vous ne pouvez avoir qu'un démon à la fois.",
-  'entities.abilities.summon_infernal.name': 'Invoquer un Pyre Colossus',
+  'entities.abilities.summon_infernal.name': 'Invoquer un Colosse du bûcher',
   'entities.abilities.summon_infernal.description':
-    "Fait s'abattre un Pyre Colossus sur la zone ciblée et inflige 58-72 points de dégâts de Feu à l'impact. Il combat pendant 30 s sans remplacer votre démon, brûle les ennemis proches toutes les 2 s et génère 1 point de Ruine par seconde.",
+    "Fait s'abattre un Colosse du bûcher sur la zone ciblée et inflige 58-72 points de dégâts de Feu à l'impact. Il combat pendant 30 s sans remplacer votre démon, brûle les ennemis proches toutes les 2 s et génère 1 point de Ruine par seconde.",
   'entities.abilities.summon_doomguard.name': 'Invoquer un Wraithborn',
   'entities.abilities.summon_doomguard.description':
     "Soumet un Wraithborn à votre volonté, un démon d'élite qui déverse de lourds dégâts d'Ombre à distance. Un long temps de recharge bride sa puissance dévastatrice. Invoquer un nouveau démon renvoie celui que vous avez. Vous ne pouvez avoir qu'un démon à la fois.",
@@ -6479,9 +6495,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.name': 'Forme de sélénien',
   'entities.abilities.moonkin_form.description':
     'Adopte la forme de sélénien, renforçant l’incantation jusqu’à ce que vous changiez de nouveau. Lancez à nouveau pour revenir à la forme normale. (signature Équilibre)',
-  'entities.abilities.feral_charge.name': 'Charge farouche',
+  'entities.abilities.feral_charge.name': 'Déferlante primordiale',
   'entities.abilities.feral_charge.description':
-    'Charge un ennemi et l’enracine pendant 1 s. Portée de 8-25 m. (signature Farouche)',
+    "Libère une déferlante primordiale. En Forme de loup, augmente la régénération d'énergie de 100% pendant 10 s. En Forme de Bruin, génère instantanément 50 points de rage. (signature Farouche)",
   'entities.abilities.swiftmend.name': 'Prompte guérison',
   'entities.abilities.crusader_strike.name': 'Frappe du croisé',
   'entities.abilities.crusader_strike.description':
@@ -6821,7 +6837,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.emberkin.name': 'Emberkin',
   'entities.mobs.gloomshade.name': 'Gloomshade',
   'entities.mobs.grix_the_tunnelking.name': 'Grix le Roi des tunnels',
-  'entities.mobs.pyre_colossus.name': 'Pyre Colossus',
+  'entities.mobs.pyre_colossus.name': 'Colosse du bûcher',
   'entities.mobs.choirmother_selthe.name': 'Selthe, mère de chœur',
   'entities.mobs.drowned_templeguard.name': 'Garde du temple noyé',
   'entities.mobs.drowned_votary.name': 'Dévot noyé',
@@ -9505,6 +9521,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'worldContent.delveSurfaceExitInteract': 'Appuyez sur F pour remonter',
   'sim.delve.objectiveClearRoom': 'Nettoyez la salle.',
   'sim.delve.objectiveDefeatBoss': 'Vainquez le boss.',
+  'sim.delve.enemiesRemain': "Éliminez d'abord les ennemis restants.",
   'sim.rift.allUnstable': 'Toutes les failles sont instables pour le moment. Réessayez bientôt.',
   'sim.rift.alreadyCleared': 'Cette faille a déjà été nettoyée par {names}.',
   'sim.rift.deadEntry': 'Vous ne pouvez pas entrer dans une faille tant que vous êtes mort.',
@@ -11438,7 +11455,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deterrence.description':
     "Augmente vos chances d'esquiver de 50 points de pourcentage pendant 10 s. (talent de Chasseur)",
   'entities.abilities.earthbind.description': 'Immobilise les ennemis dans un rayon de 4 m autour du point visé pendant 2 s, puis les ralentit de 40% pendant 6 s. (Talent de chaman)',
-  'entities.abilities.evocation.description': 'Restaura mana rápidamente. (talent de mage)',
+  'entities.abilities.evocation.description':
+    'Canalisez pendant 6 s : chaque seconde, vous récupérez 100 points de mana et gagnez 8 points de puissance des sorts. Le bonus se cumule pendant la canalisation et dure 15 s. (talent de Mage)',
   'entities.abilities.frenzied_regeneration.description':
     "Rend 40% de vos points de vie maximum en 10 s. Forme d'ours uniquement. (talent de Druide)",
   'entities.abilities.frost_trap.description':
@@ -11447,9 +11465,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Rend 120 points de vie à une cible alliée en 12 s. (talent de Chaman)',
   'entities.abilities.howl_of_terror.description':
-    "Effraie les ennemis proches pendant un maximum de 3 s. Les dégâts peuvent interrompre l'effet. (talent de Démoniste)",
+    "Effraie les ennemis proches pendant un maximum de 5 s. Les dégâts cumulés équivalant à 8% du maximum de points de vie d'une cible interrompent sa peur. (talent de Démoniste)",
   'entities.abilities.ice_block.description':
-    'Te encierra en hielo y absorbe una enorme cantidad de daño durante 8 s. (talent de mage)',
+    'Vous enferme dans la glace pendant 8 s, vous immunisant contre tous les dégâts. Supprime les effets néfastes ordinaires déjà actifs et empêche les nouveaux effets de contrôle ordinaires. Utilisable lorsque vous êtes étourdi ou métamorphosé. Vous ne pouvez pas agir pendant cet effet. Relancez la capacité pour l’annuler. (Mage)',
   'entities.abilities.inner_focus.description': 'Rend votre prochain sort de prêtre gratuit et ininterruptible. Dure 60 s.',
   'entities.abilities.innervate.description':
     "De la sève vivante afflue en vous pendant 10 s et restaure par vagues 20 points de votre ressource actuelle : mana, rage ou énergie. Changer de forme ne l'interrompt pas. Le sommeil, l'étourdissement ou la stase immobilisent la sève. (talent de Druide)",
@@ -11465,7 +11483,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.preparation.description':
     'Met fin au temps de recharge de Sprint, Évasion et Disparition. (talent de Voleur)',
   'entities.abilities.presence_of_mind.description':
-    'Hace instantáneo tu siguiente hechizo con tiempo de lanzamiento. Dura 60 s. (talent de mage)',
+    'Votre prochain sort ayant un temps d’incantation devient instantané. Dure 60 s. (talent de Mage)',
   'entities.abilities.psychic_scream.description': "Effraie les ennemis dans un rayon de 8 m pendant 4 s au plus. Les dégâts peuvent briser l'effet.",
   'entities.abilities.shadowstep.description':
     'Vous fait traverser les ombres en direction de votre cible. (talent de Voleur)',
@@ -12922,7 +12940,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.abyssal_rift.name': 'Faille abyssale',
   'entities.abilities.ambush.description': "Frappe depuis les ombres pour 250% des dégâts de l'arme plus {damage}. Camouflage requis, derrière la cible. Requiert une dague. Confère 1 point de combo.",
   'entities.abilities.ambush.specNote_subtlety': "Utilisée depuis le Voile du crépuscule, elle ajoute 1 Pénombre (maximum 3). À 3 Pénombre, vous pouvez l'utiliser SANS camouflage et sous n'importe quel angle : cette utilisation ne coûte rien, dépense les 3 Pénombre, déclenche le voile d'ombre de 6 s, et inflige le double de dégâts.",
-  'entities.abilities.army_of_the_dead.description': 'Ouvre un portail funéraire pour relever temporairement un Skeletal Warrior, un Bone Mage et un Gravewing pendant 20 s, comblant les rangs que vos serviteurs de Domination habituels laissent vides.',
+  'entities.abilities.army_of_the_dead.description': 'Ouvre un portail funéraire pour relever temporairement un Guerrier squelette, un Mage d’os et une Aile funéraire pendant 20 s, comblant les rangs que vos serviteurs de Domination habituels laissent vides.',
   'entities.abilities.army_of_the_dead.name': 'Armée des morts',
   'entities.abilities.backstab.description': "Plantez votre dague dans le dos de la cible pour 150% des dégâts de l'arme plus {damage}. Doit être derrière la cible. Requiert une dague. Confère 1 point de combo.",
   'entities.abilities.backstab.specNote_assassination': "Chaque frappe ajoute 1 Rituel du venin (maximum 6) et rembourse 15 énergie. À 6 Rituel du venin, Sommeil éternel devient Déchirure venimeuse (elle inflige d'un coup tous les dégâts de saignement restants).",
@@ -12935,8 +12953,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cinderhide.name': 'Peau de braise',
   'entities.abilities.claw.description': "Griffe l'ennemi pour les dégâts de l'arme plus {damage}. Confère 1 point de combo. Forme de loup uniquement.",
   'entities.abilities.claw.specNote_feral': 'Chaque coup porté ajoute 1 Sang ancien (maximum 3).',
-  'entities.abilities.cold_blood.description': 'Concentre votre instinct meurtrier pour que votre prochaine attaque soit un coup critique. (signature Knifework)',
-  'entities.abilities.corpse_explosion.description': "Sacrifie d'abord un Bone Mage, puis un Skeletal Warrior, et un Gravewing seulement en dernier recours. Parmi les doublons, choisit celui dont la durée restante est la plus faible, puis le plus faible, pour infliger {damage} points de dégâts d'Ombre à l'endroit choisi.",
+  'entities.abilities.cold_blood.description': 'Concentre votre instinct meurtrier pour que votre prochaine attaque soit un coup critique. (signature Art des lames)',
+  'entities.abilities.corpse_explosion.description': "Sacrifie d'abord un Mage d’os, puis un Guerrier squelette, et une Aile funéraire seulement en dernier recours. Parmi les doublons, choisit celui dont la durée restante est la plus faible, puis le plus faible, pour infliger {damage} points de dégâts d'Ombre à l'endroit choisi.",
   'entities.abilities.corpse_explosion.name': 'Explosion de cadavre',
   'entities.abilities.coven.description': "Crée jusqu'à 4 Mauvais œil secondaires sur des ennemis proches pendant 15 s. Ils alimentent la réserve commune de Condamnation à 50%, et Sentence se répercute sur eux pour 35% de dégâts.",
   'entities.abilities.coven.name': 'Sabbat',
@@ -12962,7 +12980,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.garrote.description': "Enroule un fil autour de la gorge de l'ennemi, infligeant {damage} points de dégâts immédiatement et le faisant saigner pour {overTime} sur 18 s. Camouflage requis. Confère 1 point de combo.",
   'entities.abilities.garrote.specNote_subtlety': "Utilisée depuis le Voile du crépuscule, elle ajoute 1 Pénombre (maximum 3). À 3 Pénombre, vous pouvez l'utiliser SANS camouflage : cette utilisation ne coûte rien, dépense les 3 Pénombre, et déclenche le voile d'ombre de 6 s.",
   'entities.abilities.ghostly_strike.description': "Frappe l'ennemi pour les dégâts de l'arme plus {damage} et augmente vos chances d'esquive de 15% pendant 7 s. Confère 1 point de combo. (talent de Voleur)",
-  'entities.abilities.hemorrhage.description': "Frappe l'ennemi pour les dégâts de l'arme plus {damage}, cause des dégâts de saignement sur 12 s, et augmente les dégâts de saignement subis de 40%. Confère 1 point de combo. Une utilisation sur deux ajoute 1 Pénombre (maximum 3). (signature Skulduggery)",
+  'entities.abilities.hemorrhage.description': "Frappe l'ennemi pour les dégâts de l'arme plus {damage}, cause des dégâts de saignement sur 12 s, et augmente les dégâts de saignement subis de 40%. Confère 1 point de combo. Une utilisation sur deux ajoute 1 Pénombre (maximum 3). (signature Fourberie)",
   'entities.abilities.hex_of_violence.description': "Maudit l'ennemi pendant 8 s. Ses 3 prochaines actions offensives génèrent chacune 7 Condamnation et lui infligent 16 points de dégâts d'Ombre.",
   'entities.abilities.hex_of_violence.name': 'Malédiction de violence',
   'entities.abilities.hour_of_judgment.description': "Appelle le jugement sur votre Mauvais œil principal pendant 15 s, accordant 40 Condamnation et 3 Fils du destin, activant la Possession, doublant la Condamnation générée par l'Œil principal, et augmentant les dégâts de Sentence de 20%. La première Sentence rembourse 50 Condamnation.",
@@ -12978,21 +12996,21 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonfire.specNote_balance': 'Entretenez le feu : Graine lunaire le prolonge de 6 s.',
   'entities.abilities.needle_of_fate.description': "Transperce l'ennemi pour {damage} points de dégâts d'Ombre et génère 5 Condamnation s'il porte votre Mauvais œil. Chaque coup sur votre Mauvais œil principal ajoute un Fil du destin pendant 12 s, jusqu'à 3. Si aucun Mauvais œil n'existe, l'Aiguille marque d'abord sa cible.",
   'entities.abilities.needle_of_fate.name': 'Aiguille du destin',
-  'entities.abilities.ossuary_mark.description': "Marque un ennemi pendant 12 s, stockant 20% des dégâts infligés par vous et vos morts-vivants. Relancez pour la faire détoner. Si l'ennemi marqué meurt, elle explose dans un rayon de 6 m et crée 1 Fragment d'âme.",
+  'entities.abilities.ossuary_mark.description': "Marque un ennemi pendant 15 s, stockant 20% des dégâts infligés par vous et vos morts-vivants. Relancez pour la faire détoner. Si l'ennemi marqué meurt, elle explose dans un rayon de 6 mètres et crée 1 Fragment d'âme.",
   'entities.abilities.ossuary_mark.name': "Marque de l'ossuaire",
   'entities.abilities.possess_evil_eye.description': "Le Maudisseur possède votre Mauvais œil principal pendant 15 s et génère 35 Condamnation. Aiguille du destin s'incante en 1 s et génère 2 Condamnation supplémentaire, Consumer peut être canalisé en mouvement, et Sentence inflige 25% de dégâts en plus et libère un écho différé pour 60% de dégâts, dégressif jusqu'à 30% entre les niveaux 17 et 20.",
   'entities.abilities.possess_evil_eye.name': 'Posséder le Mauvais œil',
-  'entities.abilities.raise_bone_mage.description': "Dépense 2 Fragments d'âme pour ajouter un Bone Mage à distance permanent à votre Domination à 2 emplacements. Un seul peut vous servir à la fois. Ses attaques exposent la cible à 5% de dégâts magiques en plus pendant 6 s, et Commandement de la moisson porte cette faiblesse à 8%.",
-  'entities.abilities.raise_bone_mage.name': 'Relever un Bone Mage',
+  'entities.abilities.raise_bone_mage.description': "Dépense 2 Fragments d'âme pour ajouter un Mage d’os à distance permanent à votre Domination à 2 emplacements. Un seul peut vous servir à la fois. Ses attaques exposent la cible à 5% de dégâts magiques en plus pendant 6 s, et Commandement de la moisson porte cette faiblesse à 8%.",
+  'entities.abilities.raise_bone_mage.name': 'Relever un Mage d’os',
   'entities.abilities.raise_graveguard.description': 'Relève un compagnon défensif permanent. Le Graveguard provoque automatiquement, intercepte 20% de vos dégâts subis via la Domination des tombes, et Commandement de la moisson le fait provoquer et subir 30% de dégâts en moins pendant 4 s.',
   'entities.abilities.raise_graveguard.name': 'Relever un Graveguard',
-  'entities.abilities.raise_gravewing.description': "Dépense 2 Fragments d'âme pour ajouter un Gravewing permanent à votre Domination à 2 emplacements. Un seul peut vous servir à la fois. Il frappe en zone les ennemis proches pour 65% de dégâts toutes les 5 s, et Commandement de la moisson fait que chaque ennemi touché subit 8% de dégâts en plus pendant 5 s.",
-  'entities.abilities.raise_gravewing.name': 'Relever un Gravewing',
-  'entities.abilities.raise_skeletal_warrior.description': "Dépense 1 Fragment d'âme pour ajouter un Skeletal Warrior permanent à votre Domination à 2 emplacements. Un seul peut vous servir à la fois. Il frappe en zone les ennemis proches pour 45% de dégâts toutes les 6 s, et Commandement de la moisson cloue sa cible avec un ralentissement de 40% pendant 4 s.",
-  'entities.abilities.raise_skeletal_warrior.name': 'Relever un Skeletal Warrior',
+  'entities.abilities.raise_gravewing.description': "Dépense 2 Fragments d'âme pour ajouter une Aile funéraire permanente à votre Domination à 2 emplacements. Une seule peut vous servir à la fois. Elle frappe en zone les ennemis proches pour 65% de dégâts toutes les 5 s, et Commandement de la moisson fait que chaque ennemi touché subit 8% de dégâts en plus pendant 5 s.",
+  'entities.abilities.raise_gravewing.name': 'Relever une Aile funéraire',
+  'entities.abilities.raise_skeletal_warrior.description': "Dépense 1 Fragment d'âme pour ajouter un Guerrier squelette permanent à votre Domination à 2 emplacements. Un seul peut vous servir à la fois. Il frappe en zone les ennemis proches pour 45% de dégâts toutes les 6 s, et Commandement de la moisson cloue sa cible avec un ralentissement de 40% pendant 4 s.",
+  'entities.abilities.raise_skeletal_warrior.name': 'Relever un Guerrier squelette',
   'entities.abilities.rake.description': "Écorche l'ennemi pour les dégâts de l'arme plus {damage} et cause des dégâts de saignement sur 18 s. Confère 1 point de combo. Forme de loup uniquement.",
   'entities.abilities.rake.specNote_feral': 'Chaque coup porté ajoute 1 Sang ancien (maximum 3).',
-  'entities.abilities.reaping_command.description': "Dépense 2 Fragments d'âme pour ordonner à tous vos serviteurs morts-vivants de frapper à l'unisson. Les Graveguards provoquent et s'arc-boutent, les Skeletal Warriors clouent leur cible, les Bone Mages exposent les défenses magiques, et le Gravewing déchire tous les ennemis touchés.",
+  'entities.abilities.reaping_command.description': "Dépense 2 Fragments d'âme pour ordonner à tous vos serviteurs morts-vivants de frapper à l'unisson. Les Graveguards provoquent et s'arc-boutent, les Guerriers squelettes clouent leur cible, les Mages d’os exposent les défenses magiques, et l’Aile funéraire déchire tous les ennemis touchés.",
   'entities.abilities.reaping_command.name': 'Commandement de la moisson',
   'entities.abilities.regrowth.description': "Soigne une cible alliée de {damage} et d'un montant supplémentaire sur 21 s.",
   'entities.abilities.regrowth.specNote_restoration': 'Planter une NOUVELLE floraison ajoute 1 Verdoyance (maximum 5).',
@@ -13023,7 +13041,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.specNote_balance': 'En Forme de sélénien, chaque incantation achevée ajoute 1 Marée lunaire (maximum 3). À 3 Marée lunaire, ce bouton devient Sillage solaire : une frappe instantanée de 80 à 100 dégâts de Nature plus une brûlure de 45 sur 9 s, restaurant 35 mana et dépensant les 3.',
   'entities.abilities.stealth.description': 'Vous dissimule dans les ombres : les ennemis vous remarquent à peine, mais vous vous déplacez 50% plus lentement. Attaquer ou subir des dégâts rompt le Voile du crépuscule. Relancez pour en sortir.',
   'entities.abilities.stealth.specNote_subtlety': 'Chaque ouverture utilisée depuis le Voile du crépuscule ajoute 1 Pénombre (maximum 3).',
-  'entities.abilities.swiftmend.description': "Consomme un effet de soin sur la durée présent sur une cible alliée pour la soigner de {damage}. Les plantations de Floraison sauvage et de Seconde floraison ajoutent de la Verdoyance ; à 5 Verdoyance, ce bouton devient Surfloraison, qui soigne instantanément chaque allié portant vos effets de soin sur la durée pour 60% de ce qu'il leur restait. (signature Groveheart)",
+  'entities.abilities.swiftmend.description': "Consomme un effet de soin sur la durée présent sur une cible alliée pour la soigner de {damage}. Les plantations de Floraison sauvage et de Seconde floraison ajoutent de la Verdoyance ; à 5 Verdoyance, ce bouton devient Surfloraison, qui soigne instantanément chaque allié portant vos effets de soin sur la durée pour 60% de ce qu'il leur restait. (signature Cœur sylvestre)",
   'entities.abilities.swipe.description': 'Balayez vos griffes à travers les ennemis proches pour {damage} points de dégâts. Cause une menace supplémentaire. Forme de Bruin uniquement.',
   'entities.abilities.swipe.specNote_feral': 'Chaque coup porté ajoute 1 Sang ancien (maximum 3).',
   'entities.abilities.umbral_anchor.description': "Première incantation : ancre votre ombre à vos pieds pendant 5 min. Relancez à moins de 40 m pour y retourner, consommant l'ancre et déclenchant une recharge de 45 s.",
@@ -13041,9 +13059,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.rimefang.name': 'Croc de givre',
   'entities.items.soul_stone.name': "Pierre d'âme",
   'entities.mobs.graveguard.name': 'Graveguard',
-  'entities.mobs.necromancy_bone_mage.name': 'Bone Mage',
-  'entities.mobs.necromancy_gravewing.name': 'Gravewing',
-  'entities.mobs.necromancy_skeletal_warrior.name': 'Skeletal Warrior',
+  'entities.mobs.necromancy_bone_mage.name': 'Mage d’os',
+  'entities.mobs.necromancy_gravewing.name': 'Aile funéraire',
+  'entities.mobs.necromancy_skeletal_warrior.name': 'Guerrier squelette',
   'guide.abilityHook.evil_eye': "Désigne l'ennemi dont les actions et les souffrances alimenteront votre Condamnation.",
   'hud.pet.abyssalChain': 'Chaîne abyssale',
   'hud.pet.abyssalChainDesc': "Ordonne à Gloomshade de tirer vers lui un ennemi normal situé à plus de 8 mètres et jusqu'à 20 mètres. Les boss ne peuvent pas être tirés de cette façon. Recharge de 15 secondes. Clic droit, appui long ou Maj+Entrée pour activer ou désactiver l'attaque automatique.",

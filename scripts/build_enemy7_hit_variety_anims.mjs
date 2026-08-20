@@ -42,7 +42,8 @@ const PREVIEW = process.argv.includes('--preview');
 
 const SOURCES = [
   { src: 'creatures/goblin.glb', out: 'creatures/goblin_hit_variety_anims.glb' },
-  { src: 'creatures/giant.glb', out: 'creatures/giant_hit_variety_anims.glb' },
+  // giant.glb retired with the authored ogre body (mob_ogre now ships its own
+  // Hit clip in ogre.glb, so the giant donor lost its last consumer).
 ];
 
 const io = createGlbIO();

@@ -13,6 +13,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.lastkeepMap.title': '{keep}: {story}',
+  'hudChrome.dawnholdMap.title': '{keep}: {story}',
   'guide.classPage.formName.form_cat': 'Облик волка',
   'guide.gear.slotOffhand': 'Левая рука',
   'guide.glossary.claudiumTerm': 'Claudium',
@@ -25,6 +27,25 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.clock': '{minutes}:{seconds}',
   'hudChrome.controller.zoomIn': 'Приблизить',
   'hudChrome.controller.zoomOut': 'Отдалить',
+  'hudChrome.controller.confirmAction': 'Подтвердить / выбрать',
+  'hudChrome.controller.cancelAction': 'Отмена / Назад',
+  'hudChrome.controller.subcommandsAction': 'Подкоманды / Карта',
+  'hudChrome.controller.cycleSetAction': 'Сменить набор панели',
+  'hudChrome.controller.cycleHudAction': 'Переключить интерфейс',
+  'hudChrome.controller.crossHotbarDisplay': 'Отображение панели',
+  'hudChrome.controller.crossHotbarDisplayFull': 'Полное',
+  'hudChrome.controller.crossHotbarDisplayCompact': 'Компактное',
+  'hudChrome.controller.crossHotbarDisplayMinimal': 'Только при удержании',
+  'hudChrome.controller.crossHotbarArrangeChord': '{bumper} + {button}',
+  'hudChrome.controller.crossHotbarCarrying': 'В руках {action}: подтверждение на ячейке кладет действие, отмена возвращает его.',
+  'hudChrome.controller.crossHotbarEditHint': 'Перестановка: подтверждение берет действие из ячейки или книги заклинаний и кладет его в ячейку, отмена очищает ячейку.',
+  'hudChrome.controller.crossHotbarEditHelp': 'Удерживайте левый бампер и нажмите верхнюю лицевую кнопку, чтобы переставить панель геймпадом.',
+  'hudChrome.controller.crossHotbarOwnsButtons': 'Пока крестовая панель включена, курки и крестовина принадлежат ей: настройте их ниже, а не здесь.',
+  'hudChrome.controller.crossHotbar': 'Крестовая панель',
+  'hudChrome.controller.crossHotbarEnable': 'Включить крестовую панель',
+  'hudChrome.controller.crossHotbarExpand': 'Двойная крестовая панель',
+  'hudChrome.controller.crossHotbarHelp': 'Удерживайте курок, чтобы подсветить восемь ячеек панели действий на крестовине и лицевых кнопках. Нажмите второй курок, чтобы переключиться на второй набор.',
+  'hudChrome.controller.crossHotbarResetLayout': 'Сбросить крестовую панель',
   'hudChrome.crafting.durationChip': '{seconds} сек.',
   'hudChrome.keybinds.dive': 'Нырнуть',
   'hudChrome.materialHint.usedBy': 'Используется в {crafts}.',
@@ -3205,7 +3226,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.drain_life.description': 'Пожирает жизненные силы цели, нанося {damage} урона от тьмы каждую секунду и передавая вам 70% от него здоровьем. Гибель передаёт вместо этого всё. Направленное на ваш главный Дурной глаз, оно расходует в начале все Нити судьбы, и каждая Нить даёт 1 дополнительное Осуждение за тик.',
   'entities.abilities.fear.name': 'Терзание',
   'entities.abilities.fear.description':
-    'Вселяет ужас во врага, заставляя его дрожать до 8 сек. Любой урон прерывает эффект.',
+    'Вселяет ужас во врага, заставляя его дрожать до 5 сек. Накопленный урон в размере 8% от максимального запаса здоровья цели прерывает эффект.',
   'entities.abilities.searing_pain.name': 'Опаление',
   'entities.abilities.searing_pain.description':
     'Обжигает врага мучительным огнем, нанося {damage} ед. урона от огня. Быстрое заклинание.',
@@ -3385,9 +3406,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonkin_form.name': 'Облик лунного совуха',
   'entities.abilities.moonkin_form.description':
     'Вы принимаете Облик лунного совуха, усиливая заклинания до обратного перехода. Примените снова, чтобы вернуться в обычный облик. (знаковое умение Баланса)',
-  'entities.abilities.feral_charge.name': 'Звериная атака',
+  'entities.abilities.feral_charge.name': 'Первобытный всплеск',
   'entities.abilities.feral_charge.description':
-    'Вы бросаетесь к врагу и обездвиживаете его на 1 сек. Дистанция 8-25 м. (знаковое умение Силы зверя)',
+    'Высвобождает первобытную силу. В облике волка скорость восстановления энергии повышается на 100% на 10 сек. В облике бурого мгновенно дает 50 ед. ярости. (знаковое умение Силы зверя)',
   'entities.abilities.swiftmend.name': 'Быстрое восстановление',
   'entities.abilities.swiftmend.description': 'Поглощает на союзной цели эффект исцеления со временем, исцеляя её на {damage}. Посевы Дикого расцвета и Второго расцвета добавляют Зелень; при 5 Зелени эта кнопка становится Сверхцветением, которое мгновенно исцеляет каждого союзника с вашими эффектами исцеления со временем на 60% от того, что этим эффектам оставалось. (знаковое умение Исцеления)',
   'entities.abilities.crusader_strike.name': 'Удар воина Света',
@@ -3714,6 +3735,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.gravecaller_summoner.name': 'Призыватель Могильного Зова',
   'entities.mobs.deacon_voss.name': 'Дьякон Восс',
   'entities.mobs.training_dummy.name': 'Тренировочный манекен',
+  'entities.mobs.friendly_player_dummy.name': 'Дружественный манекен игрока',
+  'entities.mobs.normal_boss_dummy.name': 'Обычный манекен босса',
+  'entities.mobs.heroic_boss_dummy.name': 'Героический манекен босса',
   'entities.mobs.ridge_stalker.name': 'Хребтовый охотник',
   'entities.mobs.deeprock_kobold.name': 'Глубокоскальный туннельщик',
   'entities.mobs.thornpeak_ogre.name': 'Огр Терновых Пиков',
@@ -7473,6 +7497,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'sim.delve.moveCloserStairs': 'Подойдите ближе к лестнице.',
   'sim.delve.notInDelve': 'Вы не находитесь в вылазке.',
   'sim.delve.nothingHappens': 'Ничего не происходит.',
+  'sim.delve.enemiesRemain': 'Сначала расправьтесь с оставшимися врагами.',
   'sim.delve.passageSealed': 'Проход запечатан.',
   'sim.delve.raiseDead': '{name} начинает Поднятие мёртвых.',
   'sim.delve.runFailed': 'Вылазка {name} провалена.',
@@ -9958,7 +9983,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.deterrence.description':
     'Повышает вероятность уклонения на 50 процентных пунктов на 10 сек. (талант охотника)',
   'entities.abilities.earthbind.description': 'Обездвиживает врагов в пределах 4 м от точки цели на 2 сек., затем замедляет их на 40% на 6 сек. (талант шамана)',
-  'entities.abilities.evocation.description': 'Быстро восполняет ману. (Талант мага)',
+  'entities.abilities.evocation.description':
+    'Поддерживается 6 сек.: каждую секунду восстанавливает 100 ед. маны и дает 8 ед. силы заклинаний. Эффект суммируется во время поддержания и длится 15 сек. (талант мага)',
   'entities.abilities.frenzied_regeneration.description':
     'Восстанавливает 40% максимального запаса здоровья за 10 сек. Только в облике медведя. (талант друида)',
   'entities.abilities.frost_trap.description':
@@ -9968,9 +9994,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.healing_stream.description':
     'Восстанавливает союзной цели 120 ед. здоровья за 12 сек. (талант шамана)',
   'entities.abilities.howl_of_terror.description':
-    'Пугает ближайших противников на срок до 3 сек. Урон может прервать эффект. (талант чернокнижника)',
+    'Пугает ближайших противников на срок до 5 сек. Накопленный урон в размере 8% от максимального запаса здоровья цели прерывает страх. (талант чернокнижника)',
   'entities.abilities.ice_block.description':
-    'Заключает вас в лед, поглощающий огромный урон в течение 8 сек. (Талант мага)',
+    'Заключает вас в прочный лед на 8 сек., делая невосприимчивыми ко всему урону. Снимает уже действующие обычные вредоносные эффекты и предотвращает наложение новых обычных эффектов контроля. Можно использовать в состоянии оглушения или превращения. Внутри нельзя действовать. Примените повторно, чтобы отменить. (маг)',
   'entities.abilities.inner_focus.description': 'Делает ваше следующее жреческое заклинание бесплатным и непрерываемым. Длится 60 сек.',
   'entities.abilities.innervate.description':
     'Живой сок наполняет вас в течение 10 сек. и волнами восполняет 20 ед. текущего ресурса: маны, ярости или энергии. Смена облика не прерывает эффект. Сон, оглушение или стазис останавливают течение сока. (талант друида)',
@@ -12166,7 +12192,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Мгновенно связывает далекого врага священной цепью. Враг движется к вам со скоростью 18 м в секунду, пока не приблизится на 3 м, после чего его скорость снижается на 50% на 4 сек. Во время Вознесения связывает второго ближайшего врага.',
   'entities.abilities.oath_chain.name': 'Цепь клятвы',
   'entities.abilities.ossuary_mark.description':
-    'Отмечает противника на 12 сек., накапливая 20% урона, нанесённого вами и вашими мертвецами. Повторное применение подрывает метку. Если отмеченный противник погибает, она взрывается в радиусе 6 м и создаёт 1 осколок души.',
+    'Отмечает противника на 15 сек., накапливая 20% урона, нанесённого вами и вашими мертвецами. Повторное применение подрывает метку. Если отмеченный противник погибает, она взрывается в радиусе 6 ярдов и создаёт 1 осколок души.',
   'entities.abilities.ossuary_mark.name': 'Метка оссуария',
   'entities.abilities.overbloom.description':
     'Расходует ваши 5 стадий Зелени: каждый союзник с вашими эффектами периодического исцеления мгновенно исцеляется на 60% оставшегося в них исцеления, сами эффекты снимаются, а цель получает новый Дикий расцвет.',
@@ -12438,6 +12464,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formName.form_travel': 'Форма скорохода',
   'guide.classPage.formsHeading': 'Смена облика',
   'guide.classPage.formsMoonwing': 'Друид ветки Баланса получает ещё один облик, Облик лунного совуха — облик заклинателя, в котором такой друид и сражается. Это единственный звериный облик, что сохраняет ваши заклинания, а ваш жезл работает лишь в нём или в обычном облике заклинателя.',
+  'guide.classPage.formsAutoUnshift':
+    'Лечащее или атакующее заклинание, применённое в облике, само выводит вас из него. Такой выход не стоит маны и не тратит общее восстановление, поэтому мгновенное заклинание срабатывает в тот же миг, как вы его нажали. Обратное превращение остаётся обычной способностью и по-прежнему стоит маны и общего восстановления.',
   'guide.classPage.formsNote': 'Друид сражается, меняя облик. Большинство способностей друида принадлежат одному облику, так что нынешний облик решает, что вы можете применить, а сама смена стоит немного маны. Менять облик можно и в бою, и вне его, сколько угодно раз.',
   'guide.classPage.mageEleHeading': 'Элементаль воды',
   'guide.classPage.mageEleJet': '«Струя воды» стоит на панели питомца отдельной кнопкой: нажмите её, чтобы навести на одного врага стылый луч, или щёлкните по ней правой кнопкой (на мобильном — нажмите и удерживайте), чтобы элементаль применял её сам, как только она готова.',
@@ -13123,6 +13151,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.metrics.render': 'рендер  отправка {submit} мс | мир {world} мс | объекты {entities} мс',
   'hudChrome.perf.diagnostics.metrics.scene': 'сцена   {calls} вызовов | {triangles} треугольников | {views} видов',
   'hudChrome.perf.diagnostics.metrics.hitches': 'рывки {hitches} | шейдеры {shaders} | загрузки {uploads} | виды {views}',
+  'hudChrome.perf.diagnostics.metrics.hitchesBuild': 'сборки зон {zoneBuilds} | вне кадра {offFrame} | сборка мусора {gc}',
   'hudChrome.perf.diagnostics.metrics.gpu': 'GPU     {renderer}',
   'hudChrome.perf.diagnostics.metrics.waitingValue': 'ожидание',
   'hudChrome.perf.diagnostics.scoreHeadline': '{score}/100: {headline}',
@@ -13161,7 +13190,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.diagnosis.titles.eventCpu': 'Обработка событий занимает время кадра',
   'hudChrome.perf.diagnostics.diagnosis.titles.shaderCompile': 'Шейдеры компилируются во время игры',
   'hudChrome.perf.diagnostics.diagnosis.titles.textureUpload': 'Загрузка текстур вызывает рывки',
+  'hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild': 'Потоковая сборка зон вызывает рывки',
   'hudChrome.perf.diagnostics.diagnosis.titles.viewCreate': 'Создание видов сущностей вызывает рывки',
+  'hudChrome.perf.diagnostics.diagnosis.titles.gcHitch': 'Сборка мусора выполняется внутри длинных кадров',
+  'hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch': 'Длинные кадры вызваны работой вне обратного вызова рендера',
   'hudChrome.perf.diagnostics.diagnosis.titles.otherHitch': 'Остаются длинные кадры без установленной причины',
   'hudChrome.perf.diagnostics.diagnosis.titles.assetStartup': 'Обработка ресурсов задерживает запуск игры',
   'hudChrome.perf.diagnostics.diagnosis.titles.longTasks': 'Длинные задачи браузера блокируют кадры',

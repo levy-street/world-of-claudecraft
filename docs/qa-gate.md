@@ -431,6 +431,17 @@ even start): `.github/workflows/ci-stall-rerun.yml` drives `scripts/ci_stall_rer
 to rerun runs killed by that narrow signature, and the driver can be invoked by hand
 for a stalled run. Triage recipes for both classes: the `ci-triage` skill.
 
+One more bounded retry lives inside a SETUP step, not a test leg: the browser jobs'
+Install Chromium step gives `playwright install-deps` one time-bounded try, then
+verifies the capability the suite demonstrably needs (CJK font coverage) directly,
+retries a targeted font install off the primary archive mirror, and fails loudly,
+still setup-class, only when no route produced the fonts (three merge-queue rejections
+on 2026-08-19 were that package-manager half dead at zero mirror throughput, and the
+first split run proved fonts were its one load-bearing effect). It can never touch a
+test result, every try is visible in the job log, and the exact block is pinned by
+`tests/helpers/playwright_install_block.ts` via `tests/ci_workflow.test.ts` and
+`tests/nightly_workflow.test.ts`.
+
 **Evidence it works.** Fault injection, 5/5 caught: a `Math.random()` in `src/sim`, a combat
 constant, a content record, a sim-emitted player string, and a deleted weapon `.glb`. In two
 of those (`Math.random` and the asset deletion) `vitest related` selected **nothing** and
@@ -498,6 +509,7 @@ before reporting readiness.
 | Privacy and security | `privacy-security-review` | `woc_security` |
 | Decisive tests | `test-coverage-auditor` | `woc_test_coverage` |
 | Frontend and graphics | `frontend-seam-reviewer` | `woc_frontend` |
+| GPU preparation | `render-performance-reviewer` | (not yet mirrored) |
 | Release malware | `release-malware-audit` | `woc_release_malware` |
 | Content same-change obligations | `content-obligations-reviewer` | (not yet mirrored) |
 | Gate/CI selection integrity | `gate-integrity-reviewer` | (not yet mirrored) |
@@ -514,7 +526,12 @@ indexes, pool pressure, locks, timeout scope, write amplification, driver/depend
 PostgreSQL engine/resource/configuration/topology changes, and production-scale observability.
 Server-hot-path review owns the non-SQL server budget: tick CPU, broadcast fan-out and
 serialization, cache seams, and retention for anything that grows (the seams in
-`server/CLAUDE.md` "Hot paths"). Dispatch every role whose set of risk applies.
+`server/CLAUDE.md` "Hot paths"). GPU-preparation review owns what the client asks the GPU to
+prepare and when: prewarm homes and twins, compile and reveal gates, program-key moves,
+post-boot lights, secondary GL contexts, the background queue and its admission budget, and
+the stand-in registry (the contract in `src/render/CLAUDE.md` "GPU work: every new producer is
+a client of the scheduler"), where frontend review keeps the presentation seams and tier
+fairness. Dispatch every role whose set of risk applies.
 
 ## Keep the gate current
 

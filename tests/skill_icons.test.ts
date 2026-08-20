@@ -944,7 +944,6 @@ describe('class ability webp icons', () => {
     expect(pins).toHaveLength(100);
     const hashes = new Set<string>();
     const mapped = new Set<string>();
-    const currentPins = new Map<string, { acceptedSha256: string; acceptedBytes: number }>();
     for (const className of [
       'druid',
       'hunter',
@@ -965,47 +964,15 @@ describe('class ability webp icons', () => {
           source?: string;
           owner?: string;
           license?: string;
-          provenanceRecord?: string;
-          acceptedSha256?: string;
-          acceptedBytes?: number;
-          supersedes?: {
-            sourcePack: string;
-            shippingSha256: string;
-            shippingBytes: number;
-          };
         }>;
       };
-      for (const entry of mapping.abilities.filter((candidate) => {
-        return (
-          candidate.sourcePack === 'woc_openai_missing_painted_icons_2026_08_01' ||
-          candidate.supersedes?.sourcePack === 'woc_openai_missing_painted_icons_2026_08_01'
-        );
-      })) {
+      for (const entry of mapping.abilities.filter(
+        ({ sourcePack }) => sourcePack === 'woc_openai_missing_painted_icons_2026_08_01',
+      )) {
         expect(entry.source, entry.abilityId).toBe('OpenAI built-in image generation');
         expect(entry.owner, entry.abilityId).toBe('World of ClaudeCraft');
         expect(entry.license, entry.abilityId).toContain('project asset');
         expect(entry.license, entry.abilityId).not.toContain('CraftPix');
-        if (entry.sourcePack !== 'woc_openai_missing_painted_icons_2026_08_01') {
-          const historicalPin = pins.find(({ id }) => id === entry.abilityId);
-          expect(historicalPin, `${entry.abilityId} historical generated-art pin`).toBeDefined();
-          expect(
-            entry.supersedes,
-            `${entry.abilityId} explicit generated-art supersession`,
-          ).toMatchObject({
-            sourcePack: 'woc_openai_missing_painted_icons_2026_08_01',
-            shippingSha256: historicalPin?.acceptedSha256,
-            shippingBytes: historicalPin?.acceptedBytes,
-          });
-          expect(entry.provenanceRecord, `${entry.abilityId} replacement provenance`).toBeTruthy();
-          expect(entry.acceptedSha256, `${entry.abilityId} replacement SHA-256`).toMatch(
-            /^[0-9a-f]{64}$/,
-          );
-          expect(entry.acceptedBytes, `${entry.abilityId} replacement bytes`).toBeGreaterThan(0);
-          currentPins.set(entry.abilityId, {
-            acceptedSha256: entry.acceptedSha256 as string,
-            acceptedBytes: entry.acceptedBytes as number,
-          });
-        }
         mapped.add(entry.abilityId);
       }
     }
@@ -1016,16 +983,13 @@ describe('class ability webp icons', () => {
       expect(abilityImageUrl(pin.id), `${pin.id} runtime URL`).toBe(pin.runtimeUrl);
       const file = path.join(publicDir, pin.runtimeUrl.replace(/^\//, ''));
       const bytes = readFileSync(file);
-      const currentPin = currentPins.get(pin.id) ?? pin;
-      expect(bytes.length, `${pin.id} accepted bytes`).toBe(currentPin.acceptedBytes);
+      expect(bytes.length, `${pin.id} accepted bytes`).toBe(pin.acceptedBytes);
       expect(bytes.length, `${pin.id} weight ceiling`).toBeLessThanOrEqual(15 * 1024);
       expect(createHash('sha256').update(bytes).digest('hex'), `${pin.id} accepted hash`).toBe(
-        currentPin.acceptedSha256,
+        pin.acceptedSha256,
       );
-      expect(hashes.has(currentPin.acceptedSha256), `${pin.id} duplicate painted encoding`).toBe(
-        false,
-      );
-      hashes.add(currentPin.acceptedSha256);
+      expect(hashes.has(pin.acceptedSha256), `${pin.id} duplicate painted encoding`).toBe(false);
+      hashes.add(pin.acceptedSha256);
       const decoded = await sharp(bytes).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
       expect(decoded.info.width, `${pin.id} width`).toBe(128);
       expect(decoded.info.height, `${pin.id} height`).toBe(128);

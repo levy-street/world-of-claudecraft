@@ -21,6 +21,7 @@ import { hash2 } from '../sim/rng';
 import type { BiomeId } from '../sim/types';
 import { roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { EMISSIVE_GLOW, GFX } from './gfx';
+import { registerGroundDecorPrewarmDraw } from './ground_decor_prewarm';
 import {
   FLORA_CAP_POOL,
   FLORA_TINT,
@@ -98,13 +99,20 @@ function stalkGeometry(): THREE.BufferGeometry {
   return stalk;
 }
 
+/** The glow caps' material: unlit and vertex-coloured, so one shared colour
+ *  uniform grades the whole field per frame. Its own factory because the boot
+ *  prewarm twin's program identity is checked against exactly this state. */
+export function nightAccentGlowMaterial(): THREE.MeshBasicMaterial {
+  return new THREE.MeshBasicMaterial({ vertexColors: true, toneMapped: true });
+}
+
 export function buildNightAccents(seed = 0): NightAccentsView {
   const group = new THREE.Group();
   group.name = 'night-accents';
   group.visible = false;
 
   // ---- glow flora ---------------------------------------------------------
-  const capMat = new THREE.MeshBasicMaterial({ vertexColors: true, toneMapped: true });
+  const capMat = nightAccentGlowMaterial();
   const stalkMat = GFX.standardMaterials
     ? new THREE.MeshStandardMaterial({ color: 0xd8cdba, roughness: 0.9, flatShading: true })
     : new THREE.MeshLambertMaterial({ color: 0xd8cdba, flatShading: true });
@@ -115,6 +123,14 @@ export function buildNightAccents(seed = 0): NightAccentsView {
   caps.count = 0;
   stalks.count = 0;
   caps.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(FLORA_CAP_POOL * 3), 3);
+  // This group starts hidden (it only lights after dusk) and the boot compile
+  // unit collects the scene with traverseVisible, so nothing else links the
+  // glow's program before the first night (ground_decor_prewarm.ts).
+  registerGroundDecorPrewarmDraw({
+    geometry: caps.geometry,
+    material: capMat,
+    instanceColor: true,
+  });
   group.add(caps);
   group.add(stalks);
 

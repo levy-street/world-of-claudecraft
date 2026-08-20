@@ -802,6 +802,15 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   // path: the camp loop, a brood egg hatching a whelp at runtime, a dev spawn. Draws
   // no rng itself, so no spawn's draw position moves.
   if (template.offStreamIdle) e.offStreamRng = true;
+  // A friendly practice dummy is an ALLY: it spawns non-hostile and carries the
+  // entity flag sim.isFriendlyTo reads to open it to heals. Set here rather than
+  // at one spawn site so every path (camp loop, dev spawn, editor) agrees. Its
+  // health and armor are stamped separately from the reference kit
+  // (mob/practice_dummies.ts), which cannot be reached from this module.
+  if (template.friendlyPracticeTarget) {
+    e.hostile = false;
+    e.friendlyPracticeTarget = true;
+  }
   return e;
 }
 

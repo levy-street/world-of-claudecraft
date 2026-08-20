@@ -1459,6 +1459,14 @@ function drownedLitany(): Scenario {
         );
         bossTicks(40);
         lethal(sim, p, boss);
+        // Nhalia's own summoned cantors/choir thralls (phase-2 adds, Final Bell's
+        // thralls) can still be alive when she dies. The rite gate now waits for
+        // them (delveHasLiveMobs), so clear the room the same way the choir loft
+        // did above before advancing to the rite choose step.
+        for (const id of [...run.mobIds]) {
+          const m = sim.entities.get(id) as AnyEntity | undefined;
+          if (m) m.dead = true;
+        }
       }
       rec.tick(6); // reliquary + shrines rise, rite awaits the intensity choice
       const reliquary = [...run.objectIds]
@@ -3925,6 +3933,12 @@ function c4bEffectDispatch(): Scenario {
       ready(eWarlock);
       sim.castAbility('fear', warlock); // 1.5s cast -> incapacitate fear-angle rng.range(-PI,PI)
       rec.tick(32); // finish fear
+      for (let i = 0; i < 48 && !mobL.auras.some((a) => a.id === 'fear_incap'); i++) {
+        rec.tick(1);
+      }
+      rec.notes.warlockFearApplied = mobL.auras.some(
+        (a) => a.id === 'fear_incap' && a.kind === 'incapacitate',
+      );
       rec.snapshot('warlock-fear');
       ready(eWarlock);
       sim.castAbility('summon_imp', warlock); // 5s cast -> summonDemon -> ctx.summonPet
@@ -3992,10 +4006,16 @@ function c4bEffectDispatch(): Scenario {
       sim.castAbility('bear_form', druid); // selfBuff form + recalc
       ready(eDruid);
       sim.castAbility('cat_form', druid); // form switch (exclusive: strips bear)
+      // Read the exclusive switch HERE rather than off the closing state: the
+      // hot below is a healing spell, so it auto-unshifts (combat/
+      // form_auto_unshift.ts) and the druid ends the scenario formless.
+      rec.notes.druidCatFormActive = eDruid.auras.some((a) => a.kind === 'form_cat');
+      rec.notes.druidBearFormStripped = !eDruid.auras.some((a) => a.kind === 'form_bear');
+      rec.snapshot('druid-form-switch');
       ready(eDruid);
       eDruid.hp = Math.max(1, eDruid.maxHp - 1000);
       sim.targetEntity(druid, druid); // self-target the friendly hot
-      sim.castAbility('rejuvenation', druid); // hot
+      sim.castAbility('rejuvenation', druid); // hot, from cat form: auto-unshifts
       rec.snapshot('druid-moonfire-forms');
     },
   };

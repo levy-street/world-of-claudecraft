@@ -38,6 +38,21 @@ function makeSim(seed = 7) {
   return new Sim({ seed, playerClass: 'warrior', autoEquip: false, world: EMPTY_TEST_WORLD });
 }
 
+// The tests/professions_capacity.test.ts idiom: count rng draws over a call
+// so a "yields only the primary" claim is provably zero-draw, not just
+// unchecked.
+function countDraws<T>(sim: Sim, fn: () => T): { result: T; draws: number } {
+  let draws = 0;
+  sim.ctx.rng.setObserver(() => {
+    draws += 1;
+  });
+  try {
+    return { result: fn(), draws };
+  } finally {
+    sim.ctx.rng.setObserver(null);
+  }
+}
+
 describe('disenchant', () => {
   it('an ineligible item (consumable/junk) cannot be disenchanted', () => {
     expect(isDisenchantable(undefined)).toBe(false);
@@ -54,6 +69,63 @@ describe('disenchant', () => {
     const result = resolveDisenchant(sim.ctx, sim.playerId, 'eastbrook_arming_sword');
     expect(result.ok).toBe(false);
     expect(result.reason).toBe('not_held');
+  });
+
+  // A held offhand is equipment (quality, requiredClass) exactly like a
+  // weapon or armor piece, so it must be disenchantable the same way: this
+  // warrior can never equip valefire_lantern (CASTER_ALL only), which is
+  // exactly the case where disenchant is the only way to get value from it.
+  it('a held offhand disenchants like any other equipment piece', () => {
+    expect(isDisenchantable(ITEMS.valefire_lantern)).toBe(true);
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.addItem('valefire_lantern', 1, pid);
+    const result = resolveDisenchant(sim.ctx, pid, 'valefire_lantern');
+    expect(result.ok).toBe(true);
+    expect(result.materialItemId).toBe('arcane_dust');
+    expect(result.count).toBeGreaterThan(0);
+    expect(sim.countItem('valefire_lantern', pid)).toBe(0);
+  });
+
+  // resolveDisenchant above proves the resolver arm; the player actually hits
+  // the disenchantItem COMMAND, which calls the very same isDisenchantable
+  // through evaluateDisenchantAdmission at cast start (and again at
+  // complete). This is not a second predicate to fix, but it IS a separately
+  // hand-copied deny chain around that shared call (see
+  // tests/professions_admission_drift.test.ts), so it closes the loop end to
+  // end rather than assuming the resolver's behavior carries through.
+  it('the disenchantItem command entry point admits a held offhand', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.addItem('valefire_lantern', 1, pid);
+    sim.disenchantItem('valefire_lantern');
+    expect(sim.lastDisenchantResult).toBeNull();
+    completeEnchantFamilyCast(sim);
+    expect(sim.lastDisenchantResult?.ok).toBe(true);
+    expect(sim.countItem('valefire_lantern', pid)).toBe(0);
+  });
+
+  // The uncommon valefire_lantern above only reaches the sub-rare arm. An
+  // epic held offhand reaches the isRarePlus branch, where
+  // typedSecondaryFor falls through to null (neither armor nor weapon): the
+  // resolve must yield the FIXED single primary and draw ZERO rng, the same
+  // shape jewelry gets, never silently rolling a phantom secondary.
+  it('an epic held offhand disenchants to the primary alone with zero rng draws', () => {
+    expect(ITEMS.wraithfire_orb.quality).toBe('epic');
+    expect(ITEMS.wraithfire_orb.kind).toBe('held_offhand');
+    const sim = makeSim();
+    const pid = sim.playerId;
+    sim.addItem('wraithfire_orb', 1, pid);
+    const { result, draws } = countDraws(sim, () =>
+      resolveDisenchant(sim.ctx, pid, 'wraithfire_orb'),
+    );
+    expect(result.ok).toBe(true);
+    expect(result.materialItemId).toBe('arcane_shard');
+    expect(result.count).toBe(1);
+    expect(result.secondaryItemId).toBeUndefined();
+    expect(result.secondaryCount).toBeUndefined();
+    expect(draws).toBe(0);
+    expect(sim.countItem('wraithfire_orb', pid)).toBe(0);
   });
 
   it('disenchanting consumes the item and yields the dedicated arcane material, not plain salvage junk', () => {

@@ -81,13 +81,7 @@ describe('Affliction Condemnation meter view', () => {
     );
   });
 
-  it('reads only Fate Threads attached to the owned primary Evil Eye', () => {
-    const primaryEye: Aura = {
-      ...doom(1, 20),
-      id: 'evil_eye',
-      kind: 'affliction_eye',
-      sourceId: 7,
-    };
+  it('reads Fate Threads from the warlock instead of the current primary Eye target', () => {
     const ownedThreads: Aura = {
       ...doom(3, 12),
       id: 'needle_of_fate',
@@ -98,14 +92,14 @@ describe('Affliction Condemnation meter view', () => {
       ...ownedThreads,
       sourceId: 9,
     };
+    const wrongKind: Aura = {
+      ...ownedThreads,
+      kind: 'affliction_doom',
+    };
 
-    expect(
-      afflictionFateThreadCount(
-        [{ auras: [foreignThreads] }, { auras: [primaryEye, ownedThreads, foreignThreads] }],
-        7,
-      ),
-    ).toBe(3);
-    expect(afflictionFateThreadCount([{ auras: [ownedThreads] }], 7)).toBe(0);
+    expect(afflictionFateThreadCount([ownedThreads, foreignThreads], 7)).toBe(3);
+    expect(afflictionFateThreadCount([foreignThreads], 7)).toBe(0);
+    expect(afflictionFateThreadCount([wrongKind], 7)).toBe(0);
   });
 
   it('hides outside Affliction', () => {

@@ -9,7 +9,7 @@ import {
 } from '../sim/data';
 import type { BiomeId, ZoneDef } from '../sim/types';
 import { SOWFIELD_CENTER } from '../sim/vale_cup_layout';
-import { loadHdr, loadTexture, releaseHdr, releaseTexture } from './assets/loader';
+import { loadKtx2Texture, loadTexture, releaseKtx2Texture, releaseTexture } from './assets/loader';
 import { BIOME_HAZE_DECLARATIONS, biomeHazeUniforms, hasBiomeHazeField } from './biome_haze_field';
 import { HAZE_SKY_SAMPLE_DIST, HAZE_SKY_TINT_MAX } from './biome_haze_field_core';
 import {
@@ -105,48 +105,83 @@ const HDRI_TUNE: Record<SkyKey, { gain: number; clamp: number; contrast?: number
 // paint-only biomes (beach/desert/volcano/cave) alias a shipped neighbour.
 // The realm skies have clean ocean horizons: no baked land, so no lift and
 // no tint hacks.
-const BIOME_HDRI_2K: Record<SkyKey, string> = {
-  vale: '/env/vale_day_2k.hdr',
-  marsh: '/env/marsh_overcast_2k.hdr',
-  peaks: '/env/peaks_dawn_2k.hdr',
-  beach: '/env/vale_day_2k.hdr',
-  desert: '/env/peaks_dawn_2k.hdr',
-  volcano: '/env/marsh_overcast_2k.hdr',
-  cave: '/env/marsh_overcast_2k.hdr',
-  dusk: '/env/hollow_dusk_2k.hdr',
-  ember: '/env/ember_storm_2k.hdr',
-  frost: '/env/frost_twilight_2k.hdr',
-  amber: '/env/amber_sunset_2k.hdr',
-  fen: '/env/fen_day_2k.hdr',
-  night: '/env/nightbloom_dream_2k.hdr',
-  haunt: '/env/wraithwood_gloom_2k.hdr',
-  jungle: '/env/palmreach_day_2k.hdr',
-  garden: '/env/evergarden_day_2k.hdr',
-  gale: '/env/galecrest_day_2k.hdr',
-  farshore: '/env/farshore_day_2k.hdr',
-  vale_cup: '/env/vale_cup_2k.hdr',
+//
+// The shipped form is KTX2 UASTC HDR, written from the committed `.hdr` masters
+// by scripts/assets/compress_sky_hdr.mjs. Where the GPU exposes ASTC HDR or
+// BC6H that is one byte per pixel (a 2k dome is 2 MB resident instead of the
+// 16.8 MB a half-float RGBA DataTexture cost, with no CPU float copy and no
+// RGBE decode); where it exposes neither, three transcodes to RGBA half, which
+// costs exactly what the Radiance path already did. The `.hdr` files stay in
+// public/env as the encoder's input, never as a runtime fallback.
+const BIOME_SKY_2K: Record<SkyKey, string> = {
+  vale: '/env/vale_day_2k.ktx2',
+  marsh: '/env/marsh_overcast_2k.ktx2',
+  peaks: '/env/peaks_dawn_2k.ktx2',
+  beach: '/env/vale_day_2k.ktx2',
+  desert: '/env/peaks_dawn_2k.ktx2',
+  volcano: '/env/marsh_overcast_2k.ktx2',
+  cave: '/env/marsh_overcast_2k.ktx2',
+  dusk: '/env/hollow_dusk_2k.ktx2',
+  ember: '/env/ember_storm_2k.ktx2',
+  frost: '/env/frost_twilight_2k.ktx2',
+  amber: '/env/amber_sunset_2k.ktx2',
+  fen: '/env/fen_day_2k.ktx2',
+  night: '/env/nightbloom_dream_2k.ktx2',
+  haunt: '/env/wraithwood_gloom_2k.ktx2',
+  jungle: '/env/palmreach_day_2k.ktx2',
+  garden: '/env/evergarden_day_2k.ktx2',
+  gale: '/env/galecrest_day_2k.ktx2',
+  farshore: '/env/farshore_day_2k.ktx2',
+  vale_cup: '/env/vale_cup_2k.ktx2',
 };
 
-const BIOME_HDRI_1K: Record<SkyKey, string> = {
-  vale: '/env/vale_day_1k.hdr',
-  marsh: '/env/marsh_overcast_1k.hdr',
-  peaks: '/env/peaks_dawn_1k.hdr',
-  beach: '/env/vale_day_1k.hdr',
-  desert: '/env/peaks_dawn_1k.hdr',
-  volcano: '/env/marsh_overcast_1k.hdr',
-  cave: '/env/marsh_overcast_1k.hdr',
-  dusk: '/env/hollow_dusk_1k.hdr',
-  ember: '/env/ember_storm_1k.hdr',
-  frost: '/env/frost_twilight_1k.hdr',
-  amber: '/env/amber_sunset_1k.hdr',
-  fen: '/env/fen_day_1k.hdr',
-  night: '/env/nightbloom_dream_1k.hdr',
-  haunt: '/env/wraithwood_gloom_1k.hdr',
-  jungle: '/env/palmreach_day_1k.hdr',
-  garden: '/env/evergarden_day_1k.hdr',
-  gale: '/env/galecrest_day_1k.hdr',
-  farshore: '/env/farshore_day_1k.hdr',
-  vale_cup: '/env/vale_cup_1k.hdr',
+const BIOME_SKY_1K: Record<SkyKey, string> = {
+  vale: '/env/vale_day_1k.ktx2',
+  marsh: '/env/marsh_overcast_1k.ktx2',
+  peaks: '/env/peaks_dawn_1k.ktx2',
+  beach: '/env/vale_day_1k.ktx2',
+  desert: '/env/peaks_dawn_1k.ktx2',
+  volcano: '/env/marsh_overcast_1k.ktx2',
+  cave: '/env/marsh_overcast_1k.ktx2',
+  dusk: '/env/hollow_dusk_1k.ktx2',
+  ember: '/env/ember_storm_1k.ktx2',
+  frost: '/env/frost_twilight_1k.ktx2',
+  amber: '/env/amber_sunset_1k.ktx2',
+  fen: '/env/fen_day_1k.ktx2',
+  night: '/env/nightbloom_dream_1k.ktx2',
+  haunt: '/env/wraithwood_gloom_1k.ktx2',
+  jungle: '/env/palmreach_day_1k.ktx2',
+  garden: '/env/evergarden_day_1k.ktx2',
+  gale: '/env/galecrest_day_1k.ktx2',
+  farshore: '/env/farshore_day_1k.ktx2',
+  vale_cup: '/env/vale_cup_1k.ktx2',
+};
+
+// The PMREM (IBL) prefilter source: its own 512x256 file, because a
+// CompressedTexture cannot be resized at load time the way the Radiance path's
+// `maxWidth: 512` resampled decoded pixels. Same downscale, baked by the
+// encoder from the 1k master (with a box filter, where the runtime used
+// nearest-neighbour).
+const BIOME_SKY_ENV: Record<SkyKey, string> = {
+  vale: '/env/vale_day_512.ktx2',
+  marsh: '/env/marsh_overcast_512.ktx2',
+  peaks: '/env/peaks_dawn_512.ktx2',
+  beach: '/env/vale_day_512.ktx2',
+  desert: '/env/peaks_dawn_512.ktx2',
+  volcano: '/env/marsh_overcast_512.ktx2',
+  cave: '/env/marsh_overcast_512.ktx2',
+  dusk: '/env/hollow_dusk_512.ktx2',
+  ember: '/env/ember_storm_512.ktx2',
+  frost: '/env/frost_twilight_512.ktx2',
+  amber: '/env/amber_sunset_512.ktx2',
+  fen: '/env/fen_day_512.ktx2',
+  night: '/env/nightbloom_dream_512.ktx2',
+  haunt: '/env/wraithwood_gloom_512.ktx2',
+  jungle: '/env/palmreach_day_512.ktx2',
+  garden: '/env/evergarden_day_512.ktx2',
+  gale: '/env/galecrest_day_512.ktx2',
+  farshore: '/env/farshore_day_512.ktx2',
+  vale_cup: '/env/vale_cup_512.ktx2',
 };
 
 function shouldUseLiteHdri(): boolean {
@@ -167,7 +202,7 @@ function shouldUseLiteHdri(): boolean {
   return false;
 }
 
-const BIOME_HDRI = shouldUseLiteHdri() ? BIOME_HDRI_1K : BIOME_HDRI_2K;
+const BIOME_SKY = shouldUseLiteHdri() ? BIOME_SKY_1K : BIOME_SKY_2K;
 
 const BIOME_BACKDROP_8K: Record<SkyKey, string> = {
   vale: '/env/vale_backdrop.webp',
@@ -388,12 +423,19 @@ const BIOME_TINT: Record<SkyKey, [number, number, number]> = {
   vale_cup: [1, 1, 1],
 };
 
-const hdriStore: Partial<Record<SkyKey, THREE.DataTexture>> = {};
-// PMREM (IBL) prefilter source, always the 1k variant even on tiers whose dome
+const hdriStore: Partial<Record<SkyKey, THREE.Texture>> = {};
+// PMREM (IBL) prefilter source, always the 512 variant even on tiers whose dome
 // samples the 2k: the prefiltered env is blurred by the GGX chain anyway, and
-// a 2k source quadruples the CubeUV working-target size and blur cost, which
-// the zone streaming lane would otherwise pay inside live frames.
-const envHdriStore: Partial<Record<SkyKey, THREE.DataTexture>> = {};
+// a larger source multiplies the CubeUV working-target size and blur cost,
+// which the zone streaming lane would otherwise pay inside live frames.
+const envHdriStore: Partial<Record<SkyKey, THREE.Texture>> = {};
+// The env PMREM source width, and the ONE cubeUV height a session prefilters
+// at. PMREMGenerator sizes its target off the SOURCE (_fromTexture calls
+// _setSize(image.width / 4) for an equirect) and envMapCubeUVHeight is a
+// program-cache-key input three re-reads with no material.needsUpdate, so a
+// biome prefiltered from a wider source relinks every lit material in the
+// scene the moment the camera crosses into it.
+const ENV_HDRI_WIDTH = 512;
 const backdropStore: Partial<Record<SkyKey, THREE.Texture>> = {};
 const skyAssetTasks = new Map<string, Promise<void>>();
 // Fetches that have not settled yet. skyAssetTasks alone cannot answer this
@@ -404,7 +446,7 @@ const skyAssetTasks = new Map<string, Promise<void>>();
 const skyAssetsInFlight = new Set<SkyKey>();
 // Biomes a warm lane (a zone prepare, or a residency ensure) is holding across
 // idle-paced GPU work. Fetch protection (skyAssetsInFlight) ends the moment the
-// fetch settles, but the lane still hands the decoded DataTexture to initTexture
+// fetch settles, but the lane still hands the transcoded texture to initTexture
 // and PMREM frames later; a release inside that window would dispose a texture
 // about to be re-uploaded, leaving GPU backing no store owns until renderer
 // teardown. Refcounted so overlapping lanes compose.
@@ -433,7 +475,25 @@ export const SKY_KEYS = Object.keys(HDRI_TUNE) as SkyKey[];
 /** The memo key for one biome's fetch: biome plus both urls, so a retuned
  *  table invalidates the memo instead of serving the old pair. */
 function skyAssetTaskKey(biome: SkyKey): string {
-  return `${biome}|${BIOME_HDRI[biome]}|${BIOME_BACKDROP[biome]}`;
+  return `${biome}|${BIOME_SKY[biome]}|${BIOME_BACKDROP[biome]}`;
+}
+
+/** The equirect setup every sky texture needs before it is sampled or
+ *  prefiltered, and the whole of what the Radiance path's finishHdrTexture did
+ *  that is still a runtime choice: colorspace, filtering, mip policy and the
+ *  vertical flip are all baked into the KTX2 container at encode time. Applied
+ *  to the SHARED cached texture, so it must stay idempotent, and applied in the
+ *  load's own resolve chain so it always precedes the first GPU upload (three
+ *  writes sampler parameters at upload time, so a wrap set afterwards would not
+ *  take).
+ *
+ *  wrapU is deliberately NOT loadKtx2Texture's `repeat` option: that sets wrapT
+ *  as well, and an equirect whose V wraps mirrors the sky across the poles. The
+ *  Radiance path set wrapS alone for the same reason. */
+function finishSkyTexture(tex: THREE.Texture, wrapU: boolean): THREE.Texture {
+  tex.mapping = THREE.EquirectangularReflectionMapping;
+  if (wrapU) tex.wrapS = THREE.RepeatWrapping;
+  return tex;
 }
 
 export function ensureSkyBiomeAssets(
@@ -441,7 +501,7 @@ export function ensureSkyBiomeAssets(
   target: Readonly<GfxSettings> = GFX,
 ): Promise<void> {
   if (!target.standardMaterials) return Promise.resolve();
-  const hdriUrls = BIOME_HDRI;
+  const skyUrls = BIOME_SKY;
   const backdropUrls = BIOME_BACKDROP;
   const tasks = [...new Set(biomes)].map((biome) => {
     const taskKey = skyAssetTaskKey(biome);
@@ -468,15 +528,16 @@ export function ensureSkyBiomeAssets(
             .catch(() => undefined)
         : Promise.resolve();
     const task = Promise.all([
-      loadHdr(hdriUrls[biome]).then((tex) => {
-        tex.wrapS = THREE.RepeatWrapping;
-        hdriStore[biome] = tex;
+      // The `large` lane: one sky dome fetch at a time, so a biome crossing
+      // cannot race two 1.6 MB requests against the model and atlas traffic.
+      loadKtx2Texture(skyUrls[biome], { large: true }).then((tex) => {
+        hdriStore[biome] = finishSkyTexture(tex, true);
       }),
       // PMREM convolves this source immediately, so 512 equirect pixels retain
       // reflection quality while reducing its CubeUV working targets by 4x.
       // The visible dome remains 2k (1k on constrained tiers).
-      loadHdr(BIOME_HDRI_1K[biome], { maxWidth: 512 }).then((tex) => {
-        envHdriStore[biome] = tex;
+      loadKtx2Texture(BIOME_SKY_ENV[biome]).then((tex) => {
+        envHdriStore[biome] = finishSkyTexture(tex, false);
       }),
       backdropTask,
     ])
@@ -521,6 +582,22 @@ export function residentSkyBiomes(): SkyKey[] {
   );
 }
 
+/** Every sky texture the module holds right now, deduped across the aliased
+ *  urls, for the dev-channel residency table (assets/residency_budget.ts). It
+ *  cannot find them by walking the scene: the dome binds them through raw
+ *  ShaderMaterial uniforms, which the walk's material-slot list does not
+ *  reach, so the resident sky read as free before this existed. */
+export function skyResidencyTextures(): THREE.Texture[] {
+  const held = new Set<THREE.Texture>();
+  for (const store of [hdriStore, envHdriStore, backdropStore]) {
+    for (const biome of SKY_KEYS) {
+      const texture = store[biome];
+      if (texture) held.add(texture);
+    }
+  }
+  return [...held];
+}
+
 /** The FULLY-READY subset of residentSkyBiomes: both HDR arms landed. The two
  *  sets deliberately differ (review round 2): eviction keys on ANY resident
  *  asset so a half-loaded biome still releases its bytes, but suppressing an
@@ -532,11 +609,11 @@ export function readySkyBiomes(): SkyKey[] {
 
 /** Whether any biome OTHER than the ones being dropped still owns `url` in
  *  `store` (or is still fetching it). The sky tables alias urls across keys
- *  (beach reuses the vale day sky, cave the marsh overcast), and loadHdr hands
- *  every consumer of one url the SAME DataTexture, so disposing it for one key
- *  would blank the other key's dome. */
-function hdrUrlStillClaimed(
-  store: Partial<Record<SkyKey, THREE.DataTexture>>,
+ *  (beach reuses the vale day sky, cave the marsh overcast), and
+ *  loadKtx2Texture hands every consumer of one url the SAME texture, so
+ *  disposing it for one key would blank the other key's dome. */
+function skyUrlStillClaimed(
+  store: Partial<Record<SkyKey, THREE.Texture>>,
   urls: Record<SkyKey, string>,
   url: string,
   dropping: ReadonlySet<SkyKey>,
@@ -549,21 +626,20 @@ function hdrUrlStillClaimed(
   );
 }
 
-function releaseHdrSlot(
-  store: Partial<Record<SkyKey, THREE.DataTexture>>,
+function releaseSkySlot(
+  store: Partial<Record<SkyKey, THREE.Texture>>,
   urls: Record<SkyKey, string>,
   biome: SkyKey,
   dropping: ReadonlySet<SkyKey>,
-  options?: { maxWidth?: number },
 ): void {
   const texture = store[biome];
   delete store[biome];
   const url = urls[biome];
-  if (hdrUrlStillClaimed(store, urls, url, dropping)) return;
+  if (skyUrlStillClaimed(store, urls, url, dropping)) return;
   texture?.dispose();
   // Dispose and cache release are ONE step: the loader would otherwise keep
   // handing the disposed texture to the next ensure for this url.
-  releaseHdr(url, options);
+  releaseKtx2Texture(url);
 }
 
 /**
@@ -590,8 +666,8 @@ export function releaseSkyBiomeAssets(biomes: readonly SkyKey[]): SkyKey[] {
   // make the next ensure resolve instantly against empty stores.
   for (const biome of dropping) skyAssetTasks.delete(skyAssetTaskKey(biome));
   for (const biome of dropping) {
-    releaseHdrSlot(hdriStore, BIOME_HDRI, biome, dropping);
-    releaseHdrSlot(envHdriStore, BIOME_HDRI_1K, biome, dropping, { maxWidth: 512 });
+    releaseSkySlot(hdriStore, BIOME_SKY, biome, dropping);
+    releaseSkySlot(envHdriStore, BIOME_SKY_ENV, biome, dropping);
     const backdrop = backdropStore[biome];
     delete backdropStore[biome];
     if (backdrop) {
@@ -654,13 +730,31 @@ export function hasBackdropAssets(biomes: readonly SkyKey[] = ['vale', 'marsh', 
 }
 
 // Decoded-asset residency for one biome, read directly off BOTH stores.
-// envTexture cannot probe env residency: it falls back to the dome HDR when
-// the env store misses, so a dome-only biome would read non-null there and a
-// caller would PMREM the full-size dome (4x the CubeUV working-target size
-// and blur cost, see envHdriStore above) and cache that wrong prefilter for
-// the session. ensureSkyBiomeAssets starts the dome and env fetches together
-// on every profile that fetches at all, but they settle independently, so
-// residency is both stores non-null.
+// envTexture cannot probe env residency: it falls back to the dome when the
+// dome is already no wider than the env source, so such a biome reads non-null
+// there and a caller would cache a prefilter built from the dome copy for the
+// session (correctly sized, but still not the shipped env source).
+// ensureSkyBiomeAssets starts the dome and env fetches together on every
+// profile that fetches at all, but they settle independently, so residency is
+// both stores non-null.
+/**
+ * The env PMREM source for a biome whose 512 wide env arm has not landed yet
+ * or was evicted: the dome ITSELF, but only while it is already no wider than
+ * ENV_HDRI_WIDTH, so the prefilter's cubeUV working size is the one every
+ * other biome of the session gets. A wider dome (the shipped 1k and 2k domes)
+ * returns null instead, which skips that biome's prefilter and leaves the
+ * previous IBL lighting the scene: a differently sized prefilter changes
+ * envMapCubeUVHeight, and the relink storm that program-cache-key change
+ * causes measured 1.1 to 1.4 s on the far-bake PR. A compressed dome cannot be
+ * resampled to the env width at load time, so the size guard is the fallback.
+ */
+function envDomeFallback(biome: SkyKey): THREE.Texture | null {
+  const dome = hdriStore[biome];
+  if (!dome) return null;
+  const width = (dome.image as { width?: number } | undefined)?.width ?? 0;
+  return width > 0 && width <= ENV_HDRI_WIDTH ? dome : null;
+}
+
 function skyBiomeAssetsResident(biome: SkyKey): boolean {
   return Boolean(hdriStore[biome]) && Boolean(envHdriStore[biome]);
 }
@@ -681,7 +775,7 @@ export interface SkyView {
    *  seconds (for star twinkle). The sun/moon discs are sprites, not dome-drawn. */
   setStars(starAmt: number, time: number): void;
   /** Raw equirect HDR (unclamped) for PMREM IBL; null on the low tier. */
-  envTexture(biome: SkyKey): THREE.DataTexture | null;
+  envTexture(biome: SkyKey): THREE.Texture | null;
   /** Dome-sampled equirect (the visible sky), for prepare-lane GPU upload. */
   domeTexture(biome: SkyKey): THREE.Texture | null;
   /** Both decoded HDR stores hold this biome (dome + env PMREM source).
@@ -1162,8 +1256,8 @@ export function buildSky(
       uniforms.uStarAmt.value = starAmt;
       uniforms.uTime.value = time;
     },
-    envTexture(biome: SkyKey): THREE.DataTexture | null {
-      return envHdriStore[biome] ?? hdriStore[biome] ?? null;
+    envTexture(biome: SkyKey): THREE.Texture | null {
+      return envHdriStore[biome] ?? envDomeFallback(biome);
     },
     domeTexture(biome: SkyKey): THREE.Texture | null {
       return hdriStore[biome] ?? null;

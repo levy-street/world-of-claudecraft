@@ -47,62 +47,9 @@
     },
     {
       "abilityId": "shadow_word_pain",
-      "sourcePack": "woc_openai_release_v039_icon_art_second_pass_2026_08_16",
-      "sourceFile": "tmp/imagegen/v039-second-pass/legacy-shaman-rogue-priest/raw/shadow_word_pain.png",
-      "output": "shadow_word_pain.webp",
-      "source": "OpenAI built-in image generation",
-      "owner": "World of ClaudeCraft",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-      "acceptedArtManifest": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/legacy-shaman-rogue-priest.json",
-      "intendedVisualSubject": "one cracked ivory funerary effigy mask bound tightly by a single thornlike violet shadow ribbon, with six broad fading pulse arcs descending behind it and cold blue light leaking from the eye slits; a solemn periodic decay curse tied to an effigy, not a generic skull, screaming face, hand, or flame.",
-      "references": [
-        {
-          "path": "public/ui/skills/priest/shadowform.webp",
-          "role": "Velvety violet silhouette energy and restrained spectral edges.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "02fd28bba5cd7e0b5c6220b18dc1d5d27eb7b887ed8bc2443a9511ff7b8a6fad",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/priest/mind_sear.webp",
-          "role": "Concentric periodic-pulse language on deep indigo.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "0ec7caace6e30e518a621d07b859b484437368b2f1927698c7e87f19fb0ffaaa",
-          "usedAsGenerationInput": false
-        },
-        {
-          "path": "public/ui/skills/priest/summon_tithefiend.webp",
-          "role": "Cold blue-violet shadow palette and tactile otherworldly form.",
-          "provenance": "World of ClaudeCraft project asset",
-          "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
-          "sha256": "689d16fd409b4a844b3906e2c236b570cc4363d7abe10d67ab367679aa3e497a",
-          "usedAsGenerationInput": false
-        }
-      ],
-      "generationPrompt": "Use case: stylized-concept. Asset type: opaque borderless square game ability icon for the World of ClaudeCraft Priest action bar. Style/medium: premium hand-painted classic dark-fantasy MMORPG shadow-priest ability art, velvety black-violet shadow, cold blue spirit light, restrained magenta edges, tactile ivory relic material, crisp focal edges and softer spectral periphery; never a flat vector or raw 3D render. Scene/backdrop: fully opaque deep indigo-black painted vignette, no literal environment scene. Composition/framing: one dominant readable curse or relic, visually centered, complete and uncropped with safe padding, 78 to 86 percent fill, strong silhouette and simplified internal values that stay distinct at 48, 32, and 16 pixels and survive a circular crop. Lighting/mood: cold upper-left spirit light, deep lower-right shadow, solemn funereal menace. Constraints: fresh composition, no text, letters, numbers, pseudo-writing, watermark, signature, transparency, checkerboard, baked border, UI frame, rarity chrome, modern graphic design, collage, gore, generic purple flame blob, or tiny decorative clutter. Primary request: repaint Dirge of Decay (shadow_word_pain). Canonical mechanic: an instant 30-yard Shadow curse dealing damage every 3 seconds for 18 seconds; Vespers increases its damage, and each tick on the Priest's Effigy grants Gloomtithe. Subject: one cracked ivory funerary effigy mask bound tightly by a single thornlike violet shadow ribbon, with six broad fading pulse arcs descending behind it and cold blue light leaking from the eye slits; a solemn periodic decay curse tied to an effigy, not a generic skull, screaming face, hand, or flame. Approved sibling references visually inspected: shadowform for velvety violet silhouette energy and restrained spectral edges; mind_sear for concentric periodic-pulse language on deep indigo; summon_tithefiend for cold blue-violet shadow palette and tactile otherworldly form.",
-      "sourceSha256": "58052c3085565d8b2c5ee2a44a7ee42df72878a0c3f7a50e3bcdbed5ed116571",
-      "sourceBytes": 2111723,
-      "acceptedSha256": "3e2b06fd6bc3675efc1cda722b102aa1241b6f7c1dc65b0c385577e2d67859d9",
-      "acceptedBytes": 3274,
-      "supersedes": {
-        "sourceCommit": "d2d1a8ad5c1121f38c52ca2709d88b84adbe5c9e",
-        "owner": "Levy Street Account - callum@levystreet.com",
-        "license": "CraftPix premium (royalty-free commercial). Icons Purchased by Levy Street Account - callum@levystreet.com",
-        "sourceManifest": "public/ui/skills/priest/mapping.json",
-        "sourcePack": "generic-skill100",
-        "sourceFile": "skill icon 9.png",
-        "output": "shadow_word_pain.webp",
-        "sha256": "d56f86219b1c7ecb075e0ef8f2d874f33214d9e05b7c6cb5b3e342f9055920bc",
-        "bytes": 3004,
-        "width": 128,
-        "height": 128,
-        "format": "webp",
-        "colorSpace": "srgb",
-        "channels": 3,
-        "hasAlpha": false
-      }
+      "sourcePack": "generic-skill100",
+      "sourceFile": "skill icon 9.png",
+      "output": "shadow_word_pain.webp"
     },
     {
       "abilityId": "mind_flay",
@@ -373,7 +320,7 @@
     }
   ],
   "deferredStayProcedural": {},
-  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 and woc_openai_release_v039_icon_art_second_pass_2026_08_16 entries are project-generated and explicitly override it.",
+  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 entries are project-generated and explicitly override it.",
   "generatedArt": {
     "source": "OpenAI image generation through Codex",
     "generatedOn": "2026-07-25",
