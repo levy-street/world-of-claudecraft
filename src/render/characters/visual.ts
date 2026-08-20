@@ -133,6 +133,10 @@ const BOW_PIN_BLEND_S = 0.12; // engage/disengage fade for the orientation pins
 
 const FADE = 0.22;
 const ONESHOT_FADE = 0.1;
+// How long the combat stance outlives the last swing or hit react: past the
+// slowest mob swing cadence (2.75s) so it holds through every gap, short
+// enough that a leashing mob relaxes on its walk home.
+const COMBAT_STANCE_HOLD = 4.5;
 // Z-key sheathe gesture: the 1H chop's WINDUP raises the hand over the shoulder
 // toward the back (grabbing/planting the hilt). The held-prop swap lands at the
 // windup peak, where update() also cuts the clip so the downswing never plays.
@@ -542,6 +546,10 @@ export class CharacterVisual {
   private initialized = false;
   private attackIdx = 0;
   private hitCooldown = 0;
+  // Combat-stance latch (ClipMap.combatIdle): armed by every swing and hit
+  // react, so a rig that authors a stance holds it BETWEEN swings instead of
+  // relaxing to Idle, and lets it lapse a few seconds after the fight stops.
+  private combatStanceTimer = 0;
   // contact-frame hitstop state (see HOLD_REFRACTORY_S)
   private holdT = 0;
   private holdScale = 1;
@@ -808,6 +816,14 @@ export class CharacterVisual {
       }
     }
     this.hitCooldown = Math.max(0, this.hitCooldown - dt);
+    if (this.combatStanceTimer > 0) {
+      this.combatStanceTimer = Math.max(0, this.combatStanceTimer - dt);
+      // the latch lapsing while he stands in the stance is the one transition
+      // no state change triggers, so re-pick the base explicitly
+      if (this.combatStanceTimer === 0 && this.baseState === 'idle' && !this.currentIsOneShot) {
+        this.fadeTo(this.baseAction(), 0.4, false);
+      }
+    }
     this.updateMetamorphWings(dt, s, reducedMotion);
     if (this.holdCooldown > 0) this.holdCooldown = Math.max(0, this.holdCooldown - dt);
     // Deferred sheathe swap: lands at the gesture's windup peak (see
@@ -1042,6 +1058,7 @@ export class CharacterVisual {
    */
   advanceOffscreen(dt: number): void {
     this.hitCooldown = Math.max(0, this.hitCooldown - dt);
+    this.combatStanceTimer = Math.max(0, this.combatStanceTimer - dt);
     if (this.holdCooldown > 0) this.holdCooldown = Math.max(0, this.holdCooldown - dt);
     const stowTick = tickStow(this.stow, dt);
     if (stowTick !== 'none') {
@@ -1296,6 +1313,7 @@ export class CharacterVisual {
 
   playAttack(abilityId?: string): void {
     if (this.deadLock) return;
+    this.combatStanceTimer = COMBAT_STANCE_HOLD;
     // Resolved against THIS rig's bound clips: a rig without the substitute
     // (every body but the hunter) keeps its own authored attack instead of
     // swinging with no animation at all.
@@ -1362,6 +1380,7 @@ export class CharacterVisual {
     const clips = this.def.clips.hit;
     if (!clips || clips.length === 0) return;
     this.hitCooldown = HIT_REACT_COOLDOWN;
+    this.combatStanceTimer = COMBAT_STANCE_HOLD;
     this.playOneShot(clips[Math.floor(Math.random() * clips.length)], 1.2);
   }
 
@@ -2787,6 +2806,14 @@ export class CharacterVisual {
         // pose for the whole fall, which is what every rig did before it.
         return this.action(c.fall) ?? this.action(c.jump) ?? this.action(c.idle);
       default:
+        // A rig that authors a combat stance stands in IT between swings while
+        // the latch is warm; movement, swimming, casting, every other state
+        // above still wins, so a chasing mob runs with its run clip and never
+        // stance-slides.
+        if (this.combatStanceTimer > 0) {
+          const stance = this.action(c.combatIdle);
+          if (stance) return stance;
+        }
         return this.action(c.idle);
     }
   }

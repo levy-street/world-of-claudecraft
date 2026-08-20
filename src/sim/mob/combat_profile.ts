@@ -13,7 +13,9 @@ import {
 } from '../types';
 import { chainPullTransitHoldsLeash, clearChainPullInbound } from './chain_pull_transit';
 import { dragonkinEngageShout } from './dragonkin_brood';
+import { enrageCryHolds } from './enrage_cry';
 import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './healer_channel';
+import { emitEnragedSwingCue } from './mob_clip_cue';
 import { chaseStalledUnreachable } from './reachability';
 import { resetRiftMechanicWindups } from './rift_escape_window';
 import { retargetMob, updateMobTarget } from './targeting';
@@ -62,6 +64,10 @@ export function tryMobMeleeSwingInRange(ctx: SimContext, mob: Entity, target: En
   mob.facing = steadyAngleTo(mob.pos, target.pos, mob.facing);
   if (mob.swingTimer <= 0) {
     ctx.mobSwing(mob, target);
+    // AFTER the swing, so it covers hit, miss, dodge, parry and block alike:
+    // mobSwing returns early on the three avoidance branches, and the renderer
+    // would otherwise animate those with the calm rotation clip mid-frenzy.
+    emitEnragedSwingCue(ctx, mob);
     mob.swingTimer = mob.weapon.speed * ctx.swingIntervalMult(mob);
   }
   return true;
@@ -140,6 +146,16 @@ export function updateMobCombatProfile(
       mob.aiState = 'attack';
       return 'done';
     }
+  }
+
+  // The enrage roar: same rooted treatment as the engage shout above, opened by
+  // an hp threshold instead of first aggro (mob/enrage_cry.ts). Standing still
+  // and facing the target for it is the whole tell, and returning here also
+  // holds every timed mechanic, so he roars instead of slamming through it.
+  if (enrageCryHolds(ctx, mob)) {
+    mob.facing = steadyAngleTo(mob.pos, target.pos, mob.facing);
+    mob.aiState = 'attack';
+    return 'done';
   }
 
   // A channelHeal caster (Malric, the Nythraxis spirit healer) is a HEALER, not a

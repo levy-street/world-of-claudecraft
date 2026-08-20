@@ -103,9 +103,27 @@ function attachmentRecord(repoRoot, attachment, assetCache) {
   };
 }
 
-function specFor(def) {
+// Portrait-only framing, per mob template, applied by the still renderer on
+// top of its shared defaults. This exists because VisualDef.yaw is an IN-GAME
+// facing correction (the wildhearts): borrowing it for a portrait would turn
+// the mob in the world too. Fields:
+//   yaw    radians ADDED on the pivot beside the global three-quarter STILL_YAW
+//   zoom   divides the framed radius (2 = twice as tight; default full-body)
+//   focusY vertical aim as a fraction of the posed bounds (0 feet, 1 crown);
+//          setting it replaces the shared headroom lift
+// Values land in the ledger's renderSpec, so changing one re-flags exactly
+// that mob's row.
+export const PORTRAIT_FRAMING_OVERRIDES = Object.freeze({
+  // Square to the camera (0.6 cancels the global three-quarter, which reads
+  // near-profile on his wide frame), tight on the face and skull necklace.
+  brutok_skullsmasher: Object.freeze({ yaw: 0.6, zoom: 2.1, focusY: 0.62 }),
+});
+
+function specFor(def, mobId) {
   const spec = { url: def.url, idle: def.clips?.idle ?? null, height: def.height };
   if (def.yaw) spec.yaw = def.yaw;
+  const framing = PORTRAIT_FRAMING_OVERRIDES[mobId];
+  if (framing) spec.portrait = framing;
   if (def.hover) spec.hover = def.hover;
   if (def.show) spec.show = def.show;
   if (def.attach) spec.attach = def.attach;
@@ -147,6 +165,7 @@ function sourceRecord(repoRoot, mob, visualKey, def, assetCache) {
     idle: def.clips?.idle ?? null,
     height: def.height,
     yaw: def.yaw ?? null,
+    portrait: PORTRAIT_FRAMING_OVERRIDES[mob.id] ?? null,
     hover: def.hover ?? null,
     show: def.show ?? null,
     attach: (def.attach ?? []).map((attachment) =>
@@ -192,7 +211,7 @@ export async function buildMobPortraitJobs(repoRoot) {
       finder,
       family: mob.family,
       visualKey,
-      spec: specFor(def),
+      spec: specFor(def, mobId),
       tint,
       renderSpec: source.renderSpec,
       tintRecord: source.tint,

@@ -84,6 +84,7 @@ import {
 } from './charge';
 import { updateMobCombatProfile } from './combat_profile';
 import { applyBroodBurn } from './dragonkin_brood';
+import { resetEnrageCry } from './enrage_cry';
 import { idleRng, wanderPause } from './idle_rng';
 import {
   claimMechanicSpacing,
@@ -92,6 +93,7 @@ import {
   resetMechanicSpacing,
   tickMechanicSpacing,
 } from './mechanic_spacing';
+import { emitAoePulseCue } from './mob_clip_cue';
 import { playerDummyShedHp } from './practice_dummies';
 import {
   impairedZoneFuseMult,
@@ -710,6 +712,11 @@ function fireAoePulse(
     targetId: mob.id,
     school,
     fx: pulse.fx ?? 'nova',
+    // An authored slam id rides the pulse's own nova so the ability-VFX
+    // painter can stage its ground-slam read (brutok_vfx_specs.ts). Spread
+    // conditionally: a template without one emits the exact object it always
+    // did, which is what keeps the parity event digests still.
+    ...(pulse.ability ? { ability: pulse.ability } : {}),
   });
   // Rift rule: raw un-telegraphed damage never one-shots from full HP
   // (the heroic_s x4 multiplier would otherwise cross that line).
@@ -725,6 +732,13 @@ function fireAoePulse(
       ctx.dealDamage(mob, pe, dmg, false, school, pulse.name, 'hit', true);
     }
   }
+  // ONE cue for the whole slam, emitted AFTER the per-player damage loop has
+  // closed. After, because the renderer animates every physical damage event
+  // with the plain rotation clip and would overwrite the authored slam inside
+  // the same drain. Outside the loop, because this is the mob's own animation,
+  // not a per-victim effect: inside it, it would fire once per CONNECTED
+  // player (ctx.players, not the in-radius subset) and scale with headcount.
+  emitAoePulseCue(ctx, mob);
 }
 
 // The War Stomp slam, extracted verbatim from the driver for the same
@@ -1429,6 +1443,7 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.counterStunReadyAt = undefined;
   mob.shoutFired = undefined;
   mob.shoutIntroUntil = undefined;
+  resetEnrageCry(mob);
   // The whelp pounce state dies with the pull too (the respawnMob twin): the
   // speed burst ends here, so the authored template speed is restored BEFORE
   // leapUntil clears (the brood pass's own restore is gated on a LIVE leapUntil,

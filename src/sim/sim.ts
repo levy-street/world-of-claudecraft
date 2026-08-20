@@ -313,10 +313,12 @@ import {
   tryMobMeleeSwingInRange as tryMobMeleeSwingInRangeImpl,
 } from './mob/combat_profile';
 import { updateDragonkinBrood } from './mob/dragonkin_brood';
+import { enrageReady, tryStartEnrageCry } from './mob/enrage_cry';
 import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './mob/healer_channel';
 import { wanderPause } from './mob/idle_rng';
 import * as lifecycle from './mob/lifecycle';
 import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from './mob/locomotion';
+import { emitEnrageCryCue } from './mob/mob_clip_cue';
 import { runMobSwingAffixes } from './mob/mob_swing';
 import { findNearbyAllies } from './mob/nearby_allies';
 import { applyPlayerDummyVitals } from './mob/practice_dummies';
@@ -8300,7 +8302,11 @@ export class Sim {
     // before. Only resolved for enrage-capable templates, so the lookup is rare.
     const enrageRun = tmpl.enrage ? this.delveRunForMob(mob.id) : null;
     const enrageAllowed = !enrageRun || enrageRun.tierId === 'heroic';
-    if (tmpl.enrage && enrageAllowed && !mob.enraged && hpFrac <= tmpl.enrage.belowHpPct) {
+    // Roar first, turn a beat later: crossing the LEAD threshold opens a rooted
+    // window (mob/enrage_cry.ts) and the buff below waits it out, so the burn
+    // phase is announced instead of flipping silently mid-swing.
+    if (enrageAllowed) tryStartEnrageCry(this.ctx, mob, hpFrac);
+    if (tmpl.enrage && enrageAllowed && !mob.enraged && enrageReady(this.ctx, mob, hpFrac)) {
       mob.enraged = true;
       if (tmpl.yells?.enrage)
         emitMobYell(this.ctx, mob, tmpl.yells.enrage, tmpl.battleYells?.range);
@@ -8319,6 +8325,9 @@ export class Sim {
         school: 'fire',
         fx: 'nova',
       });
+      // A template with a LEAD threshold already roared when the window opened;
+      // one with a clip but no lead still cues here, on the flip itself.
+      if (tmpl.enrage?.cryBelowHpPct === undefined) emitEnrageCryCue(this.ctx, mob);
     }
     if (
       tmpl.desperateHeal &&

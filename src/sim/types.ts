@@ -1582,6 +1582,10 @@ export interface MobTemplate {
     name: string;
     school?: string;
     fx?: 'nova' | 'projectile';
+    // Presentation only: an authored one-shot for the slam itself, picked via
+    // the rig's ClipMap.attackByAbility (mob/mob_clip_cue.ts). Optional, so a
+    // template without it emits exactly what it always did.
+    ability?: string;
   };
   // Boss mechanic: a Geddon-style stationary channel. Every `every` seconds
   // the boss roots in place, stops meleeing, and channels for `duration`,
@@ -1726,7 +1730,28 @@ export interface MobTemplate {
   rankMechanics?: readonly string[];
   // Boss mechanic: damage multiplier (and optional swing-speed haste) once hp
   // drops below the threshold. hasteMult > 1 makes the enraged mob swing faster.
-  enrage?: { belowHpPct: number; dmgMult: number; hasteMult?: number };
+  // `cryAbility` / `swingAbility` are PRESENTATION ONLY and optional: ids the
+  // rig maps in ClipMap.attackByAbility (mob/mob_clip_cue.ts). cryAbility is a
+  // one-shot at the moment the threshold is crossed (Brutok's Battlecry);
+  // swingAbility replaces the plain attack rotation on every swing for the
+  // REST of the pull, so a template can read visibly enraged rather than only
+  // hitting harder. Neither moves a balance number, and a template that sets
+  // neither emits exactly what it always did.
+  enrage?: {
+    belowHpPct: number;
+    dmgMult: number;
+    hasteMult?: number;
+    cryAbility?: string;
+    swingAbility?: string;
+    // Two-phase enrage (mob/enrage_cry.ts). `cryBelowHpPct` is a LEAD threshold
+    // sitting ABOVE belowHpPct: crossing it starts the roar while the mob is
+    // still un-enraged, and the buff lands only once the roar finishes, so the
+    // burn phase is always announced. `cryRootSeconds` is how long the mob
+    // stands rooted for it (size it to the authored clip's played duration).
+    // Omit both and the enrage behaves exactly as it always did.
+    cryBelowHpPct?: number;
+    cryRootSeconds?: number;
+  };
   // Mob mechanic: a one-time desperation self-heal the first time hp drops
   // below the threshold (healPct is a fraction of maxHp). Resets on evade/respawn.
   desperateHeal?: { belowHpPct: number; healPct: number };
@@ -4502,6 +4527,8 @@ export interface Entity extends ClientMirroredEntityFields {
   breathTimer?: number; // breathCone cadence countdown (the bigCastTimer twin)
   shoutFired?: boolean; // engageShout consumed this pull (reset on evade/respawn)
   shoutIntroUntil?: number; // sim-time end of the rooted shout window
+  enrageCryFired?: boolean; // enrage roar consumed this pull (reset on evade/respawn)
+  enrageCryUntil?: number; // sim-time end of the rooted enrage-roar window
   counterStunReadyAt?: number; // sim-time the counterStun retaliation is next available
   broodCracked?: boolean; // egg: died through the REAL damage path (handleDeath); only flagged corpses hatch
   broodHatched?: boolean; // egg: break already processed (hatch fired)

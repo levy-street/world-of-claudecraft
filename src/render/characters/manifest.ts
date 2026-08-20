@@ -32,6 +32,11 @@ export interface ClipMap {
   death: string;
   /** hit-react one-shots (optional — spider/raptor rigs have none) */
   hit?: string[];
+  /** Combat stance loop: replaces `idle` between swings while the visual's
+   *  combat latch is warm (armed by every playAttack/playHit, lapses ~4.5s
+   *  after the last), so a fighter holds a braced guard instead of relaxing.
+   *  Locomotion and every other base state still win over it. */
+  combatIdle?: string;
   /** looping cast channel */
   cast?: string;
   sitDown?: string;
@@ -503,6 +508,39 @@ const OGRE: ClipMap = {
   walk: 'Walk',
   run: 'Run',
   attack: ['Attack'],
+  hit: ['Hit'],
+  death: 'Death',
+};
+
+// Brutok Skullsmasher's own drop (tmp/brutok_build.mjs): the same 25-bone
+// mixamorig family as OGRE, but the artist authored three clips the family
+// clipmap has no slot for, so they hang off attackByAbility keyed to the ids
+// his template opts into (src/sim/content/zone3.ts, emitted by
+// src/sim/mob/mob_clip_cue.ts). The maul rides a bone-parented node under
+// mixamorigRightHand, so it is carried by every clip with no extra wiring.
+//
+// Per-ability rates are cadence-matched, not taste:
+//  - the slam fires on an INSTANT mechanic (aoePulse has no castTime), and its
+//    impact sits 1.73s into the 2.97s clip, so 1.6 pulls the hammer to ~1.08s
+//    after the damage instead of 1.33s while keeping the weight;
+//  - the roar has to finish inside one ENRAGED swing window (2.10s at the 1.3
+//    haste), and 2.83s / 1.5 = 1.89s does, where the 1.3 default would be cut
+//    off mid-bellow by the next swing.
+const BRUTOK: ClipMap = {
+  idle: 'Idle',
+  combatIdle: 'Combat_Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: ['Attack'],
+  attackByAbility: {
+    brutok_skull_smash: 'Slam',
+    brutok_enraged_swing: 'Attack_Enraged',
+    brutok_battlecry: 'Battlecry',
+  },
+  attackTimeScaleByAbility: {
+    brutok_skull_smash: 1.6,
+    brutok_battlecry: 1.5,
+  },
   hit: ['Hit'],
   death: 'Death',
 };
@@ -2089,6 +2127,29 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.12,
   },
+  // Brutok Skullsmasher, the ogre family's rare elite: his own authored body
+  // and maul rather than the family ogre, so his three signature clips (slam,
+  // enraged swing, battlecry) have somewhere to live.
+  //
+  // Gait refs measured at HIS template scale 1.9 (tmp/brutok_gait_measure.mjs;
+  // refs are scale-dependent, so they cannot be borrowed from mob_ogre's 1.3,
+  // and they MUST be re-measured whenever his scale moves): Walk natural 3.04,
+  // Run natural 7.64 yd/s. The build still retimes the authored Run 1.567x in
+  // place to a 0.62s heavy sprint (it measured 3.72 at the old 1.45 scale,
+  // which would have pinned the matcher's 1.6 clamp); at 1.9 that lands the
+  // 7.0 chase on timeScale ~0.92, i.e. exact foot-match with clamp room on
+  // both sides, which is what a body this size should read as.
+  mob_brutok: {
+    url: `${CREATURES}/brutok.glb`,
+    height: 2.8,
+    clips: BRUTOK,
+    walkRef: 3.04,
+    runRef: 7.64,
+    // Matches mob_ogre: the drop ships an authored hide, so the wash only has
+    // to separate him from the rest of the family, not carry his colour.
+    tint: 'entity',
+    tintStrength: 0.12,
+  },
   // Five Wildheart troll silhouettes use the same complete biped vocabulary,
   // but preserve their woven cloth, bone paint, feathers, and jungle palette.
   mob_wildheart_stalker: {
@@ -2952,6 +3013,9 @@ for (const propSet of NPC_PROP_SET_IDS) {
 // ---------------------------------------------------------------------------
 
 const MOB_KEYS: Record<string, string> = {
+  // The ogre family's rare elite gets his own body; every other ogre template
+  // still falls through to FAMILY_KEYS.ogre.
+  brutok_skullsmasher: 'mob_brutok',
   wildheart_stalker: 'mob_wildheart_stalker',
   wildheart_ravager: 'mob_wildheart_ravager',
   wildheart_hexcaller: 'mob_wildheart_hexcaller',

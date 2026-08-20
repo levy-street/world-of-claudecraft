@@ -70,7 +70,9 @@ window.renderStill = (spec, tint) =>
         // to the model's ACTUAL posed bounds (yaw included), so a rig the idle clip flings far
         // from its bind box is still centered.
         const pivot = new THREE.Group();
-        pivot.rotation.y = STILL_YAW;
+        // per-mob portrait framing rides ON TOP of the shared defaults
+        // (PORTRAIT_FRAMING_OVERRIDES in mob_portrait_jobs.mjs)
+        pivot.rotation.y = STILL_YAW + (spec.portrait?.yaw ?? 0);
         pivot.add(built.root);
         // Skinned rigs frustum-cull by a bind-pose sphere that can sit off the posed mesh;
         // disabling the cull guarantees the model is drawn (the game does the same).
@@ -90,9 +92,12 @@ window.renderStill = (spec, tint) =>
         const camera = new THREE.PerspectiveCamera(40, 1, 0.01, 1000);
         // Lift the framing center a touch so the subject sits slightly low with headroom above.
         // frameCamera keeps the camera level with the center, so this reframes vertically; it is
-        // not a downward tilt.
-        center.y += radius * 0.08;
-        frameCamera(camera, radius, center);
+        // not a downward tilt. A per-mob focusY replaces the lift outright: it AIMS (a bust shot
+        // wants the head and chest centered), while zoom tightens the framed radius around it.
+        const focusY = spec.portrait?.focusY;
+        if (focusY === undefined) center.y += radius * 0.08;
+        else center.y = bounds.min.y + (bounds.max.y - bounds.min.y) * focusY;
+        frameCamera(camera, radius / (spec.portrait?.zoom ?? 1), center);
 
         renderer.render(scene, camera);
         const url = renderer.domElement.toDataURL('image/png');
