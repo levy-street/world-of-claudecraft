@@ -534,7 +534,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: '단골 손님',
-    desc: '병참장교 벡스의 취급 물품 열 가지를 모두 발견하십시오.',
+    desc: '병참장교 벡스의 취급 장비 열 가지를 모두 발견하십시오.',
   },
   col_glimmerfin: {
     name: '희망의 반짝임',

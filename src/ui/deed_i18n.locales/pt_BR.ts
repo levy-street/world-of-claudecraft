@@ -537,7 +537,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Cliente Preferencial',
-    desc: 'Descubra todas as dez peças do estoque heroico do Intendente Vex.',
+    desc: 'Descubra todas as dez peças de equipamento do estoque heroico do Intendente Vex.',
   },
   col_glimmerfin: {
     name: 'Lampejo de Esperança',

@@ -535,7 +535,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Pelanggan Kesayangan',
-    desc: 'Temukan kesepuluh barang dagangan Kepala Perbekalan Vex.',
+    desc: 'Temukan kesepuluh perlengkapan dagangan Kepala Perbekalan Vex.',
   },
   col_glimmerfin: {
     name: 'Kilau Harapan',

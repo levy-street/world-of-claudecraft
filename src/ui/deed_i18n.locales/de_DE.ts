@@ -535,7 +535,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Stammkunde',
-    desc: 'Entdecke alle zehn Stücke aus dem Vorrat des Heroischen Quartiermeisters.',
+    desc: 'Entdecke alle zehn Ausrüstungsstücke aus dem Vorrat des Heroischen Quartiermeisters.',
   },
   col_glimmerfin: {
     name: 'Ein Schimmer Hoffnung',

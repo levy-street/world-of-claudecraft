@@ -405,7 +405,7 @@ export const table: DeedLocaleTable = {
   },
   col_true_colors: { name: '真我本色', desc: '穿着你职业默认之外的任意外观登场。' },
   col_all_slots: { name: '十一分讲究', desc: '让全部十一个装备栏位同时都有装备。' },
-  col_quartermaster_buyout: { name: '老主顾', desc: '发现军需官维克斯所售的全部十件货品。' },
+  col_quartermaster_buyout: { name: '老主顾', desc: '发现军需官维克斯所售的全部十件装备。' },
   col_glimmerfin: {
     name: '一线微光',
     desc: '钓起一条日辉锦鲤。',

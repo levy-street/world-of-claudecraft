@@ -540,7 +540,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Vaste Klant',
-    desc: 'Ontdek alle tien de stukken uit de voorraad van de Heroïsche Kwartiermeester.',
+    desc: 'Ontdek alle tien de uitrustingsstukken uit de voorraad van de Heroïsche Kwartiermeester.',
   },
   col_glimmerfin: {
     name: 'Een Glansje Hoop',

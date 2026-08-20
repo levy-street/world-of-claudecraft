@@ -528,7 +528,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Stały klient',
-    desc: 'Odkryj wszystkie dziesięć przedmiotów z zapasów Kwatermistrza Vexa.',
+    desc: 'Odkryj wszystkie dziesięć części ekwipunku z zapasów Kwatermistrza Vexa.',
   },
   col_glimmerfin: {
     name: 'Promyk nadziei',

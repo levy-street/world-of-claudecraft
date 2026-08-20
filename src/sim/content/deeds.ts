@@ -1244,7 +1244,7 @@ export const DEEDS: Record<string, DeedDef> = {
   col_quartermaster_buyout: {
     id: 'col_quartermaster_buyout',
     name: 'Preferred Customer',
-    desc: "Discover all ten pieces of the Heroic Quartermaster's stock.",
+    desc: "Discover all ten pieces of the Heroic Quartermaster's gear stock.",
     category: 'collection',
     renown: 25,
     trigger: {

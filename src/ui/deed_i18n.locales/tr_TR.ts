@@ -512,7 +512,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Gedikli Müşteri',
-    desc: "Kahramanca Levazımcısı'nın tezgâhındaki on parçanın tamamını keşfet.",
+    desc: "Kahramanca Levazımcısı'nın tezgâhındaki on teçhizat parçasının tamamını keşfet.",
   },
   col_glimmerfin: {
     name: 'Umut Pırıltısı',

@@ -528,7 +528,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Khách Quen Hạng Nhất',
-    desc: 'Khám phá đủ cả mười món hàng của Quân Nhu Trưởng Vex.',
+    desc: 'Khám phá đủ cả mười món trang bị của Quân Nhu Trưởng Vex.',
   },
   col_glimmerfin: {
     name: 'Tia Hy Vọng Lấp Lánh',

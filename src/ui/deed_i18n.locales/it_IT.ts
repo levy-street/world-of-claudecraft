@@ -549,7 +549,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Cliente di Riguardo',
-    desc: 'Scopri tutti e dieci i pezzi della mercanzia del Quartiermastro Vex.',
+    desc: 'Scopri tutti e dieci i pezzi di equipaggiamento della mercanzia del Quartiermastro Vex.',
   },
   col_glimmerfin: {
     name: 'Un Barlume di Speranza',

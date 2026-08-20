@@ -510,7 +510,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'お得意様',
-    desc: '補給係ヴェックスの品揃え全10点を発見する。',
+    desc: '補給係ヴェックスの装備品全10点を発見する。',
   },
   col_glimmerfin: {
     name: '希望のきらめき',

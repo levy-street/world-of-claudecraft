@@ -555,7 +555,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Client privilégié',
-    desc: "Découvrir les dix pièces du stock de l'Intendant Vex.",
+    desc: "Découvrir les dix pièces d'équipement du stock de l'Intendant Vex.",
   },
   col_glimmerfin: {
     name: "Une lueur d'espoir",

@@ -515,7 +515,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Věrný zákazník',
-    desc: 'Objev všech deset kusů z nabídky Zásobovače Vexe.',
+    desc: 'Objev všech deset kusů výstroje z nabídky Zásobovače Vexe.',
   },
   col_glimmerfin: {
     name: 'Třpyt naděje',

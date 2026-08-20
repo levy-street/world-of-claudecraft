@@ -408,7 +408,7 @@ export const table: DeedLocaleTable = {
   },
   col_true_colors: { name: '本色登場', desc: '穿上職業預設以外的任一外觀上場。' },
   col_all_slots: { name: '十一分體面', desc: '同時在全部十一個裝備欄位裝上物品。' },
-  col_quartermaster_buyout: { name: '老主顧', desc: '發現軍需官維克斯所販售的全部十件貨品。' },
+  col_quartermaster_buyout: { name: '老主顧', desc: '發現軍需官維克斯所販售的全部十件裝備。' },
   col_glimmerfin: {
     name: '一線微光',
     desc: '釣起一條日輝錦鯉。',
