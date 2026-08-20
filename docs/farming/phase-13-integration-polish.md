@@ -16,6 +16,16 @@ progress.md Phase 13 Notes block instead, and the deferral sweep's canonical hom
 the state.md handoff table. The Close block's push-and-open-a-PR wording is superseded
 by the same rule.]
 
+[IN-PHASE DECISIONS, swept 2026-08-19: the phase OPENED with the mandated sim.ts
+extraction (M5, the boss support kit to src/sim/mob/boss_mechanics.ts, ceiling 12660
+lowered to 12249, golden byte-identical, architecture review 0 BLOCKING), discharging
+the Phase 12 ratchet-spirit read. Two never-executed re-pointed checks found by the
+sweep (the disposable-PG TOAST/WAL measurement; the online resumed mid-growth render
+check) are handed to Phase 13 QA's correctness lane, execute or maintainer-waive; the
+QA twin's STEP 2 carries them. The FarmBiomePalette.trim channel was found to have no
+draw-time consumer; the core comment is corrected and the wire-or-drop call is a
+handoff row.]
+
 Live-surface note (binding): LIVE, complete. No new mechanic ships. This phase merges the wiki
 page, the screenshots, the asset handoff manifest, and the recorded whole-feature audit
 evidence. After it, the feature is done and the packet is ready for the teardown offer

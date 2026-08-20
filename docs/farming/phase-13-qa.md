@@ -72,7 +72,14 @@ BLOCKING / SHOULD-FIX / NICE-TO-HAVE / VERDICT."
   change in this diff is
   itself a finding (Phase 13 ships no mechanics); if one exists anyway, probe it with
   the throwaway-vitest ADVANCEABLE-clock rig (the clock must advance now() or waits
-  hang), then delete the rig and verify the tree is clean.
+  hang), then delete the rig and verify the tree is clean. [ADDED by the Phase 13
+  sweep: two never-executed re-pointed checks are handed to THIS lane, execute or
+  get a maintainer waive: (1) the disposable-PG TOAST/WAL measurement (a P3 QA hard
+  gate aimed at Phase 9 that no block records executing; the user-space PG16 recipe
+  is in the no-docker-userspace-postgres memory), and (2) the online resumed
+  mid-growth live render check (P7 QA re-pointed it at the online rig). One sim
+  relocation IS expected in this diff and is not a finding: the M5 boss-mechanics
+  extraction, reviewed 0-BLOCKING with the golden byte-identical.]
 - Test-coverage agent: decisive assertions that fail on regression; no
   constant-self-comparison pins; both arms of every either/all claim; orphaned tests
   removed; the guide freshness gate really binds the new content; mutation checks only
