@@ -504,7 +504,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Stamkund',
-    desc: 'Upptäck alla tio utrustningsdelar av den heroiska kvartersmästarens utbud.',
+    desc: 'Upptäck alla tio utrustningsdelar i den heroiska kvartersmästarens utbud.',
   },
   col_glimmerfin: {
     name: 'Ett skimmer av hopp',

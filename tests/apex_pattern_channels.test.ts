@@ -417,6 +417,39 @@ describe('the no-fourth-channel sweep (R8: three pillars, no fourth)', () => {
       expect(RIFT_GEAR_ITEM_IDS as readonly string[], `${cls} ring ${shellId}`).toContain(shellId);
     }
   });
+
+  it('no recipe RESULT is a pattern id (crafting can never mint a fourth channel)', () => {
+    // Patterns TEACH recipes; a recipe whose resultItemId were itself a
+    // pattern would make crafting a craftable-pattern fourth channel that no
+    // loot, vendor, or drop sweep sees. The recipe-side universe is the whole
+    // merged ALL_RECIPES table.
+    const leaks: string[] = [];
+    let walked = 0;
+    for (const recipe of ALL_RECIPES) {
+      walked++;
+      if (isPatternId(recipe.resultItemId)) leaks.push(`${recipe.id}: ${recipe.resultItemId}`);
+    }
+    expect(walked).toBeGreaterThanOrEqual(132);
+    expect(leaks).toEqual([]);
+  });
+
+  it('no class starter kit carries a pattern id', () => {
+    // CLASSES[*].startItems is a static grant table (rations today); a
+    // pattern seeded there would be a free fourth channel at character
+    // creation.
+    const leaks: string[] = [];
+    let itemsWalked = 0;
+    const classes = Object.keys(CLASSES) as PlayerClass[];
+    expect(classes.length).toBeGreaterThanOrEqual(9);
+    for (const cls of classes) {
+      for (const row of CLASSES[cls].startItems) {
+        itemsWalked++;
+        if (isPatternId(row.itemId)) leaks.push(`CLASSES.${cls} startItems: ${row.itemId}`);
+      }
+    }
+    expect(itemsWalked).toBeGreaterThanOrEqual(9);
+    expect(leaks).toEqual([]);
+  });
 });
 
 describe('the phase 02 sweep floor', () => {

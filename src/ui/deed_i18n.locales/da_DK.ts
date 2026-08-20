@@ -485,7 +485,7 @@ export const table: DeedLocaleTable = {
   },
   col_quartermaster_buyout: {
     name: 'Stamkunde',
-    desc: 'Opdag alle ti udstyrsdele af den Heroiske Kvartermesters lager.',
+    desc: 'Opdag alle ti udstyrsdele fra den Heroiske Kvartermesters lager.',
   },
   col_glimmerfin: {
     name: 'Et Glimt af Håb',
