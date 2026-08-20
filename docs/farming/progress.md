@@ -3502,6 +3502,20 @@ Integration record (the orchestrator, 2026-08-19):
   byte-identical; guide/ci_workflow/i18n_completeness/localization_fixes/
   monolith/architecture/world_api_parity 587 passed; tests/parity 216 passed
   with the golden md5 exact; ci:changed rc 0.
+- qa-checklist (the phase-completion gate, dispatched LAST): READY, 0
+  BLOCKING, 0 SHOULD-FIX; it independently re-verified the golden md5, the
+  16-row both-directions manifest cross-check, the M16 fills key by key, the
+  regen-only i18n artifacts (re-ran i18n:gen, tree stayed clean), the
+  dormancy arithmetic of the new prose, and the farm_patches_core comment
+  claims; its two informational notes (the unconsumed trim field, already a
+  handoff row; the honest [dev] farmgrow line visible in the feast capture's
+  chat log) need no action.
+- GATE RECORD (the close gate, run on the frozen tip 5787094ee8):
+  BROWSER_PATH + GATE_MAX_WORKERS=8 node scripts/gate_select.mjs, mode=full
+  (the planner fell back on the broad change set as expected),
+  "[gate:select] PASS: all 12 steps green (vitest workers: 8)", vitest
+  40572 passed / 2 expected fail / 115 skipped, browser suite 133 passed,
+  zero FAIL markers in the log, no druid_engines timeout, exit 0.
 
 Notes (Lane C, the deferral sweep and the checklist execution, 2026-08-19):
 - TASK 1 delivered in state.md: the head block healed (Phase 12 merged
