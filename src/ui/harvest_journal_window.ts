@@ -129,6 +129,11 @@ export interface HarvestJournalWindowDeps {
   closeOthers(): void;
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
+  /** Fired after the root's display flips either way (the leaderboard /
+   *  daily-rewards family shape): Hud wires it to syncAnyWindowOpenState so
+   *  the mobile chrome's body classes track this window like every sibling
+   *  (the P9b QA body-class gap this dep closes). */
+  onVisibilityChange?(): void;
 }
 
 export class HarvestJournalWindow {
@@ -156,6 +161,7 @@ export class HarvestJournalWindow {
     const root = this.deps.root();
     markDialogRoot(root, { labelledBy: 'harvest-journal-title' });
     root.style.display = 'block';
+    this.deps.onVisibilityChange?.();
     this.render();
     root.querySelector<HTMLElement>('[data-close]')?.focus();
     this.countdown = window.setInterval(() => this.tick(), HARVEST_JOURNAL_TICK_MS);
@@ -169,6 +175,7 @@ export class HarvestJournalWindow {
     }
     this.clearCountdown();
     root.style.display = 'none';
+    this.deps.onVisibilityChange?.();
     this.paintedSignature = null;
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;

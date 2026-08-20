@@ -61,6 +61,11 @@ export interface PlantSheetWindowDeps {
   closeOthers(): void;
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
+  /** Fired after the root's display flips either way (the leaderboard /
+   *  daily-rewards family shape): Hud wires it to syncAnyWindowOpenState so
+   *  the mobile chrome's body classes track this window like every sibling
+   *  (the P9b QA body-class gap this dep closes). */
+  onVisibilityChange?(): void;
 }
 
 export class PlantSheetWindow {
@@ -98,6 +103,7 @@ export class PlantSheetWindow {
       this.openerFocus = this.deps.captureFocus();
       markDialogRoot(root, { labelledBy: 'plant-sheet-title' });
       root.style.display = 'block';
+      this.deps.onVisibilityChange?.();
     }
     // A fresh bed is a fresh decision: selection and knob picks reset, so a
     // toggle paid for one bed never silently rides to another.
@@ -133,6 +139,7 @@ export class PlantSheetWindow {
       return;
     }
     root.style.display = 'none';
+    this.deps.onVisibilityChange?.();
     this.bedId = null;
     this.pendingSend = false;
     this.deps.restoreFocus(this.openerFocus);

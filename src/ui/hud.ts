@@ -570,7 +570,6 @@ import {
   pickIdleBarkCandidates,
 } from './mob_idle_sfx';
 import { type MobTooltipI18n, type MobTooltipModel, mobTooltipHtml } from './mob_tooltip_view';
-import { isMobileFullscreenWindowOpen } from './mobile_fullscreen_window_core';
 import { MobileMoreDialogController } from './mobile_more_dialog';
 import { MOUNT_DESC_KEYS, mountSpecLines } from './mount_labels';
 import { MountRaceControls } from './mount_race_controls';
@@ -707,7 +706,6 @@ import {
   statTooltipHtml,
 } from './stat_tooltip_view';
 import { mountStorePromoCard, type StorePromoCardController } from './store_promo_card';
-import { recordStoreStackSample } from './store_stack_diag';
 import { nearestSubzone } from './subzone';
 import { swingTimerState } from './swing_timer';
 import { SwingTimerPainter } from './swing_timer_painter';
@@ -766,8 +764,8 @@ import {
   type WindowDragController,
 } from './window_drag';
 import { makeWindowFocus } from './window_focus';
+import { syncWindowOpenBodyClasses } from './window_open_state';
 import { installWindowResize, markResizableWindow } from './window_resize';
-import { stackedWindowsVisible } from './window_stack_state_core';
 import { installWorldDropTarget } from './world_drop_target';
 import { formatXp, type XpBarView, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
@@ -3154,40 +3152,9 @@ export class Hud {
   }
 
   private syncAnyWindowOpenState(): void {
-    const windows = [...document.querySelectorAll<HTMLElement>('.window.panel')];
-    const anyOpen = windows
-      .filter((win) => win.id !== 'mobile-extra-controls')
-      .some((win) => this.isWindowVisible(win));
-    document.body.classList.toggle('mobile-window-open', anyOpen);
-    const bagsWindow = document.getElementById('bags');
-    const charWindow = document.getElementById('char-window');
-    document.body.classList.toggle(
-      'mobile-fullscreen-window-open',
-      isMobileFullscreenWindowOpen(
-        !!bagsWindow && this.isWindowVisible(bagsWindow),
-        !!charWindow && this.isWindowVisible(charWindow),
-        document.body.classList.contains('vendor-open'),
-        document.body.classList.contains('bank-open'),
-        document.body.classList.contains('market-open'),
-        document.body.classList.contains('char-bags-paired'),
-      ),
-    );
-    const storeWindow = document.getElementById('daily-rewards-window') as HTMLElement | null;
-    const claudiumWindow = document.getElementById('claudium-window') as HTMLElement | null;
-    const storeVisible = !!storeWindow && this.isWindowVisible(storeWindow);
-    const claudiumVisible = !!claudiumWindow && this.isWindowVisible(claudiumWindow);
-    const storeStacked = stackedWindowsVisible(storeVisible, claudiumVisible);
-    document.body.classList.toggle('store-stack-open', storeStacked);
-    recordStoreStackSample(storeVisible, claudiumVisible, storeStacked);
-    const mapWindow = document.getElementById('map-window');
-    const questLogWindow = document.getElementById('quest-log-window');
-    document.body.classList.toggle(
-      'mobile-map-quest-open',
-      !!mapWindow &&
-        !!questLogWindow &&
-        this.isWindowVisible(mapWindow) &&
-        this.isWindowVisible(questLogWindow),
-    );
+    // The whole body-class scan lives in window_open_state.ts (Phase 14
+    // extraction); every window's onVisibilityChange dep points here.
+    syncWindowOpenBodyClasses((el) => this.isWindowVisible(el));
   }
 
   private placeNewWindow(el: HTMLElement): void {
@@ -4822,6 +4789,7 @@ export class Hud {
     world: () => this.sim,
     closeOthers: () => this.closeOtherWindows('#harvest-journal-window'),
     ...this.windowFocus('#harvest-journal-window'),
+    onVisibilityChange: () => this.syncAnyWindowOpenState(),
   });
   // The plant sheet painter (farming_plant_sheet_view.ts core + its painter):
   // the bed-verbs plant window. Cold, paint-on-open; farm events feed it.
@@ -4830,6 +4798,7 @@ export class Hud {
     world: () => this.sim,
     closeOthers: () => this.closeOtherWindows('#plant-sheet-window'),
     ...this.windowFocus('#plant-sheet-window'),
+    onVisibilityChange: () => this.syncAnyWindowOpenState(),
   });
   // The Reliquary window painter (reliquary_view.ts core + reliquary_window.ts
   // painter): Overview + shelf chrome over IWorldReliquary. A standalone
