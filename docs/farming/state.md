@@ -754,6 +754,24 @@ visit or a punishment for lateness is violating the design, not tuning it.
   feature eventually ships (early sim phases stay dormant: no vendor seeds, no
   render, no UI entry until their enabling phases land). When the user green-lights
   going public, `feature/farming-plan` is pushed and delivered whole.
+- D22 ADDENDUM (2026-08-19, three real user amendments given with the Phase 13 QA
+  starter prompt; ledgered verbatim, and swept into phase-13-qa.md where its STEP 5
+  and final-response wording disagreed):
+  - (A) THE PACKET TEARDOWN IS DEFERRED: Phase 13 QA does NOT offer or execute the
+    docs/farming/ deletion. Its STEP 5 runs as a PRECONDITION VERIFICATION ONLY:
+    confirm the teardown-precondition rows are ledgered and correct (the
+    seven-subtree screenshot reference hazard in particular), then leave the packet
+    in place. The teardown happens later, on an explicit user instruction.
+  - (B) NO PR EVER: when the user later declares the feature truly done, delivery is
+    pushing `feature/farming-plan` to origin, nothing more. No pull request is ever
+    opened for the farming program. (This sharpens D22's "pushed and delivered
+    whole": the push IS the whole delivery.) Phase 13 QA itself still pushes NOTHING.
+  - (C) THE PERFECTION SWEEP: Phase 13 QA builds the complete corpus of every finding
+    of any severity ever recorded in the program and classifies each into exactly one
+    bucket (RESOLVED / ACTIONABLE-IN-REPO / MAINTAINER-GATED / ACCEPTED-BY-DESIGN).
+    If ACTIONABLE-IN-REPO is non-empty, it authors docs/farming/
+    phase-14-final-polish.md scoped exactly to that list (D22 shape: no push, no PR);
+    if empty, it declares the program CODE-COMPLETE pending the maintainer-only gates.
 - D23: Parity goldens. Professions fields are sampled into every golden digest, so
   adding `farming: 0` to the default proficiency map regenerates ALL goldens in Phase 1
   (deliberate, `UPDATE_PARITY=1`, its own reviewed commit, the Phase 8 professions
