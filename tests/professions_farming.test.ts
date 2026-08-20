@@ -2799,6 +2799,43 @@ describe('the golden_harvest roll: the shared rare event at the farm bed', () =>
     expect(h.meta.inventory.some((s) => s.itemId === FINE_ID && s.instance)).toBe(false);
   });
 
+  it('a truncating golden win NAMES its surface: one gatherDowngrade crop/mark ((bu) follow-up)', () => {
+    // The Phase 14 widening: the signature truncation is no longer silent.
+    // The full-bags construction truncates BOTH grades (the base grade signs
+    // only its merge room, the fine grade lands fully plain), yet exactly ONE
+    // event fires per harvest command (the gatherDenied dedupe idiom). The
+    // client needs no new line: hud.ts's gatherDowngrade case resolves the
+    // toast off the lost arm alone (downgradeMark), surface-independent.
+    const h = makeHarness(GOLDEN_WIN_SEED);
+    ripenWinner(h);
+    const stack = stackSizeOf(ITEMS[PRODUCE_ID]);
+    h.sim.ctx.addItemInstance(PRODUCE_ID, { signer: h.meta.name }, h.pid, stack - 2, {
+      silent: true,
+      callerLogs: true,
+    });
+    const capacity = bagCapacity(h.meta.bags);
+    while (h.meta.inventory.length < capacity) h.sim.addItem(HOE_ID, 1, h.pid);
+    const from = h.sim.events.length;
+    const values = recordDraws(h.sim, () => harvest(h));
+    expect(values[0]).toBeLessThan(GATHER_RARE_EVENT_CHANCE); // the probed win, in-arm
+    const downgrades = h.sim.events.slice(from).filter((e) => e.type === 'gatherDowngrade');
+    expect(downgrades).toEqual([
+      { type: 'gatherDowngrade', pid: h.pid, surface: 'crop', lost: 'mark' },
+    ]);
+  });
+
+  it('a golden win with bag room emits NO downgrade (the signature landed in full)', () => {
+    const h = makeHarness(GOLDEN_WIN_SEED);
+    ripenWinner(h);
+    const from = h.sim.events.length;
+    const values = recordDraws(h.sim, () => harvest(h));
+    expect(values[0]).toBeLessThan(GATHER_RARE_EVENT_CHANCE);
+    // Positive control that the win really landed signed, so the quiet is
+    // the full signature landing and not a missed win.
+    expect(signedCountOf(h, PRODUCE_ID)).toBeGreaterThan(0);
+    expect(h.sim.events.slice(from).filter((e) => e.type === 'gatherDowngrade')).toHaveLength(0);
+  });
+
   it('the announce lands AFTER the grants (celebrate once the windfall is real)', () => {
     // Pins the deliberate order the code comment states: every grant leg's
     // loot event precedes the first gatherRareEvent copy, and the
