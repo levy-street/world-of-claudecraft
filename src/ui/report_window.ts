@@ -93,7 +93,10 @@ export function openReportWindow(
     request
       .then(() => {
         el.style.display = 'none';
-        deps.log(t('hud.report.submitted', { name }), '#ffd100');
+        // The gold token, not a hex: painters never hard-code a color in TS
+        // (src/styles/CLAUDE.md); the log sink writes style.color, so the
+        // var() resolves against the live theme like the talents signature.
+        deps.log(t('hud.report.submitted', { name }), 'var(--gold)');
       })
       .catch((err: unknown) => {
         submit.disabled = false;

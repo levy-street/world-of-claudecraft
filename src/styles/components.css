@@ -9479,7 +9479,10 @@
     padding: 8px 10px;
     border: 1px solid var(--color-border-showcase);
     border-radius: 7px;
-    background: rgba(0, 0, 0, 0.24);
+    /* The input-surface token its sibling .ps-knob already rides (Phase 14
+       style batch): the raw 24%-black scrim read a shade apart from the knobs
+       in the same sheet and drifted from the tokens the theme presets drive. */
+    background: var(--color-bg-input);
     color: var(--color-text-light);
     font: inherit;
     text-align: left;

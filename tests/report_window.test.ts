@@ -102,9 +102,10 @@ describe('report window: submit routing', () => {
     expect(submit).toHaveBeenCalledTimes(1);
     expect(submit).toHaveBeenCalledWith(7, 'harassment', 'kited the boss');
     expect(hooks.submitByName).not.toHaveBeenCalled();
-    // Success closes and logs the submitted line.
+    // Success closes and logs the submitted line in the theme gold token
+    // (never a raw hex in a painter, src/styles/CLAUDE.md).
     expect(el.style.display).toBe('none');
-    expect(log).toHaveBeenCalledWith('Report submitted for Rega.', '#ffd100');
+    expect(log).toHaveBeenCalledWith('Report submitted for Rega.', 'var(--gold)');
   });
 
   it('routes a name-only target through submitByName', async () => {
