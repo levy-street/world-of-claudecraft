@@ -252,8 +252,15 @@ describe('harvest journal window: the countdown clock', () => {
     expect(status()?.getAttribute('role')).toBe('status');
     expect(status()?.textContent).toBe('');
     const node = status();
+    // The repaint wrapper's identity is the decisive never-detached proof: a
+    // regression that rebuilds the wrapper each paint would re-append the
+    // SAME cached status element (identity alone stays green) while still
+    // detaching it from the tree every repaint.
+    const wrapper = root.querySelector<HTMLElement>('.hj-content');
+    expect(wrapper).not.toBeNull();
     world.plots = [plot({ status: 'ready' })];
     vi.advanceTimersByTime(HARVEST_JOURNAL_TICK_MS);
+    expect(root.querySelector<HTMLElement>('.hj-content')).toBe(wrapper);
     // The SAME node carries the announcement across the whole repaint AND it
     // was never detached: the repaint targets the inner content element, so
     // the region's parent stays the root (a region that leaves and re-enters
