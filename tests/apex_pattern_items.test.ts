@@ -10,7 +10,9 @@
 // tests/recipe_pattern_items.test.ts; this file pins the SHIPPED phase 11
 // content against the recorded contract.
 import { describe, expect, it } from 'vitest';
+import { CRAFT_RING } from '../src/sim/content/professions';
 import {
+  ALL_RECIPES,
   APEX_ARMOR_RECIPES,
   APEX_CONSUMABLE_RECIPES,
   APEX_GEAR_RECIPES,
@@ -136,6 +138,14 @@ describe('apex pattern channel wiring (R8: raid gear, rift armor, vendor consuma
     const SAMPLE = 5000;
     // C (baseLevel 20) returns before the pattern draw BY DESIGN.
     for (let s = 1; s <= SAMPLE; s++) expect(patternsOf(20, s)).toEqual([]);
+    // The sample is fully deterministic (seeds 1..SAMPLE, a fresh Rng per
+    // seed), so the exact count is stable; when RIFT_PATTERN_CHANCE
+    // deliberately retunes (phase 15 measures), re-derive by running the
+    // suite and adopting the printed observed counts. The band below
+    // documents the intent; this pin closes the call-site-literal decoupling
+    // window (a hardcoded chance near 0.08 at the draw site would survive
+    // every band pin).
+    const EXACT_HITS: Record<number, number> = { 22: 401, 25: 400, 28: 405 };
     // B/A/S each draw once per clear at 0.08; the pick is uniform over the
     // sorted list, so every armor pattern must actually be reachable.
     for (const baseLevel of [22, 25, 28]) {
@@ -149,6 +159,9 @@ describe('apex pattern channel wiring (R8: raid gear, rift armor, vendor consuma
           seen.add(id);
         }
       }
+      expect(hits, `baseLevel ${baseLevel}: observed ${hits}/${SAMPLE}`).toBe(
+        EXACT_HITS[baseLevel],
+      );
       const expected = SAMPLE * 0.08; // 400
       expect(hits, `baseLevel ${baseLevel}: ${hits}/${SAMPLE}`).toBeGreaterThan(expected * 0.7);
       expect(hits, `baseLevel ${baseLevel}: ${hits}/${SAMPLE}`).toBeLessThan(expected * 1.3);
@@ -156,5 +169,26 @@ describe('apex pattern channel wiring (R8: raid gear, rift armor, vendor consuma
         expect(seen.has(id), `${id} never dropped at baseLevel ${baseLevel}`).toBe(true);
       }
     }
+  });
+
+  it('every drop-acquisition recipe is learnable within its craft skill cap', () => {
+    // The two capstone patterns (recipe_grand_cauldron, recipe_laden_hearth)
+    // teach skillReq-125 recipes, and 125 IS the cap for their crafts: a
+    // zero-margin boundary. A future cap lowering or tier shift would strand
+    // purchasable-but-unlearnable vendor stock, and nothing else pins this.
+    const maxSkillByCraft = new Map(CRAFT_RING.map((craft) => [craft.id, craft.maxSkill]));
+    let walked = 0;
+    for (const recipe of ALL_RECIPES) {
+      if (!recipe.acquisition?.includes('drop')) continue;
+      walked++;
+      const cap = maxSkillByCraft.get(recipe.professionId);
+      expect(cap, `${recipe.id}: no CRAFT_RING record for ${recipe.professionId}`).toBeDefined();
+      expect(
+        recipe.skillReq,
+        `${recipe.id}: skillReq above the ${recipe.professionId} cap`,
+      ).toBeLessThanOrEqual(cap!);
+    }
+    // Vacuity floor: the 28 apex recipes are all acquisition:['drop'] today.
+    expect(walked).toBeGreaterThanOrEqual(28);
   });
 });

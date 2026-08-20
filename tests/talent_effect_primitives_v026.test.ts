@@ -162,7 +162,7 @@ describe('Talents V2 dispel and steal primitives', () => {
     });
     const enemy2 = addHostile(sim2);
     const minted2 = mintFlaskAura(sim2, 'warboar_flask', 'elixir_buff_ap');
-    enemy2.auras.unshift({ ...minted2, sourceId: enemy2.id });
+    enemy2.auras.push({ ...minted2, sourceId: enemy2.id });
     runAbilityEffect(sim2, enemy2, 'spellsteal');
     expect(enemy2.auras.some((entry) => entry.id === 'elixir_buff_ap')).toBe(true);
     expect(sim2.player.auras.some((entry) => entry.flask === true)).toBe(false);

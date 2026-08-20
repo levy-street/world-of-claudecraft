@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { ClientWorld } from '../src/net/online';
+import { MARKET_ITEM_TYPE_FILTERS } from '../src/ui/market_filters';
+import { MarketWindow } from '../src/ui/market_window';
 
 // The market window painter is a DOM module; driving the live DOM + events is the
 // opt-in browser suite. This is the no-DOM-suite equivalent: it
@@ -392,6 +394,26 @@ describe('market_window: behavior preserved through the core', () => {
     expect(painter).toContain('.marketCollect()');
     expect(painter).toContain('this.deps.moneyHtml(');
     expect(painter).toContain('formatLocalizedMoney(');
+  });
+});
+
+describe('market_window: filter chip label routing', () => {
+  // marketItemTypeLabel falls through to the 'All types' label for any filter
+  // value without an arm, so deleting a chip's arm (say 'pattern') would render
+  // that chip labeled 'All' with tsc and every predicate suite still green.
+  // This drives the REAL private resolver over the live filter list (the
+  // constructor only stores its deps and the method only calls t(), so no DOM
+  // is involved; the private reach-in follows this file's `as any` precedent)
+  // and requires every member to resolve to its own distinct label: a member
+  // that falls through collides with the 'all' entry and reds this, future
+  // chips included.
+  it('maps every item-type filter to its own distinct label, never the All fall-through', () => {
+    const win = new MarketWindow({} as never);
+    const labels = MARKET_ITEM_TYPE_FILTERS.map(
+      (filter) => (win as any).marketItemTypeLabel(filter) as string,
+    );
+    for (const label of labels) expect(label.length).toBeGreaterThan(0);
+    expect(new Set(labels).size).toBe(MARKET_ITEM_TYPE_FILTERS.length);
   });
 });
 

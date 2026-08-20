@@ -825,7 +825,15 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     [NYTHRAXIS_RAID_BOSS_ID]: 'conquerors_nythraxis_heroic',
   };
 
-  /** The live ids a heroic page is expected to catalog, both carve-outs applied. */
+  /** The live ids a heroic page is expected to catalog, both carve-outs applied.
+   *
+   *  Deliberately NOT threaded here: isReliquaryCarvedOut. Today that is
+   *  vacuously fine (patterns ride the BASE Nythraxis table and mint no heroic
+   *  variants), but if a kind 'recipe' pattern ever enters a HEROIC_BOSS_LOOT
+   *  table, add isReliquaryCarvedOut to this filter too, and extend the
+   *  exactly-ten vacuity diff below to cover the heroic walk, per the Phase 11
+   *  BUILT ledger decision 2 (no Reliquary pages for patterns): otherwise the
+   *  heroic equality pin would demand a page the ledger refuses. */
   function catalogueableHeroicIds(entries: (typeof HEROIC_BOSS_LOOT)[string]): string[] {
     const liveIds: string[] = [];
     for (const e of entries) {

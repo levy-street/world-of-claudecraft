@@ -693,12 +693,14 @@ describe('using a recipe pattern over the live server (online host)', () => {
 });
 
 describe('shipped pattern content shape', () => {
-  // VACUOUS TODAY on purpose: no shipped item carries kind 'recipe' yet, so
-  // this sweep asserts over an empty set until phase 11 authors the drops. It
-  // goes live the moment it does, and the two conditions it checks are exactly
-  // the ones resolvePatternLearn refuses SILENTLY: a pattern that trips either
-  // is a dead click with no message at all, the worst failure mode this
-  // feature has, and content review is the only place to catch it.
+  // Born VACUOUS at phase 02 by design: no shipped item carried kind 'recipe'
+  // then, so this sweep asserted over an empty set until the drops were
+  // authored. Live since phase 11, which shipped the 28 apex patterns
+  // (src/sim/content/apex_patterns.ts); every one of them now rides the
+  // sweep. The two conditions it checks are exactly the ones
+  // resolvePatternLearn refuses SILENTLY: a pattern that trips either is a
+  // dead click with no message at all, the worst failure mode this feature
+  // has, and content review is the only place to catch it.
   it('skips exactly this suite own synthetic ids, and they are really present', () => {
     // The skip below is only safe while it covers this file's fixtures and
     // nothing else. Three of the four are deliberately malformed; if a shipped

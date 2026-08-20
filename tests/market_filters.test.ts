@@ -6,7 +6,9 @@ import {
   marketItemMatches,
   sanitizeMarketQuery,
 } from '../src/sim/market_query';
+import { Sim } from '../src/sim/sim';
 import type { ItemDef } from '../src/sim/types';
+import { groundHeight } from '../src/sim/world';
 import {
   MARKET_ARMOR_CLASS_FILTERS,
   MARKET_ARMOR_TYPE_FILTERS,
@@ -353,6 +355,34 @@ describe('World Market filters', () => {
     ]);
   });
 
+  // The LIST (sell) half of the phase 11 chip: the browse pins above only prove
+  // the PREDICATE, so a listing-gate refusal of kind 'recipe' would leave every
+  // one of them green while no pattern could actually reach the book. This
+  // drives the real sim path (the market.test.ts rig in miniature): a seller
+  // standing at the Merchant lists a held shipped pattern, the listing lands,
+  // and the Patterns chip browse returns it.
+  it('lists a held pattern on the market and finds it under the Patterns chip', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const merchant = [...sim.entities.values()].find((e) => e.templateId === 'the_merchant');
+    if (!merchant) throw new Error('the Merchant was not spawned');
+    const e = sim.entities.get(seller);
+    if (!e) throw new Error(`missing entity ${seller}`);
+    // stand right on the Merchant so marketList's proximity gate passes
+    e.pos.x = merchant.pos.x;
+    e.pos.z = merchant.pos.z;
+    e.pos.y = groundHeight(e.pos.x, e.pos.z, sim.cfg.seed);
+    e.prevPos = { ...e.pos };
+    sim.addItem('pattern_forgefold_legguards', 1, seller);
+    sim.marketList('pattern_forgefold_legguards', 1, 100, seller);
+    const listing = sim.marketListings.find((l) => l.itemId === 'pattern_forgefold_legguards');
+    expect(listing, 'the pattern listing must land on the book').toBeDefined();
+    sim.marketSearch(q({ itemType: 'pattern' }), seller);
+    const info = sim.marketInfoFor(seller);
+    expect(info?.itemType).toBe('pattern');
+    expect(info?.listings.some((l) => l.itemId === 'pattern_forgefold_legguards')).toBe(true);
+  });
+
   // The exhaustiveness tail in itemMatchesType is a tsc guard, and tsc is erased in
   // the shipped bundle. This drives what SURVIVES that erasure: an item type with no
   // arm must browse as nothing, never as everything. Returning the asserted `never`
@@ -374,6 +404,15 @@ describe('World Market filters', () => {
     expect(sanitizeMarketQuery({ itemType: 'bag', subtype: size }).subtype).toBe(size);
     // A capacity no bag ships is not an option, so it must not survive the wire.
     expect(sanitizeMarketQuery({ itemType: 'bag', subtype: '9999' }).subtype).toBe('all');
+  });
+
+  // The 'pattern' twin of the bag acceptance above, and the online arm's
+  // load-bearing half: server/game.ts routes the untrusted msg.itemType of a
+  // market_search command through sanitizeMarketQuery, so the Patterns chip
+  // only browses online while the sanitizer keeps 'pattern' instead of
+  // falling back to 'all'.
+  it("keeps the 'pattern' item type through wire sanitization instead of falling back", () => {
+    expect(sanitizeMarketQuery({ itemType: 'pattern' }).itemType).toBe('pattern');
   });
 
   it('matches rarities by the game quality names', () => {

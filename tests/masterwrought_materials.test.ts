@@ -826,6 +826,15 @@ describe('sundered essence: the extraction', () => {
       'premise: the raid pattern IS raid-sourced, so only the kind clause refuses it',
     ).toBe(true);
     expect(isSunderable(ITEMS.pattern_duskforged_warblade)).toBe(false);
+    // And drive the REAL cast path with a held pattern, not just the
+    // predicate: the refusal line, the pattern kept, no essence minted.
+    sim.addItem('pattern_duskforged_warblade', 1, pid);
+    sim.drainEvents();
+    runSunder(sim, 'pattern_duskforged_warblade');
+    const patternErrors = (sim.drainEvents() as any[]).filter((e) => e.type === 'error');
+    expect(patternErrors.map((e) => e.text)).toEqual(['Only raid-won epics can be sundered.']);
+    expect(sim.countItem('pattern_duskforged_warblade', pid)).toBe(1);
+    expect(sim.countItem(SUNDERED_ESSENCE_ITEM_ID, pid)).toBe(0);
   });
 
   it('refuses while busy and while dead', () => {

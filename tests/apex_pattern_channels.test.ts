@@ -21,8 +21,12 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { DELVE_SHOPS } from '../src/sim/content/delves';
+import { drownedLitanyChestItemsForTier } from '../src/sim/content/delves/drowned_litany_loot';
+import { delveChestItemsForTier } from '../src/sim/content/delves/lockpick_tiers';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_NPC_ID, HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
+import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
+import { authoredLettersById } from '../src/sim/content/letters';
 import { FURY_STOCK } from '../src/sim/content/pvp_honor';
 import {
   ALL_RECIPES,
@@ -31,12 +35,27 @@ import {
   APEX_GEAR_RECIPES,
   recipeById,
 } from '../src/sim/content/recipes';
-import { RIFT_LEGENDARY_ITEM_IDS } from '../src/sim/content/rift/items';
-import { DUNGEONS, GATHER_NODES, ITEMS, MOBS, NPCS, QUESTS } from '../src/sim/data';
+import {
+  RIFT_ESSENCE_ITEM_ID,
+  RIFT_GEAR_ITEM_IDS,
+  RIFT_GEM_IDS,
+  RIFT_LEGENDARY_ITEM_IDS,
+} from '../src/sim/content/rift/items';
+import {
+  CLASSES,
+  DUNGEONS,
+  GATHER_NODES,
+  GROUND_OBJECTS,
+  ITEMS,
+  MOBS,
+  NPCS,
+  QUESTS,
+} from '../src/sim/data';
 import { nodeMaterialFor } from '../src/sim/professions/gathering';
 import { riftHeroicClearPool, riftNormalClearPool } from '../src/sim/rift/loot_pools';
 import {
   addRiftClearGearLoot,
+  createRiftGearInstance,
   RIFT_BLUE_MOUNT_REINS,
   RIFT_EPIC_MOUNT_REINS,
   RIFT_GREEN_MOUNT_REINS,
@@ -45,7 +64,7 @@ import {
 } from '../src/sim/rift/progression';
 import { Rng } from '../src/sim/rng';
 import type { SimContext } from '../src/sim/sim_context';
-import type { Entity } from '../src/sim/types';
+import type { Entity, PlayerClass } from '../src/sim/types';
 
 const NYTHRAXIS_BOSS_ID = 'nythraxis_scourge_of_thornpeak';
 const RAID_GROUP = 'nythraxis_patterns';
@@ -292,8 +311,111 @@ describe('the no-fourth-channel sweep (R8: three pillars, no fourth)', () => {
         if (isPatternId(entry.itemId)) leaks.push(`DELVE_SHOPS.${delveId}: ${entry.itemId}`);
       }
     }
-    expect(rowsWalked).toBeGreaterThanOrEqual(18);
+    expect(rowsWalked).toBeGreaterThanOrEqual(26);
     expect(leaks).toEqual([]);
+  });
+
+  it('no fishing table entry resolves to a pattern id', () => {
+    // Three proficiency bands, each a per-zone table (the eastbrook row
+    // doubles as the fallback for zones without their own).
+    expect(FISHING_TABLES_BY_BAND.length).toBeGreaterThanOrEqual(3);
+    let entriesWalked = 0;
+    const leaks: string[] = [];
+    for (let band = 0; band < FISHING_TABLES_BY_BAND.length; band++) {
+      for (const [zoneId, table] of Object.entries(FISHING_TABLES_BY_BAND[band])) {
+        for (const entry of table) {
+          entriesWalked++;
+          // itemId: null is the empty-hook row, not an item grant.
+          if (isPatternId(entry.itemId ?? undefined)) {
+            leaks.push(`FISHING_TABLES_BY_BAND[${band}].${zoneId}: ${entry.itemId}`);
+          }
+        }
+      }
+    }
+    expect(entriesWalked).toBeGreaterThanOrEqual(48);
+    expect(leaks).toEqual([]);
+  });
+
+  it('no mail letter attachment carries a pattern id', () => {
+    // authoredLettersById() is the one merged registry both client letter
+    // registries build from, so the walked corpus is every authored letter.
+    // Only static items rows sweep here: the marks/cores reward letter bases
+    // deliberately carry none (the PostOffice fills those stacks per kill).
+    const letters = Object.values(authoredLettersById());
+    expect(letters.length).toBeGreaterThanOrEqual(37);
+    let attachmentIdsWalked = 0;
+    const leaks: string[] = [];
+    for (const letter of letters) {
+      for (const slot of letter.items ?? []) {
+        attachmentIdsWalked++;
+        if (isPatternId(slot.itemId)) leaks.push(`letters ${letter.letterId}: ${slot.itemId}`);
+      }
+    }
+    expect(attachmentIdsWalked).toBeGreaterThanOrEqual(1);
+    expect(leaks).toEqual([]);
+  });
+
+  it('no ground-object pickup carries a pattern id (overworld or dungeon object lists)', () => {
+    expect(GROUND_OBJECTS.length).toBeGreaterThanOrEqual(43);
+    let idsWalked = 0;
+    const leaks: string[] = [];
+    for (const obj of GROUND_OBJECTS) {
+      idsWalked++;
+      if (isPatternId(obj.itemId)) leaks.push(`GROUND_OBJECTS: ${obj.itemId}`);
+    }
+    // Dungeon defs seed their own object spawns (doors and encounter
+    // interactables included; every row carries an item id, so all sweep).
+    for (const dungeon of Object.values(DUNGEONS)) {
+      for (const obj of dungeon.objects ?? []) {
+        idsWalked++;
+        if (isPatternId(obj.itemId)) leaks.push(`DUNGEONS.${dungeon.id} objects: ${obj.itemId}`);
+      }
+    }
+    expect(idsWalked).toBeGreaterThanOrEqual(52);
+    expect(leaks).toEqual([]);
+  });
+
+  it('no delve cache draw resolves to a pattern id (lockpick chests, the Drowned Reliquary)', () => {
+    // Both cache surfaces are draw FUNCTIONS, not static tables: enumerate
+    // the reachable id corpus by running the live draws across every tier,
+    // class, and coffer arm over a fixed seed range (deterministic, and wide
+    // enough that every chance() branch, the 3 percent epic included, lands).
+    const ids = new Set<string>();
+    const classes = Object.keys(CLASSES) as PlayerClass[];
+    expect(classes.length).toBeGreaterThanOrEqual(9);
+    for (const tier of ['premium', 'medium', 'low'] as const) {
+      for (const cls of classes) {
+        for (const bountiful of [false, true]) {
+          for (let seed = 1; seed <= 200; seed++) {
+            for (const row of delveChestItemsForTier(tier, cls, new Rng(seed), bountiful)) {
+              ids.add(row.itemId);
+            }
+            for (const row of drownedLitanyChestItemsForTier(tier, cls, new Rng(seed), bountiful)) {
+              ids.add(row.itemId);
+            }
+          }
+        }
+      }
+    }
+    expect(ids.size).toBeGreaterThanOrEqual(20);
+    const leaks = [...ids].filter((id) => isPatternId(id));
+    expect(leaks).toEqual([]);
+  });
+
+  it('the rift first-clear personal loot mints no pattern id (rings, essence, gems)', () => {
+    // addRiftProgressionLoot is the OTHER rift grant beside the clear draw:
+    // per-winner ring + Rift Essence + an A/S gem, all from static id lists.
+    // The forge verbs (upgrade/enchant/socket) mutate an existing copy's
+    // payload and never mint an item id, so these lists are the whole surface.
+    const staticIds = [...RIFT_GEAR_ITEM_IDS, RIFT_ESSENCE_ITEM_ID, ...RIFT_GEM_IDS];
+    expect(staticIds.length).toBeGreaterThanOrEqual(7);
+    expect(staticIds.filter((id) => isPatternId(id))).toEqual([]);
+    // The live ring picker must stay inside the swept static list, so the
+    // sweep provably covers what the function grants for every class.
+    for (const cls of Object.keys(CLASSES) as PlayerClass[]) {
+      const shellId = createRiftGearInstance('sweep_probe', 'S', cls, 1).itemId;
+      expect(RIFT_GEAR_ITEM_IDS as readonly string[], `${cls} ring ${shellId}`).toContain(shellId);
+    }
   });
 });
 

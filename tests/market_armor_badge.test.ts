@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { ITEMS } from '../src/sim/data';
 import type { ArmorItemDef, ItemDef } from '../src/sim/types';
 import {
   isHeroicItem,
@@ -47,6 +48,17 @@ describe('marketArmorBadge', () => {
 
   it('returns null for non-armor listings (weapons, bags, materials, and so on)', () => {
     expect(marketArmorBadge(sword)).toBeNull();
+  });
+
+  it('returns null for a live recipe-kind pattern def (the Browse-row corner stays pip-free)', () => {
+    // The redesigned corner family composes with the phase 11 pattern rows only
+    // while this resolver answers null for kind 'recipe'; pin it on a SHIPPED
+    // catalog def rather than a synthetic one, so the composition is a tested
+    // fact about the live content.
+    const pattern = ITEMS['pattern_forgefold_legguards'];
+    if (!pattern) throw new Error('missing shipped pattern def');
+    expect(pattern.kind).toBe('recipe');
+    expect(marketArmorBadge(pattern)).toBeNull();
   });
 
   it('is deterministic for a given item', () => {
@@ -110,6 +122,16 @@ describe('isHeroicItem / marketHeroicStar', () => {
   it('emits a star only for heroic items, empty otherwise', () => {
     expect(marketHeroicStar(base({ heroicOf: 'b' }), 'Heroic')).toContain('★');
     expect(marketHeroicStar(base({}), 'Heroic')).toBe('');
+  });
+
+  it('emits its empty value for a live recipe-kind pattern def', () => {
+    // The other Browse-row corner: a shipped pattern is not heroic-tier, so
+    // the star resolver must answer the empty string for it, keeping a
+    // recipe-kind row's icon free on both corners.
+    const pattern = ITEMS['pattern_forgefold_legguards'];
+    if (!pattern) throw new Error('missing shipped pattern def');
+    expect(isHeroicItem(pattern)).toBe(false);
+    expect(marketHeroicStar(pattern, 'Heroic')).toBe('');
   });
 
   it('carries the localized Heroic word as the accessible name; the glyph is decorative', () => {
