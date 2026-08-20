@@ -32,12 +32,14 @@ STEP 2 - QA AUDIT (parallel agents, COVERAGE not filtering):
 Draw-order agent (adversarial): every loot change is a pure append (diff each table:
 no insert mid-list, no reorder, no rollGroup membership change for a pre-existing
 entry); the parity suite is green and no golden changed except by append.
-SCOPING (added at the v0.40.0 sync, 2026-08-19): take the loot diff against the
-sync merge 210ec2f7d1, not the phase-start commit. The release itself edited four
-EXISTING finale copper rows (heroicCopper on Morthen, Vael, Korzul, Nythraxis;
-Korzul base 50000 to 15000) as draw-count-neutral value swaps on the same single
-int draw, and re-minted parity goldens for its warlock rework: release-owned
-movement, outside the phase's append-only proof.
+SCOPING (added at the v0.40.0 sync, 2026-08-19; baseline refreshed at the second
+sync, 2026-08-20): take the loot diff against the newest sync merge (fba8f47ee9;
+equivalently 210ec2f7d1, since no loot file changed on either side between the
+two), not the phase-start commit. The release itself edited four EXISTING finale
+copper rows (heroicCopper on Morthen, Vael, Korzul, Nythraxis; Korzul base 50000
+to 15000) as draw-count-neutral value swaps on the same single int draw, and
+re-minted parity goldens for its warlock rework: release-owned movement, outside
+the phase's append-only proof.
 Reachability agent: every apex recipe from phases 08/09/10 has its R8 channel live
 (the hosting raid boss, rift pool, or quartermaster row exists in shipped content);
 every pattern teaches an existing recipe; no orphan either direction; patterns are

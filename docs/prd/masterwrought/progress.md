@@ -524,3 +524,18 @@ never future-PR items, per the delivery contract in `state.md`).
   seal fresh; count pins verified from suite output (IWorld 324, commands
   200/213, no silent composition). Full record: state.md "Phase 11 QA
   release sync".
+- Phase 11 QA release sync, second pass (2026-08-20, Step 0 only; the QA
+  fan-out runs in a fresh session): release/v0.40.0 moved again (182
+  commits, the GPU adaptive scheduler and the controller cross-hotbar
+  redesign; render/game/ui only, zero Phase 11 surfaces, the one sim change
+  an additive data.ts predicate). Merged as fba8f47ee9 with 12 conflicts in
+  the recorded classes (eastbrook seals re-minted, shard weights unioned
+  with 49 branch-only rows carried, pending.ts regenerated, the hud.ts
+  ratchet re-pinned at the exact merged 19445 between the parents'
+  19337/19490 pins). Six-agent merge audit: zero blocking, no Phase 11
+  premise invalidated; naming guards 26/26, portrait suites 65 green, nine
+  guard-suite invocations green at the tip; gate_select at the QA tip stays
+  owed to the fan-out. One carry: recut (never drop) the stale
+  "drop after v0.36.0" comment on the two live sim_i18n deploy-window
+  alias rows. Full record: state.md "Phase 11 QA release sync, second
+  pass".

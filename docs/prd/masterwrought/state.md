@@ -4941,3 +4941,63 @@ recorded, or refuted with the file open)
   full-suite fallback (2879 files / 40101 passed, ZERO failures, browser
   131 green, typecheck and all builds green). Portrait manifest --check
   fresh at the tip. Branch stays LOCAL, never pushed.
+
+## Phase 11 QA release sync, second pass (2026-08-20, merge fba8f47ee9; the same QA session continues into the fan-out)
+
+- THE SYNC: origin/release/v0.40.0 moved again after the 2026-08-19 pass
+  (182 commits: the GPU adaptive scheduler PR 3519 and the controller
+  cross-hotbar redesign PR 3501; render/game/ui perf work only). Merged as
+  fba8f47ee9 with 12 conflicts, all in the recorded provenance classes.
+  The only sim file in the delta is data.ts (an additive
+  isBuiltinWorldActive read for the release's zone-build workers; zero
+  callers in sim/server/headless, determinism-neutral). No stop-rule file
+  touched: loot_roll.ts, rift/progression.ts, heroic_vendor.ts, and
+  market_query.ts are all absent from the delta, so the draw-order
+  baseline moves to fba8f47ee9 as a pure relabel.
+- RESOLUTIONS: eastbrook polish seals re-minted from the merged tree via
+  remint_polish_provenance.mjs (three literals re-pinned, no capture
+  retaken); shard weights unioned (the release's fresher 2026-08-18 CI
+  harvest, 2830 rows, plus 49 branch-only rows carried from the 2026-08-19
+  local measurement, recorded in the provenance localMerge note);
+  pending.ts taken-and-regenerated via i18n:gen; hud.ts import hand-union
+  (the release's tSim in; localizeSimAuraName dropped because its only
+  hud.ts usage was extracted to entity_display_core on the branch);
+  pr_shot_targets.mjs keeps BOTH shot targets with the release's
+  cross-hotbar entry AHEAD of the branch's phase 10 target (the union
+  doctrine); the branch's stealth comment rename re-applied into the
+  release's new effect_materials.ts home (Smokefade); the hud.ts ratchet
+  re-pinned at the exact merged 19445, a MERGE-TIME hand re-pin sitting
+  between the parents (branch 19337; release 19490 for its cross-hotbar
+  thin-consumer wiring), while the renderer and main.ts ceilings in the
+  merged row set are the release's own.
+- VALIDATION AT THE MERGE TIP: tsc clean; the three naming guards 26/26
+  (the release touched five non-Latin overlays); portrait manifest --check
+  fresh (bookkeeping-only renderer-bundle drift, the tolerated class); the
+  portrait suite set green (8 files / 65 tests, covering the release's
+  rewritten capture lane); pnpm reinstall done for the release's three
+  patch-hash bumps. gate_select at the QA tip remains the freshness proof
+  for the merged generated artifacts and is owed by the fan-out's own
+  validation close.
+- SIX-AGENT MERGE AUDIT (five lanes plus completeness critic): ZERO
+  blocking. Every overlap file carries both sides' intent (the branch's
+  tome grips and Wintergnaw/Vandric/Frostglobe/Flitstep/Smokefade renames,
+  the masterwrought CSS blocks and hud_chrome keys, mintsSignerPayload and
+  the carve-out seams all verified at HEAD); the release's worker rename
+  (terrain_chunk_worker to zone_build_worker, terrain_chunk_pool deleted)
+  left zero dangling references; legacy arms, inventory rows, and stale
+  db-mock export lists are vacuously clean (zero server/net/headless files
+  in the delta). Guard-suite lane green across nine invocations
+  (architecture 44, hud_update_drive 16, monolith 13, eastbrook 29,
+  GLB/preload 30 plus 2 design-gated skips, shot targets 33, icon suites
+  41 plus release_v039_icon_art 5 with the 75/75 hotbar census,
+  hud_perf_budget 119 plus 4 env-gated skips). NO Phase 11 premise is
+  invalidated: the audit proved surface by surface that the delta contains
+  none of the phase's loot, rift, vendor, market, pattern, sundering, or
+  reliquary files.
+- CARRY (fix-round item for this QA): the two sim_i18n.ts deploy-window
+  alias rows (the Winterbite aura alias and the Deacon Varric delve-line
+  regex) carry a stale "drop after v0.36.0 ships" horizon comment. The
+  rows themselves stay LIVE: the window they protect is the deploy of the
+  masterwrought branch's own renames, which has not happened, so the fix
+  is recutting the comment to name the branch's release, never dropping
+  the rows (the critic's drop suggestion is REFUTED on this analysis).
