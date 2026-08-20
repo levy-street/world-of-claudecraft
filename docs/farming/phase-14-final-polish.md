@@ -166,13 +166,17 @@ INVARIANTS (all standing rules bind; the load-bearing ones restated)
 
 STEP N - REVIEWS + CLOSE
 - Dispatch the matrix rows the diff matches (architecture-reviewer for B6-B9,
+  cross-platform-sync for B9 in particular: a SimEvent union member is a wire
+  shape change and takes the parity reviewer, not architecture alone;
   frontend-seam-reviewer for A1-A5 and C10-C11, test-coverage-auditor for C12),
   FRESH, hard 30-tool-call budgets, report-first; qa-checklist LAST.
 - Gate via BROWSER_PATH=$HOME/.cache/ms-playwright/chromium-1228/
   chrome-linux64/chrome GATE_MAX_WORKERS=8 node scripts/gate_select.mjs on the
-  frozen committed tree (never edit while a gate runs); judge by the log
-  markers, never the exit code. Budget the druid_engines 20 s contention
-  timeout as the recorded environmental flake.
+  frozen committed tree (never edit while a gate runs). A run passes only when
+  the exit code is 0 AND the log prints the PASS marker; a printed FAIL marker
+  overrides a zero exit (the recorded shell-exit-lied precedent). Budget the
+  druid_engines 20 s contention timeout as the recorded environmental flake
+  (prove it standalone if it fires, do not chase it).
 - Merge --no-ff into LOCAL feature/farming-plan, delete the branch, record the
   merge hash in progress.md and the farming-skill-program memory topic.
 

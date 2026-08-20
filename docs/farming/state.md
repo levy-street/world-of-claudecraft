@@ -773,11 +773,15 @@ visit or a punishment for lateness is violating the design, not tuning it.
     If ACTIONABLE-IN-REPO is non-empty, it authors docs/farming/
     phase-14-final-polish.md scoped exactly to that list (D22 shape: no push, no PR);
     if empty, it declares the program CODE-COMPLETE pending the maintainer-only gates.
-  - PERFECTION SWEEP EXECUTED (Phase 13 QA, 2026-08-19). Universe: the 117-row
-    handoff table plus this QA round's own 13 findings (the corpus's per-phase
+  - PERFECTION SWEEP EXECUTED (Phase 13 QA, 2026-08-19). Universe: the handoff
+    table's 117 rows AS THE ROUND OPENED (this round then added the
+    teardown-hygiene addendum as a 118th, classified inside the row-56 clause
+    below) plus this QA round's own 13 findings (the corpus's per-phase
     findings, 241 restated from every progress.md Notes block, are RESOLVED by
     construction where their disposition says fixed, and every still-live one maps
-    to a handoff row; the loaders verified none was lost). Buckets: RESOLVED 22
+    to a handoff row; the loaders verified none was lost). Row numbers below use
+    the round-open ordering; the table is append-mostly, so re-derive positions
+    from the row TEXT if it is ever resequenced. Buckets: RESOLVED 22
     (the 13 closed rows, row 50, the two executed-check rows 51/52, this round's
     five fixed findings, one verified-exact citation), ACTIONABLE-IN-REPO 13
     (handoff rows 38 to 47 plus three of this round's NICE-TO-HAVEs),
