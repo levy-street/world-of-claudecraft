@@ -218,9 +218,11 @@ function deedsSection(g: GuideProfGathering): string {
   // precedent): the retired gatherDeeds.farming prose promised the trade
   // kept no deeds yet, which the celebrations phase (D13) made false, and
   // a reword would strand any filled locale copy.
+  // Only the template-literal arm needs the cast; casting the literal arm
+  // too would let a typo'd key name slip past tsc.
   const key =
     g.id === 'farming'
-      ? ('guide.profPages.gatherDeeds.farmingSown' as TranslationKey)
+      ? 'guide.profPages.gatherDeeds.farmingSown'
       : (`guide.profPages.gatherDeeds.${g.id}` as TranslationKey);
   return `<section class="guide-block" id="prof-gather-deeds">
       <h2>${esc(t('guide.profPages.gatherDeedsHeading'))}</h2>

@@ -497,12 +497,13 @@ closed-by-X.
 | map_doc NPC sanitizer drops the farmer flag (one whitelist line plus a round-trip pin when the editor authors farmers) | P9 | editor curation | handed-to-maintainer |
 | Steam/Epic achievement mapping (no ACH_ rows; hard cap 100 names) | P10 | maintainer | handed-to-maintainer |
 | STALE PLAYER PROSE FOUND BY THIS SWEEP: guide.profPages.gatherDeeds.farming said farming "keeps no deeds of its own yet", FALSE since Phase 10 shipped seven deeds | P7 / P10 | Phase 13 lane A | closed-by-Phase-13 (new key gatherDeeds.farmingSown with its five M16 fills, deedsSection farming arm re-pointed, retired leaf kept with a RETIRED comment; its stale Latin fills join the release-fill row above) |
-| Disposable-PG TOAST/WAL measurement (P3 QA made it a Phase 9 HARD gate; NO execution is recorded in any Phase 9 / 9b / QA block; the user-space PG16 recipe exists) | P3 QA | Phase 13 QA (execute) or maintainer (waive) | open, handed-to-Phase-13-QA |
-| Online resumed mid-growth live render check (P7 QA moved it to Phase 9 QA, which owns the online rig; no execution recorded) | P7 QA | Phase 13 QA (execute) or maintainer (waive) | open, handed-to-Phase-13-QA |
+| Disposable-PG TOAST/WAL measurement (P3 QA made it a Phase 9 HARD gate) | P3 QA | Phase 13 QA | closed-by-Phase-13-QA, EXECUTED 2026-08-19 first-hand on the user-space PG16 (:5433) against the real server (:8787): a real online session planted ALL 23 beds with all three knobs through the real plant_crop wire (persistedPlots 23, denials 0). Numbers: characters.state pg_column_size 1,499 B compressed / 2,059 B raw EMPTY vs 3,261 B / 7,831 B FULLY PLANTED (+1,762 B compressed, +5,772 B raw, about 251 B raw per plot; per-plot row = cropId + plantedAtMs + readyAtMs + survivalRoll + yieldSeed + 3 knob booleans); post-VACUUM-FULL the 6-row probe table held 32,768 B TOAST + 8,192 B heap (rows past the 2 KB threshold TOAST as expected); WAL per 30 s autosave cycle about 12.5 KB ambient-idle vs 13 to 15.5 KB with the planted blob (delta about +1.5 to 3 KB per cycle per fully-planted character), aperiodic 36 to 82 KB checkpoint spikes rode both phases. Extrapolation: 10k fully planted characters is about +17.6 MB compressed at rest and about +60 KB/s WAL at 1,000 concurrently online, matching the Phase 2 db-review estimate class. Probe traps recorded in the memory topic (chat token bucket, silent /dev give/gather, the hoe ladder garden 1 / bronze 2 / skysilver 3 / osmium 4, level-1-dies-in-tier-4-zones) |
+| Online resumed mid-growth live render check (P7 QA moved it to Phase 9 QA) | P7 QA | Phase 13 QA | closed-by-Phase-13-QA, EXECUTED 2026-08-19 first-hand as a PLAYER on the real dev client (LOW preset, puppeteer): planted vale_wheat through the real plant sheet (KeyF, seed row, Plant; the Sow It Begins toast fired), read the Harvest Journal (readyAtMs stamped 1787199621334, "Ready in 44m 56s", stage SPROUT), closed the LIVE game socket in place and let the client's own reconnect resume the session, then re-read: readyAtMs BYTE-IDENTICAL, countdown "Ready in 44m 47s" at 9 s elapsed (drift 0 s), row still hj-growing with the correct SPROUT stage; post-resume liveness proven by a /dev farmgrow round-trip flipping the row to "Ready to harvest" with the ready banner on screen (the event-forced-read race class the P7 QA adapter fix hardened: held). Screenshot evidence in the session scratchpad (probe evidence only, not committed, per the Phase 11 QA precedent). One rig note: the offer gate correctly listed the seed LOCKED as "Requires a tier 1 farming hoe" until the garden_hoe was granted, re-proving (bp) live |
 | guide.profPages.rareBody (shared across the four gathering pages, filled translated key) names only the three node-trade windfall flavors; farming's golden-harvest flavor is absent (the farming page's new tableBody covers it, so no falsehood renders); the reword needs the new-key treatment plus fills | P13 lane A | release fill / maintainer | open, deferred (reword landmine) |
 | FarmBiomePalette.trim has no draw-time consumer (soil tints the bed, wood tints the bin; the core comment claimed trim covered the bin and is now corrected); wire trim in the higher-tier pass or drop the channel | P13 integration | maintainer / art batch | open, handed-to-maintainer |
 | "Well Fed" (aura.wellFed) is verbatim the classic-era MMO food-buff term; plain descriptive English, shipped Phase 11 with fills, past ip_scrub; awareness note only | P13 lane A | maintainer | accepted-no-action (awareness) |
-| TEARDOWN PRECONDITION (gate-integrity finding): seven screenshot cone subtrees (farming-phase-01/05/07/08/09/09b/12) are referenced ONLY from docs/farming/ files, so deleting the packet reds tests/ci_workflow.test.ts's set-equality (in-cone-but-unreferenced), and the in-test comment then points at deleting the cone rows, which silently drops the evidence from five CI checkouts; the teardown change must re-home those references (or deliberately retire the subtrees WITH their cone rows and PNGs) in the SAME change; the plain farming/ subtree and farming-phase-13 survive via the asset manifest and the exporter | P13 integration | Phase 13 QA (the teardown step) | open, handed-to-Phase-13-QA (blocks teardown, not the merge) |
+| TEARDOWN PRECONDITION (gate-integrity finding): seven screenshot cone subtrees (farming-phase-01/05/07/08/09/09b/12) are referenced ONLY from docs/farming/ files, so deleting the packet reds tests/ci_workflow.test.ts's set-equality (in-cone-but-unreferenced), and the in-test comment then points at deleting the cone rows, which silently drops the evidence from five CI checkouts; the teardown change must re-home those references (or deliberately retire the subtrees WITH their cone rows and PNGs) in the SAME change; the plain farming/ subtree and farming-phase-13 survive via the asset manifest and the exporter | P13 integration | the eventual teardown change (deferred per the D22 addendum; Phase 13 QA verified the row against the tree and it holds exactly as written) | open, verified-by-Phase-13-QA (blocks teardown, not the merge) |
+| TEARDOWN PRECONDITION addendum (Phase 13 QA dead-code lane): four out-of-packet COMMENT references to docs/farming/state.md exist beyond the screenshot subtrees: tests/monolith_budget.test.ts (cites deviation (an)), tests/item_art_consistency.test.ts (two citations of deviation (al)), tests/mob_portrait_source_manifest.test.ts (one (al) citation). Comment prose only, no build or CI impact; after the packet deletion they would cite a path that no longer exists. The teardown change should reword them to cite the surviving record (the git history of the merge, or progress-notes equivalents) in the same commit, or accept them as historical citations deliberately | P13 QA | the eventual teardown change | open (blocks nothing; teardown-hygiene note) |
 | Second v0.39.0 deed-locale fill pass (15 manifest rows unfilled in 20 locales) | P10 | release fill | deferred-to-release-fill |
 | All pending Latin locale rows (about 660 as of the nineteenth absorb) | P1 to P12 | release fill | deferred-to-release-fill |
 | Stale Latin count prose (whatBody, gatherHubBody, gatherDeeds bodies) plus the 18 dropped Master Gatherer desc fills | P1 | release fill | deferred-to-release-fill |
@@ -754,6 +755,43 @@ visit or a punishment for lateness is violating the design, not tuning it.
   feature eventually ships (early sim phases stay dormant: no vendor seeds, no
   render, no UI entry until their enabling phases land). When the user green-lights
   going public, `feature/farming-plan` is pushed and delivered whole.
+- D22 ADDENDUM (2026-08-19, three real user amendments given with the Phase 13 QA
+  starter prompt; ledgered verbatim, and swept into phase-13-qa.md where its STEP 5
+  and final-response wording disagreed):
+  - (A) THE PACKET TEARDOWN IS DEFERRED: Phase 13 QA does NOT offer or execute the
+    docs/farming/ deletion. Its STEP 5 runs as a PRECONDITION VERIFICATION ONLY:
+    confirm the teardown-precondition rows are ledgered and correct (the
+    seven-subtree screenshot reference hazard in particular), then leave the packet
+    in place. The teardown happens later, on an explicit user instruction.
+  - (B) NO PR EVER: when the user later declares the feature truly done, delivery is
+    pushing `feature/farming-plan` to origin, nothing more. No pull request is ever
+    opened for the farming program. (This sharpens D22's "pushed and delivered
+    whole": the push IS the whole delivery.) Phase 13 QA itself still pushes NOTHING.
+  - (C) THE PERFECTION SWEEP: Phase 13 QA builds the complete corpus of every finding
+    of any severity ever recorded in the program and classifies each into exactly one
+    bucket (RESOLVED / ACTIONABLE-IN-REPO / MAINTAINER-GATED / ACCEPTED-BY-DESIGN).
+    If ACTIONABLE-IN-REPO is non-empty, it authors docs/farming/
+    phase-14-final-polish.md scoped exactly to that list (D22 shape: no push, no PR);
+    if empty, it declares the program CODE-COMPLETE pending the maintainer-only gates.
+  - PERFECTION SWEEP EXECUTED (Phase 13 QA, 2026-08-19). Universe: the handoff
+    table's 117 rows AS THE ROUND OPENED (this round then added the
+    teardown-hygiene addendum as a 118th, classified inside the row-56 clause
+    below) plus this QA round's own 13 findings (the corpus's per-phase
+    findings, 241 restated from every progress.md Notes block, are RESOLVED by
+    construction where their disposition says fixed, and every still-live one maps
+    to a handoff row; the loaders verified none was lost). Row numbers below use
+    the round-open ordering; the table is append-mostly, so re-derive positions
+    from the row TEXT if it is ever resequenced. Buckets: RESOLVED 22
+    (the 13 closed rows, row 50, the two executed-check rows 51/52, this round's
+    five fixed findings, one verified-exact citation), ACTIONABLE-IN-REPO 13
+    (handoff rows 38 to 47 plus three of this round's NICE-TO-HAVEs),
+    MAINTAINER-GATED 51 (rows 1 to 37, 48, 49, 53, 54, 56 with its hygiene
+    addendum, and the nine release-fill rows; row 56 is user-gated on the
+    teardown decision), ACCEPTED-BY-DESIGN 44 (rows 55 and 66 to 104 plus four
+    of this round's depth/awareness notes). Nothing landed in no bucket. The
+    ACTIONABLE bucket is non-empty, so docs/farming/phase-14-final-polish.md is
+    authored (PROPOSED; the plan-table row and README line are marked); the
+    thirteen items discharge their handoff rows when Phase 14 lands them.
 - D23: Parity goldens. Professions fields are sampled into every golden digest, so
   adding `farming: 0` to the default proficiency map regenerates ALL goldens in Phase 1
   (deliberate, `UPDATE_PARITY=1`, its own reviewed commit, the Phase 8 professions

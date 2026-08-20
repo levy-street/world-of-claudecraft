@@ -1099,6 +1099,15 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
     // output (the dishes and the tonic), and the three crafted hoes (R23,
     // craft-only). Literal where the doctrine is literal, derived from the
     // recipe table where it is a table.
+    //
+    // When the D11 ruling lands ANY tier 3/4 seed faucet, vendor-shaped or
+    // not (a quest reward, a loot drop, a profession output), sweep the (bo)
+    // dormancy prose with it: guide.profPages.gatherDeeds.farmingSown and
+    // guide.profPages.farm.tableBody both promise the top tier "with a later
+    // patch", and tests/guide.test.ts pins that disclosure until the faucet
+    // is real. This sweep and tests/deeds_content.test.ts red only on the
+    // purchase surfaces, so a non-purchase faucet reaches the prose ONLY
+    // through this reminder and the D11 phase's own checklist.
     const NEVER_STOCKED = new Set<string>([
       'highland_barley_seed',
       'frost_gourd_seed',

@@ -35,7 +35,7 @@
 | Phase 12 (shared feast) | DONE 2026-08-19 | fix/farming-phase-12-shared-feast off deffe3a5d4 (release/v0.40.0 e56707a675 still newest, no absorb); merged --no-ff as 71010cf82a, phase tip 1b33789ba4 | harvest_feast (kind junk, ItemDef.feast {charges 10, 3600 ticks, dishItemId evergarden_braised_greens}) + recipe_harvest_feast (FARM_RECIPES 14, reagent-dormant under (ca)); placeFeast/consumeFeast on IWorldFarming (331 = 88 + 243); the farm_feast entity on the normal snapshot; one-active-per-placer; the bite is a consume slot at the capstone dish (the one updateRegen mint site); the lootable re-arm trap found BY PLAYING and fixed; beat P appended (draws 110 unchanged, md5 9dfd1c6e); five-review round + qa-checklist 0 standing BLOCKING; gate run 2 all 12 green |
 | Phase 12 QA | DONE 2026-08-19 (PASS-WITH-FOLLOWUPS) | fix/farming-phase-12-qa off 2445de46ab (e56707a675 still newest, no absorb); merge hash in the notes tail | All four emphases proven first-hand over the real wire (three-session lifecycle incl. placer-eats-own and latecomer denies; the ledger survives leave/rejoin on the characterId key; nothing serializes, save blobs + db calls captured clean; the re-arm class online through a real ClientWorld mirror); ONE real defect class found and fixed test-first in BOTH legs (the teardown leak: a feast placed in a dungeon instance or a delve run outlived it); the re-arm dodge amended to the Infinity sentinel (worst-case margin was ONE tick, four lanes converged); flourish rebuild-replay silenced + FEAST_SHADOW_CAP 8 (presence never culled); six decisive arms added (swim-bite, exact-range, keyed placer, orphan window, delve lifecycle, behavioral bags click); mutations 13/13 killed named; 3 audit lanes + 5 reviewers + qa-checklist READY, 0 BLOCKING anywhere |
 | Phase 13 (integration polish) | complete 2026-08-19, merged --no-ff as 1f1a74a8ad (phase tip 5c371c2fba) | | |
-| Phase 13 QA (final; teardown offer) | not started | | |
+| Phase 13 QA (final; teardown deferred per the D22 addendum) | complete 2026-08-19 | PASS-WITH-FOLLOWUPS | merged --no-ff (hash in the block) |
 
 ## Per-phase deliverable checklists
 
@@ -3509,7 +3509,10 @@ Integration record (the orchestrator, 2026-08-19):
   dormancy arithmetic of the new prose, and the farm_patches_core comment
   claims; its two informational notes (the unconsumed trim field, already a
   handoff row; the honest [dev] farmgrow line visible in the feast capture's
-  chat log) need no action.
+  chat log) need no action. [CORRECTED by Phase 13 QA: the [dev] farmgrow
+  chat line is visible in THREE desktop captures (03-harvest,
+  04-harvest-journal, 05-harvest-feast), not the feast capture alone; the
+  shots themselves are honest staging evidence and stay as shipped.]
 - GATE RECORD (the close gate, run on the frozen tip 5787094ee8):
   BROWSER_PATH + GATE_MAX_WORKERS=8 node scripts/gate_select.mjs, mode=full
   (the planner fell back on the broad change set as expected),
@@ -3720,5 +3723,95 @@ BUILD GATE AND DELIVERY:
 - ci:changed rc: DEFERRED-TO-INTEGRATION (owner: the orchestrator; this
   lane's diff is docs-only).
 
-### Phase 13 QA (final; teardown offer)
-(not started)
+### Phase 13 QA (final; teardown deferred per the D22 addendum)
+
+Completed 2026-08-19 on fix/farming-phase-13-qa off feature/farming-plan at
+6e03459500, local-only per D22 as amended. VERDICT: PASS-WITH-FOLLOWUPS
+(0 BLOCKING anywhere; every SHOULD-FIX fixed in-round; the follow-ups are the
+proposed Phase 14 packet plus the standing maintainer gates). Three real user
+amendments arrived with the starter prompt and are ledgered as the D22
+addendum in state.md: (A) teardown deferred (STEP 5 ran as a precondition
+verification only; the packet stays), (B) no PR ever (the end-state delivery
+is pushing feature/farming-plan to origin on the user's go, nothing more),
+(C) the perfection sweep (verdict below).
+
+- PRE-FLIGHT: tree clean at the Phase 13 merge-hash record; newest release
+  branch re-resolved (origin/release/v0.40.0 e56707a675, already absorbed as
+  the twenty-first; nothing newer, no absorb needed); the 14-commit phase
+  chain bf02b405cb..5c371c2fba identified cleanly. EVERY baseline verified by
+  RUNNING: farming_session md5 9dfd1c6ea073f853655e38675460e81f at 110 draws
+  / 2439 ticks / 144 frames, IWorld 331 = 88 + 243, commands 204/217, delta
+  keys 87, NEVER_STOCKED 21, ITEM_ART_PENDING 44, deeds suite green,
+  FEAST_SHADOW_CAP 8, monoliths exact (sim 12246/12249, hud 19214/19214,
+  renderer 13774/13774, main 11454/11460, online 5920/5950, game
+  10793/10900). Golden and every parity pin held the whole round: ZERO golden
+  movement.
+- AUDIT FAN-OUT: three read-only lanes via one Workflow (correctness,
+  test-coverage, dead-code), 3/3 first try; architecture-reviewer and
+  frontend-seam-reviewer fresh on the Agent tool, both delivered first try;
+  qa-checklist LAST: READY, 0 BLOCKING, 0 SHOULD-FIX, five NICE-TO-HAVE doc
+  clarifications, all taken. The STEP 1 Explore context loader died
+  report-less even after its nudge (the standing failure mode) and was
+  recovered as a two-lane Workflow, 2/2. All five reviews PASS; the M5
+  boss-mechanics extraction re-proven move-not-rewrite independently by two
+  lanes (statement-level diff, rng draw order intact, parity green, tsc
+  clean, the S3 scan-list entry verified).
+- THE TWO HANDED CHECKS: EXECUTED first-hand, both PASS; the full numbers
+  and evidence live on their state.md handoff rows (closed-by-Phase-13-QA):
+  (a) the disposable-PG TOAST/WAL measurement (all 23 beds + all knobs
+  planted over the real wire and persisted through the real 30 s autosave;
+  blob 1,499 B compressed empty to 3,261 B fully planted; WAL delta about
+  +1.5 to 3 KB per autosave cycle per planted character), and (b) the online
+  resumed mid-growth live render check (planted as a PLAYER through the real
+  plant sheet; the live socket closed in place; the client's own reconnect
+  resumed; readyAtMs byte-identical, countdown drift 0 s, stage SPROUT
+  correct; farmgrow round-trip flipped the row to ready post-resume).
+- FIXES (all committed on the QA branch): fbcc3736d4 the D22 addendum ledger
+  + QA-twin sweep; afc60cd554 the farm_patches_core palette mechanism comment
+  (the sharpened comment had traded one inaccuracy for another: the tint is a
+  per-instance whole-mesh setColorAt, no material-name selection);
+  2547b4aa51 the later-patch dormancy disclosure pins (count-two pin over the
+  farming page, mining negative arm, NEVER_STOCKED cross-pointer so a
+  non-purchase D11 faucet still routes to the guide prose); c28370e4dd the
+  redundant TranslationKey cast dropped from the literal deeds-key arm;
+  767dd78eac the manifest honesty fix (generatedFrom/regenerationNote now
+  state the real hand-derived contract) plus the NEW
+  tests/farming_asset_manifest.test.ts binding the manifest's derivable
+  halves to model.js, the farm_patches_core tables, and the importable
+  adapter constants; 025d9dd89f the teardown-hygiene ledger addendum + the
+  dev-line disclosure correction (three shots, not one); 5a13c1a851 the
+  perfection-sweep verdict + the PROPOSED phase-14 packet; 9d9de6c3cb the
+  five qa-checklist clarifications.
+- MUTATION KILL TABLE (dirty-refusing scratchpad runner, targets committed
+  first, rc nonzero AND named failing test AND summary line per kill):
+  M1b resolved-tableBody dormancy reword KILLED ("both farming sections must
+  carry the later-patch dormancy disclosure: expected 1 to be 2");
+  M1c farmingSown-arm reword KILLED (same pin, other arm);
+  M2 manifest footprint drift KILLED (farming_asset_manifest);
+  M4 biome palette hex drift KILLED; M5 journeyEvidence reference dropped
+  KILLED. M1 (catalog-side reword) SURVIVED AS A RIG ARTIFACT, not a pin
+  gap: runtime English resolves from the generated en.ts bundle, so the
+  catalog side is the i18n freshness gate's kill; the pin correctly binds
+  the resolved artifact (recorded so nobody re-diagnoses it).
+- THE PERFECTION SWEEP (D22 addendum (C)): buckets RESOLVED 22 /
+  ACTIONABLE-IN-REPO 13 / MAINTAINER-GATED 51 / ACCEPTED-BY-DESIGN 44,
+  nothing in no bucket (the full decomposition lives beside the D22 addendum
+  in state.md). ACTIONABLE-IN-REPO is non-empty, so
+  docs/farming/phase-14-final-polish.md is authored (PROPOSED, plan-table
+  row + README line marked): thirteen polish items, no mechanics, no tuning,
+  no maintainer input.
+- STEP 5 (teardown): PRECONDITION VERIFICATION ONLY per amendment (A). The
+  dead-code lane re-derived the reference map from the tree: exactly seven
+  screenshot subtrees (01/05/07/08/09/09b/12) are referenced only from
+  docs/farming/ while farming/ and farming-phase-13 survive via the manifest
+  and the exporter; the ledger row MATCHES reality and is marked verified.
+  Four out-of-packet state.md comment citations ledgered as a
+  teardown-hygiene addendum row. The packet stays in place.
+- Screenshots: none committed this round (the two executed checks produced
+  probe evidence only, the Phase 11 QA precedent; the frozen journal
+  literals and the state.md rows pin the content).
+- GATE RECORD: one run on the frozen QA tip 8816205d5e, BROWSER_PATH +
+  GATE_MAX_WORKERS=8 node scripts/gate_select.mjs, "[gate:select] PASS:
+  all 12 steps green (vitest workers: 8)", exit code 0, ZERO FAIL markers,
+  no druid_engines timeout. The two commits after the run (this gate record
+  and the merge-hash record) are records only.

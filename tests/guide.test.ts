@@ -1898,6 +1898,18 @@ describe('Guide professions gathering accuracy', () => {
     // never the retired no-deeds-yet leaf.
     expect(html).toContain('its own shelf in the Book of Deeds');
     expect(html).not.toContain('keeps no deeds of its own yet');
+    // The (bo) dormancy disclosure: while the tier 3/4 seed faucet is absent
+    // (the D11 ruling), BOTH farming prose sections must keep the later-patch
+    // idiom (gatherDeeds.farmingSown for Harvestmaster, farm.tableBody for the
+    // top dishes and the feast). A reword that drops either disclosure would
+    // advertise dormant content as live, which the purchase-surface sweeps in
+    // tests/deeds_content.test.ts and tests/professions_zone_rollout.test.ts
+    // cannot see (they red only on vendor-shaped faucets). The D11 phase
+    // retires these two pins WITH its prose revisit.
+    expect(
+      html.split('comes within reach with a later patch').length - 1,
+      'both farming sections must carry the later-patch dormancy disclosure',
+    ).toBe(2);
     expect(html).toContain('Farmer Jessica');
     // Tied to the live NPC name so a rename cannot leave the page lying.
     expect(html).toContain(NPCS.farmer_jessica.name);
@@ -1934,6 +1946,9 @@ describe('Guide professions gathering accuracy', () => {
     // The deeds ternary's other branch: a non-farming trade still renders its
     // own gatherDeeds leaf.
     expect(miningHtml).toContain('Ore in the Blood');
+    // The dormancy disclosure is farming-only prose: its phrase leaking into
+    // another trade's page would mean the shared builder grew a wrong branch.
+    expect(miningHtml).not.toContain('comes within reach with a later patch');
   });
 
   // Master Gatherer's trigger counts every registered trade (src/sim/deeds.ts

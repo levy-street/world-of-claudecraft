@@ -8,6 +8,18 @@ fix touched, and then, uniquely, offers the packet teardown to the user. Note:
 docs/design/farming-asset-manifest.json is deliberately outside the packet and stays
 after teardown; only docs/farming/ is ever offered for deletion.
 
+[AMENDED 2026-08-19 per the D22 addendum in state.md (three real user amendments
+delivered with this QA's starter prompt): (A) the packet teardown is DEFERRED, so
+STEP 5 below runs as a precondition verification only and the packet stays in place;
+(B) NO PR EVER: the program's end-state delivery is pushing feature/farming-plan to
+origin on the user's go, nothing more, and this QA round pushes nothing; (C) a
+whole-program PERFECTION SWEEP runs after the fix round (STEP 5b): classify every
+finding ever recorded into RESOLVED / ACTIONABLE-IN-REPO / MAINTAINER-GATED /
+ACCEPTED-BY-DESIGN, then either author docs/farming/phase-14-final-polish.md scoped
+exactly to the actionable list or declare the program code-complete pending the
+maintainer-only gates. Where the starter prompt below disagrees with this block, this
+block wins.]
+
 ### QA Starter Prompt
 
 ```
@@ -106,6 +118,11 @@ docs/farming/state.md (drift, final ledger state). Any deviation gets swept into
 docs/farming/phase-13-integration-polish.md AND this QA twin in the same pass.
 
 STEP 5 - PACKET TEARDOWN
+[AMENDED 2026-08-19 per the D22 addendum, amendment (A): the teardown is DEFERRED.
+This step runs as a PRECONDITION VERIFICATION ONLY: confirm the teardown-precondition
+rows below are ledgered and correct (the seven-subtree screenshot reference hazard in
+particular), then leave docs/farming/ in place. Do not offer the deletion, do not
+execute it. The bullets below stay as the recipe for the eventual teardown.]
 Only after every prior step is green:
 - FIRST surface every deferred follow-up recorded anywhere in the packet (every
   progress.md Notes block, the state.md ledgers and OPEN items, any phase-file
@@ -135,6 +152,12 @@ Only after every prior step is green:
   stays, whatever the user decides.
 
 STEP 6 - FINAL RESPONSE FORMAT
+[AMENDED 2026-08-19 per the D22 addendum: the packet is never removed this round, so
+the "whether the packet was removed" line reads as the teardown status (deferred per
+amendment (A), packet intact, preconditions ledgered). Add: the perfection-sweep
+bucket counts with the full ACTIONABLE-IN-REPO list (or "empty"); the Phase 14
+starter prompt OR the code-complete declaration; and one line stating the end-state
+delivery (push feature/farming-plan to origin, no PR, on the user's go).]
 Verdict PASS / PASS-WITH-FOLLOWUPS / FAIL; counts of issues found and fixed per
 severity; deferrals, each with where it now lives (a teardown-surviving home per the
 STEP 5 amendment, or an issue); whether the

@@ -36,7 +36,8 @@ Review Dispatch Matrix. Each phase is a self-contained session prompt in its own
 | 12 | `phase-12-shared-feast.md` | The placeable tier-4 feast entity: charges, per-player ledger, expiry, interaction | LIVE |
 | 12 QA | `phase-12-qa.md` | Verify Phase 12 | |
 | 13 | `phase-13-integration-polish.md` | Wiki prose, screenshots, the asset handoff manifest in docs/design, whole-feature QA sweep | LIVE, complete |
-| 13 QA | `phase-13-qa.md` | Final QA; offers packet teardown | |
+| 13 QA | `phase-13-qa.md` | Final QA; teardown deferred per the D22 addendum (preconditions verified, packet left in place) | |
+| 14 | `phase-14-final-polish.md` | PROPOSED: the perfection-sweep ACTIONABLE-IN-REPO bucket (13 polish items: UI body-class family fix, style tokens, feast hint key, a11y batch, pending-generator RETIRED_KEYS, feast slotIndex, shared countRawInSlots/distToBed, mobMeleeRange retirement, gatherDowngrade 'crop', dish effect prose, nameplate pair, boss-mechanics test depth, handoff-row discharge) | polish only, no mechanics |
 
 Dormancy rule: a phase may merge with its surface dormant (players cannot reach it)
 but never half-reachable. Each phase file's Live-surface note is binding; the QA twin
