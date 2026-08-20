@@ -86,8 +86,56 @@ describe('plant sheet window: paint', () => {
     const seed = root.querySelector<HTMLElement>('[data-seed-crop]');
     expect(seed?.dataset.seedCrop).toBe(WHEAT.id);
     expect(seed?.getAttribute('aria-label')).toBe('Sow Vale Wheat Seed');
-    expect(seed?.getAttribute('aria-pressed')).toBe('true');
+    expect(seed?.getAttribute('aria-checked')).toBe('true');
     expect(root.querySelector('[data-plant]')?.textContent).toBe('Plant');
+  });
+
+  it('exposes the seed rows as a radiogroup, the locked rows as a plain list (a11y batch)', () => {
+    // Single-select semantics: picking one seed un-picks the rest, so the
+    // rows are radios in a named group, never independent toggles. The li
+    // wrappers are presentational so the radios are the group's owned
+    // children, and the locked rows live OUTSIDE the group: they are not
+    // options and must not dilute the radio count AT reports.
+    world.inventory.push({ itemId: RICE.seedItemId, count: 1 }); // gated -> locked row
+    makeWindow().open(BED);
+    const group = root.querySelector<HTMLElement>('[role="radiogroup"]');
+    expect(group).not.toBeNull();
+    expect(group?.getAttribute('aria-labelledby')).toBe('plant-sheet-title');
+    const radios = [...(group?.querySelectorAll('[role="radio"]') ?? [])];
+    expect(radios.length).toBeGreaterThan(0);
+    for (const radio of radios) {
+      expect(radio.classList.contains('ps-seed')).toBe(true);
+      expect(radio.getAttribute('aria-checked')).toMatch(/^(true|false)$/);
+      expect((radio.parentElement as HTMLElement).getAttribute('role')).toBe('none');
+    }
+    // The locked row sits in its own plain list, with no radio inside.
+    const locked = root.querySelector<HTMLElement>('.ps-locked');
+    expect(locked).not.toBeNull();
+    expect(locked?.closest('[role="radiogroup"]')).toBeNull();
+    expect(locked?.closest('ul')?.getAttribute('role')).toBe('list');
+  });
+
+  it('reports aria-busy while a Plant send is in flight, and only then (a11y batch)', () => {
+    const win = makeWindow();
+    win.open(BED);
+    expect(root.getAttribute('aria-busy')).toBe('false');
+    root.querySelector<HTMLElement>('[data-plant]')?.click();
+    expect(world.plantCrop).toHaveBeenCalledTimes(1);
+    expect(root.getAttribute('aria-busy')).toBe('true');
+    // The deny that answers it clears the affordance with the send arm.
+    win.notifyFarmEvent(denied(BED));
+    expect(root.getAttribute('aria-busy')).toBe('false');
+    // The error-toast forward (dead/busy answer) clears it the same way.
+    root.querySelector<HTMLElement>('[data-plant]')?.click();
+    expect(root.getAttribute('aria-busy')).toBe('true');
+    win.notifyErrorToast();
+    expect(root.getAttribute('aria-busy')).toBe('false');
+    // A close never strands the stale busy state for the next open.
+    root.querySelector<HTMLElement>('[data-plant]')?.click();
+    expect(root.getAttribute('aria-busy')).toBe('true');
+    win.close();
+    win.open(BED);
+    expect(root.getAttribute('aria-busy')).toBe('false');
   });
 
   it('renders ONLY sowable seeds as pick rows; a gated one is a reasoned locked row', () => {
@@ -204,14 +252,14 @@ describe('plant sheet window: paint', () => {
 });
 
 describe('plant sheet window: selection and knobs', () => {
-  it('re-picking a seed row moves aria-pressed and the knob picks survive the repaint', () => {
+  it('re-picking a seed row moves aria-checked and the knob picks survive the repaint', () => {
     world.inventory.push({ itemId: CARROT.seedItemId, count: 2 });
     makeWindow().open(BED);
     root.querySelector<HTMLElement>('[data-knob="compost"]')?.click();
     root.querySelector<HTMLElement>(`[data-seed-crop="${CARROT.id}"]`)?.click();
     const pressed = [...root.querySelectorAll<HTMLElement>('[data-seed-crop]')].map((el) => [
       el.dataset.seedCrop,
-      el.getAttribute('aria-pressed'),
+      el.getAttribute('aria-checked'),
     ]);
     expect(pressed).toEqual([
       [WHEAT.id, 'false'],
@@ -300,7 +348,7 @@ describe('plant sheet window: re-open, event filters, and staleness (the review 
     win.open(BED);
     // Picks survived the re-press...
     expect(
-      root.querySelector(`[data-seed-crop="${CARROT.id}"]`)?.getAttribute('aria-pressed'),
+      root.querySelector(`[data-seed-crop="${CARROT.id}"]`)?.getAttribute('aria-checked'),
     ).toBe('true');
     expect(root.querySelector('[data-knob="compost"]')?.getAttribute('aria-pressed')).toBe('true');
     // ...and so did the send arm: the re-press is not a re-send license.

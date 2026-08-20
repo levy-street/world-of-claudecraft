@@ -3124,7 +3124,7 @@ export const en_XA: EnTranslations = {
       "feastTitle": "[{name}'š Ĥáŕʋéšţ Ƒéášţ]",
       "feastPlacedLine": "[Ýóú šéţ óúţ ýóúŕ ĥáŕʋéšţ ƒéášţ.]",
       "huskTrade": "[Ţŕáðé ĥúšķš ƒóŕ çóɱþóšţ]",
-      "huskTradeAria": "[Ţŕáðé ŵíţĥéŕéð ĥúšķš ƒóŕ çóɱþóšţ ŵíţĥ {name}]",
+      "huskTradeAria": "[Ţŕáðé ĥúšķš ƒóŕ çóɱþóšţ ŵíţĥ {name}]",
       "plantSheet": {
         "title": "[Þļáñţ á Çŕóþ]",
         "plant": "[Þļáñţ]",
@@ -3147,6 +3147,7 @@ export const en_XA: EnTranslations = {
       "ready": "[Ŕéáðý ţó ĥáŕʋéšţ]",
       "finishing": "[Ƒíñíšĥíñĝ úþ]",
       "withered": "[Ŵíţĥéŕéð]",
+      "readyAnnounce": "[Ŕéáðý ţó ĥáŕʋéšţ: {name}]",
       "remainingDaysHours": "[{days}ð {hours}ĥ]",
       "remainingHoursMinutes": "[{hours}ĥ {minutes}ɱ]",
       "remainingMinutesSeconds": "[{minutes}ɱ {seconds}š]",

@@ -9041,7 +9041,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.farming.denied.no_farmer':
     'Чтобы обменять шелуху на компост, нужно стоять рядом с фермером.',
   'hudChrome.farming.huskTrade': 'Обменять шелуху на компост',
-  'hudChrome.farming.huskTradeAria': 'Обменять засохшую шелуху на компост у {name}',
+  'hudChrome.farming.huskTradeAria': 'Обменять шелуху на компост у {name}',
   'hudChrome.farming.plantSheet.title': 'Посадить культуру',
   'hudChrome.farming.plantSheet.plant': 'Посадить',
   'hudChrome.farming.plantSheet.sowAria': 'Посеять: {name}',
@@ -9078,6 +9078,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.harvestJournal.listLabel': 'Засаженные грядки',
   'hudChrome.harvestJournal.growing': 'Готово через {time}',
   'hudChrome.harvestJournal.ready': 'Готово к сбору',
+  'hudChrome.harvestJournal.readyAnnounce': 'Готово к сбору: {name}',
   'hudChrome.harvestJournal.finishing': 'Почти созрел',
   'hudChrome.harvestJournal.withered': 'Засох',
   'hudChrome.harvestJournal.remainingDaysHours': '{days} д {hours} ч',

@@ -7,7 +7,7 @@ import type { Entity } from '../src/sim/types';
 import { craftNameText } from '../src/ui/char_window';
 import type { FocusTrapHandle } from '../src/ui/focus_manager';
 import { QuestDialogController } from '../src/ui/hud/quest/quest_dialog_controller';
-import { t } from '../src/ui/i18n';
+import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
 import type { IWorld } from '../src/world_api';
 
 function npc(id: number, templateId: string, x = 0): Entity {
@@ -641,9 +641,12 @@ describe('QuestDialogController', () => {
     // The English literals once, beside the t() form: a key swap to any other
     // existing key would keep the t() comparisons green on their own.
     expect(button?.textContent).toContain('Trade husks for compost');
-    expect(button?.getAttribute('aria-label')).toBe(
-      `Trade withered husks for compost with npc:${farmerId}`,
-    );
+    expect(button?.getAttribute('aria-label')).toBe(`Trade husks for compost with npc:${farmerId}`);
+    // WCAG 2.5.3 label-in-name (the Phase 14 a11y batch): the accessible
+    // name CONTAINS the visible label verbatim, so speech-input users can
+    // say what they see. Pinned as the containment PROPERTY, not just the
+    // literal above, so a future reword of either key must keep it.
+    expect(button?.getAttribute('aria-label')).toContain(button?.textContent?.trim() ?? 'MISSING');
     // No shop row for an empty stock, so the trade row is the only action.
     expect(farmer.element.querySelector('[data-vendor]')).toBeNull();
     expect(farmer.convertHusks).not.toHaveBeenCalled();
@@ -658,6 +661,24 @@ describe('QuestDialogController', () => {
     expect(farmer.release).toHaveBeenCalledWith(true);
     expect(farmer.release).not.toHaveBeenCalledWith(false);
     expect(farmer.controller.isOpen).toBe(false);
+  });
+
+  it('label-in-name holds in every non-Latin husk fill (WCAG 2.5.3 per locale)', async () => {
+    // The Phase 14 a11y batch reworded the aria pair so the accessible name
+    // contains the visible label verbatim IN EVERY FILLED LOCALE, not just
+    // English (speech-input users say what they see in their language).
+    // Rendered through the real sink in the app's own order (await the
+    // locale, then switch): a clobbered or re-stale fill reds here.
+    for (const locale of ['ja_JP', 'ko_KR', 'ru_RU', 'zh_CN', 'zh_TW'] as const) {
+      await ensureLocaleLoaded(locale);
+      setLanguage(locale);
+      const visible = t('hudChrome.farming.huskTrade');
+      const aria = t('hudChrome.farming.huskTradeAria', { name: 'X' });
+      expect(aria, locale).toContain(visible);
+      // Non-vacuity: the locale really is filled, not English-falling-back.
+      expect(visible, locale).not.toBe('Trade husks for compost');
+    }
+    setLanguage('en');
   });
 
   it('a farmer with stock renders the trade row BESIDE the goods row', () => {

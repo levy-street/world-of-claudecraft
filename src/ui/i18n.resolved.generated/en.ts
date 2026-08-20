@@ -3124,7 +3124,7 @@ export const en: EnTranslations = {
       "feastTitle": "{name}'s Harvest Feast",
       "feastPlacedLine": "You set out your harvest feast.",
       "huskTrade": "Trade husks for compost",
-      "huskTradeAria": "Trade withered husks for compost with {name}",
+      "huskTradeAria": "Trade husks for compost with {name}",
       "plantSheet": {
         "title": "Plant a Crop",
         "plant": "Plant",
@@ -3147,6 +3147,7 @@ export const en: EnTranslations = {
       "ready": "Ready to harvest",
       "finishing": "Finishing up",
       "withered": "Withered",
+      "readyAnnounce": "Ready to harvest: {name}",
       "remainingDaysHours": "{days}d {hours}h",
       "remainingHoursMinutes": "{hours}h {minutes}m",
       "remainingMinutesSeconds": "{minutes}m {seconds}s",

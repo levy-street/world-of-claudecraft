@@ -8906,6 +8906,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.harvestJournal.noviceBody'
   | 'hudChrome.harvestJournal.noviceTitle'
   | 'hudChrome.harvestJournal.ready'
+  | 'hudChrome.harvestJournal.readyAnnounce'
   | 'hudChrome.harvestJournal.remainingDaysHours'
   | 'hudChrome.harvestJournal.remainingHoursMinutes'
   | 'hudChrome.harvestJournal.remainingMinutesSeconds'

@@ -140,6 +140,12 @@ export class HarvestJournalWindow {
   private openerFocus: HTMLElement | null = null;
   private countdown: number | null = null;
   private paintedSignature: string | null = null;
+  /** The persistent in-dialog status line (see liveStatusNode). */
+  private liveStatus: HTMLElement | null = null;
+  /** Bed ids observed ready by the LAST paint of an open journal, or null
+   *  before the first paint after an open: the flip detector's baseline, so
+   *  rows already ready at open are shown but never announced. */
+  private readyBedIds: Set<string> | null = null;
 
   constructor(private readonly deps: HarvestJournalWindowDeps) {}
 
@@ -177,6 +183,10 @@ export class HarvestJournalWindow {
     root.style.display = 'none';
     this.deps.onVisibilityChange?.();
     this.paintedSignature = null;
+    // The flip baseline and any standing announcement die with the session:
+    // a reopen observes fresh and must not re-announce (or announce stale).
+    this.readyBedIds = null;
+    if (this.liveStatus) this.liveStatus.textContent = '';
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
   }
@@ -261,6 +271,8 @@ export class HarvestJournalWindow {
       `<div class="panel-title"><span id="harvest-journal-title">${esc(t('hudChrome.harvestJournal.title'))}</span>` +
       `<button type="button" class="x-btn" data-close data-focus-key="harvestJournalClose" aria-label="${esc(t('hudChrome.harvestJournal.close'))}">${svgIcon('close')}</button></div>` +
       `<div class="hj-body">${this.bodyHtml(view, nowMs)}</div>`;
+    root.appendChild(this.liveStatusNode());
+    this.announceReadyFlips(view);
     root.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     if (focusKey !== null) {
       restoreFirstEnabled([
@@ -269,6 +281,41 @@ export class HarvestJournalWindow {
       ]);
     }
     this.paintedSignature = harvestJournalViewSignature(view);
+  }
+
+  /** The persistent in-dialog status line (role=status, implicit polite
+   *  aria-live). The SAME element instance survives every whole repaint: it
+   *  is re-appended after each innerHTML write rather than re-created, so AT
+   *  keeps tracking one live region instead of meeting a fresh node per
+   *  paint (a re-created live region announces unreliably). */
+  private liveStatusNode(): HTMLElement {
+    if (this.liveStatus === null) {
+      this.liveStatus = document.createElement('div');
+      this.liveStatus.className = 'hj-live-status';
+      this.liveStatus.setAttribute('role', 'status');
+    }
+    return this.liveStatus;
+  }
+
+  /** The a11y batch's recorded follow-up: a row flipping to ready UNDER an
+   *  open journal announces through the in-dialog status line. The chat line
+   *  already reaches the LOG live region, but a reader standing in the
+   *  journal dialog hears nothing there; this line is both visible and the
+   *  announcement. The first paint after an open only observes (rows already
+   *  ready at open are visible, not news), and the baseline tracks bed ids
+   *  so a repaint that changes nothing announces nothing. */
+  private announceReadyFlips(view: HarvestJournalView): void {
+    const ready = new Set<string>();
+    if (view.kind === 'rows') {
+      for (const row of view.rows) if (row.status === 'ready') ready.add(row.bedId);
+    }
+    const prior = this.readyBedIds;
+    this.readyBedIds = ready;
+    if (prior === null || view.kind !== 'rows') return;
+    const flipped = view.rows.filter((row) => row.status === 'ready' && !prior.has(row.bedId));
+    if (flipped.length === 0) return;
+    const name = flipped.map((row) => itemName(row.produceItemId)).join(', ');
+    this.liveStatusNode().textContent = t('hudChrome.harvestJournal.readyAnnounce', { name });
   }
 
   private bodyHtml(view: HarvestJournalView, nowMs: number): string {

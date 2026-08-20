@@ -241,6 +241,40 @@ describe('harvest journal window: the countdown clock', () => {
     expect(countdownCell()).toBeNull();
   });
 
+  it('announces a ready flip through the in-dialog status line (a11y batch)', () => {
+    world.nowMs = 5 * MINUTE;
+    makeWindow().open();
+    const status = () => root.querySelector<HTMLElement>('.hj-live-status');
+    // The line exists from the first paint (a live region must be PRESENT
+    // before its content changes) and starts empty: rows already ready at
+    // open are shown, never announced.
+    expect(status()).not.toBeNull();
+    expect(status()?.getAttribute('role')).toBe('status');
+    expect(status()?.textContent).toBe('');
+    const node = status();
+    world.plots = [plot({ status: 'ready' })];
+    vi.advanceTimersByTime(HARVEST_JOURNAL_TICK_MS);
+    // The SAME node carries the announcement across the whole repaint (a
+    // re-created live region announces unreliably), naming the crop.
+    expect(status()).toBe(node);
+    expect(status()?.textContent).toBe('Ready to harvest: Vale Wheat');
+  });
+
+  it('a journal opened onto an already-ready plot stays quiet; a close clears the line', () => {
+    world.plots = [plot({ status: 'ready' })];
+    const win = makeWindow();
+    win.open();
+    expect(root.querySelector('.hj-live-status')?.textContent).toBe('');
+    // A second bed flips under the open window: announced. Then a close and
+    // reopen must start quiet again (no stale announcement to re-read).
+    world.plots = [plot({ status: 'ready' }), plot({ bedId: 'bed_eastbrook_2', status: 'ready' })];
+    vi.advanceTimersByTime(HARVEST_JOURNAL_TICK_MS);
+    expect(root.querySelector('.hj-live-status')?.textContent).toBe('Ready to harvest: Vale Wheat');
+    win.close();
+    win.open();
+    expect(root.querySelector('.hj-live-status')?.textContent).toBe('');
+  });
+
   it('repaints whole the tick a countdown crosses its own deadline', () => {
     world.nowMs = 10 * MINUTE - 2 * SECOND;
     makeWindow().open();

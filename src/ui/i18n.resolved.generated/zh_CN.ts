@@ -3124,7 +3124,7 @@ export const zh_CN: EnTranslations = {
       "feastTitle": "{name}的丰收盛宴",
       "feastPlacedLine": "你摆出了丰收盛宴。",
       "huskTrade": "用谷壳换堆肥",
-      "huskTradeAria": "与{name}用枯萎谷壳换取堆肥",
+      "huskTradeAria": "与{name}用谷壳换堆肥",
       "plantSheet": {
         "title": "种植作物",
         "plant": "种植",
@@ -3147,6 +3147,7 @@ export const zh_CN: EnTranslations = {
       "ready": "可以收成",
       "finishing": "即将成熟",
       "withered": "已枯萎",
+      "readyAnnounce": "可以收成：{name}",
       "remainingDaysHours": "{days}天{hours}小时",
       "remainingHoursMinutes": "{hours}小时{minutes}分",
       "remainingMinutesSeconds": "{minutes}分{seconds}秒",

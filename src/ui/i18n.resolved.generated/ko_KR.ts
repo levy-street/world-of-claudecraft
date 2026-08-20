@@ -3124,7 +3124,7 @@ export const ko_KR: EnTranslations = {
       "feastTitle": "{name}의 수확의 잔치",
       "feastPlacedLine": "수확의 잔치를 차렸습니다.",
       "huskTrade": "껍질을 퇴비로 교환",
-      "huskTradeAria": "{name}에게 시든 껍질을 퇴비로 교환",
+      "huskTradeAria": "{name}에게 껍질을 퇴비로 교환",
       "plantSheet": {
         "title": "작물 심기",
         "plant": "심기",
@@ -3147,6 +3147,7 @@ export const ko_KR: EnTranslations = {
       "ready": "수확 가능",
       "finishing": "마무리 중",
       "withered": "시들었음",
+      "readyAnnounce": "수확 가능: {name}",
       "remainingDaysHours": "{days}일 {hours}시간",
       "remainingHoursMinutes": "{hours}시간 {minutes}분",
       "remainingMinutesSeconds": "{minutes}분 {seconds}초",

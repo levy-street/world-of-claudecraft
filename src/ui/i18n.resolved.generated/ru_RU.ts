@@ -3124,7 +3124,7 @@ export const ru_RU: EnTranslations = {
       "feastTitle": "Пир урожая {name}",
       "feastPlacedLine": "Вы накрыли свой пир урожая.",
       "huskTrade": "Обменять шелуху на компост",
-      "huskTradeAria": "Обменять засохшую шелуху на компост у {name}",
+      "huskTradeAria": "Обменять шелуху на компост у {name}",
       "plantSheet": {
         "title": "Посадить культуру",
         "plant": "Посадить",
@@ -3147,6 +3147,7 @@ export const ru_RU: EnTranslations = {
       "ready": "Готово к сбору",
       "finishing": "Почти созрел",
       "withered": "Засох",
+      "readyAnnounce": "Готово к сбору: {name}",
       "remainingDaysHours": "{days} д {hours} ч",
       "remainingHoursMinutes": "{hours} ч {minutes} мин",
       "remainingMinutesSeconds": "{minutes} мин {seconds} с",

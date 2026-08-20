@@ -9431,6 +9431,17 @@
     font-size: 11px;
     color: var(--color-text-muted);
   }
+  /* The in-dialog ready announcement (role=status, the a11y batch): a
+     visible status line that doubles as the polite live region. Collapses
+     while empty so the quiet journal pays no layout for it. */
+  .hj-live-status {
+    margin: 6px 14px 10px;
+    font-size: 11px;
+    color: var(--gold);
+  }
+  .hj-live-status:empty {
+    display: none;
+  }
 
   /* ---------- plant sheet ---------- */
   /* The plant sheet (#plant-sheet-window, the bed verbs): the window a press
@@ -9488,7 +9499,9 @@
     text-align: left;
     cursor: pointer;
   }
-  .ps-seed[aria-pressed="true"] {
+  /* The seed rows are radios since the Phase 14 a11y batch (single-select),
+     so the picked state rides aria-checked, never aria-pressed. */
+  .ps-seed[aria-checked="true"] {
     border-color: var(--gold);
     color: var(--gold);
   }
