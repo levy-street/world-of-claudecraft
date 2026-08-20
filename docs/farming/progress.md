@@ -3810,3 +3810,8 @@ is pushing feature/farming-plan to origin on the user's go, nothing more),
 - Screenshots: none committed this round (the two executed checks produced
   probe evidence only, the Phase 11 QA precedent; the frozen journal
   literals and the state.md rows pin the content).
+- GATE RECORD: one run on the frozen QA tip 8816205d5e, BROWSER_PATH +
+  GATE_MAX_WORKERS=8 node scripts/gate_select.mjs, "[gate:select] PASS:
+  all 12 steps green (vitest workers: 8)", exit code 0, ZERO FAIL markers,
+  no druid_engines timeout. The two commits after the run (this gate record
+  and the merge-hash record) are records only.
