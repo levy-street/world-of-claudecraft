@@ -1007,7 +1007,8 @@ export function reapplySurfaceDetailToClone(clone: THREE.Material): void {
  * Every resolved family detail texture (normal/AO/rough/disp/metal clones),
  * for the renderer's boot-prewarm window. These textures are shader UNIFORMS
  * attached in onBeforeCompile, not material properties, so the scene texture
- * sweep (renderer.ts collectObjectTextures reads map/normalMap/... keys) can
+ * sweep (material_texture_slots.ts collectObjectTextures reads the named map
+ * slots) can
  * never find them: without an explicit prewarm they upload on the first live
  * draw that binds them. The Displacement fields are the heavy case: they only
  * load on the parallax tiers (ultra+), and their first-draw decode+upload was

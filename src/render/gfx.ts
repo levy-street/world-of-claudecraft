@@ -1962,6 +1962,11 @@ export interface SurfaceMatOpts {
   normalMap?: THREE.Texture;
   /** PBR roughness map (high/ultra only; ignored on the Lambert tier) */
   roughnessMap?: THREE.Texture;
+  /** PBR metalness map (high/ultra only; ignored on the Lambert tier). An
+   *  OPTION rather than a post-hoc write on the returned material: slot
+   *  presence is a program-cache-key input, so writing it onto a shared cache
+   *  entry relinks every material already drawing with it. */
+  metalnessMap?: THREE.Texture;
   /** baked AO map — needs uv2 on the geometry (high/ultra only) */
   aoMap?: THREE.Texture;
   roughness?: number;
@@ -2022,6 +2027,7 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
     map: opts.map?.uuid,
     normalMap: opts.normalMap?.uuid,
     roughnessMap: opts.roughnessMap?.uuid,
+    metalnessMap: opts.metalnessMap?.uuid,
     aoMap: opts.aoMap?.uuid,
     std: GFX.standardMaterials,
   });
@@ -2034,6 +2040,7 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
         vertexColors: opts.vertexColors ?? false,
         normalMap: opts.normalMap ?? null,
         roughnessMap: opts.roughnessMap ?? null,
+        metalnessMap: opts.metalnessMap ?? null,
         aoMap: opts.aoMap ?? null,
         roughness: opts.roughness ?? 0.85,
         metalness: opts.metalness ?? 0,

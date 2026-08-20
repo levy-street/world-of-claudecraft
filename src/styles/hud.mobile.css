@@ -1630,6 +1630,23 @@
   body.mobile-touch #actionbar {
     display: none;
   }
+  /* Pairing a pad to a phone changes the INPUT, not the layout. The action ring
+     above already owns this band, so the cross hotbar stands down here rather
+     than drawing its bar across the ring and shoving the touch seats around. */
+  body.mobile-touch .xhb {
+    display: none;
+  }
+  /* !important because cross_hotbar_wiring writes the measured lift inline on
+     body, which a stylesheet declaration alone cannot outrank. */
+  body.mobile-touch {
+    --xhb-lift: 0px !important;
+  }
+  /* Pad mode stands the stance bar down because the cross hotbar is seeded with
+     the stances. With no bar on touch, that would leave a warrior no way to
+     switch stance at all, so it keeps its mobile seat. */
+  body.mobile-touch.xhb-mode #stancebar {
+    visibility: visible;
+  }
   /* The community-links rail (Discord/GitHub/Donate) is hidden in-game on
      touch: its two-person toggle icon under the minimap read as a Friends
      button next to the real Social button in the top-left trio. The links

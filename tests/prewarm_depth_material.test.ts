@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import {
   prewarmDepthMaterial,
   prewarmDepthMaterialKey,
+  prewarmDepthMaterialsOf,
   prewarmDepthShadowSide,
   prewarmDepthShapeKey,
 } from '../src/render/prewarm_depth_material';
@@ -258,5 +259,61 @@ describe('prewarm depth material: one instance per depth program', () => {
     expect(prewarmDepthMaterialKey(source, skinnedCaster(2))).not.toBe(
       prewarmDepthMaterialKey(source, skinnedCaster(3)),
     );
+  });
+});
+
+describe('prewarmDepthMaterialsOf: the twins the shadow arm used for a caster', () => {
+  it('finds the cached twin of every material of a caster tuple by the same key, deduped, minting nothing', () => {
+    const cache = new Map<string, THREE.MeshDepthMaterial>();
+    const plain = new THREE.MeshStandardMaterial({ name: 'plain' });
+    const cutout = new THREE.MeshStandardMaterial({ name: 'cutout', alphaTest: 0.5 });
+    const caster = new THREE.Mesh(new THREE.BoxGeometry(), [plain, cutout, plain]);
+    caster.castShadow = true;
+    // nothing minted yet: the lookup answers empty and adds nothing
+    expect(prewarmDepthMaterialsOf(cache, caster)).toEqual([]);
+    expect(cache.size).toBe(0);
+    const plainTwin = prewarmDepthMaterial(cache, plain, caster);
+    const cutoutTwin = prewarmDepthMaterial(cache, cutout, caster);
+    expect(prewarmDepthMaterialsOf(cache, caster)).toEqual([plainTwin, cutoutTwin]);
+    expect(cache.size).toBe(2);
+  });
+
+  it('keys on the caster shape too: a skinned twin of the same material is not a rigid caster twin', () => {
+    const cache = new Map<string, THREE.MeshDepthMaterial>();
+    const skin = new THREE.MeshStandardMaterial();
+    const rig = skinnedCaster();
+    rig.material = skin;
+    const statue = new THREE.Mesh(new THREE.BoxGeometry(), skin);
+    statue.castShadow = true;
+    const skinnedTwin = prewarmDepthMaterial(cache, skin, rig);
+    expect(prewarmDepthMaterialsOf(cache, statue)).toEqual([]);
+    expect(prewarmDepthMaterialsOf(cache, rig)).toEqual([skinnedTwin]);
+  });
+
+  it('is blind to castShadow: a mesh not casting today still names the twin minted for its shape and material', () => {
+    // castShadow is a runtime toggle; whatever swap rule the shadow arm
+    // applies, the lookup answers which twins EXIST for this mesh, and a twin
+    // minted through another mesh of the same shape and material is the very
+    // program this one draws once it casts.
+    const cache = new Map<string, THREE.MeshDepthMaterial>();
+    const material = new THREE.MeshStandardMaterial();
+    const shadowless = new THREE.Mesh(new THREE.BoxGeometry(), material);
+    shadowless.castShadow = false;
+    expect(prewarmDepthMaterialsOf(cache, shadowless)).toEqual([]);
+    const other = new THREE.Mesh(new THREE.BoxGeometry(), material);
+    other.castShadow = true;
+    const twin = prewarmDepthMaterial(cache, material, other);
+    expect(prewarmDepthMaterialsOf(cache, shadowless)).toEqual([twin]);
+  });
+
+  it('answers empty for a material-less mesh and a non-mesh', () => {
+    const cache = new Map<string, THREE.MeshDepthMaterial>();
+    const material = new THREE.MeshStandardMaterial();
+    const bare = new THREE.Mesh(new THREE.BoxGeometry(), material);
+    bare.castShadow = true;
+    prewarmDepthMaterial(cache, material, bare);
+    (bare as unknown as { material: THREE.Material | null }).material = null;
+    expect(prewarmDepthMaterialsOf(cache, bare)).toEqual([]);
+    expect(prewarmDepthMaterialsOf(cache, new THREE.Group())).toEqual([]);
   });
 });

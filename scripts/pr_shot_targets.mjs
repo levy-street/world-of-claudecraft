@@ -335,6 +335,50 @@ async function pinReliquaryTrackerPages(page) {
   return picks;
 }
 
+// Standard-mapping button indices the cross-hotbar shots press (mirrors GP in
+// src/game/gamepad_map.ts; duplicated as literals because this script cannot import
+// from src/).
+const GP_Y = 3;
+const GP_LB = 4;
+const GP_LT = 6;
+const GP_RT = 7;
+
+// Install a fake standard-mapping pad before the document loads. The cross hotbar
+// only appears while one is connected, and headless Chrome exposes no Gamepad API,
+// so without this every cross-hotbar shot is just the keyboard HUD. `window.__fakePad`
+// is the handle the capture drives: the manager re-reads getGamepads every frame, so
+// writing `pressed` is enough to hold a trigger. String form because this script runs
+// under tsx (keepNames breaks nested functions inside evaluate callbacks).
+const fakePadSeed = async (page) => {
+  await page.evaluateOnNewDocument(
+    `window.__fakePad = { pressed: [] };
+     var fakeGetGamepads = function () {
+       var down = window.__fakePad.pressed;
+       var buttons = [];
+       for (var i = 0; i < 17; i++) {
+         var on = down.indexOf(i) >= 0;
+         buttons.push({ pressed: on, touched: on, value: on ? 1 : 0 });
+       }
+       return [{
+         index: 0,
+         id: 'Xbox Wireless Controller (STANDARD GAMEPAD Vendor: 045e Product: 02fd)',
+         connected: true,
+         mapping: 'standard',
+         buttons: buttons,
+         axes: [0, 0, 0, 0],
+         timestamp: performance.now(),
+       }];
+     };
+     // getGamepads lives on Navigator.prototype and is not writable through a
+     // plain assignment on the instance, so define it on both.
+     try { Object.defineProperty(Navigator.prototype, 'getGamepads', { value: fakeGetGamepads, configurable: true, writable: true }); } catch (e) {}
+     try { Object.defineProperty(navigator, 'getGamepads', { value: fakeGetGamepads, configurable: true, writable: true }); } catch (e) {}
+     // Headless pages can report themselves unfocused, and the pad manager takes
+     // no input from an unfocused window. Say focused so the poll runs.
+     try { Object.defineProperty(document, 'hasFocus', { value: function () { return true; }, configurable: true, writable: true }); } catch (e) {}`,
+  );
+};
+
 export const TARGETS = [
   {
     key: 'ravenrift',
@@ -9528,6 +9572,78 @@ export const TARGETS = [
             height: r.h + pad * 2,
           },
         });
+      }
+      return {};
+    },
+  },
+  {
+    key: 'cross-hotbar',
+    label: 'Cross hotbar: resting, a held trigger, the expanded set, arrange mode',
+    when: [
+      'game/cross_hotbar',
+      'game/pad_focus_action',
+      'game/gamepad.ts',
+      'game/gamepad_map.ts',
+      'ui/hud/cross_hotbar/',
+    ],
+    // The bar only exists while a pad is connected, and headless Chrome has no
+    // Gamepad API surface at all, so every variant except `no-pad` installs a
+    // fake pad before the document loads. `no-pad` is the honest BEFORE frame:
+    // it is what a keyboard player still sees, in the same run.
+    variants: [
+      { key: 'no-pad' },
+      { key: 'resting', beforeLoad: fakePadSeed, pad: [] },
+      { key: 'left-trigger', beforeLoad: fakePadSeed, pad: [GP_LT] },
+      { key: 'expanded', beforeLoad: fakePadSeed, expand: true },
+      { key: 'arranging', beforeLoad: fakePadSeed, pad: [], arrange: true },
+    ],
+    async capture(page, variant) {
+      for (let i = 0; i < 12; i++) {
+        await page.evaluate(() => {
+          document.querySelector('.camera-prompt-confirm')?.click();
+          document.querySelector('.tut-skip')?.click();
+          document.querySelector('.gpu-notice-dismiss')?.click();
+        });
+        await wait(500);
+      }
+      if (!variant?.beforeLoad) return {};
+      // Arrange mode is a CHORD, so it has to be pressed and released like one
+      // rather than set as a steady state; the poll runs on the render loop, so
+      // each step needs frames either side of it.
+      // The expanded set is reached by HOLDING one trigger and TAPPING the other,
+      // not by pressing both: pressed in the same poll they tie and resolve to the
+      // left half, which is why setting both at once photographed the plain bar.
+      if (variant.expand) {
+        await page.evaluate(`window.__fakePad.pressed = [${GP_LT}]`);
+        await wait(300);
+        await page.evaluate(`window.__fakePad.pressed = [${GP_LT}, ${GP_RT}]`);
+        await wait(300);
+        await page.evaluate(`window.__fakePad.pressed = [${GP_LT}]`);
+        await wait(500);
+      } else if (variant.arrange) {
+        await page.evaluate(`window.__fakePad.pressed = [${GP_LB}]`);
+        await wait(200);
+        await page.evaluate(`window.__fakePad.pressed = [${GP_LB}, ${GP_Y}]`);
+        await wait(200);
+        await page.evaluate('window.__fakePad.pressed = []');
+        await wait(400);
+      } else {
+        await page.evaluate(`window.__fakePad.pressed = ${JSON.stringify(variant.pad ?? [])}`);
+        await wait(600);
+      }
+      // A fake pad that never reached the manager produces a frame identical to
+      // the no-pad one, which reads as "no change" rather than as a broken rig.
+      const seen = await page.evaluate(() => {
+        const el = document.querySelector('#cross-hotbar');
+        return {
+          pads: navigator.getGamepads?.().filter(Boolean).length ?? 0,
+          focused: document.hasFocus(),
+          padMode: document.body.classList.contains('xhb-mode'),
+          barShown: !!el && getComputedStyle(el).display !== 'none',
+        };
+      });
+      if (!seen.barShown) {
+        console.log(`SHOT cross-hotbar: bar not shown (${JSON.stringify(seen)})`);
       }
       return {};
     },

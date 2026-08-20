@@ -112,3 +112,52 @@ describe('ambient precipitation biome mapping', () => {
     expect(rainy / (probe.positions.length / 3)).toBeGreaterThan(0.98);
   });
 });
+
+describe('weather prewarm slot lifecycle', () => {
+  it('leaves LIVE precipitation untouched when the resumed slot cleans up', () => {
+    // 'weather.materials' is deadline-droppable, so its slot can resume (and
+    // clean up) tens of seconds after world entry. A player standing in the
+    // rain then saw it snap off and ease back in, because the cleanup zeroed
+    // the eased intensity the live update loop owns by then.
+    installCanvasStub();
+    const scene = new THREE.Scene();
+    const weather = new Weather(scene, false);
+    const probe = weather as unknown as WeatherProbe;
+    const cam = new THREE.Vector3(0, 0, 0);
+
+    settle(weather, cam, 'haunt');
+    const liveIntensity = probe.intensity;
+    expect(liveIntensity).toBeGreaterThan(0.65);
+
+    weather.beginPrewarm();
+    weather.hidePrewarm();
+    weather.endPrewarm();
+
+    expect(probe.intensity).toBe(liveIntensity);
+    expect(probe.material.opacity).toBe(liveIntensity);
+    // The draw is handed back to update()'s own visibility rule, not left off
+    // for a frame.
+    expect(probe.points.visible).toBe(true);
+    // Idempotent: the slot's cleanup can run again without a second verdict.
+    weather.endPrewarm();
+    expect(probe.intensity).toBe(liveIntensity);
+    expect(probe.points.visible).toBe(true);
+  });
+
+  it('still returns a purely staged artifact to its cold state at cleanup', () => {
+    // Before any update() the intensity is nobody's live weather: the boot
+    // slot's cleanup owns it and must leave the material undrawable.
+    installCanvasStub();
+    const scene = new THREE.Scene();
+    const weather = new Weather(scene, false);
+    const probe = weather as unknown as WeatherProbe;
+
+    const textures = weather.beginPrewarm();
+    expect(textures).toEqual([probe.textures.flake, probe.textures.streak]);
+    expect(probe.points.visible).toBe(true);
+    weather.endPrewarm();
+    expect(probe.points.visible).toBe(false);
+    expect(probe.intensity).toBe(0);
+    expect(probe.material.opacity).toBe(0);
+  });
+});

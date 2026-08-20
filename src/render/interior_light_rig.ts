@@ -26,6 +26,14 @@ export type FogSceneState =
   | 'lastkeep'
   | 'dawnhold';
 
+/** The states whose scene is open to the sky: the overworld, Wildheart's field
+ *  and the Thornhollow Fields hollow keep the sky dome (hiding it there left a
+ *  black void above the ramparts); every interior, the maze, the rift and the
+ *  water hide it. */
+export function isOpenAirFogState(state: FogSceneState): boolean {
+  return state === 'outdoor' || state === 'wildheartField' || state === 'battleground';
+}
+
 // dungeon interiors: kill the daylight so torchlight carries the scene
 // (env at 0.15 still lit rigs sky-blue against the pitch-dark crypt)
 const DUNGEON_SUN_INTENSITY = 0.34;

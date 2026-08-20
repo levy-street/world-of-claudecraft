@@ -899,7 +899,7 @@ export class DungeonInteriors {
       });
       group.position.set(ox, 0, oz);
       group.userData.renderCategory = 'dungeon';
-      this.scene.add(group);
+      await attachSceneGroupGated(this.scene, group, this.compileGate);
       return group;
     }
 

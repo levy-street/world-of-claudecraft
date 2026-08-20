@@ -51,10 +51,15 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned for the merge of release/v0.40.0 into this branch: both
     // parents' deletions land together (the release's extractions plus the
     // branch SUNDER_ARMOR_PCT_PER_STACK import the release's extraction
-    // orphaned), so the merged file shrinks below both prior pins. Exact
-    // merged count per this row's zero-slack rule: any further growth reds
-    // again.
-    ceiling: 19337,
+    // orphaned), so the merged file shrank below both prior pins (19337).
+    // Re-pinned again when release/v0.40.0 moved (the controller cross-hotbar
+    // and cast-fallback work): upstream raised its own row to a zero-slack
+    // 19490 for thin-consumer wiring to the extracted src/ui/hud/cross_hotbar/
+    // domain (a maintainer decision recorded on that side), while the branch's
+    // entity_display_core extraction still holds, so the merged union lands
+    // between the two parent pins. Exact merged count per this row's
+    // zero-slack rule: any further growth reds again.
+    ceiling: 19445,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -114,7 +119,92 @@ const MONOLITHS: MonolithRow[] = [
     // resolved count.
     // PR #3468 changes the shadow-depth prewarm material contract, but this
     // wrapper's combined renderer remains at the same resolved count.
-    ceiling: 13744,
+    // Lowered again on the integration branch, which combines three extractions
+    // out of the renderer: the shadow-depth prewarm material factory
+    // (src/render/prewarm_depth_material.ts, PR #3468), the character-visual
+    // pool take/store halves (src/render/characters/pooled_visual_lifecycle.ts,
+    // PR #3473) and the material texture-slot walk
+    // (src/render/material_texture_slots.ts, the streamed-decor reveal gate).
+    // The merged file lands below all three branches' own pins, so the ceiling
+    // is the exact merged count per the ratchet's rule: any growth reds again.
+    // Lowered again by the foliage reveal-gate wiring, which paid for its four
+    // lines by extracting the millisecond rollup into
+    // src/render/frame_ms_stats_core.ts (net -15).
+    // Lowered again by the GPU-preparation admission wiring, which paid for its
+    // lines by extracting the perfStats return-type literal and the renderer's
+    // frame/phase stat shapes into src/render/renderer_perf_stats.ts, so the
+    // report's contract is nameable instead of inline (net -32).
+    // The compile-gate stand-in wiring paid for itself in place: the form/base
+    // visibility fan-out moved to src/render/entity_gate_stand_in_core.ts, which
+    // covers the lines the shapeshift and base-swap stand-ins added (net 0).
+    // Lowered again by the piecewise reveal-gate wiring, which paid for its
+    // soft-deadline binding by extracting the shared reveal compile host
+    // (link, shadow arm, touch tail, learned soft deadline) into
+    // src/render/reveal_compile_host.ts (net -15).
+    // Lowered again by the prewarm slot generalization: the landmark and
+    // weather manifest entries became createPrewarmGroupSlot bindings and the
+    // impact-site prewarm clone moved to its own subsystem module,
+    // buildImpactSitePrewarmGroup in src/render/impact_site.ts (net -2).
+    // Lowered again by the GPU-preparation pacing fixes: three dead type
+    // imports went, and moving the budget's frame boundary into the sync
+    // prologue traded a five-line rationale in the governor for the one that
+    // now sits beside the queue's own noteFrame (net -3).
+    // Lowered again by the live-program telemetry, which paid for its arm by
+    // extracting the renderer's info.programs readouts into
+    // src/render/live_program_watch.ts; the per-draw bracket lives in
+    // frame_present.ts, where the draw is (net -5).
+    // Lowered again when the watch moved onto the injected present host: the
+    // host's placeholder fields went with it (net -1 with the zero-env
+    // prefilter size comment).
+    // Lowered again by the production-named coverage fixes, which paid their
+    // wiring by moving the empty phase-ms fixtures into
+    // renderer_frame_telemetry_core.ts and canvasDataUrlAsync into
+    // canvas_data_url.ts (net -26); the post-effect prewarm lane was then
+    // removed after the bench (its entry never ran inside the boot budget and
+    // resumed live), keeping the extraction (net -24).
+    // The touch tail's readiness threading (the gate result down to
+    // src/render/linked_program_readiness.ts) paid for itself in place: the
+    // single-use compilePriorityFor wrapper folded into the one gate that
+    // called it, the core it delegated to being its whole body (net 0).
+    // Lowered again by the build-ledger instrumentation, which paid for its
+    // producers (timed view and zone feature builds, the arrival mark, the
+    // hitch sample's two new fields) by moving the zone prepare report and its
+    // stat shapes into src/render/zone_prepare_stats.ts and the hitch scratch
+    // factory into scene_census_core.ts (net -1).
+    // Lowered again by the composed-look pieces hold (the live candidate path
+    // consults characters/look_pieces.ts), which paid for its wiring by moving
+    // the zero foliage readout into renderer_frame_telemetry_core.ts beside
+    // the other zero fixtures and the created-view type sampler into
+    // view_candidate_pool_core.ts (net -16).
+    // Lowered again by the gc hitch cause, whose heap read (heap_sample.ts)
+    // paid for its import and sample line by folding the key-light follow
+    // beside it onto its single statement (net -1).
+    // Lowered again by the deferred-decal stand-in (the live candidate path
+    // builds the body without its face decals and attaches them on the
+    // pieces' arrival), which paid for its wiring by moving the mobile
+    // opening render scale into dynamic_resolution_core.ts (net -1).
+    // Lowered again by the compile gate's piece cut (one queue unit per
+    // material group of the target, compile_gate_pieces.ts): the enumeration
+    // and the per-piece work live in that module, and the gate's rationale
+    // comment was rewritten to the design that ships (net -10).
+    // Lowered again by the hitch sample alignment (hitch_frame_align_core.ts:
+    // the start-of-sync reading and the aligned end-of-sync sample), which
+    // paid for its wiring by extracting the perfStats last-frame deep copy
+    // into src/render/renderer_frame_stats_snapshot.ts (net -21).
+    // Lowered again by the compile gate's variant settle
+    // (program_variant_settle.ts, the third piece arm both gates bind), which
+    // paid for its wiring by moving the open-air fog predicate beside the
+    // FogSceneState it classifies (interior_light_rig.ts isOpenAirFogState),
+    // landing with the shadow arm's every-mesh twin swap in the same change
+    // (net -3).
+    // Lowered again when the world gates' touch tail moved behind
+    // linked_program_touch_lane.ts runWorldGateTouchLane (no walk mark, the
+    // unproven walk recorded as a touch-unproven event) (net -2).
+    // The upstream/main merge landed upstream's own growth (the mount-program
+    // prewarm entry, the delve tracker extraction) on top of this branch's
+    // extractions, so the pin is the exact merged count, still lower than
+    // upstream main's own (13744), and any growth reds again.
+    ceiling: 13546,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -124,7 +214,12 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/main.ts',
-    ceiling: 11490,
+    // Pinned at the exact merged count. This branch's extractions (the blocking
+    // arrival chain into src/game/arrival_warmup.ts, the world-entry settle
+    // cover joining it) net against the base's pad-selection extraction plus
+    // controller-config growth (src/game/pad_target_pick.ts, ceiling 11552),
+    // landing below both parents' pins. Any further growth reds again.
+    ceiling: 11516,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

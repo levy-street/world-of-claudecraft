@@ -476,3 +476,86 @@ describe('tryNearbyInteraction: off-quest collectables are not there', () => {
     expect(r.calls).toEqual(['pickup:2']);
   });
 });
+
+// Two reaches meet on the npc arm. The nearest-wins scan has always accepted an
+// npc just past INTERACT_RANGE (its sentinel is INTERACT_RANGE + 1, so a keypress
+// reaches six yards), while a promotion names an npc the player selected rather
+// than walked up to, so it stops at INTERACT_RANGE.
+describe('tryNearbyInteraction npc reach', () => {
+  const npcAt = (id: number, x: number) =>
+    entity({ id, kind: 'npc', templateId: 'elder_maren', pos: { x, y: 0, z: 0 } });
+
+  const interactPreferring = (r: ReturnType<typeof rig>, preferNpcId: number | null) =>
+    tryNearbyInteraction(
+      r.world,
+      r.hud,
+      r.nodes,
+      null,
+      'too far',
+      'not ready',
+      'escort away',
+      'nothing',
+      true,
+      undefined,
+      preferNpcId,
+    );
+
+  it('talks to an npc standing just past the five yard interact range', () => {
+    const r = rig([npcAt(2, 5.5)]);
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['quest:2']);
+  });
+
+  it('stops the scan at the six yard sentinel', () => {
+    const r = rig([npcAt(2, 6)]);
+    expect(interact(r)).toBe(false);
+    expect(r.calls).toEqual(['error:nothing']);
+  });
+
+  it('promotes a selected npc that is farther than the nearest but still in reach', () => {
+    const near = () => npcAt(2, 1);
+    const selected = () => npcAt(3, 4.5);
+    for (const targets of [
+      [near(), selected()],
+      [selected(), near()],
+    ]) {
+      const r = rig(targets);
+      expect(interactPreferring(r, 3)).toBe(true);
+      expect(r.calls).toEqual(['quest:3']);
+    }
+  });
+
+  it('refuses to promote a selected npc past the interact range', () => {
+    const near = () => npcAt(2, 1);
+    const selected = () => npcAt(3, 5.5);
+    for (const targets of [
+      [near(), selected()],
+      [selected(), near()],
+    ]) {
+      const r = rig(targets);
+      expect(interactPreferring(r, 3)).toBe(true);
+      expect(r.calls).toEqual(['quest:2']);
+    }
+  });
+
+  it('promotes a selected npc standing exactly ON the interact range', () => {
+    // The inclusive edge of that reach check: at five yards the promotion still
+    // holds, so the comparison cannot quietly narrow to a strict less-than.
+    const near = () => npcAt(2, 1);
+    const selected = () => npcAt(3, 5);
+    for (const targets of [
+      [near(), selected()],
+      [selected(), near()],
+    ]) {
+      const r = rig(targets);
+      expect(interactPreferring(r, 3)).toBe(true);
+      expect(r.calls).toEqual(['quest:3']);
+    }
+  });
+
+  it('still lets the scan reach an npc the promotion refused', () => {
+    const r = rig([npcAt(3, 5.5)]);
+    expect(interactPreferring(r, 3)).toBe(true);
+    expect(r.calls).toEqual(['quest:3']);
+  });
+});

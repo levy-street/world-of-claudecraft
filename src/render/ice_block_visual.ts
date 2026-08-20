@@ -74,7 +74,7 @@ const SHELL_GEOMETRY = buildShellGeometry();
 const BASE_GEOMETRY = new THREE.CylinderGeometry(0.73, 0.66, 0.16, 8);
 const SHARD_GEOMETRY = new THREE.ConeGeometry(0.14, 0.66, 4);
 
-interface IceMaterials {
+export interface IceMaterials {
   shell: THREE.Material;
   solid: THREE.Material;
 }
@@ -86,7 +86,7 @@ export function resetIceBlockProfileCaches(): void {
 }
 
 /** Built after initGfxTier(), so low graphics receives the renderer's Lambert fallback. */
-function iceMaterials(): IceMaterials {
+export function iceMaterials(): IceMaterials {
   if (materials) return materials;
   const shell = surfaceMat({
     color: 0x79c9ff,

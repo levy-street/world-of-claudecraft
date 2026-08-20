@@ -6,7 +6,7 @@ const SHELL_GEOMETRY = new THREE.IcosahedronGeometry(0.92, 2);
 const FLAME_GEOMETRY = new THREE.ConeGeometry(0.34, 1.25, 7);
 const EMBER_GEOMETRY = new THREE.IcosahedronGeometry(0.055, 0);
 
-interface FireballMaterials {
+export interface FireballMaterials {
   core: THREE.Material;
   shell: THREE.Material;
   flame: THREE.Material;
@@ -19,7 +19,7 @@ export function resetFireballTravelProfileCaches(): void {
   materials = null;
 }
 
-function fireballMaterials(): FireballMaterials {
+export function fireballMaterials(): FireballMaterials {
   if (materials) return materials;
   const core = surfaceMat({
     color: 0xffc53d,

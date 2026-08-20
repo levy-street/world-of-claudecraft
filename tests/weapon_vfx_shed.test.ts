@@ -319,18 +319,22 @@ describe('graphics-settings fairness', () => {
   });
 
   it('skips a far rig only once a baked mesh is actually standing in for it', () => {
-    // setFar leaves modelWrap VISIBLE when there is no baked mesh, while isFar
-    // reads true either way: skipping on the flag alone would freeze a rig that
-    // is still drawing. Pinned as a source scan because constructing a real
-    // CharacterVisual needs the GLB assets.
+    // setFar leaves modelWrap VISIBLE when there is no baked mesh, or when the
+    // mesh's freshly minted materials are still linking behind the compile
+    // gate, while isFar reads true either way: skipping on the flag alone
+    // would freeze a rig that is still drawing. The one predicate for "the
+    // far mesh is standing in" is farMeshShown (far_lod_reveal_core), the same
+    // one syncFarVisibility writes modelWrap.visible from. Pinned as a source
+    // scan because constructing a real CharacterVisual needs the GLB assets.
     const visual = readFileSync('src/render/characters/visual.ts', 'utf8');
     const start = visual.indexOf('updateWeaponVfx(dt: number');
     const body = visual.slice(start, visual.indexOf('\n  }', start));
     expect(start).toBeGreaterThan(-1);
-    expect(body).toContain('if (this.far && this.farMesh) return;');
+    const guard =
+      'if (farMeshShown(this.far, this.farMesh !== null, this.farCompilePending)) return;';
+    expect(body).toContain(guard);
+    expect(body).not.toContain('if (this.far) return;');
     // the orientation pins must keep running while far, or a bow snaps on return
-    expect(body.indexOf('applySkinOrientation')).toBeLessThan(
-      body.indexOf('if (this.far && this.farMesh) return;'),
-    );
+    expect(body.indexOf('applySkinOrientation')).toBeLessThan(body.indexOf(guard));
   });
 });

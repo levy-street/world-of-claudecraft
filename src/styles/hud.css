@@ -578,7 +578,7 @@
     top: auto;
     left: auto;
     width: 612px;
-    margin: 0 auto 6px;
+    margin: 0 auto 8px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -9224,4 +9224,370 @@ body.reduce-motion #proc-overlay.frost .frost-bird::after {
 }
 body.reduce-motion .breath-bar.breath-bar-drowning {
   animation: none;
+}
+
+/* ---------- controller cross hotbar ----------
+   The pad's held-trigger bar: a whole set at once, sixteen cells in two halves
+   (the left trigger's eight and the right trigger's eight), each half a d-pad
+   diamond plus a face diamond. Holding a trigger ARMS a half rather than swapping
+   the contents, so both halves stay readable. Cells carry .action-btn as well, so
+   every icon, cooldown sweep, recharge veil and state class the action bar already
+   styles applies unchanged; only the geometry and the arm treatment live here.
+   The overlay is pointer-events-free: a readout for a controller, never a target. */
+.xhb {
+  --xhb-cell: 40px;
+  /* Fixed, not in the HUD column's flow: the bar comes and goes with the pad, and
+     anything in flow here shoves the player frame and XP bar as it does. Out of
+     flow it can never move another element. Its BOTTOM sits where the action-bar
+     rows sit, so the pad bar takes over that band rather than floating elsewhere. */
+  position: fixed;
+  left: 50%;
+  bottom: var(--xhb-bottom, 18px);
+  transform: translateX(-50%);
+  z-index: 6;
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  width: max-content;
+  max-width: 100%;
+  pointer-events: none;
+  /* No panel behind it, ever. A filled slab is the single heaviest thing the bar
+     put on screen, and the cells already read as a bar on their own. The labels
+     carry their own contrast instead (see the outlines below), which is what a
+     slab was really buying. */
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 8px;
+}
+/* One trigger's eight: its d-pad diamond and its face diamond, side by side.
+   Dimmed until that trigger arms it, so the armed half reads at a glance. */
+.xhb-half {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 6px;
+  opacity: 0.5;
+  transition: opacity 120ms ease;
+}
+.xhb-half.xhb-armed {
+  opacity: 1;
+  background: rgba(255, 209, 0, 0.08);
+}
+/* The two halves read as one bar but must not run together. */
+.xhb-half-right {
+  border-left: 1px solid var(--border);
+}
+body.reduce-motion .xhb-half {
+  transition: none;
+}
+.xhb-diamond {
+  display: grid;
+  grid-template-columns: repeat(3, var(--xhb-cell));
+  grid-template-rows: repeat(3, var(--xhb-cell));
+  gap: 2px;
+}
+.xhb-slot {
+  width: var(--xhb-cell);
+  height: var(--xhb-cell);
+  position: relative;
+}
+.xhb-slot[data-xhb-point="top"] {
+  grid-area: 1 / 2;
+}
+.xhb-slot[data-xhb-point="left"] {
+  grid-area: 2 / 1;
+}
+.xhb-slot[data-xhb-point="right"] {
+  grid-area: 2 / 3;
+}
+.xhb-slot[data-xhb-point="bottom"] {
+  grid-area: 3 / 2;
+}
+/* The double set: the same bar showing the second sixteen, marked by the accent
+   frame so a player never has to guess which set a press will cast from. */
+.xhb.xhb-expanded {
+  border-color: var(--gold);
+  box-shadow: 0 0 10px rgba(255, 209, 0, 0.35);
+}
+/* Pad mode: the cross hotbar IS the hotbar, so the desktop rows stand down rather
+   than duplicating it under a bar the player has stopped reading.
+   VISIBILITY, never display: the rows sit in the bottom HUD column, so collapsing
+   their boxes drags the player frame and stance bar down the screen the moment a
+   pad connects. Keeping the box hides the ink and holds the layout still. */
+body.xhb-mode #actionbar,
+body.xhb-mode #actionbar2,
+body.xhb-mode #actionbar3,
+/* The stance bar goes with them: the stance is seeded onto the cross hotbar for
+   exactly this reason, so leaving its own bar up duplicates a button the player
+   now presses somewhere else. */
+body.xhb-mode #stancebar {
+  visibility: hidden;
+}
+/* The bar is taller than the rows it replaces, so lift the rest of the bottom
+   column clear of it. A transform, not a margin: it moves no other element's box
+   and so cannot reflow anything.
+   The distance is measured, not guessed, and it is a NARROW window: too little
+   and the player frame sits on the bar, too much and it climbs into the cast bar
+   (which is pinned 260px off the bottom). The old value was tuned when the bar
+   still had a panel and overshot on both counts. */
+body.xhb-mode #player-frame {
+  transform: translateY(calc(-1 * var(--xhb-lift, 56px)));
+}
+/* The cast bar rides up with it. It is pinned a fixed distance off the bottom, so
+   left alone the frame climbs into it exactly when the bar is tallest (a handheld
+   at a larger interface scale), which is the one case the lift has to handle. The
+   two move as one column instead.
+   Its own centring translate is repeated here on purpose: transform is a single
+   property, so naming only the lift would drop the -50% and shove the bar right by
+   half its width. */
+body.xhb-mode #castbar {
+  transform: translateX(-50%) translateY(calc(-1 * var(--xhb-lift, 56px)));
+}
+/* The pad has no cursor, so the keycap column the action bar shows would be noise
+   here: the button under each cell is the d-pad or face button it sits on. */
+.xhb-slot .keybind {
+  display: none;
+}
+/* Each half names the trigger that opens it, so the two-trigger model is legible
+   without a trip to the options panel. Brand-resolved (LT/RT, L2/R2, ZL/ZR). */
+.xhb-trigger {
+  position: absolute;
+  top: -9px;
+  left: 10px;
+  padding: 1px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  /* The trigger chips keep a fill of their own. They are two small labels rather
+     than a slab behind sixteen cells, and a chip is what makes LT/RT read as a
+     button name instead of floating text. */
+  background: var(--panel-bg);
+  font-family: var(--ui-font);
+  font-size: 11px;
+  font-weight: bold;
+  line-height: 1.3;
+  color: var(--gold);
+}
+.xhb-half {
+  position: relative;
+}
+.xhb-half.xhb-armed .xhb-trigger {
+  color: var(--gold);
+  border-color: var(--gold);
+}
+/* The route to the second set: hold one trigger, tap the other. Sits under the bar
+   so it explains itself without competing with the icons. */
+.xhb-hint {
+  position: absolute;
+  /* A CHIP, matching the trigger labels, not a line of prose. The bar already has
+     a language for naming buttons (the bordered LT/RT pills), and loose text beside
+     them read as a debug string rather than part of the interface.
+     Above the bar and pushed to its right shoulder: below, it covered the XP bar,
+     and centred above it sat in the channel between the bar and the player frame. */
+  bottom: auto;
+  top: -11px;
+  left: auto;
+  right: 0;
+  transform: none;
+  padding: 1px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--panel-bg);
+  font-family: var(--ui-font);
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+  color: var(--gold-dim);
+  /* One line, always: wrapped, the longer arrange-mode line ran off the bottom
+     of the screen instead of growing the bar. */
+  white-space: nowrap;
+}
+/* The arrange line is a sentence rather than two glyphs, and there is no room
+   for it under the bar, so it sits above one. */
+.xhb.xhb-editing .xhb-hint {
+  display: block;
+  bottom: auto;
+  top: -16px;
+  /* Centred and un-chipped while arranging: this one is a sentence being read, not
+     a button name the player is meant to stop noticing. */
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+  padding: 0;
+  border-color: transparent;
+  background: none;
+  color: var(--gold);
+  text-shadow:
+    0 0 3px #000,
+    0 1px 2px #000,
+    1px 0 2px #000,
+    -1px 0 2px #000,
+    0 -1px 2px #000;
+}
+.xhb.xhb-expanded .xhb-hint {
+  color: var(--gold);
+  opacity: 1;
+}
+/* The hardware glyph under each cell, so the mapping reads itself without a trip
+   to the options panel. Its own element: the shared action-bar painter owns
+   `.keybind` and would overwrite a glyph parked there with the keyboard keycap. */
+.xhb-glyph {
+  position: absolute;
+  left: 50%;
+  bottom: -12px;
+  transform: translateX(-50%);
+  font-family: var(--ui-font);
+  font-size: 11px;
+  font-weight: bold;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--gold);
+  /* A halo, not a drop shadow: the button hints sit over open world now, so they
+     need contrast from every side rather than only below. */
+  text-shadow:
+    0 0 3px #000,
+    0 1px 2px #000,
+    1px 0 2px #000,
+    -1px 0 2px #000,
+    0 -1px 2px #000;
+}
+
+/* The d-pad's UI-navigation highlight. An explicit class, not :focus-visible:
+   focus set programmatically does not satisfy the browser's keyboard-like
+   heuristic, so a pad player would see no ring and read the navigation as
+   broken. Drawn from tokens and steady (never transitioned off), matching the
+   focus-ring contract in src/ui/CLAUDE.md. */
+.pad-focus {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  box-shadow: 0 0 10px rgba(255, 209, 0, 0.45);
+  border-radius: 4px;
+}
+
+/* The pad's pointer: a mouse-cursor graphic anchored to whatever the d-pad has
+   selected. A console MMO still SHOWS a cursor under gamepad control, it just
+   never makes you steer it, so this snaps to the selection and never free-moves.
+   It is drawn by us because a page cannot move the OS pointer. */
+#pad-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 28px;
+  height: 28px;
+  display: none;
+  pointer-events: none;
+  z-index: 100000;
+  /* The SAME ornate arrow the mouse uses (--cursor-arrow / CURSOR_HAND), so the
+     pad's pointer and the mouse's are one cursor rather than two designs. */
+  background: url("/ui/cursors/arrow.png") no-repeat center / contain;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.85));
+}
+
+/* Pad navigation hides the OS pointer, which would otherwise sit abandoned
+   wherever it was last left. Any real mouse or trackpad movement clears this
+   class immediately (gamepad/dpad_focus_nav.ts), so a keyboard-and-mouse player
+   never loses their cursor.
+   Gated on game-active, the in-world gate: a universal !important reaches the
+   start screen and character select too, where the pad drives nothing and the
+   player still needs a pointer to get into the world. */
+body.pad-nav.game-active,
+body.pad-nav.game-active * {
+  cursor: none !important;
+}
+
+/* The expanded bank (both triggers) is a THIRD set of eight, not a second page
+   of sixteen: only the half those triggers reach exists, so the other half is
+   dropped rather than drawn as an unreachable twin. Without this the bank looks
+   identical to an ordinary trigger page and reads as the bar having swapped
+   pages, which is not what happened. */
+.xhb.xhb-expanded .xhb-half:not(.xhb-armed) {
+  display: none;
+}
+
+/* The opt-in virtual mouse pointer. Same ornate arrow as everything else, so the
+   pad's two pointers and the mouse's are one cursor; only how it MOVES differs. */
+#pad-mouse-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 28px;
+  height: 28px;
+  margin: -2px 0 0 -7px;
+  display: none;
+  pointer-events: none;
+  z-index: 100001;
+  background: url("/ui/cursors/arrow.png") no-repeat center / contain;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.9));
+}
+
+/* Edit mode: the bar is pinned open and arrangeable, so it says so rather than
+   looking like an ordinary resting bar the player's presses are bouncing off. */
+.xhb.xhb-editing {
+  opacity: 1;
+  border-color: var(--gold);
+  box-shadow: 0 0 14px rgba(255, 209, 0, 0.4);
+}
+.xhb.xhb-editing .xhb-half {
+  opacity: 1;
+}
+/* The cell an action was lifted from: it reads as a gap the carried thing came
+   out of, so the player can see where "put it back" would land. */
+.xhb-slot.xhb-carried {
+  opacity: 0.35;
+  outline: 2px dashed var(--gold);
+  outline-offset: 2px;
+}
+
+/* The spellbook row whose action the pad is carrying. An action lifted off a CELL
+   leaves a visible gap on the bar; one picked out of the book leaves none, so this
+   is the only sign the pick-up worked. */
+.spell-row.spell-carried {
+  border-color: var(--gold);
+  box-shadow: 0 0 10px rgba(255, 209, 0, 0.35);
+}
+
+/* Cross hotbar display presets. The bar's structure never changes: each preset is
+   a class on <body> and CSS owns the whole difference, so a player can flip
+   between them mid-session without the bar rebuilding.
+   Full is the default and needs no rules of its own. */
+
+/* Compact: no panel to remove any more, so this preset is purely about the
+   LABELS. They stay on the half a trigger has armed, where they are still saying
+   something, and go everywhere else. */
+body.xhb-compact .xhb-hint,
+body.xhb-compact .xhb-half:not(.xhb-armed) .xhb-glyph,
+body.xhb-compact .xhb-half:not(.xhb-armed) .xhb-trigger {
+  display: none;
+}
+
+/* Minimal: nothing at all until a trigger is held, for a player who knows the
+   layout and wants the screen back. The bar keeps its box (visibility, not
+   display) so the HUD above it never moves. */
+body.xhb-minimal .xhb-hint {
+  display: none;
+}
+body.xhb-minimal .xhb:not(.xhb-editing) .xhb-half:not(.xhb-armed) {
+  visibility: hidden;
+}
+body.xhb-minimal .xhb.xhb-editing .xhb-half {
+  visibility: visible;
+}
+
+/* The d-pad glyphs are one triangle turned four ways. Rotating a single glyph is
+   the only way the four read as the same size: measured, no font draws its four
+   arrows (or its four triangles) to matching widths. */
+.xhb-glyph-top {
+  transform: translateX(-50%) rotate(0deg);
+}
+.xhb-glyph-left {
+  transform: translateX(-50%) rotate(-90deg);
+}
+.xhb-glyph-right {
+  transform: translateX(-50%) rotate(90deg);
+}
+.xhb-glyph-bottom {
+  transform: translateX(-50%) rotate(180deg);
 }

@@ -62,24 +62,6 @@
     background: transparent;
   }
 
-  /* Software pointer driven by the gamepad's stick while a HUD window is open
-     (gamepad.ts). Hidden until cursor mode activates; sits above the HUD. */
-  .gamepad-cursor {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 22px;
-    height: 22px;
-    margin: -11px 0 0 -11px;
-    border: 2px solid #d4af37;
-    border-radius: 50%;
-    background: rgba(212, 175, 55, 0.25);
-    box-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
-    pointer-events: none;
-    z-index: 100000;
-    display: none;
-  }
-
   /* ---------- MMO-themed native form controls ----------
      Global element-level theming so every slider/spinner/checkbox/textarea
      inherits the dark-fantasy look (matches the scrollbar palette above),

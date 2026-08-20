@@ -4,16 +4,26 @@
 // the Renderer constructs views.
 import { type Entity, isMechWearer, type PlayerClass } from '../../sim/types';
 import { logAssetMissOnce } from './asset_miss_log';
-import { mechHeldWeaponOverride, modularVisualKey, VISUALS, visualKeyFor } from './manifest';
+import { type AssembleOptions, modularHeadFor } from './assets';
+import { composedLookPiecesFor, type LookPieceQueue, type LookPieces } from './look_pieces';
+import {
+  mechHeldWeaponOverride,
+  modularVisualKey,
+  VISUALS,
+  type VisualDef,
+  visualKeyFor,
+} from './manifest';
 import { MODULAR_WARRIOR_KEY, type ModularLook } from './modular';
 import { npcModularKeyFor } from './npc_looks';
 import { CharacterVisual } from './visual';
 
+export type { AssembleOptions } from './assets';
+export { type LookPiecesStats, lookPiecesStats } from './look_pieces';
 export { npcLookFor } from './npc_looks';
 export { CharacterPreview } from './preview';
 export type { PreviewAppearance } from './preview_appearance';
 export type { PreviewFramingName } from './preview_framing';
-export type { AnimState } from './visual';
+export type { AnimState, FarBakeGate } from './visual';
 export { CharacterVisual, setWeaponVfxViewportHeight } from './visual';
 
 // A composed (modular) body is opt-in per entity: the app installs a provider
@@ -53,6 +63,31 @@ export function modularKeyFor(e: Entity): string {
   return VISUALS[key] ? key : MODULAR_WARRIOR_KEY;
 }
 
+/** The composed body an entity's BASE visual will build from, resolved the
+ *  same way createCharacterVisual resolves it (a mech wearer never composes;
+ *  forms are separate lazy slots over this base), or null when the entity
+ *  keeps a fixed rig. */
+function composedLookOf(e: Entity): { def: VisualDef; look: ModularLook } | null {
+  if (isMechWearer(e)) return null;
+  const look = modularLookProvider?.(e) ?? null;
+  if (!look) return null;
+  return { def: VISUALS[modularKeyFor(e)], look };
+}
+
+/** The pieces of an entity's composed look on the queue (look_pieces.ts):
+ *  null for an entity that keeps a fixed rig, otherwise its readiness with the
+ *  missing pieces enqueued, the head resolved from the cached part set. */
+export function composedLookPiecesOf(
+  e: Entity,
+  queue: LookPieceQueue,
+  priority: number,
+): LookPieces | null {
+  const composed = composedLookOf(e);
+  if (!composed) return null;
+  const { def, look } = composed;
+  return composedLookPiecesFor(def, look, modularHeadFor(def, look), queue, priority);
+}
+
 /** Build a rideable mount's visual: no skin, no held weapon, authored colours
  *  (mount defs carry no tint). The caller gates on mountAssetsReady() first:
  *  mount GLBs are lazyPreload and resolvedGltf throws when not yet fetched. */
@@ -69,6 +104,7 @@ export function createMountVisual(visualKey: string): CharacterVisual {
 export function createCharacterVisual(
   e: Entity,
   formKey?: 'form_sheep' | 'form_bear' | 'form_cat' | 'form_travel' | 'form_metamorph',
+  opts?: AssembleOptions,
 ): CharacterVisual | null {
   // Forms are their own models. Skins and held weapons
   // only apply to the base body
@@ -96,6 +132,7 @@ export function createCharacterVisual(
       weaponOverride,
       formKey ? null : e.offhandItemId,
       look,
+      opts,
     );
     visual.budgetedWeaponLight = true;
     return visual;

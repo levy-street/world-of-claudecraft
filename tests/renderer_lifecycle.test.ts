@@ -56,7 +56,6 @@ describe('Renderer lifecycle wiring', () => {
     renderer.questObjectHidden = makeQuestObjectGate({});
     renderer.viewCreateRetry = { canAttempt };
     renderer.createView = createView;
-    renderer.sampleCreatedViewType = () => {};
 
     const hiddenFrames = Array.from({ length: 3 }, () => renderer.createRequiredViews(player, []));
     expect(hiddenFrames).toEqual([0, 0, 0]);
@@ -185,7 +184,10 @@ describe('Renderer lifecycle wiring', () => {
     // the entity's current mountKey when the view is born, so a remote rider
     // entering interest range mid-ride and an already-mounted login both have
     // no edge to detect and would otherwise always hit the cold path.
-    const createView = slice('private createView(e: Entity): void {', '\n  }\n\n  // Shared core');
+    const createView = slice(
+      'private createView(e: Entity, opts?: AssembleOptions): void {',
+      '\n  }\n\n  // Shared core',
+    );
     expect(createView).toContain("if (e.mountKey !== '') this.audioSink?.preloadMountEngine(");
   });
 

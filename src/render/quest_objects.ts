@@ -229,22 +229,26 @@ function convertMaterial(src: THREE.Material, itemId: string): THREE.Material {
           roughnessMap: fenbridgeSurfaceRoughnessTexture(),
         }
       : { normalMap: undefined, roughnessMap: undefined };
+  // The muster order's aged-iron arm packs metalness in the response map's
+  // blue channel. It rides in the OPTIONS, never as a write on the returned
+  // material: surfaceMat dedupes by key and metalnessMap is a program-cache-key
+  // input, so a post-hoc write relinked every other prop sharing that entry.
+  const musterIron = fenbridgePbr.normalMap !== undefined;
   const mat = surfaceMat({
     color: color.getHex(),
     map: fenbridgeAtlas ?? s.map ?? undefined,
     vertexColors: fenbridgeAtlas ? false : s.vertexColors,
     normalMap: fenbridgePbr.normalMap ?? s.normalMap ?? undefined,
     roughnessMap: fenbridgePbr.roughnessMap ?? s.roughnessMap ?? undefined,
+    metalnessMap: musterIron ? fenbridgePbr.roughnessMap : undefined,
     roughness: s.roughness ?? 0.88,
-    metalness: Math.min(s.metalness ?? 0, 0.75),
+    metalness: musterIron ? 1 : Math.min(s.metalness ?? 0, 0.75),
     emissive: ov?.emissive,
     emissiveIntensity: ov?.emissiveIntensity,
     flatShading: !GFX.standardMaterials,
   });
-  if (itemId === 'fen_muster_order' && mat instanceof THREE.MeshStandardMaterial && mat.normalMap) {
+  if (musterIron && mat instanceof THREE.MeshStandardMaterial) {
     mat.normalScale.setScalar(FENBRIDGE_SURFACE_NORMAL_SCALE);
-    mat.metalness = 1;
-    mat.metalnessMap = mat.roughnessMap;
   }
   if (
     !AUTHORED_SCROLL_CUE_IDS.has(itemId) &&

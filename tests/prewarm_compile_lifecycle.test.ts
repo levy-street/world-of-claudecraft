@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { createPrewarmCompileLifecycle } from '../src/render/prewarm_compile_lifecycle';
+import {
+  COMPILE_UNIT_ROOT_LABELS,
+  compileRootLabel,
+  createPrewarmCompileLifecycle,
+} from '../src/render/prewarm_compile_lifecycle';
 
 describe('prewarm compile lifecycle', () => {
   it('records the synchronous and asynchronous boundaries on the injected clock', () => {
@@ -49,5 +53,36 @@ describe('prewarm compile lifecycle', () => {
     expect(first.lane).toBe('submit');
     lifecycle.markReveal();
     expect(lifecycle.recordFor({ id: 'post' }, 'resume').statusAtReveal).toBe('post-reveal');
+  });
+
+  it("labels a unit's roots for the capture when a labeler is installed, bounded per unit", () => {
+    // A capture could say a unit was deferred at the reveal but not WHICH
+    // scene objects it left unlinked (bench batch 17 had to infer the far
+    // bakes from the live draw cadence). The record carries the roots as
+    // `name|material` labels, at most COMPILE_UNIT_ROOT_LABELS of them.
+    expect(compileRootLabel({ name: 'far-bake:0:5', material: { name: 'village:Bell' } })).toBe(
+      'far-bake:0:5|village:Bell',
+    );
+    expect(
+      compileRootLabel({ type: 'Mesh', material: [{ name: '' }, { name: 'qprops:Trim' }] }),
+    ).toBe('Mesh|qprops:Trim');
+    expect(compileRootLabel({ name: '', type: 'InstancedMesh', material: null })).toBe(
+      'InstancedMesh',
+    );
+    const labeled = createPrewarmCompileLifecycle(
+      () => 1,
+      (root) => compileRootLabel(root as { name?: string }),
+    );
+    const roots = Array.from({ length: COMPILE_UNIT_ROOT_LABELS + 3 }, (_, i) => ({
+      name: `root-${i}`,
+    }));
+    const record = labeled.recordFor({ id: 'scene:6', roots }, 'programs.compile');
+    expect(record.roots).toHaveLength(COMPILE_UNIT_ROOT_LABELS);
+    expect(record.roots?.[0]).toBe('root-0');
+    // No labeler, or a unit without roots: no field at all.
+    expect(
+      createPrewarmCompileLifecycle(() => 1).recordFor({ id: 'a', roots }, 'x').roots,
+    ).toBeUndefined();
+    expect(labeled.recordFor({ id: 'b' }, 'x').roots).toBeUndefined();
   });
 });

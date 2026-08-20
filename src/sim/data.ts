@@ -748,6 +748,14 @@ export function getContentGeneration(): number {
   return contentGeneration;
 }
 
+// Whether the active content is the built-in world. Consumers whose derived
+// state lives OUTSIDE this thread (the zone-build workers) must fall back to
+// in-thread paths for a custom world: a worker samples its own module copy of
+// the content, which is always the built-in one.
+export function isBuiltinWorldActive(): boolean {
+  return activeWorld === BUILTIN_WORLD;
+}
+
 // Swap in a custom world (editor play-test) or restore the built-in (pass nothing).
 // Affects terrain (world.ts), props (render/props.ts), and any consumer that reads
 // through getActiveWorldContent. Spawns come from SimConfig.world too (sim.ts ctor).

@@ -10,9 +10,9 @@
 //   next stage, and its late encode result is never committed;
 // - the cache commit happens only after a successful encode.
 // The host's own contract (kept out of this core because it needs the rig):
-// the visual must never stay MOUNTED across an await, because the mount is
-// shared with the synchronous capture() path and a mounted visual would bleed
-// into any concurrent live portrait capture.
+// the visual must never stay MOUNTED across an await, because one mount is
+// shared by every capture and a mounted visual would bleed into any concurrent
+// one (and that one's visual into ours).
 
 export interface PortraitPrewarmSteps<V> {
   /** True when the portrait is already in the data-URL cache. */

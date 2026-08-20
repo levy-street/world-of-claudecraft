@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { createPreviewOpenGate } from '../src/render/characters/preview_open_gate_core';
 import {
   buildPostEntryPreviewPrewarmUnits,
   PREVIEW_PREWARM_BUSY_POLL_MS,
@@ -180,6 +181,64 @@ describe('runPreviewPrewarmSchedule', () => {
       'enqueue:a', // only now does the unit actually run
       'delay', // the fixed inter-unit spacing after the unit
     ]);
+  });
+});
+
+describe('the schedule and the cold-open gate share one linked signature', () => {
+  // The per-skin units warm the SAME visual with different body textures, so
+  // only the first of them links anything: the rest would re-run a compileAsync
+  // that compiles nothing while still blocking the main thread. The open gate
+  // holds the other half of the rule (an open after these skips its warm), so
+  // the two are driven here against the real gate rather than a fake flag.
+  it('the first skin unit links, the rest still upload but skip their compile', async () => {
+    const gate = createPreviewOpenGate();
+    const sig = '["player_warrior",null,null,null,null]';
+    let compiles = 0;
+    let uploads = 0;
+    const ran: string[] = [];
+
+    const units = buildPostEntryPreviewPrewarmUnits({
+      playerClass: 'warrior',
+      allClasses: [],
+      skinCount: () => 3,
+      cardPoses: [],
+      includeCharFamily: true,
+      warmCharSkins: true,
+      // The subject is the per-skin units alone: no poses, no portraits.
+      includeCardPoses: false,
+      portraitFramings: [],
+      renderCharShell: () => {},
+      prewarmCharSkin: () => {
+        if (!gate.isLinked(sig)) {
+          compiles++;
+          gate.noteLinked(sig);
+        }
+        uploads++;
+      },
+      prewarmCardPose: () => {},
+      renderPortrait: () => {},
+    });
+
+    const handle = runPreviewPrewarmSchedule(units, {
+      enqueue: async (label, run) => {
+        ran.push(label);
+        await run();
+      },
+      isFamilyBusy: () => false,
+      delay: async () => {},
+    });
+    await handle.done;
+
+    expect(ran).toEqual([
+      'preview:char-window',
+      'preview:char-skin:0',
+      'preview:char-skin:1',
+      'preview:char-skin:2',
+    ]);
+    expect(compiles).toBe(1);
+    expect(uploads).toBe(3);
+    // ...and the open gate skips too, because it reads the same signature.
+    expect(gate.arm(sig, 0)).toBe(false);
   });
 });
 

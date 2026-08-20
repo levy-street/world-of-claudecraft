@@ -75,37 +75,49 @@ describe('shapeshift-form compile gate (#2571)', () => {
     expect(builder).not.toContain('this.gateSwapOnCompile(built.root)');
   });
 
-  it('consults the pending token, keyed per form root, in the per-frame visibility recompute', () => {
+  it('feeds the pending token to the readiness mask, so the BASE body stands in', () => {
     const source = renderer();
-    const blockStart = source.indexOf(
-      '// Gated per form root: the resolved visibility AND the compile-pending',
-    );
+    const blockStart = source.indexOf('// A form rig that is still linking is NOT ready');
     const blockEnd = source.indexOf('// rideable mount under the player', blockStart);
     expect(blockStart).toBeGreaterThan(-1);
     expect(blockEnd).toBeGreaterThan(blockStart);
     const block = source.slice(blockStart, blockEnd);
 
+    // The readiness mask, not the per-root setActive lines, is what the gate
+    // now feeds: a pending form is NOT ready, so resolvedCharacterForm stays
+    // 'base' and formVisibility.base keeps the body drawing.
+    expect(block).toContain('const formReadyMask = characterFormReadyMask(');
+    expect(block).toContain('v.formCompilePending,\n      );');
     expect(block).toContain(
-      'v.sheepVisual?.setActive(formVisibility.sheep && v.formCompilePending !== v.sheepVisual.root);',
+      'const resolvedForm = resolvedCharacterForm(requestedForm, formReadyMask);',
     );
+    expect(block).toContain('const formVisibility = characterFormVisibility(resolvedForm);');
     expect(block).toContain(
-      'v.bearVisual?.setActive(formVisibility.bear && v.formCompilePending !== v.bearVisual.root);',
+      'applyCharacterFormVisibility(v, formVisibility, v.visualCompilePending);',
     );
-    expect(block).toContain(
-      'v.catVisual?.setActive(formVisibility.cat && v.formCompilePending !== v.catVisual.root);',
-    );
-    expect(block).toContain(
-      'formVisibility.travel && v.formCompilePending !== v.travelVisual.root,',
-    );
-    expect(block).toContain(
-      'formVisibility.metamorph && v.formCompilePending !== v.metamorphVisual.root,',
-    );
+  });
+
+  it('never darkens a rig on formCompilePending any more (that was the fairness hole)', () => {
+    const source = renderer();
+    // The old shape hid the FORM on its pending token while the resolved form
+    // had already left 'base', so both bodies were dark at once. No setActive
+    // call may read the token again; the readiness mask owns it.
+    for (const line of source.split('\n')) {
+      if (line.includes('setActive(')) {
+        expect(line, 'setActive must not read the form gate token').not.toContain(
+          'formCompilePending',
+        );
+      }
+    }
+    // ...and the base body is only ever hidden by its OWN swap gate, which has
+    // the outgoing rig standing in (updateBaseVisual).
+    expect(source).not.toContain('formVisibility.base && !v.visualCompilePending');
   });
 
   it('imports settlePendingSwap from the shared compile_gate core', () => {
     const source = renderer();
     expect(source).toContain(
-      "import { CompileGateQueue, settlePendingSwap } from './compile_gate';",
+      "import { CompileGateQueue, SerialGateLane, settlePendingSwap } from './compile_gate';",
     );
   });
 });

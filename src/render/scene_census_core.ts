@@ -262,18 +262,42 @@ export function censusTableLines(report: SceneCensusReport): string[] {
 // ---------------------------------------------------------------------------
 // Hitch tracker: per-frame correlation of long frames with program/texture
 // growth and view creation. Fed by the renderer only while the ?perf overlay
-// is up (zero cost otherwise); all timestamps come from the caller.
+// is up (zero cost otherwise); all timestamps come from the caller, and the
+// sample is ALIGNED with the span its dt measures by hitch_frame_align_core
+// (the renderer feeds the aligner's output, never a raw end-of-callback read).
 // ---------------------------------------------------------------------------
 
-export type HitchCause = 'shader-compile' | 'texture-upload' | 'view-create' | 'other';
+export type HitchCause =
+  | 'shader-compile'
+  | 'texture-upload'
+  | 'zone-build'
+  | 'view-create'
+  | 'gc'
+  | 'off-frame'
+  | 'other';
 
+/** One frame's sample: every field describes the span `frameMs` measures
+ *  (the previous callback plus the gap before this one, hitch_frame_align_core),
+ *  so a cause inside a callback is filed on the frame that paid it. */
 export interface HitchFrameSample {
   atMs: number;
   frameMs: number;
   submitMs: number;
+  /** Program count at the END of the span; the tracker's delta against the
+   *  previous sample is the span's own growth. */
   programs: number;
   textures: number;
   createdViews: number;
+  /** Main-thread zone streaming build ms the build ledger accumulated over
+   *  the span (build_ledger_core zoneMs): the callback's feature builders
+   *  plus those that ran in idle callbacks in the gap. */
+  zoneBuildMs: number;
+  /** Main-thread entity view build ms over the span (build_ledger_core viewMs). */
+  viewBuildMs: number;
+  /** The renderer frame callback's own total ms in the span. */
+  rendererMs: number;
+  /** Used JS heap in MB at the sample (heap_sample.ts); 0 where unknown. */
+  heapMb: number;
 }
 
 export interface HitchEvent {
@@ -283,7 +307,29 @@ export interface HitchEvent {
   programDelta: number;
   textureDelta: number;
   createdViews: number;
+  zoneBuildMs: number;
+  viewBuildMs: number;
+  rendererMs: number;
+  /** MB the heap shrank since the previous sample (0 when it grew or is unknown). */
+  heapDropMb: number;
   cause: HitchCause;
+}
+
+/** The aligner's reused per-frame scratch (hitch_frame_align_core), so the
+ *  sample path allocates nothing while the overlay is up. */
+export function emptyHitchFrameSample(): HitchFrameSample {
+  return {
+    atMs: 0,
+    frameMs: 0,
+    submitMs: 0,
+    programs: 0,
+    textures: 0,
+    createdViews: 0,
+    zoneBuildMs: 0,
+    viewBuildMs: 0,
+    rendererMs: 0,
+    heapMb: 0,
+  };
 }
 
 export interface HitchSummary {
@@ -310,12 +356,53 @@ export interface HitchTracker {
 export const HITCH_FRAME_MS = 33;
 const HITCH_RECENT_LIMIT = 20;
 
-function hitchCause(programDelta: number, textureDelta: number, createdViews: number): HitchCause {
+/** The renderer callback's share of the frame below which the stall sits OFF
+ *  the render path (GC, network, a background task). One half is structural,
+ *  not a tuned constant: below it, more of the frame passed outside the
+ *  callback than inside it. */
+export const HITCH_OFF_FRAME_SHARE = 0.5;
+
+/** The heap drop below which a shrink does not decide the cause. Mirrors
+ *  GC_DROP_MIN_MB in src/game/heap_sawtooth.ts (render must not import game/;
+ *  tests/scene_census_core.test.ts pins the two equal): Chrome quantizes
+ *  usedJSHeapSize on non-isolated pages, so smaller dips are quantization
+ *  noise, not a collection. The event still carries the smaller drop. */
+export const HITCH_GC_DROP_MIN_MB = 2;
+
+function hitchCause(
+  programDelta: number,
+  textureDelta: number,
+  createdViews: number,
+  zoneBuildMs: number,
+  viewBuildMs: number,
+  heapDropMb: number,
+  rendererMs: number,
+  frameMs: number,
+): HitchCause {
   if (programDelta > 0) return 'shader-compile';
   if (textureDelta > 0) return 'texture-upload';
-  if (createdViews > 0) return 'view-create';
+  // Both ledgers name main-thread construction; the one that spent more
+  // owns the frame (a 0.3 ms zone step beside 50 ms of view builds is the
+  // views' hitch). A created view with no ledger spend still files here.
+  if (zoneBuildMs > 0 || viewBuildMs > 0 || createdViews > 0) {
+    return zoneBuildMs >= viewBuildMs && zoneBuildMs > 0 ? 'zone-build' : 'view-create';
+  }
+  // The heap shrank during the frame: a collection ran in it. The event
+  // carries the size so an analysis can weigh a coincidental drop.
+  if (heapDropMb >= HITCH_GC_DROP_MIN_MB) return 'gc';
+  if (rendererMs < frameMs * HITCH_OFF_FRAME_SHARE) return 'off-frame';
   return 'other';
 }
+
+export const emptyByCause = (): Record<HitchCause, number> => ({
+  'shader-compile': 0,
+  'texture-upload': 0,
+  'zone-build': 0,
+  'view-create': 0,
+  gc: 0,
+  'off-frame': 0,
+  other: 0,
+});
 
 export function createHitchTracker(
   opts: { hitchFrameMs?: number; recentLimit?: number } = {},
@@ -324,18 +411,14 @@ export function createHitchTracker(
   const recentLimit = opts.recentLimit ?? HITCH_RECENT_LIMIT;
   let frames = 0;
   let hitches = 0;
-  let byCause: Record<HitchCause, number> = {
-    'shader-compile': 0,
-    'texture-upload': 0,
-    'view-create': 0,
-    other: 0,
-  };
+  let byCause = emptyByCause();
   let programGrowthFrames = 0;
   let programsAdded = 0;
   // Scalars, not an object: this runs per frame while the overlay is up, and
   // the per-frame path stays allocation-free outside actual hitch events.
   let lastPrograms = -1;
   let lastTextures = -1;
+  let lastHeapMb = 0;
   let recent: HitchEvent[] = [];
   return {
     frame(sample: HitchFrameSample): HitchEvent | null {
@@ -345,6 +428,13 @@ export function createHitchTracker(
       const textureDelta = lastTextures >= 0 ? sample.textures - lastTextures : 0;
       lastPrograms = sample.programs;
       lastTextures = sample.textures;
+      // An unknown heap (0) neither drops nor moves the baseline, so a browser
+      // without performance.memory never files a gc hitch.
+      const heapDropMb =
+        sample.heapMb > 0 && lastHeapMb > 0
+          ? Math.round(Math.max(0, lastHeapMb - sample.heapMb) * 10) / 10
+          : 0;
+      if (sample.heapMb > 0) lastHeapMb = sample.heapMb;
       if (programDelta > 0) {
         programGrowthFrames++;
         programsAdded += programDelta;
@@ -357,7 +447,20 @@ export function createHitchTracker(
         programDelta,
         textureDelta,
         createdViews: sample.createdViews,
-        cause: hitchCause(programDelta, textureDelta, sample.createdViews),
+        zoneBuildMs: Math.round(sample.zoneBuildMs * 100) / 100,
+        viewBuildMs: Math.round(sample.viewBuildMs * 100) / 100,
+        rendererMs: Math.round(sample.rendererMs * 100) / 100,
+        heapDropMb,
+        cause: hitchCause(
+          programDelta,
+          textureDelta,
+          sample.createdViews,
+          sample.zoneBuildMs,
+          sample.viewBuildMs,
+          heapDropMb,
+          sample.rendererMs,
+          sample.frameMs,
+        ),
       };
       hitches++;
       byCause[event.cause]++;
@@ -378,11 +481,12 @@ export function createHitchTracker(
     reset(): void {
       frames = 0;
       hitches = 0;
-      byCause = { 'shader-compile': 0, 'texture-upload': 0, 'view-create': 0, other: 0 };
+      byCause = emptyByCause();
       programGrowthFrames = 0;
       programsAdded = 0;
       lastPrograms = -1;
       lastTextures = -1;
+      lastHeapMb = 0;
       recent = [];
     },
   };

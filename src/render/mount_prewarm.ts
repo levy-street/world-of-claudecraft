@@ -9,7 +9,7 @@
 // entry for why).
 
 import * as THREE from 'three';
-import type { MountKey } from '../sim/content/mounts';
+import { DEFAULT_MOUNT, type MountKey } from '../sim/content/mounts';
 import { type CharacterVisual, createMountVisual } from './characters';
 import { mountAssetsReady, preloadMountAssets } from './characters/assets';
 import { MOUNT_VISUAL_SPECS } from './mount_visuals';
@@ -43,13 +43,19 @@ function raceTimeout<T>(promise: Promise<T>, ms: number): Promise<T | 'timeout'>
   });
 }
 
-/** Every mount the catalog carries. Derived from MOUNT_VISUAL_SPECS (typed
- *  Record<MountKey, ...>, so a new MountKey missing there is a compile error)
- *  rather than a separately hand-maintained list: nothing here can drift out
- *  of sync with src/sim/content/mounts.ts the way the prewarm manifest drifted
- *  from the mount catalog before this module existed. */
-export function mountPrewarmKeys(): MountKey[] {
-  return Object.keys(MOUNT_VISUAL_SPECS) as MountKey[];
+/** The mounts worth warming for THIS session: the horse (the one purchasable
+ *  mount, the default pick) plus the mounts the player owns, in catalog
+ *  order, deduplicated. Upstream warmed every catalog key; on this branch the
+ *  first sight of any other mount (a rare collectible on another player, a
+ *  developer-only special) already goes through the live view gate with a
+ *  stand-in, so warming all nine cost nine lazy GLB fetches (4.5 MB, the
+ *  Groundshaker alone 1.16 MB), nine hidden rigs and nine compiles on the
+ *  post-reveal resume lane for content most sessions never draw. Validated
+ *  against MOUNT_VISUAL_SPECS (typed Record<MountKey, ...>), so an owned key
+ *  the specs do not carry is dropped rather than thrown. */
+export function mountPrewarmKeys(owned: readonly MountKey[] = []): MountKey[] {
+  const wanted = new Set<MountKey>([DEFAULT_MOUNT, ...owned]);
+  return (Object.keys(MOUNT_VISUAL_SPECS) as MountKey[]).filter((key) => wanted.has(key));
 }
 
 function createReadyMountPrewarmVisual(key: MountKey): CharacterVisual | null {

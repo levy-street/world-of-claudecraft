@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
-import { applyMaterials, tintedMaterial } from '../src/render/characters/assets';
+import {
+  applyMaterials,
+  tintedFarMaterials,
+  tintedMaterial,
+} from '../src/render/characters/assets';
 import type { VisualDef } from '../src/render/characters/manifest';
 import { gfxInternalsForTest } from '../src/render/gfx';
 import { createWeaponVfx, type WeaponVfxSpec } from '../src/render/weapon_vfx';
@@ -17,6 +21,35 @@ vi.mock('../src/render/assets/preload', () => ({
 }));
 
 describe('tinted character materials', () => {
+  it('gives the far mesh its own clone objects, never the rig clone (the compileAsync currentProgram trap)', () => {
+    // three's compileAsync waits on a material's currentProgram, the variant
+    // its LAST draw or compile picked; a clone shared between the skinned rig
+    // and the rigid far mesh flips that slot to the rig's variant one frame
+    // later, and the far bake's gate settled before its own variant linked.
+    const src = new THREE.MeshStandardMaterial({ name: 'mod_cloth' });
+    const rigClaims = new Set<string>();
+    const farClaims = new Set<string>();
+    const rig = tintedMaterial(src, 0x336699, 0.5, null, null, 'body', rigClaims);
+    const rigAgain = tintedMaterial(src, 0x336699, 0.5, null, null, 'body', rigClaims, 'rig');
+    const far = tintedMaterial(src, 0x336699, 0.5, null, null, 'body', farClaims, 'far');
+    // same inputs: the rig clone is memoized, the far clone is a distinct object...
+    expect(rigAgain).toBe(rig);
+    expect(far).not.toBe(rig);
+    // ...with the same tint (only the object identity, and so the polled slot, differs)
+    expect((far as THREE.MeshStandardMaterial).color.getHex()).toBe(
+      (rig as THREE.MeshStandardMaterial).color.getHex(),
+    );
+    // and separate leases
+    expect(rigClaims.size).toBe(1);
+    expect(farClaims.size).toBe(1);
+    expect([...farClaims][0]).not.toBe([...rigClaims][0]);
+    // tintedFarMaterials is the far mount
+    const def = { tint: 'entity', tintStrength: 0.5 } as unknown as VisualDef;
+    const [viaFar] = tintedFarMaterials(def, 0x336699, [src], [true], null, null, farClaims);
+    expect(viaFar).toBe(far);
+    expect(viaFar).not.toBe(rig);
+  });
+
   it('returns a colorless shader material as-is and continues the material traversal', () => {
     const restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: true });
     try {

@@ -185,6 +185,26 @@ is the `frontend-seam-reviewer` agent; dispatch it and hold only the headline ru
   Gates: `tests/ui_tier_knobs.test.ts`, `tests/ui_effects_profile.test.ts`;
   `docs/design/graphics-settings-fairness.md` is the contract.
 
+#### 6c. GPU preparation (dispatch `render-performance-reviewer`)
+
+For any change that produces GPU work, the deep checklist is the `render-performance-reviewer`
+agent; dispatch it and hold only the headline rules here. Every material a live frame can draw
+for the first time after the curtain has a prewarm home (a twin in a manifest entry, or a
+compile / reveal gate at its first appearance), never a bare `scene.add` of new materials after
+boot and never an unregistered module-scope cache filled on first cast; every program-key move
+on a visible material (texture slots, `transparent` / `blending` / `alphaToCoverage` /
+`alphaHash`, `defines`, `onBeforeCompile` / `customProgramCacheKey`, skinning, instancing,
+`needsUpdate`) rides a gated swap with a stand-in; no directional, hemisphere, spot, or
+rect-area light is added, removed, or hidden after boot (re-grade the constructor pair through
+`interior_light_rig.ts`; point lights ride the pad budget); a new secondary GL context links and
+uploads before its first draw and disables `checkShaderErrors`; and new work rides
+`background_gpu_queue.ts` at an existing `GPU_WORK_PRIORITY` with a learnable label, never a new
+lane or a wall-clock constant inside a gate. The contract is `src/render/CLAUDE.md` "GPU work:
+every new producer is a client of the scheduler". Gates:
+`npx vitest run tests/ability_material_prewarm_sweep.test.ts tests/renderer_compile_gate.test.ts tests/render_light_census_pin.test.ts tests/entity_gate_stand_in.test.ts`;
+the `live-program` count in `perfStats().gpuPrep` on an offline tour is the acceptance bar, so
+mark it `[VERIFY]` rather than asserting it from code.
+
 ### 7. Content fidelity & obligations (dispatch `content-obligations-reviewer`)
 
 Skip if no `src/sim/content/` files are in scope. For any added or changed content record the
@@ -264,6 +284,7 @@ headline rules here:
 | `src/world_api.ts` (IWorld), `src/sim/`, `src/net/online.ts`, `server/game.ts` wire/dispatch, or the sim/server i18n matchers | cross-platform-sync |
 | `src/sim/` (determinism, rng draw-order, tick-phase, SimContext seam, move-not-rewrite on a relocation) | architecture-reviewer |
 | `src/ui/`, `src/styles/`, or `src/render/` presentation change (HUD windows/painters, CSS, mobile, graphics tiering) | frontend-seam-reviewer |
+| a new GPU producer: a THREE material, a light, a `WebGLRenderer` or render target, a group attached to the scene after boot, or a prewarm manifest / gate / lane / admission-budget change | render-performance-reviewer |
 | a release tag / `release/**` branch | release-malware-audit (plus `I18N_RELEASE_TIER=1`) |
 | new or rewritten tests, or acceptance criteria that claim coverage | test-coverage-auditor |
 | `src/sim/content/` record added or changed (items, mobs, quests, zones, dungeons, abilities, recipes, deeds, reliquary) | content-obligations-reviewer (balance numbers additionally get maintainer eyes against `docs/design/`) |

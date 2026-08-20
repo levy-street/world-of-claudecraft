@@ -4,7 +4,9 @@
 // disposal, eviction transparency (an evicted key misses and rebuilds), and
 // the acquire-time re-tint seam (CharacterVisual.setEntityColor).
 import { readFileSync } from 'node:fs';
+import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
+import { PooledVisualLifecycle } from '../src/render/characters/pooled_visual_lifecycle';
 import { CharacterVisualPool, characterVisualPoolKey } from '../src/render/characters/visual_pool';
 import { gfxInternalsForTest } from '../src/render/gfx';
 
@@ -231,15 +233,9 @@ describe('renderer integration (source pins)', () => {
   });
 
   it('applies the per-instance jitter at acquire time and rebuilds on a miss from the live entity', () => {
-    const takeStart = renderer.indexOf('private takePooledVisual(');
-    const takeEnd = renderer.indexOf('\n  private ', takeStart + 1);
-    expect(takeStart).toBeGreaterThan(-1);
-    const take = renderer.slice(takeStart, takeEnd);
-    // color is an acquire-time instance attribute now that the key is
-    // per-template (rift mobs jitter it per instance)
-    expect(take).toContain('visual.setEntityColor(entityColor)');
-    // ... and the caller hands the live entity's color in
-    const acquire = 'this.takePooledVisual(visualPoolKey, e.color)';
+    // The acquire path is the extracted PooledVisualLifecycle.take (behaviour
+    // below); the renderer hands the live entity's color in...
+    const acquire = 'this.pooledVisuals.take(visualPoolKey, e.color)';
     const acquireIdx = renderer.indexOf(acquire);
     expect(acquireIdx).toBeGreaterThan(-1);
     // scale rides the view group for pooled and fresh visuals alike
@@ -247,7 +243,82 @@ describe('renderer integration (source pins)', () => {
     // a pool miss falls through to a fresh build from the SAME entity the
     // evicted visual was built from: eviction is invisible on screen
     const missWindow = renderer.slice(acquireIdx, acquireIdx + 1200);
-    expect(missWindow).toContain("this.createCharacterVisualWithRetry(e, 'view')");
+    expect(missWindow).toContain("this.createCharacterVisualWithRetry(e, 'view', undefined, opts)");
+  });
+});
+
+describe('PooledVisualLifecycle (the renderer take/store halves)', () => {
+  function stubVisual() {
+    const root = new THREE.Group();
+    const parent = new THREE.Group();
+    parent.add(root);
+    root.position.set(3, 4, 5);
+    root.rotation.set(1, 0, 0);
+    root.scale.set(2, 2, 2);
+    root.visible = false;
+    return {
+      root,
+      dispose: vi.fn(),
+      setFar: vi.fn(),
+      setGhost: vi.fn(),
+      setEntityColor: vi.fn(),
+      setFarBakeGate: vi.fn(),
+    };
+  }
+
+  it('take resets a pooled visual for a new entity and installs the live compile gate', () => {
+    const pool = new CharacterVisualPool<ReturnType<typeof stubVisual>>();
+    const visual = stubVisual();
+    pool.store('mob:wolf', visual, 8);
+    const gate = vi.fn();
+    const lifecycle = new PooledVisualLifecycle(pool, {
+      farBakeGate: () => gate,
+      maxPooled: () => 8,
+    });
+
+    expect(lifecycle.take('mob:bear', 0x123456)).toBeNull();
+    const taken = lifecycle.take('mob:wolf', 0x123456);
+    expect(taken).toBe(visual);
+    expect(pool.size).toBe(0);
+    // detached, visible, identity transform: the caller re-parents it under
+    // the new view group, which carries entity scale
+    expect(visual.root.parent).toBeNull();
+    expect(visual.root.visible).toBe(true);
+    expect(visual.root.position.toArray()).toEqual([0, 0, 0]);
+    expect(visual.root.rotation.toArray().slice(0, 3)).toEqual([0, 0, 0]);
+    expect(visual.root.scale.toArray()).toEqual([1, 1, 1]);
+    // near LOD, no ghost, and the per-instance colour (rift jitter) at acquire
+    expect(visual.setFar).toHaveBeenCalledWith(false);
+    expect(visual.setGhost).toHaveBeenCalledWith(false);
+    expect(visual.setEntityColor).toHaveBeenCalledWith(0x123456);
+    // a prewarm-seeded visual carries no far-bake compile gate; a live one must
+    expect(visual.setFarBakeGate).toHaveBeenCalledWith(gate);
+  });
+
+  it('store parks the visual detached and hidden under the live cap', () => {
+    const pool = new CharacterVisualPool<ReturnType<typeof stubVisual>>();
+    let cap = 1;
+    const lifecycle = new PooledVisualLifecycle(pool, {
+      farBakeGate: () => null,
+      maxPooled: () => cap,
+    });
+    const first = stubVisual();
+    first.root.visible = true;
+    lifecycle.store('mob:wolf', first);
+    expect(first.root.parent).toBeNull();
+    expect(first.root.visible).toBe(false);
+    expect(first.root.position.toArray()).toEqual([0, 0, 0]);
+    expect(pool.size).toBe(1);
+    // the cap is read at call time (it follows the live graphics settings):
+    // a second store under cap 1 evicts and disposes the colder entry
+    const second = stubVisual();
+    lifecycle.store('mob:bear', second);
+    expect(pool.size).toBe(1);
+    expect(first.dispose).toHaveBeenCalledTimes(1);
+    expect(second.dispose).not.toHaveBeenCalled();
+    cap = 2;
+    lifecycle.store('mob:wolf', stubVisual());
+    expect(pool.size).toBe(2);
   });
 });
 

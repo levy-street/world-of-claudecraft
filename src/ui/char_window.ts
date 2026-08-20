@@ -38,7 +38,13 @@ import type { ItemDragState } from './item_drag_state';
 import { wornTooltipInstance } from './item_instance_tooltip';
 import type { PainterHostPresentation } from './painter_host';
 import { playtimeParts, playtimeShape } from './playtime_view';
-import { hydratePortraits, modularLookFor, portraitChipHtml } from './portrait_chip';
+import {
+  hydratePortraits,
+  isComposedPortraitKey,
+  modularLookFor,
+  onPortraitUpdate,
+  portraitChipHtml,
+} from './portrait_chip';
 import { archetypeImageUrl, professionImageUrl } from './profession_art';
 import { qualityGlowShadow } from './quality_glow';
 import { tSim } from './sim_i18n';
@@ -187,7 +193,9 @@ const SHARE_GLYPH =
 export class CharWindow {
   private openerFocus: HTMLElement | null = null;
 
-  constructor(private readonly deps: CharWindowDeps) {}
+  constructor(private readonly deps: CharWindowDeps) {
+    this.watchComposedPortrait();
+  }
 
   get isOpen(): boolean {
     return this.deps.root().style.display === 'block';
@@ -215,6 +223,17 @@ export class CharWindow {
 
   renderIfOpen(): void {
     if (this.isOpen) this.render();
+  }
+
+  /** The title chip carries the player's own COMPOSED face, and that portrait
+   *  is captured off the frame that asks for it: a miss paints the class crest,
+   *  so the open sheet rebuilds once the real headshot lands. hydratePortraits
+   *  cannot upgrade this one in place (a look does not fit in the chip's data
+   *  attributes, which is why it is marked composed and skipped there). */
+  private watchComposedPortrait(): void {
+    onPortraitUpdate((_visualKey, _skin, key) => {
+      if (isComposedPortraitKey(key)) this.renderIfOpen();
+    });
   }
 
   render(): void {

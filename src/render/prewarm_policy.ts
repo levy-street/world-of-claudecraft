@@ -16,6 +16,7 @@
 // renderer.ts is the thin consumer that runs the manifest the policy describes.
 
 import { EASTBROOK_LAYOUT } from '../sim/eastbrook_layout';
+import type { PrewarmSubmitStopVerdict } from './prewarm_submit_stop_core';
 
 /** Manifest entries a constrained device still runs; everything else is skipped. */
 export const CONSTRAINED_PREWARM_KEEP: readonly string[] = [
@@ -285,15 +286,24 @@ export function prewarmEntryShouldDefer(
  * prologue is synchronous main-thread work, and one uninterrupted loop
  * measured 22 s in production against the 15 s hard deadline, which dropped
  * every entry behind it, the deadline-exempt debt payers included
- * (hitch-hunt S1/S2). The check runs BETWEEN units, never preemptively, and
- * the Insane finish-full-manifest arm keeps submitting without bound: its
- * contract is a complete manifest behind the cover.
+ * (hitch-hunt S1/S2). The check runs BETWEEN units, never preemptively.
+ *
+ * Two independent clauses, and only ONE of them is exemptible:
+ * - the manifest DEADLINE, which the Insane finish-full-manifest arm ignores
+ *   (its contract is a complete manifest behind the loading cover), and
+ * - the lane's own HARD STOP (prewarm_submit_stop_core.ts), which nothing
+ *   exempts. Without it that arm had no stop at all, and one lane ate 11.8 s
+ *   of a 12 s budget while twelve entries behind it timed out. The verdict is
+ *   passed in rather than computed here so this stays a pure decision over
+ *   readings the caller already holds.
  */
 export function prewarmSubmitShouldStop(
   nowMs: number,
   gpuSubmitDeadlineMs: number,
   finishFullManifestBeforeReveal: boolean,
+  laneVerdict?: PrewarmSubmitStopVerdict | null,
 ): boolean {
+  if (laneVerdict?.stop === true) return true;
   if (finishFullManifestBeforeReveal) return false;
   return nowMs >= gpuSubmitDeadlineMs;
 }
@@ -316,12 +326,16 @@ export function prewarmSubmitShouldStop(
  * `programs.compile-submit` here names the SYNTHETIC dropped entry the
  * deferred-submit hand-off pushes (the manifest entry of that id declares no
  * resumeUnits, so no other resume entry can carry it).
+ * `foliage.materials` IS ambient-scene debt: the species it links stream in
+ * with every step of travel (the distant-only pines and far impostors), not on
+ * a specific event, so its dropped units pay on the debt arm too.
  */
 const PREWARM_DEBT_RESUME_IDS: ReadonlySet<string> = new Set([
   'programs.compile',
   'programs.compile-submit',
   'textures.scene',
   'surface-detail.textures',
+  'foliage.materials',
 ]);
 
 /** True when a dropped entry's resume units are hitch-causing debt. */
@@ -339,12 +353,20 @@ export function prewarmResumeIsDebt(entryId: string): boolean {
  * preserved.
  */
 export function orderPrewarmResumeEntries<T extends { id: string }>(entries: readonly T[]): T[] {
-  const debt: T[] = [];
+  // Inside the debt class, program links go before texture uploads: a program
+  // the live frame meets unlinked blocks it (a freeze), an unresident texture
+  // is a paced piece. On the iGPU stepped ride the lane spent its first 100 s
+  // on surface-detail + textures.scene (151 units) and never reached the 19
+  // programs.compile-submit units, so the town's unique materials linked cold.
+  const programDebt: T[] = [];
+  const otherDebt: T[] = [];
   const cosmetic: T[] = [];
   for (const entry of entries) {
-    (prewarmResumeIsDebt(entry.id) ? debt : cosmetic).push(entry);
+    if (!prewarmResumeIsDebt(entry.id)) cosmetic.push(entry);
+    else if (entry.id.startsWith('programs.')) programDebt.push(entry);
+    else otherDebt.push(entry);
   }
-  return [...debt, ...cosmetic];
+  return [...programDebt, ...otherDebt, ...cosmetic];
 }
 
 /** The mesh-shape bits three folds into a program's cache key, structurally
@@ -408,6 +430,9 @@ export function prewarmProgramContentKeys(
   return materialIds.map((id) => `${token}:${id}`);
 }
 
+/** three's NormalBlending, as a literal because this module stays Three-free. */
+const NORMAL_BLENDING = 1;
+
 /** The material half of a program-content key. A program SIGNATURE, not the
  * material uuid: distinct GLB materials by the hundred share the same linked
  * program (same type, same shader hooks, same map-presence defines), and an
@@ -417,8 +442,11 @@ export function prewarmProgramContentKeys(
  * inputs three keys program defines on that the mesh-shape token does not
  * already carry: material type, hook identity (customProgramCacheKey, whose
  * three default is onBeforeCompile source), custom vertex/fragment source,
- * defines, the texture-channel presence bits, blending/alpha-test, vertex
- * colors, flat shading, fog opt-out and side. An imperfect signature is
+ * defines, the texture-channel presence bits, three's own `opaque` bit
+ * (transparent + blending + alphaToCoverage, which an earlier version of this
+ * comment claimed while the code carried transparency alone), alphaHash,
+ * dithering, premultipliedAlpha, alpha-test, vertex colors, flat shading, fog
+ * opt-out and side. An imperfect signature is
  * fail-soft: world.initial-frame's own
  * guaranteed submit (its start is bounded ahead of the hard deadline by
  * prewarmCompileAwaitDeadline) links any residue behind the loading cover
@@ -443,6 +471,11 @@ export function materialProgramSignature(material: {
   specularMap?: unknown;
   gradientMap?: unknown;
   transparent?: boolean;
+  blending?: number;
+  alphaToCoverage?: boolean;
+  alphaHash?: boolean;
+  dithering?: boolean;
+  premultipliedAlpha?: boolean;
   alphaTest?: number;
   vertexColors?: boolean;
   flatShading?: boolean;
@@ -476,6 +509,19 @@ export function materialProgramSignature(material: {
     bit(material.specularMap),
     bit(material.gradientMap),
     bit(material.transparent),
+    // three's `opaque` bit verbatim (WebGLPrograms.getParameters): an
+    // additive-blended opaque material and a normal-blended one are two
+    // programs, and folding transparency alone collapsed them onto one
+    // stand-in that never linked the second.
+    bit(
+      material.transparent !== true &&
+        (material.blending ?? NORMAL_BLENDING) === NORMAL_BLENDING &&
+        material.alphaToCoverage !== true,
+    ),
+    bit(material.alphaToCoverage),
+    bit(material.alphaHash),
+    bit(material.dithering),
+    bit(material.premultipliedAlpha),
     bit((material.alphaTest ?? 0) > 0),
     bit(material.vertexColors),
     bit(material.flatShading),

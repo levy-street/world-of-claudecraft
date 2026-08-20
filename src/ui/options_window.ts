@@ -21,11 +21,17 @@
 
 import { syncAppViewport } from '../game/app_viewport';
 import { audio } from '../game/audio';
+import { CROSS_HOTBAR_TRIGGERS, isCrossHotbarButton } from '../game/cross_hotbar';
 import { desktopDisplayModeSupported } from '../game/desktop_display_mode_sync';
 import { desktopGpuPrefSupported } from '../game/desktop_gpu_pref_sync';
 import { desktopDiscordPresenceSupported } from '../game/discord_presence';
 import {
+  GAMEPAD_CANCEL,
+  GAMEPAD_CONFIRM,
+  GAMEPAD_CYCLE_HUD,
+  GAMEPAD_CYCLE_SET,
   GAMEPAD_NONE,
+  GAMEPAD_SUBCOMMANDS,
   GAMEPAD_ZOOM_IN,
   GAMEPAD_ZOOM_OUT,
   gamepadButtonLabel,
@@ -39,6 +45,7 @@ import {
   stageGraphicsDraftChange,
 } from '../game/graphics_rebuild_core';
 import {
+  ACTION_BAR_SLOTS,
   BIND_ACTIONS,
   BIND_CATEGORIES,
   isReservedCode,
@@ -910,6 +917,15 @@ export class OptionsWindow {
     return body;
   }
 
+  // Restore exactly these keys, re-apply them to their subsystem, then redraw.
+  // Shared so a view whose scope also covers a bespoke row can widen the key list
+  // without restating what Reset to Defaults means.
+  private resetSettingScope(hooks: OptionsHooks, keys: readonly (keyof GameSettings)[]): void {
+    hooks.settings.reset(keys);
+    for (const k of keys) hooks.onSettingChange(k, hooks.settings.get(k));
+    this.render();
+  }
+
   // `controls` is the sub-view's own declarative control list (as built for
   // this render pass): Reset to Defaults scopes to exactly the setting keys
   // that view renders (issue 2341), rather than wiping the whole GameSettings
@@ -934,10 +950,7 @@ export class OptionsWindow {
         resetAction(hooks, keys);
         return;
       }
-      hooks.settings.reset(keys);
-      // re-apply only this view's settings to their subsystem, then redraw
-      for (const k of keys) hooks.onSettingChange(k, hooks.settings.get(k));
-      this.render();
+      this.resetSettingScope(hooks, keys);
     });
     const back = document.createElement('button');
     back.className = 'btn';
@@ -1795,6 +1808,11 @@ export class OptionsWindow {
     const opts: { value: string; label: string }[] = [
       { value: GAMEPAD_NONE, label: t('hud.options.unbound') },
       { value: 'escape', label: t('hudChrome.controller.menuAction') },
+      { value: GAMEPAD_CONFIRM, label: t('hudChrome.controller.confirmAction') },
+      { value: GAMEPAD_CANCEL, label: t('hudChrome.controller.cancelAction') },
+      { value: GAMEPAD_SUBCOMMANDS, label: t('hudChrome.controller.subcommandsAction') },
+      { value: GAMEPAD_CYCLE_HUD, label: t('hudChrome.controller.cycleHudAction') },
+      { value: GAMEPAD_CYCLE_SET, label: t('hudChrome.controller.cycleSetAction') },
       { value: GAMEPAD_ZOOM_IN, label: t('hudChrome.controller.zoomIn') },
       { value: GAMEPAD_ZOOM_OUT, label: t('hudChrome.controller.zoomOut') },
     ];
@@ -1825,7 +1843,16 @@ export class OptionsWindow {
     if (hooks) {
       const opts = this.gamepadActionOptions();
       const kind = hooks.gamepad.kind();
+      // While the cross hotbar is on it OWNS the d-pad and both triggers: the
+      // triggers are its modifiers and the d-pad is four of its cells (plus HUD
+      // navigation on a bare press). Listing them here as freely rebindable is a
+      // lie the panel used to tell, so they are dropped from the flat list and
+      // the cross-hotbar section below is where those buttons are configured.
+      const crossHotbarOwned = hooks.settings.get('gamepadCrossHotbar');
       for (const { button, action } of hooks.gamepad.entries()) {
+        const isModifier =
+          button === CROSS_HOTBAR_TRIGGERS.left || button === CROSS_HOTBAR_TRIGGERS.right;
+        if (crossHotbarOwned && (isCrossHotbarButton(button) || isModifier)) continue;
         const row = document.createElement('div');
         row.className = 'set-row';
         const name = document.createElement('span');
@@ -1849,6 +1876,12 @@ export class OptionsWindow {
         row.append(name, dd);
         body.appendChild(row);
       }
+      if (crossHotbarOwned) {
+        const owned = document.createElement('div');
+        owned.className = 'set-note';
+        owned.textContent = t('hudChrome.controller.crossHotbarOwnsButtons');
+        body.appendChild(owned);
+      }
       const reset = document.createElement('button');
       reset.type = 'button';
       reset.className = 'btn';
@@ -1859,8 +1892,77 @@ export class OptionsWindow {
         this.renderController();
       });
       body.appendChild(reset);
+      this.renderCrossHotbarRows(body, hooks);
     }
-    this.settingsViewFooter(controls);
+    // The display picker stays out of buildControllerControls (it is a dropdown and
+    // it reads beside the bar's own rows, not up in the toggle block), so its key is
+    // named here or Reset to Defaults would walk past the one row it cannot see.
+    this.settingsViewFooter(controls, (hooks, keys) =>
+      this.resetSettingScope(hooks, [...keys, 'gamepadCrossHotbarDisplay']),
+    );
+  }
+
+  // Which action-bar slot each cross-hotbar position casts. One row per position,
+  // grouped by set and by the trigger that reaches it; the row is named for the
+  // physical pair a player presses (both halves are hardware glyphs, so the pair
+  // is assembled from a t() template rather than concatenated).
+  private renderCrossHotbarRows(body: HTMLElement, hooks: OptionsHooks): void {
+    const head = document.createElement('div');
+    head.className = 'kb-cat';
+    head.textContent = t('hudChrome.controller.crossHotbar');
+    body.appendChild(head);
+
+    const help = document.createElement('div');
+    help.className = 'set-note';
+    help.textContent = t('hudChrome.controller.crossHotbarHelp');
+    body.appendChild(help);
+
+    // The per-cell assignment rows are gone: they addressed action-bar SLOTS, which
+    // the bar no longer stores, and thirty-two dropdowns was a miserable way to
+    // arrange a bar you are looking at. Arranging happens on the bar itself now,
+    // so this says how to get there.
+    // How much of itself the bar shows. A picker rather than a toggle: the three
+    // presets are points on one scale, and the right one is a taste call.
+    const displayRow = document.createElement('div');
+    displayRow.className = 'set-row';
+    const displayName = document.createElement('span');
+    displayName.className = 'set-name';
+    displayName.textContent = t('hudChrome.controller.crossHotbarDisplay');
+    displayRow.append(
+      displayName,
+      this.deps.buildDropdown(
+        [
+          { value: '0', label: t('hudChrome.controller.crossHotbarDisplayFull') },
+          { value: '1', label: t('hudChrome.controller.crossHotbarDisplayCompact') },
+          { value: '2', label: t('hudChrome.controller.crossHotbarDisplayMinimal') },
+        ],
+        String(hooks.settings.get('gamepadCrossHotbarDisplay') ?? 0),
+        (v) =>
+          hooks.onSettingChange(
+            'gamepadCrossHotbarDisplay',
+            hooks.settings.set('gamepadCrossHotbarDisplay', Number(v)),
+          ),
+        undefined,
+        { ariaLabel: t('hudChrome.controller.crossHotbarDisplay') },
+      ),
+    );
+    body.appendChild(displayRow);
+
+    const editHelp = document.createElement('div');
+    editHelp.className = 'set-note';
+    editHelp.textContent = t('hudChrome.controller.crossHotbarEditHelp');
+    body.appendChild(editHelp);
+
+    const resetLayout = document.createElement('button');
+    resetLayout.type = 'button';
+    resetLayout.className = 'btn';
+    resetLayout.textContent = t('hudChrome.controller.crossHotbarResetLayout');
+    resetLayout.addEventListener('click', () => {
+      audio.click();
+      hooks.gamepad.resetCrossHotbar();
+      this.renderController();
+    });
+    body.appendChild(resetLayout);
   }
 
   // -------------------------------------------------------------------------

@@ -362,7 +362,15 @@ describe('perf monitor scene census wiring', () => {
       hitchStats: () => ({
         frames: 100,
         hitches: 2,
-        byCause: { 'shader-compile': 1, 'texture-upload': 0, 'view-create': 0, other: 1 },
+        byCause: {
+          'shader-compile': 1,
+          'texture-upload': 0,
+          'zone-build': 0,
+          'view-create': 0,
+          gc: 0,
+          'off-frame': 0,
+          other: 1,
+        },
         programGrowthFrames: 1,
         programsAdded: 3,
         recent: [],
@@ -399,6 +407,49 @@ describe('perf monitor scene census wiring', () => {
     expect(snap.census?.rows[0]?.category).toBe('props');
     expect(snap.hitches?.hitches).toBe(2);
     expect(snap.hitches?.byCause['shader-compile']).toBe(1);
+  });
+
+  it('renders every hitch cause counter on the overlay hitch line', () => {
+    // The zone-build, gc and off-frame causes are the ones the build ledger,
+    // the heap sample and the frame-gap attribution added: a hitch filed
+    // under them must be readable on the overlay, not only in the JSON report.
+    const created: Array<{ textContent?: string }> = [];
+    installBrowserGlobals('?perf');
+    (globalThis as any).document.createElement = () => {
+      const el = {
+        style: {},
+        textContent: '',
+        addEventListener: () => {},
+        appendChild: () => {},
+      };
+      created.push(el);
+      return el;
+    };
+    const renderer = fakeRenderer();
+    renderer.hitchStats = () => ({
+      frames: 100,
+      hitches: 21,
+      byCause: {
+        'shader-compile': 1,
+        'texture-upload': 2,
+        'zone-build': 3,
+        'view-create': 4,
+        gc: 5,
+        'off-frame': 6,
+        other: 7,
+      },
+      programGrowthFrames: 1,
+      programsAdded: 8,
+      recent: [],
+    });
+    const perf = new PerfMonitor(renderer as unknown as Renderer);
+    perf.frame(0.016, 100);
+    perf.tick(2000);
+    const overlayText =
+      created.map((el) => el.textContent ?? '').find((text) => text.includes('fps ')) ?? '';
+    expect(overlayText).toContain(
+      'hitch 21 (compile 1 tex 2 zone 3 view 4 gc 5 off 6 other 7)  prog +8',
+    );
   });
 
   it('drops the one self-inflicted frame sample after a census run', () => {

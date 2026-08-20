@@ -72,11 +72,12 @@ describe('padReelItemId', () => {
     expect(interactCase).toContain(
       'const reelRod = padReelItemId(world.player.castingAbility, world.inventory);',
     );
-    // The reel wins BEFORE interactKey runs: a live bobber must never be
-    // answered with a nearby scan.
-    expect(interactCase.indexOf('padReelItemId')).toBeLessThan(
-      interactCase.indexOf('interactKey()'),
-    );
+    // The reel wins BEFORE the nearby scan runs: a live bobber must never be
+    // answered with a scan. The scan moved behind padTargetPick (it selects the
+    // npc first now), so the guarantee is pinned against that call.
+    const scanCall = interactCase.indexOf('padTargetPick.interact()');
+    expect(scanCall).toBeGreaterThan(-1);
+    expect(interactCase.indexOf('padReelItemId')).toBeLessThan(scanCall);
   });
 });
 

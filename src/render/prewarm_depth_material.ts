@@ -28,7 +28,11 @@
 //    the others are linked in flight but never awaited, so their first draw
 //    waits synchronously on the link exactly as if nothing had compiled them.
 //    The cache key therefore folds in the mesh-derived program parameters, not
-//    just the material-derived ones.
+//    just the material-derived ones. The gate's variant settle
+//    (program_variant_settle.ts) now polls every program under a twin as
+//    well, found through prewarmDepthMaterialsOf below; the one-instance rule
+//    stays, because it is what keeps each shape's compileAsync awaiting its
+//    own program instead of the settle catching up on a sibling.
 //
 // Scope: the directional sun is the only shadow-casting light (no point-light
 // shadows), so three's MeshDistanceMaterial arm of getDepthMaterial is never
@@ -142,4 +146,28 @@ export function prewarmDepthMaterial(
   depth.name = `prewarm-depth:${key}`;
   cache.set(key, depth);
   return depth;
+}
+
+/**
+ * The cached twins the shadow arm swaps onto `mesh` for its depth compile
+ * (one per material of the mesh's tuple, by the same key), deduped; empty for
+ * a non-mesh, a material-less mesh, or a twin the arm never minted. A lookup
+ * only, never a mint, and deliberately blind to `castShadow`: it answers
+ * "which twins exist for this mesh", whatever the arm's own swap rule, so the
+ * gate's variant settle can poll the depth programs, which live under the
+ * twins' own material properties, not the mesh's.
+ */
+export function prewarmDepthMaterialsOf(
+  cache: ReadonlyMap<string, THREE.MeshDepthMaterial>,
+  mesh: THREE.Object3D,
+): THREE.MeshDepthMaterial[] {
+  const carrier = mesh as THREE.Mesh;
+  if (!carrier.isMesh || !carrier.material) return [];
+  const twins: THREE.MeshDepthMaterial[] = [];
+  const sources = Array.isArray(carrier.material) ? carrier.material : [carrier.material];
+  for (const source of sources) {
+    const twin = cache.get(prewarmDepthMaterialKey(source, mesh));
+    if (twin && !twins.includes(twin)) twins.push(twin);
+  }
+  return twins;
 }

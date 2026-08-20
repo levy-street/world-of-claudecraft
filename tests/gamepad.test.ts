@@ -1,8 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { CROSS_HOTBAR_EXPANDED_SET, CROSS_HOTBAR_PRIMARY_SET } from '../src/game/cross_hotbar';
+import { CrossHotbarBindings } from '../src/game/cross_hotbar_bindings';
+import { clearPadFocus, hasPadFocus, setPadNavSpansWindows } from '../src/game/dpad_focus_nav';
 import { type GamepadCallbacks, GamepadManager } from '../src/game/gamepad';
 import { GamepadBindings } from '../src/game/gamepad_bindings';
 import {
   AXIS,
+  GAMEPAD_CANCEL,
   GAMEPAD_ZOOM_IN,
   GAMEPAD_ZOOM_OUT,
   GAMEPAD_ZOOM_STEP,
@@ -11,6 +15,20 @@ import {
 } from '../src/game/gamepad_map';
 import { Input, type InputCallbacks } from '../src/game/input';
 import { Keybinds } from '../src/game/keybinds';
+
+// Every export still runs for real; three are wrapped because the module keeps the
+// state behind them private: the whole-screen d-pad switch (leaving it on is exactly
+// what a missing arrange-mode teardown looks like), and the pad's HUD selection,
+// which has no DOM to hold it in this env.
+vi.mock('../src/game/dpad_focus_nav', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../src/game/dpad_focus_nav')>();
+  return {
+    ...actual,
+    setPadNavSpansWindows: vi.fn(actual.setPadNavSpansWindows),
+    clearPadFocus: vi.fn(actual.clearPadFocus),
+    hasPadFocus: vi.fn(actual.hasPadFocus),
+  };
+});
 
 const originalNavigator = globalThis.navigator;
 
@@ -564,7 +582,15 @@ describe('GamepadManager: onActivity', () => {
     const hadWindow = 'window' in globalThis;
     Object.defineProperty(globalThis, 'document', {
       configurable: true,
-      value: { createElement: makeEl, body: makeEl(), hasFocus: () => focused },
+      value: {
+        createElement: makeEl,
+        body: makeEl(),
+        hasFocus: () => focused,
+        // UI navigation queries these; an empty HUD is the right shape here (the
+        // cases care about the activity signal, not about what gets focused).
+        querySelectorAll: () => [],
+        activeElement: null,
+      },
     });
     Object.defineProperty(globalThis, 'window', {
       configurable: true,
@@ -613,17 +639,19 @@ describe('GamepadManager: onActivity', () => {
     }
   });
 
-  it('fires on UI cursor movement alone while a window is open (pointer mode)', () => {
-    // Pointer mode returns before the movement/look arms, so it needs its own
-    // signal: a player navigating the bags with the stick is still present.
+  it('fires on a UI navigation step while a window is open', () => {
+    // UI navigation returns before the movement/look arms, so it needs its own
+    // signal: a player stepping through the bags with the d-pad is still present.
+    // The STICK no longer counts here: it drives no cursor since the software
+    // pointer was removed (navigation is focus-driven), so only a real d-pad or
+    // button edge is activity.
     const restore = installDocumentStub(true);
     try {
-      stubPad(padWith([], stickAxes(AXIS.LEFT_X, 1)));
+      stubPad(padWith([GP.DPAD_DOWN]));
       const { manager, onActivity } = rig(true);
       manager.poll(1 / 60);
       expect(onActivity).toHaveBeenCalledTimes(1);
-      // and a still stick in the same mode is silent, so the arm is the cursor
-      // MOVING, not merely being drawn
+      // A still pad in the same mode is silent.
       stubPad(padWith());
       const idle = rig(true);
       idle.manager.poll(1 / 60);
@@ -633,15 +661,15 @@ describe('GamepadManager: onActivity', () => {
     }
   });
 
-  it('fires on vertical cursor movement alone (both cursor dimensions count)', () => {
-    // The horizontal case above cannot see a dropped `my` arm in the cursor's
-    // moved-this-frame predicate; this one isolates it.
+  it('does not count a deflected stick as activity while navigating the UI', () => {
+    // The software cursor is gone, so a stick push in UI navigation genuinely
+    // does nothing and must not report the player as present.
     const restore = installDocumentStub(true);
     try {
-      stubPad(padWith([], stickAxes(AXIS.LEFT_Y, 1)));
+      stubPad(padWith([], stickAxes(AXIS.LEFT_X, 1)));
       const { manager, onActivity } = rig(true);
       manager.poll(1 / 60);
-      expect(onActivity).toHaveBeenCalledTimes(1);
+      expect(onActivity).not.toHaveBeenCalled();
     } finally {
       restore();
     }
@@ -714,5 +742,919 @@ describe('GamepadManager: onActivity', () => {
     } satisfies GamepadCallbacks);
     (manager as unknown as { index: number | null }).index = 0;
     expect(() => manager.poll(1 / 60)).not.toThrow();
+  });
+});
+
+// The cross hotbar turns the two triggers into modifiers: holding one lights
+// eight slots (the d-pad and face diamonds), and those presses cast action-bar
+// slots instead of the buttons' own flat bindings. With the setting off, every
+// button must behave exactly as it did before the cross hotbar existed.
+describe('GamepadManager cross hotbar', () => {
+  // Own the DOM globals poll() and stop() read (the focus gate and the connect
+  // listeners), the same way withRealInput above does, so these cases do not
+  // inherit whatever an earlier suite left on globalThis.
+  afterEach(() => vi.unstubAllGlobals());
+
+  // The per-character storage namespace, matching the other cross-hotbar suites.
+  const CROSS_HOTBAR_SCOPE = 'char:test';
+
+  function setupCrossHotbar(enabled: boolean) {
+    let windowFocused = true;
+    vi.stubGlobal('document', {
+      hasFocus: () => windowFocused,
+      // Cursor mode builds the virtual pointer element on entry.
+      createElement: () => ({ className: '', style: {}, setAttribute: vi.fn() }),
+      body: { appendChild: vi.fn() },
+      // UI navigation queries these; an empty HUD means every move falls back to
+      // nudging the cursor, which is the behaviour these cases care about.
+      querySelectorAll: () => [],
+      activeElement: null,
+    });
+    vi.stubGlobal('getComputedStyle', () => ({ visibility: 'visible', display: 'block' }));
+    // Kept by reference so a case can deliver a real pad event through whatever
+    // start() registered, instead of reaching for the private handler.
+    const windowStub = {
+      innerWidth: 1920,
+      innerHeight: 1080,
+      addEventListener: vi.fn<(type: string, handler: unknown) => void>(),
+      removeEventListener: vi.fn(),
+    };
+    vi.stubGlobal('window', windowStub);
+    let pad = gamepadWithPressed();
+    Object.defineProperty(globalThis, 'navigator', {
+      configurable: true,
+      value: { getGamepads: () => [pad] },
+    });
+    const onAction = vi.fn();
+    const onConnectionChange = vi.fn();
+    const onCrossHotbar = vi.fn();
+    const onCrossHotbarCast = vi.fn();
+    const onCrossHotbarEdit = vi.fn();
+    const onOpenSpellbook = vi.fn();
+    // Which cell the bar reports as focused, driven per case; null is "focus is
+    // somewhere else", which arranging must ignore.
+    let focusedCell: number | null = null;
+    const triggerGamepadJump = vi.fn();
+    const input = {
+      applyGamepadLook: vi.fn(),
+      setGamepadLookActive: vi.fn(),
+      setGamepadMove: vi.fn(),
+      clearGamepadMove: vi.fn(),
+      triggerGamepadJump,
+      toggleAutorun: vi.fn(),
+      zoomBy: vi.fn(),
+    } as unknown as Input & Record<string, ReturnType<typeof vi.fn>>;
+    let pointerMode = false;
+    const bindings = new GamepadBindings();
+    const manager = new GamepadManager(input, bindings, {
+      onAction,
+      onInputEdge: vi.fn(),
+      isPointerMode: () => pointerMode,
+      onConnectionChange,
+      onCrossHotbar,
+      onCrossHotbarCast,
+      onCrossHotbarEdit,
+      onOpenSpellbook,
+      focusedCrossHotbarCell: () => focusedCell,
+    } satisfies GamepadCallbacks);
+    const xhb = new CrossHotbarBindings(CROSS_HOTBAR_SCOPE);
+    // Seed a known bar so a cell's action is predictable: cell N holds ability aN.
+    // Reset first: seedOnce is a no-op on an already-seeded bar, and this Node has
+    // a real localStorage, so a layout persisted by an earlier case would survive.
+    xhb.reset();
+    xhb.seedOnce(Array.from({ length: 32 }, (_, i) => ({ type: 'ability' as const, id: `a${i}` })));
+    manager.setCrossHotbarBindings(xhb);
+    (manager as unknown as { index: number | null }).index = 0;
+    manager.setCrossHotbar(enabled);
+    return {
+      manager,
+      bindings,
+      xhb,
+      input,
+      onAction,
+      onConnectionChange,
+      onCrossHotbarCast,
+      onCrossHotbar,
+      onCrossHotbarEdit,
+      onOpenSpellbook,
+      triggerGamepadJump,
+      focus: (cell: number | null) => {
+        focusedCell = cell;
+      },
+      // Put a spellbook row under focus. Draggable because that is the flag the
+      // spellbook sets once isAbilityActionBarEligible has passed.
+      focusSpell: (abilityId: string | null) => {
+        if (abilityId === null) {
+          Reflect.deleteProperty(globalThis, 'document');
+          return;
+        }
+        Object.defineProperty(globalThis, 'document', {
+          configurable: true,
+          value: {
+            activeElement: {
+              draggable: true,
+              getAttribute: (name: string) => (name === 'data-ability-id' ? abilityId : null),
+            },
+            // The focus stepper runs on the same press; it finds nothing to move to.
+            querySelectorAll: () => [],
+          },
+        });
+      },
+      press: (...buttons: number[]) => {
+        pad = gamepadWithPressed(...buttons);
+        manager.poll(1 / 60);
+      },
+      // One idle poll of an arbitrary length, for the time-based paths.
+      poll: (dt: number) => {
+        pad = gamepadWithPressed();
+        manager.poll(dt);
+      },
+      setWindowFocused: (on: boolean) => {
+        windowFocused = on;
+      },
+      // Push the left stick past the deadzone for one poll.
+      move: () => {
+        pad = gamepadWithPressed();
+        (pad as unknown as { axes: number[] }).axes = [0, -1, 0, 0];
+        manager.poll(1 / 60);
+      },
+      setPointerMode: (on: boolean) => {
+        pointerMode = on;
+      },
+      // Unplug a pad the way the browser reports it: through the listener start()
+      // put on window, so a case cannot pass against a handler nothing wires up.
+      // Throws if start() was never called, which is the honest failure.
+      disconnectPad: (padIndex: number) => {
+        const registered = windowStub.addEventListener.mock.calls.find(
+          ([type]) => type === 'gamepaddisconnected',
+        );
+        const handler = registered?.[1] as (e: { gamepad: { index: number } }) => void;
+        handler({ gamepad: { index: padIndex } });
+      },
+    };
+  }
+
+  it('casts the action on the cell for a left-trigger d-pad press', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.LT);
+    h.press(GP.LT, GP.DPAD_UP);
+    // D-pad up is the first cell of the left half.
+    expect(h.onCrossHotbarCast).toHaveBeenCalledWith({ type: 'ability', id: 'a0' });
+    // The bar owns its actions, so nothing goes out as an action-bar slot.
+    expect(h.onAction).not.toHaveBeenCalled();
+  });
+
+  it('reaches the second eight through the right trigger', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.RT);
+    h.press(GP.RT, GP.A);
+    expect(h.onCrossHotbarCast).toHaveBeenCalledWith({ type: 'ability', id: 'a15' });
+  });
+
+  it('resolves a trigger and a button pressed in the same poll', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.LT, GP.DPAD_UP);
+    expect(h.onCrossHotbarCast).toHaveBeenCalledWith({ type: 'ability', id: 'a0' });
+  });
+
+  it('never fires a trigger own flat binding while the cross hotbar is on', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.LT);
+    h.press(GP.RT);
+    // The default flat layout puts slot4 on LT and slot3 on RT.
+    expect(h.onAction).not.toHaveBeenCalledWith('slot4');
+    expect(h.onAction).not.toHaveBeenCalledWith('slot3');
+  });
+
+  it('swaps to the second set when the opposite trigger is tapped', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.LT);
+    h.press(GP.LT, GP.RT);
+    h.press(GP.LT);
+    h.press(GP.LT, GP.DPAD_UP);
+    expect(h.onCrossHotbarCast).toHaveBeenCalledWith({ type: 'ability', id: 'a16' });
+    expect(h.onCrossHotbarCast).not.toHaveBeenCalledWith({ type: 'ability', id: 'a0' });
+  });
+
+  it('stays on the primary set when the double bar is switched off', () => {
+    const h = setupCrossHotbar(true);
+    h.manager.setCrossHotbarExpand(false);
+    h.press(GP.LT);
+    h.press(GP.LT, GP.RT);
+    h.press(GP.LT);
+    h.press(GP.LT, GP.DPAD_UP);
+    expect(h.onCrossHotbarCast).toHaveBeenCalledWith({ type: 'ability', id: 'a0' });
+    expect(h.onCrossHotbarCast).not.toHaveBeenCalledWith({ type: 'ability', id: 'a16' });
+  });
+
+  it('fires no action-bar slot from any button while the bar is on', () => {
+    // Not just the diamond: the bumpers carried slot1 and slot2, so reaching for
+    // one as a modifier cast a spell on the way in. With the bar on it owns every
+    // ability, and the whole set is one trigger away.
+    const h = setupCrossHotbar(true);
+    h.press(GP.LB);
+    h.press();
+    h.press(GP.RB);
+    expect(h.onAction).not.toHaveBeenCalledWith('slot2');
+    expect(h.onAction).not.toHaveBeenCalledWith('slot1');
+  });
+
+  it('keeps a non-slot binding on a button the bar does not claim', () => {
+    // The rule is about action-bar slots specifically: a system verb still fires,
+    // or turning the bar on would silently disarm half the pad.
+    const h = setupCrossHotbar(true);
+    h.bindings.bind(GP.LB, 'map');
+    h.press(GP.LB);
+    expect(h.onAction).toHaveBeenCalledWith('map');
+  });
+
+  it('toggles the virtual mouse on LB + right-stick-click, either order', () => {
+    // FFXIV's own chord. Order-independent so a player cannot half-press it.
+    const h = setupCrossHotbar(true);
+    const mode = () => (h.manager as unknown as { mouseMode: boolean }).mouseMode;
+    h.press(GP.LB);
+    h.press(GP.LB, GP.R3);
+    expect(mode()).toBe(true);
+    h.press();
+    // and back off, pressed the other way round
+    h.press(GP.R3);
+    h.press(GP.R3, GP.LB);
+    expect(mode()).toBe(false);
+  });
+
+  it('gives the triggers to the pointer in mouse mode, not the cross hotbar', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.LB);
+    h.press(GP.LB, GP.R3); // mouse mode on
+    h.press();
+    h.press(GP.LT);
+    // LT is a click now, so the cross hotbar must never report an armed half.
+    const armed = h.onCrossHotbar.mock.calls.filter((c: unknown[]) => c[0] !== null);
+    expect(armed).toEqual([]);
+  });
+
+  it('stops driving the world while the pointer owns the pad', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.LB);
+    h.press(GP.LB, GP.R3);
+    (h.input.setGamepadMove as ReturnType<typeof vi.fn>).mockClear();
+    h.press();
+    expect(h.input.clearGamepadMove).toHaveBeenCalled();
+    expect(h.input.setGamepadMove).not.toHaveBeenCalled();
+  });
+
+  it('navigates the HUD WITHOUT taking the world away', () => {
+    // The d-pad steps through menus while the character keeps playing: movement
+    // and the camera must still be driven on the very same poll. An earlier
+    // version suspended the world whenever the d-pad was used, which meant a
+    // player could not walk and read a window at the same time.
+    const h = setupCrossHotbar(true);
+    h.press(GP.DPAD_UP);
+    expect(h.input.setGamepadMove).toHaveBeenCalled();
+    expect(h.input.applyGamepadLook).toHaveBeenCalled();
+    expect(h.input.clearGamepadMove).not.toHaveBeenCalled();
+  });
+
+  it('leaves a d-pad press alone while a trigger is held (that is the hotbar)', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.LT);
+    h.press(GP.LT, GP.DPAD_UP);
+    // The cross hotbar took it: the first cell of the left half.
+    expect(h.onCrossHotbarCast).toHaveBeenCalledWith({ type: 'ability', id: 'a0' });
+  });
+
+  it('never casts an action-bar slot from a bare diamond press', () => {
+    const h = setupCrossHotbar(true);
+    // A button that casts one ability bare and a DIFFERENT one under a trigger is
+    // the random-cast problem; the whole set is a trigger away, so bare presses of
+    // a cross-hotbar button never reach a slot.
+    h.press(GP.DPAD_UP);
+    // A bare d-pad press cycles targets now, so assert on the SLOT specifically
+    // rather than on silence: the rule is about abilities, not about the button
+    // being inert.
+    for (const call of h.onAction.mock.calls) {
+      expect(String(call[0]).startsWith('slot')).toBe(false);
+    }
+  });
+
+  it('keeps the SYSTEM verbs on the diamond buttons when no trigger is held', () => {
+    const h = setupCrossHotbar(true);
+    // B is 'cancel' by default, which is not a slot, so a bare press still works.
+    h.press(GP.B);
+    expect(h.onAction).toHaveBeenCalledWith('cancel');
+  });
+
+  it('swaps the standing set on the right bumper', () => {
+    // The bar has two sets and, before this, the only way to the second was
+    // tapping the opposite trigger mid-hold. The bumper is the standing switch.
+    const h = setupCrossHotbar(true);
+    h.press(GP.RB);
+    expect(h.onCrossHotbar).toHaveBeenLastCalledWith(null, CROSS_HOTBAR_EXPANDED_SET);
+    h.press();
+    h.press(GP.RB);
+    expect(h.onCrossHotbar).toHaveBeenLastCalledWith(null, CROSS_HOTBAR_PRIMARY_SET);
+  });
+
+  it('interacts on confirm when no interface control is focused', () => {
+    // The console-MMO reading of the bottom button: confirm what is focused, and
+    // with nothing focused talk to (or loot) what is targeted. Pressing "back" to
+    // start a conversation is the thing every console player gets wrong once.
+    const h = setupCrossHotbar(true);
+    h.press(GP.A);
+    expect(h.onAction).toHaveBeenCalledWith('interact');
+  });
+
+  it('cycles targets on the bare d-pad, and only outside the HUD', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.DPAD_RIGHT);
+    h.press();
+    h.press(GP.DPAD_LEFT);
+    expect(h.onAction).toHaveBeenCalledWith('target');
+    expect(h.onAction).toHaveBeenCalledWith('targetPrev');
+  });
+
+  it('suppresses a slot a player REMAPPED onto a diamond button too', () => {
+    const h = setupCrossHotbar(true);
+    h.bindings.bind(GP.B, 'slot9');
+    h.press(GP.B);
+    expect(h.onAction).not.toHaveBeenCalledWith('slot9');
+  });
+
+  it('preserves the flat layout exactly when the cross hotbar is off', () => {
+    const h = setupCrossHotbar(false);
+    // The triggers ship unbound (they are the cross hotbar's modifiers), so with
+    // the cross hotbar OFF they simply do nothing until a player remaps them.
+    h.press(GP.LT);
+    expect(h.onAction).not.toHaveBeenCalled();
+    // With the cross hotbar OFF a diamond button DOES fire whatever it is bound to,
+    // slot or not: the suppression above exists only to protect the cross hotbar.
+    h.bindings.bind(GP.DPAD_UP, 'slot5');
+    h.press(GP.LT, GP.DPAD_UP);
+    expect(h.onAction).toHaveBeenCalledWith('slot5');
+    h.press();
+    h.press(GP.Y); // jump lives on the top face button now (Triangle on PS)
+    expect(h.triggerGamepadJump).toHaveBeenCalled();
+    expect(h.onCrossHotbar).not.toHaveBeenCalled();
+  });
+
+  it('tells the overlay when the hotbar opens, swaps sets, and closes', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.LT);
+    expect(h.onCrossHotbar).toHaveBeenLastCalledWith('left', 0);
+    h.press(GP.LT, GP.RT);
+    expect(h.onCrossHotbar).toHaveBeenLastCalledWith('left', 1);
+    h.press();
+    expect(h.onCrossHotbar).toHaveBeenLastCalledWith(null, 0);
+    expect(h.onCrossHotbar).toHaveBeenCalledTimes(3);
+  });
+
+  it('does not re-notify the overlay on an unchanged hold', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.LT);
+    h.press(GP.LT);
+    h.press(GP.LT);
+    expect(h.onCrossHotbar).toHaveBeenCalledTimes(1);
+  });
+
+  it('auto-focuses a window the moment it opens, once', () => {
+    // A pad player should already be inside the window, not have to press a
+    // direction to get in. Edge-detected: it must not re-grab focus every poll.
+    const h = setupCrossHotbar(true);
+    const focused: string[] = [];
+    const btn = {
+      focus: () => focused.push('focus'),
+      classList: { add: () => {}, remove: () => {} },
+      getBoundingClientRect: () => ({
+        left: 0,
+        top: 0,
+        right: 10,
+        bottom: 10,
+        width: 10,
+        height: 10,
+      }),
+      hasAttribute: () => false,
+    };
+    const dialog = {
+      getBoundingClientRect: () => ({
+        left: 0,
+        top: 0,
+        right: 99,
+        bottom: 99,
+        width: 99,
+        height: 99,
+      }),
+      querySelectorAll: () => [btn],
+    };
+    const baseDoc = (globalThis as unknown as { document: Record<string, unknown> }).document;
+    (globalThis as unknown as { document: Record<string, unknown> }).document = {
+      ...baseDoc,
+      querySelectorAll: (sel: string) => (sel.includes('dialog') ? [dialog] : [btn]),
+      activeElement: null,
+    };
+    h.setPointerMode(true);
+    h.press();
+    h.press();
+    expect(focused).toEqual(['focus']);
+  });
+
+  it('drops the pad pointer when the window closes', () => {
+    // It used to hang in mid-air over a surface that was no longer there.
+    const h = setupCrossHotbar(true);
+    const removed: string[] = [];
+    const btn = {
+      focus: () => {},
+      classList: { add: () => {}, remove: (c: string) => removed.push(c) },
+      getBoundingClientRect: () => ({
+        left: 0,
+        top: 0,
+        right: 10,
+        bottom: 10,
+        width: 10,
+        height: 10,
+      }),
+      hasAttribute: () => false,
+    };
+    const dialog = {
+      getBoundingClientRect: () => ({
+        left: 0,
+        top: 0,
+        right: 99,
+        bottom: 99,
+        width: 99,
+        height: 99,
+      }),
+      querySelectorAll: () => [btn],
+    };
+    const baseDoc = (globalThis as unknown as { document: Record<string, unknown> }).document;
+    (globalThis as unknown as { document: Record<string, unknown> }).document = {
+      ...baseDoc,
+      querySelectorAll: (sel: string) => (sel.includes('dialog') ? [dialog] : [btn]),
+      activeElement: null,
+    };
+    h.setPointerMode(true);
+    h.press(); // window opens, focus lands inside it
+    h.setPointerMode(false);
+    // The drop is no longer decided on the closing frame: the pad waits a few
+    // frames for the window to hand focus back. With nothing to return to
+    // (activeElement stays null) it still gives up, just not instantly.
+    for (let i = 0; i < 20; i++) h.press();
+    expect(removed).toContain('pad-focus');
+  });
+
+  it('returns the selection to the opener instead of dropping it', () => {
+    // The whole point: closing a window puts the cursor back on the thing the
+    // player opened it from, not in the middle of the screen.
+    const h = setupCrossHotbar(true);
+    const added: string[] = [];
+    const opener = {
+      focus: () => {},
+      classList: { add: (c: string) => added.push(c), remove: () => {} },
+      getBoundingClientRect: () => ({
+        left: 0,
+        top: 0,
+        right: 10,
+        bottom: 10,
+        width: 10,
+        height: 10,
+      }),
+      hasAttribute: () => false,
+    };
+    const baseDoc = (globalThis as unknown as { document: Record<string, unknown> }).document;
+    (globalThis as unknown as { document: Record<string, unknown> }).document = {
+      ...baseDoc,
+      // No window is open any more, and focus has come back to the opener.
+      querySelectorAll: (sel: string) => (sel.includes('dialog') ? [] : [opener]),
+      activeElement: opener,
+      body: {},
+    };
+    h.setPointerMode(true);
+    h.press();
+    h.setPointerMode(false);
+    h.press();
+    expect(added).toContain('pad-focus');
+  });
+
+  it('closes the hotbar when a HUD window takes the pad into cursor mode', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.LT);
+    h.setPointerMode(true);
+    h.press(GP.LT);
+    expect(h.onCrossHotbar).toHaveBeenLastCalledWith(null, 0);
+  });
+
+  it('closes the hotbar when the setting is turned off mid-hold', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.LT);
+    h.manager.setCrossHotbar(false);
+    expect(h.onCrossHotbar).toHaveBeenLastCalledWith(null, 0);
+    // The trigger is still physically down, but its flat binding takes over again
+    // only on the NEXT press, never as a phantom edge from the release.
+    h.press(GP.LT);
+    expect(h.onAction).not.toHaveBeenCalledWith('slot4');
+  });
+
+  it('closes the hotbar when the pad is stopped', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.LT);
+    h.manager.stop();
+    expect(h.onCrossHotbar).toHaveBeenLastCalledWith(null, 0);
+  });
+
+  it('keeps the standing set through a release, so opening a window never undoes it', () => {
+    // A release runs on every poll while a window is open. The standing set is the
+    // switch the player leaves flipped, not part of the hold, so it has to survive
+    // one; the bar and the overlay must also still agree afterwards.
+    const h = setupCrossHotbar(true);
+    h.press(GP.RB);
+    h.setPointerMode(true);
+    h.press();
+    h.press();
+    expect(h.onCrossHotbar).toHaveBeenLastCalledWith(null, CROSS_HOTBAR_EXPANDED_SET);
+    h.setPointerMode(false);
+    h.press(GP.LT);
+    expect(h.onCrossHotbar).toHaveBeenLastCalledWith('left', CROSS_HOTBAR_EXPANDED_SET);
+    // Cell 0 of the SECOND set, which is where the player left the bar.
+    h.press(GP.LT, GP.DPAD_UP);
+    expect(h.onCrossHotbarCast).toHaveBeenCalledWith({ type: 'ability', id: 'a16' });
+  });
+
+  it('does not re-notify the overlay on the polls after a release', () => {
+    const h = setupCrossHotbar(true);
+    h.press(GP.LT);
+    h.setPointerMode(true);
+    h.press(GP.LT);
+    const closed = h.onCrossHotbar.mock.calls.length;
+    h.press(GP.LT);
+    h.press(GP.LT);
+    expect(h.onCrossHotbar).toHaveBeenCalledTimes(closed);
+  });
+
+  it('retries the one-time seed on a timer, never once per poll', () => {
+    // Each ask rebuilds the Controller options panel, so a per-poll retry made its
+    // own dropdowns unclickable for as long as the bar stayed empty.
+    const h = setupCrossHotbar(true);
+    h.xhb.reset();
+    h.onConnectionChange.mockClear();
+    for (let i = 0; i < 12; i++) h.press();
+    expect(h.onConnectionChange).not.toHaveBeenCalled();
+    h.poll(1);
+    expect(h.onConnectionChange).toHaveBeenCalledTimes(1);
+    h.poll(0.5);
+    expect(h.onConnectionChange).toHaveBeenCalledTimes(1);
+    h.poll(0.5);
+    expect(h.onConnectionChange).toHaveBeenCalledTimes(2);
+  });
+
+  it('stops retrying the moment the bar is seeded', () => {
+    const h = setupCrossHotbar(true);
+    h.xhb.reset();
+    h.onConnectionChange.mockClear();
+    h.poll(1);
+    expect(h.onConnectionChange).toHaveBeenCalledTimes(1);
+    h.xhb.seedOnce([{ type: 'ability', id: 'a0' }]);
+    for (let i = 0; i < 5; i++) h.poll(1);
+    expect(h.onConnectionChange).toHaveBeenCalledTimes(1);
+  });
+
+  it('gives up on a bar that never fills instead of asking all session', () => {
+    const h = setupCrossHotbar(true);
+    h.xhb.reset();
+    h.onConnectionChange.mockClear();
+    for (let i = 0; i < 60; i++) h.poll(1);
+    const asks = h.onConnectionChange.mock.calls.length;
+    expect(asks).toBeGreaterThan(0);
+    for (let i = 0; i < 60; i++) h.poll(1);
+    expect(h.onConnectionChange).toHaveBeenCalledTimes(asks);
+  });
+  describe('cross hotbar arrange mode', () => {
+    // focusSpell installs a document global; drop it so a later case in this file
+    // sees the plain-Node environment the rest of the suite assumes.
+    afterEach(() => {
+      Reflect.deleteProperty(globalThis, 'document');
+    });
+
+    const enterEdit = (h: ReturnType<typeof setupCrossHotbar>) => {
+      h.press(GP.LB);
+      h.press(GP.LB, GP.Y);
+      h.press();
+    };
+
+    it('opens and closes on the bumper plus top face button', () => {
+      const h = setupCrossHotbar(true);
+      enterEdit(h);
+      // The third argument is what is in hand, which is nothing on the way in.
+      expect(h.onCrossHotbarEdit).toHaveBeenLastCalledWith(true, null, null);
+      enterEdit(h);
+      expect(h.onCrossHotbarEdit).toHaveBeenLastCalledWith(false, null, null);
+    });
+
+    it('moves an action onto another cell', () => {
+      const h = setupCrossHotbar(true);
+      enterEdit(h);
+      h.focus(0);
+      h.press(GP.A);
+      h.press();
+      h.focus(3);
+      h.press(GP.A);
+      h.press();
+      expect(h.xhb.setActions(0)[3]).toEqual({ type: 'ability', id: 'a0' });
+      // A move is a SWAP: what was on the target went where the action came from.
+      expect(h.xhb.setActions(0)[0]).toEqual({ type: 'ability', id: 'a3' });
+    });
+
+    it('casts nothing while arranging', () => {
+      // The whole point of a mode: a press that would fire the ability being moved
+      // has to stay silent.
+      const h = setupCrossHotbar(true);
+      enterEdit(h);
+      h.focus(0);
+      h.press(GP.LT);
+      h.press(GP.LT, GP.DPAD_UP);
+      expect(h.onCrossHotbarCast).not.toHaveBeenCalled();
+    });
+
+    it('clears the focused cell with cancel', () => {
+      const h = setupCrossHotbar(true);
+      enterEdit(h);
+      h.focus(2);
+      h.press(GP.B);
+      expect(h.xhb.setActions(0)[2]).toBeNull();
+    });
+
+    it('leaves the bar alone when nothing on it is focused', () => {
+      const h = setupCrossHotbar(true);
+      enterEdit(h);
+      h.focus(null);
+      h.press(GP.A);
+      h.press();
+      h.press(GP.B);
+      expect(h.xhb.setActions(0)[0]).toEqual({ type: 'ability', id: 'a0' });
+    });
+
+    it('drops the pad selection the moment the player moves', () => {
+      // Pressing confirm out of instinct while running should not activate
+      // whatever the cursor was left resting on, so moving puts it away.
+      const h = setupCrossHotbar(true);
+      const removed: string[] = [];
+      const marked = {
+        focus: () => {},
+        classList: { add: () => {}, remove: (c: string) => removed.push(c) },
+        getBoundingClientRect: () => ({
+          left: 0,
+          top: 0,
+          right: 10,
+          bottom: 10,
+          width: 10,
+          height: 10,
+        }),
+        hasAttribute: () => false,
+      };
+      const baseDoc = (globalThis as unknown as { document: Record<string, unknown> }).document;
+      const doc = {
+        ...baseDoc,
+        querySelectorAll: (sel: string) => (sel.includes('dialog') ? [] : [marked]),
+        // Nothing focused yet, so the first d-pad step lands on (and marks) it.
+        activeElement: null as unknown,
+        body: {},
+      };
+      (globalThis as unknown as { document: Record<string, unknown> }).document = doc;
+      marked.focus = () => {
+        doc.activeElement = marked;
+      };
+      h.setPointerMode(false);
+      h.press(GP.DPAD_DOWN); // the pad marks what it stepped onto
+      h.move();
+      expect(removed).toContain('pad-focus');
+      Reflect.deleteProperty(globalThis, 'document');
+    });
+
+    it('still lets confirm drive the HUD while arranging', () => {
+      // Arrange mode swallowed confirm along with the casts, which left the player
+      // unable to press anything (the spellbook included) once the mode was on.
+      const h = setupCrossHotbar(true);
+      enterEdit(h);
+      h.focus(null);
+      h.focusSpell(null);
+      h.press(GP.A);
+      expect(h.onCrossHotbarCast).not.toHaveBeenCalled();
+      // Consumed by the focus stepper rather than dropped on the floor.
+      expect(h.onAction).not.toHaveBeenCalledWith('slot0');
+    });
+
+    it('picks a spell up with a window open, where the poll used to bail out', () => {
+      // With a window up the poll returned before dispatch, so confirm on a
+      // spellbook row did nothing at all: the one press the whole flow needs.
+      const h = setupCrossHotbar(true);
+      enterEdit(h);
+      h.setPointerMode(true);
+      h.focusSpell('mortal_strike');
+      h.press(GP.A);
+      h.press();
+      h.setPointerMode(false);
+      h.focusSpell(null);
+      h.focus(7);
+      h.press(GP.A);
+      h.press();
+      expect(h.xhb.setActions(0)[7]).toEqual({ type: 'ability', id: 'mortal_strike' });
+    });
+
+    it('opens the spellbook when confirm lands on an empty cell', () => {
+      // "Put something here" is what an empty cell means; answering with nothing
+      // left no way in at all.
+      const h = setupCrossHotbar(true);
+      enterEdit(h);
+      h.xhb.bind(0, 6, null);
+      h.focus(6);
+      h.press(GP.A);
+      expect(h.onOpenSpellbook).toHaveBeenCalled();
+    });
+
+    it('does not jump on the way into arrange mode', () => {
+      // The chord's completing button must not also fire its own binding, or
+      // every trip into arrange mode makes the character hop.
+      const h = setupCrossHotbar(true);
+      enterEdit(h);
+      expect(h.triggerGamepadJump).not.toHaveBeenCalled();
+    });
+
+    it('picks an ability out of the spellbook and drops it on a cell', () => {
+      // The other half of arranging: slot-to-slot moves what is already there,
+      // this is how something NEW reaches the bar.
+      const h = setupCrossHotbar(true);
+      enterEdit(h);
+      h.focusSpell('mortal_strike');
+      h.press(GP.A);
+      h.press();
+      h.focusSpell(null);
+      h.focus(5);
+      h.press(GP.A);
+      h.press();
+      expect(h.xhb.setActions(0)[5]).toEqual({ type: 'ability', id: 'mortal_strike' });
+    });
+
+    it('leaves a spellbook row alone outside arrange mode', () => {
+      const h = setupCrossHotbar(true);
+      h.focusSpell('mortal_strike');
+      h.focus(5);
+      h.press(GP.A);
+      h.press();
+      expect(h.xhb.setActions(0)[5]).toEqual({ type: 'ability', id: 'a5' });
+    });
+
+    it('leaves arrange mode when the bar is switched off mid-arrange', () => {
+      // The chord out of the mode is gated on the bar being ON, so switching it off
+      // while arranging used to take the only exit away with the player inside.
+      const h = setupCrossHotbar(true);
+      enterEdit(h);
+      h.focus(0);
+      h.press(GP.A);
+      h.press();
+      vi.mocked(setPadNavSpansWindows).mockClear();
+      h.manager.setCrossHotbar(false);
+      expect(h.onCrossHotbarEdit).toHaveBeenLastCalledWith(false, null, null);
+      expect(setPadNavSpansWindows).toHaveBeenLastCalledWith(false);
+      // Really over: a confirm on another cell no longer moves what was in hand.
+      h.focus(3);
+      h.press(GP.A);
+      h.press();
+      expect(h.xhb.setActions(0)[3]).toEqual({ type: 'ability', id: 'a3' });
+    });
+
+    it('leaves arrange mode when the pad is stopped', () => {
+      const h = setupCrossHotbar(true);
+      enterEdit(h);
+      vi.mocked(setPadNavSpansWindows).mockClear();
+      h.manager.stop();
+      expect(h.onCrossHotbarEdit).toHaveBeenLastCalledWith(false, null, null);
+      expect(setPadNavSpansWindows).toHaveBeenLastCalledWith(false);
+    });
+
+    it('leaves arrange mode when the active pad is unplugged', () => {
+      // The fourth way out, and the only one no human action follows: a pad that
+      // dies mid-arrange leaves the HUD drawing a mode nothing can now exit, and
+      // the action in hand nowhere at all.
+      const h = setupCrossHotbar(true);
+      h.manager.start();
+      enterEdit(h);
+      h.focus(0);
+      h.press(GP.A);
+      h.press();
+      h.disconnectPad(0);
+      expect(h.onCrossHotbarEdit).toHaveBeenLastCalledWith(false, null, null);
+      // What was in hand went back on the cell it came off.
+      expect(h.xhb.setActions(0)[0]).toEqual({ type: 'ability', id: 'a0' });
+    });
+
+    it('stays in arrange mode when a different pad is unplugged', () => {
+      // Only the ACTIVE pad's loss ends the mode: a second controller leaving
+      // must not cancel the arrange the player is still in the middle of.
+      const h = setupCrossHotbar(true);
+      h.manager.start();
+      enterEdit(h);
+      h.disconnectPad(1);
+      expect(h.onCrossHotbarEdit).toHaveBeenLastCalledWith(true, null, null);
+    });
+
+    it('leaves arrange mode when the window loses focus', () => {
+      const h = setupCrossHotbar(true);
+      enterEdit(h);
+      h.setWindowFocused(false);
+      h.press();
+      expect(h.onCrossHotbarEdit).toHaveBeenLastCalledWith(false, null, null);
+    });
+
+    it('does nothing at all when the player never entered the mode', () => {
+      const h = setupCrossHotbar(true);
+      h.focus(2);
+      h.press(GP.B);
+      expect(h.xhb.setActions(0)[2]).toEqual({ type: 'ability', id: 'a2' });
+    });
+  });
+});
+
+// The pad's HUD selection is state that a press has to be able to LEAVE. Cancel is
+// that press, and the grace the pad allows a closing window to hand focus back is a
+// wall-clock budget, not a frame count, so it means the same on a 30 fps handheld
+// and a 144 Hz desktop.
+describe('GamepadManager pad focus handover', () => {
+  // Own the DOM globals poll() reads, the same way the cross-hotbar suite does, so
+  // these cases do not inherit an unfocused window from an earlier one.
+  afterEach(() => vi.unstubAllGlobals());
+
+  function setupFocus(pointerMode: () => boolean) {
+    vi.stubGlobal('document', {
+      hasFocus: () => true,
+      querySelectorAll: () => [],
+      activeElement: null,
+    });
+    let pad = gamepadWithPressed();
+    Object.defineProperty(globalThis, 'navigator', {
+      configurable: true,
+      value: { getGamepads: () => [pad] },
+    });
+    const onAction = vi.fn();
+    const input = {
+      applyGamepadLook: vi.fn(),
+      clearGamepadMove: vi.fn(),
+      setGamepadLookActive: vi.fn(),
+      setGamepadMove: vi.fn(),
+      triggerGamepadJump: vi.fn(),
+    } as unknown as Input;
+    const callbacks = {
+      onAction,
+      onInputEdge: vi.fn(),
+      isPointerMode: pointerMode,
+    } satisfies GamepadCallbacks;
+    const manager = new GamepadManager(input, new GamepadBindings(), callbacks);
+    (manager as unknown as { index: number | null }).index = 0;
+    vi.mocked(clearPadFocus).mockClear();
+    return {
+      manager,
+      onAction,
+      press: (...buttons: number[]) => {
+        pad = gamepadWithPressed(...buttons);
+      },
+    };
+  }
+
+  it('spends the focus-return grace in seconds, so one long frame ends it', () => {
+    let pointerMode = true;
+    const h = setupFocus(() => pointerMode);
+    h.manager.poll(1 / 60);
+    pointerMode = false;
+    h.manager.poll(1 / 60); // the closing edge: nothing restored focus, so the wait starts
+    expect(clearPadFocus).not.toHaveBeenCalled();
+    h.manager.poll(0.25);
+    expect(clearPadFocus).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps waiting across the short frames a high refresh rate delivers', () => {
+    let pointerMode = true;
+    const h = setupFocus(() => pointerMode);
+    h.manager.poll(1 / 144);
+    pointerMode = false;
+    h.manager.poll(1 / 144);
+    // Twelve frames at 144 Hz is 83 ms, well inside the grace the old frame count spent.
+    for (let i = 0; i < 12; i++) h.manager.poll(1 / 144);
+    expect(clearPadFocus).not.toHaveBeenCalled();
+    for (let i = 0; i < 20; i++) h.manager.poll(1 / 144);
+    expect(clearPadFocus).toHaveBeenCalledTimes(1);
+  });
+
+  it('drops the pad selection on cancel instead of clearing the target under it', () => {
+    const h = setupFocus(() => false);
+    vi.mocked(hasPadFocus).mockReturnValueOnce(true);
+    h.press(GP.B);
+    h.manager.poll(1 / 60);
+    expect(clearPadFocus).toHaveBeenCalledTimes(1);
+    expect(h.onAction).not.toHaveBeenCalledWith(GAMEPAD_CANCEL);
+  });
+
+  it('passes cancel through to the host once the pad holds no selection', () => {
+    const h = setupFocus(() => false);
+    h.press(GP.B);
+    h.manager.poll(1 / 60);
+    expect(clearPadFocus).not.toHaveBeenCalled();
+    expect(h.onAction).toHaveBeenCalledWith(GAMEPAD_CANCEL);
   });
 });

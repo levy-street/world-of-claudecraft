@@ -327,6 +327,43 @@ describe('PerfDiagnosticsPanel', () => {
     expect(start?.disabled).toBe(true);
   });
 
+  it('shows the zone-build and off-frame hitch counts on their own metrics row', () => {
+    setVisibility('visible');
+    let now = 1000;
+    vi.spyOn(performance, 'now').mockImplementation(() => now);
+    const sample = snapshot();
+    sample.hitches = {
+      frames: 600,
+      hitches: 7,
+      byCause: {
+        'shader-compile': 1,
+        'texture-upload': 0,
+        'zone-build': 4,
+        'view-create': 0,
+        gc: 3,
+        'off-frame': 2,
+        other: 0,
+      },
+      programGrowthFrames: 1,
+      programsAdded: 1,
+      recent: [],
+    };
+    const panel = new PerfDiagnosticsPanel({
+      startMeasurement: vi.fn(),
+      snapshot: () => sample,
+      runSceneCensus: vi.fn(() => null),
+      desktopShell: false,
+    });
+    panel.setReady(true);
+    panel.onMonitorReset();
+    now += 15_000;
+    panel.update(sample);
+
+    const text = document.body.textContent ?? '';
+    expect(text).toContain('hitches 7 | shaders 1 | uploads 0 | views 0');
+    expect(text).toContain('zone builds 4 | off-frame 2 | gc 3');
+  });
+
   it('fully collapses and expands the diagnostic body', () => {
     const panel = new PerfDiagnosticsPanel({
       startMeasurement: vi.fn(),

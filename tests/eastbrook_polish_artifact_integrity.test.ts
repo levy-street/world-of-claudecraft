@@ -752,9 +752,6 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // the release monolith ratchet. Behavior is unchanged; no capture was retaken.
 // Re-minted again after registering the extracted policy as its own provenance
 // leaf. The captures remain unchanged and were not retaken.
-// Re-minted for the phase 10 QA merge of release/v0.38.0 into
-// feature/masterwrought: both sides re-minted since the common base, so the
-// merged tree mints values matching neither parent. No capture was retaken.
 // Re-minted for the quest-collectable spawn gate: this branch's renderer.ts
 // edits (the view gate call sites and the ground-object pool key move) shift
 // the runtimeRender.renderer leaf, the only leaf that moved. No Eastbrook
@@ -769,12 +766,6 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the r185 frozen-camera aim fix: the first-order composite
 // follows renderer.ts, then this seal follows the swept evidence bytes. No
 // capture was retaken.
-// Re-minted for the merge of release/v0.39.0 into feature/masterwrought:
-// both sides re-minted since the common base, so the merged tree mints
-// values matching neither parent. No capture was retaken.
-// Re-minted again for the merge of release/v0.38.2 (the composer NaN
-// hotfix's lockfile bump re-stamped every fingerprinted GLB upstream); the
-// merged tree mints values matching neither parent. No capture was retaken.
 // Re-minted again after extracting the delve interior build-cache scheduling
 // into src/render/delve_interior_tracker.ts (renderer.ts moved, no capture retaken).
 // Re-minted again for the login preview/self-spirit prewarm merge with the
@@ -809,13 +800,55 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // first-order composite follows the retained self-spirit prewarm and delve
 // rebuild renderer bytes, then this seal follows the swept evidence bytes. No
 // capture was retaken.
-// Re-minted for the merge of release/v0.40.0 into feature/masterwrought:
-// both sides re-minted since the common base, so the merged tree mints
-// values matching neither parent. No capture was retaken.
+// Re-minted for the GPU-preparation scheduler batch and its second and third
+// passes: renderer.ts and prewarm_policy.ts moved again, the seals follow the
+// swept evidence bytes. No capture was retaken.
+// Re-minted for the touch tail's readiness fix (the walk no longer asks the
+// driver): renderer.ts moved, the seals follow the swept evidence bytes. No
+// capture was retaken.
+// Re-minted for the build-ledger instrumentation (timed view and zone
+// builds, the arrival mark): renderer.ts and entity_view_policy_core.ts
+// moved, the seals follow the swept evidence bytes. No capture was retaken.
+// Re-minted for the build-span sink wiring (view-part sub-spans): renderer.ts
+// moved, the seals follow the swept evidence bytes. No capture was retaken.
+// Re-minted for the composed-look pieces hold (live candidate path wiring):
+// renderer.ts moved, the seals follow the swept evidence bytes. No capture was
+// retaken.
+// Re-minted for the gc hitch cause (the heap read on the hitch sample):
+// renderer.ts moved, the seals follow the swept evidence bytes. No capture was
+// retaken.
+// Re-minted for the deferred-decal stand-in (the live candidate path builds
+// the body without its face decals): renderer.ts moved, the seals follow the
+// swept evidence bytes. No capture was retaken.
+// Re-minted for the compile gate's piece cut (one queue unit per material
+// group of the target): renderer.ts moved, the seals follow the swept evidence
+// bytes. No capture was retaken.
+// Re-minted for the hitch sample alignment (the top-of-sync reading and the
+// aligned end-of-sync sample): renderer.ts moved, the seals follow the swept
+// evidence bytes. No capture was retaken.
+// Re-minted for the compile gate's variant settle (the third piece arm) and
+// the shadow arm's every-mesh depth twin: renderer.ts moved, the seals follow
+// the swept evidence bytes. No capture was retaken.
+// Re-minted for the resume lane ordering (program debt before upload debt):
+// prewarm_policy.ts moved, the seals follow the swept evidence bytes. No
+// capture was retaken.
+// Re-minted for the three patch-hash bump in pnpm-lock.yaml: the lockfile is a
+// hashed leaf of the town fingerprint, so the seals follow the swept evidence
+// bytes. No capture was retaken.
+// Re-minted for the merge of upstream/main into the GPU-preparation
+// scheduler branch: both parents' renderer and prewarm bytes combine in one
+// tree, so the seals follow the swept evidence bytes. No capture was retaken.
+// Re-minted for the second three patch-hash bump in pnpm-lock.yaml (the count 0
+// instanced-mesh render-list skip): the lockfile is a hashed leaf of the town
+// fingerprint, so the seals follow the swept evidence bytes. No capture was
+// retaken.
+// Re-minted for the merge of the moved release/v0.40.0 tip into
+// feature/masterwrought: both sides re-minted since the common base, so the
+// merged tree mints values matching neither parent. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '09b79915db27187503e1c2938e59b3047725841b0697cae1984fe6817ff7b154';
+  '9e51decc334852ceb40c046d28f104dad8f3c68d70a98df62e7b707ab090d598';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '5f5254363617ed85f902045745499d41bb1ac018b372691bbd5e9e24a259eae3';
+  '99cb45d06ee457ee7000bf0e1b4e8ca6ae07950f10f8e0d8ea699941ff02e817';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1800,10 +1833,6 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // monolith ratchet. The seal follows the swept bytes; no capture was retaken.
     // Re-pinned again after the policy became an explicit provenance leaf. The
     // performance records changed only in their swept provenance blocks.
-    // Re-pinned for the phase 10 QA merge of release/v0.38.0 into
-    // feature/masterwrought: both parents moved provenance inputs, so the
-    // merged tree mints a value matching neither parent. No capture was
-    // retaken.
     // Re-minted for the merge of release/v0.38.0 into the Armory warming
     // branch: the first-order composite follows the merged renderer.ts bytes,
     // then this second-order performance seal follows the swept evidence
@@ -1822,9 +1851,6 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Re-minted for the r185 frozen-camera aim fix. The first-order composite
     // follows renderer.ts, then this second-order performance seal follows the
     // swept evidence bytes. No capture was retaken.
-    // Re-minted for the merge of release/v0.39.0 into feature/masterwrought:
-    // both sides re-minted since the common base, so the merged tree mints
-    // values matching neither parent. No capture was retaken.
     // Re-minted again after extracting the delve interior build-cache
     // scheduling into src/render/delve_interior_tracker.ts. No capture retaken.
     // Re-minted again for the merged prewarm and delve-tracker runtime inputs.
@@ -1854,13 +1880,50 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // The first-order composite follows the retained self-spirit prewarm and
     // delve rebuild renderer bytes, then this second-order performance seal
     // follows the swept evidence bytes. No capture was retaken.
-    // Re-minted for the merge of release/v0.40.0 into feature/masterwrought:
-    // both sides re-minted since the common base, so the merged tree mints
-    // values matching neither parent. No capture was retaken.
+    // Re-minted for the r185 frozen-camera aim fix, then for the far-bake
+    // compile gate (renderer.ts wiring). The first-order composite follows
+    // renderer.ts, then this second-order performance seal follows the swept
+    // evidence bytes. No capture was retaken.
+    // Re-minted for the touch tail's readiness fix (renderer.ts wiring): the
+    // first-order composite follows renderer.ts, then this second-order
+    // performance seal follows the swept evidence bytes. No capture was
+    // retaken.
+    // Re-minted for the build-ledger instrumentation (renderer.ts and
+    // entity_view_policy_core.ts wiring): same order, the composite first,
+    // then this seal over the swept evidence bytes. No capture was retaken.
+    // Re-minted for the build-span sink wiring (renderer.ts): same order, the
+    // composite first, then this seal. No capture was retaken.
+    // Re-minted for the composed-look pieces hold (renderer.ts): same order,
+    // the composite first, then this seal. No capture was retaken.
+    // Re-minted for the gc hitch cause (renderer.ts): same order, the
+    // composite first, then this seal. No capture was retaken.
+    // Re-minted for the deferred-decal stand-in (renderer.ts): same order, the
+    // composite first, then this seal. No capture was retaken.
+    // Re-minted for the compile gate's piece cut (renderer.ts): same order, the
+    // composite first, then this seal. No capture was retaken.
+    // Re-minted for the hitch sample alignment (renderer.ts): same order, the
+    // composite first, then this seal. No capture was retaken.
+    // Re-minted for the compile gate's variant settle and the every-mesh depth
+    // twin (renderer.ts): same order, the composite first, then this seal. No
+    // capture was retaken.
+    // Re-minted for the resume lane ordering (prewarm_policy.ts): same order,
+    // the composite first, then this seal. No capture was retaken.
+    // Re-minted for the three patch-hash bump (pnpm-lock.yaml): same order, the
+    // composite first, then this seal. No capture was retaken.
+    // Re-minted for the merge of upstream/main into the GPU-preparation
+    // scheduler branch: both parents' renderer and prewarm bytes combine in one
+    // tree, so the seals follow the swept evidence bytes. No capture was retaken.
+    // Re-minted for the second three patch-hash bump (pnpm-lock.yaml, the count
+    // 0 instanced-mesh render-list skip): same order, the composite first, then
+    // this seal. No capture was retaken.
+    // Re-minted for the merge of the moved release/v0.40.0 tip into
+    // feature/masterwrought: both sides re-minted since the common base, so
+    // the merged tree mints values matching neither parent. No capture was
+    // retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('0ed10cc2b249229bb5cf68604cf13453d54bed27e842ebb957dc92f84db19d49');
+    ).toBe('e8e1fe6e72822f0bb7bd70b133ff22b625764a5154d27cae9505e03a4e2e0f79');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

@@ -14,7 +14,12 @@ import {
 
 type Slot = { source: THREE.Mesh; overlay: THREE.Material };
 
-function fakeVisual(name: string, slots = 2, timeline: string[] = []) {
+function fakeVisual(
+  name: string,
+  slots = 2,
+  timeline: string[] = [],
+  overlayMap: THREE.Texture | null = null,
+) {
   const calls = { prewarmSoulRendSlots: 0 };
   return {
     name,
@@ -23,7 +28,7 @@ function fakeVisual(name: string, slots = 2, timeline: string[] = []) {
       calls.prewarmSoulRendSlots++;
       timeline.push(`slots:${name}`);
       return Array.from({ length: slots }, () => {
-        const overlay = new THREE.MeshBasicMaterial();
+        const overlay = new THREE.MeshBasicMaterial({ map: overlayMap });
         overlay.name = name;
         return {
           source: new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial()),
@@ -46,6 +51,7 @@ function fakeHost(
   timeline: string[] = [],
 ) {
   const compiled: string[] = [];
+  const uploaded: THREE.Texture[] = [];
   const host = {
     shutdownStarted: false,
     views: new Map(views.map((v) => [v.id, { visual: v.visual, ...look() }])),
@@ -67,7 +73,7 @@ function fakeHost(
         return work();
       },
     },
-    webgl: { initTexture: () => {} },
+    webgl: { initTexture: (texture: THREE.Texture) => uploaded.push(texture) },
     prewarmEntity: () => ({ kind: 'player', templateId: 'warrior' }),
     compilePrewarmColorPrograms: async (root: THREE.Object3D) => {
       // Name the BODY this batch belongs to, read off the overlay material the
@@ -80,8 +86,8 @@ function fakeHost(
     },
     compileShadowPrograms: async () => {},
     renderBoundedPrewarmRoot: () => {},
-    collectObjectTextures: () => new Set<THREE.Texture>(),
     compiled,
+    uploaded,
   };
   return host;
 }
@@ -162,6 +168,22 @@ describe('interior encounter prewarm pass (driven)', () => {
     expect(player.calls.prewarmSoulRendSlots).toBeGreaterThan(0);
   });
 
+  it('uploads the textures bound on the staged overlays before their bounded render', async () => {
+    // The pass reads the staged proxies' map slots through the shared
+    // material_texture_slots walk (not through the renderer host any more):
+    // an overlay's map must reach webgl.initTexture, and nothing else does.
+    const map = new THREE.Texture();
+    const player = fakeVisual('player', 2, [], map);
+    const host = fakeHost([{ id: 1, kind: 'player', visual: player }]);
+    startInteriorEncounterPrewarm('nythraxis', host);
+    await drain();
+    queueLiveSoulRendPrewarm(host, player as never, look({ weaponSkinId: 'ice_fang' }), 'player');
+    await drain();
+    expect(player.calls.prewarmSoulRendSlots).toBeGreaterThan(0);
+    expect(host.uploaded.length).toBeGreaterThan(0);
+    expect(new Set(host.uploaded)).toEqual(new Set([map]));
+  });
+
   it('stops warming live bodies once the host reports leaving the interior', async () => {
     const player = fakeVisual('player');
     const host = fakeHost([{ id: 1, kind: 'player', visual: player }]);
@@ -180,6 +202,70 @@ describe('interior encounter prewarm pass (driven)', () => {
     startInteriorEncounterPrewarm('nythraxis', host);
     await drain();
     expect(host.compiled.length).toBe(afterFirst);
+  });
+
+  it('retries an interior whose first prewarm pass failed', async () => {
+    // The interior key is claimed BEFORE the work runs, so without the failure
+    // arm giving it back a pass that rejected (a compile that threw, a queue
+    // rejection during a graphics rebuild) left the catalog cold for the whole
+    // session and it linked at first draw instead. The injected throw stands in
+    // for any of those: it fails the first pass and only the first.
+    const host = fakeHost();
+    let built = 0;
+    host.prewarmEntity = () => {
+      built++;
+      return { kind: 'player', templateId: 'warrior' };
+    };
+    const pos = host.sim.player.pos;
+    let failNext = true;
+    Object.defineProperty(host.sim.player, 'pos', {
+      get() {
+        if (!failNext) return pos;
+        failNext = false;
+        throw new Error('prewarm pass failed');
+      },
+    });
+
+    startInteriorEncounterPrewarm('nythraxis', host);
+    await drain();
+    expect(built).toBe(0);
+
+    // The same interior attaches again and the catalog build runs this time.
+    startInteriorEncounterPrewarm('nythraxis', host);
+    await drain();
+    expect(built).toBeGreaterThan(0);
+
+    // ... and a pass that SUCCEEDED still claims the interior: no third build.
+    const afterRetry = built;
+    startInteriorEncounterPrewarm('nythraxis', host);
+    await drain();
+    expect(built).toBe(afterRetry);
+  });
+
+  it('retries a live body whose warm pass failed, for the same look', async () => {
+    const player = fakeVisual('player');
+    const host = fakeHost([{ id: 1, kind: 'player', visual: player }]);
+    setEncounterPrewarmInterior(host, 'nythraxis');
+    const good = host.compilePrewarmColorPrograms;
+    host.compilePrewarmColorPrograms = async () => {
+      throw new Error('compile rejected');
+    };
+
+    queueLiveSoulRendPrewarm(host, player as never, look(), 'player');
+    await drain();
+    expect(player.calls.prewarmSoulRendSlots).toBe(1);
+
+    // Same look, and it warms again: the failed identity was un-claimed.
+    host.compilePrewarmColorPrograms = good;
+    queueLiveSoulRendPrewarm(host, player as never, look(), 'player');
+    await drain();
+    expect(player.calls.prewarmSoulRendSlots).toBe(2);
+    expect(host.compiled.length).toBeGreaterThan(0);
+
+    // ... and a look that then SUCCEEDS is still claimed only once.
+    queueLiveSoulRendPrewarm(host, player as never, look(), 'player');
+    await drain();
+    expect(player.calls.prewarmSoulRendSlots).toBe(2);
   });
 
   it('ignores an interior with no spec, and a host already shutting down', async () => {

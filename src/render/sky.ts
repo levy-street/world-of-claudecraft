@@ -429,6 +429,13 @@ const hdriStore: Partial<Record<SkyKey, THREE.Texture>> = {};
 // a larger source multiplies the CubeUV working-target size and blur cost,
 // which the zone streaming lane would otherwise pay inside live frames.
 const envHdriStore: Partial<Record<SkyKey, THREE.Texture>> = {};
+// The env PMREM source width, and the ONE cubeUV height a session prefilters
+// at. PMREMGenerator sizes its target off the SOURCE (_fromTexture calls
+// _setSize(image.width / 4) for an equirect) and envMapCubeUVHeight is a
+// program-cache-key input three re-reads with no material.needsUpdate, so a
+// biome prefiltered from a wider source relinks every lit material in the
+// scene the moment the camera crosses into it.
+const ENV_HDRI_WIDTH = 512;
 const backdropStore: Partial<Record<SkyKey, THREE.Texture>> = {};
 const skyAssetTasks = new Map<string, Promise<void>>();
 // Fetches that have not settled yet. skyAssetTasks alone cannot answer this
@@ -723,13 +730,31 @@ export function hasBackdropAssets(biomes: readonly SkyKey[] = ['vale', 'marsh', 
 }
 
 // Decoded-asset residency for one biome, read directly off BOTH stores.
-// envTexture cannot probe env residency: it falls back to the dome HDR when
-// the env store misses, so a dome-only biome would read non-null there and a
-// caller would PMREM the full-size dome (4x the CubeUV working-target size
-// and blur cost, see envHdriStore above) and cache that wrong prefilter for
-// the session. ensureSkyBiomeAssets starts the dome and env fetches together
-// on every profile that fetches at all, but they settle independently, so
-// residency is both stores non-null.
+// envTexture cannot probe env residency: it falls back to the dome when the
+// dome is already no wider than the env source, so such a biome reads non-null
+// there and a caller would cache a prefilter built from the dome copy for the
+// session (correctly sized, but still not the shipped env source).
+// ensureSkyBiomeAssets starts the dome and env fetches together on every
+// profile that fetches at all, but they settle independently, so residency is
+// both stores non-null.
+/**
+ * The env PMREM source for a biome whose 512 wide env arm has not landed yet
+ * or was evicted: the dome ITSELF, but only while it is already no wider than
+ * ENV_HDRI_WIDTH, so the prefilter's cubeUV working size is the one every
+ * other biome of the session gets. A wider dome (the shipped 1k and 2k domes)
+ * returns null instead, which skips that biome's prefilter and leaves the
+ * previous IBL lighting the scene: a differently sized prefilter changes
+ * envMapCubeUVHeight, and the relink storm that program-cache-key change
+ * causes measured 1.1 to 1.4 s on the far-bake PR. A compressed dome cannot be
+ * resampled to the env width at load time, so the size guard is the fallback.
+ */
+function envDomeFallback(biome: SkyKey): THREE.Texture | null {
+  const dome = hdriStore[biome];
+  if (!dome) return null;
+  const width = (dome.image as { width?: number } | undefined)?.width ?? 0;
+  return width > 0 && width <= ENV_HDRI_WIDTH ? dome : null;
+}
+
 function skyBiomeAssetsResident(biome: SkyKey): boolean {
   return Boolean(hdriStore[biome]) && Boolean(envHdriStore[biome]);
 }
@@ -1232,7 +1257,7 @@ export function buildSky(
       uniforms.uTime.value = time;
     },
     envTexture(biome: SkyKey): THREE.Texture | null {
-      return envHdriStore[biome] ?? hdriStore[biome] ?? null;
+      return envHdriStore[biome] ?? envDomeFallback(biome);
     },
     domeTexture(biome: SkyKey): THREE.Texture | null {
       return hdriStore[biome] ?? null;

@@ -10,7 +10,7 @@ import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import { VISUALS } from '../src/render/characters/manifest';
 import { MOUNT_VISUAL_SPECS } from '../src/render/mount_visuals';
-import { MOUNT_KEYS } from '../src/sim/content/mounts';
+import { DEFAULT_MOUNT, MOUNT_KEYS } from '../src/sim/content/mounts';
 
 function stubGltf(): { scene: THREE.Group; animations: THREE.AnimationClip[] } {
   const scene = new THREE.Group();
@@ -36,9 +36,22 @@ async function importMountPrewarm(loadGltf: ReturnType<typeof vi.fn>) {
 }
 
 describe('mountPrewarmKeys', () => {
-  it('covers every catalog MountKey, derived rather than hand-listed', async () => {
+  it('warms the horse plus the owned mounts only, in catalog order, never the whole catalog', async () => {
+    // Every other mount's first sight goes through the live view gate with a
+    // stand-in on this branch; warming all nine cost nine lazy GLB fetches
+    // and nine rigs on the post-reveal resume lane for mounts most sessions
+    // never draw (upstream warmed every catalog key).
     const { mountPrewarmKeys } = await importMountPrewarm(vi.fn(() => Promise.resolve(stubGltf())));
-    expect(mountPrewarmKeys().sort()).toEqual([...MOUNT_KEYS].sort());
+    expect(mountPrewarmKeys()).toEqual([DEFAULT_MOUNT]);
+    expect(mountPrewarmKeys([])).toEqual([DEFAULT_MOUNT]);
+    const owned = ['terrorspark_groundshaker', 'grag_bear', DEFAULT_MOUNT] as const;
+    const keys = mountPrewarmKeys(owned);
+    expect(keys).toHaveLength(3);
+    expect(new Set(keys)).toEqual(new Set(owned));
+    // catalog order, not ownership order
+    expect(keys).toEqual(MOUNT_KEYS.filter((key) => keys.includes(key)));
+    // and still a subset of the typed catalog: every key has a visual spec
+    for (const key of keys) expect(MOUNT_KEYS).toContain(key);
   });
 });
 
@@ -46,7 +59,7 @@ describe('buildMountPrewarmVisual', () => {
   it('lazily fetches the mount GLB and builds a hidden, off-screen, prewarm-tagged rig', async () => {
     const loadGltf = vi.fn(() => Promise.resolve(stubGltf()));
     const { buildMountPrewarmVisual, mountPrewarmKeys } = await importMountPrewarm(loadGltf);
-    const [key] = mountPrewarmKeys();
+    const [key] = mountPrewarmKeys(MOUNT_KEYS);
     const visual = await buildMountPrewarmVisual(key);
     expect(visual).not.toBeNull();
     expect(visual?.root.name).toBe(`prewarm-mount:${key}`);
@@ -64,7 +77,7 @@ describe('buildMountPrewarmVisual', () => {
     const loadGltf = vi.fn((_url: string) => Promise.resolve(stubGltf()));
     const { buildMountPrewarmVisual, mountPrewarmKeys, mountAssetsReady } =
       await importMountPrewarm(loadGltf);
-    const key = mountPrewarmKeys().find(
+    const key = mountPrewarmKeys(MOUNT_KEYS).find(
       (candidate) => !mountAssetsReady(MOUNT_VISUAL_SPECS[candidate].visualKey),
     );
     if (!key) throw new Error('every mount asset is already resident after charactersReady()');
@@ -81,7 +94,7 @@ describe('buildMountPrewarmVisual', () => {
     const loadGltf = vi.fn((_url: string) => Promise.resolve(stubGltf()));
     const { buildMountPrewarmVisual, mountPrewarmKeys, mountAssetsReady } =
       await importMountPrewarm(loadGltf);
-    const key = mountPrewarmKeys().find(
+    const key = mountPrewarmKeys(MOUNT_KEYS).find(
       (candidate) => !mountAssetsReady(MOUNT_VISUAL_SPECS[candidate].visualKey),
     );
     if (!key) throw new Error('every mount asset is already resident after charactersReady()');
@@ -106,7 +119,7 @@ describe('buildMountPrewarmVisual', () => {
     const loadGltf = vi.fn((_url: string) => Promise.resolve(stubGltf()));
     const { buildMountPrewarmVisual, mountPrewarmKeys, mountAssetsReady } =
       await importMountPrewarm(loadGltf);
-    const key = mountPrewarmKeys().find(
+    const key = mountPrewarmKeys(MOUNT_KEYS).find(
       (candidate) => !mountAssetsReady(MOUNT_VISUAL_SPECS[candidate].visualKey),
     );
     if (!key) throw new Error('every mount asset is already resident after charactersReady()');
@@ -130,7 +143,7 @@ describe('stageMountPrewarmVisual', () => {
   it('creates and adds the shared group to the scene on first use, then reuses it', async () => {
     const loadGltf = vi.fn(() => Promise.resolve(stubGltf()));
     const { stageMountPrewarmVisual, mountPrewarmKeys } = await importMountPrewarm(loadGltf);
-    const [keyA, keyB] = mountPrewarmKeys();
+    const [keyA, keyB] = mountPrewarmKeys(MOUNT_KEYS);
     const scene = new THREE.Scene();
 
     const first = await stageMountPrewarmVisual(scene, null, keyA);
@@ -153,7 +166,7 @@ describe('stageMountPrewarmVisual', () => {
     const loadGltf = vi.fn((_url: string) => Promise.resolve(stubGltf()));
     const { stageMountPrewarmVisual, mountPrewarmKeys, mountAssetsReady } =
       await importMountPrewarm(loadGltf);
-    const key = mountPrewarmKeys().find(
+    const key = mountPrewarmKeys(MOUNT_KEYS).find(
       (candidate) => !mountAssetsReady(MOUNT_VISUAL_SPECS[candidate].visualKey),
     );
     if (!key) throw new Error('every mount asset is already resident after charactersReady()');
@@ -172,7 +185,7 @@ describe('stageMountPrewarmVisual', () => {
     const loadGltf = vi.fn((_url: string) => Promise.resolve(stubGltf()));
     const { stageResidentMountPrewarmVisual, mountPrewarmKeys, mountAssetsReady } =
       await importMountPrewarm(loadGltf);
-    const key = mountPrewarmKeys().find(
+    const key = mountPrewarmKeys(MOUNT_KEYS).find(
       (candidate) => !mountAssetsReady(MOUNT_VISUAL_SPECS[candidate].visualKey),
     );
     if (!key) throw new Error('every mount asset is already resident after charactersReady()');

@@ -509,6 +509,7 @@ before reporting readiness.
 | Privacy and security | `privacy-security-review` | `woc_security` |
 | Decisive tests | `test-coverage-auditor` | `woc_test_coverage` |
 | Frontend and graphics | `frontend-seam-reviewer` | `woc_frontend` |
+| GPU preparation | `render-performance-reviewer` | (not yet mirrored) |
 | Release malware | `release-malware-audit` | `woc_release_malware` |
 | Content same-change obligations | `content-obligations-reviewer` | (not yet mirrored) |
 | Gate/CI selection integrity | `gate-integrity-reviewer` | (not yet mirrored) |
@@ -525,7 +526,12 @@ indexes, pool pressure, locks, timeout scope, write amplification, driver/depend
 PostgreSQL engine/resource/configuration/topology changes, and production-scale observability.
 Server-hot-path review owns the non-SQL server budget: tick CPU, broadcast fan-out and
 serialization, cache seams, and retention for anything that grows (the seams in
-`server/CLAUDE.md` "Hot paths"). Dispatch every role whose set of risk applies.
+`server/CLAUDE.md` "Hot paths"). GPU-preparation review owns what the client asks the GPU to
+prepare and when: prewarm homes and twins, compile and reveal gates, program-key moves,
+post-boot lights, secondary GL contexts, the background queue and its admission budget, and
+the stand-in registry (the contract in `src/render/CLAUDE.md` "GPU work: every new producer is
+a client of the scheduler"), where frontend review keeps the presentation seams and tier
+fairness. Dispatch every role whose set of risk applies.
 
 ## Keep the gate current
 

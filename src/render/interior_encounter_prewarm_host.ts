@@ -29,5 +29,4 @@ export interface InteriorEncounterPrewarmHost {
   compilePrewarmColorPrograms(root: THREE.Object3D, includeOffscreen: boolean): Promise<void>;
   compileShadowPrograms(root: THREE.Object3D): Promise<void>;
   renderBoundedPrewarmRoot(group: THREE.Group, child: THREE.Object3D): void;
-  collectObjectTextures(root: THREE.Object3D, visibleOnly: boolean): Set<THREE.Texture>;
 }

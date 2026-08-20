@@ -305,7 +305,9 @@ export interface ActionBarView {
   tick(world: ActionBarWorldInput): ActionBarState;
 }
 
-function makeSlotState(): ActionBarSlotState {
+/** A blank slot state. Exported so another bar family can hold a fallback cell
+ *  for a position its layout does not fill. */
+export function makeSlotState(): ActionBarSlotState {
   return {
     kind: 'empty',
     abilityId: null,

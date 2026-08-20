@@ -1,5 +1,6 @@
 import { audio } from '../game/audio';
 import { corpseLootAvailability, localPartyMemberIds } from '../game/corpse_loot_availability';
+import { CROSS_HOTBAR_ATTACK_ID } from '../game/cross_hotbar';
 import type { GamepadKind } from '../game/gamepad_map';
 import type { GraphicsSettingsSnapshot } from '../game/graphics_rebuild_core';
 import { InstanceMusicController, type InstanceMusicDecision } from '../game/instance_music';
@@ -28,6 +29,7 @@ import { preloadMechAssets } from '../render/characters/assets';
 import { mechHeldWeaponOverride, skinCount } from '../render/characters/manifest';
 import type { ModularLook } from '../render/characters/modular';
 import {
+  isComposedPortraitKey,
   onPortraitsReady,
   onPortraitUpdate,
   prewarmPlayerPortrait,
@@ -420,6 +422,7 @@ import {
   HOTBAR_ACTION_MIME,
   type HotbarAction,
   handleMobileAttackTap,
+  isAbilityActionBarEligible,
   loadoutKnownAbilityIds,
   parseHotbarAction,
   placeAbilityOnSlot,
@@ -462,6 +465,13 @@ import { type ChatClock, clampChatClock, formatChatTimestamp } from './hud/chat/
 import { ChatWindowController } from './hud/chat/chat_window_controller';
 import { DEED_NAME_TOKEN, deedChatLinkEl, deedLineNodes } from './hud/chat/deed_chat_line';
 import { SkinEventController } from './hud/cosmetics/skin_event_controller';
+import {
+  CrossHotbarController,
+  type CrossHotbarHold,
+  type CrossHotbarOverlayAction,
+  type CrossHotbarPanelHooks,
+  crossHotbarResolvers,
+} from './hud/cross_hotbar';
 import { DelveBoardController } from './hud/delve/delve_board_controller';
 import { DelveMapPainter } from './hud/delve/delve_map_painter';
 import { DelveTrackerController } from './hud/delve/delve_tracker_controller';
@@ -631,6 +641,7 @@ import {
   type PreviewPrewarmUnit,
   runPreviewPrewarmSchedule,
 } from './preview_prewarm_core';
+import { armPreviewOpen } from './preview_stand_in';
 import { procAuraConsumeSelfNoteText, procAuraGainSelfNoteText } from './proc_fct_notes';
 import { buildProcOverlay } from './proc_overlay_dom';
 import { attachOverlayDrag } from './proc_overlay_drag';
@@ -692,7 +703,7 @@ import { curatorRankNameKey, ReliquaryWindow } from './reliquary_window';
 import { restView } from './rest_indicator';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
-import { localizeSimText } from './sim_i18n';
+import { localizeSimText, tSim } from './sim_i18n';
 import { openSimpleMenu } from './simple_context_menu';
 import {
   advanceSkillLevelObservation,
@@ -840,13 +851,14 @@ export interface ThemeHooks {
 }
 
 // Read/rebind the gamepad's button→action layout from the options panel.
-export interface GamepadBindingsHooks {
+export interface GamepadBindingsHooks extends CrossHotbarPanelHooks {
   entries(): { button: number; action: string }[];
   bind(button: number, action: string): void;
   reset(): void;
   // Detected brand of the connected pad, so the panel labels each button with the
   // glyph printed on that controller ('generic' combined labels when none/unknown).
   kind(): GamepadKind;
+  // The cross hotbar layout: the action-bar slot each position casts, per set.
 }
 
 export interface ReportHooks {
@@ -1319,6 +1331,7 @@ export class Hud {
   private mobileActionPage = 0;
   private mobileActionRingView: ActionBarView | undefined;
   private mobileActionRingPainter: MobileActionRingPainter | undefined;
+  private crossHotbar: CrossHotbarController | undefined;
   // Consumables quick bar (touch): the auto-populated potion/elixir/food/drink
   // row behind the chevron chip next to the top-left trio. consumableBarIds is
   // the ONE reused array the pure core fills WHEN THE ROW OPENS and that stays
@@ -2410,7 +2423,14 @@ export class Hud {
       this.targetFramePainter.invalidatePortrait();
       this.totFramePainter.invalidatePortrait();
     });
-    onPortraitUpdate((visualKey, skin) => {
+    onPortraitUpdate((visualKey, skin, key) => {
+      // A composed capture is keyed on the look SIGNATURE rather than on
+      // (class, skin), and the player's own frame is the only composed one
+      // (see drawPlayerFramePortrait), so its key is the one that lands here.
+      if (isComposedPortraitKey(key)) {
+        this.drawPlayerFramePortrait();
+        return;
+      }
       // The mech is not a class: a lazily-arriving chroma atlas must refresh
       // the frame of the player wearing it (drawMech falls back to the class
       // face until the atlas is resident).
@@ -2420,29 +2440,19 @@ export class Hud {
         }
         return;
       }
-      const playerClass = visualKey.startsWith('player_')
-        ? (visualKey.slice('player_'.length) as PlayerClass)
-        : null;
-      if (!playerClass) return;
+      if (!visualKey.startsWith('player_')) return;
+      const playerClass = visualKey.slice('player_'.length) as PlayerClass;
       if (playerClass === this.sim.cfg.playerClass && skin === (this.sim.player.skin ?? 0)) {
         this.drawPlayerFramePortrait();
       }
-      const target = this.targetPortraitSubject;
-      if (
-        target?.kind === 'player' &&
-        target.templateId === playerClass &&
-        (target.skin ?? 0) === skin
-      ) {
-        this.targetFramePainter.invalidatePortrait();
-      }
-      const targetOfTarget = this.totPortraitSubject;
-      if (
-        targetOfTarget?.kind === 'player' &&
-        targetOfTarget.templateId === playerClass &&
-        (targetOfTarget.skin ?? 0) === skin
-      ) {
-        this.totFramePainter.invalidatePortrait();
-      }
+      // The target and target-of-target frames stay on the stock class art, so
+      // each repaints on exactly the (class, skin) pair it framed.
+      const framed = (subject: Entity | null): boolean =>
+        subject?.kind === 'player' &&
+        subject.templateId === playerClass &&
+        (subject.skin ?? 0) === skin;
+      if (framed(this.targetPortraitSubject)) this.targetFramePainter.invalidatePortrait();
+      if (framed(this.totPortraitSubject)) this.totFramePainter.invalidatePortrait();
     });
     const mm = $('#minimap') as unknown as HTMLCanvasElement;
     this.minimapCtx = require2dContext(mm);
@@ -6738,6 +6748,13 @@ export class Hud {
 
   private syncSlotMap(): void {
     this.actionBarController.syncKnownAbilities();
+    // The pad's bar gets the same offer minus passives, and stances ride along
+    // because pad mode hides the stance bar: a stance learned after the seed
+    // (Defensive Stance, the druid forms) is otherwise unreachable without the
+    // arrange chord. Seeded ids are already marked seen, so this never re-offers.
+    this.optionsHooks?.gamepad.syncCrossHotbarKnown(
+      this.sim.known.filter((k) => isAbilityActionBarEligible(k.def)).map((k) => k.def.id),
+    );
     this.mobileActionPage = this.currentMobileActionPage();
   }
 
@@ -7051,6 +7068,52 @@ export class Hud {
   }
 
   // Shared entry point for hotbar clicks and the 1..0-= keybinds.
+  /**
+   * Fire an action the cross hotbar holds. Routed through castSlot by finding the
+   * action on the bar, so a pad press gets the SAME semantics a key press does
+   * (ground-aim reticle, empower release, sport tap, mouseover cast, the
+   * auto-attack QoL) rather than a second cast path that would drift from it.
+   *
+   * The bar is seeded from the action bar, so the lookup almost always hits. An
+   * action arranged onto the pad and nowhere else falls back to a plain cast (the
+   * one case without a reticle) or, for an item, to the shared item-use seam.
+   */
+  castCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void {
+    // Attack is the fixed slot-0 toggle, not something the sim can cast by id.
+    if (action.id === CROSS_HOTBAR_ATTACK_ID) {
+      this.activateFixedAttackSlot();
+      return;
+    }
+    // Matched against the EFFECTIVE action of each slot, never the raw array: with
+    // the Attack button on, slot 0 IS Attack and whatever the array holds at index
+    // 0 is not reachable there, so delegating by array index fired auto-attack
+    // instead of the ability the player pressed.
+    let slot = -1;
+    // barSlot 0 is that Attack seat and 1..length are the configurable slots, so
+    // the last one is length itself, not length - 1.
+    for (let i = 0; i <= this.hotbarActions.length && slot < 0; i++) {
+      const onBar = this.actionForSlot(i);
+      if (onBar?.type === action.type && onBar.id === action.id) slot = i;
+    }
+    if (slot >= 0) {
+      this.castSlot(slot);
+      return;
+    }
+    // The sim owns the refusal for an ability the player no longer knows.
+    if (action.type === 'ability') {
+      this.sim.castAbility(action.id);
+      return;
+    }
+    if (this.tradeOpen) return;
+    if (this.isHotbarItemId(action.id)) {
+      this.useHotbarItem(action.id);
+      return;
+    }
+    // A cell left holding an item this client cannot use is a stale binding, so
+    // refuse it out loud rather than eating the press.
+    this.showError(tSim('error.noItem'));
+  }
+
   castSlot(barSlot: number): void {
     if (this.isGroundAimActive()) {
       if (this.groundAim.activeSlot === barSlot) {
@@ -7143,13 +7206,17 @@ export class Hud {
       }
     } else if (action?.type === 'item' && this.isHotbarItemId(action.id)) {
       if (this.tradeOpen) return;
-      // Gathering tools route through the interact-style handler first
-      // (#2343); everything else (and fishing implements) keeps the plain
-      // useItem command.
-      if (!this.tryGatherToolUse(action.id)) this.sim.useItem(action.id);
-      if ($('#bags').style.display !== 'none') this.renderBags();
+      this.useHotbarItem(action.id);
       this.flashActionSlot(barSlot);
     }
+  }
+
+  // The one item-use path a bar press takes, keyboard or pad: gathering tools
+  // route through the interact-style handler first (#2343); everything else
+  // (and fishing implements) keeps the plain useItem command.
+  private useHotbarItem(itemId: string): void {
+    if (!this.tryGatherToolUse(itemId)) this.sim.useItem(itemId);
+    if ($('#bags').style.display !== 'none') this.renderBags();
   }
 
   private mobileActionSourceSlotCount(): number {
@@ -7592,6 +7659,11 @@ export class Hud {
       (iconKey) => this.actionBarIconBg(iconKey),
     );
 
+    this.crossHotbar = CrossHotbarController.create(
+      this.writerFacet,
+      (k) => this.actionBarIconBg(k),
+      crossHotbarResolvers(this.sim, ITEMS, abilityDisplayName, itemDisplayName),
+    );
     this.buildMobileActionRing();
     this.buildMobileConsumableBar();
   }
@@ -9518,6 +9590,10 @@ export class Hud {
     if (this.spellbookWindow.isOpen) this.spellbookWindow.tickOpen();
     if (!this.isMobileLayout())
       this.actionBarPainter.paint(this.actionBarView.tick(actionBarWorld));
+    // Painted whatever the desktop bar did: the cross hotbar owns its OWN ticked
+    // state, so it is not a re-presentation of the row above and does not follow
+    // that row's mobile gate.
+    this.crossHotbar?.paint(actionBarWorld);
 
     // mobile action ring: the paged touch cluster replacing the bar above
     // (view/painter stay undefined if the ring DOM never got built, e.g. an
@@ -17095,6 +17171,7 @@ export class Hud {
     this.charPreview.setSkin(opts.skin);
     this.charPreview.setWeaponSkin(opts.weaponSkinId);
     this.charPreview.setFraming(opts.framing);
+    armPreviewOpen(this.charPreview, container, { cls: opts.cls, skin: opts.skin }, this.renderer);
   }
 
   /** Char-sheet / skin-picker mount: the SELF character with both currently
@@ -17757,6 +17834,11 @@ export class Hud {
   // The spellbook window lives in SpellbookWindow (spellbook_view.ts core +
   // spellbook_window.ts painter), which renders the class kit + bar toggles and
   // refreshes the +/- controls from hud.update() while open.
+  /** Open the spellbook; unlike the toggle, calling it twice does not close it. */
+  openSpellbook(): void {
+    if (!this.spellbookWindow.isOpen) this.toggleSpellbook();
+  }
+
   toggleSpellbook(): void {
     this.spellbookWindow.toggle();
   }
@@ -19126,6 +19208,32 @@ export class Hud {
    *  dropped normalized position to the options window's open performance panel. */
   onPerfOverlayMoved(x: number, y: number): void {
     this.optionsWindow.onPerfOverlayMoved(x, y);
+  }
+
+  /** What an untouched cross hotbar is filled from: this character's action bar,
+   *  plus stance-style abilities, known but unbound and so unreachable on a pad. */
+  crossHotbarSeed(): { bar: CrossHotbarOverlayAction[]; extras: string[] } {
+    return {
+      bar: this.hotbarActions.map((a) => (a ? { type: a.type, id: a.id } : null)),
+      // Attack leads: it is on no hotbar slot to copy (the desktop bar draws it as
+      // a fixed button), so a pad player would otherwise have no auto-attack at all.
+      extras: [
+        CROSS_HOTBAR_ATTACK_ID,
+        ...this.sim.known
+          .filter((k) => isStanceBarAbilityGroup(k.def.exclusiveGroup))
+          .map((k) => k.def.id),
+      ],
+    };
+  }
+
+  /** The bar's own arrange surface, whole rather than proxied method by method. */
+  crossHotbarEdit(): CrossHotbarController | null {
+    return this.crossHotbar ?? null;
+  }
+
+  /** Open or close the controller cross hotbar (the pad's held-trigger bar). */
+  setCrossHotbar(hold: CrossHotbarHold | null): void {
+    this.crossHotbar?.setHold(hold);
   }
 
   /** Called by main.ts when a pad connects/disconnects: re-label the Controller

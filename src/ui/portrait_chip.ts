@@ -32,6 +32,10 @@ import { iconDataUrl } from './icons';
 // layer (char_window's paperdoll boundary test) get it without their own
 // render import.
 export { modularLookFor } from '../render/characters';
+// The composed-capture signal rides the same crossing: a composed chip is a
+// full HTML rebuild rather than a src swap (hydratePortraits skips it below),
+// so its builder listens for the capture landing and re-renders itself.
+export { isComposedPortraitKey, onPortraitUpdate } from '../render/characters/portrait';
 
 export type PortraitVariant = 'sm' | 'md' | 'lg';
 
@@ -65,8 +69,10 @@ export interface PortraitChipOpts {
 }
 
 /** Class crest data URL — the placeholder before the 3D portrait is ready and
- *  the small class badge overlaid on the portrait. */
-function crestUrl(cls: PlayerClass): string {
+ *  the small class badge overlaid on the portrait. Exported for the
+ *  paperdoll cold-open stand-in (preview_stand_in.ts), which climbs the same
+ *  ladder while the preview's programs link. */
+export function crestUrl(cls: PlayerClass): string {
   return iconDataUrl('crest', `class_${cls}`, 96);
 }
 
@@ -99,6 +105,12 @@ export function portraitChipHtml(opts: PortraitChipOpts): string {
   const source = src ? ` src="${src}"` : '';
   const crestId = `class_${cls}`;
   const fallbackAttrs = crestImageFallbackAttributes(crestId, 96);
+  // A deferSource chip deliberately carries NO crest fallback: it ships with no
+  // src at all, and hydrateCrestImageFallbacks fires its error path immediately
+  // for a src-less image (complete, naturalWidth 0), painting a procedural crest
+  // data URL into every chip. That per-chip cost is exactly what deferSource
+  // exists to avoid in dense grids; those chips upgrade through
+  // hydratePortraits instead.
   const portraitFallbackAttrs = !portrait && !deferSource ? ` ${fallbackAttrs}` : '';
   const pending = portrait && !deferSource ? '' : ' data-portrait-pending="1"';
   const fallbackCls = portrait && !deferSource ? '' : ' is-fallback';
@@ -158,5 +170,11 @@ export function hydratePortraits(
 onPortraitsReady(() => hydratePortraits(document));
 onPortraitUpdate((visualKey, skin) => {
   if (!visualKey.startsWith('player_')) return;
+  // A mech chip carries the WEARER's class in data-cls and the chroma in
+  // data-skin, so no class filter can name it: rehydrate the whole page.
+  if (visualKey === 'player_mech') {
+    hydratePortraits(document);
+    return;
+  }
   hydratePortraits(document, visualKey.slice('player_'.length) as PlayerClass, skin);
 });

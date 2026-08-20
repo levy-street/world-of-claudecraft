@@ -157,10 +157,15 @@ export function installGpuHitchProbe(options = {}) {
     let node = object ?? null;
     let topChild = node;
     let depth = 0;
+    // The ancestor chain's names (safe tokens only, innermost first), so a
+    // first-draw row names the subtree that drew (a band, a far bake, a
+    // hideable structure) and not only the scene root's index.
+    const ancestors = [];
     while (node?.parent && depth < 64) {
       topChild = node;
       node = node.parent;
       depth++;
+      if (ancestors.length < 8) ancestors.push(safeToken(node.name));
     }
     const rootChildren = Array.isArray(node?.children) ? node.children : null;
     const rootIndex = rootChildren ? rootChildren.indexOf(topChild) : -1;
@@ -180,6 +185,9 @@ export function installGpuHitchProbe(options = {}) {
       rootIndex,
       rootCount: rootChildren ? rootChildren.length : 0,
       depth,
+      objectName: safeToken(object?.name),
+      ancestors,
+      instanceCount: typeof object?.count === 'number' ? object.count : null,
     };
   };
 

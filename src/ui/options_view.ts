@@ -613,6 +613,8 @@ export function buildAudioControls(s: OptionsSettingsSource): OptionsControl[] {
 export function buildControllerControls(s: OptionsSettingsSource): OptionsControl[] {
   return [
     boolToggle(s, 'gamepadEnabled', 'hudChrome.controller.enable'),
+    boolToggle(s, 'gamepadCrossHotbar', 'hudChrome.controller.crossHotbarEnable'),
+    boolToggle(s, 'gamepadCrossHotbarExpand', 'hudChrome.controller.crossHotbarExpand'),
     boolToggle(s, 'gamepadInvertY', 'hudChrome.controller.invertY'),
     slider(s, 'gamepadStickDeadzone', 'hudChrome.controller.deadzone'),
     slider(s, 'gamepadCameraSpeed', 'hudChrome.controller.cameraSpeed', 'oneDecimal'),

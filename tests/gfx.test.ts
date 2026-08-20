@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { DEVICE_MEMORY_GB_KEY, ENTRY_TIGHT_MODE_KEY } from '../src/device_memory_hint';
@@ -19,8 +20,10 @@ import {
   isWeakIntegratedGpu,
   resolveDefaultGraphicsPreset,
   shouldUseAutoGovernor,
+  surfaceMat,
   tierFromHints,
 } from '../src/render/gfx';
+import { tsFilesUnder } from './helpers/ts_files_under';
 
 const desktop: GfxRuntimeHints = {
   search: '',
@@ -1287,6 +1290,56 @@ describe('animated far character band: per-tier ceiling', () => {
     for (const tier of ['medium', 'high', 'ultra'] as const) {
       expect(gfxInternalsForTest.settingsFor(tier, nativeIos).farCharacterAnimScale).toBe(1);
       expect(gfxInternalsForTest.settingsFor(tier, constrained).farCharacterAnimScale).toBe(1);
+    }
+  });
+});
+
+describe('surfaceMat dedupe key', () => {
+  it('splits two option sets that differ only in metalnessMap', () => {
+    // The key folded map / normalMap / roughnessMap / aoMap but not
+    // metalnessMap, so a caller that wanted the metallic arm got the SAME
+    // cached material as one that did not, and wrote the slot on afterwards.
+    // Slot presence is a program-cache-key input, so that write relinked every
+    // material already drawing with the shared entry, live.
+    const response = new THREE.Texture();
+    const base = { color: 0x808080, roughnessMap: response };
+    const plain = surfaceMat(base);
+    expect(surfaceMat({ ...base })).toBe(plain);
+
+    const metallic = surfaceMat({ ...base, metalnessMap: response });
+
+    expect(metallic).not.toBe(plain);
+    if (metallic instanceof THREE.MeshStandardMaterial) {
+      expect(metallic.metalnessMap).toBe(response);
+      expect((plain as THREE.MeshStandardMaterial).metalnessMap).toBeNull();
+    }
+  });
+
+  it('splits two option sets whose metalnessMap is a DIFFERENT texture', () => {
+    const base = { color: 0x707070, roughnessMap: new THREE.Texture() };
+    const first = surfaceMat({ ...base, metalnessMap: new THREE.Texture() });
+    const second = surfaceMat({ ...base, metalnessMap: new THREE.Texture() });
+
+    // The uuid is what the key folds, so two metallic callers with their own
+    // texture must not share the entry either.
+    expect(second).not.toBe(first);
+    if (first instanceof THREE.MeshStandardMaterial && second instanceof THREE.MeshStandardMaterial)
+      expect(second.metalnessMap).not.toBe(first.metalnessMap);
+  });
+
+  it('leaves no surfaceMat consumer writing the slot onto a shared material', () => {
+    // Every caller in the tree, not the two that once did it: the write is
+    // legal on a material a caller owns and a live relink on a shared one, and
+    // nothing tells the two apart at the call site.
+    const callers = tsFilesUnder(fileURLToPath(new URL('../src/render/', import.meta.url)))
+      .map(({ file, full }) => ({ file, source: readFileSync(full, 'utf8') }))
+      .filter(({ source }) => source.includes('surfaceMat('));
+
+    expect(callers.length).toBeGreaterThanOrEqual(24);
+    for (const { file, source } of callers) {
+      expect(source, `${file} writes metalnessMap after surfaceMat`).not.toMatch(
+        /\.metalnessMap = /,
+      );
     }
   });
 });

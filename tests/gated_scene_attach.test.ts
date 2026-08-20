@@ -1,6 +1,20 @@
 import * as THREE from 'three';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { attachSceneGroupGated, GATED_ATTACH_WATCHDOG_MS } from '../src/render/gated_scene_attach';
+import {
+  gpuPrepEventsSnapshot,
+  resetGpuPrepEventsForTest,
+  setGpuPrepClockForTest,
+} from '../src/render/gpu_prep_events';
+
+beforeEach(() => {
+  resetGpuPrepEventsForTest();
+});
+
+afterEach(() => {
+  setGpuPrepClockForTest(null);
+  resetGpuPrepEventsForTest();
+});
 
 const fakeScene = () => {
   const added: THREE.Object3D[] = [];
@@ -60,6 +74,41 @@ describe('attachSceneGroupGated', () => {
       warn.mockRestore();
       vi.useRealTimers();
     }
+  });
+
+  it('records the watchdog reveal as a machine-readable gpu-prep event', async () => {
+    // The console line the case above pins is the only evidence a stuck town
+    // used to leave. A capture needs the same fact as data: which group, and
+    // how long it sat hidden before the escape fired.
+    vi.useFakeTimers();
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    let clock = 0;
+    setGpuPrepClockForTest(() => clock);
+    try {
+      const scene = fakeScene();
+      const group = new THREE.Group();
+      group.name = 'stuck-town';
+      void attachSceneGroupGated(scene, group, () => new Promise(() => {}));
+      clock = GATED_ATTACH_WATCHDOG_MS;
+      vi.advanceTimersByTime(GATED_ATTACH_WATCHDOG_MS);
+
+      const snapshot = gpuPrepEventsSnapshot();
+      expect(snapshot.counts['attach-watchdog']).toBe(1);
+      expect(snapshot.events).toHaveLength(1);
+      expect(snapshot.events[0].kind).toBe('attach-watchdog');
+      expect(snapshot.events[0].key).toBe('stuck-town');
+      expect(snapshot.events[0].ageMs).toBe(GATED_ATTACH_WATCHDOG_MS);
+    } finally {
+      warn.mockRestore();
+      vi.useRealTimers();
+    }
+  });
+
+  it('records nothing when the gate settles inside its watchdog window', async () => {
+    const scene = fakeScene();
+    const group = new THREE.Group();
+    await attachSceneGroupGated(scene, group, () => Promise.resolve());
+    expect(gpuPrepEventsSnapshot().total).toBe(0);
   });
 
   it('never fires the watchdog once the gate has settled', async () => {
