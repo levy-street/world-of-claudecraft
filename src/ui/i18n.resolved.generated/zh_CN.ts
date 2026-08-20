@@ -9087,6 +9087,7 @@ export const zh_CN: EnTranslations = {
       "useManaPotion": "使用：立即恢复 {amount} 点法力值。战斗中可用。1 分钟冷却。",
       "clickUseInstant": "点击在战斗中立即使用",
       "clickUse": "点击使用",
+      "clickSetOut": "点击摆放",
       "clickBuyback": "点击回购",
       "bagSlots": "{slots} 格背包"
     },

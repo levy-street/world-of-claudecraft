@@ -9087,6 +9087,7 @@ export const ja_JP: EnTranslations = {
       "useManaPotion": "使用: 即座にマナを{amount}回復します。戦闘中に使用可能。クールダウン1分。",
       "clickUseInstant": "クリックして戦闘中に即使用",
       "clickUse": "クリックして使用",
+      "clickSetOut": "クリックして設置",
       "clickBuyback": "クリックして買い戻す",
       "bagSlots": "{slots}スロットのバッグ"
     },

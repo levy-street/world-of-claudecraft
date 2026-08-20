@@ -9087,6 +9087,7 @@ export const vi_VN: EnTranslations = {
       "useManaPotion": "Dùng: Hồi tức thời {amount} mana. Dùng được trong chiến đấu. Hồi chiêu 1 phút.",
       "clickUseInstant": "Nhấp để dùng tức thời trong chiến đấu",
       "clickUse": "Nhấp để sử dụng",
+      "clickSetOut": "Click to set out",
       "clickBuyback": "Nhấp để mua lại",
       "bagSlots": "Túi {slots} Ô"
     },

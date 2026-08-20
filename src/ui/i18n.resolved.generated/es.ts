@@ -9087,6 +9087,7 @@ export const es: EnTranslations = {
       "useManaPotion": "Uso: restaura al instante {amount} de maná. Se puede usar en combate. Reutilización de 1 min.",
       "clickUseInstant": "Haz clic para usar al instante en combate",
       "clickUse": "Haz clic para usar",
+      "clickSetOut": "Click to set out",
       "clickBuyback": "Haz clic para recomprar",
       "bagSlots": "Bolsa de {slots} espacios"
     },

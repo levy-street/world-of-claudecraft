@@ -9087,6 +9087,7 @@ export const id_ID: EnTranslations = {
       "useManaPotion": "Pakai: Memulihkan {amount} mana seketika. Bisa dipakai dalam pertempuran. Jeda 1 mnt.",
       "clickUseInstant": "Klik untuk memakai seketika dalam pertempuran",
       "clickUse": "Klik untuk memakai",
+      "clickSetOut": "Click to set out",
       "clickBuyback": "Klik untuk membeli kembali",
       "bagSlots": "Tas {slots} Slot"
     },

@@ -2632,6 +2632,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useFeastBuffAura': '每份：吃完 {seconds} 秒的一餐後獲得{aura}效果，持續 {minutes} 分鐘。',
   'itemUi.tooltip.clickUseInstant': '點擊在戰鬥中立即使用',
   'itemUi.tooltip.clickUse': '點擊使用',
+  'itemUi.tooltip.clickSetOut': '點擊擺放',
   'itemUi.tooltip.clickBuyback': '點擊買回',
   'itemUi.bags.title': '背包',
   'itemUi.bags.close': '關閉背包',

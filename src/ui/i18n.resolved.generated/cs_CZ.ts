@@ -9087,6 +9087,7 @@ export const cs_CZ: EnTranslations = {
       "useManaPotion": "Použití: Okamžitě obnoví {amount} many. Použitelné v boji. Doba obnovy 2 min.",
       "clickUseInstant": "Kliknutím okamžitě použiješ v boji",
       "clickUse": "Kliknutím použiješ",
+      "clickSetOut": "Click to set out",
       "clickBuyback": "Kliknutím odkoupíš zpět",
       "bagSlots": "Batoh s {slots} sloty"
     },

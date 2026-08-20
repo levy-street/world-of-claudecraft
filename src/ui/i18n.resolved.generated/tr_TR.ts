@@ -9087,6 +9087,7 @@ export const tr_TR: EnTranslations = {
       "useManaPotion": "Kullanım: Anında {amount} mana yeniler. Savaşta kullanılabilir. 1 dk bekleme süresi.",
       "clickUseInstant": "Savaşta anında kullanmak için tıkla",
       "clickUse": "Kullanmak için tıkla",
+      "clickSetOut": "Click to set out",
       "clickBuyback": "Geri satın almak için tıkla",
       "bagSlots": "{slots} Yuvalı Çanta"
     },

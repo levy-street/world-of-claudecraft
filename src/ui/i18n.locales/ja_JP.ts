@@ -2746,6 +2746,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '1人前につき、{seconds}秒の食事を終えると{aura}の効果を得て、{minutes}分間持続します。',
   'itemUi.tooltip.clickUseInstant': 'クリックして戦闘中に即使用',
   'itemUi.tooltip.clickUse': 'クリックして使用',
+  'itemUi.tooltip.clickSetOut': 'クリックして設置',
   'itemUi.tooltip.clickBuyback': 'クリックして買い戻す',
   'itemUi.bags.title': 'バッグ',
   'itemUi.bags.close': 'バッグを閉じる',

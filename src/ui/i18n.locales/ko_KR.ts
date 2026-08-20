@@ -2724,6 +2724,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '한 접시를 {seconds}초 동안 다 먹으면 {aura} 효과를 얻어 {minutes}분 동안 지속됩니다.',
   'itemUi.tooltip.clickUseInstant': '클릭하여 전투 중 즉시 사용',
   'itemUi.tooltip.clickUse': '클릭하여 사용',
+  'itemUi.tooltip.clickSetOut': '클릭하여 차리기',
   'itemUi.tooltip.clickBuyback': '클릭하여 되사기',
   'itemUi.bags.title': '가방',
   'itemUi.bags.close': '가방 닫기',

@@ -9087,6 +9087,7 @@ export const da_DK: EnTranslations = {
       "useManaPotion": "Brug: Genopretter øjeblikkeligt {amount} mana. Brugbar i kamp. 1 min afkøling.",
       "clickUseInstant": "Klik for at bruge øjeblikkeligt i kamp",
       "clickUse": "Klik for at bruge",
+      "clickSetOut": "Click to set out",
       "clickBuyback": "Klik for at købe tilbage",
       "bagSlots": "Taske med {slots} pladser"
     },

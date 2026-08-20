@@ -9087,6 +9087,7 @@ export const en_XA: EnTranslations = {
       "useManaPotion": "[Úšé: Íñšţáñţļý ŕéšţóŕéš {amount} ɱáñá. Úšáƀļé íñ çóɱƀáţ. 2 ɱíñ çóóļðóŵñ.]",
       "clickUseInstant": "[Çļíçķ ţó úšé íñšţáñţļý íñ çóɱƀáţ]",
       "clickUse": "[Çļíçķ ţó úšé]",
+      "clickSetOut": "[Çļíçķ ţó šéţ óúţ]",
       "clickBuyback": "[Çļíçķ ţó ƀúý ƀáçķ]",
       "bagSlots": "[{slots} Šļóţ Ɓáĝ]"
     },

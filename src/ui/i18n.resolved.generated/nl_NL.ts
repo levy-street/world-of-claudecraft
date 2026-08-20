@@ -9087,6 +9087,7 @@ export const nl_NL: EnTranslations = {
       "useManaPotion": "Gebruik: Herstelt direct {amount} mana. Bruikbaar in gevecht. 1 min afkoeltijd.",
       "clickUseInstant": "Klik om direct te gebruiken in gevecht",
       "clickUse": "Klik om te gebruiken",
+      "clickSetOut": "Click to set out",
       "clickBuyback": "Klik om terug te kopen",
       "bagSlots": "Tas met {slots} vakken"
     },

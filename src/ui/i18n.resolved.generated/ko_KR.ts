@@ -9087,6 +9087,7 @@ export const ko_KR: EnTranslations = {
       "useManaPotion": "사용: 즉시 마나를 {amount} 회복합니다. 전투 중 사용 가능. 재사용 대기시간 1분.",
       "clickUseInstant": "클릭하여 전투 중 즉시 사용",
       "clickUse": "클릭하여 사용",
+      "clickSetOut": "클릭하여 차리기",
       "clickBuyback": "클릭하여 되사기",
       "bagSlots": "{slots}칸 가방"
     },

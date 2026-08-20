@@ -9087,6 +9087,7 @@ export const fr_FR: EnTranslations = {
       "useManaPotion": "Utiliser : rend instantanément {amount} mana. Utilisable en combat. Recharge de 1 min.",
       "clickUseInstant": "Cliquer pour utiliser instantanément en combat",
       "clickUse": "Cliquer pour utiliser",
+      "clickSetOut": "Click to set out",
       "clickBuyback": "Cliquer pour racheter",
       "bagSlots": "Sac de {slots} emplacements"
     },

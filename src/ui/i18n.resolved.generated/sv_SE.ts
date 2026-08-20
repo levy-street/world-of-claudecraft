@@ -9087,6 +9087,7 @@ export const sv_SE: EnTranslations = {
       "useManaPotion": "Använd: Återställer omedelbart {amount} mana. Användbar i strid. 1 min nedkylning.",
       "clickUseInstant": "Klicka för att använda omedelbart i strid",
       "clickUse": "Klicka för att använda",
+      "clickSetOut": "Click to set out",
       "clickBuyback": "Klicka för att köpa tillbaka",
       "bagSlots": "Väska med {slots} platser"
     },
