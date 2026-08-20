@@ -753,9 +753,11 @@ export function useItem(
   // converge on the ONE action body (professions/feast.ts owns every gate
   // and the lock-aware spend; nothing here consumes a unit). Without it a
   // use_item frame naming the feast would be exactly the silent no-op the
-  // raw-catch arm below exists to refuse.
+  // raw-catch arm below exists to refuse. The validated slotIndex threads
+  // through (the consumeOneUnit rule above: the family has no id-only holes
+  // left for a new command to copy), so the CLICKED copy is the one spent.
   if (def.feast) {
-    placeFeastAction(ctx, p, meta);
+    placeFeastAction(ctx, p, meta, slotIndex);
     return;
   }
   // Raw fishing catches are cooking reagents only (kind junk, no foodHp).

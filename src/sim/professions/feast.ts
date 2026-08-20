@@ -41,7 +41,8 @@ import { ITEMS } from '../data';
 import { delveRunForPlayer } from '../delves/runs';
 import { createGroundObject } from '../entity';
 import { instanceAt } from '../instances/dungeons';
-import { countUnlockedInSlots, removeUnlockedFromSlots } from '../item_lock';
+import { consumeSelectedInventorySlot, selectedInventorySlot } from '../item_copy_ref';
+import { countUnlockedInSlots, isItemLocked, removeUnlockedFromSlots } from '../item_lock';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
@@ -85,8 +86,19 @@ export function feastOwnerKey(meta: PlayerMeta): number {
  *  from bags. Gate order mirrors plantCrop: the family's shared ctx.error
  *  sentences for dead/busy (deviation (bq): no new wire enum arm for a
  *  state every command family refuses the same way), then text-free
- *  id-carrying farmDenied reasons for everything feast-specific. */
-export function placeFeastAction(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
+ *  id-carrying farmDenied reasons for everything feast-specific.
+ *
+ *  `slotIndex` is the per-copy selection (item_copy_ref.ts): a use_item
+ *  press NAMES the bag slot it came from and that copy is honored exactly,
+ *  the consumeOneUnit thread every sibling use arm runs. Absent (the
+ *  dedicated place_feast command carries no slot), the id-only lock-aware
+ *  walk below stays byte-for-byte what it was. */
+export function placeFeastAction(
+  ctx: SimContext,
+  p: Entity,
+  meta: PlayerMeta,
+  slotIndex?: number,
+): void {
   if (p.dead) {
     ctx.error(meta.entityId, "You can't do that while dead.");
     return;
@@ -115,22 +127,43 @@ export function placeFeastAction(ctx: SimContext, p: Entity, meta: PlayerMeta): 
   const def = ITEMS[FARM_FEAST_ITEM_ID];
   const info = def?.feast;
   if (!info) return; // content invariant; pinned in the suite
-  // Lock-aware spend split (deviation (ao), the crafting.ts idiom): a raw
-  // count the owner locked is invisible to the sufficiency gate, and when
-  // only a lock caused the shortfall the toast says so.
-  if (countUnlockedInSlots(meta.inventory, FARM_FEAST_ITEM_ID) < 1) {
+  // The named-copy resolve (tri-state, item_copy_ref.ts): a slot holds the
+  // selection, `null` is an invalid selection (refuse: the family's not-held
+  // answer), `undefined` means no selection was given (the id-only path).
+  // useItem already validated the selection before routing here; the
+  // re-resolve is this arm's OWN refusal so a direct caller can never fall
+  // through to a silent guess.
+  const selected = selectedInventorySlot(meta.inventory, FARM_FEAST_ITEM_ID, slotIndex);
+  if (selected === null) {
+    ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'no_feast' });
+    return;
+  }
+  if (selected) {
+    // A NAMED locked copy denies as locked even when an unlocked spare
+    // exists: spending a different copy than the one the player clicked is
+    // exactly the id-only guess per-copy addressing exists to remove.
+    if (isItemLocked(selected.instance)) {
+      ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'locked' });
+      return;
+    }
+  } else if (countUnlockedInSlots(meta.inventory, FARM_FEAST_ITEM_ID) < 1) {
+    // Lock-aware spend split (deviation (ao), the crafting.ts idiom): a raw
+    // count the owner locked is invisible to the sufficiency gate, and when
+    // only a lock caused the shortfall the toast says so.
     const reason = ctx.countItem(FARM_FEAST_ITEM_ID, meta.entityId) >= 1 ? 'locked' : 'no_feast';
     ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason });
     return;
   }
-  // Lock-aware SPEND to match the lock-aware gate above: ctx.removeItem is
-  // the inventory hub's lock-blind walk (highest bag index first, any slot a
-  // victim), so a locked end-slot copy would be spent first while the gate
-  // had counted only the unlocked one. Same walk the seed spend uses
-  // (plantCrop): locked slots are never victims. removeUnlockedFromSlots
-  // mutates the slot array only, so the quest hook fires once here
-  // (place_feast stays a HEAVY_SELF_CMDS member for the self snapshot).
-  removeUnlockedFromSlots(meta.inventory, FARM_FEAST_ITEM_ID, 1);
+  // The SPEND. Named copy: exactly the validated slot (its unlocked state
+  // was just proven above). Id-only: the lock-aware walk, NOT ctx.removeItem
+  // (the inventory hub's lock-blind walk takes the highest bag index first,
+  // any slot a victim, so a locked end-slot copy would be spent while the
+  // gate had counted only the unlocked one; same walk the seed spend uses in
+  // plantCrop, locked slots are never victims). Both mutate the slot array
+  // only, so the quest hook fires once here (place_feast stays a
+  // HEAVY_SELF_CMDS member for the self snapshot).
+  if (selected) consumeSelectedInventorySlot(meta.inventory, FARM_FEAST_ITEM_ID, slotIndex);
+  else removeUnlockedFromSlots(meta.inventory, FARM_FEAST_ITEM_ID, 1);
   ctx.onInventoryChangedForQuests?.(meta);
   // The entity, the battleground-flag shape: a ground object with a custom
   // templateId, no pickup item, not lootable. `name` carries the PLACER'S
