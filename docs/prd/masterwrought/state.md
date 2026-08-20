@@ -5016,3 +5016,115 @@ recorded, or refuted with the file open)
   renderer bundle drift class; everything else byte-identical to the
   committed acceptance). gate_select at this tip stays owed to this
   session's fan-out, per the second-pass sync record.
+
+## Phase 11 QA ledger (2026-08-20, verdict PASS-WITH-FOLLOWUPS; tip 2544d3e16a)
+- FAN-OUT: one eleven-agent ultracode workflow (draw-order adversarial,
+  reachability, market, cleanup, plus architecture / cross-platform /
+  frontend-seam / content-obligations / test-coverage reviewers dispatched
+  as general-purpose agents with inlined charters per the recorded
+  harness lesson; a mutation-probe lane in the isolated wocc-mw11-probe
+  worktree re-detached to the QA tip; a completeness critic over every
+  report). ZERO blocking findings anywhere. Six should-fix, nine nits,
+  and a body of notes; ALL applied or recorded, nothing filtered.
+  privacy-security-review SKIPPED with rationale: zero server/ files in
+  d149382bc4..b0d77be779 (verified empty diff), no new commands, no SQL,
+  no auth surface; the critic judged the skip SOUND with substitute
+  evidence (the shared-sim wire-input surface, sanitizeMarketQuery over
+  untrusted itemType, and the vendor-buy authority ordering were examined
+  by the cross-platform and cleanup lanes).
+- FINDINGS ROUND (each commit reviewed fresh, new pins probed isolated):
+  2aef4a97f4 scopes the Preferred Customer deed desc to the gear stock
+  with ALL 18 deed_i18n locale descs refreshed in-change (no pending debt
+  minted); 027fba8446 adds the phase-11 art README accepted sha256 record
+  the CREDITS row claimed; 8eb65fa33f trues the deploy-window horizons
+  (the recorded carry: both sim_i18n alias rows now name the branch
+  release, rows LIVE), the dungeons append-contract heroic-claim
+  qualifier, and the heroic_vendor item-level phrasing; 3e5ffda3e1 puts
+  the pattern no-pages supersession pointer at the stale ledger sentence
+  and records the recipe-pattern exclusion in docs/design/reliquary.md
+  beside its rift-gear precedent; 15ee96018f hardens the pins (five new
+  no-fourth-channel sweeps: fishing, letters, ground objects, delve cache
+  draws, rift personal loot; exact deterministic rift-rate counts
+  401/400/405 closing the call-site-literal window the band left; the
+  drop-recipe skill-cap guard; the end-to-end extractEssence pattern
+  refusal; market wire-sanitize, list-drive, corner-resolver, and
+  label-distinctness pins; the VACUOUS header and spellsteal seat trued);
+  3b52e51cd1 closes the fresh review round (craft-result and starter-kit
+  sweeps, da/sv/id locale prepositions, comment reflow).
+- REVIEW CHAIN: fix-round reviewer FRESH (zero blocking; one should-fix
+  and five nits, all applied in 3b52e51cd1; all 28 art hashes verified
+  byte for byte; all 18 locale renderings judged competent); round-2
+  verifier reported NOTHING FALSE and probed both new sweeps red (R1
+  craft-result, R2 starter kit). Probe record this QA: fan-out 12/12
+  caught (tail pin, raid chance, vendor price, vendor grant count,
+  channel exactness, prose+behavior draw-6 pair, sundering clause, market
+  arm deletion, tradability by absence, wiki generator freshness,
+  statistical band, plus fixture-self-supply audit), fix round 9/9 caught
+  (exact-count window, skill cap, fishing plant, delve-cache plant, label
+  fall-through, sundering predicate AND drive proven independently, rift
+  list unsort, flask stamp removal with seven failing titles across four
+  suites). Zero survivors across the whole phase.
+- SYNC-DEBT CLOSED AT THE TIP (2544d3e16a), surfaced by the owed gate
+  exactly as designed: the inscription tome source fingerprint includes
+  pnpm-lock.yaml and the second sync's three patch-hash bumps moved it
+  without a re-stamp (size-preserving remint moved EXACTLY the three tome
+  GLBs, every other fingerprinted family current, so
+  remint_polish_provenance was not owed; test literals and media manifest
+  follow); the shard-weight union carried 49 branch rows without
+  advancing __provenance.files (now the merged 2879 with the arithmetic
+  in the localMerge note; the ci_shard_partition pin is the guard and is
+  green, the change records truth and fails toward accuracy).
+- DECISIONS taken this QA: (1) the C/B/S rift-arm golden residual is
+  RECORD-AND-ACCEPT, with the feasibility record preserved so the
+  maintainer can overturn cheaply: closing it is a PLAIN ADDITION (a rank
+  parameter on the riftClearRewards factory, three SCENARIOS appends at
+  baseLevel 20/22/28, one coverage arm and an UPDATE_PARITY mint each,
+  roughly half a day; seed hunting only for the B/S in-window picks,
+  about 1 in 12 seeds), NOT a restructuring, so the stopping rule did not
+  fire; what goldens would add over the 5000-seed behavior arms is
+  stream-position coverage of rank-local insertions. The NEWLY
+  characterized sibling residual joins the same entry: heroic-claim
+  Nythraxis kills roll their HEROIC_BOSS_LOOT draws one position later
+  behind the appended base group (benign, distribution-identical,
+  inherent to any base-table append, the maul precedent had it too, and
+  no golden covers the heroic Nythraxis path); the dungeons.ts comment
+  now says so. (2) The flask tooltip wording stays: dispelled, stolen,
+  and canceled by hand are player-counter verbs, classic-idiom consumable
+  tooltips do not enumerate mob-affix interactions, so the pinned
+  Spellgnaw devour exception stays out of the tooltip copy. (3) The
+  privacy-security skip rationale is restated with substitute evidence
+  (above).
+- AUDIT VERDICTS recorded, no action: the early skillReq obligation
+  DISSOLVED (patterns carry no skillReq field; the learn flow gates on
+  the recipes, all 28 on tier boundaries 100/125, both reachable; the
+  new skill-cap guard pins the zero-margin capstone boundary);
+  reachability semantics are archetype-major by settled design; the
+  ALL_RECIPES content-vs-data.ts duality is inert for the learn path;
+  market search matches English names and ids only (pre-existing,
+  catalog-wide); the committed mediawiki seed carries zero pattern pages
+  (the recorded stale-on-record deferral; kind wording landed at the
+  generator); marketItemTypeLabel had no exhaustiveness guard, closed by
+  the new distinctness sweep; sv_SE kvartersmastarens spelling is
+  pre-existing fill debt for the locale owner; the guide vendor-mirror
+  shared-expression note is filed at low weight (the four literal
+  per-arm exemplars and the probe-proven freshness arm carry it).
+- VALIDATION RECORD (close): suite list at 3b52e51cd1: 47 files passed,
+  1 design-skip, 1400 tests green. Full suite at 2544d3e16a: 2972 files,
+  41270 passed, 2 expected fail, 115 skipped, ZERO failures.
+  gate_select PASS all 12 steps at 2544d3e16a (GATE_MAX_WORKERS=5,
+  committed tree, no pipe, exit 0; the vitest step ran the full-suite
+  fallback, so the tip carries TWO full-suite proofs, plus browser 131,
+  tsc, and all builds inside the gate). Portrait seal fresh at
+  pre-flight (tolerated bundle-only drift). Tree clean at every commit.
+- RULINGS WANTED (maintainer, non-blocking): (a) OPTIONAL overturn of
+  the residual acceptance: three rank scenarios plus optionally a
+  heroic-claim golden, roughly half a day, feasibility recorded above;
+  (b) the standing flask owner-cancel classic deviation remains posted
+  for review with phase 14's wire marker (unchanged from the build).
+- PHASE 12 CARRIES: unchanged from the Phase 11 BUILT ledger (the
+  rolled.quality successor ruling, promotion re-validation, the
+  heroic-raid sunderable flip premise, the reliquary pin trio, the
+  masterwork head-start wiring with the suppressed-proc credit decision,
+  movement:true on the re-mint arm, the Infusion slot/stat, the
+  masterwork guide prose apex clause). This QA adds NOTHING new owed to
+  phase 12.

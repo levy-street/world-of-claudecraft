@@ -544,3 +544,19 @@ never future-PR items, per the delivery contract in `state.md`).
   after a fresh fetch), portrait seal fresh, tree clean at e78c7dda90; the
   QA fan-out proceeds in this session. Full record: state.md "Phase 11 QA
   pre-flight".
+- Phase 11 QA (2026-08-20): verdict PASS-WITH-FOLLOWUPS at tip
+  2544d3e16a. Eleven-agent ultracode fan-out (four audit lanes, five
+  inlined-charter reviewers, the isolated probe lane, a completeness
+  critic): ZERO blocking; six should-fix plus nine nits plus notes, ALL
+  applied across two reviewed fix rounds (deed desc scoped to the gear
+  stock with all 18 locale refreshes, art hash record, comment and
+  horizon truth, supersession pointers, and a test-hardening wave: seven
+  new no-fourth-channel sweeps, exact rift-rate counts, the skill-cap
+  guard, end-to-end sundering refusal, market sanitize/list/corner/label
+  pins). Probe record 21/21 caught plus the round-2 pair, zero survivors.
+  The owed gate surfaced two sync-debt reds (tome lockfile fingerprint,
+  shard-weight provenance count), both closed. C/B/S golden residual
+  decided record-and-accept with the heroic-claim sibling folded in and
+  the overturn feasibility recorded. Full suite 41270 green zero
+  failures; gate_select PASS all 12 steps at the tip. Full record:
+  state.md "Phase 11 QA ledger".
