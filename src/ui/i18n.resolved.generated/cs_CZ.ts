@@ -3080,6 +3080,7 @@ export const cs_CZ: EnTranslations = {
         "rodBand": "Od rybářské dovednosti {skill} výše odemyká bohatší úlovky."
       },
       "downgradeMark": "Plné brašny: nález byl uložen bez značky sběrače.",
+      "downgradeMarkCrop": "Bags full: the harvest was stored without its grower's mark.",
       "downgradeFind": "Plné brašny: vzácný nález ti proklouzl.",
       "emptyHookNote": "Na háčku nic není",
       "stateReady": "Připraveno",

@@ -3080,6 +3080,7 @@ export const en: EnTranslations = {
         "rodBand": "Unlocks richer catch tables at fishing skill {skill} and above."
       },
       "downgradeMark": "Bags full: the find was stored without its gatherer's mark.",
+      "downgradeMarkCrop": "Bags full: the harvest was stored without its grower's mark.",
       "downgradeFind": "Bags full: a pristine find slipped away.",
       "emptyHookNote": "Nothing on the hook",
       "stateReady": "Ready",

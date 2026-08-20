@@ -3080,6 +3080,7 @@ export const sv_SE: EnTranslations = {
         "rodBand": "Låser upp rikare fångster vid fiskeskicklighet {skill} och uppåt."
       },
       "downgradeMark": "Väskorna fulla: fyndet förvarades utan samlarmärke.",
+      "downgradeMarkCrop": "Bags full: the harvest was stored without its grower's mark.",
       "downgradeFind": "Väskorna fulla: ett orört fynd gled undan.",
       "emptyHookNote": "Inget på kroken",
       "stateReady": "Redo",

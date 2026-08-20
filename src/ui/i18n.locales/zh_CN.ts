@@ -8447,6 +8447,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.rodReel': '收线时限延长{seconds}秒。',
   'hudChrome.gathering.toolTooltip.rodBand': '钓鱼技能达到{skill}后可解锁更丰富的渔获。',
   'hudChrome.gathering.downgradeMark': '背包已满：这份收获未能留下采集者的印记。',
+  'hudChrome.gathering.downgradeMarkCrop': '背包已满：这份收成未能留下种植者的印记。',
   'hudChrome.gathering.downgradeFind': '背包已满：一件完美的收获溜走了。',
   'hudChrome.gathering.emptyHookNote': '空钩',
   'hudChrome.gathering.stateReady': '可采集',

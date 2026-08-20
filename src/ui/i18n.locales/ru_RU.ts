@@ -9020,6 +9020,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.rodBand':
     'Открывает более богатый улов при навыке рыбалки от {skill}.',
   'hudChrome.gathering.downgradeMark': 'Сумки полны: добыча сохранена без метки сборщика.',
+  'hudChrome.gathering.downgradeMarkCrop': 'Сумки полны: урожай сохранен без метки садовода.',
   'hudChrome.gathering.downgradeFind': 'Сумки полны: превосходная находка ускользнула.',
   'hudChrome.gathering.emptyHookNote': 'Пустой крючок',
   'hudChrome.gathering.stateReady': 'Готово',

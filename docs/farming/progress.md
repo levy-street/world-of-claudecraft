@@ -3984,6 +3984,29 @@ farmer-shadow band, beds[2] is clear. Browser suites standalone: a11y 35
 green (including the busy tree and the announcing tree under axe),
 target-size 19 green.
 
+QA-CHECKLIST ROUND (2026-08-20, dispatched LAST per the packet): verdict
+READY, 0 BLOCKING, 3 SHOULD-FIX, all resolved:
+- Retired-keys inverse assertion TAKEN: the render sweep's own `seen` set now
+  proves no retired key is actually rendered (the static liveReferences scan
+  cannot see the computed families; the Phase 14 exclusion made a
+  retired-but-rendered key ship silent English, so the sweep gained the one
+  line that reds it).
+- The huskTradeAria 16-stale-locales claim DISSOLVED BY PROBE (the
+  one-probe-outranks-agreeing-agents rule): only the five non-Latin overlays
+  fill the pair; the other fifteen locales are PENDING, English-fill BOTH
+  keys with the NEW English, and stay on the release-fill worklist. The
+  containment property was still widened to EVERY supported locale through
+  the real sink (a future one-sided fill reds).
+- The crop downgrade toast's node vocabulary TAKEN: the crop surface now
+  carries its own mark line (hudChrome.gathering.downgradeMarkCrop, five M16
+  fills); gatherDowngradeLineKey resolves off lost PLUS surface (still the
+  ONE client dispatch), the hud case and its source pin follow, and the find
+  arm stays surface-blind (a crop can only lose the mark). This also closes
+  the reviewers' surface-never-read note: the field now has a client reader.
+Its two LOW notes were already ledgered (roving tabindex) or are now closed
+(the surface reader). Its N/A verdicts (content obligations, persistence,
+tier fairness) were verified against the file list, not assumed.
+
 NOTES FOR THE MAINTAINER (recorded, not decided): src/ui/CLAUDE.md's
 catalog-domain gotcha list omits merge.ts as an en-only domain (A3 landed
 there cleanly); the C12 stays-silent arms could return to the strong

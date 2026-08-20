@@ -3080,6 +3080,7 @@ export const id_ID: EnTranslations = {
         "rodBand": "Membuka hasil tangkapan yang lebih kaya pada keahlian memancing {skill} ke atas."
       },
       "downgradeMark": "Tas penuh: temuan disimpan tanpa tanda pengumpulnya.",
+      "downgradeMarkCrop": "Bags full: the harvest was stored without its grower's mark.",
       "downgradeFind": "Tas penuh: temuan murni terlewat.",
       "emptyHookNote": "Kail masih kosong",
       "stateReady": "Siap",

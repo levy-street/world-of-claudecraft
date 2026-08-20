@@ -3080,6 +3080,7 @@ export const ja_JP: EnTranslations = {
         "rodBand": "釣りスキル{skill}以上でより豊かな釣果が解放されます。"
       },
       "downgradeMark": "バッグが満杯です：収穫は採集者の印なしで収納されました。",
+      "downgradeMarkCrop": "バッグが満杯です：収穫物は栽培者の銘なしで収納されました。",
       "downgradeFind": "バッグが満杯です：極上の獲物を逃してしまいました。",
       "emptyHookNote": "針には何もなし",
       "stateReady": "採集可能",

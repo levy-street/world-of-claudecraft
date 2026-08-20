@@ -357,10 +357,19 @@ export function gatherToolNoNodeKey(professionId: GatheringProfessionId): Transl
 
 /** The i18n key the gatherDowngrade SimEvent's toast resolves (the
  *  sim is text-free): 'mark' means the yield arrived as a plain unsigned
- *  top-up, 'find' means a pure-extra specimen jackpot was dropped outright. */
-export function gatherDowngradeLineKey(lost: 'mark' | 'find'): TranslationKey {
-  return lost === 'find'
-    ? 'hudChrome.gathering.downgradeFind'
+ *  top-up, 'find' means a pure-extra specimen jackpot was dropped outright.
+ *  The 'crop' surface (Phase 14, the golden-harvest truncation) takes its
+ *  own mark line: the node line's "the find" is prospecting vocabulary and
+ *  reads wrong for a harvest you grew. A crop can only ever lose the mark
+ *  (nothing-rots lands the units always), so no crop find line exists; this
+ *  resolver stays the ONE surface dispatch on the client. */
+export function gatherDowngradeLineKey(
+  lost: 'mark' | 'find',
+  surface: 'node' | 'corpse' | 'crop',
+): TranslationKey {
+  if (lost === 'find') return 'hudChrome.gathering.downgradeFind';
+  return surface === 'crop'
+    ? 'hudChrome.gathering.downgradeMarkCrop'
     : 'hudChrome.gathering.downgradeMark';
 }
 

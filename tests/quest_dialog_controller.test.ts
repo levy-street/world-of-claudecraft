@@ -7,7 +7,7 @@ import type { Entity } from '../src/sim/types';
 import { craftNameText } from '../src/ui/char_window';
 import type { FocusTrapHandle } from '../src/ui/focus_manager';
 import { QuestDialogController } from '../src/ui/hud/quest/quest_dialog_controller';
-import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
+import { ensureLocaleLoaded, setLanguage, supportedLanguages, t } from '../src/ui/i18n';
 import type { IWorld } from '../src/world_api';
 
 function npc(id: number, templateId: string, x = 0): Entity {
@@ -667,20 +667,25 @@ describe('QuestDialogController', () => {
     expect(farmer.controller.isOpen).toBe(false);
   });
 
-  it('label-in-name holds in every non-Latin husk fill (WCAG 2.5.3 per locale)', async () => {
+  it('label-in-name holds in EVERY locale for the husk pair (WCAG 2.5.3)', async () => {
     // The Phase 14 a11y batch reworded the aria pair so the accessible name
-    // contains the visible label verbatim IN EVERY FILLED LOCALE, not just
-    // English (speech-input users say what they see in their language).
-    // Rendered through the real sink in the app's own order (await the
-    // locale, then switch): a clobbered or re-stale fill reds here.
-    for (const locale of ['ja_JP', 'ko_KR', 'ru_RU', 'zh_CN', 'zh_TW'] as const) {
+    // contains the visible label verbatim in every locale (speech-input
+    // users say what they see in their language). The property is asserted
+    // across the WHOLE supported set: the five filled non-Latin locales
+    // render their fills, the rest English-fall-back BOTH keys together, so
+    // containment must hold everywhere; a future one-sided fill (aria
+    // translated, visible pending, or vice versa) reds here. Rendered
+    // through the real sink in the app's own order (await, then switch).
+    const FILLED = new Set(['ja_JP', 'ko_KR', 'ru_RU', 'zh_CN', 'zh_TW']);
+    for (const locale of supportedLanguages) {
+      if (locale === 'en') continue;
       await ensureLocaleLoaded(locale);
       setLanguage(locale);
       const visible = t('hudChrome.farming.huskTrade');
       const aria = t('hudChrome.farming.huskTradeAria', { name: 'X' });
       expect(aria, locale).toContain(visible);
-      // Non-vacuity: the locale really is filled, not English-falling-back.
-      expect(visible, locale).not.toBe('Trade husks for compost');
+      // Non-vacuity where a real fill exists: not English-falling-back.
+      if (FILLED.has(locale)) expect(visible, locale).not.toBe('Trade husks for compost');
     }
     setLanguage('en');
   });

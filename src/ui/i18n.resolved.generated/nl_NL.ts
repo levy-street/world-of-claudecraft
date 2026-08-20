@@ -3080,6 +3080,7 @@ export const nl_NL: EnTranslations = {
         "rodBand": "Ontgrendelt een rijkere vangst vanaf visvaardigheid {skill}."
       },
       "downgradeMark": "Tassen vol: de vondst werd opgeslagen zonder verzamelderstempel.",
+      "downgradeMarkCrop": "Bags full: the harvest was stored without its grower's mark.",
       "downgradeFind": "Tassen vol: een ongeschonden vondst glipte weg.",
       "emptyHookNote": "Niets aan de haak",
       "stateReady": "Gereed",

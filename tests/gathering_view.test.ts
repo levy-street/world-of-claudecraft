@@ -603,9 +603,17 @@ describe('tool-tier lock dimension', () => {
     expect(gatherToolNoNodeKey('fishing')).toBe('hudChrome.gathering.noNodeNearby.mining');
   });
 
-  it('gatherDowngradeLineKey maps each lost arm to its exact key', () => {
-    expect(gatherDowngradeLineKey('mark')).toBe('hudChrome.gathering.downgradeMark');
-    expect(gatherDowngradeLineKey('find')).toBe('hudChrome.gathering.downgradeFind');
+  it('gatherDowngradeLineKey maps each lost+surface pair to its exact key', () => {
+    // The crop surface gets its own MARK line (Phase 14: "the find" is
+    // prospecting vocabulary and reads wrong for a harvest you grew); node
+    // and corpse keep the shared lines, and the find arm is surface-blind
+    // (a crop can only ever lose the mark, so no crop find line exists).
+    expect(gatherDowngradeLineKey('mark', 'node')).toBe('hudChrome.gathering.downgradeMark');
+    expect(gatherDowngradeLineKey('mark', 'corpse')).toBe('hudChrome.gathering.downgradeMark');
+    expect(gatherDowngradeLineKey('mark', 'crop')).toBe('hudChrome.gathering.downgradeMarkCrop');
+    expect(gatherDowngradeLineKey('find', 'node')).toBe('hudChrome.gathering.downgradeFind');
+    expect(gatherDowngradeLineKey('find', 'corpse')).toBe('hudChrome.gathering.downgradeFind');
+    expect(gatherDowngradeLineKey('find', 'crop')).toBe('hudChrome.gathering.downgradeFind');
   });
 
   // The farmDeniedLineKey block moved to tests/farming_view.test.ts with the

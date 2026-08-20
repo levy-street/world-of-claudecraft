@@ -3080,6 +3080,7 @@ export const de_DE: EnTranslations = {
         "rodBand": "Schaltet ab Angelfertigkeit {skill} reichhaltigere Fangtabellen frei."
       },
       "downgradeMark": "Taschen voll: der Fund wurde ohne Sammelzeichen gespeichert.",
+      "downgradeMarkCrop": "Bags full: the harvest was stored without its grower's mark.",
       "downgradeFind": "Taschen voll: ein makelloser Fund ist entkommen.",
       "emptyHookNote": "Nichts am Haken",
       "stateReady": "Bereit",

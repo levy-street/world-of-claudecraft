@@ -3080,6 +3080,7 @@ export const pt_BR: EnTranslations = {
         "rodBand": "Libera tabelas de captura mais ricas a partir de {skill} de proficiência em Pesca."
       },
       "downgradeMark": "Bolsas cheias: a descoberta foi armazenada sem a marca do coletor.",
+      "downgradeMarkCrop": "Bags full: the harvest was stored without its grower's mark.",
       "downgradeFind": "Bolsas cheias: uma descoberta imaculada escapou.",
       "emptyHookNote": "Nada no anzol",
       "stateReady": "Disponível",

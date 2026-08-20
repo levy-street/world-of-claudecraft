@@ -8822,6 +8822,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '낚시 기술 {skill} 이상에서 더 풍성한 어획 목록이 해금됩니다.',
   'hudChrome.gathering.downgradeMark':
     '가방이 가득 찼습니다: 수확물이 채집자의 표식 없이 보관되었습니다.',
+  'hudChrome.gathering.downgradeMarkCrop': '가방이 가득 찼습니다: 수확물이 재배자의 표식 없이 보관되었습니다.',
   'hudChrome.gathering.downgradeFind': '가방이 가득 찼습니다: 최상급 수확물을 놓쳐 버렸습니다.',
   'hudChrome.gathering.emptyHookNote': '빈 낚싯바늘',
   'hudChrome.gathering.stateReady': '채집 가능',

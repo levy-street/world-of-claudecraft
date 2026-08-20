@@ -3080,6 +3080,7 @@ export const fr_CA: EnTranslations = {
         "rodBand": "Débloque des tables de prises plus riches à partir de {skill} en compétence de pêche."
       },
       "downgradeMark": "Sacs pleins : la trouvaille a été rangée sans la marque du collecteur.",
+      "downgradeMarkCrop": "Bags full: the harvest was stored without its grower's mark.",
       "downgradeFind": "Sacs pleins : une trouvaille de qualité supérieure vous a échappé.",
       "emptyHookNote": "Rien sur l'hameçon",
       "stateReady": "Disponible",

@@ -3080,6 +3080,7 @@ export const vi_VN: EnTranslations = {
         "rodBand": "Mở khóa danh sách cá phong phú hơn khi kỹ năng câu cá đạt {skill} trở lên."
       },
       "downgradeMark": "Túi đầy: phát hiện được lưu mà không có dấu thợ thu thập.",
+      "downgradeMarkCrop": "Bags full: the harvest was stored without its grower's mark.",
       "downgradeFind": "Túi đầy: một phát hiện tuyệt vời đã trôi qua.",
       "emptyHookNote": "Không có gì dính câu",
       "stateReady": "Sẵn Sàng",

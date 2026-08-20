@@ -300,6 +300,18 @@ describe('Guide key coverage', () => {
     ).toEqual([]);
   });
 
+  it('has no retired key the render sweep actually RENDERED', () => {
+    // The inverse of the coverage sweep, made load-bearing by Phase 14: a
+    // retired key is now excluded from BOTH pending generators (registry
+    // blocked rows + runtime pending.ts), so a retired-but-rendered key
+    // would ship untranslated English in every unfilled locale with nothing
+    // red. The static liveReferences scan above cannot see COMPUTED keys
+    // (guide.abilityHook.<id> and friends, most of the retired list); the
+    // sweep's own `seen` set can, because it records what a surface REALLY
+    // rendered.
+    expect(RETIRED_KEYS.filter((k) => seen.has(k)).sort()).toEqual([]);
+  });
+
   it('has a live reference for every off-sweep key', () => {
     const dead = LIVE_OFF_SWEEP_KEYS.filter((k) => liveReferences(k, files).length === 0).sort();
     expect(

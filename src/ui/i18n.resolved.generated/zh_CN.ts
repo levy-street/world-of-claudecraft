@@ -3080,6 +3080,7 @@ export const zh_CN: EnTranslations = {
         "rodBand": "钓鱼技能达到{skill}后可解锁更丰富的渔获。"
       },
       "downgradeMark": "背包已满：这份收获未能留下采集者的印记。",
+      "downgradeMarkCrop": "背包已满：这份收成未能留下种植者的印记。",
       "downgradeFind": "背包已满：一件完美的收获溜走了。",
       "emptyHookNote": "空钩",
       "stateReady": "可采集",
