@@ -539,3 +539,8 @@ never future-PR items, per the delivery contract in `state.md`).
   "drop after v0.36.0" comment on the two live sim_i18n deploy-window
   alias rows. Full record: state.md "Phase 11 QA release sync, second
   pass".
+- Phase 11 QA pre-flight (2026-08-20, the fan-out session): release sync
+  verified a no-op (v0.40.0 tip 65b91fa190 already merged, zero incoming
+  after a fresh fetch), portrait seal fresh, tree clean at e78c7dda90; the
+  QA fan-out proceeds in this session. Full record: state.md "Phase 11 QA
+  pre-flight".

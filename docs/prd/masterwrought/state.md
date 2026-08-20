@@ -5001,3 +5001,15 @@ recorded, or refuted with the file open)
   masterwrought branch's own renames, which has not happened, so the fix
   is recutting the comment to name the branch's release, never dropping
   the rows (the critic's drop suggestion is REFUTED on this analysis).
+
+## Phase 11 QA pre-flight (2026-08-20, the fan-out session)
+- Release sync verified a NO-OP: after a fresh fetch the newest release
+  line is still origin/release/v0.40.0 at 65b91fa190, exactly the commit
+  merge fba8f47ee9 already brought in; zero incoming from v0.40.0 and
+  v0.39.0 both, so no merge and no release-merge-audit are owed. Branch
+  tip e78c7dda90, tree clean; the Phase 11 code tip b0d77be779 and docs
+  tip bbeff457a5 are both ancestors.
+- Portrait manifest --check fresh (the tolerated bookkeeping-only
+  renderer bundle drift class; everything else byte-identical to the
+  committed acceptance). gate_select at this tip stays owed to this
+  session's fan-out, per the second-pass sync record.
