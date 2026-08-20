@@ -3066,6 +3066,14 @@ a.guide-poi:hover {
 .guide-tools-table {
   min-width: 640px;
 }
+/* The dish effect sub-lines under a recipe name (C10): quiet reference
+   prose, one line per fact, so the effect never crowds the name cell. */
+.guide-prof-effect {
+  display: block;
+  font-size: 0.85em;
+  font-weight: 400;
+  color: var(--g-text-dim);
+}
 .guide-set-name {
   color: var(--g-text);
   font-weight: 600;

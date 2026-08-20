@@ -112,7 +112,7 @@ import {
   TIER5_TOOL_WIELD_PROFICIENCY,
   WIELD_REQUIREMENT_BY_TIER,
 } from '../src/sim/professions/wield_gate';
-import type { DeedDef } from '../src/sim/types';
+import { CONSUME_DURATION, type DeedDef } from '../src/sim/types';
 import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
 import { ensureLocaleLoaded, type SupportedLanguage, setLanguage, t } from '../src/ui/i18n';
 import { guideStrings } from '../src/ui/i18n.catalog/guide';
@@ -1685,6 +1685,10 @@ describe('Guide professions generated content accuracy', () => {
       'output',
       'combo',
       'gain',
+      // The consumable effect facts (C10): the foodHp restore and well-fed
+      // boon values the craft page's effect sub-lines compose. Shape-pinned
+      // in its own accuracy arm below.
+      'effect',
     ]);
     for (const c of GUIDE_PROF_CRAFTS) {
       for (const k of Object.keys(c)) {
@@ -1743,6 +1747,48 @@ describe('Guide professions generated content accuracy', () => {
         expect(tierProgressMultiplier(tierForSkill(row.gain.zeroAt), rTier)).toBe(0);
       }
     }
+  });
+
+  it('mirrors every consumable effect row against the live item def (C10)', () => {
+    // The dish effect prose is composed from these VALUES, so the accuracy
+    // guard binds them to the sim source both ways: every foodHp/wellfed
+    // output carries the row with the def's own numbers, and a row never
+    // appears on a non-consumable. Non-vacuity: the four buff dishes and at
+    // least a dozen foodHp dishes exist, counted below.
+    let foodRows = 0;
+    let wellfedRows = 0;
+    for (const c of GUIDE_PROF_CRAFTS) {
+      for (const row of c.recipes) {
+        const def = ALL_RECIPES.find((r) => r.id === row.id);
+        if (!def) continue;
+        const item = ITEMS[def.resultItemId];
+        if (item.foodHp) {
+          foodRows++;
+          expect(row.effect?.food, `${row.id} foodHp row missing`).toEqual({
+            amount: item.foodHp,
+            seconds: CONSUME_DURATION,
+          });
+        } else {
+          expect(row.effect?.food, `${row.id} phantom food effect`).toBeUndefined();
+        }
+        if (item.wellfed) {
+          wellfedRows++;
+          expect(row.effect?.wellfed, `${row.id} wellfed row missing`).toEqual({
+            aura: item.wellfed.aura,
+            kind: item.wellfed.kind,
+            value: item.wellfed.value,
+            minutes: item.wellfed.duration / 60,
+          });
+        } else {
+          expect(row.effect?.wellfed, `${row.id} phantom wellfed effect`).toBeUndefined();
+        }
+        if (!item.foodHp && !item.wellfed) {
+          expect(row.effect, `${row.id} effect on a non-consumable`).toBeUndefined();
+        }
+      }
+    }
+    expect(foodRows).toBeGreaterThanOrEqual(12);
+    expect(wellfedRows).toBe(4);
   });
 
   it('pins the spot literals a consistently-wrong regeneration would keep wrong', () => {

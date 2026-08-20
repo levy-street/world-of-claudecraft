@@ -103,6 +103,12 @@ const LIVE_OFF_SWEEP_KEYS: string[] = [
   'guide.profPages.toolCrafted',
   'guide.profPages.toolUnavailable',
 
+  // The dish effect line's unmapped-buff-kind fallback (the wellfed_tooltip_view
+  // rule: no dish ships a silent effect cell). Every shipped buff dish carries a
+  // kind WELLFED_STAT_KEYS maps, so current generated content never selects this
+  // arm (src/guide/pages/professions_craft.ts effectLines).
+  'guide.profPages.effectWellFedAura',
+
   // Resolved by the game HUD, not the guide SPA: src/ui/talent_i18n.ts renders a talent
   // tooltip's Thorns retaliation line through this key. The druid overhaul pushed 'thorns'
   // out of the class page's six signature slots, so the guide sweep no longer reaches it,

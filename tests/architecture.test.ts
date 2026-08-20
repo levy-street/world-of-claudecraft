@@ -1927,6 +1927,7 @@ const UI_DOM_MODULES = [
   'src/ui/vale_cup_hud.ts',
   'src/ui/wiki_link.ts',
   'src/ui/window_drag.ts',
+  'src/ui/window_open_state.ts',
   'src/ui/window_resize.ts',
 ].map((rel) => join(repoRoot, rel));
 

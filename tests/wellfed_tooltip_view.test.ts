@@ -165,7 +165,10 @@ describe('the wellfed and elixir stat maps stay in step', () => {
   }
 
   it('identical key sets, every key mapped in both views, off-map falls back in both', () => {
-    const wellfedKeys = readMapKeys('../src/ui/wellfed_tooltip_view.ts', 'WELLFED_STAT_KEYS');
+    // WELLFED_STAT_KEYS moved to its own pure leaf (Phase 14, C10: the wiki's
+    // effect prose consumes it too and the guide bundle may not reach this
+    // view's sim_i18n graph); the source read follows it there.
+    const wellfedKeys = readMapKeys('../src/ui/wellfed_stat_keys.ts', 'WELLFED_STAT_KEYS');
     const elixirKeys = readMapKeys('../src/ui/elixir_tooltip_view.ts', 'ELIXIR_STAT_KEYS');
     expect(wellfedKeys).toEqual(elixirKeys);
     expect(wellfedKeys.length).toBeGreaterThanOrEqual(5);

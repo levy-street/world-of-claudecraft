@@ -145,6 +145,13 @@ export interface GuideProfRecipe {
   combo: { crafts: string[]; minTier: number } | null;
   /** Mastery Curve boundaries: skill where gain drops to 0.5 / 0.25 / 0. */
   gain: { reducedAt: number; minimalAt: number; zeroAt: number };
+  /** Consumable effect facts from the live output def (absent for a
+   *  non-consumable): the craft page composes them through the
+   *  guide.profPages.effect* templates. */
+  effect?: {
+    food?: { amount: number; seconds: number };
+    wellfed?: { aura: string; kind: string; value: number; minutes: number };
+  };
 }
 
 export interface GuideProfMaster { name: string; title: string; hub: string; }
@@ -8360,6 +8367,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 25,
           "minimalAt": 50,
           "zeroAt": 75
+        },
+        "effect": {
+          "food": {
+            "amount": 61,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8390,6 +8403,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 25,
           "minimalAt": 50,
           "zeroAt": 75
+        },
+        "effect": {
+          "food": {
+            "amount": 90,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8420,6 +8439,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 25,
           "minimalAt": 50,
           "zeroAt": 75
+        },
+        "effect": {
+          "food": {
+            "amount": 117,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8454,6 +8479,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 25,
           "minimalAt": 50,
           "zeroAt": 75
+        },
+        "effect": {
+          "food": {
+            "amount": 117,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8488,6 +8519,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 50,
           "minimalAt": 75,
           "zeroAt": 100
+        },
+        "effect": {
+          "food": {
+            "amount": 243,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8522,6 +8559,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 50,
           "minimalAt": 75,
           "zeroAt": 100
+        },
+        "effect": {
+          "food": {
+            "amount": 243,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8556,6 +8599,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 50,
           "minimalAt": 75,
           "zeroAt": 100
+        },
+        "effect": {
+          "food": {
+            "amount": 432,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8594,6 +8643,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 75,
           "minimalAt": 100,
           "zeroAt": 125
+        },
+        "effect": {
+          "food": {
+            "amount": 552,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8632,6 +8687,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 75,
           "minimalAt": 100,
           "zeroAt": 125
+        },
+        "effect": {
+          "food": {
+            "amount": 552,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8670,6 +8731,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 75,
           "minimalAt": 100,
           "zeroAt": 125
+        },
+        "effect": {
+          "food": {
+            "amount": 980,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8700,6 +8767,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 25,
           "minimalAt": 50,
           "zeroAt": 75
+        },
+        "effect": {
+          "food": {
+            "amount": 90,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8734,6 +8807,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 25,
           "minimalAt": 50,
           "zeroAt": 75
+        },
+        "effect": {
+          "food": {
+            "amount": 117,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8764,6 +8843,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 50,
           "minimalAt": 75,
           "zeroAt": 100
+        },
+        "effect": {
+          "food": {
+            "amount": 243,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8794,6 +8879,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 50,
           "minimalAt": 75,
           "zeroAt": 100
+        },
+        "effect": {
+          "food": {
+            "amount": 432,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8824,6 +8915,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 75,
           "minimalAt": 100,
           "zeroAt": 125
+        },
+        "effect": {
+          "food": {
+            "amount": 552,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8858,6 +8955,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 75,
           "minimalAt": 100,
           "zeroAt": 125
+        },
+        "effect": {
+          "food": {
+            "amount": 552,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8892,6 +8995,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 75,
           "minimalAt": 100,
           "zeroAt": 125
+        },
+        "effect": {
+          "food": {
+            "amount": 980,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8926,6 +9035,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 75,
           "minimalAt": 100,
           "zeroAt": 125
+        },
+        "effect": {
+          "food": {
+            "amount": 980,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8960,6 +9075,18 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 25,
           "minimalAt": 50,
           "zeroAt": 75
+        },
+        "effect": {
+          "food": {
+            "amount": 90,
+            "seconds": 18
+          },
+          "wellfed": {
+            "aura": "Well Fed",
+            "kind": "buff_sta",
+            "value": 3,
+            "minutes": 10
+          }
         }
       },
       {
@@ -8990,6 +9117,18 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 50,
           "minimalAt": 75,
           "zeroAt": 100
+        },
+        "effect": {
+          "food": {
+            "amount": 243,
+            "seconds": 18
+          },
+          "wellfed": {
+            "aura": "Well Fed",
+            "kind": "buff_sta",
+            "value": 6,
+            "minutes": 15
+          }
         }
       },
       {
@@ -9020,6 +9159,18 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 75,
           "minimalAt": 100,
           "zeroAt": 125
+        },
+        "effect": {
+          "food": {
+            "amount": 552,
+            "seconds": 18
+          },
+          "wellfed": {
+            "aura": "Well Fed",
+            "kind": "buff_sta",
+            "value": 9,
+            "minutes": 15
+          }
         }
       },
       {
@@ -9050,6 +9201,18 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 75,
           "minimalAt": 100,
           "zeroAt": 125
+        },
+        "effect": {
+          "food": {
+            "amount": 980,
+            "seconds": 18
+          },
+          "wellfed": {
+            "aura": "Well Fed",
+            "kind": "buff_sta",
+            "value": 12,
+            "minutes": 15
+          }
         }
       },
       {

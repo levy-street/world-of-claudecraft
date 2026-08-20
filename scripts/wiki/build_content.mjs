@@ -23,7 +23,7 @@ const outFile = path.join(root, 'src', 'guide', 'content.generated.ts');
 const entrySource = `
   export { CLASSES, ABILITIES } from './src/sim/content/classes.ts';
   export { TALENTS } from './src/sim/content/talents.ts';
-  export { ALL_CLASSES, FISHING_SESSION_CAP_SEC } from './src/sim/types.ts';
+  export { ALL_CLASSES, CONSUME_DURATION, FISHING_SESSION_CAP_SEC } from './src/sim/types.ts';
   export { ZONES, DUNGEONS, MOBS, CAMPS, DELVE_LIST, NPCS, ITEMS, QUESTS, zoneAt } from './src/sim/data.ts';
   export { WARLOCK_PET_MOBS } from './src/sim/content/warlock_pets.ts';
   export { DELVE_COMPANIONS, DELVE_AFFIXES } from './src/sim/content/delves/index.ts';
@@ -123,6 +123,7 @@ const {
   guideStrings,
   VISUALS,
   visualKeyFor,
+  CONSUME_DURATION,
   FISHING_SESSION_CAP_SEC,
   ITEMS,
   QUESTS,
@@ -669,29 +670,56 @@ const gainBoundaries = (skillReq) => {
   };
 };
 
-const profRecipeRow = (r) => ({
-  id: r.id,
-  name: itemName(r.resultItemId),
-  skillReq: r.skillReq,
-  tier: tierForSkill(r.skillReq),
-  station: r.stationType ?? null,
-  acquisition: r.acquisition?.includes('trainer') ? 'trainer' : 'known',
-  feeCopper: r.acquisition?.includes('trainer') ? trainingFeeFor(r) : 0,
-  materials: r.reagents.map((g) => ({ name: itemName(g.itemId), count: g.count })),
-  output: {
+// Consumable effect facts for a recipe's output item, straight from the live
+// def (the C10 effect-prose gap): the foodHp restore and the well-fed boon as
+// VALUES the craft page composes through its guide.profPages.effect*
+// templates, never baked prose. Spoiler-safe by construction: both are overt
+// facts the item's own tooltip already states (no probabilities, no hidden
+// constants; the seconds value is the same CONSUME_DURATION the tooltip
+// renders). Null for a non-consumable output.
+const consumableEffect = (itemId) => {
+  const def = ITEMS[itemId];
+  if (!def) return null;
+  const effect = {};
+  if (def.foodHp) effect.food = { amount: def.foodHp, seconds: CONSUME_DURATION };
+  if (def.wellfed) {
+    effect.wellfed = {
+      aura: def.wellfed.aura,
+      kind: def.wellfed.kind,
+      value: def.wellfed.value,
+      minutes: def.wellfed.duration / 60,
+    };
+  }
+  return Object.keys(effect).length > 0 ? effect : null;
+};
+
+const profRecipeRow = (r) => {
+  const effect = consumableEffect(r.resultItemId);
+  return {
+    id: r.id,
     name: itemName(r.resultItemId),
-    count: r.resultCount,
-    quality: itemQuality(r.resultItemId),
-  },
-  // Craft IDS, not baked names: the client localizes them via hudChrome.craftName.*.
-  combo: r.comboRequirement
-    ? {
-        crafts: [r.comboRequirement.craftA, r.comboRequirement.craftB],
-        minTier: r.comboRequirement.minTier,
-      }
-    : null,
-  gain: gainBoundaries(r.skillReq),
-});
+    skillReq: r.skillReq,
+    tier: tierForSkill(r.skillReq),
+    station: r.stationType ?? null,
+    acquisition: r.acquisition?.includes('trainer') ? 'trainer' : 'known',
+    feeCopper: r.acquisition?.includes('trainer') ? trainingFeeFor(r) : 0,
+    materials: r.reagents.map((g) => ({ name: itemName(g.itemId), count: g.count })),
+    output: {
+      name: itemName(r.resultItemId),
+      count: r.resultCount,
+      quality: itemQuality(r.resultItemId),
+    },
+    // Craft IDS, not baked names: the client localizes them via hudChrome.craftName.*.
+    combo: r.comboRequirement
+      ? {
+          crafts: [r.comboRequirement.craftA, r.comboRequirement.craftB],
+          minTier: r.comboRequirement.minTier,
+        }
+      : null,
+    gain: gainBoundaries(r.skillReq),
+    ...(effect ? { effect } : {}),
+  };
+};
 
 // The six typed stations with their resident masters, for the training and
 // overview sections.
@@ -1208,6 +1236,13 @@ export interface GuideProfRecipe {
   combo: { crafts: string[]; minTier: number } | null;
   /** Mastery Curve boundaries: skill where gain drops to 0.5 / 0.25 / 0. */
   gain: { reducedAt: number; minimalAt: number; zeroAt: number };
+  /** Consumable effect facts from the live output def (absent for a
+   *  non-consumable): the craft page composes them through the
+   *  guide.profPages.effect* templates. */
+  effect?: {
+    food?: { amount: number; seconds: number };
+    wellfed?: { aura: string; kind: string; value: number; minutes: number };
+  };
 }
 
 export interface GuideProfMaster { name: string; title: string; hub: string; }
