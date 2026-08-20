@@ -214,7 +214,7 @@ function toolEffectsSection(): string {
 }
 
 function deedsSection(g: GuideProfGathering): string {
-  // Farming's arm re-points at a NEW leaf (the harvestBodyFamilies
+  // Farming's arm re-points at a NEW leaf (the harvestBodyChoice
   // precedent): the retired gatherDeeds.farming prose promised the trade
   // kept no deeds yet, which the celebrations phase (D13) made false, and
   // a reword would strand any filled locale copy.

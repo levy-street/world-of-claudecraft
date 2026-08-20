@@ -929,7 +929,9 @@ describe('count-form gathering deeds stay earnable', () => {
     // This arm is SELF-CLEARING for the three PURCHASE surfaces it walks
     // (NPC vendorItems, HEROIC_VENDOR_STOCK, DELVE_SHOPS): a vendor-shaped
     // faucet reds it and the sweep that fixes it must also sweep the
-    // dormancy notes here, on the deed row, and in the design doc. A faucet
+    // dormancy notes here, on the deed row, in the design doc, and in the
+    // guide prose (guide.profPages.gatherDeeds.farmingSown and
+    // guide.profPages.farm.tableBody carry the later-patch phrasing). A faucet
     // arriving as a quest reward, loot drop, or profession output is OUTSIDE
     // this walk; the NEVER_STOCKED pin in
     // tests/professions_zone_rollout.test.ts remains the authoritative
