@@ -773,6 +773,21 @@ visit or a punishment for lateness is violating the design, not tuning it.
     If ACTIONABLE-IN-REPO is non-empty, it authors docs/farming/
     phase-14-final-polish.md scoped exactly to that list (D22 shape: no push, no PR);
     if empty, it declares the program CODE-COMPLETE pending the maintainer-only gates.
+  - PERFECTION SWEEP EXECUTED (Phase 13 QA, 2026-08-19). Universe: the 117-row
+    handoff table plus this QA round's own 13 findings (the corpus's per-phase
+    findings, 241 restated from every progress.md Notes block, are RESOLVED by
+    construction where their disposition says fixed, and every still-live one maps
+    to a handoff row; the loaders verified none was lost). Buckets: RESOLVED 22
+    (the 13 closed rows, row 50, the two executed-check rows 51/52, this round's
+    five fixed findings, one verified-exact citation), ACTIONABLE-IN-REPO 13
+    (handoff rows 38 to 47 plus three of this round's NICE-TO-HAVEs),
+    MAINTAINER-GATED 51 (rows 1 to 37, 48, 49, 53, 54, 56 with its hygiene
+    addendum, and the nine release-fill rows; row 56 is user-gated on the
+    teardown decision), ACCEPTED-BY-DESIGN 44 (rows 55 and 66 to 104 plus four
+    of this round's depth/awareness notes). Nothing landed in no bucket. The
+    ACTIONABLE bucket is non-empty, so docs/farming/phase-14-final-polish.md is
+    authored (PROPOSED; the plan-table row and README line are marked); the
+    thirteen items discharge their handoff rows when Phase 14 lands them.
 - D23: Parity goldens. Professions fields are sampled into every golden digest, so
   adding `farming: 0` to the default proficiency map regenerates ALL goldens in Phase 1
   (deliberate, `UPDATE_PARITY=1`, its own reviewed commit, the Phase 8 professions

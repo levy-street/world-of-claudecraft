@@ -34,10 +34,16 @@ Phase files, in order (each implementation phase has a QA twin):
 10. `phase-10-celebrations.md` / `phase-10-qa.md`
 11. `phase-11-well-fed-food.md` / `phase-11-qa.md`
 12. `phase-12-shared-feast.md` / `phase-12-qa.md`
-13. `phase-13-integration-polish.md` / `phase-13-qa.md` (offers packet teardown)
+13. `phase-13-integration-polish.md` / `phase-13-qa.md` (teardown deferred per the
+    D22 addendum: Phase 13 QA verified the preconditions and left the packet in place)
+14. `phase-14-final-polish.md` (PROPOSED 2026-08-19 by the Phase 13 QA perfection
+    sweep: the ACTIONABLE-IN-REPO bucket, thirteen polish items, no mechanics)
 
 Working agreements: all farming work happens in the persistent worktree
 `~/Documents/woc-farming-plan`; every phase re-resolves the newest `release/**`
-branch at session start; each phase is its own PR; the packet docs never ship (the
-final QA phase offers teardown; the asset handoff manifest lives in
+branch at session start; phases land as local commits merged --no-ff into
+`feature/farming-plan` per D22, and NO PR is ever opened (the D22 addendum: the
+end-state delivery is pushing `feature/farming-plan` to origin on the user's go,
+nothing more); the packet docs never ship (teardown happens later on explicit user
+instruction; the asset handoff manifest lives in
 `docs/design/farming-asset-manifest.json` so it survives).
