@@ -8831,7 +8831,8 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Static Charge': 'aura.staticCharge',
   Wintergnaw: 'aura.frostbite',
   // Legacy alias for mixed-fleet deploy windows: a not-yet-restarted server
-  // still emits the pre-rename aura string. Drop after v0.36.0 ships.
+  // still emits the pre-rename aura string. The rename ships with the
+  // masterwrought branch; drop after its release (v0.40.0 or later) deploys.
   Winterbite: 'aura.frostbite',
   'Maddening Whisper': 'aura.maddeningWhisper',
   'Wyrmward Sigil': 'aura.wyrmwardSigil',
@@ -11934,7 +11935,8 @@ const RULES: Rule[] = [
   },
   {
     // Legacy alias for mixed-fleet deploy windows: a not-yet-restarted server
-    // still emits the pre-rename line. Drop after v0.36.0 ships.
+    // still emits the pre-rename line. The rename ships with the masterwrought
+    // branch; drop after its release (v0.40.0 or later) deploys.
     re: /^The dead answer Deacon Varric's call!$/,
     build: () => t('delveUi.boss.varric.raise.interrupt_fail'),
   },

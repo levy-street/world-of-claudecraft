@@ -753,8 +753,12 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       // kills shed none). APPENDED AT THE TAIL by contract: loot_roll.ts
       // consumes rng draws in array order (one draw per rollGroup at its first
       // member's index), so a tail append leaves every existing draw's stream
-      // position byte-identical while an insert or reorder forks the parity
-      // digest. Never insert or reorder any entry above this group. kind
+      // position byte-identical WITHIN THE BASE WALK (a heroic claim's
+      // HEROIC_BOSS_LOOT draws roll after the base table in the same rollLoot
+      // call, so they sit one draw later; benign, and unpinned by any golden
+      // since the parity scenario kills normal difficulty) while an insert or
+      // reorder forks the parity digest. Never insert or reorder any entry
+      // above this group. kind
       // 'recipe' defs mint no heroic variants (heroic_variants.ts generator
       // filter), so the heroic auto-upgrade path ignores them.
       { itemId: 'pattern_duskforged_warblade', chance: 0.04, rollGroup: 'nythraxis_patterns' },

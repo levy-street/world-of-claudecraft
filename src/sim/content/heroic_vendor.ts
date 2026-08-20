@@ -174,8 +174,9 @@ export const HEROIC_VENDOR_STOCK: readonly HeroicVendorOffer[] = [
   // ceiling. Purchase quantity is the vendor's hardcoded 1 per buy
   // (buyHeroicVendorItem debits one price and grants exactly one copy; this
   // vendor has no count multiplier). The defs live in
-  // content/apex_patterns.ts; the item_level stock bump no-ops for them
-  // (kind 'recipe' carries no slot, so it is not item-level eligible).
+  // content/apex_patterns.ts; the item_level stock bump still indexes their
+  // source level, but kind 'recipe' carries no slot so the rows are not
+  // item-level ELIGIBLE and itemLevel() stays undefined for them.
   { itemId: 'pattern_ironhusk_flask', marks: 12 },
   { itemId: 'pattern_warboar_flask', marks: 12 },
   { itemId: 'pattern_runewater_flask', marks: 12 },
