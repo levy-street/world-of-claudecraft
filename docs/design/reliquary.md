@@ -465,7 +465,11 @@ evaluated over the ownership options.
   weapon skins are `store`. The **Rift gear exclusion is permanent**: derived
   tier-mirror pools paid out as one uniform pick are not a route a player can
   aim at a single relic, so they are not listed. The reins ladder IS such a
-  route and is listed.
+  route and is listed. The **recipe-pattern exclusion is likewise permanent**
+  (Phase 11 of the Masterwrought packet): `kind: 'recipe'` pattern items are
+  repeatable, tradable, consumed-on-learn knowledge, not conquerable unique
+  loot, so no pattern takes a page; the derivation-side carve-out and its
+  exactly-matching vacuity guard live in `tests/reliquary_content.test.ts`.
 - **Obtain counts omit at zero, widened.** A movement grant at ANY clear-meter
   value must not stamp a clear count. A market buy at 12 clears must never
   print "first found on clear 12": that is the same fabricated-provenance class

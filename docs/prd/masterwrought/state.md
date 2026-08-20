@@ -2438,7 +2438,10 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   - Reliquary: NO page owed (same review): the catalog curates conquerable unique
     loot and holds zero crafted gear by precedent; a repeatably crafted tradable
     epic is not that. The phase 11 apex PATTERNS (raid/rift drops) are the rows
-    that will owe pages.
+    that will owe pages. [SUPERSEDED at the Phase 11 build, decision 2: patterns
+    take NO pages either (consumed-on-learn knowledge, not catalogued collectible
+    gear; the kind-keyed carve-out in tests/reliquary_content.test.ts executes
+    it). See the Phase 11 BUILT ledger.]
   - Vendor asymmetry ACCEPTED: apex epics vendor at 1.5 to 3 percent of their
     same-slot drops (the economy invariant binds sellValue strictly below the
     265c to 491c bills; vendor value is not power). Raising the intermediates'
