@@ -3412,7 +3412,203 @@ NOTES TAIL (records):
   md5 9dfd1c6ea073f853655e38675460e81f held through the whole round.
 
 ### Phase 13
-(not started)
+Status: IN FLIGHT (2026-08-19, integration polish, local-only per D22;
+branch fix/farming-phase-13-integration-polish, opened with the M5 sim.ts
+extraction, monolith ceiling 12660 lowered to 12249). The orchestrator
+appends the status row and the gate record after integration.
+
+Notes (Lane C, the deferral sweep and the checklist execution, 2026-08-19):
+- TASK 1 delivered in state.md: the head block healed (Phase 12 merged
+  71010cf82a, Phase 12 QA merged caf0fdee9f, Phase 13 in flight) and the
+  new "Phase 13 handoff" section (the MAINTAINER GATES block plus the
+  one-table deferral ledger, 105 rows) inserted above the locked design
+  decisions.
+- SWEEP FINDING (new, player-visible): guide.profPages.gatherDeeds.farming
+  (src/ui/i18n.catalog/guide.ts:2920) still tells players farming "keeps no
+  deeds of its own yet ... arrive in a later patch", which Phase 10 made
+  false (seven deeds shipped). The Phase 7 deferral scheduled the reword
+  for Phase 9; only gatherIntro was reworded there. Recorded as an open
+  handoff row (reword needs M16 fills and the i18n-semantic-regressions
+  care); Lane C is docs-only and changed no code.
+- SWEEP FINDING (execution not placeable): the disposable-PG TOAST/WAL
+  measurement (the P3 QA hard gate re-pointed at Phase 9) and the online
+  resumed mid-growth live render check (P7 QA re-pointed at Phase 9 QA)
+  have no recorded execution in any Phase 9 / 9b / QA block; both are open
+  handoff rows.
+- Environmental note for fresh worktrees: tests/localization_fixes.test.ts
+  reds until `npm run i18n:gen` mints src/ui/i18n.status.json (the pretest
+  artifact); after the regen the suite is green and the tree stays clean.
+
+#### Phase 13 qa-checklist execution (docs/farming/qa-checklist.md, every row)
+
+Executed by Lane C on the p13/lane-c worktree (branch p13/lane-c, base
+fix/farming-phase-13-integration-polish), 2026-08-19. Suite runs on this
+tree: FAST BATCH `npx vitest run tests/architecture.test.ts
+tests/localization_fixes.test.ts tests/monolith_budget.test.ts
+tests/hud_perf_budget.test.ts` (3 files green first run, 173 passed / 4
+skipped; localization_fixes green after the i18n:gen note above, 43
+passed / 3 skipped). PARITY BATCH `npx vitest run tests/parity
+tests/world_api_parity.test.ts tests/snapshots.test.ts`: 13 files passed,
+1 skipped; 772 tests passed, 1 skipped; `md5sum
+tests/parity/golden/farming_session.json` =
+9dfd1c6ea073f853655e38675460e81f (the pinned value, exact). FARMING
+BATTERY (17 suites: professions_farming, professions_farming_state,
+farm_watch_fee, farm_recipes, recipe_economy, professions_zone_rollout,
+professions_silent_loot, professions_work_orders, deeds_content,
+farm_patch_placement, farm_verb_reachability, professions_feast,
+farm_ready, farming_view, farm_event_feedback,
+farming_command_chain_online, professions_graphics_fairness): 17 files,
+567 tests, ALL green.
+
+THE ANTI-CHORE AUDIT (the five design-promise rows, each with code-path
+evidence, called out as its own subsection per the lane brief):
+- A1 Two visits per cycle, no mid-growth interaction: PASS. The whole
+  farming command surface is five verbs on IWorldFarming (plantCrop
+  src/world_api/farming.ts:81, harvestCrop :89, convertHusks :100,
+  placeFeast :110, consumeFeast :119; the server cases at
+  server/farming_commands.ts:16/64/72/80/89); every knob rides plantCrop's
+  payload, never a command of its own (facet comment
+  src/world_api/farming.ts:20, D8); no verb reads or advances a growing
+  plot; the draw-contract and gate-order pins ran green in the battery.
+- A2 Nothing rots: PASS. normalizeFarmPlots admits a duration of exactly
+  zero as a permanently-ready row and drops only a negative duration
+  (src/sim/professions/farm_persist.ts:162-167 and :235, deviation (u));
+  status derives from readyAtMs against the clock, withered is the
+  pre-rolled survival outcome and never a lateness penalty; the late
+  -harvest-equality arm (Phase 3 acceptance) ran green in
+  tests/professions_farming.test.ts.
+- A3 Absence never punished: PASS. Wall clock enters only through
+  ctx.lockoutNowMs (src/sim/professions/farming.ts:630 write side, :743
+  read side; the D3 seam); growth continues logged out; the login notice
+  rides the shared persisted-notified predicate with flip-before-emit
+  (src/sim/professions/farm_ready.ts:20-24, :59-67); tests/farm_ready
+  .test.ts green in the battery.
+- A4 Risk is opt-in: PASS. Survival ramps only inside the 25-point band
+  (FARM_SURVIVAL_AT_GATE / BAND_SPAN / COMPOST_BONUS / WATCH_BONUS,
+  imported at src/sim/professions/farming.ts:114-117); one band above the
+  gate is always 100 percent, evaluated at CURRENT skill (deviation (r),
+  monotone player-favorable); failure pays FARM_WITHERED_HUSK_COUNT = 2
+  husks (farming.ts:179) with the convertHusks consumer; the boundary and
+  cap arms ran green in the battery.
+- A5 The timer UI exists and is honest: PASS. The Harvest Journal renders
+  status-first with the decisive skew pin (deviation (ay); the
+  harvest_journal suites), map and minimap pins mark the patch sites (P8),
+  ready states surface as banners online plus the login notice, and
+  farmNowMs supplies each host's own clock base
+  (src/world_api/farming.ts:57); the cold-window contracts ran green in
+  tests/hud_perf_budget.test.ts.
+
+THREE-HOST PARITY:
+- Both worlds implement the facet, parity pins current, farming_session
+  green: PASS. The parity batch above (772 passed) plus the exact golden
+  md5 9dfd1c6ea073f853655e38675460e81f.
+- Offline growth degrades to session-local without error: PASS. The D3
+  documented taster; the offline emitter is the sweep alone ((bf)(1));
+  the offline clock floor at farming.ts:625-630; (ap) gives each world its
+  own farmNowMs base.
+
+DETERMINISM:
+- Draw-count contract stated and pinned: PASS. The farming.ts banner plus
+  per-arm pins (plant 2; harvest tier 1/2 exactly 1, tier 3/4 exactly 2;
+  denies, expiry, login, tick all 0, the Phase 10 restatement); battery
+  green; the parity draw digests green.
+- No Math.random / Date.now / performance.now in src/sim/: PASS.
+  tests/architecture.test.ts green (fast batch).
+- Goldens moved only in deliberate isolated commits: PASS. The recorded
+  chain (P3 twice-for-cause, P5 564ad5382a, the two (am) absorb re-mints,
+  P8 ready-notice beat, P9 5676e12b73, P10 rare-event, P11 (bw)
+  discharge, P12 beat P), md5 chain ending at the verified live value; no
+  hand edit anywhere in the record.
+
+I18N COMPLETENESS:
+- PASS. tests/localization_fixes.test.ts green (43 passed / 3 skipped);
+  every phase's ledger records English catalog rows plus M16 non-Latin
+  fills, no overlay edits outside M16; AURA_NAME_KEY carries the one
+  'Well Fed' row ((by)); sim/server farming emits are text-free
+  id-carrying SimEvents (the standing pattern) plus the one
+  error.castingPlanting matcher row. KNOWN accuracy gap recorded above
+  (gatherDeeds.farming stale prose), an open handoff row, not an S3 red.
+
+ECONOMY AND FIDELITY:
+- No invented balance numbers presented as classic; tuning flagged: PASS.
+  Every farming constant is maintainer-flagged at its definition and
+  collected in the state.md MAINTAINER GATES block.
+- recipe_economy invariant, work-order arithmetic, every-material-has-a
+  -consumer, stocked rows carry positive buyValue, crafted outputs none:
+  PASS. recipe_economy, professions_work_orders,
+  professions_zone_rollout, farm_recipes, farmer stock pins all green in
+  the battery; the consumer rule closed in Phase 6 with the
+  merged-ALL_RECIPES closure arm.
+- Produce market-listable under the material filter: PASS (kind junk,
+  materials taxonomy, the P3/P5 pins in the battery).
+- Tier 3/4 seeds reach the market via seed-back and rare events:
+  BLOCKED-ON-RULING (the honest verdict; the row FAILS AS WRITTEN). The
+  seed-back roll returns the SAME crop's seed and only from tier 3+
+  crops, and golden_harvest is a yield multiplier, so NO first faucet
+  exists (deviation (bo)); the checklist row's premise is exactly the
+  recorded D11 hole, MAINTAINER GATE 1. The dormancy itself is honest and
+  pinned (NEVER_STOCKED plus the self-clearing honesty arm, green in the
+  battery).
+
+SERVER AUTHORITY AND SAFETY: PASS. All five verbs resolve in the shared
+sim server-side (server/farming_commands.ts:16-89); no farming command
+ingests an ItemInstancePayload (the packet constraint, re-verified by the
+per-phase privacy reviews); the one new server state family (FeastState)
+is transient with a despawn sweep plus the instance and delve teardown
+rosters (the P12 QA retention story); dev cheats sit behind
+ALLOW_DEV_COMMANDS (src/sim/dev_commands.ts:345 farmgrow).
+
+PERSISTENCE: PASS. CharacterState.farmPlots optional with defaults;
+normalize clamps, sorts, and derives (the anti-tamper set at
+src/sim/professions/farm_persist.ts:93, the 13 tamper arms);
+save-then-load round-trip pins green (tests/professions_farming_state
+.test.ts in the battery); NO DDL landed anywhere in the packet (the
+feast is transient by design; every ledger records zero schema
+movement), so the migration-safety dispatch condition never arose.
+
+PERFORMANCE AND BUDGETS: PASS. updateFarming draws nothing and allocates
+nothing per tick (architecture green; the P8 server-hot-path review and
+the (bc) sub-millisecond measurement); fplot fires behind the heavy-self
+diff gate (P3 ledger); the journal painter passes the cold-window
+contracts (tests/hud_perf_budget.test.ts green); asset budget per the
+(aq) honest bar (models/props moved exactly +174,844 bytes, no other
+group moved); graphics tiers shed only cosmetics
+(tests/professions_graphics_fairness.test.ts green; timers and ready
+notices are actionable and never shed).
+
+COPY AND CONTENT:
+- No em dashes, en dashes, emojis in farming-authored text: PASS (the
+  qa-stop hook and the pre-push floor enforce it; the four keybinds.ts em
+  dashes are pre-existing release-side, recorded at P8 QA).
+- IP-safe names (D17): PASS (the P5 batch-spec audit; the P9 farmer-name
+  audit including the rejected candidates).
+- Deeds pins re-pinned deliberately: PASS (280 / 3190 / 43 plus the
+  frozen sha; tests/deeds_content.test.ts green in the battery).
+- Wiki farming page regenerated and accurate; guide freshness green:
+  DEFERRED-TO-INTEGRATION (owner: lane-a-wiki plus the orchestrator).
+  Freshness was green at the Phase 12 QA gate (the caf0fdee9f record);
+  Lane A owns the Phase 13 regen and accuracy pass; the
+  gatherDeeds.farming stale prose above is the known accuracy gap to
+  clear.
+
+BUILD GATE AND DELIVERY:
+- gate_select green per phase: PASS by the recorded per-phase gate logs
+  (every phase block above carries its "[gate:select] PASS" marker line
+  with counts; the log-marker rule is the arbiter).
+- npm run gate green at packet close: DEFERRED-TO-INTEGRATION (owner: the
+  orchestrator; the armory browser red stays the standing environmental
+  exception).
+- Screenshots committed and referenced: PASS.
+  docs/screenshots/farming-phase-{01,05,07,08,09,09b,12} exist on this
+  tree (ls evidence this sweep); phases 2 to 4, 6, 10, and 11 record
+  no-visual-surface or deliberate-no-capture rationales in their blocks.
+- The asset handoff manifest exists at
+  docs/design/farming-asset-manifest.json: DEFERRED-TO-INTEGRATION
+  (owner: lane-b-handoff). MISSING on this tree at sweep time (ls check);
+  FARM_PROP_CONTRACTS in scripts/assets/farm_props/model.js is the
+  JSON-shaped source; the manifest is lane B's Phase 13 deliverable.
+- ci:changed rc: DEFERRED-TO-INTEGRATION (owner: the orchestrator; this
+  lane's diff is docs-only).
 
 ### Phase 13 QA (final; teardown offer)
 (not started)
