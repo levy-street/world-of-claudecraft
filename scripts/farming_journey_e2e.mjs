@@ -253,7 +253,8 @@ async function main() {
       return {
         title: root?.querySelector('#plant-sheet-title')?.textContent ?? null,
         crop: seed?.dataset.seedCrop ?? null,
-        pressed: seed?.getAttribute('aria-pressed') ?? null,
+        // The seed rows are radios since the Phase 14 a11y batch.
+        checked: seed?.getAttribute('aria-checked') ?? null,
         plant: !!root?.querySelector('[data-plant]'),
         knobs: [...(root?.querySelectorAll('.ps-knob-name') ?? [])].map((el) => el.textContent),
       };
@@ -262,7 +263,7 @@ async function main() {
       fail(`plant sheet wrong: ${JSON.stringify(sheet)}`);
     ok(
       `interact press opened the plant sheet: title "${sheet.title}", seed row ${sheet.crop} ` +
-        `(aria-pressed ${sheet.pressed}), knobs [${sheet.knobs.join(', ')}], Plant control present`,
+        `(aria-checked ${sheet.checked}), knobs [${sheet.knobs.join(', ')}], Plant control present`,
     );
     await wait(600);
     await shot('plant-sheet-open');
