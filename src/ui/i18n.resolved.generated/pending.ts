@@ -419,8 +419,6 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeast",
     "itemUi.tooltip.useFeastBuff",
     "itemUi.tooltip.useFeastBuffAura",
-    "itemUi.tooltip.useWellfed",
-    "itemUi.tooltip.useWellfedAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
     "worldContent.farmPatchName"
@@ -835,8 +833,6 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeast",
     "itemUi.tooltip.useFeastBuff",
     "itemUi.tooltip.useFeastBuffAura",
-    "itemUi.tooltip.useWellfed",
-    "itemUi.tooltip.useWellfedAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
     "worldContent.farmPatchName"
@@ -1266,8 +1262,6 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeast",
     "itemUi.tooltip.useFeastBuff",
     "itemUi.tooltip.useFeastBuffAura",
-    "itemUi.tooltip.useWellfed",
-    "itemUi.tooltip.useWellfedAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
     "worldContent.farmPatchName"
@@ -1697,8 +1691,6 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeast",
     "itemUi.tooltip.useFeastBuff",
     "itemUi.tooltip.useFeastBuffAura",
-    "itemUi.tooltip.useWellfed",
-    "itemUi.tooltip.useWellfedAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
     "worldContent.farmPatchName"
@@ -2133,8 +2125,6 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeast",
     "itemUi.tooltip.useFeastBuff",
     "itemUi.tooltip.useFeastBuffAura",
-    "itemUi.tooltip.useWellfed",
-    "itemUi.tooltip.useWellfedAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
     "worldContent.farmPatchName"
@@ -2577,8 +2567,6 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeast",
     "itemUi.tooltip.useFeastBuff",
     "itemUi.tooltip.useFeastBuffAura",
-    "itemUi.tooltip.useWellfed",
-    "itemUi.tooltip.useWellfedAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
     "worldContent.farmPatchName"
@@ -3042,8 +3030,6 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeast",
     "itemUi.tooltip.useFeastBuff",
     "itemUi.tooltip.useFeastBuffAura",
-    "itemUi.tooltip.useWellfed",
-    "itemUi.tooltip.useWellfedAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
     "worldContent.farmPatchName"
@@ -3493,8 +3479,6 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeast",
     "itemUi.tooltip.useFeastBuff",
     "itemUi.tooltip.useFeastBuffAura",
-    "itemUi.tooltip.useWellfed",
-    "itemUi.tooltip.useWellfedAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
     "worldContent.farmPatchName"
@@ -3937,8 +3921,6 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeast",
     "itemUi.tooltip.useFeastBuff",
     "itemUi.tooltip.useFeastBuffAura",
-    "itemUi.tooltip.useWellfed",
-    "itemUi.tooltip.useWellfedAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
     "worldContent.farmPatchName"
@@ -4367,8 +4349,6 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeast",
     "itemUi.tooltip.useFeastBuff",
     "itemUi.tooltip.useFeastBuffAura",
-    "itemUi.tooltip.useWellfed",
-    "itemUi.tooltip.useWellfedAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
     "worldContent.farmPatchName"
@@ -4785,8 +4765,6 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeast",
     "itemUi.tooltip.useFeastBuff",
     "itemUi.tooltip.useFeastBuffAura",
-    "itemUi.tooltip.useWellfed",
-    "itemUi.tooltip.useWellfedAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
     "worldContent.farmPatchName"
@@ -5214,8 +5192,6 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeast",
     "itemUi.tooltip.useFeastBuff",
     "itemUi.tooltip.useFeastBuffAura",
-    "itemUi.tooltip.useWellfed",
-    "itemUi.tooltip.useWellfedAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
     "worldContent.farmPatchName"
@@ -5656,8 +5632,6 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeast",
     "itemUi.tooltip.useFeastBuff",
     "itemUi.tooltip.useFeastBuffAura",
-    "itemUi.tooltip.useWellfed",
-    "itemUi.tooltip.useWellfedAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
     "worldContent.farmPatchName"
@@ -6080,8 +6054,6 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeast",
     "itemUi.tooltip.useFeastBuff",
     "itemUi.tooltip.useFeastBuffAura",
-    "itemUi.tooltip.useWellfed",
-    "itemUi.tooltip.useWellfedAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
     "worldContent.farmPatchName"
@@ -6531,8 +6503,6 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.tooltip.useFeast",
     "itemUi.tooltip.useFeastBuff",
     "itemUi.tooltip.useFeastBuffAura",
-    "itemUi.tooltip.useWellfed",
-    "itemUi.tooltip.useWellfedAura",
     "itemUi.tooltip.wellFed",
     "itemUi.tooltip.wellFedAura",
     "worldContent.farmPatchName"

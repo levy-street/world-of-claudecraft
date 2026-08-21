@@ -10797,8 +10797,6 @@ export type TranslationKeyFlat =
   | 'itemUi.tooltip.useHealingPotion'
   | 'itemUi.tooltip.useHealingPotionPct'
   | 'itemUi.tooltip.useManaPotion'
-  | 'itemUi.tooltip.useWellfed'
-  | 'itemUi.tooltip.useWellfedAura'
   | 'itemUi.tooltip.wellFed'
   | 'itemUi.tooltip.wellFedAura'
   | 'itemUi.vendor.buyAria'
