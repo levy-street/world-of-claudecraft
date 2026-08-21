@@ -8,12 +8,11 @@
 // DRAW CONTRACT: placement and consumption draw ZERO rng (no Rng access in
 // this module at all). Placement is a bag spend plus an entity spawn;
 // consumption is a ledger write plus the SAME eating slot a bagged dish
-// sets. The live completion mint is masterwrought's inline clear-then-grant
-// in updateRegen (src/sim/combat/auras.ts), which owns no draw either;
-// farming's src/sim/wellfed.ts mint path is PARKED UNWIRED at the 11b
-// absorb until 11c unifies the spellings (state.md, the 11c carry list).
-// The expiry sweep decides from stored state alone. Nothing here can fork
-// the shared draw stream.
+// sets (built by the one src/sim/consuming.ts builder, so the bite carries
+// the dish's wellFed payload exactly as the bagged dish does). The
+// completion mint (updateRegen clearing the slot, then src/sim/wellfed.ts
+// paying the carried payload) owns no draw either. The expiry sweep decides
+// from stored state alone. Nothing here can fork the shared draw stream.
 //
 // TRANSIENT BY DESIGN: FeastState lives only in SimContext.feasts and dies
 // with the Sim instance. No field of it enters PlayerMeta, CharacterState,
@@ -39,6 +38,7 @@
 // count and dropped wholesale at despawn, so it inherits none of the
 // persistence machinery the credited-objects ledger needs.
 
+import { buildConsuming } from '../consuming';
 import { ITEMS } from '../data';
 import { delveRunForPlayer } from '../delves/runs';
 import { createGroundObject } from '../entity';
@@ -48,8 +48,6 @@ import { countUnlockedInSlots, isItemLocked, removeUnlockedFromSlots } from '../
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
-  CONSUME_DURATION,
-  CONSUME_TICKS,
   dist2d,
   type Entity,
   INTERACT_RANGE,
@@ -299,21 +297,14 @@ export function consumeFeastAction(
   if (!dish) return; // content invariant; pinned in the suite
   feast.eatenBy.add(feastOwnerKey(meta));
   feast.charges -= 1;
-  // The bite: one serving of the capstone dish, the items.ts food-arm
-  // construction verbatim (sit, slot, the sfx-only first bite, the log
-  // line). PARKED at the 11b absorb: completion currently mints NOTHING for
-  // this dish, because the live completion mint (combat/auras.ts) reads the
-  // masterwrought `wellFed` spelling and the farming dishes carry `wellfed`;
-  // 11c unifies the two and re-wires the mint (state.md, the 11c carry list).
+  // The bite: one serving of the capstone dish, built by the SAME
+  // src/sim/consuming.ts builder the items.ts food arm uses (sit, slot, the
+  // sfx-only first bite, the log line), so the meal carries the dish's
+  // wellFed payload and a feast serving mints the identical aura a bagged
+  // dish does when the 18s drain completes. The bite has always served the
+  // dish as FOOD by contract, so the kind is passed literally.
   p.sitting = true;
-  p.eating = {
-    itemId: dish.id,
-    kind: 'food',
-    hpPer2s: dish.foodHp ? Math.round(dish.foodHp / CONSUME_TICKS) : 0,
-    manaPer2s: dish.drinkMana ? Math.round(dish.drinkMana / CONSUME_TICKS) : 0,
-    remaining: CONSUME_DURATION,
-    ticksElapsed: 0,
-  };
+  p.eating = buildConsuming('food', dish);
   ctx.emit({ type: 'heal', targetId: p.id, amount: 0, source: 'food', sfxTick: true });
   ctx.emit({ type: 'log', text: 'You sit down to eat.', color: '#999', pid: meta.entityId });
 }

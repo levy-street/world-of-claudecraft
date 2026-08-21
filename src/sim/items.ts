@@ -24,6 +24,7 @@ import {
   equipBag as equipBagCmd,
   stackSizeOf,
 } from './bags';
+import { buildConsuming } from './consuming';
 import { isRawCookingCatch } from './content/items';
 import { ITEMS } from './data';
 import { markItemDiscovered } from './deeds';
@@ -66,8 +67,6 @@ import type { ItemUseResult, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import {
   ALL_EQUIP_SLOTS,
-  CONSUME_DURATION,
-  CONSUME_TICKS,
   cloneItemInstancePayload,
   dist2d,
   type Entity,
@@ -823,12 +822,9 @@ export function useItem(
     return;
   }
   // Buff dishes mint their Well Fed aura at COMPLETION of the sit-restore,
-  // not here. The live completion mint is masterwrought's inline
-  // clear-then-grant in updateRegen (src/sim/combat/auras.ts), and it reads
-  // the `wellFed` spelling only; farming's `wellfed` dishes and its
-  // src/sim/wellfed.ts module are PARKED UNWIRED at the 11b absorb, so those
-  // four dishes grant no buff at this tip. 11c unifies the spellings and the
-  // mint path (state.md, the 11c carry list).
+  // not here: the completion site in updateRegen (src/sim/combat/auras.ts)
+  // clears the slot and then pays the carried payload through the one mint in
+  // src/sim/wellfed.ts.
   if (def.kind === 'food' || def.kind === 'drink') {
     if (p.inCombat) {
       ctx.error(meta.entityId, "You can't do that while in combat.");
@@ -852,18 +848,11 @@ export function useItem(
     }
     consumeOneUnit();
     p.sitting = true;
-    p[slot] = {
-      itemId,
-      kind: def.kind,
-      hpPer2s: def.foodHp ? Math.round(def.foodHp / CONSUME_TICKS) : 0,
-      manaPer2s: def.drinkMana ? Math.round(def.drinkMana / CONSUME_TICKS) : 0,
-      remaining: CONSUME_DURATION,
-      ticksElapsed: 0,
-      // The Well Fed buff a role food owes, carried on the meal rather than
-      // granted here: it is the reward for FINISHING (combat/auras.ts pays it
-      // when the drain runs out), so standing up early forfeits it, classic.
-      ...(def.kind === 'food' && def.wellFed ? { wellFed: def.wellFed } : {}),
-    };
+    // The one Consuming build site (src/sim/consuming.ts): rates, clock, and
+    // the Well Fed carry. The buff rides the meal rather than being granted
+    // here: it is the reward for FINISHING (combat/auras.ts pays it when the
+    // drain runs out), so standing up early forfeits it, classic.
+    p[slot] = buildConsuming(def.kind, def);
     // A one-shot bite/gulp the instant you sit down, on top of the regular
     // every-3rd-tick cadence (updateRegen, combat/auras.ts): otherwise the
     // first sound doesn't land until ~6s in and using the item reads silent.
