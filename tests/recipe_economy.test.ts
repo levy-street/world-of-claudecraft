@@ -306,6 +306,13 @@ describe('REFERENTIAL INTEGRITY', () => {
         HOE_RECIPES.length +
         FARM_RECIPES.length,
     );
+    // COMBO and LADDER get the same sibling treatment as the rest (Phase 11d QA):
+    // without a literal beside them, losing one combo row drops BOTH sides of the
+    // equality by one and the sum stays balanced, so the arm passes over a
+    // smaller world. Every other term already had one; 11d itself added the
+    // pattern for HOE and FARM.
+    expect(COMBO_RECIPES).toHaveLength(3);
+    expect(LADDER_RECIPES).toHaveLength(54);
     expect(JEWELCRAFTING_RECIPES).toHaveLength(9);
     expect(INSCRIPTION_RECIPES).toHaveLength(6);
     expect(INTERMEDIATE_RECIPES).toHaveLength(10);

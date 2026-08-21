@@ -253,9 +253,11 @@ const MONOLITHS: MonolithRow[] = [
     // its 12232 pin (all live at the absorbed tip: the delegate pair stayed
     // retired), while this branch's pin stood at 12650. The merged count
     // composes as base 12518 plus ours' +111 minus farming's -289, plus the
-    // one comment line the 11c QA trued. Both parent pins for the record:
-    // ours 12650, farming 12232. Exact merged count, zero slack: any
-    // further growth reds again.
+    // one comment line the 11c QA trued. ALL THREE parent pins for the record
+    // (hud.ts sets the precedent of naming its third): ours 12650, farming
+    // 12232, and the release 12660 against a 12518 file at both f50b30de29 and
+    // 35a6481825. 12341 lands under all three. Exact merged count, zero slack:
+    // any further growth reds again.
     ceiling: 12341,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
@@ -276,7 +278,17 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'server/game.ts',
-    ceiling: 10890,
+    // LOWERED 10890 -> 10761 at the Phase 11d QA, banking un-banked slack the
+    // way the same packet already treated sim.ts (whose row called a pin
+    // sitting above its file "with no comment" a defect, not a licence). The
+    // merged file composes exactly: base 10894 - 32 (ours) - 101 (farming) =
+    // 10761. Ours' pin was 10890 against a 10862 file, so 28 lines of slack
+    // pre-dated the merge and the merge added 101 more; left alone, the two
+    // server monoliths a crafting and farming packet is most likely to grow
+    // could take 129 more lines with the ratchet green. Parent pins for the
+    // record: ours 10890, farming and release 10900. Exact merged count, zero
+    // slack: any further growth reds again, and the fix is extraction.
+    ceiling: 10761,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -305,7 +317,14 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'server/db.ts',
-    ceiling: 4980,
+    // LOWERED 4980 -> 4865 at the Phase 11d QA, the sibling case to server/game.ts
+    // above. This row GREW at the absorb rather than falling (4835 to 4865, all of
+    // it farming's) and grew straight into pre-existing slack with no row comment,
+    // which is the shape that makes a ratchet stop ratcheting. The merged file is
+    // theirs' exactly (ours never touched it). Parent pins for the record: ours
+    // 4980, farming 4980. Exact merged count, zero slack: any further growth reds
+    // again, and the fix is a domain module, not a raise.
+    ceiling: 4865,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {

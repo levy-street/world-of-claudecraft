@@ -41,6 +41,7 @@ import { MAX_CRAFTED_BY_LENGTH, slotToolEffectRefused } from '../src/sim/profess
 import { MAX_KNOWN_RECIPE_ID_LENGTH, MAX_KNOWN_RECIPE_IDS } from '../src/sim/professions/training';
 import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
 import { ALL_EQUIP_SLOTS, type InvSlot } from '../src/sim/types';
+import { stripComments } from './helpers/strip_comments';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // This file never spawns, targets, or asserts on a camp, npc, or ground
@@ -509,9 +510,14 @@ describe('the professions blob growth bound (phase 16)', () => {
     // this bound); this scrape makes drift impossible in either direction.
     // Anchored at the declaration and closed at the first `] as const`, so
     // surrounding prose cannot leak into the capture.
-    const source = readFileSync(
-      new URL('./professions_blob_roundtrip.test.ts', import.meta.url),
-      'utf8',
+    // Comments stripped first, like every sibling source scrape in this tree
+    // (command_schema defines its own stripper for exactly this reason, and
+    // farm_verb_reachability imports the shared helper). The block is
+    // comment-free today, so this changes nothing now; a `// dropped:
+    // 'farmPlots'` note beside a real removal would otherwise keep the two
+    // field lists looking identical while they diverged (Phase 11d QA).
+    const source = stripComments(
+      readFileSync(new URL('./professions_blob_roundtrip.test.ts', import.meta.url), 'utf8'),
     );
     const anchor = source.indexOf('const PROFESSIONS_BLOB_FIELDS = [');
     expect(anchor).toBeGreaterThan(-1);
