@@ -1,6 +1,6 @@
 // Mount-owned interaction evidence: the real player_warrior GLB posed in its
 // shipped Sit_Floor_Idle clip at the proposed rider socket.
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { NodeIO } from '@gltf-transform/core';

@@ -117,7 +117,7 @@ function woodFields(size) {
       const grain = periodicFbm2(u, v, 14, 4, 60_427, 10) - 0.5;
       const rings = periodicFbm2(u, v, 4, 3, 60_733, 0.35) - 0.5;
       const macro = periodicFbm2(u, v, 3, 3, 60_121) - 0.5;
-      const micro = periodicNoise2(u * 72, v * 72, 72, 72, 61_039) - 0.5;
+      const _micro = periodicNoise2(u * 72, v * 72, 72, 72, 61_039) - 0.5;
       const board = Math.min((u * 5) % 1, 1 - ((u * 5) % 1));
       const seam = 1 - smoothstep(0, 0.025, board);
       albedo[index] = clamp01(0.96 + macro * 0.12 + grain * 0.22 + rings * 0.05 - seam * 0.34);

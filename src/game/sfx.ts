@@ -122,10 +122,6 @@ const FOOTSTEP_CUES: Partial<Record<string, string>> = {
   water: 'foot_water',
 };
 
-function summonClipKey(mountKey: string): string {
-  return `mount_summon_${mountKey}`;
-}
-
 function assetCacheKey(key: string, variantIndex: number): string {
   return variantIndex === 0 ? key : `${key}:${variantIndex}`;
 }
