@@ -631,19 +631,31 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // --- Apex role foods (cooking, Masterwrought phase 10) --------------------
   // Outputs of APEX_CONSUMABLE_RECIPES (content/recipes.ts) at skillReq 100,
   // kitchens-bound like the ladder above. Still kind 'food' with the ordinary
-  // 18-second sit heal, plus the classic Well Fed buff the new `wellFed`
+  // 18-second sit heal, plus the classic Well Fed buff the `wellFed`
   // payload carries (types.ts): it lands only when the drain COMPLETES, so a
   // meal cut short feeds and buffs nothing. One shared 'well_fed' aura id
-  // across all three, so the newest plate replaces the last and no one eats
-  // three roles at once, and no flask marker: Well Fed dies with you.
+  // across EVERY well-fed food (WELL_FED_AURA_ID, src/sim/wellfed.ts), so
+  // the newest meal replaces the last, no one eats two buffs at once, and no
+  // flask marker: Well Fed dies with you.
   //
   // foodHp 1392 is the next classic-era food band above everything shipped:
   // the classic ladder runs 61 / 243 / 552 / 874 / 1392 / 2148, and the
   // shipped top of 980 (conjured_bread4 / marlows_grand_roast) is an off-band
   // value that already sits past the 874 band, so the apex rung continues the
-  // classic ladder rather than stepping from that value. The well-fed stat
-  // enters at the consumable family's own entry rung, value 6 (the common
-  // elixir rung), for the classic 10-minute duration. sellValue 90 is set by
+  // classic ladder rather than stepping from that value. The well-fed VALUE
+  // enters at the consumable family's own entry rung, 6 (elixir_of_the_boar,
+  // the common elixir rung, the number R5's kit was measured against: flask
+  // 15 plus food 6 equals 21 stamina); the DURATION takes the elixir
+  // ladder's own next step, the entry rung's 600 plus the boar-to-venomfire
+  // duration step of 300, so the apex plate is 6 / 900 and strictly
+  // dominates every farming rung of the five-rung Well Fed ladder below
+  // (farming climbs 2/3/4/5 at 600s, one point per crop tier, topping out
+  // one below the apex; the apex plate then beats every one of them on stat
+  // AND duration, last eaten wins under the one 'well_fed' id). Raising the
+  // crafted duration here is ladder ORDERING inside the crafted line, not a
+  // floor move: R23 governs the vendor-versus-crafted margin and no vendor
+  // item grants Well Fed at all, while R5's always-on kit premise is
+  // indifferent to 600 versus 900. sellValue 90 is set by
   // the BATCH, not the quality band: the recipe yields four plates and
   // 4 x 90 = 360 stays strictly below the summed reagent value (about 422),
   // where Marlow's per-plate 150 on a four-plate batch (600) would turn the
@@ -660,7 +672,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     kind: 'food',
     quality: 'epic',
     foodHp: 1392,
-    wellFed: { aura: 'Well Fed', kind: 'buff_sta', value: 6, duration: 600 },
+    wellFed: { aura: 'Well Fed', kind: 'buff_sta', value: 6, duration: 900 },
     sellValue: 90,
   },
   warspice_skewers: {
@@ -669,7 +681,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     kind: 'food',
     quality: 'epic',
     foodHp: 1392,
-    wellFed: { aura: 'Well Fed', kind: 'buff_ap', value: 6, duration: 600 },
+    wellFed: { aura: 'Well Fed', kind: 'buff_ap', value: 6, duration: 900 },
     sellValue: 90,
   },
   sageleaf_chowder: {
@@ -678,7 +690,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     kind: 'food',
     quality: 'epic',
     foodHp: 1392,
-    wellFed: { aura: 'Well Fed', kind: 'buff_int', value: 6, duration: 600 },
+    wellFed: { aura: 'Well Fed', kind: 'buff_int', value: 6, duration: 900 },
     sellValue: 90,
   },
 
@@ -768,26 +780,27 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // --- Farm buff dishes (cooking, Phase 11 well-fed food) -------------------
   // Trainer-taught outputs of FARM_RECIPES, one BUFF dish per crop tier so
   // the produce ladder has a well-fed consumer at every rung. Exactly the
-  // plain-dish shape above plus the ONE new field: `wellfed`, the elixir-arm
-  // mirror, a temporary buff_sta aura payload for the 18s sit-restore's
-  // completion. PARKED UNWIRED at the 11b absorb: the live completion mint
-  // (src/sim/combat/auras.ts updateRegen) reads the `wellFed` spelling only,
-  // so these four dishes grant no buff until 11c unifies the spellings
-  // (state.md, the 11c carry list). All four share the aura name
-  // 'Well Fed' and therefore the aura id wellfed_buff_sta: within the food
-  // namespace last eaten always wins (the classic one-food-buff idiom), and
-  // the distinct namespace means no dish ever clobbers an elixir_<kind> buff
-  // or the reverse.
+  // plain-dish shape above plus the ONE extra field: `wellFed`, the same
+  // payload the apex role foods carry (types.ts), minted at the 18s
+  // sit-restore's completion under the one shared 'well_fed' aura id.
   //
-  // VALUES ARE PROPOSED AND FLAGGED FOR THE MAINTAINER. Every wellfed pair
-  // sits at or below the documented elixir budget ceiling (buff_sta <= 12
-  // for <= 900s; the alchemy ladder header below): 3/600s, 6/900s, 9/900s,
-  // 12/900s, each dominated by or equal to a shipped elixir point (boar
-  // 6/600, venomfire 9/900, bear and serpent 12/900). Tuning read to flag:
-  // a well-fed buff STACKS with a same-stat elixir by design (distinct aura
-  // id), so the combined crafted ceiling is 24 stamina, still below the raid
-  // floor. foodHp and sellValue reuse shipped curve points; quality matches
-  // the rung. The tier 3/4 pair ships REAGENT-DORMANT under (bo): trainable
+  // These four are the LEVELLING AND PRE-RAID RUNGS of the one five-rung
+  // Well Fed ladder (Masterwrought 11c, ruling 11c-D-2): one point of
+  // stamina per crop tier, 2/3/4/5, all at the entry duration of 600s,
+  // topping out one point below the apex plates (6 / 900, the block above),
+  // so the drop-taught apex strictly dominates every trainer rung on stat
+  // AND duration. One aura id across the whole family means last eaten
+  // always wins (the classic one-food-buff rule) and a dish can never stack
+  // with a role plate; a same-stat elixir still coexists (different aura
+  // id), so the combined crafted ceiling is dish 5 plus elixir 12, 17
+  // stamina, comfortably below the raid floor. The earlier per-kind
+  // wellfed_<kind> namespace and its "at or below the elixir budget ceiling"
+  // calibration were retired here: they let a cooking-50 trainer dish (12 /
+  // 900) beat the cooking-100 apex plate on both axes, the inversion the
+  // re-tune removes.
+  //
+  // foodHp and sellValue reuse shipped curve points; quality matches the
+  // rung. The tier 3/4 pair ships REAGENT-DORMANT under (bo): trainable
   // and well-formed, but tier 3/4 produce has no seed faucet until the D11
   // bootstrap ruling. Names are IP-safe per D17 (real culinary words plus
   // settlement flavor) and collide with none of the eight plain dishes.
@@ -798,7 +811,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     quality: 'common',
     foodHp: 90,
     sellValue: 6,
-    wellfed: { aura: 'Well Fed', kind: 'buff_sta', value: 3, duration: 600 },
+    wellFed: { aura: 'Well Fed', kind: 'buff_sta', value: 2, duration: 600 },
   },
   fenbridge_rice_pudding: {
     id: 'fenbridge_rice_pudding',
@@ -807,7 +820,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     quality: 'uncommon',
     foodHp: 243,
     sellValue: 25,
-    wellfed: { aura: 'Well Fed', kind: 'buff_sta', value: 6, duration: 900 },
+    wellFed: { aura: 'Well Fed', kind: 'buff_sta', value: 3, duration: 600 },
   },
   highwatch_barley_porridge: {
     id: 'highwatch_barley_porridge',
@@ -816,7 +829,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     quality: 'rare',
     foodHp: 552,
     sellValue: 60,
-    wellfed: { aura: 'Well Fed', kind: 'buff_sta', value: 9, duration: 900 },
+    wellFed: { aura: 'Well Fed', kind: 'buff_sta', value: 4, duration: 600 },
   },
   evergarden_braised_greens: {
     id: 'evergarden_braised_greens',
@@ -825,7 +838,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     quality: 'rare',
     foodHp: 980,
     sellValue: 150,
-    wellfed: { aura: 'Well Fed', kind: 'buff_sta', value: 12, duration: 900 },
+    wellFed: { aura: 'Well Fed', kind: 'buff_sta', value: 5, duration: 600 },
   },
   // The shared feast (Phase 12, D16): the tier-4 communal showcase. NOT
   // kind 'food': using it PLACES a farm_feast world entity instead of
