@@ -16,8 +16,8 @@ import { Sim } from '../src/sim/sim';
 import type { Aura, Entity, ItemDef } from '../src/sim/types';
 import { WELL_FED_AURA_ID } from '../src/sim/wellfed';
 import { hasAuraRecipe } from '../src/ui/icons';
-import { sourceFilesUnder } from './helpers/source_files_under';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
+import { sourceFilesUnder } from './helpers/source_files_under';
 import { stripComments } from './helpers/strip_comments';
 
 function playerWorld(seed = 42) {
@@ -413,12 +413,19 @@ describe('well fed: the retired namespace is gone (the unification landed)', () 
     // Needle built from parts so this file's own source cannot match it.
     const needle = new RegExp(`['"\`]${'well'}${'fed'}_`);
     const offenders: string[] = [];
+    let scanned = 0;
     for (const root of ['src', 'scripts', 'tests']) {
       for (const f of sourceFilesUnder(join(process.cwd(), root))) {
+        scanned++;
         const code = stripComments(readFileSync(f.full, 'utf8'));
         if (needle.test(code)) offenders.push(`${root}/${f.file}`);
       }
     }
+    // Non-vacuity floor: an empty walk would make the assertion below pass
+    // over nothing at all, which is the shape of a sweep that silently
+    // stopped scanning (tests/CLAUDE.md). The floor sits near the real
+    // count of the three roots, not at 1.
+    expect(scanned, 'the sweep really walked the three source roots').toBeGreaterThan(2000);
     expect(offenders, 'files still carrying a wellfed_<kind> id literal').toEqual([]);
   });
 
