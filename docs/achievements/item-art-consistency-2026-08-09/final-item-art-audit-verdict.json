@@ -5,8 +5,8 @@
     "baselineCommit": "aee195551b5aef628eb7a72192117d7e3079818e",
     "branch": "feature/placeholder-art-completion-v036",
     "shippingDirectory": "public/ui/items",
-    "itemArtFilesReviewed": 823,
-    "liveItemDefinitions": 838,
+    "itemArtFilesReviewed": 824,
+    "liveItemDefinitions": 839,
     "generatedHeroicDefinitions": 64,
     "heroicDefinitionsWithOwnWebp": 48,
     "heroicWeaponArtAliases": 16,
@@ -304,7 +304,7 @@
       "food": 21,
       "held_offhand": 9,
       "junk": 82,
-      "mount": 9,
+      "mount": 10,
       "potion": 13,
       "quest": 97,
       "tool": 45,
@@ -370,7 +370,7 @@
   },
   "visualVerdict": {
     "status": "pass",
-    "passCount": 823,
+    "passCount": 824,
     "passIds": [
       "abyssal_loop",
       "abysswrought_band",
@@ -926,6 +926,7 @@
       "reins_aether_hover_cycle",
       "reins_drakemaw_raptor",
       "reins_grag_bear",
+      "reins_mech_bird",
       "reins_shadowjump_toad",
       "reins_stalkglider_snail",
       "reins_stormfeather_griffin",
@@ -1200,7 +1201,7 @@
     "watch": [],
     "rejectCount": 0,
     "reject": [],
-    "summary": "All 823 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12."
+    "summary": "All 824 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the Cluckwork Mech Bird mount icon (project Blender render under the same contract) added for owner review on 2026-08-17."
   },
   "nonVisualContentWatch": [
     {
@@ -1357,8 +1358,8 @@
   "evidence": {
     "catalog": {
       "path": "tmp/imagegen/item-art-consistency/final-audit/catalog.json",
-      "sha256": "33d4dbff43be4e9f8628756571bc1a0ff33ad8069b607979ba9fbacbdd6b9b6e",
-      "bytes": 451762
+      "sha256": "51dee8cb916a90ad74ba8f74232c7a0625615680e51b18dad2203f950cad995f",
+      "bytes": 452290
     },
     "rendererFingerprint": "fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082",
     "sheetCount": 208,
@@ -1372,7 +1373,7 @@
       "small-multiview": 26,
       "identity": 26
     },
-    "sheetSetSha256": "3c5ad46c56f049fab4696791e8d487e389f505dd0313a6b1037af58e60919110",
+    "sheetSetSha256": "e20e6b159128022fe4b68fe1da725215870ee5e68bc3d9f9b3d27602a63b020d",
     "sheets": [
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--128-color.png",
@@ -2528,64 +2529,64 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--128-color.png",
-        "sha256": "31f74ade6951362722f51cc85c98c1d4705d1b2adfe7414ce7989688e9f1ea4d",
-        "bytes": 324975,
+        "sha256": "00e0af07fcc2672ab0b8c4a31ce5c27169f74c7a35190e818da4d94b157cf3e5",
+        "bytes": 351897,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--40-color.png",
-        "sha256": "e7d83e7409f03de58024266dd7aa8cd9da4fe7136f092b1c2c8ef78cc6957694",
-        "bytes": 61084,
+        "sha256": "6359dbead0f143309d5ac629c3f6e41cf932fafaa8d3ef07580db32ce70693a5",
+        "bytes": 65391,
         "width": 1600,
         "height": 166,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--28-color.png",
-        "sha256": "237e10d12c6246022ad5bf5ab8439ff4d2f75df48b9211968048f029662e4bfb",
-        "bytes": 42755,
+        "sha256": "16d2e61110d0577934e9dffb7d8efc08d60174e041828eaeeb73704ccb00f2c7",
+        "bytes": 45542,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--22-color.png",
-        "sha256": "d2a3cc6a0bfc8a7843fd56b59fc1922dc8e5b3fe638c68212d3d41a9a9da5f73",
-        "bytes": 33828,
+        "sha256": "4f78b811488cce11cc7c2e8ca58badc366f2f8818c4c7d4f6e723b630111dcb8",
+        "bytes": 36113,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--28-grayscale.png",
-        "sha256": "0fded7fbd7173e32d7b7d8a9c08e099b5865f1c8d6e99eac4bcf1f13b3c89229",
-        "bytes": 32248,
+        "sha256": "f31cfa4beef136c306bf4970ca2de69478b65c083e03a7a6c76cffca4a94d98e",
+        "bytes": 34164,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--64-circle.png",
-        "sha256": "f2d3f9ebf7f761042a0f67a9f915bb3847fce05782684e3a7f99f51ed8f7c311",
-        "bytes": 100934,
+        "sha256": "0a289808346b40a645eb230a0603ae79ebd29b706ccb4da55b98e248048a5bb4",
+        "bytes": 110030,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--small-multiview.png",
-        "sha256": "e4bdd337ad3df5a849ecee8acf24ab9af1d7d4fbed3541b0729d36a2df0e038e",
-        "bytes": 183714,
+        "sha256": "aacaa1c09c0291cc91225b47070eb3cd049adc3a5bf8ca4660e2fedfce3b3352",
+        "bytes": 199969,
         "width": 1800,
         "height": 262,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--identity.png",
-        "sha256": "e817d99475d5599a05b2164e3367b85b9148f16e8acd2b46ed170ef868cfce58",
-        "bytes": 342039,
+        "sha256": "dbfd6508f2474c3d20a84458c59b65b34f5851f5c0d89303e56459c0c5a14694",
+        "bytes": 370186,
         "width": 1800,
         "height": 248,
         "format": "png"
@@ -3039,6 +3040,6 @@
         "format": "png"
       }
     ],
-    "shippingCatalogSha256": "cc5fc2f49d88532ef79bf342c0c56f14a798ff566f586dac55291ef44c88be87"
+    "shippingCatalogSha256": "ace08d8728f8e898f8960780e72969758907f7df6834ff0f1978d48e2c8f5607"
   }
 }

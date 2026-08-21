@@ -235,6 +235,24 @@ const MOUNT_RIGGED: ClipMap = {
   death: 'Death',
 };
 
+// The Mech Bird's own map: the authored Blender set on its 28-bone rig ships
+// as Idle / Run / Jump / Land (the source 0.883s jump was split at 0.6s by
+// tmp/mech_bird_split_jump.mjs: Jump keeps the crouch-launch + wing-flap and,
+// because `land` is named, CLAMPS on its final airborne pose for the rest of
+// the fall; Land is the absorb-dip + recover one-shot the touchdown edge
+// fires, so the landing can never play mid-air). Walk aliases the run cycle
+// (the servo sprint reads as a stately strut at walk timeScales) and death
+// holds Idle (a ridden mount never plays a death; the summon strips first).
+const MOUNT_MECH_BIRD: ClipMap = {
+  idle: 'Idle',
+  walk: 'Run',
+  run: 'Run',
+  attack: [],
+  death: 'Idle',
+  jump: 'Jump',
+  land: 'Land',
+};
+
 // The Drakelands dragonkin brood (tmp/dragonkin_build.mjs bakes): artist
 // clips on the 25-bone mixamorig core. Run reuses the walk cycle (the rigs
 // ship no separate sprint; visual timeScale matching covers the chase). The
@@ -1719,6 +1737,23 @@ export const VISUALS: Record<string, VisualDef> = {
     // inside what the other baked mounts already ship (grag_bear's 3.58 yd/s
     // natural against the same 12.6 leaves it sliding over half its travel).
     runRef: 12.6,
+    lazyPreload: true,
+  },
+  // The Cluckwork Mech Bird (developer-only, granted via /dev mounts):
+  // authored Blender clips on its own 28-bone rig (no bake_mount_gaits entry,
+  // never bake over it). walkRef is the Run cycle's measured natural speed
+  // (stride 0.332 raw p2p, 0.433s cycle, height 4.4 over rawHeight 1.0 =
+  // 6.8 yd/s), so walking plays near the authored look. runRef follows the
+  // drakemaw precedent above: the RIDDEN speed (RUN_SPEED 7 x +75% = 12.25)
+  // so timeScale lands on 1.0 and the servo sprint keeps its authored
+  // cadence; at this height the natural cycle covers over half the ridden
+  // travel, so the residual slide is milder than the drakemaw's 28%.
+  mount_mech_bird: {
+    url: `${MOUNTS_DIR}/mech_bird.glb`,
+    height: 4.4,
+    clips: MOUNT_MECH_BIRD,
+    walkRef: 6.8,
+    runRef: 12.25,
     lazyPreload: true,
   },
 

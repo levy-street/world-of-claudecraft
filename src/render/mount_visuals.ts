@@ -81,6 +81,12 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // The Drakemaw Raptor: authored saddle sits over the hips behind the neck
   // spines (hence the slight rear shift), gait-rigged Walk/Run cycles.
   drakemaw_raptor: spec('mount_drakemaw_raptor', 2.35, true, undefined, -0.1),
+  // The Cluckwork Mech Bird: authored rigid-servo clips (no procedural bob,
+  // the clips carry the motion). Seat tuned by eye at the shipped x4.4 height:
+  // the rider drops INTO the saddle bucket (the raw 0.60-of-height saddle
+  // surface reads as floating on the fixed-size chibi rider), dead over the
+  // origin, so no fore/aft shift.
+  mech_bird: spec('mount_mech_bird', 2.5, true),
 };
 
 /** Spec for an entity's active mountKey, or null when dismounted/unknown. */

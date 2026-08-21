@@ -414,6 +414,21 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: true,
     sellValue: 0,
   },
+  // Developer-only mount, the tank's sibling: intentionally absent from
+  // vendors, quests, creature loot, heroic loot, and Rift reward pools. Use
+  // /dev mounts or /dev give reins_mech_bird while the feature remains under
+  // development. Soulbound for the same reason as the tank: with no
+  // acquisition path, tradability would turn a dev grant into an economy leak.
+  reins_mech_bird: {
+    id: 'reins_mech_bird',
+    name: 'Ignition Key: Cluckwork Mech Bird',
+    kind: 'mount',
+    mount: 'mech_bird',
+    quality: 'rare',
+    soulbound: true,
+    noDiscard: true,
+    sellValue: 0,
+  },
   mistveil_cord: {
     id: 'mistveil_cord',
     name: 'Mistveil Cord',

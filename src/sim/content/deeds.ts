@@ -2766,11 +2766,11 @@ export const DEEDS: Record<string, DeedDef> = {
   // feat: true, uniquely off the feat_ prefix (pinned with rationale in
   // tests/deeds_content.test.ts): the capstone is a dynamic meta over a
   // growing catalog, the feat_book_complete class, and the flag is what
-  // keeps it OUT of BOOK_COMPLETE_REQUIREMENTS. Three catalog slots are
+  // keeps it OUT of BOOK_COMPLETE_REQUIREMENTS. Four catalog slots are
   // owner-pended today (masterwork:engineering, reins_drakemaw_raptor,
-  // reins_terrorspark_groundshaker), so a non-feat capstone would dead-end
-  // The Whole Book for every player (the retroFallbackGrants stranded-heal
-  // doctrine names exactly that failure). It stays on the Collection shelf
+  // reins_terrorspark_groundshaker, reins_mech_bird), so a non-feat capstone
+  // would dead-end The Whole Book for every player (the retroFallbackGrants
+  // stranded-heal doctrine names exactly that failure). It stays on the Collection shelf
   // beside its ladder; grant, marquee, and feed behavior are unaffected.
   col_reliquary_complete: {
     id: 'col_reliquary_complete',

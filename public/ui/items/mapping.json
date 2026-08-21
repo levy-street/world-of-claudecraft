@@ -6035,6 +6035,21 @@
     "marrowpoint",
     "rimefang"
    ]
+  },
+  {
+   "batchId": "mech-bird-mount-icon-2026-08-17",
+   "source": "Project Blender render of the shipped mount model (Cycles) with painted-treatment post (median brushwork pass, warm and cool grade, vignette multiply)",
+   "owner": "World of ClaudeCraft",
+   "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+   "styleContract": {
+    "id": "woc-item-icon-v1",
+    "document": "docs/design/item-icon-art-style.md"
+   },
+   "styleReference": "Generated under item-icon contract woc-item-icon-v1, Mount collectible family row: three-quarter mount bust with tack. Source model is the shipped public/models/mounts/mech_bird.glb posed on its Idle clip head-turn hold, rendered opaque on a dark umber vignette with a top-left warm key.",
+   "commonPrompt": "Three-quarter bust portrait of the Cluckwork Mech Bird mount with saddle and grab handle visible, opaque dark atmospheric vignette ground, top-left warm key light, cool deep shadow, painted brushwork finish, no writing, frame, transparency, or crop.",
+   "itemIds": [
+    "reins_mech_bird"
+   ]
   }
  ]
 }

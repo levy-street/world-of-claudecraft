@@ -138,7 +138,11 @@ which already computes interpolated position, `loco.speed/moving`, `swimming`,
 - **Mount running:** the same distance accumulator fires a mount-specific
   `sink.mountRun(x,y,z, mountKey, self)` gait beat while a grounded mount runs.
   Mount walking stays quiet. These cues use the normal SFX mix and remain audible
-  when the optional on-foot footstep setting is disabled.
+  when the optional on-foot footstep setting is disabled. A catalog mount MAY be
+  deliberately silent (owner call): `mountRun` falls through when no
+  `mount_run_<key>` clip ships, and the exemption is recorded in `SILENT_MOUNTS`
+  in `tests/sfx.test.ts` (today: `mech_bird`, the dev-only Cluckwork Mech Bird),
+  so a mount missing its clip by accident still reds the suite.
 - **Jump / land / splash / swim:** per-view edge detection on `airborne` and
   `swimming` transitions fires `sink.movement('jump'|'land'|'splash'|'swim', …)`.
 - **Listener:** after the camera is positioned (~L1583), `sink.setListener(camPos,

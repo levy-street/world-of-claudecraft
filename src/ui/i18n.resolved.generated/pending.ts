@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "entities.items.reins_mech_bird.name",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -30,12 +31,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "es_ES": [
+    "entities.items.reins_mech_bird.name",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -56,12 +60,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "fr_FR": [
+    "entities.items.reins_mech_bird.name",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -82,12 +89,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "fr_CA": [
+    "entities.items.reins_mech_bird.name",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -108,6 +118,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
@@ -115,6 +127,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "entities.items.reins_mech_bird.name",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -135,12 +148,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "de_DE": [
+    "entities.items.reins_mech_bird.name",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -161,6 +177,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
@@ -179,6 +197,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarPosition"
   ],
   "pt_BR": [
+    "entities.items.reins_mech_bird.name",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -199,6 +218,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
@@ -208,6 +229,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarPosition"
   ],
   "cs_CZ": [
+    "entities.items.reins_mech_bird.name",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -228,12 +250,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "nl_NL": [
+    "entities.items.reins_mech_bird.name",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -254,12 +279,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "pl_PL": [
+    "entities.items.reins_mech_bird.name",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -280,12 +308,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "id_ID": [
+    "entities.items.reins_mech_bird.name",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -306,12 +337,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "tr_TR": [
+    "entities.items.reins_mech_bird.name",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -332,12 +366,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "sv_SE": [
+    "entities.items.reins_mech_bird.name",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -358,12 +395,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "vi_VN": [
+    "entities.items.reins_mech_bird.name",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -384,12 +424,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "da_DK": [
+    "entities.items.reins_mech_bird.name",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -410,6 +453,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.cycleHudAction",
     "hudChrome.controller.cycleSetAction",
     "hudChrome.controller.subcommandsAction",
+    "hudChrome.mounts.desc_mech_bird",
+    "hudChrome.mounts.name_mech_bird",
     "hudChrome.perf.diagnostics.diagnosis.titles.gcHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch",
     "hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild",
