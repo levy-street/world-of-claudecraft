@@ -6614,6 +6614,16 @@ FRACTIONAL farming value per its own instruction (unrelated to this call).
   its 2 reds are the 11b-parked 11d-owned count pins (the 11b red list's
   "recipe_economy (2)"); nothing this phase touched feeds them (no sellValue,
   no count moved). Not defects of this phase.
+- CORRECTED AT THE QA GATE: this ledger first read `npm run ci:changed`'s
+  exit 1 as the branch-wide scope noise of the memory catalog, on the
+  evidence that every error named a file outside this phase's diff. That
+  reading was WRONG by one file: an import-order ASSIST error in
+  tests/wellfed.test.ts was inside the changed set and was the gate's only
+  error, fixed at deb22b262d, after which ci:changed exits 0. The scope
+  noise is real for other files, which is exactly what made the miss easy;
+  the durable rule is in the QA verdict block below (a `--write` FORMAT
+  pass does not organize imports, and the gate is re-run after the LAST
+  commit rather than the last source edit).
 - The 11b red list's guide.test.ts row (the count-free guard) went GREEN
   here; the FILE now carries exactly the 2 freshness reds named to 11d (the
   regen-diff arm and the C10 effect-row mirror, which this phase re-aimed
