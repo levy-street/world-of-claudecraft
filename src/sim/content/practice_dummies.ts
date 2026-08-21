@@ -123,18 +123,28 @@ export const PRACTICE_DUMMY_MOBS: Record<string, MobTemplate> = {
   },
 };
 
-// The row runs east to west along the hill above Highwatch (the engine compass
-// puts east at minus x, so ascending x walks west) at a fixed 2 yard pitch, in
-// ascending order of what it represents: ally, normal trash, normal
+// The row runs ACROSS the walk-up from Highwatch, not along it. The hub sits at
+// (0, 660) and the row at x -40, so a player arrives travelling almost pure
+// minus x: a row laid out along x is seen end-on, which stacks the four bodies
+// and their nameplates into what reads as a single dummy. Running the row along
+// z instead puts them side by side from that approach.
+//
+// The pitch is 6 yards: wide enough that each dummy owns its own ground and its
+// own nameplate lane, tight enough that all four are still in frame from where a
+// player stands to read one. It is also the only axis with room to spread at
+// all: 6 yard steps along x would walk the heroic dummy to x -28, halfway back
+// to the Highwatch hub boundary.
+//
+// Order along ascending z is what each represents: ally, normal trash, normal
 // boss, heroic boss. The original training dummy holds its shipped spot at
-// x -40 (zone3.ts owns that camp entry and the deed that names it), so the row
-// is anchored on it and the three new marks are measured off it rather than the
-// dummies being re-placed around a new anchor.
-export const PRACTICE_ROW_Z = 648;
-export const PRACTICE_ROW_SPACING = 2;
-export const PRACTICE_ROW_TRAINING_DUMMY_X = -40;
+// (-40, 648) (zone3.ts owns that camp entry and the deed that names it), so the
+// row is anchored on it and the three new marks are measured off it rather than
+// the dummies being re-placed around a new anchor.
+export const PRACTICE_ROW_X = -40;
+export const PRACTICE_ROW_SPACING = 6;
+export const PRACTICE_ROW_TRAINING_DUMMY_Z = 648;
 
-// Position in the row, east (0) to west (3). The training dummy is slot 1.
+// Position in the row, ascending z. The training dummy is slot 1.
 export const PRACTICE_ROW_ORDER: readonly string[] = [
   FRIENDLY_PLAYER_DUMMY_ID,
   'training_dummy',
@@ -144,9 +154,9 @@ export const PRACTICE_ROW_ORDER: readonly string[] = [
 
 const TRAINING_DUMMY_SLOT = PRACTICE_ROW_ORDER.indexOf('training_dummy');
 
-/** The x of a row slot, measured off the training dummy's shipped position. */
-export function practiceRowX(slot: number): number {
-  return PRACTICE_ROW_TRAINING_DUMMY_X + (slot - TRAINING_DUMMY_SLOT) * PRACTICE_ROW_SPACING;
+/** The z of a row slot, measured off the training dummy's shipped position. */
+export function practiceRowZ(slot: number): number {
+  return PRACTICE_ROW_TRAINING_DUMMY_Z + (slot - TRAINING_DUMMY_SLOT) * PRACTICE_ROW_SPACING;
 }
 
 // radius 0 / count 1, like the training dummy's own entry: a dummy camp is a
@@ -155,5 +165,30 @@ export function practiceRowX(slot: number): number {
 export const PRACTICE_DUMMY_CAMPS: CampDef[] = PRACTICE_ROW_ORDER.flatMap((mobId, slot) =>
   mobId === 'training_dummy'
     ? []
-    : [{ mobId, center: { x: practiceRowX(slot), z: PRACTICE_ROW_Z }, radius: 0, count: 1 }],
+    : [{ mobId, center: { x: PRACTICE_ROW_X, z: practiceRowZ(slot) }, radius: 0, count: 1 }],
 );
+
+// The row's ONE fire, authored into ZONE3_PROPS.campfires.
+//
+// Every camp whose mob family builds fires and that no authored campfire
+// already covers gets a procedural brazier of its own (render/camp_braziers.ts),
+// and a dummy is family 'humanoid', so the row was lighting one fire per dummy:
+// four inert practice targets each tending a campfire. The fix has two halves.
+// An inert practice target now builds nothing (render/night_accents_core.ts),
+// which removes all four, and this authored campfire puts a single one back in
+// FRONT of the normal boss dummy. Front is plus x: the row faces the walk-up
+// from Highwatch, which is the side a player stands on.
+//
+// The offset is 1.5 yards, not the 3 feet the fire LOOKS like it wants, and the
+// reason is the campfire's own collider. A campfire is a solid circle of radius
+// 0.85 (sim/colliders.ts) and a spawning mob keeps 0.65 of clearance, so a fire
+// closer than their sum shoves the dummy off its camp mark: at 1 yard the boss
+// dummy resolved to (-38.66, 652.54), two yards out of the row and visibly
+// crooked beside its neighbours. 1.5 is the nearest the fire can stand with the
+// dummy still exactly on its mark, which tests/practice_dummies.test.ts pins so
+// a future clearance change fails loudly instead of bending the row again.
+export const PRACTICE_ROW_CAMPFIRE_OFFSET = 1.5;
+export const PRACTICE_ROW_CAMPFIRE: [number, number] = [
+  PRACTICE_ROW_X + PRACTICE_ROW_CAMPFIRE_OFFSET,
+  practiceRowZ(PRACTICE_ROW_ORDER.indexOf(NORMAL_BOSS_DUMMY_ID)),
+];

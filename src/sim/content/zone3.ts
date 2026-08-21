@@ -16,6 +16,7 @@ import type {
 } from '../types';
 import { FERAL, HUNTER_ONLY } from './items';
 import { MOUNT_RACE_COURSE, STABLE_HORSE_TEMPLATE_ID, STABLE_PADDOCK } from './mounts';
+import { PRACTICE_ROW_CAMPFIRE } from './practice_dummies';
 import { FURY_STOCK } from './pvp_honor';
 
 export const ZONE3_ZONE: ZoneDef = {
@@ -4092,6 +4093,10 @@ export const ZONE3_PROPS: ZonePropsDef = {
     [-136, 743],
     [52, 817],
     [28, 847],
+    // The practice row's single fire, three feet in front of the normal boss
+    // dummy. The mark is derived from the row itself (content/practice_dummies.ts)
+    // so it follows the row if the pitch is ever retuned.
+    PRACTICE_ROW_CAMPFIRE,
   ],
   mudHuts: [],
   marshReeds: [],
