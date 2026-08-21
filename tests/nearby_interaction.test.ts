@@ -491,7 +491,6 @@ describe('tryNearbyInteraction: off-quest collectables are not there', () => {
   });
 });
 
-
 // Two reaches meet on the npc arm. The nearest-wins scan has always accepted an
 // npc just past INTERACT_RANGE (its sentinel is INTERACT_RANGE + 1, so a keypress
 // reaches six yards), while a promotion names an npc the player selected rather
@@ -574,7 +573,6 @@ describe('tryNearbyInteraction npc reach', () => {
     expect(r.calls).toEqual(['quest:3']);
   });
 });
-
 
 describe('the garden-bed arm (Phase 9b)', () => {
   const bedPatch: FarmPatchDef = {

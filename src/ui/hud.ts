@@ -299,7 +299,6 @@ import {
   disenchantSecondaryLineKey,
   salvageResultToast,
 } from './enchanting_view';
-import { entityDisplayName } from './entity_display_name';
 import {
   delveDisplayName,
   delveText,
@@ -317,6 +316,7 @@ import {
   questTitleFromSource,
   zoneWelcome,
 } from './entity_display_core';
+import { entityDisplayName } from './entity_display_name';
 import {
   classDisplayName,
   dungeonDisplayName,

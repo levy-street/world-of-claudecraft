@@ -3118,7 +3118,6 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
   },
 ];
 
-
 // Exported (not just used internally by recipeById below) so the IWorld
 // recipeList read surface (Sim.recipeList / ClientWorld.recipeList) can list
 // every recipe, common, tool, and combo alike: see PR #1209 review, a combo
