@@ -25,9 +25,13 @@
 //     every farm bed planted, all gathering and craft skills capped, and 140
 //     inventory / bank / buyback slots each carrying an instance payload with a
 //     24-character signer) serializes to about 38.9 KB.
-// The professions-owned portion alone is independently pinned at 14 KiB by
-// tests/professions_blob_growth.test.ts (measured 13,948 bytes at its worst
-// case), which is the largest content-scaled block inside that 38.9 KB.
+// The professions-owned portion alone is the largest content-scaled block
+// inside that 38.9 KB, independently pinned by
+// tests/professions_blob_growth.test.ts. (At the 11b absorb that pin is
+// PARKED on the pre-merge masterwrought literal, whose fixture plants no
+// farm bed; 11d restores the farming branch's every-bed worst-case fixture,
+// which measured 14,218 bytes under a 15,360 ceiling, and re-derives the
+// merged bound. Re-true this sentence to the re-derived figure then.)
 //
 // 131,072 bytes is therefore about 3.4x the measured legitimate worst case: far
 // enough above it that ordinary authored content growth (a new zone's nodes, a

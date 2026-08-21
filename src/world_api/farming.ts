@@ -112,9 +112,11 @@ export interface IWorldFarming {
   // off the entity snapshot; the interact funnel's feast arm supplies it).
   // Server-authoritative: the sim re-checks liveness, expiry, charges,
   // range, and the once-per-player consumed ledger, then spends a serving
-  // and starts the SAME 18s sit-restore a bagged tier-4 dish starts, so the
-  // Well Fed buff mints at completion through the one Phase 11 site
-  // (src/sim/wellfed.ts) and an interrupted meal forfeits it. The client
+  // and starts the SAME 18s sit-restore a bagged tier-4 dish starts; an
+  // interrupted meal forfeits the completion. The live completion mint is
+  // the inline clear-then-grant in updateRegen (src/sim/combat/auras.ts);
+  // farming's src/sim/wellfed.ts path is PARKED UNWIRED at the 11b absorb
+  // until 11c unifies the spellings (state.md, the 11c carry list). The client
   // never decides or predicts any feast outcome; consumption draws zero rng.
   consumeFeast(feastId: number): void;
 }

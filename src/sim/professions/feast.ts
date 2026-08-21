@@ -8,10 +8,12 @@
 // DRAW CONTRACT: placement and consumption draw ZERO rng (no Rng access in
 // this module at all). Placement is a bag spend plus an entity spawn;
 // consumption is a ledger write plus the SAME eating slot a bagged dish
-// sets, so the Well Fed mint stays the Phase 11 completion path
-// (src/sim/wellfed.ts via updateRegen) and owns no draw either. The expiry
-// sweep decides from stored state alone. Nothing here can fork the shared
-// draw stream.
+// sets. The live completion mint is masterwrought's inline clear-then-grant
+// in updateRegen (src/sim/combat/auras.ts), which owns no draw either;
+// farming's src/sim/wellfed.ts mint path is PARKED UNWIRED at the 11b
+// absorb until 11c unifies the spellings (state.md, the 11c carry list).
+// The expiry sweep decides from stored state alone. Nothing here can fork
+// the shared draw stream.
 //
 // TRANSIENT BY DESIGN: FeastState lives only in SimContext.feasts and dies
 // with the Sim instance. No field of it enters PlayerMeta, CharacterState,

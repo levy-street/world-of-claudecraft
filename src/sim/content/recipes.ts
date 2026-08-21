@@ -2754,9 +2754,10 @@ export const HOE_RECIPES: ProfessionRecipeRecord[] = [
 
 // The farm-economy hook set (Phase 6, reopened by Phase 11): the recipes that
 // turn farm output into something a player wants, so growing a crop is a
-// supply chain rather than a vendor-sell loop. Twelve cooking rows (the eight
-// plain dishes plus the four Phase 11 well-fed buff dishes) plus one alchemy
-// row, the growth tonic's craft (D7, the cross-profession trade).
+// supply chain rather than a vendor-sell loop. Thirteen cooking rows (the
+// eight plain dishes, the four Phase 11 well-fed buff dishes, and the Phase
+// 12 harvest feast) plus one alchemy row, the growth tonic's craft (D7, the
+// cross-profession trade).
 //
 // A SEPARATE LIST FROM LADDER_RECIPES, deliberately, for the same reason
 // ROD_RECIPES and HOE_RECIPES are separate: LADDER_RECIPES is CLOSED at three

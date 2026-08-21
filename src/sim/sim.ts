@@ -6507,8 +6507,9 @@ export class Sim {
     lap?.('postOffice');
     drainDelayedEvents(this.ctx);
     lap?.('delayedEv');
-    // The farming sweep: APPENDED here, never inserted (any reorder of the
-    // tail forks every golden). Draws ZERO rng behind its own 1 Hz guard:
+    // The farming sweep: appended to the mail/delayed-event tail group,
+    // ahead of the zero-rng deeds evaluator (any reorder of the tail forks
+    // every golden). Draws ZERO rng behind its own 1 Hz guard:
     // the ready notice and the shared-feast despawn check (charges/expiry,
     // professions/feast.ts) both decide from stored state alone, so its
     // position cannot fork the draw order, like its neighbours.

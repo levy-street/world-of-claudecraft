@@ -769,8 +769,11 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // Trainer-taught outputs of FARM_RECIPES, one BUFF dish per crop tier so
   // the produce ladder has a well-fed consumer at every rung. Exactly the
   // plain-dish shape above plus the ONE new field: `wellfed`, the elixir-arm
-  // mirror (src/sim/items.ts / src/sim/wellfed.ts), a temporary buff_sta aura
-  // minted when the 18s sit-restore completes. All four share the aura name
+  // mirror, a temporary buff_sta aura payload for the 18s sit-restore's
+  // completion. PARKED UNWIRED at the 11b absorb: the live completion mint
+  // (src/sim/combat/auras.ts updateRegen) reads the `wellFed` spelling only,
+  // so these four dishes grant no buff until 11c unifies the spellings
+  // (state.md, the 11c carry list). All four share the aura name
   // 'Well Fed' and therefore the aura id wellfed_buff_sta: within the food
   // namespace last eaten always wins (the classic one-food-buff idiom), and
   // the distinct namespace means no dish ever clobbers an elixir_<kind> buff
