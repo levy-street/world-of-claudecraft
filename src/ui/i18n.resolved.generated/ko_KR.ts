@@ -1182,6 +1182,7 @@ export const ko_KR: EnTranslations = {
       "endedForfeitLog": "이 경기는 기권으로 끝났습니다.",
       "firstWinBonusLine": "오늘의 첫 승리: 명예 +{honor}",
       "firstWinBonusLog": "오늘의 첫 승리: 추가로 명예를 {honor} 획득했습니다.",
+      "doubleHonorLine": "명예 2배 주말: 오늘 쏜할로우 평원 명예 보상이 {mult}배로 지급되며, 끝까지 치른 패배도 승리와 같은 보상을 받습니다",
       "timeWarningMinutes": "{minutes}분 남았습니다",
       "timeWarningOneMinute": "1분 남았습니다",
       "timeWarningMinutesLog": "전투가 {minutes}분 남았습니다.",
@@ -2965,6 +2966,10 @@ export const ko_KR: EnTranslations = {
         "arenaClash": {
           "title": "투기장 격돌",
           "note": "결투사들이 잿빛 투기장으로 몰려듭니다. 대기열에 올라 순위를 노리세요."
+        },
+        "doubleHonor": {
+          "title": "명예 2배 주말",
+          "note": "전쟁 진영이 소집 나팔을 붑니다. 주말 동안 쏜할로우 평원 명예 보상이 2배가 되며, 끝까지 치른 패배도 승리와 같은 보상을 받습니다."
         },
         "fishingDerby": {
           "title": "낚시 대회",

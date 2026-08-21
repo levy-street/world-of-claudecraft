@@ -1182,6 +1182,7 @@ export const vi_VN: EnTranslations = {
       "endedForfeitLog": "Trận đấu đã bị bỏ cuộc.",
       "firstWinBonusLine": "Chiến thắng đầu tiên trong ngày: +{honor} Danh dự",
       "firstWinBonusLog": "Chiến thắng đầu tiên trong ngày: bạn nhận thêm {honor} Danh dự thưởng.",
+      "doubleHonorLine": "Double Honor Weekend: Thornhollow Fields Honor pays {mult}x today, and a played-out loss pays like a win",
       "timeWarningMinutes": "Còn lại {minutes} phút",
       "timeWarningOneMinute": "Còn lại một phút",
       "timeWarningMinutesLog": "Còn lại {minutes} phút trong trận đấu.",
@@ -2965,6 +2966,10 @@ export const vi_VN: EnTranslations = {
         "arenaClash": {
           "title": "Đại Chiến Đấu Trường",
           "note": "Các đấu sĩ đổ về Đấu Trường Tro Tàn. Hãy xếp hàng và leo bảng xếp hạng."
+        },
+        "doubleHonor": {
+          "title": "Double Honor Weekend",
+          "note": "The war camps sound the muster: all weekend, Thornhollow Fields Honor pays double and a played-out loss pays like a win."
         },
         "fishingDerby": {
           "title": "Hội Thi Câu Cá",

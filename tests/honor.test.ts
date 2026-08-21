@@ -34,9 +34,15 @@ function world(): Sim {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: RL_TEST_WORLD });
 }
 
+// Fixture reset days in this file are deliberately WEEKDAYS: the Double Honor
+// Weekend (src/sim/pvp/honor_event.ts) doubles every battleground award on
+// Saturday and Sunday reset days and boosts played-out losses, and these
+// suites pin the BASE amounts. The event has its own describe near the
+// bottom, on weekend keys on purpose.
+
 function liveArena(): { sim: Sim; a: number; b: number; match: ArenaMatch } {
   const sim = world();
-  sim.resetDay = '2026-07-11';
+  sim.resetDay = '2026-07-08';
   const a = sim.addPlayer('warrior', 'Aleph', { characterId: 101 });
   const b = sim.addPlayer('mage', 'Bet', { characterId: 202 });
   sim.setPlayerLevel(arena.ARENA_MIN_LEVEL, a);
@@ -53,7 +59,7 @@ function liveArena(): { sim: Sim; a: number; b: number; match: ArenaMatch } {
 
 function liveArena2v2(): { sim: Sim; match: ArenaMatch } {
   const sim = world();
-  sim.resetDay = '2026-07-11';
+  sim.resetDay = '2026-07-08';
   const classes = ['warrior', 'mage', 'rogue', 'priest'] as const;
   const pids = classes.map((cls, i) => sim.addPlayer(cls, `Ranked${i}`, { characterId: 500 + i }));
   for (const pid of pids) sim.setPlayerLevel(arena.ARENA_MIN_LEVEL, pid);
@@ -68,7 +74,7 @@ function liveArena2v2(): { sim: Sim; match: ArenaMatch } {
 
 function liveFiesta(): { sim: Sim; match: ArenaMatch; pids: number[] } {
   const sim = world();
-  sim.resetDay = '2026-07-11';
+  sim.resetDay = '2026-07-08';
   const classes = ['warrior', 'mage', 'rogue', 'priest'] as const;
   const pids = classes.map((cls, i) => sim.addPlayer(cls, `Fiesta${i}`, { characterId: 300 + i }));
   for (const pid of pids) sim.arenaQueueJoin(pid, 'fiesta');
@@ -259,7 +265,7 @@ describe('ranked Arena honor', () => {
 
   it('applies repeat-opponent DR, the daily taper, and UTC rollover deterministically', () => {
     const sim = world();
-    sim.resetDay = '2026-07-11';
+    sim.resetDay = '2026-07-08';
     const pid = sim.addPlayer('warrior', 'Climber');
     const meta = sim.meta(pid)!;
 
@@ -269,7 +275,7 @@ describe('ranked Arena honor', () => {
     expect(repeat).toEqual([25, 0, 0, 0]);
 
     const fresh = world();
-    fresh.resetDay = '2026-07-11';
+    fresh.resetDay = '2026-07-08';
     const freshPid = fresh.addPlayer('warrior', 'Taper');
     const freshMeta = fresh.meta(freshPid)!;
     for (let i = 0; i < ARENA_DAILY_TAPER_START; i++) {
@@ -281,7 +287,7 @@ describe('ranked Arena honor', () => {
       awardRankedArenaResultHonor(fresh.ctx, freshMeta, '1v1', '["character:next"]', 'win'),
     ).toBe(12);
 
-    fresh.resetDay = '2026-07-12';
+    fresh.resetDay = '2026-07-09';
     expect(
       awardRankedArenaResultHonor(fresh.ctx, freshMeta, '1v1', '["character:next"]', 'win'),
     ).toBe(25);
@@ -289,7 +295,7 @@ describe('ranked Arena honor', () => {
 
   it('decays a repeated loss to the same team and rolls the counter over each day', () => {
     const sim = world();
-    sim.resetDay = '2026-07-11';
+    sim.resetDay = '2026-07-08';
     const meta = sim.meta(sim.addPlayer('warrior', 'Loser'))!;
     const key = '["character:9"]';
 
@@ -300,13 +306,13 @@ describe('ranked Arena honor', () => {
     // pays, every rematch pays nothing, so a traded pair cannot farm the loss arm.
     expect(repeat).toEqual([8, 0, 0, 0]);
 
-    sim.resetDay = '2026-07-12';
+    sim.resetDay = '2026-07-09';
     expect(awardRankedArenaResultHonor(sim.ctx, meta, '1v1', key, 'loss')).toBe(8);
   });
 
   it('keeps the loss counter off the win counter, in both directions', () => {
     const sim = world();
-    sim.resetDay = '2026-07-11';
+    sim.resetDay = '2026-07-08';
     const meta = sim.meta(sim.addPlayer('warrior', 'Rematch'))!;
     const key = '["character:9"]';
 
@@ -322,7 +328,7 @@ describe('ranked Arena honor', () => {
 
   it('tapers loss awards on the daily win count without letting losses advance it', () => {
     const sim = world();
-    sim.resetDay = '2026-07-11';
+    sim.resetDay = '2026-07-08';
     const meta = sim.meta(sim.addPlayer('warrior', 'Grinder'))!;
 
     // A day of nothing but losses never tapers itself: the taper caps arena
@@ -337,7 +343,7 @@ describe('ranked Arena honor', () => {
 
     // Wins do taper the loss award, on the same curve they taper themselves.
     const winner = world();
-    winner.resetDay = '2026-07-11';
+    winner.resetDay = '2026-07-08';
     const winnerMeta = winner.meta(winner.addPlayer('warrior', 'Champion'))!;
     for (let i = 0; i < ARENA_DAILY_TAPER_START; i++) {
       awardRankedArenaResultHonor(winner.ctx, winnerMeta, '1v1', `["character:${i}"]`, 'win');
@@ -349,7 +355,7 @@ describe('ranked Arena honor', () => {
 
   it('does not reset a persisted daily window when the host has no UTC day', () => {
     const sim = world();
-    sim.resetDay = '2026-07-11';
+    sim.resetDay = '2026-07-08';
     const pid = sim.addPlayer('warrior', 'Replay');
     const meta = sim.meta(pid)!;
     const key = '["name:opponent"]';
@@ -360,7 +366,7 @@ describe('ranked Arena honor', () => {
 
   it('round-trips the loss counter and leaves an unused one out of the save', () => {
     const sim = world();
-    sim.resetDay = '2026-07-11';
+    sim.resetDay = '2026-07-08';
     const pid = sim.addPlayer('warrior', 'Persist');
     const meta = sim.meta(pid)!;
 
@@ -374,7 +380,7 @@ describe('ranked Arena honor', () => {
     expect(saved.honorArenaDaily?.lossesByOpponent).toEqual({ '1v1:["character:9"]': 1 });
 
     const loaded = world();
-    loaded.resetDay = '2026-07-11';
+    loaded.resetDay = '2026-07-08';
     const loadedPid = loaded.addPlayer('warrior', 'Persist', { state: saved });
     const loadedMeta = loaded.meta(loadedPid)!;
     // The spent counter survives the reload, so relogging cannot re-arm it.
@@ -388,7 +394,7 @@ describe('ranked Arena honor', () => {
     const seedPid = seed.addPlayer('warrior', 'Corrupt');
     const state = seed.serializeCharacter(seedPid)! as unknown as Record<string, unknown>;
     state.honorArenaDaily = {
-      date: '2026-07-11',
+      date: '2026-07-08',
       winsByOpponent: {},
       lossesByOpponent: { valid: 3.7, negative: -2, nan: Number.NaN },
       fiestaCompletionsByOpponent: {},
@@ -423,7 +429,7 @@ describe('Fiesta honor', () => {
 
   it('applies per-victim kill DR and repeat-opposition completion DR', () => {
     const sim = world();
-    sim.resetDay = '2026-07-11';
+    sim.resetDay = '2026-07-08';
     const pid = sim.addPlayer('rogue', 'Fighter');
     const meta = sim.meta(pid)!;
     const pairs = new Map<string, number>();
@@ -590,6 +596,106 @@ describe('Thornhollow Fields honor income', () => {
     // The counters live on the MATCH, so a new match starts the curve over.
     const nextMatch = new Map<string, number>();
     expect(awardBattlegroundKillHonor(sim.ctx, meta, 99, nextMatch)).toBe(5);
+  });
+});
+
+describe('weekly Double Honor', () => {
+  it('doubles battleground kill and assist drips before the single floor, all weekend', () => {
+    const sim = world();
+    sim.resetDay = '2026-08-15'; // a Saturday
+    const pid = sim.addPlayer('warrior', 'Weekender');
+    const meta = sim.meta(pid)!;
+
+    // Doubled BEFORE grantHonor's single floor: the third (0.25-decayed) kill
+    // pays floor(5 * 0.25 * 2) = 2, and the second pays 5, never floor-then-double.
+    const kills = new Map<string, number>();
+    expect(
+      Array.from({ length: 5 }, () => awardBattlegroundKillHonor(sim.ctx, meta, 99, kills)),
+    ).toEqual([10, 5, 2, 0, 0]);
+    const assists = new Map<string, number>();
+    expect(
+      Array.from({ length: 5 }, () => awardBattlegroundAssistHonor(sim.ctx, meta, 99, assists)),
+    ).toEqual([4, 2, 1, 0, 0]);
+    expect(sim.events).toContainEqual({
+      type: 'honor',
+      pid,
+      amount: 10,
+      reason: 'battleground_kill',
+    });
+
+    // Sunday is still inside the window; the Monday rollover closes it.
+    sim.resetDay = '2026-08-16';
+    const sunday = new Map<string, number>();
+    expect(awardBattlegroundKillHonor(sim.ctx, meta, 100, sunday)).toBe(10);
+    sim.resetDay = '2026-08-17';
+    const monday = new Map<string, number>();
+    expect(awardBattlegroundKillHonor(sim.ctx, meta, 101, monday)).toBe(5);
+  });
+
+  it('pays a played-out loss and draw the WIN base during the weekend, and the loss base outside it', () => {
+    const sim = world();
+    sim.resetDay = '2026-08-16'; // a Sunday, inside the window
+    const pid = sim.addPlayer('warrior', 'Stalwart', { characterId: 704 });
+    const meta = sim.meta(pid)!;
+
+    // The weekend loss boost: a played-out loss pays the WIN base, doubled,
+    // and a draw the same; the DR curve still applies on the shared counter.
+    const loss = awardBattlegroundHonor(sim.ctx, meta, '["character:sun"]', 'loss');
+    expect(loss.total).toBe(BATTLEGROUND_WIN_HONOR * 2);
+    expect(loss.firstWinBonus, 'a loss never claims the daily bonus').toBe(0);
+    const draw = awardBattlegroundHonor(sim.ctx, meta, '["character:sun"]', 'draw');
+    expect(draw.total).toBe(Math.floor(BATTLEGROUND_WIN_HONOR * 0.5) * 2);
+    // The first WIN still arms the daily bonus on top: losing first, then
+    // winning, keeps the day's headline reward intact.
+    const win = awardBattlegroundHonor(sim.ctx, meta, '["character:sun"]', 'win');
+    expect(win.firstWinBonus).toBe(BATTLEGROUND_FIRST_WIN_BONUS_HONOR * 2);
+
+    // Monday: weekday loss economics are untouched.
+    sim.resetDay = '2026-08-17';
+    const weekday = awardBattlegroundHonor(sim.ctx, meta, '["character:mon"]', 'loss');
+    expect(weekday.total).toBe(BATTLEGROUND_LOSS_HONOR);
+  });
+
+  it('leaves arena and Fiesta honor at base rate on the weekend (5v5-only scope)', () => {
+    const sim = world();
+    sim.resetDay = '2026-08-15'; // a Saturday
+    const pid = sim.addPlayer('warrior', 'Purist', { characterId: 703 });
+    const meta = sim.meta(pid)!;
+
+    // The issue scopes the event to the 5v5 CTF explicitly, so a Saturday
+    // ranked arena win and a Fiesta kill both pay exactly their weekday rate.
+    expect(awardRankedArenaResultHonor(sim.ctx, meta, '1v1', '["character:foe"]', 'win')).toBe(
+      RANKED_ARENA_WIN_HONOR['1v1'],
+    );
+    const pairs = new Map<string, number>();
+    expect(awardFiestaKillHonor(sim.ctx, meta, 99, pairs)).toBe(FIESTA_KILL_HONOR);
+    // And the funnel itself never applies the event: raw grants stay raw.
+    expect(grantHonor(sim.ctx, meta, 60, 'arena_win')).toBe(60);
+  });
+
+  it('doubles the whole battleground result, first-win bonus included, with the DR curve intact', () => {
+    const sim = world();
+    sim.resetDay = '2026-08-15'; // a Saturday
+    const pid = sim.addPlayer('warrior', 'SatWinner', { characterId: 702 });
+    const meta = sim.meta(pid)!;
+
+    const first = awardBattlegroundHonor(sim.ctx, meta, '["character:sat"]', 'win');
+    expect(first.total).toBe((BATTLEGROUND_WIN_HONOR + BATTLEGROUND_FIRST_WIN_BONUS_HONOR) * 2);
+    expect(first.firstWinBonus).toBe(BATTLEGROUND_FIRST_WIN_BONUS_HONOR * 2);
+    // The anti-farm decay applies first, then the event doubling: the repeat
+    // win against the same team pays 2 x floor(60 * 0.5), not 2 x 60.
+    const repeat = awardBattlegroundHonor(sim.ctx, meta, '["character:sat"]', 'win');
+    expect(repeat.total).toBe(Math.floor(BATTLEGROUND_WIN_HONOR * 0.5) * 2);
+    expect(repeat.firstWinBonus).toBe(0);
+  });
+
+  it('never fires without a host calendar (the empty reset day)', () => {
+    const sim = world(); // resetDay stays '': headless / replay / parity runs
+    const pid = sim.addPlayer('warrior', 'Headless');
+    const kills = new Map<string, number>();
+    expect(awardBattlegroundKillHonor(sim.ctx, sim.meta(pid)!, 99, kills)).toBe(
+      BATTLEGROUND_KILL_HONOR,
+    );
   });
 });
 

@@ -32,6 +32,13 @@ export {
   repeatHonorMultiplier,
 } from './honor';
 export {
+  DOUBLE_HONOR_MULTIPLIER,
+  DOUBLE_HONOR_WEEKDAYS,
+  doubleHonorActive,
+  honorEventMultiplier,
+  weekdayOfDayKey,
+} from './honor_event';
+export {
   PVP_DEFENSE_CAP,
   PVP_OFFENSE_CAP,
   PVP_RATING_PER_PCT,

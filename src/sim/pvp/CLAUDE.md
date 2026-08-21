@@ -8,6 +8,14 @@ ratings.
 - `honor.ts` owns currency grants, reward constants, UTC-day rollover, and the
   anti-farm diminishing returns. It must use `SimContext` state and the
   HOST-provided UTC day, never a wall clock.
+- `honor_event.ts` owns the weekly Double Honor Weekend: the Saturday/Sunday
+  window decision (pure weekday arithmetic on the host-provided `resetDay`
+  key, no `Date`) and the event multiplier the four BATTLEGROUND award paths
+  in `honor.ts` apply (result, kill, assist, first-win bonus; arena and
+  Fiesta honor never read it, per the issue's 5v5-only scope). During the
+  window a played-out loss or draw also pays the WIN base (the weekend loss
+  boost in `awardBattlegroundHonor`). An empty `resetDay` (no host calendar)
+  never fires the event.
 - `power.ts` owns rating conversion, the independent offense/defense caps, and
   the hostile-player damage multiplier. It must stay pure and deterministic.
 - `warfare_quartermaster.ts` spawns Warmarshal Draven Kole, the Highwatch

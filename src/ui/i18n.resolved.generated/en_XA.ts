@@ -1182,6 +1182,7 @@ export const en_XA: EnTranslations = {
       "endedForfeitLog": "[Ţĥé ɱáţçĥ ŵáš ƒóŕƒéíţéð.]",
       "firstWinBonusLine": "[Ƒíŕšţ ŵíñ óƒ ţĥé ðáý: +{honor} Ĥóñóŕ]",
       "firstWinBonusLog": "[Ƒíŕšţ ŵíñ óƒ ţĥé ðáý: ýóú ĝáíñ {honor} ƀóñúš Ĥóñóŕ.]",
+      "doubleHonorLine": "[Ðóúƀļé Ĥóñóŕ Ŵééķéñð: Ţĥóŕñĥóļļóŵ Ƒíéļðš Ĥóñóŕ þáýš {mult}ẋ ţóðáý, áñð á þļáýéð-óúţ ļóšš þáýš ļíķé á ŵíñ]",
       "timeWarningMinutes": "[{minutes} ɱíñúţéš ŕéɱáíñ]",
       "timeWarningOneMinute": "[Óñé ɱíñúţé ŕéɱáíñš]",
       "timeWarningMinutesLog": "[{minutes} ɱíñúţéš ŕéɱáíñ íñ ţĥé ƀáţţļé.]",
@@ -2965,6 +2966,10 @@ export const en_XA: EnTranslations = {
         "arenaClash": {
           "title": "[Áŕéñá Çļášĥ]",
           "note": "[Ðúéļíšţš ƒļóçķ ţó ţĥé Ášĥéñ Çóļíšéúɱ. Ɋúéúé úþ áñð çļíɱƀ ţĥé ļáððéŕ.]"
+        },
+        "doubleHonor": {
+          "title": "[Ðóúƀļé Ĥóñóŕ Ŵééķéñð]",
+          "note": "[Ţĥé ŵáŕ çáɱþš šóúñð ţĥé ɱúšţéŕ: áļļ ŵééķéñð, Ţĥóŕñĥóļļóŵ Ƒíéļðš Ĥóñóŕ þáýš ðóúƀļé áñð á þļáýéð-óúţ ļóšš þáýš ļíķé á ŵíñ.]"
         },
         "fishingDerby": {
           "title": "[Ƒíšĥíñĝ Ðéŕƀý]",

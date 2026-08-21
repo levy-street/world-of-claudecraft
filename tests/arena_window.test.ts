@@ -68,6 +68,11 @@ describe('arena_window: WCAG chrome (focusable controls + focus-return)', () => 
       code.indexOf('private bgActionHtml'),
     );
     const composed = bgBody.slice(bgBody.indexOf('return ('));
+    // The Double Honor event chip reads first (the realm-wide, rarer fact),
+    // then the personal daily chip, then the queue button both invite a click on.
+    expect(composed.indexOf('bgDoubleHonorChipHtml')).toBeLessThan(
+      composed.indexOf('bgFirstWinChipHtml'),
+    );
     expect(composed.indexOf('bgFirstWinChipHtml')).toBeLessThan(composed.indexOf('bgActionHtml'));
     expect(composed.indexOf('bgActionHtml')).toBeLessThan(composed.indexOf('onlineSection'));
     expect(composed.indexOf('onlineSection')).toBeLessThan(composed.indexOf('allTimeSection'));

@@ -1182,6 +1182,7 @@ export const es_ES: EnTranslations = {
       "endedForfeitLog": "El combate terminó en abandono.",
       "firstWinBonusLine": "Primera victoria del día: +{honor} de Honor",
       "firstWinBonusLog": "Primera victoria del día: obtienes {honor} de Honor adicional.",
+      "doubleHonorLine": "Double Honor Weekend: Thornhollow Fields Honor pays {mult}x today, and a played-out loss pays like a win",
       "timeWarningMinutes": "Quedan {minutes} minutos",
       "timeWarningOneMinute": "Queda un minuto",
       "timeWarningMinutesLog": "Quedan {minutes} minutos de combate.",
@@ -2965,6 +2966,10 @@ export const es_ES: EnTranslations = {
         "arenaClash": {
           "title": "Choque en la Arena",
           "note": "Los duelistas acuden en masa al Coliseo Cinéreo. Entra en cola y asciende en la clasificación."
+        },
+        "doubleHonor": {
+          "title": "Double Honor Weekend",
+          "note": "The war camps sound the muster: all weekend, Thornhollow Fields Honor pays double and a played-out loss pays like a win."
         },
         "fishingDerby": {
           "title": "Torneo de Pesca",

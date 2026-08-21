@@ -1096,6 +1096,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.endedForfeitLog': 'この試合は棄権で終了しました。',
   'hudChrome.bg.firstWinBonusLine': '本日の初勝利:名誉+{honor}',
   'hudChrome.bg.firstWinBonusLog': '本日の初勝利:追加で名誉を{honor}獲得しました。',
+  'hudChrome.bg.doubleHonorLine':
+    '名誉2倍ウィークエンド:本日のソーンホロウ平原の名誉獲得は{mult}倍、最後まで戦えば敗北でも勝利と同額',
   'hudChrome.bg.timeWarningMinutes': '残り{minutes}分',
   'hudChrome.bg.timeWarningOneMinute': '残り1分',
   'hudChrome.bg.timeWarningMinutesLog': '戦闘は残り{minutes}分です。',
@@ -8753,6 +8755,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.arenaClash.title': 'アリーナ激突',
   'hudChrome.calendar.events.arenaClash.note':
     '決闘者たちが灰燼の闘技場へ。キューに並んでラダーを駆け上がろう。',
+  'hudChrome.calendar.events.doubleHonor.title': '名誉2倍ウィークエンド',
+  'hudChrome.calendar.events.doubleHonor.note':
+    '戦陣が召集の号令を上げる。週末の間、ソーンホロウ平原の名誉報酬が2倍になり、最後まで戦えば敗北でも勝利と同額を得られる。',
   'hudChrome.calendar.events.fishingDerby.title': 'フィッシングダービー',
   'hudChrome.calendar.events.fishingDerby.note': '釣り人が湖に並ぶ。竿を持って釣り話を交わそう。',
   'hudChrome.calendar.events.delveDay.title': 'デルヴの日',

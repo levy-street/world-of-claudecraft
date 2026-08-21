@@ -1182,6 +1182,7 @@ export const zh_TW: EnTranslations = {
       "endedForfeitLog": "本場比賽以棄權告終。",
       "firstWinBonusLine": "每日首勝:+{honor}榮譽",
       "firstWinBonusLog": "每日首勝:你額外獲得{honor}點榮譽。",
+      "doubleHonorLine": "雙倍榮譽週末:今日荊谷原野榮譽獎勵均為{mult}倍,打滿全場的敗方也按勝方獎勵結算",
       "timeWarningMinutes": "還剩{minutes}分鐘",
       "timeWarningOneMinute": "還剩一分鐘",
       "timeWarningMinutesLog": "本場戰鬥還剩{minutes}分鐘。",
@@ -2965,6 +2966,10 @@ export const zh_TW: EnTranslations = {
         "arenaClash": {
           "title": "競技場之戰",
           "note": "決鬥者湧向灰燼鬥獸場。排隊開打，向天梯進發。"
+        },
+        "doubleHonor": {
+          "title": "雙倍榮譽週末",
+          "note": "戰營吹響集結號：整個週末，荊谷原野榮譽獎勵加倍，打滿全場的敗方也按勝方獎勵結算。"
         },
         "fishingDerby": {
           "title": "釣魚大賽",

@@ -10,6 +10,9 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -36,6 +39,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "es_ES": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -62,6 +68,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "fr_FR": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -88,6 +97,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "fr_CA": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -115,6 +127,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -141,6 +156,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "de_DE": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -179,6 +197,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarPosition"
   ],
   "pt_BR": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -208,6 +229,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.crossHotbarPosition"
   ],
   "cs_CZ": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -234,6 +258,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "nl_NL": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -260,6 +287,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "pl_PL": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -286,6 +316,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "id_ID": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -312,6 +345,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "tr_TR": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -338,6 +374,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "sv_SE": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -364,6 +403,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "vi_VN": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",
@@ -390,6 +432,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.perf.diagnostics.metrics.hitchesBuild"
   ],
   "da_DK": [
+    "hudChrome.bg.doubleHonorLine",
+    "hudChrome.calendar.events.doubleHonor.note",
+    "hudChrome.calendar.events.doubleHonor.title",
     "hudChrome.controller.cancelAction",
     "hudChrome.controller.confirmAction",
     "hudChrome.controller.crossHotbar",

@@ -1063,6 +1063,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.endedForfeitLog': '本場比賽以棄權告終。',
   'hudChrome.bg.firstWinBonusLine': '每日首勝:+{honor}榮譽',
   'hudChrome.bg.firstWinBonusLog': '每日首勝:你額外獲得{honor}點榮譽。',
+  'hudChrome.bg.doubleHonorLine':
+    '雙倍榮譽週末:今日荊谷原野榮譽獎勵均為{mult}倍,打滿全場的敗方也按勝方獎勵結算',
   'hudChrome.bg.timeWarningMinutes': '還剩{minutes}分鐘',
   'hudChrome.bg.timeWarningOneMinute': '還剩一分鐘',
   'hudChrome.bg.timeWarningMinutesLog': '本場戰鬥還剩{minutes}分鐘。',
@@ -8375,6 +8377,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.marketDay.note': '商人正等著新貨。今天很適合逛逛世界市場。',
   'hudChrome.calendar.events.arenaClash.title': '競技場之戰',
   'hudChrome.calendar.events.arenaClash.note': '決鬥者湧向灰燼鬥獸場。排隊開打，向天梯進發。',
+  'hudChrome.calendar.events.doubleHonor.title': '雙倍榮譽週末',
+  'hudChrome.calendar.events.doubleHonor.note':
+    '戰營吹響集結號：整個週末，荊谷原野榮譽獎勵加倍，打滿全場的敗方也按勝方獎勵結算。',
   'hudChrome.calendar.events.fishingDerby.title': '釣魚大賽',
   'hudChrome.calendar.events.fishingDerby.note': '釣手們在湖邊排開。帶上魚竿，交流釣魚趣聞。',
   'hudChrome.calendar.events.delveDay.title': '探窟日',

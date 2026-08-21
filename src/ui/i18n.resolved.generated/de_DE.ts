@@ -1182,6 +1182,7 @@ export const de_DE: EnTranslations = {
       "endedForfeitLog": "Das Spiel wurde aufgegeben.",
       "firstWinBonusLine": "Erster Sieg des Tages: +{honor} Ehre",
       "firstWinBonusLog": "Erster Sieg des Tages: Ihr erhaltet {honor} Bonus-Ehre.",
+      "doubleHonorLine": "Double Honor Weekend: Thornhollow Fields Honor pays {mult}x today, and a played-out loss pays like a win",
       "timeWarningMinutes": "{minutes} Minuten verbleiben",
       "timeWarningOneMinute": "Eine Minute verbleibt",
       "timeWarningMinutesLog": "{minutes} Minuten verbleiben im Kampf.",
@@ -2965,6 +2966,10 @@ export const de_DE: EnTranslations = {
         "arenaClash": {
           "title": "Arena-Schlagabtausch",
           "note": "Duellanten strömen zum Aschenkolosseum. Stell dich an und erklimm die Rangliste."
+        },
+        "doubleHonor": {
+          "title": "Double Honor Weekend",
+          "note": "The war camps sound the muster: all weekend, Thornhollow Fields Honor pays double and a played-out loss pays like a win."
         },
         "fishingDerby": {
           "title": "Angelderby",

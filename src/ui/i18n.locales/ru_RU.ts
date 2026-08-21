@@ -1106,6 +1106,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.endedForfeitLog': 'Бой завершён отказом.',
   'hudChrome.bg.firstWinBonusLine': 'Первая победа за день: +{honor} чести',
   'hudChrome.bg.firstWinBonusLog': 'Первая победа за день: вы получаете {honor} очк. чести дополнительно.',
+  'hudChrome.bg.doubleHonorLine':
+    'Выходные двойной чести: сегодня награды чести Терновой Лощины умножаются на {mult}, а сыгранное до конца поражение оплачивается как победа',
   'hudChrome.bg.timeWarningMinutes': 'Осталось {minutes} мин.',
   'hudChrome.bg.timeWarningOneMinute': 'Осталась одна минута',
   'hudChrome.bg.timeWarningMinutesLog': 'До конца боя осталось {minutes} мин.',
@@ -8881,6 +8883,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.arenaClash.title': 'Битва на арене',
   'hudChrome.calendar.events.arenaClash.note':
     'Дуэлянты стекаются в Пепельный Колизей. Вставайте в очередь и поднимайтесь по лестнице.',
+  'hudChrome.calendar.events.doubleHonor.title': 'Выходные двойной чести',
+  'hudChrome.calendar.events.doubleHonor.note':
+    'Военные лагеря трубят сбор: все выходные награды чести Терновой Лощины удваиваются, а сыгранное до конца поражение оплачивается как победа.',
   'hudChrome.calendar.events.fishingDerby.title': 'Рыбацкое дерби',
   'hudChrome.calendar.events.fishingDerby.note':
     'Рыбаки выстраиваются вдоль озёр. Берите удочку и делитесь байками.',

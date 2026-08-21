@@ -370,6 +370,9 @@ export class ArenaWindow {
     return (
       blurb +
       rank +
+      // Event chip above the daily chip: the realm-wide, rarer fact reads
+      // first, and both sit against the queue affordance they advertise.
+      this.bgDoubleHonorChipHtml(view.doubleHonor) +
       this.bgFirstWinChipHtml(view.firstWinBonus) +
       this.bgActionHtml(view.action) +
       onlineSection +
@@ -388,6 +391,18 @@ export class ArenaWindow {
   private bgFirstWinChipHtml(bonus: { honor: number } | null): string {
     if (!bonus) return '';
     const label = t('hudChrome.bg.firstWinBonusLine', { honor: num(bonus.honor) });
+    return (
+      `<div class="bg-firstwin-chip"><span aria-hidden="true">${svgIcon('battleground')}</span>` +
+      `<span>${esc(label)}</span></div>`
+    );
+  }
+
+  /** The Double Honor Weekend event chip: same accessibility posture (and the
+   *  same chip styling) as the first-win chip above, absent outside the
+   *  weekend window (the pure view decides, never this painter). */
+  private bgDoubleHonorChipHtml(event: { multiplier: number } | null): string {
+    if (!event) return '';
+    const label = t('hudChrome.bg.doubleHonorLine', { mult: num(event.multiplier) });
     return (
       `<div class="bg-firstwin-chip"><span aria-hidden="true">${svgIcon('battleground')}</span>` +
       `<span>${esc(label)}</span></div>`

@@ -1087,6 +1087,12 @@ export const hudChromeStrings = {
     // its own key because it is past tense.
     firstWinBonusLine: 'First win of the day: +{honor} Honor',
     firstWinBonusLog: 'First win of the day: you gain {honor} bonus Honor.',
+    // The weekly Double Honor event chip ({mult} is the event multiplier,
+    // formatted). One key for the one surface; the calendar row below carries
+    // its own longer copy. Scoped copy on purpose: the event doubles
+    // Thornhollow Fields honor only, never arena or Fiesta honor.
+    doubleHonorLine:
+      'Double Honor Weekend: Thornhollow Fields Honor pays {mult}x today, and a played-out loss pays like a win',
     // Remaining-time calls, announced to the whole field (BG_TIME_WARNINGS).
     timeWarningMinutes: '{minutes} minutes remain',
     timeWarningOneMinute: 'One minute remains',
@@ -3582,6 +3588,10 @@ export const hudChromeStrings = {
       arenaClash: {
         title: 'Arena Clash',
         note: 'Duelists flock to the Ashen Coliseum. Queue up and climb the ladder.',
+      },
+      doubleHonor: {
+        title: 'Double Honor Weekend',
+        note: 'The war camps sound the muster: all weekend, Thornhollow Fields Honor pays double and a played-out loss pays like a win.',
       },
       fishingDerby: {
         title: 'Fishing Derby',

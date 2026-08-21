@@ -288,6 +288,27 @@ Phase 1 starts with these owner-selected values:
   award (`BATTLEGROUND_FIRST_WIN_BONUS_HONOR`), so the day's first win pays 80
   against a routine 60, a ratio of 1.33x.
 
+Every weekend is the Double Honor Weekend: every Thornhollow Fields Honor
+award (the result, the kill and assist drip, and the first-win bonus) pays
+`DOUBLE_HONOR_MULTIPLIER` (2x) times its normal amount for the Saturday and
+Sunday reset windows (`src/sim/pvp/honor_event.ts`, applied by the
+battleground award paths in `honor.ts` before their single floor). In realm
+time that is Saturday 3 AM to Monday 3 AM: the event rolls on the reset-day
+boundary like every other daily window, and a host that sets no calendar
+never runs it. Battleground only, never arena or Fiesta Honor: that is the
+scope the feature request asked for by name, and it is the classic-era shape,
+where a battleground holiday weekend boosted one battleground's faucet.
+
+While the event window is open, a played-out loss or draw also pays the WIN
+base (still decayed on `BATTLEGROUND_RESULT_DR`, still doubled): owner tuning
+for the early, gearless realm, so queueing on an event day is never a wasted
+evening for the side that stayed. Winning still pays more through the
+first-win bonus and the natural kill-drip edge, forfeits still pay nothing on
+either side, and weekday loss economics are untouched. Both the 2x and the
+loss boost are owner tuning to revisit against live weekend queue data. The
+diminishing-returns curves below apply first, then the event: the weekend
+raises income without weakening any anti-farm rule.
+
 Only the first ranked Arena win against the same opponent or team pays Honor
 each UTC day. Repeated Fiesta rewards against the same opposition pay 100, 50,
 25, then 0 percent (`HONOR_REPEAT_DR`, shared with battleground kill and assist
