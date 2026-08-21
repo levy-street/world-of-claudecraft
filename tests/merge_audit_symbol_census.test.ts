@@ -164,6 +164,22 @@ describe('extractSimEventEmits', () => {
     expect(extractSimEventEmits(src).kinds).toEqual(['farmReady']);
   });
 
+  it('resolves a ternary whose condition is a BARE identifier, not just an expression', () => {
+    // The fragility the audit found: `ready ?` was read as an optional-parameter
+    // declaration and the whole call discarded, so both literals vanished. The
+    // live site survived only because its condition is `withered > 0`; hoisting
+    // that to a named boolean would have silently blinded the census.
+    const src = "ctx.emit(ready ? { type: 'farmReady', ready } : { type: 'farmReady' });";
+    expect(extractSimEventEmits(src).kinds).toEqual(['farmReady']);
+  });
+
+  it('still treats a real optional parameter as a declaration, not a site', () => {
+    const res = extractSimEventEmits('function emit(ev?: SimEvent) {}');
+    expect(res.kinds).toEqual([]);
+    expect(res.declarations).toBe(1);
+    expect(res.sites).toBe(0);
+  });
+
   it('keeps the plain shape precise: a nested type is not a second kind', () => {
     // The plain path reads its literal at depth 0 of the event object, so an
     // inner object carrying its own `type` cannot mint one.

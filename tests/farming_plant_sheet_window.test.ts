@@ -498,9 +498,11 @@ describe('plant sheet window: the pointer-only focus drop the v0.40.0 sync added
   // loop into src/ui/chrome_focus_wiring.ts, and taking that extraction gave
   // this window the pointer-only focus drop it never had before. The wiring's
   // own suite proves the mechanism over a hand-rolled fake root; this proves it
-  // over the sheet's REAL markup and repaint ladder, which is where the drop
-  // could go wrong (a parked root that the ladder mistakes for a focused
-  // control would plant a pick on the next repaint).
+  // over the sheet's REAL markup: the park target, the keyboard carve-out, and
+  // that a repaint over a parked root sends nothing. The ladder's own refusal to
+  // treat a parked root as a focused control is NOT this arm's coverage (a Phase
+  // 11d QA mutation confirmed it survives here); that mechanism is pinned in
+  // tests/focus_restore.test.ts, where the same mutation reds two arms.
   it('parks a mouse click on the root, leaves a keyboard click focused, and repaints clean', () => {
     const win = makeWindow();
     win.open(BED);

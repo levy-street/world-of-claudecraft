@@ -157,7 +157,12 @@ describe('the Hud glue between the funnel and the sheet', () => {
   // Both halves are needed. Membership alone would survive hud.ts dropping the
   // call, and the call alone would survive the sheet falling out of the list.
   it('keeps the sheet in the panel keydown guard list', () => {
-    expect(stripped).toContain('wireChromeFocus($);');
+    // The call is matched by SHAPE, not by an exact string: `wireChromeFocus($);`
+    // would rot on a rename of the local `$` helper or a biome reflow to a
+    // multi-line call, neither of which is a behavior change. This file already
+    // paid for that class once, when an upstream extraction deleted the source
+    // anchor its previous version sliced on.
+    expect(stripped).toMatch(/wireChromeFocus\s*\(/);
     expect(CHROME_GUARDED_PANELS).toContain('#plant-sheet-window');
   });
 });

@@ -1164,8 +1164,16 @@ export function extractSimEventEmits(src) {
     if (!helper) continue;
     const first = tokens[i + 2];
     if (!first) break;
-    // A declaration (`emit(ev: SimEvent)`, `emit(ev?: ...)`) is not a site.
-    if (first.t === 'id' && (isPunct(tokens[i + 3], ':') || isPunct(tokens[i + 3], '?'))) {
+    // A declaration (`emit(ev: SimEvent)`, `emit(ev?: SimEvent)`) is not a site.
+    // The `?` arm requires the type colon after it: without that check a TERNARY
+    // whose condition is a bare identifier (`emit(ready ? {...} : {...})`) is read
+    // as an optional parameter and the whole call is discarded, so both of its
+    // event literals vanish. The live site survives only because its condition is
+    // `withered > 0`, where the token after the identifier is `>` rather than `?`;
+    // hoisting that condition to a named boolean would have silently blinded the
+    // census to farmReady (Phase 11d QA pin audit).
+    const optionalParam = isPunct(tokens[i + 3], '?') && isPunct(tokens[i + 4], ':');
+    if (first.t === 'id' && (isPunct(tokens[i + 3], ':') || optionalParam)) {
       declarations++;
       continue;
     }
