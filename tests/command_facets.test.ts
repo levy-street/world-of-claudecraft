@@ -423,6 +423,13 @@ const FARMING_TAGS: Readonly<Record<string, string>> = {
   plant_crop: 'IWorldFarming',
   harvest_crop: 'IWorldFarming',
   convert_husks: 'IWorldFarming',
+  // The feast pair, added by the Phase 11d QA parity audit: both were tagged in
+  // COMMAND_FACETS on the farming parent and the absorb carried them in
+  // untagged HERE, so deleting or re-tagging either one stayed green (the
+  // table-consistency arms do not name commands, and command_schema never reads
+  // COMMAND_FACETS). Three of five pinned reads as "farming is covered".
+  place_feast: 'IWorldFarming',
+  consume_feast: 'IWorldFarming',
 };
 
 describe('command facet tags (farming)', () => {
@@ -435,23 +442,32 @@ describe('command facet tags (farming)', () => {
   });
 
   it('preserves the snake_case farming wire strings (never normalized to camelCase)', () => {
-    // The three wire strings pinned literally: these are the protocol, and a
+    // The five wire strings pinned literally: these are the protocol, and a
     // rename is a breaking change, not a refactor.
     expect(Object.keys(FARMING_TAGS).sort()).toEqual([
+      'consume_feast',
       'convert_husks',
       'harvest_crop',
+      'place_feast',
       'plant_crop',
     ]);
     expect('plant_crop' in tags).toBe(true);
     expect('harvest_crop' in tags).toBe(true);
     expect('convert_husks' in tags).toBe(true);
+    expect('place_feast' in tags).toBe(true);
+    expect('consume_feast' in tags).toBe(true);
     expect('plantCrop' in tags).toBe(false);
     expect('harvestCrop' in tags).toBe(false);
     expect('convertHusks' in tags).toBe(false);
+    expect('placeFeast' in tags).toBe(false);
+    expect('consumeFeast' in tags).toBe(false);
   });
 
-  it('does not tag the reads (farmPatches, a bundled content table; myFarmPlots, the fplot mirror)', () => {
-    for (const read of ['farmPatches', 'myFarmPlots']) {
+  it('does not tag the reads (farmPatches and myFarmPlots, plus the farmNowMs clock base)', () => {
+    // farmPatches is served from the client bundle with no round trip at all,
+    // myFarmPlots mirrors the `fplot` self delta, and farmNowMs is a local
+    // clock read. None of the three sends a command, so none may be tagged.
+    for (const read of ['farmPatches', 'myFarmPlots', 'farmNowMs']) {
       expect(read in tags, `${read} should be untagged (no wire command)`).toBe(false);
     }
   });
