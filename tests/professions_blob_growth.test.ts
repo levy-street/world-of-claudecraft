@@ -20,6 +20,8 @@
 // precedent), rather than loosening it ahead of need.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { FARM_CROPS } from '../src/sim/content/farm_crops';
+import { FARM_BED_IDS } from '../src/sim/content/farm_patches';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import {
   CRAFT_RING,
@@ -32,6 +34,7 @@ import {
   craftsForPairTarget,
   hobbyCandidatesForPair,
 } from '../src/sim/professions/archetype';
+import { FARM_MAX_GROW_MS } from '../src/sim/professions/farm_persist';
 import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
 import { MAX_CRAFTED_BY_LENGTH } from '../src/sim/professions/tools';
 import { MAX_KNOWN_RECIPE_ID_LENGTH, MAX_KNOWN_RECIPE_IDS } from '../src/sim/professions/training';
@@ -71,6 +74,7 @@ const PROFESSIONS_BLOB_FIELDS = [
   'profTierTutorialSent',
   'guildLetterSent',
   'craftDaily',
+  'farmPlots',
 ] as const;
 
 // Every CharacterState key this serializer writes that is NOT professions
@@ -222,7 +226,24 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
 // that measurement. The phase 10 enchants add nothing here: an enchant is
 // not a recipe, and equipmentInstance already carries one enchant id per
 // slot at the fixture's ceiling whatever the catalog holds.
-const PROFESSIONS_BYTE_CEILING = 12288;
+// The farming absorb (masterwrought Phase 11d) is the next growth, and it is
+// a UNION, not an authored phase: the merged shape carries this branch's
+// craftDaily/wyrmfallDaily/emberWeekAnchor beside farming's farmPlots, and
+// the fixture restores farming's every-bed block whole (the amended 11b
+// count-pin row: a bound re-minted around a plotless fixture would sit near
+// 11 KiB and stay blind to ~4.7 KiB of farmPlots). Predicted from the two
+// parents' chains off the shared 9,451 base: 9,451 + 1,498 (this branch's
+// phase 05..10 delta to 10,949) + 4,767 (farming's fifth-profession key plus
+// 23 full-width beds to 14,218) = 15,716. Measured 16,206: the +490 is 433
+// bytes of the FOURTEEN farming recipe ids (FARM_RECIPES plus growth_tonic)
+// that joined knownRecipes AFTER farming's Phase 5 re-measure and rotted
+// inside its one-sided band (exactly the rot this file's two-sided band
+// exists to stop), plus ~57 bytes of intra-band drift on both parents' last
+// measurements. The bound re-mints at 17 KiB, not 16,384: both parents'
+// re-mints left over 1 KiB of headroom (10,224 -> 12 KiB; 14,218 -> 15 KiB)
+// and 16,384 would leave 178 bytes, thinner than the tracking band itself.
+// The band below re-centers at 160 either side of the 16,206 measurement.
+const PROFESSIONS_BYTE_CEILING = 17408;
 
 function ceilingSim(): Sim {
   const sim = makeSim();
@@ -326,6 +347,39 @@ function ceilingSim(): Sim {
   meta.tierMailSent.set(firstPair[1], 2);
   meta.profTierTutorialSent = true;
   meta.guildLetterSent = true;
+  // Every garden bed planted at full row width: hidden slots at their widest
+  // JSON forms (a full-precision roll, a 32-bit seed), every knob and the
+  // notice flag true, and the duration EXACTLY at the tamper ceiling so the
+  // load-side clamp is a no-op and the settle stays a fixed point. The
+  // fresh-Sim load runs at time 0, where the growth phase's anchor rule
+  // re-anchors any positive plant time to the floor of 1 and leaves it there
+  // on every later load. Content-scaled like nodeHarvestCooldowns: about 203
+  // bytes per authored bed at the Phase 5 crop-ladder re-measure (the settled
+  // total lives in the ceiling ledger above). Farming's fixture, restored
+  // whole at the absorb per the amended 11b count-pin row: a bound re-minted
+  // around a plotless fixture would sit near 11 KiB and stay permanently
+  // blind to the largest persisted field this absorb adds.
+  if (FARM_BED_IDS.size !== 23) throw new Error('farm bed set changed; re-mint the ceiling');
+  // Full width includes the crop id column: the Phase 5 ladder shipped ids
+  // longer than vale_wheat, so the worst case plants every bed with the
+  // WIDEST id the catalog carries. Derived, with the winner pinned, so a
+  // future longer id moves the fixture and forces this ceiling re-read.
+  const widestCropId = Object.keys(FARM_CROPS).reduce((a, b) => (b.length > a.length ? b : a));
+  if (widestCropId !== 'evergarden_greens')
+    throw new Error('widest crop id changed; re-measure and re-mint the ceiling');
+  for (const bedId of FARM_BED_IDS) {
+    meta.farmPlots.set(bedId, {
+      cropId: widestCropId,
+      plantedAtMs: 1_000,
+      readyAtMs: 1_000 + FARM_MAX_GROW_MS,
+      survivalRoll: 0.12345678901234566,
+      yieldSeed: 4_294_967_295,
+      compost: true,
+      watch: true,
+      tonic: true,
+      notified: true,
+    });
+  }
   return sim;
 }
 
@@ -485,16 +539,19 @@ describe('the professions blob growth bound (phase 16)', () => {
       Object.values(QUESTS).filter((q) => q.repeatCadenceTicks).length,
     );
     expect(Object.keys(s2.equipmentInstance ?? {})).toHaveLength(ALL_EQUIP_SLOTS.length);
+    // Content-scaled like the node cooldowns: one row per authored bed, so
+    // the field grows with the FARM_PATCHES table, never per player action.
+    expect(Object.keys(s2.farmPlots ?? {})).toHaveLength(FARM_BED_IDS.size);
 
     // The byte bound itself, on the settled state: the two-sided tracking
-    // band around the phase 10 measurement (10,949 settled bytes; phase 09
-    // measured 10,756 and the eight phase 10 knownRecipes ids grew the blob
-    // by ~193 bytes; the authoritative narrative lives at the bound's note
-    // above). A re-measure obligation, not the structural ceiling: drift
-    // past either edge reds here and forces the note to be re-read.
+    // band around the farming-absorb measurement (16,206 settled bytes, the
+    // union fixture: every bed planted full-width beside every masterwrought
+    // field; the authoritative narrative lives at the bound's note above).
+    // A re-measure obligation, not the structural ceiling: drift past either
+    // edge reds here and forces the note to be re-read.
     const bytes = professionsBytes(s2);
-    expect(bytes).toBeGreaterThan(10789);
-    expect(bytes).toBeLessThan(11109);
+    expect(bytes).toBeGreaterThan(16046);
+    expect(bytes).toBeLessThan(16366);
     // Strictly dominated by the band's upper edge while the band holds:
     // kept as documentation that the structural ceiling also bounds this
     // state, never the live guard.

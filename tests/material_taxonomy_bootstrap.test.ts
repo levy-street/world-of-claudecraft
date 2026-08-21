@@ -22,10 +22,24 @@ describe('material_taxonomy as the first-evaluated sim module', () => {
     // and sablewax_vellum derived IN as the APEX_GEAR_RECIPES reagents.
     // 64 -> 66 at phase 10: lucent_reagent through the ENCHANT half of the
     // reagent union, and seasoned_stock through the recipe half as the apex
-    // cooking reagent (APEX_CONSUMABLE_RECIPES).
-    expect(MATERIAL_ITEM_IDS.size).toBe(66);
+    // cooking reagent (APEX_CONSUMABLE_RECIPES). 66 -> 93 at the farming
+    // absorb (masterwrought Phase 11d): farming's 27 junk-kind ids derive IN
+    // (eight crop trios of seed, produce, and fine twin, plus withered_husks,
+    // compost, and growth_tonic). The count is a literal because this file
+    // may not import the tables to derive it: importing anything else from
+    // src/sim is exactly what the premise arm below forbids, so the number
+    // is re-pinned by hand whenever the set moves.
+    expect(MATERIAL_ITEM_IDS.size).toBe(93);
     expect(MATERIAL_ITEM_IDS.has('iron_ore')).toBe(true);
     expect(MATERIAL_ITEM_IDS.has('arcanite_bar')).toBe(true);
+    // The farming source specifically, because it is the newest and the one
+    // whose own module is reached FIRST on this path: a source that failed to
+    // derive during bootstrap would leave the size short, but naming an id
+    // says WHICH loop broke instead of only that the total drifted.
+    expect(MATERIAL_ITEM_IDS.has('vale_wheat')).toBe(true);
+    expect(MATERIAL_ITEM_IDS.has('withered_husks')).toBe(true);
+    expect(MATERIAL_ITEM_IDS.has('compost')).toBe(true);
+    expect(MATERIAL_ITEM_IDS.has('growth_tonic')).toBe(true);
     expect(isMaterialItem({ id: 'iron_ore' } as ItemDef)).toBe(true);
   });
 

@@ -368,8 +368,8 @@ describe('Book of Deeds webp icons', () => {
     // Masterwrought jewelcrafting and inscription milestone deeds, each crest
     // shipped in the change that authored it) + the release's walk-in castle
     // visit pair, which ships art-pending by upstream design.
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(279);
-    expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(277);
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(286);
+    expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(278);
     for (const id of artless) {
       const catCrestId = deedCrestId(id, DEEDS[id].category);
       expect(catCrestId, `${id} must fall back to a category base crest`).toMatch(/^deed_cat_/);

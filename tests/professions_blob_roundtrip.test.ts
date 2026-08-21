@@ -44,6 +44,7 @@ const PROFESSIONS_BLOB_FIELDS = [
   'profTierTutorialSent',
   'guildLetterSent',
   'craftDaily',
+  'farmPlots',
 ] as const;
 
 const NODE = GATHER_NODES.find((n) => n.type === 'herb' && n.zoneId === 'eastbrook_vale');
@@ -60,8 +61,18 @@ const populatedSim = (): Sim => {
   const sim = makeSim();
   const meta = sim.players.get(sim.playerId) as PlayerMeta;
   // Fractional proficiency on purpose: gather gains move in 0.25 steps, so a
-  // serializer that rounded would pass an integer fixture.
-  meta.gatheringProficiency = { mining: 42.25, logging: 0, herbalism: 7, fishing: 150, farming: 0 };
+  // serializer that rounded would pass an integer fixture. Farming carries a
+  // fractional value too, deliberately NOT the zero the ours-side fixture
+  // shipped with: normalizeGatheringProficiency restores exactly 0 for a
+  // dropped key, so farming: 0 is structurally blind to the drop this sweep
+  // exists to catch (the 11b QA migration finding; farming absorb, Phase 11d).
+  meta.gatheringProficiency = {
+    mining: 42.25,
+    logging: 0,
+    herbalism: 7,
+    fishing: 150,
+    farming: 12.5,
+  };
   meta.toolEffectSlots = {
     logging: {
       effectId: 'gatherers_cache',
@@ -131,6 +142,29 @@ const populatedSim = (): Sim => {
   // the one shipped oncePerDay recipe stamped. The id must be a LIVE gated
   // recipe or the load clamp's anti-tamper filter drops it by design.
   meta.craftDaily = { date: '2026-08-11', crafted: new Set(['recipe_quickening_catalyst']) };
+  // One fully-populated plot on a REAL bed and crop id (the load-side
+  // allowlists are shipped content, so a fixture id would be dropped and
+  // fail the presence pin). The anchor is 1, not a round number, and that is
+  // load-bearing for the FIXED POINT: these arms load at sim.time 0, where
+  // normalizeFarmPlots re-anchors any plant time above its floor of 1 (the
+  // growth phase's one anchor rule, which replaced a zero-clock guard that
+  // used to let a future-dated row through unchanged on this path alone). At
+  // exactly 1 the row is already at rest, so the blob crosses the load bound
+  // byte-faithfully; anything higher would re-anchor on the FIRST load and
+  // only settle on the second. (Farming's fixture, restored whole at the
+  // absorb per the amended 11b count-pin row: the same blob now holds a plot
+  // AND a craftDaily stamp, the merged shape's two newest writers.)
+  meta.farmPlots.set('bed_eastbrook_1', {
+    cropId: 'vale_wheat',
+    plantedAtMs: 1,
+    readyAtMs: 3_001,
+    survivalRoll: 0.25,
+    yieldSeed: 123456,
+    compost: true,
+    watch: false,
+    tonic: true,
+    notified: false,
+  });
   return sim;
 };
 
@@ -150,6 +184,7 @@ describe('the professions blob round-trip sweep', () => {
       logging: 0,
       herbalism: 7,
       fishing: 150,
+      farming: 12.5,
     });
     expect(s1.professions).toEqual(s1.gatheringProficiency); // legacy dual-write
     // Separate objects, never one aliased through the other (the serializer
@@ -217,7 +252,7 @@ describe('the professions blob round-trip sweep', () => {
     // clamped value. Pinned to the literal shipped caps.
     const sim = populatedSim();
     const s1 = sim.serializeCharacter(sim.playerId) as CharacterState;
-    s1.gatheringProficiency = { mining: 250, logging: 0, herbalism: 7, fishing: 999 };
+    s1.gatheringProficiency = { mining: 250, logging: 0, herbalism: 7, fishing: 999, farming: 999 };
     s1.professions = { ...s1.gatheringProficiency };
     s1.craftSkills = { ...s1.craftSkills, weaponcrafting: 999 };
 
@@ -226,6 +261,7 @@ describe('the professions blob round-trip sweep', () => {
     const meta = reloaded.players.get(pid) as PlayerMeta;
     expect(meta.gatheringProficiency.mining).toBe(100); // gathering cap
     expect(meta.gatheringProficiency.fishing).toBe(200); // fishing cap
+    expect(meta.gatheringProficiency.farming).toBe(100); // farming cap (100, no 200 tier)
     expect(meta.craftSkills.weaponcrafting).toBe(125); // craft ring cap
 
     const resaved = reloaded.serializeCharacter(pid) as CharacterState;
@@ -234,6 +270,7 @@ describe('the professions blob round-trip sweep', () => {
       logging: 0,
       herbalism: 7,
       fishing: 200,
+      farming: 100,
     });
     expect(resaved.craftSkills?.weaponcrafting).toBe(125);
   });

@@ -811,10 +811,10 @@ describe('real catalog integration', () => {
     // walk-in castle visit pair; col_reliquary_complete is the catalog's one
     // off-prefix feat, so it sits outside the completion denominator like the
     // three feat_ deeds).
-    expect(view.summary.visibleTotal).toBe(266);
+    expect(view.summary.visibleTotal).toBe(273);
     // The bucket sum adds the feat-flagged rows back on top (3 on the Feats
     // shelf plus the off-prefix capstone on Collection).
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(270);
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(277);
   });
 
   it('offers exactly the live catalog border deeds once they are earned', () => {

@@ -73,9 +73,14 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // price-reference pair (marketSellPriceCheck on IWorld): both sides read
 // 199/212 pre-merge, the constants auto-merged as identical, and the merged
 // tree carries both pairs; the numbers below were re-set from a suite run.
+// The farming absorb (masterwrought Phase 11d) composes a FIFTH time, at
+// scale: farming's five client-sent pairs (plant_crop, harvest_crop,
+// convert_husks from the growth phases, then the shared-feast place_feast +
+// consume_feast) land beside extract_essence, so the merged universe is
+// ours' 200/213 plus farming's five on each axis.
 
-const EXPECTED_SEND_COUNT = 200;
-const EXPECTED_DISPATCH_COUNT = 213;
+const EXPECTED_SEND_COUNT = 205;
+const EXPECTED_DISPATCH_COUNT = 218;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;
 
 // The chat sub-channel routing switch (server/game.ts `switch

@@ -31,6 +31,8 @@
 //     "getter on the prototype" would falsely redden every one of those, so the data
 //     probe checks contract shape (present + readable), never getter-vs-field backing.
 
+import { readdirSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { ClientWorld } from '../src/net/online';
 import { Sim } from '../src/sim/sim';
@@ -57,6 +59,7 @@ import type { IWorldDuelArena } from '../src/world_api/duel_arena';
 import type { IWorldDungeonFinder } from '../src/world_api/dungeon_finder';
 import type { IWorldDungeons } from '../src/world_api/dungeons';
 import type { IWorldEntityRoster } from '../src/world_api/entity_roster';
+import type { IWorldFarming } from '../src/world_api/farming';
 import type { IWorldGuildBank } from '../src/world_api/guild_bank';
 import type { IWorldInteraction } from '../src/world_api/interaction';
 import type { IWorldInventory } from '../src/world_api/inventory';
@@ -449,6 +452,24 @@ export const IWORLD_MEMBERS = [
   // IWorldActionBar: per-character action-bar layout persistence + login restore.
   { name: 'saveActionBarLayout', kind: 'method' },
   { name: 'takeActionBarLayoutRestore', kind: 'method' },
+  // IWorldFarming: the static garden-bed geography plus the viewer's own plot
+  // rows (both data), the growth phase's two plot mutations, and the knobs
+  // phase's husk conversion (all methods). The plant-time knobs themselves
+  // ride plantCrop's payload rather than members of their own (D8:
+  // front-loaded choice).
+  { name: 'farmPatches', kind: 'data' },
+  { name: 'myFarmPlots', kind: 'data' },
+  { name: 'plantCrop', kind: 'method' },
+  { name: 'harvestCrop', kind: 'method' },
+  { name: 'convertHusks', kind: 'method' },
+  // The render phase's clock read: each world returns its OWN lockoutNowMs
+  // base, so a growth-stage fraction never mixes clock bases.
+  { name: 'farmNowMs', kind: 'method' },
+  // The shared-feast phase's pair: payload-free placement and the
+  // entity-id-keyed bite (both methods; the feast entity itself rides the
+  // normal entity snapshot, so no data member exists for it).
+  { name: 'placeFeast', kind: 'method' },
+  { name: 'consumeFeast', kind: 'method' },
 ] as const satisfies readonly IWorldMember[];
 
 const DATA_MEMBERS = IWORLD_MEMBERS.filter((m) => m.kind === 'data');
@@ -611,6 +632,28 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // (IWorldMarket, a method), and both sides read 323 pre-merge, so the
     // merged tree carries both extractEssence and marketSellPriceCheck,
     // leaving 324.
+    // Farming's own narrative reaches its 331 off the shared release base
+    // (its sync history below repeats the same four release pairs, so only
+    // its EIGHT farming members are new to this union):
+    // (data) + setActiveBorder (method), leaving 319. This branch's backward
+    // target cycle (Shift+Tab) adds tabTargetPrev (IWorldTargeting, a method),
+    // leaving 320. The player item lock (issue #3042) adds setItemLocked
+    // (IWorldInventory, a method), leaving 321. Civic service anchors add
+    // civicServicePlacements (IWorldInteraction, data), leaving 322. The market
+    // Sell-tab price reference adds marketSellPriceCheck (IWorldMarket, a
+    // method), leaving 323.
+    // Farming's patches-and-plots phase adds farmPatches and myFarmPlots
+    // (IWorldFarming, data), leaving 325. Farming's growth phase adds the two
+    // plot mutations, plantCrop and harvestCrop (IWorldFarming, methods),
+    // leaving 327. Farming's knobs phase adds the husk conversion,
+    // convertHusks (IWorldFarming, a method), leaving 328. Farming's render
+    // phase adds the clock read farmNowMs (IWorldFarming, a method), leaving
+    // 329. Farming's shared-feast phase adds the placement and bite pair,
+    // placeFeast and consumeFeast (IWorldFarming, methods), leaving 331.
+    // The farming absorb (masterwrought Phase 11d) is the union of the two:
+    // ours' 324 plus farming's eight (farmPatches and myFarmPlots as data,
+    // the six farming methods), 332 members, 88 data, 244 method, and the
+    // 34th facet file (farming.ts) joins FACET_MEMBER_ARRAYS.
     //
     // NOTE for the next merge, four syncs run now: BOTH sides of this pin move
     // it independently every cycle. Twice git merged identical numbers with no
@@ -620,9 +663,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // even when the total agrees. Only running the suite says what these
     // numbers really are; never reconcile them by arithmetic in the diff (the
     // numbers below were set from a suite run, not from this narrative).
-    expect(IWORLD_MEMBERS.length).toBe(324);
-    expect(DATA_MEMBERS.length).toBe(86);
-    expect(METHOD_MEMBERS.length).toBe(238);
+    expect(IWORLD_MEMBERS.length).toBe(332);
+    expect(DATA_MEMBERS.length).toBe(88);
+    expect(METHOD_MEMBERS.length).toBe(244);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -695,6 +738,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'companionState',
       'companionUpgrade',
       'companionUpgrades',
+      'consumeFeast',
+      'convertHusks',
       'convertPartyToRaid',
       'convertRaidToParty',
       'copper',
@@ -748,6 +793,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'equipment',
       'equipmentInstances',
       'extractEssence',
+      'farmNowMs',
+      'farmPatches',
       'feedPet',
       'forfeitCardDuel',
       'friendAdd',
@@ -776,6 +823,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'guildSetMotd',
       'guildTransfer',
       'harvestCorpse',
+      'harvestCrop',
       'harvestNode',
       'healPet',
       'hobbyCraft',
@@ -829,6 +877,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'moveInput',
       'moveInventoryItem',
       'moveRaidMember',
+      'myFarmPlots',
       'nodeHarvestableByMe',
       'nodeRespawnSeconds',
       'openCommissionOrder',
@@ -846,7 +895,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'petTaunt',
       'petWaterJet',
       'pickUpObject',
+      'placeFeast',
       'placeMobileStation',
+      'plantCrop',
       'playCardInDuel',
       'playEmote',
       'player',
@@ -998,6 +1049,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'entities',
       'equipment',
       'equipmentInstances',
+      'farmPatches',
       'gatheringProficiency',
       'guildBankInfo',
       'hobbyCraft',
@@ -1018,6 +1070,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketCollectPending',
       'marketInfo',
       'moveInput',
+      'myFarmPlots',
       'partyInfo',
       'petSpecialCommandsSupported',
       'player',
@@ -1094,6 +1147,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'clearMarker',
       'collectDelveChestLoot',
       'companionUpgrade',
+      'consumeFeast',
+      'convertHusks',
       'convertPartyToRaid',
       'convertRaidToParty',
       'craftItem',
@@ -1132,6 +1187,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'equipItem',
       'equipItemToSlot',
       'extractEssence',
+      'farmNowMs',
       'feedPet',
       'forfeitCardDuel',
       'friendAdd',
@@ -1158,6 +1214,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'guildSetMotd',
       'guildTransfer',
       'harvestCorpse',
+      'harvestCrop',
       'harvestNode',
       'healPet',
       'ignoreAdd',
@@ -1208,7 +1265,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'petTaunt',
       'petWaterJet',
       'pickUpObject',
+      'placeFeast',
       'placeMobileStation',
+      'plantCrop',
       'playCardInDuel',
       'playEmote',
       'prestige',
@@ -1833,6 +1892,18 @@ type _ExhaustActionBar = AssertNever<
   Exclude<keyof IWorldActionBar, (typeof FACET_ACTION_BAR)[number]>
 >;
 
+const FACET_FARMING = [
+  'farmPatches',
+  'myFarmPlots',
+  'plantCrop',
+  'harvestCrop',
+  'convertHusks',
+  'farmNowMs',
+  'placeFeast',
+  'consumeFeast',
+] as const satisfies readonly (keyof IWorldFarming)[];
+type _ExhaustFarming = AssertNever<Exclude<keyof IWorldFarming, (typeof FACET_FARMING)[number]>>;
+
 // The facet partition, keyed by facet for legible failure messages.
 const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   entityRoster: FACET_ENTITY_ROSTER,
@@ -1868,13 +1939,39 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   deeds: FACET_DEEDS,
   reliquary: FACET_RELIQUARY,
   actionBar: FACET_ACTION_BAR,
+  farming: FACET_FARMING,
 };
 
 describe('W1: aggregate IWorld member set equals the disjoint union of the facets', () => {
   it('pins the facet count', () => {
     // +1 battleground facet (Thornhollow Fields) on the release line; +1
-    // Reliquary facet on this branch: 33 total.
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(33);
+    // Reliquary facet on the release line; +1 farming facet on this branch:
+    // 34 total. (The v0.38.0 sync hit the silent-count trap here: both sides
+    // moved 32 to 33 independently and git kept a single 33.)
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(34);
+  });
+
+  it('every facet FILE on disk is a FACET_MEMBER_ARRAYS key (none can go silently unpartitioned)', () => {
+    // Adopted at the farming absorb (the 11b QA parity reviewer): this pin
+    // self-checks only its own pinned list, so a facet file existing on disk
+    // but absent from the partition was invisible (the farming facet rode the
+    // ledger's predicted-counts row, not a red). The directory IS the truth:
+    // every src/world_api/*.ts module except the barrel-adjacent validator
+    // module appearance.ts (no IWorld facet by design: it exports the shared
+    // wire-bounds validator, not members both worlds implement; its own
+    // header says so) must be a key here, keyed by its basename.
+    const facetFiles = readdirSync(fileURLToPath(new URL('../src/world_api', import.meta.url)))
+      .filter((f) => f.endsWith('.ts'))
+      .map((f) => f.replace(/\.ts$/, ''))
+      .filter((f) => f !== 'appearance')
+      .sort();
+    // Keys are camelCase, files snake_case; the conversion is mechanical.
+    const keys = Object.keys(FACET_MEMBER_ARRAYS)
+      .map((k) => k.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`))
+      .sort();
+    expect(keys).toEqual(facetFiles);
+    // Floor: the sweep walked a real directory, not an empty one.
+    expect(facetFiles.length).toBeGreaterThanOrEqual(34);
   });
 
   it('each facet array is non-empty and internally duplicate-free', () => {
@@ -1884,7 +1981,7 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     }
   });
 
-  it('the 28 facet arrays are pairwise disjoint (no member filed in two facets)', () => {
+  it('the facet arrays are pairwise disjoint (no member filed in two facets)', () => {
     const entries = Object.entries(FACET_MEMBER_ARRAYS);
     const overlaps: string[] = [];
     for (let i = 0; i < entries.length; i++) {
@@ -1902,8 +1999,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(324);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(324);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(332);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(332);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

@@ -9,7 +9,11 @@ import { describe, expect, it } from 'vitest';
 import { POWERUPS } from '../src/sim/content/augments';
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from '../src/sim/content/deeds';
 import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
+import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
+import { FARM_CROPS } from '../src/sim/content/farm_crops';
+import { FARM_PATCHES } from '../src/sim/content/farm_patches';
+import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
 import { MAGE_PET_MOBS } from '../src/sim/content/mage_pets';
 import { NECROMANCY_MOBS } from '../src/sim/content/necromancy';
@@ -34,6 +38,7 @@ import {
   ZONES,
 } from '../src/sim/data';
 import {
+  FARM_CHRONICLE_ZONES,
   GROUND_PICKUP_PROVING_QUESTS,
   MAX_CREDITABLE_MOB_LEVEL,
   MILESTONE_DEED_TO_LEGACY,
@@ -46,6 +51,7 @@ import {
   craftSkillGainMultiplier,
   enchantingGainMultiplier,
 } from '../src/sim/professions/archetype';
+import { farmingTeachingCeilingFor } from '../src/sim/professions/farming';
 import { RIFT_LEVEL_CAP, RIFT_MAX_MOB_LEVEL } from '../src/sim/rift/rift_gen';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import { DEED_STAT_KEYS, type DeedCategory, MILESTONES } from '../src/sim/types';
@@ -67,7 +73,7 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 279 deeds worth 3235 total Renown', () => {
+  it('ships exactly 286 deeds worth 3270 total Renown', () => {
     // Release base (262 / 3145 after the WARFARE lifetime-honor ladder) plus
     // four Reliquary Curator rank bridges and the five Phase 18 completion
     // ladder deeds (all nine renown 0: catalog prestige never scores the
@@ -78,9 +84,13 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // prog_grandmaster_jewelcrafting (renown 25) joining their cross-craft
     // families, plus the phase 06 inscription base catalog's three
     // (prog_inscription_rare 10, prog_inscription_50 5,
-    // prog_grandmaster_inscription 25).
-    expect(DEED_ORDER.length).toBe(279);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3235);
+    // prog_grandmaster_inscription 25), plus the seven farming celebration
+    // deeds of the absorbed packet (D13: prog_first_planting and the four
+    // first-harvest chronicles at renown 5, col_golden_harvest at 0 per the
+    // luck rule, prog_farming_100 at the profession-100 family value of 10,
+    // so +35 Renown in all).
+    expect(DEED_ORDER.length).toBe(286);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3270);
   });
 
   it('ships the audited per-category counts', () => {
@@ -91,16 +101,18 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +2 for the phase 05 QA ruling pair (the 50-skill and Grandmaster
       // jewelcrafting milestones joining their cross-craft families), then
       // +3 for the phase 06 inscription trio (rare-tier, 50-skill, and
-      // Grandmaster) landing the same three families at the table tail.
-      progression: 63,
+      // Grandmaster) landing the same three families at the table tail, then
+      // +2 farming celebrations (prog_first_planting, prog_farming_100).
+      progression: 65,
       combat: 10,
       // +2 Rift coverage deeds (dgn_rift, dgn_rift_s_rank).
       dungeon: 31,
       delve: 13,
-      chronicle: 49,
+      // +4 farming first-harvest chronicles (chr_*_first_harvest).
+      chronicle: 53,
       // +4 Reliquary Curator rank bridges and +5 Phase 18 completion ladder
-      // deeds on top of the release collection set.
-      collection: 37,
+      // deeds on top of the release collection set, +1 col_golden_harvest.
+      collection: 38,
       // Release's Thornhollow battlegrounds plus the WARFARE honor ladder.
       pvp: 35,
       social: 18,
@@ -250,6 +262,16 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'prog_inscription_rare',
       'prog_inscription_50',
       'prog_grandmaster_inscription',
+      // The farming celebration deeds (D13): the first-planting proof, the
+      // four per-hub first-harvest chronicles, the golden-harvest rare find,
+      // and the Farming 100 milestone with the Harvestmaster title.
+      'prog_first_planting',
+      'chr_vale_first_harvest',
+      'chr_marsh_first_harvest',
+      'chr_peaks_first_harvest',
+      'chr_evergarden_first_harvest',
+      'col_golden_harvest',
+      'prog_farming_100',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -584,19 +606,21 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     });
   });
 
-  it('ships exactly 44 titles and 4 borders', () => {
+  it('ships exactly 45 titles and 4 borders', () => {
     const titles = ALL.filter((d) => d.reward?.kind === 'title');
     const borders = ALL.filter((d) => d.reward?.kind === 'border');
     // Reliquary Curator ranks append 3 titles + 1 border, the WARFARE honor
     // ladder 3 more titles, the Phase 18 Reliquary completion ladder 5 more
     // on top of the release base (31 + 3), Grandmaster Jewelcrafting (phase
-    // 05 QA) the ninth per-craft grandmaster, and Grandmaster Inscription
-    // (phase 06) the tenth, closing the family across the whole ring.
-    expect(titles.length).toBe(44);
+    // 05 QA) the ninth per-craft grandmaster, Grandmaster Inscription
+    // (phase 06) the tenth, closing the family across the whole ring, and
+    // prog_farming_100's Harvestmaster (the absorbed packet's D13 title
+    // mandate).
+    expect(titles.length).toBe(45);
     expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(44);
+    expect(new Set(titleTexts).size).toBe(45);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual([
       'curators_gilt',
@@ -697,7 +721,17 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // the merged canonical string matches neither parent literal. No shipped
   // trigger or renown changed (both parents reproduce their own priors
   // exactly; the merged hash is re-minted from the suite output).
-  const FROZEN_CATALOG_SHA256 = 'ea007571ae354f38849ac913aaed470dccca3c52eb44199995b9370f0b4a8bf8';
+  // Re-baselined for the farming celebration deeds (D13): seven appended
+  // deeds, prog_first_planting, the four chr_*_first_harvest chronicles,
+  // col_golden_harvest, and prog_farming_100 with the Harvestmaster title.
+  // No shipped trigger or renown changed.
+  // Re-baselined for the farming absorb merge (masterwrought Phase 11d):
+  // both parents' appends land in one order (the six craft milestones, then
+  // the seven farming rows) so the merged canonical string matches neither
+  // parent literal; no shipped trigger or renown changed (both parents
+  // reproduce their own priors exactly; the merged hash is re-minted from
+  // the suite output).
+  const FROZEN_CATALOG_SHA256 = '560f0e188136f8e636419f97d55c5c8d641ff9a57707083c6c88392c837bd525';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -890,7 +924,7 @@ describe('table shape', () => {
   it('DEED_ORDER holds the append-only authored order (first and last pinned)', () => {
     // DEED_ORDER derives from the table keys, so covering DEEDS is inherent;
     // what CAN drift is the authored order itself. Pin the endpoints as
-    // literals: prog_first_steps opens the catalog and exp_dawnhold_castle
+    // literals: prog_first_steps opens the catalog and prog_farming_100
     // closes the tail, and either moving would signal a reorder
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
@@ -898,8 +932,10 @@ describe('table shape', () => {
     // The release's walk-in castle visit pair sits after the Phase 18
     // Reliquary completion ladder, then the Masterwrought phase 05
     // jewelcrafting milestones and the phase 06 inscription milestones
-    // append behind it; the inscription Grandmaster deed closes the tail.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('prog_grandmaster_inscription');
+    // append behind it, and the absorbed farming celebration block closes
+    // the catalog per the 11b three-tier ordering rule; the Farming 100
+    // milestone is the tail.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('prog_farming_100');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {
@@ -954,6 +990,110 @@ describe('table shape', () => {
     for (const def of ALL) {
       expect(def.name.includes('Edda Hartwell'), `${def.id} name`).toBe(false);
       expect(def.desc.includes('Edda Hartwell'), `${def.id} desc`).toBe(false);
+    }
+  });
+});
+
+describe('count-form gathering deeds stay earnable', () => {
+  // An any-N gathering trigger demanding more professions than are actually
+  // gainable would ship an unearnable deed, so this guard caps every one of
+  // them at the gainable count. Farming was the exception for two phases: it
+  // joined GATHERING_PROFESSION_IDS with no gain path at all. The growth phase
+  // gave it one (a harvest queues through queueGatheringGrant like any other
+  // gathering harvest), so all five are gainable and the count is simply the
+  // roster length again. This guard compares COUNT only, never amount; the
+  // amount side of the model is held by the amount-aware farming arm in the
+  // next test, added with prog_farming_100 (the first farming trigger to
+  // carry an amount above the old tier-1 teaching ceiling).
+  const GAINABLE_GATHERING_PROFESSIONS = GATHERING_PROFESSION_IDS.length;
+  it('caps every any-N gathering trigger at the gainable profession count', () => {
+    expect(GATHERING_PROFESSION_IDS.length).toBe(5);
+    let countForm = 0;
+    for (const def of ALL) {
+      const t = def.trigger;
+      if (t.kind !== 'gathering' || t.professionId !== undefined) continue;
+      countForm += 1;
+      expect(
+        t.count ?? 1,
+        `${def.id}: any-N gathering deed demands more professions than are gainable`,
+      ).toBeLessThanOrEqual(GAINABLE_GATHERING_PROFESSIONS);
+    }
+    // The loop must have seen the real count-form deeds (prog_first_gather
+    // and prog_master_gatherer) or this guard is vacuous.
+    expect(countForm).toBeGreaterThanOrEqual(2);
+  });
+
+  it('caps every farming gathering trigger at the ceiling the gain schedule can teach', () => {
+    // The amount-aware arm the count-form caveat above demanded: farming
+    // gains gray at the crop's teaching ceiling (farmingTeachingCeilingFor,
+    // professions/farming.ts), so a farming trigger demanding more than the
+    // best crop tier can teach would ship unearnable forever, invisible to
+    // the count-only guard. The max over live crop tiers 1 to 4 is the
+    // profession cap of 100, exactly what prog_farming_100 demands.
+    const teachable = Math.max(...[1, 2, 3, 4].map((tier) => farmingTeachingCeilingFor(tier)));
+    expect(teachable).toBe(100);
+    let farmingTriggers = 0;
+    for (const def of ALL) {
+      const t = def.trigger;
+      if (t.kind !== 'gathering' || t.professionId !== 'farming') continue;
+      farmingTriggers += 1;
+      expect(
+        t.amount,
+        `${def.id}: farming deed demands more proficiency than any crop can teach`,
+      ).toBeLessThanOrEqual(teachable);
+    }
+    // Non-vacuity: the loop must have seen prog_farming_100.
+    expect(farmingTriggers).toBeGreaterThanOrEqual(1);
+  });
+
+  it('honesty arm ((bo)): no vendor stocks a tier 3/4 seed, so prog_farming_100 waits on D11', () => {
+    // The tier 3/4 seed faucet is still an open D11 ruling (state.md (bo)):
+    // while NO purchase surface stocks these four seeds, tier 3/4 crops
+    // cannot be planted, farming gains gray at the tier-2 ceiling of 75, and
+    // prog_farming_100 (with its Harvestmaster title) is unreachable. The
+    // deed ships anyway by the D13 mandate, documented as dormant in its row
+    // comment and waived in docs/design/deeds.md (the dormancy window note).
+    // This arm is SELF-CLEARING for the three PURCHASE surfaces it walks
+    // (NPC vendorItems, HEROIC_VENDOR_STOCK, DELVE_SHOPS): a vendor-shaped
+    // faucet reds it and the sweep that fixes it must also sweep the
+    // dormancy notes here, on the deed row, in the design doc, and in the
+    // guide prose (guide.profPages.gatherDeeds.farmingSown and
+    // guide.profPages.farm.tableBody carry the later-patch phrasing). A faucet
+    // arriving as a quest reward, loot drop, or profession output is OUTSIDE
+    // this walk; the NEVER_STOCKED pin in
+    // tests/professions_zone_rollout.test.ts remains the authoritative
+    // acquisition-surface sweep, and the D11 phase that lands any faucet
+    // owns re-earnability-auditing this deed either way.
+    // DERIVED from the crop catalog (the QA hardening: a hand literal would
+    // let a future fifth tier-3 crop's seed gain a faucet with this arm still
+    // green), with the shipped four pinned as the non-vacuity floor.
+    const tier34Seeds = Object.values(FARM_CROPS)
+      .filter((crop) => crop.tier >= 3)
+      .map((crop) => crop.seedItemId);
+    expect(tier34Seeds.length).toBeGreaterThanOrEqual(4);
+    expect(new Set(tier34Seeds)).toEqual(
+      new Set([
+        'highland_barley_seed',
+        'frost_gourd_seed',
+        'gilded_sunmelon_seed',
+        'evergarden_greens_seed',
+      ]),
+    );
+    const stocked = new Set<string>();
+    for (const npc of Object.values(NPCS)) {
+      for (const itemId of npc.vendorItems ?? []) stocked.add(itemId);
+    }
+    for (const offer of HEROIC_VENDOR_STOCK) stocked.add(offer.itemId);
+    for (const entries of Object.values(DELVE_SHOPS)) {
+      for (const entry of entries) stocked.add(entry.itemId);
+    }
+    // Non-vacuity: the walk really saw the world's counters.
+    expect(stocked.size).toBeGreaterThan(0);
+    for (const seedId of tier34Seeds) {
+      expect(ITEMS[seedId], seedId).toBeDefined();
+      expect(stocked.has(seedId), `${seedId} gained a faucet: sweep the (bo) dormancy notes`).toBe(
+        false,
+      );
     }
   });
 });
@@ -1085,13 +1225,30 @@ describe('trigger references resolve against the real content tables', () => {
       } else if (ns === 'dungeon') {
         expect(DUNGEONS[mark.slice(8)], `${deedId}: ${mark}`).toBeDefined();
       } else if (ns === 'gather_event') {
-        // The three node-flavor marks written by announceGatherRareEvent
-        // (professions/gather_events.ts gatherRareEventFlavor) plus the
-        // corpse-harvest perfect_specimen jackpot (interaction.ts).
+        // The four rare-event flavor marks written by announceGatherRareEvent
+        // (professions/gather_events.ts gatherRareEventFlavor; golden_harvest
+        // is the crop-source flavor) plus the corpse-harvest perfect_specimen
+        // jackpot (interaction.ts).
         expect(
-          ['pristine_vein', 'ancient_heartwood', 'moonlit_bloom', 'perfect_specimen'],
+          [
+            'pristine_vein',
+            'ancient_heartwood',
+            'moonlit_bloom',
+            'golden_harvest',
+            'perfect_specimen',
+          ],
           `${deedId}: ${mark}`,
         ).toContain(mark.slice('gather_event:'.length));
+      } else if (ns === 'farm') {
+        // Farming celebration marks: farm:planted (the first-planting proof
+        // written at plant success) or a farm:<zone> first-harvest chronicle
+        // mark for a listed farming hub (src/sim/deeds.ts
+        // onCropHarvestedForDeeds); nothing else may ride the namespace.
+        const rest = mark.slice('farm:'.length);
+        expect(
+          rest === 'planted' || FARM_CHRONICLE_ZONES.includes(rest),
+          `${deedId}: ${mark}`,
+        ).toBe(true);
       } else if (ns === 'craft_rare') {
         // Written by professions/crafting.ts craftItem the first time a
         // player crafts a rare-or-better output in that craft (#2055).
@@ -1196,6 +1353,44 @@ describe('trigger references resolve against the real content tables', () => {
       }
     }
     expect([...Object.keys(ZONE_FISH)].sort()).toEqual([...deedFishZones].sort());
+  });
+
+  it('FARM_CHRONICLE_ZONES is real zones and exactly the authored farm-patch zone set', () => {
+    // The ZONE_FISH template, forward direction: every listed chronicle zone
+    // is a shipped zone, and the list matches the zones that actually carry
+    // authored farm patches (FARM_PATCHES) from both directions, so a new
+    // patch zone cannot land without its chronicle row and a chronicle row
+    // cannot name a bedless zone.
+    for (const zoneId of FARM_CHRONICLE_ZONES) {
+      expect(
+        ZONES.some((z) => z.id === zoneId),
+        `${zoneId} names no real zone`,
+      ).toBe(true);
+    }
+    const patchZones = [...new Set(FARM_PATCHES.map((p) => p.zoneId))].sort();
+    expect([...FARM_CHRONICLE_ZONES].sort()).toEqual(patchZones);
+  });
+
+  it('every farm:<zone> deed mark covers FARM_CHRONICLE_ZONES exactly (the reverse sweep)', () => {
+    // The other direction of the farm-guard intersection: a chronicle zone
+    // with no deed consuming its farm:<zone> mark is inert authoring debt,
+    // so the list and the deed catalog must cover each other exactly (the
+    // ZONE_FISH reverse sweep above).
+    const deedFarmZones = new Set<string>();
+    for (const def of ALL) {
+      if (def.trigger.kind === 'visit' && def.trigger.markId.startsWith('farm:')) {
+        const rest = def.trigger.markId.slice(5);
+        if (rest !== 'planted') deedFarmZones.add(rest);
+      }
+      if (def.trigger.kind === 'visits') {
+        for (const mark of def.trigger.markIds) {
+          if (mark.startsWith('farm:') && mark !== 'farm:planted') {
+            deedFarmZones.add(mark.slice(5));
+          }
+        }
+      }
+    }
+    expect([...deedFarmZones].sort()).toEqual([...FARM_CHRONICLE_ZONES].sort());
   });
 
   it('every static-zone poi carries a stable id, unique within its zone', () => {

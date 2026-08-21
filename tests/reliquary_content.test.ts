@@ -385,7 +385,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Grandmaster Jewelcrafting title-shelf slot the phase 05 QA ruling
     // authored: 342, plus the Masterwrought phase 06 inscription pair (the
     // masterwork:inscription mark and the Grandmaster Inscription title-shelf
-    // slot): 344. Catalog growth reverts
+    // slot): 344, plus the absorbed farming packet's Harvestmaster title-shelf
+    // slot: 345. Catalog growth reverts
     // page completion for finished players, per docs/design/reliquary.md.
     // The two excludeFromCompletion pages add
     // slots and 0 to BOTH pairs: the Vault of Ages contributes four retired
@@ -393,7 +394,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // and the flag keeps each whole page out of owned AND total (the dedicated
     // vault and riftbound pins in this file and tests/reliquary_state.test.ts
     // hold both sides), so neither page moves these two literals.
-    expect(full).toEqual({ owned: 344, total: 344 });
+    expect(full).toEqual({ owned: 345, total: 345 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -405,7 +406,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // masterwork marks, and the two Grandmaster title-shelf slots; marks are
     // character-scoped, so this trails the overview by the 29 account-scoped
     // weapon skins).
-    expect(character).toEqual({ owned: 315, total: 315 });
+    expect(character).toEqual({ owned: 316, total: 316 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -418,9 +419,10 @@ describe('Reliquary Conqueror catalog structure', () => {
     // three daggers the v0.36.0 release merge added to live content (375), the
     // jewelcrafting masterwork slot the trainer ladder earned (376), the
     // Grandmaster Jewelcrafting title slot the phase 05 QA ruling authored
-    // (377), and the two Masterwrought phase 06 inscription slots (the
+    // (377), the two Masterwrought phase 06 inscription slots (the
     // masterwork:inscription mark slot and the Grandmaster Inscription title
-    // slot): 379 total.
+    // slot): 379, and the absorbed farming packet's Harvestmaster title slot
+    // on horizons_titles: 380 total.
     // Slots, not unique relics: the seven excludeFromCompletion slots (four
     // vault, three bands) count here while adding zero to every completion
     // pair, and every duplicate ITEM slot counts again here where the overview
@@ -433,7 +435,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(379);
+    ).toBe(380);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, and the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription).
@@ -2629,8 +2631,9 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   horizons_mounts: 10,
   horizons_weapon_skins: 1,
   // Every title relic's source is its own deed, so the count tracks the page
-  // rows: 36 + the four Phase 18 completion-ladder titles.
-  horizons_titles: 42,
+  // rows: 36 + the four Phase 18 completion-ladder titles + the Grandmaster
+  // Jewelcrafting and Inscription titles + the farming Harvestmaster.
+  horizons_titles: 43,
   // 29 = 27 distinct rift mobs across the ten rare multi-hints (eight theme
   // bosses + both citadel bosses + 17 trash carriers), plus the B and S rank
   // doors. The rift_first_clear activity left with the bands.

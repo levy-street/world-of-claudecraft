@@ -7052,3 +7052,142 @@ round; 11d's npm run i18n:gen must produce a ZERO diff (the 11d phase file
 carries the dated note). The 11b parked list (count pins, art census, the
 renderer.ts and online.ts ceilings, the farm_props fingerprint) is unchanged
 and 11d-owned. Close tip e4ccbe659c.
+
+## Phase 11d ledger (2026-08-21, derived artifacts; predictions written BEFORE observation, appended as units land)
+
+### Blob-suite predictions (written before any run of the two suites)
+Restore executed FIRST per the amended 11b count-pin row: farming's coverage
+from 8cd964d599 is back in both files before any number moved ('farmPlots' in
+both PROFESSIONS_BLOB_FIELDS lists and the roundtrip sweep, the ceilingSim()
+every-bed evergarden_greens fixture with its two derivation throws, the
+single-plot roundtrip fixture with the anchor-of-1 doctrine), UNIONED with
+ours' craftDaily/wyrmfallDaily/emberWeekAnchor coverage; the roundtrip
+farming fixture takes the FRACTIONAL 12.5 (not farming: 0, which the
+normalizer restores on a dropped key, the 11b QA migration instruction), and
+the clamp arm gains farming 999 -> 100 (farming's maxSkill, read from
+src/sim/content/professions.ts).
+- tests/professions_blob_roundtrip.test.ts: predicted GREEN as restored (no
+  count literal; the field sweep now covers craftDaily AND farmPlots; the
+  same blob holds a plot and a craftDaily stamp).
+- tests/professions_blob_growth.test.ts settled-bytes prediction, derived
+  from the parents' own recorded chains (both anchored at the shared 9,451
+  phase 20 density measure): ours 10,949 (delta +1,498: jewelcrafting 9,734,
+  inscription 9,889, intermediates+craftDaily 10,224, ph08 10,499, ph09
+  10,756, ph10 10,949); theirs 14,218 (delta +4,767: fifth-profession key
+  9,497, farm plots 13,948, Phase 3 QA 13,994, Phase 5 ladder 14,218).
+  PREDICTED merged settled = 9,451 + 1,498 + 4,767 = 15,716, small
+  cross-terms allowed (a farming oncePerDay recipe joining the craftDaily
+  stamp, JSON separators). Ceiling re-mint at the next round step above the
+  measurement (predicted 16384); the two-sided tracking band re-centers at
+  measured +/- 160 per the file's own doctrine. Parent bounds for the ledger:
+  ours ceiling 12288 band 10789..11109; theirs ceiling 15360 floor 13952
+  (measured 14218, ~203 B per bed at full width, 23 beds).
+- OBSERVED (after the predictions above were written): roundtrip GREEN as
+  predicted (2 tests). Growth measured 16,206 settled bytes against the
+  15,716 prediction; the +490 is EXPLAINED AND NAMED, not pasted over: 433
+  bytes are the FOURTEEN farming recipe ids (the 13 FARM_RECIPES rows plus
+  recipe_growth_tonic, 391 id chars plus JSON overhead) that joined
+  knownRecipes AFTER farming's Phase 5 re-measure and rotted inside
+  farming's one-sided band (farming's note chain counted only the three
+  HOE_RECIPES ids; verified by diffing recipe ids base..theirs: 17 added,
+  3 counted), and ~57 bytes are intra-band drift on both parents' last
+  measurements (each note lags its tree inside its own band by design).
+  Exactly ONE oncePerDay recipe exists on the merged tree (ours'
+  recipe_quickening_catalyst), so craftDaily contributes no cross-term.
+  Ceiling re-minted 17408 (17 KiB), NOT 16384: both parents' own re-mints
+  left over 1 KiB of headroom (ours 10,224 -> 12 KiB; farming 14,218 -> 15
+  KiB) and 16,384 would leave 178 bytes, thinner than the band; the
+  two-sided band re-centers 16046..16366. Both suites green (11 tests).
+
+### Unit 4 prediction table (written BEFORE any count-pin suite ran; every
+### literal read off the three refs with git show in the main loop this
+### session; base e56707a675 / ours d5304a78c4 / theirs 8cd964d599)
+| pin | base | ours | theirs | PREDICTED merged |
+|---|---|---|---|---|
+| world_api_parity IWORLD_MEMBERS.length | 323 | 324 | 331 | 332 |
+| world_api_parity DATA_MEMBERS.length | 86 | 86 | 88 | 88 |
+| world_api_parity METHOD_MEMBERS.length | 237 | 238 | 243 | 244 |
+| world_api_parity FACET_MEMBER_ARRAYS keys | 33 | 33 | 34 | 34 |
+| world_api_parity union before/after dedup | 323 | 324 | 331 | 332 both |
+| command_schema EXPECTED_SEND_COUNT | 199 | 200 | 204 | 205 |
+| command_schema EXPECTED_DISPATCH_COUNT | 212 | 213 | 217 | 218 |
+| command_schema EXPECTED_DISPATCH_ONLY_COUNT | 13 | 13 | 13 | 13 |
+| deeds_content DEED_ORDER.length | 273 | 279 | 280 | 286 |
+| deeds_content total renown | 3155 | 3235 | 3190 | 3270 |
+| deeds_content byCategory.progression | 57 | 63 | 59 | 65 |
+| deeds_content byCategory.chronicle | 49 | 49 | 53 | 53 |
+| deeds_content byCategory.collection | 37 | 37 | 38 | 38 |
+| deeds_content byCategory others | 10/31/13/35/18/11/3/9 | same | same | same (sum 286) |
+| deeds_content titles (x2 lines) | 42 | 44 | 43 | 45 |
+| deeds_content borders | 4 | 4 | 4 | 4 |
+| deeds_content DEED_ORDER[len-1] | exp_dawnhold_castle | prog_grandmaster_inscription | prog_farming_100 | prog_farming_100 (11b RULE 1: farming block LAST; not a numeric compose) |
+| deed_i18n manifest.length | 273*2+42 | 279*2+44 | 280*2+43 | 286*2+45 = 617 |
+| deed_i18n title rows | 42 | 44 | 43 | 45 |
+| deeds_view visibleTotal | 260 | 266 | 267 | 273 (= 286 - 9 hidden - 4 visible-shelf feats; merged deeds.ts read: hidden 9, feat-flagged 5 with col_reliquary_complete the off-prefix Collection feat and one feat also hidden) |
+| deeds_view categories visible sum | 264 | 270 | 271 | 277 (= visibleTotal + 4 feat-flagged shelf rows) |
+| deed_icons DEED_ORDER length | 273 | 279 | 280 | 286 |
+| deed_icons DEED_IMAGE_IDS.size (painted) | 271 | 277 | 272 | 278 |
+| deed_icons DEED_ART_PENDING | 2 | 2 | 8 | 8 (cross-check: 286 - 278 = 8) |
+| reliquary_content overview full | 340 | 344 | 341 | 345 |
+| reliquary_content character completion | 311 | 315 | 312 | 316 |
+| reliquary_content slot total | 375 | 379 | 376 | 380 |
+| reliquary_content distinct mark ids | 29 | 31 | 29 | 31 |
+| reliquary_content horizons_titles page rows | 40 | 42 | 41 | 43 |
+| profile_page catalogTotal | 311 | 315 | 312 | 316 |
+| material_taxonomy_bootstrap MATERIAL_ITEM_IDS.size | 55 | 66 | 82 | 93 |
+| material_taxonomy HONEST_MATERIALS | 55 rows | 66 rows (+11 masterwrought intermediates) | 82 rows (+27 farming junk: 8 crop trios seed/produce/fine + withered_husks + compost + growth_tonic) | 93 rows, sorted union (no deletion on either side) |
+| material_taxonomy ALLOWED_UNCLASSIFIED_JUNK | 6 | 6 | 7 (+harvest_feast) | 7 |
+| material_taxonomy VENDOR_STAPLES | 6 | 6 | 6 | 6 (untouched) |
+| recipe_economy vendor-fed sorted membership | 6 rows | 6 rows | 7 rows (+recipe_bronze_hoe) | 7 rows, floor 7 |
+| recipe_economy trainer-acquisition sum arm | base form | +JEWELCRAFTING/INSCRIPTION/INTERMEDIATE arms | +HOE_RECIPES.length +FARM_RECIPES.length in the sum, +HOE_RECIPES toHaveLength(3), +FARM_RECIPES toHaveLength(14) | both sides' arms composed |
+| sfx_manifest keys.size | 265 | 265 | 270 | 270 (VERIFIED green at unit 1; zero-diff regen) |
+| FROZEN_CATALOG_SHA256 | 36e9f307.. | ea007571.. | 3bc5bc55.. | re-minted LAST from the suite output after every count above is green (not arithmetic; matches neither parent) |
+NOTE on the phase file's worked reliquary derivation: its "slot count 380
+(375 + 4 + 1)" read 375 as ours; the direct read shows base 375, ours 379,
+theirs 376, so the SAME prediction (380) comes out of the honest arithmetic
+375 + 4 + 1 with base read directly. No prediction changed by the re-read.
+The deeds_view "ours 279 - 4 - 9 = 266" arithmetic is confirmed with the
+feat term meaning the 4 VISIBLE-shelf feat-flagged rows (feat: true count
+is 5 at every ref, constant; one is hidden).
+Farming assertion BLOCKS composed alongside the literals (not count pins,
+listed so the diff is accounted): deeds_content gains theirs' count-form
+gathering describe, the farming teaching-ceiling arm, the (bo) tier-3/4
+seed dormancy honesty arm, golden_harvest in the gather_event mark list,
+the farm: mark namespace arm and both FARM_CHRONICLE_ZONES sweeps;
+recipe_economy gains theirs' comment recuts beside the sum arm.
+
+### Unit 4 observed (every suite run AFTER the table above was written)
+PREDICTED == OBSERVED for EVERY pin in the table: world_api_parity
+332/88/244/34 and both union arms 332 (346 tests green, including the NEW
+facet-directory sweep adopted from the 11b QA parity reviewer: every
+src/world_api/*.ts file except appearance.ts, whose header records the
+no-facet design, must be a FACET_MEMBER_ARRAYS key via the mechanical
+camelCase-to-snake_case conversion, with a 34-file floor); command_schema
+205/218/13; deeds_content 286 / 3270 / progression 65 / chronicle 53 /
+collection 38 / titles 45 / borders 4 / tail prog_farming_100 (the tail
+slice literal composed ours' six craft milestones then farming's seven
+rows, matching the merged table order); deed_i18n 617 (286 * 2 + 45) / 45;
+deeds_view 273 / 277; deed_icons 286 / 278 (pending 8 by the 286 - 278
+cross-check); reliquary_content 345 / 316 / 380 / 31 / horizons_titles 43;
+profile_page 316; material_taxonomy_bootstrap 93; material_taxonomy
+HONEST_MATERIALS the 93-row sorted union (ours' 11 + farming's 27 adds,
+zero deletions on either side) with ALLOWED_UNCLASSIFIED_JUNK 7
+(+harvest_feast); recipe_economy vendor-fed 7 rows (+recipe_bronze_hoe,
+floor 7) with the trainer-sum arm carrying BOTH parents' recipe-set terms
+and farming's HOE 3 / FARM 14 pins; sfx keys.size 270 (unit 1). Blob suites
+per their own block above. FROZEN_CATALOG_SHA256 re-minted LAST, after
+every count went green, via the suite's own one-liner:
+560f0e188136f8e636419f97d55c5c8d641ff9a57707083c6c88392c837bd525 ("no
+shipped trigger or renown changed; both parents reproduce their own priors
+exactly; the merged hash is re-minted from the suite output"). Farming's
+assertion BLOCKS composed alongside (the count-form gathering describe, the
+farming teaching-ceiling arm, the (bo) seed-dormancy honesty arm, the farm:
+mark namespace arm, both FARM_CHRONICLE_ZONES sweeps, golden_harvest in the
+gather_event list). Full set: 687 tests across the 13 suites, green; tsc
+clean; biome zero errors (9 pre-existing-class warnings).
+COUNT_PIN class count CORRECTED per ruling 11d-U4-MATTAX: the 13-file class
+is 12 count-pin files (material_taxonomy.test.ts is exact-set equality plus
+membership and class-exclusion arms with zero count literals, resolved by
+re-deriving its sorted literal; material_taxonomy_bootstrap.test.ts IS the
+count pin at MATERIAL_ITEM_IDS.size); the 13th file of the conflict class
+is tests/monolith_budget.test.ts, which unit 6 owns.

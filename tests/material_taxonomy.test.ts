@@ -46,7 +46,12 @@ const HONEST_MATERIALS = [
   'arcane_shard',
   'arcanite_bar',
   'ashwood_log',
+  'bog_beet',
+  'bog_beet_seed',
   'bone_fragments',
+  'brook_carrot',
+  'brook_carrot_seed',
+  'compost',
   'cooking_salt',
   'copper_ore',
   'curved_tusk',
@@ -54,22 +59,39 @@ const HONEST_MATERIALS = [
   // consume (APEX_GEAR_RECIPES), per the phase 07 allowlist obligation.
   'duskforged_billet',
   'elderwood_log',
+  'evergarden_greens',
+  'evergarden_greens_seed',
   'fine_ashwood_log',
+  'fine_bog_beet',
+  'fine_brook_carrot',
   'fine_copper_ore',
   'fine_elderwood_log',
+  'fine_evergarden_greens',
+  'fine_frost_gourd',
+  'fine_gilded_sunmelon',
   'fine_goldleaf_herb',
+  'fine_highland_barley',
   'fine_iron_ore',
   'fine_ironbark_log',
+  'fine_marsh_rice',
   'fine_silverleaf_herb',
   'fine_sunpetal_herb',
   'fine_thorium_ore',
+  'fine_vale_wheat',
   // Masterwrought phase 08: derives IN as the reagent the apex armor rows
   // consume (APEX_ARMOR_RECIPES), per the phase 07 allowlist obligation.
   'forgefold_plating',
+  'frost_gourd',
+  'frost_gourd_seed',
   'game_meat',
+  'gilded_sunmelon',
+  'gilded_sunmelon_seed',
   'glass_vial',
   'glimmerfin_koi',
   'goldleaf_herb',
+  'growth_tonic',
+  'highland_barley',
+  'highland_barley_seed',
   'homespun_cloth',
   'iron_ore',
   'ironbark_log',
@@ -79,6 +101,8 @@ const HONEST_MATERIALS = [
   // phase 11), through the enchant half of the reagent union rather than
   // the recipe half, per the phase 07 allowlist obligation.
   'lucent_reagent',
+  'marsh_rice',
+  'marsh_rice_seed',
   // Masterwrought phase 09: derives IN as the reagent the apex engineering
   // rows consume (APEX_GEAR_RECIPES), per the phase 07 allowlist obligation.
   'precision_chassis',
@@ -123,7 +147,15 @@ const HONEST_MATERIALS = [
   'sunspun_bolt',
   'tanning_agent',
   'thorium_ore',
+  // The farming yields (content/farm_crops.ts): produce, its fine twin, the
+  // seed a plant consumes, and the husks a failed crop pays. IN as materials
+  // for the same reason node yields are, and the seed because it is the
+  // tradeable input side of the same gathering loop. The crop-ladder phase's
+  // seven crop families (21 more ids) sit at their sorted positions above.
+  'vale_wheat',
+  'vale_wheat_seed',
   'venom_gland',
+  'withered_husks',
   'wolf_fang',
   // Masterwrought phase 08: both derive IN via the apex armor rows
   // (wyrmfall_core is a reagent on all ten, cording on the leather three).
@@ -132,12 +164,10 @@ const HONEST_MATERIALS = [
 ] as const;
 
 // The ONLY non-poor junk allowed outside the material set: four rare-mob
-// trophies plus the two placed castle keepsakes (Q4 ruled them out of the
-// sweep; the Dawnhold garden posy follows the keep signet's ruling), the
-// phase 04 making-catalyst, and the Masterwrought phase 07 intermediates
-// still awaiting their consuming apex rows (the wyrmfall_core precedent; the
 // Quickening Catalyst is deliberately NOT here, it derives IN via its nine
-// in-phase consumers). A new junk item landing in this assertion's diff must
+// in-phase consumers), and the Phase 12 harvest feast (a crafted PLACEABLE,
+// not a material: nothing crafts FROM it, and its one consumer is the
+// place_feast command). A new junk item landing in this assertion's diff must
 // be classified: either author it into a source table (a node yield, grade,
 // component, specimen, salvage return, or junk-kind reagent) so it derives
 // IN, or add it here as a deliberate non-material with the maintainer's
@@ -147,6 +177,7 @@ const ALLOWED_UNCLASSIFIED_JUNK = [
   'emberwing_cinderscale',
   'gleamstag_charm',
   'guardian_core',
+  'harvest_feast',
   'last_keep_signet',
   'old_cragmaws_pelt',
   // Phase 08 removed forgefold_plating, wyrmhide_cording, sunspun_bolt, and
@@ -316,6 +347,51 @@ describe('MATERIAL_ITEM_IDS: every source table is fully represented', () => {
     expect(rows).toBeGreaterThan(0);
   });
 
+  it('contains every farming yield and supply: produce, fine twin, seed, husks, knobs', () => {
+    // Farming is fishing-shaped, not node-shaped: nothing it yields is in
+    // NODE_MATERIAL_TABLE and its fine grade is deliberately not a
+    // MATERIAL_GRADES row, so without its own source loop every crop the
+    // ladder phase adds would land unclassified. The two knob supplies
+    // (compost and the growth tonic, the knobs phase) join through the same
+    // source: they are the tradeable input side of the same loop, exactly
+    // like the seeds.
+    for (const id of FARM_MATERIAL_ITEM_IDS) {
+      expect(MATERIAL_ITEM_IDS.has(id), id).toBe(true);
+    }
+    // Anti-vacuous: the derived list is not empty and really does span all
+    // the families, so a crop table that stopped exporting would red here
+    // instead of passing over nothing.
+    expect([...FARM_MATERIAL_ITEM_IDS].sort()).toEqual([
+      'bog_beet',
+      'bog_beet_seed',
+      'brook_carrot',
+      'brook_carrot_seed',
+      'compost',
+      'evergarden_greens',
+      'evergarden_greens_seed',
+      'fine_bog_beet',
+      'fine_brook_carrot',
+      'fine_evergarden_greens',
+      'fine_frost_gourd',
+      'fine_gilded_sunmelon',
+      'fine_highland_barley',
+      'fine_marsh_rice',
+      'fine_vale_wheat',
+      'frost_gourd',
+      'frost_gourd_seed',
+      'gilded_sunmelon',
+      'gilded_sunmelon_seed',
+      'growth_tonic',
+      'highland_barley',
+      'highland_barley_seed',
+      'marsh_rice',
+      'marsh_rice_seed',
+      'vale_wheat',
+      'vale_wheat_seed',
+      'withered_husks',
+    ]);
+  });
+
   it('contains every salvage return', () => {
     let rows = 0;
     for (const id of Object.values(SALVAGE_MATERIAL_BY_QUALITY)) {
@@ -377,9 +453,9 @@ describe('deriveMaterialItemIds: every source table is actually consulted (injec
     harvestComponentItems: HARVEST_COMPONENT_ITEMS,
     harvestComponentSpecimens: HARVEST_COMPONENT_SPECIMENS,
     salvageMaterialByQuality: SALVAGE_MATERIAL_BY_QUALITY,
+    farmMaterialItemIds: FARM_MATERIAL_ITEM_IDS,
     recipes: ALL_RECIPES,
     enchants: ENCHANTS,
-    farmMaterialItemIds: FARM_MATERIAL_ITEM_IDS,
     items: ITEMS,
   };
   // The probe def rides the real catalog so the junk-kind filter sees it.
@@ -421,6 +497,7 @@ describe('deriveMaterialItemIds: every source table is actually consulted (injec
       'salvage return',
       { salvageMaterialByQuality: { ...SALVAGE_MATERIAL_BY_QUALITY, zzz_probe_quality: PROBE } },
     ],
+    ['farming yield', { farmMaterialItemIds: [...FARM_MATERIAL_ITEM_IDS, PROBE] }],
     [
       'recipe reagent',
       { recipes: [...ALL_RECIPES, { ...ALL_RECIPES[0], reagents: [{ itemId: PROBE, count: 1 }] }] },
