@@ -483,6 +483,36 @@ describe('crafting station gate: the partyShared arm', () => {
     expect(sim.countItem('laden_hearth', b), 'the hearth survives its own use').toBe(1);
   });
 
+  it('a cook holding a live Laden Hearth cooks the Harvest Feast away from any kitchen (11c pairing pin)', () => {
+    // The already-true pairing, pinned so it cannot silently break (11c:
+    // recipe_harvest_feast carries stationType kitchens, STATION_TYPE_BY_CRAFT
+    // maps cooking there, the Hearth places a cooking station, and the craft
+    // gate satisfies a kitchens recipe from the live mobile station), which is
+    // exactly the flavor the guide's cooking prose promises: dinner, and the
+    // feast that seeds it, get cooked at the dungeon door. Every input is read
+    // off the live recipe so a re-tier or bill edit re-aims this pin by itself.
+    const sim = makeWorld();
+    const cook = sim.addPlayer('warrior', 'Aleph');
+    const recipe = ALL_RECIPES.find((r) => r.id === 'recipe_harvest_feast');
+    expect(recipe, 'the feast recipe exists').toBeDefined();
+    if (!recipe) return;
+    expect(recipe.stationType, 'the feast recipe is kitchens-bound').toBe('kitchens');
+
+    teleport(sim, cook, FIELD.x, FIELD.z);
+    grantItem(sim, 'laden_hearth', 1, cook);
+    sim.useItem('laden_hearth', cook);
+    expect(metaOf(sim, cook).mobileStation?.craftId, 'the field kitchen stands').toBe('cooking');
+
+    metaOf(sim, cook).knownRecipes.add(recipe.id);
+    metaOf(sim, cook).craftSkills.cooking = recipe.skillReq;
+    for (const reagent of recipe.reagents) grantItem(sim, reagent.itemId, reagent.count, cook);
+    const crafterPos = (sim as any).entities.get(cook).pos;
+    expect(isAtStation(STATIONS, crafterPos, 'kitchens'), 'no static kitchen in reach').toBe(false);
+    const result = resolveCraft(simCtx(sim), cook, recipe.id);
+    expect(result.ok, 'the feast cooks at the field kitchen').toBe(true);
+    expect(sim.countItem(recipe.resultItemId, cook)).toBe(recipe.resultCount);
+  });
+
   it('regression: a legacy specialization placement stays owner-only for party members', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
