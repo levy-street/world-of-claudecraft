@@ -505,3 +505,22 @@ and in the state.md Phase 11b BUILT ledger's carry list (items 4, 7, 14):
    judges the press-competition question moot until a station gains a press
    or 11k's apex feasts land, it may re-route the row to 11k, RECORDING the
    re-route in the handoff table rather than leaving the row orphaned.
+
+TWO MORE ROWS, appended 2026-08-21 by the 11b QA audit (carry items 15, 16):
+
+3. THE GUIDE-PAGE COMMENT SWEEP (carry item 15). The stale "the four
+   gathering" code comment at src/guide/pages/professions.ts:7 sits outside
+   ruling 11b-R3c-2's literal scope and cannot trip Phase 16's verify arm
+   (a comment is not a shipped string); sweep it in the same reword pass.
+
+4. THE FEAST-FLOURISH PREWARM TENSION (carry item 16, a recorded design
+   call, not a bug fix). The farm-patch feast flourish arms on the FIRST
+   sync pass even over an EMPTY entity map (deliberately pinned by
+   tests/farm_patches_adapter.test.ts's unarmed-baseline arm), so a
+   renderer prewarm pass that runs before the online mirror's first
+   snapshot would consume the silent first pass and every standing feast
+   would puff at once on the first live read. Closing it means choosing:
+   wire age, snapshot-ready gating at the renderer call site, or
+   accept-and-record (the module's own scope-reentry paragraph is the
+   precedent). Owned by this phase's food/feast UI pass or Phase 14's UI
+   beauty pass, whichever opens src/render/farm_patches.ts first.

@@ -251,13 +251,16 @@ For off-box safety, sync the directory to S3 occasionally:
 - **Farming plot deploy order and rollback (mixed fleet)**: `farmPlots` rides
   `characters.state`, which is written whole, so a server binary that predates the
   farming growth-engine release autosaves the blob WITHOUT `farmPlots` and erases
-  every planted crop that process touches. Deploy order: roll the growth-engine
-  release out to EVERY realm process before any release that lets players obtain
-  seeds goes live (seeds are deliberately unobtainable online until the farming
-  go-live release, so the window is theoretical until then; it stops being
-  theoretical the moment a seed faucet ships). Rollback: rolling back past the
-  growth-engine release after plants exist destroys all plot state on the next
-  30 s autosave sweep, and the only recovery is restore-from-backup. The hidden
+  every planted crop that process touches. Deploy order: the 11b absorb collapsed
+  the growth-engine and seed-faucet releases into ONE (Farmer Jessica vendors
+  seeds and `q_farm_intro` grants one from first boot), so the window is LIVE
+  from the first mixed-fleet minute of that release: roll it out to EVERY realm
+  process in one deploy pass, never staged across days. Rollback: rolling back
+  past the growth-engine release after plants exist destroys all plot state on
+  the next 30 s autosave sweep, AND erases each character's accumulated Farming
+  skill number (the pre-farming binary's four-trade serializer drops the
+  `farming` key from both `gatheringProficiency` and the legacy dual-written
+  `professions` record); the only recovery is restore-from-backup. The hidden
   per-plot pre-rolls (`survivalRoll`, `yieldSeed`) live in the same blob; the load
   side clamps them into their value domains and re-derives absent slots
   deterministically, so RESTORED bytes always resolve to the same outcome and

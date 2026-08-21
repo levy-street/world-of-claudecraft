@@ -1919,8 +1919,9 @@ visit or a punishment for lateness is violating the design, not tuning it.
 - SUPERSEDED IN PLACE (2026-08-20, the Masterwrought 11b absorb, ruling
   11b-D-3 / masterwrought decision 3): D22 below and its addendum's arm (B)
   are superseded, never deleted (the never-renumber rule requires supersession
-  in place; the bodies stay verbatim as the record of how the packet was
-  actually delivered). What replaces them: farming is ABSORBED into the
+  in place; the bodies stay verbatim apart from the doc move's path-string
+  rewrites, the same carve-out the moved README's banner states, as the record
+  of how the packet was actually delivered). What replaces them: farming is ABSORBED into the
   Masterwrought packet (`feature/masterwrought`, merge 424ce89a20 of tip
   8cd964d599), both packets ship as ONE branch and ONE PR under the
   Masterwrought delivery contract, and the (B) "no PR ever" arm is void.

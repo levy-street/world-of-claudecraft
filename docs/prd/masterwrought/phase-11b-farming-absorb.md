@@ -457,6 +457,10 @@ STEP 5 - ACCEPTANCE:
 - [ ] docs/farming moved with git mv; the tracked-file count DERIVED with git ls-tree and
       recorded; zero `docs/farming/` anywhere except the moved README's dated banner; the
       asset-manifest needle re-pointed AND watched to fail.
+      (ACCEPTANCE SUPERSEDED as executed, 2026-08-21 QA audit: the executed sweep
+      inventories 14 deliberate verbatim-history mentions across 5 ledgered exception
+      files, zero in executable code; state.md's doc-move ledger holds the exception
+      inventory and governs over this line's literal "zero".)
 - [ ] tests/release_v039_icon_art.test.ts parked on FARMING's art-subject split form, with
       the verdict REFACTORED, NOT DELETED recorded for 11d and nothing added to the
       deletion list for it.

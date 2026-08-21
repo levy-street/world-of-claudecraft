@@ -678,7 +678,13 @@ is deliberately not copied here, it lives in the farming record.
   `tests/monolith_budget.test.ts`, `tests/item_art_consistency.test.ts` twice,
   `tests/mob_portrait_source_manifest.test.ts`, and `docs/design/deeds.md`, plus
   the needle in `tests/farming_asset_manifest.test.ts` that would otherwise pass
-  vacuously after the move), `farming/state.md` becomes the farming design
+  vacuously after the move) (SUPERSEDED ON THE CITATION SET, 2026-08-21 QA
+  audit: that list was measured on farming's branch BEFORE the merge; at the
+  merge the monolith_budget and item_art_consistency citations no longer
+  existed because conflict resolution took ours' parked arms, and the executed
+  set, recorded in state.md's doc-move ledger, is `src/sim/content/zone1.ts:918`,
+  `docs/design/deeds.md`, and the mob_portrait manifest comment, plus the
+  needle), `farming/state.md` becomes the farming design
   authority and this packet's ONE open-item collection point (the MAINTAINER GATES
   block plus the handoff table, with masterwrought's own open decisions appended at
   the end and never interleaved), and the new `decisions-index.md` states which

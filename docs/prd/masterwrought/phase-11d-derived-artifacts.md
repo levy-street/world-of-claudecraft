@@ -286,7 +286,13 @@ UNIT 4 - COUNT PINS (12 of the 13; tests/monolith_budget.test.ts is unit 6). Com
     completion (311 + 4 + 1).
   tests/professions_blob_growth.test.ts and tests/professions_blob_roundtrip.test.ts:
     re-derive the bound on the MERGED serialized shape, which now carries farming's
-    farmPlots alongside masterwrought's craftDaily and wyrmfallDaily. Farming measured
+    farmPlots alongside masterwrought's craftDaily and wyrmfallDaily.
+    (AMENDED 2026-08-21 by the 11b QA audit, and the state.md count-pin row
+    governs: RESTORE farming's discarded coverage from 8cd964d599 FIRST, before
+    any number moves: 'farmPlots' in PROFESSIONS_BLOB_FIELDS and the roundtrip
+    sweep, and the ceilingSim() arm planting EVERY authored bed with
+    evergarden_greens, so the MEASURED arm carries farmPlots and the bound is
+    not re-minted around a plotless fixture.) Farming measured
     the blob first-hand: empty character 1499 B compressed and 2059 B raw; 23 beds
     planted 3261 and 7831; about 251 B raw per plot; TOAST past 2 KB; WAL plus 1.5 to
     3 KB per 30 s autosave. Predict from the two parents' bounds plus that measured
