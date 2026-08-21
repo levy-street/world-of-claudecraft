@@ -3,7 +3,7 @@
     "run": "32190441549",
     "harvested": "2026-08-18",
     "files": 2879,
-    "localMerge": "2026-08-21 farming absorb (masterwrought Phase 11d, ruling 11d-U1-SHARD): KEY UNION of the two parent harvests; the newer CI harvest (run 32190441549, 2851 rows) wins on every shared key and 28 rows only the other parent's table carried (run 32103940330) keep that table's measured weight; no weight is hand-written; files counts the merged table (2851 harvested + 28 carried)"
+    "localMerge": "2026-08-21 farming absorb (masterwrought Phase 11d, ruling 11d-U1-SHARD): KEY UNION of the two parent harvests; the newer CI harvest (run 32190441549, 2851 rows) wins on every shared key and 28 rows only the other parent's table carried keep that table's measured weight, sourced from the older table (run 32103940330), whose own provenance reads: \"2026-08-20 v0.40.0 sync: 49 branch-only rows carried from the 2026-08-19 local measurement, CI-harvested weights untouched; files counts the merged table (2830 CI-harvested + 49 carried)\"; no weight is hand-written; files counts the merged table (2851 harvested + 28 carried)"
   },
   "tests/abilities_command.test.ts": 1933,
   "tests/ability_audio_defers_to_recordings.test.ts": 171,

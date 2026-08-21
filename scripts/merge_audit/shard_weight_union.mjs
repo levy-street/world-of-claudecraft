@@ -18,7 +18,7 @@
 // Optional: --ours <ref> --theirs <ref> (defaults below are the 11b merge parents).
 // The parents are read with `git show`; nothing is checked out.
 import { execFileSync } from 'node:child_process';
-import { readdirSync, statSync, writeFileSync } from 'node:fs';
+import { readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const ROOT = process.cwd();
@@ -58,6 +58,16 @@ export function unionTables(ours, theirs) {
   const sortedKeys = [...new Set([...newerKeys, ...olderKeys])].sort();
   const merged = { __provenance: null };
   for (const k of sortedKeys) merged[k] = newerKeys.has(k) ? newer[k] : older[k];
+  // The carried rows keep the older TABLE's values, and that table's own
+  // provenance disclosure travels with them: collapsing the carried rows to
+  // "run <olderProv.run>" would launder locally measured weights into an
+  // apparent CI-harvested pedigree one union at a time (the 11d gate
+  // reviewer's finding: 27 of the absorb's 28 carried rows were the
+  // 2026-08-19 LOCAL measurements the older table disclosed, not harvest
+  // rows).
+  const olderPedigree = olderProv.localMerge
+    ? `the older table (run ${olderProv.run}), whose own provenance reads: "${olderProv.localMerge}"`
+    : `the older table's CI harvest (run ${olderProv.run})`;
   merged.__provenance = {
     run: newerProv.run,
     harvested: newerProv.harvested,
@@ -66,7 +76,7 @@ export function unionTables(ours, theirs) {
       '2026-08-21 farming absorb (masterwrought Phase 11d, ruling 11d-U1-SHARD): KEY UNION of ' +
       `the two parent harvests; the newer CI harvest (run ${newerProv.run}, ${newerKeys.size} ` +
       `rows) wins on every shared key and ${carried.length} rows only the other parent's table ` +
-      `carried (run ${olderProv.run}) keep that table's measured weight; no weight is ` +
+      `carried keep that table's measured weight, sourced from ${olderPedigree}; no weight is ` +
       `hand-written; files counts the merged table (${newerKeys.size} harvested + ` +
       `${carried.length} carried)`,
   };
@@ -83,16 +93,26 @@ export function unionTables(ours, theirs) {
   };
 }
 
+// The SAME walk predicate the enforcing pin applies
+// (tests/ci_shard_partition.test.ts): skip browser/, node_modules, dist and
+// dot-directories, and never follow symlinks (withFileTypes, no statSync), so
+// this tool cannot certify a coverage number the gate's own walk would then
+// reject.
 export function walkTestFiles(root) {
   const out = [];
   const walk = (dir) => {
-    for (const name of readdirSync(dir)) {
-      const p = join(dir, name);
-      if (statSync(p).isDirectory()) {
-        if (name === 'browser') continue;
-        walk(p);
-      } else if (name.endsWith('.test.ts') && !name.endsWith('.browser.test.ts')) {
-        out.push(p.slice(root.length + 1));
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const name = entry.name;
+      if (entry.isDirectory()) {
+        if (name === 'browser' || name === 'node_modules' || name === 'dist') continue;
+        if (name.startsWith('.')) continue;
+        walk(join(dir, name));
+      } else if (
+        entry.isFile() &&
+        name.endsWith('.test.ts') &&
+        !name.endsWith('.browser.test.ts')
+      ) {
+        out.push(join(dir, name).slice(root.length + 1));
       }
     }
   };

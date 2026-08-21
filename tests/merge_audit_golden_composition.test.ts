@@ -1,0 +1,122 @@
+// Fixture pins for the golden COMPOSITION checker
+// (scripts/merge_audit/golden_composition.mjs), the unit 2 evidence tool of
+// the farming absorb (masterwrought Phase 11d). Inline fixtures only: no git,
+// no repo walk, so the selective gate sees it through the import graph. The
+// 11d gate review flagged the tool as the one merge_audit script without a
+// pin; these arms prove the two properties the phase leaned on: numeric
+// leaves must COMPOSE (merged - base == oursDelta + theirsDelta) and a moved
+// rng digest in a scenario neither side touched is a FINDING, not a delta.
+import { describe, expect, it } from 'vitest';
+import {
+  checkAdd,
+  checkShared,
+  composeLeaf,
+  isIdPath,
+  newCtx,
+} from '../scripts/merge_audit/golden_composition.mjs';
+
+const frame = (tick: number, over: Record<string, unknown> = {}) => ({
+  tick,
+  time: tick / 20,
+  nextId: 968,
+  state: 's0',
+  events: 'e0',
+  rng: { draws: 10, digest: 'aaaa' },
+  label: 'init',
+  players: [],
+  entities: [{ id: 963, hp: 100 }],
+  ...over,
+});
+const golden = (over: Record<string, unknown> = {}, frames = [frame(0)]) => ({
+  scenario: 'fixture',
+  seed: 1,
+  sampleEvery: 20,
+  ticks: 1,
+  coverage: ['c'],
+  draws: 10,
+  drawDigest: 'aaaa',
+  frames,
+  ...over,
+});
+
+describe('composeLeaf', () => {
+  it('accepts a numeric leaf that composes and rejects one that does not', () => {
+    const ok = newCtx();
+    composeLeaf(100, 110, 96, 106, 'hp', ok); // 100 + 10 - 4 = 106
+    expect(ok.findings).toEqual([]);
+    const bad = newCtx();
+    composeLeaf(100, 110, 96, 110, 'hp', bad); // took ours, dropped theirs' delta
+    expect(bad.findings).toHaveLength(1);
+    expect(bad.findings[0]).toContain('does not compose');
+  });
+
+  it('applies the three-way rule to strings and flags a both-moved CONFLICT', () => {
+    const ok = newCtx();
+    composeLeaf('a', 'a', 'b', 'b', 'name', ok); // ours kept base, theirs moved
+    expect(ok.findings).toEqual([]);
+    const conflict = newCtx();
+    composeLeaf('a', 'b', 'c', 'b', 'name', conflict);
+    expect(conflict.findings[0]).toContain('CONFLICT');
+  });
+
+  it('composes key PRESENCE: a key one side added must be in merged', () => {
+    const dropped = newCtx();
+    composeLeaf(undefined, undefined, 5, undefined, 'craftDaily', dropped);
+    expect(dropped.findings[0]).toContain('presence does not compose');
+  });
+});
+
+describe('checkShared', () => {
+  it('reports a moved rng digest as a finding when theirs kept base', () => {
+    const b = golden();
+    const o = golden();
+    const t = golden();
+    const m = golden({ drawDigest: 'ffff' }, [frame(0, { rng: { draws: 10, digest: 'ffff' } })]);
+    const { ctx } = checkShared('fx', b, o, t, m);
+    expect(ctx.findings.some((f: string) => f.includes('RNG MOVED'))).toBe(true);
+  });
+
+  it('passes a clean composition with a uniform id shift and counts it', () => {
+    const shift = (g: ReturnType<typeof golden>, d: number) => ({
+      ...g,
+      frames: [frame(0, { nextId: 968 + d, entities: [{ id: 963 + d, hp: 100 }] })],
+    });
+    const b = golden();
+    const o = golden();
+    const t = shift(golden(), 4);
+    const m = shift(golden(), 4);
+    const { ctx } = checkShared('fx', b, o, t, m);
+    expect(ctx.findings).toEqual([]);
+    expect(ctx.idShifts.get(4)).toBeGreaterThan(0);
+  });
+});
+
+describe('checkAdd', () => {
+  it('flags rng movement against the carrying parent of a clean add', () => {
+    const p = golden();
+    const m = golden({ draws: 11, drawDigest: 'bbbb' });
+    const { ctx } = checkAdd('fx', p, m, 'theirs');
+    expect(ctx.findings.some((f: string) => f.includes('RNG MOVED'))).toBe(true);
+  });
+
+  it('rejects non-id movement in an ours-only add and allows the id shift', () => {
+    const p = golden();
+    const idOnly = golden(undefined, [frame(0, { nextId: 972, entities: [{ id: 967, hp: 100 }] })]);
+    expect(checkAdd('fx', p, idOnly, 'ours').ctx.findings).toEqual([]);
+    const hpMoved = golden(undefined, [frame(0, { entities: [{ id: 963, hp: 90 }] })]);
+    const { ctx } = checkAdd('fx', p, hpMoved, 'ours');
+    expect(ctx.findings.some((f: string) => f.includes('non-id numeric'))).toBe(true);
+  });
+});
+
+describe('isIdPath', () => {
+  it('classifies the id family and only the id family', () => {
+    expect(isIdPath('frames[0:init#0].nextId')).toBe(true);
+    expect(isIdPath('frames[0].entities[0].sourceId')).toBe(true);
+    expect(isIdPath('frames[0].entities[1].threat[2][0]')).toBe(true);
+    expect(isIdPath('frames[0].entities[1].lootRecipientIds[0]')).toBe(true);
+    // The threat AMOUNT column and plain gameplay numbers are NOT ids.
+    expect(isIdPath('frames[0].entities[1].threat[2][1]')).toBe(false);
+    expect(isIdPath('frames[0].entities[0].hp')).toBe(false);
+  });
+});

@@ -7353,3 +7353,120 @@ zero-diff note now covers the sync's 5 tracker keys).
   by the same predicted-then-observed method. The blob band (16046..16366)
   and ceiling 17408 re-measure at the next authored growth per the file's
   own doctrine; the bed-count and widest-crop throws force the re-read.
+- LEDGER CORRECTIONS from the second prediction desk's independent pass
+  (2026-08-21, after the pins landed; its whole table matches the committed
+  values pin for pin): (1) the unit 4 table's deeds_view parenthetical
+  ("feat-flagged 5 ... one feat also hidden") was a comment-counting error,
+  the source-text trap striking the reader itself: `feat: true` greps 5 in
+  merged deeds.ts but one hit is a COMMENT (the col_reliquary_complete
+  off-prefix rationale); the real flag set is 4 at every ref
+  (feat_era_cap, feat_book_complete, feat_brightwood_relic,
+  col_reliquary_complete), none hidden, and the committed 273/277
+  arithmetic (286 - 9 - 4) was already built on 4. (2) The 11b-qa-B8 row's
+  "12249 -> 12235 -> 12232" chain is farming's PIN history by commit
+  (8caa0c669c, 570fd2c026, 8a7fd2a349), while the file's tip comment
+  carries the three-extraction narrative ending at 12229: both records are
+  true; the unit 6 row cites the narrative and this line reconciles the
+  two. (3) The desk's "still-open monolith reds" flag was read at
+  1900e38210, before the unit 6 commit 55714f2350 re-pinned them; green at
+  the tip.
+
+### Review-round fix predictions (written before the re-measure)
+The DB reviewer's bound-fidelity findings move the ceiling fixture toward
+the production shape: F1 adds the FOURTH tool-effect slot (farming became
+slottable when the hoe phase lifted its refusal arm; measured 130 B), F2
+anchors the every-bed fixture at a fixed EPOCH clock threaded through the
+measure arm's three sims (13-digit anchors, measured +16 B x 23 rows =
++368 B; the offline-anchored shape understated production by more than the
+band's own width). PREDICTED re-measure: 16,206 + 130 + 368 = 16,704;
+band re-centers 16544..16864; the 17408 ceiling HOLDS (704 headroom), no
+ceiling movement predicted. The slot-cap pin derives from
+GATHERING_PROFESSION_IDS filtered through slotToolEffectRefused with the
+literal 4 pinned beside it (predicted-then-observed, and the derived form
+cannot self-vacuate).
+
+### Review round (five domain reviewers, COVERAGE prompts; every finding applied or recorded, none dropped)
+- MIGRATION: PASS on every mechanism (the merged blob a load fixed point
+  with both writers in one blob; farming 12.5 byte-faithful and drop-
+  catching; the clamp arm at farming's real cap 100; census provably
+  non-mutating; the downgrade record intact verbatim). Two WARNINGs
+  APPLIED: the roundtrip suite gains the either-parent-shaped-save arms (a
+  farmPlots-less OURS shape and a craftDaily-less THEIRS shape each load,
+  settle without resurrecting the absent key, hold every other professions
+  field byte-faithful, and re-settle as a fixed point) and the
+  wyrmfallDaily/emberWeekAnchor writers now ride the whole-blob fixed
+  point with spot pins. INFO applied: the sim.ts farm-plot load comment no
+  longer over-claims whole-blob byte equality (relined to hold the
+  zero-slack pin); the 11b "REQUIRED_FIELDS" row's real seams are named in
+  the corrections above (PROFESSIONS_BLOB_FIELDS x2 and the growth
+  survival loop); the plot-at-rest scope note and the mixed-fleet
+  documented-rule note recorded as stated.
+- GATE-INTEGRITY: PASS (union semantics byte-verified: 0 rows untraceable
+  to a parent, 0 invented weights; the table-only-edit adversarial case
+  selects full tier on CI and the pins locally). WARNING APPLIED: the
+  union tool no longer collapses carried rows to "run <older run>", which
+  was FALSE for 27 of the 28 (they were the 2026-08-19 LOCAL measurements)
+  and erased the older table's own disclosure; the provenance now carries
+  the older table's localMerge forward verbatim, and the committed table
+  was re-minted with the honest pedigree chain (partition suite 13/13
+  after). INFO applied: the tool's walk now matches the enforcing pin's
+  predicate exactly (withFileTypes, node_modules/dist/dot-dirs skipped, no
+  symlink follow); the stale-key analysis (4 harmless fallback rows,
+  selection-inert via the sequencer's files-driven partition) and the
+  coverage recompute (2875/3003 = 95.74 percent, ~23 more unweighted files
+  to the floor) recorded; golden_composition.mjs gains its own fixture
+  suite (tests/merge_audit_golden_composition.test.ts, 8 arms: composes,
+  three-way, presence, RNG MOVED on shared and add paths, the id-family
+  classifier including the threat amount-column negative).
+- PARITY: PASS (all nine added members traced facet -> both worlds ->
+  wire; 205/218/13 re-derived with the test's own regexes; the singular
+  activeMobileStationCraft correctly gone; fplot's empty-list delta
+  semantics verified deliberate). Two WARNINGs APPLIED: the facet-
+  directory sweep now walks through the SHARED walker (ts_files_under, a
+  subdirectory move reds loudly) with the scan-guard self-audit
+  registered, and a new pin proves every facet interface sits on the
+  IWorld barrel extends list (and nothing else does), closing the one
+  unpinned hop (348 tests green).
+- ARCHITECTURE: PASS, the strongest form: zero rng movement proven against
+  BOTH baselines (the ours parent AND the goldens the re-record replaced);
+  the whole-table leaf footprint is 4,661 numeric moves, every one exactly
+  +4, plus the two named files; the two ours-side draw movers proven
+  ours-parent deltas (nythraxis base==theirs 6116/73b08c60, ours 6113;
+  professions_craft ours' two added frames). Two SHOULD-FIXes APPLIED as
+  ledger truings here: (1) the 11c prediction block's "sourceId 967 to
+  971" clause was WRONG twice over: the aura's source is the player, whose
+  id does not shift in that file, and the re-record keeps sourceId 967 in
+  all six rows (my unit 2 commit recorded this; this line trues the 11c
+  block's row so no future reader accepts a +4 there as expected); (2)
+  idle_mob_distance_culling's 8 non-id numeric moves are NAMED movement,
+  root-caused: the scenario sets idleMobTickRadius, routing passive rolls
+  through the private id-seeded idle lane (src/sim/mob/idle_rng.ts seeds
+  by mob.id, shifted +4), and the scenario draws ZERO shared rng, so the
+  draw digest is structurally blind there: exactly the shape a real drift
+  would take in a draw-free scenario, benign HERE because ours kept base
+  and merged equals theirs. NOTEs recorded: the composition script's
+  theirs-only-add arm asserts rng only (the ledger prediction is the
+  authority for farming_session's non-rng rows, all verified item by
+  item); the script's default refs are the 11B absorb parents by design
+  (the 11d sync was separately proven golden-inert: no tests/parity file
+  in the sync, the release's whole sim delta one additive function); the
+  "tick-0 nextId 972" phrasing is inexact (34 shared goldens sit at
+  967/971, 33 at 968/972; the true invariant, ours == base and merged ==
+  theirs == base + 4, held in all 67); the additive-compose and
+  min-length-array residual holes recorded for the next re-record's
+  reader.
+- DB-PERFORMANCE: verdict "6 P2 bound-fidelity findings, none a production
+  regression". ALL SIX APPLIED OR RECORDED: F1 the fourth tool-effect slot
+  (farming slottable since the hoe phase; fixture + derived cap with the
+  literal 4 beside it); F2 the epoch-anchor measure (CEILING_EPOCH_MS
+  threaded through the measure arm's three sims); the re-measure landed at
+  16,704, EXACTLY the predicted 16,206 + 130 + 368, band re-centered
+  16544..16864, ceiling 17408 HOLDS (704 headroom); F3 the rift-payload
+  term recorded in the bound note and carried to Phase 12 as bound-policy
+  work (phase-12-perfecting.md, both numbers named); F4 the exponential
+  survivalRoll width noted at the fixture; F5 logging joins the non-zero
+  columns (0.25) with the zero-blindness argument stated once; F6
+  craftDaily's structural-vs-content bound gap recorded in the note. Its
+  TOAST/WAL assessment recorded: the 17 KiB pin is structurally sane, the
+  zero-default omission shape is what keeps write volume sane, and the
+  ceiling's job is regression detection.

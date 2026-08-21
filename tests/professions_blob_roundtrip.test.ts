@@ -68,7 +68,10 @@ const populatedSim = (): Sim => {
   // exists to catch (the 11b QA migration finding; farming absorb, Phase 11d).
   meta.gatheringProficiency = {
     mining: 42.25,
-    logging: 0,
+    // Non-zero on every column: a zero is exactly what the normalizer
+    // restores for a dropped key, so a zero column proves nothing about the
+    // sweep (the same argument as farming below; 11d DB review, F5).
+    logging: 0.25,
     herbalism: 7,
     fishing: 150,
     farming: 12.5,
@@ -142,6 +145,14 @@ const populatedSim = (): Sim => {
   // the one shipped oncePerDay recipe stamped. The id must be a LIVE gated
   // recipe or the load clamp's anti-tamper filter drops it by design.
   meta.craftDaily = { date: '2026-08-11', crafted: new Set(['recipe_quickening_catalyst']) };
+  // The other two masterwrought daily writers ride the WHOLE-BLOB fixed
+  // point (layer 2) from here: they are non-professions fields (the growth
+  // suite's complement list owns their classification), but a populated
+  // value in this fixture means the s3-equals-s2 arm pins their composed
+  // round trip too, which the byte-ceiling suite alone cannot (it measures
+  // size, not a load fixed point). The 11d migration review's gap.
+  meta.wyrmfallDaily = { date: '2026-08-11', sources: new Set(['rift']) };
+  meta.emberWeekAnchor = '2026-08-11';
   // One fully-populated plot on a REAL bed and crop id (the load-side
   // allowlists are shipped content, so a fixture id would be dropped and
   // fail the presence pin). The anchor is 1, not a round number, and that is
@@ -181,7 +192,7 @@ describe('the professions blob round-trip sweep', () => {
     // Spot pins on load-bearing values so the sweep is not only structural.
     expect(s1.gatheringProficiency).toEqual({
       mining: 42.25,
-      logging: 0,
+      logging: 0.25,
       herbalism: 7,
       fishing: 150,
       farming: 12.5,
@@ -243,6 +254,46 @@ describe('the professions blob round-trip sweep', () => {
     // toEqual ignores a key that is present with an explicit undefined value,
     // so pin the key SETS too: an absent key must stay absent.
     expect(Object.keys(s3).sort()).toEqual(Object.keys(s2).sort());
+    // The two non-professions daily writers the fixture populates above ride
+    // the fixed point; spot-pin them so a serializer arm dropping either is
+    // named here instead of surfacing as a whole-blob toEqual diff.
+    expect(s3.wyrmfallDaily).toEqual({ date: '2026-08-11', sources: ['rift'] });
+    expect(s3.emberWeekAnchor).toBe('2026-08-11');
+  });
+
+  it('an either-parent-shaped save settles cleanly on merged code (the absorb load contract)', () => {
+    // The farming absorb (masterwrought Phase 11d migration review): the
+    // merged loader must accept a save written by EITHER parent binary, not
+    // only the both-writers blob the sweep above drives. A THEIRS-shaped
+    // save carries farmPlots and no craftDaily; an OURS-shaped save the
+    // reverse. Both load through their unconditional normalizers
+    // (normalizeFarmPlots returns the no-plots default for an absent field;
+    // sanitizeDailyGateLoad keeps the createPlayer default when the stamp is
+    // absent), and zero-default omission makes each shape its own fixed
+    // point: the deleted key must NOT resurrect on the re-save.
+    for (const missing of ['farmPlots', 'craftDaily'] as const) {
+      const sim = populatedSim();
+      const s1 = sim.serializeCharacter(sim.playerId) as CharacterState;
+      expect(s1[missing]).toBeDefined(); // the deletion below deletes something real
+      delete s1[missing];
+
+      const reloaded = makeSim(25);
+      const pid = reloaded.addPlayer('warrior', 'ParentShape', { state: s1 });
+      const s2 = reloaded.serializeCharacter(pid) as CharacterState;
+      expect(s2[missing], `${missing} resurrected from an absent field`).toBeUndefined();
+      // Every OTHER professions field settles byte-faithfully: the absence
+      // of one packet's writer must not perturb the other packet's data.
+      for (const field of PROFESSIONS_BLOB_FIELDS) {
+        if (field === missing) continue;
+        expect(s2[field], `${field} drifted loading a ${missing}-less save`).toEqual(s1[field]);
+      }
+      // And the settle is a fixed point: a second load changes nothing.
+      const again = makeSim(26);
+      const pid2 = again.addPlayer('warrior', 'ParentShape2', { state: s2 });
+      const s3 = again.serializeCharacter(pid2) as CharacterState;
+      expect(s3).toEqual(s2);
+      expect(Object.keys(s3).sort()).toEqual(Object.keys(s2).sort());
+    }
   });
 
   it('over-cap values clamp DOWN through the documented load normalizers and persist clamped', () => {

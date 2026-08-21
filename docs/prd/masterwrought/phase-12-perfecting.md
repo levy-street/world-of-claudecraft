@@ -273,3 +273,21 @@ into one blob in both directions.
 **Stopping rule, added.** Stop and ask if the merged blob bound cannot be derived from
 farming's recorded measurement without a fresh Postgres measurement run this phase has no
 rig for.
+
+### Blob-bound policy carry (added 2026-08-21 by Phase 11d's DB review)
+Phase 11d re-minted the professions blob PIN at the measured production
+shape (17 KiB ceiling, band 16544..16864 around a 16,704-byte settle; the
+ledger narrative lives in tests/professions_blob_growth.test.ts). Two
+terms are recorded as DELIBERATELY unmeasured and belong to this phase's
+bound-as-policy work (the 11d phase file: "This phase owns the PIN; Phase
+12 owns the merged size BOUND as policy"):
+- The rift-forged equipmentInstance payload: a legitimate endgame copy
+  (sourceEventId, tier, power, upgrade fields, baseStats, gems) measures
+  ~461 bytes against the fixture's 107, ~4.2 KB across the 12 instanced
+  slots, MORE than the pin's remaining headroom. Decide whether the
+  ceiling fixture instances the rift shape (re-minting the bound upward)
+  or the bound's scope formally excludes rift payloads to their own bound
+  (item_instance_load.ts's per-slot clamps are the current backstop).
+- craftDaily's structural clamp bound (32 ids x 64 chars, ~2.1 KB) sits
+  far above the one oncePerDay recipe content funds; re-mint when the
+  gated set grows.

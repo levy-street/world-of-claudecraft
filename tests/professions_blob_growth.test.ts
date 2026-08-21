@@ -25,6 +25,7 @@ import { FARM_BED_IDS } from '../src/sim/content/farm_patches';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import {
   CRAFT_RING,
+  GATHERING_PROFESSION_IDS,
   GATHERING_PROFESSIONS,
   HARVEST_COMPONENT_ITEMS,
 } from '../src/sim/content/professions';
@@ -36,7 +37,7 @@ import {
 } from '../src/sim/professions/archetype';
 import { FARM_MAX_GROW_MS } from '../src/sim/professions/farm_persist';
 import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
-import { MAX_CRAFTED_BY_LENGTH } from '../src/sim/professions/tools';
+import { MAX_CRAFTED_BY_LENGTH, slotToolEffectRefused } from '../src/sim/professions/tools';
 import { MAX_KNOWN_RECIPE_ID_LENGTH, MAX_KNOWN_RECIPE_IDS } from '../src/sim/professions/training';
 import { type CharacterState, type PlayerMeta, Sim } from '../src/sim/sim';
 import { ALL_EQUIP_SLOTS, type InvSlot } from '../src/sim/types';
@@ -49,8 +50,25 @@ import { EMPTY_TEST_WORLD } from './sim_shared';
 // terrain, props, and playerStart identical to the built-in world (so
 // findSafePos/groundPos still settle every fixture the same way) while
 // skipping the camp/npc/ground-object population that this file never reads.
-const makeSim = (seed = 31) =>
-  new Sim({ seed, playerClass: 'warrior', autoEquip: false, world: EMPTY_TEST_WORLD });
+const makeSim = (seed = 31, nowMs?: number) =>
+  new Sim({
+    seed,
+    playerClass: 'warrior',
+    autoEquip: false,
+    world: EMPTY_TEST_WORLD,
+    ...(nowMs === undefined ? {} : { lockoutNowMs: () => nowMs }),
+  });
+
+// A fixed EPOCH clock for the byte-MEASURE arm (11d DB review, F2): the
+// production anchors are 13-digit epoch milliseconds, and an offline-anchored
+// fixture (plantedAtMs re-anchored to 1) understates every farm row by 16
+// bytes, 368 across the 23 beds, more than the tracking band is wide. The
+// value is 2026-01-01T04:00Z so the craftDaily stamp date and the clock agree
+// whatever the gate consults. Threaded through ceilingSim AND the measure
+// arm's settle sims so no re-anchor fires and the fixed point holds at full
+// anchor width; every other arm keeps the offline clock (they assert caps and
+// complements, not bytes).
+const CEILING_EPOCH_MS = 1_767_240_000_000;
 
 // The professions-owned key list, mirrored from the roundtrip sweep. The
 // scrape test below pins the two lists together so neither can silently
@@ -243,10 +261,24 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
 // re-mints left over 1 KiB of headroom (10,224 -> 12 KiB; 14,218 -> 15 KiB)
 // and 16,384 would leave 178 bytes, thinner than the tracking band itself.
 // The band below re-centers at 160 either side of the 16,206 measurement.
+// The 11d DB review then trued the fixture to the production shape and the
+// re-measure landed at 16,704, EXACTLY the predicted 16,206 + 130 (the
+// fourth tool-effect slot: farming became slottable when the hoe phase
+// lifted its refusal arm, F1) + 368 (13-digit epoch anchors on all 23 farm
+// rows via CEILING_EPOCH_MS, F2): the 17 KiB ceiling HOLDS with 704 bytes
+// of headroom and the band re-centers on the new measurement. Two terms
+// stay DELIBERATELY unmeasured and recorded instead: the rift-forged
+// equipmentInstance payload (~354 B per slot on legitimate endgame copies,
+// bounded separately by src/sim/item_instance_load.ts; measuring it is
+// Phase 12 bound-policy work, F3) and craftDaily's structural clamp bound
+// (32 ids x 64 chars, ~2.1 KB, far above the one oncePerDay recipe content
+// funds today; re-mint when the gated set grows, F6). The fixture measures
+// crafted, signed, enchanted, stat-rolled instances: the professions-CRAFT
+// worst case, not the rift endgame's.
 const PROFESSIONS_BYTE_CEILING = 17408;
 
-function ceilingSim(): Sim {
-  const sim = makeSim();
+function ceilingSim(nowMs?: number): Sim {
+  const sim = makeSim(31, nowMs);
   const meta = sim.players.get(sim.playerId) as PlayerMeta;
   // Every gathering skill at its own cap (fishing's is higher by design).
   meta.gatheringProficiency = Object.fromEntries(
@@ -281,6 +313,18 @@ function ceilingSim(): Sim {
       maxDurability: 30,
       craftedBy: longName,
       confirmMode: 'prompt',
+    },
+    // Farming became SLOTTABLE when the hoe phase lifted its shipless
+    // refusal arm (slotToolEffectRefused's own header); the merged worst
+    // case is four slots, not three (11d DB review, F1). confirmMode
+    // 'always': farming refuses 'prompt' at the mint, and the two spellings
+    // are byte-equal.
+    farming: {
+      effectId: 'gatherers_cache',
+      durability: 30,
+      maxDurability: 30,
+      craftedBy: longName,
+      confirmMode: 'always',
     },
   };
   // The daily craft gate at content size: every oncePerDay recipe stamped
@@ -367,11 +411,15 @@ function ceilingSim(): Sim {
   const widestCropId = Object.keys(FARM_CROPS).reduce((a, b) => (b.length > a.length ? b : a));
   if (widestCropId !== 'evergarden_greens')
     throw new Error('widest crop id changed; re-measure and re-mint the ceiling');
+  const plantAnchorMs = nowMs ?? 1_000;
   for (const bedId of FARM_BED_IDS) {
     meta.farmPlots.set(bedId, {
       cropId: widestCropId,
-      plantedAtMs: 1_000,
-      readyAtMs: 1_000 + FARM_MAX_GROW_MS,
+      plantedAtMs: plantAnchorMs,
+      readyAtMs: plantAnchorMs + FARM_MAX_GROW_MS,
+      // The widest LEGAL JSON form of a roll is exponential (up to 23
+      // characters, reachable only by hand-edited rows; the real mint divides
+      // a uint32 by 2^32); deliberately unmeasured (11d DB review, F4).
       survivalRoll: 0.12345678901234566,
       yieldSeed: 4_294_967_295,
       compost: true,
@@ -473,15 +521,18 @@ describe('the professions blob growth bound (phase 16)', () => {
   });
 
   it('the settled ceiling honors the byte bound and every entry cap', () => {
-    const sim = ceilingSim();
+    const sim = ceilingSim(CEILING_EPOCH_MS);
     const s1 = sim.serializeCharacter(sim.playerId) as CharacterState;
     // Settle through one real load (normalizers, one-shot transforms), then
     // prove the result is a fixed point so the measurement is of a REAL
-    // steady state, not a pre-normalization inflation.
-    const second = makeSim(32);
+    // steady state, not a pre-normalization inflation. The settle sims carry
+    // the SAME epoch clock, or the anchor rule would fold the 13-digit
+    // production anchors back to the offline floor and the measurement would
+    // understate every farm row (11d DB review, F2).
+    const second = makeSim(32, CEILING_EPOCH_MS);
     const pid2 = second.addPlayer('warrior', 'Ceiling', { state: s1 });
     const s2 = second.serializeCharacter(pid2) as CharacterState;
-    const third = makeSim(33);
+    const third = makeSim(33, CEILING_EPOCH_MS);
     const pid3 = third.addPlayer('warrior', 'CeilingB', { state: s2 });
     const s3 = third.serializeCharacter(pid3) as CharacterState;
     expect(s3).toEqual(s2);
@@ -507,7 +558,14 @@ describe('the professions blob growth bound (phase 16)', () => {
     // the blob linear in CONTENT rather than unbounded per player.
     expect(Object.keys(s2.nodeHarvestCooldowns ?? {})).toHaveLength(GATHER_NODES.length);
     expect(s2.knownRecipes ?? []).toHaveLength(new Set(ALL_RECIPES.map((r) => r.id)).size);
-    expect(Object.keys(s2.toolEffectSlots ?? {})).toHaveLength(3);
+    // Derived from the refusal policy so a profession becoming slottable
+    // moves this pin instead of freezing the understatement; the literal 4
+    // is pinned beside it so the derivation cannot self-vacuate (11d F1).
+    const slottable = GATHERING_PROFESSION_IDS.filter(
+      (id) => !slotToolEffectRefused(id, 'gatherers_cache'),
+    );
+    expect(slottable).toHaveLength(4);
+    expect(Object.keys(s2.toolEffectSlots ?? {})).toHaveLength(slottable.length);
     // Content-scaled like knownRecipes: at most one stamp per oncePerDay
     // recipe per day, and the 32-entry load clamp bounds even a tampered row.
     // The floor throw is the file's re-check-the-fixture idiom: at zero
@@ -544,14 +602,15 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(Object.keys(s2.farmPlots ?? {})).toHaveLength(FARM_BED_IDS.size);
 
     // The byte bound itself, on the settled state: the two-sided tracking
-    // band around the farming-absorb measurement (16,206 settled bytes, the
-    // union fixture: every bed planted full-width beside every masterwrought
-    // field; the authoritative narrative lives at the bound's note above).
-    // A re-measure obligation, not the structural ceiling: drift past either
-    // edge reds here and forces the note to be re-read.
+    // band around the production-shape measurement (16,704 settled bytes:
+    // every bed planted full-width at epoch anchor width beside every
+    // masterwrought field and all four tool-effect slots; the authoritative
+    // narrative lives at the bound's note above). A re-measure obligation,
+    // not the structural ceiling: drift past either edge reds here and
+    // forces the note to be re-read.
     const bytes = professionsBytes(s2);
-    expect(bytes).toBeGreaterThan(16046);
-    expect(bytes).toBeLessThan(16366);
+    expect(bytes).toBeGreaterThan(16544);
+    expect(bytes).toBeLessThan(16864);
     // Strictly dominated by the band's upper edge while the band holds:
     // kept as documentation that the structural ceiling also bounds this
     // state, never the live guard.

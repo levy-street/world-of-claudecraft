@@ -3520,7 +3520,7 @@ export class Sim {
       // trusted: a bed or crop id the shipped content no longer carries drops,
       // and a hand-edited growth duration clamps to FARM_MAX_GROW_MS
       // (professions/farm_persist.ts). An absent field loads to the no-plots
-      // default, so a pre-farming save round-trips byte-equal.
+      // default: this FIELD round-trips (the blob still gains farming: 0).
       meta.farmPlots = normalizeFarmPlots(s.farmPlots, {
         validBedIds: FARM_BED_IDS,
         validCropIds: FARM_CROP_IDS,

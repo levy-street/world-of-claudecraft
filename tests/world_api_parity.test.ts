@@ -31,7 +31,7 @@
 //     "getter on the prototype" would falsely redden every one of those, so the data
 //     probe checks contract shape (present + readable), never getter-vs-field backing.
 
-import { readdirSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { ClientWorld } from '../src/net/online';
@@ -79,6 +79,8 @@ import type { IWorldTargeting } from '../src/world_api/targeting';
 import type { IWorldTelemetry } from '../src/world_api/telemetry';
 import type { IWorldTrade } from '../src/world_api/trade';
 import type { IWorldValeCup } from '../src/world_api/vale_cup';
+import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
+import { tsFilesUnder } from './helpers/ts_files_under';
 
 type IWorldMemberKind = 'method' | 'data';
 
@@ -1959,10 +1961,12 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // every src/world_api/*.ts module except the barrel-adjacent validator
     // module appearance.ts (no IWorld facet by design: it exports the shared
     // wire-bounds validator, not members both worlds implement; its own
-    // header says so) must be a key here, keyed by its basename.
-    const facetFiles = readdirSync(fileURLToPath(new URL('../src/world_api', import.meta.url)))
-      .filter((f) => f.endsWith('.ts'))
-      .map((f) => f.replace(/\.ts$/, ''))
+    // header says so) must be a key here, keyed by its basename. The walk is
+    // the SHARED RECURSIVE walker (tests/CLAUDE.md scan-guard rule): a facet
+    // moved into a subdirectory keeps its path prefix here and reds the
+    // equality loudly instead of leaving both sides of it.
+    const facetFiles = tsFilesUnder(fileURLToPath(new URL('../src/world_api', import.meta.url)))
+      .map((f) => f.file.replace(/\.ts$/, ''))
       .filter((f) => f !== 'appearance')
       .sort();
     // Keys are camelCase, files snake_case; the conversion is mechanical.
@@ -1972,6 +1976,31 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     expect(keys).toEqual(facetFiles);
     // Floor: the sweep walked a real directory, not an empty one.
     expect(facetFiles.length).toBeGreaterThanOrEqual(34);
+  });
+
+  it('scans only through the shared walkers (self-audit)', () => {
+    expectScansOnlyThroughSharedWalkers(import.meta.url, ['ts_files_under']);
+  });
+
+  it('every facet interface is on the IWorld barrel extends list (and nothing else is)', () => {
+    // The 11d parity review's second gap: file -> key -> array -> union was
+    // pinned end to end, but nothing proved facet -> the barrel's `extends`
+    // list, and a facet missing there leaves IWorld without its members while
+    // every other pin stays green. Textual read of the one declaration; the
+    // expected set derives mechanically from the partition keys.
+    const barrel = readFileSync(
+      fileURLToPath(new URL('../src/world_api.ts', import.meta.url)),
+      'utf8',
+    );
+    const decl = barrel.match(/export interface IWorld\s+extends\s+([\s\S]*?)\{\}/);
+    expect(decl, 'the IWorld extends declaration was not found').toBeTruthy();
+    const extendsList = [...(decl as RegExpMatchArray)[1].matchAll(/IWorld[A-Za-z0-9]+/g)]
+      .map((m) => m[0])
+      .sort();
+    const expected = Object.keys(FACET_MEMBER_ARRAYS)
+      .map((k) => `IWorld${k[0].toUpperCase()}${k.slice(1)}`)
+      .sort();
+    expect(extendsList).toEqual(expected);
   });
 
   it('each facet array is non-empty and internally duplicate-free', () => {
