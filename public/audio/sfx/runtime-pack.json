@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "c8082147b952937faa6a342b5e4210b7076c67f4488e4005851976aba3e82bd5",
-  "catalogHash": "54a5057ce0c0f4b2416200d0f13ac2413f0b2a54bdc7eec213cc24fe2d97c2dd",
+  "bundleId": "f9e88b6e7f34f50f1188769e35de9b148a2e748240b4b159bb1e840d0fbc2046",
+  "catalogHash": "a8976b117dfa625857d6d5bd4f8897ca16f710299ad9e2816a3c3fecaec936b9",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -3050,6 +3050,42 @@
         }
       ],
       "gain": 2.238721,
+      "playbackRate": 1
+    },
+    "mount_run_rallycart_rxt_reverse": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_rallycart_rxt_reverse.mp3?v=4b25cb575704",
+          "bytes": 90950,
+          "sha256": "4b25cb575704feff27d8cbdc1ed4c61cbbe834d29b62277b02aa3e11a1fe6255"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_run_rallycart_rxt_reverse_start": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_rallycart_rxt_reverse_start.mp3?v=f3a10bfc2037",
+          "bytes": 24494,
+          "sha256": "f3a10bfc20378a0510e5c1be0ff12836b57e666e292b56b91e8d267d2ffd8806"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "mount_run_rallycart_rxt_reverse_stop": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_rallycart_rxt_reverse_stop.mp3?v=30c342fa3260",
+          "bytes": 33898,
+          "sha256": "30c342fa32607256af0337c30b638c6f5b2e4d0b5e0a23e4cd2dba7815d76a0b"
+        }
+      ],
+      "gain": 1,
       "playbackRate": 1
     },
     "mount_run_rallycart_rxt_start": {

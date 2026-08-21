@@ -174,6 +174,23 @@ export const SFX = [
     key: 'mount_run_rallycart_rxt_stop',
     custom: true,
   },
+  // Reverse, the same three-part shape the sled uses. The engine builds these
+  // key names generically (`mount_run_<mountKey>_reverse*`), so the takes were
+  // on disk and reachable by code but absent from this catalog, which meant
+  // they were never in SFX_CLIPS and reversing the cart was silent.
+  {
+    key: 'mount_run_rallycart_rxt_reverse_start',
+    custom: true,
+  },
+  {
+    key: 'mount_run_rallycart_rxt_reverse',
+    custom: true,
+    loop: true,
+  },
+  {
+    key: 'mount_run_rallycart_rxt_reverse_stop',
+    custom: true,
+  },
   {
     // Takeoff and touchdown for the cart, five and four takes respectively.
     // A mount that carries no jump/land set falls back to the rider's own

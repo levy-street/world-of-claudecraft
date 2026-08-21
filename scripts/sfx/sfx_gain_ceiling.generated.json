@@ -2533,6 +2533,39 @@
       }
     ]
   },
+  "mount_run_rallycart_rxt_reverse": {
+    "ceilingDb": 14.2,
+    "tracks": [
+      {
+        "filename": "mount_run_rallycart_rxt_reverse.mp3",
+        "sha256": "4b25cb575704feff27d8cbdc1ed4c61cbbe834d29b62277b02aa3e11a1fe6255",
+        "size": 90950,
+        "peakDb": -15.2
+      }
+    ]
+  },
+  "mount_run_rallycart_rxt_reverse_start": {
+    "ceilingDb": 15.2,
+    "tracks": [
+      {
+        "filename": "mount_run_rallycart_rxt_reverse_start.mp3",
+        "sha256": "f3a10bfc20378a0510e5c1be0ff12836b57e666e292b56b91e8d267d2ffd8806",
+        "size": 24494,
+        "peakDb": -16.2
+      }
+    ]
+  },
+  "mount_run_rallycart_rxt_reverse_stop": {
+    "ceilingDb": 14.4,
+    "tracks": [
+      {
+        "filename": "mount_run_rallycart_rxt_reverse_stop.mp3",
+        "sha256": "30c342fa32607256af0337c30b638c6f5b2e4d0b5e0a23e4cd2dba7815d76a0b",
+        "size": 33898,
+        "peakDb": -15.4
+      }
+    ]
+  },
   "mount_run_rallycart_rxt_start": {
     "ceilingDb": 7.3,
     "tracks": [
