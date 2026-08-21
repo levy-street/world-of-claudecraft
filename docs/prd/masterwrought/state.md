@@ -6418,6 +6418,37 @@ prog_master_gatherer's deed desc overlay row was deleted by farming in ALL
 is now count-free), so the desc renders the English fallback everywhere
 until the release fill re-fills it; this row makes that orphan owned.
 
+### Validation at close (the owed gate_select pass + the perf arm, discharged)
+Fix commits: 9455d31254 (flex windows + forced-colors + dead imports),
+bc9399c7a4 (comment truings + sim CLAUDE.md row), 4d804b8057 (this record +
+record corrections + DEPLOY.md), 44bb54541d (fix-round review findings),
+6bb2de9b0f (qa-checklist findings + the flex source-contract pins, the
+journal pin proven by a full-flip mutation), 19beba1f4a (coverage-audit
+hardening: CSS-half pins, ps-knob markup binding, comment-stripped scans,
+symmetric needles). Review chain: fresh reviewer over the first four (PASS,
+3 low, applied), qa-checklist LAST (READY, 0 blocking, 5 should-fix + 3
+nits, ALL applied), test-coverage-auditor over the new pins (3 should-fix +
+5 nits, ALL applied or recorded; its F6 brace-walk comment-skip remark is a
+shared-idiom note on the quest_marker precedent too, recorded not fixed).
+GATE_MAX_WORKERS=5 node scripts/gate_select.mjs at 44bb54541d: mode=full
+fallback; artifacts regen + freshness, media manifest, malware scan, and
+ci:changed all GREEN; the vitest step FAILED EXACTLY as the parks predict
+(141 failed / 35 files, the red-file set diffed IDENTICAL to the audited
+tip's verified set; a green gate is impossible at this tip BY CONSTRUCTION
+until 11c/11d clear the parks). The steps behind the gate's first-fail stop
+were run individually: browser regression suite 20 files / 134 tests GREEN,
+npx tsc --noEmit exit 0, npm run build exit 0 with the tree CLEAN after
+full artifact regen (the freshness proof). ci:changed exit 0 re-verified at
+the close tip. The owed perf arm: tests/hud_perf_budget.test.ts 119 green;
+npm run perf:tour ran TWICE, both exit 0 with no threshold set
+(informational), artifacts tmp/perf-tour-2026-08-21T01-58-20-508Z.json and
+the 02:2x run; structural outputs healthy both times (prewarm 0 fail / 0
+timeout, views complete, FCT pool cap-bounded 24/24/24, hudSkip 97 to 99
+percent); ABSOLUTE frame numbers are load-depressed (concurrent sessions on
+this host) and are NOT comparable to a quiet-CI baseline; the
+HUD_PERF_BUDGET_TOUR=1 anchor comparison was not run (same-machine-baseline
+contract; the committed anchors are another machine's).
+
 ### F14 actionables (GATE 9): ALL THIRTEEN SURVIVED, cited not twinned
 Per the settled gate, the record is farming/progress.md's Phase 14
 "QA-CHECKLIST ROUND (2026-08-20, dispatched LAST per the packet)" block
