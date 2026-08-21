@@ -6746,3 +6746,64 @@ Fed is transient across save by design).
   Its NIT (the "exactly one below the apex" adjacency was unpinned, since
   the value and the apex are pinned independently) was APPLIED as a new
   arm on the dominance sweep.
+
+### QA gate verdict (qa-checklist, run LAST after the four reviewers and their fix rounds)
+READY after one blocking fix, applied. The gate ran the FULL matrix over 75
+changed files in 10 domains and re-verified the load-bearing reviewer
+findings itself rather than taking them on trust.
+
+- BLOCKING, FIXED (deb22b262d): `npm run ci:changed` was RED on exactly one
+  error, an import-order assist violation in tests/wellfed.test.ts. It
+  slipped because biome's organize-imports is an ERROR-severity ASSIST and
+  the phase's earlier `--write` pass was a FORMAT pass, which does not
+  organize imports; nobody re-ran the changed-files gate after the last
+  three commits. Re-run through the assist; `npm run ci:changed` now exits
+  0 over the changed set. DURABLE LESSON for the packet: a format pass is
+  not a check pass, and ci:changed must be re-run after the LAST commit,
+  not after the last source edit.
+- NIT, FIXED (same commit): the retired-namespace sweep had no non-vacuity
+  floor, so a walk that silently stopped scanning would have passed over
+  nothing. It now counts the files it walked and floors that near the real
+  corpus size (tests/CLAUDE.md's rule).
+- SHOULD-FIX, DISPOSITIONED WITH AUTHORITY (no change owed): the gate asked
+  for a recorded ruling behind the locale-overlay term edits, since root
+  CLAUDE.md says contributors never edit the overlays. One already exists
+  and predates this phase: 11c carry item 11 (the 11b review round's
+  adopted parity warning, in the 11b carry-list addendum above) orders
+  exactly this work, "sweep every farming-authored locale surface for the
+  retired term during the key-pair retirement", and the phase file
+  separately orders the whatBody five-overlay fills by name. The class is
+  also the maintainer's own sanctioned overlay-edit reason (a term the
+  PACKET retired leaves its translated rows stale with no gate to catch
+  it). The gate independently verified the edits are correct and complete
+  against the authoritative aura.wellFed rows in sim_i18n.ts, and that
+  ja_JP and ru_RU already agreed so the three edited locales are exactly
+  the drifted ones. Recorded here as the citation the gate wanted; no
+  revert, no new blessing sought.
+- The gate's own adversarial pass chased four things nobody else had; three
+  came back CLEAN and are worth keeping: the new Consuming.wellFed field
+  does NOT widen the parity goldens (trace.ts and record.ts sample no
+  eating slot, so the composition handed to 11d is complete), the glossary
+  alignment is not one-sided across locales, and src/sim/consuming.ts owes
+  no module-table row of its own (that table scopes to SimContext
+  importers; the pure leaf imports none and is named inside the wellfed.ts
+  row). The fourth was the ci:changed red above.
+- Parked-red discipline VERIFIED INDEPENDENTLY, not asserted: the gate ran
+  `vitest related` over all fourteen changed source modules, got 24 failing
+  files, and matched every one against the 11b parked list plus this
+  phase's named 11d reds, confirming none is new and that hud.ts's monolith
+  pin passes while the two recorded raises (renderer.ts, online.ts) are
+  untouched by this range. It also confirmed tests/guide.test.ts fails with
+  EXACTLY the two claimed freshness arms, no third.
+- ACCEPTANCE (STEP 5): ten of eleven boxes met as written; three carry
+  recorded qualifications, each already in this ledger rather than silent:
+  the no-`wellfed`-identifier box is met in its true narrower form (the
+  pin asserts `wellfed_<kind>` exists nowhere; the generated wiki SHAPE key
+  survives by design), the five-gathering box was resolved COUNT-FREE under
+  the addendum's explicit permission with the choice recorded three times
+  over, and the only-three-named-reds box carries the in-phase i18n regen
+  deviation. The gate judged the count-free resolution the better one.
+- WORKTREE HYGIENE, noted by three separate agents: running
+  tests/guide.test.ts REGENERATES src/guide/content.generated.ts in place
+  and dirties the tree. Every agent restored it; the phase tip is clean and
+  the committed artifact stays deliberately stale for 11d.
