@@ -1,13 +1,17 @@
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import { syncDelveInteractableVisibility } from '../src/render/delve_props';
 import {
   entityViewCandidatePriority,
   entityViewDistanceSq,
   entityViewIsAdmitted,
   entityViewShouldDrop,
+  isDistanceCullExemptObject,
   isPersistentPortalObject,
   viewBuildClass,
 } from '../src/render/entity_view_policy_core';
 import type { QuestObjectGate } from '../src/render/quest_object_gate_core';
+import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import type { Entity, QuestProgress } from '../src/sim/types';
 
 function entity(id: number, kind: Entity['kind'], overrides: Partial<Entity> = {}): Entity {
@@ -21,6 +25,18 @@ function entity(id: number, kind: Entity['kind'], overrides: Partial<Entity> = {
     pos: { x: 0, y: 0, z: 0 },
     ...overrides,
   } as Entity;
+}
+
+// The real world-x/z of a Nythraxis raid wardstone, read off the actual dungeon def
+// (never a magic offset, so a moved wardstone cannot leave this test stale):
+// dungeonAt(x) must resolve back to nythraxis_boss_arena for
+// isInteractOnlyInstanceObject to find its interactOnly:true declaration.
+const NYTHRAXIS_ARENA = DUNGEONS.nythraxis_boss_arena;
+const nythraxisOrigin = instanceOrigin(NYTHRAXIS_ARENA.index, 0);
+function nythraxisWardstonePos(name: string): Entity['pos'] {
+  const ward = (NYTHRAXIS_ARENA.objects ?? []).find((o) => o.name === name);
+  if (!ward) throw new Error(`no Nythraxis dungeon object named ${name}`);
+  return { x: nythraxisOrigin.x + ward.x, y: 0, z: nythraxisOrigin.z + ward.z };
 }
 
 describe('entity view candidate priority', () => {
@@ -53,6 +69,35 @@ describe('entity view candidate priority', () => {
       expect(entityViewCandidatePriority(portal, player, 10_000)).toBe(2);
     }
     expect(isPersistentPortalObject(entity(3, 'object', { templateId: 'mailbox' }))).toBe(false);
+  });
+
+  it('is distance-cull exempt for a heroic Nythraxis wardstone, lootable or not', () => {
+    // The live raid client marks these lootable:true (which already lands them in
+    // the interactive tier above via the ordinary lootable branch), but the
+    // EXEMPTION itself - the thing the create/destroy-range fix depends on - must
+    // not depend on that: it is keyed on the dungeon's interactOnly declaration,
+    // not on whether the object happens to carry loot.
+    const wardstone = entity(3, 'object', {
+      objectItemId: 'bastion_ward_stone',
+      lootable: false,
+      pos: nythraxisWardstonePos('Left Wardstone'),
+    });
+    expect(isDistanceCullExemptObject(wardstone)).toBe(true);
+  });
+
+  it('does not exempt the same item id when it is the overworld Sunken Bastion pickup', () => {
+    // Same objectItemId, but standing in the open world rather than inside the
+    // raid instance that declares it interactOnly: this stays an ordinary
+    // (non-lootable) ground object, matching isQuestGatedGroundObjectHidden's
+    // own instance-scoped rule in src/sim/quest_gated_entity.ts, and so sits in
+    // the bottom ordinary-object tier like any other unclaimed collectable.
+    const overworldPickup = entity(3, 'object', {
+      objectItemId: 'bastion_ward_stone',
+      lootable: false,
+      pos: { x: 0, y: 0, z: 0 },
+    });
+    expect(isDistanceCullExemptObject(overworldPickup)).toBe(false);
+    expect(entityViewCandidatePriority(overworldPickup, player, 10_000)).toBe(7);
   });
 });
 
@@ -123,6 +168,51 @@ describe('entity view retirement', () => {
         ),
       ).toBe(false);
     }
+  });
+
+  it('never drops a heroic Nythraxis wardstone view, however far the viewer stands', () => {
+    // The three wardstones sit spread ~80-90u apart specifically so raiders must
+    // split to reach them (dungeons.ts), so a raider working the fight from range
+    // routinely stands well beyond an ordinary draw-range destroy radius from one
+    // or two of them. Losing the view there would just rebuild it on the next
+    // frame anyway (the matching create-range exemption in renderer.ts), but
+    // dropping it at all is needless per-frame churn for raid-critical scenery.
+    const farWardstone = entity(3, 'object', {
+      objectItemId: 'bastion_ward_stone',
+      pos: nythraxisWardstonePos('Right Wardstone'),
+    });
+    expect(entityViewShouldDrop(farWardstone, player, questLog, showAll, 100)).toBe(false);
+  });
+});
+
+describe('distance-cull-exempt wardstone actually draws', () => {
+  // The exemption above only proves a far wardstone stays a view CANDIDATE and is
+  // never DROPPED; the renderer's separate per-frame visibility hysteresis
+  // (character_view_core.ts, exercised only via a source-pin regex test since it
+  // needs a live Renderer) is bypassed the same way, and the object branch
+  // (syncDelveInteractableVisibility) is what actually decides group.visible every
+  // frame after that. Compose the two real functions end to end so the claim under
+  // test is "the pillar draws", not just "a view object exists somewhere".
+  it('renders visible once its shader compile clears, independent of distance', () => {
+    const wardstone = entity(3, 'object', {
+      objectItemId: 'bastion_ward_stone',
+      templateId: 'ground_bastion_ward_stone',
+      lootable: true,
+      pos: nythraxisWardstonePos('Right Wardstone'),
+    });
+    const player = entity(1, 'player', { pos: { x: 0, y: 0, z: 0 } });
+    expect(entityViewDistanceSq(wardstone, player)).toBeGreaterThan(80 * 80);
+    expect(isDistanceCullExemptObject(wardstone)).toBe(true);
+
+    const group = new THREE.Object3D();
+    const visible = syncDelveInteractableVisibility(
+      group,
+      wardstone.templateId,
+      wardstone.lootable,
+      false, // compilePending: false, the async-compile gate already cleared
+    );
+    expect(visible).toBe(true);
+    expect(group.visible).toBe(true);
   });
 });
 

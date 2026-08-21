@@ -229,7 +229,11 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered for the PR #3470 Duskfall gate occluder-fade merge result: the
     // resolved renderer keeps the hollow-gate view type and per-frame update
     // while landing below the previous v0.40 pin.
-    ceiling: 13538,
+    // Raised +1 for the heroic Nythraxis wardstone view-priority merge:
+    // the extra renderer wiring is one import plus two distance-check AND terms
+    // against isDistanceCullExemptObject; the predicate itself lives in
+    // entity_view_policy_core.ts.
+    ceiling: 13539,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

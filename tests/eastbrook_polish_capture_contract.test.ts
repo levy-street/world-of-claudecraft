@@ -262,8 +262,12 @@ interface AttributionTargetFixture {
 // Eastbrook GPU-preparation provenance and the PR-side corpse-decay admission
 // check combine in entity_view_policy_core.ts, so the composite follows its
 // bytes. No capture was retaken.
+// Re-minted for the PR #3528 merge into release/v0.40.0: the release-side
+// Eastbrook provenance and the PR-side Nythraxis wardstone view-priority
+// wiring combine in renderer.ts and entity_view_policy_core.ts. No capture
+// was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '44f7e5150a6c11433849981e2d7299aadce4bbe7a55c68be6bdb5906eb9462b6';
+  'd5c38f8383329d7773cb16db1994d03e3030c9e19c928881115eac47b327d1c8';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

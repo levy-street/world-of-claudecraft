@@ -43,8 +43,10 @@ function collectQuestForObject(entity: Entity): string | null {
 
 /** Whether the instance this object stands in declares its item an interact-only
  *  mechanic (`DungeonObjectSpawn.interactOnly`). Overworld objects have no dungeon and
- *  are never exempt this way. */
-function isInteractOnlyInstanceObject(entity: Entity): boolean {
+ *  are never exempt this way. Exported: the renderer's distance-cull policy
+ *  (`entity_view_policy_core.ts`) reuses the same signal to keep these objects built
+ *  and visible at any distance, not just exempt from the quest-gate hide below. */
+export function isInteractOnlyInstanceObject(entity: Entity): boolean {
   const dungeon = dungeonAt(entity.pos.x);
   if (!dungeon?.objects) return false;
   return dungeon.objects.some((o) => o.interactOnly === true && o.itemId === entity.objectItemId);
