@@ -42,12 +42,29 @@ function showJson(ref) {
   return JSON.parse(raw);
 }
 
+/** The run id as a comparable number, REFUSING anything that is not one. A
+ *  missing or non-numeric run yields NaN, every NaN comparison is false, and the
+ *  "newer" pick would silently fall to ours and promote the wrong table's weights
+ *  on every shared key. Throwing names the defect instead (Phase 11d QA gate
+ *  review). The shape pin in tests/ci_shard_partition.test.ts catches an
+ *  undefined run reaching the OUTPUT, never the wrong-parent-wins case. */
+function runOrder(prov, side) {
+  const n = Number(prov?.run);
+  if (!Number.isFinite(n)) {
+    throw new Error(
+      `${side} table has no numeric __provenance.run (got ${JSON.stringify(prov?.run)}); ` +
+        'refusing to guess which harvest is newer',
+    );
+  }
+  return n;
+}
+
 export function unionTables(ours, theirs) {
   const oursProv = ours.__provenance;
   const theirsProv = theirs.__provenance;
   const oursKeys = Object.keys(ours).filter((k) => k !== '__provenance');
   const theirsKeys = Object.keys(theirs).filter((k) => k !== '__provenance');
-  const newerIsTheirs = Number(theirsProv.run) > Number(oursProv.run);
+  const newerIsTheirs = runOrder(theirsProv, 'theirs') > runOrder(oursProv, 'ours');
   const newer = newerIsTheirs ? theirs : ours;
   const older = newerIsTheirs ? ours : theirs;
   const newerProv = newer.__provenance;
@@ -68,14 +85,27 @@ export function unionTables(ours, theirs) {
   const olderPedigree = olderProv.localMerge
     ? `the older table (run ${olderProv.run}), whose own provenance reads: "${olderProv.localMerge}"`
     : `the older table's CI harvest (run ${olderProv.run})`;
+  // The SAME disclosure rule on the newer side, which used to be a hard-coded
+  // "the newer CI harvest": the mirror of the laundering the 11d review round
+  // fixed on the older side, found by the 11d QA audit. Nothing false shipped,
+  // because the newer parent had no localMerge, but the table 11d produced IS a
+  // union with 27 locally measured carried rows and is itself a parent now, so
+  // feeding it in as the newer side would have called it a CI harvest and
+  // dropped its honest disclosure on the first re-union.
+  // The no-disclosure branch reproduces the previous wording BYTE for byte, so
+  // this change does not drift the committed table from its own generator.
+  const newerPedigree = newerProv.localMerge
+    ? `the newer table (run ${newerProv.run}, ${newerKeys.size} rows), whose own provenance ` +
+      `reads: "${newerProv.localMerge}"`
+    : `the newer CI harvest (run ${newerProv.run}, ${newerKeys.size} rows)`;
   merged.__provenance = {
     run: newerProv.run,
     harvested: newerProv.harvested,
     files: sortedKeys.length,
     localMerge:
       '2026-08-21 farming absorb (masterwrought Phase 11d, ruling 11d-U1-SHARD): KEY UNION of ' +
-      `the two parent harvests; the newer CI harvest (run ${newerProv.run}, ${newerKeys.size} ` +
-      `rows) wins on every shared key and ${carried.length} rows only the other parent's table ` +
+      `the two parent harvests; ${newerPedigree} ` +
+      `wins on every shared key and ${carried.length} rows only the other parent's table ` +
       `carried keep that table's measured weight, sourced from ${olderPedigree}; no weight is ` +
       `hand-written; files counts the merged table (${newerKeys.size} harvested + ` +
       `${carried.length} carried)`,
@@ -141,7 +171,20 @@ function main() {
   console.log('walked non-browser test files', walked.length, 'covered', covered, ratio.toFixed(4));
   const stale = [...keys].filter((k) => !walked.includes(k));
   console.log('union keys with no file on disk', stale.length, stale.join(' '));
-  if (ratio < 0.95) console.log('COVERAGE UNDER THE 95 PERCENT FLOOR: a fresh CI harvest is owed');
+  // The floor FAILS rather than merely printing. It used to log and then write
+  // the sub-floor table anyway with a zero exit, so the phase file's "a fresh CI
+  // harvest happens BEFORE this phase closes" was enforced entirely by a human
+  // reading a line (Phase 11d QA gate review). NaN (an empty walk) is treated as
+  // under the floor, not above it, so the silent-pass shape cannot come back.
+  const underFloor = !(ratio >= 0.95);
+  if (underFloor) {
+    console.log('COVERAGE UNDER THE 95 PERCENT FLOOR: a fresh CI harvest is owed');
+    process.exitCode = 1;
+  }
+  if (write && underFloor && !process.argv.includes('--force')) {
+    console.log('REFUSING to write a sub-floor table (pass --force to override deliberately)');
+    return;
+  }
   if (write) {
     writeFileSync(join(ROOT, TABLE), `${JSON.stringify(merged, null, 2)}\n`);
     console.log('wrote', TABLE, 'keys', stats.union);
