@@ -5,12 +5,10 @@
 // localized display form (the sim stays language-agnostic, src/sim/CLAUDE.md).
 // Extracted verbatim from src/ui/hud.ts under the monolith ratchet
 // (tests/monolith_budget.test.ts); a pure core with no DOM and no IWorld.
-import { isNecromancyUndead } from '../sim/combat/necromancy';
 import { DUNGEON_LIST, ITEMS, QUESTS } from '../sim/data';
-import type { Entity, PlayerClass } from '../sim/types';
+import type { PlayerClass } from '../sim/types';
 import { classDisplayName, dungeonDisplayName, itemDisplayName, tEntity } from './entity_i18n';
 import { formatNumber, t } from './i18n';
-import { localizeSimAuraName } from './sim_i18n';
 
 export function itemDisplayNameFromSource(name: string): string {
   const item = Object.values(ITEMS).find((candidate) => candidate.name === name);
@@ -93,14 +91,13 @@ export function dungeonDisplayNameFromSource(name: string): string {
   return dungeon ? dungeonDisplayName(dungeon.id) : name;
 }
 
-export function entityDisplayName(entity: Entity): string {
-  if (entity.kind === 'mob')
-    return entity.ownerId !== null && !isNecromancyUndead(entity)
-      ? (localizeSimAuraName(entity.name) ?? entity.name)
-      : mobDisplayName(entity.templateId);
-  if (entity.kind === 'npc') return npcDisplayName(entity.templateId);
-  return entity.name;
-}
+// entityDisplayName lives in ./entity_display_name, NOT here: both packets
+// extracted it out of hud.ts (this module at the v0.37.0 chat-quota sync,
+// farming's module at its Phase 12 headroom extraction), and the farming
+// absorb (Masterwrought 11b) kept farming's copy as the one authority because
+// it carries the live feast-title arm and its own direct Vitest
+// (tests/entity_display_name.test.ts). This module's copy was byte-equivalent
+// to the pre-extraction hud.ts original, so nothing was lost in the removal.
 
 export function delveDisplayName(delveId: string): string {
   return tEntity({ kind: 'delve', id: delveId, field: 'name' });

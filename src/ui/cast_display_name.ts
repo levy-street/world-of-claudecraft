@@ -12,6 +12,7 @@ import {
   FISHING_CAST_ID,
   GATHER_CAST_ID,
   SALVAGE_CAST_ID,
+  SUNDER_CAST_ID,
   TOOL_RECHARGE_CAST_ID,
 } from '../sim/types';
 import { abilityDisplayName } from './ability_display_name';
@@ -46,6 +47,11 @@ export const castDisplayName = (id: string): string => {
   if (id === DISENCHANT_CAST_ID) return t('abilityUi.cast.disenchanting');
   if (id === ENCHANT_CAST_ID) return t('abilityUi.cast.enchanting_apply');
   if (id === SALVAGE_CAST_ID) return t('abilityUi.cast.salvaging');
+  // Ported from the masterwrought side of the farming absorb (11b RULE 2):
+  // hud.ts gained this arm in place while farming extracted the resolver
+  // here, so the arm follows the function into its new home, keeping the
+  // pre-extraction resolver order (between SALVAGE and TOOL_RECHARGE).
+  if (id === SUNDER_CAST_ID) return t('abilityUi.cast.sundering');
   if (id === TOOL_RECHARGE_CAST_ID) return t('abilityUi.cast.tool_recharge');
   if (id === 'demon_heal') return t('abilityUi.cast.demonHeal');
   if (id === 'thunzharr_stormcall') return t('abilityUi.cast.thunzharrStormcall');

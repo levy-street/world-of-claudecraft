@@ -12,12 +12,16 @@
 import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { DELVE_LIST, DUNGEON_LIST, ITEMS, MOBS, QUESTS, ZONES } from '../src/sim/data';
 import type { Entity } from '../src/sim/types';
+// entityDisplayName's authority moved to entity_display_name at the farming
+// absorb (11b): both packets had extracted it from hud.ts, farming's copy
+// carries the live feast-title arm, so the core module's byte-equivalent
+// duplicate was removed and this suite follows the import.
+import { entityDisplayName } from '../src/ui/entity_display_name';
 import {
   delveDisplayName,
   delveText,
   dungeonDisplayNameFromSource,
   dungeonText,
-  entityDisplayName,
   itemDisplayNameFromSource,
   itemStackDisplayName,
   mobDisplayName,
