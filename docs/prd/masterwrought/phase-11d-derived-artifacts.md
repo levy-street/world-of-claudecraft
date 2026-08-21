@@ -172,6 +172,12 @@ UNIT 1 - REGEN (27 files). Commit 1.
   proof below still runs it); pending.ts does NOT move in this phase. The named-red list
   this phase inherits is therefore TWO classes, the 69 parity goldens and
   tests/guide.test.ts's two freshness arms, not three.)
+  (DATED NOTE 2026-08-21, the STEP 0 release sync e0cf44b111: release/v0.40.0 moved to
+  f50b30de29 (PR #3549, the Reliquary HUD tracker) between this phase's planning and its
+  run, adding 5 tracker keys, so pending.ts moved ONCE, regenerated inside the sync merge
+  commit itself (byte-fresh on a second run there). The zero-diff expectation above holds
+  on the synced tree and now includes those keys; a later reader must not read the sync's
+  pending.ts motion as a violation of this note.)
 - Proof: run every generator a SECOND time and require a zero diff (idempotence is the
   freshness gate), then
   npx vitest run tests/i18n_resolved_equivalence.test.ts tests/guide.test.ts
@@ -409,6 +415,14 @@ stopped being read.
 - Verified literals on masterwrought's tip (tests/monolith_budget.test.ts): hud.ts 19445,
   renderer.ts 13546, sim.ts 12650, main.ts 11516. Farming's pins: hud.ts 19186 (file
   19183), renderer.ts 13774, sim.ts 12232, main.ts 11460.
+  (DATED NOTE 2026-08-21, the STEP 0 release sync e0cf44b111: the v0.40.0
+  tracker-visibility absorb lowered src/ui/hud.ts 19251 to 19248 (the
+  makeReliquaryTrackerInput extraction, net minus 3) and the release's own hud.ts row is
+  19487, lowered from 19490 by that same extraction, so the hud.ts row now has a THIRD
+  parent pin. The plain-merge figures in the provenance paragraph below (19489 / 19235 /
+  19324 / 19385 / 19474, and the 19460 estimate) were measured BEFORE the sync and stand
+  as the record of the 11b resolution they describe; unit 6 measures the live file (19248)
+  and cites 19487 wherever the release parent pin is named.)
 - PROVENANCE OF THE FOUR FIGURES BELOW, so no later session "corrects" them back. They
   come from a plain `git merge --no-commit --no-ff` of origin/feature/farming-plan, then
   counting the conflicted src/ui/hud.ts: 19489 total lines, 15 marker lines (5 hunks times

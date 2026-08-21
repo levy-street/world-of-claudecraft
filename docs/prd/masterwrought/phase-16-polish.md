@@ -271,3 +271,16 @@ masterwrought id and no master SHA is available, since that is the exact conditi
 farming's pending allowlist exists to hold. The storefront soft cap can no longer be
 reached, because decision 8 maps nothing; a diff that adds an `ACHIEVEMENT_MAP` row is a
 finding against 11k-D-K3, not a cap question.
+
+### Monolith payback carry (added 2026-08-21 by Phase 11d unit 6)
+The farming absorb's two recorded monolith raises name THIS phase as their
+payback, scoped to the merge-attributable growth only (rulings 11d-D-4 as
+amended and 11d-U6-FIFTH; the ledger rows live in
+tests/monolith_budget.test.ts and state.md's Phase 11d ledger):
+- src/render/renderer.ts: raised 13546 to 13576 (+30, farming's deviation
+  (an) farm-visual wiring). Payback target: extraction bringing the row
+  back to 13546 or lower, LOWERING the ceiling in the same change.
+- src/net/online.ts: raised 5950 to 5967 (+17, both packets' new command
+  mirrors). Payback target: 5950 or lower, same rule.
+The hud.ts Phase 14 carry (11d-U6-PAYBACK) needs nothing here: the merged
+file fell to 19248, already under the 19445 target.

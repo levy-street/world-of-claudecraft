@@ -7322,3 +7322,34 @@ suites 626 green + 1 skip. Two doc amendments ordered by the audits are
 applied in the unit 7 commit (the phase file's unit 6 figures were
 pre-sync and hud.ts now has a third parent pin 19487; the i18n
 zero-diff note now covers the sync's 5 tracker keys).
+
+### Unit 7 and the phase close (2026-08-21)
+- decisions-index.md VERIFIED against the merged tree: the R-namespace row
+  (11e-D-F) survived the merge with the docs/design/ widening intact; the
+  one missing piece, the reviewer instruction, is now authored in place ("a
+  bare packet R-number in source is a FINDING, not a nit"). The admission
+  row reads 11b through 11o, FOURTEEN inserted phases, all ADMITTED, citing
+  ip-GATE-PAIN, 11m-ADMIT and qr-11o-ADMIT (state.md row 117): verified, no
+  restore needed (N1 and N2 stand discharged as verifications).
+- The two release-merge-audit doc amendments applied to
+  phase-11d-derived-artifacts.md as dated notes (the sync's pending.ts
+  motion; the third hud.ts parent pin 19487 with the pre-sync provenance
+  figures marked as the 11b record). phase-16-polish.md gains the payback
+  carry for the two raises; progress.md carries the 11d row and prose.
+- farming/state.md open items: NONE MINTED, stated explicitly rather than
+  skipped: the census closed with zero unexplained members, every pin
+  matched its prediction or carried a named explanation, and the two
+  record truings this phase found (the B8 row's file-vs-progress figures;
+  the 11b scenario counts being golden-file counts) are corrected in this
+  ledger, nothing left unsettled for the packet.
+- DATABASE_URL: `env | grep -c DATABASE_URL` printed 0 at STEP 0, before
+  the goldens commit, and before the pins ran; no .env was sourced at any
+  point.
+- FORWARD CARRY unchanged from the phase file: 11e moves DEED_ORDER to 287
+  and total renown to 3275 (deed_i18n 287 * 2 + 45 = 619, DEED_IMAGE_IDS
+  and the wave suites following, DEED_ORDER's tail off prog_farming_100),
+  and 11g moves both recipe_economy literals by two rows when marsh_rice 2
+  plus bog_beet 2 join recipe_seasoned_stock; every named phase re-derives
+  by the same predicted-then-observed method. The blob band (16046..16366)
+  and ceiling 17408 re-measure at the next authored growth per the file's
+  own doctrine; the bed-count and widest-crop throws force the re-read.

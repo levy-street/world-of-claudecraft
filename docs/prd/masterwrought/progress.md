@@ -28,7 +28,7 @@
 | 11b QA | verify | complete | 2026-08-20 | 2026-08-21 |
 | 11c | Food and feast reconciliation | complete | 2026-08-21 | 2026-08-21 |
 | 11c QA | verify | complete | 2026-08-21 | 2026-08-21 |
-| 11d | Derived artifacts, pins, and the merge audit | pending | | |
+| 11d | Derived artifacts, pins, and the merge audit | complete | 2026-08-21 | 2026-08-21 |
 | 11d QA | verify | pending | | |
 | 11e | A true skill, farming's mastery curve and crop roster | pending | | |
 | 11e QA | verify | pending | | |
@@ -715,6 +715,23 @@ is deliberately not copied here, it lives in the farming record.
   gathering-tool family. The stale `phase-11e-farming-apex-arm.md` is replaced by
   `phase-11e-mastery-curve.md` and deleted; its apex-feast design moves into 11h and
   11k and its GATE 1 material into 11e, so no table references the old file.
+- Phase 11d (2026-08-21): DERIVED ARTIFACTS RE-MINTED AND PROVEN, the seven
+  commits in order (55b09db21f regen + shard-weight union at 95.80 percent
+  coverage; e0cf44b111 the STEP 0 release sync of v0.40.0 f50b30de29, twice
+  audit-verified CLEAN; 9ce2f68162 the 69-golden re-record with the
+  composition check PASSING, zero rng movement anywhere, farming_session
+  matching the 11c prediction with the delta-of-300 carry proof; 1900e38210
+  the art census 907/922/44 and the eastbrook seals, renderer.ts the only
+  drifted seal input; b987df912a the count pins, every one predicted from
+  the three refs in the ledger BEFORE its suite ran and observed equal,
+  FROZEN_CATALOG_SHA256 re-minted last, the blob suites restored
+  farming's every-bed fixture per the amended 11b row and re-minted the
+  union bound at 17 KiB from a measured 16,206 with the +490 deviation
+  named; ec06a3edb1 the symbol census, MISSING empty in all five classes,
+  EXTRA exactly the six 11c-authored names, eight mutation-guard kills;
+  55714f2350 the monolith rows, TWO raises as amended with Phase 16
+  paybacks, three falls re-pinned zero-slack; then the docs commit).
+  Full record: state.md, "Phase 11d ledger".
 - Phase 11c QA (2026-08-21): THE UNIFICATION VERIFIED, verdict
   PASS-WITH-FOLLOWUPS. Release sync a no-op again (v0.40.0 still ancestor).
   Seven-lane ultracode audit (the five mutating lanes each in a throwaway
