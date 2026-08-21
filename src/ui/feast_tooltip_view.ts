@@ -20,7 +20,7 @@ import { CONSUME_DURATION, DT, type ItemDef } from '../sim/types';
 import { auraDisplayNameForHud } from './aura_display_name';
 import { esc } from './esc';
 import { formatNumber, t } from './i18n';
-import { WELLFED_STAT_KEYS } from './wellfed_tooltip_view';
+import { WELLFED_STAT_KEYS } from './wellfed_stat_keys';
 
 /** The feast lines for a placeable feast item, or '' for any other item.
  *  `items` is injectable so the dish-resolution branches are testable

@@ -5725,7 +5725,7 @@ export const zh_CN: EnTranslations = {
       "comboReq": "需要{a}与{b}",
       "oncePerDay": "Once per day",
       "effectFood": "食用后在{seconds}秒内恢复{amount}点生命值。",
-      "effectWellFed": "吃完后进入饱腹状态：{stat}+{value}，持续{minutes}分钟。",
+      "effectWellFed": "吃完后进入精神饱满状态：{stat}+{value}，持续{minutes}分钟。",
       "effectWellFedAura": "吃完后获得{aura}，持续{minutes}分钟。",
       "sourceTrainerFee": "训练师，{fee}",
       "sourceTrainerFree": "训练师，免费",

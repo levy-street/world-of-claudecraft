@@ -5725,7 +5725,7 @@ export const ko_KR: EnTranslations = {
       "comboReq": "{a}와 {b} 필요",
       "oncePerDay": "Once per day",
       "effectFood": "먹으면 {seconds}초에 걸쳐 생명력을 {amount} 회복합니다.",
-      "effectWellFed": "식사를 마치면 배부름: {minutes}분간 {stat} +{value}.",
+      "effectWellFed": "식사를 마치면 잘 먹음: {minutes}분간 {stat} +{value}.",
       "effectWellFedAura": "식사를 마치면 {minutes}분간 {aura} 효과를 얻습니다.",
       "sourceTrainerFee": "훈련사, {fee}",
       "sourceTrainerFree": "훈련사, 무료",

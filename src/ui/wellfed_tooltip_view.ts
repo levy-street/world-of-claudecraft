@@ -20,12 +20,6 @@ import { esc } from './esc';
 import { formatNumber, t } from './i18n';
 import { WELLFED_STAT_KEYS } from './wellfed_stat_keys';
 
-// The stat map lives in the pure leaf src/ui/wellfed_stat_keys.ts (the wiki's
-// dish effect prose is a consumer too, and the guide bundle may not reach
-// this module's sim_i18n graph). Re-exported unchanged for
-// feast_tooltip_view.ts and every other existing importer.
-export { WELLFED_STAT_KEYS } from './wellfed_stat_keys';
-
 /** The Well Fed line for a buff food, or '' for any other item. Gated on the
  *  KIND first, which is also what narrows the union to the one def shape
  *  that can spell a wellFed payload at all (FoodItemDef). */

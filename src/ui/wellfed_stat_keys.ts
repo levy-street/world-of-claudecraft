@@ -2,11 +2,12 @@
 // stat-buff kinds a well-fed dish plausibly carries, each mapped to the item
 // tooltip's own stat label so "Stamina" reads identically on the dish
 // tooltip, the feast tooltip, the elixir line, a gear stat line, AND the
-// wiki's dish effect prose. Moved whole from wellfed_tooltip_view.ts (which
-// re-exports it unchanged) because the guide bundle consumes it too and the
-// tooltip view's import graph reaches sim_i18n -> sim.ts -> the deeds
-// catalog, which the guide's spoiler-containment pin forbids. Kinds outside
-// this map take each consumer's aura-name fallback.
+// wiki's dish effect prose. Moved whole from wellfed_tooltip_view.ts because
+// the guide bundle consumes it too and the tooltip view's import graph
+// reaches sim_i18n -> sim.ts -> the deeds catalog, which the guide's
+// spoiler-containment pin forbids; every consumer imports THIS leaf directly
+// (the old view re-export was dropped in 11c once its last importer moved).
+// Kinds outside this map take each consumer's aura-name fallback.
 
 import type { AuraKind } from '../sim/types';
 import type { TranslationKey } from './i18n.catalog';

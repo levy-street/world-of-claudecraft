@@ -1412,6 +1412,13 @@ describe('the phase 10 apex rungs step exactly one rung off the shipped ladders'
         ).toBeLessThan(apex!.duration);
       }
     }
+    // The ruling's ADJACENCY, not just the ordering: the farming ladder tops
+    // out EXACTLY one point below the apex (11c-D-2, "topping out one below
+    // the apex"). Without this arm the dominance sweep would stay green if
+    // the apex drifted upward and reopened a gap the ruling closed.
+    const topRung = Math.max(...nonApex.map((d) => d.wellFed!.value));
+    const apexValue = foodDef(APEX_FOOD_IDS[0]).wellFed!.value;
+    expect(topRung, 'the farming ladder tops out one below the apex').toBe(apexValue - 1);
   });
 
   it('each apex enchant continues its OWN slot ladder by that ladder step', () => {
