@@ -4,7 +4,7 @@
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { ArenaFormat, HonorArenaDailyState, HonorReason } from '../types';
-import { honorEventMultiplier } from './honor_event';
+import { doubleHonorActive, honorEventMultiplier } from './honor_event';
 
 export const RANKED_ARENA_WIN_HONOR = {
   '1v1': 25,
@@ -335,9 +335,14 @@ export function awardBattlegroundHonor(
   // wasted evening for the side that stayed and played it out. Forfeits never
   // reach this function, so deserting still pays nothing, and winning stays
   // ahead through the first-win bonus and the natural kill-drip edge.
-  // Weekday loss economics are untouched.
+  // Weekday loss economics are untouched. Gated on the WINDOW, not on
+  // `eventMult > 1`: the multiplier and the loss boost are two independent
+  // owner knobs, and retuning DOUBLE_HONOR_MULTIPLIER to exactly 1 must not
+  // silently switch the loss boost off with it.
   const base =
-    outcome === 'win' || eventMult > 1 ? BATTLEGROUND_WIN_HONOR : BATTLEGROUND_LOSS_HONOR;
+    outcome === 'win' || doubleHonorActive(ctx.resetDay)
+      ? BATTLEGROUND_WIN_HONOR
+      : BATTLEGROUND_LOSS_HONOR;
   const reason: HonorReason = outcome === 'win' ? 'battleground_win' : 'battleground_complete';
   let total = grantHonor(
     ctx,
