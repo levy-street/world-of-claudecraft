@@ -711,11 +711,17 @@ class Sfx {
     peak: number,
     now: number,
     tail: number,
+    /** Earliest the fade may begin, absolute. Used by the attack path: a clip
+     *  short enough that its tail window overlaps its own fade-IN would have
+     *  the two ramps fighting over the same gain param, so the fade is dropped
+     *  rather than allowed to cut the attack short. */
+    notBefore = now,
   ): boolean {
     if (!(tail > 0) || !src.buffer) return false;
     const clip = src.buffer.duration / (src.playbackRate.value || 1);
     if (clip <= tail) return false;
     const from = now + clip - tail;
+    if (from < notBefore) return false;
     g.gain.setValueAtTime(peak, from);
     // Same curve shape the percussive release uses (time constant = span/3, so
     // it is ~5% of peak by the end of the window), for one consistent house
@@ -750,6 +756,16 @@ class Sfx {
     g.gain.setValueAtTime(0.0001, now);
     g.gain.linearRampToValueAtTime(peak, now + a);
     src.start();
+    // A tail fade survives an ATTACK. Only `release` is incompatible with it,
+    // because that truncates the clip and there is then no tail left to fade.
+    //
+    // This branch is reachable without the caller ever asking for an attack:
+    // playAt injects `attack: voiceCrossfade` when a cue replaces a live
+    // `voiceKey` voice. Handling tailRelease only in the no-envelope branch
+    // above would therefore drop it for such a cue exactly when a prior voice
+    // happened to be playing, and keep it otherwise, which is the same class of
+    // silently-dropped option this whole option was added to fix.
+    if (release === 0) this.scheduleTailFade(src, g, peak, now, tailRelease, now + a);
     if (release > 0) {
       // Effective clip length at this playback rate; never schedule past it.
       const clip = src.buffer ? src.buffer.duration / (src.playbackRate.value || 1) : a + release;

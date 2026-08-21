@@ -238,6 +238,67 @@ describe('mount summon to idle crossfade', () => {
     expect(sources.at(-1)?.playbackRate.value).toBeCloseTo(1, 6);
   });
 
+  it('keeps the tail fade when an attack is also set', () => {
+    // playAt injects `attack: voiceCrossfade` when a cue replaces a live
+    // voiceKey voice. Honouring tailRelease only in the no-envelope branch
+    // would drop it exactly when a prior voice happened to be playing and keep
+    // it otherwise: the same silently-dropped-option bug tailRelease exists to
+    // fix. Only `release` is genuinely incompatible, since that truncates.
+    seedSummon();
+    gainScheduleCalls = [];
+    const sfxAny = sfx as unknown as {
+      applyEnvelope(
+        src: unknown,
+        g: unknown,
+        peak: number,
+        now: number,
+        opts?: Record<string, unknown>,
+      ): void;
+    };
+    const ctx = (
+      sfx as unknown as {
+        ctx: { createBufferSource(): FakeSource; createGain(): { gain: unknown } };
+      }
+    ).ctx;
+    const src = ctx.createBufferSource();
+    src.buffer = { duration: SUMMON_DURATION } as never;
+    const gain = ctx.createGain();
+    sfxAny.applyEnvelope(src, gain, 0.9, nowT, { attack: 0.04, tailRelease: CROSSFADE });
+
+    const fade = gainScheduleCalls.find((c) => c.kind === 'setTargetAtTime' && c.value < 0.01);
+    expect(fade, 'an attack must not cancel the tail fade').toBeDefined();
+    expect(fade?.time).toBeCloseTo(nowT + SUMMON_DURATION - CROSSFADE, 5);
+    expect(src.stopAt, 'a tail fade never truncates, attack or not').toBeNull();
+  });
+
+  it('drops the tail fade when it would collide with its own attack', () => {
+    // A clip short enough that the tail window starts before the fade-IN has
+    // finished would leave two ramps fighting over one gain param.
+    gainScheduleCalls = [];
+    const sfxAny = sfx as unknown as {
+      applyEnvelope(
+        src: unknown,
+        g: unknown,
+        peak: number,
+        now: number,
+        opts?: Record<string, unknown>,
+      ): void;
+    };
+    const ctx = (
+      sfx as unknown as {
+        ctx: { createBufferSource(): FakeSource; createGain(): { gain: unknown } };
+      }
+    ).ctx;
+    const src = ctx.createBufferSource();
+    src.buffer = { duration: 0.5 } as never; // tail 0.45 starts at 0.05, inside a 0.3 attack
+    const gain = ctx.createGain();
+    sfxAny.applyEnvelope(src, gain, 0.9, nowT, { attack: 0.3, tailRelease: CROSSFADE });
+
+    expect(gainScheduleCalls.some((c) => c.kind === 'setTargetAtTime' && c.value < 0.01)).toBe(
+      false,
+    );
+  });
+
   it('leaves a take shorter than the crossfade at flat gain', () => {
     // Guard against scheduling a fade that would start before the sound does.
     seedSummon(0.2);
