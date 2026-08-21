@@ -112,7 +112,7 @@ export class PlantSheetWindow {
       markDialogRoot(root, { labelledBy: 'plant-sheet-title' });
       // Flex, not block: the sheet's stylesheet is authored against the
       // column-flex window family (flex-direction: column, .ps-body flex),
-      // matching every sibling window's open style.
+      // matching that family's open style (professions, deeds, bank, ...).
       root.style.display = 'flex';
       this.deps.onVisibilityChange?.();
     }

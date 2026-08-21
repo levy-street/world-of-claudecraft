@@ -6006,8 +6006,10 @@ built, minus the coverage_c re-own above):
   THE 11b-qa-B8 SECOND-ARM ROW, written by the QA audit (2026-08-21) as the
   settlement requires: F14's lowered sim.ts pin is 12232 (farming ratcheted
   12249 -> 12235 at B7 -> 12232 at B8, each with a written rationale, all
-  at 8cd964d599); masterwrought's pin is 12650; the merged file measures
-  12340. The merge kept ours' 12650, so the raise measured against F14's
+  at 8cd964d599); masterwrought's pin is 12650; the merged file measured
+  12340 at the audited tip 8f3efa2fc8 (12341 after this QA's own one-line
+  comment truing; 11d measures at its own tip). The merge kept ours' 12650,
+  so the raise measured against F14's
   number ONLY is +108, which is merge arithmetic, never a regression: the
   B8 extraction survives whole (Sim.mobMeleeRange has ZERO references at
   the tip; the delegate pair was retired at 570fd2c026 and stayed retired).

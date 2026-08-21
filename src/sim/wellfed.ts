@@ -30,9 +30,13 @@ import type { SimContext } from './sim_context';
 import type { Consuming, Entity } from './types';
 
 /**
- * Mint the Well Fed buff for a just-completed meal. Called from updateRegen
- * (src/sim/combat/auras.ts) at the moment the consume timer runs out, before
- * the slot is nulled. A dish without a `wellfed` field (every plain food and
+ * Mint the Well Fed buff for a just-completed meal. PARKED UNWIRED at the
+ * 11b absorb: nothing calls this yet. The live completion mint is
+ * masterwrought's inline clear-then-grant in updateRegen
+ * (src/sim/combat/auras.ts), which reads the `wellFed` spelling; 11c
+ * unifies the spellings and decides the one mint path (state.md, the 11c
+ * carry list, item 1), at which point this doc gains the real call site
+ * and ordering. A dish without a `wellfed` field (every plain food and
  * all drinks) is a no-op.
  */
 export function applyWellfedOnConsumeComplete(
