@@ -35,21 +35,6 @@ function elixirDef(record: BuffRecord): ItemDef {
   };
 }
 
-// The Well Fed twin of elixirDef, carrying a restore line as every shipped role
-// food does, so the same off-data sweeps (stat map, formatter options,
-// fallback, escaping) run against the food builder.
-function wellFedDef(record: BuffRecord): ItemDef {
-  return {
-    id: 'qa_probe_food',
-    name: 'QA Probe Food',
-    kind: 'food',
-    quality: 'common',
-    foodHp: 100,
-    sellValue: 1,
-    wellFed: record,
-  };
-}
-
 describe('elixirTooltipLines', () => {
   afterEach(() => setLanguage('en'));
 
@@ -255,4 +240,3 @@ describe('elixirTooltipLines', () => {
     });
   });
 });
-

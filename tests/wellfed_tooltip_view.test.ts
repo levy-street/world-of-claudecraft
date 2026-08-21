@@ -69,7 +69,9 @@ describe('wellFedTooltipLines', () => {
       expect(html.split('<div class="tt-desc">').length - 1, `${def.id} renders one line`).toBe(1);
       // Expected fragments built with the same formatter the view uses; the
       // formatter OPTIONS themselves are pinned off-data below.
-      expect(html).toContain(`by ${formatNumber(def.wellFed.value, { maximumFractionDigits: 0 })} `);
+      expect(html).toContain(
+        `by ${formatNumber(def.wellFed.value, { maximumFractionDigits: 0 })} `,
+      );
       expect(html).toContain(
         `for ${formatNumber(def.wellFed.duration / 60, { maximumFractionDigits: 1 })} min`,
       );
@@ -288,18 +290,21 @@ describe('the five non-Latin fills render end to end (frozen literals, the M16 s
     expect(wellFedTooltipLines(ITEMS.eastbrook_glazed_carrots)).toBe(want);
   });
 
-  it.each(FALLBACK)('%s: the wellFedAura sentence and interpolated aura name', async (loc, want) => {
-    await ensureLocaleLoaded(loc);
-    setLanguage(loc);
-    expect(
-      wellFedTooltipLines(
-        wellFedDef({
-          aura: 'Well Fed',
-          kind: 'buff_spellpower' as AuraKind,
-          value: 5,
-          duration: 300,
-        }),
-      ),
-    ).toBe(want);
-  });
+  it.each(FALLBACK)(
+    '%s: the wellFedAura sentence and interpolated aura name',
+    async (loc, want) => {
+      await ensureLocaleLoaded(loc);
+      setLanguage(loc);
+      expect(
+        wellFedTooltipLines(
+          wellFedDef({
+            aura: 'Well Fed',
+            kind: 'buff_spellpower' as AuraKind,
+            value: 5,
+            duration: 300,
+          }),
+        ),
+      ).toBe(want);
+    },
+  );
 });

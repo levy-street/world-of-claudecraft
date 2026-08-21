@@ -86,9 +86,7 @@ describe('the builder is the ONE Consuming writer', () => {
     expect(offenders, 'hand-built Consuming writers outside the builder').toEqual([]);
     expect(simTsLiterals, 'exactly the two dev-scenario freezes in sim.ts').toBe(2);
     // And the named non-writers really are the freeze sentinels, not meals.
-    const simSrc = stripComments(
-      readFileSync(join(process.cwd(), 'src', 'sim', 'sim.ts'), 'utf8'),
-    );
+    const simSrc = stripComments(readFileSync(join(process.cwd(), 'src', 'sim', 'sim.ts'), 'utf8'));
     expect(simSrc).toContain("itemId: 'dev_cascade_freeze'");
     expect(simSrc).toContain("itemId: 'dev_sandbox_freeze'");
   });

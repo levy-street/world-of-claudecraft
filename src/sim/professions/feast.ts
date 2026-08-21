@@ -47,13 +47,7 @@ import { consumeSelectedInventorySlot, selectedInventorySlot } from '../item_cop
 import { countUnlockedInSlots, isItemLocked, removeUnlockedFromSlots } from '../item_lock';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import {
-  dist2d,
-  type Entity,
-  INTERACT_RANGE,
-  isConsuming,
-  isNonSpellCast,
-} from '../types';
+import { dist2d, type Entity, INTERACT_RANGE, isConsuming, isNonSpellCast } from '../types';
 
 /** The one placeable feast item (content/profession_items.ts) and the
  *  templateId its placed entity carries. A second placeable is explicitly
