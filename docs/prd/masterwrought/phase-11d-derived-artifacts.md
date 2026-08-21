@@ -163,9 +163,15 @@ UNIT 1 - REGEN (27 files). Commit 1.
   gate-integrity-reviewer is a REQUIRED dispatch on this file, not an optional one.
 - i18n scope: PR tier permits English-only. The one exception is M16, a new wordy
   English value needs its non-Latin fills in the same change. Do not fill a pending row
-  here; the release-tier pass is a Phase 17 line item. 11c retired one of the two
-  competing tooltip key pairs, so pending.ts moves in that direction and that movement
-  is expected.
+  here; the release-tier pass is a Phase 17 line item.
+  (AMENDED 2026-08-21 by the 11c QA: the i18n arm of this unit was DISCHARGED in 11c.
+  Retiring the useWellfed key pair made the committed resolved slices tsc-red, so 11c
+  regenerated the 24 bundles, pending.ts and translation_keys.generated.ts in-phase and
+  its QA round regenerated them again after its copy fixes; both regens are committed
+  and byte-fresh. Expect `npm run i18n:gen` here to produce a ZERO diff (the idempotence
+  proof below still runs it); pending.ts does NOT move in this phase. The named-red list
+  this phase inherits is therefore TWO classes, the 69 parity goldens and
+  tests/guide.test.ts's two freshness arms, not three.)
 - Proof: run every generator a SECOND time and require a zero diff (idempotence is the
   freshness gate), then
   npx vitest run tests/i18n_resolved_equivalence.test.ts tests/guide.test.ts
@@ -371,9 +377,10 @@ program is skipped, it must not be this.
   - masterwrought's copy of the well-fed tooltip lines inside src/ui/elixir_tooltip_view.ts
     (11c: farming's view survives)
   - the wellFedTooltipLines export rename in src/ui/wellfed_tooltip_view.ts (11c)
-  - whichever of the two tooltip key pairs 11c retired
-    (itemUi.tooltip.wellFed / wellFedAura versus itemUi.tooltip.useWellfed /
-    useWellfedAura), after the locale-fill coverage comparison
+  - farming's itemUi.tooltip.useWellfed / useWellfedAura key pair and its ten
+    non-Latin overlay rows (11c, ruling 11c-A4-KEYPAIR: masterwrought's
+    itemUi.tooltip.wellFed / wellFedAura survives; the coverage comparison
+    was a measured tie and the tie-break went to copy)
   - the in-place copies deleted by 11b's extraction-beats-in-place rule, castDisplayName
     in src/ui/hud.ts and every other member of 11b's enumerated set
   - tests/release_v039_icon_art.test.ts's TWO farming literals only (the art-subject and

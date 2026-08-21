@@ -27,7 +27,7 @@
 | 11b | Farming absorb | complete | 2026-08-20 | 2026-08-20 |
 | 11b QA | verify | complete | 2026-08-20 | 2026-08-21 |
 | 11c | Food and feast reconciliation | complete | 2026-08-21 | 2026-08-21 |
-| 11c QA | verify | pending | | |
+| 11c QA | verify | complete | 2026-08-21 | 2026-08-21 |
 | 11d | Derived artifacts, pins, and the merge audit | pending | | |
 | 11d QA | verify | pending | | |
 | 11e | A true skill, farming's mastery curve and crop roster | pending | | |
@@ -715,6 +715,26 @@ is deliberately not copied here, it lives in the farming record.
   gathering-tool family. The stale `phase-11e-farming-apex-arm.md` is replaced by
   `phase-11e-mastery-curve.md` and deleted; its apex-feast design moves into 11h and
   11k and its GATE 1 material into 11e, so no table references the old file.
+- Phase 11c QA (2026-08-21): THE UNIFICATION VERIFIED, verdict
+  PASS-WITH-FOLLOWUPS. Release sync a no-op again (v0.40.0 still ancestor).
+  Seven-lane ultracode audit (the five mutating lanes each in a throwaway
+  worktree at the tip) + five fresh matrix reviewers + four adversarial
+  verifiers over 4f9097858c..a9ad2a3dd1: one system, the carry, the ladder
+  (flask 15 plus food 6 equals 21), every pin, and the named reds all PROVED
+  by mutation and by a scratch parity re-record (zero rng movement); no
+  fourth red. Findings applied in three fix commits (67943f544c, 407968806d,
+  2de3231104): the Consuming record kind-scoped (FoodConsuming |
+  DrinkConsuming) so the mint's type claim holds at both layers, literal pins
+  on the minted record's school and self-source, a shape arm on the writer
+  sweep, the feast serving lines state the one-at-a-time rule, the cooking
+  identity clause trued (English plus five overlays), the wiki cell's proper
+  noun, and the ledger's farming_session composition COMPLETED (the
+  delta-of-300 carry proof, the eating.wellFed rows, hp/sta, the daily keys,
+  sourceId +4). Fresh reviewers over the fix round; tsc, ci:changed, the
+  affected suites and the regen equivalence green at the close tip
+  e4ccbe659c. Handoff: 11d inherits TWO named-red classes (69 goldens, guide
+  freshness x2), the i18n regen already discharged. Full record: state.md,
+  "Phase 11c QA audit record".
 - Phase 11c (2026-08-21): FOOD AND FEAST RECONCILED, the well-fed unification
   executed per decision 2 (all six axes: one 'well_fed' id as the exported
   WELL_FED_AURA_ID seam, FoodItemDef.wellFed, clear-then-grant at the

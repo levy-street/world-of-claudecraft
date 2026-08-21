@@ -6483,8 +6483,10 @@ fresh reviewers).
 ### Decision 2, SETTLED 2026-08-20 and EXECUTED as written
 Rulings 11b-D-2 / 11c-D-2 executed on all six axes, no gate left reading
 confirm-at-STEP-0: one aura id 'well_fed' (exported as WELL_FED_AURA_ID from
-src/sim/wellfed.ts, THE seam constant every site references; the one
-re-typing of the string is the identity pin in tests/wellfed.test.ts);
+src/sim/wellfed.ts, THE seam constant every runtime site references; the
+literal survives only in the identity pin in tests/wellfed.test.ts, the
+sanctioned literal-keyed AURA_RECIPES row in src/ui/icons.ts, and the
+view/painter test fixtures that pin it on purpose, TRUED at the QA audit);
 FoodItemDef.wellFed as the one field (farming's lowercase twin deleted, its
 runtime kind guard unrepresentable, pinned by a self-verifying
 ts-expect-error); masterwrought's clear-then-grant order at the updateRegen
@@ -6518,7 +6520,12 @@ sim.ts's two dev freezes). THE TWO DELIBERATE NON-WRITERS, named so nobody
 "fixes" them: sim.ts's 'dev_cascade_freeze' and 'dev_sandbox_freeze'
 zero-rate meals (no item def, sentinel remaining, must never mint) stay
 hand-built by design. Monolith position considered: consuming.ts is a
-57-line pure leaf outside MONOLITHS; no ceiling entry owed. The
+short pure leaf outside MONOLITHS (its exported ConsumableDefFacts is the
+builder's structural parameter type, satisfied by FoodItemDef and every drink
+def without an ItemDef union import); no ceiling entry owed. (QA audit
+2026-08-21: the Consuming record itself is now kind-scoped too, FoodConsuming
+| DrinkConsuming in src/sim/types.ts, so the mint's "types beat guards" claim
+holds at both layers; see the QA record below.) The
 feast-versus-bag identity pin (professions_feast) compares the minted aura
 as a WHOLE record through the real tick path in both runs. The wire was
 re-verified untouched: server game.ts ships eat: { remaining } only.
@@ -6528,8 +6535,9 @@ wellfed_tooltip_view.ts survives (export renamed wellFedTooltipLines),
 re-pointed to the surviving keys' placeholder sets READ OFF the catalog
 ({stat}/{value}/{minutes}; {aura} only in the fallback), wired at
 masterwrought's restore-adjacent hud position; the elixir-module twin and
-hud.ts's second import and call are deleted (hud.ts shrank; the ratchet as a
-reduction). Ruling 11c-A4-KEYPAIR executed: farming's useWellfed pair and
+hud.ts's second import and call are deleted (hud.ts net-zero in LINES, trued
+at the QA audit: one call line and one import name removed, one comment line
+added, 19251 before and after; the ratchet did not move and nothing grew). Ruling 11c-A4-KEYPAIR executed: farming's useWellfed pair and
 its ten overlay rows died in the same change; the exactly-one-line rule is
 pinned per buff food AND as a method-scoped exact-count source pin on
 Hud.itemTooltip. DELIBERATE NON-ACTION recorded in elixir_tooltip_view.ts:
@@ -6555,9 +6563,12 @@ registered, which is EXACTLY what the shipped "four" was doing; the guard's
 names-every-trade arm is self-maintaining (a sixth trade fails until named),
 while spelling "five" would re-arm the same staleness bug and weaken a guard
 that had just caught it. Phase 16's verify arm ("no shipped string says four
-gathering") is satisfied verbatim. The five non-Latin overlays carry real
-count-free fills in the same change; the stale "the four gathering" code
-comment in src/guide/pages/professions.ts was swept (carry 15).
+gathering") is satisfied verbatim. The five non-Latin overlays all read
+count-free after this change (trued at the QA audit: ja_JP, ko_KR and ru_RU
+were re-filled here; zh_CN and zh_TW already read count-free, 各类采集行业 /
+各類採集行業, and were left as they stood); the stale "the four gathering"
+code comment in src/guide/pages/professions.ts was swept (carry 15), and its
+byte-parallel twin in scripts/wiki/build_content.mjs at the QA audit.
 
 ### The interaction reorder (obligation 2, ruling 11b-R3c-1 EXECUTED, not re-routed)
 The press competition is NOT moot for the feast: a placed harvest_feast and
@@ -6633,13 +6644,32 @@ FRACTIONAL farming value per its own instruction (unrelated to this call).
   recorded snapshot labels whose rename would move goldens for no behavior.
 
 ### RELEASE-FILL OBLIGATIONS (reword-staleness, flagged BY KEY for the Phase 17 fill)
+(TRUED at the QA audit 2026-08-21: every key below is filled ONLY in the five
+non-Latin overlays, ja_JP / ko_KR / ru_RU / zh_CN / zh_TW; the 15 Latin
+locales are registry-PENDING for them, rendering the new English correctly
+through the passthrough, so no Latin overlay row exists to be stale. The
+earlier "filled in every locale" reading was the build spec's premise and was
+drift.)
 - guide.profPages.craftProse.cooking.routeBody: the Hearth clause reword
-  ("the feast" to "dinner"). Filled in every locale; ALL locale rows are now
-  silently stale against the new English (the reword-staleness class; the
-  flag is the deliverable per 11c-VOCAB).
-- guide.professions.whatBody: the count-free reword. The five non-Latin
-  overlays were re-filled in this change; every LATIN overlay row is now
-  silently stale against the new English.
+  ("the feast" to "dinner"). The five non-Latin rows are now reword-stale
+  against the new English (the reword-staleness class; the flag is the
+  deliverable per 11c-VOCAB); the Latin locales stay pending.
+- guide.professions.whatBody: the count-free reword. The five non-Latin rows
+  all read count-free (three re-filled here, two already were); the Latin
+  locales stay pending. No stale overlay row exists for this key.
+- guide.profPages.craftProse.cooking.identityBody (QA round): the "only food
+  that leaves a Well Fed buff" clause became FALSE under the unification
+  (seven direct carriers) and was reworded to the ladder-top clause; the five
+  non-Latin rows were re-filled in the same change (clause swap only); the
+  Latin locales stay pending.
+- itemUi.tooltip.useFeastBuff and useFeastBuffAura (QA round): the
+  one-at-a-time clause appended, in the wellFed pair's own words per locale
+  (byte-identical clause to the surviving itemUi.tooltip.wellFed rows); the
+  five non-Latin rows were re-filled in the same change; Latin pending.
+- guide.profPages.effectWellFed (QA round): English capitalization only
+  ("Well fed" to the proper noun "Well Fed"); the five non-Latin rows already
+  carry the aura TERM and need no re-fill; Latin pending. Recorded so the
+  fill does not read the English delta as a pending reword.
 - (Standing from the 11b QA: prog_master_gatherer's desc overlay rows,
   deleted in all 18 locales, remain owned by the release fill; not re-filled
   here.)
@@ -6668,12 +6698,41 @@ committed goldens and then RESTORED (nothing re-recorded in the tree):
   re-record would bless, never an expected delta.
 - farming_session: the six readable aura rows move exactly as predicted, id
   wellfed_buff_sta to well_fed, value 12 to 5, duration 900 to 600,
-  remaining down by EXACTLY 300 in every row, name "Well Fed" and school
-  "nature" unchanged; the rows are PRESENT in the same six frames (117, 118,
-  119, 140, 142, 143; the feast-wellfed-minted frame included, the carry
-  proof), total draws 110 both sides, final drawDigest equal.
-- Everything else moving in the re-record is the known 11b +4 entity-id
-  shift and the derived state digests, per the 11b QA's characterization.
+  remaining down by EXACTLY 300 in every row (THE CARRY PROOF, trued at the
+  QA audit: presence at frame 140 is vacuous, because the bagged dish's aura
+  minted at tick 1959 is still alive there under either outcome; what
+  discriminates is the delta. Carry working: 897.05 to 597.05 at frames
+  117/118/119/140 and 896 to 596 at 142/143, a delta of 300 everywhere.
+  Carry BROKEN: frame 140 reads 577.05 and 142/143 read 576, a delta of 320,
+  because the feast bite re-minted nothing and the bagged aura just kept
+  decaying. The refresh signature 11d can eyeball: the committed golden's
+  frame-140 remaining equals frame 117's byte for byte, 897.05 both, and the
+  re-record must keep that equality at 597.05), name "Well Fed" and school
+  "nature" unchanged, sourceId 967 to 971 (the known 11b +4 entity-id shift,
+  named here so a legitimate +4 is not read as an unexpected delta); the rows
+  are PRESENT in the same six frames (117, 118, 119, 140, 142, 143), total
+  draws 110 both sides, final drawDigest equal. The golden carries SEVEN
+  retired-id hits today: the six aura rows plus the covers prose line that
+  743f1540a0 reworded at the source, so the re-record drops all seven.
+- Everything else moving in the re-record, ENUMERATED at the QA audit from
+  a scratch re-record of shard g (the earlier "+4 shift and derived digests"
+  line was incomplete for THIS file, whose nextId does not move in any of
+  its 144 frames): (a) entities[0].eating gains the carried payload
+  `wellFed: { aura: 'Well Fed', duration: 600, kind: 'buff_sta', value: 5 }`
+  in the two frames that sample a live meal, 96 (wellfed-eating, tick 1618)
+  and 119 (feast-bitten, tick 2018): the eating slot IS sampled on
+  checkpoint frames (trace.ts sampleEntity copies every gameplay field and
+  the committed golden already holds eating rows), so the carry becomes
+  VISIBLE there; it is not a wire widening (server ships eat:{remaining});
+  (b) entities[0].hp and maxHp 220 to 150 and stats.sta 35 to 28 in the six
+  aura frames (the 12-to-5 stamina delta); (c) players[0].craftDaily and
+  wyrmfallDaily `{}` appear in all 23 checkpoint frames: farming_session is
+  the ONLY one of the 69 committed goldens lacking them (a farming-origin
+  golden-shape gap, recorded on the parents' tree), not the +4 shift; (d) the
+  events digest moves in frames 114 (tick 1960) and 137 (tick 2360); (e) the
+  coverage[19] prose line moves to the unified wording (743f1540a0); and the
+  derived state digests. Across all 32 shard-g goldens the re-record moved
+  ZERO rng.draws / rng.digest values and no frame count.
 
 ### Review round (four fresh domain reviewers, COVERAGE prompts; every finding dispositioned, none dropped)
 Dispatched per the matrix over the immutable range 4f9097858c..HEAD:
@@ -6791,9 +6850,12 @@ findings itself rather than taking them on trust.
   the drifted ones. Recorded here as the citation the gate wanted; no
   revert, no new blessing sought.
 - The gate's own adversarial pass chased four things nobody else had; three
-  came back CLEAN and are worth keeping: the new Consuming.wellFed field
-  does NOT widen the parity goldens (trace.ts and record.ts sample no
-  eating slot, so the composition handed to 11d is complete), the glossary
+  came back CLEAN and are worth keeping (ONE of them CORRECTED at the QA
+  audit: the new Consuming.wellFed field DOES reach the parity goldens,
+  because the eating slot IS sampled on checkpoint frames, so the carried
+  payload widens farming_session in exactly the two frames that hold a live
+  meal; it never crosses the wire, and the composition block above now
+  names it), the glossary
   alignment is not one-sided across locales, and src/sim/consuming.ts owes
   no module-table row of its own (that table scopes to SimContext
   importers; the pure leaf imports none and is named inside the wellfed.ts
@@ -6817,3 +6879,176 @@ findings itself rather than taking them on trust.
   tests/guide.test.ts REGENERATES src/guide/content.generated.ts in place
   and dirties the tree. Every agent restored it; the phase tip is clean and
   the committed artifact stays deliberately stale for 11d.
+
+## Phase 11c QA audit record (2026-08-21, the unification verified; verdict PASS-WITH-FOLLOWUPS)
+
+Session facts: worktree guard passed (EnterWorktree into wocc-masterwrought);
+release sync a VERIFIED NO-OP (origin/release/v0.40.0 tip 65b91fa190 already
+an ancestor, newest by version sort; no merge, no release-merge-audit owed).
+Base: the 11c close tip a9ad2a3dd1 (18 commits over 4f9097858c), tree clean,
+tsc clean, ci:changed exit 0 at start; decision 2 read as SETTLED and
+EXECUTED before any lane ran. ULTRACODE: yes. Shape: a seven-lane COVERAGE
+Workflow (unification, carried payload, ladder, copy and i18n, test
+decisiveness, named reds, cleanup), the five mutating or regenerating lanes
+each in their OWN throwaway detached worktree at the tip with node_modules
+symlinked and the read-only lanes on the real tree (zero cross-lane leaks,
+the real tree clean throughout); the five matrix reviewers (architecture,
+cross-platform-sync, frontend-seam, content-obligations, qa-checklist)
+dispatched fresh over the immutable range; a verify stage of four
+adversarial verifiers over the should-fix findings; then the fix round with
+its own two fresh reviewers. Delivery: 7/7 lanes, 5/5 reviewers unprompted,
+4/4 verifiers (11 workflow agents, 0 errors, 0 empty results).
+
+### What the audit PROVED (the phase goal, each with the evidence that carried it)
+- ONE system: one def field FoodItemDef.wellFed; one mint (src/sim/wellfed.ts
+  is the only applyAura on the id); one exported WELL_FED_AURA_ID; the
+  clear-then-grant order at the updateRegen completion site with its reason
+  comment; the retired inline block in combat/auras.ts and the elixir-view
+  twin GONE; hud.ts one import and one call; one AURA_NAME_KEY row; every
+  lowercase `wellfed` hit classified (the wiki SHAPE key by design, the module
+  and test filenames, the parity beat labels, comments, test-local names)
+  with no lowercase def read in live code; the `wellfed_` id prefix nowhere
+  outside the sweep's own prose and the un-re-recorded farming_session golden.
+- THE CARRY, mutated in an isolated worktree: deleting the builder carry
+  reddens 20 tests in 5 files; the OLD hand-built feast bite without the carry
+  reddens the feast-versus-bag identity pin AND the writer sweep (8); the bite
+  served as 'drink' reddens 7; a hand-built items.ts arm that KEEPS the carry
+  still reddens the source sweep while behavior stays green (2); dropping the
+  kind half of the builder guard reddens 1. Exactly two real writers, both
+  through buildConsuming; the two dev freezes hand-built by design (named in
+  the ledger and the builder header); the wire untouched (eat:{remaining}
+  only, nothing in src/net or server/ reads wellFed).
+- THE LADDER, recomputed from the LIVE catalog: farm dishes 2/3/4/5 at 600
+  (all buff_sta), apex plates 6/900 (buff_sta / buff_ap / buff_int), the apex
+  strictly dominant on both axes with the farming top exactly one below,
+  harvest_feast serving the 5/600 dish, ironhusk_flask 15/1200: FLASK 15 PLUS
+  FOOD 6 EQUALS 21 STAMINA, untouched. The apex 900 is derived live, 600 plus
+  (venomfire 900 minus boar 600). Seven mutations (a fifth dish at 6/600,
+  5/900 and 7/600; the apex duration back to 600; a 1500-hp farm dish; carrots
+  2 to 3; greens 5 to 4) each reddened the arm named for it, so the sweeps are
+  live, not pasted. The CUT arm of the QA spec is moot (decision 2 was TAKEN).
+- THE PINS, mutated: the identity pin against the literal (5 red under
+  'well_fed2'); the clear-then-grant swap (1 red, the order pin at the new
+  site); the per-kind id regression (16 red incl. both exclusivity cases);
+  the Laden Hearth pairing on BOTH inputs (stationType and
+  STATION_TYPE_BY_CRAFT); the namespace sweep (a quoted literal reds, the
+  same literal in a comment stays green); the writer sweep on both hand-built
+  shapes; the ITEMS alias key; the bed moved above the feast; the
+  @ts-expect-error narrowing pin load-bearing (TS2353 when removed); the hud
+  double-wire reddening the exact-count source pin; every deleted it() in the
+  ten rewritten files has a named replacement.
+- THE NAMED REDS: tsc clean; the STEP 3 list (23 files, 604 tests) green
+  except recipe_economy's two 11b-parked count pins; the parity suite EXACTLY
+  the 69 golden compares (a7 b4 c2 d4 e19 f1 g32) with coverage_a/b/c and the
+  harness green; tests/guide.test.ts EXACTLY the two freshness arms; vitest
+  related over the 27 changed modules ran 1825 files / 27989 tests with 107
+  failures in 24 files, EVERY one classified (69 goldens + 2 guide + 28 count
+  pins + 7 art census + 1 fingerprint), NO fourth red; no golden and no
+  content.generated.ts in the diff; TURBO_FORCE=1 i18n:gen byte-fresh at the
+  tip; ci:changed 0; 18 commits with bodies, no trailers, zero em/en dashes
+  or emoji in added lines. The farming_session composition was RE-PROVED by
+  a scratch UPDATE_PARITY re-record of shard g: the six rows moved exactly as
+  predicted, draws 110/110, drawDigest fcb50df1 both sides, zero rng movement
+  across all 32 shard-g goldens; the composition block above was then
+  COMPLETED with the movements the re-record also carries.
+
+### Findings and what the fix round did with them (every one applied or dispositioned, none dropped)
+BLOCKING: none.
+SHOULD-FIX, APPLIED:
+- The Consuming record was not kind-scoped while the mint's header claimed
+  "types beat guards" (architecture): Consuming is now FoodConsuming |
+  DrinkConsuming, the builder branches on the kind, the completion site
+  narrows on c.kind, the claim is true at the def AND the record, a
+  DrinkConsuming @ts-expect-error pin twins the def pin (67943f544c,
+  407968806d).
+- No literal pin on the minted record's school 'nature' and self-source
+  (carried-payload lane, CONFIRMED by its verifier; the identity equality
+  compares two mints and is blind to both-sides drift): the literal record
+  pin in tests/wellfed.test.ts and the bite-side anchors beside the identity
+  pin; both mutations now red (407968806d).
+- The writer sweep was blind to an intermediate-variable build (CONFIRMED):
+  the Consuming-SHAPE arm counts `ticksElapsed:` literals across src/sim
+  outside the builder and pins exactly the two dev freezes, with negative
+  self-proofs; the opener accepts a quoted slot (407968806d).
+- The farming_session composition handed to 11d was INCOMPLETE and the gate's
+  "sample no eating slot" claim was false (named-reds lane, CONFIRMED):
+  both trued in the ledger above (the eating.wellFed rows in frames 96 and
+  119, hp/maxHp and sta in the six aura frames, the craftDaily/wyrmfallDaily
+  keys in 23 frames, the two events digests, sourceId +4, nextId unmoved in
+  this file, the delta-of-300 as the carry proof with the 320 broken-case
+  signature).
+- The cooking identityBody still called the apex plates "the only food that
+  leaves a Well Fed buff" (cross-platform WARNING, the ladder lane's
+  should-fix; its verifier REFUTED it as 11c's on scope grounds, judged HALF
+  RIGHT here: the cooking-versus-farming page contradiction predates 11c and
+  Phase 16 owns the one-explanation coherence pass, but the clause became
+  false in LIVE behavior the day 11c made the farm dishes mint, so the one
+  clause was fixed now, English plus the five non-Latin overlays, and 16's
+  pass stands unchanged) (2de3231104).
+- useFeastBuff / useFeastBuffAura omitted the one-at-a-time rule the
+  unification made universal (content WARNING): appended, per locale
+  byte-identical to the surviving wellFed rows' clause; frozen renders
+  re-pointed (2de3231104).
+- The wiki effect cell spelled "Well fed" against the proper noun everywhere
+  else (frontend should-fix, content INFO): capitalization trued; the
+  non-Latin rows already carry the term (2de3231104).
+NITS, APPLIED: the last spelled gathering count in scripts/wiki/
+build_content.mjs; the exactly-one-line source pin widened to any argument
+list plus a composed-output arm (tests/wellfed_tooltip_composition.test.ts,
+happy-dom, the rendered tooltip for a farm dish and an apex plate); the
+non-food probe list regains the flask/scroll/potion/drink siblings; the
+namespace sweep's vacuity floor per root; the exclusivity cases count the
+family by name; fullAtMint asserted outright; the builder carry pin's
+precondition; the ledger truings above (hud.ts net-zero, the line count
+dropped per the anchor rule, "the one re-typing" narrowed, three overlays
+not five, the RELEASE-FILL block trued to the rows that exist,
+ConsumableDefFacts named); the stale comments in feast_tooltip_view.ts,
+wellfed.ts ("copied off"), sim_i18n.ts, icons.ts, farm_recipes.test.ts, the
+builder header's src/sim scope, profession_items.ts's 17-stamina phrase, the
+flask-band test naming the bear's duplicate rung.
+DECLINED WITH REASON: a feast-dish-strictly-below arm on the dominance sweep
+(architecture note): the shared feast is a delivery VEHICLE whose dish is
+already in the sweep, and 11k's apex feasts will serve the apex plates by
+design (equal to the apex, never above), so the arm would red the day 11k
+ships; recorded in the sweep's own comment so nobody adds it.
+RECORDED, NO CHANGE: TimedStatBuffPayload.kind is the full AuraKind
+(pre-existing, shared with the elixir family, carrier set pinned to seven);
+the wellFedAura fallback reads "Grants Well Fed" now that every record's aura
+is 'Well Fed' (the never-silent degradation path, no live kind off-map); no
+interact affordance says whether a press hits the feast or the bed
+(gameplay ruling 11b-R3c-1, both directions pinned); the consumable ladder
+has no docs/design home, its derivation lives in this PRD, the def comments
+and the pins (maintainer call); the one unscoped commit subject
+(f7ae712c01, immutable); the harness noise of a related-set suite trying to
+git-checkout the gitignored i18n.status.summary.json (left nothing dirty).
+PHASE 16 CARRY (in-packet, not a future-PR item): the wiki's one-at-a-time
+statement and the ONE well-fed explanation across the cooking and farming
+pages (the coherence pass phase-16-polish.md already owes).
+
+### The fix round (commits, validation, review)
+- 67943f544c fix(sim), 407968806d test(sim), 2de3231104 fix(ui) (the i18n
+  regen rides the third; no key added or removed, translation_keys unchanged).
+- Pre-verified in a throwaway worktree before touching the real tree, then
+  on the real tree: tsc clean; 35 suites / 1089 tests green (plus the three
+  release-tier skips) over the affected set including the new composition
+  test and every Consuming-literal suite; tests/i18n_resolved_equivalence
+  green after the regen commit; biome error-free over the 19 changed source
+  and test files; ci:changed exit 0 after the LAST code commit (740 files).
+- Fix-round review (fresh eyes over a9ad2a3dd1..2de3231104): two fresh agents over a9ad2a3dd1..2de3231104, a general correctness/coverage reviewer and the test-coverage auditor. General: 0 blocking, 0 should-fix, 3 nits (the shape arm blind to the shorthand property spelling with an over-claiming comment; two comments still spelling Consuming.wellFed; commit subjects of 87 to 104 characters, optional), plus two pre-existing observations (the 11b-parked renderer.ts/online.ts ceilings; the happy-dom Hud.prototype idiom's ECONNREFUSED noise, inherited and not added). Test-coverage: 3 should-fix (the tests/ vacuity floor at 2500 could not catch a single-level collapse, which leaves about 2780 files; the negative namespace sweep had no positive needle control; the retitled non-food tooltip claim was unpinned, every probe returning through the payload gate), 6 nits (the single-overwrite case lacked the by-name arm; the composition count could miss a second line without the label; no sim-level drink-completion arm; the spread-built evasion of both sweep arms; toMatchObject is partial and the id key tautological inside it; the html += prefix residual, backstopped by the composition test; the farm comment's global-21 sum unpinned), and six mutation recipes. ALL applied in e4ccbe659c (the tests/ floor at 3000 plus NESTED per-root counts pinning the recursion directly; a positive needle control built from parts; the kind gate pinned with a drink record smuggling a payload past the type; a real gulp to completion mints nothing; the by-name arm on the overwrite case; the bare term bounded at exactly two; the shape arm counting the shorthand spelling with the spread evasion named as stated reach; the two spellings trued) except: the commit-subject length (recorded, no history rewrite on SHAs already cited; later subjects short), the toMatchObject keys tightening (the comment made honest about the partial match instead), and the global-21 sum (recorded as unpinned: both operands are pinned in masterwrought_budget, the sum and its globality are a comment claim). The recipes were then RUN in a throwaway worktree at e4ccbe659c: collapsing the union (DrinkConsuming regaining wellFed) reds tsc with TS2578 at the new directive; doubling the hud call reds exactly 3 (the source pin and both composition counts); a foreign tt-desc div inserted between the restore line and the call reds ONLY the adjacency arm (2 cases); an intermediate-variable build in items.ts reds ONLY the shape arm while the opener arm stays green (the arm's whole justification); a second applyAura under well_fed_extra reds ONLY the three by-name arms, each as 'expected length 1 but got 2', the claim those cases are named for; baseline green after every restore.
+
+### Handoff to 11d: the named reds restated verbatim (two classes, not three)
+1. tests/parity: the 69 golden compares (parity_a 7, parity_b 4, parity_c 2,
+   parity_d 4, parity_e 19, parity_f 1, parity_g 32); re-record via
+   UPDATE_PARITY under the 11d instruction, checking farming_session against
+   the completed composition above (the delta-of-300 carry proof, the
+   eating.wellFed rows in frames 96 and 119, hp/maxHp and sta in the six aura
+   frames, the craftDaily/wyrmfallDaily keys, the two events digests, sourceId
+   +4; drawDigest fcb50df1 unchanged; zero rng movement anywhere is the bar).
+2. tests/guide.test.ts: the two freshness arms (the regen-diff arm and the
+   C10 effect-row mirror); after npm run wiki:content the shape carries SEVEN
+   wellfed cells reading 2/10, 3/10, 4/10, 5/10 and 6/15 three times.
+The i18n regen is NOT a named red: discharged in 11c and again in this QA
+round; 11d's npm run i18n:gen must produce a ZERO diff (the 11d phase file
+carries the dated note). The 11b parked list (count pins, art census, the
+renderer.ts and online.ts ceilings, the farm_props fingerprint) is unchanged
+and 11d-owned. Close tip e4ccbe659c.
