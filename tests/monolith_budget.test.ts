@@ -19,6 +19,17 @@ import { describe, expect, it } from 'vitest';
 //   small margin in the same change; the ratchet only works if it tightens.
 // - Raising a ceiling is a maintainer decision: do it only when a change genuinely
 //   cannot land behind a seam, keep the raise small, and justify it in the PR body.
+// - WHEN A RELEASE SYNC PUSHES A ZERO-SLACK ROW OVER, which is a different case and
+//   the one this branch will meet most often (added 2026-08-21 by the Phase 11d QA
+//   fix-round review). Seven of the eleven rows sit at zero slack, and a long-lived
+//   feature branch keeps merging release/**, so a routine upstream change can grow a
+//   file this branch does not own and land red on the sync. Do NOT extract upstream's
+//   code to buy the lines back, and do not raise the ceiling silently: re-pin at the
+//   exact merged count with a comment naming the sync, the release tip, and the
+//   parent pins, exactly as the hud.ts row does for its two syncs. That keeps the
+//   ratchet honest (the pin still equals the file) while recording that the growth
+//   was inherited rather than authored. If the growth is large enough that the merged
+//   file is materially worse, that is a maintainer conversation, not a quiet re-pin.
 // - A missing file usually means it was split or renamed: update or remove its row in
 //   the same change so the gate tracks the real tree.
 //
