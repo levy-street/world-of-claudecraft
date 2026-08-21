@@ -20,7 +20,8 @@ export type MountKey =
   | 'stormfeather_griffin'
   | 'thunderstrut_gobbler'
   | 'drakemaw_raptor'
-  | 'terrorspark_groundshaker';
+  | 'terrorspark_groundshaker'
+  | 'mech_bird';
 
 export type MountRarity = 'common' | 'uncommon' | 'rare' | 'epic';
 
@@ -79,9 +80,10 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     moveSpeedPct: 0.75,
   },
   // Epic tier (80%): the hover-cycle and the gobbler come from Rift S clears.
-  // The Terrorspark Groundshaker is developer-only for now and has no
-  // player-facing acquisition, and stays LAST in the catalog (the tests pin the
-  // developer mount as the tail, so a new player-facing mount lands above it).
+  // The developer-only mounts (the Terrorspark Groundshaker and the Cluckwork
+  // Mech Bird) have no player-facing acquisition and hold the catalog TAIL
+  // (the tests pin the developer mounts as the tail, so a new player-facing
+  // mount lands above them; within the tail, declaration order beats rarity).
   aether_hover_cycle: {
     key: 'aether_hover_cycle',
     name: 'Aether-Jouster Hover-Cycle',
@@ -108,6 +110,15 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     name: 'Terrorspark Groundshaker',
     rarity: 'epic',
     moveSpeedPct: 0.8,
+  },
+  // The Cluckwork Mech Bird: developer-only like the tank above, no
+  // player-facing acquisition (/dev mounts grants its soulbound ignition key).
+  // Rare tier on the collectible speed ladder, parked in the dev tail.
+  mech_bird: {
+    key: 'mech_bird',
+    name: 'Cluckwork Mech Bird',
+    rarity: 'rare',
+    moveSpeedPct: 0.75,
   },
 };
 

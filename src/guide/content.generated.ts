@@ -6498,6 +6498,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "mount",
         "name": "Terrorspark Groundshaker"
+      },
+      {
+        "kind": "mount",
+        "name": "Cluckwork Mech Bird"
       }
     ]
   },

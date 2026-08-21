@@ -574,7 +574,7 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // and ONE deliberate shipped-trigger change the hash correctly caught:
   // feat_book_complete's meta list gained the FOUR earnable ladder deeds and
   // deliberately did NOT gain the capstone, which took feat: true (unearnable
-  // while three catalog slots stay owner-pended; a non-feat capstone would
+  // while four catalog slots stay owner-pended; a non-feat capstone would
   // dead-end The Whole Book; see the reachability pin below). No other
   // trigger or renown changed (verified by reconstructing the pre-phase
   // catalog, which reproduces the previous literal exactly).
@@ -1172,10 +1172,10 @@ describe('the completionist feat', () => {
   });
 
   it('stays reachable: the unearnable Reliquary capstone is OUT, its earnable ladder is IN', () => {
-    // col_reliquary_complete is unearnable while three catalog slots stay
+    // col_reliquary_complete is unearnable while four catalog slots stay
     // owner-pended (masterwork:engineering, reins_drakemaw_raptor,
-    // reins_terrorspark_groundshaker); as a Book requirement it would
-    // dead-end The Whole Book for every player, the exact failure the
+    // reins_terrorspark_groundshaker, reins_mech_bird); as a Book requirement
+    // it would dead-end The Whole Book for every player, the exact failure the
     // retroFallbackGrants stranded-heal doctrine names. The feat flag is the
     // exclusion mechanism; this arm reds the moment anyone drops it. The
     // derivation pin above cannot catch that regression on its own, because

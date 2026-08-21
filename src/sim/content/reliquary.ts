@@ -267,6 +267,7 @@ export const RELIQUARY_HORIZON_MOUNTS = [
   'thunderstrut_gobbler',
   'drakemaw_raptor',
   'terrorspark_groundshaker',
+  'mech_bird',
 ] as const;
 
 // Per-mount sources. A mount is owned through its reins ItemDef (kind 'mount',
@@ -282,11 +283,12 @@ export const RELIQUARY_HORIZON_MOUNTS = [
 // def in content/zone3.ts), so a quest hint there would name a door that hands
 // out nothing.
 //
-// drakemaw_raptor and terrorspark_groundshaker are absent, and that absence IS
-// the answer: no live table awards either (drakemaw_raptor has no acquisition
-// path, terrorspark_groundshaker is dev-grant only). They are the catalog's
-// two SOURCE_PENDING_RULING mounts; masterwork:engineering on the professions
-// shelf is the third pending slot (QA ruling 2026-08-07).
+// drakemaw_raptor, terrorspark_groundshaker, and mech_bird are absent, and
+// that absence IS the answer: no live table awards any of them (drakemaw_raptor
+// has no acquisition path; terrorspark_groundshaker and mech_bird are dev-grant
+// only). They are the catalog's three SOURCE_PENDING_RULING mounts;
+// masterwork:engineering on the professions shelf is the fourth pending slot
+// (QA ruling 2026-08-07).
 //
 // Keys are typed against the live mount ladder so a misspelled or renamed key
 // fails tsc at the authoring site instead of falling through to the pending

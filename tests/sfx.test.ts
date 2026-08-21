@@ -2,7 +2,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FORGE_MAX_DISTANCE, MAX_DISTANCE, REF_DISTANCE, sfx } from '../src/game/sfx';
 import { SFX_CLIPS, type SfxEntry } from '../src/game/sfx_manifest.generated';
-import { MOUNT_KEYS } from '../src/sim/content/mounts';
+import { MOUNT_KEYS, type MountKey } from '../src/sim/content/mounts';
 
 // The footstep "jingling" bug: foot clips are ~0.48s but steps fire every ~0.22s
 // at a run, so flat retriggers overlap two pitch-jittered copies of one sample and
@@ -257,7 +257,15 @@ describe('isBuffered/preload', () => {
 });
 
 describe('mount running audio', () => {
-  it('ships one generated manifest entry for every catalog mount', () => {
+  // The dev-only Cluckwork Mech Bird deliberately ships NO audio (owner call:
+  // just the mount). That is a supported runtime state, not a gap:
+  // Sfx.mountRun returns silently for a mountKey with no clip and
+  // engineClipKeys resolves null, so a silent mount costs nothing at runtime.
+  // Listed here so a mount MISSING its clip by accident still fails below.
+  const SILENT_MOUNTS = new Set<MountKey>(['mech_bird']);
+  type AudibleMountKey = Exclude<MountKey, 'mech_bird'>;
+
+  it('ships one generated manifest entry for every catalog mount (silent dev mounts excepted)', () => {
     // terrorspark_groundshaker's mount_run_ entry is the sustain take of an
     // engine mount's windup/loop/winddown set (see the "mount engine audio"
     // suite below): it is genuinely driven through Sfx.loop() at runtime, so
@@ -265,7 +273,12 @@ describe('mount running audio', () => {
     // mount's plain per-stride gait clip.
     const ENGINE_LOOP_MOUNTS = new Set(['terrorspark_groundshaker']);
     for (const mountKey of MOUNT_KEYS) {
-      const entry = SFX_CLIPS[`mount_run_${mountKey}`];
+      if (SILENT_MOUNTS.has(mountKey)) {
+        // Deliberately silent: the manifest must NOT carry a clip for it.
+        expect(`mount_run_${mountKey}` in SFX_CLIPS).toBe(false);
+        continue;
+      }
+      const entry = SFX_CLIPS[`mount_run_${mountKey as AudibleMountKey}`];
       expect(entry).toMatchObject({
         loop: ENGINE_LOOP_MOUNTS.has(mountKey),
         spatial: true,
@@ -285,12 +298,14 @@ describe('mount running audio', () => {
 
   it('ships one non-empty MP3 asset for every catalog mount and no orphan mount clips', () => {
     const directory = new URL('../public/audio/sfx/', import.meta.url);
-    const expected = MOUNT_KEYS.flatMap((mountKey) => [
-      `mount_run_${mountKey}.mp3`,
-      ...(ENGINE_MOUNT_EXTRA_SUFFIXES[mountKey] ?? []).map(
-        (suffix) => `mount_run_${mountKey}${suffix}.mp3`,
-      ),
-    ]).sort();
+    const expected = MOUNT_KEYS.filter((mountKey) => !SILENT_MOUNTS.has(mountKey))
+      .flatMap((mountKey) => [
+        `mount_run_${mountKey}.mp3`,
+        ...(ENGINE_MOUNT_EXTRA_SUFFIXES[mountKey] ?? []).map(
+          (suffix) => `mount_run_${mountKey}${suffix}.mp3`,
+        ),
+      ])
+      .sort();
     const actual = readdirSync(directory)
       .filter((file) => file.startsWith('mount_run_') && file.endsWith('.mp3'))
       .sort();
@@ -304,19 +319,25 @@ describe('mount running audio', () => {
     }
   });
 
-  it('plays a distinct custom clip for every catalog mount', () => {
+  it('plays a distinct custom clip for every audible catalog mount, nothing for a silent one', () => {
     const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
     const played = new Set<unknown>();
 
     for (const mountKey of MOUNT_KEYS) {
       nowT += 0.5;
+      const before = sources.length;
       sfx.mountRun(0, 0, 0, mountKey, true);
+      if (SILENT_MOUNTS.has(mountKey)) {
+        // The clipless dev mount falls through without starting a source.
+        expect(sources.length).toBe(before);
+        continue;
+      }
       const src = sources.at(-1)!;
       expect(src.buffer).toBe(buffers.get(`mount_run_${mountKey}`));
       played.add(src.buffer);
     }
 
-    expect(played.size).toBe(MOUNT_KEYS.length);
+    expect(played.size).toBe(MOUNT_KEYS.length - SILENT_MOUNTS.size);
   });
 
   it('plays independently of the optional on-foot footstep toggle', () => {

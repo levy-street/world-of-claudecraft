@@ -103,10 +103,13 @@ function ride(sim: Sim, pid: number, key: string): void {
 }
 
 describe('mount catalog', () => {
-  it('has exactly nine mounts with the horse first and the developer tank last', () => {
-    expect(MOUNT_KEYS).toHaveLength(9);
+  it('has exactly ten mounts with the horse first and the developer pair last', () => {
+    expect(MOUNT_KEYS).toHaveLength(10);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
-    expect(MOUNT_KEYS.at(-1)).toBe('terrorspark_groundshaker');
+    // The developer-only mounts hold the catalog tail: a new player-facing
+    // mount lands above them.
+    expect(MOUNT_KEYS.at(-2)).toBe('terrorspark_groundshaker');
+    expect(MOUNT_KEYS.at(-1)).toBe('mech_bird');
     expect(DEFAULT_MOUNT).toBe('valorsteed');
   });
 
@@ -123,6 +126,7 @@ describe('mount catalog', () => {
     expect(spec('aether_hover_cycle')).toEqual(['epic', 0.8]);
     expect(spec('thunderstrut_gobbler')).toEqual(['epic', 0.8]);
     expect(spec('terrorspark_groundshaker')).toEqual(['epic', 0.8]);
+    expect(spec('mech_bird')).toEqual(['rare', 0.75]);
     // The level field is GONE, not merely unused: it never fired (reins carry no
     // requiredLevel and every source is level-20 content) and leaving it would
     // invite a second gate to grow back beside ridingTrained.
@@ -170,15 +174,16 @@ describe('mount reins items (the collection: owning the item is owning the mount
   const reinsFor = (key: string) =>
     Object.values(ITEMS).filter((d) => d.kind === 'mount' && d.mount === key) as MountItemDef[];
 
-  it('every mount has exactly one reins item; player reins are unbound, the dev tank stays bound', () => {
+  it('every mount has exactly one reins item; player reins are unbound, the dev pair stays bound', () => {
     for (const key of MOUNT_KEYS) {
       const items = reinsFor(key);
       expect(items).toHaveLength(1);
       const item = items[0];
       expect(mountItemId(key)).toBe(item.id);
-      if (key === 'terrorspark_groundshaker') {
-        // The developer-only tank stays soulbound: it has no player acquisition
-        // path, and tradability would turn a dev grant into a leak vector.
+      if (key === 'terrorspark_groundshaker' || key === 'mech_bird') {
+        // The developer-only mounts stay soulbound: neither has a player
+        // acquisition path, and tradability would turn a dev grant into a
+        // leak vector.
         expect(item.soulbound).toBe(true);
       } else {
         // Player reins are NOT soulbound: they trade, mail, list, and store in
@@ -254,6 +259,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
     for (const key of MOUNT_KEYS) {
       if (key === 'valorsteed') continue; // the purchase, not a drop
       if (key === 'terrorspark_groundshaker') continue; // developer-only, pinned separately below
+      if (key === 'mech_bird') continue; // developer-only, pinned separately below
       const itemId = mountItemId(key)!;
       const rarity = MOUNTS[key].rarity;
       // No mount is ever on a NORMAL mob table, at any rarity.
@@ -317,64 +323,73 @@ describe('mount reins items (the collection: owning the item is owning the mount
     }
   });
 
-  it('keeps the tank developer-only and absent from every normal acquisition table', () => {
-    const itemId = 'reins_terrorspark_groundshaker';
-    const item = ITEMS[itemId] as MountItemDef;
-    expect(item).toMatchObject({
-      kind: 'mount',
-      mount: 'terrorspark_groundshaker',
-      quality: 'epic',
-      soulbound: true,
-      noDiscard: true,
-      sellValue: 0,
-    });
-    expect(item.buyValue).toBeUndefined();
+  it('keeps the developer mounts dev-only and absent from every normal acquisition table', () => {
+    const DEV_MOUNT_REINS = [
+      {
+        itemId: 'reins_terrorspark_groundshaker',
+        mount: 'terrorspark_groundshaker',
+        quality: 'epic',
+      },
+      { itemId: 'reins_mech_bird', mount: 'mech_bird', quality: 'rare' },
+    ] as const;
+    for (const { itemId, mount, quality } of DEV_MOUNT_REINS) {
+      const item = ITEMS[itemId] as MountItemDef;
+      expect(item).toMatchObject({
+        kind: 'mount',
+        mount,
+        quality,
+        soulbound: true,
+        noDiscard: true,
+        sellValue: 0,
+      });
+      expect(item.buyValue).toBeUndefined();
 
-    for (const mob of Object.values(MOBS)) {
+      for (const mob of Object.values(MOBS)) {
+        expect(
+          mob.loot.some((entry) => entry.itemId === itemId),
+          `${itemId} must not be on ${mob.id}`,
+        ).toBe(false);
+      }
+      for (const [bossId, loot] of Object.entries(HEROIC_BOSS_LOOT)) {
+        expect(
+          loot.some((entry) => entry.itemId === itemId),
+          `${itemId} must not be on heroic boss ${bossId}`,
+        ).toBe(false);
+      }
+      expect([
+        ...RIFT_GREEN_MOUNT_REINS,
+        ...RIFT_BLUE_MOUNT_REINS,
+        ...RIFT_EPIC_MOUNT_REINS,
+      ]).not.toContain(itemId);
+      for (const npc of Object.values(NPCS)) {
+        expect(npc.vendorItems ?? [], `${itemId} must not be sold by ${npc.id}`).not.toContain(
+          itemId,
+        );
+      }
       expect(
-        mob.loot.some((entry) => entry.itemId === itemId),
-        `${itemId} must not be on ${mob.id}`,
-      ).toBe(false);
-    }
-    for (const [bossId, loot] of Object.entries(HEROIC_BOSS_LOOT)) {
-      expect(
-        loot.some((entry) => entry.itemId === itemId),
-        `${itemId} must not be on heroic boss ${bossId}`,
-      ).toBe(false);
-    }
-    expect([
-      ...RIFT_GREEN_MOUNT_REINS,
-      ...RIFT_BLUE_MOUNT_REINS,
-      ...RIFT_EPIC_MOUNT_REINS,
-    ]).not.toContain(itemId);
-    for (const npc of Object.values(NPCS)) {
-      expect(npc.vendorItems ?? [], `${itemId} must not be sold by ${npc.id}`).not.toContain(
-        itemId,
-      );
-    }
-    expect(
-      HEROIC_VENDOR_STOCK.map((offer) => offer.itemId),
-      `${itemId} must not be sold by the Heroic Quartermaster`,
-    ).not.toContain(itemId);
-    for (const [delveId, offers] of Object.entries(DELVE_SHOPS)) {
-      expect(
-        offers.map((offer) => offer.itemId),
-        `${itemId} must not be sold by delve shop ${delveId}`,
+        HEROIC_VENDOR_STOCK.map((offer) => offer.itemId),
+        `${itemId} must not be sold by the Heroic Quartermaster`,
       ).not.toContain(itemId);
-    }
-    expect(
-      MARKET_HOUSE_STOCK.map((offer) => offer.itemId),
-      `${itemId} must not be seeded by the World Market`,
-    ).not.toContain(itemId);
-    for (const quest of Object.values(QUESTS)) {
+      for (const [delveId, offers] of Object.entries(DELVE_SHOPS)) {
+        expect(
+          offers.map((offer) => offer.itemId),
+          `${itemId} must not be sold by delve shop ${delveId}`,
+        ).not.toContain(itemId);
+      }
       expect(
-        Object.values(quest.itemRewards),
-        `${itemId} must not be rewarded by ${quest.id}`,
+        MARKET_HOUSE_STOCK.map((offer) => offer.itemId),
+        `${itemId} must not be seeded by the World Market`,
       ).not.toContain(itemId);
-      expect(
-        quest.requiredItems ?? [],
-        `${itemId} must not be required by ${quest.id}`,
-      ).not.toContain(itemId);
+      for (const quest of Object.values(QUESTS)) {
+        expect(
+          Object.values(quest.itemRewards),
+          `${itemId} must not be rewarded by ${quest.id}`,
+        ).not.toContain(itemId);
+        expect(
+          quest.requiredItems ?? [],
+          `${itemId} must not be required by ${quest.id}`,
+        ).not.toContain(itemId);
+      }
     }
   });
 
@@ -740,10 +755,11 @@ describe('mount reins transfer (not soulbound: the collection trades hands)', ()
     }
   });
 
-  it('the developer tank stays refused by the exchange pipes (still soulbound)', () => {
+  it('the developer mounts stay refused by the exchange pipes (still soulbound)', () => {
     expect(guildBankPipeRefusal({ itemId: 'reins_terrorspark_groundshaker', count: 1 })).not.toBe(
       null,
     );
+    expect(guildBankPipeRefusal({ itemId: 'reins_mech_bird', count: 1 })).not.toBe(null);
   });
 
   it('vendor sell still refuses reins (noVendorSell: sellValue 0 protects the collection)', () => {
