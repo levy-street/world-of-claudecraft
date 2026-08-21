@@ -26,7 +26,7 @@
 | 11 QA | verify | complete | 2026-08-19 | 2026-08-20 |
 | 11b | Farming absorb | complete | 2026-08-20 | 2026-08-20 |
 | 11b QA | verify | complete | 2026-08-20 | 2026-08-21 |
-| 11c | Food and feast reconciliation | pending | | |
+| 11c | Food and feast reconciliation | complete | 2026-08-21 | 2026-08-21 |
 | 11c QA | verify | pending | | |
 | 11d | Derived artifacts, pins, and the merge audit | pending | | |
 | 11d QA | verify | pending | | |
@@ -715,6 +715,28 @@ is deliberately not copied here, it lives in the farming record.
   gathering-tool family. The stale `phase-11e-farming-apex-arm.md` is replaced by
   `phase-11e-mastery-curve.md` and deleted; its apex-feast design moves into 11h and
   11k and its GATE 1 material into 11e, so no table references the old file.
+- Phase 11c (2026-08-21): FOOD AND FEAST RECONCILED, the well-fed unification
+  executed per decision 2 (all six axes: one 'well_fed' id as the exported
+  WELL_FED_AURA_ID seam, FoodItemDef.wellFed, clear-then-grant at the
+  updateRegen completion site delegating to farming's src/sim/wellfed.ts,
+  farming's tooltip view surviving on masterwrought's key pair, the ladder
+  re-tuned to 2/3/4/5 at 600s with the apex plates at 6/900 derived from the
+  elixir ladder's own step). The feast bite's silent payload loss is closed
+  at the CLASS level by the one src/sim/consuming.ts builder (11c-A2-BUILDER)
+  with the feast-versus-bag whole-record identity pin; farming's useWellfed
+  key pair and its ten overlay rows retired (11c-A4-KEYPAIR); the Hearth
+  clause reads "dinner" verbatim (11c-VOCAB) and the professions overview
+  went COUNT-FREE (the recorded 11b-R3c-2 resolution: the guard stands, the
+  ruling's wording amended in place); the feast now outranks the farm bed
+  with both directions pinned (11b-R3c-1 executed; the station half moot by
+  construction); the Laden Hearth pairing pinned; the flourish tension closed
+  accept-and-record; carry 12 closed accept (family-convention serializer).
+  All 30 handed reds green; the i18n named red was resolved in-phase under
+  the 11b tsc precedent; remaining reds are 11d's (69 goldens, the guide
+  regen pair, the parked pins/ceilings/census), with the farming_session
+  prediction PROVEN by a restored trial re-record (rng draws and digests
+  byte-identical across all 69 scenarios). Full record: state.md, "Phase 11c
+  BUILT ledger".
 - Phase 11b QA (2026-08-21): THE ABSORB VERIFIED, verdict PASS. Release sync
   a no-op again (v0.40.0 still ancestor). Seven-lane ultracode audit + five
   fresh domain reviewers + qa-checklist over d5304a78c4..8f3efa2fc8: the

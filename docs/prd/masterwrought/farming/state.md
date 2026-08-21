@@ -471,7 +471,7 @@ closed-by-X.
 | (be) simplified-mode gathering rows (a Professions 2.0 surface change) | P8 QA | maintainer | open ruling-owed |
 | (bg) intro grant fence, trade-pipe leak, garden_hoe reagent knock-on | P9 | maintainer | open ruling-owed |
 | (bh) NPCs-are-terrain pad rule (Highwatch eyeballed, no re-seat) | P9 | maintainer | open ruling-owed |
-| Well-fed ladder magnitudes: capstone at the elixir ceiling, 24-stam stacking, twins stat-identity, tier-1 inversion, unanchored raid-floor phrase | P11 / P11 QA | maintainer | open ruling-owed |
+| Well-fed ladder magnitudes: capstone at the elixir ceiling, 24-stam stacking, twins stat-identity, tier-1 inversion, unanchored raid-floor phrase | P11 / P11 QA | maintainer | CLOSED 2026-08-21 by decision 2 (11c-D-2), executed in MW 11c: farming rungs 2/3/4/5 at 600s, apex plates 6/900 (derived: entry value; entry duration plus the elixir ladder's own 300s step); one 'well_fed' id retires the stacking read (dish plus elixir tops at 17) and resolves the tier-1 inversion at 2; the raid-floor phrase is anchored by the untouched R5 kit arithmetic (flask 15 plus food 6 equals 21) |
 | Feast tuning: charges 10, 180 s, trainer fee 10000, sellValue 250, reagents x4/x4/x2 | P12 | maintainer | open ruling-owed |
 | Seed-back rates 0.08/0.40 tier 3, 0.06/0.35 tier 4 (economy-sensitive) | P5 | maintainer | open ruling-owed |
 | Watch fees 2/3/4/6, compost 2/8, FARM_HUSKS_PER_COMPOST 2, tonic bonus 0.5/2 | P4 | maintainer | open ruling-owed |
@@ -595,8 +595,8 @@ except the one hand-back, which gets its own table row:
 |---|---|---|---|
 | ip-17-PUSH: consent to push the merged branch (the one delegated hand-back; needs an input that does not exist yet) | MW P17 | maintainer | open ruling-owed |
 | The masterwrought delegated-rulings block (133 rows, the full delegation plus the same-day reconcile pass), migrated here whole at the 11b doc move | MW 11b | record | closed-by-the-2026-08-20-delegation (block below) |
-| The guide professions-overview reword (ruling 11b-R3c-2): write the merged five-gathering sentence around guide.profPages plus the five non-Latin overlays, AND reconcile it with farming's count-free guard in tests/guide.test.ts, which forbids ANY spelled count while the ruling's wording spells "five"; 11c records whichever way it resolves (11b carry items 4 and 14) | MW 11c | 11c session | open ruling-owed |
-| The interaction-priority pin (ruling 11b-R3c-1): the placed transient (station or feast) wins over the farm bed. The merged tree keeps farming's shipped bed-over-feast order and masterwrought stations take NO press today (proximity-activated), so the both-directions pin needs the arm reorder first; owned by 11c per the ruling's carry clause, with the apex-feast press also concerning 11k (11b carry item 7) | MW 11c | 11c session | open ruling-owed |
+| The guide professions-overview reword (ruling 11b-R3c-2): write the merged five-gathering sentence around guide.profPages plus the five non-Latin overlays, AND reconcile it with farming's count-free guard in tests/guide.test.ts, which forbids ANY spelled count while the ruling's wording spells "five"; 11c records whichever way it resolves (11b carry items 4 and 14) | MW 11c | 11c session | CLOSED 2026-08-21, executed COUNT-FREE: guide.professions.whatBody rewritten ("the gathering trades ... a ring of ten crafts"; "every gathering profession") with real count-free fills in the five non-Latin overlays; the guard stands unamended (its names-every-trade arm is self-maintaining) and ruling row 6 below carries the dated wording amendment; the stale professions.ts code comment swept (carry 15); reasoning in the 11c BUILT ledger |
+| The interaction-priority pin (ruling 11b-R3c-1): the placed transient (station or feast) wins over the farm bed. The merged tree keeps farming's shipped bed-over-feast order and masterwrought stations take NO press today (proximity-activated), so the both-directions pin needs the arm reorder first; owned by 11c per the ruling's carry clause, with the apex-feast press also concerning 11k (11b carry item 7) | MW 11c | 11c session | CLOSED 2026-08-21, EXECUTED (not re-routed): tryNearbyInteraction reordered (nodes, feast, bed, escort-away) and BOTH directions pinned in one tests/nearby_interaction.test.ts rig; the station half stays moot by construction (stations take no press; recorded at the arm), and 11k's apex feasts ride the ordered feast arm as placed farm_feast entities |
 
 ### Decisions closed 2026-08-20 (the full delegation)
 
@@ -692,6 +692,14 @@ existing row that was wrong is AMENDED IN PLACE with a dated line rather than re
    implementation-plan.md's Phase 16 arm changes from "author" to "verify: no shipped string
    says four gathering". WHY: 11c already owns a guide.ts reword plus five-overlay obligation
    in the same fill batch, so folding one more reword in costs nothing.
+   (AMENDED 2026-08-21 by 11c's recorded reconciliation: the sentence is COUNT-FREE, not
+   spelled ("the gathering trades that pull raw material straight out of the land ... a ring
+   of ten crafts"; "every gathering profession"), because farming's count-free guard in
+   tests/guide.test.ts forbids any spelled gathering count and exists precisely because a
+   spelled count lies the moment another trade registers, which the shipped "four" was doing;
+   the guard's names-every-trade arm is the self-maintaining form of this ruling's intent.
+   The five non-Latin overlays carry the count-free fills. Phase 16's verify arm is
+   unchanged and already satisfied.)
 7. 11b-PARK-1. Neither deleted nor moved: farming REFACTORED the icon-art assertion and the
    merged tree takes farming's refactored form (artSubjectHotbarItemIds plus
    pendingHotbarItemIds plus a both-directions debt check), with both literals re-derived on
@@ -1883,6 +1891,16 @@ visit or a punishment for lateness is violating the design, not tuning it.
   exclusivity-slot trap). Every new aura name gets an `AURA_NAME_KEY` row. Magnitudes
   are modest, classic-era, at or below the existing elixir budget ceilings; crafted
   power stays below the raid floor.
+  (SUPERSEDED IN PART 2026-08-21 by decision 2, executed in Masterwrought 11c.
+  STANDS: the completion-timing half (with (bx)) and the food-path half (the mint
+  fires from the eating slot's completion, via ctx.applyAura, never through
+  effect_dispatch; deviation (bx) unaffected). SUPERSEDED: the `wellfed_<kind>`
+  namespace half and the BaseItemDef `wellfed` field half: the one aura id is
+  'well_fed' (WELL_FED_AURA_ID, src/sim/wellfed.ts), kind-agnostic, so the whole
+  food family is one-at-a-time and elixir coexistence holds because the ids can
+  never collide; the one field is FoodItemDef.wellFed, kind-scoped. The "at or
+  below the elixir budget ceiling" calibration was retired with the namespace:
+  it produced the trainer-over-apex inversion the 11c-D-2 ladder removed.)
 - D16: The shared feast (the tier-4 showcase): placed by a player, spawns a REAL entity
   so the normal entity snapshot carries it to everyone (the battleground flag precedent;
   the mobile-station `mst` scalar cannot carry a shared world object and has no render

@@ -6470,3 +6470,197 @@ window); C11 both nameplate comments + the cast display names (the SUNDER
 interlock verified); C12 mob_boss_mechanics 8/8 green; C13 exactly 10
 closed-by-Phase-14 handoff rows, matching the acceptance matrix (A5, B8,
 C12, C13 had no pre-existing rows to discharge).
+
+## Phase 11c BUILT ledger (2026-08-21, food and feast reconciled; the well-fed unification executed)
+
+Session facts: worktree guard passed (EnterWorktree into wocc-masterwrought);
+release sync a VERIFIED NO-OP again (origin/release/v0.40.0 tip 65b91fa190
+already an ancestor, newest by version sort; no merge, no release-merge-audit
+owed). Base: the 11b QA close tip 4f9097858c, tsc clean and architecture
+green at start. ULTRACODE: no per the phase file (a careful serial build with
+fresh reviewers).
+
+### Decision 2, SETTLED 2026-08-20 and EXECUTED as written
+Rulings 11b-D-2 / 11c-D-2 executed on all six axes, no gate left reading
+confirm-at-STEP-0: one aura id 'well_fed' (exported as WELL_FED_AURA_ID from
+src/sim/wellfed.ts, THE seam constant every site references; the one
+re-typing of the string is the identity pin in tests/wellfed.test.ts);
+FoodItemDef.wellFed as the one field (farming's lowercase twin deleted, its
+runtime kind guard unrepresentable, pinned by a self-verifying
+ts-expect-error); masterwrought's clear-then-grant order at the updateRegen
+completion site, now delegating to the module; farming's src/sim/wellfed.ts
+module (rewritten header: the single-id rule and why it is stronger, elixir
+coexistence by construction) and farming's tooltip view surviving.
+
+### The ladder and its derivation (no number invented)
+Farming dishes 2/3/4/5 at 600s (one stamina point per crop tier, at the
+entry duration); apex plates 6/900. The apex VALUE stays 6,
+elixir_of_the_boar's entry rung, the number R5's kit was measured against
+(flask 15 plus food 6 equals 21, untouched). The apex DURATION is DERIVED:
+entry duration (600) plus the elixir ladder's own duration step read live
+(venomfire_elixir 900 minus boar 600 = 300), so 900. The R23 challenge is
+answered in the apex block comment and here: raising the crafted duration is
+ladder ORDERING inside the crafted line, not floor creation (no vendor item
+grants Well Fed; R5's always-on premise is duration-indifferent). Farming's
+flagged 24-stamina stacking read resolves to 17 (dish 5 plus elixir 12); the
+tier-1 inversion resolves at 2. Pins: masterwrought_budget re-derives the
+apex band live and gains the live-catalog strict-dominance sweep (a fifth
+dish authored at or above the apex reds the day it ships); farm_recipes
+derives the dish rungs off the boar anchor rather than pasting.
+
+### The carried payload (ruling 11c-A2-BUILDER)
+src/sim/consuming.ts is the one Consuming build site; BOTH real writers
+route through it (items.ts useItem food/drink arm; the feast bite, which
+previously hand-built the record with no wellFed carry and silently minted
+nothing). tests/consuming.test.ts drives the builder directly and holds the
+acceptance at source level (no hand-built eating/drinking literal outside
+sim.ts's two dev freezes). THE TWO DELIBERATE NON-WRITERS, named so nobody
+"fixes" them: sim.ts's 'dev_cascade_freeze' and 'dev_sandbox_freeze'
+zero-rate meals (no item def, sentinel remaining, must never mint) stay
+hand-built by design. Monolith position considered: consuming.ts is a
+57-line pure leaf outside MONOLITHS; no ceiling entry owed. The
+feast-versus-bag identity pin (professions_feast) compares the minted aura
+as a WHOLE record through the real tick path in both runs. The wire was
+re-verified untouched: server game.ts ships eat: { remaining } only.
+
+### One view, one key pair, one vocabulary
+wellfed_tooltip_view.ts survives (export renamed wellFedTooltipLines),
+re-pointed to the surviving keys' placeholder sets READ OFF the catalog
+({stat}/{value}/{minutes}; {aura} only in the fallback), wired at
+masterwrought's restore-adjacent hud position; the elixir-module twin and
+hud.ts's second import and call are deleted (hud.ts shrank; the ratchet as a
+reduction). Ruling 11c-A4-KEYPAIR executed: farming's useWellfed pair and
+its ten overlay rows died in the same change; the exactly-one-line rule is
+pinned per buff food AND as a method-scoped exact-count source pin on
+Hud.itemTooltip. DELIBERATE NON-ACTION recorded in elixir_tooltip_view.ts:
+ELIXIR_STAT_KEYS stays a private byte-identical twin of WELLFED_STAT_KEYS
+(rule of three; the leaf is named for well-fed because of the guide's
+spoiler-containment constraint). The retired farming aura terms were swept
+from the zh_CN/zh_TW/ko_KR guide surfaces onto the kept aura.wellFed terms
+(carry 11). 11c-VOCAB executed verbatim: 'a mobile field kitchen so dinner
+gets cooked at the dungeon door'. The Laden Hearth pairing pin landed in
+tests/mobile_station_party.test.ts (a cook with a live Hearth cooks
+recipe_harvest_feast away from any static kitchen, every input read off the
+live recipe). Both feasts kept, as ruled; nothing merged.
+
+### The guide sentence and the count-free RESOLUTION (obligation 1, RECORDED CHOICE)
+Ruling 11b-R3c-2's wording spelled "five gathering trades" while farming's
+guard in tests/guide.test.ts forbids ANY spelled gathering count; the two
+could not both stand. RESOLVED: the sentence is COUNT-FREE ("the gathering
+trades that pull raw material straight out of the land"; "every gathering
+profession") and the ruling's wording is amended in place in the delegated
+block (farming/state.md row 6, dated line). WHY count-free wins: the guard
+exists because a spelled count made the wiki lie the moment a fifth trade
+registered, which is EXACTLY what the shipped "four" was doing; the guard's
+names-every-trade arm is self-maintaining (a sixth trade fails until named),
+while spelling "five" would re-arm the same staleness bug and weaken a guard
+that had just caught it. Phase 16's verify arm ("no shipped string says four
+gathering") is satisfied verbatim. The five non-Latin overlays carry real
+count-free fills in the same change; the stale "the four gathering" code
+comment in src/guide/pages/professions.ts was swept (carry 15).
+
+### The interaction reorder (obligation 2, ruling 11b-R3c-1 EXECUTED, not re-routed)
+The press competition is NOT moot for the feast: a placed harvest_feast and
+a farm bed stand in reach together today, and farming's shipped order gave
+the press to the bed. The arms are reordered in
+src/game/nearby_interaction.ts (nodes, then FEAST, then bed, then
+escort-away) and BOTH directions are pinned in one
+tests/nearby_interaction.test.ts rig (feast plus bed presses the feast; the
+identical press opens the bed once the feast despawns). The STATION half
+stays moot BY CONSTRUCTION and is recorded at the arm and here: mobile
+crafting stations take no interact press at all (proximity-activated via
+inRangeStationTypes), so there is no station arm to order until one gains a
+press; 11k's apex feasts ride the ordered feast arm as placed farm_feast
+entities. The handoff row is closed EXECUTED, not re-routed.
+
+### The flourish design call (obligation 4 / carry 16, CLOSED accept-and-record)
+Chosen: accept-and-record, written into applyFeasts' own doc comment in
+src/render/farm_patches.ts as a second accepted residual beside the module's
+scope-reentry precedent. Grounds: no renderer prewarm pass precedes the
+online mirror's first snapshot today, so the burst window is empty; the
+puffs are cosmetic and ride vfx.ts's scaled budget; and both code options
+would couple farm visuals to another mirror's sync semantics for a race that
+does not exist. The comment names the correct future fix (hold
+farmPatchVisuals.sync at the RENDERER call site until the mirror syncs) and
+forbids the non-empty-map guard that would flip the pinned rebuild/login
+silence. The pinned unarmed-baseline arm is untouched.
+
+### Carry 12 CLOSED: the farming:0 serialization call (accept, with grounds)
+serializeCharacter writes the WHOLE folded gatheringProficiency record and
+always has: mining/logging/herbalism/fishing zeroes ship non-omitted, so
+farming: 0 is the family convention, not a farming quirk. Omitting only
+farming's zero would make one key's presence value-dependent against four
+unconditional siblings for a one-time ~14-byte rewrite per character.
+ACCEPTED as-is, no code change; 11d's blob-roundtrip fixture still takes a
+FRACTIONAL farming value per its own instruction (unrelated to this call).
+
+### Deviations and drift (recorded, not silent)
+- THE i18n NAMED RED WAS RESOLVED HERE, NOT HANDED TO 11d: retiring the
+  useWellfed catalog keys makes the committed resolved slices
+  excess-property RED under tsc (22 files), so the phase file's premise that
+  the stale bundles stay compilable was drift, and the tsc-clean exit
+  criterion is unreachable without i18n:gen. Regenerated and committed under
+  the 11b precedent (the merge ran the same generators in-commit for the
+  same reason). Consequence: 11d's named-red list loses the i18n row; the
+  guide/wiki row and the parity goldens remain 11d's.
+- The generated wiki effect shape KEEPS its lowercase wellfed key
+  (build_content.mjs emit, content.generated.ts type, professions_craft.ts
+  read): a serialized shape name, consumer-pinned, deliberately NOT the def
+  field spelling; renaming it now would tsc-red the committed generated type
+  until 11d's regen. Recorded as the one surviving lowercase spelling beside
+  the surviving module filenames (wellfed.ts, wellfed_tooltip_view.ts,
+  wellfed_stat_keys.ts), none of which are the retired identifier.
+- tests/recipe_economy.test.ts is on this phase's STEP 3 validation list but
+  its 2 reds are the 11b-parked 11d-owned count pins (the 11b red list's
+  "recipe_economy (2)"); nothing this phase touched feeds them (no sellValue,
+  no count moved). Not defects of this phase.
+- The 11b red list's guide.test.ts row (the count-free guard) went GREEN
+  here; the FILE now carries exactly the 2 freshness reds named to 11d (the
+  regen-diff arm and the C10 effect-row mirror, which this phase re-aimed
+  to the post-regen truth of SEVEN effect rows: the plates gain cells).
+- The parity scenario beat labels (wellfed-eating, wellfed-dish-minted,
+  feast-wellfed-minted, ...) keep their historical hyphenated names: they are
+  recorded snapshot labels whose rename would move goldens for no behavior.
+
+### RELEASE-FILL OBLIGATIONS (reword-staleness, flagged BY KEY for the Phase 17 fill)
+- guide.profPages.craftProse.cooking.routeBody: the Hearth clause reword
+  ("the feast" to "dinner"). Filled in every locale; ALL locale rows are now
+  silently stale against the new English (the reword-staleness class; the
+  flag is the deliverable per 11c-VOCAB).
+- guide.professions.whatBody: the count-free reword. The five non-Latin
+  overlays were re-filled in this change; every LATIN overlay row is now
+  silently stale against the new English.
+- (Standing from the 11b QA: prog_master_gatherer's desc overlay rows,
+  deleted in all 18 locales, remain owned by the release fill; not re-filled
+  here.)
+
+### The named red list movement (this phase's whole delta)
+11C-OWNED reds, 30 in 8 files at handoff, ALL GREEN at this tip: wellfed 10,
+professions_feast 4, feast_online 1, wellfed_tooltip_view 6,
+feast_tooltip_view 6, localization_fixes 1, guide (count-free arm) 1,
+parity/coverage_c 1. The verification surface GREW: consuming.test.ts (6),
+the feast-versus-bag identity pin, the two exclusivity cases, the
+retired-namespace sweep (no quoted wellfed_ prefix in src/, scripts/, tests/,
+shared-walker + stripped comments, self-audited), the exactly-one-tooltip-
+line pins, the ladder derivation and strict-dominance sweeps, the both-
+direction interaction pins, and the Laden Hearth pairing pin.
+REMAINING reds at this tip, all 11d-owned: the 69 parity golden compares,
+tests/guide.test.ts (2, the wiki regen), and 11b's parked count pins,
+monolith ceilings (renderer.ts, online.ts), art census, and the
+farm_props fingerprint, per the 11b ledger.
+
+### The predicted farming_session composition handed to 11d (checked, not pasted)
+PROVEN on this tip by a full UPDATE_PARITY re-record diffed against the
+committed goldens and then RESTORED (nothing re-recorded in the tree):
+- ALL 69 scenarios: every frame's rng.draws AND rng.digest BYTE-IDENTICAL to
+  the committed goldens (zero mismatches; the audit script walked every
+  frame). A digest that moves during 11d's re-record is a real regression the
+  re-record would bless, never an expected delta.
+- farming_session: the six readable aura rows move exactly as predicted, id
+  wellfed_buff_sta to well_fed, value 12 to 5, duration 900 to 600,
+  remaining down by EXACTLY 300 in every row, name "Well Fed" and school
+  "nature" unchanged; the rows are PRESENT in the same six frames (117, 118,
+  119, 140, 142, 143; the feast-wellfed-minted frame included, the carry
+  proof), total draws 110 both sides, final drawDigest equal.
+- Everything else moving in the re-record is the known 11b +4 entity-id
+  shift and the derived state digests, per the 11b QA's characterization.
