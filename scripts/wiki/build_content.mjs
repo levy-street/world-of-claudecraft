@@ -699,21 +699,22 @@ const vendorTaughtRecipe = (r) =>
 // templates, never baked prose. Spoiler-safe by construction: both are overt
 // facts the item's own tooltip already states (no probabilities, no hidden
 // constants; the seconds value is the same CONSUME_DURATION the tooltip
-// renders). Null for a non-consumable output. Reads farming's `wellfed`
-// spelling only, as authored: when 11c unifies the two well-fed spellings
-// onto FoodItemDef.wellFed, this read moves onto the surviving field in the
-// same change (on the 11c carry list).
+// renders). Null for a non-consumable output. Reads the one unified
+// FoodItemDef.wellFed field (Masterwrought 11c), so every well-fed carrier,
+// the four farm buff dishes and the three apex role plates alike, gets its
+// effect cell; the generated shape keeps its lowercase `wellfed` key (a
+// wire-shape name in content.generated.ts, not a def read).
 const consumableEffect = (itemId) => {
   const def = ITEMS[itemId];
   if (!def) return null;
   const effect = {};
   if (def.foodHp) effect.food = { amount: def.foodHp, seconds: CONSUME_DURATION };
-  if (def.wellfed) {
+  if (def.wellFed) {
     effect.wellfed = {
-      aura: def.wellfed.aura,
-      kind: def.wellfed.kind,
-      value: def.wellfed.value,
-      minutes: def.wellfed.duration / 60,
+      aura: def.wellFed.aura,
+      kind: def.wellFed.kind,
+      value: def.wellFed.value,
+      minutes: def.wellFed.duration / 60,
     };
   }
   return Object.keys(effect).length > 0 ? effect : null;

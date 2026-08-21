@@ -1241,7 +1241,7 @@ export interface OtherItemDef extends BaseItemDef {
   // farm_feast world entity instead of consuming food. `charges` is how many
   // players may eat once each, `durationTicks` the tick-domain lifetime, and
   // `dishItemId` names the dish whose serving each bite IS: the eating slot
-  // points at that dish, so its foodHp and wellfed fields drive the restore
+  // points at that dish, so its foodHp and wellFed fields drive the restore
   // and the completion mint unchanged (src/sim/professions/feast.ts owns the
   // whole lifecycle; both numbers are maintainer-flagged tuning). It lives
   // HERE rather than on BaseItemDef for the same reason wellFed lives on
@@ -1266,18 +1266,12 @@ export interface OtherItemDef extends BaseItemDef {
 // Optional, because most food is a plain sit-down heal with no buff at all.
 export interface FoodItemDef extends BaseItemDef {
   kind: 'food';
+  // The one well-fed field (unified in Masterwrought 11c; farming's lowercase
+  // `wellfed` twin was retired with its per-kind aura namespace). The aura is
+  // minted only when the 18s sit-restore COMPLETES (never on first bite; an
+  // interrupted meal forfeits it; src/sim/wellfed.ts owns the mint), under
+  // the one shared WELL_FED_AURA_ID.
   wellFed?: TimedStatBuffPayload;
-  // well-fed buff food (farming, D15): the elixir mirror for food, field for
-  // field, but the aura is minted only when the 18s sit-restore COMPLETES
-  // (never on first bite; an interrupted meal forfeits it; src/sim/wellfed.ts
-  // owns the timing and the mint). Aura ids live in the wellfed_<kind>
-  // namespace on the farming path. BOTH spellings are present during the
-  // farming absorb (Masterwrought 11b): `wellFed` above is the masterwrought
-  // payload the live mint reads, `wellfed` is the absorbed farming payload,
-  // carried by farming's four buff dishes and read only by the parked
-  // src/sim/wellfed.ts module. Phase 11c unifies them (one aura id, one
-  // field) and retires this spelling; no new content may use it.
-  wellfed?: TimedStatBuffPayload;
   // A food is a sit-down heal that may leave Well Fed; it is never also an
   // elixir source (the use path's elixir arm would never see a food anyway,
   // so an `elixir` record here would be dead data, the same class as `use`).

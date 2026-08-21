@@ -1,4 +1,4 @@
-// Well Fed: the buff-dish completion arm (farming Phase 11).
+// Well Fed: the buff-food completion mint, unified (Masterwrought 11c).
 //
 // TIMING (locked design decision): the buff applies at COMPLETION of the 18s
 // sit-restore (CONSUME_DURATION), the sit-through-the-meal ritual, never on
@@ -11,58 +11,62 @@
 // updateRegen, in the eating/drinking loop where `c.remaining <= 0` nulls the
 // slot. That is the only place a meal finishes on its own; every other exit
 // from the slot is an interruption and correctly never reaches this function.
+// The order there is clear-then-grant: the slot is nulled BEFORE this mint
+// runs, so the meal is already over from every reader's point of view when
+// applyAura lands.
 //
-// NAMESPACE: the aura id is wellfed_<kind> (today wellfed_buff_sta), a
-// deliberate sibling of the elixir arm's elixir_<kind> (src/sim/items.ts).
-// Aura replacement keys on aura.id + sourceId (auraReplacementConflicts,
-// src/sim/combat/aura_stacking.ts), so food and an elixir of the SAME stat
-// kind coexist and neither ever clobbers the other, while all buff dishes of
-// one kind share one id: last eaten wins, exactly like same-kind elixirs.
+// ONE AURA ID: every well-fed food shares WELL_FED_AURA_ID ('well_fed'),
+// kind-agnostic, no <kind> suffix. This is the classic one-food-buff rule:
+// aura replacement keys on aura.id + sourceId (auraReplacementConflicts,
+// src/sim/combat/aura_stacking.ts) and Well Fed is self-sourced, so the whole
+// food family is one-at-a-time and the newest meal always replaces the last,
+// whatever stat it carries. The single id is the STRONGER rule than the
+// retired per-kind wellfed_<kind> namespace: under per-kind ids two dishes of
+// different stats could stack, which no classic food buff ever did. Elixir
+// coexistence still holds for free, because 'well_fed' can never equal an
+// 'elixir_<kind>' id; no group registration and no new stacking mechanism is
+// involved.
 //
 // This function draws ZERO rng (no Rng access at all): the mint is a pure
-// def lookup plus applyAura, so the shared draw stream is untouched. The
-// minted aura is TRANSIENT across save/load: no persistence path serializes
-// entity auras (serializeCharacter carries no auras key), so a relog drops
-// the buff, matching every other temporary aura.
+// applyAura over the payload the meal CARRIED (Consuming.wellFed, copied off
+// FoodItemDef.wellFed at sit-down by the src/sim/consuming.ts builder), so
+// the shared draw stream is untouched and no catalog lookup happens here.
+// The minted aura is TRANSIENT across save/load: no persistence path
+// serializes entity auras (serializeCharacter carries no auras key), so a
+// relog drops the buff, matching every other temporary aura.
 
-import { ITEMS } from './data';
 import type { SimContext } from './sim_context';
-import type { Consuming, Entity } from './types';
+import type { Entity, TimedStatBuffPayload } from './types';
+
+/** The one Well Fed aura id, shared by every well-fed food. */
+export const WELL_FED_AURA_ID = 'well_fed';
 
 /**
- * Mint the Well Fed buff for a just-completed meal. PARKED UNWIRED at the
- * 11b absorb: nothing calls this yet. The live completion mint is
- * masterwrought's inline clear-then-grant in updateRegen
- * (src/sim/combat/auras.ts), which reads the `wellFed` spelling; 11c
- * unifies the spellings and decides the one mint path (state.md, the 11c
- * carry list, item 1), at which point this doc gains the real call site
- * and ordering. A dish without a `wellfed` field (every plain food and
- * all drinks) is a no-op.
+ * Mint the Well Fed buff for a just-completed meal. Called from the
+ * updateRegen completion site AFTER the consuming slot is nulled
+ * (clear-then-grant); `wellFed` is the payload the meal carried, so the
+ * grant is decided by what was eaten, not by what the catalog says now.
+ * A meal that carried no payload (every drink and every plain food) is a
+ * no-op. The kind guard the old farming module needed is unrepresentable
+ * now: only FoodItemDef can spell a wellFed payload (types beat guards),
+ * so no drink record can ever carry one into this call.
  */
-export function applyWellfedOnConsumeComplete(
+export function applyWellFedOnMealComplete(
   ctx: SimContext,
   p: Entity,
-  consumed: Consuming,
+  wellFed: TimedStatBuffPayload | undefined,
 ): void {
-  // FOOD ONLY, by contract (D15: well-fed is buff FOOD): the completion hook
-  // fires for both consume slots, so this guard is what keeps a future drink
-  // record carrying a wellfed field from silently minting at gulp completion
-  // with nothing having decided that. tests/wellfed.test.ts pins both the
-  // guard and the content-level rule (every wellfed carrier is kind 'food').
-  if (consumed.kind !== 'food') return;
-  const dishDef = ITEMS[consumed.itemId];
-  const w = dishDef && 'wellfed' in dishDef ? dishDef.wellfed : undefined;
-  if (!w) return;
-  // Field for field the elixir arm's applyAura call (src/sim/items.ts), with
-  // the wellfed_ id prefix carrying the coexistence rule above. No log emit:
+  if (!wellFed) return;
+  // Field for field the elixir arm's applyAura call (src/sim/items.ts), on
+  // the one shared id carrying the one-at-a-time rule above. No log emit:
   // the aura-gain event already covers the feedback (keeps S3 clean).
   ctx.applyAura(p, {
-    id: `wellfed_${w.kind}`,
-    name: w.aura,
-    kind: w.kind,
-    remaining: w.duration,
-    duration: w.duration,
-    value: w.value,
+    id: WELL_FED_AURA_ID,
+    name: wellFed.aura,
+    kind: wellFed.kind,
+    remaining: wellFed.duration,
+    duration: wellFed.duration,
+    value: wellFed.value,
     sourceId: p.id,
     school: 'nature',
   });
