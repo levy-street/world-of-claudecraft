@@ -1,5 +1,12 @@
 import type * as http from 'node:http';
 import { verifyLoginTwoFactor } from './account';
+import {
+  LARGE_GOLD_MOVEMENT_LIMIT,
+  LARGE_GOLD_MOVEMENT_THRESHOLD_COPPER,
+  readTopWealthHolders,
+  redactActiveFlagCounts,
+} from './account_wealth';
+import { accountWealthBreakdown, largeGoldMovementsForAccount } from './account_wealth_db';
 import { parseAdminAccountSort } from './admin_accounts_sort';
 import {
   ACTIVITY_WINDOW_DAYS,
@@ -148,7 +155,14 @@ import {
 } from './moderation_db';
 import { readModerationQueue } from './moderation_queue_cache';
 import { providerUsageSnapshot } from './provider_usage';
-import { authThrottled, clearAuthFailures, rateLimited, recordAuthFailure } from './ratelimit';
+import {
+  adminFlagWriteRateLimited,
+  adminOversightReadRateLimited,
+  authThrottled,
+  clearAuthFailures,
+  rateLimited,
+  recordAuthFailure,
+} from './ratelimit';
 import { REALM } from './realm';
 import {
   adminRolesForAccount,
@@ -156,6 +170,15 @@ import {
   roleChangeHistory,
   setAccountAdminRoles,
 } from './staff_db';
+import { flagListResponse } from './suspicion_flag_list';
+import { isSuspicionFlagStatus } from './suspicion_flag_workflow';
+import { bustSuspicionFlagCache, readSuspicionFlagDataset } from './suspicion_flags';
+import {
+  activeSuspicionFlagCounts,
+  addSuspicionFlagNote,
+  suspicionFlagsForAccount,
+  transitionSuspicionFlag,
+} from './suspicion_flags_db';
 import {
   type UnstuckHotspotRow as DbUnstuckHotspotRow,
   type UnstuckReportPage as DbUnstuckReportPage,
@@ -185,6 +208,16 @@ const ADMIN_LOGIN_MAX_PER_MINUTE = 10;
 // bad-password response so it never reveals whether the account exists.
 const ADMIN_LOGIN_TOO_MANY_FAILED_ATTEMPTS =
   'too many failed attempts, wait a few minutes and try again';
+
+// Economy-oversight endpoints (player search / wealth / flagged workflow).
+// Error literals are reverse-mapped to i18n keys by the admin client
+// (ADMIN_ERROR_KEYS in src/admin/i18n.ts); change one and the mapping in the
+// SAME change.
+const ADMIN_TOO_MANY_REQUESTS = 'too many requests, wait a moment and try again';
+const FLAG_NOT_FOUND = 'flag not found';
+const FLAG_INVALID_STATUS = 'invalid flag status';
+const FLAG_INVALID_TRANSITION = 'that status change is not allowed';
+const FLAG_NOTE_REQUIRED = 'a note is required';
 // Second factor, mirroring server/auth_routes.ts loginHandler exactly: an account
 // with TOTP enabled (account.totp_enabled_at) must supply a live code or a recovery
 // code before a token is minted. Without one, the response is a 200 CHALLENGE (never
@@ -631,6 +664,16 @@ function sortSharedIpRows<T extends { ip: string; accountCount: number; lastSeen
 function moderationHistoryTab(params: URLSearchParams): ModerationHistoryTab {
   const tab = params.get('tab');
   return tab === 'mine' || tab === 'notes' ? tab : 'all';
+}
+
+// Stamp each account row with its active suspicion-flag count. Only callers
+// holding moderation.read receive the counts at all (the flag store is
+// moderation data; accounts.read alone must not see it).
+function withActiveFlagCounts<T extends { id: number }>(
+  rows: readonly T[],
+  counts: ReadonlyMap<number, number>,
+): (T & { activeFlagCount: number })[] {
+  return rows.map((row) => ({ ...row, activeFlagCount: counts.get(row.id) ?? 0 }));
 }
 
 function getBlockedIpsForAccount(
@@ -1395,6 +1438,46 @@ export async function handleAdminApi(
       return ok(res, game.startPerfCapture(durationMs));
     }
 
+    const flagStatusMatch = /^\/admin\/api\/flags\/(\d+)\/status$/.exec(path);
+    if (req.method === 'POST' && flagStatusMatch) {
+      if (!adminFlagWriteRateLimited(req, accountId).allowed) {
+        return fail(res, 429, ADMIN_TOO_MANY_REQUESTS);
+      }
+      const body = await readBody(req);
+      if (!isSuspicionFlagStatus(body.status)) return fail(res, 400, FLAG_INVALID_STATUS);
+      const note = typeof body.note === 'string' ? body.note.trim() : '';
+      const result = await transitionSuspicionFlag({
+        flagId: Number(flagStatusMatch[1]),
+        adminAccountId: accountId,
+        to: body.status,
+        note,
+      });
+      if (!result.ok) {
+        return result.error === 'not_found'
+          ? fail(res, 404, FLAG_NOT_FOUND)
+          : fail(res, 400, FLAG_INVALID_TRANSITION);
+      }
+      bustSuspicionFlagCache();
+      return ok(res, { flag: result.flag });
+    }
+    const flagNoteMatch = /^\/admin\/api\/flags\/(\d+)\/note$/.exec(path);
+    if (req.method === 'POST' && flagNoteMatch) {
+      if (!adminFlagWriteRateLimited(req, accountId).allowed) {
+        return fail(res, 429, ADMIN_TOO_MANY_REQUESTS);
+      }
+      const body = await readBody(req);
+      const note = typeof body.note === 'string' ? body.note.trim() : '';
+      if (!note) return fail(res, 400, FLAG_NOTE_REQUIRED);
+      const added = await addSuspicionFlagNote({
+        flagId: Number(flagNoteMatch[1]),
+        adminAccountId: accountId,
+        note,
+      });
+      if (!added) return fail(res, 404, FLAG_NOT_FOUND);
+      bustSuspicionFlagCache();
+      return ok(res, { ok: true });
+    }
+
     if (req.method !== 'GET') return fail(res, 405, 'method not allowed');
 
     // Current capture status + the last frozen result.
@@ -1491,7 +1574,55 @@ export async function handleAdminApi(
       const { page, limit } = parsePageParams(url.searchParams);
       const search = (url.searchParams.get('search') ?? '').slice(0, 64);
       const { sort, dir } = parseAdminAccountSort(url.searchParams);
-      return ok(res, await listAccounts(search, page, limit, sort, dir));
+      const list = await listAccounts(search, page, limit, sort, dir);
+      if (!identity.permissions.has('moderation.read')) return ok(res, list);
+      const counts = await activeSuspicionFlagCounts(list.rows.map((row) => row.id));
+      return ok(res, { ...list, rows: withActiveFlagCounts(list.rows, counts) });
+    }
+    if (path === '/admin/api/wealth/top') {
+      if (!adminOversightReadRateLimited(req, accountId).allowed) {
+        return fail(res, 429, ADMIN_TOO_MANY_REQUESTS);
+      }
+      const rows = await readTopWealthHolders();
+      // Flag counts are moderation data: the same rule as the accounts list.
+      return identity.permissions.has('moderation.read')
+        ? ok(res, { rows })
+        : ok(res, { rows: redactActiveFlagCounts(rows) });
+    }
+    const accountWealthMatch = /^\/admin\/api\/accounts\/(\d+)\/wealth$/.exec(path);
+    if (accountWealthMatch) {
+      if (!adminOversightReadRateLimited(req, accountId).allowed) {
+        return fail(res, 429, ADMIN_TOO_MANY_REQUESTS);
+      }
+      const targetAccountId = Number(accountWealthMatch[1]);
+      const breakdown = await accountWealthBreakdown(targetAccountId);
+      if (breakdown === null) return fail(res, 404, 'account not found');
+      const largeMovements = await largeGoldMovementsForAccount(
+        targetAccountId,
+        LARGE_GOLD_MOVEMENT_THRESHOLD_COPPER,
+        LARGE_GOLD_MOVEMENT_LIMIT,
+      );
+      return ok(res, { ...breakdown, largeMovements });
+    }
+    const accountFlagsMatch = /^\/admin\/api\/accounts\/(\d+)\/flags$/.exec(path);
+    if (accountFlagsMatch) {
+      if (!adminOversightReadRateLimited(req, accountId).allowed) {
+        return fail(res, 429, ADMIN_TOO_MANY_REQUESTS);
+      }
+      return ok(res, await suspicionFlagsForAccount(Number(accountFlagsMatch[1])));
+    }
+    if (path === '/admin/api/flags') {
+      if (!adminOversightReadRateLimited(req, accountId).allowed) {
+        return fail(res, 429, ADMIN_TOO_MANY_REQUESTS);
+      }
+      return ok(
+        res,
+        flagListResponse(
+          await readSuspicionFlagDataset(),
+          url.searchParams,
+          parsePageParams(url.searchParams),
+        ),
+      );
     }
     if (path === '/admin/api/guilds') {
       const { page, limit } = parsePageParams(url.searchParams);
@@ -1991,6 +2122,20 @@ function makeRealAdminDb() {
     loadAntibotConfig,
     listAntibotConfigHistory,
     saveAntibotConfigChange,
+    // Economy oversight: the materialised wealth reads (top holders is
+    // cache-backed like overviewCounts; an override replaces it outright),
+    // the persisted suspicion-flag workflow, and the dedicated oversight
+    // rate limiters (scoped buckets, see server/ratelimit.ts).
+    topWealthHolders: readTopWealthHolders,
+    accountWealthBreakdown,
+    largeGoldMovementsForAccount,
+    suspicionFlagDataset: readSuspicionFlagDataset,
+    suspicionFlagsForAccount,
+    transitionSuspicionFlag,
+    addSuspicionFlagNote,
+    activeSuspicionFlagCounts,
+    adminOversightReadRateLimited,
+    adminFlagWriteRateLimited,
   };
 }
 
@@ -2297,12 +2442,124 @@ async function perfTickCaptureHandler(ctx: Ctx): Promise<void> {
   ok(ctx.res, useAdminRuntime().startPerfCapture(durationMs));
 }
 
-/** GET /admin/api/accounts: paged, sortable account search (search clamped to 64 chars). */
+/** GET /admin/api/accounts: paged, sortable account search (search clamped to
+ *  64 chars; an all-digits search also matches exact account/character ids,
+ *  and character names match alongside usernames). Rows carry the materialised
+ *  gold total, plus active suspicion-flag counts for moderation.read holders
+ *  only (the flag store is moderation data). */
 async function accountsHandler(ctx: Ctx): Promise<void> {
   const { page, limit } = parsePageParams(ctx.url.searchParams);
   const search = (ctx.url.searchParams.get('search') ?? '').slice(0, 64);
   const { sort, dir } = parseAdminAccountSort(ctx.url.searchParams);
-  ok(ctx.res, await adminDb().listAccounts(search, page, limit, sort, dir));
+  const list = await adminDb().listAccounts(search, page, limit, sort, dir);
+  const identity = adminIdentityOf(ctx);
+  if (!identity?.permissions.has('moderation.read')) return ok(ctx.res, list);
+  const counts = await adminDb().activeSuspicionFlagCounts(list.rows.map((row) => row.id));
+  ok(ctx.res, { ...list, rows: withActiveFlagCounts(list.rows, counts) });
+}
+
+/** GET /admin/api/wealth/top: the rich list (top holders by materialised
+ *  total), served from the TTL cache in server/account_wealth.ts. Flag counts
+ *  are stripped for callers without moderation.read, the same rule as the
+ *  accounts list. */
+async function wealthTopHandler(ctx: Ctx): Promise<void> {
+  if (!adminDb().adminOversightReadRateLimited(ctx.req, ctxAccountId(ctx)).allowed) {
+    return fail(ctx.res, 429, ADMIN_TOO_MANY_REQUESTS);
+  }
+  const rows = await adminDb().topWealthHolders();
+  const identity = adminIdentityOf(ctx);
+  ok(
+    ctx.res,
+    identity?.permissions.has('moderation.read')
+      ? { rows }
+      : { rows: redactActiveFlagCounts(rows) },
+  );
+}
+
+/** GET /admin/api/accounts/:id/wealth: one account's gold breakdown (per
+ *  character, escrow, guild treasury context) plus its recent large
+ *  bank-ledger movements. */
+async function accountWealthHandler(ctx: Ctx): Promise<void> {
+  if (!adminDb().adminOversightReadRateLimited(ctx.req, ctxAccountId(ctx)).allowed) {
+    return fail(ctx.res, 429, ADMIN_TOO_MANY_REQUESTS);
+  }
+  const accountId = adminTargetId(ctx);
+  const breakdown = await adminDb().accountWealthBreakdown(accountId);
+  if (breakdown === null) return fail(ctx.res, 404, 'account not found');
+  const largeMovements = await adminDb().largeGoldMovementsForAccount(
+    accountId,
+    LARGE_GOLD_MOVEMENT_THRESHOLD_COPPER,
+    LARGE_GOLD_MOVEMENT_LIMIT,
+  );
+  ok(ctx.res, { ...breakdown, largeMovements });
+}
+
+/** GET /admin/api/accounts/:id/flags: the account's full flag history (active
+ *  and resolved; flags never silently disappear) with the workflow audit
+ *  trail. */
+async function accountFlagsHandler(ctx: Ctx): Promise<void> {
+  if (!adminDb().adminOversightReadRateLimited(ctx.req, ctxAccountId(ctx)).allowed) {
+    return fail(ctx.res, 429, ADMIN_TOO_MANY_REQUESTS);
+  }
+  ok(ctx.res, await adminDb().suspicionFlagsForAccount(adminTargetId(ctx)));
+}
+
+/** GET /admin/api/flags: the Flagged view (cached dataset, filtered and paged
+ *  by flagListResponse). */
+async function flagsHandler(ctx: Ctx): Promise<void> {
+  if (!adminDb().adminOversightReadRateLimited(ctx.req, ctxAccountId(ctx)).allowed) {
+    return fail(ctx.res, 429, ADMIN_TOO_MANY_REQUESTS);
+  }
+  ok(
+    ctx.res,
+    flagListResponse(
+      await adminDb().suspicionFlagDataset(),
+      ctx.url.searchParams,
+      parsePageParams(ctx.url.searchParams),
+    ),
+  );
+}
+
+/** POST /admin/api/flags/:id/status: one workflow move (validated against the
+ *  state machine), recorded with the acting admin in the audit trail. */
+async function flagStatusHandler(ctx: Ctx): Promise<void> {
+  if (!adminDb().adminFlagWriteRateLimited(ctx.req, ctxAccountId(ctx)).allowed) {
+    return fail(ctx.res, 429, ADMIN_TOO_MANY_REQUESTS);
+  }
+  const body = await readBody(ctx.req);
+  if (!isSuspicionFlagStatus(body.status)) return fail(ctx.res, 400, FLAG_INVALID_STATUS);
+  const note = typeof body.note === 'string' ? body.note.trim() : '';
+  const result = await adminDb().transitionSuspicionFlag({
+    flagId: adminTargetId(ctx),
+    adminAccountId: ctxAccountId(ctx),
+    to: body.status,
+    note,
+  });
+  if (!result.ok) {
+    return result.error === 'not_found'
+      ? fail(ctx.res, 404, FLAG_NOT_FOUND)
+      : fail(ctx.res, 400, FLAG_INVALID_TRANSITION);
+  }
+  bustSuspicionFlagCache();
+  ok(ctx.res, { flag: result.flag });
+}
+
+/** POST /admin/api/flags/:id/note: append a note-only audit event. */
+async function flagNoteHandler(ctx: Ctx): Promise<void> {
+  if (!adminDb().adminFlagWriteRateLimited(ctx.req, ctxAccountId(ctx)).allowed) {
+    return fail(ctx.res, 429, ADMIN_TOO_MANY_REQUESTS);
+  }
+  const body = await readBody(ctx.req);
+  const note = typeof body.note === 'string' ? body.note.trim() : '';
+  if (!note) return fail(ctx.res, 400, FLAG_NOTE_REQUIRED);
+  const added = await adminDb().addSuspicionFlagNote({
+    flagId: adminTargetId(ctx),
+    adminAccountId: ctxAccountId(ctx),
+    note,
+  });
+  if (!added) return fail(ctx.res, 404, FLAG_NOT_FOUND);
+  bustSuspicionFlagCache();
+  ok(ctx.res, { ok: true });
 }
 
 /** GET /admin/api/guilds: current-realm guild search with bounded pagination. */
@@ -3421,6 +3678,57 @@ export const routes: RouteDef[] = [
     middleware: [requireAdmin, requireAdminTarget('account')],
     meta: adminTargetMeta('account'),
     handler: resetPasswordHandler,
+  },
+
+  // Economy oversight (p2p market launch): the rich list, per-account gold
+  // breakdown, and the persisted suspicion-flag workflow.
+  {
+    method: 'GET',
+    path: '/admin/api/wealth/top',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: wealthTopHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/accounts/:id/wealth',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: accountWealthHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/accounts/:id/flags',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('account')],
+    meta: adminTargetMeta('account'),
+    handler: accountFlagsHandler,
+  },
+  {
+    method: 'GET',
+    path: '/admin/api/flags',
+    surface: 'admin',
+    middleware: [requireAdmin],
+    meta: ADMIN_META,
+    handler: flagsHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/flags/:id/status',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('flag')],
+    meta: adminTargetMeta('flag'),
+    handler: flagStatusHandler,
+  },
+  {
+    method: 'POST',
+    path: '/admin/api/flags/:id/note',
+    surface: 'admin',
+    middleware: [requireAdmin, requireAdminTarget('flag')],
+    meta: adminTargetMeta('flag'),
+    handler: flagNoteHandler,
   },
   {
     method: 'POST',

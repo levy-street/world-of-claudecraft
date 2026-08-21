@@ -37,6 +37,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.crossHotbarDisplayCompact': 'コンパクト',
   'hudChrome.controller.crossHotbarDisplayMinimal': '押している間のみ',
   'hudChrome.controller.crossHotbarArrangeChord': '{bumper} + {button}',
+  'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
   'hudChrome.controller.crossHotbarCarrying': '{action}を持っています。マスで決定を押すと置き、キャンセルで戻します。',
   'hudChrome.controller.crossHotbarEditHint': '配置変更中：決定でマスまたはスペルブックからアクションを持ち上げてマスに置き、キャンセルでマスを空にします。',
   'hudChrome.controller.crossHotbarEditHelp': '左バンパーを押しながら上の面ボタンを押すと、コントローラーでバーを配置変更できます。',
@@ -7886,6 +7887,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.reload': '再読み込み',
   'desktop.crash.quit': '終了',
   'desktop.crash.fatalBody': 'World of ClaudeCraft で予期しないエラーが発生したため、終了します。',
+  'desktop.window.exitToDesktop': 'デスクトップに戻る',
   'gpuNotice.bodyDesktop':
     'ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。グラフィックドライバーを更新してから、ゲームを再起動してください。Windowsでは、設定 > システム > ディスプレイ > グラフィック でこのゲームを「高パフォーマンス」に設定してください。',
   'gpuNotice.bodyDiscreteInactive':

@@ -2,6 +2,7 @@
 // Candidate storage stays in view_candidate_pool_core; this module owns only
 // entity classification and lifecycle decisions.
 
+import { corpseHasDecayed } from '../sim/respawn_policy';
 import type { Entity, QuestProgress } from '../sim/types';
 import { interactionLandmarkViewPriority } from './prewarm_policy';
 import type { QuestObjectGate } from './quest_object_gate_core';
@@ -24,6 +25,12 @@ export function entityViewIsAdmitted(
   questLog: Map<string, QuestProgress>,
   questObjectHidden: QuestObjectGate,
 ): boolean {
+  // A decayed corpse (corpseHasDecayed) has no loot left and is never
+  // selectable (dead_target.ts deadTargetSelectable), so it must not keep a
+  // view either: left standing for the rest of a long respawn wait (a
+  // self-scheduled rare/elite/world boss), it reads as a stuck, warped
+  // statue rather than an absent, still-respawning mob.
+  if (entity.kind === 'mob' && corpseHasDecayed(entity.dead, entity.corpseTimer)) return false;
   return !questObjectHidden(entity, questLog);
 }
 

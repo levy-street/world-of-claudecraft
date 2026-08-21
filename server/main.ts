@@ -45,6 +45,18 @@ import {
   verifyLoginTwoFactor,
 } from './account';
 import {
+  configureTopWealthHolders,
+  startAccountWealthSweep,
+  TOP_WEALTH_HOLDERS_LIMIT,
+} from './account_wealth';
+import {
+  applyEscrowTotals,
+  listEscrowStateRows,
+  refreshAccountPurseTotals,
+  topWealthHolders,
+  withAccountWealthSweepLock,
+} from './account_wealth_db';
+import {
   configureAdminGuildBoardCacheBust,
   configureAdminPlayersCap,
   configureAdminRuntime,
@@ -347,6 +359,8 @@ import {
 } from './static_cache';
 import { readStaticSfxSnapshot, type StaticSfxSnapshot } from './static_sfx';
 import { stopSteamMirror } from './steam/mirror';
+import { configureSuspicionFlagDataset, suspicionFlagsIdle } from './suspicion_flags';
+import { listSuspicionFlagDataset } from './suspicion_flags_db';
 import { passesTurnstile } from './turnstile';
 import { pruneUnstuckReportsBatch } from './unstuck_db';
 import { stopUnstuckRecords, UNSTUCK_RECORD_SHUTDOWN_DRAIN_MS } from './unstuck_records';
@@ -3501,6 +3515,20 @@ export async function startServer(): Promise<http.Server> {
   });
   retentionSweep.start();
 
+  // Admin economy oversight: wire the cached reads to their SQL sources and
+  // start the account-wealth sweep (self-clocked, non-overlapping; see
+  // server/account_wealth.ts for the materialisation rationale).
+  configureTopWealthHolders(() => topWealthHolders(TOP_WEALTH_HOLDERS_LIMIT));
+  configureSuspicionFlagDataset(listSuspicionFlagDataset);
+  const accountWealthSweep = startAccountWealthSweep({
+    refreshAccountPurseTotals,
+    listEscrowStateRows,
+    applyEscrowTotals,
+    // The sweep's queries are global, so exactly one process across all realms
+    // runs a pass; losers of the advisory lock stand down until their next tick.
+    withSweepLock: withAccountWealthSweepLock,
+  });
+
   const shutdown = async () => {
     // Flip readiness to draining FIRST so /readyz answers 503 and a load balancer
     // sheds new traffic before we stop the loop and persist (in-flight requests and
@@ -3516,6 +3544,9 @@ export async function startServer(): Promise<http.Server> {
     // race the pool close below.
     await retentionSweep.stop();
     await generalChatQuotaListener.stop();
+    // Stop the wealth sweep's timer (an in-flight pass logs its own failure if
+    // it races the pool close; the next boot's first pass rebuilds the totals).
+    accountWealthSweep.stop();
     game.stop();
     await game.saveAll('shutdown');
     await game.saveMarket();
@@ -3531,6 +3562,10 @@ export async function startServer(): Promise<http.Server> {
     // transient mismatch). Rejections log inside the writer, so the drain never
     // throws.
     await bankLedgerIdle();
+    // Drain queued suspicion-flag writes for the same reason: a detector
+    // confirmation or burst flag still on the FIFO tail would be rejected by
+    // pool.end(). Rejections log inside the writer, so the drain never throws.
+    await suspicionFlagsIdle();
     // Drain the character_deeds FIFO too: saveAll above already persisted every
     // blob, and an insert still queued here would be rejected by pool.end() and
     // go missing until that character's next login (the join reconcile is the

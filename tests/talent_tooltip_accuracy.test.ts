@@ -17,7 +17,7 @@ import {
   STANCE_MASTERY_GUARDED_HP_PCT,
 } from '../src/sim/types';
 import { tEntity } from '../src/ui/entity_i18n';
-import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
+import { ensureLocaleLoaded, setLanguage, supportedLanguages } from '../src/ui/i18n';
 import { grantAbilityValues, tTalent } from '../src/ui/talent_i18n';
 
 // English row prose is authored alongside the canonical effect; localized tooltips are
@@ -814,5 +814,36 @@ describe('talent tooltip accuracy for specs, masteries, and choice rows', () => 
     expect(rendered).toContain('Égida de Truenos');
     expect(rendered).toContain('10%');
     setLanguage('en');
+  });
+});
+
+// The non-English generator (effectDescription and its proc/added-effect helpers in
+// talent_i18n.ts) composes localized words mechanically, the same way grant/increase/reduce
+// already do. It must never fall back to raw ASCII connectives (@, ->, <=, >=) meant as
+// internal shorthand: those leak straight into player-facing tooltips undetected by every
+// other check here, since none of them scan for stray notation.
+describe('talent tooltip generator never leaks raw notation', () => {
+  const RAW_NOTATION = /(->|<=|>=|(?:^|[\s(])@(?:[\s)]|$))/;
+
+  it('every generated description, across every locale, is free of @ -> <= >= shorthand', async () => {
+    const rowChoices = allEntries();
+    const masteriesAndRows = effectEntries();
+    const specs = specEntries();
+    const offenders: string[] = [];
+
+    for (const lang of supportedLanguages) {
+      if (lang === 'en' || lang === 'en_CA') continue;
+      await ensureLocaleLoaded(lang);
+      setLanguage(lang);
+      for (const entry of [...rowChoices, ...masteriesAndRows, ...specs]) {
+        const text = entry.render();
+        if (RAW_NOTATION.test(text)) {
+          offenders.push(`${lang} ${entry.cls}:${entry.id} -> "${text}"`);
+        }
+      }
+    }
+    setLanguage('en');
+
+    expect(offenders, offenders.join('\n')).toEqual([]);
   });
 });

@@ -173,6 +173,45 @@ function forceIntoBgWallTrap(sim: Sim, match: BgMatch, pid: number): Entity {
   return e;
 }
 
+function forceAgainstBgWall(sim: Sim, match: BgMatch, pid: number): Entity {
+  const wall = must(
+    bgFieldPlanWalls().find((candidate) => candidate.height >= 3),
+    'battleground wall collider',
+  );
+  const e = must(sim.entities.get(pid), 'entity');
+  const meta = must(sim.meta(pid), 'player meta');
+  const origin = battlegroundOrigin(match.slot);
+  const wallX = origin.x + wall.x;
+  const wallZ = origin.z + wall.z;
+  let clearX = wallX;
+  let clearZ = wallZ;
+  for (let i = 0; i < 8; i++) {
+    const next = resolvePosition(sim.cfg.seed, clearX, clearZ, PLAYER_BODY_RADIUS);
+    const moved = Math.hypot(next.x - clearX, next.z - clearZ);
+    clearX = next.x;
+    clearZ = next.z;
+    if (moved <= 1e-6) break;
+  }
+  e.pos = sim.ctx.groundPos(clearX, clearZ);
+  e.prevPos = { ...e.pos };
+  e.facing = Math.atan2(wallX - e.pos.x, wallZ - e.pos.z);
+  e.prevFacing = e.facing;
+  e.vx = 0;
+  e.vy = 0;
+  e.vz = 0;
+  e.onGround = true;
+  e.jumping = false;
+  meta.moveInput.forward = true;
+  sim.ctx.rebucket(e);
+  const currentResolved = resolvePosition(sim.cfg.seed, e.pos.x, e.pos.z, PLAYER_BODY_RADIUS);
+  expect(Math.hypot(currentResolved.x - e.pos.x, currentResolved.z - e.pos.z)).toBeLessThan(1e-4);
+  const probeX = e.pos.x + Math.sin(e.facing) * (PLAYER_BODY_RADIUS * 0.5);
+  const probeZ = e.pos.z + Math.cos(e.facing) * (PLAYER_BODY_RADIUS * 0.5);
+  const probeResolved = resolvePosition(sim.cfg.seed, probeX, probeZ, PLAYER_BODY_RADIUS);
+  expect(Math.hypot(probeResolved.x - probeX, probeResolved.z - probeZ)).toBeGreaterThan(0.01);
+  return e;
+}
+
 function errorTexts(events: SimEvent[]): string[] {
   return events
     .filter((e): e is Extract<SimEvent, { type: 'error' }> => e.type === 'error')
@@ -1205,6 +1244,31 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     const e = forceIntoBgWallTrap(sim, match, pid);
     const meta = must(sim.meta(pid), 'player meta');
     meta.moveInput.forward = true;
+
+    expect(sim.unstuck(pid)).toBe(true);
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'started', pid }),
+    );
+
+    const events: SimEvent[] = [];
+    for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) events.push(...sim.tick());
+
+    expect(events).toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'completed', pid }),
+    );
+    expect(sim.bgMatchFor(pid)).toBe(match);
+    expect(inGraveyard(sim, match, pid, 0)).toBe(true);
+    expectClearPlayerPosition(sim, e);
+    expect(meta.pendingUnstuck).toBeNull();
+  });
+
+  it('ESC Unstuck accepts held input when collision pins the fighter against a wall', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    const e = forceAgainstBgWall(sim, match, pid);
+    const meta = must(sim.meta(pid), 'player meta');
 
     expect(sim.unstuck(pid)).toBe(true);
     expect(sim.drainEvents()).toContainEqual(

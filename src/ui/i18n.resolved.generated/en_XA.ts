@@ -7851,6 +7851,9 @@ export const en_XA: EnTranslations = {
       "reload": "[Ŕéļóáð]",
       "quit": "[Ɋúíţ]",
       "fatalBody": "[Ŵóŕļð óƒ ÇļáúðéÇŕáƒţ ĥíţ áñ úñéẋþéçţéð éŕŕóŕ áñð ñééðš ţó çļóšé.]"
+    },
+    "window": {
+      "exitToDesktop": "[Éẋíţ ţó Ðéšķţóþ]"
     }
   },
   "gpuNotice": {

@@ -137,6 +137,44 @@ describe('entity view admission', () => {
     expect(entityViewIsAdmitted(hidden, questLog, hideCollectable)).toBe(false);
     expect(entityViewIsAdmitted(visible, questLog, hideCollectable)).toBe(true);
   });
+
+  // A dead mob's corpseTimer (60s by default) is independent of its
+  // respawnTimer, which for a self-scheduled rare/elite can run far longer
+  // (Grix the Tunnelking: 15 to 30 minutes). Without this, a decayed corpse
+  // keeps its view (a rendered, unclickable body) for the whole gap.
+  it('drops a decayed corpse even though nothing hides it and it is not quest-gated', () => {
+    const alwaysShow: QuestObjectGate = () => false;
+    const decayedCorpse = entity(4, 'mob', { dead: true, corpseTimer: 0 });
+    const freshCorpse = entity(5, 'mob', { dead: true, corpseTimer: 12 });
+    const liveMob = entity(6, 'mob', { dead: false, corpseTimer: 0 });
+
+    expect(entityViewIsAdmitted(decayedCorpse, questLog, alwaysShow)).toBe(false);
+    expect(entityViewIsAdmitted(freshCorpse, questLog, alwaysShow)).toBe(true);
+    expect(entityViewIsAdmitted(liveMob, questLog, alwaysShow)).toBe(true);
+  });
+
+  it('never drops a decayed-looking dead PLAYER: the corpse rule is mob-only', () => {
+    const alwaysShow: QuestObjectGate = () => false;
+    const deadPlayer = entity(7, 'player', { dead: true, corpseTimer: 0 });
+    expect(entityViewIsAdmitted(deadPlayer, questLog, alwaysShow)).toBe(true);
+  });
+});
+
+describe('entity view retirement drops a decayed corpse even when nearby', () => {
+  const player = entity(1, 'player', { targetId: 2 });
+  const questLog = new Map<string, QuestProgress>();
+  const showAll: QuestObjectGate = () => false;
+
+  it('retires a decayed corpse inside the destroy radius, unlike a fresh one', () => {
+    const decayed = entity(5, 'mob', {
+      dead: true,
+      corpseTimer: 0,
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const fresh = entity(6, 'mob', { dead: true, corpseTimer: 30, pos: { x: 1, y: 0, z: 0 } });
+    expect(entityViewShouldDrop(decayed, player, questLog, showAll, 100)).toBe(true);
+    expect(entityViewShouldDrop(fresh, player, questLog, showAll, 100)).toBe(false);
+  });
 });
 
 describe('view build class', () => {

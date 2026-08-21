@@ -37,6 +37,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.crossHotbarDisplayCompact': '精簡',
   'hudChrome.controller.crossHotbarDisplayMinimal': '僅按住時顯示',
   'hudChrome.controller.crossHotbarArrangeChord': '{bumper} + {button}',
+  'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
   'hudChrome.controller.crossHotbarCarrying': '正在拿著{action}：在格子上按確認放置，按取消放回。',
   'hudChrome.controller.crossHotbarEditHint': '整理中：確認鍵可從格子或法術書中拿起技能並放到格子上，取消鍵清空格子。',
   'hudChrome.controller.crossHotbarEditHelp': '按住左肩鍵並按上方面鍵，即可用手把整理十字熱鍵列。',
@@ -7581,6 +7582,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.reload': '重新載入',
   'desktop.crash.quit': '離開',
   'desktop.crash.fatalBody': 'World of ClaudeCraft 發生未預期的錯誤，必須關閉。',
+  'desktop.window.exitToDesktop': '離開至桌面',
   'gpuNotice.bodyDesktop':
     '遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請更新顯示卡驅動程式後重新啟動遊戲。在 Windows 上，還請在 設定 > 系統 > 顯示器 > 顯示卡 中將本遊戲設為「高效能」。',
   'gpuNotice.bodyDiscreteInactive':

@@ -12,6 +12,7 @@ import { normalizeCheaterMarkSeconds } from '../src/sim/moderation';
 // pure leaf (schemas + codes, no db), so importing it here adds no cycle.
 import { CheaterMarkRefused } from './cheater_mark_api';
 import { pool } from './db';
+import { flagRegistrationBurst } from './suspicion_flags';
 
 export const REPORT_REASONS = [
   'harassment',
@@ -193,6 +194,24 @@ async function countRecentRegistrations(whereSql: string, params: unknown[]): Pr
   return Number(res.rows[0]?.n ?? 0);
 }
 
+// The burst cohort for the suspicion flag's related-accounts field: the same
+// window/ban predicate as countRecentRegistrations, returning ids instead of a
+// count. Bounded: the flag row caps how many related ids it stores anyway.
+const REGISTRATION_COHORT_MAX = 50;
+
+async function recentRegistrationCohortIds(whereSql: string, params: unknown[]): Promise<number[]> {
+  const res = await pool.query(
+    `SELECT id FROM accounts
+     WHERE created_at > now() - ($1 || ' minutes')::interval
+       AND banned_at IS NULL
+       AND ${whereSql}
+     ORDER BY id DESC
+     LIMIT ${REGISTRATION_COHORT_MAX}`,
+    [String(REGISTRATION_BURST_WINDOW_MINUTES), ...params],
+  );
+  return res.rows.map((row) => Number(row.id));
+}
+
 export async function createSuspiciousRegistrationReport(input: {
   accountId: number;
   username: string;
@@ -200,46 +219,57 @@ export async function createSuspiciousRegistrationReport(input: {
   userAgent?: string | null;
 }): Promise<{ created: boolean; signals: string[] }> {
   const signals: string[] = [];
+  // The where-clause of every TRIPPED signal, kept so the suspicion flag can
+  // carry the burst cohort as related accounts (see the flag call below).
+  const trippedClauses: { whereSql: string; params: unknown[] }[] = [];
   const prefix = numericPrefix(input.username);
   const ip = cleanText(input.ip, 128);
   const userAgent = cleanText(input.userAgent, 512);
   const subnet24 = ipv4Subnet24(ip);
 
+  const prefixClause = {
+    whereSql: `lower(username) LIKE $2 || '%' AND lower(username) ~ ('^' || $2 || '[0-9]+$')`,
+    params: [prefix],
+  };
   const prefixCount = prefix
-    ? await countRecentRegistrations(
-        `lower(username) LIKE $2 || '%' AND lower(username) ~ ('^' || $2 || '[0-9]+$')`,
-        [prefix],
-      )
+    ? await countRecentRegistrations(prefixClause.whereSql, prefixClause.params)
     : 0;
   if (prefix && prefixCount >= REGISTRATION_PREFIX_THRESHOLD) {
     signals.push(
       `${prefixCount} accounts with username prefix "${prefix}" in ${REGISTRATION_BURST_WINDOW_MINUTES} minutes`,
     );
+    trippedClauses.push(prefixClause);
   }
 
-  const ipCount = ip ? await countRecentRegistrations('created_ip = $2', [ip]) : 0;
+  const ipClause = { whereSql: 'created_ip = $2', params: [ip] };
+  const ipCount = ip ? await countRecentRegistrations(ipClause.whereSql, ipClause.params) : 0;
   if (ip && ipCount >= REGISTRATION_IP_THRESHOLD) {
     signals.push(
       `${ipCount} accounts from IP ${ip} in ${REGISTRATION_BURST_WINDOW_MINUTES} minutes`,
     );
+    trippedClauses.push(ipClause);
   }
 
+  const subnetClause = { whereSql: 'created_ip LIKE $2', params: [`${subnet24}%`] };
   const subnetCount = subnet24
-    ? await countRecentRegistrations('created_ip LIKE $2', [`${subnet24}%`])
+    ? await countRecentRegistrations(subnetClause.whereSql, subnetClause.params)
     : 0;
   if (subnet24 && subnetCount >= REGISTRATION_SUBNET_THRESHOLD) {
     signals.push(
       `${subnetCount} accounts from subnet ${subnet24}0/24 in ${REGISTRATION_BURST_WINDOW_MINUTES} minutes`,
     );
+    trippedClauses.push(subnetClause);
   }
 
+  const userAgentClause = { whereSql: 'created_user_agent = $2', params: [userAgent] };
   const userAgentCount = userAgent
-    ? await countRecentRegistrations('created_user_agent = $2', [userAgent])
+    ? await countRecentRegistrations(userAgentClause.whereSql, userAgentClause.params)
     : 0;
   if (userAgent && userAgentCount >= REGISTRATION_USER_AGENT_THRESHOLD) {
     signals.push(
       `${userAgentCount} accounts with the same user agent in ${REGISTRATION_BURST_WINDOW_MINUTES} minutes`,
     );
+    trippedClauses.push(userAgentClause);
   }
 
   if (signals.length === 0) return { created: false, signals };
@@ -276,6 +306,18 @@ export async function createSuspiciousRegistrationReport(input: {
      ) VALUES (NULL, NULL, '', $1, NULL, '', $2, $3)`,
     [input.accountId, 'spam', details],
   );
+  // Mirror the report into the persisted suspicion-flag workflow, carrying the
+  // burst cohort (every account matching a tripped signal in the window) as
+  // related accounts. Fire-and-forget inside the emitter; the cohort reads are
+  // awaited here because this whole function already runs detached from the
+  // registration response (.catch at the call sites).
+  const cohort = new Set<number>();
+  for (const clause of trippedClauses) {
+    for (const id of await recentRegistrationCohortIds(clause.whereSql, clause.params)) {
+      cohort.add(id);
+    }
+  }
+  flagRegistrationBurst({ accountId: input.accountId, signals, cohortAccountIds: [...cohort] });
   return { created: true, signals };
 }
 

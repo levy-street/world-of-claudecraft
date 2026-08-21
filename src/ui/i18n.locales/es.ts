@@ -13451,4 +13451,38 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Golpea al objetivo por {damage} de daño y lo aturde durante 4 s. Otorga 2 puntos de combo.',
   'gpuNotice.bodyDiscreteInactive':
     'El juego no está usando la GPU dedicada para videojuegos y se está ejecutando en la GPU integrada (de ahorro de energía), así que el rendimiento se verá afectado. Actualiza los controladores de gráficos y reinicia el juego. En Windows, establece también el juego como Alto rendimiento en Configuración > Sistema > Pantalla > Gráficos.',
+  'hudChrome.controller.cancelAction': 'Cancelar / Atrás',
+  'hudChrome.controller.confirmAction': 'Confirmar / Seleccionar',
+  'hudChrome.controller.crossHotbar': 'Barra cruzada',
+  'hudChrome.controller.crossHotbarArrangeChord': '{bumper} + {button}',
+  'hudChrome.controller.crossHotbarCarrying':
+    'Llevando {action}: confirma en una celda para colocarla, cancela para devolverla.',
+  'hudChrome.controller.crossHotbarDisplay': 'Visualización de la barra',
+  'hudChrome.controller.crossHotbarDisplayCompact': 'Compacta',
+  'hudChrome.controller.crossHotbarDisplayFull': 'Completa',
+  'hudChrome.controller.crossHotbarDisplayMinimal': 'Solo mientras se mantiene pulsada',
+  'hudChrome.controller.crossHotbarEditHelp':
+    'Mantén pulsado el botón superior izquierdo y pulsa el botón frontal superior para organizar la barra con el mando.',
+  'hudChrome.controller.crossHotbarEditHint':
+    'Organizando: confirmar recoge de una celda o del libro de hechizos y suelta en una celda; cancelar borra una.',
+  'hudChrome.controller.crossHotbarEnable': 'Activar barra cruzada',
+  'hudChrome.controller.crossHotbarExpand': 'Barra cruzada doble',
+  'hudChrome.controller.crossHotbarHelp':
+    'Mantén pulsado un gatillo para iluminar ocho espacios de la barra de acción en la cruceta y los botones frontales. Toca el otro gatillo para cambiar al segundo conjunto.',
+  'hudChrome.controller.crossHotbarOwnsButtons':
+    'Mientras está activada, la barra cruzada usa los gatillos y la cruceta, así que se configuran abajo en vez de aquí.',
+  'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
+  'hudChrome.controller.crossHotbarResetLayout': 'Restablecer barra cruzada',
+  'hudChrome.controller.cycleHudAction': 'Recorrer interfaz',
+  'hudChrome.controller.cycleSetAction': 'Cambiar conjunto de barra',
+  'hudChrome.controller.subcommandsAction': 'Subcomandos / Mapa',
+  'hudChrome.perf.diagnostics.diagnosis.titles.gcHitch':
+    'La recolección de basura se está ejecutando dentro de fotogramas largos',
+  'hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch':
+    'Los fotogramas largos vienen de trabajo fuera de la llamada de renderizado',
+  'hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild':
+    'La construcción de zonas por streaming está causando tirones',
+  'hudChrome.perf.diagnostics.metrics.hitchesBuild':
+    'construcción de zonas {zoneBuilds} | fuera de fotograma {offFrame} | GC {gc}',
+  'desktop.window.exitToDesktop': 'Salir al escritorio',
 };

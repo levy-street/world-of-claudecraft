@@ -68,3 +68,39 @@ SELECT 1
 
 export const BANK_LEDGER_CONTAINER_INVALID_INDEX_DROP_SQL =
   'DROP INDEX CONCURRENTLY IF EXISTS bank_ledger_container_recent';
+
+// ---------------------------------------------------------------------------
+// The admin economy-oversight per-account reader
+// (server/account_wealth_db.ts largeGoldMovementsForAccount):
+// `WHERE account_id = $1 AND abs(copper_delta) >= $2 ORDER BY id DESC LIMIT N`.
+// Same shape and reasoning as the guild reader above: an equality column paired
+// with `id DESC` turns "the newest large movements of one account" into a
+// bounded backwards index scan instead of a walk of the account's whole
+// keep-forever history. Without it the read has no index leading with
+// account_id at all, so an account with few or no large movements scans to the
+// end of one of the largest live tables, on every account-detail open.
+//
+// abs(copper_delta) stays OUT of the index: the threshold is applied as a
+// trailing Filter on rows already arriving in id order, so its cost is only
+// the suppressed small-movement rows of that one account. A partial index on
+// the fixed threshold constant remains available if that filter ever proves
+// heavy in production; it costs a redeploy of this module, not a schema
+// migration.
+//
+// CONCURRENTLY, never boot DDL, same as the guild reader: bank_ledger is too
+// large to lock for a transactional build.
+
+export const BANK_LEDGER_ACCOUNT_INDEX_SQL = `
+CREATE INDEX CONCURRENTLY IF NOT EXISTS bank_ledger_account_recent
+  ON bank_ledger(account_id, id DESC);
+`;
+
+export const BANK_LEDGER_ACCOUNT_INVALID_INDEX_CHECK_SQL = `
+SELECT 1
+  FROM pg_index i
+ WHERE i.indexrelid = to_regclass('bank_ledger_account_recent')
+   AND NOT i.indisvalid
+`;
+
+export const BANK_LEDGER_ACCOUNT_INVALID_INDEX_DROP_SQL =
+  'DROP INDEX CONCURRENTLY IF EXISTS bank_ledger_account_recent';

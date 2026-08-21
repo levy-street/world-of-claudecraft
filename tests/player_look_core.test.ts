@@ -17,6 +17,7 @@ import {
   armorSetSourceFor,
   charselectLook,
   composedLook,
+  helmSlotAvailable,
   inWorldLookFor,
   modularLookChanged,
 } from '../src/render/characters/player_look_core';
@@ -150,6 +151,36 @@ describe('armorSetSourceFor', () => {
     const kit = (): ArmorSetId => 'mage';
     expect(armorSetSourceFor(true, override, kit)('mage')).toBe('barbarian');
     expect(armorSetSourceFor(false, override, kit)('mage')).toBe('mage');
+  });
+});
+
+describe('helmSlotAvailable (issue: hide helmet does nothing)', () => {
+  it('is false for a class kit whose set ships no head geometry', () => {
+    // druid, the hunter's ranger kit, and rogue all leave ARMOR_BY_SET.head
+    // empty: the composed body has no helm to remove, so the paperdoll eye
+    // must not claim it can hide one.
+    expect(helmSlotAvailable('druid', false, true)).toBe(false);
+    expect(helmSlotAvailable('hunter', false, true)).toBe(false);
+    expect(helmSlotAvailable('rogue', false, true)).toBe(false);
+  });
+
+  it('is true for a class kit whose set has a head piece', () => {
+    expect(helmSlotAvailable('warrior', false, true)).toBe(true);
+    expect(helmSlotAvailable('mage', false, true)).toBe(true);
+    expect(helmSlotAvailable('paladin', false, true)).toBe(true);
+  });
+
+  it('is false for a fixed-rig player with no composed modular look', () => {
+    // Pre-creator characters still render through the fixed class rig, so the
+    // modular helmet preference cannot change the drawn head.
+    expect(helmSlotAvailable('warrior', false, false)).toBe(false);
+  });
+
+  it('is false for a Combat Mech wearer regardless of class kit', () => {
+    // A mech is a whole replacement body that never composes the kit at all
+    // (renderer.ts skips its look via the same isMechWearer guard), so even a
+    // helmed class kit has nothing the eye could hide while mech-skinned.
+    expect(helmSlotAvailable('warrior', true, true)).toBe(false);
   });
 });
 

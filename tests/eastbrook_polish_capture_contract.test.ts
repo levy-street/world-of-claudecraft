@@ -258,8 +258,12 @@ interface AttributionTargetFixture {
 // instanced-mesh render-list skip): the lockfile is a hashed leaf of the town
 // fingerprint, so the seals follow the swept evidence bytes. No capture was
 // retaken.
+// Re-minted for the PR #3497 merge into release/v0.40.0: the release-side
+// Eastbrook GPU-preparation provenance and the PR-side corpse-decay admission
+// check combine in entity_view_policy_core.ts, so the composite follows its
+// bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'd13c65d42e6d6e89cb900fb18151f754db3f6451e5540c1800044939c2d63c74';
+  '44f7e5150a6c11433849981e2d7299aadce4bbe7a55c68be6bdb5906eb9462b6';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

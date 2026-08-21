@@ -206,6 +206,7 @@ describe('admin account detail query', () => {
             suspended_until: null,
             character_count: 2,
             max_level: 12,
+            total_copper: '0',
             playtime_seconds: '3600',
             is_ai: false,
             is_streamer: false,
@@ -228,6 +229,7 @@ describe('admin account detail query', () => {
         characterCount: 2,
         maxLevel: 12,
         playtimeSeconds: 3600,
+        totalCopper: 0,
         isAi: false,
         isStreamer: false,
       },
@@ -238,7 +240,7 @@ describe('admin account detail query', () => {
     expect(mocks.query.mock.calls[0][0]).toContain(
       'FROM play_session_totals t WHERE t.account_id = a.id',
     );
-    expect(mocks.query.mock.calls[0][1]).toEqual(['%ali%', 25, 0]);
+    expect(mocks.query.mock.calls[0][1]).toEqual(['%ali%', 25, 0, null]);
     // The listing read goes through pool.query directly on the default
     // statement timeout; it must not silently grow the heavy-allowance wrap
     // (its per-account subqueries are bounded, unlike accountDetail's).
@@ -258,6 +260,7 @@ describe('admin account detail query', () => {
       ['username', 'asc', 'ORDER BY lower(a.username) ASC, a.id ASC'],
       ['character_count', 'desc', 'ORDER BY character_count DESC, a.id DESC'],
       ['max_level', 'asc', 'ORDER BY max_level ASC, a.id ASC'],
+      ['total_copper', 'desc', 'ORDER BY total_copper DESC, a.id DESC'],
       ['playtime_seconds', 'desc', 'ORDER BY playtime_seconds DESC, a.id DESC'],
       ['created_at', 'asc', 'ORDER BY a.created_at ASC, a.id ASC'],
       ['last_login', 'desc', 'ORDER BY a.last_login DESC NULLS LAST, a.id DESC'],

@@ -19,6 +19,7 @@ import {
 } from '../src/sim/data';
 import {
   baseRespawnSecondsAt,
+  corpseHasDecayed,
   DEFAULT_RESPAWN_SECONDS,
   isSelfScheduled,
   LEGACY_RESPAWN_SECONDS,
@@ -392,6 +393,23 @@ describe('resolveRespawnSeconds: full precedence', () => {
   });
 });
 
+describe('corpseHasDecayed: the render/wire admission signal', () => {
+  it('is false while alive, however low a stale corpseTimer field reads', () => {
+    expect(corpseHasDecayed(false, 0)).toBe(false);
+    expect(corpseHasDecayed(false, -5)).toBe(false);
+  });
+
+  it('is false for a dead mob still inside its loot window', () => {
+    expect(corpseHasDecayed(true, CORPSE_DURATION)).toBe(false);
+    expect(corpseHasDecayed(true, 1)).toBe(false);
+  });
+
+  it('is true once the window elapses, at and past the zero boundary', () => {
+    expect(corpseHasDecayed(true, 0)).toBe(true);
+    expect(corpseHasDecayed(true, -1)).toBe(true);
+  });
+});
+
 describe('the death site consumes the policy', () => {
   it('puts a slain open-world mob down for the world delay, not the off-map 25s', () => {
     const sim = new Sim({ seed: 20061, playerClass: 'warrior' });
@@ -421,6 +439,25 @@ describe('the death site consumes the policy', () => {
     expect(grix.respawnTimer).toBeGreaterThanOrEqual(900);
     expect(grix.respawnTimer).toBeLessThan(1800);
     expect(grix.respawnTimer).not.toBe(10_800);
+  });
+
+  it('leaves Grix corpseTimer well short of his own respawnTimer, the gap the stuck-corpse fix closes', () => {
+    // Grix's corpse decays on the ordinary 60s window (CORPSE_DURATION) like
+    // any other kill, but his respawn is self-scheduled (respawnWindow) and
+    // always much longer (900 to 1800s). Nothing here respawns him early to
+    // close that gap (his loot window is deliberately bounded, not his
+    // respawn), so the corpse would sit dead-but-decayed for up to half an
+    // hour: entity_view_policy_core.ts's admission check (fed by the wire
+    // `cd` flag added in server/game.ts) is what stops it from rendering and
+    // staying "clickable" as a warped, stuck statue for that whole gap.
+    const sim = new Sim({ seed: 20061, playerClass: 'warrior' });
+    const grix = [...sim.entities.values()].find(
+      (e) => e.kind === 'mob' && e.templateId === 'grix_the_tunnelking',
+    );
+    if (!grix) throw new Error('no grix_the_tunnelking spawned');
+    sim.dealDamage(null, grix, 999_999, false, 'physical', null, 'hit');
+    expect(grix.corpseTimer).toBe(CORPSE_DURATION);
+    expect(grix.respawnTimer).toBeGreaterThan(grix.corpseTimer);
   });
 
   it('honors an explicit global base, which is what the fast suites rely on', () => {

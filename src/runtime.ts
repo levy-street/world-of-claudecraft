@@ -189,6 +189,9 @@ export interface DesktopBridge {
   // post-trio methods.
   getDisplayMode?(): Promise<DesktopDisplayMode>;
   setDisplayMode?(mode: DesktopDisplayMode): Promise<boolean>;
+  // Gracefully exits the desktop application through the shell's normal quit
+  // lifecycle. Absent on older shells: feature-check before use.
+  quitApp?(): Promise<boolean>;
   // Posts an OS notification. Absent on older shells: feature-check before use,
   // like the other post-trio methods.
   showNotification?(request: DesktopNotificationRequest): void;

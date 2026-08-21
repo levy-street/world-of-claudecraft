@@ -13462,4 +13462,38 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.challenging_roar.name': 'Unheilvolles Gebrüll',
   'entities.abilities.cheap_shot.descriptionNoStealth': 'Trefft das Ziel für {damage} Schaden und betäubt es 4 Sek. lang. Gewährt 2 Combopunkte.',
   'gpuNotice.bodyDiscreteInactive': 'Das Spiel nutzt nicht die dedizierte (Gaming-)GPU und läuft stattdessen auf der stromsparenden GPU, sodass die Leistung darunter leidet. Aktualisiere deine Grafiktreiber und starte das Spiel neu. Unter Windows stelle das Spiel außerdem unter Einstellungen > System > Anzeige > Grafik auf Hohe Leistung ein.',
+  'desktop.window.exitToDesktop': 'Zum Desktop beenden',
+  'hudChrome.controller.cancelAction': 'Abbrechen / Zurück',
+  'hudChrome.controller.confirmAction': 'Bestätigen / Auswählen',
+  'hudChrome.controller.crossHotbar': 'Cross-Hotbar',
+  'hudChrome.controller.crossHotbarArrangeChord': '{bumper} + {button}',
+  'hudChrome.controller.crossHotbarCarrying':
+    '{action} wird gehalten: Bestätige auf einer Zelle, um es zu platzieren, brich ab, um es zurückzulegen.',
+  'hudChrome.controller.crossHotbarDisplay': 'Leistenanzeige',
+  'hudChrome.controller.crossHotbarDisplayCompact': 'Kompakt',
+  'hudChrome.controller.crossHotbarDisplayFull': 'Vollständig',
+  'hudChrome.controller.crossHotbarDisplayMinimal': 'Nur beim Halten',
+  'hudChrome.controller.crossHotbarEditHelp':
+    'Halte den linken Bumper und drücke die obere Aktionstaste, um die Leiste mit dem Controller anzuordnen.',
+  'hudChrome.controller.crossHotbarEditHint':
+    'Anordnen: Bestätigen nimmt aus einer Zelle oder dem Zauberbuch auf und legt auf einer Zelle ab; Abbrechen leert eine Zelle.',
+  'hudChrome.controller.crossHotbarEnable': 'Cross-Hotbar aktivieren',
+  'hudChrome.controller.crossHotbarExpand': 'Doppelte Cross-Hotbar',
+  'hudChrome.controller.crossHotbarHelp':
+    'Halte einen Trigger, um acht Aktionsleistenplätze auf Steuerkreuz und Aktionstasten einzublenden. Tippe den anderen Trigger an, um zum zweiten Satz zu wechseln.',
+  'hudChrome.controller.crossHotbarOwnsButtons':
+    'Solange die Cross-Hotbar eingeschaltet ist, gehören Trigger und Steuerkreuz zu ihr; deshalb werden sie unten statt hier eingerichtet.',
+  'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
+  'hudChrome.controller.crossHotbarResetLayout': 'Cross-Hotbar zurücksetzen',
+  'hudChrome.controller.cycleHudAction': 'Oberfläche wechseln',
+  'hudChrome.controller.cycleSetAction': 'Hotbar-Set wechseln',
+  'hudChrome.controller.subcommandsAction': 'Unterbefehle / Karte',
+  'hudChrome.perf.diagnostics.diagnosis.titles.gcHitch':
+    'Garbage Collections laufen innerhalb langer Frames',
+  'hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch':
+    'Lange Frames entstehen durch Arbeit außerhalb des Render-Callbacks',
+  'hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild':
+    'Zone-Streaming-Builds verursachen Ruckler',
+  'hudChrome.perf.diagnostics.metrics.hitchesBuild':
+    'Zonen-Builds {zoneBuilds} | außerhalb Frame {offFrame} | GC {gc}',
 };

@@ -308,7 +308,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/chars/enemies/skeleton_warrior.glb": "/media/models/chars/enemies/skeleton_warrior.572feed3592c.glb",
   "models/chars/enemies/skeleton_warrior_hit_variety_anims.glb": "/media/models/chars/enemies/skeleton_warrior_hit_variety_anims.5931811e47fc.glb",
   "models/chars/forms/metamorphosis.glb": "/media/models/chars/forms/metamorphosis.7d722a6a0a9b.glb",
-  "models/chars/modular/warrior_modular.glb": "/media/models/chars/modular/warrior_modular.0c6a3a3df499.glb",
+  "models/chars/modular/warrior_modular.glb": "/media/models/chars/modular/warrior_modular.f39755e73982.glb",
   "models/chars/players/Mech/characters/CombatMech.fbx": "/media/models/chars/players/Mech/characters/CombatMech.51bb345b166f.fbx",
   "models/chars/players/Mech/characters/CombatMech.glb": "/media/models/chars/players/Mech/characters/CombatMech.025c2cbb7bbe.glb",
   "models/chars/players/Mech/characters/CombatMech_hit_variety_anims.glb": "/media/models/chars/players/Mech/characters/CombatMech_hit_variety_anims.1bb5590541dc.glb",

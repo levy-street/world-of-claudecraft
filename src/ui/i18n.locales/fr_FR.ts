@@ -13416,4 +13416,38 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Frappe la cible pour {damage} points de dégâts, l\'étourdissant pendant 4 s. Confère 2 points de combo.',
   'gpuNotice.bodyDiscreteInactive':
     'Le jeu n\'utilise pas le GPU de jeu dédié et fonctionne à la place sur le GPU intégré (économie d\'énergie), ce qui nuira aux performances. Mettez à jour vos pilotes graphiques, puis redémarrez le jeu. Sous Windows, définissez également le jeu sur Performances élevées dans Paramètres, Système, Affichage, Graphiques.',
+  'hudChrome.controller.cancelAction': 'Annuler / Retour',
+  'hudChrome.controller.confirmAction': 'Confirmer / Sélectionner',
+  'hudChrome.controller.crossHotbar': 'Barre croisée',
+  'hudChrome.controller.crossHotbarArrangeChord': '{bumper} + {button}',
+  'hudChrome.controller.crossHotbarCarrying':
+    'Vous tenez {action} : confirmez sur une case pour la placer, annulez pour la remettre.',
+  'hudChrome.controller.crossHotbarDisplay': 'Affichage de la barre',
+  'hudChrome.controller.crossHotbarDisplayCompact': 'Compacte',
+  'hudChrome.controller.crossHotbarDisplayFull': 'Complet',
+  'hudChrome.controller.crossHotbarDisplayMinimal': 'Seulement quand maintenue',
+  'hudChrome.controller.crossHotbarEditHelp':
+    'Maintenez le bouton supérieur gauche et appuyez sur le bouton de façade supérieur pour organiser la barre à la manette.',
+  'hudChrome.controller.crossHotbarEditHint':
+    'Organisation : confirmer prend depuis une case ou le grimoire et dépose sur une case ; annuler en efface une.',
+  'hudChrome.controller.crossHotbarEnable': 'Activer la barre croisée',
+  'hudChrome.controller.crossHotbarExpand': 'Double barre croisée',
+  'hudChrome.controller.crossHotbarHelp':
+    'Maintenez une gâchette pour allumer huit emplacements de barre d’action sur la croix directionnelle et les boutons de façade. Touchez l’autre gâchette pour passer au second ensemble.',
+  'hudChrome.controller.crossHotbarOwnsButtons':
+    'Quand elle est active, la barre croisée utilise les gâchettes et la croix directionnelle ; elles se configurent donc ci-dessous plutôt qu’ici.',
+  'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
+  'hudChrome.controller.crossHotbarResetLayout': 'Réinitialiser la barre croisée',
+  'hudChrome.controller.cycleHudAction': 'Parcourir l’interface',
+  'hudChrome.controller.cycleSetAction': 'Changer d’ensemble de barre',
+  'hudChrome.controller.subcommandsAction': 'Sous-commandes / Carte',
+  'hudChrome.perf.diagnostics.diagnosis.titles.gcHitch':
+    'Les collectes mémoire s’exécutent pendant des images longues',
+  'hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch':
+    'Les images longues viennent de travail hors du rappel de rendu',
+  'hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild':
+    'Les constructions de zones en streaming causent des saccades',
+  'hudChrome.perf.diagnostics.metrics.hitchesBuild':
+    'constructions de zones {zoneBuilds} | hors image {offFrame} | GC {gc}',
+  'desktop.window.exitToDesktop': 'Quitter vers le bureau',
 };

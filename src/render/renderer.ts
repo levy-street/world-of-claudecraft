@@ -343,7 +343,7 @@ import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { usedJsHeapMb } from './heap_sample';
 import { createHitchFrameAligner } from './hitch_frame_align_core';
-import { buildHollowGates } from './hollow_gates';
+import { buildHollowGates, type HollowGatesView } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
 import { buildImpactSite, buildImpactSitePrewarmGroup, type ImpactSiteView } from './impact_site';
@@ -1649,6 +1649,7 @@ export class Renderer {
   private foliageRevealGate: RevealGateCore | null = null;
   private eastbrookTownView!: EastbrookTownView;
   private fenbridgeTownView!: FenbridgeTownView;
+  private hollowGates!: HollowGatesView;
   private lightRank: RankedPointLight[] = [];
   private doomedIds: number[] = [];
   private dungeons: DungeonInteriors | null = null;
@@ -2454,8 +2455,9 @@ export class Renderer {
     // palm strand. Attached like the per-zone features so the distance cull
     // applies: the gates and the palm strand have compact footprints of their
     // own, and water flora registers one cull child per zone.
+    this.hollowGates = buildHollowGates(this.sim.cfg.seed);
     for (const staticFeature of [
-      buildHollowGates(this.sim.cfg.seed),
+      this.hollowGates,
       buildWaterFlora(this.sim.cfg.seed),
       buildFarshoreFeatures(this.sim.cfg.seed),
     ]) {
@@ -12373,49 +12375,39 @@ export class Renderer {
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'terrain', worldStart);
     this.updateZoneFeatureVisibility(fogFar);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'zoneVisibility', worldStart);
-    this.propsView.update(
-      this.camera.position.x,
-      this.camera.position.y,
-      this.camera.position.z,
-      this.cameraLookAt.x,
-      this.cameraLookAt.y,
-      this.cameraLookAt.z,
-      fogFar,
-      dt,
-      this.reducedMotion(),
-    );
+    // Shared by every occluder-fade view below: same camera and look-at
+    // point, so one read stands in for the six repeated field accesses.
+    const camX = this.camera.position.x;
+    const camY = this.camera.position.y;
+    const camZ = this.camera.position.z;
+    const eyeX = this.cameraLookAt.x;
+    const eyeY = this.cameraLookAt.y;
+    const eyeZ = this.cameraLookAt.z;
+    this.propsView.update(camX, camY, camZ, eyeX, eyeY, eyeZ, fogFar, dt, this.reducedMotion());
     this.eastbrookTownView.update(
-      this.camera.position.x,
-      this.camera.position.y,
-      this.camera.position.z,
-      this.cameraLookAt.x,
-      this.cameraLookAt.y,
-      this.cameraLookAt.z,
+      camX,
+      camY,
+      camZ,
+      eyeX,
+      eyeY,
+      eyeZ,
       fogFar,
       dt,
       this.reducedMotion(),
     );
     this.fenbridgeTownView.update(
-      this.camera.position.x,
-      this.camera.position.y,
-      this.camera.position.z,
-      this.cameraLookAt.x,
-      this.cameraLookAt.y,
-      this.cameraLookAt.z,
+      camX,
+      camY,
+      camZ,
+      eyeX,
+      eyeY,
+      eyeZ,
       fogFar,
       dt,
       this.reducedMotion(),
     );
-    this.dungeons?.update(
-      this.camera.position.x,
-      this.camera.position.y,
-      this.camera.position.z,
-      this.cameraLookAt.x,
-      this.cameraLookAt.y,
-      this.cameraLookAt.z,
-      dt,
-      this.reducedMotion(),
-    );
+    this.dungeons?.update(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, this.reducedMotion());
+    this.hollowGates.update(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, this.reducedMotion());
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'props', worldStart);
     this.foliage.update(
       p.pos.x,

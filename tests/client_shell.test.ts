@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { shellStrings } from '../src/ui/i18n.catalog/shell';
 
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
 // The CSS extraction moved the :root tokens and the reset/base
@@ -96,6 +97,10 @@ const padTargetPickTs = readFileSync(
 const stripLineComments = (source: string) => source.replace(/^\s*\/\/.*$/gm, '');
 const mainTsCode = stripLineComments(mainTs);
 const padTargetPickCode = stripLineComments(padTargetPickTs);
+const desktopShellIntegrationTs = readFileSync(
+  new URL('../src/game/desktop_shell_integration.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 const newsFeedTs = readFileSync(new URL('../src/ui/news_feed.ts', import.meta.url), 'utf8').replace(
   /\r\n/g,
   '\n',
@@ -211,6 +216,79 @@ function splitGameUiTemplate(): { templateHtml: string; liveHtml: string } {
 }
 
 describe('client HTML shell', () => {
+  it('ships one localized, fail-closed desktop exit control in both pre-game headers', () => {
+    const controls = [html, playHtml].map(
+      (entry) =>
+        entry.match(/<button(?=[^>]*id="desktop-login-exit")[^>]*>[\s\S]*?<\/button>/)?.[0] ?? '',
+    );
+    expect(controls[0]).not.toBe('');
+    expect(controls[1]).toBe(controls[0]);
+    expect(controls[0]).toContain('type="button"');
+    expect(controls[0]).toContain('class="desktop-login-exit"');
+    expect(controls[0]).toContain('data-i18n="desktop.window.exitToDesktop"');
+    expect(controls[0]).toContain('data-i18n-title="desktop.window.exitToDesktop"');
+    expect(controls[0]).toContain('title="Exit to Desktop"');
+    expect(controls[0]).toMatch(/\n\s+hidden\s*\n/);
+    expect(controls[0]).toContain('>Exit to Desktop</button>');
+    for (const entry of [html, playHtml]) {
+      expect(entry.match(/id="desktop-login-exit"/g)).toHaveLength(1);
+      const headerActions = entry.match(/<div class="header-actions">([\s\S]*?)<\/div>/)?.[1] ?? '';
+      const musicAt = headerActions.indexOf('id="homepage-music-toggle"');
+      const exitAt = headerActions.indexOf('id="desktop-login-exit"');
+      const donateAt = headerActions.indexOf('class="donate-cta"');
+      expect(musicAt).toBeGreaterThanOrEqual(0);
+      expect(exitAt).toBeGreaterThan(musicAt);
+      expect(exitAt).toBeLessThan(donateAt);
+    }
+    expect(splitGameUiTemplate().templateHtml).not.toContain('desktop-login-exit');
+    expect(shellCss).toContain('.desktop-login-exit[hidden] {\n    display: none;\n  }');
+    const baseRule = shellCss.match(/\.desktop-login-exit\s*\{([^}]*)\}/)?.[1] ?? '';
+    expect(baseRule).toContain('min-height: 40px;');
+    const hoverRule = shellCss.match(/\.desktop-login-exit:hover\s*\{([^}]*)\}/)?.[1] ?? '';
+    expect(hoverRule).toContain('background:');
+    expect(hoverRule).toContain('box-shadow:');
+    expect(hoverRule).not.toMatch(/transform|scale/);
+    const activeRule = shellCss.match(/\.desktop-login-exit:active\s*\{([^}]*)\}/)?.[1] ?? '';
+    expect(activeRule).toContain('background:');
+    expect(activeRule).toContain('box-shadow:');
+    expect(activeRule).not.toMatch(/transform|scale/);
+    const focusRule = shellCss.match(/\.desktop-login-exit:focus-visible\s*\{([^}]*)\}/)?.[1] ?? '';
+    expect(focusRule).toContain('outline: 3px solid var(--color-border-focus);');
+    expect(focusRule).not.toContain('transition');
+    const forcedColorsRule =
+      shellCss.match(/@media \(forced-colors: active\)\s*\{([\s\S]*?)\n {2}\}/)?.[1] ?? '';
+    const forcedColorsBase =
+      forcedColorsRule.match(/\.desktop-login-exit\s*\{([^}]*)\}/)?.[1] ?? '';
+    const forcedColorsFocus =
+      forcedColorsRule.match(/\.desktop-login-exit:focus-visible\s*\{([^}]*)\}/)?.[1] ?? '';
+    expect(forcedColorsBase).toContain('border-color: ButtonText;');
+    expect(forcedColorsFocus).toContain('outline-color: Highlight;');
+    expect(desktopShellIntegrationTs).toContain(
+      "import { initDesktopLoginExit } from './desktop_login_exit';",
+    );
+    expect(desktopShellIntegrationTs).toContain('initDesktopLoginExit(bridge)');
+    expect(mainTs).not.toContain('desktop-login-exit');
+  });
+
+  it('pins the approved Exit to Desktop glossary values', () => {
+    expect(shellStrings.en.desktop.window.exitToDesktop).toBe('Exit to Desktop');
+    for (const [locale, translation] of [
+      ['zh_CN', '退出到桌面'],
+      ['zh_TW', '離開至桌面'],
+      ['ja_JP', 'デスクトップに戻る'],
+      ['ko_KR', '바탕 화면으로 나가기'],
+      ['ru_RU', 'Выйти на рабочий стол'],
+    ]) {
+      const overlay = readFileSync(
+        new URL(`../src/ui/i18n.locales/${locale}.ts`, import.meta.url),
+        'utf8',
+      )
+        .replace(/(^|[^:])\/\/[^\n]*/gm, '$1')
+        .replace(/\/\*[\s\S]*?\*\//g, '');
+      expect(overlay).toContain(`'desktop.window.exitToDesktop': '${translation}'`);
+    }
+  });
+
   it('uses the painted combat-status crest in both game entries', () => {
     for (const entry of [html, playHtml]) {
       const combat = entry.match(/<div class="combat-flash"[^>]*>[\s\S]*?<\/div>/)?.[0];

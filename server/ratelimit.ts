@@ -774,6 +774,64 @@ export function resetReportsCreateRateLimits(): void {
 }
 
 // ---------------------------------------------------------------------------
+// Admin economy-oversight endpoints (player search / wealth / flagged
+// workflow). Dedicated buckets, NOT the shared `attempts` map, so dashboard
+// polling can never burn anyone's login budget (the cardUpload precedent).
+// Reads get headroom for several admins polling with the dashboard's 5 s
+// refresh plus debounced search keystrokes; flag-workflow writes are
+// deliberate clicks and get a tighter cap.
+// ---------------------------------------------------------------------------
+export const ADMIN_OVERSIGHT_READ_MAX_PER_MINUTE = 120;
+export const ADMIN_FLAG_WRITE_MAX_PER_MINUTE = 30;
+
+const adminOversightReadIpAttempts = new Map<string, number[]>();
+const adminOversightReadAccountAttempts = new Map<number, number[]>();
+const adminFlagWriteIpAttempts = new Map<string, number[]>();
+const adminFlagWriteAccountAttempts = new Map<number, number[]>();
+
+export function adminOversightReadRateLimited(
+  req: http.IncomingMessage,
+  accountId: number,
+): RateLimitOutcome {
+  const ip = recordSlidingWindowAttempt(
+    adminOversightReadIpAttempts,
+    requestIp(req),
+    ADMIN_OVERSIGHT_READ_MAX_PER_MINUTE,
+  );
+  const account = recordSlidingWindowAttempt(
+    adminOversightReadAccountAttempts,
+    accountId,
+    ADMIN_OVERSIGHT_READ_MAX_PER_MINUTE,
+  );
+  return mergeFusedOutcomes(ip, account);
+}
+
+export function adminFlagWriteRateLimited(
+  req: http.IncomingMessage,
+  accountId: number,
+): RateLimitOutcome {
+  const ip = recordSlidingWindowAttempt(
+    adminFlagWriteIpAttempts,
+    requestIp(req),
+    ADMIN_FLAG_WRITE_MAX_PER_MINUTE,
+  );
+  const account = recordSlidingWindowAttempt(
+    adminFlagWriteAccountAttempts,
+    accountId,
+    ADMIN_FLAG_WRITE_MAX_PER_MINUTE,
+  );
+  return mergeFusedOutcomes(ip, account);
+}
+
+/** Reset admin economy-oversight throttles. Test-only. */
+export function resetAdminOversightRateLimits(): void {
+  adminOversightReadIpAttempts.clear();
+  adminOversightReadAccountAttempts.clear();
+  adminFlagWriteIpAttempts.clear();
+  adminFlagWriteAccountAttempts.clear();
+}
+
+// ---------------------------------------------------------------------------
 // Per-account failed-login throttle (#93)
 //
 // The per-IP limiter above can't stop credential stuffing: a botnet spreads

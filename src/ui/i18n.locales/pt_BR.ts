@@ -13380,4 +13380,38 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.challenging_roar.name': 'Rugido Funesto',
   'entities.abilities.cheap_shot.descriptionNoStealth': 'Golpeia o alvo causando {damage} de dano, atordoando-o por 4 s. Concede 2 pontos de combo.',
   'gpuNotice.bodyDiscreteInactive': 'O jogo não está usando a GPU dedicada (para jogos) e está sendo executado na GPU de economia de energia, o que prejudicará o desempenho. Atualize os drivers de placa de vídeo e reinicie o jogo. No Windows, defina o jogo como Alto desempenho em Configurações > Sistema > Vídeo > Gráficos.',
+  'hudChrome.controller.cancelAction': 'Cancelar / Voltar',
+  'hudChrome.controller.confirmAction': 'Confirmar / Selecionar',
+  'hudChrome.controller.crossHotbar': 'Barra cruzada',
+  'hudChrome.controller.crossHotbarArrangeChord': '{bumper} + {button}',
+  'hudChrome.controller.crossHotbarCarrying':
+    'Levando {action}: confirme em uma célula para posicionar, cancele para devolver.',
+  'hudChrome.controller.crossHotbarDisplay': 'Exibição da barra',
+  'hudChrome.controller.crossHotbarDisplayCompact': 'Compacta',
+  'hudChrome.controller.crossHotbarDisplayFull': 'Completa',
+  'hudChrome.controller.crossHotbarDisplayMinimal': 'Somente enquanto segurada',
+  'hudChrome.controller.crossHotbarEditHelp':
+    'Segure o botão superior esquerdo e pressione o botão frontal superior para organizar a barra com o controle.',
+  'hudChrome.controller.crossHotbarEditHint':
+    'Organizando: confirmar pega de uma célula ou do grimório e solta em uma célula; cancelar limpa uma.',
+  'hudChrome.controller.crossHotbarEnable': 'Ativar barra cruzada',
+  'hudChrome.controller.crossHotbarExpand': 'Barra cruzada dupla',
+  'hudChrome.controller.crossHotbarHelp':
+    'Segure um gatilho para acender oito espaços da barra de ações no direcional e nos botões frontais. Toque no outro gatilho para trocar para o segundo conjunto.',
+  'hudChrome.controller.crossHotbarOwnsButtons':
+    'Enquanto está ativa, a barra cruzada usa os gatilhos e o direcional, então eles são configurados abaixo em vez de aqui.',
+  'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
+  'hudChrome.controller.crossHotbarResetLayout': 'Redefinir barra cruzada',
+  'hudChrome.controller.cycleHudAction': 'Percorrer interface',
+  'hudChrome.controller.cycleSetAction': 'Trocar conjunto da barra',
+  'hudChrome.controller.subcommandsAction': 'Subcomandos / Mapa',
+  'hudChrome.perf.diagnostics.diagnosis.titles.gcHitch':
+    'As coletas de lixo estão rodando dentro de quadros longos',
+  'hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch':
+    'Os quadros longos vêm de trabalho fora do retorno de renderização',
+  'hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild':
+    'As construções de zonas por streaming estão causando travamentos',
+  'hudChrome.perf.diagnostics.metrics.hitchesBuild':
+    'construções de zonas {zoneBuilds} | fora de quadro {offFrame} | GC {gc}',
+  'desktop.window.exitToDesktop': 'Sair para a área de trabalho',
 };

@@ -747,6 +747,7 @@ export type TranslationKeyFlat =
   | 'desktop.update.restart'
   | 'desktop.update.uptodateTitle'
   | 'desktop.update.whatsNew'
+  | 'desktop.window.exitToDesktop'
   | 'devCommand.actions.attune.description'
   | 'devCommand.actions.attune.label'
   | 'devCommand.actions.biskit.description'

@@ -100,7 +100,12 @@ const NYTHRAXIS_SOUL_REND_MARKS_HEROIC = 6;
 // any topped-off health bar) and even a pair splitting takes 75% each.
 // Deathless Rage on a FAILED wardstone channel hits for 115% of max hp on
 // heroic (a raid wipe) versus 82% on normal. Both are percentage math with no
-// rng, so the normal trace and parity golden are unchanged.
+// rng, so the normal trace and parity golden are unchanged. Both dealDamage
+// calls below pass alreadyFinal for their calibrated-lethal heroic case, so a
+// source-side damage-done reduction on the boss (Direhowl) cannot pull either
+// hit back under 100%; Veilbound Mark reaches the same class of reduction
+// through an ungated fold elsewhere in dealDamage and is not yet closed here
+// (issue #3508).
 const NYTHRAXIS_SOUL_REND_HEROIC_MULT = 1.5;
 const NYTHRAXIS_DEATHLESS_PCT = 0.82;
 const NYTHRAXIS_DEATHLESS_PCT_HEROIC = 1.15;
@@ -1125,6 +1130,16 @@ export function updateNythraxisSoulRend(
       'Soul Rend',
       'hit',
       true,
+      undefined,
+      true,
+      false,
+      // alreadyFinal, but only for the same reason and under the same
+      // condition as Deathless Rage above: an unstacked heroic mark
+      // (rendMult / share > 1) is the guaranteed kill "through any
+      // topped-off health bar" this file's own comment promises; a stacked
+      // split is not, and keeps taking every source-side reduction it
+      // always did.
+      rendMult / share > 1,
     );
     p.auras = p.auras.filter((a) => a.id !== 'nythraxis_soul_rend');
     ctx.emit({
@@ -1234,6 +1249,17 @@ export function updateNythraxisDeathlessRage(
       'Deathless Rage',
       'hit',
       true,
+      undefined,
+      true,
+      false,
+      // alreadyFinal, but only when ragePct exceeds 100%: on heroic this hit
+      // is calibrated above max hp specifically so a failed channel is an
+      // unconditional wipe, and skipping the source-output fold there stops a
+      // damage-done debuff on the boss (Direhowl's aoeAttackPower pct form)
+      // from pulling it back under the raid's health pool. Normal's 82% was
+      // never a guaranteed kill by design, so it keeps taking every source-
+      // side reduction it always did (Direhowl included).
+      ragePct > 1,
     );
   }
   // Heroic: an uninterrupted Deathless Rage (the pillar cast) raises the court

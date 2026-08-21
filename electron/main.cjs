@@ -1053,6 +1053,17 @@ ipcMain.handle('desktop-get-display-mode', (event) => {
   return desktopPrefs.displayMode;
 });
 
+// Exit the application through Electron's normal quit lifecycle. This lets
+// the window close handler capture its final remembered bounds and gives
+// before-quit / will-quit handlers their normal teardown opportunity.
+ipcMain.handle('desktop-app-quit', (event) => {
+  if (!trustedSender(event)) return false;
+  if (!mainWindow) return false;
+  if (mainWindow.isDestroyed()) return false;
+  app.quit();
+  return true;
+});
+
 // Gamepad activity from the renderer's input loop, the one signal the display-sleep lease
 // runs on (gamepad input does not reset the OS idle timer on any platform we ship). The
 // renderer fires and forgets; the rate limit lives in electron/power_save.cjs.

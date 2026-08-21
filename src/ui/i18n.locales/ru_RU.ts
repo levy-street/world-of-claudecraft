@@ -37,6 +37,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.crossHotbarDisplayCompact': 'Компактное',
   'hudChrome.controller.crossHotbarDisplayMinimal': 'Только при удержании',
   'hudChrome.controller.crossHotbarArrangeChord': '{bumper} + {button}',
+  'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
   'hudChrome.controller.crossHotbarCarrying': 'В руках {action}: подтверждение на ячейке кладет действие, отмена возвращает его.',
   'hudChrome.controller.crossHotbarEditHint': 'Перестановка: подтверждение берет действие из ячейки или книги заклинаний и кладет его в ячейку, отмена очищает ячейку.',
   'hudChrome.controller.crossHotbarEditHelp': 'Удерживайте левый бампер и нажмите верхнюю лицевую кнопку, чтобы переставить панель геймпадом.',
@@ -8003,6 +8004,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.quit': 'Выйти',
   'desktop.crash.fatalBody':
     'World of ClaudeCraft столкнулась с непредвиденной ошибкой и будет закрыта.',
+  'desktop.window.exitToDesktop': 'Выйти на рабочий стол',
   'gpuNotice.bodyDesktop':
     'Игра работает без GPU-ускорения и будет сильно тормозить. Обновите драйверы видеокарты и перезапустите игру. В Windows также выберите для игры режим «Высокая производительность» в разделе Параметры > Система > Дисплей > Графика.',
   'gpuNotice.bodyDiscreteInactive':

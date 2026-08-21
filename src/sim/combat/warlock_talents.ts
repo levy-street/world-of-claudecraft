@@ -1,6 +1,7 @@
+import { recalcPlayerStats } from '../entity';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { type AbilityDef, type Aura, DT, type Entity } from '../types';
+import { type AbilityDef, type AbilityEffect, type Aura, DT, type Entity } from '../types';
 
 export const WARLOCK_GENERATOR_IDS = ['needle_of_fate', 'soul_harvest', 'shadow_bolt'] as const;
 
@@ -51,6 +52,7 @@ const BLACKTIDE_SPEED_ID = 'wlk_blacktide_speed';
 const BLACKTIDE_SPEED_DURATION = 4;
 const LEVEL_20_ABILITY_IDS = new Set(['abyssal_rift']);
 const FORBIDDEN_REFLECTION_EXCLUDED_IDS = new Set(['soulwell', 'army_of_the_dead']);
+const FIENDHIDE_ABILITY_ID = 'demon_skin';
 
 function warlockMods(ctx: SimContext, player: Entity) {
   const meta = ctx.players.get(player.id);
@@ -113,12 +115,42 @@ export function reconcileWarlockTalentState(
     if (!staleAuraIds.has(aura.id)) continue;
     removeAura(ctx, player, aura);
   }
+  if (retuneActiveFiendhideAura(ctx, player)) {
+    recalcPlayerStats(
+      player,
+      meta.cls,
+      meta.equipment,
+      ctx.playerMods(meta),
+      meta.equipmentInstance,
+    );
+  }
   if (meta.talentMods.global.warlockAshenFocus <= 0 && player.procState) {
     delete player.procState.counters[ASHEN_SECONDS_KEY];
     delete player.procState.counters[ASHEN_X_KEY];
     delete player.procState.counters[ASHEN_Z_KEY];
   }
   return statsChanged;
+}
+
+function retuneActiveFiendhideAura(ctx: SimContext, player: Entity): boolean {
+  const aura = player.auras.find(
+    (active) =>
+      active.id === FIENDHIDE_ABILITY_ID &&
+      active.kind === 'buff_armor' &&
+      active.sourceId === player.id,
+  );
+  if (!aura) return false;
+  const resolved = ctx.resolvedAbility(FIENDHIDE_ABILITY_ID, player.id);
+  const armorEffect = resolved?.effects.find(isFiendhideArmorEffect);
+  if (!armorEffect || aura.value === armorEffect.value) return false;
+  aura.value = armorEffect.value;
+  return true;
+}
+
+function isFiendhideArmorEffect(
+  effect: AbilityEffect,
+): effect is Extract<AbilityEffect, { type: 'selfBuff' }> & { kind: 'buff_armor' } {
+  return effect.type === 'selfBuff' && effect.kind === 'buff_armor';
 }
 
 function removeAura(ctx: SimContext, owner: Entity, aura: Aura): void {

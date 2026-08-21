@@ -1163,6 +1163,58 @@ describe('Input Space handling', () => {
   });
 });
 
+describe('Input mouse-click focus guard (issue: clicked HUD buttons hijack Space/Enter)', () => {
+  it('blurs a HUD button left focused by a real mouse click', () => {
+    const { windowListeners } = makeInput();
+    const blur = vi.fn();
+    (globalThis as any).document.activeElement = { tagName: 'BUTTON', blur };
+
+    // A real mouse click reports a click count (detail) of 1 or more.
+    windowListeners.get('click')!({ type: 'click', detail: 1 });
+
+    expect(blur).toHaveBeenCalledTimes(1);
+  });
+
+  it('leaves a button focused and activated via keyboard (Tab then Enter/Space) alone', () => {
+    const { windowListeners } = makeInput();
+    const blur = vi.fn();
+    (globalThis as any).document.activeElement = { tagName: 'BUTTON', blur };
+
+    // A keyboard-synthesized click reports detail 0 (no mouse click count).
+    windowListeners.get('click')!({ type: 'click', detail: 0 });
+
+    expect(blur).not.toHaveBeenCalled();
+  });
+
+  it('does not touch focus when nothing HUD-button-like is focused', () => {
+    const { windowListeners } = makeInput();
+    (globalThis as any).document.activeElement = { tagName: 'INPUT' };
+
+    // Would throw if the guard assumed activeElement always has a blur().
+    expect(() => windowListeners.get('click')!({ type: 'click', detail: 1 })).not.toThrow();
+  });
+
+  it('blurs a focused HUD button on a right-click release (equip-via-right-click has no click event)', () => {
+    const { windowListeners } = makeInput();
+    const blur = vi.fn();
+    (globalThis as any).document.activeElement = { tagName: 'BUTTON', blur };
+
+    windowListeners.get('mouseup')!({ button: 2, clientX: 100, clientY: 100, target: null });
+
+    expect(blur).toHaveBeenCalledTimes(1);
+  });
+
+  it('leaves a primary-button mouseup to the click handler (no double-fire)', () => {
+    const { windowListeners } = makeInput();
+    const blur = vi.fn();
+    (globalThis as any).document.activeElement = { tagName: 'BUTTON', blur };
+
+    windowListeners.get('mouseup')!({ button: 0, clientX: 100, clientY: 100, target: null });
+
+    expect(blur).not.toHaveBeenCalled();
+  });
+});
+
 describe('Input attack move', () => {
   it('reserves only the attack-move key and keeps other movement keys working', () => {
     const { input, cb, windowListeners, canvasListeners } = makeInput();

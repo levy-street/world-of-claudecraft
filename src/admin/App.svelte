@@ -37,6 +37,8 @@
   import UnstuckReports from './pages/UnstuckReports.svelte';
   import IpAssociations from './pages/IpAssociations.svelte';
   import Staff from './pages/Staff.svelte';
+  import TopHolders from './pages/TopHolders.svelte';
+  import Flags from './pages/Flags.svelte';
 
   // Root of the admin SPA. Shows the login overlay until authed, then the shared
   // navigation shell and the routed page. The {#key session.locale} wrapper
@@ -49,6 +51,8 @@
     accounts: Accounts,
     characters: Characters,
     'online-players': OnlinePlayers,
+    'top-holders': TopHolders,
+    flags: Flags,
     usage: Usage,
     'tick-perf': TickPerf,
     moderation: Moderation,

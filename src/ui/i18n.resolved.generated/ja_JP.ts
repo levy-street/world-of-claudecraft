@@ -7851,6 +7851,9 @@ export const ja_JP: EnTranslations = {
       "reload": "再読み込み",
       "quit": "終了",
       "fatalBody": "World of ClaudeCraft で予期しないエラーが発生したため、終了します。"
+    },
+    "window": {
+      "exitToDesktop": "デスクトップに戻る"
     }
   },
   "gpuNotice": {

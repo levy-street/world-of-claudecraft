@@ -30,13 +30,13 @@ describe('browser path resolver', () => {
     fs.mkdirSync(path.dirname(chrome), { recursive: true });
     fs.writeFileSync(chrome, '');
 
-    expect(playwrightBrowserCandidates({ homeDir: home })).toContain(chrome);
-    expect(findBrowserPath(playwrightBrowserCandidates({ homeDir: home }))).toBe(chrome);
+    expect(playwrightBrowserCandidates({ env: {}, homeDir: home })).toContain(chrome);
+    expect(findBrowserPath(playwrightBrowserCandidates({ env: {}, homeDir: home }))).toBe(chrome);
   });
 
   it('keeps returning null when no candidate exists', () => {
     const home = tempHome();
 
-    expect(findBrowserPath(playwrightBrowserCandidates({ homeDir: home }))).toBeNull();
+    expect(findBrowserPath(playwrightBrowserCandidates({ env: {}, homeDir: home }))).toBeNull();
   });
 });

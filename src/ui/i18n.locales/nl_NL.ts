@@ -13375,4 +13375,38 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.challenging_roar.name': 'Onheilspellend Gebrul',
   'entities.abilities.cheap_shot.descriptionNoStealth': 'Treft het doelwit voor {damage} schade en verdooft het 4 sec. Levert 2 combopunten op.',
   'gpuNotice.bodyDiscreteInactive': 'Het spel gebruikt niet de game-GPU en draait in plaats daarvan op de energiezuinige GPU, waardoor de prestaties zullen lijden. Werk je grafische stuurprogramma\'s bij en herstart het spel. Stel op Windows ook het spel in op Hoge prestaties via Instellingen, Systeem, Beeldscherm, Afbeeldingen.',
+  'desktop.window.exitToDesktop': 'Afsluiten naar desktop',
+  'hudChrome.controller.cancelAction': 'Annuleren / Terug',
+  'hudChrome.controller.confirmAction': 'Bevestigen / Selecteren',
+  'hudChrome.controller.crossHotbar': 'Cross-hotbar',
+  'hudChrome.controller.crossHotbarArrangeChord': '{bumper} + {button}',
+  'hudChrome.controller.crossHotbarCarrying':
+    'Je draagt {action}: bevestig op een cel om het te plaatsen, annuleer om het terug te leggen.',
+  'hudChrome.controller.crossHotbarDisplay': 'Balkweergave',
+  'hudChrome.controller.crossHotbarDisplayCompact': 'Compact',
+  'hudChrome.controller.crossHotbarDisplayFull': 'Volledig',
+  'hudChrome.controller.crossHotbarDisplayMinimal': 'Alleen tijdens vasthouden',
+  'hudChrome.controller.crossHotbarEditHelp':
+    'Houd de linkerbumpper vast en druk op de bovenste actieknop om de balk met de controller in te delen.',
+  'hudChrome.controller.crossHotbarEditHint':
+    'Indelen: bevestigen pakt iets op uit een cel of het spreukenboek en legt het neer in een cel; annuleren wist er een.',
+  'hudChrome.controller.crossHotbarEnable': 'Cross-hotbar inschakelen',
+  'hudChrome.controller.crossHotbarExpand': 'Dubbele cross-hotbar',
+  'hudChrome.controller.crossHotbarHelp':
+    'Houd een trigger vast om acht actiebalkvakken op de d-pad en actieknoppen te laten oplichten. Tik op de andere trigger om naar de tweede set te wisselen.',
+  'hudChrome.controller.crossHotbarOwnsButtons':
+    'De triggers en de d-pad horen bij de cross-hotbar zolang die aan staat, dus ze worden hieronder ingesteld in plaats van hier.',
+  'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
+  'hudChrome.controller.crossHotbarResetLayout': 'Cross-hotbar resetten',
+  'hudChrome.controller.cycleHudAction': 'Interface wisselen',
+  'hudChrome.controller.cycleSetAction': 'Hotbarset wijzigen',
+  'hudChrome.controller.subcommandsAction': "Subcommando's / Kaart",
+  'hudChrome.perf.diagnostics.diagnosis.titles.gcHitch':
+    'Garbagecollection gebeurt binnen lange frames',
+  'hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch':
+    'Lange frames komen door werk buiten de render-callback',
+  'hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild':
+    'Zonestreaming-builds veroorzaken haperingen',
+  'hudChrome.perf.diagnostics.metrics.hitchesBuild':
+    'zonebuilds {zoneBuilds} | buiten frame {offFrame} | gc {gc}',
 };

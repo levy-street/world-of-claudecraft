@@ -223,6 +223,48 @@ describe('linkdead grace lifecycle', () => {
     expect(server.clients.size).toBe(1);
   });
 
+  it('adopts an explicit mutedUntil/reason/strikes supplied on resume', () => {
+    // resumeSession trusts meta.mutedUntil/reason/chatStrikes as-is: the race
+    // that could make that snapshot stale (an admin /mute or the chat
+    // filter's own optimistic mute landing on this exact still-linkdead
+    // session while ws_auth.ts's account read is in flight) is fenced
+    // upstream, before this value is ever computed (server/chat_mod_live.ts,
+    // exercised end to end in tests/server/ws_auth.test.ts). This pins the
+    // wiring half: an explicit fresh mute must actually reach the session.
+    const server = new GameServer();
+    const ws = fakeWs();
+    const session = expectJoined(server.join(ws, 11, 101, 'Muted', 'warrior', null));
+    dropSocket(server, session, ws);
+    expect(session.chatMutedUntil).toBeNull();
+
+    const ws2 = fakeWs();
+    const mutedUntil = new Date(Date.now() + 5 * 60_000).toISOString();
+    const resumed = expectJoined(
+      server.join(ws2, 11, 101, 'Muted', 'warrior', null, false, {
+        mutedUntil,
+        reason: 'spam',
+        chatStrikes: 2,
+      }),
+    );
+
+    expect(resumed.chatMutedUntil).toBe(new Date(mutedUntil).getTime());
+    expect(resumed.chatMuteReason).toBe('spam');
+    expect(resumed.chatStrikes).toBe(2);
+  });
+
+  it('resumes unmuted when nothing was ever muted and the resume meta carries no mute', () => {
+    const server = new GameServer();
+    const ws = fakeWs();
+    const session = expectJoined(server.join(ws, 11, 101, 'NeverMuted', 'warrior', null));
+    dropSocket(server, session, ws);
+    expect(session.chatMutedUntil).toBeNull();
+
+    const ws2 = fakeWs();
+    const resumed = expectJoined(server.join(ws2, 11, 101, 'NeverMuted', 'warrior', null));
+
+    expect(resumed.chatMutedUntil).toBeNull();
+  });
+
   it('ignores a late close event from the pre-resume socket', () => {
     const server = new GameServer();
     const ws = fakeWs();
@@ -444,6 +486,61 @@ describe('linkdead grace lifecycle', () => {
     (server as any).broadcastSnapshots();
 
     expect(ws.send).not.toHaveBeenCalled();
+  });
+});
+
+describe('chat-moderation live-state pushes (server/chat_mod_live.ts wiring)', () => {
+  // Each of these opens a hydration BEFORE calling the live-push method, the
+  // same order a real reconnect race has it in (server/ws_auth.ts captures
+  // the hydration before its DB reads; the push lands during those reads).
+  // Proves the wiring, not just the pure fence (already covered directly in
+  // tests/chat_mod_live.test.ts): deleting any pushMuteChange/pushStrikesChange
+  // call in server/game.ts must fail one of these.
+  const UNMUTED = { mutedUntil: null, reason: '', strikes: 0 };
+
+  it('muteAccountChat pushes the mute into an in-flight hydration', () => {
+    const server = new GameServer();
+    const ws = fakeWs();
+    expectJoined(server.join(ws, 11, 101, 'Muted', 'warrior', null));
+    const hydration = server.beginChatModerationHydration(11);
+
+    const expiresAt = new Date(Date.now() + 5 * 60_000).toISOString();
+    server.muteAccountChat(11, expiresAt, 'spam');
+
+    expect(hydration.resolve(UNMUTED)).toEqual({
+      mutedUntil: expiresAt,
+      reason: 'spam',
+      strikes: 0,
+    });
+    hydration.release();
+  });
+
+  it('liftChatMuteLive pushes the unmute into an in-flight hydration', () => {
+    const server = new GameServer();
+    const ws = fakeWs();
+    expectJoined(server.join(ws, 11, 101, 'WasMuted', 'warrior', null));
+    server.muteAccountChat(11, new Date(Date.now() + 60_000).toISOString(), 'spam');
+
+    const hydration = server.beginChatModerationHydration(11);
+    server.liftChatMuteLive(11);
+
+    expect(hydration.resolve({ ...UNMUTED, mutedUntil: '2099-01-01T00:00:00.000Z' })).toEqual(
+      UNMUTED,
+    );
+    hydration.release();
+  });
+
+  it('resetChatStrikesLive pushes the reset into an in-flight hydration', () => {
+    const server = new GameServer();
+    const ws = fakeWs();
+    const session = expectJoined(server.join(ws, 11, 101, 'Strikeout', 'warrior', null));
+    session.chatStrikes = 2;
+
+    const hydration = server.beginChatModerationHydration(11);
+    server.resetChatStrikesLive(11);
+
+    expect(hydration.resolve({ ...UNMUTED, strikes: 2 })).toEqual(UNMUTED);
+    hydration.release();
   });
 });
 

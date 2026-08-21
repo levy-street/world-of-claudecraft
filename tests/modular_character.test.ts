@@ -1038,6 +1038,44 @@ describe('head shading', () => {
     }
     expect(flat / tris.length, `${node} share of flat-shaded triangles`).toBeLessThan(0.12);
   });
+
+  // Regression pin for the male-only "open top of the nose" bug report: the
+  // ten vertices ringing the bridge of the nose (theta ~77 to ~136 in the
+  // headAngles frame, see src/render/characters/stubble.ts) formed a closed
+  // boundary loop with no triangles capping it, so the mesh was open there
+  // and looking down the nose (from above or the side) showed straight into
+  // the empty head interior. scripts/fix_male_head_nose_hole.mjs closes it.
+  // This walks every edge and demands every one be shared by exactly two
+  // triangles (a watertight mesh) EXCEPT the small, intentional cutouts the
+  // other modular parts (eyes/ears/mouth) and the isNoseUnderside decal
+  // plug into, which stay open by design. A regression that reopens the
+  // bridge hole (or opens a new one) shows up as an edge used by only one
+  // triangle outside that allowance.
+  // Baseline open-edge counts once the bridge hole is closed: the eyes, ears,
+  // mouth, and (male only) nostril-underside cutouts the other modular parts
+  // plug into. The two heads are separate sculpts with different cutout
+  // counts, so each gets its own pin rather than a shared cap; a tolerance
+  // band catches a reopened bridge hole (adds ~10 edges) without hand-pinning
+  // every legitimate cutout edge.
+  const OPEN_EDGES: Record<string, number> = { M_Head: 76, F_Head: 116 };
+  it.each(['M_Head', 'F_Head'])('%s has no unintended open edges', async (node) => {
+    const { tris } = await decode(node);
+    const edgeCount = new Map<string, number>();
+    const key = (a: number, b: number) => (a < b ? `${a}_${b}` : `${b}_${a}`);
+    for (const [a, b, c] of tris) {
+      for (const [x, y] of [
+        [a, b],
+        [b, c],
+        [c, a],
+      ])
+        edgeCount.set(key(x, y), (edgeCount.get(key(x, y)) ?? 0) + 1);
+    }
+    let openEdges = 0;
+    for (const count of edgeCount.values()) if (count === 1) openEdges++;
+    const expected = OPEN_EDGES[node];
+    expect(openEdges, `${node} open (non-manifold) edges`).toBeGreaterThanOrEqual(expected - 4);
+    expect(openEdges, `${node} open (non-manifold) edges`).toBeLessThanOrEqual(expected + 4);
+  });
 });
 
 describe('randomizeAppearance', () => {

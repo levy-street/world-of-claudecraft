@@ -25,6 +25,7 @@ import {
   type ModularAppearance,
   type ModularLook,
   normalizeAppearance,
+  slotCovered,
 } from './modular';
 
 /** The roster-row fields a look is composed from. Structural on purpose: the
@@ -147,4 +148,23 @@ export function modularLookChanged(
   if (prevLook === null && nextLook === null) return false;
   if (prevLook === null || nextLook === null) return true;
   return !sameAppearance(prevLook, nextLook);
+}
+
+/**
+ * Whether the paperdoll's helm-visibility eye could ever change anything for
+ * a `cls` character. False for pre-creator or fixed-rig characters with no
+ * composed modular look, for a class kit whose set ships no helm geometry at
+ * all (druid, the hunter's ranger kit, rogue; see ARMOR_BY_SET in modular.ts),
+ * and false for a Combat Mech wearer, whose replacement body never composes
+ * the kit either (the `isMechWearer` guard the renderer's live helm-toggle
+ * diff already applies). Toggling `helmHidden` when this is false still flips
+ * the flag, but nothing about the drawn body ever changes, so the eye must not
+ * be offered at all (issue: "hide helmet does nothing").
+ */
+export function helmSlotAvailable(
+  cls: PlayerClass,
+  isMech: boolean,
+  hasComposedModularLook: boolean,
+): boolean {
+  return hasComposedModularLook && !isMech && slotCovered(fullSet(classArmorSet(cls)), 'head');
 }

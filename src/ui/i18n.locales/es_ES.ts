@@ -518,4 +518,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
     'Ese código de diseño procede de una versión más reciente del juego.',
   'auth.designCodeErrMalformed':
     'Ese código de diseño está dañado. Copia el código completo e inténtalo de nuevo.',
+  'hudChrome.controller.cancelAction': 'Cancelar / Volver',
+  'hudChrome.controller.crossHotbarHelp':
+    'Mantén pulsado un gatillo para iluminar ocho huecos de la barra de acción en la cruceta y los botones frontales. Toca el otro gatillo para cambiar al segundo conjunto.',
 };

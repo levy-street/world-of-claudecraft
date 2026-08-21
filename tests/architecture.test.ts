@@ -1667,7 +1667,9 @@ const SWEPT_BY_NAME_RE = /_(?:view|core|painter)\.ts$/;
 const UI_HOST_GLOBALS = 'document|window|navigator|localStorage|sessionStorage|globalThis';
 // Dereferenced: `window.innerWidth`, `globalThis?.localStorage`, `document['x']`,
 // and the formatter's broken member chain.
-const UI_HOST_MEMBER_RE = new RegExp(`\\b(?:${UI_HOST_GLOBALS})\\??\\s*(?:\\.[A-Za-z_$]|\\[)`);
+const UI_HOST_MEMBER_RE = new RegExp(
+  `(?<!desktop\\.)\\b(?:${UI_HOST_GLOBALS})\\??\\s*(?:\\.[A-Za-z_$]|\\[)`,
+);
 // Assigned, passed, returned, spread, shorthanded, probed or cast rather than
 // dereferenced: `= document)`, `(document)`, `return document;`, `() => window`,
 // `{ document }`, `[document, window]`, `{ ...globalThis }`,
@@ -1676,7 +1678,7 @@ const UI_HOST_MEMBER_RE = new RegExp(`\\b(?:${UI_HOST_GLOBALS})\\??\\s*(?:\\.[A-
 // open brace refuses a `${...}` interpolation so a template variable named
 // `window` (talent_i18n has one) is not mistaken for the global.
 const UI_HOST_VALUE_RE = new RegExp(
-  `typeof\\s+(?:${UI_HOST_GLOBALS})\\b|(?:[=(,?!\\[]|(?<!\\$)\\{|=>|\\.\\.\\.|\\breturn)\\s*(?:${UI_HOST_GLOBALS})\\s*(?:[),;:!=}\\]]|\\s+as\\b|$)`,
+  `typeof\\s+(?:${UI_HOST_GLOBALS})\\b|(?:[=(,?!\\[]|(?<!\\$)\\{|=>|\\.\\.\\.|\\breturn)\\s*(?:${UI_HOST_GLOBALS})\\s*(?:[),;!=}\\]]|\\s+as\\b|$)`,
   'm',
 );
 // window.location reached bare. Pinned to the real Location members so a game
@@ -1737,7 +1739,7 @@ const HELPER_HOST_PATTERNS: ReadonlyArray<readonly [string, RegExp]> = [
   [
     'a browser global, passed or probed',
     new RegExp(
-      `typeof\\s+(?:${HELPER_HOST_GLOBALS})\\b|(?:[=(,?!\\[]|(?<!\\$)\\{|=>|\\.\\.\\.|\\breturn)\\s*(?:${HELPER_HOST_GLOBALS})\\s*(?:[),;:!=}\\]]|\\s+as\\b|$)`,
+      `typeof\\s+(?:${HELPER_HOST_GLOBALS})\\b|(?:[=(,?!\\[]|(?<!\\$)\\{|=>|\\.\\.\\.|\\breturn)\\s*(?:${HELPER_HOST_GLOBALS})\\s*(?:[),;!=}\\]]|\\s+as\\b|$)`,
       'm',
     ),
   ],
@@ -1790,8 +1792,9 @@ const UI_PAINTER_HELPERS = [
 // reach is a clock or an RNG in a module that is otherwise pure, inject it instead
 // and stay out of both lists.
 //
-// The rot mode to know: a future catalog value carrying a string like
-// 'window.open' would trip the member matcher inside a data file. Most of the
+// The rot mode to know: a future catalog value carrying a bare string like
+// 'window.open' would trip the member matcher inside a data file. A dotted key
+// namespace such as 'desktop.window.exitToDesktop' is not a global reach. Most of the
 // residual modules are i18n catalogs, overlays and generated bundles (the
 // anti-vacuity pin below keeps them in scope) and NONE trips it today; they stay
 // in the sweep on purpose, since a directory exclusion is a hole of exactly the
@@ -2123,6 +2126,7 @@ describe('src/ui module classification (every module is swept by exactly one gat
       "'This document. Signed.',",
       'const windowless = computeViewport();',
       'this.documentTitle = t;',
+      "'desktop.window.exitToDesktop': 'Exit to Desktop',",
     ]) {
       expect(UI_HOST_MEMBER_RE.test(negative), negative).toBe(false);
     }
@@ -2147,6 +2151,7 @@ describe('src/ui module classification (every module is swept by exactly one gat
       "'Close the window, then click the marker.',",
       "'Open the document; read it.',",
       'const shadowWindow = 1;',
+      'window: { exitToDesktop: label },',
       // A template variable named window (talent_i18n has one) is not the global,
       // which is why the open-brace arm refuses a ${...} interpolation.
       `const label = \`(\${window})\`;`,

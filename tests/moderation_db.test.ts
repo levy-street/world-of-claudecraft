@@ -15,6 +15,13 @@ vi.mock('../server/db', () => ({
   pool: db,
 }));
 
+// The suspicion-flag emitter is its own unit (tests/suspicion_flags.test.ts);
+// here it only matters that the burst path hands it the report's signals and
+// cohort, so it is mocked inert.
+vi.mock('../server/suspicion_flags', () => ({
+  flagRegistrationBurst: vi.fn(),
+}));
+
 import {
   addAccountNote,
   cleanReportReason,
@@ -37,6 +44,7 @@ import {
   setOnAccountModerated,
   setOnModerationQueueChanged,
 } from '../server/moderation_db';
+import { flagRegistrationBurst } from '../server/suspicion_flags';
 
 const { query, connect } = db;
 
@@ -108,7 +116,8 @@ describe('moderation report helpers', () => {
       .mockResolvedValueOnce(queryResult([{ n: 1 }])) // same /24
       .mockResolvedValueOnce(queryResult([{ n: 1 }])) // same UA
       .mockResolvedValueOnce(queryResult([])) // duplicate report check
-      .mockResolvedValueOnce(queryResult([{ id: 123 }])); // insert
+      .mockResolvedValueOnce(queryResult([{ id: 123 }])) // insert
+      .mockResolvedValueOnce(queryResult([{ id: 42 }, { id: 41 }])); // burst cohort ids
 
     const result = await createSuspiciousRegistrationReport({
       accountId: 42,
@@ -126,6 +135,14 @@ describe('moderation report helpers', () => {
       'spam',
       expect.stringContaining('Automated registration pattern'),
     ]);
+    // The suspicion flag mirrors the report, carrying the tripped signals and
+    // the burst cohort as related accounts.
+    expect(query.mock.calls[6][0]).toMatch(/SELECT id FROM accounts/);
+    expect(flagRegistrationBurst).toHaveBeenCalledWith({
+      accountId: 42,
+      signals: result.signals,
+      cohortAccountIds: [42, 41],
+    });
   });
 
   it('does not create a system moderation report without a suspicious registration signal', async () => {

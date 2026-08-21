@@ -289,6 +289,12 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
   'failed to add note': 'error.addNoteFailed',
   'chat strikes reset failed': 'error.chatStrikesResetFailed',
   'reactivation failed': 'error.reactivationFailed',
+  // Economy oversight (wealth + suspicion-flag workflow, server/admin.ts).
+  'too many requests, wait a moment and try again': 'error.tooManyRequests',
+  'flag not found': 'error.flagNotFound',
+  'invalid flag status': 'error.flagInvalidStatus',
+  'that status change is not allowed': 'error.flagInvalidTransition',
+  'a note is required': 'error.flagNoteRequired',
 };
 export function localizeAdminError(message: string): string {
   const key = ADMIN_ERROR_KEYS[message.trim().toLowerCase()];

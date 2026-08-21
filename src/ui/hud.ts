@@ -28,6 +28,7 @@ import {
 import { preloadMechAssets } from '../render/characters/assets';
 import { mechHeldWeaponOverride, skinCount } from '../render/characters/manifest';
 import type { ModularLook } from '../render/characters/modular';
+import { helmSlotAvailable } from '../render/characters/player_look_core';
 import {
   isComposedPortraitKey,
   onPortraitsReady,
@@ -459,6 +460,7 @@ import { lootSettingsView } from './hud/loot/loot_settings_view';
 import { renderLootSettingsWindow } from './hud/loot/loot_settings_window';
 import { LootWindowController } from './hud/loot/loot_window_controller';
 import { MapMarkerInteractionController, MapMarkerTooltipContent } from './hud/map';
+import { livingSecondaryPet } from './hud/pet_bar_core';
 import { CARD_POSES } from './hud/player_card/player_card';
 import { PlayerCardController } from './hud/player_card/player_card_controller';
 import { QuestDialogController } from './hud/quest/quest_dialog_controller';
@@ -5060,6 +5062,12 @@ export class Hud {
     dragState: this.itemDragState,
     renderBags: () => this.renderBags(),
     showError: (text) => this.showError(text),
+    helmSlotAvailable: () =>
+      helmSlotAvailable(
+        this.sim.cfg.playerClass,
+        isMechWearer(this.sim.player),
+        modularLookFor(this.sim.player) != null,
+      ),
     helmHidden: () => this.sim.player?.helmHidden ?? false,
     toggleHelm: () => {
       const next = !(this.sim.player?.helmHidden ?? false);
@@ -8388,17 +8396,9 @@ export class Hud {
     }
   }
 
-  // `pet` is resolved ONCE per frame by update() and passed in, shared with the pet
-  // frame above it: both surfaces need the same entity, and each resolving its own
-  // would walk the interest-scoped roster twice per frame.
   private renderPetBar(pet: Entity | null): void {
     const bar = $('#petbar') as HTMLElement;
-    // Value-diffed body-class flag the mobile top-band layout reads (see field doc):
-    // toggled only on a real transition so the per-frame path stays write-free.
-    // Deliberately toggled on EVERY host, not just touch: only body.mobile-touch
-    // CSS consumes it, and an always-true flag survives a desktop-to-touch flip
-    // mid-session where a mobile-gated toggle would leave it stale until the
-    // pet's presence next changed.
+    if (!pet || pet.dead) pet = livingSecondaryPet(this.sim.entities.values(), this.sim.playerId);
     const petPresent = !!pet && !pet.dead;
     if (petPresent !== this.lastPetPresent) {
       this.lastPetPresent = petPresent;

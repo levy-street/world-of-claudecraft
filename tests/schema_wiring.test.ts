@@ -619,6 +619,7 @@ describe('ensureSchema wires every schema module at boot', () => {
       'bank_ledger_container_recent',
       'player_reports_retention_created',
       'chat_violations_retention_created',
+      'bank_ledger_account_recent',
     ]);
     const guildPrefix = CONCURRENT_INDEX_MIGRATIONS.find(
       (m) => m.name === 'guilds_realm_lower_name_prefix',
@@ -652,6 +653,19 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(bankLedgerContainer?.checkSql).toContain("to_regclass('bank_ledger_container_recent')");
     expect(bankLedgerContainer?.dropSql).toBe(
       'DROP INDEX CONCURRENTLY IF EXISTS bank_ledger_container_recent',
+    );
+    // The admin economy-oversight per-account bank_ledger reader
+    // (largeGoldMovementsForAccount): equality column + trailing id DESC, the
+    // same bounded-backwards-scan shape as the guild reader. NOT partial: the
+    // threshold is a parameter here, applied as a trailing Filter.
+    const bankLedgerAccount = CONCURRENT_INDEX_MIGRATIONS.find(
+      (m) => m.name === 'bank_ledger_account_recent',
+    );
+    expect(bankLedgerAccount?.createSql).toContain('ON bank_ledger(account_id, id DESC)');
+    expect(bankLedgerAccount?.createSql).toContain('CREATE INDEX CONCURRENTLY IF NOT EXISTS');
+    expect(bankLedgerAccount?.checkSql).toContain("to_regclass('bank_ledger_account_recent')");
+    expect(bankLedgerAccount?.dropSql).toBe(
+      'DROP INDEX CONCURRENTLY IF EXISTS bank_ledger_account_recent',
     );
     // player_reports retention prune (prunePlayerReportsBatch): account-agnostic
     // age scan, so the index leads with created_at rather than either existing

@@ -93,3 +93,85 @@ export function occluderSegmentHitsBox(
   if (tmin < 0 || tmin > 1) return false;
   return eyeY + (camY - eyeY) * tmin < topY;
 }
+
+/**
+ * A crossing that begins within this many yards of the EYE end of the
+ * segment is the player standing AGAINST the structure, not the structure
+ * covering the player: without this guard, a body pressed to a wall (or, for
+ * a landing point authored close to a gate mouth, simply standing near it)
+ * hides the whole structure at most orbit angles, because the entry point
+ * sits centimetres from the eye at eye height.
+ */
+export const OCCLUDER_HIDE_EYE_CLEARANCE = 1.0;
+
+/**
+ * Whether the eye-to-camera segment crosses an ORIENTED box footprint below
+ * its top (rotated slab test in the box's local frame, Y checked at the
+ * entry point, gated by `OCCLUDER_HIDE_EYE_CLEARANCE`). Either endpoint
+ * standing inside the footprint below the top also counts as a hit,
+ * mirroring `occluderSegmentHitsBox`; unlike that axis-aligned test, this one
+ * takes `rot` (three.js `rotation.y` convention) so it fits a footprint that
+ * does not sit world-axis-aligned, such as a gate mouth seated at an
+ * authored facing.
+ */
+export function occluderSegmentHitsObb(
+  boxX: number,
+  boxZ: number,
+  halfW: number,
+  halfD: number,
+  rot: number,
+  topY: number,
+  eyeX: number,
+  eyeY: number,
+  eyeZ: number,
+  camX: number,
+  camY: number,
+  camZ: number,
+): boolean {
+  const c = Math.cos(rot);
+  const s = Math.sin(rot);
+  const toLocal = (x: number, z: number): [number, number] => {
+    const dx = x - boxX;
+    const dz = z - boxZ;
+    return [dx * c - dz * s, dx * s + dz * c];
+  };
+  const [lex, lez] = toLocal(eyeX, eyeZ);
+  const [lcx, lcz] = toLocal(camX, camZ);
+  const eyeInside = Math.abs(lex) < halfW && Math.abs(lez) < halfD;
+  const camInside = Math.abs(lcx) < halfW && Math.abs(lcz) < halfD;
+  if ((eyeY < topY && eyeInside) || (camY < topY && camInside)) return true;
+  const dx = lcx - lex;
+  const dz = lcz - lez;
+  let tmin = -Infinity;
+  let tmax = Infinity;
+  if (Math.abs(dx) < 1e-9) {
+    if (lex < -halfW || lex > halfW) return false;
+  } else {
+    let t1 = (-halfW - lex) / dx;
+    let t2 = (halfW - lex) / dx;
+    if (t1 > t2) {
+      const tmp = t1;
+      t1 = t2;
+      t2 = tmp;
+    }
+    tmin = Math.max(tmin, t1);
+    tmax = Math.min(tmax, t2);
+  }
+  if (Math.abs(dz) < 1e-9) {
+    if (lez < -halfD || lez > halfD) return false;
+  } else {
+    let t1 = (-halfD - lez) / dz;
+    let t2 = (halfD - lez) / dz;
+    if (t1 > t2) {
+      const tmp = t1;
+      t1 = t2;
+      t2 = tmp;
+    }
+    tmin = Math.max(tmin, t1);
+    tmax = Math.min(tmax, t2);
+  }
+  if (tmax < tmin || tmax < 0) return false;
+  if (tmin < 0 || tmin > 1) return false;
+  if (tmin * Math.hypot(camX - eyeX, camZ - eyeZ) < OCCLUDER_HIDE_EYE_CLEARANCE) return false;
+  return eyeY + (camY - eyeY) * tmin < topY;
+}

@@ -10,6 +10,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../src/runtime', () => ({ desktopBridge: vi.fn(() => null) }));
 vi.mock('../src/ui/desktop_update_toast', () => ({ initDesktopUpdateToast: vi.fn() }));
 vi.mock('../src/game/desktop_error_relay', () => ({ initDesktopErrorRelay: vi.fn() }));
+vi.mock('../src/game/desktop_login_exit', () => ({
+  initDesktopLoginExit: vi.fn(() => () => {}),
+}));
 vi.mock('../src/game/desktop_gpu_status', () => ({ initDesktopGpuStatus: vi.fn(() => () => {}) }));
 vi.mock('../src/game/desktop_display_change', () => ({
   initDesktopDisplayChange: vi.fn(() => () => {}),
@@ -24,6 +27,7 @@ vi.mock('../src/game/discord_presence', () => ({ initDiscordPresence: vi.fn() })
 import { initDesktopDisplayChange } from '../src/game/desktop_display_change';
 import { initDesktopErrorRelay } from '../src/game/desktop_error_relay';
 import { initDesktopGpuStatus } from '../src/game/desktop_gpu_status';
+import { initDesktopLoginExit } from '../src/game/desktop_login_exit';
 import { initDesktopNotifications } from '../src/game/desktop_notifications';
 import { initDesktopPresentation } from '../src/game/desktop_presentation';
 import { initDesktopShellIntegration } from '../src/game/desktop_shell_integration';
@@ -39,6 +43,7 @@ const pieces = [
   initDesktopUpdateToast,
   initDesktopGpuStatus,
   initDesktopDisplayChange,
+  initDesktopLoginExit,
   initDesktopPresentation,
   initDesktopNotifications,
   initDiscordPresence,
@@ -76,7 +81,7 @@ describe('initDesktopShellIntegration', () => {
   });
 
   it('disposes the previous composition before re-composing (no stacked subscriptions)', () => {
-    // The three subscribing inits return unsubscribe handles; a re-init that
+    // The subscribing inits return unsubscribe handles; a re-init that
     // discarded them would leave the old closures folding bridge pushes beside
     // the new ones (double GPU latch, double display fold, double presentation
     // latch). The retained handles must fire exactly once, on the NEXT init.
@@ -89,15 +94,18 @@ describe('initDesktopShellIntegration', () => {
     vi.mocked(initDesktopDisplayChange).mockReturnValue(() => {
       disposals.push('display');
     });
+    vi.mocked(initDesktopLoginExit).mockReturnValue(() => {
+      disposals.push('login-exit');
+    });
     vi.mocked(initDesktopPresentation).mockReturnValue(() => {
       disposals.push('presentation');
     });
     initDesktopShellIntegration();
     expect(disposals).toEqual([]);
     initDesktopShellIntegration();
-    // Exactly the first composition's three handles, disposed exactly once,
+    // Exactly the first composition's handles, disposed exactly once,
     // and every piece composed once per init (one live subscription each).
-    expect(disposals).toEqual(['gpu', 'display', 'presentation']);
+    expect(disposals).toEqual(['gpu', 'display', 'login-exit', 'presentation']);
     for (const piece of pieces) {
       expect(piece).toHaveBeenCalledTimes(2);
     }

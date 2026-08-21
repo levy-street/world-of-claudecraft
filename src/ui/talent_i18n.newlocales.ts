@@ -46,7 +46,12 @@ export const TALENT_NEW: Record<
     roleLabels: { tank: 'tankování', healer: 'léčení', dps: 'poškození' },
     perRank: ' za stupeň',
     noEffect: 'Poskytuje bonus specializace.',
-    chooseOne: (name) => 'Vyber jednu možnost pro ' + name + '.',
+    whileWord: 'během',
+    vsWord: 'proti',
+    thenWord: 'poté',
+    upToWord: 'až',
+    atLeastWord: 'alespoň',
+    chooseOne: (name) => `Vyber jednu možnost pro ${name}.`,
     specDescription: (className, role, abilityName) =>
       'Specializace pro ' +
       className +
@@ -55,9 +60,9 @@ export const TALENT_NEW: Record<
       '. Hlavní schopnost: ' +
       abilityName +
       '.',
-    grant: (abilityName) => 'Poskytuje ' + abilityName + '.',
-    increase: (target, amount, perRank) => 'Zvyšuje ' + target + ' o ' + amount + perRank + '.',
-    reduce: (target, amount, perRank) => 'Snižuje ' + target + ' o ' + amount + perRank + '.',
+    grant: (abilityName) => `Poskytuje ${abilityName}.`,
+    increase: (target, amount, perRank) => `Zvyšuje ${target} o ${amount}${perRank}.`,
+    reduce: (target, amount, perRank) => `Snižuje ${target} o ${amount}${perRank}.`,
   },
   da_DK: {
     masteryDescriptions: {
@@ -100,12 +105,17 @@ export const TALENT_NEW: Record<
     roleLabels: { tank: 'tank', healer: 'helbreder', dps: 'skade' },
     perRank: ' pr. rang',
     noEffect: 'Giver en specialiseringsfordel.',
-    chooseOne: (name) => 'Vælg én ' + name + '-mulighed.',
+    whileWord: 'mens',
+    vsWord: 'mod',
+    thenWord: 'derefter',
+    upToWord: 'op til',
+    atLeastWord: 'mindst',
+    chooseOne: (name) => `Vælg én ${name}-mulighed.`,
     specDescription: (className, role, abilityName) =>
-      className + '-specialisering med fokus på ' + role + '. Signaturevne: ' + abilityName + '.',
-    grant: (abilityName) => 'Giver ' + abilityName + '.',
-    increase: (target, amount, perRank) => 'Forøger ' + target + ' med ' + amount + perRank + '.',
-    reduce: (target, amount, perRank) => 'Reducerer ' + target + ' med ' + amount + perRank + '.',
+      `${className}-specialisering med fokus på ${role}. Signaturevne: ${abilityName}.`,
+    grant: (abilityName) => `Giver ${abilityName}.`,
+    increase: (target, amount, perRank) => `Forøger ${target} med ${amount}${perRank}.`,
+    reduce: (target, amount, perRank) => `Reducerer ${target} med ${amount}${perRank}.`,
   },
   id_ID: {
     masteryDescriptions: {
@@ -148,7 +158,12 @@ export const TALENT_NEW: Record<
     roleLabels: { tank: 'tank', healer: 'penyembuh', dps: 'kerusakan' },
     perRank: ' per tingkat',
     noEffect: 'Memberikan manfaat spesialisasi.',
-    chooseOne: (name) => 'Pilih salah satu opsi ' + name + '.',
+    whileWord: 'selama',
+    vsWord: 'vs',
+    thenWord: 'lalu',
+    upToWord: 'hingga',
+    atLeastWord: 'setidaknya',
+    chooseOne: (name) => `Pilih salah satu opsi ${name}.`,
     specDescription: (className, role, abilityName) =>
       'Spesialisasi ' +
       className +
@@ -157,11 +172,9 @@ export const TALENT_NEW: Record<
       '. Kemampuan khas: ' +
       abilityName +
       '.',
-    grant: (abilityName) => 'Memberikan ' + abilityName + '.',
-    increase: (target, amount, perRank) =>
-      'Meningkatkan ' + target + ' sebesar ' + amount + perRank + '.',
-    reduce: (target, amount, perRank) =>
-      'Mengurangi ' + target + ' sebesar ' + amount + perRank + '.',
+    grant: (abilityName) => `Memberikan ${abilityName}.`,
+    increase: (target, amount, perRank) => `Meningkatkan ${target} sebesar ${amount}${perRank}.`,
+    reduce: (target, amount, perRank) => `Mengurangi ${target} sebesar ${amount}${perRank}.`,
   },
   nl_NL: {
     masteryDescriptions: {
@@ -204,7 +217,12 @@ export const TALENT_NEW: Record<
     roleLabels: { tank: 'tank', healer: 'genezer', dps: 'schade' },
     perRank: ' per rang',
     noEffect: 'Biedt een specialisatievoordeel.',
-    chooseOne: (name) => 'Kies één ' + name + '-optie.',
+    whileWord: 'tijdens',
+    vsWord: 'tegen',
+    thenWord: 'dan',
+    upToWord: 'tot',
+    atLeastWord: 'minstens',
+    chooseOne: (name) => `Kies één ${name}-optie.`,
     specDescription: (className, role, abilityName) =>
       className +
       '-specialisatie gericht op ' +
@@ -212,9 +230,9 @@ export const TALENT_NEW: Record<
       '. Kenmerkende vaardigheid: ' +
       abilityName +
       '.',
-    grant: (abilityName) => 'Verleent ' + abilityName + '.',
-    increase: (target, amount, perRank) => 'Verhoogt ' + target + ' met ' + amount + perRank + '.',
-    reduce: (target, amount, perRank) => 'Verlaagt ' + target + ' met ' + amount + perRank + '.',
+    grant: (abilityName) => `Verleent ${abilityName}.`,
+    increase: (target, amount, perRank) => `Verhoogt ${target} met ${amount}${perRank}.`,
+    reduce: (target, amount, perRank) => `Verlaagt ${target} met ${amount}${perRank}.`,
   },
   pl_PL: {
     masteryDescriptions: { arms: 'Dzierżąc broń dwuręczną, zadajesz o 10% większe obrażenia.' },
@@ -255,7 +273,12 @@ export const TALENT_NEW: Record<
     roleLabels: { tank: 'tank', healer: 'uzdrowiciel', dps: 'obrażenia' },
     perRank: ' na poziom',
     noEffect: 'Zapewnia korzyść specjalizacji.',
-    chooseOne: (name) => 'Wybierz jedną opcję: ' + name + '.',
+    whileWord: 'podczas',
+    vsWord: 'przeciw',
+    thenWord: 'potem',
+    upToWord: 'do',
+    atLeastWord: 'co najmniej',
+    chooseOne: (name) => `Wybierz jedną opcję: ${name}.`,
     specDescription: (className, role, abilityName) =>
       'Specjalizacja klasy ' +
       className +
@@ -264,9 +287,9 @@ export const TALENT_NEW: Record<
       '. Sztandarowa zdolność: ' +
       abilityName +
       '.',
-    grant: (abilityName) => 'Daje ' + abilityName + '.',
-    increase: (target, amount, perRank) => 'Zwiększa ' + target + ' o ' + amount + perRank + '.',
-    reduce: (target, amount, perRank) => 'Zmniejsza ' + target + ' o ' + amount + perRank + '.',
+    grant: (abilityName) => `Daje ${abilityName}.`,
+    increase: (target, amount, perRank) => `Zwiększa ${target} o ${amount}${perRank}.`,
+    reduce: (target, amount, perRank) => `Zmniejsza ${target} o ${amount}${perRank}.`,
   },
   sv_SE: {
     masteryDescriptions: { arms: 'När du bär ett tvåhandsvapen ökar all skada du gör med 10 %.' },
@@ -307,12 +330,17 @@ export const TALENT_NEW: Record<
     roleLabels: { tank: 'tank', healer: 'läkare', dps: 'skada' },
     perRank: ' per rang',
     noEffect: 'Ger en specialiseringsfördel.',
-    chooseOne: (name) => 'Välj ett ' + name + '-alternativ.',
+    whileWord: 'under',
+    vsWord: 'mot',
+    thenWord: 'sedan',
+    upToWord: 'upp till',
+    atLeastWord: 'minst',
+    chooseOne: (name) => `Välj ett ${name}-alternativ.`,
     specDescription: (className, role, abilityName) =>
-      className + '-specialisering inriktad på ' + role + '. Signaturförmåga: ' + abilityName + '.',
-    grant: (abilityName) => 'Ger ' + abilityName + '.',
-    increase: (target, amount, perRank) => 'Ökar ' + target + ' med ' + amount + perRank + '.',
-    reduce: (target, amount, perRank) => 'Minskar ' + target + ' med ' + amount + perRank + '.',
+      `${className}-specialisering inriktad på ${role}. Signaturförmåga: ${abilityName}.`,
+    grant: (abilityName) => `Ger ${abilityName}.`,
+    increase: (target, amount, perRank) => `Ökar ${target} med ${amount}${perRank}.`,
+    reduce: (target, amount, perRank) => `Minskar ${target} med ${amount}${perRank}.`,
   },
   tr_TR: {
     masteryDescriptions: { arms: 'İki elli silah kuşanırken verdiğin tüm hasar %10 artar.' },
@@ -353,12 +381,17 @@ export const TALENT_NEW: Record<
     roleLabels: { tank: 'tank', healer: 'şifacı', dps: 'hasar' },
     perRank: ' her rütbede',
     noEffect: 'Bir uzmanlık avantajı sağlar.',
-    chooseOne: (name) => 'Bir ' + name + ' seçeneği seçin.',
+    whileWord: 'sırasında',
+    vsWord: 'karşı',
+    thenWord: 'ardından',
+    upToWord: 'en fazla',
+    atLeastWord: 'en az',
+    chooseOne: (name) => `Bir ${name} seçeneği seçin.`,
     specDescription: (className, role, abilityName) =>
-      role + ' odaklı ' + className + ' uzmanlığı. İmza yeteneği: ' + abilityName + '.',
-    grant: (abilityName) => abilityName + ' kazandırır.',
-    increase: (target, amount, perRank) => target + ' değerini ' + amount + perRank + ' artırır.',
-    reduce: (target, amount, perRank) => target + ' değerini ' + amount + perRank + ' azaltır.',
+      `${role} odaklı ${className} uzmanlığı. İmza yeteneği: ${abilityName}.`,
+    grant: (abilityName) => `${abilityName} kazandırır.`,
+    increase: (target, amount, perRank) => `${target} değerini ${amount}${perRank} artırır.`,
+    reduce: (target, amount, perRank) => `${target} değerini ${amount}${perRank} azaltır.`,
   },
   vi_VN: {
     masteryDescriptions: {
@@ -401,7 +434,12 @@ export const TALENT_NEW: Record<
     roleLabels: { tank: 'đỡ đòn', healer: 'trị liệu', dps: 'sát thương' },
     perRank: ' mỗi cấp',
     noEffect: 'Mang lại lợi ích chuyên môn hóa.',
-    chooseOne: (name) => 'Chọn một tùy chọn ' + name + '.',
+    whileWord: 'trong khi',
+    vsWord: 'với',
+    thenWord: 'sau đó',
+    upToWord: 'tối đa',
+    atLeastWord: 'ít nhất',
+    chooseOne: (name) => `Chọn một tùy chọn ${name}.`,
     specDescription: (className, role, abilityName) =>
       'Chuyên môn hóa ' +
       className +
@@ -410,9 +448,9 @@ export const TALENT_NEW: Record<
       '. Kỹ năng đặc trưng: ' +
       abilityName +
       '.',
-    grant: (abilityName) => 'Trao ' + abilityName + '.',
-    increase: (target, amount, perRank) => 'Tăng ' + target + ' thêm ' + amount + perRank + '.',
-    reduce: (target, amount, perRank) => 'Giảm ' + target + ' đi ' + amount + perRank + '.',
+    grant: (abilityName) => `Trao ${abilityName}.`,
+    increase: (target, amount, perRank) => `Tăng ${target} thêm ${amount}${perRank}.`,
+    reduce: (target, amount, perRank) => `Giảm ${target} đi ${amount}${perRank}.`,
   },
 };
 

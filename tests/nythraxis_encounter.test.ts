@@ -332,6 +332,69 @@ describe('Nythraxis encounter module (N1)', () => {
     expect(b.hp).toBe(250);
   });
 
+  it('a Direhowl debuff on the boss cannot save an unstacked heroic Soul Rend mark', () => {
+    // Same fix and reasoning as the Deathless Rage case above: an unstacked
+    // heroic mark (150% of max hp, share 1) is the "guaranteed kill through
+    // any topped-off health bar" this file's own comment promises.
+    const { ctx, boss, dps } = setup({ difficulty: 'heroic', dpsCount: 7 });
+    const st = nythraxis.initNythraxisEncounter(boss);
+    st.phase = 2;
+    const [a] = dps;
+    a.maxHp = 1000;
+    a.hp = 1000;
+    st.soulRendMarks = [{ playerId: a.id, remaining: 0 }];
+    ctx.applyAura(boss, {
+      id: 'demoralizing_shout_ap',
+      name: 'Direhowl',
+      kind: 'buff_dmg_done',
+      remaining: 20,
+      duration: 20,
+      value: -0.2,
+      sourceId: a.id,
+      school: 'physical',
+    });
+
+    nythraxis.updateNythraxisSoulRend(ctx, boss, st);
+
+    expect(a.dead).toBe(true);
+  });
+
+  it('a Direhowl debuff still mitigates a stacked heroic Soul Rend split', () => {
+    // A stacked pair (75% each) was never claimed as a guaranteed kill, so
+    // Direhowl mitigating it is the ability working as intended, not the bug
+    // the unstacked case above guards against.
+    const { ctx, boss, dps } = setup({ difficulty: 'heroic', dpsCount: 7 });
+    const st = nythraxis.initNythraxisEncounter(boss);
+    st.phase = 2;
+    const [a, b] = dps;
+    b.pos = { ...a.pos };
+    a.maxHp = 1000;
+    a.hp = 1000;
+    b.maxHp = 1000;
+    b.hp = 1000;
+    st.soulRendMarks = [
+      { playerId: a.id, remaining: 0 },
+      { playerId: b.id, remaining: 0 },
+    ];
+    ctx.applyAura(boss, {
+      id: 'demoralizing_shout_ap',
+      name: 'Direhowl',
+      kind: 'buff_dmg_done',
+      remaining: 20,
+      duration: 20,
+      value: -0.2,
+      sourceId: a.id,
+      school: 'physical',
+    });
+
+    nythraxis.updateNythraxisSoulRend(ctx, boss, st);
+
+    // Unmitigated leaves 250 each (see the 75%-per-pair test above); the -20%
+    // Direhowl cut on top of the 75% hit leaves more.
+    expect(a.hp).toBe(400);
+    expect(b.hp).toBe(400);
+  });
+
   it('heroic Deathless Rage is lethal on a failed wardstone channel (115% max hp)', () => {
     const heroic = setup({ difficulty: 'heroic' });
     let st = nythraxis.initNythraxisEncounter(heroic.boss);
@@ -357,6 +420,66 @@ describe('Nythraxis encounter module (N1)', () => {
     for (const p of [normal.tank, ...normal.dps]) {
       expect(p.dead).toBe(false);
       expect(p.hp).toBe(180);
+    }
+  });
+
+  it('a Direhowl debuff on the boss cannot save the raid from a failed heroic channel', () => {
+    // Direhowl (demoralizing_shout) lands a -20% buff_dmg_done aura on the boss
+    // (effect_dispatch.ts aoeAttackPower pct form). Deathless Rage on a failed
+    // heroic channel is a scripted, rng-free wipe calibrated at 115% of max hp
+    // specifically so it clears the raid outright; it must not be pulled back
+    // under 100% just because a warrior timed a raid cooldown on the boss.
+    const heroic = setup({ difficulty: 'heroic' });
+    const st = nythraxis.initNythraxisEncounter(heroic.boss);
+    st.phase = 2;
+    st.deathlessCastRemaining = 0.01; // completes this update, no channels ran
+    for (const p of [heroic.tank, ...heroic.dps]) {
+      p.maxHp = 1000;
+      p.hp = 1000;
+    }
+    heroic.ctx.applyAura(heroic.boss, {
+      id: 'demoralizing_shout_ap',
+      name: 'Direhowl',
+      kind: 'buff_dmg_done',
+      remaining: 20,
+      duration: 20,
+      value: -0.2,
+      sourceId: heroic.tank.id,
+      school: 'physical',
+    });
+    nythraxis.updateNythraxisDeathlessRage(heroic.ctx, heroic.boss, st);
+    for (const p of [heroic.tank, ...heroic.dps]) expect(p.dead).toBe(true);
+  });
+
+  it('a Direhowl debuff still mitigates the survivable normal-mode Deathless Rage hit', () => {
+    // Normal's 82% was never calibrated as a guaranteed kill (unlike heroic's
+    // 115%), so the alreadyFinal skip above must stay heroic-only: Direhowl
+    // reducing an ordinary, survivable hit is the ability working as intended,
+    // not the bug this file's heroic test guards against.
+    const normal = setup();
+    const st = nythraxis.initNythraxisEncounter(normal.boss);
+    st.phase = 2;
+    st.deathlessCastRemaining = 0.01;
+    for (const p of [normal.tank, ...normal.dps]) {
+      p.maxHp = 1000;
+      p.hp = 1000;
+    }
+    normal.ctx.applyAura(normal.boss, {
+      id: 'demoralizing_shout_ap',
+      name: 'Direhowl',
+      kind: 'buff_dmg_done',
+      remaining: 20,
+      duration: 20,
+      value: -0.2,
+      sourceId: normal.tank.id,
+      school: 'physical',
+    });
+    nythraxis.updateNythraxisDeathlessRage(normal.ctx, normal.boss, st);
+    // Unmitigated normal Deathless Rage leaves 180 hp (see the 115%/82% test
+    // above); the -20% Direhowl cut on top of the 82% hit leaves more.
+    for (const p of [normal.tank, ...normal.dps]) {
+      expect(p.dead).toBe(false);
+      expect(p.hp).toBe(344);
     }
   });
 

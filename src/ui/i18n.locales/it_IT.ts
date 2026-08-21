@@ -13459,4 +13459,38 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Colpisci il bersaglio per {damage} danni, stordendolo per 4 sec. Conferisce 2 punti combo.',
   'gpuNotice.bodyDiscreteInactive':
     'Il gioco non sta usando la GPU dedicata (per il gioco) e sta girando invece sulla GPU a risparmio energetico, quindi le prestazioni ne risentiranno. Aggiorna i driver grafici, poi riavvia il gioco. Su Windows, imposta anche il gioco su Prestazioni elevate in Impostazioni > Sistema > Schermo > Grafica.',
+  'hudChrome.controller.cancelAction': 'Annulla / Indietro',
+  'hudChrome.controller.confirmAction': 'Conferma / Seleziona',
+  'hudChrome.controller.crossHotbar': 'Barra incrociata',
+  'hudChrome.controller.crossHotbarArrangeChord': '{bumper} + {button}',
+  'hudChrome.controller.crossHotbarCarrying':
+    'Hai {action}: conferma su una cella per posizionarla, annulla per rimetterla a posto.',
+  'hudChrome.controller.crossHotbarDisplay': 'Visualizzazione barra',
+  'hudChrome.controller.crossHotbarDisplayCompact': 'Compatta',
+  'hudChrome.controller.crossHotbarDisplayFull': 'Completa',
+  'hudChrome.controller.crossHotbarDisplayMinimal': 'Solo mentre premuta',
+  'hudChrome.controller.crossHotbarEditHelp':
+    'Tieni premuto il dorsale sinistro e premi il pulsante frontale superiore per organizzare la barra con il controller.',
+  'hudChrome.controller.crossHotbarEditHint':
+    'Organizzazione: conferma prende da una cella o dal libro degli incantesimi e deposita su una cella; annulla ne cancella una.',
+  'hudChrome.controller.crossHotbarEnable': 'Attiva barra incrociata',
+  'hudChrome.controller.crossHotbarExpand': 'Doppia barra incrociata',
+  'hudChrome.controller.crossHotbarHelp':
+    'Tieni premuto un grilletto per illuminare otto slot della barra azioni su croce direzionale e pulsanti frontali. Tocca l’altro grilletto per passare al secondo set.',
+  'hudChrome.controller.crossHotbarOwnsButtons':
+    'Quando è attiva, la barra incrociata usa i grilletti e la croce direzionale, quindi si configurano qui sotto invece che qui.',
+  'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
+  'hudChrome.controller.crossHotbarResetLayout': 'Ripristina barra incrociata',
+  'hudChrome.controller.cycleHudAction': 'Scorri interfaccia',
+  'hudChrome.controller.cycleSetAction': 'Cambia set barra',
+  'hudChrome.controller.subcommandsAction': 'Sottocomandi / Mappa',
+  'hudChrome.perf.diagnostics.diagnosis.titles.gcHitch':
+    'Le raccolte della memoria vengono eseguite dentro frame lunghi',
+  'hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch':
+    'I frame lunghi vengono da lavoro fuori dal callback di rendering',
+  'hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild':
+    'La costruzione delle zone in streaming causa scatti',
+  'hudChrome.perf.diagnostics.metrics.hitchesBuild':
+    'costruzioni zone {zoneBuilds} | fuori frame {offFrame} | GC {gc}',
+  'desktop.window.exitToDesktop': 'Esci al desktop',
 };

@@ -329,4 +329,13 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'auth.designCodeErrVersion': "Ce code d'apparence vient d'une version plus récente du jeu.",
   'auth.designCodeErrMalformed':
     "Ce code d'apparence est endommagé. Copiez le code au complet et réessayez.",
+  'hudChrome.controller.cancelAction': 'Annuler / Revenir',
+  'hudChrome.controller.crossHotbarEditHint':
+    'Organisation : confirmer prend depuis une case ou le grimoire et dépose sur une case; annuler en efface une.',
+  'hudChrome.controller.crossHotbarHelp':
+    'Maintenez une gâchette pour allumer huit emplacements de barre d’action sur la croix directionnelle et les boutons de façade. Touchez l’autre gâchette pour passer au deuxième ensemble.',
+  'hudChrome.controller.crossHotbarOwnsButtons':
+    'Quand elle est active, la barre croisée utilise les gâchettes et la croix directionnelle; elles se configurent donc ci-dessous plutôt qu’ici.',
+  'hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild':
+    'Les constructions de zones en diffusion causent des saccades',
 };

@@ -13242,4 +13242,38 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Slå till målet för {damage} skada, vilket bedövar det i 4 sek. Ger 2 kombopoäng.',
   'gpuNotice.bodyDiscreteInactive':
     'Spelet använder inte det separata (spel-)grafikkortet och körs i stället på det strömsparande grafikkortet, vilket försämrar prestandan. Uppdatera dina grafikdrivrutiner och starta sedan om spelet. I Windows anger du även spelet till Höga prestanda under Inställningar > System > Skärm > Grafik.',
+  'desktop.window.exitToDesktop': 'Avsluta till skrivbordet',
+  'hudChrome.controller.cancelAction': 'Avbryt / Tillbaka',
+  'hudChrome.controller.confirmAction': 'Bekräfta / Välj',
+  'hudChrome.controller.crossHotbar': 'Cross-hotbar',
+  'hudChrome.controller.crossHotbarArrangeChord': '{bumper} + {button}',
+  'hudChrome.controller.crossHotbarCarrying':
+    'Du bär {action}: bekräfta på en cell för att placera det, avbryt för att lägga tillbaka det.',
+  'hudChrome.controller.crossHotbarDisplay': 'Radvisning',
+  'hudChrome.controller.crossHotbarDisplayCompact': 'Kompakt',
+  'hudChrome.controller.crossHotbarDisplayFull': 'Fullständig',
+  'hudChrome.controller.crossHotbarDisplayMinimal': 'Endast när den hålls inne',
+  'hudChrome.controller.crossHotbarEditHelp':
+    'Håll vänster bumper och tryck på den övre ansiktsknappen för att ordna raden med handkontrollen.',
+  'hudChrome.controller.crossHotbarEditHint':
+    'Ordnar: bekräfta plockar upp från en cell eller trollformelboken och släpper på en cell; avbryt rensar en.',
+  'hudChrome.controller.crossHotbarEnable': 'Aktivera cross-hotbar',
+  'hudChrome.controller.crossHotbarExpand': 'Dubbel cross-hotbar',
+  'hudChrome.controller.crossHotbarHelp':
+    'Håll en trigger för att tända åtta åtgärdsradsplatser på styrkorset och ansiktsknapparna. Tryck på den andra triggern för att byta till den andra uppsättningen.',
+  'hudChrome.controller.crossHotbarOwnsButtons':
+    'Triggers och styrkorset hör till cross-hotbaren medan den är på, så de ställs in nedan i stället för här.',
+  'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
+  'hudChrome.controller.crossHotbarResetLayout': 'Återställ cross-hotbar',
+  'hudChrome.controller.cycleHudAction': 'Växla gränssnitt',
+  'hudChrome.controller.cycleSetAction': 'Byt hotbar-uppsättning',
+  'hudChrome.controller.subcommandsAction': 'Underkommandon / Karta',
+  'hudChrome.perf.diagnostics.diagnosis.titles.gcHitch':
+    'Skräpinsamling körs under långa bildrutor',
+  'hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch':
+    'Långa bildrutor kommer från arbete utanför renderingscallbacken',
+  'hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild':
+    'Zonströmningsbyggen orsakar hack',
+  'hudChrome.perf.diagnostics.metrics.hitchesBuild':
+    'zonbyggen {zoneBuilds} | utanför bildruta {offFrame} | gc {gc}',
 };

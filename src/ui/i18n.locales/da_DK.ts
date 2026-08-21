@@ -13219,4 +13219,38 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Slå målet for {damage} skade og bedøv det i 4 sek. Giver 2 combopoint.',
   'gpuNotice.bodyDiscreteInactive':
     'Spillet bruger ikke den dedikerede (gaming-)GPU og kører i stedet på den strømbesparende GPU, så ydeevnen forringes. Opdater dine grafikdrivere og genstart derefter spillet. På Windows skal du også indstille spillet til Høj ydeevne under Indstillinger, System, Skærm, Grafik.',
+  'desktop.window.exitToDesktop': 'Afslut til skrivebordet',
+  'hudChrome.controller.cancelAction': 'Annuller / Tilbage',
+  'hudChrome.controller.confirmAction': 'Bekræft / Vælg',
+  'hudChrome.controller.crossHotbar': 'Cross-hotbar',
+  'hudChrome.controller.crossHotbarArrangeChord': '{bumper} + {button}',
+  'hudChrome.controller.crossHotbarCarrying':
+    '{action} bæres: bekræft på en celle for at placere den, annuller for at lægge den tilbage.',
+  'hudChrome.controller.crossHotbarDisplay': 'Bjælkevisning',
+  'hudChrome.controller.crossHotbarDisplayCompact': 'Kompakt',
+  'hudChrome.controller.crossHotbarDisplayFull': 'Fuld',
+  'hudChrome.controller.crossHotbarDisplayMinimal': 'Kun mens den holdes',
+  'hudChrome.controller.crossHotbarEditHelp':
+    'Hold venstre bumper nede, og tryk på den øverste frontknap for at arrangere bjælken med controlleren.',
+  'hudChrome.controller.crossHotbarEditHint':
+    'Arrangerer: bekræft samler op fra en celle eller tryllebogen og slipper på en celle; annuller rydder en.',
+  'hudChrome.controller.crossHotbarEnable': 'Aktivér cross-hotbar',
+  'hudChrome.controller.crossHotbarExpand': 'Dobbelt cross-hotbar',
+  'hudChrome.controller.crossHotbarHelp':
+    'Hold en trigger nede for at tænde otte handlingsbjælkepladser på d-pad og frontknapper. Tryk på den anden trigger for at skifte til det andet sæt.',
+  'hudChrome.controller.crossHotbarOwnsButtons':
+    'Triggere og d-pad hører til cross-hotbaren, mens den er slået til, så de sættes op nedenfor i stedet for her.',
+  'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
+  'hudChrome.controller.crossHotbarResetLayout': 'Nulstil cross-hotbar',
+  'hudChrome.controller.cycleHudAction': 'Skift grænseflade',
+  'hudChrome.controller.cycleSetAction': 'Skift hotbar-sæt',
+  'hudChrome.controller.subcommandsAction': 'Underkommandoer / Kort',
+  'hudChrome.perf.diagnostics.diagnosis.titles.gcHitch':
+    'Garbage collection kører under lange frames',
+  'hudChrome.perf.diagnostics.diagnosis.titles.offFrameHitch':
+    'Lange frames kommer fra arbejde uden for render-callbacken',
+  'hudChrome.perf.diagnostics.diagnosis.titles.zoneBuild':
+    'Zone-streaming-builds forårsager hak',
+  'hudChrome.perf.diagnostics.metrics.hitchesBuild':
+    'zone-builds {zoneBuilds} | uden for frame {offFrame} | gc {gc}',
 };

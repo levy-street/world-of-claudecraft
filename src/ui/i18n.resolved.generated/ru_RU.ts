@@ -7851,6 +7851,9 @@ export const ru_RU: EnTranslations = {
       "reload": "Перезагрузить",
       "quit": "Выйти",
       "fatalBody": "World of ClaudeCraft столкнулась с непредвиденной ошибкой и будет закрыта."
+    },
+    "window": {
+      "exitToDesktop": "Выйти на рабочий стол"
     }
   },
   "gpuNotice": {

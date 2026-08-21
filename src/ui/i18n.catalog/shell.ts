@@ -156,6 +156,9 @@ export const shellStrings = {
         quit: 'Quit',
         fatalBody: 'World of ClaudeCraft hit an unexpected error and needs to close.',
       },
+      window: {
+        exitToDesktop: 'Exit to Desktop',
+      },
     },
     // Software-rendering notice (src/ui/gpu_notice_toast.ts): shown once when
     // the session runs on a software rasterizer (WARP/SwiftShader). Two body

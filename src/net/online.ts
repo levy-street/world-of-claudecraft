@@ -3163,6 +3163,13 @@ export class ClientWorld implements IWorld {
       e.dead = nowDead;
       e.ghost = !!w.gh; // released spirit: rendered translucent, runs faster
       e.lootable = !!w.loot;
+      // Synthetic sentinel, not a real countdown (same idiom as the paladin
+      // `pasc` note above): 0 once the server's one-shot `cd` corpse-decay
+      // flag has fired, 1 while still inside the loot window.
+      // entity_view_policy_core's admission check only ever tests <= 0, so
+      // this coarse mirror is all it needs; offline Sim entities carry the
+      // real countdown. Same idea as the ffa/lootFfaTimer mirror below.
+      e.corpseTimer = w.cd ? 0 : 1;
       e.hostile = !!w.h;
       e.castingAbility = w.cast ?? null;
       e.castRemaining = w.castRem ?? 0;

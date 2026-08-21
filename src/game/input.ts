@@ -384,6 +384,9 @@ export class Input {
     window.addEventListener('auxclick', (e) => this.onAuxClick(e));
     window.addEventListener('mouseup', (e) => this.onMouseUp(e));
     window.addEventListener('mousemove', (e) => this.onMouseMove(e));
+    // See releaseMouseActivatedFocus: sheds a HUD button's lingering focus
+    // after a real mouse click so it cannot hijack the next Space/Enter.
+    window.addEventListener('click', (e) => this.releaseMouseActivatedFocus(e));
     canvas.addEventListener(
       'wheel',
       (e) => {
@@ -1322,7 +1325,32 @@ export class Input {
     e.preventDefault?.();
   }
 
+  // A native <button> (action-bar slot, bag row, sidebar icon...) keeps
+  // browser focus after a mouse click. Left focused, it hijacks the very next
+  // Space or Enter meant for jump/chat: the browser replays that still-focused
+  // button's own native Space/Enter click-activation, re-using whatever it
+  // does (dismounting, re-consuming a potion...) instead of, or alongside,
+  // the intended game action. Shed focus right after a MOUSE-driven
+  // activation so the next keypress reaches gameplay untouched.
+  //
+  // A keyboard Enter/Space activation also fires 'click', but with detail 0
+  // (no click count) versus >=1 for a real mouse click, so a button reached
+  // and activated via Tab+Enter is left focused, exactly as keyboard users
+  // expect. 'click' never fires after a completed drag, so bag
+  // drag-to-equip/drag-to-hotbar stay untouched. A non-primary release
+  // (right/middle-click) has no keyboard equivalent in this game, so
+  // onMouseUp always treats it as mouse-driven.
+  private releaseMouseActivatedFocus(e: { type: string; detail?: number }): void {
+    if (e.type === 'click' && e.detail === 0) return;
+    const active = document.activeElement as { tagName?: string; blur?: () => void } | null;
+    if ((active?.tagName ?? '').toLowerCase() === 'button') active?.blur?.();
+  }
+
   private onMouseUp(e: MouseEvent): void {
+    // A right/middle/thumb release can be the resolution of a HUD button
+    // click (e.g. equip-via-right-click); those buttons have no 'click'
+    // equivalent for the guard above to catch, so shed focus here instead.
+    if (e.button !== 0) this.releaseMouseActivatedFocus(e);
     // Release the binding half first: it is the only part an extra button has,
     // and it must run whether the release arrives as pointerup or mouseup.
     const boundCode = bindableMouseCodeForButton(e.button);

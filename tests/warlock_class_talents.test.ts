@@ -150,6 +150,32 @@ describe('warlock class talent tree', () => {
     });
   });
 
+  it('retunes an active Fiendhide aura when Pact Deepened changes', () => {
+    const { sim, player } = rig({});
+    const baseArmor = player.stats.armor;
+
+    sim.castAbility('demon_skin');
+    expect(player.auras.find((aura) => aura.id === 'demon_skin')).toMatchObject({
+      kind: 'buff_armor',
+      value: 80,
+    });
+    expect(player.stats.armor - baseArmor).toBe(80);
+
+    expect(sim.selectTalentRow(11, 'wlk_r11_improved_life_tap')).toBe(true);
+    expect(player.auras.find((aura) => aura.id === 'demon_skin')).toMatchObject({
+      kind: 'buff_armor',
+      value: 160,
+    });
+    expect(player.stats.armor - baseArmor).toBe(160);
+
+    expect(sim.selectTalentRow(11, null)).toBe(true);
+    expect(player.auras.find((aura) => aura.id === 'demon_skin')).toMatchObject({
+      kind: 'buff_armor',
+      value: 80,
+    });
+    expect(player.stats.armor - baseArmor).toBe(80);
+  });
+
   it('makes Pact Deepened reduce magic damage by 5% only while Fiendhide is active', () => {
     const { sim, player } = rig({ 11: 'wlk_r11_improved_life_tap' });
     const source = addTarget(sim);
