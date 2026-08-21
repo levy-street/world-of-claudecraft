@@ -7578,7 +7578,9 @@ BEFORE the merge ran and are reproduced here with their observations.
 - PREDICTED and OBSERVED identical for everything else: census exports union
   17595 / merged 17596 / MISSING 0 / EXTRA 6 (the 13 new export names verified
   absent from the branch beforehand); contentIds 3061/3061; i18n 18161/18158;
-  SimEvent 159 union / 148 emits; composition PASS; i18n:gen, wiki:content and
+  SimEvent 159 union / 148 emits (the emits figure as the extractor read it at
+  the sync; it became 152 later in this QA when the extractor learned the two
+  indirections, see below); composition PASS; i18n:gen, wiki:content and
   sfx:manifest all ZERO DIFF; every count pin unchanged; no other MONOLITHS row
   moved. Release parent count 2, AUTO-DERIVED off the first-parent merge chain
   exactly as unit 5 designed it, which makes this sync the live test of that arm.
@@ -7615,6 +7617,17 @@ their blind spots are the highest-value findings here. All four exited 0 before.
   arms now assert a uniform shift and main() asserts the whole table agrees on
   ONE. That arm independently reproduces +4x4661, exactly the 4,661 uniform id
   moves the 11d architecture review recorded.
+- Census could not see FOUR SimEvent types emitted at all, all four in
+  src/sim/professions/, the directory both packets rewrote: attunedZone,
+  farmReady, gatherRareEvent, masterworkZone are built in a fanout callback or a
+  ternary rather than an `emit({ type: '<literal>' })`, so a hunk dropping the
+  emit CALL while leaving the union arm and the exported helper passed every
+  class. The extractor now resolves both indirections one level deep, so all
+  four are ordinary members of the emits class (that class moves 142/148/148 to
+  ours 145 / theirs 152 / merged 152, MISSING 0 and EXTRA 0 throughout), and the
+  seven server-side events that legitimately remain unseen are PINNED so the set
+  cannot grow silently. Proved: deleting the masterworkZone call now reports it
+  MISSING with per-parent provenance and exits 1, where it exited 0 before.
 - Composition built its work list from the MERGED golden directory alone, so a
   golden a parent carried and the merge DROPPED was never visited, and an empty
   input set printed PASS. Now enumerates both parents, reports a MISSING class,
