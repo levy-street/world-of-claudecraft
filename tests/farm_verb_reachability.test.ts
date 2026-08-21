@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { CHROME_GUARDED_PANELS } from '../src/ui/chrome_focus_wiring';
 import { stripComments } from './helpers/strip_comments';
 
 // The pin that would have caught the Phase 9 (bn) gap: a farming verb the
@@ -149,10 +150,15 @@ describe('the Hud glue between the funnel and the sheet', () => {
     expect(block).toContain('.plantSheetWindow.notifyErrorToast(');
   });
 
+  // The guard list left hud.ts at the v0.40.0 sync of release tip 35a6481825
+  // (PR #3506 extracted it into src/ui/chrome_focus_wiring.ts), so the claim
+  // moves to the extracted seam rather than being deleted: hud.ts must still
+  // call the wiring, and the sheet must still be one of the roots it guards.
+  // Both halves are needed. Membership alone would survive hud.ts dropping the
+  // call, and the call alone would survive the sheet falling out of the list.
   it('keeps the sheet in the panel keydown guard list', () => {
-    const block = sliceOnce(stripped, 'for (const panelId of [', '});');
-    expect(block).toContain("'#plant-sheet-window'");
-    expect(block).toContain('stopPropagation');
+    expect(stripped).toContain('wireChromeFocus($);');
+    expect(CHROME_GUARDED_PANELS).toContain('#plant-sheet-window');
   });
 });
 
