@@ -1,12 +1,15 @@
-// Well-fed buff-dish tooltip line: the pure string-builder composed inside
-// Hud.itemTooltip (the elixir_tooltip_view.test.ts idiom). English copy
-// asserted directly; the numbers must mirror each def's own wellfed record,
-// never re-invented copy, and every line must state the finish-eating
-// trigger, because the buff lands only when the 18s sit-restore COMPLETES
-// (an interrupted meal forfeits it), which is exactly the important-trigger
-// rule of docs/design/tooltip-writing.md. Also guards the data side: a buff
-// dish without a wellfed record would render no well-fed line at all, the
-// silent-tooltip bug class the elixir view fixed.
+// The one Well Fed tooltip line (unified in Masterwrought 11c): the pure
+// string-builder composed inside Hud.itemTooltip (the
+// elixir_tooltip_view.test.ts idiom). English copy asserted directly; the
+// numbers must mirror each def's own wellFed record, never re-invented copy,
+// and every line must state BOTH load-bearing clauses of the surviving key
+// pair (ruling 11c-A4-KEYPAIR): the finish-eating trigger, because the buff
+// lands only when the 18s sit-restore COMPLETES, and the one-at-a-time rule,
+// because the whole food family shares one 'well_fed' aura id. Also guards
+// the data side: a buff food without a wellFed record would render no
+// well-fed line at all, the silent-tooltip bug class the elixir view fixed,
+// and the hud composes exactly ONE well-fed line per tooltip (the 11b merge
+// briefly wired two views over the same record).
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -19,128 +22,152 @@ import {
   type SupportedLanguage,
   setLanguage,
 } from '../src/ui/i18n';
-import { wellfedTooltipLines } from '../src/ui/wellfed_tooltip_view';
+import { wellFedTooltipLines } from '../src/ui/wellfed_tooltip_view';
 import { stripComments } from './helpers/strip_comments';
 
-// Synthetic wellfed variants: one def spread with a replaced record, so the
+// Synthetic wellFed variants: one def spread with a replaced record, so the
 // mapped-stat rows, the formatter options, and the escaping are each pinned
-// off-data (every shipped buff dish is a small-number buff_sta, which
+// off-data (every shipped farming dish is a small-number buff_sta, which
 // exercises exactly one map row and no grouping, rounding, or escaping).
-function wellfedDef(record: NonNullable<FoodItemDef['wellfed']>): ItemDef {
-  return { ...(ITEMS.eastbrook_glazed_carrots as FoodItemDef), wellfed: record };
+function wellFedDef(record: NonNullable<FoodItemDef['wellFed']>): ItemDef {
+  return { ...(ITEMS.eastbrook_glazed_carrots as FoodItemDef), wellFed: record };
 }
 
-describe('wellfedTooltipLines', () => {
+describe('wellFedTooltipLines', () => {
   afterEach(() => setLanguage('en'));
 
-  it('glazed carrots state the buff, duration, and the finish-eating trigger', () => {
-    expect(wellfedTooltipLines(ITEMS.eastbrook_glazed_carrots)).toBe(
-      '<div class="tt-desc">Well Fed: +3 Stamina for 10 min, granted when you finish eating.</div>',
+  it('glazed carrots state the buff, the trigger, and the one-at-a-time rule', () => {
+    expect(wellFedTooltipLines(ITEMS.eastbrook_glazed_carrots)).toBe(
+      '<div class="tt-desc">Well Fed: Increases your Stamina by 2 for 10 min once you finish ' +
+        'eating. Only one Well Fed effect at a time: a newer meal replaces it.</div>',
     );
   });
 
-  it('every buff dish in the game data renders a line carrying its own numbers', () => {
-    const dishes = Object.values(ITEMS).filter(
-      (def): def is FoodItemDef & { wellfed: NonNullable<FoodItemDef['wellfed']> } =>
-        'wellfed' in def && def.wellfed !== undefined,
+  it('an apex role plate states the dominant rung: value 6 for 15 min', () => {
+    // The 11c ladder's apex row (6 / 900): the duration is the elixir
+    // ladder's next step above the entry rung, so the plate strictly
+    // dominates every farming dish on both axes and the tooltip says so in
+    // resolved numbers.
+    expect(wellFedTooltipLines(ITEMS.stonepot_stew)).toBe(
+      '<div class="tt-desc">Well Fed: Increases your Stamina by 6 for 15 min once you finish ' +
+        'eating. Only one Well Fed effect at a time: a newer meal replaces it.</div>',
     );
-    // carrots, pudding, porridge, greens: one buff dish per crop tier.
-    expect(dishes.length).toBeGreaterThanOrEqual(4);
-    for (const def of dishes) {
-      const html = wellfedTooltipLines(def);
+  });
+
+  it('every buff food in the game data renders one line carrying its own numbers', () => {
+    const foods = Object.values(ITEMS).filter(
+      (def): def is FoodItemDef & { wellFed: NonNullable<FoodItemDef['wellFed']> } =>
+        def.kind === 'food' && def.wellFed !== undefined,
+    );
+    // The whole unified family: four farm dishes plus three apex role plates.
+    expect(foods.length).toBeGreaterThanOrEqual(7);
+    for (const def of foods) {
+      const html = wellFedTooltipLines(def);
       expect(html, `${def.id} must render a well-fed line`).toContain('Well Fed');
+      // EXACTLY ONE line per food (the two-views hazard the unification
+      // removed): a second wired view would double this on every tooltip.
+      expect(html.split('<div class="tt-desc">').length - 1, `${def.id} renders one line`).toBe(1);
       // Expected fragments built with the same formatter the view uses; the
       // formatter OPTIONS themselves are pinned off-data below.
-      expect(html).toContain(`+${formatNumber(def.wellfed.value, { maximumFractionDigits: 0 })} `);
+      expect(html).toContain(`by ${formatNumber(def.wellFed.value, { maximumFractionDigits: 0 })} `);
       expect(html).toContain(
-        `for ${formatNumber(def.wellfed.duration / 60, { maximumFractionDigits: 1 })} min`,
+        `for ${formatNumber(def.wellFed.duration / 60, { maximumFractionDigits: 1 })} min`,
       );
-      // The completion trigger is load-bearing copy: the buff is granted at
-      // the END of the sit-restore, never on the first bite.
-      expect(html).toContain('when you finish eating');
+      // Both clauses are load-bearing copy: the buff is granted at the END
+      // of the sit-restore, and the family is one-at-a-time under one id.
+      expect(html).toContain('once you finish eating');
+      expect(html).toContain('Only one Well Fed effect at a time');
     }
   });
 
   it('pins the formatter options off-data: grouped value, fractional minutes', () => {
-    const html = wellfedTooltipLines(
-      wellfedDef({ aura: 'Probe', kind: 'buff_sta', value: 1234, duration: 450 }),
+    const html = wellFedTooltipLines(
+      wellFedDef({ aura: 'Probe', kind: 'buff_sta', value: 1234, duration: 450 }),
     );
     expect(html).toBe(
-      '<div class="tt-desc">Probe: +1,234 Stamina for 7.5 min, granted when you finish eating.</div>',
+      '<div class="tt-desc">Well Fed: Increases your Stamina by 1,234 for 7.5 min once you ' +
+        'finish eating. Only one Well Fed effect at a time: a newer meal replaces it.</div>',
     );
   });
 
   it('maps every stat-buff kind to its own stat label', () => {
-    const cases: Array<[NonNullable<FoodItemDef['wellfed']>['kind'], string]> = [
+    const cases: Array<[NonNullable<FoodItemDef['wellFed']>['kind'], string]> = [
       ['buff_int', 'Intellect'],
       ['buff_agi', 'Agility'],
       ['buff_armor', 'Armor'],
       ['buff_ap', 'Attack Power'],
     ];
     for (const [kind, label] of cases) {
-      const html = wellfedTooltipLines(
-        wellfedDef({ aura: 'Probe', kind, value: 8, duration: 600 }),
+      const html = wellFedTooltipLines(
+        wellFedDef({ aura: 'Probe', kind, value: 8, duration: 600 }),
       );
-      expect(html, `${kind} must read as ${label}`).toContain(`+8 ${label} for 10 min`);
+      expect(html, `${kind} must read as ${label}`).toContain(`your ${label} by 8 for 10 min`);
     }
   });
 
-  it('renders nothing for items without a wellfed record', () => {
-    expect(wellfedTooltipLines(ITEMS.roasted_boar)).toBe('');
-    expect(wellfedTooltipLines(ITEMS.vale_hearth_loaf)).toBe('');
-    expect(wellfedTooltipLines(ITEMS.elixir_of_the_boar)).toBe('');
+  it('renders nothing for items without a wellFed record', () => {
+    expect(wellFedTooltipLines(ITEMS.roasted_boar)).toBe('');
+    expect(wellFedTooltipLines(ITEMS.vale_hearth_loaf)).toBe('');
+    expect(wellFedTooltipLines(ITEMS.elixir_of_the_boar)).toBe('');
   });
 
-  it('an unmapped buff kind falls back to naming the granted aura with the trigger', () => {
-    const def = wellfedDef({
+  it('an unmapped buff kind falls back to naming the granted aura with both clauses', () => {
+    const def = wellFedDef({
       aura: 'Well Fed',
       kind: 'buff_spellpower',
       value: 5,
       duration: 300,
     });
-    expect(wellfedTooltipLines(def)).toBe(
-      '<div class="tt-desc">Grants Well Fed for 5 min when you finish eating.</div>',
+    expect(wellFedTooltipLines(def)).toBe(
+      '<div class="tt-desc">Well Fed: Grants Well Fed for 5 min once you finish eating. ' +
+        'Only one Well Fed effect at a time: a newer meal replaces it.</div>',
     );
   });
 
   it('the aura fallback localizes through the buff-bar matcher', () => {
-    // Only the aura fragment is pinned: the surrounding sentence is a new
-    // catalog key, English-pending in de_DE until the release fill, while
-    // the aura name rides the AURA_NAME_KEY matcher (the elixir fixture,
-    // whose de_DE row predates this suite).
-    const def = wellfedDef({
+    // Only the aura fragment is pinned: the aura name rides the
+    // AURA_NAME_KEY matcher (the elixir fixture, whose de_DE row predates
+    // this suite), whatever the surrounding sentence's fill state.
+    const def = wellFedDef({
       aura: 'Might of the Boar',
       kind: 'buff_spellpower',
       value: 5,
       duration: 300,
     });
     setLanguage('de_DE');
-    expect(wellfedTooltipLines(def)).toContain('Macht des Ebers');
+    expect(wellFedTooltipLines(def)).toContain('Macht des Ebers');
   });
 
   it('escapes the interpolated aura name', () => {
-    const def = wellfedDef({
+    const def = wellFedDef({
       aura: "Grandmother's Cooking",
       kind: 'buff_spellpower',
       value: 5,
       duration: 300,
     });
-    expect(wellfedTooltipLines(def)).toContain('Grandmother&#39;s Cooking');
+    expect(wellFedTooltipLines(def)).toContain('Grandmother&#39;s Cooking');
   });
 
-  it('Hud.itemTooltip composes the well-fed line (method-scoped source pin)', () => {
+  it('Hud.itemTooltip composes EXACTLY ONE well-fed line (method-scoped source pin)', () => {
     // Comments are stripped through the SHARED order-safe stripper (both
     // line and block classes in one pass, tests/helpers/strip_comments.ts),
-    // so neither prose form can satisfy the pin: the original line-only
-    // strip left a block-commented `html += wellfedTooltipLines(item);`
-    // able to pass. Scoped to the itemTooltip method body so the call
-    // cannot drift into some other surface and still pass.
+    // so neither prose form can satisfy the pin. Scoped to the itemTooltip
+    // method body so the call cannot drift into some other surface and
+    // still pass. The exact-count arm is the unification's own hazard: the
+    // 11b merge left BOTH packets' views wired at different lines, silent
+    // under tsc, and the moment the field unified every buff dish would
+    // have rendered the sentence twice in two wordings.
     const hudSrc = stripComments(readFileSync(path.join(__dirname, '../src/ui/hud.ts'), 'utf8'));
     const start = hudSrc.indexOf('private itemTooltip(');
     const end = hudSrc.indexOf('private itemProcBlock(');
     expect(start).toBeGreaterThan(-1);
     expect(end).toBeGreaterThan(start);
-    expect(hudSrc.slice(start, end)).toContain('html += wellfedTooltipLines(item);');
+    const body = hudSrc.slice(start, end);
+    expect(body).toContain('html += wellFedTooltipLines(item);');
+    // Any composition call whose builder name says well-fed, in either
+    // retired or surviving spelling, counted case-insensitively: one.
+    const wellFedCalls = body.match(/html \+= well[Ff]ed\w*\(item\);/g) ?? [];
+    expect(wellFedCalls, 'exactly one well-fed composition call').toHaveLength(1);
   });
 });
 
@@ -165,16 +192,16 @@ describe('the wellfed and elixir stat maps stay in step', () => {
   }
 
   it('identical key sets, every key mapped in both views, off-map falls back in both', () => {
-    // WELLFED_STAT_KEYS moved to its own pure leaf (Phase 14, C10: the wiki's
-    // effect prose consumes it too and the guide bundle may not reach this
-    // view's sim_i18n graph); the source read follows it there.
+    // WELLFED_STAT_KEYS lives in its own pure leaf (Phase 14, C10: the
+    // wiki's effect prose consumes it too and the guide bundle may not
+    // reach this view's sim_i18n graph); the source read follows it there.
     const wellfedKeys = readMapKeys('../src/ui/wellfed_stat_keys.ts', 'WELLFED_STAT_KEYS');
     const elixirKeys = readMapKeys('../src/ui/elixir_tooltip_view.ts', 'ELIXIR_STAT_KEYS');
     expect(wellfedKeys).toEqual(elixirKeys);
     expect(wellfedKeys.length).toBeGreaterThanOrEqual(5);
     for (const kind of wellfedKeys) {
       const record = { aura: 'Probe', kind: kind as AuraKind, value: 5, duration: 300 };
-      expect(wellfedTooltipLines(wellfedDef(record)), `wellfed maps ${kind}`).not.toContain(
+      expect(wellFedTooltipLines(wellFedDef(record)), `wellfed maps ${kind}`).not.toContain(
         'Grants',
       );
       expect(
@@ -189,7 +216,7 @@ describe('the wellfed and elixir stat maps stay in step', () => {
       ).not.toContain('Grants');
     }
     const offMap = { aura: 'Probe', kind: 'buff_spellpower' as AuraKind, value: 5, duration: 300 };
-    expect(wellfedTooltipLines(wellfedDef(offMap))).toContain('Grants');
+    expect(wellFedTooltipLines(wellFedDef(offMap))).toContain('Grants');
     expect(
       elixirTooltipLines({
         ...ITEMS.eastbrook_glazed_carrots,
@@ -202,51 +229,71 @@ describe('the wellfed and elixir stat maps stay in step', () => {
 describe('the five non-Latin fills render end to end (frozen literals, the M16 staleness pin)', () => {
   afterEach(() => setLanguage('en'));
 
-  // Frozen renders of the two new catalog keys through the REAL sink
-  // (locale chunk awaited first, the app's own order, then t() + the
-  // AURA_NAME_KEY matcher): a stale or clobbered fill, a broken {aura}
-  // interpolation, or a lost matcher row reds the exact literal. A reviewed
-  // reword of a fill re-points its row here deliberately, the
-  // localization_fixes idiom.
+  // Frozen renders of the SURVIVING key pair through the REAL sink (locale
+  // chunk awaited first, the app's own order, then t() + the AURA_NAME_KEY
+  // matcher): a stale or clobbered fill, a broken {aura} interpolation, or a
+  // lost matcher row reds the exact literal. A reviewed reword of a fill
+  // re-points its row here deliberately, the localization_fixes idiom. The
+  // mapped sentence carries NO aura token (the surviving key's placeholder
+  // set is {stat}/{value}/{minutes}); the aura interpolates only in the
+  // fallback, where the matcher serves the kept aura.wellFed terms.
   const MAPPED: [SupportedLanguage, string][] = [
-    ['zh_CN', '<div class="tt-desc">吃完后获得饱足效果，使你的耐力提高 3 点，持续 10 分钟。</div>'],
-    ['zh_TW', '<div class="tt-desc">吃完後獲得飽足效果，使你的耐力提高 3 點，持續 10 分鐘。</div>'],
+    [
+      'zh_CN',
+      '<div class="tt-desc">精神饱满：吃完后使你的耐力提高 2 点，持续 10 分钟。同时只能有一种精神饱满效果：更新的一餐会顶替它。</div>',
+    ],
+    [
+      'zh_TW',
+      '<div class="tt-desc">精神飽滿：吃完後使你的耐力提高 2 點，持續 10 分鐘。同時只能有一種精神飽滿效果：較新的餐點會頂替它。</div>',
+    ],
     [
       'ko_KR',
-      '<div class="tt-desc">다 먹으면 포만감 효과를 얻어 체력이(가) 3 증가하며 10분 동안 지속됩니다.</div>',
+      '<div class="tt-desc">잘 먹음: 식사를 마치면 체력이(가) 2 증가하며 10분 동안 지속됩니다. 잘 먹음 효과는 한 번에 하나만 유지되며, 새로 먹은 음식이 이전 효과를 대체합니다.</div>',
     ],
     [
       'ja_JP',
-      '<div class="tt-desc">食べ終えると満腹の効果を得て、スタミナが3上昇し、10分間持続します。</div>',
+      '<div class="tt-desc">満腹：食べ終えるとスタミナが 2 上昇し、10 分間持続します。満腹の効果は同時に一つだけで、新しい食事が古いものを置き換えます。</div>',
     ],
     [
       'ru_RU',
-      '<div class="tt-desc">Эффект &quot;Сытость&quot;: Выносливость +3 на 10 мин. Дается, когда вы доедаете.</div>',
+      '<div class="tt-desc">Сытость: по окончании трапезы повышает Выносливость на 2 в течение 10 мин. Одновременно действует только один эффект сытости: более свежая трапеза заменяет прежний.</div>',
     ],
   ];
   const FALLBACK: [SupportedLanguage, string][] = [
-    ['zh_CN', '<div class="tt-desc">吃完后获得饱足效果，持续 5 分钟。</div>'],
-    ['zh_TW', '<div class="tt-desc">吃完後獲得飽足效果，持續 5 分鐘。</div>'],
-    ['ko_KR', '<div class="tt-desc">다 먹으면 포만감 효과를 얻어 5분 동안 지속됩니다.</div>'],
-    ['ja_JP', '<div class="tt-desc">食べ終えると満腹の効果を得て、5分間持続します。</div>'],
+    [
+      'zh_CN',
+      '<div class="tt-desc">精神饱满：吃完后获得精神饱满效果，持续 5 分钟。同时只能有一种精神饱满效果：更新的一餐会顶替它。</div>',
+    ],
+    [
+      'zh_TW',
+      '<div class="tt-desc">精神飽滿：吃完後獲得精神飽滿效果，持續 5 分鐘。同時只能有一種精神飽滿效果：較新的餐點會頂替它。</div>',
+    ],
+    [
+      'ko_KR',
+      '<div class="tt-desc">잘 먹음: 식사를 마치면 잘 먹음 효과를 얻어 5분 동안 지속됩니다. 잘 먹음 효과는 한 번에 하나만 유지되며, 새로 먹은 음식이 이전 효과를 대체합니다.</div>',
+    ],
+    [
+      'ja_JP',
+      '<div class="tt-desc">満腹：食べ終えると満腹を得て、5 分間持続します。満腹の効果は同時に一つだけで、新しい食事が古いものを置き換えます。</div>',
+    ],
     [
       'ru_RU',
-      '<div class="tt-desc">Дает эффект &quot;Сытость&quot; на 5 мин, когда вы доедаете.</div>',
+      '<div class="tt-desc">Сытость: по окончании трапезы дает эффект &quot;Сытость&quot; на 5 мин. Одновременно действует только один эффект сытости: более свежая трапеза заменяет прежний.</div>',
     ],
   ];
 
-  it.each(MAPPED)('%s: the useWellfed sentence and interpolated aura name', async (loc, want) => {
+  it.each(MAPPED)('%s: the wellFed sentence with the dish numbers', async (loc, want) => {
     await ensureLocaleLoaded(loc);
     setLanguage(loc);
-    expect(wellfedTooltipLines(ITEMS.eastbrook_glazed_carrots)).toBe(want);
+    expect(wellFedTooltipLines(ITEMS.eastbrook_glazed_carrots)).toBe(want);
   });
 
-  it.each(FALLBACK)('%s: the useWellfedAura sentence', async (loc, want) => {
+  it.each(FALLBACK)('%s: the wellFedAura sentence and interpolated aura name', async (loc, want) => {
     await ensureLocaleLoaded(loc);
     setLanguage(loc);
     expect(
-      wellfedTooltipLines(
-        wellfedDef({
+      wellFedTooltipLines(
+        wellFedDef({
           aura: 'Well Fed',
           kind: 'buff_spellpower' as AuraKind,
           value: 5,

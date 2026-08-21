@@ -17,7 +17,7 @@ import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import type { ItemDef } from '../src/sim/types';
 import { cookingCatchHintKey } from '../src/ui/cooking_catch_hint_view';
-import { elixirTooltipLines, wellFedTooltipLines } from '../src/ui/elixir_tooltip_view';
+import { elixirTooltipLines } from '../src/ui/elixir_tooltip_view';
 import { feastTooltipLines } from '../src/ui/feast_tooltip_view';
 import { gatherToolTooltipLines } from '../src/ui/gather_tool_tooltip';
 import { materialHintLine } from '../src/ui/material_hint_view';
@@ -25,7 +25,7 @@ import { materialProfessionHintText } from '../src/ui/material_profession_hint_v
 import { mobileStationTooltipLines } from '../src/ui/mobile_station_tooltip';
 import { recipePatternTooltipLines } from '../src/ui/recipe_pattern_tooltip_view';
 import { toolEffectTooltipLines } from '../src/ui/tool_effect_tooltip';
-import { wellfedTooltipLines } from '../src/ui/wellfed_tooltip_view';
+import { wellFedTooltipLines } from '../src/ui/wellfed_tooltip_view';
 
 const EFFECT_SOURCES: Array<[string, (def: ItemDef) => boolean]> = [
   ['weapon damage', (def) => def.weapon !== undefined],
@@ -39,18 +39,17 @@ const EFFECT_SOURCES: Array<[string, (def: ItemDef) => boolean]> = [
       Math.min(def.pvpOffenseRating ?? 0, def.pvpDefenseRating ?? 0) > 0,
   ],
   ['food use line', (def) => (def.foodHp ?? 0) > 0],
-  // The Well Fed buff a role food leaves behind, AFTER the food-restore row on
-  // purpose. The order is the claim: every shipped role food restores health
-  // too, so it matches the row above first and is reported as an ordinary
-  // dish, which is what it is. This row exists for the case that row cannot
-  // cover, a buff food with no sit-down restore at all, whose only tooltip
-  // text is the Well Fed line. Putting it first would relabel the three
-  // shipped foods and say nothing new.
+  // The Well Fed buff a buff food leaves behind (the ONE unified view since
+  // 11c), AFTER the food-restore row on purpose. The order is the claim:
+  // every shipped buff food restores health too, so it matches the row above
+  // first and is reported as an ordinary dish, which is what it is. This row
+  // exists for the case that row cannot cover, a buff food with no sit-down
+  // restore at all, whose only tooltip text is the Well Fed line. Putting it
+  // first would relabel the seven shipped foods and say nothing new.
   ['well fed line', (def) => wellFedTooltipLines(def) !== ''],
   ['drink use line', (def) => (def.drinkMana ?? 0) > 0],
   ['potion use line', (def) => (def.potionHp ?? 0) > 0 || (def.potionMana ?? 0) > 0],
   ['elixir use line', (def) => elixirTooltipLines(def) !== ''],
-  ['wellfed use line', (def) => wellfedTooltipLines(def) !== ''],
   ['feast use line', (def) => feastTooltipLines(def) !== ''],
   ['gathering tool lines', (def) => gatherToolTooltipLines(def) !== ''],
   ['tool effect charm lines', (def) => toolEffectTooltipLines(def) !== ''],
@@ -150,7 +149,6 @@ describe('crafted item tooltip coverage', () => {
       'elixirTooltipLines(item)',
       'wellFedTooltipLines(item)',
       'recipePatternTooltipLines(item, this.sim.craftingIdentity)',
-      'wellfedTooltipLines(item)',
       'feastTooltipLines(item)',
       'stackSizeTooltipLine(item, instance)',
     ]) {

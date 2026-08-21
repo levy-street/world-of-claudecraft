@@ -1,17 +1,24 @@
-// Well Fed buff dishes (farming Phase 11): the completion-time mint in
+// Well Fed, unified (Masterwrought 11c): the completion-time mint in
 // src/sim/wellfed.ts, hooked from the eat/drink loop in updateRegen
-// (src/sim/combat/auras.ts). A real Sim is driven through real ticks (the
-// elixir.test.ts construction and use-item idiom): the buff lands only when
-// the 18s sit-restore COMPLETES, an interrupted meal forfeits it, the
-// wellfed_<kind> namespace coexists with elixir_<kind> in both orders, all
-// dishes share one aura id (last eaten wins, no self-stacking), the mint
-// draws zero rng, and the aura is transient across save/load.
+// (src/sim/combat/auras.ts) on the carried Consuming.wellFed payload. A real
+// Sim is driven through real ticks (the elixir.test.ts construction and
+// use-item idiom): the buff lands only when the 18s sit-restore COMPLETES,
+// an interrupted meal forfeits it, the ONE 'well_fed' aura id makes the
+// whole food family mutually exclusive (last eaten wins, dish or role plate
+// alike) while elixir_<kind> coexists because the ids can never collide, the
+// mint draws zero rng, and the aura is transient across save/load.
 
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import type { Aura, Entity } from '../src/sim/types';
-import { applyWellfedOnConsumeComplete } from '../src/sim/wellfed';
+import type { Aura, Entity, ItemDef } from '../src/sim/types';
+import { WELL_FED_AURA_ID } from '../src/sim/wellfed';
+import { hasAuraRecipe } from '../src/ui/icons';
+import { sourceFilesUnder } from './helpers/source_files_under';
+import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
+import { stripComments } from './helpers/strip_comments';
 
 function playerWorld(seed = 42) {
   const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true });
@@ -30,8 +37,8 @@ function tickSeconds(sim: Sim, seconds: number): void {
   for (let i = 0; i < seconds * 20; i++) sim.tick();
 }
 
-function wellfedAuras(p: Entity): Aura[] {
-  return p.auras.filter((a) => a.id.startsWith('wellfed_'));
+function wellFedAuras(p: Entity): Aura[] {
+  return p.auras.filter((a) => a.id === WELL_FED_AURA_ID);
 }
 
 // Eat a dish and ride out the full sit-restore: 18s of meal plus regen-tick
@@ -42,6 +49,56 @@ function eatToCompletion(sim: Sim, pid: number, p: Entity, itemId: string): void
   expect(p.eating, `${itemId} meal completed`).toBeNull();
 }
 
+describe('well fed: the one aura id', () => {
+  it('identity pin: WELL_FED_AURA_ID is well_fed and owns a painted recipe', () => {
+    // The ONE site that re-types the string (every other site references the
+    // constant, which is what keeps this from being a constant-self-compare):
+    // the seam Phase 15 and the icon prewarm read.
+    expect(WELL_FED_AURA_ID).toBe('well_fed');
+    expect(hasAuraRecipe(WELL_FED_AURA_ID)).toBe(true);
+  });
+
+  it('type fact: only a food def can spell a wellFed payload', () => {
+    // The retired runtime food-kind guard is unrepresentable now: the field
+    // is kind-scoped on FoodItemDef, so a drink def carrying a payload does
+    // not compile. Self-verifying: if the union ever widened, the directive
+    // below would itself red tsc as unused.
+    const bad: ItemDef = {
+      id: 'test_drink',
+      name: 'Test Drink',
+      kind: 'drink',
+      sellValue: 1,
+      drinkMana: 10,
+      // @ts-expect-error a drink cannot carry a wellFed payload (FoodItemDef only)
+      wellFed: { aura: 'Well Fed', kind: 'buff_sta', value: 1, duration: 60 },
+    };
+    expect(bad.id).toBe('test_drink');
+  });
+
+  it('content pin: the well-fed carrier set is exactly the seven buff foods', () => {
+    const carriers = Object.values(ITEMS)
+      .filter((def) => def.kind === 'food' && def.wellFed !== undefined)
+      .map((def) => def.id)
+      .sort();
+    expect(carriers).toEqual([
+      'eastbrook_glazed_carrots',
+      'evergarden_braised_greens',
+      'fenbridge_rice_pudding',
+      'highwatch_barley_porridge',
+      'sageleaf_chowder',
+      'stonepot_stew',
+      'warspice_skewers',
+    ]);
+    // The items.ts use-arm ordering claim (placeMobileStation before feast is
+    // behaviorally free because the arms key on different fields) is only
+    // true while no def carries both fields; pin that premise too.
+    const useAndFeast = Object.values(ITEMS).filter(
+      (def) => def.use !== undefined && 'feast' in def && def.feast !== undefined,
+    );
+    expect(useAndFeast, 'no def may carry both use and feast').toEqual([]);
+  });
+});
+
 describe('well fed: completion timing', () => {
   it('mints the aura only when the 18s sit-restore completes, never mid-meal', () => {
     const { sim, pid, p } = playerWorld();
@@ -49,16 +106,16 @@ describe('well fed: completion timing', () => {
 
     tickSeconds(sim, 5);
     expect(p.eating, 'still mid-meal at 5s').toBeTruthy();
-    expect(wellfedAuras(p), 'no buff on the first bite').toEqual([]);
+    expect(wellFedAuras(p), 'no buff on the first bite').toEqual([]);
 
     tickSeconds(sim, 17); // 22s total: past 18s plus regen-tick alignment
     expect(p.eating, 'meal finished').toBeNull();
-    const wf = wellfedAuras(p);
+    const wf = wellFedAuras(p);
     expect(wf.length).toBe(1);
-    expect(wf[0].id).toBe('wellfed_buff_sta');
+    expect(wf[0].id).toBe(WELL_FED_AURA_ID);
     expect(wf[0].name).toBe('Well Fed');
     expect(wf[0].kind).toBe('buff_sta');
-    expect(wf[0].value).toBe(3);
+    expect(wf[0].value).toBe(2);
     expect(wf[0].duration).toBe(600);
   });
 
@@ -72,98 +129,16 @@ describe('well fed: completion timing', () => {
     consume(sim, pid, 'eastbrook_glazed_carrots');
     tickSeconds(sim, 17);
     expect(p.eating, 'still eating at 17s').toBeTruthy();
-    expect(wellfedAuras(p), 'no aura at 17s').toEqual([]);
+    expect(wellFedAuras(p), 'no aura at 17s').toEqual([]);
     tickSeconds(sim, 2);
     expect(p.eating, 'meal ended at the 18s boundary').toBeNull();
-    expect(wellfedAuras(p)).toHaveLength(1);
+    expect(wellFedAuras(p)).toHaveLength(1);
   });
 
-  it('a plain dish (no wellfed field) completes with no aura minted', () => {
+  it('a plain dish (no wellFed field) completes with no aura minted', () => {
     const { sim, pid, p } = playerWorld();
     eatToCompletion(sim, pid, p, 'vale_hearth_loaf');
-    expect(wellfedAuras(p)).toEqual([]);
-  });
-
-  it('the food-kind guard: a drink-slot completion never mints, even for a wellfed item', () => {
-    // No shipped drink carries a wellfed field, so the guard is exercised by
-    // calling the completion hook directly with a synthetic drink-kind slot
-    // pointing at a REAL wellfed dish: the D15 food-only contract, pinned.
-    const { sim, p } = playerWorld();
-    applyWellfedOnConsumeComplete(sim.ctx, p, {
-      itemId: 'eastbrook_glazed_carrots',
-      kind: 'drink',
-      hpPer2s: 0,
-      manaPer2s: 10,
-      remaining: 0,
-      ticksElapsed: 9,
-    });
-    expect(wellfedAuras(p), 'the drink slot must not mint').toEqual([]);
-    // The same slot as food DOES mint: the guard is the only difference.
-    applyWellfedOnConsumeComplete(sim.ctx, p, {
-      itemId: 'eastbrook_glazed_carrots',
-      kind: 'food',
-      hpPer2s: 10,
-      manaPer2s: 0,
-      remaining: 0,
-      ticksElapsed: 9,
-    });
-    expect(wellfedAuras(p)).toHaveLength(1);
-  });
-
-  it('11b parked-state pin: the two well-fed spellings stay on their known carriers only', () => {
-    // The absorb leaves FoodItemDef carrying BOTH spellings on purpose
-    // (state.md, the 11c carry list): masterwrought's `wellFed` is the one
-    // the live completion mint reads, farming's `wellfed` is parked data
-    // until 11c unifies them. tsc cannot tell the spellings apart, so a NEW
-    // dish authored with the parked spelling would type-check and silently
-    // grant nothing. This pin makes that a loud failure: the parked-spelling
-    // carrier set is EXACTLY farming's four dishes, the live-spelling set is
-    // EXACTLY masterwrought's three plates, and no def carries both. 11c
-    // retires this pin together with the `wellfed` spelling itself.
-    const lower = Object.values(ITEMS)
-      .filter((def) => 'wellfed' in def && def.wellfed !== undefined)
-      .map((def) => def.id)
-      .sort();
-    expect(lower).toEqual([
-      'eastbrook_glazed_carrots',
-      'evergarden_braised_greens',
-      'fenbridge_rice_pudding',
-      'highwatch_barley_porridge',
-    ]);
-    const upper = Object.values(ITEMS)
-      .filter((def) => 'wellFed' in def && def.wellFed !== undefined)
-      .map((def) => def.id)
-      .sort();
-    expect(upper).toEqual(['sageleaf_chowder', 'stonepot_stew', 'warspice_skewers']);
-    const both = Object.values(ITEMS).filter(
-      (def) =>
-        'wellfed' in def &&
-        def.wellfed !== undefined &&
-        'wellFed' in def &&
-        def.wellFed !== undefined,
-    );
-    expect(both, 'no def may carry both well-fed spellings').toEqual([]);
-    // The items.ts use-arm ordering claim (placeMobileStation before feast is
-    // behaviorally free because the arms key on different fields) is only
-    // true while no def carries both fields; pin that premise too.
-    const useAndFeast = Object.values(ITEMS).filter(
-      (def) => def.use !== undefined && 'feast' in def && def.feast !== undefined,
-    );
-    expect(useAndFeast, 'no def may carry both use and feast').toEqual([]);
-  });
-
-  it('content rule: every wellfed carrier in the merged catalog is kind food', () => {
-    // Since the 11b union port the TYPE already scopes wellfed to
-    // FoodItemDef; the sweep stays as the content-level restatement of the
-    // D15 contract, so a future widening of the union member is a deliberate,
-    // visible decision instead of a silent gulp-completion mint.
-    const carriers = Object.values(ITEMS).filter(
-      (def) => 'wellfed' in def && def.wellfed !== undefined,
-    );
-    expect(carriers.length, 'the four Phase 11 buff dishes').toBeGreaterThanOrEqual(4);
-    for (const def of carriers) {
-      expect(def.kind, `${def.id} carries wellfed but is not food`).toBe('food');
-    }
+    expect(wellFedAuras(p)).toEqual([]);
   });
 });
 
@@ -178,7 +153,7 @@ describe('well fed: interruption forfeits the buff', () => {
     expect(p.eating, 'the hit cancels the meal').toBeNull();
 
     tickSeconds(sim, 20); // well past where 18s would have landed
-    expect(wellfedAuras(p), 'the forfeited meal never pays out').toEqual([]);
+    expect(wellFedAuras(p), 'the forfeited meal never pays out').toEqual([]);
   });
 
   it('the killing blow clears the meal and the buff is forfeited for good', () => {
@@ -204,7 +179,7 @@ describe('well fed: interruption forfeits the buff', () => {
     // Far past every boundary the meal could have reached, through death
     // and any respawn handling: the mint must never land posthumously.
     tickSeconds(sim, 30);
-    expect(wellfedAuras(p), 'no posthumous mint').toEqual([]);
+    expect(wellFedAuras(p), 'no posthumous mint').toEqual([]);
   });
 
   it('a second dish mid-meal is refused outright, never a restart', () => {
@@ -226,22 +201,27 @@ describe('well fed: interruption forfeits the buff', () => {
     // A's meal completes on A's own clock and mints A's aura, exactly one.
     tickSeconds(sim, 17);
     expect(p.eating).toBeNull();
-    const wf = wellfedAuras(p);
+    const wf = wellFedAuras(p);
     expect(wf).toHaveLength(1);
-    expect(wf[0].value).toBe(3); // A's value, never B's 6
+    expect(wf[0].value).toBe(2); // A's value, never B's 3
   });
 });
 
-describe('well fed: namespace isolation from elixirs (both orders)', () => {
-  it('eat then quaff: wellfed_buff_sta and elixir_buff_sta coexist untouched', () => {
+describe('well fed: elixir coexistence (the ids cannot collide, both orders)', () => {
+  // Coexistence needs no namespace registration and no stacking mechanism:
+  // aura replacement keys purely on aura.id + sourceId, and 'well_fed' can
+  // never equal an 'elixir_<kind>' id BY CONSTRUCTION, so the two families
+  // are independent in both orders. The construction itself is pinned in the
+  // exclusivity describe below.
+  it('eat then quaff: well_fed and elixir_buff_sta coexist untouched', () => {
     const { sim, pid, p } = playerWorld();
     eatToCompletion(sim, pid, p, 'eastbrook_glazed_carrots');
     consume(sim, pid, 'elixir_of_the_boar');
 
-    const wf = p.auras.find((a) => a.id === 'wellfed_buff_sta');
+    const wf = p.auras.find((a) => a.id === WELL_FED_AURA_ID);
     const elx = p.auras.find((a) => a.id === 'elixir_buff_sta');
     expect(wf, 'food buff survives the quaff').toBeTruthy();
-    expect(wf!.value).toBe(3);
+    expect(wf!.value).toBe(2);
     expect(elx, 'elixir landed beside it').toBeTruthy();
     expect(elx!.value).toBe(6);
   });
@@ -251,40 +231,86 @@ describe('well fed: namespace isolation from elixirs (both orders)', () => {
     consume(sim, pid, 'elixir_of_the_boar');
     eatToCompletion(sim, pid, p, 'eastbrook_glazed_carrots');
 
-    const wf = p.auras.find((a) => a.id === 'wellfed_buff_sta');
+    const wf = p.auras.find((a) => a.id === WELL_FED_AURA_ID);
     const elx = p.auras.find((a) => a.id === 'elixir_buff_sta');
     expect(wf, 'food buff landed').toBeTruthy();
-    expect(wf!.value).toBe(3);
+    expect(wf!.value).toBe(2);
     expect(elx, 'elixir intact after the meal').toBeTruthy();
     expect(elx!.value).toBe(6);
   });
 });
 
-describe('well fed: last eaten wins (one shared aura id)', () => {
-  it('a better dish overwrites: exactly one wellfed aura, the new value', () => {
+describe('well fed: one food buff at a time (last eaten wins, whole family)', () => {
+  it('a better dish overwrites: exactly one well_fed aura, the new value', () => {
     const { sim, pid, p } = playerWorld();
     eatToCompletion(sim, pid, p, 'eastbrook_glazed_carrots');
-    expect(wellfedAuras(p).length).toBe(1);
-    expect(wellfedAuras(p)[0].value).toBe(3);
+    expect(wellFedAuras(p).length).toBe(1);
+    expect(wellFedAuras(p)[0].value).toBe(2);
 
     eatToCompletion(sim, pid, p, 'fenbridge_rice_pudding');
-    const wf = wellfedAuras(p);
+    const wf = wellFedAuras(p);
     expect(wf.length, 'food buffs never stack with each other').toBe(1);
+    expect(wf[0].value).toBe(3);
+  });
+
+  it('the three role foods are mutually exclusive: newest kind wins', () => {
+    // The unified id is what makes this true: under the retired per-kind
+    // namespace a stew and a skewer would have STACKED (different ids), and
+    // no classic food buff ever did. Stew, then skewers, then chowder:
+    // exactly one well_fed aura after each meal, carrying the newest kind.
+    const { sim, pid, p } = playerWorld();
+    eatToCompletion(sim, pid, p, 'stonepot_stew');
+    let wf = wellFedAuras(p);
+    expect(wf).toHaveLength(1);
+    expect(wf[0].kind).toBe('buff_sta');
+
+    eatToCompletion(sim, pid, p, 'warspice_skewers');
+    wf = wellFedAuras(p);
+    expect(wf, 'the skewers replaced the stew').toHaveLength(1);
+    expect(wf[0].kind).toBe('buff_ap');
+
+    eatToCompletion(sim, pid, p, 'sageleaf_chowder');
+    wf = wellFedAuras(p);
+    expect(wf, 'the chowder replaced the skewers').toHaveLength(1);
+    expect(wf[0].kind).toBe('buff_int');
     expect(wf[0].value).toBe(6);
+  });
+
+  it('a farming dish and a role food are mutually exclusive, in both orders', () => {
+    // Dish then plate: the apex overwrites the trainer rung.
+    const a = playerWorld();
+    eatToCompletion(a.sim, a.pid, a.p, 'evergarden_braised_greens');
+    expect(wellFedAuras(a.p)[0].value).toBe(5);
+    eatToCompletion(a.sim, a.pid, a.p, 'stonepot_stew');
+    let wf = wellFedAuras(a.p);
+    expect(wf, 'the plate replaced the dish').toHaveLength(1);
+    expect(wf[0].value).toBe(6);
+    expect(wf[0].duration).toBe(900);
+
+    // Plate then dish: last eaten still wins, even downward. Classic rule:
+    // the mint never compares power, it replaces on the shared id.
+    const b = playerWorld(43);
+    eatToCompletion(b.sim, b.pid, b.p, 'stonepot_stew');
+    expect(wellFedAuras(b.p)[0].value).toBe(6);
+    eatToCompletion(b.sim, b.pid, b.p, 'evergarden_braised_greens');
+    wf = wellFedAuras(b.p);
+    expect(wf, 'the dish replaced the plate').toHaveLength(1);
+    expect(wf[0].value).toBe(5);
+    expect(wf[0].duration).toBe(600);
   });
 
   it('re-eating the same dish refreshes remaining to full duration', () => {
     const { sim, pid, p } = playerWorld();
     eatToCompletion(sim, pid, p, 'fenbridge_rice_pudding');
     tickSeconds(sim, 30);
-    const before = wellfedAuras(p)[0].remaining;
-    expect(before).toBeLessThan(880); // decayed well below full (900)
+    const before = wellFedAuras(p)[0].remaining;
+    expect(before).toBeLessThan(580); // decayed well below full (600)
 
     eatToCompletion(sim, pid, p, 'fenbridge_rice_pudding');
-    const wf = wellfedAuras(p);
-    expect(wf.length, 'still exactly one wellfed aura').toBe(1);
+    const wf = wellFedAuras(p);
+    expect(wf.length, 'still exactly one well_fed aura').toBe(1);
     expect(wf[0].remaining).toBeGreaterThan(before);
-    expect(wf[0].remaining).toBeGreaterThan(890); // fresh 900 minus tick slack
+    expect(wf[0].remaining).toBeGreaterThan(590); // fresh 600 minus tick slack
   });
 });
 
@@ -292,19 +318,19 @@ describe('well fed: duration ticks down and the aura expires', () => {
   it('remaining decreases with real ticks and the expiry path removes it', () => {
     const { sim, pid, p } = playerWorld();
     eatToCompletion(sim, pid, p, 'eastbrook_glazed_carrots');
-    const first = wellfedAuras(p)[0].remaining;
+    const first = wellFedAuras(p)[0].remaining;
 
     tickSeconds(sim, 10);
-    const later = wellfedAuras(p)[0].remaining;
+    const later = wellFedAuras(p)[0].remaining;
     expect(later).toBeLessThan(first);
     expect(first - later).toBeGreaterThan(8); // roughly the 10s that passed
 
     // Riding out the full 600s is thousands of ticks; the generic expiry walk
     // in updateAuras is what removes it, so drop remaining to the brink and
     // let real ticks finish the job.
-    wellfedAuras(p)[0].remaining = 0.5;
+    wellFedAuras(p)[0].remaining = 0.5;
     tickSeconds(sim, 2);
-    expect(wellfedAuras(p), 'expired aura removed').toEqual([]);
+    expect(wellFedAuras(p), 'expired aura removed').toEqual([]);
   });
 });
 
@@ -315,7 +341,7 @@ describe('well fed: transient across save and load', () => {
     // sickness timers), so a relog drops the buff like any temporary aura.
     const { sim, pid, p } = playerWorld();
     eatToCompletion(sim, pid, p, 'eastbrook_glazed_carrots');
-    expect(wellfedAuras(p).length).toBe(1);
+    expect(wellFedAuras(p).length).toBe(1);
 
     const state = sim.serializeCharacter(pid)!;
     expect(state).toBeTruthy();
@@ -325,14 +351,14 @@ describe('well fed: transient across save and load', () => {
     const pid2 = sim2.addPlayer('warrior', 'Restored', { state });
     sim2.tick();
     const p2 = sim2.entities.get(pid2)! as Entity;
-    expect(wellfedAuras(p2), 'buff gone after the round trip').toEqual([]);
+    expect(wellFedAuras(p2), 'buff gone after the round trip').toEqual([]);
   });
 });
 
 describe('well fed: the mint draws zero rng', () => {
   // The professions_farming.test.ts draw-observer idiom, twinned: two sims
   // from one seed run the identical eat sequence, one with the buff dish and
-  // one with a plain dish of the SAME foodHp (90). If the wellfed mint drew
+  // one with a plain dish of the SAME foodHp (90). If the well-fed mint drew
   // even one rng value, the recorded draw streams would diverge in count or
   // value; identical streams prove the mint adds zero draws.
   function recordEatSequence(itemId: string): { draws: number[]; p: Entity } {
@@ -356,16 +382,47 @@ describe('well fed: the mint draws zero rng', () => {
     const plain = recordEatSequence('vale_hearth_loaf');
 
     // Non-vacuity: the buffed run really minted, the plain run really did not.
-    expect(wellfedAuras(buffed.p).length).toBe(1);
-    expect(wellfedAuras(plain.p)).toEqual([]);
+    expect(wellFedAuras(buffed.p).length).toBe(1);
+    expect(wellFedAuras(plain.p)).toEqual([]);
     // Non-vacuity of the RIG: the observer really recorded a stream (an
     // unwired observer would leave both runs empty-equal and prove nothing),
     // and the twin premise holds: same foodHp, so the two meals differ ONLY
-    // in the wellfed field.
+    // in the wellFed field.
     expect(buffed.draws.length).toBeGreaterThan(0);
     expect(ITEMS.vale_hearth_loaf.foodHp).toBe(ITEMS.eastbrook_glazed_carrots.foodHp);
 
     expect(buffed.draws.length).toBe(plain.draws.length);
     expect(buffed.draws).toEqual(plain.draws);
+  });
+});
+
+describe('well fed: the retired namespace is gone (the unification landed)', () => {
+  // Phase 15 reads this pin as the proof the unification actually landed
+  // rather than leaving a dead second aura namespace behind: 'well_fed' and
+  // 'elixir_<kind>' coexist BY CONSTRUCTION (an id equality can never hold
+  // between them), the food family is one-at-a-time (the behavioral arms
+  // above), and no source anywhere still mints or matches a wellfed_<kind>
+  // aura id. The sweep looks for the id namespace as a STRING-LITERAL prefix
+  // (a quote directly before the token), which is what an aura id literal or
+  // a template like the retired mint's id interpolation looks like, and what
+  // a module path or prose mention does not.
+  it('well_fed can never collide with an elixir id, and wellfed_<kind> exists nowhere', () => {
+    expect(WELL_FED_AURA_ID.startsWith('elixir')).toBe(false);
+    expect(WELL_FED_AURA_ID.includes('_fed')).toBe(true);
+
+    // Needle built from parts so this file's own source cannot match it.
+    const needle = new RegExp(`['"\`]${'well'}${'fed'}_`);
+    const offenders: string[] = [];
+    for (const root of ['src', 'scripts', 'tests']) {
+      for (const f of sourceFilesUnder(join(process.cwd(), root))) {
+        const code = stripComments(readFileSync(f.full, 'utf8'));
+        if (needle.test(code)) offenders.push(`${root}/${f.file}`);
+      }
+    }
+    expect(offenders, 'files still carrying a wellfed_<kind> id literal').toEqual([]);
+  });
+
+  it('scan hygiene: this guard reads only through the shared walker', () => {
+    expectScansOnlyThroughSharedWalkers(import.meta.url, ['source_files_under']);
   });
 });

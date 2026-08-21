@@ -1828,7 +1828,7 @@ describe('Guide professions generated content accuracy', () => {
         const def = ALL_RECIPES.find((r) => r.id === row.id);
         if (!def) continue;
         const item = ITEMS[def.resultItemId];
-        const itemWellfed = 'wellfed' in item ? item.wellfed : undefined;
+        const itemWellfed = item.kind === 'food' ? item.wellFed : undefined;
         if (item.foodHp) {
           foodRows++;
           expect(row.effect?.food, `${row.id} foodHp row missing`).toEqual({
@@ -1864,7 +1864,10 @@ describe('Guide professions generated content accuracy', () => {
       }
     }
     expect(foodRows).toBeGreaterThanOrEqual(12);
-    expect(wellfedRows).toBe(4);
+    // The whole unified well-fed family since 11c: the four farm dishes plus
+    // the three apex role plates (the generator reads the one wellFed field,
+    // so the plates gain their effect cells at the same regen).
+    expect(wellfedRows).toBe(7);
   });
 
   it('the unmapped-kind fallback line renders (never a silent effect cell)', () => {

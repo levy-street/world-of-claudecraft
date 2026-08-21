@@ -10,7 +10,7 @@ import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import type { AuraKind, ItemDef } from '../src/sim/types';
-import { elixirTooltipLines, wellFedTooltipLines } from '../src/ui/elixir_tooltip_view';
+import { elixirTooltipLines } from '../src/ui/elixir_tooltip_view';
 import { formatNumber, setLanguage } from '../src/ui/i18n';
 
 /** The shared temporary-buff effect record both builders read. */
@@ -166,15 +166,15 @@ describe('elixirTooltipLines', () => {
     expect(elixirTooltipLines(def)).toContain('Warchief&#39;s Blessing');
   });
 
-  it('Hud.itemTooltip composes BOTH builder lines (method-scoped source pin)', () => {
+  it('Hud.itemTooltip composes the elixir line (method-scoped source pin)', () => {
     // Whole-line // comments are stripped before scanning so the pin is not
     // satisfied by prose (the comment-gameable trap; block comments are left
     // alone: a /* strip would misfire on string and regex literals, the
     // gather_tool_tooltip.test.ts idiom). Scoped to the itemTooltip method
     // body so the call cannot drift into some other surface and still pass.
-    // BOTH exports are pinned: this module ships two builders and the Well Fed
-    // one could be unwired from the coordinator without any test noticing,
-    // which is the same unwiring hazard the elixir pin was written for.
+    // The Well Fed line moved to the ONE surviving view in
+    // wellfed_tooltip_view.ts (Masterwrought 11c); its wiring, including the
+    // exactly-one-call rule, is pinned in tests/wellfed_tooltip_view.test.ts.
     const hudSrc = readFileSync(path.join(__dirname, '../src/ui/hud.ts'), 'utf8').replace(
       /^\s*\/\/.*$/gm,
       '',
@@ -185,7 +185,6 @@ describe('elixirTooltipLines', () => {
     expect(end).toBeGreaterThan(start);
     const body = hudSrc.slice(start, end);
     expect(body).toContain('html += elixirTooltipLines(item);');
-    expect(body).toContain('html += wellFedTooltipLines(item);');
   });
 
   describe('flask rules', () => {
@@ -257,112 +256,3 @@ describe('elixirTooltipLines', () => {
   });
 });
 
-describe('wellFedTooltipLines', () => {
-  afterEach(() => setLanguage('en'));
-
-  it('a role food states its buff, value, duration, and the finish-eating rule', () => {
-    // The "once you finish eating" clause is the mechanic: the buff lands only
-    // when the 18-second drain completes, so standing up early grants nothing.
-    expect(wellFedTooltipLines(ITEMS.stonepot_stew)).toBe(
-      '<div class="tt-desc">Well Fed: Increases your Stamina by 6 for 10 min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.</div>',
-    );
-  });
-
-  it('every shipped well-fed food renders a line carrying its own numbers', () => {
-    const foods = Object.values(ITEMS).filter(
-      (def) => def.kind === 'food' && def.wellFed !== undefined,
-    );
-    // The three apex role foods (stamina, attack power, intellect).
-    expect(foods.length).toBeGreaterThanOrEqual(3);
-    for (const def of foods) {
-      const fed = def.kind === 'food' ? def.wellFed : undefined;
-      expect(fed, `${def.id} must carry a wellFed record`).toBeDefined();
-      const html = wellFedTooltipLines(def);
-      expect(html, `${def.id} must render a Well Fed line`).toContain('Well Fed:');
-      expect(html).toContain(`by ${formatNumber(fed!.value, { maximumFractionDigits: 0 })} `);
-      expect(html).toContain(
-        `for ${formatNumber(fed!.duration / 60, { maximumFractionDigits: 1 })} min`,
-      );
-    }
-  });
-
-  it('pins the formatter options off-data: grouped value, fractional minutes', () => {
-    const html = wellFedTooltipLines(
-      wellFedDef({ aura: 'Probe', kind: 'buff_sta', value: 1234, duration: 450 }),
-    );
-    expect(html).toBe(
-      '<div class="tt-desc">Well Fed: Increases your Stamina by 1,234 for 7.5 min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.</div>',
-    );
-  });
-
-  it('maps every stat-buff kind to its own stat label', () => {
-    const cases: Array<[AuraKind, string]> = [
-      ['buff_sta', 'Stamina'],
-      ['buff_int', 'Intellect'],
-      ['buff_agi', 'Agility'],
-      ['buff_armor', 'Armor'],
-      ['buff_ap', 'Attack Power'],
-    ];
-    for (const [kind, label] of cases) {
-      const html = wellFedTooltipLines(
-        wellFedDef({ aura: 'Probe', kind, value: 8, duration: 600 }),
-      );
-      expect(html, `${kind} must read as ${label}`).toContain(
-        `Well Fed: Increases your ${label} by 8 for 10 min`,
-      );
-    }
-  });
-
-  it('renders nothing for a food with no wellFed payload, or for any non-food kind', () => {
-    // A plain dish: kind matches, payload absent.
-    expect(ITEMS.roasted_boar.kind).toBe('food');
-    expect(wellFedTooltipLines(ITEMS.roasted_boar)).toBe('');
-    // Non-food kinds, including the ones carrying the SIBLING elixir payload:
-    // the two builders never answer for each other's items.
-    for (const def of [
-      ITEMS.elixir_of_the_boar,
-      ITEMS.ironhusk_flask,
-      ITEMS.silverleaf_scroll,
-      ITEMS.healing_potion,
-      ITEMS.spring_water,
-    ]) {
-      expect(wellFedTooltipLines(def), `${def.id} is not a food`).toBe('');
-    }
-  });
-
-  it('an unmapped buff kind falls back to naming the granted aura', () => {
-    const def = wellFedDef({
-      aura: 'Might of the Boar',
-      kind: 'buff_spellpower',
-      value: 5,
-      duration: 300,
-    });
-    expect(wellFedTooltipLines(def)).toBe(
-      '<div class="tt-desc">Well Fed: Grants Might of the Boar for 5 min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.</div>',
-    );
-  });
-
-  it('the aura fallback localizes through the buff-bar matcher', () => {
-    // Only the aura fragment is pinned: the surrounding sentence is a catalog
-    // key filled per locale, while the aura name rides the AURA_NAME_KEY
-    // matcher the buff bar itself uses.
-    const def = wellFedDef({
-      aura: 'Might of the Boar',
-      kind: 'buff_spellpower',
-      value: 5,
-      duration: 300,
-    });
-    setLanguage('de_DE');
-    expect(wellFedTooltipLines(def)).toContain('Macht des Ebers');
-  });
-
-  it('escapes the interpolated aura name', () => {
-    const def = wellFedDef({
-      aura: "Warchief's Blessing",
-      kind: 'buff_spellpower',
-      value: 5,
-      duration: 300,
-    });
-    expect(wellFedTooltipLines(def)).toContain('Warchief&#39;s Blessing');
-  });
-});

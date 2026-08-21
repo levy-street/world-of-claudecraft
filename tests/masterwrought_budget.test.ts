@@ -498,7 +498,7 @@ const APEX_CONSUMABLES: Record<
     resultCount: 4,
     stationType: 'kitchens',
     sellValue: 90,
-    effect: { aura: 'Well Fed', kind: 'buff_sta', value: 6, duration: 600 },
+    effect: { aura: 'Well Fed', kind: 'buff_sta', value: 6, duration: 900 },
     foodHp: 1392,
     reagents: ROLE_FOOD_BILL,
   },
@@ -508,7 +508,7 @@ const APEX_CONSUMABLES: Record<
     resultCount: 4,
     stationType: 'kitchens',
     sellValue: 90,
-    effect: { aura: 'Well Fed', kind: 'buff_ap', value: 6, duration: 600 },
+    effect: { aura: 'Well Fed', kind: 'buff_ap', value: 6, duration: 900 },
     foodHp: 1392,
     reagents: ROLE_FOOD_BILL,
   },
@@ -518,7 +518,7 @@ const APEX_CONSUMABLES: Record<
     resultCount: 4,
     stationType: 'kitchens',
     sellValue: 90,
-    effect: { aura: 'Well Fed', kind: 'buff_int', value: 6, duration: 600 },
+    effect: { aura: 'Well Fed', kind: 'buff_int', value: 6, duration: 900 },
     foodHp: 1392,
     reagents: ROLE_FOOD_BILL,
   },
@@ -1223,14 +1223,16 @@ describe('masterwrought apex budget sweep', () => {
       if (def.kind !== 'food' || !def.wellFed) throw new Error(`${id} carries no wellFed payload`);
       return def.wellFed;
     };
-    // One shared entry-rung value and duration across all three roles, so the
-    // choice is which stat you carry, never how much.
+    // One shared apex band across all three roles (value 6 at the 11c ladder's
+    // apex duration 900), so the choice is which stat you carry, never how
+    // much; the band's own derivation lives in the phase 10 increment pins.
     const bands = new Set(
       roleFoodIds.map((id) => `${wellFedOf(id).value}/${wellFedOf(id).duration}`),
     );
-    expect(bands).toEqual(new Set(['6/600']));
-    // One shared aura display NAME too, which is what puts every role food on
-    // the single 'well_fed' exclusivity id in src/sim/combat/auras.ts.
+    expect(bands).toEqual(new Set(['6/900']));
+    // One shared aura display NAME too, which puts every role food (and since
+    // 11c every farming buff dish) on the single 'well_fed' exclusivity id
+    // minted by src/sim/wellfed.ts.
     expect(new Set(roleFoodIds.map((id) => wellFedOf(id).aura))).toEqual(new Set(['Well Fed']));
   });
 
@@ -1349,7 +1351,7 @@ describe('the phase 10 apex rungs step exactly one rung off the shipped ladders'
     }
   });
 
-  it('the role foods clear the shipped food ceiling, and Well Fed enters at the elixir entry rung', () => {
+  it('the role foods clear the shipped food ceiling, and the apex Well Fed band derives from the elixir ladder', () => {
     // The shipped ceiling derived from the live table rather than named, so a
     // newly authored 1,000-hp food reds here instead of quietly passing the
     // apex rung.
@@ -1360,19 +1362,55 @@ describe('the phase 10 apex rungs step exactly one rung off the shipped ladders'
     );
     expect(shippedCeiling, 'the shipped food ceiling').toBe(980);
 
-    // Well Fed enters at the CONSUMABLE family's own entry rung (the bottom
-    // elixir), never at the flask band: read live from that elixir.
+    // The 11c derivation (ruling 11c-D-2), computed LIVE with the twin
+    // literals the file's own idiom uses: the apex VALUE is still the
+    // consumable family's own entry rung (the bottom elixir, the number R5's
+    // kit was measured against), and the apex DURATION takes the elixir
+    // ladder's own duration step above that entry rung (boar to venomfire,
+    // 600 + 300 = 900), so the plate strictly dominates the farming rungs
+    // below without moving the R5 magnitude.
     const entry = elixirPayload('elixir_of_the_boar');
+    const durationStep = elixirPayload('venomfire_elixir').duration - entry.duration;
     for (const id of APEX_FOOD_IDS) {
       const def = foodDef(id);
       expect(def.foodHp, `${id} sits above the shipped ceiling`).toBeGreaterThan(shippedCeiling);
       expect(def.foodHp, `${id} foodHp literal`).toBe(1392);
       expect(def.wellFed?.value, `${id} enters at the elixir entry value`).toBe(entry.value);
-      expect(def.wellFed?.duration, `${id} enters at the elixir entry duration`).toBe(
-        entry.duration,
+      expect(def.wellFed?.duration, `${id} duration is entry plus the ladder step`).toBe(
+        entry.duration + durationStep,
       );
       expect(def.wellFed?.value, `${id} well-fed value literal`).toBe(6);
-      expect(def.wellFed?.duration, `${id} well-fed duration literal`).toBe(600);
+      expect(def.wellFed?.duration, `${id} well-fed duration literal`).toBe(900);
+    }
+  });
+
+  it('the apex plates strictly dominate every non-apex well-fed food on BOTH axes', () => {
+    // Swept over the LIVE catalog rather than a hand-listed set, so a fifth
+    // farming dish (or any future well-fed food) authored at or above the
+    // apex band reds here the day it ships: the power inversion the 11c
+    // re-tune removed (a cooking-50 trainer dish at 12/900 beating the
+    // cooking-100 apex plate) can never quietly return.
+    const nonApex = Object.values(ITEMS).filter(
+      (d): d is Extract<typeof d, { kind: 'food' }> =>
+        d.kind === 'food' &&
+        d.wellFed !== undefined &&
+        !(APEX_FOOD_IDS as readonly string[]).includes(d.id),
+    );
+    // Non-vacuity: the farming rungs really are inside the sweep.
+    expect(nonApex.length).toBeGreaterThanOrEqual(4);
+    for (const apexId of APEX_FOOD_IDS) {
+      const apex = foodDef(apexId).wellFed;
+      expect(apex, `${apexId} carries the apex payload`).toBeDefined();
+      for (const other of nonApex) {
+        expect(
+          other.wellFed!.value,
+          `${other.id} value must stay strictly below the apex`,
+        ).toBeLessThan(apex!.value);
+        expect(
+          other.wellFed!.duration,
+          `${other.id} duration must stay strictly below the apex`,
+        ).toBeLessThan(apex!.duration);
+      }
     }
   });
 

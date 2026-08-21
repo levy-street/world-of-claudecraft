@@ -809,19 +809,19 @@ describe('auras_view: the carried-flag buff', () => {
 });
 
 // ---------------------------------------------------------------------------
-// The farming well-fed food buff. All four buff dishes mint the ONE aura id
-// wellfed_buff_sta (last eaten wins; the namespace is distinct from
-// elixir_<kind>, so food and elixir stack by design). On the buff bar it is
+// The well-fed food buff. Every buff food mints the ONE unified 'well_fed'
+// aura id (Masterwrought 11c: last eaten wins across the whole family; an
+// elixir coexists because the ids can never collide). On the buff bar it is
 // an ordinary timed buff: its display name rides the AURA_NAME_KEY matcher
 // exactly like the elixir auras, and it is NOT a toggle, so
 // compactAuraDuration applies and the remaining time shows.
 // ---------------------------------------------------------------------------
 describe('auras_view: the well-fed food buff', () => {
   const wellFed = (): AuraInput => ({
-    id: 'wellfed_buff_sta',
+    id: 'well_fed',
     name: 'Well Fed',
     kind: 'buff_sta',
-    value: 3,
+    value: 2,
     remaining: 600,
     duration: 600,
   });
@@ -838,7 +838,7 @@ describe('auras_view: the well-fed food buff', () => {
 
   it('shows its remaining time: a real timed buff, never a toggle', () => {
     const slot = createAurasView('buffs', deps()).tick(entity([wellFed()])).slots[0];
-    expect(slot.key).toBe('wellfed_buff_sta');
+    expect(slot.key).toBe('well_fed');
     expect(slot.toggle).toBe(false);
     expect(slot.durationText).toBe('10m'); // compactAuraDuration: 600s reads 10m
     expect(slot.isDebuff).toBe(false);

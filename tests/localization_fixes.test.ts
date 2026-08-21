@@ -1700,17 +1700,19 @@ describe('elixir aura names stay wired to the sim aura matcher', () => {
 });
 
 // --- Well-fed aura name: the same double-authoring hazard as the elixirs
-// (each buff dish's wellfed.aura and the sim_i18n map row), so the same
-// identity round-trip pin. All four dishes deliberately share the ONE
-// 'Well Fed' name (last eaten wins on the shared wellfed_buff_sta id). ---
+// (each buff food's wellFed.aura and the sim_i18n map row), so the same
+// identity round-trip pin. Since the 11c unification the ONE field spans the
+// whole family (four farm dishes plus three apex role plates), all sharing
+// the ONE 'Well Fed' name and the one 'well_fed' aura id (last eaten wins
+// across the family), and the matcher serves the kept aura.wellFed terms. ---
 describe('well-fed aura names stay wired to the sim aura matcher', () => {
-  it('every authored wellfed aura resolves through localizeSimAuraName', async () => {
+  it('every authored wellFed aura resolves through localizeSimAuraName', async () => {
     const { ITEMS } = await import('../src/sim/data');
     const auras = Object.values(ITEMS)
-      .map((item) => ('wellfed' in item ? item.wellfed?.aura : undefined))
+      .map((item) => (item.kind === 'food' ? item.wellFed?.aura : undefined))
       .filter((aura): aura is string => typeof aura === 'string');
-    // one buff dish per crop tier
-    expect(auras.length).toBeGreaterThanOrEqual(4);
+    // the union of carriers: one buff dish per crop tier plus three plates
+    expect(auras.length).toBeGreaterThanOrEqual(7);
     setLanguage('en');
     for (const aura of auras) {
       // Identity round-trip, not just non-null: the EN DICT value must equal
@@ -1721,9 +1723,9 @@ describe('well-fed aura names stay wired to the sim aura matcher', () => {
 
   it('the Well Fed aura localizes on every non-Latin surface', async () => {
     const expected: Record<string, string> = {
-      zh_CN: '饱足',
-      zh_TW: '飽足',
-      ko_KR: '포만감',
+      zh_CN: '精神饱满',
+      zh_TW: '精神飽滿',
+      ko_KR: '잘 먹음',
       ja_JP: '満腹',
       ru_RU: 'Сытость',
     };

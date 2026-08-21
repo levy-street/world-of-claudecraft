@@ -1,8 +1,8 @@
 // Shared-feast item tooltip lines: the pure string-builder composed inside
-// Hud.itemTooltip beside the wellfed line (the wellfed_tooltip_view.test.ts
+// Hud.itemTooltip beside the well-fed line (the wellfed_tooltip_view.test.ts
 // idiom). English copy asserted directly; every number must mirror the live
 // records (the def's own feast record for servings and duration, the
-// pointed-at dish's wellfed record for the buff, CONSUME_DURATION for the
+// pointed-at dish's wellFed record for the buff, CONSUME_DURATION for the
 // meal length), never re-typed copy, and the buff line must state the
 // finish-the-meal trigger, because the buff lands only when the 18s
 // sit-restore COMPLETES (an interrupted meal forfeits it), the
@@ -22,14 +22,14 @@ import {
 import { stripComments } from './helpers/strip_comments';
 
 // A synthetic feast whose dish is injectable: the dish-resolution branches
-// (no wellfed record, an unmapped buff kind, an escaping-hostile aura name)
+// (no wellFed record, an unmapped buff kind, an escaping-hostile aura name)
 // are each pinned off-data, since the one shipped feast points at a
 // small-number buff_sta dish and exercises exactly one branch.
 function feastDef(record: NonNullable<OtherItemDef['feast']>): ItemDef {
   return { ...(ITEMS.harvest_feast as OtherItemDef), feast: record };
 }
-function dishDef(wellfed: NonNullable<FoodItemDef['wellfed']> | undefined): ItemDef {
-  return { ...(ITEMS.evergarden_braised_greens as FoodItemDef), id: 'probe_dish', wellfed };
+function dishDef(wellFed: NonNullable<FoodItemDef['wellFed']> | undefined): ItemDef {
+  return { ...(ITEMS.evergarden_braised_greens as FoodItemDef), id: 'probe_dish', wellFed };
 }
 
 describe('feastTooltipLines', () => {
@@ -39,7 +39,7 @@ describe('feastTooltipLines', () => {
     expect(feastTooltipLines(ITEMS.harvest_feast)).toBe(
       '<div class="tt-desc">Use: Sets out a feast others can eat from, one serving each ' +
         '(10 servings, lasts 3 min).</div>' +
-        '<div class="tt-desc">Each serving grants Well Fed: +12 Stamina for 15 min ' +
+        '<div class="tt-desc">Each serving grants Well Fed: +5 Stamina for 10 min ' +
         'when you finish the 18 sec meal.</div>',
     );
   });
@@ -69,7 +69,7 @@ describe('feastTooltipLines', () => {
     expect(retuned).toContain('+24 Stamina for 7.5 min');
   });
 
-  it('a dish without a wellfed record leaves only the placement line', () => {
+  it('a dish without a wellFed record leaves only the placement line', () => {
     // Positive control first: the live dish DOES add a buff line, so the
     // absence below is the branch, not a vacuous always-one-line builder.
     expect(feastTooltipLines(ITEMS.harvest_feast)).toContain('Each serving grants');
@@ -147,41 +147,41 @@ describe('the five non-Latin fills render end to end (frozen literals, the M16 s
     [
       'zh_CN',
       '<div class="tt-desc">使用：摆出一桌他人也能享用的盛宴，每人限享一份（10 份，持续 3 分钟）。</div>' +
-        '<div class="tt-desc">每份：吃完 18 秒的一餐后获得饱足效果，使你的耐力提高 12 点，持续 15 分钟。</div>',
+        '<div class="tt-desc">每份：吃完 18 秒的一餐后获得精神饱满效果，使你的耐力提高 5 点，持续 10 分钟。</div>',
     ],
     [
       'zh_TW',
       '<div class="tt-desc">使用：擺出一桌他人也能享用的盛宴，每人限享一份（10 份，持續 3 分鐘）。</div>' +
-        '<div class="tt-desc">每份：吃完 18 秒的一餐後獲得飽足效果，使你的耐力提高 12 點，持續 15 分鐘。</div>',
+        '<div class="tt-desc">每份：吃完 18 秒的一餐後獲得精神飽滿效果，使你的耐力提高 5 點，持續 10 分鐘。</div>',
     ],
     [
       'ja_JP',
       '<div class="tt-desc">使用: 他のプレイヤーも食べられる宴を広げる。1人1食まで（10人前、3分間持続）。</div>' +
-        '<div class="tt-desc">1人前につき、18秒の食事を終えると満腹の効果を得て、スタミナが12上昇し、15分間持続します。</div>',
+        '<div class="tt-desc">1人前につき、18秒の食事を終えると満腹の効果を得て、スタミナが5上昇し、10分間持続します。</div>',
     ],
     [
       'ko_KR',
       '<div class="tt-desc">사용: 다른 플레이어도 먹을 수 있는 잔치를 차립니다. 1인당 1인분입니다(10인분, 3분간 지속).</div>' +
-        '<div class="tt-desc">한 접시를 18초 동안 다 먹으면 포만감 효과를 얻어 체력이(가) 12 증가하며 15분 동안 지속됩니다.</div>',
+        '<div class="tt-desc">한 접시를 18초 동안 다 먹으면 잘 먹음 효과를 얻어 체력이(가) 5 증가하며 10분 동안 지속됩니다.</div>',
     ],
     [
       'ru_RU',
       '<div class="tt-desc">Использование: накрывает пир, с которого могут поесть и другие, ' +
         'по одной порции каждому (10 порций, действует 3 мин).</div>' +
-        '<div class="tt-desc">Каждая порция дает эффект &quot;Сытость&quot;: Выносливость +12 ' +
-        'на 15 мин после 18 сек еды.</div>',
+        '<div class="tt-desc">Каждая порция дает эффект &quot;Сытость&quot;: Выносливость +5 ' +
+        'на 10 мин после 18 сек еды.</div>',
     ],
   ];
   const FALLBACK: [SupportedLanguage, string][] = [
-    ['zh_CN', '<div class="tt-desc">每份：吃完 18 秒的一餐后获得饱足效果，持续 5 分钟。</div>'],
-    ['zh_TW', '<div class="tt-desc">每份：吃完 18 秒的一餐後獲得飽足效果，持續 5 分鐘。</div>'],
+    ['zh_CN', '<div class="tt-desc">每份：吃完 18 秒的一餐后获得精神饱满效果，持续 5 分钟。</div>'],
+    ['zh_TW', '<div class="tt-desc">每份：吃完 18 秒的一餐後獲得精神飽滿效果，持續 5 分鐘。</div>'],
     [
       'ja_JP',
       '<div class="tt-desc">1人前につき、18秒の食事を終えると満腹の効果を得て、5分間持続します。</div>',
     ],
     [
       'ko_KR',
-      '<div class="tt-desc">한 접시를 18초 동안 다 먹으면 포만감 효과를 얻어 5분 동안 지속됩니다.</div>',
+      '<div class="tt-desc">한 접시를 18초 동안 다 먹으면 잘 먹음 효과를 얻어 5분 동안 지속됩니다.</div>',
     ],
     [
       'ru_RU',

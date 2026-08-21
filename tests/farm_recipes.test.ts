@@ -607,7 +607,7 @@ describe('FARM_RECIPES: the shared feast, the Phase 12 placeable cooking row', (
     });
     const dishDef = ITEMS[feastRecord?.dishItemId ?? ''];
     expect(
-      dishDef && 'wellfed' in dishDef ? dishDef.wellfed : undefined,
+      dishDef?.kind === 'food' ? dishDef.wellFed : undefined,
       'the feast dish must be a live buff dish',
     ).toBeDefined();
     // Closed key shape, the dish-shape doctrine below applied to the feast:
@@ -639,8 +639,9 @@ describe('FARM_RECIPES: the shared feast, the Phase 12 placeable cooking row', (
 
 describe('FARM_RECIPES: the dish ItemDef shape, reopened by Phase 11 and closed again', () => {
   // Phase 11 (well-fed food) is the reopening the old pin scheduled: the four
-  // buff dishes now carry the `wellfed` field, and NOTHING else moved. The
-  // shape is closed again until the next consumable phase reopens it here.
+  // buff dishes carry the well-fed field (unified onto `wellFed` by
+  // Masterwrought 11c), and NOTHING else moved. The shape is closed again
+  // until the next consumable phase reopens it here.
   //
   // The buff-dish id set is an explicit sorted literal, so a FIFTH buff dish
   // is a deliberate re-pin in this file, never a silent def edit; both sweeps
@@ -653,7 +654,7 @@ describe('FARM_RECIPES: the dish ItemDef shape, reopened by Phase 11 and closed 
     'highwatch_barley_porridge',
   ];
   const PLAIN_FOOD_KEYS = ['foodHp', 'id', 'kind', 'name', 'quality', 'sellValue'];
-  const BUFF_FOOD_KEYS = ['foodHp', 'id', 'kind', 'name', 'quality', 'sellValue', 'wellfed'];
+  const BUFF_FOOD_KEYS = ['foodHp', 'id', 'kind', 'name', 'quality', 'sellValue', 'wellFed'];
 
   it('the eight plain dishes keep EXACTLY the six plain-food keys, nothing more', () => {
     const plain = dishes.filter((d) => !BUFF_DISH_IDS.includes(d.resultItemId));
@@ -668,7 +669,7 @@ describe('FARM_RECIPES: the dish ItemDef shape, reopened by Phase 11 and closed 
     }
   });
 
-  it('the four buff dishes carry EXACTLY the seven keys (plain plus wellfed)', () => {
+  it('the four buff dishes carry EXACTLY the seven keys (plain plus wellFed)', () => {
     const buff = dishes.filter((d) => BUFF_DISH_IDS.includes(d.resultItemId));
     // Derived from FARM_RECIPES and matched against the literal, so a buff
     // dish authored without a recipe row (or the reverse) reds here too.
@@ -683,48 +684,41 @@ describe('FARM_RECIPES: the dish ItemDef shape, reopened by Phase 11 and closed 
     }
   });
 
-  it('every buff dish wellfed field is well-formed, at the exact proposed tuning', () => {
-    // The ceiling comes from the documented elixir budget (the alchemy ladder
-    // header in content/profession_items.ts): buff_sta value <= 12 for
-    // duration <= 900s. The exact pairs are pinned so a silent retune is a
-    // visible edit; VALUES ARE PROPOSED AND MAINTAINER-FLAGGED at the defs.
-    const EXPECTED_WELLFED: Record<string, [number, number]> = {
-      eastbrook_glazed_carrots: [3, 600],
-      fenbridge_rice_pudding: [6, 900],
-      highwatch_barley_porridge: [9, 900],
-      evergarden_braised_greens: [12, 900],
-    };
+  it('every buff dish wellFed field sits on the derived 11c ladder rung', () => {
+    // The five-rung Well Fed ladder (Masterwrought 11c, ruling 11c-D-2), the
+    // farming rungs DERIVED rather than pasted: one point of stamina per crop
+    // tier starting at 2 (carrots / pudding / porridge / greens = 2/3/4/5),
+    // every rung at the consumable family's own entry duration, read LIVE
+    // off elixir_of_the_boar so the anchor cannot drift apart from the
+    // ladder it calibrates. The apex plates (6 / entry + step) live in
+    // profession_items.ts's apex block; their dominance over these rungs is
+    // pinned in tests/masterwrought_budget.test.ts over the live catalog.
+    const boar = ITEMS.elixir_of_the_boar;
+    const entryDuration = boar.elixir?.duration;
+    expect(entryDuration, 'the elixir entry rung anchors the dish duration').toBeDefined();
+    const TIER_ORDER = [
+      'eastbrook_glazed_carrots',
+      'fenbridge_rice_pudding',
+      'highwatch_barley_porridge',
+      'evergarden_braised_greens',
+    ];
     const buff = dishes.filter((d) => BUFF_DISH_IDS.includes(d.resultItemId));
     expect(buff, 'the buff sweep really covers the four Phase 11 dishes').toHaveLength(4);
     for (const dish of buff) {
       const def = ITEMS[dish.resultItemId];
-      const wellfed = 'wellfed' in def ? def.wellfed : undefined;
-      expect(wellfed, `${dish.resultItemId} lost its wellfed field`).toBeDefined();
-      if (!wellfed) continue;
-      // The shared namespace: one aura name, therefore ONE aura id
-      // (wellfed_buff_sta), so last eaten always wins within food while the
-      // distinct wellfed_ prefix keeps elixir_<kind> buffs coexisting.
-      expect(wellfed.aura, `${dish.resultItemId} aura name`).toBe('Well Fed');
-      expect(wellfed.kind, `${dish.resultItemId} aura kind`).toBe('buff_sta');
-      expect(Number.isInteger(wellfed.value), `${dish.resultItemId} value integer`).toBe(true);
-      expect(wellfed.value, `${dish.resultItemId} value floor`).toBeGreaterThan(0);
-      expect(
-        wellfed.value,
-        `${dish.resultItemId} value ceiling (elixir budget)`,
-      ).toBeLessThanOrEqual(12);
-      expect(Number.isInteger(wellfed.duration), `${dish.resultItemId} duration integer`).toBe(
-        true,
-      );
-      expect(wellfed.duration, `${dish.resultItemId} duration floor`).toBeGreaterThan(0);
-      expect(
-        wellfed.duration,
-        `${dish.resultItemId} duration ceiling (elixir budget)`,
-      ).toBeLessThanOrEqual(900);
-      const [value, duration] = EXPECTED_WELLFED[dish.resultItemId];
-      expect(wellfed.value, `${dish.resultItemId} proposed value retuned silently`).toBe(value);
-      expect(wellfed.duration, `${dish.resultItemId} proposed duration retuned silently`).toBe(
-        duration,
-      );
+      const wellFed = def.kind === 'food' ? def.wellFed : undefined;
+      expect(wellFed, `${dish.resultItemId} lost its wellFed field`).toBeDefined();
+      if (!wellFed) continue;
+      // One aura name and ONE shared aura id for the whole food family
+      // (WELL_FED_AURA_ID, src/sim/wellfed.ts): last eaten always wins,
+      // dish or role plate alike, while elixir_<kind> coexists because the
+      // ids can never collide.
+      expect(wellFed.aura, `${dish.resultItemId} aura name`).toBe('Well Fed');
+      expect(wellFed.kind, `${dish.resultItemId} aura kind`).toBe('buff_sta');
+      const tier = TIER_ORDER.indexOf(dish.resultItemId);
+      expect(tier, `${dish.resultItemId} sits on the crop-tier ladder`).toBeGreaterThanOrEqual(0);
+      expect(wellFed.value, `${dish.resultItemId} ladder value (tier + 2)`).toBe(tier + 2);
+      expect(wellFed.duration, `${dish.resultItemId} entry-rung duration`).toBe(entryDuration);
     }
   });
 

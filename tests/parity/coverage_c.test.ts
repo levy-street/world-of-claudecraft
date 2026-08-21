@@ -946,11 +946,12 @@ describe('coverage: each scenario fires its subsystem', () => {
     const simAny = rec.sim as any;
     expect(simAny.feasts.size).toBe(0);
     expect(simAny.entities.get(placedEv[0].feastId)).toBeUndefined();
-    // The bite refreshed the dish mint (last-eaten-wins on the shared id):
-    // the drive ends Well Fed at the tier-4 value, and both beat-P items
-    // left the bags (the dish eaten, the feast spent at placement).
-    const wellfedAura = (simAny.player.auras as any[]).find((a) => a.id === 'wellfed_buff_sta');
-    expect(wellfedAura?.value).toBe(12);
+    // The bite refreshed the dish mint (last-eaten-wins on the ONE unified
+    // 'well_fed' id, Masterwrought 11c): the drive ends Well Fed at the
+    // tier-4 dish's ladder value 5, and both beat-P items left the bags
+    // (the dish eaten, the feast spent at placement).
+    const wellfedAura = (simAny.player.auras as any[]).find((a) => a.id === 'well_fed');
+    expect(wellfedAura?.value).toBe(5);
     expect(countOf('evergarden_braised_greens')).toBe(0);
     expect(countOf('harvest_feast')).toBe(0);
     expect(meta.farmPlots.size).toBe(0);

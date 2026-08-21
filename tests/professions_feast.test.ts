@@ -30,6 +30,7 @@ import {
   INTERACT_RANGE,
   type SimEvent,
 } from '../src/sim/types';
+import { WELL_FED_AURA_ID } from '../src/sim/wellfed';
 import { groundHeight, isInWaterBody, waterLevelAt } from '../src/sim/world';
 
 // The capstone dish the bite serves (ITEMS[FARM_FEAST_ITEM_ID].feast.dishItemId,
@@ -144,8 +145,8 @@ function tickSeconds(sim: Sim, seconds: number): void {
   for (let i = 0; i < seconds * 20; i++) sim.tick();
 }
 
-function wellfedAuras(p: Entity): Aura[] {
-  return p.auras.filter((a) => a.id.startsWith('wellfed_'));
+function wellFedAuras(p: Entity): Aura[] {
+  return p.auras.filter((a) => a.id === WELL_FED_AURA_ID);
 }
 
 /** Toggle the lock on one feast slot in the wanted direction (the
@@ -200,11 +201,11 @@ describe('shared feast: wire tokens and content', () => {
     const dish = ITEMS[DISH_ID];
     expect(dish.kind).toBe('food');
     expect(dish.foodHp).toBe(980);
-    expect('wellfed' in dish ? dish.wellfed : undefined).toEqual({
+    expect(dish.kind === 'food' ? dish.wellFed : undefined).toEqual({
       aura: 'Well Fed',
       kind: 'buff_sta',
-      value: 12,
-      duration: 900,
+      value: 5,
+      duration: 600,
     });
   });
 });
@@ -489,7 +490,7 @@ describe('shared feast: placing', () => {
 });
 
 describe('shared feast: the bite and the Well Fed mint', () => {
-  it('spends a serving at bite START and mints value 12 only at the 18s completion', () => {
+  it('spends a serving at bite START and mints the dish buff only at the 18s completion', () => {
     const { sim, placer, eaters } = world(1);
     const eater = eaters[0];
     const feastId = placeOk(sim, placer);
@@ -506,17 +507,57 @@ describe('shared feast: the bite and the Well Fed mint', () => {
     expect(eater.p.eating?.hpPer2s).toBe(109); // round(980 foodHp / 9 regen ticks)
     expect(eater.p.eating?.manaPer2s).toBe(0);
     expect(eater.p.eating?.remaining).toBe(18); // CONSUME_DURATION
-    expect(wellfedAuras(eater.p), 'no mint at the bite').toEqual([]);
+    expect(wellFedAuras(eater.p), 'no mint at the bite').toEqual([]);
 
     // Ride out the sit-restore: the mint lands through the REAL updateRegen
     // completion path (no direct wellfed call anywhere in this suite).
     tickSeconds(sim, 22);
     expect(eater.p.eating).toBeNull();
-    const wf = wellfedAuras(eater.p);
+    const wf = wellFedAuras(eater.p);
     expect(wf).toHaveLength(1);
-    expect(wf[0].id).toBe('wellfed_buff_sta');
-    expect(wf[0].value).toBe(12);
-    expect(wf[0].duration).toBe(900);
+    expect(wf[0].id).toBe(WELL_FED_AURA_ID);
+    expect(wf[0].value).toBe(5);
+    expect(wf[0].duration).toBe(600);
+  });
+
+  it('a feast bite and a bagged dish of the same id mint an IDENTICAL aura', () => {
+    // The carried-payload guard (ruling 11c-A2-BUILDER): the defect class
+    // this pins is the bite WRITING a Consuming without the wellFed carry,
+    // which fails no restore assertion and silently never mints. Both paths
+    // run the REAL tick machinery (bag use vs place-then-bite, each ridden
+    // through the 18s drain), and the minted aura is compared as a WHOLE
+    // record, never mere presence, so a drifted field (kind, school, source,
+    // duration) reds here too. `remaining` is excluded by construction: the
+    // two runs complete on different ticks of their own sims, so it is
+    // re-read at mint time instead (asserted equal to the full duration).
+    const bag = world(1, 7);
+    const bagEater = bag.eaters[0];
+    bag.sim.addItem(DISH_ID, 1, bagEater.pid);
+    bag.sim.useItem(DISH_ID, bagEater.pid);
+    tickSeconds(bag.sim, 22);
+    expect(bag.sim.entities.get(bagEater.pid)).toBeTruthy();
+    const bagged = wellFedAuras(bagEater.p);
+    expect(bagged, 'the bagged dish minted').toHaveLength(1);
+
+    const feast = world(1, 7);
+    const feastEater = feast.eaters[0];
+    const feastId = placeOk(feast.sim, feast.placer);
+    feast.sim.consumeFeast(feastId, feastEater.pid);
+    tickSeconds(feast.sim, 22);
+    const bitten = wellFedAuras(feastEater.p);
+    expect(bitten, 'the feast bite minted').toHaveLength(1);
+
+    const record = (a: Aura, sourceOf: Entity) => ({
+      id: a.id,
+      name: a.name,
+      kind: a.kind,
+      value: a.value,
+      duration: a.duration,
+      school: a.school,
+      selfSourced: a.sourceId === sourceOf.id,
+      fullAtMint: a.duration - a.remaining < 30, // fresh, minus tick slack
+    });
+    expect(record(bitten[0], feastEater.p)).toEqual(record(bagged[0], bagEater.p));
   });
 
   it('once per player: the second press denies feast_eaten, a third player still eats', () => {
@@ -739,7 +780,7 @@ describe('shared feast: the bite and the Well Fed mint', () => {
     expect(eater.p.eating, 'the hit cancels the meal').toBeNull();
 
     tickSeconds(sim, 20); // well past where 18s would have landed
-    expect(wellfedAuras(eater.p), 'the forfeited meal never pays out').toEqual([]);
+    expect(wellFedAuras(eater.p), 'the forfeited meal never pays out').toEqual([]);
     expect(st.charges).toBe(9); // spent at START, never refunded
 
     // The ledger kept the eater: the re-press is feast_eaten, not a free retry.
@@ -882,7 +923,7 @@ describe('shared feast: charges, expiry, and the 1 Hz sweep', () => {
   });
 });
 
-describe('shared feast: wellfed vs elixir isolation and last-eaten-wins', () => {
+describe('shared feast: well-fed vs elixir coexistence and last-eaten-wins', () => {
   it('an elixir survives the feast mint, and a later tier-1 dish downgrades the food buff', () => {
     const { sim, placer, eaters } = world(1);
     const eater = eaters[0];
@@ -893,30 +934,31 @@ describe('shared feast: wellfed vs elixir isolation and last-eaten-wins', () => 
     sim.useItem('elixir_of_the_boar', eater.pid);
     expect(eater.p.auras.find((a) => a.id === 'elixir_buff_sta')?.value).toBe(6);
 
-    // The feast bite to completion: both stand, neither clobbered.
+    // The feast bite to completion: both stand, neither clobbered (the ids
+    // cannot collide: 'well_fed' is never an 'elixir_<kind>').
     sim.consumeFeast(feastId, eater.pid);
     tickSeconds(sim, 22);
     expect(eater.p.eating).toBeNull();
-    expect(wellfedAuras(eater.p)).toHaveLength(1);
-    expect(wellfedAuras(eater.p)[0].value).toBe(12);
+    expect(wellFedAuras(eater.p)).toHaveLength(1);
+    expect(wellFedAuras(eater.p)[0].value).toBe(5);
     expect(
       eater.p.auras.find((a) => a.id === 'elixir_buff_sta')?.value,
       'the elixir survived the feast grant',
     ).toBe(6);
 
-    // Last eaten wins, the downgrade direction: a tier-1 dish (value 3)
-    // eaten after the feast REPLACES the value-12 buff, one shared aura id.
+    // Last eaten wins, the downgrade direction: a tier-1 dish (value 2)
+    // eaten after the feast REPLACES the value-5 buff, one shared aura id.
     sim.addItem('eastbrook_glazed_carrots', 1, eater.pid);
     sim.useItem('eastbrook_glazed_carrots', eater.pid);
     tickSeconds(sim, 22);
     expect(eater.p.eating).toBeNull();
-    const wf = wellfedAuras(eater.p);
-    expect(wf, 'still exactly one wellfed aura').toHaveLength(1);
-    expect(wf[0].value).toBe(3);
+    const wf = wellFedAuras(eater.p);
+    expect(wf, 'still exactly one well_fed aura').toHaveLength(1);
+    expect(wf[0].value).toBe(2);
     expect(eater.p.auras.find((a) => a.id === 'elixir_buff_sta')?.value).toBe(6);
   });
 
-  it('the upgrade direction: the feast bite after a tier-1 dish overwrites 3 with 12', () => {
+  it('the upgrade direction: the feast bite after a tier-1 dish overwrites 2 with 5', () => {
     const { sim, placer, eaters } = world(1);
     const eater = eaters[0];
     const feastId = placeOk(sim, placer);
@@ -924,13 +966,13 @@ describe('shared feast: wellfed vs elixir isolation and last-eaten-wins', () => 
     sim.addItem('eastbrook_glazed_carrots', 1, eater.pid);
     sim.useItem('eastbrook_glazed_carrots', eater.pid);
     tickSeconds(sim, 22);
-    expect(wellfedAuras(eater.p)[0].value).toBe(3);
+    expect(wellFedAuras(eater.p)[0].value).toBe(2);
 
     sim.consumeFeast(feastId, eater.pid);
     tickSeconds(sim, 22);
-    const wf = wellfedAuras(eater.p);
+    const wf = wellFedAuras(eater.p);
     expect(wf).toHaveLength(1);
-    expect(wf[0].value).toBe(12);
+    expect(wf[0].value).toBe(5);
   });
 });
 
@@ -985,8 +1027,8 @@ describe('shared feast: zero-draw determinism', () => {
 
     // Non-vacuity: the feast run really minted, the control really did not,
     // and the observer really recorded a stream.
-    expect(wellfedAuras(feastRun.eater)).toHaveLength(1);
-    expect(wellfedAuras(control.eater)).toEqual([]);
+    expect(wellFedAuras(feastRun.eater)).toHaveLength(1);
+    expect(wellFedAuras(control.eater)).toEqual([]);
     expect(feastRun.draws.length).toBeGreaterThan(0);
 
     expect(feastRun.draws.length).toBe(control.draws.length);

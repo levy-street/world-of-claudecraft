@@ -39,6 +39,7 @@ import { GameServer } from '../server/game';
 import { ClientWorld } from '../src/net/online';
 import { farmBedById } from '../src/sim/content/farm_patches';
 import { CONSUME_DURATION, type SimEvent } from '../src/sim/types';
+import { WELL_FED_AURA_ID } from '../src/sim/wellfed';
 import { broadcast, type FakeClient, fakeWs, joinServer, lastSnap } from './helpers/bare_client';
 
 // --- the client half: a real ClientWorld whose socket keeps every send ---
@@ -301,15 +302,16 @@ describe('the multi-session feast routing over the real broadcast path', () => {
     expect(eat.remaining).toBeGreaterThan(0);
     expect(eat.remaining).toBeLessThanOrEqual(CONSUME_DURATION);
 
-    // Past the 18s sit-restore, the Phase 11 completion path mints Well Fed
-    // on the EATER's own snapshot (value 12, the +12 Stamina buff).
+    // Past the 18s sit-restore, the completion path mints Well Fed on the
+    // EATER's own snapshot: the unified 'well_fed' id, the dish's value 5
+    // (the 11c five-rung ladder's top farming rung).
     for (let i = 0; i < CONSUME_DURATION * 20 + 10; i++) routeTick(server);
     const wellfed = awaitFrames(server, () => {
       const snap = lastSnap(guestFc.sent);
       const auras = (snap?.self?.auras ?? []) as { id?: string; value?: number }[];
-      return auras.find((a) => a.id === 'wellfed_buff_sta') ?? null;
+      return auras.find((a) => a.id === WELL_FED_AURA_ID) ?? null;
     });
-    expect(wellfed.value).toBe(12);
+    expect(wellfed.value).toBe(5);
 
     // The SECOND bite answers the ledger deny, to the eater's socket ONLY
     // (farm events are pid-scoped personal; the placer is the bystander

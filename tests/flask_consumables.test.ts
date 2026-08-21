@@ -505,26 +505,30 @@ describe('role foods: Well Fed lands only on a finished meal, and is mortal', ()
     expect(fed, 'the finished meal paid out').toHaveLength(1);
     expect(fed[0].kind).toBe('buff_sta');
     expect(fed[0].value).toBe(6);
-    expect(fed[0].duration).toBe(600);
-    expect(fed[0].remaining).toBeGreaterThan(590);
+    expect(fed[0].duration).toBe(900);
+    expect(fed[0].remaining).toBeGreaterThan(890);
     expect(fed[0].flask, 'Well Fed carries no flask marker').toBeUndefined();
   });
 
   it('the eating slot is already cleared at the moment Well Fed is applied', () => {
-    // src/sim/combat/auras.ts spells the finish as clear THEN grant: the
-    // payload is read into a local, p.eating is nulled, and only then does
-    // applyAura run, so the meal is over from every reader's point of view
-    // when the buff lands. Nothing on the apply path consults isConsuming
-    // today, which is exactly why the order needs an assertion rather than a
-    // comment: swapping the two lines is invisible to every other case here.
-    // ctx is a plain record of bound functions built once at construction, so
-    // the seam is patched on the ctx object (a Sim.prototype spy cannot
-    // intercept a reference bound before it).
+    // The completion site in src/sim/combat/auras.ts spells the finish as
+    // clear THEN grant: the payload is read into a local, p.eating is
+    // nulled, and only then does applyWellFedOnMealComplete
+    // (src/sim/wellfed.ts, the one mint site since 11c) run ctx.applyAura,
+    // so the meal is over from every reader's point of view when the buff
+    // lands. Nothing on the apply path consults isConsuming today, which is
+    // exactly why the order needs an assertion rather than a comment:
+    // swapping the clear and the mint call is invisible to every other case
+    // here. The mint still rides the ctx seam (the module takes SimContext),
+    // so the patch below intercepts it; ctx is a plain record of bound
+    // functions built once at construction, so the seam is patched on the
+    // ctx object (a Sim.prototype spy cannot intercept a reference bound
+    // before it).
     const { sim, pid, p } = world();
     const ctx = sim.ctx as unknown as { applyAura: (target: Entity, aura: Aura) => void };
     const realApplyAura = ctx.applyAura;
     let eatingAtApply: unknown =
-      'ctx.applyAura never ran for well_fed (the grant rides the ctx seam; if the call moved to a direct import, re-point this patch, the order claim is unchanged)';
+      'ctx.applyAura never ran for well_fed (src/sim/wellfed.ts mints through the ctx seam; if the mint ever moves to a direct import, re-point this patch, the order claim is unchanged)';
     ctx.applyAura = (target: Entity, aura: Aura): void => {
       if (aura.id === WELL_FED) eatingAtApply = target.eating;
       realApplyAura(target, aura);
