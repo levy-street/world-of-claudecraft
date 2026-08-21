@@ -13,7 +13,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import type { Aura, Entity, ItemDef } from '../src/sim/types';
+import type { Aura, Consuming, Entity, ItemDef } from '../src/sim/types';
 import { WELL_FED_AURA_ID } from '../src/sim/wellfed';
 import { hasAuraRecipe } from '../src/ui/icons';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
@@ -41,6 +41,14 @@ function wellFedAuras(p: Entity): Aura[] {
   return p.auras.filter((a) => a.id === WELL_FED_AURA_ID);
 }
 
+// The family counted by NAME rather than by id: under a per-kind id
+// regression the exact-id helper above finds zero auras (which still reds,
+// but as "none" rather than "two"), so the exclusivity arms count the family
+// this way too and fail as the claim they are named for.
+function wellFedByName(p: Entity): Aura[] {
+  return p.auras.filter((a) => a.name === 'Well Fed');
+}
+
 // Eat a dish and ride out the full sit-restore: 18s of meal plus regen-tick
 // alignment slack (the 2s classic tick fires on tickCount % 40 === 0).
 function eatToCompletion(sim: Sim, pid: number, p: Entity, itemId: string): void {
@@ -51,9 +59,11 @@ function eatToCompletion(sim: Sim, pid: number, p: Entity, itemId: string): void
 
 describe('well fed: the one aura id', () => {
   it('identity pin: WELL_FED_AURA_ID is well_fed and owns a painted recipe', () => {
-    // The ONE site that re-types the string (every other site references the
-    // constant, which is what keeps this from being a constant-self-compare):
-    // the seam Phase 15 and the icon prewarm read.
+    // The one src/ site besides the sanctioned literal AURA_RECIPES key in
+    // src/ui/icons.ts that spells the string: every runtime site references
+    // the constant (which is what keeps this from being a constant-self-
+    // compare), and the view/painter suites pin the literal as FIXTURES on
+    // purpose. The seam Phase 15 and the icon prewarm read.
     expect(WELL_FED_AURA_ID).toBe('well_fed');
     expect(hasAuraRecipe(WELL_FED_AURA_ID)).toBe(true);
   });
@@ -73,6 +83,24 @@ describe('well fed: the one aura id', () => {
       wellFed: { aura: 'Well Fed', kind: 'buff_sta', value: 1, duration: 60 },
     };
     expect(bad.id).toBe('test_drink');
+  });
+
+  it('type fact: only the food arm of the eating record can carry the payload', () => {
+    // The record the completion site reads is kind-scoped too (FoodConsuming
+    // | DrinkConsuming, src/sim/types.ts), so a drink slot can never reach
+    // the mint with a payload and the old runtime kind guard is
+    // unrepresentable at BOTH layers. Self-verifying like the def pin above.
+    const bad: Consuming = {
+      itemId: 'test_drink',
+      kind: 'drink',
+      hpPer2s: 0,
+      manaPer2s: 10,
+      remaining: 18,
+      ticksElapsed: 0,
+      // @ts-expect-error a drink record cannot carry a wellFed payload (FoodConsuming only)
+      wellFed: { aura: 'Well Fed', kind: 'buff_sta', value: 1, duration: 60 },
+    };
+    expect(bad.kind).toBe('drink');
   });
 
   it('content pin: the well-fed carrier set is exactly the seven buff foods', () => {
@@ -112,11 +140,20 @@ describe('well fed: completion timing', () => {
     expect(p.eating, 'meal finished').toBeNull();
     const wf = wellFedAuras(p);
     expect(wf.length).toBe(1);
-    expect(wf[0].id).toBe(WELL_FED_AURA_ID);
-    expect(wf[0].name).toBe('Well Fed');
-    expect(wf[0].kind).toBe('buff_sta');
-    expect(wf[0].value).toBe(2);
-    expect(wf[0].duration).toBe(600);
+    // The minted record against LITERALS, every field the mint writes: the
+    // feast-versus-bag identity pin (professions_feast) compares two mints to
+    // each other and cannot see a field that moves on both sides, so the
+    // school and the self-source are anchored here.
+    expect(wf[0]).toMatchObject({
+      id: WELL_FED_AURA_ID,
+      name: 'Well Fed',
+      kind: 'buff_sta',
+      value: 2,
+      duration: 600,
+      school: 'nature',
+      sourceId: p.id,
+    });
+    expect(wf[0].remaining).toBeGreaterThan(590);
   });
 
   it('the 18s boundary: still no mint at 17s in, minted by 19s', () => {
@@ -268,12 +305,14 @@ describe('well fed: one food buff at a time (last eaten wins, whole family)', ()
     wf = wellFedAuras(p);
     expect(wf, 'the skewers replaced the stew').toHaveLength(1);
     expect(wf[0].kind).toBe('buff_ap');
+    expect(wellFedByName(p), 'one Well Fed by name, not two').toHaveLength(1);
 
     eatToCompletion(sim, pid, p, 'sageleaf_chowder');
     wf = wellFedAuras(p);
     expect(wf, 'the chowder replaced the skewers').toHaveLength(1);
     expect(wf[0].kind).toBe('buff_int');
     expect(wf[0].value).toBe(6);
+    expect(wellFedByName(p), 'one Well Fed by name after three plates').toHaveLength(1);
   });
 
   it('a farming dish and a role food are mutually exclusive, in both orders', () => {
@@ -286,6 +325,7 @@ describe('well fed: one food buff at a time (last eaten wins, whole family)', ()
     expect(wf, 'the plate replaced the dish').toHaveLength(1);
     expect(wf[0].value).toBe(6);
     expect(wf[0].duration).toBe(900);
+    expect(wellFedByName(a.p), 'dish then plate: one Well Fed by name').toHaveLength(1);
 
     // Plate then dish: last eaten still wins, even downward. Classic rule:
     // the mint never compares power, it replaces on the shared id.
@@ -297,6 +337,7 @@ describe('well fed: one food buff at a time (last eaten wins, whole family)', ()
     expect(wf, 'the dish replaced the plate').toHaveLength(1);
     expect(wf[0].value).toBe(5);
     expect(wf[0].duration).toBe(600);
+    expect(wellFedByName(b.p), 'plate then dish: one Well Fed by name').toHaveLength(1);
   });
 
   it('re-eating the same dish refreshes remaining to full duration', () => {
@@ -413,19 +454,22 @@ describe('well fed: the retired namespace is gone (the unification landed)', () 
     // Needle built from parts so this file's own source cannot match it.
     const needle = new RegExp(`['"\`]${'well'}${'fed'}_`);
     const offenders: string[] = [];
-    let scanned = 0;
-    for (const root of ['src', 'scripts', 'tests']) {
+    const scanned = { src: 0, scripts: 0, tests: 0 };
+    for (const root of ['src', 'scripts', 'tests'] as const) {
       for (const f of sourceFilesUnder(join(process.cwd(), root))) {
-        scanned++;
+        scanned[root]++;
         const code = stripComments(readFileSync(f.full, 'utf8'));
         if (needle.test(code)) offenders.push(`${root}/${f.file}`);
       }
     }
-    // Non-vacuity floor: an empty walk would make the assertion below pass
-    // over nothing at all, which is the shape of a sweep that silently
-    // stopped scanning (tests/CLAUDE.md). The floor sits near the real
-    // count of the three roots, not at 1.
-    expect(scanned, 'the sweep really walked the three source roots').toBeGreaterThan(2000);
+    // Non-vacuity floor PER ROOT (tests/CLAUDE.md): an empty walk would make
+    // the assertion below pass over nothing at all, and a single total would
+    // clear on src/ alone even if scripts/ or tests/ silently dropped out of
+    // the walk (or tests/ collapsed to one level), so each root is floored
+    // near its own real count rather than at 1.
+    expect(scanned.src, 'the sweep really walked src/').toBeGreaterThan(1800);
+    expect(scanned.scripts, 'the sweep really walked scripts/').toBeGreaterThan(400);
+    expect(scanned.tests, 'the sweep really walked tests/').toBeGreaterThan(2500);
     expect(offenders, 'files still carrying a wellfed_<kind> id literal').toEqual([]);
   });
 

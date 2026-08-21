@@ -558,6 +558,13 @@ describe('shared feast: the bite and the Well Fed mint', () => {
       fullAtMint: a.duration - a.remaining < 30, // fresh, minus tick slack
     });
     expect(record(bitten[0], feastEater.p)).toEqual(record(bagged[0], bagEater.p));
+    // Anchor the equality on one side: a field moving on BOTH sides (the
+    // school, the self-source, the at-mint freshness) is invisible to the
+    // equality alone, so the bite's record is also pinned to the literals
+    // the mint writes.
+    expect(bitten[0].school).toBe('nature');
+    expect(bitten[0].sourceId).toBe(feastEater.p.id);
+    expect(record(bitten[0], feastEater.p).fullAtMint).toBe(true);
   });
 
   it('once per player: the second press denies feast_eaten, a third player still eats', () => {

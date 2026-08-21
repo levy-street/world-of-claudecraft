@@ -19,6 +19,9 @@ describe('buildConsuming', () => {
   it('builds a food meal: rates off CONSUME_TICKS, the full clock, the wellFed carry', () => {
     const dish = ITEMS.evergarden_braised_greens;
     expect(dish.kind).toBe('food');
+    // Non-vacuity: the sample dish really carries a payload, so the carry
+    // assertions below cannot pass over an undefined-equals-undefined.
+    expect(dish.kind === 'food' && dish.wellFed, 'the sample dish carries a payload').toBeTruthy();
     const c = buildConsuming('food', dish);
     expect(c).toEqual({
       itemId: 'evergarden_braised_greens',
@@ -30,8 +33,11 @@ describe('buildConsuming', () => {
       wellFed: dish.kind === 'food' ? dish.wellFed : undefined,
     });
     // The carry is a REFERENCE to the def's record, not a copy (house style,
-    // the same as def.elixir): the grant is decided by what was eaten.
-    expect(c.wellFed).toBe(dish.kind === 'food' ? dish.wellFed : undefined);
+    // the same as def.elixir): the grant is decided by what was eaten. Read
+    // off the food arm: the record type is kind-scoped (FoodConsuming).
+    expect(c.kind === 'food' ? c.wellFed : undefined).toBe(
+      dish.kind === 'food' ? dish.wellFed : undefined,
+    );
   });
 
   it('a plain food carries no payload key at all (spread-elided, not undefined)', () => {
@@ -75,12 +81,24 @@ const CONSUMING_SHAPE_WINDOW = 400;
 
 function hasHandBuiltConsumingWrite(code: string): number {
   let hits = 0;
-  const opener = /(?:\.(?:eating|drinking)|\[\s*\w+\s*\])\s*=\s*\{/g;
+  // The computed arm also accepts a quoted slot name (`p['eating'] = {`).
+  const opener = /(?:\.(?:eating|drinking)|\[\s*['"]?\w+['"]?\s*\])\s*=\s*\{/g;
   for (const m of code.matchAll(opener)) {
     const from = (m.index ?? 0) + m[0].length;
     if (code.slice(from, from + CONSUMING_SHAPE_WINDOW).includes('ticksElapsed')) hits++;
   }
   return hits;
+}
+
+// The second arm keys on the Consuming SHAPE alone, wherever the literal
+// sits: a writer that builds the record in an intermediate (`const meal:
+// Consuming = {...}; p.eating = meal;`) never shows the opener above a brace,
+// so the assignment-shaped arm is structurally blind to it. `ticksElapsed:`
+// as an object-literal KEY (not the `ticksElapsed: number` type annotation,
+// excluded by the lookahead) is Consuming's own field and appears in no other
+// src/sim object literal, so counting it counts hand-built records.
+function countConsumingShapedLiterals(code: string): number {
+  return (code.match(/\bticksElapsed\s*:(?!\s*number\b)/g) ?? []).length;
 }
 
 describe('the builder is the ONE Consuming writer', () => {
@@ -91,11 +109,21 @@ describe('the builder is the ONE Consuming writer', () => {
     expect(hasHandBuiltConsumingWrite('p.eating = { itemId, ticksElapsed: 0 }')).toBe(1);
     expect(hasHandBuiltConsumingWrite('e.drinking = {\n  ticksElapsed: 0,\n}')).toBe(1);
     expect(hasHandBuiltConsumingWrite('p[slot] = {\n  itemId,\n  ticksElapsed: 0,\n}')).toBe(1);
+    expect(hasHandBuiltConsumingWrite("p['eating'] = { itemId, ticksElapsed: 0 }")).toBe(1);
     // Neither routed construction nor an ordinary computed-key assignment
     // (the idiom the shape discriminator keeps this guard away from).
     expect(hasHandBuiltConsumingWrite('p[slot] = buildConsuming(def.kind, def);')).toBe(0);
     expect(hasHandBuiltConsumingWrite("p.eating = buildConsuming('food', dish);")).toBe(0);
     expect(hasHandBuiltConsumingWrite('byId[key] = { name, count };')).toBe(0);
+    // The shape arm sees the intermediate-variable build the opener cannot,
+    // and ignores the type annotation and a read of the field.
+    expect(
+      countConsumingShapedLiterals(
+        'const meal: Consuming = {\n  ticksElapsed: 0,\n};\np.eating = meal;',
+      ),
+    ).toBe(1);
+    expect(countConsumingShapedLiterals('function f(ticksElapsed: number) {}')).toBe(0);
+    expect(countConsumingShapedLiterals('c.ticksElapsed += 1; fire(c.ticksElapsed);')).toBe(0);
   });
 
   it('ITEMS keys equal their def ids (the builder names the meal by def.id)', () => {
@@ -138,6 +166,23 @@ describe('the builder is the ONE Consuming writer', () => {
     const simSrc = stripComments(readFileSync(join(process.cwd(), 'src', 'sim', 'sim.ts'), 'utf8'));
     expect(simSrc).toContain("itemId: 'dev_cascade_freeze'");
     expect(simSrc).toContain("itemId: 'dev_sandbox_freeze'");
+  });
+
+  it('no src/sim literal outside the builder is Consuming-shaped (the intermediate-build arm)', () => {
+    // The assignment-shaped sweep above cannot see a record built into a
+    // variable and assigned afterwards; this arm counts every object literal
+    // carrying Consuming's own `ticksElapsed:` key across src/sim, outside
+    // the builder itself, and pins the count to exactly the two dev freezes
+    // in sim.ts. A third hand-built record anywhere in src/sim, however it
+    // is assigned, reds here.
+    const shaped: string[] = [];
+    for (const f of sourceFilesUnder(join(process.cwd(), 'src', 'sim'))) {
+      if (f.file === 'consuming.ts') continue;
+      const code = stripComments(readFileSync(f.full, 'utf8'));
+      const n = countConsumingShapedLiterals(code);
+      for (let i = 0; i < n; i++) shaped.push(f.file);
+    }
+    expect(shaped, 'Consuming-shaped literals outside the builder').toEqual(['sim.ts', 'sim.ts']);
   });
 
   it('both real writers construct through buildConsuming (positive pin)', () => {

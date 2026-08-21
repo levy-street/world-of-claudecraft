@@ -1334,6 +1334,9 @@ describe('the phase 10 apex rungs step exactly one rung off the shipped ladders'
     // The shipped ladder, read live and pinned literally: 6/600, 9/900, 12/900.
     expect([boar.value, vipersear.value, serpent.value]).toEqual([6, 9, 12]);
     expect([boar.duration, vipersear.duration, serpent.duration]).toEqual([600, 900, 900]);
+    // elixir_of_the_bear (buff_sta 12/900) shares the serpent's top rung as a
+    // duplicate; it sits inside the band sweep above and does not touch the
+    // first-to-second duration step the apex food derivation reads.
 
     // The ladder's own steps, taken from the rungs that HAVE one (the top two
     // rungs share a duration, so the duration step is the first-to-second one).
@@ -1390,6 +1393,11 @@ describe('the phase 10 apex rungs step exactly one rung off the shipped ladders'
     // apex band reds here the day it ships: the power inversion the 11c
     // re-tune removed (a cooking-50 trainer dish at 12/900 beating the
     // cooking-100 apex plate) can never quietly return.
+    // The shared harvest_feast is a delivery VEHICLE, not a food of its own:
+    // its bite serves feast.dishItemId, which is itself inside this sweep, so
+    // the feast needs no arm here; and 11k's apex feasts will serve the apex
+    // plates by design (equal to the apex, never above it), which is why a
+    // feast-dish-strictly-below arm is deliberately NOT written.
     const nonApex = Object.values(ITEMS).filter(
       (d): d is Extract<typeof d, { kind: 'food' }> =>
         d.kind === 'food' &&

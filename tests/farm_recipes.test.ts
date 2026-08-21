@@ -205,8 +205,9 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
       expect(def, `${dish.id}: output ${dish.resultItemId} has no ItemDef`).toBeDefined();
       expect(def.kind, `${dish.resultItemId} kind`).toBe('food');
       expect(def.foodHp, `${dish.resultItemId} foodHp`).toBeGreaterThan(0);
-      // foodHp is the shared floor; the wellfed field is allowed ONLY on the
-      // four Phase 11 buff dishes, which the closed-shape describe below pins.
+      // foodHp is the shared floor; among FARM_RECIPES outputs the wellFed field
+      // is allowed ONLY on the four Phase 11 buff dishes, which the closed-shape
+      // describe below pins.
       expect(def.buyValue, `${dish.resultItemId} must never be vendor-stocked`).toBeUndefined();
       expect(def.quality, `${dish.resultItemId} quality for rung ${dish.skillReq}`).toBe(
         QUALITY_BY_RUNG[dish.skillReq],
