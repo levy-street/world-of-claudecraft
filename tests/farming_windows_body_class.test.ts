@@ -129,7 +129,7 @@ describe('the mobile-window-open body class follows the farming windows', () => 
     // The open really opened (canOpenPlantSheet allows a plotless bed), so
     // the class assertion below cannot pass vacuously on a refused open.
     expect((document.getElementById('plant-sheet-window') as HTMLElement).style.display).toBe(
-      'block',
+      'flex',
     );
     expect(document.body.classList.contains('mobile-window-open')).toBe(true);
     win.close();

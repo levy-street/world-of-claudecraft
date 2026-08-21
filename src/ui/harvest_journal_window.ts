@@ -150,7 +150,7 @@ export class HarvestJournalWindow {
   constructor(private readonly deps: HarvestJournalWindowDeps) {}
 
   get isOpen(): boolean {
-    return this.deps.root().style.display === 'block';
+    return this.deps.root().style.display === 'flex';
   }
 
   open(): void {
@@ -166,7 +166,11 @@ export class HarvestJournalWindow {
     this.openerFocus = this.deps.captureFocus();
     const root = this.deps.root();
     markDialogRoot(root, { labelledBy: 'harvest-journal-title' });
-    root.style.display = 'block';
+    // Flex, not block: the window family's stylesheet (flex-direction: column,
+    // .hj-body flex + overflow-y) only engages under flex, and the mobile rule
+    // pins the root with overflow hidden, so block would clip the bed list
+    // with no scroller on a phone.
+    root.style.display = 'flex';
     this.deps.onVisibilityChange?.();
     this.render();
     root.querySelector<HTMLElement>('[data-close]')?.focus();
@@ -175,7 +179,7 @@ export class HarvestJournalWindow {
 
   close(): void {
     const root = this.deps.root();
-    if (root.style.display !== 'block') {
+    if (root.style.display !== 'flex') {
       this.openerFocus = null;
       return;
     }

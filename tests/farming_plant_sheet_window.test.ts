@@ -151,7 +151,7 @@ describe('plant sheet window: paint', () => {
     expect(root.getAttribute('aria-busy')).toBe('true');
     win.notifyFarmEvent(planted('bed_eastbrook_2'));
     expect(root.getAttribute('aria-busy')).toBe('false');
-    expect(root.style.display).toBe('block');
+    expect(root.style.display).toBe('flex');
     root.querySelector<HTMLElement>('[data-plant]')?.click();
     expect(root.getAttribute('aria-busy')).toBe('true');
     win.notifyFarmEvent(planted(BED));

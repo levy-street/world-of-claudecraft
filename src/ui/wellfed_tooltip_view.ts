@@ -12,18 +12,17 @@
 // (localized through the same matcher the buff bar uses), so no buff dish
 // ever ships a silent tooltip.
 
-import type { AuraKind, ItemDef } from '../sim/types';
+import type { ItemDef } from '../sim/types';
 import { auraDisplayNameForHud } from './aura_display_name';
 import { esc } from './esc';
-import { formatNumber, type TranslationKey, t } from './i18n';
+import { formatNumber, t } from './i18n';
+import { WELLFED_STAT_KEYS } from './wellfed_stat_keys';
 
 // The stat map moved to the pure leaf src/ui/wellfed_stat_keys.ts (Phase 14:
 // the wiki's dish effect prose is a consumer too, and the guide bundle may
 // not reach this module's sim_i18n graph). Re-exported unchanged for
 // feast_tooltip_view.ts and every other existing importer.
 export { WELLFED_STAT_KEYS } from './wellfed_stat_keys';
-
-import { WELLFED_STAT_KEYS } from './wellfed_stat_keys';
 
 /** The well-fed line for a buff dish, or '' for any other item. */
 export function wellfedTooltipLines(item: ItemDef): string {

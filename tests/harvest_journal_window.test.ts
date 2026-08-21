@@ -405,7 +405,7 @@ describe('harvest journal window: open, close, and focus', () => {
     expect(win.isOpen).toBe(false);
     win.toggle();
     expect(win.isOpen).toBe(true);
-    expect(root.style.display).toBe('block');
+    expect(root.style.display).toBe('flex');
     win.toggle();
     expect(win.isOpen).toBe(false);
     expect(root.style.display).toBe('none');

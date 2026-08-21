@@ -93,7 +93,7 @@ export class PlantSheetWindow {
   }
 
   get isOpen(): boolean {
-    return this.deps.root().style.display === 'block';
+    return this.deps.root().style.display === 'flex';
   }
 
   open(bedId: string): void {
@@ -110,7 +110,10 @@ export class PlantSheetWindow {
       this.deps.closeOthers();
       this.openerFocus = this.deps.captureFocus();
       markDialogRoot(root, { labelledBy: 'plant-sheet-title' });
-      root.style.display = 'block';
+      // Flex, not block: the sheet's stylesheet is authored against the
+      // column-flex window family (flex-direction: column, .ps-body flex),
+      // matching every sibling window's open style.
+      root.style.display = 'flex';
       this.deps.onVisibilityChange?.();
     }
     // A fresh bed is a fresh decision: selection and knob picks reset, so a
@@ -142,7 +145,7 @@ export class PlantSheetWindow {
 
   close(): void {
     const root = this.deps.root();
-    if (root.style.display !== 'block') {
+    if (root.style.display !== 'flex') {
       this.openerFocus = null;
       return;
     }
