@@ -59,7 +59,18 @@ const MONOLITHS: MonolithRow[] = [
     // entity_display_core extraction still holds, so the merged union lands
     // between the two parent pins. Exact merged count per this row's
     // zero-slack rule: any further growth reds again.
-    ceiling: 19445,
+    // LOWERED at the farming absorb (masterwrought Phase 11d, decision 4 as
+    // amended 2026-08-20): both packets' independent extractions STACK, so
+    // the merged file lands under all three parent pins (ours 19445,
+    // farming 19186 measured against its own smaller file, and the
+    // release's 19487, itself lowered by the makeReliquaryTrackerInput
+    // extraction this branch absorbed at the Phase 11d sync). No raise, so
+    // the Phase 14 payback target of 19445-or-lower (ruling 11d-U6-PAYBACK)
+    // is already met at this pin; Phase 14 may not grow the file back, and
+    // the professions-module migration counts for nothing toward any future
+    // target (a file move relocates zero lines). Exact merged count, zero
+    // slack: any further growth reds again.
+    ceiling: 19248,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -204,12 +215,38 @@ const MONOLITHS: MonolithRow[] = [
     // prewarm entry, the delve tracker extraction) on top of this branch's
     // extractions, so the pin is the exact merged count, still lower than
     // upstream main's own (13744), and any growth reds again.
-    ceiling: 13546,
+    // RECORDED RAISE at the farming absorb (masterwrought Phase 11d,
+    // decision 4 as amended 2026-08-20): the merge of
+    // origin/feature/farming-plan composes farming's 30 lines of
+    // farm-visual wiring (its own deviation (an) raise, confirmed thin
+    // wiring at the correct seam by the 11b frontend reviewer) into ours'
+    // smaller file, a two-packet union where neither side's extractions
+    // cover the other side's additions. Both parent pins for the record:
+    // ours 13546, farming 13774 (base 13744), so this is +30 against ours
+    // and a FALL of 198 against farming's own row; 13546 + (13774 - 13744)
+    // composes to the exact merged count. Payback: Phase 16 (the packet's
+    // polish phase), scoped to the merge-attributable growth only. Exact
+    // merged count, zero slack: any further growth reds again.
+    ceiling: 13576,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
     file: 'src/sim/sim.ts',
-    ceiling: 12650,
+    // Re-pinned at the farming absorb (masterwrought Phase 11d, the
+    // 11b-qa-B8 second-arm row): the pin previously sat 309 lines above the
+    // file with no comment, un-banked slack. The merged file FALLS under
+    // ours' pin because both packets extracted independently: farming's own
+    // row comment (verbatim at 8cd964d599) records its three extractions,
+    // the M5 boss support kit to src/sim/mob/boss_mechanics.ts, the retired
+    // mobMeleeRange / mobCombatProfile delegates, and countItem thinned
+    // over the shared countRawInSlots walk, landing its file at 12229 under
+    // its 12232 pin (all live at the absorbed tip: the delegate pair stayed
+    // retired), while this branch's pin stood at 12650. The merged count
+    // composes as base 12518 plus ours' +111 minus farming's -289, plus the
+    // one comment line the 11c QA trued. Both parent pins for the record:
+    // ours 12650, farming 12232. Exact merged count, zero slack: any
+    // further growth reds again.
+    ceiling: 12341,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -219,7 +256,12 @@ const MONOLITHS: MonolithRow[] = [
     // cover joining it) net against the base's pad-selection extraction plus
     // controller-config growth (src/game/pad_target_pick.ts, ceiling 11552),
     // landing below both parents' pins. Any further growth reds again.
-    ceiling: 11516,
+    // Re-pinned at the farming absorb (masterwrought Phase 11d, decision 4
+    // as amended): the merged file FALLS under both parent pins (ours
+    // 11516, farming 11460), composing exactly as base 11490 plus ours'
+    // +26 minus farming's -36. Exact merged count, zero slack: any further
+    // growth reds again.
+    ceiling: 11480,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -229,7 +271,16 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'src/net/online.ts',
-    ceiling: 5950,
+    // RECORDED RAISE at the farming absorb (masterwrought Phase 11d, the
+    // fifth-monolith case under ruling 11d-U6-FIFTH): BOTH parents grew the
+    // online mirror under one shared 5950 pin (ours +47 for the
+    // masterwrought client surface, farming +65 for its farm facet mirror),
+    // and the union composes exactly as base 5855 + 47 + 65. Both parent
+    // pins for the record: ours 5950, farming 5950. The raise is scoped to
+    // this merge-attributable growth, never to growth a phase authors.
+    // Payback: Phase 16 (the packet's polish phase). Exact merged count,
+    // zero slack: any further growth reds again.
+    ceiling: 5967,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
