@@ -261,8 +261,12 @@ interface AttributionTargetFixture {
 // Re-minted for the merge of the moved release/v0.40.0 tip into
 // feature/masterwrought: both sides re-minted since the common base, so the
 // merged tree mints values matching neither parent. No capture was retaken.
+// Re-minted for the farming absorb (Phase 11d): renderer.ts moved (the
+// farming runtime integration landed on the masterwrought renderer; the other
+// swept inputs, prewarm_policy.ts included, held their sealed bytes), the
+// seals follow the swept evidence bytes. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '99cb45d06ee457ee7000bf0e1b4e8ca6ae07950f10f8e0d8ea699941ff02e817';
+  '9fdb68decd660145891d03bd09c6079a9591c5804cab372fdd9bc3868d2d6d70';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

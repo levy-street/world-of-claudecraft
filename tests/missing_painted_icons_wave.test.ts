@@ -635,14 +635,18 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // release art audit painted those additions, and the six Masterwrought
     // jewelcrafting and inscription milestone deeds (phases 05 and 06) each
     // shipped their crest in the change that added them. The only artless ids
-    // are the release's walk-in castle visit pair appended after the audit,
-    // riding the category-crest fallback the Icons authoring rule in
-    // docs/design/deeds.md sanctions until their 512px sources are
-    // commissioned (flagged in docs/achievements/icon-brief.md). Read from
-    // DEED_ART_PENDING, the one enumeration of that debt (src/ui/icons.ts),
-    // so this file cannot end up naming a different pending set than the
-    // other two art suites. Exhaustive: a third artless deed still reds here.
-    expect(DEED_ORDER).toHaveLength(279);
+    // are the release's walk-in castle visit pair and the six farming
+    // celebration deeds appended after the audit, riding the category-crest
+    // fallback the Icons authoring rule in docs/design/deeds.md sanctions
+    // until their 512px sources are commissioned (flagged in
+    // docs/achievements/icon-brief.md). Read from DEED_ART_PENDING, the one
+    // enumeration of that debt (src/ui/icons.ts), so this file cannot end up
+    // naming a different pending set than the other two art suites.
+    // Exhaustive: an unenumerated artless deed still reds here.
+    // 286 at the farming absorb (Phase 11d): the base 273 plus the six
+    // Masterwrought milestone deeds plus farming's seven (six pending
+    // celebration deeds and the painted prog_farming_100 crest).
+    expect(DEED_ORDER).toHaveLength(286);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(

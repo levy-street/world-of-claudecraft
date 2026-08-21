@@ -332,8 +332,12 @@ describe('item-art consistency accepted-art provenance', () => {
         acceptedBytes: 294_428,
       },
       {
+        // Re-minted by the farming absorb's --refresh-verdict run (Phase 11d
+        // of docs/prd/masterwrought/; farming's deviation (al) in
+        // docs/prd/masterwrought/farming/state.md): only the catalog sha and
+        // the lib self-hash moved, so the byte count held.
         path: `${evidenceDir}/final-item-art-audit-verdict.json`,
-        acceptedSha256: 'c7fa0e80c134812f02c62cb94cce645ea2cb2f4c41fa1764378c4272518f9a3a',
+        acceptedSha256: 'd20216e722b9936066f68711257b1ea6cedd467447df7dd6dfd1d54b3b8cfa09',
         acceptedBytes: 122_036,
       },
     ]);
@@ -451,7 +455,7 @@ describe('item-art consistency accepted-art provenance', () => {
     const verdictBytes = readFileSync(path.join(repoRoot, verdictPath));
     expect(verdictBytes.length).toBe(122_036);
     expect(sha256(verdictBytes)).toBe(
-      'c7fa0e80c134812f02c62cb94cce645ea2cb2f4c41fa1764378c4272518f9a3a',
+      'd20216e722b9936066f68711257b1ea6cedd467447df7dd6dfd1d54b3b8cfa09',
     );
     const verdict = JSON.parse(verdictBytes.toString('utf8')) as FinalAuditVerdict;
 
@@ -565,13 +569,18 @@ describe('item-art consistency accepted-art provenance', () => {
       expect(sha256(bytes), `${pin.id} resolved audit hash`).toBe(pin.sha256);
     }
 
+    // Re-minted with the farming branch's ITEM_ART_PENDING exemption (Phase
+    // 11d of the Masterwrought absorb; farming's deviation (al) in
+    // docs/prd/masterwrought/farming/state.md): the catalog sha follows the
+    // audit lib's self-hash fingerprint; the reviewed 907-file evidence, the
+    // catalog byte count, and the shipping catalog sha are untouched.
     expect(verdict.evidence.catalog).toEqual({
       path: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      sha256: '1a7f563f4eac92cfbb3e81eb2ee81f0bcd4550e001a62bb7b9ea20fa57486ef4',
+      sha256: '100088198a02f7742178e322d96d722b5b1723c40b7d8269a4be5e05f335061b',
       bytes: 498_026,
     });
     expect(verdict.evidence.rendererFingerprint).toBe(
-      'fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082',
+      '84410592a4686975e13d43d4fecc88fb7eb0e3b90f27f7b7dc38498cdf7e090c',
     );
     expect(verdict.evidence.rendererFingerprint).toBe(ITEM_ART_AUDIT_RENDERER_FINGERPRINT);
     expect(verdict.evidence.sheetCount).toBe(232);
@@ -620,6 +629,9 @@ describe('item-art consistency accepted-art provenance', () => {
       expect(sheet.format).toBe('png');
       sheetSetDigest.update(`${sheet.path}\0${sheet.sha256}\0${sheet.bytes}\n`);
     }
+    // Re-rendered by the farming absorb's --refresh-verdict run (Phase 11d):
+    // the 232 contact sheets reproduced byte-for-byte, so the set digest held;
+    // the per-sheet consistency arm below keeps it honest either way.
     expect(verdict.evidence.sheetSetSha256).toBe(
       '667e2e02123bd6375970f1452e1dd6e9343446ebb170975d755897d37bcaec80',
     );

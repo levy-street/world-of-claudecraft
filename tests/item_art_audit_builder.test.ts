@@ -736,6 +736,80 @@ describe('item-art audit builder', () => {
     ).toThrow('Resolved audit item is absent from the current catalog: absent_blade');
   });
 
+  it('exempts declared pending-art ids from the missing-art sweep, policed in both directions', async () => {
+    // The farming branch ships procedural icons as declared debt
+    // (ITEM_ART_PENDING); the audit honors exactly that declaration and
+    // nothing else. Three arms: the undeclared def still reds, a phantom
+    // declaration reds, and a declared id that GAINS art reds until it is
+    // struck from the pending set (the self-clearing direction).
+    const root = mkdtempSync(path.join(tmpdir(), 'woc-item-art-pending-'));
+    temporaryRoots.push(root);
+    const itemDirectory = 'public/ui/items';
+    const outputDirectory = 'tmp/item-art-audit';
+    mkdirSync(path.join(root, itemDirectory), { recursive: true });
+    const red = await sharp({
+      create: { width: 128, height: 128, channels: 3, background: { r: 150, g: 24, b: 35 } },
+    })
+      .webp({ quality: 82 })
+      .toBuffer();
+    writeFileSync(path.join(root, itemDirectory, 'alpha_blade.webp'), red);
+    const items = {
+      alpha_blade: { name: 'Alpha Blade', kind: 'weapon', quality: 'common' },
+      gamma_root: { name: 'Gamma Root', kind: 'junk', quality: 'common' },
+    };
+    const mapping = { entries: [{ itemId: 'alpha_blade' }], generatedBatches: [] };
+    const base = {
+      repoRoot: root,
+      itemDirectory,
+      outputDirectory,
+      renderOutputs: false,
+      items,
+      mapping,
+    };
+    await expect(buildItemArtAudit(base)).rejects.toThrow(
+      'Live item definitions without dedicated art: gamma_root',
+    );
+    const build = await buildItemArtAudit({ ...base, pendingArtIds: ['gamma_root'] });
+    // liveItemCount is the ART-SUBJECT universe: two live defs minus the one
+    // declared debt id.
+    expect(build.catalog.liveItemCount).toBe(1);
+    expect(build.catalog.catalogCount).toBe(1);
+    // The debt term is its own expected literal: an audit run that pins BOTH
+    // halves reds when the pending set grows even though liveItemCount is
+    // structurally blind to a def that joins the catalog and the debt at
+    // once. Conforms arm, then the violates arm one off in each direction.
+    await buildItemArtAudit({
+      ...base,
+      pendingArtIds: ['gamma_root'],
+      expected: { pendingArtCount: 1 },
+    });
+    await expect(
+      buildItemArtAudit({
+        ...base,
+        pendingArtIds: ['gamma_root'],
+        expected: { pendingArtCount: 0 },
+      }),
+    ).rejects.toThrow('Unexpected pending procedural-art debt count');
+    await expect(
+      buildItemArtAudit({
+        ...base,
+        pendingArtIds: ['gamma_root'],
+        expected: { pendingArtCount: 2 },
+      }),
+    ).rejects.toThrow('Unexpected pending procedural-art debt count');
+    await expect(buildItemArtAudit({ ...base, pendingArtIds: ['ghost_id'] })).rejects.toThrow(
+      'pending-art id ghost_id is not a live item definition',
+    );
+    await expect(
+      buildItemArtAudit({ ...base, pendingArtIds: ['alpha_blade', 'gamma_root'] }),
+    ).rejects.toThrow('pending-art id alpha_blade has shipping art');
+  });
+
+  // Declared 60s allowance: this arm execs the real CLI twice (help plus a
+  // full --verify-only, which esbuild-bundles the sim and sharp-decodes 907
+  // committed files, itself budgeted 30s), and under full-suite worker
+  // contention the pair runs past the 20s repo default (21.4s observed at the
+  // farming Phase 6 QA gate) while taking ~7s in isolation.
   it('exposes the fresh-checkout rebuild and explicit verdict-refresh CLI', () => {
     const help = execFileSync(process.execPath, ['scripts/item_art_audit.mjs', '--help'], {
       cwd: repoRoot,
@@ -753,11 +827,19 @@ describe('item-art audit builder', () => {
         timeout: 30_000,
       }),
     ) as Record<string, unknown>;
+    // Re-minted for the farming absorb (Phase 11d): the audit gained the
+    // ITEM_ART_PENDING exemption (44 farming ids ship procedural icons as
+    // declared debt, counted by pendingArtCount in scripts/item_art_audit.mjs),
+    // liveItemCount counts the ART-SUBJECT universe (live defs minus declared
+    // debt, so the reviewed 922 stands: base 838 plus the 84 Masterwrought
+    // art-shipping ids), and the catalog sha moves only through the lib's
+    // self-hash fingerprint. The 907 reviewed art files and their shipping
+    // catalog sha are untouched.
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: '1a7f563f4eac92cfbb3e81eb2ee81f0bcd4550e001a62bb7b9ea20fa57486ef4',
+      catalogSha256: '100088198a02f7742178e322d96d722b5b1723c40b7d8269a4be5e05f335061b',
       catalogBytes: 498026,
-      rendererFingerprint: 'fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082',
+      rendererFingerprint: '84410592a4686975e13d43d4fecc88fb7eb0e3b90f27f7b7dc38498cdf7e090c',
       catalogCount: 907,
       liveItemCount: 922,
       generatedHeroicDefinitions: 64,
@@ -772,5 +854,5 @@ describe('item-art audit builder', () => {
       machineChecksPassed: true,
       verdict: null,
     });
-  });
+  }, 60_000);
 });

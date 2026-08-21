@@ -37,8 +37,16 @@ const recordPath = path.join(
 const ACCEPTED_ART_SHA256 = '3d8cb36726050e3a708720b650744005f4ce23d3ac49c0323761441beb50eb51';
 const SECOND_PASS_RECORD =
   'docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-art.json';
+// Advanced at the feature/masterwrought release/v0.40.0 sync: the branch's
+// three role foods (stonepot_stew, warspice_skewers, sageleaf_chowder) join
+// the live isHotbarItemId census, so the sealed runtimeClosure.hotbarItems
+// moves 72 to 75 (each food ships committed painted art, so painted moves
+// with live and the no-gap assertions below still bind). Carried unchanged
+// through the farming absorb (Phase 11d): farming's sixteen pending hotbar
+// items are ITEM_ART_PENDING debt, outside the art-subject universe the
+// record seals, so the record bytes did not move.
 const SECOND_PASS_RECORD_SHA256 =
-  '88a9e7c35e79eb6620843734493e9b7e29f04b6bc986b1e81b3f36b4572d429f';
+  '2d8ece746cf703da9dd8f16679209a7aeb337e9b18c0f9f8a7de73a7bb17c16b';
 const EVIDENCE = {
   'icon-art-before-after-desktop.png': {
     sha256: '61d19fb321f2b30eb3749e0966f26efea0fa4df53edae4b253cfd70edb82cd7a',
@@ -329,7 +337,10 @@ describe('release v0.39 icon-art second-pass lineage', () => {
       },
       runtimeClosure: {
         abilities: { live: 410, painted: 410 },
-        hotbarItems: { live: 72, painted: 72 },
+        // 75 on the masterwrought branch: the three phase 10 role foods
+        // joined the census (see the record-sha comment above). The art-
+        // subject universe, live minus ITEM_ART_PENDING.
+        hotbarItems: { live: 75, painted: 75 },
         fixedActions: { painted: 11 },
         mobAuraRouting: { paintedFamilies: 44, exactRuntimeIds: 89 },
         fiesta: { augments: 20, powerups: 4, painted: 24 },
@@ -435,13 +446,19 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     expect(new Set(liveHotbarItemIds).size, 'live hotbar item ids remain unique').toBe(
       liveHotbarItemIds.length,
     );
+    // 72 at the v0.39 pass; 75 on the masterwrought branch (the three phase
+    // 10 role foods classify as hotbar items and ship painted art). Re-derived
+    // on the merged tree at the farming absorb (Phase 11d): farming's 72 plus
+    // masterwrought's three painted role foods.
     expect(
       artSubjectHotbarItemIds,
       'production isHotbarItemId art-subject inventory (live minus ITEM_ART_PENDING)',
-    ).toHaveLength(72);
+    ).toHaveLength(75);
     // The farming branch's declared debt on the hotbar: eight plain farm
     // dishes plus the four Phase 11 buff dishes (kind 'food') and the
-    // four-rung hoe ladder (use.type 'gatherTool').
+    // four-rung hoe ladder (use.type 'gatherTool'). Re-derived unchanged on
+    // the merged tree at the farming absorb (Phase 11d); grows as 11e
+    // through 11k park ids.
     expect(pendingHotbarItemIds, 'ITEM_ART_PENDING hotbar items').toHaveLength(16);
     expect(
       pendingHotbarItemIds.filter((id) => shippingImageExists(`/ui/items/${id}.webp`)),
