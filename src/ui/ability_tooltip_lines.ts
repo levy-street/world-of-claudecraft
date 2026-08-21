@@ -85,7 +85,8 @@ export function abilityRangeLine(def: AbilityDef): string | null {
 }
 
 // The live caster's TOTAL spell-haste fraction: the resolved stat (set bonuses + spec
-// mastery) PLUS active buff_spellhaste auras (Aether Surge, Coldsurge, Lich Form).
+// mastery) PLUS active buff_spellhaste auras (e.g. Aether Surge, Coldsurge, Lich Form,
+// Anointing's target buff).
 // Mirrors the sim's spellHasteMult (spell_combat.ts) EXACTLY, including its
 // `Math.max(0, ...)` floor, so a shown cast time never disagrees with the real one (a
 // net-negative haste, e.g. a cast-slow debuff, floors at 0 for both). ui/ cannot import

@@ -19,6 +19,7 @@ import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import type { FarmPlotView } from '../src/sim/professions/farm_projection';
 import { HARVEST_JOURNAL_TICK_MS, HarvestJournalWindow } from '../src/ui/harvest_journal_window';
 import type { IWorld } from '../src/world_api';
+import { stripComments } from './helpers/strip_comments';
 
 const SECOND = 1000;
 const MINUTE = 60 * SECOND;
@@ -515,16 +516,27 @@ describe('harvest journal window (source contract)', () => {
   // 'block' leaves the body's flex sizing inert, and the inset-pinned
   // mobile rule's overflow: hidden then clips a long bed list with no
   // scroller) and every read-guard must test the value it writes. The #bags
-  // pin in tests/client_shell.test.ts is the precedent: the behavioral pins
-  // above track whatever the painter writes, so only this source pin reds
-  // if a future edit flips the window back to block.
-  const src = readFileSync(join(process.cwd(), 'src/ui/harvest_journal_window.ts'), 'utf8');
+  // pin in tests/client_shell.test.ts is the precedent. The behavioral pin
+  // above also reds on a whole-window flip; this source pin's added value
+  // is a SECOND show-site or a read-guard shape no behavioral case drives,
+  // and the CSS half below is what keeps the column contract itself from
+  // being deleted out from under a green TS pin. Comments are stripped so
+  // prose about 'block' can neither satisfy nor trip a needle.
+  const src = stripComments(
+    readFileSync(join(process.cwd(), 'src/ui/harvest_journal_window.ts'), 'utf8'),
+  );
 
-  it('opens and closes with inline flex, matching its flex-column components rule', () => {
+  it('opens and closes with inline flex, with no block write or block-shaped guard', () => {
     expect(src).toContain("root.style.display = 'flex';");
     expect(src).toContain("root.style.display = 'none';");
     expect(src).toContain("return this.deps.root().style.display === 'flex';");
     expect(src).not.toContain("style.display = 'block'");
     expect(src).not.toContain("=== 'block'");
+    expect(src).not.toContain("!== 'block'");
+  });
+
+  it('keeps the flex-column components rule the inline flex engages', () => {
+    const componentsCss = readFileSync(join(process.cwd(), 'src/styles/components.css'), 'utf8');
+    expect(componentsCss).toMatch(/#harvest-journal-window \{[^}]*flex-direction: column;/s);
   });
 });

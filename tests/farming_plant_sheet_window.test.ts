@@ -24,6 +24,7 @@ import type { InvSlot } from '../src/sim/types';
 import type { FarmEvent } from '../src/ui/farm_event_feedback';
 import { PlantSheetWindow } from '../src/ui/farming_plant_sheet_window';
 import type { IWorld } from '../src/world_api';
+import { stripComments } from './helpers/strip_comments';
 
 // happy-dom rewrites import.meta.url to an http scheme, so the repo root
 // comes from the vitest cwd (the localization_fixes idiom).
@@ -292,6 +293,10 @@ describe('plant sheet window: selection and knobs', () => {
   it('flips a knob toggle in place through aria-pressed', () => {
     makeWindow().open(BED);
     const compost = root.querySelector<HTMLElement>('[data-knob="compost"]');
+    // The class is load-bearing beyond styling: the forced-colors underline
+    // cue selects .ps-knob[aria-pressed="true"], so the markup must carry it
+    // or the source-contract CSS pin below guards a selector nothing wears.
+    expect(compost?.classList.contains('ps-knob')).toBe(true);
     expect(compost?.getAttribute('aria-pressed')).toBe('false');
     compost?.click();
     expect(compost?.getAttribute('aria-pressed')).toBe('true');
@@ -557,16 +562,27 @@ describe('plant sheet window (source contract)', () => {
   // components rule is flex-column (#plant-sheet-window flex-direction:
   // column; .ps-body flex: 1 1 auto), so every show-site writes 'flex' and
   // every read-guard tests the value it writes (the #bags precedent in
-  // tests/client_shell.test.ts). The behavioral display pins track whatever
-  // the painter writes; only this source pin reds on a flip back to block.
-  const sheetSrc = readFileSync(join(repoRoot, 'src/ui/farming_plant_sheet_window.ts'), 'utf8');
+  // tests/client_shell.test.ts). The behavioral display pin above also reds
+  // on a whole-window flip; this source pin's added value is a SECOND
+  // show-site or a read-guard shape no behavioral case drives, plus the CSS
+  // half below. Comments are stripped so prose about 'block' can neither
+  // satisfy nor trip a needle.
+  const sheetSrc = stripComments(
+    readFileSync(join(repoRoot, 'src/ui/farming_plant_sheet_window.ts'), 'utf8'),
+  );
 
-  it('opens and closes with inline flex, matching its flex-column components rule', () => {
+  it('opens and closes with inline flex, with no block write or block-shaped guard', () => {
     expect(sheetSrc).toContain("root.style.display = 'flex';");
     expect(sheetSrc).toContain("root.style.display = 'none';");
     expect(sheetSrc).toContain("return this.deps.root().style.display === 'flex';");
     expect(sheetSrc).not.toContain("style.display = 'block'");
+    expect(sheetSrc).not.toContain("=== 'block'");
     expect(sheetSrc).not.toContain("!== 'block'");
+  });
+
+  it('keeps the flex-column components rule the inline flex engages', () => {
+    const componentsCss = readFileSync(join(repoRoot, 'src/styles/components.css'), 'utf8');
+    expect(componentsCss).toMatch(/#plant-sheet-window \{[^}]*flex-direction: column;/s);
   });
 
   it('keeps the forced-colors non-color cue for the picked seed and armed knob', () => {

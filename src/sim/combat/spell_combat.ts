@@ -24,7 +24,8 @@ export function spellDamageMultFromAuras(p: Entity): number {
 
 // The total spell-haste multiplier for a caster: the resolved Entity.spellHaste stat
 // (item-set bonuses + spec-mastery passive haste) PLUS any live buff_spellhaste auras
-// (Aether Surge, Coldsurge, Lich Form, Anointing's target buff). This is the single source of truth casts and
+// (e.g. Aether Surge, Coldsurge, Lich Form, Anointing's target buff). This is the
+// single source of truth casts and
 // the cast-time tooltips both read, so a shown cast time never disagrees with reality.
 export function spellHasteMult(p: Entity): number {
   let bonus = p.spellHaste;
