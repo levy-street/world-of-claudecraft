@@ -1540,12 +1540,35 @@ export function compareCensus({
       t.size < floorTheirs ||
       releaseSets.some((set) => set.size < floorRelease);
     const defs = merged.exportDefinitions;
+    const multiFile = (tree) => {
+      const d = tree?.exportDefinitions;
+      if (!d) return new Set();
+      return new Set(
+        sortedKeys(d).filter((name) => new Set([...d.get(name)].map(defBase)).size > 1),
+      );
+    };
     const duplicates =
       cls === 'exports'
         ? sortedKeys(defs)
             .filter((name) => new Set([...defs.get(name)].map(defBase)).size > 1)
             .map((name) => ({ name, files: [...defs.get(name)].sort() }))
         : [];
+    // The DELTA is the signal, not the list. The header calls the
+    // extraction-versus-in-place duplicate "precisely what the merge produces
+    // with ZERO conflict markers", but the full list is merged-only and prints
+    // as an INFO of ~250 names that predate the merge, so a duplicate the MERGE
+    // created was indistinguishable from them (Phase 11d QA). A name defined in
+    // more than one file on merged and on NO parent is a merge artifact.
+    const parentMultiFile =
+      cls === 'exports'
+        ? new Set([
+            ...multiFile(ours),
+            ...multiFile(theirs),
+            ...releases.flatMap((re) => [...multiFile(re)]),
+          ])
+        : new Set();
+    const newDuplicates =
+      cls === 'exports' ? duplicates.filter((d) => !parentMultiFile.has(d.name)) : [];
     // unusedExtras is a FAIL, not a WARN. The header's contract is SET EQUALITY
     // ("EXTRA must be EXACTLY the set the ledgers authored"), but only the subset
     // direction was enforced: un-exporting any of the six 11c-authored names gave
@@ -1593,6 +1616,7 @@ export function compareCensus({
       missingRenameTargets,
       staleDeletionRows,
       duplicates,
+      newDuplicates,
     };
   }
   return { perClass, failed };
@@ -1620,7 +1644,11 @@ export function formatReport(r, limit = 60) {
   L.push(`  base   ${r.refs.base} (informational)`);
   L.push(`  ours   ${r.refs.ours}`);
   L.push(`  theirs ${r.refs.theirs}`);
-  L.push(`  merged ${r.mergedRoot}`);
+  // The merged side is read from the WORKING TREE, so the report has to say which
+  // tree. Without this a run recorded as "census PASS at <sha>" can attest to a
+  // state no commit contains: during the 11d QA, HEAD moved under two lanes
+  // mid-audit and their reports carried no stamp to notice it with.
+  L.push(`  merged ${r.mergedRoot}${r.mergedStamp ? ` ${r.mergedStamp}` : ''}`);
   L.push(
     `  release parent(s) (${r.releaseRefs.length}): ${r.releaseRefs.map((re) => `${re.ref.slice(0, 10)}${re.via ? ` (via merge ${re.via.slice(0, 10)})` : ''}`).join(', ') || '-'}  (prior synced tip ${PRIOR_SYNC_TIP.slice(0, 10)})`,
   );
@@ -1692,13 +1720,34 @@ export function formatReport(r, limit = 60) {
         `  WARN deletion-list rows not matching a missing name: ${c.staleDeletionRows.join(', ')}`,
       );
     if (cls === 'exports') {
+      // The delta first, because it is the only part the MERGE is answerable for.
       L.push(
-        `  INFO names DEFINED in more than one merged file (re-export-only files excluded; declaration twins collapsed): ${c.duplicates.length}`,
+        `  ${c.newDuplicates?.length ? 'WARN' : 'INFO'} names newly defined in more than one file ON MERGED and on NO parent (the extraction-versus-in-place duplicate this merge could produce with zero conflict markers): ${c.newDuplicates?.length ?? 0}`,
+      );
+      L.push(...fmtList(c.newDuplicates ?? [], limit, (d) => `${d.name}  [${d.files.join(', ')}]`));
+      L.push(
+        `  INFO names DEFINED in more than one merged file (re-export-only files excluded; declaration twins collapsed; most predate the merge, see the delta above): ${c.duplicates.length}`,
       );
       L.push(...fmtList(c.duplicates, limit, (d) => `${d.name}  [${d.files.join(', ')}]`));
     }
     L.push('');
   }
+  // The SimEvent types the union DECLARES that the emits extractor never sees.
+  // Counted as "nonLiteral" before, which hid which NAMES they were: the emits
+  // walk records only emit({ type: '<literal>' }), so an event emitted through a
+  // helper callback (emitToZonePlayers) or a ternary is invisible to that class,
+  // and a hunk dropping the CALL while leaving the union arm and the helper
+  // export passes every class. Four of these are the packets' own, in
+  // src/sim/professions/, the directory both packets rewrote (Phase 11d QA).
+  // Printed BY NAME so the gap is reviewable rather than a bare count.
+  const unionOnly = r.simEventUnionOnly ?? [];
+  L.push(
+    `SimEvent types DECLARED but never seen emitted by the extractor (${unionOnly.length}); ` +
+      'the server-side ones are legitimately outside the sim scan root, the rest are ' +
+      'helper-emitted and are a real blind spot:',
+  );
+  L.push(`  ${unionOnly.join(', ') || '-'}`);
+  L.push('');
   L.push('blind spots (counted, never silent):');
   for (const side of ['ours', 'theirs', 'merged']) {
     const lim = r.limits[side];
@@ -1797,6 +1846,19 @@ export function runCensus(opts = {}) {
   const ours = censusTree(readRefTree(repo, oursRef));
   const theirs = censusTree(readRefTree(repo, theirsRef));
   const merged = censusTree(readMergedTree(mergedRoot));
+  // Stamp the tree the merged side was actually read from: HEAD plus whether the
+  // working tree was dirty at read time. Only for a real worktree; a scratch
+  // --merged-root is not one and gets no stamp.
+  const mergedStamp = (() => {
+    if (path.resolve(mergedRoot) !== path.resolve(repo)) return 'scratch copy (not a git worktree)';
+    const rev = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: repo, encoding: 'utf8' });
+    if (rev.status !== 0) return '';
+    const st = spawnSync('git', ['status', '--porcelain'], { cwd: repo, encoding: 'utf8' });
+    const dirty = st.status === 0 && st.stdout.trim().length > 0;
+    return `at HEAD ${rev.stdout.trim().slice(0, 10)}${
+      dirty ? ' (WORKING TREE DIRTY: this census describes uncommitted state)' : ' (clean)'
+    }`;
+  })();
   // The release parent set: the synced tip, plus the second parent of every later
   // first-parent merge, plus any --sync additions; resolved to full SHAs and deduped.
   const resolve = (ref) => {
@@ -1826,11 +1888,16 @@ export function runCensus(opts = {}) {
     refs: { base: BASE_REF, ours: oursRef, theirs: theirsRef, priorSyncTip: PRIOR_SYNC_TIP },
     releaseRefs,
     mergedRoot,
+    mergedStamp,
     deletionListPath,
     deletionRows: deletion.rows,
     deletionConsumed: deletion.rows.filter((r) => r.cls).length,
     deletionDefects: deletion.defects,
     fileCounts: { ours: ours.fileCounts, theirs: theirs.fileCounts, merged: merged.fileCounts },
+    /** SimEvent types the union declares that the emits extractor never sees. */
+    simEventUnionOnly: [...merged.sets.simEventUnion.keys()]
+      .filter((name) => !merged.sets.simEventEmits.has(name))
+      .sort(),
     limits: { ours: ours.limits, theirs: theirs.limits, merged: merged.limits },
     perClass: cmp.perClass,
     failed,
@@ -1839,7 +1906,12 @@ export function runCensus(opts = {}) {
       ours: serializeSets(ours.sets),
       theirs: serializeSets(theirs.sets),
       merged: serializeSets(merged.sets),
+      // EVERY release parent, not just the first: with two of them, serializing
+      // only releases[0] made the --json dump disagree with the per-parent floor
+      // check that runs over all of them (Phase 11d QA). `release` stays for
+      // back-compat readers; `releases` is the honest one.
       release: releases.length ? serializeSets(releases[0].sets) : null,
+      releases: releases.map((re) => serializeSets(re.sets)),
     },
     contentIdsByPath: {
       ours: sortedKeys(ours.contentIdsByPath),
