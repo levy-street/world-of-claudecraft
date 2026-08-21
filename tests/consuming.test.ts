@@ -70,7 +70,11 @@ describe('the builder is the ONE Consuming writer', () => {
     // zero-rate meals in src/sim/sim.ts ('dev_cascade_freeze',
     // 'dev_sandbox_freeze'): no item def, a sentinel `remaining`, must never
     // mint, so they stay hand-built by design and are the ONLY object
-    // literals this sweep tolerates, both in sim.ts.
+    // literals this sweep tolerates, both in sim.ts. The sweep is scoped to
+    // src/sim ON PURPOSE: the online mirror (src/net/online.ts) rebuilds
+    // display-only eating/drinking shadows off the wire (empty itemId, zero
+    // rates, the mirrored remaining, never a payload: the client never
+    // mints), a different-host shape the builder must NOT produce.
     const offenders: string[] = [];
     let simTsLiterals = 0;
     for (const f of sourceFilesUnder(join(process.cwd(), 'src', 'sim'))) {

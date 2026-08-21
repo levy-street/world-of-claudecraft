@@ -2776,7 +2776,7 @@ export const HOE_RECIPES: ProfessionRecipeRecord[] = [
 // serves. Every row follows the ladder's cross-craft scaffolding convention
 // (skillReq 0 -> 10/10, 25 -> 16/15, 50 -> 20/20). The PLAIN dish outputs are
 // plain kind 'food' + foodHp ItemDefs in content/profession_items.ts with no
-// buff machinery; the four Phase 11 buff dishes add exactly the one `wellfed`
+// buff machinery; the four Phase 11 buff dishes add exactly the one `wellFed`
 // field (see their block below). The tonic's output is the kind 'junk' item
 // the plant_crop command already consumes as a knob, which is why it gets no
 // use arm here either.
