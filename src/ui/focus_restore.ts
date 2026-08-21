@@ -72,6 +72,8 @@
  * is what keeps a future caller from quietly reintroducing the per-window divergence
  * #2528 exists to end.
  */
+import { POINTER_FOCUS_PARK_SELECTOR } from './pointer_blur';
+
 export interface FocusRestoreCandidate {
   readonly disabled?: boolean;
   focus(): void;
@@ -123,12 +125,28 @@ export function captureFocusKey(root: HTMLElement): string | null {
  * `instanceof` narrowing are the two lines a copy gets wrong, and `data-focus-key` is not
  * what makes them worth centralizing.
  *
- * Note the containment check subsumes the `<body>` case a caller might otherwise special
- * case: `root` is a descendant of `<body>`, so `root.contains(document.body)` is false.
+ * `<body>` is refused explicitly: for an ELEMENT root the containment check already
+ * excludes it (`root` is a descendant of `<body>`), but `root` may be any ParentNode
+ * (form_draft.ts keys its own fields and passes the container it is handed), and a
+ * Document root does contain its body.
+ *
+ * A DIALOG ROOT is never "a focused control within": the pointer-only focus drop
+ * (src/ui/pointer_blur.ts) parks pointer focus on the nearest POINTER_FOCUS_PARK_SELECTOR
+ * root so the Tab trap stays armed, and a repaint ladder that read a parked root as a
+ * focused control would resolve no key and fall through to its Close rung, planting focus
+ * on Close after every mouse click (the #2377 double-fire family). Refused by identity (the
+ * root passed in) AND by the park's own shape (the same selector, so the reader can never
+ * drift from what the drop parks on, and a root nested inside `root` is refused too).
+ * Repaint ladders that hand-roll `root.contains(active)` must use this helper instead
+ * (deeds_window.ts, bank_window.ts and form_draft.ts do); the bare containment reads that
+ * remain in src/ui are trap boundary checks or dataset-keyed reads that cannot resolve a
+ * root into a Close fallback, and tests/focus_restore.test.ts lists each one with its reason.
  */
-export function focusedWithin(root: HTMLElement): HTMLElement | null {
+export function focusedWithin(root: ParentNode): HTMLElement | null {
   const active = document.activeElement;
-  if (!(active instanceof HTMLElement)) return null;
+  if (!(active instanceof HTMLElement) || active === root) return null;
+  if (active === active.ownerDocument.body) return null;
+  if (active.matches(POINTER_FOCUS_PARK_SELECTOR)) return null;
   return root.contains(active) ? active : null;
 }
 

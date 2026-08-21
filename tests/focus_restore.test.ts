@@ -23,7 +23,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { captureFocusKey, restoreFirstEnabled } from '../src/ui/focus_restore';
+import { captureFocusKey, focusedWithin, restoreFirstEnabled } from '../src/ui/focus_restore';
 import { tsFilesUnder } from './helpers/ts_files_under';
 
 afterEach(() => {
@@ -162,6 +162,56 @@ describe('captureFocusKey', () => {
     expect(svg instanceof HTMLElement).toBe(false);
     stubActiveElement(svg);
     expect(captureFocusKey(root)).toBeNull();
+  });
+});
+
+describe('focusedWithin', () => {
+  it('returns the focused control inside the root', () => {
+    const { root, btn } = windowWithKeyedButton('k');
+    btn.focus();
+    expect(focusedWithin(root)).toBe(btn);
+  });
+
+  it('returns null when the ROOT ITSELF holds focus (pointer focus parked there by pointer_blur.ts)', () => {
+    // The park slot is not a control: a ladder that read it as one would resolve no
+    // key and land on its Close rung after every mouse click in the window.
+    const { root } = windowWithKeyedButton('k');
+    root.tabIndex = -1;
+    root.focus();
+    expect(document.activeElement).toBe(root);
+    expect(focusedWithin(root)).toBeNull();
+  });
+
+  it('returns null for a dialog root NESTED inside the root (the park lands on the nearest one)', () => {
+    // dropPointerFocus parks on closest([role="dialog"]); a window that nests a
+    // second dialog root would otherwise see the inner root as a keyless control
+    // and fall through to Close.
+    const { root } = windowWithKeyedButton('k');
+    const inner = document.createElement('div');
+    inner.setAttribute('role', 'dialog');
+    inner.tabIndex = -1;
+    root.appendChild(inner);
+    inner.focus();
+    expect(document.activeElement).toBe(inner);
+    expect(focusedWithin(root)).toBeNull();
+  });
+
+  it('never hands back <body>, even for a Document root (the one ParentNode that contains it)', () => {
+    const { btn } = windowWithKeyedButton('k');
+    btn.blur();
+    expect(document.activeElement).toBe(document.body);
+    expect(focusedWithin(document)).toBeNull();
+    btn.focus();
+    expect(focusedWithin(document)).toBe(btn);
+  });
+
+  it('returns null when focus is on <body> or in another window', () => {
+    const { root } = windowWithKeyedButton('k');
+    const other = windowWithKeyedButton('elsewhere');
+    other.btn.focus();
+    expect(focusedWithin(root)).toBeNull();
+    other.btn.blur();
+    expect(focusedWithin(root)).toBeNull();
   });
 });
 
@@ -367,6 +417,48 @@ describe('focus_restore module contract (source scans)', () => {
   it('never passes FocusOptions to focus()', () => {
     expect(moduleCode).toContain('candidate.focus();');
     expect(moduleCode).not.toContain('preventScroll');
+  });
+
+  it('refuses a parked root by the SAME selector the pointer drop parks on (no drift)', () => {
+    // pointer_blur.ts exports the park selector so its readers cannot desync from it;
+    // a literal 'dialog' here would silently diverge the day the park widens.
+    expect(moduleCode).toContain("import { POINTER_FOCUS_PARK_SELECTOR } from './pointer_blur';");
+    expect(moduleCode).toContain('active.matches(POINTER_FOCUS_PARK_SELECTOR)');
+  });
+});
+
+describe('bare containment reads of the active element stay out of repaint ladders', () => {
+  // The durability half of the parked-root rule: a repaint ladder that hand-rolls
+  // `root.contains(active)` reads a parked dialog root as a focused control and falls
+  // through to Close. The reads that remain are listed with the reason each is not a
+  // ladder; a new one must route through focusedWithin or be added here with its reason.
+  const KNOWN_BARE_CONTAINMENT_READS: Record<string, string> = {
+    'armory_inspect.ts': 'overlay Tab-trap boundary check, not a restore ladder',
+    'claudium_window.ts': 'dataset-keyed read on a sub-root; a parked root resolves nothing',
+    'desktop_update_toast.ts': 'do-not-steal-focus check, never focuses anything',
+    'dialog_key_activation.ts': 'keyboard activation guard, requires a button',
+    'focus_manager.ts': 'the Tab trap itself (armed while focus is inside the root)',
+    'focus_restore.ts': 'the helper',
+    'hud/vendor/buy_quantity_prompt_window.ts': 'do-not-steal-focus check, never focuses anything',
+    'spellbook_window.ts':
+      'dataset/class-keyed read with no Close rung; a parked root resolves nothing',
+  };
+  const uiFiles = tsFilesUnder(path.join(repoRoot, 'src/ui')).map((f) => ({
+    ...f,
+    code: stripComments(readFileSync(f.full, 'utf8')),
+  }));
+  const readers = uiFiles
+    .filter((f) => /\.contains\((?:active|document\.activeElement)\)/.test(f.code))
+    .map((f) => f.file)
+    .sort();
+
+  it('finds the known readers (anti-vacuity)', () => {
+    expect(readers).toContain('focus_manager.ts');
+    expect(readers).toContain('spellbook_window.ts');
+  });
+
+  it('every bare read is a listed non-ladder, and every listed one still exists', () => {
+    expect(readers).toEqual(Object.keys(KNOWN_BARE_CONTAINMENT_READS).sort());
   });
 });
 

@@ -191,6 +191,10 @@ export class FakeElement extends EventTarget {
     this.focused = true;
   }
 
+  blur(): void {
+    this.focused = false;
+  }
+
   setPointerCapture(_pointerId: number): void {}
 }
 

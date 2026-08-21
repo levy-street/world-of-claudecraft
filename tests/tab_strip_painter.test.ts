@@ -20,6 +20,9 @@ class FakeTab {
   focus(): void {
     this.focused = true;
   }
+  blur(): void {
+    this.focused = false;
+  }
   fire(type: string, event: unknown = { preventDefault: () => {} }): void {
     for (const cb of this.listeners[type] ?? []) cb(event);
   }
@@ -52,6 +55,33 @@ describe('wireTabStrip', () => {
     );
     friends.fire('click');
     expect(calls).toEqual([['friends', false]]);
+  });
+
+  it('drops focus after a pointer click (detail > 0) and keeps it for keyboard/programmatic clicks', () => {
+    // The pointer-only blur (src/ui/pointer_blur.ts): a mouse click would otherwise
+    // leave the tab holding document focus (no strip rebuild on select), and the
+    // next Space that escapes the game layer's preventDefault would re-click it.
+    const [friends, guild] = [
+      new FakeTab('friends', ['soc-tab']),
+      new FakeTab('guild', ['soc-tab']),
+    ];
+    const calls: [string, boolean][] = [];
+    wireTabStrip(
+      new FakeContainer([friends, guild]) as unknown as HTMLElement,
+      'soc-tab',
+      (id, focusFollow) => calls.push([id, focusFollow]),
+    );
+    friends.focused = true;
+    friends.fire('click', { detail: 1, preventDefault: () => {} });
+    expect(friends.focused).toBe(false);
+    guild.focused = true;
+    guild.fire('click', { detail: 0, preventDefault: () => {} });
+    expect(guild.focused).toBe(true);
+    // Selection still dispatches on both paths, without focus-follow.
+    expect(calls).toEqual([
+      ['friends', false],
+      ['guild', false],
+    ]);
   });
 
   it('moves selection to the next tab on ArrowRight, with focus-follow', () => {

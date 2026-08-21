@@ -19,6 +19,7 @@ import {
 } from './pointer_lock';
 import { normalizePointerLookDelta } from './pointer_look_delta';
 import { clickPickFromMouseGesture, DEFAULT_CLICK_PICK_MAX_MS } from './pointer_pick';
+import { isStaleChromeButton } from './stale_chrome_focus';
 
 function detectPointerLockNeedsSyncGesture(): boolean {
   try {
@@ -980,7 +981,25 @@ export class Input {
       this.cb.onUiKey('escape');
       return;
     }
-    if (this.cb.canUseGameKeys && !this.cb.canUseGameKeys()) return;
+    if (this.cb.canUseGameKeys && !this.cb.canUseGameKeys()) {
+      // This early return skips the Space preventDefault below, so with a
+      // blocking surface up the browser would natively activate whatever HUD
+      // chrome button still holds focus on the keyup (the "Space reopens the
+      // last-used menu" bug). Suppress that ONLY for a button outside every
+      // dialog root: buttons inside the blocking surface (prompt dialogs, the
+      // options window, the player card) keep their native Space activation.
+      // Suppress only, never blur: at keydown time the guard cannot tell stale
+      // pointer focus from the place a keyboard user just Tabbed to (Chromium
+      // flips :focus-visible on the very keypress), and every further Space
+      // lands in this same guard, so the focus position is left for the player
+      // (Enter on a stale button stays a residual either way; the pointer drop
+      // on every wired surface is what removes the stale focus).
+      if (e.code === 'Space') {
+        const active = document.activeElement;
+        if (active instanceof HTMLElement && isStaleChromeButton(active)) e.preventDefault();
+      }
+      return;
+    }
     if (e.code === 'Tab') e.preventDefault();
     if (e.code === 'Space') e.preventDefault?.();
     // The full modifier chord for this press (null if it is itself a bare

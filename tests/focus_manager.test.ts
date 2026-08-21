@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FOCUSABLE_SELECTOR, FocusManager } from '../src/ui/focus_manager';
+import { dropPointerFocus } from '../src/ui/pointer_blur';
 
 // The shared focus-manager TRAP wiring. The pure boundary math (nextFocusIndex)
 // is covered by focus_order.test.ts; this file exercises the wiring the manager layers on
@@ -96,6 +97,11 @@ class FakeHTMLElement {
 
   focus(): void {
     fakeDoc.activeElement = this;
+  }
+
+  blur(): void {
+    // A real blur moves document focus to the body.
+    if (fakeDoc.activeElement === this) fakeDoc.activeElement = fakeDoc.body;
   }
 }
 
@@ -242,6 +248,23 @@ describe('FocusManager Tab trap cycle', () => {
     expect(fakeDoc.activeElement).toBe(b); // the hidden member is not a cycle stop
   });
 
+  it('cycles from the focused root itself (pointer focus parked there by pointer_blur.ts) into the first and last controls', () => {
+    // A mouse click inside a dialog-rooted window parks focus on the root rather
+    // than the body (src/ui/pointer_blur.ts): root.contains(root) holds, so the
+    // trap stays armed and the next Tab enters the cycle instead of leaving it.
+    const root = new FakeHTMLElement();
+    const a = new FakeHTMLElement({ focusable: true });
+    const b = new FakeHTMLElement({ focusable: true });
+    root.append(a, b);
+    new FocusManager().open({ root: () => el(root) });
+    fakeDoc.activeElement = root;
+    expect(tab()).toBe(true);
+    expect(fakeDoc.activeElement).toBe(a);
+    fakeDoc.activeElement = root;
+    expect(tab(true)).toBe(true);
+    expect(fakeDoc.activeElement).toBe(b);
+  });
+
   it('does NOT trap Tab when focus is outside the window (game Tab-targeting preserved)', () => {
     const root = new FakeHTMLElement();
     root.append(new FakeHTMLElement({ focusable: true }));
@@ -336,5 +359,45 @@ describe('FocusManager listener lifecycle', () => {
     expect(keydownHandler).not.toBeNull(); // installed on open
     handle.release(false);
     expect(keydownHandler).toBeNull(); // removed once the stack empties
+  });
+});
+
+describe('opener capture vs the pointer-only focus drop (src/ui/pointer_blur.ts)', () => {
+  it('records no opener for a window opened from a pointer-dropped trigger, and the trigger itself for a keyboard one', () => {
+    // The focus-restore-to-trigger contract: a keyboard open (detail 0, no drop)
+    // records the focused trigger and returns focus to it on close; a mouse open
+    // ran the capture-phase drop first, so the trigger is no longer focused and
+    // nothing stale is recorded for the close to re-plant focus on.
+    const trigger = new FakeHTMLElement({ focusable: true });
+    const root = new FakeHTMLElement();
+    root.append(new FakeHTMLElement({ focusable: true }));
+    const fm = new FocusManager();
+
+    trigger.focus();
+    dropPointerFocus(el(trigger));
+    expect(fakeDoc.activeElement).toBe(fakeDoc.body);
+    const mouse = fm.open({ root: () => el(root) });
+    expect(mouse.opener()).toBeNull();
+    mouse.release(false);
+
+    trigger.focus();
+    const keyboard = fm.open({ root: () => el(root) });
+    expect(keyboard.opener()).toBe(trigger);
+    keyboard.release(false);
+  });
+
+  it('records a focused window ROOT (where the pointer drop parks a click inside a dialog-rooted window) as the next opener', () => {
+    // Inside a dialog-rooted window the drop parks focus on the window's root
+    // (src/ui/pointer_blur.ts, pinned there and in the browser suite); the opener
+    // capture accepts any rendered element, so the next window records that root,
+    // never the clicked button. Restoring to a still-open window's root re-arms
+    // its trap; a closed one fails canFocus and restores nothing.
+    const parkedRoot = new FakeHTMLElement();
+    const nextRoot = new FakeHTMLElement();
+    nextRoot.append(new FakeHTMLElement({ focusable: true }));
+    parkedRoot.focus();
+    const trap = new FocusManager().open({ root: () => el(nextRoot) });
+    expect(trap.opener()).toBe(parkedRoot);
+    trap.release(false);
   });
 });

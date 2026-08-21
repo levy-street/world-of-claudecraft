@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { QUESTS } from '../src/sim/data';
 import type { QuestProgress } from '../src/sim/types';
 import { QuestTrackerController } from '../src/ui/hud/quest/quest_tracker_controller';
+import { dropPointerFocus } from '../src/ui/pointer_blur';
 import type { IWorld } from '../src/world_api';
 
 function progress(questId: string, state: QuestProgress['state'] = 'active'): QuestProgress {
@@ -22,7 +23,12 @@ function harness(entries: QuestProgress[] = []) {
   const header = {
     classList: { contains: (value: string) => value === 'qt-header' },
     focus: vi.fn(),
+    // A real blur moves document focus to the body; the fake document mirrors that.
+    blur: vi.fn(() => {
+      docState.activeElement = null;
+    }),
   };
+  const docState: { activeElement: unknown } = { activeElement: header };
   const element = {
     get innerHTML() {
       return html;
@@ -33,7 +39,7 @@ function harness(entries: QuestProgress[] = []) {
     },
     querySelector: (selector: string) => (selector === '.qt-header' ? header : null),
   } as unknown as HTMLElement;
-  const document = { activeElement: header } as unknown as Document;
+  const document = docState as unknown as Document;
   const settings = {
     available: vi.fn(() => true),
     collapsed: vi.fn(() => collapsed),
@@ -143,5 +149,23 @@ describe('QuestTrackerController', () => {
     expect(test.html()).toContain('aria-expanded="false"');
     expect(test.html()).not.toContain('title:q_wolves');
     expect(test.header.focus).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not restore header focus after a pointer-driven toggle (the focus drop ran first)', () => {
+    // hud.ts binds the pointer-only focus drop (src/ui/pointer_blur.ts) over
+    // #quest-tracker in the CAPTURE phase, so a mouse click drops the header's
+    // focus before the click handler toggles and repaints: the repaint's refocus
+    // check (activeElement is a .qt-header) then sees nothing to restore, and the
+    // header cannot be left holding focus for Space to re-toggle. Keyboard
+    // activation (no drop) keeps the restore above.
+    const test = harness([progress('q_wolves')]);
+    test.controller.update();
+
+    dropPointerFocus(test.header);
+    test.controller.toggleCollapsed();
+
+    expect(test.header.blur).toHaveBeenCalledTimes(1);
+    expect(test.collapsed()).toBe(true);
+    expect(test.header.focus).not.toHaveBeenCalled();
   });
 });

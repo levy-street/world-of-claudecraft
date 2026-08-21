@@ -30,6 +30,7 @@ import {
 } from './deeds_view';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
+import { focusedWithin } from './focus_restore';
 import {
   formatDateTime,
   formatNumber,
@@ -339,7 +340,10 @@ export class DeedsWindow {
     if (!this.opened) return;
     this.pruneWatchedIfStale();
     const active = document.activeElement as HTMLElement | null;
-    const hadFocus = el.contains(active);
+    // The shared reader, not a bare root-containment check: the pointer-only
+    // focus drop parks pointer focus on this root, and the root is not a control
+    // to restore (it would resolve no selector and fall through to Close).
+    const hadFocus = focusedWithin(el) !== null;
     const searchEl = el.querySelector('.deed-search') as HTMLInputElement | null;
     const searchFocus =
       searchEl !== null && active === searchEl

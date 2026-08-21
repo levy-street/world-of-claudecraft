@@ -50,7 +50,19 @@ mobile portrait *and* landscape before calling UI work done.
     the opener on close, via the one shared `FocusManager` (`src/ui/focus_manager.ts`), which
     `Hud` drives through `windowFocus(rootSel)`. The trap intercepts Tab ONLY when focus is
     already inside (Tab is the game's target-nearest key; an unconditional trap would hijack
-    it). Esc stays with the single `closeAll` dispatcher, not the manager.
+    it). Esc stays with the single `closeAll` dispatcher, not the manager. The opener is
+    modality-dependent by design: a KEYBOARD open (click `detail === 0`) records the focused
+    trigger; a MOUSE open ran the pointer-only focus drop first (`src/ui/pointer_blur.ts`,
+    wired by `src/ui/chrome_focus_wiring.ts`), so the recorded opener is never the clicked
+    button: a rail click blurs to the body and records nothing; a click inside a
+    dialog-rooted window parks focus on that window's root, which keeps its Tab trap armed,
+    and the next window records THAT root as its opener (`activeFocusable` accepts any
+    rendered element; returning focus to a still-open window's root re-arms its trap, a
+    closed one fails `canFocus` and restores nothing). Repaint ladders are the other reader
+    of the parked root and never treat it as a focused control (`focusedWithin` refuses the
+    root it is handed and any root matching the park selector). Two modality discriminators coexist on purpose: `UIEvent.detail` for click
+    activation (this), and the pointerdown flag for focus-driven tooltips (`hud.ts`); pick by
+    what the handler receives, a click or a focus event.
   - **Focus across a REBUILD is the other half, and a different module:** a painter that wipes
     its own subtree carries the focused control's identity across with `captureFocusKey` /
     `restoreFirstEnabled` (`src/ui/focus_restore.ts`), never a hand-rolled `activeElement`

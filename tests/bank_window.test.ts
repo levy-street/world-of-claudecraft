@@ -7,6 +7,7 @@
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { CHROME_GUARDED_PANELS } from '../src/ui/chrome_focus_wiring';
 
 const painter = readFileSync(new URL('../src/ui/bank_window.ts', import.meta.url), 'utf8');
 const promptDialog = readFileSync(new URL('../src/ui/prompt_dialog.ts', import.meta.url), 'utf8');
@@ -84,6 +85,11 @@ describe('bank_window: load-bearing behaviors preserved', () => {
     expect(renderBody).toContain('dismissBankPrompts()');
     expect(renderBody).toContain('inert = false');
     expect(renderBody).toContain('hadFocus');
+    // Through the shared reader, never a bare el.contains(active): the pointer-only
+    // focus drop parks pointer focus on the root, and focusedWithin refuses the root
+    // itself, so a parked root cannot take the close-button fallback on a repaint.
+    expect(renderBody).toMatch(/const hadFocus =\s+focusedWithin\(el\) !== null \|\|/);
+    expect(renderBody).not.toContain('el.contains(active)');
   });
 
   it('marks the window as a dialog root for the accessible name', () => {
@@ -628,11 +634,11 @@ describe('bank_window: keyboard a11y (non-modal activation + prompt Enter)', () 
     // of activating the focused control. The guard stopPropagation's Enter/Space on
     // a focused BUTTON so native activation survives (the delve/lockpick/map family
     // precedent). Slice to the guard array so a removal reds this.
-    const start = hud.indexOf("'#delve-board',");
-    const guardArray = hud.slice(start, hud.indexOf(']', start));
-    expect(start).toBeGreaterThan(0);
-    expect(guardArray).toContain("'#bank-window'");
-    expect(guardArray).toContain("'#bags'");
+    // The root list lives in src/ui/chrome_focus_wiring.ts (hud.ts is a one-line
+    // consumer, pinned below with line comments stripped).
+    expect(CHROME_GUARDED_PANELS).toContain('#bank-window');
+    expect(CHROME_GUARDED_PANELS).toContain('#bags');
+    expect(hud.replace(/^\s*\/\/.*$/gm, '')).toContain('wireChromeFocus($)');
   });
 
   it('an open aria-modal prompt suppresses game keybinds (WCAG 2.4.3 focus return)', () => {

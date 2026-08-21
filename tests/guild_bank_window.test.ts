@@ -260,6 +260,24 @@ describe('guild tab visibility', () => {
     expect(h.window.guildTabActive).toBe(false);
   });
 
+  it('moves focus NOWHERE on an external repaint while pointer focus is parked on the window root (never to Close)', () => {
+    // The pointer-only focus drop (src/ui/pointer_blur.ts) parks a mouse click's
+    // focus on the window root (markDialogRoot's tabindex=-1); the root is not a
+    // control to re-land on, so the repaint must leave it alone rather than take
+    // the close-button fallback (focusedWithin refuses the root itself).
+    const h = harness(guildInfo({ slots: [{ itemId: plainId, count: 5 }], treasury: 700 }));
+    h.window.open();
+    clickGuildTab(h);
+    const closeBefore = h.root.querySelector('[data-close]');
+    expect(closeBefore).not.toBeNull();
+    h.root.focus();
+    expect(document.activeElement).toBe(h.root);
+    h.world.guildBankInfo = guildInfo({ slots: [{ itemId: plainId, count: 5 }], treasury: 900 });
+    h.window.refreshIfChanged();
+    expect(h.root.querySelector('[data-close]')).not.toBe(closeBefore); // really rebuilt
+    expect(document.activeElement).toBe(h.root);
+  });
+
   it('keeps keyboard focus on the guild control across an EXTERNAL signature repaint', () => {
     // Another officer's op echoes through refreshIfChanged while a keyboard
     // user sits on a guild cell: focus must re-land on the SAME control in the

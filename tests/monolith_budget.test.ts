@@ -70,7 +70,17 @@ const MONOLITHS: MonolithRow[] = [
     // the professions-module migration counts for nothing toward any future
     // target (a file move relocates zero lines). Exact merged count, zero
     // slack: any further growth reds again.
-    ceiling: 19248,
+    // LOWERED again 19248 -> 19235 at the Phase 11d QA release sync (release
+    // tip 35a6481825, prior synced tip f50b30de29): the stale-focus Space fix
+    // (PR #3506) extracted the tracker drops and the panel key-guard loop into
+    // src/ui/chrome_focus_wiring.ts, lowering the release's own row 19487 ->
+    // 19476, and this branch takes the same extraction. The merged fall is 13,
+    // two lines deeper than the release's own 11, because the branch's guarded
+    // panel list carried two roots the release never had (#harvest-journal-window
+    // and #plant-sheet-window, from the Phase 11b farming absorb); they moved
+    // into CHROME_GUARDED_PANELS with the rest rather than being dropped. No
+    // raise. Exact merged count, zero slack: any further growth reds again.
+    ceiling: 19235,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

@@ -585,6 +585,24 @@ describe('ReliquaryWindow: focus survives a rebuild', () => {
     expect(document.activeElement).toBe(outside);
   });
 
+  it('moves focus NOWHERE on a rebuild while pointer focus is parked on the root (never to Close)', () => {
+    // The pointer-only focus drop (src/ui/pointer_blur.ts) parks a mouse click's
+    // focus on the window root; the root is not a control to restore, so the
+    // rebuild must leave it alone rather than fall through to Close.
+    const state = baseState();
+    const ids = relicIds(PAGE_ID);
+    for (const id of ids.slice(0, 4)) state.itemsDiscovered.add(id);
+    const rig = makeWindow(state, { nav: 'overview' });
+    const closeBefore = rig.el.querySelector('[data-close]');
+    expect(closeBefore).not.toBeNull();
+    rig.el.focus();
+    expect(document.activeElement).toBe(rig.el);
+    state.itemsDiscovered.add(ids[4] ?? '');
+    rig.w.refreshIfChanged();
+    expect(rig.el.querySelector('[data-close]')).not.toBe(closeBefore); // really rebuilt
+    expect(document.activeElement).toBe(rig.el);
+  });
+
   it('falls back to Close when the focused control is gone after the rebuild', () => {
     const state = baseState();
     const ids = relicIds(PAGE_ID);

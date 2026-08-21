@@ -140,9 +140,7 @@ export function captureFormDraft(root: ParentNode): FormDraft {
     if (key === null || values.has(key)) continue;
     values.set(key, el.value);
   }
-  const active = typeof document === 'undefined' ? null : document.activeElement;
-  const focused =
-    active !== null && active !== document.body && root.contains(active) ? active : null;
+  const focused = typeof document === 'undefined' ? null : focusedWithin(root);
   return {
     values,
     focusKey: focused ? elementKey(focused) : null,

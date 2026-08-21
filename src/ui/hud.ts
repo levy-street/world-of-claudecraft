@@ -207,6 +207,7 @@ import {
   serializeIgnoreList,
 } from './chat_ignore_core';
 import { cheaterTagLabel } from './cheater_tag';
+import { wireChromeFocus } from './chrome_focus_wiring';
 import { ClaudiumLauncherBalance } from './claudium_launcher_balance_core';
 import type { ClaudiumRail, ClaudiumSnapshot } from './claudium_window';
 import { ClaudiumWindow } from './claudium_window';
@@ -282,6 +283,7 @@ import { DeedsWindow } from './deeds_window';
 import { DevCommandWindow } from './dev_command_window';
 import { devTierByIndex, devTierDisplayName } from './dev_tier';
 import { bindDialogKeyActivation } from './dialog_key_activation';
+import { markDialogRoot } from './dialog_root';
 import { discordRoleTagLabel } from './discord_role_tag';
 import { discordStatusDisplayName } from './discord_tier';
 import { dropdownKeyNav } from './dropdown_nav';
@@ -2740,31 +2742,10 @@ export class Hud {
       }
       this.toggleReliquaryTrackerCollapsed();
     });
-    // The delve board, lockpick panel, map window, and the bank + bags cluster are
-    // non-modal overlays, so canUseGameKeys() stays true and the global jump (Space)
-    // / chat (Enter) binds would otherwise hijack those keys on a focused panel
-    // button (the map's Quests toggle, a bank grid cell, and each close button
-    // included). Stop propagation (but NOT the default, so the button's native
-    // activation still fires) when a panel button has focus, mirroring the
-    // quest-tracker guard above.
-    for (const panelId of [
-      '#delve-board',
-      '#lockpick-panel',
-      '#delve-rite-panel',
-      '#map-window',
-      '#bank-window',
-      '#bags',
-      '#deeds-window',
-      '#reliquary-window',
-      '#professions-window',
-      '#harvest-journal-window',
-      '#plant-sheet-window',
-    ]) {
-      $(panelId).addEventListener('keydown', (e) => {
-        if ((e.target as HTMLElement).tagName !== 'BUTTON') return;
-        if (e.key === 'Enter' || e.key === ' ' || e.code === 'Space') e.stopPropagation();
-      });
-    }
+    // Chrome focus hygiene (the shared Enter/Space key guard + pointer-only focus
+    // drop) over the trackers, the non-modal overlay panels, and the micromenu rail:
+    // src/ui/chrome_focus_wiring.ts owns the root list and the rationale.
+    wireChromeFocus($);
     $('#mm-map').addEventListener('click', () => this.toggleMap());
     $('#map-close').addEventListener('click', () => {
       $('#map-window').style.display = 'none';
@@ -3868,6 +3849,9 @@ export class Hud {
       document.getElementById('ui')?.appendChild(el);
       this.emoteWheelEl = el;
     }
+    // An isModalOpen() surface: a dialog root (re-marked per show, so its name follows a
+    // language switch); the blocked-state Space guard (stale_chrome_focus.ts) spares it.
+    markDialogRoot(el, { label: t('hudChrome.emoteWheel.label') });
     const slots = this.emoteWheelSlots.filter(isOverheadEmoteId).slice(0, EMOTE_WHEEL_LIMIT);
     el.innerHTML = `<div class="emote-wheel-ring"></div><button class="emote-wheel-edit" data-edit>${esc(t('hudChrome.emoteWheel.edit'))}</button>`;
     slots.forEach((id, i) => {
@@ -3951,6 +3935,9 @@ export class Hud {
 
   private renderEmoteEditor(): void {
     const el = $('#emote-editor');
+    // An isModalOpen() surface: a dialog root, so the blocked-state Space guard
+    // (src/game/stale_chrome_focus.ts) spares the editor's own buttons.
+    markDialogRoot(el, { label: t('hudChrome.emoteEditor.title') });
     el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.emoteEditor.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.emoteEditor.close'))}">${svgIcon('close')}</button></div>`;
     const count = document.createElement('div');
     count.className = 'emote-editor-count';
