@@ -5672,7 +5672,7 @@ function professionsFarmingSession(seed = 1): Scenario {
       'padding cycles (Phase 11): real plant-plus-withered-harvest cycles walk the shared stream to the probed positions, exactly three draws each, no produce, no gains, no notices',
       'golden-WIN harvest (Phase 11, (bw)): the tier-1 golden roll WINS at the searched position; the five-fold signed grants at both grades, the crop-source announce fanout, and the gather_event:golden_harvest mark reach the golden digest',
       'tier-3 seed-back PAYING band (Phase 11, (bw)): the re-seated Thornpeak harvest pays exactly one highland_barley_seed (the one-seed band), upgrading the Phase 10 zero-band grant proof',
-      'wellfed tick-phase mint (Phase 12, beat P): a REAL consume completion through ticks (addItem + useItem + the full 18s sit-restore) mints wellfed_buff_sta at the updateRegen completion arm, zero draws',
+      'wellfed tick-phase mint (Phase 12, beat P; unified in 11c): a REAL consume completion through ticks (addItem + useItem + the full 18s sit-restore) mints the one well_fed aura at the updateRegen completion arm, zero draws',
       'shared feast loop (Phase 12): placeFeast spends the bag item and spawns the farm_feast entity on the normal roster; the placer bites the own feast (a charge spent at START) and rides the same completion to a last-eaten-wins refresh of the buff, zero draws',
       'feast expiry despawn (Phase 12): the draw-free expiresAtTick write plus the 1 Hz updateFarming sweep drop the entity and the FeastState together (the one despawn site)',
     ],
