@@ -10838,6 +10838,13 @@ function abilityDescription(id: string): string {
 function authoredChoiceDescription(choice: TalentRowOption): string {
   const grantId = choice.effect.grant?.ability;
   if (!grantId) return choice.description;
+  // spell_lock (Abyssal Gag) is the one cross-class grant target that is ALSO already
+  // in its class's base kit (every Warlock learns it at 10 regardless of this pick):
+  // synthesizing from the granted ability's own description below drops the one fact
+  // that explains the pick (two levels early) and reads as a no-op to anyone who
+  // already sees Abyssal Gag on their action bar. The authored source carries that
+  // framing plus the real numbers, so use it verbatim instead.
+  if (grantId === 'spell_lock') return choice.description;
   const lang = getLanguage();
   const riderDescriptions = (choice.effect.ability ?? [])
     .filter((mod) => mod.ability === grantId)

@@ -113,6 +113,26 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
     }
   });
 
+  it('keeps the Abyssal Gag early-access framing in English (the one grant row whose target ability is already baseline kit)', () => {
+    // spell_lock (Abyssal Gag) is the only cross-class grant target that is ALSO in its
+    // class's base ability list (learnLevel 10, every Warlock spec): the generic
+    // grant-expansion in authoredChoiceDescription synthesizes from the granted
+    // ability's OWN description, which says nothing about early access and duplicates
+    // what a level-10+ Warlock already reads on their action bar, making the pick read
+    // as a no-op. The authored source is the one place "two levels early" survives.
+    const improvedAbyssalGag = ROW_TREES.warlock
+      .find((row) => row.level === 8)
+      ?.options.find((option) => option.id === 'wlk_r8_voidfeast');
+    if (!improvedAbyssalGag) throw new Error('missing wlk_r8_voidfeast');
+    const rendered = tTalent({
+      kind: 'talentChoice',
+      choice: improvedAbyssalGag,
+      field: 'description',
+    });
+    expect(rendered).toBe(improvedAbyssalGag.description);
+    expect(rendered).toContain('two levels early');
+  });
+
   it('ships no unresolved ability placeholders in canonical source prose', () => {
     const unresolved = entries.filter((entry) =>
       /\$[A-Za-z0-9_]+|\{[A-Za-z0-9_]+\}/.test(entry.source),
