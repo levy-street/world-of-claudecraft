@@ -20,8 +20,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 968,
-      "state": "3a25667d",
+      "nextId": 972,
+      "state": "20c8b201",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -59,7 +59,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 967,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -100,7 +100,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 963
+              "sourceId": 967
             }
           ],
           "blockChance": 0.05,
@@ -113,7 +113,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 963,
+          "id": 967,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -157,9 +157,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 968,
-      "state": "dd2f3300",
-      "events": "07ce633b",
+      "nextId": 972,
+      "state": "338ff5e4",
+      "events": "4144ee77",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -196,7 +196,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 967,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -241,7 +241,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 963
+              "sourceId": 967
             }
           ],
           "blockChance": 0.05,
@@ -254,7 +254,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 963,
+          "id": 967,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -298,9 +298,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 968,
-      "state": "78ec2962",
-      "events": "a3a70b1c",
+      "nextId": 972,
+      "state": "fb245106",
+      "events": "7b793670",
       "rng": {
         "draws": 1,
         "digest": "412668e3"
@@ -347,7 +347,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 967,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -401,7 +401,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 963
+              "sourceId": 967
             }
           ],
           "blockChance": 0.05,
@@ -415,7 +415,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 963,
+          "id": 967,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -459,9 +459,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 968,
-      "state": "3805ecad",
-      "events": "b8dabfff",
+      "nextId": 972,
+      "state": "09cb137d",
+      "events": "f60f44a3",
       "rng": {
         "draws": 2,
         "digest": "58bf8a9e"
@@ -524,7 +524,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 967,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -576,7 +576,7 @@
             "selfSignedBonusApplied": true
           },
           "lastMasterwork": {
-            "crafter": 963,
+            "crafter": 967,
             "itemId": "eastbrook_ritual_vestments",
             "recipeId": "recipe_eastbrook_ritual_vestments"
           },
@@ -626,7 +626,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 963
+              "sourceId": 967
             }
           ],
           "blockChance": 0.05,
@@ -640,7 +640,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 963,
+          "id": 967,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -684,9 +684,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 968,
-      "state": "c008fdd6",
-      "events": "a3a70b1c",
+      "nextId": 972,
+      "state": "34ce4936",
+      "events": "7b793670",
       "rng": {
         "draws": 3,
         "digest": "7e0fce15"
@@ -749,7 +749,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 967,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -799,7 +799,7 @@
             "recipeId": "recipe_minor_healing_potion"
           },
           "lastMasterwork": {
-            "crafter": 963,
+            "crafter": 967,
             "itemId": "eastbrook_ritual_vestments",
             "recipeId": "recipe_eastbrook_ritual_vestments"
           },
@@ -849,7 +849,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 963
+              "sourceId": 967
             }
           ],
           "blockChance": 0.05,
@@ -863,7 +863,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 963,
+          "id": 967,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -907,9 +907,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 968,
-      "state": "89e93c06",
-      "events": "f04edd07",
+      "nextId": 972,
+      "state": "c576da1e",
+      "events": "20fff67b",
       "rng": {
         "draws": 4,
         "digest": "c0076677"
@@ -983,7 +983,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 967,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1048,7 +1048,7 @@
             "recipeId": "recipe_quickening_catalyst"
           },
           "lastMasterwork": {
-            "crafter": 963,
+            "crafter": 967,
             "itemId": "eastbrook_ritual_vestments",
             "recipeId": "recipe_eastbrook_ritual_vestments"
           },
@@ -1098,7 +1098,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 963
+              "sourceId": 967
             }
           ],
           "blockChance": 0.05,
@@ -1112,7 +1112,7 @@
           "fallStartY": 9,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 963,
+          "id": 967,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1156,9 +1156,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 968,
-      "state": "33ff0ba1",
-      "events": "9ce97664",
+      "nextId": 972,
+      "state": "804c8d29",
+      "events": "0a40d5e0",
       "rng": {
         "draws": 4,
         "digest": "c0076677"
@@ -1232,7 +1232,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 967,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1294,7 +1294,7 @@
             "recipeId": "recipe_quickening_catalyst"
           },
           "lastMasterwork": {
-            "crafter": 963,
+            "crafter": 967,
             "itemId": "eastbrook_ritual_vestments",
             "recipeId": "recipe_eastbrook_ritual_vestments"
           },
@@ -1344,7 +1344,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 963
+              "sourceId": 967
             }
           ],
           "blockChance": 0.05,
@@ -1358,7 +1358,7 @@
           "fallStartY": 9,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 963,
+          "id": 967,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1402,9 +1402,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 968,
-      "state": "779f786a",
-      "events": "0f312f41",
+      "nextId": 972,
+      "state": "1a138f4a",
+      "events": "ca2d5961",
       "rng": {
         "draws": 4,
         "digest": "c0076677"
@@ -1478,7 +1478,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 967,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1552,7 +1552,7 @@
             "recipeId": "recipe_quickening_catalyst"
           },
           "lastMasterwork": {
-            "crafter": 963,
+            "crafter": 967,
             "itemId": "eastbrook_ritual_vestments",
             "recipeId": "recipe_eastbrook_ritual_vestments"
           },
@@ -1602,7 +1602,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 963
+              "sourceId": 967
             }
           ],
           "blockChance": 0.05,
@@ -1621,7 +1621,7 @@
           "fallStartY": 9,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 963,
+          "id": 967,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1665,8 +1665,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 968,
-      "state": "779f786a",
+      "nextId": 972,
+      "state": "1a138f4a",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -1741,7 +1741,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 963,
+          "entityId": 967,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1815,7 +1815,7 @@
             "recipeId": "recipe_quickening_catalyst"
           },
           "lastMasterwork": {
-            "crafter": 963,
+            "crafter": 967,
             "itemId": "eastbrook_ritual_vestments",
             "recipeId": "recipe_eastbrook_ritual_vestments"
           },
@@ -1865,7 +1865,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 963
+              "sourceId": 967
             }
           ],
           "blockChance": 0.05,
@@ -1884,7 +1884,7 @@
           "fallStartY": 9,
           "fiveSecondRule": 99,
           "hp": 100,
-          "id": 963,
+          "id": 967,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

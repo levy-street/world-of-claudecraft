@@ -23,7 +23,7 @@
     "padding cycles (Phase 11): real plant-plus-withered-harvest cycles walk the shared stream to the probed positions, exactly three draws each, no produce, no gains, no notices",
     "golden-WIN harvest (Phase 11, (bw)): the tier-1 golden roll WINS at the searched position; the five-fold signed grants at both grades, the crop-source announce fanout, and the gather_event:golden_harvest mark reach the golden digest",
     "tier-3 seed-back PAYING band (Phase 11, (bw)): the re-seated Thornpeak harvest pays exactly one highland_barley_seed (the one-seed band), upgrading the Phase 10 zero-band grant proof",
-    "wellfed tick-phase mint (Phase 12, beat P): a REAL consume completion through ticks (addItem + useItem + the full 18s sit-restore) mints wellfed_buff_sta at the updateRegen completion arm, zero draws",
+    "wellfed tick-phase mint (Phase 12, beat P; unified in 11c): a REAL consume completion through ticks (addItem + useItem + the full 18s sit-restore) mints the one well_fed aura at the updateRegen completion arm, zero draws",
     "shared feast loop (Phase 12): placeFeast spends the bag item and spawns the farm_feast entity on the normal roster; the placer bites the own feast (a charge spent at START) and rides the same completion to a last-eaten-wins refresh of the buff, zero draws",
     "feast expiry despawn (Phase 12): the draw-free expiresAtTick write plus the 1 Hz updateFarming sweep drop the entity and the FeastState together (the one despawn site)"
   ],
@@ -34,7 +34,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 972,
-      "state": "d1ccd0ac",
+      "state": "e0291cba",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -59,6 +59,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -97,7 +98,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -170,7 +172,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 972,
-      "state": "4258c2c8",
+      "state": "2c3c6bf4",
       "events": "bb3ea9b0",
       "rng": {
         "draws": 2,
@@ -195,6 +197,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -258,7 +261,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -334,7 +338,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 972,
-      "state": "facb253f",
+      "state": "c8095f91",
       "events": "b55b2487",
       "rng": {
         "draws": 2,
@@ -345,7 +349,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 972,
-      "state": "755110c7",
+      "state": "79449b69",
       "events": "bdab63e5",
       "rng": {
         "draws": 2,
@@ -356,7 +360,7 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 972,
-      "state": "8922c4ec",
+      "state": "c1d135bc",
       "events": "d613fcc8",
       "rng": {
         "draws": 4,
@@ -381,6 +385,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -457,7 +462,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -533,7 +539,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 972,
-      "state": "1f5e404c",
+      "state": "c3fe4f9c",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -544,7 +550,7 @@
       "tick": 61,
       "time": 3.05,
       "nextId": 972,
-      "state": "3a32d4a1",
+      "state": "f84459fd",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -569,6 +575,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -645,7 +652,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -721,7 +729,7 @@
       "tick": 61,
       "time": 3.05,
       "nextId": 972,
-      "state": "0e9135b2",
+      "state": "3815fbc0",
       "events": "08316203",
       "rng": {
         "draws": 6,
@@ -746,6 +754,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -817,7 +826,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -893,7 +903,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 972,
-      "state": "785bdcb9",
+      "state": "a8766a23",
       "events": "a1150cf1",
       "rng": {
         "draws": 6,
@@ -904,7 +914,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 972,
-      "state": "055a58c5",
+      "state": "e16decbf",
       "events": "bdab63e5",
       "rng": {
         "draws": 6,
@@ -915,7 +925,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 972,
-      "state": "5b8d0fcc",
+      "state": "254b0a3c",
       "events": "e1884589",
       "rng": {
         "draws": 8,
@@ -940,6 +950,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1032,7 +1043,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -1108,7 +1120,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 972,
-      "state": "c28cfcbb",
+      "state": "ff399c45",
       "events": "742e9e54",
       "rng": {
         "draws": 9,
@@ -1133,6 +1145,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1216,7 +1229,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -1292,7 +1306,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 972,
-      "state": "669953a2",
+      "state": "e2fd750c",
       "events": "013df3f4",
       "rng": {
         "draws": 9,
@@ -1317,6 +1331,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1400,7 +1415,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -1476,7 +1492,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 972,
-      "state": "74faa201",
+      "state": "c2edb299",
       "events": "741638a5",
       "rng": {
         "draws": 9,
@@ -1487,7 +1503,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 972,
-      "state": "4e1436a3",
+      "state": "10d698af",
       "events": "741638a5",
       "rng": {
         "draws": 9,
@@ -1498,7 +1514,7 @@
       "tick": 151,
       "time": 7.55,
       "nextId": 972,
-      "state": "f52e6688",
+      "state": "bc1ae6ec",
       "events": "7f52c039",
       "rng": {
         "draws": 11,
@@ -1523,6 +1539,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1618,7 +1635,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -1694,7 +1712,7 @@
       "tick": 151,
       "time": 7.55,
       "nextId": 972,
-      "state": "11319924",
+      "state": "0d0f0a16",
       "events": "2023a137",
       "rng": {
         "draws": 13,
@@ -1719,6 +1737,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1814,7 +1833,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -1890,7 +1910,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 972,
-      "state": "86175455",
+      "state": "02ae3cdd",
       "events": "f55d981d",
       "rng": {
         "draws": 13,
@@ -1901,7 +1921,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 972,
-      "state": "2e0d1c03",
+      "state": "5e530bff",
       "events": "741638a5",
       "rng": {
         "draws": 13,
@@ -1912,7 +1932,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 972,
-      "state": "33bbc896",
+      "state": "918d1f98",
       "events": "bdab63e5",
       "rng": {
         "draws": 13,
@@ -1923,7 +1943,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 972,
-      "state": "2d7a7aef",
+      "state": "9828fa49",
       "events": "e1884589",
       "rng": {
         "draws": 15,
@@ -1934,7 +1954,7 @@
       "tick": 240,
       "time": 12,
       "nextId": 972,
-      "state": "67112539",
+      "state": "78ca6647",
       "events": "bdab63e5",
       "rng": {
         "draws": 15,
@@ -1945,7 +1965,7 @@
       "tick": 260,
       "time": 13,
       "nextId": 972,
-      "state": "0a7b68ed",
+      "state": "7a288b2f",
       "events": "a4182909",
       "rng": {
         "draws": 15,
@@ -1956,7 +1976,7 @@
       "tick": 280,
       "time": 14,
       "nextId": 972,
-      "state": "721781e4",
+      "state": "f6784c8c",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1967,7 +1987,7 @@
       "tick": 282,
       "time": 14.1,
       "nextId": 972,
-      "state": "e0b14196",
+      "state": "9bd8b0aa",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1992,6 +2012,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -2098,7 +2119,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -2172,7 +2194,7 @@
       "tick": 282,
       "time": 14.1,
       "nextId": 972,
-      "state": "b5931a93",
+      "state": "db703e0f",
       "events": "86e12c14",
       "rng": {
         "draws": 16,
@@ -2197,6 +2219,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -2290,7 +2313,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -2364,7 +2388,7 @@
       "tick": 300,
       "time": 15,
       "nextId": 972,
-      "state": "0712d26a",
+      "state": "6c75d678",
       "events": "3ef536a5",
       "rng": {
         "draws": 16,
@@ -2375,7 +2399,7 @@
       "tick": 320,
       "time": 16,
       "nextId": 972,
-      "state": "f4fc0199",
+      "state": "2b0d247d",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -2386,7 +2410,7 @@
       "tick": 340,
       "time": 17,
       "nextId": 972,
-      "state": "7f06739b",
+      "state": "5e15ab77",
       "events": "10a84667",
       "rng": {
         "draws": 19,
@@ -2397,7 +2421,7 @@
       "tick": 360,
       "time": 18,
       "nextId": 972,
-      "state": "70b816a7",
+      "state": "0fa53963",
       "events": "741638a5",
       "rng": {
         "draws": 19,
@@ -2408,7 +2432,7 @@
       "tick": 380,
       "time": 19,
       "nextId": 972,
-      "state": "d057de9b",
+      "state": "349d1e03",
       "events": "e5d758df",
       "rng": {
         "draws": 22,
@@ -2419,7 +2443,7 @@
       "tick": 400,
       "time": 20,
       "nextId": 972,
-      "state": "026eabfb",
+      "state": "9ef35a63",
       "events": "741638a5",
       "rng": {
         "draws": 22,
@@ -2430,7 +2454,7 @@
       "tick": 420,
       "time": 21,
       "nextId": 972,
-      "state": "f5fca58b",
+      "state": "89630c97",
       "events": "e5d758df",
       "rng": {
         "draws": 25,
@@ -2441,7 +2465,7 @@
       "tick": 440,
       "time": 22,
       "nextId": 972,
-      "state": "b32c11cb",
+      "state": "d8cd0bd7",
       "events": "741638a5",
       "rng": {
         "draws": 25,
@@ -2452,7 +2476,7 @@
       "tick": 460,
       "time": 23,
       "nextId": 972,
-      "state": "c77b0485",
+      "state": "5c5bbaa9",
       "events": "e5d758df",
       "rng": {
         "draws": 28,
@@ -2463,7 +2487,7 @@
       "tick": 480,
       "time": 24,
       "nextId": 972,
-      "state": "a8e1276d",
+      "state": "f228afa1",
       "events": "741638a5",
       "rng": {
         "draws": 28,
@@ -2474,7 +2498,7 @@
       "tick": 500,
       "time": 25,
       "nextId": 972,
-      "state": "4055346f",
+      "state": "6b533049",
       "events": "e5d758df",
       "rng": {
         "draws": 31,
@@ -2485,7 +2509,7 @@
       "tick": 520,
       "time": 26,
       "nextId": 972,
-      "state": "ca16491b",
+      "state": "938da055",
       "events": "741638a5",
       "rng": {
         "draws": 31,
@@ -2496,7 +2520,7 @@
       "tick": 540,
       "time": 27,
       "nextId": 972,
-      "state": "4a113539",
+      "state": "017939df",
       "events": "e5d758df",
       "rng": {
         "draws": 34,
@@ -2507,7 +2531,7 @@
       "tick": 560,
       "time": 28,
       "nextId": 972,
-      "state": "ad7040a9",
+      "state": "37379ecf",
       "events": "741638a5",
       "rng": {
         "draws": 34,
@@ -2518,7 +2542,7 @@
       "tick": 580,
       "time": 29,
       "nextId": 972,
-      "state": "2a61e548",
+      "state": "b21b89a4",
       "events": "e5d758df",
       "rng": {
         "draws": 37,
@@ -2529,7 +2553,7 @@
       "tick": 600,
       "time": 30,
       "nextId": 972,
-      "state": "49f3eac4",
+      "state": "317df4f0",
       "events": "741638a5",
       "rng": {
         "draws": 37,
@@ -2540,7 +2564,7 @@
       "tick": 620,
       "time": 31,
       "nextId": 972,
-      "state": "37930fa5",
+      "state": "b9a062cb",
       "events": "e5d758df",
       "rng": {
         "draws": 40,
@@ -2551,7 +2575,7 @@
       "tick": 640,
       "time": 32,
       "nextId": 972,
-      "state": "11867d05",
+      "state": "8531e5ab",
       "events": "741638a5",
       "rng": {
         "draws": 40,
@@ -2562,7 +2586,7 @@
       "tick": 660,
       "time": 33,
       "nextId": 972,
-      "state": "0ea01354",
+      "state": "b9572088",
       "events": "e5d758df",
       "rng": {
         "draws": 43,
@@ -2573,7 +2597,7 @@
       "tick": 680,
       "time": 34,
       "nextId": 972,
-      "state": "dd71da20",
+      "state": "f310e234",
       "events": "741638a5",
       "rng": {
         "draws": 43,
@@ -2584,7 +2608,7 @@
       "tick": 700,
       "time": 35,
       "nextId": 972,
-      "state": "1fb9fa4d",
+      "state": "3e947793",
       "events": "bdab63e5",
       "rng": {
         "draws": 43,
@@ -2595,7 +2619,7 @@
       "tick": 720,
       "time": 36,
       "nextId": 972,
-      "state": "7aeccd56",
+      "state": "595f3e76",
       "events": "10a84667",
       "rng": {
         "draws": 46,
@@ -2606,7 +2630,7 @@
       "tick": 740,
       "time": 37,
       "nextId": 972,
-      "state": "cba5020c",
+      "state": "51592418",
       "events": "bdab63e5",
       "rng": {
         "draws": 46,
@@ -2617,7 +2641,7 @@
       "tick": 760,
       "time": 38,
       "nextId": 972,
-      "state": "e4224939",
+      "state": "f92fd057",
       "events": "10a84667",
       "rng": {
         "draws": 49,
@@ -2628,7 +2652,7 @@
       "tick": 780,
       "time": 39,
       "nextId": 972,
-      "state": "35b2ff2f",
+      "state": "a05619e1",
       "events": "741638a5",
       "rng": {
         "draws": 49,
@@ -2639,7 +2663,7 @@
       "tick": 800,
       "time": 40,
       "nextId": 972,
-      "state": "83f04277",
+      "state": "843d49e9",
       "events": "e5d758df",
       "rng": {
         "draws": 52,
@@ -2650,7 +2674,7 @@
       "tick": 820,
       "time": 41,
       "nextId": 972,
-      "state": "155b64f4",
+      "state": "8438d758",
       "events": "741638a5",
       "rng": {
         "draws": 52,
@@ -2661,7 +2685,7 @@
       "tick": 840,
       "time": 42,
       "nextId": 972,
-      "state": "2f3bc907",
+      "state": "3d80d669",
       "events": "e5d758df",
       "rng": {
         "draws": 55,
@@ -2672,7 +2696,7 @@
       "tick": 860,
       "time": 43,
       "nextId": 972,
-      "state": "fbce48cd",
+      "state": "57d9f31b",
       "events": "741638a5",
       "rng": {
         "draws": 55,
@@ -2683,7 +2707,7 @@
       "tick": 880,
       "time": 44,
       "nextId": 972,
-      "state": "35e0c857",
+      "state": "31c8e759",
       "events": "e5d758df",
       "rng": {
         "draws": 58,
@@ -2694,7 +2718,7 @@
       "tick": 900,
       "time": 45,
       "nextId": 972,
-      "state": "aacbae9d",
+      "state": "8e953d4b",
       "events": "741638a5",
       "rng": {
         "draws": 58,
@@ -2705,7 +2729,7 @@
       "tick": 920,
       "time": 46,
       "nextId": 972,
-      "state": "4ad2e3ab",
+      "state": "8c7c9aab",
       "events": "e5d758df",
       "rng": {
         "draws": 61,
@@ -2716,7 +2740,7 @@
       "tick": 940,
       "time": 47,
       "nextId": 972,
-      "state": "566f0369",
+      "state": "0087a195",
       "events": "741638a5",
       "rng": {
         "draws": 61,
@@ -2727,7 +2751,7 @@
       "tick": 960,
       "time": 48,
       "nextId": 972,
-      "state": "ce2874ff",
+      "state": "59d16073",
       "events": "e5d758df",
       "rng": {
         "draws": 64,
@@ -2738,7 +2762,7 @@
       "tick": 980,
       "time": 49,
       "nextId": 972,
-      "state": "bf82ba6d",
+      "state": "394bb9b5",
       "events": "741638a5",
       "rng": {
         "draws": 64,
@@ -2749,7 +2773,7 @@
       "tick": 1000,
       "time": 50,
       "nextId": 972,
-      "state": "25f71c54",
+      "state": "d329a69e",
       "events": "e5d758df",
       "rng": {
         "draws": 67,
@@ -2760,7 +2784,7 @@
       "tick": 1020,
       "time": 51,
       "nextId": 972,
-      "state": "3c187c2d",
+      "state": "f3ba15b9",
       "events": "741638a5",
       "rng": {
         "draws": 67,
@@ -2771,7 +2795,7 @@
       "tick": 1040,
       "time": 52,
       "nextId": 972,
-      "state": "e0d791e1",
+      "state": "e1cbf261",
       "events": "e5d758df",
       "rng": {
         "draws": 70,
@@ -2782,7 +2806,7 @@
       "tick": 1060,
       "time": 53,
       "nextId": 972,
-      "state": "a46178cb",
+      "state": "da07813f",
       "events": "741638a5",
       "rng": {
         "draws": 70,
@@ -2793,7 +2817,7 @@
       "tick": 1080,
       "time": 54,
       "nextId": 972,
-      "state": "e51f33c2",
+      "state": "280a8738",
       "events": "e5d758df",
       "rng": {
         "draws": 73,
@@ -2804,7 +2828,7 @@
       "tick": 1100,
       "time": 55,
       "nextId": 972,
-      "state": "a5a716cc",
+      "state": "99401296",
       "events": "741638a5",
       "rng": {
         "draws": 73,
@@ -2815,7 +2839,7 @@
       "tick": 1120,
       "time": 56,
       "nextId": 972,
-      "state": "7c803b15",
+      "state": "8d61b665",
       "events": "e5d758df",
       "rng": {
         "draws": 76,
@@ -2826,7 +2850,7 @@
       "tick": 1140,
       "time": 57,
       "nextId": 972,
-      "state": "d3623ccf",
+      "state": "19798c03",
       "events": "741638a5",
       "rng": {
         "draws": 76,
@@ -2837,7 +2861,7 @@
       "tick": 1160,
       "time": 58,
       "nextId": 972,
-      "state": "15342ad0",
+      "state": "27b1ecc2",
       "events": "e5d758df",
       "rng": {
         "draws": 79,
@@ -2848,7 +2872,7 @@
       "tick": 1180,
       "time": 59,
       "nextId": 972,
-      "state": "b8d8bafa",
+      "state": "4e4d11d0",
       "events": "741638a5",
       "rng": {
         "draws": 79,
@@ -2859,7 +2883,7 @@
       "tick": 1200,
       "time": 60,
       "nextId": 972,
-      "state": "a7e657d2",
+      "state": "5efbc964",
       "events": "e5d758df",
       "rng": {
         "draws": 82,
@@ -2870,7 +2894,7 @@
       "tick": 1220,
       "time": 61,
       "nextId": 972,
-      "state": "785375c7",
+      "state": "54291c4b",
       "events": "741638a5",
       "rng": {
         "draws": 82,
@@ -2881,7 +2905,7 @@
       "tick": 1240,
       "time": 62,
       "nextId": 972,
-      "state": "28afa038",
+      "state": "a4785afa",
       "events": "e5d758df",
       "rng": {
         "draws": 85,
@@ -2892,7 +2916,7 @@
       "tick": 1260,
       "time": 63,
       "nextId": 972,
-      "state": "3cde7942",
+      "state": "dbe8ad50",
       "events": "741638a5",
       "rng": {
         "draws": 85,
@@ -2903,7 +2927,7 @@
       "tick": 1280,
       "time": 64,
       "nextId": 972,
-      "state": "f0e94930",
+      "state": "37d31e76",
       "events": "e5d758df",
       "rng": {
         "draws": 88,
@@ -2914,7 +2938,7 @@
       "tick": 1300,
       "time": 65,
       "nextId": 972,
-      "state": "379d1f32",
+      "state": "7fd94674",
       "events": "741638a5",
       "rng": {
         "draws": 88,
@@ -2925,7 +2949,7 @@
       "tick": 1320,
       "time": 66,
       "nextId": 972,
-      "state": "888b3146",
+      "state": "6e7ba582",
       "events": "e5d758df",
       "rng": {
         "draws": 91,
@@ -2936,7 +2960,7 @@
       "tick": 1340,
       "time": 67,
       "nextId": 972,
-      "state": "8dbe65f0",
+      "state": "a961bdf0",
       "events": "741638a5",
       "rng": {
         "draws": 91,
@@ -2947,7 +2971,7 @@
       "tick": 1360,
       "time": 68,
       "nextId": 972,
-      "state": "55ea5ff2",
+      "state": "5f318106",
       "events": "e5d758df",
       "rng": {
         "draws": 94,
@@ -2958,7 +2982,7 @@
       "tick": 1380,
       "time": 69,
       "nextId": 972,
-      "state": "8a4a2ba4",
+      "state": "cde1e0dc",
       "events": "741638a5",
       "rng": {
         "draws": 94,
@@ -2969,7 +2993,7 @@
       "tick": 1400,
       "time": 70,
       "nextId": 972,
-      "state": "c9f77a8d",
+      "state": "87c4ad2f",
       "events": "e5d758df",
       "rng": {
         "draws": 97,
@@ -2980,7 +3004,7 @@
       "tick": 1420,
       "time": 71,
       "nextId": 972,
-      "state": "a749d07e",
+      "state": "8e646a2a",
       "events": "741638a5",
       "rng": {
         "draws": 97,
@@ -2991,7 +3015,7 @@
       "tick": 1440,
       "time": 72,
       "nextId": 972,
-      "state": "5ee300ec",
+      "state": "9ac56e94",
       "events": "e5d758df",
       "rng": {
         "draws": 100,
@@ -3002,7 +3026,7 @@
       "tick": 1460,
       "time": 73,
       "nextId": 972,
-      "state": "cacf9792",
+      "state": "0b672096",
       "events": "741638a5",
       "rng": {
         "draws": 100,
@@ -3013,7 +3037,7 @@
       "tick": 1479,
       "time": 73.95,
       "nextId": 972,
-      "state": "d6e3c909",
+      "state": "cd069973",
       "events": "83c141d1",
       "rng": {
         "draws": 102,
@@ -3038,6 +3062,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -3155,7 +3180,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -3231,7 +3257,7 @@
       "tick": 1479,
       "time": 73.95,
       "nextId": 972,
-      "state": "96ac9cb9",
+      "state": "cdc2f15d",
       "events": "2c18bd23",
       "rng": {
         "draws": 103,
@@ -3256,6 +3282,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -3377,7 +3404,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -3453,7 +3481,7 @@
       "tick": 1480,
       "time": 74,
       "nextId": 972,
-      "state": "9e52b2fd",
+      "state": "fa0150b5",
       "events": "e2593f9c",
       "rng": {
         "draws": 103,
@@ -3464,7 +3492,7 @@
       "tick": 1500,
       "time": 75,
       "nextId": 972,
-      "state": "40c666f9",
+      "state": "dcb46dd7",
       "events": "3ef536a5",
       "rng": {
         "draws": 103,
@@ -3475,7 +3503,7 @@
       "tick": 1520,
       "time": 76,
       "nextId": 972,
-      "state": "4ea158e2",
+      "state": "54b5a2c2",
       "events": "bdab63e5",
       "rng": {
         "draws": 103,
@@ -3486,7 +3514,7 @@
       "tick": 1540,
       "time": 77,
       "nextId": 972,
-      "state": "79631b13",
+      "state": "fb6787b3",
       "events": "8487eee8",
       "rng": {
         "draws": 106,
@@ -3497,7 +3525,7 @@
       "tick": 1560,
       "time": 78,
       "nextId": 972,
-      "state": "2eafcea3",
+      "state": "f3c39703",
       "events": "741638a5",
       "rng": {
         "draws": 106,
@@ -3508,7 +3536,7 @@
       "tick": 1569,
       "time": 78.45,
       "nextId": 972,
-      "state": "5fb0d420",
+      "state": "e4f98ee6",
       "events": "111e11ce",
       "rng": {
         "draws": 108,
@@ -3533,6 +3561,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -3670,7 +3699,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -3746,7 +3776,7 @@
       "tick": 1569,
       "time": 78.45,
       "nextId": 972,
-      "state": "2113864c",
+      "state": "5b9ec202",
       "events": "1029cce2",
       "rng": {
         "draws": 110,
@@ -3771,6 +3801,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -3911,7 +3942,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -3987,7 +4019,7 @@
       "tick": 1580,
       "time": 79,
       "nextId": 972,
-      "state": "60049e98",
+      "state": "1d404c2a",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -3998,7 +4030,7 @@
       "tick": 1600,
       "time": 80,
       "nextId": 972,
-      "state": "4aea0504",
+      "state": "d3f683f6",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4009,7 +4041,7 @@
       "tick": 1618,
       "time": 80.9,
       "nextId": 972,
-      "state": "dfb28dda",
+      "state": "694429d3",
       "events": "264ce8b8",
       "rng": {
         "draws": 110,
@@ -4034,6 +4066,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -4170,7 +4203,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -4200,7 +4234,13 @@
             "hpPer2s": 109,
             "itemId": "evergarden_braised_greens",
             "kind": "food",
-            "remaining": 18
+            "remaining": 18,
+            "wellFed": {
+              "aura": "Well Fed",
+              "duration": 600,
+              "kind": "buff_sta",
+              "value": 5
+            }
           },
           "fallStartY": 2.459535,
           "fiveSecondRule": 179.9,
@@ -4251,7 +4291,7 @@
       "tick": 1620,
       "time": 81,
       "nextId": 972,
-      "state": "cbe7aeb9",
+      "state": "30ab20da",
       "events": "f42d07e8",
       "rng": {
         "draws": 110,
@@ -4262,7 +4302,7 @@
       "tick": 1640,
       "time": 82,
       "nextId": 972,
-      "state": "ad0603c3",
+      "state": "01a2b736",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4273,7 +4313,7 @@
       "tick": 1660,
       "time": 83,
       "nextId": 972,
-      "state": "d98ca6a2",
+      "state": "9edcdbb1",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4284,7 +4324,7 @@
       "tick": 1680,
       "time": 84,
       "nextId": 972,
-      "state": "c8ec92a4",
+      "state": "394b7225",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4295,7 +4335,7 @@
       "tick": 1700,
       "time": 85,
       "nextId": 972,
-      "state": "032fd105",
+      "state": "ce335646",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4306,7 +4346,7 @@
       "tick": 1720,
       "time": 86,
       "nextId": 972,
-      "state": "89b0078d",
+      "state": "255a9abc",
       "events": "e5ef9ed0",
       "rng": {
         "draws": 110,
@@ -4317,7 +4357,7 @@
       "tick": 1740,
       "time": 87,
       "nextId": 972,
-      "state": "d4990f64",
+      "state": "aea7efbf",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4328,7 +4368,7 @@
       "tick": 1760,
       "time": 88,
       "nextId": 972,
-      "state": "6505af6e",
+      "state": "9ecc7783",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4339,7 +4379,7 @@
       "tick": 1780,
       "time": 89,
       "nextId": 972,
-      "state": "156605bf",
+      "state": "aac7626c",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4350,7 +4390,7 @@
       "tick": 1800,
       "time": 90,
       "nextId": 972,
-      "state": "c79c3b30",
+      "state": "375a4545",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4361,7 +4401,7 @@
       "tick": 1820,
       "time": 91,
       "nextId": 972,
-      "state": "3d244136",
+      "state": "dbc6acc3",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4372,7 +4412,7 @@
       "tick": 1840,
       "time": 92,
       "nextId": 972,
-      "state": "755afcec",
+      "state": "1e7455f3",
       "events": "e5ef9ed0",
       "rng": {
         "draws": 110,
@@ -4383,7 +4423,7 @@
       "tick": 1860,
       "time": 93,
       "nextId": 972,
-      "state": "9237b6a9",
+      "state": "21c5fbd4",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4394,7 +4434,7 @@
       "tick": 1880,
       "time": 94,
       "nextId": 972,
-      "state": "362327c1",
+      "state": "46a099b2",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4405,7 +4445,7 @@
       "tick": 1900,
       "time": 95,
       "nextId": 972,
-      "state": "aab5172c",
+      "state": "c67c8afd",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4416,7 +4456,7 @@
       "tick": 1920,
       "time": 96,
       "nextId": 972,
-      "state": "b83af81a",
+      "state": "2b6b3215",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4427,7 +4467,7 @@
       "tick": 1940,
       "time": 97,
       "nextId": 972,
-      "state": "1cd4f3f7",
+      "state": "2e0a0d46",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4438,8 +4478,8 @@
       "tick": 1960,
       "time": 98,
       "nextId": 972,
-      "state": "943a8ceb",
-      "events": "1da5e344",
+      "state": "611f2e9b",
+      "events": "33b18520",
       "rng": {
         "draws": 110,
         "digest": "fcb50df1"
@@ -4449,7 +4489,7 @@
       "tick": 1980,
       "time": 99,
       "nextId": 972,
-      "state": "d9923ba3",
+      "state": "d1e45e57",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4460,7 +4500,7 @@
       "tick": 2000,
       "time": 100,
       "nextId": 972,
-      "state": "db474fc7",
+      "state": "2663562b",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4471,7 +4511,7 @@
       "tick": 2018,
       "time": 100.9,
       "nextId": 972,
-      "state": "53d3a51c",
+      "state": "94004688",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -4496,6 +4536,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -4636,7 +4677,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -4654,14 +4696,14 @@
               "sourceId": 967
             },
             {
-              "duration": 900,
-              "id": "wellfed_buff_sta",
+              "duration": 600,
+              "id": "well_fed",
               "kind": "buff_sta",
               "name": "Well Fed",
-              "remaining": 897.05,
+              "remaining": 597.05,
               "school": "nature",
               "sourceId": 967,
-              "value": 12
+              "value": 5
             }
           ],
           "blockChance": 0.05,
@@ -4674,12 +4716,12 @@
           "dodgeChance": 0.06,
           "fallStartY": 2.459535,
           "fiveSecondRule": 199.9,
-          "hp": 220,
+          "hp": 150,
           "id": 967,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 220,
+          "maxHp": 150,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -4705,7 +4747,7 @@
             "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 35,
+            "sta": 28,
             "str": 23
           },
           "templateId": "warrior",
@@ -4721,7 +4763,7 @@
       "tick": 2018,
       "time": 100.9,
       "nextId": 973,
-      "state": "dc03e19d",
+      "state": "b79c92e7",
       "events": "ddd24784",
       "rng": {
         "draws": 110,
@@ -4746,6 +4788,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -4887,7 +4930,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -4905,14 +4949,14 @@
               "sourceId": 967
             },
             {
-              "duration": 900,
-              "id": "wellfed_buff_sta",
+              "duration": 600,
+              "id": "well_fed",
               "kind": "buff_sta",
               "name": "Well Fed",
-              "remaining": 897.05,
+              "remaining": 597.05,
               "school": "nature",
               "sourceId": 967,
-              "value": 12
+              "value": 5
             }
           ],
           "blockChance": 0.05,
@@ -4925,12 +4969,12 @@
           "dodgeChance": 0.06,
           "fallStartY": 2.459535,
           "fiveSecondRule": 199.9,
-          "hp": 220,
+          "hp": 150,
           "id": 967,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 220,
+          "maxHp": 150,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -4956,7 +5000,7 @@
             "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 35,
+            "sta": 28,
             "str": 23
           },
           "templateId": "warrior",
@@ -4972,7 +5016,7 @@
       "tick": 2018,
       "time": 100.9,
       "nextId": 973,
-      "state": "6fb9e459",
+      "state": "04e015cc",
       "events": "340f6919",
       "rng": {
         "draws": 110,
@@ -4997,6 +5041,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -5138,7 +5183,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -5156,14 +5202,14 @@
               "sourceId": 967
             },
             {
-              "duration": 900,
-              "id": "wellfed_buff_sta",
+              "duration": 600,
+              "id": "well_fed",
               "kind": "buff_sta",
               "name": "Well Fed",
-              "remaining": 897.05,
+              "remaining": 597.05,
               "school": "nature",
               "sourceId": 967,
-              "value": 12
+              "value": 5
             }
           ],
           "blockChance": 0.05,
@@ -5178,16 +5224,22 @@
             "hpPer2s": 109,
             "itemId": "evergarden_braised_greens",
             "kind": "food",
-            "remaining": 18
+            "remaining": 18,
+            "wellFed": {
+              "aura": "Well Fed",
+              "duration": 600,
+              "kind": "buff_sta",
+              "value": 5
+            }
           },
           "fallStartY": 2.459535,
           "fiveSecondRule": 199.9,
-          "hp": 220,
+          "hp": 150,
           "id": 967,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 220,
+          "maxHp": 150,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -5213,7 +5265,7 @@
             "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 35,
+            "sta": 28,
             "str": 23
           },
           "templateId": "warrior",
@@ -5229,7 +5281,7 @@
       "tick": 2020,
       "time": 101,
       "nextId": 973,
-      "state": "7bb86118",
+      "state": "a96f51eb",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5240,7 +5292,7 @@
       "tick": 2040,
       "time": 102,
       "nextId": 973,
-      "state": "c397b5a5",
+      "state": "45671d00",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5251,7 +5303,7 @@
       "tick": 2060,
       "time": 103,
       "nextId": 973,
-      "state": "08d2ba81",
+      "state": "f8379816",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5262,7 +5314,7 @@
       "tick": 2080,
       "time": 104,
       "nextId": 973,
-      "state": "6c3f8f34",
+      "state": "0f1eae99",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5273,7 +5325,7 @@
       "tick": 2100,
       "time": 105,
       "nextId": 973,
-      "state": "5e24d404",
+      "state": "185358a7",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5284,7 +5336,7 @@
       "tick": 2120,
       "time": 106,
       "nextId": 973,
-      "state": "3448c84b",
+      "state": "84eddc7a",
       "events": "e5ef9ed0",
       "rng": {
         "draws": 110,
@@ -5295,7 +5347,7 @@
       "tick": 2140,
       "time": 107,
       "nextId": 973,
-      "state": "1c489b4f",
+      "state": "6fcf4da0",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5306,7 +5358,7 @@
       "tick": 2160,
       "time": 108,
       "nextId": 973,
-      "state": "8e40f84f",
+      "state": "a28118a8",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5317,7 +5369,7 @@
       "tick": 2180,
       "time": 109,
       "nextId": 973,
-      "state": "615ee6e7",
+      "state": "f3174ffe",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5328,7 +5380,7 @@
       "tick": 2200,
       "time": 110,
       "nextId": 973,
-      "state": "253db65b",
+      "state": "a6fb66f0",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5339,7 +5391,7 @@
       "tick": 2220,
       "time": 111,
       "nextId": 973,
-      "state": "0f79652e",
+      "state": "5d198413",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5350,7 +5402,7 @@
       "tick": 2240,
       "time": 112,
       "nextId": 973,
-      "state": "ff284255",
+      "state": "dda8f5f6",
       "events": "e5ef9ed0",
       "rng": {
         "draws": 110,
@@ -5361,7 +5413,7 @@
       "tick": 2260,
       "time": 113,
       "nextId": 973,
-      "state": "2847f447",
+      "state": "e7e59096",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5372,7 +5424,7 @@
       "tick": 2280,
       "time": 114,
       "nextId": 973,
-      "state": "8e061fce",
+      "state": "20bc491d",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5383,7 +5435,7 @@
       "tick": 2300,
       "time": 115,
       "nextId": 973,
-      "state": "23267a2c",
+      "state": "f99dd8a5",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5394,7 +5446,7 @@
       "tick": 2320,
       "time": 116,
       "nextId": 973,
-      "state": "258e4e53",
+      "state": "4651d008",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5405,7 +5457,7 @@
       "tick": 2340,
       "time": 117,
       "nextId": 973,
-      "state": "dc3a3c71",
+      "state": "5d2a9974",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5416,8 +5468,8 @@
       "tick": 2360,
       "time": 118,
       "nextId": 973,
-      "state": "ac04ce49",
-      "events": "d1027447",
+      "state": "de85c063",
+      "events": "f81d2a13",
       "rng": {
         "draws": 110,
         "digest": "fcb50df1"
@@ -5427,7 +5479,7 @@
       "tick": 2380,
       "time": 119,
       "nextId": 973,
-      "state": "ca3e3855",
+      "state": "2bd9b543",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5438,7 +5490,7 @@
       "tick": 2400,
       "time": 120,
       "nextId": 973,
-      "state": "88a21d25",
+      "state": "bf12db9b",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5449,7 +5501,7 @@
       "tick": 2418,
       "time": 120.9,
       "nextId": 973,
-      "state": "3f1e19b9",
+      "state": "d90b7beb",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5474,6 +5526,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -5615,7 +5668,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -5633,14 +5687,14 @@
               "sourceId": 967
             },
             {
-              "duration": 900,
-              "id": "wellfed_buff_sta",
+              "duration": 600,
+              "id": "well_fed",
               "kind": "buff_sta",
               "name": "Well Fed",
-              "remaining": 897.05,
+              "remaining": 597.05,
               "school": "nature",
               "sourceId": 967,
-              "value": 12
+              "value": 5
             }
           ],
           "blockChance": 0.05,
@@ -5653,12 +5707,12 @@
           "dodgeChance": 0.06,
           "fallStartY": 2.459535,
           "fiveSecondRule": 219.9,
-          "hp": 220,
+          "hp": 150,
           "id": 967,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 220,
+          "maxHp": 150,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -5684,7 +5738,7 @@
             "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 35,
+            "sta": 28,
             "str": 23
           },
           "templateId": "warrior",
@@ -5700,7 +5754,7 @@
       "tick": 2420,
       "time": 121,
       "nextId": 973,
-      "state": "47499184",
+      "state": "ab26a5aa",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5711,7 +5765,7 @@
       "tick": 2439,
       "time": 121.95,
       "nextId": 973,
-      "state": "d275734a",
+      "state": "5f35172c",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5736,6 +5790,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -5877,7 +5932,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -5895,14 +5951,14 @@
               "sourceId": 967
             },
             {
-              "duration": 900,
-              "id": "wellfed_buff_sta",
+              "duration": 600,
+              "id": "well_fed",
               "kind": "buff_sta",
               "name": "Well Fed",
-              "remaining": 896,
+              "remaining": 596,
               "school": "nature",
               "sourceId": 967,
-              "value": 12
+              "value": 5
             }
           ],
           "blockChance": 0.05,
@@ -5915,12 +5971,12 @@
           "dodgeChance": 0.06,
           "fallStartY": 2.459535,
           "fiveSecondRule": 220.95,
-          "hp": 220,
+          "hp": 150,
           "id": 967,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 220,
+          "maxHp": 150,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -5946,7 +6002,7 @@
             "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 35,
+            "sta": 28,
             "str": 23
           },
           "templateId": "warrior",
@@ -5962,7 +6018,7 @@
       "tick": 2439,
       "time": 121.95,
       "nextId": 973,
-      "state": "d275734a",
+      "state": "5f35172c",
       "events": "741638a5",
       "rng": {
         "draws": 110,
@@ -5987,6 +6043,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -6128,7 +6185,8 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -6146,14 +6204,14 @@
               "sourceId": 967
             },
             {
-              "duration": 900,
-              "id": "wellfed_buff_sta",
+              "duration": 600,
+              "id": "well_fed",
               "kind": "buff_sta",
               "name": "Well Fed",
-              "remaining": 896,
+              "remaining": 596,
               "school": "nature",
               "sourceId": 967,
-              "value": 12
+              "value": 5
             }
           ],
           "blockChance": 0.05,
@@ -6166,12 +6224,12 @@
           "dodgeChance": 0.06,
           "fallStartY": 2.459535,
           "fiveSecondRule": 220.95,
-          "hp": 220,
+          "hp": 150,
           "id": 967,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
-          "maxHp": 220,
+          "maxHp": 150,
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
@@ -6197,7 +6255,7 @@
             "armor": 144,
             "int": 10,
             "spi": 11,
-            "sta": 35,
+            "sta": 28,
             "str": 23
           },
           "templateId": "warrior",

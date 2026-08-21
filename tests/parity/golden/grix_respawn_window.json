@@ -13,7 +13,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 967,
+      "nextId": 971,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -27,9 +27,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 969,
-      "state": "ebf2a70b",
-      "events": "0b0ecc41",
+      "nextId": 973,
+      "state": "7d5ee7bc",
+      "events": "6678aad8",
       "rng": {
         "draws": 8,
         "digest": "0abbf3ef"
@@ -82,7 +82,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 967,
+          "entityId": 971,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -132,7 +132,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 967
+              "sourceId": 971
             }
           ],
           "blockChance": 0.05,
@@ -144,7 +144,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 1000000,
-          "id": 967,
+          "id": 971,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -187,7 +187,7 @@
         {
           "aiState": "dead",
           "bossDamagers": [
-            967
+            971
           ],
           "comboUntil": -1,
           "corpseTimer": 60,
@@ -198,7 +198,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 968,
+          "id": 972,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -229,7 +229,7 @@
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
-            967
+            971
           ],
           "lootable": true,
           "maxHp": 1362,
@@ -250,7 +250,7 @@
           "stats": {
             "armor": 144
           },
-          "tappedById": 967,
+          "tappedById": 971,
           "templateId": "grix_the_tunnelking",
           "weapon": {
             "max": 58,
@@ -263,9 +263,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 969,
-      "state": "3413e624",
-      "events": "b1195e3d",
+      "nextId": 973,
+      "state": "95be7a07",
+      "events": "3fd9e75e",
       "rng": {
         "draws": 17,
         "digest": "1f988a97"
@@ -318,7 +318,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 967,
+          "entityId": 971,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -368,7 +368,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 967
+              "sourceId": 971
             }
           ],
           "blockChance": 0.05,
@@ -380,7 +380,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 1000000,
-          "id": 967,
+          "id": 971,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -423,7 +423,7 @@
         {
           "aiState": "dead",
           "bossDamagers": [
-            967
+            971
           ],
           "comboUntil": -1,
           "corpseTimer": 60,
@@ -434,7 +434,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 968,
+          "id": 972,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -469,7 +469,7 @@
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
-            967
+            971
           ],
           "lootable": true,
           "maxHp": 1362,
@@ -490,7 +490,7 @@
           "stats": {
             "armor": 144
           },
-          "tappedById": 967,
+          "tappedById": 971,
           "templateId": "grix_the_tunnelking",
           "wanderTimer": 7.012083,
           "weapon": {
@@ -504,8 +504,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 969,
-      "state": "3413e624",
+      "nextId": 973,
+      "state": "95be7a07",
       "events": "741638a5",
       "rng": {
         "draws": 17,
@@ -559,7 +559,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 967,
+          "entityId": 971,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -609,7 +609,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 967
+              "sourceId": 971
             }
           ],
           "blockChance": 0.05,
@@ -621,7 +621,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 1000000,
-          "id": 967,
+          "id": 971,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -664,7 +664,7 @@
         {
           "aiState": "dead",
           "bossDamagers": [
-            967
+            971
           ],
           "comboUntil": -1,
           "corpseTimer": 60,
@@ -675,7 +675,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 968,
+          "id": 972,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -710,7 +710,7 @@
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
-            967
+            971
           ],
           "lootable": true,
           "maxHp": 1362,
@@ -731,7 +731,7 @@
           "stats": {
             "armor": 144
           },
-          "tappedById": 967,
+          "tappedById": 971,
           "templateId": "grix_the_tunnelking",
           "wanderTimer": 7.012083,
           "weapon": {
