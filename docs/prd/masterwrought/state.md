@@ -6664,3 +6664,85 @@ committed goldens and then RESTORED (nothing re-recorded in the tree):
   proof), total draws 110 both sides, final drawDigest equal.
 - Everything else moving in the re-record is the known 11b +4 entity-id
   shift and the derived state digests, per the 11b QA's characterization.
+
+### Review round (four fresh domain reviewers, COVERAGE prompts; every finding dispositioned, none dropped)
+Dispatched per the matrix over the immutable range 4f9097858c..HEAD:
+architecture-reviewer, cross-platform-sync, frontend-seam-reviewer,
+content-obligations-reviewer; qa-checklist LAST (verdict below). Three fix
+commits landed: 7984e751c3 (frontend + content), 743f1540a0 (parity),
+828a9a5b64 (architecture). Skipped by the phase file and confirmed
+correct: privacy-security-review, migration-safety,
+database-performance-reviewer (no server, no persisted shape, no SQL; Well
+Fed is transient across save by design).
+
+- ARCHITECTURE: 2 blocking, 3 should-fix, 4 notes. Determinism CLEAN WITH
+  PROOF: the reviewer diffed the pre-phase auras.ts against the tip and
+  confirmed the mint moved field for field (same eight properties in the
+  same order, the guard preserved as an early return, clear-then-grant
+  intact), read Sim.applyAura end to end for rng access (none), and
+  verified both new modules import no Rng, clock or DOM; it also scanned
+  the whole 60k-line parity failure log and found NOT ONE rng.digest or
+  draws value differing in any scenario, independently reproducing this
+  ledger's byte-identity claim. Both BLOCKINGs are the recorded parks
+  dispositioned SETTLED-BY-SPEC, not new information: the wiki regen is
+  the named red the phase file forbids running early ("running a generator
+  before this phase is final means running it twice"), and the 69 golden
+  compares are 11d's re-record whose own instruction this ledger already
+  carries. Should-fixes APPLIED: the src/sim/CLAUDE.md module-table row
+  for wellfed.ts (its own every-SimContext-importer rule; the omission was
+  inherited from the absorb, but 11c is what made the module live), the
+  writer sweep's COMPUTED-SLOT blindness (see below), and the world_api
+  facet doc (already fixed at 24f532604b). Note ADOPTED as a pin: the
+  builder names the meal by def.id where the old inline code used the
+  caller's lookup key, equivalent only while no ITEMS entry is keyed under
+  an alias, so the premise is now pinned over the whole catalog. Note
+  RECORDED, not changed: eating a tier-1 dish after an apex plate
+  downgrades the buff, the deliberate classic last-eaten-wins rule.
+- PARITY: 0 critical, 3 should-fix, 1 nit. THE CATCH WORTH THE ROUND: the
+  farming_session scenario's `covers` prose still named wellfed_buff_sta,
+  and that array is RECORDED INTO the golden, so 11d's re-record would
+  have baked the retired id into the fresh artifact and cost a second
+  re-record; the retired-namespace sweep structurally cannot see it (prose
+  inside a string, not a quoted id prefix). Fixed before 11d records. The
+  other two should-fixes were the same facet doc and the same two locale
+  effect rows the other reviewers found. PASSED with tables: no IWorld
+  member added or changed (so no parity-pin update was owed), the
+  Consuming payload never crosses the wire (server ships eat:{remaining},
+  the client decodes exactly that), the aura itself rides the untouched
+  wireAura so id/name/kind/value/school reach the online buff bar exactly
+  as offline, no SimEvent or command added, the RL obs surface unchanged
+  (obs.ts reads aura KIND only), and tryNearbyInteraction has exactly ONE
+  call site so the reorder applies identically on every input path.
+- FRONTEND: 0 blocking, 2 should-fix, 4 notes. Every seam gate green
+  (architecture + painter_host 65, hud_perf_budget 119, the i18n trio 64,
+  the tooltip suites 103, auras/party/mobile-station 160, hud_update_drive
+  + language_fanout + focus_restore). Both should-fixes APPLIED: the
+  zh_CN and ko_KR guide effect rows were a ONE-SIDED sweep (zh_TW's
+  byte-parallel row was swept in the same commit, which is what made them
+  misses rather than decisions), and the routeBody reword staleness, which
+  is DISPOSITIONED settled-by-ruling (11c-VOCAB makes the by-key
+  release-fill flag the deliverable, and this ledger carries it).
+  Notes: the feast view's stat-map import moved to the pure leaf and the
+  now-importerless re-export was dropped (leaf header trued); the aura
+  resolver differs from the deleted twin only in chain order with no live
+  difference, and the surviving choice is the one the buff bar itself
+  uses. Confirmed zero DOM writes, zero new drivers, no CSS, no tier knob.
+- CONTENT: 0 blocking. Verified the balance derivation is computed LIVE and
+  not pasted on both sides (the apex band off venomfire minus boar, the
+  dish rungs off the boar anchor), referential integrity clean with tsc as
+  the load-bearing check (the lowercase field was REMOVED, so any surviving
+  typed read is a compile error) and the two other .mjs item-def generators
+  never spelled the field, and that no deed / reliquary / art / M16
+  obligation arises (no item id added, removed or renamed). Its deeds (7)
+  and reliquary (3) reds matched the 11b parked rows exactly.
+  Two INFOs recorded rather than acted on: harvest_feast is an eighth,
+  INDIRECT well-fed carrier whose wiki craft row ships no effect cell
+  (pre-existing Phase 12 shape, and the in-game feast tooltip does state
+  it live); and the re-tune drops the shared feast's party payout from
+  12/900 to 5/600 because it serves evergarden_braised_greens, a
+  CONSEQUENCE of 11c-D-2 as written (farming tops out one below the apex)
+  that the ruling did not name, recorded here so a later phase re-tunes it
+  deliberately rather than discovering it.
+  Its NIT (the "exactly one below the apex" adjacency was unpinned, since
+  the value and the apex are pinned independently) was APPLIED as a new
+  arm on the dominance sweep.
