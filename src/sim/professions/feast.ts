@@ -299,7 +299,10 @@ export function consumeFeastAction(
   feast.charges -= 1;
   // The bite: one serving of the capstone dish, the items.ts food-arm
   // construction verbatim (sit, slot, the sfx-only first bite, the log
-  // line). Completion mints ITEMS[dish].wellfed through updateRegen.
+  // line). PARKED at the 11b absorb: completion currently mints NOTHING for
+  // this dish, because the live completion mint (combat/auras.ts) reads the
+  // masterwrought `wellFed` spelling and the farming dishes carry `wellfed`;
+  // 11c unifies the two and re-wires the mint (state.md, the 11c carry list).
   p.sitting = true;
   p.eating = {
     itemId: dish.id,

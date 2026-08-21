@@ -420,8 +420,11 @@ export function bagTooltipHintKey(
   // raises (placeFeast), in the feast's own words: the click sets the table
   // out at your feet, it never eats it, so the generic use hint undersold
   // the action (the P12 QA deferral this key discharges). Sits ABOVE the
-  // generic use hint because the feast is placed and never eaten.
-  if (item.kind === 'junk' && item.feast) return 'itemUi.tooltip.clickSetOut';
+  // generic use hint because the feast is placed and never eaten. The guard
+  // is deliberately the SAME bare `item.feast` the click ladder's placeFeast
+  // arm uses (this module's own item shape carries feast? on every item), so
+  // the hover can never advertise a click the ladder routes elsewhere.
+  if (item.feast) return 'itemUi.tooltip.clickSetOut';
   // Patterns are usable but carry no `use` payload (the kind IS the payload),
   // so the kind joins this arm to reach the shared use hint; without it the
   // hover stayed silent about a click that learns a recipe.

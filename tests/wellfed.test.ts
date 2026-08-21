@@ -110,6 +110,48 @@ describe('well fed: completion timing', () => {
     expect(wellfedAuras(p)).toHaveLength(1);
   });
 
+  it('11b parked-state pin: the two well-fed spellings stay on their known carriers only', () => {
+    // The absorb leaves FoodItemDef carrying BOTH spellings on purpose
+    // (state.md, the 11c carry list): masterwrought's `wellFed` is the one
+    // the live completion mint reads, farming's `wellfed` is parked data
+    // until 11c unifies them. tsc cannot tell the spellings apart, so a NEW
+    // dish authored with the parked spelling would type-check and silently
+    // grant nothing. This pin makes that a loud failure: the parked-spelling
+    // carrier set is EXACTLY farming's four dishes, the live-spelling set is
+    // EXACTLY masterwrought's three plates, and no def carries both. 11c
+    // retires this pin together with the `wellfed` spelling itself.
+    const lower = Object.values(ITEMS)
+      .filter((def) => 'wellfed' in def && def.wellfed !== undefined)
+      .map((def) => def.id)
+      .sort();
+    expect(lower).toEqual([
+      'eastbrook_glazed_carrots',
+      'evergarden_braised_greens',
+      'fenbridge_rice_pudding',
+      'highwatch_barley_porridge',
+    ]);
+    const upper = Object.values(ITEMS)
+      .filter((def) => 'wellFed' in def && def.wellFed !== undefined)
+      .map((def) => def.id)
+      .sort();
+    expect(upper).toEqual(['sageleaf_chowder', 'stonepot_stew', 'warspice_skewers']);
+    const both = Object.values(ITEMS).filter(
+      (def) =>
+        'wellfed' in def &&
+        def.wellfed !== undefined &&
+        'wellFed' in def &&
+        def.wellFed !== undefined,
+    );
+    expect(both, 'no def may carry both well-fed spellings').toEqual([]);
+    // The items.ts use-arm ordering claim (placeMobileStation before feast is
+    // behaviorally free because the arms key on different fields) is only
+    // true while no def carries both fields; pin that premise too.
+    const useAndFeast = Object.values(ITEMS).filter(
+      (def) => def.use !== undefined && 'feast' in def && def.feast !== undefined,
+    );
+    expect(useAndFeast, 'no def may carry both use and feast').toEqual([]);
+  });
+
   it('content rule: every wellfed carrier in the merged catalog is kind food', () => {
     // Since the 11b union port the TYPE already scopes wellfed to
     // FoodItemDef; the sweep stays as the content-level restatement of the

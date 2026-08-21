@@ -822,9 +822,13 @@ export function useItem(
     throwFirebottleAtNearestHut(ctx, p, meta);
     return;
   }
-  // Buff dishes (def.wellfed) mint their Well Fed aura at COMPLETION of the
-  // sit-restore, not here: completion-time minting lives in src/sim/wellfed.ts,
-  // hooked from updateRegen (src/sim/combat/auras.ts).
+  // Buff dishes mint their Well Fed aura at COMPLETION of the sit-restore,
+  // not here. The live completion mint is masterwrought's inline
+  // clear-then-grant in updateRegen (src/sim/combat/auras.ts), and it reads
+  // the `wellFed` spelling only; farming's `wellfed` dishes and its
+  // src/sim/wellfed.ts module are PARKED UNWIRED at the 11b absorb, so those
+  // four dishes grant no buff at this tip. 11c unifies the spellings and the
+  // mint path (state.md, the 11c carry list).
   if (def.kind === 'food' || def.kind === 'drink') {
     if (p.inCombat) {
       ctx.error(meta.entityId, "You can't do that while in combat.");
