@@ -128,6 +128,7 @@
         "src/sim/**",
         "src/render/characters/manifest.ts",
         "src/ui/deed_image_ids.ts",
+        "src/ui/i18n.catalog/**",
         "scripts/wiki/**",
         "package.json"
       ],
