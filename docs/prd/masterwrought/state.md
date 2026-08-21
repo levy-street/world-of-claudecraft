@@ -7711,6 +7711,32 @@ row also gains its THIRD parent pin (the release's 12660 against a 12518 file).
     the provenance claim is. Going forward the unit 6 pattern is the rule: the
     prediction block lands one commit BEFORE the literals it predicts.
 
+### The fix round's own review (the rule that caught this phase twice)
+A FRESH pin auditor over the fix round found THREE BLOCKING defects in it, every
+one the same class this phase exists to catch: a guard added, believed, and never
+proved. Recorded because the pattern is the lesson, not the individual fixes.
+- The contentIdRows class was pinned by its NAME only. Degrading its key back to
+  the bare id left all twelve tests green and silently reopened the hole it was
+  added to close.
+- The two entry-document id pins were comment-gameable, and their own comments
+  claimed the opposite. Commenting the root out of BOTH entries passed 162 tests,
+  and since the sync that is a TypeError at HUD construction, not one dead window.
+- The census conditions added earlier in the round had no test at all, because
+  they lived inside runCensus(), which no test calls. Disabling the fanout
+  resolution, the indirect resolution, the pinned drift list or the subset guard
+  each left the suite green.
+Then a SECOND-ORDER instance in the fixes for those: the tiny inline trees the
+new compareCensus arms use sit far below the real FLOORS, so `failed` was true
+for a reason unrelated to the arm under test and one new arm was passing partly
+on that. Every fixture now zeroes the floors.
+Both audit tools' verdicts are now pure exported functions, because in both the
+helpers were pinned while the WIRING was not: each tool could compute its new
+class and then discard it with a PASS and exit 0. One latent bug fell out of the
+same pass: the emit resolver's declaration guard read any `emit(<id> ?` as an
+optional parameter, so a ternary with a bare-identifier condition was discarded
+whole. The live site survives only because its condition is `withered > 0`;
+hoisting it to a named boolean would have blinded the census to farmReady.
+
 ### Forward carry, re-scoped
 - 11e still moves DEED_ORDER to 287 and total renown to 3275, with deed_i18n
   287 * 2 + 45 = 619, DEED_IMAGE_IDS and the wave suites following, and
