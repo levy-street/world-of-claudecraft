@@ -34,6 +34,19 @@ export interface MissingGolden {
 }
 
 export const GOLDEN_FLOOR: number;
+export function compositionVerdict(args: {
+  goldenCount: number;
+  missingCount: number;
+  rowFindingCount: number;
+  shifts: ReadonlyMap<number, number>;
+  floor?: number;
+}): {
+  failures: number;
+  floorFail: boolean;
+  shiftDisagreement: boolean;
+  distinctShifts: number[];
+  failed: boolean;
+};
 export function checkUniformIdShift(diffs: AddDiffs, ctx: CompositionCtx, label: string): void;
 export function missingFromMerged(
   mergedFiles: readonly string[],

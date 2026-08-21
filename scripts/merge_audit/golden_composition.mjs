@@ -125,6 +125,33 @@ function gitLsGoldens(ref) {
  *  Set ~10 percent under the 69 goldens observed when this was written. */
 export const GOLDEN_FLOOR = 62;
 
+/**
+ * The run's VERDICT as a pure function, so the wiring is observable. The helpers
+ * below were each pinned while main() was not exported and nothing asserted that
+ * their results reached the exit code: the Phase 11d QA pin audit showed the
+ * dropped-golden class could be computed and then discarded with a PASS verdict
+ * and exit 0. Everything that can fail a run is counted here, in one place.
+ *
+ * @param {{goldenCount: number, missingCount: number, rowFindingCount: number,
+ *          shifts: Map<number, number>, floor?: number}} args
+ */
+export function compositionVerdict({
+  goldenCount,
+  missingCount,
+  rowFindingCount,
+  shifts,
+  floor = GOLDEN_FLOOR,
+}) {
+  // The merge contributed ONE world-init id shift, so more than one distinct
+  // non-zero shift across the whole table is a disagreement, not a tally.
+  const distinctShifts = [...shifts.keys()].filter((d) => d !== 0);
+  const shiftDisagreement = distinctShifts.length > 1;
+  const floorFail = goldenCount < floor;
+  const failures =
+    rowFindingCount + missingCount + (shiftDisagreement ? 1 : 0) + (floorFail ? 1 : 0);
+  return { failures, floorFail, shiftDisagreement, distinctShifts, failed: failures > 0 };
+}
+
 /** The MISSING class as a pure set operation, so it is testable without git:
  *  every golden a parent carries that the merged tree does not, carrying WHICH
  *  parents had it. Sorted by name so the report is stable. */
@@ -565,7 +592,6 @@ function main() {
     ['theirs', gitLsGoldens(REFS.theirs)],
   ]);
   const missing = missingFromMerged(files, parentGoldens);
-  failures += missing.length;
   for (const f of files) {
     const rel = `${GOLDEN_DIR}/${f}`;
     const name = f.replace(/\.json$/, '');
@@ -667,11 +693,17 @@ function main() {
     for (const [d, n] of r.ctx?.idShifts ?? []) tableShifts.set(d, (tableShifts.get(d) ?? 0) + n);
     for (const [d, n] of r.diffs?.idDeltas ?? []) tableShifts.set(d, (tableShifts.get(d) ?? 0) + n);
   }
-  const shiftAgreement = [...tableShifts.keys()].filter((d) => d !== 0);
-  if (shiftAgreement.length > 1) failures += 1;
-
-  const floorFail = files.length < GOLDEN_FLOOR;
-  if (floorFail) failures += 1;
+  // ONE place decides the verdict, and it is a pure function so the wiring is
+  // observable: `failures` above is only the per-row finding count.
+  const verdict = compositionVerdict({
+    goldenCount: files.length,
+    missingCount: missing.length,
+    rowFindingCount: failures,
+    shifts: tableShifts,
+  });
+  const shiftAgreement = verdict.distinctShifts;
+  const floorFail = verdict.floorFail;
+  failures = verdict.failures;
   console.log(
     `floor: ${files.length} >= ${GOLDEN_FLOOR} ${floorFail ? 'FAIL (an empty or truncated set cannot pass by composing nothing)' : 'ok'}`,
   );

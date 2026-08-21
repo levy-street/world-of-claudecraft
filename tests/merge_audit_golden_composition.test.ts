@@ -11,6 +11,7 @@ import {
   checkAdd,
   checkShared,
   composeLeaf,
+  compositionVerdict,
   GOLDEN_FLOOR,
   isIdPath,
   missingFromMerged,
@@ -102,6 +103,62 @@ describe('checkShared', () => {
     const m = golden(undefined, [frame(0, { nextId: 972, entities: [{ id: 967, hp: 100 }] })]);
     const { ctx } = checkShared('fx', b, o, t, m);
     expect(ctx.findings.length).toBeGreaterThan(0);
+  });
+});
+
+describe('compositionVerdict: the wiring, not just the helpers', () => {
+  // Every helper in this file was pinned while main() was not exported, so
+  // nothing asserted their results reached the exit code: the Phase 11d QA pin
+  // audit showed the dropped-golden class could be computed and then DISCARDED
+  // with a PASS verdict and exit 0. These arms pin each term separately.
+  const base = {
+    goldenCount: 69,
+    missingCount: 0,
+    rowFindingCount: 0,
+    shifts: new Map([[4, 100]]),
+  };
+
+  it('passes a clean run', () => {
+    const v = compositionVerdict(base);
+    expect(v).toMatchObject({ failures: 0, failed: false, floorFail: false });
+  });
+
+  it('a MISSING golden reaches the verdict', () => {
+    expect(compositionVerdict({ ...base, missingCount: 1 }).failed).toBe(true);
+  });
+
+  it('a per-row finding reaches the verdict', () => {
+    expect(compositionVerdict({ ...base, rowFindingCount: 3 }).failures).toBe(3);
+  });
+
+  it('a set under the floor reaches the verdict', () => {
+    const v = compositionVerdict({ ...base, goldenCount: 10 });
+    expect(v.floorFail).toBe(true);
+    expect(v.failed).toBe(true);
+  });
+
+  it('two distinct id shifts across the table reach the verdict', () => {
+    const v = compositionVerdict({
+      ...base,
+      shifts: new Map([
+        [4, 100],
+        [41, 1],
+      ]),
+    });
+    expect(v.shiftDisagreement).toBe(true);
+    expect(v.failed).toBe(true);
+  });
+
+  it('a zero shift is not a second shift (an unmoved table is not a disagreement)', () => {
+    const v = compositionVerdict({
+      ...base,
+      shifts: new Map([
+        [0, 5],
+        [4, 100],
+      ]),
+    });
+    expect(v.shiftDisagreement).toBe(false);
+    expect(v.failed).toBe(false);
   });
 });
 
