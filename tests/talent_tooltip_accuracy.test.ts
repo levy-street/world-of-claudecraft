@@ -129,8 +129,11 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
       choice: improvedAbyssalGag,
       field: 'description',
     });
-    expect(rendered).toBe(improvedAbyssalGag.description);
+    expect(rendered).toContain(improvedAbyssalGag.description);
     expect(rendered).toContain('two levels early');
+    expect(rendered).toContain('35 Mana');
+    expect(rendered).toContain('30 yd range');
+    expect(rendered).toContain('24 sec cooldown');
   });
 
   it('ships no unresolved ability placeholders in canonical source prose', () => {

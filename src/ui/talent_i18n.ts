@@ -10843,8 +10843,11 @@ function authoredChoiceDescription(choice: TalentRowOption): string {
   // synthesizing from the granted ability's own description below drops the one fact
   // that explains the pick (two levels early) and reads as a no-op to anyone who
   // already sees Abyssal Gag on their action bar. The authored source carries that
-  // framing plus the real numbers, so use it verbatim instead.
-  if (grantId === 'spell_lock') return choice.description;
+  // framing, then keep the generic ability metadata so the pick still carries
+  // cost, range, and cooldown planning details.
+  if (grantId === 'spell_lock') {
+    return [choice.description, grantAbilityMetadata(grantId)].filter(Boolean).join(' ');
+  }
   const lang = getLanguage();
   const riderDescriptions = (choice.effect.ability ?? [])
     .filter((mod) => mod.ability === grantId)
