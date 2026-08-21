@@ -28,6 +28,13 @@ interface FakeSource {
 const sources: FakeSource[] = [];
 let nowT = 0;
 let gainAutomationCalls: string[] = [];
+interface GainScheduleCall {
+  kind: 'setValueAtTime' | 'setTargetAtTime';
+  value: number;
+  time: number;
+  constant?: number;
+}
+let gainScheduleCalls: GainScheduleCall[] = [];
 let linearRampCalls: Array<{ value: number; time: number }> = [];
 let playbackRateCalls: Array<{ value: number; time: number; constant: number }> = [];
 const WOOD_BUFFER = { duration: 0.37 };
@@ -41,21 +48,29 @@ function lastSource(): FakeSource {
 function installAudioStub(): void {
   sources.length = 0;
   gainAutomationCalls = [];
+  gainScheduleCalls = [];
   linearRampCalls = [];
   playbackRateCalls = [];
   nowT += 1000; // monotonic across tests so the singleton's cooldown map never blocks
   const param = () => ({
     value: 0,
-    setValueAtTime(v: number) {
+    setValueAtTime(v: number, time?: number) {
       this.value = v;
       gainAutomationCalls.push('setValueAtTime');
+      gainScheduleCalls.push({ kind: 'setValueAtTime', value: v, time: time ?? 0 });
     },
     linearRampToValueAtTime(value: number, time: number) {
       linearRampCalls.push({ value, time });
     },
-    setTargetAtTime(v: number) {
+    setTargetAtTime(v: number, time?: number, constant?: number) {
       this.value = v;
       gainAutomationCalls.push('setTargetAtTime');
+      gainScheduleCalls.push({
+        kind: 'setTargetAtTime',
+        value: v,
+        time: time ?? 0,
+        constant: constant ?? 0,
+      });
     },
   });
   class FakeCtx {
@@ -147,6 +162,93 @@ beforeEach(() => {
   buffers.set('impact_shadow', { duration: 0.7 });
   buffers.set('impact_bone', { duration: 0.5 });
   buffers.set('proj_shadow', { duration: 0.65 });
+});
+
+// The summon-to-idle handoff. The bug these pin: `playUi` (the LOCAL player's
+// path) set a flat gain and ignored the envelope options entirely, so the
+// summon take never faded and simply stopped dead at its last sample, while the
+// parked idle had already been rising underneath it at full level. What the
+// player heard was two engines and then a step, not a crossfade.
+describe('mount summon to idle crossfade', () => {
+  const SUMMON_KEY = 'mount_summon_rallycart_rxt';
+  const SUMMON_DURATION = 2.3;
+  // Mirrors SUMMON_CROSSFADE_SEC in src/game/sfx.ts. Pinned as a literal so a
+  // change to that constant has to be a deliberate edit here too: both halves
+  // of the crossfade are derived from it, and they only line up while they
+  // share one value.
+  const CROSSFADE = 0.45;
+
+  const seedSummon = (duration = SUMMON_DURATION) => {
+    const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
+    buffers.set(SUMMON_KEY, { duration });
+  };
+
+  it('fades the summon tail instead of truncating the take', () => {
+    seedSummon();
+    gainScheduleCalls = [];
+    sfx.mountSummon(0, 0, 0, 'rallycart_rxt', true, 1);
+
+    const fade = gainScheduleCalls.find((c) => c.kind === 'setTargetAtTime' && c.value < 0.01);
+    expect(fade, 'the summon must schedule a fade to silence').toBeDefined();
+    // Starts one crossfade before the buffer ends, not at time zero: a
+    // `release` would have started decaying immediately and stopped the take
+    // 0.45s in, which is the percussive behaviour and wrong for a 2.3s cue.
+    expect(fade?.time).toBeCloseTo(nowT + SUMMON_DURATION - CROSSFADE, 5);
+    expect(fade?.constant).toBeCloseTo(CROSSFADE / 3, 5);
+
+    // Nothing may shorten the take.
+    const summonSource = sources.at(-1);
+    expect(summonSource?.started).toBe(true);
+    expect(summonSource?.stopAt, 'a tail fade never stops the source early').toBeNull();
+  });
+
+  it('opens the idle gate exactly as the summon starts fading', () => {
+    seedSummon();
+    sfx.mountSummon(0, 0, 0, 'rallycart_rxt', true, 7);
+
+    const gate = (
+      sfx as unknown as { mountEngineIdleGate: Map<number, number> }
+    ).mountEngineIdleGate.get(7);
+    // The two halves of one crossfade: the idle begins rising at the same
+    // instant the summon begins falling, so the curves cross once.
+    expect(gate).toBeCloseTo(nowT + SUMMON_DURATION - CROSSFADE, 5);
+  });
+
+  it('measures the take the same way for the fade and the gate', () => {
+    // The two halves used to disagree: the fade divided the buffer duration by
+    // the playback rate and the gate did not, so the idle could start rising
+    // before the summon had begun fading. They must land on the same instant.
+    seedSummon();
+    gainScheduleCalls = [];
+    sfx.mountSummon(0, 0, 0, 'rallycart_rxt', true, 11);
+
+    const fade = gainScheduleCalls.find((c) => c.kind === 'setTargetAtTime' && c.value < 0.01);
+    const gate = (
+      sfx as unknown as { mountEngineIdleGate: Map<number, number> }
+    ).mountEngineIdleGate.get(11);
+    expect(fade?.time).toBeCloseTo(gate as number, 5);
+  });
+
+  it('plays the summon at its authored rate, with no jitter', () => {
+    // Jitter would move the crossfade point randomly on every cast, because
+    // the handoff is scheduled off the take's real (rate-scaled) length.
+    seedSummon();
+    vi.spyOn(Math, 'random').mockReturnValue(0.99); // a maximal jitter roll
+    sfx.mountSummon(0, 0, 0, 'rallycart_rxt', true, 12);
+    expect(sources.at(-1)?.playbackRate.value).toBeCloseTo(1, 6);
+  });
+
+  it('leaves a take shorter than the crossfade at flat gain', () => {
+    // Guard against scheduling a fade that would start before the sound does.
+    seedSummon(0.2);
+    gainScheduleCalls = [];
+    sfx.mountSummon(0, 0, 0, 'rallycart_rxt', true, 2);
+
+    expect(gainScheduleCalls.some((c) => c.kind === 'setTargetAtTime' && c.value < 0.01)).toBe(
+      false,
+    );
+    expect(sources.at(-1)?.stopAt).toBeNull();
+  });
 });
 
 describe('footstep audio', () => {

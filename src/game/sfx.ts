@@ -96,12 +96,18 @@ const MOUNT_ENGINE_START_FALLBACK_SEC = 0.9;
 // long costs a beat of silence before the engine settles, too short lets the
 // idle cut into the summon, which is the artefact this gate exists to stop.
 const MOUNT_SUMMON_FALLBACK_SEC = 2.5;
-/** Fade applied to the summon take's tail so ending the buffer is not a step. */
-const SUMMON_RELEASE_SEC = 0.2;
-/** How far before the summon take ends the parked idle starts rising, so the
- *  two overlap instead of butting against each other. Comfortably longer than
- *  the release above, so the idle is already up as the summon fades. */
-const SUMMON_IDLE_LEAD_SEC = 0.45;
+/** The summon-to-idle crossfade, used for BOTH halves so they cannot drift:
+ *  the summon take fades out over its last `SUMMON_CROSSFADE_SEC`, and the
+ *  parked idle starts rising exactly that far before the take ends.
+ *
+ *  It has to be one constant. When these were two numbers the summon's fade was
+ *  not happening at all on the self path (see mountSummon), so the "overlap"
+ *  was the idle rising underneath a take still at full level, which is two
+ *  engines rather than a handoff, and shortening the lead only made the pile-up
+ *  briefer instead of removing it. Sized against the idle's own 0.25s ramp time
+ *  constant: at 0.45s the idle is ~84% up as the summon reaches ~5%, so the two
+ *  curves cross once, in the middle, with no dip and no doubling. */
+const SUMMON_CROSSFADE_SEC = 0.45;
 
 // Rift roller/portal loops (src/render/rift_ambience.ts): a moving hazard or
 // an open portal should read as a clear nearby presence, not a wallpaper bed
@@ -152,6 +158,13 @@ export interface PlayOpts {
   // pile up and comb-filter into a metallic ring. 0 (default) plays the clip flat.
   attack?: number; // fade-in seconds (default 0 = instant)
   release?: number; // fade-out seconds; the clip is stopped once it ends
+  /** Fade the clip's OWN TAIL, keeping its full length. The opposite of
+   *  `release` above, which truncates: `release: 0.2` on a 2.3s take stops it
+   *  0.2s in, correct for a footstep and wrong for anything meant to play out.
+   *  Use this when a long take simply must not end on a step, and when it has
+   *  to hand over to a loop: the fade is the crossfade's outgoing half, so
+   *  whatever rises underneath should be given the same number of seconds. */
+  tailRelease?: number;
   /** One live authored transition voice per key. */
   voiceKey?: string;
   /** Seconds to crossfade when replacing an existing `voiceKey` voice. */
@@ -685,6 +698,36 @@ class Sfx {
     return true;
   }
 
+  /** Fade a one-shot's own tail without shortening it: hold `peak` until
+   *  `tail` seconds before the buffer runs out, then decay to silence across
+   *  exactly that window. Returns false when the clip is too short to carry the
+   *  fade (nothing is scheduled, the caller's flat gain stands).
+   *
+   *  Separate from applyEnvelope on purpose. That one shapes a clip INTO a
+   *  short transient and stops it early, which is what a retriggered footstep
+   *  wants; this one leaves the take's length alone and only softens its last
+   *  moments, which is what a long authored take handing over to a loop wants.
+   *  Both paths call this, so a cue asking for a tail fade gets the same curve
+   *  whether it is the local player's (playUi) or another player's (playAt). */
+  private scheduleTailFade(
+    src: AudioBufferSourceNode,
+    g: GainNode,
+    peak: number,
+    now: number,
+    tail: number,
+  ): boolean {
+    if (!(tail > 0) || !src.buffer) return false;
+    const clip = src.buffer.duration / (src.playbackRate.value || 1);
+    if (clip <= tail) return false;
+    const from = now + clip - tail;
+    g.gain.setValueAtTime(peak, from);
+    // Same curve shape the percussive release uses (time constant = span/3, so
+    // it is ~5% of peak by the end of the window), for one consistent house
+    // fade rather than a second one that sounds subtly different.
+    g.gain.setTargetAtTime(0.0001, from, tail / 3);
+    return true;
+  }
+
   /** Set the gain envelope on a one-shot source and start it. With no
    *  attack/release this is a flat play at `peak`; with a `release` the source is
    *  shaped into a short transient and stopped early so rapid retriggers of the
@@ -698,9 +741,13 @@ class Sfx {
   ): void {
     const attack = Math.max(0, opts?.attack ?? 0);
     const release = Math.max(0, opts?.release ?? 0);
+    const tailRelease = Math.max(0, opts?.tailRelease ?? 0);
     if (attack === 0 && release === 0) {
       g.gain.value = peak;
       src.start();
+      // Scheduled AFTER start so the buffer's duration is the one actually
+      // playing; a tail fade never truncates, so there is no stop() to arrange.
+      this.scheduleTailFade(src, g, peak, now, tailRelease);
       return;
     }
     const a = Math.max(0.001, attack);
@@ -763,7 +810,8 @@ class Sfx {
       this.authoredPlaybackRate(key) *
       (jitter ? 1 + (Math.random() * 2 - 1) * 0.05 : 1);
     const g = ctx.createGain();
-    g.gain.value = (opts?.gain ?? 1) * (this.entry(key)?.gain ?? 1);
+    const peak = (opts?.gain ?? 1) * (this.entry(key)?.gain ?? 1);
+    g.gain.value = peak;
     src.connect(g).connect(master);
     this.active++;
     src.onended = () => {
@@ -772,6 +820,14 @@ class Sfx {
       g.disconnect();
     };
     src.start();
+    // playUi used to play every take at a flat gain and drop `attack`/`release`
+    // on the floor, so a long cue asking not to end on a step got no fade at
+    // all on the local player's own path (mountSummon's, and the reason its
+    // handoff to the parked idle sounded like two engines rather than one
+    // crossfade). Only the non-truncating tail fade is honored here: `release`
+    // shortens a clip, which is a percussive-retrigger behavior that the
+    // positional path owns and no UI cue has ever asked for.
+    this.scheduleTailFade(src, g, peak, now, Math.max(0, opts?.tailRelease ?? 0));
   }
 
   // --- Looping sources (ambience + sustained casts) ------------------------
@@ -1037,11 +1093,23 @@ class Sfx {
   ): void {
     const key = `mount_summon_${mountKey}`;
     if (!(key in SFX_CLIPS)) return;
-    // A release fade, because the take does NOT decay to silence: its last
-    // 120ms still peaks at about -15 dBFS, so simply reaching the end of the
-    // buffer is a discontinuity, and that is an audible click.
-    if (self) this.playUi(key, { gain: 0.9, cooldown: 0.1, release: SUMMON_RELEASE_SEC });
-    else this.playAt(key, x, y, z, { gain: 0.85, cooldown: 0.1, release: SUMMON_RELEASE_SEC });
+    // A TAIL fade, because the take does NOT decay to silence: its last 120ms
+    // still peaks at about -15 dBFS, so simply reaching the end of the buffer
+    // is a discontinuity, and that is an audible click. It must be
+    // `tailRelease` and not `release`: the latter truncates, and on a 2.3s
+    // summon it stopped the take 0.2s in, which is what the positional path
+    // was doing to every other player's summon.
+    // `jitter: false` matters for more than pitch. playUi's default +/-5% rate
+    // jitter changes the take's REAL length by up to 0.12s either way, and the
+    // idle's handoff is scheduled off that length, so a jittered summon moved
+    // the crossfade point randomly on every cast: on a slow roll the idle began
+    // rising before the summon had started fading at all, which is the "idle
+    // comes in too early" this cue kept being reported for. Jitter exists to
+    // stop rapid retriggers of one sample comb-filtering (footsteps); a summon
+    // fires once, so it buys nothing here and costs the handoff its timing.
+    const opts = { cooldown: 0.1, jitter: false, tailRelease: SUMMON_CROSSFADE_SEC };
+    if (self) this.playUi(key, { ...opts, gain: 0.9 });
+    else this.playAt(key, x, y, z, { ...opts, gain: 0.85 });
     // Hold the parked idle until the summon take has finished: the engine
     // catching and settling IS the summon sound, so an idle loop underneath it
     // reads as two engines. Preloaded on the channel's start edge, so the
@@ -1051,14 +1119,23 @@ class Sfx {
     const buf = this.buffers.get(assetCacheKey(key, 0));
     this.mountEngineIdleGate.set(
       entityId,
-      // Lead the idle in UNDER the summon's tail rather than starting it at the
-      // seam. The gate used to expire exactly when the buffer ended, so the
-      // idle began from silence at the same instant the summon stopped: two
-      // discontinuities stacked on one sample boundary. Overlapping them makes
-      // it a crossfade, which is what the handoff always sounded like it should
-      // be. Floored at zero so a very short take cannot gate into the past.
+      // Start the idle rising exactly as the summon begins its tail fade, so
+      // the two are the halves of one crossfade. Overlapping them without that
+      // fade is what made this read as two engines: the idle climbed while the
+      // summon was still at full level, and the summon then stopped on a step.
+      //
+      // Measured the way the FADE measures it: a buffer's duration is its
+      // length at rate 1, and what matters is how long the take will actually
+      // be audible, so both sides divide by the same playback rate. They used
+      // to disagree (the fade divided, this did not), which put the handoff in
+      // a different place than intended on any key with an authored rate.
+      // Floored at zero so a very short take cannot gate into the past.
       ctx.currentTime +
-        Math.max(0, (buf?.duration ?? MOUNT_SUMMON_FALLBACK_SEC) - SUMMON_IDLE_LEAD_SEC),
+        Math.max(
+          0,
+          (buf ? buf.duration / this.authoredPlaybackRate(key) : MOUNT_SUMMON_FALLBACK_SEC) -
+            SUMMON_CROSSFADE_SEC,
+        ),
     );
   }
 
