@@ -532,7 +532,14 @@ export const CASTER_HUB_RECIPES: ProfessionRecipeRecord[] = [
       { itemId: 'rough_hide', count: 2 },
       { itemId: 'tanning_agent', count: 1 },
     ],
-    skillReq: 75,
+    // skillReq bucketed to tier 3 (tierForSkill) while the output is
+    // quality:'rare' (tier 2), one tier above the rare ceiling every craft
+    // carries before an archetype is chosen (archetypeCeilingFor). That
+    // mismatch hard-zeroed skill gain from this recipe for every
+    // pre-archetype leatherworker, forever (#3520). 50 matches the rung the
+    // rest of the rare-quality leatherworking ladder already uses
+    // (mirewarden_jerkin/leggings/treads).
+    skillReq: 50,
     itemLevelBudget: 20,
     level: 20,
     stationType: 'tannery',
