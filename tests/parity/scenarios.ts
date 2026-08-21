@@ -6080,6 +6080,20 @@ function riftBossFloor(): Scenario {
 // passive idle rolls from the historical shared stream to deterministic per-mob
 // lanes. Track one mob on each side of the boundary so the golden records both
 // the intended state divergence and the resulting shared RNG digest.
+// ID-FRAGILE BY CONSTRUCTION, and it costs a review round every time nobody
+// remembers: this scenario's facing / pos.x / pos.z / wanderTimer leaves are a
+// pure function of the mob's ABSOLUTE entity id, because the culling path routes
+// passive rolls through the private id-seeded lane (src/sim/mob/idle_rng.ts seeds
+// on mob.id). So ANY change that adds a world-init entity ahead of these mobs (a
+// merged packet, a release sync adding an NPC) shifts the id and moves four
+// physics-looking leaves at once, which reads exactly like a determinism drift.
+// The scenario also draws ZERO shared rng, so the draw digest cannot arbitrate.
+// The recipe that settles it in two minutes, used at the Phase 11d farming
+// absorb: build this scenario on the new tree, reassign the near mob's id back to
+// its old value before driving, re-drive the same tick count, and compare the four
+// leaves against the OLD golden. If they reproduce to 1e-6, the movement is the
+// id shift and nothing else. (At 11d, forcing 972 back to 968 reproduced base's
+// leaves exactly.) A real drift will not reproduce under that substitution.
 function idleMobDistanceCulling(): Scenario {
   const seed = 20061;
   return {

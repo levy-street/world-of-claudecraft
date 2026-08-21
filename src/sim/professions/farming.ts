@@ -269,7 +269,15 @@ export function farmingHarvestGainAt(proficiency: number, cropTier: number): num
  *  of a value ctx.rng already drew at plant time, NOT a new source of
  *  randomness, which is the whole reason a harvest can draw zero. It never
  *  touches ctx.rng, Math.random, or any clock, so the same yieldSeed produces
- *  the same harvest on every host, at every time, forever. */
+ *  the same harvest on every host, at every time, forever.
+ *
+ *  NOT a drop-in for src/sim/rng.ts's Rng, and the difference is silent: Rng's
+ *  constructor remaps seed 0 to 0x9e3779b9, while this keeps 0 as 0. Consolidating
+ *  the two generators would therefore change the harvest of any plot whose stored
+ *  yieldSeed is exactly 0, with no test naming the seed and nothing else to say
+ *  so. If they are ever unified, the seed-0 case has to move deliberately or be
+ *  preserved. (Recorded by the Phase 11d QA architecture audit; the tree's other
+ *  private sub-stream, src/sim/mob/idle_rng.ts, uses Rng and inherits the remap.) */
 function mulberry32(seed: number): () => number {
   let a = seed >>> 0;
   return () => {

@@ -47,8 +47,16 @@ function plain(trace: Trace): unknown {
 // per-file cost (not by scenario count). Two subtleties found while balancing:
 // recording warms subsystem code paths for later same-subsystem scenarios, so
 // `fiesta` stays in the same shard as the heavy `fiesta_powerups` (cold, that
-// scenario alone records ~4x slower); and `nythraxis_full_pull` is the one
-// irreducibly heavy scenario, so it rides alone. The last bound is
+// scenario alone records ~4x slower); and one irreducibly heavy scenario rides
+// alone in the single-entry slice [36, 37). NOTE, found by the Phase 11d QA
+// architecture audit: that slice was authored for `nythraxis_full_pull`, but
+// scenarios inserted since have shifted the indices, and index 36 is
+// `mob_locomotion` today while `nythraxis_full_pull` sits at 40 inside the final
+// shard. Nothing is dropped or double-run by that (the tiling is re-validated at
+// import and the bounds still cover 0..SCENARIOS.length), so this is a wall-time
+// balance that no longer does what its comment says, not a correctness bug. Any
+// re-balance should re-derive the isolated index from the measured costs rather
+// than trusting the name here. The last bound is
 // SCENARIOS.length, so a newly appended scenario automatically lands in the
 // final shard. Every shard file re-validates the tiling at import time, so a
 // bad edit here fails the whole suite instead of silently dropping scenarios
