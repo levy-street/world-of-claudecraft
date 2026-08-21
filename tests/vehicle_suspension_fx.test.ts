@@ -191,6 +191,49 @@ describe('vehicle suspension scene pass', () => {
     }
   });
 
+  it('measures a model once and shares it with every later instance', () => {
+    // The measuring sweep walks every vertex and builds a whole-body triangle
+    // list per steered corner, which on a real vehicle is tens of thousands of
+    // each. Paying that per instance hitched the frame on EVERY summon. Clones
+    // share geometry, so the result is a property of the MODEL.
+    const v = buildBodiedVehicle();
+    v.group.updateWorldMatrix(true, true);
+    const first = createVehicleSuspensionRig(v.mountRoot, v.group)!;
+
+    // A second rider on the same vehicle: Object3D.clone() shares geometry,
+    // exactly as the character asset clones do.
+    const clonedRoot = v.mountRoot.clone();
+    const secondGroup = new THREE.Object3D();
+    secondGroup.add(clonedRoot);
+    secondGroup.updateWorldMatrix(true, true);
+    const second = createVehicleSuspensionRig(clonedRoot, secondGroup)!;
+
+    // Same object, not merely equal: that is what proves it was not re-measured.
+    expect(second.envelope).toBe(first.envelope);
+    expect(second.steerLock).toBe(first.steerLock);
+
+    // ...and the per-frame mutable state must NOT be shared, or two riders on
+    // the same vehicle would drive each other's suspension.
+    expect(second.state).not.toBe(first.state);
+    expect(second.steerState).not.toBe(first.steerState);
+    expect(second.nodes.fl).not.toBe(first.nodes.fl);
+  });
+
+  it('measures a different model separately', () => {
+    // Fresh geometry (a re-export, or a different vehicle) must not collide
+    // with a cached entry: the arch sits lower here, so the envelope differs.
+    const tall = buildBodiedVehicle();
+    tall.group.updateWorldMatrix(true, true);
+    const tallRig = createVehicleSuspensionRig(tall.mountRoot, tall.group)!;
+
+    const low = buildBodiedVehicle({ FL: ARCH_Y - 0.05 });
+    low.group.updateWorldMatrix(true, true);
+    const lowRig = createVehicleSuspensionRig(low.mountRoot, low.group)!;
+
+    expect(lowRig.envelope).not.toBe(tallRig.envelope);
+    expect(lowRig.envelope.corner.fl.bump).toBeLessThan(tallRig.envelope.corner.fl.bump);
+  });
+
   it('measures bump against the tire crown, not its bounding box', () => {
     const v = buildBodiedVehicle();
     v.group.updateWorldMatrix(true, true);

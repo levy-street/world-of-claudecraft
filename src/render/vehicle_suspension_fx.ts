@@ -580,6 +580,49 @@ function fallbackEnvelope(track: number): SuspensionEnvelope {
  * Call once per view and cache: it forces a world-matrix update and walks the
  * body mesh once to measure the envelope.
  */
+/** Measured-once-per-MODEL results, shared by every instance of it.
+ *
+ *  The measuring passes below sweep every vertex of the vehicle and build a
+ *  flat triangle list of its whole body, twice (once per steered corner). On
+ *  the Rallycart that is 24,815 vertices and an 18,506-triangle body, so each
+ *  steering measurement alone allocates a 166,554-float array. All of it is a
+ *  pure function of the MODEL: clones share their geometry (the asset caches in
+ *  characters/assets.ts are immutable and never disposed) and the `Susp_*`
+ *  nodes sit at the same local positions in every copy, so two riders on the
+ *  same vehicle measure the identical envelope and steering lock.
+ *
+ *  Doing it per instance made every summon pay the whole sweep on the frame the
+ *  mount appears, which is a visible hitch on EVERY summon, not just the first
+ *  (the shader-program side was already gated, and the mount prewarm only
+ *  covers the first sighting, so neither of those covered this).
+ *
+ *  Keyed on the geometry identity of the meshes under the chassis, not on a
+ *  mount key: this module deliberately knows nothing about which vehicle it is
+ *  measuring, and a re-exported model gets fresh geometry and so a fresh entry.
+ *  Both cached values are read-only downstream (the mutable per-frame state is
+ *  `rig.state` and `rig.steerState`, minted per instance), so sharing them
+ *  cannot couple two riders together.
+ *
+ *  Bounded by the number of distinct vehicle models the session draws, and each
+ *  entry is a handful of numbers, so it is never worth evicting. */
+const MEASURED_BY_GEOMETRY = new Map<string, VehicleMeasurement>();
+
+interface VehicleMeasurement {
+  envelope: SuspensionEnvelope;
+  steerLock: SteerLimits;
+}
+
+/** A stable identity for the chassis' geometry set. Cheap: it walks the node
+ *  tree (tens of nodes) and reads uuids, never any vertex data. */
+function geometryKey(chassis: THREE.Object3D): string {
+  const ids: string[] = [];
+  chassis.traverse((o) => {
+    const geometry = (o as THREE.Mesh).geometry;
+    if (geometry?.uuid) ids.push(geometry.uuid);
+  });
+  return ids.sort().join('|');
+}
+
 export function createVehicleSuspensionRig(
   mountRoot: THREE.Object3D,
   group: THREE.Object3D,
@@ -626,7 +669,17 @@ export function createVehicleSuspensionRig(
   const steer: Record<string, THREE.Object3D | null> = {};
   for (const c of STEER_CORNERS) steer[c] = mountRoot.getObjectByName(STEER_NAMES[c]) ?? null;
 
-  const envelope = measureEnvelope(chassis, nodes) ?? fallbackEnvelope(track);
+  const key = geometryKey(chassis);
+  let measured = MEASURED_BY_GEOMETRY.get(key);
+  if (!measured) {
+    const measuredEnvelope = measureEnvelope(chassis, nodes) ?? fallbackEnvelope(track);
+    measured = {
+      envelope: measuredEnvelope,
+      steerLock: measureSteerLock(chassis, nodes, steer, measuredEnvelope),
+    };
+    MEASURED_BY_GEOMETRY.set(key, measured);
+  }
+  const envelope = measured.envelope;
 
   return {
     nodes,
@@ -635,7 +688,7 @@ export function createVehicleSuspensionRig(
     wheels,
     wheelHold,
     steer,
-    steerLock: measureSteerLock(chassis, nodes, steer, envelope),
+    steerLock: measured.steerLock,
     steerState: createSteering(),
     prevFacing: Number.NaN,
     fallPeak: 0,
