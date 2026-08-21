@@ -1522,6 +1522,16 @@ export function compareCensus({
     const staleDeletionRows = [...deletionByClass[cls].keys()].filter(
       (name) => m.has(name) || !union.has(name),
     );
+    // A RENAME's target must actually be present in merged. Six of the seven
+    // rename rows are covered incidentally because their new name also lives on
+    // a parent, but a rename whose target exists on NO parent (the 11c-authored
+    // applyWellFedOnMealComplete) was covered only by the WARN below. Without
+    // this the merge's own OUTPUT is the one class the detector cannot see
+    // disappear (Phase 11d QA audit).
+    const missingRenameTargets = [...deletionByClass[cls].values()]
+      .filter((row) => row.newName && !/^\(none\)$/i.test(row.newName.trim()))
+      .filter((row) => !m.has(row.newName.trim()))
+      .map((row) => ({ name: row.newName.trim(), oldName: row.oldName, line: row.line }));
     const floorOurs = floors[cls]?.ours ?? 0;
     const floorTheirs = floors[cls]?.theirs ?? 0;
     const floorRelease = floors[cls]?.release ?? 0;
@@ -1536,12 +1546,32 @@ export function compareCensus({
             .filter((name) => new Set([...defs.get(name)].map(defBase)).size > 1)
             .map((name) => ({ name, files: [...defs.get(name)].sort() }))
         : [];
-    if (missing.length || extraUnexplained.length || floorFail) failed = true;
+    // unusedExtras is a FAIL, not a WARN. The header's contract is SET EQUALITY
+    // ("EXTRA must be EXACTLY the set the ledgers authored"), but only the subset
+    // direction was enforced: un-exporting any of the six 11c-authored names gave
+    // MISSING 0, extra unexplained 0, a silent WARN, and exit 0 (Phase 11d QA
+    // audit reproduced it on buildConsuming). An allowlist entry that stops being
+    // EXTRA means the merged tree lost the symbol the merge itself authored.
+    if (
+      missing.length ||
+      extraUnexplained.length ||
+      floorFail ||
+      unusedExtras.length ||
+      missingRenameTargets.length
+    )
+      failed = true;
     perClass[cls] = {
       counts: {
         ours: o.size,
         theirs: t.size,
+        // EVERY release parent's size, not just the first. The floor is checked
+        // per parent (releaseSets.some below), so reporting only releaseSets[0]
+        // made a genuine failure on the SECOND parent render with every printed
+        // value above its floor: a FAIL flag contradicted by its own numbers,
+        // with no ref named. Live since this branch carried two release parents
+        // (Phase 11d QA audit).
         release: releaseSets.length ? releaseSets[0].size : 0,
+        releaseSizes: releaseSets.map((set) => set.size),
         union: union.size,
         merged: m.size,
         missing: missing.length,
@@ -1560,6 +1590,7 @@ export function compareCensus({
       extraExplained,
       extraUnexplained,
       unusedExtras,
+      missingRenameTargets,
       staleDeletionRows,
       duplicates,
     };
@@ -1612,7 +1643,7 @@ export function formatReport(r, limit = 60) {
       `  |ours| ${n.ours}  |theirs| ${n.theirs}  |release| ${n.release}  |union| ${n.union}  |merged| ${n.merged}  |missing| ${n.missing} (packet ${n.missingPacket}, release-attributable ${n.missingRelease})  |extra| ${n.extra} (explained ${n.extraExplained}, unexplained ${n.extraUnexplained})  deletion-list hits ${n.deleted}`,
     );
     L.push(
-      `  floors: ours >= ${c.floors.ours} (observed ${n.ours}), theirs >= ${c.floors.theirs} (observed ${n.theirs}), release >= ${c.floors.release} (observed ${n.release})  ${c.floors.fail ? 'FAIL' : 'ok'}`,
+      `  floors: ours >= ${c.floors.ours} (observed ${n.ours}), theirs >= ${c.floors.theirs} (observed ${n.theirs}), release >= ${c.floors.release} (observed ${(n.releaseSizes ?? [n.release]).join(', ')})  ${c.floors.fail ? 'FAIL' : 'ok'}`,
     );
     const where = (m) =>
       `[ours: ${m.oursFiles.join(', ') || '-'}] [theirs: ${m.theirsFiles.join(', ') || '-'}] [release: ${m.releaseFiles.join(', ') || '-'}] base:${m.base === null ? '?' : m.base ? 'yes' : 'no'}`;
@@ -1646,7 +1677,16 @@ export function formatReport(r, limit = 60) {
     );
     L.push(...fmtList(c.extraUnexplained, limit, (e) => `${e.name}  [${e.files.join(', ')}]`));
     if (c.unusedExtras.length)
-      L.push(`  WARN allowlist entries not currently EXTRA: ${c.unusedExtras.join(', ')}`);
+      L.push(
+        `  FAIL allowlist entries not currently EXTRA (the merge authored these; they are gone ` +
+          `from merged, or a parent grew them): ${c.unusedExtras.join(', ')}`,
+      );
+    if (c.missingRenameTargets?.length)
+      L.push(
+        `  FAIL rename targets absent from merged: ${c.missingRenameTargets
+          .map((r) => `${r.oldName} -> ${r.name} (deletion list line ${r.line})`)
+          .join(', ')}`,
+      );
     if (c.staleDeletionRows.length)
       L.push(
         `  WARN deletion-list rows not matching a missing name: ${c.staleDeletionRows.join(', ')}`,

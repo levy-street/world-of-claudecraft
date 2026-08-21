@@ -78,18 +78,60 @@ describe('checkShared', () => {
     expect(ctx.findings.some((f: string) => f.includes('RNG MOVED'))).toBe(true);
   });
 
-  it('passes a clean composition with a uniform id shift and counts it', () => {
-    const shift = (g: ReturnType<typeof golden>, d: number) => ({
-      ...g,
-      frames: [frame(0, { nextId: 968 + d, entities: [{ id: 963 + d, hp: 100 }] })],
-    });
-    const b = golden();
-    const o = golden();
-    const t = shift(golden(), 4);
-    const m = shift(golden(), 4);
+  it('passes a clean composition where BOTH parents moved a leaf, and counts the shift', () => {
+    // Merged is built INDEPENDENTLY of theirs, not by the same call: the earlier
+    // shape (`const t = shift(g,4); const m = shift(g,4)`) made merged a copy of
+    // theirs, so no arm exercised a leaf both parents moved and a take-theirs
+    // mutant of the additive rule went unkilled (Phase 11d QA audit, N9).
+    // ours moves hp 100 -> 110; theirs shifts the ids by +4; merged carries both.
+    const b = golden(undefined, [frame(0, { nextId: 968, entities: [{ id: 963, hp: 100 }] })]);
+    const o = golden(undefined, [frame(0, { nextId: 968, entities: [{ id: 963, hp: 110 }] })]);
+    const t = golden(undefined, [frame(0, { nextId: 972, entities: [{ id: 967, hp: 100 }] })]);
+    const m = golden(undefined, [frame(0, { nextId: 972, entities: [{ id: 967, hp: 110 }] })]);
     const { ctx } = checkShared('fx', b, o, t, m);
     expect(ctx.findings).toEqual([]);
     expect(ctx.idShifts.get(4)).toBeGreaterThan(0);
+  });
+
+  it('FAILS when merged takes theirs on a leaf ours moved (the additive rule doing work)', () => {
+    // The mutant the old self-comparing arm could not kill: merged keeps base's
+    // hp instead of composing ours' move.
+    const b = golden(undefined, [frame(0, { nextId: 968, entities: [{ id: 963, hp: 100 }] })]);
+    const o = golden(undefined, [frame(0, { nextId: 968, entities: [{ id: 963, hp: 110 }] })]);
+    const t = golden(undefined, [frame(0, { nextId: 972, entities: [{ id: 967, hp: 100 }] })]);
+    const m = golden(undefined, [frame(0, { nextId: 972, entities: [{ id: 967, hp: 100 }] })]);
+    const { ctx } = checkShared('fx', b, o, t, m);
+    expect(ctx.findings.length).toBeGreaterThan(0);
+  });
+});
+
+describe('the id-family shift must be UNIFORM (Phase 11d QA)', () => {
+  // isIdPath routes an id leaf away from the hard `numeric` finding into a
+  // counted shift, so in the TWO-WAY arms it decides finding versus silence.
+  // Before this, an id leaf could move by ANY amount and the run still exited 0
+  // with a PASS verdict: the audit moved one nextId by +37 and got "+4x28 +41x1"
+  // printed in a cell.
+  it('accepts one shift and reports nothing', () => {
+    const p = golden(undefined, [frame(0, { nextId: 968, entities: [{ id: 963, hp: 100 }] })]);
+    const m = golden(undefined, [frame(0, { nextId: 972, entities: [{ id: 967, hp: 100 }] })]);
+    const { ctx } = checkAdd('fx', p, m, 'ours');
+    expect(ctx.findings).toEqual([]);
+  });
+
+  it('FAILS a second, different shift in the same golden', () => {
+    const p = golden(undefined, [frame(0, { nextId: 968, entities: [{ id: 963, hp: 100 }] })]);
+    // nextId moves +41 while the entity id moves +4: the exact shape the audit
+    // reproduced on rift_clear_rewards.
+    const m = golden(undefined, [frame(0, { nextId: 1009, entities: [{ id: 967, hp: 100 }] })]);
+    const { ctx } = checkAdd('fx', p, m, 'ours');
+    expect(ctx.findings.some((f: string) => f.includes('NOT uniform'))).toBe(true);
+  });
+
+  it('applies to a THEIRS-only add too, whose other rows are only listed', () => {
+    const p = golden(undefined, [frame(0, { nextId: 968, entities: [{ id: 963, hp: 100 }] })]);
+    const m = golden(undefined, [frame(0, { nextId: 1009, entities: [{ id: 967, hp: 100 }] })]);
+    const { ctx } = checkAdd('fx', p, m, 'theirs');
+    expect(ctx.findings.some((f: string) => f.includes('NOT uniform'))).toBe(true);
   });
 });
 

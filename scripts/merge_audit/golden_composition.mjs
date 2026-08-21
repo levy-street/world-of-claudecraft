@@ -60,8 +60,14 @@ const VERBOSE = process.argv.includes('--verbose');
 // The id FAMILY, for reporting which numeric moves are the uniform entity-id
 // shift: `id`, `nextId`, any `...Id` key, the id LISTS (`...Ids[i]`,
 // bossDamagers[i], personalFor[i]), the threat table's entity column
-// (threat[i][0]) and the masterwork crafter. Classification only: the
-// composition assertion above is the same for every numeric leaf.
+// (threat[i][0]) and the masterwork crafter. In the four-way path this is
+// classification only, and the composition assertion is the same for every
+// numeric leaf. In the TWO-WAY path (a clean add, or a frame only one parent
+// carries) it is LOAD-BEARING: it routes a leaf away from the hard `numeric`
+// finding into a counted shift, so it decides finding versus silence. That is
+// why both two-way arms now assert the shift is uniform, and why main() checks
+// the whole table agrees on ONE shift; before those, an id leaf the classifier
+// accepted could move by any amount and still exit 0 (Phase 11d QA audit).
 export function isIdPath(path) {
   const key = lastKey(path);
   if (/(^id$|^nextId$|Id$|^crafter$)/.test(key)) return true;
@@ -357,6 +363,25 @@ export function diffAgainst(p, m, path, diffs, ctx) {
 function newDiffs() {
   return { rng: [], idDeltas: new Map(), numeric: [], other: [], presence: [] };
 }
+
+/** The id-family shift must be UNIFORM within a comparison. `isIdPath` routes an
+ *  id leaf away from the hard `numeric` finding and into a counted classification,
+ *  which meant a leaf the classifier accepted could move by ANY amount and still
+ *  exit 0: the Phase 11d QA audit moved a single `nextId` by +37 and got PASS with
+ *  a cell reading "+4x28 +41x1". The whole point of the two-way arms is that the
+ *  other parent's contribution is limited to the uniform world-init shift, so more
+ *  than one distinct delta is a finding, not a cell. */
+export function checkUniformIdShift(diffs, ctx, label) {
+  if (diffs.idDeltas.size <= 1) return;
+  const shown = [...diffs.idDeltas.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .map(([d, n]) => `${d > 0 ? '+' : ''}${d}x${n}`)
+    .join(' ');
+  ctx.findings.push(
+    `${label}: id-family shift is NOT uniform (${shown}); the other parent's contribution ` +
+      'must be one world-init shift, so a second delta is a moved id, not a classification',
+  );
+}
 function frameKey(f, i) {
   return `${f.tick}:${f.label ?? ''}#${i}`;
 }
@@ -438,6 +463,7 @@ export function checkShared(name, b, o, t, m) {
         ctx.findings.push(
           `frame ${key}: keys appeared or vanished vs ours: ${diffs.presence.slice(0, 5).join('; ')}`,
         );
+      checkUniformIdShift(diffs, ctx, `frame ${key} (ours-only)`);
       for (const [d, n] of diffs.idDeltas) ctx.idShifts.set(d, (ctx.idShifts.get(d) ?? 0) + n);
     } else if (inT && !inO) {
       // theirs lengthened the scenario: ours' contribution is listed.
@@ -446,6 +472,8 @@ export function checkShared(name, b, o, t, m) {
       diffAgainst(ft.get(key), fm.get(key), `frames[${key}]`, diffs, ctx);
       if (diffs.rng.length)
         ctx.findings.push(`frame ${key}: RNG MOVED vs theirs (${diffs.rng.join('; ')})`);
+      checkUniformIdShift(diffs, ctx, `frame ${key} (theirs-only)`);
+      for (const [d, n] of diffs.idDeltas) ctx.idShifts.set(d, (ctx.idShifts.get(d) ?? 0) + n);
       ctx.theirsOnlyFrameDiffs = (ctx.theirsOnlyFrameDiffs ?? []).concat(
         diffs.numeric.map((x) => `numeric ${x}`),
         diffs.other.map((x) => `other ${x}`),
@@ -483,6 +511,10 @@ export function checkAdd(name, p, m, side) {
   }
   if (diffs.rng.length)
     ctx.findings.push(`${name}: RNG MOVED vs ${side} (${diffs.rng.length} rows)`);
+  // Both sides: the only id movement a clean add may show is the ONE world-init
+  // shift the other parent contributed. Applied to theirs-only adds too, whose
+  // non-rng rows are otherwise only listed for a reader.
+  checkUniformIdShift(diffs, ctx, name);
   if (side === 'ours') {
     // The other parent (farming) only shifts ids at world init: nothing else
     // may move in an ours-only golden.
@@ -608,10 +640,32 @@ function main() {
   console.log(
     `goldens: ${files.length} (shared ${classes.shared}, ours-only ${classes.oursOnly}, theirs-only ${classes.theirsOnly}, orphan ${classes.orphan})`,
   );
+  // WHOLE-TABLE agreement: the merge contributed ONE world-init id shift, so every
+  // golden that shifts ids at all must shift them by the SAME amount. A per-golden
+  // uniformity check cannot see a golden whose every id moved by +1 while the rest
+  // moved by +4; this can. (Phase 11d QA audit: both shapes exited 0 before.)
+  // Both maps: shared goldens accumulate into ctx.idShifts, clean adds into
+  // diffs.idDeltas. Reading only the first would leave every add outside the
+  // table-wide agreement check, which is where a wrong-but-uniform shift hides.
+  const tableShifts = new Map();
+  for (const r of rows) {
+    for (const [d, n] of r.ctx?.idShifts ?? []) tableShifts.set(d, (tableShifts.get(d) ?? 0) + n);
+    for (const [d, n] of r.diffs?.idDeltas ?? []) tableShifts.set(d, (tableShifts.get(d) ?? 0) + n);
+  }
+  const shiftAgreement = [...tableShifts.keys()].filter((d) => d !== 0);
+  if (shiftAgreement.length > 1) failures += 1;
+
   const floorFail = files.length < GOLDEN_FLOOR;
   if (floorFail) failures += 1;
   console.log(
     `floor: ${files.length} >= ${GOLDEN_FLOOR} ${floorFail ? 'FAIL (an empty or truncated set cannot pass by composing nothing)' : 'ok'}`,
+  );
+  console.log(
+    `id shift across the whole table: ${shiftsText(tableShifts)} ${
+      shiftAgreement.length > 1
+        ? `FAIL (${shiftAgreement.length} distinct shifts; the merge contributed one)`
+        : 'ok'
+    }`,
   );
   console.log(
     `parent goldens: ours ${parentGoldens.get('ours').size}, theirs ${parentGoldens.get('theirs').size}; MISSING from merged ${missing.length}`,

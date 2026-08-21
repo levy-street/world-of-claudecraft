@@ -34,6 +34,7 @@ export interface MissingGolden {
 }
 
 export const GOLDEN_FLOOR: number;
+export function checkUniformIdShift(diffs: AddDiffs, ctx: CompositionCtx, label: string): void;
 export function missingFromMerged(
   mergedFiles: readonly string[],
   parentSets: ReadonlyMap<string, ReadonlySet<string>>,
