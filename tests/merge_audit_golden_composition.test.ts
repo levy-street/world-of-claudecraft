@@ -105,6 +105,43 @@ describe('checkShared', () => {
   });
 });
 
+describe('the one-parent FRAME branch (a scenario one parent lengthened)', () => {
+  // The Phase 11d QA pin audit put a sentinel throw in this branch and every test
+  // stayed green: it was never entered. That is the shape the farming absorb
+  // actually had (both parents lengthened scenarios), so its findings, including
+  // the uniform-shift call, were entirely unpinned.
+  const twoFrames = (over: Record<string, unknown> = {}) => [frame(0), frame(20, { ...over })];
+
+  it('accepts an ours-only frame that merged carries unchanged', () => {
+    const b = golden(undefined, [frame(0)]);
+    const o = golden(undefined, twoFrames());
+    const t = golden(undefined, [frame(0)]);
+    const m = golden(undefined, twoFrames());
+    const { ctx } = checkShared('fx', b, o, t, m);
+    expect(ctx.findings).toEqual([]);
+  });
+
+  it('FAILS when a non-id numeric leaf moved inside an ours-only frame', () => {
+    const b = golden(undefined, [frame(0)]);
+    const o = golden(undefined, twoFrames({ entities: [{ id: 963, hp: 100 }] }));
+    const t = golden(undefined, [frame(0)]);
+    // merged silently changed hp in the frame only ours carries.
+    const m = golden(undefined, twoFrames({ entities: [{ id: 963, hp: 55 }] }));
+    const { ctx } = checkShared('fx', b, o, t, m);
+    expect(ctx.findings.some((f: string) => f.includes('non-id numeric'))).toBe(true);
+  });
+
+  it('FAILS on two distinct id shifts inside an ours-only frame', () => {
+    const b = golden(undefined, [frame(0)]);
+    const o = golden(undefined, twoFrames({ nextId: 968, entities: [{ id: 963, hp: 100 }] }));
+    const t = golden(undefined, [frame(0)]);
+    // nextId +41 while the entity id moves +4: not one world-init shift.
+    const m = golden(undefined, twoFrames({ nextId: 1009, entities: [{ id: 967, hp: 100 }] }));
+    const { ctx } = checkShared('fx', b, o, t, m);
+    expect(ctx.findings.some((f: string) => f.includes('NOT uniform'))).toBe(true);
+  });
+});
+
 describe('the id-family shift must be UNIFORM (Phase 11d QA)', () => {
   // isIdPath routes an id leaf away from the hard `numeric` finding into a
   // counted shift, so in the TWO-WAY arms it decides finding versus silence.
@@ -189,12 +226,14 @@ describe('the dropped-golden class (Phase 11d QA)', () => {
     expect(missing.map((m) => m.file)).toEqual(['a.json', 'b.json']);
   });
 
-  it('keeps the vacuity floor under the real set but far above empty', () => {
-    // A floor at or above the live count would red on any legitimate deletion;
-    // a floor of 0 would not catch the truncation it exists for.
-    expect(GOLDEN_FLOOR).toBeGreaterThan(0);
-    expect(GOLDEN_FLOOR).toBeLessThan(69);
-    expect(GOLDEN_FLOOR).toBeGreaterThan(50);
+  it('keeps the vacuity floor CLOSE under the real set, not merely above zero', () => {
+    // A floor at or above the live count reds on any legitimate deletion; a floor
+    // far below it does not catch the truncation it exists for. The first version
+    // of this arm permitted 51 against a live 69, an 18-golden hole (Phase 11d QA
+    // pin audit). Band is roughly 10 percent under the live count and is
+    // RE-DERIVED at each re-record, not widened: 11f re-records these goldens.
+    expect(GOLDEN_FLOOR).toBeGreaterThanOrEqual(60);
+    expect(GOLDEN_FLOOR).toBeLessThanOrEqual(68);
   });
 });
 

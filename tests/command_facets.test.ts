@@ -463,6 +463,20 @@ describe('command facet tags (farming)', () => {
     expect('consumeFeast' in tags).toBe(false);
   });
 
+  it('names EVERY IWorldFarming tag, so a sixth one cannot be added and forgotten', () => {
+    // The reverse direction. Every arm above iterates the local literal FORWARD
+    // into COMMAND_FACETS, which is how three-of-five read as "farming is
+    // covered" in the first place: a tag the table gains and this block does not
+    // is silent. Reading the table back closes that, one step later (Phase 11d
+    // QA pin audit). Scope: this is the file's idiom, not a general fix; 57
+    // tagged commands are named by no *_TAGS table at all.
+    const tagged = Object.entries(tags)
+      .filter(([, facet]) => facet === 'IWorldFarming')
+      .map(([cmd]) => cmd)
+      .sort();
+    expect(tagged).toEqual(Object.keys(FARMING_TAGS).sort());
+  });
+
   it('does not tag the reads (farmPatches and myFarmPlots, plus the farmNowMs clock base)', () => {
     // farmPatches is served from the client bundle with no round trip at all,
     // myFarmPlots mirrors the `fplot` self delta, and farmNowMs is a local

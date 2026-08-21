@@ -14,9 +14,18 @@
 import { describe, expect, it } from 'vitest';
 import { unionTables } from '../scripts/merge_audit/shard_weight_union.mjs';
 
+// The harvest DATE is part of the same provenance-honesty contract as the run id
+// and the pedigree text, so the fixtures must not share one: with both sides on
+// the same date, swapping which side's `harvested` is copied was invisible (Phase
+// 11d QA pin audit). Each table now carries a date derived from its own run.
 const table = (run: string, rows: Record<string, number>, extra: Record<string, unknown> = {}) =>
   ({
-    __provenance: { run, harvested: '2026-08-18', files: Object.keys(rows).length, ...extra },
+    __provenance: {
+      run,
+      harvested: `2026-08-${String(run ?? 'xx').slice(0, 2)}`,
+      files: Object.keys(rows).length,
+      ...extra,
+    },
     ...rows,
   }) as never;
 
@@ -28,6 +37,10 @@ describe('unionTables: which harvest wins', () => {
     expect(stats.newer).toBe('theirs');
     expect(merged['tests/a.test.ts']).toBe(11);
     expect(merged['tests/b.test.ts']).toBe(22);
+    // The DATE travels with the run id it belongs to, never the other side's.
+    const prov = merged.__provenance as { run: string; harvested: string };
+    expect(prov.run).toBe('200');
+    expect(prov.harvested).toBe('2026-08-20');
   });
 
   it('picks the newer run whichever SIDE carries it (not a fixed preference)', () => {

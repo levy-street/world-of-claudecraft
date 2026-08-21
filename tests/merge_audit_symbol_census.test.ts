@@ -260,6 +260,7 @@ describe('contentIdRows: the reused-id blind spot the class exists to close', ()
       theirs: parent,
       merged,
       deletionRows: [],
+      floors: NO_FLOORS,
       releases: [],
       base: null,
     });
@@ -270,6 +271,90 @@ describe('contentIdRows: the reused-id blind spot the class exists to close', ()
       `${CROPS}:bog_beet`,
     ]);
     expect(cmp.failed).toBe(true);
+  });
+});
+
+// Tiny inline trees sit far below the real FLOORS, so every compareCensus fixture
+// passes zeroed floors: without them `failed` is true for a reason that has
+// nothing to do with the arm under test, which is its own kind of vacuous pass.
+const NO_FLOORS = Object.fromEntries(
+  CLASSES.map((cls) => [cls, { ours: 0, theirs: 0, release: 0 }]),
+) as never;
+
+describe('the fix round own promotions: unusedExtras and rename targets FAIL', () => {
+  // Phase 11d QA pin audit: commit 55cc42980c advertised turning these from WARN
+  // to FAIL, and deleting either term from the `failed` expression left the suite
+  // green, so the promotion itself was unpinned. compareCensus is exported, so
+  // the arms are cheap.
+  const SIM = 'src/sim/thing.ts';
+  const tree = (src: string) => censusTree([[SIM, src]]);
+  const cmp = (
+    merged: ReturnType<typeof tree>,
+    parent: ReturnType<typeof tree>,
+    explainedExtras: Array<{ cls: string; name: string; phase: string; ruling: string }> = [],
+  ) =>
+    compareCensus({
+      ours: parent,
+      theirs: parent,
+      merged,
+      deletionRows: [],
+      explainedExtras: explainedExtras as never,
+      floors: NO_FLOORS,
+      releases: [],
+      base: null,
+    });
+
+  it('FAILS when an allowlist entry stops being EXTRA (the merge lost what it authored)', () => {
+    const parent = tree('export const alpha = 1;');
+    // `beta` was the merge's own authored export; merged no longer has it.
+    const merged = tree('export const alpha = 1;');
+    const res = cmp(merged, parent, [
+      { cls: 'exports', name: 'beta', phase: '11c', ruling: 'test' },
+    ]);
+    expect(res.perClass.exports.unusedExtras).toEqual(['beta']);
+    expect(res.failed).toBe(true);
+  });
+
+  it('passes when that same allowlist entry IS present as an EXTRA', () => {
+    const parent = tree('export const alpha = 1;');
+    const merged = tree('export const alpha = 1;\nexport const beta = 2;');
+    const res = cmp(merged, parent, [
+      { cls: 'exports', name: 'beta', phase: '11c', ruling: 'test' },
+    ]);
+    expect(res.perClass.exports.unusedExtras).toEqual([]);
+    expect(res.perClass.exports.extraUnexplained).toEqual([]);
+    expect(res.failed).toBe(false);
+  });
+
+  it('FAILS when a deletion-list RENAME target is absent from merged', () => {
+    const parent = tree('export const oldName = 1;');
+    const merged = tree('export const somethingElse = 1;');
+    const res = compareCensus({
+      ours: parent,
+      theirs: parent,
+      merged,
+      deletionRows: [
+        {
+          cls: 'exports',
+          oldName: 'oldName',
+          newName: 'newName',
+          phase: '11c',
+          ruling: 'r',
+          reason: 'renamed',
+          line: 1,
+        },
+      ] as never,
+      explainedExtras: [
+        { cls: 'exports', name: 'somethingElse', phase: '11c', ruling: 'r' },
+      ] as never,
+      floors: NO_FLOORS,
+      releases: [],
+      base: null,
+    });
+    expect(res.perClass.exports.missingRenameTargets.map((r: { name: string }) => r.name)).toEqual([
+      'newName',
+    ]);
+    expect(res.failed).toBe(true);
   });
 });
 
