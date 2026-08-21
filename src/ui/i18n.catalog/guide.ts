@@ -2657,7 +2657,7 @@ export const guideStrings = {
     // aura variant is the unmapped-buff-kind fallback, the
     // wellfed_tooltip_view rule: no dish ever ships a silent effect cell.
     effectFood: 'Restores {amount} health over {seconds} sec when eaten.',
-    effectWellFed: 'Well fed when you finish eating: +{value} {stat} for {minutes} min.',
+    effectWellFed: 'Well Fed when you finish eating: +{value} {stat} for {minutes} min.',
     effectWellFedAura: 'Grants {aura} for {minutes} min when you finish eating.',
     sourceTrainerFee: 'Trainer, {fee}',
     sourceTrainerFree: 'Trainer, free',
@@ -2768,7 +2768,7 @@ export const guideStrings = {
       cooking: {
         identityHeading: 'The pot that feeds the party',
         identityBody:
-          "Eat a cooked meal and it heals you over 18 seconds of rest, which between pulls is the cheapest healing in the game. The ladder runs from a 90-health Pan-Seared River Perch up through Marlow's Grand Roast at 980, and above even the roast sit the three apex role dishes at 1,392, the largest sit-heal in the game and the only food that leaves a Well Fed buff behind when the plate is finished.\n\nOn the ring Cooking sits between Alchemy and Leatherworking. Its living pair is the Apothecary, Alchemy and Cooking, sworn before Cook Marlow at the Eastbrook kitchens after hunting four wild boars for the pot; the Trapper pair with Leatherworking is named on the ring but has no oath quest yet.",
+          "Eat a cooked meal and it heals you over 18 seconds of rest, which between pulls is the cheapest healing in the game. The ladder runs from a 90-health Pan-Seared River Perch up through Marlow's Grand Roast at 980, and above even the roast sit the three apex role dishes at 1,392, the largest sit-heal in the game and the strongest Well Fed buff a finished plate can leave behind (the farm kitchen's buff dishes fill the rungs below it).\n\nOn the ring Cooking sits between Alchemy and Leatherworking. Its living pair is the Apothecary, Alchemy and Cooking, sworn before Cook Marlow at the Eastbrook kitchens after hunting four wild boars for the pot; the Trapper pair with Leatherworking is named on the ring but has no oath quest yet.",
         materialsHeading: 'A pantry fed by rod and knife',
         materialsBody:
           "Fishing stocks the signature ingredients, zone by zone: raw mirror trout and river perch from the waters of Eastbrook Vale, marsh pike and bog eel from Mirefen Marsh, frostgill trout and slatefin carp from Thornpeak Heights. Raw catches never restore health on their own: they are kitchen reagents, and the cooked meals are what you eat. The rungs mix the zones freely (the free rung already wants marsh pike, the mid rung Thornpeak's frostgill, and the rare supper folds the Vale's mirror trout back in), so a cook who fishes wherever the road goes never runs dry.\n\nThe butcher's side comes off harvested corpses: game meat from boars and their kin, and, on a rare or better harvest roll, a signed Prime Cut, the centerpiece of the grand roast. Herbs season the better dishes, one ashwood log smokes the eel, and Cooking Salt runs 8 copper a pouch from Marlow's own stall.",

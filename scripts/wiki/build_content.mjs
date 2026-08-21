@@ -1150,7 +1150,8 @@ const profEconomy = {
 const profStationsOut = { radius: STATION_RADIUS, stations: profStations };
 
 // Every professions detail sub-page id under /wiki/professions/<id>: the
-// earnable crafts, the four gathering professions, and the two fixed pages.
+// earnable crafts, every gathering profession the sim ships, and the two
+// fixed pages.
 // Drives the router dispatch, the sitemap, and the head canonicalization.
 const profPages = [
   ...profCrafts.map((c) => c.id),

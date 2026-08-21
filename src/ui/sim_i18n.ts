@@ -479,8 +479,9 @@ const baseEnTable = {
   'aura.elixirVenomfire': 'Vipersear Vigor',
   'aura.elixirSerpent': 'Might of the Serpent',
   // Masterwrought phase 10 consumable auras: the three apex flask buffs
-  // (content/profession_items.ts) and the shared Well Fed a finished role
-  // meal leaves. Same channel as the elixir names above, since both ride the
+  // (content/profession_items.ts) and the shared Well Fed a finished buff
+  // meal leaves (farm dish or apex role plate alike since Masterwrought 11c).
+  // Same channel as the elixir names above, since both ride the
   // same aura-name matcher; 'aura.fed' is a PET key with a different English
   // string and is not this one.
   'aura.flaskIronhusk': 'Ironhusk Vigor',
@@ -8765,7 +8766,8 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Venomfire Vigor': 'aura.elixirVenomfire',
   'Might of the Serpent': 'aura.elixirSerpent',
   // Masterwrought phase 10: the three apex flask auras and the Well Fed a
-  // finished role meal leaves (content/profession_items.ts). Same reverse
+  // finished buff meal leaves, farm dish or role plate since 11c
+  // (content/profession_items.ts). Same reverse
   // channel as the elixir names above, which is also what keeps the flask
   // tooltip's unmapped-kind fallback line localized.
   'Ironhusk Vigor': 'aura.flaskIronhusk',

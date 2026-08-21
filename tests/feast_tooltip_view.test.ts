@@ -40,7 +40,8 @@ describe('feastTooltipLines', () => {
       '<div class="tt-desc">Use: Sets out a feast others can eat from, one serving each ' +
         '(10 servings, lasts 3 min).</div>' +
         '<div class="tt-desc">Each serving grants Well Fed: +5 Stamina for 10 min ' +
-        'when you finish the 18 sec meal.</div>',
+        'when you finish the 18 sec meal. Only one Well Fed effect at a time: a newer meal ' +
+        'replaces it.</div>',
     );
   });
 
@@ -93,7 +94,8 @@ describe('feastTooltipLines', () => {
     );
     expect(html).toContain(
       '<div class="tt-desc">Each serving grants Well Fed for 5 min ' +
-        'when you finish the 18 sec meal.</div>',
+        'when you finish the 18 sec meal. Only one Well Fed effect at a time: a newer meal ' +
+        'replaces it.</div>',
     );
     // The mapped branch names the stat; the fallback never does.
     expect(html).not.toContain('Stamina');
@@ -147,45 +149,51 @@ describe('the five non-Latin fills render end to end (frozen literals, the M16 s
     [
       'zh_CN',
       '<div class="tt-desc">使用：摆出一桌他人也能享用的盛宴，每人限享一份（10 份，持续 3 分钟）。</div>' +
-        '<div class="tt-desc">每份：吃完 18 秒的一餐后获得精神饱满效果，使你的耐力提高 5 点，持续 10 分钟。</div>',
+        '<div class="tt-desc">每份：吃完 18 秒的一餐后获得精神饱满效果，使你的耐力提高 5 点，持续 10 分钟。同时只能有一种精神饱满效果：更新的一餐会顶替它。</div>',
     ],
     [
       'zh_TW',
       '<div class="tt-desc">使用：擺出一桌他人也能享用的盛宴，每人限享一份（10 份，持續 3 分鐘）。</div>' +
-        '<div class="tt-desc">每份：吃完 18 秒的一餐後獲得精神飽滿效果，使你的耐力提高 5 點，持續 10 分鐘。</div>',
+        '<div class="tt-desc">每份：吃完 18 秒的一餐後獲得精神飽滿效果，使你的耐力提高 5 點，持續 10 分鐘。同時只能有一種精神飽滿效果：較新的餐點會頂替它。</div>',
     ],
     [
       'ja_JP',
       '<div class="tt-desc">使用: 他のプレイヤーも食べられる宴を広げる。1人1食まで（10人前、3分間持続）。</div>' +
-        '<div class="tt-desc">1人前につき、18秒の食事を終えると満腹の効果を得て、スタミナが5上昇し、10分間持続します。</div>',
+        '<div class="tt-desc">1人前につき、18秒の食事を終えると満腹の効果を得て、スタミナが5上昇し、10分間持続します。満腹の効果は同時に一つだけで、新しい食事が古いものを置き換えます。</div>',
     ],
     [
       'ko_KR',
       '<div class="tt-desc">사용: 다른 플레이어도 먹을 수 있는 잔치를 차립니다. 1인당 1인분입니다(10인분, 3분간 지속).</div>' +
-        '<div class="tt-desc">한 접시를 18초 동안 다 먹으면 잘 먹음 효과를 얻어 체력이(가) 5 증가하며 10분 동안 지속됩니다.</div>',
+        '<div class="tt-desc">한 접시를 18초 동안 다 먹으면 잘 먹음 효과를 얻어 체력이(가) 5 증가하며 10분 동안 지속됩니다. 잘 먹음 효과는 한 번에 하나만 유지되며, 새로 먹은 음식이 이전 효과를 대체합니다.</div>',
     ],
     [
       'ru_RU',
       '<div class="tt-desc">Использование: накрывает пир, с которого могут поесть и другие, ' +
         'по одной порции каждому (10 порций, действует 3 мин).</div>' +
         '<div class="tt-desc">Каждая порция дает эффект &quot;Сытость&quot;: Выносливость +5 ' +
-        'на 10 мин после 18 сек еды.</div>',
+        'на 10 мин после 18 сек еды. Одновременно действует только один эффект сытости: более свежая трапеза заменяет прежний.</div>',
     ],
   ];
   const FALLBACK: [SupportedLanguage, string][] = [
-    ['zh_CN', '<div class="tt-desc">每份：吃完 18 秒的一餐后获得精神饱满效果，持续 5 分钟。</div>'],
-    ['zh_TW', '<div class="tt-desc">每份：吃完 18 秒的一餐後獲得精神飽滿效果，持續 5 分鐘。</div>'],
+    [
+      'zh_CN',
+      '<div class="tt-desc">每份：吃完 18 秒的一餐后获得精神饱满效果，持续 5 分钟。同时只能有一种精神饱满效果：更新的一餐会顶替它。</div>',
+    ],
+    [
+      'zh_TW',
+      '<div class="tt-desc">每份：吃完 18 秒的一餐後獲得精神飽滿效果，持續 5 分鐘。同時只能有一種精神飽滿效果：較新的餐點會頂替它。</div>',
+    ],
     [
       'ja_JP',
-      '<div class="tt-desc">1人前につき、18秒の食事を終えると満腹の効果を得て、5分間持続します。</div>',
+      '<div class="tt-desc">1人前につき、18秒の食事を終えると満腹の効果を得て、5分間持続します。満腹の効果は同時に一つだけで、新しい食事が古いものを置き換えます。</div>',
     ],
     [
       'ko_KR',
-      '<div class="tt-desc">한 접시를 18초 동안 다 먹으면 잘 먹음 효과를 얻어 5분 동안 지속됩니다.</div>',
+      '<div class="tt-desc">한 접시를 18초 동안 다 먹으면 잘 먹음 효과를 얻어 5분 동안 지속됩니다. 잘 먹음 효과는 한 번에 하나만 유지되며, 새로 먹은 음식이 이전 효과를 대체합니다.</div>',
     ],
     [
       'ru_RU',
-      '<div class="tt-desc">Каждая порция дает эффект &quot;Сытость&quot; на 5 мин после 18 сек еды.</div>',
+      '<div class="tt-desc">Каждая порция дает эффект &quot;Сытость&quot; на 5 мин после 18 сек еды. Одновременно действует только один эффект сытости: более свежая трапеза заменяет прежний.</div>',
     ],
   ];
 

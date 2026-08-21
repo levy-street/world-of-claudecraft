@@ -2653,8 +2653,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.wellFedAura': '精神饱满：吃完后获得{aura}效果，持续 {minutes} 分钟。同时只能有一种精神饱满效果：更新的一餐会顶替它。',
   'itemUi.tooltip.useFeast': '使用：摆出一桌他人也能享用的盛宴，每人限享一份（{servings} 份，持续 {minutes} 分钟）。',
   'itemUi.tooltip.useFeastBuff':
-    '每份：吃完 {seconds} 秒的一餐后获得{aura}效果，使你的{stat}提高 {value} 点，持续 {minutes} 分钟。',
-  'itemUi.tooltip.useFeastBuffAura': '每份：吃完 {seconds} 秒的一餐后获得{aura}效果，持续 {minutes} 分钟。',
+    '每份：吃完 {seconds} 秒的一餐后获得{aura}效果，使你的{stat}提高 {value} 点，持续 {minutes} 分钟。同时只能有一种精神饱满效果：更新的一餐会顶替它。',
+  'itemUi.tooltip.useFeastBuffAura':
+    '每份：吃完 {seconds} 秒的一餐后获得{aura}效果，持续 {minutes} 分钟。同时只能有一种精神饱满效果：更新的一餐会顶替它。',
   'itemUi.tooltip.clickUseInstant': '点击在战斗中立即使用',
   'itemUi.tooltip.clickUse': '点击使用',
   'itemUi.tooltip.clickSetOut': '点击摆放',
@@ -11222,7 +11223,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     "marshstalker档及以上都掷杰作，Mirewarden Jerkin里的Pristine Hide自动提供署名材料加成；锇矿算一级材料。无属性的硬皮普通件不会触发。\n\n自然而然地练：从一级起剥下每只狼和野猪，硬皮档随地做到25，随任务进沼泽时顺路受训；marshstalker到50，mirewarden到75，此后Duskhide Wraps（三层配方，六块锇矿、三块Pristine Hide、两块粗皮、一份Tanning Agent）到99全速、之后半速，最后五十点约75次。75专精后移动制革坊尤其宝贵：营火边就能把一袋皮子变成成品。Hesk的订单每30分钟收八张粗皮。技能50记下Tanner's Trade，上限处是Grandmaster Leatherworking。",
   'guide.profPages.craftProse.cooking.identityHeading': '喂饱队伍的锅',
   'guide.profPages.craftProse.cooking.identityBody':
-    "吃下熟食会在18秒的休息中治疗你，这是拉怪间隙最便宜的治疗。梯子从90点治疗的Pan-Seared River Perch经980点的Marlow's Grand Roast，一路做到其上的三道顶级分职佳肴（1392点），这是游戏中最大的坐地回复，也是唯一在吃完整盘后留下精神饱满效果的食物。烹饪位于炼金术与制皮之间；药剂师（炼金术与烹饪）在Eastbrook厨房的Cook Marlow处宣誓（先为锅猎四头野猪），与制皮组成的Trapper暂无誓约任务。",
+    "吃下熟食会在18秒的休息中治疗你，这是拉怪间隙最便宜的治疗。梯子从90点治疗的Pan-Seared River Perch经980点的Marlow's Grand Roast，一路做到其上的三道顶级分职佳肴（1392点），这是游戏中最大的坐地回复，也是吃完整盘后所能留下的最强精神饱满效果（农场厨房的增益菜肴填补其下的各级）。烹饪位于炼金术与制皮之间；药剂师（炼金术与烹饪）在Eastbrook厨房的Cook Marlow处宣誓（先为锅猎四头野猪），与制皮组成的Trapper暂无誓约任务。",
   'guide.profPages.craftProse.cooking.materialsHeading': '钓竿与猎刀供养的食柜',
   'guide.profPages.craftProse.cooking.materialsBody':
     '钓鱼按区域供应招牌食材：Eastbrook Vale的镜鳟与河鲈，Mirefen Marsh的沼狗鱼与泥鳗，Thornpeak Heights的霜鳃鳟与板鳍鲤，每一档都烹本档的鱼。屠夫的一侧来自尸体采集：野味肉，以及精良采集掷出的署名Prime Cut（大烤肉的核心）。草药调味，梣木熏鳗，Cooking Salt在Marlow摊位8铜一袋。',

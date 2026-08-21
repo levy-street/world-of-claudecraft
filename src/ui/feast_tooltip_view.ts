@@ -11,9 +11,10 @@
 // load-bearing copy: the buff lands only when the 18s eat COMPLETES (an
 // interrupted meal forfeits it), exactly like the well-fed line. The buff
 // NAME interpolates through the buff bar's own matcher chain in every branch
-// (the (by) rule), and the stat label comes from the wellfed view's own
-// exported map, so the feast line, the dish tooltip, and the buff bar can
-// never disagree on a term in any locale.
+// (the (by) rule), and the stat label comes from the shared
+// src/ui/wellfed_stat_keys.ts leaf the dish tooltip and the wiki prose also
+// read, so the feast line, the dish tooltip, and the buff bar can never
+// disagree on a term in any locale.
 
 import { ITEMS } from '../sim/data';
 import { CONSUME_DURATION, DT, type ItemDef } from '../sim/types';

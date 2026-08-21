@@ -144,13 +144,16 @@ const itemStringsEn = {
       // the shared sim_i18n matcher row ({aura}), the (by) rule, so the
       // tooltip, the dish tooltip, and the buff bar can never disagree per
       // locale. useFeast keeps the Use: prefix: the feast has no foodHp, so
-      // no useFood sentence owns that slot on its tooltip.
+      // no useFood sentence owns that slot on its tooltip. Since 11c a
+      // serving mints the one shared 'well_fed' aura exactly as a bagged dish
+      // does, so both serving lines state the one-at-a-time rule too, in the
+      // wellFed pair's own words.
       useFeast:
         'Use: Sets out a feast others can eat from, one serving each ({servings} servings, lasts {minutes} min).',
       useFeastBuff:
-        'Each serving grants {aura}: +{value} {stat} for {minutes} min when you finish the {seconds} sec meal.',
+        'Each serving grants {aura}: +{value} {stat} for {minutes} min when you finish the {seconds} sec meal. Only one Well Fed effect at a time: a newer meal replaces it.',
       useFeastBuffAura:
-        'Each serving grants {aura} for {minutes} min when you finish the {seconds} sec meal.',
+        'Each serving grants {aura} for {minutes} min when you finish the {seconds} sec meal. Only one Well Fed effect at a time: a newer meal replaces it.',
       questItem: 'Quest Item',
       // Story tooltip lines (quest_item_tooltip_view.ts): related quest title,
       // keep-rules footer, and orphaned copy when the item is no longer needed

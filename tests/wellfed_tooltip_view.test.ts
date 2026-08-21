@@ -64,8 +64,11 @@ describe('wellFedTooltipLines', () => {
     for (const def of foods) {
       const html = wellFedTooltipLines(def);
       expect(html, `${def.id} must render a well-fed line`).toContain('Well Fed');
-      // EXACTLY ONE line per food (the two-views hazard the unification
-      // removed): a second wired view would double this on every tooltip.
+      // EXACTLY ONE line from the VIEW per food. The hud-composition half of
+      // the two-views hazard (a second wired call) is pinned by the
+      // method-scoped source pin below and by the composed-output arm in
+      // tests/wellfed_tooltip_composition.test.ts, since this view-level
+      // count cannot see a second call site.
       expect(html.split('<div class="tt-desc">').length - 1, `${def.id} renders one line`).toBe(1);
       // Expected fragments built with the same formatter the view uses; the
       // formatter OPTIONS themselves are pinned off-data below.
@@ -107,10 +110,16 @@ describe('wellFedTooltipLines', () => {
     }
   });
 
-  it('renders nothing for items without a wellFed record', () => {
+  it('renders nothing for items without a wellFed record, or for any non-food kind', () => {
     expect(wellFedTooltipLines(ITEMS.roasted_boar)).toBe('');
     expect(wellFedTooltipLines(ITEMS.vale_hearth_loaf)).toBe('');
+    // The sibling payload families never answer for this view: elixir,
+    // flask (elixir payload plus the flask marker), scroll, potion, drink.
     expect(wellFedTooltipLines(ITEMS.elixir_of_the_boar)).toBe('');
+    expect(wellFedTooltipLines(ITEMS.ironhusk_flask)).toBe('');
+    expect(wellFedTooltipLines(ITEMS.silverleaf_scroll)).toBe('');
+    expect(wellFedTooltipLines(ITEMS.healing_potion)).toBe('');
+    expect(wellFedTooltipLines(ITEMS.spring_water)).toBe('');
   });
 
   it('an unmapped buff kind falls back to naming the granted aura with both clauses', () => {
@@ -167,8 +176,10 @@ describe('wellFedTooltipLines', () => {
     const body = hudSrc.slice(start, end);
     expect(body).toContain('html += wellFedTooltipLines(item);');
     // Any composition call whose builder name says well-fed, in either
-    // retired or surviving spelling, counted case-insensitively: one.
-    const wellFedCalls = body.match(/html \+= well[Ff]ed\w*\(item\);/g) ?? [];
+    // retired or surviving spelling, counted case-insensitively and with ANY
+    // argument list (a re-wiring that passes a second argument still
+    // counts): one.
+    const wellFedCalls = body.match(/html \+= well[Ff]ed\w*\(/g) ?? [];
     expect(wellFedCalls, 'exactly one well-fed composition call').toHaveLength(1);
   });
 });

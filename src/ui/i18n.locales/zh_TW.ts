@@ -2655,8 +2655,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.wellFedAura': '精神飽滿：吃完後獲得{aura}效果，持續 {minutes} 分鐘。同時只能有一種精神飽滿效果：較新的餐點會頂替它。',
   'itemUi.tooltip.useFeast': '使用：擺出一桌他人也能享用的盛宴，每人限享一份（{servings} 份，持續 {minutes} 分鐘）。',
   'itemUi.tooltip.useFeastBuff':
-    '每份：吃完 {seconds} 秒的一餐後獲得{aura}效果，使你的{stat}提高 {value} 點，持續 {minutes} 分鐘。',
-  'itemUi.tooltip.useFeastBuffAura': '每份：吃完 {seconds} 秒的一餐後獲得{aura}效果，持續 {minutes} 分鐘。',
+    '每份：吃完 {seconds} 秒的一餐後獲得{aura}效果，使你的{stat}提高 {value} 點，持續 {minutes} 分鐘。同時只能有一種精神飽滿效果：較新的餐點會頂替它。',
+  'itemUi.tooltip.useFeastBuffAura':
+    '每份：吃完 {seconds} 秒的一餐後獲得{aura}效果，持續 {minutes} 分鐘。同時只能有一種精神飽滿效果：較新的餐點會頂替它。',
   'itemUi.tooltip.clickUseInstant': '點擊在戰鬥中立即使用',
   'itemUi.tooltip.clickUse': '點擊使用',
   'itemUi.tooltip.clickSetOut': '點擊擺放',
@@ -11224,7 +11225,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     "marshstalker檔及以上都擲傑作，Mirewarden Jerkin裡的Pristine Hide自動提供署名材料加成；鋨礦算一級材料。無屬性的硬皮普通件不會觸發。自然而然地練：從一級起剝下每隻狼和野豬，硬皮檔隨地做到25，隨任務進沼澤時順路受訓；marshstalker到50，mirewarden到75，此後Duskhide Wraps（三層配方，六塊鋨礦、三塊Pristine Hide、兩塊粗皮、一份Tanning Agent）帶你走完最後五十點（約75次）。75專精後移動製革坊尤其寶貴：營火邊就能把一袋皮子變成成品。Hesk的訂單每30分鐘收八張粗皮。技能50記下Tanner's Trade，上限處是Grandmaster Leatherworking。",
   'guide.profPages.craftProse.cooking.identityHeading': '餵飽隊伍的鍋',
   'guide.profPages.craftProse.cooking.identityBody':
-    "吃下熟食會在18秒的休息中治療你，這是拉怪間隙最便宜的治療。梯子從90點治療的Pan-Seared River Perch經980點的Marlow's Grand Roast，一路做到其上的三道頂級分職佳餚（1392點），這是遊戲中最大的坐地回復，也是唯一在吃完整盤後留下精神飽滿效果的食物。烹飪位於鍊金術與製皮之間；藥劑師（鍊金術與烹飪）在Eastbrook廚房的Cook Marlow處宣誓（先為鍋獵四頭野豬），與製皮組成的Trapper暫無誓約任務。",
+    "吃下熟食會在18秒的休息中治療你，這是拉怪間隙最便宜的治療。梯子從90點治療的Pan-Seared River Perch經980點的Marlow's Grand Roast，一路做到其上的三道頂級分職佳餚（1392點），這是遊戲中最大的坐地回復，也是吃完整盤後所能留下的最強精神飽滿效果（農場廚房的增益菜餚填補其下的各級）。烹飪位於鍊金術與製皮之間；藥劑師（鍊金術與烹飪）在Eastbrook廚房的Cook Marlow處宣誓（先為鍋獵四頭野豬），與製皮組成的Trapper暫無誓約任務。",
   'guide.profPages.craftProse.cooking.materialsHeading': '釣竿與獵刀供養的食櫃',
   'guide.profPages.craftProse.cooking.materialsBody':
     '釣魚按區域供應招牌食材：Eastbrook Vale的鏡鱒與河鱸，Mirefen Marsh的沼狗魚與泥鰻，Thornpeak Heights的霜鰓鱒與板鰭鯉，每一檔都烹本檔的魚。屠夫的一側來自屍體採集：野味肉，以及精良採集擲出的署名Prime Cut（大烤肉的核心）。藥草調味，梣木燻鰻，Cooking Salt在Marlow攤位8銅一袋。',

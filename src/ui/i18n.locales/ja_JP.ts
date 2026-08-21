@@ -2768,9 +2768,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useFeast':
     '使用: 他のプレイヤーも食べられる宴を広げる。1人1食まで（{servings}人前、{minutes}分間持続）。',
   'itemUi.tooltip.useFeastBuff':
-    '1人前につき、{seconds}秒の食事を終えると{aura}の効果を得て、{stat}が{value}上昇し、{minutes}分間持続します。',
+    '1人前につき、{seconds}秒の食事を終えると{aura}の効果を得て、{stat}が{value}上昇し、{minutes}分間持続します。満腹の効果は同時に一つだけで、新しい食事が古いものを置き換えます。',
   'itemUi.tooltip.useFeastBuffAura':
-    '1人前につき、{seconds}秒の食事を終えると{aura}の効果を得て、{minutes}分間持続します。',
+    '1人前につき、{seconds}秒の食事を終えると{aura}の効果を得て、{minutes}分間持続します。満腹の効果は同時に一つだけで、新しい食事が古いものを置き換えます。',
   'itemUi.tooltip.clickUseInstant': 'クリックして戦闘中に即使用',
   'itemUi.tooltip.clickUse': 'クリックして使用',
   'itemUi.tooltip.clickSetOut': 'クリックして設置',
@@ -11718,7 +11718,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     "marshstalker段以上はすべて傑作の抽選があり、Mirewarden JerkinのPristine Hideが署名素材ボーナスを自動で満たします。オスミウムは素材段階1。無能力値の硬革コモンは発動しません。自然に育てましょう。レベル1から狼と猪を残らず剥ぎ、硬革段はその場で25まで、クエストで沼に入るついでに修行を。marshstalkerで50、mirewardenで75、以降はDuskhide Wraps（第3段レシピ、オスミウム6個、Pristine Hide 3枚、粗皮2枚、Tanning Agent 1）が99まで全速、以降半減で、最後の50ポイントはおよそ75回。75の特化で得る移動なめし場はこの職で最も輝きます。焚き火のそばで革袋が装備に変わり、Fenbridgeへの往復が消えます。Heskの依頼は30分ごとに粗皮8枚。スキル50でTanner's Trade、上限でGrandmaster Leatherworkingです。",
   'guide.profPages.craftProse.cooking.identityHeading': '一行を養う鍋',
   'guide.profPages.craftProse.cooking.identityBody':
-    "料理を食べると18秒の休憩で回復します。戦闘の合間には最安の回復です。梯子は回復90のPan-Seared River Perchから、Marlow's Grand Roast（980）を経て、その上に立つ三種の頂点料理（1392）まで届きます。ゲーム中で最大の座り回復であり、皿を食べ終えると満腹の効果を残す唯一の食べ物です。環では錬金術と皮革加工の間。生きた対は薬師（錬金術と料理）で、Eastbrook厨房のCook Marlowの前で猪を四頭狩って誓います。皮革加工との対Trapperには誓いのクエストがまだありません。",
+    "料理を食べると18秒の休憩で回復します。戦闘の合間には最安の回復です。梯子は回復90のPan-Seared River Perchから、Marlow's Grand Roast（980）を経て、その上に立つ三種の頂点料理（1392）まで届きます。ゲーム中で最大の座り回復であり、皿を食べ終えると得られる満腹の効果としては最強のものです（農場台所の強化料理がその下の段を埋めます）。環では錬金術と皮革加工の間。生きた対は薬師（錬金術と料理）で、Eastbrook厨房のCook Marlowの前で猪を四頭狩って誓います。皮革加工との対Trapperには誓いのクエストがまだありません。",
   'guide.profPages.craftProse.cooking.materialsHeading': '竿と包丁が満たす食料庫',
   'guide.profPages.craftProse.cooking.materialsBody':
     '看板食材は釣りが地方ごとに供給します。Eastbrook Valeの鏡鱒と川鱸、Mirefen Marshの沼カワカマスと泥鰻、Thornpeak Heightsの霜鰓鱒と板鰭鯉。梯子の各段はその段の魚を調理するので、釣る料理人は品切れ知らずです。肉屋の側は亡骸採集から。猪などの獣肉、そしてレア以上の採集判定で署名入りのPrime Cut、大ローストの主役が出ます。薬草が上位の皿に香りを添え、ashwoodの丸太一本が鰻を燻し、Cooking SaltはMarlowの店で一袋8銅です。',

@@ -2747,9 +2747,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useFeast':
     '사용: 다른 플레이어도 먹을 수 있는 잔치를 차립니다. 1인당 1인분입니다({servings}인분, {minutes}분간 지속).',
   'itemUi.tooltip.useFeastBuff':
-    '한 접시를 {seconds}초 동안 다 먹으면 {aura} 효과를 얻어 {stat}이(가) {value} 증가하며 {minutes}분 동안 지속됩니다.',
+    '한 접시를 {seconds}초 동안 다 먹으면 {aura} 효과를 얻어 {stat}이(가) {value} 증가하며 {minutes}분 동안 지속됩니다. 잘 먹음 효과는 한 번에 하나만 유지되며, 새로 먹은 음식이 이전 효과를 대체합니다.',
   'itemUi.tooltip.useFeastBuffAura':
-    '한 접시를 {seconds}초 동안 다 먹으면 {aura} 효과를 얻어 {minutes}분 동안 지속됩니다.',
+    '한 접시를 {seconds}초 동안 다 먹으면 {aura} 효과를 얻어 {minutes}분 동안 지속됩니다. 잘 먹음 효과는 한 번에 하나만 유지되며, 새로 먹은 음식이 이전 효과를 대체합니다.',
   'itemUi.tooltip.clickUseInstant': '클릭하여 전투 중 즉시 사용',
   'itemUi.tooltip.clickUse': '클릭하여 사용',
   'itemUi.tooltip.clickSetOut': '클릭하여 차리기',
@@ -11708,7 +11708,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     "marshstalker 단 이상은 모두 걸작을 굴리고, Mirewarden Jerkin의 Pristine Hide가 서명 재료 보너스를 자동으로 채운다. 오스뮴은 재료 1단계. 능력치 없는 생가죽 일반품은 발동하지 않는다. 자연스럽게 키우자. 1레벨부터 잡는 늑대와 멧돼지를 모두 벗기고, 생가죽 단은 선 자리에서 25까지, 퀘스트가 늪으로 이끌 때 겸사겸사 수련한다. marshstalker로 50, mirewarden으로 75, 그 뒤는 Duskhide Wraps(3단 제조법, 오스뮴 6개, Pristine Hide 3장, 거친 가죽 2장, Tanning Agent 1)가 99까지 전속, 이후 절반으로 마지막 50점을 약 75회에 데려간다. 75 특화의 이동 무두질 작업장은 이 기술에서 가장 빛난다. 모닥불 곁에서 가죽 자루가 장비로 변해 Fenbridge 왕복이 사라진다. Hesk의 주문은 30분마다 거친 가죽 8장. 기술 50에 Tanner's Trade, 상한에 Grandmaster Leatherworking이다.",
   'guide.profPages.craftProse.cooking.identityHeading': '일행을 먹이는 솥',
   'guide.profPages.craftProse.cooking.identityBody':
-    "요리를 먹으면 18초의 휴식 동안 회복한다. 전투 사이에는 가장 싼 치유다. 사다리는 회복 90의 Pan-Seared River Perch에서 Marlow's Grand Roast(980)를 지나 그 위의 세 가지 정점 요리(1392)까지 이어진다. 게임에서 가장 큰 앉은 회복이며, 접시를 다 비우면 잘 먹음 효과를 남기는 유일한 음식이다. 연금술과 가죽세공 사이에 있으며, 살아 있는 짝은 약제사(연금술과 요리)로 Eastbrook 주방의 Cook Marlow 앞에서 멧돼지 네 마리를 사냥해 맹세한다. 가죽세공과 이루는 Trapper는 아직 서약 퀘스트가 없다.",
+    "요리를 먹으면 18초의 휴식 동안 회복한다. 전투 사이에는 가장 싼 치유다. 사다리는 회복 90의 Pan-Seared River Perch에서 Marlow's Grand Roast(980)를 지나 그 위의 세 가지 정점 요리(1392)까지 이어진다. 게임에서 가장 큰 앉은 회복이며, 접시를 다 비우면 얻는 잘 먹음 효과 중 가장 강력한 것이다(농장 주방의 강화 요리들이 그 아래 단계를 채운다). 연금술과 가죽세공 사이에 있으며, 살아 있는 짝은 약제사(연금술과 요리)로 Eastbrook 주방의 Cook Marlow 앞에서 멧돼지 네 마리를 사냥해 맹세한다. 가죽세공과 이루는 Trapper는 아직 서약 퀘스트가 없다.",
   'guide.profPages.craftProse.cooking.materialsHeading': '낚싯대와 칼이 채우는 찬장',
   'guide.profPages.craftProse.cooking.materialsBody':
     '간판 재료는 낚시가 지역별로 댄다. Eastbrook Vale의 거울 송어와 강 농어, Mirefen Marsh의 늪 창꼬치와 진흙 장어, Thornpeak Heights의 서리아가미 송어와 판지느러미 잉어. 사다리의 각 단은 제 단의 물고기를 요리하니 낚는 요리사는 재료가 마르지 않는다. 푸줏간 쪽은 사체 채집에서 온다. 멧돼지 따위의 사냥 고기, 그리고 희귀 이상 판정에서 나오는 서명된 Prime Cut, 대구이의 주인공이다. 약초가 좋은 접시에 향을 더하고, ashwood 통나무 하나가 장어를 훈제하며, Cooking Salt는 Marlow의 가판에서 한 봉지 8동이다.',
