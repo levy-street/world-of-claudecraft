@@ -62,7 +62,52 @@ describe('buildConsuming', () => {
   });
 });
 
+// The offender predicate the sweep below runs, named so its own reach is
+// provable. It catches BOTH assignment shapes a hand-built record can take,
+// the dotted slot (`p.eating = {`) and the COMPUTED slot (`p[slot] = {`, the
+// exact shape items.ts used before the builder and therefore the exact shape
+// a regression would take), on any receiver name; the computed arm is keyed
+// on the Consuming SHAPE rather than the assignment alone, because a bare
+// computed-key assignment is an everyday idiom this file must not police.
+// `ticksElapsed` is the discriminator: it is Consuming's own field, carried
+// by every hand-built record and by no other object literal in src/sim.
+const CONSUMING_SHAPE_WINDOW = 400;
+
+function hasHandBuiltConsumingWrite(code: string): number {
+  let hits = 0;
+  const opener = /(?:\.(?:eating|drinking)|\[\s*\w+\s*\])\s*=\s*\{/g;
+  for (const m of code.matchAll(opener)) {
+    const from = (m.index ?? 0) + m[0].length;
+    if (code.slice(from, from + CONSUMING_SHAPE_WINDOW).includes('ticksElapsed')) hits++;
+  }
+  return hits;
+}
+
 describe('the builder is the ONE Consuming writer', () => {
+  it('the offender predicate really catches both hand-built shapes (producer self-proof)', () => {
+    // The sweep is only evidence if its needle can see the regression shape:
+    // the pre-11c items.ts wrote through a COMPUTED slot, which a
+    // dotted-only needle is structurally blind to.
+    expect(hasHandBuiltConsumingWrite('p.eating = { itemId, ticksElapsed: 0 }')).toBe(1);
+    expect(hasHandBuiltConsumingWrite('e.drinking = {\n  ticksElapsed: 0,\n}')).toBe(1);
+    expect(hasHandBuiltConsumingWrite('p[slot] = {\n  itemId,\n  ticksElapsed: 0,\n}')).toBe(1);
+    // Neither routed construction nor an ordinary computed-key assignment
+    // (the idiom the shape discriminator keeps this guard away from).
+    expect(hasHandBuiltConsumingWrite('p[slot] = buildConsuming(def.kind, def);')).toBe(0);
+    expect(hasHandBuiltConsumingWrite("p.eating = buildConsuming('food', dish);")).toBe(0);
+    expect(hasHandBuiltConsumingWrite('byId[key] = { name, count };')).toBe(0);
+  });
+
+  it('ITEMS keys equal their def ids (the builder names the meal by def.id)', () => {
+    // The builder writes itemId: def.id where the old inline construction
+    // wrote the caller's lookup key; equivalent only while no catalog entry
+    // is keyed under an alias. Pin the premise so an aliased key cannot
+    // silently change which item an eating slot names.
+    for (const [key, def] of Object.entries(ITEMS)) {
+      expect(def.id, `ITEMS['${key}'] id mismatch`).toBe(key);
+    }
+  });
+
   it('no src/sim site hand-builds an eating/drinking record outside the two dev freezes', () => {
     // The acceptance of ruling 11c-A2-BUILDER, held at the source level: a
     // THIRD hand-built copy of the shape is how the wellFed carry gets
@@ -79,13 +124,13 @@ describe('the builder is the ONE Consuming writer', () => {
     let simTsLiterals = 0;
     for (const f of sourceFilesUnder(join(process.cwd(), 'src', 'sim'))) {
       const code = stripComments(readFileSync(f.full, 'utf8'));
-      const hits = code.match(/\.(?:eating|drinking)\s*=\s*\{/g) ?? [];
-      if (hits.length === 0) continue;
+      const hits = hasHandBuiltConsumingWrite(code);
+      if (hits === 0) continue;
       if (f.file === 'sim.ts') {
-        simTsLiterals += hits.length;
+        simTsLiterals += hits;
         continue;
       }
-      offenders.push(`${f.file} (${hits.length})`);
+      offenders.push(`${f.file} (${hits})`);
     }
     expect(offenders, 'hand-built Consuming writers outside the builder').toEqual([]);
     expect(simTsLiterals, 'exactly the two dev-scenario freezes in sim.ts').toBe(2);
