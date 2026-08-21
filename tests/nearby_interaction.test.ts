@@ -708,7 +708,15 @@ describe('the feast arm (Phase 12)', () => {
     expect(r.calls).toEqual(['consumeFeast:12', 'consumeFeast:12']);
   });
 
-  it('a garden bed in reach keeps winning the press over a feast (the arm sits below the bed arm)', () => {
+  it('a placed feast wins the press over a garden bed, and the bed takes it back once the feast is gone (ruling 11b-R3c-1, both directions)', () => {
+    // The placed TRANSIENT outranks permanent world furniture: a feast
+    // despawns on a timer and is what the player just walked to, so with
+    // both in reach the press bites the feast. The second direction in the
+    // SAME rig: the feast despawns (the entity leaves the roster) and the
+    // identical press now opens the bed, so the bed arm is proven live
+    // below the feast rather than swallowed by it. Mobile crafting stations
+    // take no press at all today (proximity-activated), so the ruling's
+    // station half has no arm to pin until one gains a press.
     const r = rig([feast(12)]);
     r.world.farmPatches = [
       {
@@ -720,6 +728,11 @@ describe('the feast arm (Phase 12)', () => {
         beds: [{ id: 'bed_test_1', x: 2, z: 0 }],
       },
     ];
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['consumeFeast:12']);
+
+    r.calls.length = 0;
+    r.world.entities = new Map();
     expect(interact(r)).toBe(true);
     expect(r.calls).toEqual(['plantSheet:bed_test_1']);
   });

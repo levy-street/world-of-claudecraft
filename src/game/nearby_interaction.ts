@@ -243,9 +243,28 @@ export function tryNearbyInteraction(
       effectConfirm,
     );
   }
-  // The garden-bed arm (Phase 9b) sits below gather nodes (a node in reach
-  // keeps winning the press) and above the escort-away last resort. Harvest
-  // is choice-free, so a bed with MY plot goes straight to the world (the
+  // The feast arm sits below gather nodes (a node in reach keeps winning the
+  // press) and ABOVE the garden-bed arm (ruling 11b-R3c-1: a PLACED TRANSIENT
+  // wins over permanent world furniture; a feast despawns on a timer and is
+  // what the player just walked to, the shipped corpses-over-nodes logic, so
+  // it outranks the bed that is always there). The press just sends the
+  // entity id: an already-fed player's press near a feast answers through
+  // the sim's own farmDenied feast_eaten line (the (bp) doctrine: the sim is
+  // the refusing authority, the client never reads the ledger, which never
+  // crosses the wire anyway). Mobile crafting stations are OUTSIDE this
+  // ordering by construction: they take no interact press at all
+  // (proximity-activated via inRangeStationTypes), so the ruling's
+  // station-over-bed half has no arm to order until a station gains a press.
+  if (!player.dead) {
+    const feastId = nearestInteractableFeast(world.entities, player.pos);
+    if (feastId !== null) {
+      world.consumeFeast(feastId);
+      return true;
+    }
+  }
+  // The garden-bed arm (Phase 9b) sits immediately below the placed feast
+  // (11b-R3c-1) and above the escort-away last resort. Harvest is
+  // choice-free, so a bed with MY plot goes straight to the world (the
   // sim's own farmDenied answers a growing plot with not_ready; the client
   // never reads plot.status here); a free bed opens the seed-and-knobs sheet.
   if (!player.dead) {
@@ -256,20 +275,6 @@ export function tryNearbyInteraction(
       } else {
         hud.openPlantSheet(bedId);
       }
-      return true;
-    }
-  }
-  // The feast arm (Phase 12) sits below the garden-bed arm (a bed press keeps
-  // winning: farming your own plot is the deliberate act, the feast the
-  // opportunistic one) and above the escort-away last resort. The press just
-  // sends the entity id: an already-fed player's press near a feast answers
-  // through the sim's own farmDenied feast_eaten line (the (bp) doctrine: the
-  // sim is the refusing authority, the client never reads the ledger, which
-  // never crosses the wire anyway).
-  if (!player.dead) {
-    const feastId = nearestInteractableFeast(world.entities, player.pos);
-    if (feastId !== null) {
-      world.consumeFeast(feastId);
       return true;
     }
   }
