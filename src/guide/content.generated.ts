@@ -9287,6 +9287,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "food": {
             "amount": 1392,
             "seconds": 18
+          },
+          "wellfed": {
+            "aura": "Well Fed",
+            "kind": "buff_sta",
+            "value": 6,
+            "minutes": 15
           }
         }
       },
@@ -9336,6 +9342,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "food": {
             "amount": 1392,
             "seconds": 18
+          },
+          "wellfed": {
+            "aura": "Well Fed",
+            "kind": "buff_ap",
+            "value": 6,
+            "minutes": 15
           }
         }
       },
@@ -9385,6 +9397,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "food": {
             "amount": 1392,
             "seconds": 18
+          },
+          "wellfed": {
+            "aura": "Well Fed",
+            "kind": "buff_int",
+            "value": 6,
+            "minutes": 15
           }
         }
       },
@@ -9785,7 +9803,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "wellfed": {
             "aura": "Well Fed",
             "kind": "buff_sta",
-            "value": 3,
+            "value": 2,
             "minutes": 10
           }
         }
@@ -9828,8 +9846,8 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "wellfed": {
             "aura": "Well Fed",
             "kind": "buff_sta",
-            "value": 6,
-            "minutes": 15
+            "value": 3,
+            "minutes": 10
           }
         }
       },
@@ -9871,8 +9889,8 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "wellfed": {
             "aura": "Well Fed",
             "kind": "buff_sta",
-            "value": 9,
-            "minutes": 15
+            "value": 4,
+            "minutes": 10
           }
         }
       },
@@ -9914,8 +9932,8 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "wellfed": {
             "aura": "Well Fed",
             "kind": "buff_sta",
-            "value": 12,
-            "minutes": 15
+            "value": 5,
+            "minutes": 10
           }
         }
       },
