@@ -8,11 +8,16 @@
 // again, so the shape is built in exactly one place.
 //
 // A pure leaf (no SimContext, no rng, no clock): a Vitest imports it
-// directly. The TWO deliberate non-writers are the dev-scenario zero-rate
-// meals in src/sim/sim.ts ('dev_cascade_freeze', 'dev_sandbox_freeze'): they
-// have no item def, exist only to trip the natural-regen freeze, must never
-// mint a buff, and hold a sentinel `remaining`, so they hand-build their
-// records and stay OUT of this builder by design (named in the 11c ledger).
+// directly. The TWO deliberate non-writers IN src/sim are the dev-scenario
+// zero-rate meals in src/sim/sim.ts ('dev_cascade_freeze',
+// 'dev_sandbox_freeze'): they have no item def, exist only to trip the
+// natural-regen freeze, must never mint a buff, and hold a sentinel
+// `remaining`, so they hand-build their records and stay OUT of this builder
+// by design (named in the 11c ledger). The online mirror's display-only
+// eating/drinking shadow (src/net/online.ts: empty itemId, zero rates, the
+// wire's remaining, never a payload) is a different-host shape the client
+// never mints from; it is not a writer of this record and stays outside the
+// builder too.
 
 import {
   CONSUME_DURATION,
@@ -39,18 +44,21 @@ export interface ConsumableDefFacts {
  *  The payload rides the MEAL rather than being re-read from the catalog at
  *  completion, so the grant is decided by what was eaten; it is a REFERENCE
  *  to the def's record, not a copy (house style, same as `def.elixir`):
- *  read-only by every consumer. The kind guard on the carry is the D15
- *  food-only contract enforced at the one build site: only FoodItemDef can
- *  spell wellFed (types beat guards), and even a drink-shaped caller could
- *  not smuggle a payload into gulp completion through here. */
+ *  read-only by every consumer. The kind branch on the carry is the D15
+ *  food-only contract enforced at the one build site AND at the record's own
+ *  type: only FoodItemDef can spell wellFed and only the food arm of
+ *  Consuming (FoodConsuming) can carry it (types beat guards), so even a
+ *  drink-shaped caller cannot smuggle a payload into gulp completion through
+ *  here or past it. */
 export function buildConsuming(kind: 'food' | 'drink', def: ConsumableDefFacts): Consuming {
-  return {
+  const base = {
     itemId: def.id,
-    kind,
     hpPer2s: def.foodHp ? Math.round(def.foodHp / CONSUME_TICKS) : 0,
     manaPer2s: def.drinkMana ? Math.round(def.drinkMana / CONSUME_TICKS) : 0,
     remaining: CONSUME_DURATION,
     ticksElapsed: 0,
-    ...(kind === 'food' && def.wellFed ? { wellFed: def.wellFed } : {}),
   };
+  return kind === 'food'
+    ? { ...base, kind, ...(def.wellFed ? { wellFed: def.wellFed } : {}) }
+    : { ...base, kind };
 }

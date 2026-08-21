@@ -4197,9 +4197,8 @@ export function questObjectiveRequired(
 export const CONSUME_DURATION = 18; // seconds
 export const CONSUME_TICKS = 9; // CONSUME_DURATION / 2s regen tick
 
-export interface Consuming {
+interface ConsumingBase {
   itemId: string;
-  kind: 'food' | 'drink';
   hpPer2s: number;
   manaPer2s: number;
   remaining: number;
@@ -4208,15 +4207,33 @@ export interface Consuming {
   // Drives the eat/drink bite/gulp sound cadence (see consume_sfx.ts); never
   // read for anything else.
   ticksElapsed: number;
-  // The Well Fed buff this meal owes on COMPLETION, copied off the food def at
-  // sit-down (FoodItemDef.wellFed, the only ItemDef member that can spell it).
-  // Carried here rather than re-read from the def at the end so the grant is
-  // decided by what was eaten, not by what the catalog says now, and so the
-  // drain in combat/auras.ts needs no item lookup. Absent for every drink and
-  // for food that grants no buff. A REFERENCE to the def's record, not a copy
-  // (house style, the same as `def.elixir`): read-only by every consumer.
+}
+
+// A meal in the eating slot: the ONE Consuming arm that can spell a Well Fed
+// payload, so the D15 food-only contract is kind-scoped at the record as well
+// as at the def (FoodItemDef.wellFed): types beat guards at both layers, and
+// the completion site (combat/auras.ts) narrows on the record's kind before
+// handing the payload to the one mint in src/sim/wellfed.ts.
+export interface FoodConsuming extends ConsumingBase {
+  kind: 'food';
+  // The Well Fed buff this meal owes on COMPLETION, carried by reference off
+  // the food def at sit-down (FoodItemDef.wellFed, the only ItemDef member
+  // that can spell it) by the src/sim/consuming.ts builder. Carried here
+  // rather than re-read from the def at the end so the grant is decided by
+  // what was eaten, not by what the catalog says now, and so the drain in
+  // combat/auras.ts needs no item lookup. Absent for food that grants no
+  // buff. A REFERENCE to the def's record, not a copy (house style, the same
+  // as `def.elixir`): read-only by every consumer.
   wellFed?: TimedStatBuffPayload;
 }
+
+// A drink in the drinking slot: no payload arm at all, so a gulp completion
+// can never reach the mint with one (unrepresentable, not guarded).
+export interface DrinkConsuming extends ConsumingBase {
+  kind: 'drink';
+}
+
+export type Consuming = FoodConsuming | DrinkConsuming;
 
 export function isConsuming(e: { eating: Consuming | null; drinking: Consuming | null }): boolean {
   return e.eating !== null || e.drinking !== null;

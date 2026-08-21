@@ -792,8 +792,9 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // AND duration. One aura id across the whole family means last eaten
   // always wins (the classic one-food-buff rule) and a dish can never stack
   // with a role plate; a same-stat elixir still coexists (different aura
-  // id), so the combined crafted ceiling is dish 5 plus elixir 12, 17
-  // stamina, comfortably below the raid floor. The earlier per-kind
+  // id), so the farming rungs' own stacking ceiling is dish 5 plus elixir
+  // 12, 17 stamina (the global crafted ceiling stays the apex block's flask
+  // 15 plus plate 6, 21), comfortably below the raid floor. The earlier per-kind
   // wellfed_<kind> namespace and its "at or below the elixir budget ceiling"
   // calibration were retired here: they let a cooking-50 trainer dish (12 /
   // 900) beat the cooking-100 apex plate on both axes, the inversion the

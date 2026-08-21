@@ -189,7 +189,9 @@ export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void 
       // today only because nothing on the apply path consults isConsuming; this
       // one stays correct if anything ever does (a buff that refuses to land on
       // an eating character, a cancel-on-consume rule).
-      const wellFed = c.wellFed;
+      // Only the food arm of Consuming can carry a payload (FoodConsuming,
+      // src/sim/types.ts); the narrowing is the type's, not a runtime guard.
+      const wellFed = c.kind === 'food' ? c.wellFed : undefined;
       p[slot] = null;
       applyWellFedOnMealComplete(ctx, p, wellFed);
     }

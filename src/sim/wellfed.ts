@@ -28,9 +28,10 @@
 // involved.
 //
 // This function draws ZERO rng (no Rng access at all): the mint is a pure
-// applyAura over the payload the meal CARRIED (Consuming.wellFed, copied off
-// FoodItemDef.wellFed at sit-down by the src/sim/consuming.ts builder), so
-// the shared draw stream is untouched and no catalog lookup happens here.
+// applyAura over the payload the meal CARRIED (FoodConsuming.wellFed, carried
+// by reference off FoodItemDef.wellFed at sit-down by the src/sim/consuming.ts
+// builder), so the shared draw stream is untouched and no catalog lookup
+// happens here.
 // The minted aura is TRANSIENT across save/load: no persistence path
 // serializes entity auras (serializeCharacter carries no auras key), so a
 // relog drops the buff, matching every other temporary aura.
@@ -48,8 +49,12 @@ export const WELL_FED_AURA_ID = 'well_fed';
  * grant is decided by what was eaten, not by what the catalog says now.
  * A meal that carried no payload (every drink and every plain food) is a
  * no-op. The kind guard the old farming module needed is unrepresentable
- * now: only FoodItemDef can spell a wellFed payload (types beat guards),
- * so no drink record can ever carry one into this call.
+ * now at BOTH layers: only FoodItemDef can spell a wellFed payload, and only
+ * the food arm of the eating record (FoodConsuming, src/sim/types.ts) can
+ * carry one, so the completion site narrows on the record's kind and no
+ * drink slot can ever reach this call with a payload (types beat guards; the
+ * builder's kind branch in src/sim/consuming.ts is the belt-and-braces
+ * layer at the write).
  */
 export function applyWellFedOnMealComplete(
   ctx: SimContext,
