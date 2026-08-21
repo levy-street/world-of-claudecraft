@@ -190,11 +190,12 @@ falling back to the previous tuned keep rates for everything else. Trees carry t
 architectural gap (every tree/tree2 trunk gets an unconditional collider, with no size gate at
 all), but a correct fix there would exempt effectively every tree from the trim, a much larger
 triangle-count and frame-time tradeoff on the weak/software GPUs this tier targets than the rock
-fix is, so it is tracked separately rather than folded in blind: see
-levy-street/world-of-claudecraft#3415. A second, unrelated invisible-collision gap was found in
-the same review, in the Evergarden's parterre beds and garden-biome pines (a zone-curation
-exclusion, unconditional on every preset, not this tier trim), tracked at
-levy-street/world-of-claudecraft#3417.
+fix is, so it was tracked separately rather than folded in blind at
+levy-street/world-of-claudecraft#3415: see the entry below, where its decimation-trim half is
+fixed for real (a distinct, still-open bucket-culling half is also identified there). A second,
+unrelated invisible-collision gap was found in the same review, in the Evergarden's parterre
+beds and garden-biome pines (a zone-curation exclusion, unconditional on every preset, not this
+tier trim), tracked at levy-street/world-of-claudecraft#3417 and still open.
 
 The rule this adds to the list at the top: ACTIONABLE now explicitly includes "the presence of
 any entity a player can physically collide with", not only HUD/map reads. A render-side decision
@@ -203,6 +204,62 @@ about what to draw must never diverge from what the sim decides a player can be 
 `tests/foliage_decimation_wiring.test.ts` source-scans `foliage.ts` so a future re-inlining of
 the old hash-vs-keep-rate filter (which is exactly what caused this) fails loudly instead of
 silently reopening the bug behind a green core test.
+
+### Low-tier trees with a real collider stayed invisible too (2026-08-20)
+
+`levy-street/world-of-claudecraft#3415` (opened alongside the rock fix above) was closed as
+completed on 2026-08-17 with no linked commit or PR: the gap it tracked was never actually
+closed. A player reported the live symptom again on Low graphics: a tree visible from one camera
+angle, then gone after a small camera turn, while still blocking movement in a straight line.
+
+The deliberation the issue asked for (accept the full triangle-count cost, or invent a cheaper
+"kept but budget" stand-in visual) resolves the same way the graphics-fairness principle at the
+top of this file already states it: a preset may shed COSMETIC richness, never ACTIONABLE
+information, and there is no "unless it is expensive" clause. A collider a player cannot see is
+the sharpest form of hidden actionable information there is, so the answer is the rock fix's
+exemption, generalized: `survivesLeanDecimation` now exempts ANY decoration `decorationHasCollider`
+calls solid, not only rocks. Since every tree/tree2 trunk carries an unconditional collider, this
+removes the lean-tier trim for trees entirely; the hash-based keep rate that used to thin them
+(0.68 standard materials / 0.46 otherwise) is now unreachable dead weight and was deleted along
+with the tree-specific branch in `leanKeepRate` (renamed `leanRockKeepRate`, the only decoration
+kind that can still lack a collider).
+
+This is a real, accepted frame-time tradeoff on the weak/software GPUs `GFX.leanFoliage`
+targets, not an oversight, and it is smaller than it first looks: the LEAN arm never had
+impostors to begin with (`src/render/foliage_lod.ts`'s own header: "THE LEAN ARM HAS NO
+IMPOSTORS AT ALL: past the tree-detail distance its trees simply end"), so a tree exempted
+from the decimation trim does not draw at full detail out to the render horizon, only out to
+the same `treeDetailDistance` every other lean-tier tree already ends at. It also still holds
+every species to a single model variant per bucket and skips shadow casters entirely on
+`GFX.leanFoliage` (both unconditional on this tier, collider status aside). Correction from an
+earlier draft of this entry: the bark-cull and billboard-impostor sheds do NOT apply here at
+all; `cullBark` requires `GFX.standardMaterials`, which is false for the plain Low preset (it
+only fires on the lean-MEDIUM weak-integrated-GPU cohort), and impostors require
+`!leanFoliage`. Neither was ever part of what a lean-tier tree degrades through.
+
+`tests/foliage_decimation_core.test.ts` pins the new behavior directly (a tree at either scale
+extreme survives the unluckiest possible hash draw, on both material tiers), and
+`tests/decoration_dims.test.ts` already pinned `decorationHasCollider`'s tree arm before this
+fix, so the only thing that changed is `survivesLeanDecimation` actually trusting it for every
+decoration kind rather than only rocks.
+
+**A second, distinct mechanism can still hide a collider-bearing rock or tree on this tier,
+independent of this fix, found during this entry's own review:** `bucketVisible()`
+(`src/render/foliage_lod.ts`) culls a whole scatter bucket by comparing camera distance to the
+bucket's CENTER against a numeric cap, not the bucket's near edge, and the shipped world's
+buckets run 273-307 yards in radius (two columns splitting the world in half, times depth
+bands), against an effective 106-245 yard lean-tier cap. A player standing right next to a
+decoration near a huge bucket's edge, whose content-weighted center is far away, can still have
+that decoration's entire InstancedMesh set invisible while the sim's collider (which knows
+nothing about camera position) keeps it solid, the same invisible-but-solid shape as the bug
+this entry fixes, through a real-time, camera-position-dependent path rather than a static
+build-time roll, which also better matches a report of a decoration flickering as the camera
+turns (this decimation-trim fix cannot produce that: its keep/drop decision is made once, at
+build time, and cannot change during a session). This affects rocks too, meaning the original
+rock fix above does not fully close the rock case either. Deliberately not folded into this fix
+for the same reason the tree case itself was originally deferred: it is a real, camera-distance
+performance tradeoff across ALL scenery sharing a bucket, cosmetic or not, and deserves its own
+measured design decision. Tracked at levy-street/world-of-claudecraft#3525.
 
 ## Enforcing guards
 
@@ -269,9 +326,9 @@ silently reopening the bug behind a green core test.
 - `tests/decoration_dims.test.ts`: `decorationHasCollider` classifies a rock at or above
   `ROCK_COLLIDER_MIN_SCALE` as solid, one below it as dressing, and every tree/tree2 as solid
   (colliders.ts gives every trunk a collider unconditionally).
-- `tests/foliage_decimation_core.test.ts`: `survivesLeanDecimation` never drops a solid rock
-  regardless of its hash draw, still decimates sub-floor dressing rocks at the tuned keep rates,
-  and leaves tree/tree2 decimation numerically unchanged.
+- `tests/foliage_decimation_core.test.ts`: `survivesLeanDecimation` never drops a solid rock or
+  any tree/tree2 regardless of its hash draw, and still decimates sub-floor dressing rocks (the
+  one decoration kind that can lack a collider) at the tuned keep rate.
 - `tests/foliage_decimation_wiring.test.ts`: source-scans `foliage.ts` to prove the leanFoliage
   decoration filter actually calls `survivesLeanDecimation` and that the old bare
   `hashAt(d.x, d.z, 83) < keep` shape has not been re-inlined.

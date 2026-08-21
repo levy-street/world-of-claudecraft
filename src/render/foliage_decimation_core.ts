@@ -2,21 +2,25 @@
 // (GFX.leanFoliage, foliage.ts buildTrees). Pure and Three/DOM-free so a
 // Vitest can pin it without a renderer: tests/foliage_decimation_core.test.ts.
 //
-// A rock big enough to carry a real collider (sim/decoration_dims.ts
+// Any decoration with a real collider (sim/decoration_dims.ts
 // decorationHasCollider, backed by sim/colliders.ts) is exempt from the trim:
 // a graphics preset may shed cosmetic dressing, but the root CLAUDE.md
 // graphics-fairness invariant forbids hiding something a player can be
-// blocked by while standing right in front of it. Tree/tree2 decimation is
-// left exactly as tuned; every tree trunk also carries an unconditional
-// collider (decorationHasCollider), so the identical gap exists for trees,
-// tracked separately rather than folded into this fix's perf-neutral scope.
+// blocked by while standing right in front of it. Every tree/tree2 trunk
+// carries an unconditional collider, so this exemption keeps every tree; the
+// hash-based keep rate below now only ever runs for a rock under the
+// collider floor (see docs/design/graphics-settings-fairness.md, "Low-tier
+// trees with a real collider stayed invisible too").
 
 import { decorationHasCollider } from '../sim/decoration_dims';
 import type { Decoration } from '../sim/world';
 
-function leanKeepRate(kind: Decoration['kind'], standardMaterials: boolean): number {
-  if (kind === 'rock') return standardMaterials ? 0.74 : 0.55;
-  return standardMaterials ? 0.68 : 0.46;
+// The exemption above routes every collider-bearing decoration away from
+// this rate before it is ever called; only a dressing rock (below
+// ROCK_COLLIDER_MIN_SCALE, the one decoration kind that can lack a collider)
+// can still reach it, so there is only a rock rate left to tune.
+function leanRockKeepRate(standardMaterials: boolean): number {
+  return standardMaterials ? 0.74 : 0.55;
 }
 
 /**
@@ -30,6 +34,6 @@ export function survivesLeanDecimation(
   hashDraw: number,
   standardMaterials: boolean,
 ): boolean {
-  if (d.kind === 'rock' && decorationHasCollider(d)) return true;
-  return hashDraw < leanKeepRate(d.kind, standardMaterials);
+  if (decorationHasCollider(d)) return true;
+  return hashDraw < leanRockKeepRate(standardMaterials);
 }
