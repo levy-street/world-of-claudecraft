@@ -200,12 +200,20 @@ UNIT 2 - GOLDENS (67 files). Commit 2, and it contains NOTHING but goldens.
   ours, theirs, and merged, and assert mergedDelta == oursDelta + theirsDelta on every
   one of those fields. Any golden whose readable fields do not compose is a finding to
   investigate BEFORE the commit lands.
-- Two anchors, both already known:
-  1. Merged tick-0 nextId in solo_warrior.json must read 972.
-  2. draws and drawDigest must be UNCHANGED from ours in any scenario neither packet
-     touched, because farming shifted ids without perturbing the rng stream. A moved
-     draws count in an untouched scenario is a DETERMINISM REGRESSION, not a re-record:
-     stop and investigate, do not commit it.
+- Two anchors, both already known. **RESTATED 2026-08-21 by the Phase 11d QA: both were
+  written before the re-record and neither survives contact with the tree as literally
+  phrased. The corrected forms are the ones to verify against.**
+  1. WAS "merged tick-0 nextId in solo_warrior.json must read 972". Inexact: 34 shared
+     goldens sit at 967/971 and 33 at 968/972. The real invariant, and it held in all 67:
+     ours == base, and merged == theirs == base + 4.
+  2. WAS "draws and drawDigest must be UNCHANGED from ours in any scenario neither packet
+     touched". Unfalsifiable as written, because there is no such scenario: all 67 shared
+     goldens were touched by BOTH parents (ours added craftDaily and wyrmfallDaily, theirs
+     the id shift). The property actually verified, and true: merged draws, drawDigest and
+     every frame's rng equal OURS byte for byte in all 67, with exactly two ours-side
+     movers named (nythraxis_full_pull and professions_craft, both traced to ours-side
+     commits). A moved draw count that is NOT one of those two is a DETERMINISM
+     REGRESSION, not a re-record: stop and investigate, do not commit it.
 - The two clean adds: tests/parity/golden/rift_clear_rewards.json (ours) and
   farming_session.json (theirs). tests/parity/scenarios.ts is modified by farming but
   does not conflict, so both scenario appends merge automatically. Verify in BOTH

@@ -127,19 +127,30 @@ Phase 14 nothing else will.
 
 **STEP 0 additions.**
 - DECISION 4 (monolith ceiling policy) IS SETTLED (2026-08-20; rows 11b-D-4, 11d-D-4 and
-  11d-U6-PAYBACK). Nothing is confirmed here. 11d took four recorded raises at the exact
-  merged counts, and Phase 14 PAYS BACK the `hud.ts` raise by extraction, because it is the
-  phase that already owns HUD work and the repo rule is that after extracting you LOWER the
-  ceiling. 11d-U6-PAYBACK fixes the target and the acceptance: this phase does not pass until
-  the `hud.ts` ceiling in `tests/monolith_budget.test.ts` reads 19445 or lower AND is LOWERED
-  in the same change, and the `ip-14-UI` professions-module migration does NOT count toward
-  it (a file move relocates zero lines out of `hud.ts`).
-  The measured facts behind that: masterwrought's pin was 19445 at zero slack, farming's
-  pin 19186 with its file at 19183, the merged clean region 19235, the take-theirs floor
-  19324, and the realistic merged resolution about 19460. There is no resolution of
-  `hud.ts` at or under farming's pin, because masterwrought added roughly 141 lines
-  outside every conflict region, so the payback is roughly 274 lines of extraction owed
-  here rather than a number anyone can argue down.
+  11d-U6-PAYBACK). Nothing is confirmed here.
+  **TRUED 2026-08-21 by the Phase 11d QA. Everything in the paragraph below was
+  written BEFORE 11d ran, and the real resolution falsified it. Read the amendment
+  first.**
+  What 11d actually did: TWO recorded raises (renderer.ts and online.ts, both paying
+  back at Phase 16), and `hud.ts` FELL rather than rising, to 19248 at the absorb and
+  then to 19235 when the QA synced release tip 35a6481825. So there is no `hud.ts`
+  raise for this phase to pay back, the 19445 target is already met with 210 lines to
+  spare, and the "roughly 274 lines of extraction owed" figure below is not merely
+  stale: it is the cost of the option 11d explicitly REJECTED (strict
+  only-ever-lower), imported here and presented as the live obligation. The
+  "take-theirs floor 19324" is not a floor either; the resolver ported BOTH packets'
+  extractions instead of picking a hunk side, which is why the file landed 89 lines
+  under that bound.
+  THE LIVE OBLIGATION, and the whole of it: this phase MAY NOT GROW `hud.ts`. The
+  ceiling is pinned at the exact count with zero slack, so any growth reds, and
+  raising a ceiling is a maintainer decision (root CLAUDE.md and the row's own
+  comment). The `ip-14-UI` professions-module migration still counts for nothing
+  either way, because a file move relocates zero lines out of `hud.ts`.
+  The superseded pre-merge estimates, kept because other documents cite them and the
+  packet told future sessions not to "correct" them: masterwrought's pin was 19445 at
+  zero slack, farming's pin 19186 with its file at 19183, the merged clean region
+  19235, the take-theirs bound 19324, and the estimated merged resolution about
+  19460, with roughly 141 masterwrought lines outside every conflict region.
 - Read the packet's open-item collection point (`docs/prd/masterwrought/farming/state.md`)
   for farming's (be) row, the simplified-mode gathering rows classified as a Professions
   2.0 surface change. It is an open maintainer ruling touching the same panel family the

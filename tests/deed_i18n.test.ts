@@ -49,8 +49,12 @@ describe('deed_i18n English resolution', () => {
 
   it('manifests one row per name and desc plus one per title reward', () => {
     const manifest = deedTranslationManifest();
-    // 279 deeds x (name + desc) + the 44 shipped title rewards (both counts
-    // pinned by tests/deeds_content.test.ts): the Drakelands brood pair, the
+    // 286 deeds x (name + desc) + the 45 shipped title rewards (both counts
+    // pinned by tests/deeds_content.test.ts, which reads 286 and 45): the
+    // farming absorb (masterwrought Phase 11d) carried this branch's 279 and 44
+    // to those figures with its seven deeds and the Harvestmaster title on
+    // prog_farming_100. The chain below is the 279/44 history it extends: the
+    // Drakelands brood pair, the
     // four Thornhollow Fields battleground deeds, the Rift coverage pair
     // (dgn_rift, dgn_rift_s_rank), the nine per-craft rare-tier profession
     // deeds (jewelcrafting joined with the Masterwrought phase 05 catalog,

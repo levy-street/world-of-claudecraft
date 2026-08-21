@@ -86,6 +86,10 @@ STEP 5 - ACCEPTANCE:
 - [ ] Guide regenerated, freshness gate green, prose keys added, spoiler-safe
 - [ ] Admin metrics localized; hot-path and retention seams respected
 - [ ] M16 fills done; screenshots committed (desktop + mobile) and referenced
+- [ ] The two monolith paybacks PAID: renderer.ts at 13546 or lower and
+      online.ts at 5950 or lower, each with its ceiling LOWERED in the same
+      change (the "Monolith payback carry" section below; a green suite does
+      NOT satisfy this, because both rows are pinned at the raised counts)
 - [ ] All listed suites green; ci:changed clean
 
 STEP 6 - DOCS: progress.md Phase 16 row; state.md ledger (render module, icon rows,
@@ -283,4 +287,19 @@ tests/monolith_budget.test.ts and state.md's Phase 11d ledger):
 - src/net/online.ts: raised 5950 to 5967 (+17, both packets' new command
   mirrors). Payback target: 5950 or lower, same rule.
 The hud.ts Phase 14 carry (11d-U6-PAYBACK) needs nothing here: the merged
-file fell to 19248, already under the 19445 target.
+file fell to 19248, and then to 19235 at the Phase 11d QA release sync
+(35a6481825, PR #3506, which extracted the chrome focus wiring), already well
+under the 19445 target.
+
+**Acceptance (added 2026-08-21 by the Phase 11d QA).** These two targets were
+prose with no gate: no checklist line and no exit criterion mentioned a
+monolith, a ceiling, renderer.ts or online.ts, so a green Phase 16 would have
+made both raises permanent, which is the exact outcome ruling 11d-D-4's
+rationale exists to prevent ("a raise with no payback number is a permanent
+raise"). Phase 14 already carries its equivalent. Both rows sit at zero slack,
+so nothing else forces the extraction.
+- [ ] src/render/renderer.ts extracted back to 13546 or lower, with the ceiling
+      in tests/monolith_budget.test.ts LOWERED in the same change.
+- [ ] src/net/online.ts extracted back to 5950 or lower, same rule.
+Both lines are also exit criteria for this phase: it does not pass with either
+row still above its parent pin.

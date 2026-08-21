@@ -799,7 +799,11 @@ describe('real catalog integration', () => {
     const view = buildDeedsView(
       makeInput({ deeds: DEEDS, order: DEED_ORDER, category: 'progression' }),
     );
-    // 279 deeds - 4 feats - 9 hidden = 266 visible to a fresh character (the
+    // 286 deeds - 4 feats - 9 hidden = 273 visible to a fresh character. The
+    // farming absorb (masterwrought Phase 11d) carried this branch's 279 to 286
+    // with its seven deeds, none of them feat-flagged or hidden, so both
+    // subtrahends are unchanged and the identity moves with the total alone.
+    // The chain below is the 279 history it extends (the
     // Drakelands brood pair, the four battleground deeds, the Rift coverage
     // pair, the nine per-craft rare-tier profession deeds (jewelcrafting
     // joined with the Masterwrought phase 05 base catalog, then its 50-skill

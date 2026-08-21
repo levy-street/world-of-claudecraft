@@ -260,6 +260,14 @@ export function composeLeaf(b, o, t, m, path, ctx) {
       threeWay(String(b), String(o), String(t), String(m), path, ctx);
       return;
     }
+    // THE ADDITIVE-COMPOSE HOLE (the other residual hole the 11d ledger records
+    // for the next reader). When only ONE parent moved a leaf this is exactly
+    // the three-way rule. When BOTH moved it, the rule demands a value NEITHER
+    // parent holds, so in that case it would bless a synthetic sum and reject a
+    // legitimate side-pick. Measured exposure at 11d: ZERO, because no numeric
+    // leaf was moved by both parents in any shared golden. A future re-record
+    // that changes that has to decide the rule deliberately rather than inherit
+    // it; the honest signal is that this line is where it would be decided.
     const expected = b + (o - b) + (t - b);
     ctx.numericChecked += 1;
     if (Math.abs(m - expected) > 1e-9) {
@@ -345,6 +353,13 @@ export function diffAgainst(p, m, path, diffs, ctx) {
     }
     if (ka === 'array') {
       if (a.length !== z.length) diffs.other.push(`${at}.length ${a.length} -> ${z.length}`);
+      // THE MIN-LENGTH-ARRAY HOLE (one of the two residual holes the 11d ledger
+      // records for the next re-record's reader). The length mismatch above is
+      // reported, but the walk then compares only the overlap, so an APPENDED
+      // element's own fields are never visited: a bogus entity appended to a
+      // frame shows up as one `.length` row and nothing else. Measured exposure
+      // at 11d: ZERO (every length-mismatched array lives in a shared golden,
+      // which takes the strict whole-value rule instead of this walk).
       const n = Math.min(a.length, z.length);
       for (let i = 0; i < n; i++) walk(a[i], z[i], `${at}[${i}]`);
       return;

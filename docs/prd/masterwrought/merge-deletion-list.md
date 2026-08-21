@@ -21,6 +21,7 @@ The refs (immutable; the census reads every parent with `git ls-tree` plus
 | ours | `d5304a78c4a1add6b1ed5a0b66ddb9f8246a4d73` | pre-merge `feature/masterwrought` tip, first parent of the absorb merge `424ce89a20` |
 | theirs | `8cd964d599ebbb6800fc20741690a0b9b6f17b40` | `origin/feature/farming-plan`, second parent of the absorb merge |
 | release | `f50b30de296945379f8d6076ecc56cca617b8e49` | the third parent: the release/v0.40.0 tip synced at Phase 11d STEP 0 (PR #3549); later sync merges contribute their second parents automatically, and `--release` overrides the tip |
+| release (2) | `35a64818251d4eeaf0ee849b9e05db57634463a4` | the FOURTH parent: the release/v0.40.0 tip synced at Phase 11d QA STEP 0 (PR #3506), merged at `5eade5c02e`. Auto-derived off the first-parent merge chain, not configured; the census reports "release parent(s) (2)" and the run needs no flag |
 | prior sync tip | `65b91fa190f1b6d7935ac38774b1742c3e93bc9c` | the release tip the branch had already absorbed before the 11d sync (informational: the sync delta window is `65b91fa190..f50b30de29`) |
 | merged | the working tree | HEAD of `feature/masterwrought` (read from disk; `--merged-root` points the scan at a scratch copy) |
 
@@ -113,6 +114,27 @@ HUD tracker family, 9 exports (`installTrackerStackAnchor`, `TrackerStackAnchor`
 `makeReliquaryTrackerInput`) and 5 i18n keys (`options.showReliquaryTracker`,
 `reliquary.trackerToggleLabel`, `reliquary.trackerToggleShowHint`,
 `reliquary.trackerToggleHideHint`, `settingsPage.ifShowReliquaryTracker`).
+
+## release/v0.40.0 sync (PR #3506), the Phase 11d QA STEP 0 sync window
+
+Second sync window, `f50b30de29..35a6481825`, merged at `5eade5c02e`. Deletions and
+renames: NONE, verified the same way (2026-08-21): the window touches no file under
+`src/sim/`, `server/`, `src/sim/content/` or `src/ui/i18n.catalog/`, so content ids,
+i18n keys and both SimEvent classes are unchanged, and exports go 17221 to 17234 with
+0 deleted. There is nothing to record under this heading either.
+
+What the window added (informational, all present on the newer release parent): the
+stale-focus Space fix, 13 exports across three new modules
+(`src/game/stale_chrome_focus.ts`: `FocusedChromeEl`, `isStaleChromeButton`;
+`src/ui/chrome_focus_wiring.ts`: `CHROME_GUARDED_PANELS`, `CHROME_TRACKER_BLURS`,
+`wireChromeFocus`; `src/ui/pointer_blur.ts`: `ClickLike`, `BlurrableEl`,
+`POINTER_FOCUS_PARK_SELECTOR`, `dropPointerFocus`, `blurIfPointerClick`,
+`ListenerHost`, `bindPointerBlur`, `bindChromeButtonKeyGuard`). No i18n key, no
+content id, no SimEvent.
+
+The census picked `35a6481825` up automatically as a second release parent, off the
+first-parent merge chain, with no flag: the refs table's promise that later syncs
+contribute their second parents is now exercised rather than only stated.
 
 ## Literal-only records (not symbols in any census class; kept for the reader)
 

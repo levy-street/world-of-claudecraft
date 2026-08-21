@@ -29,7 +29,7 @@
 | 11c | Food and feast reconciliation | complete | 2026-08-21 | 2026-08-21 |
 | 11c QA | verify | complete | 2026-08-21 | 2026-08-21 |
 | 11d | Derived artifacts, pins, and the merge audit | complete | 2026-08-21 | 2026-08-21 |
-| 11d QA | verify | pending | | |
+| 11d QA | verify | complete | 2026-08-21 | 2026-08-21 |
 | 11e | A true skill, farming's mastery curve and crop roster | pending | | |
 | 11e QA | verify | pending | | |
 | 11f | Farming joins the drop economy | pending | | |
@@ -715,9 +715,26 @@ is deliberately not copied here, it lives in the farming record.
   gathering-tool family. The stale `phase-11e-farming-apex-arm.md` is replaced by
   `phase-11e-mastery-curve.md` and deleted; its apex-feast design moves into 11h and
   11k and its GATE 1 material into 11e, so no table references the old file.
-- Phase 11d (2026-08-21): DERIVED ARTIFACTS RE-MINTED AND PROVEN, the seven
+- Phase 11d QA (2026-08-21): THE EVIDENCE AUDITED, verdict
+  PASS-WITH-FOLLOWUPS. STEP 0 took a SECOND release sync (5eade5c02e, release
+  tip 35a6481825 eleven commits past the tip 11d synced), predicted before it
+  ran: every prediction observed except hud.ts, predicted 19237 and observed
+  19235, the 2-line miss named (two branch-only farming roots left hud.ts with
+  the release's extraction). That sync shipped ONE red suite, caught by a fresh
+  reviewer over the merge commit and fixed at the seam. Six read-only evidence
+  lanes with adversarial verification, plus six domain reviewers, found no wrong
+  pin: every count pin re-derives from the three refs, the goldens compose, the
+  regen is fresh and the ceilings are honest. What they DID find was the
+  evidence around them: four cases where the two merge-audit tools exited 0 on a
+  real dropped hunk (all four now fail, each reproduced by execution before and
+  after), two server ceilings carrying un-banked slack, three deed pin
+  narratives contradicting their own literals, and eleven record corrections
+  including a superseded blob band that this file and state.md agreed on, which
+  made it look corroborated rather than stale. Full record: state.md,
+  "Phase 11d QA ledger".
+- Phase 11d (2026-08-21): DERIVED ARTIFACTS RE-MINTED AND PROVEN, the ELEVEN
   commits in order (55b09db21f regen + shard-weight union at 95.80 percent
-  coverage; e0cf44b111 the STEP 0 release sync of v0.40.0 f50b30de29, twice
+  coverage as measured then; e0cf44b111 the STEP 0 release sync of v0.40.0 f50b30de29, twice
   audit-verified CLEAN; 9ce2f68162 the 69-golden re-record with the
   composition check PASSING, zero rng movement anywhere, farming_session
   matching the 11c prediction with the delta-of-300 carry proof; 1900e38210
@@ -730,8 +747,17 @@ is deliberately not copied here, it lives in the farming record.
   named; ec06a3edb1 the symbol census, MISSING empty in all five classes,
   EXTRA exactly the six 11c-authored names, eight mutation-guard kills;
   55714f2350 the monolith rows, TWO raises as amended with Phase 16
-  paybacks, three falls re-pinned zero-slack; then the docs commit).
-  Full record: state.md, "Phase 11d ledger".
+  paybacks, three falls re-pinned zero-slack; 9d52176b8d the decisions-index
+  rows; 2859f37165 THE FIVE-REVIEWER FIX ROUND, which changed test code and
+  MOVED the blob measurement: the DB reviewer's two bound-fidelity findings
+  added the fourth tool-effect slot (+130 B) and a fixed production-width
+  epoch anchor (+368 B), so the fixture re-measured at 16,704, exactly its
+  written prediction of 16,206 + 130 + 368, the band re-centred to
+  16544..16864 and the 17408 ceiling held with 704 of headroom; then the two
+  ledger folds 2551956725 and bdaef0d1b8).
+  The 16,206 above is therefore the PRE-fix-round measurement, kept because
+  it is the chain the +490 derivation hangs on; 16,704 is the live one.
+  Full record: state.md, "Phase 11d ledger". Audit: "Phase 11d QA ledger".
 - Phase 11c QA (2026-08-21): THE UNIFICATION VERIFIED, verdict
   PASS-WITH-FOLLOWUPS. Release sync a no-op again (v0.40.0 still ancestor).
   Seven-lane ultracode audit (the five mutating lanes each in a throwaway

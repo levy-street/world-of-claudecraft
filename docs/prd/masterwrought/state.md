@@ -7084,14 +7084,21 @@ src/sim/content/professions.ts).
   (measured 14218, ~203 B per bed at full width, 23 beds).
 - OBSERVED (after the predictions above were written): roundtrip GREEN as
   predicted (2 tests). Growth measured 16,206 settled bytes against the
-  15,716 prediction; the +490 is EXPLAINED AND NAMED, not pasted over: 433
-  bytes are the FOURTEEN farming recipe ids (the 13 FARM_RECIPES rows plus
-  recipe_growth_tonic, 391 id chars plus JSON overhead) that joined
-  knownRecipes AFTER farming's Phase 5 re-measure and rotted inside
-  farming's one-sided band (farming's note chain counted only the three
-  HOE_RECIPES ids; verified by diffing recipe ids base..theirs: 17 added,
-  3 counted), and ~57 bytes are intra-band drift on both parents' last
-  measurements (each note lags its tree inside its own band by design).
+  15,716 prediction; 433 of the +490 is DERIVED and the remaining ~57 is an
+  unmeasured residual, and the Phase 11d QA re-worded this so the two are not
+  read as one explanation. DERIVED: 433 bytes are the FOURTEEN FARM_RECIPES
+  ids (fourteen is the whole set and recipe_growth_tonic is one OF them, not
+  a thirteen-plus-one; tests/recipe_economy.test.ts pins toHaveLength(14)),
+  391 id chars plus JSON overhead, which joined knownRecipes AFTER farming's
+  Phase 5 re-measure and rotted inside farming's one-sided band (farming's
+  note chain counted only the three HOE_RECIPES ids; verified by diffing
+  recipe ids base..theirs: 17 added, 3 counted). UNMEASURED: the remaining
+  ~57 bytes are attributed to intra-band drift on both parents' last
+  measurements (each note lags its tree inside its own band by design). That
+  attribution is plausible and bounded by the two parents' own bands, but it
+  is not a measurement and as phrased it could absorb any residual; settling
+  it means re-running each parent's growth fixture against its own tree, and
+  it is carried to Phase 12 with the rest of the bound-policy work.
   Exactly ONE oncePerDay recipe exists on the merged tree (ours'
   recipe_quickening_catalyst), so craftDaily contributes no cross-term.
   Ceiling re-minted 17408 (17 KiB), NOT 16384: both parents' own re-mints
@@ -7123,7 +7130,7 @@ src/sim/content/professions.ts).
 | deeds_content DEED_ORDER[len-1] | exp_dawnhold_castle | prog_grandmaster_inscription | prog_farming_100 | prog_farming_100 (11b RULE 1: farming block LAST; not a numeric compose) |
 | deed_i18n manifest.length | 273*2+42 | 279*2+44 | 280*2+43 | 286*2+45 = 617 |
 | deed_i18n title rows | 42 | 44 | 43 | 45 |
-| deeds_view visibleTotal | 260 | 266 | 267 | 273 (= 286 - 9 hidden - 4 visible-shelf feats; merged deeds.ts read: hidden 9, feat-flagged 5 with col_reliquary_complete the off-prefix Collection feat and one feat also hidden) |
+| deeds_view visibleTotal | 260 | 266 | 267 | 273 (= 286 - 9 hidden - 4 visible-shelf feats; merged deeds.ts read: hidden 9, feat-flagged 4 at EVERY ref: feat_era_cap, feat_book_complete, feat_brightwood_relic, col_reliquary_complete the off-prefix Collection feat, NONE of them hidden. Trued in place at the Phase 11d QA: this cell used to say "feat-flagged 5 ... and one feat also hidden", the comment-counting error the LEDGER CORRECTIONS block records, and the committed arithmetic was always built on 4) |
 | deeds_view categories visible sum | 264 | 270 | 271 | 277 (= visibleTotal + 4 feat-flagged shelf rows) |
 | deed_icons DEED_ORDER length | 273 | 279 | 280 | 286 |
 | deed_icons DEED_IMAGE_IDS.size (painted) | 271 | 277 | 272 | 278 |
@@ -7140,7 +7147,7 @@ src/sim/content/professions.ts).
 | material_taxonomy VENDOR_STAPLES | 6 | 6 | 6 | 6 (untouched) |
 | recipe_economy vendor-fed sorted membership | 6 rows | 6 rows | 7 rows (+recipe_bronze_hoe) | 7 rows, floor 7 |
 | recipe_economy trainer-acquisition sum arm | base form | +JEWELCRAFTING/INSCRIPTION/INTERMEDIATE arms | +HOE_RECIPES.length +FARM_RECIPES.length in the sum, +HOE_RECIPES toHaveLength(3), +FARM_RECIPES toHaveLength(14) | both sides' arms composed |
-| sfx_manifest keys.size | 265 | 265 | 270 | 270 (VERIFIED green at unit 1; zero-diff regen) |
+| sfx_manifest keys.size | 265 | 265 | 270 | 270 (= 265 + 0 + 5, DERIVED: ours' key SET is identical to base's member for member, zero adds and zero drops, and theirs adds exactly the five ui_farm_* cues, so merged is the union. Re-warranted at the Phase 11d QA: this cell used to read "VERIFIED green at unit 1", the one PREDICTED value justified by its own observation. The green run proves a different and also true thing, that the manifest regenerates byte-identically from the merged cue set) |
 | FROZEN_CATALOG_SHA256 | 36e9f307.. | ea007571.. | 3bc5bc55.. | re-minted LAST from the suite output after every count above is green (not arithmetic; matches neither parent) |
 NOTE on the phase file's worked reliquary derivation: its "slot count 380
 (375 + 4 + 1)" read 375 as ours; the direct read shows base 375, ours 379,
@@ -7350,9 +7357,12 @@ zero-diff note now covers the sync's 5 tracker keys).
   and the wave suites following, DEED_ORDER's tail off prog_farming_100),
   and 11g moves both recipe_economy literals by two rows when marsh_rice 2
   plus bog_beet 2 join recipe_seasoned_stock; every named phase re-derives
-  by the same predicted-then-observed method. The blob band (16046..16366)
-  and ceiling 17408 re-measure at the next authored growth per the file's
-  own doctrine; the bed-count and widest-crop throws force the re-read.
+  by the same predicted-then-observed method. The blob band (16544..16864,
+  around the review round's re-measured 16,704: the 16046..16366 this line
+  carried until the Phase 11d QA was the PRE-review-round band, superseded by
+  the F1/F2 fixture corrections two blocks below and never trued here) and
+  ceiling 17408 re-measure at the next authored growth per the file's own
+  doctrine; the bed-count and widest-crop throws force the re-read.
 - LEDGER CORRECTIONS from the second prediction desk's independent pass
   (2026-08-21, after the pins landed; its whole table matches the committed
   values pin for pin): (1) the unit 4 table's deeds_view parenthetical
@@ -7402,19 +7412,42 @@ cannot self-vacuate).
   survival loop); the plot-at-rest scope note and the mixed-fleet
   documented-rule note recorded as stated.
 - GATE-INTEGRITY: PASS (union semantics byte-verified: 0 rows untraceable
-  to a parent, 0 invented weights; the table-only-edit adversarial case
-  selects full tier on CI and the pins locally). WARNING APPLIED: the
+  to a parent, 0 invented weights; the table-only-edit adversarial case is
+  covered, though NOT the way this line first said. Trued at the Phase 11d
+  QA: a table-only edit does NOT select the full tier. The table is a .json,
+  it does not match BROAD_CONFIG_RE, isNonCodePath classifies it as nonCode,
+  and decideTestMode returns `selective` with the table an inert path. The
+  real protection is better than the one recorded: the enforcing pin
+  tests/ci_shard_partition.test.ts reads the table with readFileSync, so
+  test_visibility classifies it out-of-graph and it rides the ALWAYS-RUN
+  floor on both arms, meaning a table-only PR runs it every time). WARNING
+  APPLIED: the
   union tool no longer collapses carried rows to "run <older run>", which
   was FALSE for 27 of the 28 (they were the 2026-08-19 LOCAL measurements)
   and erased the older table's own disclosure; the provenance now carries
   the older table's localMerge forward verbatim, and the committed table
   was re-minted with the honest pedigree chain (partition suite 13/13
   after). INFO applied: the tool's walk now matches the enforcing pin's
-  predicate exactly (withFileTypes, node_modules/dist/dot-dirs skipped, no
-  symlink follow); the stale-key analysis (4 harmless fallback rows,
-  selection-inert via the sequencer's files-driven partition) and the
-  coverage recompute (2875/3003 = 95.74 percent, ~23 more unweighted files
-  to the floor) recorded; golden_composition.mjs gains its own fixture
+  predicate CLOSELY, not exactly (Phase 11d QA correction, two residual
+  asymmetries, neither live in this tree and neither load-bearing for
+  partition completeness: the tool applies the dot-prefix skip only in the
+  directory branch, so a dot-prefixed .test.ts counts for the tool and not
+  the pin, which is the pessimistic direction; and the tool requires
+  isFile() where the pin uses a bare else, so a SYMLINKED .test.ts would
+  count for the pin and not the tool, the optimistic one); the stale-key
+  analysis (4 harmless stale KEYS whose files no longer exist, not files
+  taking the fallback, selection-inert via the sequencer's files-driven
+  partition) recorded. COVERAGE, re-derived at the Phase 11d QA because the
+  recorded figure was already stale when written: 2875/3003 = 95.74 percent
+  was measured mid-fix-round, and the SAME commit (2859f37165) then added
+  tests/merge_audit_golden_composition.test.ts, moving its own denominator.
+  True at the 11d close bdaef0d1b8: 2875/3004 = 95.67 percent. True after
+  this QA's STEP 0 sync (three more non-browser test files): 2875/3007 =
+  95.61 percent. True after this QA's own new suite: 2875/3008 = 95.58
+  percent, 18 files of headroom before the 95 percent floor breaks (the
+  "~23 more unweighted files" was correct only at 3003). A fix round that
+  adds a test file moves this number, so re-measure it rather than citing
+  it; golden_composition.mjs gains its own fixture
   suite (tests/merge_audit_golden_composition.test.ts, 8 arms: composes,
   three-way, presence, RNG MOVED on shared and add paths, the id-family
   classifier including the threat amount-column negative).
@@ -7519,3 +7552,171 @@ new scripts, and no doc contradicting the tree.
   plausible one. ci:changed exit 0 re-run after the last code commit;
   qa-stop hook exit 0; the composition check and the symbol census PASS at
   the tip. Phase tip after the QA gate's ledger fold-in: 2551956725.
+
+## Phase 11d QA ledger (2026-08-21, audit of the 11d re-mint)
+
+The 11d question was whether the pins were right. The QA question was whether
+the EVIDENCE was real: predicted before observed, census able to catch a dropped
+hunk, goldens composing, regen fresh, ceilings honest. Verdict and the full
+finding list are in the report; this block is the durable record.
+
+### STEP 0: the SECOND release sync (this is where hud.ts went to 19235)
+origin/release/v0.40.0 had moved ELEVEN commits past the tip 11d synced
+(f50b30de29 to 35a6481825, PR #3506, the stale-focus Space fix), so the QA took
+it before auditing anything. Merge 5eade5c02e. Predictions were written to disk
+BEFORE the merge ran and are reproduced here with their observations.
+- Blast radius, verified by diff --stat before predicting: ZERO files under
+  src/sim/, server/, src/sim/content/, src/ui/i18n.catalog/, i18n.locales/ or
+  tests/parity/. So golden-inert, content-id-inert, i18n-key-inert,
+  count-pin-inert. It adds three src modules and four test files.
+- PREDICTED hud.ts 19237 (= 19248 + the release's own -11). OBSERVED 19235. The
+  2-line miss is NAMED, not absorbed: this branch's copy of the extracted
+  key-guard loop carried two roots the release never had
+  (#harvest-journal-window and #plant-sheet-window, from the 11b absorb), so the
+  branch's fall is 13 where the release's was 11. Ceiling re-pinned 19235, exact,
+  zero slack, with a comment naming both parent pins (ours 19248, release 19476).
+- PREDICTED and OBSERVED identical for everything else: census exports union
+  17595 / merged 17596 / MISSING 0 / EXTRA 6 (the 13 new export names verified
+  absent from the branch beforehand); contentIds 3061/3061; i18n 18161/18158;
+  SimEvent 159 union / 148 emits; composition PASS; i18n:gen, wiki:content and
+  sfx:manifest all ZERO DIFF; every count pin unchanged; no other MONOLITHS row
+  moved. Release parent count 2, AUTO-DERIVED off the first-parent merge chain
+  exactly as unit 5 designed it, which makes this sync the live test of that arm.
+- Shard coverage after the sync: 2875/3007 = 95.61 percent, predicted to the
+  digit before the merge. Still clear of the floor, so no fresh harvest is owed.
+- The conflict resolution is reviewed code, not merge output: a fresh frontend
+  reviewer over 5eade5c02e found the merge had shipped a RED suite
+  (tests/farm_verb_reachability.test.ts pinned hud.ts source text on the anchor
+  `for (const panelId of [`, which the release's extraction deleted). Fixed at
+  the seam, both halves mutation-proved. The same review found the two farming
+  windows silently GAINED the pointer-only focus drop; that is correct behavior
+  for them and is now pinned rather than merely true.
+
+### What the audit changed in the TOOLS (each case reproduced by execution first)
+The two merge-audit tools are the whole mitigation for the merge's top risk, so
+their blind spots are the highest-value findings here. All four exited 0 before.
+- Census, explained-extras was a SUBSET rule while the header promised set
+  equality: un-exporting any of the six symbols the MERGE ITSELF authored gave
+  MISSING 0, unexplained 0, a silent WARN, exit 0. Proved on buildConsuming. Now
+  a FAIL. Rename targets got the same gap (six of seven were covered only
+  incidentally, because their new name also lives on a parent;
+  applyWellFedOnMealComplete exists on no parent and was covered by nothing) and
+  now have their own assertion naming both names and the deletion-list line.
+- Census floor line printed only the FIRST release parent's size while the check
+  runs over every one, so a genuine failure on the second would have rendered
+  with every printed number above its floor. Live since this branch carried two.
+- Census could not see a dropped content-table ROW when the id is reused in
+  another table, which this packet does constantly (farm_crops.ts and items.ts
+  both define bog_beet). New sixth class contentIdRows, keyed file:id. Measured
+  before wiring: MISSING 0, EXTRA 0, union 3084 == merged 3084, so zero noise.
+- Composition treated isIdPath as classification only. True in the four-way
+  path, FALSE in the two-way arms, where it decides finding versus silence: one
+  nextId moved +37 printed "+4x28 +41x1" in a cell and exited 0. Both two-way
+  arms now assert a uniform shift and main() asserts the whole table agrees on
+  ONE. That arm independently reproduces +4x4661, exactly the 4,661 uniform id
+  moves the 11d architecture review recorded.
+- Composition built its work list from the MERGED golden directory alone, so a
+  golden a parent carried and the merge DROPPED was never visited, and an empty
+  input set printed PASS. Now enumerates both parents, reports a MISSING class,
+  and carries a floor of 62 against the live 69. Hiding farming_session.json now
+  names it and exits 1.
+- shard_weight_union.mjs was the one merge_audit tool with no fixture suite, no
+  .d.mts and no tsc reach, on the only one whose output is a committed CI
+  artifact. Its 95 percent floor printed a line and wrote the table anyway with
+  exit 0. It now fails, refuses to --write a sub-floor table without --force,
+  refuses to guess which harvest is newer when a run id is not numeric (NaN
+  silently made ours "newer" and promoted the wrong table's weights), and gives
+  the NEWER side the same disclosure rule the review round gave the older side.
+  Eight fixture arms plus the .d.mts. The no-disclosure branch reproduces the old
+  wording byte for byte, verified by re-deriving the committed table: identical.
+
+### Ceilings, banked
+server/game.ts 10890 to 10761 and server/db.ts 4980 to 4865. Both were carrying
+un-banked slack (129 and 115), which is the shape that makes a ratchet stop
+ratcheting, and the same packet had already called that a defect on sim.ts. Left
+alone, the two server monoliths a crafting and farming packet is most likely to
+grow could have taken 244 lines between them with the ratchet green. The sim.ts
+row also gains its THIRD parent pin (the release's 12660 against a 12518 file).
+
+### Record corrections this audit made (each verified at the source)
+1. The forward carry named the PRE-review-round blob band 16046..16366. The
+   committed pin is 16544..16864 around 16,704. Both records a future phase reads
+   first (this file and progress.md) agreed on a number the tree does not hold,
+   which made the error look corroborated rather than stale.
+2. progress.md's 11d row said "the seven commits" (eleven landed), omitted the
+   five-reviewer fix round entirely, and cited the superseded 16,206 as final.
+3. The unit 4 table's "feat-flagged 5" parenthetical is trued in place to 4, and
+   the sfx row's warrant is now the arithmetic (265 + 0 + 5) rather than its own
+   observation, the one PREDICTED cell justified by a green run.
+4. The blob +490 is now split honestly: 433 DERIVED, ~57 an unmeasured residual
+   whose attribution cannot be falsified as phrased, carried to Phase 12.
+   Separately, FARM_RECIPES is fourteen rows INCLUDING recipe_growth_tonic, not
+   thirteen plus one.
+5. The gate-integrity row claimed a table-only edit selects the full tier on CI.
+   It does not; the real protection is the always-run floor, which is stronger.
+   The walk-predicate claim is "closely", not "exactly": two residual
+   asymmetries, both recorded, neither live.
+6. The recorded shard coverage was stale when written, because the commit that
+   recorded it added a test file and moved its own denominator. Every true value
+   is now recorded with the tip it belongs to.
+7. The phase file's determinism anchor ("draws unchanged in any scenario neither
+   packet touched") is unfalsifiable as literally written: all 67 shared goldens
+   were touched by both parents. The property actually verified, and true, is
+   that merged draws, drawDigest and every frame's rng equal OURS byte for byte
+   in all 67, with nythraxis_full_pull and professions_craft the two ours-side
+   movers.
+8. The goldens commit body (9ce2f68162) states two universals that are false for
+   the tree it records: tick-0 nextId is 968 in 33 goldens and 967 in 34, and
+   idle_mob_distance_culling has 8 theirs-side non-id moves. The ledger already
+   corrected both; this names the artifact they supersede. No history rewrite.
+9. The phase file's "two SORTED literal pins, both edited by both packets" for
+   recipe_economy is wrong. There is ONE sorted membership literal (the
+   seven-row vendor-fed list, theirs-only, +recipe_bronze_hoe);
+   EXPECTED_LEGACY_SORTED is [] at all four refs and untouched. The other sorted
+   comparison ours added is INTERMEDIATE_RECIPES against the reagent-bill keys.
+   The 11g forward carry therefore names the wrong artifact and is re-scoped
+   below.
+10. The two "residual holes" the ledger recorded for the next re-record's reader
+    existed in no other place. They are: ADDITIVE-COMPOSE, when both parents move
+    the same numeric leaf the rule demands merged - base == oursDelta +
+    theirsDelta, a value neither parent holds, so it can bless a synthetic value
+    and reject a legitimate side-pick; and MIN-LENGTH-ARRAY, diffAgainst walks
+    only min(a.length, z.length), so elements past the shorter array are never
+    compared. Measured exposure at 11d for both: ZERO.
+11. Prediction ORDERING, stated plainly because the ledger advertises it: unit 6
+    pre-registered its prediction one commit ahead of the ceilings (though its
+    OBSERVED bullet shipped in that same earlier commit, so the tip
+    re-verification is its real evidence). Unit 4's table, its observation block
+    and every changed literal landed in ONE commit, b987df912a. Most of its rows
+    were genuinely pre-registered in phase-11d-derived-artifacts.md at
+    fab18ccd0b; these were NOT, and for them a pasted observation and a real
+    prediction are indistinguishable in git: command_schema 205/218/13,
+    byCategory chronicle 53 and collection 38, deeds_view 273/277,
+    MATERIAL_ITEM_IDS 93 and the three material_taxonomy literals,
+    recipe_economy vendor-fed 7, and the blob 15,716. Every one of them
+    re-derives correctly from the three refs, so the numbers are not in doubt;
+    the provenance claim is. Going forward the unit 6 pattern is the rule: the
+    prediction block lands one commit BEFORE the literals it predicts.
+
+### Forward carry, re-scoped
+- 11e still moves DEED_ORDER to 287 and total renown to 3275, with deed_i18n
+  287 * 2 + 45 = 619, DEED_IMAGE_IDS and the wave suites following, and
+  DEED_ORDER's tail off prog_farming_100. The three deed pin NARRATIVES now
+  match their literals, so 11e extends a chain that is true rather than one
+  that stopped at 279.
+- 11g: re-derive WHICH recipe_economy literal moves before moving it. The carry
+  says "both literals by two rows when marsh_rice 2 plus bog_beet 2 join
+  recipe_seasoned_stock", but the vendor-fed list is a membership set that
+  recipe_seasoned_stock is not in, and EXPECTED_LEGACY_SORTED is empty. The
+  honest statement is that adding farm-crop reagents changes reagent bills, and
+  the artifact that moves is whichever of the seven-row vendor-fed membership
+  list, the INTERMEDIATE_RECIPES-versus-bills key comparison, or the trainer-sum
+  term literals actually reads those rows. Predicted-then-observed applies to the
+  identification, not just the value.
+- Phase 12 inherits three measurement debts, all bound-policy: the ~57-byte blob
+  residual, the whole-character maximal measurement (38.9 KB was taken with the
+  professions block about 2.5 KB smaller, so the merged carry is roughly 41.4 KB
+  and the headroom ratio about 3.2x, an arithmetic carry and labelled as one),
+  and the rift-payload and craftDaily-clamp terms already carried.
+- Shard coverage headroom is 18 files at the QA close tip. Re-measure it, do not
+  cite it.
