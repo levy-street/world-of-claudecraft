@@ -36,7 +36,7 @@
 // fills it (the skip predicate above), and the Illumination banner plus the chat
 // line own that moment instead.
 
-import { RELIQUARY_PAGES_BY_ID } from '../sim/content/reliquary';
+import { RELIQUARY_PAGE_ORDER, RELIQUARY_PAGES_BY_ID } from '../sim/content/reliquary';
 import type { ReliquaryPageCompletion } from '../world_api/reliquary';
 import { isReliquaryNearlyComplete, rankNearlyComplete } from './reliquary_view';
 
@@ -115,6 +115,67 @@ export interface ReliquaryTrackerInput {
    */
   ownershipSig(): number;
   collapsed: boolean;
+  /**
+   * The persisted "show the tracker at all" master switch (showReliquaryTracker,
+   * flipped from The Reliquary's eye toggle and the Interface options row).
+   * False short-circuits the whole build: no completion reads, no signature
+   * read, an invisible view. Distinct from `collapsed`, which still shows the
+   * header.
+   */
+  enabled: boolean;
+}
+
+/** The five live world reads the tracker build folds, as a structural slice so
+ *  both hosts (offline Sim, online ClientWorld mirror) satisfy it and a test
+ *  can stub it without carrying the whole IWorld. */
+export interface ReliquaryTrackerWorld {
+  reliquaryPageCompletion(pageId: string): ReliquaryPageCompletion | null;
+  deedStats: { itemsDiscovered: { size: number } };
+  reliquaryMarks: { size: number };
+  deedsEarned: { size: number };
+  ownedMounts(): readonly string[];
+  accountCosmetics: { weaponSkinIds: readonly string[] };
+}
+
+/**
+ * Mint the reused tracker input over a live world thunk (built ONCE by the host
+ * and reused every build; pinned / collapsed / enabled are the per-build fields
+ * the host re-reads before each call). The deliberate asymmetry, recorded here
+ * because the two halves read as an inconsistency otherwise: pinned pages (at
+ * most RELIQUARY_TRACK_CAP, five) are read LIVE on every slow build, while the
+ * whole-catalog default scan memoizes on the ownership signature. The signature
+ * is cheap but has a documented same-band blind spot (an add and a remove on
+ * ONE surface inside a single 500ms band cancel out), and five live reads sit
+ * comfortably inside the slow-band budget, so the pages the player explicitly
+ * chose get the exact answer and the whole-catalog scan gets the cheap one.
+ * Accepted with it: the mount count is the expensive read here, not a cheap
+ * one. Offline, Sim.ownedMounts() copies the whole bags-plus-bank array before
+ * scanning it, and every completion() call pays that copy again through
+ * Sim.reliquaryOwnershipSurfaces(); online, ClientWorld returns a stored field.
+ * Accepted because this is the 500ms band with at most five pinned reads. The
+ * signature is a thunk, not a value, so the signature (and that copy) is
+ * skipped entirely while the player has pins: only the default branch reads it.
+ */
+export function makeReliquaryTrackerInput(
+  world: () => ReliquaryTrackerWorld,
+): ReliquaryTrackerInput {
+  return {
+    pinned: new Set<string>(),
+    pageIds: RELIQUARY_PAGE_ORDER,
+    completion: (pageId) => world().reliquaryPageCompletion(pageId),
+    ownershipSig: () => {
+      const w = world();
+      return reliquaryTrackerOwnershipSig({
+        itemsDiscovered: w.deedStats.itemsDiscovered.size,
+        marks: w.reliquaryMarks.size,
+        deedsEarned: w.deedsEarned.size,
+        mounts: w.ownedMounts().length,
+        weaponSkins: w.accountCosmetics.weaponSkinIds.length,
+      });
+    },
+    collapsed: false,
+    enabled: true,
+  };
 }
 
 /** Preallocate the reused tracker container (one per painter instance). */
@@ -180,6 +241,19 @@ export function buildReliquaryTrackerViewInto(
   out: ReliquaryTrackerView,
   input: ReliquaryTrackerInput,
 ): ReliquaryTrackerView {
+  // The master switch beats everything: a hidden tracker pays for NO world
+  // reads (no completion folds, no ownership signature). The previous-build
+  // table is cleared so a later re-show is a first sighting, which the flash
+  // contract already keeps quiet: re-showing the strip must not pulse every
+  // line over fills that happened while it was hidden. The memo survives on
+  // purpose (its signature gate re-validates it for free on re-show).
+  if (!input.enabled) {
+    out.count = 0;
+    out.visible = false;
+    out.collapsed = input.collapsed;
+    out.prevCount = 0;
+    return out;
+  }
   // Pass 1: which pages, and their progress.
   let count = 0;
   if (input.pinned.size > 0) {

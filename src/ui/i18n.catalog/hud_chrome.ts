@@ -1416,6 +1416,10 @@ export const hudChromeStrings = {
     stickyTarget: 'Keep Target on Ground Click',
     // Interface panel toggle + the item-tooltip lines it reveals (off by default).
     showItemLevel: 'Show Item Level',
+    // Interface panel toggle for the on-screen Reliquary tracker (on by
+    // default); shares the persisted switch with the eye toggle inside The
+    // Reliquary window.
+    showReliquaryTracker: 'Show Reliquary Tracker',
     itemLevelLine: 'Item Level {level}',
     itemScoreLine: 'Score {score}',
     // Interface panel toggle that reveals the optional second action bar row (off
@@ -5241,6 +5245,15 @@ export const hudChromeStrings = {
     pinFull: 'The tracker is full (up to {cap} pages)',
     pinAria: 'Pin {name} to the HUD tracker',
     unpinAria: 'Unpin {name}',
+    // The summary band's eye toggle for the HUD tracker's master switch
+    // (showReliquaryTracker). The label is the toggle's constant accessible
+    // name (aria-pressed carries the state); each hint is the action the
+    // press performs, rendered through the window's shared tooltip seam
+    // (reliquary_window.ts attachTooltip; that window never sets a native
+    // title, a pinned contract), not a title attribute.
+    trackerToggleLabel: 'HUD tracker',
+    trackerToggleShowHint: 'Show the Reliquary tracker on your screen',
+    trackerToggleHideHint: 'Hide the Reliquary tracker from your screen',
     // Phase 22: realm population rarity (the hudChrome.deeds.rarityLine
     // sibling). {percent} arrives pre-formatted through formatNumber's percent
     // style. "Found" is deliberate over "Owned": the aggregate counts sticky

@@ -8206,6 +8206,70 @@
     font-weight: 400;
     color: var(--color-text-muted);
   }
+  /* The HUD-tracker eye at the summary's right edge: a pressed toggle (the
+     paperdoll helm/playtime eye idiom) whose lit state mirrors the strip
+     being on screen. Pushed to the row's end so the readouts keep their left
+     rhythm; the pin-button chip palette AND radius keep it in the window's
+     family (.reliquary-pin is a 4px chip; DESIGN.md 14 rules out pill
+     buttons, so the toggle is not one either). */
+  .reliquary-tracker-toggle {
+    position: relative;
+    flex: none;
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--ui-font);
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid #6a5320;
+    background: #241c0c;
+    color: #ffe6a8;
+    cursor: var(--cursor-point);
+    white-space: nowrap;
+  }
+  /* Invisible hit extension over the ~20px visual chip (the char-playtime-eye
+     idiom, DESIGN.md 10.1): 20px plus 8px each way is the 36px desktop hit
+     floor that section names (the WCAG 2.5.8 24px floor is the weaker bound).
+     -9px, not -8px: an absolutely positioned pseudo-element's inset is
+     measured from the host's PADDING edge, so on this 1px-bordered button
+     -9px is 8px beyond the visual edge (-8px measured as a 34px hit box in
+     the browser suite, under the floor; tests/browser/target_size pins the
+     live reach). A plain rectangle on purpose: it paints nothing, and a radius
+     on a hit box only trims corner hit area. Scoped per pointer like the idiom
+     it cites: the mobile arm below sizes the box itself to the 40px floor and
+     zeroes the reach, so the toggle never overreaches the sticky panel-title
+     row on the full-bleed phone layout. */
+  .reliquary-tracker-toggle::after {
+    content: "";
+    position: absolute;
+    inset: -9px;
+  }
+  .reliquary-tracker-toggle .ui-icon {
+    width: 14px;
+    height: 14px;
+    flex: none;
+  }
+  /* Hidden state: the eye-off glyph plus a dimmed chip, so the switch reads
+     at a glance without relying on the icon swap alone. */
+  .reliquary-tracker-toggle[aria-pressed="false"] {
+    color: var(--color-text-muted);
+    border-color: #4a3d1d;
+  }
+  .reliquary-tracker-toggle:hover {
+    filter: brightness(1.12);
+  }
+  .reliquary-tracker-toggle:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  body.mobile-touch .reliquary-tracker-toggle {
+    min-height: 40px;
+  }
+  body.mobile-touch .reliquary-tracker-toggle::after {
+    inset: 0;
+  }
   /* Phase 6: Curator rank seal chrome (cosmetic only; no combat info).
      Phase 14 removed this block's reduced-motion box-shadow suppression on
      purpose: the tier glows are STATIC shadows that never animate, so hiding

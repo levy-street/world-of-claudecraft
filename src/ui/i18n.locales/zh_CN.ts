@@ -1301,6 +1301,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.uiScale': '界面缩放',
   'hudChrome.options.highContrastBackground': '高对比度背景',
   'hudChrome.options.showItemLevel': '显示物品等级',
+  'hudChrome.options.showReliquaryTracker': '显示圣物库追踪器',
   'hudChrome.options.showSecondaryActionBar': '显示副动作条',
   'hudChrome.options.showThirdActionBar': '显示第三动作条',
   'hudChrome.options.hideUnusedActionSlots': '隐藏未使用的动作栏位',
@@ -10513,6 +10514,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.pinFull': '追踪器已满（最多 {cap} 个页面）',
   'hudChrome.reliquary.pinAria': '将{name}固定到界面追踪器',
   'hudChrome.reliquary.unpinAria': '取消固定{name}',
+  'hudChrome.reliquary.trackerToggleLabel': '界面追踪器',
+  'hudChrome.reliquary.trackerToggleShowHint': '在屏幕上显示圣物库追踪器',
+  'hudChrome.reliquary.trackerToggleHideHint': '在屏幕上隐藏圣物库追踪器',
   'hudChrome.reliquary.rarityLine': '{percent} 的收藏家已发现',
   'hudChrome.reliquary.pageRarityLine': '{percent} 的收藏家已点亮',
   'hudChrome.reliquary.cellAriaWithRarity': '{base}，{rarity}',
@@ -12715,6 +12719,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifShowAttackButton': '在你的动作条上放一个明确的“攻击”按钮。',
   'guide.settingsPage.ifShowItemLevel':
     '在每个物品提示框里加上一行物品等级。默认关闭，以保留只显示属性的经典提示框。',
+  'guide.settingsPage.ifShowReliquaryTracker': '控制圣物库追踪器（你固定的书页及其进度）是否显示在界面上。圣物库窗口中有对应的眼睛按钮，固定书页时追踪器也会重新打开。',
   'guide.settingsPage.ifShowOwnNameplate':
     '把你自己的头顶铭牌完全按别人看到的样子画出来，装饰也一并显示。想要经典视角就把它关掉。',
   'guide.settingsPage.ifShowPlayerNameplates':

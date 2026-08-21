@@ -376,6 +376,7 @@ const UI_PURE_CORES = [
   'src/ui/reliquary_view.ts',
   'src/ui/reliquary_sheet_view.ts',
   'src/ui/reliquary_tracker_view.ts',
+  'src/ui/tracker_stack_anchor_core.ts',
   'src/ui/spellbook_view.ts',
   'src/ui/hud/quest/questlog_view.ts',
   'src/ui/swing_timer.ts',
@@ -1952,6 +1953,11 @@ const UI_DOM_MODULES = [
   'src/ui/touch_item_drag.ts',
   'src/ui/touch_tap.ts',
   'src/ui/town_focus_window.ts',
+  // The tracker-stack seat applier: owns a resize listener and bounded
+  // getBoundingClientRect reads by design (the module comment carries the
+  // cadence contract); the seat math itself is the tracker_stack_anchor_core
+  // pure core.
+  'src/ui/tracker_stack_anchor.ts',
   'src/ui/tutorial.ts',
   'src/ui/ui_effects_applier.ts',
   'src/ui/ui_icons.ts',

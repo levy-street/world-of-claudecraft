@@ -97,6 +97,8 @@ function makeWindow(state: WorldState, opts: { open?: boolean; nav?: ReliquaryNa
     captureFocus: () => null,
     restoreFocus: () => {},
     onPinChanged: () => {},
+    trackerShown: () => true,
+    setTrackerShown: () => {},
     itemIcon: (item) => `<img data-item-icon="${item.id}" alt="">`,
     moneyHtml: () => '',
     itemTooltip: () => '',

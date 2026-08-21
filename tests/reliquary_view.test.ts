@@ -1951,6 +1951,7 @@ describe('outside-completion exclusion (nearly strip and tracker default)', () =
       completion,
       ownershipSig: () => 1,
       collapsed: false,
+      enabled: true,
     });
     expect(view.lines.slice(0, view.count).map((l) => l.pageId)).toEqual(['ctrl_page']);
     // A page the player PINNED is their own choice: pass 1 applies no flag
@@ -1960,6 +1961,7 @@ describe('outside-completion exclusion (nearly strip and tracker default)', () =
       pageIds: ['horizons_vault_of_ages', 'horizons_riftbound', 'ctrl_page'],
       completion,
       ownershipSig: () => 1,
+      enabled: true,
       collapsed: false,
     });
     expect(pinned.lines.slice(0, pinned.count).map((l) => l.pageId)).toEqual([

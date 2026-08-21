@@ -667,6 +667,8 @@ function makeRig(seed: { recent?: string[]; marks?: string[] } = {}): ArtRig {
     captureFocus: () => opener,
     restoreFocus: () => {},
     onPinChanged: () => {},
+    trackerShown: () => true,
+    setTrackerShown: () => {},
     // The production body verbatim (Hud.itemIcon is `knownItemIconHtml(item)`,
     // pinned below), so the markup these tests read is the markup a player gets.
     itemIcon: (item) => knownItemIconHtml(item),

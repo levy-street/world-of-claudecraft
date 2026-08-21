@@ -367,6 +367,12 @@ export const BOOL_SETTINGS = {
   // collapsed to just its header. Toggled by clicking the tracker header (the
   // quest-tracker convention); kept here so the choice persists.
   reliquaryTrackerCollapsed: { def: false },
+  // on by default: the on-screen Reliquary tracker (pinned pages, or the
+  // nearly-complete default before any pin) is shown at all. The master
+  // switch above the collapse: off removes the strip entirely. Flipped from
+  // The Reliquary window's eye toggle and the Interface options row; pinning
+  // a page while it is off turns it back on.
+  showReliquaryTracker: { def: true },
   // off by default: append an "Item Level N" (plus power score) line to every item
   // tooltip. Purely a display preference read live by the HUD; off keeps the
   // classic stat-only tooltip. See src/sim/item_level.ts for the derivation.

@@ -4366,6 +4366,65 @@
   body.mobile-touch.hud-mobile-compact #reliquary-tracker .dt-chevron {
     display: none;
   }
+  /* ---------- mobile tracker chips (compact) ---------- */
+  /* Compact count chips, both trackers at once: with the rows folded away the
+     header is the whole surface, and the desktop treatment (14px title font on
+     a bare underlined button) read enormous over the world on a 390px-tall
+     phone. Restyle it as a small chip borrowing the minimap cluster's chrome
+     (the #minimap-clock radial fill, drop shadow, and --radius-md; not its 2px
+     border, top highlight, or type size; DESIGN.md 14 rules out pill buttons)
+     and hug the right rail under the minimap. Sized to sit UNDER the scaled
+     column rather than beside it: the column renders about 82px wide at the
+     compact transform, and the first cut of this chip (12px type, the 40px
+     coarse min-height as its own box) measured 109x40 and dwarfed the clock.
+     11px is the tracker's own mobile type size (body.mobile-touch
+     #reliquary-tracker above), not a new step; the DESIGN.md 5.3 12px body
+     floor is already below the water line on this tier (the quest tracker
+     sits at 10px), a recorded sheet-wide deviation rather than a new one. The
+     24px is a border-box value (the base.css universal reset). The base
+     :focus-visible rules' 2px radius is overridden here by layer, so the
+     keyboard ring follows this chip's radius on the compact tier. Its own
+     banner section because the rule spans BOTH trackers (the corpus scan
+     credits by section). */
+  body.mobile-touch.hud-mobile-compact #deed-tracker .dt-header,
+  body.mobile-touch.hud-mobile-compact #reliquary-tracker .dt-header {
+    position: relative;
+    margin: 0 0 6px auto;
+    gap: 4px;
+    min-height: 24px;
+    padding: 2px 8px;
+    font-size: 11px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: radial-gradient(circle at 50% 30%, #2c2c3a, #14141d);
+    box-shadow: 0 2px 4px #0009;
+  }
+  /* The 40px coarse-pointer floor (DESIGN.md 13.5) rides an invisible hit
+     extension (DESIGN.md 10.1, the char-playtime-eye idiom): a 24px visual
+     plus 8px each way, instead of the base sheet's pointer-coarse
+     min-height: 40px inflating the chip itself. -9px, not -8px: an absolutely
+     positioned pseudo-element's inset is measured from the host's PADDING
+     edge, so on this 1px-bordered button -9px is the 8px beyond the visual
+     edge that the sum needs (-8px measured as a 38px hit box in the browser
+     suite; tests/browser/target_size pins the live reach). It needs
+     position: relative on the chip above to anchor, and it paints nothing (a
+     plain rectangle: a radius on a hit box only trims corner hit area).
+     Geometry: the extension reaches exactly to the minimap column's bottom
+     edge (the anchor's 8px gap), never over the clock; two stacked chips sit
+     6px (this margin) plus the stack's 14px flex gap (#right-tracker-stack,
+     hud.css, which no mobile rule overrides) apart, 20px against 16px of
+     combined reach, so the two hit boxes clear each other by 4px and neither
+     chip loses a pixel to its neighbor. The widened hit box cannot steal a
+     rail click the way a wider VISUAL box would on desktop (the width:
+     fit-content rationale on the base .dt-header): #side-buttons is
+     display: none under body.mobile-touch, so there is no rail beneath this
+     tier's stack. */
+  body.mobile-touch.hud-mobile-compact #deed-tracker .dt-header::after,
+  body.mobile-touch.hud-mobile-compact #reliquary-tracker .dt-header::after {
+    content: "";
+    position: absolute;
+    inset: -9px;
+  }
   /* ---------- mobile Reliquary (standalone window) ---------- */
   /* Full-bleed safe-area panel, horizontal shelf chips, 40px targets. The
      body column collapses the desktop rail into a chip row (deeds idiom). */
@@ -6053,9 +6112,14 @@
   body.mobile-touch.hud-mobile-compact.mobile-chat-open #chat-input {
     bottom: calc(env(safe-area-inset-bottom) + 68px);
   }
+  /* Resting seat only: tracker_stack_anchor.ts re-seats the stack below the
+     minimap column's REAL rendered bottom (the 0.57-scaled column ends near
+     140px at stock chrome scale, and the old 96px seat painted the tracker
+     chips over the compass and clock). The constant here is the no-JS
+     first-paint fallback, tuned to the stock-scale measurement. */
   body.mobile-touch.hud-mobile-compact #right-tracker-stack {
     width: calc(148px * var(--mobile-chrome-scale, 1));
-    top: max(96px, env(safe-area-inset-top));
+    top: max(140px, env(safe-area-inset-top));
   }
   body.mobile-touch.hud-mobile-compact #quest-tracker {
     font-size: 10px;

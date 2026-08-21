@@ -754,6 +754,11 @@ describe('mobile layout (hud.mobile.css)', () => {
   });
 
   it('folds the tracker to a count chip on the compact tier and routes its tap to the Book', () => {
+    // The chip's own chrome (the shared compact `.dt-header` rule and its
+    // ::after hit extension, which this tracker and the Reliquary tracker
+    // share) is pinned once, in tests/reliquary_tracker_view.test.ts
+    // ('keeps the compact mobile chip a 40px tap target ...'); this test
+    // owns the fold and the routing only.
     expect(hudMobile).toMatch(
       /body\.mobile-touch\.hud-mobile-compact #deed-tracker \.dt-list \{\s*display: none;/,
     );
@@ -840,6 +845,18 @@ describe('chrome keys and CSS floors', () => {
     );
     expect(hudCss).toMatch(
       /@media \(pointer: coarse\) \{\s*#deed-tracker \.dt-header \{\s*min-height: 40px;/,
+    );
+    // On the COMPACT tier that coarse min-height is overridden by layer (the
+    // chip is a 24px visual there) and the 40px floor rides an invisible
+    // ::after hit extension instead (24 + 2x8; DESIGN.md 10.1; the inset is
+    // -9px because it is measured from the padding edge of the 1px-bordered
+    // chip). The shared chip rule is pinned in full in
+    // tests/reliquary_tracker_view.test.ts and its live reach in
+    // tests/browser/target_size.browser.test.ts; this half-pin keeps the deed
+    // tracker's own floor guarded where a deed-tracker change would look: the
+    // deed selector must be IN the extension's selector list, with the reach.
+    expect(hudMobile.replace(/\/\*[\s\S]*?\*\//g, '')).toMatch(
+      /hud-mobile-compact #deed-tracker \.dt-header::after[^{]*\{\s*content: "";\s*position: absolute;\s*inset: -9px;/,
     );
     // The recent-strip jump buttons: the floor lives in hud.mobile.css and
     // must be UNCONDITIONAL under body.mobile-touch (a landscape tablet never

@@ -1303,6 +1303,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.uiScale': '介面縮放',
   'hudChrome.options.highContrastBackground': '高對比度背景',
   'hudChrome.options.showItemLevel': '顯示物品等級',
+  'hudChrome.options.showReliquaryTracker': '顯示聖物庫追蹤器',
   'hudChrome.options.showSecondaryActionBar': '顯示副動作列',
   'hudChrome.options.showThirdActionBar': '顯示第三動作列',
   'hudChrome.options.hideUnusedActionSlots': '隱藏未使用的動作欄位',
@@ -10515,6 +10516,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.pinFull': '追蹤器已滿（最多 {cap} 個頁面）',
   'hudChrome.reliquary.pinAria': '將{name}釘選到介面追蹤器',
   'hudChrome.reliquary.unpinAria': '取消釘選{name}',
+  'hudChrome.reliquary.trackerToggleLabel': '介面追蹤器',
+  'hudChrome.reliquary.trackerToggleShowHint': '在畫面上顯示聖物庫追蹤器',
+  'hudChrome.reliquary.trackerToggleHideHint': '在畫面上隱藏聖物庫追蹤器',
   'hudChrome.reliquary.rarityLine': '{percent} 的收藏家已發現',
   'hudChrome.reliquary.pageRarityLine': '{percent} 的收藏家已點亮',
   'hudChrome.reliquary.cellAriaWithRarity': '{base}，{rarity}',
@@ -12719,6 +12723,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifShowAttackButton': '在你的動作列上放一個明確的「攻擊」按鈕。',
   'guide.settingsPage.ifShowItemLevel':
     '在每個物品提示框上加一行裝備等級。預設關閉，以保留經典的純屬性提示框。',
+  'guide.settingsPage.ifShowReliquaryTracker': '控制聖物庫追蹤器（你釘選的書頁及其進度）是否顯示在介面上。聖物庫視窗中有對應的眼睛按鈕，釘選書頁時追蹤器也會重新開啟。',
   'guide.settingsPage.ifShowOwnNameplate':
     '把你自己頭上的名條，完全照別的玩家看到的樣子畫出來，連裝飾都一併呈現。想要經典的視野就把它關掉。',
   'guide.settingsPage.ifShowPlayerNameplates':

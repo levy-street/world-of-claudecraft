@@ -545,6 +545,8 @@ export const guideStrings = {
     ifInvertLookY: 'Flips the up and down direction of mouse look.',
     ifShowItemLevel:
       'Adds an item level line to every item tooltip. Off by default, which keeps the classic stat-only tooltip.',
+    ifShowReliquaryTracker:
+      'Whether the Reliquary tracker (your pinned pages and their progress) sits on your HUD. The Reliquary window has a matching eye button, and pinning a page turns the tracker back on.',
     ifShowPlaytime:
       'Shows your lifetime time played on the character sheet. On by default, and the sheet has an eye button that flips it per device, which is handy if you stream or take screenshots. The total keeps counting either way.',
     ifShowOwnNameplate:

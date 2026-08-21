@@ -1327,6 +1327,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the always-on Reliquary tracker (not gated on a window): pinned pages fill from normal play and an illuminated page drops off',
   },
   {
+    call: 'this.trackerStackAnchor.apply',
+    band: 'slow',
+    gate: '',
+    surface: 'chrome',
+    why: 'seats #right-tracker-stack below the minimap column, whose rendered height moves with the zone label and mobile chrome scale; a bounded layout read, elided write (tracker_stack_anchor.ts owns the cadence contract)',
+  },
+  {
     call: 'this.calendarWindow.refreshIfChanged',
     band: 'slow',
     gate: 'this.calendarWindow.isOpen',
@@ -1651,7 +1658,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // release's own window/chrome churn), so it cannot be reconciled by
       // arithmetic across a merge. The numbers below were set from a suite run
       // on the merged tree, not from either side's narrative.
-    ).toEqual({ window: 47, chrome: 83, none: 17 });
+      // chrome 83 -> 84: the tracker-stack anchor apply (seats the stack below
+      // the minimap column; tracker_stack_anchor.ts).
+    ).toEqual({ window: 47, chrome: 84, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
