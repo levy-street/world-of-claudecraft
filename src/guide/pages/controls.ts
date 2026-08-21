@@ -52,6 +52,7 @@ const GROUPS: Group[] = [
       { keys: ['C'], label: 'controls.charPane' },
       { keys: ['P'], label: 'controls.spellbook' },
       { keys: ['Shift+P'], label: 'guide.controls.professions' },
+      { keys: ['Shift+K'], label: 'guide.controls.harvestJournal' },
       { keys: ['L'], label: 'controls.questLog' },
       { keys: ['M'], label: 'controls.worldMap' },
       { keys: ['B'], label: 'controls.bags' },

@@ -30,6 +30,7 @@ import { marshDressingPreloadInternalsForTest } from '../src/render/delve_marsh_
 import { delvePropsPreloadInternalsForTest } from '../src/render/delve_props';
 import { doorPortalPreloadInternalsForTest } from '../src/render/door_portal';
 import { eastbrookGrandArmouryInternalsForTest } from '../src/render/eastbrook_grand_armoury';
+import { farmPatchesPreloadInternalsForTest } from '../src/render/farm_patches';
 import { fishPreloadInternalsForTest } from '../src/render/fish';
 import { galeFeaturesPreloadInternalsForTest } from '../src/render/gale_features';
 import { gardenFeaturesPreloadInternalsForTest } from '../src/render/garden_features';
@@ -501,6 +502,19 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
 
   it('mailbox pillar asset', () => {
     expectAssetExistsAndManifested(mailboxPreloadInternalsForTest.mailboxAssetUrl);
+  });
+
+  // The farm patch set: garden beds, the compost bin, and the per-family crop
+  // stage and withered meshes. The renderer's own url list is the source here,
+  // so a family or stage added to the core without an export reds this.
+  it('farm patch assets', () => {
+    const urls = farmPatchesPreloadInternalsForTest.modelUrls;
+    // The full committed set: bed + bin + shared sprout + 3 families x
+    // (stage2, stage3, stage4, withered), plus the Phase 12 harvest feast
+    // table. A new family or stage moves this count deliberately, in the
+    // same change that commits its GLB.
+    expect(urls.length).toBe(16);
+    for (const url of urls) expectAssetExistsAndManifested(url);
   });
 
   // Thornhollow Fields rune pads: all three defs are filled in now, so this

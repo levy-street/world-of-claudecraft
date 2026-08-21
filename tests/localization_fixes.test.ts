@@ -992,6 +992,10 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/progression/xp.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/mob_swing.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/lifecycle.ts'), 'utf8'),
+    // M5 -> src/sim/mob/boss_mechanics.ts (the boss support kit: "calls for aid!",
+    // "becomes enraged!", the desperate-second-wind line, the channels/unleashes
+    // support-pulse lines, "<mechanic> is interrupted!").
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/boss_mechanics.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/pet/pet_commands.ts'), 'utf8'),
     // The arena-shaped-match pet round trip: its one emit is the same
     // "<name> returns to your side." line Revive Pet uses, so it is matched by
@@ -1692,6 +1696,46 @@ describe('elixir aura names stay wired to the sim aura matcher', () => {
     const canonicalLine = "The dead answer Deacon Vandric's call!";
     expect(localizeSimText(legacyLine)).toBe(localizeSimText(canonicalLine));
     expect(localizeSimText(legacyLine)).not.toBe(legacyLine);
+  });
+});
+
+// --- Well-fed aura name: the same double-authoring hazard as the elixirs
+// (each buff dish's wellfed.aura and the sim_i18n map row), so the same
+// identity round-trip pin. All four dishes deliberately share the ONE
+// 'Well Fed' name (last eaten wins on the shared wellfed_buff_sta id). ---
+describe('well-fed aura names stay wired to the sim aura matcher', () => {
+  it('every authored wellfed aura resolves through localizeSimAuraName', async () => {
+    const { ITEMS } = await import('../src/sim/data');
+    const auras = Object.values(ITEMS)
+      .map((item) => item.wellfed?.aura)
+      .filter((aura): aura is string => typeof aura === 'string');
+    // one buff dish per crop tier
+    expect(auras.length).toBeGreaterThanOrEqual(4);
+    setLanguage('en');
+    for (const aura of auras) {
+      // Identity round-trip, not just non-null: the EN DICT value must equal
+      // the item def's aura string, or the matcher resolves a stale name.
+      expect(localizeSimAuraName(aura), `aura "${aura}" out of sync with AURA_NAME_KEY`).toBe(aura);
+    }
+  });
+
+  it('the Well Fed aura localizes on every non-Latin surface', async () => {
+    const expected: Record<string, string> = {
+      zh_CN: '饱足',
+      zh_TW: '飽足',
+      ko_KR: '포만감',
+      ja_JP: '満腹',
+      ru_RU: 'Сытость',
+    };
+    try {
+      for (const [locale, value] of Object.entries(expected)) {
+        await ensureLocaleLoaded(locale as Parameters<typeof ensureLocaleLoaded>[0]);
+        setLanguage(locale as Parameters<typeof setLanguage>[0]);
+        expect(localizeSimAuraName('Well Fed'), locale).toBe(value);
+      }
+    } finally {
+      setLanguage('en');
+    }
   });
 });
 

@@ -13,8 +13,10 @@
 // (enchant/disenchant/salvage tables instead of a recipe ladder), so sharing
 // the module reuses strictly more than a separate page would.
 
+import type { AuraKind } from '../../sim/types';
 import { esc } from '../../ui/esc';
 import { formatMoney, formatNumber, type TranslationKey, t } from '../../ui/i18n';
+import { WELLFED_STAT_KEYS } from '../../ui/wellfed_stat_keys';
 import {
   GUIDE_PROF_CRAFTS,
   GUIDE_PROF_CURVE,
@@ -70,6 +72,47 @@ function sourceCell(r: GuideProfRecipe): string {
   return esc(t('guide.profPages.sourceKnown'));
 }
 
+/** The consumable-effect sub-lines for a dish recipe (the C10 gap: the wiki
+ *  showed no effect prose for ANY dish). Composed from the generated VALUES
+ *  through t() templates per the tooltip doctrine (resolved numbers from the
+ *  live def, the finish-the-meal trigger stated, nothing hidden); the stat
+ *  label rides the SAME exported map the in-game dish and feast tooltips use
+ *  (WELLFED_STAT_KEYS), so the wiki can never name a stat the tooltip does
+ *  not. An unmapped buff kind degrades to the aura-name line rather than
+ *  shipping a silent dish (the wellfed_tooltip_view fallback rule); the
+ *  interpolated aura value is the def's own baked English proper noun, the
+ *  SAME policy every name on this page follows (see the module header's
+ *  GUIDE_DEEDS precedent), and tests/guide.test.ts asserts every SHIPPED
+ *  wellfed kind is mapped, so the fallback stays a degradation path, never
+ *  the live rendering. Exported for the direct fallback-render test. */
+export function effectLines(r: GuideProfRecipe): string {
+  const effect = r.effect;
+  if (!effect) return '';
+  const lines: string[] = [];
+  if (effect.food) {
+    lines.push(
+      t('guide.profPages.effectFood', {
+        amount: formatNumber(effect.food.amount),
+        seconds: formatNumber(effect.food.seconds),
+      }),
+    );
+  }
+  if (effect.wellfed) {
+    const statKey = WELLFED_STAT_KEYS[effect.wellfed.kind as AuraKind];
+    const minutes = formatNumber(effect.wellfed.minutes, { maximumFractionDigits: 1 });
+    lines.push(
+      statKey
+        ? t('guide.profPages.effectWellFed', {
+            stat: t(statKey),
+            value: formatNumber(effect.wellfed.value),
+            minutes,
+          })
+        : t('guide.profPages.effectWellFedAura', { aura: effect.wellfed.aura, minutes }),
+    );
+  }
+  return lines.map((line) => `<span class="guide-prof-effect">${esc(line)}</span>`).join('');
+}
+
 function recipeRow(r: GuideProfRecipe): string {
   const combo = r.combo
     ? `<span class="guide-prof-combo">${esc(
@@ -90,7 +133,7 @@ function recipeRow(r: GuideProfRecipe): string {
       ? t('guide.profPages.outputFmt', { name: r.output.name, count: formatNumber(r.output.count) })
       : r.output.name;
   return `<tr>
-      <td class="guide-prof-recipe q-${esc(r.output.quality)}">${esc(output)}${combo}${daily}</td>
+      <td class="guide-prof-recipe q-${esc(r.output.quality)}">${esc(output)}${combo}${daily}${effectLines(r)}</td>
       <td>${esc(formatNumber(r.skillReq))}</td>
       <td>${sourceCell(r)}</td>
       <td>${esc(r.station ? stationLabel(r.station) : t('guide.profPages.stationAnywhere'))}</td>

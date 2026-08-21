@@ -29,12 +29,13 @@ import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { gameMetricsCounters } from '../server/http/game_signals';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
-import { type ClientWorld, EMPTY_MST_CRAFTS } from '../src/net/online';
+import { ClientWorld, EMPTY_MST_CRAFTS } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
 import {
   emptyPriestMarkerState,
   priestMarkerStateForAuras,
 } from '../src/sim/combat/priest/presentation';
+import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import { MOUNT_RACE_START_PLATFORM, type MountKey } from '../src/sim/content/mounts';
 import { CRAFT_RING, STATION_RADIUS } from '../src/sim/content/professions';
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
@@ -3799,6 +3800,104 @@ describe('equipped instance wire (eqi)', () => {
   });
 });
 
+// The farming own-plot delta. A plot's survival outcome and yield are pre-rolled
+// at plant time and stored in hidden PlotState slots; shipping either would let a
+// client know a crop's fate before its timer runs out, so the projection
+// (src/sim/professions/farm_projection.ts) picks its fields explicitly. This is
+// the gate over the REAL wire: a GameServer broadcast, JSON-encoded and parsed
+// back, so an accidental spread reddens here rather than in a unit test of the
+// projection alone.
+describe('farm plot wire (fplot)', () => {
+  it('never carries the hidden pre-rolled outcome slots to a client', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Rowan');
+    const meta = server.sim.meta(session.pid)!;
+    meta.farmPlots.set('bed_eastbrook_1', {
+      cropId: 'vale_wheat',
+      plantedAtMs: 1_700_000_000_000,
+      readyAtMs: FAR_FUTURE_MS,
+      survivalRoll: 0.42,
+      yieldSeed: 987654,
+      compost: true,
+      watch: false,
+      tonic: true,
+      notified: false,
+    });
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    // The wire key is pinned as a literal: renaming it silently would strip the
+    // plots from every online client while every projection test stayed green.
+    const rows = snap.self.fplot as Record<string, unknown>[];
+    expect(rows).toHaveLength(1);
+    const row = rows[0];
+    // Positive first: the public fields carry what was planted, so the absence
+    // assertions below cannot pass on an empty or defaulted payload.
+    expect(row.bedId).toBe('bed_eastbrook_1');
+    expect(row.cropId).toBe('vale_wheat');
+    expect(row.plantedAtMs).toBe(1_700_000_000_000);
+    expect(row.readyAtMs).toBe(FAR_FUTURE_MS);
+    expect(row.compost).toBe(true);
+    expect(row.watch).toBe(false);
+    expect(row.tonic).toBe(true);
+    expect(row.notified).toBe(false);
+    expect(row.status).toBe('growing');
+    // The leak pin, both ways: named absence for a reader, then the exhaustive
+    // key set so a NEW hidden PlotState field cannot ride along unnoticed.
+    expect(row.survivalRoll).toBeUndefined();
+    expect(row.yieldSeed).toBeUndefined();
+    expect(Object.keys(row).sort()).toEqual([
+      'bedId',
+      'compost',
+      'cropId',
+      'notified',
+      'plantedAtMs',
+      'readyAtMs',
+      'status',
+      'tonic',
+      'watch',
+    ]);
+  });
+
+  it('rides the wire as [] for a player with no planted bed', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    joinServer(server, fc, 1, 'Bramble');
+    broadcast(server);
+    expect(lastSnap(fc.sent).self.fplot).toEqual([]);
+  });
+
+  it('a real ClientWorld serves the frozen patch table by reference from construction', () => {
+    // The static-content arm of IWorldFarming: farmPatches never rides the
+    // wire, so only a REAL construction (not the bareClient fixture, which
+    // stamps its own copy of the default) can pin src/net/online.ts against
+    // an accidental [] or defensive copy. DOM/network-free construction via
+    // the withDomStubs idiom (target_echo_client.test.ts /
+    // account_flair_client.test.ts).
+    class StubWebSocket {
+      static readonly OPEN = 1;
+      onopen: (() => void) | null = null;
+      readyState = StubWebSocket.OPEN;
+      constructor(public readonly url: string) {}
+      send(): void {}
+      close(): void {}
+    }
+    const g = globalThis as Record<string, unknown>;
+    const prevWebSocket = g.WebSocket;
+    const prevWindow = g.window;
+    g.WebSocket = StubWebSocket as unknown;
+    g.window = { setInterval: () => 0, clearInterval: () => undefined };
+    try {
+      const w = new ClientWorld('farm-statics-probe', 1, 'warrior', 'http://localhost');
+      expect(w.farmPatches).toBe(FARM_PATCHES);
+      expect(w.myFarmPlots).toEqual([]);
+    } finally {
+      g.WebSocket = prevWebSocket;
+      g.window = prevWindow;
+    }
+  });
+});
+
 describe('delve self-state mirrors over the wire', () => {
   let server: GameServer;
   let fc: FakeClient;
@@ -4182,6 +4281,7 @@ const ALL_DELTA_KEYS = [
   'einst',
   'ench',
   'equip',
+  'fplot',
   'gprof',
   'guildBank',
   'hbl',
@@ -4282,6 +4382,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   einst: 'equipmentInstances',
   ench: 'lastEnchantResult',
   equip: 'equipment',
+  fplot: 'myFarmPlots',
   gprof: 'gatheringProficiency',
   guildBank: 'guildBankInfo',
   hirat: 'hitRating',
@@ -4433,7 +4534,7 @@ function dirtyEveryDeltaField(): {
   meta.delveMarks = 7;
   meta.delveClears = { 'collapsed_reliquary:heroic': 1 };
   meta.companionUpgrades = { companion_tessa: 2 };
-  meta.gatheringProficiency = { mining: 6, logging: 0, herbalism: 0, fishing: 0 };
+  meta.gatheringProficiency = { mining: 6, logging: 0, herbalism: 0, fishing: 0, farming: 0 };
   // tslot: a REAL slotted effect, not the empty default. Without this the key
   // rides the first snapshot as `[]`, which is not null, so it passes the
   // "dirtied to a non-default value" loop below vacuously and nothing anywhere
@@ -4449,6 +4550,27 @@ function dirtyEveryDeltaField(): {
       confirmMode: 'always',
     },
   };
+  // fplot: a REAL planted plot, not the empty default. Without this the key
+  // rides the first snapshot as `[]`, which is not null, so it passes the
+  // "dirtied to a non-default value" loop below vacuously and nothing anywhere
+  // proves a plot row reaches a client. Written straight onto meta (the plant
+  // command lands in the growth phase; the wire shape under test is the DELTA,
+  // not the mint). The hidden pre-rolled outcome slots are FILLED here on
+  // purpose: they are what the 'farm plot wire (fplot)' leak pin proves never
+  // crosses the wire.
+  // readyAtMs sits far past the fixture's clock (the sim-time lockoutNowMs
+  // seam, single-digit seconds in), so `status` is deterministically 'growing'.
+  meta.farmPlots.set('bed_eastbrook_1', {
+    cropId: 'vale_wheat',
+    plantedAtMs: 1_700_000_000_000,
+    readyAtMs: FAR_FUTURE_MS,
+    survivalRoll: 0.42,
+    yieldSeed: 987654,
+    compost: true,
+    watch: true,
+    tonic: false,
+    notified: false,
+  });
   meta.craftSkills.armorcrafting = 31;
   meta.craftSkills.weaponcrafting = 29;
   meta.archetype = {
@@ -4866,6 +4988,7 @@ describe('full self-state snapshot delta fixture', () => {
       logging: 0,
       herbalism: 0,
       fishing: 0,
+      farming: 0,
     }); // gprof -> gatheringProficiency
     // tslot -> toolEffectSlots: the projected row shape, so a decode onto the
     // wrong field or a renamed wire key reddens here rather than silently
@@ -4882,18 +5005,37 @@ describe('full self-state snapshot delta fixture', () => {
         selfCrafted: false,
       },
     ]);
+    // fplot -> myFarmPlots: the projected row shape, written out fresh here
+    // rather than compared against the fixture's PlotState, which carries the
+    // hidden slots and no status. The knob flags are deliberately mixed so a
+    // decode that dropped or transposed one reddens.
+    expect(client.myFarmPlots).toEqual([
+      {
+        bedId: 'bed_eastbrook_1',
+        cropId: 'vale_wheat',
+        plantedAtMs: 1_700_000_000_000,
+        readyAtMs: FAR_FUTURE_MS,
+        compost: true,
+        watch: true,
+        tonic: false,
+        notified: false,
+        status: 'growing',
+      },
+    ]);
     // ncd -> nodeHarvestableByMe: the cooling-down node reads not-ready, an
     // untouched node (never in the map) still reads ready.
     expect(client.nodeHarvestableByMe(GATHER_NODES[0].id)).toBe(false);
     expect(client.nodeHarvestableByMe('not_a_real_node')).toBe(true);
     // Re-pin: the enforced per-profession caps
-    // (mining/logging/herbalism 100, fishing 200) replace the old uniform 300.
+    // (mining/logging/herbalism/farming 100, fishing 200) replace the old
+    // uniform 300, in the append-last order farming joined in.
     expect(client.professionsState).toEqual({
       skills: [
         { professionId: 'mining', skill: 6, maxSkill: 100 },
         { professionId: 'logging', skill: 0, maxSkill: 100 },
         { professionId: 'herbalism', skill: 0, maxSkill: 100 },
         { professionId: 'fishing', skill: 0, maxSkill: 200 },
+        { professionId: 'farming', skill: 0, maxSkill: 100 },
       ],
     }); // prof -> professionsState
     expect(client.craftingIdentity).toMatchObject({
@@ -5262,7 +5404,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 86 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 87 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -5276,14 +5418,22 @@ describe('delta-key contract pins (anti-drift)', () => {
     // immutable so it rides this channel instead of re-serializing per tick),
     // for 86. Every v0.36.0 sync conflicts here because each side pins its own
     // additions alone; the merged tree carries all of them, and this number
-    // came from a run on the merged tree.
-    expect(ALL_DELTA_KEYS).toHaveLength(86);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(86);
+    // came from a run on the merged tree. Plus farming's own-plot key fplot,
+    // for 87 on this branch.
+    expect(ALL_DELTA_KEYS).toHaveLength(87);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(87);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
-  it('ALL_DELTA_KEYS equals the maybe(...) keys scraped from server/game.ts (multi-line lockouts incl.)', () => {
-    const raw = readFileSync(resolve(process.cwd(), 'server/game.ts'), 'utf8');
+  it('ALL_DELTA_KEYS equals the maybe(...) keys scraped from the self-snapshot emit sources (multi-line lockouts incl.)', () => {
+    // The emit surface is server/game.ts plus the one extracted emitter:
+    // farming's fplot row moved whole to server/farming_commands.ts at the
+    // v0.38.0 sync monolith heal (appendFarmPlotsWire), so that file joins
+    // the scrape; a key emitted from an unscraped module would silently
+    // vacate this pin's coverage.
+    const raw =
+      readFileSync(resolve(process.cwd(), 'server/game.ts'), 'utf8') +
+      readFileSync(resolve(process.cwd(), 'server/farming_commands.ts'), 'utf8');
     // Strip comments before scraping so a commented-out call cannot keep its key
     // in the scraped set (the `(^|[^:])` guard keeps protocol `://` intact).
     const src = raw.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
@@ -5308,8 +5458,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // key ptime for 67, then the 16 static combat-rating/progression scalars
     // (ap/sp/sh/crit/dodge/blk/bval/crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff)
     // for 83, then reliq (Reliquary Phase 3 sparse blob) for 84, the nameplate
-    // border echo aborder for 85, and the authored modular look `app` for 86.
-    expect(scraped.size).toBe(86);
+    // border echo aborder for 85, the authored modular look `app` for 86, and
+    // farming's own-plot key fplot for 87.
+    expect(scraped.size).toBe(87);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -5381,6 +5532,9 @@ describe('delta-key contract pins (anti-drift)', () => {
       // right-hand side would pass every other check in this test.
       lroll: 'lootRollPrompts',
       mloot: 'masterLootPrompts',
+      // The farming own-plot delta: the wire key and the IWorld name share no
+      // stem, so a typo on either side would decode onto nothing at all.
+      fplot: 'myFarmPlots',
     };
     for (const [terse, iworld] of Object.entries(required)) {
       expect(TERSE_TO_IWORLD[terse], `rename ${terse} -> ${iworld} drifted`).toBe(iworld);

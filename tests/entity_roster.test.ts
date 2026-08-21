@@ -79,6 +79,7 @@ function makeCtx() {
     primaryId: -1,
     tradeInvites: new Map(),
     duelInvites: new Map(),
+    feasts: new Map(),
     nextId: 1,
     get grid() {
       return grid;

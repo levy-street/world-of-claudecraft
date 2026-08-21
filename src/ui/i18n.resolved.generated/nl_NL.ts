@@ -64,7 +64,8 @@ export const nl_NL: EnTranslations = {
       "dungeon": "Kerker",
       "difficulty": "Moeilijkheidsgraad",
       "name": "Naam",
-      "spec": "Spec"
+      "spec": "Spec",
+      "bed": "Bed id (optional)"
     },
     "difficulty": {
       "normal": "Normaal",
@@ -150,6 +151,10 @@ export const nl_NL: EnTranslations = {
       "gather": {
         "label": "Verzamelvaardigheid verhogen",
         "description": "Verhoog de vaardigheid van een verzamelberoep."
+      },
+      "farmgrow": {
+        "label": "Ripen crops",
+        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
       },
       "teleport": {
         "label": "Teleporteren",
@@ -2581,7 +2586,8 @@ export const nl_NL: EnTranslations = {
       "resonantSteel": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame of betere meleewapens.",
       "resonantTimber": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame of betere staven, stokken, bogen en kruisbogen.",
       "masterwroughtIntermediate": "Masterwrought crafting component.",
-      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day."
+      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day.",
+      "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it."
     },
     "discord": {
       "title": "Discord",
@@ -3018,6 +3024,7 @@ export const nl_NL: EnTranslations = {
       "logging": "Houtkap",
       "herbalism": "Kruidenkunde",
       "fishing": "Vissen",
+      "farming": "Farming",
       "notReady": "Dit grondstoffenpunt is voor jou nog niet teruggekeerd.",
       "gatherLine": "Jij verzamelt: {name}.",
       "gatherLineQty": "Je verzamelt: {name} x{qty}.",
@@ -3036,7 +3043,8 @@ export const nl_NL: EnTranslations = {
       "tierRequired": {
         "mining": "Vereist een rang {tier} mijnhouweel",
         "logging": "Vereist een rang {tier} kapbijl",
-        "herbalism": "Vereist een rang {tier} kruidenkunde-sikkel"
+        "herbalism": "Vereist een rang {tier} kruidenkunde-sikkel",
+        "farming": "Requires a tier {tier} farming hoe"
       },
       "requiresTool": {
         "mining": "Vereist een mijnhouweel",
@@ -3047,23 +3055,27 @@ export const nl_NL: EnTranslations = {
         "mining": "Je hebt een rang {tier} mijnhouweel nodig om deze ader te oogsten.",
         "logging": "Je hebt een rang {tier} kapbijl nodig om deze opstand te kappen.",
         "herbalism": "Je hebt een rang {tier} kruidenkunde-sikkel nodig om dit veld te verzamelen.",
-        "fishing": "Je hebt een rang {tier} hengel nodig om in deze wateren te vissen."
+        "fishing": "Je hebt een rang {tier} hengel nodig om in deze wateren te vissen.",
+        "farming": "You need a tier {tier} farming hoe to work this bed."
       },
       "toolRequired": {
         "mining": "Je hebt een mijnhouweel nodig om deze ertsader te ontginnen.",
         "logging": "Je hebt een kapbijl nodig om deze houtopstand te vellen.",
         "herbalism": "Je hebt een kruidenkunde-sikkel nodig om dit kruidenveld te oogsten.",
-        "fishing": "Je hebt een hengel nodig om je lijn uit te werpen."
+        "fishing": "Je hebt een hengel nodig om je lijn uit te werpen.",
+        "farming": "You need a farming hoe to work this bed."
       },
       "noNodeNearby": {
         "mining": "Er is geen ertsader binnen bereik.",
         "logging": "Er is geen houtopstand binnen bereik.",
-        "herbalism": "Er is geen kruidenveld binnen bereik."
+        "herbalism": "Er is geen kruidenveld binnen bereik.",
+        "farming": "There is no crop bed within reach."
       },
       "wieldUnmet": {
         "mining": "Je hebt Mijnbouw {skill} nodig om het houweel in je tassen te zwaaien.",
         "logging": "Je hebt Houtkap {skill} nodig om de bijl in je tassen te zwaaien.",
-        "herbalism": "Je hebt Kruidenkunde {skill} nodig om de sikkel in je tassen te hanteren."
+        "herbalism": "Je hebt Kruidenkunde {skill} nodig om de sikkel in je tassen te hanteren.",
+        "farming": "You need Farming {skill} to swing the hoe already in your bags."
       },
       "wieldUnmetCorpse": "Je hebt verzamelvaardigheid {skill} nodig om je beste gereedschap aan het werk te zetten.",
       "toolTierUnmetCorpse": "Je hebt een rang {tier} verzamelgereedschap nodig om de fijnste materialen te verzamelen.",
@@ -3072,18 +3084,21 @@ export const nl_NL: EnTranslations = {
           "mining": "Mijnbouwgereedschap (rang {tier})",
           "logging": "Houtkapgereedschap (rang {tier})",
           "herbalism": "Kruidenkundegereedschap (rang {tier})",
-          "fishing": "Hengel (rang {tier})"
+          "fishing": "Hengel (rang {tier})",
+          "farming": "Farming tool (tier {tier})"
         },
         "unlocks": {
           "mining": "Vereist om ertsaders tot en met rang {tier} te ontginnen.",
           "logging": "Vereist om houtopstanden tot en met rang {tier} te vellen.",
           "herbalism": "Vereist om kruidenvelden tot en met rang {tier} te oogsten.",
-          "fishing": "Vereist om wateren tot en met rang {tier} te bevissen."
+          "fishing": "Vereist om wateren tot en met rang {tier} te bevissen.",
+          "farming": "Required to plant crops up to tier {tier}."
         },
         "use": {
           "mining": "Gebruik: ontgin een nabijgelegen ertsader.",
           "logging": "Gebruik: vel een nabijgelegen houtopstand.",
-          "herbalism": "Gebruik: oogst van een nabijgelegen kruidenveld."
+          "herbalism": "Gebruik: oogst van een nabijgelegen kruidenveld.",
+          "farming": "Works from your bags when you plant a crop bed."
         },
         "speed": "Verzamelt sneller bij grondstoffenpunten onder rang {tier}.",
         "rodRequired": "Vereist om te vissen.",
@@ -3092,6 +3107,7 @@ export const nl_NL: EnTranslations = {
         "rodBand": "Ontgrendelt een rijkere vangst vanaf visvaardigheid {skill}."
       },
       "downgradeMark": "Tassen vol: de vondst werd opgeslagen zonder verzamelderstempel.",
+      "downgradeMarkCrop": "Bags full: the harvest was stored without its grower's mark.",
       "downgradeFind": "Tassen vol: een ongeschonden vondst glipte weg.",
       "emptyHookNote": "Niets aan de haak",
       "stateReady": "Gereed",
@@ -3099,6 +3115,83 @@ export const nl_NL: EnTranslations = {
       "stateCooldownTimed": "Hergroeit over {time}",
       "respawnClock": "{minutes}:{seconds}",
       "fineGradePreview": "Je gereedschap verfijnt deze opbrengst tot fijne kwaliteit."
+    },
+    "farming": {
+      "plantLine": "You plant: {name}.",
+      "harvestLine": "You bring in: {name}.",
+      "harvestLineQty": "You bring in: {name} x{qty}.",
+      "harvestFineLine": "You also bring in: {name}.",
+      "harvestFineLineQty": "You also bring in: {name} x{qty}.",
+      "witheredLine": "The crop withered. You clear the bed: {name}.",
+      "witheredLineQty": "The crop withered. You clear the bed: {name} x{qty}.",
+      "seedBackLine": "You recover seed: {name}.",
+      "seedBackLineQty": "You recover seed: {name} x{qty}.",
+      "denied": {
+        "bad_bed": "There is no crop bed there.",
+        "bad_crop": "You cannot plant that here.",
+        "range": "You are too far from that crop bed.",
+        "bed_taken": "You already have a crop growing there.",
+        "skill": "Your Farming skill is too low for that crop.",
+        "no_seed": "You have no seed for that crop.",
+        "not_ready": "That crop is still growing.",
+        "no_plot": "Nothing is planted in that bed.",
+        "no_husks": "You do not have enough withered husks.",
+        "no_compost": "You have no compost.",
+        "no_fee_produce": "You have no produce to pay the watch fee.",
+        "no_tonic": "You have no growth tonic.",
+        "tool": "You have no farming hoe fit for that crop.",
+        "locked": "An item that would pay for that is locked.",
+        "no_farmer": "You must be near a farmer to trade husks for compost.",
+        "no_feast": "You have no feast to set out.",
+        "feast_active": "Your feast is already set out.",
+        "feast_expired": "That feast is gone.",
+        "feast_finished": "That feast has been picked clean.",
+        "feast_range": "You are too far from the feast.",
+        "feast_eaten": "You have already eaten from that feast."
+      },
+      "feastTitle": "{name}'s Harvest Feast",
+      "feastPlacedLine": "You set out your harvest feast.",
+      "huskTrade": "Trade husks for compost",
+      "huskTradeAria": "Trade husks for compost with {name}",
+      "plantSheet": {
+        "title": "Plant a Crop",
+        "plant": "Plant",
+        "sowAria": "Sow {name}",
+        "empty": "You have no seed you can sow at this bed.",
+        "close": "Close the plant sheet"
+      },
+      "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
+      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
+      "readyLine": "A crop is ready to harvest.",
+      "readyLineQty": "{count} crops are ready to harvest.",
+      "readyWitheredLine": "A crop withered in its bed.",
+      "readyWitheredLineQty": "{count} crops withered in their beds."
+    },
+    "harvestJournal": {
+      "title": "Harvest Journal",
+      "close": "Close",
+      "listLabel": "Planted crop beds",
+      "growing": "Ready in {time}",
+      "ready": "Ready to harvest",
+      "finishing": "Finishing up",
+      "withered": "Withered",
+      "readyAnnounce": "Ready to harvest: {name}",
+      "remainingDaysHours": "{days}d {hours}h",
+      "remainingHoursMinutes": "{hours}h {minutes}m",
+      "remainingMinutesSeconds": "{minutes}m {seconds}s",
+      "remainingSeconds": "{seconds}s",
+      "bedLine": "{zone}, bed {index}",
+      "bedLineUnknown": "Unknown bed",
+      "careWatch": "Farmer's Watch",
+      "careNone": "No extras",
+      "stageSprout": "Sprout",
+      "stageSeedling": "Seedling",
+      "stageMaturing": "Maturing",
+      "stageRipe": "Ripe",
+      "emptyTitle": "No crops planted",
+      "emptyBody": "Sow a seed in any garden bed and the plot appears here with its timer.",
+      "noviceTitle": "You have not worked a garden bed yet",
+      "noviceBody": "Farming skill grows every time you bring in a crop. Sow a seed in any garden bed to begin."
     },
     "archetypeTitle": {
       "label": "Titel",
@@ -3218,7 +3311,7 @@ export const nl_NL: EnTranslations = {
           "quickeningCharm": "Verkort de hergroeitijd van het grondstoffenpunt dat het activeert.",
           "makersCharm": "+2 yield per harvest while charged."
         },
-        "howToSlot": "Plaats op een mijnbouw-, houtkap- of kruidenkundegereedschap vanuit het venster Beroepen. Wordt verbruikt bij plaatsing.",
+        "howToSlot": "Plaats op een mijnbouw-, houtkap-, kruidenkunde- of landbouwgereedschap vanuit het venster Beroepen. Wordt verbruikt bij plaatsing.",
         "charges": "Begint met {base} ladingen op een gewoon gereedschap (+{bonus} per zeldzaamheidsrang).",
         "landOnly": "Kan niet op hengels worden geplaatst.",
         "openProfessions": "Open Beroepen om dit op een verzamelgereedschap te plaatsen."
@@ -3887,7 +3980,8 @@ export const nl_NL: EnTranslations = {
   "gatherEvent": {
     "pristineVein": "{finder} raakte een ongerepte ader!",
     "ancientHeartwood": "{finder} heeft een oud kernhout gekapt!",
-    "moonlitBloom": "{finder} ontdekte een maanverlichte bloei!"
+    "moonlitBloom": "{finder} ontdekte een maanverlichte bloei!",
+    "goldenHarvest": "{finder} reaped a golden harvest!"
   },
   "apiError": {
     "validation": {
@@ -4260,6 +4354,7 @@ export const nl_NL: EnTranslations = {
       "groupCamera": "Camera",
       "talents": "Talenten",
       "professions": "Beroepen",
+      "harvestJournal": "Harvest Journal",
       "arena": "PvP-venster (de arena's en de Doornholte-Velden)",
       "leaderboard": "Ranglijst",
       "deeds": "Boek der Daden",
@@ -5629,6 +5724,9 @@ export const nl_NL: EnTranslations = {
       "outputFmt": "{name} x{count}",
       "comboReq": "Vereist {a} en {b}",
       "oncePerDay": "Once per day",
+      "effectFood": "Restores {amount} health over {seconds} sec when eaten.",
+      "effectWellFed": "Well fed when you finish eating: +{value} {stat} for {minutes} min.",
+      "effectWellFedAura": "Grants {aura} for {minutes} min when you finish eating.",
       "sourceTrainerFee": "Trainer, {fee}",
       "sourceTrainerFree": "Trainer, gratis",
       "sourceKnown": "Al bekend vanaf het begin",
@@ -5806,7 +5904,8 @@ export const nl_NL: EnTranslations = {
         "mining": "Mijnbouw haalt erts recht uit het gesteente van de wereld: koper in Oostbeekdal, ijzer in Slijkveenmoeras en osmium hoog in Doorntop-Hoogten, met startaders verspreid door elke jongere zone daarbuiten, die de smidse-ambachten voeden. Vanaf niveau 1 voor iedereen open: een mijnhouweel van 20 koper aan een balie in Oostbeek, Fenbridge of Highwatch opent elke startader, en de hogere treden van de houweelladder ontwaken zodra je eigen teller ze verdient. Bijgehouden op een eigen teller tot een grens van 100.",
         "logging": "Houtkap velt hout uit houtopstanden over de hele wereld: ijzerschors in Oostbeekdal, essenhout in Slijkveenmoeras, hoogden in Doorntop-Hoogten, en startopstanden in elke jongere zone, de ruwe voorraad voor stelen, staven en de werkbank van de knutselaar. Vanaf niveau 1 voor iedereen open met een kapbijl in je tassen (20 koper aan de balies van Oostbeek, Fenbridge en Highwatch), bijgehouden op een eigen teller tot een grens van 100.",
         "herbalism": "Kruidenkunde verzamelt wat in het wild groeit: glansloofkruid in Oostbeekdal, goudblad in Slijkveenmoeras, zonnebloem in Doorntop-Hoogten, en startvelden in elke jongere zone, het blad en de stengel die de apothekersvakken aan het brouwen houden. Vanaf niveau 1 voor iedereen open met een kruidenkunde-sikkel in je tassen (20 koper aan de balies van Oostbeek, Fenbridge en Highwatch), bijgehouden op een eigen teller tot een grens van 100.",
-        "fishing": "Vissen is de vreemde eend onder de verzamelvakken, en het diepste: een echt aanslaan-en-inhalen-minispel, eigen vangsttabellen in elk van de drie kernlandzones (de jonge wateren daarbuiten bedienen voorlopig allemaal de tabel van het Dal), en een vaardigheidsgrens van 200, het dubbele van de rest. Koop een hengel, keer je naar open water, en werp uit."
+        "fishing": "Vissen is de vreemde eend onder de verzamelvakken, en het diepste: een echt aanslaan-en-inhalen-minispel, eigen vangsttabellen in elk van de drie kernlandzones (de jonge wateren daarbuiten bedienen voorlopig allemaal de tabel van het Dal), en een vaardigheidsgrens van 200, het dubbele van de rest. Koop een hengel, keer je naar open water, en werp uit.",
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe whenever you come back, because nothing in a bed ever spoils. A farmer stands beside every bed site, from the Eastbrook allotments through Fenbridge and Highwatch to the Evergarden parterre, and Farmer Jessica in Eastbrook is where the trade starts: she sells the garden hoe and the first seeds, and her errand walks a new farmer through a first crop. Each rung of the ladder grows its own pair of crops, each with a finer grade for a practiced hand to pull, and engineers craft the hoes for the tougher ground above the starter beds. Tracked on its own counter to a cap of 100."
       },
       "rhythmHeading": "Het verzamelritme",
       "rhythmBody": "Een oogst is een korte zichtbare worp, geen directe greep: {base} seconden basis, nooit onder een ondergrens van {floor} seconde. Gereedschap dragen boven de rang van het grondstoffenpunt, dat je vaardigheid je laat hanteren, versnelt je met {tool} seconde per rang daarboven, en elke vaardigheidsband die je passeert knipt er nog {band} seconde af; de rang van het grondstoffenpunt alleen maar evenaren brengt je door de deur, het zijn de rangen daarboven die je snel maken.\n\nEen volle tas weigert de worp beleefd voordat die begint, zodat er niets halverwege de zwaai verloren gaat, en elke oogst betaalt een klein plakje personage-XP, geschaald naar het niveau van het grondstoffenpunt tegenover het jouwe zoals kill-XP schaalt: een triviaal grijs grondstoffenpunt leert een afgetopt personage niets.",
@@ -5837,7 +5936,9 @@ export const nl_NL: EnTranslations = {
         "mining": "Je eerste grondstoffenpunt van een beroep verdient Vruchten van het Veld, en de grens van 100 in Mijnbouw schrijft Erts in het Bloed in. 100 bereiken in drie van Mijnbouw, Houtkap, Kruidenkunde en Vissen voegt Meesterverzamelaar toe bij 25 Roem, en het kraken van een ongerept ertsader legt zijn eigen verzamelaarsmerk vast. Niets hiervan schenkt macht: daden zijn titels en Roem, een verslag van de wegen die je bewandeld hebt.",
         "logging": "Je eerste grondstoffenpunt van een beroep verdient Vruchten van het Veld, en de grens van 100 in Houtkap schrijft Kernhouthakker in. 100 bereiken in drie van Mijnbouw, Houtkap, Kruidenkunde en Vissen voegt Meesterverzamelaar toe bij 25 Roem, en een slag in oud kernhout legt zijn eigen verzamelaarsmerk vast. Daden zijn titels en Roem, nooit macht.",
         "herbalism": "Je eerste grondstoffenpunt van een beroep verdient Vruchten van het Veld, en de grens van 100 in Kruidenkunde schrijft Meester van de Weide in. 100 bereiken in drie van Mijnbouw, Houtkap, Kruidenkunde en Vissen voegt Meesterverzamelaar toe bij 25 Roem, en een maanverlichte bloem legt zijn eigen verzamelaarsmerk vast. Daden zijn titels en Roem, nooit macht.",
-        "fishing": "De mijlpaal van 100 schrijft Oude Zout in en 200 schrijft Meesterhengelaar in met zijn titel, de absolute top van de hengelaarskunst; Vissen telt ook mee voor Meesterverzamelaar, verdiend bij 100 in drie willekeurige verzamelvakken. Een eerste vis uit de wateren van elk van zes zones vult een eigen pagina, de drie kernlandzones en daarbuiten Het Wilgenveen, De Windkam en De Verrekust, en de Zonglinstering-Koi legt Glinstering van Hoop vast, dus reizigers met een hengel in hun bagage vullen hun boek sneller dan ze verwachten."
+        "fishing": "De mijlpaal van 100 schrijft Oude Zout in en 200 schrijft Meesterhengelaar in met zijn titel, de absolute top van de hengelaarskunst; Vissen telt ook mee voor Meesterverzamelaar, verdiend bij 100 in drie willekeurige verzamelvakken. Een eerste vis uit de wateren van elk van zes zones vult een eigen pagina, de drie kernlandzones en daarbuiten Het Wilgenveen, De Windkam en De Verrekust, en de Zonglinstering-Koi legt Glinstering van Hoop vast, dus reizigers met een hengel in hun bagage vullen hun boek sneller dan ze verwachten.",
+        "farming": "Farming keeps no deeds of its own yet: now that its beds and crops are in the ground, the milestone and cap deeds that mark the other trades arrive in a later patch. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power.",
+        "farmingSown": "Farming keeps its own shelf in the Book of Deeds now. Sow It Begins marks your first planted crop, and four chronicle pages mark a first thriving harvest at each of the bed sites, from Eastbrook Vale to the Evergarden. A golden harvest records its own zero-Renown collector's mark, and proficiency in Farming counts toward Master Gatherer, earned at 100 in any three gathering trades. The capstone is already written: Harvestmaster, the trade's 100-proficiency title, comes within reach with a later patch's deeper fields. Deeds are titles and Renown only, never power."
       },
       "fish": {
         "startHeading": "Aan de slag",
@@ -5859,6 +5960,12 @@ export const nl_NL: EnTranslations = {
         "emptyHook": "Niets bijt",
         "koiHeading": "De Zonglinstering-Koi",
         "koiBody": "Elk water in het spel verbergt dezelfde prijs: de Zonglinstering-Koi, een ongewone glans aan de lijn die 75 koper waard is bij een handelaar en aanzienlijk meer voor je trots. Zijn kansen antwoorden op je vangstband en op niets anders, in elke zone hetzelfde: een rij van 1 procent van de vangsttabel op band 0, 3 op band 1 en 6 op band 2, getrokken bij elke binnengehaalde worp, dus de koi komt naar de hengelaar die de diepe tabellen heeft verdiend. Er een landen legt Glinstering van Hoop vast in je Boek der Daden, een verzamelaarsmerk zonder Roem. Wanneer het gebeurt, zorgt het logboek ervoor dat je het weet."
+      },
+      "farm": {
+        "bedsHeading": "Working the beds",
+        "bedsBody": "The loop is short. Buy seeds and compost from the farmer beside the beds: Jessica in Eastbrook stocks the Vale pair, the Fenbridge farmer the marsh pair, and no counter anywhere sells the Highwatch or Evergarden seeds, which come back a seed or two at a time from a high-tier harvest and otherwise change hands on the World Market. Sow with a hoe in your bags, and tip the odds if you like: compost from the counter and the farmer's watch, paid in produce as you plant, each raise a crop's chance of coming through, an alchemist's growth tonic gives the harvest a shot at a larger yield, and once your skill has climbed a full band past a crop's tier that crop never fails at all. Then walk away. The bed keeps growing while you are logged out, a ripe crop waits as long as you leave it, and the Harvest Journal (Shift+K, or the Farming row of your professions window) lists every bed you have planted with its timer.\n\nA crop that fails leaves withered husks in place of produce, and any farmer trades husks for compost, so a bad season buys the next one's insurance. What you bring in feeds the kitchens: the produce cooks into dishes at the kitchens, and Cook Marlow's wheat and rice orders take Vale Wheat and Marsh Rice off your hands for coin on the same clock as every other work order.",
+        "tableHeading": "From the beds to the table",
+        "tableBody": "The kitchens are where a season pays forward. Beyond the everyday farm dishes, each crop tier has a richer dish that leaves you Well Fed: finish the meal and a lasting boon stays with you, the kind of edge a group wants eaten before the dungeon door. Crowning the set is the Harvest Feast, a spread a cook sets out in the world itself: everyone at hand takes a serving of their own, one each, and every finished meal pays the same Well Fed boon, so one farmer's season can set the table for a whole party. The top of that ladder, the two richest dishes and the feast itself, comes within reach with a later patch's deeper fields; everything below them is cooking today.\n\nLuck keeps a place at that table too. Every harvest you bring in rolls the same windfall chance the other gathering trades enjoy, and now and then a crop comes up golden: the yield lands far past a normal pull, the whole zone hears the find announced by name, and Golden Harvest is recorded in your Book of Deeds."
       },
       "econ": {
         "title": "Ambachteconomie",
@@ -5882,7 +5989,7 @@ export const nl_NL: EnTranslations = {
         "marketHeading": "De Wereldmarkt en zijn korting",
         "marketBody": "De Wereldmarkt is de rijksbrede beurs, beheerd door de Koopman in Oostbeek en Veilingmeester Voss in Highwatch. Plaatsen is gratis: er is geen deposito, en een onverkochte plaatsing komt gewoon terug bij je. Het huis neemt zijn deel alleen wanneer iets daadwerkelijk verkoopt: 5 procent van de verkoopprijs, en de rest wacht tot je het ophaalt.\n\nEén belangrijke beperking: de Markt bemiddelt alleen in gewone goederen. Een gesigneerde, meesterwerk-, betoverde of gebonden kopie wordt nooit in een plaatsing meegenomen, dus de bijzondere stukken wisselen van eigenaar van aangezicht tot aangezicht in een ruilvenster, dat de volledige identiteit van een voorwerp draagt, handtekening en al. Prijs die zelf in; de Markt vertelt je alleen wat de gewone versie opbrengt.",
         "workOrdersHeading": "Werkopdrachten",
-        "workOrdersNote": "Elke stationsmeester plaatst een vaste werkopdracht: breng een stapel van het basismateriaal van zijn ambacht en word ter plekke betaald, plus een beetje questvervaring. De betaling is bewust {pct}% van wat een handelaar je zou geven voor dezelfde stapel, naar beneden afgerond, dus een werkopdracht is nooit de winstgevende manier om materialen te verkopen, alleen een reden om langs het station te rijden.\n\nElke opdracht loopt op zijn eigen {minutes} minuten klok per personage: lever er een in en die meester heeft niets meer voor je totdat de timer zijn ronde heeft gedaan. Behandel ze als een kleine bonus op materialen die je toch al aan het verzamelen was, niet als een bedrijf.",
+        "workOrdersNote": "Elke stationsmeester plaatst vaste werkopdrachten, een per basismateriaal: breng de stapel waar een opdracht om vraagt en word ter plekke betaald, plus een beetje questvervaring. De betaling is bewust {pct}% van wat een handelaar je zou geven voor dezelfde stapel, naar beneden afgerond, dus een werkopdracht is nooit de winstgevende manier om materialen te verkopen, alleen een reden om langs het station te rijden.\n\nElke opdracht loopt op zijn eigen {minutes} minuten klok per personage: lever er een in en die opdracht is voor je gesloten totdat de timer zijn ronde heeft gedaan, terwijl de andere opdrachten van de meester open blijven. Behandel ze als een kleine bonus op materialen die je toch al aan het verzamelen was, niet als een bedrijf.",
         "colOrder": "Werkopdracht",
         "colMaster": "Meester",
         "colAsks": "Vraagt voor",
@@ -8182,6 +8289,7 @@ export const nl_NL: EnTranslations = {
         "cooldownLockedHerb": "Uitgeput kruidenveld, gereedschap vergrendeld",
         "station": "Ambachtsstation: {name}",
         "service": "Dienst: {name}",
+        "farmPatch": "Garden beds",
         "partyMember": "Groepslid: {name}",
         "deadPartyMember": "Dood groepslid: {name}",
         "partyMemberGeneric": "Groepslid",
@@ -8865,6 +8973,7 @@ export const nl_NL: EnTranslations = {
     },
     "cast": {
       "fishing": "Vissen",
+      "farming": "Planting",
       "gathering": "Verzamelen",
       "crafting": "Vervaardigen",
       "disenchanting": "Onttoveren",
@@ -9050,6 +9159,11 @@ export const nl_NL: EnTranslations = {
       "flaskThroughDeath": "The effect remains through death, but ends when you log out; instanced matches begin and end on a clean slate.",
       "wellFed": "Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.",
       "wellFedAura": "Well Fed: Grants {aura} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.",
+      "useWellfed": "{aura}: +{value} {stat} for {minutes} min, granted when you finish eating.",
+      "useWellfedAura": "Grants {aura} for {minutes} min when you finish eating.",
+      "useFeast": "Use: Sets out a feast others can eat from, one serving each ({servings} servings, lasts {minutes} min).",
+      "useFeastBuff": "Each serving grants {aura}: +{value} {stat} for {minutes} min when you finish the {seconds} sec meal.",
+      "useFeastBuffAura": "Each serving grants {aura} for {minutes} min when you finish the {seconds} sec meal.",
       "questItem": "Questvoorwerp",
       "questRelated": "Quest: {quest}",
       "questRules": "Kan niet worden verkocht, in de bank gezet of geruild.",
@@ -9072,6 +9186,7 @@ export const nl_NL: EnTranslations = {
       "useManaPotion": "Gebruik: Herstelt direct {amount} mana. Bruikbaar in gevecht. 1 min afkoeltijd.",
       "clickUseInstant": "Klik om direct te gebruiken in gevecht",
       "clickUse": "Klik om te gebruiken",
+      "clickSetOut": "Click to set out",
       "clickBuyback": "Klik om terug te kopen",
       "bagSlots": "Tas met {slots} vakken"
     },
@@ -12737,6 +12852,138 @@ export const nl_NL: EnTranslations = {
       "pattern_laden_hearth": {
         "name": "Recipe: The Laden Hearth"
       },
+      "vale_wheat_seed": {
+        "name": "Vale Wheat Seed"
+      },
+      "vale_wheat": {
+        "name": "Vale Wheat"
+      },
+      "fine_vale_wheat": {
+        "name": "Fine Vale Wheat"
+      },
+      "withered_husks": {
+        "name": "Withered Husks"
+      },
+      "compost": {
+        "name": "Compost"
+      },
+      "growth_tonic": {
+        "name": "Growth Tonic"
+      },
+      "brook_carrot_seed": {
+        "name": "Brook Carrot Seed"
+      },
+      "brook_carrot": {
+        "name": "Brook Carrot"
+      },
+      "fine_brook_carrot": {
+        "name": "Fine Brook Carrot"
+      },
+      "marsh_rice_seed": {
+        "name": "Marsh Rice Seed"
+      },
+      "marsh_rice": {
+        "name": "Marsh Rice"
+      },
+      "fine_marsh_rice": {
+        "name": "Fine Marsh Rice"
+      },
+      "bog_beet_seed": {
+        "name": "Bog Beet Seed"
+      },
+      "bog_beet": {
+        "name": "Bog Beet"
+      },
+      "fine_bog_beet": {
+        "name": "Fine Bog Beet"
+      },
+      "highland_barley_seed": {
+        "name": "Highland Barley Seed"
+      },
+      "highland_barley": {
+        "name": "Highland Barley"
+      },
+      "fine_highland_barley": {
+        "name": "Fine Highland Barley"
+      },
+      "frost_gourd_seed": {
+        "name": "Frost Gourd Seed"
+      },
+      "frost_gourd": {
+        "name": "Frost Gourd"
+      },
+      "fine_frost_gourd": {
+        "name": "Fine Frost Gourd"
+      },
+      "gilded_sunmelon_seed": {
+        "name": "Gilded Sunmelon Seed"
+      },
+      "gilded_sunmelon": {
+        "name": "Gilded Sunmelon"
+      },
+      "fine_gilded_sunmelon": {
+        "name": "Fine Gilded Sunmelon"
+      },
+      "evergarden_greens_seed": {
+        "name": "Evergarden Greens Seed"
+      },
+      "evergarden_greens": {
+        "name": "Evergarden Greens"
+      },
+      "fine_evergarden_greens": {
+        "name": "Fine Evergarden Greens"
+      },
+      "garden_hoe": {
+        "name": "Garden Hoe"
+      },
+      "bronze_hoe": {
+        "name": "Bronze Hoe"
+      },
+      "skysilver_hoe": {
+        "name": "Skysilver Hoe"
+      },
+      "osmium_hoe": {
+        "name": "Osmium Hoe"
+      },
+      "vale_hearth_loaf": {
+        "name": "Vale Hearth Loaf"
+      },
+      "eastbrook_root_pottage": {
+        "name": "Eastbrook Root Pottage"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "Fenbridge Rice Bowl"
+      },
+      "fenbridge_beet_braise": {
+        "name": "Fenbridge Beet Braise"
+      },
+      "highwatch_barley_bannock": {
+        "name": "Highwatch Barley Bannock"
+      },
+      "highwatch_gourd_soup": {
+        "name": "Highwatch Gourd Soup"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "Evergarden Sunmelon Tart"
+      },
+      "evergarden_harvest_platter": {
+        "name": "Evergarden Harvest Platter"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "Eastbrook Glazed Carrots"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "Fenbridge Rice Pudding"
+      },
+      "highwatch_barley_porridge": {
+        "name": "Highwatch Barley Porridge"
+      },
+      "evergarden_braised_greens": {
+        "name": "Evergarden Braised Greens"
+      },
+      "harvest_feast": {
+        "name": "Harvest Feast"
+      },
       "conjured_water4": {
         "name": "Getoverd bronwater"
       },
@@ -14676,6 +14923,26 @@ export const nl_NL: EnTranslations = {
         "title": "Meester van de apotheek",
         "greeting": "Meet twee keer en giet één keer, {className}. De apotheker heeft geen geduld voor gemorste reagentia."
       },
+      "farmer_jessica": {
+        "name": "Farmer Jessica",
+        "title": "Allotment Keeper",
+        "greeting": "Good soil and fair weather, {playerName}. Buy a seed from me, sow it in one of those beds, and go about your day. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer."
+      },
+      "farmer_teasel": {
+        "name": "Farmer Teasel",
+        "title": "Fen Paddy Farmer",
+        "greeting": "Marsh rice and bog beet seed, {className}, and compost to feed them. The paddies drain slow, so mind where you tread."
+      },
+      "farmer_hollis": {
+        "name": "Farmer Hollis",
+        "title": "Highwatch Terrace Farmer",
+        "greeting": "The terraces give what the mountain allows, {className}. I sell compost, and if a crop of yours comes up withered I will work the husks back into good soil for you."
+      },
+      "farmer_verbena": {
+        "name": "Farmer Verbena",
+        "title": "Parterre Gardener",
+        "greeting": "Mind the edging, {playerName}, these beds are the pride of the parterre. Compost is what I sell, and I will turn any withered husks you carry into more of it."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Tijwachter",
@@ -14690,6 +14957,19 @@ export const nl_NL: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Ertsslagader geoogst"
+          }
+        }
+      },
+      "q_farm_intro": {
+        "title": "First Furrow",
+        "text": "Take this hoe and a pinch of vale wheat seed, {playerName}. Sow the seed in one of the beds beside me, then go about your business. Come back whenever you like and bring the crop in; I will be here.",
+        "completion": "There, your first crop in your own hands. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer. Come back for seed whenever the beds call you, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat planted"
+          },
+          "1": {
+            "label": "Vale Wheat harvested"
           }
         }
       },
@@ -15586,6 +15866,26 @@ export const nl_NL: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Wildvlees afgeleverd"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_wheat": {
+        "title": "Kitchens Wheat Order",
+        "text": "Bread does not bake itself, {playerName}, and my flour bins are scraping bottom. Bring me eight sheaves of vale wheat and I will pay you honest coin for the lot. Grown by your own hand or bought off the market, I do not care, so long as it grinds.",
+        "completion": "Good dry grain, and plenty of it. There is your pay, counted out. When the next crop comes in, you know which door to knock on.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat delivered"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_rice": {
+        "title": "Kitchens Rice Order",
+        "text": "The marsh folk swear by their rice, {playerName}, and I mean to find out why. Fetch me five measures of marsh rice and there is coin waiting for you here. Keep it dry on the road, mind: wet rice is porridge, and I did not order porridge.",
+        "completion": "Plump and dry, every grain. Here is your coin. If the marsh keeps giving, so do I.",
+        "objectives": {
+          "0": {
+            "label": "Marsh Rice delivered"
           }
         }
       },
@@ -17550,6 +17850,7 @@ export const nl_NL: EnTranslations = {
     "delveRiteShrineReedInteract": "Rietschrijn: druk op F om het aan te raken",
     "delveRiteShrineSkullInteract": "Schedelschrijn: druk op F om het aan te raken",
     "mailboxName": "Brievenbus",
-    "noticeboardName": "Mededelingenbord"
+    "noticeboardName": "Mededelingenbord",
+    "farmPatchName": "Garden Beds"
   }
 };

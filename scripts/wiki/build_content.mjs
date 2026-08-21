@@ -23,7 +23,7 @@ const outFile = path.join(root, 'src', 'guide', 'content.generated.ts');
 const entrySource = `
   export { CLASSES, ABILITIES } from './src/sim/content/classes.ts';
   export { TALENTS } from './src/sim/content/talents.ts';
-  export { ALL_CLASSES, FISHING_SESSION_CAP_SEC } from './src/sim/types.ts';
+  export { ALL_CLASSES, CONSUME_DURATION, FISHING_SESSION_CAP_SEC } from './src/sim/types.ts';
   export { ZONES, DUNGEONS, MOBS, CAMPS, DELVE_LIST, NPCS, ITEMS, QUESTS, zoneAt } from './src/sim/data.ts';
   export { WARLOCK_PET_MOBS } from './src/sim/content/warlock_pets.ts';
   export { DELVE_COMPANIONS, DELVE_AFFIXES } from './src/sim/content/delves/index.ts';
@@ -124,6 +124,7 @@ const {
   guideStrings,
   VISUALS,
   visualKeyFor,
+  CONSUME_DURATION,
   FISHING_SESSION_CAP_SEC,
   ITEMS,
   QUESTS,
@@ -692,42 +693,72 @@ const vendorPatternItemIds = new Set(HEROIC_VENDOR_STOCK.map((o) => o.itemId));
 const vendorTaughtRecipe = (r) =>
   Boolean(r.acquisition?.includes('drop')) && vendorPatternItemIds.has(`pattern_${r.resultItemId}`);
 
-const profRecipeRow = (r) => ({
-  id: r.id,
-  name: itemName(r.resultItemId),
-  skillReq: r.skillReq,
-  tier: tierForSkill(r.skillReq),
-  station: r.stationType ?? null,
-  // Drop-taught recipes (the Masterwrought apex rows, R8) say so rather than
-  // claiming "Known from the start", and the vendor-sold slice of them says
-  // 'vendor' (see vendorTaughtRecipe above): the wiki row must never
-  // misstate the acquisition.
-  acquisition: r.acquisition?.includes('trainer')
-    ? 'trainer'
-    : vendorTaughtRecipe(r)
-      ? 'vendor'
-      : r.acquisition?.includes('drop')
-        ? 'drop'
-        : 'known',
-  feeCopper: r.acquisition?.includes('trainer') ? trainingFeeFor(r) : 0,
-  materials: r.reagents.map((g) => ({ name: itemName(g.itemId), count: g.count })),
-  output: {
+// Consumable effect facts for a recipe's output item, straight from the live
+// def (the C10 effect-prose gap): the foodHp restore and the well-fed boon as
+// VALUES the craft page composes through its guide.profPages.effect*
+// templates, never baked prose. Spoiler-safe by construction: both are overt
+// facts the item's own tooltip already states (no probabilities, no hidden
+// constants; the seconds value is the same CONSUME_DURATION the tooltip
+// renders). Null for a non-consumable output. Reads farming's `wellfed`
+// spelling only, as authored: when 11c unifies the two well-fed spellings
+// onto FoodItemDef.wellFed, this read moves onto the surviving field in the
+// same change (on the 11c carry list).
+const consumableEffect = (itemId) => {
+  const def = ITEMS[itemId];
+  if (!def) return null;
+  const effect = {};
+  if (def.foodHp) effect.food = { amount: def.foodHp, seconds: CONSUME_DURATION };
+  if (def.wellfed) {
+    effect.wellfed = {
+      aura: def.wellfed.aura,
+      kind: def.wellfed.kind,
+      value: def.wellfed.value,
+      minutes: def.wellfed.duration / 60,
+    };
+  }
+  return Object.keys(effect).length > 0 ? effect : null;
+};
+
+const profRecipeRow = (r) => {
+  const effect = consumableEffect(r.resultItemId);
+  return {
+    id: r.id,
     name: itemName(r.resultItemId),
-    count: r.resultCount,
-    quality: itemQuality(r.resultItemId),
-  },
-  // Craft IDS, not baked names: the client localizes them via hudChrome.craftName.*.
-  combo: r.comboRequirement
-    ? {
-        crafts: [r.comboRequirement.craftA, r.comboRequirement.craftB],
-        minTier: r.comboRequirement.minTier,
-      }
-    : null,
-  // The daily craft gate (Masterwrought phase 07): the defining fact of a
-  // gated recipe, so the wiki states it the way the in-game tooltip does.
-  oncePerDay: r.oncePerDay === true,
-  gain: gainBoundaries(r.skillReq),
-});
+    skillReq: r.skillReq,
+    tier: tierForSkill(r.skillReq),
+    station: r.stationType ?? null,
+    // Drop-taught recipes (the Masterwrought apex rows, R8) say so rather than
+    // claiming "Known from the start", and the vendor-sold slice of them says
+    // 'vendor' (see vendorTaughtRecipe above): the wiki row must never
+    // misstate the acquisition.
+    acquisition: r.acquisition?.includes('trainer')
+      ? 'trainer'
+      : vendorTaughtRecipe(r)
+        ? 'vendor'
+        : r.acquisition?.includes('drop')
+          ? 'drop'
+          : 'known',
+    feeCopper: r.acquisition?.includes('trainer') ? trainingFeeFor(r) : 0,
+    materials: r.reagents.map((g) => ({ name: itemName(g.itemId), count: g.count })),
+    output: {
+      name: itemName(r.resultItemId),
+      count: r.resultCount,
+      quality: itemQuality(r.resultItemId),
+    },
+    // Craft IDS, not baked names: the client localizes them via hudChrome.craftName.*.
+    combo: r.comboRequirement
+      ? {
+          crafts: [r.comboRequirement.craftA, r.comboRequirement.craftB],
+          minTier: r.comboRequirement.minTier,
+        }
+      : null,
+    // The daily craft gate (Masterwrought phase 07): the defining fact of a
+    // gated recipe, so the wiki states it the way the in-game tooltip does.
+    oncePerDay: r.oncePerDay === true,
+    gain: gainBoundaries(r.skillReq),
+    ...(effect ? { effect } : {}),
+  };
+};
 
 // The six typed stations with their resident masters, for the training and
 // overview sections.
@@ -949,10 +980,17 @@ const profGathering = GATHERING_PROFESSION_IDS.map((id) => {
   const nodeType = Object.keys(NODE_HARVEST_TABLE).find(
     (type) => NODE_HARVEST_TABLE[type].professionId === id,
   );
+  // A gathering profession can have NO harvest nodes at all: farming is
+  // fishing-shaped on land (its beds are patch content, never GATHER_NODES
+  // rows), so its node table stays empty forever while its tool ladder
+  // carries the hoes. Emit the row with an empty nodes table and no respawn
+  // number instead of failing the build; respawnSeconds is optional in the
+  // emitted type and the page length-guards the section.
+  const harvest = nodeType ? NODE_HARVEST_TABLE[nodeType] : null;
   return {
     ...base,
     nodes: nodeRowsFor(id),
-    respawnSeconds: NODE_HARVEST_TABLE[nodeType].respawnSeconds,
+    ...(harvest ? { respawnSeconds: harvest.respawnSeconds } : {}),
   };
 });
 
@@ -1270,6 +1308,13 @@ export interface GuideProfRecipe {
   oncePerDay: boolean;
   /** Mastery Curve boundaries: skill where gain drops to 0.5 / 0.25 / 0. */
   gain: { reducedAt: number; minimalAt: number; zeroAt: number };
+  /** Consumable effect facts from the live output def (absent for a
+   *  non-consumable): the craft page composes them through the
+   *  guide.profPages.effect* templates. */
+  effect?: {
+    food?: { amount: number; seconds: number };
+    wellfed?: { aura: string; kind: string; value: number; minutes: number };
+  };
 }
 
 export interface GuideProfMaster { name: string; title: string; hub: string; }

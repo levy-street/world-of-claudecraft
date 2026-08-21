@@ -379,6 +379,14 @@ export class QuestDialogController {
     );
     const hasValeCup = npc.templateId === 'groundskeeper_bram';
     const hasCardMaster = !!definition?.cardMaster;
+    // A farmer NPC (the farming go-live) offers the husk-to-compost trade,
+    // the one UI affordance that sends convert_husks; gated on the NpcDef
+    // flag like the card master, never on an id. STATIC BY CONTRACT: the row
+    // sits outside the gossip-row write-elision signature (gossipRowSig reads
+    // the quest rows only), which is sound only while its predicate is this
+    // content flag. Gate it on live state (a husk count, the farmer range)
+    // and it must join the signature or the row goes stale between refreshes.
+    const hasFarmer = definition?.farmer === true;
     if (
       closeIfEmpty &&
       gossipMenuIsEmpty({
@@ -392,6 +400,7 @@ export class QuestDialogController {
         hasVcup: hasValeCup,
         hasCardMaster,
         hasTraining,
+        hasFarmer,
       })
     ) {
       this.close();
@@ -492,6 +501,12 @@ export class QuestDialogController {
     if (hasCardMaster) {
       html += `<button type="button" class="qd-list-item" data-card-duel="1" aria-label="${esc(t('cardDuel.title'))}"><span class="gold">&#9824;</span> ${esc(t('cardDuel.title'))}</button>`;
     }
+    if (hasFarmer) {
+      // The trade's feedback is the sim's own: the farmHusksConverted line
+      // and the farmDenied toasts (farm_event_feedback.ts), so the row sends
+      // and closes like the market row rather than opening a window.
+      html += `<button type="button" class="qd-list-item" data-husk-trade="1" aria-label="${esc(t('hudChrome.farming.huskTradeAria', { name: npcName }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('hudChrome.farming.huskTrade'))}</button>`;
+    }
     this.deps.element.innerHTML = html;
     this.deps.element.querySelectorAll<HTMLElement>('[data-quest]').forEach((item) => {
       item.addEventListener('click', () => this.renderQuestDetail(npc, item.dataset.quest ?? ''));
@@ -516,6 +531,19 @@ export class QuestDialogController {
     this.bindRoute('[data-delve-board]', () => this.deps.openDelveBoard(npc.id));
     this.bindRoute('[data-vcup]', this.deps.openValeCup);
     this.bindRoute('[data-card-duel]', this.deps.openCardDuel);
+    // The husk trade goes straight to the world (IWorldFarming.convertHusks,
+    // both worlds; online it is the convert_husks command): no new dep, no
+    // window. The live world is read at click time, never captured at render.
+    // The husk trade opens NO successor window (the sim's own event lines are
+    // the feedback), so it is deliberately NOT a bindRoute consumer: that
+    // family closes with release(false) because it hands the trap opener to a
+    // successor window that restores focus when IT closes; with no successor
+    // that chain would drop keyboard focus to <body>. Send, then close WITH
+    // the trap's own focus restore.
+    this.deps.element.querySelector('[data-husk-trade]')?.addEventListener('click', () => {
+      this.deps.world().convertHusks();
+      this.close(true);
+    });
     this.bindClose();
     this.showAndFocus();
   }

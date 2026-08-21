@@ -64,7 +64,8 @@ export const da_DK: EnTranslations = {
       "dungeon": "Fangekælder",
       "difficulty": "Sværhedsgrad",
       "name": "Navn",
-      "spec": "Specialisering"
+      "spec": "Specialisering",
+      "bed": "Bed id (optional)"
     },
     "difficulty": {
       "normal": "Normal",
@@ -150,6 +151,10 @@ export const da_DK: EnTranslations = {
       "gather": {
         "label": "Giv indsamlingsfærdighed",
         "description": "Forøg færdigheden i et indsamlingsfag."
+      },
+      "farmgrow": {
+        "label": "Ripen crops",
+        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
       },
       "teleport": {
         "label": "Teleportér",
@@ -2581,7 +2586,8 @@ export const da_DK: EnTranslations = {
       "resonantSteel": "Fortryllelsesreagens. Fås ved affortryllelse af nærkampsvåben af sjælden kvalitet eller bedre.",
       "resonantTimber": "Fortryllelsesreagens. Fås ved affortryllelse af stave, tryllestave, buer og armbrøster af sjælden kvalitet eller bedre.",
       "masterwroughtIntermediate": "Masterwrought crafting component.",
-      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day."
+      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day.",
+      "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it."
     },
     "discord": {
       "title": "Discord",
@@ -3018,6 +3024,7 @@ export const da_DK: EnTranslations = {
       "logging": "Skovhugst",
       "herbalism": "Urtekundskab",
       "fishing": "Fiskeri",
+      "farming": "Farming",
       "notReady": "Denne ressourcekilde er endnu ikke genskabt for dig.",
       "gatherLine": "Du samler: {name}.",
       "gatherLineQty": "Du samler: {name} x{qty}.",
@@ -3036,7 +3043,8 @@ export const da_DK: EnTranslations = {
       "tierRequired": {
         "mining": "Kræver en niveau {tier} mineøkse",
         "logging": "Kræver en niveau {tier} skovhuggeøkse",
-        "herbalism": "Kræver en niveau {tier} urtesegl"
+        "herbalism": "Kræver en niveau {tier} urtesegl",
+        "farming": "Requires a tier {tier} farming hoe"
       },
       "requiresTool": {
         "mining": "Kræver en minehakke",
@@ -3047,23 +3055,27 @@ export const da_DK: EnTranslations = {
         "mining": "Du har brug for en niveau {tier} mineøkse for at høste denne åre.",
         "logging": "Du har brug for en niveau {tier} skovhuggeøkse for at fælde denne lund.",
         "herbalism": "Du har brug for en niveau {tier} urtesegl for at samle denne plette.",
-        "fishing": "Du har brug for en niveau {tier} fiskestang for at fiske i disse vande."
+        "fishing": "Du har brug for en niveau {tier} fiskestang for at fiske i disse vande.",
+        "farming": "You need a tier {tier} farming hoe to work this bed."
       },
       "toolRequired": {
         "mining": "Du har brug for en minehakke for at høste denne åre.",
         "logging": "Du har brug for en skovhuggeøkse for at fælde denne lund.",
         "herbalism": "Du har brug for en urtesegl for at samle denne plette.",
-        "fishing": "Du har brug for en fiskestang for at kaste linen ud."
+        "fishing": "Du har brug for en fiskestang for at kaste linen ud.",
+        "farming": "You need a farming hoe to work this bed."
       },
       "noNodeNearby": {
         "mining": "Der er ingen malmåre inden for rækkevidde.",
         "logging": "Der er ingen tømmerlund inden for rækkevidde.",
-        "herbalism": "Der er ingen urteplette inden for rækkevidde."
+        "herbalism": "Der er ingen urteplette inden for rækkevidde.",
+        "farming": "There is no crop bed within reach."
       },
       "wieldUnmet": {
         "mining": "Du har brug for Minedrift {skill} for at svinge den hakke, du allerede har i taskerne.",
         "logging": "Du har brug for Skovhugst {skill} for at svinge den økse, du allerede har i taskerne.",
-        "herbalism": "Du har brug for Urtekundskab {skill} for at bruge den segl, du allerede har i taskerne."
+        "herbalism": "Du har brug for Urtekundskab {skill} for at bruge den segl, du allerede har i taskerne.",
+        "farming": "You need Farming {skill} to swing the hoe already in your bags."
       },
       "wieldUnmetCorpse": "Du har brug for indsamlingsfærdighed {skill} for at sætte dit fineste værktøj i arbejde.",
       "toolTierUnmetCorpse": "Du har brug for et niveau {tier} indsamlingsværktøj for at genvinde de fineste materialer.",
@@ -3072,18 +3084,21 @@ export const da_DK: EnTranslations = {
           "mining": "Minedriftsværktøj (niveau {tier})",
           "logging": "Skovhugstværktøj (niveau {tier})",
           "herbalism": "Urtekundskabsværktøj (niveau {tier})",
-          "fishing": "Fiskestang (niveau {tier})"
+          "fishing": "Fiskestang (niveau {tier})",
+          "farming": "Farming tool (tier {tier})"
         },
         "unlocks": {
           "mining": "Kræves for at høste malmårer op til niveau {tier}.",
           "logging": "Kræves for at fælde tømmerlunde op til niveau {tier}.",
           "herbalism": "Kræves for at samle urtepletter op til niveau {tier}.",
-          "fishing": "Kræves for at fiske i vande op til niveau {tier}."
+          "fishing": "Kræves for at fiske i vande op til niveau {tier}.",
+          "farming": "Required to plant crops up to tier {tier}."
         },
         "use": {
           "mining": "Brug: Høst en nærliggende malmåre.",
           "logging": "Brug: Fæld en nærliggende tømmerlund.",
-          "herbalism": "Brug: Saml fra en nærliggende urteplette."
+          "herbalism": "Brug: Saml fra en nærliggende urteplette.",
+          "farming": "Works from your bags when you plant a crop bed."
         },
         "speed": "Indsamler hurtigere ved ressourcekilder under niveau {tier}.",
         "rodRequired": "Kræves for at fiske.",
@@ -3092,6 +3107,7 @@ export const da_DK: EnTranslations = {
         "rodBand": "Låser op for rigere fangsttabeller ved fiskerifærdighed {skill} og derover."
       },
       "downgradeMark": "Tasker fyldte: fundet blev gemt uden indsamlerens mærke.",
+      "downgradeMarkCrop": "Bags full: the harvest was stored without its grower's mark.",
       "downgradeFind": "Tasker fyldte: et pristint fund slap væk.",
       "emptyHookNote": "Intet på krogen",
       "stateReady": "Klar",
@@ -3099,6 +3115,83 @@ export const da_DK: EnTranslations = {
       "stateCooldownTimed": "Genskabes om {time}",
       "respawnClock": "{minutes}:{seconds}",
       "fineGradePreview": "Dit værktøj forfiner dette udbytte til fin kvalitet."
+    },
+    "farming": {
+      "plantLine": "You plant: {name}.",
+      "harvestLine": "You bring in: {name}.",
+      "harvestLineQty": "You bring in: {name} x{qty}.",
+      "harvestFineLine": "You also bring in: {name}.",
+      "harvestFineLineQty": "You also bring in: {name} x{qty}.",
+      "witheredLine": "The crop withered. You clear the bed: {name}.",
+      "witheredLineQty": "The crop withered. You clear the bed: {name} x{qty}.",
+      "seedBackLine": "You recover seed: {name}.",
+      "seedBackLineQty": "You recover seed: {name} x{qty}.",
+      "denied": {
+        "bad_bed": "There is no crop bed there.",
+        "bad_crop": "You cannot plant that here.",
+        "range": "You are too far from that crop bed.",
+        "bed_taken": "You already have a crop growing there.",
+        "skill": "Your Farming skill is too low for that crop.",
+        "no_seed": "You have no seed for that crop.",
+        "not_ready": "That crop is still growing.",
+        "no_plot": "Nothing is planted in that bed.",
+        "no_husks": "You do not have enough withered husks.",
+        "no_compost": "You have no compost.",
+        "no_fee_produce": "You have no produce to pay the watch fee.",
+        "no_tonic": "You have no growth tonic.",
+        "tool": "You have no farming hoe fit for that crop.",
+        "locked": "An item that would pay for that is locked.",
+        "no_farmer": "You must be near a farmer to trade husks for compost.",
+        "no_feast": "You have no feast to set out.",
+        "feast_active": "Your feast is already set out.",
+        "feast_expired": "That feast is gone.",
+        "feast_finished": "That feast has been picked clean.",
+        "feast_range": "You are too far from the feast.",
+        "feast_eaten": "You have already eaten from that feast."
+      },
+      "feastTitle": "{name}'s Harvest Feast",
+      "feastPlacedLine": "You set out your harvest feast.",
+      "huskTrade": "Trade husks for compost",
+      "huskTradeAria": "Trade husks for compost with {name}",
+      "plantSheet": {
+        "title": "Plant a Crop",
+        "plant": "Plant",
+        "sowAria": "Sow {name}",
+        "empty": "You have no seed you can sow at this bed.",
+        "close": "Close the plant sheet"
+      },
+      "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
+      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
+      "readyLine": "A crop is ready to harvest.",
+      "readyLineQty": "{count} crops are ready to harvest.",
+      "readyWitheredLine": "A crop withered in its bed.",
+      "readyWitheredLineQty": "{count} crops withered in their beds."
+    },
+    "harvestJournal": {
+      "title": "Harvest Journal",
+      "close": "Close",
+      "listLabel": "Planted crop beds",
+      "growing": "Ready in {time}",
+      "ready": "Ready to harvest",
+      "finishing": "Finishing up",
+      "withered": "Withered",
+      "readyAnnounce": "Ready to harvest: {name}",
+      "remainingDaysHours": "{days}d {hours}h",
+      "remainingHoursMinutes": "{hours}h {minutes}m",
+      "remainingMinutesSeconds": "{minutes}m {seconds}s",
+      "remainingSeconds": "{seconds}s",
+      "bedLine": "{zone}, bed {index}",
+      "bedLineUnknown": "Unknown bed",
+      "careWatch": "Farmer's Watch",
+      "careNone": "No extras",
+      "stageSprout": "Sprout",
+      "stageSeedling": "Seedling",
+      "stageMaturing": "Maturing",
+      "stageRipe": "Ripe",
+      "emptyTitle": "No crops planted",
+      "emptyBody": "Sow a seed in any garden bed and the plot appears here with its timer.",
+      "noviceTitle": "You have not worked a garden bed yet",
+      "noviceBody": "Farming skill grows every time you bring in a crop. Sow a seed in any garden bed to begin."
     },
     "archetypeTitle": {
       "label": "Titel",
@@ -3218,7 +3311,7 @@ export const da_DK: EnTranslations = {
           "quickeningCharm": "Forkorter genskabelsestiden for den ressourcekilde, effekten udløses på.",
           "makersCharm": "+2 yield per harvest while charged."
         },
-        "howToSlot": "Sæt den i et minedrifts-, skovhugst- eller urtekundskabsværktøj fra Erhverv-vinduet. Forbruges, når den sættes i.",
+        "howToSlot": "Sæt den i et minedrifts-, skovhugst-, urtekundskabs- eller landbrugsværktøj fra Erhverv-vinduet. Forbruges, når den sættes i.",
         "charges": "Starter med {base} ladninger på et almindeligt værktøj (+{bonus} pr. sjældenhedstrin).",
         "landOnly": "Kan ikke sættes i fiskestænger.",
         "openProfessions": "Åbn Erhverv for at sætte denne i et indsamlingsværktøj."
@@ -3887,7 +3980,8 @@ export const da_DK: EnTranslations = {
   "gatherEvent": {
     "pristineVein": "{finder} ramte en uberørt åre!",
     "ancientHeartwood": "{finder} fældet et gammelt kernetræ!",
-    "moonlitBloom": "{finder} opdagede en måneskin opblomstring!"
+    "moonlitBloom": "{finder} opdagede en måneskin opblomstring!",
+    "goldenHarvest": "{finder} reaped a golden harvest!"
   },
   "apiError": {
     "validation": {
@@ -4260,6 +4354,7 @@ export const da_DK: EnTranslations = {
       "groupCamera": "Kamera",
       "talents": "Talenter",
       "professions": "Erhverv",
+      "harvestJournal": "Harvest Journal",
       "arena": "PvP-vinduet (arenaerne og Tornehulemarkerne)",
       "leaderboard": "Resultattavle",
       "deeds": "Bedrifternes Bog",
@@ -5629,6 +5724,9 @@ export const da_DK: EnTranslations = {
       "outputFmt": "{name} x{count}",
       "comboReq": "Kræver {a} og {b}",
       "oncePerDay": "Once per day",
+      "effectFood": "Restores {amount} health over {seconds} sec when eaten.",
+      "effectWellFed": "Well fed when you finish eating: +{value} {stat} for {minutes} min.",
+      "effectWellFedAura": "Grants {aura} for {minutes} min when you finish eating.",
       "sourceTrainerFee": "Træner, {fee}",
       "sourceTrainerFree": "Træner, gratis",
       "sourceKnown": "Kendes fra starten",
@@ -5806,7 +5904,8 @@ export const da_DK: EnTranslations = {
         "mining": "Minedrift trækker malm direkte ud af verdens klippe: kobber i Østbæk Dal, jern i Mosekær Sump og osmium oppe i Tornetop Højder, med startårer spredt ud over hver eneste yngre zone hinsides dem, som føde til smedjehåndværkene. Åben for alle fra niveau 1: en minehakke til 20 kobber fra en disk i Østbæk, Fenbridge eller Højvagt åbner hver eneste startåre, og de højere trin på hakkestigen vågner, efterhånden som din egen tæller optjener dem. Sporet på sin egen tæller op til en grænse på 100.",
         "logging": "Skovhugst fælder tømmer fra trælunde over hele verden: jernbark i Østbæk Dal, askeved i Mosekær Sump, højfyr i Tornetop Højder og startlunde i hver eneste yngre zone, råvaren til skafter, stave og ingeniørens bænk. Åben for alle fra niveau 1 med en skovhuggeøkse i dine tasker (20 kobber ved diskene i Østbæk, Fenbridge og Højvagt), sporet på sin egen tæller op til en grænse på 100.",
         "herbalism": "Urtekundskab samler det, der gror vildt: glansblad i Østbæk Dal, guldblad i Mosekær Sump, solkrone i Tornetop Højder og startpletter i hver eneste yngre zone, det blad og den stængel, der holder apotekerfagene i gang med at brygge. Åben for alle fra niveau 1 med en urtesegl i dine tasker (20 kobber ved diskene i Østbæk, Fenbridge og Højvagt), sporet på sin egen tæller op til en grænse på 100.",
-        "fishing": "Fiskeri er den, der stikker ud blandt indsamlingsfagene, og den dybeste: et rigtigt bid-og-hiv-minispil, sine egne fangsttabeller i hver af de tre kernelandszoner (de unge vande hinsides dem serverer alle Dalens tabel indtil videre) og en proficiensgrænse på 200, det dobbelte af de andres. Køb en stang, vend dig mod åbent vand, og kast ud."
+        "fishing": "Fiskeri er den, der stikker ud blandt indsamlingsfagene, og den dybeste: et rigtigt bid-og-hiv-minispil, sine egne fangsttabeller i hver af de tre kernelandszoner (de unge vande hinsides dem serverer alle Dalens tabel indtil videre) og en proficiensgrænse på 200, det dobbelte af de andres. Køb en stang, vend dig mod åbent vand, og kast ud.",
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe whenever you come back, because nothing in a bed ever spoils. A farmer stands beside every bed site, from the Eastbrook allotments through Fenbridge and Highwatch to the Evergarden parterre, and Farmer Jessica in Eastbrook is where the trade starts: she sells the garden hoe and the first seeds, and her errand walks a new farmer through a first crop. Each rung of the ladder grows its own pair of crops, each with a finer grade for a practiced hand to pull, and engineers craft the hoes for the tougher ground above the starter beds. Tracked on its own counter to a cap of 100."
       },
       "rhythmHeading": "Indsamlingsrytmen",
       "rhythmBody": "En høst er et kort, synligt kast, ikke et øjeblikkeligt greb: {base} sekunder i basis, aldrig under et gulv på {floor} sekunder. At bære et værktøj over ressourcekildens niveau, et som din proficiens tillader dig at håndtere, gør dig hurtigere med {tool} sekunder pr. niveau over den, og hvert proficiensbånd, du krydser, trimmer yderligere {band} sekunder; blot at matche ressourcekildens niveau får dig ind ad døren, det er niveauerne over den, der gør dig hurtig.\n\nEn fuld taske afviser høfligt kastet, før det begynder, så intet spildes midt i svinget, og hver høst betaler en lille skive karakter-XP, skaleret efter ressourcekildens niveau mod dit eget, ligesom drabs-XP skalerer: en triviel grå ressourcekilde lærer en karakter ved grænsen ingenting.",
@@ -5837,7 +5936,9 @@ export const da_DK: EnTranslations = {
         "mining": "Din første ressourcekilde i et fag optjener Markens Frugter, og 100-grænsen i Minedrift indskriver Malm i Blodet. At nå 100 i tre af Minedrift, Skovhugst, Urtekundskab og Fiskeri tilføjer Mesterindsamler ved 25 Hæder, og at knække en uberørt åre optegner sit eget samlerensmærke. Ingen af disse giver magt: bedrifter er titler og Hæder, et minde om de veje, du har vandret.",
         "logging": "Din første ressourcekilde i et fag optjener Markens Frugter, og 100-grænsen i Skovhugst indskriver Kernevedhugger. At nå 100 i tre af Minedrift, Skovhugst, Urtekundskab og Fiskeri tilføjer Mesterindsamler ved 25 Hæder, og et hugget stykke gammelt kernetræ optegner sit eget samlerensmærke. Bedrifter er titler og Hæder alene, aldrig magt.",
         "herbalism": "Din første ressourcekilde i et fag optjener Markens Frugter, og 100-grænsen i Urtekundskab indskriver Engmarksmesters. At nå 100 i tre af Minedrift, Skovhugst, Urtekundskab og Fiskeri tilføjer Mesterindsamler ved 25 Hæder, og en måneskinsblomst optegner sit eget samlerensmærke. Bedrifter er titler og Hæder alene, aldrig magt.",
-        "fishing": "Milepælen ved 100 indskriver Gammel Søulk, og 200 indskriver Mesterangler med sin titel, det allerhøjeste i anglerens kunst; Fiskeri tæller også mod Mesterindsamler, som optjenes ved 100 i tre vilkårlige indsamlingsfag. En første fisk fra hvert af seks zoners vande udfylder sin egen side, de tre kernelandszoner samt Pilekæret, Stormkammen og Fjernkysten hinsides dem, og Solglimt-Koikarpen optegner Et Glimt af Håb, så rejsende med en stang i oppakningen fylder deres bog hurtigere, end de venter."
+        "fishing": "Milepælen ved 100 indskriver Gammel Søulk, og 200 indskriver Mesterangler med sin titel, det allerhøjeste i anglerens kunst; Fiskeri tæller også mod Mesterindsamler, som optjenes ved 100 i tre vilkårlige indsamlingsfag. En første fisk fra hvert af seks zoners vande udfylder sin egen side, de tre kernelandszoner samt Pilekæret, Stormkammen og Fjernkysten hinsides dem, og Solglimt-Koikarpen optegner Et Glimt af Håb, så rejsende med en stang i oppakningen fylder deres bog hurtigere, end de venter.",
+        "farming": "Farming keeps no deeds of its own yet: now that its beds and crops are in the ground, the milestone and cap deeds that mark the other trades arrive in a later patch. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power.",
+        "farmingSown": "Farming keeps its own shelf in the Book of Deeds now. Sow It Begins marks your first planted crop, and four chronicle pages mark a first thriving harvest at each of the bed sites, from Eastbrook Vale to the Evergarden. A golden harvest records its own zero-Renown collector's mark, and proficiency in Farming counts toward Master Gatherer, earned at 100 in any three gathering trades. The capstone is already written: Harvestmaster, the trade's 100-proficiency title, comes within reach with a later patch's deeper fields. Deeds are titles and Renown only, never power."
       },
       "fish": {
         "startHeading": "Kom i gang",
@@ -5859,6 +5960,12 @@ export const da_DK: EnTranslations = {
         "emptyHook": "Intet bider",
         "koiHeading": "Solglimt-Koikarpen",
         "koiBody": "Hvert eneste vand i spillet skjuler den samme præmie: Solglimt-Koikarpen, et ualmindeligt glimt på linen, 75 kobber værd hos en handlende og noget mere for din stolthed. Dens odds svarer til dit fangstbånd og til intet andet, de samme i hver zone: en række på 1 procent af fangsttabellen ved bånd 0, 3 ved bånd 1 og 6 ved bånd 2, trukket ved hvert indhivet kast, så koikarpen kommer til den angler, der har fortjent de dybe tabeller. At lande en optegner Et Glimt af Håb i din Bedrifternes Bog, et samlermærke uden Hæder. Når det sker, sørger loggen for, at du ved det."
+      },
+      "farm": {
+        "bedsHeading": "Working the beds",
+        "bedsBody": "The loop is short. Buy seeds and compost from the farmer beside the beds: Jessica in Eastbrook stocks the Vale pair, the Fenbridge farmer the marsh pair, and no counter anywhere sells the Highwatch or Evergarden seeds, which come back a seed or two at a time from a high-tier harvest and otherwise change hands on the World Market. Sow with a hoe in your bags, and tip the odds if you like: compost from the counter and the farmer's watch, paid in produce as you plant, each raise a crop's chance of coming through, an alchemist's growth tonic gives the harvest a shot at a larger yield, and once your skill has climbed a full band past a crop's tier that crop never fails at all. Then walk away. The bed keeps growing while you are logged out, a ripe crop waits as long as you leave it, and the Harvest Journal (Shift+K, or the Farming row of your professions window) lists every bed you have planted with its timer.\n\nA crop that fails leaves withered husks in place of produce, and any farmer trades husks for compost, so a bad season buys the next one's insurance. What you bring in feeds the kitchens: the produce cooks into dishes at the kitchens, and Cook Marlow's wheat and rice orders take Vale Wheat and Marsh Rice off your hands for coin on the same clock as every other work order.",
+        "tableHeading": "From the beds to the table",
+        "tableBody": "The kitchens are where a season pays forward. Beyond the everyday farm dishes, each crop tier has a richer dish that leaves you Well Fed: finish the meal and a lasting boon stays with you, the kind of edge a group wants eaten before the dungeon door. Crowning the set is the Harvest Feast, a spread a cook sets out in the world itself: everyone at hand takes a serving of their own, one each, and every finished meal pays the same Well Fed boon, so one farmer's season can set the table for a whole party. The top of that ladder, the two richest dishes and the feast itself, comes within reach with a later patch's deeper fields; everything below them is cooking today.\n\nLuck keeps a place at that table too. Every harvest you bring in rolls the same windfall chance the other gathering trades enjoy, and now and then a crop comes up golden: the yield lands far past a normal pull, the whole zone hears the find announced by name, and Golden Harvest is recorded in your Book of Deeds."
       },
       "econ": {
         "title": "Håndværksøkonomi",
@@ -5882,7 +5989,7 @@ export const da_DK: EnTranslations = {
         "marketHeading": "Verdensmarkedet og dets andel",
         "marketBody": "Verdensmarkedet er rigets dækkende børs, holdt af Købmanden i Østbæk og Auktionsholder Voss i Højvagt. Notering er gratis: der er intet depositum, og en usolgt notering kommer simpelthen tilbage til dig. Huset tager sin andel kun, når noget faktisk sælger: 5 procent af salgsprisen, og resten venter på, at du henter det.\n\nEn vigtig begrænsning: Markedet mægler kun ordinære varer. Et signeret, mesterværks-, fortryllet eller bundet eksemplar medtages aldrig i en notering, så de særlige stykker skifter hænder ansigt til ansigt i et handelvindue, som bærer en genstandens fulde identitet, signatur og det hele. Prissæt dem selv; Markedet fortæller dig kun hvad den ordinære version henter.",
         "workOrdersHeading": "Arbejdsordrer",
-        "workOrdersNote": "Hver stationsmester udsteder en stående arbejdsordre: bring en stak af deres håndværks standardmateriale og bliv betalt på stedet, plus lidt quest-erfaring. Betalingen er bevidst {pct}% af hvad en handlende ville give dig for den samme stak, afrundet nedad, så en arbejdsordre aldrig er den profitable måde at sælge materialer på, blot en grund til at svinge forbi stationen.\n\nHver ordre kører på sin egen {minutes}-minutters ur pr. karakter: aflevér én og den mester har intet mere til dig, før timeren løber rundt. Behandl dem som en lille bonus på materialer, du alligevel var ved at indsamle, ikke som en forretning.",
+        "workOrdersNote": "Hver stationsmester udsteder stående arbejdsordrer, en pr. standardmateriale: bring den stak, en ordre beder om, og bliv betalt på stedet, plus lidt quest-erfaring. Betalingen er bevidst {pct}% af hvad en handlende ville give dig for den samme stak, afrundet nedad, så en arbejdsordre aldrig er den profitable måde at sælge materialer på, blot en grund til at svinge forbi stationen.\n\nHver ordre kører på sin egen {minutes}-minutters ur pr. karakter: aflevér én og den ordre er lukket for dig, før timeren løber rundt, mens mesterens andre ordrer forbliver åbne. Behandl dem som en lille bonus på materialer, du alligevel var ved at indsamle, ikke som en forretning.",
         "colOrder": "Arbejdsordre",
         "colMaster": "Mester",
         "colAsks": "Beder om",
@@ -8182,6 +8289,7 @@ export const da_DK: EnTranslations = {
         "cooldownLockedHerb": "Udtømt urteplet, værktøj låst",
         "station": "Håndværksstation: {name}",
         "service": "Tjeneste: {name}",
+        "farmPatch": "Garden beds",
         "partyMember": "Gruppemedlem: {name}",
         "deadPartyMember": "Dødt gruppemedlem: {name}",
         "partyMemberGeneric": "Gruppemedlem",
@@ -8865,6 +8973,7 @@ export const da_DK: EnTranslations = {
     },
     "cast": {
       "fishing": "Fiskeri",
+      "farming": "Planting",
       "gathering": "Indsamling",
       "crafting": "Håndværk",
       "disenchanting": "Affortryllelse",
@@ -9050,6 +9159,11 @@ export const da_DK: EnTranslations = {
       "flaskThroughDeath": "The effect remains through death, but ends when you log out; instanced matches begin and end on a clean slate.",
       "wellFed": "Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.",
       "wellFedAura": "Well Fed: Grants {aura} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.",
+      "useWellfed": "{aura}: +{value} {stat} for {minutes} min, granted when you finish eating.",
+      "useWellfedAura": "Grants {aura} for {minutes} min when you finish eating.",
+      "useFeast": "Use: Sets out a feast others can eat from, one serving each ({servings} servings, lasts {minutes} min).",
+      "useFeastBuff": "Each serving grants {aura}: +{value} {stat} for {minutes} min when you finish the {seconds} sec meal.",
+      "useFeastBuffAura": "Each serving grants {aura} for {minutes} min when you finish the {seconds} sec meal.",
       "questItem": "Questgenstand",
       "questRelated": "Opgave: {quest}",
       "questRules": "Kan ikke sælges, lægges i banken eller byttes.",
@@ -9072,6 +9186,7 @@ export const da_DK: EnTranslations = {
       "useManaPotion": "Brug: Genopretter øjeblikkeligt {amount} mana. Brugbar i kamp. 1 min afkøling.",
       "clickUseInstant": "Klik for at bruge øjeblikkeligt i kamp",
       "clickUse": "Klik for at bruge",
+      "clickSetOut": "Click to set out",
       "clickBuyback": "Klik for at købe tilbage",
       "bagSlots": "Taske med {slots} pladser"
     },
@@ -12737,6 +12852,138 @@ export const da_DK: EnTranslations = {
       "pattern_laden_hearth": {
         "name": "Recipe: The Laden Hearth"
       },
+      "vale_wheat_seed": {
+        "name": "Vale Wheat Seed"
+      },
+      "vale_wheat": {
+        "name": "Vale Wheat"
+      },
+      "fine_vale_wheat": {
+        "name": "Fine Vale Wheat"
+      },
+      "withered_husks": {
+        "name": "Withered Husks"
+      },
+      "compost": {
+        "name": "Compost"
+      },
+      "growth_tonic": {
+        "name": "Growth Tonic"
+      },
+      "brook_carrot_seed": {
+        "name": "Brook Carrot Seed"
+      },
+      "brook_carrot": {
+        "name": "Brook Carrot"
+      },
+      "fine_brook_carrot": {
+        "name": "Fine Brook Carrot"
+      },
+      "marsh_rice_seed": {
+        "name": "Marsh Rice Seed"
+      },
+      "marsh_rice": {
+        "name": "Marsh Rice"
+      },
+      "fine_marsh_rice": {
+        "name": "Fine Marsh Rice"
+      },
+      "bog_beet_seed": {
+        "name": "Bog Beet Seed"
+      },
+      "bog_beet": {
+        "name": "Bog Beet"
+      },
+      "fine_bog_beet": {
+        "name": "Fine Bog Beet"
+      },
+      "highland_barley_seed": {
+        "name": "Highland Barley Seed"
+      },
+      "highland_barley": {
+        "name": "Highland Barley"
+      },
+      "fine_highland_barley": {
+        "name": "Fine Highland Barley"
+      },
+      "frost_gourd_seed": {
+        "name": "Frost Gourd Seed"
+      },
+      "frost_gourd": {
+        "name": "Frost Gourd"
+      },
+      "fine_frost_gourd": {
+        "name": "Fine Frost Gourd"
+      },
+      "gilded_sunmelon_seed": {
+        "name": "Gilded Sunmelon Seed"
+      },
+      "gilded_sunmelon": {
+        "name": "Gilded Sunmelon"
+      },
+      "fine_gilded_sunmelon": {
+        "name": "Fine Gilded Sunmelon"
+      },
+      "evergarden_greens_seed": {
+        "name": "Evergarden Greens Seed"
+      },
+      "evergarden_greens": {
+        "name": "Evergarden Greens"
+      },
+      "fine_evergarden_greens": {
+        "name": "Fine Evergarden Greens"
+      },
+      "garden_hoe": {
+        "name": "Garden Hoe"
+      },
+      "bronze_hoe": {
+        "name": "Bronze Hoe"
+      },
+      "skysilver_hoe": {
+        "name": "Skysilver Hoe"
+      },
+      "osmium_hoe": {
+        "name": "Osmium Hoe"
+      },
+      "vale_hearth_loaf": {
+        "name": "Vale Hearth Loaf"
+      },
+      "eastbrook_root_pottage": {
+        "name": "Eastbrook Root Pottage"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "Fenbridge Rice Bowl"
+      },
+      "fenbridge_beet_braise": {
+        "name": "Fenbridge Beet Braise"
+      },
+      "highwatch_barley_bannock": {
+        "name": "Highwatch Barley Bannock"
+      },
+      "highwatch_gourd_soup": {
+        "name": "Highwatch Gourd Soup"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "Evergarden Sunmelon Tart"
+      },
+      "evergarden_harvest_platter": {
+        "name": "Evergarden Harvest Platter"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "Eastbrook Glazed Carrots"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "Fenbridge Rice Pudding"
+      },
+      "highwatch_barley_porridge": {
+        "name": "Highwatch Barley Porridge"
+      },
+      "evergarden_braised_greens": {
+        "name": "Evergarden Braised Greens"
+      },
+      "harvest_feast": {
+        "name": "Harvest Feast"
+      },
       "conjured_water4": {
         "name": "Fremmanet kildevand"
       },
@@ -14676,6 +14923,26 @@ export const da_DK: EnTranslations = {
         "title": "Apothekermester",
         "greeting": "Mål to gange og hæld én gang, {className}. Apotekeren har ingen tålmodighed med spildte reagenser."
       },
+      "farmer_jessica": {
+        "name": "Farmer Jessica",
+        "title": "Allotment Keeper",
+        "greeting": "Good soil and fair weather, {playerName}. Buy a seed from me, sow it in one of those beds, and go about your day. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer."
+      },
+      "farmer_teasel": {
+        "name": "Farmer Teasel",
+        "title": "Fen Paddy Farmer",
+        "greeting": "Marsh rice and bog beet seed, {className}, and compost to feed them. The paddies drain slow, so mind where you tread."
+      },
+      "farmer_hollis": {
+        "name": "Farmer Hollis",
+        "title": "Highwatch Terrace Farmer",
+        "greeting": "The terraces give what the mountain allows, {className}. I sell compost, and if a crop of yours comes up withered I will work the husks back into good soil for you."
+      },
+      "farmer_verbena": {
+        "name": "Farmer Verbena",
+        "title": "Parterre Gardener",
+        "greeting": "Mind the edging, {playerName}, these beds are the pride of the parterre. Compost is what I sell, and I will turn any withered husks you carry into more of it."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Tidevogter",
@@ -14690,6 +14957,19 @@ export const da_DK: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Malmåre høstet"
+          }
+        }
+      },
+      "q_farm_intro": {
+        "title": "First Furrow",
+        "text": "Take this hoe and a pinch of vale wheat seed, {playerName}. Sow the seed in one of the beds beside me, then go about your business. Come back whenever you like and bring the crop in; I will be here.",
+        "completion": "There, your first crop in your own hands. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer. Come back for seed whenever the beds call you, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat planted"
+          },
+          "1": {
+            "label": "Vale Wheat harvested"
           }
         }
       },
@@ -15586,6 +15866,26 @@ export const da_DK: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Vildt kød leveret"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_wheat": {
+        "title": "Kitchens Wheat Order",
+        "text": "Bread does not bake itself, {playerName}, and my flour bins are scraping bottom. Bring me eight sheaves of vale wheat and I will pay you honest coin for the lot. Grown by your own hand or bought off the market, I do not care, so long as it grinds.",
+        "completion": "Good dry grain, and plenty of it. There is your pay, counted out. When the next crop comes in, you know which door to knock on.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat delivered"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_rice": {
+        "title": "Kitchens Rice Order",
+        "text": "The marsh folk swear by their rice, {playerName}, and I mean to find out why. Fetch me five measures of marsh rice and there is coin waiting for you here. Keep it dry on the road, mind: wet rice is porridge, and I did not order porridge.",
+        "completion": "Plump and dry, every grain. Here is your coin. If the marsh keeps giving, so do I.",
+        "objectives": {
+          "0": {
+            "label": "Marsh Rice delivered"
           }
         }
       },
@@ -17550,6 +17850,7 @@ export const da_DK: EnTranslations = {
     "delveRiteShrineReedInteract": "Sivskrin: Tryk på F for at røre det",
     "delveRiteShrineSkullInteract": "Kranieskrin: Tryk på F for at røre det",
     "mailboxName": "Postkasse",
-    "noticeboardName": "Opslagstavle"
+    "noticeboardName": "Opslagstavle",
+    "farmPatchName": "Garden Beds"
   }
 };

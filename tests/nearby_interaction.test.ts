@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { tryNearbyInteraction } from '../src/game/nearby_interaction';
 import { ITEMS } from '../src/sim/data';
 import type { Entity, GatherNodeDef, QuestProgress } from '../src/sim/types';
+import type { FarmPatchDef, FarmPlotStatus, FarmPlotView } from '../src/world_api/farming';
 
 function entity(overrides: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Entity {
   return {
@@ -62,6 +63,17 @@ function rig(targets: Entity[] = [], nodes: GatherNodeDef[] = []) {
       return true;
     },
     nodeHarvestableByMe: vi.fn(() => true),
+    // Phase 9b bed-arm seam members: inert by default (the bed-arm describe
+    // below overrides them per test).
+    farmPatches: [] as readonly FarmPatchDef[],
+    myFarmPlots: [] as readonly FarmPlotView[],
+    harvestCrop: (bedId: string) => {
+      calls.push(`harvestCrop:${bedId}`);
+    },
+    // Phase 12 feast-arm seam member (the feast describe below exercises it).
+    consumeFeast: (feastId: number) => {
+      calls.push(`consumeFeast:${feastId}`);
+    },
     harvestNode: (id: string) => {
       calls.push(`harvest:${id}`);
       return true;
@@ -73,6 +85,8 @@ function rig(targets: Entity[] = [], nodes: GatherNodeDef[] = []) {
     openDelveBoard: (id: number) => calls.push(`board:${id}`),
     showError: (text: string) => calls.push(`error:${text}`),
     requestSpiritHealerResurrect: () => calls.push('requestResurrect'),
+    // Phase 9b bed-arm seam member: inert here (lane A's arms exercise it).
+    openPlantSheet: (bedId: string) => calls.push(`plantSheet:${bedId}`),
   };
   return { world, hud, nodes, calls, player };
 }
@@ -477,6 +491,7 @@ describe('tryNearbyInteraction: off-quest collectables are not there', () => {
   });
 });
 
+
 // Two reaches meet on the npc arm. The nearest-wins scan has always accepted an
 // npc just past INTERACT_RANGE (its sentinel is INTERACT_RANGE + 1, so a keypress
 // reaches six yards), while a promotion names an npc the player selected rather
@@ -557,5 +572,184 @@ describe('tryNearbyInteraction npc reach', () => {
     const r = rig([npcAt(3, 5.5)]);
     expect(interactPreferring(r, 3)).toBe(true);
     expect(r.calls).toEqual(['quest:3']);
+  });
+});
+
+
+describe('the garden-bed arm (Phase 9b)', () => {
+  const bedPatch: FarmPatchDef = {
+    id: 'patch_test',
+    zoneId: 'eastbrook_vale',
+    tier: 1,
+    x: 2,
+    z: 0,
+    beds: [{ id: 'bed_test_1', x: 2, z: 0 }],
+  };
+
+  function myPlot(status: FarmPlotStatus): FarmPlotView {
+    return {
+      bedId: 'bed_test_1',
+      cropId: 'vale_wheat',
+      plantedAtMs: 0,
+      readyAtMs: 1000,
+      compost: false,
+      watch: false,
+      tonic: false,
+      notified: false,
+      status,
+    };
+  }
+
+  function bedRig(
+    status: FarmPlotStatus | null,
+    targets: Entity[] = [],
+    nodes: GatherNodeDef[] = [],
+  ) {
+    const r = rig(targets, nodes);
+    r.world.farmPatches = [bedPatch];
+    r.world.myFarmPlots = status === null ? [] : [myPlot(status)];
+    return r;
+  }
+
+  // Status never gates the client press: the sim's own farmDenied not_ready
+  // answers a growing plot, so all three statuses send the same harvest.
+  it.each(['ready', 'withered', 'growing'] as const)(
+    'presses harvest exactly once beside my %s plot and never opens the sheet',
+    (status) => {
+      const r = bedRig(status);
+      expect(interact(r)).toBe(true);
+      expect(r.calls).toEqual(['harvestCrop:bed_test_1']);
+    },
+  );
+
+  it('an NPC in range keeps the press over a free bed (the farmer-at-the-beds collision)', () => {
+    // The real layout this pins: Farmer Jessica stands about 4 yd from
+    // bed_eastbrook_2, so both are routinely in reach at once. The NPC arm
+    // sits above the bed arm; a press beside both must open the dialog,
+    // never the sheet (the sheet is one more press after stepping clear).
+    const npc = entity({
+      id: 9,
+      kind: 'npc',
+      templateId: 'farmer_jessica',
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const r = bedRig(null, [npc]);
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['quest:9']);
+  });
+
+  it('opens the plant sheet once beside a free bed and never sends harvest', () => {
+    const r = bedRig(null);
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['plantSheet:bed_test_1']);
+  });
+
+  it('lets a gather node in range keep winning the press over a bed', () => {
+    const node = {
+      id: 'ore_1',
+      zoneId: 'zone',
+      type: 'ore',
+      pos: { x: 1, z: 0 },
+      level: 1,
+      tier: 1,
+    } as const;
+    const r = bedRig('ready', [], [node]);
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['harvest:ore_1']);
+  });
+
+  it('lets a corpse in range keep winning the press over a bed', () => {
+    const corpse = entity({
+      id: 2,
+      kind: 'mob',
+      dead: true,
+      lootable: true,
+      loot: { copper: 1, items: [] },
+      pos: { x: 1, y: 0, z: 0 },
+    });
+    const r = bedRig('ready', [corpse]);
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['loot:2']);
+  });
+
+  it('falls through to the nothing-to-interact line when every bed is out of range', () => {
+    const r = rig();
+    r.world.farmPatches = [{ ...bedPatch, beds: [{ id: 'bed_test_1', x: 10, z: 0 }] }];
+    r.world.myFarmPlots = [myPlot('ready')];
+    expect(interact(r)).toBe(false);
+    expect(r.calls).toEqual(['error:nothing']);
+  });
+
+  it('never fires for a dead player standing on a free bed', () => {
+    const r = bedRig(null);
+    r.player.dead = true;
+    expect(interact(r)).toBe(false);
+    expect(r.calls).toEqual(['error:nothing']);
+  });
+});
+
+describe('the feast arm (Phase 12)', () => {
+  // The templateId stays the LITERAL here (never the sim constant): the wire
+  // rows carry this exact string, so a constant-value drift must red.
+  const feast = (id: number, x = 2) =>
+    entity({ id, kind: 'object', templateId: 'farm_feast', pos: { x, y: 0, z: 0 } });
+
+  it('presses consume exactly once beside a placed feast', () => {
+    const r = rig([feast(12)]);
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['consumeFeast:12']);
+  });
+
+  it('sends the press even when this player already ate: the sim answers feast_eaten', () => {
+    // The (bp) doctrine: the ledger never crosses the wire, so the client has
+    // nothing to read and must not invent a prediction. The press always
+    // sends; the sim is the refusing authority.
+    const r = rig([feast(12)]);
+    expect(interact(r)).toBe(true);
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['consumeFeast:12', 'consumeFeast:12']);
+  });
+
+  it('a garden bed in reach keeps winning the press over a feast (the arm sits below the bed arm)', () => {
+    const r = rig([feast(12)]);
+    r.world.farmPatches = [
+      {
+        id: 'patch_test',
+        zoneId: 'eastbrook_vale',
+        tier: 1,
+        x: 2,
+        z: 0,
+        beds: [{ id: 'bed_test_1', x: 2, z: 0 }],
+      },
+    ];
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['plantSheet:bed_test_1']);
+  });
+
+  it('a gather node in reach keeps winning the press over a feast', () => {
+    const node = {
+      id: 'ore_1',
+      zoneId: 'zone',
+      type: 'ore',
+      pos: { x: 1, z: 0 },
+      level: 1,
+      tier: 1,
+    } as const;
+    const r = rig([feast(12)], [node as unknown as GatherNodeDef]);
+    expect(interact(r)).toBe(true);
+    expect(r.calls).toEqual(['harvest:ore_1']);
+  });
+
+  it('falls through to the nothing-to-interact line when the feast is out of range', () => {
+    const r = rig([feast(12, 10)]);
+    expect(interact(r)).toBe(false);
+    expect(r.calls).toEqual(['error:nothing']);
+  });
+
+  it('never fires for a dead player beside a feast', () => {
+    const r = rig([feast(12)]);
+    r.player.dead = true;
+    expect(interact(r)).toBe(false);
+    expect(r.calls).toEqual(['error:nothing']);
   });
 });

@@ -64,7 +64,8 @@ export const cs_CZ: EnTranslations = {
       "dungeon": "Dungeon",
       "difficulty": "Obtížnost",
       "name": "Jméno",
-      "spec": "Specializace"
+      "spec": "Specializace",
+      "bed": "Bed id (optional)"
     },
     "difficulty": {
       "normal": "Normální",
@@ -150,6 +151,10 @@ export const cs_CZ: EnTranslations = {
       "gather": {
         "label": "Přidat sběračskou dovednost",
         "description": "Zvyš úroveň sběračského povolání."
+      },
+      "farmgrow": {
+        "label": "Ripen crops",
+        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
       },
       "teleport": {
         "label": "Teleportovat",
@@ -2581,7 +2586,8 @@ export const cs_CZ: EnTranslations = {
       "resonantSteel": "Reagencie k okouzlení. Získává se rozzačarováním zbraní na blízko vzácné kvality a lepších.",
       "resonantTimber": "Reagencie k okouzlení. Získává se rozzačarováním holí, hůlek, luků a kuší vzácné kvality a lepších.",
       "masterwroughtIntermediate": "Masterwrought crafting component.",
-      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day."
+      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day.",
+      "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it."
     },
     "discord": {
       "title": "Discord",
@@ -3018,6 +3024,7 @@ export const cs_CZ: EnTranslations = {
       "logging": "Dřevorubectví",
       "herbalism": "Bylinkářství",
       "fishing": "Rybaření",
+      "farming": "Farming",
       "notReady": "Tento zdroj pro tebe ještě neobnovil zásoby.",
       "gatherLine": "Shromažďujete: {name}.",
       "gatherLineQty": "Shromažďujete: {name} x{qty}.",
@@ -3036,7 +3043,8 @@ export const cs_CZ: EnTranslations = {
       "tierRequired": {
         "mining": "Vyžaduje těžbu úrovně {tier}.",
         "logging": "Vyžaduje dřevorubectví úrovně {tier}.",
-        "herbalism": "Vyžaduje bylinkářství úrovně {tier}."
+        "herbalism": "Vyžaduje bylinkářství úrovně {tier}.",
+        "farming": "Requires a tier {tier} farming hoe"
       },
       "requiresTool": {
         "mining": "Vyžaduje hornický krumpáč",
@@ -3047,23 +3055,27 @@ export const cs_CZ: EnTranslations = {
         "mining": "K vytěžení této žíly potřebuješ krumpáč úrovně {tier}.",
         "logging": "K pokácení tohoto porostu potřebuješ dřevorubeckou sekeru úrovně {tier}.",
         "herbalism": "K sesbírání tohoto záhonu potřebuješ bylinkářský srp úrovně {tier}.",
-        "fishing": "K rybaření v těchto vodách potřebuješ rybářský prut úrovně {tier}."
+        "fishing": "K rybaření v těchto vodách potřebuješ rybářský prut úrovně {tier}.",
+        "farming": "You need a tier {tier} farming hoe to work this bed."
       },
       "toolRequired": {
         "mining": "K vytěžení této žíly potřebuješ hornický krumpáč.",
         "logging": "Ke skácení této skupiny stromů potřebuješ dřevorubeckou sekeru.",
         "herbalism": "Ke sběru tohoto porostu bylin potřebuješ bylinkářský srp.",
-        "fishing": "K nahození udice potřebuješ rybářský prut."
+        "fishing": "K nahození udice potřebuješ rybářský prut.",
+        "farming": "You need a farming hoe to work this bed."
       },
       "noNodeNearby": {
         "mining": "V dosahu není žádná rudná žíla.",
         "logging": "V dosahu není žádná skupina stromů.",
-        "herbalism": "V dosahu není žádný porost bylin."
+        "herbalism": "V dosahu není žádný porost bylin.",
+        "farming": "There is no crop bed within reach."
       },
       "wieldUnmet": {
         "mining": "K máchnutí krumpáčem, který už máš v batozích, potřebuješ Těžbu {skill}.",
         "logging": "K máchnutí sekerou, kterou už máš v batozích, potřebuješ Dřevorubectví {skill}.",
-        "herbalism": "K práci se srpem, který už máš v batozích, potřebuješ Bylinkářství {skill}."
+        "herbalism": "K práci se srpem, který už máš v batozích, potřebuješ Bylinkářství {skill}.",
+        "farming": "You need Farming {skill} to swing the hoe already in your bags."
       },
       "wieldUnmetCorpse": "K využití svého nejlepšího nástroje potřebuješ sběračskou dovednost {skill}.",
       "toolTierUnmetCorpse": "K získání nejjemnějších materiálů potřebuješ sběračský nástroj úrovně {tier}.",
@@ -3072,18 +3084,21 @@ export const cs_CZ: EnTranslations = {
           "mining": "Hornický nástroj ({tier}. úroveň)",
           "logging": "Dřevorubecký nástroj ({tier}. úroveň)",
           "herbalism": "Bylinkářský nástroj ({tier}. úroveň)",
-          "fishing": "Rybářský prut ({tier}. úroveň)"
+          "fishing": "Rybářský prut ({tier}. úroveň)",
+          "farming": "Farming tool (tier {tier})"
         },
         "unlocks": {
           "mining": "Nutný k těžbě rudných žil až do {tier}. úrovně.",
           "logging": "Nutná ke kácení skupin stromů až do {tier}. úrovně.",
           "herbalism": "Nutný ke sběru porostů bylin až do {tier}. úrovně.",
-          "fishing": "Nutný k rybaření ve vodách až do {tier}. úrovně."
+          "fishing": "Nutný k rybaření ve vodách až do {tier}. úrovně.",
+          "farming": "Required to plant crops up to tier {tier}."
         },
         "use": {
           "mining": "Použití: Vytěží blízkou rudnou žílu.",
           "logging": "Použití: Pokácí blízkou skupinu stromů.",
-          "herbalism": "Použití: Sesbírá blízký porost bylin."
+          "herbalism": "Použití: Sesbírá blízký porost bylin.",
+          "farming": "Works from your bags when you plant a crop bed."
         },
         "speed": "Rychleji sbírá na nalezištích pod {tier}. úrovní.",
         "rodRequired": "Nutný k rybaření.",
@@ -3092,6 +3107,7 @@ export const cs_CZ: EnTranslations = {
         "rodBand": "Od rybářské dovednosti {skill} výše odemyká bohatší úlovky."
       },
       "downgradeMark": "Plné brašny: nález byl uložen bez značky sběrače.",
+      "downgradeMarkCrop": "Bags full: the harvest was stored without its grower's mark.",
       "downgradeFind": "Plné brašny: vzácný nález ti proklouzl.",
       "emptyHookNote": "Na háčku nic není",
       "stateReady": "Připraveno",
@@ -3099,6 +3115,83 @@ export const cs_CZ: EnTranslations = {
       "stateCooldownTimed": "Obnoví se za {time}",
       "respawnClock": "{minutes}:{seconds}",
       "fineGradePreview": "Tvůj nástroj povyšuje tento výnos na jemnou jakost."
+    },
+    "farming": {
+      "plantLine": "You plant: {name}.",
+      "harvestLine": "You bring in: {name}.",
+      "harvestLineQty": "You bring in: {name} x{qty}.",
+      "harvestFineLine": "You also bring in: {name}.",
+      "harvestFineLineQty": "You also bring in: {name} x{qty}.",
+      "witheredLine": "The crop withered. You clear the bed: {name}.",
+      "witheredLineQty": "The crop withered. You clear the bed: {name} x{qty}.",
+      "seedBackLine": "You recover seed: {name}.",
+      "seedBackLineQty": "You recover seed: {name} x{qty}.",
+      "denied": {
+        "bad_bed": "There is no crop bed there.",
+        "bad_crop": "You cannot plant that here.",
+        "range": "You are too far from that crop bed.",
+        "bed_taken": "You already have a crop growing there.",
+        "skill": "Your Farming skill is too low for that crop.",
+        "no_seed": "You have no seed for that crop.",
+        "not_ready": "That crop is still growing.",
+        "no_plot": "Nothing is planted in that bed.",
+        "no_husks": "You do not have enough withered husks.",
+        "no_compost": "You have no compost.",
+        "no_fee_produce": "You have no produce to pay the watch fee.",
+        "no_tonic": "You have no growth tonic.",
+        "tool": "You have no farming hoe fit for that crop.",
+        "locked": "An item that would pay for that is locked.",
+        "no_farmer": "You must be near a farmer to trade husks for compost.",
+        "no_feast": "You have no feast to set out.",
+        "feast_active": "Your feast is already set out.",
+        "feast_expired": "That feast is gone.",
+        "feast_finished": "That feast has been picked clean.",
+        "feast_range": "You are too far from the feast.",
+        "feast_eaten": "You have already eaten from that feast."
+      },
+      "feastTitle": "{name}'s Harvest Feast",
+      "feastPlacedLine": "You set out your harvest feast.",
+      "huskTrade": "Trade husks for compost",
+      "huskTradeAria": "Trade husks for compost with {name}",
+      "plantSheet": {
+        "title": "Plant a Crop",
+        "plant": "Plant",
+        "sowAria": "Sow {name}",
+        "empty": "You have no seed you can sow at this bed.",
+        "close": "Close the plant sheet"
+      },
+      "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
+      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
+      "readyLine": "A crop is ready to harvest.",
+      "readyLineQty": "{count} crops are ready to harvest.",
+      "readyWitheredLine": "A crop withered in its bed.",
+      "readyWitheredLineQty": "{count} crops withered in their beds."
+    },
+    "harvestJournal": {
+      "title": "Harvest Journal",
+      "close": "Close",
+      "listLabel": "Planted crop beds",
+      "growing": "Ready in {time}",
+      "ready": "Ready to harvest",
+      "finishing": "Finishing up",
+      "withered": "Withered",
+      "readyAnnounce": "Ready to harvest: {name}",
+      "remainingDaysHours": "{days}d {hours}h",
+      "remainingHoursMinutes": "{hours}h {minutes}m",
+      "remainingMinutesSeconds": "{minutes}m {seconds}s",
+      "remainingSeconds": "{seconds}s",
+      "bedLine": "{zone}, bed {index}",
+      "bedLineUnknown": "Unknown bed",
+      "careWatch": "Farmer's Watch",
+      "careNone": "No extras",
+      "stageSprout": "Sprout",
+      "stageSeedling": "Seedling",
+      "stageMaturing": "Maturing",
+      "stageRipe": "Ripe",
+      "emptyTitle": "No crops planted",
+      "emptyBody": "Sow a seed in any garden bed and the plot appears here with its timer.",
+      "noviceTitle": "You have not worked a garden bed yet",
+      "noviceBody": "Farming skill grows every time you bring in a crop. Sow a seed in any garden bed to begin."
     },
     "archetypeTitle": {
       "label": "Titul",
@@ -3218,7 +3311,7 @@ export const cs_CZ: EnTranslations = {
           "quickeningCharm": "Zkracuje časovač obnovy naleziště, který spustí.",
           "makersCharm": "+2 yield per harvest while charged."
         },
-        "howToSlot": "Vlož do hornického, dřevorubeckého nebo bylinkářského nástroje z okna Profese. Při vložení se spotřebuje.",
+        "howToSlot": "Vlož do hornického, dřevorubeckého, bylinkářského nebo zemědělského nástroje z okna Profese. Při vložení se spotřebuje.",
         "charges": "Na běžném nástroji začíná s {base} nabitími (+{bonus} za každý stupeň vzácnosti).",
         "landOnly": "Nelze vložit do rybářských prutů.",
         "openProfessions": "Otevři Profese a vlož ho do sběračského nástroje."
@@ -3887,7 +3980,8 @@ export const cs_CZ: EnTranslations = {
   "gatherEvent": {
     "pristineVein": "{finder} narazil na nedotčenou rudnou žílu!",
     "ancientHeartwood": "{finder} pokácel prastaré jádrové dřevo!",
-    "moonlitBloom": "{finder} objevil měsíční květ!"
+    "moonlitBloom": "{finder} objevil měsíční květ!",
+    "goldenHarvest": "{finder} reaped a golden harvest!"
   },
   "apiError": {
     "validation": {
@@ -4260,6 +4354,7 @@ export const cs_CZ: EnTranslations = {
       "groupCamera": "Kamera",
       "talents": "Talenty",
       "professions": "Profese",
+      "harvestJournal": "Harvest Journal",
       "arena": "Okno PvP (arény a Thornhollowská pole)",
       "leaderboard": "Žebříček",
       "deeds": "Kniha skutků",
@@ -5629,6 +5724,9 @@ export const cs_CZ: EnTranslations = {
       "outputFmt": "{name} x{count}",
       "comboReq": "Vyžaduje {a} a {b}",
       "oncePerDay": "Once per day",
+      "effectFood": "Restores {amount} health over {seconds} sec when eaten.",
+      "effectWellFed": "Well fed when you finish eating: +{value} {stat} for {minutes} min.",
+      "effectWellFedAura": "Grants {aura} for {minutes} min when you finish eating.",
       "sourceTrainerFee": "Trenér, {fee}",
       "sourceTrainerFree": "Trenér, zdarma",
       "sourceKnown": "Známo od začátku",
@@ -5806,7 +5904,8 @@ export const cs_CZ: EnTranslations = {
         "mining": "Těžba tahá rudu přímo ze skály světa: měď v Eastbrookském údolí, železo v Mirefenském močálu a osmium nahoře v Thornpeakských výšinách, se začátečnickými žilami roztroušenými po každé mladší zóně za nimi, což živí kovářská řemesla. Otevřená každému od 1. úrovně: hornický krumpáč za 20 měďáků z přepážky v Eastbrooku, Fenbridge nebo Highwatchi otevře každou začátečnickou žílu a vyšší příčle krumpáčového žebříčku se probouzejí, jak si je tvé vlastní počitadlo vyslouží. Vedená na vlastním počitadle až ke stropu 100.",
         "logging": "Dřevorubectví kácí dřevo ze skupin stromů po celém světě: železokůru v Eastbrookském údolí, jasan v Mirefenském močálu, horskou borovici v Thornpeakských výšinách a začátečnické skupiny v každé mladší zóně, surovinu pro topůrka, hole a strojírův pracovní stůl. Otevřené každému od 1. úrovně s dřevorubeckou sekerou v brašnách (20 měďáků u přepážek v Eastbrooku, Fenbridge a Highwatchi), vedené na vlastním počitadle až ke stropu 100.",
         "herbalism": "Bylinkářství sbírá to, co roste divoce: stříbrolist v Eastbrookském údolí, zlatolist v Mirefenském močálu, sluncokvět v Thornpeakských výšinách a začátečnické porosty v každé mladší zóně, list a stonek, které drží lékárnická řemesla v chodu. Otevřené každému od 1. úrovně s bylinkářským srpem v brašnách (20 měďáků u přepážek v Eastbrooku, Fenbridge a Highwatchi), vedené na vlastním počitadle až ke stropu 100.",
-        "fishing": "Rybaření je mezi sběratelskými živnostmi ta zvláštní, a zároveň nejhlubší: skutečná minihra na záběr a navíjení, vlastní tabulky úlovků v každé ze tří vnitrozemských zón (mladé vody za nimi zatím všechny obsluhuje tabulka Údolí) a strop zdatnosti 200, dvojnásobek ostatních. Kup prut, postav se čelem k otevřené vodě a nahoď."
+        "fishing": "Rybaření je mezi sběratelskými živnostmi ta zvláštní, a zároveň nejhlubší: skutečná minihra na záběr a navíjení, vlastní tabulky úlovků v každé ze tří vnitrozemských zón (mladé vody za nimi zatím všechny obsluhuje tabulka Údolí) a strop zdatnosti 200, dvojnásobek ostatních. Kup prut, postav se čelem k otevřené vodě a nahoď.",
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe whenever you come back, because nothing in a bed ever spoils. A farmer stands beside every bed site, from the Eastbrook allotments through Fenbridge and Highwatch to the Evergarden parterre, and Farmer Jessica in Eastbrook is where the trade starts: she sells the garden hoe and the first seeds, and her errand walks a new farmer through a first crop. Each rung of the ladder grows its own pair of crops, each with a finer grade for a practiced hand to pull, and engineers craft the hoes for the tougher ground above the starter beds. Tracked on its own counter to a cap of 100."
       },
       "rhythmHeading": "Rytmus sběru",
       "rhythmBody": "Sklizeň je krátké viditelné nahození, ne okamžité chňapnutí: {base} sekundy základ, nikdy ne pod dolní hranici {floor} sekundy. Nošení nástroje nad úrovní naleziště, takového, který ti tvá dovednost dovolí použít, tě zrychlí o {tool} sekundy za každou úroveň nad ní a každé překročené dovednostní pásmo ukrojí ještě {band} sekundy; pouhé vyrovnání úrovně naleziště tě dostane do dveří, rychlým tě dělají teprve úrovně nad ní.\n\nPlná brašna zdvořile odmítne nahození ještě před začátkem, takže se uprostřed rozmachu nic nepromarní, a každá sklizeň vyplatí malý díl zkušeností postavy, škálovaný úrovní naleziště proti té tvé stejně, jako se škálují zkušenosti za zabití: triviální šedé naleziště postavě na stropu nedá nic.",
@@ -5837,7 +5936,9 @@ export const cs_CZ: EnTranslations = {
         "mining": "Tvé první naleziště v jakékoli živnosti získá Plody pole a limit 100 v Těžbě zapíše Rudu v krvi. Dosažení 100 ve třech z Těžby, Dřevorubectví, Bylinkářství a Rybaření přidá Mistra sběrače za 25 Věhlasu a rozlomení čisté žíly zaznamená svůj vlastní sběratelský odkaz. Nic z toho nedává moc: skutky jsou tituly a Věhlas, záznam cest, kterými jsi prošel.",
         "logging": "Tvé první naleziště v jakékoli živnosti získá Plody pole a limit 100 v Dřevorubectví zapíše Tesače srdcoviny. Dosažení 100 ve třech z Těžby, Dřevorubectví, Bylinkářství a Rybaření přidá Mistra sběrače za 25 Věhlasu a záseky do dávného jádra zaznamenají svůj vlastní sběratelský odkaz. Skutky jsou jen tituly a Věhlas, nikdy moc.",
         "herbalism": "Tvé první naleziště v jakékoli živnosti získá Plody pole a limit 100 v Bylinkářství zapíše Pána luk. Dosažení 100 ve třech z Těžby, Dřevorubectví, Bylinkářství a Rybaření přidá Mistra sběrače za 25 Věhlasu a měsíčně kvetoucí květ zaznamená svůj vlastní sběratelský odkaz. Skutky jsou jen tituly a Věhlas, nikdy moc.",
-        "fishing": "Milník 100 zapíše Starého solanáře a 200 zapíše Mistrného rybáře i s jeho titulem, úplný vrchol rybářského umění; Rybaření se také počítá k Mistru sběrači, získanému na 100 ve třech libovolných sběratelských živnostech. První ryba z vod každé ze šesti zón zaplní vlastní stránku, tří vnitrozemských zón a Vrbové bažiny, Vichrného hřebene a Vzdáleného pobřeží za nimi, a Slunolesklý koi zapíše Záblesk naděje, takže cestovatelé s prutem v batohu si knihu plní rychleji, než čekají."
+        "fishing": "Milník 100 zapíše Starého solanáře a 200 zapíše Mistrného rybáře i s jeho titulem, úplný vrchol rybářského umění; Rybaření se také počítá k Mistru sběrači, získanému na 100 ve třech libovolných sběratelských živnostech. První ryba z vod každé ze šesti zón zaplní vlastní stránku, tří vnitrozemských zón a Vrbové bažiny, Vichrného hřebene a Vzdáleného pobřeží za nimi, a Slunolesklý koi zapíše Záblesk naděje, takže cestovatelé s prutem v batohu si knihu plní rychleji, než čekají.",
+        "farming": "Farming keeps no deeds of its own yet: now that its beds and crops are in the ground, the milestone and cap deeds that mark the other trades arrive in a later patch. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power.",
+        "farmingSown": "Farming keeps its own shelf in the Book of Deeds now. Sow It Begins marks your first planted crop, and four chronicle pages mark a first thriving harvest at each of the bed sites, from Eastbrook Vale to the Evergarden. A golden harvest records its own zero-Renown collector's mark, and proficiency in Farming counts toward Master Gatherer, earned at 100 in any three gathering trades. The capstone is already written: Harvestmaster, the trade's 100-proficiency title, comes within reach with a later patch's deeper fields. Deeds are titles and Renown only, never power."
       },
       "fish": {
         "startHeading": "Jak začít",
@@ -5859,6 +5960,12 @@ export const cs_CZ: EnTranslations = {
         "emptyHook": "Nic nezabírá",
         "koiHeading": "Slunolesklý koi",
         "koiBody": "Každá vodní plocha ve hře skrývá stejnou výhru: Slunolesklého koie, neobvyklý záblesk na vlasci, který má u prodejce cenu 75 měďáků a o dost víc pro tvou hrdost. Jeho šance odpovídají tvému pásmu úlovků a ničemu jinému, ve všech zónách stejně: 1 procento řádku tabulky úlovků v pásmu 0, 3 v pásmu 1 a 6 v pásmu 2, losováno při každém navinutém nahození, takže koi připlave k rybáři, který si hluboké tabulky vysloužil. Ulovení jednoho zapíše do tvé Knihy skutků Záblesk naděje, sběratelský odkaz s nulovým Věhlasem. Až se to stane, log se postará, abys o tom věděl."
+      },
+      "farm": {
+        "bedsHeading": "Working the beds",
+        "bedsBody": "The loop is short. Buy seeds and compost from the farmer beside the beds: Jessica in Eastbrook stocks the Vale pair, the Fenbridge farmer the marsh pair, and no counter anywhere sells the Highwatch or Evergarden seeds, which come back a seed or two at a time from a high-tier harvest and otherwise change hands on the World Market. Sow with a hoe in your bags, and tip the odds if you like: compost from the counter and the farmer's watch, paid in produce as you plant, each raise a crop's chance of coming through, an alchemist's growth tonic gives the harvest a shot at a larger yield, and once your skill has climbed a full band past a crop's tier that crop never fails at all. Then walk away. The bed keeps growing while you are logged out, a ripe crop waits as long as you leave it, and the Harvest Journal (Shift+K, or the Farming row of your professions window) lists every bed you have planted with its timer.\n\nA crop that fails leaves withered husks in place of produce, and any farmer trades husks for compost, so a bad season buys the next one's insurance. What you bring in feeds the kitchens: the produce cooks into dishes at the kitchens, and Cook Marlow's wheat and rice orders take Vale Wheat and Marsh Rice off your hands for coin on the same clock as every other work order.",
+        "tableHeading": "From the beds to the table",
+        "tableBody": "The kitchens are where a season pays forward. Beyond the everyday farm dishes, each crop tier has a richer dish that leaves you Well Fed: finish the meal and a lasting boon stays with you, the kind of edge a group wants eaten before the dungeon door. Crowning the set is the Harvest Feast, a spread a cook sets out in the world itself: everyone at hand takes a serving of their own, one each, and every finished meal pays the same Well Fed boon, so one farmer's season can set the table for a whole party. The top of that ladder, the two richest dishes and the feast itself, comes within reach with a later patch's deeper fields; everything below them is cooking today.\n\nLuck keeps a place at that table too. Every harvest you bring in rolls the same windfall chance the other gathering trades enjoy, and now and then a crop comes up golden: the yield lands far past a normal pull, the whole zone hears the find announced by name, and Golden Harvest is recorded in your Book of Deeds."
       },
       "econ": {
         "title": "Řemeslná ekonomika",
@@ -5882,7 +5989,7 @@ export const cs_CZ: EnTranslations = {
         "marketHeading": "Světový trh a jeho podíl",
         "marketBody": "Světový trh je celosférickí burza spravovaná Obchodníkem v Eastbrooku a Dražitelem Vossem v Highwatchi. Vystavení je zdarma: žádná záloha a nevyužité vystavení se ti jednoduše vrátí. Dům si bere podíl pouze tehdy, když se něco skutečně prodá: 5 procent z prodejní ceny a zbytek na tebe čeká k vybrání.\n\nJedno důležité omezení: Trh zprostředkovává pouze běžné zboží. Podepsaná, mistrovská, okouzlená nebo vázaná kopie nikdy nevstoupí do výpisu, takže zvláštní kusy přecházejí z ruky do ruky tváří v tvář v okně výměny, které nese plnou identitu předmětu, podpis i vše ostatní. Cenu si určuj sám; Trh ti jen ukáže, co platí za běžnou verzi.",
         "workOrdersHeading": "Pracovní příkazy",
-        "workOrdersNote": "Každý správce stanice zveřejňuje stálý pracovní příkaz: přines hromadu základního materiálu pro dané řemeslo a dostaneš okamžitou platbu plus trochu zkušeností z úkolu. Odměna je záměrně {pct} % z toho, co by ti za stejný stack dal prodejce, zaokrouhleno dolů, takže pracovní příkaz nikdy není výhodný způsob prodeje materiálů, jen důvod, proč se k stanici zastavit.\n\nKaždý příkaz běží na vlastním časovači {minutes} minut na postavu: odevzdej jeden a ten mistr pro tebe nic dalšího nemá, dokud časovač neoběhne. Berte je jako malý bonus za materiály, které jsi stejně sbíral, ne jako podnikání.",
+        "workOrdersNote": "Každý správce stanice zveřejňuje stálé pracovní příkazy, jeden na každý základní materiál: přines hromadu, o kterou příkaz žádá, a dostaneš okamžitou platbu plus trochu zkušeností z úkolu. Odměna je záměrně {pct} % z toho, co by ti za stejný stack dal prodejce, zaokrouhleno dolů, takže pracovní příkaz nikdy není výhodný způsob prodeje materiálů, jen důvod, proč se k stanici zastavit.\n\nKaždý příkaz běží na vlastním časovači {minutes} minut na postavu: odevzdej jeden a ten příkaz je pro tebe uzavřený, dokud časovač neoběhne, zatímco ostatní příkazy mistra zůstávají otevřené. Berte je jako malý bonus za materiály, které jsi stejně sbíral, ne jako podnikání.",
         "colOrder": "Pracovní příkaz",
         "colMaster": "Mistr",
         "colAsks": "Požaduje za",
@@ -8182,6 +8289,7 @@ export const cs_CZ: EnTranslations = {
         "cooldownLockedHerb": "Sesbíraný porost bylin, potřebný nástroj je uzamčený",
         "station": "Řemeslná stanice: {name}",
         "service": "Služba: {name}",
+        "farmPatch": "Garden beds",
         "partyMember": "Člen skupiny: {name}",
         "deadPartyMember": "Mrtvý člen skupiny: {name}",
         "partyMemberGeneric": "Člen skupiny",
@@ -8865,6 +8973,7 @@ export const cs_CZ: EnTranslations = {
     },
     "cast": {
       "fishing": "Rybaření",
+      "farming": "Planting",
       "gathering": "Sběr",
       "crafting": "Výroba",
       "disenchanting": "Rozzačarování",
@@ -9050,6 +9159,11 @@ export const cs_CZ: EnTranslations = {
       "flaskThroughDeath": "The effect remains through death, but ends when you log out; instanced matches begin and end on a clean slate.",
       "wellFed": "Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.",
       "wellFedAura": "Well Fed: Grants {aura} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.",
+      "useWellfed": "{aura}: +{value} {stat} for {minutes} min, granted when you finish eating.",
+      "useWellfedAura": "Grants {aura} for {minutes} min when you finish eating.",
+      "useFeast": "Use: Sets out a feast others can eat from, one serving each ({servings} servings, lasts {minutes} min).",
+      "useFeastBuff": "Each serving grants {aura}: +{value} {stat} for {minutes} min when you finish the {seconds} sec meal.",
+      "useFeastBuffAura": "Each serving grants {aura} for {minutes} min when you finish the {seconds} sec meal.",
       "questItem": "Úkolový předmět",
       "questRelated": "Úkol: {quest}",
       "questRules": "Nelze prodat, uložit do banky ani směnit.",
@@ -9072,6 +9186,7 @@ export const cs_CZ: EnTranslations = {
       "useManaPotion": "Použití: Okamžitě obnoví {amount} many. Použitelné v boji. Doba obnovy 2 min.",
       "clickUseInstant": "Kliknutím okamžitě použiješ v boji",
       "clickUse": "Kliknutím použiješ",
+      "clickSetOut": "Click to set out",
       "clickBuyback": "Kliknutím odkoupíš zpět",
       "bagSlots": "Batoh s {slots} sloty"
     },
@@ -12737,6 +12852,138 @@ export const cs_CZ: EnTranslations = {
       "pattern_laden_hearth": {
         "name": "Recipe: The Laden Hearth"
       },
+      "vale_wheat_seed": {
+        "name": "Vale Wheat Seed"
+      },
+      "vale_wheat": {
+        "name": "Vale Wheat"
+      },
+      "fine_vale_wheat": {
+        "name": "Fine Vale Wheat"
+      },
+      "withered_husks": {
+        "name": "Withered Husks"
+      },
+      "compost": {
+        "name": "Compost"
+      },
+      "growth_tonic": {
+        "name": "Growth Tonic"
+      },
+      "brook_carrot_seed": {
+        "name": "Brook Carrot Seed"
+      },
+      "brook_carrot": {
+        "name": "Brook Carrot"
+      },
+      "fine_brook_carrot": {
+        "name": "Fine Brook Carrot"
+      },
+      "marsh_rice_seed": {
+        "name": "Marsh Rice Seed"
+      },
+      "marsh_rice": {
+        "name": "Marsh Rice"
+      },
+      "fine_marsh_rice": {
+        "name": "Fine Marsh Rice"
+      },
+      "bog_beet_seed": {
+        "name": "Bog Beet Seed"
+      },
+      "bog_beet": {
+        "name": "Bog Beet"
+      },
+      "fine_bog_beet": {
+        "name": "Fine Bog Beet"
+      },
+      "highland_barley_seed": {
+        "name": "Highland Barley Seed"
+      },
+      "highland_barley": {
+        "name": "Highland Barley"
+      },
+      "fine_highland_barley": {
+        "name": "Fine Highland Barley"
+      },
+      "frost_gourd_seed": {
+        "name": "Frost Gourd Seed"
+      },
+      "frost_gourd": {
+        "name": "Frost Gourd"
+      },
+      "fine_frost_gourd": {
+        "name": "Fine Frost Gourd"
+      },
+      "gilded_sunmelon_seed": {
+        "name": "Gilded Sunmelon Seed"
+      },
+      "gilded_sunmelon": {
+        "name": "Gilded Sunmelon"
+      },
+      "fine_gilded_sunmelon": {
+        "name": "Fine Gilded Sunmelon"
+      },
+      "evergarden_greens_seed": {
+        "name": "Evergarden Greens Seed"
+      },
+      "evergarden_greens": {
+        "name": "Evergarden Greens"
+      },
+      "fine_evergarden_greens": {
+        "name": "Fine Evergarden Greens"
+      },
+      "garden_hoe": {
+        "name": "Garden Hoe"
+      },
+      "bronze_hoe": {
+        "name": "Bronze Hoe"
+      },
+      "skysilver_hoe": {
+        "name": "Skysilver Hoe"
+      },
+      "osmium_hoe": {
+        "name": "Osmium Hoe"
+      },
+      "vale_hearth_loaf": {
+        "name": "Vale Hearth Loaf"
+      },
+      "eastbrook_root_pottage": {
+        "name": "Eastbrook Root Pottage"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "Fenbridge Rice Bowl"
+      },
+      "fenbridge_beet_braise": {
+        "name": "Fenbridge Beet Braise"
+      },
+      "highwatch_barley_bannock": {
+        "name": "Highwatch Barley Bannock"
+      },
+      "highwatch_gourd_soup": {
+        "name": "Highwatch Gourd Soup"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "Evergarden Sunmelon Tart"
+      },
+      "evergarden_harvest_platter": {
+        "name": "Evergarden Harvest Platter"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "Eastbrook Glazed Carrots"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "Fenbridge Rice Pudding"
+      },
+      "highwatch_barley_porridge": {
+        "name": "Highwatch Barley Porridge"
+      },
+      "evergarden_braised_greens": {
+        "name": "Evergarden Braised Greens"
+      },
+      "harvest_feast": {
+        "name": "Harvest Feast"
+      },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
       },
@@ -14676,6 +14923,26 @@ export const cs_CZ: EnTranslations = {
         "title": "Mistr lékárny",
         "greeting": "Dvakrát měř a jednou nalij, {className}. Lékárník nemá trpělivost na rozlité reagencie."
       },
+      "farmer_jessica": {
+        "name": "Farmer Jessica",
+        "title": "Allotment Keeper",
+        "greeting": "Good soil and fair weather, {playerName}. Buy a seed from me, sow it in one of those beds, and go about your day. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer."
+      },
+      "farmer_teasel": {
+        "name": "Farmer Teasel",
+        "title": "Fen Paddy Farmer",
+        "greeting": "Marsh rice and bog beet seed, {className}, and compost to feed them. The paddies drain slow, so mind where you tread."
+      },
+      "farmer_hollis": {
+        "name": "Farmer Hollis",
+        "title": "Highwatch Terrace Farmer",
+        "greeting": "The terraces give what the mountain allows, {className}. I sell compost, and if a crop of yours comes up withered I will work the husks back into good soil for you."
+      },
+      "farmer_verbena": {
+        "name": "Farmer Verbena",
+        "title": "Parterre Gardener",
+        "greeting": "Mind the edging, {playerName}, these beds are the pride of the parterre. Compost is what I sell, and I will turn any withered husks you carry into more of it."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Hlídač přílivu",
@@ -14690,6 +14957,19 @@ export const cs_CZ: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Vytěžena rudná žíla"
+          }
+        }
+      },
+      "q_farm_intro": {
+        "title": "First Furrow",
+        "text": "Take this hoe and a pinch of vale wheat seed, {playerName}. Sow the seed in one of the beds beside me, then go about your business. Come back whenever you like and bring the crop in; I will be here.",
+        "completion": "There, your first crop in your own hands. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer. Come back for seed whenever the beds call you, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat planted"
+          },
+          "1": {
+            "label": "Vale Wheat harvested"
           }
         }
       },
@@ -15586,6 +15866,26 @@ export const cs_CZ: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Doručeno zvěřinové maso"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_wheat": {
+        "title": "Kitchens Wheat Order",
+        "text": "Bread does not bake itself, {playerName}, and my flour bins are scraping bottom. Bring me eight sheaves of vale wheat and I will pay you honest coin for the lot. Grown by your own hand or bought off the market, I do not care, so long as it grinds.",
+        "completion": "Good dry grain, and plenty of it. There is your pay, counted out. When the next crop comes in, you know which door to knock on.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat delivered"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_rice": {
+        "title": "Kitchens Rice Order",
+        "text": "The marsh folk swear by their rice, {playerName}, and I mean to find out why. Fetch me five measures of marsh rice and there is coin waiting for you here. Keep it dry on the road, mind: wet rice is porridge, and I did not order porridge.",
+        "completion": "Plump and dry, every grain. Here is your coin. If the marsh keeps giving, so do I.",
+        "objectives": {
+          "0": {
+            "label": "Marsh Rice delivered"
           }
         }
       },
@@ -17550,6 +17850,7 @@ export const cs_CZ: EnTranslations = {
     "delveRiteShrineReedInteract": "Rákosová svatyně: stiskni F a dotkni se jí",
     "delveRiteShrineSkullInteract": "Lebková svatyně: stiskni F a dotkni se jí",
     "mailboxName": "Poštovní schránka",
-    "noticeboardName": "Vývěska"
+    "noticeboardName": "Vývěska",
+    "farmPatchName": "Garden Beds"
   }
 };

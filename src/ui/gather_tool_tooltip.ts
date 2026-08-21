@@ -36,6 +36,7 @@ const KIND_KEYS: Record<GatheringProfessionId, TranslationKey> = {
   logging: 'hudChrome.gathering.toolTooltip.kind.logging',
   herbalism: 'hudChrome.gathering.toolTooltip.kind.herbalism',
   fishing: 'hudChrome.gathering.toolTooltip.kind.fishing',
+  farming: 'hudChrome.gathering.toolTooltip.kind.farming',
 };
 
 const UNLOCKS_KEYS: Partial<Record<GatheringProfessionId, TranslationKey>> = {
@@ -43,12 +44,19 @@ const UNLOCKS_KEYS: Partial<Record<GatheringProfessionId, TranslationKey>> = {
   logging: 'hudChrome.gathering.toolTooltip.unlocks.logging',
   herbalism: 'hudChrome.gathering.toolTooltip.unlocks.herbalism',
   fishing: 'hudChrome.gathering.toolTooltip.unlocks.fishing',
+  // The hoe phase filled the farming rows: `unlocks` states the crop tiers
+  // the hoe's tier opens (the step-12 plant gate in professions/farming.ts).
+  farming: 'hudChrome.gathering.toolTooltip.unlocks.farming',
 };
 
 const USE_KEYS: Partial<Record<GatheringProfessionId, TranslationKey>> = {
   mining: 'hudChrome.gathering.toolTooltip.use.mining',
   logging: 'hudChrome.gathering.toolTooltip.use.logging',
   herbalism: 'hudChrome.gathering.toolTooltip.use.herbalism',
+  // The farming row deliberately has NO "Use:" imperative: a hoe is a passive
+  // gate (useGatherToolItem never gains a farming arm; beds are not nodes),
+  // so the line states the bags-carried behavior instead of a click action.
+  farming: 'hudChrome.gathering.toolTooltip.use.farming',
 };
 
 function line(cls: 'tt-sub' | 'tt-desc', text: string): string {

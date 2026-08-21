@@ -64,7 +64,8 @@ export const ja_JP: EnTranslations = {
       "dungeon": "ダンジョン",
       "difficulty": "難易度",
       "name": "名前",
-      "spec": "スペック"
+      "spec": "スペック",
+      "bed": "Bed id (optional)"
     },
     "difficulty": {
       "normal": "ノーマル",
@@ -150,6 +151,10 @@ export const ja_JP: EnTranslations = {
       "gather": {
         "label": "採集スキルを付与",
         "description": "採集専門職のスキルを上げます。"
+      },
+      "farmgrow": {
+        "label": "Ripen crops",
+        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
       },
       "teleport": {
         "label": "テレポート",
@@ -2581,7 +2586,8 @@ export const ja_JP: EnTranslations = {
       "resonantSteel": "エンチャントの材料。レア以上の近接武器を魔力分解して得られる。",
       "resonantTimber": "エンチャントの材料。レア以上の杖、ワンド、弓、クロスボウを魔力分解して得られる。",
       "masterwroughtIntermediate": "名匠鍛造の製作部材。",
-      "quickeningCatalyst": "製作用の触媒。錬金術師は1日に1個しか作れません。"
+      "quickeningCatalyst": "製作用の触媒。錬金術師は1日に1個しか作れません。",
+      "growthTonic": "農業用品。作付け時に消費され、収穫がやや増えることがある。作物が枯れるとトニックも失われる。"
     },
     "discord": {
       "title": "Discord",
@@ -3018,6 +3024,7 @@ export const ja_JP: EnTranslations = {
       "logging": "伐採",
       "herbalism": "薬草学",
       "fishing": "釣り",
+      "farming": "農耕",
       "notReady": "この資源ノードはまだあなたのために再生していません。",
       "gatherLine": "{name}を採集した。",
       "gatherLineQty": "{name}を{qty}個採集した。",
@@ -3036,7 +3043,8 @@ export const ja_JP: EnTranslations = {
       "tierRequired": {
         "mining": "ティア{tier}の採掘ピッケルが必要",
         "logging": "ティア{tier}の伐採斧が必要",
-        "herbalism": "ティア{tier}の薬草鎌が必要"
+        "herbalism": "ティア{tier}の薬草鎌が必要",
+        "farming": "ティア{tier}の農耕鍬が必要"
       },
       "requiresTool": {
         "mining": "採掘ピッケルが必要",
@@ -3047,23 +3055,27 @@ export const ja_JP: EnTranslations = {
         "mining": "この鉱脈を採掘するにはティア{tier}の採掘ピッケルが必要です。",
         "logging": "この立木を伐り倒すにはティア{tier}の伐採斧が必要です。",
         "herbalism": "この群生地を採取するにはティア{tier}の薬草鎌が必要です。",
-        "fishing": "この水域で釣るにはティア{tier}の釣り竿が必要です。"
+        "fishing": "この水域で釣るにはティア{tier}の釣り竿が必要です。",
+        "farming": "この作物畑を耕すにはティア{tier}の農耕鍬が必要です。"
       },
       "toolRequired": {
         "mining": "この鉱脈を採掘するには採掘ピッケルが必要です。",
         "logging": "この立木を伐り倒すには伐採斧が必要です。",
         "herbalism": "この群生地を採取するには薬草鎌が必要です。",
-        "fishing": "釣り糸を垂らすには釣り竿が必要です。"
+        "fishing": "釣り糸を垂らすには釣り竿が必要です。",
+        "farming": "この作物畑を耕すには農耕鍬が必要です。"
       },
       "noNodeNearby": {
         "mining": "手の届く範囲に鉱脈がありません。",
         "logging": "手の届く範囲に立木がありません。",
-        "herbalism": "手の届く範囲に薬草の群生地がありません。"
+        "herbalism": "手の届く範囲に薬草の群生地がありません。",
+        "farming": "手の届く範囲に作物畑がありません。"
       },
       "wieldUnmet": {
         "mining": "バッグにある採掘ピッケルを振るうには採掘{skill}が必要です。",
         "logging": "バッグにある伐採斧を振るうには伐採{skill}が必要です。",
-        "herbalism": "バッグにある薬草鎌を扱うには薬草学{skill}が必要です。"
+        "herbalism": "バッグにある薬草鎌を扱うには薬草学{skill}が必要です。",
+        "farming": "バッグにある農耕鍬を振るうには農耕{skill}が必要です。"
       },
       "wieldUnmetCorpse": "最高の道具を使いこなすには採集スキル{skill}が必要です。",
       "toolTierUnmetCorpse": "最高の素材を回収するにはティア{tier}の採集道具が必要です。",
@@ -3072,18 +3084,21 @@ export const ja_JP: EnTranslations = {
           "mining": "採掘道具（ティア{tier}）",
           "logging": "伐採道具（ティア{tier}）",
           "herbalism": "薬草道具（ティア{tier}）",
-          "fishing": "釣り竿（ティア{tier}）"
+          "fishing": "釣り竿（ティア{tier}）",
+          "farming": "農耕道具（ティア{tier}）"
         },
         "unlocks": {
           "mining": "ティア{tier}までの鉱脈の採掘に必要です。",
           "logging": "ティア{tier}までの立木の伐採に必要です。",
           "herbalism": "ティア{tier}までの薬草の群生地の採取に必要です。",
-          "fishing": "ティア{tier}までの水域での釣りに必要です。"
+          "fishing": "ティア{tier}までの水域での釣りに必要です。",
+          "farming": "ティア{tier}までの作物の植え付けに必要です。"
         },
         "use": {
           "mining": "使用：近くの鉱脈を採掘する。",
           "logging": "使用：近くの立木を伐り倒す。",
-          "herbalism": "使用：近くの薬草の群生地から採取する。"
+          "herbalism": "使用：近くの薬草の群生地から採取する。",
+          "farming": "バッグに入れておけば、作物畑に植え付ける際に使われます。"
         },
         "speed": "ティア{tier}未満のノードでの採集が速くなります。",
         "rodRequired": "釣りに必要です。",
@@ -3092,6 +3107,7 @@ export const ja_JP: EnTranslations = {
         "rodBand": "釣りスキル{skill}以上でより豊かな釣果が解放されます。"
       },
       "downgradeMark": "バッグが満杯です：収穫は採集者の印なしで収納されました。",
+      "downgradeMarkCrop": "バッグが満杯です：収穫物は栽培者の銘なしで収納されました。",
       "downgradeFind": "バッグが満杯です：極上の獲物を逃してしまいました。",
       "emptyHookNote": "針には何もなし",
       "stateReady": "採集可能",
@@ -3099,6 +3115,83 @@ export const ja_JP: EnTranslations = {
       "stateCooldownTimed": "{time}後に再生",
       "respawnClock": "{minutes}:{seconds}",
       "fineGradePreview": "あなたの道具なら、ここの採取物は上質な等級になります。"
+    },
+    "farming": {
+      "plantLine": "{name}を植えた。",
+      "harvestLine": "{name}を収穫した。",
+      "harvestLineQty": "{name} x{qty}を収穫した。",
+      "harvestFineLine": "さらに{name}も収穫した。",
+      "harvestFineLineQty": "さらに{name} x{qty}も収穫した。",
+      "witheredLine": "作物が枯れた。畑を片づけた：{name}。",
+      "witheredLineQty": "作物が枯れた。畑を片づけた：{name} x{qty}。",
+      "seedBackLine": "種を回収した：{name}。",
+      "seedBackLineQty": "種を回収した：{name} x{qty}。",
+      "denied": {
+        "bad_bed": "そこに作物畑はありません。",
+        "bad_crop": "それはここには植えられません。",
+        "range": "その作物畑から離れすぎています。",
+        "bed_taken": "そこにはすでに作物が育っています。",
+        "skill": "その作物を育てるには農耕スキルが足りません。",
+        "no_seed": "その作物の種を持っていません。",
+        "not_ready": "その作物はまだ育っています。",
+        "no_plot": "その畑には何も植えられていません。",
+        "no_husks": "枯れた殻が足りません。",
+        "no_compost": "堆肥がありません。",
+        "no_fee_produce": "見張り料を払う作物がありません。",
+        "no_tonic": "成長トニックがありません。",
+        "tool": "その作物に合う農耕鍬を持っていません。",
+        "locked": "その支払いに使えるアイテムがロックされています。",
+        "no_farmer": "籾殻を堆肥と交換するには農夫のそばにいなければなりません。",
+        "no_feast": "広げられる宴の料理を持っていません。",
+        "feast_active": "あなたの宴はすでに広げられています。",
+        "feast_expired": "その宴はもうありません。",
+        "feast_finished": "その宴は食べ尽くされました。",
+        "feast_range": "その宴から離れすぎています。",
+        "feast_eaten": "その宴からはすでに食べました。"
+      },
+      "feastTitle": "{name}の収穫の宴",
+      "feastPlacedLine": "収穫の宴を広げた。",
+      "huskTrade": "籾殻を堆肥と交換する",
+      "huskTradeAria": "{name}と籾殻を堆肥と交換する",
+      "plantSheet": {
+        "title": "作物を植える",
+        "plant": "植える",
+        "sowAria": "{name}を蒔く",
+        "empty": "この畑に蒔ける種を持っていません。",
+        "close": "植え付けシートを閉じる"
+      },
+      "husksConvertedLine": "{husksName} x{husks}を{name}と交換した。",
+      "husksConvertedLineQty": "{husksName} x{husks}を{name} x{qty}と交換した。",
+      "readyLine": "作物が1区画、収穫できるようになった。",
+      "readyLineQty": "作物が{count}区画、収穫できるようになった。",
+      "readyWitheredLine": "作物が1区画、畑で枯れた。",
+      "readyWitheredLineQty": "作物が{count}区画、畑で枯れた。"
+    },
+    "harvestJournal": {
+      "title": "収穫日誌",
+      "close": "閉じる",
+      "listLabel": "作付け済みの作物畑",
+      "growing": "あと{time}で収穫可能",
+      "ready": "収穫可能",
+      "finishing": "まもなく完了",
+      "withered": "枯れた",
+      "readyAnnounce": "収穫可能: {name}",
+      "remainingDaysHours": "{days}日{hours}時間",
+      "remainingHoursMinutes": "{hours}時間{minutes}分",
+      "remainingMinutesSeconds": "{minutes}分{seconds}秒",
+      "remainingSeconds": "{seconds}秒",
+      "bedLine": "{zone}、作物畑{index}",
+      "bedLineUnknown": "不明な作物畑",
+      "careWatch": "農夫の見回り",
+      "careNone": "追加の手入れなし",
+      "stageSprout": "芽",
+      "stageSeedling": "苗",
+      "stageMaturing": "生育中",
+      "stageRipe": "熟した",
+      "emptyTitle": "作物がありません",
+      "emptyBody": "どの作物畑でも種をまけば、その畑が残り時間とともにここに並びます。",
+      "noviceTitle": "まだ作物畑を耕したことがありません",
+      "noviceBody": "作物を収穫するたびに農耕スキルが上がります。どの作物畑でもよいので、種をまいて始めましょう。"
     },
     "archetypeTitle": {
       "label": "称号",
@@ -3218,7 +3311,7 @@ export const ja_JP: EnTranslations = {
           "quickeningCharm": "発動した資源ノードの再生タイマーを短縮する。",
           "makersCharm": "充填中は採集ごとに産出+2。"
         },
-        "howToSlot": "専門技能ウィンドウから採掘・伐採・薬草学のツールに装着する。装着すると消費される。",
+        "howToSlot": "専門技能ウィンドウから採掘・伐採・薬草学・農耕のツールに装着する。装着すると消費される。",
         "charges": "コモン品質のツールでは{base}回の充填から始まる（レア度が1段階上がるごとに+{bonus}回）。",
         "landOnly": "釣り竿には装着できない。",
         "openProfessions": "専門技能ウィンドウを開き、採集ツールに装着しよう。"
@@ -3887,7 +3980,8 @@ export const ja_JP: EnTranslations = {
   "gatherEvent": {
     "pristineVein": "{finder}が純粋な鉱脈を掘り当てた！",
     "ancientHeartwood": "{finder}が太古の心木を切り倒した！",
-    "moonlitBloom": "{finder}が月光の花を発見した！"
+    "moonlitBloom": "{finder}が月光の花を発見した！",
+    "goldenHarvest": "{finder}が黄金の実りを刈り取った！"
   },
   "apiError": {
     "validation": {
@@ -4260,6 +4354,7 @@ export const ja_JP: EnTranslations = {
       "groupCamera": "カメラ",
       "talents": "タレント",
       "professions": "生産職",
+      "harvestJournal": "収穫日誌",
       "arena": "PvPウィンドウ（アリーナとソーンホロウ平原）",
       "leaderboard": "リーダーボード",
       "deeds": "功績の書",
@@ -5592,7 +5687,7 @@ export const ja_JP: EnTranslations = {
       "capFmt": "上限{cap}",
       "comingSoon": "レシピ未実装",
       "gatherHubHeading": "採集",
-      "gatherHubBody": "四つの採集職が製作に素材を供給します。採掘・伐採・薬草学の上限は100、釣りは200です。",
+      "gatherHubBody": "採集職が製作に素材を供給します。採掘・伐採・薬草学の上限は100、農耕は手入れした畑で種から作物を育て上限は同じく100、釣りは200です。",
       "archetypesHeading": "十の生き方",
       "archetypesBody": "隣り合う二つの職に調律すると対の称号を得ます。二つの主専攻は上限まで伸ばせ、反対側の一つは趣味としてレア段階まで残り、その他の職はコモン段階に留まります。",
       "pairFmt": "{a}と{b}",
@@ -5629,6 +5724,9 @@ export const ja_JP: EnTranslations = {
       "outputFmt": "{name}×{count}",
       "comboReq": "{a}と{b}が必要",
       "oncePerDay": "Once per day",
+      "effectFood": "食べると{seconds}秒かけて体力を{amount}回復する。",
+      "effectWellFed": "食べ終えると満腹: {stat}+{value}({minutes}分)。",
+      "effectWellFedAura": "食べ終えると{minutes}分間{aura}を得る。",
       "sourceTrainerFee": "訓練師、{fee}",
       "sourceTrainerFree": "訓練師、無料",
       "sourceKnown": "最初から習得済み",
@@ -5806,7 +5904,8 @@ export const ja_JP: EnTranslations = {
         "mining": "採掘は三つのゾーンの鉱脈から鉱石を掘り出し、鍛冶系の職に素材を供給します。銅鉱石はイーストブルック渓谷、鉄鉱石はマイアフェン湿地、オスミウム鉱石はソーンピーク高地から。レベル1から誰でも始められ、必要なのはバッグに入れた採掘ピッケルだけです。どのゾーンの拠点でも銅貨20枚で手に入ります。専用のカウンターで記録され、上限は100です。",
         "logging": "伐採は三つのゾーンの林から木材を切り出し、武器の柄や杖、そして工作の作業台の素材を供給します。鉄樹皮はイーストブルック渓谷、トネリコ材はマイアフェン湿地、高嶺松はソーンピーク高地から。レベル1から誰でも始められ、バッグに伐採斧（どのゾーンの拠点でも銅貨20枚）があれば伐り出せます。専用のカウンターで記録され、上限は100です。",
         "herbalism": "薬草学は三つのゾーンで薬草を摘み、調合系の職に素材を供給します。艶葉草はイーストブルック渓谷、金葉草はマイアフェン湿地、陽花草はソーンピーク高地に育ちます。レベル1から誰でも始められ、バッグに薬草鎌（どのゾーンの拠点でも銅貨20枚）があれば摘み取れます。専用のカウンターで記録され、上限は100です。",
-        "fishing": "釣りはアタリとリールの呼吸で各ゾーンの開けた水辺から獲物を釣り上げます。上限は200です。"
+        "fishing": "釣りはアタリとリールの呼吸で各ゾーンの開けた水辺から獲物を釣り上げます。上限は200です。",
+        "farming": "農耕は奪うのではなく世話をして育てる唯一の採集職です。手入れした畑に種をまけば、留守の間も作物は自分の時計で育ち、いつ戻っても実りを引き抜けます。畑にあるものは決して腐らないからです。Eastbrookの割当地からFenbridge、Highwatchを経てEvergardenの花壇まで、どの畑のそばにも農夫が立ち、EastbrookのFarmer Jessicaがこの職の入口です。彼女はGarden Hoeと最初の種を売り、その使いは新米農夫に最初の作物の育て方を教えてくれます。はしごの段ごとに固有の作物が一対ずつ実り、腕が上がれば上質な等級も採れ、最初の畑より手強い土地の鍬はエンジニアが作ります。熟練度は専用のカウンターで上限100まで数えられます。"
       },
       "rhythmHeading": "採集のリズム",
       "rhythmBody": "採集は目に見える詠唱です。基本{base}秒、最短{floor}秒で、道具がノードより1ティア高いごとに{tool}秒、熟練度バンドごとに{band}秒短くなります。",
@@ -5834,10 +5933,12 @@ export const ja_JP: EnTranslations = {
       "specimenBody": "死体の採集では署名入りの完璧な標本が見つかることもあります。死体採集の約{pct}%はレア以上を引き当てます。",
       "gatherDeedsHeading": "道すがらの功績",
       "gatherDeeds": {
-        "mining": "どの採集職でも最初の採取でFruits of the Fieldを、採掘100でOre in the Bloodを刻みます。採掘、伐採、薬草学、釣りのうち三つで100に達するとMaster Gatherer（名声25）。pristine veinを掘り当てれば専用の収集印も。功績は称号と名声のみで、力は与えません。",
-        "logging": "どの採集職でも最初の採取でFruits of the Fieldを、伐採100でHeartwood Hewerを刻みます。四採集職のうち三つで100に達するとMaster Gatherer（名声25）。ancient heartwoodを切り出せば専用の収集印も。功績は称号と名声のみで、力は与えません。",
-        "herbalism": "どの採集職でも最初の採取でFruits of the Fieldを、薬草学100でMaster of the Meadowを刻みます。四採集職のうち三つで100に達するとMaster Gatherer（名声25）。moonlit bloomを摘めば専用の収集印も。功績は称号と名声のみで、力は与えません。",
-        "fishing": "熟練100でOld Saltを、200でMaster Anglerとその称号を刻みます。釣り人の頂点です。釣りもMaster Gatherer（三職100）に数えられます。各地方の水域で最初の一匹を釣ればそれぞれのページが埋まり、日映えの錦鯉を釣ればGlimmer of Hopeが記されます。杖を荷物に忍ばせる旅人は、思いのほか早く功績の書を満たします。"
+        "mining": "どの採集職でも最初の採取でFruits of the Fieldを、採掘100でOre in the Bloodを刻みます。採集職のうち三つで100に達するとMaster Gatherer（名声25）。pristine veinを掘り当てれば専用の収集印も。功績は称号と名声のみで、力は与えません。",
+        "logging": "どの採集職でも最初の採取でFruits of the Fieldを、伐採100でHeartwood Hewerを刻みます。採集職のうち三つで100に達するとMaster Gatherer（名声25）。ancient heartwoodを切り出せば専用の収集印も。功績は称号と名声のみで、力は与えません。",
+        "herbalism": "どの採集職でも最初の採取でFruits of the Fieldを、薬草学100でMaster of the Meadowを刻みます。採集職のうち三つで100に達するとMaster Gatherer（名声25）。moonlit bloomを摘めば専用の収集印も。功績は称号と名声のみで、力は与えません。",
+        "fishing": "熟練100でOld Saltを、200でMaster Anglerとその称号を刻みます。釣り人の頂点です。釣りもMaster Gatherer（三職100）に数えられます。各地方の水域で最初の一匹を釣ればそれぞれのページが埋まり、日映えの錦鯉を釣ればGlimmer of Hopeが記されます。杖を荷物に忍ばせる旅人は、思いのほか早く功績の書を満たします。",
+        "farming": "農耕には専用の功績がまだありません。畑と作物が根付いた今、他の職を彩る到達と上限の功績は今後の更新で加わります。熟練はすでにMaster Gatherer（いずれか三職で100）に数えられるため、農夫もそのページを皆と同じように埋められます。功績は称号と名声だけを与え、力を与えることはありません。",
+        "farmingSown": "農耕は今、功績の書に自分の棚を持っています。Sow It Beginsは最初に植えた作物を記し、四つの年代記のページが、Eastbrook ValeからEvergardenまで、それぞれの畑の地での最初の実った収穫を記します。黄金の収穫は名声ゼロの収集印を自ら記し、農耕の熟練もMaster Gatherer（いずれか三職で100）に数えられます。頂の功績はすでに書かれています。Harvestmaster、この職の熟練100の称号は、後の更新が拓くより深い畑とともに手の届くところへ来ます。功績は称号と名声のみで、力は与えません。"
       },
       "fish": {
         "startHeading": "はじめかた",
@@ -5859,6 +5960,12 @@ export const ja_JP: EnTranslations = {
         "emptyHook": "アタリなし",
         "koiHeading": "日映えの錦鯉",
         "koiBody": "世界中のあらゆる水域に同じ大物が潜んでいます。日映えの錦鯉、良質のきらめく錦鯉で、商人に売れば75銅、誇りとしてはそれ以上の価値があります。確率は釣り上げごとに一律3%（Thornpeakの冷たい水では4%）でスキルに左右されず、桟橋の新人もMaster Anglerも同じ土俵です。釣り上げれば功績の書にGlimmer of Hope（名声ゼロの収集印）が記されます。"
+      },
+      "farm": {
+        "bedsHeading": "畑の手入れ",
+        "bedsBody": "手順は短いものです。畑のそばの農夫から種と堆肥を買います。EastbrookのJessicaは渓谷の二種、Fenbridgeの農夫は湿地の二種を置いていますが、HighwatchとEvergardenの種はどこの店にもありません。高い段の収穫から一つ二つ戻ってくるか、それ以外はWorld Marketで手に入れます。鍬を袋に入れて種をまき、望むなら勝ちの目を上げましょう。店の堆肥と、まくときに農作物で払う農夫の見回りはどちらも作物が無事に育つ確率を上げ、錬金術師の成長トニックは収穫が増える見込みを与え、熟練が作物の段より丸一帯上がれば、その作物はもう決して枯れません。あとは立ち去るだけです。ログアウト中も畑は育ち続け、熟した作物はいつまでも待っていて、収穫日誌（Shift+K、または専門技能ウィンドウの農耕の行）が植えた畑すべてをタイマーつきで一覧にします。\n\n枯れた作物は農作物の代わりに枯れた籾殻を残し、どの農夫でも籾殻を堆肥に換えてくれるので、悪い季節は次の季節の保険を買います。持ち帰ったものは厨房を支えます。農作物は厨房で料理になり、Cook Marlowの小麦と米の受注はVale WheatとMarsh Riceを、他のどの受注とも同じ時計で買い取ってくれます。",
+        "tableHeading": "畑から食卓へ",
+        "tableBody": "厨房は、一季の実りが報いに変わる場所です。日々の農家料理に加えて、作物の各段にはより豪華な一皿があり、食べれば満腹が残ります。食事を終えると長持ちする恵みが身に残り、ダンジョンの扉の前でパーティーが先に済ませておきたい一手です。締めくくりはHarvest Feast。料理人が世界そのものに広げるごちそうで、居合わせた皆が一人前ずつ、一人一度だけ取り分け、食べ終えた食事はどれも同じ満腹の恵みを支払います。一人の農夫の一季が、パーティー全員の食卓を整えるのです。その梯子の頂、最も豪華な二皿とごちそうそのものは、後の更新が拓くより深い畑とともに手の届くところへ来ます。それより下は今日すでに火にかかっています。\n\nその食卓には運の席もあります。持ち帰るどの収穫も、他の採集職と同じ思わぬ実りの機会を転がし、時おり作物が黄金に実ります。実りは並の収穫をはるかに超え、地方全体がその発見をあなたの名とともに耳にし、Golden Harvestが功績の書に記されます。"
       },
       "econ": {
         "title": "製作経済",
@@ -5882,7 +5989,7 @@ export const ja_JP: EnTranslations = {
         "marketHeading": "世界市場と手数料",
         "marketBody": "世界市場はレルム全体の取引所で、EastbrookのMerchantとHighwatchのAuctioneer Vossが取り仕切ります。出品は無料。保証金はなく、売れ残りはそのまま戻ります。手数料は成立時のみ、売値の5%です。特別な品も歓迎です。署名入り、傑作、エンチャント済みの品は一品ずつの単品出品となり、ツールチップに署名まで含めた素性がそのまま表示され、無印の山と混ざることはありません。唯一の拒否はバインドされた品です。作り手の絆で縛られた、またはこれから縛られる品は市場にも郵便にも出せず、絆を洗い流すことはできません。特別な品の値付けは自分で。無印の出品が教えてくれるのは無印の相場だけです。",
         "workOrdersHeading": "作業依頼",
-        "workOrdersNote": "各師匠は自分の定番素材の束を店売り価格の{pct}%で買い取り、{minutes}分ごとに繰り返せます。",
+        "workOrdersNote": "各師匠は定番素材ごとに受注を出しており、求められた束を店売り価格の{pct}%で買い取ります。受注ごとに{minutes}分の時計が別々に回り、納品した受注だけが閉じ、同じ師匠の他の受注は開いたままです。",
         "colOrder": "作業依頼",
         "colMaster": "師匠",
         "colAsks": "要求",
@@ -8182,6 +8289,7 @@ export const ja_JP: EnTranslations = {
         "cooldownLockedHerb": "枯渇した薬草、道具未解放",
         "station": "製作設備：{name}",
         "service": "施設：{name}",
+        "farmPatch": "菜園",
         "partyMember": "パーティメンバー：{name}",
         "deadPartyMember": "死亡したパーティメンバー：{name}",
         "partyMemberGeneric": "パーティメンバー",
@@ -8865,6 +8973,7 @@ export const ja_JP: EnTranslations = {
     },
     "cast": {
       "fishing": "釣り",
+      "farming": "種まき",
       "gathering": "採集",
       "crafting": "製作",
       "disenchanting": "分解",
@@ -9050,6 +9159,11 @@ export const ja_JP: EnTranslations = {
       "flaskThroughDeath": "この効果は死亡しても残りますが、ログアウトすると失われます。インスタンスマッチは開始時も終了時も白紙の状態になります。",
       "wellFed": "満腹：食べ終えると{stat}が {value} 上昇し、{minutes} 分間持続します。満腹の効果は同時に一つだけで、新しい食事が古いものを置き換えます。",
       "wellFedAura": "満腹：食べ終えると{aura}を得て、{minutes} 分間持続します。満腹の効果は同時に一つだけで、新しい食事が古いものを置き換えます。",
+      "useWellfed": "食べ終えると{aura}の効果を得て、{stat}が{value}上昇し、{minutes}分間持続します。",
+      "useWellfedAura": "食べ終えると{aura}の効果を得て、{minutes}分間持続します。",
+      "useFeast": "使用: 他のプレイヤーも食べられる宴を広げる。1人1食まで（{servings}人前、{minutes}分間持続）。",
+      "useFeastBuff": "1人前につき、{seconds}秒の食事を終えると{aura}の効果を得て、{stat}が{value}上昇し、{minutes}分間持続します。",
+      "useFeastBuffAura": "1人前につき、{seconds}秒の食事を終えると{aura}の効果を得て、{minutes}分間持続します。",
       "questItem": "クエストアイテム",
       "questRelated": "クエスト：{quest}",
       "questRules": "売却、銀行預け入れ、取引はできません。",
@@ -9072,6 +9186,7 @@ export const ja_JP: EnTranslations = {
       "useManaPotion": "使用: 即座にマナを{amount}回復します。戦闘中に使用可能。クールダウン1分。",
       "clickUseInstant": "クリックして戦闘中に即使用",
       "clickUse": "クリックして使用",
+      "clickSetOut": "クリックして設置",
       "clickBuyback": "クリックして買い戻す",
       "bagSlots": "{slots}スロットのバッグ"
     },
@@ -12737,6 +12852,138 @@ export const ja_JP: EnTranslations = {
       "pattern_laden_hearth": {
         "name": "レシピ：豊穣の炉"
       },
+      "vale_wheat_seed": {
+        "name": "渓谷小麦の種"
+      },
+      "vale_wheat": {
+        "name": "渓谷小麦"
+      },
+      "fine_vale_wheat": {
+        "name": "上質な渓谷小麦"
+      },
+      "withered_husks": {
+        "name": "枯れた籾殻"
+      },
+      "compost": {
+        "name": "堆肥"
+      },
+      "growth_tonic": {
+        "name": "成長トニック"
+      },
+      "brook_carrot_seed": {
+        "name": "小川ニンジンの種"
+      },
+      "brook_carrot": {
+        "name": "小川ニンジン"
+      },
+      "fine_brook_carrot": {
+        "name": "上質な小川ニンジン"
+      },
+      "marsh_rice_seed": {
+        "name": "湿原米の種"
+      },
+      "marsh_rice": {
+        "name": "湿原米"
+      },
+      "fine_marsh_rice": {
+        "name": "上質な湿原米"
+      },
+      "bog_beet_seed": {
+        "name": "沼地ビートの種"
+      },
+      "bog_beet": {
+        "name": "沼地ビート"
+      },
+      "fine_bog_beet": {
+        "name": "上質な沼地ビート"
+      },
+      "highland_barley_seed": {
+        "name": "高地大麦の種"
+      },
+      "highland_barley": {
+        "name": "高地大麦"
+      },
+      "fine_highland_barley": {
+        "name": "上質な高地大麦"
+      },
+      "frost_gourd_seed": {
+        "name": "霜瓜の種"
+      },
+      "frost_gourd": {
+        "name": "霜瓜"
+      },
+      "fine_frost_gourd": {
+        "name": "上質な霜瓜"
+      },
+      "gilded_sunmelon_seed": {
+        "name": "黄金の太陽メロンの種"
+      },
+      "gilded_sunmelon": {
+        "name": "黄金の太陽メロン"
+      },
+      "fine_gilded_sunmelon": {
+        "name": "上質な黄金の太陽メロン"
+      },
+      "evergarden_greens_seed": {
+        "name": "エバーガーデン青菜の種"
+      },
+      "evergarden_greens": {
+        "name": "エバーガーデン青菜"
+      },
+      "fine_evergarden_greens": {
+        "name": "上質なエバーガーデン青菜"
+      },
+      "garden_hoe": {
+        "name": "菜園の鍬"
+      },
+      "bronze_hoe": {
+        "name": "青銅の鍬"
+      },
+      "skysilver_hoe": {
+        "name": "スカイシルバーの鍬"
+      },
+      "osmium_hoe": {
+        "name": "オスミウムの鍬"
+      },
+      "vale_hearth_loaf": {
+        "name": "渓谷の炉焼きパン"
+      },
+      "eastbrook_root_pottage": {
+        "name": "イーストブルックの根菜ポタージュ"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "フェンブリッジの炊き込みご飯"
+      },
+      "fenbridge_beet_braise": {
+        "name": "フェンブリッジのビート煮込み"
+      },
+      "highwatch_barley_bannock": {
+        "name": "ハイウォッチの大麦平焼きパン"
+      },
+      "highwatch_gourd_soup": {
+        "name": "ハイウォッチの霜瓜スープ"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "エバーガーデンの太陽メロンタルト"
+      },
+      "evergarden_harvest_platter": {
+        "name": "エバーガーデンの収穫プレート"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "イーストブルックの人参グラッセ"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "フェンブリッジのライスプディング"
+      },
+      "highwatch_barley_porridge": {
+        "name": "ハイウォッチの大麦粥"
+      },
+      "evergarden_braised_greens": {
+        "name": "エバーガーデンの青菜煮込み"
+      },
+      "harvest_feast": {
+        "name": "収穫の宴"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
@@ -14676,6 +14923,26 @@ export const ja_JP: EnTranslations = {
         "title": "薬房の主",
         "greeting": "二度量って一度で注ぐ、{className}。薬房ではこぼした試薬に容赦はしない。"
       },
+      "farmer_jessica": {
+        "name": "農婦ジェシカ",
+        "title": "菜園の管理人",
+        "greeting": "良い土と良い天気を、{playerName}。私から種を買って、そこの畑のどれかに蒔いたら、あとは好きに過ごしなさい。留守の間も育ち続けるし、腐ることはない。収穫日誌（Shift+K、または専門技能ウィンドウの農耕の行）に、植えた畑と残り時間がすべて載っている。"
+      },
+      "farmer_teasel": {
+        "name": "農夫ティーゼル",
+        "title": "湿地の水田農夫",
+        "greeting": "湿原米と沼地ビートの種、それに肥やしの堆肥だ、{className}。水田は水はけが悪い、足元に気をつけな。"
+      },
+      "farmer_hollis": {
+        "name": "農夫ホリス",
+        "title": "ハイウォッチの段々畑農夫",
+        "greeting": "段々畑は山が許すぶんだけ実る、{className}。堆肥を売っているし、あんたの作物が枯れて上がってきたら、その籾殻を良い土に戻してやろう。"
+      },
+      "farmer_verbena": {
+        "name": "農婦ヴァーベナ",
+        "title": "パルテールの庭師",
+        "greeting": "縁取りに気をつけて、{playerName}、この畑はパルテールの誇りなんだから。売っているのは堆肥、それと持ってきた枯れた籾殻はどれも堆肥に変えてあげる。"
+      },
       "tidewatcher_ondrel": {
         "name": "オンドレル・ヴェイン",
         "title": "潮見の番人",
@@ -14690,6 +14957,19 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "鉱脈を採掘"
+          }
+        }
+      },
+      "q_farm_intro": {
+        "title": "最初の畝",
+        "text": "この鍬と渓谷小麦の種をひとつまみ持っていきなさい、{playerName}。私のそばの畑のどれかに種を蒔いて、あとは自分の用事を済ませておいで。いつでも好きな時に戻って作物を収穫すればいい。私はここにいるから。",
+        "completion": "ほら、初めての作物が自分の手の中に。留守の間も育ち続けるし、腐ることはない。収穫日誌（Shift+K、または専門技能ウィンドウの農耕の行）に、植えた畑と残り時間がすべて載っている。畑に呼ばれたら、いつでも種を買いにおいで、{playerName}。",
+        "objectives": {
+          "0": {
+            "label": "渓谷小麦を植えた"
+          },
+          "1": {
+            "label": "渓谷小麦を収穫した"
           }
         }
       },
@@ -15586,6 +15866,26 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "野獣の肉を納品"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_wheat": {
+        "title": "厨房の小麦受注",
+        "text": "パンは勝手に焼けてくれやしない、{playerName}。うちの粉櫃は底が見えてきた。渓谷小麦を八束持ってきてくれれば、まとめて正当な貨幣を払う。自分の手で育てたものでも市場で買ったものでも構わん、挽けるなら文句はない。",
+        "completion": "よく乾いた粒だ、量もたっぷりある。これがお前の報酬だ、きっちり数えてある。次の収穫が上がったら、どの戸を叩けばいいか分かってるな。",
+        "objectives": {
+          "0": {
+            "label": "渓谷小麦を納品"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_rice": {
+        "title": "厨房の米受注",
+        "text": "湿地の連中は自分たちの米を自慢してやまない、{playerName}。その理由を確かめてやるつもりだ。湿原米を五升持ってきてくれれば、ここに貨幣を用意しておく。道中は濡らすなよ。濡れた米は粥だ、俺は粥を頼んだ覚えはない。",
+        "completion": "ふっくらして乾いている、どの粒もな。これがお前の貨幣だ。湿地が実らせ続ける限り、俺も払い続ける。",
+        "objectives": {
+          "0": {
+            "label": "湿原米を納品"
           }
         }
       },
@@ -17550,6 +17850,7 @@ export const ja_JP: EnTranslations = {
     "delveRiteShrineReedInteract": "葦の祠：Fで触れる",
     "delveRiteShrineSkullInteract": "髑髏の祠：Fで触れる",
     "mailboxName": "メールボックス",
-    "noticeboardName": "掲示板"
+    "noticeboardName": "掲示板",
+    "farmPatchName": "菜園"
   }
 };

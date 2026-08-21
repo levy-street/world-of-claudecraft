@@ -38,6 +38,7 @@
 
 import { ENCHANTS, type EnchantDef } from '../sim/content/enchants';
 import { ITEMS } from '../sim/data';
+import { countRawInSlots } from '../sim/item_lock';
 import { isEnchantedInstance, replaceVictimIndex } from '../sim/professions/enchanting';
 import {
   ALL_EQUIP_SLOTS,
@@ -77,15 +78,6 @@ export const HEROIC_TAG_KEY: TranslationKey = 'hudChrome.itemHeroicTag';
 function isHeroicItem(itemId: string): boolean {
   const def = ITEMS[itemId];
   return def?.heroicOf !== undefined || def?.heroic === true;
-}
-
-/** Total held count of an item id across every stack (fungible + instanced).
- *  Enchant reagents are plain materials, so this mirrors the sim's ctx.countItem
- *  the apply command checks each reagent against. */
-function heldCount(inventory: readonly InvSlot[], itemId: string): number {
-  let n = 0;
-  for (const slot of inventory) if (slot.itemId === itemId) n += slot.count;
-  return n;
 }
 
 export interface EnchantReagentRow {
@@ -210,7 +202,7 @@ export function enchantsForReagent(
     const reagents = enchant.reagents.map((reagent) => ({
       itemId: reagent.itemId,
       required: reagent.count,
-      have: heldCount(inventory, reagent.itemId),
+      have: countRawInSlots(inventory, reagent.itemId),
     }));
     const effects: EnchantEffectRow[] = [];
     for (const [stat, value] of Object.entries(enchant.statBonus)) {

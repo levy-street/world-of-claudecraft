@@ -14,6 +14,7 @@ import { buildGatherNodeTooltip } from '../../gathering_view';
 import { formatNumber, t } from '../../i18n';
 import { type MapGatherTipMemo, resolveGatherTipMemo } from '../../map_gather_tip_memo';
 import type {
+  MapFarmPatchMarker,
   MapGatherNodeMarker,
   MapNpcMarker,
   MapServiceMarker,
@@ -80,6 +81,13 @@ export class MapMarkerTooltipContent {
     const key =
       marker.kind === 'mailbox' ? 'worldContent.mailboxName' : 'worldContent.noticeboardName';
     return `<div class="tt-title">${esc(t(key))}</div>`;
+  }
+
+  // Every farming patch is the same kind of place, one per farming hub, so the
+  // pin needs no per-site name: the zone map is already zone-scoped, which is
+  // what tells the four sites apart. Same shape as service() above.
+  farm(_marker: MapFarmPatchMarker): string {
+    return `<div class="tt-title">${esc(t('worldContent.farmPatchName'))}</div>`;
   }
 
   navigation(text: string): string {

@@ -209,6 +209,26 @@ the root `CLAUDE.md` content rule points here.
 - **`pvp_vcup_bet_flex`**: cut; no betting-adjacent deeds ship, even at 0
   Renown.
 
+### A recorded dormancy-window waiver (shipped, not deferred)
+
+- **`prog_farming_100` (the Harvestmaster title)** shipped with the farming
+  celebrations phase per the farming program's locked D13 scope
+  (`docs/farming/state.md`) while the tier 3/4 seed bootstrap ruling
+  (state.md (bo)/D11) is still open, so the deed is temporarily unearnable:
+  farming teaching grays at the tier-2 ceiling of 75 until a tier 3 seed
+  exists. This is a deliberate, program-scoped exception to the "never ship
+  a deed no site can satisfy" line in the recipe above (contrast
+  `prog_ringwright`, which stayed out), bounded two ways: the self-clearing
+  honesty arm in `tests/deeds_content.test.ts` reds when any purchase
+  surface stocks a tier 3/4 seed, and the deed's own row comment states the
+  dependency. The D11 faucet phase closes the window; nothing here needs a
+  retro-edit when it does. Until then, Book completion and the catalog's
+  full Renown are capped one deed short for every player, which transitively
+  parks `feat_book_complete` too (`BOOK_COMPLETE_REQUIREMENTS` derives over
+  every non-feat non-hidden deed, so the dormant capstone joins it
+  automatically): TWO deeds sit dormant for the window, a consequence the
+  program accepts.
+
 The reviewed design blocks for all of these live in the deed catalog's
 authoring history; a deferred deed stays out of `DEED_ORDER` and off Steam
 until its blocker actually lands.

@@ -36,6 +36,8 @@ export interface BagItemInfo {
   soulbound?: boolean;
   /** The catalog mount a kind:'mount' reins item owns (see MountItemDef). */
   mount?: string;
+  /** The placeable shared feast payload (ItemDef.feast, Farming Phase 12). */
+  feast?: { charges: number; durationTicks: number; dishItemId: string };
 }
 
 /** The open-window modes that change what a bag click does. At most one is the
@@ -93,6 +95,7 @@ export type BagAction =
   | 'petFeedBlocked'
   | 'discardQuest'
   | 'equipBag'
+  | 'placeFeast'
   | 'use';
 
 /** The tooltip hint sub-line i18n key for a bag item (or '' for no hint). */
@@ -114,6 +117,9 @@ export type BagTooltipHintKey =
   | 'itemUi.tooltip.clickConsume'
   | 'itemUi.tooltip.clickUseInstant'
   | 'itemUi.tooltip.clickUse'
+  // The placeable feast: the click SETS IT OUT at your feet (placeFeast),
+  // it never eats it, so the generic "Click to use" undersold the action.
+  | 'itemUi.tooltip.clickSetOut'
   // Tool-effect charms are not bag-usable: the sim refuses useItem with the
   // "Open Professions to slot that" line, so the hover must not advertise
   // "Click to use" for a click that only errors.
@@ -185,6 +191,13 @@ export function bagItemAction(
   // not discarded; only inert quest items fall through to the discard prompt.
   if (item.kind === 'quest') return item.use ? 'use' : 'discardQuest';
   if (item.kind === 'bag') return 'equipBag';
+  // A placeable feast (ItemDef.feast, Farming Phase 12) routes to the
+  // dedicated place verb instead of plain useItem, the mount-classification
+  // pattern: this pure core decides off the def, bags_window dispatches
+  // world.placeFeast(). Sits below every window mode above (a vendor click
+  // still sells it) and cannot overlap the quest/bag arms (the feast item is
+  // kind 'junk'); the sim owns every outcome, refusals included.
+  if (item.feast) return 'placeFeast';
   // A collected reins item falls through to 'use' like any other usable item:
   // clicking it summons that mount (sim useItem -> summonMountItem). There is no
   // picker to open any more.
@@ -403,6 +416,12 @@ export function bagTooltipHintKey(
   if (isToolEffectBagUse(item.use)) {
     return 'hudChrome.professions.toolEffectTooltip.openProfessions';
   }
+  // The placeable feast: the hover previews the click the action ladder
+  // raises (placeFeast), in the feast's own words: the click sets the table
+  // out at your feet, it never eats it, so the generic use hint undersold
+  // the action (the P12 QA deferral this key discharges). Sits ABOVE the
+  // generic use hint because the feast is placed and never eaten.
+  if (item.kind === 'junk' && item.feast) return 'itemUi.tooltip.clickSetOut';
   // Patterns are usable but carry no `use` payload (the kind IS the payload),
   // so the kind joins this arm to reach the shared use hint; without it the
   // hover stayed silent about a click that learns a recipe.

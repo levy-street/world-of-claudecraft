@@ -10,13 +10,14 @@
 // entities helpers live in run_scenarios.ts.
 
 import { describe, expect, it } from 'vitest';
-import { MOBS } from '../../src/sim/data';
+import { ITEMS, MOBS } from '../../src/sim/data';
 import { RIFT_IMPAIRED_FUSE_CAP } from '../../src/sim/mob/rift_escape_window';
+import { resolveFarmHarvest } from '../../src/sim/professions/farming';
 import { RIFT_COIN_BONUS_A, RIFT_PATTERN_ITEM_IDS } from '../../src/sim/rift/progression';
 import { RIFT_S_ZONE_TEMPO } from '../../src/sim/rift/ranks';
 import { record } from './record';
 import { type Ev, entities, run } from './run_scenarios';
-import { SCENARIOS } from './scenarios';
+import { FARM_GOLDEN_WIN_YIELD_SEED, FARM_TONIC_WINNER_YIELD_SEED, SCENARIOS } from './scenarios';
 
 describe('coverage: each scenario fires its subsystem', () => {
   it('mob_lifecycle: frenzy + death-throes arm/detonate + wild respawn (despawn adds) + dungeon stays dead', () => {
@@ -615,6 +616,354 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(slot.maxDurability).toBe(30);
     expect(slot.durability).toBeLessThan(slot.maxDurability);
     expect(slot.durability).toBe(29);
+  });
+
+  it('farming_session: plants draw two each, every harvest one golden roll, the tier-3 one the seed-back too', () => {
+    const { trace, rec } = record(SCENARIOS.find((s) => s.name === 'farming_session')!);
+    const ev = rec.allEvents as Ev[];
+    const pid = (rec.sim as any).playerId as number;
+    const meta = (rec.sim as any).players.get(pid);
+
+    // All five plants landed, in drive order, and each started the flavor
+    // cast. The second one is the load-bearing half of the busy gate (it only
+    // lands because the drive waits out the first cast); the third is the
+    // knobbed plant on the freed bed; the fourth is the tier-3 barley at the
+    // Thornpeak patch; the fifth is the Phase 8 ready-notice beat back on the
+    // freed northern bed.
+    expect(ev.filter((e) => e.type === 'farmPlanted').map((e) => e.bedId)).toEqual([
+      'bed_eastbrook_1',
+      'bed_eastbrook_2',
+      'bed_eastbrook_1',
+      'bed_thornpeak_1',
+      'bed_eastbrook_1',
+      // The Phase 11 (bw) extension: 28 padding cycles on the southern bed,
+      // the golden-WIN plant on the northern bed, one more padding cycle,
+      // then the paying-band barley at Thornpeak (see the drive's probe
+      // comment for why the padding walks the stream).
+      ...Array.from({ length: 28 }, () => 'bed_eastbrook_2'),
+      'bed_eastbrook_1',
+      'bed_eastbrook_2',
+      'bed_thornpeak_1',
+    ]);
+    expect(
+      ev.filter((e) => e.type === 'castStart' && e.ability === 'farming'),
+      'every plant started the FARMING_CAST_ID flavor cast',
+    ).toHaveLength(36);
+
+    // THE READY NOTICE (Phase 8): the fifth plant is left standing across two
+    // 1 Hz boundaries, so the sweep fires EXACTLY once for it: a second event
+    // here means the notified flip stopped silencing the sweep, and zero
+    // means the sweep stopped observing ready plots at all. Counts only, no
+    // withered field on an all-survived notice.
+    expect(ev.filter((e) => e.type === 'farmReady')).toEqual([
+      { type: 'farmReady', pid, ready: 1 },
+    ]);
+
+    // THE DRAW LEDGER, the point of this scenario. rng.draws is cumulative
+    // from drive start: two draws per plant (the contiguous survival + yield
+    // seed pre-roll), EXACTLY one golden-harvest roll at EVERY harvest
+    // (both outcomes, the celebrations phase), plus the seed-back roll at
+    // the tier-3 harvest (so harvested-t3 sits at planted-t3 + 2, the
+    // contiguous pair), and NOTHING anywhere else. Growth windows and the
+    // husk trade sit at the count of the beat before them; the two tier-1
+    // opening harvests land together in the harvested frame at +2 (one
+    // golden roll each, survived and withered alike).
+    const drawsAt = (label: string): number => {
+      const frame = trace.frames.find((f) => f.label === label);
+      expect(frame, `missing the ${label} checkpoint frame`).toBeTruthy();
+      return frame?.rng.draws ?? -1;
+    };
+    expect(drawsAt('planted-first')).toBe(2);
+    expect(drawsAt('planted')).toBe(4);
+    expect(drawsAt('grown')).toBe(4);
+    expect(drawsAt('harvested')).toBe(6);
+    expect(drawsAt('planted-knobbed')).toBe(8);
+    expect(drawsAt('harvested-toniced')).toBe(9);
+    expect(drawsAt('husks-converted')).toBe(9);
+    expect(drawsAt('planted-t3')).toBe(11);
+    expect(drawsAt('harvested-t3')).toBe(13);
+    // The Phase 8 ready-notice beat: its plant pre-rolls two more, then
+    // NOTHING draws through the sweep that emits the notice or the sampled
+    // notified flag, and the closing tier-1 harvest spends exactly its one
+    // golden roll.
+    expect(drawsAt('ready-noticed')).toBe(15);
+    expect(drawsAt('harvested-noticed')).toBe(16);
+    // The Phase 11 (bw) extension: 28 padding cycles (three draws each) plus
+    // the win plant put the golden-WIN harvest's one roll at draw 103, the
+    // final padding cycle plus the barley plant put the paying seed-back
+    // pair at 109 and 110. The padding arithmetic is the probe comment in
+    // the drive; these literals are what pin it.
+    expect(drawsAt('planted-golden')).toBe(102);
+    expect(drawsAt('harvested-golden-win')).toBe(103);
+    expect(drawsAt('planted-t3-paying')).toBe(108);
+    expect(drawsAt('harvested-t3-paying')).toBe(110);
+    // THE PHASE 12 BEAT-P FRAMES: the dish's tick-phase mint and the whole
+    // feast loop (place, bite, mint, expire) draw NOTHING: the ledger closes
+    // at 110 with every appended frame flat (the recorded truth of the
+    // re-recorded golden).
+    expect(drawsAt('wellfed-eating')).toBe(110);
+    expect(drawsAt('wellfed-dish-minted')).toBe(110);
+    expect(drawsAt('feast-placed')).toBe(110);
+    expect(drawsAt('feast-bitten')).toBe(110);
+    expect(drawsAt('feast-wellfed-minted')).toBe(110);
+    expect(drawsAt('feast-expired')).toBe(110);
+    expect(trace.draws).toBe(110);
+
+    // The knobbed plant really stored all three paid flags (farmPlanted is
+    // knob-free on the wire, so the drive stashes the stored plot's flags).
+    expect(rec.notes.knobbedFlags).toEqual({ compost: true, watch: true, tonic: true });
+
+    // The first survived plot paid produce expanded from its stored yield
+    // seed: the guaranteed three-pick floor, with no pick upgrading at
+    // proficiency 0 (the fine chance there is 0.02), so BOTH fine fields stay
+    // absent and the common harvest keeps the pre-field wire shape. No
+    // seedBackCount either: tier 1 never rolls (the omit-zero doctrine).
+    const harvested = ev.filter((e) => e.type === 'farmHarvested');
+    expect(harvested).toHaveLength(6);
+    // The Phase 8 closing harvest: skill sits at 75-and-change by now, and
+    // its yieldSeed now mints two stream positions later (the golden rolls
+    // upstream re-seated every later mint), so the expansion pays 3 (the
+    // recorded truth of the re-recorded golden, a literal for the drawsAt
+    // reason above) with no fine or seed-back fields on a tier-1 crop. Its
+    // own golden roll (draw 16, 0.515190) loses, so no multiplier.
+    expect(harvested[3]).toEqual({
+      type: 'farmHarvested',
+      pid,
+      bedId: 'bed_eastbrook_1',
+      cropId: 'vale_wheat',
+      itemId: 'vale_wheat',
+      count: 3,
+    });
+    expect('fineItemId' in harvested[3]).toBe(false);
+    expect('seedBackCount' in harvested[3]).toBe(false);
+    expect(harvested[0].bedId).toBe('bed_eastbrook_1');
+    expect(harvested[0].itemId).toBe('vale_wheat');
+    expect(harvested[0].count).toBe(3);
+    expect('fineItemId' in harvested[0]).toBe(false);
+    expect('fineCount' in harvested[0]).toBe(false);
+    expect('seedBackCount' in harvested[0]).toBe(false);
+
+    // The plot forced to fail paid husks INSTEAD of produce, and said so with
+    // its own event rather than a quiet empty harvest. Tier 1: no seed-back
+    // field on the withered arm either.
+    const withered = ev.filter((e) => e.type === 'farmWithered');
+    // One from the original forced-fail beat, 29 from the Phase 11 padding
+    // cycles (all on the southern bed at the written skill-0 window, each
+    // paying the same two-husk batch, none carrying a seed-back field).
+    expect(withered).toHaveLength(30);
+    expect(withered[0].bedId).toBe('bed_eastbrook_2');
+    expect(withered[0].count).toBe(2);
+    expect('seedBackCount' in withered[0]).toBe(false);
+    for (const w of withered.slice(1)) {
+      expect(w.bedId).toBe('bed_eastbrook_2');
+      expect(w.count).toBe(2);
+      expect('seedBackCount' in w).toBe(false);
+    }
+
+    // The toniced harvest, on the probed WINNING yieldSeed the drive wrote
+    // (the M8 lesson: at a losing seed both expansions coincide and this
+    // beat proves nothing). The in-arm non-vacuity guard is the first
+    // assertion: the toniced expansion of that seed really exceeds the
+    // unarmed one at the harvest-time skill of 1 (the first harvest's +1
+    // gain had drained by then).
+    const toniced = resolveFarmHarvest(FARM_TONIC_WINNER_YIELD_SEED, 1, true);
+    const unarmed = resolveFarmHarvest(FARM_TONIC_WINNER_YIELD_SEED, 1, false);
+    expect(toniced.count).toBeGreaterThan(unarmed.count);
+    expect(toniced.fine).toBe(0); // the probe chose a fine-free winner
+    expect(harvested[1].bedId).toBe('bed_eastbrook_1');
+    expect(harvested[1].itemId).toBe('vale_wheat');
+    expect(harvested[1].count).toBe(toniced.count);
+    expect('fineItemId' in harvested[1]).toBe(false);
+    expect('seedBackCount' in harvested[1]).toBe(false);
+
+    // The husk trade: the withered beat paid exactly 2 husks, one batch, so
+    // one call converts them into exactly one compost.
+    const convertedEv = ev.filter((e) => e.type === 'farmHusksConverted');
+    expect(convertedEv).toHaveLength(1);
+    expect(convertedEv[0].husks).toBe(2);
+    expect(convertedEv[0].compost).toBe(1);
+
+    // The tier-3 harvest. The band is pinned as a LITERAL, the drawsAt style
+    // above: seedBackCount 0 (the zero band, so the field is OMITTED) is the
+    // recorded truth of the re-recorded farming_session golden, and it moves
+    // only with a deliberate re-record, never silently. The golden rolls
+    // upstream re-seated the seed-back roll from the old draw 9 (0.297173,
+    // the one-seed band) to draw 12 (0.981881, the zero band): the
+    // celebrations phase's expected ledger shift, not a band retune. The bag
+    // consistency arm stays: the event's count must equal the
+    // highland_barley_seed bag delta (the drive granted 1 seed and the plant
+    // spent it, so the final bag IS the seed-back), and the base/fine grants
+    // must match their bags the same way.
+    const countOf = (itemId: string): number =>
+      meta.inventory
+        .filter((s: any) => s.itemId === itemId)
+        .reduce((n: number, s: any) => n + (s.count ?? 1), 0);
+    const barleyEv = harvested[2];
+    expect(barleyEv.bedId).toBe('bed_thornpeak_1');
+    expect(barleyEv.cropId).toBe('highland_barley');
+    const seedBack = (barleyEv.seedBackCount as number | undefined) ?? 0;
+    expect(seedBack).toBe(0);
+    expect('seedBackCount' in barleyEv).toBe(false); // omit-zero doctrine
+
+    // THE PHASE 11 (bw) BEATS, in the same drawsAt-literal style: the golden
+    // WIN and the PAYING seed-back band are the recorded truth of the
+    // re-recorded golden and move only with a deliberate re-record.
+    const goldenEv = harvested[4];
+    const barleyPayingEv = harvested[5];
+    // The WIN: the five-fold applies to BOTH grades of the probed
+    // both-grades yield seed (the in-arm non-vacuity guard first, the M8
+    // rule: the unfolded expansion really is nonzero in base AND fine, so
+    // the x5 below cannot be five times zero on either grade).
+    const goldenExpansion = resolveFarmHarvest(FARM_GOLDEN_WIN_YIELD_SEED, 75);
+    expect(goldenExpansion.count).toBeGreaterThan(0);
+    expect(goldenExpansion.fine).toBeGreaterThan(0);
+    expect(goldenEv).toEqual({
+      type: 'farmHarvested',
+      pid,
+      bedId: 'bed_eastbrook_1',
+      cropId: 'vale_wheat',
+      itemId: 'vale_wheat',
+      count: goldenExpansion.count * 5,
+      fineItemId: 'fine_vale_wheat',
+      fineCount: goldenExpansion.fine * 5,
+    });
+    // The announce fanout: exactly ONE gatherRareEvent (one player in zone),
+    // the crop source naming the base grant, and the finder's visit mark
+    // written while the reliquary field-note stays the ledgered no-op.
+    const rare = ev.filter((e) => e.type === 'gatherRareEvent');
+    expect(rare).toHaveLength(1);
+    expect(rare[0]).toEqual({
+      type: 'gatherRareEvent',
+      pid,
+      flavor: 'golden_harvest',
+      finderName: 'Adventurer',
+      finderPid: pid,
+      zoneId: 'eastbrook_vale',
+      nodeType: 'crop',
+      itemId: 'vale_wheat',
+    });
+    expect(meta.deedStats.visited.has('gather_event:golden_harvest')).toBe(true);
+    expect(meta.reliquary.marks.has('gather_event:golden_harvest')).toBe(false);
+    // THE PAYING BAND: seedBackCount PRESENT at exactly one (the one-seed
+    // band, 0.08 <= 0.155753 < 0.4), the upgrade from the zero-band beat
+    // above whose grant proof degraded to 0 === 0.
+    expect(barleyPayingEv.bedId).toBe('bed_thornpeak_1');
+    expect(barleyPayingEv.cropId).toBe('highland_barley');
+    expect(barleyPayingEv.seedBackCount).toBe(1);
+
+    // Bag consistency across BOTH tier-3 beats: the zero-band beat left no
+    // seed and the paying beat's one seed-back is the only barley seed the
+    // player holds (each beat's granted seed was consumed by its own plant).
+    expect(countOf('highland_barley_seed')).toBe(seedBack + 1);
+    expect(countOf(barleyEv.itemId)).toBe(
+      (barleyEv.count as number) + (barleyPayingEv.count as number),
+    );
+    if (barleyEv.fineItemId !== undefined || barleyPayingEv.fineItemId !== undefined) {
+      const fineTotal =
+        ((barleyEv.fineCount as number | undefined) ?? 0) +
+        ((barleyPayingEv.fineCount as number | undefined) ?? 0);
+      expect(countOf('fine_highland_barley')).toBe(fineTotal);
+    }
+
+    // ONE LINE PER FARM GRANT (#2430), pinned where it is actually
+    // observable. Every farm payout goes through the shared inventory hub,
+    // whose "You receive: X" loot event must ride with { silent: true,
+    // callerLogs: true } so the client's own farming line is the only one a
+    // player sees. The drive's scaffolding grants keep the plain hub line,
+    // which is the inverse arm proving the flags come from the farming grant
+    // path and not from every loot event in the world. The partition is
+    // exhaustive and EXACT: no event may carry half the pair, the unflagged
+    // side is pinned to the eight scaffolding grants in drive order, and the
+    // flagged side is counted by arithmetic over the farm events themselves
+    // (one hub grant per base payout, per present fine pair, per present
+    // seedBackCount, per husk trade).
+    const loot = ev.filter((e) => e.type === 'loot');
+    const flagged = loot.filter((l) => l.silent === true && l.callerLogs === true);
+    const unflagged = loot.filter((l) => l.silent === undefined && l.callerLogs === undefined);
+    expect(flagged.length + unflagged.length, 'no loot event may carry half the flag pair').toBe(
+      loot.length,
+    );
+    const receiveLine = (itemId: string, count = 1): string =>
+      `You receive: ${(ITEMS as any)[itemId].name}${count > 1 ? ' x' + count : ''}.`;
+    expect(unflagged.map((l) => l.text)).toEqual([
+      receiveLine('vale_wheat_seed', 2),
+      receiveLine('garden_hoe'),
+      receiveLine('vale_wheat_seed'),
+      receiveLine('compost'),
+      receiveLine('growth_tonic'),
+      receiveLine('vale_wheat', 2),
+      receiveLine('skysilver_hoe'),
+      receiveLine('highland_barley_seed'),
+      receiveLine('vale_wheat_seed'), // the Phase 8 ready-notice beat's seed
+      // The Phase 11 (bw) extension's scaffolding, in drive order: one seed
+      // per padding cycle (28), the golden-win beat's seed, the final
+      // padding cycle's seed, then the paying tier-3 beat's barley seed.
+      ...Array.from({ length: 30 }, () => receiveLine('vale_wheat_seed')),
+      receiveLine('highland_barley_seed'),
+      // The Phase 12 beat-P scaffolding, in drive order: the dish the
+      // tick-phase mint eats, then the feast item the place verb spends.
+      receiveLine('evergarden_braised_greens'),
+      receiveLine('harvest_feast'),
+    ]);
+    const expectedFlagged =
+      harvested.reduce(
+        (n, e) =>
+          n + 1 + (e.fineItemId !== undefined ? 1 : 0) + (e.seedBackCount !== undefined ? 1 : 0),
+        0,
+      ) +
+      withered.reduce((n, e) => n + 1 + (e.seedBackCount !== undefined ? 1 : 0), 0) +
+      convertedEv.length;
+    expect(flagged).toHaveLength(expectedFlagged);
+
+    // The bags agree with every beat: the fee spent 2 of the 5 produce held
+    // (3 banked + 2 scaffolding) before the toniced harvest re-paid, the
+    // Phase 8 closing harvest banked its 7 on top (harvested[3] above), the
+    // husk batch became the compost back in the bag (1 granted - 1 paid + 1
+    // converted), the tonic was consumed, and every seed pouch is empty
+    // except the seed-back. Both eastbrook beds and the thornpeak bed are
+    // free again (one visit takes the plot out on either outcome).
+    // The Phase 11 terms: the golden win banks its five-fold base grade on
+    // top (signed instances count like any stack member here), the fine
+    // grade is the win's alone, and the 29 padding withers re-fill the husk
+    // pouch AFTER the convert beat (two per cycle, never converted again).
+    expect(countOf('vale_wheat')).toBe(3 + toniced.count + 3 + goldenExpansion.count * 5);
+    expect(countOf('fine_vale_wheat')).toBe(goldenExpansion.fine * 5);
+    expect(countOf('withered_husks')).toBe(
+      withered.slice(1).reduce((n, w) => n + (w.count as number), 0),
+    );
+    expect(countOf('vale_wheat_seed')).toBe(0);
+    expect(countOf('compost')).toBe(1);
+    expect(countOf('growth_tonic')).toBe(0);
+
+    // THE PHASE 12 BEAT P, event and state truth. Exactly one
+    // farmFeastPlaced (the placer's own confirmation; everyone else learns
+    // by seeing the entity), and the post-drive world holds NO feast: the
+    // draw-free expiry write plus ONE 1 Hz updateFarming sweep dropped the
+    // entity and the FeastState together.
+    const placedEv = ev.filter((e) => e.type === 'farmFeastPlaced');
+    expect(placedEv).toHaveLength(1);
+    expect(placedEv[0].pid).toBe(pid);
+    const simAny = rec.sim as any;
+    expect(simAny.feasts.size).toBe(0);
+    expect(simAny.entities.get(placedEv[0].feastId)).toBeUndefined();
+    // The bite refreshed the dish mint (last-eaten-wins on the shared id):
+    // the drive ends Well Fed at the tier-4 value, and both beat-P items
+    // left the bags (the dish eaten, the feast spent at placement).
+    const wellfedAura = (simAny.player.auras as any[]).find((a) => a.id === 'wellfed_buff_sta');
+    expect(wellfedAura?.value).toBe(12);
+    expect(countOf('evergarden_braised_greens')).toBe(0);
+    expect(countOf('harvest_feast')).toBe(0);
+    expect(meta.farmPlots.size).toBe(0);
+
+    // The gathering-grant drain across the whole session: +1 at proficiency
+    // 0 from the first harvest, +1 at 1 from the toniced harvest (drained
+    // before the drive's proficiency write of 75), then the barley harvest's
+    // 0.02 at 75 (tier 3 teaches past 75) lands on the tail ticks. The
+    // Phase 11 extension leaves the SAME final value by a different route:
+    // its padding withers at the written skill-0 window queue nothing, the
+    // win harvest at the written 75 grays on a tier-1 crop, and only the
+    // paying barley harvest adds its 0.02 on top of the final restore of 75.
+    expect(meta.gatheringProficiency.farming).toBeCloseTo(75.02, 10);
   });
 
   it('rift_boss_floor: stretched S fuse spawns, detonates, and boss death clears the pending zone', () => {

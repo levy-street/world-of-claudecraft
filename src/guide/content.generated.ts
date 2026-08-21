@@ -148,6 +148,13 @@ export interface GuideProfRecipe {
   oncePerDay: boolean;
   /** Mastery Curve boundaries: skill where gain drops to 0.5 / 0.25 / 0. */
   gain: { reducedAt: number; minimalAt: number; zeroAt: number };
+  /** Consumable effect facts from the live output def (absent for a
+   *  non-consumable): the craft page composes them through the
+   *  guide.profPages.effect* templates. */
+  effect?: {
+    food?: { amount: number; seconds: number };
+    wellfed?: { aura: string; kind: string; value: number; minutes: number };
+  };
 }
 
 export interface GuideProfMaster { name: string; title: string; hub: string; }
@@ -5634,6 +5641,57 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "feat": false,
     "rewardTitle": "Grandmaster Inscription",
     "crest": "/ui/deeds/prog_grandmaster_inscription.webp"
+  },
+  {
+    "id": "prog_first_planting",
+    "name": "Sow It Begins",
+    "category": "progression",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_vale_first_harvest",
+    "name": "First Fruits of the Vale",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_marsh_first_harvest",
+    "name": "Sprouts in the Peat",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_peaks_first_harvest",
+    "name": "A Crop Among the Crags",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_evergarden_first_harvest",
+    "name": "A Plot in Paradise",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "col_golden_harvest",
+    "name": "Golden Harvest",
+    "category": "collection",
+    "renown": 0,
+    "feat": false
+  },
+  {
+    "id": "prog_farming_100",
+    "name": "Harvestmaster",
+    "category": "progression",
+    "renown": 10,
+    "feat": false,
+    "rewardTitle": "Harvestmaster",
+    "crest": "/ui/deeds/prog_farming_100.webp"
   }
 ];
 
@@ -6859,6 +6917,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "title",
         "name": "Grandmaster Inscription"
+      },
+      {
+        "kind": "title",
+        "name": "Harvestmaster"
       }
     ]
   },
@@ -7975,6 +8037,99 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 150,
           "zeroAt": 175
         }
+      },
+      {
+        "id": "recipe_bronze_hoe",
+        "name": "Bronze Hoe",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Fine Vale Wheat",
+            "count": 4
+          },
+          {
+            "name": "Garden Hoe",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Bronze Hoe",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_skysilver_hoe",
+        "name": "Skysilver Hoe",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Fine Marsh Rice",
+            "count": 4
+          },
+          {
+            "name": "Bronze Hoe",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Skysilver Hoe",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        }
+      },
+      {
+        "id": "recipe_osmium_hoe",
+        "name": "Osmium Hoe",
+        "skillReq": 75,
+        "tier": 3,
+        "station": "toolworks",
+        "acquisition": "trainer",
+        "feeCopper": 40000,
+        "materials": [
+          {
+            "name": "Fine Highland Barley",
+            "count": 4
+          },
+          {
+            "name": "Skysilver Hoe",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Osmium Hoe",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 100,
+          "minimalAt": 125,
+          "zeroAt": 150
+        }
       }
     ]
   },
@@ -8589,6 +8744,37 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 175,
           "zeroAt": 200
         }
+      },
+      {
+        "id": "recipe_growth_tonic",
+        "name": "Growth Tonic",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "apothecary",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Sheenleaf Herb",
+            "count": 2
+          },
+          {
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Growth Tonic",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        }
       }
     ]
   },
@@ -8635,6 +8821,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 25,
           "minimalAt": 50,
           "zeroAt": 75
+        },
+        "effect": {
+          "food": {
+            "amount": 61,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8666,6 +8858,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 25,
           "minimalAt": 50,
           "zeroAt": 75
+        },
+        "effect": {
+          "food": {
+            "amount": 90,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8697,6 +8895,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 25,
           "minimalAt": 50,
           "zeroAt": 75
+        },
+        "effect": {
+          "food": {
+            "amount": 117,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8732,6 +8936,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 25,
           "minimalAt": 50,
           "zeroAt": 75
+        },
+        "effect": {
+          "food": {
+            "amount": 117,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8767,6 +8977,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 50,
           "minimalAt": 75,
           "zeroAt": 100
+        },
+        "effect": {
+          "food": {
+            "amount": 243,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8802,6 +9018,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 50,
           "minimalAt": 75,
           "zeroAt": 100
+        },
+        "effect": {
+          "food": {
+            "amount": 243,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8837,6 +9059,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 50,
           "minimalAt": 75,
           "zeroAt": 100
+        },
+        "effect": {
+          "food": {
+            "amount": 432,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8876,6 +9104,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 75,
           "minimalAt": 100,
           "zeroAt": 125
+        },
+        "effect": {
+          "food": {
+            "amount": 552,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8915,6 +9149,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 75,
           "minimalAt": 100,
           "zeroAt": 125
+        },
+        "effect": {
+          "food": {
+            "amount": 552,
+            "seconds": 18
+          }
         }
       },
       {
@@ -8954,6 +9194,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 75,
           "minimalAt": 100,
           "zeroAt": 125
+        },
+        "effect": {
+          "food": {
+            "amount": 980,
+            "seconds": 18
+          }
         }
       },
       {
@@ -9036,6 +9282,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 125,
           "minimalAt": 150,
           "zeroAt": 175
+        },
+        "effect": {
+          "food": {
+            "amount": 1392,
+            "seconds": 18
+          }
         }
       },
       {
@@ -9079,6 +9331,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 125,
           "minimalAt": 150,
           "zeroAt": 175
+        },
+        "effect": {
+          "food": {
+            "amount": 1392,
+            "seconds": 18
+          }
         }
       },
       {
@@ -9122,6 +9380,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 125,
           "minimalAt": 150,
           "zeroAt": 175
+        },
+        "effect": {
+          "food": {
+            "amount": 1392,
+            "seconds": 18
+          }
         }
       },
       {
@@ -9165,6 +9429,529 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 150,
           "minimalAt": 175,
           "zeroAt": 200
+        }
+      },
+      {
+        "id": "recipe_vale_hearth_loaf",
+        "name": "Vale Hearth Loaf",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Vale Wheat",
+            "count": 3
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Vale Hearth Loaf",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        },
+        "effect": {
+          "food": {
+            "amount": 90,
+            "seconds": 18
+          }
+        }
+      },
+      {
+        "id": "recipe_eastbrook_root_pottage",
+        "name": "Eastbrook Root Pottage",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Brook Carrot",
+            "count": 2
+          },
+          {
+            "name": "Fine Brook Carrot",
+            "count": 1
+          },
+          {
+            "name": "Vale Wheat",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Eastbrook Root Pottage",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        },
+        "effect": {
+          "food": {
+            "amount": 117,
+            "seconds": 18
+          }
+        }
+      },
+      {
+        "id": "recipe_fenbridge_rice_bowl",
+        "name": "Fenbridge Rice Bowl",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Marsh Rice",
+            "count": 4
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Fenbridge Rice Bowl",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        },
+        "effect": {
+          "food": {
+            "amount": 243,
+            "seconds": 18
+          }
+        }
+      },
+      {
+        "id": "recipe_fenbridge_beet_braise",
+        "name": "Fenbridge Beet Braise",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Bog Beet",
+            "count": 3
+          },
+          {
+            "name": "Fine Bog Beet",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Fenbridge Beet Braise",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        },
+        "effect": {
+          "food": {
+            "amount": 432,
+            "seconds": 18
+          }
+        }
+      },
+      {
+        "id": "recipe_highwatch_barley_bannock",
+        "name": "Highwatch Barley Bannock",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Highland Barley",
+            "count": 4
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Highwatch Barley Bannock",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        },
+        "effect": {
+          "food": {
+            "amount": 552,
+            "seconds": 18
+          }
+        }
+      },
+      {
+        "id": "recipe_highwatch_gourd_soup",
+        "name": "Highwatch Gourd Soup",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Frost Gourd",
+            "count": 3
+          },
+          {
+            "name": "Fine Frost Gourd",
+            "count": 1
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Highwatch Gourd Soup",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        },
+        "effect": {
+          "food": {
+            "amount": 552,
+            "seconds": 18
+          }
+        }
+      },
+      {
+        "id": "recipe_evergarden_sunmelon_tart",
+        "name": "Evergarden Sunmelon Tart",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Gilded Sunmelon",
+            "count": 3
+          },
+          {
+            "name": "Fine Gilded Sunmelon",
+            "count": 1
+          },
+          {
+            "name": "Vale Wheat",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Evergarden Sunmelon Tart",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        },
+        "effect": {
+          "food": {
+            "amount": 980,
+            "seconds": 18
+          }
+        }
+      },
+      {
+        "id": "recipe_evergarden_harvest_platter",
+        "name": "Evergarden Harvest Platter",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Evergarden Greens",
+            "count": 3
+          },
+          {
+            "name": "Fine Evergarden Greens",
+            "count": 1
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Evergarden Harvest Platter",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        },
+        "effect": {
+          "food": {
+            "amount": 980,
+            "seconds": 18
+          }
+        }
+      },
+      {
+        "id": "recipe_eastbrook_glazed_carrots",
+        "name": "Eastbrook Glazed Carrots",
+        "skillReq": 0,
+        "tier": 0,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "name": "Brook Carrot",
+            "count": 4
+          },
+          {
+            "name": "Vale Wheat",
+            "count": 1
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Eastbrook Glazed Carrots",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 25,
+          "minimalAt": 50,
+          "zeroAt": 75
+        },
+        "effect": {
+          "food": {
+            "amount": 90,
+            "seconds": 18
+          },
+          "wellfed": {
+            "aura": "Well Fed",
+            "kind": "buff_sta",
+            "value": 3,
+            "minutes": 10
+          }
+        }
+      },
+      {
+        "id": "recipe_fenbridge_rice_pudding",
+        "name": "Fenbridge Rice Pudding",
+        "skillReq": 25,
+        "tier": 1,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 2500,
+        "materials": [
+          {
+            "name": "Marsh Rice",
+            "count": 4
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Fenbridge Rice Pudding",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        },
+        "effect": {
+          "food": {
+            "amount": 243,
+            "seconds": 18
+          },
+          "wellfed": {
+            "aura": "Well Fed",
+            "kind": "buff_sta",
+            "value": 6,
+            "minutes": 15
+          }
+        }
+      },
+      {
+        "id": "recipe_highwatch_barley_porridge",
+        "name": "Highwatch Barley Porridge",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Highland Barley",
+            "count": 4
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Highwatch Barley Porridge",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        },
+        "effect": {
+          "food": {
+            "amount": 552,
+            "seconds": 18
+          },
+          "wellfed": {
+            "aura": "Well Fed",
+            "kind": "buff_sta",
+            "value": 9,
+            "minutes": 15
+          }
+        }
+      },
+      {
+        "id": "recipe_evergarden_braised_greens",
+        "name": "Evergarden Braised Greens",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Evergarden Greens",
+            "count": 4
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Evergarden Braised Greens",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
+        },
+        "effect": {
+          "food": {
+            "amount": 980,
+            "seconds": 18
+          },
+          "wellfed": {
+            "aura": "Well Fed",
+            "kind": "buff_sta",
+            "value": 12,
+            "minutes": 15
+          }
+        }
+      },
+      {
+        "id": "recipe_harvest_feast",
+        "name": "Harvest Feast",
+        "skillReq": 50,
+        "tier": 2,
+        "station": "kitchens",
+        "acquisition": "trainer",
+        "feeCopper": 10000,
+        "materials": [
+          {
+            "name": "Evergarden Greens",
+            "count": 4
+          },
+          {
+            "name": "Gilded Sunmelon",
+            "count": 4
+          },
+          {
+            "name": "Cooking Salt",
+            "count": 2
+          }
+        ],
+        "output": {
+          "name": "Harvest Feast",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 75,
+          "minimalAt": 100,
+          "zeroAt": 125
         }
       }
     ]
@@ -13638,6 +14425,58 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         }
       ]
     }
+  },
+  {
+    "id": "farming",
+    "name": "Farming",
+    "maxSkill": 100,
+    "bands": [
+      0,
+      100,
+      200
+    ],
+    "tools": [
+      {
+        "name": "Garden Hoe",
+        "tier": 1,
+        "quality": "common",
+        "priceCopper": 20,
+        "vendors": [
+          {
+            "name": "Farmer Jessica",
+            "hub": "Eastbrook"
+          }
+        ]
+      },
+      {
+        "name": "Bronze Hoe",
+        "tier": 2,
+        "quality": "common",
+        "priceCopper": null,
+        "vendors": [],
+        "craftedBy": "engineering",
+        "wieldProficiency": 40
+      },
+      {
+        "name": "Skysilver Hoe",
+        "tier": 3,
+        "quality": "uncommon",
+        "priceCopper": null,
+        "vendors": [],
+        "craftedBy": "engineering",
+        "wieldProficiency": 70
+      },
+      {
+        "name": "Osmium Hoe",
+        "tier": 4,
+        "quality": "rare",
+        "priceCopper": null,
+        "vendors": [],
+        "craftedBy": "engineering",
+        "wieldProficiency": 85
+      }
+    ],
+    "nodes": []
   }
 ];
 
@@ -14854,6 +15693,24 @@ export const GUIDE_PROF_ECONOMY: GuideProfEconomy = {
         "coinCopper": 16
       },
       {
+        "id": "q_prof_workorder_kitchens_wheat",
+        "name": "Kitchens Wheat Order",
+        "master": "Cook Marlow",
+        "hub": "Eastbrook",
+        "material": "Vale Wheat",
+        "count": 8,
+        "coinCopper": 16
+      },
+      {
+        "id": "q_prof_workorder_kitchens_rice",
+        "name": "Kitchens Rice Order",
+        "master": "Cook Marlow",
+        "hub": "Eastbrook",
+        "material": "Marsh Rice",
+        "count": 5,
+        "coinCopper": 20
+      },
+      {
         "id": "q_prof_workorder_loom",
         "name": "Loom Work Order",
         "master": "Weaver Ottilie",
@@ -14974,6 +15831,7 @@ export const GUIDE_PROF_PAGES: string[] = [
   "logging",
   "herbalism",
   "fishing",
+  "farming",
   "economy",
   "faq"
 ];

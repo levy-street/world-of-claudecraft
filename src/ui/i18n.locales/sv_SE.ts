@@ -1177,7 +1177,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.charges':
     'Börjar med {base} laddningar på ett vanligt verktyg (+{bonus} per sällsynthetssteg).',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    'Montera på ett gruv-, skogsavverknings- eller örtinsamlingsverktyg från Yrkesfönstret. Förbrukas när den monteras.',
+    'Montera på ett gruv-, skogsavverknings-, örtinsamlings- eller jordbruksverktyg från Yrkesfönstret. Förbrukas när den monteras.',
   'hudChrome.professions.toolEffectTooltip.kind': 'Verktygsamulett',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'Kan inte monteras på fiskespön.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':
@@ -1841,7 +1841,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Världsmarknaden är rikets täckande börs, skött av Köpmannen i Östbäck och Auktionist Voss i Highwatch. Listning är gratis: det finns ingen deposition, och en osåld listning kommer bara tillbaka till dig. Huset tar sin andel bara när något faktiskt säljer: 5 procent av försäljningspriset, och resten väntar på dig att hämta.\n\nEn viktig begränsning: Marknaden förmedlar bara vanliga varor. En signerad, mästerverk, förtrollad eller bunden kopia sveps aldrig in i en listning, så de speciella pjäserna byter händer ansikte mot ansikte i ett handelsfönster, som bär ett föremåls fullständiga identitet, signatur och allt. Prissätt dessa själv; Marknaden berättar bara vad den vanliga versionen inbringar.',
   'guide.profPages.econ.workOrdersHeading': 'Arbetsordrar',
   'guide.profPages.econ.workOrdersNote':
-    'Varje stationsmästare lägger ut en stående arbetsorder: ta med en stapel av deras hantverks bastanta material och få betalt på fläcken, plus lite uppdragserfarenhet. Betalningen är avsiktligt {pct}% av vad en handlare skulle ge dig för samma stapel, avrundat nedåt, så en arbetsorder är aldrig det lönsamma sättet att sälja material, bara en anledning att svänga förbi stationen.\n\nVarje order rullar på sin egen {minutes} minuters klocka per karaktär: lämna in en och den mästaren har inget mer för dig tills timern löper om. Behandla dem som en liten bonus på material du ändå samlade, inte en affärsverksamhet.',
+    'Varje stationsmästare lägger ut stående arbetsordrar, en per basmaterial: ta med den stapel en order ber om och få betalt på fläcken, plus lite uppdragserfarenhet. Betalningen är avsiktligt {pct}% av vad en handlare skulle ge dig för samma stapel, avrundat nedåt, så en arbetsorder är aldrig det lönsamma sättet att sälja material, bara en anledning att svänga förbi stationen.\n\nVarje order rullar på sin egen {minutes} minuters klocka per karaktär: lämna in en och den ordern är stängd för dig tills timern löper om, medan mästarens övriga ordrar förblir öppna. Behandla dem som en liten bonus på material du ändå samlade, inte en affärsverksamhet.',
   'guide.profPages.econ.colOrder': 'Arbetsorder',
   'guide.profPages.econ.colMaster': 'Mästare',
   'guide.profPages.econ.colAsks': 'Begär',

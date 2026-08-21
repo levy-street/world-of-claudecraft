@@ -510,6 +510,10 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'gleamstag_charm',
     'gravewoven_bag',
     'guardian_core',
+    // The Phase 12 shared feast: a placeable crafted junk-kind item whose
+    // click PLACES (never uses or equips), so no chip predicate claims it;
+    // All-only is the honest home (the tonic settlement's shape).
+    'harvest_feast',
     'inert_storm_shard',
     'last_keep_signet',
     'linen_pouch',

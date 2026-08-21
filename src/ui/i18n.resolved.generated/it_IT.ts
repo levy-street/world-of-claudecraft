@@ -64,7 +64,8 @@ export const it_IT: EnTranslations = {
       "dungeon": "Dungeon",
       "difficulty": "Difficoltà",
       "name": "Nome",
-      "spec": "Specializzazione"
+      "spec": "Specializzazione",
+      "bed": "Bed id (optional)"
     },
     "difficulty": {
       "normal": "Normale",
@@ -150,6 +151,10 @@ export const it_IT: EnTranslations = {
       "gather": {
         "label": "Aumenta abilità di raccolta",
         "description": "Aumenta l’abilità in un mestiere di raccolta."
+      },
+      "farmgrow": {
+        "label": "Ripen crops",
+        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
       },
       "teleport": {
         "label": "Teletrasporta",
@@ -2581,7 +2586,8 @@ export const it_IT: EnTranslations = {
       "resonantSteel": "Reagente dell'incantamento. Si ottiene disincantando armi da mischia rare o superiori.",
       "resonantTimber": "Reagente dell'incantamento. Si ottiene disincantando bastoni, bacchette, archi e balestre rari o superiori.",
       "masterwroughtIntermediate": "Masterwrought crafting component.",
-      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day."
+      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day.",
+      "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it."
     },
     "discord": {
       "title": "Discord",
@@ -3018,6 +3024,7 @@ export const it_IT: EnTranslations = {
       "logging": "Taglio del legname",
       "herbalism": "Erbalismo",
       "fishing": "Pesca",
+      "farming": "Farming",
       "notReady": "Questo nodo di risorse non e ancora rispawnato per te.",
       "gatherLine": "Raccogli: {name}.",
       "gatherLineQty": "Raccogli: {name} x {qty}.",
@@ -3036,7 +3043,8 @@ export const it_IT: EnTranslations = {
       "tierRequired": {
         "mining": "Richiede un piccone da estrazione di livello {tier}",
         "logging": "Richiede un'ascia da taglio di livello {tier}",
-        "herbalism": "Richiede una falce da erbalismo di livello {tier}"
+        "herbalism": "Richiede una falce da erbalismo di livello {tier}",
+        "farming": "Requires a tier {tier} farming hoe"
       },
       "requiresTool": {
         "mining": "Richiede un piccone da estrazione",
@@ -3047,23 +3055,27 @@ export const it_IT: EnTranslations = {
         "mining": "Hai bisogno di un piccone da estrazione di livello {tier} per raccogliere questo filone.",
         "logging": "Hai bisogno di un'ascia da taglio di livello {tier} per abbattere questo boschetto.",
         "herbalism": "Hai bisogno di una falce da erbalismo di livello {tier} per raccogliere quest'aiuola.",
-        "fishing": "Hai bisogno di una canna da pesca di livello {tier} per pescare in queste acque."
+        "fishing": "Hai bisogno di una canna da pesca di livello {tier} per pescare in queste acque.",
+        "farming": "You need a tier {tier} farming hoe to work this bed."
       },
       "toolRequired": {
         "mining": "Hai bisogno di un piccone da estrazione per raccogliere questo filone.",
         "logging": "Hai bisogno di un'ascia da taglio per abbattere questo boschetto.",
         "herbalism": "Hai bisogno di una falce da erbalismo per raccogliere quest'aiuola.",
-        "fishing": "Hai bisogno di una canna da pesca per lanciare la lenza."
+        "fishing": "Hai bisogno di una canna da pesca per lanciare la lenza.",
+        "farming": "You need a farming hoe to work this bed."
       },
       "noNodeNearby": {
         "mining": "Non c'è nessun filone di minerale a portata.",
         "logging": "Non c'è nessun boschetto di alberi a portata.",
-        "herbalism": "Non c'è nessuna aiuola d'erbe a portata."
+        "herbalism": "Non c'è nessuna aiuola d'erbe a portata.",
+        "farming": "There is no crop bed within reach."
       },
       "wieldUnmet": {
         "mining": "Ti serve Estrazione mineraria {skill} per impugnare il piccone che hai già nelle borse.",
         "logging": "Ti serve Taglio del legname {skill} per impugnare l'ascia che hai già nelle borse.",
-        "herbalism": "Ti serve Erbalismo {skill} per usare la falce che hai già nelle borse."
+        "herbalism": "Ti serve Erbalismo {skill} per usare la falce che hai già nelle borse.",
+        "farming": "You need Farming {skill} to swing the hoe already in your bags."
       },
       "wieldUnmetCorpse": "Ti serve abilità di raccolta {skill} per mettere all'opera il tuo strumento migliore.",
       "toolTierUnmetCorpse": "Hai bisogno di uno strumento da raccolta di livello {tier} per recuperare i materiali migliori.",
@@ -3072,18 +3084,21 @@ export const it_IT: EnTranslations = {
           "mining": "Strumento da estrazione (livello {tier})",
           "logging": "Strumento da taglio (livello {tier})",
           "herbalism": "Strumento da erbalismo (livello {tier})",
-          "fishing": "Canna da pesca (livello {tier})"
+          "fishing": "Canna da pesca (livello {tier})",
+          "farming": "Farming tool (tier {tier})"
         },
         "unlocks": {
           "mining": "Necessario per estrarre dai filoni di minerale fino al livello {tier}.",
           "logging": "Necessaria per abbattere i boschetti di alberi fino al livello {tier}.",
           "herbalism": "Necessaria per raccogliere le aiuole d'erbe fino al livello {tier}.",
-          "fishing": "Necessaria per pescare nelle acque fino al livello {tier}."
+          "fishing": "Necessaria per pescare nelle acque fino al livello {tier}.",
+          "farming": "Required to plant crops up to tier {tier}."
         },
         "use": {
           "mining": "Uso: estrai da un filone di minerale vicino.",
           "logging": "Uso: abbatti un boschetto di alberi vicino.",
-          "herbalism": "Uso: raccogli da un'aiuola d'erbe vicina."
+          "herbalism": "Uso: raccogli da un'aiuola d'erbe vicina.",
+          "farming": "Works from your bags when you plant a crop bed."
         },
         "speed": "Raccoglie più in fretta sui nodi di livello inferiore a {tier}.",
         "rodRequired": "Necessaria per pescare.",
@@ -3092,6 +3107,7 @@ export const it_IT: EnTranslations = {
         "rodBand": "Sblocca tabelle di catture più ricche con abilità di Pesca {skill} o superiore."
       },
       "downgradeMark": "Borse piene: il ritrovamento e stato conservato senza il marchio del raccoglitore.",
+      "downgradeMarkCrop": "Bags full: the harvest was stored without its grower's mark.",
       "downgradeFind": "Borse piene: un ritrovamento pregiato e scivolato via.",
       "emptyHookNote": "Niente all'amo",
       "stateReady": "Pronto",
@@ -3099,6 +3115,83 @@ export const it_IT: EnTranslations = {
       "stateCooldownTimed": "Si rigenera tra {time}",
       "respawnClock": "{minutes}:{seconds}",
       "fineGradePreview": "Il tuo strumento affina questa resa al grado pregiato."
+    },
+    "farming": {
+      "plantLine": "You plant: {name}.",
+      "harvestLine": "You bring in: {name}.",
+      "harvestLineQty": "You bring in: {name} x{qty}.",
+      "harvestFineLine": "You also bring in: {name}.",
+      "harvestFineLineQty": "You also bring in: {name} x{qty}.",
+      "witheredLine": "The crop withered. You clear the bed: {name}.",
+      "witheredLineQty": "The crop withered. You clear the bed: {name} x{qty}.",
+      "seedBackLine": "You recover seed: {name}.",
+      "seedBackLineQty": "You recover seed: {name} x{qty}.",
+      "denied": {
+        "bad_bed": "There is no crop bed there.",
+        "bad_crop": "You cannot plant that here.",
+        "range": "You are too far from that crop bed.",
+        "bed_taken": "You already have a crop growing there.",
+        "skill": "Your Farming skill is too low for that crop.",
+        "no_seed": "You have no seed for that crop.",
+        "not_ready": "That crop is still growing.",
+        "no_plot": "Nothing is planted in that bed.",
+        "no_husks": "You do not have enough withered husks.",
+        "no_compost": "You have no compost.",
+        "no_fee_produce": "You have no produce to pay the watch fee.",
+        "no_tonic": "You have no growth tonic.",
+        "tool": "You have no farming hoe fit for that crop.",
+        "locked": "An item that would pay for that is locked.",
+        "no_farmer": "You must be near a farmer to trade husks for compost.",
+        "no_feast": "You have no feast to set out.",
+        "feast_active": "Your feast is already set out.",
+        "feast_expired": "That feast is gone.",
+        "feast_finished": "That feast has been picked clean.",
+        "feast_range": "You are too far from the feast.",
+        "feast_eaten": "You have already eaten from that feast."
+      },
+      "feastTitle": "{name}'s Harvest Feast",
+      "feastPlacedLine": "You set out your harvest feast.",
+      "huskTrade": "Trade husks for compost",
+      "huskTradeAria": "Trade husks for compost with {name}",
+      "plantSheet": {
+        "title": "Plant a Crop",
+        "plant": "Plant",
+        "sowAria": "Sow {name}",
+        "empty": "You have no seed you can sow at this bed.",
+        "close": "Close the plant sheet"
+      },
+      "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
+      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
+      "readyLine": "A crop is ready to harvest.",
+      "readyLineQty": "{count} crops are ready to harvest.",
+      "readyWitheredLine": "A crop withered in its bed.",
+      "readyWitheredLineQty": "{count} crops withered in their beds."
+    },
+    "harvestJournal": {
+      "title": "Harvest Journal",
+      "close": "Close",
+      "listLabel": "Planted crop beds",
+      "growing": "Ready in {time}",
+      "ready": "Ready to harvest",
+      "finishing": "Finishing up",
+      "withered": "Withered",
+      "readyAnnounce": "Ready to harvest: {name}",
+      "remainingDaysHours": "{days}d {hours}h",
+      "remainingHoursMinutes": "{hours}h {minutes}m",
+      "remainingMinutesSeconds": "{minutes}m {seconds}s",
+      "remainingSeconds": "{seconds}s",
+      "bedLine": "{zone}, bed {index}",
+      "bedLineUnknown": "Unknown bed",
+      "careWatch": "Farmer's Watch",
+      "careNone": "No extras",
+      "stageSprout": "Sprout",
+      "stageSeedling": "Seedling",
+      "stageMaturing": "Maturing",
+      "stageRipe": "Ripe",
+      "emptyTitle": "No crops planted",
+      "emptyBody": "Sow a seed in any garden bed and the plot appears here with its timer.",
+      "noviceTitle": "You have not worked a garden bed yet",
+      "noviceBody": "Farming skill grows every time you bring in a crop. Sow a seed in any garden bed to begin."
     },
     "archetypeTitle": {
       "label": "Titolo",
@@ -3218,7 +3311,7 @@ export const it_IT: EnTranslations = {
           "quickeningCharm": "Riduce il tempo di rigenerazione del nodo che attiva.",
           "makersCharm": "+2 yield per harvest while charged."
         },
-        "howToSlot": "Inseriscilo su uno strumento da estrazione mineraria, taglio del legname o erbalismo dalla finestra Professioni. Viene consumato quando inserito.",
+        "howToSlot": "Inseriscilo su uno strumento da estrazione mineraria, taglio del legname, erbalismo o agricoltura dalla finestra Professioni. Viene consumato quando inserito.",
         "charges": "Parte con {base} cariche su uno strumento comune (+{bonus} per ogni gradino di rarità).",
         "landOnly": "Non si inserisce sulle canne da pesca.",
         "openProfessions": "Apri Professioni per inserirlo su uno strumento da raccolta."
@@ -3887,7 +3980,8 @@ export const it_IT: EnTranslations = {
   "gatherEvent": {
     "pristineVein": "{finder} ha colpito una vena incontaminata!",
     "ancientHeartwood": "{finder} ha abbattuto un antico durame!",
-    "moonlitBloom": "{finder} ha scoperto una fioritura illuminata dalla luna!"
+    "moonlitBloom": "{finder} ha scoperto una fioritura illuminata dalla luna!",
+    "goldenHarvest": "{finder} reaped a golden harvest!"
   },
   "apiError": {
     "validation": {
@@ -4260,6 +4354,7 @@ export const it_IT: EnTranslations = {
       "groupCamera": "Telecamera",
       "talents": "Talenti",
       "professions": "Professioni",
+      "harvestJournal": "Harvest Journal",
       "arena": "Finestra GcG (le arene e i Campi di Thornhollow)",
       "leaderboard": "Classifica",
       "deeds": "Libro delle Imprese",
@@ -5629,6 +5724,9 @@ export const it_IT: EnTranslations = {
       "outputFmt": "{name} x{count}",
       "comboReq": "Richiede {a} e {b}",
       "oncePerDay": "Once per day",
+      "effectFood": "Restores {amount} health over {seconds} sec when eaten.",
+      "effectWellFed": "Well fed when you finish eating: +{value} {stat} for {minutes} min.",
+      "effectWellFedAura": "Grants {aura} for {minutes} min when you finish eating.",
       "sourceTrainerFee": "Istruttore, {fee}",
       "sourceTrainerFree": "Istruttore, gratuito",
       "sourceKnown": "Conosciuta dall'inizio",
@@ -5806,7 +5904,8 @@ export const it_IT: EnTranslations = {
         "mining": "L'Estrazione mineraria strappa il minerale direttamente dalla roccia del mondo: rame nella Valle di Eastbrook, ferro nella Palude di Mirefen e osmio lassù sulle Alture di Thornpeak, con filoni iniziali sparsi per ogni zona più giovane oltre di esse, che alimentano i mestieri della forgia. Aperta a tutti dal livello 1: un piccone da estrazione da 20 monete di rame preso a un bancone di Eastbrook, Fenbridge o Highwatch apre ogni filone iniziale, e i gradini più alti della scala dei picconi si risvegliano man mano che il tuo contatore se li guadagna. Tracciata su un contatore proprio fino a un limite di 100.",
         "logging": "Il Taglio del legname abbatte legname dai boschetti di alberi di tutto il mondo: corteccia di ferro nella Valle di Eastbrook, frassino nella Palude di Mirefen, altopino sulle Alture di Thornpeak e boschetti iniziali in ogni zona più giovane, la materia grezza per manici, bastoni e il banco dell'ingegnere. Aperto a tutti dal livello 1 con un'ascia da taglio nelle borse (20 monete di rame ai banconi di Eastbrook, Fenbridge e Highwatch), tracciato su un contatore proprio fino a un limite di 100.",
         "herbalism": "L'Erbalismo raccoglie ciò che cresce spontaneo: foglialucente nella Valle di Eastbrook, fogliadoro nella Palude di Mirefen, petalo solare sulle Alture di Thornpeak e aiuole iniziali in ogni zona più giovane, la foglia e lo stelo che tengono in ebollizione i mestieri dell'apotecario. Aperto a tutti dal livello 1 con una falce da erbalismo nelle borse (20 monete di rame ai banconi di Eastbrook, Fenbridge e Highwatch), tracciato su un contatore proprio fino a un limite di 100.",
-        "fishing": "La Pesca è la mosca bianca tra i mestieri di raccolta, e il più profondo: un vero minigioco di abboccata e recupero, tabelle delle catture proprie in ciascuna delle tre zone centrali (per ora le acque giovani oltre di esse servono tutte la tabella della Valle) e un limite di competenza di 200, il doppio degli altri. Compra una canna, mettiti di fronte all'acqua aperta e lancia."
+        "fishing": "La Pesca è la mosca bianca tra i mestieri di raccolta, e il più profondo: un vero minigioco di abboccata e recupero, tabelle delle catture proprie in ciascuna delle tre zone centrali (per ora le acque giovani oltre di esse servono tutte la tabella della Valle) e un limite di competenza di 200, il doppio degli altri. Compra una canna, mettiti di fronte all'acqua aperta e lancia.",
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe whenever you come back, because nothing in a bed ever spoils. A farmer stands beside every bed site, from the Eastbrook allotments through Fenbridge and Highwatch to the Evergarden parterre, and Farmer Jessica in Eastbrook is where the trade starts: she sells the garden hoe and the first seeds, and her errand walks a new farmer through a first crop. Each rung of the ladder grows its own pair of crops, each with a finer grade for a practiced hand to pull, and engineers craft the hoes for the tougher ground above the starter beds. Tracked on its own counter to a cap of 100."
       },
       "rhythmHeading": "Il ritmo del raccolto",
       "rhythmBody": "Un raccolto è un breve lancio visibile, non una presa istantanea: {base} secondi di base, mai sotto un minimo di {floor} secondi. Portare uno strumento sopra il livello del nodo, e che la tua competenza ti permetta di impugnare, ti accelera di {tool} secondi per ogni livello in più, e ogni fascia di competenza che superi taglia altri {band} secondi; limitarsi a pareggiare il livello del nodo ti fa entrare dalla porta, sono i livelli sopra di esso a renderti veloce.\n\nUna borsa piena rifiuta educatamente il lancio prima che cominci, così nulla va sprecato a metà colpo, e ogni raccolto paga una piccola fetta di PE del personaggio, scalata sul livello del nodo rispetto al tuo come scalano i PE da uccisione: un nodo grigio insignificante non insegna nulla a un personaggio al massimo.",
@@ -5837,7 +5936,9 @@ export const it_IT: EnTranslations = {
         "mining": "Il tuo primo nodo di qualsiasi professione guadagna Frutti del Campo, e il massimo di 100 in Mineria iscrive Minerale nel Sangue. Raggiungere 100 in qualsiasi tre tra Mineria, Boscaiolia, Erboristeria e Pesca aggiunge Maestro Raccoglitore a 25 Rinomanza, e il cracking di un filone intatto registra il proprio segno del collezionista. Nessuno di questi conferisce potere: le Imprese sono titoli e Rinomanza, un registro delle strade che hai percorso.",
         "logging": "Il tuo primo nodo di qualsiasi professione guadagna Frutti del Campo, e il massimo di 100 in Boscaiolia iscrive Taglialegna Cuore di Legno. Raggiungere 100 in qualsiasi tre tra Mineria, Boscaiolia, Erboristeria e Pesca aggiunge Maestro Raccoglitore a 25 Rinomanza, e un colpo di antico cuore di legno registra il proprio segno del collezionista. Le Imprese sono solo titoli e Rinomanza, mai potere.",
         "herbalism": "Il tuo primo nodo di qualsiasi professione guadagna Frutti del Campo, e il massimo di 100 in Erboristeria iscrive Maestro del Prato. Raggiungere 100 in qualsiasi tre tra Mineria, Boscaiolia, Erboristeria e Pesca aggiunge Maestro Raccoglitore a 25 Rinomanza, e un fiore lunare in fiore registra il proprio segno del collezionista. Le Imprese sono solo titoli e Rinomanza, mai potere.",
-        "fishing": "Il traguardo dei 100 iscrive Vecchio Sale e quello dei 200 iscrive Maestro Pescatore con il suo titolo, il vertice assoluto dell'arte del pescatore; la Pesca conta anche per Maestro Raccoglitore, guadagnato a 100 in tre qualsiasi dei mestieri di raccolta. Un primo pesce dalle acque di ciascuna di sei zone riempie una pagina propria, le tre zone centrali più il Willowfen, il Galecrest e Farshore oltre di esse, e il Koi del Bagliore Solare registra Barlume di Speranza, così i viaggiatori con una canna nello zaino riempiono il loro libro più in fretta di quanto si aspettino."
+        "fishing": "Il traguardo dei 100 iscrive Vecchio Sale e quello dei 200 iscrive Maestro Pescatore con il suo titolo, il vertice assoluto dell'arte del pescatore; la Pesca conta anche per Maestro Raccoglitore, guadagnato a 100 in tre qualsiasi dei mestieri di raccolta. Un primo pesce dalle acque di ciascuna di sei zone riempie una pagina propria, le tre zone centrali più il Willowfen, il Galecrest e Farshore oltre di esse, e il Koi del Bagliore Solare registra Barlume di Speranza, così i viaggiatori con una canna nello zaino riempiono il loro libro più in fretta di quanto si aspettino.",
+        "farming": "Farming keeps no deeds of its own yet: now that its beds and crops are in the ground, the milestone and cap deeds that mark the other trades arrive in a later patch. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power.",
+        "farmingSown": "Farming keeps its own shelf in the Book of Deeds now. Sow It Begins marks your first planted crop, and four chronicle pages mark a first thriving harvest at each of the bed sites, from Eastbrook Vale to the Evergarden. A golden harvest records its own zero-Renown collector's mark, and proficiency in Farming counts toward Master Gatherer, earned at 100 in any three gathering trades. The capstone is already written: Harvestmaster, the trade's 100-proficiency title, comes within reach with a later patch's deeper fields. Deeds are titles and Renown only, never power."
       },
       "fish": {
         "startHeading": "Come iniziare",
@@ -5859,6 +5960,12 @@ export const it_IT: EnTranslations = {
         "emptyHook": "Nulla abbocca",
         "koiHeading": "Il Koi del Bagliore Solare",
         "koiBody": "Ogni specchio d'acqua del gioco nasconde lo stesso premio: il Koi del Bagliore Solare, un lampo non comune sulla lenza che vale 75 monete di rame per un venditore e parecchio di più per il tuo orgoglio. Le sue probabilità rispondono alla tua fascia di cattura e a nient'altro, identiche in ogni zona: una riga dell'1 percento nella tabella delle catture alla fascia 0, 3 alla fascia 1 e 6 alla fascia 2, estratta a ogni lancio recuperato, quindi il koi va al pescatore che si è guadagnato le tabelle profonde. Portarne a riva uno registra Barlume di Speranza nel tuo Libro delle Imprese, un segno da collezionista a zero Rinomanza. Quando accade, il registro si assicura che tu lo sappia."
+      },
+      "farm": {
+        "bedsHeading": "Working the beds",
+        "bedsBody": "The loop is short. Buy seeds and compost from the farmer beside the beds: Jessica in Eastbrook stocks the Vale pair, the Fenbridge farmer the marsh pair, and no counter anywhere sells the Highwatch or Evergarden seeds, which come back a seed or two at a time from a high-tier harvest and otherwise change hands on the World Market. Sow with a hoe in your bags, and tip the odds if you like: compost from the counter and the farmer's watch, paid in produce as you plant, each raise a crop's chance of coming through, an alchemist's growth tonic gives the harvest a shot at a larger yield, and once your skill has climbed a full band past a crop's tier that crop never fails at all. Then walk away. The bed keeps growing while you are logged out, a ripe crop waits as long as you leave it, and the Harvest Journal (Shift+K, or the Farming row of your professions window) lists every bed you have planted with its timer.\n\nA crop that fails leaves withered husks in place of produce, and any farmer trades husks for compost, so a bad season buys the next one's insurance. What you bring in feeds the kitchens: the produce cooks into dishes at the kitchens, and Cook Marlow's wheat and rice orders take Vale Wheat and Marsh Rice off your hands for coin on the same clock as every other work order.",
+        "tableHeading": "From the beds to the table",
+        "tableBody": "The kitchens are where a season pays forward. Beyond the everyday farm dishes, each crop tier has a richer dish that leaves you Well Fed: finish the meal and a lasting boon stays with you, the kind of edge a group wants eaten before the dungeon door. Crowning the set is the Harvest Feast, a spread a cook sets out in the world itself: everyone at hand takes a serving of their own, one each, and every finished meal pays the same Well Fed boon, so one farmer's season can set the table for a whole party. The top of that ladder, the two richest dishes and the feast itself, comes within reach with a later patch's deeper fields; everything below them is cooking today.\n\nLuck keeps a place at that table too. Every harvest you bring in rolls the same windfall chance the other gathering trades enjoy, and now and then a crop comes up golden: the yield lands far past a normal pull, the whole zone hears the find announced by name, and Golden Harvest is recorded in your Book of Deeds."
       },
       "econ": {
         "title": "Economia Artigianale",
@@ -5882,7 +5989,7 @@ export const it_IT: EnTranslations = {
         "marketHeading": "Il Mercato Mondiale e la sua commissione",
         "marketBody": "Il Mercato Mondiale e la borsa a livello di reame, gestita dal Mercante a Eastbrook e dal Banditore Voss a Highwatch. L'inserzione e gratuita: non c'e deposito, e un'inserzione invenduta ti ritorna semplicemente. La casa prende la sua commissione solo quando qualcosa si vende davvero: il 5 percento del prezzo di vendita, e il resto ti aspetta da riscuotere.\n\nUn limite importante: il Mercato gestisce solo beni semplici. Una copia firmata, da capolavoro, incantata o vincolata non viene mai inclusa in un'inserzione, quindi i pezzi speciali cambiano mani faccia a faccia in una finestra di scambio, che porta l'identita completa di un oggetto, firma inclusa. Fissa tu stesso il prezzo; il Mercato ti dice solo cosa rende la versione semplice.",
         "workOrdersHeading": "Ordini di lavoro",
-        "workOrdersNote": "Ogni maestro di stazione pubblica un ordine di lavoro fisso: porta una pila del materiale di base del suo mestiere e vieni pagato sul momento, piu un po' di esperienza missione. La paga e deliberatamente il {pct}% di cio che un venditore ti darebbe per la stessa pila, arrotondato per difetto, quindi un ordine di lavoro non e mai il modo piu redditizio per vendere materiali, solo un motivo per passare dalla stazione.\n\nOgni ordine va sul proprio orologio di {minutes} minuti per personaggio: consegnane uno e quel maestro non ha piu nulla per te finche il timer non scade. Trattali come un piccolo bonus sui materiali che raccoglievi comunque, non come un'attivita.",
+        "workOrdersNote": "Ogni maestro di stazione pubblica ordini di lavoro fissi, uno per materiale di base: porta la pila che un ordine chiede e vieni pagato sul momento, piu un po' di esperienza missione. La paga e deliberatamente il {pct}% di cio che un venditore ti darebbe per la stessa pila, arrotondato per difetto, quindi un ordine di lavoro non e mai il modo piu redditizio per vendere materiali, solo un motivo per passare dalla stazione.\n\nOgni ordine va sul proprio orologio di {minutes} minuti per personaggio: consegnane uno e quell'ordine resta chiuso per te finche il timer non scade, mentre gli altri ordini del maestro restano aperti. Trattali come un piccolo bonus sui materiali che raccoglievi comunque, non come un'attivita.",
         "colOrder": "Ordine di lavoro",
         "colMaster": "Maestro",
         "colAsks": "Chiede",
@@ -8182,6 +8289,7 @@ export const it_IT: EnTranslations = {
         "cooldownLockedHerb": "Aiuola d'erbe esaurita, strumento non disponibile",
         "station": "Stazione di artigianato: {name}",
         "service": "Servizio: {name}",
+        "farmPatch": "Garden beds",
         "partyMember": "Membro del gruppo: {name}",
         "deadPartyMember": "Membro del gruppo caduto: {name}",
         "partyMemberGeneric": "Membro del gruppo",
@@ -8865,6 +8973,7 @@ export const it_IT: EnTranslations = {
     },
     "cast": {
       "fishing": "Pesca",
+      "farming": "Planting",
       "gathering": "Raccolta",
       "crafting": "Creazione",
       "disenchanting": "Disincantamento",
@@ -9050,6 +9159,11 @@ export const it_IT: EnTranslations = {
       "flaskThroughDeath": "The effect remains through death, but ends when you log out; instanced matches begin and end on a clean slate.",
       "wellFed": "Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.",
       "wellFedAura": "Well Fed: Grants {aura} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.",
+      "useWellfed": "{aura}: +{value} {stat} for {minutes} min, granted when you finish eating.",
+      "useWellfedAura": "Grants {aura} for {minutes} min when you finish eating.",
+      "useFeast": "Use: Sets out a feast others can eat from, one serving each ({servings} servings, lasts {minutes} min).",
+      "useFeastBuff": "Each serving grants {aura}: +{value} {stat} for {minutes} min when you finish the {seconds} sec meal.",
+      "useFeastBuffAura": "Each serving grants {aura} for {minutes} min when you finish the {seconds} sec meal.",
       "questItem": "Oggetto missione",
       "questRelated": "Missione: {quest}",
       "questRules": "Non può essere venduto, depositato in banca o scambiato.",
@@ -9072,6 +9186,7 @@ export const it_IT: EnTranslations = {
       "useManaPotion": "Uso: ripristina istantaneamente {amount} mana. Usabile in combattimento. Recupero 1 min.",
       "clickUseInstant": "Clicca per usare subito in combattimento",
       "clickUse": "Clicca per usare",
+      "clickSetOut": "Click to set out",
       "clickBuyback": "Clicca per ricomprare",
       "bagSlots": "Borsa da {slots} spazi"
     },
@@ -12737,6 +12852,138 @@ export const it_IT: EnTranslations = {
       "pattern_laden_hearth": {
         "name": "Recipe: The Laden Hearth"
       },
+      "vale_wheat_seed": {
+        "name": "Vale Wheat Seed"
+      },
+      "vale_wheat": {
+        "name": "Vale Wheat"
+      },
+      "fine_vale_wheat": {
+        "name": "Fine Vale Wheat"
+      },
+      "withered_husks": {
+        "name": "Withered Husks"
+      },
+      "compost": {
+        "name": "Compost"
+      },
+      "growth_tonic": {
+        "name": "Growth Tonic"
+      },
+      "brook_carrot_seed": {
+        "name": "Brook Carrot Seed"
+      },
+      "brook_carrot": {
+        "name": "Brook Carrot"
+      },
+      "fine_brook_carrot": {
+        "name": "Fine Brook Carrot"
+      },
+      "marsh_rice_seed": {
+        "name": "Marsh Rice Seed"
+      },
+      "marsh_rice": {
+        "name": "Marsh Rice"
+      },
+      "fine_marsh_rice": {
+        "name": "Fine Marsh Rice"
+      },
+      "bog_beet_seed": {
+        "name": "Bog Beet Seed"
+      },
+      "bog_beet": {
+        "name": "Bog Beet"
+      },
+      "fine_bog_beet": {
+        "name": "Fine Bog Beet"
+      },
+      "highland_barley_seed": {
+        "name": "Highland Barley Seed"
+      },
+      "highland_barley": {
+        "name": "Highland Barley"
+      },
+      "fine_highland_barley": {
+        "name": "Fine Highland Barley"
+      },
+      "frost_gourd_seed": {
+        "name": "Frost Gourd Seed"
+      },
+      "frost_gourd": {
+        "name": "Frost Gourd"
+      },
+      "fine_frost_gourd": {
+        "name": "Fine Frost Gourd"
+      },
+      "gilded_sunmelon_seed": {
+        "name": "Gilded Sunmelon Seed"
+      },
+      "gilded_sunmelon": {
+        "name": "Gilded Sunmelon"
+      },
+      "fine_gilded_sunmelon": {
+        "name": "Fine Gilded Sunmelon"
+      },
+      "evergarden_greens_seed": {
+        "name": "Evergarden Greens Seed"
+      },
+      "evergarden_greens": {
+        "name": "Evergarden Greens"
+      },
+      "fine_evergarden_greens": {
+        "name": "Fine Evergarden Greens"
+      },
+      "garden_hoe": {
+        "name": "Garden Hoe"
+      },
+      "bronze_hoe": {
+        "name": "Bronze Hoe"
+      },
+      "skysilver_hoe": {
+        "name": "Skysilver Hoe"
+      },
+      "osmium_hoe": {
+        "name": "Osmium Hoe"
+      },
+      "vale_hearth_loaf": {
+        "name": "Vale Hearth Loaf"
+      },
+      "eastbrook_root_pottage": {
+        "name": "Eastbrook Root Pottage"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "Fenbridge Rice Bowl"
+      },
+      "fenbridge_beet_braise": {
+        "name": "Fenbridge Beet Braise"
+      },
+      "highwatch_barley_bannock": {
+        "name": "Highwatch Barley Bannock"
+      },
+      "highwatch_gourd_soup": {
+        "name": "Highwatch Gourd Soup"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "Evergarden Sunmelon Tart"
+      },
+      "evergarden_harvest_platter": {
+        "name": "Evergarden Harvest Platter"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "Eastbrook Glazed Carrots"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "Fenbridge Rice Pudding"
+      },
+      "highwatch_barley_porridge": {
+        "name": "Highwatch Barley Porridge"
+      },
+      "evergarden_braised_greens": {
+        "name": "Evergarden Braised Greens"
+      },
+      "harvest_feast": {
+        "name": "Harvest Feast"
+      },
       "conjured_water4": {
         "name": "Acqua sorgiva evocata"
       },
@@ -14676,6 +14923,26 @@ export const it_IT: EnTranslations = {
         "title": "Maestro dello speziale",
         "greeting": "Misura due volte e versa una volta, {className}. Il farmacista non ha pazienza per i reagenti versati."
       },
+      "farmer_jessica": {
+        "name": "Farmer Jessica",
+        "title": "Allotment Keeper",
+        "greeting": "Good soil and fair weather, {playerName}. Buy a seed from me, sow it in one of those beds, and go about your day. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer."
+      },
+      "farmer_teasel": {
+        "name": "Farmer Teasel",
+        "title": "Fen Paddy Farmer",
+        "greeting": "Marsh rice and bog beet seed, {className}, and compost to feed them. The paddies drain slow, so mind where you tread."
+      },
+      "farmer_hollis": {
+        "name": "Farmer Hollis",
+        "title": "Highwatch Terrace Farmer",
+        "greeting": "The terraces give what the mountain allows, {className}. I sell compost, and if a crop of yours comes up withered I will work the husks back into good soil for you."
+      },
+      "farmer_verbena": {
+        "name": "Farmer Verbena",
+        "title": "Parterre Gardener",
+        "greeting": "Mind the edging, {playerName}, these beds are the pride of the parterre. Compost is what I sell, and I will turn any withered husks you carry into more of it."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Guardamarea",
@@ -14690,6 +14957,19 @@ export const it_IT: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Filone di minerale raccolto"
+          }
+        }
+      },
+      "q_farm_intro": {
+        "title": "First Furrow",
+        "text": "Take this hoe and a pinch of vale wheat seed, {playerName}. Sow the seed in one of the beds beside me, then go about your business. Come back whenever you like and bring the crop in; I will be here.",
+        "completion": "There, your first crop in your own hands. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer. Come back for seed whenever the beds call you, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat planted"
+          },
+          "1": {
+            "label": "Vale Wheat harvested"
           }
         }
       },
@@ -15586,6 +15866,26 @@ export const it_IT: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Carne di selvaggina consegnata"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_wheat": {
+        "title": "Kitchens Wheat Order",
+        "text": "Bread does not bake itself, {playerName}, and my flour bins are scraping bottom. Bring me eight sheaves of vale wheat and I will pay you honest coin for the lot. Grown by your own hand or bought off the market, I do not care, so long as it grinds.",
+        "completion": "Good dry grain, and plenty of it. There is your pay, counted out. When the next crop comes in, you know which door to knock on.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat delivered"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_rice": {
+        "title": "Kitchens Rice Order",
+        "text": "The marsh folk swear by their rice, {playerName}, and I mean to find out why. Fetch me five measures of marsh rice and there is coin waiting for you here. Keep it dry on the road, mind: wet rice is porridge, and I did not order porridge.",
+        "completion": "Plump and dry, every grain. Here is your coin. If the marsh keeps giving, so do I.",
+        "objectives": {
+          "0": {
+            "label": "Marsh Rice delivered"
           }
         }
       },
@@ -17550,6 +17850,7 @@ export const it_IT: EnTranslations = {
     "delveRiteShrineReedInteract": "Santuario delle Canne: premi F per toccarlo",
     "delveRiteShrineSkullInteract": "Santuario del Teschio: premi F per toccarlo",
     "mailboxName": "Cassetta postale",
-    "noticeboardName": "Bacheca degli annunci"
+    "noticeboardName": "Bacheca degli annunci",
+    "farmPatchName": "Garden Beds"
   }
 };

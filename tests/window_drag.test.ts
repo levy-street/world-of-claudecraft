@@ -294,6 +294,7 @@ describe('installWindowDrag', () => {
       station: () => '',
       service: () => '',
       gather: () => '<div>gather</div>',
+      farm: () => '',
       questArea: () => '',
       paint: () => {},
       clearMemo: () => {},

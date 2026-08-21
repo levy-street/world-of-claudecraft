@@ -4501,6 +4501,75 @@
   body.mobile-touch #professions-window .prof-list {
     grid-template-columns: minmax(0, 1fr);
   }
+  /* The Harvest Journal on touch: inset-pinned on all four edges like the
+     professions window above, since its row list is the whole window and a
+     centered 520px card wastes a landscape phone. The .hj-body scroller is
+     the one internal scroll container; the title bar stays pinned chrome and
+     the close button keeps the shared 40px x-btn tap floor. */
+  body.mobile-touch #harvest-journal-window {
+    position: fixed;
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    top: max(10px, env(safe-area-inset-top));
+    bottom: max(10px, env(safe-area-inset-bottom));
+    width: auto;
+    transform: none;
+    max-width: none;
+    max-height: none;
+    box-sizing: border-box;
+    /* The generic mobile .window rule pads the bottom for the safe area; this
+       window is already inset-pinned on all four edges, so that rule would
+       double count the inset. */
+    padding-bottom: var(--window-pad);
+    overflow: hidden;
+    z-index: 95;
+  }
+  /* Narrow phones stack each row into one column: the right-hand state and
+     care cells keep their full width rather than crushing the crop name. */
+  @media (max-width: 560px) {
+    body.mobile-touch .hj-row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    body.mobile-touch .hj-state,
+    body.mobile-touch .hj-care {
+      grid-column: 1;
+      grid-row: auto;
+      justify-content: flex-start;
+    }
+  }
+  /* The plant sheet on touch: the desktop 440px card clamps to the phone
+     (844x390 landscape stays fully on screen), and the pick / toggle / plant
+     controls carry the 44px touch floor, the class-scoped twin of the
+     coarse-pointer rules (the map-zoom-btn idiom). */
+  body.mobile-touch #plant-sheet-window {
+    /* The card stays CENTERED (unlike the journal's four-edge pin), so a
+       symmetric shrink only clears an asymmetric inset when it is TWICE the
+       larger side: a landscape notch is 44px on one edge and 0 on the other,
+       and subtracting the sum would leave the card 12px inside the cutout.
+       Both caps clamp against the JS-synced app viewport (the layout.css
+       .window contract: never raw viewport units); an inset-less phone
+       resolves the env() terms to 0 and keeps the exact prior box. */
+    width: min(
+      440px,
+      calc(
+        var(--app-vw, 100vw) -
+        20px -
+        2 *
+        max(env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px))
+      )
+    );
+    max-height: calc(
+      var(--app-vh, 100vh) -
+      20px -
+      2 *
+      max(env(safe-area-inset-top, 0px), env(safe-area-inset-bottom, 0px))
+    );
+  }
+  body.mobile-touch .ps-seed,
+  body.mobile-touch .ps-knob,
+  body.mobile-touch .ps-plant {
+    min-height: 44px;
+  }
   /* The tool-effect controls' touch floors, the body.mobile-touch twin of the
      @media (pointer: coarse) rules in components.css (the map-zoom-btn idiom):
      the coarse-pointer media rule serves real devices, and this class-scoped

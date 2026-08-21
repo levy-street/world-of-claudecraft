@@ -64,7 +64,8 @@ export const id_ID: EnTranslations = {
       "dungeon": "Dungeon",
       "difficulty": "Tingkat kesulitan",
       "name": "Nama",
-      "spec": "Spesialisasi"
+      "spec": "Spesialisasi",
+      "bed": "Bed id (optional)"
     },
     "difficulty": {
       "normal": "Normal",
@@ -150,6 +151,10 @@ export const id_ID: EnTranslations = {
       "gather": {
         "label": "Berikan keterampilan mengumpulkan",
         "description": "Tingkatkan profesi pengumpulan."
+      },
+      "farmgrow": {
+        "label": "Ripen crops",
+        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
       },
       "teleport": {
         "label": "Teleportasi",
@@ -2581,7 +2586,8 @@ export const id_ID: EnTranslations = {
       "resonantSteel": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan senjata jarak dekat langka atau lebih baik.",
       "resonantTimber": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan staf, tongkat sihir, busur, dan busur silang langka atau lebih baik.",
       "masterwroughtIntermediate": "Masterwrought crafting component.",
-      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day."
+      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day.",
+      "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it."
     },
     "discord": {
       "title": "Discord",
@@ -3018,6 +3024,7 @@ export const id_ID: EnTranslations = {
       "logging": "Penebangan",
       "herbalism": "Herbalisme",
       "fishing": "Memancing",
+      "farming": "Farming",
       "notReady": "Simpul sumber daya ini belum muncul kembali untukmu.",
       "gatherLine": "Anda mengumpulkan: {name}.",
       "gatherLineQty": "Anda mengumpulkan: {name} x{qty}.",
@@ -3036,7 +3043,8 @@ export const id_ID: EnTranslations = {
       "tierRequired": {
         "mining": "Membutuhkan beliung pertambangan tingkat {tier}",
         "logging": "Membutuhkan kapak penebangan tingkat {tier}",
-        "herbalism": "Membutuhkan arit herbalisme tingkat {tier}"
+        "herbalism": "Membutuhkan arit herbalisme tingkat {tier}",
+        "farming": "Requires a tier {tier} farming hoe"
       },
       "requiresTool": {
         "mining": "Membutuhkan beliung penambangan",
@@ -3047,23 +3055,27 @@ export const id_ID: EnTranslations = {
         "mining": "Kamu membutuhkan beliung pertambangan tingkat {tier} untuk memanen urat ini.",
         "logging": "Kamu membutuhkan kapak penebangan tingkat {tier} untuk menebang rumpun ini.",
         "herbalism": "Kamu membutuhkan arit herbalisme tingkat {tier} untuk mengumpulkan petak ini.",
-        "fishing": "Kamu membutuhkan joran pancing tingkat {tier} untuk memancing di perairan ini."
+        "fishing": "Kamu membutuhkan joran pancing tingkat {tier} untuk memancing di perairan ini.",
+        "farming": "You need a tier {tier} farming hoe to work this bed."
       },
       "toolRequired": {
         "mining": "Kamu membutuhkan beliung penambangan untuk menambang urat ini.",
         "logging": "Kamu membutuhkan kapak penebangan untuk menebang tegakan ini.",
         "herbalism": "Kamu membutuhkan sabit herbalisme untuk mengumpulkan petak ini.",
-        "fishing": "Kamu membutuhkan joran pancing untuk melempar kail."
+        "fishing": "Kamu membutuhkan joran pancing untuk melempar kail.",
+        "farming": "You need a farming hoe to work this bed."
       },
       "noNodeNearby": {
         "mining": "Tidak ada urat bijih dalam jangkauan.",
         "logging": "Tidak ada tegakan pohon dalam jangkauan.",
-        "herbalism": "Tidak ada petak herba dalam jangkauan."
+        "herbalism": "Tidak ada petak herba dalam jangkauan.",
+        "farming": "There is no crop bed within reach."
       },
       "wieldUnmet": {
         "mining": "Kamu membutuhkan Penambangan {skill} untuk mengayunkan beliung yang sudah ada di tasmu.",
         "logging": "Kamu membutuhkan Penebangan {skill} untuk mengayunkan kapak yang sudah ada di tasmu.",
-        "herbalism": "Kamu membutuhkan Herbalisme {skill} untuk memakai sabit yang sudah ada di tasmu."
+        "herbalism": "Kamu membutuhkan Herbalisme {skill} untuk memakai sabit yang sudah ada di tasmu.",
+        "farming": "You need Farming {skill} to swing the hoe already in your bags."
       },
       "wieldUnmetCorpse": "Kamu membutuhkan keahlian pengumpulan {skill} untuk memakai alat terbaikmu.",
       "toolTierUnmetCorpse": "Kamu membutuhkan alat pengumpul tingkat {tier} untuk mendapatkan bahan terbaik.",
@@ -3072,18 +3084,21 @@ export const id_ID: EnTranslations = {
           "mining": "Alat penambangan (tingkat {tier})",
           "logging": "Alat penebangan (tingkat {tier})",
           "herbalism": "Alat herbalisme (tingkat {tier})",
-          "fishing": "Joran pancing (tingkat {tier})"
+          "fishing": "Joran pancing (tingkat {tier})",
+          "farming": "Farming tool (tier {tier})"
         },
         "unlocks": {
           "mining": "Diperlukan untuk menambang urat bijih hingga tingkat {tier}.",
           "logging": "Diperlukan untuk menebang tegakan pohon hingga tingkat {tier}.",
           "herbalism": "Diperlukan untuk mengumpulkan petak herba hingga tingkat {tier}.",
-          "fishing": "Diperlukan untuk memancing di perairan hingga tingkat {tier}."
+          "fishing": "Diperlukan untuk memancing di perairan hingga tingkat {tier}.",
+          "farming": "Required to plant crops up to tier {tier}."
         },
         "use": {
           "mining": "Gunakan: Menambang urat bijih terdekat.",
           "logging": "Gunakan: Menebang tegakan pohon terdekat.",
-          "herbalism": "Gunakan: Mengumpulkan dari petak herba terdekat."
+          "herbalism": "Gunakan: Mengumpulkan dari petak herba terdekat.",
+          "farming": "Works from your bags when you plant a crop bed."
         },
         "speed": "Mengumpulkan lebih cepat di simpul di bawah tingkat {tier}.",
         "rodRequired": "Diperlukan untuk memancing.",
@@ -3092,6 +3107,7 @@ export const id_ID: EnTranslations = {
         "rodBand": "Membuka hasil tangkapan yang lebih kaya pada keahlian memancing {skill} ke atas."
       },
       "downgradeMark": "Tas penuh: temuan disimpan tanpa tanda pengumpulnya.",
+      "downgradeMarkCrop": "Bags full: the harvest was stored without its grower's mark.",
       "downgradeFind": "Tas penuh: temuan murni terlewat.",
       "emptyHookNote": "Kail masih kosong",
       "stateReady": "Siap",
@@ -3099,6 +3115,83 @@ export const id_ID: EnTranslations = {
       "stateCooldownTimed": "Muncul kembali dalam {time}",
       "respawnClock": "{minutes}.{seconds}",
       "fineGradePreview": "Alatmu menyempurnakan hasil ini menjadi mutu halus."
+    },
+    "farming": {
+      "plantLine": "You plant: {name}.",
+      "harvestLine": "You bring in: {name}.",
+      "harvestLineQty": "You bring in: {name} x{qty}.",
+      "harvestFineLine": "You also bring in: {name}.",
+      "harvestFineLineQty": "You also bring in: {name} x{qty}.",
+      "witheredLine": "The crop withered. You clear the bed: {name}.",
+      "witheredLineQty": "The crop withered. You clear the bed: {name} x{qty}.",
+      "seedBackLine": "You recover seed: {name}.",
+      "seedBackLineQty": "You recover seed: {name} x{qty}.",
+      "denied": {
+        "bad_bed": "There is no crop bed there.",
+        "bad_crop": "You cannot plant that here.",
+        "range": "You are too far from that crop bed.",
+        "bed_taken": "You already have a crop growing there.",
+        "skill": "Your Farming skill is too low for that crop.",
+        "no_seed": "You have no seed for that crop.",
+        "not_ready": "That crop is still growing.",
+        "no_plot": "Nothing is planted in that bed.",
+        "no_husks": "You do not have enough withered husks.",
+        "no_compost": "You have no compost.",
+        "no_fee_produce": "You have no produce to pay the watch fee.",
+        "no_tonic": "You have no growth tonic.",
+        "tool": "You have no farming hoe fit for that crop.",
+        "locked": "An item that would pay for that is locked.",
+        "no_farmer": "You must be near a farmer to trade husks for compost.",
+        "no_feast": "You have no feast to set out.",
+        "feast_active": "Your feast is already set out.",
+        "feast_expired": "That feast is gone.",
+        "feast_finished": "That feast has been picked clean.",
+        "feast_range": "You are too far from the feast.",
+        "feast_eaten": "You have already eaten from that feast."
+      },
+      "feastTitle": "{name}'s Harvest Feast",
+      "feastPlacedLine": "You set out your harvest feast.",
+      "huskTrade": "Trade husks for compost",
+      "huskTradeAria": "Trade husks for compost with {name}",
+      "plantSheet": {
+        "title": "Plant a Crop",
+        "plant": "Plant",
+        "sowAria": "Sow {name}",
+        "empty": "You have no seed you can sow at this bed.",
+        "close": "Close the plant sheet"
+      },
+      "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
+      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
+      "readyLine": "A crop is ready to harvest.",
+      "readyLineQty": "{count} crops are ready to harvest.",
+      "readyWitheredLine": "A crop withered in its bed.",
+      "readyWitheredLineQty": "{count} crops withered in their beds."
+    },
+    "harvestJournal": {
+      "title": "Harvest Journal",
+      "close": "Close",
+      "listLabel": "Planted crop beds",
+      "growing": "Ready in {time}",
+      "ready": "Ready to harvest",
+      "finishing": "Finishing up",
+      "withered": "Withered",
+      "readyAnnounce": "Ready to harvest: {name}",
+      "remainingDaysHours": "{days}d {hours}h",
+      "remainingHoursMinutes": "{hours}h {minutes}m",
+      "remainingMinutesSeconds": "{minutes}m {seconds}s",
+      "remainingSeconds": "{seconds}s",
+      "bedLine": "{zone}, bed {index}",
+      "bedLineUnknown": "Unknown bed",
+      "careWatch": "Farmer's Watch",
+      "careNone": "No extras",
+      "stageSprout": "Sprout",
+      "stageSeedling": "Seedling",
+      "stageMaturing": "Maturing",
+      "stageRipe": "Ripe",
+      "emptyTitle": "No crops planted",
+      "emptyBody": "Sow a seed in any garden bed and the plot appears here with its timer.",
+      "noviceTitle": "You have not worked a garden bed yet",
+      "noviceBody": "Farming skill grows every time you bring in a crop. Sow a seed in any garden bed to begin."
     },
     "archetypeTitle": {
       "label": "Gelar",
@@ -3218,7 +3311,7 @@ export const id_ID: EnTranslations = {
           "quickeningCharm": "Mempersingkat penghitung waktu munculnya kembali simpul yang dipicunya.",
           "makersCharm": "+2 yield per harvest while charged."
         },
-        "howToSlot": "Pasangkan pada alat Penambangan, Penebangan, atau Herbalisme dari jendela Profesi. Habis terpakai saat dipasang.",
+        "howToSlot": "Pasangkan pada alat Penambangan, Penebangan, Herbalisme, atau Pertanian dari jendela Profesi. Habis terpakai saat dipasang.",
         "charges": "Dimulai dengan {base} muatan pada alat umum (+{bonus} per anak tangga kelangkaan).",
         "landOnly": "Tidak dapat dipasang pada joran pancing.",
         "openProfessions": "Buka Profesi untuk memasangnya pada alat pengumpulan."
@@ -3887,7 +3980,8 @@ export const id_ID: EnTranslations = {
   "gatherEvent": {
     "pristineVein": "{finder} memberikan kesan yang murni!",
     "ancientHeartwood": "{finder} menebang inti kayu kuno!",
-    "moonlitBloom": "{finder} menemukan mekarnya cahaya bulan!"
+    "moonlitBloom": "{finder} menemukan mekarnya cahaya bulan!",
+    "goldenHarvest": "{finder} reaped a golden harvest!"
   },
   "apiError": {
     "validation": {
@@ -4260,6 +4354,7 @@ export const id_ID: EnTranslations = {
       "groupCamera": "Kamera",
       "talents": "Bakat",
       "professions": "Profesi",
+      "harvestJournal": "Harvest Journal",
       "arena": "Jendela PvP (arena dan Medan Thornhollow)",
       "leaderboard": "Papan Peringkat",
       "deeds": "Kitab Jasa",
@@ -5629,6 +5724,9 @@ export const id_ID: EnTranslations = {
       "outputFmt": "{name} x{count}",
       "comboReq": "Membutuhkan {a} dan {b}",
       "oncePerDay": "Once per day",
+      "effectFood": "Restores {amount} health over {seconds} sec when eaten.",
+      "effectWellFed": "Well fed when you finish eating: +{value} {stat} for {minutes} min.",
+      "effectWellFedAura": "Grants {aura} for {minutes} min when you finish eating.",
       "sourceTrainerFee": "Pelatih, {fee}",
       "sourceTrainerFree": "Pelatih, gratis",
       "sourceKnown": "Diketahui dari awal",
@@ -5806,7 +5904,8 @@ export const id_ID: EnTranslations = {
         "mining": "Penambangan menarik bijih langsung dari batuan dunia: tembaga di Lembah Eastbrook, besi di Rawa Mirefen, dan osmium di ketinggian Dataran Tinggi Thornpeak, dengan urat pemula tersebar di setiap zona yang lebih muda di luarnya, memberi makan kerajinan tempa. Terbuka untuk semua orang sejak level 1: beliung penambangan seharga 20 tembaga dari konter Eastbrook, Fenbridge, atau Highwatch membuka setiap urat pemula, dan anak tangga beliung yang lebih tinggi terbangun saat penghitungmu sendiri meraihnya. Dilacak pada penghitungnya sendiri hingga batas 100.",
         "logging": "Penebangan menumbangkan kayu dari rumpun pohon di seluruh dunia: ironbark di Lembah Eastbrook, ashwood di Rawa Mirefen, highpine di Dataran Tinggi Thornpeak, dan rumpun pemula di setiap zona yang lebih muda, bahan mentah untuk gagang, staf, dan bangku sang insinyur. Terbuka untuk semua orang sejak level 1 dengan kapak penebangan di tasmu (20 tembaga di konter Eastbrook, Fenbridge, dan Highwatch), dilacak pada penghitungnya sendiri hingga batas 100.",
         "herbalism": "Herbalisme mengumpulkan apa yang tumbuh liar: sheenleaf di Lembah Eastbrook, goldleaf di Rawa Mirefen, sunpetal di Dataran Tinggi Thornpeak, dan petak pemula di setiap zona yang lebih muda, daun dan batang yang membuat perdagangan apoteker terus menyeduh. Terbuka untuk semua orang sejak level 1 dengan sabit herbalisme di tasmu (20 tembaga di konter Eastbrook, Fenbridge, dan Highwatch), dilacak pada penghitungnya sendiri hingga batas 100.",
-        "fishing": "Memancing adalah yang paling berbeda di antara perdagangan pengumpulan, sekaligus yang paling dalam: minigame gigit-dan-tarik yang sungguhan, tabel tangkapan tersendiri di masing-masing tiga zona tanah inti (perairan muda di luar itu semuanya menyajikan tabel Lembah untuk saat ini), dan batas kecakapan 200, dua kali lipat yang lain. Beli joran, hadapi air terbuka, dan lemparkan kailmu."
+        "fishing": "Memancing adalah yang paling berbeda di antara perdagangan pengumpulan, sekaligus yang paling dalam: minigame gigit-dan-tarik yang sungguhan, tabel tangkapan tersendiri di masing-masing tiga zona tanah inti (perairan muda di luar itu semuanya menyajikan tabel Lembah untuk saat ini), dan batas kecakapan 200, dua kali lipat yang lain. Beli joran, hadapi air terbuka, dan lemparkan kailmu.",
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe whenever you come back, because nothing in a bed ever spoils. A farmer stands beside every bed site, from the Eastbrook allotments through Fenbridge and Highwatch to the Evergarden parterre, and Farmer Jessica in Eastbrook is where the trade starts: she sells the garden hoe and the first seeds, and her errand walks a new farmer through a first crop. Each rung of the ladder grows its own pair of crops, each with a finer grade for a practiced hand to pull, and engineers craft the hoes for the tougher ground above the starter beds. Tracked on its own counter to a cap of 100."
       },
       "rhythmHeading": "Ritme pengumpulan",
       "rhythmBody": "Panen adalah rapal singkat yang terlihat, bukan comotan instan: {base} detik dasar, tidak pernah di bawah lantai {floor} detik. Membawa alat di atas tingkat simpul, yang kecakapanmu izinkan untuk kamu gunakan, mempercepatmu {tool} detik per tingkat di atasnya, dan setiap band kecakapan yang kamu lewati memangkas {band} detik lagi; sekadar menyamai tingkat simpul hanya membuatmu masuk pintu, tingkat-tingkat di atasnyalah yang membuatmu cepat.\n\nTas yang penuh menolak rapal itu dengan sopan sebelum dimulai, sehingga tidak ada yang terbuang di tengah ayunan, dan setiap panen membayar sepotong kecil XP karakter, diskalakan berdasarkan level simpul terhadap levelmu sendiri seperti XP dari membunuh: simpul abu-abu yang remeh tidak mengajarkan apa pun kepada karakter yang sudah mentok.",
@@ -5837,7 +5936,9 @@ export const id_ID: EnTranslations = {
         "mining": "Simpul pertamamu dari perdagangan mana pun meraih jasa Buah dari Ladang, dan batas 100 dalam Penambangan mengukir jasa Bijih dalam Darah. Mencapai 100 dalam tiga dari Penambangan, Penebangan, Herbalisme, dan Memancing menambahkan jasa Pengumpul Mahir di 25 Kemasyhuran, dan memecahkan urat bijih pilihan mencatat tanda kolektor tersendiri. Tidak satu pun dari ini memberikan kekuatan: jasa adalah gelar dan Kemasyhuran, catatan jalan yang telah kamu lalui.",
         "logging": "Simpul pertamamu dari perdagangan mana pun meraih jasa Buah dari Ladang, dan batas 100 dalam Penebangan mengukir Penebang Kayu Inti. Mencapai 100 dalam tiga dari Penambangan, Penebangan, Herbalisme, dan Memancing menambahkan jasa Pengumpul Mahir di 25 Kemasyhuran, dan satu pukulan pada kayu inti kuno mencatat tanda kolektor tersendiri. Jasa adalah gelar dan Kemasyhuran saja, tidak pernah memberikan kekuatan.",
         "herbalism": "Simpul pertamamu dari perdagangan mana pun meraih jasa Buah dari Ladang, dan batas 100 dalam Herbalisme mengukir Penguasa Padang. Mencapai 100 dalam tiga dari Penambangan, Penebangan, Herbalisme, dan Memancing menambahkan jasa Pengumpul Mahir di 25 Kemasyhuran, dan mekar yang bersinar di bawah sinar bulan mencatat tanda kolektor tersendiri. Jasa adalah gelar dan Kemasyhuran saja, tidak pernah memberikan kekuatan.",
-        "fishing": "Tonggak 100 mengukir Garam Tua dan 200 mengukir Pemancing Mahir beserta gelarnya, puncak tertinggi seni sang pemancing; Memancing juga dihitung untuk Pengumpul Mahir, yang diraih pada 100 di tiga perdagangan pengumpulan mana pun. Ikan pertama dari perairan masing-masing enam zona mengisi halamannya sendiri, tiga zona tanah inti ditambah Paya Willow, Puncak Angin, dan Pesisir Jauh di luar sana, dan Koi Kerlip Surya mencatat Kilau Harapan, sehingga para pengelana yang membawa joran di ranselnya mengisi kitab mereka lebih cepat daripada yang mereka kira."
+        "fishing": "Tonggak 100 mengukir Garam Tua dan 200 mengukir Pemancing Mahir beserta gelarnya, puncak tertinggi seni sang pemancing; Memancing juga dihitung untuk Pengumpul Mahir, yang diraih pada 100 di tiga perdagangan pengumpulan mana pun. Ikan pertama dari perairan masing-masing enam zona mengisi halamannya sendiri, tiga zona tanah inti ditambah Paya Willow, Puncak Angin, dan Pesisir Jauh di luar sana, dan Koi Kerlip Surya mencatat Kilau Harapan, sehingga para pengelana yang membawa joran di ranselnya mengisi kitab mereka lebih cepat daripada yang mereka kira.",
+        "farming": "Farming keeps no deeds of its own yet: now that its beds and crops are in the ground, the milestone and cap deeds that mark the other trades arrive in a later patch. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power.",
+        "farmingSown": "Farming keeps its own shelf in the Book of Deeds now. Sow It Begins marks your first planted crop, and four chronicle pages mark a first thriving harvest at each of the bed sites, from Eastbrook Vale to the Evergarden. A golden harvest records its own zero-Renown collector's mark, and proficiency in Farming counts toward Master Gatherer, earned at 100 in any three gathering trades. The capstone is already written: Harvestmaster, the trade's 100-proficiency title, comes within reach with a later patch's deeper fields. Deeds are titles and Renown only, never power."
       },
       "fish": {
         "startHeading": "Memulai",
@@ -5859,6 +5960,12 @@ export const id_ID: EnTranslations = {
         "emptyHook": "Tidak ada yang menggigit",
         "koiHeading": "Koi Kerlip Surya",
         "koiBody": "Setiap perairan dalam permainan menyembunyikan hadiah yang sama: Koi Kerlip Surya, kilau tidak umum di ujung kail yang bernilai 75 tembaga bagi penjaja dan jauh lebih berharga bagi harga dirimu. Peluangnya hanya menjawab band tangkapanmu dan tidak ada yang lain, sama di setiap zona: baris 1 persen dari tabel tangkapan pada band 0, 3 pada band 1, dan 6 pada band 2, diundi pada setiap lemparan yang berhasil ditarik, sehingga sang koi datang kepada pemancing yang telah mendapatkan tabel-tabel dalam. Mendaratkan satu ekor mencatat Kilau Harapan di Kitab Jasamu, tanda kolektor tanpa Kemasyhuran. Saat itu terjadi, log memastikan kamu mengetahuinya."
+      },
+      "farm": {
+        "bedsHeading": "Working the beds",
+        "bedsBody": "The loop is short. Buy seeds and compost from the farmer beside the beds: Jessica in Eastbrook stocks the Vale pair, the Fenbridge farmer the marsh pair, and no counter anywhere sells the Highwatch or Evergarden seeds, which come back a seed or two at a time from a high-tier harvest and otherwise change hands on the World Market. Sow with a hoe in your bags, and tip the odds if you like: compost from the counter and the farmer's watch, paid in produce as you plant, each raise a crop's chance of coming through, an alchemist's growth tonic gives the harvest a shot at a larger yield, and once your skill has climbed a full band past a crop's tier that crop never fails at all. Then walk away. The bed keeps growing while you are logged out, a ripe crop waits as long as you leave it, and the Harvest Journal (Shift+K, or the Farming row of your professions window) lists every bed you have planted with its timer.\n\nA crop that fails leaves withered husks in place of produce, and any farmer trades husks for compost, so a bad season buys the next one's insurance. What you bring in feeds the kitchens: the produce cooks into dishes at the kitchens, and Cook Marlow's wheat and rice orders take Vale Wheat and Marsh Rice off your hands for coin on the same clock as every other work order.",
+        "tableHeading": "From the beds to the table",
+        "tableBody": "The kitchens are where a season pays forward. Beyond the everyday farm dishes, each crop tier has a richer dish that leaves you Well Fed: finish the meal and a lasting boon stays with you, the kind of edge a group wants eaten before the dungeon door. Crowning the set is the Harvest Feast, a spread a cook sets out in the world itself: everyone at hand takes a serving of their own, one each, and every finished meal pays the same Well Fed boon, so one farmer's season can set the table for a whole party. The top of that ladder, the two richest dishes and the feast itself, comes within reach with a later patch's deeper fields; everything below them is cooking today.\n\nLuck keeps a place at that table too. Every harvest you bring in rolls the same windfall chance the other gathering trades enjoy, and now and then a crop comes up golden: the yield lands far past a normal pull, the whole zone hears the find announced by name, and Golden Harvest is recorded in your Book of Deeds."
       },
       "econ": {
         "title": "Ekonomi Kerajinan",
@@ -5882,7 +5989,7 @@ export const id_ID: EnTranslations = {
         "marketHeading": "Pasar Dunia dan potongannya",
         "marketBody": "Pasar Dunia adalah bursa seluruh realm, dijaga oleh Pedagang di Eastbrook dan Pelelang Voss di Highwatch. Pendaftaran gratis: tidak ada setoran, dan daftar yang tidak terjual hanya kembali kepadamu. Rumah mengambil potongannya hanya ketika sesuatu benar-benar terjual: 5 persen dari harga jual, dan sisanya menunggumu untuk diambil.\n\nSatu batas penting: Pasar hanya menjadi perantara barang biasa. Salinan yang ditandatangani, karya besar, terpesonan, atau terikat tidak pernah masuk ke daftar, sehingga item istimewa berpindah tangan secara langsung di jendela perdagangan, yang membawa identitas lengkap item, termasuk tanda tangan. Tentukan harga sendiri; Pasar hanya memberi tahu kamu berapa harga versi biasanya.",
         "workOrdersHeading": "Pesanan kerja",
-        "workOrdersNote": "Setiap master stasiun memposting pesanan kerja tetap: bawa setumpuk bahan pokok kerajinan mereka dan langsung dibayar di tempat, ditambah sedikit pengalaman misi. Bayarannya sengaja {pct}% dari harga yang akan diberikan pedagang untuk tumpukan yang sama, dibulatkan ke bawah, sehingga pesanan kerja tidak pernah menjadi cara menguntungkan untuk menjual bahan, hanya alasan untuk mampir ke stasiun.\n\nSetiap pesanan berjalan pada jam {minutes} menit tersendiri per karakter: serahkan satu dan master itu tidak punya apa-apa lagi untukmu hingga penghitung waktu berputar. Perlakukan sebagai bonus kecil pada bahan yang sudah kamu kumpulkan, bukan bisnis.",
+        "workOrdersNote": "Setiap master stasiun memposting pesanan kerja tetap, satu per bahan pokok: bawa tumpukan yang diminta sebuah pesanan dan langsung dibayar di tempat, ditambah sedikit pengalaman misi. Bayarannya sengaja {pct}% dari harga yang akan diberikan pedagang untuk tumpukan yang sama, dibulatkan ke bawah, sehingga pesanan kerja tidak pernah menjadi cara menguntungkan untuk menjual bahan, hanya alasan untuk mampir ke stasiun.\n\nSetiap pesanan berjalan pada jam {minutes} menit tersendiri per karakter: serahkan satu dan pesanan itu tertutup untukmu hingga penghitung waktu berputar, sementara pesanan lain dari master tetap terbuka. Perlakukan sebagai bonus kecil pada bahan yang sudah kamu kumpulkan, bukan bisnis.",
         "colOrder": "Pesanan kerja",
         "colMaster": "Master",
         "colAsks": "Meminta",
@@ -8182,6 +8289,7 @@ export const id_ID: EnTranslations = {
         "cooldownLockedHerb": "Petak herba telah dipanen, alat belum dapat digunakan",
         "station": "Stasiun kerajinan: {name}",
         "service": "Layanan: {name}",
+        "farmPatch": "Garden beds",
         "partyMember": "Anggota party: {name}",
         "deadPartyMember": "Anggota party yang tewas: {name}",
         "partyMemberGeneric": "Anggota party",
@@ -8865,6 +8973,7 @@ export const id_ID: EnTranslations = {
     },
     "cast": {
       "fishing": "Memancing",
+      "farming": "Planting",
       "gathering": "Mengumpulkan",
       "crafting": "Membuat",
       "disenchanting": "Menghancurkan Pemantraan",
@@ -9050,6 +9159,11 @@ export const id_ID: EnTranslations = {
       "flaskThroughDeath": "The effect remains through death, but ends when you log out; instanced matches begin and end on a clean slate.",
       "wellFed": "Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.",
       "wellFedAura": "Well Fed: Grants {aura} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.",
+      "useWellfed": "{aura}: +{value} {stat} for {minutes} min, granted when you finish eating.",
+      "useWellfedAura": "Grants {aura} for {minutes} min when you finish eating.",
+      "useFeast": "Use: Sets out a feast others can eat from, one serving each ({servings} servings, lasts {minutes} min).",
+      "useFeastBuff": "Each serving grants {aura}: +{value} {stat} for {minutes} min when you finish the {seconds} sec meal.",
+      "useFeastBuffAura": "Each serving grants {aura} for {minutes} min when you finish the {seconds} sec meal.",
       "questItem": "Barang Misi",
       "questRelated": "Misi: {quest}",
       "questRules": "Tidak dapat dijual, disimpan di bank, atau ditukar.",
@@ -9072,6 +9186,7 @@ export const id_ID: EnTranslations = {
       "useManaPotion": "Pakai: Memulihkan {amount} mana seketika. Bisa dipakai dalam pertempuran. Jeda 1 mnt.",
       "clickUseInstant": "Klik untuk memakai seketika dalam pertempuran",
       "clickUse": "Klik untuk memakai",
+      "clickSetOut": "Click to set out",
       "clickBuyback": "Klik untuk membeli kembali",
       "bagSlots": "Tas {slots} Slot"
     },
@@ -12737,6 +12852,138 @@ export const id_ID: EnTranslations = {
       "pattern_laden_hearth": {
         "name": "Recipe: The Laden Hearth"
       },
+      "vale_wheat_seed": {
+        "name": "Vale Wheat Seed"
+      },
+      "vale_wheat": {
+        "name": "Vale Wheat"
+      },
+      "fine_vale_wheat": {
+        "name": "Fine Vale Wheat"
+      },
+      "withered_husks": {
+        "name": "Withered Husks"
+      },
+      "compost": {
+        "name": "Compost"
+      },
+      "growth_tonic": {
+        "name": "Growth Tonic"
+      },
+      "brook_carrot_seed": {
+        "name": "Brook Carrot Seed"
+      },
+      "brook_carrot": {
+        "name": "Brook Carrot"
+      },
+      "fine_brook_carrot": {
+        "name": "Fine Brook Carrot"
+      },
+      "marsh_rice_seed": {
+        "name": "Marsh Rice Seed"
+      },
+      "marsh_rice": {
+        "name": "Marsh Rice"
+      },
+      "fine_marsh_rice": {
+        "name": "Fine Marsh Rice"
+      },
+      "bog_beet_seed": {
+        "name": "Bog Beet Seed"
+      },
+      "bog_beet": {
+        "name": "Bog Beet"
+      },
+      "fine_bog_beet": {
+        "name": "Fine Bog Beet"
+      },
+      "highland_barley_seed": {
+        "name": "Highland Barley Seed"
+      },
+      "highland_barley": {
+        "name": "Highland Barley"
+      },
+      "fine_highland_barley": {
+        "name": "Fine Highland Barley"
+      },
+      "frost_gourd_seed": {
+        "name": "Frost Gourd Seed"
+      },
+      "frost_gourd": {
+        "name": "Frost Gourd"
+      },
+      "fine_frost_gourd": {
+        "name": "Fine Frost Gourd"
+      },
+      "gilded_sunmelon_seed": {
+        "name": "Gilded Sunmelon Seed"
+      },
+      "gilded_sunmelon": {
+        "name": "Gilded Sunmelon"
+      },
+      "fine_gilded_sunmelon": {
+        "name": "Fine Gilded Sunmelon"
+      },
+      "evergarden_greens_seed": {
+        "name": "Evergarden Greens Seed"
+      },
+      "evergarden_greens": {
+        "name": "Evergarden Greens"
+      },
+      "fine_evergarden_greens": {
+        "name": "Fine Evergarden Greens"
+      },
+      "garden_hoe": {
+        "name": "Garden Hoe"
+      },
+      "bronze_hoe": {
+        "name": "Bronze Hoe"
+      },
+      "skysilver_hoe": {
+        "name": "Skysilver Hoe"
+      },
+      "osmium_hoe": {
+        "name": "Osmium Hoe"
+      },
+      "vale_hearth_loaf": {
+        "name": "Vale Hearth Loaf"
+      },
+      "eastbrook_root_pottage": {
+        "name": "Eastbrook Root Pottage"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "Fenbridge Rice Bowl"
+      },
+      "fenbridge_beet_braise": {
+        "name": "Fenbridge Beet Braise"
+      },
+      "highwatch_barley_bannock": {
+        "name": "Highwatch Barley Bannock"
+      },
+      "highwatch_gourd_soup": {
+        "name": "Highwatch Gourd Soup"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "Evergarden Sunmelon Tart"
+      },
+      "evergarden_harvest_platter": {
+        "name": "Evergarden Harvest Platter"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "Eastbrook Glazed Carrots"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "Fenbridge Rice Pudding"
+      },
+      "highwatch_barley_porridge": {
+        "name": "Highwatch Barley Porridge"
+      },
+      "evergarden_braised_greens": {
+        "name": "Evergarden Braised Greens"
+      },
+      "harvest_feast": {
+        "name": "Harvest Feast"
+      },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
       },
@@ -14676,6 +14923,26 @@ export const id_ID: EnTranslations = {
         "title": "Master Apoteker",
         "greeting": "Ukur dua kali dan tuang sekali, {className}. Apoteker tidak mempunyai kesabaran terhadap reagen yang tumpah."
       },
+      "farmer_jessica": {
+        "name": "Farmer Jessica",
+        "title": "Allotment Keeper",
+        "greeting": "Good soil and fair weather, {playerName}. Buy a seed from me, sow it in one of those beds, and go about your day. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer."
+      },
+      "farmer_teasel": {
+        "name": "Farmer Teasel",
+        "title": "Fen Paddy Farmer",
+        "greeting": "Marsh rice and bog beet seed, {className}, and compost to feed them. The paddies drain slow, so mind where you tread."
+      },
+      "farmer_hollis": {
+        "name": "Farmer Hollis",
+        "title": "Highwatch Terrace Farmer",
+        "greeting": "The terraces give what the mountain allows, {className}. I sell compost, and if a crop of yours comes up withered I will work the husks back into good soil for you."
+      },
+      "farmer_verbena": {
+        "name": "Farmer Verbena",
+        "title": "Parterre Gardener",
+        "greeting": "Mind the edging, {playerName}, these beds are the pride of the parterre. Compost is what I sell, and I will turn any withered husks you carry into more of it."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Pengawas Pasang",
@@ -14690,6 +14957,19 @@ export const id_ID: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Urat bijih dipanen"
+          }
+        }
+      },
+      "q_farm_intro": {
+        "title": "First Furrow",
+        "text": "Take this hoe and a pinch of vale wheat seed, {playerName}. Sow the seed in one of the beds beside me, then go about your business. Come back whenever you like and bring the crop in; I will be here.",
+        "completion": "There, your first crop in your own hands. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer. Come back for seed whenever the beds call you, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat planted"
+          },
+          "1": {
+            "label": "Vale Wheat harvested"
           }
         }
       },
@@ -15586,6 +15866,26 @@ export const id_ID: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Daging Buruan dikirim"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_wheat": {
+        "title": "Kitchens Wheat Order",
+        "text": "Bread does not bake itself, {playerName}, and my flour bins are scraping bottom. Bring me eight sheaves of vale wheat and I will pay you honest coin for the lot. Grown by your own hand or bought off the market, I do not care, so long as it grinds.",
+        "completion": "Good dry grain, and plenty of it. There is your pay, counted out. When the next crop comes in, you know which door to knock on.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat delivered"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_rice": {
+        "title": "Kitchens Rice Order",
+        "text": "The marsh folk swear by their rice, {playerName}, and I mean to find out why. Fetch me five measures of marsh rice and there is coin waiting for you here. Keep it dry on the road, mind: wet rice is porridge, and I did not order porridge.",
+        "completion": "Plump and dry, every grain. Here is your coin. If the marsh keeps giving, so do I.",
+        "objectives": {
+          "0": {
+            "label": "Marsh Rice delivered"
           }
         }
       },
@@ -17550,6 +17850,7 @@ export const id_ID: EnTranslations = {
     "delveRiteShrineReedInteract": "Altar Buluh: Tekan F untuk menyentuhnya",
     "delveRiteShrineSkullInteract": "Altar Tengkorak: Tekan F untuk menyentuhnya",
     "mailboxName": "Kotak Surat",
-    "noticeboardName": "Papan Pengumuman"
+    "noticeboardName": "Papan Pengumuman",
+    "farmPatchName": "Garden Beds"
   }
 };

@@ -4,6 +4,7 @@
 // whatever the content modules currently export, so they hold as zones grow.
 import { describe, expect, it } from 'vitest';
 import { CHOICE_ROW_LEVELS, CHOICE_ROWS } from '../src/sim/content/choice_rows';
+import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import {
   ABILITIES,
   ALL_RECIPES,
@@ -40,7 +41,9 @@ const SCRIPTED_COLLECT_ITEMS = new Set(['the_codfather']);
 // materials use: gather-node harvest (NODE_MATERIAL_TABLE grants copper_ore,
 // ironbark_log, goldleaf_herb in their zones) and corpse harvest
 // (HARVEST_COMPONENT_ITEMS maps a component tag to game_meat, spider_silk,
-// rough_hide, etc). Both the obtainability check and its negative control call
+// rough_hide, etc), plus the farm harvest path the produce work orders use
+// (FARM_CROPS: harvestCrop grants a crop's produceItemId, vale_wheat, marsh_rice,
+// etc). Both the obtainability check and its negative control call
 // this one predicate, so the negative control proves the REAL model, not a copy.
 function collectItemAcquirable(itemId: string): boolean {
   const fromLoot = Object.values(MOBS).some((m) => m.loot.some((l) => l.itemId === itemId));
@@ -50,7 +53,8 @@ function collectItemAcquirable(itemId: string): boolean {
     Object.values(byZone).some((row) => row.itemId === itemId),
   );
   const fromHarvest = Object.values(HARVEST_COMPONENT_ITEMS).includes(itemId);
-  return fromLoot || fromGround || fromScript || fromNode || fromHarvest;
+  const fromFarm = Object.values(FARM_CROPS).some((crop) => crop.produceItemId === itemId);
+  return fromLoot || fromGround || fromScript || fromNode || fromHarvest || fromFarm;
 }
 
 describe('content referential integrity', () => {
@@ -120,19 +124,26 @@ describe('content referential integrity', () => {
   });
 
   it('the collect-obtainability model rejects a fabricated unobtainable item (negative control)', () => {
-    // Decisive guard so the widened model (with the gather-node and
-    // corpse-harvest paths for the work-order materials) can never go all-
-    // permissive: an item that lives in NO mob loot table, ground object,
-    // scripted set, gather-node material row, or corpse-harvest component map
-    // must still be classified unacquirable. The four real acquisition paths are
-    // re-proven acquirable here so a later refactor that drops a path reds this.
+    // Decisive guard so the widened model (with the gather-node, corpse-
+    // harvest, and farm-harvest paths for the work-order materials) can never
+    // go all-permissive: an item that lives in NO mob loot table, ground
+    // object, scripted set, gather-node material row, corpse-harvest component
+    // map, or crop produce column must still be classified unacquirable. The
+    // real acquisition paths are re-proven acquirable here so a later refactor
+    // that drops a path reds this. The farm arm's negative side is a crop SEED:
+    // a seed is farming content too, but nothing harvests one out of the ground
+    // (tier 1 and 2 seeds are vendor stock, tiers 3 and 4 seed-back rolls),
+    // so it must stay unacquirable to this model.
     expect(collectItemAcquirable('totally_not_a_real_item_xyz')).toBe(false);
+    expect(collectItemAcquirable('vale_wheat_seed')).toBe(false);
     expect(collectItemAcquirable('copper_ore')).toBe(true); // gather-node material
     expect(collectItemAcquirable('ironbark_log')).toBe(true); // gather-node material
     expect(collectItemAcquirable('goldleaf_herb')).toBe(true); // gather-node material
     expect(collectItemAcquirable('game_meat')).toBe(true); // corpse-harvest component
     expect(collectItemAcquirable('spider_silk')).toBe(true); // corpse-harvest component
     expect(collectItemAcquirable('rough_hide')).toBe(true); // corpse-harvest component
+    expect(collectItemAcquirable('vale_wheat')).toBe(true); // farm-harvest produce
+    expect(collectItemAcquirable('marsh_rice')).toBe(true); // farm-harvest produce
   });
 
   it('QUEST_ORDER covers every quest exactly once', () => {

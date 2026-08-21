@@ -282,6 +282,7 @@ import {
   FOGLESS_DETAIL_FAR,
   horizonHazePlan,
 } from './far_terrain_core';
+import { buildFarmPatchProps, type FarmBedSeat, FarmPatchVisuals } from './farm_patches';
 import { buildFarshoreFeatures } from './farshore_features';
 import { buildFenFeatures, type FenFeaturesView } from './fen_features';
 import { buildFenbridgeTownView, type FenbridgeTownView } from './fenbridge_town';
@@ -1807,6 +1808,10 @@ export class Renderer {
   private abyssalRiftFx!: AbyssalRiftFx;
   private ringOfFrostVisuals!: RingOfFrostVisuals;
   private riftDeathZoneVisuals!: import('./rift_death_zone').RiftDeathZoneVisuals;
+  // The viewer's OWN farm plots. Seats are sampled once with the static beds;
+  // the visuals wait for the Vfx, which is built later in the same lifecycle.
+  private farmBedSeats: ReadonlyMap<string, FarmBedSeat> = new Map();
+  private farmPatchVisuals: FarmPatchVisuals | null = null;
   private temporalHourglassGroundVisuals!: TemporalHourglassGroundVisuals;
   private paladinConsecrationVisuals!: PaladinConsecrationVisuals;
   private readonly mageBarrierStateScratch: MageBarrierState = {
@@ -2603,6 +2608,14 @@ export class Renderer {
     this.flames.push(...stationProps.flames);
     // After the mass hide above, so these adopt individually.
     for (const light of stationProps.fireLights) this.fireLightAdopter.adopt(light);
+
+    // The garden beds and compost bins: static world furniture EVERY viewer
+    // sees, whatever they have planted (the per-viewer crops mount later).
+    const farmPatchProps = buildFarmPatchProps(this.sim.cfg.seed, this.sim.farmPatches);
+    setRenderCategory(farmPatchProps.group, 'props');
+    this.scene.add(farmPatchProps.group);
+    freezeStaticMatrices(farmPatchProps.group);
+    this.farmBedSeats = farmPatchProps.seats;
     bd('stations');
 
     // Town streetlamps: world-spanning dressing, so it is built here with the
@@ -2955,6 +2968,7 @@ export class Renderer {
     this.vfx = new Vfx(this.scene, vfxAnchor, offsetVfxAnchor);
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
     this.bgFx = new BattlegroundFx(this.sim, this.views, this.vfx);
+    this.farmPatchVisuals = new FarmPatchVisuals(this.scene, this.farmBedSeats, this.vfx);
     this.underwaterView = new UnderwaterView(this.lowGfx);
     this.scene.add(this.underwaterView.group);
     this.abilityVfxFx = new AbilityVfxFx(
@@ -4942,6 +4956,10 @@ export class Renderer {
     if (this.riftDeathZoneVisuals) {
       this.riftDeathZoneVisuals.sync(this.sim.riftBossDeathZones());
       this.riftDeathZoneVisuals.update(dt);
+    }
+    if (this.farmPatchVisuals) {
+      this.farmPatchVisuals.sync(this.sim, dt);
+      this.farmPatchVisuals.update(dt);
     }
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
     this.temporalHourglassGroundVisuals.update(dt);
@@ -8100,6 +8118,14 @@ export class Renderer {
         }
         break;
       }
+      // The farm flourishes. These arrive on the viewer's own pid-scoped
+      // channel, so there is nothing to filter: the module turns each one into
+      // a puff or a sparkle over the bed it names.
+      case 'farmPlanted':
+      case 'farmHarvested':
+      case 'farmWithered':
+        this.farmPatchVisuals?.onFarmEvent(ev, this.sim.playerId);
+        break;
     }
   }
 
@@ -12257,6 +12283,10 @@ export class Renderer {
     if (this.riftDeathZoneVisuals) {
       this.riftDeathZoneVisuals.sync(this.sim.riftBossDeathZones());
       this.riftDeathZoneVisuals.update(dt);
+    }
+    if (this.farmPatchVisuals) {
+      this.farmPatchVisuals.sync(this.sim, dt);
+      this.farmPatchVisuals.update(dt);
     }
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
     this.temporalHourglassGroundVisuals.update(dt);

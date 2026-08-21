@@ -105,3 +105,29 @@ Exploration (the walk-in castles):
 
 - [v1] `exp_the_last_keep`, The Quiet Halls: the Last Keep's gatehouse arch half in shadow, one banner stirring in a cold draught, dusk grey on ember red.
 - [v1] `exp_dawnhold_castle`, An Open Door in the Garden: Dawnhold's garden gate standing open, petals drifting across the threshold, warm morning gold on hedge green.
+
+## The farming celebration crests (2026-08-18)
+
+Seven new ids from the farming celebrations pass (D13), same delivery contract
+as above: one 512x512 RGBA PNG per deed, named exactly by deed id, ingested
+with `npm run assets:deeds <source-dir>`. Six of the seven ride their
+procedural category crests until the paintings land (enumerated in
+`DEED_ART_PENDING`, `src/ui/icons.ts`); `prog_farming_100` is the exception,
+shipped with a COMMITTED interim crest because the Reliquary title shelf
+forbids fallback art for title deeds (see its row's NOTE below).
+
+Progression and chronicle (the planting and first-harvest line):
+
+- [v1] `prog_first_planting`, Sow It Begins: a single seed dropped into a fresh furrow from an open hand, morning light on turned earth.
+- [v1] `chr_vale_first_harvest`, First Fruits of the Vale: a wicker basket of ripe vegetables against rolling green meadow and a distant mill, warm valley daylight.
+- [v1] `chr_marsh_first_harvest`, Sprouts in the Peat: bright young shoots standing in dark peaty soil, mist and reed silhouettes behind, bog green on umber.
+- [v1] `chr_peaks_first_harvest`, A Crop Among the Crags: a hardy barley sheaf lashed to a stone cairn on a windswept ledge, thin mountain sky.
+- [v1] `chr_evergarden_first_harvest`, A Plot in Paradise: a tidy raised bed overflowing with produce beneath drifting petals, lush garden light.
+
+Collection (the rare-find family):
+
+- [v1] `col_golden_harvest`, Golden Harvest: one impossibly golden gourd glowing amid ordinary crops, radiant sunburst rays on harvest amber.
+
+Progression (the profession milestone):
+
+- [v1] `prog_farming_100`, Harvestmaster: a crossed hoe and sickle over a ribbon-tied wheat crown, proud guild-seal framing in bronze and gold. NOTE: an interim tied-wheat-sheaf medallion crest is COMMITTED with the phase (the Reliquary title shelf forbids fallback art for title deeds, so this one could not ride the pending ledger); the commissioned piece replaces it through the normal converter run.

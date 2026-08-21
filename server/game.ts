@@ -228,6 +228,7 @@ import { isUpdateDue } from './entity_update_cadence';
 import { reconcileOnLogin as reconcileEpicOnLogin } from './epic/mirror';
 import { shouldDeliverCombatEventToViewer } from './event_delivery';
 import { assembleEventsFrame, serializeEventFragments } from './event_frame';
+import { appendFarmPlotsWire, dispatchFarmingCommand } from './farming_commands';
 import { fishingBandLabel, isKoi, isRodFeeRecipe } from './fishing_telemetry';
 import {
   classifyOnlineGeneralChat,
@@ -267,6 +268,7 @@ import {
   type GuildBankWriteResult,
   loadGuildBanksIntoSim,
 } from './guild_bank_state';
+import { HEAVY_SELF_CMDS, HEAVY_SELF_EVENTS } from './heavy_self';
 import { gameMetricsCounters, type WsDropCause } from './http/game_signals';
 import { buildSharedInterestCandidates } from './interest_candidates';
 import {
@@ -487,6 +489,12 @@ export const SIM_LAP_PHASES = [
   'market',
   'postOffice',
   'delayedEv',
+  // Farming's per-tick sweep (src/sim/professions/farming.ts updateFarming),
+  // appended in Sim.tick between delayedEv and deeds. Registered here in the
+  // SAME order the tick runs them: without the marker the profiler silently
+  // drops the phase's timing instead of erroring, so a regression in it would
+  // be invisible in the capture.
+  'farming',
   'deeds',
   'gridRefresh',
   // Per-family mob.update buckets, appended after the base lap names so those
@@ -793,129 +801,6 @@ const JAILED_BLOCKED_COMMANDS = new Set<string>([
   'duel_accept',
   'unstuck',
   'card_queue_join',
-]);
-const HEAVY_SELF_CMDS = new Set<string>([
-  'equip',
-  'inv_move', // rewrites the inventory array order: the self snapshot must resend it
-  'inv_sort', // consolidates stacks + restamps cell hints: the self snapshot must resend it
-  'unequip_item',
-  // salvage_item is deliberately ABSENT since the Craft Cast System: the
-  // command only starts a cast (nothing mutates on receipt), and the
-  // complete-time loot event is a HEAVY_SELF_EVENTS member, so listing it
-  // here would buy a wasted heavy re-serialize per cast start.
-  'rift_upgrade_item',
-  'rift_enchant_item',
-  'rift_socket_gem',
-  'equip_bag',
-  'unequip_bag',
-  'use',
-  'discard',
-  'lock_item',
-  'buy',
-  'sell',
-  'buyback',
-  'vcup_bet', // debits copper: refresh the self snapshot so the purse updates
-  'loot',
-  'harvestCorpse',
-  'pickup',
-  'interact',
-  'accept',
-  'turnin',
-  'abandon',
-  'applyTalents',
-  'respec',
-  'setSpec',
-  'selectTalentRow',
-  'saveLoadout',
-  'switchLoadout',
-  'deleteLoadout',
-  'change_skin',
-  'unequip_mech_chroma',
-  'claim_event_skin',
-  'mount_toggle',
-  'change_weapon_skin',
-  'prestige',
-  'market_list',
-  'market_list_instance',
-  'market_buy',
-  'market_cancel',
-  'market_collect',
-  'mail_send',
-  'mail_take',
-  'mail_delete',
-  'mail_read',
-  'bank_deposit',
-  'bank_withdraw',
-  'bank_buy_slots',
-  // Guild bank ops that touch a HEAVY self field: the two item moves rewrite
-  // the carried inventory (heavy-gated `inv`). The gold ops and buy_slots are
-  // deliberately absent: copper rides the ALWAYS-SENT base self object (not
-  // the heavy gate) and the treasury/slots ride the ungated maybe('guildBank')
-  // stream, so listing them would only buy a redundant heavy re-serialize.
-  'guild_bank_deposit',
-  'guild_bank_withdraw',
-  'pet_feed',
-  'dev_give',
-  'dev_level',
-]);
-const HEAVY_SELF_EVENTS = new Set<string>([
-  'loot',
-  'vcupBetSettled', // credits copper to the bettor: refresh their purse
-  'mailArrived',
-  'mailResult',
-  'levelup',
-  'virtualLevelUp',
-  'deedUnlocked', // the earned map + stat block ride the heavy-gated deeds/dstats keys
-  // The Reliquary sparse blob (firstFind / illuminatedPages / marks / recent)
-  // rides the heavy-gated `reliq` key. No saveCharacter on pure fill; since
-  // Phase 18 the event is NOT presentation-only: detectActivity derives the
-  // illumination marquee fan-out from its illuminatedPageId field.
-  'reliquaryUnlock',
-  'questAccepted',
-  'questProgress',
-  'questReady',
-  'questDone',
-  'learnAbility',
-  'mechChroma',
-  'skinEvent',
-  'skinSelect',
-  'tradeDone',
-  'vendor',
-  'tamePet',
-  'summonPet',
-  'dismissPet',
-  'summonDemon',
-  // The acquisition craft's slot/recharge outcome: a successful slot consumes
-  // a charm copy and a successful recharge consumes arcane materials, neither
-  // through a loot-event path, so the self inv mirror re-diffs off this event.
-  // Deny arms ride along and force the same re-diff for no state change,
-  // ACCEPTED as the family's standing shape: enchantResult/unbindResult are
-  // members on the same terms, and HEAVY_SELF_CMDS already dirties on receipt
-  // regardless of outcome, so a denial-spamming client buys nothing another
-  // command does not already offer it.
-  'toolEffectResult',
-  // Maker's Bond unbind (Professions 2.0): a successful unbind can
-  // clear boundTo IN PLACE (the single-copy arm emits no loot event), so the
-  // result event itself must re-diff the heavy self keys or the holder's inv
-  // mirror goes stale until the staggered refresh. Also refreshes the purse
-  // for the fee debit.
-  'unbindResult',
-  // Apply-enchant, for the same reason as unbindResult above: the WORN arm
-  // (src/sim/professions/enchanting.ts resolveApplyEnchantWorn) enchants in
-  // place, so it only REMOVES reagents and emits no loot event. Without this the
-  // enchant itself would show at once (it rides the `eqi` identity diff, which
-  // recalcPlayerStats rebuilds) while the spent reagents lingered in the bag
-  // mirror until the staggered refresh, and re-opening the picker could still
-  // offer an enchant the player can no longer afford. The bagged arm's loot
-  // event already covered it; this makes both arms explicit.
-  'enchantResult',
-  // Commission order board delivery (issue #1298): the crafter's arm
-  // removes the delivered copy directly from PlayerMeta.inventory (no
-  // addItem/removeItem call, so no loot event fires on that side), so the
-  // result event itself must re-diff the crafter's heavy self keys or their
-  // inv mirror goes stale until the staggered refresh. The requester's side
-  // already gets a loot event from the ordinary addItemInstance grant.
-  'commissionOrderResult',
 ]);
 
 // How often to re-broadcast online players' $WOC holder-tier flair. Each wallet
@@ -7111,6 +6996,16 @@ export class GameServer {
           sim.rechargeToolEffect(msg.profession, pid);
         }
         break;
+      case 'plant_crop':
+      case 'harvest_crop':
+      case 'convert_husks':
+      case 'place_feast':
+      case 'consume_feast':
+        // Farming's command bodies live whole in server/farming_commands.ts
+        // (the v0.38.0 sync monolith heal). The labels stay HERE: the
+        // command-schema suite scans this switch for the dispatch universe.
+        dispatchFarmingCommand(sim, msg, pid);
+        break;
       case 'sell_all_junk':
         sim.sellAllJunk(pid);
         break;
@@ -9427,6 +9322,10 @@ export class GameServer {
       // flag, not the modulo, is what carries correctness here. Wire key
       // `mntOwn`.
       maybe('mntOwn', this.sim.ownedMountsFor(anchorSession.pid));
+      // The viewer's own farm plots (wire key `fplot`): heavy-gated, built by
+      // appendFarmPlotsWire in server/farming_commands.ts since the v0.38.0
+      // sync monolith heal; the gating and projection doctrine lives there.
+      appendFarmPlotsWire(this.sim, anchorSession.pid, maybe, maybeSerialized);
       maybe('buyback', meta.vendorBuyback);
       maybe('equip', meta.equipment);
       maybe('einst', meta.equipmentInstance);

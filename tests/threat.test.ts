@@ -3,6 +3,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { computeTalentModifiers } from '../src/sim/content/talents';
 import { abilitiesKnownAt, BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
+import { mobCombatProfile } from '../src/sim/mob/combat_profile';
 import { PET_AGGRESSIVE_RANGE, petPickTarget } from '../src/sim/pet/pet_ai';
 import { Sim } from '../src/sim/sim';
 import {
@@ -21,7 +22,6 @@ import { expectDefined } from './helpers/defined';
 
 interface SimPrivateHarness {
   applyHeal(source: Entity, target: Entity, amount: number, ability: string): void;
-  mobMeleeRange(mob: Entity): number;
   effectiveArmor(entity: Entity): number;
   effectiveAttackPower(entity: Entity): number;
   moveSpeedMult(entity: Entity): number;
@@ -440,7 +440,7 @@ describe('classic pull-over rules (110% melee / 130% ranged)', () => {
     // size-scaled reach) was misclassified as ranged and forced to clear 130%.
     const { sim, a, b, wolf } = aggroSetup();
     wolf.scale = 3; // a boss-sized creature
-    const reach = asHarness(sim).mobMeleeRange(wolf);
+    const reach = mobCombatProfile(wolf).meleeRange;
     expect(reach).toBeGreaterThan(6); // scaled reach exceeds the old flat 6yd gate
     // 8yd is inside the big reach (~11yd) but beyond the old flat 6yd check
     teleport(sim, b, wolf.pos.x - 8, wolf.pos.z);

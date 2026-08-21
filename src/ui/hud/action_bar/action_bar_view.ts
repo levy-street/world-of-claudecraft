@@ -52,6 +52,7 @@ import { priestActionGlowActive } from '../../../sim/combat/priest/presentation'
 import { mendingCurrentTargetCapped } from '../../../sim/combat/shaman_spiritmend';
 import { flowStateDiscountedCost } from '../../../sim/combat/shaman_talents';
 import { thundercallPayoffGlowActive } from '../../../sim/combat/shaman_thundercall';
+import { countRawInSlots } from '../../../sim/item_lock';
 import { isAscensionEmpoweredAbility } from '../../../sim/paladin_devotion';
 import {
   type AbilityDef,
@@ -382,18 +383,6 @@ function hasForbiddenReflection(
   return false;
 }
 
-function inventoryCount(
-  inventory: readonly { itemId: string; count: number }[],
-  itemId: string,
-): number {
-  // A for-loop, not reduce: no per-frame closure allocation on the hot path.
-  let total = 0;
-  for (const slot of inventory) {
-    if (slot.itemId === itemId) total += slot.count;
-  }
-  return total;
-}
-
 /**
  * Build an action-bar view bound to one descriptor. The per-slot state array is
  * preallocated once here; tick() mutates it in place and returns the SAME references
@@ -498,7 +487,7 @@ export function createActionBarView(
         }
 
         if (item !== null) {
-          const count = inventoryCount(world.inventory, item.id);
+          const count = countRawInSlots(world.inventory, item.id);
           // Potions share one global cooldown, so any potion slot paints the same
           // swipe; other items have no cooldown.
           const potionCd = item.kind === 'potion' ? player.potionCdRemaining : 0;

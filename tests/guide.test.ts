@@ -8,7 +8,7 @@ import { assertFamiliesKnown } from '../scripts/wiki/family_guard.mjs';
 // The English the /c/ public sheet resolves a mark id to. Imported here so the
 // generator's own hand table cannot drift away from what the sheet says.
 import { RELIQUARY_MARK_ENGLISH } from '../server/character_sheet';
-import { BIND_ACTIONS } from '../src/game/keybinds';
+import { BIND_ACTIONS, keyLabel } from '../src/game/keybinds';
 import {
   GUIDE_CLASSES,
   GUIDE_DEEDS,
@@ -36,6 +36,8 @@ import { controls as controlsPage } from '../src/guide/pages/controls';
 import { catalogSections, deeds as deedsPage } from '../src/guide/pages/deeds';
 import { dungeons as dungeonsPage } from '../src/guide/pages/dungeons';
 import { professions as professionsPage, ringCards } from '../src/guide/pages/professions';
+import { effectLines } from '../src/guide/pages/professions_craft';
+import { gatheringDetailHtml } from '../src/guide/pages/professions_gathering';
 import { reliquaryCatalogSections, reliquary as reliquaryPage } from '../src/guide/pages/reliquary';
 import { world as worldPage } from '../src/guide/pages/world';
 import {
@@ -112,10 +114,11 @@ import {
   TIER5_TOOL_WIELD_PROFICIENCY,
   WIELD_REQUIREMENT_BY_TIER,
 } from '../src/sim/professions/wield_gate';
-import type { DeedDef } from '../src/sim/types';
+import { CONSUME_DURATION, type DeedDef } from '../src/sim/types';
 import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
 import { ensureLocaleLoaded, type SupportedLanguage, setLanguage, t } from '../src/ui/i18n';
 import { guideStrings } from '../src/ui/i18n.catalog/guide';
+import { WELLFED_STAT_KEYS } from '../src/ui/wellfed_stat_keys';
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 const publicPath = (url: string): string => resolve(repoRoot, 'public', url.replace(/^\//, ''));
@@ -1458,6 +1461,47 @@ describe('Guide controls reference completeness', () => {
     expect(html).toContain('<kbd>Shift+Tab</kbd></td><td>Cycle target backward');
   });
 
+  // Third wave, found by the farming Phase 8 QA: the Harvest Journal shipped a
+  // defaulted window bind (Shift+K) with no controls row, exactly the drift
+  // class the two waves above were written against. Same per-bind contract.
+  it('documents the Harvest Journal bind and keeps it in step with the game default', () => {
+    setLanguage('en');
+    const html = controlsPage.render({
+      params: [],
+      sub: 'reference/controls',
+      titleKey: 'guide.nav.controls',
+    });
+    expect(html).toContain('<kbd>Shift+K</kbd></td><td>Harvest Journal</td>');
+    expect(BIND_ACTIONS.find((a) => a.id === 'harvestJournal')?.defaults).toEqual(['Shift+KeyK']);
+  });
+
+  // The COMPLETENESS pin the three waves above were missing: every Interface
+  // window bind's default keycap must appear in the controls reference, so
+  // the next shipped bind reds here instead of drifting silently. Both halves
+  // read the live tables (BIND_ACTIONS through the same keyLabel the options
+  // panel prints, the page through its rendered <kbd> cells). A page-wide
+  // keycap SET is enough here because tests/keybinds.test.ts pins that no two
+  // shipped defaults share a code (the one sanctioned KeyA pair aside), so a
+  // new Interface bind cannot borrow another action's keycap to pass: its
+  // keycap is on the page only if a row was written for it.
+  it('lists every Interface bind default on the controls page', () => {
+    setLanguage('en');
+    const html = controlsPage.render({
+      params: [],
+      sub: 'reference/controls',
+      titleKey: 'guide.nav.controls',
+    });
+    const kbds = new Set([...html.matchAll(/<kbd>([^<]+)<\/kbd>/g)].map((m) => m[1]));
+    const missing = BIND_ACTIONS.filter(
+      (a) => a.category === 'Interface' && !a.defaults.some((code) => kbds.has(keyLabel(code))),
+    ).map((a) => a.id);
+    expect(missing).toEqual([]);
+    // Anti-vacuous: the scrape really read keycaps, and the two shifted rows
+    // this pin was written for are among them.
+    expect(kbds.has('Shift+P')).toBe(true);
+    expect(kbds.has('Shift+K')).toBe(true);
+  });
+
   it('keeps the second-wave binds in step with the game defaults', () => {
     const defaults = new Map(BIND_ACTIONS.map((a) => [a.id, a.defaults]));
     expect(defaults.get('dive')).toEqual(['ControlLeft']);
@@ -1692,6 +1736,10 @@ describe('Guide professions generated content accuracy', () => {
       'combo',
       'oncePerDay',
       'gain',
+      // The consumable effect facts (C10): the foodHp restore and well-fed
+      // boon values the craft page's effect sub-lines compose. Shape-pinned
+      // in its own accuracy arm below.
+      'effect',
     ]);
     for (const c of GUIDE_PROF_CRAFTS) {
       for (const k of Object.keys(c)) {
@@ -1765,6 +1813,70 @@ describe('Guide professions generated content accuracy', () => {
         expect(tierProgressMultiplier(tierForSkill(row.gain.zeroAt), rTier)).toBe(0);
       }
     }
+  });
+
+  it('mirrors every consumable effect row against the live item def (C10)', () => {
+    // The dish effect prose is composed from these VALUES, so the accuracy
+    // guard binds them to the sim source both ways: every foodHp/wellfed
+    // output carries the row with the def's own numbers, and a row never
+    // appears on a non-consumable. Non-vacuity: the four buff dishes and at
+    // least a dozen foodHp dishes exist, counted below.
+    let foodRows = 0;
+    let wellfedRows = 0;
+    for (const c of GUIDE_PROF_CRAFTS) {
+      for (const row of c.recipes) {
+        const def = ALL_RECIPES.find((r) => r.id === row.id);
+        if (!def) continue;
+        const item = ITEMS[def.resultItemId];
+        if (item.foodHp) {
+          foodRows++;
+          expect(row.effect?.food, `${row.id} foodHp row missing`).toEqual({
+            amount: item.foodHp,
+            seconds: CONSUME_DURATION,
+          });
+        } else {
+          expect(row.effect?.food, `${row.id} phantom food effect`).toBeUndefined();
+        }
+        if (item.wellfed) {
+          wellfedRows++;
+          expect(row.effect?.wellfed, `${row.id} wellfed row missing`).toEqual({
+            aura: item.wellfed.aura,
+            kind: item.wellfed.kind,
+            value: item.wellfed.value,
+            minutes: item.wellfed.duration / 60,
+          });
+          // The LIVE_OFF_SWEEP exemption for effectWellFedAura rests on this
+          // precondition: every SHIPPED wellfed kind is mapped, so the
+          // aura-name fallback stays a degradation path and never renders.
+          // The first dish with an unmapped kind reds here instead of
+          // silently selecting the fallback prose on the wiki.
+          expect(
+            Object.keys(WELLFED_STAT_KEYS),
+            `${row.id} ships an unmapped wellfed kind`,
+          ).toContain(item.wellfed.kind);
+        } else {
+          expect(row.effect?.wellfed, `${row.id} phantom wellfed effect`).toBeUndefined();
+        }
+        if (!item.foodHp && !item.wellfed) {
+          expect(row.effect, `${row.id} effect on a non-consumable`).toBeUndefined();
+        }
+      }
+    }
+    expect(foodRows).toBeGreaterThanOrEqual(12);
+    expect(wellfedRows).toBe(4);
+  });
+
+  it('the unmapped-kind fallback line renders (never a silent effect cell)', () => {
+    // Synthetic row: no shipped dish carries an unmapped kind (asserted
+    // above), so the fallback branch is driven directly. Its aura value is
+    // the def's baked English proper noun, the page's GUIDE_DEEDS policy.
+    const row = {
+      effect: { wellfed: { aura: 'Test Boon', kind: 'buff_spellpower', value: 3, minutes: 10 } },
+    } as unknown as Parameters<typeof effectLines>[0];
+    const html = effectLines(row);
+    expect(html).toContain('guide-prof-effect');
+    expect(html).toContain('Test Boon');
+    expect(html).toContain('10');
   });
 
   it('pins the spot literals a consistently-wrong regeneration would keep wrong', () => {
@@ -1876,7 +1988,17 @@ describe('Guide professions generated content accuracy', () => {
 });
 
 describe('Guide professions gathering accuracy', () => {
-  it('covers the four gathering professions with grounded caps and bands', () => {
+  it('covers every gathering profession with grounded caps and bands', () => {
+    // Literal list, not a mirror of GATHERING_PROFESSION_IDS: comparing the
+    // generated ids against the same array the generator iterates cannot see a
+    // trade that never reached the wiki. The mirror below still ties order.
+    expect(GUIDE_PROF_GATHERING.map((g) => g.id)).toEqual([
+      'mining',
+      'logging',
+      'herbalism',
+      'fishing',
+      'farming',
+    ]);
     expect(GUIDE_PROF_GATHERING.map((g) => g.id)).toEqual([...GATHERING_PROFESSION_IDS]);
     for (const g of GUIDE_PROF_GATHERING) {
       expect(g.maxSkill).toBe(
@@ -1886,12 +2008,164 @@ describe('Guide professions gathering accuracy', () => {
     }
     expect(GUIDE_PROF_GATHERING.find((g) => g.id === 'mining')?.maxSkill).toBe(100);
     expect(GUIDE_PROF_GATHERING.find((g) => g.id === 'fishing')?.maxSkill).toBe(200);
+    expect(GUIDE_PROF_GATHERING.find((g) => g.id === 'farming')?.maxSkill).toBe(100);
+  });
+
+  // Both hub bodies used to spell the trade count into the prose ("four
+  // gathering trades"), which made the wiki quietly lie the moment a fifth
+  // trade was registered. They are count-free now, and the hub sentence names
+  // every trade the sim ships, so a sixth one cannot land without an edit here.
+  it('describes the gathering trades count-free and names every one of them', () => {
+    setLanguage('en');
+    const bodies = [
+      ['guide.professions.whatBody', t('guide.professions.whatBody')],
+      ['guide.professions.gatherHubBody', t('guide.professions.gatherHubBody')],
+    ] as const;
+    for (const [key, value] of bodies) {
+      expect(value.length, key).toBeGreaterThan(0);
+      expect(value, `${key} spells a gathering-trade count`).not.toMatch(/\b(four|five|[45])\b/i);
+    }
+    const gatherHubBody = t('guide.professions.gatherHubBody');
+    for (const id of GATHERING_PROFESSION_IDS) {
+      const name = GATHERING_PROFESSIONS[id].name;
+      expect(gatherHubBody, `gatherHubBody never names ${name}`).toContain(name);
+    }
+    // Literal, so the loop above cannot pass vacuously on an empty id list.
+    expect(gatherHubBody).toContain('Farming');
+  });
+
+  // The farming page once rendered "respawns for you 0 seconds" (the `?? 0`
+  // fallback over an empty nodes array) and the full vendor-ladder prose over
+  // an empty tools table: invented content on a public page that three data
+  // pins and a full gate never saw, because data pins are not page pins. This
+  // drives the REAL page render on both sides of the length guard. The Phase
+  // 5 hoe ladder flipped farming's tools side: the section is DEMANDED now,
+  // while the nodes side stays guarded off forever (farming has no
+  // GATHER_NODES by design, fishing-shaped on land), and a synthetic toolless
+  // record keeps the guard's absent side exercised.
+  it('renders farming with its tool ladder, no node prose, and length-guards empty tables', () => {
+    setLanguage('en');
+    const farming = GUIDE_PROF_GATHERING.find((g) => g.id === 'farming');
+    expect(farming).toBeDefined();
+    const html = gatheringDetailHtml(farming as (typeof GUIDE_PROF_GATHERING)[number]);
+    expect(html, 'the shipped hoe ladder must render its tools section').toContain(
+      'id="prof-tools"',
+    );
+    expect(html).toContain('Garden Hoe');
+    expect(html, 'nodes prose must not render for a nodeless trade').not.toContain(
+      'id="prof-nodes"',
+    );
+    expect(html).toContain('id="prof-rhythm"');
+    // The go-live planting-loop section: farming only, and it names the
+    // front door and the timer surface a reader needs (both literals, so a
+    // reword that drops either fails here rather than on the public page).
+    expect(html, 'the farming page must carry its planting-loop section').toContain(
+      'id="prof-farm-beds"',
+    );
+    // The Phase 13 beds-to-table section (the well-fed dishes, the shared
+    // feast, the golden harvest): farming-only, like the beds section above.
+    expect(html, 'the farming page must carry its beds-to-table section').toContain(
+      'id="prof-farm-table"',
+    );
+    // The deeds ternary's farming branch renders the live farmingSown prose,
+    // never the retired no-deeds-yet leaf.
+    expect(html).toContain('its own shelf in the Book of Deeds');
+    expect(html).not.toContain('keeps no deeds of its own yet');
+    // The (bo) dormancy disclosure: while the tier 3/4 seed faucet is absent
+    // (the D11 ruling), BOTH farming prose sections must keep the later-patch
+    // idiom (gatherDeeds.farmingSown for Harvestmaster, farm.tableBody for the
+    // top dishes and the feast). A reword that drops either disclosure would
+    // advertise dormant content as live, which the purchase-surface sweeps in
+    // tests/deeds_content.test.ts and tests/professions_zone_rollout.test.ts
+    // cannot see (they red only on vendor-shaped faucets). The D11 phase
+    // retires these two pins WITH its prose revisit.
+    expect(
+      html.split('comes within reach with a later patch').length - 1,
+      'both farming sections must carry the later-patch dormancy disclosure',
+    ).toBe(2);
+    expect(html).toContain('Farmer Jessica');
+    // Tied to the live NPC name so a rename cannot leave the page lying.
+    expect(html).toContain(NPCS.farmer_jessica.name);
+    expect(html).toContain('Harvest Journal');
+    expect(html).toContain('withered husks');
+    // The guard itself stays honest on its absent side: a toolless record
+    // still renders neither section, never prose over an empty table.
+    const toolless = {
+      ...(farming as (typeof GUIDE_PROF_GATHERING)[number]),
+      tools: [],
+      nodes: [],
+    };
+    const bareHtml = gatheringDetailHtml(toolless);
+    expect(bareHtml, 'tools prose must not render for a toolless trade').not.toContain(
+      'id="prof-tools"',
+    );
+    expect(bareHtml, 'nodes prose must not render for a nodeless trade').not.toContain(
+      'id="prof-nodes"',
+    );
+    const mining = GUIDE_PROF_GATHERING.find((g) => g.id === 'mining');
+    const miningHtml = gatheringDetailHtml(mining as (typeof GUIDE_PROF_GATHERING)[number]);
+    expect(miningHtml, 'the guard is length-based: a full trade keeps tools').toContain(
+      'id="prof-tools"',
+    );
+    expect(miningHtml, 'the guard is length-based: a full trade keeps nodes').toContain(
+      'id="prof-nodes"',
+    );
+    expect(miningHtml, 'the planting loop is farming-only prose').not.toContain(
+      'id="prof-farm-beds"',
+    );
+    expect(miningHtml, 'the beds-to-table section is farming-only prose').not.toContain(
+      'id="prof-farm-table"',
+    );
+    // The deeds ternary's other branch: a non-farming trade still renders its
+    // own gatherDeeds leaf.
+    expect(miningHtml).toContain('Ore in the Blood');
+    // The dormancy disclosure is farming-only prose: its phrase leaking into
+    // another trade's page would mean the shared builder grew a wrong branch.
+    expect(miningHtml).not.toContain('comes within reach with a later patch');
+  });
+
+  // Master Gatherer's trigger counts every registered trade (src/sim/deeds.ts
+  // filters GATHERING_PROFESSION_IDS), so prose that enumerates the roster goes
+  // stale the moment a trade joins. It went stale twice, on fishing and again
+  // on farming, so the enumerating form is banned outright rather than patched
+  // a third time. tests/deeds_content.test.ts owns the trigger itself; this
+  // pins the player-visible strings that describe it.
+  it('never enumerates the Master Gatherer roster in the deed prose', () => {
+    setLanguage('en');
+    for (const id of GATHERING_PROFESSION_IDS) {
+      const body = t(`guide.profPages.gatherDeeds.${id}` as never);
+      expect(body.length, id).toBeGreaterThan(0);
+      expect(body, `gatherDeeds.${id} enumerates the gathering roster`).not.toMatch(
+        /any three of/i,
+      );
+    }
+    expect(DEEDS.prog_master_gatherer.desc).toBe(
+      'Reach 100 proficiency in any three gathering trades.',
+    );
   });
 
   it('aggregates every world node into its zone row (tool tier = node tier)', () => {
     const typeFor: Record<string, string> = { mining: 'ore', logging: 'wood', herbalism: 'herb' };
     for (const g of GUIDE_PROF_GATHERING) {
       if (g.id === 'fishing') continue;
+      if (g.id === 'farming') {
+        // Farming has no GATHER_NODES rows by design (fishing-shaped on land:
+        // beds are patch content, never nodes), so the node aggregation stays
+        // EMPTY on purpose and no respawn number ever publishes. The tool
+        // ladder is the aggregation's real farming output since the Phase 5
+        // hoes: the four rungs, rung 1 the only priced one (seated on the
+        // tier-1 farmer NPC since the go-live; the row-by-row mirror below
+        // owns the rest of the fields).
+        expect(g.nodes).toEqual([]);
+        expect((g.tools ?? []).map((tool) => [tool.name, tool.tier, tool.priceCopper])).toEqual([
+          ['Garden Hoe', 1, 20],
+          ['Bronze Hoe', 2, null],
+          ['Skysilver Hoe', 3, null],
+          ['Osmium Hoe', 4, null],
+        ]);
+        expect(g.respawnSeconds).toBeUndefined();
+        continue;
+      }
       const simNodes = GATHER_NODES.filter((n) => n.type === typeFor[g.id]);
       const total = (g.nodes ?? []).reduce((sum, row) => sum + row.count, 0);
       expect(total, `${g.id} node count drifted`).toBe(simNodes.length);
@@ -1937,6 +2211,10 @@ describe('Guide professions gathering accuracy', () => {
       expect(rows[0].quality).toBe(def.quality ?? 'common');
       expect(rows[0].priceCopper).toBe(def.buyValue ?? null);
       if (def.buyValue != null) {
+        // Every vendor-priced tool has a counter, the farming garden hoe
+        // included since the go-live seated it on the tier-1 farmer (the
+        // priced-but-unstocked narrowing this branch used to carry is gone;
+        // tests/professions_zone_rollout.test.ts pins the farmer stock).
         const stocked = Object.values(NPCS).some((n) => n.vendorItems?.includes(itemId));
         expect(stocked, `vendor tool "${itemId}" is stocked by no NPC`).toBe(true);
         expect(rows[0].vendors.length).toBeGreaterThan(0);

@@ -1200,7 +1200,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.charges':
     'Começa com {base} cargas em uma ferramenta comum (+{bonus} por degrau de raridade).',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    'Encaixe em uma ferramenta de mineração, lenharia ou herborismo pela janela de Profissões. Consumido ao ser encaixado.',
+    'Encaixe em uma ferramenta de mineração, lenharia, herborismo ou agricultura pela janela de Profissões. Consumido ao ser encaixado.',
   'hudChrome.professions.toolEffectTooltip.kind': 'Amuleto de ferramenta',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'Não se encaixa em varas de pesca.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':
@@ -1865,7 +1865,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'O Mercado Mundial é a bolsa de todo o reino, mantida pelo Mercador em Eastbrook e pelo Leiloeiro Voss em Highwatch. A listagem é gratuita: não há depósito, e uma listagem não vendida simplesmente retorna para você. A casa só cobra sua comissão quando algo de fato é vendido: 5 por cento do preço de venda, e o restante fica esperando por você coletar.\n\nUm limite importante: o Mercado negocia apenas bens comuns. Uma cópia assinada, obra-prima, encantada ou vinculada nunca entra em uma listagem, então as peças especiais trocam de mãos face a face em uma janela de negociação, que carrega a identidade completa do item, assinatura inclusa. Precifique essas você mesmo; o Mercado só te diz o que a versão comum alcança.',
   'guide.profPages.econ.workOrdersHeading': 'Encomendas de trabalho',
   'guide.profPages.econ.workOrdersNote':
-    'Cada mestre de posto publica uma encomenda de trabalho fixa: traga uma pilha do material básico do ofício dele e seja pago na hora, mais um pouco de experiência de missão. O pagamento é deliberadamente {pct}% do que um vendedor lhe daria pela mesma pilha, arredondado para baixo, então uma encomenda de trabalho nunca é a forma lucrativa de vender materiais, apenas um motivo para passar pelo posto.\n\nCada encomenda roda em seu próprio relógio de {minutes} minutos por personagem: entregue uma e aquele mestre não tem mais nada para você até o cronômetro girar. Trate-as como um bônus pequeno sobre materiais que você já estaria coletando, não como um negócio.',
+    'Cada mestre de posto publica encomendas de trabalho fixas, uma por material básico: traga a pilha que uma encomenda pede e seja pago na hora, mais um pouco de experiência de missão. O pagamento é deliberadamente {pct}% do que um vendedor lhe daria pela mesma pilha, arredondado para baixo, então uma encomenda de trabalho nunca é a forma lucrativa de vender materiais, apenas um motivo para passar pelo posto.\n\nCada encomenda roda em seu próprio relógio de {minutes} minutos por personagem: entregue uma e essa encomenda fica fechada para você até o cronômetro girar, enquanto as outras encomendas do mestre continuam abertas. Trate-as como um bônus pequeno sobre materiais que você já estaria coletando, não como um negócio.',
   'guide.profPages.econ.colOrder': 'Encomenda de trabalho',
   'guide.profPages.econ.colMaster': 'Mestre',
   'guide.profPages.econ.colAsks': 'Solicita',

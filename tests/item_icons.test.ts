@@ -306,11 +306,149 @@ describe('item webp icons', () => {
     for (const id of ITEM_ART_PENDING) {
       expect(itemImageUrl(id), `${id} must not resolve to uncommitted art`).toBeNull();
     }
-    expect(ITEM_ART_PENDING.size, 'the accepted painted-art wave clears all enumerated debt').toBe(
-      0,
-    );
+    // The size pin is what stops the list becoming a dumping ground: it must be
+    // re-pinned deliberately, in the change that enumerates the debt, never
+    // grown quietly. The painted-art wave cleared this to 0; the farming
+    // growth-engine phase re-opened it for its four items, the knobs phase
+    // added its two supplies (compost and the growth tonic), the crop-ladder
+    // phase added its seven crop families (21 ids: seed, produce, fine twin
+    // per crop), the hoe phase added its four ladder rungs, the Phase 6
+    // economy-hooks phase added its eight farm dishes, the Phase 11
+    // well-fed phase added its four buff dishes, and the Phase 12 shared
+    // feast added the harvest_feast placeable, all under the same
+    // reasoning: all are dormant online (no faucet for any exists yet)
+    // and their art is scheduled as its own later phase. It must fall back to
+    // 0 as that art lands.
+    expect(
+      [...ITEM_ART_PENDING].sort(),
+      'art debt is enumerated and re-pinned deliberately, never grown quietly',
+    ).toEqual([
+      'bog_beet',
+      'bog_beet_seed',
+      'bronze_hoe',
+      'brook_carrot',
+      'brook_carrot_seed',
+      'compost',
+      'eastbrook_glazed_carrots',
+      'eastbrook_root_pottage',
+      'evergarden_braised_greens',
+      'evergarden_greens',
+      'evergarden_greens_seed',
+      'evergarden_harvest_platter',
+      'evergarden_sunmelon_tart',
+      'fenbridge_beet_braise',
+      'fenbridge_rice_bowl',
+      'fenbridge_rice_pudding',
+      'fine_bog_beet',
+      'fine_brook_carrot',
+      'fine_evergarden_greens',
+      'fine_frost_gourd',
+      'fine_gilded_sunmelon',
+      'fine_highland_barley',
+      'fine_marsh_rice',
+      'fine_vale_wheat',
+      'frost_gourd',
+      'frost_gourd_seed',
+      'garden_hoe',
+      'gilded_sunmelon',
+      'gilded_sunmelon_seed',
+      'growth_tonic',
+      // The Phase 12 shared feast: the placeable tier-4 showcase, same
+      // scheduled art phase as the dish set (the deliberate re-pin this
+      // list's contract demands; 43 to 44).
+      'harvest_feast',
+      'highland_barley',
+      'highland_barley_seed',
+      'highwatch_barley_bannock',
+      'highwatch_barley_porridge',
+      'highwatch_gourd_soup',
+      'marsh_rice',
+      'marsh_rice_seed',
+      'osmium_hoe',
+      'skysilver_hoe',
+      'vale_hearth_loaf',
+      'vale_wheat',
+      'vale_wheat_seed',
+      'withered_husks',
+    ]);
     // And the inverse: an id with committed art must still win the static url.
     expect(itemImageUrl('linen_pouch')).toBe('/ui/items/linen_pouch.webp');
+  });
+
+  it('A4) every art-pending id serves a deliberate, DISTINCT procedural recipe', () => {
+    // A3 proves the four ids decline static art; this arm proves what they get
+    // instead is usable. Without explicit ITEM_RECIPES rows all four fell to
+    // the trinket default (scroll on leather), so a farmer's bag showed the
+    // seed, the produce, its fine twin and the husks as four identical
+    // glyphs. The recipes must exist (never the shared unknown fallback) and
+    // must differ pairwise, so the fine twin is tellable from the base grade
+    // at a glance.
+    const seen = new Map<string, string>();
+    for (const id of ITEM_ART_PENDING) {
+      const recipe = itemIconRecipe(id);
+      expect(isUnknownIconRecipe(recipe), `${id} must resolve a real recipe`).toBe(false);
+      const key = JSON.stringify(recipe);
+      const clash = seen.get(key);
+      expect(clash, `${id} must not share its whole recipe with ${clash}`).toBeUndefined();
+      seen.set(key, id);
+    }
+  });
+
+  it('A4b) the two blue-radial seed sacks differ in the GLYPH, never only the background', () => {
+    // The Phase 5 QA catch: marsh_rice_seed (drink radial) and
+    // frost_gourd_seed (frost radial) sat behind pale-to-deep BLUE radials
+    // with the identical brown sack, and A4's whole-recipe JSON identity was
+    // satisfied by the radial name alone, a distinction a 32px bag cell does
+    // not show. This pair pin demands the prim lists (each prim WITH its
+    // palette) differ, so the sacks themselves are tellable; the radials
+    // stay free to move with each crop's flavor. Targeted at the one pair
+    // whose radials share a hue family, because a general ignore-background
+    // rule would outlaw pairs whose radials genuinely differ (green nature
+    // vs brown earth reads fine at 32px).
+    const a = itemIconRecipe('marsh_rice_seed');
+    const b = itemIconRecipe('frost_gourd_seed');
+    expect(JSON.stringify(a.prims)).not.toBe(JSON.stringify(b.prims));
+    // Non-vacuity: both really are sack glyphs on blue radials today; if
+    // either half moves off this shape, re-eyeball the pair and retire or
+    // re-aim this pin deliberately.
+    expect(a.prims[0]?.p).toBe('sack');
+    expect(b.prims[0]?.p).toBe('sack');
+  });
+
+  it('A4c) the twelve farm dishes differ in their PRIM LISTS, never only the shared food radial', () => {
+    // The A4b lesson generalized to the dish family (the Phase 6 eight plus
+    // the Phase 11 four buff dishes): all twelve sit on the 'food' radial
+    // DELIBERATELY (a cooked dish must never read as raw produce), and
+    // several share a palette, so A4's whole-recipe JSON identity could be
+    // satisfied by the background alone, a distinction a 32px bag cell does
+    // not show. Demanding pairwise-distinct prim lists (each prim WITH its
+    // palette) keeps every pair tellable at a glance.
+    const DISH_ICON_IDS = [
+      'vale_hearth_loaf',
+      'eastbrook_root_pottage',
+      'fenbridge_rice_bowl',
+      'fenbridge_beet_braise',
+      'highwatch_barley_bannock',
+      'highwatch_gourd_soup',
+      'evergarden_sunmelon_tart',
+      'evergarden_harvest_platter',
+      'eastbrook_glazed_carrots',
+      'fenbridge_rice_pudding',
+      'highwatch_barley_porridge',
+      'evergarden_braised_greens',
+    ];
+    const seen = new Map<string, string>();
+    for (const id of DISH_ICON_IDS) {
+      const recipe = itemIconRecipe(id);
+      // Non-vacuity: the family really does share the food radial today,
+      // which is exactly what makes background-only distinctness a live
+      // hazard; if a dish leaves the radial, re-aim this pin deliberately.
+      expect(recipe.bg, `${id} left the shared food radial`).toBe('food');
+      const key = JSON.stringify(recipe.prims);
+      const clash = seen.get(key);
+      expect(clash, `${id} must not share its prim list with ${clash}`).toBeUndefined();
+      seen.set(key, id);
+    }
   });
 
   it('B) commits only webp art (+ mapping.json) under public/ui/items', () => {

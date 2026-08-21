@@ -1179,7 +1179,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.charges':
     'Dimulai dengan {base} muatan pada alat umum (+{bonus} per anak tangga kelangkaan).',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    'Pasangkan pada alat Penambangan, Penebangan, atau Herbalisme dari jendela Profesi. Habis terpakai saat dipasang.',
+    'Pasangkan pada alat Penambangan, Penebangan, Herbalisme, atau Pertanian dari jendela Profesi. Habis terpakai saat dipasang.',
   'hudChrome.professions.toolEffectTooltip.kind': 'Jimat Alat',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'Tidak dapat dipasang pada joran pancing.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':
@@ -1838,7 +1838,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Pasar Dunia adalah bursa seluruh realm, dijaga oleh Pedagang di Eastbrook dan Pelelang Voss di Highwatch. Pendaftaran gratis: tidak ada setoran, dan daftar yang tidak terjual hanya kembali kepadamu. Rumah mengambil potongannya hanya ketika sesuatu benar-benar terjual: 5 persen dari harga jual, dan sisanya menunggumu untuk diambil.\n\nSatu batas penting: Pasar hanya menjadi perantara barang biasa. Salinan yang ditandatangani, karya besar, terpesonan, atau terikat tidak pernah masuk ke daftar, sehingga item istimewa berpindah tangan secara langsung di jendela perdagangan, yang membawa identitas lengkap item, termasuk tanda tangan. Tentukan harga sendiri; Pasar hanya memberi tahu kamu berapa harga versi biasanya.',
   'guide.profPages.econ.workOrdersHeading': 'Pesanan kerja',
   'guide.profPages.econ.workOrdersNote':
-    'Setiap master stasiun memposting pesanan kerja tetap: bawa setumpuk bahan pokok kerajinan mereka dan langsung dibayar di tempat, ditambah sedikit pengalaman misi. Bayarannya sengaja {pct}% dari harga yang akan diberikan pedagang untuk tumpukan yang sama, dibulatkan ke bawah, sehingga pesanan kerja tidak pernah menjadi cara menguntungkan untuk menjual bahan, hanya alasan untuk mampir ke stasiun.\n\nSetiap pesanan berjalan pada jam {minutes} menit tersendiri per karakter: serahkan satu dan master itu tidak punya apa-apa lagi untukmu hingga penghitung waktu berputar. Perlakukan sebagai bonus kecil pada bahan yang sudah kamu kumpulkan, bukan bisnis.',
+    'Setiap master stasiun memposting pesanan kerja tetap, satu per bahan pokok: bawa tumpukan yang diminta sebuah pesanan dan langsung dibayar di tempat, ditambah sedikit pengalaman misi. Bayarannya sengaja {pct}% dari harga yang akan diberikan pedagang untuk tumpukan yang sama, dibulatkan ke bawah, sehingga pesanan kerja tidak pernah menjadi cara menguntungkan untuk menjual bahan, hanya alasan untuk mampir ke stasiun.\n\nSetiap pesanan berjalan pada jam {minutes} menit tersendiri per karakter: serahkan satu dan pesanan itu tertutup untukmu hingga penghitung waktu berputar, sementara pesanan lain dari master tetap terbuka. Perlakukan sebagai bonus kecil pada bahan yang sudah kamu kumpulkan, bukan bisnis.',
   'guide.profPages.econ.colOrder': 'Pesanan kerja',
   'guide.profPages.econ.colMaster': 'Master',
   'guide.profPages.econ.colAsks': 'Meminta',

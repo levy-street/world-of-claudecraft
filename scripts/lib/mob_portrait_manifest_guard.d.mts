@@ -22,6 +22,11 @@ export function changedPortraitIds(
   next: ReceiptGuardManifest,
 ): string[];
 
+export function rowChangedPortraitIds(
+  previous: ReceiptGuardManifest,
+  next: ReceiptGuardManifest,
+): string[];
+
 export function assertManifestWriteAuthorized(args: {
   previous: ReceiptGuardManifest | null;
   next: ReceiptGuardManifest;

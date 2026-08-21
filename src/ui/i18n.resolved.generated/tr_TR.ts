@@ -64,7 +64,8 @@ export const tr_TR: EnTranslations = {
       "dungeon": "Zindan",
       "difficulty": "Zorluk",
       "name": "Ad",
-      "spec": "Uzmanlık"
+      "spec": "Uzmanlık",
+      "bed": "Bed id (optional)"
     },
     "difficulty": {
       "normal": "Normal",
@@ -150,6 +151,10 @@ export const tr_TR: EnTranslations = {
       "gather": {
         "label": "Toplama becerisi ver",
         "description": "Bir toplama mesleğini geliştir."
+      },
+      "farmgrow": {
+        "label": "Ripen crops",
+        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
       },
       "teleport": {
         "label": "Işınlan",
@@ -2581,7 +2586,8 @@ export const tr_TR: EnTranslations = {
       "resonantSteel": "Nadir ve üstü yakın dövüş silahlarından büyü bozularak elde edilen büyü malzemesi.",
       "resonantTimber": "Nadir ve üstü asa, değnek, yay ve arbaletlerden büyü bozularak elde edilen büyü malzemesi.",
       "masterwroughtIntermediate": "Masterwrought crafting component.",
-      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day."
+      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day.",
+      "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it."
     },
     "discord": {
       "title": "Discord",
@@ -3018,6 +3024,7 @@ export const tr_TR: EnTranslations = {
       "logging": "Ağaç kesme",
       "herbalism": "Bitkicilik",
       "fishing": "Balıkçılık",
+      "farming": "Farming",
       "notReady": "Bu kaynak noktası senin için henüz yeniden oluşmadı.",
       "gatherLine": "Topladığınız şey: {name}.",
       "gatherLineQty": "Şunu toplarsınız: {name} x{qty}.",
@@ -3036,7 +3043,8 @@ export const tr_TR: EnTranslations = {
       "tierRequired": {
         "mining": "{tier}. kademe madenci kazması gerektirir",
         "logging": "{tier}. kademe odun kesme baltası gerektirir",
-        "herbalism": "{tier}. kademe bitkicilik orakı gerektirir"
+        "herbalism": "{tier}. kademe bitkicilik orakı gerektirir",
+        "farming": "Requires a tier {tier} farming hoe"
       },
       "requiresTool": {
         "mining": "Madenci kazması gerektirir",
@@ -3047,23 +3055,27 @@ export const tr_TR: EnTranslations = {
         "mining": "Bu damarı işlemek için {tier}. kademe madenci kazmasına ihtiyacınız var.",
         "logging": "Bu korulugu devirmek için {tier}. kademe odun kesme baltasına ihtiyacınız var.",
         "herbalism": "Bu tarlayı toplamak için {tier}. kademe bitkicilik orakına ihtiyacınız var.",
-        "fishing": "Bu sularda balık tutmak için {tier}. kademe olta kamışına ihtiyacınız var."
+        "fishing": "Bu sularda balık tutmak için {tier}. kademe olta kamışına ihtiyacınız var.",
+        "farming": "You need a tier {tier} farming hoe to work this bed."
       },
       "toolRequired": {
         "mining": "Bu cevher damarını kazmak için bir madenci kazmasına ihtiyacınız var.",
         "logging": "Bu ağaç kümesini devirmek için bir oduncu baltasına ihtiyacınız var.",
         "herbalism": "Bu ot öbeğini toplamak için bir otçu orağına ihtiyacınız var.",
-        "fishing": "Balık tutmak için bir olta kamışına ihtiyacınız var."
+        "fishing": "Balık tutmak için bir olta kamışına ihtiyacınız var.",
+        "farming": "You need a farming hoe to work this bed."
       },
       "noNodeNearby": {
         "mining": "Erişebileceğiniz bir cevher damarı yok.",
         "logging": "Erişebileceğiniz bir ağaç kümesi yok.",
-        "herbalism": "Erişebileceğiniz bir ot öbeği yok."
+        "herbalism": "Erişebileceğiniz bir ot öbeği yok.",
+        "farming": "There is no crop bed within reach."
       },
       "wieldUnmet": {
         "mining": "Çantanızdaki kazmayı sallamak için Madencilik {skill} becerisine ihtiyacınız var.",
         "logging": "Çantanızdaki baltayı sallamak için Ağaç kesme {skill} becerisine ihtiyacınız var.",
-        "herbalism": "Çantanızdaki orağı kullanmak için Bitkicilik {skill} becerisine ihtiyacınız var."
+        "herbalism": "Çantanızdaki orağı kullanmak için Bitkicilik {skill} becerisine ihtiyacınız var.",
+        "farming": "You need Farming {skill} to swing the hoe already in your bags."
       },
       "wieldUnmetCorpse": "En iyi aletinizi iş başına koymak için {skill} toplama becerisine ihtiyacınız var.",
       "toolTierUnmetCorpse": "En iyi malzemeleri kurtarmak için {tier}. kademe toplama aracına ihtiyacınız var.",
@@ -3072,18 +3084,21 @@ export const tr_TR: EnTranslations = {
           "mining": "Madencilik aleti (kademe {tier})",
           "logging": "Odun kesimi aleti (kademe {tier})",
           "herbalism": "Otçuluk aleti (kademe {tier})",
-          "fishing": "Olta kamışı (kademe {tier})"
+          "fishing": "Olta kamışı (kademe {tier})",
+          "farming": "Farming tool (tier {tier})"
         },
         "unlocks": {
           "mining": "Kademe {tier} ve altındaki cevher damarlarını kazmak için gereklidir.",
           "logging": "Kademe {tier} ve altındaki ağaç kümelerini devirmek için gereklidir.",
           "herbalism": "Kademe {tier} ve altındaki ot öbeklerini toplamak için gereklidir.",
-          "fishing": "Kademe {tier} ve altındaki sularda balık tutmak için gereklidir."
+          "fishing": "Kademe {tier} ve altındaki sularda balık tutmak için gereklidir.",
+          "farming": "Required to plant crops up to tier {tier}."
         },
         "use": {
           "mining": "Kullanım: Yakındaki bir cevher damarını kazar.",
           "logging": "Kullanım: Yakındaki bir ağaç kümesini devirir.",
-          "herbalism": "Kullanım: Yakındaki bir ot öbeğini toplar."
+          "herbalism": "Kullanım: Yakındaki bir ot öbeğini toplar.",
+          "farming": "Works from your bags when you plant a crop bed."
         },
         "speed": "Kademe {tier} altındaki düğümlerde daha hızlı toplar.",
         "rodRequired": "Balık tutmak için gereklidir.",
@@ -3092,6 +3107,7 @@ export const tr_TR: EnTranslations = {
         "rodBand": "Balıkçılık becerisi {skill} ve üzerinde daha zengin av listelerinin kilidini açar."
       },
       "downgradeMark": "Çantalar dolu: bulgu, toplayıcı işareti olmadan saklandı.",
+      "downgradeMarkCrop": "Bags full: the harvest was stored without its grower's mark.",
       "downgradeFind": "Çantalar dolu: pırıl pırıl bir bulgu kayboldu gitti.",
       "emptyHookNote": "Oltada bir şey yok",
       "stateReady": "Hazır",
@@ -3099,6 +3115,83 @@ export const tr_TR: EnTranslations = {
       "stateCooldownTimed": "{time} içinde yeniden oluşur",
       "respawnClock": "{minutes}:{seconds}",
       "fineGradePreview": "Aletiniz bu verimi kaliteli dereceye yükseltir."
+    },
+    "farming": {
+      "plantLine": "You plant: {name}.",
+      "harvestLine": "You bring in: {name}.",
+      "harvestLineQty": "You bring in: {name} x{qty}.",
+      "harvestFineLine": "You also bring in: {name}.",
+      "harvestFineLineQty": "You also bring in: {name} x{qty}.",
+      "witheredLine": "The crop withered. You clear the bed: {name}.",
+      "witheredLineQty": "The crop withered. You clear the bed: {name} x{qty}.",
+      "seedBackLine": "You recover seed: {name}.",
+      "seedBackLineQty": "You recover seed: {name} x{qty}.",
+      "denied": {
+        "bad_bed": "There is no crop bed there.",
+        "bad_crop": "You cannot plant that here.",
+        "range": "You are too far from that crop bed.",
+        "bed_taken": "You already have a crop growing there.",
+        "skill": "Your Farming skill is too low for that crop.",
+        "no_seed": "You have no seed for that crop.",
+        "not_ready": "That crop is still growing.",
+        "no_plot": "Nothing is planted in that bed.",
+        "no_husks": "You do not have enough withered husks.",
+        "no_compost": "You have no compost.",
+        "no_fee_produce": "You have no produce to pay the watch fee.",
+        "no_tonic": "You have no growth tonic.",
+        "tool": "You have no farming hoe fit for that crop.",
+        "locked": "An item that would pay for that is locked.",
+        "no_farmer": "You must be near a farmer to trade husks for compost.",
+        "no_feast": "You have no feast to set out.",
+        "feast_active": "Your feast is already set out.",
+        "feast_expired": "That feast is gone.",
+        "feast_finished": "That feast has been picked clean.",
+        "feast_range": "You are too far from the feast.",
+        "feast_eaten": "You have already eaten from that feast."
+      },
+      "feastTitle": "{name}'s Harvest Feast",
+      "feastPlacedLine": "You set out your harvest feast.",
+      "huskTrade": "Trade husks for compost",
+      "huskTradeAria": "Trade husks for compost with {name}",
+      "plantSheet": {
+        "title": "Plant a Crop",
+        "plant": "Plant",
+        "sowAria": "Sow {name}",
+        "empty": "You have no seed you can sow at this bed.",
+        "close": "Close the plant sheet"
+      },
+      "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
+      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
+      "readyLine": "A crop is ready to harvest.",
+      "readyLineQty": "{count} crops are ready to harvest.",
+      "readyWitheredLine": "A crop withered in its bed.",
+      "readyWitheredLineQty": "{count} crops withered in their beds."
+    },
+    "harvestJournal": {
+      "title": "Harvest Journal",
+      "close": "Close",
+      "listLabel": "Planted crop beds",
+      "growing": "Ready in {time}",
+      "ready": "Ready to harvest",
+      "finishing": "Finishing up",
+      "withered": "Withered",
+      "readyAnnounce": "Ready to harvest: {name}",
+      "remainingDaysHours": "{days}d {hours}h",
+      "remainingHoursMinutes": "{hours}h {minutes}m",
+      "remainingMinutesSeconds": "{minutes}m {seconds}s",
+      "remainingSeconds": "{seconds}s",
+      "bedLine": "{zone}, bed {index}",
+      "bedLineUnknown": "Unknown bed",
+      "careWatch": "Farmer's Watch",
+      "careNone": "No extras",
+      "stageSprout": "Sprout",
+      "stageSeedling": "Seedling",
+      "stageMaturing": "Maturing",
+      "stageRipe": "Ripe",
+      "emptyTitle": "No crops planted",
+      "emptyBody": "Sow a seed in any garden bed and the plot appears here with its timer.",
+      "noviceTitle": "You have not worked a garden bed yet",
+      "noviceBody": "Farming skill grows every time you bring in a crop. Sow a seed in any garden bed to begin."
     },
     "archetypeTitle": {
       "label": "Unvan",
@@ -3218,7 +3311,7 @@ export const tr_TR: EnTranslations = {
           "quickeningCharm": "Tetiklediği düğüm yeniden oluşma süresini kısaltır.",
           "makersCharm": "+2 yield per harvest while charged."
         },
-        "howToSlot": "Meslekler penceresinden bir madencilik, ağaç kesme ya da bitkicilik aletine yuvala. Yuvalandığında tüketilir.",
+        "howToSlot": "Meslekler penceresinden bir madencilik, ağaç kesme, bitkicilik ya da çiftçilik aletine yuvala. Yuvalandığında tüketilir.",
         "charges": "Sıradan bir alette {base} şarjla başlar (her nadirlik kademesinde +{bonus}).",
         "landOnly": "Olta kamışlarına yuvalanmaz.",
         "openProfessions": "Bunu bir toplama aletine yuvalamak için Meslekler'i aç."
@@ -3887,7 +3980,8 @@ export const tr_TR: EnTranslations = {
   "gatherEvent": {
     "pristineVein": "{finder} bozulmamış bir damara çarptı!",
     "ancientHeartwood": "{finder} eski bir öz odunu kesti!",
-    "moonlitBloom": "{finder} ay ışığının aydınlattığı bir çiçek keşfetti!"
+    "moonlitBloom": "{finder} ay ışığının aydınlattığı bir çiçek keşfetti!",
+    "goldenHarvest": "{finder} reaped a golden harvest!"
   },
   "apiError": {
     "validation": {
@@ -4260,6 +4354,7 @@ export const tr_TR: EnTranslations = {
       "groupCamera": "Kamera",
       "talents": "Yetenekler",
       "professions": "Meslekler",
+      "harvestJournal": "Harvest Journal",
       "arena": "PvP penceresi (arenalar ve Dikenvadi Ovası)",
       "leaderboard": "Lider Tablosu",
       "deeds": "Yiğitlikler Kitabı",
@@ -5629,6 +5724,9 @@ export const tr_TR: EnTranslations = {
       "outputFmt": "{name} x{count}",
       "comboReq": "{a} ve {b} gerektirir",
       "oncePerDay": "Once per day",
+      "effectFood": "Restores {amount} health over {seconds} sec when eaten.",
+      "effectWellFed": "Well fed when you finish eating: +{value} {stat} for {minutes} min.",
+      "effectWellFedAura": "Grants {aura} for {minutes} min when you finish eating.",
       "sourceTrainerFee": "Eğitmen, {fee}",
       "sourceTrainerFree": "Eğitmen, ücretsiz",
       "sourceKnown": "Başlangıçtan bilinir",
@@ -5806,7 +5904,8 @@ export const tr_TR: EnTranslations = {
         "mining": "Madencilik cevheri doğrudan dünyanın kayasından söker: Doğudere Vadisi'nde bakır, Mirefen Bataklığı'nda demir ve yukarıda Dikenzirve Tepeleri'nde osmiyum; bunların ötesindeki her genç bölgeye de başlangıç damarları serpiştirilmiştir ve hepsi ocak zanaatlarını besler. 1. seviyeden itibaren herkese açıktır: Doğudere, Fenbridge ya da Highwatch tezgahından alınan 20 bakırlık bir madenci kazması her başlangıç damarını açar, kazma merdiveninin üst basamakları ise kendi sayacınız onları hak ettikçe uyanır. 100 tavanına kadar kendi sayacında izlenir.",
         "logging": "Odun Kesimi tüm dünyaya yayılmış ağaç kümelerinden kereste devirir: Doğudere Vadisi'nde demirkabuk, Mirefen Bataklığı'nda kül ağacı, Dikenzirve Tepeleri'nde yüksekçam ve her genç bölgede başlangıç kümeleri; saplar, asalar ve mühendisin tezgahı için ham stok. Çantanızda bir oduncu baltası varsa 1. seviyeden itibaren herkese açıktır (Doğudere, Fenbridge ve Highwatch tezgahlarında 20 bakır) ve 100 tavanına kadar kendi sayacında izlenir.",
         "herbalism": "Bitkicilik yabanda yetişeni toplar: Doğudere Vadisi'nde parlakyaprak, Mirefen Bataklığı'nda altın yaprak, Dikenzirve Tepeleri'nde güneşyaprağı ve her genç bölgede başlangıç öbekleri; eczacılık mesleklerinin kazanını kaynatan yaprak ve sap. Çantanızda bir bitkicilik orağı varsa 1. seviyeden itibaren herkese açıktır (Doğudere, Fenbridge ve Highwatch tezgahlarında 20 bakır) ve 100 tavanına kadar kendi sayacında izlenir.",
-        "fishing": "Balıkçılık, toplama meslekleri arasında kuralın dışında kalanı ve en derinidir: gerçek bir ısır-ve-çek mini oyunu, üç ana bölgenin her birinde kendine ait av tabloları (bunların ötesindeki genç sular şimdilik hep Vadi'nin tablosunu sunar) ve diğerlerinin iki katı olan 200'lük bir yetkinlik tavanı. Bir olta alın, açık suya dönün ve oltayı atın."
+        "fishing": "Balıkçılık, toplama meslekleri arasında kuralın dışında kalanı ve en derinidir: gerçek bir ısır-ve-çek mini oyunu, üç ana bölgenin her birinde kendine ait av tabloları (bunların ötesindeki genç sular şimdilik hep Vadi'nin tablosunu sunar) ve diğerlerinin iki katı olan 200'lük bir yetkinlik tavanı. Bir olta alın, açık suya dönün ve oltayı atın.",
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe whenever you come back, because nothing in a bed ever spoils. A farmer stands beside every bed site, from the Eastbrook allotments through Fenbridge and Highwatch to the Evergarden parterre, and Farmer Jessica in Eastbrook is where the trade starts: she sells the garden hoe and the first seeds, and her errand walks a new farmer through a first crop. Each rung of the ladder grows its own pair of crops, each with a finer grade for a practiced hand to pull, and engineers craft the hoes for the tougher ground above the starter beds. Tracked on its own counter to a cap of 100."
       },
       "rhythmHeading": "Toplama ritmi",
       "rhythmBody": "Bir hasat, anında bir kapış değil kısa ve görünür bir toplama yayıdır: temelde {base} saniye, asla {floor} saniyelik tabanın altına inmez. Düğümün kademesinin üzerinde, yetkinliğinizin kullanmanıza izin verdiği bir alet taşımak sizi üstündeki her kademe için {tool} saniye hızlandırır ve geçtiğiniz her yetkinlik bandı {band} saniye daha kırpar; düğümün kademesini yalnızca tutturmak sizi kapıdan içeri sokar, hızlı yapan ise onun üzerindeki kademelerdir.\n\nDolu bir çanta, toplama yayını daha başlamadan kibarca reddeder, böylece darbenin ortasında hiçbir şey ziyan olmaz; ayrıca her hasat küçük bir dilim karakter XP'si öder, tıpkı öldürme XP'sinin ölçeklendiği gibi düğümün seviyesi sizinkine göre ölçeklenir: önemsiz, gri bir düğüm tavana ulaşmış bir karaktere hiçbir şey öğretmez.",
@@ -5837,7 +5936,9 @@ export const tr_TR: EnTranslations = {
         "mining": "Herhangi bir mesleğin ilk düğümü Toprağın Meyvelerini kazandırır ve Madencilikteki 100 tavanı Kanında Maden'i yazar. Madencilik, Odun Kesimi, Otçuluk ve Balık Tutma'nın herhangi üçünde 100'e ulaşmak 25 Ün'de Usta Toplayıcı'yı ekler; bozulmamış bir damarı kırmak kendi koleksiyoncu işaretini kaydeder. Bunların hiçbiri güç vermez: yiğitlikler unvanlar ve Ün'dür, yürüdüğün yolların bir kaydıdır.",
         "logging": "Herhangi bir mesleğin ilk düğümü Toprağın Meyvelerini kazandırır ve Odun Kesimindeki 100 tavanı Kalp Odunu Yontucusu'nu yazar. Madencilik, Odun Kesimi, Otçuluk ve Balık Tutma'nın herhangi üçünde 100'e ulaşmak 25 Ün'de Usta Toplayıcı'yı ekler; antik bir kalp odunu darbesi kendi koleksiyoncu işaretini kaydeder. Yiğitlikler yalnızca unvanlar ve Ün'dür, asla güç değil.",
         "herbalism": "Herhangi bir mesleğin ilk düğümü Toprağın Meyvelerini kazandırır ve Otçuluktaki 100 tavanı Çayır Ustası'nı yazar. Madencilik, Odun Kesimi, Otçuluk ve Balık Tutma'nın herhangi üçünde 100'e ulaşmak 25 Ün'de Usta Toplayıcı'yı ekler; mehtaplı bir çiçek kendi koleksiyoncu işaretini kaydeder. Yiğitlikler yalnızca unvanlar ve Ün'dür, asla güç değil.",
-        "fishing": "100 kilometre taşı Eski Denizci'yi, 200 ise balıkçılık sanatının en tepesi olan Usta Balıkçı'yı kendi unvanıyla birlikte yazar; Balıkçılık ayrıca herhangi üç toplama mesleğinde 100'e ulaşınca kazanılan Usta Toplayıcı'ya da sayılır. Altı bölgenin sularından yakalanan ilk balık kendi sayfasını doldurur: üç ana bölge ile onların ötesindeki Söğüt Bataklığı, Fırtına Sırtı ve Uzak Kıyı; Günışıltısı Sazan ise Umut Işıltısı'nı kaydeder, bu yüzden çantasında olta taşıyan gezginler kitaplarını umduklarından daha hızlı doldurur."
+        "fishing": "100 kilometre taşı Eski Denizci'yi, 200 ise balıkçılık sanatının en tepesi olan Usta Balıkçı'yı kendi unvanıyla birlikte yazar; Balıkçılık ayrıca herhangi üç toplama mesleğinde 100'e ulaşınca kazanılan Usta Toplayıcı'ya da sayılır. Altı bölgenin sularından yakalanan ilk balık kendi sayfasını doldurur: üç ana bölge ile onların ötesindeki Söğüt Bataklığı, Fırtına Sırtı ve Uzak Kıyı; Günışıltısı Sazan ise Umut Işıltısı'nı kaydeder, bu yüzden çantasında olta taşıyan gezginler kitaplarını umduklarından daha hızlı doldurur.",
+        "farming": "Farming keeps no deeds of its own yet: now that its beds and crops are in the ground, the milestone and cap deeds that mark the other trades arrive in a later patch. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power.",
+        "farmingSown": "Farming keeps its own shelf in the Book of Deeds now. Sow It Begins marks your first planted crop, and four chronicle pages mark a first thriving harvest at each of the bed sites, from Eastbrook Vale to the Evergarden. A golden harvest records its own zero-Renown collector's mark, and proficiency in Farming counts toward Master Gatherer, earned at 100 in any three gathering trades. The capstone is already written: Harvestmaster, the trade's 100-proficiency title, comes within reach with a later patch's deeper fields. Deeds are titles and Renown only, never power."
       },
       "fish": {
         "startHeading": "Başlangıç",
@@ -5859,6 +5960,12 @@ export const tr_TR: EnTranslations = {
         "emptyHook": "Hiçbir şey ısırmıyor",
         "koiHeading": "Günışıltısı Sazan",
         "koiBody": "Oyundaki her su kütlesi aynı ödülü saklar: Günışıltısı Sazan, misinada sıradan dışı bir parıltı, bir satıcıya 75 bakır, gururunuza ise epeyce fazlası değerinde. Olasılığı yalnızca av bandınıza yanıt verir, başka hiçbir şeye; her bölgede aynıdır: av tablosunda bant 0'da yüzde 1'lik bir satır, bant 1'de 3, bant 2'de 6; ve çekilen her atışta çekiliş yapılır, yani sazan derin tabloları hak etmiş balıkçıya gelir. Bir tane yakalamak Yiğitlikler Kitabınıza Umut Işıltısı'nı yazar, sıfır Ün'lü bir koleksiyoncu işareti. Gerçekleştiğinde kayıt bunu bilmenizi sağlar."
+      },
+      "farm": {
+        "bedsHeading": "Working the beds",
+        "bedsBody": "The loop is short. Buy seeds and compost from the farmer beside the beds: Jessica in Eastbrook stocks the Vale pair, the Fenbridge farmer the marsh pair, and no counter anywhere sells the Highwatch or Evergarden seeds, which come back a seed or two at a time from a high-tier harvest and otherwise change hands on the World Market. Sow with a hoe in your bags, and tip the odds if you like: compost from the counter and the farmer's watch, paid in produce as you plant, each raise a crop's chance of coming through, an alchemist's growth tonic gives the harvest a shot at a larger yield, and once your skill has climbed a full band past a crop's tier that crop never fails at all. Then walk away. The bed keeps growing while you are logged out, a ripe crop waits as long as you leave it, and the Harvest Journal (Shift+K, or the Farming row of your professions window) lists every bed you have planted with its timer.\n\nA crop that fails leaves withered husks in place of produce, and any farmer trades husks for compost, so a bad season buys the next one's insurance. What you bring in feeds the kitchens: the produce cooks into dishes at the kitchens, and Cook Marlow's wheat and rice orders take Vale Wheat and Marsh Rice off your hands for coin on the same clock as every other work order.",
+        "tableHeading": "From the beds to the table",
+        "tableBody": "The kitchens are where a season pays forward. Beyond the everyday farm dishes, each crop tier has a richer dish that leaves you Well Fed: finish the meal and a lasting boon stays with you, the kind of edge a group wants eaten before the dungeon door. Crowning the set is the Harvest Feast, a spread a cook sets out in the world itself: everyone at hand takes a serving of their own, one each, and every finished meal pays the same Well Fed boon, so one farmer's season can set the table for a whole party. The top of that ladder, the two richest dishes and the feast itself, comes within reach with a later patch's deeper fields; everything below them is cooking today.\n\nLuck keeps a place at that table too. Every harvest you bring in rolls the same windfall chance the other gathering trades enjoy, and now and then a crop comes up golden: the yield lands far past a normal pull, the whole zone hears the find announced by name, and Golden Harvest is recorded in your Book of Deeds."
       },
       "econ": {
         "title": "Zanaat Ekonomisi",
@@ -5882,7 +5989,7 @@ export const tr_TR: EnTranslations = {
         "marketHeading": "Dünya Pazarı ve komisyonu",
         "marketBody": "Dünya Pazarı, Doğudere'deki Tüccar ve Highwatch'taki Müzayedeci Voss tarafından yönetilen diyar genelindeki borsadır. İlan ücretsizdir: depozito yoktur ve satılmayan ilan size geri gelir. Ev payını yalnızca bir şey gerçekten satıldığında alır: satış fiyatının yüzde 5'i, gerisi de toplamanızı bekler.\n\nÖnemli bir sınır: Pazar yalnızca düz ürünlere aracılık eder. İmzalı, şaheser, büyülü veya bağlı bir kopya asla bir ilana dahil edilmez, bu nedenle özel parçalar yüz yüze bir ticaret penceresinde el değiştirir; bu pencere imzası dahil bir eşyanın tam kimliğini taşır. Bunları kendiniz fiyatlandırın; Pazar yalnızca düz versiyonun ne getirdiğini söyler.",
         "workOrdersHeading": "İş emirleri",
-        "workOrdersNote": "Her tezgah ustası sürekli bir iş emri verir: zanaatnın temel malzemesinden bir yığın getirin ve hemen ödeme alın, üstüne biraz görev deneyimi de. Ödeme kasıtlı olarak aynı yığın için bir satıcının vereceğinin %{pct}'si, aşağı yuvarlanmış olarak belirlenir; bu nedenle bir iş emri malzemeleri satmanın karlı yolu asla değildir, yalnızca tezgahın yanından geçmek için bir nedendir.\n\nHer emir karakter başına kendi {minutes} dakikalık saatinde çalışır: birini teslim edin ve o usta timer'ı dönene kadar sizin için başka bir şeyi yoktur. Bunları zaten topladığınız malzemelere küçük bir bonus olarak değerlendirin, bir iş olarak değil.",
+        "workOrdersNote": "Her tezgah ustası sürekli iş emirleri verir, her temel malzeme için bir tane: bir emrin istediği yığını getirin ve hemen ödeme alın, üstüne biraz görev deneyimi de. Ödeme kasıtlı olarak aynı yığın için bir satıcının vereceğinin %{pct}'si, aşağı yuvarlanmış olarak belirlenir; bu nedenle bir iş emri malzemeleri satmanın karlı yolu asla değildir, yalnızca tezgahın yanından geçmek için bir nedendir.\n\nHer emir karakter başına kendi {minutes} dakikalık saatinde çalışır: birini teslim edin ve o emir sayaç dönene kadar size kapalı kalır, ustanın diğer emirleri ise açık kalır. Bunları zaten topladığınız malzemelere küçük bir bonus olarak değerlendirin, bir iş olarak değil.",
         "colOrder": "İş emri",
         "colMaster": "Usta",
         "colAsks": "Talep fiyatı",
@@ -8182,6 +8289,7 @@ export const tr_TR: EnTranslations = {
         "cooldownLockedHerb": "Toplanmış ot öbeği, alet kullanılamıyor",
         "station": "Zanaat istasyonu: {name}",
         "service": "Hizmet: {name}",
+        "farmPatch": "Garden beds",
         "partyMember": "Grup üyesi: {name}",
         "deadPartyMember": "Ölü grup üyesi: {name}",
         "partyMemberGeneric": "Grup üyesi",
@@ -8865,6 +8973,7 @@ export const tr_TR: EnTranslations = {
     },
     "cast": {
       "fishing": "Balık Tutma",
+      "farming": "Planting",
       "gathering": "Toplama",
       "crafting": "Üretim",
       "disenchanting": "Büyü Bozma",
@@ -9050,6 +9159,11 @@ export const tr_TR: EnTranslations = {
       "flaskThroughDeath": "The effect remains through death, but ends when you log out; instanced matches begin and end on a clean slate.",
       "wellFed": "Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.",
       "wellFedAura": "Well Fed: Grants {aura} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.",
+      "useWellfed": "{aura}: +{value} {stat} for {minutes} min, granted when you finish eating.",
+      "useWellfedAura": "Grants {aura} for {minutes} min when you finish eating.",
+      "useFeast": "Use: Sets out a feast others can eat from, one serving each ({servings} servings, lasts {minutes} min).",
+      "useFeastBuff": "Each serving grants {aura}: +{value} {stat} for {minutes} min when you finish the {seconds} sec meal.",
+      "useFeastBuffAura": "Each serving grants {aura} for {minutes} min when you finish the {seconds} sec meal.",
       "questItem": "Görev Eşyası",
       "questRelated": "Görev: {quest}",
       "questRules": "Satılamaz, bankaya konulamaz veya takas edilemez.",
@@ -9072,6 +9186,7 @@ export const tr_TR: EnTranslations = {
       "useManaPotion": "Kullanım: Anında {amount} mana yeniler. Savaşta kullanılabilir. 1 dk bekleme süresi.",
       "clickUseInstant": "Savaşta anında kullanmak için tıkla",
       "clickUse": "Kullanmak için tıkla",
+      "clickSetOut": "Click to set out",
       "clickBuyback": "Geri satın almak için tıkla",
       "bagSlots": "{slots} Yuvalı Çanta"
     },
@@ -12737,6 +12852,138 @@ export const tr_TR: EnTranslations = {
       "pattern_laden_hearth": {
         "name": "Recipe: The Laden Hearth"
       },
+      "vale_wheat_seed": {
+        "name": "Vale Wheat Seed"
+      },
+      "vale_wheat": {
+        "name": "Vale Wheat"
+      },
+      "fine_vale_wheat": {
+        "name": "Fine Vale Wheat"
+      },
+      "withered_husks": {
+        "name": "Withered Husks"
+      },
+      "compost": {
+        "name": "Compost"
+      },
+      "growth_tonic": {
+        "name": "Growth Tonic"
+      },
+      "brook_carrot_seed": {
+        "name": "Brook Carrot Seed"
+      },
+      "brook_carrot": {
+        "name": "Brook Carrot"
+      },
+      "fine_brook_carrot": {
+        "name": "Fine Brook Carrot"
+      },
+      "marsh_rice_seed": {
+        "name": "Marsh Rice Seed"
+      },
+      "marsh_rice": {
+        "name": "Marsh Rice"
+      },
+      "fine_marsh_rice": {
+        "name": "Fine Marsh Rice"
+      },
+      "bog_beet_seed": {
+        "name": "Bog Beet Seed"
+      },
+      "bog_beet": {
+        "name": "Bog Beet"
+      },
+      "fine_bog_beet": {
+        "name": "Fine Bog Beet"
+      },
+      "highland_barley_seed": {
+        "name": "Highland Barley Seed"
+      },
+      "highland_barley": {
+        "name": "Highland Barley"
+      },
+      "fine_highland_barley": {
+        "name": "Fine Highland Barley"
+      },
+      "frost_gourd_seed": {
+        "name": "Frost Gourd Seed"
+      },
+      "frost_gourd": {
+        "name": "Frost Gourd"
+      },
+      "fine_frost_gourd": {
+        "name": "Fine Frost Gourd"
+      },
+      "gilded_sunmelon_seed": {
+        "name": "Gilded Sunmelon Seed"
+      },
+      "gilded_sunmelon": {
+        "name": "Gilded Sunmelon"
+      },
+      "fine_gilded_sunmelon": {
+        "name": "Fine Gilded Sunmelon"
+      },
+      "evergarden_greens_seed": {
+        "name": "Evergarden Greens Seed"
+      },
+      "evergarden_greens": {
+        "name": "Evergarden Greens"
+      },
+      "fine_evergarden_greens": {
+        "name": "Fine Evergarden Greens"
+      },
+      "garden_hoe": {
+        "name": "Garden Hoe"
+      },
+      "bronze_hoe": {
+        "name": "Bronze Hoe"
+      },
+      "skysilver_hoe": {
+        "name": "Skysilver Hoe"
+      },
+      "osmium_hoe": {
+        "name": "Osmium Hoe"
+      },
+      "vale_hearth_loaf": {
+        "name": "Vale Hearth Loaf"
+      },
+      "eastbrook_root_pottage": {
+        "name": "Eastbrook Root Pottage"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "Fenbridge Rice Bowl"
+      },
+      "fenbridge_beet_braise": {
+        "name": "Fenbridge Beet Braise"
+      },
+      "highwatch_barley_bannock": {
+        "name": "Highwatch Barley Bannock"
+      },
+      "highwatch_gourd_soup": {
+        "name": "Highwatch Gourd Soup"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "Evergarden Sunmelon Tart"
+      },
+      "evergarden_harvest_platter": {
+        "name": "Evergarden Harvest Platter"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "Eastbrook Glazed Carrots"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "Fenbridge Rice Pudding"
+      },
+      "highwatch_barley_porridge": {
+        "name": "Highwatch Barley Porridge"
+      },
+      "evergarden_braised_greens": {
+        "name": "Evergarden Braised Greens"
+      },
+      "harvest_feast": {
+        "name": "Harvest Feast"
+      },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"
       },
@@ -14676,6 +14923,26 @@ export const tr_TR: EnTranslations = {
         "title": "Eczacı Ustası",
         "greeting": "İki kez ölçün ve bir kez dökün, {className}. Eczacının dökülen reaktiflere karşı sabrı yoktur."
       },
+      "farmer_jessica": {
+        "name": "Farmer Jessica",
+        "title": "Allotment Keeper",
+        "greeting": "Good soil and fair weather, {playerName}. Buy a seed from me, sow it in one of those beds, and go about your day. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer."
+      },
+      "farmer_teasel": {
+        "name": "Farmer Teasel",
+        "title": "Fen Paddy Farmer",
+        "greeting": "Marsh rice and bog beet seed, {className}, and compost to feed them. The paddies drain slow, so mind where you tread."
+      },
+      "farmer_hollis": {
+        "name": "Farmer Hollis",
+        "title": "Highwatch Terrace Farmer",
+        "greeting": "The terraces give what the mountain allows, {className}. I sell compost, and if a crop of yours comes up withered I will work the husks back into good soil for you."
+      },
+      "farmer_verbena": {
+        "name": "Farmer Verbena",
+        "title": "Parterre Gardener",
+        "greeting": "Mind the edging, {playerName}, these beds are the pride of the parterre. Compost is what I sell, and I will turn any withered husks you carry into more of it."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Gelgit Gözcüsü",
@@ -14690,6 +14957,19 @@ export const tr_TR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Maden damarı işlendi"
+          }
+        }
+      },
+      "q_farm_intro": {
+        "title": "First Furrow",
+        "text": "Take this hoe and a pinch of vale wheat seed, {playerName}. Sow the seed in one of the beds beside me, then go about your business. Come back whenever you like and bring the crop in; I will be here.",
+        "completion": "There, your first crop in your own hands. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer. Come back for seed whenever the beds call you, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat planted"
+          },
+          "1": {
+            "label": "Vale Wheat harvested"
           }
         }
       },
@@ -15586,6 +15866,26 @@ export const tr_TR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Av Eti teslim edildi"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_wheat": {
+        "title": "Kitchens Wheat Order",
+        "text": "Bread does not bake itself, {playerName}, and my flour bins are scraping bottom. Bring me eight sheaves of vale wheat and I will pay you honest coin for the lot. Grown by your own hand or bought off the market, I do not care, so long as it grinds.",
+        "completion": "Good dry grain, and plenty of it. There is your pay, counted out. When the next crop comes in, you know which door to knock on.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat delivered"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_rice": {
+        "title": "Kitchens Rice Order",
+        "text": "The marsh folk swear by their rice, {playerName}, and I mean to find out why. Fetch me five measures of marsh rice and there is coin waiting for you here. Keep it dry on the road, mind: wet rice is porridge, and I did not order porridge.",
+        "completion": "Plump and dry, every grain. Here is your coin. If the marsh keeps giving, so do I.",
+        "objectives": {
+          "0": {
+            "label": "Marsh Rice delivered"
           }
         }
       },
@@ -17550,6 +17850,7 @@ export const tr_TR: EnTranslations = {
     "delveRiteShrineReedInteract": "Saz Sunağı: Dokunmak için F'ye bas",
     "delveRiteShrineSkullInteract": "Kafatası Sunağı: Dokunmak için F'ye bas",
     "mailboxName": "Posta Kutusu",
-    "noticeboardName": "İlan Tahtası"
+    "noticeboardName": "İlan Tahtası",
+    "farmPatchName": "Garden Beds"
   }
 };

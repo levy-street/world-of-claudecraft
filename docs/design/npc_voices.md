@@ -149,6 +149,22 @@ every clause of it. Age 40s, female.
 
 **Voice test:** *"The forge answers to me. Bring good ore and it will answer to you too."*
 
+### Farmer Jessica: *Allotment Keeper*
+**Visual:** villager, harvest gold (#a8843a), the Eastbrook allotments beside the
+north-east lane.
+
+Warm, plain-spoken, sun-and-soil mezzo, unhurried and patient, the voice of
+someone who explains a thing once and trusts you with it. Open vowels, an
+easy country cadence, no bark in her at all: the profession's front door
+should sound like a welcome. Age 30s to 40s, female. **No designed voice of her
+own yet:** she borrows Provisioner Fenna's bright, generous mezzo through
+`VOICE_ALIAS` (a role match, not the same character), so her lines ship in
+that voice until a key is available to design and render this description.
+Promote her to her own `VOICE_PROMPTS` entry then, slower and earthier than
+Fenna's market patter.
+
+**Voice test:** *"Buy a seed from me, sow it in one of those beds, and go about your day. It keeps growing while you are away, and it never spoils."*
+
 ### Groundskeeper Bram: *Keeper of the Sowfield*
 **Visual:** villager, field green (#3f7d34), sporting field.
 
@@ -237,6 +253,20 @@ in them at all. Not unfriendly, simply finished talking. Faint rasp of lye and
 hide-smoke. Age 40s to 50s, male.
 
 **Voice test:** *"Vats are empty. Bring eight rough hides. Coin when you do."*
+
+### Farmer Teasel: *Fen Paddy Farmer*
+**Visual:** villager, paddy olive (#6b7f3a), the raised beds south-west of Fenbridge.
+
+Dry, laconic, mud-and-reed baritone, sentences that end early because the fen
+does not reward talk. Wary of the water, fond of the crop, faintly amused by
+anyone in clean boots. Age 50s, male. **No designed voice of his own yet:** he
+borrows Trapper Brosk's craggy, cold-roughened old fen voice through
+`VOICE_ALIAS` (a role match: another man alone with the marsh), so his lines
+ship in that voice until a key is available. Promote him to his own
+`VOICE_PROMPTS` entry then, younger and warmer than Brosk, with the water in
+it rather than the cold.
+
+**Voice test:** *"Marsh rice and bog beet seed, and compost to feed them. The paddies drain slow, so mind where you tread."*
 
 ---
 
@@ -338,6 +368,19 @@ it, barking corrections and grinning at the same time. Open-air volume, dust in
 the throat. Age 40s, female.
 
 **Voice test:** *"I will not hand you the reins until you can sit the Valorsteed without kissing the dirt."*
+
+### Farmer Hollis: *Highwatch Terrace Farmer*
+**Visual:** villager, terrace brown (#8c6a4a), the terraces on the shelf below Highwatch.
+
+Broad, weather-cured hill-farmer baritone, slow and even, the patience of a man
+who works stone terraces by hand. Rolling rural vowels, thin mountain air in
+the breath, gruff kindness. Age 50s to 60s, male. **No designed voice of his own
+yet:** he borrows Groundskeeper Bram's country baritone through `VOICE_ALIAS`
+(a role match, not the same character), so his lines ship in that voice until
+a key is available. Promote him to his own `VOICE_PROMPTS` entry then, quieter
+and more deliberate than Bram, with none of the referee's grin.
+
+**Voice test:** *"The terraces give what the mountain allows. I sell compost, and if a crop of yours comes up withered I will work the husks back into good soil for you."*
 
 ---
 
@@ -587,6 +630,21 @@ Speaks of the garden as a colleague and of his own masterwork as something that
 must now be unmade. Age 90s or older, male.
 
 **Voice test:** *"The garden is afraid. In a hundred years I have never once known it afraid."*
+
+### Farmer Verbena: *Parterre Gardener*
+**Visual:** villager, parterre green (#7d9b5c), the eight showcase beds west of The
+Parterre Walk.
+
+Precise, proprietary older alto, clipped and a little tart, the pride of the
+parterre in every sentence and a real, grudging warmth for anyone who keeps
+the edging straight. Age 50s to 60s, female. **No designed voice of her own
+yet:** she borrows Orchardist Pomeline's tart, territorial older voice through
+`VOICE_ALIAS` (a role match: another woman proprietary about her rows), so her
+lines ship in that voice until a key is available. Promote her to her own
+`VOICE_PROMPTS` entry then, more polished than Pomeline, a garden voice rather
+than an orchard one.
+
+**Voice test:** *"Mind the edging, these beds are the pride of the parterre. Compost is what I sell, and I will turn any withered husks you carry into more of it."*
 
 ---
 

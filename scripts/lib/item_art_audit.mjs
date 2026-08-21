@@ -476,8 +476,25 @@ export async function buildItemArtAudit(options) {
     heroicWeaponArtAliases.every(([, item]) => fileIds.has(item.heroicOf)),
     'Every heroic weapon art alias must reference a shipping base-art file',
   );
+  // Declared procedural-art debt (src/ui/icons.ts ITEM_ART_PENDING): ids that
+  // deliberately ship a procedural icon while their committed art is owed.
+  // The set is exact-pinned in tests/item_icons.test.ts, so growing it is a
+  // visible test edit, never a silent audit bypass. Both directions are held
+  // here: a pending id must be a live def with NO shipping webp (art landing
+  // forces the id OFF the pending set, which keeps the debt ledger honest).
+  const pendingArtIds = new Set(options.pendingArtIds ?? []);
+  for (const id of pendingArtIds) {
+    assert(options.items[id], `pending-art id ${id} is not a live item definition`);
+    assert(
+      !fileIds.has(id),
+      `pending-art id ${id} has shipping art; strike it from ITEM_ART_PENDING`,
+    );
+  }
   const missingFiles = Object.entries(options.items)
-    .filter(([id, item]) => !fileIds.has(id) && !(item.kind === 'weapon' && item.heroicOf))
+    .filter(
+      ([id, item]) =>
+        !fileIds.has(id) && !(item.kind === 'weapon' && item.heroicOf) && !pendingArtIds.has(id),
+    )
     .map(([id]) => id);
   assert.deepEqual(
     missingFiles,
@@ -537,9 +554,20 @@ export async function buildItemArtAudit(options) {
     'Unexpected item-art catalog count',
   );
   assertExpected(
-    Object.keys(options.items).length,
+    Object.keys(options.items).length - pendingArtIds.size,
     options.expected?.liveItemCount,
     'Unexpected live item definition count',
+  );
+  // The debt term pinned INDEPENDENTLY of the art-subject term: liveItemCount
+  // subtracts the pending set, so a new artless def that also joins
+  // ITEM_ART_PENDING moves neither number. Pinning the pending size here too
+  // means growing the debt is a visible literal edit in the audit itself,
+  // even when the audit runs standalone without the vitest exact-set pin
+  // (tests/item_icons.test.ts).
+  assertExpected(
+    pendingArtIds.size,
+    options.expected?.pendingArtCount,
+    'Unexpected pending procedural-art debt count',
   );
   assertExpected(
     generatedHeroicDefinitions.length,
@@ -603,7 +631,11 @@ export async function buildItemArtAudit(options) {
       rendererFingerprint: ITEM_ART_AUDIT_RENDERER_FINGERPRINT,
     },
     catalogCount: records.length,
-    liveItemCount: Object.keys(options.items).length,
+    // The ART-SUBJECT universe: every live def minus the declared
+    // procedural-art debt (pendingArtIds). The reviewed evidence counts stay
+    // stable while debt items exist, and each id rejoins this count the day
+    // its art lands and it leaves the pending set.
+    liveItemCount: Object.keys(options.items).length - pendingArtIds.size,
     generatedHeroicDefinitions: generatedHeroicDefinitions.length,
     heroicDefinitionsWithOwnWebp: heroicDefinitionsWithOwnWebp.length,
     heroicWeaponArtAliases: records.reduce((sum, record) => sum + record.aliases.length, 0),

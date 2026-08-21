@@ -8,6 +8,7 @@
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
+import { PlantSheetWindow } from '../../src/ui/farming_plant_sheet_window';
 import { cleanup } from './_harness';
 
 const TOUCH_FLOOR = 40;
@@ -240,6 +241,48 @@ describe('mobile target-size: in-game touch controls are >=40x40 in landscape', 
     toggle.appendChild(document.createTextNode(' Ask each use'));
     document.body.appendChild(toggle);
     expectAtLeastFloor(toggle, '.prof-effect-mode-toggle');
+  });
+
+  it('plant sheet controls: seed pick, three care knobs, and Plant (real painter)', () => {
+    // The real painter under the real styles, the a11y-suite idiom, so the
+    // measured markup can never drift from what a bed press renders. The
+    // knobs paint DISABLED here (a fresh bag affords none), which is exactly
+    // the state the touch floor must still honor.
+    // CAUTION: the world stub is handed over through `as never`; it must
+    // carry every member the window's buildInput reads (inventory,
+    // myFarmPlots, professionsState) or the miss is a runtime throw in this
+    // suite only.
+    const host = el('div', { id: 'plant-sheet-window', class: 'window panel' });
+    document.body.appendChild(host);
+    const world = {
+      inventory: [
+        { itemId: 'vale_wheat_seed', count: 3 },
+        { itemId: 'garden_hoe', count: 1 },
+      ],
+      myFarmPlots: [],
+      professionsState: { skills: [{ professionId: 'farming', skill: 10, maxSkill: 100 }] },
+      plantCrop: () => {},
+    };
+    const win = new PlantSheetWindow({
+      root: () => host,
+      world: () => world as never,
+      closeOthers: () => {},
+      captureFocus: () => null,
+      restoreFocus: () => {},
+    });
+    win.open('bed_eastbrook_1');
+    for (const sel of [
+      '.ps-seed',
+      '[data-knob="compost"]',
+      '[data-knob="watch"]',
+      '[data-knob="tonic"]',
+      '.ps-plant',
+    ]) {
+      const node = host.querySelector<HTMLElement>(sel);
+      expect(node, `${sel} must render`).not.toBeNull();
+      expectAtLeastFloor(node as HTMLElement, sel);
+    }
+    win.close();
   });
 
   it('the per-use confirm dialog actions (R40 confirmToolEffectUse)', () => {

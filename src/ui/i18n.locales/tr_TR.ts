@@ -1178,7 +1178,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.charges':
     'Sıradan bir alette {base} şarjla başlar (her nadirlik kademesinde +{bonus}).',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    'Meslekler penceresinden bir madencilik, ağaç kesme ya da bitkicilik aletine yuvala. Yuvalandığında tüketilir.',
+    'Meslekler penceresinden bir madencilik, ağaç kesme, bitkicilik ya da çiftçilik aletine yuvala. Yuvalandığında tüketilir.',
   'hudChrome.professions.toolEffectTooltip.kind': 'Alet tılsımı',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'Olta kamışlarına yuvalanmaz.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':
@@ -1838,7 +1838,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Dünya Pazarı, Doğudere'deki Tüccar ve Highwatch'taki Müzayedeci Voss tarafından yönetilen diyar genelindeki borsadır. İlan ücretsizdir: depozito yoktur ve satılmayan ilan size geri gelir. Ev payını yalnızca bir şey gerçekten satıldığında alır: satış fiyatının yüzde 5'i, gerisi de toplamanızı bekler.\n\nÖnemli bir sınır: Pazar yalnızca düz ürünlere aracılık eder. İmzalı, şaheser, büyülü veya bağlı bir kopya asla bir ilana dahil edilmez, bu nedenle özel parçalar yüz yüze bir ticaret penceresinde el değiştirir; bu pencere imzası dahil bir eşyanın tam kimliğini taşır. Bunları kendiniz fiyatlandırın; Pazar yalnızca düz versiyonun ne getirdiğini söyler.",
   'guide.profPages.econ.workOrdersHeading': 'İş emirleri',
   'guide.profPages.econ.workOrdersNote':
-    "Her tezgah ustası sürekli bir iş emri verir: zanaatnın temel malzemesinden bir yığın getirin ve hemen ödeme alın, üstüne biraz görev deneyimi de. Ödeme kasıtlı olarak aynı yığın için bir satıcının vereceğinin %{pct}'si, aşağı yuvarlanmış olarak belirlenir; bu nedenle bir iş emri malzemeleri satmanın karlı yolu asla değildir, yalnızca tezgahın yanından geçmek için bir nedendir.\n\nHer emir karakter başına kendi {minutes} dakikalık saatinde çalışır: birini teslim edin ve o usta timer'ı dönene kadar sizin için başka bir şeyi yoktur. Bunları zaten topladığınız malzemelere küçük bir bonus olarak değerlendirin, bir iş olarak değil.",
+    "Her tezgah ustası sürekli iş emirleri verir, her temel malzeme için bir tane: bir emrin istediği yığını getirin ve hemen ödeme alın, üstüne biraz görev deneyimi de. Ödeme kasıtlı olarak aynı yığın için bir satıcının vereceğinin %{pct}'si, aşağı yuvarlanmış olarak belirlenir; bu nedenle bir iş emri malzemeleri satmanın karlı yolu asla değildir, yalnızca tezgahın yanından geçmek için bir nedendir.\n\nHer emir karakter başına kendi {minutes} dakikalık saatinde çalışır: birini teslim edin ve o emir sayaç dönene kadar size kapalı kalır, ustanın diğer emirleri ise açık kalır. Bunları zaten topladığınız malzemelere küçük bir bonus olarak değerlendirin, bir iş olarak değil.",
   'guide.profPages.econ.colOrder': 'İş emri',
   'guide.profPages.econ.colMaster': 'Usta',
   'guide.profPages.econ.colAsks': 'Talep fiyatı',

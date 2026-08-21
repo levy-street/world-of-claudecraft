@@ -23,7 +23,7 @@ describe('toolEffectTooltipLines: live charms', () => {
     expect(html).toContain('<div class="tt-sub">Tool charm</div>');
     expect(html).toContain('<div class="tt-green">+1 yield per harvest while charged.</div>');
     expect(html).toContain(
-      '<div class="tt-desc">Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.</div>',
+      '<div class="tt-desc">Slot onto a mining, logging, herbalism, or farming tool from the Professions window. Consumed when slotted.</div>',
     );
     expect(html).toContain(
       `<div class="tt-desc">Starts with ${TOOL_EFFECTS.gatherers_cache.startingDurability} charges on a common tool (+${RARITY_DURABILITY_BONUS} per rarity rung).</div>`,
@@ -70,6 +70,26 @@ describe('toolEffectTooltipLines: live charms', () => {
     // ever wired for real, this pin drags the landOnly copy along.
     expect(slotToolEffectRefused('fishing', 'gatherers_cache')).toBe(true);
     expect(slotToolEffectRefused('fishing', 'artisans_eye')).toBe(true);
+    // The hoe phase lifted farming's shipless refusal arm: both live effects
+    // now slot on farming for real (professions/farming.ts harvestCrop maps
+    // quantity to bonus picks and quality to a fine-chance bump), so the
+    // admission is pinned in both live-effect rows.
+    expect(slotToolEffectRefused('farming', 'gatherers_cache')).toBe(false);
+    expect(slotToolEffectRefused('farming', 'artisans_eye')).toBe(false);
+    // Springback Charm (id quickening_charm, kind respawnSpeed) stays refused
+    // on EVERY profession via the kind arm, farming included. One arm per
+    // site: farming proves the kind arm survives the lifted shipless arm,
+    // mining proves it fires away from farming entirely.
+    expect(slotToolEffectRefused('farming', 'quickening_charm')).toBe(true);
+    expect(slotToolEffectRefused('mining', 'quickening_charm')).toBe(true);
+    // The farming gatherTool roster, once the self-clearing empty tripwire of
+    // the shipless era, is now the exact four-rung hoe ladder, in ITEMS
+    // insertion order (which is how Object.values returns them).
+    expect(
+      Object.values(ITEMS)
+        .filter((item) => item.use?.type === 'gatherTool' && item.use.professionId === 'farming')
+        .map((item) => item.id),
+    ).toEqual(['garden_hoe', 'bronze_hoe', 'skysilver_hoe', 'osmium_hoe']);
   });
 });
 

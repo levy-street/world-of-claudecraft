@@ -3112,6 +3112,17 @@ export const hudChromeStrings = {
     // The Quickening Catalyst states its own craft limit (the tooltip rule:
     // never hide a limit); the Used-by line lists the nine consuming crafts.
     quickeningCatalyst: 'Crafting catalyst. An alchemist can craft only one each day.',
+    // The crafted farm supply (Phase 6): kind junk with no use arm, consumed
+    // by plant_crop as the yield knob, so the tooltip purpose line is the one
+    // in-game place that says what it is for.
+    // Written from the live mechanic (src/sim/professions/farming.ts): spent
+    // at plant time via the knob payload, one yield roll at harvest, and a
+    // withered plot never reaches the resolver, so the tonic is forfeited
+    // with the crop. Magnitude stays qualitative on purpose: the chance and
+    // pick constants are maintainer-provisional (flagged at their rows).
+    growthTonic:
+      'Farming supply. Spent when you plant a crop for a chance of a slightly larger ' +
+      'harvest. If the crop withers, the tonic is lost with it.',
   },
   discord: {
     title: 'Discord',
@@ -3662,6 +3673,7 @@ export const hudChromeStrings = {
     logging: 'Logging',
     herbalism: 'Herbalism',
     fishing: 'Fishing',
+    farming: 'Farming',
     // #1866: click/tap/interact-key error when a targeted node's per-viewer
     // respawn timer has not elapsed yet (IWorldProfessions#nodeHarvestableByMe).
     notReady: 'This resource node has not respawned for you yet.',
@@ -3731,9 +3743,18 @@ export const hudChromeStrings = {
       mining: 'Requires a tier {tier} mining pick',
       logging: 'Requires a tier {tier} logging axe',
       herbalism: 'Requires a tier {tier} herbalism sickle',
+      // The farming arm's sink is NOT the node tooltip (farming has no world
+      // nodes): it is the farmDenied 'tool' toast, which names the tier the
+      // refused CROP demands when the event's cropId resolves
+      // (farming_view.ts farmDeniedToast), so the refusal teaches the same
+      // number the node families' hover line does.
+      farming: 'Requires a tier {tier} farming hoe',
     },
     // Tooltip requirement line for tier-1 nodes (#2343: every harvest needs a
     // matching tool, bare hands never gather, so tier 1 needs the base tool).
+    // No farming arm: farming has no nodes, so a tierless "requires a hoe"
+    // line has no surface to render on (the tiered toast above covers the
+    // refusal, falling back to hudChrome.farming.denied.tool).
     requiresTool: {
       mining: 'Requires a mining pick',
       logging: 'Requires a logging axe',
@@ -3747,6 +3768,7 @@ export const hudChromeStrings = {
       logging: 'You need a tier {tier} logging axe to fell this stand.',
       herbalism: 'You need a tier {tier} herbalism sickle to gather this patch.',
       fishing: 'You need a tier {tier} fishing rod to fish these waters.',
+      farming: 'You need a tier {tier} farming hoe to work this bed.',
     },
     // gatherDenied error toast for requiredTier 1 (#2343): the player owns no
     // matching tool at all, so no tier number is named. The fishing arm is
@@ -3756,13 +3778,18 @@ export const hudChromeStrings = {
       logging: 'You need a logging axe to fell this stand.',
       herbalism: 'You need a herbalism sickle to gather this patch.',
       fishing: 'You need a fishing pole to cast a line.',
+      farming: 'You need a farming hoe to work this bed.',
     },
     // gatherToolNoNode error toast (#2343): the player used a gathering tool
     // from the bags with no matching resource node within interact range.
+    // Node professions only, so fishing has no arm here (a rod routes to
+    // startFishing and never emits the event); farming does, because a crop
+    // bed is a world node like a vein, a stand, or a patch.
     noNodeNearby: {
       mining: 'There is no ore vein within reach.',
       logging: 'There is no timber stand within reach.',
       herbalism: 'There is no herb patch within reach.',
+      farming: 'There is no crop bed within reach.',
     },
     // gatherDenied error toast, the R22 wield arm: a covering tool IS in the
     // bags and only its proficiency requirement is short, so the line names
@@ -3773,6 +3800,7 @@ export const hudChromeStrings = {
       mining: 'You need Mining {skill} to swing the pick already in your bags.',
       logging: 'You need Logging {skill} to swing the axe already in your bags.',
       herbalism: 'You need Herbalism {skill} to work the sickle already in your bags.',
+      farming: 'You need Farming {skill} to swing the hoe already in your bags.',
     },
     // The corpse flavor of the wield arm: profession-neutral like its
     // tier-based sibling below.
@@ -3791,6 +3819,7 @@ export const hudChromeStrings = {
         logging: 'Logging tool (tier {tier})',
         herbalism: 'Herbalism tool (tier {tier})',
         fishing: 'Fishing rod (tier {tier})',
+        farming: 'Farming tool (tier {tier})',
       },
       unlocks: {
         mining: 'Required to mine ore veins up to tier {tier}.',
@@ -3802,11 +3831,19 @@ export const hudChromeStrings = {
         // tool family whose tooltip never named the access it buys, so the
         // only way to learn the water refuses you was to be refused.
         fishing: 'Required to fish waters up to tier {tier}.',
+        // The hoe arm says CROPS rather than nodes: what a hoe tier opens is
+        // which crop tiers may be planted (the step-12 gate in
+        // professions/farming.ts), and beds themselves are not tiered nodes.
+        farming: 'Required to plant crops up to tier {tier}.',
       },
       use: {
         mining: 'Use: Mine a nearby ore vein.',
         logging: 'Use: Fell a nearby timber stand.',
         herbalism: 'Use: Gather from a nearby herb patch.',
+        // No "Use:" imperative: a hoe is a passive gate (clicking it starts
+        // nothing; beds are worked by planting and harvesting directly), so
+        // the line states the bags-carried behavior instead of a click.
+        farming: 'Works from your bags when you plant a crop bed.',
       },
       speed: 'Gathers faster at nodes below tier {tier}.',
       rodRequired: 'Required to fish.',
@@ -3818,6 +3855,11 @@ export const hudChromeStrings = {
     // text-free personal gatherDowngrade SimEvent, one key per lost arm:
     // 'mark' (the yield arrived unsigned) and 'find' (the jackpot dropped).
     downgradeMark: "Bags full: the find was stored without its gatherer's mark.",
+    // The crop surface's own mark line (Phase 14): "the find" is prospecting
+    // vocabulary and reads wrong for a harvest you grew; a crop can only
+    // ever lose the mark (nothing-rots always lands the units), so no crop
+    // find line exists.
+    downgradeMarkCrop: "Bags full: the harvest was stored without its grower's mark.",
     downgradeFind: 'Bags full: a pristine find slipped away.',
     // The empty-hook FCT self-note (the UX pass), fired off the
     // fishingEmptyHook event beside the sim's grey log line: the reel was
@@ -3838,6 +3880,210 @@ export const hudChromeStrings = {
     // mint this node's FINE grade, through the same effectiveGradeToolTier
     // read the grant runs.
     fineGradePreview: 'Your tool refines this yield to fine grade.',
+  },
+  // Farming (the growth-engine phase): the chat lines and refusal toasts for
+  // the plant / grow / harvest loop, rendered from the text-free, id-carrying
+  // farmPlanted / farmHarvested / farmWithered / farmDenied SimEvents. Its own
+  // namespace rather than more arms under `gathering` above, because those are
+  // per-profession arms of TOOL keys every gathering profession shares, while
+  // these are farming's own event family. The line keys follow the shipped
+  // grant-line shape (a plain variant plus a {qty} sibling, selected by
+  // grant_line_view.ts isMultiUnitGrant) and stay worded APART from both the
+  // gather and the corpse-harvest families, whose "You gather:" / "You
+  // harvest:" wording those matchers still own.
+  farming: {
+    // The plant confirmation. Names the SEED that was consumed, the
+    // disenchant/salvage precedent for a line about a spent item, so the
+    // player can tell which of several seeds went into the bed.
+    plantLine: 'You plant: {name}.',
+    // The produce a ready plot paid. The sole line for the grant (the farming
+    // resolver emits its hub grants callerLogs, the #2430 one-line rule), so
+    // it carries the quantity.
+    harvestLine: 'You bring in: {name}.',
+    harvestLineQty: 'You bring in: {name} x{qty}.',
+    // The fine-grade twin, on its own line for the reason
+    // harvestSpecimenLine takes one: it is a DIFFERENT item granted beside
+    // the plain produce, so folding it in would read as one yield counted
+    // twice. Unlike a specimen it can land several units, so it keeps a
+    // {qty} sibling.
+    harvestFineLine: 'You also bring in: {name}.',
+    harvestFineLineQty: 'You also bring in: {name} x{qty}.',
+    // The failed-crop payout. A plot that lost its survival roll pays husks
+    // instead of produce, and the player learns it HERE, at the harvest:
+    // nothing rots and no timer fires, so this line is the whole of the bad
+    // news and says plainly that the crop, not the bed, was lost.
+    witheredLine: 'The crop withered. You clear the bed: {name}.',
+    witheredLineQty: 'The crop withered. You clear the bed: {name} x{qty}.',
+    // The seed-back sentence (the crop-ladder phase): a tier 3/4 harvest can
+    // hand back seeds beside its payout, on EITHER outcome, so this renders
+    // whenever farmHarvested / farmWithered carries a positive seedBackCount.
+    // Names the SEED as a spliced token (farming_view.ts resolves the crop id
+    // to its seed item, the plant line's shared hop), with the family's
+    // quantity split.
+    seedBackLine: 'You recover seed: {name}.',
+    seedBackLineQty: 'You recover seed: {name} x{qty}.',
+    // Refusal toasts, one per farmDenied reason, keyed by the reason id
+    // itself so gathering_view.ts resolves them by template literal and no
+    // second map can drift. Error toasts only: no line, no cue, no other
+    // state (the gatherDenied pattern).
+    denied: {
+      bad_bed: 'There is no crop bed there.',
+      bad_crop: 'You cannot plant that here.',
+      range: 'You are too far from that crop bed.',
+      bed_taken: 'You already have a crop growing there.',
+      skill: 'Your Farming skill is too low for that crop.',
+      no_seed: 'You have no seed for that crop.',
+      not_ready: 'That crop is still growing.',
+      no_plot: 'Nothing is planted in that bed.',
+      // The knobs phase: the husk trade with fewer husks than one batch
+      // costs (convert_husks), then the three plant-time knob payments.
+      no_husks: 'You do not have enough withered husks.',
+      no_compost: 'You have no compost.',
+      no_fee_produce: 'You have no produce to pay the watch fee.',
+      no_tonic: 'You have no growth tonic.',
+      // The hoe phase: the step-12 hoe gate's refusal, one line for both the
+      // no-hoe and the tier-short (or wield-short) case.
+      tool: 'You have no farming hoe fit for that crop.',
+      // Player item lock (issue 3042, the v0.38.0 sync): fired instead of the
+      // family shortfall line when the shortfall is caused solely by a locked
+      // copy, so the denial names the real cause rather than reading as a
+      // generic shortage (the crafting.reagentLocked twin). One line for all
+      // five farming spends: the event does not say which leg was locked.
+      locked: 'An item that would pay for that is locked.',
+      // The farming go-live: the husk trade's range gate (convertHusks refuses
+      // out of reach of a farmer NPC, professions/farmer_npcs.ts). Its own
+      // leaf rather than `range` above, whose English names a crop bed.
+      no_farmer: 'You must be near a farmer to trade husks for compost.',
+      // The shared feast (professions/feast.ts): the place arm's refusals
+      // (missing item, one active feast per placer), then the consume arm's
+      // (stale or expired, picked clean, range with its own leaf since
+      // `range` above names a crop bed, once per player). The lock-caused
+      // shortfall reuses `locked` above.
+      no_feast: 'You have no feast to set out.',
+      feast_active: 'Your feast is already set out.',
+      feast_expired: 'That feast is gone.',
+      feast_finished: 'That feast has been picked clean.',
+      feast_range: 'You are too far from the feast.',
+      feast_eaten: 'You have already eaten from that feast.',
+    },
+    // The placed feast entity's title (professions/feast.ts), composed
+    // client-side off templateId 'farm_feast': {name} is the PLACER'S raw
+    // player name, carried by the entity as a VALUE and never translated
+    // (the gatherEvent.goldenHarvest finder-param precedent).
+    feastTitle: "{name}'s Harvest Feast",
+    // The placer's own confirmation, rendered from the text-free
+    // farmFeastPlaced SimEvent (everyone else learns of the feast by seeing
+    // the entity itself, so only the placer gets a line).
+    feastPlacedLine: 'You set out your harvest feast.',
+    // The farmer NPC's gossip row (the farming go-live): the one UI affordance
+    // that sends convert_husks, offered in the dialog of every NpcDef carrying
+    // the farmer flag (hud/quest/quest_dialog_controller.ts). The trade's own
+    // feedback is the husksConverted line below and the denied toasts above.
+    huskTrade: 'Trade husks for compost',
+    // WCAG 2.5.3 label-in-name: the accessible name CONTAINS the visible
+    // huskTrade label verbatim (speech-input users say what they see), so
+    // the aria adds only the counterparty, never rewords the action. The
+    // same containment rule binds every locale fill of this pair.
+    huskTradeAria: 'Trade husks for compost with {name}',
+    // The plant sheet (the bed-verbs phase): the window a press on a free
+    // garden bed opens. Seed and supply names come from itemDisplayName and
+    // the watch knob reuses the journal's careWatch label, so the copy here
+    // is only what no other family owns: the title, the one Plant control,
+    // the seed-row aria, and the no-sowable-seed empty state.
+    plantSheet: {
+      title: 'Plant a Crop',
+      plant: 'Plant',
+      sowAria: 'Sow {name}',
+      empty: 'You have no seed you can sow at this bed.',
+      close: 'Close the plant sheet',
+    },
+    // The husk trade's one line (the knobs phase): names BOTH sides of the
+    // trade, what left the bags and what arrived, because the compost grant's
+    // hub line stands down for it (silent + callerLogs, the #2430 one-line
+    // rule). BOTH items splice as tokens ({husksName} is the husk item's own
+    // localized link, exactly like {name}): hardcoding "withered husks" as
+    // prose would drift from entities.items.withered_husks.name per locale
+    // on any rename, and the xN form sidesteps English pluralization. The
+    // quantity split follows the grant-line families above.
+    husksConvertedLine: 'You trade {husksName} x{husks} for {name}.',
+    husksConvertedLineQty: 'You trade {husksName} x{husks} for {name} x{qty}.',
+    // The ready notice (the ready-notice phase), rendered on BOTH the ambient
+    // banner and the chat log from one text-free farmReady event. Two
+    // sentences, one per outcome, so a mixed notice reports both halves
+    // honestly; a notice never repeats for the same plot, so each reads as
+    // news rather than a standing reminder. {count} is a count of BEDS, not a
+    // stack size, which is why these carry a spelled-out plural sibling
+    // instead of the grant families' " xN" form.
+    readyLine: 'A crop is ready to harvest.',
+    readyLineQty: '{count} crops are ready to harvest.',
+    // The failed-crop half. Says only that the crop is finished and lost, not
+    // what it will pay: the husks arrive at the harvest, and the withered
+    // harvest line above is where they get counted.
+    readyWitheredLine: 'A crop withered in its bed.',
+    readyWitheredLineQty: '{count} crops withered in their beds.',
+  },
+  // The Harvest Journal window: the farmer's read-only list of their own
+  // planted beds. INFORMATIONAL ONLY, so nothing in here labels an action:
+  // the plant and harvest verbs stay at the beds themselves and this window
+  // sends no command, which is why there is no button copy but the entry
+  // control and the close chrome.
+  harvestJournal: {
+    title: 'Harvest Journal',
+    close: 'Close',
+    listLabel: 'Planted crop beds',
+    // The time cell, one arm per plot state. `growing` wraps whichever clock
+    // arm below the remaining duration selected. READY IS ITS OWN ARM AND
+    // COMES FROM THE AUTHORITY'S `status`, never from a countdown reaching
+    // zero, which is what `finishing` is for: the deadline has passed on this
+    // client's clock while the server still calls the plot growing, so the
+    // line reports the wait honestly instead of promising a harvest that
+    // would be refused.
+    growing: 'Ready in {time}',
+    ready: 'Ready to harvest',
+    finishing: 'Finishing up',
+    withered: 'Withered',
+    // The in-dialog status line (role=status, the a11y batch): announced when
+    // a row flips to ready UNDER an open journal, naming the crop(s); the
+    // chat line reaches the log live region, but a reader standing in the
+    // journal hears nothing there. {name} is the produce display name (a
+    // comma-joined list when several flip on one repaint).
+    readyAnnounce: 'Ready to harvest: {name}',
+    // The clock arms, selected by scale in harvest_journal_view.ts. Token-only
+    // on purpose: no colon string is ever hand-built, and a locale is free to
+    // reorder the units or change the unit letters. The seconds value arrives
+    // zero-padded, so the minute arms read 3m 07s.
+    remainingDaysHours: '{days}d {hours}h',
+    remainingHoursMinutes: '{hours}h {minutes}m',
+    remainingMinutesSeconds: '{minutes}m {seconds}s',
+    remainingSeconds: '{seconds}s',
+    // Where the bed is. The patch's ZONE is the only localized location handle
+    // farming content carries (patches and beds have ids, not names), so the
+    // line pairs it with the bed's 1-based position in that garden; the
+    // unknown arm covers a bed id no shipped patch claims (content drift
+    // between a client and a newer server).
+    bedLine: '{zone}, bed {index}',
+    bedLineUnknown: 'Unknown bed',
+    // The plant-time knobs this plot was paid for. Compost and the growth
+    // tonic are real items and take their names from the item catalog, so
+    // they need no copy here; the farmer's watch is a produce FEE with no
+    // item of its own, which makes it the one knob that needs a name.
+    careWatch: "Farmer's Watch",
+    careNone: 'No extras',
+    // The four derived growth stages (farmGrowthStage), shown on growing rows
+    // so a journal line matches what the bed itself looks like in the world.
+    stageSprout: 'Sprout',
+    stageSeedling: 'Seedling',
+    stageMaturing: 'Maturing',
+    stageRipe: 'Ripe',
+    // The two empty states. Gathering professions have no learn gate in this
+    // game, so NEITHER sentence claims a plant would be refused: the skill-0
+    // one simply says where to start, and the other says the list fills
+    // itself.
+    emptyTitle: 'No crops planted',
+    emptyBody: 'Sow a seed in any garden bed and the plot appears here with its timer.',
+    noviceTitle: 'You have not worked a garden bed yet',
+    noviceBody:
+      'Farming skill grows every time you bring in a crop. Sow a seed in any garden bed to begin.',
   },
   // Archetype title chrome (#1130, pair-named under Professions 2.0):
   // `label` heads the character-sheet title line, `none` is shown before the
@@ -4026,7 +4272,7 @@ export const hudChromeStrings = {
         makersCharm: '+2 yield per harvest while charged.',
       },
       howToSlot:
-        'Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.',
+        'Slot onto a mining, logging, herbalism, or farming tool from the Professions window. Consumed when slotted.',
       charges: 'Starts with {base} charges on a common tool (+{bonus} per rarity rung).',
       landOnly: 'Does not slot on fishing rods.',
       openProfessions: 'Open Professions to slot this onto a gathering tool.',

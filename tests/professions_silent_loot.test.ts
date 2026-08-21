@@ -470,6 +470,18 @@ describe('every professions grant site is accounted for (#2430)', () => {
     'commission_order.ts': 1,
     'crafting.ts': 6,
     'enchanting.ts': 4,
+    // Farming's eight grants: base produce, its fine twin, the withered-husk
+    // payout on each of the two failure arms (a lost survival roll and the
+    // defensive retired-crop fallback), the knobs phase's compost grant in
+    // convertHusks, the crop-ladder phase's tier 3/4 seed-back grant (ONE
+    // call site above the survived/withered branch, deliberately shared by
+    // both outcomes, so it counts once), and the celebrations phase's two
+    // golden-harvest sites in harvestCrop's grantGolden closure (the signed
+    // addItemInstance for what fits, the plain addItem overflow remainder;
+    // one closure serves both grades, so the pair counts once). All eight
+    // carry both flags, because farmHarvested / farmWithered /
+    // farmHusksConverted own the whole player feedback.
+    'farming.ts': 8,
     'fishing.ts': 2,
     'gathering.ts': 2,
     // Masterwrought phase 04: the two core delivery arms (heroic/raid kill

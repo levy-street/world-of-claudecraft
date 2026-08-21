@@ -22,6 +22,7 @@ import type { PendingLootRoll } from './loot/loot_roll';
 import type { MarketListing } from './market';
 import type { MobScanCounters } from './mob/scan_counters';
 import type { CommissionOrder } from './professions/commission_order';
+import type { FeastState } from './professions/feast';
 import type { PendingProjectile } from './projectile_travel';
 import type { NaturalRiftPortal } from './rift/portals';
 import type { RiftEvent, RiftInstance } from './rift/types';
@@ -112,6 +113,11 @@ export interface SimContextPrimitives {
   // stay on Sim (mutated in place), like E1's delayedEvents/groundAoEs.
   readonly tradeInvites: Map<number, { fromPid: number; expires: number }>;
   readonly duelInvites: Map<number, { fromPid: number; expires: number }>;
+  // Live placed shared feasts, keyed by entity id (professions/feast.ts).
+  // A LIVE view like the invite maps above: the backing field stays on Sim,
+  // mutated in place. TRANSIENT by design: never serialized anywhere (the
+  // feast module's header owns the rationale).
+  readonly feasts: Map<number, FeastState>;
   // The monotonically increasing entity-id counter (I1). Read-write so spawners (I1's
   // claimInstance) allocate ids exactly as `this.nextId++` did on Sim.
   nextId: number;
@@ -586,6 +592,11 @@ export interface SimContextCallbacks {
   onMobKilledForQuests(mob: Entity, meta: PlayerMeta): void;
   onRecipeCraftedForQuests(recipeId: string, meta: PlayerMeta): void;
   onNodeGatheredForQuests(node: GatherNodeDef, itemId: string, meta: PlayerMeta): void;
+  // The farm action credit (quests/quest_credit.ts onCropFarmedForQuests) is
+  // NOT a seam callback: professions/farming.ts imports it module-to-module
+  // (the sim.ts host wiring sits at its monolith ceiling), so a reader
+  // enumerating credit routes here must add that one; every crediter still
+  // takes ctx and draws nothing.
   onInventoryChangedForQuests(meta: PlayerMeta): void;
   checkQuestReady(qp: QuestProgress, meta: PlayerMeta): void;
   countItem(itemId: string, pid?: number): number;
@@ -731,7 +742,7 @@ export interface SimContextCallbacks {
     e: Entity,
     ignoreFences?: boolean,
   ): { x: number; z: number };
-  // --- pet / delve-companion / boss-mechanic branches (owners: P1 / delve / M3-N1) ---
+  // --- pet / delve-companion / boss-mechanic branches (owners: P1 / delve / M3-N1 / M5) ---
   updatePet(pet: Entity): void;
   isDelveCompanionMob(mob: Entity): boolean;
   updateDelveCompanion(companion: Entity): void;
@@ -815,6 +826,7 @@ export interface SimContextCallbacks {
   ): void;
   // L2 World Market escrow (marketList) also consumes removeItem; it is declared once
   // above (P1b inventory-hub helper, points-at Sim) - deduped, not re-added here.
+  // Owned by mob/boss_mechanics.ts (M5); the delve boss scripts consume it.
   spawnBossAdds(boss: Entity, mobId: string, count: number): void;
   tradeFor(pid: number): TradeSession | null;
   duelFor(pid: number): DuelState | null;
@@ -1154,6 +1166,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get duelInvites() {
       return host.duelInvites;
+    },
+    get feasts() {
+      return host.feasts;
     },
     get nextId() {
       return host.nextId;

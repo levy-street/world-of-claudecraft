@@ -1,6 +1,11 @@
 // Per-gathering-profession reference page (/wiki/professions/<id>), one module
-// for mining, logging, herbalism, and fishing (the classes-page parameterized
-// precedent). Renders entirely from GUIDE_PROF_* generated data plus guide.*
+// for every gathering trade (the classes-page parameterized precedent). A
+// trade renders only the sections whose data exists; the tools and nodes
+// sections length-guard rather than print prose over an empty table (farming
+// ships its hoe ladder but deliberately no nodes: it is fishing-shaped on
+// land, so its nodes section stays guarded off forever, and it carries its
+// own planting-loop section instead, the fishing sections' precedent).
+// Renders entirely from GUIDE_PROF_* generated data plus guide.*
 // t() keys; item/vendor names are baked English proper nouns and
 // profession/quality labels localize via their existing catalog keys.
 // TRANSPARENCY POLICY: professions pages publish EXACT
@@ -72,6 +77,12 @@ function toolRow(tool: GuideProfTool): string {
 }
 
 function toolsSection(g: GuideProfGathering): string {
+  // A trade with no tool ladder must render NOTHING here: the note
+  // interpolates the live gate constants, and prose about a vendor ladder
+  // that does not exist reads as invented content on a public page. Every
+  // shipped trade carries a ladder today (farming's hoes landed with the
+  // crop-ladder phase), so the guard is for the next registered-early trade.
+  if (!g.tools.length) return '';
   return `<section class="guide-block" id="prof-tools">
       <h2>${esc(t('guide.profPages.toolsHeading'))}</h2>
       ${paras('guide.profPages.toolsNote', {
@@ -103,7 +114,11 @@ function toolsSection(g: GuideProfGathering): string {
 }
 
 function nodesSection(g: GuideProfGathering): string {
-  if (!g.nodes) return '';
+  // Length-guarded, not just presence-guarded: an EMPTY nodes array
+  // (farming, which has no nodes by design) once rendered "respawns for you
+  // 0 seconds" from the `?? 0` fallback below, a fabricated number on a
+  // public page.
+  if (!g.nodes?.length) return '';
   const rows = g.nodes
     .map(
       (n) => `<tr>
@@ -199,9 +214,19 @@ function toolEffectsSection(): string {
 }
 
 function deedsSection(g: GuideProfGathering): string {
+  // Farming's arm re-points at a NEW leaf (the harvestBodyChoice
+  // precedent): the retired gatherDeeds.farming prose promised the trade
+  // kept no deeds yet, which the celebrations phase (D13) made false, and
+  // a reword would strand any filled locale copy.
+  // Only the template-literal arm needs the cast; casting the literal arm
+  // too would let a typo'd key name slip past tsc.
+  const key =
+    g.id === 'farming'
+      ? 'guide.profPages.gatherDeeds.farmingSown'
+      : (`guide.profPages.gatherDeeds.${g.id}` as TranslationKey);
   return `<section class="guide-block" id="prof-gather-deeds">
       <h2>${esc(t('guide.profPages.gatherDeedsHeading'))}</h2>
-      ${paras(`guide.profPages.gatherDeeds.${g.id}` as TranslationKey)}
+      ${paras(key)}
     </section>`;
 }
 
@@ -300,9 +325,25 @@ function fishingSections(g: GuideProfGathering): string {
     </section>`;
 }
 
+// -------------------------------------------------------- farming only
+// The planting loop as a player works it (counter, knobs, journal, husks,
+// kitchens): farming has no nodes to map, so this is the section that tells a
+// reader where the trade actually happens. Prose only, no generated data.
+function farmingSection(): string {
+  return `<section class="guide-block" id="prof-farm-beds">
+      <h2>${esc(t('guide.profPages.farm.bedsHeading'))}</h2>
+      ${paras('guide.profPages.farm.bedsBody')}
+    </section>
+    <section class="guide-block" id="prof-farm-table">
+      <h2>${esc(t('guide.profPages.farm.tableHeading'))}</h2>
+      ${paras('guide.profPages.farm.tableBody')}
+    </section>`;
+}
+
 // ------------------------------------------------------------- page assembly
 export function gatheringDetailHtml(g: GuideProfGathering): string {
   const isFishing = g.id === 'fishing';
+  const isFarming = g.id === 'farming';
   return `
     <article class="guide-article guide-prof-page">
       <p class="guide-section-more"><a href="${esc(hrefFor('professions'))}">${esc(t('guide.profPages.back'))}</a></p>
@@ -311,6 +352,7 @@ export function gatheringDetailHtml(g: GuideProfGathering): string {
       <dl class="guide-class-facts guide-prof-facts">
         <div class="guide-fact"><dt>${esc(t('guide.profPages.capLabel'))}</dt><dd>${esc(formatNumber(g.maxSkill))}</dd></div>
       </dl>
+      ${isFarming ? farmingSection() : ''}
       ${isFishing ? fishingSections(g) : rhythmSection(g) + nodesSection(g) + yieldsSection()}
       ${toolsSection(g)}
       ${isFishing ? '' : toolEffectsSection()}

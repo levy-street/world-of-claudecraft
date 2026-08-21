@@ -3608,6 +3608,200 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
   // Nythraxis raid offhand epics. Two-handed weapons use the painted-weapon lane below.
   bonewrought_bulwark: r('steel', 'bone', ['shield', { p: 'skull', ...TR }], ['glow', 'sparkle']),
   wraithfire_orb: r('shadow', 'shadowPurple', ['gem'], ['glow', 'sparkle']),
+  // Farming (growth-engine phase). Explicit recipes because the trinket
+  // fallback would send all four to the same scroll-on-leather glyph, and a
+  // farmer's bag needs the seed, the produce, its fine twin and the husks
+  // tellable apart at a glance (pinned distinct by tests/item_icons.test.ts
+  // A4). These are the ART_PENDING drawn stand-ins; committed WebP art
+  // replaces them at the art phase.
+  vale_wheat_seed: r('nature', 'earthBrown', [{ p: 'sack', pal: 'earthBrown' }]),
+  vale_wheat: r('nature', 'gold', [{ p: 'leaf', pal: 'gold' }]),
+  fine_vale_wheat: r('nature', 'gold', [{ p: 'leaf', pal: 'gold' }], ['sparkle']),
+  withered_husks: r('earth', 'earthBrown', [{ p: 'leaf', pal: 'earthBrown' }], ['crack']),
+  // Farming's knob supplies (the knobs phase), same ART_PENDING stand-in
+  // treatment and the same A4 pairwise-distinctness demand: a damp sack for
+  // the compost (earth base + drips, against the seed's plain nature sack)
+  // and a green draught for the tonic (the one potion glyph in the family).
+  compost: r('earth', 'earthBrown', [{ p: 'sack', pal: 'earthBrown' }], ['drips']),
+  growth_tonic: r('nature', 'leafGreen', [{ p: 'potion', pal: 'leafGreen' }], ['sparkle']),
+  // The crop-ladder phase's seven crop families (seed, produce, fine twin),
+  // same ART_PENDING drawn stand-in treatment and the same A4
+  // pairwise-distinctness demand as the vale_wheat family above. Each fine
+  // recipe is exactly its produce recipe plus 'sparkle' (the fine-grade
+  // marker); no non-fine row carries sparkle.
+  brook_carrot_seed: r('nature', 'ember', [
+    { p: 'sack', pal: 'earthBrown' },
+    { p: 'fang', pal: 'ember', x: 13, y: -13, s: 0.45 },
+  ]),
+  brook_carrot: r('nature', 'ember', [
+    { p: 'fang', pal: 'ember' },
+    { p: 'leaf', pal: 'leafGreen', x: 13, y: -13, s: 0.45 },
+  ]),
+  fine_brook_carrot: r(
+    'nature',
+    'ember',
+    [
+      { p: 'fang', pal: 'ember' },
+      { p: 'leaf', pal: 'leafGreen', x: 13, y: -13, s: 0.45 },
+    ],
+    ['sparkle'],
+  ),
+  marsh_rice_seed: r('drink', 'earthBrown', [{ p: 'sack', pal: 'earthBrown' }]),
+  marsh_rice: r('drink', 'bone', [{ p: 'leaf', pal: 'bone' }]),
+  fine_marsh_rice: r('drink', 'bone', [{ p: 'leaf', pal: 'bone' }], ['sparkle']),
+  bog_beet_seed: r('nature', 'venom', [{ p: 'sack', pal: 'venom' }]),
+  bog_beet: r('nature', 'blood', [{ p: 'droplet', pal: 'blood' }]),
+  fine_bog_beet: r('nature', 'blood', [{ p: 'droplet', pal: 'blood' }], ['sparkle']),
+  highland_barley_seed: r('earth', 'gold', [{ p: 'sack', pal: 'earthBrown' }]),
+  highland_barley: r('earth', 'gold', [{ p: 'leaf', pal: 'gold' }]),
+  fine_highland_barley: r('earth', 'gold', [{ p: 'leaf', pal: 'gold' }], ['sparkle']),
+  // The sack takes the ICE palette, not the seed family's brown: the drink
+  // and frost radials are both pale-to-deep blue, so beside marsh_rice_seed
+  // the background alone cannot tell the two apart at 32px (the Phase 5 QA
+  // catch, pinned as the glyph-difference arm in tests/item_icons.test.ts).
+  frost_gourd_seed: r('frost', 'earthBrown', [{ p: 'sack', pal: 'ice' }]),
+  frost_gourd: r('frost', 'ice', [{ p: 'waterskin', pal: 'ice' }]),
+  fine_frost_gourd: r('frost', 'ice', [{ p: 'waterskin', pal: 'ice' }], ['sparkle']),
+  gilded_sunmelon_seed: r('nature', 'gold', [{ p: 'sack', pal: 'gold' }]),
+  gilded_sunmelon: r('nature', 'gold', [{ p: 'sunburst', pal: 'gold' }]),
+  fine_gilded_sunmelon: r('nature', 'gold', [{ p: 'sunburst', pal: 'gold' }], ['sparkle']),
+  evergarden_greens_seed: r('nature', 'leafGreen', [{ p: 'sack', pal: 'leafGreen' }]),
+  evergarden_greens: r('nature', 'leafGreen', [{ p: 'leaf', pal: 'leafGreen' }]),
+  fine_evergarden_greens: r('nature', 'leafGreen', [{ p: 'leaf', pal: 'leafGreen' }], ['sparkle']),
+  // The hoe ladder (the crop-ladder phase's tool half), same ART_PENDING
+  // drawn stand-in treatment and the same A4 pairwise-distinctness demand: a
+  // staff haft plus an angled blade up the material palettes, glow on the
+  // rare top rung only (the gorraks_cleaver precedent). NO sparkle on any
+  // rung: sparkle is the fine-grade marker.
+  garden_hoe: r('wood', 'earthBrown', [
+    { p: 'staff', pal: 'earthBrown', rot: 0.7 },
+    { p: 'fang', pal: 'steel', x: 12, y: -14, s: 0.5, rot: 2.4 },
+  ]),
+  bronze_hoe: r('wood', 'leather', [
+    { p: 'staff', pal: 'leather', rot: 0.7 },
+    { p: 'fang', pal: 'gold', x: 12, y: -14, s: 0.55, rot: 2.4 },
+  ]),
+  skysilver_hoe: r('steel', 'silverWhite', [
+    { p: 'staff', pal: 'earthBrown', rot: 0.7 },
+    { p: 'fang', pal: 'silverWhite', x: 12, y: -14, s: 0.6, rot: 2.4 },
+  ]),
+  osmium_hoe: r(
+    'steel',
+    'steel',
+    [
+      { p: 'staff', pal: 'earthBrown', rot: 0.7 },
+      { p: 'fang', pal: 'steel', x: 12, y: -14, s: 0.65, rot: 2.4 },
+    ],
+    ['glow'],
+  ),
+  // The economy-hooks phase's eight farm dishes (FARM_RECIPES), the same
+  // ART_PENDING drawn stand-in treatment and the same A4 pairwise-distinctness
+  // demand as the crop families above. Two rules hold the family together and
+  // keep it tellable:
+  //   - EVERY dish sits on the 'food' radial, which no other farming icon
+  //     uses, so a cooked dish never reads as raw produce at 32px.
+  //   - Each dish takes a DIFFERENT primary glyph (bread, waterskin, sack,
+  //     droplet, moon, snowflake, sunburst, leaf), so the frost_gourd_seed
+  //     lesson cannot repeat here: no pair is separated by palette alone.
+  // NO sparkle on any dish: sparkle is the fine-grade marker on the produce
+  // rows, and a dish is not a grade.
+  vale_hearth_loaf: r('food', 'gold', [{ p: 'bread', pal: 'gold' }]),
+  eastbrook_root_pottage: r(
+    'food',
+    'ember',
+    [
+      { p: 'waterskin', pal: 'ember' },
+      { p: 'fang', pal: 'ember', ...TR },
+    ],
+    ['drips'],
+  ),
+  fenbridge_rice_bowl: r(
+    'food',
+    'bone',
+    [
+      { p: 'sack', pal: 'bone' },
+      { p: 'droplet', pal: 'sky', ...TR },
+    ],
+    ['motion'],
+  ),
+  fenbridge_beet_braise: r(
+    'food',
+    'blood',
+    [
+      { p: 'droplet', pal: 'blood' },
+      { p: 'leaf', pal: 'leafGreen', ...TR },
+    ],
+    ['drips'],
+  ),
+  highwatch_barley_bannock: r('food', 'gold', [
+    { p: 'moon', pal: 'gold' },
+    { p: 'leaf', pal: 'gold', ...TR },
+  ]),
+  highwatch_gourd_soup: r(
+    'food',
+    'ice',
+    [
+      { p: 'snowflake', pal: 'ice' },
+      { p: 'waterskin', pal: 'ice', ...TR },
+    ],
+    ['motion'],
+  ),
+  evergarden_sunmelon_tart: r(
+    'food',
+    'gold',
+    [
+      { p: 'sunburst', pal: 'gold' },
+      { p: 'bread', pal: 'earthBrown', ...TR },
+    ],
+    ['glow'],
+  ),
+  evergarden_harvest_platter: r('food', 'leafGreen', [
+    { p: 'leaf', pal: 'leafGreen' },
+    { p: 'droplet', pal: 'gold', ...TR },
+  ]),
+  // The well-fed phase's four buff dishes join the same family under the same
+  // two rules: the shared 'food' radial, and a DIFFERENT primary glyph per
+  // dish (fang, coin, potion, tendrils; distinct from the eight primaries
+  // above), so no pair in the twelve-dish family is separated by palette
+  // alone. NO sparkle, same as above: a dish is not a grade.
+  eastbrook_glazed_carrots: r(
+    'food',
+    'ember',
+    [
+      { p: 'fang', pal: 'ember' },
+      { p: 'leaf', pal: 'leafGreen', ...TR },
+    ],
+    ['glow'],
+  ),
+  fenbridge_rice_pudding: r('food', 'bone', [
+    { p: 'coin', pal: 'bone' },
+    { p: 'droplet', pal: 'gold', ...TR },
+  ]),
+  highwatch_barley_porridge: r('food', 'gold', [
+    { p: 'potion', pal: 'gold' },
+    { p: 'leaf', pal: 'earthBrown', ...TR },
+  ]),
+  evergarden_braised_greens: r(
+    'food',
+    'leafGreen',
+    [
+      { p: 'tendrils', pal: 'leafGreen' },
+      { p: 'flame', pal: 'ember', ...TR },
+    ],
+    ['drips'],
+  ),
+  // The shared feast (Phase 12): a laden spread, distinct from every dish
+  // above (gold ground + green tendrils + sparkle; no dish pairs gold with
+  // tendrils), pinned by the A4 distinctness sweep.
+  harvest_feast: r(
+    'food',
+    'gold',
+    [
+      { p: 'tendrils', pal: 'leafGreen' },
+      { p: 'coin', pal: 'gold', ...TR },
+    ],
+    ['sparkle'],
+  ),
   // misc UI icons (not real items)
   coin_gold: r('treasure', 'gold', ['coin'], ['sparkle']),
   slot_empty: r('junk', 'silverWhite', []),
@@ -5364,7 +5558,82 @@ export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 // the line from both sides: it rejects stale entries after art lands and unenumerated art
 // debt. Do not add to this list merely to silence that failure; commission the art.
 // Empty again after the hunter quiver art landed in the same branch that enumerated it.
-export const ITEM_ART_PENDING = new Set<string>();
+//
+// Re-opened by the farming growth-engine phase for its four items. This is the
+// "development-only item" case the paragraph above reserves the mechanism for, not a way to
+// silence the gate: farming is DORMANT ONLINE at this phase (no seed faucet exists, so no
+// player can hold any of these), the packet schedules farming art as its own later phase, and
+// committing placeholder binaries to turn the guard green would be the dishonest fix. Each id
+// therefore serves its procedural recipe through iconDataUrl instead of pointing an <img> at a
+// 404, and A2/A3 in tests/item_icons.test.ts keep the debt from outliving the art: A2 reds the
+// moment a .webp lands, and A3's size pin reds if this set grows without a deliberate re-pin.
+export const ITEM_ART_PENDING = new Set<string>([
+  'fine_vale_wheat',
+  'vale_wheat',
+  'vale_wheat_seed',
+  'withered_husks',
+  // The knobs phase's two supplies, the same dormant-online reasoning as the
+  // four above (no faucet for either exists until go-live) and the same
+  // scheduled art phase.
+  'compost',
+  'growth_tonic',
+  // The crop-ladder phase's seven crop families (seed, produce, fine twin),
+  // the same dormant-online reasoning as everything above and the same
+  // scheduled art phase.
+  'bog_beet',
+  'bog_beet_seed',
+  'brook_carrot',
+  'brook_carrot_seed',
+  'evergarden_greens',
+  'evergarden_greens_seed',
+  'fine_bog_beet',
+  'fine_brook_carrot',
+  'fine_evergarden_greens',
+  'fine_frost_gourd',
+  'fine_gilded_sunmelon',
+  'fine_highland_barley',
+  'fine_marsh_rice',
+  'frost_gourd',
+  'frost_gourd_seed',
+  'gilded_sunmelon',
+  'gilded_sunmelon_seed',
+  'highland_barley',
+  'highland_barley_seed',
+  'marsh_rice',
+  'marsh_rice_seed',
+  // The hoe ladder (the crop-ladder phase's tool half), the same
+  // dormant-online reasoning (rungs 2 to 4 are craft-only behind farming fine
+  // twins no live faucet mints, and the vendor rung is stocked at go-live)
+  // and the same scheduled art phase.
+  'bronze_hoe',
+  'garden_hoe',
+  'osmium_hoe',
+  'skysilver_hoe',
+  // The economy-hooks phase's eight farm dishes. Same dormant-online reasoning
+  // as everything above (they are cooked from produce no live faucet mints
+  // yet) and the same scheduled art phase; committed art is the site norm and
+  // these have none, so they ride the pending set as honest, enumerated debt.
+  'eastbrook_root_pottage',
+  'evergarden_harvest_platter',
+  'evergarden_sunmelon_tart',
+  'fenbridge_beet_braise',
+  'fenbridge_rice_bowl',
+  'highwatch_barley_bannock',
+  'highwatch_gourd_soup',
+  'vale_hearth_loaf',
+  // The well-fed phase's four buff dishes, one per crop tier. Same
+  // dormant-online reasoning as the eight plain dishes above (cooked from
+  // produce whose live faucet is the same farm) and the same scheduled art
+  // phase; each serves a distinct procedural recipe through iconDataUrl.
+  'eastbrook_glazed_carrots',
+  'evergarden_braised_greens',
+  'fenbridge_rice_pudding',
+  'highwatch_barley_porridge',
+  // The shared feast (Phase 12): same dormant-online reasoning (cooked from
+  // tier-4 produce under the (bo) faucet hole) and the same scheduled art
+  // phase; serves its own distinct procedural recipe through iconDataUrl.
+  'harvest_feast',
+]);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */
 export function itemImageUrl(id: string): string | null {
@@ -5394,6 +5663,20 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   // (docs/achievements/icon-brief.md).
   'exp_the_last_keep',
   'exp_dawnhold_castle',
+  // The farming celebration deeds (D13): the chronicles and prog_ rows fall
+  // back to their category crests (deed_cat_chronicle / deed_cat_progression)
+  // and col_golden_harvest to deed_cat_collection until their commissioned
+  // art lands (docs/achievements/icon-brief.md). prog_farming_100 is NOT
+  // here: the Reliquary title shelf forbids fallback art for title deeds
+  // (tests/reliquary_cell_art.test.ts), so its wheat-sheaf medallion crest
+  // shipped committed with the phase; the brief flags it for a commissioned
+  // replacement.
+  'prog_first_planting',
+  'chr_vale_first_harvest',
+  'chr_marsh_first_harvest',
+  'chr_peaks_first_harvest',
+  'chr_evergarden_first_harvest',
+  'col_golden_harvest',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {
@@ -5672,6 +5955,15 @@ const PROFESSION_RECIPES: Record<string, IconRecipe> = {
     ['sparkle'],
   ),
   gather_fishing: r('drink', 'sky', [{ p: 'fish' }], ['glow']),
+  // Farming, the fifth gathering skill: a seed sack faded into tilled-earth
+  // ground behind a crisp sprout, the tailoring/enchanting backdrop idiom. Read
+  // deliberately apart from herbalism, whose twin wild leaves sit on a nature
+  // ground: farming is the CULTIVATED skill, so the soil and the sack carry the
+  // silhouette and the foliage is only the payoff on top.
+  gather_farming: r('earth', 'leafGreen', [
+    { p: 'sack', ...BIG, pal: 'earthBrown' },
+    { p: 'leaf' },
+  ]),
 };
 
 /** True when `id` has an explicit profession recipe, as opposed to falling

@@ -682,6 +682,172 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     sellValue: 90,
   },
 
+  // --- Farm dishes (cooking, Phase 6 economy hooks) ------------------------
+  // Trainer-taught outputs of FARM_RECIPES (content/recipes.ts), the farm
+  // half of cooking: eight dishes cooked from crop produce at the kitchens,
+  // a SIBLING of the ladder block above rather than part of it (the ladder is
+  // closed at three rungs x three recipes per craft; see the FARM_RECIPES
+  // header for why folding these in would break that shape).
+  //
+  // Exactly the same shape as the ladder dishes: kind 'food' + foodHp (an 18s
+  // sit heal), no buff machinery and no new effect field. Every foodHp and
+  // sellValue pair REUSES a point the block above already ships (90/6, 117/12,
+  // 243/25, 432/40, 552/60, 552/75, 980/150; 980 is the ceiling,
+  // conjured_bread4), so the farm line adds no new rung to the food curve.
+  // Never vendor-stocked (no buyValue); output quality matches the rung
+  // (skillReq 0 common, 25 uncommon, 50 rare).
+  //
+  // VALUES ARE PROPOSED AND FLAGGED FOR THE MAINTAINER. Names are IP-safe per
+  // D17: real plant, food and cooking words (loaf, pottage, braise, bannock,
+  // tart, platter) plus this game's own settlement and zone flavor.
+  vale_hearth_loaf: {
+    id: 'vale_hearth_loaf',
+    name: 'Vale Hearth Loaf',
+    kind: 'food',
+    quality: 'common',
+    foodHp: 90,
+    sellValue: 6,
+  },
+  eastbrook_root_pottage: {
+    id: 'eastbrook_root_pottage',
+    name: 'Eastbrook Root Pottage',
+    kind: 'food',
+    quality: 'common',
+    foodHp: 117,
+    sellValue: 12,
+  },
+  fenbridge_rice_bowl: {
+    id: 'fenbridge_rice_bowl',
+    name: 'Fenbridge Rice Bowl',
+    kind: 'food',
+    quality: 'uncommon',
+    foodHp: 243,
+    sellValue: 25,
+  },
+  fenbridge_beet_braise: {
+    id: 'fenbridge_beet_braise',
+    name: 'Fenbridge Beet Braise',
+    kind: 'food',
+    quality: 'uncommon',
+    foodHp: 432,
+    sellValue: 40,
+  },
+  highwatch_barley_bannock: {
+    id: 'highwatch_barley_bannock',
+    name: 'Highwatch Barley Bannock',
+    kind: 'food',
+    quality: 'rare',
+    foodHp: 552,
+    sellValue: 60,
+  },
+  highwatch_gourd_soup: {
+    id: 'highwatch_gourd_soup',
+    name: 'Highwatch Gourd Soup',
+    kind: 'food',
+    quality: 'rare',
+    foodHp: 552,
+    sellValue: 75,
+  },
+  evergarden_sunmelon_tart: {
+    id: 'evergarden_sunmelon_tart',
+    name: 'Evergarden Sunmelon Tart',
+    kind: 'food',
+    quality: 'rare',
+    foodHp: 980,
+    sellValue: 150,
+  },
+  evergarden_harvest_platter: {
+    id: 'evergarden_harvest_platter',
+    name: 'Evergarden Harvest Platter',
+    kind: 'food',
+    quality: 'rare',
+    foodHp: 980,
+    sellValue: 150,
+  },
+
+  // --- Farm buff dishes (cooking, Phase 11 well-fed food) -------------------
+  // Trainer-taught outputs of FARM_RECIPES, one BUFF dish per crop tier so
+  // the produce ladder has a well-fed consumer at every rung. Exactly the
+  // plain-dish shape above plus the ONE new field: `wellfed`, the elixir-arm
+  // mirror (src/sim/items.ts / src/sim/wellfed.ts), a temporary buff_sta aura
+  // minted when the 18s sit-restore completes. All four share the aura name
+  // 'Well Fed' and therefore the aura id wellfed_buff_sta: within the food
+  // namespace last eaten always wins (the classic one-food-buff idiom), and
+  // the distinct namespace means no dish ever clobbers an elixir_<kind> buff
+  // or the reverse.
+  //
+  // VALUES ARE PROPOSED AND FLAGGED FOR THE MAINTAINER. Every wellfed pair
+  // sits at or below the documented elixir budget ceiling (buff_sta <= 12
+  // for <= 900s; the alchemy ladder header below): 3/600s, 6/900s, 9/900s,
+  // 12/900s, each dominated by or equal to a shipped elixir point (boar
+  // 6/600, venomfire 9/900, bear and serpent 12/900). Tuning read to flag:
+  // a well-fed buff STACKS with a same-stat elixir by design (distinct aura
+  // id), so the combined crafted ceiling is 24 stamina, still below the raid
+  // floor. foodHp and sellValue reuse shipped curve points; quality matches
+  // the rung. The tier 3/4 pair ships REAGENT-DORMANT under (bo): trainable
+  // and well-formed, but tier 3/4 produce has no seed faucet until the D11
+  // bootstrap ruling. Names are IP-safe per D17 (real culinary words plus
+  // settlement flavor) and collide with none of the eight plain dishes.
+  eastbrook_glazed_carrots: {
+    id: 'eastbrook_glazed_carrots',
+    name: 'Eastbrook Glazed Carrots',
+    kind: 'food',
+    quality: 'common',
+    foodHp: 90,
+    sellValue: 6,
+    wellfed: { aura: 'Well Fed', kind: 'buff_sta', value: 3, duration: 600 },
+  },
+  fenbridge_rice_pudding: {
+    id: 'fenbridge_rice_pudding',
+    name: 'Fenbridge Rice Pudding',
+    kind: 'food',
+    quality: 'uncommon',
+    foodHp: 243,
+    sellValue: 25,
+    wellfed: { aura: 'Well Fed', kind: 'buff_sta', value: 6, duration: 900 },
+  },
+  highwatch_barley_porridge: {
+    id: 'highwatch_barley_porridge',
+    name: 'Highwatch Barley Porridge',
+    kind: 'food',
+    quality: 'rare',
+    foodHp: 552,
+    sellValue: 60,
+    wellfed: { aura: 'Well Fed', kind: 'buff_sta', value: 9, duration: 900 },
+  },
+  evergarden_braised_greens: {
+    id: 'evergarden_braised_greens',
+    name: 'Evergarden Braised Greens',
+    kind: 'food',
+    quality: 'rare',
+    foodHp: 980,
+    sellValue: 150,
+    wellfed: { aura: 'Well Fed', kind: 'buff_sta', value: 12, duration: 900 },
+  },
+  // The shared feast (Phase 12, D16): the tier-4 communal showcase. NOT
+  // kind 'food': using it PLACES a farm_feast world entity instead of
+  // eating (src/sim/professions/feast.ts owns the whole lifecycle), and
+  // each of `charges` players eats once, receiving one serving OF THE
+  // CAPSTONE DISH above (`dishItemId`: the bite's eating slot points at
+  // that def, so its foodHp restore and its Well Fed mint apply verbatim
+  // and can never drift from the bagged dish; re-tuning the dish re-tunes
+  // the feast). kind 'junk' is the tonic precedent for a crafted
+  // non-equippable usable; quality 'rare' matches the tier-4 dish set, and
+  // the junk-sale sweep keys on quality 'poor' so a feast can never ride
+  // the bulk junk sale. No buyValue: never vendor-stocked, and
+  // REAGENT-DORMANT under deviation (bo) like the tier 3/4 dishes (the
+  // (ca) reconciliation: the D11 seed-bootstrap ruling owns the faucet).
+  // charges 10 and durationTicks 3600 (180s at 20 Hz) are
+  // maintainer-flagged tuning, like every farming constant.
+  harvest_feast: {
+    id: 'harvest_feast',
+    name: 'Harvest Feast',
+    kind: 'junk',
+    quality: 'rare',
+    sellValue: 250,
+    feast: { charges: 10, durationTicks: 3600, dishItemId: 'evergarden_braised_greens' },
+  },
+
   // --- Crafted alchemy ladder (alchemy) ------------------------------------
   // Trainer-taught outputs of LADDER_RECIPES (content/recipes.ts), three rungs
   // at skillReq 0/25/50, apothecary-bound at alchemist_verane. Potions reuse the

@@ -58,6 +58,7 @@ import { isItemLocked } from './item_lock';
 import { mountOwned, summonMountItem } from './mounts';
 import { learnRiding } from './mounts_training';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
+import { placeFeastAction } from './professions/feast';
 import { useGatherToolItem } from './professions/gathering';
 import { placeMobileStationFromItem } from './professions/mobile_station';
 import { useRecipePatternItem } from './professions/pattern_items';
@@ -786,6 +787,21 @@ export function useItem(
     placeMobileStationFromItem(ctx, def.use.stationCraftId, def.name, meta.entityId);
     return;
   }
+  // The placeable shared feast (ItemDef.feast, Farming Phase 12): using the
+  // item IS placing it, so this arm and the bags placeFeast classification
+  // converge on the ONE action body (professions/feast.ts owns every gate
+  // and the lock-aware spend; nothing here consumes a unit). Without it a
+  // use_item frame naming the feast would be exactly the silent no-op the
+  // raw-catch arm below exists to refuse. The validated slotIndex threads
+  // through (the consumeOneUnit rule above: the family has no id-only holes
+  // left for a new command to copy), so the CLICKED copy is the one spent.
+  // The two arms key on different fields (def.use?.type vs def.feast), so
+  // they are mutually exclusive per item and this order is behaviorally free
+  // (ours-first per the absorb's RULE 3b).
+  if (def.feast) {
+    placeFeastAction(ctx, p, meta, slotIndex);
+    return;
+  }
   // Raw fishing catches are cooking reagents only (kind junk, no foodHp).
   // Without this arm a right-click is a silent no-op; refuse loudly instead
   // of letting the player think the item is broken. Does not remove the stack.
@@ -805,6 +821,9 @@ export function useItem(
     throwFirebottleAtNearestHut(ctx, p, meta);
     return;
   }
+  // Buff dishes (def.wellfed) mint their Well Fed aura at COMPLETION of the
+  // sit-restore, not here: completion-time minting lives in src/sim/wellfed.ts,
+  // hooked from updateRegen (src/sim/combat/auras.ts).
   if (def.kind === 'food' || def.kind === 'drink') {
     if (p.inCombat) {
       ctx.error(meta.entityId, "You can't do that while in combat.");

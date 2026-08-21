@@ -713,6 +713,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Истощённая трава, инструмент недоступен',
   'hud.core.mapMarkerLabels.station': 'Ремесленная станция: {name}',
   'hud.core.mapMarkerLabels.service': 'Служба: {name}',
+  'hud.core.mapMarkerLabels.farmPatch': 'Грядки',
   'hud.core.mapMarkerLabels.partyMember': 'Участник группы: {name}',
   'hud.core.mapMarkerLabels.deadPartyMember':
     'Погибший участник группы: {name}',
@@ -2614,6 +2615,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.forms.bear': 'медведя',
   'abilityUi.forms.cat': 'волка',
   'abilityUi.cast.fishing': 'Рыбная ловля',
+  'abilityUi.cast.farming': 'Посадка',
   'abilityUi.cast.gathering': 'Сбор ресурсов',
   'abilityUi.cast.thunzharrStormcall': 'Зов бури',
   'abilityUi.cast.demonHeal': 'Исцеление демона',
@@ -2796,8 +2798,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Сытость: по окончании трапезы повышает {stat} на {value} в течение {minutes} мин. Одновременно действует только один эффект сытости: более свежая трапеза заменяет прежний.',
   'itemUi.tooltip.wellFedAura':
     'Сытость: по окончании трапезы дает эффект "{aura}" на {minutes} мин. Одновременно действует только один эффект сытости: более свежая трапеза заменяет прежний.',
+  'itemUi.tooltip.useWellfed':
+    'Эффект "{aura}": {stat} +{value} на {minutes} мин. Дается, когда вы доедаете.',
+  'itemUi.tooltip.useWellfedAura': 'Дает эффект "{aura}" на {minutes} мин, когда вы доедаете.',
+  'itemUi.tooltip.useFeast':
+    'Использование: накрывает пир, с которого могут поесть и другие, по одной порции каждому ({servings} порций, действует {minutes} мин).',
+  'itemUi.tooltip.useFeastBuff':
+    'Каждая порция дает эффект "{aura}": {stat} +{value} на {minutes} мин после {seconds} сек еды.',
+  'itemUi.tooltip.useFeastBuffAura':
+    'Каждая порция дает эффект "{aura}" на {minutes} мин после {seconds} сек еды.',
   'itemUi.tooltip.clickUseInstant': 'Нажмите, чтобы мгновенно использовать в бою',
   'itemUi.tooltip.clickUse': 'Нажмите, чтобы использовать',
+  'itemUi.tooltip.clickSetOut': 'Нажмите, чтобы накрыть стол',
   'itemUi.tooltip.clickBuyback': 'Нажмите, чтобы выкупить',
   'itemUi.bags.title': 'Сумки',
   'itemUi.bags.close': 'Закрыть сумки',
@@ -3942,6 +3954,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.completion':
     'Вот видите? Руда добыта, а на руках появились мозоли. В дороге продолжайте добывать руду, рубить лес и собирать травы. Вернувшись в город, не забудьте о доске городского направления у рынка и ремесленном столе рядом. Если захотите, все эти занятия обеспечат честный заработок.',
   'entities.quests.q_prof_intro.objectives.0.label': 'Рудная жила разработана',
+  'entities.quests.q_farm_intro.title': 'Первая борозда',
+  'entities.quests.q_farm_intro.text':
+    'Возьми эту мотыгу и щепоть семян долинной пшеницы, {playerName}. Посей семена на одной из грядок рядом со мной, а потом займись своими делами. Возвращайся, когда захочешь, и собери урожай; я буду здесь.',
+  'entities.quests.q_farm_intro.completion':
+    'Вот он, твой первый урожай в собственных руках. Урожай растёт, пока тебя нет, и никогда не портится. В журнале урожая (Shift+K или строка Земледелие в окне профессий) перечислена каждая засеянная грядка и её таймер. Приходи за семенами всякий раз, как позовут грядки, {playerName}.',
+  'entities.quests.q_farm_intro.objectives.0.label': 'Долинная пшеница посажена',
+  'entities.quests.q_farm_intro.objectives.1.label': 'Долинная пшеница собрана',
   'entities.quests.q_wolves.title': 'Волки у дверей',
   'entities.quests.q_wolves.text':
     'Лесные волки осмелели и бросаются на путников у северной дороги, {playerName}. Убейте 8, чтобы Истврук вздохнул свободнее.',
@@ -5585,6 +5604,50 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.iron_ore.name': 'Железная руда',
   'entities.items.ironbark_log.name': 'Бревно железнокорого дерева',
   'entities.items.silverleaf_herb.name': 'Трава глянцелист',
+  'entities.items.vale_wheat_seed.name': 'Семена долинной пшеницы',
+  'entities.items.vale_wheat.name': 'Долинная пшеница',
+  'entities.items.fine_vale_wheat.name': 'Отборная долинная пшеница',
+  'entities.items.withered_husks.name': 'Засохшая шелуха',
+  'entities.items.compost.name': 'Компост',
+  'entities.items.growth_tonic.name': 'Тоник роста',
+  'entities.items.brook_carrot_seed.name': 'Семена ручьевой моркови',
+  'entities.items.brook_carrot.name': 'Ручьевая морковь',
+  'entities.items.fine_brook_carrot.name': 'Отборная ручьевая морковь',
+  'entities.items.marsh_rice_seed.name': 'Семена болотного риса',
+  'entities.items.marsh_rice.name': 'Болотный рис',
+  'entities.items.fine_marsh_rice.name': 'Отборный болотный рис',
+  'entities.items.bog_beet_seed.name': 'Семена болотной свёклы',
+  'entities.items.bog_beet.name': 'Болотная свёкла',
+  'entities.items.fine_bog_beet.name': 'Отборная болотная свёкла',
+  'entities.items.highland_barley_seed.name': 'Семена высокогорного ячменя',
+  'entities.items.highland_barley.name': 'Высокогорный ячмень',
+  'entities.items.fine_highland_barley.name': 'Отборный высокогорный ячмень',
+  'entities.items.frost_gourd_seed.name': 'Семена морозной тыквы',
+  'entities.items.frost_gourd.name': 'Морозная тыква',
+  'entities.items.fine_frost_gourd.name': 'Отборная морозная тыква',
+  'entities.items.gilded_sunmelon_seed.name': 'Семена золочёной солнечной дыни',
+  'entities.items.gilded_sunmelon.name': 'Золочёная солнечная дыня',
+  'entities.items.fine_gilded_sunmelon.name': 'Отборная золочёная солнечная дыня',
+  'entities.items.evergarden_greens_seed.name': 'Семена зелени Вечного Сада',
+  'entities.items.evergarden_greens.name': 'Зелень Вечного Сада',
+  'entities.items.fine_evergarden_greens.name': 'Отборная зелень Вечного Сада',
+  'entities.items.garden_hoe.name': 'Садовая мотыга',
+  'entities.items.bronze_hoe.name': 'Бронзовая мотыга',
+  'entities.items.skysilver_hoe.name': 'Небосеребряная мотыга',
+  'entities.items.osmium_hoe.name': 'Осмиевая мотыга',
+  'entities.items.vale_hearth_loaf.name': 'Долинный подовый хлеб',
+  'entities.items.eastbrook_root_pottage.name': 'Истврукская похлёбка из корнеплодов',
+  'entities.items.fenbridge_rice_bowl.name': 'Миска риса из Фенбриджа',
+  'entities.items.fenbridge_beet_braise.name': 'Фенбриджская тушёная свёкла',
+  'entities.items.highwatch_barley_bannock.name': 'Хайвотчская ячменная лепёшка',
+  'entities.items.highwatch_gourd_soup.name': 'Хайвотчский суп из морозной тыквы',
+  'entities.items.evergarden_sunmelon_tart.name': 'Тарт с солнечной дыней из Вечного Сада',
+  'entities.items.evergarden_harvest_platter.name': 'Блюдо урожая Вечного Сада',
+  'entities.items.eastbrook_glazed_carrots.name': 'Истврукская глазированная морковь',
+  'entities.items.fenbridge_rice_pudding.name': 'Фенбриджский рисовый пудинг',
+  'entities.items.highwatch_barley_porridge.name': 'Хайвотчская ячменная каша',
+  'entities.items.evergarden_braised_greens.name': 'Тушёная зелень Вечного Сада',
+  'entities.items.harvest_feast.name': 'Пир урожая',
   'hud.core.chatChannels.add': 'Добавить канал чата',
   'hud.core.chatChannels.addTitle': 'Добавить канал',
   'hud.core.chatChannels.close': 'Закрыть вкладку {channel}',
@@ -6340,6 +6403,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.controls.leaderboard': 'Таблица лидеров',
   'guide.controls.deeds': 'Книга деяний',
   'guide.controls.reliquary': 'Реликварий',
+  'guide.controls.harvestJournal': 'Журнал урожая',
   'guide.controls.sheathe': 'Убрать/обнажить оружие',
   'guide.controls.crafting': 'Крафт',
   'guide.controls.valeCup': 'Кубок Долины',
@@ -8796,6 +8860,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.takeParcelsFirst': 'Сначала заберите посылки, затем удаляйте письмо.',
   'worldContent.mailboxName': 'Почтовый ящик',
   'worldContent.noticeboardName': 'Доска объявлений',
+  'worldContent.farmPatchName': 'Грядки',
   'entities.letters.ravenpost_welcome.sender': 'Вороновая почта',
   'entities.letters.ravenpost_welcome.subject': 'Теперь вороны летают и для вас',
   'entities.letters.ravenpost_welcome.body':
@@ -8921,6 +8986,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.logging': 'Лесозаготовка',
   'hudChrome.gathering.herbalism': 'Травничество',
   'hudChrome.gathering.fishing': 'Рыбная ловля',
+  'hudChrome.gathering.farming': 'Земледелие',
   'hudChrome.gathering.notReady': 'Этот ресурсный узел еще не восстановился для вас.',
   'hudChrome.gathering.gatherLine': 'Вы добываете: {name}.',
   'hudChrome.gathering.gatherLineQty': 'Вы добываете: {name} x{qty}.',
@@ -8937,6 +9003,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.tierRequired.mining': 'Требуется шахтерская кирка {tier} уровня',
   'hudChrome.gathering.tierRequired.logging': 'Требуется лесорубный топор {tier} уровня',
   'hudChrome.gathering.tierRequired.herbalism': 'Требуется серп травника {tier} уровня',
+  'hudChrome.gathering.tierRequired.farming': 'Требуется мотыга земледельца {tier} уровня',
   'hudChrome.gathering.toolTierUnmet.mining':
     'Чтобы разработать эту жилу, нужна шахтерская кирка {tier} уровня.',
   'hudChrome.gathering.toolTierUnmet.logging':
@@ -8945,6 +9012,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Чтобы собрать эти заросли, нужен серп травника {tier} уровня.',
   'hudChrome.gathering.toolTierUnmet.fishing':
     'Чтобы рыбачить в этих водах, нужна удочка {tier} уровня.',
+  'hudChrome.gathering.toolTierUnmet.farming':
+    'Чтобы возделать эту грядку, нужна мотыга земледельца {tier} уровня.',
   'hudChrome.gathering.toolTierUnmetCorpse':
     'Чтобы добыть лучшие материалы, нужен инструмент сбора {tier} уровня.',
   'hudChrome.gathering.wieldUnmet.mining':
@@ -8953,6 +9022,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Чтобы махать лесорубным топором, который уже лежит в ваших сумках, нужен навык лесозаготовки {skill}.',
   'hudChrome.gathering.wieldUnmet.herbalism':
     'Чтобы работать серпом травника, который уже лежит в ваших сумках, нужен навык травничества {skill}.',
+  'hudChrome.gathering.wieldUnmet.farming':
+    'Чтобы махать мотыгой, которая уже лежит в ваших сумках, нужен навык земледелия {skill}.',
   'hudChrome.gathering.wieldUnmetCorpse':
     'Чтобы пустить в ход свой лучший инструмент, нужен навык сбора {skill}.',
   'hudChrome.gathering.requiresTool.mining': 'Требуется шахтерская кирка',
@@ -8963,22 +9034,30 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Чтобы срубить этот древостой, нужен лесорубный топор.',
   'hudChrome.gathering.toolRequired.herbalism': 'Чтобы собрать эти заросли, нужен серп травника.',
   'hudChrome.gathering.toolRequired.fishing': 'Чтобы рыбачить, нужна удочка.',
+  'hudChrome.gathering.toolRequired.farming':
+    'Чтобы возделать эту грядку, нужна мотыга земледельца.',
   'hudChrome.gathering.noNodeNearby.mining': 'Поблизости нет рудной жилы.',
   'hudChrome.gathering.noNodeNearby.logging': 'Поблизости нет древостоя.',
   'hudChrome.gathering.noNodeNearby.herbalism': 'Поблизости нет зарослей трав.',
+  'hudChrome.gathering.noNodeNearby.farming': 'Поблизости нет грядки.',
   'hudChrome.gathering.toolTooltip.kind.mining': 'Шахтерский инструмент ({tier} уровень)',
   'hudChrome.gathering.toolTooltip.kind.logging': 'Лесорубный инструмент ({tier} уровень)',
   'hudChrome.gathering.toolTooltip.kind.herbalism': 'Инструмент травника ({tier} уровень)',
   'hudChrome.gathering.toolTooltip.kind.fishing': 'Удочка ({tier} уровень)',
+  'hudChrome.gathering.toolTooltip.kind.farming': 'Земледельческий инструмент ({tier} уровень)',
   'hudChrome.gathering.toolTooltip.unlocks.mining': 'Нужна для добычи рудных жил до {tier} уровня.',
   'hudChrome.gathering.toolTooltip.unlocks.logging': 'Нужен для валки древостоев до {tier} уровня.',
   'hudChrome.gathering.toolTooltip.unlocks.herbalism':
     'Нужен для сбора зарослей трав до {tier} уровня.',
   'hudChrome.gathering.toolTooltip.unlocks.fishing': 'Нужна для рыбалки в водах до {tier} уровня.',
+  'hudChrome.gathering.toolTooltip.unlocks.farming':
+    'Нужна для посадки культур до {tier} уровня.',
   'hudChrome.gathering.toolTooltip.use.mining': 'Использование: добыть руду из ближайшей жилы.',
   'hudChrome.gathering.toolTooltip.use.logging': 'Использование: срубить ближайший древостой.',
   'hudChrome.gathering.toolTooltip.use.herbalism':
     'Использование: собрать травы из ближайших зарослей.',
+  'hudChrome.gathering.toolTooltip.use.farming':
+    'Действует из ваших сумок, когда вы сажаете культуру на грядке.',
   'hudChrome.gathering.toolTooltip.speed': 'Быстрее собирает на узлах ниже {tier} уровня.',
   'hudChrome.gathering.toolTooltip.rodRequired': 'Нужна для рыбалки.',
   'hudChrome.gathering.toolTooltip.rodBite': 'Рыба клюет до {seconds} с быстрее.',
@@ -8986,15 +9065,90 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.rodBand':
     'Открывает более богатый улов при навыке рыбалки от {skill}.',
   'hudChrome.gathering.downgradeMark': 'Сумки полны: добыча сохранена без метки сборщика.',
+  'hudChrome.gathering.downgradeMarkCrop': 'Сумки полны: урожай сохранен без метки садовода.',
   'hudChrome.gathering.downgradeFind': 'Сумки полны: превосходная находка ускользнула.',
   'hudChrome.gathering.emptyHookNote': 'Пустой крючок',
   'hudChrome.gathering.stateReady': 'Готово',
   'hudChrome.gathering.stateCooldown': 'Восстанавливается',
   'hudChrome.gathering.stateCooldownTimed': 'Восстановится через {time}',
   'hudChrome.gathering.fineGradePreview': 'Ваш инструмент даёт здесь отборный сорт добычи.',
+  'hudChrome.farming.plantLine': 'Вы сажаете: {name}.',
+  'hudChrome.farming.harvestLine': 'Вы собираете урожай: {name}.',
+  'hudChrome.farming.harvestLineQty': 'Вы собираете урожай: {name} x{qty}.',
+  'hudChrome.farming.harvestFineLine': 'Вы также собираете: {name}.',
+  'hudChrome.farming.harvestFineLineQty': 'Вы также собираете: {name} x{qty}.',
+  'hudChrome.farming.witheredLine': 'Урожай засох. Вы расчищаете грядку: {name}.',
+  'hudChrome.farming.witheredLineQty': 'Урожай засох. Вы расчищаете грядку: {name} x{qty}.',
+  'hudChrome.farming.seedBackLine': 'Вы сохраняете семена на посадку: {name}.',
+  'hudChrome.farming.seedBackLineQty': 'Вы сохраняете семена на посадку: {name} x{qty}.',
+  'hudChrome.farming.denied.bad_bed': 'Там нет грядки.',
+  'hudChrome.farming.denied.bad_crop': 'Это здесь посадить нельзя.',
+  'hudChrome.farming.denied.range': 'Вы слишком далеко от этой грядки.',
+  'hudChrome.farming.denied.no_farmer':
+    'Чтобы обменять шелуху на компост, нужно стоять рядом с фермером.',
+  'hudChrome.farming.huskTrade': 'Обменять шелуху на компост',
+  'hudChrome.farming.huskTradeAria': 'Обменять шелуху на компост у {name}',
+  'hudChrome.farming.plantSheet.title': 'Посадить культуру',
+  'hudChrome.farming.plantSheet.plant': 'Посадить',
+  'hudChrome.farming.plantSheet.sowAria': 'Посеять: {name}',
+  'hudChrome.farming.plantSheet.empty': 'У вас нет семян, которые можно посеять на этой грядке.',
+  'hudChrome.farming.plantSheet.close': 'Закрыть окно посадки',
+  'hudChrome.farming.denied.bed_taken': 'Там у вас уже растет урожай.',
+  'hudChrome.farming.denied.skill': 'Ваш навык земледелия слишком низок для этой культуры.',
+  'hudChrome.farming.denied.no_seed': 'У вас нет семян этой культуры.',
+  'hudChrome.farming.denied.not_ready': 'Этот урожай еще растет.',
+  'hudChrome.farming.denied.no_plot': 'На этой грядке ничего не посажено.',
+  'hudChrome.farming.denied.no_husks': 'У вас недостаточно засохшей шелухи.',
+  'hudChrome.farming.denied.no_compost': 'У вас нет компоста.',
+  'hudChrome.farming.denied.no_fee_produce': 'У вас нет урожая, чтобы оплатить присмотр.',
+  'hudChrome.farming.denied.no_tonic': 'У вас нет тоника роста.',
+  'hudChrome.farming.denied.tool': 'У вас нет мотыги земледельца, подходящей для этой культуры.',
+  'hudChrome.farming.denied.locked': 'Предмет, которым можно за это заплатить, заблокирован.',
+  'hudChrome.farming.denied.no_feast': 'У вас нет пира, который можно накрыть.',
+  'hudChrome.farming.denied.feast_active': 'Ваш пир уже накрыт.',
+  'hudChrome.farming.denied.feast_expired': 'Этого пира больше нет.',
+  'hudChrome.farming.denied.feast_finished': 'Этот пир съеден подчистую.',
+  'hudChrome.farming.denied.feast_range': 'Вы слишком далеко от пира.',
+  'hudChrome.farming.denied.feast_eaten': 'Вы уже поели с этого пира.',
+  'hudChrome.farming.feastTitle': 'Пир урожая {name}',
+  'hudChrome.farming.feastPlacedLine': 'Вы накрыли свой пир урожая.',
+  'hudChrome.farming.husksConvertedLine': 'Вы обмениваете {husksName} x{husks} на {name}.',
+  'hudChrome.farming.husksConvertedLineQty':
+    'Вы обмениваете {husksName} x{husks} на {name} x{qty}.',
+  'hudChrome.farming.readyLine': 'Урожай на одной грядке готов к сбору.',
+  'hudChrome.farming.readyLineQty': 'Урожай готов к сбору на грядках: {count}.',
+  'hudChrome.farming.readyWitheredLine': 'Урожай на одной грядке засох.',
+  'hudChrome.farming.readyWitheredLineQty': 'Грядок с засохшим урожаем: {count}.',
+  'hudChrome.harvestJournal.title': 'Журнал урожая',
+  'hudChrome.harvestJournal.close': 'Закрыть',
+  'hudChrome.harvestJournal.listLabel': 'Засаженные грядки',
+  'hudChrome.harvestJournal.growing': 'Готово через {time}',
+  'hudChrome.harvestJournal.ready': 'Готово к сбору',
+  'hudChrome.harvestJournal.readyAnnounce': 'Готово к сбору: {name}',
+  'hudChrome.harvestJournal.finishing': 'Почти созрел',
+  'hudChrome.harvestJournal.withered': 'Засох',
+  'hudChrome.harvestJournal.remainingDaysHours': '{days} д {hours} ч',
+  'hudChrome.harvestJournal.remainingHoursMinutes': '{hours} ч {minutes} мин',
+  'hudChrome.harvestJournal.remainingMinutesSeconds': '{minutes} мин {seconds} с',
+  'hudChrome.harvestJournal.remainingSeconds': '{seconds} с',
+  'hudChrome.harvestJournal.bedLine': '{zone}, грядка {index}',
+  'hudChrome.harvestJournal.bedLineUnknown': 'Неизвестная грядка',
+  'hudChrome.harvestJournal.careWatch': 'Присмотр земледельца',
+  'hudChrome.harvestJournal.careNone': 'Без дополнений',
+  'hudChrome.harvestJournal.stageSprout': 'Росток',
+  'hudChrome.harvestJournal.stageSeedling': 'Всходы',
+  'hudChrome.harvestJournal.stageMaturing': 'Созревает',
+  'hudChrome.harvestJournal.stageRipe': 'Созрел',
+  'hudChrome.harvestJournal.emptyTitle': 'Ничего не посажено',
+  'hudChrome.harvestJournal.emptyBody':
+    'Посейте семя на любой грядке, и она появится здесь вместе с таймером.',
+  'hudChrome.harvestJournal.noviceTitle': 'Вы еще не работали на грядке',
+  'hudChrome.harvestJournal.noviceBody':
+    'Навык земледелия растет с каждым собранным урожаем. Посейте семя на любой грядке, чтобы начать.',
   'gatherEvent.pristineVein': '{finder} находит нетронутую жилу!',
   'gatherEvent.ancientHeartwood': '{finder} добывает древнюю сердцевину!',
   'gatherEvent.moonlitBloom': '{finder} находит лунный цветок!',
+  'gatherEvent.goldenHarvest': '{finder} собирает золотой урожай!',
   'hudChrome.archetypeTitle.label': 'Титул',
   'hudChrome.archetypeTitle.none': 'Нет',
   'hudChrome.archetypeTitle.hobbyLabel': 'Хобби',
@@ -10353,6 +10507,22 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.cook_marlow.title': 'Хозяин кухни',
   'entities.npcs.cook_marlow.greeting':
     'Из моей кухни ничего не выходит полусырым, {className}. Садись, поешь, а потом обратно в путь.',
+  'entities.npcs.farmer_jessica.name': 'Фермер Джессика',
+  'entities.npcs.farmer_jessica.title': 'Хранительница огородов',
+  'entities.npcs.farmer_jessica.greeting':
+    'Доброй земли и ясной погоды, {playerName}. Купи у меня семена, посей их на одной из этих грядок и ступай по своим делам. Урожай растёт, пока тебя нет, и никогда не портится. В журнале урожая (Shift+K или строка Земледелие в окне профессий) перечислена каждая засеянная грядка и её таймер.',
+  'entities.npcs.farmer_teasel.name': 'Фермер Тизель',
+  'entities.npcs.farmer_teasel.title': 'Болотный рисовод',
+  'entities.npcs.farmer_teasel.greeting':
+    'Семена болотного риса и болотной свёклы, {className}, и компост, чтобы их подкормить. Вода с чеков уходит медленно, так что смотри под ноги.',
+  'entities.npcs.farmer_hollis.name': 'Фермер Холлис',
+  'entities.npcs.farmer_hollis.title': 'Террасник Хайвотча',
+  'entities.npcs.farmer_hollis.greeting':
+    'Террасы дают столько, сколько позволяет гора, {className}. Я продаю компост, а если твой урожай засохнет, я переработаю шелуху обратно в добрую землю.',
+  'entities.npcs.farmer_verbena.name': 'Фермер Вербена',
+  'entities.npcs.farmer_verbena.title': 'Садовница партера',
+  'entities.npcs.farmer_verbena.greeting':
+    'Осторожнее с бордюром, {playerName}, эти грядки гордость партера. Я продаю компост, а любую засохшую шелуху, что ты принесёшь, превращу в новый.',
   'entities.npcs.weaver_ottilie.name': 'Ткачиха Оттилия',
   'entities.npcs.weaver_ottilie.title': 'Хозяйка ткацкого стана',
   'entities.npcs.weaver_ottilie.greeting':
@@ -10830,7 +11000,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm':
     'Сокращает таймер возрождения источника, на котором сработал.',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    'Устанавливается на инструмент для горного дела, лесозаготовки или травничества в окне профессий. Расходуется при установке.',
+    'Устанавливается на инструмент для горного дела, лесозаготовки, травничества или земледелия в окне профессий. Расходуется при установке.',
   'hudChrome.professions.toolEffectTooltip.charges':
     'На обычном инструменте изначально {base} зарядов (+{bonus} за каждую ступень редкости).',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'На удочку не устанавливается.',
@@ -11213,6 +11383,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_workorder_kitchens.completion':
     'Вот теперь кладовая полна. Вот твоя плата. Возвращайся, когда сумки снова потяжелеют.',
   'entities.quests.q_prof_workorder_kitchens.objectives.0.label': 'Мясо дичи доставлено',
+  'entities.quests.q_prof_workorder_kitchens_wheat.title': 'Наряд на работу: кухни, пшеница',
+  'entities.quests.q_prof_workorder_kitchens_wheat.text':
+    'Хлеб сам себя не испечет, {playerName}, а мои лари с мукой скребут по дну. Принеси мне восемь снопов долинной пшеницы, и я честно заплачу за всю партию. Сам вырастил или купил на рынке, мне все равно, лишь бы мололось.',
+  'entities.quests.q_prof_workorder_kitchens_wheat.completion':
+    'Сухое доброе зерно, и вдоволь. Вот твоя плата, отсчитана до монеты. Когда подойдет следующий урожай, ты знаешь, в какую дверь стучать.',
+  'entities.quests.q_prof_workorder_kitchens_wheat.objectives.0.label': 'Долинная пшеница доставлена',
+  'entities.quests.q_prof_workorder_kitchens_rice.title': 'Наряд на работу: кухни, рис',
+  'entities.quests.q_prof_workorder_kitchens_rice.text':
+    'Болотный люд клянется своим рисом, {playerName}, и я намерен выяснить почему. Добудь мне пять мер болотного риса, и здесь тебя будут ждать деньги. И смотри, не намочи его в дороге: мокрый рис это каша, а каши я не заказывал.',
+  'entities.quests.q_prof_workorder_kitchens_rice.completion':
+    'Крупный и сухой, каждое зернышко. Вот твои деньги. Пока болото родит, я плачу.',
+  'entities.quests.q_prof_workorder_kitchens_rice.objectives.0.label': 'Болотный рис доставлен',
   'entities.quests.q_prof_workorder_loom.title': 'Наряд на работу: ткацкий станок',
   'entities.quests.q_prof_workorder_loom.text':
     'Станок стоит без дела, а праздные руки тратят дневной свет впустую, {playerName}. Принеси мне шесть мотков паучьего шёлка, и я заплачу по честной ставке, отсчитанной до последней медной монеты.',
@@ -11411,7 +11593,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.professions.comingSoon': 'Рецептов пока нет',
   'guide.professions.gatherHubHeading': 'Сбор',
   'guide.professions.gatherHubBody':
-    'Четыре ремесла сбора кормят производство: горное дело, лесозаготовка и травничество ограничены 100, рыбная ловля 200.',
+    'Ремесла сбора кормят производство: горное дело, лесозаготовка и травничество ограничены 100, земледелие растит урожай из семян на ухоженных грядках и тоже ограничено 100, рыбная ловля 200.',
   'guide.professions.archetypesHeading': 'Десять призваний',
   'guide.professions.archetypesBody':
     'Настройка на два соседних ремесла дарует парный титул: две основные специальности растут до полного предела, одно противоположное ремесло остается хобби с пределом на редком уровне, а прочие отдыхают на обычном.',
@@ -11441,6 +11623,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.matFmt': '{name} x{count}',
   'guide.profPages.outputFmt': '{name} x{count}',
   'guide.profPages.comboReq': 'Нужны {a} и {b}',
+  'guide.profPages.effectFood': 'Восстанавливает {amount} здоровья за {seconds} сек. при еде.',
+  'guide.profPages.effectWellFed': 'Сытость после еды: +{value} к характеристике {stat} на {minutes} мин.',
+  'guide.profPages.effectWellFedAura': 'Дает {aura} на {minutes} мин., когда вы доедаете.',
   'guide.profPages.sourceTrainerFee': 'Учитель, {fee}',
   'guide.profPages.sourceTrainerFree': 'Учитель, бесплатно',
   'guide.profPages.sourceKnown': 'Известен с самого начала',
@@ -11527,6 +11712,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Травничество собирает дикорастущее: глянцелист в Истврукской долине, золотолист в Мирефенской топи и солнцелепест на Терновых высотах, лист и стебель, на которых держатся аптечные ремёсла. Открыто для всех с 1 уровня, нужен лишь серп травника в сумках (20 меди в любом узловом городе), ведётся на собственном счётчике до предела в 100.',
   'guide.profPages.gatherIntro.fishing':
     'Рыбная ловля тянет улов из открытой воды каждой зоны в ритме поклевки и подсечки и ограничена 200.',
+  'guide.profPages.gatherIntro.farming':
+    'Земледелие: единственное собирательское ремесло, где урожай растят, а не добывают. Посейте семена на возделанных грядках: растения растут по своим часам, с вами или без вас, а вернувшись когда угодно, вы соберете созревший урожай, потому что на грядке ничто не портится. У каждого участка стоит земледелец, от наделов Eastbrook через Fenbridge и Highwatch до партера Evergarden, а начинается ремесло с Farmer Jessica в Eastbrook: она продает Garden Hoe и первые семена, а ее поручение проводит новичка через первый урожай. На каждой ступени лестницы растет своя пара культур, умелые руки снимают и отборный сорт, а мотыги для более трудной земли выше первых грядок куют инженеры. Навык растет на собственном счетчике до предела 100.',
   'guide.profPages.rhythmHeading': 'Ритм сбора',
   'guide.profPages.rhythmBody':
     'Сбор идет как видимое действие: базовые {base} секунды, не короче {floor}; каждая ступень инструмента выше залежи срезает {tool} секунды, а каждый разряд мастерства еще {band}.',
@@ -11591,7 +11778,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.free': 'Бесплатно',
   'guide.profPages.econ.workOrdersHeading': 'Рабочие заказы',
   'guide.profPages.econ.workOrdersNote':
-    'Каждый мастер платит {pct}% от торговой цены за связку своего ходового материала, и заказ повторяется каждые {minutes} минут.',
+    'Каждый мастер вывешивает наряды, по одному на ходовой материал, и платит {pct}% от торговой цены за затребованную связку. У каждого наряда свои часы на {minutes} минут: сданный наряд закрывается до конца отсчета, а остальные наряды того же мастера остаются открытыми.',
   'guide.profPages.econ.colOrder': 'Заказ',
   'guide.profPages.econ.colMaster': 'Мастер',
   'guide.profPages.econ.colAsks': 'Просит',
@@ -11771,13 +11958,23 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Каждый сбор катит качество для того, что он дает, и ваше мастерство, это вся история этого броска. Совсем новый собиратель всегда тянет обычный материал; каждое очко навыка стабильно переносит вес из обычного в высшие сорта и никогда назад, пока на пределе в 100 обычный сорт не исчезнет совсем: 60 процентов необычного, 30 процентов редкого, 8 процентов эпического и 2 процента легендарного, каждый раз.\n\nКачество означает и количество: обычный бросок дает 1 единицу, необычный и редкий дают 2, эпический 3, а легендарный 4. Любая редкая, эпическая или легендарная добыча приходит подписанным экземпляром с клеймом Gathered by you: на пределе это четыре сбора из десяти несут ваше имя, а правила происхождения на странице Crafting Economy объясняют, почему ремесленники платят сверху ровно за такие стопки.',
   'guide.profPages.gatherDeedsHeading': 'Деяния по пути',
   'guide.profPages.gatherDeeds.mining':
-    'Ваша первая жила любого ремесла зарабатывает Fruits of the Field, а предел в 100 в Mining вписывает Ore in the Blood. Достижение 100 в любых трех из Mining, Logging, Herbalism и Fishing добавляет Master Gatherer при 25 Известности, а вскрытие pristine vein записывает собственную коллекционную отметку. Ничто из этого не дает силы: деяния, это титулы и Известность, летопись дорог, что вы прошли.',
+    'Ваша первая жила любого ремесла зарабатывает Fruits of the Field, а предел в 100 в Mining вписывает Ore in the Blood. Достижение 100 в любых трех собирательских ремеслах добавляет Master Gatherer при 25 Известности, а вскрытие pristine vein записывает собственную коллекционную отметку. Ничто из этого не дает силы: деяния, это титулы и Известность, летопись дорог, что вы прошли.',
   'guide.profPages.gatherDeeds.logging':
-    'Ваша первая жила любого ремесла зарабатывает Fruits of the Field, а предел в 100 в Logging вписывает Heartwood Hewer. Достижение 100 в любых трех из Mining, Logging, Herbalism и Fishing добавляет Master Gatherer при 25 Известности, а срез ancient heartwood записывает собственную коллекционную отметку. Деяния, это только титулы и Известность, никогда не сила.',
+    'Ваша первая жила любого ремесла зарабатывает Fruits of the Field, а предел в 100 в Logging вписывает Heartwood Hewer. Достижение 100 в любых трех собирательских ремеслах добавляет Master Gatherer при 25 Известности, а срез ancient heartwood записывает собственную коллекционную отметку. Деяния, это только титулы и Известность, никогда не сила.',
   'guide.profPages.gatherDeeds.herbalism':
-    'Ваша первая жила любого ремесла зарабатывает Fruits of the Field, а предел в 100 в Herbalism вписывает Master of the Meadow. Достижение 100 в любых трех из Mining, Logging, Herbalism и Fishing добавляет Master Gatherer при 25 Известности, а moonlit bloom записывает собственную коллекционную отметку. Деяния, это только титулы и Известность, никогда не сила.',
+    'Ваша первая жила любого ремесла зарабатывает Fruits of the Field, а предел в 100 в Herbalism вписывает Master of the Meadow. Достижение 100 в любых трех собирательских ремеслах добавляет Master Gatherer при 25 Известности, а moonlit bloom записывает собственную коллекционную отметку. Деяния, это только титулы и Известность, никогда не сила.',
   'guide.profPages.gatherDeeds.fishing':
     'Рубеж в 100 вписывает Old Salt, а 200 вписывает Master Angler с его титулом, самую вершину искусства рыбака; Fishing также засчитывается в Master Gatherer, зарабатываемый при 100 в любых трех собирательских ремеслах. Первая рыба из вод каждой зоны заполняет свою страницу, а Кои солнечного блика записывает Glimmer of Hope, так что путники с удочкой в котомке заполняют книгу быстрее, чем ожидают.',
+  'guide.profPages.gatherDeeds.farming':
+    'У земледелия пока нет собственных деяний: теперь, когда грядки и культуры укоренились, вехи и деяния предела, что отмечают другие ремесла, придут с одним из будущих обновлений. Его мастерство уже засчитывается в Master Gatherer, зарабатываемый при 100 в любых трех собирательских ремеслах, так что земледелец заполнит эту страницу наравне со всеми. Деяния дают только титулы и известность, но никогда не силу.',
+  'guide.profPages.gatherDeeds.farmingSown':
+    'У земледелия теперь есть собственная полка в Книге деяний. Sow It Begins отмечает вашу первую посаженную культуру, а четыре страницы летописи отмечают первый удавшийся урожай на каждом из мест с грядками, от Eastbrook Vale до Evergarden. Золотой урожай записывает собственную коллекционную отметку без Известности, а мастерство земледелия засчитывается в Master Gatherer, зарабатываемый при 100 в любых трех собирательских ремеслах. Венец уже вписан: Harvestmaster, титул за 100 мастерства этого ремесла, станет достижим вместе с более глубокими полями одного из будущих обновлений. Деяния, это только титулы и Известность, никогда не сила.',
+  'guide.profPages.farm.tableHeading': 'С грядки на стол',
+  'guide.profPages.farm.tableBody':
+    'Кухни, вот где сезон окупается. Помимо повседневных фермерских блюд, у каждой ступени культур есть блюдо побогаче, оставляющее Сытость: доешьте трапезу, и долгое благо останется с вами, то самое преимущество, которое группа хочет съесть перед дверью подземелья. Венчает набор Harvest Feast, стол, который повар накрывает прямо в мире: каждый, кто рядом, берет свою порцию, по одной на каждого, и всякая доеденная трапеза платит то же благо Сытости, так что сезон одного земледельца может накрыть стол целой группе. Вершина этой лестницы, два самых богатых блюда и сам пир, станет достижима вместе с более глубокими полями одного из будущих обновлений; все, что ниже, уже готовится сегодня.\n\nЗа этим столом есть место и удаче. Каждый собранный урожай бросает тот же шанс нежданной находки, что и другие собирательские ремесла, и время от времени культура выходит золотой: урожай далеко превосходит обычный, вся зона слышит о находке, объявленной с вашим именем, а Golden Harvest записывается в вашу Книгу деяний.',
+  'guide.profPages.farm.bedsHeading': 'Работа на грядках',
+  'guide.profPages.farm.bedsBody':
+    'Цикл короток. Купите семена и компост у земледельца возле грядок: Jessica в Eastbrook держит пару долинных культур, земледелец в Fenbridge пару болотных, а семена Highwatch и Evergarden не продает ни один прилавок: они по одному-два возвращаются с урожая высокой ступени, а в остальном ходят через World Market. Сейте с мотыгой в сумке и, если хотите, склоните шансы в свою пользу: компост с прилавка и присмотр земледельца, оплаченный урожаем при посеве, повышают шанс культуры выжить, тоник роста от алхимика дает урожаю шанс стать больше, а когда ваш навык поднимется на целую полосу выше ступени культуры, она перестанет гибнуть вовсе. Затем просто уходите. Грядка растет, пока вы не в игре, созревший урожай ждет сколько угодно, а Журнал урожая (Shift+K или строка Земледелие в окне профессий) показывает каждую засеянную грядку с ее таймером.\n\nПогибшая культура оставляет вместо урожая засохшую шелуху, и любой земледелец обменяет шелуху на компост, так что плохой сезон покупает страховку следующему. Собранное кормит кухни: урожай готовится в блюда на кухнях, а заказы Cook Marlow на пшеницу и рис забирают Vale Wheat и Marsh Rice за монету по тем же часам, что и любой другой наряд.',
   'guide.profPages.fish.startHeading': 'С чего начать',
   'guide.profPages.fish.startBody':
     'Simple Fishing Pole стоит 20 меди у Fisherman Brandt в Eastbrook (ищите Old Salt, что зыркает на Mirror Lake с восточной окраины города); Tinker Gizzel, Provisioner Hale в Fenbridge и Quartermaster Bree в Highwatch тоже держат удочки. Используйте удочку лицом к воде, достаточно глубокой, чтобы держать рыбу, примерно до 24 ярдов перед вами, и ваш поплавок улетает.\n\nНельзя забрасывать в бою, вплавь или мертвым: заброс с берега, это задуманная поза, и любая рыбная вода годится, в каждой зоне.',
@@ -11817,6 +12014,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.materialHint.masterwroughtIntermediate': 'Компонент ковки мастера.',
   'hudChrome.materialHint.quickeningCatalyst':
     'Катализатор для ремесла. Алхимик может создать лишь один в день.',
+  'hudChrome.materialHint.growthTonic':
+    'Принадлежность для фермерства. Расходуется при посадке и даёт шанс собрать чуть больший урожай. Если растение засохнет, тоник пропадает вместе с ним.',
   'hudChrome.enchanting.tier.base': 'Базовые чары',
   'hudChrome.enchanting.tier.runed': 'Рунные чары',
   'hudChrome.enchanting.tier.greater': 'Высшие чары',

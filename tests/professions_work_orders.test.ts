@@ -1,6 +1,8 @@
 // Repeatable craft work orders (Professions 2.0): the six masters each
 // take a stack of their craft's staple material for coin on a fixed cadence
-// (WORK_ORDER_CADENCE_TICKS). This suite pins the economics as a deliberate,
+// (WORK_ORDER_CADENCE_TICKS); since the farming go-live the kitchens master
+// posts three orders (game meat plus the two early-tier crops), each on its
+// own cadence key. This suite pins the economics as a deliberate,
 // live-data-derived contract so a later material sell-value retune or a count
 // change reds it on purpose:
 //   - copperReward == floor(0.5 * summed vendor sell value of the requested
@@ -23,6 +25,9 @@ import { Sim } from '../src/sim/sim';
 const WORK_ORDERS: { questId: string; master: string }[] = [
   { questId: 'q_prof_workorder_forge', master: 'forgemistress_darva' },
   { questId: 'q_prof_workorder_kitchens', master: 'cook_marlow' },
+  // Farming go-live: the two early-tier produce orders, same master, same contract.
+  { questId: 'q_prof_workorder_kitchens_wheat', master: 'cook_marlow' },
+  { questId: 'q_prof_workorder_kitchens_rice', master: 'cook_marlow' },
   { questId: 'q_prof_workorder_loom', master: 'weaver_ottilie' },
   { questId: 'q_prof_workorder_toolworks', master: 'tinker_gizzel' },
   { questId: 'q_prof_workorder_tannery', master: 'tanner_hesk' },
@@ -142,4 +147,74 @@ describe.each(WORK_ORDERS)('$questId turn-in behavior (Sim)', ({ questId, master
     sim.acceptQuest(questId);
     expect(sim.questLog.has(questId)).toBe(false);
   });
+});
+
+describe('the produce orders take plain produce only (farming twins have no grade substitution)', () => {
+  // The forge order accepts Fine Copper Ore for copper ore because
+  // MATERIAL_GRADES maps the node grades downward; farming's fine twins are
+  // NOT MATERIAL_GRADES rows (their consumers are their own reagent slots in
+  // the hoe ladder and the dishes), so a fine twin neither counts toward a
+  // produce order nor gets spent by its turn-in. Both arms are exercised so a
+  // later grade-table change that folds the twins in reds this on purpose.
+  // The authored count and payout of each produce row, as literals: the guard
+  // above recomputes the payout from the live item rows, so a coordinated
+  // retune (count and reward moved together, or a produce sellValue retune
+  // with matching rewards) stays green there; these two literals make it a
+  // visible edit (deviation (bm): vale_wheat x8 -> 16 copper, marsh_rice x5
+  // -> 20 copper, both floor(0.5 x summed sellValue)).
+  const PRODUCE_ORDERS = [
+    {
+      questId: 'q_prof_workorder_kitchens_wheat',
+      plain: 'vale_wheat',
+      fine: 'fine_vale_wheat',
+      count: 8,
+      copperReward: 16,
+    },
+    {
+      questId: 'q_prof_workorder_kitchens_rice',
+      plain: 'marsh_rice',
+      fine: 'fine_marsh_rice',
+      count: 5,
+      copperReward: 20,
+    },
+  ] as const;
+
+  it.each(PRODUCE_ORDERS)(
+    '$questId asks $count $plain for $copperReward copper (the authored literals)',
+    ({ questId, plain, count, copperReward }) => {
+      const objective = collectObjective(questId);
+      expect(objective.itemId).toBe(plain);
+      expect(objective.count).toBe(count);
+      expect(QUESTS[questId].copperReward).toBe(copperReward);
+    },
+  );
+
+  it.each(PRODUCE_ORDERS)(
+    '$questId: the fine twin never counts, the plain produce does',
+    ({ questId, plain, fine }) => {
+      const sim = makeSim();
+      const { itemId, count } = collectObjective(questId);
+      expect(itemId).toBe(plain);
+      moveToNpc(sim, 'cook_marlow');
+      sim.acceptQuest(questId);
+      const qp = sim.questLog.get(questId);
+      if (!qp) throw new Error(`${questId} was not accepted`);
+      // Negative arm: a full stack of the fine twin moves nothing.
+      sim.addItem(fine, count, sim.playerId);
+      expect(qp.counts[0]).toBe(0);
+      expect(qp.state).not.toBe('ready');
+      // Positive arm: the plain produce fills the order and the turn-in spends
+      // exactly the plain stack, leaving the fine twin untouched.
+      sim.addItem(plain, count, sim.playerId);
+      expect(qp.counts[0]).toBe(count);
+      expect(qp.state).toBe('ready');
+      const meta = sim.players.get(sim.playerId)!;
+      const copperBefore = meta.copper;
+      moveToNpc(sim, 'cook_marlow');
+      sim.turnInQuest(questId);
+      expect(sim.countItem(plain)).toBe(0);
+      expect(sim.countItem(fine)).toBe(count);
+      expect(meta.copper).toBe(copperBefore + QUESTS[questId].copperReward);
+    },
+  );
 });

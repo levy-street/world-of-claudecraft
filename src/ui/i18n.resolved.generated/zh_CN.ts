@@ -64,7 +64,8 @@ export const zh_CN: EnTranslations = {
       "dungeon": "地下城",
       "difficulty": "难度",
       "name": "名称",
-      "spec": "专精"
+      "spec": "专精",
+      "bed": "Bed id (optional)"
     },
     "difficulty": {
       "normal": "普通",
@@ -150,6 +151,10 @@ export const zh_CN: EnTranslations = {
       "gather": {
         "label": "授予采集技能",
         "description": "提高一项采集专业技能。"
+      },
+      "farmgrow": {
+        "label": "Ripen crops",
+        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
       },
       "teleport": {
         "label": "传送",
@@ -2581,7 +2586,8 @@ export const zh_CN: EnTranslations = {
       "resonantSteel": "附魔材料。分解精良及以上品质的近战武器可得。",
       "resonantTimber": "附魔材料。分解精良及以上品质的法杖、魔杖、弓和弩可得。",
       "masterwroughtIntermediate": "大师锻造制作部件。",
-      "quickeningCatalyst": "制作催化剂。炼金术士每天只能制作一个。"
+      "quickeningCatalyst": "制作催化剂。炼金术士每天只能制作一个。",
+      "growthTonic": "农用品。种植时消耗，有机会获得略多的收成。若作物枯萎，滋补剂也会随之失去。"
     },
     "discord": {
       "title": "Discord",
@@ -3018,6 +3024,7 @@ export const zh_CN: EnTranslations = {
       "logging": "伐木",
       "herbalism": "草药学",
       "fishing": "钓鱼",
+      "farming": "耕作",
       "notReady": "这个资源节点尚未为你重新生成。",
       "gatherLine": "你采集了：{name}。",
       "gatherLineQty": "你采集了：{name} x{qty}。",
@@ -3036,7 +3043,8 @@ export const zh_CN: EnTranslations = {
       "tierRequired": {
         "mining": "需要{tier}阶采矿镐",
         "logging": "需要{tier}阶伐木斧",
-        "herbalism": "需要{tier}阶草药镰"
+        "herbalism": "需要{tier}阶草药镰",
+        "farming": "需要{tier}阶耕作锄"
       },
       "requiresTool": {
         "mining": "需要采矿镐",
@@ -3047,23 +3055,27 @@ export const zh_CN: EnTranslations = {
         "mining": "你需要{tier}阶采矿镐才能开采这条矿脉。",
         "logging": "你需要{tier}阶伐木斧才能砍伐这片林木。",
         "herbalism": "你需要{tier}阶草药镰才能采集这片草药丛。",
-        "fishing": "你需要{tier}阶钓竿才能在这片水域垂钓。"
+        "fishing": "你需要{tier}阶钓竿才能在这片水域垂钓。",
+        "farming": "你需要{tier}阶耕作锄才能打理这片田畦。"
       },
       "toolRequired": {
         "mining": "你需要采矿镐才能开采这条矿脉。",
         "logging": "你需要伐木斧才能砍伐这片林木。",
         "herbalism": "你需要草药镰才能采集这片草药丛。",
-        "fishing": "你需要钓竿才能抛竿垂钓。"
+        "fishing": "你需要钓竿才能抛竿垂钓。",
+        "farming": "你需要耕作锄才能打理这片田畦。"
       },
       "noNodeNearby": {
         "mining": "附近没有矿脉可供开采。",
         "logging": "附近没有林木可供砍伐。",
-        "herbalism": "附近没有草药丛可供采集。"
+        "herbalism": "附近没有草药丛可供采集。",
+        "farming": "附近没有田畦可供打理。"
       },
       "wieldUnmet": {
         "mining": "你需要采矿{skill}才能挥动背包里已有的采矿镐。",
         "logging": "你需要伐木{skill}才能挥动背包里已有的伐木斧。",
-        "herbalism": "你需要草药学{skill}才能使用背包里已有的草药镰。"
+        "herbalism": "你需要草药学{skill}才能使用背包里已有的草药镰。",
+        "farming": "你需要耕作{skill}才能挥动背包里已有的耕作锄。"
       },
       "wieldUnmetCorpse": "你需要采集技能{skill}才能让最上等的工具派上用场。",
       "toolTierUnmetCorpse": "你需要{tier}阶采集工具才能取得最上等的材料。",
@@ -3072,18 +3084,21 @@ export const zh_CN: EnTranslations = {
           "mining": "采矿工具（{tier}阶）",
           "logging": "伐木工具（{tier}阶）",
           "herbalism": "草药工具（{tier}阶）",
-          "fishing": "钓鱼竿（{tier}阶）"
+          "fishing": "钓鱼竿（{tier}阶）",
+          "farming": "耕作工具（{tier}阶）"
         },
         "unlocks": {
           "mining": "开采最高{tier}阶的矿脉所需。",
           "logging": "砍伐最高{tier}阶的林木所需。",
           "herbalism": "采集最高{tier}阶的草药丛所需。",
-          "fishing": "在最高{tier}阶的水域垂钓所需。"
+          "fishing": "在最高{tier}阶的水域垂钓所需。",
+          "farming": "种植最高{tier}阶的作物所需。"
         },
         "use": {
           "mining": "使用：开采附近的矿脉。",
           "logging": "使用：砍伐附近的林木。",
-          "herbalism": "使用：采集附近的草药丛。"
+          "herbalism": "使用：采集附近的草药丛。",
+          "farming": "放在背包里即可，在田畦种植作物时自动生效。"
         },
         "speed": "在低于{tier}阶的节点采集速度更快。",
         "rodRequired": "钓鱼所需。",
@@ -3092,6 +3107,7 @@ export const zh_CN: EnTranslations = {
         "rodBand": "钓鱼技能达到{skill}后可解锁更丰富的渔获。"
       },
       "downgradeMark": "背包已满：这份收获未能留下采集者的印记。",
+      "downgradeMarkCrop": "背包已满：这份收成未能留下种植者的印记。",
       "downgradeFind": "背包已满：一件完美的收获溜走了。",
       "emptyHookNote": "空钩",
       "stateReady": "可采集",
@@ -3099,6 +3115,83 @@ export const zh_CN: EnTranslations = {
       "stateCooldownTimed": "{time}后恢复",
       "respawnClock": "{minutes}:{seconds}",
       "fineGradePreview": "使用当前工具采集可获得优质品级。"
+    },
+    "farming": {
+      "plantLine": "你播下了：{name}。",
+      "harvestLine": "你收获了：{name}。",
+      "harvestLineQty": "你收获了：{name} x{qty}。",
+      "harvestFineLine": "你还收获了：{name}。",
+      "harvestFineLineQty": "你还收获了：{name} x{qty}。",
+      "witheredLine": "作物枯萎了。你清理了田畦：{name}。",
+      "witheredLineQty": "作物枯萎了。你清理了田畦：{name} x{qty}。",
+      "seedBackLine": "你回收了种子：{name}。",
+      "seedBackLineQty": "你回收了种子：{name} x{qty}。",
+      "denied": {
+        "bad_bed": "那里没有田畦。",
+        "bad_crop": "你无法在这里种植它。",
+        "range": "你离那片田畦太远了。",
+        "bed_taken": "你已经在那里种下了作物。",
+        "skill": "你的耕作技能不足以种植该作物。",
+        "no_seed": "你没有该作物的种子。",
+        "not_ready": "那株作物还在生长。",
+        "no_plot": "那片田畦里什么也没种。",
+        "no_husks": "你的枯萎谷壳不够。",
+        "no_compost": "你没有堆肥。",
+        "no_fee_produce": "你没有可以支付看守费的农产品。",
+        "no_tonic": "你没有生长滋补剂。",
+        "tool": "你没有适合该作物的耕作锄。",
+        "locked": "有一件可用于支付的物品已被锁定。",
+        "no_farmer": "你必须靠近农夫才能用谷壳换堆肥。",
+        "no_feast": "你没有可以摆出的盛宴。",
+        "feast_active": "你的盛宴已经摆出了。",
+        "feast_expired": "那桌盛宴已经不在了。",
+        "feast_finished": "那桌盛宴已被吃光。",
+        "feast_range": "你离盛宴太远了。",
+        "feast_eaten": "你已经吃过那桌盛宴了。"
+      },
+      "feastTitle": "{name}的丰收盛宴",
+      "feastPlacedLine": "你摆出了丰收盛宴。",
+      "huskTrade": "用谷壳换堆肥",
+      "huskTradeAria": "与{name}用谷壳换堆肥",
+      "plantSheet": {
+        "title": "种植作物",
+        "plant": "种植",
+        "sowAria": "播种{name}",
+        "empty": "你没有可以在这块田里播种的种子。",
+        "close": "关闭种植面板"
+      },
+      "husksConvertedLine": "你用{husksName} x{husks}换取了{name}。",
+      "husksConvertedLineQty": "你用{husksName} x{husks}换取了{name} x{qty}。",
+      "readyLine": "有一块作物可以收获了。",
+      "readyLineQty": "有 {count} 块作物可以收获了。",
+      "readyWitheredLine": "有一块作物在田畦里枯萎了。",
+      "readyWitheredLineQty": "有 {count} 块作物在田畦里枯萎了。"
+    },
+    "harvestJournal": {
+      "title": "收成日志",
+      "close": "关闭",
+      "listLabel": "已种植的田畦",
+      "growing": "{time}后成熟",
+      "ready": "可以收成",
+      "finishing": "即将成熟",
+      "withered": "已枯萎",
+      "readyAnnounce": "可以收成：{name}",
+      "remainingDaysHours": "{days}天{hours}小时",
+      "remainingHoursMinutes": "{hours}小时{minutes}分",
+      "remainingMinutesSeconds": "{minutes}分{seconds}秒",
+      "remainingSeconds": "{seconds}秒",
+      "bedLine": "{zone}，第{index}号田畦",
+      "bedLineUnknown": "未知田畦",
+      "careWatch": "农夫看护",
+      "careNone": "无额外照料",
+      "stageSprout": "幼芽",
+      "stageSeedling": "幼苗",
+      "stageMaturing": "成长中",
+      "stageRipe": "成熟",
+      "emptyTitle": "尚未种下作物",
+      "emptyBody": "在任意田畦播下种子，这块田就会带着计时出现在这里。",
+      "noviceTitle": "你还没有打理过田畦",
+      "noviceBody": "每收成一次作物，耕作技能都会提升。在任意田畦播下种子即可开始。"
     },
     "archetypeTitle": {
       "label": "称号",
@@ -3218,7 +3311,7 @@ export const zh_CN: EnTranslations = {
           "quickeningCharm": "缩短其触发的资源节点重生计时。",
           "makersCharm": "充能期间每次采集产出+2。"
         },
-        "howToSlot": "在专业窗口中将其镶嵌到采矿、伐木或草药学工具上。镶嵌后即消耗。",
+        "howToSlot": "在专业窗口中将其镶嵌到采矿、伐木、草药学或耕作工具上。镶嵌后即消耗。",
         "charges": "普通品质工具初始有{base}次充能（稀有度每升一级+{bonus}次）。",
         "landOnly": "无法镶嵌到鱼竿上。",
         "openProfessions": "打开专业窗口，将其镶嵌到采集工具上。"
@@ -3887,7 +3980,8 @@ export const zh_CN: EnTranslations = {
   "gatherEvent": {
     "pristineVein": "{finder}挖到了一条纯净的矿脉！",
     "ancientHeartwood": "{finder}砍倒了一棵远古心木！",
-    "moonlitBloom": "{finder}发现了一朵月光之花！"
+    "moonlitBloom": "{finder}发现了一朵月光之花！",
+    "goldenHarvest": "{finder}收获了一场金色丰收！"
   },
   "apiError": {
     "validation": {
@@ -4260,6 +4354,7 @@ export const zh_CN: EnTranslations = {
       "groupCamera": "镜头",
       "talents": "天赋",
       "professions": "专业",
+      "harvestJournal": "收成日志",
       "arena": "PvP 窗口（竞技场与荆谷原野）",
       "leaderboard": "排行榜",
       "deeds": "功绩之书",
@@ -5592,7 +5687,7 @@ export const zh_CN: EnTranslations = {
       "capFmt": "上限{cap}",
       "comingSoon": "暂无配方",
       "gatherHubHeading": "采集",
-      "gatherHubBody": "四种采集行业为制作供给材料：采矿、伐木与草药学的上限为100，钓鱼为200。",
+      "gatherHubBody": "采集行业为制作供给材料：采矿、伐木与草药学的上限为100，耕作在照料的田畦中从种子育出作物，上限同为100，钓鱼为200。",
       "archetypesHeading": "十大命途",
       "archetypesBody": "调谐到两个相邻行业即可获得一个成对头衔：两门主修可以一路练到最高层级，对侧的一门行业作为爱好保留在精良层级，其余行业则停留在普通层级。",
       "pairFmt": "{a}与{b}",
@@ -5629,6 +5724,9 @@ export const zh_CN: EnTranslations = {
       "outputFmt": "{name}×{count}",
       "comboReq": "需要{a}与{b}",
       "oncePerDay": "Once per day",
+      "effectFood": "食用后在{seconds}秒内恢复{amount}点生命值。",
+      "effectWellFed": "吃完后进入饱腹状态：{stat}+{value}，持续{minutes}分钟。",
+      "effectWellFedAura": "吃完后获得{aura}，持续{minutes}分钟。",
       "sourceTrainerFee": "训练师，{fee}",
       "sourceTrainerFree": "训练师，免费",
       "sourceKnown": "初始即会",
@@ -5806,7 +5904,8 @@ export const zh_CN: EnTranslations = {
         "mining": "采矿从世界的岩层中直接提取矿石：东溪谷产铜矿，泥沼湿地产铁矿，荆峰高地产锇矿，为锻造类行业供料。从1级起向所有人开放：只需背包里备有一把采矿镐，任意主城均售20铜。以独立计数器追踪，上限为100。",
         "logging": "伐木在三大区域的林地中砍伐木材：东溪谷产铁皮木，泥沼湿地产梣木，荆峰高地产高松，为武器柄材、法杖与工程学工作台供料。从1级起向所有人开放，只需背包里备有一把伐木斧（任意主城20铜），以独立计数器追踪，上限为100。",
         "herbalism": "草药学采集野生植物：东溪谷产润光叶，泥沼湿地产金叶，荆峰高地产日瓣草，为药坊类行业持续供应叶茎原料。从1级起向所有人开放，只需背包里备有一把草药镰（任意主城20铜），以独立计数器追踪，上限为100。",
-        "fishing": "钓鱼通过咬钩与收线的节奏，在每个区域的开阔水面垂钓，上限为200。"
+        "fishing": "钓鱼通过咬钩与收线的节奏，在每个区域的开阔水面垂钓，上限为200。",
+        "farming": "耕作是唯一以照料代替采掘的采集行业：在整治好的田畦中播下种子，人在与不在作物都按自己的钟点生长，无论何时回来都能拔起成熟的收成，因为田畦里的东西从不腐坏。从Eastbrook的份地经Fenbridge、Highwatch直到Evergarden的花圃，每处田畦旁都站着一位农夫，而Eastbrook的Farmer Jessica是这门手艺的起点：她出售Garden Hoe和最初的种子，她的差事会带新手农夫种完第一茬。阶梯的每一级都长着一对专属作物，手艺到家还能收下精良等级，起步田畦之上更难耕的土地所需的锄头则由工程师打造。熟练在专属计数上累积，上限为100。"
       },
       "rhythmHeading": "采集节奏",
       "rhythmBody": "采集是一段可见的施法：基础{base}秒，最短不低于{floor}秒；工具每高于节点一阶缩短{tool}秒，每个熟练度区间再缩短{band}秒。",
@@ -5834,10 +5933,12 @@ export const zh_CN: EnTranslations = {
       "specimenBody": "采集尸体还可能获得署名的完美标本：约{pct}%的尸体采集会掷出精良或更高品质。",
       "gatherDeedsHeading": "沿途的功业",
       "gatherDeeds": {
-        "mining": "任意行业的第一次采集获得Fruits of the Field，采矿100上限铭刻Ore in the Blood。采矿、伐木、草药学与钓鱼中任意三项达到100可得Master Gatherer（25声望），凿开纯净矿脉另有收藏印记。功业只有头衔与声望，永不赋予力量。",
-        "logging": "任意行业的第一次采集获得Fruits of the Field，伐木100上限铭刻Heartwood Hewer。四种采集行业中任意三项达到100可得Master Gatherer（25声望），劈出远古心材另有收藏印记。功业只有头衔与声望，永不赋予力量。",
-        "herbalism": "任意行业的第一次采集获得Fruits of the Field，草药学100上限铭刻Master of the Meadow。四种采集行业中任意三项达到100可得Master Gatherer（25声望），采下月光绽放另有收藏印记。功业只有头衔与声望，永不赋予力量。",
-        "fishing": "钓鱼100熟练铭刻Old Salt，200铭刻Master Angler及其头衔，那是垂钓技艺的顶点；钓鱼同样计入Master Gatherer（任意三项采集达到100）。在每个区域的水域钓起第一条鱼各有其页，钓起日辉锦鲤则记下Glimmer of Hope，所以包里常备鱼竿的旅人往往比预想中更快填满功业之书。"
+        "mining": "任意行业的第一次采集获得Fruits of the Field，采矿100上限铭刻Ore in the Blood。任意三项采集行业达到100可得Master Gatherer（25声望），凿开纯净矿脉另有收藏印记。功业只有头衔与声望，永不赋予力量。",
+        "logging": "任意行业的第一次采集获得Fruits of the Field，伐木100上限铭刻Heartwood Hewer。任意三项采集行业达到100可得Master Gatherer（25声望），劈出远古心材另有收藏印记。功业只有头衔与声望，永不赋予力量。",
+        "herbalism": "任意行业的第一次采集获得Fruits of the Field，草药学100上限铭刻Master of the Meadow。任意三项采集行业达到100可得Master Gatherer（25声望），采下月光绽放另有收藏印记。功业只有头衔与声望，永不赋予力量。",
+        "fishing": "钓鱼100熟练铭刻Old Salt，200铭刻Master Angler及其头衔，那是垂钓技艺的顶点；钓鱼同样计入Master Gatherer（任意三项采集达到100）。在每个区域的水域钓起第一条鱼各有其页，钓起日辉锦鲤则记下Glimmer of Hope，所以包里常备鱼竿的旅人往往比预想中更快填满功业之书。",
+        "farming": "耕作暂无专属功业：如今田畦与作物已经扎根，标记其他行业的里程碑与上限功业将随后续更新一并到来。它的熟练已经计入Master Gatherer（任意三项采集达到100），耕作者能像旁人一样填满那一页。功业只给头衔与名望，绝不给予力量。",
+        "farmingSown": "耕作如今在功业之书里有了自己的一栏。Sow It Begins标记你种下的第一株作物，四页编年记则标记你在每处田畦所在地的第一次成活收成，从Eastbrook Vale直到Evergarden。一次金色的丰收会记下自己的零声望收藏印记，而耕作的熟练同样计入Master Gatherer（任意三项采集行业达到100）。压卷之作已经写好：Harvestmaster，这门行业的100熟练头衔，将随后续更新的更深田野而触手可及。功业只有头衔与声望，永不赋予力量。"
       },
       "fish": {
         "startHeading": "入门",
@@ -5859,6 +5960,12 @@ export const zh_CN: EnTranslations = {
         "emptyHook": "无鱼上钩",
         "koiHeading": "日辉锦鲤",
         "koiBody": "全世界的每片水域都藏着同一份大奖：日辉锦鲤，一尾优秀品质的闪光锦鲤，卖给商人值75铜，对你的自豪感则远不止此。它的几率固定为每次起竿3%（Thornpeak的冷水中为4%），不随等级段变化，因此码头上的新手与Master Angler机会均等。钓起它会在功业之书记下Glimmer of Hope（零声望的收藏印记）。当那一刻来临，战斗日志会让你知道。"
+      },
+      "farm": {
+        "bedsHeading": "打理田畦",
+        "bedsBody": "流程很短。向田畦旁的农夫购买种子和堆肥：Eastbrook的Jessica备有谷地的两种，Fenbridge的农夫备有沼泽的两种，而Highwatch和Evergarden的种子没有任何柜台出售，它们只会从高阶收成中一两粒地返还，其余则在World Market上流转。行囊里带着锄头播种，愿意的话再压一压胜算：柜台的堆肥和播种时用农产品支付的农夫看护都会提高作物成活的几率，炼金术士的生长滋补剂让收成有机会更丰，而一旦你的熟练比作物所在阶高出整整一档，那种作物就再也不会失败。然后走开就好。你下线时田畦照样生长，成熟的作物你放多久它等多久，收成日志（Shift+K，或专业窗口的耕作一行）列出你种下的每一畦及其计时。\n\n失败的作物留下枯萎的谷壳而非农产品，任何农夫都会用谷壳换堆肥，于是坏年景买下了下一季的保险。收上来的东西供养厨房：农产品在厨房烹成菜肴，Cook Marlow的小麦和稻米工单按与其他任何工单相同的钟点，用铜币收走你的Vale Wheat和Marsh Rice。",
+        "tableHeading": "从田畦到餐桌",
+        "tableBody": "厨房是一季收成得到回报的地方。在日常农家菜之外，每一阶作物都有一道更丰盛的菜肴，吃了能获得饱足：吃完这一餐，一份持久的恩泽便留在你身上，正是队伍在地下城门前想先吃下的那份底气。压轴的是Harvest Feast，厨师直接摆进世界里的一桌盛宴：在场的每个人各取一份，每人一次，而每一顿吃完的餐食都给出同样的饱足恩泽，于是一位农夫的一季收成能让整支队伍坐上餐桌。这架梯子的顶端，两道最丰盛的菜肴与盛宴本身，将随后续更新的更深田野而触手可及；其下的一切如今都已开火烹煮。\n\n这张餐桌上也留着运气的位置。你收进的每一次收成都掷出与其他采集行业相同的横财几率，作物偶尔会结出金色的一茬：产量远超寻常，整个区域都会听到这项发现连着你的名字一同宣告，Golden Harvest也会记入你的功业之书。"
       },
       "econ": {
         "title": "制作经济",
@@ -5882,7 +5989,7 @@ export const zh_CN: EnTranslations = {
         "marketHeading": "世界市场与抽成",
         "marketBody": "世界市场是全服交易所，由Eastbrook的Merchant与Highwatch的Auctioneer Voss主持。挂单免费，没有押金，流拍原样退回；只在成交时抽取5%。特殊物品同样欢迎：署名、杰作或附魔的副本会以单件挂单上架，提示中带着完整的身份与署名，且绝不与普通堆叠混同。唯一拒收的是已绑定的副本：被制作者之约锁定（或仍待绑定）的物品既不能上市也不能邮寄，绑定无法被洗白。特殊物品请自行定价；普通挂单只能告诉你普通版的行情。",
         "workOrdersHeading": "工作订单",
-        "workOrdersNote": "每位大师都会以商店价的{pct}%收购一批本行常用材料，每{minutes}分钟可重复一次。",
+        "workOrdersNote": "每位大师都张贴工单，每种常用材料一张，按商店价的{pct}%收购工单要求的一批。每张工单各有{minutes}分钟的计时：交付后只有那张工单关闭，同一位大师的其他工单照常开放。",
         "colOrder": "工作订单",
         "colMaster": "大师",
         "colAsks": "需求",
@@ -8182,6 +8289,7 @@ export const zh_CN: EnTranslations = {
         "cooldownLockedHerb": "已枯竭的草药点，工具未解锁",
         "station": "制作站：{name}",
         "service": "服务：{name}",
+        "farmPatch": "菜畦",
         "partyMember": "队伍成员：{name}",
         "deadPartyMember": "已死亡的队伍成员：{name}",
         "partyMemberGeneric": "队伍成员",
@@ -8865,6 +8973,7 @@ export const zh_CN: EnTranslations = {
     },
     "cast": {
       "fishing": "钓鱼",
+      "farming": "播种",
       "gathering": "采集",
       "crafting": "制作",
       "disenchanting": "分解",
@@ -9050,6 +9159,11 @@ export const zh_CN: EnTranslations = {
       "flaskThroughDeath": "该效果在死亡后依然保留，但在登出后消失；副本比赛开始和结束时都会一切归零。",
       "wellFed": "精神饱满：吃完后使你的{stat}提高 {value} 点，持续 {minutes} 分钟。同时只能有一种精神饱满效果：更新的一餐会顶替它。",
       "wellFedAura": "精神饱满：吃完后获得{aura}效果，持续 {minutes} 分钟。同时只能有一种精神饱满效果：更新的一餐会顶替它。",
+      "useWellfed": "吃完后获得{aura}效果，使你的{stat}提高 {value} 点，持续 {minutes} 分钟。",
+      "useWellfedAura": "吃完后获得{aura}效果，持续 {minutes} 分钟。",
+      "useFeast": "使用：摆出一桌他人也能享用的盛宴，每人限享一份（{servings} 份，持续 {minutes} 分钟）。",
+      "useFeastBuff": "每份：吃完 {seconds} 秒的一餐后获得{aura}效果，使你的{stat}提高 {value} 点，持续 {minutes} 分钟。",
+      "useFeastBuffAura": "每份：吃完 {seconds} 秒的一餐后获得{aura}效果，持续 {minutes} 分钟。",
       "questItem": "任务物品",
       "questRelated": "任务：{quest}",
       "questRules": "无法出售、存入银行或交易。",
@@ -9072,6 +9186,7 @@ export const zh_CN: EnTranslations = {
       "useManaPotion": "使用：立即恢复 {amount} 点法力值。战斗中可用。1 分钟冷却。",
       "clickUseInstant": "点击在战斗中立即使用",
       "clickUse": "点击使用",
+      "clickSetOut": "点击摆放",
       "clickBuyback": "点击回购",
       "bagSlots": "{slots} 格背包"
     },
@@ -12737,6 +12852,138 @@ export const zh_CN: EnTranslations = {
       "pattern_laden_hearth": {
         "name": "配方：丰盛炉灶"
       },
+      "vale_wheat_seed": {
+        "name": "谷地小麦种子"
+      },
+      "vale_wheat": {
+        "name": "谷地小麦"
+      },
+      "fine_vale_wheat": {
+        "name": "优质谷地小麦"
+      },
+      "withered_husks": {
+        "name": "枯萎的谷壳"
+      },
+      "compost": {
+        "name": "堆肥"
+      },
+      "growth_tonic": {
+        "name": "生长滋补剂"
+      },
+      "brook_carrot_seed": {
+        "name": "溪畔胡萝卜种子"
+      },
+      "brook_carrot": {
+        "name": "溪畔胡萝卜"
+      },
+      "fine_brook_carrot": {
+        "name": "优质溪畔胡萝卜"
+      },
+      "marsh_rice_seed": {
+        "name": "沼泽稻米种子"
+      },
+      "marsh_rice": {
+        "name": "沼泽稻米"
+      },
+      "fine_marsh_rice": {
+        "name": "优质沼泽稻米"
+      },
+      "bog_beet_seed": {
+        "name": "沼泽甜菜种子"
+      },
+      "bog_beet": {
+        "name": "沼泽甜菜"
+      },
+      "fine_bog_beet": {
+        "name": "优质沼泽甜菜"
+      },
+      "highland_barley_seed": {
+        "name": "高地大麦种子"
+      },
+      "highland_barley": {
+        "name": "高地大麦"
+      },
+      "fine_highland_barley": {
+        "name": "优质高地大麦"
+      },
+      "frost_gourd_seed": {
+        "name": "霜瓜种子"
+      },
+      "frost_gourd": {
+        "name": "霜瓜"
+      },
+      "fine_frost_gourd": {
+        "name": "优质霜瓜"
+      },
+      "gilded_sunmelon_seed": {
+        "name": "鎏金太阳瓜种子"
+      },
+      "gilded_sunmelon": {
+        "name": "鎏金太阳瓜"
+      },
+      "fine_gilded_sunmelon": {
+        "name": "优质鎏金太阳瓜"
+      },
+      "evergarden_greens_seed": {
+        "name": "常青园青菜种子"
+      },
+      "evergarden_greens": {
+        "name": "常青园青菜"
+      },
+      "fine_evergarden_greens": {
+        "name": "优质常青园青菜"
+      },
+      "garden_hoe": {
+        "name": "菜园锄"
+      },
+      "bronze_hoe": {
+        "name": "青铜锄"
+      },
+      "skysilver_hoe": {
+        "name": "天银锄"
+      },
+      "osmium_hoe": {
+        "name": "锇金锄"
+      },
+      "vale_hearth_loaf": {
+        "name": "谷地炉烤面包"
+      },
+      "eastbrook_root_pottage": {
+        "name": "东溪根菜浓汤"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "芬桥稻米碗"
+      },
+      "fenbridge_beet_braise": {
+        "name": "芬桥焖甜菜"
+      },
+      "highwatch_barley_bannock": {
+        "name": "高望大麦烙饼"
+      },
+      "highwatch_gourd_soup": {
+        "name": "高望霜瓜汤"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "常青园太阳瓜挞"
+      },
+      "evergarden_harvest_platter": {
+        "name": "常青园丰收拼盘"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "东溪蜜汁胡萝卜"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "芬桥大米布丁"
+      },
+      "highwatch_barley_porridge": {
+        "name": "高望大麦粥"
+      },
+      "evergarden_braised_greens": {
+        "name": "常青园焖青菜"
+      },
+      "harvest_feast": {
+        "name": "丰收盛宴"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
@@ -14676,6 +14923,26 @@ export const zh_CN: EnTranslations = {
         "title": "药坊大师",
         "greeting": "量两次，倒一次，{className}。药坊里容不得洒掉的药剂。"
       },
+      "farmer_jessica": {
+        "name": "农妇杰西卡",
+        "title": "菜园管事",
+        "greeting": "祝你土好天晴，{playerName}。从我这里买粒种子，播到那边任意一块田畦里，然后该忙什么忙什么去。你不在的时候它也一直在长，而且永远不会坏。收成日志（Shift+K，或专业窗口里的耕作一行）列出了每块已播种的田畦和它的计时。"
+      },
+      "farmer_teasel": {
+        "name": "农夫蒂泽尔",
+        "title": "沼地稻田农夫",
+        "greeting": "沼泽稻米和沼泽甜菜的种子，{className}，还有喂养它们的堆肥。稻田排水慢，脚下留神。"
+      },
+      "farmer_hollis": {
+        "name": "农夫霍利斯",
+        "title": "高望梯田农夫",
+        "greeting": "梯田只给山肯给的那么多，{className}。我卖堆肥，要是你的庄稼枯萎了，我可以把谷壳重新沤成好土给你。"
+      },
+      "farmer_verbena": {
+        "name": "农妇维贝娜",
+        "title": "花坛园丁",
+        "greeting": "当心镶边，{playerName}，这些田畦可是花坛的骄傲。我卖的是堆肥，你带来的枯萎谷壳，我都能给你变成更多堆肥。"
+      },
       "tidewatcher_ondrel": {
         "name": "翁德雷尔·凡恩",
         "title": "守潮者",
@@ -14690,6 +14957,19 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "已开采矿脉"
+          }
+        }
+      },
+      "q_farm_intro": {
+        "title": "第一道犁沟",
+        "text": "拿着这把锄头和一小撮谷地小麦种子，{playerName}。把种子播到我旁边任意一块田畦里，然后去忙你的事。想什么时候回来收庄稼都行；我会在这儿。",
+        "completion": "瞧，你亲手种出的第一茬庄稼。你不在的时候它也一直在长，而且永远不会坏。收成日志（Shift+K，或专业窗口里的耕作一行）列出了每块已播种的田畦和它的计时。田畦召唤你的时候，随时回来买种子，{playerName}。",
+        "objectives": {
+          "0": {
+            "label": "已种下谷地小麦"
+          },
+          "1": {
+            "label": "已收获谷地小麦"
           }
         }
       },
@@ -15586,6 +15866,26 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "已交付野味肉"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_wheat": {
+        "title": "厨房小麦工单",
+        "text": "面包不会自己烤出来，{playerName}，我的面粉柜都快见底了。给我送来八捆谷地小麦，我按实价付你整批的钱。是你亲手种的还是从市场买的，我不在乎，磨得出粉就行。",
+        "completion": "好干爽的粮食，还不少。这是你的酬劳，一枚不差。下一茬收上来的时候，你知道该敲哪扇门。",
+        "objectives": {
+          "0": {
+            "label": "已交付谷地小麦"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_rice": {
+        "title": "厨房稻米工单",
+        "text": "沼泽人对自家的米赞不绝口，{playerName}，我倒要弄明白是为什么。给我弄来五升沼泽稻米，钱就在这儿等着你。路上留神别弄湿了：湿米就是粥，我可没点过粥。",
+        "completion": "粒粒饱满干爽。这是你的钱。只要沼泽还长米，我就一直收。",
+        "objectives": {
+          "0": {
+            "label": "已交付沼泽稻米"
           }
         }
       },
@@ -17550,6 +17850,7 @@ export const zh_CN: EnTranslations = {
     "delveRiteShrineReedInteract": "芦苇神龛：按 F 触碰",
     "delveRiteShrineSkullInteract": "骷髅神龛：按 F 触碰",
     "mailboxName": "邮箱",
-    "noticeboardName": "告示板"
+    "noticeboardName": "告示板",
+    "farmPatchName": "菜畦"
   }
 };

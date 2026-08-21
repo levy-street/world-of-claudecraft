@@ -1,7 +1,9 @@
 // Purpose hints: the hint table is keyed on exactly the eight arcane/resonant
-// enchanting ids plus the nine fine gathered grades and nothing else, every row
-// resolves to real English, and the rendered line is the muted description
-// style the tooltip's other def-driven use lines share.
+// enchanting ids, the nine fine gathered grades, and the crafted farm supply
+// (growth_tonic, the Phase 6 re-pin: a recipe output must state its purpose,
+// and the tonic's junk kind carries no def-level use to say it) and nothing
+// else, every row resolves to real English, and the rendered line is the muted
+// description style the tooltip's other def-driven use lines share.
 import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { ITEMS } from '../src/sim/data';
@@ -48,10 +50,19 @@ const MASTERWROUGHT_IDS = [
   'lucent_reagent',
   'sablewax_vellum',
 ];
-const EXPECTED_IDS = [...ENCHANTING_IDS, ...FINE_IDS, ...MASTERWROUGHT_IDS].sort();
+// The crafted farm supply joined in Phase 6 when the alchemy recipe made it a
+// recipe output (crafted_item_tooltip_coverage demands purpose text and its
+// junk kind has no def-level use line to provide it).
+const FARM_SUPPLY_HINT_IDS = ['growth_tonic'];
+const EXPECTED_IDS = [
+  ...ENCHANTING_IDS,
+  ...FINE_IDS,
+  ...MASTERWROUGHT_IDS,
+  ...FARM_SUPPLY_HINT_IDS,
+].sort();
 
 describe('material_hint_view', () => {
-  it('covers exactly the enchanting materials, fine grades, and masterwrought intermediates, no more and no less', () => {
+  it('covers exactly the enchanting materials, fine grades, masterwrought intermediates, and farm supplies, no more and no less', () => {
     expect(Object.keys(MATERIAL_HINT_KEYS).slice().sort()).toEqual(EXPECTED_IDS);
     expect(FINE_IDS).toHaveLength(9);
     expect(MASTERWROUGHT_IDS).toHaveLength(10);

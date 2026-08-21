@@ -20,6 +20,7 @@ import {
 import { ITEMS } from '../sim/data';
 import { requiredAmendsProgress } from '../sim/professions/archetype';
 import {
+  promptSlotRefused,
   resolveRechargeToolEffect,
   resolveSlotToolEffect,
   type ToolEffectSlot,
@@ -288,6 +289,13 @@ export interface ProfessionsViewInput {
    *  the confirm mode renders its button exactly when the server would
    *  accept it (the no_gain mode conjunct). Omitted reads as none. */
   slotModePrompt?: readonly string[];
+  /** How many garden beds the viewer has planted (IWorld `myFarmPlots`
+   *  length). Read by the SIMPLIFIED body only: a farmer whose first crop is
+   *  still in the ground has farming skill 0, and the Farming row (the
+   *  Harvest Journal's in-window entry) must still reach them, so the row
+   *  joins simplifiedGathering while any bed is planted (state.md deviation
+   *  (be)). REQUIRED for the same compile-time-proof reason as `toolEffects`. */
+  farmPlotCount: number;
 }
 
 export interface ProfessionsCraftRow {
@@ -341,6 +349,13 @@ export interface ProfessionsGatheringRow {
    *  Empty for a charm-less or tool-less row; re-slotting an already-slotted
    *  effect stays offered (it consumes another charm and resets to full). */
   slottable: readonly string[];
+  /** Whether the R40 "Ask each use" toggle may render for this row: false
+   *  where the mint authority refuses the prompt pairing outright
+   *  (promptSlotRefused: farming has no harvest confirm channel), so the
+   *  window never offers a mode whose every resulting mint would be
+   *  refused, which used to erase the row's whole slot affordance on the
+   *  very click that checked the box. */
+  promptable: boolean;
 }
 
 export interface SwitchCostModel {
@@ -383,6 +398,17 @@ export interface ProfessionsViewModel {
   crafts: ProfessionsCraftRow[];
   /** Injected order preserved. */
   gathering: ProfessionsGatheringRow[];
+  /** The gathering rows the SIMPLIFIED body paints beneath its call to action
+   *  (EMPTY in full mode, which paints `gathering` whole): only rows the
+   *  player has actually worked (skill above 0), plus the farming row while
+   *  a crop is in the ground. Deviation (be): the Harvest Journal's in-window
+   *  entry rides the Farming row, and before this arm a pre-attunement
+   *  farmer had no in-window entry at all (simplified mode painted no
+   *  gathering section). Skill-0 rows stay hidden, so a fresh character's
+   *  simplified window keeps its one call to action, and the tutorial's
+   *  "craft or gather with any profession" invitation is honoured the moment
+   *  a player has gathered. Injected order preserved. */
+  simplifiedGathering: ProfessionsGatheringRow[];
   ring: RingLayout;
   switchCost: SwitchCostModel;
   /** Non-null iff mode is 'simplified'. */
@@ -526,6 +552,7 @@ export function buildProfessionsView(input: ProfessionsViewInput): ProfessionsVi
       // with its inputs threaded whole is what makes the contract real: the
       // button set cannot drift from what the server accepts, and a re-slot
       // the resolver would refuse as no-gain never renders a button at all.
+      promptable: !promptSlotRefused(row.professionId),
       slottable: heldEffectIds.filter(
         (effectId) =>
           resolveSlotToolEffect(
@@ -548,11 +575,18 @@ export function buildProfessionsView(input: ProfessionsViewInput): ProfessionsVi
     identity.state === 'syncing' || (identity.state !== 'attuned' && !anyTier)
       ? 'simplified'
       : 'full';
+  const simplifiedGathering =
+    mode === 'simplified'
+      ? gathering.filter(
+          (row) => row.bar.skill > 0 || (row.professionId === 'farming' && input.farmPlotCount > 0),
+        )
+      : [];
   return {
     mode,
     identity,
     crafts,
     gathering,
+    simplifiedGathering,
     ring: buildRingLayout(identity.summary.majors, identity.summary.hobbyCraft),
     switchCost: {
       returnCount: identity.summary.returnCount,
@@ -632,6 +666,10 @@ export function professionsRefreshSig(
     // which buttons exist and must repaint. Sorted: set order is not a
     // repaint dimension.
     [...(input.slotModePrompt ?? [])].sort(),
+    // Whether ANY bed is planted, not the count: the simplified body's
+    // farming-row arm keys on presence alone, so a second plant must not
+    // rebuild a window that would paint the same thing.
+    input.farmPlotCount > 0,
     [...local],
   ]);
 }

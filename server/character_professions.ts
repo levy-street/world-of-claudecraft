@@ -314,9 +314,10 @@ export function restoreSlotBodyError(body: {
   }
   // The static pair-validity policy (fishing takes no effect; respawnSpeed
   // effects are parked on every profession) is a pure content predicate, so
-  // it belongs HERE, ahead of the audit write: without it, 6 of the 12 pairs
-  // the admin modal offers were refusable only by the sim action, and each
-  // attempt left a moderation audit row for a grant that was never possible.
+  // it belongs HERE, ahead of the audit write: without it, every pair the
+  // predicate refuses (fishing entirely, plus each respawnSpeed-kind row)
+  // was refusable only by the sim action, and each attempt left a
+  // moderation audit row for a grant that was never possible.
   if (slotToolEffectRefused(body.professionId, body.effectId)) {
     return 'that effect cannot be slotted on that profession';
   }

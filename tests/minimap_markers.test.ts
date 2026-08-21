@@ -10,11 +10,14 @@
 // canvas no-magic-values guard is in tests/minimap_painter.test.ts.
 
 import { describe, expect, it } from 'vitest';
+import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import { DELVE_X_MIN, GATHER_NODES, ITEMS, QUESTS, STATIONS, YUMI_MAZE_X } from '../src/sim/data';
 import { isQuestTurnInNpc } from '../src/sim/types';
 import { STABLE_MAP_NAVIGATION_LANDMARKS } from '../src/ui/map_navigation_landmarks_core';
 import {
   createMinimapMarkers,
+  FARM_PATCH_MARKER_SIZE,
+  FARM_PATCH_MARKER_SIZE_COMPACT,
   MINIMAP_CLIP_INSET,
   type MinimapMarker,
   minimapMode,
@@ -140,6 +143,7 @@ function makeWorld(shape: 'sim' | 'client'): IWorld {
     cfg: { seed: 42, playerClass: 'warrior' },
     playerId: 1,
     stationPlacements: STATIONS,
+    farmPatches: [],
     questState: (q: string) => (q === GIVER_QUEST.id ? 'available' : 'unavailable'),
     // The gather-node reads. This scenario is not about gathering, but the core
     // consults both members for any node inside the rim, and whether one IS
@@ -870,6 +874,7 @@ describe('station markers (Professions 2.0)', () => {
       cfg: { seed: 42, playerClass: 'warrior' },
       playerId: 1,
       stationPlacements: STATIONS,
+      farmPatches: [],
       questState: () => 'unavailable',
       nodeHarvestableByMe: () => true,
       // Paired with nodeHarvestableByMe above: both gather-node reads, both
@@ -956,6 +961,104 @@ describe('station markers (Professions 2.0)', () => {
     expect(lastStation).toBeGreaterThanOrEqual(0);
     expect(lastStation).toBeLessThan(markers.length - 1);
   });
+
+  // Farm patches ride the same static-content doctrine as the stations above:
+  // one pin per site, no per-viewer state, identical on both hosts.
+  function farmMarkers(world: IWorld): MinimapMarker[] {
+    return buildMarkers(world).filter((m) => m.kind === 'farm-patch');
+  }
+
+  // The Eastbrook allotments (18.5, 32.5) sit inside the rim from (0, 10);
+  // the tier-2 Mirefen site (z 341) is far beyond it.
+  const NEAR_PATCH = FARM_PATCHES.find((patch) => patch.id === 'patch_eastbrook');
+  const FAR_PATCH = FARM_PATCHES.find((patch) => patch.id === 'patch_mirefen');
+
+  it('projects one marker per in-range patch anchor at the exact canvas px (both shapes)', () => {
+    expect(NEAR_PATCH).toBeDefined();
+    if (!NEAR_PATCH) return;
+    for (const shape of ['sim', 'client'] as const) {
+      const markers = farmMarkers(makeStationWorld(shape, { farmPatches: FARM_PATCHES }));
+      expect(markers, shape).toEqual([
+        {
+          kind: 'farm-patch',
+          patchId: 'patch_eastbrook',
+          mx: S / 2 - (NEAR_PATCH.x - VIEW_POS.x) * PPY,
+          my: S / 2 - (NEAR_PATCH.z - VIEW_POS.z) * PPY,
+        },
+      ]);
+    }
+  });
+
+  it('culls a patch beyond the rim and a zone with no patch at all', () => {
+    expect(FAR_PATCH).toBeDefined();
+    if (!FAR_PATCH) return;
+    expect(farmMarkers(makeStationWorld('sim', { farmPatches: [FAR_PATCH] }))).toEqual([]);
+    expect(farmMarkers(makeStationWorld('sim', { farmPatches: [] }))).toEqual([]);
+  });
+
+  it('sizes the pin from its own painted footprint, not a marker-art row', () => {
+    // Literals, not a re-read of the constant production uses: the pin has no
+    // MapMarkerArtId, so these two numbers are the whole size contract.
+    expect(FARM_PATCH_MARKER_SIZE).toBe(16);
+    expect(FARM_PATCH_MARKER_SIZE_COMPACT).toBe(22);
+  });
+
+  it('drops a patch whose painted footprint would cross the minimap rim', () => {
+    expect(NEAR_PATCH).toBeDefined();
+    if (!NEAR_PATCH) return;
+    // Straddle the exact safe-centre radius for a standard-profile pin. The
+    // margin is deliberately far smaller than the gap to any neighbouring
+    // marker size, so drawing this cull from the wrong footprint flips an arm.
+    const clearance = minimapPaintedMarkerClearance(FARM_PATCH_MARKER_SIZE);
+    const safeYards = minimapSafeCenterRadius(S, clearance) / PPY;
+    const at = (yards: number) => ({ ...NEAR_PATCH, x: VIEW_POS.x, z: VIEW_POS.z + yards });
+    expect(
+      farmMarkers(makeStationWorld('sim', { farmPatches: [at(safeYards - 0.01)] })),
+    ).toHaveLength(1);
+    expect(farmMarkers(makeStationWorld('sim', { farmPatches: [at(safeYards + 0.01)] }))).toEqual(
+      [],
+    );
+  });
+
+  it('gives the compact touch profile its own larger clearance', () => {
+    expect(NEAR_PATCH).toBeDefined();
+    if (!NEAR_PATCH) return;
+    const compactClearance = minimapPaintedMarkerClearance(FARM_PATCH_MARKER_SIZE_COMPACT);
+    const compactSafeYards = minimapSafeCenterRadius(S, compactClearance) / PPY;
+    // A patch just outside the COMPACT safe radius but inside the standard one:
+    // the standard profile keeps it, the compact profile culls it.
+    const patch = { ...NEAR_PATCH, x: VIEW_POS.x, z: VIEW_POS.z + compactSafeYards + 0.01 };
+    const world = makeStationWorld('sim', { farmPatches: [patch] });
+    expect(farmMarkers(world)).toHaveLength(1);
+    const compact = createMinimapMarkers()
+      .build(world, S, PPY, 'compact')
+      .markers.filter((m) => m.kind === 'farm-patch');
+    expect(compact).toEqual([]);
+  });
+
+  it('is viewer-invariant: quest, social, and profession state never change the set', () => {
+    const base = farmMarkers(makeStationWorld('sim', { farmPatches: FARM_PATCHES }));
+    expect(base).toHaveLength(1);
+    const busy = makeStationWorld('client', {
+      farmPatches: FARM_PATCHES,
+      questState: () => 'available',
+      nodeHarvestableByMe: () => false,
+      socialInfo: {
+        friends: [{ id: 20, name: 'Friend', online: true }],
+        blocks: [],
+        guild: { id: 1, name: 'G', rank: 'member', members: [] },
+      },
+    });
+    expect(farmMarkers(busy)).toEqual(base);
+  });
+
+  it('draws patches before the player arrow (draw order: the arrow stays on top)', () => {
+    const markers = buildMarkers(makeStationWorld('sim', { farmPatches: FARM_PATCHES }));
+    expect(markers[markers.length - 1].kind).toBe('player');
+    const lastPatch = markers.map((m) => m.kind).lastIndexOf('farm-patch');
+    expect(lastPatch).toBeGreaterThanOrEqual(0);
+    expect(lastPatch).toBeLessThan(markers.length - 1);
+  });
 });
 
 describe('minimap corpse marker (ghost run)', () => {
@@ -1026,6 +1129,7 @@ describe('gather-node markers: the locked dimension', () => {
       cfg: { seed: 42, playerClass: 'warrior' },
       playerId: 1,
       stationPlacements: STATIONS,
+      farmPatches: [],
       inventory: opts.inventory ?? [],
       gatheringProficiency: opts.gatheringProficiency ?? {},
       nodeHarvestableByMe: opts.harvestable ?? (() => true),
@@ -1170,6 +1274,7 @@ describe('gather-node markers scale with the rim, not the node table (phase 16)'
       cfg: { seed: 42, playerClass: 'warrior' },
       playerId: 1,
       stationPlacements: [],
+      farmPatches: [],
       inventory: [],
       gatheringProficiency: {},
       nodeHarvestableByMe: () => true,

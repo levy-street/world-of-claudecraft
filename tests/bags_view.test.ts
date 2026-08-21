@@ -83,6 +83,16 @@ const ITEMS: Record<string, ItemDef> = {
     // the next author copies into a place that DOES resolve it.
     teachesRecipeId: 'recipe_eastbrook_arming_sword',
   } as ItemDef,
+  // The placeable shared feast (Farming Phase 12): the feast FIELD is the
+  // classifier, mirrored by the plain-junk twin below that must stay on the
+  // use ladder.
+  feastItem: {
+    kind: 'junk',
+    name: 'Harvest Feast',
+    quality: 'rare',
+    feast: { charges: 10, durationTicks: 3600, dishItemId: 'evergarden_braised_greens' },
+  } as ItemDef,
+  plainJunk: { kind: 'junk', name: 'Cracked Fang', quality: 'common' } as ItemDef,
 };
 const lookup: ItemLookup = (id) => ITEMS[id];
 
@@ -213,6 +223,46 @@ describe('bagItemAction priority order', () => {
     expect(staged).toEqual(
       MODES.map((mode) => bagItemAction(ITEMS.sword, { ...NO_MODE, [mode]: true })),
     );
+  });
+});
+
+describe('the placeable feast classification (Farming Phase 12)', () => {
+  it('classifies a def carrying the feast field as placeFeast, never plain use', () => {
+    expect(bagItemAction(ITEMS.feastItem, NO_MODE)).toBe('placeFeast');
+  });
+
+  it('the hover previews the click the feast arm raises, in the feast`s own words', () => {
+    // The frontend-seam review's ask plus the P12 QA copy deferral: the feast
+    // needs a hint sub-line (hover-previews-click doctrine), and the click
+    // SETS OUT the table (placeFeast), it never eats it, so the hint is the
+    // dedicated set-out key, never the generic use line.
+    expect(bagTooltipHintKey(ITEMS.feastItem, NO_MODE)).toBe('itemUi.tooltip.clickSetOut');
+    // The real shipped def rides the same key (the fixture cannot detach).
+    expect(bagTooltipHintKey(CATALOG_ITEMS.harvest_feast, NO_MODE)).toBe(
+      'itemUi.tooltip.clickSetOut',
+    );
+  });
+
+  it('keeps a plain junk def (no feast field) on the use ladder', () => {
+    // The twin that keeps the arm honest: without it, classifying EVERY junk
+    // item as placeFeast would pass the positive arm above.
+    expect(bagItemAction(ITEMS.plainJunk, NO_MODE)).toBe('use');
+  });
+
+  it('every window mode still outranks the feast arm (a vendor click sells it)', () => {
+    expect(bagItemAction(ITEMS.feastItem, { ...NO_MODE, tradeOpen: true })).toBe('trade');
+    expect(bagItemAction(ITEMS.feastItem, { ...NO_MODE, marketSell: true })).toBe('marketSell');
+    expect(bagItemAction(ITEMS.feastItem, { ...NO_MODE, vendorOpen: true })).toBe('vendorSell');
+    expect(bagItemAction(ITEMS.feastItem, { ...NO_MODE, bankDeposit: true })).toBe('bankDeposit');
+    expect(bagItemAction(ITEMS.feastItem, { ...NO_MODE, petFeed: true })).toBe('petFeedBlocked');
+  });
+
+  it('the REAL shipped harvest_feast def classifies as placeFeast (the wiring is live)', () => {
+    // Off the real catalog, so the classification cannot silently detach from
+    // the item the sim actually places (a renamed field would red here while
+    // every fixture arm above stayed green).
+    expect(CATALOG_ITEMS.harvest_feast).toBeDefined();
+    expect(bagItemAction(CATALOG_ITEMS.harvest_feast, NO_MODE)).toBe('placeFeast');
   });
 });
 

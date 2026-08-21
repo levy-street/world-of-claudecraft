@@ -9320,6 +9320,311 @@
     font-size: 11px;
     color: var(--color-text-muted);
   }
+  /* ---------- harvest journal ---------- */
+  /* The Harvest Journal: a cold, read-only list of the caller's own planted
+     garden beds over IWorldFarming. One row per plot (crop name, bed location,
+     state, plant-time care), with a 1 Hz countdown that rewrites only the
+     .hj-time text. IDENTICAL ON EVERY GRAPHICS PRESET AND FPS TIER: a crop
+     timer is actionable information, so nothing here is preset- or tier-gated.
+     The rows ride the showcase inset-card idiom the professions sections use;
+     the two state hues are the shared success/error text tokens and never the
+     only signal (each state also says its word). */
+  #harvest-journal-window {
+    width: 520px;
+    max-height: calc(var(--app-vh, 100vh) * 0.8 / var(--window-scale) - 24px);
+    flex-direction: column;
+  }
+  #harvest-journal-window .panel-title {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #harvest-journal-window .panel-title > span {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .hj-body {
+    flex: 1 1 auto;
+    min-height: 120px;
+    overflow-y: auto;
+    padding-right: 2px;
+  }
+  .hj-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* Two columns: what and where on the left, when and how tended on the
+     right. Both columns wrap rather than truncate, so a long localized crop
+     or zone name stays readable. */
+  .hj-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, auto);
+    gap: 2px 12px;
+    padding: 8px 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    background: rgba(0, 0, 0, 0.24);
+  }
+  .hj-crop {
+    grid-column: 1;
+    min-width: 0;
+    font-weight: 600;
+    color: var(--color-text-light);
+  }
+  .hj-bed {
+    grid-column: 1;
+    min-width: 0;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .hj-state {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 8px;
+    min-width: 0;
+  }
+  .hj-time {
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-light);
+  }
+  .hj-ready .hj-time {
+    color: var(--color-text-success);
+  }
+  .hj-withered .hj-time {
+    color: var(--color-text-error);
+  }
+  .hj-stage {
+    font-size: 11px;
+    font-variant: small-caps;
+    letter-spacing: 0.04em;
+    color: var(--gold-dim);
+  }
+  .hj-care {
+    grid-column: 2;
+    grid-row: 2;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 4px;
+  }
+  .hj-care-chip {
+    padding: 1px 6px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 999px;
+    background: var(--color-bg-input);
+    font-size: 10px;
+    color: var(--color-text-muted);
+  }
+  .hj-care-none {
+    font-size: 10px;
+    color: var(--color-text-muted);
+  }
+  .hj-empty {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 18px 14px;
+    text-align: center;
+  }
+  .hj-empty h3 {
+    margin: 0;
+    font-family: var(--title-font);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    font-variant: small-caps;
+    color: var(--gold);
+  }
+  .hj-empty p {
+    margin: 0;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  /* The journal's repaint wrapper: the whole title + body re-renders inside
+     it while the status line beside it persists (a live region must never be
+     destroyed and re-inserted). display: contents keeps the title and body
+     laying out as the root's own flex children, exactly as before. */
+  .hj-content {
+    display: contents;
+  }
+  /* The in-dialog ready announcement (role=status, the a11y batch): a
+     visible status line that doubles as the polite live region, appended
+     once per open and never removed while the window lives (the #chatlog
+     persistent-region exemplar). Collapses while empty so the quiet journal
+     pays no layout for it; each announcement lands as a fresh child span so
+     a repeat of the same text still mutates the region. */
+  .hj-live-status {
+    margin: 6px 14px 10px;
+    font-size: 11px;
+    color: var(--gold);
+  }
+  .hj-live-status:empty {
+    display: none;
+  }
+
+  /* ---------- plant sheet ---------- */
+  /* The plant sheet (#plant-sheet-window, the bed verbs): the window a press
+     on a free garden bed opens. Seed rows are single-select RADIOS in a
+     radiogroup (aria-checked carries the pick, the Phase 14 a11y batch) and
+     the three care knobs are aria-pressed toggles, all on the 40px touch
+     floor; hue is never the only signal (a short knob also says its reason).
+     Reuses the journal's inset-card idiom and the shared window chrome. */
+  #plant-sheet-window {
+    width: 440px;
+    max-height: calc(var(--app-vh, 100vh) * 0.8 / var(--window-scale) - 24px);
+    flex-direction: column;
+  }
+  #plant-sheet-window .panel-title {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #plant-sheet-window .panel-title > span {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .ps-body {
+    flex: 1 1 auto;
+    min-height: 100px;
+    overflow-y: auto;
+    padding-right: 2px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .ps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ps-seed {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 40px;
+    padding: 8px 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    /* The input-surface token its sibling .ps-knob already rides (Phase 14
+       style batch): the raw 24%-black scrim read a shade apart from the knobs
+       in the same sheet and drifted from the tokens the theme presets drive. */
+    background: var(--color-bg-input);
+    color: var(--color-text-light);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  /* The seed rows are radios since the Phase 14 a11y batch (single-select),
+     so the picked state rides aria-checked, never aria-pressed. */
+  .ps-seed[aria-checked="true"] {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+  .ps-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-weight: 600;
+  }
+  .ps-count {
+    font-variant-numeric: tabular-nums;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .ps-locked {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 2px 8px;
+    padding: 8px 10px;
+    border: 1px dashed var(--color-border-showcase);
+    border-radius: 7px;
+    color: var(--color-text-muted);
+  }
+  .ps-locked .ps-name {
+    flex: none;
+  }
+  .ps-reason {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .ps-knobs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .ps-knob {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 6px 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 7px;
+    background: var(--color-bg-input);
+    color: var(--color-text-muted);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .ps-knob[aria-pressed="true"] {
+    border-color: var(--gold);
+    color: var(--color-text-light);
+  }
+  .ps-knob:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+  .ps-knob-name {
+    font-weight: 600;
+    font-size: 12px;
+  }
+  .ps-knob-leg {
+    font-size: 10px;
+    color: var(--color-text-muted);
+  }
+  .ps-leg-count {
+    font-variant-numeric: tabular-nums;
+    padding-left: 3px;
+  }
+  .ps-knob-short {
+    font-size: 10px;
+    color: var(--color-text-error);
+  }
+  .ps-plant {
+    align-self: flex-end;
+    min-height: 40px;
+    padding: 8px 18px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 7px;
+    background: var(--color-bg-input);
+    color: var(--gold);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .ps-empty {
+    margin: 0;
+    padding: 14px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+
   /* ---------- AAA window-frame adoption: master-detail windows (batch 2) ---------- */
   /* The quest log, mailbox, social panel, and spellbook adopt the shared
      window-frame grammar (src/ui/window_frame.ts; spec 6.1 + 8). Each mounts the

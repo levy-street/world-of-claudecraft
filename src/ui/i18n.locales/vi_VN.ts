@@ -1142,7 +1142,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.bonus.gatherersCache': '+1 sản lượng mỗi lần thu hoạch trong khi còn nạp.',
   'hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm': 'Rút ngắn thời gian hồi sinh của điểm tài nguyên mà nó kích hoạt.',
   'hudChrome.professions.toolEffectTooltip.charges': 'Bắt đầu với {base} lượt nạp trên một công cụ phổ thông (+{bonus} mỗi bậc hiếm).',
-  'hudChrome.professions.toolEffectTooltip.howToSlot': 'Gắn vào công cụ khai khoáng, đốn gỗ, hoặc thảo dược từ cửa sổ Nghề Nghiệp. Bị tiêu hao khi gắn.',
+  'hudChrome.professions.toolEffectTooltip.howToSlot': 'Gắn vào công cụ khai khoáng, đốn gỗ, thảo dược, hoặc nông nghiệp từ cửa sổ Nghề Nghiệp. Bị tiêu hao khi gắn.',
   'hudChrome.professions.toolEffectTooltip.kind': 'Bùa Công Cụ',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'Không thể gắn vào cần câu.',
   'hudChrome.professions.toolEffectTooltip.openProfessions': 'Mở Nghề Nghiệp để gắn cái này vào một công cụ thu thập.',
@@ -1727,7 +1727,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Chợ Thế Giới là sàn giao dịch toàn vương quốc, do Thương Nhân ở Đông Khê và Đấu Giá Voss ở Highwatch quản lý. Đăng rao miễn phí: không có tiền đặt cọc, và một rao bán không ai mua sẽ đơn giản trở về tay bạn. Nhà cái chỉ lấy hoa hồng khi thứ gì đó thực sự được bán: 5 phần trăm giá bán, phần còn lại chờ bạn đến thu.\n\nMột giới hạn quan trọng: Chợ chỉ môi giới hàng hóa thông thường. Một bản có dấu thợ, kiệt tác, pháp khắc, hoặc đã ràng buộc không bao giờ được đưa vào rao bán, nên những món đặc biệt đổi tay trực tiếp qua cửa sổ giao dịch, vốn mang đầy đủ danh tính của vật phẩm, gồm cả dấu thợ. Tự định giá những thứ đó; Chợ chỉ cho bạn biết bản thông thường được mua bao nhiêu.',
   'guide.profPages.econ.workOrdersHeading': 'Đơn hàng',
   'guide.profPages.econ.workOrdersNote':
-    'Mỗi chủ bàn đăng một đơn hàng thường trực: mang đến một đống nguyên liệu chủ lực của nghề họ và nhận tiền ngay tại chỗ, cộng thêm ít kinh nghiệm nhiệm vụ. Mức trả cố tình là {pct}% so với những gì người bán NPC sẽ trả cho cùng đống nguyên liệu đó, làm tròn xuống, nên đơn hàng không bao giờ là cách có lời để bán nguyên liệu, chỉ là lý do để ghé qua bàn.\n\nMỗi đơn chạy theo đồng hồ riêng {minutes} phút mỗi nhân vật: nộp một cái và vị chủ bàn đó không có gì thêm cho bạn cho đến khi hết giờ. Hãy coi chúng là phần thưởng nhỏ cho nguyên liệu bạn đang thu hoạch dù sao, không phải là một công việc kinh doanh.',
+    'Mỗi chủ bàn đăng các đơn hàng thường trực, mỗi nguyên liệu chủ lực một đơn: mang đến đúng đống nguyên liệu mà đơn yêu cầu và nhận tiền ngay tại chỗ, cộng thêm ít kinh nghiệm nhiệm vụ. Mức trả cố tình là {pct}% so với những gì người bán NPC sẽ trả cho cùng đống nguyên liệu đó, làm tròn xuống, nên đơn hàng không bao giờ là cách có lời để bán nguyên liệu, chỉ là lý do để ghé qua bàn.\n\nMỗi đơn chạy theo đồng hồ riêng {minutes} phút mỗi nhân vật: nộp một cái và đơn đó đóng lại với bạn cho đến khi hết giờ, còn các đơn khác của chủ bàn vẫn mở. Hãy coi chúng là phần thưởng nhỏ cho nguyên liệu bạn đang thu hoạch dù sao, không phải là một công việc kinh doanh.',
   'guide.profPages.econ.colOrder': 'Đơn hàng',
   'guide.profPages.econ.colMaster': 'Bậc thầy',
   'guide.profPages.econ.colAsks': 'Yêu cầu cho',

@@ -43,7 +43,15 @@ function cloneState(state: CharacterState): CharacterState {
 
 function templateStates(): ReadonlyMap<PlayerClass, CharacterState> {
   if (cachedTemplates) return cachedTemplates;
-  const sim = new Sim({ seed: TEMPLATE_SEED, playerClass: 'warrior', noPlayer: true });
+  // Wall-clock injection is load-bearing for persistence (farm_persist.ts
+  // clock-base doctrine): template blobs reach Postgres, so they must be
+  // written on the epoch base, never the sim-clock default.
+  const sim = new Sim({
+    seed: TEMPLATE_SEED,
+    playerClass: 'warrior',
+    noPlayer: true,
+    lockoutNowMs: () => Date.now(),
+  });
   const templates = new Map<PlayerClass, CharacterState>();
   for (const cls of ALL_CLASSES) {
     const pid = sim.addPlayer(cls, `${cls}template`);

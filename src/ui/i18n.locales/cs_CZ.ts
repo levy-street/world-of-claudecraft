@@ -1190,7 +1190,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.charges':
     'Na běžném nástroji začíná s {base} nabitími (+{bonus} za každý stupeň vzácnosti).',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    'Vlož do hornického, dřevorubeckého nebo bylinkářského nástroje z okna Profese. Při vložení se spotřebuje.',
+    'Vlož do hornického, dřevorubeckého, bylinkářského nebo zemědělského nástroje z okna Profese. Při vložení se spotřebuje.',
   'hudChrome.professions.toolEffectTooltip.kind': 'Amulet nástroje',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'Nelze vložit do rybářských prutů.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':
@@ -1848,7 +1848,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Světový trh je celosférickí burza spravovaná Obchodníkem v Eastbrooku a Dražitelem Vossem v Highwatchi. Vystavení je zdarma: žádná záloha a nevyužité vystavení se ti jednoduše vrátí. Dům si bere podíl pouze tehdy, když se něco skutečně prodá: 5 procent z prodejní ceny a zbytek na tebe čeká k vybrání.\n\nJedno důležité omezení: Trh zprostředkovává pouze běžné zboží. Podepsaná, mistrovská, okouzlená nebo vázaná kopie nikdy nevstoupí do výpisu, takže zvláštní kusy přecházejí z ruky do ruky tváří v tvář v okně výměny, které nese plnou identitu předmětu, podpis i vše ostatní. Cenu si určuj sám; Trh ti jen ukáže, co platí za běžnou verzi.',
   'guide.profPages.econ.workOrdersHeading': 'Pracovní příkazy',
   'guide.profPages.econ.workOrdersNote':
-    'Každý správce stanice zveřejňuje stálý pracovní příkaz: přines hromadu základního materiálu pro dané řemeslo a dostaneš okamžitou platbu plus trochu zkušeností z úkolu. Odměna je záměrně {pct} % z toho, co by ti za stejný stack dal prodejce, zaokrouhleno dolů, takže pracovní příkaz nikdy není výhodný způsob prodeje materiálů, jen důvod, proč se k stanici zastavit.\n\nKaždý příkaz běží na vlastním časovači {minutes} minut na postavu: odevzdej jeden a ten mistr pro tebe nic dalšího nemá, dokud časovač neoběhne. Berte je jako malý bonus za materiály, které jsi stejně sbíral, ne jako podnikání.',
+    'Každý správce stanice zveřejňuje stálé pracovní příkazy, jeden na každý základní materiál: přines hromadu, o kterou příkaz žádá, a dostaneš okamžitou platbu plus trochu zkušeností z úkolu. Odměna je záměrně {pct} % z toho, co by ti za stejný stack dal prodejce, zaokrouhleno dolů, takže pracovní příkaz nikdy není výhodný způsob prodeje materiálů, jen důvod, proč se k stanici zastavit.\n\nKaždý příkaz běží na vlastním časovači {minutes} minut na postavu: odevzdej jeden a ten příkaz je pro tebe uzavřený, dokud časovač neoběhne, zatímco ostatní příkazy mistra zůstávají otevřené. Berte je jako malý bonus za materiály, které jsi stejně sbíral, ne jako podnikání.',
   'guide.profPages.econ.colOrder': 'Pracovní příkaz',
   'guide.profPages.econ.colMaster': 'Mistr',
   'guide.profPages.econ.colAsks': 'Požaduje za',

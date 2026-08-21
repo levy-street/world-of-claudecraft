@@ -128,6 +128,9 @@ export const en = {
       difficulty: 'Difficulty',
       name: 'Name',
       spec: 'Spec',
+      // Blank means every planted bed, which is what the farmgrow command
+      // itself does without an argument; the action description says so.
+      bed: 'Bed id (optional)',
     },
     difficulty: { normal: 'Normal', heroic: 'Heroic' },
     actions: {
@@ -187,6 +190,11 @@ export const en = {
         label: 'Grant gathering skill',
         description: 'Increase a gathering profession.',
       },
+      farmgrow: {
+        label: 'Ripen crops',
+        description:
+          'Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted.',
+      },
       teleport: { label: 'Teleport', description: 'Move to exact world coordinates.' },
       dungeon: {
         label: 'Enter dungeon',
@@ -221,6 +229,7 @@ export const en = {
     pristineVein: '{finder} struck a pristine vein!',
     ancientHeartwood: '{finder} felled an ancient heartwood!',
     moonlitBloom: '{finder} discovered a moonlit bloom!',
+    goldenHarvest: '{finder} reaped a golden harvest!',
   },
   apiError: apiErrorStrings,
   guide: guideStrings,

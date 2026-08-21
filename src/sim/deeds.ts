@@ -278,6 +278,24 @@ export const ZONE_FISH: Record<string, readonly string[]> = {
   evergarden: ['raw_mirror_trout', 'raw_river_perch', 'glimmerfin_koi'],
 };
 
+// Farming hub zones whose beds feed the chr_ first-harvest chronicle deeds:
+// harvesting a SURVIVING crop from a bed in a listed zone writes its
+// farm:<zone> mark (professions/farming.ts harvestCrop via the
+// onCropHarvestedForDeeds hook below). ANY crop counts on purpose: plantCrop
+// carries no bed-tier gate (probed live in the celebrations phase), so every
+// hub's chronicle is earnable today with vendor-stocked low-tier seeds even
+// while the tier 3/4 seed faucet stays open (state.md (bo), which gates only
+// the high-tier crops themselves, never these marks). Exported for the
+// new-zone checklist like ZONE_FISH above: a future farm patch zone earns its
+// chronicle only when a row lands here, and tests/deeds_content.test.ts pins
+// this list against the authored FARM_PATCHES zones from both directions.
+export const FARM_CHRONICLE_ZONES: readonly string[] = [
+  'eastbrook_vale',
+  'mirefen_marsh',
+  'thornpeak_heights',
+  'evergarden',
+];
+
 // The three Chronicler NPCs (interaction-only). Talking to one feeds an
 // 'npc:<templateId>' visited mark; Saul additionally drives the
 // consecutive-talk counter behind hid_saul_footnote.
@@ -2023,6 +2041,15 @@ export function onFishCaughtForDeeds(
   if ((ZONE_FISH[zoneId] ?? []).includes(itemId)) markVisited(ctx, meta, `fish:${zoneId}`);
 }
 
+/** A harvest collected a SURVIVING crop from a farm bed in `zoneId` (withered
+ *  plots pay husks, never a chronicle: the fish rule that weeds and boots do
+ *  not count). Writes the farm:<zone> mark the chr_ first-harvest chronicle
+ *  deeds read. Marks only, zero rng, draw-order neutral (the deed-credit
+ *  line in src/sim/professions/CLAUDE.md). */
+export function onCropHarvestedForDeeds(ctx: SimContext, meta: PlayerMeta, zoneId: string): void {
+  if (FARM_CHRONICLE_ZONES.includes(zoneId)) markVisited(ctx, meta, `farm:${zoneId}`);
+}
+
 /** A plain /roll (classic 1-100 bounds) landed exactly 100. */
 export function onChatRollForDeeds(
   ctx: SimContext,
@@ -2083,4 +2110,10 @@ export const VISITED_MARK_NAMESPACES = [
   // namespace registered it would serialize fine and be dropped on load,
   // exactly the gather_event bug above, and the mark could never refill.
   'masterwork',
+  // Farming celebration marks (the celebrations phase): farm:planted, the
+  // first-planting proof written at plant success, and the farm:<zone>
+  // first-harvest chronicle marks (onCropHarvestedForDeeds above), both
+  // written from professions/farming.ts. Registered so restoreDeedStats
+  // keeps them across saves (the gather_event lesson above).
+  'farm',
 ] as const;

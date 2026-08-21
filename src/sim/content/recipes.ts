@@ -2663,11 +2663,468 @@ export const APEX_CONSUMABLE_RECIPES: ProfessionRecipeRecord[] = [
   },
 ];
 
+// The crafted farming hoes, tiers 2 to 4 (the crop-ladder phase's tool half).
+//
+// A SEPARATE LIST FROM TOOL_RECIPES, deliberately, for the same reason
+// ROD_RECIPES above is: TOOL_RECIPES' whole invariant is that every member
+// consumes a FINE gathered GRADE (a MATERIAL_GRADES row) plus the tool one
+// rung down, and farming has no MATERIAL_GRADES rows at all: its fine twins
+// come from the harvest roll (professions/farming.ts resolveFarmHarvest),
+// never from a node grade. Folding these in would weaken that invariant into
+// a disjunction, so the hoe ladder states its own
+// (tests/professions_hoe_recipes.test.ts) and leaves TOOL_RECIPES alone.
+//
+// THE HOE LADDER'S OWN INVARIANT: every member consumes the fine TWIN of a
+// crop ONE TIER BELOW its result plus the hoe one rung down, at the
+// toolworks. The one-tier-below reagent is the closed-circuit resolution the
+// tier-4 pick recorded above: the step-12 hoe gate reads
+// canGatherTier(hoe tier, crop.tier), so a tier-N crop's fine twin cannot be
+// grown without the tier-N hoe already owned; consuming the MATCHING-tier
+// twin would be a circuit with no entry. One tier down, the twin's crop
+// grows under exactly the hoe the recipe already consumes (rung 2 takes
+// fine_vale_wheat, tier 1, grown under the vendor-PRICED garden_hoe,
+// stocked on the tier-1 farmer NPC since the go-live).
+//
+// ACQUISITION COVERAGE, where this ladder diverges from the rods and why:
+// the rod ladder leaves rungs 2 and 3 vendor-priced and crafts only 4 and 5,
+// but the hoe pricing table locks buyValue OFF rungs 2 to 4, so the vendor
+// arm cannot be mirrored; HOE_RECIPES covers rungs 2, 3, AND 4 instead,
+// making craft the only mint above rung 1 and leaving no acquisition gap
+// WITHIN the ladder (each rung is reachable from a state the rung below
+// grants; the ladder's one entry point is rung 1's vendor stocking on the
+// tier-1 farmer NPC, the go-live counter). There is
+// also, deliberately, NO delve Marks fallback row this phase (see the hoe
+// block in content/items.ts; flagged for the maintainer).
+//
+// All three are `acquisition: ['trainer']` per the post-freeze authoring
+// default: Tinker Gizzel at the Eastbrook toolworks teaches them with no
+// content edit (the trainer list derives from the station). skillReq
+// 25/50/75 resolves to trainer tiers 1/2/3, all inside engineering's
+// learnable band, honoring the ROD_RECIPES lesson (a trainer-taught recipe
+// above the cap band is permanently unlearnable). The rung-4 shape
+// (skillReq 75, itemLevelBudget 20, level 20, toolworks) matches every other
+// tier-4 tool recipe in TOOL_RECIPES.
+export const HOE_RECIPES: ProfessionRecipeRecord[] = [
+  {
+    id: 'recipe_bronze_hoe',
+    professionId: 'engineering',
+    resultItemId: 'bronze_hoe',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'fine_vale_wheat', count: 4 },
+      { itemId: 'garden_hoe', count: 1 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 10,
+    level: 10,
+    stationType: 'toolworks',
+    acquisition: ['trainer'],
+  },
+  {
+    id: 'recipe_skysilver_hoe',
+    professionId: 'engineering',
+    resultItemId: 'skysilver_hoe',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'fine_marsh_rice', count: 4 },
+      { itemId: 'bronze_hoe', count: 1 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 15,
+    level: 15,
+    stationType: 'toolworks',
+    acquisition: ['trainer'],
+  },
+  {
+    id: 'recipe_osmium_hoe',
+    professionId: 'engineering',
+    resultItemId: 'osmium_hoe',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'fine_highland_barley', count: 4 },
+      { itemId: 'skysilver_hoe', count: 1 },
+    ],
+    skillReq: 75,
+    itemLevelBudget: 20,
+    level: 20,
+    stationType: 'toolworks',
+    acquisition: ['trainer'],
+  },
+];
+
+// The farm-economy hook set (Phase 6, reopened by Phase 11): the recipes that
+// turn farm output into something a player wants, so growing a crop is a
+// supply chain rather than a vendor-sell loop. Twelve cooking rows (the eight
+// plain dishes plus the four Phase 11 well-fed buff dishes) plus one alchemy
+// row, the growth tonic's craft (D7, the cross-profession trade).
+//
+// A SEPARATE LIST FROM LADDER_RECIPES, deliberately, for the same reason
+// ROD_RECIPES and HOE_RECIPES are separate: LADDER_RECIPES is CLOSED at three
+// rungs x three recipes for each of its six crafts (54 rows, pinned as a
+// literal and as a per-craft shape in tests/recipe_economy.test.ts). Folding
+// four rung-50 dishes into cooking's nine would break that shape outright, so
+// the farm set states its own conformance (tests/farm_recipes.test.ts) and
+// leaves the ladder alone. Both lists join content-side ALL_RECIPES below, so
+// every recipe surface (recipeList, the trainer, the crafting window, the
+// guide) picks these up with no further wiring.
+//
+// SHAPE: trainer-taught at whichever station the row's own craft serves (the
+// dishes at the kitchens under cook_marlow, the tonic at the apothecary under
+// alchemist_verane), with no content edit either side, the post-freeze
+// authoring default: a trainer's list derives from the crafts its station
+// serves. Every row follows the ladder's cross-craft scaffolding convention
+// (skillReq 0 -> 10/10, 25 -> 16/15, 50 -> 20/20). The PLAIN dish outputs are
+// plain kind 'food' + foodHp ItemDefs in content/profession_items.ts with no
+// buff machinery; the four Phase 11 buff dishes add exactly the one `wellfed`
+// field (see their block below). The tonic's output is the kind 'junk' item
+// the plant_crop command already consumes as a knob, which is why it gets no
+// use arm here either.
+//
+// THE FINE-TWIN SLOTS ARE THE POINT, not decoration. Farming's fine twins get
+// no downward grade substitution (materialGradeIds walks MATERIAL_GRADES only,
+// and no farm row is a member), so a fine twin gains a consumer ONLY through
+// its own reagent slot. The hoe ladder took three of the eight
+// (fine_vale_wheat, fine_marsh_rice, fine_highland_barley); these dishes take
+// the remaining five, which is the Phase 5 deferral closing.
+//
+// EVERY row carries at least one reagent with NO buyValue, deliberately: a
+// recipe whose reagents ALL carry a copper basis joins the counterfactual
+// vendor-fed arm in tests/recipe_economy.test.ts (a sorted literal pin plus a
+// discounted-input bound), and neither a dish grown from produce nor a tonic
+// brewed from gathered herbs is that shape (Sheenleaf carries no buyValue).
+//
+// VALUES ARE PROPOSED AND FLAGGED FOR THE MAINTAINER: classic-modest, and
+// every foodHp/sellValue pair REUSES a point the shipped food curve already
+// ships (980 is the ceiling, conjured_bread4). Reagent counts are sized so
+// each dish vendors strictly below its input value at the LISTED counts on
+// the recipe-economy unitValue basis (buyValue when one exists, else
+// sellValue); on a raw sellValue basis the beet braise is exactly break-even,
+// which converts produce without minting copper and is the intended shape.
+// TRAINABLE FROM THE START, deliberately (deviation (aj)): the binding
+// Live-surface note wanted these visible in the crafting window before the
+// farm opened, and trainer acquisition is the only path there, so the rows
+// were trainable ahead of the go-live and stay so (free at rung 0, the
+// settled R8 fee curve's tier-0 point, and fee-charging at rungs 25/50;
+// pinned in tests/farm_recipes.test.ts).
+export const FARM_RECIPES: ProfessionRecipeRecord[] = [
+  {
+    id: 'recipe_vale_hearth_loaf',
+    professionId: 'cooking',
+    resultItemId: 'vale_hearth_loaf',
+    resultCount: 1,
+    // The starter bake: wheat and salt, the plainest thing a vale kitchen
+    // makes, and the one dish reachable the hour a first plot comes in.
+    // Input 20 vs output 6.
+    reagents: [
+      { itemId: 'vale_wheat', count: 3 },
+      { itemId: 'cooking_salt', count: 1 },
+    ],
+    skillReq: 0,
+    itemLevelBudget: 10,
+    level: 10,
+    acquisition: ['trainer'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_eastbrook_root_pottage',
+    professionId: 'cooking',
+    resultItemId: 'eastbrook_root_pottage',
+    resultCount: 1,
+    // The first fine-twin sink: a thick root pottage whose body comes from
+    // brook_carrot (the vendor-priced starter vegetable that also pays the
+    // farmer's watch fee, D9) and whose sweetness comes from the fine pick,
+    // thickened with a handful of wheat. Input 68 vs output 12.
+    reagents: [
+      { itemId: 'brook_carrot', count: 2 },
+      { itemId: 'fine_brook_carrot', count: 1 },
+      { itemId: 'vale_wheat', count: 1 },
+    ],
+    skillReq: 0,
+    itemLevelBudget: 10,
+    level: 10,
+    acquisition: ['trainer'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_fenbridge_rice_bowl',
+    professionId: 'cooking',
+    resultItemId: 'fenbridge_rice_bowl',
+    resultCount: 1,
+    // Marsh rice steamed plain and salted, the bulk staple of the fen towns.
+    // resultCount stays 1 where the ladder's rung-25 cooking rows sometimes
+    // pay 2: doubling the output here would need inputs above 50 copper to
+    // clear the economy bound, which is a heavier ask than a plain rice bowl
+    // should carry. Input 40 vs output 25.
+    reagents: [
+      { itemId: 'marsh_rice', count: 4 },
+      { itemId: 'cooking_salt', count: 1 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    level: 15,
+    acquisition: ['trainer'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_fenbridge_beet_braise',
+    professionId: 'cooking',
+    resultItemId: 'fenbridge_beet_braise',
+    resultCount: 1,
+    // Beets braised down until they candy, the fine pick going in whole for
+    // the colour. The tier-2 fine-twin slot. Input 88 vs output 40.
+    reagents: [
+      { itemId: 'bog_beet', count: 3 },
+      { itemId: 'fine_bog_beet', count: 1 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    level: 15,
+    acquisition: ['trainer'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_highwatch_barley_bannock',
+    professionId: 'cooking',
+    resultItemId: 'highwatch_barley_bannock',
+    resultCount: 1,
+    // A griddle flatcake off the wall kitchens, salted hard because it is
+    // carried cold on watch. The one rung-50 dish with no fine twin in it,
+    // so the base tier-3 grain has a demand of its own. Input 76 vs output 60.
+    reagents: [
+      { itemId: 'highland_barley', count: 4 },
+      { itemId: 'cooking_salt', count: 2 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_highwatch_gourd_soup',
+    professionId: 'cooking',
+    resultItemId: 'highwatch_gourd_soup',
+    resultCount: 1,
+    // Frost gourd simmered to a soup, the fine pick carrying the sweetness
+    // the base gourds lack. The tier-3 fine-twin slot. Input 173 vs output 75.
+    reagents: [
+      { itemId: 'frost_gourd', count: 3 },
+      { itemId: 'fine_frost_gourd', count: 1 },
+      { itemId: 'cooking_salt', count: 1 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_evergarden_sunmelon_tart',
+    professionId: 'cooking',
+    resultItemId: 'evergarden_sunmelon_tart',
+    resultCount: 1,
+    // The top band, and the wheat line's second life: a melon tart on a
+    // wheat crust, so the tier-1 crop still has a buyer at the tier-4 table.
+    // The tier-4 fine-twin slot. Input 448 vs output 150.
+    reagents: [
+      { itemId: 'gilded_sunmelon', count: 3 },
+      { itemId: 'fine_gilded_sunmelon', count: 1 },
+      { itemId: 'vale_wheat', count: 2 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_evergarden_harvest_platter',
+    professionId: 'cooking',
+    resultItemId: 'evergarden_harvest_platter',
+    resultCount: 1,
+    // The capstone plate, dressed greens off the Evergarden beds. The last
+    // fine-twin slot, closing the Phase 5 deferral. Input 456 vs output 150.
+    reagents: [
+      { itemId: 'evergarden_greens', count: 3 },
+      { itemId: 'fine_evergarden_greens', count: 1 },
+      { itemId: 'cooking_salt', count: 2 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'kitchens',
+  },
+  // --- Phase 11 buff dishes (well-fed food) --------------------------------
+  // One buff dish per crop tier, so the produce ladder has a well-fed
+  // consumer at every rung. Each takes its tier's produce x4 (one more than
+  // the plain twins), so the buff dish costs strictly more produce than its
+  // plain sibling at the same rung, plus the kitchen staple salt (the tier-1
+  // row adds the pottage-precedent vale_wheat binder, see below). NO fine
+  // twins here: the fine_marsh_rice / fine_highland_barley consumer set is an
+  // OPEN maintainer question, and the five dish twins above stay single-owner.
+  // The tier 3/4 pair ships REAGENT-DORMANT under deviation (bo): trainable
+  // and well-formed, but tier 3/4 produce has no seed faucet until the D11
+  // bootstrap ruling (stated again at the two rows). VALUES ARE PROPOSED AND
+  // FLAGGED FOR THE MAINTAINER, reagent counts and rungs alike.
+  //
+  // The tier-1 row keeps the POTTAGE PRECEDENT: brook_carrot is the D9
+  // vegetable, the one produce row that is vendor-stocked AND priced, so a
+  // carrot dish carries a vale_wheat binder exactly like
+  // recipe_eastbrook_root_pottage above. That keeps the whole-list invariant
+  // intact (every farm recipe holds at least one reagent no counter stocks
+  // and no vendor prices), so no dish, buff or plain, is craftable from
+  // counter stock alone, and no rung-0 cooking skill-up faucet opens from
+  // vendor goods (the unresolved hazard the deviation (ai) QA addendum
+  // flagged for the tonic; opening a second one is a maintainer call this
+  // phase does not make).
+  {
+    id: 'recipe_eastbrook_glazed_carrots',
+    professionId: 'cooking',
+    resultItemId: 'eastbrook_glazed_carrots',
+    resultCount: 1,
+    // The starter buff dish: the D9 carrot glazed down with salt and bound
+    // with a handful of wheat (the pottage's binder idiom), reachable the
+    // hour a first carrot bed comes in. Input 76 vs output 6.
+    reagents: [
+      { itemId: 'brook_carrot', count: 4 },
+      { itemId: 'vale_wheat', count: 1 },
+      { itemId: 'cooking_salt', count: 1 },
+    ],
+    skillReq: 0,
+    itemLevelBudget: 10,
+    level: 10,
+    acquisition: ['trainer'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_fenbridge_rice_pudding',
+    professionId: 'cooking',
+    resultItemId: 'fenbridge_rice_pudding',
+    resultCount: 1,
+    // The fen tier's buff dish: the same rice and salt as the plain bowl,
+    // slow-cooked into a pudding worth sitting through. Input 40 vs output 25.
+    reagents: [
+      { itemId: 'marsh_rice', count: 4 },
+      { itemId: 'cooking_salt', count: 1 },
+    ],
+    skillReq: 25,
+    itemLevelBudget: 16,
+    level: 15,
+    acquisition: ['trainer'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_highwatch_barley_porridge',
+    professionId: 'cooking',
+    resultItemId: 'highwatch_barley_porridge',
+    resultCount: 1,
+    // The wall kitchens' buff dish. REAGENT-DORMANT under deviation (bo):
+    // trainable and well-formed today, but highland_barley has no seed
+    // faucet until the D11 bootstrap ruling. Input 68 vs output 60.
+    reagents: [
+      { itemId: 'highland_barley', count: 4 },
+      { itemId: 'cooking_salt', count: 1 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_evergarden_braised_greens',
+    professionId: 'cooking',
+    resultItemId: 'evergarden_braised_greens',
+    resultCount: 1,
+    // The capstone buff dish. REAGENT-DORMANT under deviation (bo):
+    // trainable and well-formed today, but evergarden_greens has no seed
+    // faucet until the D11 bootstrap ruling. Input 168 vs output 150.
+    reagents: [
+      { itemId: 'evergarden_greens', count: 4 },
+      { itemId: 'cooking_salt', count: 1 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'kitchens',
+  },
+  {
+    id: 'recipe_harvest_feast',
+    professionId: 'cooking',
+    resultItemId: 'harvest_feast',
+    resultCount: 1,
+    // The shared feast (Phase 12, D16): the tier-4 communal showcase, cooked
+    // from BOTH tier-4 produce lines at once so one feast asks a whole
+    // evergarden harvest, not a single bed. Input vs output: unit value =
+    // buyValue when finite and > 0 else sellValue, so greens 40x4 + sunmelon
+    // 40x4 + salt 8x2 = 336 in against an output sellValue of 250:
+    // gold-negative, like every farm row.
+    //
+    // The (bz) whole-list invariant holds here too: both produce reagents
+    // (evergarden_greens, gilded_sunmelon) carry no buyValue and no counter
+    // stocks them, so the feast can never be cooked from vendor stock alone
+    // and stays out of the counterfactual vendor-fed set in
+    // tests/recipe_economy.test.ts.
+    //
+    // REAGENT-DORMANT under deviation (bo), with the (ca) reconciliation:
+    // the D11 seed-bootstrap ruling owns the tier 3/4 seed faucet, so this
+    // row ships trainable and well-formed but honest-dormant, exactly like
+    // the tier 3/4 dishes above it.
+    //
+    // FLAGGED FOR THE MAINTAINER: the reagent counts (4 + 4 + 2) and the
+    // 250 output sellValue are proposed tuning, like every farming constant.
+    reagents: [
+      { itemId: 'evergarden_greens', count: 4 },
+      { itemId: 'gilded_sunmelon', count: 4 },
+      { itemId: 'cooking_salt', count: 2 },
+    ],
+    skillReq: 50,
+    itemLevelBudget: 20,
+    level: 20,
+    acquisition: ['trainer'],
+    stationType: 'kitchens',
+  },
+  // --- alchemy -------------------------------------------------------------
+  {
+    id: 'recipe_growth_tonic',
+    professionId: 'alchemy',
+    resultItemId: 'growth_tonic',
+    resultCount: 1,
+    // The cross-profession trade (D7): the one knob that speeds a planting is
+    // brewed by an ALCHEMIST out of wild herbs, never grown, so a farmer who
+    // wants faster beds has to buy from (or level) the other craft, and the
+    // herb line gains a buyer outside the potion ladder. Sheenleaf is the
+    // rung-0 herb every shipped alchemy entry starts from; the vial is the
+    // flask each of them decants into. Input 20 vs output 6.
+    //
+    // FLAGGED FOR THE MAINTAINER: the reagent counts (2 herbs, the low end of
+    // the shipped 2-to-4 band, plus the usual single vial) and skillReq 0. The
+    // tonic is a plant-time knob for EVERY farm tier rather than a late luxury,
+    // so it sits on the accessible rung; gating it at 25 or 50 would leave the
+    // early tiers with a knob nobody can brew for them, and it is never
+    // vendor-stocked (see the growth_tonic ItemDef comment), so the trainer
+    // rung is the only faucet there is.
+    reagents: [
+      { itemId: 'silverleaf_herb', count: 2 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 0,
+    itemLevelBudget: 10,
+    level: 10,
+    acquisition: ['trainer'],
+    stationType: 'apothecary',
+  },
+];
+
+
 // Exported (not just used internally by recipeById below) so the IWorld
 // recipeList read surface (Sim.recipeList / ClientWorld.recipeList) can list
 // every recipe, common, tool, and combo alike: see PR #1209 review, a combo
 // recipe omitted from recipeList was unreachable in normal play; the same
 // applies to the tool recipes de-stubbed here (#1135's crafted base tools).
+
 export const ALL_RECIPES: ProfessionRecipeRecord[] = [
   ...COMMON_RECIPES,
   ...TOOL_RECIPES,
@@ -2682,6 +3139,8 @@ export const ALL_RECIPES: ProfessionRecipeRecord[] = [
   ...APEX_ARMOR_RECIPES,
   ...APEX_GEAR_RECIPES,
   ...APEX_CONSUMABLE_RECIPES,
+  ...HOE_RECIPES,
+  ...FARM_RECIPES,
 ];
 
 // O(1) indexes for the two per-lookup resolvers below (the recipe table grows

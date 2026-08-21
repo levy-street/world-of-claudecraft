@@ -165,4 +165,8 @@ describe('the quantity-variant key selectors', () => {
     expect(harvestKeys).not.toContain(gatherLineKey(1));
     expect(harvestKeys).not.toContain(gatherLineKey(2));
   });
+
+  // The farm grant-line selector blocks (farmPlantedTokenId and the three
+  // farm key selectors) moved to tests/farming_view.test.ts with the
+  // selectors themselves: the knobs phase extracted src/ui/farming_view.ts.
 });

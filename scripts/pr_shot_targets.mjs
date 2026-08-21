@@ -6375,7 +6375,9 @@ export const TARGETS = [
   {
     key: 'professions',
     label: 'Professions wheel window',
-    when: ['src/ui/professions_view.ts', 'src/ui/professions_window.ts'],
+    // content/professions: registering or retuning a profession in the content
+    // table changes what this window renders (the farming Phase 1 lesson).
+    when: ['src/ui/professions_view.ts', 'src/ui/professions_window.ts', 'content/professions'],
     variants: [
       { key: 'desktop-full', charClass: 'warrior', charName: 'Forgeheart' },
       { key: 'desktop-simplified', charClass: 'mage', charName: 'Newhand', simplified: true },
@@ -6386,6 +6388,13 @@ export const TARGETS = [
         key: 'desktop-gathering',
         charClass: 'warrior',
         charName: 'Forgeheart',
+        scrollSel: '.prof-gathering',
+      },
+      {
+        key: 'mobile-gathering',
+        charClass: 'warrior',
+        charName: 'Anvilmar',
+        mobile: true,
         scrollSel: '.prof-gathering',
       },
     ],
@@ -6446,6 +6455,9 @@ export const TARGETS = [
               { professionId: 'logging', skill: 45, maxSkill: 100 },
               { professionId: 'herbalism', skill: 100, maxSkill: 100 },
               { professionId: 'fishing', skill: 68, maxSkill: 200 },
+              // Farming is registered but ungainable until its growth phase
+              // ships, so the honest staged value is the only live one: 0.
+              { professionId: 'farming', skill: 0, maxSkill: 100 },
             ],
           };
           // professionsState is a data read on BOTH world shapes (a getter on
@@ -9337,6 +9349,392 @@ export const TARGETS = [
     },
   },
   {
+    key: 'farm-patches',
+    label: 'Farming hub garden beds with per-viewer growth stages (Eastbrook patch)',
+    when: ['render/farm_patches', 'assets/farm_props', 'content/farm_patches'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await page.waitForFunction(
+        () => {
+          const loading = document.querySelector('#loading-screen');
+          const ui = document.querySelector('#ui');
+          return (
+            document.body.classList.contains('game-active') &&
+            !!ui &&
+            getComputedStyle(ui).display !== 'none' &&
+            !!loading &&
+            !loading.classList.contains('visible')
+          );
+        },
+        { timeout: 90000, polling: 200 },
+      );
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      const staged = await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const player = sim?.player;
+        if (!sim || !player?.pos) return { ok: false, reason: 'offline world is unavailable' };
+        // Stand in the middle of the Eastbrook patch (beds at x 16/21, z 30/35,
+        // walkable by the no-collider ruling) so beds frame the player whichever
+        // way the camera faces.
+        player.pos.x = 18.5;
+        player.pos.z = 32.5;
+        sim.addItem?.('garden_hoe', 1);
+        sim.addItem?.('vale_wheat_seed', 4);
+        sim.addItem?.('brook_carrot_seed', 4);
+        // The patch sits in Forest Wolf territory and a hit interrupts the
+        // plant cast, so shove every nearby hostile far away before staging.
+        const ents = sim.entities?.values?.();
+        if (ents) {
+          for (const e of ents) {
+            if (!e?.hostile || !e.pos) continue;
+            const dx = e.pos.x - player.pos.x;
+            const dz = e.pos.z - player.pos.z;
+            if (dx * dx + dz * dz < 60 * 60) {
+              e.pos.x += 500;
+              e.pos.z += 500;
+            }
+          }
+        }
+        return { ok: true };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      // Plant the four beds ONE AT A TIME: plantCrop starts a real cast, so a
+      // second plant while the first is casting refuses with "You are busy".
+      // Poll for the plot row to exist (cast complete) before the next plant,
+      // and retry a bed whose cast got interrupted. On the base build the
+      // plots still plant sim-side but no bed or crop renders, which is the
+      // honest BEFORE at identical framing.
+      const PLANTS = [
+        ['bed_eastbrook_1', 'vale_wheat'],
+        ['bed_eastbrook_2', 'brook_carrot'],
+        ['bed_eastbrook_3', 'vale_wheat'],
+        ['bed_eastbrook_4', 'brook_carrot'],
+      ];
+      for (const [bedId, cropId] of PLANTS) {
+        let planted = false;
+        for (let attempt = 0; attempt < 4 && !planted; attempt++) {
+          await page.evaluate(
+            (bed, crop) => window.__game?.sim?.plantCrop?.(bed, crop),
+            bedId,
+            cropId,
+          );
+          for (let i = 0; i < 10; i++) {
+            planted = await page.evaluate((bed) => {
+              const sim = window.__game?.sim;
+              return !!sim?.players?.get?.(sim?.playerId)?.farmPlots?.get?.(bed);
+            }, bedId);
+            if (planted) break;
+            await wait(400);
+          }
+        }
+      }
+      // Spread the timers so one frame shows the whole ladder: sprout,
+      // seedling, maturing, ready. Direct PlotState edits are the offline
+      // shot idiom (the skill-toast target mutates player meta the same
+      // way); the adapter re-reads on its uniform cadence.
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const plots = sim?.players?.get?.(sim?.playerId)?.farmPlots;
+        const now = sim?.farmNowMs?.();
+        if (!plots?.get || typeof now !== 'number') return;
+        const shape = (bedId, elapsedMs, totalMs) => {
+          const p = plots.get(bedId);
+          if (!p) return;
+          p.plantedAtMs = now - elapsedMs;
+          p.readyAtMs = p.plantedAtMs + totalMs;
+        };
+        shape('bed_eastbrook_1', 5_000, 100_000);
+        shape('bed_eastbrook_2', 40_000, 100_000);
+        shape('bed_eastbrook_3', 75_000, 100_000);
+        shape('bed_eastbrook_4', 200_000, 100_000);
+      });
+      // Give the adapter's 0.5s read cadence and the deferred farm GLBs time
+      // to land; keep dismissing overlays right up to the shot.
+      for (let i = 0; i < 12; i++) {
+        await page.evaluate(() => {
+          document.querySelector('.camera-prompt-confirm')?.click();
+          document.querySelector('.tut-skip')?.click();
+          document.querySelector('.gpu-notice-dismiss')?.click();
+        });
+        await wait(500);
+      }
+      return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'farm-feast',
+    label: 'Placed harvest feast beside the Eastbrook garden beds (the shared feast)',
+    when: ['sim/professions/feast', 'game/feast_interact', 'ui/feast_tooltip_view'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      // The beds give the shot its farming context; the staging helper owns
+      // the game-active wait, the framing stand point, and the hostile shove.
+      await stageEastbrookBeds(page);
+      // Grant and place the feast, then take the placer's own bite so the
+      // shot shows the sit-and-eat beside the spread. Optional-chained on
+      // purpose: on the BASE build neither verb exists, so the staging
+      // degrades to the plain beds at identical framing, the honest BEFORE
+      // (the Phase 8 base-shot precedent).
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        sim?.addItem?.('harvest_feast', 1);
+        sim?.placeFeast?.();
+      });
+      await wait(600);
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const feastId = sim?.feasts ? [...sim.feasts.keys()][0] : undefined;
+        if (feastId !== undefined) sim?.consumeFeast?.(feastId);
+      });
+      // Give the adapter's 0.5s read cadence and the deferred feast GLB time
+      // to land; keep dismissing overlays right up to the shot.
+      for (let i = 0; i < 12; i++) {
+        await page.evaluate(() => {
+          document.querySelector('.camera-prompt-confirm')?.click();
+          document.querySelector('.tut-skip')?.click();
+          document.querySelector('.gpu-notice-dismiss')?.click();
+        });
+        await wait(500);
+      }
+      return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'harvest-journal',
+    label: 'Harvest Journal window with staged growth ladder (Eastbrook beds)',
+    when: ['ui/harvest_journal'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page, shot) {
+      await stageEastbrookBeds(page);
+      // Open through the real toggle the keybind dispatches to; the window's
+      // own 1 Hz countdown driver needs a beat to stamp the time cells.
+      await page.evaluate(() => window.__game?.hud?.toggleHarvestJournal?.());
+      const open = await pollForSize(page, '#harvest-journal-window');
+      if (!open) return { skip: 'the harvest journal never opened' };
+      await wait(1600);
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+      });
+      // Mobile clips the whole HUD so the shot also proves safe-area placement
+      // and shows the minimap farm-patch pin beside the open window.
+      return { clip: shot?.mobile ? '#ui' : '#harvest-journal-window' };
+    },
+  },
+  {
+    key: 'farm-map-pins',
+    label: 'World map farm-patch pins from the Eastbrook garden beds',
+    when: [
+      'ui/map_window_view',
+      'ui/map_window_painter',
+      'ui/minimap_markers',
+      'ui/minimap_painter',
+    ],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await stageEastbrookBeds(page);
+      await page.evaluate(() => window.__game?.hud?.toggleMap?.());
+      const open = await pollForSize(page, '#map-window');
+      if (!open) return { skip: 'the map window never opened' };
+      await wait(600);
+      return { clip: '#map-window' };
+    },
+  },
+  {
+    key: 'farmer-jessica',
+    label: 'Farmer Jessica beside the Eastbrook garden beds (the farming go-live face)',
+    when: ['professions/farmer_npcs', 'content/zone1'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await stageFarmerJessica(page);
+      // Let the deferred farm GLBs and the NPC mesh land; keep dismissing
+      // overlays right up to the shot.
+      for (let i = 0; i < 10; i++) {
+        await page.evaluate(() => {
+          document.querySelector('.camera-prompt-confirm')?.click();
+          document.querySelector('.tut-skip')?.click();
+          document.querySelector('.gpu-notice-dismiss')?.click();
+        });
+        await wait(500);
+      }
+      return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'farm-intro-quest-dialog',
+    label:
+      'Farmer Jessica gossip menu and the First Furrow quest detail (magic sentence, journal pointer)',
+    when: ['professions/farmer_npcs', 'hud/quest/gossip_menu', 'hud/quest/quest_dialog_controller'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await stageFarmerJessica(page);
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const jess = [...sim.entities.values()].find((e) => e.templateId === 'farmer_jessica');
+        if (!jess) return { ok: false, reason: 'no farmer_jessica entity (base build?)' };
+        const el = document.querySelector('#quest-dialog');
+        if (el) el.style.display = 'none';
+        game.hud.openQuestDialog(jess.id);
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`farm-intro-quest-dialog setup failed: ${setup.reason}`);
+      const open = await pollForSize(page, '#quest-dialog');
+      if (!open) throw new Error('quest dialog did not open');
+      await wait(300);
+      // The gossip menu itself (quest row, Browse Goods, Trade husks for
+      // compost) is the first frame's claim; then the quest detail with the
+      // intro text is the second. One target, two shots would need two
+      // variants per viewport, so this shot holds the DETAIL view (the text
+      // is the design promise) with the menu already proven by the row test.
+      await page.evaluate(() => {
+        document.querySelector('#quest-dialog [data-quest="q_farm_intro"]')?.click();
+      });
+      await wait(400);
+      // The detail view is the narrative block plus the objectives sub-list;
+      // the accept button is a plain <button> the controller appends after it.
+      const detail = await page.evaluate(() => {
+        const dialog = document.querySelector('#quest-dialog');
+        return (
+          Boolean(dialog?.querySelector('.qd-obj')) &&
+          Boolean(dialog?.querySelector('button:not(.qd-list-item):not(.x-btn)'))
+        );
+      });
+      if (!detail) throw new Error('the First Furrow detail did not render');
+      return { clip: '#quest-dialog' };
+    },
+  },
+  {
+    key: 'farmer-gossip-menu',
+    label: 'Farmer Jessica gossip menu: quest, Browse Goods, Trade husks for compost',
+    when: ['professions/farmer_npcs', 'hud/quest/gossip_menu', 'hud/quest/quest_dialog_controller'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await stageFarmerJessica(page);
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const jess = [...sim.entities.values()].find((e) => e.templateId === 'farmer_jessica');
+        if (!jess) return { ok: false, reason: 'no farmer_jessica entity (base build?)' };
+        const el = document.querySelector('#quest-dialog');
+        if (el) el.style.display = 'none';
+        game.hud.openQuestDialog(jess.id);
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`farmer-gossip-menu setup failed: ${setup.reason}`);
+      const open = await pollForSize(page, '#quest-dialog');
+      if (!open) throw new Error('quest dialog did not open');
+      await wait(400);
+      const rows = await page.evaluate(() => ({
+        quest: Boolean(document.querySelector('#quest-dialog [data-quest="q_farm_intro"]')),
+        goods: Boolean(document.querySelector('#quest-dialog [data-vendor]')),
+        husks: Boolean(document.querySelector('#quest-dialog [data-husk-trade]')),
+      }));
+      if (!rows.quest || !rows.goods || !rows.husks) {
+        throw new Error(`gossip rows missing: ${JSON.stringify(rows)}`);
+      }
+      return { clip: '#quest-dialog' };
+    },
+  },
+  {
+    key: 'farmer-vendor-grid',
+    label: 'Farmer Jessica vendor grid: tier-1 seeds, brook carrot, compost, garden hoe',
+    when: ['professions/farmer_npcs', 'content/zone1'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await stageFarmerJessica(page);
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const jess = [...sim.entities.values()].find((e) => e.templateId === 'farmer_jessica');
+        if (!jess) return { ok: false, reason: 'no farmer_jessica entity (base build?)' };
+        sim.copper = 5000;
+        const el = document.querySelector('#vendor-window');
+        if (el) el.style.display = 'none';
+        game.hud.openVendor(jess.id);
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`farmer-vendor-grid setup failed: ${setup.reason}`);
+      const open = await pollForSize(page, '#vendor-window');
+      if (!open) throw new Error('vendor window did not open');
+      await wait(400);
+      // Count the GOODS grid's item rows only: the window also lists the
+      // buyback grid, and every stackable good carries a bulk-buy row under
+      // it (.vendor-item-bulk), so Jessica's five goods paint as nine rows.
+      const rows = await page.evaluate(
+        () =>
+          document.querySelectorAll(
+            '#vendor-window .vendor-goods-grid[data-grid="goods"] .vendor-item:not(.vendor-item-bulk)',
+          ).length,
+      );
+      if (rows !== 5) throw new Error(`expected 5 goods rows, saw ${rows}`);
+      return { clip: '#vendor-window' };
+    },
+  },
+  {
+    // The Phase 9b plant surface: standing on a FREE Eastbrook bed with the
+    // tier-1 farming kit in the bags, the real interact gesture (KeyF on
+    // desktop, the mobile-interact button on touch) opens the plant sheet
+    // with the seed rows and the three knob toggles. The press goes through
+    // the real input funnel, never hud.openPlantSheet directly, so the shot
+    // proves the binding is live end to end.
+    key: 'farm-plant-sheet',
+    label: 'The plant sheet opened from a free garden bed by the interact press (Phase 9b)',
+    when: ['ui/farming_plant_sheet', 'game/farm_bed_interact'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page, shot) {
+      await stagePlantSheetBed(page);
+      await page.evaluate(() => {
+        const el = document.activeElement;
+        if (el && el !== document.body) el.blur?.();
+      });
+      const touch = await page.evaluate(() => document.body.classList.contains('mobile-touch'));
+      if (shot?.mobile && touch) {
+        await page.evaluate(() => document.getElementById('mobile-interact')?.click());
+      } else {
+        await page.keyboard.press('KeyF');
+      }
+      const open = await pollForSize(page, '#plant-sheet-window');
+      if (!open) return { skip: 'the plant sheet never opened from the bed press' };
+      await wait(400);
+      // Mobile clips the whole HUD so the shot also proves the sheet fits the
+      // 844x390 landscape viewport beside the touch cluster.
+      return { clip: shot?.mobile ? '#ui' : '#plant-sheet-window' };
+    },
+  },
+  {
     // Auto-unshift (src/sim/combat/form_auto_unshift.ts). The change is a
     // behavior, so the evidence is a MOMENT, not a window: the same press, one
     // second in. Before the change the druid is still wearing the beast and the
@@ -9957,6 +10355,208 @@ export const TARGETS = [
     },
   },
 ];
+
+// Shared staging for the farming Phase 8 shots: stand in the Eastbrook patch,
+// plant the four beds one cast at a time, and spread the timers into a
+// growth ladder (the farm-patches target above documents every step's why).
+// Stand the player in front of Farmer Jessica (the farming go-live face) so
+// she fills the camera's forward view beside the Eastbrook garden beds. On a
+// base build without her the player still stands at her authored spot, which
+// is the honest BEFORE at identical framing (empty ground beside the beds).
+async function stageFarmerJessica(page) {
+  await page.waitForFunction(
+    () => {
+      const loading = document.querySelector('#loading-screen');
+      const ui = document.querySelector('#ui');
+      return (
+        document.body.classList.contains('game-active') &&
+        !!ui &&
+        getComputedStyle(ui).display !== 'none' &&
+        !!loading &&
+        !loading.classList.contains('visible')
+      );
+    },
+    { timeout: 90000, polling: 200 },
+  );
+  await page.evaluate(
+    () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+  );
+  const staged = await page.evaluate(() => {
+    const game = window.__game;
+    const sim = game?.sim;
+    const player = sim?.player;
+    if (!game || !sim || !player?.pos) return { ok: false, reason: 'offline world is unavailable' };
+    const jess = [...sim.entities.values()].find((e) => e.templateId === 'farmer_jessica');
+    const spot = jess ? { x: jess.pos.x, z: jess.pos.z } : { x: 24.5, z: 32.5 };
+    // Camera-forward is (sin yaw, cos yaw): stand 4.5 yd behind the spot along
+    // that bearing so Jessica sits squarely ahead of the player.
+    const yaw = game.input.camYaw;
+    player.pos.x = spot.x - Math.sin(yaw) * 4.5;
+    player.pos.z = spot.z - Math.cos(yaw) * 4.5;
+    player.prevPos = { ...player.pos };
+    // The patch sits in Forest Wolf territory: shove hostiles away so nothing
+    // interrupts or walks into the frame.
+    for (const e of sim.entities.values()) {
+      if (!e?.hostile || !e.pos) continue;
+      const dx = e.pos.x - spot.x;
+      const dz = e.pos.z - spot.z;
+      if (dx * dx + dz * dz < 60 * 60) {
+        e.pos.x += 500;
+        e.pos.z += 500;
+      }
+    }
+    return { ok: true, jessica: Boolean(jess) };
+  });
+  if (!staged.ok) throw new Error(staged.reason);
+  for (let i = 0; i < 6; i++) {
+    await page.evaluate(() => {
+      document.querySelector('.camera-prompt-confirm')?.click();
+      document.querySelector('.tut-skip')?.click();
+      document.querySelector('.gpu-notice-dismiss')?.click();
+      document.querySelector('#gpu-notice')?.remove();
+    });
+    await wait(400);
+  }
+  return staged;
+}
+
+async function stageEastbrookBeds(page) {
+  await page.waitForFunction(
+    () => {
+      const loading = document.querySelector('#loading-screen');
+      const ui = document.querySelector('#ui');
+      return (
+        document.body.classList.contains('game-active') &&
+        !!ui &&
+        getComputedStyle(ui).display !== 'none' &&
+        !!loading &&
+        !loading.classList.contains('visible')
+      );
+    },
+    { timeout: 90000, polling: 200 },
+  );
+  const staged = await page.evaluate(() => {
+    const sim = window.__game?.sim;
+    const player = sim?.player;
+    if (!sim || !player?.pos) return { ok: false, reason: 'offline world is unavailable' };
+    player.pos.x = 18.5;
+    player.pos.z = 32.5;
+    sim.addItem?.('garden_hoe', 1);
+    sim.addItem?.('vale_wheat_seed', 4);
+    sim.addItem?.('brook_carrot_seed', 4);
+    const ents = sim.entities?.values?.();
+    if (ents) {
+      for (const e of ents) {
+        if (!e?.hostile || !e.pos) continue;
+        const dx = e.pos.x - player.pos.x;
+        const dz = e.pos.z - player.pos.z;
+        if (dx * dx + dz * dz < 60 * 60) {
+          e.pos.x += 500;
+          e.pos.z += 500;
+        }
+      }
+    }
+    return { ok: true };
+  });
+  if (!staged.ok) throw new Error(staged.reason);
+  const PLANTS = [
+    ['bed_eastbrook_1', 'vale_wheat'],
+    ['bed_eastbrook_2', 'brook_carrot'],
+    ['bed_eastbrook_3', 'vale_wheat'],
+    ['bed_eastbrook_4', 'brook_carrot'],
+  ];
+  for (const [bedId, cropId] of PLANTS) {
+    let planted = false;
+    for (let attempt = 0; attempt < 4 && !planted; attempt++) {
+      await page.evaluate((bed, crop) => window.__game?.sim?.plantCrop?.(bed, crop), bedId, cropId);
+      for (let i = 0; i < 10; i++) {
+        planted = await page.evaluate((bed) => {
+          const sim = window.__game?.sim;
+          return !!sim?.players?.get?.(sim?.playerId)?.farmPlots?.get?.(bed);
+        }, bedId);
+        if (planted) break;
+        await wait(400);
+      }
+    }
+  }
+  await page.evaluate(() => {
+    const sim = window.__game?.sim;
+    const plots = sim?.players?.get?.(sim?.playerId)?.farmPlots;
+    const now = sim?.farmNowMs?.();
+    if (!plots?.get || typeof now !== 'number') return;
+    const shape = (bedId, elapsedMs, totalMs) => {
+      const p = plots.get(bedId);
+      if (!p) return;
+      p.plantedAtMs = now - elapsedMs;
+      p.readyAtMs = p.plantedAtMs + totalMs;
+    };
+    shape('bed_eastbrook_1', 5_000, 100_000);
+    shape('bed_eastbrook_2', 40_000, 100_000);
+    shape('bed_eastbrook_3', 75_000, 100_000);
+    shape('bed_eastbrook_4', 200_000, 100_000);
+  });
+  for (let i = 0; i < 6; i++) {
+    await page.evaluate(() => {
+      document.querySelector('.camera-prompt-confirm')?.click();
+      document.querySelector('.tut-skip')?.click();
+      document.querySelector('.gpu-notice-dismiss')?.click();
+    });
+    await wait(500);
+  }
+}
+
+// Stand the player ON bed_eastbrook_1 (16, 30) with the tier-1 farming kit in
+// the bags and NOTHING planted, so the interact press resolves the free bed
+// and opens the plant sheet (the farm-plant-sheet target above). Compost rides
+// along so one knob paints affordable beside the two that honestly cannot pay.
+async function stagePlantSheetBed(page) {
+  await page.waitForFunction(
+    () => {
+      const loading = document.querySelector('#loading-screen');
+      const ui = document.querySelector('#ui');
+      return (
+        document.body.classList.contains('game-active') &&
+        !!ui &&
+        getComputedStyle(ui).display !== 'none' &&
+        !!loading &&
+        !loading.classList.contains('visible')
+      );
+    },
+    { timeout: 90000, polling: 200 },
+  );
+  const staged = await page.evaluate(() => {
+    const sim = window.__game?.sim;
+    const player = sim?.player;
+    if (!sim || !player?.pos) return { ok: false, reason: 'offline world is unavailable' };
+    player.pos.x = 16;
+    player.pos.z = 30;
+    player.prevPos = { ...player.pos };
+    sim.addItem?.('garden_hoe', 1);
+    sim.addItem?.('vale_wheat_seed', 3);
+    sim.addItem?.('compost', 1);
+    for (const e of sim.entities.values()) {
+      if (!e?.hostile || !e.pos) continue;
+      const dx = e.pos.x - player.pos.x;
+      const dz = e.pos.z - player.pos.z;
+      if (dx * dx + dz * dz < 60 * 60) {
+        e.pos.x += 500;
+        e.pos.z += 500;
+      }
+    }
+    return { ok: true };
+  });
+  if (!staged.ok) throw new Error(staged.reason);
+  for (let i = 0; i < 6; i++) {
+    await page.evaluate(() => {
+      document.querySelector('.camera-prompt-confirm')?.click();
+      document.querySelector('.tut-skip')?.click();
+      document.querySelector('.gpu-notice-dismiss')?.click();
+      document.querySelector('#gpu-notice')?.remove();
+    });
+    await wait(400);
+  }
+  return staged;
+}
 
 // Grant one staged stack (a plain count, or a specific ItemInstancePayload) and
 // open the bags window on it. Shared by the tooltip targets above, which each

@@ -298,6 +298,14 @@ interface GlyphTrace {
     strokeStyle: string;
     lineWidth: number;
   }>;
+  /** Command grammar and resolved fill of each FILLED immediate-mode path.
+   *  filledArcs covers only arcs, so a painted polygon (the farm sprout) needs
+   *  its own record to pin which token actually coloured it. */
+  filledPaths: Array<{
+    commands: string[];
+    fillStyle: string;
+    points: Array<{ x: number; y: number }>;
+  }>;
   /** Immediate-mode rectangle paints. A hollow lootable-corpse marker uses
    *  these instead of depending on color alone. */
   rects: Array<{
@@ -401,6 +409,7 @@ function newTrace(): GlyphTrace {
     filledArcs: [],
     strokedArcs: [],
     strokedPaths: [],
+    filledPaths: [],
     rects: [],
   };
 }
@@ -442,6 +451,7 @@ function fakeMinimapContext(trace: GlyphTrace): CanvasRenderingContext2D {
   let alpha = 1;
   let pendingArcs: GlyphTrace['filledArcs'] = [];
   let pendingCommands: string[] = [];
+  let pendingPoints: Array<{ x: number; y: number }> = [];
   const ctx = {
     fillStyle: '',
     strokeStyle: '',
@@ -485,6 +495,7 @@ function fakeMinimapContext(trace: GlyphTrace): CanvasRenderingContext2D {
       pending.length = 0;
       pendingArcs = [];
       pendingCommands = [];
+      pendingPoints = [];
     },
     closePath(): void {
       pendingCommands.push('closePath');
@@ -496,10 +507,12 @@ function fakeMinimapContext(trace: GlyphTrace): CanvasRenderingContext2D {
     },
     moveTo(x: number, y: number): void {
       pendingCommands.push('moveTo');
+      pendingPoints.push({ x, y });
       pathStart = { x, y };
     },
     lineTo(x: number, y: number): void {
       pendingCommands.push('lineTo');
+      pendingPoints.push({ x, y });
       if (pathStart !== null) {
         pending.push({ fromX: pathStart.x, fromY: pathStart.y, toX: x, toY: y, stroked: false });
       }
@@ -507,6 +520,11 @@ function fakeMinimapContext(trace: GlyphTrace): CanvasRenderingContext2D {
     },
     fill(): void {
       trace.filledArcs.push(...pendingArcs);
+      trace.filledPaths.push({
+        commands: [...pendingCommands],
+        fillStyle: String(ctx.fillStyle),
+        points: pendingPoints.map((point) => ({ ...point })),
+      });
     },
     stroke(): void {
       trace.strokedPaths.push({
@@ -627,6 +645,7 @@ function glyphWorld(
     playerId: 1,
     inventory: [],
     stationPlacements: [],
+    farmPatches: [],
     nodeHarvestableByMe: () => false,
     questState: (q: string) =>
       q === quest.id
@@ -1075,6 +1094,7 @@ describe('minimap_painter: gathering state cues (decisive trace)', () => {
       inventory: over.locked ? [] : [{ itemId: 'copper_mining_pick', count: 1 }],
       gatheringProficiency: {},
       stationPlacements: [],
+      farmPatches: [],
       nodeHarvestableByMe: () => over.ready,
       questState: () => 'unavailable',
     } as unknown as IWorld;
@@ -1175,6 +1195,7 @@ function gatherArtWorld(
         ],
     gatheringProficiency: { mining: 1, logging: 1, herbalism: 1 },
     stationPlacements: [],
+    farmPatches: [],
     nodeHarvestableByMe: (id: string) => id === node.id && ready,
     questState: () => 'unavailable',
   } as unknown as IWorld;
@@ -1185,6 +1206,7 @@ function stableMarkerWorld(opts: {
   services?: Array<'mailbox' | typeof EASTBROOK_NOTICEBOARD_TEMPLATE_ID>;
   station?: boolean;
   stationTypes?: readonly (typeof TEST_STATION_TYPES)[number][];
+  farmPatch?: boolean;
 }): IWorld {
   const player = { id: 1, kind: 'player', name: 'Me', pos: { ...PLAYER_POS }, facing: 0 };
   const entities = new Map<number, unknown>([[1, player]]);
@@ -1227,6 +1249,18 @@ function stableMarkerWorld(opts: {
       pos: { x: PLAYER_POS.x - 3 + index * 2, z: PLAYER_POS.z + 2 },
       masterNpcId: `test_${type}_master`,
     })),
+    farmPatches: opts.farmPatch
+      ? [
+          {
+            id: 'patch_test',
+            zoneId: 'eastbrook_vale',
+            tier: 1,
+            x: PLAYER_POS.x + 3,
+            z: PLAYER_POS.z - 2,
+            beds: [],
+          },
+        ]
+      : [],
     nodeHarvestableByMe: () => false,
     questState: () => 'unavailable',
   } as unknown as IWorld;
@@ -1385,6 +1419,63 @@ describe('minimap_painter: painted stable marker sprites', () => {
         },
       ]),
     );
+  });
+
+  it('paints the farm-patch sprout procedurally, in the station token, with no art lookup', () => {
+    const markerArt = fakeMarkerArt([]);
+    const trace = newTrace();
+    installGlyphGlobals(trace);
+    const world = stableMarkerWorld({ farmPatch: true });
+
+    paint(newPainter(markerArt.art), fakeMinimapContext(trace), world);
+
+    // No MapMarkerArtId exists for a garden bed this phase: the painter must
+    // neither ask the art cache for one nor blit a sprite.
+    expect(markerArt.calls.filter((call) => call.id.includes('farm'))).toEqual([]);
+    expect(trace.markerBlits).toEqual([]);
+
+    const patch = createMinimapMarkers()
+      .build(world, 162, 1.7)
+      .markers.find((marker) => marker.kind === 'farm-patch');
+    if (patch?.kind !== 'farm-patch') throw new Error('expected the farm-patch marker');
+    expect(patch.patchId).toBe('patch_test');
+
+    const radius = 3.5;
+    const crownY = patch.my - radius * 0.2;
+    const heelX = radius * 0.15;
+    const heelY = patch.my + radius * 0.25;
+    // Two leaves in ONE filled path, in the STATION family's token: a patch is
+    // a static service site like a crafting station, and gatherReady green is
+    // refused on this surface because it means "harvestable right now" while
+    // this pin carries no plot state. The silhouette (two closed triangles vs
+    // the diamond's four lineTo calls) is what separates the two pins.
+    const leaves = trace.filledPaths.find(
+      (path) =>
+        path.commands.join() === 'moveTo,lineTo,lineTo,closePath,moveTo,lineTo,lineTo,closePath',
+    );
+    expect(leaves?.fillStyle).toBe('paint:--color-minimap-station');
+    expect(leaves?.points).toEqual([
+      { x: patch.mx, y: crownY },
+      { x: patch.mx - radius, y: patch.my - radius },
+      { x: patch.mx - heelX, y: heelY },
+      { x: patch.mx, y: crownY },
+      { x: patch.mx + radius, y: patch.my - radius },
+      { x: patch.mx + heelX, y: heelY },
+    ]);
+    // The stem is its own outlined two-point stroke from the crown downward.
+    expect(trace.segments).toEqual(
+      expect.arrayContaining([
+        { fromX: patch.mx, fromY: crownY, toX: patch.mx, toY: patch.my + radius, stroked: true },
+      ]),
+    );
+    const stem = trace.strokedPaths.find((path) => path.commands.join() === 'moveTo,lineTo');
+    expect(stem).toMatchObject({ strokeStyle: trace.outlineColor });
+    // No station diamond is drawn: a farm patch is not a station.
+    expect(
+      trace.strokedPaths.some(
+        (path) => path.commands.join() === 'moveTo,lineTo,lineTo,lineTo,closePath',
+      ),
+    ).toBe(false);
   });
 
   it('routes distinct dungeon entrance and exit paintings through the shared minimap size', () => {
@@ -1844,6 +1935,7 @@ function bgAllyWorld(opts: { match: BgMatchInfo | null; partyPids?: number[] }):
     playerId: 1,
     inventory: [],
     stationPlacements: [],
+    farmPatches: [],
     nodeHarvestableByMe: () => false,
     questState: () => 'unavailable',
   } as unknown as IWorld;

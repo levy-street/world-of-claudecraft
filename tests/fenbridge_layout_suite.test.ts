@@ -647,8 +647,11 @@ describe('Fenbridge content projection and preservation', () => {
     expect(Object.keys(ZONE2_NPCS)).toEqual(FENBRIDGE_LAYOUT.services.npcs.map((npc) => npc.id));
     // Re-pinned for q_rite_of_redemption joining brother_aldric_fen's quest
     // list (the only NPC-payload delta vs the prior pin; zone2.ts diff-checked).
+    // Re-pinned again for the farming go-live: farmer_teasel joined ZONE2_NPCS
+    // (and this layout's services.npcs) as the ninth Fenbridge NPC; the eight
+    // prior payloads are byte-identical (zone2.ts diff-checked).
     expect(createHash('sha256').update(JSON.stringify(stableNpcPayload())).digest('hex')).toBe(
-      '7ba7c8ae4db5470fd76b7410698f113322e77df9fdad03415320a8988cccac0d',
+      '2358003ec32b94b4d4f6119ac88ef596769d3d77f25523d217c41dc16120c06a',
     );
     for (const placement of FENBRIDGE_LAYOUT.services.npcs) {
       expect(FENBRIDGE_NPC_PLACEMENTS_BY_ID[placement.id]).toBe(placement);

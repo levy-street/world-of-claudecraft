@@ -18,12 +18,14 @@ import { ITEMS } from '../src/sim/data';
 import type { ItemDef } from '../src/sim/types';
 import { cookingCatchHintKey } from '../src/ui/cooking_catch_hint_view';
 import { elixirTooltipLines, wellFedTooltipLines } from '../src/ui/elixir_tooltip_view';
+import { feastTooltipLines } from '../src/ui/feast_tooltip_view';
 import { gatherToolTooltipLines } from '../src/ui/gather_tool_tooltip';
 import { materialHintLine } from '../src/ui/material_hint_view';
 import { materialProfessionHintText } from '../src/ui/material_profession_hint_view';
 import { mobileStationTooltipLines } from '../src/ui/mobile_station_tooltip';
 import { recipePatternTooltipLines } from '../src/ui/recipe_pattern_tooltip_view';
 import { toolEffectTooltipLines } from '../src/ui/tool_effect_tooltip';
+import { wellfedTooltipLines } from '../src/ui/wellfed_tooltip_view';
 
 const EFFECT_SOURCES: Array<[string, (def: ItemDef) => boolean]> = [
   ['weapon damage', (def) => def.weapon !== undefined],
@@ -48,6 +50,8 @@ const EFFECT_SOURCES: Array<[string, (def: ItemDef) => boolean]> = [
   ['drink use line', (def) => (def.drinkMana ?? 0) > 0],
   ['potion use line', (def) => (def.potionHp ?? 0) > 0 || (def.potionMana ?? 0) > 0],
   ['elixir use line', (def) => elixirTooltipLines(def) !== ''],
+  ['wellfed use line', (def) => wellfedTooltipLines(def) !== ''],
+  ['feast use line', (def) => feastTooltipLines(def) !== ''],
   ['gathering tool lines', (def) => gatherToolTooltipLines(def) !== ''],
   ['tool effect charm lines', (def) => toolEffectTooltipLines(def) !== ''],
   // The station-name resolver is irrelevant to the has-a-card predicate.
@@ -146,6 +150,8 @@ describe('crafted item tooltip coverage', () => {
       'elixirTooltipLines(item)',
       'wellFedTooltipLines(item)',
       'recipePatternTooltipLines(item, this.sim.craftingIdentity)',
+      'wellfedTooltipLines(item)',
+      'feastTooltipLines(item)',
       'stackSizeTooltipLine(item, instance)',
     ]) {
       expect(body, `itemTooltip must compose ${call}`).toContain(call);

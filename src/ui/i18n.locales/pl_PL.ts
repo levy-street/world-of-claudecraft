@@ -1187,7 +1187,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.charges':
     'Zaczyna z {base} ładunkami na pospolitym narzędziu (+{bonus} za każdy stopień rzadkości).',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    'Osadź na narzędziu górniczym, drwalskim lub zielarskim w oknie Profesji. Zużywa się przy osadzeniu.',
+    'Osadź na narzędziu górniczym, drwalskim, zielarskim lub rolniczym w oknie Profesji. Zużywa się przy osadzeniu.',
   'hudChrome.professions.toolEffectTooltip.kind': 'Talizman narzędzia',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'Nie osadza się na wędkach.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':
@@ -1846,7 +1846,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Rynek Świata to wymiana obejmująca całe królestwo, prowadzona przez Kupca w Eastbrook i Licytatora Vossa w Highwatch. Wystawienie jest bezpłatne: nie ma kaucji, a niesprzedane wystawienie po prostu wraca do ciebie. Dom pobiera swoją prowizję tylko wtedy, gdy coś faktycznie się sprzedaje: 5 procent ceny sprzedaży, a reszta czeka, aż ją odbierzesz.\n\nJedno ważne ograniczenie: Rynek pośredniczy wyłącznie w zwykłych towarach. Podpisanej, mistrzowskiej, zaklinowanej lub związanej kopii nigdy nie wciąga do wystawienia, więc wyjątkowe przedmioty zmieniają właścicieli twarzą w twarz w oknie wymiany, które przenosi pełną tożsamość przedmiotu, z podpisem włącznie. Wyceniaj je samodzielnie; Rynek mówi ci tylko, za ile idzie zwykła wersja.',
   'guide.profPages.econ.workOrdersHeading': 'Zlecenia robocze',
   'guide.profPages.econ.workOrdersNote':
-    'Każdy mistrz stacji wystawia stałe zlecenie robocze: przynieś stos podstawowego materiału ich rzemiosła i zostań opłacony na miejscu, plus trochę doświadczenia z zadania. Zapłata jest celowo ustalona na {pct}% tego, co sprzedawca dałby ci za ten sam stos, zaokrąglona w dół, więc zlecenie robocze nigdy nie jest opłacalnym sposobem sprzedaży materiałów, tylko powodem, by zajrzeć do stacji.\n\nKażde zlecenie działa na własnym zegarze {minutes} minut na postać: oddaj jedno i ten mistrz nic więcej dla ciebie nie ma, dopóki licznik nie przejdzie koła. Traktuj je jako mały bonus do materiałów, które i tak zbierałeś, nie jako biznes.',
+    'Każdy mistrz stacji wystawia stałe zlecenia robocze, po jednym na każdy podstawowy materiał: przynieś stos, o który prosi zlecenie, i zostań opłacony na miejscu, plus trochę doświadczenia z zadania. Zapłata jest celowo ustalona na {pct}% tego, co sprzedawca dałby ci za ten sam stos, zaokrąglona w dół, więc zlecenie robocze nigdy nie jest opłacalnym sposobem sprzedaży materiałów, tylko powodem, by zajrzeć do stacji.\n\nKażde zlecenie działa na własnym zegarze {minutes} minut na postać: oddaj jedno i to zlecenie jest dla ciebie zamknięte, dopóki licznik nie przejdzie koła, a pozostałe zlecenia mistrza pozostają otwarte. Traktuj je jako mały bonus do materiałów, które i tak zbierałeś, nie jako biznes.',
   'guide.profPages.econ.colOrder': 'Zlecenie robocze',
   'guide.profPages.econ.colMaster': 'Mistrz',
   'guide.profPages.econ.colAsks': 'Prosi o',

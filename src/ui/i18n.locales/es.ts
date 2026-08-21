@@ -1204,7 +1204,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.charges':
     'Empieza con {base} cargas en una herramienta común (+{bonus} por nivel de rareza).',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    'Colócalo en una herramienta de minería, tala o herboristería desde la ventana de Profesiones. Se consume al colocarlo.',
+    'Colócalo en una herramienta de minería, tala, herboristería o agricultura desde la ventana de Profesiones. Se consume al colocarlo.',
   'hudChrome.professions.toolEffectTooltip.kind': 'Amuleto de herramienta',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'No se coloca en cañas de pescar.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':
@@ -1961,7 +1961,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'El Mercado Mundial es el intercambio de todo el reino, administrado por el Mercader en Eastbrook y el Subastador Voss en Highwatch. Publicar es gratis: no hay depósito, y una publicación sin vender simplemente te regresa. La casa toma su comisión solo cuando algo realmente se vende: 5 por ciento del precio de venta, y el resto te espera para cobrarlo.\n\nUn límite importante: el Mercado solo intermedia bienes corrientes. Una copia firmada, de obra maestra, encantada o vinculada nunca entra en una publicación, por lo que las piezas especiales cambian de manos cara a cara en una ventana de intercambio, que lleva la identidad completa de un objeto, firma incluida. Ponles precio tú mismo; el Mercado solo te dice lo que vale la versión corriente.',
   'guide.profPages.econ.workOrdersHeading': 'Órdenes de trabajo',
   'guide.profPages.econ.workOrdersNote':
-    'Cada maestro de estación publica una orden de trabajo permanente: trae una pila del material básico de su oficio y te pagan en el momento, más un poco de experiencia de misión. El pago es deliberadamente un {pct}% de lo que un vendedor te daría por la misma pila, redondeado hacia abajo, así que una orden de trabajo nunca es la forma rentable de vender materiales, solo una razón para pasar por la estación.\n\nCada orden funciona con su propio temporizador de {minutes} minutos por personaje: entrega una y ese maestro no tiene nada más para ti hasta que el temporizador vuelva a dar la vuelta. Trátalas como un pequeño bono sobre materiales que ibas a recolectar de todas formas, no como un negocio.',
+    'Cada maestro de estación publica órdenes de trabajo permanentes, una por material básico: trae la pila que pide una orden y te pagan en el momento, más un poco de experiencia de misión. El pago es deliberadamente un {pct}% de lo que un vendedor te daría por la misma pila, redondeado hacia abajo, así que una orden de trabajo nunca es la forma rentable de vender materiales, solo una razón para pasar por la estación.\n\nCada orden funciona con su propio temporizador de {minutes} minutos por personaje: entrega una y esa orden queda cerrada para ti hasta que el temporizador vuelva a dar la vuelta, mientras las demás órdenes del maestro siguen abiertas. Trátalas como un pequeño bono sobre materiales que ibas a recolectar de todas formas, no como un negocio.',
   'guide.profPages.econ.colOrder': 'Orden de trabajo',
   'guide.profPages.econ.colMaster': 'Maestro',
   'guide.profPages.econ.colAsks': 'Pide',

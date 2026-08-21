@@ -158,6 +158,15 @@ export const SUNDER_CAST_ID = 'sundering';
 // activity-marker shape as craft/enchant-family. Separate id keeps cast-bar
 // labels and audio routing clean.
 export const TOOL_RECHARGE_CAST_ID = 'tool_recharge';
+// The planting cast sentinel (Farming, the growth-engine phase): same
+// activity-marker shape as the craft/gather family. UNLIKE every other
+// sentinel here, this cast decides NOTHING: plantCrop resolves the whole
+// plant at command time and the cast is pure flavor, so its completion arm in
+// combat/casting_lifecycle.ts dispatches no work (see the comment there).
+// Membership in isNonSpellCast below is what buys it the shared bundle
+// (silence exemption, no spell queue, damage cancels instead of pushing back,
+// item use blocked while it runs).
+export const FARMING_CAST_ID = 'farming';
 // The non-spell casts: castingAbility sentinels that are activities, not
 // abilities. They share one semantics bundle at the casting choke points:
 // exempt from silence and school lockouts, no blink-through, no spell queue,
@@ -174,7 +183,8 @@ export function isNonSpellCast(castId: string | null): boolean {
     castId === ENCHANT_CAST_ID ||
     castId === SALVAGE_CAST_ID ||
     castId === SUNDER_CAST_ID ||
-    castId === TOOL_RECHARGE_CAST_ID
+    castId === TOOL_RECHARGE_CAST_ID ||
+    castId === FARMING_CAST_ID
   );
 }
 // Seconds an empty instance idles before it resets. Shared by the dungeon instance
@@ -1227,6 +1237,18 @@ export interface OtherItemDef extends BaseItemDef {
     'armor' | 'weapon' | 'held_offhand' | 'mount' | 'recipe' | 'scroll' | 'flask' | 'food'
   >;
   armorType?: never;
+  // The shared feast (farming, D16): a placeable item whose use spawns a
+  // farm_feast world entity instead of consuming food. `charges` is how many
+  // players may eat once each, `durationTicks` the tick-domain lifetime, and
+  // `dishItemId` names the dish whose serving each bite IS: the eating slot
+  // points at that dish, so its foodHp and wellfed fields drive the restore
+  // and the completion mint unchanged (src/sim/professions/feast.ts owns the
+  // whole lifecycle; both numbers are maintainer-flagged tuning). It lives
+  // HERE rather than on BaseItemDef for the same reason wellFed lives on
+  // FoodItemDef: the shipped harvest_feast is kind 'junk' (the tonic
+  // precedent for a crafted non-equippable usable), and kind-scoping keeps a
+  // sword or a drink from silently carrying a feast payload nothing places.
+  feast?: { charges: number; durationTicks: number; dishItemId: string };
 }
 
 // FOOD. Its own kind-scoped def for exactly one reason: `wellFed` lives HERE
@@ -1245,6 +1267,17 @@ export interface OtherItemDef extends BaseItemDef {
 export interface FoodItemDef extends BaseItemDef {
   kind: 'food';
   wellFed?: TimedStatBuffPayload;
+  // well-fed buff food (farming, D15): the elixir mirror for food, field for
+  // field, but the aura is minted only when the 18s sit-restore COMPLETES
+  // (never on first bite; an interrupted meal forfeits it; src/sim/wellfed.ts
+  // owns the timing and the mint). Aura ids live in the wellfed_<kind>
+  // namespace on the farming path. BOTH spellings are present during the
+  // farming absorb (Masterwrought 11b): `wellFed` above is the masterwrought
+  // payload the live mint reads, `wellfed` is the absorbed farming payload,
+  // carried by farming's four buff dishes and read only by the parked
+  // src/sim/wellfed.ts module. Phase 11c unifies them (one aura id, one
+  // field) and retires this spelling; no new content may use it.
+  wellfed?: TimedStatBuffPayload;
   // A food is a sit-down heal that may leave Well Fed; it is never also an
   // elixir source (the use path's elixir arm would never see a food anyway,
   // so an `elixir` record here would be dead data, the same class as `use`).
@@ -3538,6 +3571,13 @@ export interface NpcDef {
   // The Card Master: talking to this NPC joins/leaves the Card Duel minigame
   // queue (src/sim/social/card_duel.ts) instead of any vendor/bank flow.
   cardMaster?: boolean;
+  // A farmer NPC (the farming go-live): the range anchor of the husk-to-compost
+  // trade (src/sim/professions/farming.ts convertHusks refuses out of reach of
+  // one) and the gossip row that offers it. A FLAG rather than a hard-keyed id
+  // list (the warfareVendor precedent) so a fifth farmer needs no constant
+  // widened. Vending stays emergent from vendorItems; the watch fee is a
+  // plant-time bag payment and never gates on this flag (D9).
+  farmer?: true;
   greeting: string;
   // Registered but not surface-placed at world init. The owning system spawns
   // the entity on demand (e.g. the Nythraxis encounter walks Brother Aldric in
@@ -3579,10 +3619,23 @@ export interface GroundObjectDef {
 // issue is content plus visibility only, no harvest logic (see G3).
 export type GatherNodeType = 'ore' | 'wood' | 'herb';
 
-// Rare gather event flavors (Professions 2.0), one per node family:
+// Rare gather event flavors (Professions 2.0), one per gather family:
 // ore rolls pristine_vein, wood rolls ancient_heartwood, herb rolls
-// moonlit_bloom (professions/gather_events.ts gatherRareEventFlavor).
-export type GatherRareEventFlavor = 'pristine_vein' | 'ancient_heartwood' | 'moonlit_bloom';
+// moonlit_bloom, and a farm-bed harvest rolls golden_harvest (the farming
+// celebrations phase, state.md D12), all mapped by
+// professions/gather_events.ts gatherRareEventFlavor.
+export type GatherRareEventFlavor =
+  | 'pristine_vein'
+  | 'ancient_heartwood'
+  | 'moonlit_bloom'
+  | 'golden_harvest';
+
+// What rolled a rare event: a gather-node family, or a farm bed ('crop').
+// Widens the gatherRareEvent payload's nodeType leaf WITHOUT conscripting
+// 'crop' into GatherNodeType itself: farm beds are deliberately not gather
+// nodes (no GATHER_NODES row, no placement suite, no node tooltip family;
+// the fishing precedent).
+export type GatherRareEventSource = GatherNodeType | 'crop';
 
 export interface GatherNodeDef {
   id: string;
@@ -3966,7 +4019,20 @@ export type QuestObjective =
   // NPC reaches its final waypoint with this player in credit range. count is
   // always 1; the run starts by interacting with the idle escortee while this
   // quest is active.
-  | (QuestObjectiveBase & { type: 'escort'; escortId: string });
+  | (QuestObjectiveBase & { type: 'escort'; escortId: string })
+  // Farm: credited by the plant and harvest ACTIONS in
+  // src/sim/professions/farming.ts (the gather precedent: inventory cannot
+  // prove the deed, and produce is a fungible material). `cropId` narrows the
+  // action to one crop; `patchId` is marker guidance only (quest_targets.ts
+  // encloses that patch's beds; without it every farming patch qualifies) and
+  // never gates the credit. A harvest credits on every outcome, withered
+  // included: the visit is the deed.
+  | (QuestObjectiveBase & {
+      type: 'farm';
+      action: 'plant' | 'harvest';
+      cropId?: string;
+      patchId?: string;
+    });
 
 // ---------------------------------------------------------------------------
 // Escort runs (src/sim/escort.ts): a quest NPC that walks an authored waypoint
@@ -6599,10 +6665,14 @@ export type SimEvent = { pid?: number } & (
   // gatherDenied above): the client composes its own localized copy off the
   // structured fields. Emitted at most ONCE per harvest command (the
   // gatherDenied dedupe idiom), even when several yields downgrade.
+  // 'crop' is the golden-harvest surface (farming.ts, the (bu) follow-up):
+  // farming's nothing-rots rule means a crop can only ever lose the mark
+  // (totals always land in full; only the signature truncates), so a crop
+  // event always carries lost 'mark', never 'find'.
   | {
       type: 'gatherDowngrade';
       pid: number;
-      surface: 'node' | 'corpse';
+      surface: 'node' | 'corpse' | 'crop';
       lost: 'mark' | 'find';
     }
   // Corpse-harvest outcome (#2457): what one harvestCorpse command actually
@@ -6693,8 +6763,11 @@ export type SimEvent = { pid?: number } & (
   // the null row resolves, draw-free.
   | { type: 'fishingEmptyHook'; pid: number; zoneId: string; band: 0 | 1 | 2 }
   // Rare gather event (Professions 2.0): a harvest struck a pristine
-  // vein / ancient heartwood / moonlit bloom. Soft zone broadcast: one copy is
-  // emitted per player currently in the node's zone, `pid` being the RECIPIENT
+  // vein / ancient heartwood / moonlit bloom, or a farm bed paid a golden
+  // harvest (nodeType 'crop', the farming celebrations phase). Soft zone
+  // broadcast: one copy is
+  // emitted per player currently in the source's zone, `pid` being the
+  // RECIPIENT
   // (the chat fanout idiom); finderPid/finderName identify the harvester. Ids
   // plus values only, text-free on purpose: the client renders its own
   // localized line off `flavor` (the gatherEvent.* keys). The HUD reads only
@@ -6708,7 +6781,7 @@ export type SimEvent = { pid?: number } & (
       finderName: string;
       finderPid: number;
       zoneId: string;
-      nodeType: GatherNodeType;
+      nodeType: GatherRareEventSource;
       itemId: string;
     }
   // Rift boss lethal death zone placed (deathZoneCast / deathZoneStrike mechanic).
@@ -6767,6 +6840,137 @@ export type SimEvent = { pid?: number } & (
       pairId: string;
       zoneId: string;
     }
+  // Farming: a crop went into a bed (the growth-engine phase). Personal
+  // (pid = the farmer) and text-free on purpose (the gatherResult idiom): the
+  // client logs its own localized line off the ids. Carries no timing, because
+  // the plot projection (the fplot wire key) already serves readyAtMs and is
+  // the ONE place growth deadlines reach a client.
+  | { type: 'farmPlanted'; pid: number; bedId: string; cropId: string }
+  // Farming: a ready plot was harvested. `count` is the base-grade produce
+  // granted and `fineCount` the fine-grade twin; the two together are the
+  // picks the harvest-lives roll resolved, since a fine roll UPGRADES a pick
+  // rather than adding one. Both fine fields are absent when no pick upgraded
+  // (the effectDepleted precedent: an absent optional keeps the common event
+  // byte-identical to the pre-field wire). `seedBackCount` is the tier 3/4
+  // seed-back roll's payout in crop seeds (the client resolves the seed item
+  // from cropId), present ONLY when positive, the same only-when-true rule.
+  // `effectDepleted` is gatherResult's last-charge signal on the farming
+  // path: present (true) exactly when THIS harvest's R42 settle spent the
+  // slotted tool effect's final charge, so the client can announce the break
+  // instead of the charm dying silently. Only farmHarvested can carry it:
+  // the withered return sits above the effect block, so a failed crop never
+  // applies, spends, or depletes. Text-free (the gatherResult idiom).
+  | {
+      type: 'farmHarvested';
+      pid: number;
+      bedId: string;
+      cropId: string;
+      itemId: string;
+      count: number;
+      fineItemId?: string;
+      fineCount?: number;
+      seedBackCount?: number;
+      effectDepleted?: true;
+    }
+  // Farming: a plot that lost its survival pre-roll was cleared, paying
+  // `count` withered husks instead of produce. Emitted at HARVEST, never at
+  // the growth deadline: nothing rots and no timer fires, so the player learns
+  // the outcome when they come to collect. `seedBackCount` mirrors
+  // farmHarvested's field (the tier 3/4 seed-back roll fires on BOTH
+  // outcomes; the withered consolation is deliberate), present ONLY when
+  // positive. Text-free (the gatherResult idiom).
+  | {
+      type: 'farmWithered';
+      pid: number;
+      bedId: string;
+      cropId: string;
+      count: number;
+      seedBackCount?: number;
+    }
+  // Farming: a plant or harvest was refused. Personal and text-free (the
+  // gatherDenied idiom): the client composes its own localized copy off
+  // `reason`. `bedId` and `cropId` are present when the refusing arm KNOWS
+  // them: usually because the refused command named them, and on harvest's
+  // not_ready arm the cropId comes from the STORED plot (harvest_crop names
+  // only the bed). Do not prune a field to match the named-by-the-command
+  // reading; the wire and the goldens carry the stored-plot case today.
+  | {
+      type: 'farmDenied';
+      pid: number;
+      reason:
+        | 'bad_bed'
+        | 'bad_crop'
+        | 'range'
+        | 'bed_taken'
+        | 'skill'
+        | 'no_seed'
+        | 'not_ready'
+        | 'no_plot'
+        // The knobs phase, appended (wire enums are never reordered):
+        // convert_husks with fewer husks than one batch costs, then the
+        // three plant-time knob payments that could not be met (each denies
+        // the WHOLE plant with nothing consumed and zero draws).
+        | 'no_husks'
+        | 'no_compost'
+        | 'no_fee_produce'
+        | 'no_tonic'
+        // The hoe phase, appended: the step-12 hoe gate refused the plant (no
+        // WIELDABLE farming hoe covering the crop's tier in bags; one reason
+        // for both the no-hoe and the tier-short case, like gatherDenied's
+        // tool arm).
+        | 'tool'
+        // The v0.38.0 sync, appended: the shortfall is caused SOLELY by the
+        // owner's own item locks (issue 3042 acceptance: "each refused
+        // action surfaces a clear locked-item message", the CraftResult
+        // 'locked' twin). Fired when the raw held count would have passed
+        // the gate that the unlocked count failed, for any of the five
+        // farming spends.
+        | 'locked'
+        // The farming go-live, appended: convert_husks refused because no
+        // farmer NPC stands within FARMER_TRADE_RANGE of the sender
+        // (professions/farmer_npcs.ts). Its own reason rather than 'range',
+        // whose HUD line names a crop bed; the trade has no bed.
+        | 'no_farmer'
+        // The shared feast, appended (professions/feast.ts): the place arm's
+        // missing-item and one-active-feast-per-placer refusals, then the
+        // consume arm's stale-or-expired, picked-clean, own-range (its own
+        // reason: 'range' names a crop bed), and once-per-player refusals.
+        // The lock-caused shortfall reuses 'locked' above.
+        | 'no_feast'
+        | 'feast_active'
+        | 'feast_expired'
+        | 'feast_finished'
+        | 'feast_range'
+        | 'feast_eaten';
+      bedId?: string;
+      cropId?: string;
+    }
+  // Farming: withered husks were traded for compost (the knobs phase's
+  // convert_husks command). Personal and text-free (the gatherResult idiom):
+  // `husks` is what left the bags and `compost` what arrived, so the client
+  // composes its one localized line off the counts. The compost grant itself
+  // rides the hub loot event with the silent/callerLogs flags, exactly like a
+  // harvest grant, so this event owns both halves of the feedback.
+  | { type: 'farmHusksConverted'; pid: number; husks: number; compost: number }
+  // Farming: one or more of this player's plots FINISHED (the ready-notice
+  // phase). Personal (pid = the farmer) and text-free like every other farm
+  // event, and COUNTS ONLY: `ready` is how many beds are waiting to be
+  // brought in and `withered` how many finished as failed crops, omitted
+  // when zero (the seedBackCount idiom). `ready` is always present and IS 0
+  // on a withered-only notice: consumers branch on each count, not on the
+  // event's presence. Deliberately carries no bed or crop
+  // id, and no timing: the fplot projection is already the ONE place a client
+  // learns which bed holds what, so a per-plot payload here would be a second
+  // definition of plot state free to drift from it. Emitted once per plot per
+  // growth cycle, gated by the plot's persisted `notified` flag
+  // (professions/farm_ready.ts), so relogging never repeats a notice.
+  | { type: 'farmReady'; pid: number; ready: number; withered?: number }
+  // The shared feast: the placer's own confirmation that the feast entity
+  // spawned (professions/feast.ts). Personal and text-free like every farm
+  // event; the entity itself is everyone else's signal (it rides the normal
+  // snapshot), so this exists only to drive the placer's cue and toast.
+  // `feastId` is the spawned entity id.
+  | { type: 'farmFeastPlaced'; pid: number; feastId: number }
 );
 
 export interface MoveInput {

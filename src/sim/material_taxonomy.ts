@@ -42,6 +42,7 @@
 // what a static import scan catches and no runtime test reliably can.
 
 import { ENCHANTS } from './content/enchants';
+import { FARM_MATERIAL_ITEM_IDS } from './content/farm_crops';
 import { HARVEST_COMPONENT_ITEMS, HARVEST_COMPONENT_SPECIMENS } from './content/professions';
 import { ALL_RECIPES, ITEMS } from './data';
 import { NODE_MATERIAL_TABLE } from './professions/gathering';
@@ -59,6 +60,7 @@ export interface MaterialSourceTables {
   harvestComponentItems: typeof HARVEST_COMPONENT_ITEMS;
   harvestComponentSpecimens: typeof HARVEST_COMPONENT_SPECIMENS;
   salvageMaterialByQuality: typeof SALVAGE_MATERIAL_BY_QUALITY;
+  farmMaterialItemIds: typeof FARM_MATERIAL_ITEM_IDS;
   recipes: typeof ALL_RECIPES;
   enchants: typeof ENCHANTS;
   items: typeof ITEMS;
@@ -79,6 +81,15 @@ export function deriveMaterialItemIds(tables: MaterialSourceTables): ReadonlySet
   // secondaries, arrive through the reagent union below: every one is consumed
   // by an enchant, the no-dead-end rule disenchant_reagents.ts records).
   for (const id of Object.values(tables.salvageMaterialByQuality)) sources.add(id);
+  // Farming yields (content/farm_crops.ts): the produce a harvest grants, its
+  // fine twin, the seed a plant consumes, and the husks a failed crop pays.
+  // A separate source because farming is fishing-shaped rather than
+  // node-shaped: nothing it yields is in NODE_MATERIAL_TABLE, and its fine
+  // grade is deliberately NOT a MATERIAL_GRADES row (that table is pinned to
+  // exactly the nine node yields). Seeds are IN for the same reason produce
+  // is: they are the tradeable input side of the same gathering loop, and the
+  // market's material filter is where a player looks for both.
+  for (const id of tables.farmMaterialItemIds) sources.add(id);
   // Everything a crafting recipe or an enchant consumes. The kind filter below
   // drops tool/rod reagents (kind tool); raw fishing catches are kind junk and
   // stay IN as honest cooking reagents. Only junk-kind reagents are materials.
@@ -100,6 +111,7 @@ export const MATERIAL_ITEM_IDS: ReadonlySet<string> = deriveMaterialItemIds({
   harvestComponentItems: HARVEST_COMPONENT_ITEMS,
   harvestComponentSpecimens: HARVEST_COMPONENT_SPECIMENS,
   salvageMaterialByQuality: SALVAGE_MATERIAL_BY_QUALITY,
+  farmMaterialItemIds: FARM_MATERIAL_ITEM_IDS,
   recipes: ALL_RECIPES,
   enchants: ENCHANTS,
   items: ITEMS,

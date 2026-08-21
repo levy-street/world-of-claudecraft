@@ -1206,7 +1206,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.charges':
     'Commence avec {base} charges sur un outil commun (+{bonus} par échelon de rareté).',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    "Sertissez-le sur un outil de Minage, de Bûcheronnage ou d'Herboristerie depuis la fenêtre Métiers. Consommé une fois serti.",
+    "Sertissez-le sur un outil de Minage, de Bûcheronnage, d'Herboristerie ou d'Agriculture depuis la fenêtre Métiers. Consommé une fois serti.",
   'hudChrome.professions.toolEffectTooltip.kind': "Breloque d'outil",
   'hudChrome.professions.toolEffectTooltip.landOnly': 'Ne se sertit pas sur les cannes à pêche.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':
@@ -1879,7 +1879,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Le Marché mondial est l'échange à l'échelle du royaume, tenu par le Marchand à Eastbrook et le Commissaire-priseur Voss à Highwatch. L'annonce est gratuite : il n'y a pas de caution, et une annonce invendue vous revient simplement. La maison ne prend sa commission que lorsque quelque chose se vend effectivement : 5 pour cent du prix de vente, et le reste vous attend pour être récupéré.\n\nUne limite importante : le Marché ne gère que les marchandises ordinaires. Un exemplaire signé, chef-d'oeuvre, enchanté ou lié n'est jamais inclus dans une annonce, si bien que les pièces spéciales changent de mains face à face dans une fenêtre d'échange, qui transporte l'identité complète d'un objet, signature comprise. Fixez ces prix vous-même ; le Marché vous indique seulement ce que la version ordinaire rapporte.",
   'guide.profPages.econ.workOrdersHeading': 'Commandes de travail',
   'guide.profPages.econ.workOrdersNote':
-    "Chaque maître d'atelier affiche une commande de travail permanente : apportez une pile de la matière première de son métier et soyez payé sur-le-champ, plus un peu d'expérience de quête. La rémunération est délibérément à {pct}% de ce qu'un marchand vous donnerait pour la même pile, arrondi à l'inférieur, de sorte qu'une commande de travail n'est jamais le moyen rentable de vendre des matériaux, juste une raison de passer à l'atelier.\n\nChaque commande tourne sur son propre chrono de {minutes} minutes par personnage : remettez-en une et ce maître n'a plus rien pour vous jusqu'à ce que le minuteur recommence. Traitez-les comme un petit bonus sur les matériaux que vous collectiez de toute façon, non comme un commerce.",
+    "Chaque maître d'atelier affiche des commandes de travail permanentes, une par matière première : apportez la pile qu'une commande demande et soyez payé sur-le-champ, plus un peu d'expérience de quête. La rémunération est délibérément à {pct}% de ce qu'un marchand vous donnerait pour la même pile, arrondi à l'inférieur, de sorte qu'une commande de travail n'est jamais le moyen rentable de vendre des matériaux, juste une raison de passer à l'atelier.\n\nChaque commande tourne sur son propre chrono de {minutes} minutes par personnage : remettez-en une et cette commande vous est fermée jusqu'à ce que le minuteur recommence, tandis que les autres commandes du maître restent ouvertes. Traitez-les comme un petit bonus sur les matériaux que vous collectiez de toute façon, non comme un commerce.",
   'guide.profPages.econ.colOrder': 'Commande de travail',
   'guide.profPages.econ.colMaster': 'Maître',
   'guide.profPages.econ.colAsks': 'Demande',

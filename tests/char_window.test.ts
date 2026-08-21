@@ -68,8 +68,11 @@ describe('char_window: WCAG 2.2 AA', () => {
 });
 
 describe('char_window: profession art placements', () => {
-  it('renders gathering rows with their dedicated painted icons', () => {
-    expect(painter).toMatch(/professionImageUrl\(`gather_\$\{r\.professionId\}`\)/);
+  it('renders gathering rows through the art-or-procedural icon resolver', () => {
+    // professionIconUrl, not professionImageUrl: the resolver that falls back
+    // to the procedural composer, so a pending-art profession still paints
+    // (the five-icon render test below pins the behavior; this pins the seam).
+    expect(painter).toMatch(/professionIconUrl\(`gather_\$\{r\.professionId\}`, 56\)/);
     expect(painter).toContain('class="char-gather-icon"');
     expect(painter).toContain('class="char-gather-row"');
   });
@@ -81,7 +84,7 @@ describe('char_window: profession art placements', () => {
     expect(painter).toContain('alt=""');
   });
 
-  it('paints the exact gathering, Honor, and archetype identities', () => {
+  it('paints the exact gathering (farming via the procedural fallback), Honor, and archetype identities', () => {
     let canvasContext: unknown;
     canvasContext = new Proxy(
       {},
@@ -111,6 +114,7 @@ describe('char_window: profession art placements', () => {
           { professionId: 'logging', skill: 12, maxSkill: 125 },
           { professionId: 'herbalism', skill: 13, maxSkill: 125 },
           { professionId: 'fishing', skill: 14, maxSkill: 125 },
+          { professionId: 'farming', skill: 0, maxSkill: 100 },
         ],
       },
     };
@@ -176,6 +180,10 @@ describe('char_window: profession art placements', () => {
       '/ui/professions/gather_logging.webp',
       '/ui/professions/gather_herbalism.webp',
       '/ui/professions/gather_fishing.webp',
+      // Farming has no committed art (PENDING_ART_IDS), so the char sheet
+      // must paint the same procedural composer the professions window uses,
+      // never an iconless gap beside four painted siblings.
+      'data:image/png;base64,stub',
     ]);
     const crest = root.querySelector<HTMLImageElement>('.char-archetype-title-crest');
     expect(crest?.getAttribute('src')).toBe('/ui/professions/archetype_smith.webp');
@@ -276,9 +284,11 @@ describe('char_window: profession art placements', () => {
     const values = [...root.querySelectorAll('.char-gather-row b')].map((b) => b.textContent);
     // The row renders a BOUNDED "skill / max", never a bare integer. The floor
     // still holds (99.75 and 99.5 read 99, never a fake crossed 100), and
-    // fishing's denominator is its own 200 cap, not the 100 the other three
-    // share.
-    expect(values).toEqual(['99 / 100', '12 / 100', '100 / 100', '99 / 200']);
+    // fishing's denominator is its own 200 cap, not the 100 the other four
+    // share. Farming's untouched "0 / 100" tail is load-bearing: a gathering id
+    // missing from GATHERING_PROFESSION_NAME_KEYS renders NO row at all, so
+    // this list length is what catches the silent drop on a fifth profession.
+    expect(values).toEqual(['99 / 100', '12 / 100', '100 / 100', '99 / 200', '0 / 100']);
     // Decisive against a regression to the bare integer: no row may render a
     // lone number with no denominator.
     for (const value of values) expect(value).toMatch(/^\d+ \/ \d+$/);

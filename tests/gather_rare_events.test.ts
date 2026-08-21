@@ -72,10 +72,13 @@ describe('gather rare events: cadence knob + flavor mapping', () => {
     expect(GATHER_RARE_EVENT_YIELD_MULT).toBe(5);
   });
 
-  it('maps each node family to its own flavor', () => {
+  it('maps each source family to its own flavor, the crop arm included', () => {
     expect(gatherRareEventFlavor('ore')).toBe('pristine_vein');
     expect(gatherRareEventFlavor('wood')).toBe('ancient_heartwood');
     expect(gatherRareEventFlavor('herb')).toBe('moonlit_bloom');
+    // The farming harvest source (Professions 2.0 celebrations): the same
+    // shared mapping, never a farming copy of the roll or the constants.
+    expect(gatherRareEventFlavor('crop')).toBe('golden_harvest');
   });
 
   it('hits exactly when the draw lands strictly below the chance', () => {
@@ -83,9 +86,11 @@ describe('gather rare events: cadence knob + flavor mapping', () => {
     expect(rollGatherRareEvent(stubRng(GATHER_RARE_EVENT_CHANCE - 1e-9), 'wood')).toBe(
       'ancient_heartwood',
     );
+    expect(rollGatherRareEvent(stubRng(0), 'crop')).toBe('golden_harvest');
     // At or above the threshold: a miss (strict <).
     expect(rollGatherRareEvent(stubRng(GATHER_RARE_EVENT_CHANCE), 'herb')).toBeNull();
     expect(rollGatherRareEvent(stubRng(0.9), 'ore')).toBeNull();
+    expect(rollGatherRareEvent(stubRng(GATHER_RARE_EVENT_CHANCE), 'crop')).toBeNull();
   });
 
   it('draws exactly one rng value on EVERY call, hit or miss (constant draw count)', () => {
@@ -288,6 +293,47 @@ describe('announceGatherRareEvent: soft zone fanout + dormant deed mark', () => 
         true,
       );
     }
+  });
+
+  it('a crop source announces golden_harvest with the structural payload and the mark, NO reliquary cell', () => {
+    // The farming harvest caller (professions/farming.ts harvestCrop) passes
+    // a STRUCTURAL source ({ zoneId, type: 'crop' }): farm beds never become
+    // gather nodes, and the fanout, event shape, and visit mark are the
+    // shared ones. The reliquary is the deliberate difference: golden_harvest
+    // has NO field-note cell (a ledgered deferral), so noteReliquaryMark
+    // no-ops and no reliquaryUnlock fires, asserted as the negative here so
+    // the deferral retires consciously rather than by accident.
+    const { ctx, emitted, marks, addPlayer } = fakeCtx();
+    const finder = addPlayer(1, 'Alba', 0);
+    addPlayer(2, 'Bystander', 0); // eastbrook_vale, receives the fanout
+    addPlayer(3, 'FarAway', 340); // mirefen_marsh: must not receive
+    // Instance space: the crop path proves the exclusion itself rather than
+    // inheriting it from the node arm above (same predicate, own proof).
+    addPlayer(4, 'Delver', 0, DUNGEON_X_THRESHOLD + 100);
+
+    announceGatherRareEvent(
+      ctx,
+      finder,
+      { zoneId: 'eastbrook_vale', type: 'crop' },
+      'golden_harvest',
+      'vale_wheat',
+    );
+
+    const events = emitted.filter((e) => e.type === 'gatherRareEvent');
+    expect(events.map((e) => e.pid).sort()).toEqual([1, 2]);
+    for (const ev of events) {
+      expect(ev.flavor).toBe('golden_harvest');
+      expect(ev.nodeType).toBe('crop');
+      expect(ev.zoneId).toBe('eastbrook_vale');
+      expect(ev.itemId).toBe('vale_wheat');
+      expect(ev.finderName).toBe('Alba');
+      expect(ev.finderPid).toBe(1);
+    }
+    // The visit mark writes through the shared path...
+    expect(marks).toEqual(['gather_event:golden_harvest']);
+    // ...and the reliquary deliberately does not.
+    expect(finder.reliquary.marks.has('gather_event:golden_harvest')).toBe(false);
+    expect(emitted.some((e) => e.type === 'reliquaryUnlock')).toBe(false);
   });
 });
 

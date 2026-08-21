@@ -36,6 +36,13 @@ import type { DelayedEvent } from '../../src/sim/entity_roster';
 import { solveLockActions } from '../../src/sim/lockpick';
 import type { PendingLootRoll } from '../../src/sim/loot/loot_roll';
 import { RIFT_MECHANIC_SPACING_SEC } from '../../src/sim/mob/mechanic_spacing';
+import type { PlotState } from '../../src/sim/professions/farm_projection';
+import {
+  convertHusks,
+  FARM_PLANT_CAST_SEC,
+  harvestCrop,
+  plantCrop,
+} from '../../src/sim/professions/farming';
 import { startFishing } from '../../src/sim/professions/fishing';
 import { gatherCastDurationSec, gatherNodeById } from '../../src/sim/professions/gathering';
 import { stationsOfType } from '../../src/sim/professions/stations';
@@ -5591,6 +5598,381 @@ function professionsToolEffectSlot(seed = 1): Scenario {
   };
 }
 
+// The farming SESSION end to end through the real command bodies: two plants
+// (two rng draws each, pre-rolled contiguously), a growth window that draws
+// NOTHING, and both harvest payouts (a survived plot's produce plus its queued
+// proficiency grant, and a withered plot's husks). Farming's whole determinism
+// contract is that randomness happens only at the two player-action moments,
+// so a scenario that plants and harvests for real is the only thing that can
+// pin it: a draw added at the growth deadline, in the tick sweep, or on a deny
+// path moves this golden's draw digest and nothing else in the suite would.
+//
+// TIME IS WRITTEN, NOT TICKED, and that is the sanctioned route rather than a
+// shortcut: vale_wheat takes 45 minutes, which is 54,000 ticks, and no golden
+// can carry that. Setting readyAtMs down to the sim's current lockout clock is
+// exactly what the /dev farmgrow cheat does, and the reason it is safe
+// here is the reason it is safe there: it writes state and draws nothing, so
+// the draw digest stays honest about the window it is standing in for.
+//
+// BOTH survival rolls are overwritten too, one each way. The pre-rolled values
+// are already pinned (they are the plant's own two draws, in the digest), and
+// forcing the stored outcomes is what makes each harvest beat unambiguous:
+// without it, one 15% roll at proficiency 0 decides whether the produce path
+// or the husk path runs, and a future re-tune of the survival ramp could flip
+// a beat while the scenario still looked green.
+// The Phase 4 QA M8 lesson: never assume a seed wins. Probed against the real
+// modules: mulberry32((4 ^ 0x9e3779b9) >>> 0)() = 0.217326 < 0.5
+// (FARM_TONIC_BONUS_CHANCE), so yieldSeed 4 WINS the tonic roll, and its
+// skill-1 expansion is fine-free (resolveFarmHarvest(4, 1) = { count: 3,
+// fine: 0 }, toniced count 5), so the toniced beat below adds exactly one
+// produce grant and no fine line. Exported for the coverage suite's in-arm
+// non-vacuity guard (tests/parity/coverage_c.test.ts).
+export const FARM_TONIC_WINNER_YIELD_SEED = 4;
+
+// The Phase 11 (bw) golden-WIN beat's yield seed, probed the same way at the
+// beat's live skill of exactly 75 (the extension writes it back just before
+// the plant, the beat-10 idiom): resolveFarmHarvest(7, 75) = { count: 3,
+// fine: 1 }, so BOTH grades are nonzero and the five-fold golden multiplier
+// reaches base and fine on one seed (at a single-grade seed the fine half of
+// the win would prove nothing, the M8 lesson again). Exported for the
+// coverage suite's in-arm non-vacuity guard (tests/parity/coverage_c.test.ts).
+export const FARM_GOLDEN_WIN_YIELD_SEED = 7;
+
+function professionsFarmingSession(seed = 1): Scenario {
+  // The two northern beds of the Eastbrook allotments (content/farm_patches.ts
+  // bed_eastbrook_1 at 16,30 and bed_eastbrook_2 at 21,30). Beds sit on a 5
+  // yard pitch, which is INTERACT_RANGE, so the midpoint below is 2.5yd from
+  // each and one stand point reaches both: no teleport between the plants, and
+  // none between the harvests. The Phase 5 extension (deviation (z)) then
+  // moves to the Thornpeak patch (content/farm_patches.ts bed_thornpeak_1 at
+  // -23,685) for the tier-3 seed-back beat.
+  const BED_READY = 'bed_eastbrook_1';
+  const BED_WITHERED = 'bed_eastbrook_2';
+  const BED_T3 = 'bed_thornpeak_1';
+  const CROP = 'vale_wheat';
+  return {
+    name: 'farming_session',
+    coverage: [
+      'class:warrior (farmer)',
+      'plantCrop gate order passed: alive, range, bed free, crop known, skill, seed in bags',
+      'plant pre-roll: exactly two contiguous rng draws per plant (survival, yield seed)',
+      'plant consumes the seed and starts the flavor cast (FARMING_CAST_ID)',
+      'busy gate: the second plant waits out the first plant cast',
+      'growth window: readyAtMs reached with ZERO rng draws and zero events',
+      'harvestCrop survived path: ONE draw at tier 1 (the golden roll, a recorded loss), produce granted from the stored yield seed',
+      'harvestCrop withered path: ONE draw at tier 1 (the golden roll, spent and ignored), withered husks paid instead of produce',
+      'both harvests free their bed (farmPlots empty at the end)',
+      'gathering grant drain: the queued farming proficiency lands on the next tick',
+      'knobbed plant (compost + watch + tonic): payments consumed, still exactly two draws',
+      'toniced harvest on a probed WINNING yieldSeed: one draw (the golden roll; the tonic itself stays draw-free seed expansion), bonus picks at base grade',
+      'convertHusks: the withered payout batch trades into compost, zero draws',
+      'tier-3 harvest (highland_barley at Thornpeak): EXACTLY two contiguous draws, the seed-back roll then the golden roll',
+      'ready-notice sweep (Phase 8): a plot left ready across the 1 Hz boundary emits ONE farmReady, zero draws',
+      'notified flag: the noticed plot samples notified true in fplot before its closing harvest',
+      'padding cycles (Phase 11): real plant-plus-withered-harvest cycles walk the shared stream to the probed positions, exactly three draws each, no produce, no gains, no notices',
+      'golden-WIN harvest (Phase 11, (bw)): the tier-1 golden roll WINS at the searched position; the five-fold signed grants at both grades, the crop-source announce fanout, and the gather_event:golden_harvest mark reach the golden digest',
+      'tier-3 seed-back PAYING band (Phase 11, (bw)): the re-seated Thornpeak harvest pays exactly one highland_barley_seed (the one-seed band), upgrading the Phase 10 zero-band grant proof',
+      'wellfed tick-phase mint (Phase 12, beat P): a REAL consume completion through ticks (addItem + useItem + the full 18s sit-restore) mints wellfed_buff_sta at the updateRegen completion arm, zero draws',
+      'shared feast loop (Phase 12): placeFeast spends the bag item and spawns the farm_feast entity on the normal roster; the placer bites the own feast (a charge spent at START) and rides the same completion to a last-eaten-wins refresh of the buff, zero draws',
+      'feast expiry despawn (Phase 12): the draw-free expiresAtTick write plus the 1 Hz updateFarming sweep drop the entity and the FeastState together (the one despawn site)',
+    ],
+    build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      const pid = sim.playerId as number;
+      const meta = sim.players.get(pid) as PlayerMeta;
+      const p = sim.player as AnyEntity;
+
+      // No mob interference: a landed hit cancels the plant cast mid-drive,
+      // which would move the second plant's gate result (the
+      // professionsFishingSession / professionsGather despawn idiom).
+      for (const e of (sim.entities as Map<number, AnyEntity>).values()) {
+        if (e.kind !== 'mob') continue;
+        e.dead = true;
+        e.hp = 0;
+        e.aiState = 'dead';
+        e.respawnTimer = 9999;
+        e.corpseTimer = 9999;
+        e.inCombat = false;
+      }
+
+      // One seed per bed. addItem draws no rng, so the grant is
+      // digest-invisible beyond the sampled inventory contents.
+      sim.addItem('vale_wheat_seed', 2, pid);
+      // The step-12 hoe gate: plantCrop now refuses without a wieldable hoe.
+      sim.addItem('garden_hoe', 1, pid);
+      teleport(sim, p, 18.5, 30); // midway between the two beds, both in reach
+
+      // Plant one: the first two draws of the session.
+      plantCrop(sim.ctx, p, meta, BED_READY, CROP);
+      rec.snapshot('planted-first');
+      // Ride out the flavor cast. plantCrop's busy gate refuses a second plant
+      // while one runs, so this window is what makes the second plant land
+      // rather than emitting a busy error.
+      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      // Plant two: two more draws, and the plot map stays in sorted bed order.
+      plantCrop(sim.ctx, p, meta, BED_WITHERED, CROP);
+      rec.snapshot('planted');
+      rec.tick(20);
+
+      // The /dev farmgrow equivalence: state written, nothing drawn.
+      const now = sim.ctx.lockoutNowMs();
+      const readyPlot = meta.farmPlots.get(BED_READY) as PlotState;
+      const witheredPlot = meta.farmPlots.get(BED_WITHERED) as PlotState;
+      readyPlot.readyAtMs = now;
+      witheredPlot.readyAtMs = now;
+      // The survival test is `survivalRoll < chance`, and chance at
+      // proficiency 0 on a tier-1 crop is the at-gate 0.85, so these two
+      // literals sit either side of it and pin one plot to each outcome.
+      readyPlot.survivalRoll = 0.01;
+      witheredPlot.survivalRoll = 0.99;
+      rec.snapshot('grown');
+
+      // Both harvests, back to back from the one stand point: the survived
+      // plot pays produce and queues proficiency, the withered plot pays
+      // husks and queues nothing. Each draws exactly once (the golden roll,
+      // both outcomes; both land losses on this stream).
+      harvestCrop(sim.ctx, p, meta, BED_READY);
+      harvestCrop(sim.ctx, p, meta, BED_WITHERED);
+      rec.snapshot('harvested');
+      // drainGatheringGrants runs EARLIER in the tick than any command, so the
+      // grant queued above lands on the next tick; this tail is what puts the
+      // raised proficiency into the final sample.
+      rec.tick(8);
+
+      // ---- The Phase 5 extension (deviation (z)): every beat below is
+      // appended AFTER the original drive, so the earlier labels and their
+      // ledger values stay byte-identical. ----
+
+      // KNOBBED PLANT: all three knobs on the freed northern bed. The
+      // supplies are scaffolding grants (draw-free, ordinary hub lines): a
+      // fresh seed (both starters are in the ground above), one compost, one
+      // tonic, and 2 vale_wheat produce for the tier-1 watch fee, paid
+      // beside the 3 produce the first harvest banked.
+      sim.addItem('vale_wheat_seed', 1, pid);
+      sim.addItem('compost', 1, pid);
+      sim.addItem('growth_tonic', 1, pid);
+      sim.addItem('vale_wheat', 2, pid);
+      // Ride out the SECOND plant's flavor cast remainder (0.6 sec of its 2
+      // sec still runs here), or the knobbed plant would deny busy.
+      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      plantCrop(sim.ctx, p, meta, BED_READY, CROP, { compost: true, watch: true, tonic: true });
+      const knobbed = meta.farmPlots.get(BED_READY) as PlotState;
+      // The stored knob flags, stashed for the coverage suite: farmPlanted is
+      // knob-free on the wire (the fplot projection carries the flags), so
+      // the notes are where a test can see what the payments bought.
+      rec.notes.knobbedFlags = {
+        compost: knobbed.compost,
+        watch: knobbed.watch,
+        tonic: knobbed.tonic,
+      };
+      rec.snapshot('planted-knobbed');
+
+      // TONICED HARVEST ON A WINNING SEED: force ready + survived exactly as
+      // the beats above, then OVERWRITE the minted yieldSeed with the probed
+      // tonic WINNER (see FARM_TONIC_WINNER_YIELD_SEED above): at a losing
+      // seed the toniced and plain expansions coincide and the beat proves
+      // nothing (the M8 lesson). One draw, the golden roll (a loss on this
+      // stream): the tonic is seed expansion, and vale_wheat is tier 1, so
+      // no seed-back roll.
+      knobbed.readyAtMs = sim.ctx.lockoutNowMs();
+      knobbed.survivalRoll = 0.01;
+      knobbed.yieldSeed = FARM_TONIC_WINNER_YIELD_SEED;
+      harvestCrop(sim.ctx, p, meta, BED_READY);
+      rec.snapshot('harvested-toniced');
+
+      // HUSK CONVERSION: the withered beat above paid exactly 2 husks, one
+      // batch, so this trades them into exactly one compost. Zero draws.
+      convertHusks(sim.ctx, p, meta);
+      rec.snapshot('husks-converted');
+
+      // TIER-3 SEED-BACK at the Thornpeak patch. Ride out the knobbed
+      // plant's own flavor cast first (its 2 sec are untouched here), which
+      // also drains the toniced harvest's queued gain BEFORE the proficiency
+      // write below, so the write is the last word.
+      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      teleport(sim, p, -23, 685); // bed_thornpeak_1 (content/farm_patches.ts)
+      meta.gatheringProficiency.farming = 75;
+      sim.addItem('skysilver_hoe', 1, pid);
+      sim.addItem('highland_barley_seed', 1, pid);
+      // Two draws (the plant pre-roll)...
+      plantCrop(sim.ctx, p, meta, BED_T3, 'highland_barley');
+      rec.snapshot('planted-t3');
+      const barley = meta.farmPlots.get(BED_T3) as PlotState;
+      barley.readyAtMs = sim.ctx.lockoutNowMs();
+      barley.survivalRoll = 0.01;
+      // ...and EXACTLY two more, the seed-back roll then the golden roll:
+      // whatever bands the shared stream yields here are the recorded truth
+      // (the coverage suite asserts the ledger arithmetic and that the
+      // event's seedBackCount matches the highland_barley_seed bag delta,
+      // never a band literal).
+      harvestCrop(sim.ctx, p, meta, BED_T3);
+      rec.snapshot('harvested-t3');
+      // Drain the barley harvest's queued 0.02 gain into the final sample.
+      rec.tick(8);
+
+      // ---- The Phase 8 extension: the READY-NOTICE SWEEP, appended after
+      // every earlier beat so their labels and draw ledger stay
+      // byte-identical. Every beat above harvests a ripened plot in the same
+      // drive step, so the 1 Hz sweep never observes one; this beat is the
+      // scenario's only farmReady, and the emission itself is the pinned
+      // fact: a draw or a repeat here moves the event digest and nothing
+      // else in the suite would see it. ----
+      sim.addItem('vale_wheat_seed', 1, pid);
+      teleport(sim, p, 18.5, 30); // back to the freed northern Eastbrook bed
+      // Ride out the t3 plant's flavor cast remainder (its harvest landed
+      // mid-cast and tick(8) covers only 0.4 sec), or this plant denies busy.
+      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      // Two draws (the plant pre-roll), the extension's only randomness.
+      plantCrop(sim.ctx, p, meta, BED_READY, CROP);
+      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      // The /dev farmgrow equivalence again: ripen in place, survived arm.
+      const noticed = meta.farmPlots.get(BED_READY) as PlotState;
+      noticed.readyAtMs = sim.ctx.lockoutNowMs();
+      noticed.survivalRoll = 0.01;
+      // DO NOT harvest yet: 21 ticks cross at least one % 20 boundary, so
+      // the sweep sees a ready, unnotified plot and emits exactly one
+      // farmReady { ready: 1 } with ZERO draws; the following 20 ticks cross
+      // another boundary and prove the flip silenced it.
+      rec.tick(21);
+      rec.tick(20);
+      rec.snapshot('ready-noticed'); // fplot samples notified: true here
+      // Close the bed out so the scenario still ends with every bed free.
+      harvestCrop(sim.ctx, p, meta, BED_READY);
+      rec.snapshot('harvested-noticed');
+      rec.tick(8);
+
+      // ---- The Phase 11 extension (deviation (bw) discharged): the
+      // golden-WIN beat and the paying-band tier-3 seed-back beat, appended
+      // AFTER every earlier beat so their labels and draw ledger stay
+      // byte-identical. Both beats are POSITION-SEARCHED against this stream
+      // (the GOLDEN_WIN_SEED probe idiom from tests/professions_farming
+      // .test.ts, transplanted to the scenario): the shared rng is
+      // mulberry32, so every appended roll is a pure function of how many
+      // draws precede it. Probed by sampling sim.rng right after the beat
+      // above: of the next values on the stream, index 86 (zero-based) is
+      // the first golden winner (0.003351 < 1/90), and index 92 is the
+      // first ONE-SEED band value past it (0.155753, in [0.08, 0.4)). The
+      // padding below is REAL play only (this scenario's charter: the real
+      // command bodies, never bare rng draws): each cycle is a real plant
+      // (two draws) plus a real WITHERED harvest (one draw, spent and
+      // ignored per the contract above), advancing the stream by exactly
+      // three while minting no CROP produce, no skill gains, no golden win,
+      // and no farmReady (the plot is planted, ripened, and harvested inside
+      // one drive step, so the 1 Hz sweep never observes it). The wither
+      // payout's two husks per cycle ARE minted and expected: coverage_c
+      // pins all 29 padding farmWithered events and the husk pouch total.
+      // Withering NEEDS
+      // low skill: crops die only at low proficiency (the keep chance
+      // saturates at 1 by 75, where a stored 0.99 roll SURVIVES), so the
+      // padding rides the beat-10 proficiency-write idiom, dropping to the
+      // at-gate 0.85 window for the cycles and restoring 75 for the real
+      // beats. The writes are draw-free state, exactly like readyAtMs. ----
+      meta.gatheringProficiency.farming = 0;
+      for (let cycle = 0; cycle < 28; cycle++) {
+        sim.addItem('vale_wheat_seed', 1, pid);
+        // Clear the previous plant's flavor-cast busy gate (draw-free).
+        rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+        plantCrop(sim.ctx, p, meta, BED_WITHERED, CROP);
+        const pad = meta.farmPlots.get(BED_WITHERED) as PlotState;
+        pad.readyAtMs = sim.ctx.lockoutNowMs();
+        pad.survivalRoll = 0.99;
+        harvestCrop(sim.ctx, p, meta, BED_WITHERED);
+      }
+
+      // THE GOLDEN-WIN BEAT: the plant spends stream indexes 84 and 85, so
+      // the harvest's one golden roll is the probed winner at index 86. The
+      // stored yieldSeed is OVERWRITTEN with the probed BOTH-GRADES winner
+      // at the live skill (FARM_GOLDEN_WIN_YIELD_SEED above, the
+      // FARM_TONIC_WINNER_YIELD_SEED idiom), so the five-fold applies to a
+      // nonzero base AND fine grade: the signed grants, the crop-source
+      // announce fanout, and the gather_event:golden_harvest mark all reach
+      // a golden digest for the first time.
+      meta.gatheringProficiency.farming = 75; // the probed expansion's skill
+      sim.addItem('vale_wheat_seed', 1, pid);
+      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      plantCrop(sim.ctx, p, meta, BED_READY, CROP);
+      rec.snapshot('planted-golden');
+      const goldenPlot = meta.farmPlots.get(BED_READY) as PlotState;
+      goldenPlot.readyAtMs = sim.ctx.lockoutNowMs();
+      goldenPlot.survivalRoll = 0.01;
+      goldenPlot.yieldSeed = FARM_GOLDEN_WIN_YIELD_SEED;
+      harvestCrop(sim.ctx, p, meta, BED_READY);
+      rec.snapshot('harvested-golden-win');
+      rec.tick(8);
+
+      // THE PAYING-BAND TIER-3 SEED-BACK BEAT: one more padding cycle walks
+      // the stream so the Thornpeak barley harvest's seed-back roll lands on
+      // the probed ONE-SEED band value at index 92 (0.155753) and really
+      // pays a highland_barley_seed: the re-seat of the Phase 10 zero-band
+      // beat, upgrading the scenario-level grant proof from 0 === 0 to a
+      // real grant. Its golden roll (index 93, 0.279179) is a recorded loss.
+      meta.gatheringProficiency.farming = 0; // the padding wither window again
+      sim.addItem('vale_wheat_seed', 1, pid);
+      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      plantCrop(sim.ctx, p, meta, BED_WITHERED, CROP);
+      const padFinal = meta.farmPlots.get(BED_WITHERED) as PlotState;
+      padFinal.readyAtMs = sim.ctx.lockoutNowMs();
+      padFinal.survivalRoll = 0.99;
+      harvestCrop(sim.ctx, p, meta, BED_WITHERED);
+      meta.gatheringProficiency.farming = 75; // restore for the tier-3 beat
+      teleport(sim, p, -23, 685); // bed_thornpeak_1 (content/farm_patches.ts)
+      sim.addItem('highland_barley_seed', 1, pid);
+      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      plantCrop(sim.ctx, p, meta, BED_T3, 'highland_barley');
+      rec.snapshot('planted-t3-paying');
+      const barleyPaying = meta.farmPlots.get(BED_T3) as PlotState;
+      barleyPaying.readyAtMs = sim.ctx.lockoutNowMs();
+      barleyPaying.survivalRoll = 0.01;
+      harvestCrop(sim.ctx, p, meta, BED_T3);
+      rec.snapshot('harvested-t3-paying');
+      // Drain the paying harvest's queued 0.02 gain into the final sample.
+      rec.tick(8);
+
+      // ---- The Phase 12 extension (beat P, the (bw) residual discharged):
+      // the wellfed TICK-PHASE mint, ridden for real. The mint is the one
+      // genuinely new tick-phase path of the well-fed phase (updateRegen
+      // completion, not a command), so the beat rides a REAL consume
+      // completion through ticks: addItem, useItem, the full 18s
+      // sit-restore, then the sampled buff. Zero draws on every step (the
+      // eat is a pure slot write and the ride is mob-dead quiet), so every
+      // prior frame and the whole 110-draw ledger stay byte-identical: a
+      // pure append. ----
+      // Wait out the tier-3 beat's still-running plant flavor cast first
+      // (the drive's own busy-gate idiom): useItem refuses during a
+      // non-spell cast, and rec.tick(8) above is shorter than the cast.
+      rec.tick(Math.ceil(FARM_PLANT_CAST_SEC / DT) + 1);
+      sim.addItem('evergarden_braised_greens', 1, pid);
+      sim.useItem('evergarden_braised_greens', pid);
+      rec.snapshot('wellfed-eating');
+      rec.tick(400); // past the 18s sit-restore (360 ticks) with regen-tick slack
+      rec.snapshot('wellfed-dish-minted');
+
+      // ---- The shared feast loop (Phase 12): place, bite, mint, expire.
+      // placeFeast spends the bag item and spawns the farm_feast entity on
+      // the normal roster; the placer bites the own feast (a charge spent
+      // at bite START, the ledger marked) and rides the SAME completion to
+      // a last-eaten-wins REFRESH of the buff minted above (the (by)
+      // namespace rule, sampled in the digest). Expiry rides the readyAtMs
+      // idiom: a draw-free expiresAtTick write plus the 1 Hz updateFarming
+      // sweep drops the entity and the FeastState together (the one
+      // despawn site). Zero draws end to end. ----
+      sim.addItem('harvest_feast', 1, pid);
+      sim.placeFeast(pid);
+      rec.snapshot('feast-placed');
+      const feastId = [...sim.feasts.keys()][0] as number;
+      sim.consumeFeast(feastId, pid);
+      rec.snapshot('feast-bitten');
+      rec.tick(400); // the bite's own 18s sit-restore, same slack as above
+      rec.snapshot('feast-wellfed-minted');
+      const feast = sim.feasts.get(feastId);
+      if (feast) feast.expiresAtTick = sim.ctx.tickCount;
+      rec.tick(21); // across the next 1 Hz boundary: the sweep despawns
+      rec.snapshot('feast-expired');
+    },
+  };
+}
+
 // Rift boss floor: a real S-rank rift instance with a hand-placed, stamped
 // death-zone boss and a control-proc dais guard (the enterRiftWithBoss fixture
 // from tests/rift_boss_reactable_mechanics.test.ts). Before this scenario the
@@ -6020,6 +6402,7 @@ export const SCENARIOS: Scenario[] = [
   professionsFishingSession(),
   professionsToolEffectSlot(),
   idleMobDistanceCulling(),
+  professionsFarmingSession(),
   riftBossFloor(),
   grixRespawnWindow(),
   catFormAutoSwing(),

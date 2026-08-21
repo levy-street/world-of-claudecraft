@@ -303,7 +303,10 @@ export function buildGatherNodeTooltip(
  *  up is the zone rod gate (D9, this water takes a better rod, so the tier IS
  *  named). Without the split a player standing in Thornpeak holding a tier-2
  *  rod would be told to go and get a fishing pole they are already carrying.
- *  Surface 'node' splits the same way; anything unexpected falls back to the
+ *  Surface 'node' splits the same way across four professions: mining,
+ *  logging, herbalism, and farming, whose denial lines are pre-wired here
+ *  ahead of its crop beds shipping (the phase that ships them decides the
+ *  exact surface its patches emit); anything unexpected falls back to the
  *  profession-neutral corpse line. */
 export function gatherDeniedLineKey(
   surface: 'node' | 'corpse' | 'fishing',
@@ -317,7 +320,12 @@ export function gatherDeniedLineKey(
       : 'hudChrome.gathering.toolRequired.fishing';
   }
   if (surface === 'node') {
-    if (professionId === 'mining' || professionId === 'logging' || professionId === 'herbalism') {
+    if (
+      professionId === 'mining' ||
+      professionId === 'logging' ||
+      professionId === 'herbalism' ||
+      professionId === 'farming'
+    ) {
       // The R22 wield arm outranks the tier arms: when the event carries a
       // wield requirement, the player already OWNS a covering tool and the
       // actionable fact is the counter, not the tier.
@@ -338,9 +346,10 @@ export function gatherDeniedLineKey(
 /** The i18n key the gatherToolNoNode SimEvent's error toast resolves (#2343:
  *  a gathering tool was used from the bags with no matching node within
  *  reach). Fishing never emits it (rods route to startFishing), so anything
- *  but the three node professions takes a safe fallback. */
+ *  but the four node professions (mining, logging, herbalism, and farming)
+ *  takes the mining fallback rather than reaching t() with an untracked key. */
 export function gatherToolNoNodeKey(professionId: GatheringProfessionId): TranslationKey {
-  if (professionId === 'logging' || professionId === 'herbalism') {
+  if (professionId === 'logging' || professionId === 'herbalism' || professionId === 'farming') {
     return `hudChrome.gathering.noNodeNearby.${professionId}`;
   }
   return 'hudChrome.gathering.noNodeNearby.mining';
@@ -348,12 +357,25 @@ export function gatherToolNoNodeKey(professionId: GatheringProfessionId): Transl
 
 /** The i18n key the gatherDowngrade SimEvent's toast resolves (the
  *  sim is text-free): 'mark' means the yield arrived as a plain unsigned
- *  top-up, 'find' means a pure-extra specimen jackpot was dropped outright. */
-export function gatherDowngradeLineKey(lost: 'mark' | 'find'): TranslationKey {
-  return lost === 'find'
-    ? 'hudChrome.gathering.downgradeFind'
+ *  top-up, 'find' means a pure-extra specimen jackpot was dropped outright.
+ *  The 'crop' surface (Phase 14, the golden-harvest truncation) takes its
+ *  own mark line: the node line's "the find" is prospecting vocabulary and
+ *  reads wrong for a harvest you grew. A crop can only ever lose the mark
+ *  (nothing-rots lands the units always), so no crop find line exists; this
+ *  resolver stays the ONE surface dispatch on the client. */
+export function gatherDowngradeLineKey(
+  lost: 'mark' | 'find',
+  surface: 'node' | 'corpse' | 'crop',
+): TranslationKey {
+  if (lost === 'find') return 'hudChrome.gathering.downgradeFind';
+  return surface === 'crop'
+    ? 'hudChrome.gathering.downgradeMarkCrop'
     : 'hudChrome.gathering.downgradeMark';
 }
+
+// The farmDenied key selector (farmDeniedLineKey) and its FarmDeniedReason
+// union moved to src/ui/farming_view.ts when the knobs phase tripped the rule
+// of three: farming's view logic now has its own pure core.
 
 /** Which layered rarity stinger (if any) a gather's loot event should play on
  *  top of the node-type impact cue. A rare event forces at least the epic

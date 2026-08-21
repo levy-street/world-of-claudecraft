@@ -13,21 +13,32 @@
 //   - The node props' TIER differentiation (nodeTierScale): tier is the
 //     access gate's number, so the scale ladder is static content -> size,
 //     identical everywhere.
+//   - The farm beds and the crop GROWTH STAGE meshes: a player walks to a bed
+//     because it looks ready, so which mesh a plot shows is actionable. Both
+//     farm_patches.ts and its core are profile-free, and the core's stage
+//     resolver takes no quality input at all.
 //
 // COSMETIC, and allowed to vary: the low preset's shorter fog (LOW_FOG in
 // renderer.ts) sheds distant SCENERY, node props included, because the
 // actionable spotting surface at range is the minimap above, which does not
-// shorten; and the water surface's splash richness around a bite, because
-// the bite itself is carried by the bobber state, the cue, and the log line.
+// shorten; the water surface's splash richness around a bite, because the bite
+// itself is carried by the bobber state, the cue, and the log line; and the
+// farm plant/harvest/wither flourishes, which emit through the shared Vfx
+// emitters, so the adaptive budget's scaledCount is their whole shed (the
+// harvest FACT is the item, the log line and the bed going bare, none of
+// which is a particle).
 
 import { readFileSync } from 'node:fs';
 import type * as THREE from 'three';
 import { Matrix4, Quaternion, Vector3 } from 'three';
 import { describe, expect, it } from 'vitest';
+import { resolveFarmPlotVisual } from '../src/render/farm_patches_core';
 import { buildGatherNodes } from '../src/render/gather_nodes';
 import { NODE_TIER_SCALE_STEP, nodeTierScale } from '../src/render/gather_nodes_lookup';
 import { GATHER_NODES } from '../src/sim/data';
 import { terrainHeight } from '../src/sim/world';
+import { HARVEST_JOURNAL_TICK_MS } from '../src/ui/harvest_journal_window';
+import type { FarmPlotView } from '../src/world_api/farming';
 
 // Comments stripped before scanning (the architecture-test rule): prose that
 // NAMES the invariant ("nothing here reads ui_effects_profile") must never
@@ -152,6 +163,105 @@ describe('professions graphics fairness (actionable surfaces stay preset-identic
     // magnitudes reaches ~1e-5, while the center-anchored-sink bug this
     // guards produced a ~0.13 world-unit offset.
     expect(baseAboveTerrain(i2, t2)).toBeCloseTo(baseAboveTerrain(i1, t1), 3);
+  });
+
+  it('the farm patch renderer and its core read no profile and no governor', () => {
+    expectProfileFree('src/render/farm_patches.ts');
+    expectProfileFree('src/render/farm_patches_core.ts');
+    // The shared instanced-prop kernel is on the same actionable path since
+    // the Phase 7 QA extraction.
+    expectProfileFree('src/render/glb_instanced_props.ts');
+  });
+
+  it('the Harvest Journal reads no profile and no governor, and its clock is wall-clock', () => {
+    // A crop's remaining time is the number a farmer plans their session
+    // around, so the journal is ACTIONABLE end to end: the pure core, the
+    // window that paints it, and above all the CADENCE of the countdown.
+    expectProfileFree('src/ui/harvest_journal_view.ts');
+    expectProfileFree('src/ui/harvest_journal_window.ts');
+    // The tick interval is a literal wall-clock second, not a tier knob: a
+    // preset that slowed it would make a low-preset player's timer lag a
+    // high-preset player's, which is exactly the shed the invariant forbids.
+    expect(HARVEST_JOURNAL_TICK_MS).toBe(1000);
+    const window = read('src/ui/harvest_journal_window.ts');
+    expect(
+      window.includes(`, ${HARVEST_JOURNAL_TICK_MS})`) ||
+        window.includes('HARVEST_JOURNAL_TICK_MS)'),
+      'the countdown interval must be armed with the fixed constant, not a derived cadence',
+    ).toBe(true);
+  });
+
+  it('the farm-patch pin surfaces read no profile and no governor', () => {
+    // The map and minimap pins are the "where" half of the journal's promise,
+    // so the marker build and both view models are actionable the same way
+    // the countdown is: drawn on every tier, never preset-gated.
+    expectProfileFree('src/ui/minimap_markers.ts');
+    expectProfileFree('src/ui/map_window_view.ts');
+    // The two PAINTERS that draw the sprout as well, so this row is complete
+    // on its own: a preset gate wrapped around either draw block would keep
+    // the model rows green while the pin vanished on LOW. (Both painters are
+    // also pinned wholesale by the gather-marker rows above; the farm row
+    // names them so the pin's own contract is provable in one place.)
+    expectProfileFree('src/ui/map_window_painter.ts');
+    expectProfileFree('src/ui/minimap_painter.ts');
+  });
+
+  it('the farm modules reach ./gfx ONLY for the sanctioned fallback material', () => {
+    // The PROFILE_TOKENS scan cannot see the OTHER static preset surface: the
+    // GFX object in src/render/gfx.ts. farm_patches.ts legitimately imports
+    // surfaceMat alone (the pre-load fallback box material: presence, geometry
+    // and stage are preset-identical, only material richness varies, the
+    // sanctioned cosmetic arm), so the allowance is pinned as an exact
+    // single-name import: widening it (a GFX branch on a stage mesh or the
+    // sync cadence) edits this line and answers to review.
+    const adapter = read('src/render/farm_patches.ts');
+    expect(adapter).toMatch(/import \{ surfaceMat \} from '\.\/gfx';/);
+    expect(adapter.includes('GFX'), 'farm_patches.ts must not read the GFX preset object').toBe(
+      false,
+    );
+    const core = read('src/render/farm_patches_core.ts');
+    expect(core.includes("from './gfx'")).toBe(false);
+    expect(core.includes('GFX')).toBe(false);
+    const kernel = read('src/render/glb_instanced_props.ts');
+    expect(kernel.includes("from './gfx'")).toBe(false);
+    expect(kernel.includes('GFX')).toBe(false);
+  });
+
+  it('the growth stage is APPLIED from (plot, nowMs) alone: no quality input exists', () => {
+    // The arity is the type-level half of the claim (a quality parameter would
+    // move it)...
+    expect(resolveFarmPlotVisual.length).toBe(2);
+    // ...and this is the behavioural half: the SAME plot at the SAME instant
+    // resolves to one stage, whatever else is going on, and the stage really
+    // does advance with the growth window rather than being a constant.
+    const hour = 60 * 60 * 1000;
+    const plot: FarmPlotView = {
+      bedId: 'bed_eastbrook_1',
+      cropId: 'vale_wheat',
+      plantedAtMs: 0,
+      readyAtMs: hour,
+      compost: false,
+      watch: false,
+      tonic: false,
+      notified: false,
+      status: 'growing',
+    };
+    const stages = [0, hour / 3, (2 * hour) / 3, hour].map(
+      (t) => resolveFarmPlotVisual(plot, t).stageMesh,
+    );
+    expect(stages).toEqual(['sprout', 'stage2', 'stage3', 'stage4']);
+    expect(resolveFarmPlotVisual(plot, hour / 3).stageMesh).toBe(stages[1]);
+  });
+
+  it('the farm flourishes ride the shared Vfx emitters (the one sanctioned shed)', () => {
+    const source = read('src/render/farm_patches.ts');
+    // Cosmetic, so it MUST go through the pooled emitters whose scaledCount
+    // the adaptive budget drives; a bespoke particle path here would escape
+    // the shed entirely.
+    expect(source).toMatch(/this\.vfx\.groundPuff\(/);
+    expect(source).toMatch(/this\.vfx\.burst\(/);
+    // ...and the shed stays in vfx.ts: no local count knob of its own.
+    expect(source.includes('scaledCount')).toBe(false);
   });
 
   it('the cosmetic side is the one that varies: LOW_FOG exists and the bobber does not read it', () => {

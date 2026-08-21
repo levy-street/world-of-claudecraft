@@ -107,3 +107,36 @@ describe('Renderer.createView object branch (source pin)', () => {
     expect(objectBranch).not.toContain('objectPoolKey = null');
   });
 });
+
+describe('buildGroundQuestObject with no item (the placed feast view)', () => {
+  // A kind-'object' entity with objectItemId null reaches the generic branch
+  // as itemId '' (today only the Phase 12 harvest feast). Its world prop is
+  // drawn by farm_patches.ts, so the generic view must NOT stack a supply
+  // crate on top of it; what it still owes the renderer is a raycastable
+  // click body (invisible, the character clickProxy precedent) and an honest
+  // anchor height at the farm_feast contract bounds.
+  it('builds an invisible pick proxy at the feast contract bounds, never a crate', () => {
+    const { group, height } = buildGroundQuestObject('', 7);
+    expect(height).toBe(0.9);
+    expect(group.children).toHaveLength(1);
+    const proxy = group.children[0] as unknown as {
+      visible: boolean;
+      geometry: { parameters: { width: number; height: number; depth: number } };
+      position: { y: number };
+      castShadow: boolean;
+    };
+    expect(proxy.visible).toBe(false);
+    expect(proxy.castShadow).toBe(false);
+    expect(proxy.geometry.parameters).toMatchObject({ width: 1.6, height: 0.9, depth: 1.6 });
+    expect(proxy.position.y).toBeCloseTo(0.45, 6);
+  });
+
+  it('the proxy differs decisively from a real item build (the crate arm still works)', () => {
+    const crate = buildGroundQuestObject('supply_crate', 7);
+    // The crate arm keeps its taller anchor and its (id % 7) yaw; the no-item
+    // arm must have taken neither.
+    expect(crate.height).not.toBe(0.9);
+    const bare = buildGroundQuestObject('', 7);
+    expect(bare.group.rotation.y).toBe(0);
+  });
+});

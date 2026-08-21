@@ -434,6 +434,7 @@ describe('i18n Localization Key Coverage', () => {
     requirement: 'Requires Mining 40',
     resource: 'Mana',
     seconds: 7,
+    servings: 10,
     shown: 120,
     slot: 5,
     source: 'Wolf',

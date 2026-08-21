@@ -108,6 +108,11 @@ const hudTs = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8')
   /\r\n/g,
   '\n',
 );
+// The body-class scan hud.ts used to hold inline (Phase 14 extraction).
+const windowOpenStateTs = readFileSync(
+  new URL('../src/ui/window_open_state.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 const playerCardControllerTs = readFileSync(
   new URL('../src/ui/hud/player_card/player_card_controller.ts', import.meta.url),
   'utf8',
@@ -1854,7 +1859,7 @@ describe('client HTML shell', () => {
     expect(bindButton.indexOf("document.getElementById('mobile-more')?.focus();")).toBeLessThan(
       bindButton.indexOf('cb();'),
     );
-    expect(hudTs).toContain(".filter((win) => win.id !== 'mobile-extra-controls')");
+    expect(windowOpenStateTs).toContain(".filter((win) => win.id !== 'mobile-extra-controls')");
     expect(hudTs).toContain('if (destination) this.focusManager.focusFirst(destination);');
   });
 
@@ -2612,9 +2617,9 @@ describe('client HTML shell', () => {
   });
 
   it('stacks the mobile map below the quest log when both are open', () => {
-    expect(hudTs).toContain("'mobile-map-quest-open'");
-    expect(hudTs).toContain('this.isWindowVisible(mapWindow)');
-    expect(hudTs).toContain('this.isWindowVisible(questLogWindow)');
+    expect(windowOpenStateTs).toContain("'mobile-map-quest-open'");
+    expect(windowOpenStateTs).toContain('isWindowVisible(mapWindow)');
+    expect(windowOpenStateTs).toContain('isWindowVisible(questLogWindow)');
     expect(hudMobileCss).toContain(
       '--mobile-map-quest-stack-top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));',
     );

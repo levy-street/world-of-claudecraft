@@ -103,7 +103,6 @@ import { TIER_SKILL_STEP, tierForSkill } from '../sim/professions/wheel';
 import { questObjectivesForMob } from '../sim/quest_targets';
 import type { ResolvedAbility } from '../sim/sim';
 import type {
-  AbilityDef,
   CalendarResultCode,
   EquipSlot,
   HonorReason,
@@ -161,6 +160,14 @@ import {
   formatAbilityNumber,
 } from './ability_description';
 import { abilityDisplayName, abilityDisplayNameFromSource } from './ability_display_name';
+import {
+  abilityCastLine,
+  abilityRangeLine,
+  abilityRequirementLines,
+  describeAbilitySummary,
+  playerSpellHasteFrac,
+  resourceDisplayName,
+} from './ability_tooltip_lines';
 import { ArenaWindow } from './arena_window';
 import { auraDisplayNameForHud, auraDisplayNameFromSource } from './aura_display_name';
 import {
@@ -189,6 +196,7 @@ import { blockLandingLogKey } from './block_landing_feedback_core';
 import { CalendarWindow } from './calendar_window';
 import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter, type CastBarPaintInput } from './cast_bar_painter';
+import { castDisplayName, targetCastDisplayLabel } from './cast_display_name';
 import { charBagsPaired } from './char_bags_pairing_core';
 import { charSheetRefreshSig } from './char_sheet_sig_core';
 import { type CharSkinPainterHost, paintCharSkinPicker } from './char_skin_window';
@@ -291,12 +299,12 @@ import {
   disenchantSecondaryLineKey,
   salvageResultToast,
 } from './enchanting_view';
+import { entityDisplayName } from './entity_display_name';
 import {
   delveDisplayName,
   delveText,
   dungeonDisplayNameFromSource,
   dungeonText,
-  entityDisplayName,
   itemDisplayNameFromSource,
   itemStackDisplayName,
   mobDisplayName,
@@ -322,9 +330,12 @@ import {
 } from './entity_i18n';
 import { ERROR_LOG_CHAN, ERROR_LOG_COLOR, shouldMirrorErrorToast } from './error_toast_log';
 import { esc } from './esc';
+import { handleFarmEvent } from './farm_event_feedback';
+import { PlantSheetWindow } from './farming_plant_sheet_window';
 import { blockFctAmountText } from './fct_core';
 import { fctSpawnShape } from './fct_event';
 import { FctPainter } from './fct_painter';
+import { feastTooltipLines } from './feast_tooltip_view';
 import { FocusManager, type FocusTrapHandle } from './focus_manager';
 import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
 import {
@@ -333,6 +344,7 @@ import {
   resetFramePositionsOnce,
   TARGET_FRAME_POS_KEY,
 } from './frame_pos_reset';
+import { gatherRareEventFeedback } from './gather_rare_event_feedback';
 import { gatherToolTooltipLines } from './gather_tool_tooltip';
 import { gatheringProfessionNameKey } from './gathering_profession_name';
 import {
@@ -351,6 +363,7 @@ import {
   harvestLineKey,
 } from './grant_line_view';
 import { decideGuildMotdLine } from './guild_motd_login';
+import { HarvestJournalWindow } from './harvest_journal_window';
 import {
   healLandingFloatTextKey,
   healLandingLogKey,
@@ -358,10 +371,6 @@ import {
   shouldShowHealLanding,
 } from './heal_landing_feedback_core';
 import { honorFloatText } from './honor_float_view';
-import {
-  type AbilityRequirementResolve,
-  abilityRequirementKeys,
-} from './hud/action_bar/ability_requirement_keys';
 import {
   type ActionBarBindState,
   actionBarBindEnter,
@@ -595,7 +604,6 @@ import {
   pickIdleBarkCandidates,
 } from './mob_idle_sfx';
 import { type MobTooltipI18n, type MobTooltipModel, mobTooltipHtml } from './mob_tooltip_view';
-import { isMobileFullscreenWindowOpen } from './mobile_fullscreen_window_core';
 import { MobileMoreDialogController } from './mobile_more_dialog';
 import { mobileStationTooltipLines } from './mobile_station_tooltip';
 import { MOUNT_DESC_KEYS, mountSpecLines } from './mount_labels';
@@ -700,6 +708,7 @@ import {
   reliquaryRelicPageIndex,
 } from './reliquary_view';
 import { curatorRankNameKey, ReliquaryWindow } from './reliquary_window';
+import { openReportWindow } from './report_window';
 import { restView } from './rest_indicator';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
@@ -734,7 +743,6 @@ import {
   statTooltipHtml,
 } from './stat_tooltip_view';
 import { mountStorePromoCard, type StorePromoCardController } from './store_promo_card';
-import { recordStoreStackSample } from './store_stack_diag';
 import { nearestSubzone } from './subzone';
 import { swingTimerState } from './swing_timer';
 import { SwingTimerPainter } from './swing_timer_painter';
@@ -785,6 +793,7 @@ import {
 } from './wallet_balance';
 import { type WeaponProcEffectDesc, weaponProcLines } from './weapon_proc_view';
 import { weaponTypeLabelKey } from './weapon_type_label';
+import { wellfedTooltipLines } from './wellfed_tooltip_view';
 import { promptWikiVisit } from './wiki_link';
 import {
   installWindowDrag,
@@ -792,8 +801,8 @@ import {
   type WindowDragController,
 } from './window_drag';
 import { makeWindowFocus } from './window_focus';
+import { syncWindowOpenBodyClasses } from './window_open_state';
 import { installWindowResize, markResizableWindow } from './window_resize';
-import { stackedWindowsVisible } from './window_stack_state_core';
 import { installWorldDropTarget } from './world_drop_target';
 import { formatXp, type XpBarView, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
@@ -1003,54 +1012,11 @@ const MOB_TOOLTIP_VIEW_DEPS: MobTooltipI18n = {
   t: (key, params) => t(key as TranslationKey, params),
   fmt: (value, opts) => formatNumber(value, opts),
 };
-// Rift boss one-shot mechanic cast IDs: keyed by their authored mechanic name.
-// These appear in the target cast bar when the boss winds up a lethal zone.
-// The lookup prevents falling back to the raw castId string on the HUD.
-const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
-  'abilityUi.cast.rift_frost_execution': true,
-  'abilityUi.cast.rift_frost_strike': true,
-  'abilityUi.cast.rift_ember_execution': true,
-  'abilityUi.cast.rift_ember_strike': true,
-  'abilityUi.cast.rift_venom_execution': true,
-  'abilityUi.cast.rift_venom_strike': true,
-  'abilityUi.cast.rift_necro_execution': true,
-  'abilityUi.cast.rift_necro_strike': true,
-  'abilityUi.cast.rift_brute_execution': true,
-  'abilityUi.cast.rift_brute_strike': true,
-  'abilityUi.cast.rift_arcane_execution': true,
-  'abilityUi.cast.rift_arcane_strike': true,
-  'abilityUi.cast.rift_storm_execution': true,
-  'abilityUi.cast.rift_storm_strike': true,
-  'abilityUi.cast.rift_tide_execution': true,
-  'abilityUi.cast.rift_tide_strike': true,
-};
 const PLAYER_TOOLTIP_VIEW_DEPS: PlayerTooltipI18n = {
   t: (key, params) => t(key as TranslationKey, params),
   fmt: (value, opts) => formatNumber(value, opts),
 };
-const castDisplayName = (id: string): string => {
-  if (id === FISHING_CAST_ID) return t('abilityUi.cast.fishing');
-  if (id === GATHER_CAST_ID) return t('abilityUi.cast.gathering');
-  if (id === CRAFT_CAST_ID) return t('abilityUi.cast.crafting');
-  if (id === DISENCHANT_CAST_ID) return t('abilityUi.cast.disenchanting');
-  if (id === ENCHANT_CAST_ID) return t('abilityUi.cast.enchanting_apply');
-  if (id === SALVAGE_CAST_ID) return t('abilityUi.cast.salvaging');
-  if (id === SUNDER_CAST_ID) return t('abilityUi.cast.sundering');
-  if (id === TOOL_RECHARGE_CAST_ID) return t('abilityUi.cast.tool_recharge');
-  if (id === 'demon_heal') return t('abilityUi.cast.demonHeal');
-  if (id === 'thunzharr_stormcall') return t('abilityUi.cast.thunzharrStormcall');
-  const riftKey = `abilityUi.cast.${id}` as TranslationKey;
-  if (riftKey in RIFT_CAST_DISPLAY_KEYS) return t(riftKey);
-  const ability = ABILITIES[id];
-  return ability ? abilityDisplayName(ability) : id;
-};
 
-const RESOURCE_LABEL_KEYS: Record<ResourceType, TranslationKey> = {
-  mana: 'abilityUi.resources.mana',
-  rage: 'abilityUi.resources.rage',
-  energy: 'abilityUi.resources.energy',
-  focus: 'abilityUi.resources.focus',
-};
 // Ravenpost mailResult refusal codes to their toast lines. `sent`/`collected`
 // are successes rendered as chat-log lines in handleEvents, but they map here
 // too; codes outside THIS bundle's union take the fallback below.
@@ -1130,10 +1096,6 @@ const RAID_MARKER_LABEL_KEYS = [
   'hud.markers.names.cross',
   'hud.markers.names.skull',
 ] as const satisfies readonly TranslationKey[];
-const FORM_LABEL_KEYS: Record<'bear' | 'cat', TranslationKey> = {
-  bear: 'abilityUi.forms.bear',
-  cat: 'abilityUi.forms.cat',
-};
 const PET_MODE_LABEL_KEYS: Record<PetMode, TranslationKey> = {
   passive: 'hud.pet.passive',
   defensive: 'hud.pet.defensive',
@@ -2069,6 +2031,7 @@ export class Hud {
       station: (marker) => this.mapMarkerTooltipContent.station(marker),
       service: (marker) => this.mapMarkerTooltipContent.service(marker),
       gather: (marker) => this.mapMarkerTooltipContent.gather(marker),
+      farm: (marker) => this.mapMarkerTooltipContent.farm(marker),
       questArea: (refs, count) => this.mapMarkerTooltipContent.questArea(refs, count),
       paint: (html, x, y) => this.paintTooltipAt(html, x, y),
       clearMemo: () => this.mapMarkerTooltipContent.clearMemo(),
@@ -2797,6 +2760,8 @@ export class Hud {
       '#deeds-window',
       '#reliquary-window',
       '#professions-window',
+      '#harvest-journal-window',
+      '#plant-sheet-window',
     ]) {
       $(panelId).addEventListener('keydown', (e) => {
         if ((e.target as HTMLElement).tagName !== 'BUTTON') return;
@@ -3223,40 +3188,9 @@ export class Hud {
   }
 
   private syncAnyWindowOpenState(): void {
-    const windows = [...document.querySelectorAll<HTMLElement>('.window.panel')];
-    const anyOpen = windows
-      .filter((win) => win.id !== 'mobile-extra-controls')
-      .some((win) => this.isWindowVisible(win));
-    document.body.classList.toggle('mobile-window-open', anyOpen);
-    const bagsWindow = document.getElementById('bags');
-    const charWindow = document.getElementById('char-window');
-    document.body.classList.toggle(
-      'mobile-fullscreen-window-open',
-      isMobileFullscreenWindowOpen(
-        !!bagsWindow && this.isWindowVisible(bagsWindow),
-        !!charWindow && this.isWindowVisible(charWindow),
-        document.body.classList.contains('vendor-open'),
-        document.body.classList.contains('bank-open'),
-        document.body.classList.contains('market-open'),
-        document.body.classList.contains('char-bags-paired'),
-      ),
-    );
-    const storeWindow = document.getElementById('daily-rewards-window') as HTMLElement | null;
-    const claudiumWindow = document.getElementById('claudium-window') as HTMLElement | null;
-    const storeVisible = !!storeWindow && this.isWindowVisible(storeWindow);
-    const claudiumVisible = !!claudiumWindow && this.isWindowVisible(claudiumWindow);
-    const storeStacked = stackedWindowsVisible(storeVisible, claudiumVisible);
-    document.body.classList.toggle('store-stack-open', storeStacked);
-    recordStoreStackSample(storeVisible, claudiumVisible, storeStacked);
-    const mapWindow = document.getElementById('map-window');
-    const questLogWindow = document.getElementById('quest-log-window');
-    document.body.classList.toggle(
-      'mobile-map-quest-open',
-      !!mapWindow &&
-        !!questLogWindow &&
-        this.isWindowVisible(mapWindow) &&
-        this.isWindowVisible(questLogWindow),
-    );
+    // The whole body-class scan lives in window_open_state.ts (Phase 14
+    // extraction); every window's onVisibilityChange dep points here.
+    syncWindowOpenBodyClasses((el) => this.isWindowVisible(el));
   }
 
   private placeNewWindow(el: HTMLElement): void {
@@ -3513,6 +3447,14 @@ export class Hud {
       case 'professions-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.professionsWindow.close();
+        break;
+      case 'harvest-journal-window':
+        // Route through the painter: focus returns (WCAG 2.2 AA), clock disposed.
+        this.harvestJournalWindow.close();
+        break;
+      case 'plant-sheet-window':
+        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
+        this.plantSheetWindow.close();
         break;
       case 'arena-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA),
@@ -4296,10 +4238,10 @@ export class Hud {
   // The two cast bars are ONE instance-parameterized painter, over the
   // castBarState core. The PLAYER instance localizes the cast id (castDisplayName),
   // layers the eat/drink overlay (consumeBarState, player-only), and clears the bar
-  // on hide (its inline block did). The TARGET instance shows the raw cast id
-  // (byte-faithful: the target block set the raw `label`), has no eat/drink (the
-  // target never eats/drinks, so its paint omits `consume`), and hides with only
-  // display:none (its inline block did not clear).
+  // on hide (its inline block did). The TARGET instance resolves through
+  // targetCastDisplayLabel (farming localized, every other id raw as its inline
+  // block was), has no eat/drink (the target never eats/drinks, so its paint
+  // omits `consume`), and hides with only display:none (no inline-block clear).
   private readonly playerCastBarPainter = new CastBarPainter(
     this.writerFacet,
     {
@@ -4318,7 +4260,7 @@ export class Hud {
       label: this.targetCastbarLabelEl,
       timer: this.targetCastbarTimerEl,
     },
-    { resolveCastLabel: (s) => s.label },
+    { resolveCastLabel: (s) => targetCastDisplayLabel(s.label) },
   );
   // The target frame is the SECOND instance of the unit_frame family: the same
   // painter + core as the player, over the target's element set. It supplies the
@@ -4873,6 +4815,26 @@ export class Hud {
     hideTooltip: () => this.hideTooltip(),
     consumePeek: () => this.peekGuard.consume(),
     ...this.windowFocus('#professions-window'),
+    openHarvestJournal: () => this.harvestJournalWindow.open(),
+  });
+  // The Harvest Journal painter (harvest_journal_view.ts core +
+  // harvest_journal_window.ts painter): the read-only plot list over
+  // IWorldFarming. Self-driven (its own 1 Hz clock), so Hud only relocalizes it.
+  private readonly harvestJournalWindow = new HarvestJournalWindow({
+    root: () => $('#harvest-journal-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#harvest-journal-window'),
+    ...this.windowFocus('#harvest-journal-window'),
+    onVisibilityChange: () => this.syncAnyWindowOpenState(),
+  });
+  // The plant sheet painter (farming_plant_sheet_view.ts core + its painter):
+  // the bed-verbs plant window. Cold, paint-on-open; farm events feed it.
+  private readonly plantSheetWindow = new PlantSheetWindow({
+    root: () => $('#plant-sheet-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#plant-sheet-window'),
+    ...this.windowFocus('#plant-sheet-window'),
+    onVisibilityChange: () => this.syncAnyWindowOpenState(),
   });
   // The Reliquary window painter (reliquary_view.ts core + reliquary_window.ts
   // painter): Overview + shelf chrome over IWorldReliquary. A standalone
@@ -6092,9 +6054,7 @@ export class Hud {
     // restore-health line; no materialHintLine HTML growth). outerHTML bridges
     // the node into the legacy string tooltip stack.
     const cookingHintKey = cookingCatchHintKey(item.id);
-    if (cookingHintKey) {
-      html += createTooltipLine(t(cookingHintKey), 'tt-desc').outerHTML;
-    }
+    if (cookingHintKey) html += createTooltipLine(t(cookingHintKey), 'tt-desc').outerHTML;
     // Profession affinity for honest materials (material_profession_hint_view.ts):
     // "Used by Leatherworking, ..." derived from live recipe/enchant consumers.
     // Skips when a more specific purpose line above already covers a single
@@ -6126,6 +6086,8 @@ export class Hud {
     if (item.kind === 'recipe') {
       html += recipePatternTooltipLines(item, this.sim.craftingIdentity);
     }
+    html += wellfedTooltipLines(item);
+    html += feastTooltipLines(item);
     // Quest story block (related quest, progress, rules, orphaned). Replaces the
     // old plain "Quest Item" desc that doubled the kind line.
     if (questModel) html += this.questItemTooltipStoryHtml(questModel);
@@ -6503,6 +6465,8 @@ export class Hud {
     if (this.deedsWindow.isOpen) this.deedsWindow.render();
     if (this.reliquaryWindow.isOpen) this.reliquaryWindow.render();
     if (this.professionsWindow.isOpen) this.professionsWindow.render();
+    this.harvestJournalWindow.relocalize();
+    this.plantSheetWindow.relocalize();
     // The crafting window's repaint memos (station set, reagent sig, the
     // profession surface sig) are all text-independent, so a language switch
     // alone never moves them and an open window kept the previous locale
@@ -12465,8 +12429,8 @@ export class Hud {
           // Full-bag signed-grant downgrade (Professions 2.0): a
           // toast ONLY, the gatherDenied pattern above. No loot line, no cue,
           // no other state (the grant-hub double-log trap); the sim event is
-          // text-free, so the pure core resolves the key off the lost arm.
-          this.showError(t(gatherDowngradeLineKey(ev.lost)));
+          // text-free, so the pure core resolves the key off lost + surface.
+          this.showError(t(gatherDowngradeLineKey(ev.lost, ev.surface)));
           break;
         }
         case 'disenchantResult': {
@@ -12640,22 +12604,29 @@ export class Hud {
           audio.fishReel();
           break;
         }
+        case 'farmPlanted':
+        case 'farmHarvested':
+        case 'farmWithered':
+        case 'farmDenied':
+        case 'farmHusksConverted':
+        case 'farmReady':
+        case 'farmFeastPlaced':
+          // Farming's seven feedback arms, extracted whole to
+          // src/ui/farm_event_feedback.ts at the v0.38.0 sync (the monolith
+          // ratchet heal); the Hud itself is the host seam.
+          handleFarmEvent(ev, this);
+          this.plantSheetWindow.notifyFarmEvent(ev);
+          break;
         case 'gatherRareEvent': {
-          // Soft zone broadcast (Professions 2.0): every recipient in
-          // the zone logs the localized flavor line; only the finder also gets
-          // the celebratory cue. The finder name splices verbatim.
-          this.log(
-            t(
-              ev.flavor === 'pristine_vein'
-                ? 'gatherEvent.pristineVein'
-                : ev.flavor === 'ancient_heartwood'
-                  ? 'gatherEvent.ancientHeartwood'
-                  : 'gatherEvent.moonlitBloom',
-              { finder: ev.finderName },
-            ),
-            QUALITY_COLOR.epic,
-          );
-          if (ev.finderPid === sim.playerId) audio.achievement();
+          // Soft zone broadcast (Professions 2.0): every recipient in the
+          // zone logs the localized flavor line; the finder-only cue rules
+          // (shared achievement, layered golden sting) live in the pure core
+          // gather_rare_event_feedback.ts, where a Vitest drives every
+          // flavor x recipient quadrant. The finder name splices verbatim.
+          const fb = gatherRareEventFeedback(ev.flavor, ev.finderPid, sim.playerId);
+          this.log(t(fb.lineKey, { finder: ev.finderName }), QUALITY_COLOR.epic);
+          if (fb.achievementCue) audio.achievement();
+          if (fb.farmGoldenSting) audio.farmGolden();
           break;
         }
         case 'lootRoll': {
@@ -12821,6 +12792,7 @@ export class Hud {
           } else {
             this.showError(this.localizeErrorText(ev.text));
           }
+          this.plantSheetWindow.notifyErrorToast();
           break;
         }
         case 'questAccepted':
@@ -16595,6 +16567,16 @@ export class Hud {
     this.reliquaryWindow.toggle();
   }
 
+  // The Harvest Journal keybind entry (the professions row opens it directly).
+  toggleHarvestJournal(): void {
+    this.harvestJournalWindow.toggle();
+  }
+
+  // The bed arm's free-bed route (NearbyInteractionHud): opens the plant sheet.
+  openPlantSheet(bedId: string): void {
+    this.plantSheetWindow.open(bedId);
+  }
+
   // Repaint the deed tracker from the live facet: the slow band, a watch
   // toggle, the collapse toggle, and language switches all funnel here; the
   // elided writers make an unchanged repaint free.
@@ -18687,73 +18669,20 @@ export class Hud {
     return null;
   }
 
+  // Body in report_window.ts (the Phase 9b headroom extraction); this
+  // wrapper only binds the coordinator's private pieces into the deps bag.
   private openReportWindow(target: { pid?: number; name: string }): void {
-    if (!this.reportHooks) return;
-    this.closeOtherWindows('#report-window');
-    const { pid, name } = target;
-    const el = $('#report-window');
-    el.innerHTML = `
-      <div class="panel-title"><span>${esc(t('hud.report.title', { name }))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.report.cancel'))}" title="${esc(t('hud.report.cancel'))}">${svgIcon('close')}</button></div>
-      <label class="report-label" for="report-reason">${esc(t('hud.report.reason'))}</label>
-      <div id="report-reason-slot" aria-describedby="report-error"></div>
-      <label class="report-label" for="report-details">${esc(t('hud.report.details'))}</label>
-      <textarea id="report-details" maxlength="1000" placeholder="${esc(t('hud.report.detailsPlaceholder'))}" aria-describedby="report-error"></textarea>
-      <div class="report-error" id="report-error" role="alert" aria-live="polite"></div>
-      <div class="report-actions">
-        <button class="btn" type="button" id="report-submit">${esc(t('hud.report.submit'))}</button>
-        <button class="btn" type="button" data-close>${esc(t('hud.report.cancel'))}</button>
-      </div>`;
-    el.style.display = 'block'; // centred by the shared .window rule
-    const reasonDD = this.buildDropdown(
-      [
-        { value: 'harassment', label: t('hud.report.reasons.harassment') },
-        { value: 'spam', label: t('hud.report.reasons.spam') },
-        { value: 'cheating', label: t('hud.report.reasons.cheating') },
-        {
-          value: 'offensive_name_or_chat',
-          label: t('hud.report.reasons.offensiveNameOrChat'),
-        },
-        { value: 'other', label: t('hud.report.reasons.other') },
-      ],
-      'harassment',
-      undefined,
-      undefined,
-      { ariaLabel: t('hud.report.reason') },
+    openReportWindow(
+      {
+        reportHooks: () => this.reportHooks,
+        closeOtherWindows: (keep) => this.closeOtherWindows(keep),
+        buildDropdown: (options, current, onChange, placeholder, a11y) =>
+          this.buildDropdown(options, current, onChange, placeholder, a11y),
+        log: (text, color) => this.log(text, color),
+        localizeReportError: (err) => this.localizeReportError(err),
+      },
+      target,
     );
-    // Give the trigger the id the <label for="report-reason"> points at, so the
-    // label (which lost its original target when the slot div was replaced)
-    // associates with a real focusable control again.
-    reasonDD.querySelector('.ui-dd-btn')?.setAttribute('id', 'report-reason');
-    el.querySelector('#report-reason-slot')?.replaceWith(reasonDD);
-    el.querySelectorAll('[data-close]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        el.style.display = 'none';
-      });
-    });
-    const submit = $('#report-submit') as HTMLButtonElement;
-    submit.addEventListener('click', () => {
-      const reason = reasonDD.dataset.value ?? 'other';
-      const details = ($('#report-details') as HTMLTextAreaElement).value;
-      submit.disabled = true;
-      const request =
-        pid !== undefined
-          ? this.reportHooks?.submit(pid, reason, details)
-          : this.reportHooks?.submitByName?.(name, reason, details);
-      if (!request) {
-        submit.disabled = false;
-        $('#report-error').textContent = t('hud.report.failed');
-        return;
-      }
-      request
-        .then(() => {
-          el.style.display = 'none';
-          this.log(t('hud.report.submitted', { name }), '#ffd100');
-        })
-        .catch((err: unknown) => {
-          submit.disabled = false;
-          $('#report-error').textContent = this.localizeReportError(err);
-        });
-    });
   }
 
   private localizeReportError(err: unknown): string {
@@ -19281,45 +19210,8 @@ export class Hud {
   }
 }
 
-function describeAbilitySummary(
-  known: ResolvedAbility,
-  resourceType: ResourceType | null,
-  spellHaste = 0,
-): string {
-  const parts: string[] = [];
-  if (known.cost > 0) {
-    parts.push(
-      t('abilityUi.tooltip.cost', {
-        cost: formatAbilityNumber(known.cost),
-        resource: resourceDisplayName(resourceType),
-      }),
-    );
-  }
-  if ((known.def.ruinCost ?? 0) > 0) {
-    parts.push(
-      t('abilityUi.tooltip.ruinCost', {
-        cost: formatAbilityNumber(known.def.ruinCost ?? 0),
-      }),
-    );
-  }
-  parts.push(abilityCastLine(known, spellHaste));
-  // Resolved cooldown (after talent cooldown modifiers), not the base def cooldown.
-  if (known.cooldown > 0) {
-    parts.push(
-      t('abilityUi.tooltip.cooldownSeconds', {
-        seconds: formatAbilityNumber(known.cooldown),
-      }),
-    );
-  }
-  return parts.join(' · ');
-}
-
 function combatAbilityName(name: string | null): string {
   return name ? abilityDisplayNameFromSource(name) : t('hud.combat.attack');
-}
-
-function resourceDisplayName(resourceType: ResourceType | null): string {
-  return t(RESOURCE_LABEL_KEYS[resourceType ?? 'mana']);
 }
 
 // itemSlotName moved to ./item_slot_labels as itemSlotLabel (imported above under
@@ -19340,96 +19232,10 @@ function parseSimMoney(text: string): number | null {
   return matched ? copper : null;
 }
 
-function abilityRangeLine(def: AbilityDef): string | null {
-  if (def.range <= 0) return null;
-  if (def.minRange !== undefined) {
-    return t('abilityUi.tooltip.rangeWithMin', {
-      min: formatAbilityNumber(def.minRange),
-      max: formatAbilityNumber(def.range),
-    });
-  }
-  return t('abilityUi.tooltip.range', {
-    range: formatAbilityNumber(def.range),
-  });
-}
-
-// The live caster's TOTAL spell-haste fraction: the resolved stat (set bonuses + spec
-// mastery) PLUS active buff_spellhaste auras (Arcane Power, Coldsurge, Metamorphosis).
-// Mirrors the sim's spellHasteMult (spell_combat.ts) EXACTLY, including its
-// `Math.max(0, ...)` floor, so a shown cast time never disagrees with the real one (a
-// net-negative haste, e.g. a cast-slow debuff, floors at 0 for both). ui/ cannot import
-// the sim-combat helper across the seam, so the formula is kept identical here by hand.
-function playerSpellHasteFrac(p: Entity | null | undefined): number {
-  if (!p) return 0;
-  let frac = p.spellHaste;
-  for (const a of p.auras) if (a.kind === 'buff_spellhaste') frac += a.value;
-  return Math.max(0, frac);
-}
-
-// `spellHaste` (the live character's total spell haste, a fraction) shortens the shown
-// cast / channel time exactly as the sim does, so a hasted caster's tooltips reflect the
-// real, faster cast.
-function abilityCastLine(known: ResolvedAbility, spellHaste = 0): string {
-  const h = 1 + Math.max(0, spellHaste);
-  if (known.def.channel) {
-    return t('abilityUi.tooltip.channeledSeconds', {
-      seconds: formatAbilityNumber(known.def.channel.duration / h),
-    });
-  }
-  if (known.castTime > 0) {
-    return t('abilityUi.tooltip.castSeconds', {
-      seconds: formatAbilityNumber(known.castTime / h),
-    });
-  }
-  return t('abilityUi.tooltip.instant');
-}
-
-// Thin i18n mapper over the pure resolver (ability_requirement_keys.ts), which
-// owns the truth table incl. the Skulduggery-only stealth-bypass line.
-export function abilityRequirementLines(
-  def: AbilityDef,
-  spec?: string | null,
-  resolved?: AbilityRequirementResolve,
-): string[] {
-  return abilityRequirementKeys(def, spec, resolved).map((req) => {
-    switch (req.key) {
-      case 'requiresForm':
-        if (req.form) {
-          return t('abilityUi.tooltip.requiresForm', { form: t(FORM_LABEL_KEYS[req.form]) });
-        }
-        return t('abilityUi.tooltip.selfOnly');
-      case 'requiresStealth':
-        return t('abilityUi.tooltip.requiresStealth');
-      case 'requiresStealthSkulduggery':
-        return t('abilityUi.tooltip.requiresStealthSkulduggery');
-      case 'requiresCombo':
-        return t('abilityUi.tooltip.requiresCombo');
-      case 'requiresDodge':
-        return t('abilityUi.tooltip.requiresDodge');
-      case 'requiresOutOfCombat':
-        return t('abilityUi.tooltip.requiresOutOfCombat');
-      case 'requiresTargetHealthBelow':
-        if (req.percent !== undefined) {
-          return t('abilityUi.tooltip.requiresTargetHealthBelow', {
-            percent: formatAbilityNumber(req.percent),
-          });
-        }
-        return t('abilityUi.tooltip.selfOnly');
-      case 'onNextSwing':
-        return t('abilityUi.tooltip.onNextSwing');
-      case 'offGlobalCooldown':
-        return t('abilityUi.tooltip.offGlobalCooldown');
-      case 'friendlyTarget':
-        return t('abilityUi.tooltip.friendlyTarget');
-      case 'enemyTarget':
-        return t('abilityUi.tooltip.enemyTarget');
-      case 'selfOnly':
-        return t('abilityUi.tooltip.selfOnly');
-      default:
-        return t('abilityUi.tooltip.selfOnly');
-    }
-  });
-}
+// abilityRangeLine, playerSpellHasteFrac, abilityCastLine,
+// abilityRequirementLines, describeAbilitySummary and resourceDisplayName
+// moved WHOLE to ./ability_tooltip_lines (imported above) at the Phase 10
+// headroom extraction, so a Vitest can pin the tooltip lines directly.
 
 // A 2D canvas context is non-null for any attached canvas in this app; centralize
 // the assertion so the call sites do not each carry a non-null bang. Throws (a

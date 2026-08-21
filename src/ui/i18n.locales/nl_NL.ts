@@ -1188,7 +1188,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.charges':
     'Begint met {base} ladingen op een gewoon gereedschap (+{bonus} per zeldzaamheidsrang).',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    'Plaats op een mijnbouw-, houtkap- of kruidenkundegereedschap vanuit het venster Beroepen. Wordt verbruikt bij plaatsing.',
+    'Plaats op een mijnbouw-, houtkap-, kruidenkunde- of landbouwgereedschap vanuit het venster Beroepen. Wordt verbruikt bij plaatsing.',
   'hudChrome.professions.toolEffectTooltip.kind': 'Gereedschapsbedel',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'Kan niet op hengels worden geplaatst.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':
@@ -1859,7 +1859,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'De Wereldmarkt is de rijksbrede beurs, beheerd door de Koopman in Oostbeek en Veilingmeester Voss in Highwatch. Plaatsen is gratis: er is geen deposito, en een onverkochte plaatsing komt gewoon terug bij je. Het huis neemt zijn deel alleen wanneer iets daadwerkelijk verkoopt: 5 procent van de verkoopprijs, en de rest wacht tot je het ophaalt.\n\nEén belangrijke beperking: de Markt bemiddelt alleen in gewone goederen. Een gesigneerde, meesterwerk-, betoverde of gebonden kopie wordt nooit in een plaatsing meegenomen, dus de bijzondere stukken wisselen van eigenaar van aangezicht tot aangezicht in een ruilvenster, dat de volledige identiteit van een voorwerp draagt, handtekening en al. Prijs die zelf in; de Markt vertelt je alleen wat de gewone versie opbrengt.',
   'guide.profPages.econ.workOrdersHeading': 'Werkopdrachten',
   'guide.profPages.econ.workOrdersNote':
-    'Elke stationsmeester plaatst een vaste werkopdracht: breng een stapel van het basismateriaal van zijn ambacht en word ter plekke betaald, plus een beetje questvervaring. De betaling is bewust {pct}% van wat een handelaar je zou geven voor dezelfde stapel, naar beneden afgerond, dus een werkopdracht is nooit de winstgevende manier om materialen te verkopen, alleen een reden om langs het station te rijden.\n\nElke opdracht loopt op zijn eigen {minutes} minuten klok per personage: lever er een in en die meester heeft niets meer voor je totdat de timer zijn ronde heeft gedaan. Behandel ze als een kleine bonus op materialen die je toch al aan het verzamelen was, niet als een bedrijf.',
+    'Elke stationsmeester plaatst vaste werkopdrachten, een per basismateriaal: breng de stapel waar een opdracht om vraagt en word ter plekke betaald, plus een beetje questvervaring. De betaling is bewust {pct}% van wat een handelaar je zou geven voor dezelfde stapel, naar beneden afgerond, dus een werkopdracht is nooit de winstgevende manier om materialen te verkopen, alleen een reden om langs het station te rijden.\n\nElke opdracht loopt op zijn eigen {minutes} minuten klok per personage: lever er een in en die opdracht is voor je gesloten totdat de timer zijn ronde heeft gedaan, terwijl de andere opdrachten van de meester open blijven. Behandel ze als een kleine bonus op materialen die je toch al aan het verzamelen was, niet als een bedrijf.',
   'guide.profPages.econ.colOrder': 'Werkopdracht',
   'guide.profPages.econ.colMaster': 'Meester',
   'guide.profPages.econ.colAsks': 'Vraagt voor',

@@ -711,6 +711,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapMarkerLabels.cooldownLockedHerb': '고갈된 약초, 도구 잠김',
   'hud.core.mapMarkerLabels.station': '제작 시설: {name}',
   'hud.core.mapMarkerLabels.service': '편의 시설: {name}',
+  'hud.core.mapMarkerLabels.farmPatch': '텃밭',
   'hud.core.mapMarkerLabels.partyMember': '파티원: {name}',
   'hud.core.mapMarkerLabels.deadPartyMember': '사망한 파티원: {name}',
   'hud.core.mapMarkerLabels.partyMemberGeneric': '파티원',
@@ -2562,6 +2563,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.forms.bear': '곰',
   'abilityUi.forms.cat': '늑대',
   'abilityUi.cast.fishing': '낚시',
+  'abilityUi.cast.farming': '파종',
   'abilityUi.cast.gathering': '채집',
   'abilityUi.cast.thunzharrStormcall': '폭풍의 부름',
   'abilityUi.cast.demonHeal': '악마 치유',
@@ -2742,8 +2744,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '잘 먹음: 식사를 마치면 {stat}이(가) {value} 증가하며 {minutes}분 동안 지속됩니다. 잘 먹음 효과는 한 번에 하나만 유지되며, 새로 먹은 음식이 이전 효과를 대체합니다.',
   'itemUi.tooltip.wellFedAura':
     '잘 먹음: 식사를 마치면 {aura} 효과를 얻어 {minutes}분 동안 지속됩니다. 잘 먹음 효과는 한 번에 하나만 유지되며, 새로 먹은 음식이 이전 효과를 대체합니다.',
+  'itemUi.tooltip.useWellfed':
+    '다 먹으면 {aura} 효과를 얻어 {stat}이(가) {value} 증가하며 {minutes}분 동안 지속됩니다.',
+  'itemUi.tooltip.useWellfedAura': '다 먹으면 {aura} 효과를 얻어 {minutes}분 동안 지속됩니다.',
+  'itemUi.tooltip.useFeast':
+    '사용: 다른 플레이어도 먹을 수 있는 잔치를 차립니다. 1인당 1인분입니다({servings}인분, {minutes}분간 지속).',
+  'itemUi.tooltip.useFeastBuff':
+    '한 접시를 {seconds}초 동안 다 먹으면 {aura} 효과를 얻어 {stat}이(가) {value} 증가하며 {minutes}분 동안 지속됩니다.',
+  'itemUi.tooltip.useFeastBuffAura':
+    '한 접시를 {seconds}초 동안 다 먹으면 {aura} 효과를 얻어 {minutes}분 동안 지속됩니다.',
   'itemUi.tooltip.clickUseInstant': '클릭하여 전투 중 즉시 사용',
   'itemUi.tooltip.clickUse': '클릭하여 사용',
+  'itemUi.tooltip.clickSetOut': '클릭하여 차리기',
   'itemUi.tooltip.clickBuyback': '클릭하여 되사기',
   'itemUi.bags.title': '가방',
   'itemUi.bags.close': '가방 닫기',
@@ -3889,6 +3901,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_intro.completion':
     '보게나. 광석도 모았고 손에는 굳은살도 박였군. 길을 다닐 때도 채광과 벌목, 약초 채집을 계속하게. 마을에 돌아오면 시장 옆의 마을 집중 게시판과 근처 제작대도 잊지 말고. 원한다면 이 모든 일에서 정당한 생계를 찾을 수 있다네.',
   'entities.quests.q_prof_intro.objectives.0.label': '광맥 채굴',
+  'entities.quests.q_farm_intro.title': '첫 고랑',
+  'entities.quests.q_farm_intro.text':
+    '이 괭이와 골짜기 밀 씨앗 한 줌을 받으세요, {playerName}. 제 옆의 밭 하나에 씨앗을 심고, 하던 일을 보러 가세요. 언제든 원할 때 돌아와서 작물을 거두면 됩니다. 저는 여기 있을 테니까요.',
+  'entities.quests.q_farm_intro.completion':
+    '자, 첫 작물이 당신 손에 들어왔네요. 자리를 비운 동안에도 계속 자라고, 절대 상하지 않아요. 수확 일지(Shift+K, 또는 전문 기술 창의 농사 행)에 심어 둔 밭과 남은 시간이 모두 적혀 있어요. 밭이 부르면 언제든 씨앗을 사러 오세요, {playerName}.',
+  'entities.quests.q_farm_intro.objectives.0.label': '골짜기 밀 심기',
+  'entities.quests.q_farm_intro.objectives.1.label': '골짜기 밀 수확',
   'entities.quests.q_wolves.title': '문 앞의 늑대들',
   'entities.quests.q_wolves.text':
     '숲늑대들이 북쪽 길의 여행자들을 물어뜯고 있습니다, {playerName}. 8마리를 처치해 이스트브룩이 숨 돌리게 해 주십시오.',
@@ -6262,6 +6281,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.controls.leaderboard': '순위표',
   'guide.controls.deeds': '업적의 서',
   'guide.controls.reliquary': '성물고',
+  'guide.controls.harvestJournal': '수확 일지',
   'guide.controls.sheathe': '무기 넣기/빼기',
   'guide.controls.crafting': '제작',
   'guide.controls.valeCup': '베일 컵',
@@ -8645,6 +8665,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.result.takeParcelsFirst': '편지를 버리기 전에 소포를 먼저 꺼내세요.',
   'worldContent.mailboxName': '우편함',
   'worldContent.noticeboardName': '게시판',
+  'worldContent.farmPatchName': '텃밭',
   'entities.letters.ravenpost_welcome.sender': '레이븐포스트',
   'entities.letters.ravenpost_welcome.subject': '이제 까마귀가 당신을 위해 날아갑니다',
   'entities.letters.ravenpost_welcome.body':
@@ -8764,6 +8785,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.logging': '벌목',
   'hudChrome.gathering.herbalism': '약초학',
   'hudChrome.gathering.fishing': '낚시',
+  'hudChrome.gathering.farming': '농사',
   'hudChrome.gathering.notReady': '이 자원 채집지는 아직 당신을 위해 재생성되지 않았습니다.',
   'hudChrome.gathering.gatherLine': '{name}을(를) 채집했습니다.',
   'hudChrome.gathering.gatherLineQty': '{name}을(를) {qty}개 채집했습니다.',
@@ -8781,6 +8803,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.tierRequired.mining': '{tier}티어 채광 곡괭이 필요',
   'hudChrome.gathering.tierRequired.logging': '{tier}티어 벌목 도끼 필요',
   'hudChrome.gathering.tierRequired.herbalism': '{tier}티어 약초 낫 필요',
+  'hudChrome.gathering.tierRequired.farming': '{tier}티어 농사 괭이 필요',
   'hudChrome.gathering.toolTierUnmet.mining':
     '이 광맥을 캐려면 {tier}티어 채광 곡괭이가 필요합니다.',
   'hudChrome.gathering.toolTierUnmet.logging':
@@ -8789,6 +8812,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '이 군락을 채집하려면 {tier}티어 약초 낫이 필요합니다.',
   'hudChrome.gathering.toolTierUnmet.fishing':
     '이 수역에서 낚시하려면 {tier}티어 낚싯대가 필요합니다.',
+  'hudChrome.gathering.toolTierUnmet.farming':
+    '이 작물밭을 일구려면 {tier}티어 농사 괭이가 필요합니다.',
   'hudChrome.gathering.toolTierUnmetCorpse':
     '최상급 재료를 회수하려면 {tier}티어 채집 도구가 필요합니다.',
   'hudChrome.gathering.wieldUnmet.mining':
@@ -8797,6 +8822,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '가방에 있는 도끼를 휘두르려면 벌목 {skill}이(가) 필요합니다.',
   'hudChrome.gathering.wieldUnmet.herbalism':
     '가방에 있는 낫을 다루려면 약초학 {skill}이(가) 필요합니다.',
+  'hudChrome.gathering.wieldUnmet.farming':
+    '가방에 있는 괭이를 휘두르려면 농사 {skill}이(가) 필요합니다.',
   'hudChrome.gathering.wieldUnmetCorpse':
     '최상급 도구를 제대로 다루려면 채집 기술 {skill}이(가) 필요합니다.',
   'hudChrome.gathering.requiresTool.mining': '채광 곡괭이 필요',
@@ -8806,13 +8833,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolRequired.logging': '이 나무를 베려면 벌목 도끼가 필요합니다.',
   'hudChrome.gathering.toolRequired.herbalism': '이 군락을 채집하려면 약초 낫이 필요합니다.',
   'hudChrome.gathering.toolRequired.fishing': '낚싯대가 있어야 낚싯줄을 드리울 수 있습니다.',
+  'hudChrome.gathering.toolRequired.farming': '이 작물밭을 일구려면 농사 괭이가 필요합니다.',
   'hudChrome.gathering.noNodeNearby.mining': '손이 닿는 곳에 광맥이 없습니다.',
   'hudChrome.gathering.noNodeNearby.logging': '손이 닿는 곳에 벌목 나무가 없습니다.',
   'hudChrome.gathering.noNodeNearby.herbalism': '손이 닿는 곳에 약초 군락이 없습니다.',
+  'hudChrome.gathering.noNodeNearby.farming': '손이 닿는 곳에 작물밭이 없습니다.',
   'hudChrome.gathering.toolTooltip.kind.mining': '채광 도구 ({tier}티어)',
   'hudChrome.gathering.toolTooltip.kind.logging': '벌목 도구 ({tier}티어)',
   'hudChrome.gathering.toolTooltip.kind.herbalism': '약초 도구 ({tier}티어)',
   'hudChrome.gathering.toolTooltip.kind.fishing': '낚싯대 ({tier}티어)',
+  'hudChrome.gathering.toolTooltip.kind.farming': '농사 도구 ({tier}티어)',
   'hudChrome.gathering.toolTooltip.unlocks.mining': '{tier}티어까지의 광맥을 캐는 데 필요합니다.',
   'hudChrome.gathering.toolTooltip.unlocks.logging':
     '{tier}티어까지의 벌목 나무를 베는 데 필요합니다.',
@@ -8820,9 +8850,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '{tier}티어까지의 약초 군락을 채집하는 데 필요합니다.',
   'hudChrome.gathering.toolTooltip.unlocks.fishing':
     '{tier}티어까지의 수역에서 낚시하는 데 필요합니다.',
+  'hudChrome.gathering.toolTooltip.unlocks.farming':
+    '{tier}티어까지의 작물을 심는 데 필요합니다.',
   'hudChrome.gathering.toolTooltip.use.mining': '사용: 근처의 광맥을 캡니다.',
   'hudChrome.gathering.toolTooltip.use.logging': '사용: 근처의 벌목 나무를 벱니다.',
   'hudChrome.gathering.toolTooltip.use.herbalism': '사용: 근처의 약초 군락에서 채집합니다.',
+  'hudChrome.gathering.toolTooltip.use.farming':
+    '가방에 넣어 두면 작물밭에 심을 때 사용됩니다.',
   'hudChrome.gathering.toolTooltip.speed': '{tier}티어 미만 채집지에서 더 빠르게 채집합니다.',
   'hudChrome.gathering.toolTooltip.rodRequired': '낚시에 필요합니다.',
   'hudChrome.gathering.toolTooltip.rodBite': '물고기가 최대 {seconds}초 더 빨리 입질합니다.',
@@ -8831,19 +8865,137 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '낚시 기술 {skill} 이상에서 더 풍성한 어획 목록이 해금됩니다.',
   'hudChrome.gathering.downgradeMark':
     '가방이 가득 찼습니다: 수확물이 채집자의 표식 없이 보관되었습니다.',
+  'hudChrome.gathering.downgradeMarkCrop': '가방이 가득 찼습니다: 수확물이 재배자의 표식 없이 보관되었습니다.',
   'hudChrome.gathering.downgradeFind': '가방이 가득 찼습니다: 최상급 수확물을 놓쳐 버렸습니다.',
   'hudChrome.gathering.emptyHookNote': '빈 낚싯바늘',
   'hudChrome.gathering.stateReady': '채집 가능',
   'hudChrome.gathering.stateCooldown': '재생성 중',
   'hudChrome.gathering.stateCooldownTimed': '{time} 후 재생성',
   'hudChrome.gathering.fineGradePreview': '현재 도구로 채집하면 상급 등급을 얻습니다.',
+  'hudChrome.farming.plantLine': '{name}을(를) 심었습니다.',
+  'hudChrome.farming.harvestLine': '{name}을(를) 수확했습니다.',
+  'hudChrome.farming.harvestLineQty': '{name} x{qty}을(를) 수확했습니다.',
+  'hudChrome.farming.harvestFineLine': '또한 {name}을(를) 수확했습니다.',
+  'hudChrome.farming.harvestFineLineQty': '또한 {name} x{qty}을(를) 수확했습니다.',
+  'hudChrome.farming.witheredLine': '작물이 시들었습니다. 밭을 정리했습니다: {name}.',
+  'hudChrome.farming.witheredLineQty': '작물이 시들었습니다. 밭을 정리했습니다: {name} x{qty}.',
+  'hudChrome.farming.seedBackLine': '씨앗을 회수했습니다: {name}.',
+  'hudChrome.farming.seedBackLineQty': '씨앗을 회수했습니다: {name} x{qty}.',
+  'hudChrome.farming.denied.bad_bed': '그곳에는 작물밭이 없습니다.',
+  'hudChrome.farming.denied.bad_crop': '그것은 여기에 심을 수 없습니다.',
+  'hudChrome.farming.denied.range': '그 작물밭에서 너무 멀리 떨어져 있습니다.',
+  'hudChrome.farming.denied.no_farmer': '껍질을 퇴비로 바꾸려면 농부 근처에 있어야 합니다.',
+  'hudChrome.farming.huskTrade': '껍질을 퇴비로 교환',
+  'hudChrome.farming.huskTradeAria': '{name}에게 껍질을 퇴비로 교환',
+  'hudChrome.farming.plantSheet.title': '작물 심기',
+  'hudChrome.farming.plantSheet.plant': '심기',
+  'hudChrome.farming.plantSheet.sowAria': '{name} 뿌리기',
+  'hudChrome.farming.plantSheet.empty': '이 밭에 뿌릴 수 있는 씨앗이 없습니다.',
+  'hudChrome.farming.plantSheet.close': '심기 창 닫기',
+  'hudChrome.farming.denied.bed_taken': '그곳에는 이미 작물이 자라고 있습니다.',
+  'hudChrome.farming.denied.skill': '그 작물을 재배하기에는 농사 숙련도가 부족합니다.',
+  'hudChrome.farming.denied.no_seed': '그 작물의 씨앗이 없습니다.',
+  'hudChrome.farming.denied.not_ready': '그 작물은 아직 자라는 중입니다.',
+  'hudChrome.farming.denied.no_plot': '그 밭에는 아무것도 심겨 있지 않습니다.',
+  'hudChrome.farming.denied.no_husks': '시든 껍질이 부족합니다.',
+  'hudChrome.farming.denied.no_compost': '퇴비가 없습니다.',
+  'hudChrome.farming.denied.no_fee_produce': '망보기 삯을 치를 농산물이 없습니다.',
+  'hudChrome.farming.denied.no_tonic': '성장 토닉이 없습니다.',
+  'hudChrome.farming.denied.tool': '그 작물에 맞는 농사 괭이가 없습니다.',
+  'hudChrome.farming.denied.locked': '지불에 쓸 아이템이 잠겨 있습니다.',
+  'hudChrome.farming.denied.no_feast': '차릴 잔치 음식이 없습니다.',
+  'hudChrome.farming.denied.feast_active': '이미 잔치를 차려 놓았습니다.',
+  'hudChrome.farming.denied.feast_expired': '그 잔치는 이미 사라졌습니다.',
+  'hudChrome.farming.denied.feast_finished': '그 잔치는 남김없이 비워졌습니다.',
+  'hudChrome.farming.denied.feast_range': '잔치에서 너무 멀리 있습니다.',
+  'hudChrome.farming.denied.feast_eaten': '이미 그 잔치에서 먹었습니다.',
+  'hudChrome.farming.feastTitle': '{name}의 수확의 잔치',
+  'hudChrome.farming.feastPlacedLine': '수확의 잔치를 차렸습니다.',
+  'hudChrome.farming.husksConvertedLine': '{husksName} x{husks}을(를) {name}(으)로 교환했습니다.',
+  'hudChrome.farming.husksConvertedLineQty':
+    '{husksName} x{husks}을(를) {name} x{qty}(으)로 교환했습니다.',
+  'hudChrome.farming.readyLine': '작물 1구획을 수확할 수 있습니다.',
+  'hudChrome.farming.readyLineQty': '작물 {count}구획을 수확할 수 있습니다.',
+  'hudChrome.farming.readyWitheredLine': '작물 1구획이 밭에서 시들었습니다.',
+  'hudChrome.farming.readyWitheredLineQty': '작물 {count}구획이 밭에서 시들었습니다.',
+  'hudChrome.harvestJournal.title': '수확 일지',
+  'hudChrome.harvestJournal.close': '닫기',
+  'hudChrome.harvestJournal.listLabel': '심어 둔 작물밭',
+  'hudChrome.harvestJournal.growing': '{time} 후 수확 가능',
+  'hudChrome.harvestJournal.ready': '수확 가능',
+  'hudChrome.harvestJournal.readyAnnounce': '수확 가능: {name}',
+  'hudChrome.harvestJournal.finishing': '마무리 중',
+  'hudChrome.harvestJournal.withered': '시들었음',
+  'hudChrome.harvestJournal.remainingDaysHours': '{days}일 {hours}시간',
+  'hudChrome.harvestJournal.remainingHoursMinutes': '{hours}시간 {minutes}분',
+  'hudChrome.harvestJournal.remainingMinutesSeconds': '{minutes}분 {seconds}초',
+  'hudChrome.harvestJournal.remainingSeconds': '{seconds}초',
+  'hudChrome.harvestJournal.bedLine': '{zone}, {index}번 작물밭',
+  'hudChrome.harvestJournal.bedLineUnknown': '알 수 없는 작물밭',
+  'hudChrome.harvestJournal.careWatch': '농부의 관리',
+  'hudChrome.harvestJournal.careNone': '추가 관리 없음',
+  'hudChrome.harvestJournal.stageSprout': '새싹',
+  'hudChrome.harvestJournal.stageSeedling': '모종',
+  'hudChrome.harvestJournal.stageMaturing': '자라는 중',
+  'hudChrome.harvestJournal.stageRipe': '다 익음',
+  'hudChrome.harvestJournal.emptyTitle': '심어 둔 작물이 없습니다',
+  'hudChrome.harvestJournal.emptyBody':
+    '아무 작물밭에나 씨앗을 심으면 그 밭이 남은 시간과 함께 여기에 표시됩니다.',
+  'hudChrome.harvestJournal.noviceTitle': '아직 작물밭을 가꾼 적이 없습니다',
+  'hudChrome.harvestJournal.noviceBody':
+    '작물을 수확할 때마다 농사 숙련도가 올라갑니다. 아무 작물밭에나 씨앗을 심어 시작하세요.',
   'gatherEvent.pristineVein': '{finder}님이 순수한 광맥을 발견했습니다!',
   'gatherEvent.ancientHeartwood': '{finder}님이 고대 심목을 베어냈습니다!',
   'gatherEvent.moonlitBloom': '{finder}님이 달빛 꽃을 발견했습니다!',
+  'gatherEvent.goldenHarvest': '{finder}님이 황금빛 수확을 거두었습니다!',
   'entities.items.copper_ore.name': '구리 광석',
   'entities.items.iron_ore.name': '철 광석',
   'entities.items.ironbark_log.name': '무쇠껍질나무 통나무',
   'entities.items.silverleaf_herb.name': '윤광잎 약초',
+  'entities.items.vale_wheat_seed.name': '골짜기 밀 씨앗',
+  'entities.items.vale_wheat.name': '골짜기 밀',
+  'entities.items.fine_vale_wheat.name': '상급 골짜기 밀',
+  'entities.items.withered_husks.name': '시든 껍질',
+  'entities.items.compost.name': '퇴비',
+  'entities.items.growth_tonic.name': '성장 토닉',
+  'entities.items.brook_carrot_seed.name': '시냇가 당근 씨앗',
+  'entities.items.brook_carrot.name': '시냇가 당근',
+  'entities.items.fine_brook_carrot.name': '상급 시냇가 당근',
+  'entities.items.marsh_rice_seed.name': '습지 쌀 씨앗',
+  'entities.items.marsh_rice.name': '습지 쌀',
+  'entities.items.fine_marsh_rice.name': '상급 습지 쌀',
+  'entities.items.bog_beet_seed.name': '늪지 비트 씨앗',
+  'entities.items.bog_beet.name': '늪지 비트',
+  'entities.items.fine_bog_beet.name': '상급 늪지 비트',
+  'entities.items.highland_barley_seed.name': '고지대 보리 씨앗',
+  'entities.items.highland_barley.name': '고지대 보리',
+  'entities.items.fine_highland_barley.name': '상급 고지대 보리',
+  'entities.items.frost_gourd_seed.name': '서리 박 씨앗',
+  'entities.items.frost_gourd.name': '서리 박',
+  'entities.items.fine_frost_gourd.name': '상급 서리 박',
+  'entities.items.gilded_sunmelon_seed.name': '금빛 태양멜론 씨앗',
+  'entities.items.gilded_sunmelon.name': '금빛 태양멜론',
+  'entities.items.fine_gilded_sunmelon.name': '상급 금빛 태양멜론',
+  'entities.items.evergarden_greens_seed.name': '상록 정원 잎채소 씨앗',
+  'entities.items.evergarden_greens.name': '상록 정원 잎채소',
+  'entities.items.fine_evergarden_greens.name': '상급 상록 정원 잎채소',
+  'entities.items.garden_hoe.name': '텃밭 괭이',
+  'entities.items.bronze_hoe.name': '청동 괭이',
+  'entities.items.skysilver_hoe.name': '천은 괭이',
+  'entities.items.osmium_hoe.name': '오스뮴 괭이',
+  'entities.items.vale_hearth_loaf.name': '골짜기 화덕빵',
+  'entities.items.eastbrook_root_pottage.name': '이스트브룩 뿌리채소 스튜',
+  'entities.items.fenbridge_rice_bowl.name': '펜브리지 쌀밥',
+  'entities.items.fenbridge_beet_braise.name': '펜브리지 비트 조림',
+  'entities.items.highwatch_barley_bannock.name': '하이워치 보리 납작빵',
+  'entities.items.highwatch_gourd_soup.name': '하이워치 서리 박 수프',
+  'entities.items.evergarden_sunmelon_tart.name': '상록 정원 태양멜론 타르트',
+  'entities.items.evergarden_harvest_platter.name': '상록 정원 수확 접시',
+  'entities.items.eastbrook_glazed_carrots.name': '이스트브룩 당근 글레이즈',
+  'entities.items.fenbridge_rice_pudding.name': '펜브리지 쌀 푸딩',
+  'entities.items.highwatch_barley_porridge.name': '하이워치 보리죽',
+  'entities.items.evergarden_braised_greens.name': '상록 정원 잎채소 조림',
+  'entities.items.harvest_feast.name': '수확의 잔치',
   'hudChrome.archetypeTitle.label': '칭호',
   'hudChrome.archetypeTitle.none': '없음',
   'hudChrome.archetypeTitle.hobbyLabel': '취미',
@@ -10164,6 +10316,22 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.cook_marlow.title': '주방의 주인',
   'entities.npcs.cook_marlow.greeting':
     '내 주방에서 설익은 채 나가는 것은 없다, {className}. 앉아서 먹고, 다시 나가라.',
+  'entities.npcs.farmer_jessica.name': '농부 제시카',
+  'entities.npcs.farmer_jessica.title': '텃밭 지기',
+  'entities.npcs.farmer_jessica.greeting':
+    '좋은 흙과 맑은 날씨를 빌어요, {playerName}. 제게서 씨앗을 사서 저기 밭 하나에 심고, 하던 일을 보러 가세요. 자리를 비운 동안에도 계속 자라고, 절대 상하지 않아요. 수확 일지(Shift+K, 또는 전문 기술 창의 농사 행)에 심어 둔 밭과 남은 시간이 모두 적혀 있어요.',
+  'entities.npcs.farmer_teasel.name': '농부 티즐',
+  'entities.npcs.farmer_teasel.title': '습지 논 농부',
+  'entities.npcs.farmer_teasel.greeting':
+    '습지 쌀과 늪지 비트 씨앗, 그리고 거름으로 쓸 퇴비요, {className}. 논은 물이 더디게 빠지니 발밑을 조심하시오.',
+  'entities.npcs.farmer_hollis.name': '농부 홀리스',
+  'entities.npcs.farmer_hollis.title': '하이워치 계단밭 농부',
+  'entities.npcs.farmer_hollis.greeting':
+    '계단밭은 산이 허락하는 만큼만 내주지, {className}. 퇴비를 팔고 있고, 그대의 작물이 시들어 올라오면 그 껍질을 다시 좋은 흙으로 만들어 주겠소.',
+  'entities.npcs.farmer_verbena.name': '농부 버베나',
+  'entities.npcs.farmer_verbena.title': '파르테르 정원사',
+  'entities.npcs.farmer_verbena.greeting':
+    '가장자리를 조심하세요, {playerName}, 이 밭들은 파르테르의 자랑이니까요. 파는 건 퇴비이고, 가져오신 시든 껍질은 무엇이든 퇴비로 바꿔 드리겠어요.',
   'entities.npcs.weaver_ottilie.name': '직조공 오틸리에',
   'entities.npcs.weaver_ottilie.title': '베틀의 주인',
   'entities.npcs.weaver_ottilie.greeting':
@@ -10640,7 +10808,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm':
     '발동한 자원 채집지의 재생성 시간을 단축합니다.',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    '전문 기술 창에서 채광, 벌목, 약초학 도구에 장착합니다. 장착 시 소모됩니다.',
+    '전문 기술 창에서 채광, 벌목, 약초학, 농사 도구에 장착합니다. 장착 시 소모됩니다.',
   'hudChrome.professions.toolEffectTooltip.charges':
     '일반 등급 도구에서는 {base}회 충전으로 시작합니다(희귀도 한 단계마다 +{bonus}회).',
   'hudChrome.professions.toolEffectTooltip.landOnly': '낚싯대에는 장착할 수 없습니다.',
@@ -11013,6 +11181,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_prof_workorder_kitchens.completion':
     '이제야 창고가 가득하군. 여기 자네 삯일세. 가방이 또 묵직해지면 다시 오게.',
   'entities.quests.q_prof_workorder_kitchens.objectives.0.label': '야생 고기 납품',
+  'entities.quests.q_prof_workorder_kitchens_wheat.title': '주방 밀 작업 의뢰',
+  'entities.quests.q_prof_workorder_kitchens_wheat.text':
+    '빵은 저 혼자 구워지지 않는다네, {playerName}. 내 밀가루 통이 바닥을 긁고 있어. 골짜기 밀 여덟 단을 가져오면 몽땅 정직한 값으로 사겠네. 자네 손으로 길렀든 시장에서 샀든 상관없어, 갈리기만 하면 되니까.',
+  'entities.quests.q_prof_workorder_kitchens_wheat.completion':
+    '잘 마른 낟알이군, 양도 넉넉하고. 여기 자네 삯일세, 정확히 세어 두었네. 다음 수확이 나오면 어느 문을 두드려야 할지 알겠지.',
+  'entities.quests.q_prof_workorder_kitchens_wheat.objectives.0.label': '골짜기 밀 납품',
+  'entities.quests.q_prof_workorder_kitchens_rice.title': '주방 쌀 작업 의뢰',
+  'entities.quests.q_prof_workorder_kitchens_rice.text':
+    '습지 사람들은 자기네 쌀이 최고라고 우기지, {playerName}. 왜 그런지 알아볼 참이야. 습지 쌀 다섯 되를 가져오면 여기 돈이 기다리고 있네. 길에서 젖지 않게 조심하게. 젖은 쌀은 죽이고, 나는 죽을 주문한 적이 없으니까.',
+  'entities.quests.q_prof_workorder_kitchens_rice.completion':
+    '통통하고 잘 말랐군, 낟알 하나하나가. 여기 자네 돈일세. 습지가 계속 내주는 한, 나도 계속 내겠네.',
+  'entities.quests.q_prof_workorder_kitchens_rice.objectives.0.label': '습지 쌀 납품',
   'entities.quests.q_prof_workorder_loom.title': '베틀 작업 의뢰',
   'entities.quests.q_prof_workorder_loom.text':
     '베틀이 비었고, 노는 손은 대낮을 허비하지, {playerName}. 거미 비단 여섯 타래를 가져오면 동전 한 닢까지 헤아려 공정한 삯을 치러 주겠다.',
@@ -11209,7 +11389,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.professions.comingSoon': '제조법 없음',
   'guide.professions.gatherHubHeading': '채집',
   'guide.professions.gatherHubBody':
-    '네 가지 채집 전문직이 제작에 재료를 공급한다. 채광, 벌목, 약초학은 상한이 100이고 낚시는 200이다.',
+    '채집 전문직이 제작에 재료를 공급한다. 채광, 벌목, 약초학은 상한이 100이고, 농사는 가꾼 밭에서 씨앗으로 작물을 길러 상한이 마찬가지로 100이며, 낚시는 200이다.',
   'guide.professions.archetypesHeading': '열 가지 원형',
   'guide.professions.archetypesBody':
     '이웃한 두 전문직에 조율하면 짝 칭호를 얻는다. 두 전공은 최고 한계까지 오르고, 반대편 하나는 취미로 남아 희귀 단계까지 오르며, 나머지 전문직은 일반 단계에 머문다.',
@@ -11239,6 +11419,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.matFmt': '{name} x{count}',
   'guide.profPages.outputFmt': '{name} x{count}',
   'guide.profPages.comboReq': '{a}와 {b} 필요',
+  'guide.profPages.effectFood': '먹으면 {seconds}초에 걸쳐 생명력을 {amount} 회복합니다.',
+  'guide.profPages.effectWellFed': '식사를 마치면 배부름: {minutes}분간 {stat} +{value}.',
+  'guide.profPages.effectWellFedAura': '식사를 마치면 {minutes}분간 {aura} 효과를 얻습니다.',
   'guide.profPages.sourceTrainerFee': '훈련사, {fee}',
   'guide.profPages.sourceTrainerFree': '훈련사, 무료',
   'guide.profPages.sourceKnown': '처음부터 습득',
@@ -11325,6 +11508,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '약초학은 야생에서 자라는 것을 캔다. 이스트브룩 골짜기의 윤기잎, 마이어펜 습지의 금빛잎, 쏜피크 고지의 태양꽃잎, 연금술 계열 전문직의 조제를 이어 주는 잎과 줄기다. 레벨 1부터 누구나 할 수 있고, 가방에 약초 낫(어느 거점 마을에서나 20동)만 있으면 된다. 자체 수치로 기록되며 상한은 100이다.',
   'guide.profPages.gatherIntro.fishing':
     '낚시는 입질과 릴 감기의 흐름으로 모든 지역의 트인 물가에서 어획물을 낚으며, 상한은 200이다.',
+  'guide.profPages.gatherIntro.farming':
+    '농사는 캐내는 것이 아니라 돌보아 기르는 유일한 채집 기술이다. 손질한 밭에 씨앗을 심으면 자리를 비워도 작물은 제 시계대로 자라고, 언제 돌아오든 익은 것을 뽑으면 된다. 밭에 있는 것은 결코 상하지 않기 때문이다. Eastbrook의 텃밭에서 Fenbridge와 Highwatch를 지나 Evergarden의 화단까지, 밭터마다 농부가 곁에 서 있으며 Eastbrook의 Farmer Jessica가 이 기술의 출발점이다. 그녀는 Garden Hoe와 첫 씨앗을 팔고, 그녀의 심부름이 새내기 농부에게 첫 작물을 기르는 법을 알려 준다. 사다리의 단마다 고유한 작물이 한 쌍씩 자라고 솜씨가 늘면 상급 등급도 거두며, 첫 밭보다 거친 땅을 위한 괭이는 기술자가 만든다. 숙련은 전용 카운터로 상한 100까지 오른다.',
   'guide.profPages.rhythmHeading': '채집의 리듬',
   'guide.profPages.rhythmBody':
     '채집은 눈에 보이는 시전이다. 기본 {base}초에 최소 {floor}초까지, 도구가 채집물보다 한 티어 높을 때마다 {tool}초, 숙련도 구간마다 {band}초씩 짧아진다.',
@@ -11387,7 +11572,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.free': '무료',
   'guide.profPages.econ.workOrdersHeading': '작업 주문',
   'guide.profPages.econ.workOrdersNote':
-    '장인마다 자기 단골 재료 한 묶음을 상점가의 {pct}%에 사들이며, {minutes}분마다 되풀이할 수 있다.',
+    '장인마다 단골 재료별로 작업 의뢰를 내걸고, 요구한 묶음을 상점가의 {pct}%에 사들인다. 의뢰마다 {minutes}분짜리 시계가 따로 돌아, 납품한 의뢰만 닫히고 같은 장인의 다른 의뢰는 열려 있다.',
   'guide.profPages.econ.colOrder': '작업 주문',
   'guide.profPages.econ.colMaster': '장인',
   'guide.profPages.econ.colAsks': '요구',
@@ -11444,13 +11629,23 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '채집마다 품질을 굴리는데, 그 확률은 숙련도가 전부다. 갓 시작한 채집가는 언제나 일반 등급을 얻지만, 숙련이 오를수록 무게가 높은 등급으로 옮겨 가며 절대 후퇴하지 않는다. 상한 100에서는 일반이 완전히 사라져 60% 고급, 30% 희귀, 8% 영웅, 2% 전설이 된다. 품질은 곧 수량이다. 일반 1개, 고급과 희귀 2개, 영웅 3개, 전설 4개. 희귀 이상은 서명이 새겨져(Gathered by) 도착하며, 상한에서는 열 번 중 네 번에 이름이 남는다.',
   'guide.profPages.gatherDeedsHeading': '길 위의 업적',
   'guide.profPages.gatherDeeds.mining':
-    '어느 채집이든 첫 채집은 Fruits of the Field를, 채광 100 상한은 Ore in the Blood를 새긴다. 채광, 벌목, 약초학, 낚시 중 셋이 100에 이르면 Master Gatherer(명성 25)를 얻고, 깨끗한 광맥을 쪼개면 전용 수집 표식도 남는다. 업적은 칭호와 명성뿐, 힘을 주지 않는다.',
+    '어느 채집이든 첫 채집은 Fruits of the Field를, 채광 100 상한은 Ore in the Blood를 새긴다. 채집 기술 중 어느 셋이든 100에 이르면 Master Gatherer(명성 25)를 얻고, 깨끗한 광맥을 쪼개면 전용 수집 표식도 남는다. 업적은 칭호와 명성뿐, 힘을 주지 않는다.',
   'guide.profPages.gatherDeeds.logging':
-    '어느 채집이든 첫 채집은 Fruits of the Field를, 벌목 100 상한은 Heartwood Hewer를 새긴다. 네 채집 기술 중 셋이 100에 이르면 Master Gatherer(명성 25)를 얻고, 고대 심재를 쪼개면 전용 수집 표식도 남는다. 업적은 칭호와 명성뿐, 힘을 주지 않는다.',
+    '어느 채집이든 첫 채집은 Fruits of the Field를, 벌목 100 상한은 Heartwood Hewer를 새긴다. 채집 기술 중 어느 셋이든 100에 이르면 Master Gatherer(명성 25)를 얻고, 고대 심재를 쪼개면 전용 수집 표식도 남는다. 업적은 칭호와 명성뿐, 힘을 주지 않는다.',
   'guide.profPages.gatherDeeds.herbalism':
-    '어느 채집이든 첫 채집은 Fruits of the Field를, 약초학 100 상한은 Master of the Meadow를 새긴다. 네 채집 기술 중 셋이 100에 이르면 Master Gatherer(명성 25)를 얻고, 달빛 개화를 꺾으면 전용 수집 표식도 남는다. 업적은 칭호와 명성뿐, 힘을 주지 않는다.',
+    '어느 채집이든 첫 채집은 Fruits of the Field를, 약초학 100 상한은 Master of the Meadow를 새긴다. 채집 기술 중 어느 셋이든 100에 이르면 Master Gatherer(명성 25)를 얻고, 달빛 개화를 꺾으면 전용 수집 표식도 남는다. 업적은 칭호와 명성뿐, 힘을 주지 않는다.',
   'guide.profPages.gatherDeeds.fishing':
     '숙련 100은 Old Salt를, 200은 Master Angler와 그 칭호를 새긴다. 낚시꾼 기예의 정점이다. 낚시도 Master Gatherer(세 기술 100)에 포함된다. 각 지역의 물에서 낚는 첫 물고기가 저마다의 페이지를 채우고, 윤슬 코이를 낚으면 Glimmer of Hope가 기록된다.',
+  'guide.profPages.gatherDeeds.farming':
+    '농사에는 아직 고유 업적이 없다. 밭과 작물이 자리 잡은 지금, 다른 전문직을 장식하는 이정표와 상한 업적은 이후 업데이트로 들어온다. 숙련은 이미 Master Gatherer(아무 세 채집 기술 100)에 포함되므로 농부도 남들과 같은 방식으로 그 페이지를 채운다. 업적은 칭호와 명성만 줄 뿐, 결코 힘을 주지 않는다.',
+  'guide.profPages.gatherDeeds.farmingSown':
+    '농사는 이제 업적의 책에 저만의 칸을 갖는다. Sow It Begins는 처음 심은 작물을 새기고, 네 장의 연대기 페이지가 Eastbrook Vale에서 Evergarden까지 각 밭 터에서의 첫 성공적인 수확을 새긴다. 황금빛 수확은 저만의 명성 0 수집 표식을 남기고, 농사 숙련도 Master Gatherer(아무 세 채집 기술 100)에 포함된다. 정점의 업적은 이미 쓰여 있다. Harvestmaster, 이 기술의 숙련 100 칭호는 이후 업데이트가 여는 더 깊은 밭과 함께 손에 닿게 된다. 업적은 칭호와 명성뿐, 힘을 주지 않는다.',
+  'guide.profPages.farm.tableHeading': '밭에서 식탁으로',
+  'guide.profPages.farm.tableBody':
+    '주방은 한 철의 수확이 보답으로 돌아오는 곳이다. 일상적인 농가 요리 너머로, 작물의 단마다 더 풍성한 요리가 하나씩 있어 먹으면 포만감이 남는다. 식사를 마치면 오래가는 축복이 몸에 남으니, 일행이 던전 문 앞에서 먼저 챙겨 먹고 싶어 하는 바로 그 이점이다. 그 정점은 Harvest Feast로, 요리사가 세계 그 자체에 차려 내는 한 상이다. 곁에 있는 모두가 저마다 한 그릇씩, 한 사람당 한 번만 덜어 가고, 다 먹은 식사는 똑같은 포만감 축복을 치러 주니, 농부 한 사람의 한 철이 일행 전체의 식탁을 차릴 수 있다. 그 사다리의 꼭대기, 가장 풍성한 두 요리와 잔치 그 자체는 이후 업데이트가 여는 더 깊은 밭과 함께 손에 닿게 되고, 그 아래는 오늘도 이미 불 위에 있다.\n\n그 식탁에는 운의 자리도 있다. 거둬들이는 모든 수확은 다른 채집 기술과 같은 횡재 확률을 굴리고, 이따금 작물이 황금빛으로 여문다. 수확량은 평범한 수확을 훌쩍 넘고, 지역 전체가 그 발견을 이름과 함께 듣게 되며, Golden Harvest가 업적의 책에 기록된다.',
+  'guide.profPages.farm.bedsHeading': '밭 일구기',
+  'guide.profPages.farm.bedsBody':
+    '순서는 짧다. 밭 곁의 농부에게서 씨앗과 퇴비를 산다. Eastbrook의 Jessica는 골짜기 두 종을, Fenbridge의 농부는 습지 두 종을 갖추고 있지만 Highwatch와 Evergarden의 씨앗은 어느 상점에도 없다. 높은 단의 수확에서 한두 알씩 되돌아오거나, 아니면 World Market에서 오간다. 가방에 괭이를 넣고 씨를 심고, 원한다면 승산을 높여라. 상점의 퇴비와 심을 때 농작물로 치르는 농부의 관리는 둘 다 작물이 무사히 자랄 확률을 올리고, 연금술사의 성장 토닉은 수확이 늘어날 기회를 주며, 숙련이 작물의 단보다 한 구간 위로 오르면 그 작물은 다시는 실패하지 않는다. 그다음은 자리를 뜨면 된다. 로그아웃 중에도 밭은 계속 자라고, 익은 작물은 놔둔 만큼 기다리며, 수확 일지(Shift+K, 또는 전문 기술 창의 농사 행)가 심어 둔 모든 밭을 타이머와 함께 보여 준다.\n\n실패한 작물은 농작물 대신 시든 껍질을 남기고, 어느 농부든 껍질을 퇴비로 바꿔 주니 나쁜 한 철이 다음 철의 보험을 사 주는 셈이다. 거둔 것은 주방을 먹여 살린다. 농작물은 주방에서 요리가 되고, Cook Marlow의 밀과 쌀 의뢰는 Vale Wheat와 Marsh Rice를 다른 모든 작업 의뢰와 같은 시계로 사들인다.',
   'guide.profPages.fish.startHeading': '시작하기',
   'guide.profPages.fish.startBody':
     'Simple Fishing Pole은 Eastbrook의 Fisherman Brandt가 20동에 판다(마을 동쪽 끝에서 Mirror Lake를 노려보는 노련한 낚시꾼이다). Tinker Gizzel, Fenbridge의 Provisioner Hale, Highwatch의 Quartermaster Bree도 재고가 있다. 전방 약 24야드 안의 충분히 깊은 물을 바라보고 낚싯대를 쓰면 찌가 날아간다. 전투 중, 수영 중, 사망 중에는 던질 수 없다. 물가에서 던지는 것이 정석이고, 어느 지역의 낚시 가능한 물이든 좋다.',
@@ -11607,6 +11802,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '마법부여 재료. 희귀 이상 지팡이, 마법봉, 활, 석궁의 마력을 추출해 얻습니다.',
   'hudChrome.materialHint.masterwroughtIntermediate': '명장 제작용 재료.',
   'hudChrome.materialHint.quickeningCatalyst': '제작용 촉매. 연금술사는 하루에 하나만 제작할 수 있습니다.',
+  'hudChrome.materialHint.growthTonic':
+    '농사 용품. 심을 때 소모되며 수확이 조금 늘어날 수 있습니다. 작물이 시들면 토닉도 함께 사라집니다.',
   'hudChrome.enchanting.tier.base': '기본 마법부여',
   'hudChrome.enchanting.tier.runed': '룬 마법부여',
   'hudChrome.enchanting.tier.greater': '상급 마법부여',

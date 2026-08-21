@@ -282,8 +282,16 @@ describe('Drowned Litany shop stock (data pins)', () => {
     // DERIVED from the item table, never a second hand-written list: a ninth
     // crafted tool added to content and forgotten here fails, which is the
     // whole point of the route existing.
+    // FARMING IS EXCLUDED, by choice (state.md ledger (aa) doctrine): the
+    // crafted osmium_hoe deliberately has NO Marks route (the go-live seated
+    // seeds, compost and the garden hoe on the farmer NPCs and nothing else;
+    // whether the top hoe ever joins a delve shop is a later decision). The
+    // farming rollout arms in tests/professions_zone_rollout.test.ts pin the
+    // craft-only acquisition positively; do not widen this exclusion to the
+    // node professions or fishing.
     const craftedTools = Object.values(ITEMS).filter(
-      (def) => def.use?.type === 'gatherTool' && def.use.tier > 3,
+      (def) =>
+        def.use?.type === 'gatherTool' && def.use.tier > 3 && def.use.professionId !== 'farming',
     );
     // At-least, not exactly: a ninth crafted tool added WITH its Marks row is
     // a legitimate content addition, and an exact pin would red on it with a
@@ -308,6 +316,25 @@ describe('Drowned Litany shop stock (data pins)', () => {
     expect(
       craftedTools.filter((t) => t.use?.type === 'gatherTool' && t.use.tier === 5),
     ).toHaveLength(4);
+    // The exclusion's SELF-CLEARING tripwire (the ITEM_ART_PENDING idiom):
+    // today NO farming gatherTool has a Marks row in any delve shop. The day
+    // Phase 9/10 gives one a row, this reds and the farming skip above is
+    // re-decided deliberately instead of silently covering the new route.
+    // Non-vacuous: the excluded set is really populated today.
+    const farmingTools = Object.values(ITEMS).filter(
+      (def) => def.use?.type === 'gatherTool' && def.use.professionId === 'farming',
+    );
+    expect(farmingTools.length).toBeGreaterThan(0);
+    const allDelveRows = new Set(
+      Object.values(DELVE_SHOPS)
+        .flat()
+        .map((e) => e.itemId),
+    );
+    for (const tool of farmingTools) {
+      expect(allDelveRows.has(tool.id), `${tool.id} gained a Marks row: re-decide the skip`).toBe(
+        false,
+      );
+    }
   });
 
   it('every Litany slot costs exactly 2x its Collapsed Reliquary price tier', () => {

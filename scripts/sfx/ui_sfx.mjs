@@ -30,6 +30,17 @@ const MASTER_GAINS_DB = {
   // Craft-family cast-start placeholder (Craft Cast System Phase 6): soft
   // workbench wind-up, distinct from the per-family completion cues.
   ui_craft_cast: 0,
+  // Farming PLACEHOLDER pair (the render / juice phase): the plant action and
+  // the harvest result. Unity gain like the other stand-ins, so a real
+  // recording can drop in without a mix re-balance.
+  ui_farm_plant: 0,
+  ui_farm_harvest: 0,
+  // The ready-notice PLACEHOLDER, unity gain with its two siblings.
+  ui_farm_ready: 0,
+  // The golden-harvest sting PLACEHOLDER, unity gain with its three siblings.
+  ui_farm_golden: 0,
+  // The shared-feast placement PLACEHOLDER, unity gain with its four siblings.
+  ui_farm_feast: 0,
 };
 
 function tone(frequency, start, duration, gain, options = {}) {
@@ -156,6 +167,63 @@ export const UI_SFX_SPECS = [
     tone(220, 0, 0.2, 0.14, { wave: 'triangle', endFrequency: 160 }),
     tone(330, 0.04, 0.22, 0.08, { wave: 'triangle', endFrequency: 240 }),
     noise('brown', 0, 0.18, 0.06, { lowpass: 700 }),
+  ]),
+  // Farming PLACEHOLDER (the render / juice phase), for the sound engineer:
+  // a deterministic synth stand-in for the seed going into the bed. Low
+  // filtered noise is the soil scrape and the sinking triangle is the tamp
+  // that closes it, the same vocabulary as ui_gather_cast's woody wind-up.
+  // Swap for a real recording when one lands, exactly as the gather-strike,
+  // rarity and fishing placeholders were swapped before it.
+  cue('ui_farm_plant', 0.5, 'Soft earthy soil scrape and tamp as a seed is planted.', [
+    noise('brown', 0, 0.26, 0.11, { lowpass: 420 }),
+    tone(150, 0.12, 0.22, 0.13, { wave: 'triangle', endFrequency: 110 }),
+  ]),
+  // Farming PLACEHOLDER (the render / juice phase), for the sound engineer:
+  // the harvest twin of the row above. A short bright noise burst is the leaf
+  // rustle, the triangle body is the pluck itself, and the rising tail is the
+  // small "got it" lift the reward cues share. Swap for a real recording.
+  cue('ui_farm_harvest', 0.6, 'Leafy pluck and rustle with a short satisfying upward tail.', [
+    noise('white', 0, 0.18, 0.05, { highpass: 2200, lowpass: 7000 }),
+    tone(420, 0.02, 0.16, 0.12, { wave: 'triangle' }),
+    tone(620, 0.16, 0.3, 0.1, { wave: 'triangle', endFrequency: 880 }),
+  ]),
+  // Farming PLACEHOLDER (the ready-notice phase), for the sound engineer: the
+  // unprompted "your crops are in" chime. Deliberately the QUIETEST and
+  // softest of the three farming stand-ins and the only one with no noise
+  // layer: it arrives without the player pressing anything, so it must read as
+  // a gentle notice rather than an action landing. Two clean rising thirds,
+  // the notification vocabulary the mail and quest chimes share. Swap for a
+  // real recording when one lands.
+  cue('ui_farm_ready', 0.5, 'Soft two-note wooden chime announcing that crops have finished.', [
+    tone(587, 0, 0.18, 0.08, { wave: 'triangle' }),
+    tone(784, 0.12, 0.26, 0.07, { wave: 'triangle' }),
+  ]),
+  // Farming PLACEHOLDER (the celebrations phase), for the sound engineer: the
+  // golden-harvest sting the finder hears layered over the shared rare-event
+  // achievement cue. A short ascending golden shimmer: a bright triangle
+  // arpeggio climbing a major arc (the ui_level_up flourish vocabulary,
+  // shortened) with a soft high sparkle on top so it reads as sunlight on
+  // grain rather than a fanfare. Swap for a real recording when one lands,
+  // exactly as its three farming siblings above.
+  cue('ui_farm_golden', 0.7, 'Bright golden shimmer sting celebrating a rare five-fold harvest.', [
+    tone(659, 0, 0.22, 0.12, { wave: 'triangle' }),
+    tone(831, 0.08, 0.24, 0.12, { wave: 'triangle' }),
+    tone(1046, 0.16, 0.3, 0.13, { wave: 'triangle' }),
+    tone(1318, 0.24, 0.36, 0.11, { wave: 'triangle', endFrequency: 1568 }),
+    noise('white', 0.1, 0.5, 0.02, { highpass: 3400 }),
+  ]),
+  // Farming PLACEHOLDER (Phase 12, the shared feast), for the sound engineer:
+  // setting the feast table out. A woody double thud (boards landing on the
+  // trestles) under a short convivial rattle of plates and mugs, closed by a
+  // small warm lift so it reads as an invitation rather than furniture being
+  // dropped. Swap for a real recording when one lands, exactly as its four
+  // farming siblings above.
+  cue('ui_farm_feast', 0.7, 'Woody table thud with a warm rattle of plates being set out.', [
+    tone(140, 0, 0.18, 0.16, { wave: 'triangle', endFrequency: 100 }),
+    tone(170, 0.12, 0.18, 0.13, { wave: 'triangle', endFrequency: 120 }),
+    noise('brown', 0, 0.2, 0.07, { lowpass: 600 }),
+    noise('white', 0.18, 0.26, 0.035, { highpass: 2400, lowpass: 8000 }),
+    tone(523, 0.3, 0.3, 0.09, { wave: 'triangle', endFrequency: 659 }),
   ]),
 ].map((spec) => ({ ...spec, masterGainDb: MASTER_GAINS_DB[spec.key] }));
 

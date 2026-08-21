@@ -64,7 +64,8 @@ export const vi_VN: EnTranslations = {
       "dungeon": "Hầm Ngục",
       "difficulty": "Độ Khó",
       "name": "Tên",
-      "spec": "Chuyên Môn"
+      "spec": "Chuyên Môn",
+      "bed": "Bed id (optional)"
     },
     "difficulty": {
       "normal": "Thường",
@@ -150,6 +151,10 @@ export const vi_VN: EnTranslations = {
       "gather": {
         "label": "Tăng kỹ năng thu thập",
         "description": "Tăng cấp một nghề thu thập."
+      },
+      "farmgrow": {
+        "label": "Ripen crops",
+        "description": "Bring your planted crop beds to their ready time, or one bed by id. Nothing else changes: the outcome was rolled when you planted."
       },
       "teleport": {
         "label": "Dịch chuyển",
@@ -2581,7 +2586,8 @@ export const vi_VN: EnTranslations = {
       "resonantSteel": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc vũ khí cận chiến hiếm trở lên.",
       "resonantTimber": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trượng, đũa phép, cung, và nỏ hiếm trở lên.",
       "masterwroughtIntermediate": "Masterwrought crafting component.",
-      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day."
+      "quickeningCatalyst": "Crafting catalyst. An alchemist can craft only one each day.",
+      "growthTonic": "Farming supply. Spent when you plant a crop for a chance of a slightly larger harvest. If the crop withers, the tonic is lost with it."
     },
     "discord": {
       "title": "Discord",
@@ -3018,6 +3024,7 @@ export const vi_VN: EnTranslations = {
       "logging": "Đốn gỗ",
       "herbalism": "Thảo dược học",
       "fishing": "Câu Cá",
+      "farming": "Farming",
       "notReady": "Điểm tài nguyên này chưa hồi sinh lại dành cho bạn.",
       "gatherLine": "Bạn tập hợp: {name}.",
       "gatherLineQty": "Bạn tập hợp: {name} x{qty}.",
@@ -3036,7 +3043,8 @@ export const vi_VN: EnTranslations = {
       "tierRequired": {
         "mining": "Yêu cầu cuốc khai khoáng bậc {tier}",
         "logging": "Yêu cầu rìu đốn gỗ bậc {tier}",
-        "herbalism": "Yêu cầu liềm hái thảo dược bậc {tier}"
+        "herbalism": "Yêu cầu liềm hái thảo dược bậc {tier}",
+        "farming": "Requires a tier {tier} farming hoe"
       },
       "requiresTool": {
         "mining": "Cần cuốc khai khoáng",
@@ -3047,23 +3055,27 @@ export const vi_VN: EnTranslations = {
         "mining": "Bạn cần cuốc khai khoáng bậc {tier} để khai thác mạch này.",
         "logging": "Bạn cần rìu đốn gỗ bậc {tier} để đốn bãi này.",
         "herbalism": "Bạn cần liềm hái thảo dược bậc {tier} để thu hoạch bụi này.",
-        "fishing": "Bạn cần cần câu bậc {tier} để câu ở vùng nước này."
+        "fishing": "Bạn cần cần câu bậc {tier} để câu ở vùng nước này.",
+        "farming": "You need a tier {tier} farming hoe to work this bed."
       },
       "toolRequired": {
         "mining": "Bạn cần cuốc khai khoáng để khai thác mạch quặng này.",
         "logging": "Bạn cần rìu đốn gỗ để đốn hạ cụm cây này.",
         "herbalism": "Bạn cần liềm thảo dược để thu hái khóm thảo dược này.",
-        "fishing": "Bạn phải có cần câu mới buông câu được."
+        "fishing": "Bạn phải có cần câu mới buông câu được.",
+        "farming": "You need a farming hoe to work this bed."
       },
       "noNodeNearby": {
         "mining": "Không có mạch quặng nào trong tầm với.",
         "logging": "Không có cụm cây gỗ nào trong tầm với.",
-        "herbalism": "Không có khóm thảo dược nào trong tầm với."
+        "herbalism": "Không có khóm thảo dược nào trong tầm với.",
+        "farming": "There is no crop bed within reach."
       },
       "wieldUnmet": {
         "mining": "Bạn cần Khai mỏ {skill} để vung chiếc cuốc đã có trong túi.",
         "logging": "Bạn cần Đốn gỗ {skill} để vung chiếc rìu đã có trong túi.",
-        "herbalism": "Bạn cần Thảo dược học {skill} để dùng chiếc liềm đã có trong túi."
+        "herbalism": "Bạn cần Thảo dược học {skill} để dùng chiếc liềm đã có trong túi.",
+        "farming": "You need Farming {skill} to swing the hoe already in your bags."
       },
       "wieldUnmetCorpse": "Bạn cần kỹ năng thu thập {skill} để dùng được công cụ tốt nhất của mình.",
       "toolTierUnmetCorpse": "Bạn cần công cụ thu thập bậc {tier} để lấy được nguyên liệu tốt nhất.",
@@ -3072,18 +3084,21 @@ export const vi_VN: EnTranslations = {
           "mining": "Công cụ khai khoáng (bậc {tier})",
           "logging": "Công cụ đốn gỗ (bậc {tier})",
           "herbalism": "Công cụ thảo dược (bậc {tier})",
-          "fishing": "Cần câu (bậc {tier})"
+          "fishing": "Cần câu (bậc {tier})",
+          "farming": "Farming tool (tier {tier})"
         },
         "unlocks": {
           "mining": "Cần thiết để khai thác các mạch quặng đến bậc {tier}.",
           "logging": "Cần thiết để đốn hạ các cụm cây gỗ đến bậc {tier}.",
           "herbalism": "Cần thiết để thu hái các khóm thảo dược đến bậc {tier}.",
-          "fishing": "Cần thiết để câu ở các vùng nước đến bậc {tier}."
+          "fishing": "Cần thiết để câu ở các vùng nước đến bậc {tier}.",
+          "farming": "Required to plant crops up to tier {tier}."
         },
         "use": {
           "mining": "Sử dụng: Khai thác mạch quặng gần đó.",
           "logging": "Sử dụng: Đốn hạ cụm cây gỗ gần đó.",
-          "herbalism": "Sử dụng: Thu hái từ khóm thảo dược gần đó."
+          "herbalism": "Sử dụng: Thu hái từ khóm thảo dược gần đó.",
+          "farming": "Works from your bags when you plant a crop bed."
         },
         "speed": "Thu hoạch nhanh hơn tại các điểm tài nguyên dưới bậc {tier}.",
         "rodRequired": "Cần thiết để câu cá.",
@@ -3092,6 +3107,7 @@ export const vi_VN: EnTranslations = {
         "rodBand": "Mở khóa danh sách cá phong phú hơn khi kỹ năng câu cá đạt {skill} trở lên."
       },
       "downgradeMark": "Túi đầy: phát hiện được lưu mà không có dấu thợ thu thập.",
+      "downgradeMarkCrop": "Bags full: the harvest was stored without its grower's mark.",
       "downgradeFind": "Túi đầy: một phát hiện tuyệt vời đã trôi qua.",
       "emptyHookNote": "Không có gì dính câu",
       "stateReady": "Sẵn Sàng",
@@ -3099,6 +3115,83 @@ export const vi_VN: EnTranslations = {
       "stateCooldownTimed": "Hồi sinh sau {time}",
       "respawnClock": "{minutes}:{seconds}",
       "fineGradePreview": "Công cụ của bạn nâng sản vật này lên phẩm cấp hảo hạng."
+    },
+    "farming": {
+      "plantLine": "You plant: {name}.",
+      "harvestLine": "You bring in: {name}.",
+      "harvestLineQty": "You bring in: {name} x{qty}.",
+      "harvestFineLine": "You also bring in: {name}.",
+      "harvestFineLineQty": "You also bring in: {name} x{qty}.",
+      "witheredLine": "The crop withered. You clear the bed: {name}.",
+      "witheredLineQty": "The crop withered. You clear the bed: {name} x{qty}.",
+      "seedBackLine": "You recover seed: {name}.",
+      "seedBackLineQty": "You recover seed: {name} x{qty}.",
+      "denied": {
+        "bad_bed": "There is no crop bed there.",
+        "bad_crop": "You cannot plant that here.",
+        "range": "You are too far from that crop bed.",
+        "bed_taken": "You already have a crop growing there.",
+        "skill": "Your Farming skill is too low for that crop.",
+        "no_seed": "You have no seed for that crop.",
+        "not_ready": "That crop is still growing.",
+        "no_plot": "Nothing is planted in that bed.",
+        "no_husks": "You do not have enough withered husks.",
+        "no_compost": "You have no compost.",
+        "no_fee_produce": "You have no produce to pay the watch fee.",
+        "no_tonic": "You have no growth tonic.",
+        "tool": "You have no farming hoe fit for that crop.",
+        "locked": "An item that would pay for that is locked.",
+        "no_farmer": "You must be near a farmer to trade husks for compost.",
+        "no_feast": "You have no feast to set out.",
+        "feast_active": "Your feast is already set out.",
+        "feast_expired": "That feast is gone.",
+        "feast_finished": "That feast has been picked clean.",
+        "feast_range": "You are too far from the feast.",
+        "feast_eaten": "You have already eaten from that feast."
+      },
+      "feastTitle": "{name}'s Harvest Feast",
+      "feastPlacedLine": "You set out your harvest feast.",
+      "huskTrade": "Trade husks for compost",
+      "huskTradeAria": "Trade husks for compost with {name}",
+      "plantSheet": {
+        "title": "Plant a Crop",
+        "plant": "Plant",
+        "sowAria": "Sow {name}",
+        "empty": "You have no seed you can sow at this bed.",
+        "close": "Close the plant sheet"
+      },
+      "husksConvertedLine": "You trade {husksName} x{husks} for {name}.",
+      "husksConvertedLineQty": "You trade {husksName} x{husks} for {name} x{qty}.",
+      "readyLine": "A crop is ready to harvest.",
+      "readyLineQty": "{count} crops are ready to harvest.",
+      "readyWitheredLine": "A crop withered in its bed.",
+      "readyWitheredLineQty": "{count} crops withered in their beds."
+    },
+    "harvestJournal": {
+      "title": "Harvest Journal",
+      "close": "Close",
+      "listLabel": "Planted crop beds",
+      "growing": "Ready in {time}",
+      "ready": "Ready to harvest",
+      "finishing": "Finishing up",
+      "withered": "Withered",
+      "readyAnnounce": "Ready to harvest: {name}",
+      "remainingDaysHours": "{days}d {hours}h",
+      "remainingHoursMinutes": "{hours}h {minutes}m",
+      "remainingMinutesSeconds": "{minutes}m {seconds}s",
+      "remainingSeconds": "{seconds}s",
+      "bedLine": "{zone}, bed {index}",
+      "bedLineUnknown": "Unknown bed",
+      "careWatch": "Farmer's Watch",
+      "careNone": "No extras",
+      "stageSprout": "Sprout",
+      "stageSeedling": "Seedling",
+      "stageMaturing": "Maturing",
+      "stageRipe": "Ripe",
+      "emptyTitle": "No crops planted",
+      "emptyBody": "Sow a seed in any garden bed and the plot appears here with its timer.",
+      "noviceTitle": "You have not worked a garden bed yet",
+      "noviceBody": "Farming skill grows every time you bring in a crop. Sow a seed in any garden bed to begin."
     },
     "archetypeTitle": {
       "label": "Danh hiệu",
@@ -3218,7 +3311,7 @@ export const vi_VN: EnTranslations = {
           "quickeningCharm": "Rút ngắn thời gian hồi sinh của điểm tài nguyên mà nó kích hoạt.",
           "makersCharm": "+2 yield per harvest while charged."
         },
-        "howToSlot": "Gắn vào công cụ khai khoáng, đốn gỗ, hoặc thảo dược từ cửa sổ Nghề Nghiệp. Bị tiêu hao khi gắn.",
+        "howToSlot": "Gắn vào công cụ khai khoáng, đốn gỗ, thảo dược, hoặc nông nghiệp từ cửa sổ Nghề Nghiệp. Bị tiêu hao khi gắn.",
         "charges": "Bắt đầu với {base} lượt nạp trên một công cụ phổ thông (+{bonus} mỗi bậc hiếm).",
         "landOnly": "Không thể gắn vào cần câu.",
         "openProfessions": "Mở Nghề Nghiệp để gắn cái này vào một công cụ thu thập."
@@ -3887,7 +3980,8 @@ export const vi_VN: EnTranslations = {
   "gatherEvent": {
     "pristineVein": "{finder} đánh vào mạch máu nguyên sơ!",
     "ancientHeartwood": "{finder} đã đốn hạ một tâm gỗ cổ xưa!",
-    "moonlitBloom": "{finder} phát hiện ra hoa nở dưới ánh trăng!"
+    "moonlitBloom": "{finder} phát hiện ra hoa nở dưới ánh trăng!",
+    "goldenHarvest": "{finder} reaped a golden harvest!"
   },
   "apiError": {
     "validation": {
@@ -4260,6 +4354,7 @@ export const vi_VN: EnTranslations = {
       "groupCamera": "Máy quay",
       "talents": "Thiên Phú",
       "professions": "Nghề Nghiệp",
+      "harvestJournal": "Harvest Journal",
       "arena": "Cửa sổ PvP (các đấu trường và Cánh Đồng Trũng Gai)",
       "leaderboard": "Bảng xếp hạng",
       "deeds": "Sách Kỳ Công",
@@ -5629,6 +5724,9 @@ export const vi_VN: EnTranslations = {
       "outputFmt": "{name} x{count}",
       "comboReq": "Cần {a} và {b}",
       "oncePerDay": "Once per day",
+      "effectFood": "Restores {amount} health over {seconds} sec when eaten.",
+      "effectWellFed": "Well fed when you finish eating: +{value} {stat} for {minutes} min.",
+      "effectWellFedAura": "Grants {aura} for {minutes} min when you finish eating.",
       "sourceTrainerFee": "Huấn Luyện Viên, {fee}",
       "sourceTrainerFree": "Huấn Luyện Viên, miễn phí",
       "sourceKnown": "Biết từ đầu",
@@ -5806,7 +5904,8 @@ export const vi_VN: EnTranslations = {
         "mining": "Khai Khoáng moi quặng thẳng ra khỏi đá của thế giới: đồng ở Thung Lũng Đông Khê, sắt ở Đầm Lầy Bùn Sâu, và osmium trên Cao Nguyên Đỉnh Gai, cùng những mạch quặng khởi đầu rải khắp mọi khu vực non trẻ hơn ở xa hơn, nuôi các nghề lò rèn. Mở cho tất cả mọi người từ cấp 1: một cây cuốc khai khoáng giá 20 đồng từ quầy Eastbrook, Fenbridge, hoặc Highwatch mở được mọi mạch quặng khởi đầu, còn những nấc cao hơn của thang cuốc sẽ thức dậy khi chính bộ đếm của bạn kiếm được chúng. Được theo dõi trên bộ đếm riêng của nó tới giới hạn 100.",
         "logging": "Đốn Gỗ hạ cây lấy gỗ từ những cụm cây khắp cả thế giới: vỏ sắt ở Thung Lũng Đông Khê, tần bì tro ở Đầm Lầy Bùn Sâu, gỗ cổ thụ ở Cao Nguyên Đỉnh Gai, và các cụm cây khởi đầu ở mọi khu vực non trẻ hơn, nguồn gỗ thô cho cán vũ khí, trượng, và bàn làm việc của kỹ sư. Mở cho tất cả mọi người từ cấp 1 chỉ cần có một cây rìu đốn gỗ trong túi (20 đồng tại các quầy Eastbrook, Fenbridge, và Highwatch), được theo dõi trên bộ đếm riêng của nó tới giới hạn 100.",
         "herbalism": "Thảo Dược Học thu hái những gì mọc hoang: lá bạc ở Thung Lũng Đông Khê, lá vàng ở Đầm Lầy Bùn Sâu, cánh mặt trời ở Cao Nguyên Đỉnh Gai, và các khóm khởi đầu ở mọi khu vực non trẻ hơn, thứ lá và thân giữ cho các nghề bào chế luôn có gì để nấu. Mở cho tất cả mọi người từ cấp 1 chỉ cần có một cây liềm thảo dược trong túi (20 đồng tại các quầy Eastbrook, Fenbridge, và Highwatch), được theo dõi trên bộ đếm riêng của nó tới giới hạn 100.",
-        "fishing": "Câu Cá là kẻ khác biệt giữa các nghề thu thập, và cũng là nghề sâu nhất: một trò nhỏ cắn mồi và giật cần thực thụ, có bảng cá riêng ở mỗi khu vực trong ba vùng lõi (những vùng nước non trẻ xa hơn hiện đều dùng bảng của Thung Lũng), và giới hạn thành thạo 200, gấp đôi các nghề khác. Hãy mua một cần câu, quay mặt ra vùng nước rộng, và buông câu."
+        "fishing": "Câu Cá là kẻ khác biệt giữa các nghề thu thập, và cũng là nghề sâu nhất: một trò nhỏ cắn mồi và giật cần thực thụ, có bảng cá riêng ở mỗi khu vực trong ba vùng lõi (những vùng nước non trẻ xa hơn hiện đều dùng bảng của Thung Lũng), và giới hạn thành thạo 200, gấp đôi các nghề khác. Hãy mua một cần câu, quay mặt ra vùng nước rộng, và buông câu.",
+        "farming": "Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe whenever you come back, because nothing in a bed ever spoils. A farmer stands beside every bed site, from the Eastbrook allotments through Fenbridge and Highwatch to the Evergarden parterre, and Farmer Jessica in Eastbrook is where the trade starts: she sells the garden hoe and the first seeds, and her errand walks a new farmer through a first crop. Each rung of the ladder grows its own pair of crops, each with a finer grade for a practiced hand to pull, and engineers craft the hoes for the tougher ground above the starter beds. Tracked on its own counter to a cap of 100."
       },
       "rhythmHeading": "Nhịp thu hoạch",
       "rhythmBody": "Một lần thu hoạch là một thao tác niệm ngắn nhìn thấy được, không phải cú chộp tức thì: {base} giây cơ bản, không bao giờ xuống dưới cái sàn {floor} giây. Mang theo một công cụ trên bậc của điểm tài nguyên, loại mà thành thạo của bạn cho phép sử dụng, sẽ làm bạn nhanh thêm {tool} giây cho mỗi bậc cao hơn nó, và mỗi dải thành thạo bạn vượt qua lại gọt thêm {band} giây nữa; chỉ khớp đúng bậc của điểm tài nguyên thì mới lọt được vào cửa, chính những bậc cao hơn nó mới làm bạn nhanh.\n\nMột chiếc túi đầy sẽ lịch sự từ chối thao tác trước khi nó bắt đầu, nên không có gì bị phí giữa chừng, và mỗi lần thu hoạch đều trả một lát kinh nghiệm nhân vật nho nhỏ, co giãn theo cấp của điểm tài nguyên đối chiếu với cấp của chính bạn, giống hệt cách kinh nghiệm giết quái co giãn: một điểm tài nguyên xám tầm thường chẳng dạy được gì cho một nhân vật đã đạt trần.",
@@ -5837,7 +5936,9 @@ export const vi_VN: EnTranslations = {
         "mining": "Lần đầu tiên bạn thu hoạch điểm tài nguyên của bất kỳ nghề nào sẽ đạt được thành tích Hoa Quả Của Đồng Ruộng, và giới hạn 100 trong Khai Khoáng khắc ghi danh hiệu Quặng Trong Máu. Đạt 100 trong bất kỳ ba trong số Khai Khoáng, Đốn Gỗ, Thảo Dược Học, và Câu Cá thêm danh hiệu Thợ Thu Thập Thành Thạo với 25 Danh Vọng, và việc khai phá một mạch quặng nguyên sơ sẽ ghi lại dấu ấn sưu tập riêng của nó. Không có gì trong số này ban sức mạnh: thành tích là danh hiệu và Danh Vọng, bằng chứng về những con đường bạn đã đi qua.",
         "logging": "Lần đầu tiên bạn thu hoạch điểm tài nguyên của bất kỳ nghề nào sẽ đạt được thành tích Hoa Quả Của Đồng Ruộng, và giới hạn 100 trong Đốn Gỗ khắc ghi danh hiệu Thợ Chặt Cốt Lõi. Đạt 100 trong bất kỳ ba trong số Khai Khoáng, Đốn Gỗ, Thảo Dược Học, và Câu Cá thêm danh hiệu Thợ Thu Thập Thành Thạo với 25 Danh Vọng, và một khúc gỗ cốt lõi cổ xưa sẽ ghi lại dấu ấn sưu tập riêng của nó. Thành tích chỉ là danh hiệu và Danh Vọng, không bao giờ là sức mạnh.",
         "herbalism": "Lần đầu tiên bạn thu hoạch điểm tài nguyên của bất kỳ nghề nào sẽ đạt được thành tích Hoa Quả Của Đồng Ruộng, và giới hạn 100 trong Thảo Dược Học khắc ghi danh hiệu Người Thành Thạo Đồng Nội. Đạt 100 trong bất kỳ ba trong số Khai Khoáng, Đốn Gỗ, Thảo Dược Học, và Câu Cá thêm danh hiệu Thợ Thu Thập Thành Thạo với 25 Danh Vọng, và một bông hoa nở dưới ánh trăng sẽ ghi lại dấu ấn sưu tập riêng của nó. Thành tích chỉ là danh hiệu và Danh Vọng, không bao giờ là sức mạnh.",
-        "fishing": "Cột mốc 100 khắc ghi Lão Muối và 200 khắc ghi Ngư Sư Thành Thạo cùng danh hiệu của nó, đỉnh cao nhất của nghệ thuật câu cá; Câu Cá cũng tính cho Thợ Thu Thập Thành Thạo, kiếm được khi đạt 100 ở bất kỳ ba nghề thu thập nào. Con cá đầu tiên từ vùng nước của mỗi khu vực trong sáu khu vực lấp đầy một trang riêng, ba vùng lõi cùng Đầm Liễu, Đỉnh Gió Lộng, và Bờ Biển Xa Xôi ở xa hơn, còn Cá Koi Ánh Nắng thì ghi Tia Hy Vọng, nên những lữ khách mang theo cần câu trong hành trang lấp đầy sách của mình nhanh hơn họ tưởng."
+        "fishing": "Cột mốc 100 khắc ghi Lão Muối và 200 khắc ghi Ngư Sư Thành Thạo cùng danh hiệu của nó, đỉnh cao nhất của nghệ thuật câu cá; Câu Cá cũng tính cho Thợ Thu Thập Thành Thạo, kiếm được khi đạt 100 ở bất kỳ ba nghề thu thập nào. Con cá đầu tiên từ vùng nước của mỗi khu vực trong sáu khu vực lấp đầy một trang riêng, ba vùng lõi cùng Đầm Liễu, Đỉnh Gió Lộng, và Bờ Biển Xa Xôi ở xa hơn, còn Cá Koi Ánh Nắng thì ghi Tia Hy Vọng, nên những lữ khách mang theo cần câu trong hành trang lấp đầy sách của mình nhanh hơn họ tưởng.",
+        "farming": "Farming keeps no deeds of its own yet: now that its beds and crops are in the ground, the milestone and cap deeds that mark the other trades arrive in a later patch. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power.",
+        "farmingSown": "Farming keeps its own shelf in the Book of Deeds now. Sow It Begins marks your first planted crop, and four chronicle pages mark a first thriving harvest at each of the bed sites, from Eastbrook Vale to the Evergarden. A golden harvest records its own zero-Renown collector's mark, and proficiency in Farming counts toward Master Gatherer, earned at 100 in any three gathering trades. The capstone is already written: Harvestmaster, the trade's 100-proficiency title, comes within reach with a later patch's deeper fields. Deeds are titles and Renown only, never power."
       },
       "fish": {
         "startHeading": "Bắt đầu",
@@ -5859,6 +5960,12 @@ export const vi_VN: EnTranslations = {
         "emptyHook": "Không có gì cắn mồi",
         "koiHeading": "Cá Koi Ánh Nắng",
         "koiBody": "Mọi vùng nước trong trò chơi đều giấu cùng một phần thưởng: Cá Koi Ánh Nắng, một tia lấp lánh khác thường trên dây câu đáng 75 đồng với người bán và đáng hơn thế nhiều với lòng tự hào của bạn. Xác suất của nó chỉ đáp lại ngưỡng câu của bạn chứ không gì khác, giống nhau ở mọi khu vực: một dòng 1 phần trăm của bảng cá ở ngưỡng 0, 3 ở ngưỡng 1, và 6 ở ngưỡng 2, được tung mỗi lần giật cần thành công, nên con koi tìm đến người câu đã kiếm được những bảng sâu. Bắt được một con sẽ ghi Tia Hy Vọng vào Sách Kỳ Công của bạn, một dấu ấn sưu tập không Danh Vọng. Khi điều đó xảy ra, nhật ký sẽ đảm bảo bạn biết."
+      },
+      "farm": {
+        "bedsHeading": "Working the beds",
+        "bedsBody": "The loop is short. Buy seeds and compost from the farmer beside the beds: Jessica in Eastbrook stocks the Vale pair, the Fenbridge farmer the marsh pair, and no counter anywhere sells the Highwatch or Evergarden seeds, which come back a seed or two at a time from a high-tier harvest and otherwise change hands on the World Market. Sow with a hoe in your bags, and tip the odds if you like: compost from the counter and the farmer's watch, paid in produce as you plant, each raise a crop's chance of coming through, an alchemist's growth tonic gives the harvest a shot at a larger yield, and once your skill has climbed a full band past a crop's tier that crop never fails at all. Then walk away. The bed keeps growing while you are logged out, a ripe crop waits as long as you leave it, and the Harvest Journal (Shift+K, or the Farming row of your professions window) lists every bed you have planted with its timer.\n\nA crop that fails leaves withered husks in place of produce, and any farmer trades husks for compost, so a bad season buys the next one's insurance. What you bring in feeds the kitchens: the produce cooks into dishes at the kitchens, and Cook Marlow's wheat and rice orders take Vale Wheat and Marsh Rice off your hands for coin on the same clock as every other work order.",
+        "tableHeading": "From the beds to the table",
+        "tableBody": "The kitchens are where a season pays forward. Beyond the everyday farm dishes, each crop tier has a richer dish that leaves you Well Fed: finish the meal and a lasting boon stays with you, the kind of edge a group wants eaten before the dungeon door. Crowning the set is the Harvest Feast, a spread a cook sets out in the world itself: everyone at hand takes a serving of their own, one each, and every finished meal pays the same Well Fed boon, so one farmer's season can set the table for a whole party. The top of that ladder, the two richest dishes and the feast itself, comes within reach with a later patch's deeper fields; everything below them is cooking today.\n\nLuck keeps a place at that table too. Every harvest you bring in rolls the same windfall chance the other gathering trades enjoy, and now and then a crop comes up golden: the yield lands far past a normal pull, the whole zone hears the find announced by name, and Golden Harvest is recorded in your Book of Deeds."
       },
       "econ": {
         "title": "Kinh Tế Chế Tác",
@@ -5882,7 +5989,7 @@ export const vi_VN: EnTranslations = {
         "marketHeading": "Chợ Thế Giới và hoa hồng của nó",
         "marketBody": "Chợ Thế Giới là sàn giao dịch toàn vương quốc, do Thương Nhân ở Đông Khê và Đấu Giá Voss ở Highwatch quản lý. Đăng rao miễn phí: không có tiền đặt cọc, và một rao bán không ai mua sẽ đơn giản trở về tay bạn. Nhà cái chỉ lấy hoa hồng khi thứ gì đó thực sự được bán: 5 phần trăm giá bán, phần còn lại chờ bạn đến thu.\n\nMột giới hạn quan trọng: Chợ chỉ môi giới hàng hóa thông thường. Một bản có dấu thợ, kiệt tác, pháp khắc, hoặc đã ràng buộc không bao giờ được đưa vào rao bán, nên những món đặc biệt đổi tay trực tiếp qua cửa sổ giao dịch, vốn mang đầy đủ danh tính của vật phẩm, gồm cả dấu thợ. Tự định giá những thứ đó; Chợ chỉ cho bạn biết bản thông thường được mua bao nhiêu.",
         "workOrdersHeading": "Đơn hàng",
-        "workOrdersNote": "Mỗi chủ bàn đăng một đơn hàng thường trực: mang đến một đống nguyên liệu chủ lực của nghề họ và nhận tiền ngay tại chỗ, cộng thêm ít kinh nghiệm nhiệm vụ. Mức trả cố tình là {pct}% so với những gì người bán NPC sẽ trả cho cùng đống nguyên liệu đó, làm tròn xuống, nên đơn hàng không bao giờ là cách có lời để bán nguyên liệu, chỉ là lý do để ghé qua bàn.\n\nMỗi đơn chạy theo đồng hồ riêng {minutes} phút mỗi nhân vật: nộp một cái và vị chủ bàn đó không có gì thêm cho bạn cho đến khi hết giờ. Hãy coi chúng là phần thưởng nhỏ cho nguyên liệu bạn đang thu hoạch dù sao, không phải là một công việc kinh doanh.",
+        "workOrdersNote": "Mỗi chủ bàn đăng các đơn hàng thường trực, mỗi nguyên liệu chủ lực một đơn: mang đến đúng đống nguyên liệu mà đơn yêu cầu và nhận tiền ngay tại chỗ, cộng thêm ít kinh nghiệm nhiệm vụ. Mức trả cố tình là {pct}% so với những gì người bán NPC sẽ trả cho cùng đống nguyên liệu đó, làm tròn xuống, nên đơn hàng không bao giờ là cách có lời để bán nguyên liệu, chỉ là lý do để ghé qua bàn.\n\nMỗi đơn chạy theo đồng hồ riêng {minutes} phút mỗi nhân vật: nộp một cái và đơn đó đóng lại với bạn cho đến khi hết giờ, còn các đơn khác của chủ bàn vẫn mở. Hãy coi chúng là phần thưởng nhỏ cho nguyên liệu bạn đang thu hoạch dù sao, không phải là một công việc kinh doanh.",
         "colOrder": "Đơn hàng",
         "colMaster": "Bậc thầy",
         "colAsks": "Yêu cầu cho",
@@ -8182,6 +8289,7 @@ export const vi_VN: EnTranslations = {
         "cooldownLockedHerb": "Khóm thảo dược đã hái, dụng cụ chưa mở khóa",
         "station": "Trạm chế tác: {name}",
         "service": "Dịch vụ: {name}",
+        "farmPatch": "Garden beds",
         "partyMember": "Thành viên tổ đội: {name}",
         "deadPartyMember": "Thành viên tổ đội đã chết: {name}",
         "partyMemberGeneric": "Thành viên tổ đội",
@@ -8865,6 +8973,7 @@ export const vi_VN: EnTranslations = {
     },
     "cast": {
       "fishing": "Câu Cá",
+      "farming": "Planting",
       "gathering": "Thu Thập",
       "crafting": "Chế Tác",
       "disenchanting": "Hủy Pháp Khắc",
@@ -9050,6 +9159,11 @@ export const vi_VN: EnTranslations = {
       "flaskThroughDeath": "The effect remains through death, but ends when you log out; instanced matches begin and end on a clean slate.",
       "wellFed": "Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.",
       "wellFedAura": "Well Fed: Grants {aura} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.",
+      "useWellfed": "{aura}: +{value} {stat} for {minutes} min, granted when you finish eating.",
+      "useWellfedAura": "Grants {aura} for {minutes} min when you finish eating.",
+      "useFeast": "Use: Sets out a feast others can eat from, one serving each ({servings} servings, lasts {minutes} min).",
+      "useFeastBuff": "Each serving grants {aura}: +{value} {stat} for {minutes} min when you finish the {seconds} sec meal.",
+      "useFeastBuffAura": "Each serving grants {aura} for {minutes} min when you finish the {seconds} sec meal.",
       "questItem": "Vật Phẩm Nhiệm Vụ",
       "questRelated": "Nhiệm vụ: {quest}",
       "questRules": "Không thể bán, gửi ngân hàng, hoặc trao đổi.",
@@ -9072,6 +9186,7 @@ export const vi_VN: EnTranslations = {
       "useManaPotion": "Dùng: Hồi tức thời {amount} mana. Dùng được trong chiến đấu. Hồi chiêu 1 phút.",
       "clickUseInstant": "Nhấp để dùng tức thời trong chiến đấu",
       "clickUse": "Nhấp để sử dụng",
+      "clickSetOut": "Click to set out",
       "clickBuyback": "Nhấp để mua lại",
       "bagSlots": "Túi {slots} Ô"
     },
@@ -12737,6 +12852,138 @@ export const vi_VN: EnTranslations = {
       "pattern_laden_hearth": {
         "name": "Recipe: The Laden Hearth"
       },
+      "vale_wheat_seed": {
+        "name": "Vale Wheat Seed"
+      },
+      "vale_wheat": {
+        "name": "Vale Wheat"
+      },
+      "fine_vale_wheat": {
+        "name": "Fine Vale Wheat"
+      },
+      "withered_husks": {
+        "name": "Withered Husks"
+      },
+      "compost": {
+        "name": "Compost"
+      },
+      "growth_tonic": {
+        "name": "Growth Tonic"
+      },
+      "brook_carrot_seed": {
+        "name": "Brook Carrot Seed"
+      },
+      "brook_carrot": {
+        "name": "Brook Carrot"
+      },
+      "fine_brook_carrot": {
+        "name": "Fine Brook Carrot"
+      },
+      "marsh_rice_seed": {
+        "name": "Marsh Rice Seed"
+      },
+      "marsh_rice": {
+        "name": "Marsh Rice"
+      },
+      "fine_marsh_rice": {
+        "name": "Fine Marsh Rice"
+      },
+      "bog_beet_seed": {
+        "name": "Bog Beet Seed"
+      },
+      "bog_beet": {
+        "name": "Bog Beet"
+      },
+      "fine_bog_beet": {
+        "name": "Fine Bog Beet"
+      },
+      "highland_barley_seed": {
+        "name": "Highland Barley Seed"
+      },
+      "highland_barley": {
+        "name": "Highland Barley"
+      },
+      "fine_highland_barley": {
+        "name": "Fine Highland Barley"
+      },
+      "frost_gourd_seed": {
+        "name": "Frost Gourd Seed"
+      },
+      "frost_gourd": {
+        "name": "Frost Gourd"
+      },
+      "fine_frost_gourd": {
+        "name": "Fine Frost Gourd"
+      },
+      "gilded_sunmelon_seed": {
+        "name": "Gilded Sunmelon Seed"
+      },
+      "gilded_sunmelon": {
+        "name": "Gilded Sunmelon"
+      },
+      "fine_gilded_sunmelon": {
+        "name": "Fine Gilded Sunmelon"
+      },
+      "evergarden_greens_seed": {
+        "name": "Evergarden Greens Seed"
+      },
+      "evergarden_greens": {
+        "name": "Evergarden Greens"
+      },
+      "fine_evergarden_greens": {
+        "name": "Fine Evergarden Greens"
+      },
+      "garden_hoe": {
+        "name": "Garden Hoe"
+      },
+      "bronze_hoe": {
+        "name": "Bronze Hoe"
+      },
+      "skysilver_hoe": {
+        "name": "Skysilver Hoe"
+      },
+      "osmium_hoe": {
+        "name": "Osmium Hoe"
+      },
+      "vale_hearth_loaf": {
+        "name": "Vale Hearth Loaf"
+      },
+      "eastbrook_root_pottage": {
+        "name": "Eastbrook Root Pottage"
+      },
+      "fenbridge_rice_bowl": {
+        "name": "Fenbridge Rice Bowl"
+      },
+      "fenbridge_beet_braise": {
+        "name": "Fenbridge Beet Braise"
+      },
+      "highwatch_barley_bannock": {
+        "name": "Highwatch Barley Bannock"
+      },
+      "highwatch_gourd_soup": {
+        "name": "Highwatch Gourd Soup"
+      },
+      "evergarden_sunmelon_tart": {
+        "name": "Evergarden Sunmelon Tart"
+      },
+      "evergarden_harvest_platter": {
+        "name": "Evergarden Harvest Platter"
+      },
+      "eastbrook_glazed_carrots": {
+        "name": "Eastbrook Glazed Carrots"
+      },
+      "fenbridge_rice_pudding": {
+        "name": "Fenbridge Rice Pudding"
+      },
+      "highwatch_barley_porridge": {
+        "name": "Highwatch Barley Porridge"
+      },
+      "evergarden_braised_greens": {
+        "name": "Evergarden Braised Greens"
+      },
+      "harvest_feast": {
+        "name": "Harvest Feast"
+      },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
       },
@@ -14676,6 +14923,26 @@ export const vi_VN: EnTranslations = {
         "title": "Bậc thầy của nhà bào chế thuốc",
         "greeting": "Đo hai lần và đổ một lần, {className}. Người bào chế thuốc không có kiên nhẫn với thuốc thử bị đổ."
       },
+      "farmer_jessica": {
+        "name": "Farmer Jessica",
+        "title": "Allotment Keeper",
+        "greeting": "Good soil and fair weather, {playerName}. Buy a seed from me, sow it in one of those beds, and go about your day. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer."
+      },
+      "farmer_teasel": {
+        "name": "Farmer Teasel",
+        "title": "Fen Paddy Farmer",
+        "greeting": "Marsh rice and bog beet seed, {className}, and compost to feed them. The paddies drain slow, so mind where you tread."
+      },
+      "farmer_hollis": {
+        "name": "Farmer Hollis",
+        "title": "Highwatch Terrace Farmer",
+        "greeting": "The terraces give what the mountain allows, {className}. I sell compost, and if a crop of yours comes up withered I will work the husks back into good soil for you."
+      },
+      "farmer_verbena": {
+        "name": "Farmer Verbena",
+        "title": "Parterre Gardener",
+        "greeting": "Mind the edging, {playerName}, these beds are the pride of the parterre. Compost is what I sell, and I will turn any withered husks you carry into more of it."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Người Canh Thủy Triều",
@@ -14690,6 +14957,19 @@ export const vi_VN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Mỏ quặng đã khai thác"
+          }
+        }
+      },
+      "q_farm_intro": {
+        "title": "First Furrow",
+        "text": "Take this hoe and a pinch of vale wheat seed, {playerName}. Sow the seed in one of the beds beside me, then go about your business. Come back whenever you like and bring the crop in; I will be here.",
+        "completion": "There, your first crop in your own hands. It keeps growing while you are away, and it never spoils. Your Harvest Journal (Shift+K, or the Farming row of your Professions window) lists every planted bed and its timer. Come back for seed whenever the beds call you, {playerName}.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat planted"
+          },
+          "1": {
+            "label": "Vale Wheat harvested"
           }
         }
       },
@@ -15586,6 +15866,26 @@ export const vi_VN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Thịt Thú Rừng đã giao"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_wheat": {
+        "title": "Kitchens Wheat Order",
+        "text": "Bread does not bake itself, {playerName}, and my flour bins are scraping bottom. Bring me eight sheaves of vale wheat and I will pay you honest coin for the lot. Grown by your own hand or bought off the market, I do not care, so long as it grinds.",
+        "completion": "Good dry grain, and plenty of it. There is your pay, counted out. When the next crop comes in, you know which door to knock on.",
+        "objectives": {
+          "0": {
+            "label": "Vale Wheat delivered"
+          }
+        }
+      },
+      "q_prof_workorder_kitchens_rice": {
+        "title": "Kitchens Rice Order",
+        "text": "The marsh folk swear by their rice, {playerName}, and I mean to find out why. Fetch me five measures of marsh rice and there is coin waiting for you here. Keep it dry on the road, mind: wet rice is porridge, and I did not order porridge.",
+        "completion": "Plump and dry, every grain. Here is your coin. If the marsh keeps giving, so do I.",
+        "objectives": {
+          "0": {
+            "label": "Marsh Rice delivered"
           }
         }
       },
@@ -17550,6 +17850,7 @@ export const vi_VN: EnTranslations = {
     "delveRiteShrineReedInteract": "Miếu Lau Sậy: Nhấn F để chạm vào",
     "delveRiteShrineSkullInteract": "Miếu Đầu Lâu: Nhấn F để chạm vào",
     "mailboxName": "Hòm Thư",
-    "noticeboardName": "Bảng Thông Báo"
+    "noticeboardName": "Bảng Thông Báo",
+    "farmPatchName": "Garden Beds"
   }
 };

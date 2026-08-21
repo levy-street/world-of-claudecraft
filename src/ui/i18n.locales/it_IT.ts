@@ -1209,7 +1209,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectTooltip.charges':
     'Parte con {base} cariche su uno strumento comune (+{bonus} per ogni gradino di rarità).',
   'hudChrome.professions.toolEffectTooltip.howToSlot':
-    'Inseriscilo su uno strumento da estrazione mineraria, taglio del legname o erbalismo dalla finestra Professioni. Viene consumato quando inserito.',
+    'Inseriscilo su uno strumento da estrazione mineraria, taglio del legname, erbalismo o agricoltura dalla finestra Professioni. Viene consumato quando inserito.',
   'hudChrome.professions.toolEffectTooltip.kind': 'Amuleto per strumenti',
   'hudChrome.professions.toolEffectTooltip.landOnly': 'Non si inserisce sulle canne da pesca.',
   'hudChrome.professions.toolEffectTooltip.openProfessions':
@@ -1874,7 +1874,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Il Mercato Mondiale e la borsa a livello di reame, gestita dal Mercante a Eastbrook e dal Banditore Voss a Highwatch. L'inserzione e gratuita: non c'e deposito, e un'inserzione invenduta ti ritorna semplicemente. La casa prende la sua commissione solo quando qualcosa si vende davvero: il 5 percento del prezzo di vendita, e il resto ti aspetta da riscuotere.\n\nUn limite importante: il Mercato gestisce solo beni semplici. Una copia firmata, da capolavoro, incantata o vincolata non viene mai inclusa in un'inserzione, quindi i pezzi speciali cambiano mani faccia a faccia in una finestra di scambio, che porta l'identita completa di un oggetto, firma inclusa. Fissa tu stesso il prezzo; il Mercato ti dice solo cosa rende la versione semplice.",
   'guide.profPages.econ.workOrdersHeading': 'Ordini di lavoro',
   'guide.profPages.econ.workOrdersNote':
-    "Ogni maestro di stazione pubblica un ordine di lavoro fisso: porta una pila del materiale di base del suo mestiere e vieni pagato sul momento, piu un po' di esperienza missione. La paga e deliberatamente il {pct}% di cio che un venditore ti darebbe per la stessa pila, arrotondato per difetto, quindi un ordine di lavoro non e mai il modo piu redditizio per vendere materiali, solo un motivo per passare dalla stazione.\n\nOgni ordine va sul proprio orologio di {minutes} minuti per personaggio: consegnane uno e quel maestro non ha piu nulla per te finche il timer non scade. Trattali come un piccolo bonus sui materiali che raccoglievi comunque, non come un'attivita.",
+    "Ogni maestro di stazione pubblica ordini di lavoro fissi, uno per materiale di base: porta la pila che un ordine chiede e vieni pagato sul momento, piu un po' di esperienza missione. La paga e deliberatamente il {pct}% di cio che un venditore ti darebbe per la stessa pila, arrotondato per difetto, quindi un ordine di lavoro non e mai il modo piu redditizio per vendere materiali, solo un motivo per passare dalla stazione.\n\nOgni ordine va sul proprio orologio di {minutes} minuti per personaggio: consegnane uno e quell'ordine resta chiuso per te finche il timer non scade, mentre gli altri ordini del maestro restano aperti. Trattali come un piccolo bonus sui materiali che raccoglievi comunque, non come un'attivita.",
   'guide.profPages.econ.colOrder': 'Ordine di lavoro',
   'guide.profPages.econ.colMaster': 'Maestro',
   'guide.profPages.econ.colAsks': 'Chiede',

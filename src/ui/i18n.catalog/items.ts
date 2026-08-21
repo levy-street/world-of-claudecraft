@@ -127,6 +127,34 @@ const itemStringsEn = {
         'Well Fed: Increases your {stat} by {value} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.',
       wellFedAura:
         'Well Fed: Grants {aura} for {minutes} min once you finish eating. Only one Well Fed effect at a time: a newer meal replaces it.',
+      // Well-fed buff dishes (wellfed_tooltip_view.ts): the buff lands only
+      // when the 18s sit-restore COMPLETES (an interrupted meal forfeits it),
+      // so the line states the finish-eating trigger; the aura-name fallback
+      // keeps an unmapped kind from shipping a silent dish.
+      // No 'Use:' prefix on either wellfed line: every buff dish also carries
+      // foodHp, so the useFood sentence above it already owns the Use: slot
+      // and a second one would double the prefix on one tooltip. The buff
+      // NAME is interpolated ({aura}) through the same sim_i18n matcher the
+      // buff bar reads, so one row owns the term in every locale.
+      useWellfed: '{aura}: +{value} {stat} for {minutes} min, granted when you finish eating.',
+      useWellfedAura: 'Grants {aura} for {minutes} min when you finish eating.',
+      // The shared feast (feast_tooltip_view.ts): what USING the item does
+      // (places a feast entity others eat from; {servings} and {minutes} come
+      // from the def's own feast record), then what each serving pays,
+      // matching the capstone dish's resolved well-fed form above. {seconds}
+      // is CONSUME_DURATION, the same sit-restore a bagged dish runs, and the
+      // finish-the-meal trigger is load-bearing copy like the wellfed lines
+      // (the buff lands only when the meal COMPLETES). The buff NAME rides
+      // the shared sim_i18n matcher row ({aura}), the (by) rule, so the
+      // tooltip, the dish tooltip, and the buff bar can never disagree per
+      // locale. useFeast keeps the Use: prefix: the feast has no foodHp, so
+      // no useFood sentence owns that slot on its tooltip.
+      useFeast:
+        'Use: Sets out a feast others can eat from, one serving each ({servings} servings, lasts {minutes} min).',
+      useFeastBuff:
+        'Each serving grants {aura}: +{value} {stat} for {minutes} min when you finish the {seconds} sec meal.',
+      useFeastBuffAura:
+        'Each serving grants {aura} for {minutes} min when you finish the {seconds} sec meal.',
       questItem: 'Quest Item',
       // Story tooltip lines (quest_item_tooltip_view.ts): related quest title,
       // keep-rules footer, and orphaned copy when the item is no longer needed
@@ -2571,6 +2599,50 @@ const ITEM_ENTITY_IDS = [
   'pattern_sageleaf_chowder',
   'pattern_grand_cauldron',
   'pattern_laden_hearth',
+  'vale_wheat_seed',
+  'vale_wheat',
+  'fine_vale_wheat',
+  'withered_husks',
+  'compost',
+  'growth_tonic',
+  'brook_carrot_seed',
+  'brook_carrot',
+  'fine_brook_carrot',
+  'marsh_rice_seed',
+  'marsh_rice',
+  'fine_marsh_rice',
+  'bog_beet_seed',
+  'bog_beet',
+  'fine_bog_beet',
+  'highland_barley_seed',
+  'highland_barley',
+  'fine_highland_barley',
+  'frost_gourd_seed',
+  'frost_gourd',
+  'fine_frost_gourd',
+  'gilded_sunmelon_seed',
+  'gilded_sunmelon',
+  'fine_gilded_sunmelon',
+  'evergarden_greens_seed',
+  'evergarden_greens',
+  'fine_evergarden_greens',
+  'garden_hoe',
+  'bronze_hoe',
+  'skysilver_hoe',
+  'osmium_hoe',
+  'vale_hearth_loaf',
+  'eastbrook_root_pottage',
+  'fenbridge_rice_bowl',
+  'fenbridge_beet_braise',
+  'highwatch_barley_bannock',
+  'highwatch_gourd_soup',
+  'evergarden_sunmelon_tart',
+  'evergarden_harvest_platter',
+  'eastbrook_glazed_carrots',
+  'fenbridge_rice_pudding',
+  'highwatch_barley_porridge',
+  'evergarden_braised_greens',
+  'harvest_feast',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2807,6 +2879,81 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   pattern_sageleaf_chowder: 'Recipe: Sageleaf Chowder',
   pattern_grand_cauldron: 'Recipe: Grand Cauldron',
   pattern_laden_hearth: 'Recipe: The Laden Hearth',
+  // Farming's tier-1 crop line (the growth-engine phase): the seed, its
+  // produce, the fine twin a skill-scaled harvest roll upgrades a pick into,
+  // and the husks a failed crop pays. Same English-appended treatment as the
+  // quivers and the Thornhide family above. These names must stay in step with
+  // the ItemDef `name` fields in src/sim/content/items.ts, which is what the
+  // sim splices into its own English text for the matchers to re-localize.
+  vale_wheat_seed: 'Vale Wheat Seed',
+  vale_wheat: 'Vale Wheat',
+  fine_vale_wheat: 'Fine Vale Wheat',
+  withered_husks: 'Withered Husks',
+  // The knobs phase's two plant-time supplies, same treatment and the same
+  // stay-in-step rule against the ItemDef `name` fields. IP-safe per D17:
+  // plain real words, no coined compost grades borrowed from other games.
+  compost: 'Compost',
+  growth_tonic: 'Growth Tonic',
+  // The crop-ladder phase's seven crop families (seed, produce, fine twin),
+  // same English-appended treatment and the same stay-in-step rule against
+  // the ItemDef `name` fields in src/sim/content/items.ts. IP-safe per D17:
+  // real plant words plus zone-flavored qualifiers, coining nothing from
+  // another game.
+  brook_carrot_seed: 'Brook Carrot Seed',
+  brook_carrot: 'Brook Carrot',
+  fine_brook_carrot: 'Fine Brook Carrot',
+  marsh_rice_seed: 'Marsh Rice Seed',
+  marsh_rice: 'Marsh Rice',
+  fine_marsh_rice: 'Fine Marsh Rice',
+  bog_beet_seed: 'Bog Beet Seed',
+  bog_beet: 'Bog Beet',
+  fine_bog_beet: 'Fine Bog Beet',
+  highland_barley_seed: 'Highland Barley Seed',
+  highland_barley: 'Highland Barley',
+  fine_highland_barley: 'Fine Highland Barley',
+  frost_gourd_seed: 'Frost Gourd Seed',
+  frost_gourd: 'Frost Gourd',
+  fine_frost_gourd: 'Fine Frost Gourd',
+  gilded_sunmelon_seed: 'Gilded Sunmelon Seed',
+  gilded_sunmelon: 'Gilded Sunmelon',
+  fine_gilded_sunmelon: 'Fine Gilded Sunmelon',
+  evergarden_greens_seed: 'Evergarden Greens Seed',
+  evergarden_greens: 'Evergarden Greens',
+  fine_evergarden_greens: 'Fine Evergarden Greens',
+  // The hoe ladder (the crop-ladder phase's tool half), same English-appended
+  // treatment and the same stay-in-step rule against the ItemDef `name`
+  // fields. IP-safe per D17: plain real words at tiers 1 and 2, and the
+  // repo's own shipped Skysilver/Osmium material coinages at tiers 3 and 4
+  // (the mining pick precedent).
+  garden_hoe: 'Garden Hoe',
+  bronze_hoe: 'Bronze Hoe',
+  skysilver_hoe: 'Skysilver Hoe',
+  osmium_hoe: 'Osmium Hoe',
+  // The economy-hooks phase's eight farm dishes (FARM_RECIPES), listed in
+  // tier order, same English-appended treatment and the same stay-in-step
+  // rule against the ItemDef `name` fields in
+  // src/sim/content/profession_items.ts. IP-safe per D17: real cooking words
+  // (loaf, pottage, braise, bannock, tart, platter) plus this game's own
+  // settlement and zone flavor, coining nothing from another game.
+  vale_hearth_loaf: 'Vale Hearth Loaf',
+  eastbrook_root_pottage: 'Eastbrook Root Pottage',
+  fenbridge_rice_bowl: 'Fenbridge Rice Bowl',
+  fenbridge_beet_braise: 'Fenbridge Beet Braise',
+  highwatch_barley_bannock: 'Highwatch Barley Bannock',
+  highwatch_gourd_soup: 'Highwatch Gourd Soup',
+  evergarden_sunmelon_tart: 'Evergarden Sunmelon Tart',
+  evergarden_harvest_platter: 'Evergarden Harvest Platter',
+  // The well-fed phase's four buff dishes (FARM_RECIPES), one per crop tier,
+  // same treatment and the same stay-in-step rule against the ItemDef `name`
+  // fields in src/sim/content/profession_items.ts. IP-safe per D17: real
+  // cooking words (glazed, pudding, porridge, braised) plus this game's own
+  // settlement flavor.
+  eastbrook_glazed_carrots: 'Eastbrook Glazed Carrots',
+  fenbridge_rice_pudding: 'Fenbridge Rice Pudding',
+  highwatch_barley_porridge: 'Highwatch Barley Porridge',
+  evergarden_braised_greens: 'Evergarden Braised Greens',
+  // The shared feast (Phase 12). IP-safe per D17: two plain cooking words.
+  harvest_feast: 'Harvest Feast',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

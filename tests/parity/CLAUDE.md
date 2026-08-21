@@ -112,6 +112,16 @@ confirmed each):
   else that must pin an unresolved roll needs the same trick. Extracting one of these should add a scenario that drives it (the
   precedents: `market_round_trip`, `bank_round_trip`, `dungeon_instances`) or sample
   the collection directly.
+- **The farming SESSION is driven; profession DENY arms are not.** `farming_session`
+  drives real plants and harvests through `plantCrop`/`harvestCrop` (its growth
+  window writes `readyAtMs` down rather than ticking 45 minutes, the draw-free
+  `/dev farmgrow` equivalence) and pins its own draws, the exact sibling of the
+  `professions_fishing_session` exemplar described above. What is still NOT
+  driven is a profession's DENY arms: those denials are draw-free by contract,
+  which is exactly why nothing here would notice one starting to draw, so a
+  change to a gate order still needs its own suite. Farming's live coverage is
+  `tests/professions_farming.test.ts` (the lifecycle plus the draw-count pins);
+  this gate pins the session, not the surface around it.
 - **Construction-time draws + ambient world mobs.** The `Rng` is born inside the Sim
   ctor, so ctor draws are not in the draw digest; ambient camp mobs are spawned but
   never tracked. A same-draw-count reorder of ctor spawns that changes only

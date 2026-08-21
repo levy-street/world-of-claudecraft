@@ -12,6 +12,7 @@ import {
 } from '../sim/account_flair';
 import { bagCapacity } from '../sim/bags';
 import { signChallenge } from '../sim/client_challenge';
+import { FARM_PATCHES } from '../sim/content/farm_patches';
 import { MOUNT_RACE_COURSE, type MountKey, normalizeMountKey } from '../sim/content/mounts';
 import { mechChromaSkinIndex } from '../sim/content/skins';
 import {
@@ -120,6 +121,9 @@ import {
   type DelveShopOfferView,
   type DevLeaderboardPage,
   type DuelInfo,
+  type FarmPatchDef,
+  type FarmPlantKnobs,
+  type FarmPlotView,
   type FriendInfo,
   type GuildBankInfo,
   type GuildBankLogEntry,
@@ -1766,6 +1770,25 @@ export class ClientWorld implements IWorld {
   // never slotted an effect, which is the server's own default: the sim leaves
   // the backing PlayerMeta field absent and projects [] for it.
   toolEffectSlots: readonly ToolEffectSlotView[] = [];
+  // Static content read (the recipeList precedent below): the garden-bed
+  // geography ships with the client bundle like every other content table, so
+  // this needs no wire round-trip. See src/world_api/farming.ts.
+  farmPatches: readonly FarmPatchDef[] = FARM_PATCHES;
+  // The viewer's own farm plots, one row per planted bed sorted by bed id,
+  // mirrored from the `fplot` self-wire delta. Empty for every player with no
+  // planted bed, which is the server's own default (the sim projects [] for an
+  // empty plot map). `status` arrives server-computed and is never re-derived
+  // here: the authority owns it, and the hidden pre-rolled outcome slots that
+  // decide a crop's fate never cross the wire at all.
+  myFarmPlots: readonly FarmPlotView[] = [];
+  // The clock base the plot timestamps above were written in. Date.now is
+  // correct here for the riftEventMsRemaining reason: the server computes farm
+  // timestamps through ctx.lockoutNowMs(), which IS real Date.now() on the
+  // live server, the same clock raidLockouts() already subtracts against.
+  // Read fresh per call so a growth stage advances between snapshots.
+  farmNowMs(): number {
+    return Date.now();
+  }
   // Per-delve clears (key `${delveId}:${tierId}`), mirrored from the self-wire so
   // delveShopOffers can resolve the shop lock badge client-side.
   delveClears: Record<string, number> = {};
@@ -3822,6 +3845,7 @@ export class ClientWorld implements IWorld {
       if (s.salv !== undefined) this.lastSalvageResult = s.salv ?? null;
       if (s.gprof !== undefined) this.gatheringProficiency = s.gprof ?? {};
       if (s.tslot !== undefined) this.toolEffectSlots = s.tslot ?? [];
+      if (s.fplot !== undefined) this.myFarmPlots = s.fplot ?? [];
       if (s.prof !== undefined) this.professionsState = s.prof ?? { skills: [] };
       if (s.cprof !== undefined && s.cprof) {
         const cprof = s.cprof as CraftingIdentityView;
@@ -4739,6 +4763,47 @@ export class ClientWorld implements IWorld {
     const restore = this.actionBarRestore;
     this.actionBarRestore = undefined; // one-shot: consumed by the HUD at world entry
     return restore;
+  }
+  // --- IWorldFarming: the two plot mutations (snake_case wire, by design).
+  // Command only, NEVER predicted: the server re-validates the bed id, the
+  // crop id, ownership, the skill threshold, the seed in bags, and the
+  // step-12 hoe gate (a wieldable farming hoe covering the crop tier; live
+  // since the crop-ladder phase) inside the
+  // sim, consumes the seed, and pre-rolls the whole hidden
+  // growth script there. Writing an optimistic plot row here would be
+  // guessing at a deadline only the authority can set, and the hidden
+  // survival/yield slots deliberately never reach this client at all, so
+  // there is nothing to predict FROM. Every outcome mirrors back on the
+  // `fplot` self delta plus a text-free id-carrying SimEvent. ---
+  plantCrop(bedId: string, cropId: string, knobs?: FarmPlantKnobs): void {
+    // Knob fields ride the frame ONLY when literally true (the fplot
+    // only-when-true convention): a plain plant's frame stays byte-identical
+    // to the pre-knob protocol, and the server treats an absent field and
+    // false identically (knob not requested).
+    this.cmd({
+      cmd: 'plant_crop',
+      bed: bedId,
+      crop: cropId,
+      ...(knobs?.compost === true ? { compost: true } : {}),
+      ...(knobs?.watch === true ? { watch: true } : {}),
+      ...(knobs?.tonic === true ? { tonic: true } : {}),
+    });
+  }
+  harvestCrop(bedId: string): void {
+    this.cmd({ cmd: 'harvest_crop', bed: bedId });
+  }
+  convertHusks(): void {
+    this.cmd({ cmd: 'convert_husks' });
+  }
+  // The shared feast pair: payload-free place (the item id, charges, expiry
+  // and anti-abuse rule all resolve server-side) and an entity-id-only
+  // consume. Never predicted: the placed feast arrives on the normal entity
+  // snapshot and every refusal answers as a text-free farmDenied SimEvent.
+  placeFeast(): void {
+    this.cmd({ cmd: 'place_feast' });
+  }
+  consumeFeast(feastId: number): void {
+    this.cmd({ cmd: 'consume_feast', id: feastId });
   }
   chat(text: string): void {
     this.cmd({ cmd: 'chat', text });

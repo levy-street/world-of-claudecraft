@@ -352,6 +352,20 @@ describe('isGatheredProvenanceKind partition over the live content', () => {
     // crafted-kind, and every crafted junk-kind output must sit BELOW
     // signable rarity, or the "Gathered by" mislabel goes live the day a
     // retune bumps an intermediate to rare.
+    // TWO sanctioned junk-kind exceptions compose with that rule (the farming
+    // absorb, RULE 3b: the two suites' rules COMPOSE). Farming deviation
+    // (ak): the growth tonic is a crafted output whose def is DELIBERATELY
+    // kind 'junk' (plant_crop consumes it as the plant-time knob; there is no
+    // use arm and Sell Junk must vendor it); common quality sits below the
+    // signing floor and the masterwork arm needs slot+stats the def lacks.
+    // The SECOND member (farming Phase 12): the harvest feast is a crafted
+    // output deliberately kind 'junk' (using it PLACES the farm_feast
+    // entity). Its rare quality sits ABOVE the signing floor, so its
+    // never-signable proof rests on the masterwork arm alone: a stat-less,
+    // slot-less def can never proc a signed masterwork instance. Both proofs
+    // are pinned below, so each exception self-invalidates the day its
+    // premise moves.
+    const CRAFTED_JUNK_EXCEPTIONS = new Set(['growth_tonic', 'harvest_feast']);
     expect(ALL_RECIPES.length).toBeGreaterThan(0);
     for (const recipe of ALL_RECIPES) {
       expect(ITEMS[recipe.resultItemId], recipe.id).toBeDefined();
@@ -366,6 +380,8 @@ describe('isGatheredProvenanceKind partition over the live content', () => {
     expect(signable.length).toBeGreaterThan(0);
     for (const recipe of signable) {
       const def = ITEMS[recipe.resultItemId];
+      expect(def, recipe.resultItemId).toBeDefined();
+      if (CRAFTED_JUNK_EXCEPTIONS.has(recipe.resultItemId)) continue;
       expect(isGatheredProvenanceKind(def.kind), `${recipe.resultItemId} (${def.kind})`).toBe(
         false,
       );
@@ -383,19 +399,26 @@ describe('isGatheredProvenanceKind partition over the live content', () => {
         'seasoned_stock',
         'lucent_reagent',
         'sablewax_vellum',
+        'growth_tonic',
+        'harvest_feast',
       ].sort(),
     );
     for (const recipe of craftedJunk) {
       const def = ITEMS[recipe.resultItemId];
-      expect(
-        signableQuality(def.quality),
-        `${recipe.resultItemId} must stay below signable rarity while kind junk`,
-      ).toBe(false);
+      // harvest_feast is the ONE junk-kind output allowed above the signing
+      // floor (rare): its never-signable proof rests on the masterwork arm
+      // alone, asserted explicitly below the loop.
+      if (recipe.resultItemId !== 'harvest_feast') {
+        expect(
+          signableQuality(def.quality),
+          `${recipe.resultItemId} must stay below signable rarity while kind junk`,
+        ).toBe(false);
+      }
       // The OTHER signing channel (the predicate header names both): the
       // masterwork proc arm signs independently of rarity, gated solely on
       // masterworkBonusStats answering non-null, which needs a slot AND
       // stats. Pin the slot-less/stat-less premise against live content so
-      // giving one of the ten a slot cannot mint a signer while every
+      // giving one of these a slot cannot mint a signer while every
       // rarity assert above stays green (the phase 07 QA pin-audit catch).
       expect(
         masterworkBonusStats({
@@ -407,6 +430,13 @@ describe('isGatheredProvenanceKind partition over the live content', () => {
         `${recipe.resultItemId} must stay outside the masterwork signing arm`,
       ).toBeNull();
     }
+    // The feast exception's rarity arm, stated honestly (rare IS signable),
+    // so a slot or stats gain on the def reds the masterwork assert above
+    // first and forces the exception to be re-decided.
+    const feastDef = ITEMS.harvest_feast;
+    expect(feastDef, 'the feast exception names a live item').toBeDefined();
+    expect(feastDef.kind, 'the feast exception exists only for the junk kind').toBe('junk');
+    expect(isSignableMaterialRarity(feastDef.quality as never)).toBe(true);
   });
 });
 

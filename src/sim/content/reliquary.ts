@@ -430,6 +430,9 @@ export const RELIQUARY_HORIZON_TITLES = [
   // Grandmaster Inscription (Masterwrought phase 06): the tenth per-craft
   // grandmaster title pages here per the same locked titles-page rule.
   'prog_grandmaster_inscription',
+  // The farming capstone (the celebrations phase): Harvestmaster pages here
+  // per the locked titles-page rule like every non-hidden title deed.
+  'prog_farming_100',
 ] as const;
 
 // Profession lifetime mark ids (Phase 7). Prefer existing visited namespaces

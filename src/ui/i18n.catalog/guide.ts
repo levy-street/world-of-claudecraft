@@ -337,6 +337,7 @@ export const guideStrings = {
     groupCamera: 'Camera',
     talents: 'Talents',
     professions: 'Professions',
+    harvestJournal: 'Harvest Journal',
     arena: 'PvP window (the arenas and Thornhollow Fields)',
     leaderboard: 'Leaderboard',
     deeds: 'Book of Deeds',
@@ -2582,7 +2583,7 @@ export const guideStrings = {
     comingSoon: 'No recipes yet',
     gatherHubHeading: 'Gathering',
     gatherHubBody:
-      'Four gathering trades feed the ring from the field: Mining, Logging, and Herbalism pull ore, timber, and herbs out of the land and cap at 100 proficiency, while Fishing runs on its own bite-and-reel rhythm all the way to 200. Each page below carries the exact node maps, tool ladders, and odds.',
+      'The gathering trades feed the ring from the field: Mining, Logging, and Herbalism pull ore, timber, and herbs out of the land and cap at 100 proficiency, Farming raises crops from seed in tended beds and caps at the same 100, while Fishing runs on its own bite-and-reel rhythm all the way to 200. Each page below carries the exact node maps, tool ladders, and odds.',
     archetypesHeading: 'The wheel and its archetypes',
     archetypesBody:
       "The ten crafts sit on a fixed wheel, and geography on that wheel matters. Every two neighbors form a named pair: Smith for Weaponcrafting and Armorcrafting, Outfitter for Leatherworking and Tailoring, Apothecary for Alchemy and Cooking, Bombardier for Engineering and Alchemy, and six more around the ring.\n\nAttuning to a pair is a quest, not a menu click. Four pairs can be joined today (Smith, Outfitter, Apothecary, and Bombardier), each anchored by a resident master in Eastbrook whose acceptance quest states the whole bargain up front before you take it. Until you declare, every craft advances freely on recipes up through the rare tier (any recipe asking skill 74 or less), so you can try nearly everything before you choose (Engineering alone has no recipe that low, so its number waits).\n\nOnce you attune, your two pair crafts become your majors, with no ceiling short of the cap. The rest of the wheel does not go dark: one craft opposite your majors stays on as a hobby that keeps climbing through the rare tier (a repeatable quest at Smith Haldren's forge lets you swap which one), and every other craft goes dormant. A dormant craft keeps its skill and its common recipes, which keep teaching it on the normal curve until they gray at 75; everything above common stops paying at once, and a dormant craft never turns out a masterwork while it rests.",
@@ -2650,6 +2651,14 @@ export const guideStrings = {
     // Daily craft gate badge (Masterwrought phase 07). Kept non-wordy (no
     // 4-plus lowercase run) per M16, matching hudChrome.crafting.oncePerDay.
     oncePerDay: 'Once per day',
+    // The dish effect sub-lines (C10): composed from the generated effect
+    // VALUES, mirroring the in-game itemUi.tooltip.useFood / useWellfed
+    // family (resolved numbers, the finish-the-meal trigger stated). The
+    // aura variant is the unmapped-buff-kind fallback, the
+    // wellfed_tooltip_view rule: no dish ever ships a silent effect cell.
+    effectFood: 'Restores {amount} health over {seconds} sec when eaten.',
+    effectWellFed: 'Well fed when you finish eating: +{value} {stat} for {minutes} min.',
+    effectWellFedAura: 'Grants {aura} for {minutes} min when you finish eating.',
     sourceTrainerFee: 'Trainer, {fee}',
     sourceTrainerFree: 'Trainer, free',
     sourceKnown: 'Known from the start',
@@ -2909,6 +2918,12 @@ export const guideStrings = {
         'Herbalism gathers what grows wild: sheenleaf in Eastbrook Vale, goldleaf in Mirefen Marsh, sunpetal in Thornpeak Heights, and starter patches in every younger zone, the leaf and stem that keep the apothecary trades brewing. Open to everyone from level 1 with a herbalism sickle in your bags (20 copper at the Eastbrook, Fenbridge, and Highwatch counters), tracked on its own counter to a cap of 100.',
       fishing:
         "Fishing is the odd one out among the gathering trades, and the deepest: a real bite-and-reel minigame, its own catch tables in each of the three heartland zones (the young waters beyond them all serve the Vale's table for now), and a proficiency cap of 200, twice the others. Buy a pole, face open water, and cast.",
+      // Reworded at the farming go-live (the farmer NPCs, the intro quest,
+      // and the seed counters opened together): the lead names the farmers
+      // beside the beds and Jessica as the front door; the loop itself lives
+      // in the farm.beds* section below.
+      farming:
+        'Farming is the one gathering trade you tend rather than take: crops raised from seed in worked garden beds, growing on their own clock whether you stay or go, and pulled up ripe whenever you come back, because nothing in a bed ever spoils. A farmer stands beside every bed site, from the Eastbrook allotments through Fenbridge and Highwatch to the Evergarden parterre, and Farmer Jessica in Eastbrook is where the trade starts: she sells the garden hoe and the first seeds, and her errand walks a new farmer through a first crop. Each rung of the ladder grows its own pair of crops, each with a finer grade for a practiced hand to pull, and engineers craft the hoes for the tougher ground above the starter beds. Tracked on its own counter to a cap of 100.',
     },
     rhythmHeading: 'The gathering rhythm',
     rhythmBody:
@@ -2954,13 +2969,25 @@ export const guideStrings = {
     gatherDeedsHeading: 'Deeds along the way',
     gatherDeeds: {
       mining:
-        "Your first node of any trade earns Fruits of the Field, and the 100 cap in Mining inscribes Ore in the Blood. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and cracking a pristine vein records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. None of these grant power: deeds are titles and Renown, a record of the roads you have walked.",
+        "Your first node of any trade earns Fruits of the Field, and the 100 cap in Mining inscribes Ore in the Blood. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and cracking a pristine vein records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. None of these grant power: deeds are titles and Renown, a record of the roads you have walked.",
       logging:
-        "Your first node of any trade earns Fruits of the Field, and the 100 cap in Logging inscribes Heartwood Hewer. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and a strike of ancient heartwood records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "Your first node of any trade earns Fruits of the Field, and the 100 cap in Logging inscribes Heartwood Hewer. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and a strike of ancient heartwood records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
       herbalism:
-        "Your first node of any trade earns Fruits of the Field, and the 100 cap in Herbalism inscribes Master of the Meadow. Reaching 100 in any three of Mining, Logging, Herbalism, and Fishing adds Master Gatherer at 25 Renown, and a moonlit bloom records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
+        "Your first node of any trade earns Fruits of the Field, and the 100 cap in Herbalism inscribes Master of the Meadow. Reaching 100 in any three gathering trades adds Master Gatherer at 25 Renown, and a moonlit bloom records its own collector's mark. Twelve zones keep a gatherer's chronicle page apiece too, filled by harvesting an ore vein, a wood stand, and an herb patch within the zone's bounds. Deeds are titles and Renown only, never power.",
       fishing:
         "The 100 milestone inscribes Old Salt and 200 inscribes Master Angler with its title, the very top of the angler's art; Fishing also counts toward Master Gatherer, earned at 100 in any three gathering trades. A first fish from each of twelve zones' waters fills its own page, the three heartland zones and the Willowfen, the Galecrest, the Farshore, the Frostveil, the Amberfall, the Nightbloom, the Wraithwood, the Palmreach, and the Evergarden beyond them, and the Sunglint Koi records Glimmer of Hope, so travelers with a pole in their pack fill their book faster than they expect.",
+      // RETIRED at the celebrations phase (D13): superseded by farmingSown
+      // below and no longer rendered, kept so filled locale overlays never
+      // strand (the harvestBodyChoice precedent).
+      farming:
+        'Farming keeps no deeds of its own yet: now that its beds and crops are in the ground, the milestone and cap deeds that mark the other trades arrive in a later patch. Proficiency in it already counts toward Master Gatherer, which is earned at 100 in any three gathering trades, so a farmer will fill that page the same way everyone else does. Deeds are titles and Renown only, never power.',
+      // The live farming arm, a NEW key (the harvestBodyFamilies precedent):
+      // the retired leaf above promised the trade kept no deeds of its own
+      // yet, which the celebrations phase's Sow It Begins, the four hub
+      // chronicles, the Golden Harvest mark, and the Harvestmaster capstone
+      // (src/sim/content/deeds.ts) made false.
+      farmingSown:
+        "Farming keeps its own shelf in the Book of Deeds now. Sow It Begins marks your first planted crop, and four chronicle pages mark a first thriving harvest at each of the bed sites, from Eastbrook Vale to the Evergarden. A golden harvest records its own zero-Renown collector's mark, and proficiency in Farming counts toward Master Gatherer, earned at 100 in any three gathering trades. The capstone is already written: Harvestmaster, the trade's 100-proficiency title, comes within reach with a later patch's deeper fields. Deeds are titles and Renown only, never power.",
     },
     fish: {
       startHeading: 'Getting started',
@@ -2992,6 +3019,24 @@ export const guideStrings = {
       koiBody:
         "Every body of water in the game hides the same prize: the Sunglint Koi, an uncommon gleam on the line worth 75 copper to a vendor and rather more to your pride. Its odds answer to your catch band and to nothing else, the same in every zone: a 1 percent row of the catch table at band 0, 3 at band 1, and 6 at band 2, drawn on every reeled-in cast, so the koi comes to the angler who earned the deep tables. Landing one records Glimmer of Hope in your Book of Deeds, a zero-Renown collector's mark. When it happens, the log makes sure you know.",
     },
+    // The farming page's own section (the fishing sections' precedent): the
+    // planting loop as a player works it, from the counter to the kitchens.
+    // Names only Farmer Jessica; the other farmers stay "the Fenbridge
+    // farmer" and so on so a title change never strands this prose.
+    farm: {
+      bedsHeading: 'Working the beds',
+      bedsBody:
+        "The loop is short. Buy seeds and compost from the farmer beside the beds: Jessica in Eastbrook stocks the Vale pair, the Fenbridge farmer the marsh pair, and no counter anywhere sells the Highwatch or Evergarden seeds, which come back a seed or two at a time from a high-tier harvest and otherwise change hands on the World Market. Sow with a hoe in your bags, and tip the odds if you like: compost from the counter and the farmer's watch, paid in produce as you plant, each raise a crop's chance of coming through, an alchemist's growth tonic gives the harvest a shot at a larger yield, and once your skill has climbed a full band past a crop's tier that crop never fails at all. Then walk away. The bed keeps growing while you are logged out, a ripe crop waits as long as you leave it, and the Harvest Journal (Shift+K, or the Farming row of your professions window) lists every bed you have planted with its timer.\n\nA crop that fails leaves withered husks in place of produce, and any farmer trades husks for compost, so a bad season buys the next one's insurance. What you bring in feeds the kitchens: the produce cooks into dishes at the kitchens, and Cook Marlow's wheat and rice orders take Vale Wheat and Marsh Rice off your hands for coin on the same clock as every other work order.",
+      // The table half of the loop, the later phases' shipments (the
+      // golden-harvest celebration, the well-fed dishes, the shared feast),
+      // as NEW keys so the shipped bedsBody prose stays untouched. Written
+      // from the live mechanics (professions/farming.ts, feast.ts, the
+      // wellfed tooltip family) but spoiler-safe on purpose: names and roles
+      // only, no chances, stat values, durations, or reagent routes.
+      tableHeading: 'From the beds to the table',
+      tableBody:
+        "The kitchens are where a season pays forward. Beyond the everyday farm dishes, each crop tier has a richer dish that leaves you Well Fed: finish the meal and a lasting boon stays with you, the kind of edge a group wants eaten before the dungeon door. Crowning the set is the Harvest Feast, a spread a cook sets out in the world itself: everyone at hand takes a serving of their own, one each, and every finished meal pays the same Well Fed boon, so one farmer's season can set the table for a whole party. The top of that ladder, the two richest dishes and the feast itself, comes within reach with a later patch's deeper fields; everything below them is cooking today.\n\nLuck keeps a place at that table too. Every harvest you bring in rolls the same windfall chance the other gathering trades enjoy, and now and then a crop comes up golden: the yield lands far past a normal pull, the whole zone hears the find announced by name, and Golden Harvest is recorded in your Book of Deeds.",
+    },
     econ: {
       title: 'Crafting Economy',
       intro:
@@ -3019,8 +3064,10 @@ export const guideStrings = {
       marketBody:
         "The World Market is the realm-wide exchange, kept by the Merchant in Eastbrook and Auctioneer Voss in Highwatch. Listing is free: there is no deposit, and an unsold listing simply comes back to you. The house takes its cut only when something actually sells: 5 percent of the sale price, and the rest waits for you to collect.\n\nSpecial pieces are welcome too: a signed, masterwork, or enchanted copy goes up as its own single-copy listing that carries its identity onto the tooltip, signature and all, and it never mixes with a plain stack. The one refusal is a bound copy: a piece locked by the Maker's Bond, or still armed to bind, stays out of the Market and the mail alike, so a bond can never be laundered away. Price special work yourself; the plain listings only tell you what the plain version fetches.",
       workOrdersHeading: 'Work orders',
+      // Reworded when the kitchens took on the produce orders: a master can
+      // post more than one order, and each order's clock is its own.
       workOrdersNote:
-        "Each station master posts a standing work order: bring a stack of their craft's staple material and get paid on the spot, plus a little quest experience. The pay is deliberately {pct}% of what a vendor would give you for the same stack, rounded down, so a work order is never the profitable way to sell materials, just a reason to swing by the station.\n\nEvery order runs on its own {minutes} minute clock per character: turn one in and that master has nothing more for you until the timer laps. The marks over a master's head and on your maps keep the score for you: a bright blue ! is repeatable work you have handled before, and the same mark dimmed is repeatable work still inside its clock, offered again once the window laps. Treat them as a small bonus on materials you were gathering anyway, not a business.",
+        "Each station master posts standing work orders, one per staple material: bring the stack an order asks for and get paid on the spot, plus a little quest experience. The pay is deliberately {pct}% of what a vendor would give you for the same stack, rounded down, so a work order is never the profitable way to sell materials, just a reason to swing by the station.\n\nEvery order runs on its own {minutes} minute clock per character: turn one in and that order is closed to you until the timer laps, while a master's other orders stay open. The marks over a master's head and on your maps keep the score for you: a bright blue ! is repeatable work you have handled before, and the same mark dimmed is repeatable work still inside its clock, offered again once the window laps. Treat them as a small bonus on materials you were gathering anyway, not a business.",
       colOrder: 'Work order',
       colMaster: 'Master',
       colAsks: 'Asks for',

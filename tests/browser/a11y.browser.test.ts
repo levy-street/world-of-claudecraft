@@ -12,13 +12,16 @@
 // by this painter-mount harness; their pixels get no faked per-marker aria.
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { FARM_PATCHES } from '../../src/sim/content/farm_patches';
 import type { TalentAllocation } from '../../src/sim/content/talents';
 import { ITEMS, QUESTS } from '../../src/sim/data';
 import { ALL_CLASSES } from '../../src/sim/types';
 import { ArenaWindow } from '../../src/ui/arena_window';
 import { BagsWindow } from '../../src/ui/bags_window';
 import { CharWindow } from '../../src/ui/char_window';
+import { PlantSheetWindow } from '../../src/ui/farming_plant_sheet_window';
 import { FOCUSABLE_SELECTOR } from '../../src/ui/focus_manager';
+import { HarvestJournalWindow } from '../../src/ui/harvest_journal_window';
 import { resolveActionBarVisibility } from '../../src/ui/hud/action_bar/action_bar_visibility_core';
 import { QuestLogWindow } from '../../src/ui/hud/quest/questlog_window';
 import { renderVendorWindow } from '../../src/ui/hud/vendor/vendor_window';
@@ -1149,6 +1152,10 @@ describe('axe: professions window tool-effect controls', () => {
         { itemId: 'copper_mining_pick', count: 1 },
         { itemId: 'artisans_eye', count: 1, instance: { signer: 'Testchar' } },
       ],
+      // The viewer's planted beds (IWorld myFarmPlots): the window reads the
+      // count for its simplified-mode Farming-row arm (deviation (be)); none
+      // here, the shape every non-farmer reads.
+      myFarmPlots: [],
       player: { name: 'Testchar' },
     };
     const win = new ProfessionsWindow(
@@ -1177,6 +1184,117 @@ describe('axe: professions window tool-effect controls', () => {
     expect(slot?.textContent?.trim().length ?? 0).toBeGreaterThan(0);
     expect(recharge?.textContent?.trim().length ?? 0).toBeGreaterThan(0);
     await expectClean(root);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The plant sheet (#plant-sheet-window) - the bed-verbs window: the seed pick
+// rows as a NAMED RADIOGROUP (single-select, the Phase 14 a11y batch), the
+// three aria-pressed care knob toggles (one disabled with its reason line),
+// the in-flight aria-busy affordance, and the Plant control, painted through
+// the real window with the real styles.
+// ---------------------------------------------------------------------------
+
+describe('axe: plant sheet window seed picks, knobs, and Plant control', () => {
+  it('pick rows, knob toggles, and the Plant control are clean with real names', async () => {
+    const root = host('plant-sheet-window');
+    // CAUTION: handed over through `as never`, so tsc cannot flag a missing
+    // member; the stub carries EVERY key the window's buildInput reads
+    // (inventory, myFarmPlots, professionsState) or the miss is a RUNTIME
+    // throw in this suite only.
+    const world = {
+      inventory: [
+        { itemId: 'vale_wheat_seed', count: 3 },
+        { itemId: 'garden_hoe', count: 1 },
+        { itemId: 'compost', count: 1 },
+      ],
+      myFarmPlots: [],
+      professionsState: { skills: [{ professionId: 'farming', skill: 10, maxSkill: 100 }] },
+      plantCrop: () => {},
+    };
+    const win = new PlantSheetWindow(
+      stubDeps({
+        root: () => root,
+        world: () => world as never,
+      }),
+    );
+    win.open('bed_eastbrook_1');
+    // The three control families must actually render: a seed pick row with
+    // its sow aria, a knob toggle (the tonic one disabled, saying why), and
+    // the one Plant control.
+    const seed = root.querySelector<HTMLButtonElement>('[data-seed-crop]');
+    const tonic = root.querySelector<HTMLButtonElement>('[data-knob="tonic"]');
+    const plant = root.querySelector<HTMLButtonElement>('[data-plant]');
+    expect(seed).not.toBeNull();
+    expect(seed?.getAttribute('aria-label')?.trim().length ?? 0).toBeGreaterThan(0);
+    expect(tonic?.disabled).toBe(true);
+    expect(plant?.textContent?.trim().length ?? 0).toBeGreaterThan(0);
+    // The Phase 14 radiogroup semantics, judged by axe with the roles LIVE:
+    // the single-select rows are radios in a group named by the dialog title,
+    // and aria-required-children/parent rules run against the real DOM here.
+    const group = root.querySelector<HTMLElement>('[role="radiogroup"]');
+    expect(group).not.toBeNull();
+    expect(seed?.getAttribute('role')).toBe('radio');
+    expect(seed?.getAttribute('aria-checked')).toBe('true');
+    await expectClean(root);
+    // The in-flight affordance: an armed Plant send reports aria-busy on the
+    // dialog and the busy tree still axes clean.
+    plant?.click();
+    expect(root.getAttribute('aria-busy')).toBe('true');
+    await expectClean(root);
+    win.close();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The harvest journal (#harvest-journal-window) - the read-only plot list,
+// with the Phase 14 in-dialog ready announcement: a persistent role=status
+// line that names a crop flipping to ready UNDER the open journal. Axed both
+// quiet and announcing.
+// ---------------------------------------------------------------------------
+
+describe('axe: harvest journal rows and the ready status line', () => {
+  it('renders rows clean, and the live status line announces a ready flip', async () => {
+    const root = host('harvest-journal-window');
+    // CAUTION: `as never` handover, same trap as the plant sheet stub above.
+    const world = {
+      myFarmPlots: [
+        {
+          bedId: 'bed_eastbrook_1',
+          cropId: 'vale_wheat',
+          plantedAtMs: 0,
+          readyAtMs: 600_000,
+          compost: false,
+          watch: false,
+          tonic: false,
+          notified: false,
+          status: 'growing',
+        },
+      ],
+      farmPatches: FARM_PATCHES,
+      professionsState: { skills: [{ professionId: 'farming', skill: 40, maxSkill: 100 }] },
+      farmNowMs: () => 0,
+    };
+    const win = new HarvestJournalWindow(
+      stubDeps({
+        root: () => root,
+        world: () => world as never,
+      }),
+    );
+    win.open();
+    const status = root.querySelector<HTMLElement>('.hj-live-status');
+    expect(status).not.toBeNull();
+    expect(status?.getAttribute('role')).toBe('status');
+    expect(status?.textContent).toBe('');
+    await expectClean(root);
+    // The authority flips the plot under the open journal: the SAME status
+    // node announces the crop, and the announcing tree still axes clean.
+    world.myFarmPlots[0].status = 'ready';
+    win.render();
+    expect(root.querySelector<HTMLElement>('.hj-live-status')).toBe(status);
+    expect(status?.textContent?.length ?? 0).toBeGreaterThan(0);
+    await expectClean(root);
+    win.close();
   });
 });
 

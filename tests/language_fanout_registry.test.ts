@@ -112,6 +112,13 @@ const FANOUT_ARMS: readonly string[] = [
   'this.bankWindow.render|this.bankWindow.isOpen',
   'this.deedsWindow.render|this.deedsWindow.isOpen',
   'this.professionsWindow.render|this.professionsWindow.isOpen',
+  // The journal's relocalize gates itself (isOpen inside) and additionally
+  // clears the standing ready announcement, whose text was minted in the OLD
+  // locale and no flip would re-mint (Phase 14).
+  'this.harvestJournalWindow.relocalize|',
+  // The plant sheet's relocalize gates itself (paint only while open), so the
+  // arm carries no guard of its own.
+  'this.plantSheetWindow.relocalize|',
   // The Reliquary cold window is signature-gated (lastSig); language switch
   // must force render while open so curator rank chrome and shelf labels re-t().
   'this.reliquaryWindow.render|this.reliquaryWindow.isOpen',
@@ -322,6 +329,17 @@ const ANSWERED: readonly AnsweredSurface[] = [
     memos: ['lastSig'],
     answer: 'this.professionsWindow.render',
     why: 'the known professions and their skill numbers; render() carries no self-gate',
+  },
+  {
+    file: 'harvest_journal_window.ts',
+    memos: ['paintedSignature'],
+    answer: 'this.harvestJournalWindow.relocalize',
+    why:
+      'every plot row (crop and bed names, stage and status labels, countdown ' +
+      'sentence) plus both empty states; the signature is ids and numbers only, ' +
+      'so a locale flip alone never moves it, and relocalize() clears the ' +
+      'stale-locale ready announcement then forces the whole repaint that ' +
+      're-latches it',
   },
   {
     file: 'social_window.ts',

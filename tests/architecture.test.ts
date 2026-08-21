@@ -202,6 +202,7 @@ describe('live graphics profile architecture', () => {
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  'src/ui/ability_tooltip_lines.ts',
   'src/ui/map_entity_disclosure_core.ts',
   'src/ui/map_navigation_landmarks_core.ts',
   'src/ui/map_marker_profile_core.ts',
@@ -276,6 +277,10 @@ const UI_PURE_CORES = [
   'src/ui/craft_denial_line_view.ts',
   'src/ui/elixir_tooltip_view.ts',
   'src/ui/recipe_pattern_tooltip_view.ts',
+  'src/ui/wellfed_stat_keys.ts',
+  'src/ui/wellfed_tooltip_view.ts',
+  'src/ui/feast_tooltip_view.ts',
+  'src/ui/entity_display_name.ts',
   'src/ui/stack_size_tooltip_view.ts',
   'src/ui/craft_name_view.ts',
   'src/ui/cooking_catch_hint_view.ts',
@@ -310,6 +315,9 @@ const UI_PURE_CORES = [
   'src/ui/craft_celebration_view.ts',
   'src/ui/skill_level_toast_view.ts',
   'src/ui/grant_line_view.ts',
+  'src/ui/farming_view.ts',
+  'src/ui/farming_plant_sheet_view.ts',
+  'src/ui/harvest_journal_view.ts',
   'src/ui/crafting_view.ts',
   'src/ui/commission_order_view.ts',
   'src/ui/craft_cast_view.ts',
@@ -387,6 +395,7 @@ const UI_PURE_CORES = [
   'src/ui/target_auras_view.ts',
   'src/ui/minimap_markers.ts',
   'src/ui/gathering_view.ts',
+  'src/ui/gather_rare_event_feedback.ts',
   'src/ui/gather_tool_tooltip.ts',
   'src/ui/tool_effect_tooltip.ts',
   'src/ui/mobile_station_tooltip.ts',
@@ -502,6 +511,7 @@ const RENDER_PURE_CORES = [
   'src/render/weapon_vfx_emissive_cache_core.ts',
   'src/render/weapon_vfx_shed_core.ts',
   'src/render/draw_stats_core.ts',
+  'src/render/farm_patches_core.ts',
   'src/render/fishing_bobber_core.ts',
   'src/render/foliage_core.ts',
   'src/render/foliage_decimation_core.ts',
@@ -622,6 +632,8 @@ const RENDER_PURE_CORES = [
 // updating this list) fails the cross-check instead of silently escaping the
 // reverse-completeness guard.
 const BARE_NAMED = [
+  'src/ui/ability_tooltip_lines.ts',
+  'src/ui/entity_display_name.ts',
   'src/ui/banner_queue.ts',
   'src/ui/item_instance_glyph_mark.ts',
   'src/ui/item_kind_label.ts',
@@ -640,6 +652,8 @@ const BARE_NAMED = [
   'src/render/prewarm_resume.ts',
   'src/render/preview_prewarm_lane.ts',
   'src/ui/mob_idle_sfx.ts',
+  'src/ui/gather_rare_event_feedback.ts',
+  'src/ui/wellfed_stat_keys.ts',
   'src/ui/gather_tool_tooltip.ts',
   'src/ui/tool_effect_tooltip.ts',
   'src/ui/mobile_station_tooltip.ts',
@@ -1439,6 +1453,7 @@ const EXPECTED_BARE_NAMED = [
   'src/render/prewarm_pass.ts',
   'src/render/prewarm_policy.ts',
   'src/render/prewarm_resume.ts',
+  'src/ui/ability_tooltip_lines.ts',
   'src/ui/absorb_bar.ts',
   'src/ui/bag_filter.ts',
   'src/ui/bag_item_context_menu.ts',
@@ -1448,8 +1463,10 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/clock.ts',
   'src/ui/compass.ts',
   'src/ui/coords.ts',
+  'src/ui/entity_display_name.ts',
   'src/ui/fct_event.ts',
   'src/ui/focus_order.ts',
+  'src/ui/gather_rare_event_feedback.ts',
   'src/ui/gather_tool_tooltip.ts',
   'src/ui/guild_hide_offline.ts',
   'src/ui/guild_motd_login.ts',
@@ -1485,6 +1502,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/tool_effect_tooltip.ts',
   'src/ui/unit_frame.ts',
   'src/ui/unit_portrait.ts',
+  'src/ui/wellfed_stat_keys.ts',
   'src/ui/xp_bar.ts',
 ];
 
@@ -1841,6 +1859,7 @@ const UI_DOM_MODULES = [
   'src/ui/gpu_notice_toast.ts',
   'src/ui/guild_bank_log_window.ts',
   'src/ui/guild_bank_window.ts',
+  'src/ui/harvest_journal_window.ts',
   'src/ui/hud.ts',
   'src/ui/hud/chat/chat_geometry_controller.ts',
   'src/ui/hud/chat/chat_window_controller.ts',
@@ -1904,6 +1923,11 @@ const UI_DOM_MODULES = [
   'src/ui/profession_tutorial_window.ts',
   'src/ui/preview_stand_in.ts',
   'src/ui/prompt_dialog.ts',
+  // The report window body moved whole out of hud.ts (the Phase 9b headroom
+  // extraction); it paints #report-window and owns its listeners. Renamed to
+  // the _window suffix by the 9b QA so the cold-painter sweep in
+  // tests/hud_perf_budget.test.ts governs it like every sibling window.
+  'src/ui/report_window.ts',
   // professions_window.ts is BACK on the ledger: the focus_restore move left
   // it host-free for a while, but armSentGuard's one-shot re-arm timer is a
   // real host reach, now spelled window.setTimeout so this sweep can see it
@@ -1938,6 +1962,7 @@ const UI_DOM_MODULES = [
   'src/ui/vale_cup_hud.ts',
   'src/ui/wiki_link.ts',
   'src/ui/window_drag.ts',
+  'src/ui/window_open_state.ts',
   'src/ui/window_resize.ts',
 ].map((rel) => join(repoRoot, rel));
 

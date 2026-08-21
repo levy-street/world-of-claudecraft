@@ -1,4 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { FARM_CROP_IDS } from '../src/sim/content/farm_crops';
+import { FARM_BED_IDS, farmBedById } from '../src/sim/content/farm_patches';
+import { normalizeFarmPlots, serializeFarmPlots } from '../src/sim/professions/farm_persist';
 import { Sim } from '../src/sim/sim';
 import { MAX_LEVEL } from '../src/sim/types';
 import { EMPTY_TEST_WORLD } from './sim_shared';
@@ -420,5 +423,212 @@ describe('/dev bg (Thornhollow Fields force-start)', () => {
     });
     sim.chat('/dev bg');
     expect(sim.bgMatchFor(sim.playerId)).toBeNull();
+  });
+});
+
+// The farming grow-now cheat. Its whole value rests on being a pure TIME
+// shortcut: the growth script is pre-rolled once at plant time, so "grow now"
+// and "wait it out" must reach the SAME harvest. These pin that literally, by
+// asserting the hidden pre-rolled slots and plantedAtMs survive untouched and
+// that not one rng draw happens. The parity scenario states the same
+// equivalence at the session level; the ready-notice and journal phases reach a
+// ready plot through this command, so a regression here is a regression there.
+describe('/dev farmgrow (farming grow-now)', () => {
+  // A plot fixture written straight onto PlayerMeta, so these tests exercise the
+  // cheat and nothing else: they neither need nor assume the plant command.
+  function plant(sim: Sim, bedId: string, readyAtMs: number, pid = sim.playerId): void {
+    const meta = sim.meta(pid);
+    if (!meta) throw new Error(`no meta for ${pid}`);
+    meta.farmPlots.set(bedId, {
+      cropId: 'vale_wheat',
+      plantedAtMs: 1_700_000_000_000,
+      readyAtMs,
+      survivalRoll: 0.4242,
+      yieldSeed: 987_654,
+      compost: false,
+      watch: false,
+      tonic: false,
+      notified: false,
+    });
+  }
+
+  const plotOf = (sim: Sim, bedId: string) => sim.meta(sim.playerId)?.farmPlots.get(bedId);
+  const FAR = 4_102_444_800_000; // year 2100, comfortably still growing
+
+  it('brings every growing plot ready, drawing zero rng and disturbing nothing else', () => {
+    const sim = devSim();
+    sim.tick(); // a real positive clock, so the floored grow-now instant IS now
+    plant(sim, 'bed_eastbrook_1', FAR);
+    plant(sim, 'bed_eastbrook_2', FAR + 90_000);
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+
+    sim.chat('/dev farmgrow');
+
+    const first = plotOf(sim, 'bed_eastbrook_1');
+    const second = plotOf(sim, 'bed_eastbrook_2');
+    // Both deadlines collapse onto the SAME instant (the authority's now), which
+    // is what "set readyAtMs to now" means without reaching for the private clock.
+    expect(first?.readyAtMs).toBe(second?.readyAtMs);
+    expect(first?.readyAtMs).toBeLessThan(FAR);
+    // Neither plot is growing any more, read back through the real projection.
+    for (const row of sim.myFarmPlots) expect(row.status).not.toBe('growing');
+    // The pre-roll is the thing that must NOT move: plant time and both hidden
+    // outcome slots are byte-identical to what was sown.
+    for (const plot of [first, second]) {
+      expect(plot?.plantedAtMs).toBe(1_700_000_000_000);
+      expect(plot?.survivalRoll).toBe(0.4242);
+      expect(plot?.yieldSeed).toBe(987_654);
+    }
+    expect(draws).toBe(0);
+  });
+
+  it('accepts the no-space spelling and reports how many plots it advanced', () => {
+    const sim = devSim();
+    plant(sim, 'bed_eastbrook_1', FAR);
+
+    sim.chat('/devfarmgrow');
+
+    const logs = sim
+      .tick()
+      .filter((e) => e.type === 'log' && e.pid === sim.playerId)
+      .map((e) => (e.type === 'log' ? e.text : ''));
+    expect(logs).toContain('[dev] Advanced 1 farm plot to ready (1 planted).');
+    expect(plotOf(sim, 'bed_eastbrook_1')?.readyAtMs).toBeLessThan(FAR);
+  });
+
+  it('leaves an already-ready plot alone rather than restamping a settled deadline', () => {
+    const sim = devSim();
+    plant(sim, 'bed_eastbrook_1', 0); // already past its deadline
+    plant(sim, 'bed_eastbrook_2', FAR);
+
+    sim.chat('/dev farmgrow');
+
+    expect(plotOf(sim, 'bed_eastbrook_1')?.readyAtMs).toBe(0);
+    expect(plotOf(sim, 'bed_eastbrook_2')?.readyAtMs).toBeLessThan(FAR);
+    const logs = sim
+      .tick()
+      .filter((e) => e.type === 'log' && e.pid === sim.playerId)
+      .map((e) => (e.type === 'log' ? e.text : ''));
+    // One advanced, two planted: the count reports work done, not rows seen.
+    expect(logs).toContain('[dev] Advanced 1 farm plot to ready (2 planted).');
+  });
+
+  it('a plot grown in the SAME tick it was planted survives a save round trip', () => {
+    // The zero-duration mint (QA round): plantCrop stamps plantedAtMs from the
+    // tick-quantized clock, and grow-now in the same tick writes readyAtMs to
+    // that same instant, so the row's duration is exactly zero. The loader
+    // used to refuse duration <= 0, silently destroying such a plot at the
+    // next load; a grow-now must stay a pure time shortcut whose result is a
+    // loadable, permanently-ready row. On the server the same window is a
+    // plant and a farmgrow inside one millisecond.
+    const sim = devSim();
+    sim.tick(); // a real, positive clock: the never-ticked zero-clock is not this arm
+    const bed = farmBedById('bed_eastbrook_1');
+    if (!bed) throw new Error('no such bed');
+    sim.player.pos.x = bed.x;
+    sim.player.pos.z = bed.z;
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.addItem('vale_wheat_seed', 1, sim.playerId);
+    sim.addItem('garden_hoe', 1, sim.playerId); // the step-12 hoe gate
+    sim.plantCrop('bed_eastbrook_1', 'vale_wheat');
+    const meta = sim.meta(sim.playerId);
+    expect(meta?.farmPlots.has('bed_eastbrook_1')).toBe(true);
+
+    sim.chat('/dev farmgrow'); // the clock has not moved since the plant
+
+    const plot = plotOf(sim, 'bed_eastbrook_1');
+    // Instantly harvestable, exactly what grow-now means...
+    for (const row of sim.myFarmPlots) expect(row.status).not.toBe('growing');
+    // ...and STILL loadable: the round trip keeps the row instead of dropping
+    // it as tampered, and it comes back permanently ready.
+    const loaded = normalizeFarmPlots(serializeFarmPlots(meta?.farmPlots ?? new Map()), {
+      validBedIds: FARM_BED_IDS,
+      validCropIds: FARM_CROP_IDS,
+      nowMs: plot?.readyAtMs ?? 1,
+    });
+    expect(loaded.has('bed_eastbrook_1')).toBe(true);
+    const back = loaded.get('bed_eastbrook_1');
+    expect(back?.plantedAtMs).toBe(plot?.plantedAtMs);
+    expect(back?.readyAtMs).toBe(plot?.readyAtMs);
+  });
+
+  it('with a bed argument advances only that bed', () => {
+    const sim = devSim();
+    plant(sim, 'bed_eastbrook_1', FAR);
+    plant(sim, 'bed_eastbrook_2', FAR);
+
+    sim.chat('/dev farmgrow bed_eastbrook_2');
+
+    expect(plotOf(sim, 'bed_eastbrook_1')?.readyAtMs).toBe(FAR);
+    expect(plotOf(sim, 'bed_eastbrook_2')?.readyAtMs).toBeLessThan(FAR);
+  });
+
+  it('with a bed argument reports honestly when the plot is already settled', () => {
+    // The settled plot is left alone AND said to be left alone: its pre-rolled
+    // outcome may be withered, so the old unconditional "is ready" reply could
+    // mislead a dev testing wither flows (QA-round finding).
+    const sim = devSim();
+    plant(sim, 'bed_eastbrook_1', 0); // already past its deadline
+    sim.chat('/dev farmgrow bed_eastbrook_1');
+    expect(plotOf(sim, 'bed_eastbrook_1')?.readyAtMs).toBe(0);
+    const logs = sim
+      .tick()
+      .filter((e) => e.type === 'log' && e.pid === sim.playerId)
+      .map((e) => (e.type === 'log' ? e.text : ''));
+    expect(logs).toContain('[dev] Bed bed_eastbrook_1 was already settled; nothing to advance.');
+    expect(logs).not.toContain('[dev] Bed bed_eastbrook_1 is ready.');
+  });
+
+  it('refuses a REAL bed the caller has nothing planted in, and plants nothing', () => {
+    // The interesting refusal: bed_eastbrook_2 is a perfectly valid bed id, so a
+    // FARM_BED_IDS check would wave it through. The lookup is against the
+    // caller's OWN plots, which is the only thing that can be advanced.
+    const sim = devSim();
+    plant(sim, 'bed_eastbrook_1', FAR);
+
+    sim.chat('/dev farmgrow bed_eastbrook_2');
+
+    expect(plotOf(sim, 'bed_eastbrook_2')).toBeUndefined();
+    expect(plotOf(sim, 'bed_eastbrook_1')?.readyAtMs).toBe(FAR);
+    const errors = sim
+      .tick()
+      .filter((e) => e.type === 'error' && e.pid === sim.playerId)
+      .map((e) => (e.type === 'error' ? e.text : ''));
+    expect(errors).toContain("[dev] No plot on bed 'bed_eastbrook_2'.");
+  });
+
+  it('refuses a caller with no planted beds at all', () => {
+    const sim = devSim();
+
+    sim.chat('/dev farmgrow');
+
+    const errors = sim
+      .tick()
+      .filter((e) => e.type === 'error' && e.pid === sim.playerId)
+      .map((e) => (e.type === 'error' ? e.text : ''));
+    expect(errors).toContain('[dev] You have no planted beds.');
+  });
+
+  it('advances plots belonging to the CALLER only, never another player', () => {
+    const sim = new Sim({ seed: 9, playerClass: 'warrior', noPlayer: true, devCommands: true });
+    const alpha = sim.addPlayer('warrior', 'Alpha');
+    const beta = sim.addPlayer('mage', 'Beta');
+    plant(sim, 'bed_eastbrook_1', FAR, alpha);
+    plant(sim, 'bed_eastbrook_1', FAR, beta);
+
+    sim.chat('/dev farmgrow', alpha);
+
+    expect(sim.meta(alpha)?.farmPlots.get('bed_eastbrook_1')?.readyAtMs).toBeLessThan(FAR);
+    expect(sim.meta(beta)?.farmPlots.get('bed_eastbrook_1')?.readyAtMs).toBe(FAR);
+  });
+
+  it('is inert without devCommands', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: false });
+    plant(sim, 'bed_eastbrook_1', FAR);
+
+    sim.chat('/dev farmgrow');
+
+    expect(plotOf(sim, 'bed_eastbrook_1')?.readyAtMs).toBe(FAR);
   });
 });

@@ -50,6 +50,8 @@
 //   dungeon_finder.ts   IWorldDungeonFinder  Dungeon Finder queue/proposals/premade board
 //   deeds.ts            IWorldDeeds          earned deeds, lifetime stats, renown, active title,
 //                                            rarity + the account-Renown leaderboard reads
+//   farming.ts          IWorldFarming        the static garden-bed geography + the caller's own
+//                                            plot rows (reads only in the patches-and-plots phase)
 //   reliquary.ts        IWorldReliquary      sparse firstFind / marks / recent + pure completion
 //
 // THREE GATES pin this seam (run before any facet edit; the literal counts are
@@ -77,6 +79,7 @@ import type { IWorldDuelArena } from './world_api/duel_arena';
 import type { IWorldDungeonFinder } from './world_api/dungeon_finder';
 import type { IWorldDungeons } from './world_api/dungeons';
 import type { IWorldEntityRoster } from './world_api/entity_roster';
+import type { IWorldFarming } from './world_api/farming';
 import type { IWorldGuildBank } from './world_api/guild_bank';
 import type { IWorldInteraction } from './world_api/interaction';
 import type { IWorldInventory } from './world_api/inventory';
@@ -215,6 +218,12 @@ export type {
   DungeonFinderQueueView,
 } from './world_api/dungeon_finder';
 export type { RaidLockout, RiftFloorView } from './world_api/dungeons';
+export type {
+  FarmPatchDef,
+  FarmPlantKnobs,
+  FarmPlotStatus,
+  FarmPlotView,
+} from './world_api/farming';
 export {
   GUILD_BANK_LOG_LIMIT,
   type GuildBankInfo,
@@ -313,7 +322,8 @@ export interface IWorld
     IWorldActionBar,
     IWorldDeeds,
     IWorldReliquary,
-    IWorldMounts {}
+    IWorldMounts,
+    IWorldFarming {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.
@@ -615,6 +625,28 @@ export const COMMAND_NAMES = [
   // payload, the sim resolves the previous enemy in the same ordered list Tab
   // walks forward. Appended because wire tokens are never reordered.
   'tabPrev',
+  // Farming's growth phase: sow a crop into a garden bed, and pull it back
+  // out (Sim.plantCrop / Sim.harvestCrop via src/sim/professions/farming.ts).
+  // Both carry IDS ONLY (`bed`, and `crop` on the plant): the seed cost, the
+  // pre-rolled growth script, the deadline and the yield are all resolved
+  // sim-side, so there is no item payload on this wire to forge. Appended
+  // because wire tokens are never reordered.
+  'plant_crop',
+  'harvest_crop',
+  // Farming's knobs phase: trade withered husks for compost at the sim's
+  // fixed ratio (Sim.convertHusks via src/sim/professions/farming.ts). NO
+  // PAYLOAD AT ALL: the ratio, the batch count and both item ids are resolved
+  // sim-side from the sender's own bags, so there is nothing on this wire to
+  // forge. Appended because wire tokens are never reordered.
+  'convert_husks',
+  // The shared feast (Sim.placeFeast / Sim.consumeFeast via
+  // src/sim/professions/feast.ts). place_feast carries NO payload (the one
+  // feast item id, charges, expiry and the anti-abuse rule resolve
+  // sim-side); consume_feast carries the feast ENTITY id only, and every
+  // outcome (ledger, charges, range, the Well Fed mint) is server state.
+  // Appended because wire tokens are never reordered.
+  'place_feast',
+  'consume_feast',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -697,7 +729,8 @@ export type WorldFacet =
   | 'IWorldActionBar'
   | 'IWorldDeeds'
   | 'IWorldReliquary'
-  | 'IWorldMounts';
+  | 'IWorldMounts'
+  | 'IWorldFarming';
 
 export const COMMAND_FACETS = {
   // IWorldCombat: ability casts, auto-attack, spirit release.
@@ -936,4 +969,13 @@ export const COMMAND_FACETS = {
   // IWorldActionBar: the debounced action-bar layout upload. takeActionBarLayoutRestore
   // is a login-time read (no send, untagged).
   save_hotbar_layout: 'IWorldActionBar',
+  // IWorldFarming: the two growth-phase plot mutations (snake_case wire
+  // strings, by design). farmPatches (a static content read served from the
+  // client bundle) and myFarmPlots (the `fplot` self-delta mirror) carry no
+  // wire command and stay untagged.
+  plant_crop: 'IWorldFarming',
+  harvest_crop: 'IWorldFarming',
+  convert_husks: 'IWorldFarming',
+  place_feast: 'IWorldFarming',
+  consume_feast: 'IWorldFarming',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

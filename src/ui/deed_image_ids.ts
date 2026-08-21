@@ -185,6 +185,7 @@ export const DEED_IMAGE_IDS: ReadonlySet<string> = new Set([
   'prog_engineering_50',
   'prog_engineering_rare',
   'prog_eternal',
+  'prog_farming_100',
   'prog_finding_your_feet',
   'prog_first_craft',
   'prog_first_harvest',
