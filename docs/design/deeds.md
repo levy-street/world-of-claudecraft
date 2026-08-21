@@ -213,7 +213,7 @@ the root `CLAUDE.md` content rule points here.
 
 - **`prog_farming_100` (the Harvestmaster title)** shipped with the farming
   celebrations phase per the farming program's locked D13 scope
-  (`docs/farming/state.md`) while the tier 3/4 seed bootstrap ruling
+  (`docs/prd/masterwrought/farming/state.md`) while the tier 3/4 seed bootstrap ruling
   (state.md (bo)/D11) is still open, so the deed is temporarily unearnable:
   farming teaching grays at the tier-2 ceiling of 75 until a tier 3 seed
   exists. This is a deliberate, program-scoped exception to the "never ship

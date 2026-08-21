@@ -1,6 +1,8 @@
 // The Phase 13 asset handoff manifest (docs/design/farming-asset-manifest.json)
-// is the maintainer's contract for sourcing real GLBs, and it survives the
-// docs/farming/ packet teardown, so it must not rot. No generator script
+// is the maintainer's contract for sourcing real GLBs, and it survives any
+// packet teardown (the farming packet now lives at
+// docs/prd/masterwrought/farming/ after the 11b absorb), so it must not rot.
+// No generator script
 // exists (a re-derivation is a hand edit), which is exactly why this suite
 // binds every DERIVABLE half to its pinned source: the asset rows to
 // FARM_PROP_CONTRACTS in scripts/assets/farm_props/model.js, the render
@@ -164,13 +166,15 @@ describe('farming asset manifest binds to its pinned sources', () => {
     // The hand-added fields a re-derivation must preserve. journeyEvidence is
     // load-bearing: it is the one tracked reference that keeps the
     // farming-phase-13 screenshot cone in tests/ci_workflow.test.ts's
-    // referenced corpus after the docs/farming/ packet teardown.
+    // referenced corpus after any packet teardown.
     expect(manifest.journeyEvidence).toContain('docs/screenshots/farming-phase-13');
     expect(manifest.heightNote.length).toBeGreaterThan(0);
     expect(manifest.regenerationNote).toContain('tests/farming_asset_manifest.test.ts');
     expect(manifest.renderIdentity.channelUse).toContain('no draw-time consumer');
     // Teardown safety: the manifest survives the packet deletion, so it must
-    // never point into it.
-    expect(manifestText.includes('docs/farming/')).toBe(false);
+    // never point into it. Re-pointed at the MERGED packet root by the 11b
+    // absorb (the pre-move packet path can never appear again, so a needle
+    // aimed at it would pass vacuously and silently stop guarding).
+    expect(manifestText.includes('docs/prd/masterwrought/')).toBe(false);
   });
 });

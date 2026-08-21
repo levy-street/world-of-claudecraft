@@ -915,7 +915,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
   // mail, or guild-bank cash-out), so the faucet feeds beds, not coin;
   // face-to-face trade is the one exchange pipe that does not read those
   // flags (a cooperative pair can pass free seeds), ledgered for the
-  // maintainer in docs/farming/state.md. Accepted at go-live.
+  // maintainer in docs/prd/masterwrought/farming/state.md. Accepted at go-live.
   q_farm_intro: {
     id: 'q_farm_intro',
     name: 'First Furrow',
