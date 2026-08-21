@@ -23,6 +23,7 @@ import { wieldRequirementForTier } from '../src/sim/professions/wield_gate';
 import type { InvSlot } from '../src/sim/types';
 import type { FarmEvent } from '../src/ui/farm_event_feedback';
 import { PlantSheetWindow } from '../src/ui/farming_plant_sheet_window';
+import { bindPointerBlur, POINTER_FOCUS_PARK_SELECTOR } from '../src/ui/pointer_blur';
 import type { IWorld } from '../src/world_api';
 import { stripComments } from './helpers/strip_comments';
 
@@ -488,6 +489,47 @@ describe('plant sheet window: re-open, event filters, and staleness (the review 
     // The repaint rebuilt the subtree from live state; the pick survived.
     expect(root.querySelector('#plant-sheet-title')?.textContent).toBe('Plant a Crop');
     expect(root.querySelector('[data-knob="compost"]')?.getAttribute('aria-pressed')).toBe('true');
+  });
+});
+
+describe('plant sheet window: the pointer-only focus drop the v0.40.0 sync added', () => {
+  // The sheet root joined CHROME_GUARDED_PANELS at the Phase 11d QA sync of
+  // release tip 35a6481825: the release extracted hud.ts's inline key-guard
+  // loop into src/ui/chrome_focus_wiring.ts, and taking that extraction gave
+  // this window the pointer-only focus drop it never had before. The wiring's
+  // own suite proves the mechanism over a hand-rolled fake root; this proves it
+  // over the sheet's REAL markup and repaint ladder, which is where the drop
+  // could go wrong (a parked root that the ladder mistakes for a focused
+  // control would plant a pick on the next repaint).
+  it('parks a mouse click on the root, leaves a keyboard click focused, and repaints clean', () => {
+    const win = makeWindow();
+    win.open(BED);
+    bindPointerBlur(root);
+    const seed = root.querySelector<HTMLElement>('[data-seed-crop]');
+    if (!seed) throw new Error('no seed control to click');
+    const seedCrop = seed.getAttribute('data-seed-crop');
+
+    // A MOUSE click (detail 1): focus parks on the dialog root, not the button
+    // and not the body, so the window's Tab trap stays armed.
+    seed.focus();
+    seed.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }));
+    expect(document.activeElement).toBe(root);
+    expect(root.matches(POINTER_FOCUS_PARK_SELECTOR)).toBe(true);
+
+    // A KEYBOARD click (detail 0) is untouched: the control keeps focus.
+    const knob = root.querySelector<HTMLElement>('[data-knob="compost"]');
+    if (!knob) throw new Error('no knob control to click');
+    knob.focus();
+    knob.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 0 }));
+    expect(document.activeElement).toBe(knob);
+
+    // The repaint over a parked root restores nothing and plants nothing: the
+    // pick the mouse click made survives, and no send was issued by either.
+    win.relocalize();
+    expect(root.querySelector(`[data-seed-crop="${seedCrop}"]`)?.getAttribute('aria-checked')).toBe(
+      'true',
+    );
+    expect(world.plantCrop).not.toHaveBeenCalled();
   });
 });
 

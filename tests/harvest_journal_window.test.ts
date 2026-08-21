@@ -540,3 +540,17 @@ describe('harvest journal window (source contract)', () => {
     expect(componentsCss).toMatch(/#harvest-journal-window \{[^}]*flex-direction: column;/s);
   });
 });
+
+describe('harvest journal window: the root div ships in BOTH entries', () => {
+  // The painter resolves #harvest-journal-window, and since the v0.40.0 sync of
+  // release tip 35a6481825 the root is also a CHROME_GUARDED_PANELS entry, so
+  // wireChromeFocus($) queries it at HUD construction: a dropped div there is no
+  // longer one broken window but a throw that fails the whole HUD boot. Read the
+  // real entry HTML, never a fixture (the plant-sheet idiom, mirrored).
+  it.each(['index.html', 'play.html'])('%s carries id="harvest-journal-window"', (entry) => {
+    const html = readFileSync(join(process.cwd(), entry), 'utf8');
+    // Exactly once: a duplicate id would make querySelector's pick arbitrary
+    // and a comment-only occurrence would leave the painter with no root.
+    expect(html.split('id="harvest-journal-window"').length - 1).toBe(1);
+  });
+});
