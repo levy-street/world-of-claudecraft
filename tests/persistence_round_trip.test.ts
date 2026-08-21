@@ -119,6 +119,18 @@ describe('serializeCharacter <-> addPlayer round-trip (G2 persistence)', () => {
       'lifetimeXp',
       'restedXp',
       'bank',
+      // The later optional blocks, added by the Phase 11d QA migration review.
+      // A fresh seed character omits most of these anyway, so listing them costs
+      // nothing today; the point is that this list is the "oldest production
+      // save" model, and a field left off it is a field this arm silently stops
+      // modelling the moment a seed character does start carrying it.
+      'heroicDaily',
+      'reliquary',
+      'deeds',
+      'farmPlots',
+      'craftDaily',
+      'wyrmfallDaily',
+      'emberWeekAnchor',
     ]) {
       delete legacy[key];
     }

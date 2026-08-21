@@ -90,8 +90,9 @@ function characterUpdateCall(client: ReturnType<typeof transactionClient>) {
 describe('characterBlobSizeWarning: the pure decision', () => {
   it('pins the warn threshold to its literal value', () => {
     // The number itself, not the constant compared against itself. 131,072 is
-    // about 3.4x the measured maximal character (~38.9 KB on this tree) and one
-    // power-of-two step below the 262,144-byte guild-bank row scale; see the
+    // about 3.2x the maximal character (~41.4 KB carried on the merged tree,
+    // where the professions block re-derived to 16,704 bytes at Phase 11d) and
+    // one power-of-two step below the 262,144-byte guild-bank row scale; see the
     // derivation in server/character_blob_size.ts. Moving it means re-measuring.
     expect(CHARACTER_BLOB_WARN_BYTES).toBe(131_072);
   });

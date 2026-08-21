@@ -271,7 +271,15 @@ describe('the professions blob round-trip sweep', () => {
     // sanitizeDailyGateLoad keeps the createPlayer default when the stamp is
     // absent), and zero-default omission makes each shape its own fixed
     // point: the deleted key must NOT resurrect on the re-save.
-    for (const missing of ['farmPlots', 'craftDaily'] as const) {
+    // All FOUR contested keys, not just one per side: a real THEIRS save carries
+    // no wyrmfallDaily and no emberWeekAnchor either, so modelling the shape with
+    // craftDaily alone under-states it (Phase 11d QA migration review).
+    for (const missing of [
+      'farmPlots',
+      'craftDaily',
+      'wyrmfallDaily',
+      'emberWeekAnchor',
+    ] as const) {
       const sim = populatedSim();
       const s1 = sim.serializeCharacter(sim.playerId) as CharacterState;
       expect(s1[missing]).toBeDefined(); // the deletion below deletes something real
@@ -281,11 +289,18 @@ describe('the professions blob round-trip sweep', () => {
       const pid = reloaded.addPlayer('warrior', 'ParentShape', { state: s1 });
       const s2 = reloaded.serializeCharacter(pid) as CharacterState;
       expect(s2[missing], `${missing} resurrected from an absent field`).toBeUndefined();
-      // Every OTHER professions field settles byte-faithfully: the absence
-      // of one packet's writer must not perturb the other packet's data.
+      // Every OTHER professions field settles byte-faithfully: the absence of one
+      // packet's writer must not perturb the other packet's data. BYTE, not just
+      // value: toEqual is key-order blind and the save is JSON, so a re-ordered
+      // rebuild would pass it while changing the stored bytes (the same reason
+      // arm 1 carries an explicit stringify pin for equipmentInstance).
       for (const field of PROFESSIONS_BLOB_FIELDS) {
         if (field === missing) continue;
         expect(s2[field], `${field} drifted loading a ${missing}-less save`).toEqual(s1[field]);
+        expect(
+          JSON.stringify(s2[field]),
+          `${field} re-ordered loading a ${missing}-less save`,
+        ).toBe(JSON.stringify(s1[field]));
       }
       // And the settle is a fixed point: a second load changes nothing.
       const again = makeSim(26);

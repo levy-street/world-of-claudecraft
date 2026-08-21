@@ -4,9 +4,12 @@
 // addPlayer (the unloadable-character class) and never poison the gate with
 // junk entries. A malformed emberWeekAnchor would otherwise stall the weekly
 // grant forever: emberWeeksBetween returns 0 for unparseable input, which is
-// indistinguishable from same-week. The clamps bound the blob too (these
-// fields are outside the professions byte ceiling, so the load clamp is what
-// bounds them, the knownRecipes doctrine): real source tokens are short
+// indistinguishable from same-week. The clamps bound the blob too. That matters
+// unevenly across the three fields, so state it exactly rather than as one rule:
+// wyrmfallDaily and emberWeekAnchor sit OUTSIDE the professions byte ceiling, so
+// the load clamp is the only thing bounding them (the knownRecipes doctrine),
+// while craftDaily is INSIDE it (it is in both PROFESSIONS_BLOB_FIELDS lists and
+// is costed in the growth bound). Real source tokens are short
 // (dungeonId:difficulty, 'rift'), real recipe ids are short, and both live
 // sets are content-bounded near ten, so oversized junk simply drops here.
 //

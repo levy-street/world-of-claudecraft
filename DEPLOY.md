@@ -267,6 +267,22 @@ For off-box safety, sync the directory to S3 occasionally:
   cannot be replayed for rerolls. A writer with direct blob access can still
   reroll by editing `plantedAtMs`; that is total compromise already and is
   bounded by the allowlists and clamps, not by the derivation.
+- **Masterwrought daily-gate rollback (a repeatable faucet, not just lost state)**:
+  three more `characters.state` keys ride the same whole-blob write, and rolling
+  back past the masterwrought material phases erases all three on the first
+  autosave. Unlike the two caveats above, whose damage is lost player value, this
+  one REOPENS GRANTS and keeps reopening them: `wyrmfallDaily.sources` is the
+  per-day per-source Wyrmfall Core gate, `craftDaily.crafted` is the once-per-day
+  craft gate, and `emberWeekAnchor` is the Maker's Ember week anchor whose empty
+  value IS the first-grant arm (`tryGrantMakersEmber` in
+  `src/sim/professions/masterwrought_materials.ts` grants an Ember outright when
+  the anchor is `''`, which is also what `createPlayer` defaults it to). So an
+  erased anchor mints a free Maker's Ember on the next qualifying completion, and
+  an erased daily record reopens that day's core and craft gates, once per
+  affected character per rollback pass rather than once overall. Deploy the
+  masterwrought material release to EVERY realm process in one pass for the same
+  reason the farming bullet gives, and treat a rollback across it as an economy
+  event: it needs a restore-from-backup plan, not just a release note.
 - **Client/server deploy order for content releases**: deploy the SERVER first, then
   let clients update. Web and desktop bundles refresh on their next load. The iOS
   binary rides App Store review and cannot pick up a same-day bundle (LiveUpdates

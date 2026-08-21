@@ -27,13 +27,24 @@
 //     24-character signer) serializes to about 38.9 KB.
 // The professions-owned portion alone is the largest content-scaled block
 // inside that 38.9 KB, independently pinned by
-// tests/professions_blob_growth.test.ts. (At the 11b absorb that pin is
-// PARKED on the pre-merge masterwrought literal, whose fixture plants no
-// farm bed; 11d restores the farming branch's every-bed worst-case fixture,
-// which measured 14,218 bytes under a 15,360 ceiling, and re-derives the
-// merged bound. Re-true this sentence to the re-derived figure then.)
+// tests/professions_blob_growth.test.ts. That pin was PARKED at the 11b absorb
+// on the pre-merge masterwrought literal, whose fixture plants no farm bed;
+// Phase 11d restored the farming branch's every-bed worst-case fixture and
+// re-derived the merged bound, which is what this sentence now records:
+//   professions block, merged tree: 16,704 bytes measured, two-sided tracking
+//   band 16,544..16,864, ceiling 17,408.
+// The 16,704 includes the two production-shape corrections the 11d review round
+// applied (the fourth tool-effect slot, farming having become slottable, and a
+// fixed production-width epoch anchor across the measure arm's three sims).
 //
-// 131,072 bytes is therefore about 3.4x the measured legitimate worst case: far
+// The 38.9 KB WHOLE-CHARACTER figure above has NOT been re-measured since: it
+// was taken with the professions block about 2.5 KB smaller than the merged
+// tree carries, so the merged maximal character is roughly 41.4 KB. That is an
+// arithmetic carry, not a measurement, and it is stated as one deliberately: a
+// fresh maximal-character measurement is the honest way to move it, and it is
+// carried to Phase 12 with the rest of the bound-policy work.
+//
+// 131,072 bytes is therefore about 3.2x the legitimate worst case: far
 // enough above it that ordinary authored content growth (a new zone's nodes, a
 // new crop, another dungeon's lockouts) cannot drift into it and train an
 // operator to ignore the line, and still one power-of-two step BELOW the
