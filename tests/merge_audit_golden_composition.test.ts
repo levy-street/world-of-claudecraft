@@ -276,6 +276,16 @@ describe('the dropped-golden class (Phase 11d QA)', () => {
     expect(missing).toEqual([{ file: 'shared.json', sides: ['ours', 'theirs'] }]);
   });
 
+  it('honours a RECORDED deliberate deletion, so a retired scenario is dischargeable', () => {
+    // The class shipped with no escape hatch, which made a legitimately retired
+    // scenario an undischargeable FAIL (Phase 11d QA fix-round review). A row
+    // clears it; anything not in the row set still reports.
+    const missing = missingFromMerged([], parents(['retired.json', 'dropped.json'], []), {
+      'retired.json': 'phase 11f: retired with its scenario row',
+    });
+    expect(missing.map((m) => m.file)).toEqual(['dropped.json']);
+  });
+
   it('is not fooled by an empty merged set: every parent golden is missing', () => {
     // The empty-input case the review found: with no lower bound the tool printed
     // "every shared golden composes" over nothing at all.

@@ -48,9 +48,11 @@ export function compositionVerdict(args: {
   failed: boolean;
 };
 export function checkUniformIdShift(diffs: AddDiffs, ctx: CompositionCtx, label: string): void;
+export const EXPLAINED_MISSING_GOLDENS: Readonly<Record<string, string>>;
 export function missingFromMerged(
   mergedFiles: readonly string[],
   parentSets: ReadonlyMap<string, ReadonlySet<string>>,
+  explained?: Readonly<Record<string, string>>,
 ): MissingGolden[];
 export function newCtx(): CompositionCtx;
 export function isIdPath(path: string): boolean;

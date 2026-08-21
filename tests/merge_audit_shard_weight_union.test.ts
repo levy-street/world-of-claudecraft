@@ -113,8 +113,9 @@ describe('unionTables: provenance honesty', () => {
     // The mirror of the arm above. The newer side used to be a hard-coded "the
     // newer CI harvest", which is exactly the laundering the review round fixed
     // on the older side. It matters now: the table 11d produced is itself a
-    // union carrying 27 locally measured rows, and it is a parent from here on.
-    const disclosure = 'KEY UNION of two harvests; 27 rows locally measured';
+    // union carrying 28 rows, 27 of them locally measured, and it is a parent
+    // from here on.
+    const disclosure = 'KEY UNION of two harvests; 28 carried, 27 locally measured';
     const ours = table('100', { 'tests/only_ours.test.ts': 5 });
     const theirs = table('200', { 'tests/shared.test.ts': 6 }, { localMerge: disclosure });
     const { merged } = unionTables(ours, theirs);

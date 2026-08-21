@@ -89,7 +89,8 @@ export function unionTables(ours, theirs) {
   // "the newer CI harvest": the mirror of the laundering the 11d review round
   // fixed on the older side, found by the 11d QA audit. Nothing false shipped,
   // because the newer parent had no localMerge, but the table 11d produced IS a
-  // union with 27 locally measured carried rows and is itself a parent now, so
+  // union with 28 carried rows, 27 of them locally measured, and is itself a
+  // parent now, so
   // feeding it in as the newer side would have called it a CI harvest and
   // dropped its honest disclosure on the first re-union.
   // The no-disclosure branch reproduces the previous wording BYTE for byte, so

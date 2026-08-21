@@ -13,10 +13,17 @@
 //             the set the 11b and 11c ledgers authored (EXPLAINED_EXTRAS below, every
 //             entry with the phase and ruling that authored it)
 //
-// Either assertion failing exits nonzero. Names are keyed BY NAME (never by file):
-// the merge's top risk is a dropped hunk, and a name defined in a different file is
-// present, not missing. Per-name file sets are kept for the report only (an export
-// defined in two files is a duplicate-definition INFO signal).
+// Either assertion failing exits nonzero. Most classes are keyed BY NAME (never by
+// file): the merge's top risk is a dropped hunk, and a name defined in a different
+// file is present, not missing. Per-name file sets are kept for the report only (an
+// export defined in two files is a duplicate-definition INFO signal).
+// THE ONE EXCEPTION is `contentIdRows`, keyed `path:id`, added at the Phase 11d QA
+// because the name-keyed rule has a real hole for content tables: an id reused
+// across two tables (every farm crop id is also an item id) hides a dropped ROW,
+// since the name survives in the other table. That class deliberately treats a
+// cross-file MOVE as a finding, which the name-keyed classes do not, so a move or a
+// retirement is recorded with a `content row` deletion-list row naming the full
+// `path:id` on both sides.
 //
 // HOW IT READS. The parents are read with git plumbing only (git ls-tree -r
 // --name-only <ref> -- <roots>, then the blob contents through one
@@ -52,7 +59,14 @@
 // CommonJS `module.exports`, destructured and multi-declarator exports, content ids
 // that are not a plain literal, i18n spread / computed members and non-literal leaves,
 // union members that are bare aliases this walk could not resolve, and emit sites whose
-// argument is not an object literal with a literal `type`.
+// argument the walk cannot resolve to an event literal.
+// On that last one, updated at the Phase 11d QA: the walk now resolves TWO
+// indirections beyond the plain `emit({ type: '<literal>' })` shape, a ternary of
+// event literals and the named fanout helpers in SIM_EVENT_FANOUT_HELPERS, in both
+// cases reading only the OUTERMOST object literal so a nested `type:` cannot mint a
+// kind. Two pins guard what is left: SIM_EVENT_UNION_ONLY fails on any drift in the
+// declared-but-never-seen set, and every emitted kind must be a declared union
+// member.
 //
 // USAGE
 //   node scripts/merge_audit/symbol_census.mjs [--merged-root <dir>] [--repo <dir>]
@@ -1213,17 +1227,32 @@ export function extractSimEventEmits(src) {
     }
     // The INDIRECT shapes, one level deep: the argument is a ternary of two
     // event literals (`emit(cond ? { type: 'farmReady', ... } : { type: ... })`)
-    // or an arrow returning one (the fanout helpers above). Collect every event
-    // literal anywhere inside the call, recognising a member only where an
-    // object literal can start it, so a `type:` inside a string or a nested
-    // non-event object cannot mint a kind.
-    // Scan the whole CALL region (the parenthesis at i+1), not an object literal:
-    // in these shapes the argument list does not start with one.
+    // or an arrow returning one (the fanout helpers above). Scan the whole CALL
+    // region (the parenthesis at i+1), not an object literal, because in these
+    // shapes the argument list does not start with one.
+    //
+    // BRACE DEPTH IS LOAD-BEARING here, exactly as it is on the plain path. A
+    // first version of this scan accepted a `type:` member at ANY nesting, so
+    // `{ type: 'deedProgress', meta: { type: 'attunedZone' } }` minted BOTH, and
+    // the emits-outside-union backstop could not see it because the nested name
+    // is itself a declared union member. That put a kind in the emits class with
+    // nothing emitting it, so a hunk dropping the REAL emit of that kind would
+    // still have reported MISSING 0: the hole this resolution exists to close,
+    // re-opened one level down (found by the Phase 11d QA fix-round review).
+    // Only members of the OUTERMOST object literal in each ternary arm or arrow
+    // body count.
     const callClose = matchingClose(tokens, i + 1);
     const indirect = [];
+    let objDepth = 0;
     for (let k = i + 2; k < callClose; k++) {
       const t = tokens[k];
+      if (t.t === 'punct') {
+        if (t.v === '{') objDepth++;
+        else if (t.v === '}') objDepth--;
+        continue;
+      }
       if (
+        objDepth === 1 &&
         t.t === 'id' &&
         t.v === SIM_EVENT_DISCRIMINANT &&
         isPunct(tokens[k + 1], ':') &&
@@ -1252,6 +1281,16 @@ const CLASS_BY_LABEL = Object.freeze({
   exports: 'exports',
   'content id': 'contentIds',
   'content ids': 'contentIds',
+  // The row class needs its own label or it cannot be discharged AT ALL: a
+  // content id that legitimately MOVES file to file (an ordinary extraction, the
+  // default in this tree) is MISSING on the old path and EXTRA on the new, and a
+  // legitimately RETIRED id is MISSING here even when the contentIds row records
+  // it, because the two classes key differently. Without a label every future
+  // content deletion or move was an undischargeable FAIL (found by the Phase 11d
+  // QA fix-round review, before 11e hit it). Write the row's names as the full
+  // `path:id` key, the same form the census reports.
+  'content row': 'contentIdRows',
+  'content rows': 'contentIdRows',
   'i18n key': 'i18nKeys',
   'i18n keys': 'i18nKeys',
   'simevent union': 'simEventUnion',
@@ -1629,9 +1668,16 @@ export function compareCensus({
       if (row) extraExplained.push({ name, row, files });
       else extraUnexplained.push({ name, files });
     }
-    const unusedExtras = [...extrasByClass[cls].keys()].filter(
-      (name) => !m.has(name) || union.has(name),
-    );
+    // Two very different reasons an allowlist entry stops being EXTRA, and only
+    // one is a regression (split at the Phase 11d QA fix-round review, which
+    // reproduced the false failure):
+    //  - GONE from merged: the merge lost a symbol it authored itself. FAIL.
+    //  - present, but a PARENT now defines it too: a later release independently
+    //    added the same name, so the row is merely obsolete. That is a legitimate
+    //    tree, and failing it would red-light an ordinary sync. WARN, drop the row.
+    const allowlisted = [...extrasByClass[cls].keys()];
+    const unusedExtras = allowlisted.filter((name) => !m.has(name));
+    const convergedExtras = allowlisted.filter((name) => m.has(name) && union.has(name));
     const staleDeletionRows = [...deletionByClass[cls].keys()].filter(
       (name) => m.has(name) || !union.has(name),
     );
@@ -1726,6 +1772,7 @@ export function compareCensus({
       extraExplained,
       extraUnexplained,
       unusedExtras,
+      convergedExtras,
       missingRenameTargets,
       staleDeletionRows,
       duplicates,
@@ -1781,7 +1828,7 @@ export function formatReport(r, limit = 60) {
     const n = c.counts;
     L.push(`[${cls}] ${CLASS_LABELS[cls]}`);
     L.push(
-      `  |ours| ${n.ours}  |theirs| ${n.theirs}  |release| ${n.release}  |union| ${n.union}  |merged| ${n.merged}  |missing| ${n.missing} (packet ${n.missingPacket}, release-attributable ${n.missingRelease})  |extra| ${n.extra} (explained ${n.extraExplained}, unexplained ${n.extraUnexplained})  deletion-list hits ${n.deleted}`,
+      `  |ours| ${n.ours}  |theirs| ${n.theirs}  |release| ${(n.releaseSizes ?? [n.release]).join('/')}  |union| ${n.union}  |merged| ${n.merged}  |missing| ${n.missing} (packet ${n.missingPacket}, release-attributable ${n.missingRelease})  |extra| ${n.extra} (explained ${n.extraExplained}, unexplained ${n.extraUnexplained})  deletion-list hits ${n.deleted}`,
     );
     L.push(
       `  floors: ours >= ${c.floors.ours} (observed ${n.ours}), theirs >= ${c.floors.theirs} (observed ${n.theirs}), release >= ${c.floors.release} (observed ${(n.releaseSizes ?? [n.release]).join(', ')})  ${c.floors.fail ? 'FAIL' : 'ok'}`,
@@ -1819,8 +1866,13 @@ export function formatReport(r, limit = 60) {
     L.push(...fmtList(c.extraUnexplained, limit, (e) => `${e.name}  [${e.files.join(', ')}]`));
     if (c.unusedExtras.length)
       L.push(
-        `  FAIL allowlist entries not currently EXTRA (the merge authored these; they are gone ` +
-          `from merged, or a parent grew them): ${c.unusedExtras.join(', ')}`,
+        `  FAIL allowlist entries GONE from merged (the merge authored these and then lost ` +
+          `them): ${c.unusedExtras.join(', ')}`,
+      );
+    if (c.convergedExtras?.length)
+      L.push(
+        `  WARN allowlist entries a PARENT now defines too, so no longer EXTRA (a later release ` +
+          `added the same name; the row is obsolete, not a regression): ${c.convergedExtras.join(', ')}`,
       );
     if (c.missingRenameTargets?.length)
       L.push(

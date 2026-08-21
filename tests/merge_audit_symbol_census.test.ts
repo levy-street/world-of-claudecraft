@@ -180,6 +180,16 @@ describe('extractSimEventEmits', () => {
     expect(res.sites).toBe(0);
   });
 
+  it('does not mint a kind from a NESTED type in the indirect shapes either', () => {
+    // The masking case, and the dangerous one: the nested name is itself a
+    // declared union member, so the emits-outside-union backstop cannot see it.
+    // Accepting it would put a kind in the emits class with nothing emitting it,
+    // and a hunk dropping the real emit of that kind would still report MISSING 0.
+    const src =
+      "emitToZonePlayers(ctx, z, (pid) => ({ type: 'deedProgress', meta: { type: 'attunedZone' } }));";
+    expect(extractSimEventEmits(src).kinds).toEqual(['deedProgress']);
+  });
+
   it('keeps the plain shape precise: a nested type is not a second kind', () => {
     // The plain path reads its literal at depth 0 of the event object, so an
     // inner object carrying its own `type` cannot mint one.

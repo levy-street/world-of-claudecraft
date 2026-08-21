@@ -13,11 +13,15 @@
 // over the top-level ticks / draws / coverage, every frame's tick / label /
 // time / nextId / rng.draws, and every leaf under players[] and entities[]
 // (ids, entityId, sourceId, hp, auras, ...). rng.digest and drawDigest follow
-// the three-way rule too, which is the determinism anchor: in a scenario
-// neither packet touched they must equal ours byte for byte, because farming
-// shifted entity ids without perturbing the shared rng stream, and a draw
-// digest that moves during a re-record is a regression the re-record would
-// bless. A frame only one parent carries (a scenario that parent lengthened)
+// the three-way rule too, which is the determinism anchor. Stated precisely,
+// because the looser phrasing this header used to carry ("in a scenario neither
+// packet touched") is UNFALSIFIABLE for the 11b absorb and the Phase 11d QA
+// corrected it in the phase file: there is no such scenario, since all 67 shared
+// goldens were touched by BOTH parents. What actually holds, and what this tool
+// asserts, is that merged draws, drawDigest and every frame's rng equal OURS byte
+// for byte, because farming shifted entity ids without perturbing the shared rng
+// stream. A draw digest that moves during a re-record is a regression the
+// re-record would bless. A frame only one parent carries (a scenario that parent lengthened)
 // is checked against that parent with the other parent's contribution
 // limited to the uniform id-family shift. The state and events digests are
 // derived from the composed fields and are reported, never asserted.
@@ -125,6 +129,17 @@ function gitLsGoldens(ref) {
  *  Set ~10 percent under the 69 goldens observed when this was written. */
 export const GOLDEN_FLOOR = 62;
 
+/** Goldens a parent carries that the merged tree DELIBERATELY does not, with the
+ *  reason. The MISSING class has to have an escape hatch or a legitimately retired
+ *  scenario is an undischargeable FAIL (Phase 11d QA fix-round review: the class
+ *  shipped without one). Empty today, which is the honest state: the absorb
+ *  dropped nothing. Add a row here, never a filter at the call site, so the
+ *  deletion stays written down. Override with --allow-missing <file> for a
+ *  one-off. */
+export const EXPLAINED_MISSING_GOLDENS = Object.freeze({
+  // 'some_scenario.json': 'phase 11f, ruling ...: retired with its scenario row',
+});
+
 /**
  * The run's VERDICT as a pure function, so the wiring is observable. The helpers
  * below were each pinned while main() was not exported and nothing asserted that
@@ -155,12 +170,15 @@ export function compositionVerdict({
 /** The MISSING class as a pure set operation, so it is testable without git:
  *  every golden a parent carries that the merged tree does not, carrying WHICH
  *  parents had it. Sorted by name so the report is stable. */
-export function missingFromMerged(mergedFiles, parentSets) {
+export function missingFromMerged(mergedFiles, parentSets, explained = EXPLAINED_MISSING_GOLDENS) {
   const onMerged = new Set(mergedFiles);
   const missing = [];
   for (const [side, set] of parentSets) {
     for (const f of set) {
       if (onMerged.has(f)) continue;
+      // A recorded deliberate deletion is not a finding; it is still REPORTED by
+      // the caller, so a stale row cannot hide behind silence.
+      if (Object.hasOwn(explained, f)) continue;
       const already = missing.find((m) => m.file === f);
       if (already) already.sides.push(side);
       else missing.push({ file: f, sides: [side] });
