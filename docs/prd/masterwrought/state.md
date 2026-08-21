@@ -1,6 +1,18 @@
 # Masterwrought: cross-phase state
 
-Current phase: 10 BUILT, its QA session's release sync COMPLETE (2026-08-14:
+Current phase: 11b BUILT (2026-08-20), THE FARMING ABSORB. This packet now
+holds BOTH absorbed states, and a fresh session must load BOTH worlds: (1)
+Masterwrought through Phase 11 incl. its QA (tip before the absorb
+d5304a78c4; ledgers below), and (2) the COMPLETE farming packet (fourteen
+phases, F01 to F14 with F06b and F09b, frozen QA tip 354cff6e77), merged
+whole as the true merge commit 424ce89a20 of origin/feature/farming-plan
+8cd964d599. The farming record lives at docs/prd/masterwrought/farming/
+(state.md there is the merged packet's ONE open-item collection point; its
+handoff table now also carries the migrated delegated-rulings block, and
+masterwrought's open items append at its END). Next: Phase 11b QA (fresh
+session), then 11c per the phase table. The Phase 11b pre-flight and BUILT
+ledgers below are the phase record. Previous header, kept for the trail:
+10 BUILT, its QA session's release sync COMPLETE (2026-08-14:
 the final v0.38.0 sync, merge 33d641773f, landed with a seven-cluster audit,
 two monolith extractions, the portrait and eastbrook re-mints, and the count
 pins re-set from suite runs; the phase 10 QA audit fan-out itself runs next in
@@ -15,7 +27,9 @@ round plus a four-agent fix round landed; see the Phase 09 BUILT ledger);
 next is Phase 09 QA (fresh session, own release sync first per the delivery
 contract).
 Packet authored 2026-08-07.
-Branch: `feature/masterwrought` (worktree `~/Documents/wocc-masterwrought`), based on `origin/release/v0.38.0`.
+Branch: `feature/masterwrought` (worktree `~/Documents/wocc-masterwrought`), based on
+`origin/release/v0.38.0`; carries every release sync through `origin/release/v0.40.0`
+(65b91fa190) and, since 11b, all of `origin/feature/farming-plan` (8cd964d599).
 
 ## Delivery contract (non-negotiable)
 - The ENTIRE system ships in ONE branch and ONE PR from `feature/masterwrought`. There are
@@ -29,6 +43,22 @@ Branch: `feature/masterwrought` (worktree `~/Documents/wocc-masterwrought`), bas
 - All ten crafting professions receive equal-shape content: one intermediate (skill 75),
   three apex products (skill 100), one capstone role (skill 125). Parity is equal prestige
   and economic role through DISTINCT levers, never identical mechanics or identical power.
+- THE ABSORB AMENDMENT (2026-08-20, ruling 11b-D-3, adopted as drafted, BOTH halves;
+  written by Phase 11b). First half: the farming packet is ABSORBED into this one. Its
+  branch origin/feature/farming-plan (tip 8cd964d599, fourteen phases complete) merged
+  whole as the true merge commit 424ce89a20, and the ONE branch and ONE PR above now
+  deliver BOTH systems together. Farming's D22 delivery model and its addendum arm (B)
+  are superseded IN PLACE in farming/state.md, never deleted, and D22's absorb
+  discipline is adopted upstream into this contract: the newest release branch is
+  re-resolved by VERSION SORT (git branch -r --list 'origin/release/*' | sort -V, last
+  row), an absorb whose pending jump is a minor version or whose changed-file
+  intersection reaches triple digits runs as its OWN sync mid-phase before feature or QA
+  work, phase merges are --no-ff so phase boundaries stay readable, and ONE teardown
+  decision covers both packets' planning docs, taken with the maintainer at Phase 17.
+  Second half: an "accepted-by-design" handoff row already CONSTITUTES the explicit
+  record the CUT requirement above asks for; a dated row saying "accepted, here is why"
+  is the most explicit form a record takes, and no phase re-closes such rows to mint a
+  second copy of an existing record.
 
 ## Locked design rulings (settled with the maintainer 2026-08-07; do not re-litigate)
 1. R1 The above-raid step is the PERFECTING STAGE (fork B): a deliberate upgrade performed
@@ -5594,6 +5624,14 @@ confirm-at-STEP-0)
   behavior-bearing extraction inside a 160-file merge makes the merge
   unreviewable; the ratchet's credibility comes from the raise being recorded
   and paid back. REJECTED: funding that extraction inside the merge phase.
+  (AMENDED 2026-08-20 by 11b's observed counts: the merged tree needs TWO
+  raises, renderer.ts 13576 over 13546 and online.ts 5967 over 5950, not
+  four. hud.ts composed UNDER its 19445 pin at 19251 because both packets'
+  extractions stacked, and sim.ts and main.ts FALL as predicted. 11d raises
+  exactly the observed red set, on the ruling's unchanged terms: each raise
+  a ledger row naming this merge, both parent pins, and the reason; hud.ts
+  needs no raise and therefore no Phase 14 payback beyond what 11d-U6-PAYBACK
+  already records against ours' own pin.)
 - Also in force for this phase, from the same block: 11b-R3c-1 (placed station
   wins, farm bed immediately below; pin both directions), 11b-R3c-2 (guide
   sentence owed to 11c; 11b takes ours), 11b-PARK-1 (icon-art test parks on
@@ -5644,3 +5682,465 @@ into docs/prd/masterwrought/farming/state.md (the handoff-table section) in the
 MERGED packet's one open-item collection point. Append convention, stated here
 once: masterwrought's open items append at the END of that handoff table, never
 interleaved with farming's rows.
+
+## Phase 11b BUILT ledger (2026-08-20, the farming absorb executed)
+
+### The merge
+- A TRUE MERGE COMMIT: 424ce89a20, parents d5304a78c4 (masterwrought) and
+  8cd964d599 (origin/feature/farming-plan, re-resolved, equal to the
+  planning-time hash; 397 commits stay reachable; git merge-base
+  --is-ancestor origin/feature/farming-plan HEAD exits 0). No squash, no
+  rebase, no cherry-pick. Follow-up commits on the phase tip: 648da390b3
+  (fix(sim): the ItemDef union port read sites), 6b763a1fc1 (refactor(ui):
+  the RULE 2 extraction ports), then the doc-move and docs commits. The
+  merge commit alone was tsc-red BY DESIGN (recorded here, not hidden); the
+  exit criterion binds the phase TIP, which is tsc-clean.
+- Class counts, PREDICTED == OBSERVED, exactly: 160 conflicted paths (the
+  merge-tree list diffed IDENTICAL to the halt list), REGEN 27, GOLDEN 67,
+  ART_CENSUS 17, COUNT_PIN 13, TAIL_APPEND 14, SEMANTIC 22 (the 14/22 split
+  counts the five locale overlays and the two i18n catalog tables with the
+  seven RULE 1 tables in TAIL_APPEND; the same 36 files either way). 442 of
+  farming's 602 changed files landed clean. The release sync was a VERIFIED
+  NO-OP (v0.40.0 tip 65b91fa190 already an ancestor), so the merge base
+  never moved and no count deviation needed explaining.
+- Parks, all held: 67 goldens on ours (no UPDATE_PARITY run); 13 count pins
+  on ours (no literal moved; two parked suites took TYPE-completion fixture
+  edits only, in 648da390b3, so the tip compiles: material_taxonomy's
+  injection BASE gained farmMaterialItemIds, blob_roundtrip's fixture gained
+  farming: 0); 16 ART_CENSUS files on ours plus
+  tests/release_v039_icon_art.test.ts parked on FARMING's refactored
+  art-subject split form, verdict REFACTORED, NOT DELETED (ruling 11b-PARK-1;
+  nothing added to any deletion list); scripts/ci_shard_weights.generated.json
+  on ours (the fix is a fresh CI harvest, 11d-U1-SHARD). The REGEN class was
+  parked on ours then the two DETERMINISTIC pretest generators re-ran on the
+  merged tree (npm run i18n:gen, npm run wiki:content) inside the merge
+  commit, per the repo's own generated-artifact merge rule in src/ui/CLAUDE.md
+  ("take either side, run i18n:gen, git add the result") and because the
+  tsc-clean exit criterion is unreachable with a stale TranslationKeyFlat
+  union; both generators run on every npm test anyway. No golden re-record,
+  no shard harvest, no pin bump, no ceiling touch.
+
+### The three rules as applied (the notable resolutions)
+- RULE 1 on all seven tables: deeds.ts (DEED_ORDER[len-1] IS
+  'prog_farming_100'; no committed masterwrought row moved), recipes.ts
+  (rebuilt deterministically from ours' stage plus farming's HOE_RECIPES and
+  FARM_RECIPES blocks placed contiguous LAST before ALL_RECIPES, spreads
+  appended at the ALL_RECIPES tail after APEX_CONSUMABLE_RECIPES; HOE sits
+  away from ROD by the never-re-sorted rule), profession_items.ts (farming's
+  13 rows byte-exact: wellfed 3/600, 6/900, 9/900, 12/900; harvest_feast
+  feast {10, 3600, evergarden_braised_greens}), reliquary.ts,
+  i18n.catalog/items.ts (ITEM_ENTITY_IDS ours-then-farming;
+  APPENDED_ITEM_NAMES both blocks; the positional legacy arrays untouched),
+  hud_chrome.ts, and the architecture allowlist (union at the insertion
+  point; the file's own grouping kept).
+- RULE 2 discharged: the diff-filter=A enumeration returned 212 added files;
+  the at-risk set was swept by extracting every same-named symbol's body at
+  BASE and at OURS and diffing (script in the session scratch; the decisive
+  argument for the rest: every non-conflicted coordinator's ours-edits and
+  theirs-deletes could not overlap or git would have conflicted). Findings:
+  castDisplayName (ours added EXACTLY the one SUNDER_CAST_ID arm; ported into
+  src/ui/cast_display_name.ts between SALVAGE and TOOL_RECHARGE) and
+  entityDisplayName, which was a NEW member of the class: BOTH packets had
+  extracted it from hud.ts into DIFFERENT modules (ours'
+  entity_display_core.ts at the v0.37.0 sync, base-identical body; farming's
+  entity_display_name.ts, base plus the live feast-title arm plus its own
+  Vitest). One authority survives: farming's module; the core's
+  byte-equivalent copy was REMOVED with a pointer comment (not a third
+  variant: neither body deviated from base except farming's feast arm, so no
+  design question arose and no stop fired). All six ability_tooltip_lines
+  functions, the turnstile trio, HEAVY_SELF_*, and every other swept symbol:
+  UNCHANGED by ours, extraction wins clean. Zero duplicate definitions at the
+  tip (tsc clean).
+- RULE 3: imports unioned (hud.ts kept tSim: a live consumer remains at its
+  error.noItem toast; main.ts unioned the turnstile block and correctly kept
+  worldEntryGpuSettleCoverMs dropped, zero consumers); independent additions
+  composed ours-first (items.ts placeMobileStation then feast arms, mutually
+  exclusive by keying field; hud.ts tooltip block composes
+  recipePatternTooltipLines THEN wellfedTooltipLines THEN feastTooltipLines,
+  and BOTH well-fed key families are live in hud.ts by design; bags_view's
+  clickSetOut feast hint sits ABOVE the generic use hint; nameplate_view was
+  the one compose a naive union would have gotten wrong: ours RESTRUCTURED
+  the hidden condition behind the standIn override, so farming's !feastNear
+  term was folded INTO the object arm inside the !standIn group rather than
+  kept as a second ungated copy); the two tooltip-coverage suites COMPOSED
+  (ours' quality-axis pin keeps all ten masterwrought junk intermediates,
+  farming's CRAFTED_JUNK_EXCEPTIONS joins it, the craftedJunk pin now lists
+  all 12, and harvest_feast's above-the-floor rarity is asserted honestly
+  with its masterwork-arm proof).
+
+### RULE 3c takes (ours verbatim) and the 11c carry list, WHOLE
+Each item records the theirs-side text this phase did NOT take, so 11c has
+the evidence in one place:
+1. src/sim/combat/auras.ts consume-complete site: took OURS (the inline
+   clear-then-grant well_fed mint). Theirs' text, whole:
+   "// Meal completed: mint the Well Fed buff (src/sim/wellfed.ts) before the
+   // slot is nulled; an interrupted meal never reaches this line. Zero draws.
+   if (c.remaining <= 0) { applyWellfedOnConsumeComplete(ctx, p, c);
+   p[slot] = null; }". CONSEQUENCE, stated and accepted: src/sim/wellfed.ts
+   is a clean add and DELIBERATELY UNREFERENCED at this tip (its export stays
+   for 11d's symbol census); the auto-merged applyWellfedOnConsumeComplete
+   import in auras.ts was pruned; farming's four buff dishes mint NOTHING
+   until 11c wires the unified path (their payloads are inert data, no
+   number moved). 11c wires wellfed.ts per 11b-D-2/11c-D-2.
+2. src/ui/sim_i18n.ts 'aura.wellFed' DICT values: took OURS everywhere. The
+   three actually-conflicting values, theirs' text whole: zh_CN '饱足',
+   zh_TW '飽足', ko_KR '포만감' (ours: 精神饱满 / 精神飽滿 / 잘 먹음; ja 満腹
+   and ru Сытость coincided on both sides). Kept from theirs:
+   'error.castingPlanting' plus its comment; the AURA_NAME_KEY 'Well Fed'
+   row was identical on both sides.
+3. itemUi.tooltip.useElixir / useElixirAura, EN catalog and the five
+   overlays: took OURS (the replacement-clause forms). Theirs' values were
+   the pre-clause base forms ("Use: Increases your {stat} by {value} for
+   {minutes} min. Usable in combat." / "Use: Grants {aura} for {minutes}
+   min. Usable in combat." and their zh_CN/zh_TW/ja/ko/ru equivalents,
+   retrievable at 8cd964d599); dropped as stale same-key values, not as
+   content.
+4. The professions overview prose (guide.ts catalog whatBody + the five
+   overlays): took OURS ("four gathering trades ... a ring of ten crafts ...
+   nine of the ten crafts and all four gathering professions"). Theirs'
+   English, whole: "Professions are the working life of the world: the
+   gathering trades that pull raw material straight out of the land, and a
+   ring of ten crafts that turn it into gear, meals, potions, and tools.
+   Everything feeds something else here. The ore you mine becomes a blade,
+   the blade takes an enchant, and the enchant needs dust broken out of old
+   gear, so a gatherer, a crafter, and a tinkerer are all links in one
+   chain.\n\nThere is no profession limit to agonize over. Every character
+   can raise seven of the eight crafts that have content today and every
+   gathering profession side by side (Engineering is the one holdout: its
+   recipes all start above the free ceiling, so its ladder waits for the
+   Bombardier's oath); the only exclusive choice is your archetype, the
+   identity you eventually swear to, though once you attune the crafts that
+   fall dormant behind it climb only on their common recipes, and past skill
+   75 not at all. Skill never goes down, and nothing you learn is ever taken
+   away." (overlay equivalents at 8cd964d599). OWED TO 11C, settled
+   (11b-R3c-2): 11c WRITES the merged sentence "five gathering trades ...
+   and a ring of ten crafts", moves "all four gathering professions" to
+   five, around guide.profPages, plus the five non-Latin overlays; Phase
+   16's arm is VERIFY, never author. "Four gathering" ships here BY DESIGN,
+   not by omission.
+5. BOTH well-fed tooltip key families are intact on purpose (ours'
+   itemUi.tooltip.wellFed/wellFedAura AND theirs' useWellfed/useWellfedAura,
+   in the EN catalog and all five overlays): 11c retires one pair only
+   AFTER comparing locale-fill coverage (settled: masterwrought's pair
+   survives per ruling 14, 11c-A4-KEYPAIR); destroying a family here would
+   have destroyed the comparison evidence.
+6. scripts/wiki/build_content.mjs consumableEffect reads farming's wellfed
+   spelling ONLY, as authored; when 11c unifies onto FoodItemDef.wellFed the
+   read moves in the same change (a wellFed fallback was deliberately NOT
+   added here: neither parent had it, and inventing it would have changed
+   the generated wiki for masterwrought's three plates).
+7. THE INTERACTION-PRIORITY RECORD (ruling 11b-R3c-1, settled): the placed
+   station wins and the farm bed sits immediately below. FINDING against the
+   live code, recorded rather than papered over: the two sides' test cases
+   do NOT textually contradict, because masterwrought's mobile stations take
+   NO interact press anywhere; they are proximity-activated
+   (inRangeStationTypes feeds the crafting window). The merged
+   tryNearbyInteraction arm order is farming's shipped one: nodes, then farm
+   bed, then feast, then escort-away; farming's own test pins bed-over-feast.
+   The ruling's target order (the placed transient, station or feast, above
+   the bed) therefore requires a BEHAVIOR CHANGE this phase is forbidden to
+   make, so the "both directions pinned" acceptance arm is DEFERRED WITH
+   REASON to the phase that reorders the arms (11c per the ruling's carry
+   clause; an apex-feast press also concerns 11k). "Bed alone presses the
+   bed" is already pinned by farming's suite. This is a RECORDED DECISION on
+   this carry list, never a take-ours.
+8. FoodItemDef carries BOTH spellings (wellFed ours, wellfed farming's,
+   identical TimedStatBuffPayload shape, verified structurally identical);
+   feast? sits on OtherItemDef (kind-scoped; the union port). 11c retires
+   the wellfed spelling and its runtime kind guard.
+
+### Derived counts (ruling 11b-CNT-1; found numbers, disagreements named)
+- Farming item rows in src/sim/content/items.ts, DERIVED ON THE MERGED TREE:
+  31 rows, split 27 kind 'junk' (7 crop trios: seed/produce/fine, plus
+  withered_husks, compost, growth_tonic) and 4 kind 'tool' (garden_hoe,
+  bronze_hoe, skysilver_hoe, osmium_hoe), zero missing, all landing on
+  OtherItemDef. This AGREES with the plan's direct count (31) and DISAGREES
+  with the plan's earlier literal of 30, which is hereby reported wrong, not
+  adopted. The 13 profession_items.ts rows (8 plain dishes + 4 buff dishes +
+  harvest_feast) landed byte-exact.
+- docs/farming tracked-file count, DERIVED with git ls-tree at HEAD before
+  the move: 36. This agrees with the plan's "one reading says 36" and
+  DISAGREES with the earlier literal of 34, reported wrong, not adopted.
+- Goldens/scenarios bijection on the merged tree: 69 golden files, 67 static
+  scenario name literals plus the hit_rating_heroic geared/ungeared ternary
+  pair = 69; both new goldens present and registered
+  (rift_clear_rewards.json ours, farming_session.json theirs), each in a
+  parity shard via the coverage suites.
+- world_api predicted-for-11d (from the 0c baseline): members
+  324 + (331 - 323) = 332, data 88, method 244, facets 34; command schema
+  predicted send 200 + (204 - 199) = 205, dispatch 213 + (217 - 212) = 218.
+  11d verifies observed == predicted; nothing bumped here.
+
+### The doc move (its own commit, after the resolution lanes rejoined)
+- git mv docs/farming to docs/prd/masterwrought/farming (36 files, rename
+  detection intact); 275 in-packet path strings rewritten; the
+  out-of-packet citations re-pointed (zone1.ts:918 comment, deeds.md,
+  mob_portrait_source_manifest comment). The RENAMED-NOT-REVISED banner
+  heads the moved README and is the ONE deliberate carrier of the old path
+  outside verbatim records; the remaining greppable mentions are all
+  verbatim history (the 11b/11b-qa phase-file instructions, the progress.md
+  absorb decision record, and migrated delegated-rulings rows 8 and 9),
+  listed here so the acceptance sweep has the exception inventory.
+- THE NEEDLE: tests/farming_asset_manifest.test.ts re-pointed at
+  docs/prd/masterwrought/ and WATCHED TO FAIL (the new path injected into
+  the manifest fixture, the assertion went red on exactly that line, the
+  injection reverted, manifest byte-identical); journeyEvidence untouched;
+  docs/design/farming-asset-manifest.json NOT moved.
+- Forward-looking rewrites (past-tense records verbatim): README working
+  agreements; implementation-plan Delivery bullet and Packet teardown
+  section; farming/state.md's three stale Current-phase headers (top header
+  replaced by the absorbed-state record, the two interior ones demoted to
+  "Prior:"); the journey-script handoff row. D22 + addendum (B) SUPERSEDED
+  IN PLACE with the dated banner (bodies verbatim); the absorb discipline
+  adopted upstream in the Delivery contract amendment above.
+- THE MIGRATION: the 133-row delegated-rulings block moved WHOLE into
+  farming/state.md's handoff-table section in the doc-move commit;
+  vocabulary translated at the batch level (every row
+  closed-by-the-2026-08-20-delegation; ip-17-PUSH gets its own open
+  ruling-owed table row as the one hand-back); the one-line pointer and the
+  append convention stand at the end of THIS file; the five stale in-file
+  citations of the block were amended in place; the block's own
+  self-description carries the dated MIGRATED note.
+
+### Deviations and drift found by this phase (recorded, not silent)
+- ULTRACODE: the operator's session prompt set ULTRACODE: no for 11b,
+  overriding the phase file's yes; resolution ran serially in the main loop
+  under the three rules (read-only agents only), over the same file
+  partitions the four slices named.
+- The phase file's premise that the station-vs-bed priority is pinnable this
+  phase was drift against the live code (carry item 7 above).
+- The planning-time hud.ts extraction map missed that ours had ALSO
+  extracted the display-name family (entity_display_core.ts): the RULE 2
+  sweep caught it as a new member of the extraction-versus-in-place class
+  (memory note written).
+- tests/entity_display_core.test.ts follows the entityDisplayName authority
+  move (import swapped to entity_display_name; cases unchanged).
+- The two research subagents dispatched at STEP 1 completed but their
+  reports were never delivered to the session (a harness delivery failure);
+  the context was re-derived by direct reads, which is why the ledger cites
+  live-tree evidence throughout.
+
+### The named red list (full suite run ONCE at the phase tip; 3016 files, 42472 tests, 141 red in 35 files; every red named and owned, ZERO defects of this phase)
+Gate facts first: npx tsc --noEmit CLEAN at the tip;
+tests/architecture.test.ts green (44); tests/ci_workflow.test.ts green (25,
+the 13 merged cone rows verified in the literal and all five workflow
+blocks); tests/farming_asset_manifest.test.ts green (needle proven);
+npm run ci:changed exit 0 after the style pass e686d7246f.
+
+11C-OWNED, 29 tests in 7 files (the parked well-fed unification and the
+guide sentence; rulings 11b-D-2, 11c-D-2, 11c-A4-KEYPAIR, 11b-R3c-2):
+- tests/wellfed.test.ts (10): farming's mint path is DELIBERATELY
+  unreferenced at this tip (carry item 1); every mint/boundary/draw-stream
+  arm reds until 11c wires the unified path.
+- tests/professions_feast.test.ts (4) and tests/feast_online.test.ts (1):
+  the feast bite's Well Fed completion arms, same cause.
+- tests/wellfed_tooltip_view.test.ts (6) and
+  tests/feast_tooltip_view.test.ts (6): the zh_CN/zh_TW/ko sentences
+  interpolate the aura name through the matcher, which now serves
+  masterwrought's aura.wellFed values (carry item 2); 11c's key-pair
+  retirement re-aims these suites.
+- tests/localization_fixes.test.ts (1): pins farming's CJK aura values
+  byte-for-byte; same cause, same owner.
+- tests/guide.test.ts (1): farming's "count-free" gathering-trades guard vs
+  the kept ours-side "four gathering trades" sentence. RECORDED FOR 11C
+  (carry list addendum): ruling 11b-R3c-2's merged sentence SPELLS "five
+  gathering trades" while this farming guard forbids ANY spelled count
+  (/\b(four|five|[45])\b/); the two cannot both stand, so 11c must either
+  amend the guard alongside the reword or write the sentence count-free and
+  amend the ruling's wording in place, a decision 11c records, never a
+  silent pick.
+
+11D-OWNED, 112 tests in 28 files (the parked derived artifacts; rulings
+11b-D-4, 11b-PARK-1, 11d-U1-SHARD, 11d-U4-MATTAX, 11d-U6-FIFTH):
+- Parity goldens, 70: tests/parity/parity_a (7), _b (4), _c (2), _d (4),
+  _e (19), _f (1), _g (32), coverage_c (1). Goldens parked on ours; the
+  merged sim's streams differ from both parents by design; 11d re-records
+  via UPDATE_PARITY in isolated reviewed commits.
+- Count pins, 31: deeds_content (7), deed_i18n (1), deeds_view (1),
+  command_schema (2), profile_page (1), recipe_economy (2),
+  reliquary_content (3), professions_blob_growth (2),
+  professions_blob_roundtrip (2), material_taxonomy (9),
+  material_taxonomy_bootstrap (1). All parked on ours' literals; 11d
+  re-derives predicted-then-observed from the 0c baseline.
+- Monolith ceilings, 2: src/render/renderer.ts over 13546 and
+  src/net/online.ts over 5950. NOTE FOR 11D: hud.ts is NOT red; the two
+  packets' independent extractions compose, so the merged hud.ts sits UNDER
+  ours' 19445 pin, and the recorded-raise set is renderer.ts and online.ts
+  (online.ts is the fifth-monolith case, 11d-U6-FIFTH), with sim.ts and
+  main.ts falling as 11b-qa-B8 predicted.
+- Art census, 8: deed_icons (1), item_art_audit_builder (1),
+  item_art_consistency (1), missing_painted_icons_wave (1),
+  release_art_audit_v036_reliquary_deeds (1), release_v039_icon_art (2,
+  parked on farming's refactored split form; 11d re-derives 75/pending),
+  eastbrook_polish_capture_contract (1).
+- Asset fingerprint, 1: farm_props_asset (the SOURCE_FINGERPRINT spans
+  package.json and pnpm-lock.yaml, and the merged tree's composition
+  differs from farming's pinned value; 11d re-mints via the
+  remint_lockfile_fingerprints tool and checks the hits column, per the
+  release-merge gate-surprises catalog).
+Arithmetic check: 29 + 112 = 141; 7 + 28 = 35 files. Nothing unclassified.
+
+### Review round (five domain reviewers, COVERAGE prompts, 30-call budgets; every finding dispositioned, none dropped)
+Dispatched per the matrix: architecture-reviewer, cross-platform-sync,
+frontend-seam-reviewer, privacy-security-review, migration-safety;
+qa-checklist LAST (verdict below). The fix round landed as its own reviewed
+commit (parked-mint comments trued, the parked-state pin, the bags_view
+guard alignment).
+
+- SECURITY: CLEAN, zero blocking or should-fix. Four INFO observations,
+  all explicitly no-change-requested, LEDGERED: (a) a refused farming
+  command still sets selfHeavyDirty (game.ts ~6537; bounded by the command
+  lane bucket and once-per-tick collapse; the rift-forge refusal-above-flag
+  idiom is the shape to copy if beds ever grow); (b) consume_feast is a weak
+  feast-existence oracle (dedicated map, no mutation, leaks only "a feast
+  exists"); (c) feastOwnerKey mixes characterId/entityId domains (cannot
+  fire online, fails safe); (d) characterUpdateStatement now logs via the
+  blob-size reporter (id + byte count only, scalar closure state). PASSED:
+  full server authority on all five farming commands, dev gating, SQL
+  parameterization, HEAVY_SELF membership set-compared across both parents
+  and the merge (58/55, nothing lost, nothing invented), secrets sweep, the
+  11,635-line i18n injection sweep, CI workflow diff. Carried loudly: the
+  DEPLOY.md farming rollback note (rolling past the growth engine after
+  players plant destroys plot state on the next autosave) is a deploy-order
+  constraint for the eventual ship.
+- FRONTEND: 2 blocking, 3 should-fix, 2 notes. Both blockings are the
+  SETTLED parks, not new information, dispositioned SETTLED-BY-RULING: the
+  aura.wellFed term collision IS the RULE 3c take-ours (ruling 11b-D-2;
+  survivor settled by 11c-A4-KEYPAIR; its reds are the 11c-owned rows of the
+  red list), and the renderer.ts/online.ts ceilings are 11d's recorded
+  raises (the reviewer confirmed the renderer growth is thin wiring at the
+  correct seam and measured hud.ts at 19251, UNDER its 19445 pin).
+  Should-fix 1 (the two families compose at different tooltip positions;
+  the survivor must keep restore-line adjacency) ADDED to the 11c carry
+  list. Should-fix 2 (bags_view hover narrowed vs click ladder bare)
+  APPLIED: both arms now read the same bare item.feast predicate (the
+  module's own item shape carries feast?). Should-fix 3 (harvest_journal's
+  hand-rolled write cache + innerHTML rebuilds, inherited from farming's
+  QA'd branch) LEDGERED as polish carry (11c or Phase 14's UI pass). Note 1
+  (the standIn fold shows a compile-pending feast plate beyond the
+  hysteresis band, the safe fairness-positive direction) RECORDED here as
+  the deliberate resolution semantics so 11c does not read it as accident.
+  Note 2 (identical 'Well Fed' display name across both families) is moot
+  at this tip (farming's mint is inert) and resolves at 11c's unification.
+- ARCHITECTURE: 2 blocking, 4 should-fix, 4 notes; determinism CLEAN with
+  proof (the 34 lap markers match farming's parent name-for-name with
+  lap('farming') exactly where farming authored it; sim.ts and
+  sim_context.ts auto-merged with ZERO combined hunks; SimContext strictly
+  append-only with the feasts live-view primitive; the parity failures'
+  rng.digest and rng.draws are BYTE-IDENTICAL in every failing golden, the
+  diffs being a constant +4 entity-id shift). Blocking 1 (parity gate red =
+  no guard signal at the tip) is the recorded GOLDEN park; its 11d
+  instruction is ADOPTED VERBATIM into the ledger: at re-record time, diff
+  old vs new and assert ONLY id/entityId/sourceId/nextId/state move and
+  every rng.digest + rng.draws pair is byte-preserved; a digest that moves
+  during the re-record is a real regression the re-record would bless.
+  Blocking 2 (the four farming dishes' EFFECTIVE magnitude is zero at this
+  tip) is the settled 11b-D-2 park, stated in the ledger's carry item 1;
+  the reviewer is right that the BEHAVIOR moved even though no literal did,
+  and that honesty is now also written at both former comment sites.
+  Should-fixes APPLIED: the two stale comments trued (feast.ts bite,
+  items.ts food arm); the lowercase-carrier content pin added
+  (tests/wellfed.test.ts, exact four-id set + three-id wellFed set + no
+  def carries both spellings + no def carries use AND feast, which also
+  discharges the arm-order note). Should-fix (prog_gather_three desc
+  merge-minted) REFUTED WITH EVIDENCE: the reworded desc and its
+  refill-protocol comment are byte-identical on farming's parent
+  8cd964d599, an auto-merged farming reword, not resolution drift; its
+  locale refill rides the release fill per the in-file protocol comment.
+  Notes ledgered: ALL_RECIPES tail order is behaviorally free for the sim
+  (verified fold-by-fold by the reviewer) with ONE observable effect,
+  farming rows list LAST in the crafting window / trainer list surfaces
+  (11d should expect reordered list goldens; QA twin should eyeball the
+  window); the sim_context comment records onCropFarmedForQuests as a
+  deliberate non-seam module import.
+- PARITY: 4 critical, 4 warning; all four criticals are facets of the ONE
+  settled park (the dead mint, the dual spelling, the advertising tooltips,
+  the aura term literals), dispositioned SETTLED-BY-RULING and owned on the
+  red list; the tooltip-advertises-inert-buff consequence is now stated in
+  the items.ts comment as well. Warning ADOPTED into the ledger: the
+  world_api_parity pin is a FALSE GREEN at this tip (it self-checks only
+  its own pinned list, so the new farming facet is invisible and 11d gets
+  no red reminder; the ledger's predicted-counts row IS the reminder, and
+  11d must not wait for a suite to prompt it). Warning (localization_fixes
+  straddles both spellings across two arms) joins the 11c carry list.
+  Warning (guide four-vs-five) already carry item 4. Also adopted: the
+  zh_CN farming guide prose still says the buff term farming chose while
+  the aura renders masterwrought's, one more locale surface for 11c's
+  key-pair retirement; and the reviewer's full MATCH tables (all 8 farming
+  facet members implemented on both worlds; fplot/mst encode-decode
+  delta-safe; all five commands round-trip; all 7 farm events + the two
+  widened unions handled) stand as the parity PASS record.
+- MIGRATION: 2 warning, 3 info, zero blocking; the JSONB composition is
+  VERIFIED four ways (release-tip, either parent, merged saves all load on
+  merged code; the merged CharacterState is the exact 98-field union; no
+  DDL anywhere in the merge). Warning 1 ADOPTED as a carry: farming's
+  gatheringProficiency serializes farming:0 non-omitted, so EVERY character
+  blob rewrites (~14 bytes) on its first post-deploy autosave, inherited
+  from farming but meeting masterwrought's blob growth here; 11c makes the
+  zero-omit-or-accept call consciously, beside the blob-size reporter it
+  lands next to. Warning 2 ADOPTED as an 11d instruction: when the
+  roundtrip pins re-derive, give farming a distinct FRACTIONAL fixture
+  value (zero is exactly what the normalizer restores on a dropped key, so
+  farming: 0 is blind to the drop it should catch); also record that the
+  merge commit itself is type-red on that file, the fix arriving in
+  648da390b3 (matters to a bisect). Infos ledgered for 11d: REQUIRED_FIELDS
+  should gain wyrmfallDaily/emberWeekAnchor/farmPlots and one fixture
+  should hold a plot AND a craftDaily stamp in the same blob; downgrade is
+  lossy in both directions (serializeCharacter rebuilds from meta), so the
+  two packets must never point at a shared database independently.
+
+### 11c carry list ADDENDUM (from the review round; continues items 1 to 8 above)
+9. The surviving well-fed tooltip family must keep the restore-line
+   adjacency ours' composition has (the line renders directly under the
+   restore it qualifies), and the retired keys must leave the catalog
+   cleanly (tests/i18n_completeness.test.ts is the check).
+10. tests/localization_fixes.test.ts straddles the two spellings across two
+   arms (one pins the wellFed plates, one the wellfed dishes); 11c's
+   unification re-aims BOTH onto the surviving field and the union of
+   carriers.
+11. The zh_CN farming guide prose (src/ui/i18n.locales/zh_CN.ts, the
+   farming section) still uses farming's buff term while the live aura
+   renders masterwrought's; sweep every farming-authored locale surface for
+   the retired term during the key-pair retirement.
+12. farming's gatheringProficiency serializer writes farming: 0 non-omitted,
+   rewriting every character blob (~14 bytes) on first post-deploy autosave;
+   11c makes the omit-or-accept call consciously (migration reviewer,
+   WARNING 1).
+13. The harvest_journal_window 1 Hz countdown hand-rolls a write cache and
+   rebuilds via innerHTML (inherited from farming's branch); route through
+   the host writers during 11c's food/feast UI pass or Phase 14's UI beauty
+   pass, whichever opens the file first.
+14. The guide count-free guard vs ruling 11b-R3c-2's "five gathering
+   trades" wording (see the red list's guide.test.ts row): 11c reconciles
+   and RECORDS the choice.
+
+### QA gate verdict (qa-checklist, run LAST after the fix round)
+READY, ZERO BLOCKING. Independent re-verification of the ledger's claims on
+the live tree: tsc clean re-run; architecture + ci_workflow +
+farming_asset_manifest green together; world_api_parity + snapshots +
+sim_context green together (563 tests); eleven farming/feast/bags suites
+green in one run (398 tests); the monolith budget file BYTE-IDENTICAL to
+ours' parent (parks, not raises, proven by empty diff); DEED_ORDER's tail
+position confirmed at the source; the delegated-rulings migration live with
+the pointer at state.md's head section; the docs/farming sweep confirmed at
+14 mentions across exactly the 5 ledgered exception files, zero in
+executable code; the red count RE-VERIFIED at 141 after the fix round's new
+pin (the pin passes, so the count did not go stale under its own commit);
+farmPlots load-path defaulting and the wholesale-UPDATE no-resurrection
+property confirmed. Three should-fix items, ALL APPLIED: (1) the two carry
+obligations with no home in 11c's own file now have open ruling-owed rows in
+the merged handoff table AND an 11b HANDOFF ADDENDUM appended to
+phase-11c-food-and-feast.md (the guide-guard contradiction and the
+interaction-priority reorder, with an explicit re-route-to-11k option to
+record if 11c judges the press competition moot); (2) Decision 4's "four
+recorded raises" trued with dated AMENDED lines in all three homes (the
+pre-flight ledger copy above, migrated rows 4 and 16): the observed set is
+TWO, renderer.ts and online.ts, hud.ts under-pin at 19251; (3) recorded
+here as a standing guard note: src/sim/wellfed.ts is DELIBERATELY
+unreferenced until 11c wires it (carry item 1), so no unused-export sweep
+may delete it as dead code before then. VERIFY items for later phases,
+adopted: the parity goldens guard NOTHING for the whole 11b-to-11d window
+(the strongest argument that 11d follows 11c promptly); 11d gives the
+blob-roundtrip farming fixture a fractional value and confirms the
+farmPlots round-trip arms; hud perf budget + perf:tour and a full
+gate_select pass ride the 11b QA session per the phase cadence.

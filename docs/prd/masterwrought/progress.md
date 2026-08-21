@@ -24,7 +24,7 @@
 | 10 QA | verify | complete | 2026-08-14 | 2026-08-16 |
 | 11 | Pattern drops and vendors | complete | 2026-08-16 | 2026-08-16 |
 | 11 QA | verify | complete | 2026-08-19 | 2026-08-20 |
-| 11b | Farming absorb | pending | | |
+| 11b | Farming absorb | complete | 2026-08-20 | 2026-08-20 |
 | 11b QA | verify | pending | | |
 | 11c | Food and feast reconciliation | pending | | |
 | 11c QA | verify | pending | | |
@@ -709,3 +709,31 @@ is deliberately not copied here, it lives in the farming record.
   gathering-tool family. The stale `phase-11e-farming-apex-arm.md` is replaced by
   `phase-11e-mastery-curve.md` and deleted; its apex-feast design moves into 11h and
   11k and its GATE 1 material into 11e, so no table references the old file.
+- Phase 11b (2026-08-20): THE FARMING ABSORB EXECUTED. A true merge commit
+  424ce89a20 (parents d5304a78c4 and origin/feature/farming-plan tip 8cd964d599,
+  397 farming commits kept reachable), zero design change: no aura id, magnitude,
+  duration, ladder rung, bill, price, charge count, or deed renown moved. The
+  release sync was a verified no-op (origin/release/v0.40.0 already an ancestor),
+  so the merge base stayed at e56707a675 and the trial-merge prediction held
+  EXACTLY: 160 conflicted paths, classified REGEN 27 / GOLDEN 67 / ART_CENSUS 17 /
+  COUNT_PIN 13 / TAIL_APPEND 14 / SEMANTIC 22, with 442 of farming's 602 changed
+  files landing clean. Parked for 11d: the 67 goldens (ours), the 13 count pins
+  (ours), 16 art-census files (ours) plus tests/release_v039_icon_art.test.ts on
+  farming's refactored art-subject split form (verdict REFACTORED, NOT DELETED,
+  ruling 11b-PARK-1), and scripts/ci_shard_weights.generated.json (ours; the fix
+  is a fresh CI harvest, ruling 11d-U1-SHARD). The deterministic pretest
+  generators (i18n:gen, wiki:content) re-ran on the merged tree per the repo's
+  generated-artifact merge rule; goldens were NOT re-recorded. Follow-up commits:
+  the ItemDef union port (wellfed? onto FoodItemDef beside wellFed?, feast? onto
+  OtherItemDef, 'in'-guard narrowing at every read site) and the RULE 2 extraction
+  ports (the SUNDER cast arm into cast_display_name.ts; entityDisplayName's one
+  authority is farming's entity_display_name.ts with the feast-title arm, the
+  byte-equivalent entity_display_core copy removed). The doc move re-homed the
+  packet whole to docs/prd/masterwrought/farming/ (36 tracked files, derived;
+  RENAMED-NOT-REVISED banner; the needle re-pointed and watched to fail; D22 and
+  addendum (B) superseded IN PLACE, the absorb discipline adopted upstream; the
+  133-row delegated-rulings block migrated into farming/state.md's handoff table
+  with the pointer and append convention left behind). F-axis mapping: F01..F14
+  with F06b and F09b in the table above; the farming record lives whole in
+  docs/prd/masterwrought/farming/progress.md. Full ledger, carry list, and the
+  named red list: state.md, "Phase 11b BUILT ledger".

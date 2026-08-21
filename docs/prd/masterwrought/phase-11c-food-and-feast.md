@@ -474,3 +474,34 @@ OTHER tooltip family renders; or if the parity suite moves anything beyond the p
 farming_session frames, because a moved draw count or a moved digest in a scenario neither
 packet touched is a determinism regression, not a re-record.
 ```
+
+### 11b HANDOFF ADDENDUM (2026-08-20, appended by Phase 11b after its QA gate; two obligations the prompt above predates)
+
+The 11b build handed this phase TWO obligations beyond the prompt above; both
+sit as open ruling-owed rows in the merged handoff table
+(docs/prd/masterwrought/farming/state.md, the appended masterwrought section)
+and in the state.md Phase 11b BUILT ledger's carry list (items 4, 7, 14):
+
+1. THE GUIDE SENTENCE, WITH A CONTRADICTION TO RESOLVE (ruling 11b-R3c-2,
+   carry items 4 and 14). Write the merged professions-overview reword (the
+   five-gathering sentence, the second paragraph's count, guide.profPages,
+   the five non-Latin overlays). BUT: farming's guard in tests/guide.test.ts
+   ("describes the gathering trades count-free") forbids ANY spelled
+   gathering count while the ruling's wording spells "five"; the two cannot
+   both stand. Either write the sentence count-free and AMEND the ruling's
+   wording in place with a dated line, or spell five and amend the guard with
+   the reasoning; RECORD the choice in the ledger, never a silent pick. This
+   phase's red list from 11b already carries the guide.test.ts red as
+   11c-owned.
+
+2. THE INTERACTION-PRIORITY PIN (ruling 11b-R3c-1, carry item 7). The settled
+   order is placed-transient-wins (station or feast above the farm bed); the
+   merged tree still has farming's shipped bed-over-feast order, and
+   masterwrought's stations take NO interact press at all today
+   (proximity-activated via inRangeStationTypes). Reordering the
+   tryNearbyInteraction arms and pinning BOTH directions in
+   tests/nearby_interaction.test.ts is owned here per the ruling's carry
+   clause (the feast arm is in this phase's surface already); if this phase
+   judges the press-competition question moot until a station gains a press
+   or 11k's apex feasts land, it may re-route the row to 11k, RECORDING the
+   re-route in the handoff table rather than leaving the row orphaned.

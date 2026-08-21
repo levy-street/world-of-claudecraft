@@ -595,6 +595,8 @@ except the one hand-back, which gets its own table row:
 |---|---|---|---|
 | ip-17-PUSH: consent to push the merged branch (the one delegated hand-back; needs an input that does not exist yet) | MW P17 | maintainer | open ruling-owed |
 | The masterwrought delegated-rulings block (133 rows, the full delegation plus the same-day reconcile pass), migrated here whole at the 11b doc move | MW 11b | record | closed-by-the-2026-08-20-delegation (block below) |
+| The guide professions-overview reword (ruling 11b-R3c-2): write the merged five-gathering sentence around guide.profPages plus the five non-Latin overlays, AND reconcile it with farming's count-free guard in tests/guide.test.ts, which forbids ANY spelled count while the ruling's wording spells "five"; 11c records whichever way it resolves (11b carry items 4 and 14) | MW 11c | 11c session | open ruling-owed |
+| The interaction-priority pin (ruling 11b-R3c-1): the placed transient (station or feast) wins over the farm bed. The merged tree keeps farming's shipped bed-over-feast order and masterwrought stations take NO press today (proximity-activated), so the both-directions pin needs the arm reorder first; owned by 11c per the ruling's carry clause, with the apex-feast press also concerning 11k (11b carry item 7) | MW 11c | 11c session | open ruling-owed |
 
 ### Decisions closed 2026-08-20 (the full delegation)
 
@@ -671,6 +673,12 @@ existing row that was wrong is AMENDED IN PLACE with a dated line rather than re
    the merge phase; hud.ts is paid back by extraction in Phase 14. WHY: no resolution of
    hud.ts lands at or under farming's 19186 pin, and mixing conflict resolution with
    behavior-bearing refactor in one commit is what makes a merge unreviewable.
+   (AMENDED 2026-08-20 by 11b's observed counts: TWO raises, not four:
+   renderer.ts 13576 over 13546 and online.ts 5967 over 5950. hud.ts composed
+   UNDER ours' 19445 pin at 19251, both packets' extractions stacking, so the
+   19186-floor premise was true of farming's pin but no raise is needed
+   against ours'; sim.ts and main.ts fall. 11d raises exactly the observed
+   red set on this ruling's unchanged terms.)
 5. 11b-R3c-1. With a farm bed and a mobile crafting station both in range, the PLACED STATION
    wins and the farm bed sits immediately below it; pin both directions in
    tests/nearby_interaction.test.ts. If the two sides' RULE 3c cases contradict, this ruling
@@ -737,6 +745,10 @@ existing row that was wrong is AMENDED IN PLACE with a dated line rather than re
     Record the direction honestly: hud.ts and renderer.ts rise, sim.ts and main.ts fall. WHY:
     same ruling as 11b-D-4 restated at the executing phase, and a ratchet that only ever shows
     raises has stopped being read.
+    (AMENDED 2026-08-20, same amendment as row 4: the observed raise set is
+    TWO, renderer.ts and online.ts; hud.ts sits UNDER ours' pin at 19251 and
+    rises nowhere, sim.ts and main.ts fall. 11d executes against the observed
+    set; the honesty rule stands.)
 17. 11d-U3-ICON. Execute 11b-PARK-1 here: take farming's art-subject split form, re-derive
     art-subject to 75 and pending to the merged count, and add the file to
     merge-deletion-list.md ONLY for the two farming literals it replaces, noting that nothing
