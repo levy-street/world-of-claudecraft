@@ -12,6 +12,8 @@
 // one t() call against another: a self-comparison would pass with the key, the
 // clock arm, and the zero padding all wrong at once.
 
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import type { FarmPlotView } from '../src/sim/professions/farm_projection';
@@ -503,5 +505,26 @@ describe('harvest journal window: the ClientWorld mirror shape', () => {
     expect(countdownCell()).toBeNull();
     expect(root.textContent).toContain('Ready to harvest');
     win.close();
+  });
+});
+
+describe('harvest journal window (source contract)', () => {
+  // The window's components rule is flex-column (#harvest-journal-window
+  // flex-direction: column; .hj-body flex: 1 1 auto + overflow-y), so per
+  // the window-frame family every show-site must set display = 'flex' (a
+  // 'block' leaves the body's flex sizing inert, and the inset-pinned
+  // mobile rule's overflow: hidden then clips a long bed list with no
+  // scroller) and every read-guard must test the value it writes. The #bags
+  // pin in tests/client_shell.test.ts is the precedent: the behavioral pins
+  // above track whatever the painter writes, so only this source pin reds
+  // if a future edit flips the window back to block.
+  const src = readFileSync(join(process.cwd(), 'src/ui/harvest_journal_window.ts'), 'utf8');
+
+  it('opens and closes with inline flex, matching its flex-column components rule', () => {
+    expect(src).toContain("root.style.display = 'flex';");
+    expect(src).toContain("root.style.display = 'none';");
+    expect(src).toContain("return this.deps.root().style.display === 'flex';");
+    expect(src).not.toContain("style.display = 'block'");
+    expect(src).not.toContain("=== 'block'");
   });
 });

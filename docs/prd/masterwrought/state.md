@@ -5853,7 +5853,8 @@ the evidence in one place:
 - Farming item rows in src/sim/content/items.ts, DERIVED ON THE MERGED TREE:
   31 rows, split 27 kind 'junk' (8 crop trios: seed/produce/fine, plus
   withered_husks, compost, growth_tonic; trio count corrected from 7 by the
-  QA audit 2026-08-21, since 7x3+3 = 24+3 contradicts its own 27) and 4 kind 'tool' (garden_hoe,
+  QA audit 2026-08-21: seven trios would sum to 21 + 3 = 24, contradicting
+  the row's own 27, while 8x3 + 3 = 27) and 4 kind 'tool' (garden_hoe,
   bronze_hoe, skysilver_hoe, osmium_hoe), zero missing, all landing on
   OtherItemDef. This AGREES with the plan's direct count (31) and DISAGREES
   with the plan's earlier literal of 30, which is hereby reported wrong, not
@@ -5874,10 +5875,11 @@ the evidence in one place:
 
 ### The doc move (its own commit, after the resolution lanes rejoined)
 - git mv docs/farming to docs/prd/masterwrought/farming (36 files, rename
-  detection intact); 303 in-packet path-string occurrences rewritten on 275
-  lines (progress.md's 303 and this ledger's earlier bare 275 were the same
-  measure in different units; one of the 275 lines, now farming/state.md's
-  handoff row, was kept verbatim by design); the
+  detection intact); 303 in-packet path-string occurrences across 275
+  carrier lines, 274 of those lines rewritten and one (now farming/
+  state.md's handoff row) kept verbatim by design (progress.md's 303 and
+  this ledger's earlier bare 275 were the same measure in different
+  units); the
   out-of-packet citations re-pointed (zone1.ts:918 comment, deeds.md,
   mob_portrait_source_manifest comment). The RENAMED-NOT-REVISED banner
   heads the moved README and is the ONE deliberate carrier of the old path
@@ -6337,8 +6339,11 @@ fifth trade).
 ### Doc move: PASS (guards verified, hygiene items trued)
 Follow-log walks through the rename on progress.md/state.md/README.md (a
 true git mv); the 36-count re-measures at tip and THEIRS; the residual
-docs/farming/ citation set re-derives to exactly the ledgered 14 mentions
-across the 5 exception files, zero in executable code; the needle asserts
+old-packet-path citation set re-derives to exactly the ledgered 14 mentions
+across the 5 exception files, zero in executable code (this record
+deliberately does NOT spell the old path, so the sweep's own inventory
+stays at 14/5; a re-sweep at any later tip should expect exactly the
+ledgered exception files and this file contributing zero); the needle asserts
 against the new root, its watched-to-fail probe is recorded above and it
 runs green; farming-asset-manifest.json unmoved, journeyEvidence
 untouched; a COMPLETE D22 set-diff (not a sample) shows every past-tense

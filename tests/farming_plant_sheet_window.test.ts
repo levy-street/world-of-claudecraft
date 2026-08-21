@@ -551,3 +551,46 @@ describe('plant sheet window: the ClientWorld mirror shape', () => {
     win.close();
   });
 });
+
+describe('plant sheet window (source contract)', () => {
+  // Same family contract as the harvest journal's source pin: the sheet's
+  // components rule is flex-column (#plant-sheet-window flex-direction:
+  // column; .ps-body flex: 1 1 auto), so every show-site writes 'flex' and
+  // every read-guard tests the value it writes (the #bags precedent in
+  // tests/client_shell.test.ts). The behavioral display pins track whatever
+  // the painter writes; only this source pin reds on a flip back to block.
+  const sheetSrc = readFileSync(join(repoRoot, 'src/ui/farming_plant_sheet_window.ts'), 'utf8');
+
+  it('opens and closes with inline flex, matching its flex-column components rule', () => {
+    expect(sheetSrc).toContain("root.style.display = 'flex';");
+    expect(sheetSrc).toContain("root.style.display = 'none';");
+    expect(sheetSrc).toContain("return this.deps.root().style.display === 'flex';");
+    expect(sheetSrc).not.toContain("style.display = 'block'");
+    expect(sheetSrc).not.toContain("!== 'block'");
+  });
+
+  it('keeps the forced-colors non-color cue for the picked seed and armed knob', () => {
+    // The picked/armed state is gold-hue-only in normal mode, so the
+    // forced-colors block in base.css must carry a redundant non-color cue
+    // for both selectors (the #tf-name.hostile idiom). Extract the block by
+    // BALANCED BRACES, not by slicing to the next media query, so a rule
+    // parked after the block's closing brace cannot satisfy the pin
+    // (tests/quest_marker_styles.test.ts is the precedent).
+    const baseCss = readFileSync(join(repoRoot, 'src/styles/base.css'), 'utf8');
+    const marker = '@media (forced-colors: active)';
+    const start = baseCss.indexOf(marker);
+    expect(start).toBeGreaterThan(-1);
+    const open = baseCss.indexOf('{', start);
+    let depth = 1;
+    let end = open + 1;
+    while (end < baseCss.length && depth > 0) {
+      if (baseCss[end] === '{') depth++;
+      else if (baseCss[end] === '}') depth--;
+      end++;
+    }
+    const forcedBlock = baseCss.slice(start, end);
+    expect(forcedBlock).toMatch(
+      /\.ps-seed\[aria-checked="true"\],\s*\.ps-knob\[aria-pressed="true"\]\s*\{[^}]*text-decoration:\s*underline;/s,
+    );
+  });
+});

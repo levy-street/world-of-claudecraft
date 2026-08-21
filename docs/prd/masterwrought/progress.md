@@ -25,7 +25,7 @@
 | 11 | Pattern drops and vendors | complete | 2026-08-16 | 2026-08-16 |
 | 11 QA | verify | complete | 2026-08-19 | 2026-08-20 |
 | 11b | Farming absorb | complete | 2026-08-20 | 2026-08-20 |
-| 11b QA | verify | pending | | |
+| 11b QA | verify | complete | 2026-08-20 | 2026-08-21 |
 | 11c | Food and feast reconciliation | pending | | |
 | 11c QA | verify | pending | | |
 | 11d | Derived artifacts, pins, and the merge audit | pending | | |
@@ -715,6 +715,28 @@ is deliberately not copied here, it lives in the farming record.
   gathering-tool family. The stale `phase-11e-farming-apex-arm.md` is replaced by
   `phase-11e-mastery-curve.md` and deleted; its apex-feast design moves into 11h and
   11k and its GATE 1 material into 11e, so no table references the old file.
+- Phase 11b QA (2026-08-21): THE ABSORB VERIFIED, verdict PASS. Release sync
+  a no-op again (v0.40.0 still ancestor). Seven-lane ultracode audit + five
+  fresh domain reviewers + qa-checklist over d5304a78c4..8f3efa2fc8: the
+  extraction census CLEAN (one authority per symbol, the SUNDER port at its
+  required position), the 91-file silent auto-merge sweep CLEAN, the three
+  uncovered surfaces CLEAN (SURF-1 discharged with its routes citation
+  corrected to the identical-set derivation), all thirteen F14 actionables
+  survived (GATE 9 honored by citation), the full parked-class census exact
+  (96 ours / 1 theirs / 63 neither over the 160), and the named red list
+  verified COMPLETE AND HONEST (full suite twice: 141 red in 35 files,
+  per-file equal; rng draw digests byte-identical across all 69 re-recorded
+  parity scenarios, so the parity park was recharacterized as pure entity-id
+  shift). Fixes: the farming windows now open flex (the mobile journal was
+  hard-clipped under block), a forced-colors arm for the picked-seed/armed-
+  knob state, dead imports dropped, seven stale absorb comments trued, the
+  blob-pin park amended to RESTORE farming's every-bed fixture before 11d
+  re-derives, DEPLOY.md's mixed-fleet bullet trued (single-release seed
+  faucet; rollback erases Farming skill), coverage_c re-owned 11C (split now
+  30/111 over 8/27), and the B8 second-arm row written (12232/12650/12340).
+  Carry items 15-16 added; the master_gatherer deed-desc overlay refill is
+  an owned release-fill row. Full record: state.md, "Phase 11b QA audit
+  record".
 - Phase 11b (2026-08-20): THE FARMING ABSORB EXECUTED. A true merge commit
   424ce89a20 (parents d5304a78c4 and origin/feature/farming-plan tip 8cd964d599,
   397 farming commits kept reachable), zero design change: no aura id, magnitude,
