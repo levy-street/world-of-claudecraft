@@ -1,0 +1,1819 @@
+#!/usr/bin/env node
+// The export and symbol census for the farming absorb merge (Phase 11d unit 5 of the
+// Masterwrought packet; Phase 17 re-runs it as a delivery gate).
+//
+// WHAT IT ASSERTS. For every exported symbol, content-table row id, i18n catalog key,
+// and SimEvent name present on EITHER parent of the merge commit 424ce89a20, that
+// name is present in the merged tree unless it is on the written deletion list
+// (docs/prd/masterwrought/merge-deletion-list.md). The parent set is ours UNION
+// theirs, never base: a name both parents deleted is legitimately gone.
+//
+//   MISSING = (ours UNION theirs) minus merged minus deletionList   -> must be EMPTY
+//   EXTRA   = merged minus (ours UNION theirs)                     -> must be EXACTLY
+//             the set the 11b and 11c ledgers authored (EXPLAINED_EXTRAS below, every
+//             entry with the phase and ruling that authored it)
+//
+// Either assertion failing exits nonzero. Names are keyed BY NAME (never by file):
+// the merge's top risk is a dropped hunk, and a name defined in a different file is
+// present, not missing. Per-name file sets are kept for the report only (an export
+// defined in two files is a duplicate-definition INFO signal).
+//
+// HOW IT READS. The parents are read with git plumbing only (git ls-tree -r
+// --name-only <ref> -- <roots>, then the blob contents through one
+// `git cat-file --batch` process per parent, the batch form of `git show
+// <ref>:<path>`): no checkout, no worktree switch, no stash. The merged side is read
+// from disk under --merged-root (default: this repo's root), so a scratch copy can be
+// mutated and scanned without touching the real tree (guard 1, mutation).
+//
+// THE THIRD PARENT (release syncs after the merge). The branch keeps syncing
+// release/** after the absorb merge (the first at Phase 11d STEP 0, tip f50b30de29),
+// and every sync brings names that are on neither ours nor theirs. Those releases are
+// PARENTS of the merged tree, not extras: the parent set is
+//   ours UNION theirs UNION release(s)
+// where the releases are RELEASE_REF (override: --release <ref>) plus the second
+// parent of every later merge commit on the branch's own first-parent chain (a later
+// sync; --sync <ref> adds one by hand for a squash sync, --no-auto-sync turns the
+// derivation off). MISSING = parents minus merged minus deletionList; EXTRA = merged
+// minus parents. A MISSING name that no release parent has but base does is annotated
+// release-attributable (the release retired it and a packet parent was behind) and
+// reported in its own sub-list; it still needs a deletion-list row. The refs used are
+// printed in the header of every run.
+//
+// GUARDS. (1) Mutation: `--merged-root <scratch copy>` lets the caller delete one
+// known symbol and confirm MISSING names it (the recipe is in the deletion list's
+// header). (2) Floors: FLOORS pins a minimum size per parent set per class; an
+// extractor that silently matches nothing fails instead of comparing two empty sets.
+//
+// THE EXTRACTORS are mechanical text walks over a conservative JS/TS tokenizer
+// (comments dropped, strings and templates atomic, regex literals recognized by the
+// usual previous-token rule and bounded to one line), so a commented-out export or an
+// export inside a string never counts. The known limits are counted and printed, never
+// silent: `export *` re-exports (names unknown), `export default`, `export =`,
+// CommonJS `module.exports`, destructured and multi-declarator exports, content ids
+// that are not a plain literal, i18n spread / computed members and non-literal leaves,
+// union members that are bare aliases this walk could not resolve, and emit sites whose
+// argument is not an object literal with a literal `type`.
+//
+// USAGE
+//   node scripts/merge_audit/symbol_census.mjs [--merged-root <dir>] [--repo <dir>]
+//        [--ours <ref>] [--theirs <ref>] [--json <out.json>] [--limit <n>]
+//
+// The script's own directory (scripts/merge_audit/) is excluded from the merged scan,
+// so its exports are never EXTRA once committed.
+
+import { spawnSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+// ---------------------------------------------------------------------------------
+// The three refs. base is informational only (the census compares ours UNION theirs
+// against merged); it is printed so a reader of the report has all three in one place.
+// ---------------------------------------------------------------------------------
+
+export const BASE_REF = 'e56707a675013fc1a86bb19d31a0a8d79a02a197';
+export const OURS_REF = 'd5304a78c4a1add6b1ed5a0b66ddb9f8246a4d73';
+export const THEIRS_REF = '8cd964d599ebbb6800fc20741690a0b9b6f17b40';
+
+/** The absorb merge itself (parents OURS_REF and THEIRS_REF). Merge commits AFTER it on
+ *  the branch's first-parent chain are release syncs; their second parents join the
+ *  release parent set. */
+export const ABSORB_MERGE_COMMIT = '424ce89a20a8612b70d52745b02746b7b4f4b886';
+
+/** The third parent: the release/v0.40.0 tip synced at Phase 11d STEP 0 (PR #3549).
+ *  Override with --release when a newer tip has been synced without a merge commit. */
+export const RELEASE_REF = 'f50b30de296945379f8d6076ecc56cca617b8e49';
+
+/** The release tip the branch had ALREADY absorbed before the 11d sync (informational:
+ *  the release delta window for sync-attributed deletions is PRIOR_SYNC_TIP..RELEASE_REF). */
+export const PRIOR_SYNC_TIP = '65b91fa190f1b6d7935ac38774b1742c3e93bc9c';
+
+export const DELETION_LIST_PATH = 'docs/prd/masterwrought/merge-deletion-list.md';
+
+export const EXPORT_ROOTS = Object.freeze(['src', 'server', 'headless', 'bot', 'scripts']);
+export const CONTENT_ROOT = 'src/sim/content';
+export const I18N_CATALOG_ROOT = 'src/ui/i18n.catalog';
+export const SIM_ROOT = 'src/sim';
+export const SIM_EVENT_UNION_FILE = 'src/sim/types.ts';
+export const SIM_EVENT_UNION_NAME = 'SimEvent';
+/** The SimEvent union discriminates on `type`, not `kind` (src/sim/types.ts). */
+export const SIM_EVENT_DISCRIMINANT = 'type';
+
+export const SOURCE_EXTENSIONS = Object.freeze(['.ts', '.mts', '.cts', '.mjs', '.js', '.cjs']);
+/** Directory segments never walked on either side. */
+export const EXCLUDED_DIR_SEGMENTS = Object.freeze(['node_modules', 'dist']);
+/** Path prefixes excluded everywhere: the resolved-i18n artifacts (regenerated, not
+ *  authored) and this script's own directory, scripts/merge_audit/, which also holds
+ *  the phase's sibling audit tools (shard_weight_union.mjs, golden_composition.mjs):
+ *  none of these exist on any parent, so scanning them would only mint EXTRA rows for
+ *  the auditors themselves. */
+export const EXCLUDED_PATH_PREFIXES = Object.freeze([
+  'src/ui/i18n.resolved.generated/',
+  'scripts/merge_audit/',
+]);
+/** Generated artifacts are excluded from every extractor so a concurrent regen
+ *  (wiki content, sfx manifest, translation keys) cannot move a count. */
+export const GENERATED_FILE_RE = /\.generated\.[cm]?[jt]s$/;
+
+export const CLASSES = Object.freeze([
+  'exports',
+  'contentIds',
+  'i18nKeys',
+  'simEventUnion',
+  'simEventEmits',
+]);
+
+export const CLASS_LABELS = Object.freeze({
+  exports: 'exported symbols',
+  contentIds: 'content-table row ids',
+  i18nKeys: 'i18n catalog keys',
+  simEventUnion: 'SimEvent union-declared types',
+  simEventEmits: 'SimEvent emitted types',
+});
+
+/**
+ * Guard 2: minimum size per parent set per class, pinned from the sizes observed at
+ * the 11d pre-run (2026-08-21) rounded DOWN by roughly ten percent. An extractor that
+ * matches nothing (a tokenizer regression, a moved root, a renamed union) fails here
+ * instead of passing by comparing two empty sets. The parents are immutable refs, so
+ * these sizes never move unless an extractor does; the release floor is checked
+ * against EVERY release parent, so it stays a touch lower for later sync tips.
+ * Observed at authoring, 2026-08-21 (release = f50b30de29):
+ *   exports       ours 17329 / theirs 16921 / release 17221
+ *   contentIds    ours  2958 / theirs  2913 / release  2810
+ *   i18nKeys      ours 18008 / theirs 17984 / release 17866
+ *   simEventUnion ours   152 / theirs   159 / release   152
+ *   simEventEmits ours   142 / theirs   148 / release   142
+ */
+export const FLOORS = Object.freeze({
+  exports: Object.freeze({ ours: 15500, theirs: 15200, release: 15400 }),
+  contentIds: Object.freeze({ ours: 2650, theirs: 2600, release: 2500 }),
+  i18nKeys: Object.freeze({ ours: 16200, theirs: 16100, release: 16000 }),
+  simEventUnion: Object.freeze({ ours: 136, theirs: 143, release: 136 }),
+  simEventEmits: Object.freeze({ ours: 127, theirs: 133, release: 127 }),
+});
+
+/**
+ * The explained-extras allowlist: every name present in the merged tree on NEITHER
+ * parent must be here, with the phase and ruling that authored it. An EXTRA with no
+ * row is a duplicate definition or a stale copy (the extraction-versus-in-place class
+ * the merge produces with zero conflict markers) and fails the census. Keep this list
+ * and the "Explained extras" section of the deletion list in step.
+ */
+export const EXPLAINED_EXTRAS = Object.freeze([
+  {
+    cls: 'exports',
+    name: 'WELL_FED_AURA_ID',
+    phase: '11c',
+    ruling: '11b-D-2 / 11c-D-2',
+    reason:
+      'the one aura id seam constant (src/sim/wellfed.ts); replaces the retired per-kind wellfed_<kind> ids',
+  },
+  {
+    cls: 'exports',
+    name: 'applyWellFedOnMealComplete',
+    phase: '11c',
+    ruling: '11b-D-2 / 11c-D-2',
+    reason:
+      'rename of theirs applyWellfedOnConsumeComplete (src/sim/wellfed.ts) when the module became the one mint',
+  },
+  {
+    cls: 'exports',
+    name: 'FoodConsuming',
+    phase: '11c QA',
+    ruling: '11c QA should-fix (architecture): Consuming kind-scoped',
+    reason:
+      'the food arm of the Consuming union (src/sim/types.ts); Consuming itself survives as the alias',
+  },
+  {
+    cls: 'exports',
+    name: 'DrinkConsuming',
+    phase: '11c QA',
+    ruling: '11c QA should-fix (architecture): Consuming kind-scoped',
+    reason: 'the drink arm of the Consuming union (src/sim/types.ts)',
+  },
+  {
+    cls: 'exports',
+    name: 'ConsumableDefFacts',
+    phase: '11c',
+    ruling: '11c-A2-BUILDER',
+    reason: 'the builder parameter type of the new src/sim/consuming.ts module',
+  },
+  {
+    cls: 'exports',
+    name: 'buildConsuming',
+    phase: '11c',
+    ruling: '11c-A2-BUILDER',
+    reason: 'the one Consuming build site (src/sim/consuming.ts), a new module on the merged tree',
+  },
+]);
+
+// ---------------------------------------------------------------------------------
+// Tokenizer: a conservative JS/TS lexer. Comments are dropped, string and template
+// literals are single tokens, regex literals are recognized only where the previous
+// token allows an expression AND the literal closes on the same line. Anything it
+// cannot classify becomes a one-character punct token, so a misread is bounded.
+// ---------------------------------------------------------------------------------
+
+const PUNCT_MULTI = [
+  '>>>=',
+  '...',
+  '===',
+  '!==',
+  '**=',
+  '<<=',
+  '>>=',
+  '>>>',
+  '&&=',
+  '||=',
+  '??=',
+  '=>',
+  '?.',
+  '==',
+  '!=',
+  '<=',
+  '>=',
+  '&&',
+  '||',
+  '??',
+  '++',
+  '--',
+  '+=',
+  '-=',
+  '*=',
+  '/=',
+  '%=',
+  '&=',
+  '|=',
+  '^=',
+  '<<',
+  '>>',
+  '**',
+];
+
+const REGEX_AFTER_KEYWORD = new Set([
+  'return',
+  'typeof',
+  'instanceof',
+  'in',
+  'of',
+  'new',
+  'delete',
+  'void',
+  'throw',
+  'case',
+  'do',
+  'else',
+  'yield',
+  'await',
+]);
+
+const ID_START = /[A-Za-z_$#À-￿]/;
+const ID_PART = /[A-Za-z0-9_$À-￿]/;
+
+function regexAllowedAfter(prev) {
+  if (!prev) return true;
+  if (prev.t === 'punct') return prev.v !== ')' && prev.v !== ']';
+  if (prev.t === 'id') return REGEX_AFTER_KEYWORD.has(prev.v);
+  return false;
+}
+
+/**
+ * Tokenize JS/TS source.
+ * @param {string} src
+ * @returns {Array<{t:'id'|'str'|'tpl'|'num'|'regex'|'punct', v:string, line:number, hasSubst?:boolean}>}
+ */
+export function tokenize(src) {
+  const out = [];
+  const n = src.length;
+  let i = 0;
+  let line = 1;
+
+  const push = (t, v, extra) => {
+    const tok = { t, v, line };
+    if (extra) Object.assign(tok, extra);
+    out.push(tok);
+    return tok;
+  };
+
+  /** Scan a template literal starting at the opening backtick; returns the index
+   *  after the closing backtick. Substitutions are tokenized recursively by a nested
+   *  scan of the same source (brace-balanced) and discarded. */
+  const scanTemplate = (start) => {
+    let j = start + 1;
+    let text = '';
+    let hasSubst = false;
+    while (j < n) {
+      const ch = src[j];
+      if (ch === '\\') {
+        text += src[j] + (src[j + 1] ?? '');
+        j += 2;
+        continue;
+      }
+      if (ch === '`') {
+        return { end: j + 1, text, hasSubst };
+      }
+      if (ch === '$' && src[j + 1] === '{') {
+        hasSubst = true;
+        text += '${}';
+        j = scanBalanced(j + 2);
+        continue;
+      }
+      if (ch === '\n') line++;
+      text += ch;
+      j++;
+    }
+    return { end: n, text, hasSubst };
+  };
+
+  /** From just after a `${`, consume tokens until the matching `}` and return the
+   *  index after it. Nested strings, templates, comments, and braces are honored. */
+  const scanBalanced = (start) => {
+    let depth = 1;
+    let j = start;
+    let prev = null;
+    while (j < n) {
+      const ch = src[j];
+      if (ch === '\n') {
+        line++;
+        j++;
+        continue;
+      }
+      if (ch === ' ' || ch === '\t' || ch === '\r') {
+        j++;
+        continue;
+      }
+      if (ch === '/' && src[j + 1] === '/') {
+        while (j < n && src[j] !== '\n') j++;
+        continue;
+      }
+      if (ch === '/' && src[j + 1] === '*') {
+        const close = src.indexOf('*/', j + 2);
+        const endc = close < 0 ? n : close + 2;
+        for (let k = j; k < endc; k++) if (src[k] === '\n') line++;
+        j = endc;
+        continue;
+      }
+      if (ch === "'" || ch === '"') {
+        j = scanString(j).end;
+        prev = { t: 'str' };
+        continue;
+      }
+      if (ch === '`') {
+        j = scanTemplate(j).end;
+        prev = { t: 'tpl' };
+        continue;
+      }
+      if (ch === '{') {
+        depth++;
+        prev = { t: 'punct', v: '{' };
+        j++;
+        continue;
+      }
+      if (ch === '}') {
+        depth--;
+        if (depth === 0) return j + 1;
+        prev = { t: 'punct', v: '}' };
+        j++;
+        continue;
+      }
+      if (ch === '/' && regexAllowedAfter(prev)) {
+        const r = scanRegex(j);
+        if (r) {
+          j = r.end;
+          prev = { t: 'regex' };
+          continue;
+        }
+      }
+      if (ID_START.test(ch)) {
+        let k = j + 1;
+        while (k < n && ID_PART.test(src[k])) k++;
+        prev = { t: 'id', v: src.slice(j, k) };
+        j = k;
+        continue;
+      }
+      prev = { t: 'punct', v: ch };
+      j++;
+    }
+    return n;
+  };
+
+  /** Scan a quoted string starting at the quote; unterminated strings end at EOL. */
+  const scanString = (start) => {
+    const q = src[start];
+    let j = start + 1;
+    let text = '';
+    while (j < n) {
+      const ch = src[j];
+      if (ch === '\\') {
+        const nx = src[j + 1] ?? '';
+        if (nx === '\n') {
+          line++;
+        } else if (nx === 'n') text += '\n';
+        else if (nx === 't') text += '\t';
+        else text += nx;
+        j += 2;
+        continue;
+      }
+      if (ch === q) return { end: j + 1, text };
+      if (ch === '\n') return { end: j, text };
+      text += ch;
+      j++;
+    }
+    return { end: n, text };
+  };
+
+  /** Scan a regex literal at `/`; null when it does not close on this line. */
+  const scanRegex = (start) => {
+    let j = start + 1;
+    let inClass = false;
+    while (j < n) {
+      const ch = src[j];
+      if (ch === '\n') return null;
+      if (ch === '\\') {
+        j += 2;
+        continue;
+      }
+      if (inClass) {
+        if (ch === ']') inClass = false;
+        j++;
+        continue;
+      }
+      if (ch === '[') {
+        inClass = true;
+        j++;
+        continue;
+      }
+      if (ch === '/') {
+        j++;
+        while (j < n && /[a-z]/.test(src[j])) j++;
+        return { end: j, text: src.slice(start, j) };
+      }
+      j++;
+    }
+    return null;
+  };
+
+  while (i < n) {
+    const ch = src[i];
+    if (ch === '\n') {
+      line++;
+      i++;
+      continue;
+    }
+    if (ch === ' ' || ch === '\t' || ch === '\r' || ch === '\f' || ch === '\v') {
+      i++;
+      continue;
+    }
+    if (ch === '/' && src[i + 1] === '/') {
+      while (i < n && src[i] !== '\n') i++;
+      continue;
+    }
+    if (ch === '/' && src[i + 1] === '*') {
+      const close = src.indexOf('*/', i + 2);
+      const end = close < 0 ? n : close + 2;
+      for (let k = i; k < end; k++) if (src[k] === '\n') line++;
+      i = end;
+      continue;
+    }
+    if (ch === "'" || ch === '"') {
+      const s = scanString(i);
+      push('str', s.text);
+      i = s.end;
+      continue;
+    }
+    if (ch === '`') {
+      const startLine = line;
+      const tpl = scanTemplate(i);
+      const tok = { t: 'tpl', v: tpl.text, line: startLine, hasSubst: tpl.hasSubst };
+      out.push(tok);
+      i = tpl.end;
+      continue;
+    }
+    if (ch === '/' && regexAllowedAfter(out[out.length - 1] ?? null)) {
+      const r = scanRegex(i);
+      if (r) {
+        push('regex', r.text);
+        i = r.end;
+        continue;
+      }
+    }
+    if (/[0-9]/.test(ch) || (ch === '.' && /[0-9]/.test(src[i + 1] ?? ''))) {
+      let k = i + 1;
+      while (k < n && /[0-9A-Za-z_.]/.test(src[k])) {
+        // Exponent sign: 1e-5.
+        if ((src[k] === 'e' || src[k] === 'E') && (src[k + 1] === '-' || src[k + 1] === '+')) k++;
+        k++;
+      }
+      push('num', src.slice(i, k));
+      i = k;
+      continue;
+    }
+    if (ID_START.test(ch)) {
+      let k = i + 1;
+      while (k < n && ID_PART.test(src[k])) k++;
+      push('id', src.slice(i, k));
+      i = k;
+      continue;
+    }
+    let matched = false;
+    for (const p of PUNCT_MULTI) {
+      if (src.startsWith(p, i)) {
+        push('punct', p);
+        i += p.length;
+        matched = true;
+        break;
+      }
+    }
+    if (matched) continue;
+    push('punct', ch);
+    i++;
+  }
+  return out;
+}
+
+/** Extractors accept either source text or an already-tokenized array. */
+function toTokens(srcOrTokens) {
+  return Array.isArray(srcOrTokens) ? srcOrTokens : tokenize(srcOrTokens);
+}
+
+function isPunct(tok, v) {
+  return !!tok && tok.t === 'punct' && tok.v === v;
+}
+function isId(tok, v) {
+  return !!tok && tok.t === 'id' && (v === undefined || tok.v === v);
+}
+
+const OPENERS = { '{': '}', '(': ')', '[': ']' };
+const CLOSERS = new Set(['}', ')', ']']);
+
+/** Index of the token matching the opener at `i`, or tokens.length when unbalanced. */
+function matchingClose(tokens, i) {
+  const stack = [];
+  for (let j = i; j < tokens.length; j++) {
+    const tok = tokens[j];
+    if (tok.t !== 'punct') continue;
+    if (OPENERS[tok.v]) stack.push(OPENERS[tok.v]);
+    else if (CLOSERS.has(tok.v)) {
+      // A stray closer that does not match the top (a lexer misread) is skipped.
+      if (stack.length && stack[stack.length - 1] === tok.v) stack.pop();
+      if (!stack.length) return j;
+    }
+  }
+  return tokens.length;
+}
+
+/** From `i` (a member start), skip forward to the index of the next `,` at this depth
+ *  or of the enclosing closer (returned index points AT that token). */
+function skipToMemberEnd(tokens, i) {
+  let depth = 0;
+  for (let j = i; j < tokens.length; j++) {
+    const tok = tokens[j];
+    if (tok.t !== 'punct') continue;
+    if (OPENERS[tok.v]) depth++;
+    else if (CLOSERS.has(tok.v)) {
+      if (depth === 0) return j;
+      depth--;
+    } else if (tok.v === ',' && depth === 0) return j;
+  }
+  return tokens.length;
+}
+
+// ---------------------------------------------------------------------------------
+// Extractor 1: exported symbol names.
+// ---------------------------------------------------------------------------------
+
+const DECL_MODIFIERS = new Set(['declare', 'abstract', 'async']);
+const NAMED_DECL_KEYWORDS = new Set([
+  'class',
+  'interface',
+  'type',
+  'enum',
+  'namespace',
+  'module',
+  'import',
+]);
+
+/** Local binding names introduced by `import` statements (default, namespace, named). */
+function collectImportBindings(tokens) {
+  const out = new Set();
+  for (let i = 0; i < tokens.length; i++) {
+    if (!isId(tokens[i], 'import') || isPunct(tokens[i - 1], '.')) continue;
+    // `export import X = ...` and dynamic `import(` are not bindings of this form.
+    if (isPunct(tokens[i + 1], '(')) continue;
+    let j = i + 1;
+    if (isId(tokens[j], 'type') && !isPunct(tokens[j + 1], ',') && !isId(tokens[j + 1], 'from'))
+      j++;
+    while (j < tokens.length) {
+      const tok = tokens[j];
+      if (tok.t === 'str') break; // bare `import 'side-effect'` or the module specifier
+      if (isId(tok, 'from')) break;
+      if (isPunct(tok, '*')) {
+        if (isId(tokens[j + 1], 'as') && isId(tokens[j + 2])) out.add(tokens[j + 2].v);
+        j += 3;
+        continue;
+      }
+      if (isPunct(tok, '{')) {
+        const close = matchingClose(tokens, j);
+        let k = j + 1;
+        while (k < close) {
+          const entry = [];
+          while (k < close && !isPunct(tokens[k], ',')) entry.push(tokens[k++]);
+          k++;
+          let e = 0;
+          if (isId(entry[e], 'type') && entry.length > 1) e++;
+          if (!entry[e]) continue;
+          const local = isId(entry[e + 1], 'as') && entry[e + 2] ? entry[e + 2] : entry[e];
+          if (local.t === 'id') out.add(local.v);
+        }
+        j = close + 1;
+        continue;
+      }
+      if (tok.t === 'id') {
+        out.add(tok.v);
+        j++;
+        continue;
+      }
+      j++;
+    }
+  }
+  return out;
+}
+
+/**
+ * @param {string} src
+ * @returns {{ names: string[], reexports: string[], limits: Record<string, number> }}
+ */
+export function extractExports(src) {
+  const tokens = toTokens(src);
+  const names = [];
+  /** Names this file only re-exports (`export { x } from`, `export * as ns from`, or a
+   *  local `export { x }` of an imported binding): present by name, but not a
+   *  definition for the duplicate-definition report. */
+  const reexports = [];
+  const imported = collectImportBindings(tokens);
+  const limits = {
+    exportStar: 0,
+    exportDefault: 0,
+    exportEquals: 0,
+    destructured: 0,
+    anonymous: 0,
+    unrecognized: 0,
+    commonJs: 0,
+  };
+  for (let i = 0; i < tokens.length; i++) {
+    const tok = tokens[i];
+    if (tok.t === 'id' && tok.v === 'module' && isPunct(tokens[i + 1], '.')) {
+      if (isId(tokens[i + 2], 'exports')) limits.commonJs++;
+      continue;
+    }
+    if (!isId(tok, 'export')) continue;
+    if (isPunct(tokens[i - 1], '.')) continue;
+    let j = i + 1;
+    const next = tokens[j];
+    if (!next) break;
+    if (isId(next, 'default')) {
+      limits.exportDefault++;
+      continue;
+    }
+    if (isPunct(next, '*')) {
+      if (isId(tokens[j + 1], 'as') && tokens[j + 2]) {
+        names.push(tokens[j + 2].v);
+        reexports.push(tokens[j + 2].v);
+      } else {
+        limits.exportStar++;
+      }
+      continue;
+    }
+    if (isPunct(next, '=')) {
+      limits.exportEquals++;
+      continue;
+    }
+    if (isPunct(next, '{') || (isId(next, 'type') && isPunct(tokens[j + 1], '{'))) {
+      const open = isPunct(next, '{') ? j : j + 1;
+      const close = matchingClose(tokens, open);
+      const isReexport = isId(tokens[close + 1], 'from');
+      // Entries: [type] name [as exported] separated by commas.
+      let k = open + 1;
+      while (k < close) {
+        const entry = [];
+        while (k < close && !isPunct(tokens[k], ',')) {
+          entry.push(tokens[k]);
+          k++;
+        }
+        k++;
+        if (!entry.length) continue;
+        let e = 0;
+        if (isId(entry[e], 'type') && entry.length > 1) e++;
+        const local = entry[e];
+        if (!local) continue;
+        let exported = local;
+        if (isId(entry[e + 1], 'as') && entry[e + 2]) exported = entry[e + 2];
+        if (exported.t === 'id' || exported.t === 'str') {
+          names.push(exported.v);
+          if (isReexport || (local.t === 'id' && imported.has(local.v))) reexports.push(exported.v);
+        }
+      }
+      continue;
+    }
+    while (isId(tokens[j]) && DECL_MODIFIERS.has(tokens[j].v)) j++;
+    let kw = tokens[j];
+    if (!kw) break;
+    if (isId(kw, 'const') && isId(tokens[j + 1], 'enum')) {
+      j++;
+      kw = tokens[j];
+    }
+    if (isId(kw, 'const') || isId(kw, 'let') || isId(kw, 'var')) {
+      const target = tokens[j + 1];
+      if (!target) break;
+      if (target.t === 'id') {
+        names.push(target.v);
+      } else if (isPunct(target, '{') || isPunct(target, '[')) {
+        limits.destructured++;
+        const close = matchingClose(tokens, j + 1);
+        for (let k = j + 2; k < close; k++) {
+          const t = tokens[k];
+          if (t.t !== 'id') continue;
+          const after = tokens[k + 1];
+          // `a: b` binds b (skip the key a); `a`, `a = x`, `...a` bind a.
+          if (isPunct(after, ':')) continue;
+          if (isPunct(after, ',') || isPunct(after, '=') || k + 1 === close) names.push(t.v);
+          else if (isPunct(after, '}') || isPunct(after, ']')) names.push(t.v);
+        }
+      } else {
+        limits.unrecognized++;
+      }
+      continue;
+    }
+    if (isId(kw, 'function')) {
+      let k = j + 1;
+      if (isPunct(tokens[k], '*')) k++;
+      if (isId(tokens[k])) names.push(tokens[k].v);
+      else limits.anonymous++;
+      continue;
+    }
+    if (kw.t === 'id' && NAMED_DECL_KEYWORDS.has(kw.v)) {
+      const name = tokens[j + 1];
+      if (isId(name)) names.push(name.v);
+      else if (name && name.t === 'str' && kw.v === 'module') {
+        // `export declare module 'x' {}` ambient: no symbol name.
+        limits.unrecognized++;
+      } else limits.anonymous++;
+      continue;
+    }
+    limits.unrecognized++;
+  }
+  return { names, reexports, limits };
+}
+
+// ---------------------------------------------------------------------------------
+// Extractor 2: content-table row ids (`id: 'x'` / "x" / `x` without substitutions).
+// ---------------------------------------------------------------------------------
+
+/**
+ * @param {string} src
+ * @returns {{ ids: string[], nonLiteral: number, annotationLike: number }}
+ */
+export function extractContentIds(src) {
+  const tokens = toTokens(src);
+  const ids = [];
+  let nonLiteral = 0;
+  let annotationLike = 0;
+  for (let i = 0; i + 2 < tokens.length; i++) {
+    const tok = tokens[i];
+    const isKey = (tok.t === 'id' && tok.v === 'id') || (tok.t === 'str' && tok.v === 'id');
+    if (!isKey) continue;
+    if (!isPunct(tokens[i + 1], ':')) continue;
+    if (isPunct(tokens[i - 1], '.') || isPunct(tokens[i - 1], '?.')) continue;
+    const value = tokens[i + 2];
+    if (value.t === 'str' || (value.t === 'tpl' && !value.hasSubst)) {
+      ids.push(value.v);
+    } else {
+      nonLiteral++;
+      if (value.t === 'id' && (value.v === 'string' || value.v === 'number')) annotationLike++;
+    }
+  }
+  return { ids, nonLiteral, annotationLike };
+}
+
+// ---------------------------------------------------------------------------------
+// Extractor 3: i18n catalog leaf key paths (dotted), by a textual walk of every
+// top-level `= {` object literal in the file.
+// ---------------------------------------------------------------------------------
+
+const STATEMENT_START_KEYWORDS = new Set([
+  'const',
+  'let',
+  'var',
+  'type',
+  'interface',
+  'function',
+  'class',
+  'enum',
+]);
+
+/**
+ * @param {string} src
+ * @returns {{ keys: string[], spread: number, computed: number, nonLiteralLeaves: number,
+ *            methods: number, shorthand: number, roots: number }}
+ */
+export function extractI18nKeys(src) {
+  const tokens = toTokens(src);
+  const keys = [];
+  const stats = {
+    spread: 0,
+    computed: 0,
+    nonLiteralLeaves: 0,
+    methods: 0,
+    shorthand: 0,
+    roots: 0,
+    typeLiteralRootsSkipped: 0,
+  };
+
+  const walkObject = (open, prefix) => {
+    let i = open + 1;
+    while (i < tokens.length) {
+      const tok = tokens[i];
+      if (isPunct(tok, '}')) return i;
+      if (isPunct(tok, ',') || isPunct(tok, ';')) {
+        i++;
+        continue;
+      }
+      if (isPunct(tok, '...')) {
+        stats.spread++;
+        i = skipToMemberEnd(tokens, i + 1);
+        continue;
+      }
+      if (isPunct(tok, '[')) {
+        stats.computed++;
+        i = skipToMemberEnd(tokens, i);
+        continue;
+      }
+      if (isPunct(tok, '*')) {
+        stats.methods++;
+        i = skipToMemberEnd(tokens, i);
+        continue;
+      }
+      if ((isId(tok, 'get') || isId(tok, 'set') || isId(tok, 'async')) && isId(tokens[i + 1])) {
+        stats.methods++;
+        i = skipToMemberEnd(tokens, i);
+        continue;
+      }
+      if (tok.t !== 'id' && tok.t !== 'str' && tok.t !== 'num') {
+        i = skipToMemberEnd(tokens, i);
+        continue;
+      }
+      const key = tok.v;
+      const next = tokens[i + 1];
+      if (isPunct(next, ':')) {
+        const value = tokens[i + 2];
+        if (isPunct(value, '{')) {
+          const close = walkObject(i + 2, [...prefix, key]);
+          i = skipToMemberEnd(tokens, close + 1);
+          continue;
+        }
+        if (value && (value.t === 'str' || value.t === 'tpl')) {
+          keys.push([...prefix, key].join('.'));
+        } else {
+          stats.nonLiteralLeaves++;
+        }
+        i = skipToMemberEnd(tokens, i + 2);
+        continue;
+      }
+      if (isPunct(next, '(')) {
+        stats.methods++;
+        i = skipToMemberEnd(tokens, i);
+        continue;
+      }
+      if (isPunct(next, ',') || isPunct(next, '}')) {
+        stats.shorthand++;
+        i++;
+        continue;
+      }
+      i = skipToMemberEnd(tokens, i);
+    }
+    return i;
+  };
+
+  // A root is every depth-0 `= {` whose statement is not a `type` alias (a type
+  // literal's members are shapes, not keys).
+  let depth = 0;
+  let lastStatementKeyword = null;
+  for (let i = 0; i < tokens.length; i++) {
+    const tok = tokens[i];
+    if (tok.t === 'id') {
+      if (depth === 0 && STATEMENT_START_KEYWORDS.has(tok.v)) lastStatementKeyword = tok.v;
+      continue;
+    }
+    if (tok.t !== 'punct') continue;
+    if (depth === 0 && tok.v === '=' && isPunct(tokens[i + 1], '{')) {
+      if (lastStatementKeyword === 'type' || lastStatementKeyword === 'interface') {
+        stats.typeLiteralRootsSkipped++;
+        i = matchingClose(tokens, i + 1);
+        continue;
+      }
+      stats.roots++;
+      const close = walkObject(i + 1, []);
+      i = close;
+      continue;
+    }
+    if (OPENERS[tok.v]) depth++;
+    else if (CLOSERS.has(tok.v)) depth = Math.max(0, depth - 1);
+  }
+  return { keys, ...stats };
+}
+
+// ---------------------------------------------------------------------------------
+// Extractor 4a: the SimEvent union's discriminant literals.
+// ---------------------------------------------------------------------------------
+
+const STATEMENT_KEYWORDS = new Set([
+  'export',
+  'import',
+  'type',
+  'interface',
+  'const',
+  'let',
+  'var',
+  'function',
+  'class',
+  'enum',
+  'declare',
+]);
+
+/** Locate `[export] type <name> =` and return the token range of its right-hand side. */
+function aliasRange(tokens, name) {
+  for (let i = 0; i + 2 < tokens.length; i++) {
+    if (!isId(tokens[i], 'type') || !isId(tokens[i + 1], name) || !isPunct(tokens[i + 2], '='))
+      continue;
+    if (isPunct(tokens[i - 1], '.')) continue;
+    const start = i + 3;
+    let depth = 0;
+    let j = start;
+    for (; j < tokens.length; j++) {
+      const tok = tokens[j];
+      if (tok.t === 'punct') {
+        if (OPENERS[tok.v]) depth++;
+        else if (CLOSERS.has(tok.v)) depth--;
+        else if (tok.v === ';' && depth <= 0) break;
+      } else if (
+        depth <= 0 &&
+        tok.t === 'id' &&
+        STATEMENT_KEYWORDS.has(tok.v) &&
+        tokens[j].line > tokens[j - 1].line
+      ) {
+        break;
+      }
+    }
+    return { start, end: j };
+  }
+  return null;
+}
+
+/** Discriminant literals at brace depth 1 of the range, plus bare alias member names. */
+function unionMembers(tokens, range, discriminant) {
+  const kinds = [];
+  const aliases = [];
+  const unresolved = [];
+  let depth = 0;
+  for (let i = range.start; i < range.end; i++) {
+    const tok = tokens[i];
+    if (tok.t === 'punct') {
+      if (tok.v === '{') depth++;
+      else if (tok.v === '}') depth--;
+      continue;
+    }
+    if (tok.t !== 'id') continue;
+    if (depth === 1 && tok.v === discriminant && isPunct(tokens[i + 1], ':')) {
+      const v = tokens[i + 2];
+      if (v && v.t === 'str') kinds.push(v.v);
+      continue;
+    }
+    if (depth === 0) {
+      const prev = tokens[i - 1];
+      const next = tokens[i + 1];
+      const prevOk =
+        isPunct(prev, '|') || isPunct(prev, '(') || isPunct(prev, '=') || isPunct(prev, '&');
+      const nextOk =
+        !next ||
+        isPunct(next, '|') ||
+        isPunct(next, ')') ||
+        isPunct(next, ';') ||
+        isPunct(next, '&');
+      if (prevOk && nextOk) aliases.push(tok.v);
+      else unresolved.push(`${tok.v}?`);
+    }
+  }
+  return { kinds, aliases, unresolved };
+}
+
+/**
+ * @param {string} src the file holding the union (src/sim/types.ts)
+ * @param {string} [unionName]
+ * @returns {{ kinds: string[], resolvedAliases: string[], unresolvedAliases: string[] }}
+ */
+export function extractSimEventUnion(src, unionName = SIM_EVENT_UNION_NAME) {
+  const tokens = toTokens(src);
+  const kinds = [];
+  const resolvedAliases = [];
+  const unresolvedAliases = [];
+  const visited = new Set();
+  const visit = (name) => {
+    if (visited.has(name)) return;
+    visited.add(name);
+    const range = aliasRange(tokens, name);
+    if (!range) {
+      unresolvedAliases.push(name);
+      return;
+    }
+    if (name !== unionName) resolvedAliases.push(name);
+    const members = unionMembers(tokens, range, SIM_EVENT_DISCRIMINANT);
+    kinds.push(...members.kinds);
+    unresolvedAliases.push(...members.unresolved);
+    for (const a of members.aliases) visit(a);
+  };
+  visit(unionName);
+  return { kinds, resolvedAliases, unresolvedAliases };
+}
+
+// ---------------------------------------------------------------------------------
+// Extractor 4b: SimEvent emit sites (`<recv>.emit({ type: 'x' ... })`, bare
+// `emit({ ... })`, `events.push({ ... })`).
+// ---------------------------------------------------------------------------------
+
+/**
+ * @param {string} src
+ * @returns {{ kinds: string[], sites: number, nonLiteral: number, declarations: number,
+ *            helpers: Record<string, number> }}
+ */
+export function extractSimEventEmits(src) {
+  const tokens = toTokens(src);
+  const kinds = [];
+  const helpers = {};
+  let sites = 0;
+  let nonLiteral = 0;
+  let declarations = 0;
+  for (let i = 0; i + 1 < tokens.length; i++) {
+    const tok = tokens[i];
+    if (tok.t !== 'id') continue;
+    if (!isPunct(tokens[i + 1], '(')) continue;
+    let helper = null;
+    if (tok.v === 'emit') {
+      if (isPunct(tokens[i - 1], '.') || isPunct(tokens[i - 1], '?.')) {
+        // Build the dotted receiver chain: this.ctx.emit -> "this.ctx.emit(".
+        const chain = [];
+        let k = i - 1;
+        while ((isPunct(tokens[k], '.') || isPunct(tokens[k], '?.')) && isId(tokens[k - 1])) {
+          chain.unshift(tokens[k - 1].v);
+          k -= 2;
+        }
+        helper = `${chain.join('.')}.emit(`;
+      } else {
+        helper = 'emit(';
+      }
+    } else if (tok.v === 'push' && isPunct(tokens[i - 1], '.') && isId(tokens[i - 2], 'events')) {
+      helper = 'events.push(';
+    }
+    if (!helper) continue;
+    const first = tokens[i + 2];
+    if (!first) break;
+    // A declaration (`emit(ev: SimEvent)`, `emit(ev?: ...)`) is not a site.
+    if (first.t === 'id' && (isPunct(tokens[i + 3], ':') || isPunct(tokens[i + 3], '?'))) {
+      declarations++;
+      continue;
+    }
+    if (isPunct(first, ')') && helper === 'emit(' && isId(tokens[i - 1], 'function')) {
+      declarations++;
+      continue;
+    }
+    sites++;
+    helpers[helper] = (helpers[helper] ?? 0) + 1;
+    if (!isPunct(first, '{')) {
+      nonLiteral++;
+      continue;
+    }
+    const close = matchingClose(tokens, i + 2);
+    let depth = 0;
+    let found = null;
+    for (let k = i + 3; k < close; k++) {
+      const t = tokens[k];
+      if (t.t === 'punct') {
+        if (OPENERS[t.v]) depth++;
+        else if (CLOSERS.has(t.v)) depth--;
+        continue;
+      }
+      if (
+        depth === 0 &&
+        t.t === 'id' &&
+        t.v === SIM_EVENT_DISCRIMINANT &&
+        isPunct(tokens[k + 1], ':') &&
+        tokens[k + 2] &&
+        tokens[k + 2].t === 'str'
+      ) {
+        found = tokens[k + 2].v;
+        break;
+      }
+    }
+    if (found === null) nonLiteral++;
+    else kinds.push(found);
+  }
+  return { kinds, sites, nonLiteral, declarations, helpers };
+}
+
+// ---------------------------------------------------------------------------------
+// The deletion list: a Markdown table the script consumes. Columns (any order, matched
+// by header text, case-insensitive): Class | Old name | New name | Phase | Ruling |
+// Reason. Class is one of: export, content id, i18n key, simevent union, simevent
+// emit, literal-only. Only census classes are consumed; literal-only rows are records.
+// ---------------------------------------------------------------------------------
+
+const CLASS_BY_LABEL = Object.freeze({
+  export: 'exports',
+  exports: 'exports',
+  'content id': 'contentIds',
+  'content ids': 'contentIds',
+  'i18n key': 'i18nKeys',
+  'i18n keys': 'i18nKeys',
+  'simevent union': 'simEventUnion',
+  'simevent emit': 'simEventEmits',
+  'simevent emits': 'simEventEmits',
+  'literal-only': null,
+  'literal only': null,
+});
+
+function cleanCell(s) {
+  return String(s ?? '')
+    .trim()
+    .replace(/^`|`$/g, '')
+    .trim();
+}
+
+/**
+ * @param {string} markdown
+ * @returns {{ rows: Array<{cls: string|null, classLabel: string, oldName: string, newName: string,
+ *            phase: string, ruling: string, reason: string, line: number}>, defects: string[] }}
+ */
+export function parseDeletionList(markdown) {
+  const rows = [];
+  const defects = [];
+  const lines = markdown.split('\n');
+  let columns = null;
+  for (let ln = 0; ln < lines.length; ln++) {
+    const raw = lines[ln];
+    const line = raw.trim();
+    if (!line.startsWith('|')) {
+      columns = null;
+      continue;
+    }
+    const cells = line
+      .slice(1, line.endsWith('|') ? -1 : undefined)
+      .split('|')
+      .map((c) => c.trim());
+    if (!columns) {
+      const lower = cells.map((c) => c.toLowerCase());
+      if (lower.includes('class') && lower.includes('old name')) {
+        columns = lower;
+        continue;
+      }
+      continue;
+    }
+    if (cells.every((c) => /^:?-{2,}:?$/.test(c))) continue;
+    const get = (name) => {
+      const idx = columns.indexOf(name);
+      return idx >= 0 ? cleanCell(cells[idx]) : '';
+    };
+    const classLabel = get('class').toLowerCase();
+    const cls = CLASS_BY_LABEL[classLabel];
+    if (cls === undefined) {
+      defects.push(`line ${ln + 1}: unknown class '${classLabel}'`);
+      continue;
+    }
+    const row = {
+      cls,
+      classLabel,
+      oldName: get('old name'),
+      newName: get('new name'),
+      phase: get('phase'),
+      ruling: get('ruling'),
+      reason: get('reason'),
+      line: ln + 1,
+    };
+    if (!row.phase || !row.ruling) defects.push(`line ${ln + 1}: phase and ruling are required`);
+    if (!row.reason || /^deleted\.?$/i.test(row.reason))
+      defects.push(`line ${ln + 1}: a reason saying only 'deleted' (or nothing) is a defect`);
+    if (cls && !row.oldName) defects.push(`line ${ln + 1}: a census-class row needs an old name`);
+    rows.push(row);
+  }
+  return { rows, defects };
+}
+
+// ---------------------------------------------------------------------------------
+// Tree readers: the merged side from disk, the parents through git plumbing.
+// ---------------------------------------------------------------------------------
+
+function toPosix(p) {
+  return p.split(path.sep).join('/');
+}
+
+/** True when a repo-relative path is in scope for the census at all. */
+export function isCensusPath(relPath) {
+  const p = toPosix(relPath);
+  const ext = path.posix.extname(p);
+  if (!SOURCE_EXTENSIONS.includes(ext)) return false;
+  if (GENERATED_FILE_RE.test(p)) return false;
+  if (p.split('/').some((seg) => EXCLUDED_DIR_SEGMENTS.includes(seg))) return false;
+  if (EXCLUDED_PATH_PREFIXES.some((prefix) => p.startsWith(prefix))) return false;
+  return true;
+}
+
+function underRoot(relPath, root) {
+  return relPath === root || relPath.startsWith(`${root}/`);
+}
+
+/** Walk the merged root on disk; returns [relPath, content] pairs for in-scope files. */
+export function readMergedTree(mergedRoot, roots = EXPORT_ROOTS) {
+  const files = [];
+  const walk = (dirAbs, relDir) => {
+    let entries;
+    try {
+      entries = fs.readdirSync(dirAbs, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    entries.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+    for (const ent of entries) {
+      const rel = relDir ? `${relDir}/${ent.name}` : ent.name;
+      if (ent.isDirectory()) {
+        if (EXCLUDED_DIR_SEGMENTS.includes(ent.name)) continue;
+        walk(path.join(dirAbs, ent.name), rel);
+      } else if (ent.isFile() && isCensusPath(rel)) {
+        files.push([rel, fs.readFileSync(path.join(dirAbs, ent.name), 'utf8')]);
+      }
+    }
+  };
+  for (const root of roots) walk(path.join(mergedRoot, root), root);
+  return files;
+}
+
+/** List + read every in-scope file of a ref without a checkout. */
+export function readRefTree(repoDir, ref, roots = EXPORT_ROOTS) {
+  const ls = spawnSync('git', ['ls-tree', '-r', '--name-only', ref, '--', ...roots], {
+    cwd: repoDir,
+    encoding: 'utf8',
+    maxBuffer: 256 * 1024 * 1024,
+  });
+  if (ls.status !== 0) {
+    throw new Error(`git ls-tree failed for ${ref}: ${ls.stderr}`);
+  }
+  const paths = ls.stdout.split('\n').filter((p) => p && isCensusPath(p));
+  const input = paths.map((p) => `${ref}:${p}`).join('\n');
+  const cat = spawnSync('git', ['cat-file', '--batch'], {
+    cwd: repoDir,
+    input,
+    maxBuffer: 2 * 1024 * 1024 * 1024,
+  });
+  if (cat.status !== 0) {
+    throw new Error(`git cat-file --batch failed for ${ref}: ${cat.stderr}`);
+  }
+  const buf = cat.stdout;
+  const files = [];
+  let off = 0;
+  let idx = 0;
+  while (off < buf.length && idx < paths.length) {
+    const nl = buf.indexOf(0x0a, off);
+    if (nl < 0) break;
+    const header = buf.subarray(off, nl).toString('utf8');
+    off = nl + 1;
+    const parts = header.split(' ');
+    if (parts[1] === 'missing' || parts.length < 3) {
+      idx++;
+      continue;
+    }
+    const size = Number(parts[2]);
+    const content = buf.subarray(off, off + size).toString('utf8');
+    off += size + 1;
+    files.push([paths[idx], content]);
+    idx++;
+  }
+  if (files.length !== paths.length) {
+    throw new Error(
+      `git cat-file returned ${files.length} blobs for ${paths.length} paths (${ref})`,
+    );
+  }
+  return files;
+}
+
+// ---------------------------------------------------------------------------------
+// Census over one tree: returns per-class name -> Set<file> maps plus limit counts.
+// ---------------------------------------------------------------------------------
+
+function addName(map, name, file) {
+  let set = map.get(name);
+  if (!set) {
+    set = new Set();
+    map.set(name, set);
+  }
+  set.add(file);
+}
+
+/**
+ * @param {Array<[string, string]>} files [relPath, content]
+ * @returns {{ sets: Record<string, Map<string, Set<string>>>, limits: Record<string, any>,
+ *            contentIdsByPath: Map<string, Set<string>>, fileCounts: Record<string, number> }}
+ */
+export function censusTree(files) {
+  const sets = {
+    exports: new Map(),
+    contentIds: new Map(),
+    i18nKeys: new Map(),
+    simEventUnion: new Map(),
+    simEventEmits: new Map(),
+  };
+  const limits = {
+    exports: {
+      exportStar: 0,
+      exportDefault: 0,
+      exportEquals: 0,
+      destructured: 0,
+      anonymous: 0,
+      unrecognized: 0,
+      commonJs: 0,
+    },
+    contentIds: { nonLiteral: 0, annotationLike: 0, filesWithoutIds: [] },
+    i18nKeys: {
+      spread: 0,
+      computed: 0,
+      nonLiteralLeaves: 0,
+      methods: 0,
+      shorthand: 0,
+      roots: 0,
+      typeLiteralRootsSkipped: 0,
+    },
+    simEventUnion: { resolvedAliases: [], unresolvedAliases: [], unionFound: false },
+    simEventEmits: { sites: 0, nonLiteral: 0, declarations: 0, helpers: {} },
+  };
+  const contentIdsByPath = new Map();
+  /** export name -> files that DEFINE it (re-export-only files excluded). */
+  const exportDefinitions = new Map();
+  const fileCounts = { exports: 0, contentIds: 0, i18nKeys: 0, simEventEmits: 0 };
+  for (const [rel, content] of files) {
+    fileCounts.exports++;
+    const tokens = tokenize(content);
+    const ex = extractExports(tokens);
+    const reexported = new Set(ex.reexports);
+    for (const name of ex.names) {
+      addName(sets.exports, name, rel);
+      if (!reexported.has(name)) addName(exportDefinitions, name, rel);
+    }
+    for (const k of Object.keys(ex.limits)) limits.exports[k] += ex.limits[k];
+
+    if (underRoot(rel, CONTENT_ROOT)) {
+      fileCounts.contentIds++;
+      const c = extractContentIds(tokens);
+      if (!c.ids.length) limits.contentIds.filesWithoutIds.push(rel);
+      for (const id of c.ids) {
+        addName(sets.contentIds, id, rel);
+        addName(contentIdsByPath, `${rel}:${id}`, rel);
+      }
+      limits.contentIds.nonLiteral += c.nonLiteral;
+      limits.contentIds.annotationLike += c.annotationLike;
+    }
+
+    if (underRoot(rel, I18N_CATALOG_ROOT)) {
+      fileCounts.i18nKeys++;
+      const k = extractI18nKeys(tokens);
+      for (const key of k.keys) addName(sets.i18nKeys, key, rel);
+      for (const f of Object.keys(limits.i18nKeys)) limits.i18nKeys[f] += k[f];
+    }
+
+    if (rel === SIM_EVENT_UNION_FILE) {
+      const u = extractSimEventUnion(tokens);
+      limits.simEventUnion.unionFound = u.kinds.length > 0 || u.resolvedAliases.length > 0;
+      limits.simEventUnion.resolvedAliases = u.resolvedAliases;
+      limits.simEventUnion.unresolvedAliases = u.unresolvedAliases;
+      for (const kind of u.kinds) addName(sets.simEventUnion, kind, rel);
+    }
+
+    if (underRoot(rel, SIM_ROOT)) {
+      fileCounts.simEventEmits++;
+      const e = extractSimEventEmits(tokens);
+      for (const kind of e.kinds) addName(sets.simEventEmits, kind, rel);
+      limits.simEventEmits.sites += e.sites;
+      limits.simEventEmits.nonLiteral += e.nonLiteral;
+      limits.simEventEmits.declarations += e.declarations;
+      for (const [h, n] of Object.entries(e.helpers))
+        limits.simEventEmits.helpers[h] = (limits.simEventEmits.helpers[h] ?? 0) + n;
+    }
+  }
+  return { sets, limits, contentIdsByPath, exportDefinitions, fileCounts };
+}
+
+// ---------------------------------------------------------------------------------
+// The comparison.
+// ---------------------------------------------------------------------------------
+
+function sortedKeys(map) {
+  return [...map.keys()].sort();
+}
+
+/** Collapse declaration twins (foo.d.mts beside foo.mjs) to one base for dup counting. */
+function defBase(file) {
+  return file.replace(/\.d\.[cm]?ts$/, '').replace(/\.[cm]?[jt]s$/, '');
+}
+
+/**
+ * @param {object} args
+ * @param {ReturnType<typeof censusTree>} args.ours
+ * @param {ReturnType<typeof censusTree>} args.theirs
+ * @param {ReturnType<typeof censusTree>} args.merged
+ * @param {ReturnType<typeof parseDeletionList>['rows']} args.deletionRows
+ * @param {typeof EXPLAINED_EXTRAS} [args.explainedExtras]
+ * @param {typeof FLOORS} [args.floors]
+ * @param {Array<ReturnType<typeof censusTree>>} [args.releases]
+ * @param {ReturnType<typeof censusTree> | null} [args.base]
+ */
+export function compareCensus({
+  ours,
+  theirs,
+  merged,
+  deletionRows,
+  explainedExtras = EXPLAINED_EXTRAS,
+  floors = FLOORS,
+  /** Census results of the release parents (the synced tip plus any later sync tips). */
+  releases = [],
+  /** Census result of the merge base (informational annotations only). */
+  base = null,
+}) {
+  const perClass = {};
+  const deletionByClass = {};
+  for (const cls of CLASSES) deletionByClass[cls] = new Map();
+  for (const row of deletionRows) {
+    if (row.cls) deletionByClass[row.cls].set(row.oldName, row);
+  }
+  const extrasByClass = {};
+  for (const cls of CLASSES) extrasByClass[cls] = new Map();
+  for (const e of explainedExtras) extrasByClass[e.cls]?.set(e.name, e);
+
+  let failed = false;
+  for (const cls of CLASSES) {
+    const o = ours.sets[cls];
+    const t = theirs.sets[cls];
+    const m = merged.sets[cls];
+    const releaseSets = releases.map((re) => re.sets[cls]);
+    const onRelease = (name) => releaseSets.some((set) => set.has(name));
+    const union = new Set([...o.keys(), ...t.keys()]);
+    for (const set of releaseSets) for (const name of set.keys()) union.add(name);
+    const baseSet = base ? base.sets[cls] : null;
+    const annotate = (name) => {
+      const onRel = releaseSets.length ? onRelease(name) : null;
+      const inBase = baseSet ? baseSet.has(name) : null;
+      return {
+        base: inBase,
+        onRelease: onRel,
+        // A parent-set name absent from merged that NO release parent carries while
+        // base does: the release retired it and a packet parent was behind. Anything
+        // else absent from merged is a packet-authored deletion or rename.
+        attribution: onRel === false && inBase === true ? 'release' : 'packet',
+      };
+    };
+    const missing = [];
+    const deleted = [];
+    for (const name of [...union].sort()) {
+      if (m.has(name)) continue;
+      const row = deletionByClass[cls].get(name);
+      const oursFiles = [...(o.get(name) ?? [])].sort();
+      const theirsFiles = [...(t.get(name) ?? [])].sort();
+      const releaseFiles = [
+        ...new Set(releaseSets.flatMap((set) => [...(set.get(name) ?? [])])),
+      ].sort();
+      const entry = { name, oursFiles, theirsFiles, releaseFiles, ...annotate(name) };
+      if (row) deleted.push({ ...entry, row });
+      else missing.push(entry);
+    }
+    const missingPacket = missing.filter((e) => e.attribution === 'packet');
+    const missingRelease = missing.filter((e) => e.attribution === 'release');
+    const extraExplained = [];
+    const extraUnexplained = [];
+    for (const name of sortedKeys(m)) {
+      if (union.has(name)) continue;
+      const row = extrasByClass[cls].get(name);
+      const files = [...m.get(name)].sort();
+      if (row) extraExplained.push({ name, row, files });
+      else extraUnexplained.push({ name, files });
+    }
+    const unusedExtras = [...extrasByClass[cls].keys()].filter(
+      (name) => !m.has(name) || union.has(name),
+    );
+    const staleDeletionRows = [...deletionByClass[cls].keys()].filter(
+      (name) => m.has(name) || !union.has(name),
+    );
+    const floorOurs = floors[cls]?.ours ?? 0;
+    const floorTheirs = floors[cls]?.theirs ?? 0;
+    const floorRelease = floors[cls]?.release ?? 0;
+    const floorFail =
+      o.size < floorOurs ||
+      t.size < floorTheirs ||
+      releaseSets.some((set) => set.size < floorRelease);
+    const defs = merged.exportDefinitions;
+    const duplicates =
+      cls === 'exports'
+        ? sortedKeys(defs)
+            .filter((name) => new Set([...defs.get(name)].map(defBase)).size > 1)
+            .map((name) => ({ name, files: [...defs.get(name)].sort() }))
+        : [];
+    if (missing.length || extraUnexplained.length || floorFail) failed = true;
+    perClass[cls] = {
+      counts: {
+        ours: o.size,
+        theirs: t.size,
+        release: releaseSets.length ? releaseSets[0].size : 0,
+        union: union.size,
+        merged: m.size,
+        missing: missing.length,
+        missingPacket: missingPacket.length,
+        missingRelease: missingRelease.length,
+        deleted: deleted.length,
+        extra: extraExplained.length + extraUnexplained.length,
+        extraExplained: extraExplained.length,
+        extraUnexplained: extraUnexplained.length,
+      },
+      floors: { ours: floorOurs, theirs: floorTheirs, release: floorRelease, fail: floorFail },
+      missing,
+      missingPacket,
+      missingRelease,
+      deleted,
+      extraExplained,
+      extraUnexplained,
+      unusedExtras,
+      staleDeletionRows,
+      duplicates,
+    };
+  }
+  return { perClass, failed };
+}
+
+// ---------------------------------------------------------------------------------
+// Report formatting.
+// ---------------------------------------------------------------------------------
+
+function fmtList(items, limit, render) {
+  const out = [];
+  const shown = items.slice(0, limit);
+  for (const it of shown) out.push(`    ${render(it)}`);
+  if (items.length > shown.length) out.push(`    ... ${items.length - shown.length} more`);
+  return out;
+}
+
+/**
+ * @param {object} r the result of runCensus
+ * @param {number} [limit] max list rows per section
+ */
+export function formatReport(r, limit = 60) {
+  const L = [];
+  L.push('symbol census (Phase 11d unit 5)');
+  L.push(`  base   ${r.refs.base} (informational)`);
+  L.push(`  ours   ${r.refs.ours}`);
+  L.push(`  theirs ${r.refs.theirs}`);
+  L.push(`  merged ${r.mergedRoot}`);
+  L.push(
+    `  release parent(s) (${r.releaseRefs.length}): ${r.releaseRefs.map((re) => `${re.ref.slice(0, 10)}${re.via ? ` (via merge ${re.via.slice(0, 10)})` : ''}`).join(', ') || '-'}  (prior synced tip ${PRIOR_SYNC_TIP.slice(0, 10)})`,
+  );
+  L.push(
+    `  deletion list ${r.deletionListPath} (${r.deletionRows.length} rows, ${r.deletionConsumed} census-class)`,
+  );
+  L.push(
+    `  files scanned: ours ${r.fileCounts.ours.exports}, theirs ${r.fileCounts.theirs.exports}, merged ${r.fileCounts.merged.exports} (content ${r.fileCounts.merged.contentIds}, catalog ${r.fileCounts.merged.i18nKeys}, sim ${r.fileCounts.merged.simEventEmits} on merged)`,
+  );
+  if (r.deletionDefects.length) {
+    L.push('  DELETION LIST DEFECTS (fail):');
+    for (const d of r.deletionDefects) L.push(`    ${d}`);
+  }
+  L.push('');
+  for (const cls of CLASSES) {
+    const c = r.perClass[cls];
+    const n = c.counts;
+    L.push(`[${cls}] ${CLASS_LABELS[cls]}`);
+    L.push(
+      `  |ours| ${n.ours}  |theirs| ${n.theirs}  |release| ${n.release}  |union| ${n.union}  |merged| ${n.merged}  |missing| ${n.missing} (packet ${n.missingPacket}, release-attributable ${n.missingRelease})  |extra| ${n.extra} (explained ${n.extraExplained}, unexplained ${n.extraUnexplained})  deletion-list hits ${n.deleted}`,
+    );
+    L.push(
+      `  floors: ours >= ${c.floors.ours} (observed ${n.ours}), theirs >= ${c.floors.theirs} (observed ${n.theirs}), release >= ${c.floors.release} (observed ${n.release})  ${c.floors.fail ? 'FAIL' : 'ok'}`,
+    );
+    const where = (m) =>
+      `[ours: ${m.oursFiles.join(', ') || '-'}] [theirs: ${m.theirsFiles.join(', ') || '-'}] [release: ${m.releaseFiles.join(', ') || '-'}] base:${m.base === null ? '?' : m.base ? 'yes' : 'no'}`;
+    L.push(
+      `  MISSING, packet-attributable (${c.missingPacket.length})${c.missingPacket.length ? ' FAIL' : ''}:`,
+    );
+    L.push(...fmtList(c.missingPacket, limit, (m) => `${m.name}  ${where(m)}`));
+    L.push(
+      `  MISSING, release-attributable (${c.missingRelease.length})${c.missingRelease.length ? ' FAIL' : ''}: (no release parent carries it, base does: the release retired it and a packet parent was behind; still needs a deletion-list row)`,
+    );
+    L.push(...fmtList(c.missingRelease, limit, (m) => `${m.name}  ${where(m)}`));
+    L.push(`  deleted per the list (${c.deleted.length}):`);
+    L.push(
+      ...fmtList(
+        c.deleted,
+        limit,
+        (d) =>
+          `${d.name}${d.row.newName ? ` -> ${d.row.newName}` : ''}  (${d.row.phase}, ${d.row.ruling})  ${where(d)}`,
+      ),
+    );
+    L.push(`  EXTRA explained (${c.extraExplained.length}):`);
+    L.push(
+      ...fmtList(
+        c.extraExplained,
+        limit,
+        (e) => `${e.name}  [${e.files.join(', ')}]  (${e.row.phase}, ${e.row.ruling})`,
+      ),
+    );
+    L.push(
+      `  EXTRA unexplained (${c.extraUnexplained.length})${c.extraUnexplained.length ? ' FAIL' : ''}:`,
+    );
+    L.push(...fmtList(c.extraUnexplained, limit, (e) => `${e.name}  [${e.files.join(', ')}]`));
+    if (c.unusedExtras.length)
+      L.push(`  WARN allowlist entries not currently EXTRA: ${c.unusedExtras.join(', ')}`);
+    if (c.staleDeletionRows.length)
+      L.push(
+        `  WARN deletion-list rows not matching a missing name: ${c.staleDeletionRows.join(', ')}`,
+      );
+    if (cls === 'exports') {
+      L.push(
+        `  INFO names DEFINED in more than one merged file (re-export-only files excluded; declaration twins collapsed): ${c.duplicates.length}`,
+      );
+      L.push(...fmtList(c.duplicates, limit, (d) => `${d.name}  [${d.files.join(', ')}]`));
+    }
+    L.push('');
+  }
+  L.push('blind spots (counted, never silent):');
+  for (const side of ['ours', 'theirs', 'merged']) {
+    const lim = r.limits[side];
+    L.push(
+      `  ${side}: exports{star ${lim.exports.exportStar}, default ${lim.exports.exportDefault}, equals ${lim.exports.exportEquals}, destructured ${lim.exports.destructured}, anonymous ${lim.exports.anonymous}, unrecognized ${lim.exports.unrecognized}, commonJs ${lim.exports.commonJs}} contentIds{nonLiteral ${lim.contentIds.nonLiteral} (annotation-like ${lim.contentIds.annotationLike}), filesWithoutIds ${lim.contentIds.filesWithoutIds.length}} i18n{roots ${lim.i18nKeys.roots}, spread ${lim.i18nKeys.spread}, computed ${lim.i18nKeys.computed}, nonLiteralLeaves ${lim.i18nKeys.nonLiteralLeaves}, methods ${lim.i18nKeys.methods}, shorthand ${lim.i18nKeys.shorthand}} union{found ${lim.simEventUnion.unionFound}, aliases ${lim.simEventUnion.resolvedAliases.join('+') || '-'}, unresolved ${lim.simEventUnion.unresolvedAliases.join('+') || '-'}} emits{sites ${lim.simEventEmits.sites}, nonLiteral ${lim.simEventEmits.nonLiteral}, declarations ${lim.simEventEmits.declarations}}`,
+    );
+  }
+  const helpers = r.limits.merged.simEventEmits.helpers;
+  L.push(
+    `  emit helpers seen on merged: ${Object.entries(helpers)
+      .sort((a, b) => b[1] - a[1])
+      .map(([h, n]) => `${h} x${n}`)
+      .join(', ')}`,
+  );
+  L.push(
+    `  merged content files with no plain id literal: ${r.limits.merged.contentIds.filesWithoutIds.join(', ') || '-'}`,
+  );
+  L.push('');
+  L.push(r.failed ? 'RESULT: FAIL' : 'RESULT: PASS');
+  return L.join('\n');
+}
+
+// ---------------------------------------------------------------------------------
+// Driver.
+// ---------------------------------------------------------------------------------
+
+export function parseArgs(argv) {
+  const opts = { oursRef: OURS_REF, theirsRef: THEIRS_REF, limit: 60 };
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i];
+    const val = () => argv[++i];
+    if (a === '--merged-root') opts.mergedRoot = val();
+    else if (a === '--repo') opts.repo = val();
+    else if (a === '--ours') opts.oursRef = val();
+    else if (a === '--theirs') opts.theirsRef = val();
+    else if (a === '--json') opts.json = val();
+    else if (a === '--deletion-list') opts.deletionList = val();
+    else if (a === '--limit') opts.limit = Number(val());
+    else if (a === '--release') opts.releaseRef = val();
+    else if (a === '--sync') {
+      opts.syncRefs = opts.syncRefs ?? [];
+      opts.syncRefs.push(val());
+    } else if (a === '--no-auto-sync') opts.autoSync = false;
+    else if (a === '--no-base') opts.readBase = false;
+    else throw new Error(`unknown argument ${a}`);
+  }
+  return opts;
+}
+
+/**
+ * Later release tips synced after the absorb merge: every merge commit on the branch's
+ * own first-parent chain after ABSORB_MERGE_COMMIT contributes its second parent
+ * (--first-parent, so the release branch's own PR merges that a sync brings along are
+ * not listed twice). RELEASE_REF is always a release parent regardless; this catches
+ * the syncs after it. Returns [] when the range cannot be listed (a detached scratch
+ * repo, the commit missing).
+ * @param {string} repoDir
+ * @param {string} [head]
+ * @returns {Array<{ref: string, via: string}>}
+ */
+export function deriveSyncRefs(repoDir, head = 'HEAD') {
+  const log = spawnSync(
+    'git',
+    ['log', '--first-parent', '--merges', '--format=%H %P', `${ABSORB_MERGE_COMMIT}..${head}`],
+    { cwd: repoDir, encoding: 'utf8' },
+  );
+  if (log.status !== 0) return [];
+  const out = [];
+  for (const line of log.stdout.split('\n')) {
+    const parts = line.trim().split(/\s+/);
+    if (parts.length < 3) continue;
+    const [via, , second] = parts;
+    out.push({ ref: second, via });
+  }
+  return out;
+}
+
+export function repoRootFromScript() {
+  return path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+}
+
+/**
+ * Run the whole census.
+ * @param {object} opts
+ */
+export function runCensus(opts = {}) {
+  const repo = path.resolve(opts.repo ?? repoRootFromScript());
+  const mergedRoot = path.resolve(opts.mergedRoot ?? repo);
+  const deletionListPath = path.resolve(opts.deletionList ?? path.join(repo, DELETION_LIST_PATH));
+  const oursRef = opts.oursRef ?? OURS_REF;
+  const theirsRef = opts.theirsRef ?? THEIRS_REF;
+
+  const releaseRef = opts.releaseRef ?? RELEASE_REF;
+
+  const deletion = parseDeletionList(fs.readFileSync(deletionListPath, 'utf8'));
+  const ours = censusTree(readRefTree(repo, oursRef));
+  const theirs = censusTree(readRefTree(repo, theirsRef));
+  const merged = censusTree(readMergedTree(mergedRoot));
+  // The release parent set: the synced tip, plus the second parent of every later
+  // first-parent merge, plus any --sync additions; resolved to full SHAs and deduped.
+  const resolve = (ref) => {
+    const rev = spawnSync('git', ['rev-parse', `${ref}^{commit}`], {
+      cwd: repo,
+      encoding: 'utf8',
+    });
+    return rev.status === 0 ? rev.stdout.trim() : ref;
+  };
+  const releaseRefs = [];
+  const seenRefs = new Set();
+  for (const cand of [
+    { ref: releaseRef, via: null },
+    ...(opts.autoSync === false ? [] : deriveSyncRefs(repo)),
+    ...(opts.syncRefs ?? []).map((ref) => ({ ref, via: null })),
+  ]) {
+    const full = resolve(cand.ref);
+    if (seenRefs.has(full)) continue;
+    seenRefs.add(full);
+    releaseRefs.push({ ref: full, via: cand.via });
+  }
+  const releases = releaseRefs.map((re) => censusTree(readRefTree(repo, re.ref)));
+  const base = opts.readBase === false ? null : censusTree(readRefTree(repo, BASE_REF));
+  const cmp = compareCensus({ ours, theirs, merged, deletionRows: deletion.rows, releases, base });
+  const failed = cmp.failed || deletion.defects.length > 0;
+  return {
+    refs: { base: BASE_REF, ours: oursRef, theirs: theirsRef, priorSyncTip: PRIOR_SYNC_TIP },
+    releaseRefs,
+    mergedRoot,
+    deletionListPath,
+    deletionRows: deletion.rows,
+    deletionConsumed: deletion.rows.filter((r) => r.cls).length,
+    deletionDefects: deletion.defects,
+    fileCounts: { ours: ours.fileCounts, theirs: theirs.fileCounts, merged: merged.fileCounts },
+    limits: { ours: ours.limits, theirs: theirs.limits, merged: merged.limits },
+    perClass: cmp.perClass,
+    failed,
+    // Raw sets for --json consumers (sorted names with their files).
+    sets: {
+      ours: serializeSets(ours.sets),
+      theirs: serializeSets(theirs.sets),
+      merged: serializeSets(merged.sets),
+      release: releases.length ? serializeSets(releases[0].sets) : null,
+    },
+    contentIdsByPath: {
+      ours: sortedKeys(ours.contentIdsByPath),
+      theirs: sortedKeys(theirs.contentIdsByPath),
+      merged: sortedKeys(merged.contentIdsByPath),
+    },
+  };
+}
+
+function serializeSets(sets) {
+  const out = {};
+  for (const cls of CLASSES) {
+    out[cls] = {};
+    for (const name of sortedKeys(sets[cls])) out[cls][name] = [...sets[cls].get(name)].sort();
+  }
+  return out;
+}
+
+function main() {
+  const opts = parseArgs(process.argv.slice(2));
+  const result = runCensus(opts);
+  process.stdout.write(`${formatReport(result, opts.limit)}\n`);
+  if (opts.json) {
+    fs.writeFileSync(opts.json, JSON.stringify(result, null, 2));
+    process.stdout.write(`json written to ${opts.json}\n`);
+  }
+  process.exitCode = result.failed ? 1 : 0;
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main();
+}

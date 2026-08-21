@@ -7191,3 +7191,134 @@ membership and class-exclusion arms with zero count literals, resolved by
 re-deriving its sorted literal; material_taxonomy_bootstrap.test.ts IS the
 count pin at MATERIAL_ITEM_IDS.size); the 13th file of the conflict class
 is tests/monolith_budget.test.ts, which unit 6 owns.
+
+### Unit 6 predictions (decision 4 as SETTLED 2026-08-20 and AMENDED by 11b's
+### observed counts; written before the monolith suite ran at this tip)
+Parent pins (ceilings) base/ours/theirs, from the 11b baseline block,
+re-confirmed against the refs: hud 19387/19445/19186, renderer
+13744/13546/13774, sim 12660/12650/12232, main 11490/11516/11460, game
+10900/10890/10900, online 5950/5950/5950, music 5470, world 5450, db 4980,
+foliage 4147, colliders 2660. The release sync adds a THIRD parent pin for
+hud.ts: 19487 at f50b30de29 (the release lowered its own 19490 by the
+makeReliquaryTrackerInput extraction; the sync kept ours' 19445 row and
+unit 6 re-pins at the exact merged count).
+Merged wc -l at this tip, with the composition arithmetic: hud 19248 (the
+hand-merged file measured 19251 at 11b, 11c net-zero, the release sync -3);
+renderer 13576 = 13546 + (13774 - 13744), exact; sim 12341 = 12518 + 111 -
+289 + 1 (the one 11c QA comment line); main 11480 = 11490 + 26 - 36,
+exact; game 10761 = 10894 - 32 - 101, exact; online 5967 = 5855 + 47 + 65,
+exact; music 5270, world 5301, db 4865 (= theirs, ours untouched), foliage
+4131, colliders 2590, all sides composing.
+THE ROWS: TWO RECORDED RAISES, renderer.ts 13546 -> 13576 (+30 against
+ours' pin, a FALL of 198 against farming's own 13774; farming's deviation
+(an) raised the same +30 for its farm-visual wiring at the correct seam,
+confirmed thin wiring by the 11b frontend reviewer) and online.ts 5950 ->
+5967 (the fifth-monolith case, ruling 11d-U6-FIFTH: +17 against BOTH
+parents' identical 5950 pins, merge-attributable, base 5855 + ours' 47 +
+farming's 65 composing exactly). Payback for both raises NAMED: Phase 16
+(the packet's polish phase), scoped to merge-attributable growth only.
+TWO FALLS re-pinned at the exact count with the direction recorded: sim.ts
+12650 -> 12341 (the 11b-qa-B8 second-arm row executed: the pin sat 309
+over the file with no comment; the two-extraction history, F14's B7/B8
+ratchet 12249 -> 12235 -> 12232 on farming's side and ours' own 12650, is
+written into the row) and main.ts 11516 -> 11480. hud.ts FALLS 19445 ->
+19248 (both packets' extractions stack; there is no raise and the
+11d-U6-PAYBACK Phase 14 target of "19445 or lower" is ALREADY MET at this
+tip; Phase 14 still may not grow the file back, and the
+professions-module migration counts for nothing, a file move relocating
+zero lines). Every other row keeps its pin with slack under the honesty
+arm's 400: game 129, music 200, world 149, db 115, foliage 16, colliders
+70. Predicted suite outcome after the re-pins: monolith_budget green
+including the honesty arm.
+- Unit 6 OBSERVED: after the re-pins the suite runs 13/13 green including
+  the 400-slack honesty arm; every changed row's observed wc -l equals the
+  predicted count above (hud 19248, renderer 13576, sim 12341, main 11480,
+  online 5967); the raises are exactly the amended decision's set (TWO:
+  renderer.ts, online.ts), the falls re-pinned zero-slack (hud.ts, sim.ts,
+  main.ts), and every other row keeps its pin with sub-400 slack. Committed
+  as the unit 6 commit after the census lands in position 5.
+- Unit 2 bijection (both directions, by count): 67 static scenario name
+  literals + the hit_rating_heroic geared/ungeared ternary pair = 69
+  runtime scenarios == 69 golden files; zero scenarios without a golden,
+  zero goldens without a scenario; farming_session (record index 62) and
+  rift_clear_rewards (record index 67) both land in shard parity_g under
+  SHARD_BOUNDS [0,7,11,13,17,36,37,len]. Composition re-run PASS on the
+  COMMITTED goldens after the unit 2 commit.
+
+### Unit 5: the export and symbol census (the phase's most important deliverable)
+Landed as scripts/merge_audit/symbol_census.mjs (+ .d.mts) with
+docs/prd/masterwrought/merge-deletion-list.md and the fixture suite
+tests/merge_audit_symbol_census.test.ts. THREE-PARENT MODEL: parents = ours
+UNION theirs UNION the release tip f50b30de29 (the Phase 11d STEP 0 sync;
+prior synced tip 65b91fa190), with every later first-parent merge after the
+absorb commit 424ce89a20 contributing its second parent automatically so
+Phase 17 re-runs it flag-free; parent blobs read via git ls-tree plus one
+cat-file --batch per ref, nothing checked out. FINAL RUN at tip 1900e38210,
+exit 0, RESULT PASS:
+- exports: ours 17329 / theirs 16921 / release 17221 / union 17582 / merged
+  17583; MISSING 0; EXTRA 6, ALL explained (WELL_FED_AURA_ID,
+  applyWellFedOnMealComplete, FoodConsuming, DrinkConsuming,
+  ConsumableDefFacts, buildConsuming: exactly the 11c-authored set,
+  predicted six for six); deletion-list hits 5 (the two 11c renames
+  wellfedTooltipLines -> wellFedTooltipLines and
+  applyWellfedOnConsumeComplete -> applyWellFedOnMealComplete, plus the
+  release's TerrainChunk trio renamed by 23b31303ec, theirs-only because
+  theirs predates the whole v0.40.0 line).
+- content ids: 2958 / 2913 / 2810 / union 3061 / merged 3061; MISSING 0;
+  EXTRA 0.
+- i18n keys: 18008 / 17984 / 17866 / union 18161 / merged 18158; MISSING 0;
+  deletion-list hits 3 (the 11c-A4-KEYPAIR pair useWellfed/useWellfedAura;
+  sim.rift.detonateHellfireBrand, a phase 03 QA deletion at 8eef8bf81b that
+  theirs and the release tip still carry, three-way took ours' deletion).
+- SimEvent union 152 / 159 / 152 / 159 merged 159, emits 142 / 148 / 142 /
+  148 merged 148; MISSING 0; EXTRA 0. The union discriminates on `type`,
+  not `kind` (src/sim/types.ts): the phase file's premise corrected in the
+  script's pinned SIM_EVENT_DISCRIMINANT.
+- Floors (guard 2) pinned per parent per class (~10 percent under observed),
+  all printed and holding; blind spots COUNTED every run (export-star 99,
+  non-literal content ids 68, i18n spreads 174, non-literal emits 11).
+- MUTATION GUARD (guard 1), EIGHT scratch-copy runs across the two engineer
+  sessions, each exit 1 reporting exactly its planted deletion and nothing
+  else: castDisplayName (export), WELLFED_STAT_KEYS (export), compost and
+  worn_sword (content ids), itemUi.tooltip.wellFed and wellFedAura (i18n
+  leaves), deedUnlocked and farmPlanted (SimEvent emits). A control run on
+  the unmutated scratch copy passes, so --merged-root itself is proven
+  sound.
+- Deletion-list corrections found by evidence (recorded in rows, not
+  silently): castDisplayName was NOT an export on ours' hud.ts (const
+  arrow), a literal-only relocation row; ours' elixir_tooltip_view.ts DID
+  export wellFedTooltipLines, so the surviving renamed export is by-name
+  ours' and is not EXTRA; the wellfed_<kind> aura ids were a substitution
+  template, never a census literal; the release window 65b91fa190..
+  f50b30de29 deleted NOTHING in any class (affirmatively verified, 9
+  exports and 5 keys added); prog_master_gatherer's 18-locale desc rows
+  recorded literal-only for the release fill; worldEntryGpuSettleCoverMs
+  verified NOT deleted (a dropped import only, the export survives).
+- The fixture suite: 12/12 green, no git, no repo walk; parseDeletionList
+  FAILS the census on a row lacking phase/ruling/reason or saying only
+  "deleted". Biome zero errors; tsc clean.
+INDEPENDENT CROSS-CHECK: the prediction desk re-derived every unit 4 pin
+from the refs without sight of my table and confirmed all of them,
+including the blob estimate (15,716 derived twice independently) and the
+deeds_view hidden-set premise (col_golden_harvest NOT hidden, renown 0
+luck rule only: the phase tasking's "hidden and luck classification"
+clause was half wrong and the prediction was built from the source read).
+Its flags folded here: the scenario counts 67/68/69 in the 11b ledger are
+golden FILE counts (SCENARIOS lengths are 65/66/66/67, the two
+hit_rating_heroic files riding a ternary); farming's sim.ts ratchet
+comment verbatim is the three-extraction narrative ending at 12229 under
+ceiling 12232 (the state.md 11b-qa-B8 row's "12249 -> 12235 -> 12232"
+figures do not appear in farming's file; the unit 6 row comment is worded
+from the verbatim file narrative).
+RELEASE-MERGE AUDIT of e0cf44b111 (two independent runs): CLEAN, both. The
+merged hud.ts carries all 7 release hunks and every branch hunk (cited by
+line in the audit reports); every both-sides file is an exact union; the
+i18n merge was REGENERATED not hand-merged (pending.ts +75 rows, all
+tracker keys, no reorders; no useWellfed key anywhere at the merge);
+injection seams re-bound everywhere (ReliquaryWindowDeps.trackerShown,
+makeReliquaryTrackerInput, BOOL_SETTINGS.showReliquaryTracker); zero new
+endpoints, zero db-mock sites; the 12 reliquary/tracker/architecture
+suites 626 green + 1 skip. Two doc amendments ordered by the audits are
+applied in the unit 7 commit (the phase file's unit 6 figures were
+pre-sync and hud.ts now has a third parent pin 19487; the i18n
+zero-diff note now covers the sync's 5 tracker keys).
