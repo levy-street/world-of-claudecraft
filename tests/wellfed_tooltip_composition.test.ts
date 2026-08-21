@@ -27,6 +27,11 @@ describe('the composed item tooltip carries exactly one Well Fed line', () => {
   it.each(['evergarden_braised_greens', 'stonepot_stew'])('%s', (id) => {
     const html = tooltipHtml(id);
     expect((html.match(/Well Fed: /g) ?? []).length, `${id} renders one Well Fed line`).toBe(1);
+    // And the bare term appears exactly twice, both inside that one line (the
+    // label and the one-at-a-time clause): a second line worded like the
+    // retired aura fallback ("Grants Well Fed for ...") carries no "Well Fed: "
+    // label and would slip the count above, so the bound catches it.
+    expect((html.match(/Well Fed/g) ?? []).length, `${id} names Well Fed exactly twice`).toBe(2);
     // The line is the view's own output, placed restore-adjacent: the
     // sentence directly before it is the sit-down restore line, so the two
     // read in the order the player experiences them.

@@ -96,9 +96,16 @@ function hasHandBuiltConsumingWrite(code: string): number {
 // so the assignment-shaped arm is structurally blind to it. `ticksElapsed:`
 // as an object-literal KEY (not the `ticksElapsed: number` type annotation,
 // excluded by the lookahead) is Consuming's own field and appears in no other
-// src/sim object literal, so counting it counts hand-built records.
+// src/sim object literal, so counting it counts hand-built records. The
+// shorthand spelling (`{ ..., ticksElapsed }`, the key followed by a comma or
+// a closing brace) counts too; a member READ (`c.ticksElapsed`) never does,
+// the lookbehind refuses a dot or a word character before the key. Stated
+// reach: a record built by SPREADING an existing Consuming (`{ ...other,
+// remaining: 5 }`) spells no key at all and escapes both arms; the named
+// defect class was a hand-typed literal, and the builder's own `{ ...base,
+// kind }` idiom still spells the key inside `base`.
 function countConsumingShapedLiterals(code: string): number {
-  return (code.match(/\bticksElapsed\s*:(?!\s*number\b)/g) ?? []).length;
+  return (code.match(/(?<![.\w])ticksElapsed\b\s*(?::(?!\s*number\b)|(?=\s*[,}]))/g) ?? []).length;
 }
 
 describe('the builder is the ONE Consuming writer', () => {
@@ -124,6 +131,10 @@ describe('the builder is the ONE Consuming writer', () => {
     ).toBe(1);
     expect(countConsumingShapedLiterals('function f(ticksElapsed: number) {}')).toBe(0);
     expect(countConsumingShapedLiterals('c.ticksElapsed += 1; fire(c.ticksElapsed);')).toBe(0);
+    // The shorthand property spelling of a hand-built record counts; a member
+    // read passed as an argument does not.
+    expect(countConsumingShapedLiterals('const meal = {\n  itemId,\n  ticksElapsed,\n};')).toBe(1);
+    expect(countConsumingShapedLiterals('fire(c.ticksElapsed, x)')).toBe(0);
   });
 
   it('ITEMS keys equal their def ids (the builder names the meal by def.id)', () => {
@@ -174,7 +185,9 @@ describe('the builder is the ONE Consuming writer', () => {
     // carrying Consuming's own `ticksElapsed:` key across src/sim, outside
     // the builder itself, and pins the count to exactly the two dev freezes
     // in sim.ts. A third hand-built record anywhere in src/sim, however it
-    // is assigned, reds here.
+    // is assigned and whether it spells the key with a colon or as a
+    // shorthand property, reds here (an over-count, say a destructure of the
+    // field, fails toward a false red, the safe direction).
     const shaped: string[] = [];
     for (const f of sourceFilesUnder(join(process.cwd(), 'src', 'sim'))) {
       if (f.file === 'consuming.ts') continue;

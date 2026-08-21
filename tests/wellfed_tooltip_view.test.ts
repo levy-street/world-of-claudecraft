@@ -120,6 +120,18 @@ describe('wellFedTooltipLines', () => {
     expect(wellFedTooltipLines(ITEMS.silverleaf_scroll)).toBe('');
     expect(wellFedTooltipLines(ITEMS.healing_potion)).toBe('');
     expect(wellFedTooltipLines(ITEMS.spring_water)).toBe('');
+    // The KIND gate itself, which the shipped catalog can no longer reach
+    // (only FoodItemDef can spell the field): a drink-shaped record that
+    // smuggles a payload past the type still renders nothing.
+    const smuggled = {
+      id: 'probe_drink',
+      name: 'Probe Drink',
+      kind: 'drink',
+      sellValue: 1,
+      drinkMana: 10,
+      wellFed: { aura: 'Well Fed', kind: 'buff_sta', value: 5, duration: 600 },
+    } as unknown as ItemDef;
+    expect(wellFedTooltipLines(smuggled)).toBe('');
   });
 
   it('an unmapped buff kind falls back to naming the granted aura with both clauses', () => {

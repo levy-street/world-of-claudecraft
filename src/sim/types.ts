@@ -947,7 +947,7 @@ export type ItemKind =
   | 'recipe';
 // One timed flat stat buff, the payload shape shared by the elixir/scroll/flask
 // `elixir` record, the role foods' `wellFed` record, and the meal in flight
-// (Consuming.wellFed). Named once because three copies had grown (the repo's
+// (FoodConsuming.wellFed). Named once because three copies had grown (the repo's
 // rule-of-three threshold); the grant POINT (use vs meal completion) is what
 // makes them different mechanics, never the payload.
 export interface TimedStatBuffPayload {

@@ -1,6 +1,6 @@
 // Well Fed, unified (Masterwrought 11c): the completion-time mint in
 // src/sim/wellfed.ts, hooked from the eat/drink loop in updateRegen
-// (src/sim/combat/auras.ts) on the carried Consuming.wellFed payload. A real
+// (src/sim/combat/auras.ts) on the carried FoodConsuming.wellFed payload. A real
 // Sim is driven through real ticks (the elixir.test.ts construction and
 // use-item idiom): the buff lands only when the 18s sit-restore COMPLETES,
 // an interrupted meal forfeits it, the ONE 'well_fed' aura id makes the
@@ -140,10 +140,13 @@ describe('well fed: completion timing', () => {
     expect(p.eating, 'meal finished').toBeNull();
     const wf = wellFedAuras(p);
     expect(wf.length).toBe(1);
-    // The minted record against LITERALS, every field the mint writes: the
-    // feast-versus-bag identity pin (professions_feast) compares two mints to
-    // each other and cannot see a field that moves on both sides, so the
-    // school and the self-source are anchored here.
+    // The minted record against LITERALS, every field the mint writes TODAY
+    // (a partial match, so a field added to the mint later is unpinned until
+    // it is named here; the id is the helper's own filter key and is pinned
+    // to its literal by the identity pin above): the feast-versus-bag
+    // identity pin (professions_feast) compares two mints to each other and
+    // cannot see a field that moves on both sides, so the school and the
+    // self-source are anchored here.
     expect(wf[0]).toMatchObject({
       id: WELL_FED_AURA_ID,
       name: 'Well Fed',
@@ -176,6 +179,20 @@ describe('well fed: completion timing', () => {
     const { sim, pid, p } = playerWorld();
     eatToCompletion(sim, pid, p, 'vale_hearth_loaf');
     expect(wellFedAuras(p)).toEqual([]);
+  });
+
+  it('a finished drink runs the same completion loop and mints nothing', () => {
+    // updateRegen runs the completion block for BOTH slots and calls the
+    // mint for the drink slot too (with no payload: DrinkConsuming has no
+    // field to carry one), so the sim-level half of the food-only contract
+    // is pinned here through a real gulp, not only at the builder.
+    const { sim, pid, p } = playerWorld();
+    consume(sim, pid, 'spring_water');
+    expect(p.drinking, 'the gulp started').toBeTruthy();
+    tickSeconds(sim, 22);
+    expect(p.drinking, 'the gulp finished').toBeNull();
+    expect(wellFedAuras(p)).toEqual([]);
+    expect(wellFedByName(p)).toEqual([]);
   });
 });
 
@@ -288,6 +305,7 @@ describe('well fed: one food buff at a time (last eaten wins, whole family)', ()
     const wf = wellFedAuras(p);
     expect(wf.length, 'food buffs never stack with each other').toBe(1);
     expect(wf[0].value).toBe(3);
+    expect(wellFedByName(p), 'one Well Fed by name after the overwrite').toHaveLength(1);
   });
 
   it('the three role foods are mutually exclusive: newest kind wins', () => {
@@ -451,25 +469,38 @@ describe('well fed: the retired namespace is gone (the unification landed)', () 
     expect(WELL_FED_AURA_ID.startsWith('elixir')).toBe(false);
     expect(WELL_FED_AURA_ID.includes('_fed')).toBe(true);
 
-    // Needle built from parts so this file's own source cannot match it.
+    // Needle built from parts so this file's own source cannot match it, and
+    // a POSITIVE control (also built from parts) so a mis-built needle can
+    // never turn the negative sweep below into a pass over nothing.
     const needle = new RegExp(`['"\`]${'well'}${'fed'}_`);
+    const retiredId = `${'well'}${'fed'}_buff_sta`;
+    expect(needle.test(`const id = '${retiredId}';`), 'the needle sees a quoted id').toBe(true);
+    expect(needle.test(`id: \`${retiredId}\``), 'the needle sees a template literal').toBe(true);
     const offenders: string[] = [];
     const scanned = { src: 0, scripts: 0, tests: 0 };
+    const nested = { src: 0, scripts: 0, tests: 0 };
     for (const root of ['src', 'scripts', 'tests'] as const) {
       for (const f of sourceFilesUnder(join(process.cwd(), root))) {
         scanned[root]++;
+        if (f.file.includes('/')) nested[root]++;
         const code = stripComments(readFileSync(f.full, 'utf8'));
         if (needle.test(code)) offenders.push(`${root}/${f.file}`);
       }
     }
-    // Non-vacuity floor PER ROOT (tests/CLAUDE.md): an empty walk would make
+    // Non-vacuity floors PER ROOT (tests/CLAUDE.md): an empty walk would make
     // the assertion below pass over nothing at all, and a single total would
     // clear on src/ alone even if scripts/ or tests/ silently dropped out of
-    // the walk (or tests/ collapsed to one level), so each root is floored
-    // near its own real count rather than at 1.
+    // the walk, so each root is floored near its own real count. The tests/
+    // floor sits ABOVE what a single-level collapse of tests/ would leave
+    // (about 2800 of its roughly 3100 files sit flat), and the NESTED counts
+    // pin the recursion directly: a walk that stopped descending reds on its
+    // own line instead of hiding inside a total.
     expect(scanned.src, 'the sweep really walked src/').toBeGreaterThan(1800);
     expect(scanned.scripts, 'the sweep really walked scripts/').toBeGreaterThan(400);
-    expect(scanned.tests, 'the sweep really walked tests/').toBeGreaterThan(2500);
+    expect(scanned.tests, 'the sweep really walked tests/').toBeGreaterThan(3000);
+    expect(nested.src, 'the walk descended under src/').toBeGreaterThan(1500);
+    expect(nested.scripts, 'the walk descended under scripts/').toBeGreaterThan(200);
+    expect(nested.tests, 'the walk descended under tests/').toBeGreaterThan(250);
     expect(offenders, 'files still carrying a wellfed_<kind> id literal').toEqual([]);
   });
 
