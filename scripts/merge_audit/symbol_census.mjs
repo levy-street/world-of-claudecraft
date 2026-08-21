@@ -1824,6 +1824,10 @@ export function formatReport(r, limit = 60) {
       `helper-emitted and are a real blind spot: ${drifted ? 'FAIL, the set DRIFTED' : 'ok, matches the pin'}`,
   );
   L.push(`  ${unionOnly.join(', ') || '-'}`);
+  if (r.emitsOutsideUnion?.length)
+    L.push(
+      `  FAIL emitted kinds that are NOT declared union members (the indirect resolver minted a bogus kind): ${r.emitsOutsideUnion.join(', ')}`,
+    );
   if (unionOnlyDrift.added.length)
     L.push(
       `  FAIL new to the blind spot (a helper-emitted event the census cannot see): ${unionOnlyDrift.added.join(', ')}`,
@@ -1977,11 +1981,22 @@ export function runCensus(opts = {}) {
     added: simEventUnionOnly.filter((n) => !pinnedUnionOnly.has(n)),
     removed: SIM_EVENT_UNION_ONLY.filter((n) => !simEventUnionOnly.includes(n)),
   };
+  // Every emitted kind must be a DECLARED union member. This is the guard on the
+  // indirect resolver above: the plain `emit({ type: ... })` shape reads a literal
+  // at depth 0 of the event object, but the ternary and fanout shapes scan a whole
+  // call region, so in principle a `type:` belonging to some nested non-event
+  // object could mint a bogus kind. Measured today: zero (all 152 emitted kinds
+  // are union members). If one ever appears it fails HERE, naming it, instead of
+  // surfacing as a confusing EXTRA in the emits class.
+  const emitsOutsideUnion = [...merged.sets.simEventEmits.keys()]
+    .filter((name) => !merged.sets.simEventUnion.has(name))
+    .sort();
   const failed =
     cmp.failed ||
     deletion.defects.length > 0 ||
     simEventUnionOnlyDrift.added.length > 0 ||
-    simEventUnionOnlyDrift.removed.length > 0;
+    simEventUnionOnlyDrift.removed.length > 0 ||
+    emitsOutsideUnion.length > 0;
   return {
     refs: { base: BASE_REF, ours: oursRef, theirs: theirsRef, priorSyncTip: PRIOR_SYNC_TIP },
     releaseRefs,
@@ -1995,6 +2010,7 @@ export function runCensus(opts = {}) {
     /** SimEvent types the union declares that the emits extractor never sees. */
     simEventUnionOnly,
     simEventUnionOnlyDrift,
+    emitsOutsideUnion,
     limits: { ours: ours.limits, theirs: theirs.limits, merged: merged.limits },
     perClass: cmp.perClass,
     failed,
