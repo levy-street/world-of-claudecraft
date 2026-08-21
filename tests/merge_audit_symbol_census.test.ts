@@ -6,6 +6,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   CLASSES,
+  censusTree,
+  compareCensus,
   extractContentIds,
   extractExports,
   extractI18nKeys,
@@ -13,6 +15,8 @@ import {
   extractSimEventUnion,
   FLOORS,
   parseDeletionList,
+  SIM_EVENT_UNION_ONLY,
+  simEventVerdict,
 } from '../scripts/merge_audit/symbol_census.mjs';
 
 describe('extractExports', () => {
@@ -139,6 +143,133 @@ describe('extractSimEventEmits', () => {
     expect(res.sites).toBe(3);
     expect(res.nonLiteral).toBe(1);
     expect(res.declarations).toBe(1);
+  });
+
+  // The two INDIRECT shapes (Phase 11d QA). Before these were resolved, four
+  // SimEvent types in src/sim/professions/ reached no class at all, so a hunk
+  // dropping the emit CALL while leaving the union arm and the exported helper
+  // passed the whole census. Both arms below died when the audit disabled the
+  // resolution, which is what makes them the pin for it.
+  it('resolves a fanout helper whose builder returns the event literal', () => {
+    const src = "emitToZonePlayers(ctx, zoneId, (pid) => ({ type: 'masterworkZone', pid }));";
+    expect(extractSimEventEmits(src).kinds).toEqual(['masterworkZone']);
+  });
+
+  it('resolves a ternary of two event literals, collapsing the duplicate kind', () => {
+    const src = [
+      'ctx.emit(',
+      "  withered > 0 ? { type: 'farmReady', ready, withered } : { type: 'farmReady', ready },",
+      ');',
+    ].join('\n');
+    expect(extractSimEventEmits(src).kinds).toEqual(['farmReady']);
+  });
+
+  it('keeps the plain shape precise: a nested type is not a second kind', () => {
+    // The plain path reads its literal at depth 0 of the event object, so an
+    // inner object carrying its own `type` cannot mint one.
+    const src = "ctx.emit({ type: 'levelup', meta: { type: 'innerPlain' } });";
+    expect(extractSimEventEmits(src).kinds).toEqual(['levelup']);
+  });
+});
+
+describe('simEventVerdict: the declared-but-unseen pin and the resolver backstop', () => {
+  // These four lines used to live inside runCensus(), which no test calls, so the
+  // Phase 11d QA pin audit disabled each condition in turn and the suite stayed
+  // green every time. Extracted to a pure function for exactly that reason.
+  const sets = (names: string[]) => new Set(names);
+
+  it('passes when the unseen set matches the pin exactly', () => {
+    const union = sets(['levelup', 'motdResult']);
+    const emits = sets(['levelup']);
+    const v = simEventVerdict(union, emits, ['motdResult']);
+    expect(v.unionOnly).toEqual(['motdResult']);
+    expect(v.drift).toEqual({ added: [], removed: [] });
+    expect(v.failed).toBe(false);
+  });
+
+  it('FAILS on a name ADDED to the blind spot (a new indirection nothing follows)', () => {
+    const union = sets(['levelup', 'motdResult']);
+    // levelup stopped being visible to the emits extractor.
+    const v = simEventVerdict(union, sets([]), ['motdResult']);
+    expect(v.drift.added).toEqual(['levelup']);
+    expect(v.failed).toBe(true);
+  });
+
+  it('FAILS on a name REMOVED from it (it became visible, or stopped being emitted)', () => {
+    const union = sets(['levelup', 'motdResult']);
+    const v = simEventVerdict(union, sets(['levelup', 'motdResult']), ['motdResult']);
+    expect(v.drift.removed).toEqual(['motdResult']);
+    expect(v.failed).toBe(true);
+  });
+
+  it('FAILS on an emitted kind that is not a declared union member', () => {
+    // The backstop on the indirect resolver: the ternary and fanout shapes scan a
+    // whole call region, so a `type:` on a nested non-event object could mint a
+    // bogus kind. It is named here rather than surfacing as a confusing EXTRA.
+    const v = simEventVerdict(sets(['levelup']), sets(['levelup', 'notAnEvent']), []);
+    expect(v.emitsOutsideUnion).toEqual(['notAnEvent']);
+    expect(v.failed).toBe(true);
+  });
+
+  it('pins the shipped list as the server-side set, non-empty and sorted', () => {
+    expect(SIM_EVENT_UNION_ONLY).toEqual([
+      'calendarResult',
+      'deedBroadcast',
+      'guildInvite',
+      'guildInviteCancelled',
+      'guildRenamed',
+      'motdResult',
+      'reliquaryIlluminationBroadcast',
+    ]);
+  });
+});
+
+describe('contentIdRows: the reused-id blind spot the class exists to close', () => {
+  // Phase 11d QA pin audit: the CLASSES.length 5-to-6 pin below covers the class
+  // NAME only. Deleting the row collection, or degrading its key from `file:id`
+  // back to the bare `id`, left every other arm green and silently reopened the
+  // hole. These arms pin the BEHAVIOUR, over the exact shape that produced it:
+  // farm_crops.ts and items.ts both define 'bog_beet'.
+  const CROPS = 'src/sim/content/farm_crops.ts';
+  const ITEMS = 'src/sim/content/items.ts';
+  const tree = (cropRow: string) =>
+    censusTree([
+      [CROPS, `export const FARM_CROPS = [\n  { ${cropRow} },\n];`],
+      [ITEMS, "export const ITEMS = [\n  { id: 'bog_beet' },\n  { id: 'iron_bar' },\n];"],
+    ]);
+
+  it('keys rows by file:id, so one reused id is TWO rows and one bare name', () => {
+    const t = tree("id: 'bog_beet'");
+    // The bare-name class collapses the two definitions into one member...
+    expect([...t.sets.contentIds.keys()].sort()).toEqual(['bog_beet', 'iron_bar']);
+    // ...while the row class keeps them apart. This is the whole difference; a
+    // key degraded to the bare id makes these two assertions the same set.
+    expect([...t.sets.contentIdRows.keys()].sort()).toEqual([
+      `${CROPS}:bog_beet`,
+      `${ITEMS}:bog_beet`,
+      `${ITEMS}:iron_bar`,
+    ]);
+  });
+
+  it('reports a DROPPED row that the bare-name class cannot see', () => {
+    const parent = tree("id: 'bog_beet'");
+    // The merge drops the CROP row; the item row of the same id survives.
+    const merged = tree('id: someVar');
+    const cmp = compareCensus({
+      ours: parent,
+      theirs: parent,
+      merged,
+      deletionRows: [],
+      releases: [],
+      base: null,
+    });
+    // The bare name is still present via items.ts, so the old class is blind...
+    expect(cmp.perClass.contentIds.missing).toEqual([]);
+    // ...and the row class names the exact row that went missing.
+    expect(cmp.perClass.contentIdRows.missing.map((m: { name: string }) => m.name)).toEqual([
+      `${CROPS}:bog_beet`,
+    ]);
+    expect(cmp.failed).toBe(true);
   });
 });
 

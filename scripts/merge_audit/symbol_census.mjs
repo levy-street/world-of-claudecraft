@@ -140,6 +140,36 @@ export const SIM_EVENT_UNION_ONLY = Object.freeze([
   'reliquaryIlluminationBroadcast',
 ]);
 
+/**
+ * The SimEvent verdict, as a PURE function of the two sets plus the pin, so it can
+ * be tested without a git walk. It used to be four lines inside runCensus(), which
+ * no test calls, so the Phase 11d QA pin audit disabled each condition in turn and
+ * the suite stayed green every time. Returns the declared-but-never-emitted set,
+ * its drift against the pin, and any emitted kind that is not a declared union
+ * member (the backstop on the indirect resolver: the plain emit shape reads its
+ * literal at depth 0, but the ternary and fanout shapes scan a whole call region,
+ * so a `type:` on a nested non-event object could in principle mint a bogus kind).
+ *
+ * @param {Map<string, Set<string>>|Set<string>} unionSet declared SimEvent types
+ * @param {Map<string, Set<string>>|Set<string>} emitsSet emitted SimEvent types
+ * @param {readonly string[]} [pinned] the expected declared-but-unseen set
+ */
+export function simEventVerdict(unionSet, emitsSet, pinned = SIM_EVENT_UNION_ONLY) {
+  const unionOnly = [...unionSet.keys()].filter((name) => !emitsSet.has(name)).sort();
+  const pinnedSet = new Set(pinned);
+  const drift = {
+    added: unionOnly.filter((n) => !pinnedSet.has(n)),
+    removed: [...pinned].filter((n) => !unionOnly.includes(n)),
+  };
+  const emitsOutsideUnion = [...emitsSet.keys()].filter((name) => !unionSet.has(name)).sort();
+  return {
+    unionOnly,
+    drift,
+    emitsOutsideUnion,
+    failed: drift.added.length > 0 || drift.removed.length > 0 || emitsOutsideUnion.length > 0,
+  };
+}
+
 export const SOURCE_EXTENSIONS = Object.freeze(['.ts', '.mts', '.cts', '.mjs', '.js', '.cjs']);
 /** Directory segments never walked on either side. */
 export const EXCLUDED_DIR_SEGMENTS = Object.freeze(['node_modules', 'dist']);
@@ -1972,31 +2002,13 @@ export function runCensus(opts = {}) {
   const releases = releaseRefs.map((re) => censusTree(readRefTree(repo, re.ref)));
   const base = opts.readBase === false ? null : censusTree(readRefTree(repo, BASE_REF));
   const cmp = compareCensus({ ours, theirs, merged, deletionRows: deletion.rows, releases, base });
-  // The declared-but-never-emitted set, and its drift against the pin.
-  const simEventUnionOnly = [...merged.sets.simEventUnion.keys()]
-    .filter((name) => !merged.sets.simEventEmits.has(name))
-    .sort();
-  const pinnedUnionOnly = new Set(SIM_EVENT_UNION_ONLY);
-  const simEventUnionOnlyDrift = {
-    added: simEventUnionOnly.filter((n) => !pinnedUnionOnly.has(n)),
-    removed: SIM_EVENT_UNION_ONLY.filter((n) => !simEventUnionOnly.includes(n)),
-  };
-  // Every emitted kind must be a DECLARED union member. This is the guard on the
-  // indirect resolver above: the plain `emit({ type: ... })` shape reads a literal
-  // at depth 0 of the event object, but the ternary and fanout shapes scan a whole
-  // call region, so in principle a `type:` belonging to some nested non-event
-  // object could mint a bogus kind. Measured today: zero (all 152 emitted kinds
-  // are union members). If one ever appears it fails HERE, naming it, instead of
-  // surfacing as a confusing EXTRA in the emits class.
-  const emitsOutsideUnion = [...merged.sets.simEventEmits.keys()]
-    .filter((name) => !merged.sets.simEventUnion.has(name))
-    .sort();
-  const failed =
-    cmp.failed ||
-    deletion.defects.length > 0 ||
-    simEventUnionOnlyDrift.added.length > 0 ||
-    simEventUnionOnlyDrift.removed.length > 0 ||
-    emitsOutsideUnion.length > 0;
+  const simEvent = simEventVerdict(merged.sets.simEventUnion, merged.sets.simEventEmits);
+  const {
+    unionOnly: simEventUnionOnly,
+    drift: simEventUnionOnlyDrift,
+    emitsOutsideUnion,
+  } = simEvent;
+  const failed = cmp.failed || deletion.defects.length > 0 || simEvent.failed;
   return {
     refs: { base: BASE_REF, ours: oursRef, theirs: theirsRef, priorSyncTip: PRIOR_SYNC_TIP },
     releaseRefs,

@@ -548,9 +548,17 @@ describe('harvest journal window: the root div ships in BOTH entries', () => {
   // longer one broken window but a throw that fails the whole HUD boot. Read the
   // real entry HTML, never a fixture (the plant-sheet idiom, mirrored).
   it.each(['index.html', 'play.html'])('%s carries id="harvest-journal-window"', (entry) => {
-    const html = readFileSync(join(process.cwd(), entry), 'utf8');
-    // Exactly once: a duplicate id would make querySelector's pick arbitrary
-    // and a comment-only occurrence would leave the painter with no root.
+    // Comments stripped FIRST, the entry_window_parity idiom: a raw occurrence
+    // count is comment-gameable, so a commented-out div kept the count at 1 and
+    // this pin green while the root was gone (Phase 11d QA pin audit found the
+    // arm vacuous for the exact case its own comment claimed). entry_window_parity
+    // catches only an ASYMMETRIC edit, so with both entries commented out nothing
+    // in the tree red-flagged it.
+    const html = readFileSync(join(process.cwd(), entry), 'utf8').replace(/<!--[\s\S]*?-->/g, '');
+    // Exactly once: a duplicate id would make querySelector's pick arbitrary,
+    // and zero is a TypeError at HUD construction rather than one dead window,
+    // because the root is a CHROME_GUARDED_PANELS entry that wireChromeFocus
+    // resolves through `$` at boot.
     expect(html.split('id="harvest-journal-window"').length - 1).toBe(1);
   });
 });

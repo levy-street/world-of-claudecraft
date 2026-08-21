@@ -20,7 +20,13 @@ export const EXCLUDED_DIR_SEGMENTS: readonly string[];
 export const EXCLUDED_PATH_PREFIXES: readonly string[];
 export const GENERATED_FILE_RE: RegExp;
 
-export type CensusClass = 'exports' | 'contentIds' | 'i18nKeys' | 'simEventUnion' | 'simEventEmits';
+export type CensusClass =
+  | 'exports'
+  | 'contentIds'
+  | 'contentIdRows'
+  | 'i18nKeys'
+  | 'simEventUnion'
+  | 'simEventEmits';
 export const CLASSES: readonly CensusClass[];
 export const CLASS_LABELS: Readonly<Record<CensusClass, string>>;
 export const FLOORS: Readonly<
@@ -124,10 +130,36 @@ export interface CompareArgs {
   releases?: TreeCensus[];
   base?: TreeCensus | null;
 }
+/** One class's comparison result. Only the members the fixture suite reads are
+ *  declared; the report consumes the rest structurally. */
+export interface ClassComparison {
+  missing: Array<{ name: string }>;
+  missingPacket: Array<{ name: string }>;
+  deleted: Array<{ name: string }>;
+  extraExplained: Array<{ name: string }>;
+  extraUnexplained: Array<{ name: string }>;
+  unusedExtras: string[];
+  missingRenameTargets: Array<{ name: string; oldName: string; line: number }>;
+  counts: Record<string, number | number[]>;
+}
 export function compareCensus(args: CompareArgs): {
-  perClass: Record<CensusClass, unknown>;
+  perClass: Record<CensusClass, ClassComparison>;
   failed: boolean;
 };
+
+export interface SimEventVerdict {
+  unionOnly: string[];
+  drift: { added: string[]; removed: string[] };
+  emitsOutsideUnion: string[];
+  failed: boolean;
+}
+export const SIM_EVENT_UNION_ONLY: readonly string[];
+export const SIM_EVENT_FANOUT_HELPERS: ReadonlySet<string>;
+export function simEventVerdict(
+  unionSet: ReadonlySet<string> | ReadonlyMap<string, Set<string>>,
+  emitsSet: ReadonlySet<string> | ReadonlyMap<string, Set<string>>,
+  pinned?: readonly string[],
+): SimEventVerdict;
 
 export function formatReport(report: unknown, limit?: number): string;
 export function parseArgs(argv: string[]): Record<string, unknown>;

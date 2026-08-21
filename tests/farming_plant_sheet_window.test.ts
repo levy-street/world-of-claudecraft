@@ -538,9 +538,14 @@ describe('plant sheet window: the root div ships in BOTH entries', () => {
   // is a runtime throw for every bed press there (the crafting_launcher
   // idiom: read the real entry HTML, never a fixture).
   it.each(['index.html', 'play.html'])('%s carries id="plant-sheet-window"', (entry) => {
-    const html = readFileSync(join(repoRoot, entry), 'utf8');
-    // Exactly once: a duplicate id would make querySelector's pick arbitrary
-    // and a comment-only occurrence would leave the painter with no root.
+    // Comments stripped FIRST (the entry_window_parity idiom): the raw count is
+    // comment-gameable, so a commented-out div kept this green while the root was
+    // gone, which is the opposite of what the line below claimed. Found by the
+    // Phase 11d QA pin audit, on the twin of this pin.
+    const html = readFileSync(join(repoRoot, entry), 'utf8').replace(/<!--[\s\S]*?-->/g, '');
+    // Exactly once: a duplicate id would make querySelector's pick arbitrary,
+    // and zero is a TypeError at HUD construction rather than one dead window,
+    // because the root is a CHROME_GUARDED_PANELS entry wireChromeFocus resolves.
     expect(html.split('id="plant-sheet-window"').length - 1).toBe(1);
   });
 });
