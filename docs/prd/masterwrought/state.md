@@ -7511,3 +7511,11 @@ independent floor re-ran qa-stop, tsc, ci:changed and 19 decisive suites
 (866 tests) at the fix-round tip, all green; its adversarial pass found
 no stale artifact, no untouched conflict-class pin file, no TODO in the
 new scripts, and no doc contradicting the tree.
+- FINAL VALIDATION at the fix-round tip: GATE_MAX_WORKERS=5 node
+  scripts/gate_select.mjs PASS, ALL 12 STEPS GREEN, exit 0 (artifact regen
+  and freshness, sfx conformance, malware scan 0 high, the merged
+  vitest-related leg, tsc, all builds): the FIRST green gate since the
+  absorb began, at exactly the point the phase file named as the first
+  plausible one. ci:changed exit 0 re-run after the last code commit;
+  qa-stop hook exit 0; the composition check and the symbol census PASS at
+  the tip. Phase tip after the QA gate's ledger fold-in: 2551956725.
